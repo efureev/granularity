@@ -50,9 +50,10 @@ const showcaseUnoConfig = readFileSync(
 
 describe('showcase bootstrap config', () => {
   it('настраивает базовые app scripts, включая analyze-режим сборки', () => {
-    expect(showcasePackageJson).toContain('"dev": "vite"')
+    expect(showcasePackageJson).toContain('"dev": "yarn prepare:granularity && vite"')
     expect(showcasePackageJson).toContain('"generate:api": "node ./scripts/generate-component-api.mjs"')
-    expect(showcasePackageJson).toContain('"generate:search": "node ./scripts/generate-showcase-search-index.mjs"')
+    expect(showcasePackageJson).toContain('"generate:search": "yarn prepare:granularity && node ./scripts/generate-showcase-search-index.mjs"')
+    expect(showcasePackageJson).toContain('"prepare:granularity": "yarn workspace @feugene/granularity build"')
     expect(showcasePackageJson).toContain('"build": "yarn generate:api && yarn generate:search && vite build"')
     expect(showcasePackageJson).toContain('"build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze"')
     expect(showcasePackageJson).toContain('"test:run": "yarn generate:api && yarn generate:search && vitest run --config vitest.config.ts"')
