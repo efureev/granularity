@@ -1,0 +1,42 @@
+{
+  "common": {
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "add": "Añadir",
+    "clear": "Limpiar",
+    "close": "Cerrar"
+  },
+  "loading": {
+    "defaultText": "Cargando..."
+  },
+  "treeSelect": {
+    "filterPlaceholder": "Buscar…",
+    "empty": "Sin datos"
+  },
+  "dialog": {
+    "confirm": {
+      "title": "Confirmar"
+    },
+    "prompt": {
+      "title": "Aviso",
+      "label": "Valor",
+      "required": "Introduzca un valor."
+    }
+  },
+  "pagination": {
+    "pageSize": "Tamaño de página",
+    "prev": "Anterior",
+    "next": "Siguiente"
+  },
+  "navbar": {
+    "openMenu": "Abrir menú"
+  },
+  "colors": {
+    "neutral": "Neutral",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "danger": "Peligro",
+    "info": "Info",
+    "primary": "Primario"
+  }
+}

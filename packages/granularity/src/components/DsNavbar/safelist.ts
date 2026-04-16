@@ -1,0 +1,16 @@
+export const dsNavbarSafelist = [
+  'h-[56px]',
+  'border-b',
+  'border-[var(--brd)]',
+  'bg-[var(--bg)]',
+  'flex',
+  'items-center',
+  'justify-between',
+  'px-4',
+  'sm:px-6',
+  'gap-3',
+  'h-4',
+  'w-4',
+  'text-[14px]',
+  'font-700',
+] as const

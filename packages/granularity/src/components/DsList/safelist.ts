@@ -1,0 +1,16 @@
+export const dsListSafelist = [
+  'divide-y',
+  'divide-[var(--brd)]',
+  'px-4',
+  'py-3',
+  'flex',
+  'items-start',
+  'justify-between',
+  'gap-4',
+  'min-w-0',
+  'text-[13px]',
+  'font-700',
+  'ds-muted',
+  'mt-0.5',
+  'shrink-0',
+] as const

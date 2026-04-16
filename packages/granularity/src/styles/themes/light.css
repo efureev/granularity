@@ -1,0 +1,98 @@
+:root {
+  /* Surface roles */
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --card: #ffffff;
+  --card-fg: #0f172a;
+  --popover: #ffffff;
+  --popover-fg: #0f172a;
+  --muted: #f1f5f9;
+  --muted-fg: #64748b;
+  --secondary: #e2e8f0;
+  --secondary-fg: #1e293b;
+  --brd: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #6366f1;
+
+  /* Action roles */
+  --primary: #4f46e5;
+  --primary-fg: #ffffff;
+  --accent: #eef2ff;
+  --accent-fg: #3730a3;
+  --destructive: #dc2626;
+  --destructive-fg: #ffffff;
+
+  /* Status roles */
+  --ds-success: #10b981;
+  --ds-success-light: #d1fae5;
+  --ds-success-fg: #ffffff;
+  --ds-success-text: #065f46;
+  --ds-warning: #f97316;
+  --ds-warning-light: #ffedd5;
+  --ds-warning-fg: #ffffff;
+  --ds-warning-text: #7c2d12;
+  --ds-danger: #dc2626;
+  --ds-danger-light: #fee2e2;
+  --ds-danger-fg: #ffffff;
+  --ds-danger-text: #991b1b;
+  --ds-info: #5850ec;
+  --ds-info-light: #e0e7ff;
+  --ds-info-fg: #ffffff;
+  --ds-info-text: #3730a3;
+  --ds-slate: #475569;
+  --ds-slate-light: #e2e8f0;
+  --ds-slate-fg: #ffffff;
+  --ds-slate-text: #334155;
+  --ds-azure: #0ea5e9;
+  --ds-azure-light: #e0f2fe;
+  --ds-azure-fg: #ffffff;
+  --ds-azure-text: #075985;
+
+  /* Data visualization roles */
+  --chart-1: #4f46e5;
+  --chart-2: #10b981;
+  --chart-3: #f97316;
+  --chart-4: #6366f1;
+  --chart-5: #8b5cf6;
+
+  /* Navigation roles */
+  --sidebar: #ffffff;
+  --sidebar-fg: #0f172a;
+  --sidebar-primary: #4f46e5;
+  --sidebar-primary-fg: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-fg: #1e293b;
+  --sidebar-brd: #e2e8f0;
+  --sidebar-ring: #6366f1;
+}
+
+@supports not (color: color-mix(in srgb, #000 50%, #fff)) {
+  :root {
+    /* Action role fallbacks */
+    --primary-hover: #4a42d6;
+    --primary-active: #453ec7;
+    --secondary-hover: #d1d7e0;
+    --secondary-active: #c0c7d0;
+    --brd-hover: #a3a9b5;
+    --brd-active: #838a97;
+    --destructive-hover: #cc2526;
+    --destructive-active: #bb2427;
+
+    /* Status role fallbacks */
+    --ds-success-hover: #10ac7a;
+    --ds-success-active: #109f73;
+    --ds-warning-hover: #e66c18;
+    --ds-warning-active: #d46419;
+    --ds-danger-hover: #cc2526;
+    --ds-danger-active: #bb2427;
+    --ds-info-hover: #5c60e1;
+    --ds-info-active: #5659d1;
+    --ds-slate-hover: #435062;
+    --ds-slate-active: #3d4a5b;
+    --ds-azure-hover: #0284c7;
+    --ds-azure-active: #0369a1;
+
+    /* Component semantic fallbacks */
+    --ds-category-tree-branch-line-active-color: #c4cdf7;
+  }
+}

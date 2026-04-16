@@ -1,0 +1,100 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
+  "name": "@feugene/granularity",
+  "version": "0.1.0",
+  "framework": "vue",
+  "js-types-syntax": "typescript",
+  "description-markup": "markdown",
+  "contributions": {
+    "html": {
+      "vue-components": [
+        {
+          "name": "DsButton",
+          "source": {
+            "module": "@feugene/granularity/components/DsButton",
+            "symbol": "DsButton"
+          },
+          "props": [
+            {
+              "name": "variant",
+              "required": false,
+              "value": {
+                "kind": "plain",
+                "type": "'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-border'"
+              },
+              "type": {
+                "module": "@feugene/granularity/components/DsButton",
+                "name": "DsButtonVariant"
+              }
+            },
+            {
+              "name": "tone",
+              "required": false,
+              "value": {
+                "kind": "plain",
+                "type": "'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'"
+              },
+              "type": {
+                "module": "@feugene/granularity/components/DsButton",
+                "name": "DsButtonTone"
+              }
+            },
+            {
+              "name": "size",
+              "required": false,
+              "type": {
+                "module": "@feugene/granularity/components/DsButton",
+                "name": "DsButtonSize"
+              }
+            },
+            {
+              "name": "loading",
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "name": "disabled",
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "name": "square",
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "name": "type",
+              "required": false,
+              "type": "'button' | 'submit' | 'reset'"
+            },
+            {
+              "name": "ariaLabel",
+              "required": false,
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "vue-directives": [
+        {
+          "name": "autofocus"
+        },
+        {
+          "name": "autosize"
+        },
+        {
+          "name": "click-outside"
+        },
+        {
+          "name": "dropzone"
+        },
+        {
+          "name": "hotkey"
+        },
+        {
+          "name": "loading"
+        }
+      ]
+    }
+  }
+}

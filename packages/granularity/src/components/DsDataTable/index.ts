@@ -1,0 +1,5 @@
+export { default } from './DsDataTable.vue'
+export { default as DsDataTable } from './DsDataTable.vue'
+export type { DsDataColumn } from './DsDataTable.vue'
+export { dsDataTableConfig } from './config'
+export { dsDataTableSafelist } from './safelist'

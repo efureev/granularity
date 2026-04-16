@@ -1,0 +1,1 @@
+export { dsBadgeSafelist } from './dsBadgeStyles'

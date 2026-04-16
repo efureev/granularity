@@ -1,0 +1,5 @@
+export { default } from './DsFormFile.vue'
+export { default as DsFormFile } from './DsFormFile.vue'
+export { dsFormFileConfig } from './config'
+export { dsFormFileSafelist } from './safelist'
+export type { DsFormFileError } from './DsFormFile.vue'

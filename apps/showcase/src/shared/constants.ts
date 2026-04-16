@@ -1,0 +1,1 @@
+export const SHOWCASE_SOURCE_PATH = '/apps/showcase/src'

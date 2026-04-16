@@ -1,0 +1,8 @@
+/dist
+yarn.lock
+/node_modules
+/.idea
+/coverage
+junit-report.xml
+.env
+.eslintcache

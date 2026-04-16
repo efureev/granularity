@@ -1,0 +1,4 @@
+export { default } from './DsLoading.vue'
+export { default as DsLoading } from './DsLoading.vue'
+export { dsLoadingConfig } from './config'
+export { dsLoadingSafelist } from './safelist'

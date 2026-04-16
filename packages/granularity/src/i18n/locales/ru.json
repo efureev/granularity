@@ -1,0 +1,42 @@
+{
+  "common": {
+    "confirm": "Подтвердить",
+    "cancel": "Отмена",
+    "add": "Добавить",
+    "clear": "Очистить",
+    "close": "Закрыть"
+  },
+  "loading": {
+    "defaultText": "Загрузка..."
+  },
+  "treeSelect": {
+    "filterPlaceholder": "Поиск…",
+    "empty": "Нет данных"
+  },
+  "dialog": {
+    "confirm": {
+      "title": "Подтверждение"
+    },
+    "prompt": {
+      "title": "Введите значение",
+      "label": "Значение",
+      "required": "Введите значение."
+    }
+  },
+  "pagination": {
+    "pageSize": "Размер страницы",
+    "prev": "Назад",
+    "next": "Вперёд"
+  },
+  "navbar": {
+    "openMenu": "Открыть меню"
+  },
+  "colors": {
+    "neutral": "Нейтральный",
+    "success": "Успех",
+    "warning": "Предупреждение",
+    "danger": "Опасность",
+    "info": "Инфо",
+    "primary": "Primary"
+  }
+}

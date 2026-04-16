@@ -1,0 +1,54 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+import {
+  DsFileUpload,
+  acceptValidator,
+  maxSizeMbValidator,
+} from '@feugene/granularity'
+
+const lastResult = ref('No uploads yet')
+
+async function request(files: File[], ctx: { extraData?: Record<string, string> }) {
+  await new Promise(resolve => window.setTimeout(resolve, 250))
+
+  return {
+    count: files.length,
+    names: files.map(file => file.name),
+    extraData: ctx.extraData,
+  }
+}
+
+function onSuccess(payload: { count: number; names: string[]; extraData?: Record<string, string> }) {
+  lastResult.value = `uploaded ${payload.count} file(s): ${payload.names.join(', ') || '—'} · bucket=${payload.extraData?.bucket ?? 'n/a'}`
+}
+
+function onError(error: unknown) {
+  lastResult.value = error instanceof Error ? error.message : String(error)
+}
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <DsFileUpload
+      :request="request"
+      :validators="[acceptValidator('image/*,.pdf'), maxSizeMbValidator(2)]"
+      :upload-extra-data="() => ({ bucket: 'showcase' })"
+      show-file-list
+      @success="onSuccess"
+      @error="onError"
+    >
+      <template #label>
+        Upload a file for validation demo
+      </template>
+
+      <template #tip>
+        image/* or .pdf · max 2 Mb
+      </template>
+    </DsFileUpload>
+
+    <div class="text-sm text-[var(--muted-fg)]">
+      {{ lastResult }}
+    </div>
+  </div>
+</template>

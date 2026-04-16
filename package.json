@@ -1,0 +1,22 @@
+{
+  "name": "@feugene/granularity-workspace",
+  "private": true,
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "yarn build:granularity && yarn build:playground",
+    "build:granularity": "yarn workspace @feugene/granularity build",
+    "build:playground": "yarn workspace @feugene/granularity-playground build",
+    "build:showcase": "yarn workspace @feugene/granularity-showcase build",
+    "build:playground-empty": "yarn workspace @feugene/granularity-playground-empty build",
+    "dev:playground": "yarn workspace @feugene/granularity-playground dev",
+    "dev:showcase": "yarn workspace @feugene/granularity-showcase dev",
+    "test": "yarn test:granularity && yarn test:playground",
+    "test:granularity": "yarn workspace @feugene/granularity test:run",
+    "test:playground": "yarn workspace @feugene/granularity-playground test:run",
+    "test:showcase": "yarn workspace @feugene/granularity-showcase test:run"
+  }
+}

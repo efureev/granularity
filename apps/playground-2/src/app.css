@@ -1,0 +1,142 @@
+:root {
+  color: var(--fg);
+  background: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+  --bundle-accent-rgb: 124, 58, 237;
+}
+
+body {
+  margin: 0;
+  font-family: var(--ds-font-ui);
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  padding: 28px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7c3aed;
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.muted {
+  margin: 0;
+  color: #475569;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.bundle-summary {
+  gap: 20px;
+}
+
+.bundle-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bundle-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.bundle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.bundle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(var(--bundle-accent-rgb), 0.16);
+  background: linear-gradient(180deg, rgba(var(--bundle-accent-rgb), 0.08) 0%, rgba(255, 255, 255, 0.96) 100%);
+}
+
+.bundle-name {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--bundle-accent-rgb));
+}
+
+.bundle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bundle-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bundle-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.bundle-value,
+.bundle-subvalue {
+  margin: 0;
+}
+
+.bundle-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.bundle-subvalue {
+  font-size: 13px;
+  color: #475569;
+}

@@ -1,0 +1,133 @@
+{
+  "header": {
+    "subtitle": "Витрина пакета компонентов",
+    "openNavigation": "Открыть навигацию",
+    "languageLabel": "Язык",
+    "searchLabel": "Быстрый поиск",
+    "navigationLabel": "Навигация",
+    "contextNavigationLabel": "Контекстная навигация"
+  },
+  "groups": {
+    "actions": "Действия",
+    "feedback": "Обратная связь",
+    "navigation": "Навигация",
+    "overlays": "Оверлеи",
+    "forms": "Формы",
+    "data": "Отображение данных",
+    "misc": "Разное",
+    "runtime": "Рантайм",
+    "validation": "Валидация",
+    "general": "Общее"
+  },
+  "pages": {
+    "overview": {
+      "title": "Обзор",
+      "shortTitle": "Обзор",
+      "eyebrow": "Showcase / Обзор",
+      "description": "Лендинг витрины с позиционированием showcase, быстрым стартом по интеграции и картой следующих этапов наполнения."
+    },
+    "foundations": {
+      "title": "Foundation",
+      "shortTitle": "Foundation",
+      "eyebrow": "Showcase / Foundation",
+      "description": "Базовая onboarding-документация: сценарии установки, слои стилей, темы, токены, UnoCSS и локализация.",
+      "sections": {
+        "installation": {
+          "title": "Сценарии установки"
+        },
+        "styling": {
+          "title": "Стили, темы и токены"
+        },
+        "unocss": {
+          "title": "UnoCSS и локализация"
+        }
+      }
+    },
+    "components": {
+      "title": "Компоненты",
+      "shortTitle": "Компоненты",
+      "eyebrow": "Showcase / Компоненты",
+      "description": "Каталог компонентных страниц с поиском, группировкой и отдельной витриной на каждый публичный компонент пакета."
+    },
+    "directives": {
+      "title": "Директивы",
+      "shortTitle": "Директивы",
+      "eyebrow": "Showcase / Директивы",
+      "description": "Раздел для публичных директив и `createLoading` с реальными интерактивными сценариями."
+    },
+    "composables": {
+      "title": "Композаблы",
+      "shortTitle": "Композаблы",
+      "eyebrow": "Showcase / Композаблы",
+      "description": "Страницы для `useTheme` и `useToast` с runnable-рецептами интеграции."
+    },
+    "utilities": {
+      "title": "Утилиты",
+      "shortTitle": "Утилиты",
+      "eyebrow": "Showcase / Утилиты",
+      "description": "Раздел для package-level утилит, начиная с `fileValidation` и прикладных сценариев использования."
+    }
+  },
+  "componentsPage": {
+    "heroTitle": "Каталог компонентов",
+    "heroDescription": "Ищите компоненты по названию и группе, а затем переходите к detail page без лишнего служебного шума.",
+    "catalogTitle": "Каталог компонентов",
+    "catalogDescription": "Компонентов с примерами:",
+    "searchLabel": "Поиск компонентов",
+    "searchPlaceholder": "Например: button, form, overlay",
+    "emptyState": "По текущему запросу компоненты не найдены. Попробуйте искать по имени (`DsButton`) или группе (`forms`, `overlays`)."
+  },
+  "packageCatalog": {
+    "titleSuffix": "каталог",
+    "heroDescription": "Здесь можно быстро найти нужную сущность и перейти к её detail page.",
+    "searchLabel": "Поиск по каталогу",
+    "searchPlaceholder": "Фильтруйте по имени или summary",
+    "itemsCount": "элементов",
+    "openDetailPage": "Открыть detail page",
+    "emptyState": "По текущему запросу ничего не найдено. Попробуйте поискать по export name или группе."
+  },
+  "foundationsPage": {
+    "heroTitle": "Foundation собирает установку, темы и базовые настройки в одном понятном разделе.",
+    "heroDescription": "Здесь собраны только полезные шаги для старта: установка, подключение стилей и ключевые рекомендации по интеграции.",
+    "installationTitle": "Установка",
+    "installPackageTitle": "Установить пакет",
+    "quickStartTitle": "Карта быстрого старта",
+    "quickStartDescription": "Выберите подходящий сценарий подключения: от простого импорта до `UnoCSS` preset.",
+    "preferredMethod": "Предпочтительный способ",
+    "keyPointsTitle": "Что важно понять",
+    "recommendationsTitle": "Практические рекомендации",
+    "connectedDocExcerptTitle": "Подключённый фрагмент документации",
+    "currentTokenRegistryTitle": "Текущий реестр токенов",
+    "currentTokenRegistryDescription": "Таблица собирается из актуального `packages/granularity/src/styles/tokens.css`, поэтому отражает текущий набор foundation tokens в пакете.",
+    "tokensCount": "токенов",
+    "expandSection": "Развернуть",
+    "collapseSection": "Свернуть",
+    "currentThemeRegistryTitle": "Текущий реестр theme-токенов",
+    "currentThemeRegistryDescription": "Таблица показывает semantic theme tokens из актуальных `light.css` и `dark.css`.",
+    "themeLabel": "Тема:",
+    "theme": {
+      "light": "светлая",
+      "dark": "тёмная"
+    },
+    "table": {
+      "token": "Токен",
+      "value": "Цвет / значение",
+      "description": "Описание",
+      "source": "Источник"
+    }
+  },
+  "search": {
+    "open": "Открыть поиск",
+    "summary": "Ищите страницы, сущности и section anchors по названию, alias и контексту использования.",
+    "placeholder": "Например: DsButton, file validation, useTheme",
+    "noResults": "Ничего не найдено. Попробуйте имя сущности, export name, тип (`component`, `utility`) или section-title.",
+    "openComponents": "Открыть components",
+    "openUtilities": "Открыть utilities"
+  },
+  "theme": {
+    "toggle": "Переключить тему"
+  },
+  "navigation": {
+    "close": "Закрыть навигацию"
+  }
+}

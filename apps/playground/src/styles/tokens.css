@@ -1,0 +1,7 @@
+:root {
+    --ds-font-ui: InterVar, system-ui, sans-serif;
+    --ds-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --ds-space-4: 18px;
+    --ds-space-6: 28px;
+    --ds-radius-md: 10px;
+}

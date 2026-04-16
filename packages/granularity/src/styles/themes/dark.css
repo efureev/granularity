@@ -1,0 +1,102 @@
+.theme-dark,
+.dark,
+[data-theme='dark'] {
+  /* Surface roles */
+  --bg: #0f172a;
+  --fg: #f8fafc;
+  --card: #1e293b;
+  --card-fg: #f8fafc;
+  --popover: #1e293b;
+  --popover-fg: #f8fafc;
+  --muted: #334155;
+  --muted-fg: #94a3b8;
+  --secondary: #334155;
+  --secondary-fg: #f1f5f9;
+  --brd: #334155;
+  --input: #334155;
+  --ring: #818cf8;
+
+  /* Action roles */
+  --primary: #6366f1;
+  --primary-fg: #ffffff;
+  --accent: #1e1b4b;
+  --accent-fg: #c7d2fe;
+  --destructive: #ef4444;
+  --destructive-fg: #ffffff;
+
+  /* Status roles */
+  --ds-success: #34d399;
+  --ds-success-light: #064e3b;
+  --ds-success-fg: #0f172a;
+  --ds-success-text: #6ee7b7;
+  --ds-warning: #fb923c;
+  --ds-warning-light: #7c2d12;
+  --ds-warning-fg: #0f172a;
+  --ds-warning-text: #fdba74;
+  --ds-danger: #f87171;
+  --ds-danger-light: #7f1d1d;
+  --ds-danger-fg: #0f172a;
+  --ds-danger-text: #fca5a5;
+  --ds-info: #818cf8;
+  --ds-info-light: #312e81;
+  --ds-info-fg: #0f172a;
+  --ds-info-text: #c7d2fe;
+  --ds-slate: #94a3b8;
+  --ds-slate-light: #334155;
+  --ds-slate-fg: #0f172a;
+  --ds-slate-text: #cbd5e1;
+  --ds-azure: #38bdf8;
+  --ds-azure-light: #0c4a6e;
+  --ds-azure-fg: #0f172a;
+  --ds-azure-text: #bae6fd;
+
+  /* Data visualization roles */
+  --chart-1: #6366f1;
+  --chart-2: #34d399;
+  --chart-3: #fb923c;
+  --chart-4: #818cf8;
+  --chart-5: #a78bfa;
+
+  /* Navigation roles */
+  --sidebar: #1e293b;
+  --sidebar-fg: #f8fafc;
+  --sidebar-primary: #6366f1;
+  --sidebar-primary-fg: #ffffff;
+  --sidebar-accent: #334155;
+  --sidebar-accent-fg: #f1f5f9;
+  --sidebar-brd: #334155;
+  --sidebar-ring: #818cf8;
+}
+
+@supports not (color: color-mix(in srgb, #000 50%, #fff)) {
+  .theme-dark,
+  .dark,
+  [data-theme='dark'] {
+    /* Action role fallbacks */
+    --primary-hover: #6f72f2;
+    --primary-active: #7b7ef3;
+    --secondary-hover: #435062;
+    --secondary-active: #535f70;
+    --brd-hover: #6e7987;
+    --brd-active: #8c94a0;
+    --destructive-hover: #f05353;
+    --destructive-active: #f06161;
+
+    /* Status role fallbacks */
+    --ds-success-hover: #44d6a1;
+    --ds-success-active: #53d9a9;
+    --ds-warning-hover: #fb9a4b;
+    --ds-warning-active: #fba35b;
+    --ds-danger-hover: #f87c7c;
+    --ds-danger-active: #f88787;
+    --ds-info-hover: #8b95f8;
+    --ds-info-active: #949ef9;
+    --ds-slate-hover: #9faec0;
+    --ds-slate-active: #aab7c8;
+    --ds-azure-hover: #4bc3f9;
+    --ds-azure-active: #5dcbf9;
+
+    /* Component semantic fallbacks */
+    --ds-category-tree-branch-line-active-color: #505b8c;
+  }
+}

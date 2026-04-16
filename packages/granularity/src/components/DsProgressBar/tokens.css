@@ -1,0 +1,23 @@
+:root {
+  --pb-bg: var(--primary);
+  --pb-neutral-bg: var(--secondary);
+  --pb-success-bg: var(--ds-success);
+  --pb-warning-bg: var(--ds-warning);
+  --pb-danger-bg: var(--ds-danger);
+  --pb-info-bg: var(--ds-info);
+  --pb-slate-bg: var(--ds-slate);
+  --pb-azure-bg: var(--ds-azure);
+}
+
+.theme-dark,
+.dark,
+[data-theme='dark'] {
+  --pb-bg: var(--primary);
+  --pb-neutral-bg: var(--secondary);
+  --pb-success-bg: var(--ds-success);
+  --pb-warning-bg: var(--ds-warning);
+  --pb-danger-bg: var(--ds-danger);
+  --pb-info-bg: var(--ds-info);
+  --pb-slate-bg: var(--ds-slate);
+  --pb-azure-bg: var(--ds-azure);
+}

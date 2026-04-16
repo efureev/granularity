@@ -1,0 +1,7 @@
+{
+  "Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers": "Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers.",
+  "Loading automatically disables the button and helps prevent repeated submit actions in async scenarios": "Loading automatically disables the button and helps prevent repeated submit actions in async scenarios.",
+  "Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events": "Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events.",
+  "Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy": "Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy.",
+  "Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario": "Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario."
+}

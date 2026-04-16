@@ -1,0 +1,133 @@
+{
+  "header": {
+    "subtitle": "Component package showcase",
+    "openNavigation": "Open navigation",
+    "languageLabel": "Language",
+    "searchLabel": "Quick search",
+    "navigationLabel": "Navigation",
+    "contextNavigationLabel": "Context navigation"
+  },
+  "groups": {
+    "actions": "Actions",
+    "feedback": "Feedback",
+    "navigation": "Navigation",
+    "overlays": "Overlays",
+    "forms": "Forms",
+    "data": "Data display",
+    "misc": "Miscellaneous",
+    "runtime": "Runtime",
+    "validation": "Validation",
+    "general": "General"
+  },
+  "pages": {
+    "overview": {
+      "title": "Overview",
+      "shortTitle": "Overview",
+      "eyebrow": "Showcase / Overview",
+      "description": "Showcase landing page with positioning, quick integration guidance, and the next content stages."
+    },
+    "foundations": {
+      "title": "Foundations",
+      "shortTitle": "Foundations",
+      "eyebrow": "Showcase / Foundations",
+      "description": "Core onboarding docs: installation paths, styling layers, themes, tokens, UnoCSS, and localization.",
+      "sections": {
+        "installation": {
+          "title": "Installation paths"
+        },
+        "styling": {
+          "title": "Styling, themes and tokens"
+        },
+        "unocss": {
+          "title": "UnoCSS and localization"
+        }
+      }
+    },
+    "components": {
+      "title": "Components",
+      "shortTitle": "Components",
+      "eyebrow": "Showcase / Components",
+      "description": "A component catalog with search, grouping, and a dedicated page for each public package component."
+    },
+    "directives": {
+      "title": "Directives",
+      "shortTitle": "Directives",
+      "eyebrow": "Showcase / Directives",
+      "description": "A section for public directives and `createLoading` with real interactive scenarios."
+    },
+    "composables": {
+      "title": "Composables",
+      "shortTitle": "Composables",
+      "eyebrow": "Showcase / Composables",
+      "description": "Pages for `useTheme` and `useToast` with runnable integration recipes."
+    },
+    "utilities": {
+      "title": "Utilities",
+      "shortTitle": "Utilities",
+      "eyebrow": "Showcase / Utilities",
+      "description": "A section for package-level utilities starting with `fileValidation` and applied usage scenarios."
+    }
+  },
+  "componentsPage": {
+    "heroTitle": "Component catalog",
+    "heroDescription": "Search components by name and group, then jump to the detail page without extra noise.",
+    "catalogTitle": "Component catalog",
+    "catalogDescription": "Components with examples:",
+    "searchLabel": "Search components",
+    "searchPlaceholder": "For example: button, form, overlay",
+    "emptyState": "No components matched the current query. Try a component name (`DsButton`) or a group (`forms`, `overlays`)."
+  },
+  "packageCatalog": {
+    "titleSuffix": "catalog",
+    "heroDescription": "Here you can quickly find the required entity and open its detail page.",
+    "searchLabel": "Search catalog",
+    "searchPlaceholder": "Filter by name or summary",
+    "itemsCount": "items",
+    "openDetailPage": "Open detail page",
+    "emptyState": "Nothing matched the current query. Try searching by export name or group."
+  },
+  "foundationsPage": {
+    "heroTitle": "Foundations brings installation, themes, and core setup together in one clear section.",
+    "heroDescription": "Only the steps that matter for getting started are collected here: installation, style wiring, and key integration notes.",
+    "installationTitle": "Installation",
+    "installPackageTitle": "Install package",
+    "quickStartTitle": "Quick-start map",
+    "quickStartDescription": "Choose the integration path that fits your app: from a simple import to an `UnoCSS` preset.",
+    "preferredMethod": "Preferred method",
+    "keyPointsTitle": "What matters most",
+    "recommendationsTitle": "Practical recommendations",
+    "connectedDocExcerptTitle": "Connected doc excerpt",
+    "currentTokenRegistryTitle": "Current token registry",
+    "currentTokenRegistryDescription": "This table is built from the current `packages/granularity/src/styles/tokens.css`, so it reflects the actual foundation tokens in the package.",
+    "tokensCount": "tokens",
+    "expandSection": "Expand",
+    "collapseSection": "Collapse",
+    "currentThemeRegistryTitle": "Current theme token registry",
+    "currentThemeRegistryDescription": "The table shows semantic theme tokens from the current `light.css` and `dark.css` files.",
+    "themeLabel": "Theme:",
+    "theme": {
+      "light": "light",
+      "dark": "dark"
+    },
+    "table": {
+      "token": "Token",
+      "value": "Color / value",
+      "description": "Description",
+      "source": "Source"
+    }
+  },
+  "search": {
+    "open": "Open search",
+    "summary": "Search pages, entities, and section anchors by title, alias, and usage context.",
+    "placeholder": "For example: DsButton, file validation, useTheme",
+    "noResults": "Nothing found. Try an entity name, export name, type (`component`, `utility`), or section title.",
+    "openComponents": "Open components",
+    "openUtilities": "Open utilities"
+  },
+  "theme": {
+    "toggle": "Toggle theme"
+  },
+  "navigation": {
+    "close": "Close navigation"
+  }
+}

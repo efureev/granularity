@@ -1,0 +1,131 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  packages: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 22, 24 ]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test package
+        run: yarn test:granularity
+
+      - name: Test showcase
+        run: yarn test:showcase
+
+      - name: Build package
+        run: yarn build:granularity
+
+      - name: Build showcase
+        run: yarn build:showcase
+
+      - name: Upload dist
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist/
+
+      - name: Upload showcase
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v7
+        with:
+          name: showcase-dist
+          path: apps/showcase/dist/
+
+  deploy-showcase:
+    needs:
+      - build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download showcase dist
+        uses: actions/download-artifact@v8
+        with:
+          name: showcase-dist
+          path: showcase-dist
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: showcase-dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+  publish:
+    needs:
+      - build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download dist
+        uses: actions/download-artifact@v6
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Publish to NPM
+        run: npm publish --access public
+        working-directory: packages/granularity
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Setup for GitHub Packages
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Publish to GitHub Packages
+        run: |
+          # У GitHub Packages имя пакета (scope) должно совпадать с владельцем репозитория (efureev)
+          # Чтобы не менять основной package.json, временно меняем имя перед публикацией в GPR
+          sed -i 's/"name": "@feugene\/granularity"/"name": "@efureev\/granularity"/' package.json
+          npm publish --ignore-scripts
+        working-directory: packages/granularity
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

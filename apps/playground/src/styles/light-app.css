@@ -1,0 +1,24 @@
+:root {
+  /* Slate Neutrals */
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --card: #ffffff;
+  --card-fg: #0f172a;
+  --popover: #ffffff;
+  --popover-fg: #0f172a;
+  --muted: #f1f5f9;
+  --muted-fg: #64748b;
+  --secondary: #e2e8f0;
+  --secondary-fg: #1e293b;
+  --brd: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #6366f1;
+
+  /* Indigo / Deep Accents */
+  --primary: #e546bd;
+  --primary-fg: #ffffff;
+  --accent: #eef2ff;
+  --accent-fg: #3730a3;
+  --destructive: #dc2626;
+  --destructive-fg: #ffffff;
+}
