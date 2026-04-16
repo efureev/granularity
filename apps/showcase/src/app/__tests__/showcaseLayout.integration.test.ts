@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
+import { initThemeEarly } from '@feugene/granularity'
+
 import App from '../../App.vue'
 import { setupShowcaseI18n } from '../../i18n'
 import ShowcaseLayout from '../../layouts/ShowcaseLayout.vue'
@@ -104,12 +106,14 @@ describe('showcase layout integration', () => {
       removeListener: vi.fn(),
       dispatchEvent: vi.fn(),
     })))
+
+    initThemeEarly()
   })
 
   it('рендерит breadcrumbs и doc sections для component detail route', async () => {
     const { wrapper } = await mountShowcaseAt('/components/ds-button')
 
-    expect(wrapper.text()).toContain('Components')
+    expect(wrapper.text()).toContain('Компоненты')
     expect(wrapper.text()).toContain('DsButton')
     expect(wrapper.text()).toContain('Live examples')
     expect(wrapper.text()).toContain('API')
@@ -180,14 +184,14 @@ describe('showcase layout integration', () => {
     expect(wrapper.text()).toContain('Навигация')
     expect(wrapper.text()).toContain('Контекстная навигация')
     expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Actions')
+    expect(wrapper.text()).toContain('Действия')
     expect(wrapper.text()).toContain('DsButtonGroup')
 
     await router.push('/utilities')
     await flushPromises()
 
     expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Utilities catalog')
+    expect(wrapper.text()).toContain('Утилиты каталог')
   })
 
   it('открывает quick search как CSS-sized панель с внутренним скроллом результатов', async () => {

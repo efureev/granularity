@@ -20,6 +20,8 @@ const showcaseMainEntry = readFileSync(
   'utf8',
 )
 
+const normalizedShowcaseMainEntry = showcaseMainEntry.replace(/\s+/g, ' ')
+
 const showcaseI18nEntryPath = fileURLToPath(new URL('../i18n/index.ts', import.meta.url))
 const showcaseI18nMessagesPath = fileURLToPath(new URL('../i18n/messages.ts', import.meta.url))
 
@@ -66,13 +68,13 @@ describe('showcase bootstrap config', () => {
   it('подключает reset, uno runtime и раннюю инициализацию темы без legacy-зависимостей', () => {
     expect(showcaseMainEntry).toContain("import '@unocss/reset/tailwind-compat.css'")
     expect(showcaseMainEntry).toContain("import 'virtual:uno.css'")
-    expect(showcaseMainEntry).toContain("import { initThemeEarly } from '@feugene/granularity'")
-    expect(showcaseMainEntry).toContain("import { setupShowcaseI18n } from './i18n'")
-    expect(showcaseMainEntry).toContain("import { router } from './app/router'")
-    expect(showcaseMainEntry).toContain('initThemeEarly()')
-    expect(showcaseMainEntry).toContain('const i18n = await setupShowcaseI18n()')
-    expect(showcaseMainEntry).toContain('.use(i18n)')
-    expect(showcaseMainEntry).toContain('.use(router)')
+    expect(normalizedShowcaseMainEntry).toContain("import {initThemeEarly} from '@feugene/granularity'")
+    expect(normalizedShowcaseMainEntry).toContain("import {setupShowcaseI18n} from './i18n'")
+    expect(normalizedShowcaseMainEntry).toContain("import {router} from './app/router'")
+    expect(normalizedShowcaseMainEntry).toContain('initThemeEarly()')
+    expect(normalizedShowcaseMainEntry).toContain('const i18n = await setupShowcaseI18n()')
+    expect(normalizedShowcaseMainEntry).toContain('.use(i18n)')
+    expect(normalizedShowcaseMainEntry).toContain('.use(router)')
     expect(showcaseMainEntry).not.toContain("@feugene/granularity/styles.css")
     expect(showcaseMainEntry).not.toContain('legacy')
   })
