@@ -16,7 +16,8 @@
   "exports": {
     ".": {
       "types": "./dist/types/src/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./i18n": {
       "types": "./dist/types/src/i18n/index.d.ts",
@@ -228,11 +229,13 @@
     },
     "./uno": {
       "types": "./dist/types/src/unocss/preset.d.ts",
-      "import": "./dist/uno.js"
+      "import": "./dist/uno.js",
+      "default": "./dist/uno.js"
     },
     "./uno-node": {
       "types": "./dist/types/src/unocss/preset.node.d.ts",
-      "import": "./dist/uno-node.js"
+      "import": "./dist/uno-node.js",
+      "default": "./dist/uno-node.js"
     },
     "./styles.css": "./dist/styles.css",
     "./foundation.css": "./dist/foundation.css",
