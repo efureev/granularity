@@ -1,11 +1,31 @@
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { granularityDirectivesIndexSource, granularityViteConfigSource } from '../helpers/granularityTestUtils'
 import pkg from '../../../package.json'
 import webTypes from '../../../web-types.json'
 
-const require = createRequire(import.meta.url)
+function createPublishedPackageRequire() {
+  const fixtureRoot = mkdtempSync(join(tmpdir(), 'granularity-package-contracts-'))
+  const packageRoot = join(fixtureRoot, 'node_modules', '@feugene', 'granularity')
+
+  mkdirSync(join(packageRoot, 'dist'), { recursive: true })
+  writeFileSync(join(packageRoot, 'package.json'), JSON.stringify(pkg, null, 2))
+  writeFileSync(join(packageRoot, 'dist', 'uno.js'), 'export default {}\n')
+  writeFileSync(join(packageRoot, 'dist', 'uno-node.js'), 'export default {}\n')
+
+  return {
+    cleanup: () => rmSync(fixtureRoot, { recursive: true, force: true }),
+    require: createRequire(join(fixtureRoot, 'consumer.cjs')),
+  }
+}
+
+function normalizePath(path: string) {
+  return path.replaceAll('\\', '/')
+}
 
 describe('granularity package contracts', () => {
   it('публикует раздельные browser-safe и node-only uno exports', () => {
@@ -72,8 +92,15 @@ describe('granularity package contracts', () => {
   })
 
   it('разрешает uno exports через cjs resolve для jiti/unconfig сценариев', () => {
-    expect(require.resolve('@feugene/granularity/uno')).toMatch(/\/dist\/uno\.js$/)
-    expect(require.resolve('@feugene/granularity/uno-node')).toMatch(/\/dist\/uno-node\.js$/)
+    const fixture = createPublishedPackageRequire()
+
+    try {
+      expect(normalizePath(fixture.require.resolve('@feugene/granularity/uno'))).toMatch(/\/node_modules\/@feugene\/granularity\/dist\/uno\.js$/)
+      expect(normalizePath(fixture.require.resolve('@feugene/granularity/uno-node'))).toMatch(/\/node_modules\/@feugene\/granularity\/dist\/uno-node\.js$/)
+    }
+    finally {
+      fixture.cleanup()
+    }
   })
 
   it('складывает внутренние js-чанки библиотеки в dist/chunks', () => {
