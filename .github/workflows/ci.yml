@@ -8,17 +8,29 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
-  packages: write
-  pages: write
-  id-token: write
+  contents: read
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build-and-test:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint package
+        run: yarn workspace @feugene/granularity lint
+
+  test-granularity:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,6 +40,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
+          cache: yarn
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -35,24 +48,80 @@ jobs:
       - name: Test package
         run: yarn test:granularity
 
-      - name: Test showcase
-        run: yarn test:showcase
+  build-granularity:
+    needs:
+      - lint
+      - test-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Build package
         run: yarn build:granularity
 
-      - name: Build showcase
-        run: yarn build:showcase
+      - name: Validate package metadata (publint)
+        run: npx --yes publint@latest packages/granularity
 
       - name: Upload dist
-        if: matrix.node == 24
         uses: actions/upload-artifact@v7
         with:
           name: granularity-dist
           path: packages/granularity/dist/
 
+  test-showcase:
+    needs:
+      - build-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Test showcase
+        run: yarn test:showcase
+
+  build-showcase:
+    needs:
+      - test-showcase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Build showcase
+        run: yarn build:showcase
+
       - name: Upload showcase
-        if: matrix.node == 24
         uses: actions/upload-artifact@v7
         with:
           name: showcase-dist
@@ -60,7 +129,7 @@ jobs:
 
   deploy-showcase:
     needs:
-      - build-and-test
+      - build-showcase
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -87,13 +156,18 @@ jobs:
         uses: actions/deploy-pages@v5
 
   publish:
+    # Релиз пакета не зависит от витрины, чтобы внешние зависимости showcase
+    # (например, @feugene/fint-i18n) не блокировали публикацию @feugene/granularity.
     needs:
-      - build-and-test
+      - lint
+      - test-granularity
+      - build-granularity
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -102,13 +176,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Download dist
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: granularity-dist
           path: packages/granularity/dist
 
       - name: Publish to NPM
-        run: npm publish --access public
+        run: npm publish --access public --provenance
         working-directory: packages/granularity
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
