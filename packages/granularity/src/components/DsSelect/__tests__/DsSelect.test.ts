@@ -212,7 +212,7 @@ describe('DsSelect', () => {
     const eur = getTeleportedOptions().find((button) => button.textContent?.includes('EUR'))
     expect(eur).toBeTruthy()
 
-    await new DOMWrapper(eur!).trigger('click')
+    await new DOMWrapper(eur).trigger('click')
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['EUR'])
@@ -324,7 +324,7 @@ describe('DsSelect', () => {
 
     await wrapper.setProps({ modelValue: ['1', '2'] })
 
-    await new DOMWrapper(getTeleportedOptions().find((option) => option.textContent?.includes('Food'))!).trigger('click')
+    await new DOMWrapper(getTeleportedOptions().find((option) => option.textContent?.includes('Food'))).trigger('click')
     await nextTick()
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['2']])
   })

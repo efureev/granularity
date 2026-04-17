@@ -69,15 +69,15 @@ const spinnerClass = computed(() => props.spinnerClass)
   >
     <div class="flex flex-col items-center justify-center gap-2 px-4 text-center">
       <component
-        v-if="props.animated"
         :is="Spinner"
+        v-if="props.animated"
         class="ds-loading__spinner ds-loading__spinner--animated h-7 w-7 text-[var(--muted-fg)]"
         :class="spinnerClass"
         aria-hidden="true"
       />
       <component
-        v-else
         :is="Spinner"
+        v-else
         class="ds-loading__spinner h-7 w-7 text-[var(--muted-fg)]"
         :class="spinnerClass"
         aria-hidden="true"

@@ -276,6 +276,7 @@ export default defineConfig({
     },
     rolldownOptions: {
       external: [
+        'node:buffer',
         'node:fs/promises',
         'node:path',
         'node:url',
