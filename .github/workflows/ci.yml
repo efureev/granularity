@@ -3,7 +3,9 @@ name: CI/CD
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
+    tags:
+      - 'v*'
+      - 'unplugin-granularity-v*'
   pull_request:
     branches: [ main ]
 
@@ -275,6 +277,124 @@ jobs:
 
       - name: Publish to GitHub Packages
         working-directory: packages/granularity
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Сборка build-time пакета @feugene/unplugin-granularity (резолвер для
+  # unplugin-vue-components). Артефакт нужен и для валидации (publint),
+  # и для последующей публикации по тегу `unplugin-granularity-v*`.
+  build-unplugin-granularity:
+    needs:
+      - lint
+      - build-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Build package
+        run: yarn workspace @feugene/unplugin-granularity build
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/unplugin-granularity
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist/
+
+  # Публикация @feugene/unplugin-granularity в npm по тегу вида
+  # `unplugin-granularity-v<semver>`. Отдельный тег позволяет релизить
+  # build-time пакет независимо от рантайма @feugene/granularity.
+  publish-npm-unplugin-granularity:
+    needs:
+      - build-unplugin-granularity
+    if: startsWith(github.ref, 'refs/tags/unplugin-granularity-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/unplugin-granularity
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#unplugin-granularity-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/unplugin-granularity
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория
+  # (`@efureev/unplugin-granularity`). Аналогично publish-gpr для granularity.
+  publish-gpr-unplugin-granularity:
+    needs:
+      - publish-npm-unplugin-granularity
+    if: startsWith(github.ref, 'refs/tags/unplugin-granularity-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/unplugin-granularity
+        run: |
+          npm pkg set name='@efureev/unplugin-granularity'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/unplugin-granularity
         run: npm publish --ignore-scripts --no-provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

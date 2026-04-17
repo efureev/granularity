@@ -1,0 +1,67 @@
+{
+  "name": "@feugene/unplugin-granularity",
+  "description": "unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.",
+  "version": "0.2.0",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/unplugin-granularity"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "unplugin",
+    "unplugin-vue-components",
+    "resolver",
+    "auto-import",
+    "tree-shaking",
+    "granularity",
+    "design-system"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/types/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.1.0",
+    "unplugin-vue-components": ">=0.26.0"
+  },
+  "devDependencies": {
+    "@feugene/granularity": "^0.2.0",
+    "@types/node": "^25.5.2",
+    "typescript": "^6.0.2",
+    "unplugin-vue-components": "^32.0.0",
+    "vite": "^8.0.7",
+    "vue-tsc": "^3.2.6"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  }
+}

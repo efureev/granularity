@@ -1,0 +1,10 @@
+.xg-quick-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.xg-quick-form > :last-child {
+  align-self: flex-start;
+}

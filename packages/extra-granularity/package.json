@@ -1,0 +1,74 @@
+{
+  "name": "@feugene/extra-granularity",
+  "description": "Composite Vue 3 components built on top of @feugene/granularity primitives (DsFormField, DsInput, DsButton, …).",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/extra-granularity"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "components",
+    "ui",
+    "granularity",
+    "design-system",
+    "composite-components",
+    "tree-shakeable"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "types": "./dist/types/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./components/XgQuickForm": {
+      "types": "./dist/types/src/components/XgQuickForm/index.d.ts",
+      "import": "./dist/components/XgQuickForm/index.js"
+    },
+    "./components/XgQuickForm/styles.css": "./dist/components/XgQuickForm/styles.css"
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.1.0",
+    "vue": "^3.5.32"
+  },
+  "devDependencies": {
+    "@feugene/granularity": "^0.1.0",
+    "@types/node": "^25.5.2",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.7",
+    "vue": "^3.5.32",
+    "vue-tsc": "^3.2.6"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  }
+}

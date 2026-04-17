@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, styles, and UnoCSS preset.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "author": {
     "name": "Evgeniy Fureev",
@@ -56,6 +56,10 @@
     "./i18n": {
       "types": "./dist/types/src/i18n/index.d.ts",
       "import": "./dist/i18n.js"
+    },
+    "./vue": {
+      "types": "./dist/types/src/vue/index.d.ts",
+      "import": "./dist/vue.js"
     },
     "./fileValidation": {
       "types": "./dist/types/src/fileValidation/index.d.ts",
