@@ -2,7 +2,7 @@
   "name": "@feugene/unplugin-granularity",
   "description": "unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.",
   "version": "0.2.0",
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
     "url": "https://github.com/efureev"

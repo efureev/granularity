@@ -2,7 +2,7 @@
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, styles, and UnoCSS preset.",
   "version": "0.2.0",
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
     "url": "https://github.com/efureev"
