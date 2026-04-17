@@ -190,9 +190,10 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
 
-  publish:
-    # Релиз пакета не зависит от витрины, чтобы внешние зависимости showcase
-    # (например, @feugene/fint-i18n) не блокировали публикацию @feugene/granularity.
+  # Публикация пакета в npm — первичный реестр.
+  # Релиз не зависит от showcase, чтобы внешние зависимости витрины
+  # (например, @feugene/fint-i18n) не блокировали публикацию @feugene/granularity.
+  publish-npm:
     needs:
       - lint
       - test-granularity
@@ -201,7 +202,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
       id-token: write
     steps:
       - uses: actions/checkout@v6
@@ -210,31 +210,70 @@ jobs:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Verify tag matches package version
+        working-directory: packages/granularity
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
       - name: Download dist
         uses: actions/download-artifact@v8
         with:
           name: granularity-dist
           path: packages/granularity/dist
 
-      - name: Publish to NPM
+      - name: Publish to npm
         run: npm publish --access public --provenance
         working-directory: packages/granularity
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Setup for GitHub Packages
-        uses: actions/setup-node@v6
+  # Публикация в GitHub Packages как зеркало под scope владельца репозитория.
+  # Отдельный job, чтобы сбой GPR не откатывал/не блокировал публикацию в npm.
+  # Имя пакета в GPR отличается (`@efureev/granularity`), поэтому меняем его
+  # на копии через `npm pkg set` (без `sed` по исходному package.json).
+  publish-gpr:
+    needs:
+      - publish-npm
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           registry-url: 'https://npm.pkg.github.com'
           scope: '@efureev'
 
-      - name: Publish to GitHub Packages
-        run: |
-          # У GitHub Packages имя пакета (scope) должно совпадать с владельцем репозитория (efureev)
-          # Чтобы не менять основной package.json, временно меняем имя перед публикацией в GPR
-          sed -i 's/"name": "@feugene\/granularity"/"name": "@efureev\/granularity"/' package.json
-          npm publish --ignore-scripts
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Prepare package for GitHub Packages
         working-directory: packages/granularity
+        run: |
+          # GitHub Packages требует, чтобы scope совпадал с владельцем репозитория.
+          # Меняем имя и отключаем provenance/publishConfig локально в рантайме —
+          # без мутации исходного package.json в индексе git.
+          npm pkg set name='@efureev/granularity'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity
+        run: npm publish --ignore-scripts --no-provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
