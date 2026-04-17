@@ -267,6 +267,7 @@ export default defineConfig({
         directives: fileURLToPath(new URL('./src/directives/index.ts', import.meta.url)),
         fileValidation: fileURLToPath(new URL('./src/fileValidation/index.ts', import.meta.url)),
         i18n: fileURLToPath(new URL('./src/i18n/index.ts', import.meta.url)),
+        vue: fileURLToPath(new URL('./src/vue/index.ts', import.meta.url)),
         uno: fileURLToPath(new URL('./src/unocss/preset.ts', import.meta.url)),
         'uno-node': fileURLToPath(new URL('./src/unocss/preset.node.ts', import.meta.url)),
         ...granularityComponentEntries,

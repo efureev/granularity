@@ -57,6 +57,10 @@
       "types": "./dist/types/src/i18n/index.d.ts",
       "import": "./dist/i18n.js"
     },
+    "./vue": {
+      "types": "./dist/types/src/vue/index.d.ts",
+      "import": "./dist/vue.js"
+    },
     "./fileValidation": {
       "types": "./dist/types/src/fileValidation/index.d.ts",
       "import": "./dist/fileValidation.js"
