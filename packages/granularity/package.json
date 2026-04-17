@@ -2,7 +2,41 @@
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, styles, and UnoCSS preset.",
   "version": "0.1.0",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "design-system",
+    "components",
+    "ui",
+    "ui-kit",
+    "ui-library",
+    "unocss",
+    "unocss-preset",
+    "granular",
+    "tree-shakeable",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "type": "module",
   "types": "./dist/types/src/index.d.ts",
   "web-types": "./web-types.json",
@@ -292,7 +326,13 @@
     "./components/DsTooltip/styles.css": "./dist/components/DsTooltip/styles.css"
   },
   "peerDependencies": {
-    "vue": "^3.5.32"
+    "vue": "^3.5.32",
+    "unocss": "^66.0.0"
+  },
+  "peerDependenciesMeta": {
+    "unocss": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23"
@@ -321,6 +361,7 @@
     "lint": "eslint --cache .",
     "lint:fix": "eslint --cache --fix .",
     "test": "vitest --config vitest.config.ts",
-    "test:run": "vitest run --config vitest.config.ts"
+    "test:run": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
   }
 }

@@ -16,6 +16,7 @@
     "dev:showcase": "yarn workspace @feugene/granularity-showcase dev",
     "test": "yarn test:granularity && yarn test:playground",
     "test:granularity": "yarn workspace @feugene/granularity test:run",
+    "coverage:granularity": "yarn workspace @feugene/granularity test:coverage",
     "test:playground": "yarn workspace @feugene/granularity-playground test:run",
     "test:showcase": "yarn workspace @feugene/granularity-showcase test:run"
   }

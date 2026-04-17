@@ -23,9 +23,10 @@
   "scripts": {
     "build": "yarn generate:api && yarn generate:search && vite build",
     "build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze",
-    "dev": "yarn prepare:granularity && vite",
+    "dev": "yarn prepare:granularity && yarn generate:api && yarn generate:search && vite",
     "generate:api": "node ./scripts/generate-component-api.mjs",
-    "generate:search": "yarn prepare:granularity && node ./scripts/generate-showcase-search-index.mjs",
+    "generate:search": "node ./scripts/generate-showcase-search-index.mjs",
+    "generate:search:local": "yarn prepare:granularity && node ./scripts/generate-showcase-search-index.mjs",
     "prepare:granularity": "yarn workspace @feugene/granularity build",
     "test": "yarn generate:api && yarn generate:search && vitest --config vitest.config.ts",
     "test:run": "yarn generate:api && yarn generate:search && vitest run --config vitest.config.ts"

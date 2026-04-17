@@ -300,7 +300,7 @@ describe('DsSegmented', () => {
     expect(observer.disconnect).not.toHaveBeenCalled()
     expect(observer.observe).not.toHaveBeenCalled()
 
-    await wrapper.unmount()
+    wrapper.unmount()
   })
 
   it('поддерживает scoped slot для кастомного контента', () => {
