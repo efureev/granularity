@@ -15,6 +15,7 @@ describe('showcase navigation model', () => {
     expect(showcaseNavigationItems.map(item => item.name)).toEqual([
       'overview',
       'foundations',
+      'integration',
       'components',
       'directives',
       'composables',
@@ -71,8 +72,8 @@ describe('showcase navigation model', () => {
   })
 
   it('подключает ленивые route loaders для всех разделов shell-навигации', () => {
-    expect(Object.keys(showcaseLazyPageLoaders)).toHaveLength(8)
-    expect(showcaseChildRoutes).toHaveLength(10)
+    expect(Object.keys(showcaseLazyPageLoaders)).toHaveLength(9)
+    expect(showcaseChildRoutes).toHaveLength(11)
     expect(showcaseChildRoutes.every(route => typeof route.component === 'function')).toBe(true)
   })
 })
