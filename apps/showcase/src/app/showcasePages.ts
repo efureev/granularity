@@ -203,6 +203,50 @@ export const showcasePages: ShowcasePage[] = [
     ],
   },
   {
+    name: 'integration',
+    path: '/integration',
+    title: 'Интеграция',
+    shortTitle: 'Integration',
+    eyebrow: 'Showcase / Integration',
+    status: 'ready',
+    description: 'Два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`createGranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`).',
+    sections: [
+      {
+        id: 'vue-plugin',
+        title: 'Vue-плагин `createGranularity`',
+        description: 'Лёгкий runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalProperties` без потери tree-shaking — сам модуль не импортирует ни одного компонента.',
+        bullets: [
+          '`createGranularity({ components, directives, provides, globalProperties })` отдаёт стандартный Vue-plugin для `app.use(...)`.',
+          'Поддерживает три формы компонентов: чистый SFC, объект с `install`, явное `{ name, component }`.',
+          'Основной сценарий — директивы, `provide`, `globalProperties`, SSR/Nuxt-плагины и окружения без сборщика.',
+          'Демо: `apps/playground-7` с `DsButton`, `DsInput` и `v-hotkey`.',
+        ],
+      },
+      {
+        id: 'unplugin',
+        title: 'Авто-импорт `@feugene/unplugin-granularity`',
+        description: 'Отдельный build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в SFC.',
+        bullets: [
+          'Пишете `<DsButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.',
+          'Опции: `prefix`, `importStyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist.',
+          'Рекомендуется для prod-приложений: идеальный tree-shaking и отсутствие ручных `import`-ов.',
+          'Демо: `apps/playground-8` и `apps/playground-9` (резолвер вместе с UnoCSS preset и композитами).',
+        ],
+      },
+      {
+        id: 'when-to-use',
+        title: 'Как выбирать между подходами',
+        description: 'Инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин — директивы вне шаблонов, `provide` и globals.',
+        bullets: [
+          '`@feugene/unplugin-granularity` — build-time, охватывает только то, что реально стоит в `<template>`.',
+          '`@feugene/granularity/vue` — runtime, охватывает всё остальное: директивы в `render()`/JSX, i18n/theme через `provide`, Options API через `globalProperties`.',
+          'SSR / тесты / окружения без `unplugin-vue-components` — только через `createGranularity`.',
+          'Прямой sub-path import остаётся самым гранулярным вариантом: `@feugene/granularity/components/<Name>`.',
+        ],
+      },
+    ],
+  },
+  {
     name: 'components',
     path: '/components',
     title: 'Components',

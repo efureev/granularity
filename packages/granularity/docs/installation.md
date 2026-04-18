@@ -41,6 +41,8 @@ yarn add -D unocss
 | 4. Несколько компонентов через subpath + общий `styles.css` | Нужен granular `JS` для нескольких компонентов | Баланс между контролем `JS` и простотой CSS-подключения | CSS всё ещё подключается общим файлом | [`playground-4`](../../../apps/playground-4/README.md) |
 | 5. `UnoCSS` + `@feugene/granularity/uno-node` | Нужна предпочтительная production-интеграция с тонкой настройкой | Лучший контроль над итоговой сборкой, удобно выбирать компоненты/темы/слои | Требует `UnoCSS` и node-конфиг сборки | [`playground-5`](../../../apps/playground-5/README.md) |
 | 6. `UnoCSS` + `@feugene/granularity/uno` | Нужен pure/browser-safe preset | Даёт preset API без чтения файлов с диска | Foundation/theme CSS надо передавать вручную | [`playground-6`](../../../apps/playground-6/README.md) |
+| 7. Vue-плагин `createGranularity` из `@feugene/granularity/vue` | Нужен единый bootstrap-вход для директив, `provide`, `globalProperties` | Одно место конфигурации, tree-shaking сохранён (адаптер не импортирует компоненты сам) | Для компонентов лучше использовать резолвер или прямые импорты | [`vue-plugin.md`](./vue-plugin.md), [`playground-7`](../../../apps/playground-7/README.md) |
+| 8. Авто-импорт через [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md) | Рекомендуется для prod-приложений | Без ручных `import`, build-time вставка granular subpath импортов, идеальный tree-shaking | Покрывает только теги/директивы в `<template>`, не `render()`/JSX | [`unplugin.md`](./unplugin.md), [`playground-8`](../../../apps/playground-8/README.md) |
 
 ## Public entrypoint-ы
 

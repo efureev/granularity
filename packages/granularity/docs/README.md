@@ -11,6 +11,8 @@
 - Если нужен быстрый старт: откройте [`installation.md`](./installation.md).
 - Если важно понять устройство слоёв стилей: откройте [`styling.md`](./styling.md).
 - Если приложение уже использует `UnoCSS`: откройте [`unocss.md`](./unocss.md).
+- Если нужен единый bootstrap-вход в Vue-приложение: откройте [`vue-plugin.md`](./vue-plugin.md).
+- Если хочется авто-импорта компонентов и директив: откройте [`unplugin.md`](./unplugin.md).
 - Если важно понять, как пакет ведёт себя в i18n-сценариях: откройте [`localization.md`](./localization.md).
 - Если нужны package-level утилиты кроме компонентов: откройте [`directives.md`](./directives.md) и [
   `file-validation.md`](./file-validation.md).
@@ -22,6 +24,10 @@
 - [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы и порядок импортов.
 - [`unocss.md`](./unocss.md) — `@feugene/granularity/uno-node`, `@feugene/granularity/uno`, preflight-ы и практические
   сценарии.
+- [`vue-plugin.md`](./vue-plugin.md) — runtime-адаптер `@feugene/granularity/vue`: `createGranularity`,
+  `installGranularity`, `defineInstallable`.
+- [`unplugin.md`](./unplugin.md) — авто-импорт компонентов и директив через
+  [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md).
 - [`localization.md`](./localization.md) — как `granularity` работает с локализацией приложения и fallback-текстами.
 - [`directives.md`](./directives.md) — все опубликованные директивы и их назначение.
 - [`file-validation.md`](./file-validation.md) — `fileValidation` API и повторное использование логики валидации файлов.
@@ -37,6 +43,8 @@
 | Нужен минимальный CSS для 1–2 компонентов                 | `components/<Name>/styles.css` (при необходимости отдельно `foundation.css`) |
 | Приложение уже собирает CSS через `UnoCSS` в node-конфиге | `@feugene/granularity/uno-node`                                     |
 | Нужен pure/browser-safe preset без чтения файлов с диска  | `@feugene/granularity/uno`                                          |
+| Нужен единый bootstrap-вход для директив, `provide`, globals | `createGranularity` из `@feugene/granularity/vue`                |
+| Нужен авто-импорт компонентов и директив в шаблонах       | [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md) (резолвер `unplugin-vue-components`) |
 
 ## Базовый quick start
 

@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 export const showcaseLazyPageLoaders = {
   overview: () => import('../pages/OverviewPage.vue'),
   foundations: () => import('../pages/FoundationsPage.vue'),
+  integration: () => import('../pages/IntegrationPage.vue'),
   components: () => import('../pages/ComponentsPage.vue'),
   componentDetail: () => import('../pages/ComponentDetailPage.vue'),
   packageEntityDetail: () => import('../pages/PackageEntityDetailPage.vue'),
@@ -21,6 +22,11 @@ export const showcaseChildRoutes = [
     path: 'foundations',
     name: 'foundations',
     component: showcaseLazyPageLoaders.foundations,
+  },
+  {
+    path: 'integration',
+    name: 'integration',
+    component: showcaseLazyPageLoaders.integration,
   },
   {
     path: 'components',

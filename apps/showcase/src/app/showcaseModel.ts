@@ -1,6 +1,7 @@
 export type ShowcasePageName =
   | 'overview'
   | 'foundations'
+  | 'integration'
   | 'components'
   | 'directives'
   | 'composables'
