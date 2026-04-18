@@ -1,7 +1,7 @@
 {
   "name": "@feugene/extra-granularity",
   "description": "Composite Vue 3 components built on top of @feugene/granularity primitives (DsFormField, DsInput, DsButton, …).",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -54,11 +54,11 @@
     "./components/XgQuickForm/styles.css": "./dist/components/XgQuickForm/styles.css"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.1.0",
+    "@feugene/granularity": ">=0.2.0 <1.0.0",
     "vue": "^3.5.32"
   },
   "devDependencies": {
-    "@feugene/granularity": "^0.1.0",
+    "@feugene/granularity": "^0.2.0",
     "@types/node": "^25.5.2",
     "@vitejs/plugin-vue": "^6.0.5",
     "typescript": "^6.0.2",

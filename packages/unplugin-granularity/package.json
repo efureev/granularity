@@ -48,7 +48,7 @@
     }
   },
   "peerDependencies": {
-    "@feugene/granularity": "^0.1.0",
+    "@feugene/granularity": ">=0.2.0 <1.0.0",
     "unplugin-vue-components": ">=0.26.0"
   },
   "devDependencies": {
