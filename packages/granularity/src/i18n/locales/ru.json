@@ -37,6 +37,8 @@
     "warning": "Предупреждение",
     "danger": "Опасность",
     "info": "Инфо",
-    "primary": "Primary"
+    "primary": "Primary",
+    "slate": "Сланцевый",
+    "azure": "Лазурный"
   }
 }

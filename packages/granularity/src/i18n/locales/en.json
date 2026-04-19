@@ -37,6 +37,8 @@
     "warning": "Warning",
     "danger": "Danger",
     "info": "Info",
-    "primary": "Primary"
+    "primary": "Primary",
+    "slate": "Slate",
+    "azure": "Azure"
   }
 }

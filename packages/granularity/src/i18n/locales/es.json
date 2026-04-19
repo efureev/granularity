@@ -37,6 +37,8 @@
     "warning": "Advertencia",
     "danger": "Peligro",
     "info": "Info",
-    "primary": "Primario"
+    "primary": "Primario",
+    "slate": "Pizarra",
+    "azure": "Azul celeste"
   }
 }
