@@ -1,8 +1,7 @@
-import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
-
-import { dsImageViewerSafelist } from './safelist'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 export const dsImageViewerConfig = defineGranularComponent(import.meta.url, {
   name: 'DsImageViewer',
-  safelist: dsImageViewerSafelist,
+  // Литералы из шаблона UnoCSS находит сканом — safelist не нужен.
+  safelist: [],
 })
