@@ -53,25 +53,209 @@
       "types": "./dist/types/src/components/DsAlert/index.d.ts",
       "import": "./dist/components/DsAlert/index.js"
     },
+    "./components/DsAvatar": {
+      "types": "./dist/types/src/components/DsAvatar/index.d.ts",
+      "import": "./dist/components/DsAvatar/index.js"
+    },
+    "./components/DsBadge": {
+      "types": "./dist/types/src/components/DsBadge/index.d.ts",
+      "import": "./dist/components/DsBadge/index.js"
+    },
+    "./components/DsBadgeWrap": {
+      "types": "./dist/types/src/components/DsBadgeWrap/index.d.ts",
+      "import": "./dist/components/DsBadgeWrap/index.js"
+    },
+    "./components/DsBottomNav": {
+      "types": "./dist/types/src/components/DsBottomNav/index.d.ts",
+      "import": "./dist/components/DsBottomNav/index.js"
+    },
     "./components/DsButton": {
       "types": "./dist/types/src/components/DsButton/index.d.ts",
       "import": "./dist/components/DsButton/index.js"
+    },
+    "./components/DsButtonGroup": {
+      "types": "./dist/types/src/components/DsButtonGroup/index.d.ts",
+      "import": "./dist/components/DsButtonGroup/index.js"
     },
     "./components/DsCard": {
       "types": "./dist/types/src/components/DsCard/index.d.ts",
       "import": "./dist/components/DsCard/index.js"
     },
+    "./components/DsCheckbox": {
+      "types": "./dist/types/src/components/DsCheckbox/index.d.ts",
+      "import": "./dist/components/DsCheckbox/index.js"
+    },
+    "./components/DsCollapse": {
+      "types": "./dist/types/src/components/DsCollapse/index.d.ts",
+      "import": "./dist/components/DsCollapse/index.js"
+    },
+    "./components/DsConfirmDialog": {
+      "types": "./dist/types/src/components/DsConfirmDialog/index.d.ts",
+      "import": "./dist/components/DsConfirmDialog/index.js"
+    },
+    "./components/DsDataTable": {
+      "types": "./dist/types/src/components/DsDataTable/index.d.ts",
+      "import": "./dist/components/DsDataTable/index.js"
+    },
+    "./components/DsDialog": {
+      "types": "./dist/types/src/components/DsDialog/index.d.ts",
+      "import": "./dist/components/DsDialog/index.js"
+    },
+    "./components/DsDrawer": {
+      "types": "./dist/types/src/components/DsDrawer/index.d.ts",
+      "import": "./dist/components/DsDrawer/index.js"
+    },
+    "./components/DsDropdown": {
+      "types": "./dist/types/src/components/DsDropdown/index.d.ts",
+      "import": "./dist/components/DsDropdown/index.js"
+    },
+    "./components/DsDropdownMenu": {
+      "types": "./dist/types/src/components/DsDropdownMenu/index.d.ts",
+      "import": "./dist/components/DsDropdownMenu/index.js"
+    },
+    "./components/DsEmptyState": {
+      "types": "./dist/types/src/components/DsEmptyState/index.d.ts",
+      "import": "./dist/components/DsEmptyState/index.js"
+    },
+    "./components/DsFileUpload": {
+      "types": "./dist/types/src/components/DsFileUpload/index.d.ts",
+      "import": "./dist/components/DsFileUpload/index.js"
+    },
     "./components/DsFormField": {
       "types": "./dist/types/src/components/DsFormField/index.d.ts",
       "import": "./dist/components/DsFormField/index.js"
+    },
+    "./components/DsFormFile": {
+      "types": "./dist/types/src/components/DsFormFile/index.d.ts",
+      "import": "./dist/components/DsFormFile/index.js"
+    },
+    "./components/DsFormSection": {
+      "types": "./dist/types/src/components/DsFormSection/index.d.ts",
+      "import": "./dist/components/DsFormSection/index.js"
+    },
+    "./components/DsIcon": {
+      "types": "./dist/types/src/components/DsIcon/index.d.ts",
+      "import": "./dist/components/DsIcon/index.js"
+    },
+    "./components/DsImageViewer": {
+      "types": "./dist/types/src/components/DsImageViewer/index.d.ts",
+      "import": "./dist/components/DsImageViewer/index.js"
     },
     "./components/DsInput": {
       "types": "./dist/types/src/components/DsInput/index.d.ts",
       "import": "./dist/components/DsInput/index.js"
     },
+    "./components/DsInputTag": {
+      "types": "./dist/types/src/components/DsInputTag/index.d.ts",
+      "import": "./dist/components/DsInputTag/index.js"
+    },
+    "./components/DsLink": {
+      "types": "./dist/types/src/components/DsLink/index.d.ts",
+      "import": "./dist/components/DsLink/index.js"
+    },
+    "./components/DsList": {
+      "types": "./dist/types/src/components/DsList/index.d.ts",
+      "import": "./dist/components/DsList/index.js"
+    },
+    "./components/DsLoading": {
+      "types": "./dist/types/src/components/DsLoading/index.d.ts",
+      "import": "./dist/components/DsLoading/index.js"
+    },
+    "./components/DsModal": {
+      "types": "./dist/types/src/components/DsModal/index.d.ts",
+      "import": "./dist/components/DsModal/index.js"
+    },
+    "./components/DsNavbar": {
+      "types": "./dist/types/src/components/DsNavbar/index.d.ts",
+      "import": "./dist/components/DsNavbar/index.js"
+    },
+    "./components/DsNumberInput": {
+      "types": "./dist/types/src/components/DsNumberInput/index.d.ts",
+      "import": "./dist/components/DsNumberInput/index.js"
+    },
+    "./components/DsPagination": {
+      "types": "./dist/types/src/components/DsPagination/index.d.ts",
+      "import": "./dist/components/DsPagination/index.js"
+    },
+    "./components/DsProgressBar": {
+      "types": "./dist/types/src/components/DsProgressBar/index.d.ts",
+      "import": "./dist/components/DsProgressBar/index.js"
+    },
+    "./components/DsPromptDialog": {
+      "types": "./dist/types/src/components/DsPromptDialog/index.d.ts",
+      "import": "./dist/components/DsPromptDialog/index.js"
+    },
     "./components/DsRadio": {
       "types": "./dist/types/src/components/DsRadio/index.d.ts",
       "import": "./dist/components/DsRadio/index.js"
+    },
+    "./components/DsRadioGroup": {
+      "types": "./dist/types/src/components/DsRadioGroup/index.d.ts",
+      "import": "./dist/components/DsRadioGroup/index.js"
+    },
+    "./components/DsSegmented": {
+      "types": "./dist/types/src/components/DsSegmented/index.d.ts",
+      "import": "./dist/components/DsSegmented/index.js"
+    },
+    "./components/DsSelect": {
+      "types": "./dist/types/src/components/DsSelect/index.d.ts",
+      "import": "./dist/components/DsSelect/index.js"
+    },
+    "./components/DsSidebar": {
+      "types": "./dist/types/src/components/DsSidebar/index.d.ts",
+      "import": "./dist/components/DsSidebar/index.js"
+    },
+    "./components/DsSkeleton": {
+      "types": "./dist/types/src/components/DsSkeleton/index.d.ts",
+      "import": "./dist/components/DsSkeleton/index.js"
+    },
+    "./components/DsSwitch": {
+      "types": "./dist/types/src/components/DsSwitch/index.d.ts",
+      "import": "./dist/components/DsSwitch/index.js"
+    },
+    "./components/DsTable": {
+      "types": "./dist/types/src/components/DsTable/index.d.ts",
+      "import": "./dist/components/DsTable/index.js"
+    },
+    "./components/DsTabs": {
+      "types": "./dist/types/src/components/DsTabs/index.d.ts",
+      "import": "./dist/components/DsTabs/index.js"
+    },
+    "./components/DsTextarea": {
+      "types": "./dist/types/src/components/DsTextarea/index.d.ts",
+      "import": "./dist/components/DsTextarea/index.js"
+    },
+    "./components/DsToaster": {
+      "types": "./dist/types/src/components/DsToaster/index.d.ts",
+      "import": "./dist/components/DsToaster/index.js"
+    },
+    "./components/DsTooltip": {
+      "types": "./dist/types/src/components/DsTooltip/index.d.ts",
+      "import": "./dist/components/DsTooltip/index.js"
+    },
+    "./components/DsTree": {
+      "types": "./dist/types/src/components/DsTree/index.d.ts",
+      "import": "./dist/components/DsTree/index.js"
+    },
+    "./components/DsTreeSelect": {
+      "types": "./dist/types/src/components/DsTreeSelect/index.d.ts",
+      "import": "./dist/components/DsTreeSelect/index.js"
+    },
+    "./directives": {
+      "types": "./dist/types/src/directives/index.d.ts",
+      "import": "./dist/directives/index.js"
+    },
+    "./fileValidation": {
+      "types": "./dist/types/src/fileValidation/index.d.ts",
+      "import": "./dist/fileValidation/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/types/src/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js"
+    },
+    "./vue": {
+      "types": "./dist/types/src/vue/index.d.ts",
+      "import": "./dist/vue/index.js"
     },
     "./granular-provider": {
       "types": "./dist/types/src/granular-provider/index.d.ts",
