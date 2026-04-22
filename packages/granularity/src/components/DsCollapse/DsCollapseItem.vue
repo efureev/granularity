@@ -2,20 +2,28 @@
 import ChevronDownIcon from '~icons/lucide/chevron-down'
 import { computed, getCurrentInstance, inject, ref } from 'vue'
 
+import DsIcon from '../DsIcon'
+
 import { DS_COLLAPSE_CONTEXT, type DsCollapseValue } from './dsCollapseContext'
 
-const props = withDefaults(
-  defineProps<{
-    name?: DsCollapseValue
-    title?: string
-    disabled?: boolean
-  }>(),
-  {
-    name: undefined,
-    title: undefined,
-    disabled: false,
-  },
-)
+/**
+ * DsCollapseItem — одна секция `DsCollapse`. Должна использоваться строго внутри `DsCollapse`.
+ *
+ * @prop name — уникальный идентификатор секции (для `v-model` у `DsCollapse`); по умолчанию генерируется из `uid`.
+ * @prop title — текст заголовка; можно заменить слотом `#title`.
+ * @prop disabled — запрещает раскрытие/сворачивание секции.
+ */
+export interface DsCollapseItemProps {
+  name?: DsCollapseValue
+  title?: string
+  disabled?: boolean
+}
+
+const props = withDefaults(defineProps<DsCollapseItemProps>(), {
+  name: undefined,
+  title: undefined,
+  disabled: false,
+})
 
 const collapse = inject(DS_COLLAPSE_CONTEXT)
 
@@ -134,16 +142,20 @@ function onKeydown(event: KeyboardEvent): void {
         <span class="min-w-0">
           <slot name="title">
             <span class="text-sm font-600">
-              {{ props.title }}
+              {{ title }}
             </span>
           </slot>
         </span>
 
-        <ChevronDownIcon
+        <DsIcon
+          size="sm"
           aria-hidden="true"
-          class="h-4 w-4 shrink-0 transition-transform duration-150 text-[var(--muted-fg)]"
+          data-ds-collapse-chevron
+          class="shrink-0 transition-transform duration-150 text-[var(--muted-fg)]"
           :class="expanded ? 'rotate-180' : ''"
-        />
+        >
+          <ChevronDownIcon />
+        </DsIcon>
       </button>
     </h3>
 

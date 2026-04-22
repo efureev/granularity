@@ -29,6 +29,6 @@ describe('DsSidebar', () => {
     })
 
     expect(wrapper.text()).toContain('Workspace')
-    expect(wrapper.find('.ds-muted').exists()).toBe(false)
+    expect(wrapper.find('.text-\\[var\\(--muted-fg\\)\\]').exists()).toBe(false)
   })
 })

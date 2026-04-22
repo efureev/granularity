@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue'
 
-export type { DsRadioVariant } from './dsRadioStyles'
+import type { DsButtonSize, DsButtonTone, DsButtonVariant } from '../DsButton'
 
 import {
   dsRadioButtonClass,
@@ -11,9 +11,33 @@ import {
   dsRadioRootClass,
   type DsRadioVariant,
 } from './dsRadioStyles'
-import type { DsButtonSize, DsButtonTone, DsButtonVariant } from '../DsButton'
-
 import { DS_RADIO_GROUP_CONTEXT } from './dsRadioGroupContext'
+
+/**
+ * DsRadio — одиночный элемент группы выбора.
+ *
+ * Может работать автономно (через `v-model`) либо внутри `DsRadioGroup`
+ * (тогда `modelValue`/`disabled`/`size`/`name` приходят через `inject`).
+ *
+ * @prop value — значение этого элемента, сравнивается с `modelValue` группы.
+ * @prop variant — визуальное представление: `radiobox` (круг+dot) или `button` (стиль `DsButton`).
+ */
+export interface DsRadioProps {
+  value: string
+  modelValue?: string
+  disabled?: boolean
+  name?: string
+  required?: boolean
+  form?: string
+  id?: string
+  size?: DsButtonSize
+  variant?: DsRadioVariant
+  buttonVariant?: DsButtonVariant
+  buttonTone?: DsButtonTone
+  selectedButtonVariant?: DsButtonVariant
+  selectedButtonTone?: DsButtonTone
+  ariaLabel?: string
+}
 
 const hiddenInputStyle = {
   position: 'absolute',
@@ -23,37 +47,21 @@ const hiddenInputStyle = {
   pointerEvents: 'none',
 } as const
 
-const props = withDefaults(
-  defineProps<{
-    value: string
-    modelValue?: string
-    disabled?: boolean
-    name?: string
-    required?: boolean
-    form?: string
-    size?: DsButtonSize
-    variant?: DsRadioVariant
-    buttonVariant?: DsButtonVariant
-    buttonTone?: DsButtonTone
-    selectedButtonVariant?: DsButtonVariant
-    selectedButtonTone?: DsButtonTone
-    ariaLabel?: string
-  }>(),
-  {
-    modelValue: undefined,
-    disabled: undefined,
-    name: undefined,
-    required: false,
-    form: undefined,
-    size: undefined,
-    variant: 'radiobox',
-    buttonVariant: 'outline',
-    buttonTone: 'neutral',
-    selectedButtonVariant: 'primary',
-    selectedButtonTone: 'primary',
-    ariaLabel: undefined,
-  },
-)
+const props = withDefaults(defineProps<DsRadioProps>(), {
+  modelValue: undefined,
+  disabled: undefined,
+  name: undefined,
+  required: false,
+  form: undefined,
+  id: undefined,
+  size: undefined,
+  variant: 'radiobox',
+  buttonVariant: 'outline',
+  buttonTone: 'neutral',
+  selectedButtonVariant: 'primary',
+  selectedButtonTone: 'primary',
+  ariaLabel: undefined,
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -126,12 +134,12 @@ function onButtonClick(): void {
 
 <template>
   <div
-    v-if="props.variant === 'button'"
+    v-if="variant === 'button'"
     data-ds-button
     data-ds-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
-    :aria-label="props.ariaLabel"
+    :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :tabindex="resolvedDisabled ? -1 : 0"
     :class="buttonClassName"
@@ -140,13 +148,14 @@ function onButtonClick(): void {
     @keydown.enter.prevent="onButtonClick"
   >
     <input
+      :id="id"
       type="radio"
       :checked="checked"
       :disabled="resolvedDisabled"
       :name="resolvedName"
-      :value="props.value"
-      :required="props.required"
-      :form="props.form"
+      :value="value"
+      :required="required"
+      :form="form"
       tabindex="-1"
       aria-hidden="true"
       :style="hiddenInputStyle"
@@ -160,7 +169,7 @@ function onButtonClick(): void {
     data-ds-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
-    :aria-label="props.ariaLabel"
+    :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :tabindex="resolvedDisabled ? -1 : 0"
     class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--ring),0_0_0_4px_var(--bg)]"
@@ -170,19 +179,21 @@ function onButtonClick(): void {
     @keydown.enter.prevent="onButtonClick"
   >
     <input
+      :id="id"
       type="radio"
       :checked="checked"
       :disabled="resolvedDisabled"
       :name="resolvedName"
-      :value="props.value"
-      :required="props.required"
-      :form="props.form"
+      :value="value"
+      :required="required"
+      :form="form"
       tabindex="-1"
       aria-hidden="true"
       :style="hiddenInputStyle"
     >
 
     <span
+      data-ds-radio-control
       aria-hidden="true"
       class="h-4 w-4 rounded-full border flex items-center justify-center transition-colors duration-150"
       :class="controlClassName"

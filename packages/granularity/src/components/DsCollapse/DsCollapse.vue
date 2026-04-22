@@ -10,20 +10,27 @@ import {
   type DsCollapseValue,
 } from './dsCollapseContext'
 
-const props = withDefaults(
-  defineProps<{
-    modelValue?: DsCollapseModelValue
-    accordion?: boolean
-    disabled?: boolean
-    divided?: boolean
-  }>(),
-  {
-    modelValue: undefined,
-    accordion: false,
-    disabled: false,
-    divided: true,
-  },
-)
+/**
+ * DsCollapse — контейнер секций `DsCollapseItem`.
+ *
+ * @prop modelValue — открытые секции. В `accordion`-режиме — `string|number|undefined`, иначе — массив значений.
+ * @prop accordion — режим, когда одновременно может быть открыта только одна секция.
+ * @prop disabled — блокирует взаимодействие со всеми секциями.
+ * @prop divided — разделители между секциями.
+ */
+export interface DsCollapseProps {
+  modelValue?: DsCollapseModelValue
+  accordion?: boolean
+  disabled?: boolean
+  divided?: boolean
+}
+
+const props = withDefaults(defineProps<DsCollapseProps>(), {
+  modelValue: undefined,
+  accordion: false,
+  disabled: false,
+  divided: true,
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: DsCollapseModelValue): void
@@ -93,7 +100,7 @@ provide(DS_COLLAPSE_CONTEXT, context)
 
 <template>
   <DsCard data-ds-collapse>
-    <div :class="props.divided ? 'divide-y divide-[var(--brd)]' : ''">
+    <div :class="divided ? 'divide-y divide-[var(--brd)]' : ''">
       <slot />
     </div>
   </DsCard>
