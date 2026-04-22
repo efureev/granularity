@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import type { DsFileUploadExtraData, DsFileUploadRequestCtx } from '@feugene/granularity'
 import {
   DsFileUpload,
   acceptValidator,
@@ -9,7 +10,7 @@ import {
 
 const lastResult = ref('No uploads yet')
 
-async function request(files: File[], ctx: { extraData?: Record<string, string> }) {
+async function request(files: File[], ctx: DsFileUploadRequestCtx) {
   await new Promise(resolve => window.setTimeout(resolve, 250))
 
   return {
@@ -19,8 +20,10 @@ async function request(files: File[], ctx: { extraData?: Record<string, string> 
   }
 }
 
-function onSuccess(payload: { count: number; names: string[]; extraData?: Record<string, string> }) {
-  lastResult.value = `uploaded ${payload.count} file(s): ${payload.names.join(', ') || '—'} · bucket=${payload.extraData?.bucket ?? 'n/a'}`
+function onSuccess(payload: { count: number; names: string[]; extraData?: DsFileUploadExtraData }) {
+  const bucketValue = payload.extraData?.bucket
+  const bucketLabel = typeof bucketValue === 'string' ? bucketValue : 'n/a'
+  lastResult.value = `uploaded ${payload.count} file(s): ${payload.names.join(', ') || '—'} · bucket=${bucketLabel}`
 }
 
 function onError(error: unknown) {

@@ -22,7 +22,7 @@ const stats = [
           <IconCircleCheck/>
         </DsIcon>
 
-        <DsBadge size="sm" tone="secondary">
+        <DsBadge size="sm" tone="neutral">
           snapshot
         </DsBadge>
       </div>

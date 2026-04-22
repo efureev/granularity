@@ -183,8 +183,8 @@ function handleUploadValidationError(error: unknown) {
       <DsDialog v-model="dialogOpen" title="Invite teammate" size="sm">
         <div class="grid gap-3 text-sm text-[var(--muted-fg)]" v-autofocus="{ selector: 'input', preventScroll: true }">
           <p>После открытия dialog фокус попадёт в первое поле ввода.</p>
-          <DsInput placeholder="name@company.com" />
-          <DsInput placeholder="Role" />
+          <DsInput model-value="" placeholder="name@company.com" />
+          <DsInput model-value="" placeholder="Role" />
         </div>
       </DsDialog>
     </template>
@@ -244,7 +244,7 @@ function handleUploadValidationError(error: unknown) {
         }"
         class="grid gap-3"
       >
-        <DsInput placeholder="Focus here and press Escape" />
+        <DsInput model-value="" placeholder="Focus here and press Escape" />
         <p class="text-sm text-[var(--muted-fg)]">
           {{ hotkeyLog }}
         </p>

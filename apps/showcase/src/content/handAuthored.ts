@@ -65,7 +65,7 @@ const componentSummaryOverrides = {
 
 export function resolveHandAuthoredComponentGroup(componentName: string): string {
   for (const [group, componentNames] of Object.entries(componentGroups)) {
-    if (componentNames.includes(componentName))
+    if ((componentNames as readonly string[]).includes(componentName))
       return group
   }
 
@@ -181,7 +181,7 @@ export function applyHandAuthoredEntityMetadata(
     ? resolveHandAuthoredComponentGroup(entity.name)
     : entity.group
   const defaultSummary = entity.kind === 'component'
-    ? componentSummaryOverrides[entity.name] ?? entity.summary
+    ? (componentSummaryOverrides as Record<string, string>)[entity.name] ?? entity.summary
     : entity.summary
 
   return {

@@ -496,6 +496,99 @@
       }
     ]
   },
+  "DsCheckbox": {
+    "name": "DsCheckbox",
+    "sourcePath": "packages/granularity/src/components/DsCheckbox/DsCheckbox.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "value",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"on\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "form",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "Пробрасывается на скрытый нативный `<input>`, чтобы работал `<label for=\"...\">`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "DsCollapse": {
     "name": "DsCollapse",
     "sourcePath": "packages/granularity/src/components/DsCollapse/DsCollapse.vue",
@@ -588,7 +681,7 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"Confirm\""
           },
           {
             "name": "size",
@@ -612,6 +705,27 @@
             "default": "true"
           },
           {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showHeader",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "headerConfig",
             "description": "",
             "type": "DsDialogSectionConfig | undefined",
@@ -626,6 +740,20 @@
             "default": "undefined"
           },
           {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "DsDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
             "name": "buttonSize",
             "description": "",
             "type": "DsButtonSize | undefined",
@@ -637,14 +765,14 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"Confirm\""
           },
           {
             "name": "cancelText",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"Cancel\""
           },
           {
             "name": "confirmVariant",
@@ -728,36 +856,194 @@
         "origin": "generated",
         "items": [
           {
-            "name": "rowKey",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"id\""
-          },
-          {
-            "name": "initialSortKey",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "initialSortDir",
-            "description": "",
-            "type": "\"asc\" | \"desc\" | undefined",
-            "required": false,
-            "default": "\"asc\""
-          },
-          {
             "name": "rows",
             "description": "",
-            "type": "Record<string, unknown>[]",
+            "type": "TRow[]",
             "required": true
           },
           {
             "name": "columns",
             "description": "",
             "type": "DsDataColumn[]",
+            "required": true
+          },
+          {
+            "name": "rowKey",
+            "description": "Ключ строки или функция-резолвер. По умолчанию — поле `'id'`.",
+            "type": "DsDataTableRowKey<TRow> | undefined",
+            "required": false,
+            "default": "\"id\" as never"
+          },
+          {
+            "name": "initialSortKey",
+            "description": "Ключ колонки для начальной сортировки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "initialSortDir",
+            "description": "Направление начальной сортировки.",
+            "type": "\"asc\" | \"desc\" | undefined",
+            "required": false,
+            "default": "\"asc\""
+          },
+          {
+            "name": "density",
+            "description": "",
+            "type": "DsTableDensity | undefined",
+            "required": false,
+            "default": "\"regular\""
+          },
+          {
+            "name": "caption",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabelledby",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "regionLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "caption",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "foot",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "DsDialog": {
+    "name": "DsDialog",
+    "sourcePath": "packages/granularity/src/components/DsDialog/DsDialog.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "DsDialogSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "closeOnBackdrop",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showHeader",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "headerConfig",
+            "description": "",
+            "type": "DsDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "footerConfig",
+            "description": "",
+            "type": "DsDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "DsDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
             "required": true
           }
         ]
@@ -766,13 +1052,36 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "any"
+          },
+          {
+            "name": "header",
+            "description": "",
+            "type": "{ title?: string | undefined; }"
+          },
+          {
+            "name": "footer",
+            "description": "",
+            "type": "any"
+          }
+        ]
       },
       {
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
       },
       {
         "key": "methods",
@@ -793,35 +1102,49 @@
         "items": [
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок; если передан — покажется в хедере. Можно переопределить слотом `#title`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
-            "type": "\"md\" | \"sm\" | \"lg\" | \"full\" | undefined",
+            "description": "Размер панели.",
+            "type": "DsDrawerSize | undefined",
             "required": false,
             "default": "\"md\""
           },
           {
             "name": "closeOnBackdrop",
-            "description": "",
+            "description": "Закрывать при клике по бэкдропу / через HeadlessUI close.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
+            "name": "closeOnEsc",
+            "description": "Закрывать по Esc.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeLabel",
+            "description": "i18n-friendly aria-label для кнопки закрытия.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
             "name": "side",
-            "description": "",
-            "type": "\"right\" | \"left\" | undefined",
+            "description": "Сторона, с которой выезжает панель.",
+            "type": "DsDrawerSide | undefined",
             "required": false,
             "default": "\"right\""
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Контроль открытия через v-model.",
             "type": "boolean",
             "required": true
           }
@@ -881,35 +1204,35 @@
         "items": [
           {
             "name": "align",
-            "description": "",
+            "description": "Выравнивание панели относительно триггера.",
             "type": "DsDropdownAlign | undefined",
             "required": false,
             "default": "\"right\""
           },
           {
             "name": "width",
-            "description": "",
+            "description": "Ширина панели (tailwind-токены `w-*` или `auto`).",
             "type": "DsDropdownWidth | undefined",
             "required": false,
             "default": "\"48\""
           },
           {
             "name": "closeOnContentClick",
-            "description": "",
+            "description": "Закрывать панель по клику внутри content.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "contentClass",
-            "description": "",
+            "description": "Дополнительные классы контейнера content.",
             "type": "string | undefined",
             "required": false,
             "default": "\"\""
           },
           {
             "name": "teleportTo",
-            "description": "",
+            "description": "Куда телепортировать панель (`body` по умолчанию).",
             "type": "string | HTMLElement | undefined",
             "required": false,
             "default": "\"body\""
@@ -958,56 +1281,56 @@
         "items": [
           {
             "name": "align",
-            "description": "",
+            "description": "Выравнивание панели относительно триггера.",
             "type": "DsDropdownMenuAlign | undefined",
             "required": false,
             "default": "\"right\""
           },
           {
             "name": "width",
-            "description": "",
+            "description": "Ширина панели.",
             "type": "DsDropdownMenuWidth | undefined",
             "required": false,
             "default": "\"48\""
           },
           {
             "name": "closeOnContentClick",
-            "description": "",
+            "description": "Закрывать по клику внутри content.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "contentClass",
-            "description": "",
+            "description": "Дополнительные классы content-контейнера; по умолчанию `p-0`.",
             "type": "string | undefined",
             "required": false,
             "default": "\"p-0\""
           },
           {
             "name": "dividers",
-            "description": "",
+            "description": "Разделители между пунктами.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "borderTop",
-            "description": "",
+            "description": "Верхний бордер контейнера списка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "borderBottom",
-            "description": "",
+            "description": "Нижний бордер контейнера списка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "listClass",
-            "description": "",
+            "description": "Дополнительные классы для wrapper'а списка.",
             "type": "string | undefined",
             "required": false,
             "default": "\"\""
@@ -1036,201 +1359,6 @@
         "title": "Events",
         "origin": "generated",
         "items": []
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
-  "DsCheckbox": {
-    "name": "DsCheckbox",
-    "sourcePath": "packages/granularity/src/components/DsCheckbox/DsCheckbox.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "value",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"on\""
-          },
-          {
-            "name": "modelValue",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "required",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "name",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "form",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "update:modelValue",
-            "description": "",
-            "type": "[value: boolean]",
-            "signature": "(event: \"update:modelValue\", value: boolean): void"
-          }
-        ]
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
-  "DsDialog": {
-    "name": "DsDialog",
-    "sourcePath": "packages/granularity/src/components/DsDialog/DsDialog.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "title",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "size",
-            "description": "",
-            "type": "DsDialogSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
-            "name": "closeOnBackdrop",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "headerConfig",
-            "description": "",
-            "type": "DsDialogSectionConfig | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "footerConfig",
-            "description": "",
-            "type": "DsDialogSectionConfig | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "showHeader",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "showCloseButton",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "modelValue",
-            "description": "",
-            "type": "boolean",
-            "required": true
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "header",
-            "description": "",
-            "type": "{ title?: string | undefined; }"
-          },
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "footer",
-            "description": "",
-            "type": "{}"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "update:modelValue",
-            "description": "",
-            "type": "[value: boolean]",
-            "signature": "(event: \"update:modelValue\", value: boolean): void"
-          }
-        ]
       },
       {
         "key": "methods",
@@ -1269,6 +1397,11 @@
         "title": "Slots",
         "origin": "generated",
         "items": [
+          {
+            "name": "icon",
+            "description": "",
+            "type": "{}"
+          },
           {
             "name": "default",
             "description": "",
@@ -1389,6 +1522,13 @@
             "type": "((files: File[]) => DsFileUploadExtraData | undefined) | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "i18n: надпись-подсказка в дефолтном UI.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Drag files here or click to select\""
           }
         ]
       },
@@ -1469,6 +1609,71 @@
       }
     ]
   },
+  "DsFormField": {
+    "name": "DsFormField",
+    "sourcePath": "packages/granularity/src/components/DsFormField/DsFormField.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "error",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "forId",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "labelClass",
+            "description": "",
+            "type": "LabelClass | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "DsFormFile": {
     "name": "DsFormFile",
     "sourcePath": "packages/granularity/src/components/DsFormFile/DsFormFile.vue",
@@ -1498,6 +1703,13 @@
             "type": "FileValidator[] | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"No files selected\""
           },
           {
             "name": "accept",
@@ -1533,13 +1745,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"Clear all\""
-          },
-          {
-            "name": "placeholder",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"No files selected\""
           },
           {
             "name": "validate",
@@ -1604,71 +1809,6 @@
             "signature": "(event: \"update:errors\", errors: FileValidationIssue[]): void"
           }
         ]
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
-  "DsFormField": {
-    "name": "DsFormField",
-    "sourcePath": "packages/granularity/src/components/DsFormField/DsFormField.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "error",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "label",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "forId",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "labelClass",
-            "description": "",
-            "type": "LabelClass | undefined",
-            "required": false,
-            "default": "undefined"
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": []
       },
       {
         "key": "methods",
@@ -1781,6 +1921,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "closeLabel",
+            "description": "i18n: aria-label кнопки закрытия.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close image viewer\""
+          },
+          {
             "name": "zIndex",
             "description": "",
             "type": "number | undefined",
@@ -1842,6 +1989,62 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "prevLabel",
+            "description": "i18n: aria-label кнопки «предыдущее изображение».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Previous image\""
+          },
+          {
+            "name": "nextLabel",
+            "description": "i18n: aria-label кнопки «следующее изображение».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Next image\""
+          },
+          {
+            "name": "zoomInLabel",
+            "description": "i18n: aria-label кнопки «увеличить».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Zoom in\""
+          },
+          {
+            "name": "zoomOutLabel",
+            "description": "i18n: aria-label кнопки «уменьшить».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Zoom out\""
+          },
+          {
+            "name": "resetZoomLabel",
+            "description": "i18n: aria-label кнопки «сбросить масштаб».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Reset zoom\""
+          },
+          {
+            "name": "rotateLeftLabel",
+            "description": "i18n: aria-label кнопки «повернуть влево».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Rotate left\""
+          },
+          {
+            "name": "rotateRightLabel",
+            "description": "i18n: aria-label кнопки «повернуть вправо».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Rotate right\""
+          },
+          {
+            "name": "emptyText",
+            "description": "i18n: текст в пустом состоянии (нет изображений).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"No image\""
           },
           {
             "name": "modelValue",
@@ -1944,14 +2147,14 @@
             "default": "false"
           },
           {
-            "name": "id",
+            "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "name",
+            "name": "id",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -2079,220 +2282,6 @@
       }
     ]
   },
-  "DsNumberInput": {
-    "name": "DsNumberInput",
-    "sourcePath": "packages/granularity/src/components/DsNumberInput/DsNumberInput.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "size",
-            "description": "",
-            "type": "DsNumberInputSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "id",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "name",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "placeholder",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "autocomplete",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "inputmode",
-            "description": "",
-            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
-            "required": false,
-            "default": "\"decimal\""
-          },
-          {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "state",
-            "description": "",
-            "type": "DsNumberInputState | undefined",
-            "required": false,
-            "default": "\"default\""
-          },
-          {
-            "name": "textAlign",
-            "description": "",
-            "type": "DsNumberInputTextAlign | undefined",
-            "required": false,
-            "default": "\"left\""
-          },
-          {
-            "name": "prefixMinWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "prefixMaxWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "suffixMinWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "suffixMaxWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "decimalSeparator",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\".\""
-          },
-          {
-            "name": "step",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "1"
-          },
-          {
-            "name": "min",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "max",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "precision",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "controls",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "controlsDirection",
-            "description": "",
-            "type": "DsNumberInputControlsDirection | undefined",
-            "required": false,
-            "default": "\"vertical\""
-          },
-          {
-            "name": "modelValue",
-            "description": "",
-            "type": "string",
-            "required": true
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "prefix",
-            "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "suffix",
-            "description": "",
-            "type": "{}"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "update:modelValue",
-            "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"update:modelValue\", value: string): void"
-          },
-          {
-            "name": "change",
-            "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"change\", value: string): void"
-          }
-        ]
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "focus",
-            "description": "",
-            "type": "() => void"
-          }
-        ]
-      }
-    ]
-  },
   "DsInputTag": {
     "name": "DsInputTag",
     "sourcePath": "packages/granularity/src/components/DsInputTag/DsInputTag.vue",
@@ -2345,13 +2334,6 @@
             "default": "\"default\""
           },
           {
-            "name": "max",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "readonly",
             "description": "",
             "type": "boolean | undefined",
@@ -2371,6 +2353,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "addOnBlur",
@@ -2420,6 +2409,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "removeTagLabel",
+            "description": "i18n-friendly aria-label for the per-tag remove button.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Remove tag\""
           },
           {
             "name": "modelValue",
@@ -2480,50 +2476,6 @@
       }
     ]
   },
-  "DsList": {
-    "name": "DsList",
-    "sourcePath": "packages/granularity/src/components/DsList/DsList.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "divided",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": []
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
   "DsLink": {
     "name": "DsLink",
     "sourcePath": "packages/granularity/src/components/DsLink/DsLink.vue",
@@ -2545,7 +2497,7 @@
             "description": "",
             "type": "DsLinkSize | undefined",
             "required": false,
-            "default": "\"sm\""
+            "default": "\"md\""
           },
           {
             "name": "disabled",
@@ -2624,6 +2576,50 @@
       }
     ]
   },
+  "DsList": {
+    "name": "DsList",
+    "sourcePath": "packages/granularity/src/components/DsList/DsList.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "divided",
+            "description": "Показывать ли горизонтальные разделители между элементами (по умолчанию — да).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "DsLoading": {
     "name": "DsLoading",
     "sourcePath": "packages/granularity/src/components/DsLoading/DsLoading.vue",
@@ -2635,56 +2631,56 @@
         "items": [
           {
             "name": "zIndex",
-            "description": "",
+            "description": "Custom `z-index`.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "text",
-            "description": "",
+            "description": "Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "spinner",
-            "description": "",
+            "description": "Custom spinner component (rendered instead of the default loader icon).",
             "type": "Component | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "spinnerClass",
-            "description": "",
+            "description": "Extra classes for the spinner element.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "animated",
-            "description": "",
+            "description": "When `true` (default), the default spinner rotates via `@keyframes ds-loading-spin`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "background",
-            "description": "",
+            "description": "Custom CSS `background-color`. When set, disables the default `bg-black/25` dim.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "fullscreen",
-            "description": "",
+            "description": "Cover the whole viewport (`position: fixed`) instead of the nearest positioned ancestor.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "customClass",
-            "description": "",
+            "description": "Extra classes appended to the overlay root.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2723,12 +2719,19 @@
           {
             "name": "size",
             "description": "",
-            "type": "DsDialogSize | undefined",
+            "type": "DsModalSize | undefined",
             "required": false,
             "default": "\"md\""
           },
           {
             "name": "closeOnBackdrop",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
@@ -2747,6 +2750,16 @@
         "title": "Slots",
         "origin": "generated",
         "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "description",
+            "description": "",
+            "type": "{}"
+          },
           {
             "name": "default",
             "description": "",
@@ -2841,6 +2854,234 @@
         "title": "Methods / Expose",
         "origin": "generated",
         "items": []
+      }
+    ]
+  },
+  "DsNumberInput": {
+    "name": "DsNumberInput",
+    "sourcePath": "packages/granularity/src/components/DsNumberInput/DsNumberInput.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "DsNumberInputSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autocomplete",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "inputmode",
+            "description": "",
+            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "required": false,
+            "default": "\"decimal\""
+          },
+          {
+            "name": "invalid",
+            "description": "Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "DsNumberInputState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "textAlign",
+            "description": "",
+            "type": "DsNumberInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "decimalSeparator",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\".\""
+          },
+          {
+            "name": "step",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "min",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "precision",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "controls",
+            "description": "Показывать кнопки +/-.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "controlsDirection",
+            "description": "",
+            "type": "DsNumberInputControlsDirection | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
+            "name": "increaseLabel",
+            "description": "i18n-friendly aria-label для кнопки \"увеличить\".",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Increase\""
+          },
+          {
+            "name": "decreaseLabel",
+            "description": "i18n-friendly aria-label для кнопки \"уменьшить\".",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Decrease\""
+          },
+          {
+            "name": "modelValue",
+            "description": "Значение (строка — контролируем форматирование внутри).",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "prefix",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "suffix",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -3009,6 +3250,27 @@
             "default": "true"
           },
           {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showHeader",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "headerConfig",
             "description": "",
             "type": "DsDialogSectionConfig | undefined",
@@ -3021,6 +3283,20 @@
             "type": "DsDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "DsDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
           },
           {
             "name": "buttonSize",
@@ -3070,6 +3346,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"Value\""
+          },
+          {
+            "name": "requiredErrorText",
+            "description": "Текст ошибки для пустого значения при `required=true` (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Enter a value.\""
           },
           {
             "name": "value",
@@ -3207,6 +3490,13 @@
             "default": "undefined"
           },
           {
+            "name": "id",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "buttonVariant",
             "description": "",
             "type": "DsButtonVariant | undefined",
@@ -3306,6 +3596,13 @@
             "default": "false"
           },
           {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
@@ -3349,6 +3646,117 @@
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "DsSegmented": {
+    "name": "DsSegmented",
+    "sourcePath": "packages/granularity/src/components/DsSegmented/DsSegmented.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "",
+            "type": "DsSegmentedVariant | undefined",
+            "required": false,
+            "default": "\"pills\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "DsSegmentedSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя скрытых radio-inputs для интеграции с нативной формой.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "indicatorDuration",
+            "description": "Длительность анимации индикатора в мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "300"
+          },
+          {
+            "name": "block",
+            "description": "Растягивать сегмент на всю ширину контейнера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "DsSegmentedValue",
+            "required": true
+          },
+          {
+            "name": "options",
+            "description": "",
+            "type": "DsSegmentedOption[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ option: DsSegmentedOption; selected: boolean; disabled: boolean; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: DsSegmentedValue]",
+            "signature": "(event: \"update:modelValue\", value: DsSegmentedValue): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: DsSegmentedValue, option: DsSegmentedOption]",
+            "signature": "(event: \"change\", value: DsSegmentedValue, option: DsSegmentedOption): void"
           }
         ]
       },
@@ -3475,6 +3883,13 @@
             "default": "false"
           },
           {
+            "name": "clearLabel",
+            "description": "i18n-label для кнопки очистки (`aria-label`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Clear\""
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "DsSelectModelValue",
@@ -3525,117 +3940,6 @@
       }
     ]
   },
-  "DsSegmented": {
-    "name": "DsSegmented",
-    "sourcePath": "packages/granularity/src/components/DsSegmented/DsSegmented.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "variant",
-            "description": "",
-            "type": "DsSegmentedVariant | undefined",
-            "required": false,
-            "default": "\"pills\""
-          },
-          {
-            "name": "size",
-            "description": "",
-            "type": "DsSegmentedSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "ariaLabel",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "name",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "indicatorDuration",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "300"
-          },
-          {
-            "name": "block",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "modelValue",
-            "description": "",
-            "type": "DsSegmentedValue",
-            "required": true
-          },
-          {
-            "name": "options",
-            "description": "",
-            "type": "DsSegmentedOption[]",
-            "required": true
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "default",
-            "description": "",
-            "type": "{ option: DsSegmentedOption; selected: boolean; disabled: boolean; }"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "update:modelValue",
-            "description": "",
-            "type": "[value: DsSegmentedValue]",
-            "signature": "(event: \"update:modelValue\", value: DsSegmentedValue): void"
-          },
-          {
-            "name": "change",
-            "description": "",
-            "type": "[value: DsSegmentedValue, option: DsSegmentedOption]",
-            "signature": "(event: \"change\", value: DsSegmentedValue, option: DsSegmentedOption): void"
-          }
-        ]
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
   "DsSidebar": {
     "name": "DsSidebar",
     "sourcePath": "packages/granularity/src/components/DsSidebar/DsSidebar.vue",
@@ -3646,17 +3950,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "subtitle",
+            "name": "title",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "title",
+            "name": "subtitle",
             "description": "",
-            "type": "string",
-            "required": true
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -3665,6 +3970,16 @@
         "title": "Slots",
         "origin": "generated",
         "items": [
+          {
+            "name": "subtitle",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
           {
             "name": "default",
             "description": "",
@@ -3770,14 +4085,14 @@
           },
           {
             "name": "activeBackgroundColor",
-            "description": "",
+            "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--primary)`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "inactiveBackgroundColor",
-            "description": "",
+            "description": "Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--muted)`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -3831,7 +4146,43 @@
         "key": "props",
         "title": "Props",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "ariaLabel",
+            "description": "Прямой ARIA-label для `<table>`. Игнорируется, если задан `ariaLabelledby`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "density",
+            "description": "Плотность таблицы — влияет на базовый размер шрифта. Паддинги ячеек оставлены за консьюмером (DsTable — «тонкий» контейнер).",
+            "type": "DsTableDensity | undefined",
+            "required": false,
+            "default": "\"regular\""
+          },
+          {
+            "name": "caption",
+            "description": "Текст caption для screen reader'ов. Рендерится как `<caption class=\"sr-only\">`, если не передан слот `#caption`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabelledby",
+            "description": "ID элемента-заголовка, связанного с `<table>` через `aria-labelledby`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "regionLabel",
+            "description": "ARIA-label для скролл-контейнера (`role=\"region\"` + `tabindex=\"0\"`). Позволяет клавиатурным пользователям проскроллить широкую таблицу. Если не задан — region-роль не включается.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
       },
       {
         "key": "slots",
@@ -3839,12 +4190,22 @@
         "origin": "generated",
         "items": [
           {
+            "name": "caption",
+            "description": "",
+            "type": "{}"
+          },
+          {
             "name": "head",
             "description": "",
             "type": "{}"
           },
           {
             "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "foot",
             "description": "",
             "type": "{}"
           }
@@ -3914,36 +4275,6 @@
       }
     ]
   },
-  "DsToaster": {
-    "name": "DsToaster",
-    "sourcePath": "packages/granularity/src/components/DsToaster/DsToaster.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": []
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": []
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": []
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
   "DsTextarea": {
     "name": "DsTextarea",
     "sourcePath": "packages/granularity/src/components/DsTextarea/DsTextarea.vue",
@@ -3961,6 +4292,13 @@
             "default": "false"
           },
           {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "id",
             "description": "",
             "type": "string | undefined",
@@ -3973,13 +4311,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "4"
-          },
-          {
-            "name": "name",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -4035,6 +4366,108 @@
             "signature": "(event: \"update:modelValue\", value: string): void"
           }
         ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "DsToaster": {
+    "name": "DsToaster",
+    "sourcePath": "packages/granularity/src/components/DsToaster/DsToaster.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "regionLabel",
+            "description": "A11y-лейбл контейнера-региона (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Notifications\""
+          },
+          {
+            "name": "placement",
+            "description": "Угол экрана для стека уведомлений.",
+            "type": "DsToasterPlacement | undefined",
+            "required": false,
+            "default": "\"top-right\""
+          },
+          {
+            "name": "dismissLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Dismiss\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "DsTooltip": {
+    "name": "DsTooltip",
+    "sourcePath": "packages/granularity/src/components/DsTooltip/DsTooltip.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "iconColor",
+            "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--muted-fg)`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"var(--muted-fg)\""
+          },
+          {
+            "name": "text",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
       },
       {
         "key": "methods",
@@ -4176,6 +4609,27 @@
             "type": "DsTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "dragLabel",
+            "description": "i18n-метка кнопки \"Перетащить\" (default: 'Drag').",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Drag\""
+          },
+          {
+            "name": "expandLabel",
+            "description": "i18n-метка кнопки \"Развернуть\" (default: 'Expand').",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Expand\""
+          },
+          {
+            "name": "collapseLabel",
+            "description": "i18n-метка кнопки \"Свернуть\" (default: 'Collapse').",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Collapse\""
           },
           {
             "name": "draggable",
@@ -4483,56 +4937,6 @@
             "signature": "(e: \"nodeClick\", data: T, node: DsTreeNode<T>): void"
           }
         ]
-      },
-      {
-        "key": "methods",
-        "title": "Methods / Expose",
-        "origin": "generated",
-        "items": []
-      }
-    ]
-  },
-  "DsTooltip": {
-    "name": "DsTooltip",
-    "sourcePath": "packages/granularity/src/components/DsTooltip/DsTooltip.vue",
-    "sections": [
-      {
-        "key": "props",
-        "title": "Props",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "iconColor",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"var(--muted-fg)\""
-          },
-          {
-            "name": "text",
-            "description": "",
-            "type": "string",
-            "required": true
-          }
-        ]
-      },
-      {
-        "key": "slots",
-        "title": "Slots",
-        "origin": "generated",
-        "items": [
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
-          }
-        ]
-      },
-      {
-        "key": "events",
-        "title": "Events",
-        "origin": "generated",
-        "items": []
       },
       {
         "key": "methods",

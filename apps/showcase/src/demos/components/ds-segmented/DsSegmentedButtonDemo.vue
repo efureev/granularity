@@ -1,30 +1,31 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import type { DsSegmentedOption, DsSelectOption } from '@feugene/granularity'
 import { DsSegmented, DsSelect, type DsSegmentedSize } from '@feugene/granularity'
 
 const view = ref<'board' | 'calendar' | 'table'>('board')
 const size = ref<DsSegmentedSize>('md')
-const indicatorDuration = ref(400)
+const indicatorDuration = ref('400')
 
-const sizeOptions = [
+const sizeOptions: DsSelectOption[] = [
   { value: 'xs', label: 'Extra small' },
   { value: 'sm', label: 'Small' },
   { value: 'md', label: 'Medium' },
   { value: 'lg', label: 'Large' },
-] as const
+]
 
-const durationOptions = [
-  { value: 200, label: 'Fast · 200 ms' },
-  { value: 400, label: 'Balanced · 400 ms' },
-  { value: 800, label: 'Smooth · 800 ms' },
-] as const
+const durationOptions: DsSelectOption[] = [
+  { value: '200', label: 'Fast · 200 ms' },
+  { value: '400', label: 'Balanced · 400 ms' },
+  { value: '800', label: 'Smooth · 800 ms' },
+]
 
-const viewOptions = [
+const viewOptions: DsSegmentedOption[] = [
   { value: 'board', label: 'Board' },
   { value: 'calendar', label: 'Calendar' },
   { value: 'table', label: 'Table' },
-] as const
+]
 </script>
 
 <template>
@@ -50,7 +51,7 @@ const viewOptions = [
       :options="viewOptions"
       variant="button"
       :size="size"
-      :indicator-duration="indicatorDuration"
+      :indicator-duration="Number(indicatorDuration)"
       aria-label="View"
     />
   </div>

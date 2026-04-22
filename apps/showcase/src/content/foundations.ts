@@ -2,7 +2,7 @@ import installationDocSource from '../../../../packages/granularity/docs/install
 import localizationDocSource from '../../../../packages/granularity/docs/localization.md?raw'
 import stylingDocSource from '../../../../packages/granularity/docs/styling.md?raw'
 import unocssDocSource from '../../../../packages/granularity/docs/unocss.md?raw'
-import { granularityDefaultThemes, granularityThemeNames } from '../../../../packages/granularity/src/theming/themeRegistry'
+import { granularityDefaultThemes, granularityThemeNames } from '@feugene/granularity/granular-provider'
 
 type ShowcaseCodeSample = {
   title: string

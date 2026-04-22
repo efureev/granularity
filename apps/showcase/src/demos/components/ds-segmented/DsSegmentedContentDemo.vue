@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import type { DsSegmentedOption } from '@feugene/granularity'
 import { DsSegmented } from '@feugene/granularity'
 
 import IconCalendarDays from '~icons/lucide/calendar-days'
@@ -11,17 +12,17 @@ import IconSunMoon from '~icons/lucide/sun-moon'
 const dashboardView = ref<'board' | 'timeline' | 'calendar'>('board')
 const iconOnlyView = ref<'board' | 'timeline' | 'calendar'>('timeline')
 
-const dashboardOptions = [
+const dashboardOptions: DsSegmentedOption[] = [
   { value: 'board', label: 'Board', icon: IconLayoutGrid },
   { value: 'timeline', label: 'Timeline', icon: IconRows3 },
   { value: 'calendar', label: 'Calendar', icon: IconCalendarDays },
-] as const
+]
 
-const iconOnlyOptions = [
+const iconOnlyOptions: DsSegmentedOption[] = [
   { value: 'board', icon: IconLayoutGrid },
   { value: 'timeline', icon: IconRows3 },
   { value: 'calendar', icon: IconCalendarDays },
-] as const
+]
 </script>
 
 <template>

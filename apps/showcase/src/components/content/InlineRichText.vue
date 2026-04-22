@@ -68,7 +68,7 @@ function createParts(text: string) {
     })
   }
 
-  return parts.length ? parts : [{type: 'text', content: text}]
+  return parts.length ? parts : [{type: 'text', content: text} as InlineRichTextPart]
 }
 
 const parts = computed(() => createParts(props.text))

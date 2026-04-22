@@ -71,7 +71,7 @@ onBeforeUnmount(() => {
         Simulate async media fetch
       </DsButton>
 
-      <DsBadge v-if="hasSlides" size="sm" tone="secondary">
+      <DsBadge v-if="hasSlides" size="sm" tone="neutral">
         {{ slides.length }} slides ready
       </DsBadge>
     </div>

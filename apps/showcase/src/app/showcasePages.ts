@@ -260,7 +260,7 @@ export const showcasePages: ShowcasePage[] = [
         title: 'Component catalog',
         description: 'Здесь будет index-страница со всеми публичными компонентами и быстрой группировкой по категориям.',
         bullets: [
-          `Источник правды — \`packages/granularity/src/registry/components.ts\` с текущим покрытием в ${showcaseComponentEntities.length} компонентных сущностей.`,
+          `Источник правды — \`packages/granularity/src/granular-provider/shared.ts\` с текущим покрытием в ${showcaseComponentEntities.length} компонентных сущностей.`,
           'Навигация по компонентам должна быть мгновенной и search-friendly.',
           'Каждый компонент получит отдельный route и собственную страницу.',
         ],

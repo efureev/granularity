@@ -7,18 +7,16 @@ import {
   transformerVariantGroup,
 } from 'unocss'
 
-import { granularContent, presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import {granularContent, presetGranularNode, type PresetGranularNodeOptions} from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
 
 export const showcaseContentIncludes = [
   /apps\/showcase\/src\/.*\.(vue|ts)($|\?)/,
 ]
 
-export const showcaseGranularOptions = {
+export const showcaseGranularOptions: PresetGranularNodeOptions = {
   providers: [granularityProvider],
-  components: [
-    { provider: '@feugene/granularity', names: ['DsButton'] },
-  ],
+  components: 'all',
   themes: { names: ['light', 'dark'] },
   layer: 'granular' as const,
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import type { DsDataColumn } from '@feugene/granularity'
 import { DsBadge, DsButton, DsDataTable } from '@feugene/granularity'
 import IconTrash from '~icons/lucide/trash2'
 
@@ -12,7 +13,7 @@ const rows = [
   { id: 3, service: 'Notifier', status: 'danger', owner: 'Growth' },
 ]
 
-const columns = [
+const columns: DsDataColumn[] = [
   { key: 'service', label: 'Service', sortable: true },
   { key: 'owner', label: 'Owner' },
   { key: 'status', label: 'Status' },
