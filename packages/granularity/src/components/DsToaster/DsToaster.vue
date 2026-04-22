@@ -1,8 +1,29 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+/**
+ * DsToaster — DS-примитив области уведомлений (toast).
+ *
+ * Модель состояния берётся из `useToast` (модульный синглтон), поэтому
+ * в приложении предполагается **один активный `DsToaster`** на корень.
+ *
+ * A11y:
+ * - контейнер — `role="region"` с `aria-label` (i18n-проп `regionLabel`);
+ * - каждый toast — `role="status"` + `aria-live="polite"` для `info`/`success`
+ *   и `role="alert"` + `aria-live="assertive"` для `warning`/`danger`
+ *   (критичные сообщения должны прерывать скринридер).
+ *
+ * UX:
+ * - появление/исчезновение анимируется `TransitionGroup`;
+ * - `placement` настраивает угол экрана;
+ * - `z-[60]` — выше, чем `DsModal` (`z-50`), чтобы уведомления не перекрывались диалогом.
+ */
+import {computed} from 'vue'
+import type {Component} from 'vue'
 
-import { useToast } from '../../composables/useToast'
+import {useToast} from '../../composables/useToast'
+import type {ToastVariant} from '../../composables/useToast'
 import DsButton from '../DsButton'
+import DsIcon from '../DsIcon'
+import {PLACEMENT_CLASS, type DsToasterPlacement} from './dsToasterStyles'
 
 import IconCheck from '~icons/lucide/check-circle'
 import IconWarning from '~icons/lucide/alert-triangle'
@@ -10,54 +31,108 @@ import IconError from '~icons/lucide/x-circle'
 import IconInfo from '~icons/lucide/info'
 import IconClose from '~icons/lucide/x'
 
-const { list, dismiss } = useToast()
+export type {DsToasterPlacement}
 
-const items = computed(() => list.value)
-
-function iconFor(variant: string) {
-  if (variant === 'success') return IconCheck
-  if (variant === 'warning') return IconWarning
-  if (variant === 'danger') return IconError
-  return IconInfo
+interface VariantMeta {
+  icon: Component
+  color: string
+  role: 'status' | 'alert'
+  live: 'polite' | 'assertive'
 }
 
-function colorFor(variant: string): string {
-  if (variant === 'success') return 'var(--ds-success)'
-  if (variant === 'warning') return 'var(--ds-warning)'
-  if (variant === 'danger') return 'var(--ds-danger)'
-  return 'var(--ds-info)'
+// Единый маппинг по variant'у: иконка, цвет, a11y-роль и «напор» live-региона.
+// На уровне модуля — чтобы не пересоздавать объект на каждый рендер.
+const VARIANT_META: Record<ToastVariant, VariantMeta> = {
+  info: {icon: IconInfo, color: 'var(--ds-info)', role: 'status', live: 'polite'},
+  success: {icon: IconCheck, color: 'var(--ds-success)', role: 'status', live: 'polite'},
+  warning: {icon: IconWarning, color: 'var(--ds-warning)', role: 'alert', live: 'assertive'},
+  danger: {icon: IconError, color: 'var(--ds-danger)', role: 'alert', live: 'assertive'},
 }
+
+
+export interface DsToasterProps {
+  /** Угол экрана для стека уведомлений. */
+  placement?: DsToasterPlacement
+  /** A11y-лейбл кнопки закрытия (i18n). */
+  dismissLabel?: string
+  /** A11y-лейбл контейнера-региона (i18n). */
+  regionLabel?: string
+}
+
+const props = withDefaults(defineProps<DsToasterProps>(), {
+  placement: 'top-right',
+  dismissLabel: 'Dismiss',
+  regionLabel: 'Notifications',
+})
+
+const {list, dismiss} = useToast()
+
+// SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
+const isClient = typeof window !== 'undefined'
+
+function metaFor(variant: ToastVariant): VariantMeta {
+  return VARIANT_META[variant] ?? VARIANT_META.info
+}
+
+const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
 </script>
 
 <template>
-  <teleport to="body">
-    <div class="fixed right-4 top-4 z-50 grid w-[360px] max-w-[calc(100vw-2rem)] gap-3">
-      <div
-        v-for="toast in items"
-        :key="toast.id"
-        class="rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--ds-shadow-2)]"
+  <teleport to="body" :disabled="!isClient">
+    <div
+        data-ds-toaster
+        role="region"
+        :aria-label="regionLabel"
+        class="fixed z-[60] grid w-[360px] max-w-[calc(100vw-2rem)] gap-3"
+        :class="containerClass"
+    >
+      <TransitionGroup
+          tag="div"
+          class="grid gap-3"
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition duration-150 ease-in absolute"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 translate-y-2"
+          move-class="transition-transform duration-200 ease-out"
       >
-        <div class="flex items-start gap-3">
-          <component :is="iconFor(toast.variant)" class="mt-0.5 h-5 w-5" :style="{ color: colorFor(toast.variant) }" aria-hidden="true" />
-          <div class="min-w-0 flex-1">
-            <div class="text-[13px] font-700">
-              {{ toast.title }}
+        <div
+            v-for="toast in list"
+            :key="toast.id"
+            data-ds-toast
+            :data-variant="toast.variant"
+            :role="metaFor(toast.variant).role"
+            :aria-live="metaFor(toast.variant).live"
+            aria-atomic="true"
+            class="rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--ds-shadow-2)]"
+        >
+          <div class="flex items-start gap-3">
+            <DsIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.variant).color }" aria-hidden="true">
+              <component :is="metaFor(toast.variant).icon"/>
+            </DsIcon>
+            <div class="min-w-0 flex-1">
+              <div class="text-[13px] font-700">
+                {{ toast.title }}
+              </div>
+              <div v-if="toast.message" class="mt-0.5 text-[13px] text-[var(--muted-fg)]">
+                {{ toast.message }}
+              </div>
             </div>
-            <div v-if="toast.message" class="mt-0.5 text-[13px] ds-muted">
-              {{ toast.message }}
-            </div>
+            <DsButton
+                variant="ghost"
+                size="sm"
+                square
+                :aria-label="dismissLabel"
+                @click="dismiss(toast.id)"
+            >
+              <DsIcon size="sm" aria-hidden="true">
+                <IconClose/>
+              </DsIcon>
+            </DsButton>
           </div>
-          <DsButton
-            variant="ghost"
-            size="sm"
-            square
-            aria-label="Dismiss"
-            @click="dismiss(toast.id)"
-          >
-            <IconClose class="h-4 w-4" aria-hidden="true" />
-          </DsButton>
         </div>
-      </div>
+      </TransitionGroup>
     </div>
   </teleport>
 </template>
