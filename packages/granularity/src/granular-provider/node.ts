@@ -6,10 +6,11 @@
 // Всё остальное — id, `theme.*`, список компонентов, `packageBaseUrl` —
 // приходит из общей фабрики `./shared`.
 import { dsButtonConfig } from '../components/DsButton/config.node'
+import { dsProgressBarConfig } from '../components/DsProgressBar/config.node'
 import { createGranularityProvider } from './shared'
 
-export { GRANULARITY_PROVIDER_ID } from './shared'
+export * from './shared'
 
-export const granularityProvider = createGranularityProvider([dsButtonConfig])
+export const granularityProvider = createGranularityProvider([dsButtonConfig, dsProgressBarConfig])
 
 export default granularityProvider

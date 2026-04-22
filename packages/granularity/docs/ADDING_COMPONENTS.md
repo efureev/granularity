@@ -170,9 +170,15 @@ export { default as DsIcon } from './DsIcon.vue'
 
 ## Что обязательно обновить вне папки компонента
 
-### 1. `src/registry/components.ts`
+### 1. `src/granular-provider/shared.ts`
 
-Подключите новый `config.ts` в `granularityComponentConfigs`.
+Подключите новый `config.ts` в `granularityComponentConfigs` (browser-safe `./config.ts`).
+
+Если у компонента есть node-only вариант конфига (например, чтение токенов
+с диска через `tokenDefinitionsFromCssSync` — как у `DsButton`),
+переопределите его в `src/granular-provider/node.ts` через массив
+`overrides`, передаваемый в `createGranularityProvider(...)`. Для браузера
+в `src/granular-provider/index.ts` аналогично передаётся `./config.ts`-вариант.
 
 Именно из этого реестра потом строятся:
 
@@ -244,7 +250,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 
 В текущем коде там проверяются:
 
-- подключение нового `config.ts` в `granularityComponentConfigs`;
+- подключение нового `config.ts` в `granularityComponentConfigs` (`src/granular-provider/shared.ts`);
 - safelist компонента в `granularityComponents` и `getGranularitySafelist(...)`;
 - зависимости `dependencies`, если они есть;
 - `styleAssetFileName`;
@@ -256,7 +262,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 ## Что проверить перед завершением задачи
 
 1. У компонента есть минимум `config.ts`, `index.ts` и основной `.vue`-файл.
-2. Компонент зарегистрирован в `src/registry/components.ts`.
+2. Компонент зарегистрирован в `src/granular-provider/shared.ts` (browser-конфиг); node-only конфиг, если нужен, подключён в `src/granular-provider/node.ts`.
 3. Компонент экспортируется из `src/index.ts`.
 4. При необходимости обновлён `packages/granularity/package.json`.
 5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.

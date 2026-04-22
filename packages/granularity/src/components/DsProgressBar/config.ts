@@ -5,5 +5,4 @@ import { dsProgressBarSafelist } from './safelist'
 export const dsProgressBarConfig = defineGranularComponent(import.meta.url, {
   name: 'DsProgressBar',
   safelist: dsProgressBarSafelist,
-  cssFiles: ['./tokens.css'],
 })

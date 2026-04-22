@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../shared/classTokens'
-
 export type DsProgressBarTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
 
 function withVar(token: string): string {
@@ -20,15 +18,3 @@ const toneVars: Record<DsProgressBarTone, string> = {
 export function dsProgressBarFillClass(tone: DsProgressBarTone): string {
   return `bg-${withVar(toneVars[tone])}`
 }
-
-const fillTokens = (Object.keys(toneVars) as DsProgressBarTone[]).flatMap(tone =>
-  splitClassTokens(dsProgressBarFillClass(tone)),
-)
-
-export const dsProgressBarClassTokens = {
-  fill: fillTokens,
-} as const
-
-export const dsProgressBarSafelist = [...new Set([
-  ...dsProgressBarClassTokens.fill,
-])] as const

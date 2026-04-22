@@ -46,3 +46,20 @@ export * from './components/DsToaster'
 export * from './components/DsTooltip'
 export * from './components/DsTree'
 export * from './components/DsTreeSelect'
+
+// Runtime composables, публикуемые пакетом через root-barrel
+export { initThemeEarly, useTheme } from './composables/useTheme'
+export type { ThemeName, UseThemeOptions } from './composables/useTheme'
+export { useToast } from './composables/useToast'
+export type { Toast, ToastInput, ToastVariant } from './composables/useToast'
+
+// File validation — реэкспортируем типы, чтобы прикладной код мог писать
+// `import type { FileValidationIssue } from '@feugene/granularity'` без
+// дополнительного subpath‑импорта. Сами раннеры/валидаторы доступны из
+// `@feugene/granularity/fileValidation`.
+export type * from './fileValidation/types'
+
+// Публичные директивы пакета и фабрика `createLoading` — реэкспорт
+// из root-barrel, чтобы прикладной код мог писать `import { vHotkey,
+// createLoading } from '@feugene/granularity'` без subpath-импорта.
+export * from './directives'

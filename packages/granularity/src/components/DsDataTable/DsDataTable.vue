@@ -13,7 +13,7 @@ export type DsDataColumn = {
   key: string
   label: string
   sortable?: boolean
-  align?: 'left' | 'right'
+  align?: 'left' | 'center' | 'right'
 }
 
 export type DsDataTableRowKey<TRow extends Record<string, unknown> = Record<string, unknown>> =
@@ -98,7 +98,11 @@ function toggleSort(col: DsDataColumn): void {
 }
 
 function cellAlign(col: DsDataColumn): string {
-  return col.align === 'right' ? 'text-right' : 'text-left'
+  if (col.align === 'right')
+    return 'text-right'
+  if (col.align === 'center')
+    return 'text-center'
+  return 'text-left'
 }
 
 function rowKeyValue(row: TRow): string | number {

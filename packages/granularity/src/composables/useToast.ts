@@ -26,7 +26,7 @@ const toasts = reactive<Toast[]>([])
 
 // Таймеры авто-дисмисса по id — чтобы при раннем `dismiss()` / `clear()`
 // не оставлять «висящие» setTimeout'ы и не будить мёртвый tab.
-const timers = new Map<string, ReturnType<typeof setTimeout>>()
+const timers = new Map<string, number>()
 
 const DEFAULT_TIMEOUT_MS = 3500
 

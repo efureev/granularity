@@ -6,6 +6,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import DsInput from '../DsInput/DsInput.vue'
 import DsTree, {
   type DsTreeInstance,
+  type DsTreeKey,
   type DsTreeNode,
 } from '../DsTree'
 import type { DsTreeSelectModelValue, DsTreeSelectProps } from './dsTreeSelectTypes'

@@ -8,10 +8,11 @@
 // тем, используйте `./node.ts` — там в `DsButton` подставляется
 // `config.node.ts` с `tokenDefinitionsFromCssSync`.
 import { dsButtonConfig } from '../components/DsButton/config'
+import { dsProgressBarConfig } from '../components/DsProgressBar/config'
 import { createGranularityProvider } from './shared'
 
-export { GRANULARITY_PROVIDER_ID } from './shared'
+export * from './shared'
 
-export const granularityProvider = createGranularityProvider([dsButtonConfig])
+export const granularityProvider = createGranularityProvider([dsButtonConfig, dsProgressBarConfig])
 
 export default granularityProvider
