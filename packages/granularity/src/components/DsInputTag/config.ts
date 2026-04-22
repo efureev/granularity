@@ -4,6 +4,6 @@ import { dsInputTagSafelist } from './safelist'
 
 export const dsInputTagConfig = defineGranularComponent(import.meta.url, {
   name: 'DsInputTag',
-  dependencies: ['DsBadge', 'DsInput'],
+  dependencies: ['DsBadge', 'DsIcon', 'DsInput'],
   safelist: dsInputTagSafelist,
 })
