@@ -67,10 +67,11 @@ function installComponent(app: App, c: GranularityInstallableComponent): void {
     }
 
     // Форма `{ name, component }` — явное указание имени для произвольного компонента.
+    // Допускаем как object-компоненты (SFC / options), так и functional-компоненты.
     if (
         typeof (c as any).name === 'string'
         && (c as any).component
-        && typeof (c as any).component === 'object'
+        && (typeof (c as any).component === 'object' || typeof (c as any).component === 'function')
     ) {
         const {name, component} = c as { name: string; component: Component }
         app.component(name, component)
@@ -100,7 +101,12 @@ function installDirective(app: App, d: GranularityInstallableDirective): void {
 
     if ('name' in d && 'directive' in d) {
         app.directive(d.name, d.directive)
+        return
     }
+
+    // Сознательно без throw — согласовано с `installComponent`.
+    // eslint-disable-next-line no-console
+    console.warn('[granularity] directive passed to createGranularity has no `install` or `{ name, directive }` — skipped.')
 }
 
 /**
