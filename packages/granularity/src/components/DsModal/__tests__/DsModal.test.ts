@@ -6,14 +6,34 @@ vi.mock('@headlessui/vue', async () => {
   const { defineComponent } = await import('vue')
 
   return {
+    // `Dialog` эмулирует поведение HeadlessUI: при нажатии Esc
+    // эмитит `close`, а сам `class`/`initial-focus` пробрасывает вниз.
     Dialog: defineComponent({
       name: 'Dialog',
       emits: ['close'],
-      template: '<div data-testid="hu-dialog"><slot /></div>',
+      props: {
+        as: { type: String, default: 'div' },
+        initialFocus: { type: Object, default: null },
+      },
+      setup(_, { emit }) {
+        function onKeydown(event: KeyboardEvent) {
+          if (event.key === 'Escape') emit('close')
+        }
+        return { onKeydown }
+      },
+      template: '<div data-testid="hu-dialog" @keydown="onKeydown"><slot /></div>',
     }),
     DialogPanel: defineComponent({
       name: 'DialogPanel',
       template: '<div data-testid="hu-panel"><slot /></div>',
+    }),
+    DialogTitle: defineComponent({
+      name: 'DialogTitle',
+      template: '<div data-testid="hu-title"><slot /></div>',
+    }),
+    DialogDescription: defineComponent({
+      name: 'DialogDescription',
+      template: '<div data-testid="hu-description"><slot /></div>',
     }),
     TransitionRoot: defineComponent({
       name: 'TransitionRoot',
@@ -29,19 +49,30 @@ vi.mock('@headlessui/vue', async () => {
 
 import DsModal from '../DsModal.vue'
 
-function mountHarness(options: { closeOnBackdrop: boolean, size?: 'sm' | 'md' | 'lg' | 'xl' | 'full' }) {
+interface HarnessOptions {
+  closeOnBackdrop?: boolean
+  closeOnEsc?: boolean
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  withTitleSlot?: boolean
+  withDescriptionSlot?: boolean
+}
+
+function mountHarness(options: HarnessOptions = {}) {
+  const slots: Record<string, string> = {
+    default: '<div data-testid="modal-body">Body</div>',
+  }
+  if (options.withTitleSlot)
+    slots.title = '<span data-testid="title-slot">Title</span>'
+  if (options.withDescriptionSlot)
+    slots.description = '<span data-testid="description-slot">Desc</span>'
+
   const Harness = defineComponent({
     name: 'Harness',
     components: { DsModal },
     props: {
-      closeOnBackdrop: {
-        type: Boolean,
-        required: true,
-      },
-      size: {
-        type: String,
-        default: 'md',
-      },
+      closeOnBackdrop: { type: Boolean, default: true },
+      closeOnEsc: { type: Boolean, default: true },
+      size: { type: String, default: 'md' },
     },
     setup() {
       const open = ref(true)
@@ -51,22 +82,28 @@ function mountHarness(options: { closeOnBackdrop: boolean, size?: 'sm' | 'md' | 
       <DsModal
         v-model="open"
         :close-on-backdrop="closeOnBackdrop"
+        :close-on-esc="closeOnEsc"
         :size="size"
       >
-        <div data-testid="modal-body">Body</div>
+        ${Object.entries(slots)
+          .map(([name, html]) =>
+            name === 'default'
+              ? html
+              : `<template #${name}>${html}</template>`,
+          )
+          .join('\n')}
       </DsModal>
     `,
   })
 
   return mount(Harness, {
     props: {
-      closeOnBackdrop: options.closeOnBackdrop,
+      closeOnBackdrop: options.closeOnBackdrop ?? true,
+      closeOnEsc: options.closeOnEsc ?? true,
       size: options.size ?? 'md',
     },
     global: {
-      stubs: {
-        teleport: true,
-      },
+      stubs: { teleport: true },
     },
   })
 }
@@ -74,10 +111,11 @@ function mountHarness(options: { closeOnBackdrop: boolean, size?: 'sm' | 'md' | 
 describe('granularity/DsModal (unit)', () => {
   afterEach(() => {
     document.body.innerHTML = ''
+    document.body.style.overflow = ''
   })
 
   it('рендерит оверлей ниже панели, aria-hidden и дефолтный размер md', () => {
-    const wrapper = mountHarness({ closeOnBackdrop: true })
+    const wrapper = mountHarness()
 
     const overlay = wrapper.find('[data-ds-modal-overlay]')
     const panel = wrapper.find('[data-ds-modal-panel]')
@@ -95,10 +133,8 @@ describe('granularity/DsModal (unit)', () => {
     wrapper.unmount()
   })
 
-  it('закрывается по ESC (keydown.esc)', async () => {
-    const wrapper = mountHarness({ closeOnBackdrop: true })
-
-    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(true)
+  it('закрывается по Esc, когда closeOnEsc=true (по умолчанию)', async () => {
+    const wrapper = mountHarness()
 
     await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
     await nextTick()
@@ -108,9 +144,32 @@ describe('granularity/DsModal (unit)', () => {
     wrapper.unmount()
   })
 
-  it('закрывается по @close, если closeOnBackdrop=true', async () => {
+  it('не закрывается по Esc, если closeOnEsc=false', async () => {
+    const wrapper = mountHarness({ closeOnEsc: false })
+
+    await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('Esc закрывает даже при closeOnBackdrop=false (независимость флагов)', async () => {
+    const wrapper = mountHarness({ closeOnBackdrop: false, closeOnEsc: true })
+
+    await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('закрывается по клику на оверлей, если closeOnBackdrop=true', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: true })
 
+    await wrapper.find('[data-ds-modal-overlay]').trigger('pointerdown')
     wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
     await nextTick()
 
@@ -119,9 +178,10 @@ describe('granularity/DsModal (unit)', () => {
     wrapper.unmount()
   })
 
-  it('не закрывается по @close, если closeOnBackdrop=false', async () => {
+  it('не закрывается по клику на оверлей, если closeOnBackdrop=false', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: false })
 
+    await wrapper.find('[data-ds-modal-overlay]').trigger('pointerdown')
     wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
     await nextTick()
 
@@ -131,7 +191,7 @@ describe('granularity/DsModal (unit)', () => {
   })
 
   it('применяет full-size модификатор для edge-case размера full', () => {
-    const wrapper = mountHarness({ closeOnBackdrop: true, size: 'full' })
+    const wrapper = mountHarness({ size: 'full' })
 
     const panelClass = wrapper.find('[data-ds-modal-panel]').attributes('class')
 
@@ -144,12 +204,55 @@ describe('granularity/DsModal (unit)', () => {
   })
 
   it('рендерит контент напрямую внутри панели без header/footer и кнопки закрытия', () => {
-    const wrapper = mountHarness({ closeOnBackdrop: true })
+    const wrapper = mountHarness()
 
     expect(wrapper.find('[data-ds-dialog-header]').exists()).toBe(false)
     expect(wrapper.find('[data-ds-dialog-footer]').exists()).toBe(false)
     expect(wrapper.find('button[aria-label="Close"]').exists()).toBe(false)
     expect(wrapper.find('[data-ds-modal-panel] [data-testid="modal-body"]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('рендерит слоты #title и #description как DialogTitle/Description, только если переданы', () => {
+    const wrapperEmpty = mountHarness()
+    expect(wrapperEmpty.find('[data-ds-modal-title]').exists()).toBe(false)
+    expect(wrapperEmpty.find('[data-ds-modal-description]').exists()).toBe(false)
+    wrapperEmpty.unmount()
+
+    const wrapper = mountHarness({ withTitleSlot: true, withDescriptionSlot: true })
+    expect(wrapper.find('[data-ds-modal-title]').exists()).toBe(true)
+    expect(wrapper.find('[data-ds-modal-description]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="title-slot"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="description-slot"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('блокирует прокрутку body при открытии и восстанавливает при закрытии', async () => {
+    document.body.style.overflow = 'auto'
+
+    const Harness = defineComponent({
+      components: { DsModal },
+      setup() {
+        const open = ref(false)
+        return { open }
+      },
+      template: `<DsModal v-model="open"><div>body</div></DsModal>`,
+    })
+
+    const wrapper = mount(Harness, {
+      global: { stubs: { teleport: true } },
+    })
+
+    expect(document.body.style.overflow).toBe('auto')
+
+    wrapper.vm.open = true
+    await nextTick()
+    expect(document.body.style.overflow).toBe('hidden')
+
+    wrapper.vm.open = false
+    await nextTick()
+    expect(document.body.style.overflow).toBe('auto')
 
     wrapper.unmount()
   })

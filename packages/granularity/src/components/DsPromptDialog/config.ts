@@ -1,9 +1,7 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-import { dsPromptDialogSafelist } from './safelist'
-
-export const dsPromptDialogConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsPromptDialog',
-  dependencies: ['DsButton', 'DsDialog', 'DsFormField', 'DsInput'],
-  safelist: dsPromptDialogSafelist,
+export const dsPromptDialogConfig = defineGranularComponent(import.meta.url, {
+    name: 'DsPromptDialog',
+    dependencies: ['DsButton', 'DsDialog', 'DsFormField', 'DsInput'],
+    safelist: [],
 })

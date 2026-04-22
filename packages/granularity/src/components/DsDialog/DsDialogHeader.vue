@@ -5,24 +5,27 @@ import { DialogTitle } from '@headlessui/vue'
 import DsDialogCloseButton from './DsDialogCloseButton.vue'
 import {
   DEFAULT_DS_DIALOG_HEADER_CONFIG,
-  resolveDsDialogSectionConfig,
   type DsDialogSectionConfig,
+  resolveDsDialogSectionConfig,
+  resolveDsDialogTitle,
 } from './dialogShared'
 
-const props = withDefaults(
-  defineProps<{
-    title?: string
-    showCloseButton?: boolean
-    config?: DsDialogSectionConfig
-  }>(),
-  {
-    title: undefined,
-    showCloseButton: true,
-    config: undefined,
-  },
-)
+export interface DsDialogHeaderProps {
+  title?: string
+  showCloseButton?: boolean
+  config?: DsDialogSectionConfig
+  /** A11y-лейбл кнопки закрытия (i18n). */
+  closeLabel?: string
+}
 
-defineSlots<{
+const props = withDefaults(defineProps<DsDialogHeaderProps>(), {
+  title: undefined,
+  showCloseButton: true,
+  config: undefined,
+  closeLabel: 'Close',
+})
+
+const slots = defineSlots<{
   default?: (props: { title?: string }) => any
 }>()
 
@@ -30,9 +33,11 @@ defineEmits<{
   (e: 'close'): void
 }>()
 
-const resolvedTitle = computed(() => props.title?.trim() || undefined)
+const resolvedTitle = computed(() => resolveDsDialogTitle(props.title))
 
-const resolvedConfig = computed(() => resolveDsDialogSectionConfig(props.config, DEFAULT_DS_DIALOG_HEADER_CONFIG))
+const resolvedConfig = computed(() =>
+  resolveDsDialogSectionConfig(props.config, DEFAULT_DS_DIALOG_HEADER_CONFIG),
+)
 
 const rootClass = computed(() => [
   resolvedConfig.value.paddingX,
@@ -40,26 +45,32 @@ const rootClass = computed(() => [
   resolvedConfig.value.bordered ? 'border-b border-[var(--brd)]' : '',
   'flex items-center justify-between gap-4',
 ])
+
+// Видимый `DialogTitle` рендерим только когда нет пользовательского слота:
+// если слот `#header` задан, a11y-title отдаётся через `DsModal #title`
+// на уровне `DsDialog` (см. JSDoc у `DsDialog.vue`).
+const showVisibleTitle = computed(() => !slots.default && !!resolvedTitle.value)
 </script>
 
 <template>
   <div data-ds-dialog-header :class="rootClass">
-    <template v-if="$slots.default">
-      <DialogTitle v-if="resolvedTitle" as="div" class="sr-only">
-        {{ resolvedTitle }}
-      </DialogTitle>
-
+    <template v-if="slots.default">
       <div class="flex-1 min-w-0 flex items-center">
         <slot :title="resolvedTitle" />
       </div>
     </template>
-
-    <DialogTitle v-else-if="resolvedTitle" as="div" class="flex-1 min-w-0 text-[14px] font-700">
+    <DialogTitle
+      v-else-if="showVisibleTitle"
+      as="div"
+      class="flex-1 min-w-0 text-[14px] font-700"
+    >
       {{ resolvedTitle }}
     </DialogTitle>
-
     <div v-else class="flex-1 min-w-0" />
-
-    <DsDialogCloseButton v-if="props.showCloseButton" @click="$emit('close')" />
+    <DsDialogCloseButton
+      v-if="showCloseButton"
+      :aria-label="closeLabel"
+      @click="$emit('close')"
+    />
   </div>
 </template>

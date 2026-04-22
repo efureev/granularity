@@ -1,9 +1,7 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-import { dsConfirmDialogSafelist } from './safelist'
-
-export const dsConfirmDialogConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsConfirmDialog',
-  dependencies: ['DsButton', 'DsDialog'],
-  safelist: dsConfirmDialogSafelist,
+export const dsConfirmDialogConfig = defineGranularComponent(import.meta.url, {
+    name: 'DsConfirmDialog',
+    dependencies: ['DsButton', 'DsDialog'],
+    safelist: [],
 })

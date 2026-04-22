@@ -1,8 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
 import { dsModalSafelist } from './safelist'
 
-export const dsModalConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsModalConfig = defineGranularComponent(import.meta.url, {
   name: 'DsModal',
   safelist: dsModalSafelist,
 })
