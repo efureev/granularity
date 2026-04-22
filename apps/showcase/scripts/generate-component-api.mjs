@@ -7,7 +7,7 @@ import { createChecker } from 'vue-component-meta'
 const showcaseDir = fileURLToPath(new URL('..', import.meta.url))
 const workspaceRoot = resolve(showcaseDir, '../..')
 const granularityTsconfigPath = resolve(workspaceRoot, 'packages/granularity/tsconfig.json')
-const granularityRegistryPath = resolve(workspaceRoot, 'packages/granularity/src/registry/components.ts')
+const granularityRegistryPath = resolve(workspaceRoot, 'packages/granularity/src/granular-provider/shared.ts')
 const outputPath = resolve(showcaseDir, 'src/content/generated/componentApi.generated.json')
 
 const filteredPropNames = new Set([
