@@ -1,8 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
 import { dsTextareaSafelist } from './safelist'
 
-export const dsTextareaConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsTextareaConfig = defineGranularComponent(import.meta.url, {
   name: 'DsTextarea',
   safelist: dsTextareaSafelist,
 })
