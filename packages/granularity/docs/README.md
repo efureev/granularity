@@ -12,7 +12,7 @@
 
 - Если нужен быстрый старт: откройте [`installation.md`](./installation.md).
 - Если важно понять устройство слоёв стилей: откройте [`styling.md`](./styling.md).
-- Если приложение уже использует `UnoCSS`: откройте [`unocss.md`](./unocss.md).
+- Если приложение уже использует `UnoCSS`: откройте [`unocss.md`](./unocss.md) и [`installation.md`](./installation.md).
 - Если нужен единый bootstrap-вход в Vue-приложение: откройте [`vue-plugin.md`](./vue-plugin.md).
 - Если хочется авто-импорта компонентов и директив: откройте [`unplugin.md`](./unplugin.md).
 - Если важно понять, как пакет ведёт себя в i18n-сценариях: откройте [`localization.md`](./localization.md).
@@ -24,8 +24,8 @@
 
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
 - [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы и порядок импортов.
-- [`unocss.md`](./unocss.md) — `@feugene/granularity/uno-node`, `@feugene/granularity/uno`, preflight-ы и практические
-  сценарии.
+- [`unocss.md`](./unocss.md) — интеграция с `UnoCSS` через `presetGranularNode` из `@feugene/unocss-preset-granular/node`
+  и granular-провайдер `@feugene/granularity/granular-provider/node`.
 - [`vue-plugin.md`](./vue-plugin.md) — runtime-адаптер `@feugene/granularity/vue`: `createGranularity`,
   `installGranularity`, `defineInstallable`.
 - [`unplugin.md`](./unplugin.md) — авто-импорт компонентов и директив через
@@ -39,8 +39,9 @@
 ## Как подключать
 
 Поддерживается один проверенный способ — тонкая настройка через `UnoCSS` preset
-`@feugene/granularity/uno-node`. Полная инструкция — в [`installation.md`](./installation.md),
-детали конфигурации — в [`unocss.md`](./unocss.md).
+`presetGranularNode` из [`@feugene/unocss-preset-granular`](https://github.com/efureev/unocss-preset-granular) вместе с
+`granularityProvider` из `@feugene/granularity/granular-provider/node`. Полная инструкция — в
+[`installation.md`](./installation.md), детали конфигурации — в [`unocss.md`](./unocss.md).
 
 Дополнительно (необязательно):
 
@@ -51,7 +52,8 @@
 
 - `Vue`-компоненты через root barrel и component subpath exports.
 - package-level API для директив и file validation.
-- `UnoCSS` preset `@feugene/granularity/uno-node` как единственный поддерживаемый способ интеграции.
+- `UnoCSS` preset `presetGranularNode` (из `@feugene/unocss-preset-granular/node`) + `granularityProvider`
+  (из `@feugene/granularity/granular-provider/node`) — единственный поддерживаемый способ интеграции.
 - внутреннюю инженерную документацию по развитию пакета.
 
 ## Принцип документации

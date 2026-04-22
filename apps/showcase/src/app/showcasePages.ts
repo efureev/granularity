@@ -219,7 +219,7 @@ export const showcasePages: ShowcasePage[] = [
           '`createGranularity({ components, directives, provides, globalProperties })` отдаёт стандартный Vue-plugin для `app.use(...)`.',
           'Поддерживает три формы компонентов: чистый SFC, объект с `install`, явное `{ name, component }`.',
           'Основной сценарий — директивы, `provide`, `globalProperties`, SSR/Nuxt-плагины и окружения без сборщика.',
-          'Демо: `apps/playground-7` с `DsButton`, `DsInput` и `v-hotkey`.',
+          'Типовые случаи: глобальные директивы (`v-hotkey`, `v-autofocus`), `provide` для i18n/theme, `globalProperties` для Options API.',
         ],
       },
       {
@@ -230,7 +230,7 @@ export const showcasePages: ShowcasePage[] = [
           'Пишете `<DsButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.',
           'Опции: `prefix`, `importStyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist.',
           'Рекомендуется для prod-приложений: идеальный tree-shaking и отсутствие ручных `import`-ов.',
-          'Демо: `apps/playground-8` и `apps/playground-9` (резолвер вместе с UnoCSS preset и композитами).',
+          'Типичный сценарий: резолвер вместе с `presetGranularNode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах.',
         ],
       },
       {

@@ -141,7 +141,3 @@ const installable = defineInstallable(DsButton, 'DsBtn')
 В большом проекте типичен гибрид: компоненты — через резолвер, директивы/`provide`/`globalProperties` — через
 `createGranularity`.
 
-## Демо
-
-- [`apps/playground-7`](../../../apps/playground-7/README.md) — сценарий «фабрика + DsButton/DsInput/v-hotkey».
-- [`apps/playground-9`](../../../apps/playground-9/README.md) — комбинация резолвера и ручной регистрации.
