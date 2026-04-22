@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots } from 'vue'
-import type { InputHTMLAttributes } from 'vue'
+import {computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots} from 'vue'
+import type {InputHTMLAttributes} from 'vue'
 
 defineOptions({
   inheritAttrs: false,
@@ -10,45 +10,45 @@ export type DsInputSize = 'xs' | 'sm' | 'md' | 'lg'
 export type DsInputTextAlign = 'left' | 'center' | 'right'
 
 const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    type?: 'text' | 'email' | 'password' | 'number' | 'search'
-    placeholder?: string
-    autocomplete?: string
-    inputmode?: InputHTMLAttributes['inputmode']
-    disabled?: boolean
-    invalid?: boolean
-    state?: 'default' | 'success' | 'warning' | 'danger'
-    name?: string
-    id?: string
-    size?: DsInputSize
+    defineProps<{
+      modelValue: string
+      type?: 'text' | 'email' | 'password' | 'number' | 'search'
+      placeholder?: string
+      autocomplete?: string
+      inputmode?: InputHTMLAttributes['inputmode']
+      disabled?: boolean
+      invalid?: boolean
+      state?: 'default' | 'success' | 'warning' | 'danger'
+      name?: string
+      id?: string
+      size?: DsInputSize
 
-    textAlign?: DsInputTextAlign
+      textAlign?: DsInputTextAlign
 
-    prefixMinWidth?: string
-    prefixMaxWidth?: string
-    suffixMinWidth?: string
-    suffixMaxWidth?: string
-  }>(),
-  {
-    type: 'text',
-    placeholder: undefined,
-    autocomplete: undefined,
-    inputmode: undefined,
-    disabled: false,
-    invalid: false,
-    state: 'default',
-    name: undefined,
-    id: undefined,
-    size: 'md',
+      prefixMinWidth?: string
+      prefixMaxWidth?: string
+      suffixMinWidth?: string
+      suffixMaxWidth?: string
+    }>(),
+    {
+      type: 'text',
+      placeholder: undefined,
+      autocomplete: undefined,
+      inputmode: undefined,
+      disabled: false,
+      invalid: false,
+      state: 'default',
+      name: undefined,
+      id: undefined,
+      size: 'md',
 
-    textAlign: 'left',
+      textAlign: 'left',
 
-    prefixMinWidth: undefined,
-    prefixMaxWidth: undefined,
-    suffixMinWidth: undefined,
-    suffixMaxWidth: undefined,
-  },
+      prefixMinWidth: undefined,
+      prefixMaxWidth: undefined,
+      suffixMinWidth: undefined,
+      suffixMaxWidth: undefined,
+    },
 )
 
 const emit = defineEmits<{
@@ -186,9 +186,6 @@ const suffixStyle = computed(() => {
   } as Record<string, string | undefined>
 })
 
-const base =
-  'w-full rounded-md border bg-[var(--bg)] text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed'
-
 const sizeClass = computed(() => {
   const map: Record<NonNullable<typeof props.size>, string> = {
     xs: 'h-7 px-2.5 text-[12px]',
@@ -221,7 +218,6 @@ const className = computed(() => {
   }
 
   return [
-    base,
     sizeClass.value,
     textAlignClass.value,
     props.invalid ? borderByState.danger : borderByState[state],
@@ -236,42 +232,43 @@ function onInput(e: Event): void {
 <template>
   <div class="relative w-full">
     <div
-      v-if="$slots.prefix"
-      ref="prefixEl"
-      data-testid="ds-input-prefix"
-      class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
-      :style="prefixStyle"
-      aria-hidden="true"
+        v-if="$slots.prefix"
+        ref="prefixEl"
+        data-testid="ds-input-prefix"
+        class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+        :style="prefixStyle"
+        aria-hidden="true"
     >
-      <slot name="prefix" />
+      <slot name="prefix"/>
     </div>
 
     <input
-      :id="props.id"
-      ref="inputEl"
-      v-bind="$attrs"
-      :name="props.name"
-      :type="props.type"
-      :inputmode="props.inputmode"
-      :autocomplete="props.autocomplete"
-      :placeholder="props.placeholder"
-      :disabled="props.disabled"
-      :value="props.modelValue"
-      :aria-invalid="props.invalid ? 'true' : undefined"
-      :class="className"
-      :style="inputStyle"
-      @input="onInput"
+        :id="props.id"
+        ref="inputEl"
+        v-bind="$attrs"
+        :name="props.name"
+        :type="props.type"
+        :inputmode="props.inputmode"
+        :autocomplete="props.autocomplete"
+        :placeholder="props.placeholder"
+        :disabled="props.disabled"
+        :value="props.modelValue"
+        :aria-invalid="props.invalid ? 'true' : undefined"
+        class="w-full rounded-md border bg-[var(--bg)] text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="className"
+        :style="inputStyle"
+        @input="onInput"
     >
 
     <div
-      v-if="$slots.suffix"
-      ref="suffixEl"
-      data-testid="ds-input-suffix"
-      class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
-      :style="suffixStyle"
-      aria-hidden="true"
+        v-if="$slots.suffix"
+        ref="suffixEl"
+        data-testid="ds-input-suffix"
+        class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+        :style="suffixStyle"
+        aria-hidden="true"
     >
-      <slot name="suffix" />
+      <slot name="suffix"/>
     </div>
   </div>
 </template>

@@ -1,8 +1,6 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-import { dsBadgeWrapSafelist } from './safelist'
-
-export const dsBadgeWrapConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsBadgeWrapConfig = defineGranularComponent(import.meta.url, {
   name: 'DsBadgeWrap',
-  safelist: dsBadgeWrapSafelist,
+  safelist: [],
 })

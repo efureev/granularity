@@ -1,17 +1,15 @@
-import { splitClassTokens } from '../shared/classTokens'
-
 export type DsButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-border'
 export type DsButtonTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
 export type DsButtonSize = 'xs' | 'sm' | 'md' | 'lg'
 
-type DsButtonClassOptions = {
+export type DsButtonClassOptions = {
   variant: DsButtonVariant
   tone: DsButtonTone
   size: DsButtonSize
   square: boolean
 }
 
-type DsButtonToneTokens = {
+export type DsButtonToneTokens = {
   solidBackground: string
   solidBackgroundHover: string
   solidBackgroundActive: string
@@ -26,26 +24,26 @@ type DsButtonToneTokens = {
   borderActive: string
 }
 
-const base =
+export const base =
   'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-md transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed'
 
 export const dsButtonBaseClass = base
 
-const sizes: Record<DsButtonSize, string> = {
+export const sizes: Record<DsButtonSize, string> = {
   xs: 'h-7 text-xs px-2.5',
   sm: 'h-8 text-sm px-3',
   md: 'h-10 text-sm px-4',
   lg: 'h-11 text-base px-5',
 }
 
-const squareSizes: Record<DsButtonSize, string> = {
+export const squareSizes: Record<DsButtonSize, string> = {
   xs: 'h-7 w-7 p-0',
   sm: 'h-8 w-8 p-0',
   md: 'h-10 w-10 p-0',
   lg: 'h-11 w-11 p-0',
 }
 
-const tones: Record<DsButtonTone, DsButtonToneTokens> = {
+export const tones: Record<DsButtonTone, DsButtonToneTokens> = {
   primary: {
     solidBackground: 'var(--ds-button-primary-bg,var(--primary))',
     solidBackgroundHover: 'var(--ds-button-primary-bg-hover,var(--primary-hover))',
@@ -164,7 +162,7 @@ function withVar(token: string): string {
   return `[${token}]`
 }
 
-function variantClass(variant: DsButtonVariant, tone: DsButtonTone): string {
+export function variantClass(variant: DsButtonVariant, tone: DsButtonTone): string {
   const tokens = tones[tone]
 
   if (variant === 'primary') {
@@ -231,27 +229,6 @@ function variantClass(variant: DsButtonVariant, tone: DsButtonTone): string {
     `hover:active:border-${withVar(tokens.borderActive)}`,
   ].join(' ')
 }
-
-const variantTokens = (Object.keys(tones) as DsButtonTone[]).flatMap(tone =>
-  (['primary', 'secondary', 'outline', 'ghost', 'ghost-border'] as DsButtonVariant[])
-    .flatMap(variant => splitClassTokens(variantClass(variant, tone))),
-)
-
-export const dsButtonClassTokens = {
-  base: splitClassTokens(base),
-  sizes: Object.values(sizes).flatMap(splitClassTokens),
-  squareSizes: Object.values(squareSizes).flatMap(splitClassTokens),
-  variants: variantTokens,
-  template: ['h-4', 'w-4', 'animate-spin'],
-} as const
-
-export const dsButtonSafelist = [...new Set([
-  ...dsButtonClassTokens.base,
-  ...dsButtonClassTokens.sizes,
-  ...dsButtonClassTokens.squareSizes,
-  ...dsButtonClassTokens.variants,
-  ...dsButtonClassTokens.template,
-])]
 
 export function dsButtonClass(options: DsButtonClassOptions): string {
   return [
