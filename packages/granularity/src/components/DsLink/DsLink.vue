@@ -1,11 +1,23 @@
 <script setup lang="ts">
+/**
+ * DsLink — DS-примитив ссылки.
+ *
+ * Корневой тег зависит от пропов:
+ * - `<a>` — когда заданы `href` и не `disabled`;
+ * - `<span>` — во всех остальных случаях (включая `disabled`, даже если `href` задан).
+ *
+ * Это осознанное решение, чтобы отключённая ссылка не была кликабельной и
+ * не участвовала в порядке табуляции. Учтите это в внешних CSS-селекторах.
+ */
 import { computed, useAttrs } from 'vue'
 
 import {
+  baseRootClass,
   dsLinkClass,
   type DsLinkSize,
   type DsLinkUnderline,
   type DsLinkVariant,
+  focusRingClass,
 } from './dsLinkStyles'
 
 defineOptions({
@@ -31,7 +43,7 @@ const props = withDefaults(defineProps<{
   ariaLabel: undefined,
   variant: 'primary',
   underline: 'auto',
-  size: 'sm',
+  size: 'md',
 })
 
 const attrs = useAttrs()
@@ -52,19 +64,27 @@ const resolvedRel = computed(() => {
   if (props.rel)
     return props.rel
 
-  if (props.external)
+  // Авто-защита для любых ссылок, открывающихся в новой вкладке,
+  // а не только когда выставлен `external`.
+  if (resolvedTarget.value === '_blank')
     return 'noopener noreferrer'
 
   return undefined
 })
 
-const className = computed(() => {
-  return dsLinkClass({
+const rootClass = computed(() => {
+  const variantClass = dsLinkClass({
     size: props.size,
     underline: props.underline,
     variant: props.variant,
     disabled: props.disabled,
   })
+
+  // На disabled-ветке (`<span>`) focus-ring не нужен: элемент не фокусируется,
+  // а если снаружи ему навесят `tabindex`, фокус-рамка на «отключённой» ссылке смотрелась бы странно.
+  return props.disabled
+    ? `${baseRootClass} ${variantClass}`
+    : `${baseRootClass} ${focusRingClass} ${variantClass}`
 })
 </script>
 
@@ -76,8 +96,7 @@ const className = computed(() => {
     :target="resolvedTarget"
     :rel="resolvedRel"
     :aria-label="ariaLabel"
-    class="inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-    :class="className"
+    :class="rootClass"
   >
     <slot />
   </a>
@@ -87,8 +106,7 @@ const className = computed(() => {
     v-bind="attrs"
     :aria-label="ariaLabel"
     :aria-disabled="disabled ? 'true' : undefined"
-    class="inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-    :class="className"
+    :class="rootClass"
   >
     <slot />
   </span>

@@ -2,6 +2,11 @@ export type DsLinkVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type DsLinkUnderline = 'auto' | 'always' | 'none'
 export type DsLinkSize = 'sm' | 'md' | 'lg'
 
+// Базовые классы корневого элемента (`<a>`/`<span>`). Вынесены сюда,
+// чтобы быть единственным источником истины как для шаблона, так и для safelist.
+export const baseRootClass = 'inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150'
+export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'
+
 export const sizeClassBySize: Record<DsLinkSize, string> = {
   sm: 'text-sm',
   md: 'text-[14px]',
