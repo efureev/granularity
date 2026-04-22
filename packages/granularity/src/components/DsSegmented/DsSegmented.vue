@@ -31,18 +31,26 @@ type IndicatorGeometry = {
   y: number
 }
 
+/**
+ * Пропсы публичного DS-примитива «Segmented».
+ */
+export interface DsSegmentedProps {
+  modelValue: DsSegmentedValue
+  options: DsSegmentedOption[]
+  variant?: DsSegmentedVariant
+  size?: DsSegmentedSize
+  /** Длительность анимации индикатора в мс. */
+  indicatorDuration?: number
+  /** Растягивать сегмент на всю ширину контейнера. */
+  block?: boolean
+  disabled?: boolean
+  /** Имя скрытых radio-inputs для интеграции с нативной формой. */
+  name?: string
+  ariaLabel?: string
+}
+
 const props = withDefaults(
-  defineProps<{
-    modelValue: DsSegmentedValue
-    options: DsSegmentedOption[]
-    variant?: DsSegmentedVariant
-    size?: DsSegmentedSize
-    indicatorDuration?: number
-    block?: boolean
-    disabled?: boolean
-    name?: string
-    ariaLabel?: string
-  }>(),
+  defineProps<DsSegmentedProps>(),
   {
     variant: 'pills',
     size: 'md',
@@ -382,10 +390,10 @@ onBeforeUnmount(() => {
   <div
     ref="rootRef"
     data-ds-segmented
-    :data-variant="props.variant"
+    :data-variant="variant"
     role="radiogroup"
-    :aria-label="props.ariaLabel"
-    :aria-disabled="props.disabled ? 'true' : undefined"
+    :aria-label="ariaLabel"
+    :aria-disabled="disabled ? 'true' : undefined"
     :class="rootClassName"
     :style="rootStyle"
   >
@@ -398,7 +406,7 @@ onBeforeUnmount(() => {
     />
 
     <button
-      v-for="(option, index) in props.options"
+      v-for="(option, index) in options"
       :key="option.value"
       :ref="element => setItemRef(option.value, element)"
       data-ds-segmented-item
@@ -410,7 +418,7 @@ onBeforeUnmount(() => {
       :disabled="resolveOptionDisabled(option)"
       :tabindex="isFocusableOption(option, index) ? 0 : -1"
       :class="dsSegmentedItemClass({
-        variant: props.variant,
+        variant,
         selected: isOptionSelected(option),
         disabled: resolveOptionDisabled(option),
         iconOnly: isIconOnlyOption(option),

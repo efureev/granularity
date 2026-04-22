@@ -1,50 +1,18 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
-import type { InputHTMLAttributes } from 'vue'
 
 import { vClickOutside } from '../../directives'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import DsInput, { type DsInputSize } from '../DsInput/DsInput.vue'
+import DsInput from '../DsInput/DsInput.vue'
 import DsTree, {
-  type DsTreeFilterNodeMethod,
-  type DsTreePropsMap,
   type DsTreeInstance,
-  type DsTreeKey,
   type DsTreeNode,
 } from '../DsTree'
-import type { DsTreeSelectModelValue, DsTreeSelectValueDisplay } from './dsTreeSelectTypes'
-import { dsTreeSelectClass, dsTreeSelectPanelClass, type DsTreeSelectState } from './dsTreeSelectStyles'
-
-type NodeKeyProp<T> = keyof T & string
+import type { DsTreeSelectModelValue, DsTreeSelectProps } from './dsTreeSelectTypes'
+import { dsTreeSelectClass, dsTreeSelectPanelClass } from './dsTreeSelectStyles'
 
 const props = withDefaults(
-  defineProps<{
-    modelValue: DsTreeSelectModelValue
-    data: T[]
-    props?: DsTreePropsMap
-    nodeKey?: NodeKeyProp<T> | 'id'
-    defaultExpandedKeys?: DsTreeKey[]
-    disabled?: boolean
-
-    placeholder?: string
-    size?: DsInputSize
-    invalid?: boolean
-    state?: DsTreeSelectState
-
-    multiple?: boolean
-    clearable?: boolean
-
-    /** Как отображать выбранное значение в single-режиме. */
-    valueDisplay?: DsTreeSelectValueDisplay
-
-    filterable?: boolean
-    filterPlaceholder?: string
-    filterInputmode?: InputHTMLAttributes['inputmode']
-    filterNodeMethod?: DsTreeFilterNodeMethod<T>
-
-    closeOnSelect?: boolean
-    dropdownMaxHeight?: number
-  }>(),
+  defineProps<DsTreeSelectProps<T>>(),
   {
     props: () => ({
       children: 'children',
@@ -415,21 +383,23 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
   <div
     ref="rootEl"
     v-click-outside="{ handler: onClickOutside, enabled: open }"
+    data-ds-tree-select
     class="relative"
   >
     <div class="relative">
       <input
         ref="triggerEl"
         data-testid="ds-tree-select-trigger"
+        data-ds-tree-select-trigger
         type="text"
         :value="displayValue"
-        :placeholder="props.placeholder"
-        :disabled="props.disabled"
+        :placeholder="placeholder"
+        :disabled="disabled"
         readonly
         role="combobox"
         aria-readonly="true"
         :aria-expanded="open ? 'true' : 'false'"
-        :aria-invalid="props.invalid ? 'true' : undefined"
+        :aria-invalid="invalid ? 'true' : undefined"
         class="w-full rounded-md border bg-[var(--bg)] text-[var(--fg)] placeholder:text-[var(--muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
         @pointerdown="onTriggerPointerDown"
@@ -439,11 +409,12 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
       >
 
       <button
-        v-if="props.clearable && hasSelection"
+        v-if="clearable && hasSelection"
         data-testid="ds-tree-select-clear"
+        data-ds-tree-select-clear
         type="button"
         class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
-        :disabled="props.disabled"
+        :disabled="disabled"
         :aria-label="t('ds.common.clear', 'Clear')"
         @click.stop="clear"
       >
@@ -453,6 +424,7 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
       <span
         v-else
         data-testid="ds-tree-select-chevron"
+        data-ds-tree-select-chevron
         class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
       >
         <span
@@ -467,7 +439,7 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
       >
         <slot
           name="value"
-          :value="props.modelValue"
+          :value="modelValue"
           :labels="selectedLabels"
           :display-value="displayValue"
           :path-labels="selectedPathLabels"
@@ -486,16 +458,18 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
       <div
         v-show="open"
         data-testid="ds-tree-select-panel"
+        data-ds-tree-select-panel
         class="absolute z-50 mt-2 w-full"
       >
         <div :class="panelClasses">
-          <div v-if="props.filterable" class="p-2 border-b border-[var(--brd)]">
+          <div v-if="filterable" class="p-2 border-b border-[var(--brd)]">
             <DsInput
               ref="filterInputRef"
               v-model="filterValue"
               data-testid="ds-tree-select-filter"
+              data-ds-tree-select-filter
               type="search"
-              :inputmode="props.filterInputmode"
+              :inputmode="filterInputmode"
               :placeholder="resolvedFilterPlaceholder"
               size="sm"
             />
@@ -503,9 +477,9 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
 
           <div
             class="p-1 overflow-auto"
-            :style="{ maxHeight: `${props.dropdownMaxHeight}px` }"
+            :style="{ maxHeight: `${dropdownMaxHeight}px` }"
           >
-            <div v-if="(props.data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--muted-fg)]">
+            <div v-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--muted-fg)]">
               <slot name="empty">
                 {{ t('ds.treeSelect.empty', 'No data') }}
               </slot>
@@ -514,12 +488,12 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
             <DsTree
               v-else
               ref="treeRef"
-              :data="props.data"
+              :data="data"
               :props="props.props"
-              :node-key="props.nodeKey as any"
-              :default-expanded-keys="props.defaultExpandedKeys"
-              :filter-node-method="props.filterNodeMethod"
-              :highlight-current="!props.multiple"
+              :node-key="nodeKey as any"
+              :default-expanded-keys="defaultExpandedKeys"
+              :filter-node-method="filterNodeMethod"
+              :highlight-current="!multiple"
               @node-click="onNodeClick"
             >
               <template #default="{ node, data }">

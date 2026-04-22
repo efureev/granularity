@@ -1,5 +1,5 @@
 export { default } from './DsTreeSelect.vue'
 export { default as DsTreeSelect } from './DsTreeSelect.vue'
-export type { DsTreeSelectModelValue, DsTreeSelectValueDisplay } from './dsTreeSelectTypes'
+export type { DsTreeSelectModelValue, DsTreeSelectProps, DsTreeSelectValueDisplay } from './dsTreeSelectTypes'
 export { dsTreeSelectConfig } from './config'
 export { dsTreeSelectSafelist } from './safelist'
