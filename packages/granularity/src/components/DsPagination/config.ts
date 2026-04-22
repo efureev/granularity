@@ -1,9 +1,7 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsPaginationSafelist } from './safelist'
-
-export const dsPaginationConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsPaginationConfig = defineGranularComponent(import.meta.url, {
   name: 'DsPagination',
   dependencies: ['DsButton', 'DsSelect'],
-  safelist: dsPaginationSafelist,
+  safelist: [],
 })
