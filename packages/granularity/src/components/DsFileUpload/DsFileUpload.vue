@@ -405,15 +405,15 @@ defineExpose({
           </slot>
         </div>
 
-        <div v-if="$slots.tip" class="mt-1 text-[13px] ds-muted">
+        <div v-if="$slots.tip" class="mt-1 text-[13px] text-[var(--muted-fg)]">
           <slot name="tip" />
         </div>
-        <div v-else class="mt-1 text-[13px] ds-muted" />
+        <div v-else class="mt-1 text-[13px] text-[var(--muted-fg)]" />
 
         <ul v-if="props.showFileList && lastFiles.length" class="mt-3 space-y-1">
           <li v-for="file in lastFiles" :key="file.name" class="text-[13px]">
             <span class="font-600">{{ file.name }}</span>
-            <span class="ds-muted"> · {{ Math.ceil(file.size / 1024) }} KB</span>
+            <span class="text-[var(--muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
           </li>
         </ul>
       </div>

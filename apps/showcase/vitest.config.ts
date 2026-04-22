@@ -15,6 +15,14 @@ export default defineConfig({
         replacement: granularityDistEntry,
       },
       {
+        find: /^@feugene\/granularity\/granular-provider\/node$/,
+        replacement: `${granularityDistRoot}/granular-provider-node.js`,
+      },
+      {
+        find: /^@feugene\/granularity\/granular-provider$/,
+        replacement: `${granularityDistRoot}/granular-provider.js`,
+      },
+      {
         find: /^@feugene\/granularity\/(.*)$/,
         replacement: `${granularityDistRoot}/$1`,
       },

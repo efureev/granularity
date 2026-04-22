@@ -1,8 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
 import { dsImageViewerSafelist } from './safelist'
 
-export const dsImageViewerConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsImageViewerConfig = defineGranularComponent(import.meta.url, {
   name: 'DsImageViewer',
   safelist: dsImageViewerSafelist,
 })

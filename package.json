@@ -9,6 +9,7 @@
   "scripts": {
     "build": "yarn build:granularity && yarn build:showcase",
     "build:granularity": "yarn workspace @feugene/granularity build",
+    "build:unocss-preset-granular": "yarn workspace @feugene/unocss-preset-granular build",
     "build:playground": "yarn workspace @feugene/granularity-playground build",
     "build:showcase": "yarn workspace @feugene/granularity-showcase build",
     "build:playground-empty": "yarn workspace @feugene/granularity-playground-empty build",
@@ -16,6 +17,8 @@
     "dev:showcase": "yarn workspace @feugene/granularity-showcase dev",
     "test": "yarn test:granularity && yarn test:playground",
     "test:granularity": "yarn workspace @feugene/granularity test:run",
+    "test:unocss-preset-granular": "yarn workspace @feugene/unocss-preset-granular test:run",
+    "coverage:unocss-preset-granular": "yarn workspace @feugene/unocss-preset-granular test:coverage",
     "coverage:granularity": "yarn workspace @feugene/granularity test:coverage",
     "test:playground": "yarn workspace @feugene/granularity-playground test:run",
     "test:showcase": "yarn workspace @feugene/granularity-showcase test:run"

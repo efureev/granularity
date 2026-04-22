@@ -3,6 +3,22 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import DsInput from '../DsInput/DsInput.vue'
 import { vClickOutside } from '../../directives'
+
+import {
+  defaultBaseClass,
+  dsSelectNativeClass,
+  dsSelectPanelClasses,
+  dsSelectTriggerClass,
+  linkBaseClass,
+  type DsSelectModelValue,
+  type DsSelectOption,
+  type DsSelectOptionsView,
+  type DsSelectSize,
+  type DsSelectUnderline,
+  type DsSelectVariant,
+  type DsSelectView,
+} from './dsSelectStyles'
+
 export type {
   DsSelectModelValue,
   DsSelectOption,
@@ -13,64 +29,48 @@ export type {
   DsSelectView,
 } from './dsSelectStyles'
 
-import {
-  dsSelectNativeClass,
-  dsSelectPanelClasses,
-  dsSelectTriggerClass,
-  type DsSelectModelValue,
-  type DsSelectOption,
-  type DsSelectOptionsView,
-  type DsSelectSize,
-  type DsSelectUnderline,
-  type DsSelectVariant,
-  type DsSelectView,
-} from './dsSelectStyles'
+/**
+ * Пропсы публичного DS-примитива «Select».
+ */
+export interface DsSelectProps {
+  modelValue: DsSelectModelValue
+  options?: DsSelectOption[]
+  disabled?: boolean
+  ariaLabel?: string
+  view?: DsSelectView
+  size?: DsSelectSize
+  /** Placeholder (показывается, когда значение не выбрано). */
+  placeholder?: string
+  /** Multiple selection. */
+  multiple?: boolean
+  /** Как отображать список опций: нативный `<select>` или кастомная панель. */
+  optionsView?: DsSelectOptionsView
+  /** Разрешает ввод/выбор значения, которого нет в `options`. */
+  allowCustomValue?: boolean
+  /** Placeholder для инпута кастомного значения (только в `optionsView="panel"`). */
+  customValuePlaceholder?: string
+  /** Максимальная высота панели (только в `optionsView="panel"`). */
+  dropdownMaxHeight?: number
+  /** Закрывать панель после выбора (только в `optionsView="panel"`). */
+  closeOnSelect?: boolean
+  /** Разрешает очистку выбранного значения. */
+  clearable?: boolean
+  /** i18n-label для кнопки очистки (`aria-label`). */
+  clearLabel?: string
+  /**
+   * Цвет/вариант ссылки для `view="link"` (аналогично `DsLink`).
+   * В `view="default"` не используется.
+   */
+  variant?: DsSelectVariant
+  /**
+   * Подчёркивание для `view="link"` (аналогично `DsLink`).
+   * В `view="default"` не используется.
+   */
+  underline?: DsSelectUnderline
+}
 
 const props = withDefaults(
-  defineProps<{
-    modelValue: DsSelectModelValue
-    options?: DsSelectOption[]
-    disabled?: boolean
-    ariaLabel?: string
-    view?: DsSelectView
-    size?: DsSelectSize
-
-    /** Placeholder (показывается, когда значение не выбрано). */
-    placeholder?: string
-
-    /** Multiple selection. */
-    multiple?: boolean
-
-    /** Как отображать список опций: нативный `<select>` или кастомная панель. */
-    optionsView?: DsSelectOptionsView
-
-    /** Разрешает ввод/выбор значения, которого нет в `options`. */
-    allowCustomValue?: boolean
-
-    /** Placeholder для инпута кастомного значения (только в `optionsView="panel"`). */
-    customValuePlaceholder?: string
-
-    /** Максимальная высота панели (только в `optionsView="panel"`). */
-    dropdownMaxHeight?: number
-
-    /** Закрывать панель после выбора (только в `optionsView="panel"`). */
-    closeOnSelect?: boolean
-
-    /** Разрешает очистку выбранного значения. */
-    clearable?: boolean
-
-    /**
-     * Цвет/вариант ссылки для `view="link"` (аналогично `DsLink`).
-     * В `view="default"` не используется.
-     */
-    variant?: DsSelectVariant
-
-    /**
-     * Подчёркивание для `view="link"` (аналогично `DsLink`).
-     * В `view="default"` не используется.
-     */
-    underline?: DsSelectUnderline
-  }>(),
+  defineProps<DsSelectProps>(),
   {
     options: undefined,
     disabled: false,
@@ -87,10 +87,15 @@ const props = withDefaults(
     dropdownMaxHeight: 280,
     closeOnSelect: true,
     clearable: false,
+    clearLabel: 'Clear',
     variant: 'primary',
     underline: 'auto',
   },
 )
+
+const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : defaultBaseClass)
+
+const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full')
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: DsSelectModelValue): void
@@ -380,20 +385,17 @@ function clearSelection(): void {
 
 <template>
   <div
-    v-if="props.optionsView === 'native'"
-    :class="props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full'"
+    v-if="optionsView === 'native'"
+    data-ds-select
+    :class="rootClass"
   >
     <select
-      :value="props.multiple ? modelMultiple : modelSingle"
-      :multiple="props.multiple"
-      :disabled="props.disabled"
-      :aria-label="props.ariaLabel"
-      :class="[
-        props.view === 'link'
-          ? 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'
-          : 'w-full rounded-md border border-[var(--brd)] bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]',
-        nativeClassName,
-      ]"
+      data-ds-select-native
+      :value="multiple ? modelMultiple : modelSingle"
+      :multiple="multiple"
+      :disabled="disabled"
+      :aria-label="ariaLabel"
+      :class="[baseClassName, nativeClassName]"
       @change="onChange"
     >
       <option v-if="nativeClearOptionVisible" value="" />
@@ -402,7 +404,7 @@ function clearSelection(): void {
         <option v-if="nativeCustomOptionVisible" :value="modelSingle">
           {{ modelSingle }}
         </option>
-        <option v-for="opt in props.options" :key="opt.value" :value="opt.value">
+        <option v-for="opt in options" :key="opt.value" :value="opt.value">
           {{ opt.label }}
         </option>
       </slot>
@@ -421,22 +423,19 @@ function clearSelection(): void {
     v-else
     ref="rootEl"
     v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
-    :class="props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full'"
+    data-ds-select
+    :class="rootClass"
   >
     <button
       data-testid="ds-select-trigger"
+      data-ds-select-trigger
       type="button"
-      :disabled="props.disabled"
-      :aria-label="props.ariaLabel"
+      :disabled="disabled"
+      :aria-label="ariaLabel"
       role="combobox"
       aria-readonly="true"
       :aria-expanded="open ? 'true' : 'false'"
-      :class="[
-        props.view === 'link'
-          ? 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'
-          : 'w-full rounded-md border border-[var(--brd)] bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]',
-        triggerClassName,
-      ]"
+      :class="[baseClassName, triggerClassName]"
       @click="toggleDropdown"
     >
       <span class="min-w-0 flex-1">
@@ -445,7 +444,7 @@ function clearSelection(): void {
           :selected-options="selectedOptions"
           :selected-values="selectedValues"
           :display-label="displayLabel"
-          :placeholder="props.placeholder"
+          :placeholder="placeholder"
           :has-selection="hasSelection"
         >
           <span
@@ -475,10 +474,11 @@ function clearSelection(): void {
     <button
       v-if="panelClearVisible"
       data-testid="ds-select-clear"
+      data-ds-select-clear
       type="button"
       class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
-      :disabled="props.disabled"
-      aria-label="Clear"
+      :disabled="disabled"
+      :aria-label="clearLabel"
       @click.stop="clearSelection"
     >
       <span class="i-lucide-x h-4 w-4" aria-hidden="true" />
@@ -497,31 +497,34 @@ function clearSelection(): void {
           v-show="open"
           ref="panelEl"
           data-testid="ds-select-panel"
+          data-ds-select-panel
           class="fixed w-full"
           :style="panelStyle"
         >
           <div :class="panelClasses">
-            <div v-if="props.allowCustomValue" class="p-2 border-b border-[var(--brd)]">
+            <div v-if="allowCustomValue" class="p-2 border-b border-[var(--brd)]">
               <DsInput
                 ref="customInputRef"
                 v-model="customValue"
                 data-testid="ds-select-custom-input"
                 type="text"
-                :placeholder="props.customValuePlaceholder"
+                :placeholder="customValuePlaceholder"
                 size="sm"
                 @keydown.enter.prevent="addCustom"
               />
             </div>
 
             <div
+              data-ds-select-listbox
               class="p-1 overflow-auto"
-              :style="{ maxHeight: `${props.dropdownMaxHeight}px` }"
+              :style="{ maxHeight: `${dropdownMaxHeight}px` }"
               role="listbox"
-              :aria-multiselectable="props.multiple ? 'true' : undefined"
+              :aria-multiselectable="multiple ? 'true' : undefined"
             >
               <button
                 v-if="canAddCustom"
                 data-testid="ds-select-add-option"
+                data-ds-select-add-option
                 type="button"
                 class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]"
                 @click="addCustom"
@@ -532,6 +535,7 @@ function clearSelection(): void {
               <button
                 v-for="opt in visibleOptions"
                 :key="opt.value"
+                data-ds-select-option
                 type="button"
                 role="option"
                 :aria-selected="isSelected(opt.value) ? 'true' : 'false'"

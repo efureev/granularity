@@ -1,51 +1,38 @@
 import type { Component } from 'vue'
-
-import { splitClassTokens } from '../shared/classTokens'
-
 export type DsSegmentedVariant = 'pills' | 'button'
 export type DsSegmentedSize = 'xs' | 'sm' | 'md' | 'lg'
 export type DsSegmentedValue = string | number
-
 export type DsSegmentedOption = {
   value: DsSegmentedValue
   label?: string
   icon?: Component
   disabled?: boolean
 }
-
-const rootBaseClass =
+export const rootBaseClass =
   'relative inline-grid min-w-0 grid-flow-col items-stretch rounded-[var(--ds-segmented-radius)] p-[var(--ds-segmented-padding)] transition-colors duration-150'
-
-const rootVariantClassMap: Record<DsSegmentedVariant, string> = {
+export const rootVariantClassMap: Record<DsSegmentedVariant, string> = {
   pills: 'border border-[var(--ds-segmented-track-brd)] bg-[var(--ds-segmented-track-bg)] text-[var(--ds-segmented-item-color)]',
   button: 'border border-[var(--ds-segmented-track-brd)] bg-[var(--ds-segmented-track-bg)] text-[var(--ds-segmented-item-color)] shadow-[var(--ds-segmented-track-shadow)]',
 }
-
-const rootBlockClass = 'w-full'
-
-const indicatorBaseClass =
+export const rootBlockClass = 'w-full'
+export const indicatorBaseClass =
   'pointer-events-none absolute left-0 top-0 rounded-[calc(var(--ds-segmented-radius)-var(--ds-segmented-padding))] transition-[transform,width,height,opacity] ease-out'
-
-const indicatorVariantClassMap: Record<DsSegmentedVariant, string> = {
+export const indicatorVariantClassMap: Record<DsSegmentedVariant, string> = {
   pills:  'border border-[var(--ds-segmented-indicator-brd)] bg-[var(--ds-segmented-indicator-bg)] shadow-[var(--ds-segmented-indicator-shadow)]',
   button: 'border border-[var(--ds-segmented-indicator-brd)] bg-[var(--ds-segmented-indicator-bg)] shadow-[var(--ds-segmented-indicator-shadow)]',
 }
-
-const itemBaseClass =
+export const itemBaseClass =
   'group/segmented-item relative z-[1] inline-flex min-h-[var(--ds-segmented-min-height)] min-w-0 items-center justify-center gap-2 rounded-[calc(var(--ds-segmented-radius)-var(--ds-segmented-padding))] px-[var(--ds-segmented-item-px)] py-[var(--ds-segmented-item-py)] text-[length:var(--ds-segmented-font-size)] leading-[var(--ds-segmented-line-height)] font-[var(--ds-segmented-font-weight)] text-[var(--ds-segmented-item-color)] transition-colors duration-150 select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--ring),0_0_0_4px_var(--bg)]'
-
-const itemVariantClassMap: Record<DsSegmentedVariant, string> = {
+export const itemVariantClassMap: Record<DsSegmentedVariant, string> = {
   pills: '',
   button: '',
 }
-
-const itemSelectedClass = 'text-[var(--ds-segmented-item-selected-color)]'
-const itemDisabledClass = 'cursor-not-allowed opacity-50'
-const itemEnabledClass = 'cursor-pointer hover:text-[var(--ds-segmented-item-hover-color)]'
-const itemLabelClass = 'truncate'
-const itemIconClass = 'h-4 w-4 shrink-0'
-const iconOnlyClass = 'gap-0'
-
+export const itemSelectedClass = 'text-[var(--ds-segmented-item-selected-color)]'
+export const itemDisabledClass = 'cursor-not-allowed opacity-50'
+export const itemEnabledClass = 'cursor-pointer hover:text-[var(--ds-segmented-item-hover-color)]'
+export const itemLabelClass = 'truncate'
+export const itemIconClass = 'h-4 w-4 shrink-0'
+export const iconOnlyClass = 'gap-0'
 const rootSizeStyles: Record<DsSegmentedSize, Record<string, string>> = {
   xs: {
     '--ds-segmented-radius': '9999px',
@@ -88,7 +75,6 @@ const rootSizeStyles: Record<DsSegmentedSize, Record<string, string>> = {
     '--ds-segmented-min-height': '46px',
   },
 }
-
 const rootVariantStyles: Record<DsSegmentedVariant, Record<string, string>> = {
   pills: {
     '--ds-segmented-track-bg': 'var(--muted)',
@@ -113,7 +99,6 @@ const rootVariantStyles: Record<DsSegmentedVariant, Record<string, string>> = {
     '--ds-segmented-item-hover-color': 'var(--fg)',
   },
 }
-
 export function dsSegmentedRootClass(options: { variant: DsSegmentedVariant, block: boolean, disabled: boolean }): string {
   return [
     rootBaseClass,
@@ -122,18 +107,15 @@ export function dsSegmentedRootClass(options: { variant: DsSegmentedVariant, blo
     options.disabled ? 'opacity-70' : '',
   ].filter(Boolean).join(' ')
 }
-
 export function dsSegmentedRootStyle(options: { variant: DsSegmentedVariant, size: DsSegmentedSize }): Record<string, string> {
   return {
     ...rootSizeStyles[options.size],
     ...rootVariantStyles[options.variant],
   }
 }
-
 export function dsSegmentedIndicatorClass(variant: DsSegmentedVariant): string {
   return [indicatorBaseClass, indicatorVariantClassMap[variant]].join(' ')
 }
-
 export function dsSegmentedItemClass(options: {
   variant: DsSegmentedVariant
   selected: boolean
@@ -148,40 +130,5 @@ export function dsSegmentedItemClass(options: {
     options.iconOnly ? iconOnlyClass : '',
   ].filter(Boolean).join(' ')
 }
-
-export const dsSegmentedClassTokens = {
-  rootBaseClass: splitClassTokens(rootBaseClass),
-  rootVariantClassMap: Object.values(rootVariantClassMap).flatMap(splitClassTokens),
-  rootBlockClass: splitClassTokens(rootBlockClass),
-  indicatorBaseClass: splitClassTokens(indicatorBaseClass),
-  indicatorVariantClassMap: Object.values(indicatorVariantClassMap).flatMap(splitClassTokens),
-  itemBaseClass: splitClassTokens(itemBaseClass),
-  itemVariantClassMap: Object.values(itemVariantClassMap).flatMap(splitClassTokens),
-  itemSelectedClass: splitClassTokens(itemSelectedClass),
-  itemDisabledClass: splitClassTokens(itemDisabledClass),
-  itemEnabledClass: splitClassTokens(itemEnabledClass),
-  itemLabelClass: splitClassTokens(itemLabelClass),
-  itemIconClass: splitClassTokens(itemIconClass),
-  iconOnlyClass: splitClassTokens(iconOnlyClass),
-  extra: splitClassTokens('opacity-70'),
-} as const
-
-export const dsSegmentedSafelist = [...new Set([
-  ...dsSegmentedClassTokens.rootBaseClass,
-  ...dsSegmentedClassTokens.rootVariantClassMap,
-  ...dsSegmentedClassTokens.rootBlockClass,
-  ...dsSegmentedClassTokens.indicatorBaseClass,
-  ...dsSegmentedClassTokens.indicatorVariantClassMap,
-  ...dsSegmentedClassTokens.itemBaseClass,
-  ...dsSegmentedClassTokens.itemVariantClassMap,
-  ...dsSegmentedClassTokens.itemSelectedClass,
-  ...dsSegmentedClassTokens.itemDisabledClass,
-  ...dsSegmentedClassTokens.itemEnabledClass,
-  ...dsSegmentedClassTokens.itemLabelClass,
-  ...dsSegmentedClassTokens.itemIconClass,
-  ...dsSegmentedClassTokens.iconOnlyClass,
-  ...dsSegmentedClassTokens.extra,
-])]
-
 export const dsSegmentedItemLabelClass = itemLabelClass
 export const dsSegmentedItemIconClass = itemIconClass

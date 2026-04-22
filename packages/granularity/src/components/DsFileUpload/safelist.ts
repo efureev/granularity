@@ -11,7 +11,7 @@ const fileUploadClasses = [
   'h-6 w-6 text-[var(--muted-fg)]',
   'min-w-0',
   'text-[14px] font-700',
-  'mt-1 text-[13px] ds-muted',
+  'mt-1 text-[13px] text-[var(--muted-fg)]',
   'mt-3 space-y-1',
   'font-600',
 ]

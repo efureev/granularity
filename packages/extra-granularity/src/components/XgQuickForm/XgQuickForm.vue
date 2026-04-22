@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
-import { DsFormField } from '@feugene/granularity/components/DsFormField'
-import { DsInput } from '@feugene/granularity/components/DsInput'
-import { DsButton } from '@feugene/granularity/components/DsButton'
+import {computed, ref, useId} from 'vue'
+import {DsFormField} from '@feugene/granularity/components/DsFormField'
+import {DsInput} from '@feugene/granularity/components/DsInput'
+import {DsButton} from '@feugene/granularity/components/DsButton'
 
 /**
  * `XgQuickForm` — single-line composite form built from granularity primitives:
@@ -15,27 +15,27 @@ import { DsButton } from '@feugene/granularity/components/DsButton'
  * role of `@feugene/extra-granularity`: small, opinionated, composite pieces.
  */
 const props = withDefaults(
-  defineProps<{
-    modelValue?: string
-    label?: string
-    placeholder?: string
-    submitLabel?: string
-    error?: string
-    disabled?: boolean
-    loading?: boolean
-    /** Emit the raw value as-is, without trimming whitespace. */
-    raw?: boolean
-  }>(),
-  {
-    modelValue: '',
-    label: undefined,
-    placeholder: undefined,
-    submitLabel: 'Submit',
-    error: undefined,
-    disabled: false,
-    loading: false,
-    raw: false,
-  },
+    defineProps<{
+      modelValue?: string
+      label?: string
+      placeholder?: string
+      submitLabel?: string
+      error?: string
+      disabled?: boolean
+      loading?: boolean
+      /** Emit the raw value as-is, without trimming whitespace. */
+      raw?: boolean
+    }>(),
+    {
+      modelValue: '',
+      label: undefined,
+      placeholder: undefined,
+      submitLabel: 'Submit',
+      error: undefined,
+      disabled: false,
+      loading: false,
+      raw: false,
+    },
 )
 
 const emit = defineEmits<{
@@ -65,21 +65,32 @@ function onSubmit() {
   <form class="xg-quick-form" @submit.prevent="onSubmit">
     <DsFormField :label="label" :for-id="inputId" :error="error">
       <DsInput
-        :id="inputId"
-        v-model="value"
-        :placeholder="placeholder"
-        :disabled="disabled || loading"
-        :invalid="Boolean(error)"
+          :id="inputId"
+          v-model="value"
+          :placeholder="placeholder"
+          :disabled="disabled || loading"
+          :invalid="Boolean(error)"
       />
     </DsFormField>
     <DsButton
-      type="submit"
-      :disabled="disabled"
-      :loading="loading"
+        type="submit"
+        :disabled="disabled"
+        :loading="loading"
     >
       <slot name="submit">{{ submitLabel }}</slot>
     </DsButton>
   </form>
 </template>
 
-<style src="./styles.css"></style>
+<style>
+.xg-quick-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.xg-quick-form > :last-child {
+  align-self: flex-start;
+}
+</style>

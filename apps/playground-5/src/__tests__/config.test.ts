@@ -51,10 +51,11 @@ describe('playground-5 config', () => {
   })
 
   it('подключает node-only preset и сканирует только свои исходники', () => {
-    expect(playground5UnoConfig).toContain("import { presetGranularityNode } from '@feugene/granularity/uno-node'")
-    expect(playground5UnoConfig).toContain("components: [...playground5GranularityComponents]")
+    expect(playground5UnoConfig).toContain("import { presetGranularNode } from '@feugene/unocss-preset-granular/node'")
+    expect(playground5UnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
+    expect(playground5UnoConfig).toContain('providers: [granularityProvider]')
     expect(playground5UnoConfig).toContain('layer: playground5GranularityLayer')
-    expect(playground5GranularityLayer).toBe('granularity')
+    expect(playground5GranularityLayer).toBe('granular')
     expect(playground5ContentIncludes.some(re => re.test('/repo/apps/playground-5/src/App.vue'))).toBe(true)
     expect(playground5ContentIncludes.some(re => re.test('/repo/apps/playground-6/src/App.vue'))).toBe(false)
     expect(playground5MainEntry).toContain('await Promise.all([')
@@ -67,7 +68,8 @@ describe('playground-5 config', () => {
     expect(playground5Tsconfig.compilerOptions?.paths).toMatchObject({
       '@feugene/granularity': ['../../packages/granularity/src/index.ts'],
       '@feugene/granularity/components/*': ['../../packages/granularity/src/components/*/index.ts'],
-      '@feugene/granularity/uno-node': ['../../packages/granularity/src/unocss/preset.node.ts'],
+      '@feugene/granularity/granular-provider/node': ['../../packages/granularity/src/granular-provider/node.ts'],
+      '@feugene/unocss-preset-granular/node': ['../../packages/unocss-preset-granular/src/node.ts'],
     })
     expect(playground5ViteEnv).toContain('/// <reference types="unplugin-icons/types/vue" />')
   })

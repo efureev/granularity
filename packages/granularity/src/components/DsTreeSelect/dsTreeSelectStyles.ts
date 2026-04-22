@@ -1,16 +1,15 @@
 import type { DsInputSize } from '../DsInput'
-import { splitClassTokens } from '../shared/classTokens'
 
 export type DsTreeSelectState = 'default' | 'success' | 'warning' | 'danger'
 
-const sizeClassBySize: Record<DsInputSize, string> = {
+export const sizeClassBySize: Record<DsInputSize, string> = {
   xs: 'h-7 px-2.5 text-[12px]',
   sm: 'h-8 px-3 text-[13px]',
   md: 'h-10 px-3 text-[14px]',
   lg: 'h-11 px-4 text-[16px]',
 }
 
-const borderClassByState: Record<DsTreeSelectState, string> = {
+export const borderClassByState: Record<DsTreeSelectState, string> = {
   default: 'border-[var(--brd)]',
   success: 'border-[var(--ds-success)] focus-visible:ring-[var(--ds-success)]',
   warning: 'border-[var(--ds-warning)] focus-visible:ring-[var(--ds-warning)]',
@@ -26,10 +25,3 @@ export function dsTreeSelectClass(options: { size: DsInputSize, state: DsTreeSel
 }
 
 export const dsTreeSelectPanelClass = 'rounded-[var(--ds-radius-xl)] border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--ds-shadow-2)] overflow-hidden'
-
-export const dsTreeSelectSafelist = [...new Set([
-  ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(borderClassByState).flatMap(splitClassTokens),
-  'pr-9',
-  ...splitClassTokens(dsTreeSelectPanelClass),
-])]

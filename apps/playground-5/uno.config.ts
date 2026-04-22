@@ -1,13 +1,12 @@
 import { defineConfig, presetMini } from 'unocss'
-
-import { presetGranularityNode } from '@feugene/granularity/uno-node'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import granularityProvider from '@feugene/granularity/granular-provider/node'
 
 export const playground5ContentIncludes = [
   /apps\/playground-5\/src\/.*\.(vue|ts)($|\?)/,
 ]
-
 export const playground5GranularityComponents = ['DsButton'] as const
-export const playground5GranularityLayer = 'granularity'
+export const playground5GranularityLayer = 'granular'
 
 export default defineConfig({
   content: {
@@ -17,8 +16,14 @@ export default defineConfig({
   },
   presets: [
     presetMini(),
-    presetGranularityNode({
-      components: [...playground5GranularityComponents],
+    presetGranularNode({
+      providers: [granularityProvider],
+      components: [
+        {
+          provider: '@feugene/granularity',
+          names: [...playground5GranularityComponents],
+        },
+      ],
       layer: playground5GranularityLayer,
     }),
   ],

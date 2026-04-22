@@ -1,33 +1,38 @@
 import { defineConfig, presetMini } from 'unocss'
-import { presetGranularityNode } from '@feugene/granularity/uno-node'
+import {granularContent, presetGranularNode, type PresetGranularNodeOptions} from '@feugene/unocss-preset-granular/node'
+// import granularityProvider from '@feugene/granularity/granular-provider/node'
+import extraGranularityProvider from '@feugene/extra-granularity/granular-provider/node'
 
-// Контент, который UnoCSS сканирует на предмет utility-классов.
-// Ограничиваем строго исходниками playground-9 — это гарантирует, что в
-// финальный `virtual:uno.css` попадут только реально использованные утилиты,
-// а preflight с компонентными стилями придёт из `presetGranularityNode`.
-export const playground9ContentIncludes = [
-  /apps\/playground-9\/src\/.*\.(vue|ts)($|\?)/,
-]
+// Композит `XgQuickForm` транзитивно подтянет все нужные примитивы granularity
+// через cross-provider `dependencies` в его `config.ts`. Дополнительно включаем
+// `DsCard`, который используется напрямую в playground'е.
+export const playground9Components = [
+  '@feugene/extra-granularity:XgQuickForm',
+  '@feugene/granularity:DsCard',
+] as const
+export const playground9GranularityLayer = 'granular'
 
-// В этом playground'е используется композитный `XgQuickForm` из
-// `@feugene/extra-granularity`, собранный ровно из трёх примитивов granularity.
-// Передаём их имена в `presetGranularityNode` — preset выдаст preflight
-// только с CSS `DsFormField`, `DsInput`, `DsButton` (плюс токены тем), и
-// ничего лишнего из пакета.
-export const playground9GranularityComponents = ['DsFormField', 'DsInput', 'DsButton', 'DsCard'] as const
-export const playground9GranularityLayer = 'granularity'
+const granularOptions: PresetGranularNodeOptions = {
+  providers: [
+    // granularityProvider,
+    extraGranularityProvider,
+  ],
+  components: [...playground9Components],
+  layer: playground9GranularityLayer,
+}
+
 
 export default defineConfig({
-  content: {
-    pipeline: {
-      include: playground9ContentIncludes,
-    },
-  },
   presets: [
-    presetMini(),
-    presetGranularityNode({
-      components: [...playground9GranularityComponents],
-      layer: playground9GranularityLayer,
+    presetMini({
+      variablePrefix: 'ds-',
     }),
+    presetGranularNode(granularOptions),
   ],
+  // `@unocss/vite` читает `content.filesystem` только из top-level user-config,
+  // поэтому подключаем хелпер `granularContent` — он автоматически соберёт
+  // globs по выбранным компонентам (+ их транзитивным `dependencies`) и
+  // расширит `pipeline.include` до `.js`, чтобы extractor увидел утилитарные
+  // классы в скомпилированных SFC‑чанках.
+  content: granularContent(granularOptions),
 })

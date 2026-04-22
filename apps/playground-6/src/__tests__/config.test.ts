@@ -35,11 +35,13 @@ describe('playground-6 config', () => {
   })
 
   it('использует pure preset и ручные css preflights', () => {
-    expect(playground6UnoConfig).toContain("import {\n  createGranularityCssPreflights,\n  presetGranularity,\n} from '@feugene/granularity/uno'")
+    expect(playground6UnoConfig).toContain("import { presetGranular } from '@feugene/unocss-preset-granular'")
+    expect(playground6UnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider'")
+    expect(playground6UnoConfig).not.toContain('presetGranularNode')
     expect(playground6UnoConfig).not.toContain('presetGranularityNode')
     expect(playground6UnoConfig).toContain('layer: playground6GranularityLayer')
-    expect(playground6UnoConfig).toContain('createGranularityCssPreflights([playground6PreflightCss], playground6GranularityLayer)')
-    expect(playground6GranularityLayer).toBe('granularity')
+    expect(playground6UnoConfig).toContain('getCSS: () => playground6PreflightCss')
+    expect(playground6GranularityLayer).toBe('granular')
     expect(playground6PreflightCss).toContain('--primary: #db2777;')
     expect(playground6ContentIncludes.some(re => re.test('/repo/apps/playground-6/src/App.vue'))).toBe(true)
     expect(playground6MainEntry).toContain('await Promise.all([')

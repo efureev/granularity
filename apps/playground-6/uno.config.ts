@@ -1,15 +1,13 @@
-import {
-  createGranularityCssPreflights,
-  presetGranularity,
-} from '@feugene/granularity/uno'
 import { defineConfig, presetMini } from 'unocss'
+import { presetGranular } from '@feugene/unocss-preset-granular'
+import granularityProvider from '@feugene/granularity/granular-provider'
 
 export const playground6ContentIncludes = [
   /apps\/playground-6\/src\/.*\.(vue|ts)($|\?)/,
 ]
 
 export const playground6GranularityComponents = ['DsButton'] as const
-export const playground6GranularityLayer = 'granularity'
+export const playground6GranularityLayer = 'granular'
 
 export const playground6PreflightCss = `
 :root {
@@ -52,10 +50,16 @@ export default defineConfig({
   },
   presets: [
     presetMini(),
-    presetGranularity({
-      components: [...playground6GranularityComponents],
+    presetGranular({
+      providers: [granularityProvider],
+      components: [
+        { provider: '@feugene/granularity', names: [...playground6GranularityComponents] },
+      ],
       layer: playground6GranularityLayer,
-      preflights: createGranularityCssPreflights([playground6PreflightCss], playground6GranularityLayer),
+      // Browser entry: inline CSS приложения прокидываем в preflights, без FS.
+      preflights: [
+        { getCSS: () => playground6PreflightCss, layer: playground6GranularityLayer },
+      ],
     }),
   ],
 })

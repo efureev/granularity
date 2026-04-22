@@ -82,7 +82,7 @@ const spinnerClass = computed(() => props.spinnerClass)
         :class="spinnerClass"
         aria-hidden="true"
       />
-      <div v-if="displayText" class="text-sm ds-muted">
+      <div v-if="displayText" class="text-sm text-[var(--muted-fg)]">
         {{ displayText }}
       </div>
     </div>

@@ -1,39 +1,41 @@
 import {
-    defineConfig,
-    presetAttributify,
-    presetIcons,
-    presetMini,
-    transformerDirectives,
-    transformerVariantGroup,
+  defineConfig,
+  presetAttributify,
+  presetIcons,
+  presetMini,
+  transformerDirectives,
+  transformerVariantGroup,
 } from 'unocss'
 
-import {presetGranularityNode} from '@feugene/granularity/uno-node'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import granularityProvider from '@feugene/granularity/granular-provider/node'
 
 export const showcaseContentIncludes = [
-    /apps\/showcase\/src\/.*\.(vue|ts)($|\?)/,
+  /apps\/showcase\/src\/.*\.(vue|ts)($|\?)/,
 ]
 
 export default defineConfig({
-    content: {
-        pipeline: {
-            include: showcaseContentIncludes,
-        },
+  content: {
+    pipeline: {
+      include: showcaseContentIncludes,
     },
-    presets: [
-        presetMini(),
-        presetGranularityNode({
-            themes: ['light', 'dark'],
-        }),
-        presetAttributify(),
-        presetIcons({
-            scale: 1.05,
-            extraProperties: {
-                display: 'inline-block',
-            },
-        }),
-    ],
-    transformers: [
-        transformerDirectives(),
-        transformerVariantGroup(),
-    ],
+  },
+  presets: [
+    presetMini(),
+    presetGranularNode({
+      providers: [granularityProvider],
+      themes: { names: ['light', 'dark'] },
+    }),
+    presetAttributify(),
+    presetIcons({
+      scale: 1.05,
+      extraProperties: {
+        display: 'inline-block',
+      },
+    }),
+  ],
+  transformers: [
+    transformerDirectives(),
+    transformerVariantGroup(),
+  ],
 })

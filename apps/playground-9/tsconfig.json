@@ -25,8 +25,26 @@
       "@feugene/granularity/components/*": [
         "../../packages/granularity/src/components/*/index.ts"
       ],
-      "@feugene/granularity/uno-node": [
-        "../../packages/granularity/src/unocss/preset.node.ts"
+      "@feugene/granularity/granular-provider": [
+        "../../packages/granularity/src/granular-provider/index.ts"
+      ],
+      "@feugene/granularity/granular-provider/node": [
+        "../../packages/granularity/src/granular-provider/node.ts"
+      ],
+      "@feugene/extra-granularity/granular-provider": [
+        "../../packages/extra-granularity/src/granular-provider/index.ts"
+      ],
+      "@feugene/extra-granularity/granular-provider/node": [
+        "../../packages/extra-granularity/src/granular-provider/node.ts"
+      ],
+      "@feugene/unocss-preset-granular": [
+        "../../packages/unocss-preset-granular/src/index.ts"
+      ],
+      "@feugene/unocss-preset-granular/node": [
+        "../../packages/unocss-preset-granular/src/node.ts"
+      ],
+      "@feugene/unocss-preset-granular/contract": [
+        "../../packages/unocss-preset-granular/src/contract/index.ts"
       ]
     }
   },
