@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
 
-export type { DsLinkSize, DsLinkUnderline, DsLinkVariant } from './dsLinkStyles'
-
 import {
   dsLinkClass,
   type DsLinkSize,
@@ -74,10 +72,10 @@ const className = computed(() => {
   <a
     v-if="isAnchor"
     v-bind="attrs"
-    :href="props.href"
+    :href="href"
     :target="resolvedTarget"
     :rel="resolvedRel"
-    :aria-label="props.ariaLabel"
+    :aria-label="ariaLabel"
     class="inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
     :class="className"
   >
@@ -87,8 +85,8 @@ const className = computed(() => {
   <span
     v-else
     v-bind="attrs"
-    :aria-label="props.ariaLabel"
-    :aria-disabled="props.disabled ? 'true' : undefined"
+    :aria-label="ariaLabel"
+    :aria-disabled="disabled ? 'true' : undefined"
     class="inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
     :class="className"
   >

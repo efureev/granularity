@@ -1,22 +1,24 @@
-import { splitClassTokens } from '../shared/classTokens'
-
 export type DsLinkVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type DsLinkUnderline = 'auto' | 'always' | 'none'
 export type DsLinkSize = 'sm' | 'md' | 'lg'
 
-const sizeClassBySize: Record<DsLinkSize, string> = {
+export const sizeClassBySize: Record<DsLinkSize, string> = {
   sm: 'text-sm',
   md: 'text-[14px]',
   lg: 'text-base',
 }
 
-const variantClassByVariant: Record<DsLinkVariant, string> = {
+export const variantClassByVariant: Record<DsLinkVariant, string> = {
   primary:
     'text-[var(--primary)] visited:text-[var(--primary)] hover:text-[var(--primary-hover)] active:text-[var(--primary-active)]',
   default: 'text-[var(--fg)] hover:text-[var(--primary)] active:text-[var(--primary-active)]',
   muted: 'text-[var(--muted-fg)] hover:text-[var(--fg)] active:text-[var(--fg)]',
   danger: 'text-[var(--ds-danger)] hover:text-[var(--ds-danger-hover)] active:text-[var(--ds-danger-active)]',
 }
+
+export const disabledStateClass = 'cursor-not-allowed opacity-60 text-[var(--muted-fg)]'
+
+const UNDERLINE_VALUES: readonly DsLinkUnderline[] = ['auto', 'always', 'none']
 
 function underlineClass(underline: DsLinkUnderline, disabled: boolean): string {
   if (disabled) return 'no-underline'
@@ -25,8 +27,15 @@ function underlineClass(underline: DsLinkUnderline, disabled: boolean): string {
   return 'no-underline hover:underline hover:underline-offset-4'
 }
 
+// Derived from `underlineClass` so that there is a single source of truth:
+// any change/extension of the underline logic is automatically reflected
+// in the safelist without manual updates.
+export const underlineClasses: readonly string[] = [...new Set(
+  UNDERLINE_VALUES.flatMap(u => [underlineClass(u, false), underlineClass(u, true)]),
+)]
+
 function disabledClass(disabled: boolean): string {
-  return disabled ? 'cursor-not-allowed opacity-60 text-[var(--muted-fg)]' : ''
+  return disabled ? disabledStateClass : ''
 }
 
 export function dsLinkClass(options: { size: DsLinkSize, underline: DsLinkUnderline, variant: DsLinkVariant, disabled: boolean }): string {
@@ -39,10 +48,3 @@ export function dsLinkClass(options: { size: DsLinkSize, underline: DsLinkUnderl
     .filter(Boolean)
     .join(' ')
 }
-
-export const dsLinkSafelist = [...new Set([
-  ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
-  ...['no-underline', 'underline underline-offset-4', 'no-underline hover:underline hover:underline-offset-4'].flatMap(splitClassTokens),
-  ...Object.values(variantClassByVariant).flatMap(splitClassTokens),
-  ...splitClassTokens('cursor-not-allowed opacity-60 text-[var(--muted-fg)]'),
-])]
