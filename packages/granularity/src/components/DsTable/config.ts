@@ -1,8 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsTableSafelist } from './safelist'
-
-export const dsTableConfig = defineGranularityComponentConfig(import.meta.url, {
+// Все классы DsTable — статические литералы в шаблоне, UnoCSS найдёт их сканом.
+export const dsTableConfig = defineGranularComponent(import.meta.url, {
   name: 'DsTable',
-  safelist: dsTableSafelist,
+  dependencies: [],
+  safelist: [],
 })
