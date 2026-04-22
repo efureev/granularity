@@ -1,9 +1,7 @@
-import { splitClassTokens } from '../shared/classTokens'
-
 export type DsDropdownAlign = 'left' | 'right' | 'center'
 export type DsDropdownWidth = 'auto' | '20' | '48' | '60' | '64' | '80'
 
-const widthClassByWidth: Record<DsDropdownWidth, string> = {
+export const widthClassByWidth: Record<DsDropdownWidth, string> = {
   auto: '',
   20: 'w-20',
   48: 'w-48',
@@ -12,7 +10,7 @@ const widthClassByWidth: Record<DsDropdownWidth, string> = {
   80: 'w-80',
 }
 
-const alignmentClassByAlign: Record<DsDropdownAlign, string> = {
+export const alignmentClassByAlign: Record<DsDropdownAlign, string> = {
   left: 'origin-top-left',
   right: 'origin-top-right -translate-x-full',
   center: 'origin-top -translate-x-1/2',
@@ -36,9 +34,3 @@ export function dsDropdownContentClass(contentClass?: string): string {
     contentClass,
   ].filter(Boolean).join(' ')
 }
-
-export const dsDropdownSafelist = [...new Set([
-  ...Object.values(widthClassByWidth).flatMap(splitClassTokens),
-  ...Object.values(alignmentClassByAlign).flatMap(splitClassTokens),
-  ...splitClassTokens('rounded-[var(--ds-radius-xl)] border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--ds-shadow-2)] p-1'),
-])]

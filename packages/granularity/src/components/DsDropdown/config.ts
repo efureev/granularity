@@ -1,8 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
 import { dsDropdownSafelist } from './safelist'
 
-export const dsDropdownConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsDropdownConfig = defineGranularComponent(import.meta.url, {
   name: 'DsDropdown',
   safelist: dsDropdownSafelist,
 })

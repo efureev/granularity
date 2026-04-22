@@ -1,44 +1,55 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import DsButton from '../DsButton/DsButton.vue'
-import { dsDrawerPanelClass, dsDrawerPanelEnterFrom } from './dsDrawerStyles'
+import DsIcon from '../DsIcon/DsIcon.vue'
+import {
+  dsDrawerPanelClass,
+  dsDrawerPanelEnterFrom,
+  type DsDrawerSide,
+  type DsDrawerSize,
+} from './dsDrawerStyles'
 
 import IconClose from '~icons/lucide/x'
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: boolean
-    title?: string
-    closeOnBackdrop?: boolean
-    side?: 'left' | 'right'
-    size?: 'sm' | 'md' | 'lg' | 'full'
-  }>(),
-  {
-    title: undefined,
-    closeOnBackdrop: true,
-    side: 'right',
-    size: 'md',
-  },
-)
+export interface DsDrawerProps {
+  /** Контроль открытия через v-model. */
+  modelValue: boolean
+  /** Заголовок; если передан — покажется в хедере. Можно переопределить слотом `#title`. */
+  title?: string
+  /** Закрывать при клике по бэкдропу / через HeadlessUI close. */
+  closeOnBackdrop?: boolean
+  /** Закрывать по Esc. */
+  closeOnEsc?: boolean
+  /** Сторона, с которой выезжает панель. */
+  side?: DsDrawerSide
+  /** Размер панели. */
+  size?: DsDrawerSize
+  /** i18n-friendly aria-label для кнопки закрытия. */
+  closeLabel?: string
+}
+
+const props = withDefaults(defineProps<DsDrawerProps>(), {
+  title: undefined,
+  closeOnBackdrop: true,
+  closeOnEsc: true,
+  side: 'right',
+  size: 'md',
+  closeLabel: 'Close',
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
 }>()
 
-const open = computed(() => props.modelValue)
+const titleId = useId()
 
 const panelClass = computed(() => {
-  return dsDrawerPanelClass({
-    side: props.side,
-    size: props.size,
-  })
+  return dsDrawerPanelClass({ side: props.side, size: props.size })
 })
 
-const panelEnterFrom = computed(() => {
-  return dsDrawerPanelEnterFrom(props.side)
-})
+const panelEnterFrom = computed(() => dsDrawerPanelEnterFrom(props.side))
 
 function close(): void {
   emit('update:modelValue', false)
@@ -53,17 +64,27 @@ function onOverlayClick(): void {
   if (!props.closeOnBackdrop) return
   close()
 }
+
+function onKeydown(e: KeyboardEvent): void {
+  if (e.key !== 'Escape') return
+  if (!props.closeOnEsc) return
+  e.stopPropagation()
+  e.preventDefault()
+  close()
+}
 </script>
 
 <template>
   <teleport to="body">
-    <TransitionRoot :show="open" as="template">
+    <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"
+        data-ds-drawer
         class="fixed inset-0 z-50"
         :static="true"
+        :aria-labelledby="titleId"
         @close="onDialogClose"
-        @keydown.esc.stop.prevent="close"
+        @keydown="onKeydown"
       >
         <div class="fixed inset-0">
           <TransitionChild
@@ -98,10 +119,13 @@ function onOverlayClick(): void {
               class="fixed inset-y-0 flex flex-col"
               :class="panelClass"
             >
-              <div class="px-5 py-4 border-b border-[var(--brd)] flex items-center justify-between gap-4">
-                <DialogTitle as="div" class="text-[14px] font-700 min-w-0 truncate">
+              <div
+                data-ds-drawer-header
+                class="px-5 py-4 border-b border-[var(--brd)] flex items-center justify-between gap-4"
+              >
+                <DialogTitle :id="titleId" as="div" data-ds-drawer-title class="text-[14px] font-700 min-w-0 truncate">
                   <slot name="title">
-                    {{ props.title ?? 'Drawer' }}
+                    {{ title ?? 'Drawer' }}
                   </slot>
                 </DialogTitle>
 
@@ -109,20 +133,26 @@ function onOverlayClick(): void {
                   variant="ghost"
                   size="sm"
                   square
-                  aria-label="Close"
+                  :aria-label="closeLabel"
                   @click="close"
                 >
-                  <IconClose class="h-4 w-4" aria-hidden="true" />
+                  <DsIcon size="sm" aria-hidden="true">
+                    <IconClose />
+                  </DsIcon>
                 </DsButton>
               </div>
 
-              <div class="flex-1 overflow-y-auto">
+              <div data-ds-drawer-body class="flex-1 overflow-y-auto">
                 <div class="p-5">
                   <slot />
                 </div>
               </div>
 
-              <div v-if="$slots.footer" class="px-5 py-4 border-t border-[var(--brd)]">
+              <div
+                v-if="$slots.footer"
+                data-ds-drawer-footer
+                class="px-5 py-4 border-t border-[var(--brd)]"
+              >
                 <slot name="footer" />
               </div>
             </DialogPanel>

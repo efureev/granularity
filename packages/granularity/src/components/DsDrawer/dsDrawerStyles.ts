@@ -1,23 +1,24 @@
-import { splitClassTokens } from '../shared/classTokens'
+export type DsDrawerSide = 'left' | 'right'
+export type DsDrawerSize = 'sm' | 'md' | 'lg' | 'full'
 
-const panelWidthBySize = {
+export const panelWidthBySize: Record<DsDrawerSize, string> = {
   sm: 'w-[360px] max-w-[90vw]',
   md: 'w-[420px] max-w-[92vw]',
   lg: 'w-[560px] max-w-[94vw]',
   full: 'w-[100vw]',
-} as const
+}
 
-const panelSideClass = {
+export const panelSideClass: Record<DsDrawerSide, string> = {
   left: 'left-0 border-r',
   right: 'right-0 border-l',
-} as const
+}
 
-const panelTransitionClass = {
+export const panelTransitionClass: Record<DsDrawerSide, string> = {
   left: '-translate-x-full',
   right: 'translate-x-full',
-} as const
+}
 
-export function dsDrawerPanelClass(options: { side: keyof typeof panelSideClass, size: keyof typeof panelWidthBySize }): string {
+export function dsDrawerPanelClass(options: { side: DsDrawerSide, size: DsDrawerSize }): string {
   return [
     panelSideClass[options.side],
     panelWidthBySize[options.size],
@@ -27,13 +28,6 @@ export function dsDrawerPanelClass(options: { side: keyof typeof panelSideClass,
   ].join(' ')
 }
 
-export function dsDrawerPanelEnterFrom(side: keyof typeof panelTransitionClass): string {
+export function dsDrawerPanelEnterFrom(side: DsDrawerSide): string {
   return panelTransitionClass[side]
 }
-
-export const dsDrawerSafelist = [...new Set([
-  ...Object.values(panelSideClass).flatMap(splitClassTokens),
-  ...Object.values(panelWidthBySize).flatMap(splitClassTokens),
-  ...Object.values(panelTransitionClass).flatMap(splitClassTokens),
-  ...splitClassTokens('border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--ds-shadow-2)] outline-none'),
-])]

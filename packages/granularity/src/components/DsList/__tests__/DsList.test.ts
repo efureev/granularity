@@ -52,7 +52,7 @@ describe('DsListItem', () => {
 
     expect(wrapper.text()).toContain('Security')
     expect(wrapper.text()).toContain('Status')
-    expect(wrapper.find('.ds-muted').exists()).toBe(false)
+    expect(wrapper.find('.text-\\[var\\(--muted-fg\\)\\]').exists()).toBe(false)
     expect(wrapper.attributes('role')).toBe('listitem')
   })
 

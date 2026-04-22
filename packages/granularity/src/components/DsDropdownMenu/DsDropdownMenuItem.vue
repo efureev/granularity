@@ -9,20 +9,19 @@ defineOptions({
 export type DsDropdownMenuItemAlign = 'left' | 'center' | 'right'
 export type DsDropdownMenuItemVariant = 'default' | 'danger'
 
-const props = withDefaults(
-  defineProps<{
-    as?: string | Component
-    disabled?: boolean
-    align?: DsDropdownMenuItemAlign
-    variant?: DsDropdownMenuItemVariant
-  }>(),
-  {
-    as: 'button',
-    disabled: false,
-    align: 'left',
-    variant: 'default',
-  },
-)
+export interface DsDropdownMenuItemProps {
+  as?: string | Component
+  disabled?: boolean
+  align?: DsDropdownMenuItemAlign
+  variant?: DsDropdownMenuItemVariant
+}
+
+const props = withDefaults(defineProps<DsDropdownMenuItemProps>(), {
+  as: 'button',
+  disabled: false,
+  align: 'left',
+  variant: 'default',
+})
 
 const attrs = useAttrs()
 
@@ -87,13 +86,14 @@ function onClickCapture(e: MouseEvent) {
 
 <template>
   <component
-    :is="props.as"
+    :is="as"
     v-bind="attrs"
+    data-ds-dropdown-menu-item
     :class="className"
     :type="isNativeButton ? (attrs.type as any) ?? 'button' : undefined"
-    :disabled="isNativeButton ? props.disabled : undefined"
-    :aria-disabled="props.disabled ? 'true' : undefined"
-    :tabindex="props.disabled ? -1 : (attrs.tabindex as any)"
+    :disabled="isNativeButton ? disabled : undefined"
+    :aria-disabled="disabled ? 'true' : undefined"
+    :tabindex="disabled ? -1 : (attrs.tabindex as any)"
     @click.capture="onClickCapture"
   >
     <slot />
