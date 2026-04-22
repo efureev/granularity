@@ -3,6 +3,7 @@ import { Comment, computed, Fragment, nextTick, ref, Text, useSlots, type VNode 
 
 import IconArrowUp from '~icons/lucide/arrow-up'
 
+import DsIcon from '../DsIcon/DsIcon.vue'
 import type { FileValidator, FileValidatorSource } from '../../fileValidation'
 
 import { FileValidationError, runFileValidators } from '../../fileValidation'
@@ -18,22 +19,34 @@ export type DsFileUploadRequestCtx = {
 
 export type DsFileUploadRequest = (files: File[], ctx: DsFileUploadRequestCtx) => Promise<any>
 
+/**
+ * Пропы `DsFileUpload`.
+ *
+ * Либо `action` (URL для POST multipart/form-data), либо `request` — кастомный
+ * загрузчик (например, через axios). Если переданы оба — приоритет у `request`.
+ *
+ * `placeholder` — надпись в дефолтном UI-варианте (без слота default).
+ */
+export interface DsFileUploadProps {
+  action?: string
+  request?: DsFileUploadRequest
+  name?: string
+  multiple?: boolean
+  limit?: number
+  onExceed?: (files: File[], limit: number) => void
+  beforeUpload?: (file: File) => boolean | Promise<unknown>
+  validators?: FileValidator[]
+  disabled?: boolean
+  headers?: Record<string, string>
+  withCredentials?: boolean
+  showFileList?: boolean
+  uploadExtraData?: (files: File[]) => DsFileUploadExtraData | undefined
+  /** i18n: надпись-подсказка в дефолтном UI. */
+  placeholder?: string
+}
+
 const props = withDefaults(
-  defineProps<{
-    action?: string
-    request?: DsFileUploadRequest
-    name?: string
-    multiple?: boolean
-    limit?: number
-    onExceed?: (files: File[], limit: number) => void
-    beforeUpload?: (file: File) => boolean | Promise<unknown>
-    validators?: FileValidator[]
-    disabled?: boolean
-    headers?: Record<string, string>
-    withCredentials?: boolean
-    showFileList?: boolean
-    uploadExtraData?: (files: File[]) => DsFileUploadExtraData | undefined
-  }>(),
+  defineProps<DsFileUploadProps>(),
   {
     action: undefined,
     request: undefined,
@@ -48,6 +61,7 @@ const props = withDefaults(
     withCredentials: false,
     showFileList: false,
     uploadExtraData: undefined,
+    placeholder: 'Drag files here or click to select',
   },
 )
 
@@ -347,16 +361,16 @@ defineExpose({
     data-ds-file-upload
     :role="hasCustomUi ? undefined : 'button'"
     :tabindex="hasCustomUi ? undefined : tabIndex"
-    :aria-disabled="hasCustomUi ? undefined : props.disabled ? 'true' : 'false'"
+    :aria-disabled="hasCustomUi ? undefined : disabled ? 'true' : 'false'"
     :class="
       hasCustomUi
         ? 'inline-block'
         : [
             'relative w-full rounded-[var(--ds-radius-lg)] border border-dashed border-[var(--brd)] bg-[var(--card)] px-5 py-6 outline-none transition',
-            props.disabled
+            disabled
               ? 'opacity-60 cursor-not-allowed'
               : 'cursor-pointer hover:bg-[var(--muted)] focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]',
-            isOver && !props.disabled ? 'border-[var(--ring)] bg-[var(--muted)]' : '',
+            isOver && !disabled ? 'border-[var(--ring)] bg-[var(--muted)]' : '',
           ]
     "
     @click="onRootClick"
@@ -373,9 +387,9 @@ defineExpose({
       type="file"
       tabindex="-1"
       aria-hidden="true"
-      :name="props.name"
-      :multiple="props.multiple"
-      :disabled="props.disabled"
+      :name="name"
+      :multiple="multiple"
+      :disabled="disabled"
       @change="onInputChange"
     >
 
@@ -383,35 +397,43 @@ defineExpose({
       v-if="hasCustomUi"
       :open-dialog="openDialog"
       :abort="abort"
-      :disabled="props.disabled"
+      :disabled="disabled"
       :files="lastFiles"
       :is-over="isOver"
     />
 
     <div v-else class="flex items-start gap-4">
       <div
+        data-ds-file-upload-icon
         class="h-12 w-12 shrink-0 rounded-[12px] bg-[var(--muted)] border border-[var(--brd)] flex items-center justify-center"
         aria-hidden="true"
       >
-        <IconArrowUp class="h-6 w-6 text-[var(--muted-fg)]" />
+        <DsIcon class="h-6 w-6 text-[var(--muted-fg)]">
+          <IconArrowUp />
+        </DsIcon>
       </div>
 
       <div class="min-w-0">
-        <div class="text-[14px] font-700">
+        <div data-ds-file-upload-label class="text-[14px] font-700">
           <slot name="label">
             <slot>
-              Перетащите файлы сюда или нажмите для выбора
+              {{ placeholder }}
             </slot>
           </slot>
         </div>
 
-        <div v-if="$slots.tip" class="mt-1 text-[13px] text-[var(--muted-fg)]">
+        <div v-if="$slots.tip" data-ds-file-upload-tip class="mt-1 text-[13px] text-[var(--muted-fg)]">
           <slot name="tip" />
         </div>
         <div v-else class="mt-1 text-[13px] text-[var(--muted-fg)]" />
 
-        <ul v-if="props.showFileList && lastFiles.length" class="mt-3 space-y-1">
-          <li v-for="file in lastFiles" :key="file.name" class="text-[13px]">
+        <ul v-if="showFileList && lastFiles.length" data-ds-file-upload-list class="mt-3 space-y-1">
+          <li
+            v-for="file in lastFiles"
+            :key="file.name"
+            data-ds-file-upload-item
+            class="text-[13px]"
+          >
             <span class="font-600">{{ file.name }}</span>
             <span class="text-[var(--muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
           </li>

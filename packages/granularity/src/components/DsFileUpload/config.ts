@@ -1,8 +1,8 @@
-import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
-
-import { dsFileUploadSafelist } from './safelist'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 export const dsFileUploadConfig = defineGranularComponent(import.meta.url, {
   name: 'DsFileUpload',
-  safelist: dsFileUploadSafelist,
+  dependencies: ['DsIcon'],
+  // Литералы из шаблона UnoCSS находит сканом — safelist не нужен.
+  safelist: [],
 })
