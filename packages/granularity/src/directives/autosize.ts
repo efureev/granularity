@@ -115,7 +115,34 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
       return
     }
 
-    if (!enabled || !state.textarea) return
+    if (!state.textarea) return
+
+    if (!enabled) {
+      // Disabled in-flight: detach listener and restore previous overflow.
+      if (state.onInput) {
+        state.textarea.removeEventListener('input', state.onInput)
+        state.onInput = null
+      }
+      if (state.prevOverflowY !== null) {
+        state.textarea.style.overflowY = state.prevOverflowY
+      }
+      return
+    }
+
+    // Re-enable after being disabled: reattach listener and re-apply overflow.
+    if (!state.onInput) {
+      state.prevOverflowY = state.textarea.style.overflowY
+      state.textarea.style.overflowY = 'hidden'
+
+      const onInput = () => {
+        const current = states.get(el)
+        if (!current?.textarea) return
+        autosize(current.textarea)
+      }
+      state.onInput = onInput
+      state.textarea.addEventListener('input', onInput)
+    }
+
     autosize(state.textarea)
     scheduleAutosize(state.textarea)
   },
