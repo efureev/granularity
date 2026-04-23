@@ -116,6 +116,113 @@
       "source": "Source"
     }
   },
+  "detailPage": {
+    "backTo": "Back to {target}",
+    "liveExamples": {
+      "title": "Live examples",
+      "descriptionComponent": "Short usage scenarios showing the component inside a real interface.",
+      "descriptionPackage": "Isolated scenarios help you quickly understand how to use the entity in an interface.",
+      "descriptionGeneric": "Illustrative usage scenarios without unnecessary explanations."
+    },
+    "api": {
+      "title": "API",
+      "descriptionPackage": "Everything about parameters and the usage contract gathered in one place."
+    },
+    "implementationNotes": {
+      "title": "Implementation notes",
+      "description": "Additional notes on accessibility, dependencies, and related materials."
+    },
+    "packageOverview": {
+      "title": "Package overview"
+    },
+    "usage": {
+      "canonicalTitle": "Canonical usage",
+      "usageTitle": "Usage",
+      "caveatsTitle": "Caveats"
+    },
+    "integration": {
+      "notesTitle": "Integration notes",
+      "dependenciesTitle": "Dependencies"
+    },
+    "info": {
+      "accessibilityTitle": "Accessibility",
+      "dependenciesTitle": "Dependencies",
+      "relatedLinksTitle": "Related links"
+    },
+    "relatedLinks": {
+      "packageSource": "Package source",
+      "publicExport": "Public export entry",
+      "showcaseRegistry": "Showcase registry",
+      "showcaseDocsOverride": "Showcase docs override",
+      "narrativeDocs": "Narrative docs",
+      "openLabel": "open"
+    },
+    "helpers": {
+      "importSnippetPlaceholder": "// Import snippet will be generated as soon as the first entity is selected.",
+      "usageSnippetPlaceholder": "// Usage snippet will be generated as soon as the first entity is selected.",
+      "accessibility": {
+        "fallback": "Accessibility notes will be added alongside the first concrete entity page.",
+        "componentFocus": "Document keyboard behavior and focus management.",
+        "componentAria": "Capture required aria attributes and usage constraints.",
+        "componentTheme": "Verify on-screen states for light and dark themes.",
+        "directiveFocus": "Describe the directive's impact on focus, keyboard shortcuts, and pointer interactions.",
+        "directiveCaveats": "Document caveats for overlay and dismissable behavior separately.",
+        "generic": "Document the UX effect on the interface and expected integration constraints."
+      },
+      "dependencies": {
+        "fallback": "Dependencies will appear once entity-level docs are connected.",
+        "empty": "No direct package-level dependencies are recorded for this entity in the registry."
+      }
+    },
+    "preview": {
+      "fallbackComponent": "Preview area is reserved for the live demo of the next iteration.",
+      "fallbackPackage": "Preview area reserved for the next iteration."
+    },
+    "snippetTitle": "Snippet",
+    "docPageExampleNote": "In upcoming stages this card will receive a live preview and the source snippet of a specific scenario.",
+    "sectionAnchorLink": "link",
+    "notFoundComponent": {
+      "title": "Component not found",
+      "description": "The component for this route was not found in the public package registry. Return to the catalog and pick an existing entity.",
+      "action": "Go to components catalog"
+    },
+    "notFoundEntity": {
+      "title": "Package entity not found",
+      "description": "It looks like the detail route did not match the current package registry. Return to one of the package-level sections and pick an existing entity.",
+      "goDirectives": "Go to directives",
+      "goComposables": "Go to composables",
+      "goUtilities": "Go to utilities"
+    }
+  },
+  "docComponents": {
+    "codeBlock": {
+      "copy": "Copy code",
+      "copied": "Code copied"
+    },
+    "apiTable": {
+      "head": {
+        "name": "Name",
+        "type": "Type",
+        "details": "Details"
+      },
+      "required": "required",
+      "optional": "optional",
+      "defaultPrefix": "default"
+    },
+    "emptyLabel": {
+      "props": "Prop metadata will be added by the generator or fallback layer.",
+      "slots": "Slot metadata will be added by the generator or fallback layer.",
+      "events": "No events were detected for this entity yet, or they have not been described by the fallback layer.",
+      "methods": "Imperative API has not been detected yet or will be added manually via the fallback layer.",
+      "generic": "API details for this section are not connected yet."
+    },
+    "table": {
+      "propsTitle": "Props",
+      "slotsTitle": "Slots",
+      "eventsTitle": "Events",
+      "methodsTitle": "Methods / Expose"
+    }
+  },
   "search": {
     "open": "Open search",
     "summary": "Search pages, entities, and section anchors by title, alias, and usage context.",

@@ -45,8 +45,8 @@ async function copyCode() {
       </div>
 
       <DsButton
-        :aria-label="isCopied ? 'Код скопирован' : 'Скопировать код'"
-        :title="isCopied ? 'Код скопирован' : 'Скопировать код'"
+        :aria-label="isCopied ? $t('showcase.docComponents.codeBlock.copied') : $t('showcase.docComponents.codeBlock.copy')"
+        :title="isCopied ? $t('showcase.docComponents.codeBlock.copied') : $t('showcase.docComponents.codeBlock.copy')"
         variant="primary"
         size="sm"
         square

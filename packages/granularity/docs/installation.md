@@ -30,7 +30,7 @@
 
 ```bash
 yarn add vue @feugene/granularity
-yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-wind4
+yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-mini
 ```
 
 Почему `@feugene/granularity` стоит в `dependencies`:
@@ -38,7 +38,7 @@ yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-wind4
 - компоненты и директивы пакета импортируются из исходников приложения и
   попадают в runtime-бандл.
 
-Почему `@feugene/unocss-preset-granular`, `unocss` и `@unocss/preset-wind4`
+Почему `@feugene/unocss-preset-granular`, `unocss` и `@unocss/preset-mini` / `@unocss/preset-wind4`
 стоят в `devDependencies`:
 
 - они выполняются исключительно на build-time (в `uno.config.ts`) и ни одной

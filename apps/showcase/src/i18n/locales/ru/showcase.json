@@ -116,6 +116,113 @@
       "source": "Источник"
     }
   },
+  "detailPage": {
+    "backTo": "Назад в {target}",
+    "liveExamples": {
+      "title": "Живые примеры",
+      "descriptionComponent": "Короткие сценарии использования компонента в реальном интерфейсе.",
+      "descriptionPackage": "Отдельные сценарии помогают быстро понять, как использовать сущность в интерфейсе.",
+      "descriptionGeneric": "Наглядные сценарии использования без лишних пояснений."
+    },
+    "api": {
+      "title": "API",
+      "descriptionPackage": "Главное по параметрам и контракту использования собрано в одном месте."
+    },
+    "implementationNotes": {
+      "title": "Заметки по реализации",
+      "description": "Дополнительные заметки по доступности, зависимостям и связанным материалам."
+    },
+    "packageOverview": {
+      "title": "Обзор пакета"
+    },
+    "usage": {
+      "canonicalTitle": "Канонический пример использования",
+      "usageTitle": "Использование",
+      "caveatsTitle": "Ограничения"
+    },
+    "integration": {
+      "notesTitle": "Интеграционные заметки",
+      "dependenciesTitle": "Зависимости"
+    },
+    "info": {
+      "accessibilityTitle": "Доступность",
+      "dependenciesTitle": "Зависимости",
+      "relatedLinksTitle": "Связанные материалы"
+    },
+    "relatedLinks": {
+      "packageSource": "Исходники пакета",
+      "publicExport": "Точка публичного экспорта",
+      "showcaseRegistry": "Showcase registry",
+      "showcaseDocsOverride": "Переопределение showcase-документации",
+      "narrativeDocs": "Нарративная документация",
+      "openLabel": "открыть"
+    },
+    "helpers": {
+      "importSnippetPlaceholder": "// Сниппет импорта будет сгенерирован, как только будет выбрана первая сущность.",
+      "usageSnippetPlaceholder": "// Сниппет использования будет сгенерирован, как только будет выбрана первая сущность.",
+      "accessibility": {
+        "fallback": "Заметки по доступности будут добавлены вместе со страницей первой конкретной сущности.",
+        "componentFocus": "Зафиксировать keyboard behavior и focus management.",
+        "componentAria": "Отразить обязательные aria-атрибуты и ограничения использования.",
+        "componentTheme": "Проверить экранные состояния в светлой и тёмной теме.",
+        "directiveFocus": "Описать влияние директивы на focus, keyboard shortcuts и pointer-взаимодействия.",
+        "directiveCaveats": "Отдельно зафиксировать caveats для overlay и dismissable behavior.",
+        "generic": "Документировать UX-эффект на интерфейс и ожидаемые ограничения интеграции."
+      },
+      "dependencies": {
+        "fallback": "Зависимости появятся, как только будет подключена документация на уровне сущности.",
+        "empty": "Прямые package-level зависимости для этой сущности не зафиксированы в registry."
+      }
+    },
+    "preview": {
+      "fallbackComponent": "Preview area зарезервирован под live demo следующего этапа.",
+      "fallbackPackage": "Preview area зарезервирован под следующую итерацию."
+    },
+    "snippetTitle": "Фрагмент кода",
+    "docPageExampleNote": "На следующих этапах эта карточка получит живой preview и source snippet конкретного сценария.",
+    "sectionAnchorLink": "ссылка",
+    "notFoundComponent": {
+      "title": "Компонент не найден",
+      "description": "Компонент по этому маршруту не найден в публичном registry пакета. Вернитесь в каталог и выберите существующую сущность.",
+      "action": "Перейти в каталог компонентов"
+    },
+    "notFoundEntity": {
+      "title": "Сущность пакета не найдена",
+      "description": "Похоже, detail-маршрут не совпал с текущим registry пакета. Вернитесь в один из разделов пакета и выберите существующую сущность.",
+      "goDirectives": "Перейти в directives",
+      "goComposables": "Перейти в composables",
+      "goUtilities": "Перейти в utilities"
+    }
+  },
+  "docComponents": {
+    "codeBlock": {
+      "copy": "Скопировать код",
+      "copied": "Код скопирован"
+    },
+    "apiTable": {
+      "head": {
+        "name": "Имя",
+        "type": "Тип",
+        "details": "Подробности"
+      },
+      "required": "обязательный",
+      "optional": "опциональный",
+      "defaultPrefix": "по умолчанию"
+    },
+    "emptyLabel": {
+      "props": "Метаданные props будут добавлены генератором или fallback-слоем.",
+      "slots": "Метаданные slots будут добавлены генератором или fallback-слоем.",
+      "events": "Для этой сущности events пока не обнаружены или ещё не описаны fallback-слоем.",
+      "methods": "Imperative API пока не обнаружен или будет добавлен вручную через fallback-слой.",
+      "generic": "Детали API для этой секции ещё не подключены."
+    },
+    "table": {
+      "propsTitle": "Свойства",
+      "slotsTitle": "Слоты",
+      "eventsTitle": "События",
+      "methodsTitle": "Методы / Expose"
+    }
+  },
   "search": {
     "open": "Открыть поиск",
     "summary": "Ищите страницы, сущности и section anchors по названию, alias и контексту использования.",

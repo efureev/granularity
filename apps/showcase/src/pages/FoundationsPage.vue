@@ -6,6 +6,7 @@ import {DsBadge, DsCard, DsLink, DsSwitch} from '@feugene/granularity'
 
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
+import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {
   showcaseFoundationGuides,
   showcaseFoundationTokens,
@@ -17,7 +18,7 @@ import IconChevronRight from '~icons/lucide/chevron-right'
 import IconHash from '~icons/lucide/hash'
 
 const i18n = useFintI18n()
-const preferredQuickStartCardId = 'quick-start-uno-node'
+const preferredQuickStartCardId = 'quick-start-preset-themes'
 const guidesWithoutNarrativeDocs = new Set([
   'styling',
   'themes',
@@ -89,16 +90,10 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
 
 <template>
   <div class="space-y-8">
-    <DsCard class="showcase-panel rounded-3xl border p-8">
-      <div class="space-y-4">
-        <h1 class="max-w-4xl text-1xl font-semibold leading-tight lg:text-2xl">
-          {{ $t('showcase.foundationsPage.heroTitle') }}
-        </h1>
-        <p class="showcase-text-muted max-w-3xl text-base leading-7">
-          {{ $t('showcase.foundationsPage.heroDescription') }}
-        </p>
-      </div>
-    </DsCard>
+    <ShowcasePageHero
+      :title="$t('showcase.foundationsPage.heroTitle')"
+      :description="$t('showcase.foundationsPage.heroDescription')"
+    />
 
     <section id="installation" class="space-y-6 scroll-mt-28">
       <DsCard class="showcase-panel rounded-3xl border p-6">

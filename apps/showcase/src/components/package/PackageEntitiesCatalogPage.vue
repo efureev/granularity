@@ -5,6 +5,7 @@ import IconArrowRight from '~icons/lucide/arrow-right'
 
 import { DsCard } from '@feugene/granularity'
 
+import ShowcasePageHero from '../showcase/ShowcasePageHero.vue'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
 import type { ShowcaseEntityKind, ShowcaseEntityRegistryItem } from '../../content/model'
 import type { ShowcasePage } from '../../app/showcase'
@@ -54,19 +55,11 @@ const groupedEntities = computed(() => {
 
 <template>
   <div class="space-y-8">
-    <DsCard class="showcase-panel rounded-3xl border p-8">
-      <div class="space-y-4">
-        <span class="showcase-kicker text-xs font-semibold tracking-[0.18em]">
-          {{ page.eyebrow }}
-        </span>
-        <h1 class="max-w-4xl text-4xl font-semibold leading-tight lg:text-5xl">
-          {{ page.title }} {{ $t('showcase.packageCatalog.titleSuffix') }}
-        </h1>
-        <p class="showcase-text-muted max-w-3xl text-base leading-7">
-          {{ page.description }} {{ $t('showcase.packageCatalog.heroDescription') }}
-        </p>
-      </div>
-    </DsCard>
+    <ShowcasePageHero
+      :eyebrow="page.eyebrow"
+      :title="`${page.title} ${$t('showcase.packageCatalog.titleSuffix')}`"
+      :description="`${page.description} ${$t('showcase.packageCatalog.heroDescription')}`"
+    />
 
     <section id="catalog" class="scroll-mt-28 space-y-5">
       <div class="showcase-panel rounded-3xl border p-4">

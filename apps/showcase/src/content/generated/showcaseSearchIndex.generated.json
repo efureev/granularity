@@ -19,7 +19,7 @@
     "kindLabel": "Page",
     "context": "Foundations",
     "searchableTitle": "foundations",
-    "searchableContent": "foundations foundations foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. foundations foundations installation paths карта стартовых интеграционных path-ов: root import, granular imports и `unocss` preset. styling, themes and tokens показывает границы между foundation layers, theme files и design tokens. unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения."
+    "searchableContent": "foundations foundations foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. foundations foundations installation paths прогрессия подключения `presetgranularity` (node-вариант `presetgranularnode`) единственного поддерживаемого способа установки. styling, themes and tokens показывает границы между foundation layers, theme files и design tokens. unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения."
   },
   {
     "id": "page:integration",
@@ -123,13 +123,13 @@
   {
     "id": "page:foundations:section:installation",
     "title": "Foundations / Installation paths",
-    "description": "Карта стартовых интеграционных path-ов: root import, granular imports и `UnoCSS` preset.",
+    "description": "Прогрессия подключения `presetGranularity` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.",
     "href": "/foundations#installation",
     "kind": "section",
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations installation paths",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. installation installation paths карта стартовых интеграционных path-ов: root import, granular imports и `unocss` preset. quick-start snippets встроены прямо в foundations page. narrative guidance подключена из `packages/granularity/docs/installation.md`. один экран сразу объясняет, когда нужен root api, granular import или `uno-node`."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. installation installation paths прогрессия подключения `presetgranularity` (node-вариант `presetgranularnode`) единственного поддерживаемого способа установки. quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularcontent`. narrative guidance подключена из `packages/granularity/docs/installation.md`. один экран последовательно показывает, как наращивать опции `components`, `themes`, `layer` и `granularcontent`."
   },
   {
     "id": "page:foundations:section:styling",
@@ -151,7 +151,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations unocss and localization",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. unocss unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения. объяснена разница между `@feugene/granularity/uno-node` и `@feugene/granularity/uno`. подключе н narrative doc по localization с package-level i18n entrypoint. foundations теперь служит реальнои onboarding-базои , а не placeholder-секциеи ."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. unocss unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения. `presetgranularnode` из `@feugene/unocss-preset-granular/node` единственныи поддерживаемыи способ подключения. подключе н narrative doc по localization с package-level i18n entrypoint. foundations теперь служит реальнои onboarding-базои , а не placeholder-секциеи ."
   },
   {
     "id": "page:integration:section:vue-plugin",
@@ -184,7 +184,7 @@
     "kindLabel": "Section",
     "context": "Интеграция",
     "searchableTitle": "интеграция как выбирать между подходами",
-    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). when-to-use как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals. `@feugene/unplugin-granularity` build-time, охватывает только то, что реально стоит в `<template>`. `@feugene/granularity/vue` runtime, охватывает все остальное: директивы в `render()`/jsx, i18n/theme через `provide`, options api через `globalproperties`. ssr / тесты / окружения без `unplugin-vue-components` только через `creategranularity`. прямои sub-path import остае тся самым гранулярным вариантом: `@feugene/granularity/components/<name>`."
+    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). when-to-use как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals. `@feugene/unplugin-granularity` build-time, охватывает только то, что реально стоит в `<template>`. `@feugene/granularity/vue` runtime, охватывает все остальное: директивы в `render()`/jsx, i18n/theme через `provide`, options api через `globalproperties`. ssr / тесты / окружения без `unplugin-vue-components` только через `creategranularity`. установка css-части пакета делается исключительно через `presetgranularnode` см. раздел foundations / installation paths."
   },
   {
     "id": "page:components:section:catalog",

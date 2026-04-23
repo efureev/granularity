@@ -73,7 +73,7 @@ const resolvedVariant = computed(() => {
         >
           <span>{{ link.label }}</span>
           <span class="showcase-text-subtle text-xs uppercase tracking-[0.16em]">
-            open
+            {{ $t('showcase.detailPage.relatedLinks.openLabel') }}
           </span>
         </a>
       </li>

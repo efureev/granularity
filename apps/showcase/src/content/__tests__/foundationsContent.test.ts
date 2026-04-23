@@ -25,7 +25,8 @@ describe('showcase foundations content', () => {
 
   it('подключает narrative docs и source layers пакета как источники foundations guidance', () => {
     expect(showcaseFoundationGuides.find(guide => guide.id === 'styling')?.sourcePath).toBe('packages/granularity/docs/styling.md')
-    expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/granularity/uno-node')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/unocss-preset-granular/node')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/granularity/granular-provider/node')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'localization')?.narrativeSource).toContain('DS_I18N_BLOCK')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'tokens')?.narrativeSource).toContain('--ds-space-4')
   })
@@ -71,17 +72,22 @@ describe('showcase foundations content', () => {
   it('даёт quick-start snippets и обзорные метрики для landing/foundations страниц', () => {
     expect(showcaseQuickStartCards).toHaveLength(5)
     expect(showcaseQuickStartCards.map(card => card.id)).toEqual([
-      'quick-start-root',
-      'quick-start-subpath-js',
-      'quick-start-component-css',
-      'quick-start-uno-node',
-      'quick-start-uno-pure',
+      'quick-start-preset-basic',
+      'quick-start-preset-components',
+      'quick-start-preset-themes',
+      'quick-start-preset-layer',
+      'quick-start-preset-granular-content',
     ])
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-root')?.code).toContain("import '@feugene/granularity/styles.css'")
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-root')?.code).not.toContain("@feugene/granularity/styles/tokens.css")
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-component-css')?.code).toContain("@feugene/granularity/components/DsButton/styles.css")
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-component-css')?.code).not.toContain("@feugene/granularity/styles/base.css")
-    expect(showcaseInstallationNarrative).toContain('@feugene/granularity/uno-node')
+    expect(showcaseQuickStartCards.every(card => card.code.includes('presetGranularNode'))).toBe(true)
+    expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/unocss-preset-granular/node'))).toBe(true)
+    expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/granularity/granular-provider/node'))).toBe(true)
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-basic')?.code).not.toContain('components:')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-components')?.code).toContain("names: ['DsButton', 'DsCard']")
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-themes')?.code).toContain("themes: { names: ['light', 'dark'] }")
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-layer')?.code).toContain("layer: 'granular'")
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-granular-content')?.code).toContain('granularContent(granularOptions)')
+    expect(showcaseInstallationNarrative).toContain('@feugene/unocss-preset-granular/node')
+    expect(showcaseInstallationNarrative).toContain('@feugene/granularity/granular-provider/node')
     expect(showcaseFoundationStats).toHaveLength(3)
     expect(showcaseFoundationsChecklist).toHaveLength(3)
   })

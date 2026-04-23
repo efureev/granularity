@@ -4,6 +4,7 @@ import {RouterLink} from 'vue-router'
 
 import {DsCard} from '@feugene/granularity'
 
+import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {showcaseComponentEntities} from '../app/showcase'
 import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
 import {DsBadge} from "@feugene/granularity";
@@ -56,19 +57,11 @@ const groupedComponents = computed(() => {
 
 <template>
   <div class="space-y-8">
-    <DsCard class="showcase-panel rounded-3xl border p-8">
-      <div class="space-y-4">
-        <span class="showcase-kicker text-xs font-semibold tracking-[0.18em]">
-          {{ page.eyebrow }}
-        </span>
-        <h1 class="max-w-4xl text-3xl font-semibold leading-tight lg:text-4xl">
-          {{ $t('showcase.componentsPage.heroTitle') }}
-        </h1>
-        <p class="showcase-text-muted max-w-3xl text-base leading-7">
-          {{ $t('showcase.componentsPage.heroDescription') }}
-        </p>
-      </div>
-    </DsCard>
+    <ShowcasePageHero
+        :eyebrow="page.eyebrow"
+        :title="$t('showcase.componentsPage.heroTitle')"
+        :description="$t('showcase.componentsPage.heroDescription')"
+    />
 
     <section id="catalog" class="scroll-mt-28 space-y-5">
       <DsCard class="showcase-panel rounded-3xl border p-6">

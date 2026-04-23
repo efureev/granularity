@@ -7,7 +7,8 @@ import {
     transformerVariantGroup,
 } from 'unocss'
 
-import {granularContent, presetGranularNode, type PresetGranularNodeOptions} from '@feugene/unocss-preset-granular/node'
+import { granularContent, type PresetGranularNodeOptions } from '@feugene/unocss-preset-granular/node'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
 import {
     animationPreflights,
@@ -27,8 +28,21 @@ export const showcaseGranularOptions: PresetGranularNodeOptions = {
 
 const granularContentConfig = granularContent(showcaseGranularOptions)
 
+// Ограничиваем сканирование Uno исходниками showcase: это предотвращает
+// случайное вытягивание утилит из playground/dist-артефактов пакета и
+// делает build детерминированным между окружениями.
+export const showcaseContentIncludes: RegExp[] = [
+    /\/apps\/showcase\/src\/.*\.(?:vue|[jt]sx?|mdx?|html|css)$/,
+]
+
 export default defineConfig({
-    content: granularContent(showcaseGranularOptions),
+    content: {
+        ...granularContentConfig,
+        pipeline: {
+            ...(granularContentConfig.pipeline ?? {}),
+            include: showcaseContentIncludes,
+        },
+    },
     // Дополнительные правила поверх preset-mini из
     // `@feugene/unocss-mini-extra-rules`: spinner-анимация, bracket‑color с
     // `/NN` opacity, расширенные filter/backdrop‑filter утилиты и

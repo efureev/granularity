@@ -26,7 +26,7 @@ defineProps<{
 
     <div class="showcase-empty-state mt-5 min-w-0 overflow-hidden rounded-2xl border border-dashed px-4 py-6 text-sm">
       <slot name="preview">
-        Preview area зарезервирован под live demo следующего этапа.
+        {{ $t('showcase.detailPage.preview.fallbackComponent') }}
       </slot>
     </div>
 
@@ -35,7 +35,7 @@ defineProps<{
       class="mt-5"
       :code="code"
       language="vue"
-      title="Snippet"
+      :title="$t('showcase.detailPage.snippetTitle')"
     />
 
     <p

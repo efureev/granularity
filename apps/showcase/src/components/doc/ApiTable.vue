@@ -26,9 +26,9 @@ defineProps<{
       <table class="min-w-full border-collapse text-left text-sm">
         <thead class="showcase-table-head">
           <tr>
-            <th class="px-5 py-3 font-semibold">Name</th>
-            <th class="px-5 py-3 font-semibold">Type</th>
-            <th class="px-5 py-3 font-semibold">Details</th>
+            <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.name') }}</th>
+            <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.type') }}</th>
+            <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.details') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -49,10 +49,10 @@ defineProps<{
                   <InlineRichText :text="item.description" />
                 </p>
                 <p v-if="typeof item.required === 'boolean'" class="showcase-kicker text-xs">
-                  {{ item.required ? 'required' : 'optional' }}
+                  {{ item.required ? $t('showcase.docComponents.apiTable.required') : $t('showcase.docComponents.apiTable.optional') }}
                 </p>
                 <p v-if="item.default" class="showcase-text-subtle text-xs">
-                  <InlineRichText :text="`default: ${item.default}`" />
+                  <InlineRichText :text="`${$t('showcase.docComponents.apiTable.defaultPrefix')}: ${item.default}`" />
                 </p>
               </div>
             </td>

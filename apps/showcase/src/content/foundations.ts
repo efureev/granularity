@@ -385,13 +385,6 @@ const rootImportSnippet = `import {
 
 import '@feugene/granularity/styles.css'`
 
-const granularImportSnippet = `import { DsButton } from '@feugene/granularity/components/DsButton'
-
-import '@feugene/granularity/styles.css'`
-
-const granularComponentCssSnippet = `import { DsButton } from '@feugene/granularity/components/DsButton'
-
-import '@feugene/granularity/components/DsButton/styles.css'`
 
 const useThemeSnippet = `import { initThemeEarly, useTheme } from '@feugene/granularity'
 
@@ -402,22 +395,101 @@ const {
   toggleTheme,
 } = useTheme()`
 
-const unoNodeSnippet = `import { fileURLToPath, URL } from 'node:url'
-import { defineConfig, presetMini } from 'unocss'
+const presetBasicSnippet = `import { defineConfig, presetMini } from 'unocss'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
 
-import { presetGranularityNode } from '@feugene/granularity/uno-node'
+import granularityProvider from '@feugene/granularity/granular-provider/node'
 
 export default defineConfig({
   presets: [
     presetMini(),
-    presetGranularityNode({
-      components: ['DsButton', 'DsCard'],
-      tokens: fileURLToPath(new URL('./src/styles/tokens.css', import.meta.url)),
-      baseFile: fileURLToPath(new URL('./src/styles/base.css', import.meta.url)),
-      themes: ['light', 'dark'],
-      themeFiles: [fileURLToPath(new URL('./src/styles/light-app.css', import.meta.url))],
+    presetGranularNode({
+      providers: [granularityProvider],
     }),
   ],
+})`
+
+const presetComponentsSnippet = `import { defineConfig, presetMini } from 'unocss'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+
+import granularityProvider from '@feugene/granularity/granular-provider/node'
+
+export default defineConfig({
+  presets: [
+    presetMini(),
+    presetGranularNode({
+      providers: [granularityProvider],
+      // Сужаем набор компонентов — в бандл попадёт только их CSS и preflight-ы.
+      components: [
+        { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+      ],
+    }),
+  ],
+})`
+
+const presetThemesSnippet = `import { defineConfig, presetMini } from 'unocss'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+
+import granularityProvider from '@feugene/granularity/granular-provider/node'
+
+export default defineConfig({
+  presets: [
+    presetMini(),
+    presetGranularNode({
+      providers: [granularityProvider],
+      components: [
+        { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+      ],
+      // Ограничиваем набор встроенных тем и/или подмешиваем свои theme files.
+      themes: { names: ['light', 'dark'] },
+    }),
+  ],
+})`
+
+const presetLayerSnippet = `import { defineConfig, presetMini } from 'unocss'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+
+import granularityProvider from '@feugene/granularity/granular-provider/node'
+
+export default defineConfig({
+  presets: [
+    presetMini(),
+    presetGranularNode({
+      providers: [granularityProvider],
+      components: [
+        { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+      ],
+      themes: { names: ['light', 'dark'] },
+      // Кладём preflight-ы пакета в отдельный CSS layer — так проще
+      // управлять порядком относительно \`preflights\`/\`default\`.
+      layer: 'granular',
+    }),
+  ],
+})`
+
+const presetGranularContentSnippet = `import { defineConfig, presetMini } from 'unocss'
+import { granularContent, presetGranularNode } from '@feugene/unocss-preset-granular/node'
+
+import granularityProvider from '@feugene/granularity/granular-provider/node'
+
+const granularOptions = {
+  providers: [granularityProvider],
+  components: [
+    { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+  ],
+  themes: { names: ['light', 'dark'] },
+  layer: 'granular' as const,
+}
+
+export default defineConfig({
+  presets: [
+    presetMini(),
+    presetGranularNode(granularOptions),
+  ],
+  // Обязательно для авто-сканирования, когда компоненты импортируются из
+  // собранного \`dist/\` через subpath exports: \`@unocss/vite\` читает
+  // \`content\` только из top-level user-config, не из \`preset.content\`.
+  content: granularContent(granularOptions),
 })`
 
 const localizationSnippet = `import { createFintI18n } from '@feugene/fint-i18n'
@@ -816,54 +888,44 @@ const tokensCssExcerpt = takeLeadingBlock(tokensCssSource, 46)
 
 export const showcaseQuickStartCards: ShowcaseQuickStartCard[] = [
   {
-    id: 'quick-start-root',
-    title: 'Быстрый старт: root import + `styles.css`',
-    description: 'Самый прямой сценарий из документации: root API даёт простой вход, а `styles.css` сразу подключает foundation и стили всех компонентов.',
-    code: rootImportSnippet,
+    id: 'quick-start-preset-basic',
+    title: 'Шаг 1. Базовый `uno.config.ts` с `presetGranularNode`',
+    description: '`presetGranularity` (node-вариант — `presetGranularNode`) — единственный поддерживаемый способ подключения пакета. На этом шаге в `presets` добавляется только сам preset и granular-провайдер пакета: никаких `components`, `themes` или `layer` пока нет.',
+    code: presetBasicSnippet,
     language: 'ts',
-    note: 'Подходит для первого подключения, прототипов и экранов, где важнее быстрый старт, чем точная настройка bundle.',
+    note: 'Уже на этом уровне в сборку подмешиваются `tokens.css` и `base.css`, включены все компоненты провайдера и их preflight-ы — эквивалент `components: "all"` по умолчанию.',
   },
   {
-    id: 'quick-start-subpath-js',
-    title: 'Granular JS: subpath import + `styles.css`',
-    code: granularImportSnippet,
+    id: 'quick-start-preset-components',
+    title: 'Шаг 2. Сужаем список компонентов',
+    description: 'Чтобы не тянуть в бандл CSS всех компонентов провайдера, явно перечисляем только нужные. Опция `components` принимает список `{ provider, names }` и может быть собрана из нескольких провайдеров.',
+    code: presetComponentsSnippet,
     language: 'ts',
-    description: 'Сценарий для более точного `JS` bundle: компоненты импортируются через subpath exports, а CSS остаётся в общем пакетном entrypoint-е.',
-    note: 'Удобный переходный вариант, если хочется уменьшить `JS`-граф без ручной сборки component-level CSS.',
+    note: 'Preset сам подмешивает foundation layers, preflight-ы и safelist только для выбранных компонентов, остальные в бандл не попадают.',
   },
   {
-    id: 'quick-start-component-css',
-    title: 'Минимальный CSS для 1–2 компонентов',
-    description: 'Если нужен точечный CSS без UnoCSS, используйте component-level bundle: он уже включает foundation и зависимости выбранного компонента.',
-    code: granularComponentCssSnippet,
+    id: 'quick-start-preset-themes',
+    title: 'Шаг 3. Ограничиваем набор тем',
+    description: 'По умолчанию подключаются все темы провайдера. Опция `themes.names` оставляет только перечисленные темы; `themeFiles` позволяет добавить или полностью переопределить CSS темы файлами приложения, а `tokensFile`/`baseFile` — подменить foundation-слои.',
+    code: presetThemesSnippet,
     language: 'ts',
-    note: 'Лучше всего работает для 1–2 компонентов; при большем масштабе удобнее общий `styles.css` или preset-подход.',
+    note: 'Это рекомендуемая production-конфигурация для большинства приложений: чёткий контроль над компонентами и набором тем без ручной сборки CSS.',
   },
   {
-    id: 'quick-start-uno-node',
-    title: 'Предпочтительный путь: `UnoCSS` + `uno-node`',
-    description: 'Рекомендуемый production-сценарий для `UnoCSS`: кроме выбора компонентов здесь можно переопределять `tokens`, `base`, набор встроенных тем и подключать собственные `themeFiles`.',
-    code: unoNodeSnippet,
+    id: 'quick-start-preset-layer',
+    title: 'Шаг 4. Отдельный CSS layer для preflight-ов',
+    description: 'По умолчанию preflight-ы пакета идут без явного `layer`. Опция `layer` кладёт их в собственный CSS-слой, что даёт предсказуемый порядок относительно `preflights`/`default` и упрощает переопределение стилей приложением.',
+    code: presetLayerSnippet,
     language: 'ts',
-    note: '`@feugene/granularity/uno-node` автоматически подтягивает foundation layers, темы и component CSS, а preset остаётся гибким для кастомных токенов, base-слоя и theme files приложения.',
+    note: 'Используйте именованный layer, если у вас уже есть своя система CSS layers или нужно, чтобы утилиты Uno гарантированно перебивали базовые стили компонентов.',
   },
   {
-    id: 'quick-start-uno-pure',
-    title: 'Pure/browser-safe preset: UnoCSS + `uno`',
-    description: 'Специальный вариант для интеграций без node-only API и без чтения файлов с диска.',
-    code: `import {
-  createGranularityCssPreflights,
-  presetGranularity,
-} from '@feugene/granularity/uno'
-
-presetGranularity({
-  components: ['DsButton'],
-  preflights: createGranularityCssPreflights([
-    ':root { --primary: hotpink; --primary-fg: white; }',
-  ]),
-})`,
+    id: 'quick-start-preset-granular-content',
+    title: 'Шаг 5. Продвинутый сценарий: `granularContent` для subpath imports',
+    description: 'Когда приложение импортирует компоненты из собранного `dist/` через subpath exports, extractor UnoCSS должен заглянуть в директории этих компонентов и их `.js`/`.ts` чанки. Хелпер `granularContent` формирует нужный `content`, который передаётся в top-level user-config UnoCSS.',
+    code: presetGranularContentSnippet,
     language: 'ts',
-    note: '`@feugene/granularity/uno` используйте только когда нужен именно pure/browser-safe preset и CSS preflight-ы надо передавать явно.',
+    note: '`@unocss/vite` читает `content` только из top-level user-config, не из `preset.content`, поэтому `granularContent(...)` передаётся именно в `defineConfig`. Если у приложения уже есть свой `content.pipeline.include`, объедините его с `granularContent(...).pipeline.include`.',
   },
 ]
 
@@ -982,24 +1044,29 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
   {
     id: 'unocss',
     title: 'UnoCSS integration',
-    summary: '`uno-node` остаётся предпочтительным preset-путём, а pure/browser-safe `uno` нужен для специальных интеграционных сценариев.',
-    description: 'Если приложение уже использует UnoCSS, пакет даёт два preset-а. Foundations должен чётко объяснять, когда нужен node-aware preset с автоподмешиванием CSS preflight-ов, а когда — pure preset без чтения файлов с диска.',
+    summary: '`presetGranularNode` из `@feugene/unocss-preset-granular/node` — единственный поддерживаемый способ интеграции пакета. Foundations показывает его прогрессию от базового конфига к продвинутому `granularContent`.',
+    description: 'Интеграция с UnoCSS строится вокруг одного preset-а. `presetGranularNode` подмешивает foundation layers, темы и component CSS выбранных провайдеров; `granularContent` дополнительно настраивает авто-сканирование для subpath imports из собранного `dist/`.',
     narrativeSource: takeLeadingBlock(unocssDocSource, 92),
     sourcePath: 'packages/granularity/docs/unocss.md',
     keyPoints: [
-      '`@feugene/granularity/uno-node` автоматически подтягивает foundation layers, темы и component CSS.',
-      '`@feugene/granularity/uno` не читает файлы с диска и требует явной передачи CSS preflight-ов.',
-      'Preset-подход помогает собирать только реально используемые компоненты и темы.',
+      '`presetGranularNode({ providers: [granularityProvider] })` — минимальный рабочий конфиг, остальные опции опциональны.',
+      '`components`, `themes`, `themeFiles`, `tokensFile`/`baseFile`, `layer` позволяют сузить бандл и управлять порядком CSS layers.',
+      '`granularContent(options)` передаётся в top-level `content` user-config: `@unocss/vite` не читает `preset.content`.',
     ],
     recommendations: [
-      'Сначала рассматривайте `uno-node`, а к pure preset переходите только при реальной архитектурной необходимости.',
-      'Используйте `components`/`themes` настройки preset-а как основу для performance-полировки showcase.',
-      'Связывайте narrative docs по UnoCSS с реальными demo-сценариями компонентов, а не только с конфигами.',
+      'Начинайте с базового конфига и добавляйте опции пресета по мере реальной необходимости.',
+      'Используйте `components`/`themes` для performance-полировки и контроля над размером CSS бандла.',
+      'Подключайте `granularContent` сразу, как только компоненты импортируются через subpath из `dist/`.',
     ],
     codeSamples: [
       {
-        title: 'Рекомендуемый `uno-node` preset',
-        code: unoNodeSnippet,
+        title: 'Базовый `presetGranularNode`',
+        code: presetBasicSnippet,
+        language: 'ts',
+      },
+      {
+        title: 'Продвинутый сценарий: `granularContent` + авто-сканирование',
+        code: presetGranularContentSnippet,
         language: 'ts',
       },
       {
