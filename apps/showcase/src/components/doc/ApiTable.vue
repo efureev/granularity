@@ -48,7 +48,7 @@ defineProps<{
                 <p v-if="item.description">
                   <InlineRichText :text="item.description" />
                 </p>
-                <p v-if="typeof item.required === 'boolean'" class="showcase-kicker text-xs">
+                <p v-if="typeof item.required === 'boolean'" class="showcase-kicker">
                   {{ item.required ? $t('showcase.docComponents.apiTable.required') : $t('showcase.docComponents.apiTable.optional') }}
                 </p>
                 <p v-if="item.default" class="showcase-text-subtle text-xs">

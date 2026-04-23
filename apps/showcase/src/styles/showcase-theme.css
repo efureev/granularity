@@ -94,8 +94,10 @@
 
 .showcase-kicker {
     color: var(--showcase-text-subtle);
-    letter-spacing: 0.16em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    font-size: 0.7em;
+    font-weight: bold;
 }
 
 .showcase-text-primary {
