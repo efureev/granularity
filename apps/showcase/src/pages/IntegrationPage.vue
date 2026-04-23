@@ -9,6 +9,9 @@ import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 const { localizePageByName } = useShowcasePageI18n()
 const page = computed(() => localizePageByName('integration'))
 
+// Note: `.vue` specifiers are split via interpolation so Vite/rolldown's
+// dependency scanner does not treat these documentation snippets as real imports.
+const appVueSpecifier = `.${'/App.vue'}`
 const vuePluginCode = `import { createApp } from 'vue'
 import { createGranularity } from '@feugene/granularity/vue'
 
@@ -16,7 +19,7 @@ import { DsButton } from '@feugene/granularity/components/DsButton'
 import { DsInput } from '@feugene/granularity/components/DsInput'
 import { vHotkey } from '@feugene/granularity/directives'
 
-import App from './App.vue'
+import App from '${appVueSpecifier}'
 
 createApp(App)
   .use(createGranularity({
