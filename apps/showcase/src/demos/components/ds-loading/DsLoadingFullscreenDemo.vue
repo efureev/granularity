@@ -24,6 +24,6 @@ function runFullscreenSync() {
       Fullscreen overlay closes automatically after a short async cycle.
     </div>
 
-    <DsLoading v-if="loading" fullscreen text="Syncing workspace data..." />
+    <DsLoading v-if="loading" fullscreen text="Syncing workspace data..." style="--muted-fg: white;" />
   </div>
 </template>
