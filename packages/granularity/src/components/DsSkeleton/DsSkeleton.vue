@@ -20,9 +20,30 @@ withDefaults(defineProps<DsSkeletonProps>(), {
 
 <template>
   <div
-    data-ds-skeleton
-    aria-hidden="true"
-    class="animate-pulse bg-[var(--muted)] border border-[var(--brd)]"
-    :style="{ height, width, borderRadius: rounded }"
+      data-ds-skeleton
+      aria-hidden="true"
+      class="bg-[var(--muted)] border border-[var(--brd)]"
+      :style="{ height, width, borderRadius: rounded }"
   />
 </template>
+
+<style>
+@keyframes ds-skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+[data-ds-skeleton] {
+  animation: ds-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ds-skeleton] {
+    animation: none;
+  }
+}
+</style>
