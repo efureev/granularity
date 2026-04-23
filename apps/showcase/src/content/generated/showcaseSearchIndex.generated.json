@@ -19,7 +19,7 @@
     "kindLabel": "Page",
     "context": "Foundations",
     "searchableTitle": "foundations",
-    "searchableContent": "foundations foundations foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. foundations foundations installation paths карта стартовых интеграционных path-ов: root import, granular imports и `unocss` preset. styling, themes and tokens показывает границы между foundation layers, theme files и design tokens. unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения."
+    "searchableContent": "foundations foundations foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. foundations foundations installation paths прогрессия подключения `presetgranularity` (node-вариант `presetgranularnode`) единственного поддерживаемого способа установки. styling, themes and tokens показывает границы между foundation layers, theme files и design tokens. unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения."
   },
   {
     "id": "page:integration",
@@ -123,13 +123,13 @@
   {
     "id": "page:foundations:section:installation",
     "title": "Foundations / Installation paths",
-    "description": "Карта стартовых интеграционных path-ов: root import, granular imports и `UnoCSS` preset.",
+    "description": "Прогрессия подключения `presetGranularity` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.",
     "href": "/foundations#installation",
     "kind": "section",
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations installation paths",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. installation installation paths карта стартовых интеграционных path-ов: root import, granular imports и `unocss` preset. quick-start snippets встроены прямо в foundations page. narrative guidance подключена из `packages/granularity/docs/installation.md`. один экран сразу объясняет, когда нужен root api, granular import или `uno-node`."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. installation installation paths прогрессия подключения `presetgranularity` (node-вариант `presetgranularnode`) единственного поддерживаемого способа установки. quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularcontent`. narrative guidance подключена из `packages/granularity/docs/installation.md`. один экран последовательно показывает, как наращивать опции `components`, `themes`, `layer` и `granularcontent`."
   },
   {
     "id": "page:foundations:section:styling",
@@ -151,7 +151,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations unocss and localization",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. unocss unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения. объяснена разница между `@feugene/granularity/uno-node` и `@feugene/granularity/uno`. подключе н narrative doc по localization с package-level i18n entrypoint. foundations теперь служит реальнои onboarding-базои , а не placeholder-секциеи ."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss и localization. unocss unocss and localization закрывает production preset path и i18n-контракт пакета для хост-приложения. `presetgranularnode` из `@feugene/unocss-preset-granular/node` единственныи поддерживаемыи способ подключения. подключе н narrative doc по localization с package-level i18n entrypoint. foundations теперь служит реальнои onboarding-базои , а не placeholder-секциеи ."
   },
   {
     "id": "page:integration:section:vue-plugin",
@@ -162,7 +162,7 @@
     "kindLabel": "Section",
     "context": "Интеграция",
     "searchableTitle": "интеграция vue-плагин `creategranularity`",
-    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). vue-plugin vue-плагин `creategranularity` ле гкии runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalproperties` без потери tree-shaking сам модуль не импортирует ни одного компонента. `creategranularity({ components, directives, provides, globalproperties })` отдае т стандартныи vue-plugin для `app.use(...)`. поддерживает три формы компонентов: чистыи sfc, объект с `install`, явное `{ name, component }`. основнои сценарии директивы, `provide`, `globalproperties`, ssr/nuxt-плагины и окружения без сборщика. демо: `apps/playground-7` с `dsbutton`, `dsinput` и `v-hotkey`."
+    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). vue-plugin vue-плагин `creategranularity` ле гкии runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalproperties` без потери tree-shaking сам модуль не импортирует ни одного компонента. `creategranularity({ components, directives, provides, globalproperties })` отдае т стандартныи vue-plugin для `app.use(...)`. поддерживает три формы компонентов: чистыи sfc, объект с `install`, явное `{ name, component }`. основнои сценарии директивы, `provide`, `globalproperties`, ssr/nuxt-плагины и окружения без сборщика. типовые случаи: глобальные директивы (`v-hotkey`, `v-autofocus`), `provide` для i18n/theme, `globalproperties` для options api."
   },
   {
     "id": "page:integration:section:unplugin",
@@ -173,7 +173,7 @@
     "kindLabel": "Section",
     "context": "Интеграция",
     "searchableTitle": "интеграция авто-импорт `@feugene/unplugin-granularity`",
-    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). unplugin авто-импорт `@feugene/unplugin-granularity` отдельныи build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в sfc. пишете `<dsbutton />` и `v-hotkey` в шаблоне резолвер сам добавит нужные импорты и подтянет component-level css. опции: `prefix`, `importstyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist. рекомендуется для prod-приложении : идеальныи tree-shaking и отсутствие ручных `import`-ов. демо: `apps/playground-8` и `apps/playground-9` (резолвер вместе с unocss preset и композитами)."
+    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). unplugin авто-импорт `@feugene/unplugin-granularity` отдельныи build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в sfc. пишете `<dsbutton />` и `v-hotkey` в шаблоне резолвер сам добавит нужные импорты и подтянет component-level css. опции: `prefix`, `importstyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist. рекомендуется для prod-приложении : идеальныи tree-shaking и отсутствие ручных `import`-ов. типичныи сценарии : резолвер вместе с `presetgranularnode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах."
   },
   {
     "id": "page:integration:section:when-to-use",
@@ -184,7 +184,7 @@
     "kindLabel": "Section",
     "context": "Интеграция",
     "searchableTitle": "интеграция как выбирать между подходами",
-    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). when-to-use как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals. `@feugene/unplugin-granularity` build-time, охватывает только то, что реально стоит в `<template>`. `@feugene/granularity/vue` runtime, охватывает все остальное: директивы в `render()`/jsx, i18n/theme через `provide`, options api через `globalproperties`. ssr / тесты / окружения без `unplugin-vue-components` только через `creategranularity`. прямои sub-path import остае тся самым гранулярным вариантом: `@feugene/granularity/components/<name>`."
+    "searchableContent": "интеграция два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`creategranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`). when-to-use как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals. `@feugene/unplugin-granularity` build-time, охватывает только то, что реально стоит в `<template>`. `@feugene/granularity/vue` runtime, охватывает все остальное: директивы в `render()`/jsx, i18n/theme через `provide`, options api через `globalproperties`. ssr / тесты / окружения без `unplugin-vue-components` только через `creategranularity`. установка css-части пакета делается исключительно через `presetgranularnode` см. раздел foundations / installation paths."
   },
   {
     "id": "page:components:section:catalog",
@@ -195,7 +195,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/registry/components.ts` с текущим покрытием в 48 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 48 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -327,7 +327,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsalert",
-    "searchableContent": "dsalert dsalert показывает важное сообщение, предупреждение или статус деи ствия. feedback component /components/ds-alert packages/granularity/src/registry/components.ts @feugene/granularity/components/dsalert generated public-api components components ds-alert ds alert"
+    "searchableContent": "dsalert dsalert показывает важное сообщение, предупреждение или статус деи ствия. feedback component /components/ds-alert packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsalert generated public-api components components ds-alert ds alert"
   },
   {
     "id": "entity:component:DsAvatar",
@@ -338,7 +338,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dsavatar",
-    "searchableContent": "dsavatar dsavatar отображает фото пользователя, а при отсутствии инициалы или fallback. data component /components/ds-avatar packages/granularity/src/registry/components.ts @feugene/granularity/components/dsavatar generated public-api components components ds-avatar ds avatar"
+    "searchableContent": "dsavatar dsavatar отображает фото пользователя, а при отсутствии инициалы или fallback. data component /components/ds-avatar packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsavatar generated public-api components components ds-avatar ds avatar"
   },
   {
     "id": "entity:component:DsBadge",
@@ -349,7 +349,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsbadge",
-    "searchableContent": "dsbadge dsbadge короткая метка для статуса, категории или сче тчика. feedback component /components/ds-badge packages/granularity/src/registry/components.ts @feugene/granularity/components/dsbadge generated public-api components components ds-badge ds badge"
+    "searchableContent": "dsbadge dsbadge короткая метка для статуса, категории или сче тчика. feedback component /components/ds-badge packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsbadge generated public-api components components ds-badge ds badge"
   },
   {
     "id": "entity:component:DsBadgeWrap",
@@ -360,7 +360,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsbadgewrap",
-    "searchableContent": "dsbadgewrap dsbadgewrap добавляет поверх элемента беи дж со статусом или количеством. feedback component /components/ds-badge-wrap packages/granularity/src/registry/components.ts @feugene/granularity/components/dsbadgewrap generated public-api components components ds-badge-wrap ds badge wrap"
+    "searchableContent": "dsbadgewrap dsbadgewrap добавляет поверх элемента беи дж со статусом или количеством. feedback component /components/ds-badge-wrap packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsbadgewrap generated public-api components components ds-badge-wrap ds badge wrap"
   },
   {
     "id": "entity:component:DsBottomNav",
@@ -371,7 +371,7 @@
     "kindLabel": "component",
     "context": "navigation / component",
     "searchableTitle": "dsbottomnav",
-    "searchableContent": "dsbottomnav dsbottomnav нижняя навигация для ключевых разделов мобильного интерфеи са. navigation component /components/ds-bottom-nav packages/granularity/src/registry/components.ts @feugene/granularity/components/dsbottomnav generated public-api components components ds-bottom-nav ds bottom nav"
+    "searchableContent": "dsbottomnav dsbottomnav нижняя навигация для ключевых разделов мобильного интерфеи са. navigation component /components/ds-bottom-nav packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsbottomnav generated public-api components components ds-bottom-nav ds bottom nav"
   },
   {
     "id": "entity:component:DsButton",
@@ -382,7 +382,7 @@
     "kindLabel": "component",
     "context": "actions / component",
     "searchableTitle": "dsbutton",
-    "searchableContent": "dsbutton dsbutton запускает основное деи ствие в форме, диалоге или панели. actions component /components/ds-button packages/granularity/src/registry/components.ts @feugene/granularity/components/dsbutton generated public-api featured starter components components ds-button ds button"
+    "searchableContent": "dsbutton dsbutton запускает основное деи ствие в форме, диалоге или панели. actions component /components/ds-button packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsbutton generated public-api featured starter components components ds-button ds button"
   },
   {
     "id": "entity:component:DsButtonGroup",
@@ -393,7 +393,7 @@
     "kindLabel": "component",
     "context": "actions / component",
     "searchableTitle": "dsbuttongroup",
-    "searchableContent": "dsbuttongroup dsbuttongroup собирает связанные кнопки в компактную группу деи ствии . actions component /components/ds-button-group packages/granularity/src/registry/components.ts @feugene/granularity/components/dsbuttongroup generated public-api components components ds-button-group ds button group"
+    "searchableContent": "dsbuttongroup dsbuttongroup собирает связанные кнопки в компактную группу деи ствии . actions component /components/ds-button-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsbuttongroup generated public-api components components ds-button-group ds button group"
   },
   {
     "id": "entity:component:DsCard",
@@ -404,7 +404,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dscard",
-    "searchableContent": "dscard dscard контеи нер для смыслового блока с контентом и деи ствиями. data component /components/ds-card packages/granularity/src/registry/components.ts @feugene/granularity/components/dscard generated public-api components components ds-card ds card"
+    "searchableContent": "dscard dscard контеи нер для смыслового блока с контентом и деи ствиями. data component /components/ds-card packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dscard generated public-api components components ds-card ds card"
   },
   {
     "id": "entity:component:DsCheckbox",
@@ -415,7 +415,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dscheckbox",
-    "searchableContent": "dscheckbox dscheckbox позволяет включать независимые опции и выбирать несколько пунктов. forms component /components/ds-checkbox packages/granularity/src/registry/components.ts @feugene/granularity/components/dscheckbox generated public-api components components ds-checkbox ds checkbox"
+    "searchableContent": "dscheckbox dscheckbox позволяет включать независимые опции и выбирать несколько пунктов. forms component /components/ds-checkbox packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dscheckbox generated public-api components components ds-checkbox ds checkbox"
   },
   {
     "id": "entity:component:DsCollapse",
@@ -426,7 +426,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dscollapse",
-    "searchableContent": "dscollapse dscollapse сворачивает и раскрывает дополнительныи контент по запросу. overlays component /components/ds-collapse packages/granularity/src/registry/components.ts @feugene/granularity/components/dscollapse generated public-api components components ds-collapse ds collapse"
+    "searchableContent": "dscollapse dscollapse сворачивает и раскрывает дополнительныи контент по запросу. overlays component /components/ds-collapse packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dscollapse generated public-api components components ds-collapse ds collapse"
   },
   {
     "id": "entity:component:DsConfirmDialog",
@@ -437,7 +437,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsconfirmdialog",
-    "searchableContent": "dsconfirmdialog dsconfirmdialog просит подтвердить потенциально важное или опасное деи ствие. overlays component /components/ds-confirm-dialog packages/granularity/src/registry/components.ts @feugene/granularity/components/dsconfirmdialog generated public-api components components ds-confirm-dialog ds confirm dialog"
+    "searchableContent": "dsconfirmdialog dsconfirmdialog просит подтвердить потенциально важное или опасное деи ствие. overlays component /components/ds-confirm-dialog packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsconfirmdialog generated public-api components components ds-confirm-dialog ds confirm dialog"
   },
   {
     "id": "entity:component:DsDataTable",
@@ -448,7 +448,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dsdatatable",
-    "searchableContent": "dsdatatable dsdatatable таблица для больших наборов данных с сортировкои и фильтрациеи . data component /components/ds-data-table packages/granularity/src/registry/components.ts @feugene/granularity/components/dsdatatable generated public-api components components ds-data-table ds data table"
+    "searchableContent": "dsdatatable dsdatatable таблица для больших наборов данных с сортировкои и фильтрациеи . data component /components/ds-data-table packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsdatatable generated public-api components components ds-data-table ds data table"
   },
   {
     "id": "entity:component:DsDialog",
@@ -459,7 +459,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsdialog",
-    "searchableContent": "dsdialog dsdialog диалоговое окно для подтверждении , форм и фокусных сценариев. overlays component /components/ds-dialog packages/granularity/src/registry/components.ts @feugene/granularity/components/dsdialog generated public-api components components ds-dialog ds dialog"
+    "searchableContent": "dsdialog dsdialog диалоговое окно для подтверждении , форм и фокусных сценариев. overlays component /components/ds-dialog packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsdialog generated public-api components components ds-dialog ds dialog"
   },
   {
     "id": "entity:component:DsDrawer",
@@ -470,7 +470,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsdrawer",
-    "searchableContent": "dsdrawer dsdrawer выезжающая панель для второстепенного контента и быстрых деи ствии . overlays component /components/ds-drawer packages/granularity/src/registry/components.ts @feugene/granularity/components/dsdrawer generated public-api components components ds-drawer ds drawer"
+    "searchableContent": "dsdrawer dsdrawer выезжающая панель для второстепенного контента и быстрых деи ствии . overlays component /components/ds-drawer packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsdrawer generated public-api components components ds-drawer ds drawer"
   },
   {
     "id": "entity:component:DsDropdown",
@@ -481,7 +481,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsdropdown",
-    "searchableContent": "dsdropdown dsdropdown открывает всплывающии список деи ствии или вариантов рядом с триггером. overlays component /components/ds-dropdown packages/granularity/src/registry/components.ts @feugene/granularity/components/dsdropdown generated public-api components components ds-dropdown ds dropdown"
+    "searchableContent": "dsdropdown dsdropdown открывает всплывающии список деи ствии или вариантов рядом с триггером. overlays component /components/ds-dropdown packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsdropdown generated public-api components components ds-dropdown ds dropdown"
   },
   {
     "id": "entity:component:DsDropdownMenu",
@@ -492,7 +492,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsdropdownmenu",
-    "searchableContent": "dsdropdownmenu dsdropdownmenu готовое меню деи ствии для кнопки, ссылки или контекстного вызова. overlays component /components/ds-dropdown-menu packages/granularity/src/registry/components.ts @feugene/granularity/components/dsdropdownmenu generated public-api components components ds-dropdown-menu ds dropdown menu"
+    "searchableContent": "dsdropdownmenu dsdropdownmenu готовое меню деи ствии для кнопки, ссылки или контекстного вызова. overlays component /components/ds-dropdown-menu packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsdropdownmenu generated public-api components components ds-dropdown-menu ds dropdown menu"
   },
   {
     "id": "entity:component:DsEmptyState",
@@ -503,7 +503,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsemptystate",
-    "searchableContent": "dsemptystate dsemptystate объясняет пустое состояние и подсказывает следующии шаг пользователю. feedback component /components/ds-empty-state packages/granularity/src/registry/components.ts @feugene/granularity/components/dsemptystate generated public-api components components ds-empty-state ds empty state"
+    "searchableContent": "dsemptystate dsemptystate объясняет пустое состояние и подсказывает следующии шаг пользователю. feedback component /components/ds-empty-state packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsemptystate generated public-api components components ds-empty-state ds empty state"
   },
   {
     "id": "entity:component:DsFileUpload",
@@ -514,7 +514,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsfileupload",
-    "searchableContent": "dsfileupload dsfileupload принимает фаи лы через выбор или перетаскивание и показывает их состояние. forms component /components/ds-file-upload packages/granularity/src/registry/components.ts @feugene/granularity/components/dsfileupload generated public-api featured integration components components ds-file-upload ds file upload"
+    "searchableContent": "dsfileupload dsfileupload принимает фаи лы через выбор или перетаскивание и показывает их состояние. forms component /components/ds-file-upload packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsfileupload generated public-api featured integration components components ds-file-upload ds file upload"
   },
   {
     "id": "entity:component:DsFormField",
@@ -525,7 +525,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsformfield",
-    "searchableContent": "dsformfield dsformfield объединяет label, control, hint и ошибку в одно поле. forms component /components/ds-form-field packages/granularity/src/registry/components.ts @feugene/granularity/components/dsformfield generated public-api components components ds-form-field ds form field"
+    "searchableContent": "dsformfield dsformfield объединяет label, control, hint и ошибку в одно поле. forms component /components/ds-form-field packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsformfield generated public-api components components ds-form-field ds form field"
   },
   {
     "id": "entity:component:DsFormFile",
@@ -536,7 +536,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsformfile",
-    "searchableContent": "dsformfile dsformfile связывает загрузку фаи лов с полем формы и валидациеи . forms component /components/ds-form-file packages/granularity/src/registry/components.ts @feugene/granularity/components/dsformfile generated public-api components components ds-form-file ds form file"
+    "searchableContent": "dsformfile dsformfile связывает загрузку фаи лов с полем формы и валидациеи . forms component /components/ds-form-file packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsformfile generated public-api components components ds-form-file ds form file"
   },
   {
     "id": "entity:component:DsFormSection",
@@ -547,7 +547,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsformsection",
-    "searchableContent": "dsformsection dsformsection группирует связанные поля формы в понятныи смысловои раздел. forms component /components/ds-form-section packages/granularity/src/registry/components.ts @feugene/granularity/components/dsformsection generated public-api components components ds-form-section ds form section"
+    "searchableContent": "dsformsection dsformsection группирует связанные поля формы в понятныи смысловои раздел. forms component /components/ds-form-section packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsformsection generated public-api components components ds-form-section ds form section"
   },
   {
     "id": "entity:component:DsIcon",
@@ -558,7 +558,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dsicon",
-    "searchableContent": "dsicon dsicon показывает иконку как самостоятельныи элемент интерфеи са. data component /components/ds-icon packages/granularity/src/registry/components.ts @feugene/granularity/components/dsicon generated public-api components components ds-icon ds icon"
+    "searchableContent": "dsicon dsicon показывает иконку как самостоятельныи элемент интерфеи са. data component /components/ds-icon packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsicon generated public-api components components ds-icon ds icon"
   },
   {
     "id": "entity:component:DsImageViewer",
@@ -569,7 +569,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsimageviewer",
-    "searchableContent": "dsimageviewer dsimageviewer открывает изображение в удобном режиме просмотра и масштабирования. overlays component /components/ds-image-viewer packages/granularity/src/registry/components.ts @feugene/granularity/components/dsimageviewer generated public-api components components ds-image-viewer ds image viewer"
+    "searchableContent": "dsimageviewer dsimageviewer открывает изображение в удобном режиме просмотра и масштабирования. overlays component /components/ds-image-viewer packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsimageviewer generated public-api components components ds-image-viewer ds image viewer"
   },
   {
     "id": "entity:component:DsInput",
@@ -580,7 +580,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsinput",
-    "searchableContent": "dsinput dsinput однострочное поле для текста, поиска и коротких значении . forms component /components/ds-input packages/granularity/src/registry/components.ts @feugene/granularity/components/dsinput generated public-api components components ds-input ds input"
+    "searchableContent": "dsinput dsinput однострочное поле для текста, поиска и коротких значении . forms component /components/ds-input packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsinput generated public-api components components ds-input ds input"
   },
   {
     "id": "entity:component:DsInputTag",
@@ -591,7 +591,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsinputtag",
-    "searchableContent": "dsinputtag dsinputtag позволяет вводить и редактировать список тегов или значении . forms component /components/ds-input-tag packages/granularity/src/registry/components.ts @feugene/granularity/components/dsinputtag generated public-api components components ds-input-tag ds input tag"
+    "searchableContent": "dsinputtag dsinputtag позволяет вводить и редактировать список тегов или значении . forms component /components/ds-input-tag packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsinputtag generated public-api components components ds-input-tag ds input tag"
   },
   {
     "id": "entity:component:DsLink",
@@ -602,7 +602,7 @@
     "kindLabel": "component",
     "context": "actions / component",
     "searchableTitle": "dslink",
-    "searchableContent": "dslink dslink навигационная ссылка для перехода между страницами и ресурсами. actions component /components/ds-link packages/granularity/src/registry/components.ts @feugene/granularity/components/dslink generated public-api components components ds-link ds link"
+    "searchableContent": "dslink dslink навигационная ссылка для перехода между страницами и ресурсами. actions component /components/ds-link packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dslink generated public-api components components ds-link ds link"
   },
   {
     "id": "entity:component:DsList",
@@ -613,7 +613,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dslist",
-    "searchableContent": "dslist dslist отображает вертикальныи список однотипных элементов или деи ствии . data component /components/ds-list packages/granularity/src/registry/components.ts @feugene/granularity/components/dslist generated public-api components components ds-list ds list"
+    "searchableContent": "dslist dslist отображает вертикальныи список однотипных элементов или деи ствии . data component /components/ds-list packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dslist generated public-api components components ds-list ds list"
   },
   {
     "id": "entity:component:DsLoading",
@@ -624,7 +624,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsloading",
-    "searchableContent": "dsloading dsloading показывает, что раздел или деи ствие сеи час загружается. feedback component /components/ds-loading packages/granularity/src/registry/components.ts @feugene/granularity/components/dsloading generated public-api components components ds-loading ds loading"
+    "searchableContent": "dsloading dsloading показывает, что раздел или деи ствие сеи час загружается. feedback component /components/ds-loading packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsloading generated public-api components components ds-loading ds loading"
   },
   {
     "id": "entity:component:DsModal",
@@ -635,7 +635,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dsmodal",
-    "searchableContent": "dsmodal dsmodal модальное окно для важного сценария, которыи временно блокирует фон. overlays component /components/ds-modal packages/granularity/src/registry/components.ts @feugene/granularity/components/dsmodal generated public-api components components ds-modal ds modal"
+    "searchableContent": "dsmodal dsmodal модальное окно для важного сценария, которыи временно блокирует фон. overlays component /components/ds-modal packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsmodal generated public-api components components ds-modal ds modal"
   },
   {
     "id": "entity:component:DsNavbar",
@@ -646,7 +646,7 @@
     "kindLabel": "component",
     "context": "navigation / component",
     "searchableTitle": "dsnavbar",
-    "searchableContent": "dsnavbar dsnavbar верхняя навигация для основных разделов и глобальных деи ствии . navigation component /components/ds-navbar packages/granularity/src/registry/components.ts @feugene/granularity/components/dsnavbar generated public-api components components ds-navbar ds navbar"
+    "searchableContent": "dsnavbar dsnavbar верхняя навигация для основных разделов и глобальных деи ствии . navigation component /components/ds-navbar packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsnavbar generated public-api components components ds-navbar ds navbar"
   },
   {
     "id": "entity:component:DsNumberInput",
@@ -657,7 +657,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsnumberinput",
-    "searchableContent": "dsnumberinput dsnumberinput поле для чисел с пошаговым изменением и контролем диапазона. forms component /components/ds-number-input packages/granularity/src/registry/components.ts @feugene/granularity/components/dsnumberinput generated public-api components components ds-number-input ds number input"
+    "searchableContent": "dsnumberinput dsnumberinput поле для чисел с пошаговым изменением и контролем диапазона. forms component /components/ds-number-input packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsnumberinput generated public-api components components ds-number-input ds number input"
   },
   {
     "id": "entity:component:DsPagination",
@@ -668,7 +668,7 @@
     "kindLabel": "component",
     "context": "navigation / component",
     "searchableTitle": "dspagination",
-    "searchableContent": "dspagination dspagination разбивает длинныи список на страницы и управляет переходами. navigation component /components/ds-pagination packages/granularity/src/registry/components.ts @feugene/granularity/components/dspagination generated public-api components components ds-pagination ds pagination"
+    "searchableContent": "dspagination dspagination разбивает длинныи список на страницы и управляет переходами. navigation component /components/ds-pagination packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dspagination generated public-api components components ds-pagination ds pagination"
   },
   {
     "id": "entity:component:DsProgressBar",
@@ -679,7 +679,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsprogressbar",
-    "searchableContent": "dsprogressbar dsprogressbar показывает прогресс выполнения задачи или загрузки. feedback component /components/ds-progress-bar packages/granularity/src/registry/components.ts @feugene/granularity/components/dsprogressbar generated public-api components components ds-progress-bar ds progress bar"
+    "searchableContent": "dsprogressbar dsprogressbar показывает прогресс выполнения задачи или загрузки. feedback component /components/ds-progress-bar packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsprogressbar generated public-api components components ds-progress-bar ds progress bar"
   },
   {
     "id": "entity:component:DsPromptDialog",
@@ -690,7 +690,7 @@
     "kindLabel": "component",
     "context": "overlays / component",
     "searchableTitle": "dspromptdialog",
-    "searchableContent": "dspromptdialog dspromptdialog запрашивает у пользователя короткии текстовыи ввод в диалоге. overlays component /components/ds-prompt-dialog packages/granularity/src/registry/components.ts @feugene/granularity/components/dspromptdialog generated public-api components components ds-prompt-dialog ds prompt dialog"
+    "searchableContent": "dspromptdialog dspromptdialog запрашивает у пользователя короткии текстовыи ввод в диалоге. overlays component /components/ds-prompt-dialog packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dspromptdialog generated public-api components components ds-prompt-dialog ds prompt dialog"
   },
   {
     "id": "entity:component:DsRadio",
@@ -701,7 +701,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsradio",
-    "searchableContent": "dsradio dsradio один вариант выбора внутри группы взаимоисключающих опции . forms component /components/ds-radio packages/granularity/src/registry/components.ts @feugene/granularity/components/dsradio generated public-api components components ds-radio ds radio"
+    "searchableContent": "dsradio dsradio один вариант выбора внутри группы взаимоисключающих опции . forms component /components/ds-radio packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsradio generated public-api components components ds-radio ds radio"
   },
   {
     "id": "entity:component:DsRadioGroup",
@@ -712,7 +712,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsradiogroup",
-    "searchableContent": "dsradiogroup dsradiogroup собирает radio-опции в единыи сценарии выбора одного варианта. forms component /components/ds-radio-group packages/granularity/src/registry/components.ts @feugene/granularity/components/dsradiogroup generated public-api components components ds-radio-group ds radio group"
+    "searchableContent": "dsradiogroup dsradiogroup собирает radio-опции в единыи сценарии выбора одного варианта. forms component /components/ds-radio-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsradiogroup generated public-api components components ds-radio-group ds radio group"
   },
   {
     "id": "entity:component:DsSegmented",
@@ -723,7 +723,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dssegmented",
-    "searchableContent": "dssegmented dssegmented компактныи single-choice control с pills/button представлением и движущимся индикатором выбора. forms component /components/ds-segmented packages/granularity/src/registry/components.ts @feugene/granularity/components/dssegmented generated public-api components components ds-segmented ds segmented"
+    "searchableContent": "dssegmented dssegmented компактныи single-choice control с pills/button представлением и движущимся индикатором выбора. forms component /components/ds-segmented packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dssegmented generated public-api components components ds-segmented ds segmented"
   },
   {
     "id": "entity:component:DsSelect",
@@ -734,7 +734,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsselect",
-    "searchableContent": "dsselect dsselect выбор одного или нескольких значении из списка опции . forms component /components/ds-select packages/granularity/src/registry/components.ts @feugene/granularity/components/dsselect generated public-api featured complex components components ds-select ds select"
+    "searchableContent": "dsselect dsselect выбор одного или нескольких значении из списка опции . forms component /components/ds-select packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsselect generated public-api featured complex components components ds-select ds select"
   },
   {
     "id": "entity:component:DsSidebar",
@@ -745,7 +745,7 @@
     "kindLabel": "component",
     "context": "navigation / component",
     "searchableTitle": "dssidebar",
-    "searchableContent": "dssidebar dssidebar боковая навигация для разделов, фильтров и вспомогательных деи ствии . navigation component /components/ds-sidebar packages/granularity/src/registry/components.ts @feugene/granularity/components/dssidebar generated public-api components components ds-sidebar ds sidebar"
+    "searchableContent": "dssidebar dssidebar боковая навигация для разделов, фильтров и вспомогательных деи ствии . navigation component /components/ds-sidebar packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dssidebar generated public-api components components ds-sidebar ds sidebar"
   },
   {
     "id": "entity:component:DsSkeleton",
@@ -756,7 +756,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dsskeleton",
-    "searchableContent": "dsskeleton dsskeleton временныи каркас интерфеи са, пока контент еще загружается. feedback component /components/ds-skeleton packages/granularity/src/registry/components.ts @feugene/granularity/components/dsskeleton generated public-api components components ds-skeleton ds skeleton"
+    "searchableContent": "dsskeleton dsskeleton временныи каркас интерфеи са, пока контент еще загружается. feedback component /components/ds-skeleton packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsskeleton generated public-api components components ds-skeleton ds skeleton"
   },
   {
     "id": "entity:component:DsSwitch",
@@ -767,7 +767,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dsswitch",
-    "searchableContent": "dsswitch dsswitch быстро включает и выключает бинарную настрои ку. forms component /components/ds-switch packages/granularity/src/registry/components.ts @feugene/granularity/components/dsswitch generated public-api components components ds-switch ds switch"
+    "searchableContent": "dsswitch dsswitch быстро включает и выключает бинарную настрои ку. forms component /components/ds-switch packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dsswitch generated public-api components components ds-switch ds switch"
   },
   {
     "id": "entity:component:DsTable",
@@ -778,7 +778,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dstable",
-    "searchableContent": "dstable dstable простая таблица для компактного показа структурированных данных. data component /components/ds-table packages/granularity/src/registry/components.ts @feugene/granularity/components/dstable generated public-api components components ds-table ds table"
+    "searchableContent": "dstable dstable простая таблица для компактного показа структурированных данных. data component /components/ds-table packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstable generated public-api components components ds-table ds table"
   },
   {
     "id": "entity:component:DsTabs",
@@ -789,7 +789,7 @@
     "kindLabel": "component",
     "context": "navigation / component",
     "searchableTitle": "dstabs",
-    "searchableContent": "dstabs dstabs переключает связанные разделы контента без смены страницы. navigation component /components/ds-tabs packages/granularity/src/registry/components.ts @feugene/granularity/components/dstabs generated public-api components components ds-tabs ds tabs"
+    "searchableContent": "dstabs dstabs переключает связанные разделы контента без смены страницы. navigation component /components/ds-tabs packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstabs generated public-api components components ds-tabs ds tabs"
   },
   {
     "id": "entity:component:DsTextarea",
@@ -800,7 +800,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dstextarea",
-    "searchableContent": "dstextarea dstextarea многострочное поле для длинного текста и комментариев. forms component /components/ds-textarea packages/granularity/src/registry/components.ts @feugene/granularity/components/dstextarea generated public-api components components ds-textarea ds textarea"
+    "searchableContent": "dstextarea dstextarea многострочное поле для длинного текста и комментариев. forms component /components/ds-textarea packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstextarea generated public-api components components ds-textarea ds textarea"
   },
   {
     "id": "entity:component:DsToaster",
@@ -811,7 +811,7 @@
     "kindLabel": "component",
     "context": "feedback / component",
     "searchableTitle": "dstoaster",
-    "searchableContent": "dstoaster dstoaster показывает краткие всплывающие уведомления о результате деи ствии . feedback component /components/ds-toaster packages/granularity/src/registry/components.ts @feugene/granularity/components/dstoaster generated public-api components components ds-toaster ds toaster"
+    "searchableContent": "dstoaster dstoaster показывает краткие всплывающие уведомления о результате деи ствии . feedback component /components/ds-toaster packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstoaster generated public-api components components ds-toaster ds toaster"
   },
   {
     "id": "entity:component:DsTooltip",
@@ -822,7 +822,7 @@
     "kindLabel": "component",
     "context": "navigation / component",
     "searchableTitle": "dstooltip",
-    "searchableContent": "dstooltip dstooltip показывает короткую подсказку при наведении или фокусе. navigation component /components/ds-tooltip packages/granularity/src/registry/components.ts @feugene/granularity/components/dstooltip generated public-api components components ds-tooltip ds tooltip"
+    "searchableContent": "dstooltip dstooltip показывает короткую подсказку при наведении или фокусе. navigation component /components/ds-tooltip packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstooltip generated public-api components components ds-tooltip ds tooltip"
   },
   {
     "id": "entity:component:DsTree",
@@ -833,7 +833,7 @@
     "kindLabel": "component",
     "context": "data / component",
     "searchableTitle": "dstree",
-    "searchableContent": "dstree dstree показывает иерархию элементов с раскрытием узлов и выбором. data component /components/ds-tree packages/granularity/src/registry/components.ts @feugene/granularity/components/dstree generated public-api components components ds-tree ds tree"
+    "searchableContent": "dstree dstree показывает иерархию элементов с раскрытием узлов и выбором. data component /components/ds-tree packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstree generated public-api components components ds-tree ds tree"
   },
   {
     "id": "entity:component:DsTreeSelect",
@@ -844,7 +844,7 @@
     "kindLabel": "component",
     "context": "forms / component",
     "searchableTitle": "dstreeselect",
-    "searchableContent": "dstreeselect dstreeselect выбор значения из древовиднои структуры в одном контроле. forms component /components/ds-tree-select packages/granularity/src/registry/components.ts @feugene/granularity/components/dstreeselect generated public-api components components ds-tree-select ds tree select"
+    "searchableContent": "dstreeselect dstreeselect выбор значения из древовиднои структуры в одном контроле. forms component /components/ds-tree-select packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/dstreeselect generated public-api components components ds-tree-select ds tree select"
   },
   {
     "id": "entity:directive:vAutofocus",

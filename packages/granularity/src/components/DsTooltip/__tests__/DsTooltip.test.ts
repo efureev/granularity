@@ -22,13 +22,26 @@ describe('DsTooltip', () => {
     })
 
     const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
-    expect(trigger.attributes('style')).toContain('--ds-tooltip-icon-color: var(--muted-fg)')
+    expect(trigger.attributes('style')).toContain('color: var(--muted-fg)')
     expect(wrapper.get('[data-icon="info"]')).toBeTruthy()
 
     const tooltip = wrapper.get('[role="tooltip"]')
     expect(tooltip.text()).toContain('Helpful hint')
     expect(tooltip.attributes('class')).toContain('group-hover:opacity-100')
     expect(tooltip.attributes('class')).toContain('group-focus-within:opacity-100')
+  })
+
+  it('связывает триггер и tooltip через aria-describedby', () => {
+    const wrapper = mount(DsTooltip, {
+      props: { text: 'Hint' },
+    })
+
+    const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
+    const tooltip = wrapper.get('[role="tooltip"]')
+
+    const describedBy = trigger.attributes('aria-describedby')
+    expect(describedBy).toBeTruthy()
+    expect(tooltip.attributes('id')).toBe(describedBy)
   })
 
   it('поддерживает кастомный слот и iconColor', () => {
@@ -43,7 +56,7 @@ describe('DsTooltip', () => {
     })
 
     const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
-    expect(trigger.attributes('style')).toContain('--ds-tooltip-icon-color: #0f172a')
+    expect(trigger.attributes('style')).toContain('color: rgb(15, 23, 42)')
     expect(wrapper.get('[data-testid="custom-trigger"]').text()).toBe('?')
     expect(wrapper.find('[data-icon="info"]').exists()).toBe(false)
   })

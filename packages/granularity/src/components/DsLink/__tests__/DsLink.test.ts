@@ -61,6 +61,43 @@ describe('DsLink', () => {
     expect(el.attributes('class')).toContain('cursor-not-allowed')
   })
 
+  it('добавляет rel noopener noreferrer при target="_blank" без external', () => {
+    const wrapper = mount(DsLink, {
+      props: {
+        href: 'https://example.com',
+        target: '_blank',
+      },
+      attrs: {
+        'data-testid': 'link',
+      },
+      slots: {
+        default: 'Blank',
+      },
+    })
+
+    const el = wrapper.get('[data-testid="link"]')
+    expect(el.attributes('target')).toBe('_blank')
+    expect(el.attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('не навешивает focus-visible ring на disabled span', () => {
+    const wrapper = mount(DsLink, {
+      props: {
+        href: 'https://example.com',
+        disabled: true,
+      },
+      attrs: {
+        'data-testid': 'link',
+      },
+      slots: {
+        default: 'Disabled',
+      },
+    })
+
+    const el = wrapper.get('[data-testid="link"]')
+    expect(el.attributes('class')).not.toContain('focus-visible:ring-2')
+  })
+
   it('управляет классами underline', () => {
     const wrapper = mount(DsLink, {
       props: {

@@ -1,8 +1,6 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsFormSectionSafelist } from './safelist'
-
-export const dsFormSectionConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsFormSectionConfig = defineGranularComponent(import.meta.url, {
   name: 'DsFormSection',
-  safelist: dsFormSectionSafelist,
+  safelist: [],
 })

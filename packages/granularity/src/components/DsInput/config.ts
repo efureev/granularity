@@ -1,8 +1,7 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { dsInputSafelist } from './safelist'
 
-import { dsInputSafelist } from './dsInputStyles'
-
-export const dsInputConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsInputConfig = defineGranularComponent(import.meta.url, {
   name: 'DsInput',
   safelist: dsInputSafelist,
 })

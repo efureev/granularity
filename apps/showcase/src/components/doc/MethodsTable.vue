@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { useFintI18n } from '@feugene/fint-i18n/vue'
+
 import type { ShowcaseApiItemMeta } from '../../content/model'
 
 import ApiTable from './ApiTable.vue'
+
+const { t } = useFintI18n()
 
 defineProps<{
   items: ShowcaseApiItemMeta[]
@@ -9,5 +13,9 @@ defineProps<{
 </script>
 
 <template>
-  <ApiTable title="Methods / Expose" :items="items" empty-label="Imperative API пока не обнаружен или будет добавлен вручную через fallback-слой." />
+  <ApiTable
+    :title="t('showcase.docComponents.table.methodsTitle')"
+    :items="items"
+    :empty-label="t('showcase.docComponents.emptyLabel.methods')"
+  />
 </template>

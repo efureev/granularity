@@ -1,9 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsDropdownMenuSafelist } from './safelist'
-
-export const dsDropdownMenuConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsDropdownMenuConfig = defineGranularComponent(import.meta.url, {
   name: 'DsDropdownMenu',
   dependencies: ['DsDropdown'],
-  safelist: dsDropdownMenuSafelist,
+  // Все токены прописаны статически в шаблонах подкомпонентов — UnoCSS находит их сканом.
+  safelist: [],
 })

@@ -1,7 +1,6 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-export const dsIconConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsIcon',
-  safelist: [],
-  cssFiles: ['./tokens.css', './styles.css'],
+export const dsIconConfig = defineGranularComponent(import.meta.url, {
+    name: 'DsIcon',
+    safelist: [],
 })

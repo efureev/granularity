@@ -56,8 +56,8 @@ describe('showcase page smoke coverage', () => {
     expect(componentDetailPageSource).toContain('import SlotsTable from')
     expect(componentDetailPageSource).toContain('import EventsTable from')
     expect(componentDetailPageSource).toContain('import MethodsTable from')
-    expect(componentDetailPageSource).toContain('Перейти в каталог компонентов')
-    expect(componentDetailPageSource).toContain('Component not found')
+    expect(componentDetailPageSource).toContain("t('showcase.detailPage.notFoundComponent.action')")
+    expect(componentDetailPageSource).toContain("t('showcase.detailPage.notFoundComponent.title')")
     expect(componentDetailPageSource).not.toContain('v-for="tag in componentEntity.tags"')
     expect(componentDetailPageSource).not.toContain('Component overview')
     expect(componentDetailPageSource).not.toContain('EntityActionBar')
@@ -81,9 +81,9 @@ describe('showcase page smoke coverage', () => {
     expect(packageEntityDetailPageSource).toContain('import ApiTable from')
     expect(packageEntityDetailPageSource).toContain('import ExampleCard from')
     expect(packageEntityDetailPageSource).not.toContain('EntityActionBar')
-    expect(packageEntityDetailPageSource).not.toContain('Related links')
-    expect(packageEntityDetailPageSource).toContain('Package entity not found')
-    expect(packageEntityDetailPageSource).toContain('Back to {{ page.shortTitle.toLowerCase() }}')
+    expect(packageEntityDetailPageSource).not.toContain("t('showcase.detailPage.info.relatedLinksTitle')")
+    expect(packageEntityDetailPageSource).toContain("t('showcase.detailPage.notFoundEntity.title')")
+    expect(packageEntityDetailPageSource).toContain("t('showcase.detailPage.backTo', { target: page.shortTitle.toLowerCase() })")
   })
 
   it('не использует tag-based metadata в component catalog page', () => {

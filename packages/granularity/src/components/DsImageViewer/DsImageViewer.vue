@@ -26,6 +26,24 @@ const props = withDefaults(
     showProgress?: boolean
     showZoomValue?: boolean
     zIndex?: number
+    /** i18n: aria-label кнопки закрытия. */
+    closeLabel?: string
+    /** i18n: aria-label кнопки «предыдущее изображение». */
+    prevLabel?: string
+    /** i18n: aria-label кнопки «следующее изображение». */
+    nextLabel?: string
+    /** i18n: aria-label кнопки «увеличить». */
+    zoomInLabel?: string
+    /** i18n: aria-label кнопки «уменьшить». */
+    zoomOutLabel?: string
+    /** i18n: aria-label кнопки «сбросить масштаб». */
+    resetZoomLabel?: string
+    /** i18n: aria-label кнопки «повернуть влево». */
+    rotateLeftLabel?: string
+    /** i18n: aria-label кнопки «повернуть вправо». */
+    rotateRightLabel?: string
+    /** i18n: текст в пустом состоянии (нет изображений). */
+    emptyText?: string
   }>(),
   {
     initialIndex: 0,
@@ -37,6 +55,15 @@ const props = withDefaults(
     showProgress: false,
     showZoomValue: true,
     zIndex: undefined,
+    closeLabel: 'Close image viewer',
+    prevLabel: 'Previous image',
+    nextLabel: 'Next image',
+    zoomInLabel: 'Zoom in',
+    zoomOutLabel: 'Zoom out',
+    resetZoomLabel: 'Reset zoom',
+    rotateLeftLabel: 'Rotate left',
+    rotateRightLabel: 'Rotate right',
+    emptyText: 'No image',
   },
 )
 
@@ -369,7 +396,7 @@ watch(
                   <button
                     type="button"
                     data-ds-image-viewer-close
-                    aria-label="Close image viewer"
+                    :aria-label="closeLabel"
                     class="h-11 w-11 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                     @click="closeViewer"
                   >
@@ -383,7 +410,7 @@ watch(
                   v-if="total > 1"
                   type="button"
                   data-ds-image-viewer-prev
-                  aria-label="Previous image"
+                  :aria-label="prevLabel"
                   class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:left-6"
                   @click="prev"
                 >
@@ -394,7 +421,7 @@ watch(
                   v-if="total > 1"
                   type="button"
                   data-ds-image-viewer-next
-                  aria-label="Next image"
+                  :aria-label="nextLabel"
                   class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-6"
                   @click="next"
                 >
@@ -416,7 +443,7 @@ watch(
                     v-else
                     class="rounded-[var(--ds-radius-xl)] border border-white/20 bg-black/25 px-4 py-3 text-sm text-white/80"
                   >
-                    No image
+                    {{ emptyText }}
                   </div>
                 </div>
               </div>
@@ -436,7 +463,7 @@ watch(
                       <button
                         type="button"
                         data-ds-image-viewer-zoom-out
-                        aria-label="Zoom out"
+                        :aria-label="zoomOutLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="zoomOut"
                       >
@@ -446,7 +473,7 @@ watch(
                       <button
                         type="button"
                         data-ds-image-viewer-zoom-reset
-                        aria-label="Reset zoom"
+                        :aria-label="resetZoomLabel"
                         class="h-11 min-w-11 px-3 flex items-center justify-center rounded-full text-xs font-700 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="resetTransform"
                       >
@@ -456,7 +483,7 @@ watch(
                       <button
                         type="button"
                         data-ds-image-viewer-zoom-in
-                        aria-label="Zoom in"
+                        :aria-label="zoomInLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="zoomIn"
                       >
@@ -484,7 +511,7 @@ watch(
                       <button
                         type="button"
                         data-ds-image-viewer-rotate-left
-                        aria-label="Rotate left"
+                        :aria-label="rotateLeftLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="rotateLeft"
                       >
@@ -494,7 +521,7 @@ watch(
                       <button
                         type="button"
                         data-ds-image-viewer-rotate-right
-                        aria-label="Rotate right"
+                        :aria-label="rotateRightLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="rotateRight"
                       >

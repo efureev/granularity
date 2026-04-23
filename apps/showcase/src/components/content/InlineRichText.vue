@@ -68,7 +68,7 @@ function createParts(text: string) {
     })
   }
 
-  return parts.length ? parts : [{type: 'text', content: text}]
+  return parts.length ? parts : [{type: 'text', content: text} as InlineRichTextPart]
 }
 
 const parts = computed(() => createParts(props.text))
@@ -79,9 +79,9 @@ const parts = computed(() => createParts(props.text))
     <template v-for="(part, index) in parts" :key="`${part.type}-${part.content}-${index}`">
       <span v-if="part.type === 'text'">{{ part.content }}</span>
       <DsBadge
-          variant="primary"
+          tone="slate"
+          class="!rounded-[7px] !px-1.5"
           v-else-if="part.type === 'badge'"
-          class="mx-1 inline-flex translate-y-[-0.05em] align-middle text-[0.78em] font-medium"
       >
         {{ part.content }}
       </DsBadge>

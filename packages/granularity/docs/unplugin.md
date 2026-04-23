@@ -100,7 +100,3 @@ GranularityResolver({
 - **Глобальная типизация.** `unplugin-vue-components` сам генерирует `components.d.ts` с глобальными компонентами,
   поэтому Volar/`vue-tsc` ничего руками дописывать не нужно.
 
-## Демо
-
-- [`apps/playground-8`](../../../apps/playground-8/README.md) — чистый сценарий авто-импорта.
-- [`apps/playground-9`](../../../apps/playground-9/README.md) — резолвер + композитные компоненты + UnoCSS preset.

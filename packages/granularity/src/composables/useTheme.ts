@@ -22,9 +22,16 @@ function getPreferredTheme(storageKey = DEFAULT_STORAGE_KEY, persist = true): Th
   if (typeof window === 'undefined') return 'light'
 
   if (persist) {
-    const storage = window.localStorage
-    const stored = typeof storage?.getItem === 'function' ? storage.getItem(storageKey) : null
-    if (stored === 'light' || stored === 'dark') return stored
+    // Доступ к `localStorage` может бросать `SecurityError` в Safari private mode
+    // и при отключённых cookies/storage — поэтому оборачиваем в try/catch.
+    try {
+      const storage = window.localStorage
+      const stored = typeof storage?.getItem === 'function' ? storage.getItem(storageKey) : null
+      if (stored === 'light' || stored === 'dark') return stored
+    }
+    catch {
+      // ignore
+    }
   }
 
   const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches
@@ -60,9 +67,15 @@ export function useTheme(options: UseThemeOptions = {}) {
     theme.value = next
 
     if (persist && typeof window !== 'undefined') {
-      const storage = window.localStorage
-      if (typeof storage?.setItem === 'function')
-        storage.setItem(storageKey, next)
+      // См. комментарий в `getPreferredTheme`: запись тоже может бросать.
+      try {
+        const storage = window.localStorage
+        if (typeof storage?.setItem === 'function')
+          storage.setItem(storageKey, next)
+      }
+      catch {
+        // ignore
+      }
     }
 
     applyTheme(next)

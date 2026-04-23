@@ -1,82 +1,167 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+/**
+ * DsModal — DS-примитив модального окна на базе `@headlessui/vue`.
+ *
+ * Публичный API:
+ * - `modelValue` (v-model) — открыто/закрыто;
+ * - `size` — размер панели (`sm | md | lg | xl | full`);
+ * - `closeOnBackdrop` (default: true) — закрывать при клике по оверлею;
+ * - `closeOnEsc` (default: true) — закрывать по Esc;
+ * - слоты `#title` / `#description` — если переданы, оборачиваются в
+ *   `DialogTitle` / `DialogDescription` (связь через `aria-labelledby` /
+ *   `aria-describedby` ставится HeadlessUI автоматически).
+ *
+ * Esc обрабатывается штатно через событие `@close` у HeadlessUI `<Dialog>`,
+ * чтобы не конфликтовать с его внутренней логикой. Источник закрытия
+ * различается через ref `closeReasonRef`.
+ */
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
-export type { DsDialogSize } from './dsModalStyles'
+import {
+  type DsModalSize,
+  getDsModalPanelClass,
+  layout,
+  overlay as overlayClass,
+  overlayTransition,
+  panelTransition,
+  root as rootClass,
+  shell,
+} from './dsModalStyles'
 
-import { getDsModalPanelClass, type DsDialogSize } from './dsModalStyles'
+export interface DsModalProps {
+  modelValue: boolean
+  closeOnBackdrop?: boolean
+  closeOnEsc?: boolean
+  size?: DsModalSize
+}
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: boolean
-    closeOnBackdrop?: boolean
-    size?: DsDialogSize
-  }>(),
-  {
-    closeOnBackdrop: true,
-    size: 'md',
-  },
-)
+const props = withDefaults(defineProps<DsModalProps>(), {
+  closeOnBackdrop: true,
+  closeOnEsc: true,
+  size: 'md',
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
 }>()
 
-const open = computed(() => props.modelValue)
-
 const panelClass = computed(() => getDsModalPanelClass(props.size))
+
+// SSR-guard: на сервере `document.body` недоступен — отключаем teleport,
+// а в клиенте включаем после маунта.
+const isClient = typeof window !== 'undefined'
+
+// Источник закрытия от HeadlessUI `<Dialog>` — либо Esc, либо клик по оверлею.
+// Различаем их, чтобы `closeOnBackdrop` и `closeOnEsc` работали независимо.
+const closeReason = ref<'backdrop' | 'esc' | null>(null)
 
 function close(): void {
   emit('update:modelValue', false)
 }
 
 function onDialogClose(): void {
-  if (props.closeOnBackdrop)
-    close()
+  const reason = closeReason.value
+  closeReason.value = null
+
+  if (reason === 'esc') {
+    if (props.closeOnEsc) close()
+    return
+  }
+
+  // По умолчанию (клик по оверлею или программный вызов `@close`)
+  // уважаем `closeOnBackdrop`.
+  if (props.closeOnBackdrop) close()
 }
+
+function onRootKeydown(event: KeyboardEvent): void {
+  if (event.key === 'Escape') closeReason.value = 'esc'
+}
+
+function onOverlayPointerDown(): void {
+  closeReason.value = 'backdrop'
+}
+
+// ————— Scroll lock на `<body>` на время открытия.
+// HeadlessUI Vue этого не делает автоматически, а фон скроллится —
+// для DS-примитива это мешающий UX.
+let savedBodyOverflow: string | null = null
+
+function lockBodyScroll(): void {
+  if (!isClient) return
+  if (savedBodyOverflow !== null) return
+  savedBodyOverflow = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
+}
+
+function unlockBodyScroll(): void {
+  if (!isClient) return
+  if (savedBodyOverflow === null) return
+  document.body.style.overflow = savedBodyOverflow
+  savedBodyOverflow = null
+}
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value) lockBodyScroll()
+    else unlockBodyScroll()
+  },
+  { immediate: true },
+)
+
+onBeforeUnmount(unlockBodyScroll)
+
 </script>
 
 <template>
-  <teleport to="body">
-    <TransitionRoot :show="open" as="template">
+  <teleport to="body" :disabled="!isClient">
+    <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"
-        class="fixed inset-0 z-50"
+        :class="rootClass"
         @close="onDialogClose"
-        @keydown.esc.stop.prevent="close"
+        @keydown.capture="onRootKeydown"
       >
-        <div class="fixed inset-0 overflow-y-auto p-4 sm:p-6">
-          <div class="min-h-full flex items-center justify-center">
+        <div :class="shell">
+          <div :class="layout">
             <TransitionChild
               as="template"
-              enter="duration-200 ease-out"
-              enter-from="opacity-0"
-              enter-to="opacity-100"
-              leave="duration-150 ease-in"
-              leave-from="opacity-100"
-              leave-to="opacity-0"
+              :enter="overlayTransition.enter"
+              :enter-from="overlayTransition.enterFrom"
+              :enter-to="overlayTransition.enterTo"
+              :leave="overlayTransition.leave"
+              :leave-from="overlayTransition.leaveFrom"
+              :leave-to="overlayTransition.leaveTo"
             >
               <div
                 data-ds-modal-overlay
-                class="fixed inset-0 z-0 bg-black/40"
+                :class="overlayClass"
                 aria-hidden="true"
+                @pointerdown="onOverlayPointerDown"
               />
             </TransitionChild>
 
             <TransitionChild
               as="template"
-              enter="duration-200 ease-out"
-              enter-from="opacity-0 translate-y-2 sm:translate-y-0 sm:scale-95"
-              enter-to="opacity-100 translate-y-0 sm:scale-100"
-              leave="duration-150 ease-in"
-              leave-from="opacity-100 translate-y-0 sm:scale-100"
-              leave-to="opacity-0 translate-y-2 sm:translate-y-0 sm:scale-95"
+              :enter="panelTransition.enter"
+              :enter-from="panelTransition.enterFrom"
+              :enter-to="panelTransition.enterTo"
+              :leave="panelTransition.leave"
+              :leave-from="panelTransition.leaveFrom"
+              :leave-to="panelTransition.leaveTo"
             >
               <DialogPanel
                 data-ds-modal-panel
                 tabindex="-1"
                 :class="panelClass"
               >
+                <DialogTitle v-if="$slots.title" as="div" data-ds-modal-title>
+                  <slot name="title" />
+                </DialogTitle>
+                <DialogDescription v-if="$slots.description" as="div" data-ds-modal-description>
+                  <slot name="description" />
+                </DialogDescription>
                 <slot />
               </DialogPanel>
             </TransitionChild>

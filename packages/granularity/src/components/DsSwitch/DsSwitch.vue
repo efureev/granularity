@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 
-export type {DsSwitchSize} from './dsSwitchStyles'
-
 import {
   dsSwitchLabelClass,
   dsSwitchThumbClass,
@@ -10,17 +8,26 @@ import {
   type DsSwitchSize,
 } from './dsSwitchStyles'
 
+export type {DsSwitchSize} from './dsSwitchStyles'
+
+/**
+ * Пропсы публичного DS-примитива «Switch».
+ */
+export interface DsSwitchProps {
+  modelValue: boolean
+  disabled?: boolean
+  ariaLabel?: string
+  size?: DsSwitchSize
+  /** Кастомный цвет фона в активном состоянии. Если не задан — `var(--primary)`. */
+  activeBackgroundColor?: string
+  /** Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--muted)`. */
+  inactiveBackgroundColor?: string
+}
+
 const getCustomColor = (value?: string) => value?.trim() || undefined
 
 const props = withDefaults(
-    defineProps<{
-      modelValue: boolean
-      disabled?: boolean
-      ariaLabel?: string
-      size?: DsSwitchSize
-      activeBackgroundColor?: string
-      inactiveBackgroundColor?: string
-    }>(),
+    defineProps<DsSwitchProps>(),
     {
       disabled: false,
       ariaLabel: undefined,
@@ -72,25 +79,29 @@ function toggle(): void {
   <button
       type="button"
       role="switch"
-      :aria-checked="props.modelValue ? 'true' : 'false'"
-      :aria-label="props.ariaLabel"
-      :disabled="props.disabled"
+      data-ds-switch
+      :aria-checked="modelValue ? 'true' : 'false'"
+      :aria-label="ariaLabel"
+      :disabled="disabled"
       class="inline-flex items-center gap-2 select-none disabled:opacity-50 disabled:cursor-not-allowed"
       @click="toggle"
   >
     <span
         data-testid="ds-switch-track"
+        data-ds-switch-track
         :class="trackClass"
         :style="trackStyle"
     >
       <span
           data-testid="ds-switch-thumb"
+          data-ds-switch-thumb
           :class="thumbClass"
           aria-hidden="true"
       />
     </span>
     <span
         v-if="$slots.default"
+        data-ds-switch-label
         :class="labelClass"
     >
       <slot />

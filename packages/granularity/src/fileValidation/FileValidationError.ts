@@ -13,6 +13,9 @@ export class FileValidationError extends Error {
     this.code = issues[0]?.code ?? 'accept'
 
     const firstFileName = issues[0]?.fileName
-    this.file = firstFileName && files ? files.find(f => f.name === firstFileName) : files?.[0]
+    const byName = firstFileName && files ? files.find(f => f.name === firstFileName) : undefined
+    // Fallback to the first file if the named one isn't present in `files`
+    // (e.g. aggregate issue like `maxTotalSize` has no `fileName`, or names diverged).
+    this.file = byName ?? files?.[0]
   }
 }

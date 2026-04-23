@@ -1,14 +1,15 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    align?: 'left' | 'center' | 'right'
-  }>(),
-  {
-    align: 'center',
-  },
-)
+export type DsDropdownMenuColumnAlign = 'left' | 'center' | 'right'
 
-const alignClass = {
+export interface DsDropdownMenuColumnProps {
+  align?: DsDropdownMenuColumnAlign
+}
+
+withDefaults(defineProps<DsDropdownMenuColumnProps>(), {
+  align: 'center',
+})
+
+const alignClass: Record<DsDropdownMenuColumnAlign, string> = {
   left: 'justify-start text-left',
   center: 'justify-center text-center',
   right: 'justify-end text-right',
@@ -16,7 +17,11 @@ const alignClass = {
 </script>
 
 <template>
-  <div class="px-3 py-2 flex items-center" :class="alignClass[align]">
+  <div
+    data-ds-dropdown-menu-column
+    class="px-3 py-2 flex items-center"
+    :class="alignClass[align]"
+  >
     <slot />
   </div>
 </template>

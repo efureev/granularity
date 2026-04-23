@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+import type { DsSegmentedOption } from '@feugene/granularity'
 import { DsBadge, DsSegmented } from '@feugene/granularity'
 
 const period = ref<'day' | 'week' | 'month'>('week')
 
-const options = [
+const options: DsSegmentedOption[] = [
   { value: 'day', label: 'Day' },
   { value: 'week', label: 'Week' },
   { value: 'month', label: 'Month' },
-] as const
+]
 
 const selectionLabel = computed(() => options.find(option => option.value === period.value)?.label ?? period.value)
 </script>

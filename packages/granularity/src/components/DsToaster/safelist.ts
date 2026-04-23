@@ -1,29 +1,9 @@
-export const dsToasterSafelist = [
-  'fixed',
-  'right-4',
-  'top-4',
-  'z-50',
-  'grid',
-  'w-[360px]',
-  'max-w-[calc(100vw-2rem)]',
-  'gap-3',
-  'rounded-[var(--ds-radius-lg)]',
-  'border',
-  'border-[var(--brd)]',
-  'bg-[var(--card)]',
-  'px-4',
-  'py-3',
-  'shadow-[var(--ds-shadow-2)]',
-  'flex',
-  'items-start',
-  'h-5',
-  'w-5',
-  'mt-0.5',
-  'min-w-0',
-  'flex-1',
-  'text-[13px]',
-  'font-700',
-  'ds-muted',
-  'h-4',
-  'w-4',
-] as const
+import { splitClassTokens } from '../shared/classTokens'
+import { PLACEMENT_CLASS } from './dsToasterStyles'
+
+// В safelist попадают только те классы, которые приходят в шаблон динамически
+// (через `:class`/`PLACEMENT_CLASS`). Литералы из шаблона (`class="..."`)
+// UnoCSS находит статическим сканом и дублировать их здесь не нужно.
+export const dsToasterSafelist = [...new Set(
+  Object.values(PLACEMENT_CLASS).flatMap(splitClassTokens),
+)]

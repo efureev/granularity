@@ -7,25 +7,32 @@ import DsRadio from '../DsRadio/DsRadio.vue'
 import { DS_RADIO_GROUP_CONTEXT } from '../DsRadio'
 
 export type DsRadioGroupVariant = 'radiobox' | 'button'
-export type DsRadioGroupOption = { value: string, label: string }
+export interface DsRadioGroupOption { value: string, label: string }
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    options?: DsRadioGroupOption[]
-    name?: string
-    disabled?: boolean
-    variant?: DsRadioGroupVariant
-    size?: DsButtonSize
-  }>(),
-  {
-    options: undefined,
-    name: undefined,
-    disabled: false,
-    variant: 'radiobox',
-    size: 'md',
-  },
-)
+/**
+ * DsRadioGroup — контейнер группы `DsRadio`.
+ *
+ * Может работать как через слот (ручной рендер `DsRadio`), так и через проп `options`.
+ * Предоставляет дочерним `DsRadio` общий `modelValue`/`disabled`/`size`/`name` через `inject`.
+ */
+export interface DsRadioGroupProps {
+  modelValue: string
+  options?: DsRadioGroupOption[]
+  name?: string
+  disabled?: boolean
+  variant?: DsRadioGroupVariant
+  size?: DsButtonSize
+  ariaLabel?: string
+}
+
+const props = withDefaults(defineProps<DsRadioGroupProps>(), {
+  options: undefined,
+  name: undefined,
+  disabled: false,
+  variant: 'radiobox',
+  size: 'md',
+  ariaLabel: undefined,
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -34,7 +41,6 @@ const emit = defineEmits<{
 function setValue(next: string): void {
   if (props.disabled)
     return
-
   emit('update:modelValue', next)
 }
 
@@ -48,31 +54,34 @@ provide(DS_RADIO_GROUP_CONTEXT, {
 </script>
 
 <template>
-  <div role="radiogroup" :aria-disabled="props.disabled ? 'true' : undefined">
+  <div
+    data-ds-radio-group
+    role="radiogroup"
+    :aria-label="ariaLabel"
+    :aria-disabled="disabled ? 'true' : undefined"
+  >
     <template v-if="$slots.default">
-      <DsButtonGroup v-if="props.variant === 'button'">
+      <DsButtonGroup v-if="variant === 'button'">
         <slot />
       </DsButtonGroup>
       <div v-else class="grid gap-2">
         <slot />
       </div>
     </template>
-
     <template v-else>
-      <DsButtonGroup v-if="props.variant === 'button'">
+      <DsButtonGroup v-if="variant === 'button'">
         <DsRadio
-          v-for="opt in props.options ?? []"
+          v-for="opt in options ?? []"
           :key="opt.value"
           :value="opt.value"
           variant="button"
-          :size="props.size"
+          :size="size"
         >
           {{ opt.label }}
         </DsRadio>
       </DsButtonGroup>
-
       <div v-else class="grid gap-2">
-        <DsRadio v-for="opt in props.options ?? []" :key="opt.value" :value="opt.value">
+        <DsRadio v-for="opt in options ?? []" :key="opt.value" :value="opt.value">
           {{ opt.label }}
         </DsRadio>
       </div>

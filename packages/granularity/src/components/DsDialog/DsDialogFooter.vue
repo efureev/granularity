@@ -7,14 +7,13 @@ import {
   type DsDialogSectionConfig,
 } from './dialogShared'
 
-const props = withDefaults(
-  defineProps<{
-    config?: DsDialogSectionConfig
-  }>(),
-  {
-    config: undefined,
-  },
-)
+export interface DsDialogFooterProps {
+  config?: DsDialogSectionConfig
+}
+
+const props = withDefaults(defineProps<DsDialogFooterProps>(), {
+  config: undefined,
+})
 
 const resolvedConfig = computed(() => resolveDsDialogSectionConfig(props.config, DEFAULT_DS_DIALOG_FOOTER_CONFIG))
 

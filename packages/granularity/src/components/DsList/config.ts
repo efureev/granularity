@@ -1,9 +1,12 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-import { dsListSafelist } from './safelist'
-
-export const dsListConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsList',
-  safelist: dsListSafelist,
-  dependencies: ['DsCard'],
+export const dsListConfig = defineGranularComponent(import.meta.url, {
+    name: 'DsList',
+    safelist: [
+        // DsListItem density
+        'px-4',
+        'py-2',
+        'py-3',
+    ],
+    dependencies: ['DsCard'],
 })

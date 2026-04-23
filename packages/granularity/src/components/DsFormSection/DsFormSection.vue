@@ -1,23 +1,42 @@
 <script setup lang="ts">
-const props = withDefaults(
-  defineProps<{
-    title: string
-    description?: string
-  }>(),
-  {
-    description: undefined,
-  },
-)
+import { useId } from 'vue'
+
+/**
+ * DsFormSection — секция формы с заголовком, опциональным описанием и контентом.
+ *
+ * - `section` связан с заголовком через `aria-labelledby` и c описанием
+ *   (если есть) через `aria-describedby` — для a11y.
+ */
+export interface DsFormSectionProps {
+  title: string
+  description?: string
+}
+
+withDefaults(defineProps<DsFormSectionProps>(), {
+  description: undefined,
+})
+
+const titleId = useId()
+const descriptionId = useId()
 </script>
 
 <template>
-  <section class="grid gap-4">
+  <section
+    data-ds-form-section
+    class="grid gap-4"
+    :aria-labelledby="titleId"
+    :aria-describedby="description ? descriptionId : undefined"
+  >
     <div>
-      <div class="text-[14px] font-700">
-        {{ props.title }}
+      <div :id="titleId" class="text-[14px] font-700">
+        {{ title }}
       </div>
-      <div v-if="props.description" class="mt-1 text-[13px] ds-muted">
-        {{ props.description }}
+      <div
+        v-if="description"
+        :id="descriptionId"
+        class="mt-1 text-[13px] text-[var(--muted-fg)]"
+      >
+        {{ description }}
       </div>
     </div>
     <slot />

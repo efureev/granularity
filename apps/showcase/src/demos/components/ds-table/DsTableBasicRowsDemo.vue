@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import type {DsBadgeTone} from '@feugene/granularity'
 import {DsBadge, DsTable} from '@feugene/granularity'
-
-const rows = [
+interface TableRow {
+  campaign: string
+  owner: string
+  status: string
+  tag: DsBadgeTone
+  reach: string
+}
+const rows: TableRow[] = [
   {campaign: 'Spring onboarding', owner: 'Olivia', status: 'Ready', tag: 'success', reach: '18.2k'},
   {campaign: 'Card migration', owner: 'Maksim', status: 'Review', tag: 'info', reach: '9.7k'},
   {campaign: 'Payout reminder', owner: 'Anna', status: 'Paused', tag: 'warning', reach: '6.3k'},

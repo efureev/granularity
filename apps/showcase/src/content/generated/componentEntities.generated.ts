@@ -1,6 +1,4 @@
-import {
-  granularityComponentConfigs,
-} from '../../../../../packages/granularity/src/registry/components.ts'
+import { granularityComponentConfigs } from '@feugene/granularity/granular-provider'
 import generatedComponentApiMetadata from './componentApi.generated.json'
 
 import type {
@@ -79,7 +77,7 @@ function mergeApiSections(
 }
 
 export const generatedComponentEntities: ShowcaseEntityRegistryItem[] = Object.values(granularityComponentConfigs)
-  .map(config => ({
+  .map((config): ShowcaseEntityRegistryItem => ({
     id: `component:${config.name}`,
     kind: 'component',
     name: config.name,
@@ -89,11 +87,19 @@ export const generatedComponentEntities: ShowcaseEntityRegistryItem[] = Object.v
     summary: `Публичный компонент ${config.name} из registry пакета.`,
     tags: ['generated', 'public-api'],
     source: {
-      packagePath: 'packages/granularity/src/registry/components.ts',
+      packagePath: 'packages/granularity/src/granular-provider/shared.ts',
       exportPath: `@feugene/granularity/components/${config.name}`,
     },
-    dependencies: [...config.dependencies],
+    dependencies: (config.dependencies ?? []).flatMap((dep): string[] => {
+      if (typeof dep === 'string')
+        return [dep]
+      if (dep && typeof dep === 'object' && 'components' in dep && Array.isArray(dep.components)) {
+        const provider = 'provider' in dep && typeof dep.provider === 'string' ? dep.provider : ''
+        return dep.components.map(component => provider ? `${provider}/${component}` : String(component))
+      }
+      return []
+    }),
     examples: [],
-    apiSections: mergeApiSections(config.name, generatedComponentApiMetadata[config.name]?.sections as ShowcaseApiSectionMeta[] | undefined),
+    apiSections: mergeApiSections(config.name, (generatedComponentApiMetadata as Record<string, { sections?: ShowcaseApiSectionMeta[] } | undefined>)[config.name]?.sections),
   }))
   .sort((left, right) => left.name.localeCompare(right.name))

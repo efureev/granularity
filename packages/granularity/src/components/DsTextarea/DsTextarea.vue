@@ -1,9 +1,13 @@
 <script setup lang="ts">
+/**
+ * DsTextarea — многострочное поле ввода DS-примитива.
+ *
+ * Состояния:
+ * - `state`: визуальный оттенок рамки (`default | success | warning | danger`).
+ * - `invalid`: форсирует `danger`-состояние и проставляет `aria-invalid="true"`.
+ */
 import { computed } from 'vue'
-
-export type { DsTextareaState } from './dsTextareaStyles'
-
-import { dsTextareaClass, type DsTextareaState } from './dsTextareaStyles'
+import { type DsTextareaState, dsTextareaClass } from './dsTextareaStyles'
 
 const props = withDefaults(defineProps<{
   modelValue: string
@@ -30,12 +34,12 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const className = computed(() => {
-  return dsTextareaClass({
-    state: props.state,
-    invalid: props.invalid,
-  })
-})
+export type DsTextareaProps = typeof props
+
+const className = computed(() => dsTextareaClass({
+  state: props.state,
+  invalid: props.invalid,
+}))
 
 function onInput(e: Event): void {
   emit('update:modelValue', (e.target as HTMLTextAreaElement).value)
@@ -44,14 +48,15 @@ function onInput(e: Event): void {
 
 <template>
   <textarea
-    :id="props.id"
-    :name="props.name"
-    :rows="props.rows"
-    :autocomplete="props.autocomplete"
-    :placeholder="props.placeholder"
-    :disabled="props.disabled"
-    :value="props.modelValue"
-    :aria-invalid="props.invalid ? 'true' : undefined"
+    :id="id"
+    data-ds-textarea
+    :name="name"
+    :rows="rows"
+    :autocomplete="autocomplete"
+    :placeholder="placeholder"
+    :disabled="disabled"
+    :value="modelValue"
+    :aria-invalid="invalid ? 'true' : undefined"
     class="w-full rounded-md border bg-[var(--bg)] px-3 py-2 text-[14px] text-[var(--fg)] placeholder:text-[var(--muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
     :class="className"
     @input="onInput"

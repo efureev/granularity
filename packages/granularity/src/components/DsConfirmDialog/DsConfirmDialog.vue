@@ -1,4 +1,14 @@
 <script setup lang="ts">
+/**
+ * DsConfirmDialog — DS-примитив диалога подтверждения поверх `DsDialog`.
+ *
+ * Синхронизирован с `DsDialog`/`DsPromptDialog` по набору проп-проксирования:
+ * `size`, `closeOnBackdrop`, `closeOnEsc`, `showHeader`, `showCloseButton`,
+ * `headerConfig`, `footerConfig`, `bodyConfig`, `closeLabel`.
+ *
+ * Клик по «Confirm»/«Cancel» эмитит одноимённое событие и закрывает диалог
+ * через `update:modelValue`.
+ */
 import { computed } from 'vue'
 
 import DsButton from '../DsButton/DsButton.vue'
@@ -6,39 +16,45 @@ import DsDialog from '../DsDialog/DsDialog.vue'
 import type { DsButtonSize, DsButtonTone, DsButtonVariant } from '../DsButton'
 import type { DsDialogSectionConfig, DsDialogSize } from '../DsDialog'
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: boolean
-    title?: string
-    description?: string
-    closeOnBackdrop?: boolean
-    size?: DsDialogSize
-    headerConfig?: DsDialogSectionConfig
-    footerConfig?: DsDialogSectionConfig
-    buttonSize?: DsButtonSize
-    confirmText?: string
-    cancelText?: string
-    confirmVariant?: DsButtonVariant
-    confirmTone?: DsButtonTone
-  }>(),
-  {
-    title: undefined,
-    description: undefined,
-    closeOnBackdrop: true,
-    size: 'md',
-    headerConfig: undefined,
-    footerConfig: undefined,
-    buttonSize: undefined,
-    confirmText: undefined,
-    cancelText: undefined,
-    confirmVariant: 'primary',
-    confirmTone: 'primary',
-  },
-)
+export interface DsConfirmDialogProps {
+  modelValue: boolean
+  title?: string
+  description?: string
+  closeOnBackdrop?: boolean
+  closeOnEsc?: boolean
+  showHeader?: boolean
+  showCloseButton?: boolean
+  size?: DsDialogSize
+  headerConfig?: DsDialogSectionConfig
+  footerConfig?: DsDialogSectionConfig
+  bodyConfig?: DsDialogSectionConfig
+  /** A11y-лейбл кнопки закрытия (i18n). */
+  closeLabel?: string
+  buttonSize?: DsButtonSize
+  confirmText?: string
+  cancelText?: string
+  confirmVariant?: DsButtonVariant
+  confirmTone?: DsButtonTone
+}
 
-const titleText = computed(() => props.title ?? 'Confirm')
-const confirmText = computed(() => props.confirmText ?? 'Confirm')
-const cancelText = computed(() => props.cancelText ?? 'Cancel')
+const props = withDefaults(defineProps<DsConfirmDialogProps>(), {
+  title: 'Confirm',
+  description: undefined,
+  closeOnBackdrop: true,
+  closeOnEsc: true,
+  showHeader: true,
+  showCloseButton: true,
+  size: 'md',
+  headerConfig: undefined,
+  footerConfig: undefined,
+  bodyConfig: undefined,
+  closeLabel: 'Close',
+  buttonSize: undefined,
+  confirmText: 'Confirm',
+  cancelText: 'Cancel',
+  confirmVariant: 'primary',
+  confirmTone: 'primary',
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -65,29 +81,34 @@ function onConfirm(): void {
 <template>
   <DsDialog
     v-model="open"
-    :title="titleText"
-    :size="props.size"
-    :close-on-backdrop="props.closeOnBackdrop"
-    :header-config="props.headerConfig"
-    :footer-config="props.footerConfig"
+    :title="title"
+    :size="size"
+    :close-on-backdrop="closeOnBackdrop"
+    :close-on-esc="closeOnEsc"
+    :show-header="showHeader"
+    :show-close-button="showCloseButton"
+    :header-config="headerConfig"
+    :footer-config="footerConfig"
+    :body-config="bodyConfig"
+    :close-label="closeLabel"
   >
     <slot>
-      <div v-if="props.description" class="text-[14px] text-[var(--muted-fg)]">
-        {{ props.description }}
+      <div v-if="description" class="text-[14px] text-[var(--muted-fg)]">
+        {{ description }}
       </div>
     </slot>
 
     <template #footer>
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
-          <DsButton data-testid="ds-confirm-cancel" variant="outline" :size="props.buttonSize" @click="onCancel">
+          <DsButton data-testid="ds-confirm-cancel" variant="outline" :size="buttonSize" @click="onCancel">
             {{ cancelText }}
           </DsButton>
           <DsButton
             data-testid="ds-confirm-confirm"
-            :variant="props.confirmVariant"
-            :tone="props.confirmTone"
-            :size="props.buttonSize"
+            :variant="confirmVariant"
+            :tone="confirmTone"
+            :size="buttonSize"
             @click="onConfirm"
           >
             {{ confirmText }}

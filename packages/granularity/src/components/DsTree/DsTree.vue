@@ -40,6 +40,9 @@ const props = withDefaults(defineProps<DsTreeProps<T>>(), {
   branchLineActiveColor: undefined,
   draggable: false,
   dragHandleIcon: 'i-lucide-grip-vertical',
+  dragLabel: 'Drag',
+  expandLabel: 'Expand',
+  collapseLabel: 'Collapse',
   rowClass: undefined,
   dragHandleClass: undefined,
   toggleClass: undefined,
@@ -287,17 +290,20 @@ defineExpose<DsTreeInstance<T>>({
 
 <template>
   <div
+      :data-ds-tree="props.internalNested ? undefined : ''"
       :class="props.internalNested ? 'ds-tree__children' : 'ds-tree'"
       :role="props.internalNested ? 'group' : 'tree'"
   >
     <div
         v-for="row in visibleRows"
         :key="row.node.key"
+        data-ds-tree-node
         role="treeitem"
         :aria-level="row.node.level"
         :aria-expanded="row.isLeaf ? undefined : row.isExpanded"
     >
       <div
+          data-ds-tree-row
           class="ds-tree__row py-2 px-2"
           :class="[
           treeProps.highlightCurrent && currentKey === row.node.key ? 'ds-tree__row--current' : '',
@@ -317,13 +323,14 @@ defineExpose<DsTreeInstance<T>>({
         <button
             v-if="treeProps.draggable"
             type="button"
+            data-ds-tree-drag-handle
             class="ds-tree__drag-handle"
             :class="[
             shouldShowDragHandle(row.node) ? 'ds-tree__drag-handle--visible' : '',
             canDrag(row.node) ? '' : 'ds-tree__drag-handle--disabled',
             resolveNodeClass(treeProps.dragHandleClass, row),
           ]"
-            aria-label="Drag"
+            :aria-label="treeProps.dragLabel"
             :draggable="canDrag(row.node)"
             @click.stop
             @mousedown.stop
@@ -335,10 +342,11 @@ defineExpose<DsTreeInstance<T>>({
 
         <button
             v-if="!row.isLeaf"
+            data-ds-tree-toggle
             type="button"
             class="ds-tree__toggle"
             :class="resolveNodeClass(treeProps.toggleClass, row)"
-            :aria-label="row.isExpanded ? 'Collapse' : 'Expand'"
+            :aria-label="row.isExpanded ? treeProps.collapseLabel : treeProps.expandLabel"
             @click.stop="toggleExpand(row.node)"
         >
           <span

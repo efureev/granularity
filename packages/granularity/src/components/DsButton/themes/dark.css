@@ -1,0 +1,39 @@
+
+.theme-dark,
+.dark,
+[data-theme='dark'] {
+  --ds-button-primary-bg: #595ce6;
+  --ds-button-primary-bg-hover: #5053dd;
+  --ds-button-primary-bg-active: #474acf;
+  --ds-button-primary-fg: #ffffff;
+
+  --ds-button-success-bg: #047857;
+  --ds-button-success-bg-hover: #036c4d;
+  --ds-button-success-bg-active: #025f44;
+  --ds-button-success-fg: #f8fafc;
+
+  --ds-button-warning-bg: #c2410c;
+  --ds-button-warning-bg-hover: #b53b0a;
+  --ds-button-warning-bg-active: #9f3307;
+  --ds-button-warning-fg: #f8fafc;
+
+  --ds-button-danger-bg: #b91c1c;
+  --ds-button-danger-bg-hover: #a91919;
+  --ds-button-danger-bg-active: #931515;
+  --ds-button-danger-fg: #f8fafc;
+
+  --ds-button-info-bg: #4338ca;
+  --ds-button-info-bg-hover: #3d33bb;
+  --ds-button-info-bg-active: #362da8;
+  --ds-button-info-fg: #f8fafc;
+
+  --ds-button-slate-bg: #475569;
+  --ds-button-slate-bg-hover: #334155;
+  --ds-button-slate-bg-active: #1e293b;
+  --ds-button-slate-fg: #f8fafc;
+
+  --ds-button-azure-bg: #0369a1;
+  --ds-button-azure-bg-hover: #075985;
+  --ds-button-azure-bg-active: #0c4a6e;
+  --ds-button-azure-fg: #f8fafc;
+}

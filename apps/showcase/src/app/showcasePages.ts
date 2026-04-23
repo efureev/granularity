@@ -173,11 +173,11 @@ export const showcasePages: ShowcasePage[] = [
       {
         id: 'installation',
         title: 'Installation paths',
-        description: 'Карта стартовых интеграционных path-ов: root import, granular imports и `UnoCSS` preset.',
+        description: 'Прогрессия подключения `presetGranularity` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.',
         bullets: [
-          'Quick-start snippets встроены прямо в foundations page.',
+          'Quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularContent`.',
           'Narrative guidance подключена из `packages/granularity/docs/installation.md`.',
-          'Один экран сразу объясняет, когда нужен root API, granular import или `uno-node`.',
+          'Один экран последовательно показывает, как наращивать опции `components`, `themes`, `layer` и `granularContent`.',
         ],
       },
       {
@@ -195,7 +195,7 @@ export const showcasePages: ShowcasePage[] = [
         title: 'UnoCSS and localization',
         description: 'Закрывает production preset path и i18n-контракт пакета для хост-приложения.',
         bullets: [
-          'Объяснена разница между `@feugene/granularity/uno-node` и `@feugene/granularity/uno`.',
+          '`presetGranularNode` из `@feugene/unocss-preset-granular/node` — единственный поддерживаемый способ подключения.',
           'Подключён narrative doc по localization с package-level i18n entrypoint.',
           'Foundations теперь служит реальной onboarding-базой, а не placeholder-секцией.',
         ],
@@ -219,7 +219,7 @@ export const showcasePages: ShowcasePage[] = [
           '`createGranularity({ components, directives, provides, globalProperties })` отдаёт стандартный Vue-plugin для `app.use(...)`.',
           'Поддерживает три формы компонентов: чистый SFC, объект с `install`, явное `{ name, component }`.',
           'Основной сценарий — директивы, `provide`, `globalProperties`, SSR/Nuxt-плагины и окружения без сборщика.',
-          'Демо: `apps/playground-7` с `DsButton`, `DsInput` и `v-hotkey`.',
+          'Типовые случаи: глобальные директивы (`v-hotkey`, `v-autofocus`), `provide` для i18n/theme, `globalProperties` для Options API.',
         ],
       },
       {
@@ -230,7 +230,7 @@ export const showcasePages: ShowcasePage[] = [
           'Пишете `<DsButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.',
           'Опции: `prefix`, `importStyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist.',
           'Рекомендуется для prod-приложений: идеальный tree-shaking и отсутствие ручных `import`-ов.',
-          'Демо: `apps/playground-8` и `apps/playground-9` (резолвер вместе с UnoCSS preset и композитами).',
+          'Типичный сценарий: резолвер вместе с `presetGranularNode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах.',
         ],
       },
       {
@@ -241,7 +241,7 @@ export const showcasePages: ShowcasePage[] = [
           '`@feugene/unplugin-granularity` — build-time, охватывает только то, что реально стоит в `<template>`.',
           '`@feugene/granularity/vue` — runtime, охватывает всё остальное: директивы в `render()`/JSX, i18n/theme через `provide`, Options API через `globalProperties`.',
           'SSR / тесты / окружения без `unplugin-vue-components` — только через `createGranularity`.',
-          'Прямой sub-path import остаётся самым гранулярным вариантом: `@feugene/granularity/components/<Name>`.',
+          'Установка CSS-части пакета делается исключительно через `presetGranularNode` — см. раздел Foundations / Installation paths.',
         ],
       },
     ],
@@ -260,7 +260,7 @@ export const showcasePages: ShowcasePage[] = [
         title: 'Component catalog',
         description: 'Здесь будет index-страница со всеми публичными компонентами и быстрой группировкой по категориям.',
         bullets: [
-          `Источник правды — \`packages/granularity/src/registry/components.ts\` с текущим покрытием в ${showcaseComponentEntities.length} компонентных сущностей.`,
+          `Источник правды — \`packages/granularity/src/granular-provider/shared.ts\` с текущим покрытием в ${showcaseComponentEntities.length} компонентных сущностей.`,
           'Навигация по компонентам должна быть мгновенной и search-friendly.',
           'Каждый компонент получит отдельный route и собственную страницу.',
         ],

@@ -11,7 +11,7 @@ const remaining = computed(() => 4 - skills.value.length)
   <div class="grid gap-4">
     <div class="flex flex-wrap gap-2">
       <DsBadge tone="neutral" radius="round">{{ skills.length }}/4 selected</DsBadge>
-      <DsBadge tone="secondary" radius="round">{{ remaining }} slots left</DsBadge>
+      <DsBadge tone="neutral" radius="round">{{ remaining }} slots left</DsBadge>
     </div>
 
     <DsInputTag

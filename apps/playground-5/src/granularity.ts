@@ -1,3 +1,3 @@
-import 'virtual:uno:granularity.css'
+import 'virtual:uno:granular.css'
 
 export {}

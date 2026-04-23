@@ -1,8 +1,6 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-import { dsCheckboxSafelist } from './safelist'
-
-export const dsCheckboxConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsCheckbox',
-  safelist: dsCheckboxSafelist,
+export const dsCheckboxConfig = defineGranularComponent(import.meta.url, {
+    name: 'DsCheckbox',
+    safelist: [],
 })

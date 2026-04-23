@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import IconClose from '~icons/lucide/x'
-
 import DsBadge from '../DsBadge/DsBadge.vue'
 import type { DsBadgeRadius, DsBadgeSize, DsBadgeTone } from '../DsBadge'
-export type { DsInputTagSize, DsInputTagState } from './dsInputTagStyles'
+import DsIcon from '../DsIcon/DsIcon.vue'
+import IconClose from '~icons/lucide/x'
 
 import {
   dsInputTagInputClass,
@@ -14,29 +13,40 @@ import {
   type DsInputTagState,
 } from './dsInputTagStyles'
 
+export type { DsInputTagSize, DsInputTagState } from './dsInputTagStyles'
+
 const REGEX_SPECIAL_CHAR_RE = /[.*+?^${}()|[\]\\]/g
 
+/**
+ * Props for {@link DsInputTag}.
+ * Tag-input primitive: renders a set of badges with an inline `<input>` for entering new tags.
+ * Splits input by configurable `separators`, supports paste, Enter and Backspace editing.
+ */
+export interface DsInputTagProps {
+  modelValue: string[]
+  placeholder?: string
+  disabled?: boolean
+  readonly?: boolean
+  invalid?: boolean
+  state?: DsInputTagState
+  size?: DsInputTagSize
+  separators?: string[]
+  allowDuplicates?: boolean
+  trim?: boolean
+  max?: number
+  addOnBlur?: boolean
+  clearInputOnAdd?: boolean
+  tagTone?: DsBadgeTone
+  tagDark?: boolean
+  tagSize?: DsBadgeSize
+  tagRadius?: DsBadgeRadius
+  tagClosable?: boolean
+  /** i18n-friendly aria-label for the per-tag remove button. */
+  removeTagLabel?: string
+}
+
 const props = withDefaults(
-  defineProps<{
-    modelValue: string[]
-    placeholder?: string
-    disabled?: boolean
-    readonly?: boolean
-    invalid?: boolean
-    state?: DsInputTagState
-    size?: DsInputTagSize
-    separators?: string[]
-    allowDuplicates?: boolean
-    trim?: boolean
-    max?: number
-    addOnBlur?: boolean
-    clearInputOnAdd?: boolean
-    tagTone?: DsBadgeTone
-    tagDark?: boolean
-    tagSize?: DsBadgeSize
-    tagRadius?: DsBadgeRadius
-    tagClosable?: boolean
-  }>(),
+  defineProps<DsInputTagProps>(),
   {
     placeholder: undefined,
     disabled: false,
@@ -55,6 +65,7 @@ const props = withDefaults(
     tagSize: 'md',
     tagRadius: 'round',
     tagClosable: true,
+    removeTagLabel: 'Remove tag',
   },
 )
 
@@ -221,19 +232,21 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
 
 <template>
   <div
+    data-ds-input-tag
     data-testid="ds-input-tag"
     class="w-full flex flex-wrap items-center rounded-md border bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
     :class="wrapperClassName"
     @click="focus"
   >
     <DsBadge
-      v-for="(tag, i) in props.modelValue"
+      v-for="(tag, i) in modelValue"
       :key="`${tag}-${i}`"
-      :tone="props.tagTone"
-      :dark="props.tagDark"
-      :size="props.tagSize"
-      :radius="props.tagRadius"
+      :tone="tagTone"
+      :dark="tagDark"
+      :size="tagSize"
+      :radius="tagRadius"
       class="gap-1"
+      data-ds-input-tag-item
       data-testid="ds-input-tag-item"
       :data-index="i"
     >
@@ -245,24 +258,28 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
         v-if="showRemove"
         type="button"
         class="-mr-0.5 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-        aria-label="Remove tag"
+        :aria-label="removeTagLabel"
+        data-ds-input-tag-remove
         data-testid="ds-input-tag-remove"
         :data-index="i"
         @mousedown.prevent.stop
         @click.stop="removeAt(i)"
       >
-        <IconClose class="h-3.5 w-3.5" aria-hidden="true" />
+        <DsIcon size="sm" aria-hidden="true">
+          <IconClose />
+        </DsIcon>
       </button>
     </DsBadge>
 
     <input
       ref="inputEl"
+      data-ds-input-tag-input
       data-testid="ds-input-tag-input"
       :value="inputValue"
-      :disabled="props.disabled || isMaxed"
-      :readonly="props.readonly"
+      :disabled="disabled || isMaxed"
+      :readonly="readonly"
       :placeholder="placeholderText"
-      :aria-invalid="props.invalid ? 'true' : undefined"
+      :aria-invalid="invalid ? 'true' : undefined"
       class="flex-1 min-w-[120px] bg-transparent border-none outline-none placeholder:text-[var(--muted-fg)]"
       :class="inputClassName"
       @input="onInput"

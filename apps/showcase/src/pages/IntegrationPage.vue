@@ -4,19 +4,21 @@ import { computed } from 'vue'
 import { DsBadge, DsCard } from '@feugene/granularity'
 
 import CodeBlock from '../components/doc/CodeBlock.vue'
+import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 
 const { localizePageByName } = useShowcasePageI18n()
 const page = computed(() => localizePageByName('integration'))
 
+// Note: `.vue` specifiers are split via interpolation so Vite/rolldown's
+// dependency scanner does not treat these documentation snippets as real imports.
+const appVueSpecifier = `.${'/App.vue'}`
 const vuePluginCode = `import { createApp } from 'vue'
+import { DsButton, DsInput } from '@feugene/granularity'
 import { createGranularity } from '@feugene/granularity/vue'
-
-import { DsButton } from '@feugene/granularity/components/DsButton'
-import { DsInput } from '@feugene/granularity/components/DsInput'
 import { vHotkey } from '@feugene/granularity/directives'
 
-import App from './App.vue'
+import App from '${appVueSpecifier}'
 
 createApp(App)
   .use(createGranularity({
@@ -51,9 +53,6 @@ const unpluginTemplateCode = `<template>
   <DsButton @click="submit">Go</DsButton>
 </template>`
 
-const directSubpathCode = `import { DsButton } from '@feugene/granularity/components/DsButton'
-import { DsInput } from '@feugene/granularity/components/DsInput'`
-
 const sectionCodeSamples: Record<string, Array<{ code: string, language: string, title?: string }>> = {
   'vue-plugin': [
     {
@@ -74,35 +73,21 @@ const sectionCodeSamples: Record<string, Array<{ code: string, language: string,
       title: 'App.vue',
     },
   ],
-  'when-to-use': [
-    {
-      code: directSubpathCode,
-      language: 'ts',
-      title: 'Прямой subpath-импорт',
-    },
-  ],
 }
 </script>
 
 <template>
   <div class="space-y-8">
-    <DsCard class="showcase-panel rounded-3xl border p-8">
-      <div class="space-y-4">
-        <p class="showcase-text-muted text-xs uppercase tracking-[0.18em]">
-          {{ page.eyebrow }}
-        </p>
-        <h1 class="max-w-4xl text-2xl font-semibold leading-tight lg:text-3xl">
-          {{ page.title }}
-        </h1>
-        <p class="showcase-text-muted max-w-3xl text-base leading-7">
-          {{ page.description }}
-        </p>
-        <div class="flex flex-wrap gap-2 pt-2">
-          <DsBadge>@feugene/granularity/vue</DsBadge>
-          <DsBadge>@feugene/unplugin-granularity</DsBadge>
-        </div>
-      </div>
-    </DsCard>
+    <ShowcasePageHero
+      :eyebrow="page.eyebrow"
+      :title="page.title"
+      :description="page.description"
+    >
+      <template #actions>
+        <DsBadge>@feugene/granularity/vue</DsBadge>
+        <DsBadge>@feugene/unplugin-granularity</DsBadge>
+      </template>
+    </ShowcasePageHero>
 
     <section
       v-for="section in page.sections"

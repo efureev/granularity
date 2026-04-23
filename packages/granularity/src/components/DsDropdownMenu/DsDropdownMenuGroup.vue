@@ -4,20 +4,19 @@ import { computed } from 'vue'
 import DsDropdownMenuHeader from './DsDropdownMenuHeader.vue'
 import type { DsDropdownMenuHeaderAlign } from './DsDropdownMenuHeader.vue'
 
-const props = withDefaults(
-  defineProps<{
-    title?: string
-    titleAlign?: DsDropdownMenuHeaderAlign
-    dividers?: boolean
-    uppercase?: boolean
-  }>(),
-  {
-    title: undefined,
-    titleAlign: 'left',
-    dividers: false,
-    uppercase: true,
-  },
-)
+export interface DsDropdownMenuGroupProps {
+  title?: string
+  titleAlign?: DsDropdownMenuHeaderAlign
+  dividers?: boolean
+  uppercase?: boolean
+}
+
+const props = withDefaults(defineProps<DsDropdownMenuGroupProps>(), {
+  title: undefined,
+  titleAlign: 'left',
+  dividers: false,
+  uppercase: true,
+})
 
 const itemsClass = computed(() => {
   return [
@@ -28,14 +27,13 @@ const itemsClass = computed(() => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div data-ds-dropdown-menu-group class="w-full">
     <DsDropdownMenuHeader
-      v-if="props.title"
-      :title="props.title"
-      :align="props.titleAlign"
-      :uppercase="props.uppercase"
+      v-if="title"
+      :title="title"
+      :align="titleAlign"
+      :uppercase="uppercase"
     />
-
     <div :class="itemsClass">
       <slot />
     </div>

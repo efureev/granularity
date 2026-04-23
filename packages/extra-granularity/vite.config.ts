@@ -1,21 +1,26 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
 /**
- * Lightweight ESM build for composite components on top of `@feugene/granularity`.
+ * Build-конфиг пакета `@feugene/extra-granularity`.
  *
- * — `vue`, `@feugene/granularity` and its sub-path exports stay external
- *   (peer dependencies), so this package carries no duplicated runtime;
- * — each component ships with its own entry + adjacent `styles.css`, so the
- *   consumer can tree-shake and import only what they really use;
- * — declarations are emitted by `vue-tsc -p tsconfig.build.json`.
+ * — `vue`, `@feugene/granularity` и `@feugene/unocss-preset-granular`
+ *   остаются external (peer-зависимости), пакет не дублирует их рантайм;
+ * — каждый компонент публикуется как отдельный `components/<Name>/index` entry
+ *   для tree‑shake; SFC‑чанки складываются в `components/<Name>/chunks/`
+ *   через `granularChunkFileNames`, чтобы UnoCSS в приложении мог корректно
+ *   сканировать шаблоны через `content.filesystem` пресета `presetGranularNode`;
+ * — деклараций `.d.ts` эмитит `vue-tsc -p tsconfig.build.json`.
  */
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), libInjectCss()],
   build: {
     target: 'esnext',
     minify: 'oxc',
+    cssCodeSplit: true,
     reportCompressedSize: true,
     emptyOutDir: true,
     lib: {
@@ -23,6 +28,12 @@ export default defineConfig({
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         'components/XgQuickForm/index': fileURLToPath(
           new URL('./src/components/XgQuickForm/index.ts', import.meta.url),
+        ),
+        'granular-provider': fileURLToPath(
+          new URL('./src/granular-provider/index.ts', import.meta.url),
+        ),
+        'granular-provider-node': fileURLToPath(
+          new URL('./src/granular-provider/node.ts', import.meta.url),
         ),
       },
       formats: ['es'],
@@ -33,17 +44,11 @@ export default defineConfig({
         /^node:/,
         'vue',
         /^@feugene\/granularity(\/.*)?$/,
+        /^@feugene\/unocss-preset-granular(\/.*)?$/,
       ],
       output: {
-        chunkFileNames: 'chunks/[name]-[hash].js',
-        assetFileNames: (assetInfo) => {
-          // Vite names the combined library CSS after the package ("extra-granularity.css").
-          // Rename it to match the package.json export `./components/XgQuickForm/styles.css`.
-          if (assetInfo.name?.endsWith('.css'))
-            return 'components/XgQuickForm/styles.css'
-
-          return assetInfo.name ?? '[name][extname]'
-        },
+        chunkFileNames: granularChunkFileNames(),
+        assetFileNames: assetInfo => assetInfo.name ?? '[name][extname]',
       },
     },
   },

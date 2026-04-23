@@ -5,6 +5,7 @@ export type {
   DsSelectModelValue,
   DsSelectOption,
   DsSelectOptionsView,
+  DsSelectProps,
   DsSelectSize,
   DsSelectUnderline,
   DsSelectVariant,

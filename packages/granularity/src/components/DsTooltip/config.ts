@@ -1,8 +1,7 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
-import { dsTooltipSafelist } from './safelist'
-
-export const dsTooltipConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsTooltip',
-  safelist: dsTooltipSafelist,
+export const dsTooltipConfig = defineGranularComponent(import.meta.url, {
+    name: 'DsTooltip',
+    dependencies: ['DsIcon'],
+    safelist: [],
 })

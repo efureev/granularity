@@ -1,14 +1,24 @@
 import {
     dsButtonBaseClass,
     dsButtonClass,
-    dsButtonSafelist,
     type DsButtonSize,
     type DsButtonTone,
     type DsButtonVariant,
 } from '../DsButton/dsButtonStyles'
-import {splitClassTokens} from '../shared/classTokens'
 
 export type DsRadioVariant = 'radiobox' | 'button'
+
+export const dsRadioDisabledClass = 'opacity-50 cursor-not-allowed'
+export const dsRadioEnabledClass = 'cursor-pointer'
+export const dsRadioRootDisabledClass = 'cursor-not-allowed opacity-70'
+export const dsRadioRootEnabledClass = 'cursor-pointer'
+export const dsRadioControlCheckedClass = 'border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_10%,var(--bg))]'
+export const dsRadioControlUncheckedClass = 'border-[var(--brd)] bg-[var(--bg)]'
+export const dsRadioDotCheckedClass = 'bg-[var(--primary)] opacity-100 scale-100'
+export const dsRadioDotUncheckedClass = 'bg-transparent opacity-0 scale-75'
+// Базовые классы «точки» внутри radiobox — нестандартные (`h-[6px]`, `w-[6px]`, произвольный transition).
+// Вынесены сюда, чтобы `safelist` мог гарантировать их присутствие в сборке даже при tree-shaking шаблона.
+export const dsRadioDotBaseClass = 'h-[6px] w-[6px] rounded-full transition-[transform,opacity,background-color] duration-150'
 
 export function dsRadioButtonClass(options: {
     checked: boolean
@@ -30,34 +40,18 @@ export function dsRadioButtonClass(options: {
             size: options.size,
             square: false,
         }),
-        options.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        options.disabled ? dsRadioDisabledClass : dsRadioEnabledClass,
     ].join(' ')
 }
 
 export function dsRadioRootClass(disabled: boolean): string {
-    return disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+    return disabled ? dsRadioRootDisabledClass : dsRadioRootEnabledClass
 }
 
 export function dsRadioControlClass(checked: boolean): string {
-    return checked
-        ? 'border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_10%,var(--bg))]'
-        : 'border-[var(--brd)] bg-[var(--bg)]'
+    return checked ? dsRadioControlCheckedClass : dsRadioControlUncheckedClass
 }
-
-export const dsRadioDotBaseClass = 'h-[6px] w-[6px] rounded-full transition-[transform,opacity,background-color] duration-150'
 
 export function dsRadioDotClass(checked: boolean): string {
-    return checked
-        ? 'bg-[var(--primary)] opacity-100 scale-100'
-        : 'bg-transparent opacity-0 scale-75'
+    return checked ? dsRadioDotCheckedClass : dsRadioDotUncheckedClass
 }
-
-export const dsRadioSafelist = [...new Set([
-    ...dsButtonSafelist,
-    ...splitClassTokens('opacity-50 cursor-not-allowed cursor-pointer opacity-70'),
-    ...splitClassTokens('border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_10%,var(--bg))]'),
-    ...splitClassTokens('border-[var(--brd)] bg-[var(--bg)]'),
-    ...splitClassTokens(dsRadioDotBaseClass),
-    ...splitClassTokens('bg-[var(--primary)] opacity-100 scale-100'),
-    ...splitClassTokens('bg-transparent opacity-0 scale-75'),
-])]

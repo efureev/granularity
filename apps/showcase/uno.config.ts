@@ -7,23 +7,66 @@ import {
     transformerVariantGroup,
 } from 'unocss'
 
-import {presetGranularityNode} from '@feugene/granularity/uno-node'
+import { granularContent, type PresetGranularNodeOptions } from '@feugene/unocss-preset-granular/node'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import granularityProvider from '@feugene/granularity/granular-provider/node'
+import {
+    animationPreflights,
+    animationRules,
+    colorOpacityRules,
+    filterRules,
+    spacingRules,
+    spacingVariants,
+} from '@feugene/unocss-mini-extra-rules'
 
-export const showcaseContentIncludes = [
-    /apps\/showcase\/src\/.*\.(vue|ts)($|\?)/,
+export const showcaseGranularOptions: PresetGranularNodeOptions = {
+    providers: [granularityProvider],
+    components: 'all',
+    themes: {names: ['light', 'dark']},
+    layer: 'granular' as const,
+}
+
+const granularContentConfig = granularContent(showcaseGranularOptions)
+
+// Дополнительно к include, которые готовит `granularContent()` для dist-чанков
+// выбранных granular-компонентов, явно разрешаем сканировать исходники showcase.
+// ВАЖНО: include'ы из `granularContentConfig` необходимо СОХРАНЯТЬ, иначе
+// extractor перестаёт видеть `.js`-чанки компонентов из `@feugene/granularity/dist/`
+// и уникальные утилиты вроде `px-1.5` пропадают из итогового CSS.
+export const showcaseContentIncludes: RegExp[] = [
+    /\/apps\/showcase\/src\/.*\.(?:vue|[jt]sx?|mdx?|html|css)$/,
 ]
 
 export default defineConfig({
     content: {
+        ...granularContentConfig,
         pipeline: {
-            include: showcaseContentIncludes,
+            ...(granularContentConfig.pipeline ?? {}),
+            include: [
+                ...(granularContentConfig.pipeline?.include ?? []),
+                ...showcaseContentIncludes,
+            ],
         },
     },
+    // Дополнительные правила поверх preset-mini из
+    // `@feugene/unocss-mini-extra-rules`: spinner-анимация, bracket‑color с
+    // `/NN` opacity, расширенные filter/backdrop‑filter утилиты и
+    // Tailwind‑совместимые `space-*` / `divide-*`.
+    rules: [
+        ...animationRules,
+        ...colorOpacityRules,
+        ...filterRules,
+        ...spacingRules,
+    ],
+    variants: [
+        ...spacingVariants,
+    ],
+    preflights: [
+        ...animationPreflights,
+    ],
     presets: [
         presetMini(),
-        presetGranularityNode({
-            themes: ['light', 'dark'],
-        }),
+        presetGranularNode(showcaseGranularOptions),
         presetAttributify(),
         presetIcons({
             scale: 1.05,

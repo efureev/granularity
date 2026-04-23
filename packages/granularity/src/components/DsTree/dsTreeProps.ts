@@ -55,6 +55,12 @@ export type DsTreeViewProps<T extends object> = {
   toggleIconClass?: DsTreeNodeClass<T>
   toggleSpacerClass?: DsTreeNodeClass<T>
   contentClass?: DsTreeNodeClass<T>
+  /** i18n-метка кнопки "Перетащить" (default: 'Drag'). */
+  dragLabel?: string
+  /** i18n-метка кнопки "Развернуть" (default: 'Expand'). */
+  expandLabel?: string
+  /** i18n-метка кнопки "Свернуть" (default: 'Collapse'). */
+  collapseLabel?: string
 }
 
 export type DsTreeInteractionProps<T extends object> = {

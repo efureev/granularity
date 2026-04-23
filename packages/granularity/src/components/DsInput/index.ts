@@ -3,4 +3,4 @@ export { default as DsInput } from './DsInput.vue'
 export { dsInputConfig } from './config'
 
 export type { DsInputSize, DsInputTextAlign } from './DsInput.vue'
-export { dsInputSafelist } from './dsInputStyles'
+export { dsInputSafelist } from './safelist'

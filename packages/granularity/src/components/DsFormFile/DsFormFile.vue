@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 
+import IconUpload from '~icons/lucide/upload'
+import IconX from '~icons/lucide/x'
+
 import DsButton from '../DsButton/DsButton.vue'
-import { vDropzone } from '../../directives/dropzone'
+import DsIcon from '../DsIcon/DsIcon.vue'
+import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
 
@@ -12,25 +16,30 @@ defineOptions({
 
 export type DsFormFileError = FileValidationIssue
 
+/**
+ * Пропы `DsFormFile` — форма-поле для выбора файлов с встроенной валидацией,
+ * drag&drop (через `v-dropzone`) и списком выбранных файлов.
+ *
+ * Все `*Text`/`placeholder` — i18n-friendly, принимают готовые строки локали.
+ */
+export interface DsFormFileProps {
+  modelValue: File | File[] | null
+  multiple?: boolean
+  disabled?: boolean
+  /** W3C `accept` для `<input type="file">` + sugar к `acceptValidator(...)`. */
+  accept?: string
+  validators?: FileValidator[]
+  uploadText?: string
+  changeText?: string
+  removeText?: string
+  clearAllText?: string
+  placeholder?: string
+  /** Дополнительная (кастомная) валидация на стороне потребителя. */
+  validate?: (files: File[]) => DsFormFileError[] | Promise<DsFormFileError[]>
+}
+
 const props = withDefaults(
-  defineProps<{
-    modelValue: File | File[] | null
-    multiple?: boolean
-    disabled?: boolean
-
-    /** W3C `accept` для `<input type="file">` + sugar к `acceptValidator(...)`. */
-    accept?: string
-    validators?: FileValidator[]
-
-    uploadText?: string
-    changeText?: string
-    removeText?: string
-    clearAllText?: string
-    placeholder?: string
-
-    /** Дополнительная (кастомная) валидация на стороне потребителя. */
-    validate?: (files: File[]) => DsFormFileError[] | Promise<DsFormFileError[]>
-  }>(),
+  defineProps<DsFormFileProps>(),
   {
     multiple: false,
     disabled: false,
@@ -229,7 +238,7 @@ watch(
     v-dropzone="dropzone"
     data-ds-form-file
     class="rounded-[var(--ds-radius-md)]"
-    :class="props.disabled ? 'opacity-60 cursor-not-allowed' : ''"
+    :class="disabled ? 'opacity-60 cursor-not-allowed' : ''"
   >
     <input
       ref="inputRef"
@@ -238,9 +247,9 @@ watch(
       tabindex="-1"
       aria-hidden="true"
       class="absolute opacity-0 w-px h-px pointer-events-none"
-      :multiple="props.multiple"
-      :accept="props.accept"
-      :disabled="props.disabled"
+      :multiple="multiple"
+      :accept="accept"
+      :disabled="disabled"
       @change="onInputChange"
     >
 
@@ -250,39 +259,45 @@ watch(
           variant="secondary"
           size="sm"
           data-ds-form-file-upload-btn
-          :disabled="props.disabled"
+          :disabled="disabled"
           @click.prevent="openDialog"
         >
-          <span class="i-lucide-upload" aria-hidden="true" />
-          <span class="ml-2">{{ hasFiles ? props.changeText : props.uploadText }}</span>
+          <DsIcon size="sm" aria-hidden="true">
+            <IconUpload />
+          </DsIcon>
+          <span class="ml-2">{{ hasFiles ? changeText : uploadText }}</span>
         </DsButton>
 
         <DsButton
-          v-if="hasFiles && !props.multiple"
+          v-if="hasFiles && !multiple"
           variant="secondary"
           size="sm"
           data-ds-form-file-clear-btn
-          :disabled="props.disabled"
+          :disabled="disabled"
           @click.prevent="clearAll"
         >
-          <span class="i-lucide-x" aria-hidden="true" />
-          <span class="ml-2">{{ props.removeText }}</span>
+          <DsIcon size="sm" aria-hidden="true">
+            <IconX />
+          </DsIcon>
+          <span class="ml-2">{{ removeText }}</span>
         </DsButton>
 
         <DsButton
-          v-if="props.multiple && hasFiles"
+          v-if="multiple && hasFiles"
           variant="secondary"
           size="sm"
           data-ds-form-file-clear-all-btn
-          :disabled="props.disabled"
+          :disabled="disabled"
           @click.prevent="clearAll"
         >
-          <span class="i-lucide-x" aria-hidden="true" />
-          <span class="ml-2">{{ props.clearAllText }}</span>
+          <DsIcon size="sm" aria-hidden="true">
+            <IconX />
+          </DsIcon>
+          <span class="ml-2">{{ clearAllText }}</span>
         </DsButton>
 
         <span
-          v-if="!props.multiple && hasFiles"
+          v-if="!multiple && hasFiles"
           class="text-sm text-[var(--muted-fg)] truncate max-w-[240px]"
           data-ds-form-file-single-name
           :title="files[0]?.name"
@@ -295,11 +310,11 @@ watch(
           class="text-sm text-[var(--muted-fg)]"
           data-ds-form-file-placeholder
         >
-          {{ props.placeholder }}
+          {{ placeholder }}
         </span>
       </div>
 
-      <div v-if="props.multiple && hasFiles" class="flex flex-col gap-2">
+      <div v-if="multiple && hasFiles" class="flex flex-col gap-2">
         <div
           v-for="(file, index) in files"
           :key="`${file.name}-${file.size}-${index}`"
@@ -318,10 +333,10 @@ watch(
             type="button"
             class="text-xs text-[var(--muted-fg)] hover:text-[var(--fg)]"
             data-ds-form-file-item-remove
-            :disabled="props.disabled"
+            :disabled="disabled"
             @click.prevent="removeAt(index)"
           >
-            {{ props.removeText }}
+            {{ removeText }}
           </button>
         </div>
       </div>

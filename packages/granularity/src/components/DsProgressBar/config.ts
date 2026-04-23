@@ -1,9 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
 import { dsProgressBarSafelist } from './safelist'
 
-export const dsProgressBarConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsProgressBarConfig = defineGranularComponent(import.meta.url, {
   name: 'DsProgressBar',
   safelist: dsProgressBarSafelist,
-  cssFiles: ['./tokens.css'],
 })

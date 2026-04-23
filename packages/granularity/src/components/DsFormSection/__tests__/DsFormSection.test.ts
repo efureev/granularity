@@ -28,6 +28,6 @@ describe('DsFormSection', () => {
     })
 
     expect(wrapper.text()).toContain('Security')
-    expect(wrapper.find('.ds-muted').exists()).toBe(false)
+    expect(wrapper.find('.text-\\[var\\(--muted-fg\\)\\]').exists()).toBe(false)
   })
 })

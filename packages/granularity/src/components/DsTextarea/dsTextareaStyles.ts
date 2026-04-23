@@ -1,8 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-
 export type DsTextareaState = 'default' | 'success' | 'warning' | 'danger'
 
-const borderClassByState: Record<DsTextareaState, string> = {
+export const borderClassByState: Record<DsTextareaState, string> = {
   default: 'border-[var(--brd)]',
   success: 'border-[var(--ds-success)] focus-visible:ring-[var(--ds-success)]',
   warning: 'border-[var(--ds-warning)] focus-visible:ring-[var(--ds-warning)]',
@@ -12,7 +10,3 @@ const borderClassByState: Record<DsTextareaState, string> = {
 export function dsTextareaClass(options: { state: DsTextareaState, invalid: boolean }): string {
   return options.invalid ? borderClassByState.danger : borderClassByState[options.state]
 }
-
-export const dsTextareaSafelist = [...new Set([
-  ...Object.values(borderClassByState).flatMap(splitClassTokens),
-])]

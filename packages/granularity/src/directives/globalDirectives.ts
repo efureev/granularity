@@ -10,7 +10,7 @@ import type { LoadingBindingValue } from './loading'
 declare module 'vue' {
   interface GlobalDirectives {
     vAutofocus: Directive<HTMLElement, AutofocusBindingValue>
-    vAutosize: Directive<HTMLTextAreaElement, AutosizeBindingValue>
+    vAutosize: Directive<HTMLElement, AutosizeBindingValue>
     vClickOutside: Directive<HTMLElement, ClickOutsideBindingValue>
     vDropzone: Directive<HTMLElement, DropzoneBindingValue>
     vHotkey: Directive<HTMLElement, HotkeyBindingValue>

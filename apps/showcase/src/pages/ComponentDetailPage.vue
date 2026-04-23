@@ -2,6 +2,7 @@
 import {computed, defineAsyncComponent, watch} from 'vue'
 import {RouterLink, useRoute} from 'vue-router'
 
+import {useFintI18n} from '@feugene/fint-i18n/vue'
 import {DsCard} from '@feugene/granularity'
 
 import {
@@ -22,6 +23,7 @@ import {
 import {getShowcaseComponentDoc} from '../content/componentDocs'
 
 const route = useRoute()
+const {t} = useFintI18n()
 const {localizePageByName, useI18nScope} = useShowcasePageI18n()
 
 const previewRegistry = {
@@ -185,9 +187,9 @@ const componentDoc = computed(() => {
   return getShowcaseComponentDoc(componentEntity.value)
 })
 
-const accessibilityItems = computed(() => createAccessibilityItems(componentEntity.value))
-const dependencyItems = computed(() => createDependencyItems(componentEntity.value))
-const relatedLinks = computed(() => createRelatedLinks(componentEntity.value))
+const accessibilityItems = computed(() => createAccessibilityItems(componentEntity.value, t))
+const dependencyItems = computed(() => createDependencyItems(componentEntity.value, t))
+const relatedLinks = computed(() => createRelatedLinks(componentEntity.value, t))
 const componentsPage = computed(() => localizePageByName('components'))
 
 function resolvePreviewComponent(previewKey?: string) {
@@ -225,10 +227,10 @@ watch(componentEntity, () => {
     <section id="live-examples" class="scroll-mt-28 space-y-4">
       <div class="space-y-2">
         <h2 class="text-2xl font-semibold">
-          Live examples
+          {{ t('showcase.detailPage.liveExamples.title') }}
         </h2>
         <p class="showcase-text-muted text-sm leading-6">
-          Короткие сценарии использования компонента в реальном интерфейсе.
+          {{ t('showcase.detailPage.liveExamples.descriptionComponent') }}
         </p>
       </div>
 
@@ -250,7 +252,7 @@ watch(componentEntity, () => {
 
     <section id="api" class="scroll-mt-28 space-y-4">
       <h2 class="text-2xl font-semibold">
-        API
+        {{ t('showcase.detailPage.api.title') }}
       </h2>
       <div class="grid gap-4">
         <PropsTable :items="componentEntity.apiSections.find(section => section.key === 'props')?.items ?? []"/>
@@ -263,17 +265,17 @@ watch(componentEntity, () => {
     <section id="integration-notes" class="scroll-mt-28 space-y-4">
       <div class="space-y-2">
         <h2 class="text-2xl font-semibold">
-          Implementation notes
+          {{ t('showcase.detailPage.implementationNotes.title') }}
         </h2>
         <p class="showcase-text-muted max-w-3xl text-sm leading-6">
-          Дополнительные заметки по доступности, зависимостям и связанным материалам.
+          {{ t('showcase.detailPage.implementationNotes.description') }}
         </p>
       </div>
 
       <div class="grid gap-4 lg:grid-cols-3">
-        <InfoSectionCard title="Accessibility" :items="accessibilityItems" variant="list"/>
-        <InfoSectionCard title="Dependencies" :items="dependencyItems" variant="chips"/>
-        <InfoSectionCard title="Related links" :links="relatedLinks" variant="links"/>
+        <InfoSectionCard :title="t('showcase.detailPage.info.accessibilityTitle')" :items="accessibilityItems" variant="list"/>
+        <InfoSectionCard :title="t('showcase.detailPage.info.dependenciesTitle')" :items="dependencyItems" variant="chips"/>
+        <InfoSectionCard :title="t('showcase.detailPage.info.relatedLinksTitle')" :links="relatedLinks" variant="links"/>
       </div>
     </section>
   </div>
@@ -283,17 +285,16 @@ watch(componentEntity, () => {
       class="showcase-panel rounded-3xl border p-8"
   >
     <h1 class="text-3xl font-semibold">
-      Component not found
+      {{ t('showcase.detailPage.notFoundComponent.title') }}
     </h1>
     <p class="showcase-text-muted mt-4 max-w-2xl text-sm leading-6">
-      Компонент по этому маршруту не найден в публичном registry пакета. Вернись в каталог и выбери существующую
-      сущность.
+      {{ t('showcase.detailPage.notFoundComponent.description') }}
     </p>
     <RouterLink
         to="/components"
         class="showcase-link-chip mt-6 inline-flex rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
     >
-      Перейти в каталог компонентов
+      {{ t('showcase.detailPage.notFoundComponent.action') }}
     </RouterLink>
   </DsCard>
 </template>

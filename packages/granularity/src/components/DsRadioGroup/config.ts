@@ -1,9 +1,7 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsRadioGroupSafelist } from './safelist'
-
-export const dsRadioGroupConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsRadioGroupConfig = defineGranularComponent(import.meta.url, {
   name: 'DsRadioGroup',
   dependencies: ['DsButtonGroup', 'DsRadio'],
-  safelist: dsRadioGroupSafelist,
+  safelist: [],
 })

@@ -51,18 +51,30 @@
       "types": "./dist/types/src/components/XgQuickForm/index.d.ts",
       "import": "./dist/components/XgQuickForm/index.js"
     },
-    "./components/XgQuickForm/styles.css": "./dist/components/XgQuickForm/styles.css"
+    "./granular-provider": {
+      "types": "./dist/types/src/granular-provider/index.d.ts",
+      "import": "./dist/granular-provider.js",
+      "default": "./dist/granular-provider.js"
+    },
+    "./granular-provider/node": {
+      "types": "./dist/types/src/granular-provider/node.d.ts",
+      "import": "./dist/granular-provider-node.js",
+      "default": "./dist/granular-provider-node.js"
+    }
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.2.0 <1.0.0",
+    "@feugene/unocss-preset-granular": "^0.2.0",
     "vue": "^3.5.32"
   },
   "devDependencies": {
     "@feugene/granularity": "^0.2.0",
+    "@feugene/unocss-preset-granular": "^0.2.0",
     "@types/node": "^25.5.2",
     "@vitejs/plugin-vue": "^6.0.5",
     "typescript": "^6.0.2",
     "vite": "^8.0.7",
+    "vite-plugin-lib-inject-css": "^2.2.2",
     "vue": "^3.5.32",
     "vue-tsc": "^3.2.6"
   },

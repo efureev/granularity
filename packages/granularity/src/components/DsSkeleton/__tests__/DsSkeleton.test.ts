@@ -7,7 +7,6 @@ describe('DsSkeleton', () => {
   it('использует дефолтные размеры и скругление', () => {
     const wrapper = mount(DsSkeleton)
 
-    expect(wrapper.attributes('class')).toContain('animate-pulse')
     expect(wrapper.attributes('style')).toContain('height: 12px;')
     expect(wrapper.attributes('style')).toContain('width: 100%;')
     expect(wrapper.attributes('style')).toContain('border-radius: 9999px;')

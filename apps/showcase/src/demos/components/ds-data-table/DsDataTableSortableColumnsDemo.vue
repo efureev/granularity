@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DsDataColumn } from '@feugene/granularity'
 import { DsDataTable } from '@feugene/granularity'
 
 const rows = [
@@ -7,7 +8,7 @@ const rows = [
   { id: 3, name: 'Gamma', incidents: 7, owner: 'Support' },
 ]
 
-const columns = [
+const columns: DsDataColumn[] = [
   { key: 'name', label: 'Workspace', sortable: true },
   { key: 'owner', label: 'Owner', sortable: true },
   { key: 'incidents', label: 'Incidents', sortable: true, align: 'right' },

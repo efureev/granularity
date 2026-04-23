@@ -115,9 +115,9 @@ describe('showcase layout integration', () => {
 
     expect(wrapper.text()).toContain('Компоненты')
     expect(wrapper.text()).toContain('DsButton')
-    expect(wrapper.text()).toContain('Live examples')
+    expect(wrapper.text()).toContain('Живые примеры')
     expect(wrapper.text()).toContain('API')
-    expect(wrapper.text()).toContain('Implementation notes')
+    expect(wrapper.text()).toContain('Заметки по реализации')
   })
 
   it('рендерит package-level api, usage и breadcrumbs для composable detail route', async () => {
@@ -125,15 +125,15 @@ describe('showcase layout integration', () => {
 
     expect(wrapper.text()).toContain('Composables')
     expect(wrapper.text()).toContain('useTheme')
-    expect(wrapper.text()).toContain('Package overview')
-    expect(wrapper.text()).toContain('Canonical usage')
+    expect(wrapper.text()).toContain('Обзор пакета')
+    expect(wrapper.text()).toContain('Канонический пример использования')
     expect(wrapper.text()).toContain('API')
   })
 
   it('показывает fallback для отсутствующей package entity и сохраняет CTA возврата', async () => {
     const { wrapper } = await mountShowcaseAt('/utilities/missing-entity')
 
-    expect(wrapper.text()).toContain('Package entity not found')
+    expect(wrapper.text()).toContain('Сущность пакета не найдена')
     expect(wrapper.text()).toContain('Перейти в directives')
     expect(wrapper.text()).toContain('Перейти в composables')
     expect(wrapper.text()).toContain('Перейти в utilities')

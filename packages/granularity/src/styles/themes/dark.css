@@ -97,6 +97,6 @@
     --ds-azure-active: #5dcbf9;
 
     /* Component semantic fallbacks */
-    --ds-category-tree-branch-line-active-color: #505b8c;
+    /*--ds-category-tree-branch-line-active-color: #505b8c;*/
   }
 }

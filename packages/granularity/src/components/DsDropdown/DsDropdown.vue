@@ -10,22 +10,26 @@ import {
   type DsDropdownWidth,
 } from './dsDropdownStyles'
 
-const props = withDefaults(
-  defineProps<{
-    align?: DsDropdownAlign
-    width?: DsDropdownWidth
-    closeOnContentClick?: boolean
-    contentClass?: string
-    teleportTo?: string | HTMLElement
-  }>(),
-  {
-    align: 'right',
-    width: '48',
-    closeOnContentClick: true,
-    contentClass: '',
-    teleportTo: 'body',
-  },
-)
+export interface DsDropdownProps {
+  /** Выравнивание панели относительно триггера. */
+  align?: DsDropdownAlign
+  /** Ширина панели (tailwind-токены `w-*` или `auto`). */
+  width?: DsDropdownWidth
+  /** Закрывать панель по клику внутри content. */
+  closeOnContentClick?: boolean
+  /** Дополнительные классы контейнера content. */
+  contentClass?: string
+  /** Куда телепортировать панель (`body` по умолчанию). */
+  teleportTo?: string | HTMLElement
+}
+
+const props = withDefaults(defineProps<DsDropdownProps>(), {
+  align: 'right',
+  width: '48',
+  closeOnContentClick: true,
+  contentClass: '',
+  teleportTo: 'body',
+})
 
 const open = ref(false)
 const rootEl = ref<HTMLElement | null>(null)
@@ -137,13 +141,9 @@ onUnmounted(() => {
   cancelPanelPositionSync()
 })
 
-const widthClass = computed(() => {
-  return dsDropdownWidthClass(props.width)
-})
+const widthClass = computed(() => dsDropdownWidthClass(props.width))
 
-const contentClasses = computed(() => {
-  return dsDropdownContentClass(props.contentClass)
-})
+const contentClasses = computed(() => dsDropdownContentClass(props.contentClass))
 
 const panelClasses = computed(() => {
   return ['fixed z-50', widthClass.value, dsDropdownAlignmentClass(props.align)].filter(Boolean)
@@ -157,17 +157,18 @@ function onContentClick(): void {
 </script>
 
 <template>
-  <div>
+  <div data-ds-dropdown>
     <div
       ref="rootEl"
       v-click-outside="{ handler: close, enabled: open, exclude: clickOutsideExclude }"
+      data-ds-dropdown-trigger
       class="inline-block max-w-full"
       @click="toggle"
     >
       <slot name="trigger" :open="open" :toggle="toggle" :close="close" />
     </div>
 
-    <teleport :to="props.teleportTo">
+    <teleport :to="teleportTo">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"
@@ -179,11 +180,12 @@ function onContentClick(): void {
         <div
           v-show="open"
           ref="panelEl"
+          data-ds-dropdown-panel
           :class="panelClasses"
           :style="panelStyle"
           @click="onContentClick"
         >
-          <div :class="contentClasses">
+          <div data-ds-dropdown-content :class="contentClasses">
             <slot name="content" :close="close" />
           </div>
         </div>

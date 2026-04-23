@@ -3,7 +3,7 @@ import { DsCard, DsSkeleton } from '@feugene/granularity'
 </script>
 
 <template>
-  <DsCard class="grid gap-4">
+  <DsCard class="grid gap-4 p-4">
     <DsSkeleton width="38%" height="20px" rounded="12px" />
     <div class="grid gap-2">
       <DsSkeleton />

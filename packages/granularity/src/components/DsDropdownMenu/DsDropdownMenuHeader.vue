@@ -3,21 +3,19 @@ import { computed, useSlots } from 'vue'
 
 export type DsDropdownMenuHeaderAlign = 'left' | 'center' | 'right'
 
-const props = withDefaults(
-  defineProps<{
-    title?: string
-    align?: DsDropdownMenuHeaderAlign
-    uppercase?: boolean
-  }>(),
-  {
-    title: undefined,
-    align: 'left',
-    uppercase: true,
-  },
-)
+export interface DsDropdownMenuHeaderProps {
+  title?: string
+  align?: DsDropdownMenuHeaderAlign
+  uppercase?: boolean
+}
+
+const props = withDefaults(defineProps<DsDropdownMenuHeaderProps>(), {
+  title: undefined,
+  align: 'left',
+  uppercase: true,
+})
 
 const slots = useSlots()
-
 const isVisible = computed(() => Boolean(props.title) || Boolean(slots.default))
 
 const titleAlignClass = computed(() => {
@@ -26,7 +24,6 @@ const titleAlignClass = computed(() => {
     center: 'text-center',
     right: 'text-right',
   }
-
   return map[props.align]
 })
 </script>
@@ -34,9 +31,10 @@ const titleAlignClass = computed(() => {
 <template>
   <div
     v-if="isVisible"
+    data-ds-dropdown-menu-header
     class="px-4 py-2 text-[11px] tracking-wide text-[var(--muted-fg)]"
-    :class="[titleAlignClass, { uppercase: props.uppercase }]"
+    :class="[titleAlignClass, { uppercase }]"
   >
-    <slot>{{ props.title }}</slot>
+    <slot>{{ title }}</slot>
   </div>
 </template>

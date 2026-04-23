@@ -1,6 +1,6 @@
 {
   "name": "@feugene/granularity",
-  "description": "Granularity design system package with Vue 3 components, styles, and UnoCSS preset.",
+  "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
   "version": "0.2.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
@@ -23,10 +23,8 @@
     "components",
     "ui",
     "ui-kit",
-    "ui-library",
-    "unocss",
-    "unocss-preset",
     "granular",
+    "unocss-preset-granular",
     "tree-shakeable",
     "typescript"
   ],
@@ -39,10 +37,8 @@
   },
   "type": "module",
   "types": "./dist/types/src/index.d.ts",
-  "web-types": "./web-types.json",
   "files": [
-    "dist",
-    "web-types.json"
+    "dist"
   ],
   "sideEffects": [
     "**/*.css"
@@ -52,30 +48,6 @@
       "types": "./dist/types/src/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    },
-    "./i18n": {
-      "types": "./dist/types/src/i18n/index.d.ts",
-      "import": "./dist/i18n.js"
-    },
-    "./vue": {
-      "types": "./dist/types/src/vue/index.d.ts",
-      "import": "./dist/vue.js"
-    },
-    "./fileValidation": {
-      "types": "./dist/types/src/fileValidation/index.d.ts",
-      "import": "./dist/fileValidation.js"
-    },
-    "./directives": {
-      "types": "./dist/types/src/directives/index.d.ts",
-      "import": "./dist/directives.js"
-    },
-    "./directives/*": {
-      "types": "./dist/types/src/directives/*.d.ts",
-      "import": "./dist/directives/*.js"
-    },
-    "./composables/*": {
-      "types": "./dist/types/src/composables/*.d.ts",
-      "import": "./dist/composables/*.js"
     },
     "./components/DsAlert": {
       "types": "./dist/types/src/components/DsAlert/index.d.ts",
@@ -109,6 +81,10 @@
       "types": "./dist/types/src/components/DsCard/index.d.ts",
       "import": "./dist/components/DsCard/index.js"
     },
+    "./components/DsCheckbox": {
+      "types": "./dist/types/src/components/DsCheckbox/index.d.ts",
+      "import": "./dist/components/DsCheckbox/index.js"
+    },
     "./components/DsCollapse": {
       "types": "./dist/types/src/components/DsCollapse/index.d.ts",
       "import": "./dist/components/DsCollapse/index.js"
@@ -120,6 +96,10 @@
     "./components/DsDataTable": {
       "types": "./dist/types/src/components/DsDataTable/index.d.ts",
       "import": "./dist/components/DsDataTable/index.js"
+    },
+    "./components/DsDialog": {
+      "types": "./dist/types/src/components/DsDialog/index.d.ts",
+      "import": "./dist/components/DsDialog/index.js"
     },
     "./components/DsDrawer": {
       "types": "./dist/types/src/components/DsDrawer/index.d.ts",
@@ -133,14 +113,6 @@
       "types": "./dist/types/src/components/DsDropdownMenu/index.d.ts",
       "import": "./dist/components/DsDropdownMenu/index.js"
     },
-    "./components/DsCheckbox": {
-      "types": "./dist/types/src/components/DsCheckbox/index.d.ts",
-      "import": "./dist/components/DsCheckbox/index.js"
-    },
-    "./components/DsDialog": {
-      "types": "./dist/types/src/components/DsDialog/index.d.ts",
-      "import": "./dist/components/DsDialog/index.js"
-    },
     "./components/DsEmptyState": {
       "types": "./dist/types/src/components/DsEmptyState/index.d.ts",
       "import": "./dist/components/DsEmptyState/index.js"
@@ -149,21 +121,17 @@
       "types": "./dist/types/src/components/DsFileUpload/index.d.ts",
       "import": "./dist/components/DsFileUpload/index.js"
     },
-    "./components/DsFormFile": {
-      "types": "./dist/types/src/components/DsFormFile/index.d.ts",
-      "import": "./dist/components/DsFormFile/index.js"
-    },
     "./components/DsFormField": {
       "types": "./dist/types/src/components/DsFormField/index.d.ts",
       "import": "./dist/components/DsFormField/index.js"
     },
+    "./components/DsFormFile": {
+      "types": "./dist/types/src/components/DsFormFile/index.d.ts",
+      "import": "./dist/components/DsFormFile/index.js"
+    },
     "./components/DsFormSection": {
       "types": "./dist/types/src/components/DsFormSection/index.d.ts",
       "import": "./dist/components/DsFormSection/index.js"
-    },
-    "./components/DsList": {
-      "types": "./dist/types/src/components/DsList/index.d.ts",
-      "import": "./dist/components/DsList/index.js"
     },
     "./components/DsIcon": {
       "types": "./dist/types/src/components/DsIcon/index.d.ts",
@@ -185,6 +153,10 @@
       "types": "./dist/types/src/components/DsLink/index.d.ts",
       "import": "./dist/components/DsLink/index.js"
     },
+    "./components/DsList": {
+      "types": "./dist/types/src/components/DsList/index.d.ts",
+      "import": "./dist/components/DsList/index.js"
+    },
     "./components/DsLoading": {
       "types": "./dist/types/src/components/DsLoading/index.d.ts",
       "import": "./dist/components/DsLoading/index.js"
@@ -196,6 +168,10 @@
     "./components/DsNavbar": {
       "types": "./dist/types/src/components/DsNavbar/index.d.ts",
       "import": "./dist/components/DsNavbar/index.js"
+    },
+    "./components/DsNumberInput": {
+      "types": "./dist/types/src/components/DsNumberInput/index.d.ts",
+      "import": "./dist/components/DsNumberInput/index.js"
     },
     "./components/DsPagination": {
       "types": "./dist/types/src/components/DsPagination/index.d.ts",
@@ -217,13 +193,13 @@
       "types": "./dist/types/src/components/DsRadioGroup/index.d.ts",
       "import": "./dist/components/DsRadioGroup/index.js"
     },
-    "./components/DsSelect": {
-      "types": "./dist/types/src/components/DsSelect/index.d.ts",
-      "import": "./dist/components/DsSelect/index.js"
-    },
     "./components/DsSegmented": {
       "types": "./dist/types/src/components/DsSegmented/index.d.ts",
       "import": "./dist/components/DsSegmented/index.js"
+    },
+    "./components/DsSelect": {
+      "types": "./dist/types/src/components/DsSelect/index.d.ts",
+      "import": "./dist/components/DsSelect/index.js"
     },
     "./components/DsSidebar": {
       "types": "./dist/types/src/components/DsSidebar/index.d.ts",
@@ -245,13 +221,17 @@
       "types": "./dist/types/src/components/DsTabs/index.d.ts",
       "import": "./dist/components/DsTabs/index.js"
     },
+    "./components/DsTextarea": {
+      "types": "./dist/types/src/components/DsTextarea/index.d.ts",
+      "import": "./dist/components/DsTextarea/index.js"
+    },
     "./components/DsToaster": {
       "types": "./dist/types/src/components/DsToaster/index.d.ts",
       "import": "./dist/components/DsToaster/index.js"
     },
-    "./components/DsTextarea": {
-      "types": "./dist/types/src/components/DsTextarea/index.d.ts",
-      "import": "./dist/components/DsTextarea/index.js"
+    "./components/DsTooltip": {
+      "types": "./dist/types/src/components/DsTooltip/index.d.ts",
+      "import": "./dist/components/DsTooltip/index.js"
     },
     "./components/DsTree": {
       "types": "./dist/types/src/components/DsTree/index.d.ts",
@@ -261,111 +241,61 @@
       "types": "./dist/types/src/components/DsTreeSelect/index.d.ts",
       "import": "./dist/components/DsTreeSelect/index.js"
     },
-    "./components/DsTooltip": {
-      "types": "./dist/types/src/components/DsTooltip/index.d.ts",
-      "import": "./dist/components/DsTooltip/index.js"
+    "./directives": {
+      "types": "./dist/types/src/directives/index.d.ts",
+      "import": "./dist/directives/index.js"
     },
-    "./uno": {
-      "types": "./dist/types/src/unocss/preset.d.ts",
-      "import": "./dist/uno.js",
-      "default": "./dist/uno.js"
+    "./fileValidation": {
+      "types": "./dist/types/src/fileValidation/index.d.ts",
+      "import": "./dist/fileValidation/index.js"
     },
-    "./uno-node": {
-      "types": "./dist/types/src/unocss/preset.node.d.ts",
-      "import": "./dist/uno-node.js",
-      "default": "./dist/uno-node.js"
+    "./i18n": {
+      "types": "./dist/types/src/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js"
     },
-    "./styles.css": "./dist/styles.css",
-    "./foundation.css": "./dist/foundation.css",
-    "./styles/base.css": "./dist/styles/base.css",
-    "./styles/tokens.css": "./dist/styles/tokens.css",
-    "./styles/themes/light.css": "./dist/styles/themes/light.css",
-    "./styles/themes/dark.css": "./dist/styles/themes/dark.css",
-    "./components/DsAlert/styles.css": "./dist/components/DsAlert/styles.css",
-    "./components/DsAvatar/styles.css": "./dist/components/DsAvatar/styles.css",
-    "./components/DsBadge/styles.css": "./dist/components/DsBadge/styles.css",
-    "./components/DsBadgeWrap/styles.css": "./dist/components/DsBadgeWrap/styles.css",
-    "./components/DsBottomNav/styles.css": "./dist/components/DsBottomNav/styles.css",
-    "./components/DsButton/styles.css": "./dist/components/DsButton/styles.css",
-    "./components/DsButtonGroup/styles.css": "./dist/components/DsButtonGroup/styles.css",
-    "./components/DsCard/styles.css": "./dist/components/DsCard/styles.css",
-    "./components/DsCollapse/styles.css": "./dist/components/DsCollapse/styles.css",
-    "./components/DsConfirmDialog/styles.css": "./dist/components/DsConfirmDialog/styles.css",
-    "./components/DsDataTable/styles.css": "./dist/components/DsDataTable/styles.css",
-    "./components/DsDrawer/styles.css": "./dist/components/DsDrawer/styles.css",
-    "./components/DsDropdown/styles.css": "./dist/components/DsDropdown/styles.css",
-    "./components/DsDropdownMenu/styles.css": "./dist/components/DsDropdownMenu/styles.css",
-    "./components/DsCheckbox/styles.css": "./dist/components/DsCheckbox/styles.css",
-    "./components/DsDialog/styles.css": "./dist/components/DsDialog/styles.css",
-    "./components/DsEmptyState/styles.css": "./dist/components/DsEmptyState/styles.css",
-    "./components/DsFileUpload/styles.css": "./dist/components/DsFileUpload/styles.css",
-    "./components/DsFormFile/styles.css": "./dist/components/DsFormFile/styles.css",
-    "./components/DsFormField/styles.css": "./dist/components/DsFormField/styles.css",
-    "./components/DsFormSection/styles.css": "./dist/components/DsFormSection/styles.css",
-    "./components/DsList/styles.css": "./dist/components/DsList/styles.css",
-    "./components/DsIcon/styles.css": "./dist/components/DsIcon/styles.css",
-    "./components/DsImageViewer/styles.css": "./dist/components/DsImageViewer/styles.css",
-    "./components/DsInput/styles.css": "./dist/components/DsInput/styles.css",
-    "./components/DsInputTag/styles.css": "./dist/components/DsInputTag/styles.css",
-    "./components/DsLink/styles.css": "./dist/components/DsLink/styles.css",
-    "./components/DsLoading/styles.css": "./dist/components/DsLoading/styles.css",
-    "./components/DsModal/styles.css": "./dist/components/DsModal/styles.css",
-    "./components/DsNavbar/styles.css": "./dist/components/DsNavbar/styles.css",
-    "./components/DsPagination/styles.css": "./dist/components/DsPagination/styles.css",
-    "./components/DsProgressBar/styles.css": "./dist/components/DsProgressBar/styles.css",
-    "./components/DsPromptDialog/styles.css": "./dist/components/DsPromptDialog/styles.css",
-    "./components/DsRadio/styles.css": "./dist/components/DsRadio/styles.css",
-    "./components/DsRadioGroup/styles.css": "./dist/components/DsRadioGroup/styles.css",
-    "./components/DsSelect/styles.css": "./dist/components/DsSelect/styles.css",
-    "./components/DsSegmented/styles.css": "./dist/components/DsSegmented/styles.css",
-    "./components/DsSidebar/styles.css": "./dist/components/DsSidebar/styles.css",
-    "./components/DsSkeleton/styles.css": "./dist/components/DsSkeleton/styles.css",
-    "./components/DsSwitch/styles.css": "./dist/components/DsSwitch/styles.css",
-    "./components/DsTable/styles.css": "./dist/components/DsTable/styles.css",
-    "./components/DsTabs/styles.css": "./dist/components/DsTabs/styles.css",
-    "./components/DsToaster/styles.css": "./dist/components/DsToaster/styles.css",
-    "./components/DsTextarea/styles.css": "./dist/components/DsTextarea/styles.css",
-    "./components/DsTree/styles.css": "./dist/components/DsTree/styles.css",
-    "./components/DsTreeSelect/styles.css": "./dist/components/DsTreeSelect/styles.css",
-    "./components/DsTooltip/styles.css": "./dist/components/DsTooltip/styles.css"
-  },
-  "peerDependencies": {
-    "vue": "^3.5.32",
-    "unocss": "^66.0.0"
-  },
-  "peerDependenciesMeta": {
-    "unocss": {
-      "optional": true
+    "./vue": {
+      "types": "./dist/types/src/vue/index.d.ts",
+      "import": "./dist/vue/index.js"
+    },
+    "./granular-provider": {
+      "types": "./dist/types/src/granular-provider/index.d.ts",
+      "import": "./dist/granular-provider.js",
+      "default": "./dist/granular-provider.js"
+    },
+    "./granular-provider/node": {
+      "types": "./dist/types/src/granular-provider/node.d.ts",
+      "import": "./dist/granular-provider-node.js",
+      "default": "./dist/granular-provider-node.js"
     }
   },
-  "dependencies": {
-    "@headlessui/vue": "^1.7.23"
+  "peerDependencies": {
+    "@feugene/unocss-preset-granular": "^0.2.0",
+    "vue": "^3.5.32"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^8.1.0",
+    "@feugene/unocss-preset-granular": "^0.2.0",
     "@iconify-json/lucide": "^1.2.101",
     "@types/node": "^25.5.2",
-    "@unocss/eslint-plugin": "^66.6.8",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitest/coverage-v8": "^4.1.3",
     "@vue/test-utils": "^2.4.6",
-    "eslint": "^10.2.0",
     "jsdom": "^29.0.2",
     "typescript": "^6.0.2",
-    "unocss": "^66.6.8",
     "unplugin-icons": "^23.0.1",
     "vite": "^8.0.7",
+    "vite-plugin-lib-inject-css": "^2.2.2",
     "vitest": "^4.1.3",
     "vue": "^3.5.32",
     "vue-tsc": "^3.2.6"
   },
   "scripts": {
-    "build": "vite build && vue-tsc -p tsconfig.build.json && node ./scripts/check-dist-no-tests.mjs",
-    "dev": "vite",
-    "lint": "eslint --cache .",
-    "lint:fix": "eslint --cache --fix .",
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
-    "test:run": "vitest run --config vitest.config.ts",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+    "test:run": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.23"
   }
 }

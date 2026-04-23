@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+import type { DsSegmentedOption } from '@feugene/granularity'
 import { DsSegmented } from '@feugene/granularity'
 
 const locale = ref<'ru' | 'en'>('ru')
 const status = ref<'draft' | 'review' | 'published'>('review')
 
-const localeOptions = [
+const localeOptions: DsSegmentedOption[] = [
   { value: 'ru', label: 'RU' },
   { value: 'en', label: 'EN' },
-] as const
+]
 
-const statusOptions = [
+const statusOptions: DsSegmentedOption[] = [
   { value: 'draft', label: 'Draft' },
   { value: 'review', label: 'Review' },
   { value: 'published', label: 'Published', disabled: true },
-] as const
+]
 
 const statusLabel = computed(() => statusOptions.find(option => option.value === status.value)?.label ?? status.value)
 </script>

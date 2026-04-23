@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+import type { DsDataColumn } from '@feugene/granularity'
 import { DsButton, DsDataTable } from '@feugene/granularity'
 
 const activeFilter = ref<'all' | 'critical'>('all')
@@ -11,7 +12,7 @@ const rows = [
   { id: 3, name: 'Webhook retries', severity: 'critical', updatedAt: '09:57' },
 ]
 
-const columns = [
+const columns: DsDataColumn[] = [
   { key: 'name', label: 'Signal', sortable: true },
   { key: 'severity', label: 'Severity', sortable: true },
   { key: 'updatedAt', label: 'Updated', align: 'right', sortable: true },

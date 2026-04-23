@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    dividers?: boolean
-    borderTop?: boolean
-    borderBottom?: boolean
-  }>(),
-  {
-    dividers: false,
-    borderTop: false,
-    borderBottom: false,
-  },
-)
+export interface DsDropdownMenuListProps {
+  dividers?: boolean
+  borderTop?: boolean
+  borderBottom?: boolean
+}
+
+const props = withDefaults(defineProps<DsDropdownMenuListProps>(), {
+  dividers: false,
+  borderTop: false,
+  borderBottom: false,
+})
 
 const className = computed(() => {
   return [
@@ -25,7 +24,7 @@ const className = computed(() => {
 </script>
 
 <template>
-  <div :class="className">
+  <div data-ds-dropdown-menu-list :class="className">
     <slot />
   </div>
 </template>

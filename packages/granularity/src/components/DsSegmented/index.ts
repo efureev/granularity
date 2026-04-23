@@ -8,4 +8,5 @@ export type {
   DsSegmentedValue,
   DsSegmentedVariant,
 } from './dsSegmentedStyles'
+export type { DsSegmentedProps } from './DsSegmented.vue'
 export { dsSegmentedSafelist } from './safelist'

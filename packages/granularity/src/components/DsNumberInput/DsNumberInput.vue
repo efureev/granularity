@@ -2,14 +2,6 @@
 import type { InputHTMLAttributes } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots } from 'vue'
 
-export type {
-  DsNumberInputControlsDirection,
-  DsNumberInputSize,
-  DsNumberInputTextAlign,
-  NumberInputControlsDirection,
-  NumberInputSize,
-} from './dsNumberInputStyles'
-
 import {
   dsNumberInputInputClass,
   dsNumberInputShellClass,
@@ -41,63 +33,73 @@ function px(n: number): string {
   return `${n}px`
 }
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    placeholder?: string
-    autocomplete?: string
-    inputmode?: InputHTMLAttributes['inputmode']
-    disabled?: boolean
-    invalid?: boolean
-    state?: DsNumberInputState
-    name?: string
-    id?: string
-    size?: DsNumberInputSize
+export interface DsNumberInputProps {
+  /** Значение (строка — контролируем форматирование внутри). */
+  modelValue: string
+  placeholder?: string
+  autocomplete?: string
+  inputmode?: InputHTMLAttributes['inputmode']
+  disabled?: boolean
+  /** Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`. */
+  invalid?: boolean
+  state?: DsNumberInputState
+  name?: string
+  id?: string
+  size?: DsNumberInputSize
 
-    textAlign?: DsNumberInputTextAlign
+  textAlign?: DsNumberInputTextAlign
 
-    decimalSeparator?: string
-    step?: number
-    min?: number
-    max?: number
-    precision?: number
+  decimalSeparator?: string
+  step?: number
+  min?: number
+  max?: number
+  precision?: number
 
-    controls?: boolean
-    controlsDirection?: DsNumberInputControlsDirection
+  /** Показывать кнопки +/-. */
+  controls?: boolean
+  controlsDirection?: DsNumberInputControlsDirection
 
-    prefixMinWidth?: string
-    prefixMaxWidth?: string
-    suffixMinWidth?: string
-    suffixMaxWidth?: string
-  }>(),
-  {
-    placeholder: undefined,
-    autocomplete: undefined,
-    inputmode: 'decimal',
-    disabled: false,
-    invalid: false,
-    state: 'default',
-    name: undefined,
-    id: undefined,
-    size: 'md',
+  prefixMinWidth?: string
+  prefixMaxWidth?: string
+  suffixMinWidth?: string
+  suffixMaxWidth?: string
 
-    textAlign: 'left',
+  /** i18n-friendly aria-label для кнопки "увеличить". */
+  increaseLabel?: string
+  /** i18n-friendly aria-label для кнопки "уменьшить". */
+  decreaseLabel?: string
+}
 
-    decimalSeparator: '.',
-    step: 1,
-    min: undefined,
-    max: undefined,
-    precision: undefined,
+const props = withDefaults(defineProps<DsNumberInputProps>(), {
+  placeholder: undefined,
+  autocomplete: undefined,
+  inputmode: 'decimal',
+  disabled: false,
+  invalid: false,
+  state: 'default',
+  name: undefined,
+  id: undefined,
+  size: 'md',
 
-    controls: false,
-    controlsDirection: 'vertical',
+  textAlign: 'left',
 
-    prefixMinWidth: undefined,
-    prefixMaxWidth: undefined,
-    suffixMinWidth: undefined,
-    suffixMaxWidth: undefined,
-  },
-)
+  decimalSeparator: '.',
+  step: 1,
+  min: undefined,
+  max: undefined,
+  precision: undefined,
+
+  controls: false,
+  controlsDirection: 'vertical',
+
+  prefixMinWidth: undefined,
+  prefixMaxWidth: undefined,
+  suffixMinWidth: undefined,
+  suffixMaxWidth: undefined,
+
+  increaseLabel: 'Increase',
+  decreaseLabel: 'Decrease',
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -331,11 +333,11 @@ function stepBy(dir: 1 | -1): void {
   emit('change', nextStr)
   focus()
 }
-
 </script>
 
 <template>
   <div
+    data-ds-number-input
     class="relative w-full overflow-hidden rounded-md border bg-[var(--bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
     :class="shellClassName"
   >
@@ -343,6 +345,7 @@ function stepBy(dir: 1 | -1): void {
       v-if="$slots.prefix"
       ref="prefixEl"
       data-testid="number-input-prefix"
+      data-ds-number-input-prefix
       class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
       :style="prefixStyle"
       aria-hidden="true"
@@ -351,17 +354,17 @@ function stepBy(dir: 1 | -1): void {
     </div>
 
     <input
-      :id="props.id"
+      :id="id"
       ref="inputEl"
       v-bind="$attrs"
-      :name="props.name"
+      :name="name"
       type="text"
-      :inputmode="props.inputmode"
-      :autocomplete="props.autocomplete"
-      :placeholder="props.placeholder"
-      :disabled="props.disabled"
-      :value="props.modelValue"
-      :aria-invalid="props.invalid ? 'true' : undefined"
+      :inputmode="inputmode"
+      :autocomplete="autocomplete"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :value="modelValue"
+      :aria-invalid="invalid ? 'true' : undefined"
       class="w-full bg-transparent text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
       :class="inputClassName"
       :style="inputStyle"
@@ -373,6 +376,7 @@ function stepBy(dir: 1 | -1): void {
       v-if="$slots.suffix"
       ref="suffixEl"
       data-testid="number-input-suffix"
+      data-ds-number-input-suffix
       class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
       :style="suffixStyle"
       aria-hidden="true"
@@ -383,6 +387,7 @@ function stepBy(dir: 1 | -1): void {
     <div
       v-if="hasVerticalControls"
       data-testid="number-input-controls-vertical"
+      data-ds-number-input-controls="vertical"
       class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)]"
       :style="verticalControlsStyle"
     >
@@ -390,12 +395,12 @@ function stepBy(dir: 1 | -1): void {
         <button
           type="button"
           class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="props.disabled"
-          aria-label="Increase"
+          :disabled="disabled"
+          :aria-label="increaseLabel"
           @mousedown.prevent
           @click="stepBy(1)"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path
               d="M7 14l5-5 5 5"
               stroke="currentColor"
@@ -408,12 +413,12 @@ function stepBy(dir: 1 | -1): void {
         <button
           type="button"
           class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="props.disabled"
-          aria-label="Decrease"
+          :disabled="disabled"
+          :aria-label="decreaseLabel"
           @mousedown.prevent
           @click="stepBy(-1)"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path
               d="M7 10l5 5 5-5"
               stroke="currentColor"
@@ -429,18 +434,19 @@ function stepBy(dir: 1 | -1): void {
     <div
       v-if="hasHorizontalControls"
       data-testid="number-input-controls-horizontal-left"
+      data-ds-number-input-controls="horizontal-left"
       class="absolute inset-y-0 flex items-stretch justify-center border-r border-[var(--brd)]"
       :style="horizontalLeftControlsStyle"
     >
       <button
         type="button"
         class="h-full w-full inline-flex items-center justify-center text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-        :disabled="props.disabled"
-        aria-label="Decrease"
+        :disabled="disabled"
+        :aria-label="decreaseLabel"
         @mousedown.prevent
         @click="stepBy(-1)"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path
             d="M14 7l-5 5 5 5"
             stroke="currentColor"
@@ -455,18 +461,19 @@ function stepBy(dir: 1 | -1): void {
     <div
       v-if="hasHorizontalControls"
       data-testid="number-input-controls-horizontal-right"
+      data-ds-number-input-controls="horizontal-right"
       class="absolute inset-y-0 flex items-stretch justify-center border-l border-[var(--brd)]"
       :style="horizontalRightControlsStyle"
     >
       <button
         type="button"
         class="h-full w-full inline-flex items-center justify-center text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-        :disabled="props.disabled"
-        aria-label="Increase"
+        :disabled="disabled"
+        :aria-label="increaseLabel"
         @mousedown.prevent
         @click="stepBy(1)"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path
             d="M10 7l5 5-5 5"
             stroke="currentColor"

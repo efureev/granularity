@@ -16,7 +16,7 @@ import App from './App.vue'
 // import '@granularity-button-css'
 // import './styles/light-app.css'
 
-// Вариант 4: granular-подключение через `presetGranularityNode`.
+// Вариант 4: granular-подключение через `presetGranularNode`.
 // Foundation-слой пакета, utility-стили выбранных компонентов, встроенные темы `light`/`dark`
 // и app theme собираются через `apps/playground/uno.config.ts`.
 

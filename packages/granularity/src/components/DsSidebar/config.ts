@@ -1,8 +1,6 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsSidebarSafelist } from './safelist'
-
-export const dsSidebarConfig = defineGranularityComponentConfig(import.meta.url, {
+export const dsSidebarConfig = defineGranularComponent(import.meta.url, {
   name: 'DsSidebar',
-  safelist: dsSidebarSafelist,
+  safelist: [],
 })

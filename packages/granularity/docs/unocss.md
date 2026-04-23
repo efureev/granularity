@@ -1,182 +1,170 @@
 # Интеграция с `UnoCSS`
 
-`@feugene/granularity` публикует два preset-а для `UnoCSS`, и между ними важно выбрать правильный:
+`@feugene/granularity` интегрируется с [`UnoCSS`][unocss] через пресет
+[`@feugene/unocss-preset-granular`][preset-granular] и granular-провайдер,
+который пакет экспортирует отдельным subpath-ом.
 
-- `@feugene/granularity/uno-node` — node-aware preset с автоподключением CSS preflight-ов из файлов пакета.
-- `@feugene/granularity/uno` — pure/browser-safe preset без чтения CSS-файлов с диска.
+Базовые понятия (что такое granular-провайдер, как устроены foundation layers,
+темы, safelist) описаны в документации пресета — см.
+[`unocss-preset-granular/docs/ru/*`][preset-docs].
 
-## Как выбрать preset
+## Что именно подключается
 
-| Сценарий                                                                                                 | Что использовать                |
-|----------------------------------------------------------------------------------------------------------|---------------------------------|
-| Конфиг выполняется в Node.js, и нужно автоматически подтягивать `tokens`, `base`, темы и CSS компонентов | `@feugene/granularity/uno-node` |
-| Нужен pure/browser-safe preset без node-only API и без чтения файлов                                     | `@feugene/granularity/uno`      |
+- `presetGranularNode` — node-aware preset из
+  `@feugene/unocss-preset-granular/node`; выполняется на build-time
+  в `uno.config.ts`, автоматически подмешивает CSS preflight-ы
+  (`tokens`, `base`, темы, компонентные стили) из файлов пакета.
+- `granularContent` — хелпер из того же subpath-а; возвращает готовые
+  `filesystem` и `pipeline.include` для точного авто-сканирования
+  исходников выбранных компонентов (в т.ч. `.js`/`.ts` чанков в `dist/`).
+- `granularityProvider` — granular-провайдер пакета,
+  реэкспортируется через `@feugene/granularity/granular-provider/node`.
+  Содержит описания компонентов пакета (например, `DsButton`), темы
+  `light`/`dark` и token-определения.
 
-## Предпочтительный путь
+## Базовый пример
 
-Если приложение уже использует `UnoCSS`, то **наиболее предпочтительный способ подключения `granularity` — тонкая
-настройка через наш preset**.
-
-Практически это означает такой порядок выбора:
-
-1. сначала рассматривать `@feugene/granularity/uno-node`;
-2. переходить к `@feugene/granularity/uno`, только если действительно нужен pure/browser-safe preset.
-
-Причина в том, что preset-подход позволяет собирать стили на стороне приложения и точнее контролировать:
-
-- набор компонентов в safelist;
-- foundation layers (`tokens`, `base`);
-- встроенные и внешние темы;
-- итоговый объём `CSS` и связанный с ним сценарий использования granular `JS` import-ов.
-
-## `@feugene/granularity/uno-node`
-
-Это рекомендуемый путь, если приложение уже использует `UnoCSS` и хочет собирать CSS на своей стороне.
-
-Практически это ещё и самый "компактный" сценарий интеграции: приложение собирает только реально нужные стили и
-работает с granular-набором компонентов, поэтому итоговый `dist` обычно получается минимальным по размеру и для `CSS`,
-и для `JS`.
-
-Что делает `presetGranularityNode`:
-
-- добавляет safelist и rules пакета;
-- автоматически добавляет preflight-ы для `tokens`, `base`, выбранных тем и выбранных компонентов;
-- работает в node-конфиге сборки, например в `uno.config.ts`.
-
-Когда выбирать:
-
-- нужен основной production-сценарий с тонкой настройкой;
-- хочется управлять тем, какие темы и какие компоненты реально участвуют в сборке;
-- важен максимально прозрачный контроль над итоговым `dist`.
-
-Плюсы:
-
-- меньше ручных CSS-импортов;
-- можно тонко выбирать `components`, `themes`, `themeFiles`, `tokens` и `baseFile`;
-- это самый прямой preset-путь к минимальному `CSS` и granular `JS`.
-
-Минусы:
-
-- нужен node-aware конфиг `UnoCSS`;
-- сценарий сложнее простого импорта готовых CSS-файлов.
-
-Пример: [`apps/playground-5`](../../../apps/playground-5/README.md)
-
-### Базовый пример
+Минимальный рабочий конфиг — только `presetGranularNode` с
+granular-провайдером пакета. Этого достаточно, чтобы `UnoCSS`
+увидел провайдера и подмешал `tokens.css`/`base.css`:
 
 ```ts
-import {defineConfig, presetMini} from 'unocss'
+import { defineConfig, presetMini } from 'unocss'
+import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
 
-import {presetGranularityNode} from '@feugene/granularity/uno-node'
+import granularityProvider from '@feugene/granularity/granular-provider/node'
 
 export default defineConfig({
-    presets: [
-        presetMini(),
-        presetGranularityNode({
-            components: ['DsButton'],
-        }),
-    ],
+  presets: [
+    presetMini(),
+    presetGranularNode({
+      providers: [granularityProvider],
+    }),
+  ],
 })
 ```
 
-По умолчанию preset добавляет:
+По умолчанию при таких опциях:
 
-- встроенный `tokens.css`;
-- встроенный `base.css`;
-- встроенную тему `light`;
-- CSS выбранных компонентов.
+- подмешивается `tokens.css` пакета и базовый `base.css`;
+- включены все компоненты granular-провайдера и их preflight-ы;
+- работают rules/variants и safelist провайдера.
 
-### Переопределение `tokens`, `base` и theme layers
+Готовые связки этого же «корня», но с дополнительными опциями — в
+`apps/showcase` и `apps/playground-5`.
+
+## Наращиваем опции
+
+Все опции ниже — необязательные; добавляйте их по мере необходимости.
+
+### Сужаем список компонентов
 
 ```ts
-import {fileURLToPath, URL} from 'node:url'
-import {defineConfig, presetMini} from 'unocss'
-
-import {presetGranularityNode} from '@feugene/granularity/uno-node'
-
-export default defineConfig({
-    presets: [
-        presetMini(),
-        presetGranularityNode({
-            components: ['DsButton'],
-            tokens: fileURLToPath(new URL('./src/styles/tokens.css', import.meta.url)),
-            baseFile: fileURLToPath(new URL('./src/styles/base.css', import.meta.url)),
-            themeFiles: [fileURLToPath(new URL('./src/styles/light-app.css', import.meta.url))],
-        }),
-    ],
+presetGranularNode({
+  providers: [granularityProvider],
+  components: [
+    { provider: '@feugene/granularity', names: ['DsButton'] },
+  ],
 })
 ```
 
-Поведение по темам:
-
-- `themeFiles` можно использовать вместе со встроенными темами;
-- если передать только `themeFiles`, preset использует только внешние темы приложения без встроенной `light` theme;
-- `components: 'all'` означает все компоненты, опубликованные в granular registry.
-
-## `@feugene/granularity/uno`
-
-`presetGranularity` из `@feugene/granularity/uno` не читает CSS-файлы с диска. Он добавляет только safelist, rules,
-variants и анимационные preflight-ы пакета.
-
-Этот вариант нужен, если preset должен оставаться pure/browser-safe и без node-only API.
-
-Когда выбирать:
-
-- среда или архитектура не позволяют использовать node-aware preset;
-- нужен именно pure/browser-safe preset;
-- вы готовы вручную передать CSS preflight-ы для foundation/theme-слоёв.
-
-Плюсы:
-
-- сохраняет доступ к preset API без чтения файлов с диска;
-- подходит для специальных интеграционных сценариев, где важна pure/browser-safe природа preset-а.
-
-Минусы:
-
-- `tokens.css`, `base.css`, `themes/*.css` и component CSS не подмешиваются автоматически;
-- ручной работы больше, чем у `uno-node`, поэтому это не основной рекомендованный путь.
-
-Пример: [`apps/playground-6`](../../../apps/playground-6/README.md)
-
-### Базовый пример
+### Темы
 
 ```ts
-import {defineConfig, presetMini} from 'unocss'
-
-import {
-    createGranularityCssPreflights,
-    presetGranularity,
-} from '@feugene/granularity/uno'
-
-export default defineConfig({
-    presets: [
-        presetMini(),
-        presetGranularity({
-            components: ['DsButton'],
-            preflights: createGranularityCssPreflights([
-                ':root { --primary: hotpink; --primary-fg: white; }',
-            ]),
-        }),
-    ],
+presetGranularNode({
+  providers: [granularityProvider],
+  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  themes: { names: ['light', 'dark'] },
 })
 ```
 
-Важно:
+### Layer
 
-- `presetGranularity` сам по себе не подмешивает `tokens.css`, `base.css`, `themes/*.css` и component CSS;
-- если нужен готовый пакетный CSS из файлов, обычно проще использовать `uno-node` или обычные CSS imports.
+```ts
+presetGranularNode({
+  providers: [granularityProvider],
+  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  themes: { names: ['light', 'dark'] },
+  layer: 'granular',
+})
+```
 
-## Что именно публикуется из preset API
+### Авто-сканирование через `granularContent`
 
-Помимо самих preset-ов, пакет экспортирует вспомогательные сущности для настройки:
+Чтобы extractor увидел классы в собранных чанках компонентов
+(`dist/components/<Name>/...`), разверните `granularContent(...)` в
+top-level `content`:
 
-- `presetGranularity`
-- `presetGranularityNode`
-- `createGranularityCssPreflight`
-- `createGranularityCssPreflights`
-- `granularityComponents`
-- `granularitySafelist`
-- `granularityThemeNames`
-- `granularityDefaultThemes`
+```ts
+const granularOptions = {
+  providers: [granularityProvider],
+  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  themes: { names: ['light', 'dark'] },
+  layer: 'granular' as const,
+}
 
-Это полезно, если приложение хочет тонко контролировать preflight-ы, safelist или набор компонентов.
+export default defineConfig({
+  presets: [
+    presetMini(),
+    presetGranularNode(granularOptions),
+  ],
+  content: granularContent(granularOptions),
+})
+```
+
+## Полезные опции пресета
+
+Детальный список параметров `presetGranularNode` (включая
+`components`, `themes`, `themeFiles`, `tokens`, `baseFile`,
+`scan`, `layer`) и `granularContent` описан в
+[документации пресета][preset-getting-started].
+
+Типовые сценарии:
+
+- `components: 'all'` — включить все компоненты из granular-registry
+  (поведение по умолчанию).
+- `themes: { names: ['light'] }` — оставить только одну встроенную тему.
+- `themeFiles: [...]` — добавить собственные CSS-темы приложения
+  (можно комбинировать со встроенными темами через `themes.names`).
+- `tokens` / `baseFile` — переопределить `tokens.css` и `base.css`
+  пакета своими файлами из приложения.
+
+## Важно: UnoCSS и `content`
+
+`@unocss/vite` читает `content.filesystem` и `content.pipeline.include`
+**только из top-level `defineConfig`**, а не из `preset.content`.
+Поэтому `granularContent(...)` нужно раскрывать в `content:` своего
+`uno.config.ts`, как показано в базовом примере.
+
+Если в приложении уже есть свой `pipeline.include`, объедините его с
+`granularContent(...).pipeline.include`:
+
+```ts
+const granularContentConfig = granularContent(granularOptions)
+
+export default defineConfig({
+  // ...
+  content: {
+    filesystem: granularContentConfig.filesystem,
+    pipeline: {
+      include: [
+        /apps\/my-app\/src\/.*\.(vue|ts)($|\?)/,
+        ...granularContentConfig.pipeline.include,
+      ],
+    },
+  },
+})
+```
+
+## Ссылки
+
+- [`@feugene/unocss-preset-granular`][preset-granular]
+  ([документация `docs/ru`][preset-docs],
+  [быстрый старт][preset-getting-started])
+- [`unocss`][unocss] и [`@unocss/preset-wind4`][preset-wind4]
+
+[preset-granular]: https://github.com/efureev/unocss-preset-granular
+[preset-docs]: ../../../../unocss-preset-granular/docs/ru/README.md
+[preset-getting-started]: ../../../../unocss-preset-granular/docs/ru/getting-started.md
+[unocss]: https://github.com/unocss/unocss
+[preset-wind4]: https://github.com/unocss/unocss/tree/main/packages-presets/preset-wind4

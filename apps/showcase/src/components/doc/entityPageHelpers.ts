@@ -1,6 +1,42 @@
 import type { ShowcaseEntityRegistryItem } from '../../content/model'
 import type { ShowcasePageName } from '../../app/showcase'
 
+type Translator = (key: string, params?: Record<string, unknown>) => string
+
+const helperFallbacks: Record<string, string> = {
+  'showcase.detailPage.helpers.importSnippetPlaceholder': '// Import snippet will be generated as soon as the first entity is selected.',
+  'showcase.detailPage.helpers.usageSnippetPlaceholder': '// Usage snippet will be generated as soon as the first entity is selected.',
+  'showcase.detailPage.helpers.accessibility.fallback': 'Accessibility notes will be added alongside the first concrete entity page.',
+  'showcase.detailPage.helpers.accessibility.componentFocus': 'Document keyboard behavior and focus management.',
+  'showcase.detailPage.helpers.accessibility.componentAria': 'Capture required aria attributes and usage constraints.',
+  'showcase.detailPage.helpers.accessibility.componentTheme': 'Verify on-screen states for light and dark themes.',
+  'showcase.detailPage.helpers.accessibility.directiveFocus': 'Describe the directive behavior for focus, keyboard shortcuts, and pointer interactions.',
+  'showcase.detailPage.helpers.accessibility.directiveCaveats': 'Document caveats for overlay and dismissable behavior separately.',
+  'showcase.detailPage.helpers.accessibility.generic': 'Document the UX effect on the interface and expected integration constraints.',
+  'showcase.detailPage.helpers.dependencies.fallback': 'Dependencies will appear once entity-level docs are connected.',
+  'showcase.detailPage.helpers.dependencies.empty': 'No direct package-level dependencies are recorded for this entity in the registry.',
+  'showcase.detailPage.relatedLinks.packageSource': 'Package source',
+  'showcase.detailPage.relatedLinks.publicExport': 'Public export entry',
+  'showcase.detailPage.relatedLinks.showcaseRegistry': 'Showcase registry',
+  'showcase.detailPage.relatedLinks.showcaseDocsOverride': 'Showcase docs override',
+  'showcase.detailPage.relatedLinks.narrativeDocs': 'Narrative docs',
+}
+
+const fallbackTranslator: Translator = key => helperFallbacks[key] ?? key
+
+function resolveTranslator(translator?: Translator): Translator {
+  if (!translator)
+    return fallbackTranslator
+
+  return (key, params) => {
+    const result = translator(key, params)
+    if (result === key)
+      return helperFallbacks[key] ?? key
+
+    return result
+  }
+}
+
 export const featuredEntityNamesByPage: Partial<Record<ShowcasePageName, string>> = {
   overview: 'DsButton',
   foundations: 'DsButton',
@@ -47,9 +83,10 @@ export function resolveFeaturedEntity(
   return entities.find(entity => entity.name === entityName)
 }
 
-export function createImportSnippet(entity?: ShowcaseEntityRegistryItem): string {
+export function createImportSnippet(entity?: ShowcaseEntityRegistryItem, translator?: Translator): string {
+  const t = resolveTranslator(translator)
   if (!entity)
-    return '// Import snippet will be generated as soon as the first entity is selected.'
+    return t('showcase.detailPage.helpers.importSnippetPlaceholder')
 
   if (entity.kind === 'directive')
     return `import { ${entity.name} } from '@feugene/granularity/directives'`
@@ -60,11 +97,12 @@ export function createImportSnippet(entity?: ShowcaseEntityRegistryItem): string
   return `import { ${entity.name} } from '@feugene/granularity'`
 }
 
-export function createUsageSnippet(entity?: ShowcaseEntityRegistryItem): string {
+export function createUsageSnippet(entity?: ShowcaseEntityRegistryItem, translator?: Translator): string {
+  const t = resolveTranslator(translator)
   if (!entity)
-    return '// Usage snippet will be generated as soon as the first entity is selected.'
+    return t('showcase.detailPage.helpers.usageSnippetPlaceholder')
 
-  const importSnippet = createImportSnippet(entity)
+  const importSnippet = createImportSnippet(entity, translator)
 
   if (entity.kind === 'component') {
     return [
@@ -99,69 +137,74 @@ export function createUsageSnippet(entity?: ShowcaseEntityRegistryItem): string 
   ].join('\n')
 }
 
-export function createAccessibilityItems(entity?: ShowcaseEntityRegistryItem): string[] {
+export function createAccessibilityItems(entity?: ShowcaseEntityRegistryItem, translator?: Translator): string[] {
+  const t = resolveTranslator(translator)
+
   if (!entity)
-    return ['Accessibility notes will be added alongside the first concrete entity page.']
+    return [t('showcase.detailPage.helpers.accessibility.fallback')]
 
   if (entity.kind === 'component') {
     return [
-      'Зафиксировать keyboard behavior и focus management.',
-      'Отразить обязательные aria-атрибуты и ограничения usage.',
-      'Проверить экранные состояния в светлой и тёмной теме.',
+      t('showcase.detailPage.helpers.accessibility.componentFocus'),
+      t('showcase.detailPage.helpers.accessibility.componentAria'),
+      t('showcase.detailPage.helpers.accessibility.componentTheme'),
     ]
   }
 
   if (entity.kind === 'directive') {
     return [
-      'Описать влияние директивы на focus, keyboard shortcuts и pointer interactions.',
-      'Отдельно зафиксировать caveats для overlay и dismissable behavior.',
+      t('showcase.detailPage.helpers.accessibility.directiveFocus'),
+      t('showcase.detailPage.helpers.accessibility.directiveCaveats'),
     ]
   }
 
   return [
-    'Документировать UX-эффект на интерфейс и ожидаемые ограничения интеграции.',
+    t('showcase.detailPage.helpers.accessibility.generic'),
   ]
 }
 
-export function createDependencyItems(entity?: ShowcaseEntityRegistryItem): string[] {
+export function createDependencyItems(entity?: ShowcaseEntityRegistryItem, translator?: Translator): string[] {
+  const t = resolveTranslator(translator)
+
   if (!entity)
-    return ['Dependencies will appear once entity-level docs are connected.']
+    return [t('showcase.detailPage.helpers.dependencies.fallback')]
 
   return entity.dependencies.length
     ? entity.dependencies.map(dependency => dependency)
-    : ['Прямые package-level зависимости для этой сущности не зафиксированы в registry.']
+    : [t('showcase.detailPage.helpers.dependencies.empty')]
 }
 
-export function createRelatedLinks(entity?: ShowcaseEntityRegistryItem): ShowcaseRelatedLink[] {
+export function createRelatedLinks(entity?: ShowcaseEntityRegistryItem, translator?: Translator): ShowcaseRelatedLink[] {
   if (!entity)
     return []
 
+  const t = resolveTranslator(translator)
   const docsPath = packageDocsByGroup[entity.group] ?? packageDocsByExportPath[entity.source.exportPath]
 
   return [
     {
-      label: 'Package source',
+      label: t('showcase.detailPage.relatedLinks.packageSource'),
       href: `/${entity.source.packagePath}`,
     },
     {
-      label: 'Public export entry',
+      label: t('showcase.detailPage.relatedLinks.publicExport'),
       href: resolvePublicExportSourcePath(entity.source.exportPath),
     },
     {
-      label: 'Showcase registry',
+      label: t('showcase.detailPage.relatedLinks.showcaseRegistry'),
       href: entity.kind === 'component'
         ? showcaseComponentRegistryPath
         : showcasePackageRegistryPath,
     },
     {
-      label: 'Showcase docs override',
+      label: t('showcase.detailPage.relatedLinks.showcaseDocsOverride'),
       href: entity.kind === 'component'
         ? componentDocsOverridePath
         : packageDocsOverridePath,
     },
     ...(docsPath
       ? [{
-          label: 'Narrative docs',
+          label: t('showcase.detailPage.relatedLinks.narrativeDocs'),
           href: docsPath,
         }]
       : []),

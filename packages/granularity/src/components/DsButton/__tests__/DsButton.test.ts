@@ -178,12 +178,13 @@ function getColorClassExpression(className: string, prefix: string): string | un
 
 const lightThemeContent = readFileSync(resolve(process.cwd(), 'src/styles/themes/light.css'), 'utf8')
 const darkThemeContent = readFileSync(resolve(process.cwd(), 'src/styles/themes/dark.css'), 'utf8')
-const dsButtonTokensContent = readFileSync(resolve(process.cwd(), 'src/components/DsButton/tokens.css'), 'utf8')
+const dsButtonLightThemeContent = readFileSync(resolve(process.cwd(), 'src/components/DsButton/themes/light.css'), 'utf8')
+const dsButtonDarkThemeContent = readFileSync(resolve(process.cwd(), 'src/components/DsButton/themes/dark.css'), 'utf8')
 const lightThemeVars = parseVars(lightThemeContent)
 const darkThemeVars = parseVars(darkThemeContent)
 const derivedThemeVars = parseVars(readFileSync(resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8'))
-const dsButtonLightThemeVars = parseVars(extractCssBlock(dsButtonTokensContent, ':root'))
-const dsButtonDarkThemeVars = parseVars(extractCssBlock(dsButtonTokensContent, ".theme-dark,"))
+const dsButtonLightThemeVars = parseVars(extractCssBlock(dsButtonLightThemeContent, ':root'))
+const dsButtonDarkThemeVars = parseVars(extractCssBlock(dsButtonDarkThemeContent, '.theme-dark,'))
 const variants: DsButtonVariant[] = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border']
 const tones: DsButtonTone[] = ['primary', 'neutral', 'success', 'warning', 'danger', 'info', 'slate', 'azure']
 const filledTones: DsButtonTone[] = ['primary', 'success', 'warning', 'danger', 'info', 'slate', 'azure']

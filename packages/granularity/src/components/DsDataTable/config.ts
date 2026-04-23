@@ -1,9 +1,8 @@
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-import { dsDataTableSafelist } from './safelist'
-
-export const dsDataTableConfig = defineGranularityComponentConfig(import.meta.url, {
+// safelist пустой — все классы прописаны литералами в шаблоне, UnoCSS находит сканом
+export const dsDataTableConfig = defineGranularComponent(import.meta.url, {
   name: 'DsDataTable',
-  safelist: dsDataTableSafelist,
-  dependencies: ['DsTable'],
+  safelist: [],
+  dependencies: ['DsTable', 'DsIcon'],
 })

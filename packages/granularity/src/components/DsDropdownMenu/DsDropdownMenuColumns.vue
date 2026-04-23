@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    cols?: 2 | 3 | 4
-  }>(),
-  {
-    cols: 2,
-  },
-)
+export interface DsDropdownMenuColumnsProps {
+  cols?: 2 | 3 | 4
+}
+
+const props = withDefaults(defineProps<DsDropdownMenuColumnsProps>(), {
+  cols: 2,
+})
 
 const colsClass = computed(() => {
   return {
@@ -20,7 +19,11 @@ const colsClass = computed(() => {
 </script>
 
 <template>
-  <div class="w-full grid divide-x divide-[var(--brd)]" :class="colsClass">
+  <div
+    data-ds-dropdown-menu-columns
+    class="w-full grid divide-x divide-[var(--brd)]"
+    :class="colsClass"
+  >
     <slot />
   </div>
 </template>
