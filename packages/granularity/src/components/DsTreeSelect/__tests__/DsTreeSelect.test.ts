@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
@@ -95,6 +95,19 @@ async function mountHarness(
   })
 }
 
+function bodyFind(selector: string): DOMWrapper<Element> {
+  const el = document.body.querySelector(selector)
+  return new DOMWrapper((el ?? document.createElement('i')) as Element)
+}
+
+function bodyExists(selector: string): boolean {
+  return document.body.querySelector(selector) !== null
+}
+
+function bodyFindAllRows(): DOMWrapper<Element>[] {
+  return [...document.body.querySelectorAll('.ds-tree__row')].map((el) => new DOMWrapper(el as Element))
+}
+
 describe('DsTreeSelect (unit)', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -113,7 +126,7 @@ describe('DsTreeSelect (unit)', () => {
     expect(chevronIcon.exists()).toBe(true)
     expect(chevronIcon.classes()).toContain('rotate-180')
 
-    const travelRow = wrapper.findAll('.ds-tree__row').find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')
@@ -141,11 +154,11 @@ describe('DsTreeSelect (unit)', () => {
     await wrapperEmpty.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const filter = wrapperEmpty.find('[data-testid="ds-tree-select-filter"]')
-    expect(filter.exists()).toBe(true)
+    const filter = bodyFind('[data-testid="ds-tree-select-filter"]')
+    expect(bodyExists('[data-testid="ds-tree-select-filter"]')).toBe(true)
     expect(filter.attributes('placeholder')).toBe('Поиск…')
 
-    expect(wrapperEmpty.text()).toContain('Нет данных')
+    expect(document.body.textContent ?? '').toContain('Нет данных')
 
     wrapperEmpty.unmount()
 
@@ -153,7 +166,7 @@ describe('DsTreeSelect (unit)', () => {
     await wrapperClear.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const travelRow = wrapperClear.findAll('.ds-tree__row').find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')
@@ -170,14 +183,13 @@ describe('DsTreeSelect (unit)', () => {
     const wrapper = await mountHarness()
 
     const trigger = wrapper.find('[data-testid="ds-tree-select-trigger"]')
-    const panel = wrapper.find('[data-testid="ds-tree-select-panel"]')
-    expect(panel.exists()).toBe(true)
 
     await trigger.trigger('pointerdown')
     await trigger.trigger('focus')
     await trigger.trigger('click')
     await nextTick()
-    expect(panel.isVisible()).toBe(true)
+    expect(bodyExists('[data-testid="ds-tree-select-panel"]')).toBe(true)
+    expect(bodyFind('[data-testid="ds-tree-select-panel"]').isVisible()).toBe(true)
 
     wrapper.unmount()
   })
@@ -185,25 +197,25 @@ describe('DsTreeSelect (unit)', () => {
   it('открывается и закрывается по клику вне / ESC', async () => {
     const wrapper = await mountHarness()
 
-    const panel = wrapper.find('[data-testid="ds-tree-select-panel"]')
-    expect(panel.exists()).toBe(true)
-    expect(panel.isVisible()).toBe(false)
+    const panel = () => bodyFind('[data-testid="ds-tree-select-panel"]')
+    expect(bodyExists('[data-testid="ds-tree-select-panel"]')).toBe(true)
+    expect(panel().isVisible()).toBe(false)
 
     await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
     await nextTick()
-    expect(panel.isVisible()).toBe(true)
+    expect(panel().isVisible()).toBe(true)
 
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await nextTick()
-    expect(panel.isVisible()).toBe(false)
+    expect(panel().isVisible()).toBe(false)
 
     await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
     await nextTick()
-    expect(panel.isVisible()).toBe(true)
+    expect(panel().isVisible()).toBe(true)
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await nextTick()
-    expect(panel.isVisible()).toBe(false)
+    expect(panel().isVisible()).toBe(false)
 
     wrapper.unmount()
   })
@@ -214,14 +226,14 @@ describe('DsTreeSelect (unit)', () => {
     await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const travelRow = wrapper.findAll('.ds-tree__row').find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')
     await nextTick()
 
     expect(wrapper.find('[data-testid="model"]').text()).toBe('2')
-    expect(wrapper.find('[data-testid="ds-tree-select-panel"]').isVisible()).toBe(false)
+    expect(bodyFind('[data-testid="ds-tree-select-panel"]').isVisible()).toBe(false)
 
     wrapper.unmount()
   })
@@ -250,7 +262,7 @@ describe('DsTreeSelect (unit)', () => {
     await trigger.trigger('click')
     await nextTick()
 
-    const rentRow = wrapper.findAll('.ds-tree__row').find((w) => w.text().includes('Rent'))
+    const rentRow = bodyFindAllRows().find((w) => w.text().includes('Rent'))
     expect(rentRow).toBeTruthy()
 
     await rentRow!.trigger('click')
@@ -267,13 +279,13 @@ describe('DsTreeSelect (unit)', () => {
     await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const filter = wrapper.find('[data-testid="ds-tree-select-filter"]')
-    expect(filter.exists()).toBe(true)
+    const filter = bodyFind('[data-testid="ds-tree-select-filter"]')
+    expect(bodyExists('[data-testid="ds-tree-select-filter"]')).toBe(true)
 
     await filter.setValue('Ren')
     await nextTick()
 
-    const rowsText = wrapper.findAll('.ds-tree__row').map((w) => w.text())
+    const rowsText = bodyFindAllRows().map((w) => w.text())
     expect(rowsText.some((t) => t.includes('Rent'))).toBe(true)
     expect(rowsText.some((t) => t.includes('Food'))).toBe(false)
     expect(rowsText.some((t) => t.includes('Travel'))).toBe(false)
@@ -314,7 +326,7 @@ describe('DsTreeSelect (unit)', () => {
     await trigger.trigger('click')
     await nextTick()
 
-    const travelRow = wrapper.findAll('.ds-tree__row').find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')

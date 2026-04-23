@@ -61,11 +61,53 @@ const rootEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLInputElement | null>(null)
 const filterInputRef = ref<InstanceType<typeof DsInput> | null>(null)
 const treeRef = ref<DsTreeInstance | null>(null)
+const panelEl = ref<HTMLElement | null>(null)
+
+const clickOutsideExclude = [() => panelEl.value]
 
 let hadPointerDownOnTrigger = false
 
 const open = ref(false)
 const filterValue = ref('')
+
+const panelStyle = ref<Record<string, string>>({
+  left: '0px',
+  top: '0px',
+  width: '0px',
+  zIndex: '2147483647',
+})
+
+function syncPanelPosition(): void {
+  if (typeof window === 'undefined')
+    return
+
+  const root = rootEl.value
+  if (!root)
+    return
+
+  const rect = root.getBoundingClientRect()
+
+  panelStyle.value = {
+    left: `${rect.left}px`,
+    top: `${rect.bottom + 8}px`,
+    width: `${rect.width}px`,
+    zIndex: '2147483647',
+  }
+}
+
+function bindPanelPositionListeners(): void {
+  if (typeof window === 'undefined')
+    return
+  window.addEventListener('resize', syncPanelPosition)
+  window.addEventListener('scroll', syncPanelPosition, true)
+}
+
+function unbindPanelPositionListeners(): void {
+  if (typeof window === 'undefined')
+    return
+  window.removeEventListener('resize', syncPanelPosition)
+  window.removeEventListener('scroll', syncPanelPosition, true)
+}
 
 const closeOnSelectResolved = computed(() => {
   return props.closeOnSelect ?? !props.multiple
@@ -265,11 +307,17 @@ watch(
       return
 
     document.removeEventListener('keydown', closeOnEscape)
+    unbindPanelPositionListeners()
+
     if (isOpen)
       document.addEventListener('keydown', closeOnEscape)
 
     if (!isOpen)
       return
+
+    bindPanelPositionListeners()
+    await nextTick()
+    syncPanelPosition()
 
     // sync tree highlight
     if (!props.multiple) {
@@ -291,6 +339,7 @@ onUnmounted(() => {
   if (typeof document === 'undefined')
     return
   document.removeEventListener('keydown', closeOnEscape)
+  unbindPanelPositionListeners()
 })
 
 watch(
@@ -383,7 +432,7 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
 <template>
   <div
     ref="rootEl"
-    v-click-outside="{ handler: onClickOutside, enabled: open }"
+    v-click-outside="{ handler: onClickOutside, enabled: open, exclude: clickOutsideExclude }"
     data-ds-tree-select
     class="relative"
   >
@@ -448,21 +497,24 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
       </div>
     </div>
 
-    <transition
-      enter-active-class="transition ease-out duration-150"
-      enter-from-class="transform opacity-0 scale-95"
-      enter-to-class="transform opacity-100 scale-100"
-      leave-active-class="transition ease-in duration-100"
-      leave-from-class="transform opacity-100 scale-100"
-      leave-to-class="transform opacity-0 scale-95"
-    >
-      <div
-        v-show="open"
-        data-testid="ds-tree-select-panel"
-        data-ds-tree-select-panel
-        class="absolute z-50 mt-2 w-full"
+    <teleport to="body">
+      <transition
+        enter-active-class="transition ease-out duration-150"
+        enter-from-class="transform opacity-0 scale-95"
+        enter-to-class="transform opacity-100 scale-100"
+        leave-active-class="transition ease-in duration-100"
+        leave-from-class="transform opacity-100 scale-100"
+        leave-to-class="transform opacity-0 scale-95"
       >
-        <div :class="panelClasses">
+        <div
+          v-show="open"
+          ref="panelEl"
+          data-testid="ds-tree-select-panel"
+          data-ds-tree-select-panel
+          class="fixed w-full"
+          :style="panelStyle"
+        >
+          <div :class="panelClasses">
           <div v-if="filterable" class="p-2 border-b border-[var(--brd)]">
             <DsInput
               ref="filterInputRef"
@@ -517,7 +569,8 @@ function onNodeClick(data: T, node: DsTreeNode<T>): void {
             </DsTree>
           </div>
         </div>
-      </div>
-    </transition>
+        </div>
+      </transition>
+    </teleport>
   </div>
 </template>
