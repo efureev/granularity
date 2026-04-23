@@ -78,7 +78,7 @@ const spinnerClassName = computed(() => props.spinnerClass)
   >
     <div
       data-ds-loading-panel
-      class="flex flex-col items-center justify-center gap-2 text-center rounded-lg border border-[var(--border)] bg-[var(--bg)]/35 px-5 py-4 shadow-lg"
+      class="flex flex-col items-center justify-center gap-2 text-center rounded-lg bg-[var(--bg)]/55 px-5 py-4 shadow-lg"
     >
       <component
         :is="Spinner"
