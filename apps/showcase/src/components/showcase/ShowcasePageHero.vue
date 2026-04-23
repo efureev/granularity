@@ -2,6 +2,7 @@
 import { computed, useSlots } from 'vue'
 
 import { DsCard } from '@feugene/granularity'
+import InlineRichText from "../content/InlineRichText.vue";
 
 defineProps<{
   /** Small kicker/eyebrow above the title. */
@@ -32,7 +33,7 @@ const hasDescription = computed(() => Boolean(slots.description) || false)
         <slot name="title">{{ title }}</slot>
       </h1>
       <p v-if="description || hasDescription" class="showcase-text-muted max-w-3xl text-base leading-7">
-        <slot name="description">{{ description }}</slot>
+        <InlineRichText :text="description" />
       </p>
     </div>
 
