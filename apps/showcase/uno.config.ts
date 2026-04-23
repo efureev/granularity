@@ -28,9 +28,11 @@ export const showcaseGranularOptions: PresetGranularNodeOptions = {
 
 const granularContentConfig = granularContent(showcaseGranularOptions)
 
-// Ограничиваем сканирование Uno исходниками showcase: это предотвращает
-// случайное вытягивание утилит из playground/dist-артефактов пакета и
-// делает build детерминированным между окружениями.
+// Дополнительно к include, которые готовит `granularContent()` для dist-чанков
+// выбранных granular-компонентов, явно разрешаем сканировать исходники showcase.
+// ВАЖНО: include'ы из `granularContentConfig` необходимо СОХРАНЯТЬ, иначе
+// extractor перестаёт видеть `.js`-чанки компонентов из `@feugene/granularity/dist/`
+// и уникальные утилиты вроде `px-1.5` пропадают из итогового CSS.
 export const showcaseContentIncludes: RegExp[] = [
     /\/apps\/showcase\/src\/.*\.(?:vue|[jt]sx?|mdx?|html|css)$/,
 ]
@@ -40,7 +42,10 @@ export default defineConfig({
         ...granularContentConfig,
         pipeline: {
             ...(granularContentConfig.pipeline ?? {}),
-            include: showcaseContentIncludes,
+            include: [
+                ...(granularContentConfig.pipeline?.include ?? []),
+                ...showcaseContentIncludes,
+            ],
         },
     },
     // Дополнительные правила поверх preset-mini из

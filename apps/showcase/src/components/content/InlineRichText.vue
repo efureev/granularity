@@ -80,7 +80,7 @@ const parts = computed(() => createParts(props.text))
       <span v-if="part.type === 'text'">{{ part.content }}</span>
       <DsBadge
           tone="slate"
-          class="!rounded-[7px] !px-1.5 !inline"
+          class="!rounded-[7px] !px-1.5"
           v-else-if="part.type === 'badge'"
       >
         {{ part.content }}
