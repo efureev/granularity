@@ -199,3 +199,400 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+-------------------------------------------------------------------------------
+
+                      ADDITIONAL ETHICAL USE CLAUSE
+                           (Addendum to the License)
+
+   In addition to the terms of the Apache License, Version 2.0 above, the
+   following ethical-use restriction applies to this Software and any
+   derivative works thereof. By using, copying, modifying, or distributing
+   the Software, You agree to comply with this clause. If You cannot or
+   will not comply with it, You are not granted any rights under this
+   License and must not use the Software.
+
+   1. The Software MUST NOT be used, in whole or in part, by:
+
+      (a) Any individual, group, organization, regime, movement, political
+          party, paramilitary or military formation, or state actor that
+          professes, promotes, endorses, or practices Nazi, neo-Nazi,
+          fascist, white-supremacist, or any other ideology that classifies
+          human beings into hierarchies of worth, dignity, or rights based
+          on ethnicity, race, nationality, national origin, skin color,
+          language, religion or absence thereof, caste, gender, sexual
+          orientation, gender identity, disability, or any other inherent
+          human characteristic;
+
+      (b) Any person or entity engaged in genocide, ethnic cleansing,
+          forced deportation, apartheid, systemic persecution, incitement
+          to hatred or violence against any of the groups described in
+          (a), or any other act recognized as a crime against humanity
+          under international law;
+
+      (c) Any person or entity acting on behalf of, providing material
+          support to, or operating infrastructure for, the parties
+          described in (a) or (b).
+
+      For the purposes of this clause (including, without limitation,
+      paragraphs 3, 4, and 7 and all their subparagraphs), the terms
+      "prohibited use" and "use in violation of paragraph 1" mean any
+      use, reproduction, modification, execution, deployment, hosting,
+      integration, distribution, sublicensing, or making available of
+      the Software or any Derivative Works thereof, in whole or in
+      part, in Source or Object form, whether directly or indirectly
+      (including through affiliates, contractors, agents, or third
+      parties acting on the violator's behalf or for the violator's
+      benefit), by any person or entity falling within subparagraph
+      (a), (b), or (c) above, or for the purpose of supporting,
+      enabling, or furthering the activities, ideologies, or parties
+      described therein. "Prohibited use" applies regardless of
+      duration (including a single execution), medium (on-premises,
+      cloud, embedded, browser, or otherwise), commercial or
+      non-commercial nature, the number of end users, whether access
+      is paid or gratuitous, and whether the Software is used as a
+      standalone product or as a component, dependency, library,
+      plugin, or service within a larger system.
+
+   2. For the avoidance of doubt, this clause reflects the Author's belief
+      that all human beings are born free and equal in dignity and rights
+      (Article 1 of the Universal Declaration of Human Rights, 1948), and
+      that the Software must not be used to further any ideology or
+      practice that denies this principle.
+
+   3. Any use of the Software in violation of this clause is a material
+      breach of this License. All rights granted to the violating party
+      under the Apache License, Version 2.0, including but not limited to
+      the rights to use, reproduce, modify, and distribute the Software,
+      terminate automatically and immediately upon such violation, without
+      the need for notice by the Author.
+
+   4. MANDATORY COMPENSATION FOR PROHIBITED USE. Any person or entity that
+      uses the Software, in whole or in part, in violation of paragraph 1
+      of this clause shall, in addition to the automatic termination of
+      rights under paragraph 3, owe the Author monetary compensation in an
+      amount equal to no less than ten percent (10%) of the violator's
+      gross revenue (for legal entities) or gross annual income (for
+      natural persons) for each calendar year during which any prohibited
+      use occurred. The ten-percent figure is calculated on the full
+      calendar year's gross revenue or gross annual income and is NOT
+      prorated: any prohibited use lasting for any length of time within a
+      given calendar year - including a single day, a single hour, or a
+      single instance of execution - triggers the compensation obligation
+      for that entire calendar year in full. The amount of compensation
+      payable under this paragraph 4 is calculated per "Accrual Period"
+      and, within a single Accrual Period, shall not exceed the product
+      of (i) one million United States dollars (USD 1,000,000) and
+      (ii) the number of calendar days (UTC) within that Accrual Period
+      on which any prohibited use of the Software occurred, provided
+      that the number of such days counted for this cap within a single
+      Accrual Period shall not exceed three hundred and sixty-five (365).
+      Any prohibited use during a calendar day (UTC), regardless of its
+      duration within that day, counts as one (1) full day. An
+      "Accrual Period" is a period of twelve (12) consecutive months,
+      the first of which begins on the date of the first prohibited use
+      of the Software by the violator (the "Accrual Date"); each
+      subsequent Accrual Period begins immediately upon the expiry of
+      the preceding one. A separate compensation, calculated
+      independently on the same basis, accrues for each Accrual Period
+      during which any prohibited use occurs, and there is no aggregate
+      ceiling on compensation across Accrual Periods.
+
+      (a) This obligation applies regardless of whether the violator knew
+          or should have known about the restrictions set forth in this
+          clause; lack of knowledge, lack of notice, good faith, mistake,
+          or reliance on a third party does NOT excuse the obligation or
+          reduce the amount owed.
+
+      (b) The ten percent (10%) figure is a contractually agreed minimum.
+          The Author reserves the right to claim any greater amount of
+          actual damages, disgorgement of profits, statutory damages,
+          injunctive relief, attorneys' fees, and any other remedy
+          available under applicable law, cumulatively and not
+          alternatively.
+
+      (c) "Gross revenue" and "gross annual income" mean the total amount
+          received from all sources before any deductions, taxes, costs,
+          or expenses, as reported in the violator's audited financial
+          statements, tax filings, or, in their absence, any other
+          reasonable evidence of income. The violator bears the burden of
+          proving a lower figure by clear and convincing evidence.
+
+      (d) Compensation is due within thirty (30) days of the Author's
+          written demand. Overdue amounts accrue default interest at the
+          maximum rate permitted by applicable law. Use of the Software
+          after the demand without full payment constitutes a continuing
+          and separate violation for each calendar year.
+
+      (e) This obligation is independent of, and survives, the termination
+          of rights under paragraph 3 and any cessation of use of the
+          Software by the violator.
+
+   5. This clause is an integral and non-severable part of this License.
+      If any part of this clause is held to be unenforceable in a given
+      jurisdiction, the Author does not grant any license to the Software
+      to parties described in paragraphs 1(a)–(c) in that jurisdiction
+      under any other terms.
+
+   6. This clause does not restrict, and shall not be interpreted to
+      restrict, legitimate academic research, journalism, education,
+      historical documentation, or human-rights advocacy that critically
+      examines the ideologies and actions described above, provided such
+      use does not promote, endorse, or materially support them.
+
+   7. GOVERNING LAW, FORUM AND JURISDICTION. Any dispute, claim,
+      controversy or cause of action arising out of or relating to this
+      Addendum, the License, the Software, or any alleged breach of any
+      of them (including, without limitation, any claim for compensation
+      under paragraph 4), shall, at the sole and exclusive election of
+      the Author (as the claimant / plaintiff), be:
+
+      (a) governed by and construed in accordance with the substantive
+          law of the jurisdiction of the Author's domicile or principal
+          place of residence at the time the action is commenced, without
+          regard to its conflict-of-laws rules; and
+
+      (b) brought exclusively before the competent state court of
+          general or commercial jurisdiction located at the Author's
+          domicile or principal place of residence at the time the
+          action is commenced (the "Author's Forum"). The violator
+          irrevocably consents to the personal jurisdiction of, and to
+          venue in, the Author's Forum, and irrevocably waives any
+          objection based on forum non conveniens, lack of personal
+          jurisdiction, improper venue, or inconvenience of the Author's
+          Forum.
+
+      (c) To the maximum extent permitted by applicable mandatory law,
+          the violator waives any right to bring or join any such
+          dispute in any other forum, and waives any right to trial by
+          jury. Nothing in this paragraph 7 limits the Author's right,
+          at the Author's sole discretion, to (i) seek injunctive,
+          provisional, or conservatory relief (including asset freezes
+          and evidence-preservation orders) in any court of competent
+          jurisdiction worldwide, or (ii) enforce any judgment,
+          arbitration award, or settlement obtained in the Author's
+          Forum in any other jurisdiction where the violator or its
+          assets may be found.
+
+      (d) If mandatory local consumer-protection or procedural law of
+          the violator's jurisdiction would otherwise grant the violator
+          a non-waivable right to sue or be sued in a different forum,
+          this paragraph 7 shall be read as granting the Author the
+          broadest election of forum permitted by such mandatory law,
+          and the remainder of this paragraph shall continue in full
+          force and effect.
+
+-------------------------------------------------------------------------------
+
+              ДОПОЛНИТЕЛЬНАЯ ОГОВОРКА ОБ ЭТИЧНОМ ИСПОЛЬЗОВАНИИ
+                      (Приложение к Лицензии, перевод)
+
+   В дополнение к условиям Apache License, Version 2.0, приведённым выше,
+   к настоящему Программному обеспечению и любым его производным работам
+   применяется следующее ограничение этического характера. Используя,
+   копируя, изменяя или распространяя Программное обеспечение, Вы
+   соглашаетесь соблюдать настоящую оговорку. Если Вы не можете или не
+   намерены её соблюдать, никакие права по настоящей Лицензии Вам не
+   предоставляются, и Вы не вправе использовать Программное обеспечение.
+
+   1. Программное обеспечение НЕ МОЖЕТ использоваться, полностью или
+      частично:
+
+      (а) любыми физическими лицами, группами, организациями, режимами,
+          движениями, политическими партиями, военизированными или
+          военными формированиями, а также государственными акторами,
+          исповедующими, продвигающими, поддерживающими или практикующими
+          нацистскую, неонацистскую, фашистскую, идеологию превосходства
+          по признаку расы, а равно любую иную идеологию, делящую людей
+          на градации ценности, достоинства или прав по признакам
+          этнической, расовой, национальной принадлежности, цвета кожи,
+          языка, религии или её отсутствия, касты, пола, сексуальной
+          ориентации, гендерной идентичности, инвалидности или иных
+          неотъемлемых человеческих характеристик;
+
+      (б) любыми лицами или организациями, причастными к геноциду,
+          этническим чисткам, насильственной депортации, апартеиду,
+          систематическим преследованиям, разжиганию ненависти или
+          насилия в отношении групп, описанных в пункте (а), а также к
+          иным деяниям, признаваемым преступлениями против человечности
+          по международному праву;
+
+      (в) любыми лицами или организациями, действующими от имени,
+          оказывающими материальную поддержку или обеспечивающими
+          инфраструктуру сторонам, описанным в пунктах (а) или (б).
+
+      Для целей настоящей оговорки (в том числе, без ограничений,
+      пунктов 3, 4 и 7 и всех их подпунктов) термины «запрещённое
+      использование» и «использование в нарушение пункта 1» означают
+      любое использование, воспроизведение, изменение, запуск,
+      развёртывание, размещение (в том числе в облаке), интеграцию,
+      распространение, сублицензирование или предоставление доступа
+      к Программному обеспечению либо любым его производным работам,
+      полностью или частично, в форме исходного текста или объектной
+      форме, прямо или косвенно (в том числе через аффилированных лиц,
+      подрядчиков, агентов или любых третьих лиц, действующих от
+      имени нарушителя или в его интересах), любым лицом или
+      организацией, подпадающими под действие подпунктов (а), (б) или
+      (в) выше, а равно любое такое использование с целью поддержки,
+      обеспечения или содействия деятельности, идеологиям или
+      сторонам, указанным в упомянутых подпунктах. «Запрещённое
+      использование» признаётся таковым независимо от его
+      продолжительности (включая единичный запуск), способа
+      размещения (on-premises, облако, встраиваемые системы, браузер
+      и т. п.), коммерческого или некоммерческого характера,
+      количества конечных пользователей, платного или безвозмездного
+      характера доступа, а также от того, используется ли Программное
+      обеспечение как самостоятельный продукт либо как компонент,
+      зависимость, библиотека, плагин или сервис в составе более
+      крупной системы.
+
+   2. Во избежание сомнений: настоящая оговорка отражает убеждение Автора
+      в том, что все люди рождаются свободными и равными в своём
+      достоинстве и правах (статья 1 Всеобщей декларации прав человека,
+      1948 г.), и что Программное обеспечение не должно использоваться
+      для продвижения какой-либо идеологии или практики, отрицающей этот
+      принцип.
+
+   3. Любое использование Программного обеспечения в нарушение настоящей
+      оговорки является существенным нарушением Лицензии. Все права,
+      предоставленные нарушителю по Apache License, Version 2.0, в том
+      числе на использование, воспроизведение, изменение и распространение
+      Программного обеспечения, прекращаются автоматически и немедленно
+      с момента такого нарушения, без необходимости уведомления со стороны
+      Автора.
+
+   4. ОБЯЗАТЕЛЬНАЯ КОМПЕНСАЦИЯ ЗА ЗАПРЕЩЁННОЕ ИСПОЛЬЗОВАНИЕ. Любое
+      физическое или юридическое лицо, использующее Программное
+      обеспечение, полностью или частично, в нарушение пункта 1 настоящей
+      оговорки, в дополнение к автоматическому прекращению прав по пункту
+      3, обязано выплатить Автору денежную компенсацию в размере не менее
+      десяти процентов (10%) от валовой выручки (для юридических лиц)
+      или валового годового дохода (для физических лиц) за каждый
+      календарный год, в течение которого имело место любое запрещённое
+      использование. Указанные десять процентов исчисляются от валовой
+      выручки или валового годового дохода за полный календарный год и
+      НЕ подлежат пропорциональному уменьшению: любое запрещённое
+      использование любой продолжительности в пределах соответствующего
+      календарного года, в том числе в течение одного дня, одного часа
+      или единичного запуска, порождает обязанность по выплате
+      компенсации за весь этот календарный год полностью. Размер
+      компенсации, подлежащей выплате по настоящему пункту 4,
+      исчисляется отдельно за каждый «Период начисления» и в пределах
+      одного Периода начисления не может превышать произведения
+      (i) одного миллиона долларов США (1 000 000 долл. США) и
+      (ii) количества календарных дней (по UTC) в пределах такого
+      Периода начисления, в течение которых имело место любое
+      запрещённое использование Программного обеспечения, при этом
+      количество таких дней, учитываемых для целей настоящего
+      ограничения в рамках одного Периода начисления, не может
+      превышать трёхсот шестидесяти пяти (365). Любое запрещённое
+      использование в течение календарного дня (по UTC), независимо от
+      его продолжительности в пределах такого дня, считается одним (1)
+      полным днём. «Период начисления» — это период из двенадцати (12)
+      следующих подряд месяцев; первый такой период начинается в дату
+      первого запрещённого использования Программного обеспечения
+      нарушителем («Дата начала начисления»), каждый последующий Период
+      начисления начинается непосредственно по истечении предыдущего.
+      За каждый Период начисления, в течение которого имело место любое
+      запрещённое использование, начисляется самостоятельная
+      компенсация, рассчитываемая независимо по тем же правилам; при
+      этом какое-либо совокупное верхнее ограничение компенсации по
+      всем Периодам начисления не применяется.
+
+      (а) Настоящая обязанность возникает независимо от того, знал или
+          должен был знать нарушитель об ограничениях, установленных
+          настоящей оговоркой. Отсутствие осведомлённости, отсутствие
+          уведомления, добросовестность, заблуждение или ссылка на
+          действия третьих лиц НЕ освобождают от обязанности и не
+          уменьшают размер подлежащей выплате суммы.
+
+      (б) Десять процентов (10%) представляют собой договорно согласованный
+          минимум. Автор сохраняет право требовать любую большую сумму
+          фактических убытков, возврат полученной прибыли, законную
+          неустойку, судебный запрет, возмещение судебных расходов и
+          гонораров представителей, а также любые иные средства правовой
+          защиты, предусмотренные применимым правом, кумулятивно, а не
+          альтернативно.
+
+      (в) Под «валовой выручкой» и «валовым годовым доходом» понимается
+          общая сумма поступлений из всех источников до вычета каких-либо
+          налогов, затрат или расходов, отражённая в аудированной
+          финансовой отчётности нарушителя, налоговых декларациях, а в
+          их отсутствие — в любых иных разумных доказательствах дохода.
+          Бремя доказывания меньшей суммы лежит на нарушителе и требует
+          ясных и убедительных доказательств.
+
+      (г) Компенсация подлежит выплате в течение тридцати (30) дней с
+          момента письменного требования Автора. На просроченные суммы
+          начисляются проценты по максимальной ставке, допускаемой
+          применимым правом. Использование Программного обеспечения
+          после такого требования без полной оплаты образует длящееся
+          и отдельное нарушение за каждый календарный год.
+
+      (д) Настоящая обязанность является самостоятельной, сохраняется
+          после прекращения прав по пункту 3 и не прекращается в
+          результате фактического прекращения использования Программного
+          обеспечения нарушителем.
+
+   5. Настоящая оговорка является неотъемлемой и неделимой частью
+      Лицензии. Если какая-либо её часть будет признана не подлежащей
+      принудительному исполнению в отдельной юрисдикции, Автор не
+      предоставляет лицам, указанным в пунктах 1(а)–(в), никакой лицензии
+      на Программное обеспечение в этой юрисдикции ни на каких иных
+      условиях.
+
+   6. Настоящая оговорка не ограничивает и не должна толковаться как
+      ограничивающая добросовестные академические исследования,
+      журналистику, образовательную деятельность, историческую
+      документацию и правозащитную деятельность, критически изучающую
+      описанные выше идеологии и действия, при условии, что такая
+      деятельность не продвигает, не поддерживает и не обеспечивает их
+      материально.
+
+   7. ПРИМЕНИМОЕ ПРАВО, ПОДСУДНОСТЬ И ВЫБОР СУДА. Любой спор, требование,
+      разногласие или основание иска, возникающие из настоящей
+      Оговорки, Лицензии, Программного обеспечения или связанные с ними,
+      либо из их предполагаемого нарушения (включая, без ограничения,
+      любые требования о компенсации по пункту 4), по единоличному и
+      исключительному выбору Автора (как истца / заявителя):
+
+      (а) регулируются и подлежат толкованию по материальному праву
+          юрисдикции места жительства или основного места нахождения
+          Автора на момент предъявления иска, без учёта её коллизионных
+          норм; и
+
+      (б) подлежат рассмотрению исключительно в компетентном
+          государственном суде общей или коммерческой (экономической,
+          арбитражной) юрисдикции, расположенном по месту жительства
+          или основному месту нахождения Автора на момент предъявления
+          иска («Суд Автора»). Нарушитель безотзывно подчиняется
+          персональной юрисдикции Суда Автора и подсудности по месту
+          его нахождения, а также безотзывно отказывается от любых
+          возражений, основанных на доктрине forum non conveniens,
+          отсутствии персональной юрисдикции, ненадлежащей
+          подсудности или неудобстве Суда Автора.
+
+      (в) В максимально допустимых применимым императивным правом
+          пределах нарушитель отказывается от права инициировать или
+          присоединяться к такому спору в любом ином суде, а также от
+          права на суд присяжных. Ничто в настоящем пункте 7 не
+          ограничивает права Автора по единоличному усмотрению
+          (i) требовать обеспечительных, предварительных или
+          временных мер (в том числе ареста активов и обеспечения
+          доказательств) в любом компетентном суде в любой юрисдикции
+          мира и (ii) приводить в исполнение любое судебное решение,
+          арбитражное решение или мировое соглашение, полученное в
+          Суде Автора, в любой иной юрисдикции, где может быть
+          обнаружен нарушитель или его активы.
+
+      (г) Если императивные нормы законодательства о защите прав
+          потребителей или процессуального законодательства
+          юрисдикции нарушителя предоставляют нарушителю не
+          подлежащее отказу право предъявлять иск или быть ответчиком
+          в ином суде, настоящий пункт 7 толкуется как
+          предоставляющий Автору наиболее широкий выбор суда,
+          допускаемый такими императивными нормами, а в остальной
+          части сохраняет полную юридическую силу.
+
+   При любом расхождении между английской и русской версиями настоящей
+   оговорки преимущественную силу имеет английский текст.
