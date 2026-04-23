@@ -10,6 +10,7 @@
     "build": "yarn build:granularity && yarn build:showcase",
     "build:granularity": "yarn workspace @feugene/granularity build",
     "build:unocss-preset-granular": "yarn workspace @feugene/unocss-preset-granular build",
+    "build:unocss-mini-extra-rules": "yarn workspace @feugene/unocss-mini-extra-rules build",
     "build:playground": "yarn workspace @feugene/granularity-playground build",
     "build:showcase": "yarn workspace @feugene/granularity-showcase build",
     "build:playground-empty": "yarn workspace @feugene/granularity-playground-empty build",

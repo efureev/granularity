@@ -204,10 +204,20 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.1.1.tgz#530a7226738d93c63398b8612969a793acb58d1b"
   integrity sha512-1dnLiO+TULfx3jEDR2IaEYCqo0M/L2l8EFILjbMYou5QvtWiK08tXAa6ntkSQlBw4W6BQANZ1oroU2lmYa+RlQ==
 
+"@feugene/unocss-mini-extra-rules@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.2.2.tgz#088832c3899bcb5525a9e7ffb16c0eba3dfd171a"
+  integrity sha512-6fqkbhsVtqaDsG9z6u7VOL+T0AzGMsLV+21mzvbpd68G30FhfANPx+Wjw20ipJR8fR61FXKeG2O2ghrBLL1XlQ==
+
 "@feugene/unocss-preset-granular@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.2.0.tgz#e7ff155796ad1fb12b651b809c2b98a3616ee68b"
   integrity sha512-AGDBiThDZcMVhXyJO+b2hRwBpm5ccib21kCiHLlV0JXO7BDQMtcKOx8l+69cyt5zQfn2MfGTaukV1CR40xCLbw==
+
+"@feugene/unocss-preset-granular@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.2.2.tgz#1ed816dae2d7c40bbae83a1c11ff346d4c2a5a0a"
+  integrity sha512-Z4XDPbTPJODKzKTdHui8Oq1iLz4l7wzDpoUqejoWDDBWizewLKh3xenW36Lkyqt0a1wVKCGHiLhQwPqusiBUbQ==
 
 "@headlessui/vue@^1.7.23":
   version "1.7.23"
