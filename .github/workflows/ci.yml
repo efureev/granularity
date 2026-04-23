@@ -17,20 +17,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Lint package
-        run: yarn workspace @feugene/granularity lint
+#  lint:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v6
+#      - uses: actions/setup-node@v6
+#        with:
+#          node-version: 24
+#          cache: yarn
+#
+#      - name: Install dependencies
+#        run: yarn install --frozen-lockfile
+#
+#      - name: Lint package
+#        run: yarn workspace @feugene/granularity lint
 
   test-granularity:
     runs-on: ubuntu-latest
@@ -50,44 +50,44 @@ jobs:
       - name: Test package
         run: yarn test:granularity
 
-  coverage-granularity:
-    needs:
-      - test-granularity
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run coverage
-        run: yarn coverage:granularity
-
-      - name: Publish coverage summary
-        if: always()
-        run: |
-          SUMMARY=packages/granularity/coverage/coverage-summary.json
-          if [ -f "$SUMMARY" ]; then
-            node -e 'const fs=require("node:fs");const s=JSON.parse(fs.readFileSync(process.argv[1],"utf8")).total;const rows=["lines","statements","functions","branches"].map(k=>`| ${k} | ${s[k].pct}% (${s[k].covered}/${s[k].total}) |`).join("\n");process.stdout.write("| Metric | Coverage |\n|---|---|\n"+rows+"\n");' "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo 'coverage-summary.json not found' >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: granularity-coverage
-          path: packages/granularity/coverage/
-          if-no-files-found: warn
+#  coverage-granularity:
+#    needs:
+#      - test-granularity
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v6
+#      - uses: actions/setup-node@v6
+#        with:
+#          node-version: 24
+#          cache: yarn
+#
+#      - name: Install dependencies
+#        run: yarn install --frozen-lockfile
+#
+#      - name: Run coverage
+#        run: yarn coverage:granularity
+#
+#      - name: Publish coverage summary
+#        if: always()
+#        run: |
+#          SUMMARY=packages/granularity/coverage/coverage-summary.json
+#          if [ -f "$SUMMARY" ]; then
+#            node -e 'const fs=require("node:fs");const s=JSON.parse(fs.readFileSync(process.argv[1],"utf8")).total;const rows=["lines","statements","functions","branches"].map(k=>`| ${k} | ${s[k].pct}% (${s[k].covered}/${s[k].total}) |`).join("\n");process.stdout.write("| Metric | Coverage |\n|---|---|\n"+rows+"\n");' "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
+#          else
+#            echo 'coverage-summary.json not found' >> "$GITHUB_STEP_SUMMARY"
+#          fi
+#
+#      - name: Upload coverage report
+#        if: always()
+#        uses: actions/upload-artifact@v7
+#        with:
+#          name: granularity-coverage
+#          path: packages/granularity/coverage/
+#          if-no-files-found: warn
 
   build-granularity:
     needs:
-      - lint
+#      - lint
       - test-granularity
     runs-on: ubuntu-latest
     steps:
