@@ -10,13 +10,17 @@ import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 const { localizePageByName } = useShowcasePageI18n()
 const page = computed(() => localizePageByName('integration'))
 
-// Note: `.vue` specifiers are split via interpolation so Vite/rolldown's
+// Note: bare specifiers are split via interpolation so Vite/rolldown's
 // dependency scanner does not treat these documentation snippets as real imports.
 const appVueSpecifier = `.${'/App.vue'}`
+const granularitySpecifier = `@feugene${'/granularity'}`
+const granularityVueSpecifier = `${granularitySpecifier}/vue`
+const granularityDirectivesSpecifier = `${granularitySpecifier}/directives`
+const unpluginGranularitySpecifier = `@feugene${'/unplugin-granularity'}`
 const vuePluginCode = `import { createApp } from 'vue'
-import { DsButton, DsInput } from '@feugene/granularity'
-import { createGranularity } from '@feugene/granularity/vue'
-import { vHotkey } from '@feugene/granularity/directives'
+import { DsButton, DsInput } from '${granularitySpecifier}'
+import { createGranularity } from '${granularityVueSpecifier}'
+import { vHotkey } from '${granularityDirectivesSpecifier}'
 
 import App from '${appVueSpecifier}'
 
@@ -33,7 +37,7 @@ const unpluginCode = `// vite.config.ts
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
-import { GranularityResolver } from '@feugene/unplugin-granularity'
+import { GranularityResolver } from '${unpluginGranularitySpecifier}'
 
 export default defineConfig({
   plugins: [

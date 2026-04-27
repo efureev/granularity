@@ -176,6 +176,12 @@ export default defineConfig({
         'components/DsTreeSelect/index': fileURLToPath(
           new URL('./src/components/DsTreeSelect/index.ts', import.meta.url),
         ),
+        'composables/useTheme': fileURLToPath(
+          new URL('./src/composables/useTheme.ts', import.meta.url),
+        ),
+        'composables/useToast': fileURLToPath(
+          new URL('./src/composables/useToast.ts', import.meta.url),
+        ),
         'directives/index': fileURLToPath(
           new URL('./src/directives/index.ts', import.meta.url),
         ),
