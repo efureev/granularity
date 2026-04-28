@@ -199,10 +199,10 @@
   resolved "https://registry.yarnpkg.com/@exodus/bytes/-/bytes-1.15.0.tgz#54479e0f406cbad024d6fe1c3190ecca4468df3b"
   integrity sha512-UY0nlA+feH81UGSHv92sLEPLCeZFjXOuHhrIo0HQydScuQc8s0A7kL/UdgwgDq8g8ilksmuoF35YVTNphV2aBQ==
 
-"@feugene/fint-i18n@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.1.1.tgz#530a7226738d93c63398b8612969a793acb58d1b"
-  integrity sha512-1dnLiO+TULfx3jEDR2IaEYCqo0M/L2l8EFILjbMYou5QvtWiK08tXAa6ntkSQlBw4W6BQANZ1oroU2lmYa+RlQ==
+"@feugene/fint-i18n@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.2.0.tgz#387e952673e7963b8d8a23892f4cfd877021b19c"
+  integrity sha512-sFd1t9UkXXk9jK+iVYsC3WB3hfD2NM863CS0ZGczQXlhwXgGbElOcLo7nMcQVMdetacz1VmpowGK7l5Mlni6CQ==
 
 "@feugene/granularity@^0.2.0":
   version "0.2.0"
