@@ -28,7 +28,7 @@ describe('showcase navigation model', () => {
     expect(getShowcasePageByPath('/foundations/')?.name).toBe('foundations')
     expect(getShowcasePageByPath('/components?tab=api')?.name).toBe('components')
     expect(getShowcasePageByPath('/components/ds-button')?.name).toBe('components')
-    expect(getShowcaseComponentBySlug('ds-button')?.name).toBe('DsButton')
+    expect(getShowcaseComponentBySlug('ds-button')?.name).toBe('GrButton')
   })
 
   it('строит breadcrumbs для overview, вложенных страниц и неизвестных route-path', () => {
@@ -58,7 +58,7 @@ describe('showcase navigation model', () => {
         to: '/components',
       },
       {
-        label: 'DsButton',
+        label: 'GrButton',
         to: '/components/ds-button',
       },
     ])
@@ -68,7 +68,7 @@ describe('showcase navigation model', () => {
         to: '/',
       },
     ])
-    expect(getShowcaseEntityByPath('/components/ds-button')?.name).toBe('DsButton')
+    expect(getShowcaseEntityByPath('/components/ds-button')?.name).toBe('GrButton')
   })
 
   it('подключает ленивые route loaders для всех разделов shell-навигации', () => {

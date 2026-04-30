@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { DsButton } from '@feugene/granularity'
+import { GrButton } from '@feugene/granularity'
 import IconCheck from '~icons/lucide/check'
 import IconCopy from '~icons/lucide/copy'
 
@@ -44,7 +44,7 @@ async function copyCode() {
         </p>
       </div>
 
-      <DsButton
+      <GrButton
         :aria-label="isCopied ? $t('showcase.docComponents.codeBlock.copied') : $t('showcase.docComponents.codeBlock.copy')"
         :title="isCopied ? $t('showcase.docComponents.codeBlock.copied') : $t('showcase.docComponents.codeBlock.copy')"
         variant="primary"
@@ -61,7 +61,7 @@ async function copyCode() {
           v-else
           class="h-4 w-4"
         />
-      </DsButton>
+      </GrButton>
     </div>
 
     <pre class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6"><code>{{ code }}</code></pre>

@@ -173,7 +173,7 @@ export const showcasePages: ShowcasePage[] = [
       {
         id: 'installation',
         title: 'Installation paths',
-        description: 'Прогрессия подключения `presetGranularity` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.',
+        description: 'Прогрессия подключения `presetGranular` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.',
         bullets: [
           'Quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularContent`.',
           'Narrative guidance подключена из `packages/granularity/docs/installation.md`.',
@@ -227,7 +227,7 @@ export const showcasePages: ShowcasePage[] = [
         title: 'Авто-импорт `@feugene/unplugin-granularity`',
         description: 'Отдельный build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в SFC.',
         bullets: [
-          'Пишете `<DsButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.',
+          'Пишете `<GrButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.',
           'Опции: `prefix`, `importStyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist.',
           'Рекомендуется для prod-приложений: идеальный tree-shaking и отсутствие ручных `import`-ов.',
           'Типичный сценарий: резолвер вместе с `presetGranularNode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах.',
@@ -385,7 +385,7 @@ export const showcasePages: ShowcasePage[] = [
         bullets: [
           `Из public exports уже собраны ${showcaseUtilityEntities.length} utility-сущностей file validation слоя.`,
           'Практические ошибки валидации и ограничения.',
-          'Сравнение use-case без UI и вместе с `DsFileUpload`.',
+          'Сравнение use-case без UI и вместе с `GrFileUpload`.',
         ],
       },
       {

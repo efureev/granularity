@@ -39,7 +39,7 @@ describe('playground config', () => {
     expect(playgroundGranularityEntry).toMatch(/\/packages\/granularity\/dist\/index\.js$/)
     expect(playgroundGranularityFoundationCssEntry).toMatch(/\/packages\/granularity\/dist\/foundation\.css$/)
     expect(playgroundGranularityStylesCssEntry).toMatch(/\/packages\/granularity\/dist\/styles\.css$/)
-    expect(playgroundGranularityButtonCssEntry).toMatch(/\/packages\/granularity\/dist\/components\/DsButton\/styles\.css$/)
+    expect(playgroundGranularityButtonCssEntry).toMatch(/\/packages\/granularity\/dist\/components\/GrButton\/styles\.css$/)
   })
 
   it('задаёт более высокий приоритет для vue chunk, чем для granularity chunk', () => {
@@ -76,17 +76,20 @@ describe('playground config', () => {
     expect(distPlaygroundMainEntry).not.toContain('../../legacy/playground/src/App.vue')
   })
 
-  it('импортирует DsButton через component subpath export', () => {
-    expect(distPlaygroundAppUnoEntry).toContain("@feugene/granularity/components/DsButton")
+  it('импортирует GrButton через component subpath export', () => {
+    expect(distPlaygroundAppUnoEntry).toContain("@feugene/granularity/components/GrButton")
     expect(distPlaygroundAppUnoEntry).not.toContain("from '@feugene/granularity'")
   })
 
   it('подключает node-only uno adapter из package exports и задаёт темы на этапе сборки', () => {
-    expect(distPlaygroundUnoConfig).toContain("import { presetGranularNode } from '@feugene/unocss-preset-granular/node'")
+    expect(distPlaygroundUnoConfig).toContain("from '@feugene/unocss-preset-granular/node'")
+    expect(distPlaygroundUnoConfig).toContain('presetGranularNode')
+    expect(distPlaygroundUnoConfig).toContain('granularContent')
     expect(distPlaygroundUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
-    expect(distPlaygroundUnoConfig).toContain("const granularPresetComponents = ['DsButton'] as const")
+    expect(distPlaygroundUnoConfig).toContain("const granularPresetComponents = ['GrButton'] as const")
     expect(distPlaygroundUnoConfig).toContain('fileURLToPath')
-    expect(distPlaygroundUnoConfig).toContain('presetGranularNode({')
+    expect(distPlaygroundUnoConfig).toContain('presetGranularNode(granularOptions)')
+    expect(distPlaygroundUnoConfig).toContain('granularContent(granularOptions)')
     expect(distPlaygroundUnoConfig).toContain('providers: [granularityProvider]')
     expect(distPlaygroundUnoConfig).toContain("{ provider: '@feugene/granularity', names: [...granularPresetComponents] }")
     expect(distPlaygroundUnoConfig).toContain('tokensFile: granularPresetThemeFiles[0]')

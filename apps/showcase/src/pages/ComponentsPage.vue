@@ -2,12 +2,12 @@
 import {computed, ref} from 'vue'
 import {RouterLink} from 'vue-router'
 
-import {DsCard} from '@feugene/granularity'
+import {GrCard} from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {showcaseComponentEntities} from '../app/showcase'
 import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
-import {DsBadge} from "@feugene/granularity";
+import {GrBadge} from "@feugene/granularity";
 
 const {
   getEntityGroupLabel,
@@ -64,7 +64,7 @@ const groupedComponents = computed(() => {
     />
 
     <section id="catalog" class="scroll-mt-28 space-y-5">
-      <DsCard class="showcase-panel rounded-3xl border p-6">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div class="space-y-2">
             <h2 class="text-2xl font-semibold">
@@ -72,7 +72,7 @@ const groupedComponents = computed(() => {
             </h2>
             <p class="showcase-text-muted max-w-3xl text-sm leading-6">
               {{ $t('showcase.componentsPage.catalogDescription') }}
-              <DsBadge tone="azure">{{ componentsWithExamples.length }}</DsBadge>
+              <GrBadge tone="azure">{{ componentsWithExamples.length }}</GrBadge>
             </p>
           </div>
 
@@ -138,7 +138,7 @@ const groupedComponents = computed(() => {
             {{ $t('showcase.componentsPage.emptyState') }}
           </div>
         </div>
-      </DsCard>
+      </GrCard>
     </section>
   </div>
 </template>

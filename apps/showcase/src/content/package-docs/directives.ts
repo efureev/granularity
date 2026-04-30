@@ -16,11 +16,11 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
         code: [
           "import { vAutofocus } from '@feugene/granularity/directives'",
           '',
-          '<DsDialog v-model="open" title="Invite teammate">',
+          '<GrDialog v-model="open" title="Invite teammate">',
           '  <div v-autofocus="{ selector: \"input\", preventScroll: true }">',
-          '    <DsInput placeholder="name@company.com" />',
+          '    <GrInput placeholder="name@company.com" />',
           '  </div>',
-          '</DsDialog>',
+          '</GrDialog>',
         ].join('\n'),
         note: 'Если пользователь явно перевёл фокус вручную, не стоит возвращать его обратно программно.',
       },
@@ -56,7 +56,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
     ],
     integrationNotes: [
       'Подходит для modal-like компонентов; для сложного focus trap используйте component-level overlay API.',
-      'Можно комбинировать с `DsDialog` и `DsDrawer`, чтобы сразу переводить пользователя в первый actionable field.',
+      'Можно комбинировать с `GrDialog` и `GrDrawer`, чтобы сразу переводить пользователя в первый actionable field.',
     ],
   },
   vAutosize: {
@@ -73,7 +73,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
         code: [
           "import { vAutosize } from '@feugene/granularity/directives'",
           '',
-          '<DsTextarea',
+          '<GrTextarea',
           '  v-model="notes"',
           '  v-autosize',
           '  :rows="2"',
@@ -111,7 +111,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
       'Если внутри контейнера textarea динамически заменяется, важно сохранить корректный mount/update цикл Vue.',
     ],
     integrationNotes: [
-      'Хорошо сочетается с `DsTextarea` для форм и side-panel editors.',
+      'Хорошо сочетается с `GrTextarea` для форм и side-panel editors.',
       'Если нужен лимит по высоте или кастомная анимация resize, лучше контролировать стиль на уровне компонента/обёртки.',
     ],
   },
@@ -174,7 +174,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
     ],
     integrationNotes: [
       'Для сложных overlay-стеков с focus-trap и keyboard-dismiss лучше использовать component-level API.',
-      'С `DsDropdown`/custom popover shell директива закрывает самый частый outside-case без лишнего boilerplate.',
+      'С `GrDropdown`/custom popover shell директива закрывает самый частый outside-case без лишнего boilerplate.',
     ],
   },
   vDropzone: {
@@ -229,7 +229,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
     ],
     usage: [
       'Подходит для upload-zones, media-drop areas и admin-форм с drag-and-drop UX.',
-      'Используйте `validators` для унификации правил с `DsFileUpload` и input-based flows.',
+      'Используйте `validators` для унификации правил с `GrFileUpload` и input-based flows.',
     ],
     caveats: [
       'Если нужен file picker fallback, комбинируйте с компонентом загрузки или отдельной кнопкой выбора файла.',
@@ -237,7 +237,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
     ],
     integrationNotes: [
       'Хорошо сочетается с `runFileValidators`, `maxSizeMbValidator` и другими file-validation helpers.',
-      'Для richer UX можно держать единый набор validators и использовать его и в `vDropzone`, и в `DsFileUpload`.',
+      'Для richer UX можно держать единый набор validators и использовать его и в `vDropzone`, и в `GrFileUpload`.',
     ],
   },
   vHotkey: {
@@ -296,7 +296,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
     ],
     integrationNotes: [
       'Подходит для feature-level UX; для глобального command palette стоит использовать единый app-shell handler.',
-      'Можно комбинировать с `DsInput` и `allowInEditable`, если shortcut должен работать даже во время ввода.',
+      'Можно комбинировать с `GrInput` и `allowInEditable`, если shortcut должен работать даже во время ввода.',
     ],
   },
   vLoading: {
@@ -313,7 +313,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
         code: [
           "import { vLoading } from '@feugene/granularity/directives'",
           '',
-          '<DsCard',
+          '<GrCard',
           '  v-loading="{',
           '    loading: isRefreshing,',
           "    text: 'Refreshing segment metrics…',",

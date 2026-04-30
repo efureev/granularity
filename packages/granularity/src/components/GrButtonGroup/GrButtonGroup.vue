@@ -16,7 +16,7 @@ withDefaults(
       role="group"
       :aria-label="ariaLabel"
   >
-    <slot/>
+    <slot />
   </div>
 </template>
 <style>

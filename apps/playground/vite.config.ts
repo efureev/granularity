@@ -9,7 +9,7 @@ export const playgroundGranularityEntry = fileURLToPath(new URL('../../packages/
 export const playgroundGranularityDistDir = fileURLToPath(new URL('../../packages/granularity/dist/', import.meta.url))
 export const playgroundGranularityFoundationCssEntry = fileURLToPath(new URL('../../packages/granularity/dist/foundation.css', import.meta.url))
 export const playgroundGranularityStylesCssEntry = fileURLToPath(new URL('../../packages/granularity/dist/styles.css', import.meta.url))
-export const playgroundGranularityButtonCssEntry = fileURLToPath(new URL('../../packages/granularity/dist/components/DsButton/styles.css', import.meta.url))
+export const playgroundGranularityButtonCssEntry = fileURLToPath(new URL('../../packages/granularity/dist/components/GrButton/styles.css', import.meta.url))
 export const playgroundBuildAnalyzeMode = 'analyze'
 export const playgroundBuildVisualizerConfig = {
   filename: 'dist/stats.html',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { DsButton, DsModal, DsPromptDialog, DsSelect } from '@feugene/granularity'
+import { GrButton, GrModal, GrPromptDialog, GrSelect } from '@feugene/granularity'
 
 const variants = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border', 'destructive'] as const
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
@@ -31,11 +31,11 @@ const tagOptions = [
         playground / granularity
       </p>
       <h1 class="text-3xl font-semibold leading-tight">
-        Проверка isolated-импорта `DsButton`, `DsModal`, `DsSelect` и `DsPromptDialog`
+        Проверка isolated-импорта `GrButton`, `GrModal`, `GrSelect` и `GrPromptDialog`
       </h1>
       <p class="max-w-3xl text-sm leading-6 text-slate-600">
-        В это демо через `presetFintDsGranularity` подключены granular-стили для
-        `DsButton`, `DsModal`, `DsSelect` и `DsPromptDialog`.
+        В это демо через `presetGranularNode` подключены granular-стили для
+        `GrButton`, `GrModal`, `GrSelect` и `GrPromptDialog`.
         На странице должны быть видны и button states, и корректная работа modal/prompt overlay, и базовые select-сценарии.
       </p>
     </header>
@@ -51,13 +51,13 @@ const tagOptions = [
       </div>
 
       <div class="flex flex-wrap gap-3">
-        <DsButton
+        <GrButton
           v-for="variant in variants"
           :key="variant"
           :variant="variant"
         >
           {{ variant }}
-        </DsButton>
+        </GrButton>
       </div>
     </section>
 
@@ -78,18 +78,18 @@ const tagOptions = [
           class="flex flex-wrap items-center gap-3"
         >
           <span class="w-12 text-xs font-medium uppercase tracking-wide text-slate-400">{{ size }}</span>
-          <DsButton :size="size">
+          <GrButton :size="size">
             Button
-          </DsButton>
-          <DsButton :size="size" square aria-label="square action">
+          </GrButton>
+          <GrButton :size="size" square aria-label="square action">
             +
-          </DsButton>
-          <DsButton :size="size" variant="outline" disabled>
+          </GrButton>
+          <GrButton :size="size" variant="outline" disabled>
             Disabled
-          </DsButton>
-          <DsButton :size="size" variant="secondary" loading>
+          </GrButton>
+          <GrButton :size="size" variant="secondary" loading>
             Loading
-          </DsButton>
+          </GrButton>
         </div>
       </div>
     </section>
@@ -100,7 +100,7 @@ const tagOptions = [
           Select
         </h2>
         <p class="text-sm text-slate-500">
-          Проверяем native и panel режимы `DsSelect`, single/multiple и clearable-сценарии.
+          Проверяем native и panel режимы `GrSelect`, single/multiple и clearable-сценарии.
         </p>
       </div>
 
@@ -109,7 +109,7 @@ const tagOptions = [
           <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Native
           </p>
-          <DsSelect
+          <GrSelect
             v-model="selectedCurrency"
             aria-label="Валюта"
             :options="currencyOptions"
@@ -124,7 +124,7 @@ const tagOptions = [
           <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Panel / multiple
           </p>
-          <DsSelect
+          <GrSelect
             v-model="selectedTags"
             aria-label="Теги"
             :options="tagOptions"
@@ -146,41 +146,41 @@ const tagOptions = [
           Modal
         </h2>
         <p class="text-sm text-slate-500">
-          Проверяем overlay, размеры панели и базовый сценарий открытия/закрытия `DsModal`.
+          Проверяем overlay, размеры панели и базовый сценарий открытия/закрытия `GrModal`.
         </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <DsButton @click="isModalOpen = true">
+        <GrButton @click="isModalOpen = true">
           Открыть modal
-        </DsButton>
-        <DsButton variant="secondary" @click="isModalOpen = false">
+        </GrButton>
+        <GrButton variant="secondary" @click="isModalOpen = false">
           Закрыть modal
-        </DsButton>
+        </GrButton>
       </div>
 
-      <DsModal v-model="isModalOpen" size="lg">
+      <GrModal v-model="isModalOpen" size="lg">
         <div class="space-y-4 p-6 text-slate-900">
           <div class="space-y-2">
             <h3 class="text-xl font-semibold leading-tight">
-              DsModal в playground
+              GrModal в playground
             </h3>
             <p class="text-sm leading-6 text-slate-600">
               Этот пример помогает быстро проверить, что granular preset подтягивает стили overlay,
-              панели и анимаций для `DsModal`.
+              панели и анимаций для `GrModal`.
             </p>
           </div>
 
           <div class="flex justify-end gap-3">
-            <DsButton variant="outline" @click="isModalOpen = false">
+            <GrButton variant="outline" @click="isModalOpen = false">
               Отмена
-            </DsButton>
-            <DsButton @click="isModalOpen = false">
+            </GrButton>
+            <GrButton @click="isModalOpen = false">
               Понятно
-            </DsButton>
+            </GrButton>
           </div>
         </div>
-      </DsModal>
+      </GrModal>
     </section>
 
     <section class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -189,20 +189,20 @@ const tagOptions = [
           Prompt dialog
         </h2>
         <p class="text-sm text-slate-500">
-          Проверяем композицию `DsPromptDialog` поверх `DsDialog`/`DsModal`, валидацию и action-кнопки.
+          Проверяем композицию `GrPromptDialog` поверх `GrDialog`/`GrModal`, валидацию и action-кнопки.
         </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <DsButton @click="isPromptOpen = true">
+        <GrButton @click="isPromptOpen = true">
           Переименовать
-        </DsButton>
+        </GrButton>
         <span class="text-sm text-slate-500">
           Текущее значение: <span class="font-medium text-slate-900">{{ promptValue }}</span>
         </span>
       </div>
 
-      <DsPromptDialog
+      <GrPromptDialog
         v-model="isPromptOpen"
         v-model:value="promptValue"
         title="Переименовать MVP"

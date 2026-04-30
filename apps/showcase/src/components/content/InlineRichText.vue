@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 
-import {DsBadge, DsLink} from '@feugene/granularity'
+import {GrBadge, GrLink} from '@feugene/granularity'
 
 type InlineRichTextPart = {
   type: 'text' | 'badge' | 'link'
@@ -78,14 +78,14 @@ const parts = computed(() => createParts(props.text))
   <component :is="tag" :class="textClass">
     <template v-for="(part, index) in parts" :key="`${part.type}-${part.content}-${index}`">
       <span v-if="part.type === 'text'">{{ part.content }}</span>
-      <DsBadge
+      <GrBadge
           tone="slate"
           class="!rounded-[7px] !px-1.5"
           v-else-if="part.type === 'badge'"
       >
         {{ part.content }}
-      </DsBadge>
-      <DsLink
+      </GrBadge>
+      <GrLink
           v-else
           :href="part.href"
           variant="primary"
@@ -94,7 +94,7 @@ const parts = computed(() => createParts(props.text))
           rel="noreferrer"
       >
         {{ part.content }}
-      </DsLink>
+      </GrLink>
     </template>
   </component>
 </template>

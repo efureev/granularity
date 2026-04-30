@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DsCard } from '@feugene/granularity'
+import { GrCard } from '@feugene/granularity'
 
 import InlineRichText from '../content/InlineRichText.vue'
 import CodeBlock from './CodeBlock.vue'
@@ -14,7 +14,7 @@ defineProps<{
 </script>
 
 <template>
-  <DsCard class="showcase-panel min-w-0 rounded-3xl border p-6">
+  <GrCard class="showcase-panel min-w-0 rounded-3xl border p-6">
     <div class="min-w-0 space-y-2">
       <h3 class="text-xl font-semibold">
         {{ title }}
@@ -44,5 +44,5 @@ defineProps<{
     >
       <InlineRichText :text="note" />
     </p>
-  </DsCard>
+  </GrCard>
 </template>

@@ -17,7 +17,7 @@ export default antfu(
     },
     jsonc: false,
     yaml: false,
-    unocss: true,
+    unocss: false,
     stylistic: false,
   },
   {

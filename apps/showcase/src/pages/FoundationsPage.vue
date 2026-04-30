@@ -2,7 +2,7 @@
 import {computed, ref} from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import {DsBadge, DsCard, DsLink, DsSwitch} from '@feugene/granularity'
+import {GrBadge, GrCard, GrLink, GrSwitch} from '@feugene/granularity'
 
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
@@ -96,7 +96,7 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
     />
 
     <section id="installation" class="space-y-6 scroll-mt-28">
-      <DsCard class="showcase-panel rounded-3xl border p-6">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-3">
           <h2 class="text-2xl font-semibold">{{ $t('showcase.foundationsPage.installationTitle') }}</h2>
           <CodeBlock
@@ -105,9 +105,9 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
             :title="$t('showcase.foundationsPage.installPackageTitle')"
           />
         </div>
-      </DsCard>
+      </GrCard>
 
-      <DsCard class="showcase-panel rounded-3xl border p-6">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-4">
           <div class="space-y-2">
             <h2 class="text-2xl font-semibold">{{ $t('showcase.foundationsPage.quickStartTitle') }}</h2>
@@ -117,7 +117,7 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
           </div>
 
           <div class="grid gap-4">
-            <DsCard
+            <GrCard
                 v-for="card in showcaseQuickStartCards"
                 :key="card.id"
                 class="showcase-panel-soft rounded-3xl border p-5"
@@ -127,9 +127,9 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
                   <h3 class="text-lg font-semibold">
                     <InlineRichText :text="card.title"/>
                   </h3>
-                  <DsBadge variant="primary" dark v-if="card.id === preferredQuickStartCardId">
+                  <GrBadge variant="primary" dark v-if="card.id === preferredQuickStartCardId">
                     {{ $t('showcase.foundationsPage.preferredMethod') }}
-                  </DsBadge>
+                  </GrBadge>
                 </div>
                 <p class="showcase-text-muted text-sm leading-6">
                   <InlineRichText :text="card.description"/>
@@ -139,10 +139,10 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
                   <InlineRichText :text="card.note"/>
                 </p>
               </div>
-            </DsCard>
+            </GrCard>
           </div>
         </div>
-      </DsCard>
+      </GrCard>
     </section>
 
     <section
@@ -151,19 +151,19 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
         :key="guide.id"
         class="scroll-mt-28"
     >
-      <DsCard class="showcase-panel rounded-3xl border p-6">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-5">
           <div class="space-y-3">
             <div class="flex flex-wrap items-center gap-3">
               <h2 class="text-2xl font-semibold">
                 {{ guide.title }}
               </h2>
-              <DsLink
+              <GrLink
                   :href="`#${guide.id}`"
                   variant="muted"
                   class="px-1 text-xs">
                 <IconHash/>
-              </DsLink>
+              </GrLink>
             </div>
             <p class="showcase-text-muted text-base leading-7">
               <InlineRichText :text="guide.summary"/>
@@ -307,13 +307,13 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
                 </p>
               </div>
 
-              <DsCard class="showcase-panel-soft min-w-[220px] rounded-3xl border px-4 py-3">
+              <GrCard class="showcase-panel-soft min-w-[220px] rounded-3xl border px-4 py-3">
                 <div class="flex items-center justify-between gap-4">
                   <div class="text-sm font-semibold">{{ $t('showcase.foundationsPage.themeLabel') }}</div>
                   <div class="text-sm">{{ activeThemeLabel }}</div>
-                  <DsSwitch v-model="isDarkThemePreview" size="sm"/>
+                  <GrSwitch v-model="isDarkThemePreview" size="sm"/>
                 </div>
-              </DsCard>
+              </GrCard>
             </div>
 
             <div
@@ -416,7 +416,7 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
               :title="sample.title"
           />
         </div>
-      </DsCard>
+      </GrCard>
     </section>
   </div>
 </template>

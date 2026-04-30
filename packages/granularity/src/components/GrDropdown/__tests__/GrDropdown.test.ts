@@ -15,7 +15,7 @@ function rect(left: number, top: number, width: number, height: number): DOMRect
     width,
     height,
     toJSON: () => ({}),
-  } as DOMRect
+  }
 }
 
 describe('GrDropdown', () => {
@@ -87,7 +87,7 @@ describe('GrDropdown', () => {
           width: 200,
           height: 32,
           toJSON: () => ({}),
-        } as DOMRect
+        }
       }
 
       return {
@@ -100,7 +100,7 @@ describe('GrDropdown', () => {
         width: 0,
         height: 0,
         toJSON: () => ({}),
-      } as DOMRect
+      }
     })
 
     const wrapper = mount(GrDropdown, {

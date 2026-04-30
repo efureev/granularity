@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 
-import { DsCard } from '@feugene/granularity'
+import { GrCard } from '@feugene/granularity'
 import InlineRichText from "../content/InlineRichText.vue";
 
 defineProps<{
@@ -21,7 +21,7 @@ const hasDescription = computed(() => Boolean(slots.description) || false)
 </script>
 
 <template>
-  <DsCard class="showcase-panel rounded-3xl border p-8">
+  <GrCard class="showcase-panel rounded-3xl border p-8">
     <div v-if="eyebrow || hasEyebrow" class="flex flex-wrap items-center gap-3">
       <span class="showcase-kicker text-xs font-semibold tracking-[0.18em]">
         <slot name="eyebrow">{{ eyebrow }}</slot>
@@ -40,5 +40,5 @@ const hasDescription = computed(() => Boolean(slots.description) || false)
     <div v-if="slots.actions" class="mt-5 flex flex-wrap gap-2">
       <slot name="actions" />
     </div>
-  </DsCard>
+  </GrCard>
 </template>

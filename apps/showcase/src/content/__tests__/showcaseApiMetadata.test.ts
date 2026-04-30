@@ -8,8 +8,8 @@ describe('showcase generated component API metadata', () => {
     expect(Object.keys(generatedComponentApiMetadata).length).toBe(showcaseComponentEntities.length)
   })
 
-  it('извлекает реальные props и slots как минимум для DsButton', () => {
-    const buttonMetadata = generatedComponentApiMetadata.DsButton
+  it('извлекает реальные props и slots как минимум для GrButton', () => {
+    const buttonMetadata = generatedComponentApiMetadata.GrButton
     const propsSection = buttonMetadata.sections.find(section => section.key === 'props')
     const slotsSection = buttonMetadata.sections.find(section => section.key === 'slots')
 
@@ -19,34 +19,34 @@ describe('showcase generated component API metadata', () => {
   })
 
   it('подмешивает fallback-описания для слотов там, где auto extraction не даёт достаточного описания', () => {
-    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButton')
+    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
     const slotsSection = buttonEntity?.apiSections.find(section => section.key === 'slots')
 
     expect(slotsSection?.origin).toBe('generated')
     expect(slotsSection?.items.find(item => item.name === 'default')?.description).toContain('Текст кнопки')
   })
 
-  it('раскрывает literal union значения для tone, tone и size у DsButton и DsLink в API showcase', () => {
-    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButton')
-    const linkEntity = showcaseComponentEntities.find(entity => entity.name === 'DsLink')
+  it('раскрывает literal union значения для tone, tone и size у GrButton и GrLink в API showcase', () => {
+    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
+    const linkEntity = showcaseComponentEntities.find(entity => entity.name === 'GrLink')
 
     const buttonProps = buttonEntity?.apiSections.find(section => section.key === 'props')
     const linkProps = linkEntity?.apiSections.find(section => section.key === 'props')
 
     expect(buttonProps?.items.find(item => item.name === 'variant')?.type).toBe(
-      'DsButtonVariant: "primary" | "secondary" | "outline" | "ghost" | "ghost-border"',
+      'GrButtonVariant: "primary" | "secondary" | "outline" | "ghost" | "ghost-border"',
     )
     expect(buttonProps?.items.find(item => item.name === 'tone')?.type).toBe(
-      'DsButtonTone: "primary" | "neutral" | "success" | "warning" | "danger" | "info"',
+      'GrButtonTone: "primary" | "neutral" | "success" | "warning" | "danger" | "info"',
     )
     expect(buttonProps?.items.find(item => item.name === 'size')?.type).toBe(
-      'DsButtonSize: "xs" | "sm" | "md" | "lg"',
+      'GrButtonSize: "xs" | "sm" | "md" | "lg"',
     )
     expect(linkProps?.items.find(item => item.name === 'variant')?.type).toBe(
-      'DsLinkVariant: "primary" | "default" | "muted" | "danger"',
+      'GrLinkVariant: "primary" | "default" | "muted" | "danger"',
     )
     expect(linkProps?.items.find(item => item.name === 'size')?.type).toBe(
-      'DsLinkSize: "sm" | "md" | "lg"',
+      'GrLinkSize: "sm" | "md" | "lg"',
     )
   })
 })

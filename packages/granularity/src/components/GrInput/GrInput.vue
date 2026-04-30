@@ -239,7 +239,7 @@ function onInput(e: Event): void {
         :style="prefixStyle"
         aria-hidden="true"
     >
-      <slot name="prefix"/>
+      <slot name="prefix" />
     </div>
 
     <input
@@ -268,7 +268,7 @@ function onInput(e: Event): void {
         :style="suffixStyle"
         aria-hidden="true"
     >
-      <slot name="suffix"/>
+      <slot name="suffix" />
     </div>
   </div>
 </template>

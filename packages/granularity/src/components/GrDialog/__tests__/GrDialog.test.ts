@@ -1,11 +1,10 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // Мокаем HeadlessUI, чтобы избавиться от teleport/focus-trap и иметь
 // возможность дёргать `close` через Esc. Эмулируем тот же контракт, что в
 // тестах `GrModal` (Esc → emit('close')).
-import { vi } from 'vitest'
 vi.mock('@headlessui/vue', async () => {
   const { defineComponent } = await import('vue')
   return {

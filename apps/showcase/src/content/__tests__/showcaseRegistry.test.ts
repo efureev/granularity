@@ -26,7 +26,7 @@ describe('showcase content registry', () => {
   })
 
   it('накладывает hand-authored metadata поверх generated layer', () => {
-    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButton')
+    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
     const themeEntity = showcaseComposableEntities.find(entity => entity.name === 'useTheme')
 
     expect(buttonEntity?.group).toBe('actions')

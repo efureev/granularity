@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-  DsButton,
-  DsCard,
+  GrButton,
+  GrCard,
 } from '@feugene/granularity'
 
 import CodeBlock from '../components/doc/CodeBlock.vue'
@@ -37,7 +37,7 @@ const overviewFeatureList = [
 
 <template>
   <div class="space-y-8">
-    <DsCard class="showcase-panel rounded-[32px] border p-6 lg:p-7">
+    <GrCard class="showcase-panel rounded-[32px] border p-6 lg:p-7">
       <div class="space-y-5">
         <div class="max-w-3xl space-y-3">
           <h1 class="text-3xl font-semibold leading-tight lg:text-4xl mb-3">
@@ -51,25 +51,25 @@ const overviewFeatureList = [
 
         <div class="flex flex-wrap gap-3">
           <RouterLink to="/foundations" custom v-slot="{ navigate, href }">
-            <DsButton :href="href" @click="navigate">
+            <GrButton :href="href" @click="navigate">
               Открыть foundations
-            </DsButton>
+            </GrButton>
           </RouterLink>
           <RouterLink to="/components" custom v-slot="{ navigate, href }">
-            <DsButton variant="ghost-border" :href="href" @click="navigate">
+            <GrButton variant="ghost-border" :href="href" @click="navigate">
               Каталог компонентов
-            </DsButton>
+            </GrButton>
           </RouterLink>
         </div>
       </div>
-    </DsCard>
+    </GrCard>
 
     <section class="space-y-4">
       <div class="space-y-2">
         <h2 class="text-2xl font-semibold">Почему Granularity</h2>
       </div>
 
-      <DsCard class="showcase-panel overflow-hidden rounded-[32px] border p-6 lg:p-8">
+      <GrCard class="showcase-panel overflow-hidden rounded-[32px] border p-6 lg:p-8">
         <div class="space-y-4">
           <h3 class="text-xl font-semibold leading-tight">
             Всё, что нужно, чтобы дизайн-система помогала команде, а не тормозила её
@@ -93,7 +93,7 @@ const overviewFeatureList = [
             </p>
           </div>
         </div>
-      </DsCard>
+      </GrCard>
     </section>
 
     <section id="quick-start" class="scroll-mt-28 space-y-4">
@@ -105,7 +105,7 @@ const overviewFeatureList = [
       </div>
 
       <div class="grid gap-6">
-        <DsCard
+        <GrCard
             v-for="card in showcaseQuickStartCards"
             :id="card.id"
             :key="card.id"
@@ -129,10 +129,10 @@ const overviewFeatureList = [
               {{ card.note }}
             </p>
           </div>
-        </DsCard>
+        </GrCard>
       </div>
 
-      <DsCard class="showcase-panel rounded-3xl border p-6">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-3">
           <h2 class="text-2xl font-semibold">Коротко об установке</h2>
           <p class="showcase-text-muted max-w-3xl text-sm leading-6">
@@ -140,7 +140,7 @@ const overviewFeatureList = [
           </p>
           <CodeBlock :code="showcaseInstallationNarrative" language="md" title="Installation guide excerpt"/>
         </div>
-      </DsCard>
+      </GrCard>
     </section>
   </div>
 </template>

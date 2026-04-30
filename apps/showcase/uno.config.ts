@@ -7,8 +7,8 @@ import {
     transformerVariantGroup,
 } from 'unocss'
 
-import { granularContent, type PresetGranularNodeOptions } from '@feugene/unocss-preset-granular/node'
-import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import {granularContent, type PresetGranularNodeOptions} from '@feugene/unocss-preset-granular/node'
+import {presetGranularNode} from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
 import {
     animationPreflights,
@@ -26,28 +26,8 @@ export const showcaseGranularOptions: PresetGranularNodeOptions = {
     layer: 'granular' as const,
 }
 
-const granularContentConfig = granularContent(showcaseGranularOptions)
-
-// Дополнительно к include, которые готовит `granularContent()` для dist-чанков
-// выбранных granular-компонентов, явно разрешаем сканировать исходники showcase.
-// ВАЖНО: include'ы из `granularContentConfig` необходимо СОХРАНЯТЬ, иначе
-// extractor перестаёт видеть `.js`-чанки компонентов из `@feugene/granularity/dist/`
-// и уникальные утилиты вроде `px-1.5` пропадают из итогового CSS.
-export const showcaseContentIncludes: RegExp[] = [
-    /\/apps\/showcase\/src\/.*\.(?:vue|[jt]sx?|mdx?|html|css)$/,
-]
-
 export default defineConfig({
-    content: {
-        ...granularContentConfig,
-        pipeline: {
-            ...(granularContentConfig.pipeline ?? {}),
-            include: [
-                ...(granularContentConfig.pipeline?.include ?? []),
-                ...showcaseContentIncludes,
-            ],
-        },
-    },
+    content: granularContent(showcaseGranularOptions),
     // Дополнительные правила поверх preset-mini из
     // `@feugene/unocss-mini-extra-rules`: spinner-анимация, bracket‑color с
     // `/NN` opacity, расширенные filter/backdrop‑filter утилиты и

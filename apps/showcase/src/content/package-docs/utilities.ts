@@ -54,7 +54,7 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       'Mixed pipelines могут возвращать несколько issues сразу, поэтому UI должен уметь отрисовать список.',
     ],
     integrationNotes: [
-      'Особенно полезен в сочетании с `vDropzone` и `DsFileUpload`, где validation errors нужно сразу показать пользователю.',
+      'Особенно полезен в сочетании с `vDropzone` и `GrFileUpload`, где validation errors нужно сразу показать пользователю.',
       'Подходит как boundary object между reusable validators и feature-specific error presentation.',
     ],
   },
@@ -110,7 +110,7 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       'Если accept-строка пустая, validator становится no-op и не создаёт issues.',
     ],
     integrationNotes: [
-      'Практический сценарий — использовать ту же строку `accept`, что и в `DsFileUpload`, чтобы UI и validator pipeline расходились как можно меньше.',
+      'Практический сценарий — использовать ту же строку `accept`, что и в `GrFileUpload`, чтобы UI и validator pipeline расходились как можно меньше.',
       'В паре с `FileValidationError` удобно преобразуется в список человекочитаемых upload-errors.',
     ],
   },
@@ -160,7 +160,7 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       'Одно лишь расширение не гарантирует содержимое файла, поэтому для security-sensitive сценариев его стоит сочетать с server-side проверкой.',
     ],
     integrationNotes: [
-      'Особенно полезен для `DsFileUpload`, когда браузер отдаёт fallback MIME и решение нужно принять по имени файла.',
+      'Особенно полезен для `GrFileUpload`, когда браузер отдаёт fallback MIME и решение нужно принять по имени файла.',
       'Может быть fallback-слоем рядом с `allowedMimeTypesValidator({ allowFallbackByExtension: true })`.',
     ],
   },
@@ -213,7 +213,7 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       'Сравнение идёт по exact MIME-строкам; wildcard-паттерны здесь не поддерживаются — для этого лучше использовать `acceptValidator`.',
     ],
     integrationNotes: [
-      'Полезен в `DsFileUpload` и custom dropzone flows, когда upload UI должен заранее объяснить mismatch между файлом и backend policy.',
+      'Полезен в `GrFileUpload` и custom dropzone flows, когда upload UI должен заранее объяснить mismatch между файлом и backend policy.',
       'В show-case сценариях удобно показывать рядом strict MIME и fallback-by-extension режим, чтобы команда понимала компромисс UX vs строгость.',
     ],
   },
@@ -321,7 +321,7 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       'Порядок validators важен, если UI потом группирует сообщения в исходной последовательности.',
     ],
     integrationNotes: [
-      'Отлично сочетается с `vDropzone`, `DsFileUpload` и custom input handlers.',
+      'Отлично сочетается с `vDropzone`, `GrFileUpload` и custom input handlers.',
       'Возвращаемый shape `{ files, issues }` удобно напрямую пробрасывать в UI-слой загрузки.',
     ],
   },

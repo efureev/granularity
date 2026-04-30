@@ -14,7 +14,7 @@ import type {
   ShowcaseSearchEntry,
 } from './showcaseSearch'
 
-const featuredEntityNames = new Set(['DsButton', 'vLoading', 'useTheme', 'runFileValidators'])
+const featuredEntityNames = new Set(['GrButton', 'vLoading', 'useTheme', 'runFileValidators'])
 
 const searchIndexEntries = generatedSearchIndex as SearchIndexEntry[]
 

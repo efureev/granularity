@@ -39,13 +39,17 @@ const hasDescription = computed(() => !!slots.description || !!props.description
     </div>
     <div class="min-w-0 flex-1">
       <div v-if="hasTitle" class="text-[13px] font-700">
-        <slot name="title">{{ title }}</slot>
+        <slot name="title">
+{{ title }}
+</slot>
       </div>
       <div
         v-if="hasDescription"
         class="text-[13px] text-[var(--muted-fg)] mt-0.5"
       >
-        <slot name="description">{{ description }}</slot>
+        <slot name="description">
+{{ description }}
+</slot>
       </div>
     </div>
     <div v-if="$slots.default" class="shrink-0">

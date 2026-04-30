@@ -6,7 +6,7 @@ import {
 } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { DsButton, DsSegmented, type DsSegmentedOption } from '@feugene/granularity'
+import { GrButton, GrSegmented, type GrSegmentedOption } from '@feugene/granularity'
 
 import { showcaseNavigationItems } from '../../app/showcase'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
@@ -27,7 +27,7 @@ const { localizePageByName } = useShowcasePageI18n()
 const localeOptions = [
   { value: 'ru', label: 'RU' },
   { value: 'en', label: 'EN' },
-] satisfies DsSegmentedOption[]
+] satisfies GrSegmentedOption[]
 
 const selectedLocale = computed<'ru' | 'en'>({
   get() {
@@ -73,7 +73,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
   <header class="showcase-header sticky top-0 z-40 border-b backdrop-blur-sm">
     <div class="mx-auto max-w-7xl px-4 py-4 lg:px-8">
       <div class="flex items-center gap-3">
-        <DsButton
+        <GrButton
           class="lg:hidden"
           variant="ghost"
           size="sm"
@@ -82,7 +82,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
           @click="emit('open-mobile-navigation')"
         >
           <IconMenu class="h-4 w-4" aria-hidden="true" />
-        </DsButton>
+        </GrButton>
 
         <RouterLink
           to="/"
@@ -117,7 +117,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
         </nav>
 
         <div class="ml-auto flex items-center gap-1 sm:gap-2">
-          <DsSegmented
+          <GrSegmented
             v-model="selectedLocale"
             class="hidden sm:inline-grid font-semibold showcase-pill"
             size="sm"

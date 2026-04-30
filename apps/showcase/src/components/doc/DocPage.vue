@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DsCard } from '@feugene/granularity'
+import { GrCard } from '@feugene/granularity'
 
 import ShowcasePageHero from '../showcase/ShowcasePageHero.vue'
 import InlineRichText from '../content/InlineRichText.vue'
@@ -39,7 +39,7 @@ defineProps<{
     </ShowcasePageHero>
 
     <section class="grid gap-6">
-      <DsCard
+      <GrCard
         v-for="section in sections"
         :id="section.id"
         :key="section.id"
@@ -65,7 +65,7 @@ defineProps<{
             <InlineRichText :text="bullet" />
           </li>
         </ul>
-      </DsCard>
+      </GrCard>
     </section>
 
     <section v-if="examples?.length" class="space-y-4">

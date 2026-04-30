@@ -52,7 +52,7 @@ describe('package docs metadata', () => {
     expect(doc.caveats.join(' ')).toContain('не выбрасывает `FileValidationError`')
   })
 
-  it('возвращает ручной override для `acceptValidator` и подчёркивает bridge с `DsFileUpload`', () => {
+  it('возвращает ручной override для `acceptValidator` и подчёркивает bridge с `GrFileUpload`', () => {
     const entity = showcaseUtilityEntities.find(item => item.name === 'acceptValidator')
 
     expect(entity).toBeDefined()
@@ -61,7 +61,7 @@ describe('package docs metadata', () => {
 
     expect(doc.examples[0]?.previewKey).toBe('accept-validator-preview')
     expect(doc.apiSections.map(section => section.origin)).toEqual(['manual', 'manual'])
-    expect(doc.integrationNotes.join(' ')).toContain('DsFileUpload')
+    expect(doc.integrationNotes.join(' ')).toContain('GrFileUpload')
   })
 
   it('возвращает ручной override для MIME/extension validators с runnable preview keys', () => {

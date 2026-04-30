@@ -51,9 +51,13 @@ describe('playground-5 config', () => {
   })
 
   it('подключает node-only preset и сканирует только свои исходники', () => {
-    expect(playground5UnoConfig).toContain("import { presetGranularNode } from '@feugene/unocss-preset-granular/node'")
+    expect(playground5UnoConfig).toContain("from '@feugene/unocss-preset-granular/node'")
+    expect(playground5UnoConfig).toContain('presetGranularNode')
+    expect(playground5UnoConfig).toContain('granularContent')
     expect(playground5UnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
     expect(playground5UnoConfig).toContain('providers: [granularityProvider]')
+    expect(playground5UnoConfig).toContain('presetGranularNode(granularOptions)')
+    expect(playground5UnoConfig).toContain('granularContent(granularOptions)')
     expect(playground5UnoConfig).toContain('layer: playground5GranularityLayer')
     expect(playground5GranularityLayer).toBe('granular')
     expect(playground5ContentIncludes.some(re => re.test('/repo/apps/playground-5/src/App.vue'))).toBe(true)

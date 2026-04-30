@@ -27,7 +27,7 @@ describe('showcase foundations content', () => {
     expect(showcaseFoundationGuides.find(guide => guide.id === 'styling')?.sourcePath).toBe('packages/granularity/docs/styling.md')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/unocss-preset-granular/node')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/granularity/granular-provider/node')
-    expect(showcaseFoundationGuides.find(guide => guide.id === 'localization')?.narrativeSource).toContain('DS_I18N_BLOCK')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'localization')?.narrativeSource).toContain('GRANULARITY_I18N_BLOCK')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'tokens')?.narrativeSource).toContain('--ds-space-4')
   })
 
@@ -82,7 +82,7 @@ describe('showcase foundations content', () => {
     expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/unocss-preset-granular/node'))).toBe(true)
     expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/granularity/granular-provider/node'))).toBe(true)
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-basic')?.code).not.toContain('components:')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-components')?.code).toContain("names: ['DsButton', 'DsCard']")
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-components')?.code).toContain("names: ['GrButton', 'GrCard']")
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-themes')?.code).toContain("themes: { names: ['light', 'dark'] }")
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-layer')?.code).toContain("layer: 'granular'")
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-granular-content')?.code).toContain('granularContent(granularOptions)')

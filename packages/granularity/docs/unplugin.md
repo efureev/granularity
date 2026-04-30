@@ -49,16 +49,15 @@ export default defineConfig({
 ```vue
 <template>
   <GrInput v-model="value" v-hotkey.enter="submit" />
-  <GrButton @click="submit">Go</GrButton>
+  <GrButton @click="submit">
+Go
+</GrButton>
 </template>
 ```
 
 Плагин сам добавит в собранный SFC:
 
 ```ts
-import { GrButton } from '@feugene/granularity/components/GrButton'
-import { GrInput } from '@feugene/granularity/components/GrInput'
-import { vHotkey } from '@feugene/granularity/directives/hotkey'
 import '@feugene/granularity/components/GrButton/styles.css'
 import '@feugene/granularity/components/GrInput/styles.css'
 ```

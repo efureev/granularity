@@ -27,9 +27,9 @@ const iconFiles = [
 ] as const
 
 const allowedSymbolUsage = new Map([
-  ['content/component-docs/examples/DsTree.examples.ts', new Set(['→'])],
+  ['content/component-docs/examples/GrTree.examples.ts', new Set(['→'])],
   ['content/foundations.ts', new Set(['→'])],
-  ['demos/components/ds-tree/DsTreeDragAndSlotDemo.vue', new Set(['→'])],
+  ['demos/components/ds-tree/GrTreeDragAndSlotDemo.vue', new Set(['→'])],
 ])
 
 const sourceExtensions = new Set(['.vue', '.ts'])

@@ -60,12 +60,14 @@ const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.captio
   >
     <table
       data-ds-table
-      :class="['min-w-full', tableTextClass]"
+      class="min-w-full" :class="[tableTextClass]"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"
     >
       <caption v-if="hasCaption" class="sr-only">
-        <slot name="caption">{{ caption }}</slot>
+        <slot name="caption">
+{{ caption }}
+</slot>
       </caption>
       <thead class="bg-[var(--muted)] text-[var(--muted-fg)]">
         <slot name="head" />

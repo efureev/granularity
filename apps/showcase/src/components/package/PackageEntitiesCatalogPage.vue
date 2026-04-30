@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import IconArrowRight from '~icons/lucide/arrow-right'
 
-import { DsCard } from '@feugene/granularity'
+import { GrCard } from '@feugene/granularity'
 
 import ShowcasePageHero from '../showcase/ShowcasePageHero.vue'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
@@ -98,7 +98,7 @@ const groupedEntities = computed(() => {
               :to="entity.path"
               class="block"
             >
-              <DsCard class="showcase-card-link h-full rounded-3xl border p-6 shadow-sm transition-transform hover:-translate-y-0.5">
+              <GrCard class="showcase-card-link h-full rounded-3xl border p-6 shadow-sm transition-transform hover:-translate-y-0.5">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="showcase-link-chip rounded-full border px-3 py-1 text-xs">
                     {{ entity.kind }}
@@ -116,17 +116,17 @@ const groupedEntities = computed(() => {
                   <span>{{ $t('showcase.packageCatalog.openDetailPage') }}</span>
                   <IconArrowRight class="h-4 w-4 shrink-0" />
                 </div>
-              </DsCard>
+              </GrCard>
             </RouterLink>
           </div>
         </section>
 
-        <DsCard
+        <GrCard
           v-if="groupedEntities.length === 0"
           class="showcase-empty-state rounded-3xl border border-dashed p-8 text-sm leading-6 shadow-sm"
         >
           {{ $t('showcase.packageCatalog.emptyState') }}
-        </DsCard>
+        </GrCard>
       </div>
     </section>
   </div>

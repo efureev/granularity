@@ -6,8 +6,8 @@ import { showcaseComponentEntities } from '../../app/showcase'
 import { getShowcaseComponentDoc } from '../componentDocs'
 
 describe('component docs metadata', () => {
-  it('возвращает ready-сценарии для `DsButton` вместе с preview keys и snippets', () => {
-    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButton')
+  it('возвращает ready-сценарии для `GrButton` вместе с preview keys и snippets', () => {
+    const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
 
     expect(buttonEntity).toBeDefined()
 
@@ -24,9 +24,9 @@ describe('component docs metadata', () => {
     expect(doc.examples.every(example => example.previewKey?.startsWith('ds-button'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для `DsSelect` и `DsFileUpload`, а не fallback metadata', () => {
-    const selectEntity = showcaseComponentEntities.find(entity => entity.name === 'DsSelect')
-    const fileUploadEntity = showcaseComponentEntities.find(entity => entity.name === 'DsFileUpload')
+  it('возвращает live-scenarios для `GrSelect` и `GrFileUpload`, а не fallback metadata', () => {
+    const selectEntity = showcaseComponentEntities.find(entity => entity.name === 'GrSelect')
+    const fileUploadEntity = showcaseComponentEntities.find(entity => entity.name === 'GrFileUpload')
 
     expect(selectEntity).toBeDefined()
     expect(fileUploadEntity).toBeDefined()
@@ -43,10 +43,10 @@ describe('component docs metadata', () => {
     expect(fileUploadDoc.examples.every(example => example.previewKey?.startsWith('ds-file-upload'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для complex-компонентов `DsModal`, `DsDropdown` и `DsDataTable`', () => {
-    const modalEntity = showcaseComponentEntities.find(entity => entity.name === 'DsModal')
-    const dropdownEntity = showcaseComponentEntities.find(entity => entity.name === 'DsDropdown')
-    const dataTableEntity = showcaseComponentEntities.find(entity => entity.name === 'DsDataTable')
+  it('возвращает live-scenarios для complex-компонентов `GrModal`, `GrDropdown` и `GrDataTable`', () => {
+    const modalEntity = showcaseComponentEntities.find(entity => entity.name === 'GrModal')
+    const dropdownEntity = showcaseComponentEntities.find(entity => entity.name === 'GrDropdown')
+    const dataTableEntity = showcaseComponentEntities.find(entity => entity.name === 'GrDataTable')
 
     expect(modalEntity).toBeDefined()
     expect(dropdownEntity).toBeDefined()
@@ -69,10 +69,10 @@ describe('component docs metadata', () => {
     expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('ds-data-table'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для `DsPagination`, `DsTabs` и `DsTooltip`', () => {
-    const paginationEntity = showcaseComponentEntities.find(entity => entity.name === 'DsPagination')
-    const tabsEntity = showcaseComponentEntities.find(entity => entity.name === 'DsTabs')
-    const tooltipEntity = showcaseComponentEntities.find(entity => entity.name === 'DsTooltip')
+  it('возвращает live-scenarios для `GrPagination`, `GrTabs` и `GrTooltip`', () => {
+    const paginationEntity = showcaseComponentEntities.find(entity => entity.name === 'GrPagination')
+    const tabsEntity = showcaseComponentEntities.find(entity => entity.name === 'GrTabs')
+    const tooltipEntity = showcaseComponentEntities.find(entity => entity.name === 'GrTooltip')
 
     expect(paginationEntity).toBeDefined()
     expect(tabsEntity).toBeDefined()
@@ -95,9 +95,9 @@ describe('component docs metadata', () => {
     expect(tooltipDoc.examples.every(example => example.previewKey?.startsWith('ds-tooltip'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для `DsTree` и `DsTreeSelect`', () => {
-    const treeEntity = showcaseComponentEntities.find(entity => entity.name === 'DsTree')
-    const treeSelectEntity = showcaseComponentEntities.find(entity => entity.name === 'DsTreeSelect')
+  it('возвращает live-scenarios для `GrTree` и `GrTreeSelect`', () => {
+    const treeEntity = showcaseComponentEntities.find(entity => entity.name === 'GrTree')
+    const treeSelectEntity = showcaseComponentEntities.find(entity => entity.name === 'GrTreeSelect')
 
     expect(treeEntity).toBeDefined()
     expect(treeSelectEntity).toBeDefined()
@@ -114,8 +114,8 @@ describe('component docs metadata', () => {
     expect(treeSelectDoc.examples.every(example => example.previewKey?.startsWith('ds-tree-select'))).toBe(true)
   })
 
-  it('выводит интерактивный builder первым live-example для `DsSwitch`', () => {
-    const switchEntity = showcaseComponentEntities.find(entity => entity.name === 'DsSwitch')
+  it('выводит интерактивный builder первым live-example для `GrSwitch`', () => {
+    const switchEntity = showcaseComponentEntities.find(entity => entity.name === 'GrSwitch')
 
     expect(switchEntity).toBeDefined()
 
@@ -131,8 +131,8 @@ describe('component docs metadata', () => {
     expect(doc.examples.every(example => example.previewKey?.startsWith('ds-switch'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для `DsSegmented` с корректными preview keys', () => {
-    const segmentedEntity = showcaseComponentEntities.find(entity => entity.name === 'DsSegmented')
+  it('возвращает live-scenarios для `GrSegmented` с корректными preview keys', () => {
+    const segmentedEntity = showcaseComponentEntities.find(entity => entity.name === 'GrSegmented')
 
     expect(segmentedEntity).toBeDefined()
 
@@ -143,11 +143,11 @@ describe('component docs metadata', () => {
     expect(doc.examples.every(example => example.previewKey?.startsWith('ds-segmented'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для form-controls `DsInput`, `DsNumberInput`, `DsTextarea` и `DsSwitch`', () => {
-    const inputEntity = showcaseComponentEntities.find(entity => entity.name === 'DsInput')
-    const numberInputEntity = showcaseComponentEntities.find(entity => entity.name === 'DsNumberInput')
-    const textareaEntity = showcaseComponentEntities.find(entity => entity.name === 'DsTextarea')
-    const switchEntity = showcaseComponentEntities.find(entity => entity.name === 'DsSwitch')
+  it('возвращает live-scenarios для form-controls `GrInput`, `GrNumberInput`, `GrTextarea` и `GrSwitch`', () => {
+    const inputEntity = showcaseComponentEntities.find(entity => entity.name === 'GrInput')
+    const numberInputEntity = showcaseComponentEntities.find(entity => entity.name === 'GrNumberInput')
+    const textareaEntity = showcaseComponentEntities.find(entity => entity.name === 'GrTextarea')
+    const switchEntity = showcaseComponentEntities.find(entity => entity.name === 'GrSwitch')
 
     expect(inputEntity).toBeDefined()
     expect(numberInputEntity).toBeDefined()
@@ -176,10 +176,10 @@ describe('component docs metadata', () => {
     expect(switchDoc.examples.every(example => example.previewKey?.startsWith('ds-switch'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для navigation batch `DsBottomNav`, `DsNavbar` и `DsSidebar`', () => {
-    const bottomNavEntity = showcaseComponentEntities.find(entity => entity.name === 'DsBottomNav')
-    const navbarEntity = showcaseComponentEntities.find(entity => entity.name === 'DsNavbar')
-    const sidebarEntity = showcaseComponentEntities.find(entity => entity.name === 'DsSidebar')
+  it('возвращает live-scenarios для navigation batch `GrBottomNav`, `GrNavbar` и `GrSidebar`', () => {
+    const bottomNavEntity = showcaseComponentEntities.find(entity => entity.name === 'GrBottomNav')
+    const navbarEntity = showcaseComponentEntities.find(entity => entity.name === 'GrNavbar')
+    const sidebarEntity = showcaseComponentEntities.find(entity => entity.name === 'GrSidebar')
 
     expect(bottomNavEntity).toBeDefined()
     expect(navbarEntity).toBeDefined()
@@ -202,13 +202,13 @@ describe('component docs metadata', () => {
     expect(sidebarDoc.examples.every(example => example.previewKey?.startsWith('ds-sidebar'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для overlay batch `DsDialog`, `DsDrawer`, `DsConfirmDialog`, `DsPromptDialog`, `DsToaster` и `DsLoading`', () => {
-    const dialogEntity = showcaseComponentEntities.find(entity => entity.name === 'DsDialog')
-    const drawerEntity = showcaseComponentEntities.find(entity => entity.name === 'DsDrawer')
-    const confirmDialogEntity = showcaseComponentEntities.find(entity => entity.name === 'DsConfirmDialog')
-    const promptDialogEntity = showcaseComponentEntities.find(entity => entity.name === 'DsPromptDialog')
-    const toasterEntity = showcaseComponentEntities.find(entity => entity.name === 'DsToaster')
-    const loadingEntity = showcaseComponentEntities.find(entity => entity.name === 'DsLoading')
+  it('возвращает live-scenarios для overlay batch `GrDialog`, `GrDrawer`, `GrConfirmDialog`, `GrPromptDialog`, `GrToaster` и `GrLoading`', () => {
+    const dialogEntity = showcaseComponentEntities.find(entity => entity.name === 'GrDialog')
+    const drawerEntity = showcaseComponentEntities.find(entity => entity.name === 'GrDrawer')
+    const confirmDialogEntity = showcaseComponentEntities.find(entity => entity.name === 'GrConfirmDialog')
+    const promptDialogEntity = showcaseComponentEntities.find(entity => entity.name === 'GrPromptDialog')
+    const toasterEntity = showcaseComponentEntities.find(entity => entity.name === 'GrToaster')
+    const loadingEntity = showcaseComponentEntities.find(entity => entity.name === 'GrLoading')
 
     expect(dialogEntity).toBeDefined()
     expect(drawerEntity).toBeDefined()
@@ -249,11 +249,11 @@ describe('component docs metadata', () => {
     expect(loadingDoc.examples.every(example => example.previewKey?.startsWith('ds-loading'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для feedback/state batch `DsCollapse`, `DsEmptyState`, `DsProgressBar` и `DsSkeleton`', () => {
-    const collapseEntity = showcaseComponentEntities.find(entity => entity.name === 'DsCollapse')
-    const emptyStateEntity = showcaseComponentEntities.find(entity => entity.name === 'DsEmptyState')
-    const progressBarEntity = showcaseComponentEntities.find(entity => entity.name === 'DsProgressBar')
-    const skeletonEntity = showcaseComponentEntities.find(entity => entity.name === 'DsSkeleton')
+  it('возвращает live-scenarios для feedback/state batch `GrCollapse`, `GrEmptyState`, `GrProgressBar` и `GrSkeleton`', () => {
+    const collapseEntity = showcaseComponentEntities.find(entity => entity.name === 'GrCollapse')
+    const emptyStateEntity = showcaseComponentEntities.find(entity => entity.name === 'GrEmptyState')
+    const progressBarEntity = showcaseComponentEntities.find(entity => entity.name === 'GrProgressBar')
+    const skeletonEntity = showcaseComponentEntities.find(entity => entity.name === 'GrSkeleton')
 
     expect(collapseEntity).toBeDefined()
     expect(emptyStateEntity).toBeDefined()
@@ -282,10 +282,10 @@ describe('component docs metadata', () => {
     expect(skeletonDoc.examples.every(example => example.previewKey?.startsWith('ds-skeleton'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для remaining form/helper batch `DsFormFile`, `DsFormSection` и `DsInputTag`', () => {
-    const formFileEntity = showcaseComponentEntities.find(entity => entity.name === 'DsFormFile')
-    const formSectionEntity = showcaseComponentEntities.find(entity => entity.name === 'DsFormSection')
-    const inputTagEntity = showcaseComponentEntities.find(entity => entity.name === 'DsInputTag')
+  it('возвращает live-scenarios для remaining form/helper batch `GrFormFile`, `GrFormSection` и `GrInputTag`', () => {
+    const formFileEntity = showcaseComponentEntities.find(entity => entity.name === 'GrFormFile')
+    const formSectionEntity = showcaseComponentEntities.find(entity => entity.name === 'GrFormSection')
+    const inputTagEntity = showcaseComponentEntities.find(entity => entity.name === 'GrInputTag')
 
     expect(formFileEntity).toBeDefined()
     expect(formSectionEntity).toBeDefined()
@@ -308,13 +308,13 @@ describe('component docs metadata', () => {
     expect(inputTagDoc.examples.every(example => example.previewKey?.startsWith('ds-input-tag'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для remaining composition/primitives batch `DsButtonGroup`, `DsDropdownMenu`, `DsIcon`, `DsLink`, `DsList` и `DsTable`', () => {
-    const buttonGroupEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButtonGroup')
-    const dropdownMenuEntity = showcaseComponentEntities.find(entity => entity.name === 'DsDropdownMenu')
-    const iconEntity = showcaseComponentEntities.find(entity => entity.name === 'DsIcon')
-    const linkEntity = showcaseComponentEntities.find(entity => entity.name === 'DsLink')
-    const listEntity = showcaseComponentEntities.find(entity => entity.name === 'DsList')
-    const tableEntity = showcaseComponentEntities.find(entity => entity.name === 'DsTable')
+  it('возвращает live-scenarios для remaining composition/primitives batch `GrButtonGroup`, `GrDropdownMenu`, `GrIcon`, `GrLink`, `GrList` и `GrTable`', () => {
+    const buttonGroupEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButtonGroup')
+    const dropdownMenuEntity = showcaseComponentEntities.find(entity => entity.name === 'GrDropdownMenu')
+    const iconEntity = showcaseComponentEntities.find(entity => entity.name === 'GrIcon')
+    const linkEntity = showcaseComponentEntities.find(entity => entity.name === 'GrLink')
+    const listEntity = showcaseComponentEntities.find(entity => entity.name === 'GrList')
+    const tableEntity = showcaseComponentEntities.find(entity => entity.name === 'GrTable')
 
     expect(buttonGroupEntity).toBeDefined()
     expect(dropdownMenuEntity).toBeDefined()
@@ -355,8 +355,8 @@ describe('component docs metadata', () => {
     expect(tableDoc.examples.every(example => example.previewKey?.startsWith('ds-table'))).toBe(true)
   })
 
-  it('возвращает live-scenarios для remaining media/advanced batch `DsImageViewer`', () => {
-    const imageViewerEntity = showcaseComponentEntities.find(entity => entity.name === 'DsImageViewer')
+  it('возвращает live-scenarios для remaining media/advanced batch `GrImageViewer`', () => {
+    const imageViewerEntity = showcaseComponentEntities.find(entity => entity.name === 'GrImageViewer')
 
     expect(imageViewerEntity).toBeDefined()
 

@@ -55,26 +55,26 @@ describe('GrSegmented', () => {
       const element = this as HTMLElement
 
       if (element.hasAttribute('data-ds-segmented')) {
-        return createRect({ left: 0, width: 260, height: 48 }) as DOMRect
+        return createRect({ left: 0, width: 260, height: 48 })
       }
 
       if (element.hasAttribute('data-ds-segmented-item')) {
         const value = element.getAttribute('data-value')
 
         if (value === 'list') {
-          return createRect({ left: 4, top: 4, width: 72, height: 40 }) as DOMRect
+          return createRect({ left: 4, top: 4, width: 72, height: 40 })
         }
 
         if (value === 'board') {
-          return createRect({ left: 80, top: 4, width: 84, height: 40 }) as DOMRect
+          return createRect({ left: 80, top: 4, width: 84, height: 40 })
         }
 
         if (value === 'calendar') {
-          return createRect({ left: 168, top: 4, width: 92, height: 40 }) as DOMRect
+          return createRect({ left: 168, top: 4, width: 92, height: 40 })
         }
       }
 
-      return createRect({ left: 0, width: 0, height: 0 }) as DOMRect
+      return createRect({ left: 0, width: 0, height: 0 })
     })
   })
 

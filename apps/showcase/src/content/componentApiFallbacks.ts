@@ -3,7 +3,7 @@ import type { ShowcaseApiSectionMeta } from './model.ts'
 export type ShowcaseComponentApiFallback = Partial<Record<'props' | 'slots' | 'events' | 'methods', ShowcaseApiSectionMeta>>
 
 export const showcaseComponentApiFallbacks: Record<string, ShowcaseComponentApiFallback> = {
-  DsButton: {
+  GrButton: {
     props: {
       key: 'props',
       title: 'Props',
@@ -12,17 +12,17 @@ export const showcaseComponentApiFallbacks: Record<string, ShowcaseComponentApiF
         {
           name: 'variant',
           description: '',
-          type: 'DsButtonVariant: \"primary\" | \"secondary\" | \"outline\" | \"ghost\" | \"ghost-border\"',
+          type: 'GrButtonVariant: \"primary\" | \"secondary\" | \"outline\" | \"ghost\" | \"ghost-border\"',
         },
         {
           name: 'tone',
           description: '',
-          type: 'DsButtonTone: \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\"',
+          type: 'GrButtonTone: \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\"',
         },
         {
           name: 'size',
           description: '',
-          type: 'DsButtonSize: \"xs\" | \"sm\" | \"md\" | \"lg\"',
+          type: 'GrButtonSize: \"xs\" | \"sm\" | \"md\" | \"lg\"',
         },
       ],
     },
@@ -33,13 +33,13 @@ export const showcaseComponentApiFallbacks: Record<string, ShowcaseComponentApiF
       items: [
         {
           name: 'default',
-          description: 'Текст кнопки, иконка или произвольный контент внутри `DsButton`.',
+          description: 'Текст кнопки, иконка или произвольный контент внутри `GrButton`.',
           type: '() => VNode[]',
         },
       ],
     },
   },
-  DsCard: {
+  GrCard: {
     slots: {
       key: 'slots',
       title: 'Slots',
@@ -53,7 +53,7 @@ export const showcaseComponentApiFallbacks: Record<string, ShowcaseComponentApiF
       ],
     },
   },
-  DsLink: {
+  GrLink: {
     props: {
       key: 'props',
       title: 'Props',
@@ -62,12 +62,12 @@ export const showcaseComponentApiFallbacks: Record<string, ShowcaseComponentApiF
         {
           name: 'variant',
           description: '',
-          type: 'DsLinkVariant: \"primary\" | \"default\" | \"muted\" | \"danger\"',
+          type: 'GrLinkVariant: \"primary\" | \"default\" | \"muted\" | \"danger\"',
         },
         {
           name: 'size',
           description: '',
-          type: 'DsLinkSize: \"sm\" | \"md\" | \"lg\"',
+          type: 'GrLinkSize: \"sm\" | \"md\" | \"lg\"',
         },
       ],
     },

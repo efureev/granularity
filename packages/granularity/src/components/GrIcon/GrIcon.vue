@@ -33,7 +33,7 @@ const iconStyle = computed(() => {
       class="ds-icon inline-flex items-center justify-center align-middle"
       :style="iconStyle"
   >
-    <slot/>
+    <slot />
   </span>
 </template>
 <style>

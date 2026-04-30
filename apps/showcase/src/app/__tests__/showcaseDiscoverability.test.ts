@@ -18,7 +18,7 @@ import {
 describe('showcase discoverability', () => {
   it('строит package-detail TOC для utilities и оставляет component detail sections на месте', () => {
     const utilityEntity = showcaseUtilityEntities.find(entity => entity.name === 'runFileValidators')
-    const componentEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButton')
+    const componentEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
 
     expect(utilityEntity).toBeDefined()
     expect(componentEntity).toBeDefined()
@@ -55,7 +55,7 @@ describe('showcase discoverability', () => {
   it('возвращает корректные import snippets и related source/doc links', () => {
     const utilityEntity = showcaseUtilityEntities.find(entity => entity.name === 'acceptValidator')
     const directiveEntity = showcaseDirectiveEntities.find(entity => entity.name === 'vLoading')
-    const componentEntity = showcaseComponentEntities.find(entity => entity.name === 'DsButton')
+    const componentEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
 
     expect(utilityEntity).toBeDefined()
     expect(directiveEntity).toBeDefined()

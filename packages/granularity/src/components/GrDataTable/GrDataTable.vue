@@ -189,7 +189,9 @@ function cellValue(row: TRow, key: string): unknown {
     <template v-if="isEmpty">
       <tr data-ds-datatable-empty>
         <td :colspan="columns.length" class="px-4 py-6 text-center text-[var(--muted-fg)]">
-          <slot name="empty">Нет данных</slot>
+          <slot name="empty">
+Нет данных
+</slot>
         </td>
       </tr>
     </template>

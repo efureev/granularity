@@ -109,7 +109,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
         >
           <div class="flex items-start gap-3">
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.variant).color }" aria-hidden="true">
-              <component :is="metaFor(toast.variant).icon"/>
+              <component :is="metaFor(toast.variant).icon" />
             </GrIcon>
             <div class="min-w-0 flex-1">
               <div class="text-[13px] font-700">
@@ -127,7 +127,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
                 @click="dismiss(toast.id)"
             >
               <GrIcon size="sm" aria-hidden="true">
-                <IconClose/>
+                <IconClose />
               </GrIcon>
             </GrButton>
           </div>

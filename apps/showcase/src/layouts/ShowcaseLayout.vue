@@ -6,7 +6,7 @@ import {
   useRoute,
 } from 'vue-router'
 
-import { DsButton } from '@feugene/granularity'
+import { GrButton } from '@feugene/granularity'
 
 import {
   getShowcaseEntityByPath,
@@ -278,7 +278,7 @@ function getSidebarItemClass(item: SidebarNavigationItem) {
             </h2>
           </div>
 
-          <DsButton
+          <GrButton
             variant="ghost"
             size="sm"
             square
@@ -286,7 +286,7 @@ function getSidebarItemClass(item: SidebarNavigationItem) {
             @click="isMobileNavigationOpen = false"
           >
             <IconX class="h-4 w-4" aria-hidden="true" />
-          </DsButton>
+          </GrButton>
         </div>
 
         <nav class="grid gap-2">

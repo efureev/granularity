@@ -2,7 +2,7 @@
 import {computed, ref, watch} from 'vue'
 import {RouterLink, useRoute} from 'vue-router'
 
-import {DsBadge, DsButton} from '@feugene/granularity'
+import {GrBadge, GrButton} from '@feugene/granularity'
 import {vClickOutside} from '@feugene/granularity/directives'
 
 import {
@@ -51,7 +51,7 @@ function closeSearch() {
       class="relative"
   >
     <div class="inline-flex">
-      <DsButton
+      <GrButton
           variant="ghost"
           size="sm"
           square
@@ -59,7 +59,7 @@ function closeSearch() {
           @click="toggleSearch()"
       >
         <SearchIcon/>
-      </DsButton>
+      </GrButton>
     </div>
 
     <div
@@ -77,9 +77,9 @@ function closeSearch() {
             </p>
           </div>
 
-          <DsBadge>
+          <GrBadge>
             {{ results.length }}
-          </DsBadge>
+          </GrBadge>
         </div>
 
         <input
@@ -134,9 +134,9 @@ function closeSearch() {
                   </p>
                 </div>
 
-                <DsBadge>
+                <GrBadge>
                   {{ result.kindLabel }}
-                </DsBadge>
+                </GrBadge>
               </div>
             </RouterLink>
           </div>

@@ -64,7 +64,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
   useToast: {
     overview: [
       '`useToast` управляет shared reactive очередью toast-уведомлений и отдаёт единый API для push/dismiss/clear из любого consumer-а приложения.',
-      'Для отображения очереди нужен mounted toast host, например `DsToaster` в app-shell showcase.',
+      'Для отображения очереди нужен mounted toast host, например `GrToaster` в app-shell showcase.',
     ],
     examples: createReadyExamples([
       {
@@ -113,7 +113,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
       },
     ],
     usage: [
-      'Добавьте toast host (`DsToaster` или аналогичный shell-компонент) один раз в корень приложения.',
+      'Добавьте toast host (`GrToaster` или аналогичный shell-компонент) один раз в корень приложения.',
       'Используйте returned `id`, если toast должен закрываться вручную после завершения пользовательского действия.',
     ],
     caveats: [

@@ -4,7 +4,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import IconArrowLeft from '~icons/lucide/arrow-left'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { DsBadge, DsCard } from '@feugene/granularity'
+import { GrBadge, GrCard } from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {
@@ -64,14 +64,14 @@ const pageEyebrow = computed(() => page.value?.eyebrow ?? localizePageByName('ov
       :description="entity.summary"
     >
       <template v-if="entity.tags?.length" #actions>
-        <DsBadge v-for="tag in entity.tags" :key="tag">
+        <GrBadge v-for="tag in entity.tags" :key="tag">
           {{ tag }}
-        </DsBadge>
+        </GrBadge>
       </template>
     </ShowcasePageHero>
 
     <section id="overview" class="scroll-mt-28">
-      <DsCard class="showcase-panel rounded-3xl border p-6">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
         <h2 class="text-2xl font-semibold">
           {{ t('showcase.detailPage.packageOverview.title') }}
         </h2>
@@ -80,7 +80,7 @@ const pageEyebrow = computed(() => page.value?.eyebrow ?? localizePageByName('ov
             {{ item }}
           </li>
         </ul>
-      </DsCard>
+      </GrCard>
     </section>
 
     <section id="examples" class="scroll-mt-28 space-y-4">
@@ -157,7 +157,7 @@ const pageEyebrow = computed(() => page.value?.eyebrow ?? localizePageByName('ov
     </section>
   </div>
 
-  <DsCard
+  <GrCard
     v-else
     class="showcase-empty-state rounded-3xl border border-dashed p-8 text-sm leading-6 shadow-sm"
   >
@@ -178,5 +178,5 @@ const pageEyebrow = computed(() => page.value?.eyebrow ?? localizePageByName('ov
         {{ t('showcase.detailPage.notFoundEntity.goUtilities') }}
       </RouterLink>
     </div>
-  </DsCard>
+  </GrCard>
 </template>

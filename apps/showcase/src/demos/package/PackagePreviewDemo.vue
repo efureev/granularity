@@ -2,13 +2,13 @@
 import { computed, ref } from 'vue'
 
 import {
-  DsBadge,
-  DsButton,
-  DsCard,
-  DsDialog,
-  DsFileUpload,
-  DsInput,
-  DsTextarea,
+  GrBadge,
+  GrButton,
+  GrCard,
+  GrDialog,
+  GrFileUpload,
+  GrInput,
+  GrTextarea,
   FileValidationError,
   acceptValidator,
   allowedExtensionsValidator,
@@ -49,7 +49,7 @@ const toasts = useToast()
 const toastStatus = ref('Очередь toast shared между всеми consumers.')
 const fileValidationStatus = ref('Запустите demo, чтобы увидеть shape `{ files, issues }`.')
 const validatorPreviewStatus = ref('Запустите demo, чтобы увидеть различия между accept, extensions и MIME validators.')
-const uploadBridgeStatus = ref('Выберите тестовые файлы, чтобы увидеть, как `DsFileUpload` транслирует `FileValidationError`.')
+const uploadBridgeStatus = ref('Выберите тестовые файлы, чтобы увидеть, как `GrFileUpload` транслирует `FileValidationError`.')
 
 const dropzoneBinding = computed(() => ({
   onFiles: async (files: File[]) => {
@@ -176,21 +176,21 @@ function handleUploadValidationError(error: unknown) {
 <template>
   <div class="grid gap-4">
     <template v-if="previewKey === 'v-autofocus-dialog'">
-      <DsButton class="justify-self-start" @click="dialogOpen = true">
+      <GrButton class="justify-self-start" @click="dialogOpen = true">
         Open dialog
-      </DsButton>
+      </GrButton>
 
-      <DsDialog v-model="dialogOpen" title="Invite teammate" size="sm">
+      <GrDialog v-model="dialogOpen" title="Invite teammate" size="sm">
         <div class="grid gap-3 text-sm text-[var(--muted-fg)]" v-autofocus="{ selector: 'input', preventScroll: true }">
           <p>После открытия dialog фокус попадёт в первое поле ввода.</p>
-          <DsInput model-value="" placeholder="name@company.com" />
-          <DsInput model-value="" placeholder="Role" />
+          <GrInput model-value="" placeholder="name@company.com" />
+          <GrInput model-value="" placeholder="Role" />
         </div>
-      </DsDialog>
+      </GrDialog>
     </template>
 
     <template v-else-if="previewKey === 'v-autosize-textarea'">
-      <DsTextarea
+      <GrTextarea
         v-model="autosizeValue"
         v-autosize
         :rows="2"
@@ -203,12 +203,12 @@ function handleUploadValidationError(error: unknown) {
 
     <template v-else-if="previewKey === 'v-click-outside-dropdown'">
       <div class="relative flex items-start gap-3">
-        <DsButton class="justify-self-start" @click="dropdownOpen = !dropdownOpen">
+        <GrButton class="justify-self-start" @click="dropdownOpen = !dropdownOpen">
           {{ dropdownOpen ? 'Close' : 'Open' }} dropdown
-        </DsButton>
-        <DsButton ref="excludeRef" variant="outline">
+        </GrButton>
+        <GrButton ref="excludeRef" variant="outline">
           Exclude zone
-        </DsButton>
+        </GrButton>
         <div
           v-if="dropdownOpen"
           v-click-outside="{ handler: () => dropdownOpen = false, exclude: [() => excludeRef] }"
@@ -227,7 +227,7 @@ function handleUploadValidationError(error: unknown) {
         class="rounded-3xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/40 p-6 transition"
       >
         <div class="flex items-center gap-3">
-          <DsBadge>{{ isDropOver ? 'drag-over' : 'idle' }}</DsBadge>
+          <GrBadge>{{ isDropOver ? 'drag-over' : 'idle' }}</GrBadge>
           <span class="text-sm text-[var(--muted-fg)]">
             {{ dropzoneState }}
           </span>
@@ -244,7 +244,7 @@ function handleUploadValidationError(error: unknown) {
         }"
         class="grid gap-3"
       >
-        <DsInput model-value="" placeholder="Focus here and press Escape" />
+        <GrInput model-value="" placeholder="Focus here and press Escape" />
         <p class="text-sm text-[var(--muted-fg)]">
           {{ hotkeyLog }}
         </p>
@@ -253,10 +253,10 @@ function handleUploadValidationError(error: unknown) {
 
     <template v-else-if="previewKey === 'v-loading-card'">
       <div class="grid gap-3">
-        <DsButton class="justify-self-start" @click="startCardLoading">
+        <GrButton class="justify-self-start" @click="startCardLoading">
           Toggle async loading
-        </DsButton>
-        <DsCard
+        </GrButton>
+        <GrCard
           v-loading="{ loading: cardLoading, text: 'Refreshing segment metrics…' }"
           class="rounded-3xl border border-[var(--brd)] bg-[var(--card)]/90 p-5 shadow-sm"
         >
@@ -266,14 +266,14 @@ function handleUploadValidationError(error: unknown) {
           <p class="mt-2 text-sm leading-6 text-[var(--muted-fg)]">
             Overlay таргетится в текущую карточку и не блокирует весь экран.
           </p>
-        </DsCard>
+        </GrCard>
       </div>
     </template>
 
     <template v-else-if="previewKey === 'create-loading-imperative'">
-      <DsButton class="justify-self-start" @click="startImperativeLoading">
+      <GrButton class="justify-self-start" @click="startImperativeLoading">
         Run imperative overlay
-      </DsButton>
+      </GrButton>
       <p class="text-sm text-[var(--muted-fg)]">
         {{ imperativeStatus }}
       </p>
@@ -281,10 +281,10 @@ function handleUploadValidationError(error: unknown) {
 
     <template v-else-if="previewKey === 'use-theme-runtime'">
       <div class="flex flex-wrap items-center gap-3">
-        <DsButton class="justify-self-start" @click="runtimeTheme.toggleTheme()">
+        <GrButton class="justify-self-start" @click="runtimeTheme.toggleTheme()">
           Toggle theme ({{ runtimeTheme.theme.value }})
-        </DsButton>
-        <DsBadge>{{ runtimeTheme.isDark.value ? 'dark' : 'light' }}</DsBadge>
+        </GrButton>
+        <GrBadge>{{ runtimeTheme.isDark.value ? 'dark' : 'light' }}</GrBadge>
       </div>
       <p class="text-sm text-[var(--muted-fg)]">
         Demo использует `persist: false`, поэтому не пишет состояние в localStorage и подходит для embedded flows.
@@ -293,18 +293,18 @@ function handleUploadValidationError(error: unknown) {
 
     <template v-else-if="previewKey === 'use-toast-queue'">
       <div class="flex flex-wrap gap-3">
-        <DsButton class="justify-self-start" @click="pushToast('success')">
+        <GrButton class="justify-self-start" @click="pushToast('success')">
           Push success
-        </DsButton>
-        <DsButton variant="outline" @click="pushToast('warning', 0)">
+        </GrButton>
+        <GrButton variant="outline" @click="pushToast('warning', 0)">
           Sticky warning
-        </DsButton>
-        <DsButton variant="ghost" @click="dismissLatestToast()">
+        </GrButton>
+        <GrButton variant="ghost" @click="dismissLatestToast()">
           Dismiss latest
-        </DsButton>
-        <DsButton variant="ghost" @click="toasts.clear()">
+        </GrButton>
+        <GrButton variant="ghost" @click="toasts.clear()">
           Clear all
-        </DsButton>
+        </GrButton>
       </div>
       <p class="text-sm text-[var(--muted-fg)]">
         {{ toastStatus }} Сейчас в очереди: {{ toasts.list.value.length }}.
@@ -313,9 +313,9 @@ function handleUploadValidationError(error: unknown) {
 
     <template v-else-if="previewKey === 'run-file-validators-pipeline'">
       <div class="grid gap-3">
-        <DsButton class="justify-self-start" @click="runFileValidationDemo">
+        <GrButton class="justify-self-start" @click="runFileValidationDemo">
           Run validator pipeline
-        </DsButton>
+        </GrButton>
         <p class="text-sm text-[var(--muted-fg)]">
           {{ fileValidationStatus }}
         </p>
@@ -325,15 +325,15 @@ function handleUploadValidationError(error: unknown) {
     <template v-else-if="previewKey === 'accept-validator-preview' || previewKey === 'allowed-extensions-validator-preview' || previewKey === 'allowed-mime-types-validator-preview'">
       <div class="grid gap-3">
         <div class="flex flex-wrap gap-3">
-          <DsButton class="justify-self-start" @click="runValidatorPreview('accept')">
+          <GrButton class="justify-self-start" @click="runValidatorPreview('accept')">
             accept
-          </DsButton>
-          <DsButton variant="outline" @click="runValidatorPreview('extensions')">
+          </GrButton>
+          <GrButton variant="outline" @click="runValidatorPreview('extensions')">
             extensions
-          </DsButton>
-          <DsButton variant="ghost" @click="runValidatorPreview('mime')">
+          </GrButton>
+          <GrButton variant="ghost" @click="runValidatorPreview('mime')">
             mime
-          </DsButton>
+          </GrButton>
         </div>
         <p class="text-sm text-[var(--muted-fg)]">
           {{ validatorPreviewStatus }}
@@ -343,7 +343,7 @@ function handleUploadValidationError(error: unknown) {
 
     <template v-else-if="previewKey === 'file-validation-upload-bridge'">
       <div class="grid gap-3">
-        <DsFileUpload
+        <GrFileUpload
           accept=".pdf,image/*"
           :multiple="true"
           :validators="[

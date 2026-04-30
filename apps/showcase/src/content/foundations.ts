@@ -379,8 +379,8 @@ function parseThemeTokens(sourceByTheme: Record<ShowcaseThemeName, string>): Sho
 }
 
 const rootImportSnippet = `import {
-  DsButton,
-  DsCard,
+  GrButton,
+  GrCard,
 } from '@feugene/granularity'
 
 import '@feugene/granularity/styles.css'`
@@ -421,7 +421,7 @@ export default defineConfig({
       providers: [granularityProvider],
       // Сужаем набор компонентов — в бандл попадёт только их CSS и preflight-ы.
       components: [
-        { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+        { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
       ],
     }),
   ],
@@ -438,7 +438,7 @@ export default defineConfig({
     presetGranularNode({
       providers: [granularityProvider],
       components: [
-        { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+        { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
       ],
       // Ограничиваем набор встроенных тем и/или подмешиваем свои theme files.
       themes: { names: ['light', 'dark'] },
@@ -457,7 +457,7 @@ export default defineConfig({
     presetGranularNode({
       providers: [granularityProvider],
       components: [
-        { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+        { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
       ],
       themes: { names: ['light', 'dark'] },
       // Кладём preflight-ы пакета в отдельный CSS layer — так проще
@@ -475,7 +475,7 @@ import granularityProvider from '@feugene/granularity/granular-provider/node'
 const granularOptions = {
   providers: [granularityProvider],
   components: [
-    { provider: '@feugene/granularity', names: ['DsButton', 'DsCard'] },
+    { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
   ],
   themes: { names: ['light', 'dark'] },
   layer: 'granular' as const,
@@ -493,15 +493,15 @@ export default defineConfig({
 })`
 
 const localizationSnippet = `import { createFintI18n } from '@feugene/fint-i18n'
-import { DS_I18N_BLOCK, dsLocaleLoaders } from '@feugene/granularity/i18n'
+import { GRANULARITY_I18N_BLOCK, grLocaleLoaders } from '@feugene/granularity/i18n'
 
 const i18n = createFintI18n({
   locale: 'ru',
   fallbackLocale: 'en',
-  loaders: [dsLocaleLoaders],
+  loaders: [grLocaleLoaders],
 })
 
-i18n.registerBlocks([DS_I18N_BLOCK])
+i18n.registerBlocks([GRANULARITY_I18N_BLOCK])
 await i18n.loadUsedBlocks('ru')`
 
 const tokensCssSource = `:root {
@@ -890,7 +890,7 @@ export const showcaseQuickStartCards: ShowcaseQuickStartCard[] = [
   {
     id: 'quick-start-preset-basic',
     title: 'Шаг 1. Базовый `uno.config.ts` с `presetGranularNode`',
-    description: '`presetGranularity` (node-вариант — `presetGranularNode`) — единственный поддерживаемый способ подключения пакета. На этом шаге в `presets` добавляется только сам preset и granular-провайдер пакета: никаких `components`, `themes` или `layer` пока нет.',
+    description: '`presetGranular` (node-вариант — `presetGranularNode`) — единственный поддерживаемый способ подключения пакета. На этом шаге в `presets` добавляется только сам preset и granular-провайдер пакета: никаких `components`, `themes` или `layer` пока нет.',
     code: presetBasicSnippet,
     language: 'ts',
     note: 'Уже на этом уровне в сборку подмешиваются `tokens.css` и `base.css`, включены все компоненты провайдера и их preflight-ы — эквивалент `components: "all"` по умолчанию.',
@@ -1086,7 +1086,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     keyPoints: [
       'Пакет ожидает внешний i18n-слой и не создаёт собственный изолированный i18n runtime.',
       'При отсутствии перевода компонент использует fallback-текст и не ломает UI.',
-      'Публичный entrypoint `@feugene/granularity/i18n` публикует `DS_I18N_BLOCK`, `dsLocaleLoaders` и adapter types.',
+      'Публичный entrypoint `@feugene/granularity/i18n` публикует `GRANULARITY_I18N_BLOCK`, `grLocaleLoaders` и adapter types.',
     ],
     recommendations: [
       'Держите словари приложения и словари дизайн-системы в одном общем i18n-слое.',

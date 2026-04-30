@@ -75,7 +75,7 @@
     "catalogDescription": "Components with examples:",
     "searchLabel": "Search components",
     "searchPlaceholder": "For example: button, form, overlay",
-    "emptyState": "No components matched the current query. Try a component name (`DsButton`) or a group (`forms`, `overlays`)."
+    "emptyState": "No components matched the current query. Try a component name (`GrButton`) or a group (`forms`, `overlays`)."
   },
   "packageCatalog": {
     "titleSuffix": "catalog",
@@ -226,7 +226,7 @@
   "search": {
     "open": "Open search",
     "summary": "Search pages, entities, and section anchors by title, alias, and usage context.",
-    "placeholder": "For example: DsButton, file validation, useTheme",
+    "placeholder": "For example: GrButton, file validation, useTheme",
     "noResults": "Nothing found. Try an entity name, export name, type (`component`, `utility`), or section title.",
     "openComponents": "Open components",
     "openUtilities": "Open utilities"

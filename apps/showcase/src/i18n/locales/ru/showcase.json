@@ -75,7 +75,7 @@
     "catalogDescription": "Компонентов с примерами:",
     "searchLabel": "Поиск компонентов",
     "searchPlaceholder": "Например: button, form, overlay",
-    "emptyState": "По текущему запросу компоненты не найдены. Попробуйте искать по имени (`DsButton`) или группе (`forms`, `overlays`)."
+    "emptyState": "По текущему запросу компоненты не найдены. Попробуйте искать по имени (`GrButton`) или группе (`forms`, `overlays`)."
   },
   "packageCatalog": {
     "titleSuffix": "каталог",
@@ -226,7 +226,7 @@
   "search": {
     "open": "Открыть поиск",
     "summary": "Ищите страницы, сущности и section anchors по названию, alias и контексту использования.",
-    "placeholder": "Например: DsButton, file validation, useTheme",
+    "placeholder": "Например: GrButton, file validation, useTheme",
     "noResults": "Ничего не найдено. Попробуйте имя сущности, export name, тип (`component`, `utility`) или section-title.",
     "openComponents": "Открыть components",
     "openUtilities": "Открыть utilities"

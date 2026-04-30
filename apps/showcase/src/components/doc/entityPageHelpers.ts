@@ -38,9 +38,9 @@ function resolveTranslator(translator?: Translator): Translator {
 }
 
 export const featuredEntityNamesByPage: Partial<Record<ShowcasePageName, string>> = {
-  overview: 'DsButton',
-  foundations: 'DsButton',
-  components: 'DsButton',
+  overview: 'GrButton',
+  foundations: 'GrButton',
+  components: 'GrButton',
   directives: 'vLoading',
   composables: 'useTheme',
   utilities: 'runFileValidators',

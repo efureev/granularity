@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import {ref} from 'vue'
 
-// import {DsButton} from '@feugene/granularity'
+// import {GrButton} from '@feugene/granularity'
 
 // const isPromptOpen = ref(false)
 // const promptValue = ref('Исходное имя')
@@ -14,11 +14,11 @@
         playground / granularity
       </p>
       <h1 class="text-3xl font-semibold leading-tight">
-        Проверка isolated-импорта `DsButton`, `DsModal` и `DsPromptDialog`
+        Проверка isolated-импорта `GrButton`, `GrModal` и `GrPromptDialog`
       </h1>
       <p class="max-w-3xl text-sm leading-6 text-slate-600">
-        В это демо через `presetFintDsGranularity` подключены granular-стили для
-        `DsPromptDialog`.
+        В это демо через `presetGranularNode` подключены granular-стили для
+        `GrPromptDialog`.
         На странице должны быть видны и button states, и корректная работа modal/prompt overlay, и базовые
         select-сценарии.
       </p>
@@ -30,21 +30,21 @@
           Prompt dialog
         </h2>
         <p class="text-sm text-slate-500">
-          Проверяем композицию `DsPromptDialog` поверх `DsDialog`/`DsModal`, валидацию и action-кнопки.
+          Проверяем композицию `GrPromptDialog` поверх `GrDialog`/`GrModal`, валидацию и action-кнопки.
         </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <!--        <DsButton @click="isPromptOpen = true">
+        <!--        <GrButton @click="isPromptOpen = true">
                   Переименовать
-                </DsButton>
+                </GrButton>
                 <span class="text-sm text-slate-500">
                   Текущее значение: <span class="font-medium text-slate-900">{{ promptValue }}</span>
                 </span>
                 -->
       </div>
       <!--
-            <DsPromptDialog
+            <GrPromptDialog
                 v-model="isPromptOpen"
                 v-model:value="promptValue"
                 title="Переименовать MVP"

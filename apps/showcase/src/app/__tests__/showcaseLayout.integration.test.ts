@@ -114,7 +114,7 @@ describe('showcase layout integration', () => {
     const { wrapper } = await mountShowcaseAt('/components/ds-button')
 
     expect(wrapper.text()).toContain('Компоненты')
-    expect(wrapper.text()).toContain('DsButton')
+    expect(wrapper.text()).toContain('GrButton')
     expect(wrapper.text()).toContain('Живые примеры')
     expect(wrapper.text()).toContain('API')
     expect(wrapper.text()).toContain('Заметки по реализации')
@@ -185,7 +185,7 @@ describe('showcase layout integration', () => {
     expect(wrapper.text()).toContain('Контекстная навигация')
     expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Действия')
-    expect(wrapper.text()).toContain('DsButtonGroup')
+    expect(wrapper.text()).toContain('GrButtonGroup')
 
     await router.push('/utilities')
     await flushPromises()

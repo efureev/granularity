@@ -9,7 +9,7 @@ import {
 
 describe('entity page helpers', () => {
   it('выбирает featured entity для page-level doc primitives', () => {
-    expect(resolveFeaturedEntity('components', showcaseEntityRegistry)?.name).toBe('DsButton')
+    expect(resolveFeaturedEntity('components', showcaseEntityRegistry)?.name).toBe('GrButton')
     expect(resolveFeaturedEntity('directives', showcaseEntityRegistry)?.name).toBe('vLoading')
   })
 
@@ -17,7 +17,7 @@ describe('entity page helpers', () => {
     const componentEntity = resolveFeaturedEntity('components', showcaseEntityRegistry)
     const directiveEntity = resolveFeaturedEntity('directives', showcaseEntityRegistry)
 
-    expect(createUsageSnippet(componentEntity)).toContain("import { DsButton } from '@feugene/granularity'")
+    expect(createUsageSnippet(componentEntity)).toContain("import { GrButton } from '@feugene/granularity'")
     expect(createUsageSnippet(directiveEntity)).toContain("import { vLoading } from '@feugene/granularity/directives'")
   })
 

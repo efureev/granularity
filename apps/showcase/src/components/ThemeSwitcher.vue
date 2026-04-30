@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  DsButton,
+  GrButton,
   useTheme,
 } from '@feugene/granularity'
 
@@ -20,7 +20,7 @@ const { isDark, toggleTheme } = useTheme({ storageKey: props.storageKey })
 </script>
 
 <template>
-  <DsButton
+  <GrButton
     variant="ghost"
     size="sm"
     square
@@ -29,5 +29,5 @@ const { isDark, toggleTheme } = useTheme({ storageKey: props.storageKey })
   >
     <IconMoon v-if="isDark" class="h-4 w-4" aria-hidden="true" />
     <IconSun v-else class="h-4 w-4" aria-hidden="true" />
-  </DsButton>
+  </GrButton>
 </template>

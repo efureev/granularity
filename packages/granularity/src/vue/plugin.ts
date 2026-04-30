@@ -89,7 +89,7 @@ function installComponent(app: App, c: GranularityInstallableComponent): void {
     }
 
     // Сознательно без throw — просто сообщаем в dev-режиме.
-    // eslint-disable-next-line no-console
+     
     console.warn('[granularity] component passed to createGranularity has no `install`, `name`, or `__name` — skipped.')
 }
 
@@ -105,7 +105,7 @@ function installDirective(app: App, d: GranularityInstallableDirective): void {
     }
 
     // Сознательно без throw — согласовано с `installComponent`.
-    // eslint-disable-next-line no-console
+     
     console.warn('[granularity] directive passed to createGranularity has no `install` or `{ name, directive }` — skipped.')
 }
 

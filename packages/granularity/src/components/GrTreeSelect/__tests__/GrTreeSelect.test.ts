@@ -97,7 +97,7 @@ async function mountHarness(
 
 function bodyFind(selector: string): DOMWrapper<Element> {
   const el = document.body.querySelector(selector)
-  return new DOMWrapper((el ?? document.createElement('i')) as Element)
+  return new DOMWrapper((el ?? document.createElement('i')))
 }
 
 function bodyExists(selector: string): boolean {
@@ -105,7 +105,7 @@ function bodyExists(selector: string): boolean {
 }
 
 function bodyFindAllRows(): DOMWrapper<Element>[] {
-  return [...document.body.querySelectorAll('.ds-tree__row')].map((el) => new DOMWrapper(el as Element))
+  return [...document.body.querySelectorAll('.ds-tree__row')].map((el) => new DOMWrapper(el))
 }
 
 describe('GrTreeSelect (unit)', () => {

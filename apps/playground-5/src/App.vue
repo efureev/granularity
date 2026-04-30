@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 
-import {DsButton} from '@feugene/granularity/components/DsButton'
+import {GrButton} from '@feugene/granularity/components/GrButton'
 
 const ready = ref(false)
 </script>
@@ -13,7 +13,7 @@ const ready = ref(false)
         playground-5 / способ 5
       </p>
       <h1 class="text-3xl font-semibold leading-tight">
-        `UnoCSS` + `presetGranularityNode`
+        `UnoCSS` + `presetGranularNode`
       </h1>
       <p class="mt-3 text-sm leading-6 text-slate-600">
         Стили кнопки и foundation CSS добавляются автоматически через node-only preset пакета.
@@ -22,9 +22,9 @@ const ready = ref(false)
 
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div class="flex flex-wrap items-center gap-3">
-        <DsButton variant="secondary" tone="success" @click="ready = !ready">
+        <GrButton variant="secondary" tone="success" @click="ready = !ready">
           {{ ready ? 'Готово' : 'Проверить preset' }}
-        </DsButton>
+        </GrButton>
         <span class="text-sm text-slate-500">
           Состояние: {{ ready ? 'uno-node подключён' : 'ожидает клика' }}
         </span>

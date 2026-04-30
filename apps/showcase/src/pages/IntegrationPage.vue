@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { DsBadge, DsCard } from '@feugene/granularity'
+import { GrBadge, GrCard } from '@feugene/granularity'
 
 import CodeBlock from '../components/doc/CodeBlock.vue'
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
@@ -18,7 +18,7 @@ const granularityVueSpecifier = `${granularitySpecifier}/vue`
 const granularityDirectivesSpecifier = `${granularitySpecifier}/directives`
 const unpluginGranularitySpecifier = `@feugene${'/unplugin-granularity'}`
 const vuePluginCode = `import { createApp } from 'vue'
-import { DsButton, DsInput } from '${granularitySpecifier}'
+import { GrButton, GrInput } from '${granularitySpecifier}'
 import { createGranularity } from '${granularityVueSpecifier}'
 import { vHotkey } from '${granularityDirectivesSpecifier}'
 
@@ -26,7 +26,7 @@ import App from '${appVueSpecifier}'
 
 createApp(App)
   .use(createGranularity({
-    components: [DsButton, DsInput],
+    components: [GrButton, GrInput],
     directives: [{ name: 'hotkey', directive: vHotkey }],
     provides: [{ key: Symbol.for('app.theme'), value: { mode: 'light' } }],
     globalProperties: { $appVersion: '0.2.0' },
@@ -53,8 +53,8 @@ export default defineConfig({
 })`
 
 const unpluginTemplateCode = `<template>
-  <DsInput v-model="value" v-hotkey.enter="submit" />
-  <DsButton @click="submit">Go</DsButton>
+  <GrInput v-model="value" v-hotkey.enter="submit" />
+  <GrButton @click="submit">Go</GrButton>
 </template>`
 
 const sectionCodeSamples: Record<string, Array<{ code: string, language: string, title?: string }>> = {
@@ -88,8 +88,8 @@ const sectionCodeSamples: Record<string, Array<{ code: string, language: string,
       :description="page.description"
     >
       <template #actions>
-        <DsBadge>@feugene/granularity/vue</DsBadge>
-        <DsBadge>@feugene/unplugin-granularity</DsBadge>
+        <GrBadge>@feugene/granularity/vue</GrBadge>
+        <GrBadge>@feugene/unplugin-granularity</GrBadge>
       </template>
     </ShowcasePageHero>
 
@@ -99,7 +99,7 @@ const sectionCodeSamples: Record<string, Array<{ code: string, language: string,
       :key="section.id"
       class="space-y-5 scroll-mt-28"
     >
-      <DsCard class="showcase-panel rounded-3xl border p-6 lg:p-7">
+      <GrCard class="showcase-panel rounded-3xl border p-6 lg:p-7">
         <div class="space-y-5">
           <div class="space-y-2">
             <h2 class="text-2xl font-semibold">
@@ -129,7 +129,7 @@ const sectionCodeSamples: Record<string, Array<{ code: string, language: string,
             />
           </div>
         </div>
-      </DsCard>
+      </GrCard>
     </section>
   </div>
 </template>
