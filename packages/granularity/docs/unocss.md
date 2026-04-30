@@ -19,7 +19,7 @@
   исходников выбранных компонентов (в т.ч. `.js`/`.ts` чанков в `dist/`).
 - `granularityProvider` — granular-провайдер пакета,
   реэкспортируется через `@feugene/granularity/granular-provider/node`.
-  Содержит описания компонентов пакета (например, `DsButton`), темы
+  Содержит описания компонентов пакета (например, `GrButton`), темы
   `light`/`dark` и token-определения.
 
 ## Базовый пример
@@ -63,7 +63,7 @@ export default defineConfig({
 presetGranularNode({
   providers: [granularityProvider],
   components: [
-    { provider: '@feugene/granularity', names: ['DsButton'] },
+    { provider: '@feugene/granularity', names: ['GrButton'] },
   ],
 })
 ```
@@ -73,7 +73,7 @@ presetGranularNode({
 ```ts
 presetGranularNode({
   providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
 })
 ```
@@ -83,7 +83,7 @@ presetGranularNode({
 ```ts
 presetGranularNode({
   providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
   layer: 'granular',
 })
@@ -98,7 +98,7 @@ top-level `content`:
 ```ts
 const granularOptions = {
   providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
   layer: 'granular' as const,
 }

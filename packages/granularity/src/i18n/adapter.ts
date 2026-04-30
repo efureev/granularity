@@ -8,4 +8,4 @@ export type GranularityI18nAdapter = {
   syncLocale?: (locale: string) => void | Promise<void>
 }
 
-export const GRANULARITY_I18N_KEY: InjectionKey<GranularityI18nAdapter | null> = Symbol('GRANULARITY_I18N_KEY')
+export const GRANULARITY_I18N_KEY: InjectionKey<GranularityI18nAdapter | null> = Symbol.for("@feugene/granularity")

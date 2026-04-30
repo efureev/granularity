@@ -37,21 +37,21 @@ yarn add @feugene/granularity vue
 import { createApp } from 'vue'
 import { createGranularity } from '@feugene/granularity/vue'
 
-import { DsButton } from '@feugene/granularity/components/DsButton'
-import { DsInput } from '@feugene/granularity/components/DsInput'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrInput } from '@feugene/granularity/components/GrInput'
 import { vHotkey } from '@feugene/granularity/directives'
 
 import App from './App.vue'
 
 createApp(App)
   .use(createGranularity({
-    components: [DsButton, DsInput],
+    components: [GrButton, GrInput],
     directives: [{ name: 'hotkey', directive: vHotkey }],
   }))
   .mount('#app')
 ```
 
-В бандл попадут только `DsButton`, `DsInput` и `vHotkey` — ничего сверх этого.
+В бандл попадут только `GrButton`, `GrInput` и `vHotkey` — ничего сверх этого.
 
 ## API
 
@@ -78,14 +78,14 @@ createApp(App)
 1. **Чистый SFC-компонент.** Vue 3 сам компилирует имя из имени файла в поле `__name`, по нему и пройдёт регистрация:
 
    ```ts
-   components: [DsButton, DsInput]
+   components: [GrButton, GrInput]
    ```
 
 2. **Объект с собственным `install`** (стиль Element Plus / Naive UI):
 
    ```ts
    components: [
-     { install: (app) => app.component('DsFancy', DsFancy) },
+     { install: (app) => app.component('GrFancy', GrFancy) },
    ]
    ```
 
@@ -93,7 +93,7 @@ createApp(App)
    `defineOptions({ name })`):
 
    ```ts
-   components: [{ name: 'DsButton', component: DsButton }]
+   components: [{ name: 'GrButton', component: GrButton }]
    ```
 
 ### Допустимые формы `directives`
@@ -107,9 +107,9 @@ createApp(App)
 
 ```ts
 import { defineInstallable } from '@feugene/granularity/vue'
-import { DsButton } from '@feugene/granularity/components/DsButton'
+import { GrButton } from '@feugene/granularity/components/GrButton'
 
-const installable = defineInstallable(DsButton, 'DsBtn')
+const installable = defineInstallable(GrButton, 'GrBtn')
 ```
 
 ## Нюансы и подводные камни

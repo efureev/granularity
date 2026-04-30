@@ -80,9 +80,9 @@ if (result.issues.length > 0) {
 - `maxFileSizeBytesValidator` / `maxSizeMbValidator` — если нужно ограничение на размер одного файла.
 - `maxTotalSizeBytesValidator` — если нужно ограничение на суммарный размер набора файлов.
 
-## Связь с `DsFileUpload` и `vDropzone`
+## Связь с `GrFileUpload` и `vDropzone`
 
-- `DsFileUpload` переиспользует этот API для своей логики.
+- `GrFileUpload` переиспользует этот API для своей логики.
 - `vDropzone` принимает `validators` в binding value и запускает их до вызова `onFiles`.
 
 Иными словами, `fileValidation` — это package-level слой, который можно использовать независимо от конкретного UI.

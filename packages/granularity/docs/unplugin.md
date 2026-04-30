@@ -9,7 +9,7 @@
 ## Когда использовать
 
 - это **рекомендуемый** способ для prod-приложений;
-- когда хочется писать `<DsButton />` и `v-hotkey` прямо в шаблонах без ручных `import`-ов;
+- когда хочется писать `<GrButton />` и `v-hotkey` прямо в шаблонах без ручных `import`-ов;
 - когда важен минимальный JS- и CSS-бандл и не хочется следить за списком импортов руками;
 - когда приложение уже использует `unplugin-vue-components`.
 
@@ -48,19 +48,19 @@ export default defineConfig({
 
 ```vue
 <template>
-  <DsInput v-model="value" v-hotkey.enter="submit" />
-  <DsButton @click="submit">Go</DsButton>
+  <GrInput v-model="value" v-hotkey.enter="submit" />
+  <GrButton @click="submit">Go</GrButton>
 </template>
 ```
 
 Плагин сам добавит в собранный SFC:
 
 ```ts
-import { DsButton } from '@feugene/granularity/components/DsButton'
-import { DsInput } from '@feugene/granularity/components/DsInput'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrInput } from '@feugene/granularity/components/GrInput'
 import { vHotkey } from '@feugene/granularity/directives/hotkey'
-import '@feugene/granularity/components/DsButton/styles.css'
-import '@feugene/granularity/components/DsInput/styles.css'
+import '@feugene/granularity/components/GrButton/styles.css'
+import '@feugene/granularity/components/GrInput/styles.css'
 ```
 
 ## Опции
@@ -70,7 +70,7 @@ GranularityResolver({
   prefix: 'Ds',             // префикс компонентов, по умолчанию 'Ds'
   importStyle: true,        // подключать component-level CSS, по умолчанию true
   directives: true,         // резолвить директивы из whitelist, по умолчанию true
-  exclude: [/^DsIcon$/],    // компоненты, которые резолвер игнорирует
+  exclude: [/^GrIcon$/],    // компоненты, которые резолвер игнорирует
 })
 ```
 

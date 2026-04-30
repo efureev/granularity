@@ -151,7 +151,7 @@ import '@feugene/granularity/foundation.css'
 ### Подключить bundle конкретного компонента
 
 ```ts
-import '@feugene/granularity/components/DsButton/styles.css'
+import '@feugene/granularity/components/GrButton/styles.css'
 ```
 
 Подходит, если нужен один конкретный компонент и не хочется подключать общий `styles.css`.

@@ -1,0 +1,6 @@
+export { default } from './GrTextarea.vue'
+export { default as GrTextarea } from './GrTextarea.vue'
+export type { GrTextareaProps } from './GrTextarea.vue'
+export { grTextareaConfig } from './config'
+export type { GrTextareaState } from './grTextareaStyles'
+export { grTextareaSafelist } from './safelist'

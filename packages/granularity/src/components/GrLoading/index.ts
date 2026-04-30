@@ -1,0 +1,5 @@
+export { default } from './GrLoading.vue'
+export { default as GrLoading } from './GrLoading.vue'
+export { grLoadingConfig } from './config'
+export { grLoadingSafelist } from './safelist'
+export type { GrLoadingProps } from './GrLoading.vue'

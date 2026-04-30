@@ -32,149 +32,149 @@ export default defineConfig({
     lib: {
       entry: {
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        'components/DsAlert/index': fileURLToPath(
-          new URL('./src/components/DsAlert/index.ts', import.meta.url),
+        'components/GrAlert/index': fileURLToPath(
+          new URL('./src/components/GrAlert/index.ts', import.meta.url),
         ),
-        'components/DsAvatar/index': fileURLToPath(
-          new URL('./src/components/DsAvatar/index.ts', import.meta.url),
+        'components/GrAvatar/index': fileURLToPath(
+          new URL('./src/components/GrAvatar/index.ts', import.meta.url),
         ),
-        'components/DsBadge/index': fileURLToPath(
-          new URL('./src/components/DsBadge/index.ts', import.meta.url),
+        'components/GrBadge/index': fileURLToPath(
+          new URL('./src/components/GrBadge/index.ts', import.meta.url),
         ),
-        'components/DsBadgeWrap/index': fileURLToPath(
-          new URL('./src/components/DsBadgeWrap/index.ts', import.meta.url),
+        'components/GrBadgeWrap/index': fileURLToPath(
+          new URL('./src/components/GrBadgeWrap/index.ts', import.meta.url),
         ),
-        'components/DsBottomNav/index': fileURLToPath(
-          new URL('./src/components/DsBottomNav/index.ts', import.meta.url),
+        'components/GrBottomNav/index': fileURLToPath(
+          new URL('./src/components/GrBottomNav/index.ts', import.meta.url),
         ),
-        'components/DsButton/index': fileURLToPath(
-          new URL('./src/components/DsButton/index.ts', import.meta.url),
+        'components/GrButton/index': fileURLToPath(
+          new URL('./src/components/GrButton/index.ts', import.meta.url),
         ),
-        'components/DsButtonGroup/index': fileURLToPath(
-          new URL('./src/components/DsButtonGroup/index.ts', import.meta.url),
+        'components/GrButtonGroup/index': fileURLToPath(
+          new URL('./src/components/GrButtonGroup/index.ts', import.meta.url),
         ),
-        'components/DsCard/index': fileURLToPath(
-          new URL('./src/components/DsCard/index.ts', import.meta.url),
+        'components/GrCard/index': fileURLToPath(
+          new URL('./src/components/GrCard/index.ts', import.meta.url),
         ),
-        'components/DsCheckbox/index': fileURLToPath(
-          new URL('./src/components/DsCheckbox/index.ts', import.meta.url),
+        'components/GrCheckbox/index': fileURLToPath(
+          new URL('./src/components/GrCheckbox/index.ts', import.meta.url),
         ),
-        'components/DsCollapse/index': fileURLToPath(
-          new URL('./src/components/DsCollapse/index.ts', import.meta.url),
+        'components/GrCollapse/index': fileURLToPath(
+          new URL('./src/components/GrCollapse/index.ts', import.meta.url),
         ),
-        'components/DsConfirmDialog/index': fileURLToPath(
-          new URL('./src/components/DsConfirmDialog/index.ts', import.meta.url),
+        'components/GrConfirmDialog/index': fileURLToPath(
+          new URL('./src/components/GrConfirmDialog/index.ts', import.meta.url),
         ),
-        'components/DsDataTable/index': fileURLToPath(
-          new URL('./src/components/DsDataTable/index.ts', import.meta.url),
+        'components/GrDataTable/index': fileURLToPath(
+          new URL('./src/components/GrDataTable/index.ts', import.meta.url),
         ),
-        'components/DsDialog/index': fileURLToPath(
-          new URL('./src/components/DsDialog/index.ts', import.meta.url),
+        'components/GrDialog/index': fileURLToPath(
+          new URL('./src/components/GrDialog/index.ts', import.meta.url),
         ),
-        'components/DsDrawer/index': fileURLToPath(
-          new URL('./src/components/DsDrawer/index.ts', import.meta.url),
+        'components/GrDrawer/index': fileURLToPath(
+          new URL('./src/components/GrDrawer/index.ts', import.meta.url),
         ),
-        'components/DsDropdown/index': fileURLToPath(
-          new URL('./src/components/DsDropdown/index.ts', import.meta.url),
+        'components/GrDropdown/index': fileURLToPath(
+          new URL('./src/components/GrDropdown/index.ts', import.meta.url),
         ),
-        'components/DsDropdownMenu/index': fileURLToPath(
-          new URL('./src/components/DsDropdownMenu/index.ts', import.meta.url),
+        'components/GrDropdownMenu/index': fileURLToPath(
+          new URL('./src/components/GrDropdownMenu/index.ts', import.meta.url),
         ),
-        'components/DsEmptyState/index': fileURLToPath(
-          new URL('./src/components/DsEmptyState/index.ts', import.meta.url),
+        'components/GrEmptyState/index': fileURLToPath(
+          new URL('./src/components/GrEmptyState/index.ts', import.meta.url),
         ),
-        'components/DsFileUpload/index': fileURLToPath(
-          new URL('./src/components/DsFileUpload/index.ts', import.meta.url),
+        'components/GrFileUpload/index': fileURLToPath(
+          new URL('./src/components/GrFileUpload/index.ts', import.meta.url),
         ),
-        'components/DsFormField/index': fileURLToPath(
-          new URL('./src/components/DsFormField/index.ts', import.meta.url),
+        'components/GrFormField/index': fileURLToPath(
+          new URL('./src/components/GrFormField/index.ts', import.meta.url),
         ),
-        'components/DsFormFile/index': fileURLToPath(
-          new URL('./src/components/DsFormFile/index.ts', import.meta.url),
+        'components/GrFormFile/index': fileURLToPath(
+          new URL('./src/components/GrFormFile/index.ts', import.meta.url),
         ),
-        'components/DsFormSection/index': fileURLToPath(
-          new URL('./src/components/DsFormSection/index.ts', import.meta.url),
+        'components/GrFormSection/index': fileURLToPath(
+          new URL('./src/components/GrFormSection/index.ts', import.meta.url),
         ),
-        'components/DsIcon/index': fileURLToPath(
-          new URL('./src/components/DsIcon/index.ts', import.meta.url),
+        'components/GrIcon/index': fileURLToPath(
+          new URL('./src/components/GrIcon/index.ts', import.meta.url),
         ),
-        'components/DsImageViewer/index': fileURLToPath(
-          new URL('./src/components/DsImageViewer/index.ts', import.meta.url),
+        'components/GrImageViewer/index': fileURLToPath(
+          new URL('./src/components/GrImageViewer/index.ts', import.meta.url),
         ),
-        'components/DsInput/index': fileURLToPath(
-          new URL('./src/components/DsInput/index.ts', import.meta.url),
+        'components/GrInput/index': fileURLToPath(
+          new URL('./src/components/GrInput/index.ts', import.meta.url),
         ),
-        'components/DsInputTag/index': fileURLToPath(
-          new URL('./src/components/DsInputTag/index.ts', import.meta.url),
+        'components/GrInputTag/index': fileURLToPath(
+          new URL('./src/components/GrInputTag/index.ts', import.meta.url),
         ),
-        'components/DsLink/index': fileURLToPath(
-          new URL('./src/components/DsLink/index.ts', import.meta.url),
+        'components/GrLink/index': fileURLToPath(
+          new URL('./src/components/GrLink/index.ts', import.meta.url),
         ),
-        'components/DsList/index': fileURLToPath(
-          new URL('./src/components/DsList/index.ts', import.meta.url),
+        'components/GrList/index': fileURLToPath(
+          new URL('./src/components/GrList/index.ts', import.meta.url),
         ),
-        'components/DsLoading/index': fileURLToPath(
-          new URL('./src/components/DsLoading/index.ts', import.meta.url),
+        'components/GrLoading/index': fileURLToPath(
+          new URL('./src/components/GrLoading/index.ts', import.meta.url),
         ),
-        'components/DsModal/index': fileURLToPath(
-          new URL('./src/components/DsModal/index.ts', import.meta.url),
+        'components/GrModal/index': fileURLToPath(
+          new URL('./src/components/GrModal/index.ts', import.meta.url),
         ),
-        'components/DsNavbar/index': fileURLToPath(
-          new URL('./src/components/DsNavbar/index.ts', import.meta.url),
+        'components/GrNavbar/index': fileURLToPath(
+          new URL('./src/components/GrNavbar/index.ts', import.meta.url),
         ),
-        'components/DsNumberInput/index': fileURLToPath(
-          new URL('./src/components/DsNumberInput/index.ts', import.meta.url),
+        'components/GrNumberInput/index': fileURLToPath(
+          new URL('./src/components/GrNumberInput/index.ts', import.meta.url),
         ),
-        'components/DsPagination/index': fileURLToPath(
-          new URL('./src/components/DsPagination/index.ts', import.meta.url),
+        'components/GrPagination/index': fileURLToPath(
+          new URL('./src/components/GrPagination/index.ts', import.meta.url),
         ),
-        'components/DsProgressBar/index': fileURLToPath(
-          new URL('./src/components/DsProgressBar/index.ts', import.meta.url),
+        'components/GrProgressBar/index': fileURLToPath(
+          new URL('./src/components/GrProgressBar/index.ts', import.meta.url),
         ),
-        'components/DsPromptDialog/index': fileURLToPath(
-          new URL('./src/components/DsPromptDialog/index.ts', import.meta.url),
+        'components/GrPromptDialog/index': fileURLToPath(
+          new URL('./src/components/GrPromptDialog/index.ts', import.meta.url),
         ),
-        'components/DsRadio/index': fileURLToPath(
-          new URL('./src/components/DsRadio/index.ts', import.meta.url),
+        'components/GrRadio/index': fileURLToPath(
+          new URL('./src/components/GrRadio/index.ts', import.meta.url),
         ),
-        'components/DsRadioGroup/index': fileURLToPath(
-          new URL('./src/components/DsRadioGroup/index.ts', import.meta.url),
+        'components/GrRadioGroup/index': fileURLToPath(
+          new URL('./src/components/GrRadioGroup/index.ts', import.meta.url),
         ),
-        'components/DsSegmented/index': fileURLToPath(
-          new URL('./src/components/DsSegmented/index.ts', import.meta.url),
+        'components/GrSegmented/index': fileURLToPath(
+          new URL('./src/components/GrSegmented/index.ts', import.meta.url),
         ),
-        'components/DsSelect/index': fileURLToPath(
-          new URL('./src/components/DsSelect/index.ts', import.meta.url),
+        'components/GrSelect/index': fileURLToPath(
+          new URL('./src/components/GrSelect/index.ts', import.meta.url),
         ),
-        'components/DsSidebar/index': fileURLToPath(
-          new URL('./src/components/DsSidebar/index.ts', import.meta.url),
+        'components/GrSidebar/index': fileURLToPath(
+          new URL('./src/components/GrSidebar/index.ts', import.meta.url),
         ),
-        'components/DsSkeleton/index': fileURLToPath(
-          new URL('./src/components/DsSkeleton/index.ts', import.meta.url),
+        'components/GrSkeleton/index': fileURLToPath(
+          new URL('./src/components/GrSkeleton/index.ts', import.meta.url),
         ),
-        'components/DsSwitch/index': fileURLToPath(
-          new URL('./src/components/DsSwitch/index.ts', import.meta.url),
+        'components/GrSwitch/index': fileURLToPath(
+          new URL('./src/components/GrSwitch/index.ts', import.meta.url),
         ),
-        'components/DsTable/index': fileURLToPath(
-          new URL('./src/components/DsTable/index.ts', import.meta.url),
+        'components/GrTable/index': fileURLToPath(
+          new URL('./src/components/GrTable/index.ts', import.meta.url),
         ),
-        'components/DsTabs/index': fileURLToPath(
-          new URL('./src/components/DsTabs/index.ts', import.meta.url),
+        'components/GrTabs/index': fileURLToPath(
+          new URL('./src/components/GrTabs/index.ts', import.meta.url),
         ),
-        'components/DsTextarea/index': fileURLToPath(
-          new URL('./src/components/DsTextarea/index.ts', import.meta.url),
+        'components/GrTextarea/index': fileURLToPath(
+          new URL('./src/components/GrTextarea/index.ts', import.meta.url),
         ),
-        'components/DsToaster/index': fileURLToPath(
-          new URL('./src/components/DsToaster/index.ts', import.meta.url),
+        'components/GrToaster/index': fileURLToPath(
+          new URL('./src/components/GrToaster/index.ts', import.meta.url),
         ),
-        'components/DsTooltip/index': fileURLToPath(
-          new URL('./src/components/DsTooltip/index.ts', import.meta.url),
+        'components/GrTooltip/index': fileURLToPath(
+          new URL('./src/components/GrTooltip/index.ts', import.meta.url),
         ),
-        'components/DsTree/index': fileURLToPath(
-          new URL('./src/components/DsTree/index.ts', import.meta.url),
+        'components/GrTree/index': fileURLToPath(
+          new URL('./src/components/GrTree/index.ts', import.meta.url),
         ),
-        'components/DsTreeSelect/index': fileURLToPath(
-          new URL('./src/components/DsTreeSelect/index.ts', import.meta.url),
+        'components/GrTreeSelect/index': fileURLToPath(
+          new URL('./src/components/GrTreeSelect/index.ts', import.meta.url),
         ),
         'composables/useTheme': fileURLToPath(
           new URL('./src/composables/useTheme.ts', import.meta.url),
@@ -190,6 +190,9 @@ export default defineConfig({
         ),
         'i18n/index': fileURLToPath(
           new URL('./src/i18n/index.ts', import.meta.url),
+        ),
+        'i18n/all': fileURLToPath(
+          new URL('./src/i18n/all.ts', import.meta.url),
         ),
         'vue/index': fileURLToPath(
           new URL('./src/vue/index.ts', import.meta.url),
@@ -209,6 +212,7 @@ export default defineConfig({
         /^node:/,
         'vue',
         /^@feugene\/unocss-preset-granular(\/.*)?$/,
+        /^@feugene\/fint-i18n(\/.*)?$/,
       ],
       output: {
         chunkFileNames: granularChunkFileNames(),

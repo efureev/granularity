@@ -89,7 +89,7 @@ export default defineConfig({
 presetGranularNode({
   providers: [granularityProvider],
   components: [
-    { provider: '@feugene/granularity', names: ['DsButton'] },
+    { provider: '@feugene/granularity', names: ['GrButton'] },
   ],
 })
 ```
@@ -101,7 +101,7 @@ presetGranularNode({
 ```ts
 presetGranularNode({
   providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
 })
 ```
@@ -119,7 +119,7 @@ presetGranularNode({
 ```ts
 presetGranularNode({
   providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
   layer: 'granular',
 })
@@ -139,7 +139,7 @@ import granularityProvider from '@feugene/granularity/granular-provider/node'
 
 const granularOptions = {
   providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['DsButton'] }],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
   layer: 'granular' as const,
 }

@@ -39,8 +39,8 @@ src/components/<ComponentName>/
 
 Важно: эти файлы **не обязательны сами по себе**. Например, сейчас:
 
-- у `DsDialog`, `DsFormField` и `DsInput` нет отдельного `safelist.ts`, safelist экспортируется из style-helper;
-- только `DsIcon` использует `cssFiles` в `config.ts` и хранит локальные `tokens.css` / `styles.css`.
+- у `GrDialog`, `GrFormField` и `GrInput` нет отдельного `safelist.ts`, safelist экспортируется из style-helper;
+- только `GrIcon` использует `cssFiles` в `config.ts` и хранит локальные `tokens.css` / `styles.css`.
 
 ## Пошаговый чеклист
 
@@ -60,10 +60,10 @@ src/components/<ComponentName>/
 
 Текущие примеры из пакета:
 
-- `DsButton/dsButtonStyles.ts`;
-- `DsDialog/dsDialogStyles.ts`;
-- `DsFormField/dsFormFieldStyles.ts`;
-- `DsInput/dsInputStyles.ts`.
+- `GrButton/grButtonStyles.ts`;
+- `GrDialog/grDialogStyles.ts`;
+- `GrFormField/grFormFieldStyles.ts`;
+- `GrInput/grInputStyles.ts`.
 
 В таких helper-файлах обычно лежат:
 
@@ -82,7 +82,7 @@ src/components/<ComponentName>/
 
 2. **Локальные сырьевые CSS-файлы**, перечисленные в `config.ts` через `cssFiles`.
    - Они нужны только если у компонента реально есть собственные `styles.css`, `tokens.css` или другие локальные CSS-файлы.
-   - Сейчас такой сценарий есть, например, у `DsIcon`.
+   - Сейчас такой сценарий есть, например, у `GrIcon`.
 
 Практическое правило:
 
@@ -107,11 +107,11 @@ src/components/<ComponentName>/
 ```ts
 import { defineGranularityComponentConfig } from '../../registry/componentConfig'
 
-import { dsButtonSafelist } from './safelist'
+import { grButtonSafelist } from './safelist'
 
-export const dsButtonConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsButton',
-  safelist: dsButtonSafelist,
+export const grButtonConfig = defineGranularityComponentConfig(import.meta.url, {
+  name: 'GrButton',
+  safelist: grButtonSafelist,
 })
 ```
 
@@ -120,12 +120,12 @@ export const dsButtonConfig = defineGranularityComponentConfig(import.meta.url, 
 ```ts
 import { defineGranularityComponentConfig } from '../../registry/componentConfig'
 
-import { dsDialogSafelist } from './dsDialogStyles'
+import { grDialogSafelist } from './grDialogStyles'
 
-export const dsDialogConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsDialog',
-  dependencies: ['DsButton', 'DsModal'],
-  safelist: dsDialogSafelist,
+export const grDialogConfig = defineGranularityComponentConfig(import.meta.url, {
+  name: 'GrDialog',
+  dependencies: ['GrButton', 'GrModal'],
+  safelist: grDialogSafelist,
 })
 ```
 
@@ -134,11 +134,11 @@ export const dsDialogConfig = defineGranularityComponentConfig(import.meta.url, 
 ```ts
 import { defineGranularityComponentConfig } from '../../registry/componentConfig'
 
-import { dsIconSafelist } from './safelist'
+import { grIconSafelist } from './safelist'
 
-export const dsIconConfig = defineGranularityComponentConfig(import.meta.url, {
-  name: 'DsIcon',
-  safelist: dsIconSafelist,
+export const grIconConfig = defineGranularityComponentConfig(import.meta.url, {
+  name: 'GrIcon',
+  safelist: grIconSafelist,
   cssFiles: ['./tokens.css', './styles.css'],
 })
 ```
@@ -150,8 +150,8 @@ export const dsIconConfig = defineGranularityComponentConfig(import.meta.url, {
 Минимум:
 
 ```ts
-export { default } from './DsIcon.vue'
-export { default as DsIcon } from './DsIcon.vue'
+export { default } from './GrIcon.vue'
+export { default as GrIcon } from './GrIcon.vue'
 ```
 
 Если наружу должны торчать типы, safelist или helper'ы, экспортируйте их здесь же.
@@ -175,7 +175,7 @@ export { default as DsIcon } from './DsIcon.vue'
 Подключите новый `config.ts` в `granularityComponentConfigs` (browser-safe `./config.ts`).
 
 Если у компонента есть node-only вариант конфига (например, чтение токенов
-с диска через `tokenDefinitionsFromCssSync` — как у `DsButton`),
+с диска через `tokenDefinitionsFromCssSync` — как у `GrButton`),
 переопределите его в `src/granular-provider/node.ts` через массив
 `overrides`, передаваемый в `createGranularityProvider(...)`. Для браузера
 в `src/granular-provider/index.ts` аналогично передаётся `./config.ts`-вариант.
@@ -195,7 +195,7 @@ export { default as DsIcon } from './DsIcon.vue'
 Минимум:
 
 ```ts
-export * from './components/DsIcon'
+export * from './components/GrIcon'
 ```
 
 ### 3. `package.json`
@@ -210,11 +210,11 @@ Subpath exports пакета задаются вручную в `packages/granul
 Пример:
 
 ```json
-"./components/DsIcon": {
-  "types": "./dist/types/src/components/DsIcon/index.d.ts",
-  "import": "./dist/components/DsIcon/index.js"
+"./components/GrIcon": {
+  "types": "./dist/types/src/components/GrIcon/index.d.ts",
+  "import": "./dist/components/GrIcon/index.js"
 },
-"./components/DsIcon/styles.css": "./dist/components/DsIcon/styles.css"
+"./components/GrIcon/styles.css": "./dist/components/GrIcon/styles.css"
 ```
 
 ### 4. `package` CSS-exports
@@ -257,7 +257,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 - `cssFiles` и `cssFileAssetNames`, если компонент использует локальные CSS-файлы;
 - итоговый список `granularityStyleAssets`.
 
-Если у компонента есть заметная runtime-логика, добавьте и отдельные component tests рядом с компонентом, как это сделано у `DsModal`, `DsPromptDialog` и `DsSelect`.
+Если у компонента есть заметная runtime-логика, добавьте и отдельные component tests рядом с компонентом, как это сделано у `GrModal`, `GrPromptDialog` и `GrSelect`.
 
 ## Что проверить перед завершением задачи
 

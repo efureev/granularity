@@ -102,17 +102,17 @@ function setOver(el: HTMLElement, next: boolean) {
   // `state.isOver` может рассинхронизироваться с DOM (например, при обновлениях
   // компонента/директивы во время drag-over). Поэтому DOM-состояние всегда
   // приводим к `next`, а коллбек вызываем только при фактическом изменении.
-  const wasDomOver = el.dataset.dsDropzoneOver === 'true'
+  const wasDomOver = el.dataset.grDropzoneOver === 'true'
   const prev = state.isOver
 
   state.isOver = next
 
   if (next) {
     el.classList.add(state.options.overClass)
-    el.dataset.dsDropzoneOver = 'true'
+    el.dataset.grDropzoneOver = 'true'
   } else {
     el.classList.remove(state.options.overClass)
-    delete el.dataset.dsDropzoneOver
+    delete el.dataset.grDropzoneOver
   }
 
   if (prev !== next || wasDomOver !== next) {
@@ -129,7 +129,7 @@ function unbind(el: HTMLElement) {
   state.overCounter = 0
   setOver(el, false)
 
-  delete el.dataset.dsDropzone
+  delete el.dataset.grDropzone
 
   el.removeEventListener('dragenter', state.onDragEnter)
   el.removeEventListener('dragover', state.onDragOver)
@@ -215,7 +215,7 @@ function bind(el: HTMLElement, value: DropzoneBindingValue | undefined) {
   states.set(el, state)
 
   // Base marker.
-  el.dataset.dsDropzone = 'true'
+  el.dataset.grDropzone = 'true'
 
   el.addEventListener('dragenter', state.onDragEnter)
   el.addEventListener('dragover', state.onDragOver)

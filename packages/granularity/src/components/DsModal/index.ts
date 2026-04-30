@@ -1,7 +1,0 @@
-export { default } from './DsModal.vue'
-export { default as DsModal } from './DsModal.vue'
-export type { DsModalProps } from './DsModal.vue'
-export { dsModalConfig } from './config'
-export type { DsModalSize } from './dsModalStyles'
-export { getDsModalPanelClass } from './dsModalStyles'
-export { dsModalClassTokens, dsModalSafelist } from './safelist'

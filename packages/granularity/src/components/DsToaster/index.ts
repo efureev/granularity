@@ -1,6 +1,0 @@
-export { default } from './DsToaster.vue'
-export { default as DsToaster } from './DsToaster.vue'
-export type { DsToasterProps, DsToasterPlacement } from './DsToaster.vue'
-export { dsToasterConfig } from './config'
-export { dsToasterSafelist } from './safelist'
-export type { Toast, ToastInput, ToastVariant } from '../../composables/useToast'

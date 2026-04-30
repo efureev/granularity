@@ -1,0 +1,562 @@
+<script setup lang="ts">
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+
+import GrInput from '../GrInput/GrInput.vue'
+import { vClickOutside } from '../../directives'
+
+import {
+  defaultBaseClass,
+  grSelectNativeClass,
+  grSelectPanelClasses,
+  grSelectTriggerClass,
+  linkBaseClass,
+  type GrSelectModelValue,
+  type GrSelectOption,
+  type GrSelectOptionsView,
+  type GrSelectSize,
+  type GrSelectUnderline,
+  type GrSelectVariant,
+  type GrSelectView,
+} from './grSelectStyles'
+
+export type {
+  GrSelectModelValue,
+  GrSelectOption,
+  GrSelectOptionsView,
+  GrSelectSize,
+  GrSelectUnderline,
+  GrSelectVariant,
+  GrSelectView,
+} from './grSelectStyles'
+
+/**
+ * Пропсы публичного DS-примитива «Select».
+ */
+export interface GrSelectProps {
+  modelValue: GrSelectModelValue
+  options?: GrSelectOption[]
+  disabled?: boolean
+  ariaLabel?: string
+  view?: GrSelectView
+  size?: GrSelectSize
+  /** Placeholder (показывается, когда значение не выбрано). */
+  placeholder?: string
+  /** Multiple selection. */
+  multiple?: boolean
+  /** Как отображать список опций: нативный `<select>` или кастомная панель. */
+  optionsView?: GrSelectOptionsView
+  /** Разрешает ввод/выбор значения, которого нет в `options`. */
+  allowCustomValue?: boolean
+  /** Placeholder для инпута кастомного значения (только в `optionsView="panel"`). */
+  customValuePlaceholder?: string
+  /** Максимальная высота панели (только в `optionsView="panel"`). */
+  dropdownMaxHeight?: number
+  /** Закрывать панель после выбора (только в `optionsView="panel"`). */
+  closeOnSelect?: boolean
+  /** Разрешает очистку выбранного значения. */
+  clearable?: boolean
+  /** i18n-label для кнопки очистки (`aria-label`). */
+  clearLabel?: string
+  /**
+   * Цвет/вариант ссылки для `view="link"` (аналогично `GrLink`).
+   * В `view="default"` не используется.
+   */
+  variant?: GrSelectVariant
+  /**
+   * Подчёркивание для `view="link"` (аналогично `GrLink`).
+   * В `view="default"` не используется.
+   */
+  underline?: GrSelectUnderline
+}
+
+const props = withDefaults(
+  defineProps<GrSelectProps>(),
+  {
+    options: undefined,
+    disabled: false,
+    ariaLabel: undefined,
+    view: 'default',
+    size: 'md',
+
+    placeholder: undefined,
+    multiple: false,
+
+    optionsView: 'native',
+    allowCustomValue: false,
+    customValuePlaceholder: 'Add value…',
+    dropdownMaxHeight: 280,
+    closeOnSelect: true,
+    clearable: false,
+    clearLabel: 'Clear',
+    variant: 'primary',
+    underline: 'auto',
+  },
+)
+
+const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : defaultBaseClass)
+
+const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full')
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: GrSelectModelValue): void
+}>()
+
+const optionsResolved = computed(() => props.options ?? [])
+
+function modelToArray(value: GrSelectModelValue): string[] {
+  if (Array.isArray(value)) return value
+  if (!value) return []
+  return [value]
+}
+
+const modelSingle = computed(() => {
+  return Array.isArray(props.modelValue) ? (props.modelValue[0] ?? '') : props.modelValue
+})
+
+const modelMultiple = computed(() => modelToArray(props.modelValue))
+
+const selectedValues = computed(() => {
+  return props.multiple ? modelMultiple.value : (modelSingle.value ? [modelSingle.value] : [])
+})
+
+const hasSelection = computed(() => selectedValues.value.length > 0)
+
+const selectedOptions = computed<GrSelectOption[]>(() => {
+  const byValue = new Map(optionsResolved.value.map(o => [o.value, o]))
+  return selectedValues.value.map((v) => byValue.get(v) ?? { value: v, label: v })
+})
+
+const hasModelInOptions = computed(() => {
+  if (props.multiple) return false
+  return optionsResolved.value.some((o) => o.value === modelSingle.value)
+})
+
+const displayLabel = computed(() => {
+  if (props.multiple) {
+    if (!selectedValues.value.length) return ''
+    return selectedValues.value
+      .map((v) => optionsResolved.value.find((o) => o.value === v)?.label ?? v)
+      .join(', ')
+  }
+
+  return optionsResolved.value.find((o) => o.value === modelSingle.value)?.label ?? modelSingle.value
+})
+
+const displayText = computed(() => {
+  if (hasSelection.value) return displayLabel.value
+  return props.placeholder ?? ''
+})
+
+const nativeCustomOptionVisible = computed(() => {
+  if (!props.allowCustomValue) return false
+  if (props.optionsView !== 'native') return false
+  if (props.multiple) return false
+  if (!props.options) return false
+  if (modelSingle.value === '') return false
+  return !hasModelInOptions.value
+})
+
+const customValue = ref('')
+const open = ref(false)
+const rootEl = ref<HTMLElement | null>(null)
+const panelEl = ref<HTMLElement | null>(null)
+const customInputRef = ref<InstanceType<typeof GrInput> | null>(null)
+const clickOutsideExclude = [() => panelEl.value]
+const panelStyle = ref<Record<string, string>>({
+  left: '0px',
+  top: '0px',
+  width: '0px',
+  zIndex: '2147483647',
+})
+
+function syncPanelPosition(): void {
+  if (typeof window === 'undefined') return
+
+  const root = rootEl.value
+  if (!root) return
+
+  const rect = root.getBoundingClientRect()
+
+  panelStyle.value = {
+    left: `${rect.left}px`,
+    top: `${rect.bottom + 8}px`,
+    width: `${rect.width}px`,
+    zIndex: '2147483647',
+  }
+}
+
+function bindPanelPositionListeners(): void {
+  if (typeof window === 'undefined') return
+  window.addEventListener('resize', syncPanelPosition)
+  window.addEventListener('scroll', syncPanelPosition, true)
+}
+
+function unbindPanelPositionListeners(): void {
+  if (typeof window === 'undefined') return
+  window.removeEventListener('resize', syncPanelPosition)
+  window.removeEventListener('scroll', syncPanelPosition, true)
+}
+
+function closeDropdown(): void {
+  open.value = false
+}
+
+function toggleDropdown(): void {
+  if (props.disabled) return
+  open.value = !open.value
+}
+
+function closeOnEscape(e: KeyboardEvent): void {
+  if (e.key === 'Escape') closeDropdown()
+}
+
+watch(
+  open,
+  async (isOpen) => {
+    if (typeof document === 'undefined') return
+
+    document.removeEventListener('keydown', closeOnEscape)
+    unbindPanelPositionListeners()
+
+    if (isOpen) document.addEventListener('keydown', closeOnEscape)
+
+    if (!isOpen) {
+      customValue.value = ''
+      return
+    }
+
+    bindPanelPositionListeners()
+    await nextTick()
+    syncPanelPosition()
+
+    if (props.allowCustomValue) {
+      customInputRef.value?.focus()
+    }
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => {
+  if (typeof document === 'undefined') return
+  document.removeEventListener('keydown', closeOnEscape)
+  unbindPanelPositionListeners()
+})
+
+const panelClasses = computed(() => {
+  return grSelectPanelClasses
+})
+
+const visibleOptions = computed(() => {
+  const base = optionsResolved.value
+
+  const withCustom = (() => {
+    if (!props.allowCustomValue) return base
+    if (props.multiple) return base
+    if (modelSingle.value === '') return base
+    if (hasModelInOptions.value) return base
+    return [{ value: modelSingle.value, label: modelSingle.value }, ...base]
+  })()
+
+  if (!props.allowCustomValue) return withCustom
+
+  const q = customValue.value.trim().toLowerCase()
+  if (!q) return withCustom
+
+  return withCustom.filter((o) => {
+    return o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q)
+  })
+})
+
+const canAddCustom = computed(() => {
+  if (!props.allowCustomValue) return false
+  if (props.optionsView !== 'panel') return false
+  const v = customValue.value.trim()
+  if (!v) return false
+
+  if (props.multiple) {
+    if (selectedValues.value.includes(v)) return false
+    return !optionsResolved.value.some((o) => o.value === v)
+  }
+
+  if (v === modelSingle.value) return false
+  return !optionsResolved.value.some((o) => o.value === v)
+})
+
+function emitValue(value: GrSelectModelValue): void {
+  emit('update:modelValue', value)
+}
+
+function isSelected(value: string): boolean {
+  return selectedValues.value.includes(value)
+}
+
+function selectValue(value: string): void {
+  emitValue(value)
+  if (props.closeOnSelect) {
+    closeDropdown()
+  }
+}
+
+function toggleValue(value: string): void {
+  if (!props.multiple) {
+    selectValue(value)
+    return
+  }
+
+  const next = selectedValues.value.slice()
+  const idx = next.indexOf(value)
+  if (idx >= 0) {
+    next.splice(idx, 1)
+  }
+  else {
+    next.push(value)
+  }
+
+  emitValue(next)
+  if (props.closeOnSelect) {
+    closeDropdown()
+  }
+}
+
+function addCustom(): void {
+  const v = customValue.value.trim()
+  if (!v) return
+  toggleValue(v)
+}
+
+const showNativeChevron = computed(() => {
+  return props.optionsView === 'native' && props.view !== 'link' && !props.multiple
+})
+
+const nativeClearOptionVisible = computed(() => {
+  if (!props.clearable) return false
+  if (props.optionsView !== 'native') return false
+  if (props.multiple) return false
+  if (!props.options) return true
+  return !props.options.some(o => o.value === '')
+})
+
+const panelClearVisible = computed(() => {
+  if (!props.clearable) return false
+  if (props.optionsView !== 'panel') return false
+  if (props.view === 'link') return false
+  return hasSelection.value
+})
+
+const nativeClassName = computed(() => {
+  return grSelectNativeClass({
+    view: props.view,
+    size: props.size,
+    disabled: props.disabled,
+    variant: props.variant,
+    underline: props.underline,
+    showNativeChevron: showNativeChevron.value,
+  })
+})
+
+const triggerClassName = computed(() => {
+  return grSelectTriggerClass({
+    view: props.view,
+    optionsView: props.optionsView,
+    size: props.size,
+    disabled: props.disabled,
+    variant: props.variant,
+    underline: props.underline,
+  })
+})
+
+function onChange(e: Event): void {
+  const el = e.target as HTMLSelectElement
+
+  if (props.multiple) {
+    const values = Array.from(el.selectedOptions, o => o.value)
+    emit('update:modelValue', values)
+    return
+  }
+
+  emit('update:modelValue', el.value)
+}
+
+function clearSelection(): void {
+  if (props.disabled) return
+  emitValue(props.multiple ? [] : '')
+}
+</script>
+
+<template>
+  <div
+    v-if="optionsView === 'native'"
+    data-ds-select
+    :class="rootClass"
+  >
+    <select
+      data-ds-select-native
+      :value="multiple ? modelMultiple : modelSingle"
+      :multiple="multiple"
+      :disabled="disabled"
+      :aria-label="ariaLabel"
+      :class="[baseClassName, nativeClassName]"
+      @change="onChange"
+    >
+      <option v-if="nativeClearOptionVisible" value="" />
+
+      <slot>
+        <option v-if="nativeCustomOptionVisible" :value="modelSingle">
+          {{ modelSingle }}
+        </option>
+        <option v-for="opt in options" :key="opt.value" :value="opt.value">
+          {{ opt.label }}
+        </option>
+      </slot>
+    </select>
+
+    <span
+      v-if="showNativeChevron"
+      data-testid="ds-select-chevron"
+      class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
+    >
+      <span class="i-lucide-chevron-down h-4 w-4" aria-hidden="true" />
+    </span>
+  </div>
+
+  <div
+    v-else
+    ref="rootEl"
+    v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
+    data-ds-select
+    :class="rootClass"
+  >
+    <button
+      data-testid="ds-select-trigger"
+      data-ds-select-trigger
+      type="button"
+      :disabled="disabled"
+      :aria-label="ariaLabel"
+      role="combobox"
+      aria-readonly="true"
+      :aria-expanded="open ? 'true' : 'false'"
+      :class="[baseClassName, triggerClassName]"
+      @click="toggleDropdown"
+    >
+      <span class="min-w-0 flex-1">
+        <slot
+          name="value"
+          :selected-options="selectedOptions"
+          :selected-values="selectedValues"
+          :display-label="displayLabel"
+          :placeholder="placeholder"
+          :has-selection="hasSelection"
+        >
+          <span
+            class="block truncate"
+            :class="!hasSelection ? 'text-[var(--muted-fg)]' : ''"
+          >
+            {{ displayText }}
+          </span>
+        </slot>
+      </span>
+
+      <span
+        v-if="panelClearVisible"
+        class="shrink-0 h-4 w-4"
+        aria-hidden="true"
+      />
+
+      <span
+        v-else
+        data-testid="ds-select-chevron"
+        class="shrink-0 text-[var(--muted-fg)] pointer-events-none"
+      >
+        <span class="i-lucide-chevron-down h-4 w-4" aria-hidden="true" />
+      </span>
+    </button>
+
+    <button
+      v-if="panelClearVisible"
+      data-testid="ds-select-clear"
+      data-ds-select-clear
+      type="button"
+      class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
+      :disabled="disabled"
+      :aria-label="clearLabel"
+      @click.stop="clearSelection"
+    >
+      <span class="i-lucide-x h-4 w-4" aria-hidden="true" />
+    </button>
+
+    <teleport to="body">
+      <transition
+        enter-active-class="transition ease-out duration-150"
+        enter-from-class="transform opacity-0 scale-95"
+        enter-to-class="transform opacity-100 scale-100"
+        leave-active-class="transition ease-in duration-100"
+        leave-from-class="transform opacity-100 scale-100"
+        leave-to-class="transform opacity-0 scale-95"
+      >
+        <div
+          v-show="open"
+          ref="panelEl"
+          data-testid="ds-select-panel"
+          data-ds-select-panel
+          class="fixed w-full"
+          :style="panelStyle"
+        >
+          <div :class="panelClasses">
+            <div v-if="allowCustomValue" class="p-2 border-b border-[var(--brd)]">
+              <GrInput
+                ref="customInputRef"
+                v-model="customValue"
+                data-testid="ds-select-custom-input"
+                type="text"
+                :placeholder="customValuePlaceholder"
+                size="sm"
+                @keydown.enter.prevent="addCustom"
+              />
+            </div>
+
+            <div
+              data-ds-select-listbox
+              class="p-1 overflow-auto"
+              :style="{ maxHeight: `${dropdownMaxHeight}px` }"
+              role="listbox"
+              :aria-multiselectable="multiple ? 'true' : undefined"
+            >
+              <button
+                v-if="canAddCustom"
+                data-testid="ds-select-add-option"
+                data-ds-select-add-option
+                type="button"
+                class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]"
+                @click="addCustom"
+              >
+                Add “{{ customValue.trim() }}”
+              </button>
+
+              <button
+                v-for="opt in visibleOptions"
+                :key="opt.value"
+                data-ds-select-option
+                type="button"
+                role="option"
+                :aria-selected="isSelected(opt.value) ? 'true' : 'false'"
+                class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]"
+                @click="toggleValue(opt.value)"
+              >
+                <slot name="option" :option="opt" :selected="isSelected(opt.value)">
+                  <span class="flex items-center gap-2 min-w-0">
+                    <span
+                      class="h-4 w-4 shrink-0"
+                      :class="isSelected(opt.value) ? 'i-lucide-check text-[var(--primary)]' : ''"
+                      aria-hidden="true"
+                    />
+                    <span class="truncate">{{ opt.label }}</span>
+                  </span>
+                </slot>
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </teleport>
+  </div>
+</template>

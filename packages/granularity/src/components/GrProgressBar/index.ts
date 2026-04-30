@@ -1,0 +1,5 @@
+export { default } from './GrProgressBar.vue'
+export { default as GrProgressBar, type GrProgressBarProps } from './GrProgressBar.vue'
+export { grProgressBarConfig } from './config'
+export { grProgressBarSafelist } from './safelist'
+export type { GrProgressBarTone } from './grStyle'

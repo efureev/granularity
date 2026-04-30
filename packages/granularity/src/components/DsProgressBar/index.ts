@@ -1,5 +1,0 @@
-export { default } from './DsProgressBar.vue'
-export { default as DsProgressBar, type DsProgressBarProps } from './DsProgressBar.vue'
-export { dsProgressBarConfig } from './config'
-export { dsProgressBarSafelist } from './safelist'
-export type { DsProgressBarTone } from './dsStyle'

@@ -1,6 +1,0 @@
-export { default } from './DsList.vue'
-export { default as DsList } from './DsList.vue'
-export type { DsListProps } from './DsList.vue'
-export { default as DsListItem } from './DsListItem.vue'
-export type { DsListItemDensity, DsListItemProps } from './DsListItem.vue'
-export { dsListConfig } from './config'

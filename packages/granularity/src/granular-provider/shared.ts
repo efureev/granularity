@@ -2,7 +2,7 @@
 //
 // Оба entry (`./index.ts`, `./node.ts`) отличаются только списком
 // компонентов, у которых есть node-only вариант конфига (например,
-// `DsButton`, чей `config.node.ts` использует `tokenDefinitionsFromCssSync`
+// `GrButton`, чей `config.node.ts` использует `tokenDefinitionsFromCssSync`
 // и тянет `node:fs`). Browser-вариант таких компонентов берёт облегчённый
 // `./config.ts`, node-вариант — `./config.node.ts`. Всё остальное — `id`,
 // `theme.*`, `packageBaseUrl` и полный список browser-safe компонентов —
@@ -22,54 +22,54 @@ import {
   type GranularComponentDescriptor,
   type GranularProvider,
 } from '@feugene/unocss-preset-granular/contract'
-import { dsAlertConfig } from '../components/DsAlert/config'
-import { dsAvatarConfig } from '../components/DsAvatar/config'
-import { dsBadgeConfig } from '../components/DsBadge/config'
-import { dsBadgeWrapConfig } from '../components/DsBadgeWrap/config'
-import { dsBottomNavConfig } from '../components/DsBottomNav/config'
-import { dsButtonConfig } from '../components/DsButton/config'
-import { dsButtonGroupConfig } from '../components/DsButtonGroup/config'
-import { dsCardConfig } from '../components/DsCard/config'
-import { dsCheckboxConfig } from '../components/DsCheckbox/config'
-import { dsCollapseConfig } from '../components/DsCollapse/config'
-import { dsConfirmDialogConfig } from '../components/DsConfirmDialog/config'
-import { dsDataTableConfig } from '../components/DsDataTable/config'
-import { dsDialogConfig } from '../components/DsDialog/config'
-import { dsDrawerConfig } from '../components/DsDrawer/config'
-import { dsDropdownConfig } from '../components/DsDropdown/config'
-import { dsDropdownMenuConfig } from '../components/DsDropdownMenu/config'
-import { dsEmptyStateConfig } from '../components/DsEmptyState/config'
-import { dsFileUploadConfig } from '../components/DsFileUpload/config'
-import { dsFormFieldConfig } from '../components/DsFormField/config'
-import { dsFormFileConfig } from '../components/DsFormFile/config'
-import { dsFormSectionConfig } from '../components/DsFormSection/config'
-import { dsIconConfig } from '../components/DsIcon/config'
-import { dsImageViewerConfig } from '../components/DsImageViewer/config'
-import { dsInputConfig } from '../components/DsInput/config'
-import { dsInputTagConfig } from '../components/DsInputTag/config'
-import { dsLinkConfig } from '../components/DsLink/config'
-import { dsListConfig } from '../components/DsList/config'
-import { dsLoadingConfig } from '../components/DsLoading/config'
-import { dsModalConfig } from '../components/DsModal/config'
-import { dsNavbarConfig } from '../components/DsNavbar/config'
-import { dsNumberInputConfig } from '../components/DsNumberInput/config'
-import { dsPaginationConfig } from '../components/DsPagination/config'
-import { dsProgressBarConfig } from '../components/DsProgressBar/config'
-import { dsPromptDialogConfig } from '../components/DsPromptDialog/config'
-import { dsRadioConfig } from '../components/DsRadio/config'
-import { dsRadioGroupConfig } from '../components/DsRadioGroup/config'
-import { dsSegmentedConfig } from '../components/DsSegmented/config'
-import { dsSelectConfig } from '../components/DsSelect/config'
-import { dsSidebarConfig } from '../components/DsSidebar/config'
-import { dsSkeletonConfig } from '../components/DsSkeleton/config'
-import { dsSwitchConfig } from '../components/DsSwitch/config'
-import { dsTableConfig } from '../components/DsTable/config'
-import { dsTabsConfig } from '../components/DsTabs/config'
-import { dsTextareaConfig } from '../components/DsTextarea/config'
-import { dsToasterConfig } from '../components/DsToaster/config'
-import { dsTooltipConfig } from '../components/DsTooltip/config'
-import { dsTreeConfig } from '../components/DsTree/config'
-import { dsTreeSelectConfig } from '../components/DsTreeSelect/config'
+import { grAlertConfig } from '../components/GrAlert/config'
+import { grAvatarConfig } from '../components/GrAvatar/config'
+import { grBadgeConfig } from '../components/GrBadge/config'
+import { grBadgeWrapConfig } from '../components/GrBadgeWrap/config'
+import { grBottomNavConfig } from '../components/GrBottomNav/config'
+import { grButtonConfig } from '../components/GrButton/config'
+import { grButtonGroupConfig } from '../components/GrButtonGroup/config'
+import { grCardConfig } from '../components/GrCard/config'
+import { grCheckboxConfig } from '../components/GrCheckbox/config'
+import { grCollapseConfig } from '../components/GrCollapse/config'
+import { grConfirmDialogConfig } from '../components/GrConfirmDialog/config'
+import { grDataTableConfig } from '../components/GrDataTable/config'
+import { grDialogConfig } from '../components/GrDialog/config'
+import { grDrawerConfig } from '../components/GrDrawer/config'
+import { grDropdownConfig } from '../components/GrDropdown/config'
+import { grDropdownMenuConfig } from '../components/GrDropdownMenu/config'
+import { grEmptyStateConfig } from '../components/GrEmptyState/config'
+import { grFileUploadConfig } from '../components/GrFileUpload/config'
+import { grFormFieldConfig } from '../components/GrFormField/config'
+import { grFormFileConfig } from '../components/GrFormFile/config'
+import { grFormSectionConfig } from '../components/GrFormSection/config'
+import { grIconConfig } from '../components/GrIcon/config'
+import { grImageViewerConfig } from '../components/GrImageViewer/config'
+import { grInputConfig } from '../components/GrInput/config'
+import { grInputTagConfig } from '../components/GrInputTag/config'
+import { grLinkConfig } from '../components/GrLink/config'
+import { grListConfig } from '../components/GrList/config'
+import { grLoadingConfig } from '../components/GrLoading/config'
+import { grModalConfig } from '../components/GrModal/config'
+import { grNavbarConfig } from '../components/GrNavbar/config'
+import { grNumberInputConfig } from '../components/GrNumberInput/config'
+import { grPaginationConfig } from '../components/GrPagination/config'
+import { grProgressBarConfig } from '../components/GrProgressBar/config'
+import { grPromptDialogConfig } from '../components/GrPromptDialog/config'
+import { grRadioConfig } from '../components/GrRadio/config'
+import { grRadioGroupConfig } from '../components/GrRadioGroup/config'
+import { grSegmentedConfig } from '../components/GrSegmented/config'
+import { grSelectConfig } from '../components/GrSelect/config'
+import { grSidebarConfig } from '../components/GrSidebar/config'
+import { grSkeletonConfig } from '../components/GrSkeleton/config'
+import { grSwitchConfig } from '../components/GrSwitch/config'
+import { grTableConfig } from '../components/GrTable/config'
+import { grTabsConfig } from '../components/GrTabs/config'
+import { grTextareaConfig } from '../components/GrTextarea/config'
+import { grToasterConfig } from '../components/GrToaster/config'
+import { grTooltipConfig } from '../components/GrTooltip/config'
+import { grTreeConfig } from '../components/GrTree/config'
+import { grTreeSelectConfig } from '../components/GrTreeSelect/config'
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_PROVIDER_ID = '@feugene/granularity'
@@ -107,7 +107,7 @@ const theme = {
  * `ds<Name>Config` из `./config.ts` рядом с SFC.
  *
  * Для компонентов, у которых есть node-only вариант конфига
- * (например, `DsButton` с `tokenDefinitionsFromCssSync`), browser‑конфиг
+ * (например, `GrButton` с `tokenDefinitionsFromCssSync`), browser‑конфиг
  * остаётся здесь, а node‑вариант подставляется снаружи через
  * `createGranularityProvider(overrides)` — см. `./index.ts` (browser)
  * и `./node.ts` (node).
@@ -116,54 +116,54 @@ const theme = {
  * в `apps/showcase/scripts/generate-component-api.mjs`, не ломайте его.
  */
 export const granularityComponentConfigs = {
-  DsAlert: dsAlertConfig,
-  DsAvatar: dsAvatarConfig,
-  DsBadge: dsBadgeConfig,
-  DsBadgeWrap: dsBadgeWrapConfig,
-  DsBottomNav: dsBottomNavConfig,
-  DsButton: dsButtonConfig,
-  DsButtonGroup: dsButtonGroupConfig,
-  DsCard: dsCardConfig,
-  DsCheckbox: dsCheckboxConfig,
-  DsCollapse: dsCollapseConfig,
-  DsConfirmDialog: dsConfirmDialogConfig,
-  DsDataTable: dsDataTableConfig,
-  DsDialog: dsDialogConfig,
-  DsDrawer: dsDrawerConfig,
-  DsDropdown: dsDropdownConfig,
-  DsDropdownMenu: dsDropdownMenuConfig,
-  DsEmptyState: dsEmptyStateConfig,
-  DsFileUpload: dsFileUploadConfig,
-  DsFormField: dsFormFieldConfig,
-  DsFormFile: dsFormFileConfig,
-  DsFormSection: dsFormSectionConfig,
-  DsIcon: dsIconConfig,
-  DsImageViewer: dsImageViewerConfig,
-  DsInput: dsInputConfig,
-  DsInputTag: dsInputTagConfig,
-  DsLink: dsLinkConfig,
-  DsList: dsListConfig,
-  DsLoading: dsLoadingConfig,
-  DsModal: dsModalConfig,
-  DsNavbar: dsNavbarConfig,
-  DsNumberInput: dsNumberInputConfig,
-  DsPagination: dsPaginationConfig,
-  DsProgressBar: dsProgressBarConfig,
-  DsPromptDialog: dsPromptDialogConfig,
-  DsRadio: dsRadioConfig,
-  DsRadioGroup: dsRadioGroupConfig,
-  DsSegmented: dsSegmentedConfig,
-  DsSelect: dsSelectConfig,
-  DsSidebar: dsSidebarConfig,
-  DsSkeleton: dsSkeletonConfig,
-  DsSwitch: dsSwitchConfig,
-  DsTable: dsTableConfig,
-  DsTabs: dsTabsConfig,
-  DsTextarea: dsTextareaConfig,
-  DsToaster: dsToasterConfig,
-  DsTooltip: dsTooltipConfig,
-  DsTree: dsTreeConfig,
-  DsTreeSelect: dsTreeSelectConfig,
+  GrAlert: grAlertConfig,
+  GrAvatar: grAvatarConfig,
+  GrBadge: grBadgeConfig,
+  GrBadgeWrap: grBadgeWrapConfig,
+  GrBottomNav: grBottomNavConfig,
+  GrButton: grButtonConfig,
+  GrButtonGroup: grButtonGroupConfig,
+  GrCard: grCardConfig,
+  GrCheckbox: grCheckboxConfig,
+  GrCollapse: grCollapseConfig,
+  GrConfirmDialog: grConfirmDialogConfig,
+  GrDataTable: grDataTableConfig,
+  GrDialog: grDialogConfig,
+  GrDrawer: grDrawerConfig,
+  GrDropdown: grDropdownConfig,
+  GrDropdownMenu: grDropdownMenuConfig,
+  GrEmptyState: grEmptyStateConfig,
+  GrFileUpload: grFileUploadConfig,
+  GrFormField: grFormFieldConfig,
+  GrFormFile: grFormFileConfig,
+  GrFormSection: grFormSectionConfig,
+  GrIcon: grIconConfig,
+  GrImageViewer: grImageViewerConfig,
+  GrInput: grInputConfig,
+  GrInputTag: grInputTagConfig,
+  GrLink: grLinkConfig,
+  GrList: grListConfig,
+  GrLoading: grLoadingConfig,
+  GrModal: grModalConfig,
+  GrNavbar: grNavbarConfig,
+  GrNumberInput: grNumberInputConfig,
+  GrPagination: grPaginationConfig,
+  GrProgressBar: grProgressBarConfig,
+  GrPromptDialog: grPromptDialogConfig,
+  GrRadio: grRadioConfig,
+  GrRadioGroup: grRadioGroupConfig,
+  GrSegmented: grSegmentedConfig,
+  GrSelect: grSelectConfig,
+  GrSidebar: grSidebarConfig,
+  GrSkeleton: grSkeletonConfig,
+  GrSwitch: grSwitchConfig,
+  GrTable: grTableConfig,
+  GrTabs: grTabsConfig,
+  GrTextarea: grTextareaConfig,
+  GrToaster: grToasterConfig,
+  GrTooltip: grTooltipConfig,
+  GrTree: grTreeConfig,
+  GrTreeSelect: grTreeSelectConfig,
 }
 
 export type GranularityComponentName = keyof typeof granularityComponentConfigs
@@ -177,7 +177,7 @@ const baseComponents: readonly GranularComponentDescriptor[] = Object.values(
  * Собирает granular-provider пакета `@feugene/granularity`.
  *
  * Принимает массив `GranularComponentDescriptor`'ов — это компоненты,
- * у которых есть node-only вариант конфига (например, `DsButton` с
+ * у которых есть node-only вариант конфига (например, `GrButton` с
  * `tokenDefinitionsFromCssSync`). Дескрипторы с именем, которое уже
  * присутствует в базовом наборе, переопределяют его (побеждает
  * переданный снаружи), остальные — добавляются в конец списка.

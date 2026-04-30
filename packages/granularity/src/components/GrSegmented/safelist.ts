@@ -1,0 +1,50 @@
+import { splitClassTokens } from '../shared/classTokens'
+import {
+  iconOnlyClass,
+  indicatorBaseClass,
+  indicatorVariantClassMap,
+  itemBaseClass,
+  itemDisabledClass,
+  itemEnabledClass,
+  itemIconClass,
+  itemLabelClass,
+  itemSelectedClass,
+  itemVariantClassMap,
+  rootBaseClass,
+  rootBlockClass,
+  rootVariantClassMap,
+} from './grSegmentedStyles'
+
+export const grSegmentedClassTokens = {
+  rootBaseClass: splitClassTokens(rootBaseClass),
+  rootVariantClassMap: Object.values(rootVariantClassMap).flatMap(splitClassTokens),
+  rootBlockClass: splitClassTokens(rootBlockClass),
+  indicatorBaseClass: splitClassTokens(indicatorBaseClass),
+  indicatorVariantClassMap: Object.values(indicatorVariantClassMap).flatMap(splitClassTokens),
+  itemBaseClass: splitClassTokens(itemBaseClass),
+  itemVariantClassMap: Object.values(itemVariantClassMap).flatMap(splitClassTokens),
+  itemSelectedClass: splitClassTokens(itemSelectedClass),
+  itemDisabledClass: splitClassTokens(itemDisabledClass),
+  itemEnabledClass: splitClassTokens(itemEnabledClass),
+  itemLabelClass: splitClassTokens(itemLabelClass),
+  itemIconClass: splitClassTokens(itemIconClass),
+  iconOnlyClass: splitClassTokens(iconOnlyClass),
+  extra: splitClassTokens('opacity-70'),
+} as const
+
+export const grSegmentedSafelist = [...new Set([
+  ...grSegmentedClassTokens.rootBaseClass,
+  ...grSegmentedClassTokens.rootVariantClassMap,
+  ...grSegmentedClassTokens.rootBlockClass,
+  ...grSegmentedClassTokens.indicatorBaseClass,
+  ...grSegmentedClassTokens.indicatorVariantClassMap,
+  ...grSegmentedClassTokens.itemBaseClass,
+  ...grSegmentedClassTokens.itemVariantClassMap,
+  ...grSegmentedClassTokens.itemSelectedClass,
+  ...grSegmentedClassTokens.itemDisabledClass,
+  ...grSegmentedClassTokens.itemEnabledClass,
+  ...grSegmentedClassTokens.itemLabelClass,
+  ...grSegmentedClassTokens.itemIconClass,
+  ...grSegmentedClassTokens.iconOnlyClass,
+  ...grSegmentedClassTokens.extra,
+])]

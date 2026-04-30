@@ -49,197 +49,197 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./components/DsAlert": {
-      "types": "./dist/types/src/components/DsAlert/index.d.ts",
-      "import": "./dist/components/DsAlert/index.js"
+    "./components/GrAlert": {
+      "types": "./dist/types/src/components/GrAlert/index.d.ts",
+      "import": "./dist/components/GrAlert/index.js"
     },
-    "./components/DsAvatar": {
-      "types": "./dist/types/src/components/DsAvatar/index.d.ts",
-      "import": "./dist/components/DsAvatar/index.js"
+    "./components/GrAvatar": {
+      "types": "./dist/types/src/components/GrAvatar/index.d.ts",
+      "import": "./dist/components/GrAvatar/index.js"
     },
-    "./components/DsBadge": {
-      "types": "./dist/types/src/components/DsBadge/index.d.ts",
-      "import": "./dist/components/DsBadge/index.js"
+    "./components/GrBadge": {
+      "types": "./dist/types/src/components/GrBadge/index.d.ts",
+      "import": "./dist/components/GrBadge/index.js"
     },
-    "./components/DsBadgeWrap": {
-      "types": "./dist/types/src/components/DsBadgeWrap/index.d.ts",
-      "import": "./dist/components/DsBadgeWrap/index.js"
+    "./components/GrBadgeWrap": {
+      "types": "./dist/types/src/components/GrBadgeWrap/index.d.ts",
+      "import": "./dist/components/GrBadgeWrap/index.js"
     },
-    "./components/DsBottomNav": {
-      "types": "./dist/types/src/components/DsBottomNav/index.d.ts",
-      "import": "./dist/components/DsBottomNav/index.js"
+    "./components/GrBottomNav": {
+      "types": "./dist/types/src/components/GrBottomNav/index.d.ts",
+      "import": "./dist/components/GrBottomNav/index.js"
     },
-    "./components/DsButton": {
-      "types": "./dist/types/src/components/DsButton/index.d.ts",
-      "import": "./dist/components/DsButton/index.js"
+    "./components/GrButton": {
+      "types": "./dist/types/src/components/GrButton/index.d.ts",
+      "import": "./dist/components/GrButton/index.js"
     },
-    "./components/DsButtonGroup": {
-      "types": "./dist/types/src/components/DsButtonGroup/index.d.ts",
-      "import": "./dist/components/DsButtonGroup/index.js"
+    "./components/GrButtonGroup": {
+      "types": "./dist/types/src/components/GrButtonGroup/index.d.ts",
+      "import": "./dist/components/GrButtonGroup/index.js"
     },
-    "./components/DsCard": {
-      "types": "./dist/types/src/components/DsCard/index.d.ts",
-      "import": "./dist/components/DsCard/index.js"
+    "./components/GrCard": {
+      "types": "./dist/types/src/components/GrCard/index.d.ts",
+      "import": "./dist/components/GrCard/index.js"
     },
-    "./components/DsCheckbox": {
-      "types": "./dist/types/src/components/DsCheckbox/index.d.ts",
-      "import": "./dist/components/DsCheckbox/index.js"
+    "./components/GrCheckbox": {
+      "types": "./dist/types/src/components/GrCheckbox/index.d.ts",
+      "import": "./dist/components/GrCheckbox/index.js"
     },
-    "./components/DsCollapse": {
-      "types": "./dist/types/src/components/DsCollapse/index.d.ts",
-      "import": "./dist/components/DsCollapse/index.js"
+    "./components/GrCollapse": {
+      "types": "./dist/types/src/components/GrCollapse/index.d.ts",
+      "import": "./dist/components/GrCollapse/index.js"
     },
-    "./components/DsConfirmDialog": {
-      "types": "./dist/types/src/components/DsConfirmDialog/index.d.ts",
-      "import": "./dist/components/DsConfirmDialog/index.js"
+    "./components/GrConfirmDialog": {
+      "types": "./dist/types/src/components/GrConfirmDialog/index.d.ts",
+      "import": "./dist/components/GrConfirmDialog/index.js"
     },
-    "./components/DsDataTable": {
-      "types": "./dist/types/src/components/DsDataTable/index.d.ts",
-      "import": "./dist/components/DsDataTable/index.js"
+    "./components/GrDataTable": {
+      "types": "./dist/types/src/components/GrDataTable/index.d.ts",
+      "import": "./dist/components/GrDataTable/index.js"
     },
-    "./components/DsDialog": {
-      "types": "./dist/types/src/components/DsDialog/index.d.ts",
-      "import": "./dist/components/DsDialog/index.js"
+    "./components/GrDialog": {
+      "types": "./dist/types/src/components/GrDialog/index.d.ts",
+      "import": "./dist/components/GrDialog/index.js"
     },
-    "./components/DsDrawer": {
-      "types": "./dist/types/src/components/DsDrawer/index.d.ts",
-      "import": "./dist/components/DsDrawer/index.js"
+    "./components/GrDrawer": {
+      "types": "./dist/types/src/components/GrDrawer/index.d.ts",
+      "import": "./dist/components/GrDrawer/index.js"
     },
-    "./components/DsDropdown": {
-      "types": "./dist/types/src/components/DsDropdown/index.d.ts",
-      "import": "./dist/components/DsDropdown/index.js"
+    "./components/GrDropdown": {
+      "types": "./dist/types/src/components/GrDropdown/index.d.ts",
+      "import": "./dist/components/GrDropdown/index.js"
     },
-    "./components/DsDropdownMenu": {
-      "types": "./dist/types/src/components/DsDropdownMenu/index.d.ts",
-      "import": "./dist/components/DsDropdownMenu/index.js"
+    "./components/GrDropdownMenu": {
+      "types": "./dist/types/src/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
     },
-    "./components/DsEmptyState": {
-      "types": "./dist/types/src/components/DsEmptyState/index.d.ts",
-      "import": "./dist/components/DsEmptyState/index.js"
+    "./components/GrEmptyState": {
+      "types": "./dist/types/src/components/GrEmptyState/index.d.ts",
+      "import": "./dist/components/GrEmptyState/index.js"
     },
-    "./components/DsFileUpload": {
-      "types": "./dist/types/src/components/DsFileUpload/index.d.ts",
-      "import": "./dist/components/DsFileUpload/index.js"
+    "./components/GrFileUpload": {
+      "types": "./dist/types/src/components/GrFileUpload/index.d.ts",
+      "import": "./dist/components/GrFileUpload/index.js"
     },
-    "./components/DsFormField": {
-      "types": "./dist/types/src/components/DsFormField/index.d.ts",
-      "import": "./dist/components/DsFormField/index.js"
+    "./components/GrFormField": {
+      "types": "./dist/types/src/components/GrFormField/index.d.ts",
+      "import": "./dist/components/GrFormField/index.js"
     },
-    "./components/DsFormFile": {
-      "types": "./dist/types/src/components/DsFormFile/index.d.ts",
-      "import": "./dist/components/DsFormFile/index.js"
+    "./components/GrFormFile": {
+      "types": "./dist/types/src/components/GrFormFile/index.d.ts",
+      "import": "./dist/components/GrFormFile/index.js"
     },
-    "./components/DsFormSection": {
-      "types": "./dist/types/src/components/DsFormSection/index.d.ts",
-      "import": "./dist/components/DsFormSection/index.js"
+    "./components/GrFormSection": {
+      "types": "./dist/types/src/components/GrFormSection/index.d.ts",
+      "import": "./dist/components/GrFormSection/index.js"
     },
-    "./components/DsIcon": {
-      "types": "./dist/types/src/components/DsIcon/index.d.ts",
-      "import": "./dist/components/DsIcon/index.js"
+    "./components/GrIcon": {
+      "types": "./dist/types/src/components/GrIcon/index.d.ts",
+      "import": "./dist/components/GrIcon/index.js"
     },
-    "./components/DsImageViewer": {
-      "types": "./dist/types/src/components/DsImageViewer/index.d.ts",
-      "import": "./dist/components/DsImageViewer/index.js"
+    "./components/GrImageViewer": {
+      "types": "./dist/types/src/components/GrImageViewer/index.d.ts",
+      "import": "./dist/components/GrImageViewer/index.js"
     },
-    "./components/DsInput": {
-      "types": "./dist/types/src/components/DsInput/index.d.ts",
-      "import": "./dist/components/DsInput/index.js"
+    "./components/GrInput": {
+      "types": "./dist/types/src/components/GrInput/index.d.ts",
+      "import": "./dist/components/GrInput/index.js"
     },
-    "./components/DsInputTag": {
-      "types": "./dist/types/src/components/DsInputTag/index.d.ts",
-      "import": "./dist/components/DsInputTag/index.js"
+    "./components/GrInputTag": {
+      "types": "./dist/types/src/components/GrInputTag/index.d.ts",
+      "import": "./dist/components/GrInputTag/index.js"
     },
-    "./components/DsLink": {
-      "types": "./dist/types/src/components/DsLink/index.d.ts",
-      "import": "./dist/components/DsLink/index.js"
+    "./components/GrLink": {
+      "types": "./dist/types/src/components/GrLink/index.d.ts",
+      "import": "./dist/components/GrLink/index.js"
     },
-    "./components/DsList": {
-      "types": "./dist/types/src/components/DsList/index.d.ts",
-      "import": "./dist/components/DsList/index.js"
+    "./components/GrList": {
+      "types": "./dist/types/src/components/GrList/index.d.ts",
+      "import": "./dist/components/GrList/index.js"
     },
-    "./components/DsLoading": {
-      "types": "./dist/types/src/components/DsLoading/index.d.ts",
-      "import": "./dist/components/DsLoading/index.js"
+    "./components/GrLoading": {
+      "types": "./dist/types/src/components/GrLoading/index.d.ts",
+      "import": "./dist/components/GrLoading/index.js"
     },
-    "./components/DsModal": {
-      "types": "./dist/types/src/components/DsModal/index.d.ts",
-      "import": "./dist/components/DsModal/index.js"
+    "./components/GrModal": {
+      "types": "./dist/types/src/components/GrModal/index.d.ts",
+      "import": "./dist/components/GrModal/index.js"
     },
-    "./components/DsNavbar": {
-      "types": "./dist/types/src/components/DsNavbar/index.d.ts",
-      "import": "./dist/components/DsNavbar/index.js"
+    "./components/GrNavbar": {
+      "types": "./dist/types/src/components/GrNavbar/index.d.ts",
+      "import": "./dist/components/GrNavbar/index.js"
     },
-    "./components/DsNumberInput": {
-      "types": "./dist/types/src/components/DsNumberInput/index.d.ts",
-      "import": "./dist/components/DsNumberInput/index.js"
+    "./components/GrNumberInput": {
+      "types": "./dist/types/src/components/GrNumberInput/index.d.ts",
+      "import": "./dist/components/GrNumberInput/index.js"
     },
-    "./components/DsPagination": {
-      "types": "./dist/types/src/components/DsPagination/index.d.ts",
-      "import": "./dist/components/DsPagination/index.js"
+    "./components/GrPagination": {
+      "types": "./dist/types/src/components/GrPagination/index.d.ts",
+      "import": "./dist/components/GrPagination/index.js"
     },
-    "./components/DsProgressBar": {
-      "types": "./dist/types/src/components/DsProgressBar/index.d.ts",
-      "import": "./dist/components/DsProgressBar/index.js"
+    "./components/GrProgressBar": {
+      "types": "./dist/types/src/components/GrProgressBar/index.d.ts",
+      "import": "./dist/components/GrProgressBar/index.js"
     },
-    "./components/DsPromptDialog": {
-      "types": "./dist/types/src/components/DsPromptDialog/index.d.ts",
-      "import": "./dist/components/DsPromptDialog/index.js"
+    "./components/GrPromptDialog": {
+      "types": "./dist/types/src/components/GrPromptDialog/index.d.ts",
+      "import": "./dist/components/GrPromptDialog/index.js"
     },
-    "./components/DsRadio": {
-      "types": "./dist/types/src/components/DsRadio/index.d.ts",
-      "import": "./dist/components/DsRadio/index.js"
+    "./components/GrRadio": {
+      "types": "./dist/types/src/components/GrRadio/index.d.ts",
+      "import": "./dist/components/GrRadio/index.js"
     },
-    "./components/DsRadioGroup": {
-      "types": "./dist/types/src/components/DsRadioGroup/index.d.ts",
-      "import": "./dist/components/DsRadioGroup/index.js"
+    "./components/GrRadioGroup": {
+      "types": "./dist/types/src/components/GrRadioGroup/index.d.ts",
+      "import": "./dist/components/GrRadioGroup/index.js"
     },
-    "./components/DsSegmented": {
-      "types": "./dist/types/src/components/DsSegmented/index.d.ts",
-      "import": "./dist/components/DsSegmented/index.js"
+    "./components/GrSegmented": {
+      "types": "./dist/types/src/components/GrSegmented/index.d.ts",
+      "import": "./dist/components/GrSegmented/index.js"
     },
-    "./components/DsSelect": {
-      "types": "./dist/types/src/components/DsSelect/index.d.ts",
-      "import": "./dist/components/DsSelect/index.js"
+    "./components/GrSelect": {
+      "types": "./dist/types/src/components/GrSelect/index.d.ts",
+      "import": "./dist/components/GrSelect/index.js"
     },
-    "./components/DsSidebar": {
-      "types": "./dist/types/src/components/DsSidebar/index.d.ts",
-      "import": "./dist/components/DsSidebar/index.js"
+    "./components/GrSidebar": {
+      "types": "./dist/types/src/components/GrSidebar/index.d.ts",
+      "import": "./dist/components/GrSidebar/index.js"
     },
-    "./components/DsSkeleton": {
-      "types": "./dist/types/src/components/DsSkeleton/index.d.ts",
-      "import": "./dist/components/DsSkeleton/index.js"
+    "./components/GrSkeleton": {
+      "types": "./dist/types/src/components/GrSkeleton/index.d.ts",
+      "import": "./dist/components/GrSkeleton/index.js"
     },
-    "./components/DsSwitch": {
-      "types": "./dist/types/src/components/DsSwitch/index.d.ts",
-      "import": "./dist/components/DsSwitch/index.js"
+    "./components/GrSwitch": {
+      "types": "./dist/types/src/components/GrSwitch/index.d.ts",
+      "import": "./dist/components/GrSwitch/index.js"
     },
-    "./components/DsTable": {
-      "types": "./dist/types/src/components/DsTable/index.d.ts",
-      "import": "./dist/components/DsTable/index.js"
+    "./components/GrTable": {
+      "types": "./dist/types/src/components/GrTable/index.d.ts",
+      "import": "./dist/components/GrTable/index.js"
     },
-    "./components/DsTabs": {
-      "types": "./dist/types/src/components/DsTabs/index.d.ts",
-      "import": "./dist/components/DsTabs/index.js"
+    "./components/GrTabs": {
+      "types": "./dist/types/src/components/GrTabs/index.d.ts",
+      "import": "./dist/components/GrTabs/index.js"
     },
-    "./components/DsTextarea": {
-      "types": "./dist/types/src/components/DsTextarea/index.d.ts",
-      "import": "./dist/components/DsTextarea/index.js"
+    "./components/GrTextarea": {
+      "types": "./dist/types/src/components/GrTextarea/index.d.ts",
+      "import": "./dist/components/GrTextarea/index.js"
     },
-    "./components/DsToaster": {
-      "types": "./dist/types/src/components/DsToaster/index.d.ts",
-      "import": "./dist/components/DsToaster/index.js"
+    "./components/GrToaster": {
+      "types": "./dist/types/src/components/GrToaster/index.d.ts",
+      "import": "./dist/components/GrToaster/index.js"
     },
-    "./components/DsTooltip": {
-      "types": "./dist/types/src/components/DsTooltip/index.d.ts",
-      "import": "./dist/components/DsTooltip/index.js"
+    "./components/GrTooltip": {
+      "types": "./dist/types/src/components/GrTooltip/index.d.ts",
+      "import": "./dist/components/GrTooltip/index.js"
     },
-    "./components/DsTree": {
-      "types": "./dist/types/src/components/DsTree/index.d.ts",
-      "import": "./dist/components/DsTree/index.js"
+    "./components/GrTree": {
+      "types": "./dist/types/src/components/GrTree/index.d.ts",
+      "import": "./dist/components/GrTree/index.js"
     },
-    "./components/DsTreeSelect": {
-      "types": "./dist/types/src/components/DsTreeSelect/index.d.ts",
-      "import": "./dist/components/DsTreeSelect/index.js"
+    "./components/GrTreeSelect": {
+      "types": "./dist/types/src/components/GrTreeSelect/index.d.ts",
+      "import": "./dist/components/GrTreeSelect/index.js"
     },
     "./composables/useTheme": {
       "types": "./dist/types/src/composables/useTheme.d.ts",
@@ -260,6 +260,10 @@
     "./i18n": {
       "types": "./dist/types/src/i18n/index.d.ts",
       "import": "./dist/i18n/index.js"
+    },
+    "./i18n/all": {
+      "types": "./dist/types/src/i18n/all.d.ts",
+      "import": "./dist/i18n/all.js"
     },
     "./vue": {
       "types": "./dist/types/src/vue/index.d.ts",

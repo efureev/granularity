@@ -1,0 +1,1 @@
+export const GRANULARITY_I18N_BLOCK = 'gr'

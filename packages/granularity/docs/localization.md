@@ -20,7 +20,7 @@
 
 Текущая схема поведения такая:
 
-1. компонент запрашивает перевод по ключу вроде `ds.pagination.prev`;
+1. компонент запрашивает перевод по ключу вроде `gr.pagination.prev`;
 2. если приложение возвращает нормальную локализованную строку, в UI используется она;
 3. если i18n-слой не подключён или вернул исходный ключ, пакет использует встроенный fallback-текст.
 
@@ -77,25 +77,25 @@
 
 Он экспортирует:
 
-- `DS_I18N_BLOCK` со значением `ds`;
-- `dsLocaleLoaders` — lazy loaders локалей `en`, `ru`, `es`;
+- `GRANULARITY_I18N_BLOCK` со значением `gr`;
+- `grLocaleLoaders` — lazy loaders локалей `en`, `ru`, `es`;
 - `GRANULARITY_I18N_KEY` и связанные типы adapter API.
 
 Минимальный пример подключения:
 
 ```ts
 import { createFintI18n } from '@feugene/fint-i18n'
-import { DS_I18N_BLOCK, dsLocaleLoaders } from '@feugene/granularity/i18n'
+import { GRANULARITY_I18N_BLOCK, grLocaleLoaders } from '@feugene/granularity/i18n'
 
 const i18n = createFintI18n({
   locale: 'ru',
   fallbackLocale: 'en',
   loaders: [
-    dsLocaleLoaders,
+    grLocaleLoaders,
   ],
 })
 
-i18n.registerBlocks([DS_I18N_BLOCK])
+i18n.registerBlocks([GRANULARITY_I18N_BLOCK])
 await i18n.loadUsedBlocks('ru')
 ```
 

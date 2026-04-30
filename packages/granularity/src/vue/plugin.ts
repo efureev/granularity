@@ -46,10 +46,10 @@ export interface CreateGranularityOptions {
  * с явным именем регистрации.
  *
  * ```ts
- * import { DsButton } from '@feugene/granularity/components/DsButton'
+ * import { GrButton } from '@feugene/granularity/components/GrButton'
  * import { defineInstallable } from '@feugene/granularity/vue'
  *
- * const installable = defineInstallable(DsButton, 'DsButton')
+ * const installable = defineInstallable(GrButton, 'GrButton')
  * ```
  */
 export function defineInstallable<T extends Component>(component: T, name: string): GranularityInstallableComponent {
@@ -79,7 +79,7 @@ function installComponent(app: App, c: GranularityInstallableComponent): void {
     }
 
     // SFC: Vue 3 компилирует имя компонента из имени файла в поле `__name`
-    // (например, `DsButton.vue` → `__name: 'DsButton'`). Также поддерживаем явное `name`.
+    // (например, `GrButton.vue` → `__name: 'GrButton'`). Также поддерживаем явное `name`.
     const resolvedName
         = (c as Component & { name?: string }).name
             ?? (c as { __name?: string }).__name
@@ -138,15 +138,15 @@ export function installGranularity(app: App, options: CreateGranularityOptions =
  * ```ts
  * import { createApp } from 'vue'
  * import { createGranularity } from '@feugene/granularity/vue'
- * import { DsButton } from '@feugene/granularity/components/DsButton'
- * import { DsInput }  from '@feugene/granularity/components/DsInput'
+ * import { GrButton } from '@feugene/granularity/components/GrButton'
+ * import { GrInput }  from '@feugene/granularity/components/GrInput'
  * import { vHotkey }  from '@feugene/granularity/directives/hotkey'
  *
  * createApp(App)
  *   .use(createGranularity({
  *     // Достаточно передать сами компоненты — имя будет взято из `__name` (Vue SFC)
  *     // или из `name`; можно также указать явно через `{ name, component }`.
- *     components: [DsButton, DsInput],
+ *     components: [GrButton, GrInput],
  *     directives: [{ name: 'hotkey', directive: vHotkey }],
  *   }))
  *   .mount('#app')

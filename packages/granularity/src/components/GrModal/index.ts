@@ -1,0 +1,7 @@
+export { default } from './GrModal.vue'
+export { default as GrModal } from './GrModal.vue'
+export type { GrModalProps } from './GrModal.vue'
+export { grModalConfig } from './config'
+export type { GrModalSize } from './grModalStyles'
+export { getGrModalPanelClass } from './grModalStyles'
+export { grModalClassTokens, grModalSafelist } from './safelist'

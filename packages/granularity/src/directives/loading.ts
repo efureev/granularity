@@ -1,7 +1,7 @@
 import type { AppContext, Component, Directive } from 'vue'
 import { createVNode, render } from 'vue'
 
-import DsLoading from '../components/DsLoading/DsLoading.vue'
+import GrLoading from '../components/GrLoading/GrLoading.vue'
 
 export type LoadingTarget = string | HTMLElement
 
@@ -116,7 +116,7 @@ type InternalLoadingState = {
   fullscreen?: boolean
 }
 
-const STATE_KEY: unique symbol = Symbol('dsLoadingState')
+const STATE_KEY: unique symbol = Symbol('grLoadingState')
 
 function getState(el: HTMLElement): InternalLoadingState {
   return ((el as any)[STATE_KEY] ??= {}) as InternalLoadingState
@@ -141,7 +141,7 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
   function doRender(): void {
     if (disposed) return
 
-    const vnode = createVNode(DsLoading as any, {
+    const vnode = createVNode(GrLoading as any, {
       text: current.text,
       spinner: current.spinner,
       spinnerClass: current.spinnerClass,
