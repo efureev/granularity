@@ -35,7 +35,7 @@ export default defineConfig({
     //   что особенно критично для модулей переводов (`src/i18n/*`).
     // Для CSS такой проблемы нет — его жмём через `cssMinify`.
     minify: false,
-    sourcemap: true,
+    sourcemap: 'hidden',
     cssMinify: true,
     cssCodeSplit: true,
     reportCompressedSize: true,
