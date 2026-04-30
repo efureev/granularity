@@ -2,25 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
   {
-    id: 'toaster-tone-push',
-    title: 'Variant push buttons',
-    description: 'Показываем базовый `push` с разными `tone` и сразу фиксируем, что toast store общий для приложения.',
+    id: 'toaster-builder',
+    title: 'Interactive toaster constructor',
+    description: 'Живой playground для ключевых пропсов `GrToaster` и payload `useToast.push`: меняйте `tone`, `placement`, `timeoutMs`, тексты и проверяйте поведение без переключения между отдельными demo-карточками.',
     status: 'ready',
-    previewKey: 'ds-toaster-variant-push',
-    code: `<script setup lang="ts">
-import { GrButton, GrToaster, useToast } from '@feugene/granularity'
-
-const { push } = useToast()
-</script>
-
-<template>
-  <GrButton size="sm" @click="push({ title: 'Saved', variant: 'success' })">
-    Push success toast
-  </GrButton>
-
-  <GrToaster />
-</template>`,
-    note: 'В showcase preview используется singleton-host pattern, чтобы несколько demo-карточек не рендерили один и тот же shared toast stack одновременно.',
+    previewKey: 'ds-toaster-builder',
+    code: '',
+    note: 'Удобный формат для дизайн-ревью и QA: один сценарий покрывает все пропсы и shared-store контракт `useToast`.',
   },
   {
     id: 'toaster-sticky-host',
