@@ -48,7 +48,7 @@ describe('GrToaster', () => {
     toast.push({
       title: 'Saved',
       message: 'Profile updated',
-      variant: 'success',
+      tone: 'success',
       timeoutMs: 0,
     })
 
@@ -80,10 +80,10 @@ describe('GrToaster', () => {
 
   it('info/success имеют role=status+polite, warning/danger — role=alert+assertive', async () => {
     const toast = useToast()
-    toast.push({ title: 'Info', variant: 'info', timeoutMs: 0 })
-    toast.push({ title: 'Danger', variant: 'danger', timeoutMs: 0 })
-    toast.push({ title: 'Warn', variant: 'warning', timeoutMs: 0 })
-    toast.push({ title: 'Ok', variant: 'success', timeoutMs: 0 })
+    toast.push({ title: 'Info', tone: 'info', timeoutMs: 0 })
+    toast.push({ title: 'Danger', tone: 'danger', timeoutMs: 0 })
+    toast.push({ title: 'Warn', tone: 'warning', timeoutMs: 0 })
+    toast.push({ title: 'Ok', tone: 'success', timeoutMs: 0 })
 
     mount(GrToaster, { attachTo: document.body })
     await nextTick()
@@ -92,7 +92,7 @@ describe('GrToaster', () => {
       document.body.querySelectorAll<HTMLElement>('[data-ds-toast]'),
     )
     const byVariant = Object.fromEntries(
-      items.map(el => [el.getAttribute('data-variant'), el] as const),
+      items.map(el => [el.getAttribute('data-tone'), el] as const),
     )
 
     expect(byVariant.info.getAttribute('role')).toBe('status')
@@ -122,7 +122,7 @@ describe('GrToaster', () => {
     const toast = useToast()
     const id = toast.push({
       title: 'Warning',
-      variant: 'warning',
+      tone: 'warning',
       timeoutMs: 0,
     })
 
@@ -147,7 +147,7 @@ describe('GrToaster', () => {
     vi.useFakeTimers()
     try {
       const toast = useToast()
-      const id = toast.push({ title: 'Auto', variant: 'info', timeoutMs: 1000 })
+      const id = toast.push({ title: 'Auto', tone: 'info', timeoutMs: 1000 })
       expect(toast.list.value.some(t => t.id === id)).toBe(true)
 
       toast.dismiss(id)

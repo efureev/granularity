@@ -1,11 +1,11 @@
 import { computed, reactive } from 'vue'
 
-export type ToastVariant = 'info' | 'success' | 'warning' | 'danger'
+export type GrToastTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
 
 export type ToastInput = {
   title: string
   message?: string
-  variant?: ToastVariant
+  tone?: GrToastTone
   /**
    * Автозакрытие через N мс. `0` или отрицательное значение — «навсегда»
    * (до явного вызова `dismiss(id)` / `clear()`). По умолчанию: `3500`.
@@ -17,7 +17,7 @@ export type Toast = {
   id: string
   title: string
   message?: string
-  variant: ToastVariant
+  tone: GrToastTone
 }
 
 // Модульный синглтон состояния: один источник истины для всех `GrToaster`
@@ -51,7 +51,7 @@ export function useToast() {
       id,
       title: input.title,
       message: input.message,
-      variant: input.variant ?? 'info',
+      tone: input.tone ?? 'info',
     }
 
     toasts.unshift(toast)

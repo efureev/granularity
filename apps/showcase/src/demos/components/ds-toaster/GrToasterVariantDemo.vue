@@ -6,12 +6,12 @@ import { useShowcaseToasterHost } from './showcaseToasterHost'
 const { push, clear } = useToast()
 const { isActiveHost, activateHost } = useShowcaseToasterHost('variants')
 
-function notify(variant: 'info' | 'success' | 'warning' | 'danger') {
+function notify(tone: 'info' | 'success' | 'warning' | 'danger') {
   activateHost()
   clear()
   push({
-    variant,
-    title: `${variant[0].toUpperCase()}${variant.slice(1)} toast`,
+    tone,
+    title: `${tone[0].toUpperCase()}${tone.slice(1)} toast`,
     message: 'Shared toast store is now rendered through the active showcase host.',
   })
 }

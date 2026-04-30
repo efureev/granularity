@@ -51,7 +51,7 @@ export * from './components/GrTreeSelect'
 export { initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { useToast } from './composables/useToast'
-export type { Toast, ToastInput, ToastVariant } from './composables/useToast'
+export type { GrToastTone, Toast, ToastInput } from './composables/useToast'
 
 // File validation — реэкспортируем типы, чтобы прикладной код мог писать
 // `import type { FileValidationIssue } from '@feugene/granularity'` без

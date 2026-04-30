@@ -9,9 +9,9 @@ const { isActiveHost, activateHost } = useShowcaseToasterHost('queue')
 function queueWorkflowToasts() {
   activateHost()
   clear()
-  push({ title: 'Sync started', message: 'Preparing records for upload.', variant: 'info' })
-  push({ title: '2 warnings', message: 'Some fields will be normalized before import.', variant: 'warning', timeoutMs: 0 })
-  push({ title: 'Sync finished', message: 'Records were uploaded successfully.', variant: 'success' })
+  push({ title: 'Sync started', message: 'Preparing records for upload.', tone: 'info' })
+  push({ title: '2 warnings', message: 'Some fields will be normalized before import.', tone: 'warning', timeoutMs: 0 })
+  push({ title: 'Sync finished', message: 'Records were uploaded successfully.', tone: 'success' })
 }
 </script>
 

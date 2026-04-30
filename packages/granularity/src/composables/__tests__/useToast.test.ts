@@ -7,7 +7,7 @@ describe('useToast', () => {
     const { list, push, dismiss, clear } = useToast()
 
     clear()
-    const id = push({ title: 'Hello', message: 'World', variant: 'info', timeoutMs: 0 })
+    const id = push({ title: 'Hello', message: 'World', tone: 'info', timeoutMs: 0 })
 
     expect(list.value.length).toBe(1)
     expect(list.value[0]?.id).toBe(id)

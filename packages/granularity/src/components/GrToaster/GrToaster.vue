@@ -20,7 +20,7 @@ import {computed} from 'vue'
 import type {Component} from 'vue'
 
 import {useToast} from '../../composables/useToast'
-import type {ToastVariant} from '../../composables/useToast'
+import type {GrToastTone} from '../../composables/useToast'
 import GrButton from '../GrButton'
 import GrIcon from '../GrIcon'
 import {PLACEMENT_CLASS, type GrToasterPlacement} from './grToasterStyles'
@@ -33,20 +33,24 @@ import IconClose from '~icons/lucide/x'
 
 export type {GrToasterPlacement}
 
-interface VariantMeta {
+interface ToneMeta {
   icon: Component
   color: string
   role: 'status' | 'alert'
   live: 'polite' | 'assertive'
 }
 
-// Единый маппинг по variant'у: иконка, цвет, a11y-роль и «напор» live-региона.
+// Единый маппинг по tone'у: иконка, цвет, a11y-роль и «напор» live-региона.
 // На уровне модуля — чтобы не пересоздавать объект на каждый рендер.
-const VARIANT_META: Record<ToastVariant, VariantMeta> = {
+const TONE_META: Record<GrToastTone, ToneMeta> = {
+  primary: {icon: IconInfo, color: 'var(--primary)', role: 'status', live: 'polite'},
+  neutral: {icon: IconInfo, color: 'var(--muted-fg)', role: 'status', live: 'polite'},
   info: {icon: IconInfo, color: 'var(--ds-info)', role: 'status', live: 'polite'},
   success: {icon: IconCheck, color: 'var(--ds-success)', role: 'status', live: 'polite'},
   warning: {icon: IconWarning, color: 'var(--ds-warning)', role: 'alert', live: 'assertive'},
   danger: {icon: IconError, color: 'var(--ds-danger)', role: 'alert', live: 'assertive'},
+  slate: {icon: IconInfo, color: 'var(--ds-slate)', role: 'status', live: 'polite'},
+  azure: {icon: IconInfo, color: 'var(--ds-azure)', role: 'status', live: 'polite'},
 }
 
 
@@ -70,8 +74,8 @@ const {list, dismiss} = useToast()
 // SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
 const isClient = typeof window !== 'undefined'
 
-function metaFor(variant: ToastVariant): VariantMeta {
-  return VARIANT_META[variant] ?? VARIANT_META.info
+function metaFor(tone: GrToastTone): ToneMeta {
+  return TONE_META[tone] ?? TONE_META.info
 }
 
 const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
@@ -101,15 +105,15 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
             v-for="toast in list"
             :key="toast.id"
             data-ds-toast
-            :data-variant="toast.variant"
-            :role="metaFor(toast.variant).role"
-            :aria-live="metaFor(toast.variant).live"
+            :data-tone="toast.tone"
+            :role="metaFor(toast.tone).role"
+            :aria-live="metaFor(toast.tone).live"
             aria-atomic="true"
             class="rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--ds-shadow-2)]"
         >
           <div class="flex items-start gap-3">
-            <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.variant).color }" aria-hidden="true">
-              <component :is="metaFor(toast.variant).icon" />
+            <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }" aria-hidden="true">
+              <component :is="metaFor(toast.tone).icon" />
             </GrIcon>
             <div class="min-w-0 flex-1">
               <div class="text-[13px] font-700">
