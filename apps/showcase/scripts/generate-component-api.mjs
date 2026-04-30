@@ -20,7 +20,7 @@ const filteredPropNames = new Set([
 ])
 
 function extractComponentNames(registrySource) {
-  const matches = [...registrySource.matchAll(/^\s*(Ds[A-Za-z0-9]+):\s*ds[A-Za-z0-9]+Config,?$/gm)]
+  const matches = [...registrySource.matchAll(/^\s*(Gr[A-Za-z0-9]+):\s*gr[A-Za-z0-9]+Config,?$/gm)]
 
   return matches.map(([, componentName]) => componentName)
 }

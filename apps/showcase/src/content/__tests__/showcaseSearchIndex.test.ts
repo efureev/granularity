@@ -27,7 +27,7 @@ describe('showcase generated search index', () => {
   it('включает быстрые переходы на ключевые страницы и canonical detail/hash anchors', () => {
     expect(generatedSearchIndex.some(entry => entry.href === '/components')).toBe(true)
     expect(generatedSearchIndex.some(entry => entry.href === '/utilities/run-file-validators')).toBe(true)
-    expect(generatedSearchIndex.some(entry => entry.href === '/components/ds-button#api')).toBe(true)
+    expect(generatedSearchIndex.some(entry => entry.href === '/components/gr-button#api')).toBe(true)
     expect(generatedSearchIndex.some(entry => entry.href === '/utilities/accept-validator#usage')).toBe(true)
   })
 })

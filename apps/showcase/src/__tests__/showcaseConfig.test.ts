@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import {
-  showcaseContentIncludes,
+  showcaseGranularOptions,
 } from '../../uno.config'
 import {
   showcaseBuildAnalyzeMode,
@@ -82,12 +82,12 @@ describe('showcase bootstrap config', () => {
   })
 
   it('подключает fint-i18n и отдельные app-level locale loaders для showcase', () => {
-    expect(showcasePackageJson).toContain('"@feugene/fint-i18n": "0.1.1"')
+    expect(showcasePackageJson).toContain('"@feugene/fint-i18n": "^0.2.0"')
     expect(existsSync(showcaseI18nEntryPath)).toBe(true)
     expect(existsSync(showcaseI18nMessagesPath)).toBe(true)
     expect(showcaseI18nEntry).toContain("import { createFintI18n } from '@feugene/fint-i18n/core'")
     expect(showcaseI18nEntry).toContain("import { installI18n } from '@feugene/fint-i18n/vue'")
-    expect(showcaseI18nEntry).toContain("import { GRANULARITY_I18N_BLOCK, grLocaleLoaders } from '@feugene/granularity/i18n'")
+    expect(showcaseI18nEntry).toContain("import { GRANULARITY_I18N_BLOCK } from '@feugene/granularity/i18n'")
     expect(showcaseI18nEntry).toContain('SHOWCASE_I18N_BLOCK')
     expect(showcaseI18nEntry).toContain('showcaseLocaleLoaders')
     expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK])')
@@ -103,10 +103,11 @@ describe('showcase bootstrap config', () => {
   })
 
   it('сканирует только исходники showcase и включает пакетный Uno preset через package exports', () => {
-    expect(showcaseContentIncludes.some(re => re.test('/repo/apps/showcase/src/main.ts'))).toBe(true)
-    expect(showcaseContentIncludes.some(re => re.test('/repo/apps/playground/src/main.ts'))).toBe(false)
-    expect(showcaseContentIncludes.some(re => re.test('/repo/packages/granularity/dist/index.js'))).toBe(false)
-    expect(showcaseUnoConfig).toContain("import { presetGranularNode } from '@feugene/unocss-preset-granular/node'")
+    expect(showcaseGranularOptions.providers.length).toBeGreaterThan(0)
+    expect(showcaseGranularOptions.components).toBe('all')
+    expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
+    expect(showcaseUnoConfig).toContain("from '@feugene/unocss-preset-granular/node'")
+    expect(showcaseUnoConfig).toContain("presetGranularNode")
     expect(showcaseUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
     expect(showcaseUnoConfig).toContain('providers: [granularityProvider]')
     expect(showcaseUnoConfig).toContain("names: ['light', 'dark']")

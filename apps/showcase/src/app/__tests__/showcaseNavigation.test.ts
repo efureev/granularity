@@ -27,8 +27,8 @@ describe('showcase navigation model', () => {
   it('нормализует path и корректно находит страницы с хвостовым slash', () => {
     expect(getShowcasePageByPath('/foundations/')?.name).toBe('foundations')
     expect(getShowcasePageByPath('/components?tab=api')?.name).toBe('components')
-    expect(getShowcasePageByPath('/components/ds-button')?.name).toBe('components')
-    expect(getShowcaseComponentBySlug('ds-button')?.name).toBe('GrButton')
+    expect(getShowcasePageByPath('/components/gr-button')?.name).toBe('components')
+    expect(getShowcaseComponentBySlug('gr-button')?.name).toBe('GrButton')
   })
 
   it('строит breadcrumbs для overview, вложенных страниц и неизвестных route-path', () => {
@@ -48,7 +48,7 @@ describe('showcase navigation model', () => {
         to: '/utilities',
       },
     ])
-    expect(getShowcaseBreadcrumbs('/components/ds-button')).toEqual([
+    expect(getShowcaseBreadcrumbs('/components/gr-button')).toEqual([
       {
         label: 'Overview',
         to: '/',
@@ -59,7 +59,7 @@ describe('showcase navigation model', () => {
       },
       {
         label: 'GrButton',
-        to: '/components/ds-button',
+        to: '/components/gr-button',
       },
     ])
     expect(getShowcaseBreadcrumbs('/missing')).toEqual([
@@ -68,7 +68,7 @@ describe('showcase navigation model', () => {
         to: '/',
       },
     ])
-    expect(getShowcaseEntityByPath('/components/ds-button')?.name).toBe('GrButton')
+    expect(getShowcaseEntityByPath('/components/gr-button')?.name).toBe('GrButton')
   })
 
   it('подключает ленивые route loaders для всех разделов shell-навигации', () => {

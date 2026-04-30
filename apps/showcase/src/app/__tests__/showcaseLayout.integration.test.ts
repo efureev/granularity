@@ -111,7 +111,7 @@ describe('showcase layout integration', () => {
   })
 
   it('рендерит breadcrumbs и doc sections для component detail route', async () => {
-    const { wrapper } = await mountShowcaseAt('/components/ds-button')
+    const { wrapper } = await mountShowcaseAt('/components/gr-button')
 
     expect(wrapper.text()).toContain('Компоненты')
     expect(wrapper.text()).toContain('GrButton')
@@ -172,7 +172,7 @@ describe('showcase layout integration', () => {
   })
 
   it('открывает mobile drawer с внутристраничной навигацией и закрывает его при смене route', async () => {
-    const { router, wrapper } = await mountShowcaseAt('/components/ds-button')
+    const { router, wrapper } = await mountShowcaseAt('/components/gr-button')
     const mobileMenuButton = findButtonByAriaLabel(wrapper, 'Открыть навигацию')
 
     expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(false)
@@ -195,7 +195,7 @@ describe('showcase layout integration', () => {
   })
 
   it('открывает quick search как CSS-sized панель с внутренним скроллом результатов', async () => {
-    const { wrapper } = await mountShowcaseAt('/components/ds-button')
+    const { wrapper } = await mountShowcaseAt('/components/gr-button')
     const searchButton = findButtonByAriaLabel(wrapper, 'Открыть поиск')
 
     expect(searchButton).toBeTruthy()

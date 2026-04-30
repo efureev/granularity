@@ -1,1 +1,4949 @@
-{}
+{
+  "GrAlert": {
+    "name": "GrAlert",
+    "sourcePath": "packages/granularity/src/components/GrAlert/GrAlert.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "",
+            "type": "GrAlertTone | undefined",
+            "required": false,
+            "default": "\"info\""
+          },
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrAlertVariant | undefined",
+            "required": false,
+            "default": "\"soft\""
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closable",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "backgroundColor",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "textColor",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "borderColor",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "close",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"close\"): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrAvatar": {
+    "name": "GrAvatar",
+    "sourcePath": "packages/granularity/src/components/GrAvatar/GrAvatar.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "40"
+          },
+          {
+            "name": "src",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "alt",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "shape",
+            "description": "",
+            "type": "GrAvatarShape | undefined",
+            "required": false,
+            "default": "\"circle\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrBadge": {
+    "name": "GrBadge",
+    "sourcePath": "packages/granularity/src/components/GrBadge/GrBadge.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "",
+            "type": "GrBadgeTone | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrBadgeSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "dark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "radius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "\"round\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrBadgeWrap": {
+    "name": "GrBadgeWrap",
+    "sourcePath": "packages/granularity/src/components/GrBadgeWrap/GrBadgeWrap.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "value",
+            "description": "",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dot",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrBottomNav": {
+    "name": "GrBottomNav",
+    "sourcePath": "packages/granularity/src/components/GrBottomNav/GrBottomNav.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "items",
+            "description": "",
+            "type": "GrBottomNavItem[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrButton": {
+    "name": "GrButton",
+    "sourcePath": "packages/granularity/src/components/GrButton/GrButton.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "",
+            "type": "GrButtonTone | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "type",
+            "description": "",
+            "type": "\"button\" | \"submit\" | \"reset\" | undefined",
+            "required": false,
+            "default": "\"button\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrButtonSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "square",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loading",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrButtonGroup": {
+    "name": "GrButtonGroup",
+    "sourcePath": "packages/granularity/src/components/GrButtonGroup/GrButtonGroup.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrCard": {
+    "name": "GrCard",
+    "sourcePath": "packages/granularity/src/components/GrCard/GrCard.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrCheckbox": {
+    "name": "GrCheckbox",
+    "sourcePath": "packages/granularity/src/components/GrCheckbox/GrCheckbox.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "value",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"on\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "form",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "Пробрасывается на скрытый нативный `<input>`, чтобы работал `<label for=\"...\">`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrCollapse": {
+    "name": "GrCollapse",
+    "sourcePath": "packages/granularity/src/components/GrCollapse/GrCollapse.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "GrCollapseValue | GrCollapseValue[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "accordion",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "divided",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: GrCollapseModelValue]",
+            "signature": "(event: \"update:modelValue\", value: GrCollapseModelValue): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: GrCollapseModelValue]",
+            "signature": "(event: \"change\", value: GrCollapseModelValue): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrConfirmDialog": {
+    "name": "GrConfirmDialog",
+    "sourcePath": "packages/granularity/src/components/GrConfirmDialog/GrConfirmDialog.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Confirm\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrDialogSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "description",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeOnBackdrop",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showHeader",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "headerConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "footerConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
+            "name": "buttonSize",
+            "description": "",
+            "type": "GrButtonSize | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "confirmText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Confirm\""
+          },
+          {
+            "name": "cancelText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Cancel\""
+          },
+          {
+            "name": "confirmVariant",
+            "description": "",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "confirmTone",
+            "description": "",
+            "type": "GrButtonTone | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "footer",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "confirm",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"confirm\"): void"
+          },
+          {
+            "name": "cancel",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"cancel\"): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDataTable": {
+    "name": "GrDataTable",
+    "sourcePath": "packages/granularity/src/components/GrDataTable/GrDataTable.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "rows",
+            "description": "",
+            "type": "TRow[]",
+            "required": true
+          },
+          {
+            "name": "columns",
+            "description": "",
+            "type": "GrDataColumn[]",
+            "required": true
+          },
+          {
+            "name": "rowKey",
+            "description": "Ключ строки или функция-резолвер. По умолчанию — поле `'id'`.",
+            "type": "GrDataTableRowKey<TRow> | undefined",
+            "required": false,
+            "default": "\"id\" as never"
+          },
+          {
+            "name": "initialSortKey",
+            "description": "Ключ колонки для начальной сортировки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "initialSortDir",
+            "description": "Направление начальной сортировки.",
+            "type": "\"asc\" | \"desc\" | undefined",
+            "required": false,
+            "default": "\"asc\""
+          },
+          {
+            "name": "density",
+            "description": "",
+            "type": "GrTableDensity | undefined",
+            "required": false,
+            "default": "\"regular\""
+          },
+          {
+            "name": "caption",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabelledby",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "regionLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "caption",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "foot",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDialog": {
+    "name": "GrDialog",
+    "sourcePath": "packages/granularity/src/components/GrDialog/GrDialog.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrDialogSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "closeOnBackdrop",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showHeader",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "headerConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "footerConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "any"
+          },
+          {
+            "name": "header",
+            "description": "",
+            "type": "{ title?: string | undefined; }"
+          },
+          {
+            "name": "footer",
+            "description": "",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDrawer": {
+    "name": "GrDrawer",
+    "sourcePath": "packages/granularity/src/components/GrDrawer/GrDrawer.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "Заголовок; если передан — покажется в хедере. Можно переопределить слотом `#title`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "Размер панели.",
+            "type": "GrDrawerSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "closeOnBackdrop",
+            "description": "Закрывать при клике по бэкдропу / через HeadlessUI close.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "Закрывать по Esc.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeLabel",
+            "description": "i18n-friendly aria-label для кнопки закрытия.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
+            "name": "side",
+            "description": "Сторона, с которой выезжает панель.",
+            "type": "GrDrawerSide | undefined",
+            "required": false,
+            "default": "\"right\""
+          },
+          {
+            "name": "modelValue",
+            "description": "Контроль открытия через v-model.",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "footer",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDropdown": {
+    "name": "GrDropdown",
+    "sourcePath": "packages/granularity/src/components/GrDropdown/GrDropdown.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "align",
+            "description": "Выравнивание панели относительно триггера.",
+            "type": "GrDropdownAlign | undefined",
+            "required": false,
+            "default": "\"right\""
+          },
+          {
+            "name": "width",
+            "description": "Ширина панели (tailwind-токены `w-*` или `auto`).",
+            "type": "GrDropdownWidth | undefined",
+            "required": false,
+            "default": "\"48\""
+          },
+          {
+            "name": "closeOnContentClick",
+            "description": "Закрывать панель по клику внутри content.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "contentClass",
+            "description": "Дополнительные классы контейнера content.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "teleportTo",
+            "description": "Куда телепортировать панель (`body` по умолчанию).",
+            "type": "string | HTMLElement | undefined",
+            "required": false,
+            "default": "\"body\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "trigger",
+            "description": "",
+            "type": "{ open: boolean; toggle: () => void; close: () => void; }"
+          },
+          {
+            "name": "content",
+            "description": "",
+            "type": "{ close: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDropdownMenu": {
+    "name": "GrDropdownMenu",
+    "sourcePath": "packages/granularity/src/components/GrDropdownMenu/GrDropdownMenu.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "align",
+            "description": "Выравнивание панели относительно триггера.",
+            "type": "GrDropdownMenuAlign | undefined",
+            "required": false,
+            "default": "\"right\""
+          },
+          {
+            "name": "width",
+            "description": "Ширина панели.",
+            "type": "GrDropdownMenuWidth | undefined",
+            "required": false,
+            "default": "\"48\""
+          },
+          {
+            "name": "closeOnContentClick",
+            "description": "Закрывать по клику внутри content.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "contentClass",
+            "description": "Дополнительные классы content-контейнера; по умолчанию `p-0`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"p-0\""
+          },
+          {
+            "name": "dividers",
+            "description": "Разделители между пунктами.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "borderTop",
+            "description": "Верхний бордер контейнера списка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "borderBottom",
+            "description": "Нижний бордер контейнера списка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "listClass",
+            "description": "Дополнительные классы для wrapper'а списка.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "trigger",
+            "description": "",
+            "type": "{ open: boolean; toggle: () => void; close: () => void; }"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ close: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrEmptyState": {
+    "name": "GrEmptyState",
+    "sourcePath": "packages/granularity/src/components/GrEmptyState/GrEmptyState.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "description",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "icon",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrFileUpload": {
+    "name": "GrFileUpload",
+    "sourcePath": "packages/granularity/src/components/GrFileUpload/GrFileUpload.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"file\""
+          },
+          {
+            "name": "action",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "request",
+            "description": "",
+            "type": "GrFileUploadRequest | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "multiple",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "limit",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "onExceed",
+            "description": "",
+            "type": "((files: File[], limit: number) => void) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "beforeUpload",
+            "description": "",
+            "type": "((file: File) => boolean | Promise<unknown>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "validators",
+            "description": "",
+            "type": "FileValidator[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "headers",
+            "description": "",
+            "type": "Record<string, string> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "withCredentials",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "showFileList",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "uploadExtraData",
+            "description": "",
+            "type": "((files: File[]) => GrFileUploadExtraData | undefined) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "i18n: надпись-подсказка в дефолтном UI.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Drag files here or click to select\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; }"
+          },
+          {
+            "name": "label",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "tip",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "success",
+            "description": "",
+            "type": "[payload: any]",
+            "signature": "(event: \"success\", payload: any): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[files: File[]]",
+            "signature": "(event: \"change\", files: File[]): void"
+          },
+          {
+            "name": "error",
+            "description": "",
+            "type": "[error: unknown]",
+            "signature": "(event: \"error\", error: unknown): void"
+          },
+          {
+            "name": "progress",
+            "description": "",
+            "type": "[percent: number]",
+            "signature": "(event: \"progress\", percent: number): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "uploadFiles",
+            "description": "",
+            "type": "(files: File[], source?: FileValidatorSource) => Promise<void>"
+          },
+          {
+            "name": "abort",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "openDialog",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
+  "GrFormField": {
+    "name": "GrFormField",
+    "sourcePath": "packages/granularity/src/components/GrFormField/GrFormField.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "error",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "forId",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "labelClass",
+            "description": "",
+            "type": "LabelClass | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrFormFile": {
+    "name": "GrFormFile",
+    "sourcePath": "packages/granularity/src/components/GrFormFile/GrFormFile.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "multiple",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "validators",
+            "description": "",
+            "type": "FileValidator[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"No files selected\""
+          },
+          {
+            "name": "accept",
+            "description": "W3C `accept` для `<input type=\"file\">` + sugar к `acceptValidator(...)`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "uploadText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Upload file\""
+          },
+          {
+            "name": "changeText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Change file\""
+          },
+          {
+            "name": "removeText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Remove\""
+          },
+          {
+            "name": "clearAllText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Clear all\""
+          },
+          {
+            "name": "validate",
+            "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
+            "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "File | File[] | null",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "errors",
+            "description": "",
+            "type": "{ errors: { fileName?: string | undefined; code: FileValidationIssueCode; message: string; meta?: Record<string, unknown> | undefined; i18nKey?: string | undefined; i18nParams?: Record<string, unknown> | undefined; }[]; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: File | File[] | null]",
+            "signature": "(event: \"update:modelValue\", value: File | File[] | null): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: File | File[] | null]",
+            "signature": "(event: \"change\", value: File | File[] | null): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
+          },
+          {
+            "name": "validation",
+            "description": "",
+            "type": "[errors: FileValidationIssue[]]",
+            "signature": "(event: \"validation\", errors: FileValidationIssue[]): void"
+          },
+          {
+            "name": "update:errors",
+            "description": "",
+            "type": "[errors: FileValidationIssue[]]",
+            "signature": "(event: \"update:errors\", errors: FileValidationIssue[]): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrFormSection": {
+    "name": "GrFormSection",
+    "sourcePath": "packages/granularity/src/components/GrFormSection/GrFormSection.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "description",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrIcon": {
+    "name": "GrIcon",
+    "sourcePath": "packages/granularity/src/components/GrIcon/GrIcon.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "number | GrIconSize | undefined",
+            "required": false
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrImageViewer": {
+    "name": "GrImageViewer",
+    "sourcePath": "packages/granularity/src/components/GrImageViewer/GrImageViewer.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "closeLabel",
+            "description": "i18n: aria-label кнопки закрытия.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close image viewer\""
+          },
+          {
+            "name": "zIndex",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "initialIndex",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "zoomRate",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1.2"
+          },
+          {
+            "name": "minScale",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0.5"
+          },
+          {
+            "name": "maxScale",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "5"
+          },
+          {
+            "name": "hideOnClickModal",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "closeOnPressEscape",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showProgress",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "showZoomValue",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "prevLabel",
+            "description": "i18n: aria-label кнопки «предыдущее изображение».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Previous image\""
+          },
+          {
+            "name": "nextLabel",
+            "description": "i18n: aria-label кнопки «следующее изображение».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Next image\""
+          },
+          {
+            "name": "zoomInLabel",
+            "description": "i18n: aria-label кнопки «увеличить».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Zoom in\""
+          },
+          {
+            "name": "zoomOutLabel",
+            "description": "i18n: aria-label кнопки «уменьшить».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Zoom out\""
+          },
+          {
+            "name": "resetZoomLabel",
+            "description": "i18n: aria-label кнопки «сбросить масштаб».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Reset zoom\""
+          },
+          {
+            "name": "rotateLeftLabel",
+            "description": "i18n: aria-label кнопки «повернуть влево».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Rotate left\""
+          },
+          {
+            "name": "rotateRightLabel",
+            "description": "i18n: aria-label кнопки «повернуть вправо».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Rotate right\""
+          },
+          {
+            "name": "emptyText",
+            "description": "i18n: текст в пустом состоянии (нет изображений).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"No image\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "urlList",
+            "description": "",
+            "type": "string[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "toolbar",
+            "description": "",
+            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; actions: GrImageViewerToolbarActions; }"
+          },
+          {
+            "name": "toolbar-actions",
+            "description": "",
+            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; actions: GrImageViewerToolbarActions; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "close",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"close\"): void"
+          },
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "switch",
+            "description": "",
+            "type": "[newIndex: number]",
+            "signature": "(event: \"switch\", newIndex: number): void"
+          },
+          {
+            "name": "rotate",
+            "description": "",
+            "type": "[deg: number]",
+            "signature": "(event: \"rotate\", deg: number): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrInput": {
+    "name": "GrInput",
+    "sourcePath": "packages/granularity/src/components/GrInput/GrInput.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "type",
+            "description": "",
+            "type": "\"number\" | \"search\" | \"text\" | \"email\" | \"password\" | undefined",
+            "required": false,
+            "default": "\"text\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrInputSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autocomplete",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "inputmode",
+            "description": "",
+            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "textAlign",
+            "description": "",
+            "type": "GrInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "prefix",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "suffix",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
+  "GrInputTag": {
+    "name": "GrInputTag",
+    "sourcePath": "packages/granularity/src/components/GrInputTag/GrInputTag.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrInputSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "trim",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "GrInputTagState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "readonly",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "separators",
+            "description": "",
+            "type": "string[] | undefined",
+            "required": false,
+            "default": "[\",\"]"
+          },
+          {
+            "name": "allowDuplicates",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "addOnBlur",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "clearInputOnAdd",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "tagTone",
+            "description": "",
+            "type": "GrBadgeTone | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "tagDark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "tagSize",
+            "description": "",
+            "type": "GrBadgeSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "tagRadius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "\"round\""
+          },
+          {
+            "name": "tagClosable",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "removeTagLabel",
+            "description": "i18n-friendly aria-label for the per-tag remove button.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Remove tag\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tag",
+            "description": "",
+            "type": "{ tag: string; index: number; remove: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string[]]",
+            "signature": "(event: \"update:modelValue\", value: string[]): void"
+          },
+          {
+            "name": "add",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"add\", value: string): void"
+          },
+          {
+            "name": "remove",
+            "description": "",
+            "type": "[value: string, index: number]",
+            "signature": "(event: \"remove\", value: string, index: number): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
+  "GrLink": {
+    "name": "GrLink",
+    "sourcePath": "packages/granularity/src/components/GrLink/GrLink.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrLinkVariant | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrLinkSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "href",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "external",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "target",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "underline",
+            "description": "",
+            "type": "GrLinkUnderline | undefined",
+            "required": false,
+            "default": "\"auto\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrList": {
+    "name": "GrList",
+    "sourcePath": "packages/granularity/src/components/GrList/GrList.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "divided",
+            "description": "Показывать ли горизонтальные разделители между элементами (по умолчанию — да).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrLoading": {
+    "name": "GrLoading",
+    "sourcePath": "packages/granularity/src/components/GrLoading/GrLoading.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "zIndex",
+            "description": "Custom `z-index`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "text",
+            "description": "Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "spinner",
+            "description": "Custom spinner component (rendered instead of the default loader icon).",
+            "type": "Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "spinnerClass",
+            "description": "Extra classes for the spinner element.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "animated",
+            "description": "When `true` (default), the default spinner rotates via `@keyframes ds-loading-spin`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "background",
+            "description": "Custom CSS `background-color`. When set, disables the default `bg-black/25` dim.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "fullscreen",
+            "description": "Cover the whole viewport (`position: fixed`) instead of the nearest positioned ancestor.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "customClass",
+            "description": "Extra classes appended to the overlay root.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrModal": {
+    "name": "GrModal",
+    "sourcePath": "packages/granularity/src/components/GrModal/GrModal.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrModalSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "closeOnBackdrop",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "description",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrNavbar": {
+    "name": "GrNavbar",
+    "sourcePath": "packages/granularity/src/components/GrNavbar/GrNavbar.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "showMenuButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "menuButtonClass",
+            "description": "Extra classes applied to the menu button wrapper (e.g. `sm:hidden`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "menu",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"menu\"): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrNumberInput": {
+    "name": "GrNumberInput",
+    "sourcePath": "packages/granularity/src/components/GrNumberInput/GrNumberInput.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrNumberInputSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autocomplete",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "inputmode",
+            "description": "",
+            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "required": false,
+            "default": "\"decimal\""
+          },
+          {
+            "name": "invalid",
+            "description": "Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "GrNumberInputState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "textAlign",
+            "description": "",
+            "type": "GrNumberInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "decimalSeparator",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\".\""
+          },
+          {
+            "name": "step",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "min",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "precision",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "controls",
+            "description": "Показывать кнопки +/-.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "controlsDirection",
+            "description": "",
+            "type": "GrNumberInputControlsDirection | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
+            "name": "increaseLabel",
+            "description": "i18n-friendly aria-label для кнопки \"увеличить\".",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Increase\""
+          },
+          {
+            "name": "decreaseLabel",
+            "description": "i18n-friendly aria-label для кнопки \"уменьшить\".",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Decrease\""
+          },
+          {
+            "name": "modelValue",
+            "description": "Значение (строка — контролируем форматирование внутри).",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "prefix",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "suffix",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
+  "GrPagination": {
+    "name": "GrPagination",
+    "sourcePath": "packages/granularity/src/components/GrPagination/GrPagination.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "pageSizes",
+            "description": "",
+            "type": "number[] | undefined",
+            "required": false,
+            "default": "[10, 20, 50]"
+          },
+          {
+            "name": "total",
+            "description": "",
+            "type": "number",
+            "required": true
+          },
+          {
+            "name": "page",
+            "description": "",
+            "type": "number",
+            "required": true
+          },
+          {
+            "name": "pageSize",
+            "description": "",
+            "type": "number",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:page",
+            "description": "",
+            "type": "[value: number]",
+            "signature": "(event: \"update:page\", value: number): void"
+          },
+          {
+            "name": "update:pageSize",
+            "description": "",
+            "type": "[value: number]",
+            "signature": "(event: \"update:pageSize\", value: number): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrProgressBar": {
+    "name": "GrProgressBar",
+    "sourcePath": "packages/granularity/src/components/GrProgressBar/GrProgressBar.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "",
+            "type": "GrProgressBarTone | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "number",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrPromptDialog": {
+    "name": "GrPromptDialog",
+    "sourcePath": "packages/granularity/src/components/GrPromptDialog/GrPromptDialog.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Prompt\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrDialogSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "description",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeOnBackdrop",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showHeader",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "headerConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "footerConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "GrDialogSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Close\""
+          },
+          {
+            "name": "buttonSize",
+            "description": "",
+            "type": "GrButtonSize | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "confirmText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Confirm\""
+          },
+          {
+            "name": "cancelText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Cancel\""
+          },
+          {
+            "name": "confirmVariant",
+            "description": "",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "confirmTone",
+            "description": "",
+            "type": "GrButtonTone | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Value\""
+          },
+          {
+            "name": "requiredErrorText",
+            "description": "Текст ошибки для пустого значения при `required=true` (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Enter a value.\""
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "footer",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "confirm",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"confirm\", value: string): void"
+          },
+          {
+            "name": "cancel",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"cancel\"): void"
+          },
+          {
+            "name": "update:value",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:value\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrRadio": {
+    "name": "GrRadio",
+    "sourcePath": "packages/granularity/src/components/GrRadio/GrRadio.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrRadioVariant | undefined",
+            "required": false,
+            "default": "\"radiobox\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrButtonSize | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "form",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "buttonVariant",
+            "description": "",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "\"outline\""
+          },
+          {
+            "name": "buttonTone",
+            "description": "",
+            "type": "GrButtonTone | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "selectedButtonVariant",
+            "description": "",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "selectedButtonTone",
+            "description": "",
+            "type": "GrButtonTone | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrRadioGroup": {
+    "name": "GrRadioGroup",
+    "sourcePath": "packages/granularity/src/components/GrRadioGroup/GrRadioGroup.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrRadioGroupVariant | undefined",
+            "required": false,
+            "default": "\"radiobox\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrButtonSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "options",
+            "description": "",
+            "type": "GrRadioGroupOption[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrSegmented": {
+    "name": "GrSegmented",
+    "sourcePath": "packages/granularity/src/components/GrSegmented/GrSegmented.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrSegmentedVariant | undefined",
+            "required": false,
+            "default": "\"pills\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSegmentedSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя скрытых radio-inputs для интеграции с нативной формой.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "indicatorDuration",
+            "description": "Длительность анимации индикатора в мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "300"
+          },
+          {
+            "name": "block",
+            "description": "Растягивать сегмент на всю ширину контейнера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "GrSegmentedValue",
+            "required": true
+          },
+          {
+            "name": "options",
+            "description": "",
+            "type": "GrSegmentedOption[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ option: GrSegmentedOption; selected: boolean; disabled: boolean; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: GrSegmentedValue]",
+            "signature": "(event: \"update:modelValue\", value: GrSegmentedValue): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: GrSegmentedValue, option: GrSegmentedOption]",
+            "signature": "(event: \"change\", value: GrSegmentedValue, option: GrSegmentedOption): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrSelect": {
+    "name": "GrSelect",
+    "sourcePath": "packages/granularity/src/components/GrSelect/GrSelect.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "Цвет/вариант ссылки для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
+            "type": "GrSelectVariant | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSelectSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "multiple",
+            "description": "Multiple selection.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "placeholder",
+            "description": "Placeholder (показывается, когда значение не выбрано).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "underline",
+            "description": "Подчёркивание для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
+            "type": "GrSelectUnderline | undefined",
+            "required": false,
+            "default": "\"auto\""
+          },
+          {
+            "name": "options",
+            "description": "",
+            "type": "GrSelectOption[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "view",
+            "description": "",
+            "type": "GrSelectView | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "optionsView",
+            "description": "Как отображать список опций: нативный `<select>` или кастомная панель.",
+            "type": "GrSelectOptionsView | undefined",
+            "required": false,
+            "default": "\"native\""
+          },
+          {
+            "name": "allowCustomValue",
+            "description": "Разрешает ввод/выбор значения, которого нет в `options`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "customValuePlaceholder",
+            "description": "Placeholder для инпута кастомного значения (только в `optionsView=\"panel\"`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Add value\\u2026\""
+          },
+          {
+            "name": "dropdownMaxHeight",
+            "description": "Максимальная высота панели (только в `optionsView=\"panel\"`).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "280"
+          },
+          {
+            "name": "closeOnSelect",
+            "description": "Закрывать панель после выбора (только в `optionsView=\"panel\"`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "clearable",
+            "description": "Разрешает очистку выбранного значения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "clearLabel",
+            "description": "i18n-label для кнопки очистки (`aria-label`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Clear\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "GrSelectModelValue",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "{ selectedOptions: GrSelectOption[]; selectedValues: string[]; displayLabel: string; placeholder: string | undefined; hasSelection: boolean; }"
+          },
+          {
+            "name": "option",
+            "description": "",
+            "type": "{ option: GrSelectOption; selected: boolean; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: GrSelectModelValue]",
+            "signature": "(event: \"update:modelValue\", value: GrSelectModelValue): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrSidebar": {
+    "name": "GrSidebar",
+    "sourcePath": "packages/granularity/src/components/GrSidebar/GrSidebar.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "subtitle",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "subtitle",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrSkeleton": {
+    "name": "GrSkeleton",
+    "sourcePath": "packages/granularity/src/components/GrSkeleton/GrSkeleton.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "width",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"100%\""
+          },
+          {
+            "name": "height",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"12px\""
+          },
+          {
+            "name": "rounded",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"9999px\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrSwitch": {
+    "name": "GrSwitch",
+    "sourcePath": "packages/granularity/src/components/GrSwitch/GrSwitch.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSwitchSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "activeBackgroundColor",
+            "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--primary)`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "inactiveBackgroundColor",
+            "description": "Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--muted)`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTable": {
+    "name": "GrTable",
+    "sourcePath": "packages/granularity/src/components/GrTable/GrTable.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "ariaLabel",
+            "description": "Прямой ARIA-label для `<table>`. Игнорируется, если задан `ariaLabelledby`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "density",
+            "description": "Плотность таблицы — влияет на базовый размер шрифта. Паддинги ячеек оставлены за консьюмером (GrTable — «тонкий» контейнер).",
+            "type": "GrTableDensity | undefined",
+            "required": false,
+            "default": "\"regular\""
+          },
+          {
+            "name": "caption",
+            "description": "Текст caption для screen reader'ов. Рендерится как `<caption class=\"sr-only\">`, если не передан слот `#caption`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabelledby",
+            "description": "ID элемента-заголовка, связанного с `<table>` через `aria-labelledby`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "regionLabel",
+            "description": "ARIA-label для скролл-контейнера (`role=\"region\"` + `tabindex=\"0\"`). Позволяет клавиатурным пользователям проскроллить широкую таблицу. Если не задан — region-роль не включается.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "caption",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "head",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "foot",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTabs": {
+    "name": "GrTabs",
+    "sourcePath": "packages/granularity/src/components/GrTabs/GrTabs.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "tabs",
+            "description": "",
+            "type": "GrTab[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTextarea": {
+    "name": "GrTextarea",
+    "sourcePath": "packages/granularity/src/components/GrTextarea/GrTextarea.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "id",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rows",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "4"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autocomplete",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "GrTextareaState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrToaster": {
+    "name": "GrToaster",
+    "sourcePath": "packages/granularity/src/components/GrToaster/GrToaster.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "regionLabel",
+            "description": "A11y-лейбл контейнера-региона (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Notifications\""
+          },
+          {
+            "name": "placement",
+            "description": "Угол экрана для стека уведомлений.",
+            "type": "GrToasterPlacement | undefined",
+            "required": false,
+            "default": "\"top-right\""
+          },
+          {
+            "name": "dismissLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Dismiss\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTooltip": {
+    "name": "GrTooltip",
+    "sourcePath": "packages/granularity/src/components/GrTooltip/GrTooltip.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "iconColor",
+            "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--muted-fg)`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"var(--muted-fg)\""
+          },
+          {
+            "name": "text",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTree": {
+    "name": "GrTree",
+    "sourcePath": "packages/granularity/src/components/GrTree/GrTree.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "data",
+            "description": "",
+            "type": "T[]",
+            "required": true
+          },
+          {
+            "name": "props",
+            "description": "",
+            "type": "GrTreePropsMap | undefined",
+            "required": false,
+            "default": "{\n    children: \"children\",\n    label: \"label\",\n}"
+          },
+          {
+            "name": "nodeKey",
+            "description": "",
+            "type": "\"id\" | Extract<keyof T, string> | undefined",
+            "required": false,
+            "default": "\"id\" as any"
+          },
+          {
+            "name": "defaultExpandedKeys",
+            "description": "",
+            "type": "GrTreeKey[] | undefined",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "filterNodeMethod",
+            "description": "",
+            "type": "GrTreeFilterNodeMethod<T> | undefined",
+            "required": false
+          },
+          {
+            "name": "highlightCurrent",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "expandIcon",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"i-lucide-chevron-right\""
+          },
+          {
+            "name": "collapseIcon",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"i-lucide-chevron-right\""
+          },
+          {
+            "name": "toggleIconRotate",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "branchLine",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "branchLineColor",
+            "description": "",
+            "type": "GrTreeBranchLineColor<T> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "branchLineActiveColor",
+            "description": "",
+            "type": "GrTreeBranchLineColor<T> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rowClass",
+            "description": "",
+            "type": "GrTreeNodeClass<T>",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dragHandleClass",
+            "description": "",
+            "type": "GrTreeNodeClass<T>",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "toggleClass",
+            "description": "",
+            "type": "GrTreeNodeClass<T>",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "toggleIconClass",
+            "description": "",
+            "type": "GrTreeNodeClass<T>",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "toggleSpacerClass",
+            "description": "",
+            "type": "GrTreeNodeClass<T>",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "contentClass",
+            "description": "",
+            "type": "GrTreeNodeClass<T>",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dragLabel",
+            "description": "i18n-метка кнопки \"Перетащить\" (default: 'Drag').",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Drag\""
+          },
+          {
+            "name": "expandLabel",
+            "description": "i18n-метка кнопки \"Развернуть\" (default: 'Expand').",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Expand\""
+          },
+          {
+            "name": "collapseLabel",
+            "description": "i18n-метка кнопки \"Свернуть\" (default: 'Collapse').",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Collapse\""
+          },
+          {
+            "name": "draggable",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "dragHandleIcon",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"i-lucide-grip-vertical\""
+          },
+          {
+            "name": "allowDrop",
+            "description": "",
+            "type": "((draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, type: GrTreeNodeDropType) => boolean) | undefined",
+            "required": false
+          },
+          {
+            "name": "allowDrag",
+            "description": "",
+            "type": "((draggingNode: GrTreeNode<T>) => boolean) | undefined",
+            "required": false
+          },
+          {
+            "name": "internalRows",
+            "description": "",
+            "type": "GrTreeVisibleTreeRow<T>[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "internalNested",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "internalStore",
+            "description": "",
+            "type": "GrTreeStore<T> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "internalInteractionContext",
+            "description": "",
+            "type": "GrTreeInteractionContext<T> | undefined",
+            "required": false
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ node: GrTreeNode<T>; data: T; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "nodeClick",
+            "description": "",
+            "type": "[T, GrTreeNode<T>]",
+            "signature": "(event: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
+          },
+          {
+            "name": "nodeExpand",
+            "description": "",
+            "type": "[T, GrTreeNode<T>]",
+            "signature": "(event: \"nodeExpand\", data: T, node: GrTreeNode<T>): void"
+          },
+          {
+            "name": "nodeCollapse",
+            "description": "",
+            "type": "[T, GrTreeNode<T>]",
+            "signature": "(event: \"nodeCollapse\", data: T, node: GrTreeNode<T>): void"
+          },
+          {
+            "name": "nodeDrop",
+            "description": "",
+            "type": "[GrTreeNode<T>, GrTreeNode<T>, GrTreeNodeDropType]",
+            "signature": "(event: \"nodeDrop\", draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTreeSelect": {
+    "name": "GrTreeSelect",
+    "sourcePath": "packages/granularity/src/components/GrTreeSelect/GrTreeSelect.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "GrTreeSelectModelValue",
+            "required": true
+          },
+          {
+            "name": "data",
+            "description": "",
+            "type": "T[]",
+            "required": true
+          },
+          {
+            "name": "props",
+            "description": "",
+            "type": "GrTreePropsMap | undefined",
+            "required": false,
+            "default": "{\n    children: \"children\",\n    label: \"label\",\n}"
+          },
+          {
+            "name": "nodeKey",
+            "description": "",
+            "type": "\"id\" | NodeKeyProp<T> | undefined",
+            "required": false,
+            "default": "\"id\" as any"
+          },
+          {
+            "name": "defaultExpandedKeys",
+            "description": "",
+            "type": "GrTreeKey[] | undefined",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrInputSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "GrTreeSelectState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "multiple",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "clearable",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "valueDisplay",
+            "description": "Как отображать выбранное значение в single-режиме.",
+            "type": "GrTreeSelectValueDisplay | undefined",
+            "required": false,
+            "default": "\"label\""
+          },
+          {
+            "name": "filterable",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "filterPlaceholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "filterInputmode",
+            "description": "",
+            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "filterNodeMethod",
+            "description": "",
+            "type": "GrTreeFilterNodeMethod<T> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeOnSelect",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dropdownMaxHeight",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "320"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "value",
+            "description": "Рендер значения внутри триггера (вместо дефолтного текста).",
+            "type": "{ value: GrTreeSelectModelValue; labels: string[]; displayValue: string; pathLabels?: string[] | undefined; }"
+          },
+          {
+            "name": "node",
+            "description": "Рендер строки дерева.",
+            "type": "{ node: GrTreeNode<T>; data: T; selected: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "Содержимое пустого состояния (когда нет данных).",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[GrTreeSelectModelValue]",
+            "signature": "(e: \"update:modelValue\", value: GrTreeSelectModelValue): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[GrTreeSelectModelValue]",
+            "signature": "(e: \"change\", value: GrTreeSelectModelValue): void"
+          },
+          {
+            "name": "visibleChange",
+            "description": "",
+            "type": "[boolean]",
+            "signature": "(e: \"visibleChange\", visible: boolean): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(e: \"clear\"): void"
+          },
+          {
+            "name": "nodeClick",
+            "description": "",
+            "type": "[T, GrTreeNode<T>]",
+            "signature": "(e: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  }
+}
