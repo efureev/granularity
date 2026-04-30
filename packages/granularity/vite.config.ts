@@ -196,6 +196,24 @@ export default defineConfig({
         'directives/index': fileURLToPath(
           new URL('./src/directives/index.ts', import.meta.url),
         ),
+        'directives/autofocus': fileURLToPath(
+          new URL('./src/directives/autofocus.ts', import.meta.url),
+        ),
+        'directives/autosize': fileURLToPath(
+          new URL('./src/directives/autosize.ts', import.meta.url),
+        ),
+        'directives/clickOutside': fileURLToPath(
+          new URL('./src/directives/clickOutside.ts', import.meta.url),
+        ),
+        'directives/dropzone': fileURLToPath(
+          new URL('./src/directives/dropzone.ts', import.meta.url),
+        ),
+        'directives/hotkey': fileURLToPath(
+          new URL('./src/directives/hotkey.ts', import.meta.url),
+        ),
+        'directives/loading': fileURLToPath(
+          new URL('./src/directives/loading.ts', import.meta.url),
+        ),
         'fileValidation/index': fileURLToPath(
           new URL('./src/fileValidation/index.ts', import.meta.url),
         ),

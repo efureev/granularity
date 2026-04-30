@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -252,6 +252,30 @@
     "./directives": {
       "types": "./dist/types/src/directives/index.d.ts",
       "import": "./dist/directives/index.js"
+    },
+    "./directives/autofocus": {
+      "types": "./dist/types/src/directives/autofocus.d.ts",
+      "import": "./dist/directives/autofocus.js"
+    },
+    "./directives/autosize": {
+      "types": "./dist/types/src/directives/autosize.d.ts",
+      "import": "./dist/directives/autosize.js"
+    },
+    "./directives/clickOutside": {
+      "types": "./dist/types/src/directives/clickOutside.d.ts",
+      "import": "./dist/directives/clickOutside.js"
+    },
+    "./directives/dropzone": {
+      "types": "./dist/types/src/directives/dropzone.d.ts",
+      "import": "./dist/directives/dropzone.js"
+    },
+    "./directives/hotkey": {
+      "types": "./dist/types/src/directives/hotkey.d.ts",
+      "import": "./dist/directives/hotkey.js"
+    },
+    "./directives/loading": {
+      "types": "./dist/types/src/directives/loading.d.ts",
+      "import": "./dist/directives/loading.js"
     },
     "./fileValidation": {
       "types": "./dist/types/src/fileValidation/index.d.ts",
