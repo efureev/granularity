@@ -25,7 +25,18 @@ export default defineConfig({
   ],
   build: {
     target: 'esnext',
-    minify: 'oxc',
+    // Намеренно НЕ минифицируем JS библиотеки:
+    // - финальную минификацию делает приложение-потребитель (esbuild/oxc/terser)
+    //   уже после tree-shaking, что эффективнее двойной минификации;
+    // - сохраняем читаемые имена идентификаторов и `/*#__PURE__*/`-аннотации,
+    //   чтобы у потребителя корректно работал tree-shaking Vue/SFC;
+    // - избегаем класса багов с переименованием локальных переменных в `h`/`t`
+    //   (конфликты с render-функцией Vue `h` и i18n-хелпером `t`),
+    //   что особенно критично для модулей переводов (`src/i18n/*`).
+    // Для CSS такой проблемы нет — его жмём через `cssMinify`.
+    minify: false,
+    sourcemap: true,
+    cssMinify: true,
     cssCodeSplit: true,
     reportCompressedSize: true,
     emptyOutDir: true,
