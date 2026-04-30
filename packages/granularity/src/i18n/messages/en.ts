@@ -8,10 +8,10 @@ import {GRANULARITY_I18N_BLOCK} from "./const";
  * can import only the languages they actually need — see the
  * "Authoring localization packages" guide in the docs.
  */
-export const en: LocaleLoaderCollection = {
+export const en = {
     en: {
         [GRANULARITY_I18N_BLOCK]: () => import('../locales/en.json'),
     },
-}
+} satisfies LocaleLoaderCollection
 
 export default en
