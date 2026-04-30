@@ -3,7 +3,7 @@
 [`unplugin-vue-components`](https://github.com/unplugin/unplugin-vue-components)
 резолвер для дизайн-системы [`@feugene/granularity`](https://github.com/efureev/granularity).
 
-Резолвит компоненты `Ds*` и поддерживаемые директивы `v-*` из шаблонов Vue на
+Резолвит компоненты `Gr*` и поддерживаемые директивы `v-*` из шаблонов Vue на
 **гранулярные sub-path-экспорты** пакета (`@feugene/granularity/components/<Name>`,
 `@feugene/granularity/directives/<module>`), а не на общий корневой `index`.
 За счёт этого tree-shaking работает максимально плотно: в бандл попадает ровно
@@ -46,19 +46,19 @@ export default defineConfig({
 
 ```vue
 <template>
-  <DsInput v-model="value" v-hotkey.enter="submit" />
-  <DsButton @click="submit">Go</DsButton>
+  <GrInput v-model="value" v-hotkey.enter="submit" />
+  <GrButton @click="submit">Go</GrButton>
 </template>
 ```
 
 `unplugin-vue-components` сам вставит в `<script setup>` что-то вроде:
 
 ```ts
-import { DsButton } from '@feugene/granularity/components/DsButton'
-import { DsInput } from '@feugene/granularity/components/DsInput'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrInput } from '@feugene/granularity/components/GrInput'
 import { vHotkey } from '@feugene/granularity/directives/hotkey'
-import '@feugene/granularity/components/DsButton/styles.css'
-import '@feugene/granularity/components/DsInput/styles.css'
+import '@feugene/granularity/components/GrButton/styles.css'
+import '@feugene/granularity/components/GrInput/styles.css'
 ```
 
 Никаких `@feugene/granularity` (корневой импорт) здесь нет — Rollup/Rolldown
@@ -68,16 +68,16 @@ import '@feugene/granularity/components/DsInput/styles.css'
 
 ```ts
 GranularityResolver({
-  prefix: 'Ds',       // префикс компонентов; default 'Ds'
+  prefix: 'Gr',       // префикс компонентов; default 'Ds'
   importStyle: true,  // подтягивать styles.css как side-effect; default true
   directives: true,   // авто-импорт директив (v-hotkey и т.п.); default true
-  exclude: /^DsIn/,   // игнорировать имена по RegExp
+  exclude: /^GrIn/,   // игнорировать имена по RegExp
 })
 ```
 
 | Опция         | Тип                          | По умолчанию | Назначение                                              |
 | ------------- | ---------------------------- | ------------ | -------------------------------------------------------- |
-| `prefix`      | `string`                     | `'Ds'`       | Какие компоненты из шаблонов считать «своими».          |
+| `prefix`      | `string`                     | `'Gr'`       | Какие компоненты из шаблонов считать «своими».          |
 | `importStyle` | `boolean \| 'css'`           | `true`       | Подгружать ли CSS компонента как side-effect.            |
 | `directives`  | `boolean`                    | `true`       | Включать ли второй резолвер — для директив.              |
 | `exclude`     | `RegExp \| undefined`        | —            | Исключение из обработки (применяется и к компонентам, и к директивам). |

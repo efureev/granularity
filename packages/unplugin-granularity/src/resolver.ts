@@ -13,10 +13,10 @@ export interface GranularityResolverOptions {
   /**
    * Префикс имён компонентов в шаблонах.
    *
-   * По умолчанию `'Ds'` — совпадает с соглашением пакета `@feugene/granularity`.
+   * По умолчанию `'Gr'` — совпадает с соглашением пакета `@feugene/granularity`.
    * Можно переопределить, если в приложении есть коллизии с другими библиотеками.
    *
-   * @default 'Ds'
+   * @default 'Gr'
    */
   prefix?: string
 
@@ -43,7 +43,7 @@ export interface GranularityResolverOptions {
   /**
    * Исключить компоненты/директивы по RegExp.
    *
-   * Удобно, если в проекте случайно пересекаются имена: `/^DsInternal/` и т.п.
+   * Удобно, если в проекте случайно пересекаются имена: `/^GrInternal/` и т.п.
    */
   exclude?: RegExp
 }

@@ -11,9 +11,9 @@
 
 /**
  * Префикс имён компонентов `@feugene/granularity` в шаблонах.
- * Все ваши компоненты — `DsButton`, `DsInput`, …, `Ds*`.
+ * Все ваши компоненты — `GrButton`, `GrInput`, …, `Gr*`.
  */
-export const GRANULARITY_DEFAULT_PREFIX = 'Ds' as const
+export const GRANULARITY_DEFAULT_PREFIX = 'Gr' as const
 
 /**
  * Корневой sub-path пакета. Централизован, чтобы не мусорить строковыми
