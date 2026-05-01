@@ -1,4 +1,4 @@
-export type GrLinkVariant = 'primary' | 'default' | 'muted' | 'danger'
+export type GrLinkVariant = 'primary' | 'default' | 'muted' | 'muted-primary' |'danger'
 export type GrLinkUnderline = 'auto' | 'always' | 'none'
 export type GrLinkSize = 'sm' | 'md' | 'lg'
 
@@ -18,6 +18,7 @@ export const variantClassByVariant: Record<GrLinkVariant, string> = {
     'text-[var(--primary)] visited:text-[var(--primary)] hover:text-[var(--primary-hover)] active:text-[var(--primary-active)]',
   default: 'text-[var(--fg)] hover:text-[var(--primary)] active:text-[var(--primary-active)]',
   muted: 'text-[var(--muted-fg)] hover:text-[var(--fg)] active:text-[var(--fg)]',
+  'muted-primary': 'text-[var(--muted-fg)] hover:text-[var(--primary-hover)] active:text-[var(--primary-hover)]',
   danger: 'text-[var(--ds-danger)] hover:text-[var(--ds-danger-hover)] active:text-[var(--ds-danger-active)]',
 }
 

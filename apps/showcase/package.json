@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@feugene/fint-i18n": "^0.2.0",
-    "@feugene/granularity": "^0.4.1",
+    "@feugene/granularity": "^0.4.2",
     "vue": "^3.5.32",
     "vue-router": "^4.6.3"
   },

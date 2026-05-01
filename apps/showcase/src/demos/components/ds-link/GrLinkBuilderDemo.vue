@@ -35,6 +35,7 @@ const variantOptions = [
   {value: 'primary', label: 'Primary'},
   {value: 'default', label: 'Default'},
   {value: 'muted', label: 'Muted'},
+  {value: 'muted-primary', label: 'MutedPrimary'},
   {value: 'danger', label: 'Danger'},
 ] satisfies Array<{ value: GrLinkVariant, label: string }>
 

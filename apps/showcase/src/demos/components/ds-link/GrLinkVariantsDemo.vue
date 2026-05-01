@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrLink } from '@feugene/granularity'
+import {GrLink} from '@feugene/granularity'
 </script>
 
 <template>
@@ -12,6 +12,9 @@ import { GrLink } from '@feugene/granularity'
     </GrLink>
     <GrLink href="#" variant="muted" underline="always" size="md">
       Muted link with persistent underline
+    </GrLink>
+    <GrLink href="#" variant="muted-primary" underline="always" size="md">
+      Muted link with Primary on hover with persistent underline
     </GrLink>
     <GrLink href="#" variant="danger" size="md">
       Destructive secondary action
