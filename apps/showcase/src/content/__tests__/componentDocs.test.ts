@@ -34,7 +34,7 @@ describe('component docs metadata', () => {
     const selectDoc = getShowcaseComponentDoc(selectEntity!)
     const fileUploadDoc = getShowcaseComponentDoc(fileUploadEntity!)
 
-    expect(selectDoc.examples).toHaveLength(3)
+    expect(selectDoc.examples).toHaveLength(4)
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('ds-select'))).toBe(true)
 
