@@ -98,6 +98,67 @@ describe('GrLink', () => {
     expect(el.attributes('class')).not.toContain('focus-visible:ring-2')
   })
 
+  it('рендерит кастомный корень через проп `as` (с пробросом href/target/rel и DS-классов)', () => {
+    const CustomLink = {
+      name: 'CustomLink',
+      props: ['href'],
+      template: '<a data-custom="1" :href="href"><slot /></a>',
+    }
+
+    const wrapper = mount(GrLink, {
+      props: {
+        as: CustomLink,
+        href: '/dashboard',
+        external: true,
+        variant: 'primary',
+      },
+      attrs: {
+        'data-testid': 'link',
+        'data-extra': 'kept',
+      },
+      slots: {
+        default: 'Go',
+      },
+    })
+
+    const el = wrapper.get('[data-testid="link"]')
+    expect(el.element.tagName.toLowerCase()).toBe('a')
+    expect(el.attributes('data-custom')).toBe('1')
+    expect(el.attributes('data-extra')).toBe('kept')
+    expect(el.attributes('href')).toBe('/dashboard')
+    expect(el.attributes('target')).toBe('_blank')
+    expect(el.attributes('rel')).toBe('noopener noreferrer')
+    expect(el.attributes('class')).toContain('inline-flex')
+    expect(el.attributes('class')).toContain('focus-visible:ring-2')
+  })
+
+  it('игнорирует `as` при disabled и рендерит span', () => {
+    const CustomLink = {
+      name: 'CustomLink',
+      props: ['href'],
+      template: '<a data-custom="1" :href="href"><slot /></a>',
+    }
+
+    const wrapper = mount(GrLink, {
+      props: {
+        as: CustomLink,
+        href: '/dashboard',
+        disabled: true,
+      },
+      attrs: {
+        'data-testid': 'link',
+      },
+      slots: {
+        default: 'Go',
+      },
+    })
+
+    const el = wrapper.get('[data-testid="link"]')
+    expect(el.element.tagName.toLowerCase()).toBe('span')
+    expect(el.attributes('aria-disabled')).toBe('true')
+    expect(el.attributes('href')).toBeUndefined()
+  })
+
   it('управляет классами underline', () => {
     const wrapper = mount(GrLink, {
       props: {

@@ -3,21 +3,29 @@
  * GrLink — DS-примитив ссылки.
  *
  * Корневой тег зависит от пропов:
- * - `<a>` — когда заданы `href` и не `disabled`;
- * - `<span>` — во всех остальных случаях (включая `disabled`, даже если `href` задан).
+ * - кастомный компонент/тег из пропа `as` — когда `as` передан и не `disabled`
+ *   (например, `Link` от `@inertiajs/vue3` или `RouterLink` от Vue Router);
+ * - `<a>` — когда задан `href` и не `disabled`;
+ * - `<span>` — во всех остальных случаях (включая `disabled`, даже если задан
+ *   `href`/`as`).
  *
  * Это осознанное решение, чтобы отключённая ссылка не была кликабельной и
  * не участвовала в порядке табуляции. Учтите это в внешних CSS-селекторах.
+ *
+ * Проп `as` нужен для интеграции с роутерами (Inertia, Vue Router и пр.):
+ * стили/поведение DS остаются едиными, а тег корня подменяется. Все
+ * специфичные для роутера атрибуты (`method`, `replace`, `preserve-scroll` и т.п.)
+ * проходят через fallthrough-attrs.
  */
-import { computed, useAttrs } from 'vue'
+import { computed, markRaw, useAttrs, type Component } from 'vue'
 
 import {
   baseRootClass,
-  grLinkClass,
+  focusRingClass,
   type GrLinkSize,
   type GrLinkUnderline,
   type GrLinkVariant,
-  focusRingClass,
+  grLinkClass,
 } from './grLinkStyles'
 
 defineOptions({
@@ -25,6 +33,11 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<{
+  /**
+   * Кастомный корневой тег/компонент. Если передан и компонент не `disabled` —
+   * рендерится через `<component :is="as">`. Игнорируется при `disabled`.
+   */
+  as?: string | Component
   href?: string
   external?: boolean
   target?: string
@@ -35,6 +48,7 @@ const props = withDefaults(defineProps<{
   underline?: GrLinkUnderline
   size?: GrLinkSize
 }>(), {
+  as: undefined,
   href: undefined,
   external: false,
   target: undefined,
@@ -48,7 +62,20 @@ const props = withDefaults(defineProps<{
 
 const attrs = useAttrs()
 
-const isAnchor = computed(() => !!props.href && !props.disabled)
+// Кастомный корень имеет приоритет над `<a>` — DS не пытается угадывать
+// «правильный» тег за пользователя, если он явно его указал.
+const isInteractive = computed(() => !props.disabled && (!!props.as || !!props.href))
+
+const renderAs = computed<string | Component>(() => {
+  if (!isInteractive.value) return 'span'
+  if (props.as) {
+    // Если `as` — объект-компонент, помечаем его как нереактивный, чтобы избежать
+    // оверхеда от Vue-прокси и предупреждений в консоли. Строки (нативные теги)
+    // оставляем как есть.
+    return typeof props.as === 'string' ? props.as : markRaw(props.as)
+  }
+  return 'a'
+})
 
 const resolvedTarget = computed(() => {
   if (props.target)
@@ -89,25 +116,16 @@ const rootClass = computed(() => {
 </script>
 
 <template>
-  <a
-    v-if="isAnchor"
+  <component
+    :is="renderAs"
     v-bind="attrs"
-    :href="href"
-    :target="resolvedTarget"
-    :rel="resolvedRel"
-    :aria-label="ariaLabel"
-    :class="rootClass"
-  >
-    <slot />
-  </a>
-
-  <span
-    v-else
-    v-bind="attrs"
+    :href="isInteractive ? href : undefined"
+    :target="isInteractive ? resolvedTarget : undefined"
+    :rel="isInteractive ? resolvedRel : undefined"
     :aria-label="ariaLabel"
     :aria-disabled="disabled ? 'true' : undefined"
     :class="rootClass"
   >
     <slot />
-  </span>
+  </component>
 </template>
