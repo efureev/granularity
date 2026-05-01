@@ -20,4 +20,5 @@ export const grSelectSafelist = [...new Set([
   ...splitClassTokens('appearance-none pr-9'),
   ...splitClassTokens('inline-flex items-center gap-1 text-left'),
   ...splitClassTokens('flex items-center justify-between text-left'),
+  ...splitClassTokens('block min-w-full w-max whitespace-nowrap'),
 ])]

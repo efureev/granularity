@@ -179,6 +179,23 @@ function syncPanelPosition(): void {
 
   const rect = root.getBoundingClientRect()
 
+  // Для `view='link'` ширина триггера = ширине выбранной опции (`inline-block w-auto`),
+  // и без отдельной обработки панель тоже становилась шириной выбранной опции, из-за чего
+  // её размер «прыгал» при выборе разных опций. Решение — отдать вычисление ширины браузеру:
+  // `width: max-content` (по самому длинному ребёнку — `w-full`-кнопкам с `whitespace-nowrap`),
+  // `min-width` равной ширине триггера (чтобы панель не была уже самого триггера).
+  // Это чисто CSS-подход — без JS-замеров и ResizeObserver, максимально перформантный.
+  if (props.view === 'link') {
+    panelStyle.value = {
+      left: `${rect.left}px`,
+      top: `${rect.bottom + 8}px`,
+      width: 'max-content',
+      minWidth: `${rect.width}px`,
+      zIndex: '2147483647',
+    }
+    return
+  }
+
   panelStyle.value = {
     left: `${rect.left}px`,
     top: `${rect.bottom + 8}px`,
@@ -554,7 +571,9 @@ function clearSelection(): void {
                 data-testid="ds-select-add-option"
                 data-ds-select-add-option
                 type="button"
-                class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]"
+                class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
+                  view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
+                ]"
                 @click="addCustom"
               >
                 Add “{{ customValue.trim() }}”
@@ -567,7 +586,9 @@ function clearSelection(): void {
                 type="button"
                 role="option"
                 :aria-selected="isSelected(opt.value) ? 'true' : 'false'"
-                class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]"
+                class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
+                  view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
+                ]"
                 @click="toggleValue(opt.value)"
               >
                 <slot name="option" :option="opt" :selected="isSelected(opt.value)">
