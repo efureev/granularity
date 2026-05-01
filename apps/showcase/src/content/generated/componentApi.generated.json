@@ -2514,6 +2514,13 @@
             "default": "undefined"
           },
           {
+            "name": "as",
+            "description": "Кастомный корневой тег/компонент. Если передан и компонент не `disabled` — рендерится через `<component :is=\"as\">`. Игнорируется при `disabled`.",
+            "type": "string | Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "href",
             "description": "",
             "type": "string | undefined",
