@@ -140,6 +140,7 @@ const previewRegistry = {
   'ds-segmented-button-variant': defineAsyncComponent(() => import('../demos/components/ds-segmented/GrSegmentedButtonDemo.vue')),
   'ds-segmented-content': defineAsyncComponent(() => import('../demos/components/ds-segmented/GrSegmentedContentDemo.vue')),
   'ds-segmented-states': defineAsyncComponent(() => import('../demos/components/ds-segmented/GrSegmentedStatesDemo.vue')),
+  'ds-select-builder': defineAsyncComponent(() => import('../demos/components/ds-select/GrSelectBuilderDemo.vue')),
   'ds-select-custom-value': defineAsyncComponent(() => import('../demos/components/ds-select/GrSelectCustomValueDemo.vue')),
   'ds-select-native-modes': defineAsyncComponent(() => import('../demos/components/ds-select/GrSelectModesDemo.vue')),
   'ds-select-panel-multiple': defineAsyncComponent(() => import('../demos/components/ds-select/GrSelectPanelDemo.vue')),

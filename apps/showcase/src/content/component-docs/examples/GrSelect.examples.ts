@@ -2,6 +2,15 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'select-builder',
+    title: 'Interactive select constructor',
+    description: 'Живой playground для всех ключевых пропсов `GrSelect`: меняйте `view`, `size`, `optionsView`, `variant`, `underline` и состояния (multiple/clearable/disabled/allow-custom-value) без переключения между отдельными demo-картами.',
+    status: 'ready',
+    previewKey: 'ds-select-builder',
+    code: '',
+    note: 'Лучший формат для дизайн-ревью и QA: один сценарий сразу покрывает весь контракт пропсов и помогает быстро проверить native/panel-режимы и link-стилизацию.',
+  },
+  {
     id: 'select-native-modes',
     title: 'Native single and clearable',
     description: 'Базовый сценарий для `GrSelect`: обычный single-select и clearable режим в native-rendering без дополнительной composition-логики.',
