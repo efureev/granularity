@@ -1,5 +1,6 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  selectLinkNativeLabelVariantClassByVariant,
   selectLinkSizeClassBySize,
   selectLinkVariantClassByVariant,
   selectSizeClassBySize,
@@ -12,7 +13,8 @@ export const grSelectSafelist = [...new Set([
   ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
   ...Object.values(selectLinkSizeClassBySize).flatMap(splitClassTokens),
   ...Object.values(selectLinkVariantClassByVariant).flatMap(splitClassTokens),
-  ...splitClassTokens('no-underline underline underline-offset-4 hover:underline hover:underline-offset-4'),
+  ...Object.values(selectLinkNativeLabelVariantClassByVariant).flatMap(splitClassTokens),
+  ...splitClassTokens('no-underline underline underline-offset-4 hover:underline hover:underline-offset-4 peer-hover:underline peer-hover:underline-offset-4'),
   ...splitClassTokens('disabled:opacity-60 disabled:cursor-not-allowed disabled:text-[var(--muted-fg)] disabled:no-underline'),
   ...splitClassTokens('disabled:opacity-50 disabled:cursor-not-allowed'),
   ...splitClassTokens('appearance-none pr-9'),

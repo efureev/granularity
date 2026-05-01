@@ -6,6 +6,8 @@ import { vClickOutside } from '../../directives'
 
 import {
   defaultBaseClass,
+  grSelectLinkNativeLabelClass,
+  grSelectLinkNativeOverlayClass,
   grSelectNativeClass,
   grSelectPanelClasses,
   grSelectTriggerClass,
@@ -354,6 +356,25 @@ const nativeClassName = computed(() => {
   })
 })
 
+/**
+ * `view="link"` в native-режиме: ширина обёртки должна определяться выбранной опцией,
+ * а не самой длинной (как делает браузер по умолчанию). Поэтому рендерим прозрачный
+ * `<select>`-overlay поверх видимого `<span>` с меткой — overlay принимает клики/клавиатуру,
+ * span задаёт ширину компонента в закрытом состоянии.
+ */
+const isLinkNative = computed(() => props.view === 'link' && props.optionsView === 'native')
+
+const linkNativeLabelClassName = computed(() => grSelectLinkNativeLabelClass({
+  size: props.size,
+  variant: props.variant,
+  underline: props.underline,
+  disabled: props.disabled,
+}))
+
+const linkNativeDisplayText = computed(() => {
+  return displayText.value || props.placeholder || '\u00A0'
+})
+
 const triggerClassName = computed(() => {
   return grSelectTriggerClass({
     view: props.view,
@@ -395,7 +416,7 @@ function clearSelection(): void {
       :multiple="multiple"
       :disabled="disabled"
       :aria-label="ariaLabel"
-      :class="[baseClassName, nativeClassName]"
+      :class="isLinkNative ? grSelectLinkNativeOverlayClass : [baseClassName, nativeClassName]"
       @change="onChange"
     >
       <option v-if="nativeClearOptionVisible" value="" />
@@ -409,6 +430,13 @@ function clearSelection(): void {
         </option>
       </slot>
     </select>
+
+    <span
+      v-if="isLinkNative"
+      data-ds-select-link-label
+      aria-hidden="true"
+      :class="linkNativeLabelClassName"
+    >{{ linkNativeDisplayText }}</span>
 
     <span
       v-if="showNativeChevron"

@@ -45,8 +45,11 @@ describe('GrSelect', () => {
       },
     })
 
-    const select = wrapper.get('select')
-    expect(select.attributes('class')).toContain('text-[12px]')
+    // В link+native режиме link-стили (size/variant/underline) применяются к видимой
+    // метке-обёртке, а не к нативному `<select>` (который сделан прозрачным overlay,
+    // чтобы ширина компонента в закрытом состоянии равнялась выбранной опции, а не самой длинной).
+    const label = wrapper.get('[data-ds-select-link-label]')
+    expect(label.attributes('class')).toContain('text-[12px]')
   })
 
   it('эмитит update:modelValue при изменении', async () => {
@@ -83,14 +86,17 @@ describe('GrSelect', () => {
       },
     })
 
+    // В link+native режиме нативный `<select>` рендерится как прозрачный overlay,
+    // а link-стили (variant/underline/size) применяются к видимой метке-обёртке.
     const linkSelect = linkWrapper.get('select')
-    expect(linkSelect.attributes('class')).toContain('inline-block')
-    expect(linkSelect.attributes('class')).toContain('w-auto')
+    expect(linkSelect.attributes('class')).toContain('absolute')
+    expect(linkSelect.attributes('class')).toContain('opacity-0')
     expect(linkSelect.attributes('class')).toContain('cursor-pointer')
-    expect(linkSelect.attributes('class')).toContain('text-[var(--muted-fg)]')
-    expect(linkSelect.attributes('class')).toContain('no-underline')
-    expect(linkSelect.attributes('class')).toContain('border-transparent')
-    expect(linkSelect.attributes('class')).toContain('bg-transparent')
+
+    const linkLabel = linkWrapper.get('[data-ds-select-link-label]')
+    expect(linkLabel.attributes('class')).toContain('inline-block')
+    expect(linkLabel.attributes('class')).toContain('text-[var(--muted-fg)]')
+    expect(linkLabel.attributes('class')).toContain('no-underline')
 
     const defaultWrapper = mount(GrSelect, {
       props: {
