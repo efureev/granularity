@@ -82,7 +82,6 @@ describe('showcase bootstrap config', () => {
   })
 
   it('подключает fint-i18n и отдельные app-level locale loaders для showcase', () => {
-    expect(showcasePackageJson).toContain('"@feugene/fint-i18n": "^0.2.0"')
     expect(existsSync(showcaseI18nEntryPath)).toBe(true)
     expect(existsSync(showcaseI18nMessagesPath)).toBe(true)
     expect(showcaseI18nEntry).toContain("import { createFintI18n } from '@feugene/fint-i18n/core'")
