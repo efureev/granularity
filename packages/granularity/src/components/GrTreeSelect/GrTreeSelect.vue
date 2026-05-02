@@ -468,7 +468,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
         :aria-label="t('gr.common.clear', 'Clear')"
         @click.stop="clear"
       >
-        <span class="i-lucide-x h-4 w-4" />
+        <span class="i-lucide-x inline-block h-4 w-4" />
       </button>
 
       <span
@@ -478,7 +478,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
         class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
       >
         <span
-          class="i-lucide-chevron-down h-4 w-4 transition-transform duration-150"
+          class="i-lucide-chevron-down inline-block h-4 w-4 transition-transform duration-150"
           :class="open ? 'rotate-180' : ''"
         />
       </span>
@@ -558,7 +558,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
                 >
                   <div class="flex items-center gap-2 min-w-0">
                     <span
-                      class="h-4 w-4 shrink-0"
+                      class="inline-block h-4 w-4 shrink-0"
                       :class="selectedKeySet.has(node.key) ? 'i-lucide-check text-[var(--primary)]' : ''"
                       aria-hidden="true"
                     />

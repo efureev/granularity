@@ -460,7 +460,7 @@ function clearSelection(): void {
       data-testid="ds-select-chevron"
       class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
     >
-      <span class="i-lucide-chevron-down h-4 w-4" aria-hidden="true" />
+      <span class="i-lucide-chevron-down inline-block h-4 w-4" aria-hidden="true" />
     </span>
   </div>
 
@@ -512,7 +512,7 @@ function clearSelection(): void {
         data-testid="ds-select-chevron"
         class="shrink-0 text-[var(--muted-fg)] pointer-events-none"
       >
-        <span class="i-lucide-chevron-down h-4 w-4" aria-hidden="true" />
+        <span class="i-lucide-chevron-down inline-block h-4 w-4" aria-hidden="true" />
       </span>
     </button>
 
@@ -526,7 +526,7 @@ function clearSelection(): void {
       :aria-label="clearLabel"
       @click.stop="clearSelection"
     >
-      <span class="i-lucide-x h-4 w-4" aria-hidden="true" />
+      <span class="i-lucide-x inline-block h-4 w-4" aria-hidden="true" />
     </button>
 
     <teleport to="body">
@@ -594,7 +594,7 @@ function clearSelection(): void {
                 <slot name="option" :option="opt" :selected="isSelected(opt.value)">
                   <span class="flex items-center gap-2 min-w-0">
                     <span
-                      class="h-4 w-4 shrink-0"
+                      class="inline-block h-4 w-4 shrink-0"
                       :class="isSelected(opt.value) ? 'i-lucide-check text-[var(--primary)]' : ''"
                       aria-hidden="true"
                     />

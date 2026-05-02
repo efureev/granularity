@@ -8,7 +8,6 @@ import {
 
 // Правило: литералы из шаблонов (`defaultBaseClass`/`linkBaseClass`/`grSelectPanelClasses`
 // и прочие статические строки) в safelist не дублируем — UnoCSS находит их сканом.
-// Сюда попадают только токены, которые собираются в рантайме через `grSelectClass*`.
 export const grSelectSafelist = [...new Set([
   ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
   ...Object.values(selectLinkSizeClassBySize).flatMap(splitClassTokens),
