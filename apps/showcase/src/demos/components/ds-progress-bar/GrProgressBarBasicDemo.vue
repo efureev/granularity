@@ -1,21 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrProgressBar } from '@feugene/granularity'
+import { GR_TONES, GrButton, GrProgressBar, type GrTone } from '@feugene/granularity'
 
 const progress = ref(32)
-const tone = ref<'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'>('primary')
+const tone = ref<GrTone>('primary')
 
-const tones = [
-  'primary',
-  'neutral',
-  'success',
-  'warning',
-  'danger',
-  'info',
-  'slate',
-  'azure',
-] as const
+const tones = GR_TONES
 </script>
 
 <template>

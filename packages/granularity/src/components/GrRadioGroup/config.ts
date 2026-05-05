@@ -3,5 +3,4 @@ import { defineGranularComponent } from '@feugene/unocss-preset-granular/contrac
 export const grRadioGroupConfig = defineGranularComponent(import.meta.url, {
   name: 'GrRadioGroup',
   dependencies: ['GrButtonGroup', 'GrRadio'],
-  safelist: [],
 })

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { type CSSProperties } from 'vue'
 
-import { GrButton, type GrButtonTone, type GrButtonVariant } from '@feugene/granularity'
+import { GR_TONES, GrButton, type GrButtonVariant } from '@feugene/granularity'
 
 const buttonVariants = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border'] as const satisfies readonly GrButtonVariant[]
-const buttonTones = ['primary', 'neutral', 'success', 'warning', 'danger', 'info', 'slate', 'azure'] as const satisfies readonly GrButtonTone[]
+const buttonTones = GR_TONES
 const buttonStates = [
   {key: 'rest', label: 'Обычное'},
   {key: 'hover', label: 'Hover'},

@@ -2,5 +2,4 @@ import { defineGranularComponent } from '@feugene/unocss-preset-granular/contrac
 
 export const grSidebarConfig = defineGranularComponent(import.meta.url, {
   name: 'GrSidebar',
-  safelist: [],
 })

@@ -1,4 +1,6 @@
-export type GrProgressBarTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
+import type { GrTone } from '../shared/tones'
+
+export type GrProgressBarTone = GrTone
 
 function withVar(token: string): string {
   return `[${token}]`

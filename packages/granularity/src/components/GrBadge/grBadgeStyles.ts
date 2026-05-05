@@ -1,4 +1,6 @@
-export type GrBadgeTone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
+import type { GrTone } from '../shared/tones'
+
+export type GrBadgeTone = GrTone
 export type GrBadgeSize = 'sm' | 'md' | 'lg'
 export type GrBadgeRadius = 'square' | 'semi' | 'round'
 export const sizeClassBySize: Record<GrBadgeSize, string> = {

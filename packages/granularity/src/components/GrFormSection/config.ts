@@ -2,5 +2,4 @@ import { defineGranularComponent } from '@feugene/unocss-preset-granular/contrac
 
 export const grFormSectionConfig = defineGranularComponent(import.meta.url, {
   name: 'GrFormSection',
-  safelist: [],
 })

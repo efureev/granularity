@@ -11,7 +11,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "GrAlertTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"info\""
           },
@@ -169,7 +169,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "GrBadgeTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
@@ -335,7 +335,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "GrButtonTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -784,7 +784,7 @@
           {
             "name": "confirmTone",
             "description": "",
-            "type": "GrButtonTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -2378,7 +2378,7 @@
           {
             "name": "tagTone",
             "description": "",
-            "type": "GrBadgeTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
@@ -3173,7 +3173,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "GrProgressBarTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -3336,7 +3336,7 @@
           {
             "name": "confirmTone",
             "description": "",
-            "type": "GrButtonTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -3513,7 +3513,7 @@
           {
             "name": "buttonTone",
             "description": "",
-            "type": "GrButtonTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
@@ -3527,7 +3527,7 @@
           {
             "name": "selectedButtonTone",
             "description": "",
-            "type": "GrButtonTone | undefined",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },

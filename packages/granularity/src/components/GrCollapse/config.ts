@@ -3,5 +3,4 @@ import { defineGranularComponent } from '@feugene/unocss-preset-granular/contrac
 export const grCollapseConfig = defineGranularComponent(import.meta.url, {
   name: 'GrCollapse',
   dependencies: ['GrCard', 'GrIcon'],
-  safelist: [],
 })

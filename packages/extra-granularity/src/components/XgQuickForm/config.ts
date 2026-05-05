@@ -13,5 +13,4 @@ export const xgQuickFormConfig = defineGranularComponent(import.meta.url, {
     dependencies: [
         {provider: '@feugene/granularity', components: ['DsFormField', 'DsInput', 'DsButton']}
     ],
-    safelist: [],
 })

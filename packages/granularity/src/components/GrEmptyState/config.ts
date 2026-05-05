@@ -3,5 +3,4 @@ import { defineGranularComponent } from '@feugene/unocss-preset-granular/contrac
 export const grEmptyStateConfig = defineGranularComponent(import.meta.url, {
   name: 'GrEmptyState',
   dependencies: ['GrIcon'],
-  safelist: [],
 })

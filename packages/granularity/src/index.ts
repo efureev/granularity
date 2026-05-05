@@ -52,6 +52,11 @@ export { initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { useToast } from './composables/useToast'
 export type { GrToastTone, Toast, ToastInput } from './composables/useToast'
+// Единый перечень дизайн-тонов для прикладного кода: `GR_TONES`/`GrTone`.
+// Используется как источник истины и для типов, и для рантайм‑итераций
+// (валидация, фильтры, генерация safelist).
+export { GR_TONES } from './components/shared/tones'
+export type { GrTone } from './components/shared/tones'
 
 // File validation — реэкспортируем типы, чтобы прикладной код мог писать
 // `import type { FileValidationIssue } from '@feugene/granularity'` без

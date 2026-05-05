@@ -1,6 +1,8 @@
 import { computed, reactive } from 'vue'
 
-export type GrToastTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
+import type { GrTone } from '../components/shared/tones'
+
+export type GrToastTone = GrTone
 
 export type ToastInput = {
   title: string

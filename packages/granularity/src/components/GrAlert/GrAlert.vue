@@ -7,7 +7,9 @@ import IconInfo from '~icons/lucide/info'
 import IconClose from '~icons/lucide/x'
 import IconError from '~icons/lucide/x-circle'
 
-export type GrAlertTone = 'info' | 'success' | 'warning' | 'danger' | 'slate' | 'azure'
+import type { GrTone } from '../shared/tones'
+
+export type GrAlertTone = GrTone
 export type GrAlertVariant = 'soft' | 'light'
 
 type GrAlertResolvedStyles = {
@@ -55,6 +57,20 @@ const props = withDefaults(defineProps<{
 const getCustomColor = (value?: string) => value?.trim() || undefined
 
 const SOFT_TONE_STYLES: Record<GrAlertTone, GrAlertResolvedStyles> = {
+  primary: {
+    bg: 'var(--accent)',
+    border: 'color-mix(in srgb, var(--primary) 22%, var(--brd))',
+    icon: 'var(--primary)',
+    ...DEFAULT_TEXT_COLORS,
+    Icon: IconInfo,
+  },
+  neutral: {
+    bg: 'var(--muted)',
+    border: 'var(--brd)',
+    icon: 'var(--muted-fg)',
+    ...DEFAULT_TEXT_COLORS,
+    Icon: IconInfo,
+  },
   info: {
     bg: 'var(--ds-info-light)',
     border: 'color-mix(in srgb, var(--ds-info) 22%, var(--brd))',

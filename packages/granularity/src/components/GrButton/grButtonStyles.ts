@@ -1,5 +1,7 @@
+import type { GrTone } from '../shared/tones'
+
 export type GrButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-border'
-export type GrButtonTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
+export type GrButtonTone = GrTone
 export type GrButtonSize = 'xs' | 'sm' | 'md' | 'lg'
 
 export type GrButtonClassOptions = {
