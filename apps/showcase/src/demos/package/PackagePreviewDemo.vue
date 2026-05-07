@@ -10,6 +10,7 @@ import {
   GrFileUpload,
   GrInput,
   GrTextarea,
+  GrToaster,
   FileValidationError,
   acceptValidator,
   allowedExtensionsValidator,
@@ -308,6 +309,7 @@ function handleUploadValidationError(error: unknown) {
       <p class="text-sm text-[var(--muted-fg)]">
         {{ toastStatus }} Сейчас в очереди: {{ toasts.list.value.length }}.
       </p>
+      <GrToaster />
     </template>
 
     <template v-else-if="previewKey === 'run-file-validators-pipeline'">
