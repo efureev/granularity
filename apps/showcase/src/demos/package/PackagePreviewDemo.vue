@@ -6,6 +6,7 @@ import {
   GrButton,
   GrCard,
   GrDialog,
+  GrDropdown,
   GrFileUpload,
   GrInput,
   GrTextarea,
@@ -36,8 +37,6 @@ const props = defineProps<{
 
 const dialogOpen = ref(false)
 const autosizeValue = ref('Первый абзац\nВторая строка для автоподстройки textarea.')
-const dropdownOpen = ref(false)
-const excludeRef = ref<HTMLElement | null>(null)
 const dropzoneState = ref('Перетащите файл в зону ниже')
 const isDropOver = ref(false)
 const hotkeyLog = ref('Нажмите `Ctrl+K`, `Shift+/` или `Escape`.')
@@ -202,22 +201,22 @@ function handleUploadValidationError(error: unknown) {
     </template>
 
     <template v-else-if="previewKey === 'v-click-outside-dropdown'">
-      <div class="relative flex items-start gap-3">
-        <GrButton class="justify-self-start" @click="dropdownOpen = !dropdownOpen">
-          {{ dropdownOpen ? 'Close' : 'Open' }} dropdown
-        </GrButton>
-        <GrButton ref="excludeRef" variant="outline">
+      <div class="flex items-start gap-3">
+        <GrDropdown align="left" width="80" :close-on-content-click="false">
+          <template #trigger="{ open }">
+            <GrButton class="justify-self-start">
+              {{ open ? 'Close' : 'Open' }} dropdown
+            </GrButton>
+          </template>
+          <template #content>
+            <p class="text-sm leading-6 text-[var(--muted-fg)]">
+              Клик вне панели закроет dropdown, но клики по exclude-зоне будут считаться внутренними.
+            </p>
+          </template>
+        </GrDropdown>
+        <GrButton variant="outline">
           Exclude zone
         </GrButton>
-        <div
-          v-if="dropdownOpen"
-          v-click-outside="{ handler: () => dropdownOpen = false, exclude: [() => excludeRef] }"
-          class="absolute left-0 top-12 z-10 w-72 rounded-2xl border border-[var(--brd)] bg-[var(--bg)] p-4 shadow-xl"
-        >
-          <p class="text-sm leading-6 text-[var(--muted-fg)]">
-            Клик вне панели закроет dropdown, но клики по exclude-зоне будут считаться внутренними.
-          </p>
-        </div>
       </div>
     </template>
 

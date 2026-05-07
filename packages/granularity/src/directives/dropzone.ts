@@ -95,6 +95,15 @@ type InternalState = {
 
 const states = new WeakMap<HTMLElement, InternalState>()
 
+/**
+ * `classList.add/remove` не принимают строки с пробелами/пустые токены —
+ * иначе DOM кидает `InvalidCharacterError`. Поэтому всегда токенизируем
+ * `overClass` (поддерживая Tailwind-подобные multi-class значения).
+ */
+function tokenizeClass(value: string): string[] {
+  return value.split(/\s+/).filter(token => token.length > 0)
+}
+
 function setOver(el: HTMLElement, next: boolean) {
   const state = states.get(el)
   if (!state) return
@@ -107,11 +116,12 @@ function setOver(el: HTMLElement, next: boolean) {
 
   state.isOver = next
 
+  const tokens = tokenizeClass(state.options.overClass)
   if (next) {
-    el.classList.add(state.options.overClass)
+    if (tokens.length) el.classList.add(...tokens)
     el.dataset.grDropzoneOver = 'true'
   } else {
-    el.classList.remove(state.options.overClass)
+    if (tokens.length) el.classList.remove(...tokens)
     delete el.dataset.grDropzoneOver
   }
 
@@ -235,10 +245,14 @@ function update(el: HTMLElement, value: DropzoneBindingValue | undefined) {
 
   state.options = nextOptions
 
-  // Если поменялся `overClass`, синхронизируем DOM.
+  // Если поменялся `overClass`, синхронизируем DOM (учитывая multi-token значения).
   if (prevOverClass !== nextOptions.overClass) {
-    el.classList.remove(prevOverClass)
-    if (state.isOver) el.classList.add(nextOptions.overClass)
+    const prevTokens = tokenizeClass(prevOverClass)
+    if (prevTokens.length) el.classList.remove(...prevTokens)
+    if (state.isOver) {
+      const nextTokens = tokenizeClass(nextOptions.overClass)
+      if (nextTokens.length) el.classList.add(...nextTokens)
+    }
   }
 
   // Если директива выключена — сбрасываем состояние.

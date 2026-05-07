@@ -3,7 +3,7 @@ import {computed, ref, watch} from 'vue'
 import {RouterLink, useRoute} from 'vue-router'
 
 import {GrBadge, GrButton} from '@feugene/granularity'
-import {vClickOutside} from '@feugene/granularity/directives'
+import {vAutofocus, vClickOutside} from '@feugene/granularity/directives'
 
 import {
   searchShowcaseEntries,
@@ -84,6 +84,7 @@ function closeSearch() {
 
         <input
             v-model="query"
+            v-autofocus="{ preventScroll: true }"
             type="search"
             :placeholder="$t('showcase.search.placeholder')"
             class="showcase-input w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors"
