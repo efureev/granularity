@@ -209,14 +209,31 @@ describe('GrFileUpload', () => {
     expect(request).toHaveBeenCalledTimes(1)
     expect(request.mock.calls[0][1].extraData).toEqual({ foo: 'bar' })
 
-    const originalFetch = globalThis.fetch
-    const fetchMock = vi.fn(async () => {
-      return new Response(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
+    const originalXhr = globalThis.XMLHttpRequest
+    const lastInstance: any = {}
+    class XhrMock {
+      upload = { addEventListener: vi.fn() }
+      status = 200
+      responseText = '{"ok":true}'
+      withCredentials = false
+      private listeners: Record<string, ((event?: any) => void)[]> = {}
+      open = vi.fn()
+      setRequestHeader = vi.fn()
+      abort = vi.fn()
+      getResponseHeader(name: string) {
+        return name.toLowerCase() === 'content-type' ? 'application/json' : null
+      }
+      addEventListener(name: string, cb: (event?: any) => void) {
+        ;(this.listeners[name] ??= []).push(cb)
+      }
+      removeEventListener() {}
+      send = vi.fn(function (this: XhrMock, body: any) {
+        lastInstance.body = body
+        lastInstance.instance = this
+        setTimeout(() => this.listeners.load?.forEach(cb => cb()), 0)
       })
-    })
-    ;(globalThis as any).fetch = fetchMock
+    }
+    ;(globalThis as any).XMLHttpRequest = XhrMock
 
     try {
       const actionWrapper = mount(GrFileUpload, {
@@ -235,14 +252,73 @@ describe('GrFileUpload', () => {
 
       await flushPromises()
 
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-      const [, init] = fetchMock.mock.calls[0]
-      expect(init?.body).toBeInstanceOf(FormData)
-      const body = init?.body as FormData
+      expect(lastInstance.body).toBeInstanceOf(FormData)
+      const body = lastInstance.body as FormData
       expect(body.get('file')).toBeInstanceOf(File)
       expect(body.get('folder')).toBe('inbox')
     } finally {
-      globalThis.fetch = originalFetch
+      ;(globalThis as any).XMLHttpRequest = originalXhr
     }
+  })
+
+  it('эмитит реальный прогресс через ctx.onProgress в кастомном request', async () => {
+    let captured: any
+    const request = vi.fn(async (_files: File[], ctx: any) => {
+      captured = ctx
+      ctx.onProgress?.({ percent: 25, loaded: 25, total: 100, indeterminate: false })
+      ctx.onProgress?.({ percent: 75, loaded: 75, total: 100, indeterminate: false })
+      return { ok: true }
+    })
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request },
+    })
+
+    const file = new File(['hello'], 'hello.txt', { type: 'text/plain' })
+    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+      dataTransfer: { files: [file] },
+    })
+
+    await flushPromises()
+
+    expect(typeof captured.onProgress).toBe('function')
+    const progressEvents = wrapper.emitted('progress') ?? []
+    // 0 (старт) + 25 + 75 + 100 (по успешной загрузке)
+    const percents = progressEvents.map(args => args[0])
+    expect(percents).toContain(0)
+    expect(percents).toContain(25)
+    expect(percents).toContain(75)
+    expect(percents).toContain(100)
+    expect(wrapper.emitted('state-change')).toBeTruthy()
+  })
+
+  it('scoped-слот progress получает state и текущий процент', async () => {
+    const request = vi.fn(async (_files: File[], ctx: any) => {
+      ctx.onProgress?.({ percent: 42, loaded: 42, total: 100, indeterminate: false })
+      return { ok: true }
+    })
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, hideProgressOnSuccess: 0 },
+      slots: {
+        progress: (scope: any) => h(
+          'div',
+          { 'data-testid': 'progress-slot', 'data-phase': scope.phase },
+          `${Math.round(scope.percent)}|${scope.state.phase}`,
+        ),
+      },
+    })
+
+    const file = new File(['x'], 'x.txt', { type: 'text/plain' })
+    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+      dataTransfer: { files: [file] },
+    })
+
+    await flushPromises()
+
+    const node = wrapper.get('[data-testid="progress-slot"]')
+    expect(node.attributes('data-phase')).toBe('success')
+    expect(node.text()).toContain('100')
+    expect(node.text()).toContain('success')
   })
 })

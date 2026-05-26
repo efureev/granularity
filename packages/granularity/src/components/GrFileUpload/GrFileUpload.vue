@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { Comment, computed, Fragment, nextTick, ref, Text, useSlots, type VNode } from 'vue'
+import { Comment, computed, Fragment, nextTick, reactive, ref, Text, useSlots, type VNode } from 'vue'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
 
 import GrIcon from '../GrIcon/GrIcon.vue'
+import GrProgressBar from '../GrProgressBar/GrProgressBar.vue'
+import type { GrProgressBarTone } from '../GrProgressBar/grStyle'
 import type { FileValidator, FileValidatorSource } from '../../fileValidation'
+import type { GrUploadProgressInfo } from './uploadViaXhr'
+import type { GrUploadState } from './uploadState'
 
 import { FileValidationError, runFileValidators } from '../../fileValidation'
+import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
+import { GR_UPLOAD_STATE_IDLE } from './uploadState'
 
 export type GrFileUploadExtraDataValue = string | Blob
 
@@ -15,6 +21,12 @@ export type GrFileUploadExtraData = Record<string, GrFileUploadExtraDataValue | 
 export type GrFileUploadRequestCtx = {
   signal: AbortSignal
   extraData?: GrFileUploadExtraData
+  /**
+   * Колбэк прогресса аплоада. Пользовательский `request` (например, axios)
+   * должен вызывать его из `onUploadProgress`, чтобы `GrFileUpload` отображал
+   * прогресс через слот `progress` / дефолтный `GrProgressBar`.
+   */
+  onProgress?: (info: GrUploadProgressInfo) => void
 }
 
 export type GrFileUploadRequest = (files: File[], ctx: GrFileUploadRequestCtx) => Promise<any>
@@ -43,6 +55,14 @@ export interface GrFileUploadProps {
   uploadExtraData?: (files: File[]) => GrFileUploadExtraData | undefined
   /** i18n: надпись-подсказка в дефолтном UI. */
   placeholder?: string
+  /** Показывать дефолтный прогресс-бар (если не используется слот `progress`). */
+  showProgress?: boolean
+  /** Цветовой тон полосы прогресса в фазе `uploading`. */
+  progressTone?: GrProgressBarTone
+  /** aria-label для прогресс-бара. */
+  progressLabel?: string
+  /** Через сколько мс после `success` скрыть прогресс-бар. `0` — не скрывать. */
+  hideProgressOnSuccess?: number
 }
 
 const props = withDefaults(
@@ -62,14 +82,19 @@ const props = withDefaults(
     showFileList: false,
     uploadExtraData: undefined,
     placeholder: 'Drag files here or click to select',
+    showProgress: true,
+    progressTone: 'primary',
+    progressLabel: 'Upload progress',
+    hideProgressOnSuccess: 800,
   },
 )
 
 const emit = defineEmits<{
   (e: 'success', payload: any): void
   (e: 'error', error: unknown): void
-  (e: 'progress', percent: number): void
+  (e: 'progress', percent: number, info?: GrUploadProgressInfo): void
   (e: 'change', files: File[]): void
+  (e: 'state-change', state: GrUploadState): void
 }>()
 
 const slots = useSlots()
@@ -121,7 +146,73 @@ let overCounter = 0
 
 const lastFiles = ref<File[]>([])
 
+const state = reactive<GrUploadState>({ ...GR_UPLOAD_STATE_IDLE }) as GrUploadState
+
 let activeController: AbortController | null = null
+let hideSuccessTimer: ReturnType<typeof setTimeout> | null = null
+
+function clearHideSuccessTimer() {
+  if (hideSuccessTimer !== null) {
+    clearTimeout(hideSuccessTimer)
+    hideSuccessTimer = null
+  }
+}
+
+function assignState(next: GrUploadState) {
+  // мутируем через Object.assign, чтобы сохранить reactive ссылку
+  for (const key of Object.keys(state) as (keyof GrUploadState)[])
+    delete (state as any)[key]
+  Object.assign(state, next)
+  emit('state-change', state as GrUploadState)
+}
+
+function setStateIdle() {
+  assignState({ ...GR_UPLOAD_STATE_IDLE })
+}
+
+function setStateUploading(info?: GrUploadProgressInfo) {
+  assignState({
+    phase: 'uploading',
+    percent: info?.percent ?? 0,
+    indeterminate: info?.indeterminate ?? true,
+    loaded: info?.loaded ?? 0,
+    total: info?.total ?? 0,
+  })
+}
+
+function setStateSuccess(info: { loaded: number, total: number }) {
+  assignState({
+    phase: 'success',
+    percent: 100,
+    indeterminate: false,
+    loaded: info.loaded,
+    total: info.total,
+  })
+}
+
+function setStateError(error: unknown) {
+  const prev = state
+  assignState({
+    phase: 'error',
+    percent: prev.phase === 'uploading' ? prev.percent : 0,
+    indeterminate: false,
+    loaded: prev.phase === 'uploading' ? prev.loaded : 0,
+    total: prev.phase === 'uploading' ? prev.total : 0,
+    error,
+  })
+}
+
+function handleProgress(info: GrUploadProgressInfo) {
+  if (state.phase !== 'uploading') return
+  assignState({
+    phase: 'uploading',
+    percent: info.percent,
+    indeterminate: info.indeterminate,
+    loaded: info.loaded,
+    total: info.total,
+  })
+  emit('progress', info.percent, info)
+}
 
 const tabIndex = computed(() => (props.disabled ? -1 : 0))
 
@@ -158,47 +249,20 @@ function normalizeLimit(limit: number | undefined): number | undefined {
   return Math.floor(limit)
 }
 
-function appendExtraFormData(body: FormData, extraData: GrFileUploadExtraData | undefined) {
-  if (!extraData) return
-
-  for (const [key, value] of Object.entries(extraData)) {
-    if (Array.isArray(value)) {
-      for (const entry of value) body.append(key, entry)
-      continue
-    }
-
-    body.append(key, value)
-  }
-}
 
 async function uploadViaAction(files: File[], signal: AbortSignal, extraData: GrFileUploadExtraData | undefined) {
   if (!props.action) throw new Error('GrFileUpload: either `action` or `request` must be provided')
 
-  const body = new FormData()
-  for (const file of files)
-    body.append(props.name, file)
-
-  appendExtraFormData(body, extraData)
-
-  const response = await fetch(props.action, {
-    method: 'POST',
+  return uploadViaXhr({
+    url: props.action,
+    files,
+    name: props.name,
     headers: props.headers,
-    body,
+    withCredentials: props.withCredentials,
+    extraData,
     signal,
-    credentials: props.withCredentials ? 'include' : 'same-origin',
+    onProgress: handleProgress,
   })
-
-  const contentType = response.headers.get('content-type')
-  const payload = contentType?.includes('application/json') ? await response.json() : await response.text()
-
-  if (!response.ok) {
-    const error = new Error(`Upload failed with status ${response.status}`)
-    ;(error as any).payload = payload
-    ;(error as any).status = response.status
-    throw error
-  }
-
-  return payload
 }
 
 async function runBeforeUpload(files: File[]): Promise<'ok' | { aborted: true; reason: unknown }> {
@@ -262,21 +326,37 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   }
 
   abort()
+  clearHideSuccessTimer()
 
   const controller = new AbortController()
   activeController = controller
 
-  emit('progress', 0)
+  setStateUploading()
+  emit('progress', 0, { percent: 0, loaded: 0, total: 0, indeterminate: true })
 
   try {
     const payload = props.request
-      ? await props.request(valid, { signal: controller.signal, extraData })
+      ? await props.request(valid, { signal: controller.signal, extraData, onProgress: handleProgress })
       : await uploadViaAction(valid, controller.signal, extraData)
 
+    const finalLoaded = state.phase === 'uploading' ? state.total || state.loaded : 0
+    setStateSuccess({ loaded: finalLoaded, total: finalLoaded })
     emit('success', payload)
     emit('change', valid)
-    emit('progress', 100)
+    emit('progress', 100, { percent: 100, loaded: finalLoaded, total: finalLoaded, indeterminate: false })
+
+    if (props.hideProgressOnSuccess && props.hideProgressOnSuccess > 0) {
+      hideSuccessTimer = setTimeout(() => {
+        if (state.phase === 'success') setStateIdle()
+        hideSuccessTimer = null
+      }, props.hideProgressOnSuccess)
+    }
   } catch (error) {
+    if (error instanceof GrUploadAbortError) {
+      setStateIdle()
+    } else {
+      setStateError(error)
+    }
     emit('error', error)
   } finally {
     if (activeController === controller) activeController = null
@@ -349,10 +429,24 @@ function onRootKeydown(event: KeyboardEvent) {
   onKeydown(event)
 }
 
+const effectiveProgressTone = computed<GrProgressBarTone>(() => {
+  if (state.phase === 'error') return 'danger'
+  if (state.phase === 'success') return 'success'
+  return props.progressTone
+})
+
+const progressVisible = computed(() => state.phase !== 'idle')
+const progressPercent = computed(() => (state.phase === 'uploading' && state.indeterminate ? 0 : state.percent))
+const progressText = computed(() => {
+  if (state.phase === 'uploading' && state.indeterminate) return ''
+  return `${Math.round(progressPercent.value)}%`
+})
+
 defineExpose({
   uploadFiles: handleFiles,
   abort,
   openDialog,
+  state,
 })
 </script>
 
@@ -400,6 +494,7 @@ defineExpose({
       :disabled="disabled"
       :files="lastFiles"
       :is-over="isOver"
+      :state="state"
     />
 
     <div v-else class="flex items-start gap-4">
@@ -438,6 +533,37 @@ defineExpose({
             <span class="text-[var(--muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
           </li>
         </ul>
+
+        <slot
+          v-if="showProgress || $slots.progress"
+          name="progress"
+          :state="state"
+          :percent="state.percent"
+          :indeterminate="state.phase === 'uploading' && state.indeterminate"
+          :phase="state.phase"
+          :files="lastFiles"
+          :abort="abort"
+        >
+          <div
+            v-if="showProgress"
+            data-ds-file-upload-progress
+            class="mt-3 transition-opacity duration-150"
+            :class="progressVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+            :aria-hidden="!progressVisible"
+          >
+            <div class="flex items-center gap-2">
+              <GrProgressBar
+                :value="progressPercent"
+                :tone="effectiveProgressTone"
+                :aria-label="progressLabel"
+              />
+              <span
+                data-ds-file-upload-progress-text
+                class="text-[12px] text-[var(--muted-fg)] tabular-nums min-w-[3ch] text-right"
+              >{{ progressText }}</span>
+            </div>
+          </div>
+        </slot>
       </div>
     </div>
   </div>

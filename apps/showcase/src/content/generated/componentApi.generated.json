@@ -1529,6 +1529,34 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"Drag files here or click to select\""
+          },
+          {
+            "name": "showProgress",
+            "description": "Показывать дефолтный прогресс-бар (если не используется слот `progress`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "progressTone",
+            "description": "Цветовой тон полосы прогресса в фазе `uploading`.",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"primary\""
+          },
+          {
+            "name": "progressLabel",
+            "description": "aria-label для прогресс-бара.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"Upload progress\""
+          },
+          {
+            "name": "hideProgressOnSuccess",
+            "description": "Через сколько мс после `success` скрыть прогресс-бар. `0` — не скрывать.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "800"
           }
         ]
       },
@@ -1540,7 +1568,7 @@
           {
             "name": "default",
             "description": "",
-            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; }"
+            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; }"
           },
           {
             "name": "label",
@@ -1551,6 +1579,11 @@
             "name": "tip",
             "description": "",
             "type": "{}"
+          },
+          {
+            "name": "progress",
+            "description": "",
+            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"idle\" | \"uploading\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; }"
           }
         ]
       },
@@ -1578,10 +1611,16 @@
             "signature": "(event: \"error\", error: unknown): void"
           },
           {
+            "name": "state-change",
+            "description": "",
+            "type": "[state: GrUploadState]",
+            "signature": "(event: \"state-change\", state: GrUploadState): void"
+          },
+          {
             "name": "progress",
             "description": "",
-            "type": "[percent: number]",
-            "signature": "(event: \"progress\", percent: number): void"
+            "type": "[percent: number, info?: GrUploadProgressInfo | undefined]",
+            "signature": "(event: \"progress\", percent: number, info?: GrUploadProgressInfo | undefined): void"
           }
         ]
       },
@@ -1604,6 +1643,11 @@
             "name": "openDialog",
             "description": "",
             "type": "() => void"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "GrUploadState"
           }
         ]
       }
@@ -1935,6 +1979,13 @@
             "default": "undefined"
           },
           {
+            "name": "showProgress",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "initialIndex",
             "description": "",
             "type": "number | undefined",
@@ -1975,13 +2026,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "showProgress",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "showZoomValue",
@@ -2168,6 +2212,13 @@
             "default": "undefined"
           },
           {
+            "name": "state",
+            "description": "",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
             "name": "autocomplete",
             "description": "",
             "type": "string | undefined",
@@ -2187,13 +2238,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "state",
-            "description": "",
-            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
-            "required": false,
-            "default": "\"default\""
           },
           {
             "name": "textAlign",
@@ -2320,18 +2364,18 @@
             "default": "undefined"
           },
           {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "state",
             "description": "",
             "type": "GrInputTagState | undefined",
             "required": false,
             "default": "\"default\""
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "readonly",
@@ -2909,6 +2953,13 @@
             "default": "undefined"
           },
           {
+            "name": "state",
+            "description": "",
+            "type": "GrNumberInputState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
             "name": "autocomplete",
             "description": "",
             "type": "string | undefined",
@@ -2928,13 +2979,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "state",
-            "description": "",
-            "type": "GrNumberInputState | undefined",
-            "required": false,
-            "default": "\"default\""
           },
           {
             "name": "textAlign",
@@ -4327,6 +4371,13 @@
             "default": "undefined"
           },
           {
+            "name": "state",
+            "description": "",
+            "type": "GrTextareaState | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
             "name": "autocomplete",
             "description": "",
             "type": "string | undefined",
@@ -4339,13 +4390,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "state",
-            "description": "",
-            "type": "GrTextareaState | undefined",
-            "required": false,
-            "default": "\"default\""
           },
           {
             "name": "modelValue",

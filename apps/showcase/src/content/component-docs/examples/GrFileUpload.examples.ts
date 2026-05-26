@@ -101,4 +101,100 @@ function onExceed(files: File[], limit: number) {
 </template>`,
     note: 'Не-happy-path нужен отдельно, чтобы быстро проверить доступность, disable-state и защиту от превышения лимита.',
   },
+  {
+    id: 'file-upload-progress',
+    title: 'Upload progress with default bar',
+    description: 'Дефолтный `GrProgressBar` в зарезервированной зоне: переключение `idle ↔ uploading ↔ success` без layout shift. Прогресс приходит из `ctx.onProgress`, который вызывает пользовательский `request` — этот контракт совместим с `axios.onUploadProgress`.',
+    status: 'ready',
+    previewKey: 'ds-file-upload-progress',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrFileUpload } from '@feugene/granularity'
+import type { GrFileUploadRequestCtx, GrUploadState } from '@feugene/granularity'
+
+const lastPercent = ref(0)
+const phase = ref<GrUploadState['phase']>('idle')
+
+async function request(files: File[], ctx: GrFileUploadRequestCtx) {
+  const total = files.reduce((sum, file) => sum + file.size, 0) || 1
+  let loaded = 0
+  const step = Math.max(1, Math.floor(total / 20))
+
+  while (loaded < total) {
+    if (ctx.signal.aborted) throw new Error('aborted')
+    await new Promise(resolve => setTimeout(resolve, 80))
+    loaded = Math.min(total, loaded + step)
+    ctx.onProgress?.({
+      percent: (loaded / total) * 100,
+      loaded,
+      total,
+      indeterminate: false,
+    })
+  }
+
+  return { uploaded: files.length }
+}
+</script>
+
+<template>
+  <GrFileUpload
+    :request="request"
+    multiple
+    @progress="(percent) => (lastPercent = percent)"
+    @state-change="(state) => (phase = state.phase)"
+  />
+</template>`,
+    note: 'Покрывает связку `ctx.onProgress` → `state-change` → дефолтный `GrProgressBar`. Без слотов.',
+  },
+  {
+    id: 'file-upload-progress-slot',
+    title: 'Custom progress via scoped slot',
+    description: 'Кастомный круговой индикатор и кнопка отмены — через scoped-слот `progress`. Дефолтный бар выключен через `:show-progress="false"`.',
+    status: 'ready',
+    previewKey: 'ds-file-upload-progress-slot',
+    code: `<script setup lang="ts">
+import { GrButton, GrFileUpload } from '@feugene/granularity'
+import type { GrFileUploadRequestCtx } from '@feugene/granularity'
+
+async function request(files: File[], ctx: GrFileUploadRequestCtx) {
+  // … вызывает ctx.onProgress(...) по мере загрузки
+  return { ok: true }
+}
+</script>
+
+<template>
+  <GrFileUpload :request="request" :show-progress="false" multiple>
+    <template #progress="{ percent, indeterminate, phase, abort }">
+      <div v-if="phase !== 'idle'" class="flex items-center gap-3">
+        <span class="tabular-nums">{{ indeterminate ? '…' : Math.round(percent) + '%' }}</span>
+        <GrButton v-if="phase === 'uploading'" size="sm" variant="ghost" @click="abort">
+          Cancel
+        </GrButton>
+      </div>
+    </template>
+  </GrFileUpload>
+</template>`,
+    note: 'Demonstrates `#progress` slot payload: `percent`, `indeterminate`, `phase`, `files`, `abort`, `state`.',
+  },
+  {
+    id: 'file-upload-action-xhr',
+    title: 'Action endpoint with real XHR progress',
+    description: 'Сценарий `action`: компонент сам формирует `multipart/form-data` и отправляет POST через `XMLHttpRequest`, давая реальный `upload.onprogress` без какого-либо кода пользователя. Отмена — внутренний `AbortController`.',
+    status: 'ready',
+    previewKey: 'ds-file-upload-action-xhr',
+    code: `<script setup lang="ts">
+import { GrFileUpload } from '@feugene/granularity'
+</script>
+
+<template>
+  <GrFileUpload
+    action="https://httpbin.org/post"
+    name="file"
+    multiple
+    :upload-extra-data="() => ({ source: 'granularity-showcase' })"
+  />
+</template>`,
+    note: 'Подтверждает миграцию с `fetch` на `XMLHttpRequest`: для action-режима теперь доступен реальный процент. Для просмотра прогресса используй файлы >1 МБ.',
+  },
 ]

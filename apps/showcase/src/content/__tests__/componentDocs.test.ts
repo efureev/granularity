@@ -38,7 +38,7 @@ describe('component docs metadata', () => {
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('ds-select'))).toBe(true)
 
-    expect(fileUploadDoc.examples).toHaveLength(3)
+    expect(fileUploadDoc.examples).toHaveLength(6)
     expect(fileUploadDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(fileUploadDoc.examples.every(example => example.previewKey?.startsWith('ds-file-upload'))).toBe(true)
   })
