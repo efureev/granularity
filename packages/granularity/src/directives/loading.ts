@@ -97,6 +97,25 @@ function ensurePositionedContainer(target: HTMLElement, fullscreen: boolean): ()
   return () => {}
 }
 
+function ensureClippedContainer(target: HTMLElement, fullscreen: boolean): () => void {
+  if (fullscreen) return () => {}
+
+  const computed = window.getComputedStyle(target)
+  // If the target has rounded corners, we must clip its content so the overlay
+  // (and its blurred backdrop) never bleeds outside the visible rounded shape.
+  const hasRadius = !!computed.borderRadius && computed.borderRadius !== '0px'
+  if (!hasRadius) return () => {}
+
+  const overflow = computed.overflow
+  if (overflow && overflow !== 'visible') return () => {}
+
+  const prevInline = target.style.overflow
+  target.style.overflow = 'hidden'
+  return () => {
+    target.style.overflow = prevInline
+  }
+}
+
 function parseBinding(value: LoadingBindingValue | undefined): { loading: boolean; options: LoadingOptions } {
   if (value === true || value === false) {
     return { loading: value, options: {} }
@@ -130,8 +149,14 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
   const appContext = options.appContext
 
   const restorePosition = ensurePositionedContainer(target, fullscreen)
+  const restoreOverflow = ensureClippedContainer(target, fullscreen)
   const mountEl = document.createElement('div')
   mountEl.setAttribute('data-ds-loading-host', '')
+  if (!fullscreen) {
+    // Host wraps the overlay; make sure rounded corners of the target cascade
+    // down to the overlay via `border-radius: inherit`.
+    mountEl.style.borderRadius = 'inherit'
+  }
   target.appendChild(mountEl)
   target.setAttribute('aria-busy', 'true')
 
@@ -165,6 +190,7 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
 
     render(null, mountEl)
     mountEl.remove()
+    restoreOverflow()
     restorePosition()
     target.removeAttribute('aria-busy')
   }
