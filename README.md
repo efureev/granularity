@@ -1,5 +1,9 @@
 # granularity
 
+🌐 **Live showcase:** **https://efureev.github.io/granularity/** &nbsp;·&nbsp;
+[![Showcase](https://img.shields.io/badge/showcase-online-brightgreen?logo=githubpages)](https://efureev.github.io/granularity/)
+[![npm](https://img.shields.io/npm/v/@feugene/granularity.svg?logo=npm)](https://www.npmjs.com/package/@feugene/granularity)
+
 Monorepo for the [`@feugene/granularity`](./packages/granularity) design system — a Vue 3 package
 with components, styles, and a UnoCSS preset that supports granular subpath exports.
 
