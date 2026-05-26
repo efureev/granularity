@@ -28,6 +28,7 @@ const iconFiles = [
 
 const allowedSymbolUsage = new Map([
   ['content/component-docs/examples/GrTree.examples.ts', new Set(['→'])],
+  ['content/component-docs/examples/GrFileUpload.examples.ts', new Set(['→'])],
   ['content/foundations.ts', new Set(['→'])],
   ['demos/components/ds-tree/GrTreeDragAndSlotDemo.vue', new Set(['→'])],
 ])
