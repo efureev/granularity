@@ -193,27 +193,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
 
-      # Прописываем URL showcase в поле "Website" (About → homepage) репозитория,
-      # чтобы на главной странице github.com/efureev/granularity сразу была
-      # видна и кликабельна прямая ссылка на https://efureev.github.io/granularity/.
-      # Стандартный виджет «Environments» в сайдбаре GitHub всегда ведёт на
-      # /deployments/github-pages — это поведение UI и из CI не меняется,
-      # поэтому делаем заметным именно "About → Website".
-      - name: Sync repo homepage with Pages URL
-        if: ${{ steps.deployment.outputs.page_url != '' }}
-        env:
-          GH_TOKEN: ${{ secrets.REPO_HOMEPAGE_TOKEN || secrets.GITHUB_TOKEN }}
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        continue-on-error: true
-        run: |
-          echo "Setting repo homepage to: $PAGE_URL"
-          gh api -X PATCH "/repos/${GITHUB_REPOSITORY}" \
-            -f "homepage=${PAGE_URL}" \
-            --silent || {
-              echo "::warning::Failed to update repo homepage via default GITHUB_TOKEN."
-              echo "::warning::Create a PAT with 'Administration: write' scope and add it as secret REPO_HOMEPAGE_TOKEN."
-            }
-
   # Публикация пакета в npm — первичный реестр.
   # Релиз не зависит от showcase, чтобы внешние зависимости витрины
   # (например, @feugene/fint-i18n) не блокировали публикацию @feugene/granularity.
