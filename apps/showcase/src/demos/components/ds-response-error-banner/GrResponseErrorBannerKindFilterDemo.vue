@@ -12,8 +12,7 @@ import {
 } from '@feugene/granularity'
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const i18n = useFintI18n()
-const { t } = i18n
+const { t } = useFintI18n()
 const NS = 'components.GrResponseErrorBanner'
 
 class FakeHttpError extends Error {
