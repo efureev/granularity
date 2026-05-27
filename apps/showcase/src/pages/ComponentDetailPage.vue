@@ -27,21 +27,11 @@ const i18n = useFintI18n()
 const {t} = i18n
 const {localizePageByName} = useShowcasePageI18n()
 
-let activeI18nBlock: string | null = null
 
 function setActiveI18nBlock(blockName: string | null) {
-  if (activeI18nBlock === blockName)
-    return
-
-  if (activeI18nBlock) {
-    i18n.unregisterUsage(activeI18nBlock)
-    activeI18nBlock = null
-  }
-
   if (blockName) {
     i18n.registerUsage(blockName)
     void i18n.loadBlock(blockName)
-    activeI18nBlock = blockName
   }
 }
 
@@ -227,7 +217,7 @@ function resolvePreviewComponent(previewKey?: string) {
 }
 
 watch(componentEntity, () => {
-  setActiveI18nBlock(componentEntity.value ? 'gr.' + componentEntity.value.name : null)
+  setActiveI18nBlock(componentEntity.value ? 'components.' + componentEntity.value.name : null)
 }, {immediate: true})
 </script>
 
