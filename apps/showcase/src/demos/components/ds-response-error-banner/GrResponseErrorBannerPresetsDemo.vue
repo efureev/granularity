@@ -156,7 +156,7 @@ async function trigger() {
 function onRetry(info: ResponseErrorInfo) {
   log(`@retry fired (kind=${info.kind})`)
   retry(() => {
-    log('retry handler executed → dismissing banner')
+    log('retry handler executed -> dismissing banner')
   })
 }
 

@@ -65,8 +65,8 @@ const { currentError, setRaw, dismiss } = useResponseError({
 
 async function handle(raw: unknown) {
   const info = await setRaw(raw)
-  // info === null  → kind не в whitelist, баннер скрыт
-  // info !== null  → классифицирован и показан
+  // info === null  -> kind не в whitelist, баннер скрыт
+  // info !== null  -> классифицирован и показан
 }
 </script>
 

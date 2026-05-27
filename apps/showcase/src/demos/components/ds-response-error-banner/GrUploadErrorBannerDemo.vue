@@ -41,7 +41,7 @@ async function triggerUploadDemo() {
     }),
   )
   fakeUploadError.value = info
-  log(`upload-wrapper classify → kind=${info.kind}`)
+  log(`upload-wrapper classify -> kind=${info.kind}`)
 }
 </script>
 
