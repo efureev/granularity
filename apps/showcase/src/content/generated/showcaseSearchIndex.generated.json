@@ -195,7 +195,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 48 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 49 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -713,6 +713,17 @@
     "context": "forms / component",
     "searchableTitle": "grradiogroup",
     "searchableContent": "grradiogroup grradiogroup собирает radio-опции в единыи сценарии выбора одного варианта. forms component /components/gr-radio-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grradiogroup generated public-api components components gr-radio-group gr radio group"
+  },
+  {
+    "id": "entity:component:GrResponseErrorBanner",
+    "title": "GrResponseErrorBanner",
+    "description": "Универсальный generic-баннер ошибки ответа сервера или сети: принимает «сырой» error/response, прогоняет его через цепочку парсеров (HTTP-статусы, Laravel/JSON:API/RFC 7807 валидация, file/network/abort) и рендерит заголовок, основной message, опциональный список деталей по полям и действия retry/dismiss — не зная ничего о конкретной фиче (загрузке файлов, формах, транзакциях).",
+    "href": "/components/gr-response-error-banner",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "feedback / component",
+    "searchableTitle": "grresponseerrorbanner",
+    "searchableContent": "grresponseerrorbanner grresponseerrorbanner универсальныи generic-баннер ошибки ответа сервера или сети: принимает сырои error/response, прогоняет его через цепочку парсеров (http-статусы, laravel/json:api/rfc 7807 валидация, file/network/abort) и рендерит заголовок, основнои message, опциональныи список деталеи по полям и деи ствия retry/dismiss не зная ничего о конкретнои фиче (загрузке фаи лов, формах, транзакциях). feedback component /components/gr-response-error-banner packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grresponseerrorbanner generated public-api components components gr-response-error-banner gr response error banner"
   },
   {
     "id": "entity:component:GrSegmented",
@@ -2638,6 +2649,50 @@
     "context": "GrRadioGroup",
     "searchableTitle": "grradiogroup integration notes",
     "searchableContent": "grradiogroup собирает radio-опции в единыи сценарии выбора одного варианта. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrResponseErrorBanner:section:overview",
+    "title": "GrResponseErrorBanner / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-response-error-banner#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrResponseErrorBanner",
+    "searchableTitle": "grresponseerrorbanner component overview",
+    "searchableContent": "grresponseerrorbanner универсальныи generic-баннер ошибки ответа сервера или сети: принимает сырои error/response, прогоняет его через цепочку парсеров (http-статусы, laravel/json:api/rfc 7807 валидация, file/network/abort) и рендерит заголовок, основнои message, опциональныи список деталеи по полям и деи ствия retry/dismiss не зная ничего о конкретнои фиче (загрузке фаи лов, формах, транзакциях). overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrResponseErrorBanner:section:live-examples",
+    "title": "GrResponseErrorBanner / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-response-error-banner#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrResponseErrorBanner",
+    "searchableTitle": "grresponseerrorbanner live examples",
+    "searchableContent": "grresponseerrorbanner универсальныи generic-баннер ошибки ответа сервера или сети: принимает сырои error/response, прогоняет его через цепочку парсеров (http-статусы, laravel/json:api/rfc 7807 валидация, file/network/abort) и рендерит заголовок, основнои message, опциональныи список деталеи по полям и деи ствия retry/dismiss не зная ничего о конкретнои фиче (загрузке фаи лов, формах, транзакциях). live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrResponseErrorBanner:section:api",
+    "title": "GrResponseErrorBanner / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-response-error-banner#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrResponseErrorBanner",
+    "searchableTitle": "grresponseerrorbanner generated api",
+    "searchableContent": "grresponseerrorbanner универсальныи generic-баннер ошибки ответа сервера или сети: принимает сырои error/response, прогоняет его через цепочку парсеров (http-статусы, laravel/json:api/rfc 7807 валидация, file/network/abort) и рендерит заголовок, основнои message, опциональныи список деталеи по полям и деи ствия retry/dismiss не зная ничего о конкретнои фиче (загрузке фаи лов, формах, транзакциях). api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrResponseErrorBanner:section:integration-notes",
+    "title": "GrResponseErrorBanner / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-response-error-banner#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrResponseErrorBanner",
+    "searchableTitle": "grresponseerrorbanner integration notes",
+    "searchableContent": "grresponseerrorbanner универсальныи generic-баннер ошибки ответа сервера или сети: принимает сырои error/response, прогоняет его через цепочку парсеров (http-статусы, laravel/json:api/rfc 7807 валидация, file/network/abort) и рендерит заголовок, основнои message, опциональныи список деталеи по полям и деи ствия retry/dismiss не зная ничего о конкретнои фиче (загрузке фаи лов, формах, транзакциях). integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrSegmented:section:overview",

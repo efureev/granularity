@@ -4,7 +4,7 @@ import { createFintI18n } from '@feugene/fint-i18n/core'
 import { installI18n } from '@feugene/fint-i18n/vue'
 import { PersistencePlugin } from '@feugene/fint-i18n/plugins'
 import { GRANULARITY_I18N_BLOCK } from '@feugene/granularity/i18n'
-import dsLocales from '@feugene/granularity/i18n/all'
+import grLocales from '@feugene/granularity/i18n/all'
 
 import { SHOWCASE_I18N_BLOCK, showcaseLocaleLoaders } from './messages'
 
@@ -14,7 +14,7 @@ export async function setupShowcaseI18n() {
   const i18n = createFintI18n({
     locale: defaultLocale,
     fallbackLocale: 'en',
-    loaders: [showcaseLocaleLoaders, ...dsLocales],
+    loaders: [showcaseLocaleLoaders, ...grLocales],
     plugins: [
       new PersistencePlugin({
         key: 'showcase-locale', // Key in localStorage

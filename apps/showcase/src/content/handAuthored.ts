@@ -5,7 +5,7 @@ import type {
 
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
-  feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrSkeleton', 'GrToaster'],
+  feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPromptDialog'],
   forms: ['GrCheckbox', 'GrFileUpload', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
@@ -49,6 +49,7 @@ const componentSummaryOverrides = {
   GrPromptDialog: 'Запрашивает у пользователя короткий текстовый ввод в диалоге.',
   GrRadio: 'Один вариант выбора внутри группы взаимоисключающих опций.',
   GrRadioGroup: 'Собирает radio-опции в единый сценарий выбора одного варианта.',
+  GrResponseErrorBanner: 'Универсальный generic-баннер ошибки ответа сервера или сети: принимает «сырой» error/response, прогоняет его через цепочку парсеров (HTTP-статусы, Laravel/JSON:API/RFC 7807 валидация, file/network/abort) и рендерит заголовок, основной message, опциональный список деталей по полям и действия retry/dismiss — не зная ничего о конкретной фиче (загрузке файлов, формах, транзакциях).',
   GrSegmented: 'Компактный single-choice control с pills/button представлением и движущимся индикатором выбора.',
   GrSelect: 'Выбор одного или нескольких значений из списка опций.',
   GrSidebar: 'Боковая навигация для разделов, фильтров и вспомогательных действий.',

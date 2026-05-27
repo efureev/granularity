@@ -3708,6 +3708,140 @@
       }
     ]
   },
+  "GrResponseErrorBanner": {
+    "name": "GrResponseErrorBanner",
+    "sourcePath": "packages/granularity/src/components/GrResponseErrorBanner/GrResponseErrorBanner.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "Жёсткий оверрайд тона. Бьёт `toneByKind`.",
+            "type": "ResponseErrorTone | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "texts",
+            "description": "Частичный override текстов. Мерджится с `DEFAULT_RESPONSE_ERROR_TEXTS`.",
+            "type": "Partial<ResponseErrorTexts> | undefined",
+            "required": false,
+            "default": "{}"
+          },
+          {
+            "name": "toneByKind",
+            "description": "Маппинг `kind` → `tone`. Мерджится с `DEFAULT_TONE_BY_KIND`.",
+            "type": "Partial<Record<ResponseErrorKind, ResponseErrorTone>> | undefined",
+            "required": false,
+            "default": "{}"
+          },
+          {
+            "name": "showDetails",
+            "description": "Показывать ли блок `details`/`fieldErrors` под основным сообщением.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showFieldLabels",
+            "description": "Префиксить ли `field:` перед сообщениями по полям.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "fieldLabels",
+            "description": "Человекочитаемые подписи полей (`{ file: 'Файл' }`).",
+            "type": "Record<string, string> | undefined",
+            "required": false,
+            "default": "{}"
+          },
+          {
+            "name": "dedupeDetails",
+            "description": "Удалять дубликаты сообщений между `message` и `details`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "canRetry",
+            "description": "Показывать ли кнопку «Повторить».",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "canDismiss",
+            "description": "Показывать ли кнопку «Скрыть».",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "autoHideKinds",
+            "description": "Какие `kind` не рендерить вообще (баннер скрывается).",
+            "type": "ResponseErrorKind[] | undefined",
+            "required": false,
+            "default": "DEFAULT_AUTO_HIDE_KINDS"
+          },
+          {
+            "name": "showStatus",
+            "description": "Показывать ли HTTP-status бейдж.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "testIdPrefix",
+            "description": "Префикс `data-testid`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"response-error\""
+          },
+          {
+            "name": "error",
+            "description": "Готовая структура ошибки. Если `null` — баннер не рендерится.",
+            "type": "ResponseErrorInfo | null",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "dismiss",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"dismiss\"): void"
+          },
+          {
+            "name": "retry",
+            "description": "",
+            "type": "[error: ResponseErrorInfo]",
+            "signature": "(event: \"retry\", error: ResponseErrorInfo): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrSegmented": {
     "name": "GrSegmented",
     "sourcePath": "packages/granularity/src/components/GrSegmented/GrSegmented.vue",
@@ -4443,18 +4577,18 @@
             "default": "\"Notifications\""
           },
           {
-            "name": "placement",
-            "description": "Угол экрана для стека уведомлений.",
-            "type": "GrToasterPlacement | undefined",
-            "required": false,
-            "default": "\"top-right\""
-          },
-          {
             "name": "dismissLabel",
             "description": "A11y-лейбл кнопки закрытия (i18n).",
             "type": "string | undefined",
             "required": false,
             "default": "\"Dismiss\""
+          },
+          {
+            "name": "placement",
+            "description": "Угол экрана для стека уведомлений.",
+            "type": "GrToasterPlacement | undefined",
+            "required": false,
+            "default": "\"top-right\""
           }
         ]
       },
