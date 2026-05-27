@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, defineAsyncComponent, watch} from 'vue'
+import {computed, defineAsyncComponent, onUnmounted, watch} from 'vue'
 import {RouterLink, useRoute} from 'vue-router'
 
 import {useFintI18n} from '@feugene/fint-i18n/vue'
@@ -23,8 +23,27 @@ import {
 import {getShowcaseComponentDoc} from '../content/componentDocs'
 
 const route = useRoute()
-const {t} = useFintI18n()
-const {localizePageByName, useI18nScope} = useShowcasePageI18n()
+const i18n = useFintI18n()
+const {t} = i18n
+const {localizePageByName} = useShowcasePageI18n()
+
+let activeI18nBlock: string | null = null
+
+function setActiveI18nBlock(blockName: string | null) {
+  if (activeI18nBlock === blockName)
+    return
+
+  if (activeI18nBlock) {
+    i18n.unregisterUsage(activeI18nBlock)
+    activeI18nBlock = null
+  }
+
+  if (blockName) {
+    i18n.registerUsage(blockName)
+    void i18n.loadBlock(blockName)
+    activeI18nBlock = blockName
+  }
+}
 
 const previewRegistry = {
   'ds-alert-closable-flow': defineAsyncComponent(() => import('../demos/components/ds-alert/GrAlertClosableDemo.vue')),
@@ -208,9 +227,7 @@ function resolvePreviewComponent(previewKey?: string) {
 }
 
 watch(componentEntity, () => {
-  if (componentEntity.value) {
-    useI18nScope(['components.' + componentEntity.value.name])
-  }
+  setActiveI18nBlock(componentEntity.value ? 'gr.' + componentEntity.value.name : null)
 }, {immediate: true})
 </script>
 
@@ -281,9 +298,12 @@ watch(componentEntity, () => {
       </div>
 
       <div class="grid gap-4 lg:grid-cols-3">
-        <InfoSectionCard :title="t('showcase.detailPage.info.accessibilityTitle')" :items="accessibilityItems" variant="list"/>
-        <InfoSectionCard :title="t('showcase.detailPage.info.dependenciesTitle')" :items="dependencyItems" variant="chips"/>
-        <InfoSectionCard :title="t('showcase.detailPage.info.relatedLinksTitle')" :links="relatedLinks" variant="links"/>
+        <InfoSectionCard :title="t('showcase.detailPage.info.accessibilityTitle')" :items="accessibilityItems"
+                         variant="list"/>
+        <InfoSectionCard :title="t('showcase.detailPage.info.dependenciesTitle')" :items="dependencyItems"
+                         variant="chips"/>
+        <InfoSectionCard :title="t('showcase.detailPage.info.relatedLinksTitle')" :links="relatedLinks"
+                         variant="links"/>
       </div>
     </section>
   </div>
