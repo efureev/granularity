@@ -31,6 +31,22 @@
   "navbar": {
     "openMenu": "Открыть меню"
   },
+  "responseError": {
+    "networkTitle": "Нет связи с сервером",
+    "networkMessage": "Проверьте подключение к интернету и попробуйте ещё раз.",
+    "abortedTitle": "Запрос отменён",
+    "abortedMessage": "Запрос был отменён.",
+    "validationTitle": "Проверьте данные",
+    "validationMessage": "Сервер вернул ошибку валидации. Исправьте поля и попробуйте снова.",
+    "clientTitle": "Ошибка запроса",
+    "clientMessage": "Сервер отклонил запрос.",
+    "serverTitle": "Ошибка сервера",
+    "serverMessage": "Произошла ошибка на сервере. Попробуйте ещё раз.",
+    "unknownTitle": "Что-то пошло не так",
+    "unknownMessage": "Не удалось выполнить операцию. Попробуйте ещё раз.",
+    "retryLabel": "Повторить",
+    "dismissLabel": "Скрыть"
+  },
   "colors": {
     "neutral": "Нейтральный",
     "success": "Успех",

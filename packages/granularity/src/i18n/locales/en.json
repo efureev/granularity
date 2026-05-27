@@ -31,6 +31,22 @@
   "navbar": {
     "openMenu": "Open menu"
   },
+  "responseError": {
+    "networkTitle": "No connection to the server",
+    "networkMessage": "Check your internet connection and try again.",
+    "abortedTitle": "Request cancelled",
+    "abortedMessage": "The request was cancelled.",
+    "validationTitle": "Check the data",
+    "validationMessage": "The server returned a validation error. Fix the fields and try again.",
+    "clientTitle": "Request error",
+    "clientMessage": "The server rejected the request.",
+    "serverTitle": "Server error",
+    "serverMessage": "A server error occurred. Please try again.",
+    "unknownTitle": "Something went wrong",
+    "unknownMessage": "The operation could not be completed. Please try again.",
+    "retryLabel": "Retry",
+    "dismissLabel": "Dismiss"
+  },
   "colors": {
     "neutral": "Neutral",
     "success": "Success",

@@ -31,6 +31,22 @@
   "navbar": {
     "openMenu": "Abrir menú"
   },
+  "responseError": {
+    "networkTitle": "Sin conexión con el servidor",
+    "networkMessage": "Compruebe su conexión a internet e inténtelo de nuevo.",
+    "abortedTitle": "Solicitud cancelada",
+    "abortedMessage": "La solicitud fue cancelada.",
+    "validationTitle": "Compruebe los datos",
+    "validationMessage": "El servidor devolvió un error de validación. Corrija los campos e inténtelo de nuevo.",
+    "clientTitle": "Error de solicitud",
+    "clientMessage": "El servidor rechazó la solicitud.",
+    "serverTitle": "Error del servidor",
+    "serverMessage": "Se produjo un error en el servidor. Inténtelo de nuevo.",
+    "unknownTitle": "Algo salió mal",
+    "unknownMessage": "No se pudo completar la operación. Inténtelo de nuevo.",
+    "retryLabel": "Reintentar",
+    "dismissLabel": "Descartar"
+  },
   "colors": {
     "neutral": "Neutral",
     "success": "Éxito",

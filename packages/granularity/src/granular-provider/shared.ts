@@ -58,6 +58,7 @@ import { grProgressBarConfig } from '../components/GrProgressBar/config'
 import { grPromptDialogConfig } from '../components/GrPromptDialog/config'
 import { grRadioConfig } from '../components/GrRadio/config'
 import { grRadioGroupConfig } from '../components/GrRadioGroup/config'
+import { grResponseErrorBannerConfig } from '../components/GrResponseErrorBanner/config'
 import { grSegmentedConfig } from '../components/GrSegmented/config'
 import { grSelectConfig } from '../components/GrSelect/config'
 import { grSidebarConfig } from '../components/GrSidebar/config'
@@ -152,6 +153,7 @@ export const granularityComponentConfigs = {
   GrPromptDialog: grPromptDialogConfig,
   GrRadio: grRadioConfig,
   GrRadioGroup: grRadioGroupConfig,
+  GrResponseErrorBanner: grResponseErrorBannerConfig,
   GrSegmented: grSegmentedConfig,
   GrSelect: grSelectConfig,
   GrSidebar: grSidebarConfig,
