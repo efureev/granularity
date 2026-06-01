@@ -5,14 +5,27 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [v0.8.0] 2026-06-01
 
 ### Added
+
+- `GrBadge`: new `xs` size.
+
+### Changed
+
+- `GrBadge`: size scale shifted (old `sm`→`xs`, `md`→`sm`, `lg`→`md`) with new `lg` values; default size changed to
+  `sm`.
+
+## [v0.1.0]
+
+### Added
+
 - Root repository artifacts: `README.md`, `LICENSE` (Apache-2.0), `CHANGELOG.md`, `CONTRIBUTING.md`.
 - Added `repository`, `homepage`, `bugs`, `keywords`, `author`, `engines`, `publishConfig` metadata
   and an optional `unocss` peerDependency to `packages/granularity/package.json`.
 
 ### Changed
+
 - Package license changed from `UNLICENSED` to `Apache-2.0`.
 - CI split into separate jobs (`lint`, `test-granularity`, `build-granularity`,
   `test-showcase`, `build-showcase`, `deploy-showcase`, `publish`); publishing no longer depends on the showcase.
@@ -20,4 +33,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (for local development the preparation step runs in `yarn dev:showcase`).
 
 ### Removed
+
 - Useless root-level `.npmignore` (publishing happens from `packages/granularity`, where `files` already applies).
