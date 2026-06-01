@@ -1,17 +1,19 @@
 import type { GrTone } from '../shared/tones'
 
 export type GrBadgeTone = GrTone
-export type GrBadgeSize = 'sm' | 'md' | 'lg'
+export type GrBadgeSize = 'xs' | 'sm' | 'md' | 'lg'
 export type GrBadgeRadius = 'square' | 'semi' | 'round'
 export const sizeClassBySize: Record<GrBadgeSize, string> = {
-  sm: 'px-2 py-0.4 text-[11px]',
-  md: 'px-2.5 py-0.5 text-[12px]',
-  lg: 'px-3 py-1 text-[13px]',
+  xs: 'px-2 py-0.4 text-[11px]',
+  sm: 'px-2.5 py-0.5 text-[12px]',
+  md: 'px-3 py-1 text-[13px]',
+  lg: 'px-3.5 py-1.5 text-[14px]',
 }
 export const semiRadiusClassBySize: Record<GrBadgeSize, string> = {
+  xs: 'rounded-[3px]',
   sm: 'rounded-[3px]',
-  md: 'rounded-[3px]',
-  lg: 'rounded-[5px]',
+  md: 'rounded-[5px]',
+  lg: 'rounded-[7px]',
 }
 export const lightToneClassByTone: Record<GrBadgeTone, string> = {
   neutral: 'bg-[var(--muted)] text-[var(--fg)] border-[var(--brd)]',

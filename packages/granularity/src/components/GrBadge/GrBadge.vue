@@ -20,7 +20,7 @@ const props = withDefaults(
     {
       tone: 'neutral',
       dark: false,
-      size: 'md',
+      size: 'sm',
       radius: 'round',
     },
 )

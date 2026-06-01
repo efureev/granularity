@@ -4,6 +4,10 @@ import { GrBadge } from '@feugene/granularity'
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
+    <GrBadge size="xs" tone="success" radius="square">xs square</GrBadge>
+    <GrBadge size="xs" tone="success" radius="semi">xs semi</GrBadge>
+    <GrBadge size="xs" tone="success" radius="round">xs round</GrBadge>
+
     <GrBadge size="sm" tone="success" radius="square">sm square</GrBadge>
     <GrBadge size="sm" tone="success" radius="semi">sm semi</GrBadge>
     <GrBadge size="sm" tone="success" radius="round">sm round</GrBadge>

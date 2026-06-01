@@ -178,7 +178,7 @@
             "description": "",
             "type": "GrBadgeSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "\"sm\""
           },
           {
             "name": "dark",

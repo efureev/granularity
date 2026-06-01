@@ -16,7 +16,7 @@ import {
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
 
 const tone = ref<GrBadgeTone>('primary')
-const size = ref<GrBadgeSize>('md')
+const size = ref<GrBadgeSize>('sm')
 const radius = ref<GrBadgeRadius>('round')
 const label = ref('Beta')
 const dark = ref(false)
@@ -34,6 +34,7 @@ const toneOptions = [
 ] satisfies Array<{ value: GrBadgeTone, label: string }>
 
 const sizeOptions = [
+  {value: 'xs', label: 'XS'},
   {value: 'sm', label: 'SM'},
   {value: 'md', label: 'MD'},
   {value: 'lg', label: 'LG'},
