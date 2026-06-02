@@ -177,6 +177,12 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
         description: 'Информационный диалог с одной кнопкой подтверждения.',
         status: 'planned',
       },
+      {
+        id: 'use-dialog-service-network',
+        title: 'Async onConfirm с ошибками сети',
+        description: 'Loading, серверная валидация (HTTP 422) и обрыв сети, обработанные через `ctx.setRawError` без закрытия диалога.',
+        status: 'planned',
+      },
     ],
   },
   'utility:runFileValidators': {

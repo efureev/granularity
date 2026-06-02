@@ -207,6 +207,55 @@ async function runAlertDemo() {
   })
   dialogStatus.value = 'alert acknowledged'
 }
+
+const networkStatus = ref('Откройте диалог: 1-я попытка вернёт серверную валидацию (422), 2-я — обрыв сети, 3-я завершится успехом.')
+let networkAttempt = 0
+
+async function runNetworkDemo() {
+  networkAttempt = 0
+  networkStatus.value = 'Dialog открыт. Жмите «Send invite», чтобы пройти сценарии loading → validation → network → success.'
+
+  const email = await dialog.prompt('Send an invite to a teammate.', {
+    title: 'Invite teammate',
+    size: 'md',
+    label: 'Work email',
+    placeholder: 'name@company.com',
+    required: true,
+    confirmText: 'Send invite',
+    // Подключаем Laravel-пресет поверх ядра: fieldErrors лягут на поле `value`.
+    errorParsers: presets => [...presets.core, presets.laravel],
+    async onConfirm(ctx) {
+      networkAttempt += 1
+      // Имитируем сетевой запрос — Confirm автоматически переходит в loading.
+      await new Promise(resolve => window.setTimeout(resolve, 700))
+
+      if (networkAttempt === 1) {
+        // Серверная валидация (HTTP 422): баннер + ошибка под полем ввода.
+        await ctx.setRawError(
+          new Response(JSON.stringify({
+            message: 'The given data was invalid.',
+            errors: { value: ['This email is already invited.'] },
+          }), {
+            status: 422,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        )
+        return false
+      }
+
+      if (networkAttempt === 2) {
+        // Обрыв сети: throw автоматически прогоняется через парсеры → kind: "network".
+        throw new TypeError('Failed to fetch')
+      }
+
+      // Успех на третьей попытке: диалог закрывается, prompt резолвится значением.
+    },
+  })
+
+  networkStatus.value = email === null
+    ? `prompt cancelled (после ${networkAttempt} попыток)`
+    : `invite sent: ${email} (успех с ${networkAttempt}-й попытки)`
+}
 </script>
 
 <template>
@@ -423,6 +472,15 @@ async function runAlertDemo() {
       </GrButton>
       <p class="text-sm text-[var(--muted-fg)]">
         {{ dialogStatus }}
+      </p>
+    </template>
+
+    <template v-else-if="previewKey === 'use-dialog-service-network'">
+      <GrButton class="justify-self-start" variant="primary" @click="runNetworkDemo">
+        Invite teammate (async onConfirm)
+      </GrButton>
+      <p class="text-sm text-[var(--muted-fg)]">
+        {{ networkStatus }}
       </p>
     </template>
 
