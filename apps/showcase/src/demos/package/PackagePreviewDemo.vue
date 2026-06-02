@@ -22,6 +22,7 @@ import {
   maxTotalSizeBytesValidator,
   normalizeFiles,
   runFileValidators,
+  useDialogService,
   useTheme,
   useToast,
   vAutofocus,
@@ -170,6 +171,41 @@ function handleUploadValidationError(error: unknown) {
   }
 
   uploadBridgeStatus.value = String(error)
+}
+
+const dialog = useDialogService()
+const dialogStatus = ref('Запустите imperative-вызов, чтобы увидеть результат Promise.')
+
+async function runConfirmDemo() {
+  const ok = await dialog.confirm('This action cannot be undone.', {
+    title: 'Delete workspace?',
+    size: 'sm',
+    confirmText: 'Delete',
+    cancelText: 'Keep',
+    confirmTone: 'danger',
+  })
+  dialogStatus.value = `confirm resolved: ${ok}`
+}
+
+async function runPromptDemo() {
+  const name = await dialog.prompt('Pick a new project name.', {
+    title: 'Rename project',
+    size: 'md',
+    label: 'Project name',
+    placeholder: 'e.g. Atlas',
+    required: true,
+    confirmText: 'Save',
+  })
+  dialogStatus.value = name === null ? 'prompt cancelled' : `prompt resolved: ${name}`
+}
+
+async function runAlertDemo() {
+  await dialog.alert('Your workspace settings have been saved.', {
+    title: 'Saved',
+    size: 'lg',
+    confirmText: 'Got it',
+  })
+  dialogStatus.value = 'alert acknowledged'
 }
 </script>
 
@@ -361,6 +397,33 @@ function handleUploadValidationError(error: unknown) {
           {{ uploadBridgeStatus }}
         </p>
       </div>
+    </template>
+
+    <template v-else-if="previewKey === 'use-dialog-service-confirm'">
+      <GrButton class="justify-self-start" variant="primary" tone="danger" @click="runConfirmDemo">
+        Delete workspace (confirm)
+      </GrButton>
+      <p class="text-sm text-[var(--muted-fg)]">
+        {{ dialogStatus }}
+      </p>
+    </template>
+
+    <template v-else-if="previewKey === 'use-dialog-service-prompt'">
+      <GrButton class="justify-self-start" variant="outline" @click="runPromptDemo">
+        Rename project (prompt)
+      </GrButton>
+      <p class="text-sm text-[var(--muted-fg)]">
+        {{ dialogStatus }}
+      </p>
+    </template>
+
+    <template v-else-if="previewKey === 'use-dialog-service-alert'">
+      <GrButton class="justify-self-start" variant="ghost" @click="runAlertDemo">
+        Show alert
+      </GrButton>
+      <p class="text-sm text-[var(--muted-fg)]">
+        {{ dialogStatus }}
+      </p>
     </template>
 
     <template v-else>

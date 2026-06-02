@@ -52,6 +52,34 @@ const open = ref(false)
 </template>`,
   },
   {
+    id: 'confirm-dialog-imperative-service-link',
+    title: 'Imperative service (useDialogService)',
+    description: 'Императивный вызов диалогов (`confirm`/`prompt`/`alert`) из `<script>`/`.ts` без вставки компонента в шаблон вынесен на отдельную страницу composable `useDialogService` — там собраны живые примеры и обработка ошибок сервера.',
+    status: 'ready',
+    previewKey: 'ds-confirm-dialog-service-link',
+    code: `<script setup lang="ts">
+import { useDialogService } from '@feugene/granularity'
+
+const dialog = useDialogService()
+
+async function remove() {
+  const ok = await dialog.confirm('This action cannot be undone.', {
+    title: 'Delete workspace?',
+    confirmText: 'Delete',
+    confirmTone: 'danger',
+  })
+  if (ok) {
+    // ... perform deletion
+  }
+}
+</script>
+
+<template>
+  <button @click="remove">Delete</button>
+</template>`,
+    note: 'Полный набор императивных сценариев (confirm/prompt/alert, async-onConfirm, ошибки сети и валидации) — на странице composable useDialogService.',
+  },
+  {
     id: 'confirm-dialog-custom-body',
     title: 'Custom summary body',
     description: 'Подтверждаем, что в confirm-shell можно выводить richer body через default slot, а не только plain description.',

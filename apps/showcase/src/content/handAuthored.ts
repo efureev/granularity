@@ -154,6 +154,31 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
       },
     ],
   },
+  'composable:useDialogService': {
+    summary: 'Императивный сервис диалогов (в духе `ElMessageBox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают Promise.',
+    group: 'overlays',
+    tags: ['featured'],
+    examples: [
+      {
+        id: 'use-dialog-service-confirm',
+        title: 'Imperative confirm',
+        description: 'Подтверждение destructive-действия из JS без декларативного компонента.',
+        status: 'planned',
+      },
+      {
+        id: 'use-dialog-service-prompt',
+        title: 'Imperative prompt',
+        description: 'Запрос строки с required-валидацией и Promise-результатом.',
+        status: 'planned',
+      },
+      {
+        id: 'use-dialog-service-alert',
+        title: 'Imperative alert',
+        description: 'Информационный диалог с одной кнопкой подтверждения.',
+        status: 'planned',
+      },
+    ],
+  },
   'utility:runFileValidators': {
     summary: 'Главная orchestration utility для пайплайна file validation.',
     group: 'validation',

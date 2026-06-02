@@ -70,4 +70,33 @@ const value = ref('Acme Corp')
   <GrPromptDialog v-model="open" v-model:value="value" title="Billing company" confirm-text="Update" cancel-text="Keep current" />
 </template>`,
   },
+  {
+    id: 'prompt-dialog-imperative-service-link',
+    title: 'Imperative service (useDialogService)',
+    description: 'Нужен `prompt` без декларативного компонента в шаблоне? Императивный `useDialogService().prompt()` возвращает `Promise<string | null>` и собран с живыми примерами на отдельной странице composable.',
+    status: 'ready',
+    previewKey: 'ds-prompt-dialog-service-link',
+    code: `<script setup lang="ts">
+import { useDialogService } from '@feugene/granularity'
+
+const dialog = useDialogService()
+
+async function rename() {
+  const name = await dialog.prompt('Pick a new project name.', {
+    title: 'Rename project',
+    label: 'Project name',
+    required: true,
+    confirmText: 'Save',
+  })
+  if (name !== null) {
+    // ... persist the new name
+  }
+}
+</script>
+
+<template>
+  <button @click="rename">Rename</button>
+</template>`,
+    note: 'Императивный prompt и остальные методы (confirm/alert) описаны на странице composable useDialogService.',
+  },
 ]

@@ -1,4 +1,5 @@
 import {
+  useDialogService,
   useTheme,
   useToast,
 } from '@feugene/granularity'
@@ -35,6 +36,7 @@ const preferredUtilityExportOrder = [
 ] as const
 
 const publicComposableExports = {
+  useDialogService,
   useTheme,
   useToast,
 } as const

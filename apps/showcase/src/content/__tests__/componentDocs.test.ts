@@ -232,11 +232,11 @@ describe('component docs metadata', () => {
     expect(drawerDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(drawerDoc.examples.every(example => example.previewKey?.startsWith('ds-drawer'))).toBe(true)
 
-    expect(confirmDialogDoc.examples).toHaveLength(3)
+    expect(confirmDialogDoc.examples).toHaveLength(4)
     expect(confirmDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(confirmDialogDoc.examples.every(example => example.previewKey?.startsWith('ds-confirm-dialog'))).toBe(true)
 
-    expect(promptDialogDoc.examples).toHaveLength(3)
+    expect(promptDialogDoc.examples).toHaveLength(4)
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('ds-prompt-dialog'))).toBe(true)
 

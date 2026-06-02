@@ -789,6 +789,34 @@
             "default": "\"primary\""
           },
           {
+            "name": "error",
+            "description": "Структура ошибки ответа сервера для показа в теле диалога (через `GrResponseErrorBanner`). Используется императивным `useDialogService` для async-`onConfirm`. `null` — блок скрыт.",
+            "type": "ResponseErrorInfo | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
+            "name": "confirmLoading",
+            "description": "Состояние загрузки кнопки Confirm (async-`onConfirm` in-flight).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "confirmDisabled",
+            "description": "Принудительно дизейблит кнопку Confirm.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "closeOnConfirm",
+            "description": "Закрывать ли диалог автоматически по клику Confirm. По умолчанию `true` (историческое поведение). `false` — отдаёт управление закрытием наружу (нужно `useDialogService`, который ждёт результат async-`onConfirm`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "boolean",
@@ -805,6 +833,11 @@
             "name": "default",
             "description": "",
             "type": "{}"
+          },
+          {
+            "name": "error",
+            "description": "",
+            "type": "{ error: ResponseErrorInfo | null; }"
           },
           {
             "name": "footer",
@@ -1611,10 +1644,10 @@
             "signature": "(event: \"error\", error: unknown): void"
           },
           {
-            "name": "state-change",
+            "name": "stateChange",
             "description": "",
             "type": "[state: GrUploadState]",
-            "signature": "(event: \"state-change\", state: GrUploadState): void"
+            "signature": "(event: \"stateChange\", state: GrUploadState): void"
           },
           {
             "name": "progress",
@@ -3385,6 +3418,34 @@
             "default": "\"primary\""
           },
           {
+            "name": "error",
+            "description": "Структура ошибки ответа сервера для показа общим блоком в теле диалога (через `GrResponseErrorBanner`). `null` — блок скрыт.",
+            "type": "ResponseErrorInfo | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
+            "name": "confirmLoading",
+            "description": "Состояние загрузки кнопки Confirm (async-`onConfirm` in-flight).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "confirmDisabled",
+            "description": "Принудительно дизейблит кнопку Confirm.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "closeOnConfirm",
+            "description": "Закрывать ли диалог автоматически по клику Confirm. По умолчанию `true`. `false` — отдаёт управление закрытием наружу (нужно `useDialogService`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "placeholder",
             "description": "",
             "type": "string | undefined",
@@ -3404,6 +3465,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"Enter a value.\""
+          },
+          {
+            "name": "fieldError",
+            "description": "Внешняя ошибка поля ввода (например, серверная валидация). Имеет приоритет над встроенной проверкой `required`. `null`/`undefined` — нет внешней ошибки.",
+            "type": "string | null | undefined",
+            "required": false,
+            "default": "null"
           },
           {
             "name": "value",
@@ -3428,6 +3496,11 @@
             "name": "default",
             "description": "",
             "type": "{}"
+          },
+          {
+            "name": "error",
+            "description": "",
+            "type": "{ error: ResponseErrorInfo | null; }"
           },
           {
             "name": "footer",

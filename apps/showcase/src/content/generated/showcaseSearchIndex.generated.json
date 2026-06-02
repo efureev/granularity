@@ -272,7 +272,7 @@
     "kindLabel": "Section",
     "context": "Composables",
     "searchableTitle": "composables `usetoast` scenarios",
-    "searchableContent": "composables страницы для `usetheme` и `usetoast` с runnable integration recipes. use-toast `usetoast` scenarios здесь появятся интерактивные примеры push/dismiss/clear и варианты уведомлении . текущии реестр composables уже содержит usetheme и usetoast. очистка очереди и управление жизненным циклом toast-сообщении . пояснения по expected usage и интеграционным паттернам."
+    "searchableContent": "composables страницы для `usetheme` и `usetoast` с runnable integration recipes. use-toast `usetoast` scenarios здесь появятся интерактивные примеры push/dismiss/clear и варианты уведомлении . текущии реестр composables уже содержит usedialogservice и usetheme и usetoast. очистка очереди и управление жизненным циклом toast-сообщении . пояснения по expected usage и интеграционным паттернам."
   },
   {
     "id": "page:composables:section:integration-recipes",
@@ -933,6 +933,17 @@
     "context": "overlays / directive",
     "searchableTitle": "createloading",
     "searchableContent": "createloading createloading helper-api рядом с `vloading`, которыи требует отдельнои демонстрации imperative сценариев. overlays directive /directives/create-loading packages/granularity/src/directives/index.ts @feugene/granularity/directives generated public-api featured directives directives create-loading create loading"
+  },
+  {
+    "id": "entity:composable:useDialogService",
+    "title": "useDialogService",
+    "description": "Императивный сервис диалогов (в духе `ElMessageBox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают Promise.",
+    "href": "/composables/use-dialog-service",
+    "kind": "entity",
+    "kindLabel": "composable",
+    "context": "overlays / composable",
+    "searchableTitle": "usedialogservice",
+    "searchableContent": "usedialogservice usedialogservice императивныи сервис диалогов (в духе `elmessagebox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают promise. overlays composable /composables/use-dialog-service packages/granularity/src/index.ts @feugene/granularity generated public-api featured composables composables use-dialog-service use dialog service"
   },
   {
     "id": "entity:composable:useTheme",
@@ -3606,6 +3617,61 @@
     "context": "createLoading",
     "searchableTitle": "createloading integration notes",
     "searchableContent": "createloading helper-api рядом с `vloading`, которыи требует отдельнои демонстрации imperative сценариев. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
+  },
+  {
+    "id": "entity:composable:useDialogService:section:overview",
+    "title": "useDialogService / Package overview",
+    "description": "Краткий контекст по роли сущности, её месту в пакете и практическому применению.",
+    "href": "/composables/use-dialog-service#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useDialogService",
+    "searchableTitle": "usedialogservice package overview",
+    "searchableContent": "usedialogservice императивныи сервис диалогов (в духе `elmessagebox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают promise. overview package overview краткии контекст по роли сущности, ее месту в пакете и практическому применению. фиксируем, какую задачу решает composable/directive/utility и где она полезна в продукте. показываем hand-authored summary и narrative notes, которых недостаточно в generated metadata. дае м быстрыи вход в api и практические integration patterns без переходов по нескольким страницам."
+  },
+  {
+    "id": "entity:composable:useDialogService:section:examples",
+    "title": "useDialogService / Live examples",
+    "description": "Каждая example-card показывает отдельный integration pattern и остаётся runnable reference.",
+    "href": "/composables/use-dialog-service#examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useDialogService",
+    "searchableTitle": "usedialogservice live examples",
+    "searchableContent": "usedialogservice императивныи сервис диалогов (в духе `elmessagebox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают promise. examples live examples каждая example-card показывает отдельныи integration pattern и остае тся runnable reference. примеры должны объяснять реальныи use-case, а не только синтаксис вызова. preview и snippet рядом позволяют быстро сравнить happy-path и edge cases. плановые сценарии остаются явно отмеченными, чтобы roadmap был виден прямо на detail page."
+  },
+  {
+    "id": "entity:composable:useDialogService:section:api",
+    "title": "useDialogService / API",
+    "description": "Package-level API документируется вручную и фокусируется на параметрах, return shape и error contract.",
+    "href": "/composables/use-dialog-service#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useDialogService",
+    "searchableTitle": "usedialogservice api",
+    "searchableContent": "usedialogservice императивныи сервис диалогов (в духе `elmessagebox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают promise. api api package-level api документируется вручную и фокусируется на параметрах, return shape и error contract. команды видят не только сигнатуру, но и expected data shape для интеграции в feature-code. ошибки, caveats и ограничения держатся рядом с основнои api-таблицеи . структура остае тся совместимои с будущеи генерациеи metadata для package-level сущностеи ."
+  },
+  {
+    "id": "entity:composable:useDialogService:section:usage",
+    "title": "useDialogService / Usage",
+    "description": "Canonical import, практические рекомендации и caveats должны быть доступны в одном месте.",
+    "href": "/composables/use-dialog-service#usage",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useDialogService",
+    "searchableTitle": "usedialogservice usage",
+    "searchableContent": "usedialogservice императивныи сервис диалогов (в духе `elmessagebox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают promise. usage usage canonical import, практические рекомендации и caveats должны быть доступны в одном месте. copy-ready import и usage snippets сокращают время на старт интеграции. caveats показывают, где потребуется дополнительная бизнес-логика или ui-обвязка. этот блок остае тся главным bridge между docs и реальным application code."
+  },
+  {
+    "id": "entity:composable:useDialogService:section:integration",
+    "title": "useDialogService / Integration notes",
+    "description": "Ссылки на исходники, docs и зависимости помогают быстрее разобраться в связанной экосистеме пакета.",
+    "href": "/composables/use-dialog-service#integration",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useDialogService",
+    "searchableTitle": "usedialogservice integration notes",
+    "searchableContent": "usedialogservice императивныи сервис диалогов (в духе `elmessagebox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают promise. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
   },
   {
     "id": "entity:composable:useTheme:section:overview",
