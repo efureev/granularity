@@ -289,7 +289,7 @@ describe('GrFileUpload', () => {
     expect(percents).toContain(25)
     expect(percents).toContain(75)
     expect(percents).toContain(100)
-    expect(wrapper.emitted('state-change')).toBeTruthy()
+    expect(wrapper.emitted('stateChange')).toBeTruthy()
   })
 
   it('scoped-слот progress получает state и текущий процент', async () => {

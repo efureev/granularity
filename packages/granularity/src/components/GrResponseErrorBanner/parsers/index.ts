@@ -10,9 +10,14 @@ export { problemDetailsParser } from './problemDetailsParser'
 export { normalizeError } from './normalizeError'
 
 export {
+  coreResponseErrorParsers,
   createResponseErrorClassifier,
   defaultResponseErrorParsers,
   extendDefaultParsers,
   resolveResponseErrorTitle,
+  responseErrorParserPresets,
 } from './createResponseErrorClassifier'
-export type { CreateResponseErrorClassifierOptions } from './createResponseErrorClassifier'
+export type {
+  CreateResponseErrorClassifierOptions,
+  ResponseErrorParserPresets,
+} from './createResponseErrorClassifier'

@@ -94,7 +94,7 @@ const emit = defineEmits<{
   (e: 'error', error: unknown): void
   (e: 'progress', percent: number, info?: GrUploadProgressInfo): void
   (e: 'change', files: File[]): void
-  (e: 'state-change', state: GrUploadState): void
+  (e: 'stateChange', state: GrUploadState): void
 }>()
 
 const slots = useSlots()
@@ -163,7 +163,7 @@ function assignState(next: GrUploadState) {
   for (const key of Object.keys(state) as (keyof GrUploadState)[])
     delete (state as any)[key]
   Object.assign(state, next)
-  emit('state-change', state as GrUploadState)
+  emit('stateChange', state as GrUploadState)
 }
 
 function setStateIdle() {

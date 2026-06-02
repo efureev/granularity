@@ -36,6 +36,48 @@ export const defaultResponseErrorParsers: ResponseErrorParser[] = [
   plainMessageParser,
 ]
 
+/**
+ * Универсальное «ядро» парсеров — транспортно-независимый набор, безопасный
+ * для любого бэкенда (Laravel / Symfony / Go / …). Не делает формат-специфичных
+ * допущений: разбирает только отмену, сетевые ошибки, HTTP-статус и «плоское»
+ * сообщение из тела. Используется как дефолт в `useDialogService`.
+ *
+ * Порядок: `abort → network → httpStatus → plainMessage`.
+ */
+export const coreResponseErrorParsers: ResponseErrorParser[] = [
+  abortErrorParser,
+  networkErrorParser,
+  httpStatusParser,
+  plainMessageParser,
+]
+
+/**
+ * Именованные пресеты-строительные блоки для удобной композиции цепочки
+ * парсеров без ручного импорта каждого из них.
+ *
+ * - `core` — универсальное ядро (см. `coreResponseErrorParsers`).
+ * - `all` — полная дефолтная цепочка (`defaultResponseErrorParsers`).
+ * - остальные — серверо-специфичные парсеры, подключаемые осознанно.
+ */
+export type ResponseErrorParserPresets = {
+  core: ResponseErrorParser[]
+  all: ResponseErrorParser[]
+  laravel: ResponseErrorParser
+  problemDetails: ResponseErrorParser
+  jsonApi: ResponseErrorParser
+  fileValidation: ResponseErrorParser
+}
+
+/** Объект пресетов, передаётся builder-функции `errorParsers`. */
+export const responseErrorParserPresets: ResponseErrorParserPresets = {
+  core: coreResponseErrorParsers,
+  all: defaultResponseErrorParsers,
+  laravel: laravelValidationParser,
+  problemDetails: problemDetailsParser,
+  jsonApi: jsonApiErrorParser,
+  fileValidation: fileValidationParser,
+}
+
 /** Добавляет пользовательские парсеры в начало дефолтной цепочки. */
 export function extendDefaultParsers(extra: ResponseErrorParser[]): ResponseErrorParser[] {
   return [...extra, ...defaultResponseErrorParsers]

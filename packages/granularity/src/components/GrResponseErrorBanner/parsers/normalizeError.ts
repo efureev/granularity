@@ -20,7 +20,7 @@ import type { NormalizedRawError } from '../responseError.types'
 export async function normalizeError(raw: unknown): Promise<NormalizedRawError> {
   // 1) Уже нормализованный вход (потребитель сам подготовил)
   if (isPlainNormalized(raw)) {
-    return { ...(raw as NormalizedRawError), raw }
+    return { ...(raw), raw }
   }
 
   // 2) `{ response: Response, body }` — уже прочитанное тело
@@ -58,7 +58,7 @@ export async function normalizeError(raw: unknown): Promise<NormalizedRawError> 
 
   // 5) axios error (есть `isAxiosError` или `response`/`request` + `code`)
   if (isAxiosLike(raw)) {
-    const e = raw as AxiosLikeError
+    const e = raw
     const status = e.response?.status
     const code = e.code
     const isAbort = code === 'ERR_CANCELED' || code === 'CANCELED' || (e as { __CANCEL__?: boolean }).__CANCEL__ === true
@@ -119,8 +119,8 @@ function isPlainNormalized(v: unknown): v is NormalizedRawError {
 
 function isResponseEnvelope(v: unknown): v is { response: Response, body: unknown } {
   return !!v && typeof v === 'object'
-      && 'response' in (v as object)
-      && isFetchResponse((v as { response: unknown }).response)
+      && 'response' in (v)
+      && isFetchResponse((v).response)
 }
 
 function isFetchResponse(v: unknown): v is Response {

@@ -5,6 +5,26 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.9.0] 2026-06-02
+
+### Added
+
+- `useDialogService` / `dialogService`: imperative dialog service (Element Plus
+  `ElMessageBox`-style) to open `confirm` / `alert` / `prompt` dialogs from
+  `<script>` / `.ts` without placing a component in the template. Supports
+  async `onConfirm` with loading state, in-dialog server-error rendering via
+  `ctx.setRawError` (reusing `GrResponseErrorBanner` parsers), `AbortSignal`,
+  FIFO queueing and application-context inheritance (i18n / theme / provider).
+- `GrResponseErrorBanner`: `coreResponseErrorParsers` (universal parser core) and
+  `responseErrorParserPresets` for composing parser chains.
+
+### Changed
+
+- `GrConfirmDialog`: added backward-compatible `error`, `confirmLoading`,
+  `confirmDisabled`, `closeOnConfirm` props and an `#error` slot.
+- `GrPromptDialog`: added backward-compatible `error`, `fieldError`,
+  `confirmLoading`, `confirmDisabled`, `closeOnConfirm` props and an `#error` slot.
+
 ## [v0.8.0] 2026-06-01
 
 ### Added

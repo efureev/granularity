@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -192,6 +192,10 @@
     "./components/GrRadioGroup": {
       "types": "./dist/types/src/components/GrRadioGroup/index.d.ts",
       "import": "./dist/components/GrRadioGroup/index.js"
+    },
+    "./components/GrResponseErrorBanner": {
+      "types": "./dist/types/src/components/GrResponseErrorBanner/index.d.ts",
+      "import": "./dist/components/GrResponseErrorBanner/index.js"
     },
     "./components/GrSegmented": {
       "types": "./dist/types/src/components/GrSegmented/index.d.ts",

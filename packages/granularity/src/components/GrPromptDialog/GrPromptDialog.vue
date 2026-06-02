@@ -16,8 +16,10 @@ import GrButton from '../GrButton/GrButton.vue'
 import GrDialog from '../GrDialog/GrDialog.vue'
 import GrFormField from '../GrFormField/GrFormField.vue'
 import GrInput from '../GrInput/GrInput.vue'
+import GrResponseErrorBanner from '../GrResponseErrorBanner/GrResponseErrorBanner.vue'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
+import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 
 export interface GrPromptDialogProps {
   modelValue: boolean
@@ -44,6 +46,25 @@ export interface GrPromptDialogProps {
   confirmVariant?: GrButtonVariant
   confirmTone?: GrButtonTone
   required?: boolean
+  /**
+   * Структура ошибки ответа сервера для показа общим блоком в теле диалога
+   * (через `GrResponseErrorBanner`). `null` — блок скрыт.
+   */
+  error?: ResponseErrorInfo | null
+  /**
+   * Внешняя ошибка поля ввода (например, серверная валидация). Имеет приоритет
+   * над встроенной проверкой `required`. `null`/`undefined` — нет внешней ошибки.
+   */
+  fieldError?: string | null
+  /** Состояние загрузки кнопки Confirm (async-`onConfirm` in-flight). */
+  confirmLoading?: boolean
+  /** Принудительно дизейблит кнопку Confirm. */
+  confirmDisabled?: boolean
+  /**
+   * Закрывать ли диалог автоматически по клику Confirm. По умолчанию `true`.
+   * `false` — отдаёт управление закрытием наружу (нужно `useDialogService`).
+   */
+  closeOnConfirm?: boolean
 }
 
 const props = withDefaults(defineProps<GrPromptDialogProps>(), {
@@ -67,6 +88,11 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   confirmVariant: 'primary',
   confirmTone: 'primary',
   required: true,
+  error: null,
+  fieldError: null,
+  confirmLoading: false,
+  confirmDisabled: false,
+  closeOnConfirm: true,
 })
 
 const emit = defineEmits<{
@@ -101,13 +127,16 @@ const canConfirm = computed(() => {
   return valueModel.value.trim().length > 0
 })
 
-const error = computed(() => {
+const validationError = computed(() => {
   if (!props.required) return undefined
   if (!touched.value) return undefined
   return valueModel.value.trim().length > 0
     ? undefined
     : props.requiredErrorText
 })
+
+// Внешняя ошибка поля (серверная валидация) имеет приоритет над встроенной.
+const fieldErrorMessage = computed(() => props.fieldError ?? validationError.value ?? undefined)
 
 function onCancel(): void {
   emit('cancel')
@@ -122,7 +151,8 @@ function onConfirm(): void {
   }
 
   emit('confirm', valueModel.value)
-  emit('update:modelValue', false)
+  if (props.closeOnConfirm)
+    emit('update:modelValue', false)
 }
 </script>
 
@@ -147,17 +177,21 @@ function onConfirm(): void {
         </div>
       </slot>
 
-      <GrFormField :label="label" :error="error" for-id="ds-prompt-input">
+      <GrFormField :label="label" :error="fieldErrorMessage" for-id="ds-prompt-input">
         <GrInput
           id="ds-prompt-input"
           ref="inputRef"
           v-model="valueModel"
           data-testid="ds-prompt-input"
           :placeholder="placeholder"
-          :invalid="!!error"
+          :invalid="!!fieldErrorMessage"
           @blur="touched = true"
         />
       </GrFormField>
+
+      <slot name="error" :error="error">
+        <GrResponseErrorBanner v-if="error" :error="error" :can-dismiss="false" />
+      </slot>
     </div>
 
     <template #footer>
@@ -171,7 +205,8 @@ function onConfirm(): void {
             :variant="confirmVariant"
             :tone="confirmTone"
             :size="buttonSize"
-            :disabled="required && touched && !canConfirm"
+            :loading="confirmLoading"
+            :disabled="confirmDisabled || (required && touched && !canConfirm)"
             @click="onConfirm"
           >
             {{ confirmText }}

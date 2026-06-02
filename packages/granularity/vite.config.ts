@@ -151,6 +151,9 @@ export default defineConfig({
         'components/GrRadioGroup/index': fileURLToPath(
           new URL('./src/components/GrRadioGroup/index.ts', import.meta.url),
         ),
+        'components/GrResponseErrorBanner/index': fileURLToPath(
+          new URL('./src/components/GrResponseErrorBanner/index.ts', import.meta.url),
+        ),
         'components/GrSegmented/index': fileURLToPath(
           new URL('./src/components/GrSegmented/index.ts', import.meta.url),
         ),

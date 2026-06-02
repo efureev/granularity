@@ -13,8 +13,10 @@ import { computed } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrDialog from '../GrDialog/GrDialog.vue'
+import GrResponseErrorBanner from '../GrResponseErrorBanner/GrResponseErrorBanner.vue'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
+import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 
 export interface GrConfirmDialogProps {
   modelValue: boolean
@@ -35,6 +37,22 @@ export interface GrConfirmDialogProps {
   cancelText?: string
   confirmVariant?: GrButtonVariant
   confirmTone?: GrButtonTone
+  /**
+   * Структура ошибки ответа сервера для показа в теле диалога
+   * (через `GrResponseErrorBanner`). Используется императивным
+   * `useDialogService` для async-`onConfirm`. `null` — блок скрыт.
+   */
+  error?: ResponseErrorInfo | null
+  /** Состояние загрузки кнопки Confirm (async-`onConfirm` in-flight). */
+  confirmLoading?: boolean
+  /** Принудительно дизейблит кнопку Confirm. */
+  confirmDisabled?: boolean
+  /**
+   * Закрывать ли диалог автоматически по клику Confirm. По умолчанию `true`
+   * (историческое поведение). `false` — отдаёт управление закрытием наружу
+   * (нужно `useDialogService`, который ждёт результат async-`onConfirm`).
+   */
+  closeOnConfirm?: boolean
 }
 
 const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
@@ -54,6 +72,10 @@ const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
   cancelText: 'Cancel',
   confirmVariant: 'primary',
   confirmTone: 'primary',
+  error: null,
+  confirmLoading: false,
+  confirmDisabled: false,
+  closeOnConfirm: true,
 })
 
 const emit = defineEmits<{
@@ -74,7 +96,8 @@ function onCancel(): void {
 
 function onConfirm(): void {
   emit('confirm')
-  emit('update:modelValue', false)
+  if (props.closeOnConfirm)
+    emit('update:modelValue', false)
 }
 </script>
 
@@ -92,11 +115,17 @@ function onConfirm(): void {
     :body-config="bodyConfig"
     :close-label="closeLabel"
   >
-    <slot>
-      <div v-if="description" class="text-[14px] text-[var(--muted-fg)]">
-        {{ description }}
-      </div>
-    </slot>
+    <div class="grid gap-4">
+      <slot>
+        <div v-if="description" class="text-[14px] text-[var(--muted-fg)]">
+          {{ description }}
+        </div>
+      </slot>
+
+      <slot name="error" :error="error">
+        <GrResponseErrorBanner v-if="error" :error="error" :can-dismiss="false" />
+      </slot>
+    </div>
 
     <template #footer>
       <slot name="footer">
@@ -109,6 +138,8 @@ function onConfirm(): void {
             :variant="confirmVariant"
             :tone="confirmTone"
             :size="buttonSize"
+            :loading="confirmLoading"
+            :disabled="confirmDisabled"
             @click="onConfirm"
           >
             {{ confirmText }}
