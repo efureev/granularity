@@ -213,7 +213,7 @@ let networkAttempt = 0
 
 async function runNetworkDemo() {
   networkAttempt = 0
-  networkStatus.value = 'Dialog открыт. Жмите «Send invite», чтобы пройти сценарии loading → validation → network → success.'
+  networkStatus.value = 'Dialog открыт. Жмите «Send invite», чтобы пройти сценарии loading -> validation -> network -> success.'
 
   const email = await dialog.prompt('Send an invite to a teammate.', {
     title: 'Invite teammate',
@@ -244,7 +244,7 @@ async function runNetworkDemo() {
       }
 
       if (networkAttempt === 2) {
-        // Обрыв сети: throw автоматически прогоняется через парсеры → kind: "network".
+        // Обрыв сети: throw автоматически прогоняется через парсеры -> kind: "network".
         throw new TypeError('Failed to fetch')
       }
 

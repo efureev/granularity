@@ -244,7 +244,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
           '      }',
           '',
           '      if (attempt === 2) {',
-          '        // Обрыв сети: throw автоматически прогоняется через парсеры → kind: "network".',
+          '        // Обрыв сети: throw автоматически прогоняется через парсеры -> kind: "network".',
           "        throw new TypeError('Failed to fetch')",
           '      }',
           '',
@@ -256,7 +256,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
           '  }',
           '}',
         ].join('\n'),
-        note: 'Возврат `false` или `throw`/reject оставляет диалог открытым с показанной ошибкой; `setRawError` сам различает валидацию (422 → warning + поле) и сетевой сбой (network → danger-баннер).',
+        note: 'Возврат `false` или `throw`/reject оставляет диалог открытым с показанной ошибкой; `setRawError` сам различает валидацию (422 -> warning + поле) и сетевой сбой (network -> danger-баннер).',
       },
     ]),
     apiSections: [
