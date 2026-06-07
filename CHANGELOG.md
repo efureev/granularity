@@ -5,6 +5,16 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.9.1] 2026-06-07
+
+### Fixed
+
+- `GrModal`: Esc now closes the topmost (last-opened) modal/dialog instead of
+  the bottom one. Added a shared `grModalEscStack` (single capture-phase
+  `window` listener) that pre-empts HeadlessUI's per-`Dialog` Escape handler,
+  so Esc targets the top window even when a `useDialogService` dialog is opened
+  over a `GrModal` (separate render tree).
+
 ## [v0.9.0] 2026-06-02
 
 ### Added
