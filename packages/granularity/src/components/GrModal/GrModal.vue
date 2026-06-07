@@ -11,12 +11,18 @@
  *   `DialogTitle` / `DialogDescription` (связь через `aria-labelledby` /
  *   `aria-describedby` ставится HeadlessUI автоматически).
  *
- * Esc обрабатывается штатно через событие `@close` у HeadlessUI `<Dialog>`,
- * чтобы не конфликтовать с его внутренней логикой. Источник закрытия
- * различается через ref `closeReasonRef`.
+ * Esc обрабатывается через общий стек открытых модалок (`grModalEscStack`):
+ * единый capture-обработчик на `window` закрывает только верхнюю (последнюю
+ * открытую) модалку и опережает window-обработчик Escape HeadlessUI. Это
+ * чинит кейс, когда поверх `GrModal` открыт диалог `useDialogService` (другое
+ * дерево рендера): Esc закрывает именно верхний диалог, а не нижнее окно.
+ * Клик по оверлею (backdrop) по-прежнему идёт через `@close` HeadlessUI;
+ * источник закрытия различается через ref `closeReason`.
  */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+
+import { pushGrModalEsc, removeGrModalEsc } from './grModalEscStack'
 
 import {
   type GrModalSize,
@@ -78,6 +84,25 @@ function onRootKeydown(event: KeyboardEvent): void {
   if (event.key === 'Escape') closeReason.value = 'esc'
 }
 
+// ————— Esc-стек: гарантирует, что Esc закрывает именно верхнюю (последнюю
+// открытую) модалку, даже если окна живут в разных деревьях рендера
+// (например, диалоги `useDialogService` поверх `GrModal`).
+let escEntryId: number | null = null
+
+function registerEsc(): void {
+  if (escEntryId !== null) return
+  escEntryId = pushGrModalEsc({
+    shouldClose: () => props.closeOnEsc,
+    close,
+  })
+}
+
+function unregisterEsc(): void {
+  if (escEntryId === null) return
+  removeGrModalEsc(escEntryId)
+  escEntryId = null
+}
+
 function onOverlayPointerDown(): void {
   closeReason.value = 'backdrop'
 }
@@ -104,13 +129,22 @@ function unlockBodyScroll(): void {
 watch(
   () => props.modelValue,
   (value) => {
-    if (value) lockBodyScroll()
-    else unlockBodyScroll()
+    if (value) {
+      lockBodyScroll()
+      registerEsc()
+    }
+    else {
+      unlockBodyScroll()
+      unregisterEsc()
+    }
   },
   { immediate: true },
 )
 
-onBeforeUnmount(unlockBodyScroll)
+onBeforeUnmount(() => {
+  unlockBodyScroll()
+  unregisterEsc()
+})
 
 </script>
 
