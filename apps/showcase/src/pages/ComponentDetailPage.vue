@@ -127,6 +127,7 @@ const previewRegistry = {
   'ds-loading-inline-overlay': defineAsyncComponent(() => import('../demos/components/ds-loading/GrLoadingInlineDemo.vue')),
   'ds-modal-backdrop-guard': defineAsyncComponent(() => import('../demos/components/ds-modal/GrModalBackdropGuardDemo.vue')),
   'ds-modal-basic-flow': defineAsyncComponent(() => import('../demos/components/ds-modal/GrModalBasicFlowDemo.vue')),
+  'ds-modal-dialog-service': defineAsyncComponent(() => import('../demos/components/ds-modal/GrModalDialogServiceDemo.vue')),
   'ds-modal-size-switcher': defineAsyncComponent(() => import('../demos/components/ds-modal/GrModalSizeSwitcherDemo.vue')),
   'ds-navbar-actions-slot': defineAsyncComponent(() => import('../demos/components/ds-navbar/GrNavbarActionsDemo.vue')),
   'ds-navbar-menu-toggle': defineAsyncComponent(() => import('../demos/components/ds-navbar/GrNavbarMenuToggleDemo.vue')),

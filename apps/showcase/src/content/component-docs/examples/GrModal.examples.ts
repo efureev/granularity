@@ -121,4 +121,80 @@ function openWithSize(size: 'sm' | 'lg') {
   </GrModal>
 </template>`,
   },
+  {
+    id: 'modal-dialog-service',
+    title: 'Imperative dialogs from an open modal',
+    description: 'Запускаем `useDialogService` (`confirm` / `alert` / `prompt`) прямо из открытой `GrModal`. Сервис монтирует собственный host в `document.body` поверх окна, поэтому закрытие диалога не закрывает исходную модалку — решение возвращается через `Promise`.',
+    status: 'ready',
+    previewKey: 'ds-modal-dialog-service',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrButton, GrModal, useDialogService } from '@feugene/granularity'
+
+const dialog = useDialogService()
+
+const open = ref(false)
+const result = ref('')
+
+// confirm → Promise<boolean>. Открытая модалка остаётся на месте.
+async function confirmFromModal() {
+  const ok = await dialog.confirm('Удалить выбранный черновик безвозвратно?', {
+    title: 'Удалить черновик?',
+    confirmText: 'Удалить',
+    confirmTone: 'danger',
+  })
+  result.value = ok ? 'confirm: подтверждено' : 'confirm: отменено'
+}
+
+// alert → Promise<void>.
+async function alertFromModal() {
+  await dialog.alert('Изменения сохранены в фоне.', { title: 'Готово' })
+  result.value = 'alert: закрыт'
+}
+
+// prompt → Promise<string | null>.
+async function promptFromModal() {
+  const name = await dialog.prompt('Введите новое имя пресета', {
+    title: 'Переименовать пресет',
+    label: 'Имя пресета',
+    value: 'Draft preset',
+    required: true,
+  })
+  result.value = name === null ? 'prompt: отменён' : 'prompt: ' + name
+}
+</script>
+
+<template>
+  <GrButton @click="open = true">
+    Open settings modal
+  </GrButton>
+
+  <GrModal v-model="open" :close-on-backdrop="false" size="md">
+    <div class="grid gap-4">
+      <div class="text-sm font-semibold">
+        Workspace settings
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <GrButton variant="primary" tone="danger" @click="confirmFromModal">
+          confirm
+        </GrButton>
+        <GrButton variant="outline" @click="alertFromModal">
+          alert
+        </GrButton>
+        <GrButton variant="outline" @click="promptFromModal">
+          prompt
+        </GrButton>
+      </div>
+      <div class="text-sm text-[var(--muted-fg)]">
+        {{ result || 'Вызовите любой диалог — окно останется открытым.' }}
+      </div>
+      <GrButton variant="outline" class="justify-self-start" @click="open = false">
+        Close modal
+      </GrButton>
+    </div>
+  </GrModal>
+</template>`,
+    note: 'Закрытие confirm/alert/prompt не закрывает исходную модалку — это удобно для подтверждений и быстрых вводов внутри сложных форм.',
+  },
 ]

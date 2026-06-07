@@ -56,7 +56,7 @@ describe('component docs metadata', () => {
     const dropdownDoc = getShowcaseComponentDoc(dropdownEntity!)
     const dataTableDoc = getShowcaseComponentDoc(dataTableEntity!)
 
-    expect(modalDoc.examples).toHaveLength(3)
+    expect(modalDoc.examples).toHaveLength(4)
     expect(modalDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(modalDoc.examples.every(example => example.previewKey?.startsWith('ds-modal'))).toBe(true)
 
