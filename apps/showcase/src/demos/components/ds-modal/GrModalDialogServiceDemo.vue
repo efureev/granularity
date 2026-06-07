@@ -12,7 +12,7 @@ function pushLog(message: string): void {
   log.value = [message, ...log.value].slice(0, 5)
 }
 
-// confirm → Promise<boolean>. Открытая модалка остаётся на месте: сервис
+// confirm -> Promise<boolean>. Открытая модалка остаётся на месте: сервис
 // монтирует свой host в document.body поверх неё.
 async function confirmFromModal(): Promise<void> {
   const ok = await dialog.confirm('Удалить выбранный черновик безвозвратно?', {
@@ -21,19 +21,19 @@ async function confirmFromModal(): Promise<void> {
     confirmTone: 'danger',
     cancelText: 'Отмена',
   })
-  pushLog(`confirm → ${ok ? 'подтверждено' : 'отменено'} (модалка не закрыта)`)
+  pushLog(`confirm -> ${ok ? 'подтверждено' : 'отменено'} (модалка не закрыта)`)
 }
 
-// alert → Promise<void>. Одна кнопка, разрешается при закрытии.
+// alert -> Promise<void>. Одна кнопка, разрешается при закрытии.
 async function alertFromModal(): Promise<void> {
   await dialog.alert('Изменения сохранены в фоне. Окно настроек осталось открытым.', {
     title: 'Готово',
     confirmText: 'Понятно',
   })
-  pushLog('alert → закрыт (модалка не закрыта)')
+  pushLog('alert -> закрыт (модалка не закрыта)')
 }
 
-// prompt → Promise<string | null>. Возвращает введённую строку или null.
+// prompt -> Promise<string | null>. Возвращает введённую строку или null.
 async function promptFromModal(): Promise<void> {
   const name = await dialog.prompt('Введите новое имя пресета', {
     title: 'Переименовать пресет',
@@ -44,7 +44,7 @@ async function promptFromModal(): Promise<void> {
     cancelText: 'Отмена',
     required: true,
   })
-  pushLog(name === null ? 'prompt → отменён' : `prompt → "${name}"`)
+  pushLog(name === null ? 'prompt -> отменён' : `prompt -> "${name}"`)
 }
 </script>
 

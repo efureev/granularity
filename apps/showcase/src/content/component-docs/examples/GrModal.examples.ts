@@ -137,7 +137,7 @@ const dialog = useDialogService()
 const open = ref(false)
 const result = ref('')
 
-// confirm → Promise<boolean>. Открытая модалка остаётся на месте.
+// confirm -> Promise<boolean>. Открытая модалка остаётся на месте.
 async function confirmFromModal() {
   const ok = await dialog.confirm('Удалить выбранный черновик безвозвратно?', {
     title: 'Удалить черновик?',
@@ -147,13 +147,13 @@ async function confirmFromModal() {
   result.value = ok ? 'confirm: подтверждено' : 'confirm: отменено'
 }
 
-// alert → Promise<void>.
+// alert -> Promise<void>.
 async function alertFromModal() {
   await dialog.alert('Изменения сохранены в фоне.', { title: 'Готово' })
   result.value = 'alert: закрыт'
 }
 
-// prompt → Promise<string | null>.
+// prompt -> Promise<string | null>.
 async function promptFromModal() {
   const name = await dialog.prompt('Введите новое имя пресета', {
     title: 'Переименовать пресет',
