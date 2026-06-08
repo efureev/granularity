@@ -2,8 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import {
-  playground5ContentIncludes,
+import playground5UnoConfigDefault, {
   playground5GranularityLayer,
 } from '../../uno.config'
 import {
@@ -11,6 +10,19 @@ import {
   playground5ResetChunkGroup,
   playground5VueChunkGroup,
 } from '../../vite.config'
+
+// `granularContent(options)` возвращает `{ filesystem, pipeline: { include } }`.
+// Раскрываем эту структуру из дефолтного экспорта конфига.
+const playground5Content = (playground5UnoConfigDefault as {
+  content: { filesystem: string[]; pipeline: { include: RegExp[] } }
+}).content
+const playground5ContentIncludes = playground5Content.pipeline.include
+
+// Директория выбранного компонента (`GrButton`) в собранном `dist/`,
+// вычисленная из filesystem-glob'а (реальный абсолютный путь).
+const playground5GrButtonDir = playground5Content.filesystem[0].replace(/\/\*\*.*$/, '')
+const playground5GrButtonFile = `${playground5GrButtonDir}/index.js`
+const playground5GrModalFile = `${playground5GrButtonDir.replace(/GrButton$/, 'GrModal')}/index.js`
 
 const playground5MainEntry = readFileSync(
   fileURLToPath(new URL('../main.ts', import.meta.url)),
@@ -60,8 +72,15 @@ describe('playground-5 config', () => {
     expect(playground5UnoConfig).toContain('granularContent(granularOptions)')
     expect(playground5UnoConfig).toContain('layer: playground5GranularityLayer')
     expect(playground5GranularityLayer).toBe('granular')
+    // Шаблоны исходников приложения (`.vue`) подхватываются стандартным фильтром.
     expect(playground5ContentIncludes.some(re => re.test('/repo/apps/playground-5/src/App.vue'))).toBe(true)
-    expect(playground5ContentIncludes.some(re => re.test('/repo/apps/playground-6/src/App.vue'))).toBe(false)
+    // filesystem и таргетированный include нацелены строго на выбранный компонент
+    // (`GrButton`) в `dist/`, не затрагивая невыбранные компоненты и артефакты.
+    expect(
+      playground5Content.filesystem.some(glob => /packages\/granularity\/dist\/components\/GrButton\//.test(glob)),
+    ).toBe(true)
+    expect(playground5ContentIncludes.some(re => re.test(playground5GrButtonFile))).toBe(true)
+    expect(playground5ContentIncludes.some(re => re.test(playground5GrModalFile))).toBe(false)
     expect(playground5MainEntry).toContain('await Promise.all([')
     expect(playground5MainEntry).toContain("import('./reset')")
     expect(playground5MainEntry).toContain("import('./granularity')")

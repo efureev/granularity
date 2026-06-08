@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { distPlaygroundContentIncludes } from '../../uno.config'
+import distPlaygroundUnoConfigDefault from '../../uno.config'
 import {
   playgroundBuildAnalyzeMode,
   playgroundBuildVisualizerConfig,
@@ -13,6 +13,21 @@ import {
   playgroundGranularityEntry,
   playgroundVueChunkGroup,
 } from '../../vite.config'
+
+// `granularContent(options)` возвращает `{ filesystem, pipeline: { include } }`.
+// Раскрываем эту структуру из дефолтного экспорта конфига, чтобы проверить,
+// какие исходники реально сканирует playground.
+const distPlaygroundContent = (distPlaygroundUnoConfigDefault as {
+  content: { filesystem: string[]; pipeline: { include: RegExp[] } }
+}).content
+const distPlaygroundContentIncludes = distPlaygroundContent.pipeline.include
+
+// Директория выбранного компонента (`GrButton`) в собранном `dist/` —
+// вычисляем из filesystem-glob'а, чтобы проверки опирались на реальный
+// абсолютный путь, а не на хардкод.
+const distPlaygroundGrButtonDir = distPlaygroundContent.filesystem[0].replace(/\/\*\*.*$/, '')
+const distPlaygroundGrButtonFile = `${distPlaygroundGrButtonDir}/index.js`
+const distPlaygroundGrModalFile = `${distPlaygroundGrButtonDir.replace(/GrButton$/, 'GrModal')}/index.js`
 
 const distPlaygroundPackageJson = readFileSync(
   fileURLToPath(new URL('../../package.json', import.meta.url)),
@@ -61,9 +76,20 @@ describe('playground config', () => {
     })
   })
 
-  it('сканирует только isolated исходники playground и не подхватывает dist артефакты', () => {
-    expect(distPlaygroundContentIncludes.some(re => re.test('/repo/apps/playground/src/main.ts'))).toBe(true)
-    expect(distPlaygroundContentIncludes.some(re => re.test('/repo/apps/other-playground/src/App.vue'))).toBe(false)
+  it('сканирует исходники приложения и только выбранные dist-компоненты granularity, не подхватывая лишние артефакты', () => {
+    // filesystem нацелен строго на выбранный компонент (`GrButton`) в `dist/`,
+    // а не на произвольные dist-артефакты.
+    expect(
+      distPlaygroundContent.filesystem.some(glob => /packages\/granularity\/dist\/components\/GrButton\//.test(glob)),
+    ).toBe(true)
+
+    // Шаблоны исходников приложения (`.vue`) подхватываются стандартным фильтром.
+    expect(distPlaygroundContentIncludes.some(re => re.test('/repo/apps/playground/src/App.vue'))).toBe(true)
+
+    // Таргетированный include разрешает только директорию выбранного компонента,
+    // не затрагивая невыбранные компоненты и произвольные dist-артефакты.
+    expect(distPlaygroundContentIncludes.some(re => re.test(distPlaygroundGrButtonFile))).toBe(true)
+    expect(distPlaygroundContentIncludes.some(re => re.test(distPlaygroundGrModalFile))).toBe(false)
     expect(distPlaygroundContentIncludes.some(re => re.test('/repo/dist/index.js'))).toBe(false)
   })
 
@@ -91,7 +117,7 @@ describe('playground config', () => {
     expect(distPlaygroundUnoConfig).toContain('presetGranularNode(granularOptions)')
     expect(distPlaygroundUnoConfig).toContain('granularContent(granularOptions)')
     expect(distPlaygroundUnoConfig).toContain('providers: [granularityProvider]')
-    expect(distPlaygroundUnoConfig).toContain("{ provider: '@feugene/granularity', names: [...granularPresetComponents] }")
+    expect(distPlaygroundUnoConfig).toContain("{provider: '@feugene/granularity', names: [...granularPresetComponents]}")
     expect(distPlaygroundUnoConfig).toContain('tokensFile: granularPresetThemeFiles[0]')
   })
 })
