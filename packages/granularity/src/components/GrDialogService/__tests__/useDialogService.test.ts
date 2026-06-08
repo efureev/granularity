@@ -8,6 +8,7 @@ vi.mock('@headlessui/vue', async () => {
     Dialog: defineComponent({
       name: 'Dialog',
       emits: ['close'],
+      props: { initialFocus: { type: Object, default: null } },
       template: '<div data-testid="hu-dialog"><slot /></div>',
     }),
     DialogPanel: defineComponent({

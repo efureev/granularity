@@ -23,6 +23,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { pushGrModalEsc, removeGrModalEsc } from './grModalEscStack'
+import { pushGrModalTop, removeGrModalTop } from './grModalTopStack'
 
 import {
   type GrModalSize,
@@ -53,6 +54,23 @@ const emit = defineEmits<{
 }>()
 
 const panelClass = computed(() => getGrModalPanelClass(props.size))
+
+// Ссылка на панель используется как `initialFocus` для HeadlessUI `<Dialog>`:
+// панель имеет `tabindex="-1"`, поэтому всегда фокусируема программно. Это
+// убирает предупреждение «There are no focusable elements inside the
+// <FocusTrap />», которое HeadlessUI выводит, когда не находит фокусируемого
+// элемента (в т.ч. когда контент окна временно помечен `inert`).
+const panelRef = ref<HTMLElement | null>(null)
+
+// Является ли это окно верхним (последним открытым) в общем стеке модалок.
+// Когда поверх открыт другой `GrModal`/диалог сервиса, окно перестаёт быть
+// верхним и помечается `inert`, чтобы не «воровать» фокус у верхнего окна.
+const isTopmost = ref(true)
+
+// `inert` ставится только на нижние (не верхние) открытые окна. Inert-поддерево
+// не интерактивно и не фокусируемо, поэтому FocusLock нижнего `<Dialog>`
+// перестаёт возвращать фокус себе — верхний диалог удерживает фокус сам.
+const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : undefined))
 
 // SSR-guard: на сервере `document.body` недоступен — отключаем teleport,
 // а в клиенте включаем после маунта.
@@ -88,6 +106,7 @@ function onRootKeydown(event: KeyboardEvent): void {
 // открытую) модалку, даже если окна живут в разных деревьях рендера
 // (например, диалоги `useDialogService` поверх `GrModal`).
 let escEntryId: number | null = null
+let topEntryId: number | null = null
 
 function registerEsc(): void {
   if (escEntryId !== null) return
@@ -101,6 +120,20 @@ function unregisterEsc(): void {
   if (escEntryId === null) return
   removeGrModalEsc(escEntryId)
   escEntryId = null
+}
+
+function registerTop(): void {
+  if (topEntryId !== null) return
+  topEntryId = pushGrModalTop({
+    setTopmost: (value) => { isTopmost.value = value },
+  })
+}
+
+function unregisterTop(): void {
+  if (topEntryId === null) return
+  removeGrModalTop(topEntryId)
+  topEntryId = null
+  isTopmost.value = true
 }
 
 function onOverlayPointerDown(): void {
@@ -132,10 +165,12 @@ watch(
     if (value) {
       lockBodyScroll()
       registerEsc()
+      registerTop()
     }
     else {
       unlockBodyScroll()
       unregisterEsc()
+      unregisterTop()
     }
   },
   { immediate: true },
@@ -144,6 +179,7 @@ watch(
 onBeforeUnmount(() => {
   unlockBodyScroll()
   unregisterEsc()
+  unregisterTop()
 })
 
 </script>
@@ -154,6 +190,8 @@ onBeforeUnmount(() => {
       <Dialog
         as="div"
         :class="rootClass"
+        :initial-focus="panelRef"
+        :inert="inertAttr"
         @close="onDialogClose"
         @keydown.capture="onRootKeydown"
       >
@@ -186,6 +224,7 @@ onBeforeUnmount(() => {
               :leave-to="panelTransition.leaveTo"
             >
               <DialogPanel
+                ref="panelRef"
                 data-ds-modal-panel
                 tabindex="-1"
                 :class="panelClass"

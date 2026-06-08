@@ -11,7 +11,10 @@ vi.mock('@headlessui/vue', async () => {
     Dialog: defineComponent({
       name: 'Dialog',
       emits: ['close'],
-      props: { as: { type: String, default: 'div' } },
+      props: {
+        as: { type: String, default: 'div' },
+        initialFocus: { type: Object, default: null },
+      },
       setup(_, { emit }) {
         function onKeydown(event: KeyboardEvent) {
           if (event.key === 'Escape') emit('close')

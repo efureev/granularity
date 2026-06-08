@@ -5,6 +5,21 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.9.2] 2026-06-08
+
+### Fixed
+
+- `GrModal`: fixed focus handling when a dialog is opened over an already open
+  modal in a separate render tree (e.g. `useDialogService` dialogs over a
+  `GrModal`). HeadlessUI's per-`Dialog` focus trap is tree-scoped, so the lower
+  modal kept its `FocusLock` and "stole" focus back — making it impossible to
+  focus inputs (e.g. the `prompt` field) in the top dialog. Added a shared
+  `grModalTopStack`: only the topmost (last-opened) modal keeps focus, lower
+  modals are marked `inert`.
+- `GrModal`: removed the HeadlessUI warning "There are no focusable elements
+  inside the `<FocusTrap />`" by passing the panel (with `tabindex="-1"`) as the
+  dialog's `initialFocus`.
+
 ## [v0.9.1] 2026-06-07
 
 ### Fixed
