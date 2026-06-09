@@ -2068,6 +2068,13 @@
             "default": "true"
           },
           {
+            "name": "wheelZoom",
+            "description": "Включает масштабирование колесом мыши / жестом на трекпаде. По умолчанию включено.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "prevLabel",
             "description": "i18n: aria-label кнопки «предыдущее изображение».",
             "type": "string | undefined",

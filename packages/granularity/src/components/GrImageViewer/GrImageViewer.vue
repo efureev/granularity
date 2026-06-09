@@ -25,6 +25,8 @@ const props = withDefaults(
     closeOnPressEscape?: boolean
     showProgress?: boolean
     showZoomValue?: boolean
+    /** Включает масштабирование колесом мыши / жестом на трекпаде. По умолчанию включено. */
+    wheelZoom?: boolean
     zIndex?: number
     /** i18n: aria-label кнопки закрытия. */
     closeLabel?: string
@@ -54,6 +56,7 @@ const props = withDefaults(
     closeOnPressEscape: true,
     showProgress: false,
     showZoomValue: true,
+    wheelZoom: true,
     zIndex: undefined,
     closeLabel: 'Close image viewer',
     prevLabel: 'Previous image',
@@ -106,6 +109,11 @@ type GrImageViewerSlotProps = {
 
 const DEFAULT_Z_INDEX = 2000
 const TRAILING_ZERO_DECIMAL_RE = /\.0$/
+// Чувствительность масштабирования колесом/трекпадом: чем больше — тем резче реакция.
+const WHEEL_ZOOM_SENSITIVITY = 0.0015
+// Сколько ms простоя после последнего wheel-события считаем «зум завершён»
+// (после этого возвращаем плавный CSS-переход).
+const WHEEL_IDLE_MS = 120
 
 const open = computed(() => props.modelValue)
 const total = computed(() => props.urlList.length)
@@ -118,6 +126,15 @@ const offsetX = ref(0)
 const offsetY = ref(0)
 
 const imageEl = ref<HTMLImageElement | null>(null)
+
+// Флаг активного зума колесом/трекпадом. Пока true — CSS-переход отключён,
+// чтобы непрерывное масштабирование не «наслаивалось» и не дёргалось.
+const isWheelZooming = ref(false)
+
+// Накопленный deltaY между кадрами и id запланированного rAF.
+let pendingWheelDelta = 0
+let wheelFrameId: number | null = null
+let wheelIdleTimer: ReturnType<typeof setTimeout> | null = null
 
 // Натуральный (исходный) размер картинки, читается из `<img>` при загрузке.
 const naturalWidth = ref(0)
@@ -152,6 +169,12 @@ const viewerStyle = computed(() => ({
 const imageStyle = computed(() => ({
   transform: `translate3d(${offsetX.value}px, ${offsetY.value}px, 0) scale(${scale.value}) rotate(${rotation.value}deg)`,
 }))
+
+// Плавный CSS-переход transform только для дискретных зумов (кнопки/клавиши).
+// При непрерывном зуме колесом переход отключаем — иначе картинка «дёргается» и наслаивается.
+const imageTransitionClass = computed(() =>
+  isWheelZooming.value ? '' : 'transition-transform duration-150 ease-out',
+)
 
 function formatPercent(value: number): string {
   if (Number.isInteger(value)) {
@@ -274,6 +297,7 @@ function setIndex(nextIndex: number, options?: { emitSwitch?: boolean }): void {
   currentIndex.value = normalizedIndex
   resetTransform()
   resetImageMetrics()
+  endWheelZoom()
 
   if (options?.emitSwitch !== false) {
     emit('switch', normalizedIndex)
@@ -289,6 +313,7 @@ function syncIndexFromInitial(): void {
   currentIndex.value = normalizeIndex(props.initialIndex)
   resetTransform()
   resetImageMetrics()
+  endWheelZoom()
 }
 
 function preloadAt(index: number): void {
@@ -316,12 +341,84 @@ function next(): void {
   setIndex(currentIndex.value + 1)
 }
 
+function setScale(value: number): void {
+  const clamped = Math.min(props.maxScale, Math.max(props.minScale, value))
+
+  scale.value = Number(clamped.toFixed(4))
+}
+
 function zoomIn(): void {
-  scale.value = Math.min(props.maxScale, Number((scale.value * props.zoomRate).toFixed(4)))
+  setScale(scale.value * props.zoomRate)
 }
 
 function zoomOut(): void {
-  scale.value = Math.max(props.minScale, Number((scale.value / props.zoomRate).toFixed(4)))
+  setScale(scale.value / props.zoomRate)
+}
+
+function cancelWheelFrame(): void {
+  if (wheelFrameId !== null) {
+    cancelAnimationFrame(wheelFrameId)
+    wheelFrameId = null
+  }
+}
+
+function endWheelZoom(): void {
+  if (wheelIdleTimer !== null) {
+    clearTimeout(wheelIdleTimer)
+    wheelIdleTimer = null
+  }
+
+  isWheelZooming.value = false
+  pendingWheelDelta = 0
+  cancelWheelFrame()
+}
+
+// Применяем накопленный за кадр deltaY одним обновлением scale — так рендер
+// происходит не чаще одного раза в кадр (без «дёрганья» от частых обновлений).
+function flushWheelZoom(): void {
+  wheelFrameId = null
+
+  const delta = pendingWheelDelta
+  pendingWheelDelta = 0
+
+  if (!delta) {
+    return
+  }
+
+  // Экспоненциальный шаг — плавно и одинаково ощущается и для колеса, и для трекпада.
+  // delta < 0 (от себя / scroll up) — приближение, delta > 0 — отдаление.
+  const factor = Math.exp(-delta * WHEEL_ZOOM_SENSITIVITY)
+
+  setScale(scale.value * factor)
+}
+
+function onWheel(event: WheelEvent): void {
+  if (!props.wheelZoom || !hasImages.value) {
+    return
+  }
+
+  // Не даём странице/оверлею проскроллиться — колесо отдаём под зум.
+  event.preventDefault()
+
+  // Во время непрерывного зума отключаем CSS-переход: плавность даёт само
+  // покадровое обновление, а transition на каждом микрошаге вызывает лаг/наслоение.
+  isWheelZooming.value = true
+
+  pendingWheelDelta += event.deltaY
+
+  if (wheelFrameId === null) {
+    wheelFrameId = requestAnimationFrame(flushWheelZoom)
+  }
+
+  if (wheelIdleTimer !== null) {
+    clearTimeout(wheelIdleTimer)
+  }
+
+  // По завершении жеста возвращаем плавный переход для последующих дискретных зумов.
+  wheelIdleTimer = setTimeout(() => {
+    wheelIdleTimer = null
+    isWheelZooming.value = false
+  }, WHEEL_IDLE_MS)
 }
 
 function rotateLeft(): void {
@@ -402,6 +499,7 @@ watch(
   async (isOpen) => {
     if (!isOpen) {
       stopObservingImage()
+      endWheelZoom()
       return
     }
 
@@ -448,7 +546,10 @@ watch(
   { immediate: true },
 )
 
-onBeforeUnmount(stopObservingImage)
+onBeforeUnmount(() => {
+  stopObservingImage()
+  endWheelZoom()
+})
 </script>
 
 <template>
@@ -527,7 +628,10 @@ onBeforeUnmount(stopObservingImage)
                 </div>
               </div>
 
-              <div class="relative z-10 h-full w-full flex items-center justify-center px-16 py-16 sm:px-24 sm:py-20">
+              <div
+                class="relative z-10 h-full w-full flex items-center justify-center px-16 py-16 sm:px-24 sm:py-20"
+                @wheel="onWheel"
+              >
                 <button
                   v-if="total > 1"
                   type="button"
@@ -558,7 +662,8 @@ onBeforeUnmount(stopObservingImage)
                     :src="currentUrl"
                     alt=""
                     draggable="false"
-                    class="max-h-full max-w-full select-none object-contain will-change-transform transition-transform duration-150 ease-out"
+                    class="max-h-full max-w-full select-none object-contain will-change-transform"
+                    :class="imageTransitionClass"
                     :style="imageStyle"
                     @load="onImageLoad"
                   >

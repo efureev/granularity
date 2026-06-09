@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the fitted (`object-contain`) layout size is tracked via `ResizeObserver`,
   and the real scale is a derived `computed` (rotation-independent). Metrics
   reset on index / `urlList` change.
+- `GrImageViewer`: zoom with the mouse wheel / trackpad pinch gesture. Scrolling
+  up zooms in, scrolling down zooms out, smoothly (exponential step, clamped to
+  `minScale` / `maxScale`). Can be disabled with the new `wheelZoom` prop
+  (defaults to `true`).
+
+### Fixed
+
+- `GrImageViewer`: jitter and visual "overlapping" of the image during
+  continuous wheel / trackpad zoom. Wheel deltas are now batched and applied
+  once per animation frame (`requestAnimationFrame`) instead of re-rendering on
+  every wheel event, and the CSS `transition-transform` is disabled while the
+  zoom gesture is active (the per-frame updates already keep it smooth) and
+  restored once the gesture ends.
 
 ## [v0.9.2] 2026-06-08
 
