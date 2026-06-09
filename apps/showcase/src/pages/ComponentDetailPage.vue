@@ -108,6 +108,7 @@ const previewRegistry = {
   'ds-icon-status-card': defineAsyncComponent(() => import('../demos/components/ds-icon/GrIconStatusCardDemo.vue')),
   'ds-image-viewer-async-media': defineAsyncComponent(() => import('../demos/components/ds-image-viewer/GrImageViewerAsyncMediaDemo.vue')),
   'ds-image-viewer-gallery': defineAsyncComponent(() => import('../demos/components/ds-image-viewer/GrImageViewerGalleryDemo.vue')),
+  'ds-image-viewer-real-size': defineAsyncComponent(() => import('../demos/components/ds-image-viewer/GrImageViewerRealSizeDemo.vue')),
   'ds-image-viewer-toolbar-slot': defineAsyncComponent(() => import('../demos/components/ds-image-viewer/GrImageViewerToolbarSlotDemo.vue')),
   'ds-input-addons-width-guards': defineAsyncComponent(() => import('../demos/components/ds-input/GrInputAddonsDemo.vue')),
   'ds-input-size-and-alignment': defineAsyncComponent(() => import('../demos/components/ds-input/GrInputSizingDemo.vue')),

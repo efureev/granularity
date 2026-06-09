@@ -52,6 +52,34 @@ const open = ref(false)
 </template>`,
   },
   {
+    id: 'image-viewer-real-size',
+    title: 'Real image size in toolbar',
+    description: 'Картинка фиксированного размера (1000×1500): компонент сам отдаёт в slot natural-размер, фактический rendered-размер и реальный масштаб (`realScalePercent`), поэтому не нужно вручную читать DOM.',
+    status: 'ready',
+    previewKey: 'ds-image-viewer-real-size',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrImageViewer } from '@feugene/granularity'
+
+const slides = ['https://picsum.photos/id/1015/1000/1500']
+const open = ref(false)
+</script>
+
+<template>
+  <GrImageViewer v-model="open" :url-list="slides" :show-zoom-value="false">
+    <template #toolbar="{ scale, naturalWidth, naturalHeight, renderedWidth, renderedHeight, realScalePercent }">
+      <div>
+        <span>Natural: {{ naturalWidth }} × {{ naturalHeight }} px</span>
+        <span>Rendered: {{ renderedWidth }} × {{ renderedHeight }} px</span>
+        <span>Nominal scale: {{ Math.round(scale * 100) }}%</span>
+        <span>Real scale: {{ realScalePercent }}%</span>
+      </div>
+    </template>
+  </GrImageViewer>
+</template>`,
+  },
+  {
     id: 'image-viewer-async-media',
     title: 'Async gallery loading',
     description: 'Закрываем async/media use-case: сначала показываем loading/progress, затем открываем viewer после получения media payload.',

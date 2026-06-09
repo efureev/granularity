@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 /**
@@ -85,6 +85,25 @@ type GrImageViewerToolbarActions = {
   rotateRight: () => void
 }
 
+type GrImageViewerSlotProps = {
+  index: number
+  displayIndex: number
+  total: number
+  scale: number
+  rotation: number
+  /** Натуральный (исходный) размер картинки, px. 0 пока изображение не загружено. */
+  naturalWidth: number
+  naturalHeight: number
+  /** Фактический размер изображения на экране c учётом scale, px (footprint вдоль осей картинки). */
+  renderedWidth: number
+  renderedHeight: number
+  /** Реальный масштаб относительно натурального размера (доля): renderedWidth / naturalWidth. */
+  realScale: number
+  /** Реальный масштаб в процентах, отформатированный (например `67`). */
+  realScalePercent: string
+  actions: GrImageViewerToolbarActions
+}
+
 const DEFAULT_Z_INDEX = 2000
 const TRAILING_ZERO_DECIMAL_RE = /\.0$/
 
@@ -97,6 +116,18 @@ const scale = ref(1)
 const rotation = ref(0)
 const offsetX = ref(0)
 const offsetY = ref(0)
+
+const imageEl = ref<HTMLImageElement | null>(null)
+
+// Натуральный (исходный) размер картинки, читается из `<img>` при загрузке.
+const naturalWidth = ref(0)
+const naturalHeight = ref(0)
+
+// Layout-размер вписанного (`object-contain`) изображения без учёта CSS transform/scale.
+const fittedWidth = ref(0)
+const fittedHeight = ref(0)
+
+let resizeObserver: ResizeObserver | null = null
 
 const currentUrl = computed(() => {
   if (!hasImages.value) {
@@ -122,15 +153,46 @@ const imageStyle = computed(() => ({
   transform: `translate3d(${offsetX.value}px, ${offsetY.value}px, 0) scale(${scale.value}) rotate(${rotation.value}deg)`,
 }))
 
-const zoomValueText = computed(() => {
-  const zoomPercent = scale.value * 100
-
-  if (Number.isInteger(zoomPercent)) {
-    return String(zoomPercent)
+function formatPercent(value: number): string {
+  if (Number.isInteger(value)) {
+    return String(value)
   }
 
-  return zoomPercent.toFixed(1).replace(TRAILING_ZERO_DECIMAL_RE, '')
+  return value.toFixed(1).replace(TRAILING_ZERO_DECIMAL_RE, '')
+}
+
+const zoomValueText = computed(() => formatPercent(scale.value * 100))
+
+// Фактический размер изображения на экране вдоль его осей (footprint), c учётом scale.
+const renderedWidth = computed(() => Math.round(fittedWidth.value * scale.value))
+const renderedHeight = computed(() => Math.round(fittedHeight.value * scale.value))
+
+// Реальный масштаб относительно натурального размера (доля). Не зависит от rotation,
+// так как scale равномерный по осям картинки.
+const realScale = computed(() => {
+  if (!naturalWidth.value) {
+    return 0
+  }
+
+  return (fittedWidth.value * scale.value) / naturalWidth.value
 })
+
+const realScalePercent = computed(() => formatPercent(realScale.value * 100))
+
+const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
+  index: currentIndex.value,
+  displayIndex: displayIndex.value,
+  total: total.value,
+  scale: scale.value,
+  rotation: rotation.value,
+  naturalWidth: naturalWidth.value,
+  naturalHeight: naturalHeight.value,
+  renderedWidth: renderedWidth.value,
+  renderedHeight: renderedHeight.value,
+  realScale: realScale.value,
+  realScalePercent: realScalePercent.value,
+  actions: toolbarActions,
+}))
 
 function normalizeIndex(value: number): number {
   if (!hasImages.value) {
@@ -149,6 +211,59 @@ function resetTransform(): void {
   offsetY.value = 0
 }
 
+function resetImageMetrics(): void {
+  naturalWidth.value = 0
+  naturalHeight.value = 0
+  fittedWidth.value = 0
+  fittedHeight.value = 0
+}
+
+function measureFitted(): void {
+  const el = imageEl.value
+
+  if (!el) {
+    return
+  }
+
+  // offsetWidth/Height — layout-размер вписанного изображения, без учёта CSS transform.
+  fittedWidth.value = el.offsetWidth
+  fittedHeight.value = el.offsetHeight
+}
+
+function onImageLoad(event: Event): void {
+  const el = event.target as HTMLImageElement
+
+  naturalWidth.value = el.naturalWidth
+  naturalHeight.value = el.naturalHeight
+  measureFitted()
+}
+
+function startObservingImage(): void {
+  const el = imageEl.value
+
+  if (!el || typeof ResizeObserver === 'undefined') {
+    return
+  }
+
+  if (!resizeObserver) {
+    resizeObserver = new ResizeObserver(() => measureFitted())
+  }
+
+  resizeObserver.observe(el)
+
+  // Если картинка уже в кэше и `load` не сработал — считаем метрики сразу.
+  if (el.complete && el.naturalWidth) {
+    naturalWidth.value = el.naturalWidth
+    naturalHeight.value = el.naturalHeight
+  }
+
+  measureFitted()
+}
+
+function stopObservingImage(): void {
+  resizeObserver?.disconnect()
+}
+
 function setIndex(nextIndex: number, options?: { emitSwitch?: boolean }): void {
   const normalizedIndex = normalizeIndex(nextIndex)
 
@@ -158,6 +273,7 @@ function setIndex(nextIndex: number, options?: { emitSwitch?: boolean }): void {
 
   currentIndex.value = normalizedIndex
   resetTransform()
+  resetImageMetrics()
 
   if (options?.emitSwitch !== false) {
     emit('switch', normalizedIndex)
@@ -172,6 +288,7 @@ function syncIndexFromInitial(): void {
 
   currentIndex.value = normalizeIndex(props.initialIndex)
   resetTransform()
+  resetImageMetrics()
 }
 
 function preloadAt(index: number): void {
@@ -282,12 +399,15 @@ function onKeydown(event: KeyboardEvent): void {
 
 watch(
   () => props.modelValue,
-  (isOpen) => {
+  async (isOpen) => {
     if (!isOpen) {
+      stopObservingImage()
       return
     }
 
     syncIndexFromInitial()
+    await nextTick()
+    startObservingImage()
   },
   { immediate: true },
 )
@@ -327,6 +447,8 @@ watch(
   },
   { immediate: true },
 )
+
+onBeforeUnmount(stopObservingImage)
 </script>
 
 <template>
@@ -431,12 +553,14 @@ watch(
                 <div class="h-full w-full flex items-center justify-center">
                   <img
                     v-if="currentUrl"
+                    ref="imageEl"
                     data-ds-image-viewer-image
                     :src="currentUrl"
                     alt=""
                     draggable="false"
                     class="max-h-full max-w-full select-none object-contain will-change-transform transition-transform duration-150 ease-out"
                     :style="imageStyle"
+                    @load="onImageLoad"
                   >
 
                   <div
@@ -452,12 +576,7 @@ watch(
                 <div class="pointer-events-auto mx-auto w-full max-w-max">
                   <slot
                     name="toolbar"
-                    :index="currentIndex"
-                    :display-index="displayIndex"
-                    :total="total"
-                    :scale="scale"
-                    :rotation="rotation"
-                    :actions="toolbarActions"
+                    v-bind="toolbarSlotProps"
                   >
                     <div class="rounded-full border border-white/20 bg-black/35 p-1 backdrop-blur-sm flex items-center gap-1">
                       <button
@@ -495,12 +614,7 @@ watch(
 
                         <slot
                           name="toolbar-actions"
-                          :index="currentIndex"
-                          :display-index="displayIndex"
-                          :total="total"
-                          :scale="scale"
-                          :rotation="rotation"
-                          :actions="toolbarActions"
+                          v-bind="toolbarSlotProps"
                         />
 
                         <div class="mx-1 h-6 w-px bg-white/25" aria-hidden="true" />

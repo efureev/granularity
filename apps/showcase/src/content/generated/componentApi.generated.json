@@ -2145,12 +2145,12 @@
           {
             "name": "toolbar",
             "description": "",
-            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; actions: GrImageViewerToolbarActions; }"
+            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
           },
           {
             "name": "toolbar-actions",
             "description": "",
-            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; actions: GrImageViewerToolbarActions; }"
+            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
           }
         ]
       },

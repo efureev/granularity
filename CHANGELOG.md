@@ -5,6 +5,20 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.9.3] 2026-06-09
+
+### Added
+
+- `GrImageViewer`: toolbar slots (`#toolbar` / `#toolbar-actions`) now expose the
+  real image metrics, so consumers no longer have to read the DOM manually
+  (`querySelector` + `requestAnimationFrame`): `naturalWidth` / `naturalHeight`
+  (intrinsic image size), `renderedWidth` / `renderedHeight` (actual on-screen
+  footprint with `scale` applied), and `realScale` / `realScalePercent` (the
+  true scale relative to the natural size). Natural size is read on `@load`,
+  the fitted (`object-contain`) layout size is tracked via `ResizeObserver`,
+  and the real scale is a derived `computed` (rotation-independent). Metrics
+  reset on index / `urlList` change.
+
 ## [v0.9.2] 2026-06-08
 
 ### Fixed

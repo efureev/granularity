@@ -362,7 +362,7 @@ describe('component docs metadata', () => {
 
     const imageViewerDoc = getShowcaseComponentDoc(imageViewerEntity!)
 
-    expect(imageViewerDoc.examples).toHaveLength(3)
+    expect(imageViewerDoc.examples).toHaveLength(4)
     expect(imageViewerDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(imageViewerDoc.examples.every(example => example.previewKey?.startsWith('ds-image-viewer'))).toBe(true)
   })
