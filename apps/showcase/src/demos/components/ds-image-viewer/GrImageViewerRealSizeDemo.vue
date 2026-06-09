@@ -30,6 +30,7 @@ const open = ref(false)
       v-model="open"
       :url-list="slides"
       show-progress
+      :draggable="true"
       :show-zoom-value="false"
     >
       <template #toolbar="{ scale, rotation, naturalWidth, naturalHeight, renderedWidth, renderedHeight, realScalePercent, actions }">

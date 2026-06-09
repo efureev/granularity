@@ -2075,6 +2075,13 @@
             "default": "true"
           },
           {
+            "name": "draggable",
+            "description": "Включает перетаскивание (pan) картинки мышью. При наведении курсор «рука». По умолчанию выключено.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "prevLabel",
             "description": "i18n: aria-label кнопки «предыдущее изображение».",
             "type": "string | undefined",

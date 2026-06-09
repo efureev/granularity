@@ -27,6 +27,8 @@ const props = withDefaults(
     showZoomValue?: boolean
     /** Включает масштабирование колесом мыши / жестом на трекпаде. По умолчанию включено. */
     wheelZoom?: boolean
+    /** Включает перетаскивание (pan) картинки мышью. При наведении курсор «рука». По умолчанию выключено. */
+    draggable?: boolean
     zIndex?: number
     /** i18n: aria-label кнопки закрытия. */
     closeLabel?: string
@@ -57,6 +59,7 @@ const props = withDefaults(
     showProgress: false,
     showZoomValue: true,
     wheelZoom: true,
+    draggable: false,
     zIndex: undefined,
     closeLabel: 'Close image viewer',
     prevLabel: 'Previous image',
@@ -136,6 +139,15 @@ let pendingWheelDelta = 0
 let wheelFrameId: number | null = null
 let wheelIdleTimer: ReturnType<typeof setTimeout> | null = null
 
+// Флаг активного перетаскивания (pan) картинки мышью.
+const isDragging = ref(false)
+
+// Координаты указателя и offset на момент начала перетаскивания.
+let dragStartX = 0
+let dragStartY = 0
+let dragOffsetStartX = 0
+let dragOffsetStartY = 0
+
 // Натуральный (исходный) размер картинки, читается из `<img>` при загрузке.
 const naturalWidth = ref(0)
 const naturalHeight = ref(0)
@@ -171,10 +183,20 @@ const imageStyle = computed(() => ({
 }))
 
 // Плавный CSS-переход transform только для дискретных зумов (кнопки/клавиши).
-// При непрерывном зуме колесом переход отключаем — иначе картинка «дёргается» и наслаивается.
+// При непрерывном зуме колесом и при перетаскивании переход отключаем —
+// иначе картинка «дёргается»/наслаивается и тянется за курсором с задержкой.
 const imageTransitionClass = computed(() =>
-  isWheelZooming.value ? '' : 'transition-transform duration-150 ease-out',
+  isWheelZooming.value || isDragging.value ? '' : 'transition-transform duration-150 ease-out',
 )
+
+// Курсор «рука» при наведении (grab) и при зажатии (grabbing), только если включён drag.
+const imageCursorClass = computed(() => {
+  if (!props.draggable) {
+    return ''
+  }
+
+  return isDragging.value ? 'cursor-grabbing' : 'cursor-grab'
+})
 
 function formatPercent(value: number): string {
   if (Number.isInteger(value)) {
@@ -232,6 +254,7 @@ function resetTransform(): void {
   rotation.value = 0
   offsetX.value = 0
   offsetY.value = 0
+  isDragging.value = false
 }
 
 function resetImageMetrics(): void {
@@ -421,6 +444,42 @@ function onWheel(event: WheelEvent): void {
   }, WHEEL_IDLE_MS)
 }
 
+function onPointerDown(event: PointerEvent): void {
+  // Тянем только основной кнопкой и только если drag включён и есть картинка.
+  if (!props.draggable || !hasImages.value || event.button !== 0) {
+    return
+  }
+
+  event.preventDefault()
+
+  isDragging.value = true
+  dragStartX = event.clientX
+  dragStartY = event.clientY
+  dragOffsetStartX = offsetX.value
+  dragOffsetStartY = offsetY.value
+
+  // Захватываем указатель, чтобы движение/отпускание ловились даже за пределами картинки.
+  ;(event.currentTarget as Element).setPointerCapture?.(event.pointerId)
+}
+
+function onPointerMove(event: PointerEvent): void {
+  if (!isDragging.value) {
+    return
+  }
+
+  offsetX.value = dragOffsetStartX + (event.clientX - dragStartX)
+  offsetY.value = dragOffsetStartY + (event.clientY - dragStartY)
+}
+
+function onPointerUp(event: PointerEvent): void {
+  if (!isDragging.value) {
+    return
+  }
+
+  isDragging.value = false
+  ;(event.currentTarget as Element).releasePointerCapture?.(event.pointerId)
+}
+
 function rotateLeft(): void {
   rotation.value -= 90
   emit('rotate', rotation.value)
@@ -500,6 +559,7 @@ watch(
     if (!isOpen) {
       stopObservingImage()
       endWheelZoom()
+      isDragging.value = false
       return
     }
 
@@ -663,9 +723,13 @@ onBeforeUnmount(() => {
                     alt=""
                     draggable="false"
                     class="max-h-full max-w-full select-none object-contain will-change-transform"
-                    :class="imageTransitionClass"
+                    :class="[imageTransitionClass, imageCursorClass]"
                     :style="imageStyle"
                     @load="onImageLoad"
+                    @pointerdown="onPointerDown"
+                    @pointermove="onPointerMove"
+                    @pointerup="onPointerUp"
+                    @pointercancel="onPointerUp"
                   >
 
                   <div

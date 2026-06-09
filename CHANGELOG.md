@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   up zooms in, scrolling down zooms out, smoothly (exponential step, clamped to
   `minScale` / `maxScale`). Can be disabled with the new `wheelZoom` prop
   (defaults to `true`).
+- `GrImageViewer`: drag-to-pan via the new `draggable` prop (defaults to
+  `false`). When enabled, hovering the image shows a grab cursor and
+  pressing + dragging moves the image (updates the translate offset). Uses
+  pointer events with pointer capture (so dragging continues outside the image),
+  switches the cursor to grabbing while active, and disables the CSS transition
+  during the drag for 1:1 tracking. Drag state resets on index / `urlList`
+  change, reset, and close.
 
 ### Fixed
 
