@@ -4100,8 +4100,8 @@
           },
           {
             "name": "options",
-            "description": "",
-            "type": "GrSelectOption[] | undefined",
+            "description": "Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`).",
+            "type": "GrSelectOptionOrGroup[] | undefined",
             "required": false,
             "default": "undefined"
           },

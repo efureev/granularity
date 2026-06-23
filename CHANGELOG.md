@@ -5,6 +5,18 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.9.4] 2026-06-23
+
+### Added
+
+- `GrSelect`: support for grouped options. The `options` prop now accepts groups
+  in the standard shape `{ label, options: [{ value, label }] }` (mixed with
+  plain options). Groups render as native `<optgroup>` in `optionsView="native"`
+  and as group headers in `optionsView="panel"`. Value lookups, selection,
+  custom-value handling and filtering operate over the flattened option list;
+  filtering hides empty groups. New exported types `GrSelectOptionGroup` and
+  `GrSelectOptionOrGroup`.
+
 ## [v0.9.3] 2026-06-09
 
 ### Added

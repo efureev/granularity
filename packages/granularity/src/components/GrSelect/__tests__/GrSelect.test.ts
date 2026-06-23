@@ -353,6 +353,138 @@ describe('GrSelect', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['1', '2']])
   })
 
+  it('в native-режиме рендерит группы опций через optgroup', () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: 'Beijing',
+        ariaLabel: 'City',
+        options: [
+          {
+            label: 'Popular cities',
+            options: [
+              { value: 'Shanghai', label: 'Shanghai' },
+              { value: 'Beijing', label: 'Beijing' },
+            ],
+          },
+          {
+            label: 'City name',
+            options: [
+              { value: 'Chengdu', label: 'Chengdu' },
+              { value: 'Shenzhen', label: 'Shenzhen' },
+            ],
+          },
+        ],
+      },
+    })
+
+    const groups = wrapper.findAll('optgroup')
+    expect(groups.map((g) => g.attributes('label'))).toEqual(['Popular cities', 'City name'])
+
+    const firstGroupOptions = groups[0].findAll('option').map((o) => o.attributes('value'))
+    expect(firstGroupOptions).toEqual(['Shanghai', 'Beijing'])
+
+    expect(wrapper.findAll('option').map((o) => o.attributes('value'))).toContain('Chengdu')
+  })
+
+  it('в native-режиме с группами показывает label выбранного значения', () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: 'Chengdu',
+        optionsView: 'panel',
+        view: 'link',
+        ariaLabel: 'City',
+        options: [
+          {
+            label: 'City name',
+            options: [{ value: 'Chengdu', label: 'Chengdu City' }],
+          },
+        ],
+      },
+    })
+
+    expect(wrapper.get('[data-testid="ds-select-trigger"]').text()).toContain('Chengdu City')
+  })
+
+  it('в panel-режиме рендерит заголовки групп и опции, и эмитит выбор', async () => {
+    const wrapper = mount(GrSelect, {
+      attachTo: document.body,
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        ariaLabel: 'City',
+        options: [
+          {
+            label: 'Popular cities',
+            options: [
+              { value: 'Shanghai', label: 'Shanghai' },
+              { value: 'Beijing', label: 'Beijing' },
+            ],
+          },
+          {
+            label: 'City name',
+            options: [{ value: 'Chengdu', label: 'Chengdu' }],
+          },
+        ],
+      },
+    })
+
+    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const groupLabels = [...document.body.querySelectorAll('[data-ds-select-group-label]')]
+      .map((el) => el.textContent?.trim())
+    expect(groupLabels).toEqual(['Popular cities', 'City name'])
+
+    const options = getTeleportedOptions()
+    expect(options.map((o) => o.textContent?.trim())).toEqual(
+      expect.arrayContaining(['Shanghai', 'Beijing', 'Chengdu']),
+    )
+
+    const chengdu = options.find((o) => o.textContent?.includes('Chengdu'))!
+    await new DOMWrapper(chengdu).trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['Chengdu'])
+  })
+
+  it('в panel-режиме с группами и allowCustomValue фильтрует и скрывает пустые группы', async () => {
+    const wrapper = mount(GrSelect, {
+      attachTo: document.body,
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        allowCustomValue: true,
+        ariaLabel: 'City',
+        options: [
+          {
+            label: 'Popular cities',
+            options: [
+              { value: 'Shanghai', label: 'Shanghai' },
+              { value: 'Beijing', label: 'Beijing' },
+            ],
+          },
+          {
+            label: 'City name',
+            options: [{ value: 'Chengdu', label: 'Chengdu' }],
+          },
+        ],
+      },
+    })
+
+    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="ds-select-custom-input"]'))
+    await input.setValue('Cheng')
+    await nextTick()
+
+    const groupLabels = [...document.body.querySelectorAll('[data-ds-select-group-label]')]
+      .map((el) => el.textContent?.trim())
+    expect(groupLabels).toEqual(['City name'])
+
+    expect(getTeleportedOptions().map((o) => o.textContent?.trim())).toEqual(['Chengdu'])
+  })
+
   it('показывает placeholder, когда значение не выбрано', async () => {
     const wrapper = mount(GrSelect, {
       props: {

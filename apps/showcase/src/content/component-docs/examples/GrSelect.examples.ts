@@ -89,6 +89,60 @@ const selectedTeams = ref<string[]>(['design', 'platform'])
     note: 'Этот сценарий помогает быстро проверить panel-behavior, множественный выбор и то, как компонент ведёт себя в формах фильтров.',
   },
   {
+    id: 'select-groups',
+    title: 'Grouped options',
+    description: 'Опции можно группировать в стандартном формате `{ label, options: [{ value, label }] }`. В `optionsView="native"` группы рендерятся как нативные `<optgroup>`, а в `optionsView="panel"` — как заголовки групп внутри dropdown-панели.',
+    status: 'ready',
+    previewKey: 'ds-select-groups',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrSelect } from '@feugene/granularity'
+
+const groupedOptions = [
+  {
+    label: 'Popular cities',
+    options: [
+      { value: 'Shanghai', label: 'Shanghai' },
+      { value: 'Beijing', label: 'Beijing' },
+    ],
+  },
+  {
+    label: 'City name',
+    options: [
+      { value: 'Chengdu', label: 'Chengdu' },
+      { value: 'Shenzhen', label: 'Shenzhen' },
+      { value: 'Guangzhou', label: 'Guangzhou' },
+      { value: 'Dalian', label: 'Dalian' },
+    ],
+  },
+]
+
+const nativeCity = ref('Beijing')
+const panelCity = ref('Chengdu')
+</script>
+
+<template>
+  <div class="grid gap-4 lg:grid-cols-2">
+    <GrSelect
+      v-model="nativeCity"
+      :options="groupedOptions"
+      placeholder="Pick a city"
+      aria-label="Pick a city (native)"
+    />
+
+    <GrSelect
+      v-model="panelCity"
+      optionsView="panel"
+      :options="groupedOptions"
+      placeholder="Pick a city"
+      aria-label="Pick a city (panel)"
+    />
+  </div>
+</template>`,
+    note: 'Группы поддерживаются в обоих режимах отображения и смешиваются с плоскими опциями; в panel-режиме фильтрация по custom-value скрывает пустые группы.',
+  },
+  {
     id: 'select-custom-value',
     title: 'Custom value and value slot',
     description: 'Сложный режим для cases, где пользователь может добавить свой вариант и одновременно кастомизировать отображение выбранного значения.',

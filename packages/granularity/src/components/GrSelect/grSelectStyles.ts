@@ -4,6 +4,10 @@ export type GrSelectVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type GrSelectUnderline = 'auto' | 'always' | 'none'
 export type GrSelectOptionsView = 'native' | 'panel'
 export type GrSelectOption = { value: string, label: string }
+/** Группа опций: заголовок `label` + вложенные опции `options`. */
+export type GrSelectOptionGroup = { label: string, options: GrSelectOption[] }
+/** Элемент списка опций: либо одиночная опция, либо группа опций. */
+export type GrSelectOptionOrGroup = GrSelectOption | GrSelectOptionGroup
 export type GrSelectModelValue = string | string[]
 
 export const defaultBaseClass = 'w-full rounded-md border border-[var(--brd)] bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'

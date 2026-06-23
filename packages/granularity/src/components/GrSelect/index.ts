@@ -4,6 +4,8 @@ export { grSelectConfig } from './config'
 export type {
   GrSelectModelValue,
   GrSelectOption,
+  GrSelectOptionGroup,
+  GrSelectOptionOrGroup,
   GrSelectOptionsView,
   GrSelectProps,
   GrSelectSize,

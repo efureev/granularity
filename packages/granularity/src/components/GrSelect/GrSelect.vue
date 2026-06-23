@@ -14,6 +14,8 @@ import {
   linkBaseClass,
   type GrSelectModelValue,
   type GrSelectOption,
+  type GrSelectOptionGroup,
+  type GrSelectOptionOrGroup,
   type GrSelectOptionsView,
   type GrSelectSize,
   type GrSelectUnderline,
@@ -24,6 +26,8 @@ import {
 export type {
   GrSelectModelValue,
   GrSelectOption,
+  GrSelectOptionGroup,
+  GrSelectOptionOrGroup,
   GrSelectOptionsView,
   GrSelectSize,
   GrSelectUnderline,
@@ -36,7 +40,8 @@ export type {
  */
 export interface GrSelectProps {
   modelValue: GrSelectModelValue
-  options?: GrSelectOption[]
+  /** Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`). */
+  options?: GrSelectOptionOrGroup[]
   disabled?: boolean
   ariaLabel?: string
   view?: GrSelectView
@@ -103,7 +108,21 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: GrSelectModelValue): void
 }>()
 
-const optionsResolved = computed(() => props.options ?? [])
+const optionsResolved = computed<GrSelectOptionOrGroup[]>(() => props.options ?? [])
+
+function isOptionGroup(item: GrSelectOptionOrGroup): item is GrSelectOptionGroup {
+  return Array.isArray((item as GrSelectOptionGroup).options)
+}
+
+/** Плоский список всех опций (группы «развёрнуты»). Используется для всех вычислений по значениям. */
+const flatOptions = computed<GrSelectOption[]>(() => {
+  const result: GrSelectOption[] = []
+  for (const item of optionsResolved.value) {
+    if (isOptionGroup(item)) result.push(...item.options)
+    else result.push(item)
+  }
+  return result
+})
 
 function modelToArray(value: GrSelectModelValue): string[] {
   if (Array.isArray(value)) return value
@@ -124,24 +143,24 @@ const selectedValues = computed(() => {
 const hasSelection = computed(() => selectedValues.value.length > 0)
 
 const selectedOptions = computed<GrSelectOption[]>(() => {
-  const byValue = new Map(optionsResolved.value.map(o => [o.value, o]))
+  const byValue = new Map(flatOptions.value.map(o => [o.value, o]))
   return selectedValues.value.map((v) => byValue.get(v) ?? { value: v, label: v })
 })
 
 const hasModelInOptions = computed(() => {
   if (props.multiple) return false
-  return optionsResolved.value.some((o) => o.value === modelSingle.value)
+  return flatOptions.value.some((o) => o.value === modelSingle.value)
 })
 
 const displayLabel = computed(() => {
   if (props.multiple) {
     if (!selectedValues.value.length) return ''
     return selectedValues.value
-      .map((v) => optionsResolved.value.find((o) => o.value === v)?.label ?? v)
+      .map((v) => flatOptions.value.find((o) => o.value === v)?.label ?? v)
       .join(', ')
   }
 
-  return optionsResolved.value.find((o) => o.value === modelSingle.value)?.label ?? modelSingle.value
+  return flatOptions.value.find((o) => o.value === modelSingle.value)?.label ?? modelSingle.value
 })
 
 const displayText = computed(() => {
@@ -265,25 +284,48 @@ const panelClasses = computed(() => {
   return grSelectPanelClasses
 })
 
-const visibleOptions = computed(() => {
-  const base = optionsResolved.value
+function matchesQuery(option: GrSelectOption, query: string): boolean {
+  if (!query) return true
+  return option.label.toLowerCase().includes(query) || option.value.toLowerCase().includes(query)
+}
 
-  const withCustom = (() => {
-    if (!props.allowCustomValue) return base
-    if (props.multiple) return base
-    if (modelSingle.value === '') return base
-    if (hasModelInOptions.value) return base
-    return [{ value: modelSingle.value, label: modelSingle.value }, ...base]
-  })()
+/**
+ * Элемент рендера панели: либо заголовок группы, либо опция.
+ * Группировка сохраняется, фильтрация по `customValue` скрывает пустые группы.
+ */
+type GrSelectPanelItem =
+  | { kind: 'group', label: string, key: string }
+  | { kind: 'option', option: GrSelectOption, key: string }
 
-  if (!props.allowCustomValue) return withCustom
+const panelItems = computed<GrSelectPanelItem[]>(() => {
+  const q = props.allowCustomValue ? customValue.value.trim().toLowerCase() : ''
+  const items: GrSelectPanelItem[] = []
 
-  const q = customValue.value.trim().toLowerCase()
-  if (!q) return withCustom
+  // Опция для кастомного значения, которого нет в options (single).
+  if (props.allowCustomValue && !props.multiple && modelSingle.value !== '' && !hasModelInOptions.value) {
+    const custom: GrSelectOption = { value: modelSingle.value, label: modelSingle.value }
+    if (matchesQuery(custom, q)) {
+      items.push({ kind: 'option', option: custom, key: `__custom__${custom.value}` })
+    }
+  }
 
-  return withCustom.filter((o) => {
-    return o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q)
+  optionsResolved.value.forEach((item, index) => {
+    if (isOptionGroup(item)) {
+      const matched = item.options.filter((o) => matchesQuery(o, q))
+      if (!matched.length) return
+      items.push({ kind: 'group', label: item.label, key: `__group__${index}` })
+      for (const option of matched) {
+        items.push({ kind: 'option', option, key: option.value })
+      }
+      return
+    }
+
+    if (matchesQuery(item, q)) {
+      items.push({ kind: 'option', option: item, key: item.value })
+    }
   })
+
+  return items
 })
 
 const canAddCustom = computed(() => {
@@ -294,11 +336,11 @@ const canAddCustom = computed(() => {
 
   if (props.multiple) {
     if (selectedValues.value.includes(v)) return false
-    return !optionsResolved.value.some((o) => o.value === v)
+    return !flatOptions.value.some((o) => o.value === v)
   }
 
   if (v === modelSingle.value) return false
-  return !optionsResolved.value.some((o) => o.value === v)
+  return !flatOptions.value.some((o) => o.value === v)
 })
 
 function emitValue(value: GrSelectModelValue): void {
@@ -352,7 +394,7 @@ const nativeClearOptionVisible = computed(() => {
   if (props.optionsView !== 'native') return false
   if (props.multiple) return false
   if (!props.options) return true
-  return !props.options.some(o => o.value === '')
+  return !flatOptions.value.some(o => o.value === '')
 })
 
 const panelClearVisible = computed(() => {
@@ -442,9 +484,16 @@ function clearSelection(): void {
         <option v-if="nativeCustomOptionVisible" :value="modelSingle">
           {{ modelSingle }}
         </option>
-        <option v-for="opt in options" :key="opt.value" :value="opt.value">
-          {{ opt.label }}
-        </option>
+        <template v-for="(item, index) in optionsResolved" :key="index">
+          <optgroup v-if="isOptionGroup(item)" :label="item.label">
+            <option v-for="opt in item.options" :key="opt.value" :value="opt.value">
+              {{ opt.label }}
+            </option>
+          </optgroup>
+          <option v-else :value="item.value">
+            {{ item.label }}
+          </option>
+        </template>
       </slot>
     </select>
 
@@ -579,29 +628,41 @@ function clearSelection(): void {
                 Add “{{ customValue.trim() }}”
               </button>
 
-              <button
-                v-for="opt in visibleOptions"
-                :key="opt.value"
-                data-ds-select-option
-                type="button"
-                role="option"
-                :aria-selected="isSelected(opt.value) ? 'true' : 'false'"
-                class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
-                  view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
-                ]"
-                @click="toggleValue(opt.value)"
-              >
-                <slot name="option" :option="opt" :selected="isSelected(opt.value)">
-                  <span class="flex items-center gap-2 min-w-0">
-                    <span
-                      class="inline-block h-4 w-4 shrink-0"
-                      :class="isSelected(opt.value) ? 'i-lucide-check text-[var(--primary)]' : ''"
-                      aria-hidden="true"
-                    />
-                    <span class="truncate">{{ opt.label }}</span>
-                  </span>
-                </slot>
-              </button>
+              <template v-for="item in panelItems" :key="item.key">
+                <div
+                  v-if="item.kind === 'group'"
+                  data-ds-select-group-label
+                  role="presentation"
+                  class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]" :class="[
+                    view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
+                  ]"
+                >
+                  {{ item.label }}
+                </div>
+
+                <button
+                  v-else
+                  data-ds-select-option
+                  type="button"
+                  role="option"
+                  :aria-selected="isSelected(item.option.value) ? 'true' : 'false'"
+                  class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
+                    view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
+                  ]"
+                  @click="toggleValue(item.option.value)"
+                >
+                  <slot name="option" :option="item.option" :selected="isSelected(item.option.value)">
+                    <span class="flex items-center gap-2 min-w-0">
+                      <span
+                        class="inline-block h-4 w-4 shrink-0"
+                        :class="isSelected(item.option.value) ? 'i-lucide-check text-[var(--primary)]' : ''"
+                        aria-hidden="true"
+                      />
+                      <span class="truncate">{{ item.option.label }}</span>
+                    </span>
+                  </slot>
+                </button>
+              </template>
             </div>
           </div>
         </div>
