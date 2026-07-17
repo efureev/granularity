@@ -92,6 +92,23 @@
   --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ds-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 
+  /*
+   * Z-index layering scale.
+   *
+   * Единый источник истины для слоёв всех компонентов, использующих `position: fixed`
+   * поверх остального контента. Правило: чем выше в UI-стеке слой обязан оказаться,
+   * тем больше значение. Floating-панели (dropdown/select/tree-select/tooltip) стоят
+   * ниже модалок, чтобы поповер, открытый ВНУТРИ модалки, не потерялся под ней, но
+   * сам этот поповер не обязан перекрывать модалку снаружи — за пределы своего дерева
+   * floating-компоненты не выходят по построению (v-click-outside/portal рядом с триггером).
+   * Тосты — единственный слой, который обязан быть виден поверх абсолютно всего,
+   * включая открытые модалки (это уведомление уровня приложения).
+   */
+  --gr-z-dropdown: 1000;
+  --gr-z-tooltip: 1050;
+  --gr-z-modal: 1100;
+  --gr-z-toast: 1200;
+
   /* Derived interaction formulas: action roles */
   --primary-hover: color-mix(in srgb, var(--primary) 92%, var(--fg));
   --primary-active: color-mix(in srgb, var(--primary) 84%, var(--fg));

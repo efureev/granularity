@@ -2,9 +2,10 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { vClickOutside } from '../../directives'
+import { useFloating } from '../../composables/internal/useFloating'
 import {
-  grDropdownAlignmentClass,
   grDropdownContentClass,
+  grDropdownOriginClass,
   grDropdownWidthClass,
   type GrDropdownAlign,
   type GrDropdownWidth,
@@ -35,65 +36,25 @@ const open = ref(false)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const clickOutsideExclude = [() => panelEl.value]
-const panelStyle = ref<Record<string, string>>({
-  left: '0px',
-  top: '0px',
-  zIndex: '2147483647',
-})
-let syncFrame = 0
 
-function cancelPanelPositionSync(): void {
-  if (typeof window === 'undefined') return
-  if (!syncFrame) return
-
-  window.cancelAnimationFrame(syncFrame)
-  syncFrame = 0
+// `align='right'` — правый край панели совпадает с правым краем триггера (bottom-end);
+// `align='left'` — левые края (bottom-start); `align='center'` — floating-ui сам
+// центрирует панель под триггером при обычном `'bottom'` без суффикса.
+const placementByAlign: Record<GrDropdownAlign, 'bottom-start' | 'bottom-end' | 'bottom'> = {
+  left: 'bottom-start',
+  right: 'bottom-end',
+  center: 'bottom',
 }
 
-function syncPanelPosition(): void {
-  if (typeof window === 'undefined') return
-
-  const root = rootEl.value
-  if (!root) return
-
-  const rootRect = root.getBoundingClientRect()
-  const left = (() => {
-    if (props.align === 'right') return rootRect.right
-    if (props.align === 'center') return rootRect.left + (rootRect.width / 2)
-    return rootRect.left
-  })()
-
-  panelStyle.value = {
-    left: `${left}px`,
-    top: `${rootRect.bottom + 8}px`,
-    zIndex: '2147483647',
-  }
-}
-
-function schedulePanelPositionSync(): void {
-  if (typeof window === 'undefined') return
-  if (syncFrame) return
-
-  syncFrame = window.requestAnimationFrame(() => {
-    syncFrame = 0
-
-    if (open.value) {
-      syncPanelPosition()
-    }
-  })
-}
-
-function bindPanelPositionListeners(): void {
-  if (typeof window === 'undefined') return
-  window.addEventListener('resize', schedulePanelPositionSync)
-  window.addEventListener('scroll', schedulePanelPositionSync, true)
-}
-
-function unbindPanelPositionListeners(): void {
-  if (typeof window === 'undefined') return
-  window.removeEventListener('resize', schedulePanelPositionSync)
-  window.removeEventListener('scroll', schedulePanelPositionSync, true)
-}
+const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = useFloating(
+  rootEl,
+  panelEl,
+  open,
+  {
+    placement: () => placementByAlign[props.align],
+    zIndexVar: '--gr-z-dropdown',
+  },
+)
 
 function toggle(): void {
   open.value = !open.value
@@ -113,14 +74,7 @@ watch(
     if (typeof document === 'undefined') return
 
     document.removeEventListener('keydown', closeOnEscape)
-    unbindPanelPositionListeners()
-    cancelPanelPositionSync()
     if (isOpen) document.addEventListener('keydown', closeOnEscape)
-
-    if (!isOpen) return
-
-    bindPanelPositionListeners()
-    syncPanelPosition()
   },
   { immediate: true },
 )
@@ -128,17 +82,13 @@ watch(
 watch(
   () => props.align,
   () => {
-    if (open.value) {
-      schedulePanelPositionSync()
-    }
+    if (open.value) updateFloatingPosition()
   },
 )
 
 onUnmounted(() => {
   if (typeof document === 'undefined') return
   document.removeEventListener('keydown', closeOnEscape)
-  unbindPanelPositionListeners()
-  cancelPanelPositionSync()
 })
 
 const widthClass = computed(() => grDropdownWidthClass(props.width))
@@ -146,7 +96,7 @@ const widthClass = computed(() => grDropdownWidthClass(props.width))
 const contentClasses = computed(() => grDropdownContentClass(props.contentClass))
 
 const panelClasses = computed(() => {
-  return ['fixed z-50', widthClass.value, grDropdownAlignmentClass(props.align)].filter(Boolean)
+  return [widthClass.value, grDropdownOriginClass(resolvedPlacement.value)].filter(Boolean)
 })
 
 function onContentClick(): void {
@@ -182,7 +132,7 @@ function onContentClick(): void {
           ref="panelEl"
           data-ds-dropdown-panel
           :class="panelClasses"
-          :style="panelStyle"
+          :style="floatingStyle"
           @click="onContentClick"
         >
           <div data-ds-dropdown-content :class="contentClasses">

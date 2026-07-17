@@ -1,3 +1,5 @@
+import type { Placement } from '@floating-ui/dom'
+
 export type GrDropdownAlign = 'left' | 'right' | 'center'
 export type GrDropdownWidth = 'auto' | '20' | '48' | '60' | '64' | '80'
 
@@ -10,18 +12,26 @@ export const widthClassByWidth: Record<GrDropdownWidth, string> = {
   80: 'w-80',
 }
 
-export const alignmentClassByAlign: Record<GrDropdownAlign, string> = {
-  left: 'origin-top-left',
-  right: 'origin-top-right -translate-x-full',
-  center: 'origin-top -translate-x-1/2',
+// `transform-origin` для scale-transition — координата x/y уже приходит от
+// `useFloating` (см. `floatingStyle`), здесь остаётся только направление
+// "роста" панели относительно триггера. Ключи — это `resolvedPlacement` ПОСЛЕ
+// применения `flip`, поэтому origin остаётся верным и когда панели не хватило
+// места снизу и её перевернуло вверх.
+export const originClassByPlacement: Partial<Record<Placement, string>> = {
+  'bottom-start': 'origin-top-left',
+  'bottom-end': 'origin-top-right',
+  'bottom': 'origin-top',
+  'top-start': 'origin-bottom-left',
+  'top-end': 'origin-bottom-right',
+  'top': 'origin-bottom',
 }
 
 export function grDropdownWidthClass(width: GrDropdownWidth): string {
   return widthClassByWidth[width]
 }
 
-export function grDropdownAlignmentClass(align: GrDropdownAlign): string {
-  return alignmentClassByAlign[align]
+export function grDropdownOriginClass(placement: Placement): string {
+  return originClassByPlacement[placement] ?? 'origin-top'
 }
 
 export function grDropdownContentClass(contentClass?: string): string {

@@ -18,6 +18,14 @@ function rect(left: number, top: number, width: number, height: number): DOMRect
   }
 }
 
+// `@floating-ui/dom` вычисляет позицию асинхронно (внутренний `Promise`-платформ-слой,
+// больше одного microtask-тика). Одного `nextTick()` не всегда хватает, чтобы дождаться
+// финального `computePosition` — досыпаем через macrotask, который гарантированно
+// выполняется после всех накопленных microtask'ов.
+function flushFloatingUpdate(): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, 0))
+}
+
 describe('GrDropdown', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -69,10 +77,6 @@ describe('GrDropdown', () => {
   })
 
   it('привязывает правый край панели к trigger без измерения ширины панели', async () => {
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) => {
-      return window.setTimeout(() => callback(performance.now()), 0)
-    })
-
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect() {
       const text = this.textContent ?? ''
 
@@ -113,21 +117,19 @@ describe('GrDropdown', () => {
 
     await wrapper.get('[data-testid="trigger"]').trigger('click')
     await nextTick()
-    await nextTick()
+    await flushFloatingUpdate()
 
     const panel = document.body.querySelector<HTMLElement>('#dropdown-content')?.parentElement?.parentElement
 
     expect(panel).toBeTruthy()
+    // `align='right'` (дефолт) → `placement='bottom-end'`: правый край панели совпадает
+    // с правым краем триггера (300px), панель без измеренной ширины (0) не сдвигается влево.
     expect(panel?.style.left).toBe('300px')
     expect(panel?.style.top).toBe('60px')
-    expect(panel?.className).toContain('-translate-x-full')
+    expect(panel?.className).toContain('origin-top-right')
   })
 
   it('привязывает панель к trigger, а не к растянутому layout-контейнеру', async () => {
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) => {
-      return window.setTimeout(() => callback(performance.now()), 0)
-    })
-
     const wrapper = mount(GrDropdown, {
       attachTo: document.body,
       slots: {
@@ -144,13 +146,13 @@ describe('GrDropdown', () => {
 
     await wrapper.get('[data-testid="trigger"]').trigger('click')
     await nextTick()
-    await nextTick()
+    await flushFloatingUpdate()
 
     const panel = document.body.querySelector<HTMLElement>('#dropdown-content')?.parentElement?.parentElement
 
     expect(panel).toBeTruthy()
     expect(panel?.style.left).toBe('264px')
     expect(panel?.style.top).toBe('68px')
-    expect(panel?.className).toContain('-translate-x-full')
+    expect(panel?.className).toContain('origin-top-right')
   })
 })

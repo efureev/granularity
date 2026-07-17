@@ -3,6 +3,7 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
+import { useFloating } from '../../composables/internal/useFloating'
 
 import {
   defaultBaseClass,
@@ -183,57 +184,16 @@ const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const customInputRef = ref<InstanceType<typeof GrInput> | null>(null)
 const clickOutsideExclude = [() => panelEl.value]
-const panelStyle = ref<Record<string, string>>({
-  left: '0px',
-  top: '0px',
-  width: '0px',
-  zIndex: '2147483647',
+
+// Для `view='link'` ширина триггера = ширине выбранной опции (`inline-block w-auto`),
+// поэтому панель растёт по контенту (`matchWidth: 'min'` → `width: max-content` +
+// `min-width` от триггера), а не сжимается до неё. Для `view='default'` панель точно
+// повторяет ширину триггера (`matchWidth: true`).
+const { floatingStyle, update: updateFloatingPosition } = useFloating(rootEl, panelEl, open, {
+  placement: 'bottom-start',
+  matchWidth: () => (props.view === 'link' ? 'min' : true),
+  zIndexVar: '--gr-z-dropdown',
 })
-
-function syncPanelPosition(): void {
-  if (typeof window === 'undefined') return
-
-  const root = rootEl.value
-  if (!root) return
-
-  const rect = root.getBoundingClientRect()
-
-  // Для `view='link'` ширина триггера = ширине выбранной опции (`inline-block w-auto`),
-  // и без отдельной обработки панель тоже становилась шириной выбранной опции, из-за чего
-  // её размер «прыгал» при выборе разных опций. Решение — отдать вычисление ширины браузеру:
-  // `width: max-content` (по самому длинному ребёнку — `w-full`-кнопкам с `whitespace-nowrap`),
-  // `min-width` равной ширине триггера (чтобы панель не была уже самого триггера).
-  // Это чисто CSS-подход — без JS-замеров и ResizeObserver, максимально перформантный.
-  if (props.view === 'link') {
-    panelStyle.value = {
-      left: `${rect.left}px`,
-      top: `${rect.bottom + 8}px`,
-      width: 'max-content',
-      minWidth: `${rect.width}px`,
-      zIndex: '2147483647',
-    }
-    return
-  }
-
-  panelStyle.value = {
-    left: `${rect.left}px`,
-    top: `${rect.bottom + 8}px`,
-    width: `${rect.width}px`,
-    zIndex: '2147483647',
-  }
-}
-
-function bindPanelPositionListeners(): void {
-  if (typeof window === 'undefined') return
-  window.addEventListener('resize', syncPanelPosition)
-  window.addEventListener('scroll', syncPanelPosition, true)
-}
-
-function unbindPanelPositionListeners(): void {
-  if (typeof window === 'undefined') return
-  window.removeEventListener('resize', syncPanelPosition)
-  window.removeEventListener('scroll', syncPanelPosition, true)
-}
 
 function closeDropdown(): void {
   open.value = false
@@ -248,13 +208,21 @@ function closeOnEscape(e: KeyboardEvent): void {
   if (e.key === 'Escape') closeDropdown()
 }
 
+// `view` определяет режим `matchWidth` (см. выше) — пересчитываем позицию/ширину
+// панели, если он меняется, пока панель открыта.
+watch(
+  () => props.view,
+  () => {
+    if (open.value) updateFloatingPosition()
+  },
+)
+
 watch(
   open,
   async (isOpen) => {
     if (typeof document === 'undefined') return
 
     document.removeEventListener('keydown', closeOnEscape)
-    unbindPanelPositionListeners()
 
     if (isOpen) document.addEventListener('keydown', closeOnEscape)
 
@@ -263,11 +231,8 @@ watch(
       return
     }
 
-    bindPanelPositionListeners()
-    await nextTick()
-    syncPanelPosition()
-
     if (props.allowCustomValue) {
+      await nextTick()
       customInputRef.value?.focus()
     }
   },
@@ -277,7 +242,6 @@ watch(
 onUnmounted(() => {
   if (typeof document === 'undefined') return
   document.removeEventListener('keydown', closeOnEscape)
-  unbindPanelPositionListeners()
 })
 
 const panelClasses = computed(() => {
@@ -592,8 +556,7 @@ function clearSelection(): void {
           ref="panelEl"
           data-testid="ds-select-panel"
           data-ds-select-panel
-          class="fixed w-full"
-          :style="panelStyle"
+          :style="floatingStyle"
         >
           <div :class="panelClasses">
             <div v-if="allowCustomValue" class="p-2 border-b border-[var(--brd)]">

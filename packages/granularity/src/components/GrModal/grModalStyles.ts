@@ -2,7 +2,7 @@ export type GrModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
 
 // Корневые утилитарные классы, используемые шаблоном `GrModal.vue`.
 // Они же являются единственным источником истины для safelist.
-export const root = 'fixed inset-0 z-50'
+export const root = 'fixed inset-0 z-[var(--gr-z-modal)]'
 export const shell = 'fixed inset-0 overflow-y-auto p-4 sm:p-6'
 export const layout = 'min-h-full flex items-center justify-center'
 export const overlay = 'fixed inset-0 z-0 bg-black/40'

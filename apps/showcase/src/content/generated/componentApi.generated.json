@@ -2005,13 +2005,6 @@
             "default": "\"Close image viewer\""
           },
           {
-            "name": "zIndex",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "showProgress",
             "description": "",
             "type": "boolean | undefined",
@@ -2080,6 +2073,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "zIndex",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "prevLabel",
@@ -2728,16 +2728,16 @@
         "origin": "generated",
         "items": [
           {
-            "name": "zIndex",
-            "description": "Custom `z-index`.",
-            "type": "number | undefined",
+            "name": "text",
+            "description": "Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "text",
-            "description": "Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`.",
-            "type": "string | undefined",
+            "name": "zIndex",
+            "description": "Custom `z-index`.",
+            "type": "number | undefined",
             "required": false,
             "default": "undefined"
           },

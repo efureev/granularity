@@ -14,7 +14,8 @@
  * UX:
  * - появление/исчезновение анимируется `TransitionGroup`;
  * - `placement` настраивает угол экрана;
- * - `z-[60]` — выше, чем `GrModal` (`z-50`), чтобы уведомления не перекрывались диалогом.
+ * - `z-[var(--gr-z-toast)]` — верхний слой шкалы токенов (см. `styles/tokens.css`),
+ *   выше `GrModal` (`--gr-z-modal`), чтобы уведомления не перекрывались диалогом.
  */
 import {computed} from 'vue'
 import type {Component} from 'vue'
@@ -87,7 +88,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
         data-ds-toaster
         role="region"
         :aria-label="regionLabel"
-        class="fixed z-[60] grid w-[360px] max-w-[calc(100vw-2rem)] gap-3"
+        class="fixed z-[var(--gr-z-toast)] grid w-[360px] max-w-[calc(100vw-2rem)] gap-3"
         :class="containerClass"
     >
       <TransitionGroup

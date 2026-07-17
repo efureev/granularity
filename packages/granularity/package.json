@@ -342,6 +342,7 @@
     "test:run": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.6.0",
     "@headlessui/vue": "^1.7.23"
   }
 }

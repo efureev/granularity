@@ -2,6 +2,7 @@
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { vClickOutside } from '../../directives'
+import { useFloating } from '../../composables/internal/useFloating'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrInput from '../GrInput/GrInput.vue'
 import GrTree, {
@@ -70,44 +71,11 @@ let hadPointerDownOnTrigger = false
 const open = ref(false)
 const filterValue = ref('')
 
-const panelStyle = ref<Record<string, string>>({
-  left: '0px',
-  top: '0px',
-  width: '0px',
-  zIndex: '2147483647',
+const { floatingStyle } = useFloating(rootEl, panelEl, open, {
+  placement: 'bottom-start',
+  matchWidth: true,
+  zIndexVar: '--gr-z-dropdown',
 })
-
-function syncPanelPosition(): void {
-  if (typeof window === 'undefined')
-    return
-
-  const root = rootEl.value
-  if (!root)
-    return
-
-  const rect = root.getBoundingClientRect()
-
-  panelStyle.value = {
-    left: `${rect.left}px`,
-    top: `${rect.bottom + 8}px`,
-    width: `${rect.width}px`,
-    zIndex: '2147483647',
-  }
-}
-
-function bindPanelPositionListeners(): void {
-  if (typeof window === 'undefined')
-    return
-  window.addEventListener('resize', syncPanelPosition)
-  window.addEventListener('scroll', syncPanelPosition, true)
-}
-
-function unbindPanelPositionListeners(): void {
-  if (typeof window === 'undefined')
-    return
-  window.removeEventListener('resize', syncPanelPosition)
-  window.removeEventListener('scroll', syncPanelPosition, true)
-}
 
 const closeOnSelectResolved = computed(() => {
   return props.closeOnSelect ?? !props.multiple
@@ -307,17 +275,12 @@ watch(
       return
 
     document.removeEventListener('keydown', closeOnEscape)
-    unbindPanelPositionListeners()
 
     if (isOpen)
       document.addEventListener('keydown', closeOnEscape)
 
     if (!isOpen)
       return
-
-    bindPanelPositionListeners()
-    await nextTick()
-    syncPanelPosition()
 
     // sync tree highlight
     if (!props.multiple) {
@@ -339,7 +302,6 @@ onUnmounted(() => {
   if (typeof document === 'undefined')
     return
   document.removeEventListener('keydown', closeOnEscape)
-  unbindPanelPositionListeners()
 })
 
 watch(
@@ -511,8 +473,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
           ref="panelEl"
           data-testid="ds-tree-select-panel"
           data-ds-tree-select-panel
-          class="fixed w-full"
-          :style="panelStyle"
+          :style="floatingStyle"
         >
           <div :class="panelClasses">
           <div v-if="filterable" class="p-2 border-b border-[var(--brd)]">

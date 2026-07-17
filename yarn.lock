@@ -381,10 +381,10 @@
   resolved "https://registry.yarnpkg.com/@exodus/bytes/-/bytes-1.15.0.tgz#54479e0f406cbad024d6fe1c3190ecca4468df3b"
   integrity sha512-UY0nlA+feH81UGSHv92sLEPLCeZFjXOuHhrIo0HQydScuQc8s0A7kL/UdgwgDq8g8ilksmuoF35YVTNphV2aBQ==
 
-"@feugene/fint-i18n@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.2.3.tgz#08dcb3d2b9239ddca2ea800cf8ddc544136fb2b7"
-  integrity sha512-k3HOzDfM4+Nwtn2GbSdDUyZqtBBa7BLg7HbJbY+4seGT4iojfuyHq9+bLV+pzp7TaSc2OLVamgcr1vb+Ssl+0g==
+"@feugene/fint-i18n@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.3.0.tgz#dfd44e77cb320b6ea9b4bab618eba5ef0863a6f2"
+  integrity sha512-d5X2rJgrSDX8OM9Ne14ztuW7alEzADT0xHcMKIKUkCr8WF9Za+oN0qxUY6GYkF+jNI7UP8tonoDSpcYn+tiTFA==
 
 "@feugene/unocss-mini-extra-rules@^0.2.2":
   version "0.2.2"
@@ -395,6 +395,26 @@
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.3.0.tgz#eb3abb6fe543007a415228c0ec8b84b71468c1fc"
   integrity sha512-ouxG+WvgJMdecNVN4TlyJH+pECzj7SoYhBy2sxMmUO7mE7nFSQdoHnb5p8JgH0DVvf/xq1eK4d/teLZMhbCxhw==
+
+"@floating-ui/core@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.8.0.tgz#d01c0bbea02e4a57f6fd7d5de6fc2c5c7dca40e1"
+  integrity sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==
+  dependencies:
+    "@floating-ui/utils" "^0.2.12"
+
+"@floating-ui/dom@^1.6.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.8.0.tgz#8a20e6facbe2456afdbeb6c8b968a72df689cf63"
+  integrity sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==
+  dependencies:
+    "@floating-ui/core" "^1.8.0"
+    "@floating-ui/utils" "^0.2.12"
+
+"@floating-ui/utils@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.12.tgz#afefe785949f16ac4cdd1e695935a321572dd56a"
+  integrity sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==
 
 "@headlessui/vue@^1.7.23":
   version "1.7.23"
