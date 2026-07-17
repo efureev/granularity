@@ -498,4 +498,31 @@ describe('GrSelect', () => {
 
     expect(wrapper.get('[data-testid="ds-select-trigger"]').text()).toContain('optional')
   })
+
+  it('без i18n-адаптера использует встроенные fallback-тексты, включая интерполяцию параметров', async () => {
+    const wrapper = mount(GrSelect, {
+      attachTo: document.body,
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        allowCustomValue: true,
+        clearable: true,
+        ariaLabel: 'City',
+        options: [{ value: 'Shanghai', label: 'Shanghai' }],
+      },
+    })
+
+    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="ds-select-custom-input"]'))
+    expect(input.attributes('placeholder')).toBe('Add value…')
+
+    await input.setValue('Wuhan')
+    await nextTick()
+
+    const addButton = getTeleportedElement<HTMLButtonElement>('[data-testid="ds-select-add-option"]')
+    // `{value}` во fallback-строке должен быть интерполирован, а не остаться сырым плейсхолдером.
+    expect(addButton.textContent?.trim()).toBe('Add "Wuhan"')
+  })
 })

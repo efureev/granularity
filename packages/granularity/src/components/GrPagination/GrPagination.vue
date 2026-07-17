@@ -78,7 +78,7 @@ function next(): void {
     class="flex flex-wrap items-center justify-end gap-3"
     data-ds-pagination
     role="navigation"
-    :aria-label="t('gr.pagination.pageSize', 'Pagination')"
+    :aria-label="t('gr.pagination.label', 'Pagination')"
   >
     <div class="min-w-[100px]">
       <GrSelect
@@ -99,7 +99,7 @@ function next(): void {
         type="button"
         data-ds-pagination-page
         :aria-current="pageNumber === page ? 'page' : undefined"
-        :aria-label="`Page ${pageNumber}`"
+        :aria-label="t('gr.pagination.page', 'Page {n}', { n: pageNumber })"
         class="h-8 min-w-8 px-2 rounded-md text-sm font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
         :class="pageNumber === page ? 'bg-[var(--primary)] text-[var(--primary-fg)]' : 'text-[var(--muted-fg)] hover:bg-[var(--muted)] hover:text-[var(--fg)]'"
         @click="goTo(pageNumber)"

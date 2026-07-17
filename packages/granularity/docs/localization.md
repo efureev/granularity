@@ -73,30 +73,38 @@
 ## Публичный API пакета
 
 Пакет публикует package-level entrypoint `@feugene/granularity/i18n`, который можно использовать вместе с
-`@feugene/fint-i18n`.
+`@feugene/fint-i18n` (начиная с `@feugene/fint-i18n@^0.3.0` — объявлена как optional peer dependency пакета;
+более старые версии не тестировались и не гарантируются).
 
 Он экспортирует:
 
 - `GRANULARITY_I18N_BLOCK` со значением `gr`;
-- `grLocaleLoaders` — lazy loaders локалей `en`, `ru`, `es`;
+- `en` / `ru` / `es` — per-locale lazy loaders (рекомендуется для продакшена — бандлер вытряхивает неиспользуемые
+  языки);
 - `GRANULARITY_I18N_KEY` и связанные типы adapter API.
+
+Загрузчики всех локалей сразу (демо/e2e/тулинг, не для продакшена) — отдельный subpath `@feugene/granularity/i18n/all`
+(экспорт `all`).
 
 Минимальный пример подключения:
 
 ```ts
-import { createFintI18n } from '@feugene/fint-i18n'
-import { GRANULARITY_I18N_BLOCK, grLocaleLoaders } from '@feugene/granularity/i18n'
+import { createFintI18n } from '@feugene/fint-i18n/core'
+import { installI18n } from '@feugene/fint-i18n/vue'
+import { GRANULARITY_I18N_BLOCK, en, ru } from '@feugene/granularity/i18n'
 
 const i18n = createFintI18n({
   locale: 'ru',
   fallbackLocale: 'en',
-  loaders: [
-    grLocaleLoaders,
-  ],
+  loaders: [en, ru],
 })
 
 i18n.registerBlocks([GRANULARITY_I18N_BLOCK])
 await i18n.loadUsedBlocks('ru')
+
+// В точке входа приложения — без этого `granularity` не найдёт инстанс через
+// provide/inject, и компоненты останутся на встроенных fallback-текстах.
+installI18n(app, i18n)
 ```
 
 Это не отменяет базовые правила интеграции:

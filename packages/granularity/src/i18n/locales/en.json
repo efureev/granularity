@@ -13,6 +13,10 @@
     "filterPlaceholder": "Search…",
     "empty": "No data"
   },
+  "select": {
+    "customValuePlaceholder": "Add value…",
+    "addOption": "Add \"{value}\""
+  },
   "dialog": {
     "confirm": {
       "title": "Confirm"
@@ -24,9 +28,11 @@
     }
   },
   "pagination": {
+    "label": "Pagination",
     "pageSize": "Page size",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "page": "Page {n}"
   },
   "navbar": {
     "openMenu": "Open menu"

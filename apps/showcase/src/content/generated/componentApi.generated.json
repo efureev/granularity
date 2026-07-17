@@ -4128,10 +4128,10 @@
           },
           {
             "name": "customValuePlaceholder",
-            "description": "Placeholder для инпута кастомного значения (только в `optionsView=\"panel\"`).",
+            "description": "Placeholder для инпута кастомного значения (только в `optionsView=\"panel\"`). i18n-friendly: если не задан — берётся из адаптера перевода (`gr.select.customValuePlaceholder`), иначе — встроенный fallback.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Add value\\u2026\""
+            "default": "undefined"
           },
           {
             "name": "dropdownMaxHeight",
@@ -4159,7 +4159,7 @@
             "description": "i18n-label для кнопки очистки (`aria-label`).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Clear\""
+            "default": "undefined"
           },
           {
             "name": "modelValue",

@@ -108,4 +108,26 @@ describe('GrPagination', () => {
     expect(wrapper.text()).toContain('Вперёд')
     expect(wrapper.findComponent({ name: 'GrSelect' }).props('ariaLabel')).toBe('Размер страницы')
   })
+
+  it('aria-label региона навигации не путается с лейблом page-size селекта', () => {
+    const wrapper = mountPagination()
+
+    // Регрессия: раньше aria-label всего `role="navigation"` ошибочно брался из ключа
+    // `gr.pagination.pageSize` (лейбл `GrSelect` для размера страницы), а не из
+    // собственного `gr.pagination.label`.
+    const nav = wrapper.get('[role="navigation"]')
+    expect(nav.attributes('aria-label')).toBe('Pagination')
+    expect(wrapper.findComponent({ name: 'GrSelect' }).props('ariaLabel')).toBe('Page size')
+  })
+
+  it('локализует aria-label номера страницы через t() с интерполяцией {n}', () => {
+    const wrapper = mountPagination({
+      props: { page: 6, pageSize: 10, total: 120 },
+    })
+
+    const pageButtons = wrapper.findAll('[data-ds-pagination-page]')
+    const labels = pageButtons.map(button => button.attributes('aria-label'))
+
+    expect(labels).toEqual(['Page 4', 'Page 5', 'Page 6', 'Page 7', 'Page 8'])
+  })
 })

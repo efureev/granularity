@@ -492,17 +492,21 @@ export default defineConfig({
   content: granularContent(granularOptions),
 })`
 
-const localizationSnippet = `import { createFintI18n } from '@feugene/fint-i18n'
-import { GRANULARITY_I18N_BLOCK, grLocaleLoaders } from '@feugene/granularity/i18n'
+const localizationSnippet = `import { createFintI18n } from '@feugene/fint-i18n/core'
+import { installI18n } from '@feugene/fint-i18n/vue'
+import { GRANULARITY_I18N_BLOCK, en, ru } from '@feugene/granularity/i18n'
 
 const i18n = createFintI18n({
   locale: 'ru',
   fallbackLocale: 'en',
-  loaders: [grLocaleLoaders],
+  loaders: [en, ru],
 })
 
 i18n.registerBlocks([GRANULARITY_I18N_BLOCK])
-await i18n.loadUsedBlocks('ru')`
+await i18n.loadUsedBlocks('ru')
+
+// В точке входа приложения — иначе granularity не найдёт инстанс через provide/inject
+installI18n(app, i18n)`
 
 const tokensCssSource = `:root {
   /* Foundations: neutral palette */
@@ -1086,7 +1090,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     keyPoints: [
       'Пакет ожидает внешний i18n-слой и не создаёт собственный изолированный i18n runtime.',
       'При отсутствии перевода компонент использует fallback-текст и не ломает UI.',
-      'Публичный entrypoint `@feugene/granularity/i18n` публикует `GRANULARITY_I18N_BLOCK`, `grLocaleLoaders` и adapter types.',
+      'Публичный entrypoint `@feugene/granularity/i18n` публикует `GRANULARITY_I18N_BLOCK`, per-locale `en`/`ru`/`es` и adapter types.',
     ],
     recommendations: [
       'Держите словари приложения и словари дизайн-системы в одном общем i18n-слое.',

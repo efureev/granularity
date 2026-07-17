@@ -13,6 +13,10 @@
     "filterPlaceholder": "Поиск…",
     "empty": "Нет данных"
   },
+  "select": {
+    "customValuePlaceholder": "Добавить значение…",
+    "addOption": "Добавить «{value}»"
+  },
   "dialog": {
     "confirm": {
       "title": "Подтверждение"
@@ -24,9 +28,11 @@
     }
   },
   "pagination": {
+    "label": "Пагинация",
     "pageSize": "Размер страницы",
     "prev": "Назад",
-    "next": "Вперёд"
+    "next": "Вперёд",
+    "page": "Страница {n}"
   },
   "navbar": {
     "openMenu": "Открыть меню"

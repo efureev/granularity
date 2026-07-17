@@ -4,6 +4,7 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
   defaultBaseClass,
@@ -55,7 +56,7 @@ export interface GrSelectProps {
   optionsView?: GrSelectOptionsView
   /** Разрешает ввод/выбор значения, которого нет в `options`. */
   allowCustomValue?: boolean
-  /** Placeholder для инпута кастомного значения (только в `optionsView="panel"`). */
+  /** Placeholder для инпута кастомного значения (только в `optionsView="panel"`). i18n-friendly: если не задан — берётся из адаптера перевода (`gr.select.customValuePlaceholder`), иначе — встроенный fallback. */
   customValuePlaceholder?: string
   /** Максимальная высота панели (только в `optionsView="panel"`). */
   dropdownMaxHeight?: number
@@ -91,15 +92,23 @@ const props = withDefaults(
 
     optionsView: 'native',
     allowCustomValue: false,
-    customValuePlaceholder: 'Add value…',
+    customValuePlaceholder: undefined,
     dropdownMaxHeight: 280,
     closeOnSelect: true,
     clearable: false,
-    clearLabel: 'Clear',
+    clearLabel: undefined,
     variant: 'primary',
     underline: 'auto',
   },
 )
+
+const { t } = useGranularityTranslations()
+
+const resolvedCustomValuePlaceholder = computed(() => {
+  return props.customValuePlaceholder ?? t('gr.select.customValuePlaceholder', 'Add value…')
+})
+
+const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.common.clear', 'Clear'))
 
 const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : defaultBaseClass)
 
@@ -536,7 +545,7 @@ function clearSelection(): void {
       type="button"
       class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
       :disabled="disabled"
-      :aria-label="clearLabel"
+      :aria-label="resolvedClearLabel"
       @click.stop="clearSelection"
     >
       <span class="i-lucide-x inline-block h-4 w-4" aria-hidden="true" />
@@ -565,7 +574,7 @@ function clearSelection(): void {
                 v-model="customValue"
                 data-testid="ds-select-custom-input"
                 type="text"
-                :placeholder="customValuePlaceholder"
+                :placeholder="resolvedCustomValuePlaceholder"
                 size="sm"
                 @keydown.enter.prevent="addCustom"
               />
@@ -588,7 +597,7 @@ function clearSelection(): void {
                 ]"
                 @click="addCustom"
               >
-                Add “{{ customValue.trim() }}”
+                {{ t('gr.select.addOption', 'Add "{value}"', { value: customValue.trim() }) }}
               </button>
 
               <template v-for="item in panelItems" :key="item.key">

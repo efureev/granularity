@@ -56,16 +56,40 @@ export function resolveGranularityI18n(context?: AppContext | GranularityI18nLik
   return null
 }
 
+// Совпадает с синтаксисом плейсхолдеров `@feugene/fint-i18n` (`{name}`, экранирование
+// `{{`/`}}` — см. docs/en/api.md → "Template Interpolation"), чтобы fallback-текст вёл
+// себя идентично реальному переводу, когда параметры переданы.
+const FALLBACK_PLACEHOLDER_RE = /\{\{|\}\}|\{([a-zA-Z0-9_.-]+)\}/g
+
+/**
+ * Интерполирует `{name}`-плейсхолдеры во fallback-строке. Нужен, чтобы `t(key, fallback,
+ * params)` корректно подставлял параметры и тогда, когда i18n не подключён (или ключ не
+ * найден) — иначе вызывающий код получил бы сырой `'Add "{value}"'` вместо `'Add "foo"'`.
+ */
+function interpolateFallback(template: string, params?: Record<string, any>): string {
+  // `{{`/`}}`-экранирование обязано работать независимо от того, переданы ли `params`
+  // (совпадает с fint-i18n: `t('literal')` без параметров тоже разэкранирует `{{name}}`).
+  // Ранний выход по `!params` здесь недопустим.
+  return template.replace(FALLBACK_PLACEHOLDER_RE, (match, name: string | undefined) => {
+    if (match === '{{') return '{'
+    if (match === '}}') return '}'
+    if (name === undefined) return match
+
+    const value = params?.[name]
+    return value == null ? match : String(value)
+  })
+}
+
 export function useGranularityTranslations(context?: AppContext | GranularityI18nLike | null) {
   const i18n = resolveGranularityI18n(context)
 
   const t = (key: string, fallback: string, params?: Record<string, any>): string => {
     if (!i18n) {
-      return fallback
+      return interpolateFallback(fallback, params)
     }
 
     const result = i18n.t(key, params)
-    return result === key ? fallback : result
+    return result === key ? interpolateFallback(fallback, params) : result
   }
 
   return {

@@ -309,11 +309,18 @@
     }
   },
   "peerDependencies": {
+    "@feugene/fint-i18n": "^0.3.0",
     "@feugene/unocss-preset-granular": "^0.3.0",
     "vue": "^3.5.32"
   },
+  "peerDependenciesMeta": {
+    "@feugene/fint-i18n": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^8.2.0",
+    "@feugene/fint-i18n": "^0.3.0",
     "@feugene/unocss-preset-granular": "^0.3.0",
     "@iconify-json/lucide": "^1.2.101",
     "@types/node": "^25.5.2",
