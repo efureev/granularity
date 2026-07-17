@@ -8,7 +8,7 @@ import grLocales from '@feugene/granularity/i18n/all'
 
 import { SHOWCASE_I18N_BLOCK, showcaseLocaleLoaders } from './messages'
 
-const defaultLocale = 'ru'
+const defaultLocale = 'en'
 
 export async function setupShowcaseI18n() {
   const i18n = createFintI18n({

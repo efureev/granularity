@@ -25,6 +25,7 @@ import type { ShowcaseNavigationItem, ShowcasePageName } from '../app/showcase'
 import type { ShowcaseEntityRegistryItem } from '../content/model'
 import ThemeSwitcher from '../components/ThemeSwitcher.vue'
 import ShowcaseHeader from '../components/layout/ShowcaseHeader.vue'
+import ShowcaseLocaleSwitcher from '../components/layout/ShowcaseLocaleSwitcher.vue'
 import ShowcaseQuickSearch from '../components/layout/ShowcaseQuickSearch.vue'
 import ShowcaseSidebarNavigation from '../components/layout/ShowcaseSidebarNavigation.vue'
 import IconX from '~icons/lucide/x'
@@ -303,10 +304,7 @@ function getSidebarItemClass(item: SidebarNavigationItem) {
         </nav>
 
         <div class="showcase-inline-surface flex items-center gap-2 rounded-2xl border p-2">
-          <div class="showcase-pill flex items-center rounded-full border p-1 text-xs font-semibold">
-            <span class="showcase-nav-item-active rounded-full px-3 py-1.5">RU</span>
-            <span class="px-3 py-1.5 opacity-60">EN</span>
-          </div>
+          <ShowcaseLocaleSwitcher />
           <div class="ml-auto flex items-center gap-1">
             <ShowcaseQuickSearch />
             <ThemeSwitcher />

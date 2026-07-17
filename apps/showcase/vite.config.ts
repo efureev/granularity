@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync } from 'node:fs'
+import { copyFileSync, existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import path from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
@@ -28,6 +28,9 @@ function githubPagesSpaFallback(): Plugin {
 const granularityDistRoot = fileURLToPath(new URL('../../packages/granularity/dist', import.meta.url))
 const granularityDistEntry = fileURLToPath(new URL('../../packages/granularity/dist/index.js', import.meta.url))
 
+const granularityPackageJson = fileURLToPath(new URL('../../packages/granularity/package.json', import.meta.url))
+const granularityVersion = JSON.parse(readFileSync(granularityPackageJson, 'utf-8')).version as string
+
 export const showcaseBuildAnalyzeMode = 'analyze'
 export const showcaseBuildVisualizerConfig = {
   filename: 'dist/stats.html',
@@ -39,6 +42,9 @@ export const showcaseBuildVisualizerConfig = {
 export default defineConfig(({ command, mode }) => ({
   root: fileURLToPath(new URL('./', import.meta.url)),
   base: command === 'serve' ? '/' : '/granularity/',
+  define: {
+    __GRANULARITY_VERSION__: JSON.stringify(granularityVersion),
+  },
   resolve: {
     alias: [
       {

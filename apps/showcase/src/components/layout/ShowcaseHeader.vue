@@ -5,13 +5,13 @@ import {
   useRoute,
 } from 'vue-router'
 
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrButton, GrSegmented, type GrSegmentedOption } from '@feugene/granularity'
+import { GrButton } from '@feugene/granularity'
 
 import { showcaseNavigationItems } from '../../app/showcase'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
 import type { ShowcaseNavigationItem } from '../../app/showcase'
 import ThemeSwitcher from '../ThemeSwitcher.vue'
+import ShowcaseLocaleSwitcher from './ShowcaseLocaleSwitcher.vue'
 import ShowcaseQuickSearch from './ShowcaseQuickSearch.vue'
 import IconLayers from '~icons/lucide/layers'
 import IconMenu from '~icons/lucide/menu'
@@ -21,24 +21,9 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
-const i18n = useFintI18n()
 const { localizePageByName } = useShowcasePageI18n()
 
-const localeOptions = [
-  { value: 'ru', label: 'RU' },
-  { value: 'en', label: 'EN' },
-] satisfies GrSegmentedOption[]
-
-const selectedLocale = computed<'ru' | 'en'>({
-  get() {
-    return i18n.locale.value === 'ru' ? 'ru' : 'en'
-  },
-  set(value) {
-    if (value !== i18n.locale.value) {
-      void i18n.setLocale(value)
-    }
-  },
-})
+const packageVersion = __GRANULARITY_VERSION__
 
 const topNavigationItems = computed(() => showcaseNavigationItems
   .filter(item => item.name !== 'overview')
@@ -95,8 +80,12 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
             <IconLayers class="h-4 w-4 text-[var(--muted-fg)]" />
           </div>
           <div class="min-w-0">
-            <p class="truncate text-base font-semibold">
+            <p class="flex items-center gap-2 truncate text-base font-semibold">
               Granularity
+              <span
+                class="showcase-pill shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none"
+                :title="$t('showcase.header.versionLabel')"
+              >v{{ packageVersion }}</span>
             </p>
             <p class="showcase-text-subtle truncate text-xs">
               {{ $t('showcase.header.subtitle') }}
@@ -117,13 +106,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
         </nav>
 
         <div class="ml-auto flex items-center gap-1 sm:gap-2">
-          <GrSegmented
-            v-model="selectedLocale"
-            class="hidden sm:inline-grid font-semibold showcase-pill"
-            size="sm"
-            :options="localeOptions"
-            :aria-label="$t('showcase.header.languageLabel')"
-          />
+          <ShowcaseLocaleSwitcher class="hidden sm:inline-grid" />
           <ShowcaseQuickSearch />
           <ThemeSwitcher />
         </div>

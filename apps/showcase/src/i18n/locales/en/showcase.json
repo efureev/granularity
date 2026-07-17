@@ -3,6 +3,7 @@
     "subtitle": "Component package showcase",
     "openNavigation": "Open navigation",
     "languageLabel": "Language",
+    "versionLabel": "Package version",
     "searchLabel": "Quick search",
     "navigationLabel": "Navigation",
     "contextNavigationLabel": "Context navigation"

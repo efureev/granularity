@@ -113,11 +113,11 @@ describe('showcase layout integration', () => {
   it('рендерит breadcrumbs и doc sections для component detail route', async () => {
     const { wrapper } = await mountShowcaseAt('/components/gr-button')
 
-    expect(wrapper.text()).toContain('Компоненты')
+    expect(wrapper.text()).toContain('Components')
     expect(wrapper.text()).toContain('GrButton')
-    expect(wrapper.text()).toContain('Живые примеры')
+    expect(wrapper.text()).toContain('Live examples')
     expect(wrapper.text()).toContain('API')
-    expect(wrapper.text()).toContain('Заметки по реализации')
+    expect(wrapper.text()).toContain('Implementation notes')
   })
 
   it('рендерит package-level api, usage и breadcrumbs для composable detail route', async () => {
@@ -125,23 +125,23 @@ describe('showcase layout integration', () => {
 
     expect(wrapper.text()).toContain('Composables')
     expect(wrapper.text()).toContain('useTheme')
-    expect(wrapper.text()).toContain('Обзор пакета')
-    expect(wrapper.text()).toContain('Канонический пример использования')
+    expect(wrapper.text()).toContain('Package overview')
+    expect(wrapper.text()).toContain('Canonical usage')
     expect(wrapper.text()).toContain('API')
   })
 
   it('показывает fallback для отсутствующей package entity и сохраняет CTA возврата', async () => {
     const { wrapper } = await mountShowcaseAt('/utilities/missing-entity')
 
-    expect(wrapper.text()).toContain('Сущность пакета не найдена')
-    expect(wrapper.text()).toContain('Перейти в directives')
-    expect(wrapper.text()).toContain('Перейти в composables')
-    expect(wrapper.text()).toContain('Перейти в utilities')
+    expect(wrapper.text()).toContain('Package entity not found')
+    expect(wrapper.text()).toContain('Go to directives')
+    expect(wrapper.text()).toContain('Go to composables')
+    expect(wrapper.text()).toContain('Go to utilities')
   })
 
   it('переключает тему через docs shell action', async () => {
     const { wrapper } = await mountShowcaseAt('/')
-    const themeToggleButton = findButtonByAriaLabel(wrapper, 'Переключить тему')
+    const themeToggleButton = findButtonByAriaLabel(wrapper, 'Toggle theme')
 
     expect(document.documentElement.dataset.theme).toBe('light')
     expect(themeToggleButton).toBeTruthy()
@@ -173,37 +173,37 @@ describe('showcase layout integration', () => {
 
   it('открывает mobile drawer с внутристраничной навигацией и закрывает его при смене route', async () => {
     const { router, wrapper } = await mountShowcaseAt('/components/gr-button')
-    const mobileMenuButton = findButtonByAriaLabel(wrapper, 'Открыть навигацию')
+    const mobileMenuButton = findButtonByAriaLabel(wrapper, 'Open navigation')
 
-    expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(false)
+    expect(wrapper.find('[aria-label="Close navigation"]').exists()).toBe(false)
     expect(mobileMenuButton).toBeTruthy()
 
     await mobileMenuButton?.trigger('click')
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Навигация')
-    expect(wrapper.text()).toContain('Контекстная навигация')
-    expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Действия')
+    expect(wrapper.text()).toContain('Navigation')
+    expect(wrapper.text()).toContain('Context navigation')
+    expect(wrapper.find('[aria-label="Close navigation"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Actions')
     expect(wrapper.text()).toContain('GrButtonGroup')
 
     await router.push('/utilities')
     await flushPromises()
 
-    expect(wrapper.find('[aria-label="Закрыть навигацию"]').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Утилиты каталог')
+    expect(wrapper.find('[aria-label="Close navigation"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Utilities catalog')
   })
 
   it('открывает quick search как CSS-sized панель с внутренним скроллом результатов', async () => {
     const { wrapper } = await mountShowcaseAt('/components/gr-button')
-    const searchButton = findButtonByAriaLabel(wrapper, 'Открыть поиск')
+    const searchButton = findButtonByAriaLabel(wrapper, 'Open search')
 
     expect(searchButton).toBeTruthy()
 
     await searchButton?.trigger('click')
     await flushPromises()
 
-    const searchPanel = wrapper.findAll('.showcase-overlay').find(node => node.text().includes('Быстрый поиск'))
+    const searchPanel = wrapper.findAll('.showcase-overlay').find(node => node.text().includes('Quick search'))
 
     expect(searchPanel).toBeTruthy()
     expect(searchPanel?.classes()).toContain('absolute')
@@ -222,6 +222,6 @@ describe('showcase layout integration', () => {
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await flushPromises()
 
-    expect(wrapper.findAll('.showcase-overlay').some(node => node.text().includes('Быстрый поиск'))).toBe(false)
+    expect(wrapper.findAll('.showcase-overlay').some(node => node.text().includes('Quick search'))).toBe(false)
   })
 })
