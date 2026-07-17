@@ -14,6 +14,10 @@ export async function setupShowcaseI18n() {
   const i18n = createFintI18n({
     locale: defaultLocale,
     fallbackLocale: 'en',
+    // Без этого `fallbackLocale` объявлен, но не работает: `loadUsedBlocks(defaultLocale)`
+    // ниже грузит только 'ru', и `messagesStore.en` остаётся пустым до первого ручного
+    // переключения языка — реальный fallback для отсутствующих ru-ключей не сработает.
+    preloadFallback: true,
     loaders: [showcaseLocaleLoaders, ...grLocales],
     plugins: [
       new PersistencePlugin({
