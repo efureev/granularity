@@ -1,9 +1,31 @@
+import { cp } from 'node:fs/promises'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
 import { granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
 import {libInjectCss} from "vite-plugin-lib-inject-css";
+
+/**
+ * Копирует сырые CSS-токены/темы/preflight (`src/styles/*`) в `dist/styles/`,
+ * чтобы потребитель мог подключить тему без UnoCSS-провайдера —
+ * `import '@feugene/granularity/styles/index.css'` (см. `exports` в package.json).
+ */
+function copyStylesPlugin() {
+  return {
+    name: 'gr-copy-styles',
+    apply: 'build' as const,
+    async closeBundle() {
+      const src = fileURLToPath(new URL('./src/styles', import.meta.url))
+      const dest = fileURLToPath(new URL('./dist/styles', import.meta.url))
+      await cp(src, dest, {
+        recursive: true,
+        // Документацию (`abbreviations.md`) в дистрибутив не тащим.
+        filter: source => !source.endsWith('.md'),
+      })
+    },
+  }
+}
 
 /**
  * Build-конфиг пакета `@feugene/granularity`.
@@ -22,6 +44,7 @@ export default defineConfig({
     vue(),
     libInjectCss(),
     Icons({ compiler: 'vue3', autoInstall: false }),
+    copyStylesPlugin(),
   ],
   build: {
     target: 'esnext',

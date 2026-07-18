@@ -2,30 +2,31 @@
 /**
  * GrToaster — DS-примитив области уведомлений (toast).
  *
- * Модель состояния берётся из `useToast` (модульный синглтон), поэтому
- * в приложении предполагается **один активный `GrToaster`** на корень.
+ * Модель состояния берётся из `useToast`, поэтому в приложении предполагается
+ * **один активный `GrToaster`** на корень (или app-scoped через плагин).
  *
  * A11y:
  * - контейнер — `role="region"` с `aria-label` (i18n-проп `regionLabel`);
- * - каждый toast — `role="status"` + `aria-live="polite"` для `info`/`success`
- *   и `role="alert"` + `aria-live="assertive"` для `warning`/`danger`
- *   (критичные сообщения должны прерывать скринридер).
+ * - список обёрнут в ПОСТОЯННЫЙ live-region (`aria-live="polite"`), который
+ *   существует до вставки тостов — иначе SR часто не озвучивают целиком
+ *   вставленный узел с `aria-live`;
+ * - критичные тосты (`warning`/`danger`) несут `role="alert"` (ассертивно).
  *
  * UX:
- * - появление/исчезновение анимируется `TransitionGroup`;
- * - `placement` настраивает угол экрана;
- * - `z-[var(--gr-z-toast)]` — верхний слой шкалы токенов (см. `styles/tokens.css`),
- *   выше `GrModal` (`--gr-z-modal`), чтобы уведомления не перекрывались диалогом.
+ * - `maxVisible` ограничивает стек; лишние ждут в очереди (их таймеры на паузе);
+ * - автозакрытие **останавливается под курсором/фокусом** (WCAG 2.2.1) и
+ *   визуализируется прогресс-баром до закрытия;
+ * - `placement` настраивает угол экрана; слой — `--gr-z-toast`.
  */
-import {computed} from 'vue'
-import type {Component} from 'vue'
+import { computed, ref, watchEffect } from 'vue'
+import type { Component } from 'vue'
 
-import {useToast} from '../../composables/useToast'
-import {useGranularityTranslations} from '../../internal/granularityI18n'
-import type {GrToastTone} from '../../composables/useToast'
+import { useToast } from '../../composables/useToast'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+import type { GrToastTone } from '../../composables/useToast'
 import GrButton from '../GrButton'
 import GrIcon from '../GrIcon'
-import {PLACEMENT_CLASS, type GrToasterPlacement} from './grToasterStyles'
+import { PLACEMENT_CLASS, type GrToasterPlacement } from './grToasterStyles'
 
 import IconCheck from '~icons/lucide/check-circle'
 import IconWarning from '~icons/lucide/alert-triangle'
@@ -33,32 +34,32 @@ import IconError from '~icons/lucide/x-circle'
 import IconInfo from '~icons/lucide/info'
 import IconClose from '~icons/lucide/x'
 
-export type {GrToasterPlacement}
+export type { GrToasterPlacement }
 
 interface ToneMeta {
   icon: Component
   color: string
   role: 'status' | 'alert'
-  live: 'polite' | 'assertive'
 }
 
-// Единый маппинг по tone'у: иконка, цвет, a11y-роль и «напор» live-региона.
-// На уровне модуля — чтобы не пересоздавать объект на каждый рендер.
+// Единый маппинг по tone'у: иконка, цвет, a11y-роль. На уровне модуля —
+// чтобы не пересоздавать объект на каждый рендер.
 const TONE_META: Record<GrToastTone, ToneMeta> = {
-  primary: {icon: IconInfo, color: 'var(--primary)', role: 'status', live: 'polite'},
-  neutral: {icon: IconInfo, color: 'var(--muted-fg)', role: 'status', live: 'polite'},
-  info: {icon: IconInfo, color: 'var(--ds-info)', role: 'status', live: 'polite'},
-  success: {icon: IconCheck, color: 'var(--ds-success)', role: 'status', live: 'polite'},
-  warning: {icon: IconWarning, color: 'var(--ds-warning)', role: 'alert', live: 'assertive'},
-  danger: {icon: IconError, color: 'var(--ds-danger)', role: 'alert', live: 'assertive'},
-  slate: {icon: IconInfo, color: 'var(--ds-slate)', role: 'status', live: 'polite'},
-  azure: {icon: IconInfo, color: 'var(--ds-azure)', role: 'status', live: 'polite'},
+  primary: { icon: IconInfo, color: 'var(--primary)', role: 'status' },
+  neutral: { icon: IconInfo, color: 'var(--muted-fg)', role: 'status' },
+  info: { icon: IconInfo, color: 'var(--ds-info)', role: 'status' },
+  success: { icon: IconCheck, color: 'var(--ds-success)', role: 'status' },
+  warning: { icon: IconWarning, color: 'var(--ds-warning)', role: 'alert' },
+  danger: { icon: IconError, color: 'var(--ds-danger)', role: 'alert' },
+  slate: { icon: IconInfo, color: 'var(--ds-slate)', role: 'status' },
+  azure: { icon: IconInfo, color: 'var(--ds-azure)', role: 'status' },
 }
-
 
 export interface GrToasterProps {
   /** Угол экрана для стека уведомлений. */
   placement?: GrToasterPlacement
+  /** Максимум одновременно видимых тостов; остальные ждут в очереди. По умолчанию `4`. */
+  maxVisible?: number
   /** A11y-лейбл кнопки закрытия (i18n). */
   dismissLabel?: string
   /** A11y-лейбл контейнера-региона (i18n). */
@@ -67,6 +68,7 @@ export interface GrToasterProps {
 
 const props = withDefaults(defineProps<GrToasterProps>(), {
   placement: 'top-right',
+  maxVisible: 4,
   dismissLabel: undefined,
   regionLabel: undefined,
 })
@@ -75,10 +77,28 @@ const { t } = useGranularityTranslations()
 const resolvedDismissLabel = computed(() => props.dismissLabel ?? t('gr.toaster.dismiss', 'Dismiss'))
 const resolvedRegionLabel = computed(() => props.regionLabel ?? t('gr.toaster.region', 'Notifications'))
 
-const {list, dismiss} = useToast()
+const { list, dismiss, pause, resume } = useToast()
 
 // SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
 const isClient = typeof window !== 'undefined'
+
+// Видимые тосты (не больше `maxVisible`); остальные — в очереди.
+const visibleToasts = computed(() => list.value.slice(0, Math.max(1, props.maxVisible)))
+const visibleIds = computed(() => new Set(visibleToasts.value.map(toast => toast.id)))
+
+// Пауза под курсором/фокусом (WCAG 2.2.1). Один флаг на весь стек.
+const paused = ref(false)
+
+// Единый источник правды по таймерам: тост тикает, только если он видим И стек не на
+// паузе. Очередь и hover — на паузе. Реагирует на изменения списка/hover.
+watchEffect(() => {
+  for (const toast of list.value) {
+    if (visibleIds.value.has(toast.id) && !paused.value)
+      resume(toast.id)
+    else
+      pause(toast.id)
+  }
+})
 
 function metaFor(tone: GrToastTone): ToneMeta {
   return TONE_META[tone] ?? TONE_META.info
@@ -93,11 +113,18 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
         data-ds-toaster
         role="region"
         :aria-label="resolvedRegionLabel"
-        class="fixed z-[var(--gr-z-toast)] grid w-[360px] max-w-[calc(100vw-2rem)] gap-3"
+        class="fixed z-[var(--gr-z-toast)] w-[360px] max-w-[calc(100vw-2rem)]"
         :class="containerClass"
+        @mouseenter="paused = true"
+        @mouseleave="paused = false"
+        @focusin="paused = true"
+        @focusout="paused = false"
     >
+      <!-- Постоянный live-region: существует всегда, поэтому вставленные тосты озвучиваются. -->
       <TransitionGroup
           tag="div"
+          aria-live="polite"
+          aria-atomic="false"
           class="grid gap-3"
           enter-active-class="transition duration-200 ease-out"
           enter-from-class="opacity-0 translate-y-2"
@@ -108,14 +135,13 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
           move-class="transition-transform duration-200 ease-out"
       >
         <div
-            v-for="toast in list"
+            v-for="toast in visibleToasts"
             :key="toast.id"
             data-ds-toast
             :data-tone="toast.tone"
             :role="metaFor(toast.tone).role"
-            :aria-live="metaFor(toast.tone).live"
             aria-atomic="true"
-            class="rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--ds-shadow-2)]"
+            class="relative overflow-hidden rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--ds-shadow-2)]"
         >
           <div class="flex items-start gap-3">
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }" aria-hidden="true">
@@ -141,8 +167,38 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
               </GrIcon>
             </GrButton>
           </div>
+
+          <!-- Прогресс до автозакрытия; замирает вместе с таймером на паузе. -->
+          <div
+              v-if="toast.timeoutMs > 0"
+              data-ds-toast-progress
+              aria-hidden="true"
+              class="gr-toast-progress absolute bottom-0 left-0 h-[2px] w-full origin-left"
+              :style="{
+                backgroundColor: metaFor(toast.tone).color,
+                animationDuration: `${toast.timeoutMs}ms`,
+                animationPlayState: paused ? 'paused' : 'running',
+              }"
+          />
         </div>
       </TransitionGroup>
     </div>
   </teleport>
 </template>
+
+<style scoped>
+.gr-toast-progress {
+  animation-name: gr-toast-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes gr-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+</style>

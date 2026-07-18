@@ -14,9 +14,9 @@
 // транслируют такие конструкции в статические asset-URL и `node:*` в бандл
 // не утаскивают.
 //
-// Ключи записи `<Name>: ds<Name>Config` в `granularityComponentConfigs`
-// критичны для regex‑парсинга в `apps/showcase/scripts/generate-component-api.mjs`,
-// не ломайте формат.
+// `apps/showcase/scripts/generate-component-api.mjs` берёт список компонентов из
+// `Object.keys(granularityComponentConfigs)` (импорт модуля через vite SSR),
+// поэтому спецформат строк реестра больше не является API — можно свободно рефакторить.
 import {
   defineGranularProvider,
   type GranularComponentDescriptor,
@@ -112,9 +112,6 @@ const theme = {
  * остаётся здесь, а node‑вариант подставляется снаружи через
  * `createGranularityProvider(overrides)` — см. `./index.ts` (browser)
  * и `./node.ts` (node).
- *
- * Формат записи `<Name>: ds<Name>Config` критичен для regex‑парсинга
- * в `apps/showcase/scripts/generate-component-api.mjs`, не ломайте его.
  */
 export const granularityComponentConfigs = {
   GrAlert: grAlertConfig,

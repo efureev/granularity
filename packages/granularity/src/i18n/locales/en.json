@@ -37,7 +37,9 @@
     "pageSize": "Page size",
     "prev": "Prev",
     "next": "Next",
-    "page": "Page {n}"
+    "page": "Page {n}",
+    "first": "First page",
+    "last": "Last page"
   },
   "navbar": {
     "openMenu": "Open menu"

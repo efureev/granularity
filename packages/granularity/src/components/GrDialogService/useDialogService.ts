@@ -65,6 +65,16 @@ function enqueue(
   options: DialogBaseOptions,
   onConfirm: DialogOnConfirm<any> | undefined,
 ): { promise: Promise<DialogResult<any>>, close: () => void } {
+  // Императивный сервис клиент-only: монтирует хост в `document.body`. В SSR
+  // выполнять его нельзя — модульная очередь (`dialogQueue`) мутировалась бы на
+  // сервере и текла между запросами. Явно запрещаем вместо тихого no-op.
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    throw new Error(
+      '[granularity] useDialogService is client-only and cannot be called during SSR '
+      + '(it mounts a host into document.body). Guard imperative dialog calls behind a client-side check.',
+    )
+  }
+
   ensureMounted(options.appContext ?? cachedAppContext)
 
   const id = makeDialogId()

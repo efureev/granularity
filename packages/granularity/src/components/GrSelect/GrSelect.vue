@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
+import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -213,9 +214,7 @@ function toggleDropdown(): void {
   open.value = !open.value
 }
 
-function closeOnEscape(e: KeyboardEvent): void {
-  if (e.key === 'Escape') closeDropdown()
-}
+useEscapeToClose(open, closeDropdown)
 
 // `view` определяет режим `matchWidth` (см. выше) — пересчитываем позицию/ширину
 // панели, если он меняется, пока панель открыта.
@@ -229,12 +228,6 @@ watch(
 watch(
   open,
   async (isOpen) => {
-    if (typeof document === 'undefined') return
-
-    document.removeEventListener('keydown', closeOnEscape)
-
-    if (isOpen) document.addEventListener('keydown', closeOnEscape)
-
     if (!isOpen) {
       customValue.value = ''
       return
@@ -247,11 +240,6 @@ watch(
   },
   { immediate: true },
 )
-
-onUnmounted(() => {
-  if (typeof document === 'undefined') return
-  document.removeEventListener('keydown', closeOnEscape)
-})
 
 const panelClasses = computed(() => {
   return grSelectPanelClasses

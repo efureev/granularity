@@ -59,31 +59,56 @@ function mountPagination(options: PaginationMountOptions = {}) {
 }
 
 describe('GrPagination', () => {
-  it('рендерит окно страниц вокруг активной страницы', () => {
+  it('усекает номера многоточием: первая/последняя + соседи вокруг текущей', () => {
     const wrapper = mountPagination({
       props: {
         page: 6,
         pageSize: 10,
-        total: 120,
+        total: 120, // 12 страниц
       },
     })
 
-    const pageButtons = wrapper.findAll('button[type="button"]')
-    const numericButtons = pageButtons.slice(1, -1)
-
-    expect(numericButtons.map(button => button.text())).toEqual(['4', '5', '6', '7', '8'])
-    expect(numericButtons[2].classes()).toContain('bg-[var(--primary)]')
+    const numericButtons = wrapper.findAll('[data-ds-pagination-page]')
+    // boundary=1, sibling=1: [1] … [5 6 7] … [12]
+    expect(numericButtons.map(button => button.text())).toEqual(['1', '5', '6', '7', '12'])
+    // активная страница подсвечена
+    const active = numericButtons.find(button => button.text() === '6')!
+    expect(active.classes()).toContain('bg-[var(--primary)]')
+    // есть многоточия (с обеих сторон)
+    expect(wrapper.findAll('[data-ds-pagination-ellipsis]').length).toBe(2)
   })
 
-  it('эмитит изменение страницы по кнопкам навигации и номеру страницы', async () => {
-    const wrapper = mountPagination()
-    const pageButtons = wrapper.findAll('button[type="button"]')
+  it('без разрывов многоточие не рисуется', () => {
+    const wrapper = mountPagination({
+      props: { page: 1, pageSize: 20, total: 60 }, // 3 страницы
+    })
 
-    await pageButtons[0].trigger('click')
-    await pageButtons[3].trigger('click')
-    await pageButtons[pageButtons.length - 1].trigger('click')
+    expect(wrapper.findAll('[data-ds-pagination-page]').map(b => b.text())).toEqual(['1', '2', '3'])
+    expect(wrapper.findAll('[data-ds-pagination-ellipsis]').length).toBe(0)
+  })
 
-    expect(wrapper.emitted('update:page')).toEqual([[2], [3], [4]])
+  it('эмитит изменение страницы по номеру и по prev/next/first/last', async () => {
+    const wrapper = mountPagination() // page 3, 8 страниц
+
+    await wrapper.findAll('[data-ds-pagination-page]').find(b => b.text() === '4')!.trigger('click')
+    await wrapper.get('[data-ds-pagination-prev]').trigger('click')
+    await wrapper.get('[data-ds-pagination-next]').trigger('click')
+    await wrapper.get('[data-ds-pagination-first]').trigger('click')
+    await wrapper.get('[data-ds-pagination-last]').trigger('click')
+
+    expect(wrapper.emitted('update:page')).toEqual([[4], [2], [4], [1], [8]])
+  })
+
+  it('клампит страницу к последней, когда total уменьшился (page вышла за диапазон)', async () => {
+    const wrapper = mountPagination({
+      props: { page: 8, pageSize: 20, total: 160 }, // 8 страниц, page=8 — валидно
+    })
+
+    expect(wrapper.emitted('update:page')).toBeFalsy()
+
+    // total упал до 60 → 3 страницы, page=8 больше → должен эмитнуться кламп к 3
+    await wrapper.setProps({ total: 60 })
+    expect(wrapper.emitted('update:page')).toEqual([[3]])
   })
 
   it('эмитит изменение размера страницы через GrSelect', async () => {
@@ -128,6 +153,7 @@ describe('GrPagination', () => {
     const pageButtons = wrapper.findAll('[data-ds-pagination-page]')
     const labels = pageButtons.map(button => button.attributes('aria-label'))
 
-    expect(labels).toEqual(['Page 4', 'Page 5', 'Page 6', 'Page 7', 'Page 8'])
+    // page 6 из 12: [1] … [5 6 7] … [12]
+    expect(labels).toEqual(['Page 1', 'Page 5', 'Page 6', 'Page 7', 'Page 12'])
   })
 })

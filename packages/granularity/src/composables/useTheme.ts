@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import type { Ref } from 'vue'
 
 export type ThemeName = 'light' | 'dark'
 
@@ -18,24 +19,30 @@ export type UseThemeOptions = {
 
 const DEFAULT_STORAGE_KEY = 'fint-ds-theme'
 
-function getPreferredTheme(storageKey = DEFAULT_STORAGE_KEY, persist = true): ThemeName {
-  if (typeof window === 'undefined') return 'light'
+function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null {
+  if (typeof window === 'undefined' || !persist) return null
 
-  if (persist) {
-    // Доступ к `localStorage` может бросать `SecurityError` в Safari private mode
-    // и при отключённых cookies/storage — поэтому оборачиваем в try/catch.
-    try {
-      const storage = window.localStorage
-      const stored = typeof storage?.getItem === 'function' ? storage.getItem(storageKey) : null
-      if (stored === 'light' || stored === 'dark') return stored
-    }
-    catch {
-      // ignore
-    }
+  // Доступ к `localStorage` может бросать `SecurityError` в Safari private mode
+  // и при отключённых cookies/storage — поэтому оборачиваем в try/catch.
+  try {
+    const storage = window.localStorage
+    const stored = typeof storage?.getItem === 'function' ? storage.getItem(storageKey) : null
+    if (stored === 'light' || stored === 'dark') return stored
+  }
+  catch {
+    // ignore
   }
 
-  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches
-  return prefersDark ? 'dark' : 'light'
+  return null
+}
+
+function getSystemTheme(): ThemeName {
+  if (typeof window === 'undefined') return 'light'
+  return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light'
+}
+
+function getPreferredTheme(storageKey = DEFAULT_STORAGE_KEY, persist = true): ThemeName {
+  return readStoredTheme(storageKey, persist) ?? getSystemTheme()
 }
 
 function applyTheme(theme: ThemeName) {
@@ -46,28 +53,79 @@ function applyTheme(theme: ThemeName) {
   root.dataset.theme = theme
 }
 
+// Модульный shared-синглтон состояния темы: единый источник истины для ВСЕХ
+// вызовов `useTheme()` (по образцу `useToast`). Раньше каждый вызов создавал
+// собственный `ref`, из-за чего переключение темы в компоненте A не обновляло
+// `theme`/`isDark` в компоненте B (менялся только DOM-класс) — та самая
+// рассинхронизация. Теперь ref один, реактивность консистентна.
+const sharedTheme: Ref<ThemeName> = ref<ThemeName>(getPreferredTheme())
+
+// Активные ключ/persist, которыми синглтон инициализирован (нужны слушателям
+// `storage`/`matchMedia`, чтобы знать, какой ключ отслеживать).
+let activeStorageKey = DEFAULT_STORAGE_KEY
+let activePersist = true
+let listenersBound = false
+
+// Подписки на системную тему и синхронизацию между вкладками. Живут на уровне
+// модуля (как таймеры в `useToast`): состояние общее, поэтому подписка нужна
+// одна на приложение, а не per-consumer — здесь `onScopeDispose` был бы вреден
+// (порвал бы shared-подписку при размонтировании одного из потребителей).
+function bindListeners() {
+  if (listenersBound || typeof window === 'undefined') return
+  listenersBound = true
+
+  // Cross-tab: другая вкладка записала тему в localStorage.
+  window.addEventListener?.('storage', (event: StorageEvent) => {
+    if (!activePersist || event.key !== activeStorageKey) return
+    if (event.newValue === 'light' || event.newValue === 'dark') {
+      sharedTheme.value = event.newValue
+      applyTheme(event.newValue)
+    }
+  })
+
+  // Системная смена `prefers-color-scheme` — следуем ей только если пользователь
+  // НЕ выбрал тему явно (в storage ничего не сохранено).
+  const mql = window.matchMedia?.('(prefers-color-scheme: dark)')
+  mql?.addEventListener?.('change', (event: MediaQueryListEvent) => {
+    if (readStoredTheme(activeStorageKey, activePersist) !== null) return
+    const next: ThemeName = event.matches ? 'dark' : 'light'
+    sharedTheme.value = next
+    applyTheme(next)
+  })
+}
+
 /**
  * Для применения темы максимально рано (до монтирования Vue), чтобы избежать "мигания".
+ * Также сидирует shared-синглтон, чтобы значение в `useTheme()` совпадало с уже
+ * применённым к документу.
  */
 export function initThemeEarly(options: UseThemeOptions = {}) {
   const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY
   const persist = options.persist ?? true
-  applyTheme(getPreferredTheme(storageKey, persist))
+  const preferred = getPreferredTheme(storageKey, persist)
+
+  activeStorageKey = storageKey
+  activePersist = persist
+  sharedTheme.value = preferred
+  applyTheme(preferred)
 }
 
 export function useTheme(options: UseThemeOptions = {}) {
   const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY
   const persist = options.persist ?? true
 
-  const theme = ref<ThemeName>(getPreferredTheme(storageKey, persist))
+  activeStorageKey = storageKey
+  activePersist = persist
+  bindListeners()
 
+  const theme = sharedTheme
   const isDark = computed(() => theme.value === 'dark')
 
   function setTheme(next: ThemeName) {
     theme.value = next
 
     if (persist && typeof window !== 'undefined') {
-      // См. комментарий в `getPreferredTheme`: запись тоже может бросать.
+      // См. комментарий в `readStoredTheme`: запись тоже может бросать.
       try {
         const storage = window.localStorage
         if (typeof storage?.setItem === 'function')

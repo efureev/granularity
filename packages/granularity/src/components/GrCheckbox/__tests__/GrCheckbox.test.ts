@@ -75,4 +75,44 @@ describe('GrCheckbox', () => {
     await wrapper.get('[role="checkbox"]').trigger('click')
     expect(new FormData(form).get('terms')).toBe(null)
   })
+
+  it('нативный input — источник истины: change (напр. клик по внешнему label) эмитит модель', async () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false },
+      slots: { default: 'Label' },
+    })
+
+    const native = wrapper.get('input[type="checkbox"]')
+    // Симулируем нативный клик по `<label for>`: сначала меняется `.checked`, затем `change`.
+    ;(native.element as HTMLInputElement).checked = true
+    await native.trigger('change')
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
+  })
+
+  it('indeterminate: aria-checked="mixed", свойство на нативном input и клик → true', async () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false, indeterminate: true },
+      slots: { default: 'Label' },
+    })
+
+    expect(wrapper.get('[role="checkbox"]').attributes('aria-checked')).toBe('mixed')
+    expect((wrapper.get('input[type="checkbox"]').element as HTMLInputElement).indeterminate).toBe(true)
+
+    await wrapper.get('[role="checkbox"]').trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
+  })
+
+  it('Enter больше не переключает (нестандартно для чекбокса), Space — переключает', async () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false },
+      slots: { default: 'Label' },
+    })
+
+    await wrapper.get('[role="checkbox"]').trigger('keydown', { key: 'Enter' })
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+
+    await wrapper.get('[role="checkbox"]').trigger('keydown', { key: ' ' })
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
+  })
 })

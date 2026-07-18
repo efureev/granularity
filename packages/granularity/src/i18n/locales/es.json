@@ -37,7 +37,9 @@
     "pageSize": "Tamaño de página",
     "prev": "Anterior",
     "next": "Siguiente",
-    "page": "Página {n}"
+    "page": "Página {n}",
+    "first": "Primera página",
+    "last": "Última página"
   },
   "navbar": {
     "openMenu": "Abrir menú"

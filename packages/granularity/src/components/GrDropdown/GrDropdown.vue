@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
+import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
 import {
   grDropdownContentClass,
   grDropdownOriginClass,
@@ -64,20 +65,7 @@ function close(): void {
   open.value = false
 }
 
-function closeOnEscape(e: KeyboardEvent): void {
-  if (e.key === 'Escape') close()
-}
-
-watch(
-  open,
-  (isOpen) => {
-    if (typeof document === 'undefined') return
-
-    document.removeEventListener('keydown', closeOnEscape)
-    if (isOpen) document.addEventListener('keydown', closeOnEscape)
-  },
-  { immediate: true },
-)
+useEscapeToClose(open, close)
 
 watch(
   () => props.align,
@@ -85,11 +73,6 @@ watch(
     if (open.value) updateFloatingPosition()
   },
 )
-
-onUnmounted(() => {
-  if (typeof document === 'undefined') return
-  document.removeEventListener('keydown', closeOnEscape)
-})
 
 const widthClass = computed(() => grDropdownWidthClass(props.width))
 

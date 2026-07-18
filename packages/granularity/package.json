@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -37,6 +37,7 @@
   },
   "type": "module",
   "types": "./dist/types/src/index.d.ts",
+  "web-types": "./dist/web-types.json",
   "files": [
     "dist"
   ],
@@ -49,6 +50,7 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./styles/*": "./dist/styles/*",
     "./components/GrAlert": {
       "types": "./dist/types/src/components/GrAlert/index.d.ts",
       "import": "./dist/components/GrAlert/index.js"
@@ -340,7 +342,7 @@
     "vue-tsc": "^3.3.7"
   },
   "scripts": {
-    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "build": "vite build && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",

@@ -78,7 +78,7 @@ describe('GrToaster', () => {
     expect(region?.getAttribute('aria-label')).toBe('Уведомления')
   })
 
-  it('info/success имеют role=status+polite, warning/danger — role=alert+assertive', async () => {
+  it('info/success — role=status, warning/danger — role=alert; список в постоянном live-region', async () => {
     const toast = useToast()
     toast.push({ title: 'Info', tone: 'info', timeoutMs: 0 })
     toast.push({ title: 'Danger', tone: 'danger', timeoutMs: 0 })
@@ -95,14 +95,54 @@ describe('GrToaster', () => {
       items.map(el => [el.getAttribute('data-tone'), el] as const),
     )
 
+    // Роль сохраняется per-toast; критичные — ассертивный `role="alert"`.
     expect(byVariant.info.getAttribute('role')).toBe('status')
-    expect(byVariant.info.getAttribute('aria-live')).toBe('polite')
     expect(byVariant.success.getAttribute('role')).toBe('status')
-    expect(byVariant.success.getAttribute('aria-live')).toBe('polite')
     expect(byVariant.warning.getAttribute('role')).toBe('alert')
-    expect(byVariant.warning.getAttribute('aria-live')).toBe('assertive')
     expect(byVariant.danger.getAttribute('role')).toBe('alert')
-    expect(byVariant.danger.getAttribute('aria-live')).toBe('assertive')
+
+    // Постоянный live-region — на обёртке списка (существует до вставки тостов).
+    const liveRegion = document.body.querySelector('[data-ds-toaster] [aria-live="polite"]')
+    expect(liveRegion).not.toBeNull()
+    expect(liveRegion?.contains(byVariant.info)).toBe(true)
+  })
+
+  it('останавливает автозакрытие под курсором и возобновляет после ухода (WCAG 2.2.1)', async () => {
+    vi.useFakeTimers()
+    const toast = useToast()
+    toast.clear()
+    toast.push({ title: 'Auto', timeoutMs: 100 })
+
+    mount(GrToaster, { attachTo: document.body })
+    await nextTick()
+
+    const region = document.body.querySelector('[data-ds-toaster]') as HTMLElement
+    region.dispatchEvent(new MouseEvent('mouseenter'))
+    await nextTick()
+
+    // Под курсором таймер на паузе — тост не должен исчезнуть.
+    await vi.advanceTimersByTimeAsync(300)
+    expect(toast.list.value.length).toBe(1)
+
+    // После ухода — отсчёт возобновляется и тост закрывается.
+    region.dispatchEvent(new MouseEvent('mouseleave'))
+    await nextTick()
+    await vi.advanceTimersByTimeAsync(300)
+    expect(toast.list.value.length).toBe(0)
+
+    vi.useRealTimers()
+  })
+
+  it('maxVisible ограничивает число видимых тостов, очередь ждёт', async () => {
+    const toast = useToast()
+    toast.clear()
+    for (let i = 0; i < 5; i += 1)
+      toast.push({ title: `T${i}`, timeoutMs: 0 })
+
+    mount(GrToaster, { attachTo: document.body, props: { maxVisible: 2 } })
+    await nextTick()
+
+    expect(document.body.querySelectorAll('[data-ds-toast]').length).toBe(2)
   })
 
   it('placement применяет классы угла (bottom-left)', () => {

@@ -1,4 +1,15 @@
-@import './tokens.css';
+/*
+ * Полный бандл стилей DS для потребителей без UnoCSS-провайдера:
+ * `import '@feugene/granularity/styles/index.css'`.
+ *
+ * Порядок подключения важен и здесь ЗАФИКСИРОВАН:
+ *   1. темы объявляют семантические роли (`--bg`, `--fg`, `--primary`, `--ds-*`…);
+ *   2. `tokens.css` объявляет примитивы и ПРОИЗВОДНЫЕ формулы
+ *      (`--primary-hover: color-mix(var(--primary), var(--fg))` и т.п.),
+ *      которым нужны роли из тем;
+ *   3. `base.css` (+ `preflight.css`) — глобальный слой, которому нужны и роли, и примитивы.
+ */
 @import './themes/light.css';
 @import './themes/dark.css';
+@import './tokens.css';
 @import './base.css';

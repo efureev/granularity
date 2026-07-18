@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { InputHTMLAttributes } from 'vue'
-import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots } from 'vue'
+import { computed, ref, useSlots } from 'vue'
 
 import {
   grNumberInputInputClass,
@@ -11,6 +11,7 @@ import {
   type GrNumberInputTextAlign,
 } from './grNumberInputStyles'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
 
 defineOptions({
   inheritAttrs: false,
@@ -137,65 +138,7 @@ const defaultAddonMinWidth = computed(() => addonLen.value)
 const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
 const suffixMinWidth = computed(() => props.suffixMinWidth ?? defaultAddonMinWidth.value)
 
-const prefixEl = ref<HTMLElement | null>(null)
-const suffixEl = ref<HTMLElement | null>(null)
-
-const measuredPrefixWidth = ref<string | undefined>(undefined)
-const measuredSuffixWidth = ref<string | undefined>(undefined)
-
-let ro: ResizeObserver | null = null
-let scheduled = false
-
-function readWidthPx(el: HTMLElement | null): string | undefined {
-  if (!el) return undefined
-
-  const width = Math.ceil(el.getBoundingClientRect().width || 0)
-  if (width <= 0) return undefined
-
-  return `${width}px`
-}
-
-function measure(): void {
-  measuredPrefixWidth.value = hasPrefix.value ? readWidthPx(prefixEl.value) : undefined
-  measuredSuffixWidth.value = hasSuffix.value ? readWidthPx(suffixEl.value) : undefined
-}
-
-function refreshObserver(): void {
-  if (typeof ResizeObserver === 'undefined') return
-  if (!ro) ro = new ResizeObserver(() => measure())
-
-  ro.disconnect()
-  if (prefixEl.value) ro.observe(prefixEl.value)
-  if (suffixEl.value) ro.observe(suffixEl.value)
-}
-
-function scheduleMeasure(): void {
-  if (scheduled) return
-  scheduled = true
-
-  void nextTick(() => {
-    scheduled = false
-    measure()
-    refreshObserver()
-  })
-}
-
-onMounted(() => scheduleMeasure())
-onUpdated(() => scheduleMeasure())
-onBeforeUnmount(() => ro?.disconnect())
-
-function addLen(a: string, b: string): string {
-  if (a === '0px') return b
-  if (b === '0px') return a
-
-  const apx = a.endsWith('px') ? Number(a.slice(0, -2)) : null
-  const bpx = b.endsWith('px') ? Number(b.slice(0, -2)) : null
-
-  if (apx !== null && Number.isFinite(apx) && bpx !== null && Number.isFinite(bpx))
-    return `${apx + bpx}px`
-
-  return `calc(${a} + ${b})`
-}
+const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
 
 const prefixLen = computed(() => (hasPrefix.value ? measuredPrefixWidth.value ?? prefixMinWidth.value : '0px'))
 const suffixLen = computed(() => (hasSuffix.value ? measuredSuffixWidth.value ?? suffixMinWidth.value : '0px'))
