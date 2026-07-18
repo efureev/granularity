@@ -66,9 +66,9 @@
       }
     },
     "foundations": {
-      "title": "Foundation",
-      "shortTitle": "Foundation",
-      "eyebrow": "Showcase / Foundation",
+      "title": "Основы",
+      "shortTitle": "Основы",
+      "eyebrow": "Showcase / Основы",
       "description": "Базовая onboarding-документация: сценарии установки, слои стилей, темы, токены, UnoCSS и локализация.",
       "sections": {
         "installation": {
@@ -242,8 +242,8 @@
     },
     "integration": {
       "title": "Интеграция",
-      "shortTitle": "Integration",
-      "eyebrow": "Showcase / Integration",
+      "shortTitle": "Интеграция",
+      "eyebrow": "Showcase / Интеграция",
       "description": "Два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`createGranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`).",
       "sections": {
         "vue-plugin": {
