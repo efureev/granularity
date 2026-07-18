@@ -1,7 +1,47 @@
 {
-  "Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers": "Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers.",
-  "Loading automatically disables the button and helps prevent repeated submit actions in async scenarios": "Loading automatically disables the button and helps prevent repeated submit actions in async scenarios.",
-  "Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events": "Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events.",
-  "Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy": "Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy.",
-  "Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario": "Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario."
+  "examples": {
+    "button-builder": {
+      "title": "Interactive button constructor",
+      "description": "A live playground for all key `GrButton` props: change `variant`, `tone`, size, type and states without switching between separate demo cards.",
+      "note": "The best format for design review and QA: one scenario covers all component props at once and helps quickly verify accessibility of the icon-only mode."
+    },
+    "button-state-matrix": {
+      "title": "Tone × variant state matrix",
+      "description": "A full matrix across every `tone` and `variant`, including live, `hover`, `focus` and `active`, for design review and visual regression.",
+      "note": "This is the same scenario that used to live in `playground-5`: it is handy for comparing new tones and checking the state contract without manual hovering."
+    }
+  },
+  "builder": {
+    "preview": "Preview",
+    "properties": "Properties",
+    "variant": "Variant",
+    "tone": "Tone",
+    "size": "Size",
+    "type": "Type",
+    "buttonLabel": "Button label",
+    "accessibilityLabel": "Accessibility label",
+    "buttonLabelPlaceholder": "Create workspace",
+    "ariaPlaceholderSquare": "Required for icon-only state",
+    "ariaPlaceholderDefault": "Optional override for screen readers",
+    "loading": "Loading",
+    "disabled": "Disabled",
+    "squareIconOnly": "Square / icon-only",
+    "renderedSnippet": "Rendered snippet",
+    "savingText": "Saving…",
+    "summarySquare": "Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers.",
+    "summaryLoading": "Loading automatically disables the button and helps prevent repeated submit actions in async scenarios.",
+    "summaryDisabled": "Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events.",
+    "summaryGhost": "Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy.",
+    "summaryDefault": "Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario."
+  },
+  "matrix": {
+    "description": "The same matrix that lived in `playground-5`: for each `tone` you can see live buttons and force-rendered `hover`, `focus`, and `active` states across all `variant`s.",
+    "liveCount": "Live + 4 states × {count} variants",
+    "stateVsVariant": "state \\ variant",
+    "live": "Live",
+    "stateRest": "Rest",
+    "stateHover": "Hover",
+    "stateFocus": "Focus",
+    "stateActive": "Active"
+  }
 }

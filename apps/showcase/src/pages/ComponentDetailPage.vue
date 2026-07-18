@@ -28,7 +28,24 @@ const {t} = i18n
 const {localizePageByName} = useShowcasePageI18n()
 
 
+// Каждый компонент — отдельный i18n-блок (`components.<Name>`). Блок грузится
+// лениво при открытии страницы компонента и выгружается при уходе на другой
+// компонент, чтобы не держать в памяти переводы всех компонентов сразу.
+let activeI18nBlock: string | null = null
+
 function setActiveI18nBlock(blockName: string | null) {
+  if (blockName === activeI18nBlock)
+    return
+
+  const previous = activeI18nBlock
+  activeI18nBlock = blockName
+
+  if (previous) {
+    i18n.unregisterUsage(previous)
+    for (const locale of i18n.getKnownLocales())
+      i18n.unloadBlock(previous, locale)
+  }
+
   if (blockName) {
     i18n.registerUsage(blockName)
     void i18n.loadBlock(blockName)
@@ -209,6 +226,33 @@ const componentDoc = computed(() => {
   return getShowcaseComponentDoc(componentEntity.value)
 })
 
+// Тексты example-карточек живут в `*.examples.ts` как fallback, а переводы —
+// в блоке `components.<Name>.examples.<id>.{title,description,note}`. Если ключа
+// нет (компонент ещё не локализован) — показываем исходную строку из examples.ts.
+const localizedExamples = computed(() => {
+  const doc = componentDoc.value
+  const name = componentEntity.value?.name
+
+  if (!doc || !name)
+    return []
+
+  return doc.examples.map((example) => {
+    const baseKey = `components.${name}.examples.${example.id}`
+    const translate = <T extends string | undefined>(field: string, fallback: T): string | T => {
+      const key = `${baseKey}.${field}`
+      const result = t(key)
+      return result === key ? fallback : result
+    }
+
+    return {
+      ...example,
+      title: translate('title', example.title),
+      description: translate('description', example.description),
+      note: translate('note', example.note),
+    }
+  })
+})
+
 const accessibilityItems = computed(() => createAccessibilityItems(componentEntity.value, t))
 const dependencyItems = computed(() => createDependencyItems(componentEntity.value, t))
 const relatedLinks = computed(() => createRelatedLinks(componentEntity.value, t))
@@ -224,6 +268,10 @@ function resolvePreviewComponent(previewKey?: string) {
 watch(componentEntity, () => {
   setActiveI18nBlock(componentEntity.value ? 'components.' + componentEntity.value.name : null)
 }, {immediate: true})
+
+onUnmounted(() => {
+  setActiveI18nBlock(null)
+})
 </script>
 
 <template>
@@ -256,7 +304,7 @@ watch(componentEntity, () => {
 
       <div class="grid gap-6">
         <ExampleCard
-            v-for="example in componentDoc.examples"
+            v-for="example in localizedExamples"
             :key="example.id"
             :title="example.title"
             :description="example.description"

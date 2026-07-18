@@ -1,7 +1,47 @@
 {
-  "Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers": "Square mode делает кнопку icon-only, поэтому `aria-label` должен описывать действие для screen reader.",
-  "Loading automatically disables the button and helps prevent repeated submit actions in async scenarios": "Loading автоматически блокирует кнопку и помогает защититься от повторного submit в асинхронных сценариях.",
-  "Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events": "Disabled сохраняет визуальный contract выбранных variant/tone, но выключает интерактивность и pointer events.",
-  "Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy": "Ghost-варианты лучше работают в тулбарах и плотных action-областях, где filled CTA был бы слишком тяжёлым.",
-  "Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario": "Соберите нужную комбинацию `variant`, `tone`, `size` и `type`, чтобы быстро проверить contract кнопки перед внедрением в продуктовый сценарий."
+  "examples": {
+    "button-builder": {
+      "title": "Интерактивный конструктор кнопки",
+      "description": "Живой playground для всех ключевых пропсов `GrButton`: меняйте `variant`, `tone`, size, type и состояния без переключения между отдельными demo-картами.",
+      "note": "Лучший формат для дизайн-ревью и QA: один сценарий сразу покрывает все пропсы компонента и помогает быстро проверить доступность icon-only режима."
+    },
+    "button-state-matrix": {
+      "title": "Матрица состояний tone × variant",
+      "description": "Полная матрица по всем `tone` и `variant`, включая live, `hover`, `focus` и `active` для дизайн-ревью и визуальной регрессии.",
+      "note": "Это тот же сценарий, который раньше жил в `playground-5`: удобно сравнивать новые tones и проверять state-contract без ручного наведения."
+    }
+  },
+  "builder": {
+    "preview": "Превью",
+    "properties": "Свойства",
+    "variant": "Вариант",
+    "tone": "Тон",
+    "size": "Размер",
+    "type": "Тип",
+    "buttonLabel": "Текст кнопки",
+    "accessibilityLabel": "Метка доступности",
+    "buttonLabelPlaceholder": "Create workspace",
+    "ariaPlaceholderSquare": "Обязательно для icon-only состояния",
+    "ariaPlaceholderDefault": "Необязательное переопределение для screen reader",
+    "loading": "Загрузка",
+    "disabled": "Заблокирована",
+    "squareIconOnly": "Квадратная / только иконка",
+    "renderedSnippet": "Готовый сниппет",
+    "savingText": "Сохранение…",
+    "summarySquare": "Square mode делает кнопку icon-only, поэтому `aria-label` должен описывать действие для screen reader.",
+    "summaryLoading": "Loading автоматически блокирует кнопку и помогает защититься от повторного submit в асинхронных сценариях.",
+    "summaryDisabled": "Disabled сохраняет визуальный contract выбранных variant/tone, но выключает интерактивность и pointer events.",
+    "summaryGhost": "Ghost-варианты лучше работают в тулбарах и плотных action-областях, где filled CTA был бы слишком тяжёлым.",
+    "summaryDefault": "Соберите нужную комбинацию `variant`, `tone`, `size` и `type`, чтобы быстро проверить contract кнопки перед внедрением в продуктовый сценарий."
+  },
+  "matrix": {
+    "description": "Та же матрица, что была в `playground-5`: для каждого `tone` видно live-кнопки и принудительно отрисованные состояния `hover`, `focus`, `active` по всем `variant`.",
+    "liveCount": "Live + 4 состояния × {count} вариантов",
+    "stateVsVariant": "состояние \\ variant",
+    "live": "Live",
+    "stateRest": "Обычное",
+    "stateHover": "Hover",
+    "stateFocus": "Focus",
+    "stateActive": "Active"
+  }
 }
