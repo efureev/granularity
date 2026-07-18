@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<GrDialogProps>(), {
   headerConfig: undefined,
   footerConfig: undefined,
   bodyConfig: undefined,
-  closeLabel: 'Close',
+  closeLabel: undefined,
 })
 
 const emit = defineEmits<{

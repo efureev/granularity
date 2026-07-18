@@ -16,16 +16,19 @@ const props = defineProps<{
   entities: ShowcaseEntityRegistryItem[]
 }>()
 
-const { getEntityGroupLabel } = useShowcasePageI18n()
+const { getEntityGroupLabel, localizeEntity } = useShowcasePageI18n()
 
 const searchQuery = ref('')
+
+// Локализуем `summary` каждой сущности в момент рендера (fallback — en из handAuthored).
+const localizedEntities = computed(() => props.entities.map(localizeEntity))
 
 const filteredEntities = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
   if (!query)
-    return props.entities
+    return localizedEntities.value
 
-  return props.entities.filter((entity) => {
+  return localizedEntities.value.filter((entity) => {
     return [entity.name, entity.summary, entity.group]
       .join(' ')
       .toLowerCase()

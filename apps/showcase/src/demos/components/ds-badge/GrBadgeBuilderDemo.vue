@@ -12,8 +12,11 @@ import {
   type GrBadgeSize,
   type GrBadgeTone,
 } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
+
+const { t } = useFintI18n()
 
 const tone = ref<GrBadgeTone>('primary')
 const size = ref<GrBadgeSize>('sm')
@@ -54,18 +57,18 @@ const badgeText = computed(() => {
 
 const previewSummary = computed(() => {
   if (dark.value)
-    return 'Filled (`dark`) badge лучше работает как яркий статусный индикатор внутри таблиц, toolbar counters и alert summaries.'
+    return t('components.GrBadge.builder.summaryDark')
 
   if (radius.value === 'square')
-    return 'Square badge даёт самый плотный силуэт и хорошо подходит для компактных row-level labels и counters.'
+    return t('components.GrBadge.builder.summarySquare')
 
   if (radius.value === 'semi')
-    return 'Semi radius визуально ближе к filter-chip и удобен там, где нужен чуть более строгий контур без полного pill-эффекта.'
+    return t('components.GrBadge.builder.summarySemi')
 
   if (tone.value === 'neutral')
-    return 'Neutral light badge — безопасный дефолт для метаданных, вторичных статусов и вспомогательных подписей.'
+    return t('components.GrBadge.builder.summaryNeutral')
 
-  return 'Соберите нужную комбинацию `tone`, `size`, `radius` и `dark`, чтобы быстро проверить badge перед использованием в интерфейсе.'
+  return t('components.GrBadge.builder.summaryDefault')
 })
 
 const previewLabelClass = computed(() => {
@@ -95,7 +98,7 @@ const previewCode = computed(() => {
           class="relative grid min-h-[240px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
         <div class="flex h-full flex-col items-center justify-center gap-5 text-center">
           <div class="showcase-demo-caption text-xs">
-            Preview
+            {{ t('components.GrBadge.builder.preview') }}
           </div>
 
           <div class="flex flex-wrap items-center justify-center gap-3">
@@ -104,7 +107,7 @@ const previewCode = computed(() => {
             </GrBadge>
 
             <span class="showcase-demo-text text-sm text-[var(--muted-fg)]">
-              SLA status
+              {{ t('components.GrBadge.builder.slaStatus') }}
             </span>
           </div>
 
@@ -116,38 +119,38 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" :title="t('components.GrBadge.builder.renderedSnippet')"/>
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
       <div class="showcase-demo-title text-sm font-semibold">
-        Свойства badge
+        {{ t('components.GrBadge.builder.properties') }}
       </div>
 
       <div class="grid gap-4">
-        <GrFormField label="Tone">
-          <GrSelect v-model="tone" :options="toneOptions" aria-label="Badge tone"/>
+        <GrFormField :label="t('components.GrBadge.builder.tone')">
+          <GrSelect v-model="tone" :options="toneOptions" :aria-label="t('components.GrBadge.builder.badgeToneAria')"/>
         </GrFormField>
 
-        <GrFormField label="Size">
+        <GrFormField :label="t('components.GrBadge.builder.size')">
           <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
         </GrFormField>
 
-        <GrFormField label="Radius">
+        <GrFormField :label="t('components.GrBadge.builder.radius')">
           <GrRadioGroup v-model="radius" :options="radiusOptions" variant="button" size="sm"/>
         </GrFormField>
 
-        <GrFormField label="Label">
-          <GrInput v-model="label" placeholder="Beta" aria-label="Badge label"/>
+        <GrFormField :label="t('components.GrBadge.builder.label')">
+          <GrInput v-model="label" :placeholder="t('components.GrBadge.builder.labelPlaceholder')" :aria-label="t('components.GrBadge.builder.badgeLabelAria')"/>
         </GrFormField>
       </div>
 
       <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
         <GrSwitch v-model="dark" size="sm">
-          Filled / dark mode
+          {{ t('components.GrBadge.builder.filledMode') }}
         </GrSwitch>
         <GrSwitch v-model="uppercase" size="sm">
-          Uppercase label
+          {{ t('components.GrBadge.builder.uppercaseLabel') }}
         </GrSwitch>
       </div>
     </div>

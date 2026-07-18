@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 
 import { GrInput, GrSwitch } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
+const { t } = useFintI18n()
 const enabled = ref(true)
 const activeBackgroundColor = ref('#22c55e')
 const inactiveBackgroundColor = ref('#e5e7eb')
@@ -15,7 +17,7 @@ const inactiveBackgroundColor = ref('#e5e7eb')
       :active-background-color="activeBackgroundColor"
       :inactive-background-color="inactiveBackgroundColor"
     >
-      Custom colors
+      {{ t('components.GrSwitch.colors.customColors') }}
     </GrSwitch>
 
     <div class="grid gap-3 md:grid-cols-2">

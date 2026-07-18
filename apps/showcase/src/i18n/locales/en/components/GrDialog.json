@@ -1,0 +1,45 @@
+{
+  "examples": {
+    "dialog-basic-flow": {
+      "title": "Basic dialog shell",
+      "description": "Shows the base layer over `GrModal`: a ready-made header/footer shell for review, approval and confirm-like scenarios."
+    },
+    "dialog-section-config": {
+      "title": "Section config and internal state",
+      "description": "Demonstrates `headerConfig` / `footerConfig` and local form state inside the dialog shell."
+    },
+    "dialog-guarded-backdrop": {
+      "title": "Guarded backdrop for critical flows",
+      "description": "A dedicated scenario for `closeOnBackdrop=false`, when closing must happen only through explicit actions."
+    }
+  },
+  "basic": {
+    "open": "Open review dialog",
+    "title": "Publish weekly digest",
+    "body": "`GrDialog` assembles a ready header/footer shell on top of `GrModal`, so it is convenient for simple approval flows.",
+    "recipients": "12 recipients",
+    "draftReady": "Draft ready",
+    "cancel": "Cancel",
+    "publish": "Publish"
+  },
+  "guarded": {
+    "open": "Open guarded dialog",
+    "title": "Resolve blockers",
+    "body": "In critical flows you can disable backdrop close and leave only explicit footer actions.",
+    "pendingApprovals": "2 approvals are still pending",
+    "legalReview": "1 issue is waiting for legal review",
+    "keepDraft": "Keep draft",
+    "continueReview": "Continue review"
+  },
+  "section": {
+    "open": "Open stateful dialog",
+    "footerEnabled": "Footer action enabled:",
+    "yes": "yes",
+    "no": "no",
+    "title": "Share workspace",
+    "body": "The internal form state keeps living inside the dialog shell, while section config helps adapt density to compact workflows.",
+    "checkbox": "I reviewed access levels and notification scope.",
+    "later": "Later",
+    "share": "Share workspace"
+  }
+}

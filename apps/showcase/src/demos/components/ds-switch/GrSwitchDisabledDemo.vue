@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 
 import { GrSwitch } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
+const { t } = useFintI18n()
 const notifications = ref(true)
 const disabled = ref(false)
 </script>
@@ -11,16 +13,16 @@ const disabled = ref(false)
   <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
     <div class="grid gap-3">
       <GrSwitch v-model="notifications" :disabled="disabled">
-        Email notifications
+        {{ t('components.GrSwitch.disabled.emailNotifications') }}
       </GrSwitch>
       <GrSwitch :model-value="true" disabled>
-        Always on
+        {{ t('components.GrSwitch.disabled.alwaysOn') }}
       </GrSwitch>
     </div>
 
     <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
       <GrSwitch v-model="disabled" size="sm">
-        Disable labeled switch
+        {{ t('components.GrSwitch.disabled.disableLabeled') }}
       </GrSwitch>
     </div>
   </div>

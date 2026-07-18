@@ -11,12 +11,20 @@ import {
   resolveFeaturedEntity,
 } from './doc/entityPageHelpers'
 import DocPage from './doc/DocPage.vue'
+import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 
 const props = defineProps<{
   page: ShowcasePage
 }>()
 
+const { localizeEntityExamples } = useShowcasePageI18n()
+
 const featuredEntity = computed(() => resolveFeaturedEntity(props.page.name, showcaseEntityRegistry))
+// Заголовки/описания example-карточек берём из блока `showcase.entityExamples.*`
+// (fallback — en-строки из `content/handAuthored.ts`).
+const featuredExamples = computed(() =>
+  featuredEntity.value ? localizeEntityExamples(featuredEntity.value) : undefined,
+)
 const usageCode = computed(() => createUsageSnippet(featuredEntity.value))
 const accessibilityItems = computed(() => createAccessibilityItems(featuredEntity.value))
 const dependencyItems = computed(() => createDependencyItems(featuredEntity.value))
@@ -30,7 +38,7 @@ const relatedLinks = computed(() => createRelatedLinks(featuredEntity.value))
     :description="page.description"
     :status="page.status"
     :sections="page.sections"
-    :examples="featuredEntity?.examples"
+    :examples="featuredExamples"
     :api-sections="featuredEntity?.apiSections"
     :usage-code="usageCode"
     :accessibility-items="accessibilityItems"

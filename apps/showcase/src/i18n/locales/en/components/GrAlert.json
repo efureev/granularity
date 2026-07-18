@@ -1,0 +1,44 @@
+{
+  "examples": {
+    "alert-tone-matrix": {
+      "title": "Semantic tones for inline feedback",
+      "description": "The base matrix captures the key alert-tone states so the component page immediately shows the visual range of `info/success/warning/danger/slate/azure`."
+    },
+    "alert-closable-flow": {
+      "title": "Closable alert with host-level state",
+      "description": "We show separately that `GrAlert` does not hide on its own: the parent screen receives `close` and decides when to bring the banner back."
+    },
+    "alert-custom-colors": {
+      "title": "Brand-specific colors without layout overrides",
+      "description": "This scenario is for dashboard teams that need to adapt the alert to a domain brand while keeping the component's icon/layout API."
+    }
+  },
+  "closable": {
+    "title": "Maintenance window",
+    "message": "Payments will be processed in read-only mode from 02:00 to 02:30 UTC.",
+    "dismissed": "Alert dismissed. Bring it back from the side panel.",
+    "eventTitle": "Close event",
+    "eventDescription": "`close` is emitted so the host screen can hide or persist the banner state.",
+    "restore": "Restore alert"
+  },
+  "customColors": {
+    "brandTitle": "Custom brand banner",
+    "brandMessage": "Teams often override colors to align alerts with domain-specific dashboards or tenant branding.",
+    "mutedTitle": "Muted reminder",
+    "mutedMessage": "The component still keeps the same layout, icon slotting and close mechanics while colors are fully customized."
+  },
+  "variants": {
+    "infoTitle": "Info",
+    "infoMessage": "Deploy preview URL is ready for the QA handoff.",
+    "successTitle": "Success",
+    "successMessage": "Billing sync finished and no manual retries are required.",
+    "warningTitle": "Warning",
+    "warningMessage": "API quota is at 78%; consider moving heavy jobs to the night window.",
+    "dangerTitle": "Danger",
+    "dangerMessage": "Background worker lost connection to Redis and needs operator attention.",
+    "slateTitle": "Slate",
+    "slateMessage": "Runbook is archived and kept for passive operator context.",
+    "azureTitle": "Azure",
+    "azureMessage": "Release note references are ready for stakeholder review."
+  }
+}

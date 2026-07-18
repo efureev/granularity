@@ -25,7 +25,7 @@ import { getShowcasePackageDoc } from '../content/packageDocs'
 
 const route = useRoute()
 const { t } = useFintI18n()
-const { localizePage, localizePageByName } = useShowcasePageI18n()
+const { localizePage, localizePageByName, localizeEntitySummary } = useShowcasePageI18n()
 
 const entity = computed(() => {
   const resolved = getShowcaseEntityByPath(route.path)
@@ -45,6 +45,7 @@ const usageSnippet = computed(() => createUsageSnippet(entity.value))
 const dependencyItems = computed(() => createDependencyItems(entity.value))
 
 const pageEyebrow = computed(() => page.value?.eyebrow ?? localizePageByName('overview').eyebrow)
+const entitySummary = computed(() => entity.value ? localizeEntitySummary(entity.value) : '')
 </script>
 
 <template>
@@ -61,7 +62,7 @@ const pageEyebrow = computed(() => page.value?.eyebrow ?? localizePageByName('ov
     <ShowcasePageHero
       :eyebrow="`${pageEyebrow} / ${entity.group}`"
       :title="entity.title"
-      :description="entity.summary"
+      :description="entitySummary"
     >
       <template v-if="entity.tags?.length" #actions>
         <GrBadge v-for="tag in entity.tags" :key="tag">

@@ -25,7 +25,7 @@ import {getShowcaseComponentDoc} from '../content/componentDocs'
 const route = useRoute()
 const i18n = useFintI18n()
 const {t} = i18n
-const {localizePageByName} = useShowcasePageI18n()
+const {localizePageByName, localizeEntitySummary} = useShowcasePageI18n()
 
 
 // Каждый компонент — отдельный i18n-блок (`components.<Name>`). Блок грузится
@@ -257,6 +257,9 @@ const accessibilityItems = computed(() => createAccessibilityItems(componentEnti
 const dependencyItems = computed(() => createDependencyItems(componentEntity.value, t))
 const relatedLinks = computed(() => createRelatedLinks(componentEntity.value, t))
 const componentsPage = computed(() => localizePageByName('components'))
+const componentSummary = computed(() =>
+  componentEntity.value ? localizeEntitySummary(componentEntity.value) : '',
+)
 
 function resolvePreviewComponent(previewKey?: string) {
   if (!previewKey)
@@ -287,7 +290,7 @@ onUnmounted(() => {
       </div>
       <div class="mt-2 space-y-4">
         <p class="showcase-text-muted max-w-3xl text-base leading-7">
-          {{ componentEntity.summary }}
+          {{ componentSummary }}
         </p>
       </div>
     </div>

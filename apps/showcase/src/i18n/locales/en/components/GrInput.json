@@ -1,0 +1,40 @@
+{
+  "examples": {
+    "input-validation-states": {
+      "title": "Validation states and native input types",
+      "description": "A single card shows the basic text scenario, email validation and search mode at once, so native behavior is visible without losing the design-system shell."
+    },
+    "input-addons-width-guards": {
+      "title": "Prefix and suffix slots with width guards",
+      "description": "The scenario focuses on add-on slots and width limits so long captions do not break the form layout."
+    },
+    "input-size-and-alignment": {
+      "title": "Size scale and text alignment",
+      "description": "Shows that `GrInput` can live both in compact toolbars and large form layouts, and text alignment is configured separately from size."
+    }
+  },
+  "addons": {
+    "currencyLabel": "Currency input",
+    "widthGuardsLabel": "Long add-ons with width guards",
+    "intlAccount": "International account",
+    "primarySettlement": "Primary settlement account"
+  },
+  "sizing": {
+    "textAlignment": "Text alignment",
+    "editablePlaceholder": "Editable content",
+    "xsPlaceholder": "Extra small",
+    "smPlaceholder": "Small",
+    "mdPlaceholder": "Medium",
+    "lgPlaceholder": "Large"
+  },
+  "states": {
+    "displayName": "Display name",
+    "workEmail": "Work email",
+    "searchInput": "Search input",
+    "invalidError": "Use a valid email address",
+    "searchPlaceholder": "Search components",
+    "validationToggle": "Validation toggle",
+    "showInvalid": "Show invalid email state",
+    "searchQuery": "Search query:"
+  }
+}

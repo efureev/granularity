@@ -1,0 +1,47 @@
+{
+  "examples": {
+    "badge-builder": {
+      "title": "Interactive badge constructor",
+      "description": "Assemble `GrBadge` for your scenario: switch `tone`, `size`, `radius`, filled-mode and the label text and see the resulting snippet instantly."
+    },
+    "badge-tone-scale": {
+      "title": "Light and dark semantic tones",
+      "description": "Works as a reference for the semantic palette: light and filled (`dark`) modes are easy to compare side by side, including `slate` and `azure`."
+    },
+    "badge-size-radius": {
+      "title": "Size and radius combinations",
+      "description": "Isolates `size` and `radius` to quickly show pill/semi/square badges for table cells, filters and inline labels."
+    },
+    "badge-toolbar-filters": {
+      "title": "Badges inside action toolbars",
+      "description": "The component is often used not on its own but as a secondary marker inside toolbar/filter buttons. This scenario shows the composition pattern."
+    }
+  },
+  "builder": {
+    "preview": "Preview",
+    "renderedSnippet": "Rendered snippet",
+    "properties": "Badge properties",
+    "tone": "Tone",
+    "size": "Size",
+    "radius": "Radius",
+    "label": "Label",
+    "labelPlaceholder": "Beta",
+    "badgeToneAria": "Badge tone",
+    "badgeLabelAria": "Badge label",
+    "slaStatus": "SLA status",
+    "filledMode": "Filled / dark mode",
+    "uppercaseLabel": "Uppercase label",
+    "summaryDark": "A filled (`dark`) badge works better as a bright status indicator inside tables, toolbar counters and alert summaries.",
+    "summarySquare": "A square badge gives the densest silhouette and suits compact row-level labels and counters.",
+    "summarySemi": "The semi radius is visually closer to a filter chip and is handy where you need a slightly stricter outline without a full pill effect.",
+    "summaryNeutral": "A neutral light badge is a safe default for metadata, secondary statuses and supporting captions.",
+    "summaryDefault": "Assemble the right combination of `tone`, `size`, `radius` and `dark` to quickly check the badge before using it in the interface."
+  },
+  "toolbar": {
+    "filterPipelines": "Filter pipelines",
+    "all": "All",
+    "failed": "Failed",
+    "needsReview": "Needs review",
+    "activeFilter": "Active filter:"
+  }
+}

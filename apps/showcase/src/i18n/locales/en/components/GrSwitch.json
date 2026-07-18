@@ -1,0 +1,55 @@
+{
+  "examples": {
+    "switch-builder": {
+      "title": "Interactive switch constructor",
+      "description": "Assemble `GrSwitch` for your scenario: change the state, size, label and local color overrides and get the resulting snippet instantly."
+    },
+    "switch-size-scale": {
+      "title": "Size scale from compact to prominent",
+      "description": "A single scenario shows how the switch scales from compact control bars to large form sections without changing behavior."
+    },
+    "switch-disabled-labeled": {
+      "title": "Labeled switches and disabled state",
+      "description": "Shows that the label lives in the default slot, and the disabled mode works equally well for a controlled and a statically enabled switch."
+    },
+    "switch-custom-colors": {
+      "title": "Custom active and inactive colors",
+      "description": "Captures one of the component's key integration capabilities: locally overriding track colors without changing the global theme."
+    }
+  },
+  "builder": {
+    "preview": "Preview",
+    "renderedSnippet": "Rendered snippet",
+    "properties": "Switch properties",
+    "size": "Size",
+    "label": "Label",
+    "labelPlaceholder": "Email notifications",
+    "switchLabelAria": "Switch label",
+    "accessibilityLabel": "Accessibility label",
+    "accessibilityPlaceholder": "Used when the visible label is not enough",
+    "accessibilityAria": "Switch accessibility label",
+    "activeColor": "Active background color",
+    "activeColorAria": "Switch active background color",
+    "inactiveColor": "Inactive background color",
+    "inactiveColorAria": "Switch inactive background color",
+    "checked": "Checked",
+    "disabled": "Disabled",
+    "summaryDisabled": "A disabled switch blocks state changes but keeps the visual context of the current setting.",
+    "summaryColors": "Local color overrides help embed the switch into a special scenario without changing global theme tokens.",
+    "summaryChecked": "In the enabled state the track uses the primary accent and works well for key feature toggles.",
+    "summaryDefault": "Pick the size, label and optional accessibility/color props to quickly assemble the switch contract you need."
+  },
+  "colors": {
+    "customColors": "Custom colors"
+  },
+  "disabled": {
+    "emailNotifications": "Email notifications",
+    "alwaysOn": "Always on",
+    "disableLabeled": "Disable labeled switch"
+  },
+  "sizes": {
+    "small": "Small",
+    "medium": "Medium",
+    "large": "Large"
+  }
+}

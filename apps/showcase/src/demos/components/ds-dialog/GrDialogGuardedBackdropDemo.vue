@@ -2,34 +2,36 @@
 import { ref } from 'vue'
 
 import { GrButton, GrDialog } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
+const { t } = useFintI18n()
 const open = ref(false)
 </script>
 
 <template>
   <div class="grid gap-3">
     <GrButton class="justify-self-start" @click="open = true">
-      Open guarded dialog
+      {{ t('components.GrDialog.guarded.open') }}
     </GrButton>
 
-    <GrDialog v-model="open" title="Resolve blockers" :close-on-backdrop="false" :show-close-button="false">
+    <GrDialog v-model="open" :title="t('components.GrDialog.guarded.title')" :close-on-backdrop="false" :show-close-button="false">
       <div class="grid gap-3 text-sm text-[var(--muted-fg)]">
         <p>
-          В критичных flows можно отключить backdrop close и оставить только явные действия в footer.
+          {{ t('components.GrDialog.guarded.body') }}
         </p>
         <ul class="list-disc pl-5">
-          <li>2 approvals are still pending</li>
-          <li>1 issue is waiting for legal review</li>
+          <li>{{ t('components.GrDialog.guarded.pendingApprovals') }}</li>
+          <li>{{ t('components.GrDialog.guarded.legalReview') }}</li>
         </ul>
       </div>
 
       <template #footer>
         <div class="flex justify-end gap-3">
           <GrButton variant="outline" @click="open = false">
-            Keep draft
+            {{ t('components.GrDialog.guarded.keepDraft') }}
           </GrButton>
           <GrButton @click="open = false">
-            Continue review
+            {{ t('components.GrDialog.guarded.continueReview') }}
           </GrButton>
         </div>
       </template>

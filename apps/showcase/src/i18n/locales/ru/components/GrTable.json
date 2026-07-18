@@ -1,0 +1,39 @@
+{
+  "examples": {
+    "table-basic-rows": {
+      "title": "Базовый рендер строк",
+      "description": "Для базовой страницы показываем canonical table markup: `#head` slot, body rows и composition с badges."
+    },
+    "table-loading-state": {
+      "title": "Загрузка строк со скелетонами",
+      "description": "Закрываем data-display edge case: таблица должна выглядеть предсказуемо и в loading-state, когда данные ещё не приехали."
+    },
+    "table-empty-state": {
+      "title": "Пустое состояние внутри tbody",
+      "description": "Показываем, как `GrTable` может содержать `GrEmptyState` внутри `tbody`, не теряя table semantics и visual shell."
+    }
+  },
+  "basic": {
+    "campaign": "Кампания",
+    "owner": "Владелец",
+    "status": "Статус",
+    "reach": "Охват"
+  },
+  "empty": {
+    "showRows": "Показать строки",
+    "showEmpty": "Показать пустое состояние",
+    "headPreset": "Пресет",
+    "headOwner": "Владелец",
+    "headValue": "Значение",
+    "emptyTitle": "Нет строк с пресетами",
+    "emptyDescription": "Для data-display сценариев `GrTable` может хостить empty state прямо внутри tbody без дополнительного shell-компонента.",
+    "loadSample": "Загрузить пример данных"
+  },
+  "loading": {
+    "showResolved": "Показать готовые строки",
+    "showLoading": "Показать состояние загрузки",
+    "headTask": "Задача",
+    "headState": "Состояние",
+    "headUpdated": "Обновлено"
+  }
+}

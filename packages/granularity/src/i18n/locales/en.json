@@ -13,6 +13,11 @@
     "filterPlaceholder": "Search…",
     "empty": "No data"
   },
+  "tree": {
+    "drag": "Drag",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
   "select": {
     "customValuePlaceholder": "Add value…",
     "addOption": "Add \"{value}\""

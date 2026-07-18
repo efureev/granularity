@@ -1,24 +1,27 @@
 <script setup lang="ts">
 import {GrAlert} from "@feugene/granularity";
+import { useFintI18n } from '@feugene/fint-i18n/vue'
+
+const { t } = useFintI18n()
 </script>
 <template>
   <div class="grid gap-3 lg:grid-cols-2">
     <GrAlert
-      title="Custom brand banner"
+      :title="t('components.GrAlert.customColors.brandTitle')"
       background-color="#ecfeff"
       border-color="#22d3ee"
       text-color="#155e75"
     >
-      Teams often override colors to align alerts with domain-specific dashboards or tenant branding.
+      {{ t('components.GrAlert.customColors.brandMessage') }}
     </GrAlert>
 
     <GrAlert
-      title="Muted reminder"
+      :title="t('components.GrAlert.customColors.mutedTitle')"
       background-color="#f8fafc"
       border-color="#cbd5e1"
       text-color="#334155"
     >
-      The component still keeps the same layout, icon slotting and close mechanics while colors are fully customized.
+      {{ t('components.GrAlert.customColors.mutedMessage') }}
     </GrAlert>
   </div>
 </template>

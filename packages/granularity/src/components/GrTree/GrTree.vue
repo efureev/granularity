@@ -9,6 +9,7 @@ import type {
 import { createGrTreeDataAdapter } from './grTreeDataAdapter'
 import { createGrTreeInteractionContext } from './grTreeInteractionContext'
 import { createGrTreeStore } from './grTreeStore'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type {
   GrTreeBranchLineColor,
   GrTreeNodeClass,
@@ -40,9 +41,9 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   branchLineActiveColor: undefined,
   draggable: false,
   dragHandleIcon: 'i-lucide-grip-vertical',
-  dragLabel: 'Drag',
-  expandLabel: 'Expand',
-  collapseLabel: 'Collapse',
+  dragLabel: undefined,
+  expandLabel: undefined,
+  collapseLabel: undefined,
   rowClass: undefined,
   dragHandleClass: undefined,
   toggleClass: undefined,
@@ -80,6 +81,11 @@ const interactionContext = props.internalInteractionContext ?? createGrTreeInter
 })
 
 const treeProps = props as Readonly<GrTreeProps<T>>
+
+const { t } = useGranularityTranslations()
+const dragLabel = computed(() => treeProps.dragLabel ?? t('gr.tree.drag', 'Drag'))
+const expandLabel = computed(() => treeProps.expandLabel ?? t('gr.tree.expand', 'Expand'))
+const collapseLabel = computed(() => treeProps.collapseLabel ?? t('gr.tree.collapse', 'Collapse'))
 const currentKey = treeStore.currentKey
 const hoveredKey = interactionContext.hoveredKey
 const dropTarget = interactionContext.dropTarget
@@ -330,7 +336,7 @@ defineExpose<GrTreeInstance<T>>({
             canDrag(row.node) ? '' : 'ds-tree__drag-handle--disabled',
             resolveNodeClass(treeProps.dragHandleClass, row),
           ]"
-            :aria-label="treeProps.dragLabel"
+            :aria-label="dragLabel"
             :draggable="canDrag(row.node)"
             @click.stop
             @mousedown.stop
@@ -346,7 +352,7 @@ defineExpose<GrTreeInstance<T>>({
             type="button"
             class="ds-tree__toggle"
             :class="resolveNodeClass(treeProps.toggleClass, row)"
-            :aria-label="row.isExpanded ? treeProps.collapseLabel : treeProps.expandLabel"
+            :aria-label="row.isExpanded ? collapseLabel : expandLabel"
             @click.stop="toggleExpand(row.node)"
         >
           <span

@@ -3,15 +3,18 @@ import { computed, useAttrs } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import IconClose from '~icons/lucide/x'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 defineOptions({
   inheritAttrs: false,
 })
 
+const { t } = useGranularityTranslations()
+
 // A11y-лейбл: берём из атрибутов (родитель прокидывает `:aria-label="closeLabel"`)
-// или используем дефолт. Не хардкодим английское "Close" — DS должен быть i18n-friendly.
+// или используем i18n-дефолт. Не хардкодим английское "Close" — DS должен быть i18n-friendly.
 const attrs = useAttrs()
-const ariaLabel = computed(() => (attrs['aria-label'] as string | undefined) ?? 'Close')
+const ariaLabel = computed(() => (attrs['aria-label'] as string | undefined) ?? t('gr.common.close', 'Close'))
 
 defineEmits<{
   (e: 'click'): void

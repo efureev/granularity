@@ -19,6 +19,10 @@ import type {
     ShowcasePageName,
     ShowcaseSection,
 } from './showcaseModel.ts'
+import type {
+    ShowcaseEntityRegistryItem,
+    ShowcaseExampleMeta,
+} from '../content/model.ts'
 
 const showcaseStaticPageRecord = Object.fromEntries(
     showcasePages.map(page => [page.name, page]),
@@ -109,6 +113,47 @@ export function useShowcasePageI18n() {
         return localizePage(showcaseStaticPageRecord[pageName])
     }
 
+    // Сводки и example-метаданные сущностей задаются в `content/handAuthored.ts`
+    // как fallback (базовая локаль en). Переводы живут в блоке `showcase`
+    // (`showcase.entitySummaries.<kind>.<name>` и
+    // `showcase.entityExamples.<kind>.<name>.<exampleId>.{title,description}`) и
+    // накладываются на реестр в момент рендера — так же, как это уже сделано для
+    // страниц/секций и example-карточек компонентов.
+    function localizeEntitySummary(entity: ShowcaseEntityRegistryItem): string {
+        return translateWithFallback(
+            `showcase.entitySummaries.${entity.kind}.${entity.name}`,
+            entity.summary,
+        )
+    }
+
+    function localizeEntityExamples(entity: ShowcaseEntityRegistryItem): ShowcaseExampleMeta[] {
+        return entity.examples.map((example) => {
+            // Планируемый example генерируется динамически в `applyHandAuthoredEntityMetadata`
+            // (id `<name>-planned-primary`), поэтому у него нет собственного ключа —
+            // используем общий параметризованный ключ с подстановкой имени сущности.
+            const isPlanned = example.id === `${entity.name}-planned-primary`
+            const baseKey = `showcase.entityExamples.${entity.kind}.${entity.name}.${example.id}`
+
+            return {
+                ...example,
+                title: isPlanned
+                    ? translateWithFallback('showcase.entityExamples.plannedTitle', example.title)
+                    : translateWithFallback(`${baseKey}.title`, example.title),
+                description: isPlanned
+                    ? translateWithFallback('showcase.entityExamples.plannedDescription', example.description, { name: entity.title })
+                    : translateWithFallback(`${baseKey}.description`, example.description),
+            }
+        })
+    }
+
+    function localizeEntity(entity: ShowcaseEntityRegistryItem): ShowcaseEntityRegistryItem {
+        return {
+            ...entity,
+            summary: localizeEntitySummary(entity),
+            examples: localizeEntityExamples(entity),
+        }
+    }
+
     function getEntityGroupLabel(pageName: ShowcasePageName, group: string) {
         const translationKey = pageName === 'components'
             ? componentGroupTranslationKeys[group]
@@ -125,6 +170,9 @@ export function useShowcasePageI18n() {
         localizePage,
         localizePageByName,
         localizeSections,
+        localizeEntity,
+        localizeEntitySummary,
+        localizeEntityExamples,
         getEntityGroupLabel,
         useI18nScope,
     }

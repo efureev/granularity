@@ -1071,7 +1071,7 @@
             "description": "A11y-лейбл кнопки закрытия (i18n).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Close\""
+            "default": "undefined"
           },
           {
             "name": "modelValue",
@@ -4887,21 +4887,21 @@
             "description": "i18n-метка кнопки \"Перетащить\" (default: 'Drag').",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Drag\""
+            "default": "undefined"
           },
           {
             "name": "expandLabel",
             "description": "i18n-метка кнопки \"Развернуть\" (default: 'Expand').",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Expand\""
+            "default": "undefined"
           },
           {
             "name": "collapseLabel",
             "description": "i18n-метка кнопки \"Свернуть\" (default: 'Collapse').",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Collapse\""
+            "default": "undefined"
           },
           {
             "name": "draggable",

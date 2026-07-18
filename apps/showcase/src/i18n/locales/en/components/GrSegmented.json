@@ -1,0 +1,45 @@
+{
+  "examples": {
+    "segmented-basic-pills": {
+      "title": "Pills variant for compact view switching",
+      "description": "The basic happy-path for `GrSegmented`: a light pills control with a moving indicator and single-value selection."
+    },
+    "segmented-button-variant": {
+      "title": "Button variant with runtime size control",
+      "description": "The button-like mode suits toolbar and view-switcher scenarios but keeps the shared segmented UX and indicator animation."
+    },
+    "segmented-custom-content": {
+      "title": "Icon + label and icon-only content",
+      "description": "The component can work with both `icon + label` and compact icon-only rendering through a scoped slot without bloating the API."
+    },
+    "segmented-states": {
+      "title": "Disabled items, block layout and language switcher",
+      "description": "We assemble real product-like scenarios: language pills, a full-width layout and a disabled item inside the group without losing readability."
+    }
+  },
+  "basic": {
+    "revenueTitle": "Revenue snapshot",
+    "revenueSubtitle": "A switcher with a soft pills backing and an animated selected track.",
+    "activeSegment": "Active segment:",
+    "periodAria": "Period"
+  },
+  "button": {
+    "sizeLabel": "Segmented size",
+    "speedLabel": "Indicator speed",
+    "viewAria": "View"
+  },
+  "content": {
+    "iconLabel": "Icon + label",
+    "iconOnly": "Icon-only with scoped slot",
+    "dashboardAria": "Dashboard view",
+    "compactAria": "Compact view switcher"
+  },
+  "states": {
+    "languageSwitcher": "Language switcher",
+    "blockLayout": "Block layout + disabled item",
+    "selectedState": "Selected state:",
+    "disabledNote": "The disabled option stays visible and keeps the structure of the choice set.",
+    "languageAria": "Language",
+    "statusAria": "Publishing status"
+  }
+}

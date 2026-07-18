@@ -1,0 +1,40 @@
+{
+  "examples": {
+    "input-validation-states": {
+      "title": "Состояния валидации и нативные типы input",
+      "description": "Одна карточка показывает сразу базовый текстовый сценарий, email-валидацию и search-mode, чтобы было видно native-поведение без потери design-system оболочки."
+    },
+    "input-addons-width-guards": {
+      "title": "Слоты prefix и suffix с ограничением ширины",
+      "description": "Сценарий фокусируется на add-on slots и ограничении ширины, чтобы длинные подписи не ломали layout формы."
+    },
+    "input-size-and-alignment": {
+      "title": "Шкала размеров и выравнивание текста",
+      "description": "Показываем, что `GrInput` умеет жить и в компактных toolbars, и в крупных form-layout, а выравнивание текста настраивается отдельно от размера."
+    }
+  },
+  "addons": {
+    "currencyLabel": "Поле суммы",
+    "widthGuardsLabel": "Длинные add-on с ограничением ширины",
+    "intlAccount": "Международный счёт",
+    "primarySettlement": "Основной расчётный счёт"
+  },
+  "sizing": {
+    "textAlignment": "Выравнивание текста",
+    "editablePlaceholder": "Редактируемое содержимое",
+    "xsPlaceholder": "Очень маленький",
+    "smPlaceholder": "Маленький",
+    "mdPlaceholder": "Средний",
+    "lgPlaceholder": "Большой"
+  },
+  "states": {
+    "displayName": "Отображаемое имя",
+    "workEmail": "Рабочий email",
+    "searchInput": "Поле поиска",
+    "invalidError": "Укажите корректный адрес email",
+    "searchPlaceholder": "Поиск компонентов",
+    "validationToggle": "Переключатель валидации",
+    "showInvalid": "Показать невалидное состояние email",
+    "searchQuery": "Поисковый запрос:"
+  }
+}

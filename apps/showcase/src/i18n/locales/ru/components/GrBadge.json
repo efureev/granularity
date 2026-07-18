@@ -1,0 +1,47 @@
+{
+  "examples": {
+    "badge-builder": {
+      "title": "Интерактивный конструктор бейджа",
+      "description": "Соберите `GrBadge` под ваш сценарий: переключайте `tone`, `size`, `radius`, filled-mode и текст лейбла, сразу видя итоговый snippet."
+    },
+    "badge-tone-scale": {
+      "title": "Светлые и тёмные семантические тона",
+      "description": "Сценарий работает как справочник по semantic palette: light и filled (`dark`) режимы удобно сравнить бок о бок, включая `slate` и `azure`."
+    },
+    "badge-size-radius": {
+      "title": "Комбинации размера и радиуса",
+      "description": "Отдельно выделяем `size` и `radius`, чтобы быстро показать pill/semi/square бейджи для table cells, фильтров и inline-подписей."
+    },
+    "badge-toolbar-filters": {
+      "title": "Бейджи внутри action-тулбаров",
+      "description": "Компонент часто используется не сам по себе, а как secondary marker внутри toolbar/filter buttons. Этот сценарий показывает composition-паттерн."
+    }
+  },
+  "builder": {
+    "preview": "Превью",
+    "renderedSnippet": "Готовый сниппет",
+    "properties": "Свойства badge",
+    "tone": "Тон",
+    "size": "Размер",
+    "radius": "Радиус",
+    "label": "Текст",
+    "labelPlaceholder": "Beta",
+    "badgeToneAria": "Тон бейджа",
+    "badgeLabelAria": "Текст бейджа",
+    "slaStatus": "Статус SLA",
+    "filledMode": "Filled / dark режим",
+    "uppercaseLabel": "Верхний регистр",
+    "summaryDark": "Filled (`dark`) badge лучше работает как яркий статусный индикатор внутри таблиц, toolbar counters и alert summaries.",
+    "summarySquare": "Square badge даёт самый плотный силуэт и хорошо подходит для компактных row-level labels и counters.",
+    "summarySemi": "Semi radius визуально ближе к filter-chip и удобен там, где нужен чуть более строгий контур без полного pill-эффекта.",
+    "summaryNeutral": "Neutral light badge — безопасный дефолт для метаданных, вторичных статусов и вспомогательных подписей.",
+    "summaryDefault": "Соберите нужную комбинацию `tone`, `size`, `radius` и `dark`, чтобы быстро проверить badge перед использованием в интерфейсе."
+  },
+  "toolbar": {
+    "filterPipelines": "Фильтр пайплайнов",
+    "all": "Все",
+    "failed": "С ошибками",
+    "needsReview": "Нужна проверка",
+    "activeFilter": "Активный фильтр:"
+  }
+}

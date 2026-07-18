@@ -3,7 +3,9 @@ import { ref } from 'vue'
 
 import type { GrSegmentedOption, GrSelectOption } from '@feugene/granularity'
 import { GrSegmented, GrSelect, type GrSegmentedSize } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
+const { t } = useFintI18n()
 const view = ref<'board' | 'calendar' | 'table'>('board')
 const size = ref<GrSegmentedSize>('md')
 const indicatorDuration = ref('400')
@@ -33,14 +35,14 @@ const viewOptions: GrSegmentedOption[] = [
     <div class="grid gap-4 md:grid-cols-2 md:max-w-[520px]">
       <div class="grid gap-3">
         <div class="text-sm font-semibold text-[var(--fg)]">
-          Segmented size
+          {{ t('components.GrSegmented.button.sizeLabel') }}
         </div>
         <GrSelect v-model="size" :options="sizeOptions" />
       </div>
 
       <div class="grid gap-3">
         <div class="text-sm font-semibold text-[var(--fg)]">
-          Indicator speed
+          {{ t('components.GrSegmented.button.speedLabel') }}
         </div>
         <GrSelect v-model="indicatorDuration" :options="durationOptions" />
       </div>
@@ -52,7 +54,7 @@ const viewOptions: GrSegmentedOption[] = [
       variant="button"
       :size="size"
       :indicator-duration="Number(indicatorDuration)"
-      aria-label="View"
+      :aria-label="t('components.GrSegmented.button.viewAria')"
     />
   </div>
 </template>

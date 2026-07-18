@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 
 import { GrBadge, GrButton, GrDropdown } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const lastAction = ref('No action yet')
+const { t } = useFintI18n()
+const lastAction = ref(t('components.GrDropdown.basic.noAction'))
 
 function select(action: string) {
   lastAction.value = action
@@ -15,20 +17,20 @@ function select(action: string) {
     <GrDropdown>
       <template #trigger="{ open }">
         <GrButton variant="outline">
-          {{ open ? 'Close menu' : 'Open menu' }}
+          {{ open ? t('components.GrDropdown.basic.closeMenu') : t('components.GrDropdown.basic.openMenu') }}
         </GrButton>
       </template>
 
       <template #content>
         <div class="grid gap-1">
-          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select('Preview')">
-            Preview
+          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select(t('components.GrDropdown.basic.preview'))">
+            {{ t('components.GrDropdown.basic.preview') }}
           </button>
-          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select('Duplicate')">
-            Duplicate
+          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select(t('components.GrDropdown.basic.duplicate'))">
+            {{ t('components.GrDropdown.basic.duplicate') }}
           </button>
-          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select('Archive')">
-            Archive
+          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select(t('components.GrDropdown.basic.archive'))">
+            {{ t('components.GrDropdown.basic.archive') }}
           </button>
         </div>
       </template>

@@ -3,7 +3,9 @@ import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
 import { GrSegmented } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
+const { t } = useFintI18n()
 const locale = ref<'ru' | 'en'>('ru')
 const status = ref<'draft' | 'review' | 'published'>('review')
 
@@ -26,14 +28,14 @@ const statusLabel = computed(() => statusOptions.find(option => option.value ===
     <div class="grid gap-4 rounded-[24px] border border-[var(--brd)] bg-[var(--card)] p-5">
       <div class="grid gap-3">
         <div class="text-sm font-semibold text-[var(--fg)]">
-          Language switcher
+          {{ t('components.GrSegmented.states.languageSwitcher') }}
         </div>
-        <GrSegmented v-model="locale" :options="localeOptions" size="sm" :indicator-duration="220" aria-label="Language" />
+        <GrSegmented v-model="locale" :options="localeOptions" size="sm" :indicator-duration="220" :aria-label="t('components.GrSegmented.states.languageAria')" />
       </div>
 
       <div class="grid gap-3">
         <div class="text-sm font-semibold text-[var(--fg)]">
-          Block layout + disabled item
+          {{ t('components.GrSegmented.states.blockLayout') }}
         </div>
         <GrSegmented
           v-model="status"
@@ -41,18 +43,18 @@ const statusLabel = computed(() => statusOptions.find(option => option.value ===
           block
           variant="button"
           :indicator-duration="500"
-          aria-label="Publishing status"
+          :aria-label="t('components.GrSegmented.states.statusAria')"
         />
       </div>
     </div>
 
     <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
-      Selected state:
+      {{ t('components.GrSegmented.states.selectedState') }}
       <div class="mt-2 text-base font-semibold text-[var(--fg)]">
         {{ statusLabel }}
       </div>
       <div class="mt-3 text-sm">
-        Disabled option остаётся видимой и сохраняет структуру choice set.
+        {{ t('components.GrSegmented.states.disabledNote') }}
       </div>
     </div>
   </div>

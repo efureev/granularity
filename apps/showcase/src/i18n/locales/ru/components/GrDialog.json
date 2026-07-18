@@ -1,0 +1,45 @@
+{
+  "examples": {
+    "dialog-basic-flow": {
+      "title": "Базовый dialog-shell",
+      "description": "Показываем базовый слой над `GrModal`: готовый header/footer shell для review, approval и confirm-like сценариев."
+    },
+    "dialog-section-config": {
+      "title": "Section config и внутреннее состояние",
+      "description": "Демонстрируем `headerConfig` / `footerConfig` и локальное состояние формы внутри dialog-shell."
+    },
+    "dialog-guarded-backdrop": {
+      "title": "Защищённый backdrop для критичных flow",
+      "description": "Отдельный сценарий для `closeOnBackdrop=false`, когда закрытие должно происходить только по явным действиям."
+    }
+  },
+  "basic": {
+    "open": "Открыть review-диалог",
+    "title": "Опубликовать еженедельный дайджест",
+    "body": "`GrDialog` собирает готовый header/footer shell поверх `GrModal`, поэтому его удобно использовать для простых approval flow.",
+    "recipients": "12 получателей",
+    "draftReady": "Черновик готов",
+    "cancel": "Отмена",
+    "publish": "Опубликовать"
+  },
+  "guarded": {
+    "open": "Открыть защищённый диалог",
+    "title": "Устранить блокеры",
+    "body": "В критичных flows можно отключить backdrop close и оставить только явные действия в footer.",
+    "pendingApprovals": "2 согласования всё ещё в ожидании",
+    "legalReview": "1 вопрос ждёт юридической проверки",
+    "keepDraft": "Оставить черновик",
+    "continueReview": "Продолжить проверку"
+  },
+  "section": {
+    "open": "Открыть stateful-диалог",
+    "footerEnabled": "Действие в footer доступно:",
+    "yes": "да",
+    "no": "нет",
+    "title": "Поделиться рабочим пространством",
+    "body": "Внутреннее состояние формы продолжает жить внутри dialog-shell, а section config помогает адаптировать плотность под compact workflows.",
+    "checkbox": "Я проверил уровни доступа и объём уведомлений.",
+    "later": "Позже",
+    "share": "Поделиться"
+  }
+}

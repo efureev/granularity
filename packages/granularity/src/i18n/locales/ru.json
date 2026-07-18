@@ -13,6 +13,11 @@
     "filterPlaceholder": "Поиск…",
     "empty": "Нет данных"
   },
+  "tree": {
+    "drag": "Перетащить",
+    "expand": "Развернуть",
+    "collapse": "Свернуть"
+  },
   "select": {
     "customValuePlaceholder": "Добавить значение…",
     "addOption": "Добавить «{value}»"

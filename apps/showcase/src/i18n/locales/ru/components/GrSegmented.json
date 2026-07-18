@@ -1,0 +1,45 @@
+{
+  "examples": {
+    "segmented-basic-pills": {
+      "title": "Вариант pills для компактного переключения вида",
+      "description": "Базовый happy-path для `GrSegmented`: лёгкий pills-control с moving indicator и выбором одного значения."
+    },
+    "segmented-button-variant": {
+      "title": "Вариант button с управлением размером в runtime",
+      "description": "Button-like режим подходит для toolbar и view-switcher сценариев, но сохраняет общий segmented UX и анимацию индикатора."
+    },
+    "segmented-custom-content": {
+      "title": "Icon + label и icon-only контент",
+      "description": "Компонент умеет работать и с `icon + label`, и с компактным icon-only рендерингом через scoped slot без раздувания API."
+    },
+    "segmented-states": {
+      "title": "Disabled-элементы, block-layout и переключатель языка",
+      "description": "Собираем реальные product-like сценарии: language pills, full-width layout и disabled item внутри группы без потери читаемости."
+    }
+  },
+  "basic": {
+    "revenueTitle": "Сводка по выручке",
+    "revenueSubtitle": "Переключатель с мягкой pills-подложкой и анимированным selected track.",
+    "activeSegment": "Активный сегмент:",
+    "periodAria": "Период"
+  },
+  "button": {
+    "sizeLabel": "Размер segmented",
+    "speedLabel": "Скорость индикатора",
+    "viewAria": "Вид"
+  },
+  "content": {
+    "iconLabel": "Иконка + подпись",
+    "iconOnly": "Только иконка со scoped-слотом",
+    "dashboardAria": "Вид дашборда",
+    "compactAria": "Компактный переключатель вида"
+  },
+  "states": {
+    "languageSwitcher": "Переключатель языка",
+    "blockLayout": "Block-layout + disabled-элемент",
+    "selectedState": "Выбранное состояние:",
+    "disabledNote": "Disabled option остаётся видимой и сохраняет структуру choice set.",
+    "languageAria": "Язык",
+    "statusAria": "Статус публикации"
+  }
+}

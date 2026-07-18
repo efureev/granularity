@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type {GrBadgeTone} from '@feugene/granularity'
 import {GrBadge, GrTable} from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
+
+const { t } = useFintI18n()
+
 interface TableRow {
   campaign: string
   owner: string
@@ -19,10 +23,10 @@ const rows: TableRow[] = [
   <GrTable>
     <template #head>
       <tr>
-        <th class="px-4 py-3 text-left font-600">Campaign</th>
-        <th class="px-4 py-3 text-left font-600">Owner</th>
-        <th class="px-4 py-3 text-left font-600">Status</th>
-        <th class="px-4 py-3 text-right font-600">Reach</th>
+        <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.basic.campaign') }}</th>
+        <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.basic.owner') }}</th>
+        <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.basic.status') }}</th>
+        <th class="px-4 py-3 text-right font-600">{{ t('components.GrTable.basic.reach') }}</th>
       </tr>
     </template>
 

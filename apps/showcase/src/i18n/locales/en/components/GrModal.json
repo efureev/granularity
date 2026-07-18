@@ -1,0 +1,72 @@
+{
+  "examples": {
+    "modal-basic-flow": {
+      "title": "Bare modal flow",
+      "description": "A basic scenario for `GrModal`: a minimal container, opening by button and explicit closing from user content."
+    },
+    "modal-backdrop-guard": {
+      "title": "Backdrop guard for critical flows",
+      "description": "Shows `closeOnBackdrop=false` for cases where you must not accidentally lose draft or confirmation progress."
+    },
+    "modal-size-switcher": {
+      "title": "Size variants for different payloads",
+      "description": "Isolates the effect of `size` on layout: the same entry point can open a compact review or a wide review panel."
+    },
+    "modal-dialog-service": {
+      "title": "Imperative dialogs from an open modal",
+      "description": "Launch `useDialogService` (`confirm` / `alert` / `prompt`) straight from an open `GrModal`. The service mounts its own host in `document.body` on top of the window, so closing a dialog does not close the source modal — the decision is returned via a `Promise`."
+    }
+  },
+  "basic": {
+    "open": "Open bare modal",
+    "shellTitle": "Bare modal shell",
+    "shellBody": "`GrModal` handles the overlay, focus trap and panel sizing — you assemble the content yourself.",
+    "close": "Close"
+  },
+  "guarded": {
+    "hint": "Try clicking the backdrop: the modal stays open until the user picks an explicit action.",
+    "open": "Open guarded modal",
+    "protectionTitle": "Draft protection",
+    "protectionBody": "Use this mode for wizard/confirm flows where a draft must not be lost by accident.",
+    "unsavedChanges": "Unsaved changes: pricing rules, SLA exceptions, recipients.",
+    "cancel": "Cancel",
+    "saveDraft": "Save draft"
+  },
+  "size": {
+    "compact": "Compact review",
+    "wide": "Wide review",
+    "activeSize": "Active size: {size}",
+    "body": "The same flow can scale for review, preview or a multi-column payload.",
+    "summaryBlock": "Summary block",
+    "secondaryBlock": "Secondary block",
+    "done": "Done"
+  },
+  "service": {
+    "intro": "An open `GrModal` invokes the imperative `useDialogService`. The service mounts its own host in `document.body` on top of the modal, so closing confirm/alert/prompt does not close the source window — it stays open, and the user's decision is returned through a `Promise`.",
+    "open": "Open settings modal",
+    "settingsTitle": "Workspace settings",
+    "settingsBody": "Launch service dialogs straight from the open window — it stays in place after any of them is closed.",
+    "resultsTitle": "Results",
+    "empty": "Empty for now — invoke any dialog above.",
+    "closeModal": "Close modal",
+    "confirmMessage": "Delete the selected draft irreversibly?",
+    "confirmTitle": "Delete draft?",
+    "confirmText": "Delete",
+    "cancelText": "Cancel",
+    "alertMessage": "Changes were saved in the background. The settings window stayed open.",
+    "alertTitle": "Done",
+    "alertConfirm": "Got it",
+    "promptMessage": "Enter a new preset name",
+    "promptTitle": "Rename preset",
+    "promptLabel": "Preset name",
+    "promptPlaceholder": "For example: Q3 pricing",
+    "promptValue": "Draft preset",
+    "promptConfirm": "Save",
+    "promptCancel": "Cancel",
+    "logConfirmYes": "confirm -> confirmed (modal not closed)",
+    "logConfirmNo": "confirm -> cancelled (modal not closed)",
+    "logAlert": "alert -> closed (modal not closed)",
+    "logPromptCancel": "prompt -> cancelled",
+    "logPrompt": "prompt -> \"{name}\""
+  }
+}

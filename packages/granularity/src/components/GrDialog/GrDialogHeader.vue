@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<GrDialogHeaderProps>(), {
   title: undefined,
   showCloseButton: true,
   config: undefined,
-  closeLabel: 'Close',
+  closeLabel: undefined,
 })
 
 const slots = defineSlots<{

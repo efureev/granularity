@@ -1,0 +1,29 @@
+{
+  "examples": {
+    "tree-expanded-state": {
+      "title": "Управляемое состояние раскрытия и branch lines",
+      "description": "Показываем `GrTree` как иерархический explorer, где внешняя orchestration управляет раскрытием групп и визуальными branch lines."
+    },
+    "tree-filtering": {
+      "title": "Фильтрация через instance API",
+      "description": "Фильтрацию важно показывать не как магический prop, а как реальную интеграцию через expose-метод `filter()` и внешний input."
+    },
+    "tree-drag-and-slot": {
+      "title": "Drag-and-drop с кастомным слотом строки",
+      "description": "Комбинируем две важные возможности complex-дерева: rearrange drag-and-drop и кастомный рендер строки через default slot."
+    }
+  },
+  "expanded": {
+    "expandAll": "Развернуть все группы",
+    "focusBilling": "Фокус на биллинге",
+    "expandedBadge": "Развёрнут: {key}"
+  },
+  "filtering": {
+    "placeholder": "Фильтр узлов по названию или команде",
+    "aria": "Фильтр узлов дерева",
+    "matches": "Совпадений: {count}"
+  },
+  "drag": {
+    "hint": "Перетащите ручку строки, чтобы переупорядочить или вложить узлы"
+  }
+}

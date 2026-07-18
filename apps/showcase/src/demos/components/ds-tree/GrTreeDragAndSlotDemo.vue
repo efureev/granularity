@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 
 import { GrBadge, GrTree } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
+
+const { t } = useFintI18n()
 
 type TreeItem = {
   id: number
@@ -31,7 +34,7 @@ const treeData = ref<TreeItem[]>([
   },
 ])
 
-const lastDrop = ref('Drag a row handle to reorder or nest nodes')
+const lastDrop = ref(t('components.GrTree.drag.hint'))
 
 function resolveTone(status: TreeItem['status']) {
   if (status === 'critical')

@@ -1,0 +1,72 @@
+{
+  "examples": {
+    "modal-basic-flow": {
+      "title": "Базовый flow модалки",
+      "description": "Базовый сценарий для `GrModal`: минимальный контейнер, открытие по кнопке и явное закрытие из пользовательского контента."
+    },
+    "modal-backdrop-guard": {
+      "title": "Защита backdrop для критичных flow",
+      "description": "Показываем `closeOnBackdrop=false` для кейсов, где нельзя случайно потерять прогресс черновика или подтверждения."
+    },
+    "modal-size-switcher": {
+      "title": "Варианты размера под разный payload",
+      "description": "Изолируем влияние `size` на layout: один и тот же entry point может открывать compact review или широкую review-панель."
+    },
+    "modal-dialog-service": {
+      "title": "Императивные диалоги из открытой модалки",
+      "description": "Запускаем `useDialogService` (`confirm` / `alert` / `prompt`) прямо из открытой `GrModal`. Сервис монтирует собственный host в `document.body` поверх окна, поэтому закрытие диалога не закрывает исходную модалку — решение возвращается через `Promise`."
+    }
+  },
+  "basic": {
+    "open": "Открыть пустую модалку",
+    "shellTitle": "Пустая оболочка модалки",
+    "shellBody": "`GrModal` отвечает за overlay, focus trap и panel sizing — содержимое вы собираете сами.",
+    "close": "Закрыть"
+  },
+  "guarded": {
+    "hint": "Попробуйте кликнуть по backdrop: модалка останется открытой, пока пользователь не выберет явное действие.",
+    "open": "Открыть защищённую модалку",
+    "protectionTitle": "Защита черновика",
+    "protectionBody": "Используйте этот режим для wizard/confirm flow, где нельзя случайно потерять черновик.",
+    "unsavedChanges": "Несохранённые изменения: правила ценообразования, исключения SLA, получатели.",
+    "cancel": "Отмена",
+    "saveDraft": "Сохранить черновик"
+  },
+  "size": {
+    "compact": "Компактный review",
+    "wide": "Широкий review",
+    "activeSize": "Текущий размер: {size}",
+    "body": "Один и тот же flow может масштабироваться под review, preview или multi-column payload.",
+    "summaryBlock": "Блок сводки",
+    "secondaryBlock": "Вторичный блок",
+    "done": "Готово"
+  },
+  "service": {
+    "intro": "Открытая `GrModal` вызывает императивный `useDialogService`. Сервис монтирует собственный host в `document.body` поверх модалки, поэтому закрытие confirm/alert/prompt не закрывает исходное окно — оно остаётся открытым, а решение пользователя возвращается через `Promise`.",
+    "open": "Открыть модалку настроек",
+    "settingsTitle": "Настройки рабочего пространства",
+    "settingsBody": "Запускайте диалоги сервиса прямо из открытого окна — оно остаётся на месте после закрытия любого из них.",
+    "resultsTitle": "Результаты",
+    "empty": "Пока пусто — вызовите любой диалог выше.",
+    "closeModal": "Закрыть модалку",
+    "confirmMessage": "Удалить выбранный черновик безвозвратно?",
+    "confirmTitle": "Удалить черновик?",
+    "confirmText": "Удалить",
+    "cancelText": "Отмена",
+    "alertMessage": "Изменения сохранены в фоне. Окно настроек осталось открытым.",
+    "alertTitle": "Готово",
+    "alertConfirm": "Понятно",
+    "promptMessage": "Введите новое имя пресета",
+    "promptTitle": "Переименовать пресет",
+    "promptLabel": "Имя пресета",
+    "promptPlaceholder": "Например: Q3 pricing",
+    "promptValue": "Draft preset",
+    "promptConfirm": "Сохранить",
+    "promptCancel": "Отмена",
+    "logConfirmYes": "confirm -> подтверждено (модалка не закрыта)",
+    "logConfirmNo": "confirm -> отменено (модалка не закрыта)",
+    "logAlert": "alert -> закрыт (модалка не закрыта)",
+    "logPromptCancel": "prompt -> отменён",
+    "logPrompt": "prompt -> \"{name}\""
+  }
+}

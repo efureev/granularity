@@ -8,6 +8,7 @@ import IconClose from '~icons/lucide/x'
 import IconError from '~icons/lucide/x-circle'
 
 import type { GrTone } from '../shared/tones'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type GrAlertTone = GrTone
 export type GrAlertVariant = 'soft' | 'light'
@@ -53,6 +54,8 @@ const props = withDefaults(defineProps<{
   textColor: undefined,
   borderColor: undefined,
 })
+
+const { t } = useGranularityTranslations()
 
 const getCustomColor = (value?: string) => value?.trim() || undefined
 
@@ -178,7 +181,7 @@ const rootStyle = computed(() => ({
         v-if="props.closable"
         type="button"
         class="-mr-1 -mt-1 rounded-[var(--ds-radius-md)] p-1 text-[var(--ds-alert-close-color)] transition-colors hover:text-[var(--ds-alert-close-hover-color)]"
-        aria-label="Close"
+        :aria-label="t('gr.common.close', 'Close')"
         @click="emit('close')"
       >
         <IconClose class="h-4 w-4" aria-hidden="true" />

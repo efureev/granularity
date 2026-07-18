@@ -1,0 +1,39 @@
+{
+  "examples": {
+    "table-basic-rows": {
+      "title": "Basic row rendering",
+      "description": "For the base page we show canonical table markup: the `#head` slot, body rows and composition with badges."
+    },
+    "table-loading-state": {
+      "title": "Loading rows with skeletons",
+      "description": "Covers the data-display edge case: the table should look predictable in a loading state, when data has not arrived yet."
+    },
+    "table-empty-state": {
+      "title": "Empty state inside tbody",
+      "description": "Shows how `GrTable` can host a `GrEmptyState` inside `tbody` without losing table semantics and the visual shell."
+    }
+  },
+  "basic": {
+    "campaign": "Campaign",
+    "owner": "Owner",
+    "status": "Status",
+    "reach": "Reach"
+  },
+  "empty": {
+    "showRows": "Show table rows",
+    "showEmpty": "Show empty state",
+    "headPreset": "Preset",
+    "headOwner": "Owner",
+    "headValue": "Value",
+    "emptyTitle": "No preset rows",
+    "emptyDescription": "For data-display scenarios `GrTable` can host an empty state right inside the tbody without an extra shell component.",
+    "loadSample": "Load sample data"
+  },
+  "loading": {
+    "showResolved": "Show resolved rows",
+    "showLoading": "Show loading state",
+    "headTask": "Task",
+    "headState": "State",
+    "headUpdated": "Updated"
+  }
+}

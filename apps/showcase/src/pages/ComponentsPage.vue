@@ -12,9 +12,14 @@ import {GrBadge} from "@feugene/granularity";
 const {
   getEntityGroupLabel,
   localizePageByName,
+  localizeEntity,
 } = useShowcasePageI18n()
 
 const page = computed(() => localizePageByName('components'))
+
+// Реестр компонентов локализуется в момент рендера: `summary`/`examples` берутся
+// из блока `showcase` (fallback — en-строки из `content/handAuthored.ts`).
+const localizedComponentEntities = computed(() => showcaseComponentEntities.map(localizeEntity))
 
 const searchQuery = ref('')
 
@@ -22,9 +27,9 @@ const filteredComponents = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
 
   if (!query)
-    return showcaseComponentEntities
+    return localizedComponentEntities.value
 
-  return showcaseComponentEntities.filter((entity) => {
+  return localizedComponentEntities.value.filter((entity) => {
     return [entity.name, entity.summary, entity.group]
         .join(' ')
         .toLowerCase()
@@ -32,7 +37,7 @@ const filteredComponents = computed(() => {
   })
 })
 
-const componentsWithExamples = computed(() => showcaseComponentEntities.filter(entity => entity.examples.length > 0))
+const componentsWithExamples = computed(() => localizedComponentEntities.value.filter(entity => entity.examples.length > 0))
 
 const groupedComponents = computed(() => {
   const buckets = new Map<string, typeof showcaseComponentEntities>()

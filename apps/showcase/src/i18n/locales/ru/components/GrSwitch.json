@@ -1,0 +1,55 @@
+{
+  "examples": {
+    "switch-builder": {
+      "title": "Интерактивный конструктор переключателя",
+      "description": "Соберите `GrSwitch` под ваш сценарий: меняйте состояние, size, подпись и локальные color overrides, сразу получая итоговый snippet."
+    },
+    "switch-size-scale": {
+      "title": "Шкала размеров от компактного до крупного",
+      "description": "Один сценарий показывает, как переключатель масштабируется от компактных control bars до больших form-sections без изменения поведения."
+    },
+    "switch-disabled-labeled": {
+      "title": "Переключатели с подписью и disabled-состояние",
+      "description": "Показываем, что label живёт в default slot, а disabled-режим одинаково корректно работает и для управляемого, и для статически включённого switch."
+    },
+    "switch-custom-colors": {
+      "title": "Кастомные активные и неактивные цвета",
+      "description": "Фиксируем одну из ключевых интеграционных возможностей компонента: локально переопределять цвета трека без изменения глобальной темы."
+    }
+  },
+  "builder": {
+    "preview": "Превью",
+    "renderedSnippet": "Готовый сниппет",
+    "properties": "Свойства переключателя",
+    "size": "Размер",
+    "label": "Подпись",
+    "labelPlaceholder": "Email notifications",
+    "switchLabelAria": "Подпись переключателя",
+    "accessibilityLabel": "Метка доступности",
+    "accessibilityPlaceholder": "Используется, когда видимой подписи недостаточно",
+    "accessibilityAria": "Метка доступности переключателя",
+    "activeColor": "Цвет фона в активном состоянии",
+    "activeColorAria": "Цвет активного фона переключателя",
+    "inactiveColor": "Цвет фона в неактивном состоянии",
+    "inactiveColorAria": "Цвет неактивного фона переключателя",
+    "checked": "Включён",
+    "disabled": "Заблокирован",
+    "summaryDisabled": "Disabled switch блокирует изменение состояния, но сохраняет визуальный контекст текущей настройки.",
+    "summaryColors": "Локальные color overrides помогают встроить switch в особый сценарий, не меняя глобальные theme tokens.",
+    "summaryChecked": "Во включённом состоянии трек использует primary-акцент и хорошо подходит для ключевых feature toggles.",
+    "summaryDefault": "Подберите size, подпись и optional accessibility/color props, чтобы быстро собрать нужный контракт переключателя."
+  },
+  "colors": {
+    "customColors": "Кастомные цвета"
+  },
+  "disabled": {
+    "emailNotifications": "Email-уведомления",
+    "alwaysOn": "Всегда включено",
+    "disableLabeled": "Отключить переключатель с подписью"
+  },
+  "sizes": {
+    "small": "Маленький",
+    "medium": "Средний",
+    "large": "Большой"
+  }
+}

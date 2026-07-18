@@ -1,0 +1,42 @@
+{
+  "examples": {
+    "dropdown-basic-menu": {
+      "title": "Basic actions menu",
+      "description": "A starter scenario for `GrDropdown`: trigger/content slots, a short action list and automatic close on click."
+    },
+    "dropdown-alignment-width": {
+      "title": "Alignment and width presets",
+      "description": "Compares `align` and `width` separately to quickly check positioning and the expected width of the dropdown content."
+    },
+    "dropdown-persistent-content": {
+      "title": "Persistent content with manual close",
+      "description": "Shows `closeOnContentClick=false`, when the dropdown contains a mini-form/filter pane and must not close after every click."
+    }
+  },
+  "alignment": {
+    "left": "Left",
+    "leftAligned": "Left aligned",
+    "leftHint": "Anchored to the left edge of a toolbar or list item.",
+    "center": "Center",
+    "centerAligned": "Center aligned",
+    "centerHint": "Works well for compact pickers.",
+    "autoWidth": "Auto width",
+    "autoHint": "Width adapts to content width."
+  },
+  "basic": {
+    "noAction": "No action yet",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "preview": "Preview",
+    "duplicate": "Duplicate",
+    "archive": "Archive"
+  },
+  "persistent": {
+    "filters": "Filters",
+    "visibleStates": "Visible states",
+    "errors": "Errors",
+    "warnings": "Warnings",
+    "passed": "Passed",
+    "apply": "Apply filters"
+  }
+}

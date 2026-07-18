@@ -8,8 +8,11 @@ import {
   GrSwitch,
   type GrSwitchSize,
 } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
+
+const { t } = useFintI18n()
 
 const checked = ref(true)
 const disabled = ref(false)
@@ -43,16 +46,16 @@ const resolvedInactiveBackgroundColor = computed(() => {
 
 const previewSummary = computed(() => {
   if (disabled.value)
-    return 'Disabled switch блокирует изменение состояния, но сохраняет визуальный контекст текущей настройки.'
+    return t('components.GrSwitch.builder.summaryDisabled')
 
   if (resolvedActiveBackgroundColor.value || resolvedInactiveBackgroundColor.value) {
-    return 'Локальные color overrides помогают встроить switch в особый сценарий, не меняя глобальные theme tokens.'
+    return t('components.GrSwitch.builder.summaryColors')
   }
 
   if (checked.value)
-    return 'Во включённом состоянии трек использует primary-акцент и хорошо подходит для ключевых feature toggles.'
+    return t('components.GrSwitch.builder.summaryChecked')
 
-  return 'Подберите size, подпись и optional accessibility/color props, чтобы быстро собрать нужный контракт переключателя.'
+  return t('components.GrSwitch.builder.summaryDefault')
 })
 
 function escapeAttribute(value: string) {
@@ -91,7 +94,7 @@ const previewCode = computed(() => {
           class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
         <div class="flex h-full flex-col items-center justify-center gap-4 text-center">
           <div class="showcase-demo-caption text-xs">
-            Preview
+            {{ t('components.GrSwitch.builder.preview') }}
           </div>
 
           <GrSwitch
@@ -114,58 +117,58 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" :title="t('components.GrSwitch.builder.renderedSnippet')"/>
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
       <div class="showcase-demo-title text-sm font-semibold">
-        Свойства переключателя
+        {{ t('components.GrSwitch.builder.properties') }}
       </div>
 
       <div class="grid gap-4">
-        <GrFormField label="Size">
+        <GrFormField :label="t('components.GrSwitch.builder.size')">
           <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
         </GrFormField>
 
-        <GrFormField label="Label">
+        <GrFormField :label="t('components.GrSwitch.builder.label')">
           <GrInput
               v-model="label"
-              placeholder="Email notifications"
-              aria-label="Switch label"
+              :placeholder="t('components.GrSwitch.builder.labelPlaceholder')"
+              :aria-label="t('components.GrSwitch.builder.switchLabelAria')"
           />
         </GrFormField>
 
-        <GrFormField label="Accessibility label">
+        <GrFormField :label="t('components.GrSwitch.builder.accessibilityLabel')">
           <GrInput
               v-model="ariaLabel"
-              placeholder="Used when visible label is not enough"
-              aria-label="Switch accessibility label"
+              :placeholder="t('components.GrSwitch.builder.accessibilityPlaceholder')"
+              :aria-label="t('components.GrSwitch.builder.accessibilityAria')"
           />
         </GrFormField>
 
-        <GrFormField label="Active background color">
+        <GrFormField :label="t('components.GrSwitch.builder.activeColor')">
           <GrInput
               v-model="activeBackgroundColor"
               placeholder="#22c55e / var(--primary)"
-              aria-label="Switch active background color"
+              :aria-label="t('components.GrSwitch.builder.activeColorAria')"
           />
         </GrFormField>
 
-        <GrFormField label="Inactive background color">
+        <GrFormField :label="t('components.GrSwitch.builder.inactiveColor')">
           <GrInput
               v-model="inactiveBackgroundColor"
               placeholder="#e5e7eb / var(--muted)"
-              aria-label="Switch inactive background color"
+              :aria-label="t('components.GrSwitch.builder.inactiveColorAria')"
           />
         </GrFormField>
       </div>
 
       <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
         <GrSwitch v-model="checked" size="sm">
-          Checked
+          {{ t('components.GrSwitch.builder.checked') }}
         </GrSwitch>
         <GrSwitch v-model="disabled" size="sm">
-          Disabled
+          {{ t('components.GrSwitch.builder.disabled') }}
         </GrSwitch>
       </div>
     </div>
