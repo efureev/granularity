@@ -14,6 +14,7 @@ import { computed } from 'vue'
 import GrButton from '../GrButton/GrButton.vue'
 import GrDialog from '../GrDialog/GrDialog.vue'
 import GrResponseErrorBanner from '../GrResponseErrorBanner/GrResponseErrorBanner.vue'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
 import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
@@ -56,7 +57,7 @@ export interface GrConfirmDialogProps {
 }
 
 const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
-  title: 'Confirm',
+  title: undefined,
   description: undefined,
   closeOnBackdrop: true,
   closeOnEsc: true,
@@ -66,10 +67,10 @@ const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
   headerConfig: undefined,
   footerConfig: undefined,
   bodyConfig: undefined,
-  closeLabel: 'Close',
+  closeLabel: undefined,
   buttonSize: undefined,
-  confirmText: 'Confirm',
-  cancelText: 'Cancel',
+  confirmText: undefined,
+  cancelText: undefined,
   confirmVariant: 'primary',
   confirmTone: 'primary',
   error: null,
@@ -83,6 +84,13 @@ const emit = defineEmits<{
   (e: 'confirm'): void
   (e: 'cancel'): void
 }>()
+
+// Дефолты берём из общего i18n-блока пакета (fallback — англ.), а не хардкодим.
+const { t } = useGranularityTranslations()
+const resolvedTitle = computed(() => props.title ?? t('gr.dialog.confirm.title', 'Confirm'))
+const resolvedCloseLabel = computed(() => props.closeLabel ?? t('gr.common.close', 'Close'))
+const resolvedConfirmText = computed(() => props.confirmText ?? t('gr.common.confirm', 'Confirm'))
+const resolvedCancelText = computed(() => props.cancelText ?? t('gr.common.cancel', 'Cancel'))
 
 const open = computed({
   get: () => props.modelValue,
@@ -104,7 +112,7 @@ function onConfirm(): void {
 <template>
   <GrDialog
     v-model="open"
-    :title="title"
+    :title="resolvedTitle"
     :size="size"
     :close-on-backdrop="closeOnBackdrop"
     :close-on-esc="closeOnEsc"
@@ -113,7 +121,7 @@ function onConfirm(): void {
     :header-config="headerConfig"
     :footer-config="footerConfig"
     :body-config="bodyConfig"
-    :close-label="closeLabel"
+    :close-label="resolvedCloseLabel"
   >
     <div class="grid gap-4">
       <slot>
@@ -131,7 +139,7 @@ function onConfirm(): void {
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
           <GrButton data-testid="ds-confirm-cancel" variant="outline" :size="buttonSize" @click="onCancel">
-            {{ cancelText }}
+            {{ resolvedCancelText }}
           </GrButton>
           <GrButton
             data-testid="ds-confirm-confirm"
@@ -142,7 +150,7 @@ function onConfirm(): void {
             :disabled="confirmDisabled"
             @click="onConfirm"
           >
-            {{ confirmText }}
+            {{ resolvedConfirmText }}
           </GrButton>
         </div>
       </slot>

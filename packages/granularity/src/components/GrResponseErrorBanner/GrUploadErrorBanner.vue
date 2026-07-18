@@ -13,6 +13,7 @@
 import { computed } from 'vue'
 
 import GrResponseErrorBanner from './GrResponseErrorBanner.vue'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type {
   ResponseErrorInfo,
   ResponseErrorKind,
@@ -47,17 +48,21 @@ const emit = defineEmits<{
   (e: 'dismiss'): void
 }>()
 
-const UPLOAD_TEXTS: Partial<ResponseErrorTexts> = {
-  networkTitle: 'Failed to upload files',
-  networkMessage: 'Check your connection and try again.',
-  validationTitle: 'Files did not pass validation',
-  validationMessage: 'Some of the files do not meet the requirements.',
-  serverTitle: 'Upload error on the server',
-  serverMessage: 'The server could not process the upload. Please try again.',
-}
+const { t } = useGranularityTranslations()
+
+// Пресеты «под загрузку файлов» резолвятся через i18n (fallback — англ. строки), иначе
+// перекрыли бы i18n базового баннера как `props.texts`.
+const uploadTexts = computed<Partial<ResponseErrorTexts>>(() => ({
+  networkTitle: t('gr.uploadErrorBanner.networkTitle', 'Failed to upload files'),
+  networkMessage: t('gr.uploadErrorBanner.networkMessage', 'Check your connection and try again.'),
+  validationTitle: t('gr.uploadErrorBanner.validationTitle', 'Files did not pass validation'),
+  validationMessage: t('gr.uploadErrorBanner.validationMessage', 'Some of the files do not meet the requirements.'),
+  serverTitle: t('gr.uploadErrorBanner.serverTitle', 'Upload error on the server'),
+  serverMessage: t('gr.uploadErrorBanner.serverMessage', 'The server could not process the upload. Please try again.'),
+}))
 
 const mergedTexts = computed<Partial<ResponseErrorTexts>>(() => ({
-  ...UPLOAD_TEXTS,
+  ...uploadTexts.value,
   ...props.texts,
 }))
 

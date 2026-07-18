@@ -67,5 +67,57 @@
     "primary": "Primario",
     "slate": "Pizarra",
     "azure": "Azul celeste"
+  },
+  "drawer": {
+    "title": "Panel"
+  },
+  "numberInput": {
+    "increase": "Aumentar",
+    "decrease": "Disminuir"
+  },
+  "toaster": {
+    "dismiss": "Descartar",
+    "region": "Notificaciones"
+  },
+  "inputTag": {
+    "removeTag": "Eliminar etiqueta"
+  },
+  "fileUpload": {
+    "placeholder": "Arrastra archivos aquí o haz clic para seleccionar",
+    "progress": "Progreso de carga"
+  },
+  "formFile": {
+    "upload": "Subir archivo",
+    "change": "Cambiar archivo",
+    "remove": "Eliminar",
+    "clearAll": "Limpiar todo",
+    "placeholder": "Ningún archivo seleccionado",
+    "validateError": "No se pudieron validar los archivos soltados"
+  },
+  "imageViewer": {
+    "close": "Cerrar el visor de imágenes",
+    "prev": "Imagen anterior",
+    "next": "Imagen siguiente",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "resetZoom": "Restablecer zoom",
+    "rotateLeft": "Girar a la izquierda",
+    "rotateRight": "Girar a la derecha",
+    "empty": "Sin imagen"
+  },
+  "formErrorBanner": {
+    "validationTitle": "Revisa los campos del formulario",
+    "validationMessage": "El servidor rechazó los datos. Corrige los campos resaltados e inténtalo de nuevo.",
+    "clientTitle": "No se pudo guardar",
+    "serverTitle": "Error al guardar",
+    "serverMessage": "No se pudieron guardar los datos. Inténtalo más tarde."
+  },
+  "uploadErrorBanner": {
+    "networkTitle": "No se pudieron subir los archivos",
+    "networkMessage": "Comprueba tu conexión e inténtalo de nuevo.",
+    "validationTitle": "Los archivos no pasaron la validación",
+    "validationMessage": "Algunos archivos no cumplen los requisitos.",
+    "serverTitle": "Error de carga en el servidor",
+    "serverMessage": "El servidor no pudo procesar la carga. Inténtalo de nuevo."
   }
 }

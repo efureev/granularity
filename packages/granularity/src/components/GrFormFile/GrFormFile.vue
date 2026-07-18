@@ -9,6 +9,7 @@ import GrIcon from '../GrIcon/GrIcon.vue'
 import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 defineOptions({
   name: 'GrFormFile',
@@ -44,11 +45,11 @@ const props = withDefaults(
     multiple: false,
     disabled: false,
     accept: undefined,
-    uploadText: 'Upload file',
-    changeText: 'Change file',
-    removeText: 'Remove',
-    clearAllText: 'Clear all',
-    placeholder: 'No files selected',
+    uploadText: undefined,
+    changeText: undefined,
+    removeText: undefined,
+    clearAllText: undefined,
+    placeholder: undefined,
     validators: undefined,
     validate: undefined,
   },
@@ -61,6 +62,13 @@ const emit = defineEmits<{
   (e: 'validation', errors: GrFormFileError[]): void
   (e: 'update:errors', errors: GrFormFileError[]): void
 }>()
+
+const { t } = useGranularityTranslations()
+const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
+const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
+const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
+const resolvedClearAllText = computed(() => props.clearAllText ?? t('gr.formFile.clearAll', 'Clear all'))
+const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.formFile.placeholder', 'No files selected'))
 
 const inputRef = ref<HTMLInputElement | null>(null)
 const localErrors = ref<GrFormFileError[]>([])
@@ -212,7 +220,7 @@ const dropzone = computed(() => {
         setErrors([
           {
             code: 'accept',
-            message: 'Failed to validate dropped files',
+            message: t('gr.formFile.validateError', 'Failed to validate dropped files'),
           },
         ])
       }
@@ -265,7 +273,7 @@ watch(
           <GrIcon size="sm" aria-hidden="true">
             <IconUpload />
           </GrIcon>
-          <span class="ml-2">{{ hasFiles ? changeText : uploadText }}</span>
+          <span class="ml-2">{{ hasFiles ? resolvedChangeText : resolvedUploadText }}</span>
         </GrButton>
 
         <GrButton
@@ -279,7 +287,7 @@ watch(
           <GrIcon size="sm" aria-hidden="true">
             <IconX />
           </GrIcon>
-          <span class="ml-2">{{ removeText }}</span>
+          <span class="ml-2">{{ resolvedRemoveText }}</span>
         </GrButton>
 
         <GrButton
@@ -293,7 +301,7 @@ watch(
           <GrIcon size="sm" aria-hidden="true">
             <IconX />
           </GrIcon>
-          <span class="ml-2">{{ clearAllText }}</span>
+          <span class="ml-2">{{ resolvedClearAllText }}</span>
         </GrButton>
 
         <span
@@ -310,7 +318,7 @@ watch(
           class="text-sm text-[var(--muted-fg)]"
           data-ds-form-file-placeholder
         >
-          {{ placeholder }}
+          {{ resolvedPlaceholder }}
         </span>
       </div>
 

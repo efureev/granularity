@@ -2,6 +2,8 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+
 /**
  * Usage:
  *
@@ -61,17 +63,28 @@ const props = withDefaults(
     wheelZoom: true,
     draggable: false,
     zIndex: undefined,
-    closeLabel: 'Close image viewer',
-    prevLabel: 'Previous image',
-    nextLabel: 'Next image',
-    zoomInLabel: 'Zoom in',
-    zoomOutLabel: 'Zoom out',
-    resetZoomLabel: 'Reset zoom',
-    rotateLeftLabel: 'Rotate left',
-    rotateRightLabel: 'Rotate right',
-    emptyText: 'No image',
+    closeLabel: undefined,
+    prevLabel: undefined,
+    nextLabel: undefined,
+    zoomInLabel: undefined,
+    zoomOutLabel: undefined,
+    resetZoomLabel: undefined,
+    rotateLeftLabel: undefined,
+    rotateRightLabel: undefined,
+    emptyText: undefined,
   },
 )
+
+const { t } = useGranularityTranslations()
+const resolvedCloseLabel = computed(() => props.closeLabel ?? t('gr.imageViewer.close', 'Close image viewer'))
+const resolvedPrevLabel = computed(() => props.prevLabel ?? t('gr.imageViewer.prev', 'Previous image'))
+const resolvedNextLabel = computed(() => props.nextLabel ?? t('gr.imageViewer.next', 'Next image'))
+const resolvedZoomInLabel = computed(() => props.zoomInLabel ?? t('gr.imageViewer.zoomIn', 'Zoom in'))
+const resolvedZoomOutLabel = computed(() => props.zoomOutLabel ?? t('gr.imageViewer.zoomOut', 'Zoom out'))
+const resolvedResetZoomLabel = computed(() => props.resetZoomLabel ?? t('gr.imageViewer.resetZoom', 'Reset zoom'))
+const resolvedRotateLeftLabel = computed(() => props.rotateLeftLabel ?? t('gr.imageViewer.rotateLeft', 'Rotate left'))
+const resolvedRotateRightLabel = computed(() => props.rotateRightLabel ?? t('gr.imageViewer.rotateRight', 'Rotate right'))
+const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.imageViewer.empty', 'No image'))
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -679,7 +692,7 @@ onBeforeUnmount(() => {
                   <button
                     type="button"
                     data-ds-image-viewer-close
-                    :aria-label="closeLabel"
+                    :aria-label="resolvedCloseLabel"
                     class="h-11 w-11 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                     @click="closeViewer"
                   >
@@ -696,7 +709,7 @@ onBeforeUnmount(() => {
                   v-if="total > 1"
                   type="button"
                   data-ds-image-viewer-prev
-                  :aria-label="prevLabel"
+                  :aria-label="resolvedPrevLabel"
                   class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:left-6"
                   @click="prev"
                 >
@@ -707,7 +720,7 @@ onBeforeUnmount(() => {
                   v-if="total > 1"
                   type="button"
                   data-ds-image-viewer-next
-                  :aria-label="nextLabel"
+                  :aria-label="resolvedNextLabel"
                   class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-6"
                   @click="next"
                 >
@@ -736,7 +749,7 @@ onBeforeUnmount(() => {
                     v-else
                     class="rounded-[var(--ds-radius-xl)] border border-white/20 bg-black/25 px-4 py-3 text-sm text-white/80"
                   >
-                    {{ emptyText }}
+                    {{ resolvedEmptyText }}
                   </div>
                 </div>
               </div>
@@ -751,7 +764,7 @@ onBeforeUnmount(() => {
                       <button
                         type="button"
                         data-ds-image-viewer-zoom-out
-                        :aria-label="zoomOutLabel"
+                        :aria-label="resolvedZoomOutLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="zoomOut"
                       >
@@ -761,7 +774,7 @@ onBeforeUnmount(() => {
                       <button
                         type="button"
                         data-ds-image-viewer-zoom-reset
-                        :aria-label="resetZoomLabel"
+                        :aria-label="resolvedResetZoomLabel"
                         class="h-11 min-w-11 px-3 flex items-center justify-center rounded-full text-xs font-700 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="resetTransform"
                       >
@@ -771,7 +784,7 @@ onBeforeUnmount(() => {
                       <button
                         type="button"
                         data-ds-image-viewer-zoom-in
-                        :aria-label="zoomInLabel"
+                        :aria-label="resolvedZoomInLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="zoomIn"
                       >
@@ -794,7 +807,7 @@ onBeforeUnmount(() => {
                       <button
                         type="button"
                         data-ds-image-viewer-rotate-left
-                        :aria-label="rotateLeftLabel"
+                        :aria-label="resolvedRotateLeftLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="rotateLeft"
                       >
@@ -804,7 +817,7 @@ onBeforeUnmount(() => {
                       <button
                         type="button"
                         data-ds-image-viewer-rotate-right
-                        :aria-label="rotateRightLabel"
+                        :aria-label="resolvedRotateRightLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="rotateRight"
                       >

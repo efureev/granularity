@@ -17,6 +17,7 @@ import GrDialog from '../GrDialog/GrDialog.vue'
 import GrFormField from '../GrFormField/GrFormField.vue'
 import GrInput from '../GrInput/GrInput.vue'
 import GrResponseErrorBanner from '../GrResponseErrorBanner/GrResponseErrorBanner.vue'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
 import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
@@ -68,9 +69,9 @@ export interface GrPromptDialogProps {
 }
 
 const props = withDefaults(defineProps<GrPromptDialogProps>(), {
-  title: 'Prompt',
+  title: undefined,
   description: undefined,
-  label: 'Value',
+  label: undefined,
   placeholder: undefined,
   closeOnBackdrop: true,
   closeOnEsc: true,
@@ -80,11 +81,11 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   headerConfig: undefined,
   footerConfig: undefined,
   bodyConfig: undefined,
-  closeLabel: 'Close',
+  closeLabel: undefined,
   buttonSize: undefined,
-  confirmText: 'Confirm',
-  cancelText: 'Cancel',
-  requiredErrorText: 'Enter a value.',
+  confirmText: undefined,
+  cancelText: undefined,
+  requiredErrorText: undefined,
   confirmVariant: 'primary',
   confirmTone: 'primary',
   required: true,
@@ -101,6 +102,15 @@ const emit = defineEmits<{
   (e: 'confirm', value: string): void
   (e: 'cancel'): void
 }>()
+
+// Дефолты берём из общего i18n-блока пакета (fallback — англ.), а не хардкодим.
+const { t } = useGranularityTranslations()
+const resolvedTitle = computed(() => props.title ?? t('gr.dialog.prompt.title', 'Prompt'))
+const resolvedLabel = computed(() => props.label ?? t('gr.dialog.prompt.label', 'Value'))
+const resolvedRequiredErrorText = computed(() => props.requiredErrorText ?? t('gr.dialog.prompt.required', 'Enter a value.'))
+const resolvedCloseLabel = computed(() => props.closeLabel ?? t('gr.common.close', 'Close'))
+const resolvedConfirmText = computed(() => props.confirmText ?? t('gr.common.confirm', 'Confirm'))
+const resolvedCancelText = computed(() => props.cancelText ?? t('gr.common.cancel', 'Cancel'))
 
 const open = computed({
   get: () => props.modelValue,
@@ -132,7 +142,7 @@ const validationError = computed(() => {
   if (!touched.value) return undefined
   return valueModel.value.trim().length > 0
     ? undefined
-    : props.requiredErrorText
+    : resolvedRequiredErrorText.value
 })
 
 // Внешняя ошибка поля (серверная валидация) имеет приоритет над встроенной.
@@ -159,7 +169,7 @@ function onConfirm(): void {
 <template>
   <GrDialog
     v-model="open"
-    :title="title"
+    :title="resolvedTitle"
     :size="size"
     :close-on-backdrop="closeOnBackdrop"
     :close-on-esc="closeOnEsc"
@@ -168,7 +178,7 @@ function onConfirm(): void {
     :header-config="headerConfig"
     :footer-config="footerConfig"
     :body-config="bodyConfig"
-    :close-label="closeLabel"
+    :close-label="resolvedCloseLabel"
   >
     <div class="grid gap-4">
       <slot>
@@ -177,7 +187,7 @@ function onConfirm(): void {
         </div>
       </slot>
 
-      <GrFormField :label="label" :error="fieldErrorMessage" for-id="ds-prompt-input">
+      <GrFormField :label="resolvedLabel" :error="fieldErrorMessage" for-id="ds-prompt-input">
         <GrInput
           id="ds-prompt-input"
           ref="inputRef"
@@ -198,7 +208,7 @@ function onConfirm(): void {
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
           <GrButton data-testid="ds-prompt-cancel" variant="outline" :size="buttonSize" @click="onCancel">
-            {{ cancelText }}
+            {{ resolvedCancelText }}
           </GrButton>
           <GrButton
             data-testid="ds-prompt-confirm"
@@ -209,7 +219,7 @@ function onConfirm(): void {
             :disabled="confirmDisabled || (required && touched && !canConfirm)"
             @click="onConfirm"
           >
-            {{ confirmText }}
+            {{ resolvedConfirmText }}
           </GrButton>
         </div>
       </slot>

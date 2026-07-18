@@ -4,6 +4,7 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
   grDrawerPanelClass,
   grDrawerPanelEnterFrom,
@@ -36,8 +37,12 @@ const props = withDefaults(defineProps<GrDrawerProps>(), {
   closeOnEsc: true,
   side: 'right',
   size: 'md',
-  closeLabel: 'Close',
+  closeLabel: undefined,
 })
+
+const { t } = useGranularityTranslations()
+const resolvedTitle = computed(() => props.title ?? t('gr.drawer.title', 'Drawer'))
+const resolvedCloseLabel = computed(() => props.closeLabel ?? t('gr.common.close', 'Close'))
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -125,7 +130,7 @@ function onKeydown(e: KeyboardEvent): void {
               >
                 <DialogTitle :id="titleId" as="div" data-ds-drawer-title class="text-[14px] font-700 min-w-0 truncate">
                   <slot name="title">
-                    {{ title ?? 'Drawer' }}
+                    {{ resolvedTitle }}
                   </slot>
                 </DialogTitle>
 
@@ -133,7 +138,7 @@ function onKeydown(e: KeyboardEvent): void {
                   variant="ghost"
                   size="sm"
                   square
-                  :aria-label="closeLabel"
+                  :aria-label="resolvedCloseLabel"
                   @click="close"
                 >
                   <GrIcon size="sm" aria-hidden="true">

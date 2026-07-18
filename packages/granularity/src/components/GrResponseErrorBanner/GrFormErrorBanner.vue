@@ -14,6 +14,7 @@
 import { computed } from 'vue'
 
 import GrResponseErrorBanner from './GrResponseErrorBanner.vue'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type {
   ResponseErrorInfo,
   ResponseErrorKind,
@@ -47,16 +48,20 @@ const emit = defineEmits<{
   (e: 'dismiss'): void
 }>()
 
-const FORM_TEXTS: Partial<ResponseErrorTexts> = {
-  validationTitle: 'Check the form fields',
-  validationMessage: 'The server rejected the data. Fix the highlighted fields and try again.',
-  clientTitle: 'Failed to save',
-  serverTitle: 'Save error',
-  serverMessage: 'Could not save the data. Please try again later.',
-}
+const { t } = useGranularityTranslations()
+
+// Пресеты «под формы» резолвятся через i18n (fallback — англ. строки). Иначе они бы,
+// как `props.texts`, перекрывали i18n базового баннера и форсили английский.
+const formTexts = computed<Partial<ResponseErrorTexts>>(() => ({
+  validationTitle: t('gr.formErrorBanner.validationTitle', 'Check the form fields'),
+  validationMessage: t('gr.formErrorBanner.validationMessage', 'The server rejected the data. Fix the highlighted fields and try again.'),
+  clientTitle: t('gr.formErrorBanner.clientTitle', 'Failed to save'),
+  serverTitle: t('gr.formErrorBanner.serverTitle', 'Save error'),
+  serverMessage: t('gr.formErrorBanner.serverMessage', 'Could not save the data. Please try again later.'),
+}))
 
 const mergedTexts = computed<Partial<ResponseErrorTexts>>(() => ({
-  ...FORM_TEXTS,
+  ...formTexts.value,
   ...props.texts,
 }))
 </script>

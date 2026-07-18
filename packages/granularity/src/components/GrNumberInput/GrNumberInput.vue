@@ -10,6 +10,7 @@ import {
   type GrNumberInputState,
   type GrNumberInputTextAlign,
 } from './grNumberInputStyles'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 defineOptions({
   inheritAttrs: false,
@@ -97,8 +98,8 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   suffixMinWidth: undefined,
   suffixMaxWidth: undefined,
 
-  increaseLabel: 'Increase',
-  decreaseLabel: 'Decrease',
+  increaseLabel: undefined,
+  decreaseLabel: undefined,
 })
 
 const emit = defineEmits<{
@@ -117,6 +118,10 @@ defineExpose({
 })
 
 const slots = useSlots()
+
+const { t } = useGranularityTranslations()
+const resolvedIncreaseLabel = computed(() => props.increaseLabel ?? t('gr.numberInput.increase', 'Increase'))
+const resolvedDecreaseLabel = computed(() => props.decreaseLabel ?? t('gr.numberInput.decrease', 'Decrease'))
 
 const hasPrefix = computed(() => Boolean(slots.prefix))
 const hasSuffix = computed(() => Boolean(slots.suffix))
@@ -396,7 +401,7 @@ function stepBy(dir: 1 | -1): void {
           type="button"
           class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="disabled"
-          :aria-label="increaseLabel"
+          :aria-label="resolvedIncreaseLabel"
           @mousedown.prevent
           @click="stepBy(1)"
         >
@@ -414,7 +419,7 @@ function stepBy(dir: 1 | -1): void {
           type="button"
           class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="disabled"
-          :aria-label="decreaseLabel"
+          :aria-label="resolvedDecreaseLabel"
           @mousedown.prevent
           @click="stepBy(-1)"
         >
@@ -442,7 +447,7 @@ function stepBy(dir: 1 | -1): void {
         type="button"
         class="h-full w-full inline-flex items-center justify-center text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
         :disabled="disabled"
-        :aria-label="decreaseLabel"
+        :aria-label="resolvedDecreaseLabel"
         @mousedown.prevent
         @click="stepBy(-1)"
       >
@@ -469,7 +474,7 @@ function stepBy(dir: 1 | -1): void {
         type="button"
         class="h-full w-full inline-flex items-center justify-center text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
         :disabled="disabled"
-        :aria-label="increaseLabel"
+        :aria-label="resolvedIncreaseLabel"
         @mousedown.prevent
         @click="stepBy(1)"
       >

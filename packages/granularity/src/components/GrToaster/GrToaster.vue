@@ -21,6 +21,7 @@ import {computed} from 'vue'
 import type {Component} from 'vue'
 
 import {useToast} from '../../composables/useToast'
+import {useGranularityTranslations} from '../../internal/granularityI18n'
 import type {GrToastTone} from '../../composables/useToast'
 import GrButton from '../GrButton'
 import GrIcon from '../GrIcon'
@@ -66,9 +67,13 @@ export interface GrToasterProps {
 
 const props = withDefaults(defineProps<GrToasterProps>(), {
   placement: 'top-right',
-  dismissLabel: 'Dismiss',
-  regionLabel: 'Notifications',
+  dismissLabel: undefined,
+  regionLabel: undefined,
 })
+
+const { t } = useGranularityTranslations()
+const resolvedDismissLabel = computed(() => props.dismissLabel ?? t('gr.toaster.dismiss', 'Dismiss'))
+const resolvedRegionLabel = computed(() => props.regionLabel ?? t('gr.toaster.region', 'Notifications'))
 
 const {list, dismiss} = useToast()
 
@@ -87,7 +92,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
     <div
         data-ds-toaster
         role="region"
-        :aria-label="regionLabel"
+        :aria-label="resolvedRegionLabel"
         class="fixed z-[var(--gr-z-toast)] grid w-[360px] max-w-[calc(100vw-2rem)] gap-3"
         :class="containerClass"
     >
@@ -128,7 +133,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
                 variant="ghost"
                 size="sm"
                 square
-                :aria-label="dismissLabel"
+                :aria-label="resolvedDismissLabel"
                 @click="dismiss(toast.id)"
             >
               <GrIcon size="sm" aria-hidden="true">

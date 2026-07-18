@@ -13,6 +13,7 @@ import type { GrUploadState } from './uploadState'
 import { FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { GR_UPLOAD_STATE_IDLE } from './uploadState'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type GrFileUploadExtraDataValue = string | Blob
 
@@ -81,10 +82,10 @@ const props = withDefaults(
     withCredentials: false,
     showFileList: false,
     uploadExtraData: undefined,
-    placeholder: 'Drag files here or click to select',
+    placeholder: undefined,
     showProgress: true,
     progressTone: 'primary',
-    progressLabel: 'Upload progress',
+    progressLabel: undefined,
     hideProgressOnSuccess: 800,
   },
 )
@@ -98,6 +99,10 @@ const emit = defineEmits<{
 }>()
 
 const slots = useSlots()
+
+const { t } = useGranularityTranslations()
+const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
+const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
 function flattenSlotNodes(nodes: VNode[]): VNode[] {
   const out: VNode[] = []
@@ -512,7 +517,7 @@ defineExpose({
         <div data-ds-file-upload-label class="text-[14px] font-700">
           <slot name="label">
             <slot>
-              {{ placeholder }}
+              {{ resolvedPlaceholder }}
             </slot>
           </slot>
         </div>
@@ -555,7 +560,7 @@ defineExpose({
               <GrProgressBar
                 :value="progressPercent"
                 :tone="effectiveProgressTone"
-                :aria-label="progressLabel"
+                :aria-label="resolvedProgressLabel"
               />
               <span
                 data-ds-file-upload-progress-text

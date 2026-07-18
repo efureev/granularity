@@ -5,6 +5,7 @@ import GrBadge from '../GrBadge/GrBadge.vue'
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconClose from '~icons/lucide/x'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
   grInputTagInputClass,
@@ -65,7 +66,7 @@ const props = withDefaults(
     tagSize: 'md',
     tagRadius: 'round',
     tagClosable: true,
-    removeTagLabel: 'Remove tag',
+    removeTagLabel: undefined,
   },
 )
 
@@ -74,6 +75,9 @@ const emit = defineEmits<{
   (e: 'add', value: string): void
   (e: 'remove', value: string, index: number): void
 }>()
+
+const { t } = useGranularityTranslations()
+const resolvedRemoveTagLabel = computed(() => props.removeTagLabel ?? t('gr.inputTag.removeTag', 'Remove tag'))
 
 const inputValue = ref('')
 const inputEl = ref<HTMLInputElement | null>(null)
@@ -258,7 +262,7 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
         v-if="showRemove"
         type="button"
         class="-mr-0.5 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-        :aria-label="removeTagLabel"
+        :aria-label="resolvedRemoveTagLabel"
         data-ds-input-tag-remove
         data-testid="ds-input-tag-remove"
         :data-index="i"

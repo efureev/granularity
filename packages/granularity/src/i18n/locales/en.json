@@ -67,5 +67,57 @@
     "primary": "Primary",
     "slate": "Slate",
     "azure": "Azure"
+  },
+  "drawer": {
+    "title": "Drawer"
+  },
+  "numberInput": {
+    "increase": "Increase",
+    "decrease": "Decrease"
+  },
+  "toaster": {
+    "dismiss": "Dismiss",
+    "region": "Notifications"
+  },
+  "inputTag": {
+    "removeTag": "Remove tag"
+  },
+  "fileUpload": {
+    "placeholder": "Drag files here or click to select",
+    "progress": "Upload progress"
+  },
+  "formFile": {
+    "upload": "Upload file",
+    "change": "Change file",
+    "remove": "Remove",
+    "clearAll": "Clear all",
+    "placeholder": "No files selected",
+    "validateError": "Failed to validate dropped files"
+  },
+  "imageViewer": {
+    "close": "Close image viewer",
+    "prev": "Previous image",
+    "next": "Next image",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "resetZoom": "Reset zoom",
+    "rotateLeft": "Rotate left",
+    "rotateRight": "Rotate right",
+    "empty": "No image"
+  },
+  "formErrorBanner": {
+    "validationTitle": "Check the form fields",
+    "validationMessage": "The server rejected the data. Fix the highlighted fields and try again.",
+    "clientTitle": "Failed to save",
+    "serverTitle": "Save error",
+    "serverMessage": "Could not save the data. Please try again later."
+  },
+  "uploadErrorBanner": {
+    "networkTitle": "Failed to upload files",
+    "networkMessage": "Check your connection and try again.",
+    "validationTitle": "Files did not pass validation",
+    "validationMessage": "Some of the files do not meet the requirements.",
+    "serverTitle": "Upload error on the server",
+    "serverMessage": "The server could not process the upload. Please try again."
   }
 }
