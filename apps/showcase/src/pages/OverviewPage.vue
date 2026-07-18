@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 import {
   GrButton,
   GrCard,
@@ -11,28 +14,14 @@ import {
 } from '../content/foundations'
 import InlineRichText from "../components/content/InlineRichText.vue";
 
-const overviewFeatureList = [
-  {
-    title: 'Быстрее собирает продуктовые интерфейсы',
-    description:
-        'Готовые компоненты, токены и темы снимают с команды рутину и ускоряют запуск экранов.',
-  },
-  {
-    title: 'Подключается без жёсткого миграционного сценария',
-    description:
-        'Можно начать с простого импорта, а затем перейти к granular imports и точному CSS-сценарию по мере роста продукта.',
-  },
-  {
-    title: 'Даёт аккуратный контроль над стилями и bundle',
-    description:
-        'Понятные слои стилей, subpath exports и интеграция с UnoCSS помогают не терять управляемость.',
-  },
-  {
-    title: 'Подходит и для быстрого старта, и для зрелой инфраструктуры',
-    description:
-        'Один пакет закрывает сценарии от нескольких готовых компонентов до dependency-aware интеграции.',
-  },
-]
+const { t } = useFintI18n()
+
+const overviewFeatureList = computed(() =>
+  [0, 1, 2, 3].map(index => ({
+    title: t(`showcase.overviewPage.features.${index}.title`),
+    description: t(`showcase.overviewPage.features.${index}.description`),
+  })),
+)
 </script>
 
 <template>
@@ -43,21 +32,18 @@ const overviewFeatureList = [
           <h1 class="text-3xl font-semibold leading-tight lg:text-4xl mb-3">
             Granularity
           </h1>
-          <InlineRichText
-              text="Витрина дизайн-системы для Vue 3: готовые компоненты, понятные слои стилей, granular imports и аккуратная
-            интеграция с `UnoCSS`."
-          />
+          <InlineRichText :text="t('showcase.overviewPage.tagline')" />
         </div>
 
         <div class="flex flex-wrap gap-3">
           <RouterLink to="/foundations" custom v-slot="{ navigate, href }">
             <GrButton :href="href" @click="navigate">
-              Открыть foundations
+              {{ t('showcase.overviewPage.ctaFoundations') }}
             </GrButton>
           </RouterLink>
           <RouterLink to="/components" custom v-slot="{ navigate, href }">
             <GrButton variant="ghost-border" :href="href" @click="navigate">
-              Каталог компонентов
+              {{ t('showcase.overviewPage.ctaComponents') }}
             </GrButton>
           </RouterLink>
         </div>
@@ -66,13 +52,13 @@ const overviewFeatureList = [
 
     <section class="space-y-4">
       <div class="space-y-2">
-        <h2 class="text-2xl font-semibold">Почему Granularity</h2>
+        <h2 class="text-2xl font-semibold">{{ t('showcase.overviewPage.whyTitle') }}</h2>
       </div>
 
       <GrCard class="showcase-panel overflow-hidden rounded-[32px] border p-6 lg:p-8">
         <div class="space-y-4">
           <h3 class="text-xl font-semibold leading-tight">
-            Всё, что нужно, чтобы дизайн-система помогала команде, а не тормозила её
+            {{ t('showcase.overviewPage.whyHeading') }}
           </h3>
         </div>
         <div class="grid gap-3 sm:grid-cols-2 mt-5 gap-6">
@@ -98,9 +84,9 @@ const overviewFeatureList = [
 
     <section id="quick-start" class="scroll-mt-28 space-y-4">
       <div class="space-y-2">
-        <h2 class="text-2xl font-semibold">Быстрый старт</h2>
+        <h2 class="text-2xl font-semibold">{{ t('showcase.overviewPage.quickStartTitle') }}</h2>
         <p class="showcase-text-muted max-w-3xl text-sm leading-6">
-          Пять документированных сценариев подключения: от root import до UnoCSS preset-ов.
+          {{ t('showcase.overviewPage.quickStartSubtitle') }}
         </p>
       </div>
 
@@ -118,7 +104,7 @@ const overviewFeatureList = [
               </h3>
               <RouterLink to="/foundations"
                           class="showcase-text-primary text-xs font-semibold uppercase tracking-[0.16em] transition-colors">
-                Foundations
+                {{ t('showcase.overviewPage.foundationsLink') }}
               </RouterLink>
             </div>
             <p class="showcase-text-muted text-sm leading-6">
@@ -134,11 +120,11 @@ const overviewFeatureList = [
 
       <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-3">
-          <h2 class="text-2xl font-semibold">Коротко об установке</h2>
+          <h2 class="text-2xl font-semibold">{{ t('showcase.overviewPage.installSummaryTitle') }}</h2>
           <p class="showcase-text-muted max-w-3xl text-sm leading-6">
-            Ниже — короткая выдержка из документации, которая помогает быстро выбрать подход к подключению.
+            {{ t('showcase.overviewPage.installSummaryText') }}
           </p>
-          <CodeBlock :code="showcaseInstallationNarrative" language="md" title="Installation guide excerpt"/>
+          <CodeBlock :code="showcaseInstallationNarrative" language="md" :title="t('showcase.overviewPage.installGuideExcerptTitle')"/>
         </div>
       </GrCard>
     </section>

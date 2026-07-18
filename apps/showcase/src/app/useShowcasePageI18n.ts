@@ -1,5 +1,16 @@
+import { computed } from 'vue'
+
 import {useFintI18n, useI18nScope} from '@feugene/fint-i18n/vue'
 
+import {
+    featuredComponentTitles,
+    featuredDirectiveTitles,
+    featuredUtilityTitles,
+    showcaseComponentEntities,
+    showcaseComposableEntities,
+    showcaseDirectiveEntities,
+    showcaseUtilityEntities,
+} from './showcaseEntities.ts'
 import {
     showcasePages,
 } from './showcasePages.ts'
@@ -38,22 +49,41 @@ function normalizeLabel(value: string) {
 }
 
 export function useShowcasePageI18n() {
-    const { t } = useFintI18n()
+    const i18n = useFintI18n()
+    const { t } = i18n
 
-    function translateWithFallback(key: string, fallback: string) {
-        const result = t(key)
+    // Значения, которые подставляются в динамические буллеты секций (списки
+    // featured-сущностей и их счётчики). Соединительный союз локале-зависим,
+    // поэтому список из 2+ элементов склеивается через локализованный разделитель.
+    const sectionParams = computed(() => {
+        const conjunction = i18n.locale.value === 'ru' ? ' и ' : ' and '
+
+        return {
+            componentTitles: featuredComponentTitles.join(', '),
+            directiveTitles: featuredDirectiveTitles.join(conjunction),
+            utilityTitles: featuredUtilityTitles.join(conjunction),
+            componentCount: showcaseComponentEntities.length,
+            directiveList: showcaseDirectiveEntities.map(entity => entity.title).join(', '),
+            composableList: showcaseComposableEntities.map(entity => entity.title).join(conjunction),
+            utilityCount: showcaseUtilityEntities.length,
+        }
+    })
+
+    function translateWithFallback(key: string, fallback: string, params?: Record<string, unknown>) {
+        const result = t(key, params)
         return result === key ? fallback : result
     }
 
     function localizeSection(pageName: ShowcasePageName, section: ShowcaseSection): ShowcaseSection {
         const baseKey = `showcase.pages.${pageName}.sections.${section.id}`
+        const params = sectionParams.value
 
         return {
             ...section,
             title: translateWithFallback(`${baseKey}.title`, section.title),
             description: translateWithFallback(`${baseKey}.description`, section.description),
             bullets: section.bullets.map((bullet, index) => {
-                return translateWithFallback(`${baseKey}.bullets.${index}`, bullet)
+                return translateWithFallback(`${baseKey}.bullets.${index}`, bullet, params)
             }),
         }
     }

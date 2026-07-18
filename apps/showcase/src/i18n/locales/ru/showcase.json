@@ -25,7 +25,45 @@
       "title": "Обзор",
       "shortTitle": "Обзор",
       "eyebrow": "Showcase / Обзор",
-      "description": "Лендинг витрины с позиционированием showcase, быстрым стартом по интеграции и картой следующих этапов наполнения."
+      "description": "Лендинг витрины с позиционированием showcase, быстрым стартом по интеграции и картой следующих этапов наполнения.",
+      "sections": {
+        "mission": {
+          "title": "Mission",
+          "description": "Объясняет, зачем нужен новый showcase и какой runtime/data-driven фундамент уже собран.",
+          "bullets": [
+            "Позиционирование новой витрины как canonical docs-shell app поверх `@feugene/granularity`.",
+            "Ключевые runtime-метрики: public registry, built-in themes и foundation tokens.",
+            "Верхний hero сразу показывает, что showcase уже живёт не на legacy, а на новой shell-архитектуре."
+          ]
+        },
+        "quick-start": {
+          "title": "Быстрый старт",
+          "description": "Показывает рекомендуемые интеграционные path-ы и реальные кодовые entrypoints пакета.",
+          "bullets": [
+            "Quick-start через root API и готовые CSS exports.",
+            "Granular component imports для точечного bundle.",
+            "Production path через `UnoCSS` preset, если приложение уже собирает стили на своей стороне."
+          ]
+        },
+        "delivery-checklist": {
+          "title": "Delivery checklist",
+          "description": "Фиксирует, что уже подтверждено текущими этапами плана и какой контент появляется следующим.",
+          "bullets": [
+            "Showcase уже запускается, собирается и использует пакет как основной UI toolkit.",
+            "Foundations теперь начинает закрывать onboarding-гайды, narrative docs и quick-start snippets.",
+            "Следующий крупный шаг после foundations — живые entity pages для компонентов, директив и utilities."
+          ]
+        },
+        "roadmap": {
+          "title": "Roadmap",
+          "description": "Показывает ближайшие продуктовые этапы наполнения showcase после foundations.",
+          "bullets": [
+            "Сначала — сценарные страницы для {componentTitles}.",
+            "Затем — интерактивные сценарии для {directiveTitles}.",
+            "Utility-покрытие начнётся с {utilityTitles}."
+          ]
+        }
+      }
     },
     "foundations": {
       "title": "Foundation",
@@ -34,13 +72,31 @@
       "description": "Базовая onboarding-документация: сценарии установки, слои стилей, темы, токены, UnoCSS и локализация.",
       "sections": {
         "installation": {
-          "title": "Сценарии установки"
+          "title": "Installation paths",
+          "description": "Прогрессия подключения `presetGranular` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.",
+          "bullets": [
+            "Quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularContent`.",
+            "Narrative guidance подключена из `packages/granularity/docs/installation.md`.",
+            "Один экран последовательно показывает, как наращивать опции `components`, `themes`, `layer` и `granularContent`."
+          ]
         },
         "styling": {
-          "title": "Стили, темы и токены"
+          "title": "Styling, themes and tokens",
+          "description": "Показывает границы между foundation layers, theme files и design tokens.",
+          "bullets": [
+            "Подключены реальные excerpts из `styling.md`, `tokens.css`, `light.css` и `dark.css`.",
+            "Есть явное разделение между `tokens`, theme layer и component-level CSS.",
+            "Показан runtime-контракт через `initThemeEarly()` и `useTheme()`."
+          ]
         },
         "unocss": {
-          "title": "UnoCSS и локализация"
+          "title": "UnoCSS and localization",
+          "description": "Закрывает production preset path и i18n-контракт пакета для хост-приложения.",
+          "bullets": [
+            "`presetGranularNode` из `@feugene/unocss-preset-granular/node` — единственный поддерживаемый способ подключения.",
+            "Подключён narrative doc по localization с package-level i18n entrypoint.",
+            "Foundations теперь служит реальной onboarding-базой, а не placeholder-секцией."
+          ]
         }
       }
     },
@@ -48,25 +104,179 @@
       "title": "Компоненты",
       "shortTitle": "Компоненты",
       "eyebrow": "Showcase / Компоненты",
-      "description": "Каталог компонентных страниц с поиском, группировкой и отдельной витриной на каждый публичный компонент пакета."
+      "description": "Каталог компонентных страниц с поиском, группировкой и отдельной витриной на каждый публичный компонент пакета.",
+      "sections": {
+        "catalog": {
+          "title": "Component catalog",
+          "description": "Здесь будет index-страница со всеми публичными компонентами и быстрой группировкой по категориям.",
+          "bullets": [
+            "Источник правды — `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в {componentCount} компонентных сущностей.",
+            "Навигация по компонентам должна быть мгновенной и search-friendly.",
+            "Каждый компонент получит отдельный route и собственную страницу."
+          ]
+        },
+        "live-demos": {
+          "title": "Live demos",
+          "description": "Каждая компонентная страница будет раскрывать реальные сценарии использования, а не просто набор всех props.",
+          "bullets": [
+            "Первые hand-authored demo-сценарии уже зарезервированы для {componentTitles}.",
+            "Отдельное покрытие состояний, composition cases и сложных сценариев.",
+            "Код примеров и live preview будут жить рядом."
+          ]
+        },
+        "api-sync": {
+          "title": "Generated API",
+          "description": "API-таблицы должны собираться из исходного кода пакета и не расходиться с реальными компонентами.",
+          "bullets": [
+            "Props, slots, events и expose/methods уже представлены в unified pending API format.",
+            "Fallback metadata только там, где автогенерации недостаточно.",
+            "Связка автогенерации с hand-authored demo-описаниями."
+          ]
+        }
+      }
     },
     "directives": {
       "title": "Директивы",
       "shortTitle": "Директивы",
       "eyebrow": "Showcase / Директивы",
-      "description": "Раздел для публичных директив и `createLoading` с реальными интерактивными сценариями."
+      "description": "Раздел для публичных директив и `createLoading` с реальными интерактивными сценариями.",
+      "sections": {
+        "public-api": {
+          "title": "Covered directives",
+          "description": "В витрину войдут все публичные директивы из package exports, а не только самые очевидные кейсы.",
+          "bullets": [
+            "Из public exports уже подняты {directiveList}.",
+            "Отдельная документация для `createLoading` рядом с `vLoading`.",
+            "Фиксация caveats, параметров и expected behavior."
+          ]
+        },
+        "interactive-cases": {
+          "title": "Interactive behavior",
+          "description": "Пользователь должен видеть директиву в действии, а не только копировать usage snippet.",
+          "bullets": [
+            "Приоритетные сценарии уже выделены для {directiveTitles}.",
+            "Пояснения по обработке edge cases и UX-ограничениям.",
+            "Готовые примеры для реальной интеграции."
+          ]
+        },
+        "integration-notes": {
+          "title": "Integration notes",
+          "description": "Каждая директива получит явные примечания по подключению, параметрам и совместимости с компонентами.",
+          "bullets": [
+            "Сигнатуры binding/value и типовые входные данные.",
+            "Комбинации с компонентами дизайн-системы.",
+            "Ограничения и caveats для embedded/SSR-like сценариев при необходимости."
+          ]
+        }
+      }
     },
     "composables": {
       "title": "Композаблы",
       "shortTitle": "Композаблы",
       "eyebrow": "Showcase / Композаблы",
-      "description": "Страницы для `useTheme` и `useToast` с runnable-рецептами интеграции."
+      "description": "Страницы для `useTheme` и `useToast` с runnable-рецептами интеграции.",
+      "sections": {
+        "use-theme": {
+          "title": "`useTheme` scenarios",
+          "description": "Showcase уже использует `useTheme()` для глобального переключателя, а дальше эта страница раскроет composable глубже.",
+          "bullets": [
+            "Инициализация и раннее применение темы.",
+            "Persist-режим и поведение в интерфейсе.",
+            "Связка theme toggle с компонентами showcase."
+          ]
+        },
+        "use-toast": {
+          "title": "`useToast` scenarios",
+          "description": "Здесь появятся интерактивные примеры push/dismiss/clear и варианты уведомлений.",
+          "bullets": [
+            "Текущий реестр composables уже содержит {composableList}.",
+            "Очистка очереди и управление жизненным циклом toast-сообщений.",
+            "Пояснения по expected usage и интеграционным паттернам."
+          ]
+        },
+        "integration-recipes": {
+          "title": "Integration recipes",
+          "description": "Каждый composable будет оформлен как готовый рецепт встраивания, а не сухой список возвращаемых значений.",
+          "bullets": [
+            "Параметры, возвращаемые значения и code snippets.",
+            "Практические схемы интеграции в app shell и feature pages.",
+            "Связи с runtime theme, overlay-сценариями и уведомлениями."
+          ]
+        }
+      }
     },
     "utilities": {
       "title": "Утилиты",
       "shortTitle": "Утилиты",
       "eyebrow": "Showcase / Утилиты",
-      "description": "Раздел для package-level утилит, начиная с `fileValidation` и прикладных сценариев использования."
+      "description": "Раздел для package-level утилит, начиная с `fileValidation` и прикладных сценариев использования.",
+      "sections": {
+        "file-validation": {
+          "title": "`fileValidation`",
+          "description": "На отдельной странице будут показаны ключевые валидаторы и формат возвращаемых результатов.",
+          "bullets": [
+            "Из public exports уже собраны {utilityCount} utility-сущностей file validation слоя.",
+            "Практические ошибки валидации и ограничения.",
+            "Сравнение use-case без UI и вместе с `GrFileUpload`."
+          ]
+        },
+        "integration": {
+          "title": "Utility integration",
+          "description": "Утилиты должны объяснять не только API, но и реальный способ применения в продукте.",
+          "bullets": [
+            "Приоритетные integration points уже выделены для {utilityTitles}.",
+            "Примеры интеграции в формы и file upload flows.",
+            "Документирование ошибок, ограничений и edge cases."
+          ]
+        },
+        "future-coverage": {
+          "title": "Future coverage",
+          "description": "Раздел останется расширяемым, чтобы безопасно включать новые package-level helpers по мере роста пакета.",
+          "bullets": [
+            "Подготовка структуры под новые utilities.",
+            "Единый формат для narrative notes и runnable examples.",
+            "Согласованность с поиском и generated metadata в будущих этапах."
+          ]
+        }
+      }
+    },
+    "integration": {
+      "title": "Интеграция",
+      "shortTitle": "Integration",
+      "eyebrow": "Showcase / Integration",
+      "description": "Два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`createGranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`).",
+      "sections": {
+        "vue-plugin": {
+          "title": "Vue-плагин `createGranularity`",
+          "description": "Лёгкий runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalProperties` без потери tree-shaking — сам модуль не импортирует ни одного компонента.",
+          "bullets": [
+            "`createGranularity({ components, directives, provides, globalProperties })` отдаёт стандартный Vue-plugin для `app.use(...)`.",
+            "Поддерживает три формы компонентов: чистый SFC, объект с `install`, явное `{ name, component }`.",
+            "Основной сценарий — директивы, `provide`, `globalProperties`, SSR/Nuxt-плагины и окружения без сборщика.",
+            "Типовые случаи: глобальные директивы (`v-hotkey`, `v-autofocus`), `provide` для i18n/theme, `globalProperties` для Options API."
+          ]
+        },
+        "unplugin": {
+          "title": "Авто-импорт `@feugene/unplugin-granularity`",
+          "description": "Отдельный build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в SFC.",
+          "bullets": [
+            "Пишете `<GrButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.",
+            "Опции: `prefix`, `importStyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist.",
+            "Рекомендуется для prod-приложений: идеальный tree-shaking и отсутствие ручных `import`-ов.",
+            "Типичный сценарий: резолвер вместе с `presetGranularNode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах."
+          ]
+        },
+        "when-to-use": {
+          "title": "Как выбирать между подходами",
+          "description": "Инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин — директивы вне шаблонов, `provide` и globals.",
+          "bullets": [
+            "`@feugene/unplugin-granularity` — build-time, охватывает только то, что реально стоит в `<template>`.",
+            "`@feugene/granularity/vue` — runtime, охватывает всё остальное: директивы в `render()`/JSX, i18n/theme через `provide`, Options API через `globalProperties`.",
+            "SSR / тесты / окружения без `unplugin-vue-components` — только через `createGranularity`.",
+            "Установка CSS-части пакета делается исключительно через `presetGranularNode` — см. раздел Foundations / Installation paths."
+          ]
+        }
+      }
     }
   },
   "componentsPage": {
@@ -237,5 +447,36 @@
   },
   "navigation": {
     "close": "Закрыть навигацию"
+  },
+  "overviewPage": {
+    "tagline": "Витрина дизайн-системы для Vue 3: готовые компоненты, понятные слои стилей, granular imports и аккуратная интеграция с `UnoCSS`.",
+    "ctaFoundations": "Открыть foundations",
+    "ctaComponents": "Каталог компонентов",
+    "whyTitle": "Почему Granularity",
+    "whyHeading": "Всё, что нужно, чтобы дизайн-система помогала команде, а не тормозила её",
+    "features": {
+      "0": {
+        "title": "Быстрее собирает продуктовые интерфейсы",
+        "description": "Готовые компоненты, токены и темы снимают с команды рутину и ускоряют запуск экранов."
+      },
+      "1": {
+        "title": "Подключается без жёсткого миграционного сценария",
+        "description": "Можно начать с простого импорта, а затем перейти к granular imports и точному CSS-сценарию по мере роста продукта."
+      },
+      "2": {
+        "title": "Даёт аккуратный контроль над стилями и bundle",
+        "description": "Понятные слои стилей, subpath exports и интеграция с UnoCSS помогают не терять управляемость."
+      },
+      "3": {
+        "title": "Подходит и для быстрого старта, и для зрелой инфраструктуры",
+        "description": "Один пакет закрывает сценарии от нескольких готовых компонентов до dependency-aware интеграции."
+      }
+    },
+    "quickStartTitle": "Быстрый старт",
+    "quickStartSubtitle": "Пять документированных сценариев подключения: от root import до UnoCSS preset-ов.",
+    "foundationsLink": "Foundations",
+    "installSummaryTitle": "Коротко об установке",
+    "installSummaryText": "Ниже — короткая выдержка из документации, которая помогает быстро выбрать подход к подключению.",
+    "installGuideExcerptTitle": "Installation guide excerpt"
   }
 }

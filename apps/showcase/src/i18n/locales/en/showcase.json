@@ -25,7 +25,45 @@
       "title": "Overview",
       "shortTitle": "Overview",
       "eyebrow": "Showcase / Overview",
-      "description": "Showcase landing page with positioning, quick integration guidance, and the next content stages."
+      "description": "Showcase landing page with positioning, quick integration guidance, and the next content stages.",
+      "sections": {
+        "mission": {
+          "title": "Mission",
+          "description": "Explains why the new showcase exists and what runtime/data-driven foundation is already in place.",
+          "bullets": [
+            "Positions the new showcase as the canonical docs-shell app on top of `@feugene/granularity`.",
+            "Key runtime metrics: public registry, built-in themes and foundation tokens.",
+            "The top hero shows right away that the showcase runs on the new shell architecture, not on legacy."
+          ]
+        },
+        "quick-start": {
+          "title": "Quick start",
+          "description": "Shows the recommended integration paths and the package's real code entrypoints.",
+          "bullets": [
+            "Quick start through the root API and ready-made CSS exports.",
+            "Granular component imports for a precise bundle.",
+            "Production path through the `UnoCSS` preset when the app already builds styles on its side."
+          ]
+        },
+        "delivery-checklist": {
+          "title": "Delivery checklist",
+          "description": "Captures what the current plan stages already confirm and which content comes next.",
+          "bullets": [
+            "The showcase already runs, builds and uses the package as its primary UI toolkit.",
+            "Foundations now begins to cover onboarding guides, narrative docs and quick-start snippets.",
+            "The next major step after foundations is live entity pages for components, directives and utilities."
+          ]
+        },
+        "roadmap": {
+          "title": "Roadmap",
+          "description": "Shows the nearest product stages of filling the showcase after foundations.",
+          "bullets": [
+            "First — scenario pages for {componentTitles}.",
+            "Then — interactive scenarios for {directiveTitles}.",
+            "Utility coverage will start with {utilityTitles}."
+          ]
+        }
+      }
     },
     "foundations": {
       "title": "Foundations",
@@ -34,13 +72,31 @@
       "description": "Core onboarding docs: installation paths, styling layers, themes, tokens, UnoCSS, and localization.",
       "sections": {
         "installation": {
-          "title": "Installation paths"
+          "title": "Installation paths",
+          "description": "The setup progression for `presetGranular` (the node variant `presetGranularNode`) — the only supported installation method.",
+          "bullets": [
+            "Quick-start snippets right on the foundations page: from a basic config to the advanced `granularContent`.",
+            "Narrative guidance is wired in from `packages/granularity/docs/installation.md`.",
+            "One screen shows step by step how to grow the `components`, `themes`, `layer` and `granularContent` options."
+          ]
         },
         "styling": {
-          "title": "Styling, themes and tokens"
+          "title": "Styling, themes and tokens",
+          "description": "Shows the boundaries between foundation layers, theme files and design tokens.",
+          "bullets": [
+            "Real excerpts from `styling.md`, `tokens.css`, `light.css` and `dark.css` are wired in.",
+            "There is a clear split between `tokens`, the theme layer and component-level CSS.",
+            "The runtime contract is shown through `initThemeEarly()` and `useTheme()`."
+          ]
         },
         "unocss": {
-          "title": "UnoCSS and localization"
+          "title": "UnoCSS and localization",
+          "description": "Covers the production preset path and the package's i18n contract for the host app.",
+          "bullets": [
+            "`presetGranularNode` from `@feugene/unocss-preset-granular/node` is the only supported way to wire it up.",
+            "The localization narrative doc with the package-level i18n entrypoint is wired in.",
+            "Foundations now serves as a real onboarding base rather than a placeholder section."
+          ]
         }
       }
     },
@@ -48,25 +104,179 @@
       "title": "Components",
       "shortTitle": "Components",
       "eyebrow": "Showcase / Components",
-      "description": "A component catalog with search, grouping, and a dedicated page for each public package component."
+      "description": "A component catalog with search, grouping, and a dedicated page for each public package component.",
+      "sections": {
+        "catalog": {
+          "title": "Component catalog",
+          "description": "This will hold the index page with all public components and quick grouping by category.",
+          "bullets": [
+            "The source of truth is `packages/granularity/src/granular-provider/shared.ts`, currently covering {componentCount} component entities.",
+            "Component navigation should be instant and search-friendly.",
+            "Every component will get its own route and its own page."
+          ]
+        },
+        "live-demos": {
+          "title": "Live demos",
+          "description": "Each component page will reveal real usage scenarios rather than just a dump of every prop.",
+          "bullets": [
+            "The first hand-authored demo scenarios are already reserved for {componentTitles}.",
+            "Dedicated coverage of states, composition cases and complex scenarios.",
+            "Example code and live preview will live side by side."
+          ]
+        },
+        "api-sync": {
+          "title": "Generated API",
+          "description": "API tables should be assembled from the package source and never drift from the real components.",
+          "bullets": [
+            "Props, slots, events and expose/methods are already represented in a unified pending API format.",
+            "Fallback metadata is used only where autogeneration is not enough.",
+            "Autogeneration is tied to hand-authored demo descriptions."
+          ]
+        }
+      }
     },
     "directives": {
       "title": "Directives",
       "shortTitle": "Directives",
       "eyebrow": "Showcase / Directives",
-      "description": "A section for public directives and `createLoading` with real interactive scenarios."
+      "description": "A section for public directives and `createLoading` with real interactive scenarios.",
+      "sections": {
+        "public-api": {
+          "title": "Covered directives",
+          "description": "The showcase will include all public directives from the package exports, not just the most obvious cases.",
+          "bullets": [
+            "{directiveList} are already lifted from the public exports.",
+            "Dedicated docs for `createLoading` next to `vLoading`.",
+            "Recording caveats, parameters and expected behavior."
+          ]
+        },
+        "interactive-cases": {
+          "title": "Interactive behavior",
+          "description": "Users should see a directive in action, not just copy a usage snippet.",
+          "bullets": [
+            "Priority scenarios are already highlighted for {directiveTitles}.",
+            "Explanations of handling edge cases and UX constraints.",
+            "Ready-made examples for real integration."
+          ]
+        },
+        "integration-notes": {
+          "title": "Integration notes",
+          "description": "Each directive will get explicit notes on setup, parameters and compatibility with components.",
+          "bullets": [
+            "Binding/value signatures and typical input data.",
+            "Combinations with design-system components.",
+            "Constraints and caveats for embedded/SSR-like scenarios where needed."
+          ]
+        }
+      }
     },
     "composables": {
       "title": "Composables",
       "shortTitle": "Composables",
       "eyebrow": "Showcase / Composables",
-      "description": "Pages for `useTheme` and `useToast` with runnable integration recipes."
+      "description": "Pages for `useTheme` and `useToast` with runnable integration recipes.",
+      "sections": {
+        "use-theme": {
+          "title": "`useTheme` scenarios",
+          "description": "The showcase already uses `useTheme()` for the global toggle, and this page will explore the composable more deeply.",
+          "bullets": [
+            "Initialization and early theme application.",
+            "Persist mode and behavior in the interface.",
+            "Wiring the theme toggle to showcase components."
+          ]
+        },
+        "use-toast": {
+          "title": "`useToast` scenarios",
+          "description": "Interactive push/dismiss/clear examples and notification variants will appear here.",
+          "bullets": [
+            "The current composables registry already contains {composableList}.",
+            "Clearing the queue and managing the toast message lifecycle.",
+            "Explanations of expected usage and integration patterns."
+          ]
+        },
+        "integration-recipes": {
+          "title": "Integration recipes",
+          "description": "Each composable will be shaped as a ready integration recipe rather than a dry list of return values.",
+          "bullets": [
+            "Parameters, return values and code snippets.",
+            "Practical integration patterns into the app shell and feature pages.",
+            "Links to the runtime theme, overlay scenarios and notifications."
+          ]
+        }
+      }
     },
     "utilities": {
       "title": "Utilities",
       "shortTitle": "Utilities",
       "eyebrow": "Showcase / Utilities",
-      "description": "A section for package-level utilities starting with `fileValidation` and applied usage scenarios."
+      "description": "A section for package-level utilities starting with `fileValidation` and applied usage scenarios.",
+      "sections": {
+        "file-validation": {
+          "title": "`fileValidation`",
+          "description": "A dedicated page will show the key validators and the format of the returned results.",
+          "bullets": [
+            "{utilityCount} utility entities of the file validation layer are already collected from the public exports.",
+            "Practical validation errors and constraints.",
+            "Comparing the use case without UI and together with `GrFileUpload`."
+          ]
+        },
+        "integration": {
+          "title": "Utility integration",
+          "description": "Utilities should explain not only the API but also the real way to apply them in a product.",
+          "bullets": [
+            "Priority integration points are already highlighted for {utilityTitles}.",
+            "Integration examples into forms and file upload flows.",
+            "Documenting errors, constraints and edge cases."
+          ]
+        },
+        "future-coverage": {
+          "title": "Future coverage",
+          "description": "The section will stay extensible to safely include new package-level helpers as the package grows.",
+          "bullets": [
+            "Preparing the structure for new utilities.",
+            "A single format for narrative notes and runnable examples.",
+            "Consistency with search and generated metadata in future stages."
+          ]
+        }
+      }
+    },
+    "integration": {
+      "title": "Integration",
+      "shortTitle": "Integration",
+      "eyebrow": "Showcase / Integration",
+      "description": "Two additional integration options: the runtime adapter `@feugene/granularity/vue` (`createGranularity`) and build-time auto-import via `@feugene/unplugin-granularity` (a `unplugin-vue-components` resolver).",
+      "sections": {
+        "vue-plugin": {
+          "title": "The `createGranularity` Vue plugin",
+          "description": "A lightweight runtime adapter from `@feugene/granularity/vue`: it registers components, directives, `provide` keys and `globalProperties` without losing tree-shaking — the module itself imports no components.",
+          "bullets": [
+            "`createGranularity({ components, directives, provides, globalProperties })` returns a standard Vue plugin for `app.use(...)`.",
+            "Supports three component forms: a plain SFC, an object with `install`, and an explicit `{ name, component }`.",
+            "The main use case is directives, `provide`, `globalProperties`, SSR/Nuxt plugins and bundler-less environments.",
+            "Typical cases: global directives (`v-hotkey`, `v-autofocus`), `provide` for i18n/theme, `globalProperties` for the Options API."
+          ]
+        },
+        "unplugin": {
+          "title": "Auto-import with `@feugene/unplugin-granularity`",
+          "description": "A separate build-time resolver package for `unplugin-vue-components`: it injects static `import`s for the package's granular subpath exports directly into SFCs.",
+          "bullets": [
+            "Write `<GrButton />` and `v-hotkey` in a template — the resolver adds the needed imports and pulls in component-level CSS.",
+            "Options: `prefix`, `importStyle`, `directives`, `exclude`; directives are resolved through an explicit whitelist.",
+            "Recommended for production apps: perfect tree-shaking and no manual `import`s.",
+            "Typical setup: the resolver together with `presetGranularNode` from `@feugene/unocss-preset-granular/node` to auto-import components in templates."
+          ]
+        },
+        "when-to-use": {
+          "title": "How to choose between the approaches",
+          "description": "The tools are orthogonal and typically used together: the resolver covers templates, the plugin covers directives outside templates, `provide` and globals.",
+          "bullets": [
+            "`@feugene/unplugin-granularity` is build-time and covers only what actually appears in `<template>`.",
+            "`@feugene/granularity/vue` is runtime and covers everything else: directives in `render()`/JSX, i18n/theme via `provide`, the Options API via `globalProperties`.",
+            "SSR / tests / environments without `unplugin-vue-components` — only through `createGranularity`.",
+            "Installing the package's CSS part is done exclusively through `presetGranularNode` — see Foundations / Installation paths."
+          ]
+        }
+      }
     }
   },
   "componentsPage": {
@@ -237,5 +447,36 @@
   },
   "navigation": {
     "close": "Close navigation"
+  },
+  "overviewPage": {
+    "tagline": "A design-system showcase for Vue 3: ready-made components, clear styling layers, granular imports and clean integration with `UnoCSS`.",
+    "ctaFoundations": "Open foundations",
+    "ctaComponents": "Component catalog",
+    "whyTitle": "Why Granularity",
+    "whyHeading": "Everything you need so the design system helps the team instead of slowing it down",
+    "features": {
+      "0": {
+        "title": "Builds product interfaces faster",
+        "description": "Ready-made components, tokens and themes take routine off the team and speed up shipping screens."
+      },
+      "1": {
+        "title": "Adopts without a rigid migration path",
+        "description": "Start with a simple import, then move to granular imports and a precise CSS setup as the product grows."
+      },
+      "2": {
+        "title": "Gives neat control over styles and bundle",
+        "description": "Clear styling layers, subpath exports and UnoCSS integration help you keep things manageable."
+      },
+      "3": {
+        "title": "Fits both a quick start and mature infrastructure",
+        "description": "One package covers scenarios from a few ready components to dependency-aware integration."
+      }
+    },
+    "quickStartTitle": "Quick start",
+    "quickStartSubtitle": "Five documented integration scenarios: from a root import to UnoCSS presets.",
+    "foundationsLink": "Foundations",
+    "installSummaryTitle": "Installation at a glance",
+    "installSummaryText": "Below is a short excerpt from the docs that helps you quickly pick an integration approach.",
+    "installGuideExcerptTitle": "Installation guide excerpt"
   }
 }
