@@ -553,6 +553,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "indeterminate",
+            "description": "Промежуточное («смешанное») состояние: `aria-checked=\"mixed\"`, индикатор — тире.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -681,7 +688,7 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Confirm\""
+            "default": "undefined"
           },
           {
             "name": "size",
@@ -751,7 +758,7 @@
             "description": "A11y-лейбл кнопки закрытия (i18n).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Close\""
+            "default": "undefined"
           },
           {
             "name": "buttonSize",
@@ -765,14 +772,14 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Confirm\""
+            "default": "undefined"
           },
           {
             "name": "cancelText",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Cancel\""
+            "default": "undefined"
           },
           {
             "name": "confirmVariant",
@@ -1166,7 +1173,7 @@
             "description": "i18n-friendly aria-label для кнопки закрытия.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Close\""
+            "default": "undefined"
           },
           {
             "name": "side",
@@ -1561,7 +1568,7 @@
             "description": "i18n: надпись-подсказка в дефолтном UI.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Drag files here or click to select\""
+            "default": "undefined"
           },
           {
             "name": "showProgress",
@@ -1582,7 +1589,7 @@
             "description": "aria-label для прогресс-бара.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Upload progress\""
+            "default": "undefined"
           },
           {
             "name": "hideProgressOnSuccess",
@@ -1786,7 +1793,7 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"No files selected\""
+            "default": "undefined"
           },
           {
             "name": "accept",
@@ -1800,28 +1807,28 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Upload file\""
+            "default": "undefined"
           },
           {
             "name": "changeText",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Change file\""
+            "default": "undefined"
           },
           {
             "name": "removeText",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Remove\""
+            "default": "undefined"
           },
           {
             "name": "clearAllText",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Clear all\""
+            "default": "undefined"
           },
           {
             "name": "validate",
@@ -2002,7 +2009,7 @@
             "description": "i18n: aria-label кнопки закрытия.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Close image viewer\""
+            "default": "undefined"
           },
           {
             "name": "showProgress",
@@ -2086,56 +2093,56 @@
             "description": "i18n: aria-label кнопки «предыдущее изображение».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Previous image\""
+            "default": "undefined"
           },
           {
             "name": "nextLabel",
             "description": "i18n: aria-label кнопки «следующее изображение».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Next image\""
+            "default": "undefined"
           },
           {
             "name": "zoomInLabel",
             "description": "i18n: aria-label кнопки «увеличить».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Zoom in\""
+            "default": "undefined"
           },
           {
             "name": "zoomOutLabel",
             "description": "i18n: aria-label кнопки «уменьшить».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Zoom out\""
+            "default": "undefined"
           },
           {
             "name": "resetZoomLabel",
             "description": "i18n: aria-label кнопки «сбросить масштаб».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Reset zoom\""
+            "default": "undefined"
           },
           {
             "name": "rotateLeftLabel",
             "description": "i18n: aria-label кнопки «повернуть влево».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Rotate left\""
+            "default": "undefined"
           },
           {
             "name": "rotateRightLabel",
             "description": "i18n: aria-label кнопки «повернуть вправо».",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Rotate right\""
+            "default": "undefined"
           },
           {
             "name": "emptyText",
             "description": "i18n: текст в пустом состоянии (нет изображений).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"No image\""
+            "default": "undefined"
           },
           {
             "name": "modelValue",
@@ -2506,7 +2513,7 @@
             "description": "i18n-friendly aria-label for the per-tag remove button.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Remove tag\""
+            "default": "undefined"
           },
           {
             "name": "modelValue",
@@ -3116,14 +3123,14 @@
             "description": "i18n-friendly aria-label для кнопки \"увеличить\".",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Increase\""
+            "default": "undefined"
           },
           {
             "name": "decreaseLabel",
             "description": "i18n-friendly aria-label для кнопки \"уменьшить\".",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Decrease\""
+            "default": "undefined"
           },
           {
             "name": "modelValue",
@@ -3198,6 +3205,20 @@
             "type": "number[] | undefined",
             "required": false,
             "default": "[10, 20, 50]"
+          },
+          {
+            "name": "siblingCount",
+            "description": "Сколько соседних страниц показывать вокруг текущей. По умолчанию `1`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "boundaryCount",
+            "description": "Сколько крайних страниц всегда показывать с каждого края. По умолчанию `1`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
           },
           {
             "name": "total",
@@ -3317,7 +3338,7 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Prompt\""
+            "default": "undefined"
           },
           {
             "name": "size",
@@ -3394,7 +3415,7 @@
             "description": "A11y-лейбл кнопки закрытия (i18n).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Close\""
+            "default": "undefined"
           },
           {
             "name": "buttonSize",
@@ -3408,14 +3429,14 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Confirm\""
+            "default": "undefined"
           },
           {
             "name": "cancelText",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Cancel\""
+            "default": "undefined"
           },
           {
             "name": "confirmVariant",
@@ -3471,14 +3492,14 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Value\""
+            "default": "undefined"
           },
           {
             "name": "requiredErrorText",
             "description": "Текст ошибки для пустого значения при `required=true` (i18n).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Enter a value.\""
+            "default": "undefined"
           },
           {
             "name": "fieldError",
@@ -4661,14 +4682,14 @@
             "description": "A11y-лейбл контейнера-региона (i18n).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Notifications\""
+            "default": "undefined"
           },
           {
             "name": "dismissLabel",
             "description": "A11y-лейбл кнопки закрытия (i18n).",
             "type": "string | undefined",
             "required": false,
-            "default": "\"Dismiss\""
+            "default": "undefined"
           },
           {
             "name": "placement",
@@ -4676,6 +4697,13 @@
             "type": "GrToasterPlacement | undefined",
             "required": false,
             "default": "\"top-right\""
+          },
+          {
+            "name": "maxVisible",
+            "description": "Максимум одновременно видимых тостов; остальные ждут в очереди. По умолчанию `4`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "4"
           }
         ]
       },

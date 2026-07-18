@@ -1,8 +1,9 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { createChecker } from 'vue-component-meta'
+import { createServer } from 'vite'
 
 const showcaseDir = fileURLToPath(new URL('..', import.meta.url))
 const workspaceRoot = resolve(showcaseDir, '../..')
@@ -19,10 +20,25 @@ const filteredPropNames = new Set([
   'style',
 ])
 
-function extractComponentNames(registrySource) {
-  const matches = [...registrySource.matchAll(/^\s*(Gr[A-Za-z0-9]+):\s*gr[A-Za-z0-9]+Config,?$/gm)]
+// Список компонентов берём из реального реестра granular-provider'а, а не парсим
+// исходник регуляркой: импортируем модуль через vite SSR и читаем ключи
+// `granularityComponentConfigs` в рантайме. Это убирает хрупкую связь «формат кода = API».
+async function loadComponentNames() {
+  const server = await createServer({
+    configFile: resolve(showcaseDir, 'vite.config.ts'),
+    server: { middlewareMode: true, watch: null },
+    appType: 'custom',
+    logLevel: 'error',
+    optimizeDeps: { noDiscovery: true },
+  })
 
-  return matches.map(([, componentName]) => componentName)
+  try {
+    const provider = await server.ssrLoadModule(granularityRegistryPath)
+    return Object.keys(provider.granularityComponentConfigs)
+  }
+  finally {
+    await server.close()
+  }
 }
 
 function normalizeText(value) {
@@ -52,8 +68,7 @@ function createSection(key, title, items, origin = 'generated') {
 }
 
 async function main() {
-  const registrySource = await readFile(granularityRegistryPath, 'utf8')
-  const componentNames = extractComponentNames(registrySource)
+  const componentNames = await loadComponentNames()
   const checker = createChecker(granularityTsconfigPath, { schema: true })
 
   const metadata = {}
@@ -107,4 +122,14 @@ async function main() {
   await writeFile(outputPath, `${JSON.stringify(metadata, null, 2)}\n`, 'utf8')
 }
 
-await main()
+main().then(
+  () => {
+    // Vite-плагины оставляют активные handle даже после `server.close()`;
+    // это разовая CLI-утилита — принудительно завершаем процесс.
+    process.exit(0)
+  },
+  (error) => {
+    console.error(error)
+    process.exit(1)
+  },
+)

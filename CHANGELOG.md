@@ -5,6 +5,10 @@ All notable changes to the [`@feugene/granularity`](./packages/granularity) pack
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.11.0] 2026-07-18
+
+## [v0.10.0] 2026-07-17
+
 ## [v0.9.4] 2026-06-23
 
 ### Added
