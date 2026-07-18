@@ -5,6 +5,26 @@ import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 export type UseFloatingPlacement = Placement
 
+/**
+ * Device pixel ratio плавающего элемента. Нужен, чтобы округлять координаты к сетке
+ * физических пикселей (см. `roundByDPR`) — иначе субпиксельные `left/top` дают размытый
+ * текст/границы панели на не-целочисленных позициях и HiDPI-экранах. Подход перенят у
+ * официального `@floating-ui/vue` (`useFloating` → `roundByDPR`), чтобы не тянуть весь
+ * пакет ради одной утилиты.
+ */
+function getDpr(element: HTMLElement): number {
+  if (typeof window === 'undefined')
+    return 1
+
+  const win = element.ownerDocument?.defaultView ?? window
+  return win.devicePixelRatio || 1
+}
+
+function roundByDpr(element: HTMLElement, value: number): number {
+  const dpr = getDpr(element)
+  return Math.round(value * dpr) / dpr
+}
+
 export interface UseFloatingOptions {
   /**
    * Предпочитаемое место панели относительно триггера. По умолчанию `bottom-start`.
@@ -122,8 +142,8 @@ export function useFloating(
     resolvedPlacement.value = placement
     floatingStyle.value = {
       position: 'fixed',
-      left: `${x}px`,
-      top: `${y}px`,
+      left: `${roundByDpr(floating, x)}px`,
+      top: `${roundByDpr(floating, y)}px`,
       zIndex: `var(${options.zIndexVar ?? '--gr-z-dropdown'})`,
     }
   }
