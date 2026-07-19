@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-datepicker",
   "description": "Date/time/range picker for the @feugene/granularity design system — a themed wrapper around @vuepic/vue-datepicker, shipped as an opt-in companion package so the core stays lean.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
