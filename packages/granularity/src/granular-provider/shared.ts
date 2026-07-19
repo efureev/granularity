@@ -35,6 +35,7 @@ import { grCollapseConfig } from '../components/GrCollapse/config'
 import { grConfirmDialogConfig } from '../components/GrConfirmDialog/config'
 import { grDataTableConfig } from '../components/GrDataTable/config'
 import { grDialogConfig } from '../components/GrDialog/config'
+import { grDialogServiceConfig } from '../components/GrDialogService/config'
 import { grDrawerConfig } from '../components/GrDrawer/config'
 import { grDropdownConfig } from '../components/GrDropdown/config'
 import { grDropdownMenuConfig } from '../components/GrDropdownMenu/config'
@@ -127,6 +128,7 @@ export const granularityComponentConfigs = {
   GrConfirmDialog: grConfirmDialogConfig,
   GrDataTable: grDataTableConfig,
   GrDialog: grDialogConfig,
+  GrDialogService: grDialogServiceConfig,
   GrDrawer: grDrawerConfig,
   GrDropdown: grDropdownConfig,
   GrDropdownMenu: grDropdownMenuConfig,

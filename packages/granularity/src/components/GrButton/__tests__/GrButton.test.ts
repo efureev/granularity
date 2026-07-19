@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrButton from '../GrButton.vue'
 import { grButtonClass, type GrButtonTone, type GrButtonVariant } from '../grButtonStyles'
@@ -407,5 +407,45 @@ describe('GrButton', () => {
     }
 
     expect(failures).toEqual([])
+  })
+
+  it('loading: aria-disabled + aria-busy, но БЕЗ нативного disabled (фокус сохраняется)', () => {
+    const wrapper = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } })
+    const button = wrapper.get('[data-ds-button]')
+
+    expect(button.attributes('aria-busy')).toBe('true')
+    expect(button.attributes('aria-disabled')).toBe('true')
+    // Нативный disabled НЕ выставлен — элемент остаётся фокусируемым.
+    expect(button.attributes('disabled')).toBeUndefined()
+    expect((button.element as HTMLButtonElement).disabled).toBe(false)
+  })
+
+  it('explicit disabled: нативный disabled на <button>', () => {
+    const wrapper = mount(GrButton, { props: { disabled: true }, slots: { default: 'Save' } })
+    expect((wrapper.get('[data-ds-button]').element as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('loading блокирует клик, сохраняя элемент интерактивным по фокусу', async () => {
+    const onClick = vi.fn()
+    const wrapper = mount(GrButton, {
+      props: { loading: true },
+      attrs: { onClick },
+      slots: { default: 'Save' },
+    })
+
+    await wrapper.get('[data-ds-button]').trigger('click')
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('полиморфизм: рендерится как <a> при href (с target/rel)', () => {
+    const wrapper = mount(GrButton, {
+      props: { href: 'https://example.com', external: true },
+      slots: { default: 'Docs' },
+    })
+    const el = wrapper.get('[data-ds-button]')
+    expect(el.element.tagName.toLowerCase()).toBe('a')
+    expect(el.attributes('href')).toBe('https://example.com')
+    expect(el.attributes('target')).toBe('_blank')
+    expect(el.attributes('rel')).toBe('noopener noreferrer')
   })
 })

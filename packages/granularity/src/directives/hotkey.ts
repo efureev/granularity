@@ -16,11 +16,20 @@ export type HotkeyEntry =
 
 export type HotkeyMap = Record<string, HotkeyEntry>
 
+/**
+ * Где слушать клавиатуру:
+ * - `'global'` (по умолчанию) — слушатель на `window`; хоткеи работают из любого места страницы.
+ * - `'element'` — слушатель на самом элементе; хоткеи срабатывают только когда фокус внутри
+ *   элемента (событие всплывает до него). Элемент должен быть фокусируемым (`tabindex`).
+ */
+export type HotkeyScope = 'global' | 'element'
+
 export type HotkeyBindingValue =
   | HotkeyMap
   | {
       handlers: HotkeyMap
       enabled?: boolean
+      scope?: HotkeyScope
     }
 
 type ParsedHotkey = {
@@ -37,6 +46,8 @@ type InternalState = {
   enabled: boolean
   hotkeys: ParsedHotkey[]
   listener: (event: KeyboardEvent) => void
+  /** Цель, на которой висит слушатель (`window` для 'global', сам `el` для 'element'). */
+  target: Window | HTMLElement
 }
 
 const states = new WeakMap<HTMLElement, InternalState>()
@@ -50,12 +61,12 @@ function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 function normalizeBinding(value: HotkeyBindingValue | undefined) {
-  if (!value) return { enabled: false, handlers: {} as HotkeyMap }
+  if (!value) return { enabled: false, handlers: {} as HotkeyMap, scope: 'global' as HotkeyScope }
   if ('handlers' in (value as any)) {
-    const v = value as { handlers: HotkeyMap; enabled?: boolean }
-    return { enabled: v.enabled ?? true, handlers: v.handlers ?? {} }
+    const v = value as { handlers: HotkeyMap; enabled?: boolean; scope?: HotkeyScope }
+    return { enabled: v.enabled ?? true, handlers: v.handlers ?? {}, scope: v.scope ?? 'global' }
   }
-  return { enabled: true, handlers: value as HotkeyMap }
+  return { enabled: true, handlers: value as HotkeyMap, scope: 'global' as HotkeyScope }
 }
 
 function normalizeKeyToken(token: string): string {
@@ -131,12 +142,19 @@ function resolveEntry(entry: HotkeyEntry) {
  * ```vue
  * <div v-hotkey="{ 'Escape': close, 'Ctrl+K': openSearch }" />
  * ```
+ *
+ * По умолчанию слушатель глобальный (`window`). Чтобы хоткеи срабатывали только
+ * когда фокус внутри элемента, используйте `scope: 'element'`:
+ * ```vue
+ * <div tabindex="0" v-hotkey="{ handlers: { 'j': next }, scope: 'element' }" />
+ * ```
  */
 export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
   mounted(el, binding) {
     if (typeof window === 'undefined') return
 
-    const { enabled, handlers } = normalizeBinding(binding.value)
+    const { enabled, handlers, scope } = normalizeBinding(binding.value)
+    const target: Window | HTMLElement = scope === 'element' ? el : window
 
     const state: InternalState = {
       enabled,
@@ -171,10 +189,11 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
           return
         }
       },
+      target,
     }
 
     states.set(el, state)
-    window.addEventListener('keydown', state.listener)
+    target.addEventListener('keydown', state.listener as EventListener)
   },
   updated(el, binding) {
     const state = states.get(el)
@@ -183,11 +202,19 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
     const next = normalizeBinding(binding.value)
     state.enabled = next.enabled
     state.hotkeys = parseHotkeys(next.handlers)
+
+    // Смена scope на лету — переносим слушатель на новую цель.
+    const nextTarget: Window | HTMLElement = next.scope === 'element' ? el : window
+    if (nextTarget !== state.target) {
+      state.target.removeEventListener('keydown', state.listener as EventListener)
+      state.target = nextTarget
+      nextTarget.addEventListener('keydown', state.listener as EventListener)
+    }
   },
   unmounted(el) {
     const state = states.get(el)
     if (!state) return
-    window.removeEventListener('keydown', state.listener)
+    state.target.removeEventListener('keydown', state.listener as EventListener)
     states.delete(el)
   },
 }

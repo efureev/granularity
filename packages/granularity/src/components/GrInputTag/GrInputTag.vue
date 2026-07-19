@@ -249,30 +249,31 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
       :dark="tagDark"
       :size="tagSize"
       :radius="tagRadius"
-      class="gap-1"
       data-ds-input-tag-item
       data-testid="ds-input-tag-item"
       :data-index="i"
     >
-      <slot name="tag" :tag="tag" :index="i" :remove="() => removeAt(i)">
-        <span class="truncate max-w-[18rem]">{{ tag }}</span>
-      </slot>
+      <span class="inline-flex items-center gap-1 align-middle">
+        <slot name="tag" :tag="tag" :index="i" :remove="() => removeAt(i)">
+          <span class="truncate max-w-[18rem]">{{ tag }}</span>
+        </slot>
 
-      <button
-        v-if="showRemove"
-        type="button"
-        class="-mr-0.5 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-        :aria-label="resolvedRemoveTagLabel"
-        data-ds-input-tag-remove
-        data-testid="ds-input-tag-remove"
-        :data-index="i"
-        @mousedown.prevent.stop
-        @click.stop="removeAt(i)"
-      >
-        <GrIcon size="sm" aria-hidden="true">
-          <IconClose />
-        </GrIcon>
-      </button>
+        <button
+          v-if="showRemove"
+          type="button"
+          class="-mr-0.5 shrink-0 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          :aria-label="resolvedRemoveTagLabel"
+          data-ds-input-tag-remove
+          data-testid="ds-input-tag-remove"
+          :data-index="i"
+          @mousedown.prevent.stop
+          @click.stop="removeAt(i)"
+        >
+          <GrIcon size="sm" aria-hidden="true">
+            <IconClose />
+          </GrIcon>
+        </button>
+      </span>
     </GrBadge>
 
     <input

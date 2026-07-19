@@ -1,6 +1,11 @@
+/*
+ * Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит
+ * `useTheme`/`initThemeEarly`). Селекторы `.theme-dark` и `.dark` — DEPRECATED-алиасы
+ * для обратной совместимости; в новом коде используйте `[data-theme]`.
+ */
+[data-theme='dark'],
 .theme-dark,
-.dark,
-[data-theme='dark'] {
+.dark {
   /* Surface roles */
   --bg: #0f172a;
   --fg: #f8fafc;

@@ -525,4 +525,71 @@ describe('GrSelect', () => {
     // `{value}` во fallback-строке должен быть интерполирован, а не остаться сырым плейсхолдером.
     expect(addButton.textContent?.trim()).toBe('Add "Wuhan"')
   })
+
+  it('native multiple: программная модель отражается через `selected` на опциях', () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: ['USD', 'GBP'],
+        multiple: true,
+        ariaLabel: 'Currencies',
+        options: [
+          { value: 'USD', label: 'USD' },
+          { value: 'EUR', label: 'EUR' },
+          { value: 'GBP', label: 'GBP' },
+        ],
+      },
+    })
+
+    const byVal = Object.fromEntries(
+      wrapper.findAll('option').map((o) => {
+        const el = o.element as HTMLOptionElement
+        return [el.value, el.selected]
+      }),
+    )
+    expect(byVal.USD).toBe(true)
+    expect(byVal.EUR).toBe(false)
+    expect(byVal.GBP).toBe(true)
+  })
+
+  it('disabled-опция получает `disabled` в native-режиме', () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: '',
+        optionsView: 'native',
+        ariaLabel: 'City',
+        options: [
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B', disabled: true },
+        ],
+      },
+    })
+
+    const b = wrapper.findAll('option').find(o => (o.element as HTMLOptionElement).value === 'b')!
+    expect((b.element as HTMLOptionElement).disabled).toBe(true)
+  })
+
+  it('panel: клик по disabled-опции не эмитит update:modelValue', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        ariaLabel: 'City',
+        options: [
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B', disabled: true },
+        ],
+      },
+    })
+
+    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const options = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-ds-select-option]'))
+    const disabledOption = options.find(o => o.textContent?.includes('B'))!
+    expect(disabledOption.disabled).toBe(true)
+
+    disabledOption.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+  })
 })

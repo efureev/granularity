@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { initThemeEarly, useTheme } from '../useTheme'
 
-const DEFAULT_STORAGE_KEY = 'fint-ds-theme'
+const DEFAULT_STORAGE_KEY = 'gr-theme'
 
 describe('useTheme (helpers)', () => {
   beforeEach(() => {
@@ -50,6 +50,18 @@ describe('useTheme (helpers)', () => {
     initThemeEarly()
     expect(document.documentElement.dataset.theme).toBe('dark')
 
+    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
+    initThemeEarly()
+    expect(document.documentElement.dataset.theme).toBe('light')
+  })
+
+  it('initThemeEarly should migrate from the legacy `fint-ds-theme` key', () => {
+    // По новому `gr-theme` пусто, но есть старый ключ — читаем его.
+    window.localStorage.setItem('fint-ds-theme', 'dark')
+    initThemeEarly()
+    expect(document.documentElement.dataset.theme).toBe('dark')
+
+    // Новый ключ имеет приоритет над старым.
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
     initThemeEarly()
     expect(document.documentElement.dataset.theme).toBe('light')

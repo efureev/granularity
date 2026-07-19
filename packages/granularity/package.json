@@ -103,6 +103,10 @@
       "types": "./dist/types/src/components/GrDialog/index.d.ts",
       "import": "./dist/components/GrDialog/index.js"
     },
+    "./components/GrDialogService": {
+      "types": "./dist/types/src/components/GrDialogService/index.d.ts",
+      "import": "./dist/components/GrDialogService/index.js"
+    },
     "./components/GrDrawer": {
       "types": "./dist/types/src/components/GrDrawer/index.d.ts",
       "import": "./dist/components/GrDrawer/index.js"

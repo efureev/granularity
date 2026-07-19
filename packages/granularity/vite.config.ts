@@ -105,6 +105,9 @@ export default defineConfig({
         'components/GrDialog/index': fileURLToPath(
           new URL('./src/components/GrDialog/index.ts', import.meta.url),
         ),
+        'components/GrDialogService/index': fileURLToPath(
+          new URL('./src/components/GrDialogService/index.ts', import.meta.url),
+        ),
         'components/GrDrawer/index': fileURLToPath(
           new URL('./src/components/GrDrawer/index.ts', import.meta.url),
         ),

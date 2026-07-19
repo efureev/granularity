@@ -6,7 +6,7 @@ export type ThemeName = 'light' | 'dark'
 export type UseThemeOptions = {
   /**
    * Ключ для хранения выбранной темы в localStorage.
-   * По умолчанию: `fint-ds-theme`.
+   * По умолчанию: `gr-theme`.
    */
   storageKey?: string
 
@@ -17,7 +17,10 @@ export type UseThemeOptions = {
   persist?: boolean
 }
 
-const DEFAULT_STORAGE_KEY = 'fint-ds-theme'
+const DEFAULT_STORAGE_KEY = 'gr-theme'
+// Старый продуктовый ключ. Читаем его для миграции, если по `gr-theme` пусто,
+// но НЕ пишем в него (публичная DS не завязана на конкретный продукт).
+const LEGACY_STORAGE_KEY = 'fint-ds-theme'
 
 function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null {
   if (typeof window === 'undefined' || !persist) return null
@@ -26,8 +29,16 @@ function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null
   // и при отключённых cookies/storage — поэтому оборачиваем в try/catch.
   try {
     const storage = window.localStorage
-    const stored = typeof storage?.getItem === 'function' ? storage.getItem(storageKey) : null
+    if (typeof storage?.getItem !== 'function') return null
+
+    const stored = storage.getItem(storageKey)
     if (stored === 'light' || stored === 'dark') return stored
+
+    // Миграция со старого ключа `fint-ds-theme` (только для дефолтного ключа).
+    if (storageKey === DEFAULT_STORAGE_KEY) {
+      const legacy = storage.getItem(LEGACY_STORAGE_KEY)
+      if (legacy === 'light' || legacy === 'dark') return legacy
+    }
   }
   catch {
     // ignore
@@ -49,8 +60,12 @@ function applyTheme(theme: ThemeName) {
   if (typeof document === 'undefined') return
 
   const root = document.documentElement
-  root.classList.toggle('theme-dark', theme === 'dark')
+  // Канон DS — атрибут `[data-theme]` на `<html>` (см. docs/styling.md → «Темизация»).
+  // `useTheme`/`initThemeEarly` — единственный рантайм-API переключения темы.
   root.dataset.theme = theme
+  // Класс `.theme-dark` — deprecated-алиас для обратной совместимости; в новом коде
+  // ориентируйтесь на `[data-theme]`.
+  root.classList.toggle('theme-dark', theme === 'dark')
 }
 
 // Модульный shared-синглтон состояния темы: единый источник истины для ВСЕХ

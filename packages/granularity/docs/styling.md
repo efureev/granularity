@@ -175,3 +175,29 @@ import '@feugene/granularity/styles/base.css'
 - `src/styles/index.css` — source-группа foundation-стилей, из которой собирается публичный `foundation.css`.
 - `components/<Name>/styles.css` и `styles.css` собираются через preset, а не простым объединением ручных CSS-импортов.
 - если приложение уже собирает стили через `presetGranularityNode`, прямой импорт `styles.css` обычно не нужен.
+## Темизация: канон
+
+Тёмную тему можно активировать несколькими селекторами, но **канон один** —
+атрибут `[data-theme]` на `<html>`:
+
+- **`[data-theme="dark"]` / `[data-theme="light"]`** — единственный рекомендуемый
+  механизм. Его выставляют `useTheme()` / `initThemeEarly()`.
+- **`.theme-dark`, `.dark`** — DEPRECATED-алиасы в `themes/dark.css` для обратной
+  совместимости. В новом коде на них не ориентируйтесь.
+
+Единственный рантайм-API переключения темы — `useTheme()` (реактивное состояние,
+persistence, синхронизация между вкладками и с `prefers-color-scheme`) и
+`initThemeEarly()` (ранний вызов до монтирования Vue, чтобы избежать «мигания»).
+`defaultThemes` у granular-provider — это build-time настройка активных тем в
+собранном CSS, а не рантайм-переключение; не путайте её с `useTheme`.
+
+```ts
+import { initThemeEarly, useTheme } from '@feugene/granularity'
+
+initThemeEarly() // до app.mount()
+
+const { theme, isDark, setTheme, toggleTheme } = useTheme()
+```
+
+Выбор темы хранится в `localStorage` под ключом `gr-theme` (старый ключ
+`fint-ds-theme` читается один раз для миграции).

@@ -110,7 +110,8 @@ describe('GrLink', () => {
         as: CustomLink,
         href: '/dashboard',
         external: true,
-        variant: 'primary',
+        variant: 'default',
+        tone: 'primary',
       },
       attrs: {
         'data-testid': 'link',

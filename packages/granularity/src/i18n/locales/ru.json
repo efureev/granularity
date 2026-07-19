@@ -20,7 +20,8 @@
   },
   "select": {
     "customValuePlaceholder": "Добавить значение…",
-    "addOption": "Добавить «{value}»"
+    "addOption": "Добавить «{value}»",
+    "clearOption": "Не выбрано"
   },
   "dialog": {
     "confirm": {

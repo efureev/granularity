@@ -31,6 +31,14 @@ const props = withDefaults(
       prefixMaxWidth?: string
       suffixMinWidth?: string
       suffixMaxWidth?: string
+      /**
+       * Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину
+       * (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю
+       * (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются»
+       * под контент (в пределах min/max), а излишек клипается оболочкой.
+       */
+      prefixFixed?: boolean
+      suffixFixed?: boolean
     }>(),
     {
       type: 'text',
@@ -50,6 +58,8 @@ const props = withDefaults(
       prefixMaxWidth: undefined,
       suffixMinWidth: undefined,
       suffixMaxWidth: undefined,
+      prefixFixed: false,
+      suffixFixed: false,
     },
 )
 
@@ -86,6 +96,10 @@ const defaultAddonMinWidth = computed(() => {
 const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
 const suffixMinWidth = computed(() => props.suffixMinWidth ?? defaultAddonMinWidth.value)
 
+// Жёсткая ширина для fixed-режима: max → min → дефолт.
+const prefixFixedWidth = computed(() => props.prefixMaxWidth ?? props.prefixMinWidth ?? defaultAddonMinWidth.value)
+const suffixFixedWidth = computed(() => props.suffixMaxWidth ?? props.suffixMinWidth ?? defaultAddonMinWidth.value)
+
 const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
 
 const basePaddingXLen = computed(() => {
@@ -101,8 +115,12 @@ const basePaddingXLen = computed(() => {
 })
 
 const inputStyle = computed(() => {
-  const leftReserved = hasPrefix.value ? measuredPrefixWidth.value ?? prefixMinWidth.value : '0px'
-  const rightReserved = hasSuffix.value ? measuredSuffixWidth.value ?? suffixMinWidth.value : '0px'
+  const leftReserved = hasPrefix.value
+    ? (props.prefixFixed ? prefixFixedWidth.value : measuredPrefixWidth.value ?? prefixMinWidth.value)
+    : '0px'
+  const rightReserved = hasSuffix.value
+    ? (props.suffixFixed ? suffixFixedWidth.value : measuredSuffixWidth.value ?? suffixMinWidth.value)
+    : '0px'
 
   // Keep the same visual text padding as without addons (px-*), but add it on top of reserved space.
   const left = hasPrefix.value ? addLen(leftReserved, basePaddingXLen.value) : undefined
@@ -115,6 +133,14 @@ const inputStyle = computed(() => {
 })
 
 const prefixStyle = computed(() => {
+  if (props.prefixFixed) {
+    return {
+      width: prefixFixedWidth.value,
+      minWidth: prefixFixedWidth.value,
+      maxWidth: prefixFixedWidth.value,
+    } as Record<string, string | undefined>
+  }
+
   return {
     minWidth: prefixMinWidth.value,
     maxWidth: props.prefixMaxWidth,
@@ -122,6 +148,14 @@ const prefixStyle = computed(() => {
 })
 
 const suffixStyle = computed(() => {
+  if (props.suffixFixed) {
+    return {
+      width: suffixFixedWidth.value,
+      minWidth: suffixFixedWidth.value,
+      maxWidth: suffixFixedWidth.value,
+    } as Record<string, string | undefined>
+  }
+
   return {
     minWidth: suffixMinWidth.value,
     maxWidth: props.suffixMaxWidth,
@@ -149,20 +183,27 @@ const textAlignClass = computed(() => {
   return map[props.textAlign]
 })
 
-const className = computed(() => {
+// Border/ring/disabled — на оболочке (`focus-within`), размеры/выравнивание — на инпуте.
+const shellClass = computed(() => {
   const state = props.state
 
   const borderByState: Record<typeof state, string> = {
     default: 'border-[var(--brd)]',
-    success: 'border-[var(--ds-success)] focus-visible:ring-[var(--ds-success)]',
-    warning: 'border-[var(--ds-warning)] focus-visible:ring-[var(--ds-warning)]',
-    danger: 'border-[var(--ds-danger)] focus-visible:ring-[var(--ds-danger)]',
+    success: 'border-[var(--ds-success)] focus-within:ring-[var(--ds-success)]',
+    warning: 'border-[var(--ds-warning)] focus-within:ring-[var(--ds-warning)]',
+    danger: 'border-[var(--ds-danger)] focus-within:ring-[var(--ds-danger)]',
   }
 
   return [
+    props.invalid ? borderByState.danger : borderByState[state],
+    props.disabled ? 'opacity-50 cursor-not-allowed' : '',
+  ].filter(Boolean).join(' ')
+})
+
+const className = computed(() => {
+  return [
     sizeClass.value,
     textAlignClass.value,
-    props.invalid ? borderByState.danger : borderByState[state],
   ].join(' ')
 })
 
@@ -172,7 +213,10 @@ function onInput(e: Event): void {
 </script>
 
 <template>
-  <div class="relative w-full">
+  <div
+      class="relative w-full overflow-hidden rounded-md border bg-[var(--bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
+      :class="shellClass"
+  >
     <div
         v-if="$slots.prefix"
         ref="prefixEl"
@@ -196,7 +240,7 @@ function onInput(e: Event): void {
         :disabled="props.disabled"
         :value="props.modelValue"
         :aria-invalid="props.invalid ? 'true' : undefined"
-        class="w-full rounded-md border bg-[var(--bg)] text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full bg-transparent text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
         :class="className"
         :style="inputStyle"
         @input="onInput"
@@ -207,6 +251,7 @@ function onInput(e: Event): void {
         ref="suffixEl"
         data-testid="ds-input-suffix"
         class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+        :class="suffixFixed ? '[direction:rtl]' : ''"
         :style="suffixStyle"
         aria-hidden="true"
     >

@@ -65,6 +65,13 @@ export interface GrNumberInputProps {
   prefixMaxWidth?: string
   suffixMinWidth?: string
   suffixMaxWidth?: string
+  /**
+   * Фиксированная ширина у prefix/suffix: жёсткая ширина (из `*MaxWidth` →
+   * `*MinWidth` → дефолт) + обрезка контента по краю (prefix — справа,
+   * suffix — слева). По умолчанию аддоны растягиваются под контент.
+   */
+  prefixFixed?: boolean
+  suffixFixed?: boolean
 
   /** i18n-friendly aria-label для кнопки "увеличить". */
   increaseLabel?: string
@@ -98,6 +105,8 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   prefixMaxWidth: undefined,
   suffixMinWidth: undefined,
   suffixMaxWidth: undefined,
+  prefixFixed: false,
+  suffixFixed: false,
 
   increaseLabel: undefined,
   decreaseLabel: undefined,
@@ -138,10 +147,20 @@ const defaultAddonMinWidth = computed(() => addonLen.value)
 const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
 const suffixMinWidth = computed(() => props.suffixMinWidth ?? defaultAddonMinWidth.value)
 
+// Жёсткая ширина для fixed-режима: max → min → дефолт.
+const prefixFixedWidth = computed(() => props.prefixMaxWidth ?? props.prefixMinWidth ?? defaultAddonMinWidth.value)
+const suffixFixedWidth = computed(() => props.suffixMaxWidth ?? props.suffixMinWidth ?? defaultAddonMinWidth.value)
+
 const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
 
-const prefixLen = computed(() => (hasPrefix.value ? measuredPrefixWidth.value ?? prefixMinWidth.value : '0px'))
-const suffixLen = computed(() => (hasSuffix.value ? measuredSuffixWidth.value ?? suffixMinWidth.value : '0px'))
+const prefixLen = computed(() => {
+  if (!hasPrefix.value) return '0px'
+  return props.prefixFixed ? prefixFixedWidth.value : measuredPrefixWidth.value ?? prefixMinWidth.value
+})
+const suffixLen = computed(() => {
+  if (!hasSuffix.value) return '0px'
+  return props.suffixFixed ? suffixFixedWidth.value : measuredSuffixWidth.value ?? suffixMinWidth.value
+})
 
 function addonStyle(side: 'left' | 'right', offset: string): Record<string, string> {
   return {
@@ -168,6 +187,15 @@ const inputStyle = computed(() => {
 })
 
 const suffixStyle = computed(() => {
+  if (props.suffixFixed) {
+    return {
+      right: '0px',
+      width: suffixFixedWidth.value,
+      minWidth: suffixFixedWidth.value,
+      maxWidth: suffixFixedWidth.value,
+    }
+  }
+
   return {
     right: '0px',
     minWidth: suffixMinWidth.value,
@@ -176,6 +204,14 @@ const suffixStyle = computed(() => {
 })
 
 const prefixStyle = computed(() => {
+  if (props.prefixFixed) {
+    return {
+      width: prefixFixedWidth.value,
+      minWidth: prefixFixedWidth.value,
+      maxWidth: prefixFixedWidth.value,
+    }
+  }
+
   return {
     minWidth: prefixMinWidth.value,
     maxWidth: props.prefixMaxWidth,
@@ -326,6 +362,7 @@ function stepBy(dir: 1 | -1): void {
       data-testid="number-input-suffix"
       data-ds-number-input-suffix
       class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+      :class="suffixFixed ? '[direction:rtl]' : ''"
       :style="suffixStyle"
       aria-hidden="true"
     >

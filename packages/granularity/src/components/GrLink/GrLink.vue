@@ -23,9 +23,11 @@ import {
   baseRootClass,
   focusRingClass,
   type GrLinkSize,
+  type GrLinkTone,
   type GrLinkUnderline,
   type GrLinkVariant,
   grLinkClass,
+  grLinkColorStyle,
 } from './grLinkStyles'
 
 defineOptions({
@@ -44,6 +46,9 @@ const props = withDefaults(defineProps<{
   rel?: string
   disabled?: boolean
   ariaLabel?: string
+  /** Семантический цвет ссылки из палитры `GrTone`. */
+  tone?: GrLinkTone
+  /** Уровень акцента: `default` (окрашен) или `muted` (приглушён, акцент на hover). */
   variant?: GrLinkVariant
   underline?: GrLinkUnderline
   size?: GrLinkSize
@@ -55,7 +60,8 @@ const props = withDefaults(defineProps<{
   rel: undefined,
   disabled: false,
   ariaLabel: undefined,
-  variant: 'primary',
+  tone: 'primary',
+  variant: 'default',
   underline: 'auto',
   size: 'md',
 })
@@ -103,7 +109,6 @@ const rootClass = computed(() => {
   const variantClass = grLinkClass({
     size: props.size,
     underline: props.underline,
-    variant: props.variant,
     disabled: props.disabled,
   })
 
@@ -113,6 +118,13 @@ const rootClass = computed(() => {
     ? `${baseRootClass} ${variantClass}`
     : `${baseRootClass} ${focusRingClass} ${variantClass}`
 })
+
+// Цвет (tone × variant) прокидываем через CSS-переменные, чтобы не плодить классы.
+const colorStyle = computed(() => grLinkColorStyle({
+  tone: props.tone,
+  variant: props.variant,
+  disabled: props.disabled,
+}))
 </script>
 
 <template>
@@ -125,6 +137,7 @@ const rootClass = computed(() => {
     :aria-label="ariaLabel"
     :aria-disabled="disabled ? 'true' : undefined"
     :class="rootClass"
+    :style="colorStyle"
   >
     <slot />
   </component>

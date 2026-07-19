@@ -20,7 +20,8 @@
   },
   "select": {
     "customValuePlaceholder": "Add value…",
-    "addOption": "Add \"{value}\""
+    "addOption": "Add \"{value}\"",
+    "clearOption": "None"
   },
   "dialog": {
     "confirm": {

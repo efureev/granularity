@@ -1,11 +1,11 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
   baseRootClass,
+  colorClass,
   disabledStateClass,
   focusRingClass,
   sizeClassBySize,
   underlineClasses,
-  variantClassByVariant,
 } from './grLinkStyles'
 
 export const grLinkSafelist = [...new Set([
@@ -13,6 +13,6 @@ export const grLinkSafelist = [...new Set([
   ...splitClassTokens(focusRingClass),
   ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
   ...underlineClasses.flatMap(splitClassTokens),
-  ...Object.values(variantClassByVariant).flatMap(splitClassTokens),
+  ...splitClassTokens(colorClass),
   ...splitClassTokens(disabledStateClass),
 ])]

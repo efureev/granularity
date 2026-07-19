@@ -3,7 +3,7 @@ export type GrSelectSize = 'xs' | 'sm' | 'md' | 'lg'
 export type GrSelectVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type GrSelectUnderline = 'auto' | 'always' | 'none'
 export type GrSelectOptionsView = 'native' | 'panel'
-export type GrSelectOption = { value: string, label: string }
+export type GrSelectOption = { value: string, label: string, disabled?: boolean }
 /** Группа опций: заголовок `label` + вложенные опции `options`. */
 export type GrSelectOptionGroup = { label: string, options: GrSelectOption[] }
 /** Элемент списка опций: либо одиночная опция, либо группа опций. */

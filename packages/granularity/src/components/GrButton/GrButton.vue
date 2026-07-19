@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, markRaw, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
@@ -23,6 +23,13 @@ const props = withDefaults(
     square?: boolean
     type?: 'button' | 'submit' | 'reset'
     ariaLabel?: string
+    /** Полиморфизм: кастомный корневой тег/компонент (например, RouterLink). */
+    as?: string | Component
+    /** Рендерит кнопку как `<a href>` (если не задан `as`). */
+    href?: string
+    target?: string
+    rel?: string
+    external?: boolean
   }>(),
   {
     variant: 'primary',
@@ -33,11 +40,43 @@ const props = withDefaults(
     square: false,
     type: 'button',
     ariaLabel: undefined,
+    as: undefined,
+    href: undefined,
+    target: undefined,
+    rel: undefined,
+    external: false,
   },
 )
 
-const isDisabled = computed(() => props.disabled || props.loading)
 const isSquare = computed(() => props.square)
+
+// Полиморфный корень: `as` → `<a href>` → `<button>`.
+const isLink = computed(() => Boolean(props.as || props.href))
+const renderAs = computed<string | Component>(() => {
+  if (props.as) return typeof props.as === 'string' ? props.as : markRaw(props.as)
+  return props.href ? 'a' : 'button'
+})
+
+// Неинтерактивно при явном `disabled` ИЛИ во время `loading`.
+const blocked = computed(() => props.disabled || props.loading)
+
+// Ключевое: `loading` НЕ ставит нативный `disabled` (элемент бы выпал из фокуса и
+// скринридер потерял бы контекст) — вместо этого `aria-disabled` + перехват клика.
+// Нативный `disabled` (только у `<button>`) оставляем лишь для явного `disabled`.
+const nativeDisabled = computed(() => (renderAs.value === 'button' && props.disabled) ? true : undefined)
+const ariaDisabled = computed(() => (props.loading || (isLink.value && props.disabled)) ? 'true' : undefined)
+
+const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
+const resolvedRel = computed(() => props.rel ?? (resolvedTarget.value === '_blank' ? 'noopener noreferrer' : undefined))
+
+function onClickCapture(e: MouseEvent): void {
+  // Блокируем и дефолт (submit/навигация), и внешние обработчики (в т.ч. по Enter/Space),
+  // сохраняя фокус на элементе.
+  if (blocked.value) {
+    e.preventDefault()
+    e.stopImmediatePropagation()
+  }
+}
 
 const squareStyle = computed(() => {
   if (!isSquare.value) return undefined
@@ -69,18 +108,25 @@ const className = computed(() => {
 </script>
 
 <template>
-  <button
+  <component
+    :is="renderAs"
     data-ds-button
     :data-ds-variant="props.variant"
     :data-ds-tone="props.tone"
-    :type="props.type"
-    :disabled="isDisabled"
+    :type="renderAs === 'button' ? props.type : undefined"
+    :disabled="nativeDisabled"
+    :href="isLink && !props.disabled ? props.href : undefined"
+    :target="isLink && !props.disabled ? resolvedTarget : undefined"
+    :rel="isLink && !props.disabled ? resolvedRel : undefined"
     :aria-busy="props.loading ? 'true' : undefined"
+    :aria-disabled="ariaDisabled"
     :aria-label="props.ariaLabel"
-    :class="[grButtonBaseClass, className]"
+    :tabindex="isLink && props.disabled ? -1 : undefined"
+    :class="[grButtonBaseClass, className, blocked ? 'cursor-not-allowed' : '']"
     :style="squareStyle"
+    @click.capture="onClickCapture"
   >
     <IconLoader v-if="props.loading" class="h-4 w-4 animate-spin" aria-hidden="true" />
     <slot />
-  </button>
+  </component>
 </template>

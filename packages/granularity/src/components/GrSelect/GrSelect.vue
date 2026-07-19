@@ -179,9 +179,19 @@ const displayText = computed(() => {
   return props.placeholder ?? ''
 })
 
+// Нативный `<select multiple>` — это многострочный listbox, а не поповер. В режиме
+// `view="link"` он рендерится невидимым overlay'ем, из-за чего multiple-вариант «не
+// открывается» (клик по невидимому listbox'у ничего не показывает). Для этой
+// неподдерживаемой комбинации форсим кастомную панель, которая корректно открывается.
+const effectiveOptionsView = computed<GrSelectOptionsView>(() => {
+  if (props.view === 'link' && props.multiple && props.optionsView === 'native')
+    return 'panel'
+  return props.optionsView
+})
+
 const nativeCustomOptionVisible = computed(() => {
   if (!props.allowCustomValue) return false
-  if (props.optionsView !== 'native') return false
+  if (effectiveOptionsView.value !== 'native') return false
   if (props.multiple) return false
   if (!props.options) return false
   if (modelSingle.value === '') return false
@@ -276,13 +286,14 @@ const panelItems = computed<GrSelectPanelItem[]>(() => {
       if (!matched.length) return
       items.push({ kind: 'group', label: item.label, key: `__group__${index}` })
       for (const option of matched) {
-        items.push({ kind: 'option', option, key: option.value })
+        // Ключ с индексом группы — одинаковое `value` в разных группах больше не даёт дубликат.
+        items.push({ kind: 'option', option, key: `${index}:${option.value}` })
       }
       return
     }
 
     if (matchesQuery(item, q)) {
-      items.push({ kind: 'option', option: item, key: item.value })
+      items.push({ kind: 'option', option: item, key: `${index}:${item.value}` })
     }
   })
 
@@ -291,7 +302,7 @@ const panelItems = computed<GrSelectPanelItem[]>(() => {
 
 const canAddCustom = computed(() => {
   if (!props.allowCustomValue) return false
-  if (props.optionsView !== 'panel') return false
+  if (effectiveOptionsView.value !== 'panel') return false
   const v = customValue.value.trim()
   if (!v) return false
 
@@ -312,6 +323,10 @@ function isSelected(value: string): boolean {
   return selectedValues.value.includes(value)
 }
 
+function isOptionDisabled(value: string): boolean {
+  return flatOptions.value.find(o => o.value === value)?.disabled === true
+}
+
 function selectValue(value: string): void {
   emitValue(value)
   if (props.closeOnSelect) {
@@ -320,6 +335,8 @@ function selectValue(value: string): void {
 }
 
 function toggleValue(value: string): void {
+  if (isOptionDisabled(value)) return
+
   if (!props.multiple) {
     selectValue(value)
     return
@@ -347,12 +364,12 @@ function addCustom(): void {
 }
 
 const showNativeChevron = computed(() => {
-  return props.optionsView === 'native' && props.view !== 'link' && !props.multiple
+  return effectiveOptionsView.value === 'native' && props.view !== 'link' && !props.multiple
 })
 
 const nativeClearOptionVisible = computed(() => {
   if (!props.clearable) return false
-  if (props.optionsView !== 'native') return false
+  if (effectiveOptionsView.value !== 'native') return false
   if (props.multiple) return false
   if (!props.options) return true
   return !flatOptions.value.some(o => o.value === '')
@@ -360,7 +377,7 @@ const nativeClearOptionVisible = computed(() => {
 
 const panelClearVisible = computed(() => {
   if (!props.clearable) return false
-  if (props.optionsView !== 'panel') return false
+  if (effectiveOptionsView.value !== 'panel') return false
   if (props.view === 'link') return false
   return hasSelection.value
 })
@@ -382,7 +399,7 @@ const nativeClassName = computed(() => {
  * `<select>`-overlay поверх видимого `<span>` с меткой — overlay принимает клики/клавиатуру,
  * span задаёт ширину компонента в закрытом состоянии.
  */
-const isLinkNative = computed(() => props.view === 'link' && props.optionsView === 'native')
+const isLinkNative = computed(() => props.view === 'link' && effectiveOptionsView.value === 'native')
 
 const linkNativeLabelClassName = computed(() => grSelectLinkNativeLabelClass({
   size: props.size,
@@ -398,7 +415,7 @@ const linkNativeDisplayText = computed(() => {
 const triggerClassName = computed(() => {
   return grSelectTriggerClass({
     view: props.view,
-    optionsView: props.optionsView,
+    optionsView: effectiveOptionsView.value,
     size: props.size,
     disabled: props.disabled,
     variant: props.variant,
@@ -426,32 +443,49 @@ function clearSelection(): void {
 
 <template>
   <div
-    v-if="optionsView === 'native'"
+    v-if="effectiveOptionsView === 'native'"
     data-ds-select
     :class="rootClass"
   >
+    <!--
+      Выбор задаём per-option через `:selected` (а не `:value` на `<select>`):
+      для `<select multiple>` биндинг `:value` массивом не работает — DOM не
+      отражает программное изменение модели. `onChange` читает выбор из DOM.
+    -->
     <select
       data-ds-select-native
-      :value="multiple ? modelMultiple : modelSingle"
       :multiple="multiple"
       :disabled="disabled"
       :aria-label="ariaLabel"
       :class="isLinkNative ? grSelectLinkNativeOverlayClass : [baseClassName, nativeClassName]"
       @change="onChange"
     >
-      <option v-if="nativeClearOptionVisible" value="" />
+      <option v-if="nativeClearOptionVisible" value="" :selected="!multiple && modelSingle === ''">
+        {{ placeholder || t('gr.select.clearOption', 'None') }}
+      </option>
 
       <slot>
-        <option v-if="nativeCustomOptionVisible" :value="modelSingle">
+        <option v-if="nativeCustomOptionVisible" :value="modelSingle" :selected="!multiple">
           {{ modelSingle }}
         </option>
         <template v-for="(item, index) in optionsResolved" :key="index">
           <optgroup v-if="isOptionGroup(item)" :label="item.label">
-            <option v-for="opt in item.options" :key="opt.value" :value="opt.value">
+            <option
+              v-for="opt in item.options"
+              :key="`${index}:${opt.value}`"
+              :value="opt.value"
+              :selected="multiple ? modelMultiple.includes(opt.value) : modelSingle === opt.value"
+              :disabled="opt.disabled"
+            >
               {{ opt.label }}
             </option>
           </optgroup>
-          <option v-else :value="item.value">
+          <option
+            v-else
+            :value="item.value"
+            :selected="multiple ? modelMultiple.includes(item.value) : modelSingle === item.value"
+            :disabled="item.disabled"
+          >
             {{ item.label }}
           </option>
         </template>
@@ -468,9 +502,9 @@ function clearSelection(): void {
     <span
       v-if="showNativeChevron"
       data-testid="ds-select-chevron"
-      class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
+      class="absolute top-1/2 -translate-y-1/2 right-3 flex items-center text-[var(--muted-fg)] pointer-events-none"
     >
-      <span class="i-lucide-chevron-down inline-block h-4 w-4" aria-hidden="true" />
+      <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
     </span>
   </div>
 
@@ -520,9 +554,9 @@ function clearSelection(): void {
       <span
         v-else
         data-testid="ds-select-chevron"
-        class="shrink-0 text-[var(--muted-fg)] pointer-events-none"
+        class="shrink-0 flex items-center text-[var(--muted-fg)] pointer-events-none"
       >
-        <span class="i-lucide-chevron-down inline-block h-4 w-4" aria-hidden="true" />
+        <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
       </span>
     </button>
 
@@ -605,9 +639,12 @@ function clearSelection(): void {
                   data-ds-select-option
                   type="button"
                   role="option"
+                  :disabled="item.option.disabled"
                   :aria-selected="isSelected(item.option.value) ? 'true' : 'false'"
-                  class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
+                  :aria-disabled="item.option.disabled ? 'true' : undefined"
+                  class="rounded-[10px] px-3 py-2 text-left text-[13px]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
+                    item.option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]',
                   ]"
                   @click="toggleValue(item.option.value)"
                 >
