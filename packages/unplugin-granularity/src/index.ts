@@ -1,4 +1,9 @@
-export { GranularityResolver, type GranularityResolverOptions } from './resolver'
+export {
+  createGranularResolver,
+  GranularityResolver,
+  type GranularResolverOptions,
+  type GranularityResolverOptions,
+} from './resolver'
 export {
   GRANULARITY_DEFAULT_PREFIX,
   GRANULARITY_DIRECTIVES,
