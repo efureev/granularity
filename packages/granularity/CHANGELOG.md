@@ -1,13 +1,59 @@
 # Changelog
 
-All notable changes to the [`@feugene/granularity`](./packages/granularity) package are documented in this file.
+All notable changes to the [`@feugene/granularity`](.) package are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [v0.11.0] 2026-07-18
+## [v0.11.0] 2026-07-19
+
+### Breaking
+
+- Renamed the CSS namespace across the whole package: design tokens `--ds-*` → `--gr-*`
+  and component attributes `data-ds-*` → `data-gr-*`. No aliases or fallbacks — consumers
+  overriding tokens or querying `data-ds-*` must migrate.
+- Theme storage key renamed `fint-ds-theme` → `gr-theme` (legacy-key migration removed).
+
+### Added
+
+- `GrSidebar` / `GrSidebarItem`: collapsible navigation rail with `v-model:collapsed`,
+  icon fallback and badges.
+- `GrButton`: polymorphism via `as` / `href` (+ `target` / `rel` / `external`) — renders as
+  `<a>` or a custom element; during `loading` the element now keeps focus via
+  `aria-disabled` instead of the native `disabled` attribute.
+- `vHotkey`: `scope: 'global' | 'element'` option (`element` listens on the bound element,
+  firing only when focus is inside it).
+- `GrSelect`: per-option `disabled` and a labeled clear-option.
+- `GrDialogService`: now a public subpath export (`./components/GrDialogService`) and
+  registered in the granular-provider.
+- `useToast` / `GrToaster`: per-toast `timeoutMs` auto-dismiss with pause-on-hover/focus
+  (WCAG 2.2.1) and a shared toast-state plugin.
+
+### Changed
+
+- Theme system: `[data-theme]` is the canonical selector (`.theme-dark` / `.dark` kept as
+  deprecated aliases) and `useTheme` is the single runtime API (persistence, cross-tab sync,
+  `prefers-color-scheme`).
+- Reworked design tokens, themes and base/preflight styles.
+- `GrTree`: accessible labels for the drag handle and expand/collapse controls.
+
+### Fixed
+
+- `GrSelect`: duplicate Vue keys for same-value options across groups; native `multiple`
+  selection now reflects the bound model (`:selected` per option).
 
 ## [v0.10.0] 2026-07-17
+
+### Changed
+
+- Overlay positioning migrated to `@floating-ui/dom` via a new internal `useFloating`:
+  `GrSelect` (panel), `GrDropdown`, `GrTooltip` and `GrTreeSelect` panels now flip/shift and
+  stay within the viewport instead of overflowing.
+- Tighter `@feugene/fint-i18n` integration and expanded locale coverage (en/es/ru).
+
+### Fixed
+
+- `GrPagination`: page-range edge cases.
 
 ## [v0.9.4] 2026-06-23
 
