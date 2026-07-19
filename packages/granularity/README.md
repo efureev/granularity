@@ -1,55 +1,54 @@
 # `@feugene/granularity`
 
-`@feugene/granularity` — это `Vue 3` design system package, который помогает собирать интерфейсы быстрее, чище и
-предсказуемее: с готовыми компонентами, прозрачной системой стилей, granular import-ами и аккуратной интеграцией с
-`UnoCSS`.
+`@feugene/granularity` is a `Vue 3` design system package that helps you build interfaces faster, cleaner, and more
+predictably: with ready-made components, a transparent styling system, granular imports, and a tidy `UnoCSS`
+integration.
 
-Он создан для случаев, когда дизайн-система должна быть не просто набором UI-деталей, а рабочим инженерным инструментом:
-удобным для продуктовой команды, масштабируемым для большого приложения и достаточно гибким для разных стратегий
-подключения.
+It's built for cases where a design system needs to be more than just a set of UI pieces — a working engineering
+tool: convenient for a product team, scalable for a large application, and flexible enough for different adoption
+strategies.
 
-## Зачем он нужен
+## Why it exists
 
-- чтобы запускать новые экраны и фичи на едином визуальном фундаменте;
-- чтобы подключать пакет постепенно, не переписывая приложение целиком;
-- чтобы контролировать размер подключаемого `JS` и `CSS`, когда это действительно важно;
-- чтобы использовать один и тот же пакет и как готовую библиотеку компонентов, и как источник низкоуровневых
-  package-level API.
+- to launch new screens and features on a single visual foundation;
+- to adopt the package incrementally, without rewriting the whole application;
+- to control the size of the `JS` and `CSS` you ship, when that actually matters;
+- to use the same package both as a ready-made component library and as a source of low-level package-level APIs.
 
-## Чем `granularity` хорош
+## What makes `granularity` good
 
-- **Быстрый старт без лишней магии.** Можно просто импортировать компоненты и готовые style entrypoint-ы.
-- **Granular-подключение.** Компоненты доступны как из root API, так и через `subpath exports`, если нужен более точный
-  контроль над bundle.
-- **Нормальная работа со стилями.** Токены, база, темы и component-level CSS разделены на понятные слои.
-- **Готовность к реальному масштабу.** Пакет подходит и для «подключили несколько компонентов», и для сценариев, где
-  важны dependency-aware imports, safelist и точная настройка CSS-пайплайна.
-- **Интеграция с `UnoCSS` без навязывания.** Если `UnoCSS` уже есть в приложении — пакет встраивается в существующий
-  pipeline. Если его нет — базовый сценарий всё равно остаётся прямым и понятным.
-- **Не только компоненты.** Вместе с UI доступны директивы, file validation API и служебные entrypoint-ы для
-  инфраструктурных сценариев.
+- **Fast start without unnecessary magic.** You can simply import components and ready-made style entrypoints.
+- **Granular imports.** Components are available both from the root API and via `subpath exports`, if you need finer
+  control over bundle size.
+- **Sane styling.** Tokens, base styles, themes, and component-level CSS are split into clear layers.
+- **Ready for real scale.** The package works for "just plugged in a few components" as well as scenarios where
+  dependency-aware imports, safelist, and precise CSS pipeline tuning matter.
+- **Integrates with `UnoCSS` without forcing it on you.** If `UnoCSS` is already in the app — the package plugs into
+  the existing pipeline. If it isn't — the basic scenario stays direct and simple.
+- **Not just components.** Alongside the UI you get directives, a file validation API, and utility entrypoints for
+  infrastructure scenarios.
 
-## Технические особенности
+## Technical highlights
 
 - root export: `@feugene/granularity`;
 - component subpath exports: `@feugene/granularity/components/<ComponentName>`;
-- готовые CSS entrypoint-ы:
-  - `@feugene/granularity/foundation.css` — `tokens` + встроенные темы `light`/`dark` + `base`;
-  - `@feugene/granularity/styles.css` — `foundation` плюс стили всех компонентов;
-  - `@feugene/granularity/components/<ComponentName>/styles.css` — `foundation` плюс стили конкретного компонента и его зависимостей;
+- ready-made CSS entrypoints:
+  - `@feugene/granularity/foundation.css` — `tokens` + built-in `light`/`dark` themes + `base`;
+  - `@feugene/granularity/styles.css` — `foundation` plus styles for all components;
+  - `@feugene/granularity/components/<ComponentName>/styles.css` — `foundation` plus styles for a specific component and its dependencies;
 - low-level foundation exports: `@feugene/granularity/styles/tokens.css`, `@feugene/granularity/styles/base.css`, `@feugene/granularity/styles/themes/light.css`, `@feugene/granularity/styles/themes/dark.css`;
 - package-level API: `@feugene/granularity/directives`, `@feugene/granularity/fileValidation`;
-- два сценария интеграции с `UnoCSS`:
+- two `UnoCSS` integration scenarios:
     - `@feugene/granularity/uno` — browser-safe preset;
-    - `@feugene/granularity/uno-node` — node-oriented preset с CSS/preflight helper-ами.
+    - `@feugene/granularity/uno-node` — node-oriented preset with CSS/preflight helpers.
 
-## Быстрый старт
+## Quick start
 
 ```bash
 yarn add @feugene/granularity vue
 ```
 
-Если приложение использует `UnoCSS`:
+If the application uses `UnoCSS`:
 
 ```bash
 yarn add -D unocss
@@ -60,20 +59,20 @@ yarn add -D unocss
 import '@feugene/granularity/styles.css'
 ```
 
-Этого достаточно, чтобы быстро получить рабочую базу: `styles.css` уже включает `foundation.css` (`tokens`, `base`,
-встроенные темы `light`/`dark`) и стили всех компонентов.
+That's enough to quickly get a working base: `styles.css` already includes `foundation.css` (`tokens`, `base`,
+built-in `light`/`dark` themes) and the styles for all components.
 
-Если нужен более точный CSS-сценарий, используйте `@feugene/granularity/foundation.css` вместе с
-`@feugene/granularity/components/<ComponentName>/styles.css` или собирайте стили через `UnoCSS` preset.
+If you need a more precise CSS setup, use `@feugene/granularity/foundation.css` together with
+`@feugene/granularity/components/<ComponentName>/styles.css`, or assemble styles via the `UnoCSS` preset.
 
-## Документация
+## Documentation
 
-- [`docs/README.md`](./docs/README.md) — обзор и карта документации
-- [`docs/installation.md`](./docs/installation.md) — установка, public entrypoint-ы и стратегии подключения
-- [`docs/styling.md`](./docs/styling.md) — слои стилей, темы и порядок импортов
-- [`docs/unocss.md`](./docs/unocss.md) — интеграция с `UnoCSS`
-- [`docs/localization.md`](./docs/localization.md) — как пакет встраивается в локализацию приложения
-- [`docs/directives.md`](./docs/directives.md) — package-level директивы
+- [`docs/README.md`](./docs/README.md) — overview and documentation map
+- [`docs/installation.md`](./docs/installation.md) — installation, public entrypoints, and adoption strategies
+- [`docs/styling.md`](./docs/styling.md) — style layers, themes, and import order
+- [`docs/unocss.md`](./docs/unocss.md) — `UnoCSS` integration
+- [`docs/localization.md`](./docs/localization.md) — how the package plugs into application localization
+- [`docs/directives.md`](./docs/directives.md) — package-level directives
 - [`docs/file-validation.md`](./docs/file-validation.md) — file validation API
-- [`docs/components.md`](./docs/components.md) — каталог опубликованных компонентов
-- [`docs/ADDING_COMPONENTS.md`](./docs/ADDING_COMPONENTS.md) — внутренняя инструкция по добавлению нового компонента
+- [`docs/components.md`](./docs/components.md) — catalog of published components
+- [`docs/ADDING_COMPONENTS.md`](./docs/ADDING_COMPONENTS.md) — internal guide for adding a new component

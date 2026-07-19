@@ -1,0 +1,105 @@
+{
+  "name": "@feugene/granularity-datepicker",
+  "description": "Date/time/range picker for the @feugene/granularity design system — a themed wrapper around @vuepic/vue-datepicker, shipped as an opt-in companion package so the core stays lean.",
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-datepicker"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "datepicker",
+    "date-picker",
+    "timepicker",
+    "daterangepicker",
+    "calendar",
+    "granularity",
+    "design-system",
+    "tree-shakeable",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "types": "./dist/types/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./components/GrDateTimePicker": {
+      "types": "./dist/types/src/components/GrDateTimePicker/index.d.ts",
+      "import": "./dist/components/GrDateTimePicker/index.js"
+    },
+    "./components/GrDatePicker": {
+      "types": "./dist/types/src/components/GrDatePicker/index.d.ts",
+      "import": "./dist/components/GrDatePicker/index.js"
+    },
+    "./components/GrTimePicker": {
+      "types": "./dist/types/src/components/GrTimePicker/index.d.ts",
+      "import": "./dist/components/GrTimePicker/index.js"
+    },
+    "./components/GrDateRangePicker": {
+      "types": "./dist/types/src/components/GrDateRangePicker/index.d.ts",
+      "import": "./dist/components/GrDateRangePicker/index.js"
+    },
+    "./granular-provider": {
+      "types": "./dist/types/src/granular-provider/index.d.ts",
+      "import": "./dist/granular-provider.js",
+      "default": "./dist/granular-provider.js"
+    },
+    "./granular-provider/node": {
+      "types": "./dist/types/src/granular-provider/node.d.ts",
+      "import": "./dist/granular-provider-node.js",
+      "default": "./dist/granular-provider-node.js"
+    }
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.11.0 <1.0.0",
+    "@feugene/unocss-preset-granular": "^0.4.0",
+    "vue": "^3.5.40"
+  },
+  "dependencies": {
+    "@vuepic/vue-datepicker": "^14.0.0",
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@feugene/granularity": "^0.11.0",
+    "@feugene/unocss-preset-granular": "^0.4.0",
+    "@types/node": "^26.1.1",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "^6.0.2",
+    "vite": "^8.1.5",
+    "vite-plugin-lib-inject-css": "^2.2.2",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  }
+}

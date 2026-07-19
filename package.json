@@ -12,6 +12,7 @@
   "scripts": {
     "build": "yarn build:granularity && yarn build:showcase",
     "build:granularity": "yarn workspace @feugene/granularity build",
+    "build:datepicker": "yarn workspace @feugene/granularity-datepicker build",
     "build:playground": "yarn workspace @feugene/granularity-playground build",
     "build:showcase": "yarn workspace @feugene/granularity-showcase build",
     "build:playground-empty": "yarn workspace @feugene/granularity-playground-empty build",
