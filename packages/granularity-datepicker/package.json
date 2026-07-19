@@ -75,12 +75,19 @@
       "types": "./dist/types/src/granular-provider/node.d.ts",
       "import": "./dist/granular-provider-node.js",
       "default": "./dist/granular-provider-node.js"
+    },
+    "./resolver": {
+      "types": "./dist/types/src/resolver.d.ts",
+      "import": "./dist/resolver.js",
+      "default": "./dist/resolver.js"
     }
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.11.0 <1.0.0",
     "@feugene/unocss-preset-granular": "^0.4.0",
-    "vue": "^3.5.40"
+    "vue": "^3.5.40",
+    "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
+    "unplugin-vue-components": ">=0.26.0"
   },
   "dependencies": {
     "@vuepic/vue-datepicker": "^14.0.0",
@@ -95,11 +102,21 @@
     "vite": "^8.1.5",
     "vite-plugin-lib-inject-css": "^2.2.2",
     "vue": "^3.5.40",
-    "vue-tsc": "^3.3.7"
+    "vue-tsc": "^3.3.7",
+    "@feugene/unplugin-granularity": "^0.4.0",
+    "unplugin-vue-components": "^32.0.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependenciesMeta": {
+    "@feugene/unplugin-granularity": {
+      "optional": true
+    },
+    "unplugin-vue-components": {
+      "optional": true
+    }
   }
 }

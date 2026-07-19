@@ -24,3 +24,6 @@ to [Semantic Versioning](https://semver.org/).
   UnoCSS safelist.
 - Per-component subpath exports and a tree-shakeable build (`@vuepic/vue-datepicker` and
   `date-fns` stay external).
+- `./resolver` entry — a `GranularityDatepickerResolver()` for `unplugin-vue-components`
+  auto-import, built on `@feugene/unplugin-granularity`'s `createGranularResolver` factory
+  (whitelist of the four components; register it before the core `GranularityResolver()`).

@@ -306,6 +306,9 @@ jobs:
           name: granularity-dist
           path: packages/granularity/dist
 
+      - name: Test package
+        run: yarn workspace @feugene/unplugin-granularity test:run
+
       - name: Build package
         run: yarn workspace @feugene/unplugin-granularity build
 
@@ -402,12 +405,14 @@ jobs:
 
   # Сборка опционального companion-пакета @feugene/granularity-datepicker
   # (date/time/range picker поверх @vuepic/vue-datepicker). Peer-зависит от
-  # @feugene/granularity, поэтому для vue-tsc нужны его собранные типы —
-  # скачиваем артефакт granularity-dist, как и для unplugin-пакета.
+  # @feugene/granularity (для vue-tsc нужны его собранные типы) и от
+  # @feugene/unplugin-granularity — на его фабрике `createGranularResolver`
+  # построен entry `./resolver`. Поэтому скачиваем оба dist-артефакта.
   build-granularity-datepicker:
     needs:
 #      - lint
       - build-granularity
+      - build-unplugin-granularity
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -424,6 +429,12 @@ jobs:
         with:
           name: granularity-dist
           path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
 
       - name: Build package
         run: yarn workspace @feugene/granularity-datepicker build

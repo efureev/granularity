@@ -96,6 +96,36 @@ presetGranularNode({
 })
 ```
 
+## Auto-import (unplugin-vue-components)
+
+Write `<GrDatePicker>` in a template without importing it, via the package's own resolver
+(built on `@feugene/unplugin-granularity`'s shared factory):
+
+```ts
+// vite.config.ts
+import Components from 'unplugin-vue-components/vite'
+import { GranularityResolver } from '@feugene/unplugin-granularity'
+import { GranularityDatepickerResolver } from '@feugene/granularity-datepicker/resolver'
+
+export default defineConfig({
+  plugins: [
+    Components({
+      resolvers: [
+        GranularityDatepickerResolver(), // whitelist — must come first…
+        GranularityResolver(),           // …before the greedy Gr* core resolver
+      ],
+    }),
+  ],
+})
+```
+
+The datepicker resolver uses an explicit whitelist of its four components, so it must be
+registered **before** the core `GranularityResolver()` (which greedily claims any `Gr*` name).
+Its CSS is inlined into the JS chunk, so no `styles.css` side-effect is added.
+
+Requires the optional peers `@feugene/unplugin-granularity` (`>=0.4.0`) and
+`unplugin-vue-components` — install them only if you use auto-import.
+
 ## License
 
 SEE LICENSE IN LICENSE (inherits the monorepo license).

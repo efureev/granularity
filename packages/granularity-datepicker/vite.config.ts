@@ -50,6 +50,9 @@ export default defineConfig({
         'granular-provider-node': fileURLToPath(
           new URL('./src/granular-provider/node.ts', import.meta.url),
         ),
+        resolver: fileURLToPath(
+          new URL('./src/resolver.ts', import.meta.url),
+        ),
       },
       formats: ['es'],
       fileName: (_format, entryName) => `${entryName}.js`,
@@ -62,6 +65,10 @@ export default defineConfig({
         /^@feugene\/unocss-preset-granular(\/.*)?$/,
         /^@vuepic\/vue-datepicker(\/.*)?$/,
         /^date-fns(\/.*)?$/,
+        // Build-time helper deps of the optional `./resolver` entry.
+        '@feugene/unplugin-granularity',
+        'unplugin-vue-components',
+        /^unplugin-vue-components\/.*/,
       ],
       output: {
         chunkFileNames: granularChunkFileNames(),
