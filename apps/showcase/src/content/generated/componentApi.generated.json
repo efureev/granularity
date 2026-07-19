@@ -951,17 +951,38 @@
           },
           {
             "name": "initialSortKey",
-            "description": "Ключ колонки для начальной сортировки.",
+            "description": "Ключ колонки для начальной сортировки (uncontrolled-режим).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "initialSortDir",
-            "description": "Направление начальной сортировки.",
+            "description": "Направление начальной сортировки (uncontrolled-режим).",
             "type": "\"asc\" | \"desc\" | undefined",
             "required": false,
             "default": "\"asc\""
+          },
+          {
+            "name": "sortKey",
+            "description": "Контролируемый ключ сортировки: `v-model:sortKey`. Задаёт controlled-режим.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "sortDir",
+            "description": "Контролируемое направление сортировки: `v-model:sortDir`.",
+            "type": "\"asc\" | \"desc\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "externalSort",
+            "description": "Внешняя сортировка (например серверная): компонент НЕ сортирует `rows` сам, а только сообщает о смене через `update:sortKey`/`update:sortDir`/ `sort-change`. `rows` при этом должны приходить уже отсортированными.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "density",
@@ -1026,7 +1047,26 @@
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "update:sortKey",
+            "description": "",
+            "type": "[string]",
+            "signature": "(e: \"update:sortKey\", value: string): void"
+          },
+          {
+            "name": "update:sortDir",
+            "description": "",
+            "type": "[\"asc\" | \"desc\"]",
+            "signature": "(e: \"update:sortDir\", value: \"asc\" | \"desc\"): void"
+          },
+          {
+            "name": "sort-change",
+            "description": "",
+            "type": "[{ key: string; dir: \"asc\" | \"desc\"; }]",
+            "signature": "(e: \"sort-change\", value: { key: string; dir: \"asc\" | \"desc\"; }): void"
+          }
+        ]
       },
       {
         "key": "methods",

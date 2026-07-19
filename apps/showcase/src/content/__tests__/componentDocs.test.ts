@@ -64,7 +64,7 @@ describe('component docs metadata', () => {
     expect(dropdownDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown'))).toBe(true)
 
-    expect(dataTableDoc.examples).toHaveLength(3)
+    expect(dataTableDoc.examples).toHaveLength(4)
     expect(dataTableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('gr-data-table'))).toBe(true)
   })

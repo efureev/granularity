@@ -25,10 +25,20 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   columns: GrDataColumn[]
   /** Ключ строки или функция-резолвер. По умолчанию — поле `'id'`. */
   rowKey?: GrDataTableRowKey<TRow>
-  /** Ключ колонки для начальной сортировки. */
+  /** Ключ колонки для начальной сортировки (uncontrolled-режим). */
   initialSortKey?: string
-  /** Направление начальной сортировки. */
+  /** Направление начальной сортировки (uncontrolled-режим). */
   initialSortDir?: 'asc' | 'desc'
+  /** Контролируемый ключ сортировки: `v-model:sortKey`. Задаёт controlled-режим. */
+  sortKey?: string
+  /** Контролируемое направление сортировки: `v-model:sortDir`. */
+  sortDir?: 'asc' | 'desc'
+  /**
+   * Внешняя сортировка (например серверная): компонент НЕ сортирует `rows`
+   * сам, а только сообщает о смене через `update:sortKey`/`update:sortDir`/
+   * `sort-change`. `rows` при этом должны приходить уже отсортированными.
+   */
+  externalSort?: boolean
   // Прокси к GrTable:
   density?: GrTableDensity
   caption?: string
@@ -48,6 +58,9 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   rowKey: 'id' as never,
   initialSortKey: undefined,
   initialSortDir: 'asc',
+  sortKey: undefined,
+  sortDir: undefined,
+  externalSort: false,
   density: 'regular',
   caption: undefined,
   ariaLabel: undefined,
@@ -55,16 +68,44 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   regionLabel: undefined,
 })
 
-const sortKey = ref<string>(props.initialSortKey ?? '')
-const sortDir = ref<'asc' | 'desc'>(props.initialSortDir)
+const emit = defineEmits<{
+  (e: 'update:sortKey', value: string): void
+  (e: 'update:sortDir', value: 'asc' | 'desc'): void
+  (e: 'sort-change', value: { key: string, dir: 'asc' | 'desc' }): void
+}>()
+
+// Uncontrolled-состояние; в controlled-режиме перекрывается пропами `sortKey`/`sortDir`.
+const internalSortKey = ref<string>(props.initialSortKey ?? '')
+const internalSortDir = ref<'asc' | 'desc'>(props.initialSortDir)
+
+const isSortKeyControlled = computed(() => props.sortKey !== undefined)
+const isSortDirControlled = computed(() => props.sortDir !== undefined)
+
+const currentSortKey = computed(() => props.sortKey ?? internalSortKey.value)
+const currentSortDir = computed<'asc' | 'desc'>(() => props.sortDir ?? internalSortDir.value)
+
+function applySort(key: string, dir: 'asc' | 'desc'): void {
+  if (!isSortKeyControlled.value)
+    internalSortKey.value = key
+  if (!isSortDirControlled.value)
+    internalSortDir.value = dir
+
+  emit('update:sortKey', key)
+  emit('update:sortDir', dir)
+  emit('sort-change', { key, dir })
+}
 
 const sortedRows = computed(() => {
   const items = [...props.rows]
-  if (!sortKey.value)
+  // Внешняя сортировка: `rows` уже отсортированы потребителем — не трогаем.
+  if (props.externalSort)
     return items
 
-  const key = sortKey.value
-  const dir = sortDir.value
+  const key = currentSortKey.value
+  if (!key)
+    return items
+
+  const dir = currentSortDir.value
 
   items.sort((a, b) => {
     const av = (a as Record<string, unknown>)[key]
@@ -88,13 +129,12 @@ function toggleSort(col: GrDataColumn): void {
   if (!col.sortable)
     return
 
-  if (sortKey.value !== col.key) {
-    sortKey.value = col.key
-    sortDir.value = 'asc'
+  if (currentSortKey.value !== col.key) {
+    applySort(col.key, 'asc')
     return
   }
 
-  sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
+  applySort(col.key, currentSortDir.value === 'asc' ? 'desc' : 'asc')
 }
 
 function cellAlign(col: GrDataColumn): string {
@@ -118,15 +158,15 @@ function rowKeyValue(row: TRow): string | number {
 function ariaSortFor(col: GrDataColumn): 'ascending' | 'descending' | 'none' | undefined {
   if (!col.sortable)
     return undefined
-  if (sortKey.value !== col.key)
+  if (currentSortKey.value !== col.key)
     return 'none'
-  return sortDir.value === 'asc' ? 'ascending' : 'descending'
+  return currentSortDir.value === 'asc' ? 'ascending' : 'descending'
 }
 
 function sortButtonLabel(col: GrDataColumn): string {
-  if (sortKey.value !== col.key)
+  if (currentSortKey.value !== col.key)
     return `Sort by ${col.label}`
-  return sortDir.value === 'asc'
+  return currentSortDir.value === 'asc'
     ? `Sorted by ${col.label} ascending, activate to sort descending`
     : `Sorted by ${col.label} descending, activate to sort ascending`
 }
@@ -172,10 +212,10 @@ function cellValue(row: TRow, key: string): unknown {
             >
               <span>{{ col.label }}</span>
               <span class="inline-flex">
-                <GrIcon v-if="sortKey === col.key && sortDir === 'asc'" size="sm" aria-hidden="true">
+                <GrIcon v-if="currentSortKey === col.key && currentSortDir === 'asc'" size="sm" aria-hidden="true">
                   <IconArrowUp />
                 </GrIcon>
-                <GrIcon v-else-if="sortKey === col.key && sortDir === 'desc'" size="sm" aria-hidden="true">
+                <GrIcon v-else-if="currentSortKey === col.key && currentSortDir === 'desc'" size="sm" aria-hidden="true">
                   <IconArrowDown />
                 </GrIcon>
               </span>

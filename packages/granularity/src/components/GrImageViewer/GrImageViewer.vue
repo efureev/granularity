@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { useScrollLock } from '../../composables/internal/useScrollLock'
 
 /**
  * Usage:
@@ -132,6 +133,10 @@ const WHEEL_ZOOM_SENSITIVITY = 0.0015
 const WHEEL_IDLE_MS = 120
 
 const open = computed(() => props.modelValue)
+
+// SSR-guard для teleport + общий reference-counted scroll-lock (как в GrModal/GrDrawer).
+const isClient = typeof window !== 'undefined'
+const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 const total = computed(() => props.urlList.length)
 const hasImages = computed(() => total.value > 0)
 
@@ -570,12 +575,14 @@ watch(
   () => props.modelValue,
   async (isOpen) => {
     if (!isOpen) {
+      unlockBodyScroll()
       stopObservingImage()
       endWheelZoom()
       isDragging.value = false
       return
     }
 
+    lockBodyScroll()
     syncIndexFromInitial()
     await nextTick()
     startObservingImage()
@@ -620,13 +627,14 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  unlockBodyScroll()
   stopObservingImage()
   endWheelZoom()
 })
 </script>
 
 <template>
-  <teleport to="body">
+  <teleport to="body" :disabled="!isClient">
     <TransitionRoot :show="open" as="template">
       <Dialog
         as="div"

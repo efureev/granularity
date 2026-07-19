@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, onBeforeUnmount, useId, watch } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+// Переиспользуем инфраструктуру оверлеев GrModal: общий Esc-стек (Esc закрывает
+// верхний оверлей независимо от дерева рендера) и reference-counted scroll-lock.
+import { pushGrModalEsc, removeGrModalEsc } from '../GrModal/grModalEscStack'
+import { useScrollLock } from '../../composables/internal/useScrollLock'
 import {
   grDrawerPanelClass,
   grDrawerPanelEnterFrom,
@@ -50,6 +54,11 @@ const emit = defineEmits<{
 
 const titleId = useId()
 
+// SSR-guard: на сервере `document.body` недоступен — отключаем teleport
+// (в клиенте включаем после маунта). Раньше `<teleport to="body">` без
+// `:disabled` падал при SSR — расхождение с GrModal.
+const isClient = typeof window !== 'undefined'
+
 const panelClass = computed(() => {
   return grDrawerPanelClass({ side: props.side, size: props.size })
 })
@@ -70,17 +79,48 @@ function onOverlayClick(): void {
   close()
 }
 
-function onKeydown(e: KeyboardEvent): void {
-  if (e.key !== 'Escape') return
-  if (!props.closeOnEsc) return
-  e.stopPropagation()
-  e.preventDefault()
-  close()
+// ————— Esc через общий стек оверлеев + scroll-lock, синхронно с открытием.
+const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
+
+let escEntryId: number | null = null
+
+function registerEsc(): void {
+  if (escEntryId !== null) return
+  escEntryId = pushGrModalEsc({
+    shouldClose: () => props.closeOnEsc,
+    close,
+  })
 }
+
+function unregisterEsc(): void {
+  if (escEntryId === null) return
+  removeGrModalEsc(escEntryId)
+  escEntryId = null
+}
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value) {
+      lockBodyScroll()
+      registerEsc()
+    }
+    else {
+      unlockBodyScroll()
+      unregisterEsc()
+    }
+  },
+  { immediate: true },
+)
+
+onBeforeUnmount(() => {
+  unlockBodyScroll()
+  unregisterEsc()
+})
 </script>
 
 <template>
-  <teleport to="body">
+  <teleport to="body" :disabled="!isClient">
     <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"
@@ -89,7 +129,6 @@ function onKeydown(e: KeyboardEvent): void {
         :static="true"
         :aria-labelledby="titleId"
         @close="onDialogClose"
-        @keydown="onKeydown"
       >
         <div class="fixed inset-0">
           <TransitionChild

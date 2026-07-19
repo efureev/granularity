@@ -5,6 +5,29 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.12.0] 2026-07-20
+
+### Added
+
+- `GrDataTable`: controlled sort via `v-model:sortKey` / `v-model:sortDir` and a
+  `sort-change` event, plus an `externalSort` prop that disables internal sorting for
+  server-side / URL-synced sorting.
+- `GrNumberInput`: WAI-ARIA spinbutton semantics (`role="spinbutton"`,
+  `aria-valuenow`/`min`/`max`) and keyboard support (Arrow to step, Home/End to `min`/`max`).
+
+### Fixed
+
+- Overlay scroll-lock is now global and reference-counted (shared `useScrollLock`), fixing a
+  LIFO bug where closing one modal out of order restored `<body>` scrolling while another was
+  still open; it also compensates for scrollbar width so content no longer shifts. Reused
+  across `GrModal`, `GrDrawer` and `GrImageViewer`.
+- `GrDrawer`: now locks background scroll, participates in the shared Esc stack (Esc closes the
+  topmost overlay across render trees), and SSR-guards its teleport (`:disabled` on the server).
+  `GrImageViewer` teleport is SSR-guarded too.
+- `GrNumberInput`: `min`/`max` are now clamped on manual input (on `change`), a leading `-`
+  can be typed for negative values, and the caret no longer jumps to the end when editing the
+  middle of a number; large values are no longer formatted in scientific notation.
+
 ## [v0.11.0] 2026-07-19
 
 ### Breaking

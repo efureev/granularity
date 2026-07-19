@@ -24,6 +24,7 @@ import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, T
 
 import { pushGrModalEsc, removeGrModalEsc } from './grModalEscStack'
 import { pushGrModalTop, removeGrModalTop } from './grModalTopStack'
+import { useScrollLock } from '../../composables/internal/useScrollLock'
 
 import {
   type GrModalSize,
@@ -141,23 +142,11 @@ function onOverlayPointerDown(): void {
 }
 
 // ————— Scroll lock на `<body>` на время открытия.
-// HeadlessUI Vue этого не делает автоматически, а фон скроллится —
-// для GR-примитива это мешающий UX.
-let savedBodyOverflow: string | null = null
-
-function lockBodyScroll(): void {
-  if (!isClient) return
-  if (savedBodyOverflow !== null) return
-  savedBodyOverflow = document.body.style.overflow
-  document.body.style.overflow = 'hidden'
-}
-
-function unlockBodyScroll(): void {
-  if (!isClient) return
-  if (savedBodyOverflow === null) return
-  document.body.style.overflow = savedBodyOverflow
-  savedBodyOverflow = null
-}
+// HeadlessUI Vue этого не делает автоматически, а фон скроллится — для
+// GR-примитива это мешающий UX. Общий reference-counted lock корректно
+// работает при нескольких открытых оверлеях (LIFO-независимо) и компенсирует
+// ширину скроллбара, чтобы контент не дёргался.
+const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
 watch(
   () => props.modelValue,

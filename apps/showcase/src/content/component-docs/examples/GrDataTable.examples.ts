@@ -2,6 +2,54 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'data-table-controlled-sort',
+    title: 'Controlled / external sort',
+    description: 'Управляемая сортировка через `v-model:sortKey` / `v-model:sortDir` + событие `@sort-change`. С `external-sort` таблица не сортирует `rows` сама — данные приходят уже отсортированными (серверная сортировка, синхронизация с URL).',
+    status: 'ready',
+    previewKey: 'gr-data-table-controlled-sort',
+    code: `<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { GrDataTable } from '@feugene/granularity'
+import type { GrDataColumn } from '@feugene/granularity'
+
+const rows = [
+  { id: 1, service: 'Auth', incidents: 2 },
+  { id: 2, service: 'Billing', incidents: 0 },
+  { id: 3, service: 'Search', incidents: 7 },
+]
+const columns: GrDataColumn[] = [
+  { key: 'service', label: 'Service', sortable: true },
+  { key: 'incidents', label: 'Incidents', sortable: true, align: 'right' },
+]
+
+const sortKey = ref('incidents')
+const sortDir = ref<'asc' | 'desc'>('desc')
+
+// external-sort: сортируем «снаружи» (например на сервере).
+const sortedRows = computed(() => {
+  const key = sortKey.value
+  const dir = sortDir.value
+  return [...rows].sort((a, b) => {
+    const res = Number(a[key as 'incidents']) - Number(b[key as 'incidents'])
+    return dir === 'asc' ? res : -res
+  })
+})
+</script>
+
+<template>
+  <GrDataTable
+    v-model:sort-key="sortKey"
+    v-model:sort-dir="sortDir"
+    :rows="sortedRows"
+    :columns="columns"
+    row-key="id"
+    external-sort
+    @sort-change="(e) => console.log(e.key, e.dir)"
+  />
+</template>`,
+    note: 'Контролируемый режим нужен для серверной сортировки и синхронизации состояния с URL; без пропов `sortKey`/`sortDir` таблица работает в uncontrolled-режиме как прежде.',
+  },
+  {
     id: 'data-table-sortable-columns',
     title: 'Sortable rows with initial state',
     description: 'Базовый сценарий для `GrDataTable`: передаём `rows`, `columns`, стартовую сортировку и сразу проверяем built-in sorting.',

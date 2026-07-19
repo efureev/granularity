@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrNumberInput from '../GrNumberInput.vue'
@@ -225,5 +225,61 @@ describe('GrNumberInput', () => {
     const inputEl = wrapper.get('input').element as HTMLInputElement
     expect(inputEl.style.paddingRight).toBe('122px')
     expect(wrapper.get('[data-testid="number-input-controls-vertical"]').attributes('style')).toContain('right: 70px')
+  })
+})
+describe('GrNumberInput — ввод, клампинг, клавиатура и ARIA (item 22)', () => {
+  it('разрешает ввести ведущий минус (отрицательные значения)', async () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '' } })
+    const input = wrapper.get('input')
+
+    await input.setValue('-5')
+
+    const emitted = wrapper.emitted('update:modelValue')
+    expect(emitted?.at(-1)).toEqual(['-5'])
+  })
+
+  it('клампит по min/max на change (ручной ввод, а не только кнопки)', async () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '999', max: 10 } })
+    const input = wrapper.get('input')
+
+    await input.trigger('change')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['10'])
+    expect(wrapper.emitted('change')?.at(-1)).toEqual(['10'])
+  })
+
+  it('шагает по ArrowUp/ArrowDown и прыгает к границам по Home/End', async () => {
+    const Harness = defineComponent({
+      components: { GrNumberInput },
+      setup() {
+        const value = ref('5')
+        return { value }
+      },
+      template: '<GrNumberInput v-model="value" :step="1" :min="0" :max="100" />',
+    })
+    const wrapper = mount(Harness)
+    const input = wrapper.get('input')
+
+    await input.trigger('keydown', { key: 'ArrowUp' })
+    expect(input.element.value).toBe('6')
+
+    await input.trigger('keydown', { key: 'ArrowDown' })
+    expect(input.element.value).toBe('5')
+
+    await input.trigger('keydown', { key: 'End' })
+    expect(input.element.value).toBe('100')
+
+    await input.trigger('keydown', { key: 'Home' })
+    expect(input.element.value).toBe('0')
+  })
+
+  it('экспонирует семантику spinbutton (role + aria-value*)', () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '7', min: 0, max: 100 } })
+    const input = wrapper.get('input')
+
+    expect(input.attributes('role')).toBe('spinbutton')
+    expect(input.attributes('aria-valuenow')).toBe('7')
+    expect(input.attributes('aria-valuemin')).toBe('0')
+    expect(input.attributes('aria-valuemax')).toBe('100')
   })
 })

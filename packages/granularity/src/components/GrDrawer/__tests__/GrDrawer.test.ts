@@ -32,6 +32,11 @@ vi.mock('@headlessui/vue', async () => {
 })
 
 import GrDrawer from '../GrDrawer.vue'
+import { resetGrModalEscStack } from '../../GrModal/grModalEscStack'
+
+afterEach(() => {
+  resetGrModalEscStack()
+})
 
 function mountHarness(options: { closeOnBackdrop: boolean, side?: 'left' | 'right', size?: 'sm' | 'md' | 'lg' | 'full' }) {
   const Harness = defineComponent({
@@ -121,7 +126,9 @@ describe('granularity/GrDrawer (unit)', () => {
 
     const escWrapper = mountHarness({ closeOnBackdrop: true })
 
-    await escWrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    // Esc обрабатывает общий стек оверлеев (window capture), а не локальный
+    // обработчик на панели — поэтому диспатчим на уровне window, как в реальности.
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await nextTick()
 
     expect(escWrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)

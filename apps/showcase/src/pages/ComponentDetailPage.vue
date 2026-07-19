@@ -87,6 +87,7 @@ const previewRegistry = {
   'gr-confirm-dialog-custom-body': defineAsyncComponent(() => import('../demos/components/gr-confirm-dialog/GrConfirmDialogCustomBodyDemo.vue')),
   'gr-confirm-dialog-destructive': defineAsyncComponent(() => import('../demos/components/gr-confirm-dialog/GrConfirmDialogDestructiveDemo.vue')),
   'gr-confirm-dialog-service-link': defineAsyncComponent(() => import('../demos/components/gr-confirm-dialog/GrDialogServiceLinkDemo.vue')),
+  'gr-data-table-controlled-sort': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableControlledSortDemo.vue')),
   'gr-data-table-custom-cells': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableCustomCellsDemo.vue')),
   'gr-data-table-filtered-view': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableFilteredViewDemo.vue')),
   'gr-data-table-sortable-columns': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableSortableColumnsDemo.vue')),

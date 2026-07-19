@@ -119,3 +119,44 @@ describe('GrDataTable', () => {
     expect(wrapper.findAll('[data-gr-datatable-row]')).toHaveLength(3)
   })
 })
+
+describe('GrDataTable — controlled sort (item 27)', () => {
+  const columns = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'score', label: 'Score', sortable: true },
+  ]
+  const rows = [
+    { id: 1, name: 'Charlie', score: 20 },
+    { id: 2, name: 'Alice', score: 10 },
+    { id: 3, name: 'Bob', score: 15 },
+  ]
+
+  it('controlled: рендерит по пропам sortKey/sortDir и эмитит update + sort-change', async () => {
+    const wrapper = mount(GrDataTable, { props: { columns, rows, sortKey: 'score', sortDir: 'asc' } })
+    expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual(['Alice10', 'Bob15', 'Charlie20'])
+
+    await wrapper.findAll('thead button')[1].trigger('click')
+    expect(wrapper.emitted('update:sortKey')?.at(-1)).toEqual(['score'])
+    expect(wrapper.emitted('update:sortDir')?.at(-1)).toEqual(['desc'])
+    expect(wrapper.emitted('sort-change')?.at(-1)).toEqual([{ key: 'score', dir: 'desc' }])
+
+    // Пропы извне не менялись — отображаемая сортировка осталась asc.
+    expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual(['Alice10', 'Bob15', 'Charlie20'])
+  })
+
+  it('externalSort: не сортирует rows сам, только эмитит смену', async () => {
+    const wrapper = mount(GrDataTable, { props: { columns, rows, externalSort: true, sortKey: 'score', sortDir: 'asc' } })
+    expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual(['Charlie20', 'Alice10', 'Bob15'])
+
+    await wrapper.findAll('thead button')[1].trigger('click')
+    expect(wrapper.emitted('sort-change')?.at(-1)).toEqual([{ key: 'score', dir: 'desc' }])
+    expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual(['Charlie20', 'Alice10', 'Bob15'])
+  })
+
+  it('uncontrolled режим по-прежнему сортирует сам', async () => {
+    const wrapper = mount(GrDataTable, { props: { columns, rows } })
+    await wrapper.findAll('thead button')[1].trigger('click')
+    expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual(['Alice10', 'Bob15', 'Charlie20'])
+    expect(wrapper.emitted('sort-change')?.at(-1)).toEqual([{ key: 'score', dir: 'asc' }])
+  })
+})

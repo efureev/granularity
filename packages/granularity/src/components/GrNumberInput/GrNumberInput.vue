@@ -248,6 +248,14 @@ function sanitize(raw: string): string {
 
   for (let i = 0; i < raw.length; i++) {
     const ch = raw[i]
+
+    // Ведущий минус: разрешаем один в начале, чтобы можно было ввести
+    // отрицательное значение с клавиатуры (границы проверит `clamp` на change).
+    if (ch === '-' && out.length === 0) {
+      out += '-'
+      continue
+    }
+
     if (isDigit(ch)) {
       out += ch
       continue
@@ -287,36 +295,94 @@ function format(n: number): string {
   const sep = props.decimalSeparator || '.'
   const p = props.precision
 
-  let s = p === undefined ? String(n) : n.toFixed(Math.max(0, p))
+  // Без `precision` избегаем экспоненциальной записи (`String(1e21)` → `"1e+21"`),
+  // форматируя через `Intl` без группировки разрядов.
+  let s = p === undefined
+    ? n.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 20 })
+    : n.toFixed(Math.max(0, p))
   if (sep !== '.') s = s.replace('.', sep)
   return s
 }
 
 function onInput(e: Event): void {
   const el = e.target as HTMLInputElement
-  const next = sanitize(el.value)
-  if (el.value !== next) el.value = next
+  const raw = el.value
+  const next = sanitize(raw)
+
+  if (raw !== next) {
+    // Сохраняем позицию каретки: считаем, сколько валидных символов было ДО
+    // каретки, и ставим её после стольких же в очищенной строке — иначе при
+    // редактировании середины числа каретка прыгала в конец.
+    const caret = el.selectionStart ?? raw.length
+    const keptBefore = sanitize(raw.slice(0, caret)).length
+    el.value = next
+    el.setSelectionRange(keptBefore, keptBefore)
+  }
+
   emit('update:modelValue', next)
 }
 
-function onChange(e: Event): void {
-  const el = e.target as HTMLInputElement
-  const next = sanitize(el.value)
+function commit(el: HTMLInputElement): void {
+  const num = toNumber(sanitize(el.value))
+  // Пустое значение (или незавершённый ввод `-`) оставляем как есть.
+  const next = num === null ? sanitize(el.value) : format(clamp(normalize(num)))
+
   if (el.value !== next) el.value = next
+  if (next !== props.modelValue) emit('update:modelValue', next)
   emit('change', next)
+}
+
+function onChange(e: Event): void {
+  // Клампинг границ (`min`/`max`) и нормализация — на `change`/`blur`, а не только
+  // в кнопках: раньше ручной ввод «999» при `max=10` оставался невалидным.
+  commit(e.target as HTMLInputElement)
+}
+
+function setValue(n: number): void {
+  const nextStr = format(clamp(normalize(n)))
+  emit('update:modelValue', nextStr)
+  emit('change', nextStr)
 }
 
 function stepBy(dir: 1 | -1): void {
   if (props.disabled) return
 
   const current = toNumber(props.modelValue) ?? 0
-  const next = clamp(normalize(current + (props.step ?? 1) * dir))
-  const nextStr = format(next)
-
-  emit('update:modelValue', nextStr)
-  emit('change', nextStr)
+  setValue(current + (props.step ?? 1) * dir)
   focus()
 }
+
+// Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, Home/End —
+// к границам `min`/`max` (если заданы).
+function onKeydown(e: KeyboardEvent): void {
+  if (props.disabled) return
+
+  switch (e.key) {
+    case 'ArrowUp':
+      e.preventDefault()
+      stepBy(1)
+      break
+    case 'ArrowDown':
+      e.preventDefault()
+      stepBy(-1)
+      break
+    case 'Home':
+      if (props.min !== undefined) {
+        e.preventDefault()
+        setValue(props.min)
+      }
+      break
+    case 'End':
+      if (props.max !== undefined) {
+        e.preventDefault()
+        setValue(props.max)
+      }
+      break
+  }
+}
+
+// `aria-valuenow` — числовое значение для скринридеров; отсутствует, если поле пусто.
+const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
 </script>
 
 <template>
@@ -348,12 +414,17 @@ function stepBy(dir: 1 | -1): void {
       :placeholder="placeholder"
       :disabled="disabled"
       :value="modelValue"
+      role="spinbutton"
+      :aria-valuenow="ariaValueNow"
+      :aria-valuemin="min"
+      :aria-valuemax="max"
       :aria-invalid="invalid ? 'true' : undefined"
       class="w-full bg-transparent text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
       :class="inputClassName"
       :style="inputStyle"
       @input="onInput"
       @change="onChange"
+      @keydown="onKeydown"
     >
 
     <div
