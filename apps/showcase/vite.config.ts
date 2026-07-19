@@ -5,7 +5,10 @@ import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
+import Components from 'unplugin-vue-components/vite'
 import UnoCSS from 'unocss/vite'
+
+import { granularityAutoImportResolvers } from './src/app/autoImportResolvers'
 
 // GitHub Pages SPA fallback: copy dist/index.html -> dist/404.html so that
 // direct visits to nested routes (e.g. /granularity/components) are served
@@ -59,6 +62,14 @@ export default defineConfig(({ command, mode }) => ({
   },
   plugins: [
     vue(),
+    // Авто-импорт компонентов дизайн-системы в шаблонах (ядро + companion-датапикер).
+    Components({
+      dts: fileURLToPath(new URL('./src/components.d.ts', import.meta.url)),
+      resolvers: granularityAutoImportResolvers(),
+      // Витрина использует только гранулярные компоненты `@feugene/granularity*`;
+      // директории собственных компонентов витрины не сканируем.
+      dirs: [],
+    }),
     mode === showcaseBuildAnalyzeMode && visualizer(showcaseBuildVisualizerConfig),
     Icons({
       compiler: 'vue3',

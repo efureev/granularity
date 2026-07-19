@@ -20,7 +20,7 @@ function collectVueFiles(directoryPath: string): string[] {
 }
 
 function collectGranularityExports(source: string): Set<string> {
-  return new Set([...source.matchAll(/\b(Ds[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
+  return new Set([...source.matchAll(/\b(Gr[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
 }
 
 function collectGranularityImports(source: string): Set<string> {
@@ -46,11 +46,14 @@ function collectTemplateComponents(source: string): Set<string> {
   if (!templateMatch)
     return new Set()
 
-  return new Set([...templateMatch[1].matchAll(/<\/?(Ds[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
+  return new Set([...templateMatch[1].matchAll(/<\/?(Gr[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
 }
 
 const demosRoot = fileURLToPath(new URL('../demos', import.meta.url))
-const demoFiles = collectVueFiles(demosRoot)
+// `demos/extra/*` — демо companion-пакетов, которые СПЕЦИАЛЬНО опираются на
+// авто-импорт `unplugin-vue-components` (см. `app/autoImportResolvers.ts`),
+// поэтому не обязаны явно импортировать компоненты. Исключаем их из проверки.
+const demoFiles = collectVueFiles(demosRoot).filter(filePath => !filePath.includes('/demos/extra/'))
 const granularityIndexSource = readFileSync(
   fileURLToPath(new URL('../../../../packages/granularity/src/index.ts', import.meta.url)),
   'utf8',
@@ -58,7 +61,7 @@ const granularityIndexSource = readFileSync(
 const granularityExports = collectGranularityExports(granularityIndexSource)
 
 describe('showcase demos imports', () => {
-  it('явно импортирует из @feugene/granularity все используемые Ds-компоненты в demo-файлах', () => {
+  it('явно импортирует из @feugene/granularity все используемые Gr-компоненты в demo-файлах', () => {
     for (const filePath of demoFiles) {
       const fileSource = readFileSync(filePath, 'utf8')
       const usedComponents = [...collectTemplateComponents(fileSource)]

@@ -3,7 +3,10 @@ import { fileURLToPath, URL } from 'node:url'
 
 import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
+import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vitest/config'
+
+import { granularityAutoImportResolvers } from './src/app/autoImportResolvers'
 
 const granularityDistRoot = fileURLToPath(new URL('../../packages/granularity/dist', import.meta.url))
 const granularityDistEntry = fileURLToPath(new URL('../../packages/granularity/dist/index.js', import.meta.url))
@@ -34,6 +37,13 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    // Тот же авто-импорт, что и в vite.config, — иначе auto-imported компоненты
+    // будут undefined в тестах. `dts: false`: не переписываем `components.d.ts` на прогонах.
+    Components({
+      dts: false,
+      resolvers: granularityAutoImportResolvers(),
+      dirs: [],
+    }),
     Icons({
       compiler: 'vue3',
       autoInstall: false,

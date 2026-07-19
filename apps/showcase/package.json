@@ -21,7 +21,9 @@
     "unplugin-icons": "^23.0.1",
     "vite": "^8.1.5",
     "vue-component-meta": "^3.3.7",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "unplugin-vue-components": "^32.0.0",
+    "@feugene/unplugin-granularity": "^0.4.0"
   },
   "scripts": {
     "build": "yarn generate:api && yarn generate:search && vite build",

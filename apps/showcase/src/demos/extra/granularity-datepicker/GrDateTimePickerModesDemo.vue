@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrRadioGroup } from '@feugene/granularity'
-import { GrDateTimePicker } from '@feugene/granularity-datepicker'
+// `GrRadioGroup` (ядро) и `GrDateTimePicker` (companion-датапикер) не импортируются
+// явно — их подставляет авто-импорт `unplugin-vue-components` (см. `autoImportResolvers`).
 import type { GrDateTimeModel, GrDateTimePickerMode } from '@feugene/granularity-datepicker'
 
 const mode = ref<GrDateTimePickerMode>('datetime')

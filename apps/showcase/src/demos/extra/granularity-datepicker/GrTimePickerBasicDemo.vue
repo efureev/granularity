@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTimePicker } from '@feugene/granularity-datepicker'
+// `GrTimePicker` подставляется авто-импортом (`unplugin-vue-components`).
 import type { GrDateTimeModel } from '@feugene/granularity-datepicker'
 
 const value = ref<GrDateTimeModel>(null)

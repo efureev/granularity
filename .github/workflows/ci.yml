@@ -115,8 +115,13 @@ jobs:
           path: packages/granularity/dist/
 
   test-showcase:
+    # Витрина использует авто-импорт `unplugin-vue-components` через резолверы из
+    # @feugene/unplugin-granularity и @feugene/granularity-datepicker/resolver —
+    # их dist нужен уже при загрузке vite/vitest-конфига, поэтому скачиваем все три.
     needs:
       - build-granularity
+      - build-unplugin-granularity
+      - build-granularity-datepicker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -133,6 +138,18 @@ jobs:
         with:
           name: granularity-dist
           path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Download granularity-datepicker dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datepicker-dist
+          path: packages/granularity-datepicker/dist
 
       - name: Test showcase
         run: yarn test:showcase
@@ -156,6 +173,18 @@ jobs:
         with:
           name: granularity-dist
           path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Download granularity-datepicker dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datepicker-dist
+          path: packages/granularity-datepicker/dist
 
       - name: Build showcase
         run: yarn build:showcase
