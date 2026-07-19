@@ -20,7 +20,9 @@ import { GrBadge, GrButton, GrNavbar } from '@feugene/granularity'
     </GrNavbar>
 
     <div class="px-4 py-3 text-sm text-[var(--muted-fg)]">
-      Title slot lets you replace the default text with richer branding or contextual breadcrumbs.
+      Слот <code>#title</code> заменяет текстовый заголовок на брендинг, статус-бейдж или
+      контекстные хлебные крошки текущего раздела — это единственная «левая» зона хедера
+      (иконка меню + заголовок). Сложную межстраничную навигацию сюда не кладут.
     </div>
   </div>
 </template>

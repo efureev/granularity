@@ -23,7 +23,12 @@ defineProps<{
     </div>
 
     <div v-else class="overflow-x-auto">
-      <table class="min-w-full border-collapse text-left text-sm">
+      <table class="w-full min-w-[560px] table-fixed border-collapse text-left text-sm">
+        <colgroup>
+          <col class="w-[22%]">
+          <col class="w-[32%]">
+          <col class="w-[46%]">
+        </colgroup>
         <thead class="showcase-table-head">
           <tr>
             <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.name') }}</th>
@@ -37,10 +42,10 @@ defineProps<{
             :key="item.name"
             class="showcase-border-strong border-t align-top"
           >
-            <td class="px-5 py-4 font-semibold">
+            <td class="px-5 py-4 font-semibold [overflow-wrap:break-word]">
               {{ item.name }}
             </td>
-            <td class="showcase-text-muted px-5 py-4">
+            <td class="showcase-text-muted px-5 py-4 font-mono text-[13px] leading-5 [overflow-wrap:break-word]">
               {{ item.type || item.signature || '—' }}
             </td>
             <td class="showcase-text-muted px-5 py-4">

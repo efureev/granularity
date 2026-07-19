@@ -4,9 +4,13 @@
       "title": "Состояния валидации и нативные типы input",
       "description": "Одна карточка показывает сразу базовый текстовый сценарий, email-валидацию и search-mode, чтобы было видно native-поведение без потери design-system оболочки."
     },
-    "input-addons-width-guards": {
-      "title": "Слоты prefix и suffix с ограничением ширины",
-      "description": "Сценарий фокусируется на add-on slots и ограничении ширины, чтобы длинные подписи не ломали layout формы."
+    "input-addons-basic": {
+      "title": "Add-on-слоты prefix и suffix",
+      "description": "Статичные add-on-слоты (валюта, единицы измерения) внутри поля — общий layout поля при этом не меняется."
+    },
+    "input-addon-slots-fit": {
+      "title": "Add-on-слоты: fixed (обрезка) vs stretch",
+      "description": "Длинный контент в prefix/suffix больше не вылезает за рамки: в fixed аддон держит ширину и обрезает контент (prefix — справа, suffix — слева), в stretch — растягивается под контент. Два поля слева реактивно управляют содержимым аддонов."
     },
     "input-size-and-alignment": {
       "title": "Шкала размеров и выравнивание текста",

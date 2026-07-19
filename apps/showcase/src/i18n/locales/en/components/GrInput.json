@@ -4,9 +4,13 @@
       "title": "Validation states and native input types",
       "description": "A single card shows the basic text scenario, email validation and search mode at once, so native behavior is visible without losing the design-system shell."
     },
-    "input-addons-width-guards": {
-      "title": "Prefix and suffix slots with width guards",
-      "description": "The scenario focuses on add-on slots and width limits so long captions do not break the form layout."
+    "input-addons-basic": {
+      "title": "Prefix and suffix add-ons",
+      "description": "Static add-on slots (currency, units) inside the field, without changing the field's overall layout."
+    },
+    "input-addon-slots-fit": {
+      "title": "Add-on slots: fixed (clip) vs stretch",
+      "description": "Long prefix/suffix content no longer overflows the field: in fixed mode the add-on keeps its width and clips content (prefix from the right, suffix from the left); in stretch it grows to fit. The two fields on the left drive the add-on content reactively."
     },
     "input-size-and-alignment": {
       "title": "Size scale and text alignment",

@@ -387,6 +387,41 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "as",
+            "description": "Полиморфизм: кастомный корневой тег/компонент (например, RouterLink).",
+            "type": "string | Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "href",
+            "description": "Рендерит кнопку как `<a href>` (если не задан `as`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "target",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "external",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -1869,16 +1904,16 @@
             "signature": "(event: \"update:modelValue\", value: File | File[] | null): void"
           },
           {
-            "name": "change",
-            "description": "",
-            "type": "[value: File | File[] | null]",
-            "signature": "(event: \"change\", value: File | File[] | null): void"
-          },
-          {
             "name": "clear",
             "description": "",
             "type": "[]",
             "signature": "(event: \"clear\"): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: File | File[] | null]",
+            "signature": "(event: \"change\", value: File | File[] | null): void"
           },
           {
             "name": "validation",
@@ -2329,6 +2364,20 @@
             "default": "undefined"
           },
           {
+            "name": "prefixFixed",
+            "description": "Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются» под контент (в пределах min/max), а излишек клипается оболочкой.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "string",
@@ -2584,11 +2633,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "variant",
-            "description": "",
-            "type": "GrLinkVariant | undefined",
+            "name": "tone",
+            "description": "Семантический цвет ссылки из палитры `GrTone`.",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
+          },
+          {
+            "name": "variant",
+            "description": "Уровень акцента: `default` (окрашен) или `muted` (приглушён, акцент на hover).",
+            "type": "GrLinkVariant | undefined",
+            "required": false,
+            "default": "\"default\""
           },
           {
             "name": "size",
@@ -2626,13 +2682,6 @@
             "default": "undefined"
           },
           {
-            "name": "external",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "target",
             "description": "",
             "type": "string | undefined",
@@ -2645,6 +2694,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "external",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "underline",
@@ -3068,6 +3124,20 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "prefixFixed",
+            "description": "Фиксированная ширина у prefix/suffix: жёсткая ширина (из `*MaxWidth` → `*MinWidth` → дефолт) + обрезка контента по краю (prefix — справа, suffix — слева). По умолчанию аддоны растягиваются под контент.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "max",
@@ -4250,8 +4320,43 @@
             "default": "undefined"
           },
           {
+            "name": "width",
+            "description": "Ширина в развёрнутом состоянии.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"240px\""
+          },
+          {
             "name": "subtitle",
             "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "collapsed",
+            "description": "Свёрнутое состояние. Поддерживает `v-model:collapsed`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "showToggleButton",
+            "description": "Показать кнопку сворачивания/разворачивания в хедере.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "collapsedWidth",
+            "description": "Ширина в свёрнутом состоянии.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"64px\""
+          },
+          {
+            "name": "toggleLabel",
+            "description": "A11y-лейбл кнопки тогла.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -4284,7 +4389,14 @@
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "update:collapsed",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:collapsed\", value: boolean): void"
+          }
+        ]
       },
       {
         "key": "methods",

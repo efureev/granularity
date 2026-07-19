@@ -9,6 +9,7 @@ import {
   GrSelect,
   GrSwitch,
   type GrLinkSize,
+  type GrLinkTone,
   type GrLinkUnderline,
   type GrLinkVariant,
 } from '@feugene/granularity'
@@ -18,7 +19,8 @@ import CodeBlock from '../../../components/doc/CodeBlock.vue'
 type GrLinkTargetMode = 'auto' | '_self' | '_blank' | 'custom'
 type GrLinkRelMode = 'auto' | 'noopener noreferrer' | 'nofollow' | 'custom'
 
-const variant = ref<GrLinkVariant>('primary')
+const tone = ref<GrLinkTone>('primary')
+const variant = ref<GrLinkVariant>('default')
 const size = ref<GrLinkSize>('md')
 const underline = ref<GrLinkUnderline>('auto')
 const label = ref('Open workspace settings')
@@ -31,12 +33,20 @@ const customTarget = ref('')
 const relMode = ref<GrLinkRelMode>('auto')
 const customRel = ref('')
 
-const variantOptions = [
+const toneOptions = [
   {value: 'primary', label: 'Primary'},
+  {value: 'neutral', label: 'Neutral'},
+  {value: 'success', label: 'Success'},
+  {value: 'warning', label: 'Warning'},
+  {value: 'danger', label: 'Danger'},
+  {value: 'info', label: 'Info'},
+  {value: 'slate', label: 'Slate'},
+  {value: 'azure', label: 'Azure'},
+] satisfies Array<{ value: GrLinkTone, label: string }>
+
+const variantOptions = [
   {value: 'default', label: 'Default'},
   {value: 'muted', label: 'Muted'},
-  {value: 'muted-primary', label: 'MutedPrimary'},
-  {value: 'danger', label: 'Danger'},
 ] satisfies Array<{ value: GrLinkVariant, label: string }>
 
 const sizeOptions = [
@@ -117,6 +127,7 @@ function escapeAttribute(value: string) {
 const previewCode = computed(() => {
   const attributes = [
     `href="${escapeAttribute(resolvedHref.value)}"`,
+    `tone="${tone.value}"`,
     `variant="${variant.value}"`,
     `size="${size.value}"`,
     `underline="${underline.value}"`,
@@ -153,6 +164,7 @@ const previewCode = computed(() => {
 
           <GrLink
               :href="resolvedHref"
+              :tone="tone"
               :variant="variant"
               :size="size"
               :underline="underline"
@@ -182,8 +194,12 @@ const previewCode = computed(() => {
       </div>
 
       <div class="grid gap-4">
+        <GrFormField label="Tone">
+          <GrSelect v-model="tone" :options="toneOptions" aria-label="Link tone"/>
+        </GrFormField>
+
         <GrFormField label="Variant">
-          <GrSelect v-model="variant" :options="variantOptions" aria-label="Link variant"/>
+          <GrRadioGroup v-model="variant" :options="variantOptions" variant="button" size="sm"/>
         </GrFormField>
 
         <GrFormField label="Size">

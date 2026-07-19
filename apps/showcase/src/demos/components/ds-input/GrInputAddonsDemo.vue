@@ -6,7 +6,7 @@ import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 const { t } = useFintI18n()
 const amount = ref('12 540')
-const iban = ref('DE89 3704 0044 0532 0130 00')
+const weight = ref('68')
 </script>
 
 <template>
@@ -18,17 +18,10 @@ const iban = ref('DE89 3704 0044 0532 0130 00')
       </GrInput>
     </GrFormField>
 
-    <GrFormField :label="t('components.GrInput.addons.widthGuardsLabel')">
-      <GrInput
-        v-model="iban"
-        placeholder="IBAN"
-        prefix-min-width="3rem"
-        prefix-max-width="7rem"
-        suffix-min-width="3rem"
-        suffix-max-width="8rem"
-      >
-        <template #prefix>{{ t('components.GrInput.addons.intlAccount') }}</template>
-        <template #suffix>{{ t('components.GrInput.addons.primarySettlement') }}</template>
+    <GrFormField label="Unit add-on">
+      <GrInput v-model="weight" placeholder="0">
+        <template #prefix>Weight</template>
+        <template #suffix>kg</template>
       </GrInput>
     </GrFormField>
   </div>

@@ -21,7 +21,7 @@ const budget = ref('240000')
       size="sm"
     />
 
-    <div class="grid gap-3 lg:grid-cols-2">
+    <div class="grid items-start gap-3 lg:grid-cols-2">
       <GrNumberInput
         v-model="budget"
         :text-align="alignment"

@@ -33,7 +33,13 @@ const multiple = ref(false)
 const clearable = ref(false)
 const disabled = ref(false)
 const allowCustomValue = ref(false)
-const closeOnSelect = ref(true)
+// «Не закрывать панель при выборе» — инвертированная семантика `close-on-select`.
+// Наиболее востребовано при мультивыборе в panel-режиме (набор нескольких опций
+// без переоткрытия панели). Действует только для `options-view="panel"`.
+const keepPanelOpen = ref(false)
+
+// Управление панелью имеет смысл только в panel-режиме.
+const panelStayOpenAvailable = computed(() => optionsView.value === 'panel')
 
 const singleValue = ref<string>('')
 const multipleValue = ref<string[]>([])
@@ -142,7 +148,7 @@ const previewCode = computed(() => {
       attributes.push(`custom-value-placeholder="${escapeAttribute(customValuePlaceholder.value.trim())}"`)
   }
 
-  if (optionsView.value === 'panel' && !closeOnSelect.value)
+  if (panelStayOpenAvailable.value && keepPanelOpen.value)
     attributes.push(':close-on-select="false"')
 
   return ['<GrSelect', ...attributes.map(attribute => `  ${attribute}`), '/>'].join('\n')
@@ -155,13 +161,13 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
   <div class="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_320px]">
     <div class="grid gap-4">
       <div
-          class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
-        <div class="flex h-full flex-col items-center justify-center gap-4 text-center">
+          class="relative grid min-h-[280px] overflow-hidden rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
+        <div class="flex h-full min-w-0 flex-col items-center justify-center gap-4 text-center">
           <div class="showcase-demo-caption text-xs">
             Preview
           </div>
 
-          <div class="w-full max-w-[320px]">
+          <div class="flex w-full max-w-[320px] min-w-0 justify-center">
             <GrSelect
                 v-if="multiple"
                 v-model="multipleValue"
@@ -178,7 +184,7 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
                 :disabled="disabled"
                 :allow-custom-value="allowCustomValue"
                 :custom-value-placeholder="customValuePlaceholder"
-                :close-on-select="closeOnSelect"
+                :close-on-select="!keepPanelOpen"
             />
             <GrSelect
                 v-else
@@ -195,7 +201,7 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
                 :disabled="disabled"
                 :allow-custom-value="allowCustomValue"
                 :custom-value-placeholder="customValuePlaceholder"
-                :close-on-select="closeOnSelect"
+                :close-on-select="!keepPanelOpen"
             />
           </div>
 
@@ -270,6 +276,16 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
         <GrSwitch v-model="multiple" size="sm">
           Multiple
         </GrSwitch>
+        <div class="grid gap-1">
+          <GrSwitch v-model="keepPanelOpen" size="sm" :disabled="!panelStayOpenAvailable">
+            Keep panel open on select
+          </GrSwitch>
+          <p class="showcase-demo-text pl-[2.75rem] text-xs leading-snug opacity-80">
+            {{ panelStayOpenAvailable
+              ? t('components.GrSelect.Sets `close-on-select=false` — the panel stays open after each pick (great for multiple selection)')
+              : t('components.GrSelect.Switch `Options view` to `Panel` to keep the dropdown open while picking multiple values') }}
+          </p>
+        </div>
         <GrSwitch v-model="clearable" size="sm">
           Clearable
         </GrSwitch>
@@ -278,9 +294,6 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
         </GrSwitch>
         <GrSwitch v-model="allowCustomValue" size="sm">
           Allow custom value
-        </GrSwitch>
-        <GrSwitch v-model="closeOnSelect" size="sm" :disabled="optionsView !== 'panel'">
-          Close on select (panel)
         </GrSwitch>
       </GrCard>
     </div>

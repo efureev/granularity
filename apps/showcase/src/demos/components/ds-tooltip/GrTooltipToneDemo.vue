@@ -4,7 +4,20 @@ import { ref } from 'vue'
 import { GrInput, GrTooltip } from '@feugene/granularity'
 
 const tooltipText = ref('Escalation policy will be applied to new alerts only.')
-const iconColor = ref('var(--warning)')
+const iconColor = ref('var(--ds-warning)')
+
+// Пресеты цвета иконки из палитры GrTone: клик подставляет валидную CSS-переменную
+// темы в инпут `icon-color` (раньше в демо был несуществующий `var(--warning)`).
+const tonePresets: Array<{ tone: string, value: string }> = [
+  { tone: 'primary', value: 'var(--primary)' },
+  { tone: 'neutral', value: 'var(--muted-fg)' },
+  { tone: 'success', value: 'var(--ds-success)' },
+  { tone: 'warning', value: 'var(--ds-warning)' },
+  { tone: 'danger', value: 'var(--ds-danger)' },
+  { tone: 'info', value: 'var(--ds-info)' },
+  { tone: 'slate', value: 'var(--ds-slate)' },
+  { tone: 'azure', value: 'var(--ds-azure)' },
+]
 </script>
 
 <template>
@@ -14,11 +27,28 @@ const iconColor = ref('var(--warning)')
         Custom tone
       </span>
       <GrTooltip :text="tooltipText" :icon-color="iconColor" />
+      <code class="rounded bg-[var(--muted)] px-2 py-1 text-xs text-[var(--muted-fg)]">
+        icon-color="{{ iconColor }}"
+      </code>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        v-for="preset in tonePresets"
+        :key="preset.tone"
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full border border-[var(--brd)] px-3 py-1 text-xs font-600 transition-colors hover:bg-[var(--muted)]"
+        :class="iconColor === preset.value ? 'ring-2 ring-[var(--ring)]' : ''"
+        @click="iconColor = preset.value"
+      >
+        <span class="h-3 w-3 rounded-full" :style="{ backgroundColor: preset.value }" />
+        {{ preset.tone }}
+      </button>
     </div>
 
     <div class="grid gap-3 md:grid-cols-2">
       <GrInput v-model="tooltipText" placeholder="Tooltip text" />
-      <GrInput v-model="iconColor" placeholder="var(--warning) / #f59e0b" />
+      <GrInput v-model="iconColor" placeholder="var(--ds-warning) / #f59e0b" />
     </div>
   </div>
 </template>

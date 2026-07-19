@@ -63,30 +63,49 @@ import {
   {
     id: 'dropdown-menu-shortcut-grid',
     title: 'Shortcut cheat-sheet grid',
-    description: 'Показываем `GrDropdownMenuColumns` и `GrDropdownMenuColumn` для двухколоночных shortcut/metadata layouts внутри overlay.',
+    description: 'Минималистичный cheat-sheet хоткеев: `GrDropdownMenuHeader` + одноколоночный `GrDropdownMenuList`, где в каждой строке действие слева и хоткей-чипы справа (`justify-between`) — без вертикальных разделителей.',
     status: 'ready',
     previewKey: 'ds-dropdown-menu-shortcut-grid',
     code: `<script setup lang="ts">
 import {
   GrButton,
   GrDropdownMenu,
-  GrDropdownMenuColumn,
-  GrDropdownMenuColumns,
+  GrDropdownMenuHeader,
+  GrDropdownMenuList,
 } from '@feugene/granularity'
+
+const shortcuts = [
+  { action: 'Search', keys: ['⌘', 'K'] },
+  { action: 'Save draft', keys: ['⌘', 'S'] },
+  { action: 'Assign owner', keys: ['A'] },
+  { action: 'Archive', keys: ['⌘', '⌫'] },
+]
 </script>
 
 <template>
   <GrDropdownMenu width="64" align="left" :close-on-content-click="false">
-    <template #trigger>
-      <GrButton variant="outline">Open shortcut map</GrButton>
+    <template #trigger="{ open }">
+      <GrButton variant="outline">{{ open ? 'Hide shortcuts' : 'Keyboard shortcuts' }}</GrButton>
     </template>
 
-    <GrDropdownMenuColumns>
-      <GrDropdownMenuColumn align="left">Search</GrDropdownMenuColumn>
-      <GrDropdownMenuColumn align="right">⌘K</GrDropdownMenuColumn>
-      <GrDropdownMenuColumn align="left">Save draft</GrDropdownMenuColumn>
-      <GrDropdownMenuColumn align="right">⌘S</GrDropdownMenuColumn>
-    </GrDropdownMenuColumns>
+    <GrDropdownMenuHeader title="Keyboard shortcuts" />
+
+    <GrDropdownMenuList>
+      <div
+        v-for="shortcut in shortcuts"
+        :key="shortcut.action"
+        class="flex items-center justify-between gap-6 px-4 py-2 text-[13px] text-[var(--fg)]"
+      >
+        <span class="truncate">{{ shortcut.action }}</span>
+        <span class="flex shrink-0 items-center gap-1">
+          <kbd
+            v-for="(key, index) in shortcut.keys"
+            :key="index"
+            class="min-w-[20px] rounded-md border border-[var(--brd)] bg-[var(--muted)] px-1.5 py-0.5 text-center text-[11px] font-medium text-[var(--muted-fg)] tabular-nums"
+          >{{ key }}</kbd>
+        </span>
+      </div>
+    </GrDropdownMenuList>
   </GrDropdownMenu>
 </template>`,
   },

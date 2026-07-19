@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -78,6 +79,13 @@ async function main() {
       workspaceRoot,
       `packages/granularity/src/components/${componentName}/${componentName}.vue`,
     )
+
+    // Не у каждой записи реестра есть одноимённый SFC: например, `GrDialogService` —
+    // это сервис (host + composable), рендерящийся `GrDialogServiceHost.vue`. Такие
+    // «сервисные» компоненты в API-таблицу пропсов не попадают — пропускаем.
+    if (!existsSync(componentPath)) {
+      continue
+    }
 
     const meta = checker.getComponentMeta(componentPath)
 

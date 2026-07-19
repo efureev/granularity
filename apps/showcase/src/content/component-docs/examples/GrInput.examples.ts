@@ -55,18 +55,18 @@ const invalid = ref(false)
 </template>`,
   },
   {
-    id: 'input-addons-width-guards',
-    title: 'Prefix and suffix slots with width guards',
-    description: 'Сценарий фокусируется на add-on slots и ограничении ширины, чтобы длинные подписи не ломали layout формы.',
+    id: 'input-addons-basic',
+    title: 'Prefix and suffix add-ons',
+    description: 'Статичные add-on-слоты (валюта, единицы измерения) внутри поля — общий layout поля при этом не меняется.',
     status: 'ready',
-    previewKey: 'ds-input-addons-width-guards',
+    previewKey: 'ds-input-addons-basic',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
 import { GrFormField, GrInput } from '@feugene/granularity'
 
 const amount = ref('12 540')
-const iban = ref('DE89 3704 0044 0532 0130 00')
+const weight = ref('68')
 </script>
 
 <template>
@@ -78,19 +78,55 @@ const iban = ref('DE89 3704 0044 0532 0130 00')
       </GrInput>
     </GrFormField>
 
-    <GrFormField label="Long add-ons with width guards">
-      <GrInput
-        v-model="iban"
-        placeholder="IBAN"
-        prefix-min-width="3rem"
-        prefix-max-width="7rem"
-        suffix-min-width="3rem"
-        suffix-max-width="8rem"
-      >
-        <template #prefix>International account</template>
-        <template #suffix>Primary settlement account</template>
+    <GrFormField label="Unit add-on">
+      <GrInput v-model="weight" placeholder="0">
+        <template #prefix>Weight</template>
+        <template #suffix>kg</template>
       </GrInput>
     </GrFormField>
+  </div>
+</template>`,
+  },
+  {
+    id: 'input-addon-slots-fit',
+    title: 'Add-on slots: fixed (clip) vs stretch',
+    description: 'Длинный контент в prefix/suffix больше не вылезает за рамки: в fixed-режиме аддон держит ширину и обрезает контент (prefix — справа, suffix — слева), в stretch — растягивается под контент. Два поля слева реактивно управляют содержимым аддонов.',
+    status: 'ready',
+    previewKey: 'ds-input-addon-slots',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrFormField, GrInput, GrSwitch } from '@feugene/granularity'
+
+const prefixText = ref('International account')
+const suffixText = ref('Primary settlement account')
+const targetValue = ref('DE89 3704 0044 0532 0130 00')
+const fixed = ref(true)
+</script>
+
+<template>
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid gap-3">
+      <GrFormField label="Prefix content">
+        <GrInput v-model="prefixText" />
+      </GrFormField>
+      <GrFormField label="Suffix content">
+        <GrInput v-model="suffixText" />
+      </GrFormField>
+      <GrSwitch v-model="fixed" size="sm">Fixed width (clip content)</GrSwitch>
+    </div>
+
+    <GrInput
+      v-model="targetValue"
+      placeholder="IBAN"
+      :prefix-fixed="fixed"
+      :suffix-fixed="fixed"
+      prefix-max-width="7rem"
+      suffix-max-width="8rem"
+    >
+      <template #prefix>{{ prefixText }}</template>
+      <template #suffix>{{ suffixText }}</template>
+    </GrInput>
   </div>
 </template>`,
   },

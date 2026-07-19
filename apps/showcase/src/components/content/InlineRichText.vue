@@ -88,7 +88,7 @@ const parts = computed(() => createParts(props.text))
       <GrLink
           v-else
           :href="part.href"
-          variant="primary"
+          tone="primary"
           class="font-semibold"
           target="_blank"
           rel="noreferrer"

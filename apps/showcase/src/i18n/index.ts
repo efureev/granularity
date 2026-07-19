@@ -28,7 +28,12 @@ export async function setupShowcaseI18n() {
   })
 
   i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK])
-  await i18n.loadUsedBlocks(defaultLocale)
+  // `PersistencePlugin` уже мог восстановить сохранённый в localStorage (`showcase-locale`)
+  // язык в `i18n.locale.value` во время `createFintI18n`. Грузим блоки именно для активного
+  // языка, а не для `defaultLocale`, иначе после перезагрузки страница остаётся на английском
+  // (fallback), пока переключатель показывает сохранённый ru. `preloadFallback: true` при этом
+  // догрузит en-fallback для отсутствующих ключей.
+  await i18n.loadUsedBlocks(i18n.locale.value)
 
   return {
     install(app: App) {
