@@ -77,6 +77,11 @@ function mergeApiSections(
 }
 
 export const generatedComponentEntities: ShowcaseEntityRegistryItem[] = Object.values(granularityComponentConfigs)
+  // Сервис-хосты (например, `GrDialogService`) регистрируются в granular-provider ради
+  // UnoCSS-safelist, но не являются документируемыми UI-компонентами: у них нет
+  // `<Name>/<Name>.vue`, поэтому генератор API их пропускает. Не показываем их в каталоге
+  // компонентов витрины — иначе они попадают как заглушки без props/demo.
+  .filter(config => Boolean((generatedComponentApiMetadata as Record<string, unknown>)[config.name]))
   .map((config): ShowcaseEntityRegistryItem => ({
     id: `component:${config.name}`,
     kind: 'component',

@@ -150,7 +150,7 @@ describe('showcase layout integration', () => {
     await flushPromises()
 
     expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(window.localStorage.getItem('fint-ds-theme')).toBe('dark')
+    expect(window.localStorage.getItem('gr-theme')).toBe('dark')
   })
 
   it('позволяет проверить theme-sensitive package demo без записи embedded state в localStorage', async () => {

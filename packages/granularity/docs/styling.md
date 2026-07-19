@@ -199,5 +199,4 @@ initThemeEarly() // до app.mount()
 const { theme, isDark, setTheme, toggleTheme } = useTheme()
 ```
 
-Выбор темы хранится в `localStorage` под ключом `gr-theme` (старый ключ
-`fint-ds-theme` читается один раз для миграции).
+Выбор темы хранится в `localStorage` под ключом `gr-theme`.

@@ -60,7 +60,7 @@ const sections = [
       </p>
     </div>
   </div>
-</template>\`,
+</template>`,
   },
   {
     id: 'sidebar-documentation-nav',
@@ -113,7 +113,7 @@ const activeSection = computed(() => {
       </div>
     </div>
   </div>
-</template>\`,
+</template>`,
   },
   {
     id: 'sidebar-filter-rail',
@@ -166,6 +166,6 @@ const filters = reactive({
       </div>
     </div>
   </div>
-</template>\`,
+</template>`,
   },
 ]

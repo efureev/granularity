@@ -18,9 +18,6 @@ export type UseThemeOptions = {
 }
 
 const DEFAULT_STORAGE_KEY = 'gr-theme'
-// Старый продуктовый ключ. Читаем его для миграции, если по `gr-theme` пусто,
-// но НЕ пишем в него (публичная DS не завязана на конкретный продукт).
-const LEGACY_STORAGE_KEY = 'fint-ds-theme'
 
 function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null {
   if (typeof window === 'undefined' || !persist) return null
@@ -33,12 +30,6 @@ function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null
 
     const stored = storage.getItem(storageKey)
     if (stored === 'light' || stored === 'dark') return stored
-
-    // Миграция со старого ключа `fint-ds-theme` (только для дефолтного ключа).
-    if (storageKey === DEFAULT_STORAGE_KEY) {
-      const legacy = storage.getItem(LEGACY_STORAGE_KEY)
-      if (legacy === 'light' || legacy === 'dark') return legacy
-    }
   }
   catch {
     // ignore

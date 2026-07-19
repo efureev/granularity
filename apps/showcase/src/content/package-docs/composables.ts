@@ -30,7 +30,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
         title: 'Parameters',
         origin: 'manual',
         items: [
-          { name: 'storageKey', type: 'string', description: 'Ключ в `localStorage`, по умолчанию `fint-ds-theme`.' },
+          { name: 'storageKey', type: 'string', description: 'Ключ в `localStorage`, по умолчанию `gr-theme`.' },
           { name: 'persist', type: 'boolean', description: 'Если `false`, composable не работает с `localStorage` и подходит для SSR/embedded сценариев.' },
         ],
       },
