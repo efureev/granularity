@@ -61,9 +61,9 @@ describe('GrToaster', () => {
     expect(icon).not.toBeNull()
 
     // Цвет приходит через inline-style на обёртке `GrIcon`.
-    const iconWrapper = icon?.closest('[data-ds-icon]') as HTMLElement | null
+    const iconWrapper = icon?.closest('[data-gr-icon]') as HTMLElement | null
     expect(iconWrapper).not.toBeNull()
-    expect(iconWrapper?.getAttribute('style')).toContain('color: var(--ds-success)')
+    expect(iconWrapper?.getAttribute('style')).toContain('color: var(--gr-success)')
   })
 
   it('контейнер — a11y-регион с aria-label, кастомизируется regionLabel', () => {
@@ -72,7 +72,7 @@ describe('GrToaster', () => {
       props: { regionLabel: 'Уведомления' },
     })
 
-    const region = document.body.querySelector('[data-ds-toaster]')
+    const region = document.body.querySelector('[data-gr-toaster]')
     expect(region).not.toBeNull()
     expect(region?.getAttribute('role')).toBe('region')
     expect(region?.getAttribute('aria-label')).toBe('Уведомления')
@@ -89,7 +89,7 @@ describe('GrToaster', () => {
     await nextTick()
 
     const items = Array.from(
-      document.body.querySelectorAll<HTMLElement>('[data-ds-toast]'),
+      document.body.querySelectorAll<HTMLElement>('[data-gr-toast]'),
     )
     const byVariant = Object.fromEntries(
       items.map(el => [el.getAttribute('data-tone'), el] as const),
@@ -102,7 +102,7 @@ describe('GrToaster', () => {
     expect(byVariant.danger.getAttribute('role')).toBe('alert')
 
     // Постоянный live-region — на обёртке списка (существует до вставки тостов).
-    const liveRegion = document.body.querySelector('[data-ds-toaster] [aria-live="polite"]')
+    const liveRegion = document.body.querySelector('[data-gr-toaster] [aria-live="polite"]')
     expect(liveRegion).not.toBeNull()
     expect(liveRegion?.contains(byVariant.info)).toBe(true)
   })
@@ -116,7 +116,7 @@ describe('GrToaster', () => {
     mount(GrToaster, { attachTo: document.body })
     await nextTick()
 
-    const region = document.body.querySelector('[data-ds-toaster]') as HTMLElement
+    const region = document.body.querySelector('[data-gr-toaster]') as HTMLElement
     region.dispatchEvent(new MouseEvent('mouseenter'))
     await nextTick()
 
@@ -142,7 +142,7 @@ describe('GrToaster', () => {
     mount(GrToaster, { attachTo: document.body, props: { maxVisible: 2 } })
     await nextTick()
 
-    expect(document.body.querySelectorAll('[data-ds-toast]').length).toBe(2)
+    expect(document.body.querySelectorAll('[data-gr-toast]').length).toBe(2)
   })
 
   it('placement применяет классы угла (bottom-left)', () => {
@@ -151,7 +151,7 @@ describe('GrToaster', () => {
       props: { placement: 'bottom-left' },
     })
 
-    const region = document.body.querySelector('[data-ds-toaster]') as HTMLElement
+    const region = document.body.querySelector('[data-gr-toaster]') as HTMLElement
     expect(region.className).toContain('left-4')
     expect(region.className).toContain('bottom-4')
     expect(region.className).not.toContain('right-4')

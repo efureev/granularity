@@ -62,16 +62,16 @@ describe('GrPromptDialog', () => {
       },
     })
 
-    expect(wrapper.find('[data-testid="ds-prompt-confirm"]').text()).toContain('Save')
+    expect(wrapper.find('[data-testid="gr-prompt-confirm"]').text()).toContain('Save')
 
-    await wrapper.find('[data-testid="ds-prompt-confirm"]').trigger('click')
+    await wrapper.find('[data-testid="gr-prompt-confirm"]').trigger('click')
     await nextTick()
 
     expect((wrapper.vm as any).onConfirm).not.toHaveBeenCalled()
     expect(wrapper.text()).toContain('Enter a value.')
 
-    await wrapper.find('[data-testid="ds-prompt-input"]').setValue('New name')
-    await wrapper.find('[data-testid="ds-prompt-confirm"]').trigger('click')
+    await wrapper.find('[data-testid="gr-prompt-input"]').setValue('New name')
+    await wrapper.find('[data-testid="gr-prompt-confirm"]').trigger('click')
     await nextTick()
 
     expect((wrapper.vm as any).onConfirm).toHaveBeenCalledWith('New name')
@@ -109,13 +109,13 @@ describe('GrPromptDialog', () => {
       },
     )
 
-    expect(wrapper.find('[data-ds-dialog-header]').classes()).toContain('px-4')
-    expect(wrapper.find('[data-ds-dialog-header]').classes()).toContain('py-2')
-    expect(wrapper.find('[data-ds-dialog-header]').classes()).not.toContain('border-b')
+    expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('px-4')
+    expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('py-2')
+    expect(wrapper.find('[data-gr-dialog-header]').classes()).not.toContain('border-b')
 
-    expect(wrapper.find('[data-ds-dialog-footer]').classes()).toContain('px-3')
-    expect(wrapper.find('[data-ds-dialog-footer]').classes()).toContain('py-1')
-    expect(wrapper.find('[data-ds-dialog-footer]').classes()).not.toContain('border-t')
+    expect(wrapper.find('[data-gr-dialog-footer]').classes()).toContain('px-3')
+    expect(wrapper.find('[data-gr-dialog-footer]').classes()).toContain('py-1')
+    expect(wrapper.find('[data-gr-dialog-footer]').classes()).not.toContain('border-t')
 
     wrapper.unmount()
   })
@@ -141,10 +141,10 @@ describe('GrPromptDialog', () => {
       },
     )
 
-    expect(wrapper.find('[data-testid="ds-prompt-cancel"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="ds-prompt-cancel"]').classes()).toContain('px-2.5')
-    expect(wrapper.find('[data-testid="ds-prompt-confirm"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="ds-prompt-confirm"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('h-7')
+    expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('h-7')
+    expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('px-2.5')
 
     wrapper.unmount()
   })

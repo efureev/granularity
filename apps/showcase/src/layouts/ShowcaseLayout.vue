@@ -23,6 +23,7 @@ import {
 import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 import type { ShowcaseNavigationItem, ShowcasePageName } from '../app/showcase'
 import type { ShowcaseEntityRegistryItem } from '../content/model'
+import { companionPackages } from '../content/companion/companionPackages'
 import ThemeSwitcher from '../components/ThemeSwitcher.vue'
 import ShowcaseHeader from '../components/layout/ShowcaseHeader.vue'
 import ShowcaseLocaleSwitcher from '../components/layout/ShowcaseLocaleSwitcher.vue'
@@ -162,6 +163,19 @@ const contextNavigationGroups = computed<SidebarNavigationGroup[]>(() => {
     ]
   }
 
+  // Extras: группа — companion-пакет, пункты — ссылки на его компоненты.
+  if (pageName === 'extras') {
+    return companionPackages.map(pkg => ({
+      id: `extras-${pkg.id}`,
+      title: pkg.label,
+      items: pkg.components.map(component => ({
+        id: component.slug,
+        label: component.title,
+        to: `/extras/${component.slug}`,
+      })),
+    }))
+  }
+
   const entities = getEntityCollection(pageName)
   const groups = new Map<string, ShowcaseEntityRegistryItem[]>()
 
@@ -229,11 +243,7 @@ function getSidebarItemClass(item: SidebarNavigationItem) {
     <ShowcaseHeader @open-mobile-navigation="isMobileNavigationOpen = true" />
 
     <div class="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[290px_minmax(0,1fr)] lg:px-8">
-      <ShowcaseSidebarNavigation
-        :eyebrow="localizedCurrentPage.shortTitle"
-        :title="currentTitle"
-        :groups="contextNavigationGroups"
-      />
+      <ShowcaseSidebarNavigation :groups="contextNavigationGroups"/>
 
       <main class="min-w-0 space-y-6">
         <div class="showcase-panel flex flex-wrap items-center gap-2 rounded-[24px] border px-4 py-3 text-sm">

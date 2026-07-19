@@ -6,7 +6,7 @@ export const grConfirmDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Destructive confirmation',
     description: 'Главный сценарий для `GrConfirmDialog`: destructive action с кастомным текстом и semantic `confirmTone` у confirm-кнопки.',
     status: 'ready',
-    previewKey: 'ds-confirm-dialog-destructive',
+    previewKey: 'gr-confirm-dialog-destructive',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -34,7 +34,7 @@ const open = ref(false)
     title: 'Compact action sizes',
     description: 'Отдельно проверяем `buttonSize`, `cancelText` и плотные approval flows.',
     status: 'ready',
-    previewKey: 'ds-confirm-dialog-button-matrix',
+    previewKey: 'gr-confirm-dialog-button-matrix',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -56,7 +56,7 @@ const open = ref(false)
     title: 'Imperative service (useDialogService)',
     description: 'Императивный вызов диалогов (`confirm`/`prompt`/`alert`) из `<script>`/`.ts` без вставки компонента в шаблон вынесен на отдельную страницу composable `useDialogService` — там собраны живые примеры и обработка ошибок сервера.',
     status: 'ready',
-    previewKey: 'ds-confirm-dialog-service-link',
+    previewKey: 'gr-confirm-dialog-service-link',
     code: `<script setup lang="ts">
 import { useDialogService } from '@feugene/granularity'
 
@@ -84,7 +84,7 @@ async function remove() {
     title: 'Custom summary body',
     description: 'Подтверждаем, что в confirm-shell можно выводить richer body через default slot, а не только plain description.',
     status: 'ready',
-    previewKey: 'ds-confirm-dialog-custom-body',
+    previewKey: 'gr-confirm-dialog-custom-body',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

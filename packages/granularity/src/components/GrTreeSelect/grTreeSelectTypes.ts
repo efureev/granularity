@@ -10,7 +10,7 @@ export type GrTreeSelectValueDisplay = 'label' | 'path'
 type NodeKeyProp<T> = keyof T & string
 
 /**
- * Пропсы публичного DS-примитива «TreeSelect».
+ * Пропсы публичного GR-примитива «TreeSelect».
  */
 export interface GrTreeSelectProps<T extends object = any> {
   modelValue: GrTreeSelectModelValue

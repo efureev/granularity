@@ -13,7 +13,7 @@ const notifications = ref(3)
     в контексте настоящего app-shell: хедер сверху + контент под ним.
     Не путайте с секционными заголовками страниц и marketing-навигацией.
   -->
-  <div class="overflow-hidden rounded-2xl border border-[var(--brd)] bg-[var(--bg)] shadow-[var(--ds-shadow-1)]">
+  <div class="overflow-hidden rounded-2xl border border-[var(--brd)] bg-[var(--bg)] shadow-[var(--gr-shadow-1)]">
     <GrNavbar title="Acme Console">
       <GrButton size="sm" variant="ghost" square aria-label="Search">
         <span class="i-lucide-search block h-4 w-4" aria-hidden="true" />

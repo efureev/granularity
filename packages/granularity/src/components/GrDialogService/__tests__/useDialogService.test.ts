@@ -43,16 +43,16 @@ async function flush(times = 4): Promise<void> {
 }
 
 function confirmButton(): HTMLElement | null {
-  return document.querySelector('[data-testid="ds-confirm-confirm"]')
+  return document.querySelector('[data-testid="gr-confirm-confirm"]')
 }
 function cancelButton(): HTMLElement | null {
-  return document.querySelector('[data-testid="ds-confirm-cancel"]')
+  return document.querySelector('[data-testid="gr-confirm-cancel"]')
 }
 function promptInput(): HTMLInputElement | null {
-  return document.querySelector('[data-testid="ds-prompt-input"]')
+  return document.querySelector('[data-testid="gr-prompt-input"]')
 }
 function promptConfirm(): HTMLElement | null {
-  return document.querySelector('[data-testid="ds-prompt-confirm"]')
+  return document.querySelector('[data-testid="gr-prompt-confirm"]')
 }
 
 afterEach(() => {
@@ -81,9 +81,9 @@ describe('useDialogService', () => {
     await flush()
 
     expect(document.body.textContent).toContain('Saved successfully')
-    expect(document.querySelector('[data-testid="ds-confirm-cancel"]')).toBeNull()
+    expect(document.querySelector('[data-testid="gr-confirm-cancel"]')).toBeNull()
 
-    document.querySelector<HTMLElement>('[data-testid="ds-alert-confirm"]')!.click()
+    document.querySelector<HTMLElement>('[data-testid="gr-alert-confirm"]')!.click()
     await expect(p).resolves.toBeUndefined()
   })
 
@@ -102,7 +102,7 @@ describe('useDialogService', () => {
     await flush()
     const p2 = dialogService.prompt('Enter again')
     await flush()
-    document.querySelector<HTMLElement>('[data-testid="ds-prompt-cancel"]')!.click()
+    document.querySelector<HTMLElement>('[data-testid="gr-prompt-cancel"]')!.click()
     await expect(p2).resolves.toBeNull()
   })
 

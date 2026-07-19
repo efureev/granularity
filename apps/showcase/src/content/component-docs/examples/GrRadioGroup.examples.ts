@@ -6,7 +6,7 @@ export const grRadioGroupExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Generated group from options list',
     description: 'Быстрый старт-сценарий для `options`: одна декларация массива сразу даёт полную radio-группу без ручного рендера каждого элемента.',
     status: 'ready',
-    previewKey: 'ds-radio-group-options',
+    previewKey: 'gr-radio-group-options',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -41,7 +41,7 @@ const selectedOption = computed(() => options.find(option => option.value === st
     title: 'Button tone with runtime size control',
     description: 'Группа переключается в button-mode и масштабируется через `size`, что особенно полезно для toolbar и page-view toggles.',
     status: 'ready',
-    previewKey: 'ds-radio-group-button-variant',
+    previewKey: 'gr-radio-group-button-variant',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -81,7 +81,7 @@ const viewOptions = [
     title: 'Custom slot content for per-option annotations',
     description: 'Когда у опций есть secondary badges и статусы, удобнее перейти от `options` к slot-based composition поверх `GrRadioGroup` + `GrRadio`.',
     status: 'ready',
-    previewKey: 'ds-radio-group-custom-slots',
+    previewKey: 'gr-radio-group-custom-slots',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

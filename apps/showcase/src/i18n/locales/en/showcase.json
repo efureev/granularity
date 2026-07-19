@@ -1,6 +1,6 @@
 {
   "header": {
-    "subtitle": "Component package showcase",
+    "subtitle": "Components package",
     "openNavigation": "Open navigation",
     "languageLabel": "Language",
     "versionLabel": "Package version",
@@ -69,7 +69,7 @@
       "title": "Foundations",
       "shortTitle": "Foundations",
       "eyebrow": "Showcase / Foundations",
-      "description": "Core onboarding docs: installation paths, styling layers, themes, tokens, UnoCSS, and localization.",
+      "description": "Core onboarding docs: installation paths, styling layers, themes, tokens, UnoCSS, and localization. Also covers two additional integration paths: the runtime adapter (createGranularity) and build-time auto-import (unplugin-granularity resolver).",
       "sections": {
         "installation": {
           "title": "Installation paths",
@@ -81,7 +81,7 @@
           ]
         },
         "styling": {
-          "title": "Styling, themes and tokens",
+          "title": "Styling layers",
           "description": "Shows the boundaries between foundation layers, theme files and design tokens.",
           "bullets": [
             "Real excerpts from `styling.md`, `tokens.css`, `light.css` and `dark.css` are wired in.",
@@ -89,13 +89,52 @@
             "The runtime contract is shown through `initThemeEarly()` and `useTheme()`."
           ]
         },
+        "themes": {
+          "title": "Themes"
+        },
+        "tokens": {
+          "title": "Tokens"
+        },
         "unocss": {
-          "title": "UnoCSS and localization",
+          "title": "UnoCSS integration",
           "description": "Covers the production preset path and the package's i18n contract for the host app.",
           "bullets": [
             "`presetGranularNode` from `@feugene/unocss-preset-granular/node` is the only supported way to wire it up.",
             "The localization narrative doc with the package-level i18n entrypoint is wired in.",
             "Foundations now serves as a real onboarding base rather than a placeholder section."
+          ]
+        },
+        "localization": {
+          "title": "Localization"
+        },
+        "vue-plugin": {
+          "title": "The `createGranularity` Vue plugin",
+          "description": "A lightweight runtime adapter from `@feugene/granularity/vue`: it registers components, directives, `provide` keys and `globalProperties` without losing tree-shaking — the module itself imports no components.",
+          "bullets": [
+            "`createGranularity({ components, directives, provides, globalProperties })` returns a standard Vue plugin for `app.use(...)`.",
+            "Supports three component forms: a plain SFC, an object with `install`, and an explicit `{ name, component }`.",
+            "The main use case is directives, `provide`, `globalProperties`, SSR/Nuxt plugins and bundler-less environments.",
+            "Typical cases: global directives (`v-hotkey`, `v-autofocus`), `provide` for i18n/theme, `globalProperties` for the Options API."
+          ]
+        },
+        "unplugin": {
+          "title": "Auto-import with `@feugene/unplugin-granularity`",
+          "description": "A separate build-time resolver package for `unplugin-vue-components`: it injects static `import`s for the package's granular subpath exports directly into SFCs.",
+          "bullets": [
+            "Write `<GrButton />` and `v-hotkey` in a template — the resolver adds the needed imports and pulls in component-level CSS.",
+            "Options: `prefix`, `importStyle`, `directives`, `exclude`; directives are resolved through an explicit whitelist.",
+            "Recommended for production apps: perfect tree-shaking and no manual `import`s.",
+            "Typical setup: the resolver together with `presetGranularNode` from `@feugene/unocss-preset-granular/node` to auto-import components in templates."
+          ]
+        },
+        "when-to-use": {
+          "title": "How to choose between the approaches",
+          "description": "The tools are orthogonal and typically used together: the resolver covers templates, the plugin covers directives outside templates, `provide` and globals.",
+          "bullets": [
+            "`@feugene/unplugin-granularity` is build-time and covers only what actually appears in `<template>`.",
+            "`@feugene/granularity/vue` is runtime and covers everything else: directives in `render()`/JSX, i18n/theme via `provide`, the Options API via `globalProperties`.",
+            "SSR / tests / environments without `unplugin-vue-components` — only through `createGranularity`.",
+            "Installing the package's CSS part is done exclusively through `presetGranularNode` — see Foundations / Installation paths."
           ]
         }
       }
@@ -240,40 +279,28 @@
         }
       }
     },
-    "integration": {
-      "title": "Integration",
-      "shortTitle": "Integration",
-      "eyebrow": "Showcase / Integration",
-      "description": "Two additional integration options: the runtime adapter `@feugene/granularity/vue` (`createGranularity`) and build-time auto-import via `@feugene/unplugin-granularity` (a `unplugin-vue-components` resolver).",
+    "extras": {
+      "title": "Extras",
+      "shortTitle": "Extras",
+      "eyebrow": "Showcase / Extras",
+      "description": "Components from companion packages of the granularity ecosystem: optional packages with their own dependency and release cycle, grouped by package.",
       "sections": {
-        "vue-plugin": {
-          "title": "The `createGranularity` Vue plugin",
-          "description": "A lightweight runtime adapter from `@feugene/granularity/vue`: it registers components, directives, `provide` keys and `globalProperties` without losing tree-shaking — the module itself imports no components.",
+        "catalog": {
+          "title": "Companion packages",
+          "description": "A catalog of components from optional packages, grouped by their source package.",
           "bullets": [
-            "`createGranularity({ components, directives, provides, globalProperties })` returns a standard Vue plugin for `app.use(...)`.",
-            "Supports three component forms: a plain SFC, an object with `install`, and an explicit `{ name, component }`.",
-            "The main use case is directives, `provide`, `globalProperties`, SSR/Nuxt plugins and bundler-less environments.",
-            "Typical cases: global directives (`v-hotkey`, `v-autofocus`), `provide` for i18n/theme, `globalProperties` for the Options API."
+            "The core @feugene/granularity stays lean — heavy dependencies live in companion packages.",
+            "The first companion package is @feugene/granularity-datepicker (date/time/range picker over @vuepic/vue-datepicker).",
+            "Every companion component gets its own page with live examples and API."
           ]
         },
-        "unplugin": {
-          "title": "Auto-import with `@feugene/unplugin-granularity`",
-          "description": "A separate build-time resolver package for `unplugin-vue-components`: it injects static `import`s for the package's granular subpath exports directly into SFCs.",
+        "live-examples": {
+          "title": "Live examples",
+          "description": "Each companion component reveals real scenarios, just like the core component pages.",
           "bullets": [
-            "Write `<GrButton />` and `v-hotkey` in a template — the resolver adds the needed imports and pulls in component-level CSS.",
-            "Options: `prefix`, `importStyle`, `directives`, `exclude`; directives are resolved through an explicit whitelist.",
-            "Recommended for production apps: perfect tree-shaking and no manual `import`s.",
-            "Typical setup: the resolver together with `presetGranularNode` from `@feugene/unocss-preset-granular/node` to auto-import components in templates."
-          ]
-        },
-        "when-to-use": {
-          "title": "How to choose between the approaches",
-          "description": "The tools are orthogonal and typically used together: the resolver covers templates, the plugin covers directives outside templates, `provide` and globals.",
-          "bullets": [
-            "`@feugene/unplugin-granularity` is build-time and covers only what actually appears in `<template>`.",
-            "`@feugene/granularity/vue` is runtime and covers everything else: directives in `render()`/JSX, i18n/theme via `provide`, the Options API via `globalProperties`.",
-            "SSR / tests / environments without `unplugin-vue-components` — only through `createGranularity`.",
-            "Installing the package's CSS part is done exclusively through `presetGranularNode` — see Foundations / Installation paths."
+            "Examples show the GR-owned wrapper contract, not the raw base-library API.",
+            "The snippet and live preview sit side by side.",
+            "Companion components are themed via the same GR tokens (light/dark)."
           ]
         }
       }
@@ -478,5 +505,20 @@
     "installSummaryTitle": "Installation at a glance",
     "installSummaryText": "Below is a short excerpt from the docs that helps you quickly pick an integration approach.",
     "installGuideExcerptTitle": "Installation guide excerpt"
+  },
+  "extrasPage": {
+    "catalogTitle": "Companion packages",
+    "catalogDescription": "Optional packages of the granularity ecosystem: installed separately, each with its own dependency and release cycle. The core @feugene/granularity stays lean.",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Filter companion components…",
+    "depsLabel": "deps:",
+    "emptyState": "Nothing found."
+  },
+  "extraDetailPage": {
+    "companionBadge": "Companion package",
+    "importTitle": "Import",
+    "backToExtras": "Back to companion packages",
+    "notFound": "Companion component not found.",
+    "notFoundLink": "Back to Extras"
   }
 }

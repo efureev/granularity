@@ -36,7 +36,7 @@ describe('granularity + fint-i18n (реальный инстанс)', () => {
     expect(wrapper.text()).toContain('Назад')
     expect(wrapper.text()).toContain('Вперёд')
 
-    const pageLabels = wrapper.findAll('[data-ds-pagination-page]').map(b => b.attributes('aria-label'))
+    const pageLabels = wrapper.findAll('[data-gr-pagination-page]').map(b => b.attributes('aria-label'))
     expect(pageLabels).toContain('Страница 6')
   })
 })

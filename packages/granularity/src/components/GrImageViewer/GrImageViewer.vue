@@ -648,7 +648,7 @@ onBeforeUnmount(() => {
             leave-to="opacity-0"
           >
             <div
-              data-ds-image-viewer-overlay
+              data-gr-image-viewer-overlay
               class="absolute inset-0 bg-black/60 backdrop-blur-sm"
               aria-hidden="true"
               @click="onBackdropClick"
@@ -665,7 +665,7 @@ onBeforeUnmount(() => {
             leave-to="opacity-0 scale-98"
           >
             <DialogPanel
-              data-ds-image-viewer-panel
+              data-gr-image-viewer-panel
               class="relative z-10 h-full w-full outline-none"
               tabindex="-1"
             >
@@ -674,7 +674,7 @@ onBeforeUnmount(() => {
                   <div class="flex items-center gap-2">
                     <div
                       v-if="showProgress"
-                      data-ds-image-viewer-progress
+                      data-gr-image-viewer-progress
                       class="rounded-full bg-black/35 px-3 py-1 text-xs font-600 text-white/95 sm:text-sm"
                     >
                       {{ displayIndex }} / {{ total }}
@@ -682,7 +682,7 @@ onBeforeUnmount(() => {
 
                     <div
                       v-if="showZoomValue"
-                      data-ds-image-viewer-zoom-value
+                      data-gr-image-viewer-zoom-value
                       class="rounded-full bg-black/35 px-3 py-1 text-xs font-700 text-white/95 sm:text-sm"
                     >
                       {{ zoomValueText }}%
@@ -691,7 +691,7 @@ onBeforeUnmount(() => {
 
                   <button
                     type="button"
-                    data-ds-image-viewer-close
+                    data-gr-image-viewer-close
                     :aria-label="resolvedCloseLabel"
                     class="h-11 w-11 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                     @click="closeViewer"
@@ -708,7 +708,7 @@ onBeforeUnmount(() => {
                 <button
                   v-if="total > 1"
                   type="button"
-                  data-ds-image-viewer-prev
+                  data-gr-image-viewer-prev
                   :aria-label="resolvedPrevLabel"
                   class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:left-6"
                   @click="prev"
@@ -719,7 +719,7 @@ onBeforeUnmount(() => {
                 <button
                   v-if="total > 1"
                   type="button"
-                  data-ds-image-viewer-next
+                  data-gr-image-viewer-next
                   :aria-label="resolvedNextLabel"
                   class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-6"
                   @click="next"
@@ -731,7 +731,7 @@ onBeforeUnmount(() => {
                   <img
                     v-if="currentUrl"
                     ref="imageEl"
-                    data-ds-image-viewer-image
+                    data-gr-image-viewer-image
                     :src="currentUrl"
                     alt=""
                     draggable="false"
@@ -747,7 +747,7 @@ onBeforeUnmount(() => {
 
                   <div
                     v-else
-                    class="rounded-[var(--ds-radius-xl)] border border-white/20 bg-black/25 px-4 py-3 text-sm text-white/80"
+                    class="rounded-[var(--gr-radius-xl)] border border-white/20 bg-black/25 px-4 py-3 text-sm text-white/80"
                   >
                     {{ resolvedEmptyText }}
                   </div>
@@ -763,7 +763,7 @@ onBeforeUnmount(() => {
                     <div class="rounded-full border border-white/20 bg-black/35 p-1 backdrop-blur-sm flex items-center gap-1">
                       <button
                         type="button"
-                        data-ds-image-viewer-zoom-out
+                        data-gr-image-viewer-zoom-out
                         :aria-label="resolvedZoomOutLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="zoomOut"
@@ -773,7 +773,7 @@ onBeforeUnmount(() => {
 
                       <button
                         type="button"
-                        data-ds-image-viewer-zoom-reset
+                        data-gr-image-viewer-zoom-reset
                         :aria-label="resolvedResetZoomLabel"
                         class="h-11 min-w-11 px-3 flex items-center justify-center rounded-full text-xs font-700 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="resetTransform"
@@ -783,7 +783,7 @@ onBeforeUnmount(() => {
 
                       <button
                         type="button"
-                        data-ds-image-viewer-zoom-in
+                        data-gr-image-viewer-zoom-in
                         :aria-label="resolvedZoomInLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="zoomIn"
@@ -806,7 +806,7 @@ onBeforeUnmount(() => {
 
                       <button
                         type="button"
-                        data-ds-image-viewer-rotate-left
+                        data-gr-image-viewer-rotate-left
                         :aria-label="resolvedRotateLeftLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="rotateLeft"
@@ -816,7 +816,7 @@ onBeforeUnmount(() => {
 
                       <button
                         type="button"
-                        data-ds-image-viewer-rotate-right
+                        data-gr-image-viewer-rotate-right
                         :aria-label="resolvedRotateRightLabel"
                         class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                         @click="rotateRight"

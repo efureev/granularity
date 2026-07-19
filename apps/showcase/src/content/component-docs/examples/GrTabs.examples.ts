@@ -6,7 +6,7 @@ export const grTabsExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic switching with controlled state',
     description: 'Базовый controlled-pattern: `GrTabs` хранит только выбранное значение, а содержимое панели принадлежит странице.',
     status: 'ready',
-    previewKey: 'ds-tabs-basic-switch',
+    previewKey: 'gr-tabs-basic-switch',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -45,7 +45,7 @@ const panelContent = computed(() => {
     title: 'Tabs with badges for queue-like navigation',
     description: 'Показываем `badge` не как украшение, а как часть операционного UI — очереди, ревью, blocked items и другие counters.',
     status: 'ready',
-    previewKey: 'ds-tabs-badge-navigation',
+    previewKey: 'gr-tabs-badge-navigation',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -76,7 +76,7 @@ const tabs = [
     title: 'Tabs as page-level panel switcher',
     description: 'Документируем ключевую идею: `GrTabs` — это navigation primitive, а не готовая система вкладочных панелей с собственной разметкой.',
     status: 'ready',
-    previewKey: 'ds-tabs-panel-layout',
+    previewKey: 'gr-tabs-panel-layout',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -104,7 +104,7 @@ const sectionTitle = computed(() => {
   <div class="grid gap-4">
     <GrTabs v-model="currentTab" :tabs="tabs" />
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 shadow-[var(--ds-shadow-1)]">
+    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 shadow-[var(--gr-shadow-1)]">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div class="text-sm font-600">{{ sectionTitle }}</div>

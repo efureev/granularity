@@ -6,7 +6,7 @@ export const grTextareaExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Default and expanded rows',
     description: 'Базовый сценарий для short-form и long-form контента: одна и та же textarea может быть компактной или сразу подготовленной под большой объём текста.',
     status: 'ready',
-    previewKey: 'ds-textarea-rows-layout',
+    previewKey: 'gr-textarea-rows-layout',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -33,7 +33,7 @@ const longNote = ref('This textarea starts taller and fits editorial copy, migra
     title: 'Success and validation states',
     description: 'Показываем state-driven оформление и связку с form-errors без искусственной ручной таблицы API.',
     status: 'ready',
-    previewKey: 'ds-textarea-validation-states',
+    previewKey: 'gr-textarea-validation-states',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -77,7 +77,7 @@ const invalid = ref(false)
     title: 'Disabled review and audit mode',
     description: 'Отдельно фиксируем, как `GrTextarea` выглядит в readonly-like review flow, когда поле временно недоступно для редактирования.',
     status: 'ready',
-    previewKey: 'ds-textarea-disabled-state',
+    previewKey: 'gr-textarea-disabled-state',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

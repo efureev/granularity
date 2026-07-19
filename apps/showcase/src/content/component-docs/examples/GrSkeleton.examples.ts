@@ -6,7 +6,7 @@ export const grSkeletonExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Text card placeholder',
     description: 'Базовый loading-surface для статей, карточек и описательных блоков: title + несколько строк контента.',
     status: 'ready',
-    previewKey: 'ds-skeleton-text-card',
+    previewKey: 'gr-skeleton-text-card',
     code: `<script setup lang="ts">
 import { GrCard, GrSkeleton } from '@feugene/granularity'
 </script>
@@ -25,7 +25,7 @@ import { GrCard, GrSkeleton } from '@feugene/granularity'
     title: 'Avatar/list row placeholders',
     description: 'Data-display сценарий для таблиц и списков: avatar, две текстовые строки и trailing action area.',
     status: 'ready',
-    previewKey: 'ds-skeleton-list-placeholder',
+    previewKey: 'gr-skeleton-list-placeholder',
     code: `<script setup lang="ts">
 import { GrSkeleton } from '@feugene/granularity'
 
@@ -46,7 +46,7 @@ const rows = [1, 2, 3]
     title: 'Dashboard and chart layout',
     description: 'Комбинируем разные размеры `GrSkeleton`, чтобы быстро собрать loading-layout для dashboard, chart и KPI blocks.',
     status: 'ready',
-    previewKey: 'ds-skeleton-dashboard-layout',
+    previewKey: 'gr-skeleton-dashboard-layout',
     code: `<script setup lang="ts">
 import { GrSkeleton } from '@feugene/granularity'
 </script>

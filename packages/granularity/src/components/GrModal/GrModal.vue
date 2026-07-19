@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrModal — DS-примитив модального окна на базе `@headlessui/vue`.
+ * GrModal — GR-примитив модального окна на базе `@headlessui/vue`.
  *
  * Публичный API:
  * - `modelValue` (v-model) — открыто/закрыто;
@@ -142,7 +142,7 @@ function onOverlayPointerDown(): void {
 
 // ————— Scroll lock на `<body>` на время открытия.
 // HeadlessUI Vue этого не делает автоматически, а фон скроллится —
-// для DS-примитива это мешающий UX.
+// для GR-примитива это мешающий UX.
 let savedBodyOverflow: string | null = null
 
 function lockBodyScroll(): void {
@@ -207,7 +207,7 @@ onBeforeUnmount(() => {
               :leave-to="overlayTransition.leaveTo"
             >
               <div
-                data-ds-modal-overlay
+                data-gr-modal-overlay
                 :class="overlayClass"
                 aria-hidden="true"
                 @pointerdown="onOverlayPointerDown"
@@ -225,14 +225,14 @@ onBeforeUnmount(() => {
             >
               <DialogPanel
                 ref="panelRef"
-                data-ds-modal-panel
+                data-gr-modal-panel
                 tabindex="-1"
                 :class="panelClass"
               >
-                <DialogTitle v-if="$slots.title" as="div" data-ds-modal-title>
+                <DialogTitle v-if="$slots.title" as="div" data-gr-modal-title>
                   <slot name="title" />
                 </DialogTitle>
-                <DialogDescription v-if="$slots.description" as="div" data-ds-modal-description>
+                <DialogDescription v-if="$slots.description" as="div" data-gr-modal-description>
                   <slot name="description" />
                 </DialogDescription>
                 <slot />

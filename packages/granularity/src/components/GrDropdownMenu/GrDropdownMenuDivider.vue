@@ -10,7 +10,7 @@ withDefaults(defineProps<GrDropdownMenuDividerProps>(), {
 
 <template>
   <div
-    data-ds-dropdown-menu-divider
+    data-gr-dropdown-menu-divider
     role="separator"
     class="border-t border-[var(--brd)]"
     :class="inset ? 'mx-2' : ''"

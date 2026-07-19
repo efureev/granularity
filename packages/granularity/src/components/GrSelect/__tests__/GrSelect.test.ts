@@ -48,7 +48,7 @@ describe('GrSelect', () => {
     // В link+native режиме link-стили (size/variant/underline) применяются к видимой
     // метке-обёртке, а не к нативному `<select>` (который сделан прозрачным overlay,
     // чтобы ширина компонента в закрытом состоянии равнялась выбранной опции, а не самой длинной).
-    const label = wrapper.get('[data-ds-select-link-label]')
+    const label = wrapper.get('[data-gr-select-link-label]')
     expect(label.attributes('class')).toContain('text-[12px]')
   })
 
@@ -93,7 +93,7 @@ describe('GrSelect', () => {
     expect(linkSelect.attributes('class')).toContain('opacity-0')
     expect(linkSelect.attributes('class')).toContain('cursor-pointer')
 
-    const linkLabel = linkWrapper.get('[data-ds-select-link-label]')
+    const linkLabel = linkWrapper.get('[data-gr-select-link-label]')
     expect(linkLabel.attributes('class')).toContain('inline-block')
     expect(linkLabel.attributes('class')).toContain('text-[var(--muted-fg)]')
     expect(linkLabel.attributes('class')).toContain('no-underline')
@@ -171,7 +171,7 @@ describe('GrSelect', () => {
       },
     })
 
-    const chevron = wrapper.get('[data-testid="ds-select-chevron"]')
+    const chevron = wrapper.get('[data-testid="gr-select-chevron"]')
     const select = wrapper.get('select')
 
     expect(chevron.attributes('class')).toContain('right-3')
@@ -192,7 +192,7 @@ describe('GrSelect', () => {
       },
     })
 
-    const chevron = wrapper.get('[data-testid="ds-select-chevron"]')
+    const chevron = wrapper.get('[data-testid="gr-select-chevron"]')
 
     expect(chevron.attributes('class')).toContain('shrink-0')
     expect(chevron.find('.i-lucide-chevron-down').exists()).toBe(true)
@@ -212,7 +212,7 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
     const eur = getTeleportedOptions().find((button) => button.textContent?.includes('EUR'))
@@ -238,7 +238,7 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-clear"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-clear"]').trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
   })
@@ -258,7 +258,7 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-clear"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-clear"]').trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
   })
@@ -278,14 +278,14 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
-    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="ds-select-custom-input"]'))
+    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="gr-select-custom-input"]'))
     await input.setValue('My custom')
     await nextTick()
 
-    expect(getTeleportedElement('[data-testid="ds-select-add-option"]').textContent).toContain('My custom')
+    expect(getTeleportedElement('[data-testid="gr-select-add-option"]').textContent).toContain('My custom')
 
     await input.trigger('keydown', { key: 'Enter' })
     await nextTick()
@@ -309,7 +309,7 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
     const options = getTeleportedOptions()
@@ -402,7 +402,7 @@ describe('GrSelect', () => {
       },
     })
 
-    expect(wrapper.get('[data-testid="ds-select-trigger"]').text()).toContain('Chengdu City')
+    expect(wrapper.get('[data-testid="gr-select-trigger"]').text()).toContain('Chengdu City')
   })
 
   it('в panel-режиме рендерит заголовки групп и опции, и эмитит выбор', async () => {
@@ -428,10 +428,10 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
-    const groupLabels = [...document.body.querySelectorAll('[data-ds-select-group-label]')]
+    const groupLabels = [...document.body.querySelectorAll('[data-gr-select-group-label]')]
       .map((el) => el.textContent?.trim())
     expect(groupLabels).toEqual(['Popular cities', 'City name'])
 
@@ -471,14 +471,14 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
-    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="ds-select-custom-input"]'))
+    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="gr-select-custom-input"]'))
     await input.setValue('Cheng')
     await nextTick()
 
-    const groupLabels = [...document.body.querySelectorAll('[data-ds-select-group-label]')]
+    const groupLabels = [...document.body.querySelectorAll('[data-gr-select-group-label]')]
       .map((el) => el.textContent?.trim())
     expect(groupLabels).toEqual(['City name'])
 
@@ -496,7 +496,7 @@ describe('GrSelect', () => {
       },
     })
 
-    expect(wrapper.get('[data-testid="ds-select-trigger"]').text()).toContain('optional')
+    expect(wrapper.get('[data-testid="gr-select-trigger"]').text()).toContain('optional')
   })
 
   it('без i18n-адаптера использует встроенные fallback-тексты, включая интерполяцию параметров', async () => {
@@ -512,16 +512,16 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
-    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="ds-select-custom-input"]'))
+    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="gr-select-custom-input"]'))
     expect(input.attributes('placeholder')).toBe('Add value…')
 
     await input.setValue('Wuhan')
     await nextTick()
 
-    const addButton = getTeleportedElement<HTMLButtonElement>('[data-testid="ds-select-add-option"]')
+    const addButton = getTeleportedElement<HTMLButtonElement>('[data-testid="gr-select-add-option"]')
     // `{value}` во fallback-строке должен быть интерполирован, а не остаться сырым плейсхолдером.
     expect(addButton.textContent?.trim()).toBe('Add "Wuhan"')
   })
@@ -581,10 +581,10 @@ describe('GrSelect', () => {
       },
     })
 
-    await wrapper.get('[data-testid="ds-select-trigger"]').trigger('click')
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
-    const options = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-ds-select-option]'))
+    const options = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-gr-select-option]'))
     const disabledOption = options.find(o => o.textContent?.includes('B'))!
     expect(disabledOption.disabled).toBe(true)
 

@@ -6,7 +6,7 @@ export const grFormFileExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Single file selection with summary state',
     description: 'Базовый сценарий показывает single-file поток: поле управляет выбором/заменой файла, а экран отдельно отображает business-friendly summary.',
     status: 'ready',
-    previewKey: 'ds-form-file-basic-selection',
+    previewKey: 'gr-form-file-basic-selection',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -46,7 +46,7 @@ const summary = computed(() => {
     title: 'Custom validation with surfaced errors',
     description: 'Отдельно фиксируем `validate`/`update:errors`: showcase должен показать, что `GrFormFile` подходит и для domain-specific upload rules, а не только для `accept`.',
     status: 'ready',
-    previewKey: 'ds-form-file-custom-validation',
+    previewKey: 'gr-form-file-custom-validation',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -107,7 +107,7 @@ function validateFiles(files: File[]) {
     title: 'Multiple attachment queue',
     description: 'Многофайловый режим раскрывает список выбранных файлов и подходит для attachment-очередей в support/review-формах.',
     status: 'ready',
-    previewKey: 'ds-form-file-multiple-queue',
+    previewKey: 'gr-form-file-multiple-queue',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 

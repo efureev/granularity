@@ -98,7 +98,7 @@ describe('GrLink', () => {
     expect(el.attributes('class')).not.toContain('focus-visible:ring-2')
   })
 
-  it('рендерит кастомный корень через проп `as` (с пробросом href/target/rel и DS-классов)', () => {
+  it('рендерит кастомный корень через проп `as` (с пробросом href/target/rel и GR-классов)', () => {
     const CustomLink = {
       name: 'CustomLink',
       props: ['href'],

@@ -20,7 +20,7 @@ const colsClass = computed(() => {
 
 <template>
   <div
-    data-ds-dropdown-menu-columns
+    data-gr-dropdown-menu-columns
     class="w-full grid divide-x divide-[var(--brd)]"
     :class="colsClass"
   >

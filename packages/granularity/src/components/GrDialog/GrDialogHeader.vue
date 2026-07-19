@@ -53,7 +53,7 @@ const showVisibleTitle = computed(() => !slots.default && !!resolvedTitle.value)
 </script>
 
 <template>
-  <div data-ds-dialog-header :class="rootClass">
+  <div data-gr-dialog-header :class="rootClass">
     <template v-if="slots.default">
       <div class="flex-1 min-w-0 flex items-center">
         <slot :title="resolvedTitle" />

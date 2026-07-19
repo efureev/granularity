@@ -6,7 +6,7 @@ export const grListExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Settings rows with actions',
     description: 'Базовый data-display сценарий: `GrList` + `GrListItem` собирают preference rows со secondary controls справа.',
     status: 'ready',
-    previewKey: 'ds-list-settings',
+    previewKey: 'gr-list-settings',
     code: `<script setup lang="ts">
 import { reactive } from 'vue'
 
@@ -28,7 +28,7 @@ const settings = reactive({ alerts: true })
     title: 'Queue rows with badges and buttons',
     description: 'Показываем `GrList` как lightweight alternative для job queues и task summaries, где справа нужны badges и compact buttons.',
     status: 'ready',
-    previewKey: 'ds-list-queue-actions',
+    previewKey: 'gr-list-queue-actions',
     code: `<script setup lang="ts">
 import { GrBadge, GrButton, GrList, GrListItem } from '@feugene/granularity'
 </script>
@@ -49,7 +49,7 @@ import { GrBadge, GrButton, GrList, GrListItem } from '@feugene/granularity'
     title: 'Empty state and undivided mode',
     description: 'Закрываем special data-display case: `GrList` может хостить richer placeholder/empty state, если отключить row dividers.',
     status: 'ready',
-    previewKey: 'ds-list-empty-state',
+    previewKey: 'gr-list-empty-state',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

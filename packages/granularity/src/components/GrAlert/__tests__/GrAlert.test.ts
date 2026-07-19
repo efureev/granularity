@@ -96,12 +96,12 @@ describe('GrAlert', () => {
 
     const alert = wrapper.get('[role="alert"]').element as HTMLDivElement
 
-    expect(alert.style.getPropertyValue('--ds-alert-bg')).toBe('#fffbeb')
-    expect(alert.style.getPropertyValue('--ds-alert-brd')).toBe('#fcd34d')
-    expect(alert.style.getPropertyValue('--ds-alert-icon-color')).toBe('#92400e')
-    expect(alert.style.getPropertyValue('--ds-alert-title-color')).toBe('#92400e')
-    expect(alert.style.getPropertyValue('--ds-alert-text-color')).toBe('#92400e')
-    expect(alert.style.getPropertyValue('--ds-alert-close-color')).toBe('#92400e')
+    expect(alert.style.getPropertyValue('--gr-alert-bg')).toBe('#fffbeb')
+    expect(alert.style.getPropertyValue('--gr-alert-brd')).toBe('#fcd34d')
+    expect(alert.style.getPropertyValue('--gr-alert-icon-color')).toBe('#92400e')
+    expect(alert.style.getPropertyValue('--gr-alert-title-color')).toBe('#92400e')
+    expect(alert.style.getPropertyValue('--gr-alert-text-color')).toBe('#92400e')
+    expect(alert.style.getPropertyValue('--gr-alert-close-color')).toBe('#92400e')
   })
 
   it('позволяет переопределить цвета через пропсы', () => {
@@ -121,12 +121,12 @@ describe('GrAlert', () => {
 
     const alert = wrapper.get('[role="alert"]').element as HTMLDivElement
 
-    expect(alert.style.getPropertyValue('--ds-alert-bg')).toBe('#111827')
-    expect(alert.style.getPropertyValue('--ds-alert-brd')).toBe('#22c55e')
-    expect(alert.style.getPropertyValue('--ds-alert-icon-color')).toBe('#f9fafb')
-    expect(alert.style.getPropertyValue('--ds-alert-title-color')).toBe('#f9fafb')
-    expect(alert.style.getPropertyValue('--ds-alert-text-color')).toBe('#f9fafb')
-    expect(alert.style.getPropertyValue('--ds-alert-close-color')).toBe('#f9fafb')
+    expect(alert.style.getPropertyValue('--gr-alert-bg')).toBe('#111827')
+    expect(alert.style.getPropertyValue('--gr-alert-brd')).toBe('#22c55e')
+    expect(alert.style.getPropertyValue('--gr-alert-icon-color')).toBe('#f9fafb')
+    expect(alert.style.getPropertyValue('--gr-alert-title-color')).toBe('#f9fafb')
+    expect(alert.style.getPropertyValue('--gr-alert-text-color')).toBe('#f9fafb')
+    expect(alert.style.getPropertyValue('--gr-alert-close-color')).toBe('#f9fafb')
   })
 
   it('поддерживает tones slate и azure', () => {
@@ -151,9 +151,9 @@ describe('GrAlert', () => {
     const slateAlert = slate.get('[role="alert"]').element as HTMLDivElement
     const azureAlert = azure.get('[role="alert"]').element as HTMLDivElement
 
-    expect(slateAlert.style.getPropertyValue('--ds-alert-bg')).toBe('var(--ds-slate-light)')
-    expect(slateAlert.style.getPropertyValue('--ds-alert-icon-color')).toBe('var(--ds-slate)')
-    expect(azureAlert.style.getPropertyValue('--ds-alert-bg')).toBe('var(--ds-azure-light)')
-    expect(azureAlert.style.getPropertyValue('--ds-alert-icon-color')).toBe('var(--ds-azure)')
+    expect(slateAlert.style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-slate-light)')
+    expect(slateAlert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-slate)')
+    expect(azureAlert.style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-azure-light)')
+    expect(azureAlert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-azure)')
   })
 })

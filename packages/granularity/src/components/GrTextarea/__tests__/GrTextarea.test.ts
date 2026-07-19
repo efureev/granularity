@@ -28,8 +28,8 @@ describe('GrTextarea', () => {
     const textarea = wrapper.get('textarea')
 
     expect(textarea.attributes('aria-invalid')).toBe('true')
-    expect(textarea.attributes('class')).toContain('border-[var(--ds-danger)]')
-    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--ds-danger)]')
+    expect(textarea.attributes('class')).toContain('border-[var(--gr-danger)]')
+    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-danger)]')
   })
 
   it('уважает rows и state для валидного значения', () => {
@@ -44,7 +44,7 @@ describe('GrTextarea', () => {
     const textarea = wrapper.get('textarea')
 
     expect(textarea.attributes('rows')).toBe('6')
-    expect(textarea.attributes('class')).toContain('border-[var(--ds-warning)]')
-    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--ds-warning)]')
+    expect(textarea.attributes('class')).toContain('border-[var(--gr-warning)]')
+    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-warning)]')
   })
 })

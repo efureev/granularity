@@ -15,8 +15,8 @@ describe('GrBadge', () => {
     })
 
     expect(wrapper.text()).toContain('Success')
-    expect(wrapper.attributes('class')).toContain('bg-[var(--ds-success-light)]')
-    expect(wrapper.attributes('class')).toContain('text-[var(--ds-success)]')
+    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-success-light)]')
+    expect(wrapper.attributes('class')).toContain('text-[var(--gr-success)]')
   })
 
   it('поддерживает size: sm / md / lg', () => {
@@ -36,7 +36,7 @@ describe('GrBadge', () => {
 
   it('поддерживает радиусы square / semi / round', () => {
     const square = mount(GrBadge, { props: { radius: 'square' }, slots: { default: 'Square' } })
-    expect(square.attributes('class')).toContain('rounded-[var(--ds-radius-none)]')
+    expect(square.attributes('class')).toContain('rounded-[var(--gr-radius-none)]')
 
     const semi = mount(GrBadge, {
       props: { radius: 'semi', size: 'lg' },
@@ -61,7 +61,7 @@ describe('GrBadge', () => {
       },
     })
 
-    expect(wrapper.attributes('class')).toContain('bg-[var(--ds-success)]')
+    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-success)]')
     expect(wrapper.attributes('class')).toContain('text-white')
     expect(wrapper.attributes('class')).toContain('rounded-[7px]')
   })
@@ -77,9 +77,9 @@ describe('GrBadge', () => {
       slots: { default: 'Azure' },
     })
 
-    expect(slate.attributes('class')).toContain('bg-[var(--ds-slate-light)]')
-    expect(slate.attributes('class')).toContain('text-[var(--ds-slate-text)]')
-    expect(azure.attributes('class')).toContain('bg-[var(--ds-azure)]')
-    expect(azure.attributes('class')).toContain('text-[var(--ds-azure-fg)]')
+    expect(slate.attributes('class')).toContain('bg-[var(--gr-slate-light)]')
+    expect(slate.attributes('class')).toContain('text-[var(--gr-slate-text)]')
+    expect(azure.attributes('class')).toContain('bg-[var(--gr-azure)]')
+    expect(azure.attributes('class')).toContain('text-[var(--gr-azure-fg)]')
   })
 })

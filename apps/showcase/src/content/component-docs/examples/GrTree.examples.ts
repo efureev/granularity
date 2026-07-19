@@ -6,7 +6,7 @@ export const grTreeExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Controlled expanded state and branch lines',
     description: 'Показываем `GrTree` как иерархический explorer, где внешняя orchestration управляет раскрытием групп и визуальными branch lines.',
     status: 'ready',
-    previewKey: 'ds-tree-expanded-state',
+    previewKey: 'gr-tree-expanded-state',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -42,7 +42,7 @@ const expandedKeys = ref([1, 2])
     title: 'Filtering through instance API',
     description: 'Фильтрацию важно показывать не как магический prop, а как реальную интеграцию через expose-метод `filter()` и внешний input.',
     status: 'ready',
-    previewKey: 'ds-tree-filtering',
+    previewKey: 'gr-tree-filtering',
     code: `<script setup lang="ts">
 import { ref, watch } from 'vue'
 
@@ -73,7 +73,7 @@ watch(query, value => treeRef.value?.filter(value), { immediate: true })
     title: 'Drag-and-drop with custom row slot',
     description: 'Комбинируем две важные возможности complex-дерева: rearrange drag-and-drop и кастомный рендер строки через default slot.',
     status: 'ready',
-    previewKey: 'ds-tree-drag-and-slot',
+    previewKey: 'gr-tree-drag-and-slot',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

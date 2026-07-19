@@ -56,6 +56,29 @@ export const showcaseComponentDetailSections: ShowcaseSection[] = [
   },
 ]
 
+export const showcaseExtraComponentDetailSections: ShowcaseSection[] = [
+  {
+    id: 'live-examples',
+    title: 'Live examples',
+    description: 'Реальные сценарии companion-компонента с live preview и snippet.',
+    bullets: [
+      'Каждая карточка раскрывает один аспект GR-owned обёртки.',
+      'Preview и код лежат рядом.',
+      'Темизация — через общие GR-токены (light/dark).',
+    ],
+  },
+  {
+    id: 'api',
+    title: 'API',
+    description: 'Публичный контракт обёртки: props, events и слоты (описаны вручную, без утечки типов базовой библиотеки).',
+    bullets: [
+      'Props отражают GR-owned контракт, а не сырое API базовой библиотеки.',
+      'Слоты/события пробрасываются прозрачно и документируются здесь.',
+      'Escape-hatch пропсы дают доступ к полному API базовой библиотеки при необходимости.',
+    ],
+  },
+]
+
 export const showcasePackageDetailSections: ShowcaseSection[] = [
   {
     id: 'overview',
@@ -168,7 +191,7 @@ export const showcasePages: ShowcasePage[] = [
     shortTitle: 'Foundations',
     eyebrow: 'Showcase / Foundations',
     status: 'ready',
-    description: 'Базовая onboarding-документация: installation paths, styling layers, themes, tokens, UnoCSS и localization.',
+    description: 'Базовая onboarding-документация: installation paths, styling layers, themes, tokens, UnoCSS, localization, а также два дополнительных способа интеграции — runtime-адаптер `createGranularity` и build-time авто-импорт `@feugene/unplugin-granularity`.',
     sections: [
       {
         id: 'installation',
@@ -182,35 +205,49 @@ export const showcasePages: ShowcasePage[] = [
       },
       {
         id: 'styling',
-        title: 'Styling, themes and tokens',
-        description: 'Показывает границы между foundation layers, theme files и design tokens.',
+        title: 'Styling layers',
+        description: 'Разделяет foundation-слои, theme CSS и component-level styles.',
         bullets: [
-          'Подключены реальные excerpts из `styling.md`, `tokens.css`, `light.css` и `dark.css`.',
-          'Есть явное разделение между `tokens`, theme layer и component-level CSS.',
-          'Показан runtime-контракт через `initThemeEarly()` и `useTheme()`.',
+          'Явное разделение между `tokens`, theme layer и component-level CSS.',
+          'Подключены реальные excerpts из `styling.md`.',
+        ],
+      },
+      {
+        id: 'themes',
+        title: 'Themes',
+        description: 'Встроенные `light`/`dark` темы отделены от foundation-токенов.',
+        bullets: [
+          'Theme layer задаёт semantic-значения (`--bg`, `--primary`, `--brd`) и статусные роли.',
+          'Интерактивный просмотр текущего theme-реестра прямо на странице.',
+        ],
+      },
+      {
+        id: 'tokens',
+        title: 'Tokens',
+        description: 'Стабильные дизайн-значения, не дублируемые по темам и компонентам.',
+        bullets: [
+          'Palette scale, typography, spacing, radii, elevation и motion.',
+          'Живёт отдельно от theme layer — базовый контракт переиспользуется.',
         ],
       },
       {
         id: 'unocss',
-        title: 'UnoCSS and localization',
-        description: 'Закрывает production preset path и i18n-контракт пакета для хост-приложения.',
+        title: 'UnoCSS integration',
+        description: 'Единственный поддерживаемый способ интеграции — `presetGranularNode`.',
         bullets: [
-          '`presetGranularNode` из `@feugene/unocss-preset-granular/node` — единственный поддерживаемый способ подключения.',
-          'Подключён narrative doc по localization с package-level i18n entrypoint.',
-          'Foundations теперь служит реальной onboarding-базой, а не placeholder-секцией.',
+          '`presetGranularNode` из `@feugene/unocss-preset-granular/node` подмешивает foundation layers, темы и component CSS.',
+          '`granularContent` настраивает авто-сканирование для subpath imports из `dist/`.',
         ],
       },
-    ],
-  },
-  {
-    name: 'integration',
-    path: '/integration',
-    title: 'Интеграция',
-    shortTitle: 'Integration',
-    eyebrow: 'Showcase / Integration',
-    status: 'ready',
-    description: 'Два дополнительных способа подключения: runtime-адаптер `@feugene/granularity/vue` (`createGranularity`) и build-time авто-импорт через `@feugene/unplugin-granularity` (резолвер `unplugin-vue-components`).',
-    sections: [
+      {
+        id: 'localization',
+        title: 'Localization',
+        description: 'Пакет не навязывает i18n-движок: источник правды переводов — приложение.',
+        bullets: [
+          'Компоненты читают переводы из хост-приложения, при отсутствии — встроенный fallback.',
+          'Localization описана как integration contract.',
+        ],
+      },
       {
         id: 'vue-plugin',
         title: 'Vue-плагин `createGranularity`',
@@ -283,6 +320,37 @@ export const showcasePages: ShowcasePage[] = [
           'Props, slots, events и expose/methods уже представлены в unified pending API format.',
           'Fallback metadata только там, где автогенерации недостаточно.',
           'Связка автогенерации с hand-authored demo-описаниями.',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'extras',
+    path: '/extras',
+    title: 'Extras',
+    shortTitle: 'Extras',
+    eyebrow: 'Showcase / Extras',
+    status: 'ready',
+    description: 'Компоненты из сопутствующих (companion) пакетов экосистемы granularity: опциональные пакеты со своей зависимостью и релизным циклом, сгруппированные по пакету.',
+    sections: [
+      {
+        id: 'catalog',
+        title: 'Companion packages',
+        description: 'Каталог компонентов из опциональных пакетов, сгруппированных по пакету-источнику.',
+        bullets: [
+          'Ядро `@feugene/granularity` остаётся lean — тяжёлые зависимости живут в companion-пакетах.',
+          'Первый companion-пакет — `@feugene/granularity-datepicker` (date/time/range picker поверх `@vuepic/vue-datepicker`).',
+          'Каждый companion-компонент получает отдельную страницу с live-примерами и API.',
+        ],
+      },
+      {
+        id: 'live-examples',
+        title: 'Live examples',
+        description: 'Каждый companion-компонент раскрывает реальные сценарии — так же, как страницы компонентов ядра.',
+        bullets: [
+          'Примеры показывают GR-owned контракт обёртки, а не сырое API базовой библиотеки.',
+          'Snippet и live preview лежат рядом.',
+          'Темизация companion-компонентов идёт через те же GR-токены (light/dark).',
         ],
       },
     ],

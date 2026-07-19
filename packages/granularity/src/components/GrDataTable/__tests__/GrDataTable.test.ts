@@ -95,9 +95,9 @@ describe('GrDataTable', () => {
       props: { columns, rows: [] },
       slots: { empty: () => 'Ничего не найдено' },
     })
-    expect(wrapper.find('[data-ds-datatable-empty]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-datatable-empty]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Ничего не найдено')
-    expect(wrapper.findAll('[data-ds-datatable-row]')).toHaveLength(0)
+    expect(wrapper.findAll('[data-gr-datatable-row]')).toHaveLength(0)
   })
 
   it('прокидывает ariaLabel и caption в GrTable', () => {
@@ -116,6 +116,6 @@ describe('GrDataTable', () => {
         rowKey: (row: { id: number }) => `row-${row.id}`,
       },
     })
-    expect(wrapper.findAll('[data-ds-datatable-row]')).toHaveLength(3)
+    expect(wrapper.findAll('[data-gr-datatable-row]')).toHaveLength(3)
   })
 })

@@ -6,7 +6,7 @@ export const grCollapseExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Accordion with controlled active item',
     description: 'Базовый controlled-сценарий: в `accordion` режиме одновременно открыт только один раздел, а текущий state можно вывести рядом.',
     status: 'ready',
-    previewKey: 'ds-collapse-accordion-flow',
+    previewKey: 'gr-collapse-accordion-flow',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -48,7 +48,7 @@ const activeLabel = computed(() => {
     title: 'Multi-expand sections with custom title slot',
     description: 'Показываем `accordion = false`, массив в `v-model` и richer `title` slot для badge/counter сценариев.',
     status: 'ready',
-    previewKey: 'ds-collapse-multi-section',
+    previewKey: 'gr-collapse-multi-section',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -75,7 +75,7 @@ const expanded = ref<Array<string | number>>(['summary', 'alerts'])
     title: 'Parent disabled mode and item-level guard',
     description: 'Отдельно проверяем whole-group `disabled` и `disabled` на уровне конкретного `GrCollapseItem`.',
     status: 'ready',
-    previewKey: 'ds-collapse-disabled-state',
+    previewKey: 'gr-collapse-disabled-state',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

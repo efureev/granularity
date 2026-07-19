@@ -28,7 +28,7 @@ const props = withDefaults(
       {{ props.label }}
     </label>
     <slot />
-    <div v-if="props.error" class="text-sm text-[var(--ds-danger)]">
+    <div v-if="props.error" class="text-sm text-[var(--gr-danger)]">
       {{ props.error }}
     </div>
   </div>

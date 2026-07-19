@@ -6,7 +6,7 @@ export const grCheckboxExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Checked, unchecked and locked states',
     description: 'Показываем базовую матрицу состояний: управляемые чекбоксы, отдельный disabled-case и компактную сводку по текущему выбору.',
     status: 'ready',
-    previewKey: 'ds-checkbox-state-matrix',
+    previewKey: 'gr-checkbox-state-matrix',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -55,7 +55,7 @@ const enabledCount = computed(() => [weeklyDigest.value, incidentAlerts.value].f
     title: 'Interactive content inside the label slot',
     description: 'Отдельный сценарий фиксирует важную интеграционную деталь: ссылки и кнопки внутри slot-контента не должны случайно переключать чекбокс.',
     status: 'ready',
-    previewKey: 'ds-checkbox-interactive-label',
+    previewKey: 'gr-checkbox-interactive-label',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -101,7 +101,7 @@ const previewOpens = ref(0)
     title: 'Native form submission semantics',
     description: 'Показываем, какие `name`/`value` пары реально уходят в `FormData`, чтобы поведение чекбокса было предсказуемо в обычных формах и без обвязки form-library.',
     status: 'ready',
-    previewKey: 'ds-checkbox-native-form',
+    previewKey: 'gr-checkbox-native-form',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

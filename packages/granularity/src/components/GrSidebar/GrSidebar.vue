@@ -77,14 +77,14 @@ const resolvedToggleLabel = computed(() =>
 
 <template>
   <aside
-    data-ds-sidebar
+    data-gr-sidebar
     :data-collapsed="collapsedState ? 'true' : undefined"
     class="flex flex-col border-r border-[var(--sidebar-brd)] bg-[var(--sidebar)] text-[var(--sidebar-fg)] transition-[width] duration-200 ease-out"
     :style="asideStyle"
   >
     <div
       v-if="showHeader"
-      data-ds-sidebar-header
+      data-gr-sidebar-header
       class="flex items-center gap-2 border-b border-[var(--sidebar-brd)] px-3 py-4"
       :class="collapsedState ? 'justify-center' : 'justify-between'"
     >
@@ -94,7 +94,7 @@ const resolvedToggleLabel = computed(() =>
       >
         <div
           v-if="$slots.subtitle || hasSubtitle"
-          data-ds-sidebar-subtitle
+          data-gr-sidebar-subtitle
           class="truncate text-[14px] text-[var(--muted-fg)]"
         >
           <slot name="subtitle">
@@ -103,7 +103,7 @@ const resolvedToggleLabel = computed(() =>
         </div>
         <div
           v-if="$slots.title || hasTitle"
-          data-ds-sidebar-title
+          data-gr-sidebar-title
           class="truncate text-[18px] font-700"
         >
           <slot name="title">
@@ -114,7 +114,7 @@ const resolvedToggleLabel = computed(() =>
 
       <GrButton
         v-if="showToggleButton"
-        data-ds-sidebar-toggle
+        data-gr-sidebar-toggle
         variant="ghost"
         size="sm"
         square

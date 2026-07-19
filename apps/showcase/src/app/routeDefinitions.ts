@@ -3,9 +3,10 @@ import type { RouteRecordRaw } from 'vue-router'
 export const showcaseLazyPageLoaders = {
   overview: () => import('../pages/OverviewPage.vue'),
   foundations: () => import('../pages/FoundationsPage.vue'),
-  integration: () => import('../pages/IntegrationPage.vue'),
   components: () => import('../pages/ComponentsPage.vue'),
   componentDetail: () => import('../pages/ComponentDetailPage.vue'),
+  extras: () => import('../pages/ExtrasPage.vue'),
+  extraComponentDetail: () => import('../pages/ExtraComponentDetailPage.vue'),
   packageEntityDetail: () => import('../pages/PackageEntityDetailPage.vue'),
   directives: () => import('../pages/DirectivesPage.vue'),
   composables: () => import('../pages/ComposablesPage.vue'),
@@ -24,11 +25,6 @@ export const showcaseChildRoutes = [
     component: showcaseLazyPageLoaders.foundations,
   },
   {
-    path: 'integration',
-    name: 'integration',
-    component: showcaseLazyPageLoaders.integration,
-  },
-  {
     path: 'components',
     name: 'components',
     component: showcaseLazyPageLoaders.components,
@@ -37,6 +33,16 @@ export const showcaseChildRoutes = [
     path: 'components/:componentSlug',
     name: 'component-detail',
     component: showcaseLazyPageLoaders.componentDetail,
+  },
+  {
+    path: 'extras',
+    name: 'extras',
+    component: showcaseLazyPageLoaders.extras,
+  },
+  {
+    path: 'extras/:componentSlug',
+    name: 'extra-component-detail',
+    component: showcaseLazyPageLoaders.extraComponentDetail,
   },
   {
     path: 'directives',

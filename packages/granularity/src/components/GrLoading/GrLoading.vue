@@ -19,7 +19,7 @@ export interface GrLoadingProps {
   spinner?: Component
   /** Extra classes for the spinner element. */
   spinnerClass?: string
-  /** When `true` (default), the default spinner rotates via `@keyframes ds-loading-spin`. */
+  /** When `true` (default), the default spinner rotates via `@keyframes gr-loading-spin`. */
   animated?: boolean
   /** Custom CSS `background-color`. When set, disables the default `bg-black/25` dim. */
   background?: string
@@ -69,7 +69,7 @@ const spinnerClassName = computed(() => props.spinnerClass)
 
 <template>
   <div
-    data-ds-loading
+    data-gr-loading
     class="flex items-center justify-center cursor-wait select-none pointer-events-auto"
     :class="rootClass"
     :style="rootStyle"
@@ -77,17 +77,17 @@ const spinnerClassName = computed(() => props.spinnerClass)
     aria-live="polite"
   >
     <div
-      data-ds-loading-panel
+      data-gr-loading-panel
       class="flex flex-col items-center justify-center gap-2 text-center rounded-lg bg-[var(--bg)]/55 px-5 py-4 shadow-lg"
     >
       <component
         :is="Spinner"
-        data-ds-loading-spinner
-        class="ds-loading__spinner h-7 w-7 text-[var(--muted-fg)]"
-        :class="[animated ? 'ds-loading__spinner--animated' : '', spinnerClassName]"
+        data-gr-loading-spinner
+        class="gr-loading__spinner h-7 w-7 text-[var(--muted-fg)]"
+        :class="[animated ? 'gr-loading__spinner--animated' : '', spinnerClassName]"
         aria-hidden="true"
       />
-      <div v-if="displayText" data-ds-loading-text class="text-sm text-[var(--muted-fg)]">
+      <div v-if="displayText" data-gr-loading-text class="text-sm text-[var(--muted-fg)]">
         {{ displayText }}
       </div>
     </div>
@@ -95,13 +95,13 @@ const spinnerClassName = computed(() => props.spinnerClass)
 </template>
 
 <style>
-@keyframes ds-loading-spin {
+@keyframes gr-loading-spin {
   to {
     transform: rotate(360deg);
   }
 }
-.ds-loading__spinner--animated {
+.gr-loading__spinner--animated {
   transform-origin: center;
-  animation: ds-loading-spin 1s linear infinite;
+  animation: gr-loading-spin 1s linear infinite;
 }
 </style>

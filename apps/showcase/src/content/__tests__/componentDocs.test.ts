@@ -21,7 +21,7 @@ describe('component docs metadata', () => {
     ])
     expect(doc.examples).toHaveLength(2)
     expect(doc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(doc.examples.every(example => example.previewKey?.startsWith('ds-button'))).toBe(true)
+    expect(doc.examples.every(example => example.previewKey?.startsWith('gr-button'))).toBe(true)
   })
 
   it('возвращает live-scenarios для `GrSelect` и `GrFileUpload`, а не fallback metadata', () => {
@@ -36,11 +36,11 @@ describe('component docs metadata', () => {
 
     expect(selectDoc.examples).toHaveLength(5)
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(selectDoc.examples.every(example => example.previewKey?.startsWith('ds-select'))).toBe(true)
+    expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
     expect(fileUploadDoc.examples).toHaveLength(6)
     expect(fileUploadDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(fileUploadDoc.examples.every(example => example.previewKey?.startsWith('ds-file-upload'))).toBe(true)
+    expect(fileUploadDoc.examples.every(example => example.previewKey?.startsWith('gr-file-upload'))).toBe(true)
   })
 
   it('возвращает live-scenarios для complex-компонентов `GrModal`, `GrDropdown` и `GrDataTable`', () => {
@@ -58,15 +58,15 @@ describe('component docs metadata', () => {
 
     expect(modalDoc.examples).toHaveLength(4)
     expect(modalDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(modalDoc.examples.every(example => example.previewKey?.startsWith('ds-modal'))).toBe(true)
+    expect(modalDoc.examples.every(example => example.previewKey?.startsWith('gr-modal'))).toBe(true)
 
     expect(dropdownDoc.examples).toHaveLength(3)
     expect(dropdownDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('ds-dropdown'))).toBe(true)
+    expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown'))).toBe(true)
 
     expect(dataTableDoc.examples).toHaveLength(3)
     expect(dataTableDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('ds-data-table'))).toBe(true)
+    expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('gr-data-table'))).toBe(true)
   })
 
   it('возвращает live-scenarios для `GrPagination`, `GrTabs` и `GrTooltip`', () => {
@@ -84,15 +84,15 @@ describe('component docs metadata', () => {
 
     expect(paginationDoc.examples).toHaveLength(3)
     expect(paginationDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('ds-pagination'))).toBe(true)
+    expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('gr-pagination'))).toBe(true)
 
     expect(tabsDoc.examples).toHaveLength(3)
     expect(tabsDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(tabsDoc.examples.every(example => example.previewKey?.startsWith('ds-tabs'))).toBe(true)
+    expect(tabsDoc.examples.every(example => example.previewKey?.startsWith('gr-tabs'))).toBe(true)
 
     expect(tooltipDoc.examples).toHaveLength(3)
     expect(tooltipDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(tooltipDoc.examples.every(example => example.previewKey?.startsWith('ds-tooltip'))).toBe(true)
+    expect(tooltipDoc.examples.every(example => example.previewKey?.startsWith('gr-tooltip'))).toBe(true)
   })
 
   it('возвращает live-scenarios для `GrTree` и `GrTreeSelect`', () => {
@@ -107,11 +107,11 @@ describe('component docs metadata', () => {
 
     expect(treeDoc.examples).toHaveLength(3)
     expect(treeDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(treeDoc.examples.every(example => example.previewKey?.startsWith('ds-tree'))).toBe(true)
+    expect(treeDoc.examples.every(example => example.previewKey?.startsWith('gr-tree'))).toBe(true)
 
     expect(treeSelectDoc.examples).toHaveLength(3)
     expect(treeSelectDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(treeSelectDoc.examples.every(example => example.previewKey?.startsWith('ds-tree-select'))).toBe(true)
+    expect(treeSelectDoc.examples.every(example => example.previewKey?.startsWith('gr-tree-select'))).toBe(true)
   })
 
   it('выводит интерактивный builder первым live-example для `GrSwitch`', () => {
@@ -124,11 +124,11 @@ describe('component docs metadata', () => {
     expect(doc.examples).toHaveLength(4)
     expect(doc.examples[0]).toMatchObject({
       id: 'switch-builder',
-      previewKey: 'ds-switch-builder',
+      previewKey: 'gr-switch-builder',
       code: '',
       status: 'ready',
     })
-    expect(doc.examples.every(example => example.previewKey?.startsWith('ds-switch'))).toBe(true)
+    expect(doc.examples.every(example => example.previewKey?.startsWith('gr-switch'))).toBe(true)
   })
 
   it('возвращает live-scenarios для `GrSegmented` с корректными preview keys', () => {
@@ -140,7 +140,7 @@ describe('component docs metadata', () => {
 
     expect(doc.examples).toHaveLength(4)
     expect(doc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(doc.examples.every(example => example.previewKey?.startsWith('ds-segmented'))).toBe(true)
+    expect(doc.examples.every(example => example.previewKey?.startsWith('gr-segmented'))).toBe(true)
   })
 
   it('возвращает live-scenarios для form-controls `GrInput`, `GrNumberInput`, `GrTextarea` и `GrSwitch`', () => {
@@ -161,19 +161,19 @@ describe('component docs metadata', () => {
 
     expect(inputDoc.examples).toHaveLength(4)
     expect(inputDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(inputDoc.examples.every(example => example.previewKey?.startsWith('ds-input'))).toBe(true)
+    expect(inputDoc.examples.every(example => example.previewKey?.startsWith('gr-input'))).toBe(true)
 
     expect(numberInputDoc.examples).toHaveLength(3)
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('ds-number-input'))).toBe(true)
+    expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 
     expect(textareaDoc.examples).toHaveLength(3)
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('ds-textarea'))).toBe(true)
+    expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 
     expect(switchDoc.examples).toHaveLength(4)
     expect(switchDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(switchDoc.examples.every(example => example.previewKey?.startsWith('ds-switch'))).toBe(true)
+    expect(switchDoc.examples.every(example => example.previewKey?.startsWith('gr-switch'))).toBe(true)
   })
 
   it('возвращает live-scenarios для navigation batch `GrBottomNav`, `GrNavbar` и `GrSidebar`', () => {
@@ -191,15 +191,15 @@ describe('component docs metadata', () => {
 
     expect(bottomNavDoc.examples).toHaveLength(3)
     expect(bottomNavDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(bottomNavDoc.examples.every(example => example.previewKey?.startsWith('ds-bottom-nav'))).toBe(true)
+    expect(bottomNavDoc.examples.every(example => example.previewKey?.startsWith('gr-bottom-nav'))).toBe(true)
 
     expect(navbarDoc.examples).toHaveLength(3)
     expect(navbarDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(navbarDoc.examples.every(example => example.previewKey?.startsWith('ds-navbar'))).toBe(true)
+    expect(navbarDoc.examples.every(example => example.previewKey?.startsWith('gr-navbar'))).toBe(true)
 
     expect(sidebarDoc.examples).toHaveLength(3)
     expect(sidebarDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(sidebarDoc.examples.every(example => example.previewKey?.startsWith('ds-sidebar'))).toBe(true)
+    expect(sidebarDoc.examples.every(example => example.previewKey?.startsWith('gr-sidebar'))).toBe(true)
   })
 
   it('возвращает live-scenarios для overlay batch `GrDialog`, `GrDrawer`, `GrConfirmDialog`, `GrPromptDialog`, `GrToaster` и `GrLoading`', () => {
@@ -226,27 +226,27 @@ describe('component docs metadata', () => {
 
     expect(dialogDoc.examples).toHaveLength(3)
     expect(dialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(dialogDoc.examples.every(example => example.previewKey?.startsWith('ds-dialog'))).toBe(true)
+    expect(dialogDoc.examples.every(example => example.previewKey?.startsWith('gr-dialog'))).toBe(true)
 
     expect(drawerDoc.examples).toHaveLength(3)
     expect(drawerDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(drawerDoc.examples.every(example => example.previewKey?.startsWith('ds-drawer'))).toBe(true)
+    expect(drawerDoc.examples.every(example => example.previewKey?.startsWith('gr-drawer'))).toBe(true)
 
     expect(confirmDialogDoc.examples).toHaveLength(4)
     expect(confirmDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(confirmDialogDoc.examples.every(example => example.previewKey?.startsWith('ds-confirm-dialog'))).toBe(true)
+    expect(confirmDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-confirm-dialog'))).toBe(true)
 
     expect(promptDialogDoc.examples).toHaveLength(4)
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('ds-prompt-dialog'))).toBe(true)
+    expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-prompt-dialog'))).toBe(true)
 
     expect(toasterDoc.examples).toHaveLength(3)
     expect(toasterDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('ds-toaster'))).toBe(true)
+    expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('gr-toaster'))).toBe(true)
 
     expect(loadingDoc.examples).toHaveLength(3)
     expect(loadingDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(loadingDoc.examples.every(example => example.previewKey?.startsWith('ds-loading'))).toBe(true)
+    expect(loadingDoc.examples.every(example => example.previewKey?.startsWith('gr-loading'))).toBe(true)
   })
 
   it('возвращает live-scenarios для feedback/state batch `GrCollapse`, `GrEmptyState`, `GrProgressBar` и `GrSkeleton`', () => {
@@ -267,19 +267,19 @@ describe('component docs metadata', () => {
 
     expect(collapseDoc.examples).toHaveLength(3)
     expect(collapseDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(collapseDoc.examples.every(example => example.previewKey?.startsWith('ds-collapse'))).toBe(true)
+    expect(collapseDoc.examples.every(example => example.previewKey?.startsWith('gr-collapse'))).toBe(true)
 
     expect(emptyStateDoc.examples).toHaveLength(3)
     expect(emptyStateDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(emptyStateDoc.examples.every(example => example.previewKey?.startsWith('ds-empty-state'))).toBe(true)
+    expect(emptyStateDoc.examples.every(example => example.previewKey?.startsWith('gr-empty-state'))).toBe(true)
 
     expect(progressBarDoc.examples).toHaveLength(3)
     expect(progressBarDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(progressBarDoc.examples.every(example => example.previewKey?.startsWith('ds-progress-bar'))).toBe(true)
+    expect(progressBarDoc.examples.every(example => example.previewKey?.startsWith('gr-progress-bar'))).toBe(true)
 
     expect(skeletonDoc.examples).toHaveLength(3)
     expect(skeletonDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(skeletonDoc.examples.every(example => example.previewKey?.startsWith('ds-skeleton'))).toBe(true)
+    expect(skeletonDoc.examples.every(example => example.previewKey?.startsWith('gr-skeleton'))).toBe(true)
   })
 
   it('возвращает live-scenarios для remaining form/helper batch `GrFormFile`, `GrFormSection` и `GrInputTag`', () => {
@@ -297,15 +297,15 @@ describe('component docs metadata', () => {
 
     expect(formFileDoc.examples).toHaveLength(3)
     expect(formFileDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(formFileDoc.examples.every(example => example.previewKey?.startsWith('ds-form-file'))).toBe(true)
+    expect(formFileDoc.examples.every(example => example.previewKey?.startsWith('gr-form-file'))).toBe(true)
 
     expect(formSectionDoc.examples).toHaveLength(3)
     expect(formSectionDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(formSectionDoc.examples.every(example => example.previewKey?.startsWith('ds-form-section'))).toBe(true)
+    expect(formSectionDoc.examples.every(example => example.previewKey?.startsWith('gr-form-section'))).toBe(true)
 
     expect(inputTagDoc.examples).toHaveLength(3)
     expect(inputTagDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(inputTagDoc.examples.every(example => example.previewKey?.startsWith('ds-input-tag'))).toBe(true)
+    expect(inputTagDoc.examples.every(example => example.previewKey?.startsWith('gr-input-tag'))).toBe(true)
   })
 
   it('возвращает live-scenarios для remaining composition/primitives batch `GrButtonGroup`, `GrDropdownMenu`, `GrIcon`, `GrLink`, `GrList` и `GrTable`', () => {
@@ -332,27 +332,27 @@ describe('component docs metadata', () => {
 
     expect(buttonGroupDoc.examples).toHaveLength(3)
     expect(buttonGroupDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(buttonGroupDoc.examples.every(example => example.previewKey?.startsWith('ds-button-group'))).toBe(true)
+    expect(buttonGroupDoc.examples.every(example => example.previewKey?.startsWith('gr-button-group'))).toBe(true)
 
     expect(dropdownMenuDoc.examples).toHaveLength(3)
     expect(dropdownMenuDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(dropdownMenuDoc.examples.every(example => example.previewKey?.startsWith('ds-dropdown-menu'))).toBe(true)
+    expect(dropdownMenuDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown-menu'))).toBe(true)
 
     expect(iconDoc.examples).toHaveLength(3)
     expect(iconDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(iconDoc.examples.every(example => example.previewKey?.startsWith('ds-icon'))).toBe(true)
+    expect(iconDoc.examples.every(example => example.previewKey?.startsWith('gr-icon'))).toBe(true)
 
     expect(linkDoc.examples).toHaveLength(4)
     expect(linkDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(linkDoc.examples.every(example => example.previewKey?.startsWith('ds-link'))).toBe(true)
+    expect(linkDoc.examples.every(example => example.previewKey?.startsWith('gr-link'))).toBe(true)
 
     expect(listDoc.examples).toHaveLength(3)
     expect(listDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(listDoc.examples.every(example => example.previewKey?.startsWith('ds-list'))).toBe(true)
+    expect(listDoc.examples.every(example => example.previewKey?.startsWith('gr-list'))).toBe(true)
 
     expect(tableDoc.examples).toHaveLength(3)
     expect(tableDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(tableDoc.examples.every(example => example.previewKey?.startsWith('ds-table'))).toBe(true)
+    expect(tableDoc.examples.every(example => example.previewKey?.startsWith('gr-table'))).toBe(true)
   })
 
   it('возвращает live-scenarios для remaining media/advanced batch `GrImageViewer`', () => {
@@ -364,7 +364,7 @@ describe('component docs metadata', () => {
 
     expect(imageViewerDoc.examples).toHaveLength(4)
     expect(imageViewerDoc.examples.every(example => example.status === 'ready')).toBe(true)
-    expect(imageViewerDoc.examples.every(example => example.previewKey?.startsWith('ds-image-viewer'))).toBe(true)
+    expect(imageViewerDoc.examples.every(example => example.previewKey?.startsWith('gr-image-viewer'))).toBe(true)
   })
 
   it('держит live previews ленивыми и не импортирует demo-слой статически в `ComponentDetailPage`', () => {

@@ -22,7 +22,7 @@ const descriptionId = useId()
 
 <template>
   <section
-    data-ds-form-section
+    data-gr-form-section
     class="grid gap-4"
     :aria-labelledby="titleId"
     :aria-describedby="description ? descriptionId : undefined"

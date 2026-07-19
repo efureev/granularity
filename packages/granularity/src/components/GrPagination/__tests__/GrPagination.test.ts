@@ -68,14 +68,14 @@ describe('GrPagination', () => {
       },
     })
 
-    const numericButtons = wrapper.findAll('[data-ds-pagination-page]')
+    const numericButtons = wrapper.findAll('[data-gr-pagination-page]')
     // boundary=1, sibling=1: [1] … [5 6 7] … [12]
     expect(numericButtons.map(button => button.text())).toEqual(['1', '5', '6', '7', '12'])
     // активная страница подсвечена
     const active = numericButtons.find(button => button.text() === '6')!
     expect(active.classes()).toContain('bg-[var(--primary)]')
     // есть многоточия (с обеих сторон)
-    expect(wrapper.findAll('[data-ds-pagination-ellipsis]').length).toBe(2)
+    expect(wrapper.findAll('[data-gr-pagination-ellipsis]').length).toBe(2)
   })
 
   it('без разрывов многоточие не рисуется', () => {
@@ -83,18 +83,18 @@ describe('GrPagination', () => {
       props: { page: 1, pageSize: 20, total: 60 }, // 3 страницы
     })
 
-    expect(wrapper.findAll('[data-ds-pagination-page]').map(b => b.text())).toEqual(['1', '2', '3'])
-    expect(wrapper.findAll('[data-ds-pagination-ellipsis]').length).toBe(0)
+    expect(wrapper.findAll('[data-gr-pagination-page]').map(b => b.text())).toEqual(['1', '2', '3'])
+    expect(wrapper.findAll('[data-gr-pagination-ellipsis]').length).toBe(0)
   })
 
   it('эмитит изменение страницы по номеру и по prev/next/first/last', async () => {
     const wrapper = mountPagination() // page 3, 8 страниц
 
-    await wrapper.findAll('[data-ds-pagination-page]').find(b => b.text() === '4')!.trigger('click')
-    await wrapper.get('[data-ds-pagination-prev]').trigger('click')
-    await wrapper.get('[data-ds-pagination-next]').trigger('click')
-    await wrapper.get('[data-ds-pagination-first]').trigger('click')
-    await wrapper.get('[data-ds-pagination-last]').trigger('click')
+    await wrapper.findAll('[data-gr-pagination-page]').find(b => b.text() === '4')!.trigger('click')
+    await wrapper.get('[data-gr-pagination-prev]').trigger('click')
+    await wrapper.get('[data-gr-pagination-next]').trigger('click')
+    await wrapper.get('[data-gr-pagination-first]').trigger('click')
+    await wrapper.get('[data-gr-pagination-last]').trigger('click')
 
     expect(wrapper.emitted('update:page')).toEqual([[4], [2], [4], [1], [8]])
   })
@@ -150,7 +150,7 @@ describe('GrPagination', () => {
       props: { page: 6, pageSize: 10, total: 120 },
     })
 
-    const pageButtons = wrapper.findAll('[data-ds-pagination-page]')
+    const pageButtons = wrapper.findAll('[data-gr-pagination-page]')
     const labels = pageButtons.map(button => button.attributes('aria-label'))
 
     // page 6 из 12: [1] … [5 6 7] … [12]

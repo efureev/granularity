@@ -15,9 +15,9 @@ export const inputSizeClassBySize: Record<GrInputTagSize, string> = {
 }
 export const wrapperBorderClassByState: Record<GrInputTagState, string> = {
   default: 'border-[var(--brd)]',
-  success: 'border-[var(--ds-success)] focus-within:ring-[var(--ds-success)]',
-  warning: 'border-[var(--ds-warning)] focus-within:ring-[var(--ds-warning)]',
-  danger: 'border-[var(--ds-danger)] focus-within:ring-[var(--ds-danger)]',
+  success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
+  warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
+  danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
 }
 export function grInputTagWrapperClass(options: { size: GrInputTagSize, state: GrInputTagState, invalid: boolean, disabled: boolean }): string {
   return [

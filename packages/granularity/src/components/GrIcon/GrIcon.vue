@@ -22,15 +22,15 @@ const resolvedSize = computed(() => props.size ?? 'md')
 
 const iconStyle = computed(() => {
   return {
-    '--ds-icon-size': `${resolveGrIconSizePx(resolvedSize.value)}px`,
+    '--gr-icon-size': `${resolveGrIconSizePx(resolvedSize.value)}px`,
   } as Record<string, string>
 })
 </script>
 
 <template>
   <span
-      data-ds-icon
-      class="ds-icon inline-flex items-center justify-center align-middle"
+      data-gr-icon
+      class="gr-icon inline-flex items-center justify-center align-middle"
       :style="iconStyle"
   >
     <slot />
@@ -43,16 +43,16 @@ const iconStyle = computed(() => {
  * This must be global because icons are usually passed via slots (SVG),
  * and we want consistent sizing without relying on SFC scoped + :deep.
  */
-:where(.ds-icon) {
-  --ds-icon-size: 18px;
-  width: var(--ds-icon-size);
-  min-width: var(--ds-icon-size);
-  height: var(--ds-icon-size);
+:where(.gr-icon) {
+  --gr-icon-size: 18px;
+  width: var(--gr-icon-size);
+  min-width: var(--gr-icon-size);
+  height: var(--gr-icon-size);
   line-height: 0;
   flex: none;
 }
 
-:where(.ds-icon svg) {
+:where(.gr-icon svg) {
   width: 100%;
   height: 100%;
   display: block;

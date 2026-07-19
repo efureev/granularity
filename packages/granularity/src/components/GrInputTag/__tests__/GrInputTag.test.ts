@@ -21,7 +21,7 @@ describe('GrInputTag', () => {
       },
     })
 
-    const input = wrapper.get('[data-testid="ds-input-tag-input"]')
+    const input = wrapper.get('[data-testid="gr-input-tag-input"]')
     await input.setValue('hello')
     await input.trigger('keydown', { key: 'Enter' })
 
@@ -36,7 +36,7 @@ describe('GrInputTag', () => {
       },
     })
 
-    const input = wrapper.get('[data-testid="ds-input-tag-input"]')
+    const input = wrapper.get('[data-testid="gr-input-tag-input"]')
     await input.setValue('a')
     await input.trigger('keydown', { key: 'Enter' })
 
@@ -56,7 +56,7 @@ describe('GrInputTag', () => {
       },
     })
 
-    const input = wrapper.get('[data-testid="ds-input-tag-input"]')
+    const input = wrapper.get('[data-testid="gr-input-tag-input"]')
     await input.trigger('keydown', { key: 'Backspace' })
 
     expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual(['a'])
@@ -70,7 +70,7 @@ describe('GrInputTag', () => {
       },
     })
 
-    const btn = wrapper.get('[data-testid="ds-input-tag-remove"][data-index="0"]')
+    const btn = wrapper.get('[data-testid="gr-input-tag-remove"][data-index="0"]')
     await btn.trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual(['b'])
@@ -85,7 +85,7 @@ describe('GrInputTag', () => {
       },
     })
 
-    const input = wrapper.get('[data-testid="ds-input-tag-input"]')
+    const input = wrapper.get('[data-testid="gr-input-tag-input"]')
     await input.setValue('c')
     await input.trigger('keydown', { key: 'Enter' })
 
@@ -100,11 +100,11 @@ describe('GrInputTag', () => {
       },
     })
 
-    const input = wrapper.get('[data-testid="ds-input-tag-input"]')
+    const input = wrapper.get('[data-testid="gr-input-tag-input"]')
     await input.setValue('b')
     await input.trigger('keydown', { key: 'Enter' })
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
-    expect(wrapper.find('[data-testid="ds-input-tag-remove"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="gr-input-tag-remove"]').exists()).toBe(false)
   })
 })

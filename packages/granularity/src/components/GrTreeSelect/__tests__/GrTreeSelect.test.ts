@@ -105,7 +105,7 @@ function bodyExists(selector: string): boolean {
 }
 
 function bodyFindAllRows(): DOMWrapper<Element>[] {
-  return [...document.body.querySelectorAll('.ds-tree__row')].map((el) => new DOMWrapper(el))
+  return [...document.body.querySelectorAll('.gr-tree__row')].map((el) => new DOMWrapper(el))
 }
 
 describe('GrTreeSelect (unit)', () => {
@@ -116,13 +116,13 @@ describe('GrTreeSelect (unit)', () => {
   it('показывает шеврон когда нет значения, переворачивает его при open и заменяет на крестик при выбранном значении (clearable)', async () => {
     const wrapper = await mountHarness({ clearable: true })
 
-    expect(wrapper.find('[data-testid="ds-tree-select-clear"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="ds-tree-select-chevron"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="gr-tree-select-clear"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="gr-tree-select-chevron"]').exists()).toBe(true)
 
-    await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const chevronIcon = wrapper.find('[data-testid="ds-tree-select-chevron"] > span')
+    const chevronIcon = wrapper.find('[data-testid="gr-tree-select-chevron"] > span')
     expect(chevronIcon.exists()).toBe(true)
     expect(chevronIcon.classes()).toContain('rotate-180')
 
@@ -132,15 +132,15 @@ describe('GrTreeSelect (unit)', () => {
     await travelRow!.trigger('click')
     await nextTick()
 
-    expect(wrapper.find('[data-testid="ds-tree-select-clear"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="ds-tree-select-chevron"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="gr-tree-select-clear"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="gr-tree-select-chevron"]').exists()).toBe(false)
 
-    await wrapper.find('[data-testid="ds-tree-select-clear"]').trigger('click')
+    await wrapper.find('[data-testid="gr-tree-select-clear"]').trigger('click')
     await nextTick()
 
     expect(wrapper.find('[data-testid="model"]').text()).toBe('')
-    expect(wrapper.find('[data-testid="ds-tree-select-clear"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="ds-tree-select-chevron"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="gr-tree-select-clear"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="gr-tree-select-chevron"]').exists()).toBe(true)
 
     wrapper.unmount()
   })
@@ -151,11 +151,11 @@ describe('GrTreeSelect (unit)', () => {
       { locale: 'ru', data: [] },
     )
 
-    await wrapperEmpty.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapperEmpty.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const filter = bodyFind('[data-testid="ds-tree-select-filter"]')
-    expect(bodyExists('[data-testid="ds-tree-select-filter"]')).toBe(true)
+    const filter = bodyFind('[data-testid="gr-tree-select-filter"]')
+    expect(bodyExists('[data-testid="gr-tree-select-filter"]')).toBe(true)
     expect(filter.attributes('placeholder')).toBe('Поиск…')
 
     expect(document.body.textContent ?? '').toContain('Нет данных')
@@ -163,7 +163,7 @@ describe('GrTreeSelect (unit)', () => {
     wrapperEmpty.unmount()
 
     const wrapperClear = await mountHarness({ clearable: true }, { locale: 'ru' })
-    await wrapperClear.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapperClear.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
     const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
@@ -172,7 +172,7 @@ describe('GrTreeSelect (unit)', () => {
     await travelRow!.trigger('click')
     await nextTick()
 
-    const clearBtn = wrapperClear.find('[data-testid="ds-tree-select-clear"]')
+    const clearBtn = wrapperClear.find('[data-testid="gr-tree-select-clear"]')
     expect(clearBtn.exists()).toBe(true)
     expect(clearBtn.attributes('aria-label')).toBe('Очистить')
 
@@ -182,14 +182,14 @@ describe('GrTreeSelect (unit)', () => {
   it('не закрывается сразу при клике (реальный порядок событий: pointerdown -> focus -> click)', async () => {
     const wrapper = await mountHarness()
 
-    const trigger = wrapper.find('[data-testid="ds-tree-select-trigger"]')
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
 
     await trigger.trigger('pointerdown')
     await trigger.trigger('focus')
     await trigger.trigger('click')
     await nextTick()
-    expect(bodyExists('[data-testid="ds-tree-select-panel"]')).toBe(true)
-    expect(bodyFind('[data-testid="ds-tree-select-panel"]').isVisible()).toBe(true)
+    expect(bodyExists('[data-testid="gr-tree-select-panel"]')).toBe(true)
+    expect(bodyFind('[data-testid="gr-tree-select-panel"]').isVisible()).toBe(true)
 
     wrapper.unmount()
   })
@@ -197,11 +197,11 @@ describe('GrTreeSelect (unit)', () => {
   it('открывается и закрывается по клику вне / ESC', async () => {
     const wrapper = await mountHarness()
 
-    const panel = () => bodyFind('[data-testid="ds-tree-select-panel"]')
-    expect(bodyExists('[data-testid="ds-tree-select-panel"]')).toBe(true)
+    const panel = () => bodyFind('[data-testid="gr-tree-select-panel"]')
+    expect(bodyExists('[data-testid="gr-tree-select-panel"]')).toBe(true)
     expect(panel().isVisible()).toBe(false)
 
-    await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
     expect(panel().isVisible()).toBe(true)
 
@@ -209,7 +209,7 @@ describe('GrTreeSelect (unit)', () => {
     await nextTick()
     expect(panel().isVisible()).toBe(false)
 
-    await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
     expect(panel().isVisible()).toBe(true)
 
@@ -223,7 +223,7 @@ describe('GrTreeSelect (unit)', () => {
   it('выбирает узел и обновляет v-model (single)', async () => {
     const wrapper = await mountHarness()
 
-    await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
     const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
@@ -233,7 +233,7 @@ describe('GrTreeSelect (unit)', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="model"]').text()).toBe('2')
-    expect(bodyFind('[data-testid="ds-tree-select-panel"]').isVisible()).toBe(false)
+    expect(bodyFind('[data-testid="gr-tree-select-panel"]').isVisible()).toBe(false)
 
     wrapper.unmount()
   })
@@ -241,7 +241,7 @@ describe('GrTreeSelect (unit)', () => {
   it('обновляет значение в input при асинхронном изменении v-model (single)', async () => {
     const wrapper = await mountHarness()
 
-    const trigger = wrapper.find('[data-testid="ds-tree-select-trigger"]')
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
     expect(trigger.exists()).toBe(true)
     expect((trigger.element as HTMLInputElement).value).toBe('')
 
@@ -258,7 +258,7 @@ describe('GrTreeSelect (unit)', () => {
   it('в режиме valueDisplay="path" показывает путь от корня до выбранной ноды (single)', async () => {
     const wrapper = await mountHarness({ valueDisplay: 'path', defaultExpandedKeys: [3] })
 
-    const trigger = wrapper.find('[data-testid="ds-tree-select-trigger"]')
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
     await trigger.trigger('click')
     await nextTick()
 
@@ -276,11 +276,11 @@ describe('GrTreeSelect (unit)', () => {
   it('фильтрует дерево (filterable)', async () => {
     const wrapper = await mountHarness({ filterable: true })
 
-    await wrapper.find('[data-testid="ds-tree-select-trigger"]').trigger('click')
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const filter = bodyFind('[data-testid="ds-tree-select-filter"]')
-    expect(bodyExists('[data-testid="ds-tree-select-filter"]')).toBe(true)
+    const filter = bodyFind('[data-testid="gr-tree-select-filter"]')
+    expect(bodyExists('[data-testid="gr-tree-select-filter"]')).toBe(true)
 
     await filter.setValue('Ren')
     await nextTick()
@@ -322,7 +322,7 @@ describe('GrTreeSelect (unit)', () => {
 
     const wrapper = mount(Harness, { attachTo: document.body })
 
-    const trigger = wrapper.find('[data-testid="ds-tree-select-trigger"]')
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
     await trigger.trigger('click')
     await nextTick()
 

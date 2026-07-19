@@ -23,14 +23,17 @@ import {
 } from './showcaseEntities.ts'
 export {
   showcaseComponentDetailSections,
+  showcaseExtraComponentDetailSections,
   showcasePackageDetailSections,
   showcasePages,
 } from './showcasePages.ts'
 import {
   showcaseComponentDetailSections,
+  showcaseExtraComponentDetailSections,
   showcasePackageDetailSections,
   showcasePages,
 } from './showcasePages.ts'
+import { getCompanionComponentByPath } from '../content/companion/companionPackages.ts'
 export type {
   ShowcaseBreadcrumb,
   ShowcaseNavigationItem,
@@ -117,12 +120,36 @@ export function getShowcaseSectionsForPath(path: string): ShowcaseSection[] {
       : showcasePackageDetailSections
   }
 
+  if (getCompanionComponentByPath(path)) {
+    return showcaseExtraComponentDetailSections
+  }
+
   return getShowcasePageByPath(path)?.sections ?? showcasePageRecord.overview.sections
 }
 
 export function getShowcaseBreadcrumbs(path: string): ShowcaseBreadcrumb[] {
   const currentEntity = getShowcaseEntityByPath(path)
   const currentPage = getShowcasePageByPath(path)
+
+  // Companion-компоненты живут не в основном registry, поэтому крошку до
+  // конкретного компонента строим отдельно (Overview / Extras / <Component>).
+  const companionComponent = getCompanionComponentByPath(path)
+  if (companionComponent && currentPage && currentPage.path !== '/') {
+    return [
+      {
+        label: showcasePageRecord.overview.shortTitle,
+        to: showcasePageRecord.overview.path,
+      },
+      {
+        label: currentPage.shortTitle,
+        to: currentPage.path,
+      },
+      {
+        label: companionComponent.title,
+        to: `/extras/${companionComponent.slug}`,
+      },
+    ]
+  }
 
   if (currentEntity && currentPage && currentPage.path !== '/') {
     return [

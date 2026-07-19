@@ -27,7 +27,7 @@ const sectionTitle = computed(() => {
   <div class="grid gap-4">
     <GrTabs v-model="currentTab" :tabs="tabs" />
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 shadow-[var(--ds-shadow-1)]">
+    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 shadow-[var(--gr-shadow-1)]">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div class="text-sm font-600 text-[var(--fg)]">

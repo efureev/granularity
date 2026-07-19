@@ -29,7 +29,7 @@ describe('GrRadio (radiobox)', () => {
     const native = wrapper.get('input[type="radio"]').element as HTMLInputElement
     expect(native.checked).toBe(true)
 
-    const dot = wrapper.get('[data-ds-radio-dot]')
+    const dot = wrapper.get('[data-gr-radio-dot]')
     expect(dot.attributes('class')).toContain('bg-[var(--primary)]')
   })
 
@@ -50,7 +50,7 @@ describe('GrRadio (radiobox)', () => {
     const native = wrapper.get('input[type="radio"]').element as HTMLInputElement
     expect(native.checked).toBe(false)
 
-    const dot = wrapper.get('[data-ds-radio-dot]')
+    const dot = wrapper.get('[data-gr-radio-dot]')
     expect(dot.attributes('class')).toContain('opacity-0')
   })
 

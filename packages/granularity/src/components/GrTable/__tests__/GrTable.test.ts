@@ -61,13 +61,13 @@ describe('GrTable', () => {
       props: { regionLabel: 'Scrollable users table' },
       slots: { default: '<tr><td>x</td></tr>' },
     })
-    const scroll = withRegion.find('[data-ds-table-scroll]')
+    const scroll = withRegion.find('[data-gr-table-scroll]')
     expect(scroll.attributes('role')).toBe('region')
     expect(scroll.attributes('tabindex')).toBe('0')
     expect(scroll.attributes('aria-label')).toBe('Scrollable users table')
 
     const without = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
-    const scrollNo = without.find('[data-ds-table-scroll]')
+    const scrollNo = without.find('[data-gr-table-scroll]')
     expect(scrollNo.attributes('role')).toBeUndefined()
     expect(scrollNo.attributes('tabindex')).toBeUndefined()
   })

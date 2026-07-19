@@ -43,7 +43,7 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
 
 <template>
   <GrDropdown
-    data-ds-dropdown-menu
+    data-gr-dropdown-menu
     :align="align"
     :width="width"
     :close-on-content-click="closeOnContentClick"

@@ -6,7 +6,7 @@ export const grBadgeWrapExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Numeric overlays on buttons and icons',
     description: 'Базовый сценарий объясняет `GrBadgeWrap` как overlay-shell: value живёт поверх trigger и не требует менять сам исходный control.',
     status: 'ready',
-    previewKey: 'ds-badge-wrap-counter',
+    previewKey: 'gr-badge-wrap-counter',
     code: `<script setup lang="ts">
 import { GrBadgeWrap, GrButton } from '@feugene/granularity'
 </script>
@@ -22,7 +22,7 @@ import { GrBadgeWrap, GrButton } from '@feugene/granularity'
     title: 'Dot mode for attention indicators',
     description: 'Когда количество не так важно, как сам факт нового события, `dot`-режим работает лучше и визуально легче.',
     status: 'ready',
-    previewKey: 'ds-badge-wrap-dot-status',
+    previewKey: 'gr-badge-wrap-dot-status',
     code: `<script setup lang="ts">
 import { GrAvatar, GrBadgeWrap } from '@feugene/granularity'
 </script>
@@ -38,7 +38,7 @@ import { GrAvatar, GrBadgeWrap } from '@feugene/granularity'
     title: 'Navigation and tab decorations',
     description: 'Третий сценарий фиксирует slot-based nature компонента: badge overlay можно повесить на tab/button/navigation item без специальных API на стороне child-компонента.',
     status: 'ready',
-    previewKey: 'ds-badge-wrap-tab-notification',
+    previewKey: 'gr-badge-wrap-tab-notification',
     code: `<script setup lang="ts">
 import { GrBadgeWrap, GrButton } from '@feugene/granularity'
 </script>

@@ -6,7 +6,7 @@ export const grBottomNavExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic section switcher',
     description: 'Базовый mobile-first сценарий: переключаем top-level разделы и синхронизируем активное состояние с контентом страницы.',
     status: 'ready',
-    previewKey: 'ds-bottom-nav-basic-flow',
+    previewKey: 'gr-bottom-nav-basic-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -29,7 +29,7 @@ const items = [
     title: 'External state sync',
     description: 'Показываем, что `v-model` у `GrBottomNav` можно менять не только через сам компонент, но и из внешних action-кнопок.',
     status: 'ready',
-    previewKey: 'ds-bottom-nav-external-state',
+    previewKey: 'gr-bottom-nav-external-state',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -58,7 +58,7 @@ const items = [
     title: 'Mobile shell composition',
     description: 'Сценарий для полноэкранного мобильного shell: контент остаётся на месте, а нижняя навигация фиксируется у safe-area края.',
     status: 'ready',
-    previewKey: 'ds-bottom-nav-mobile-shell',
+    previewKey: 'gr-bottom-nav-mobile-shell',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

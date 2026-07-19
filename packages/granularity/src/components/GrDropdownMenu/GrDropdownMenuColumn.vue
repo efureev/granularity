@@ -18,7 +18,7 @@ const alignClass: Record<GrDropdownMenuColumnAlign, string> = {
 
 <template>
   <div
-    data-ds-dropdown-menu-column
+    data-gr-dropdown-menu-column
     class="px-3 py-2 flex items-center"
     :class="alignClass[align]"
   >

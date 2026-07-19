@@ -20,7 +20,7 @@ withDefaults(defineProps<GrSkeletonProps>(), {
 
 <template>
   <div
-      data-ds-skeleton
+      data-gr-skeleton
       aria-hidden="true"
       class="bg-[var(--muted)] border border-[var(--brd)]"
       :style="{ height, width, borderRadius: rounded }"
@@ -28,7 +28,7 @@ withDefaults(defineProps<GrSkeletonProps>(), {
 </template>
 
 <style>
-@keyframes ds-skeleton-pulse {
+@keyframes gr-skeleton-pulse {
   0%, 100% {
     opacity: 1;
   }
@@ -37,12 +37,12 @@ withDefaults(defineProps<GrSkeletonProps>(), {
   }
 }
 
-[data-ds-skeleton] {
-  animation: ds-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+[data-gr-skeleton] {
+  animation: gr-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-ds-skeleton] {
+  [data-gr-skeleton] {
     animation: none;
   }
 }

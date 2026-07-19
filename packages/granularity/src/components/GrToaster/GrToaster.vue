@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrToaster — DS-примитив области уведомлений (toast).
+ * GrToaster — GR-примитив области уведомлений (toast).
  *
  * Модель состояния берётся из `useToast`, поэтому в приложении предполагается
  * **один активный `GrToaster`** на корень (или app-scoped через плагин).
@@ -47,12 +47,12 @@ interface ToneMeta {
 const TONE_META: Record<GrToastTone, ToneMeta> = {
   primary: { icon: IconInfo, color: 'var(--primary)', role: 'status' },
   neutral: { icon: IconInfo, color: 'var(--muted-fg)', role: 'status' },
-  info: { icon: IconInfo, color: 'var(--ds-info)', role: 'status' },
-  success: { icon: IconCheck, color: 'var(--ds-success)', role: 'status' },
-  warning: { icon: IconWarning, color: 'var(--ds-warning)', role: 'alert' },
-  danger: { icon: IconError, color: 'var(--ds-danger)', role: 'alert' },
-  slate: { icon: IconInfo, color: 'var(--ds-slate)', role: 'status' },
-  azure: { icon: IconInfo, color: 'var(--ds-azure)', role: 'status' },
+  info: { icon: IconInfo, color: 'var(--gr-info)', role: 'status' },
+  success: { icon: IconCheck, color: 'var(--gr-success)', role: 'status' },
+  warning: { icon: IconWarning, color: 'var(--gr-warning)', role: 'alert' },
+  danger: { icon: IconError, color: 'var(--gr-danger)', role: 'alert' },
+  slate: { icon: IconInfo, color: 'var(--gr-slate)', role: 'status' },
+  azure: { icon: IconInfo, color: 'var(--gr-azure)', role: 'status' },
 }
 
 export interface GrToasterProps {
@@ -110,7 +110,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
 <template>
   <teleport to="body" :disabled="!isClient">
     <div
-        data-ds-toaster
+        data-gr-toaster
         role="region"
         :aria-label="resolvedRegionLabel"
         class="fixed z-[var(--gr-z-toast)] w-[360px] max-w-[calc(100vw-2rem)]"
@@ -137,11 +137,11 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
         <div
             v-for="toast in visibleToasts"
             :key="toast.id"
-            data-ds-toast
+            data-gr-toast
             :data-tone="toast.tone"
             :role="metaFor(toast.tone).role"
             aria-atomic="true"
-            class="relative overflow-hidden rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--ds-shadow-2)]"
+            class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--gr-shadow-2)]"
         >
           <div class="flex items-start gap-3">
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }" aria-hidden="true">
@@ -171,7 +171,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
           <!-- Прогресс до автозакрытия; замирает вместе с таймером на паузе. -->
           <div
               v-if="toast.timeoutMs > 0"
-              data-ds-toast-progress
+              data-gr-toast-progress
               aria-hidden="true"
               class="gr-toast-progress absolute bottom-0 left-0 h-[2px] w-full origin-left"
               :style="{

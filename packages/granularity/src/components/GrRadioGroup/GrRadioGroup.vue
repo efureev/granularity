@@ -55,7 +55,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
 
 <template>
   <div
-    data-ds-radio-group
+    data-gr-radio-group
     role="radiogroup"
     :aria-label="ariaLabel"
     :aria-disabled="disabled ? 'true' : undefined"

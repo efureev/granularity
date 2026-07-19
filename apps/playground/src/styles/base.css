@@ -5,14 +5,14 @@ body {
 
 body {
     margin: 0;
-    font-family: var(--ds-font-ui);
+    font-family: var(--gr-font-ui);
     background: var(--bg);
     color: var(--fg);
 }
 
 /*
  * UnoCSS tailwind-compat reset intentionally does not force `background-color: transparent` for buttons
- * (to avoid breaking component libraries). In our DS we want plain buttons/links to be transparent by default.
+ * (to avoid breaking component libraries). In our GR we want plain buttons/links to be transparent by default.
  */
 :where(a, button) {
     background-color: transparent;
@@ -25,7 +25,7 @@ body {
 code,
 pre,
 kbd {
-    font-family: var(--ds-font-mono);
+    font-family: var(--gr-font-mono);
 }
 
 * {

@@ -31,7 +31,7 @@ describe('GrCheckbox', () => {
     expect(native.checked).toBe(true)
 
     const icon = wrapper.get('[data-icon="check"]')
-    expect(icon.attributes('class')).toContain('ds-checkbox-icon')
+    expect(icon.attributes('class')).toContain('gr-checkbox-icon')
   })
 
   it('эмитит update:modelValue при изменении', async () => {

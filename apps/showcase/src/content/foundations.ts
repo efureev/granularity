@@ -127,76 +127,76 @@ function normalizeThemeTokenSection(section: string) {
 }
 
 function getFoundationTokenDescription(name: string, section: string) {
-  if (name.startsWith('--ds-slate-')) {
+  if (name.startsWith('--gr-slate-')) {
     const shade = name.split('-').at(-1)
     return `Нейтральный оттенок slate ${shade} для базовой palette scale, поверхностей и бордеров.`
   }
 
-  if (name === '--ds-font-ui')
+  if (name === '--gr-font-ui')
     return 'Основной стек шрифта для интерфейсного текста и большинства компонентных подписей.'
 
-  if (name === '--ds-font-mono')
+  if (name === '--gr-font-mono')
     return 'Моноширинный стек для кода, числовых значений и технических подписей.'
 
-  if (name.startsWith('--ds-text-')) {
-    const size = name.replace('--ds-text-', '')
+  if (name.startsWith('--gr-text-')) {
+    const size = name.replace('--gr-text-', '')
     return `Размер шрифта \`${size}\` из типографической шкалы foundation tokens.`
   }
 
-  if (name.startsWith('--ds-leading-')) {
-    const density = name.replace('--ds-leading-', '')
+  if (name.startsWith('--gr-leading-')) {
+    const density = name.replace('--gr-leading-', '')
     return `Коэффициент межстрочного интервала \`${density}\` для текстовых блоков и подписей.`
   }
 
-  if (name.startsWith('--ds-font-')) {
-    const weight = name.replace('--ds-font-', '')
+  if (name.startsWith('--gr-font-')) {
+    const weight = name.replace('--gr-font-', '')
     return `Вес шрифта \`${weight}\` для типографической иерархии интерфейса.`
   }
 
-  if (name.startsWith('--ds-space-')) {
-    const step = name.replace('--ds-space-', '')
+  if (name.startsWith('--gr-space-')) {
+    const step = name.replace('--gr-space-', '')
     return `Шаг spacing scale \`${step}\` для отступов, gap и внутренних paddings.`
   }
 
-  if (name.startsWith('--ds-container-')) {
+  if (name.startsWith('--gr-container-')) {
     if (name.includes('padding'))
       return 'Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария.'
 
     return 'Максимальная ширина layout-контейнера для контентных страниц и shell-структур.'
   }
 
-  if (name.startsWith('--ds-bp-')) {
-    const breakpoint = name.replace('--ds-bp-', '')
+  if (name.startsWith('--gr-bp-')) {
+    const breakpoint = name.replace('--gr-bp-', '')
     return `Foundation breakpoint \`${breakpoint}\` для адаптивных layout-решений.`
   }
 
   if (name === '--radius')
     return 'Совместимый alias базового радиуса для интеграций, ожидающих shadcn-style token contract.'
 
-  if (name.startsWith('--ds-radius-')) {
-    const radius = name.replace('--ds-radius-', '')
+  if (name.startsWith('--gr-radius-')) {
+    const radius = name.replace('--gr-radius-', '')
     return `Радиус скругления \`${radius}\` для углов компонентов и поверхностей.`
   }
 
-  if (name.startsWith('--ds-shadow-')) {
-    const level = name.replace('--ds-shadow-', '')
+  if (name.startsWith('--gr-shadow-')) {
+    const level = name.replace('--gr-shadow-', '')
     return `Уровень elevation \`${level}\` для карточек, popover-слоёв и акцентных поверхностей.`
   }
 
-  if (name.startsWith('--ds-duration-')) {
-    const speed = name.replace('--ds-duration-', '')
+  if (name.startsWith('--gr-duration-')) {
+    const speed = name.replace('--gr-duration-', '')
     return `Базовая длительность анимации \`${speed}\` для transitions и state changes.`
   }
 
-  if (name.startsWith('--ds-ease-')) {
-    const easing = name.replace('--ds-ease-', '')
+  if (name.startsWith('--gr-ease-')) {
+    const easing = name.replace('--gr-ease-', '')
     return `Кривая ускорения \`${easing}\` для motion-паттернов дизайн-системы.`
   }
 
   if (name.startsWith('--primary-') || name.startsWith('--secondary-') || name.startsWith('--brd-') || name.startsWith('--destructive-'))
     return 'Производное interaction-состояние, вычисляемое из semantic theme roles для hover/active поведения.'
 
-  if (name.startsWith('--ds-success-') || name.startsWith('--ds-warning-') || name.startsWith('--ds-danger-') || name.startsWith('--ds-info-'))
+  if (name.startsWith('--gr-success-') || name.startsWith('--gr-warning-') || name.startsWith('--gr-danger-') || name.startsWith('--gr-info-'))
     return 'Производное status-состояние, вычисляемое из semantic статусных цветов для hover/active сценариев.'
 
   return `Токен из группы \`${section}\` в текущем foundation contract пакета.`
@@ -223,30 +223,30 @@ function getThemeTokenDescription(name: string, section: string) {
     '--accent-fg': 'Цвет текста поверх accent-подложек.',
     '--destructive': 'Цвет destructive action-сценариев и критических состояний.',
     '--destructive-fg': 'Контрастный текст и иконки поверх destructive-заливки.',
-    '--ds-success': 'Основной semantic success-цвет для статусов, бейджей и уведомлений.',
-    '--ds-success-light': 'Облегчённая success-подложка для мягких статусов и подсветок.',
-    '--ds-success-fg': 'Контрастный текст и иконки поверх success-заливки.',
-    '--ds-success-text': 'Текстовый оттенок для success-сообщений на светлой подложке.',
-    '--ds-warning': 'Основной semantic warning-цвет для предупреждений и промежуточных статусов.',
-    '--ds-warning-light': 'Облегчённая warning-подложка для мягких warning-состояний.',
-    '--ds-warning-fg': 'Контрастный текст и иконки поверх warning-заливки.',
-    '--ds-warning-text': 'Текстовый оттенок для warning-сообщений на мягкой warning-подложке.',
-    '--ds-danger': 'Semantic danger-цвет для ошибок, рисков и критических сообщений.',
-    '--ds-danger-light': 'Облегчённая danger-подложка для мягких error-состояний.',
-    '--ds-danger-fg': 'Контрастный текст и иконки поверх danger-заливки.',
-    '--ds-danger-text': 'Текстовый оттенок для error-сообщений на мягкой danger-подложке.',
-    '--ds-info': 'Semantic info-цвет для нейтральных уведомлений и информационных акцентов.',
-    '--ds-info-light': 'Облегчённая info-подложка для спокойных информационных блоков.',
-    '--ds-info-fg': 'Контрастный текст и иконки поверх info-заливки.',
-    '--ds-info-text': 'Текстовый оттенок для спокойных info-сообщений и подсказок.',
-    '--ds-slate': 'Нейтральный semantic slate-цвет для subdued индикаторов и secondary статусов.',
-    '--ds-slate-light': 'Облегчённая slate-подложка для мягких нейтральных состояний.',
-    '--ds-slate-fg': 'Контрастный текст и иконки поверх slate-заливки.',
-    '--ds-slate-text': 'Текстовый оттенок для нейтральных slate-сообщений и плашек.',
-    '--ds-azure': 'Semantic azure-цвет для информационных акцентов и вспомогательных статусов.',
-    '--ds-azure-light': 'Облегчённая azure-подложка для мягких informational поверхностей.',
-    '--ds-azure-fg': 'Контрастный текст и иконки поверх azure-заливки.',
-    '--ds-azure-text': 'Текстовый оттенок для azure-плашек и спокойных informational блоков.',
+    '--gr-success': 'Основной semantic success-цвет для статусов, бейджей и уведомлений.',
+    '--gr-success-light': 'Облегчённая success-подложка для мягких статусов и подсветок.',
+    '--gr-success-fg': 'Контрастный текст и иконки поверх success-заливки.',
+    '--gr-success-text': 'Текстовый оттенок для success-сообщений на светлой подложке.',
+    '--gr-warning': 'Основной semantic warning-цвет для предупреждений и промежуточных статусов.',
+    '--gr-warning-light': 'Облегчённая warning-подложка для мягких warning-состояний.',
+    '--gr-warning-fg': 'Контрастный текст и иконки поверх warning-заливки.',
+    '--gr-warning-text': 'Текстовый оттенок для warning-сообщений на мягкой warning-подложке.',
+    '--gr-danger': 'Semantic danger-цвет для ошибок, рисков и критических сообщений.',
+    '--gr-danger-light': 'Облегчённая danger-подложка для мягких error-состояний.',
+    '--gr-danger-fg': 'Контрастный текст и иконки поверх danger-заливки.',
+    '--gr-danger-text': 'Текстовый оттенок для error-сообщений на мягкой danger-подложке.',
+    '--gr-info': 'Semantic info-цвет для нейтральных уведомлений и информационных акцентов.',
+    '--gr-info-light': 'Облегчённая info-подложка для спокойных информационных блоков.',
+    '--gr-info-fg': 'Контрастный текст и иконки поверх info-заливки.',
+    '--gr-info-text': 'Текстовый оттенок для спокойных info-сообщений и подсказок.',
+    '--gr-slate': 'Нейтральный semantic slate-цвет для subdued индикаторов и secondary статусов.',
+    '--gr-slate-light': 'Облегчённая slate-подложка для мягких нейтральных состояний.',
+    '--gr-slate-fg': 'Контрастный текст и иконки поверх slate-заливки.',
+    '--gr-slate-text': 'Текстовый оттенок для нейтральных slate-сообщений и плашек.',
+    '--gr-azure': 'Semantic azure-цвет для информационных акцентов и вспомогательных статусов.',
+    '--gr-azure-light': 'Облегчённая azure-подложка для мягких informational поверхностей.',
+    '--gr-azure-fg': 'Контрастный текст и иконки поверх azure-заливки.',
+    '--gr-azure-text': 'Текстовый оттенок для azure-плашек и спокойных informational блоков.',
     '--chart-1': 'Первый цвет серии для графиков и data-visualization элементов.',
     '--chart-2': 'Второй цвет серии для графиков и data-visualization элементов.',
     '--chart-3': 'Третий цвет серии для графиков и data-visualization элементов.',
@@ -260,7 +260,7 @@ function getThemeTokenDescription(name: string, section: string) {
     '--sidebar-accent-fg': 'Цвет текста поверх sidebar accent-подложек.',
     '--sidebar-brd': 'Бордеры и разделители sidebar-области.',
     '--sidebar-ring': 'Focus-ring для интерактивных элементов внутри sidebar.',
-    '--ds-category-tree-branch-line-active-color': 'Semantic цвет активной ветки category tree и подобных композитных компонентов.',
+    '--gr-category-tree-branch-line-active-color': 'Semantic цвет активной ветки category tree и подобных композитных компонентов.',
     '--primary-hover': 'Fallback-цвет hover-состояния для primary action без поддержки `color-mix`.',
     '--primary-active': 'Fallback-цвет active-состояния для primary action без поддержки `color-mix`.',
     '--secondary-hover': 'Fallback-цвет hover-состояния для secondary action без поддержки `color-mix`.',
@@ -269,18 +269,18 @@ function getThemeTokenDescription(name: string, section: string) {
     '--brd-active': 'Fallback-цвет active-состояния для border/outline-элементов без поддержки `color-mix`.',
     '--destructive-hover': 'Fallback-цвет hover-состояния для destructive action без поддержки `color-mix`.',
     '--destructive-active': 'Fallback-цвет active-состояния для destructive action без поддержки `color-mix`.',
-    '--ds-success-hover': 'Fallback-цвет hover-состояния для success-ролей без поддержки `color-mix`.',
-    '--ds-success-active': 'Fallback-цвет active-состояния для success-ролей без поддержки `color-mix`.',
-    '--ds-warning-hover': 'Fallback-цвет hover-состояния для warning-ролей без поддержки `color-mix`.',
-    '--ds-warning-active': 'Fallback-цвет active-состояния для warning-ролей без поддержки `color-mix`.',
-    '--ds-danger-hover': 'Fallback-цвет hover-состояния для danger-ролей без поддержки `color-mix`.',
-    '--ds-danger-active': 'Fallback-цвет active-состояния для danger-ролей без поддержки `color-mix`.',
-    '--ds-info-hover': 'Fallback-цвет hover-состояния для info-ролей без поддержки `color-mix`.',
-    '--ds-info-active': 'Fallback-цвет active-состояния для info-ролей без поддержки `color-mix`.',
-    '--ds-slate-hover': 'Fallback-цвет hover-состояния для slate-ролей без поддержки `color-mix`.',
-    '--ds-slate-active': 'Fallback-цвет active-состояния для slate-ролей без поддержки `color-mix`.',
-    '--ds-azure-hover': 'Fallback-цвет hover-состояния для azure-ролей без поддержки `color-mix`.',
-    '--ds-azure-active': 'Fallback-цвет active-состояния для azure-ролей без поддержки `color-mix`.',
+    '--gr-success-hover': 'Fallback-цвет hover-состояния для success-ролей без поддержки `color-mix`.',
+    '--gr-success-active': 'Fallback-цвет active-состояния для success-ролей без поддержки `color-mix`.',
+    '--gr-warning-hover': 'Fallback-цвет hover-состояния для warning-ролей без поддержки `color-mix`.',
+    '--gr-warning-active': 'Fallback-цвет active-состояния для warning-ролей без поддержки `color-mix`.',
+    '--gr-danger-hover': 'Fallback-цвет hover-состояния для danger-ролей без поддержки `color-mix`.',
+    '--gr-danger-active': 'Fallback-цвет active-состояния для danger-ролей без поддержки `color-mix`.',
+    '--gr-info-hover': 'Fallback-цвет hover-состояния для info-ролей без поддержки `color-mix`.',
+    '--gr-info-active': 'Fallback-цвет active-состояния для info-ролей без поддержки `color-mix`.',
+    '--gr-slate-hover': 'Fallback-цвет hover-состояния для slate-ролей без поддержки `color-mix`.',
+    '--gr-slate-active': 'Fallback-цвет active-состояния для slate-ролей без поддержки `color-mix`.',
+    '--gr-azure-hover': 'Fallback-цвет hover-состояния для azure-ролей без поддержки `color-mix`.',
+    '--gr-azure-active': 'Fallback-цвет active-состояния для azure-ролей без поддержки `color-mix`.',
   }
 
   return descriptions[name] ?? `Theme token из группы \`${section}\`, задающий semantic цветовой контракт текущего режима.`
@@ -510,97 +510,97 @@ installI18n(app, i18n)`
 
 const tokensCssSource = `:root {
   /* Foundations: neutral palette */
-  --ds-slate-0: #ffffff;
-  --ds-slate-50: #f8fafc;
-  --ds-slate-100: #f1f5f9;
-  --ds-slate-200: #e2e8f0;
-  --ds-slate-300: #cbd5e1;
-  --ds-slate-400: #94a3b8;
-  --ds-slate-500: #64748b;
-  --ds-slate-600: #475569;
-  --ds-slate-700: #334155;
-  --ds-slate-800: #1e293b;
-  --ds-slate-900: #0f172a;
+  --gr-slate-0: #ffffff;
+  --gr-slate-50: #f8fafc;
+  --gr-slate-100: #f1f5f9;
+  --gr-slate-200: #e2e8f0;
+  --gr-slate-300: #cbd5e1;
+  --gr-slate-400: #94a3b8;
+  --gr-slate-500: #64748b;
+  --gr-slate-600: #475569;
+  --gr-slate-700: #334155;
+  --gr-slate-800: #1e293b;
+  --gr-slate-900: #0f172a;
 
   /* Typography: font families */
-  --ds-font-ui: Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  --ds-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  --gr-font-ui: Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  --gr-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
   /* Typography: font sizes */
-  --ds-text-xs: 12px;
-  --ds-text-sm: 14px;
-  --ds-text-base: 16px;
-  --ds-text-lg: 18px;
-  --ds-text-xl: 20px;
-  --ds-text-2xl: 24px;
-  --ds-text-3xl: 30px;
-  --ds-text-4xl: 36px;
+  --gr-text-xs: 12px;
+  --gr-text-sm: 14px;
+  --gr-text-base: 16px;
+  --gr-text-lg: 18px;
+  --gr-text-xl: 20px;
+  --gr-text-2xl: 24px;
+  --gr-text-3xl: 30px;
+  --gr-text-4xl: 36px;
 
   /* Typography: line heights */
-  --ds-leading-tight: 1.25;
-  --ds-leading-normal: 1.5;
-  --ds-leading-relaxed: 1.625;
+  --gr-leading-tight: 1.25;
+  --gr-leading-normal: 1.5;
+  --gr-leading-relaxed: 1.625;
 
   /* Typography: font weights */
-  --ds-font-regular: 400;
-  --ds-font-medium: 500;
-  --ds-font-semibold: 600;
-  --ds-font-bold: 700;
+  --gr-font-regular: 400;
+  --gr-font-medium: 500;
+  --gr-font-semibold: 600;
+  --gr-font-bold: 700;
 
   /* Layout: spacing scale */
-  --ds-space-0: 0px;
-  --ds-space-1: 4px;
-  --ds-space-2: 8px;
-  --ds-space-3: 12px;
-  --ds-space-4: 16px;
-  --ds-space-5: 20px;
-  --ds-space-6: 24px;
-  --ds-space-8: 32px;
-  --ds-space-10: 40px;
-  --ds-space-12: 48px;
-  --ds-space-16: 64px;
-  --ds-space-20: 80px;
-  --ds-space-24: 96px;
-  --ds-space-32: 128px;
-  --ds-space-40: 160px;
-  --ds-space-48: 192px;
-  --ds-space-64: 256px;
+  --gr-space-0: 0px;
+  --gr-space-1: 4px;
+  --gr-space-2: 8px;
+  --gr-space-3: 12px;
+  --gr-space-4: 16px;
+  --gr-space-5: 20px;
+  --gr-space-6: 24px;
+  --gr-space-8: 32px;
+  --gr-space-10: 40px;
+  --gr-space-12: 48px;
+  --gr-space-16: 64px;
+  --gr-space-20: 80px;
+  --gr-space-24: 96px;
+  --gr-space-32: 128px;
+  --gr-space-40: 160px;
+  --gr-space-48: 192px;
+  --gr-space-64: 256px;
 
   /* Layout: containers */
-  --ds-container-max: 1280px;
-  --ds-container-max-2xl: 1440px;
-  --ds-container-padding-mobile: 16px;
-  --ds-container-padding-tablet: 24px;
-  --ds-container-padding-desktop: 32px;
+  --gr-container-max: 1280px;
+  --gr-container-max-2xl: 1440px;
+  --gr-container-padding-mobile: 16px;
+  --gr-container-padding-tablet: 24px;
+  --gr-container-padding-desktop: 32px;
 
   /* Layout: breakpoints */
-  --ds-bp-sm: 640px;
-  --ds-bp-md: 768px;
-  --ds-bp-lg: 1024px;
-  --ds-bp-xl: 1280px;
-  --ds-bp-2xl: 1536px;
+  --gr-bp-sm: 640px;
+  --gr-bp-md: 768px;
+  --gr-bp-lg: 1024px;
+  --gr-bp-xl: 1280px;
+  --gr-bp-2xl: 1536px;
 
   /* Shapes: radii and compatibility aliases */
   --radius: 0.5rem;
-  --ds-radius-none: 0px;
-  --ds-radius-sm: 4px;
-  --ds-radius-md: 8px;
-  --ds-radius-lg: 12px;
-  --ds-radius-xl: 16px;
-  --ds-radius-full: 9999px;
+  --gr-radius-none: 0px;
+  --gr-radius-sm: 4px;
+  --gr-radius-md: 8px;
+  --gr-radius-lg: 12px;
+  --gr-radius-xl: 16px;
+  --gr-radius-full: 9999px;
 
   /* Elevation */
-  --ds-shadow-0: none;
-  --ds-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
-  --ds-shadow-2: 0 8px 24px rgba(15, 23, 42, 0.14);
-  --ds-shadow-3: 0 16px 48px rgba(15, 23, 42, 0.20);
+  --gr-shadow-0: none;
+  --gr-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --gr-shadow-2: 0 8px 24px rgba(15, 23, 42, 0.14);
+  --gr-shadow-3: 0 16px 48px rgba(15, 23, 42, 0.20);
 
   /* Motion */
-  --ds-duration-fast: 150ms;
-  --ds-duration-base: 200ms;
-  --ds-duration-slow: 300ms;
-  --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ds-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --gr-duration-fast: 150ms;
+  --gr-duration-base: 200ms;
+  --gr-duration-slow: 300ms;
+  --gr-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --gr-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 
   /* Derived interaction formulas: action roles */
   --primary-hover: color-mix(in srgb, var(--primary) 92%, var(--fg));
@@ -613,14 +613,14 @@ const tokensCssSource = `:root {
   --destructive-active: color-mix(in srgb, var(--destructive) 84%, var(--fg));
 
   /* Derived interaction formulas: status roles */
-  --ds-success-hover: color-mix(in srgb, var(--ds-success) 92%, var(--fg));
-  --ds-success-active: color-mix(in srgb, var(--ds-success) 84%, var(--fg));
-  --ds-warning-hover: color-mix(in srgb, var(--ds-warning) 92%, var(--fg));
-  --ds-warning-active: color-mix(in srgb, var(--ds-warning) 84%, var(--fg));
-  --ds-danger-hover: color-mix(in srgb, var(--ds-danger) 92%, var(--fg));
-  --ds-danger-active: color-mix(in srgb, var(--ds-danger) 84%, var(--fg));
-  --ds-info-hover: color-mix(in srgb, var(--ds-info) 92%, var(--fg));
-  --ds-info-active: color-mix(in srgb, var(--ds-info) 84%, var(--fg));
+  --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--fg));
+  --gr-success-active: color-mix(in srgb, var(--gr-success) 84%, var(--fg));
+  --gr-warning-hover: color-mix(in srgb, var(--gr-warning) 92%, var(--fg));
+  --gr-warning-active: color-mix(in srgb, var(--gr-warning) 84%, var(--fg));
+  --gr-danger-hover: color-mix(in srgb, var(--gr-danger) 92%, var(--fg));
+  --gr-danger-active: color-mix(in srgb, var(--gr-danger) 84%, var(--fg));
+  --gr-info-hover: color-mix(in srgb, var(--gr-info) 92%, var(--fg));
+  --gr-info-active: color-mix(in srgb, var(--gr-info) 84%, var(--fg));
 }`
 
 const lightThemeCssSource = `:root {
@@ -648,30 +648,30 @@ const lightThemeCssSource = `:root {
   --destructive-fg: #ffffff;
 
   /* Status roles */
-  --ds-success: #10b981;
-  --ds-success-light: #d1fae5;
-  --ds-success-fg: #ffffff;
-  --ds-success-text: #065f46;
-  --ds-warning: #f97316;
-  --ds-warning-light: #ffedd5;
-  --ds-warning-fg: #ffffff;
-  --ds-warning-text: #7c2d12;
-  --ds-danger: #dc2626;
-  --ds-danger-light: #fee2e2;
-  --ds-danger-fg: #ffffff;
-  --ds-danger-text: #991b1b;
-  --ds-info: #5850ec;
-  --ds-info-light: #e0e7ff;
-  --ds-info-fg: #ffffff;
-  --ds-info-text: #3730a3;
-  --ds-slate: #475569;
-  --ds-slate-light: #e2e8f0;
-  --ds-slate-fg: #ffffff;
-  --ds-slate-text: #334155;
-  --ds-azure: #0ea5e9;
-  --ds-azure-light: #e0f2fe;
-  --ds-azure-fg: #ffffff;
-  --ds-azure-text: #075985;
+  --gr-success: #10b981;
+  --gr-success-light: #d1fae5;
+  --gr-success-fg: #ffffff;
+  --gr-success-text: #065f46;
+  --gr-warning: #f97316;
+  --gr-warning-light: #ffedd5;
+  --gr-warning-fg: #ffffff;
+  --gr-warning-text: #7c2d12;
+  --gr-danger: #dc2626;
+  --gr-danger-light: #fee2e2;
+  --gr-danger-fg: #ffffff;
+  --gr-danger-text: #991b1b;
+  --gr-info: #5850ec;
+  --gr-info-light: #e0e7ff;
+  --gr-info-fg: #ffffff;
+  --gr-info-text: #3730a3;
+  --gr-slate: #475569;
+  --gr-slate-light: #e2e8f0;
+  --gr-slate-fg: #ffffff;
+  --gr-slate-text: #334155;
+  --gr-azure: #0ea5e9;
+  --gr-azure-light: #e0f2fe;
+  --gr-azure-fg: #ffffff;
+  --gr-azure-text: #075985;
 
   /* Data visualization roles */
   --chart-1: #4f46e5;
@@ -691,7 +691,7 @@ const lightThemeCssSource = `:root {
   --sidebar-ring: #6366f1;
 
   /* Component semantic roles */
-  --ds-category-tree-branch-line-active-color: color-mix(in srgb, var(--primary) 20%, var(--brd));
+  --gr-category-tree-branch-line-active-color: color-mix(in srgb, var(--primary) 20%, var(--brd));
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
@@ -707,21 +707,21 @@ const lightThemeCssSource = `:root {
     --destructive-active: #bb2427;
 
     /* Status role fallbacks */
-    --ds-success-hover: #10ac7a;
-    --ds-success-active: #109f73;
-    --ds-warning-hover: #e66c18;
-    --ds-warning-active: #d46419;
-    --ds-danger-hover: #cc2526;
-    --ds-danger-active: #bb2427;
-    --ds-info-hover: #5c60e1;
-    --ds-info-active: #5659d1;
-    --ds-slate-hover: #435062;
-    --ds-slate-active: #3d4a5b;
-    --ds-azure-hover: #0284c7;
-    --ds-azure-active: #0369a1;
+    --gr-success-hover: #10ac7a;
+    --gr-success-active: #109f73;
+    --gr-warning-hover: #e66c18;
+    --gr-warning-active: #d46419;
+    --gr-danger-hover: #cc2526;
+    --gr-danger-active: #bb2427;
+    --gr-info-hover: #5c60e1;
+    --gr-info-active: #5659d1;
+    --gr-slate-hover: #435062;
+    --gr-slate-active: #3d4a5b;
+    --gr-azure-hover: #0284c7;
+    --gr-azure-active: #0369a1;
 
     /* Component semantic fallbacks */
-    --ds-category-tree-branch-line-active-color: #c4cdf7;
+    --gr-category-tree-branch-line-active-color: #c4cdf7;
   }
 }`
 
@@ -752,30 +752,30 @@ const darkThemeCssSource = `.theme-dark,
   --destructive-fg: #ffffff;
 
   /* Status roles */
-  --ds-success: #34d399;
-  --ds-success-light: #064e3b;
-  --ds-success-fg: #0f172a;
-  --ds-success-text: #6ee7b7;
-  --ds-warning: #fb923c;
-  --ds-warning-light: #7c2d12;
-  --ds-warning-fg: #0f172a;
-  --ds-warning-text: #fdba74;
-  --ds-danger: #f87171;
-  --ds-danger-light: #7f1d1d;
-  --ds-danger-fg: #0f172a;
-  --ds-danger-text: #fca5a5;
-  --ds-info: #818cf8;
-  --ds-info-light: #312e81;
-  --ds-info-fg: #0f172a;
-  --ds-info-text: #c7d2fe;
-  --ds-slate: #94a3b8;
-  --ds-slate-light: #334155;
-  --ds-slate-fg: #0f172a;
-  --ds-slate-text: #cbd5e1;
-  --ds-azure: #38bdf8;
-  --ds-azure-light: #0c4a6e;
-  --ds-azure-fg: #0f172a;
-  --ds-azure-text: #bae6fd;
+  --gr-success: #34d399;
+  --gr-success-light: #064e3b;
+  --gr-success-fg: #0f172a;
+  --gr-success-text: #6ee7b7;
+  --gr-warning: #fb923c;
+  --gr-warning-light: #7c2d12;
+  --gr-warning-fg: #0f172a;
+  --gr-warning-text: #fdba74;
+  --gr-danger: #f87171;
+  --gr-danger-light: #7f1d1d;
+  --gr-danger-fg: #0f172a;
+  --gr-danger-text: #fca5a5;
+  --gr-info: #818cf8;
+  --gr-info-light: #312e81;
+  --gr-info-fg: #0f172a;
+  --gr-info-text: #c7d2fe;
+  --gr-slate: #94a3b8;
+  --gr-slate-light: #334155;
+  --gr-slate-fg: #0f172a;
+  --gr-slate-text: #cbd5e1;
+  --gr-azure: #38bdf8;
+  --gr-azure-light: #0c4a6e;
+  --gr-azure-fg: #0f172a;
+  --gr-azure-text: #bae6fd;
 
   /* Data visualization roles */
   --chart-1: #6366f1;
@@ -795,7 +795,7 @@ const darkThemeCssSource = `.theme-dark,
   --sidebar-ring: #818cf8;
 
   /* Component semantic roles */
-  --ds-category-tree-branch-line-active-color: color-mix(in srgb, var(--primary) 38%, var(--brd));
+  --gr-category-tree-branch-line-active-color: color-mix(in srgb, var(--primary) 38%, var(--brd));
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
@@ -813,21 +813,21 @@ const darkThemeCssSource = `.theme-dark,
     --destructive-active: #f06161;
 
     /* Status role fallbacks */
-    --ds-success-hover: #44d6a1;
-    --ds-success-active: #53d9a9;
-    --ds-warning-hover: #fb9a4b;
-    --ds-warning-active: #fba35b;
-    --ds-danger-hover: #f87c7c;
-    --ds-danger-active: #f88787;
-    --ds-info-hover: #8b95f8;
-    --ds-info-active: #949ef9;
-    --ds-slate-hover: #9faec0;
-    --ds-slate-active: #aab7c8;
-    --ds-azure-hover: #4bc3f9;
-    --ds-azure-active: #5dcbf9;
+    --gr-success-hover: #44d6a1;
+    --gr-success-active: #53d9a9;
+    --gr-warning-hover: #fb9a4b;
+    --gr-warning-active: #fba35b;
+    --gr-danger-hover: #f87c7c;
+    --gr-danger-active: #f88787;
+    --gr-info-hover: #8b95f8;
+    --gr-info-active: #949ef9;
+    --gr-slate-hover: #9faec0;
+    --gr-slate-active: #aab7c8;
+    --gr-azure-hover: #4bc3f9;
+    --gr-azure-active: #5dcbf9;
 
     /* Component semantic fallbacks */
-    --ds-category-tree-branch-line-active-color: #505b8c;
+    --gr-category-tree-branch-line-active-color: #505b8c;
   }
 }`
 
@@ -847,7 +847,7 @@ body {
 
 body {
   margin: 0;
-  font-family: var(--ds-font-ui);
+  font-family: var(--gr-font-ui);
   background: var(--bg);
   color: var(--fg);
 }
@@ -865,10 +865,10 @@ const lightThemeCssExcerpt = `:root {
   --ring: #6366f1;
   --primary: #4f46e5;
   --primary-fg: #ffffff;
-  --ds-success: #10b981;
-  --ds-warning: #f97316;
-  --ds-danger: #dc2626;
-  --ds-info: #6366f1;
+  --gr-success: #10b981;
+  --gr-warning: #f97316;
+  --gr-danger: #dc2626;
+  --gr-info: #6366f1;
 }`
 
 const darkThemeCssExcerpt = `.theme-dark,
@@ -882,10 +882,10 @@ const darkThemeCssExcerpt = `.theme-dark,
   --ring: #818cf8;
   --primary: #6366f1;
   --primary-fg: #ffffff;
-  --ds-success: #34d399;
-  --ds-warning: #fb923c;
-  --ds-danger: #f87171;
-  --ds-info: #818cf8;
+  --gr-success: #34d399;
+  --gr-warning: #fb923c;
+  --gr-danger: #f87171;
+  --gr-info: #818cf8;
 }`
 
 const tokensCssExcerpt = takeLeadingBlock(tokensCssSource, 46)

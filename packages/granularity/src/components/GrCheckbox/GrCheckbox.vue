@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrCheckbox — DS-примитив чекбокса с нативным скрытым `<input type="checkbox">`
+ * GrCheckbox — GR-примитив чекбокса с нативным скрытым `<input type="checkbox">`
  * для интеграции с HTML-формами (`FormData`, `required`, `form`).
  *
  * Источник истины — нативный input: клик по нему (в т.ч. по внешнему
@@ -102,7 +102,7 @@ function onClick(e: MouseEvent): void {
 </script>
 <template>
   <div
-    data-ds-checkbox
+    data-gr-checkbox
     class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--ring),0_0_0_4px_var(--bg)]"
     role="checkbox"
     :aria-checked="indeterminate ? 'mixed' : (modelValue ? 'true' : 'false')"
@@ -128,7 +128,7 @@ function onClick(e: MouseEvent): void {
       @change="onNativeChange"
     >
     <span
-      data-ds-checkbox-indicator
+      data-gr-checkbox-indicator
       aria-hidden="true"
       class="h-4 w-4 rounded border flex items-center justify-center transition-colors duration-150"
       :class="(modelValue || indeterminate)
@@ -137,11 +137,11 @@ function onClick(e: MouseEvent): void {
     >
       <IconMinus
         v-if="indeterminate"
-        class="ds-checkbox-icon h-3.5 w-3.5 text-[var(--primary-fg)]"
+        class="gr-checkbox-icon h-3.5 w-3.5 text-[var(--primary-fg)]"
       />
       <IconCheck
         v-else
-        class="ds-checkbox-icon h-3.5 w-3.5 transition-transform transition-opacity duration-150"
+        class="gr-checkbox-icon h-3.5 w-3.5 transition-transform transition-opacity duration-150"
         :class="modelValue
           ? 'opacity-100 scale-100 text-[var(--primary-fg)]'
           : 'opacity-0 scale-75 text-transparent'"

@@ -6,7 +6,7 @@ export const grPromptDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Rename flow with required value',
     description: 'Базовый сценарий для `GrPromptDialog`: controlled value, required validation и сохранение подтверждённого текста.',
     status: 'ready',
-    previewKey: 'ds-prompt-dialog-rename-flow',
+    previewKey: 'gr-prompt-dialog-rename-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -29,7 +29,7 @@ const value = ref('Q2 North Star')
     title: 'Optional input mode',
     description: 'Показываем `required=false`, placeholder и compact footer для необязательных handoff notes.',
     status: 'ready',
-    previewKey: 'ds-prompt-dialog-optional-value',
+    previewKey: 'gr-prompt-dialog-optional-value',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -52,7 +52,7 @@ const note = ref('Call finance before noon')
     title: 'External source-of-truth reset',
     description: 'Изолируем кейс, когда значение приходит из внешнего store и должно сбрасываться на момент повторного открытия.',
     status: 'ready',
-    previewKey: 'ds-prompt-dialog-reset-flow',
+    previewKey: 'gr-prompt-dialog-reset-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -75,7 +75,7 @@ const value = ref('Acme Corp')
     title: 'Imperative service (useDialogService)',
     description: 'Нужен `prompt` без декларативного компонента в шаблоне? Императивный `useDialogService().prompt()` возвращает `Promise<string | null>` и собран с живыми примерами на отдельной странице composable.',
     status: 'ready',
-    previewKey: 'ds-prompt-dialog-service-link',
+    previewKey: 'gr-prompt-dialog-service-link',
     code: `<script setup lang="ts">
 import { useDialogService } from '@feugene/granularity'
 

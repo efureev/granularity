@@ -6,7 +6,7 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Sortable rows with initial state',
     description: 'Базовый сценарий для `GrDataTable`: передаём `rows`, `columns`, стартовую сортировку и сразу проверяем built-in sorting.',
     status: 'ready',
-    previewKey: 'ds-data-table-sortable-columns',
+    previewKey: 'gr-data-table-sortable-columns',
     code: `<script setup lang="ts">
 import { GrDataTable } from '@feugene/granularity'
 
@@ -37,7 +37,7 @@ const columns = [
     title: 'Custom status and actions cells',
     description: 'Ключевой composition-scenario: стандартный data pipeline остаётся у `GrDataTable`, а конкретные ячейки переопределяются слотами.',
     status: 'ready',
-    previewKey: 'ds-data-table-custom-cells',
+    previewKey: 'gr-data-table-custom-cells',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -92,7 +92,7 @@ function actionLabel(status: string) {
     title: 'Filtered datasets outside the component',
     description: 'Показываем границу ответственности: фильтрация остаётся снаружи, а `GrDataTable` честно рендерит уже подготовленный набор строк.',
     status: 'ready',
-    previewKey: 'ds-data-table-filtered-view',
+    previewKey: 'gr-data-table-filtered-view',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrTextarea — многострочное поле ввода DS-примитива.
+ * GrTextarea — многострочное поле ввода GR-примитива.
  *
  * Состояния:
  * - `state`: визуальный оттенок рамки (`default | success | warning | danger`).
@@ -49,7 +49,7 @@ function onInput(e: Event): void {
 <template>
   <textarea
     :id="id"
-    data-ds-textarea
+    data-gr-textarea
     :name="name"
     :rows="rows"
     :autocomplete="autocomplete"

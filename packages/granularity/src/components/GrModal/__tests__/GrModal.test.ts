@@ -135,8 +135,8 @@ describe('granularity/GrModal (unit)', () => {
   it('рендерит оверлей ниже панели, aria-hidden и дефолтный размер md', () => {
     const wrapper = mountHarness()
 
-    const overlay = wrapper.find('[data-ds-modal-overlay]')
-    const panel = wrapper.find('[data-ds-modal-panel]')
+    const overlay = wrapper.find('[data-gr-modal-overlay]')
+    const panel = wrapper.find('[data-gr-modal-panel]')
 
     expect(overlay.exists()).toBe(true)
     expect(panel.exists()).toBe(true)
@@ -157,7 +157,7 @@ describe('granularity/GrModal (unit)', () => {
     await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
     await nextTick()
 
-    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
 
     wrapper.unmount()
   })
@@ -168,7 +168,7 @@ describe('granularity/GrModal (unit)', () => {
     await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
     await nextTick()
 
-    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(true)
 
     wrapper.unmount()
   })
@@ -179,7 +179,7 @@ describe('granularity/GrModal (unit)', () => {
     await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
     await nextTick()
 
-    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
 
     wrapper.unmount()
   })
@@ -187,11 +187,11 @@ describe('granularity/GrModal (unit)', () => {
   it('закрывается по клику на оверлей, если closeOnBackdrop=true', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: true })
 
-    await wrapper.find('[data-ds-modal-overlay]').trigger('pointerdown')
+    await wrapper.find('[data-gr-modal-overlay]').trigger('pointerdown')
     wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
     await nextTick()
 
-    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
 
     wrapper.unmount()
   })
@@ -199,11 +199,11 @@ describe('granularity/GrModal (unit)', () => {
   it('не закрывается по клику на оверлей, если closeOnBackdrop=false', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: false })
 
-    await wrapper.find('[data-ds-modal-overlay]').trigger('pointerdown')
+    await wrapper.find('[data-gr-modal-overlay]').trigger('pointerdown')
     wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
     await nextTick()
 
-    expect(wrapper.find('[data-ds-modal-panel]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(true)
 
     wrapper.unmount()
   })
@@ -211,7 +211,7 @@ describe('granularity/GrModal (unit)', () => {
   it('применяет full-size модификатор для edge-case размера full', () => {
     const wrapper = mountHarness({ size: 'full' })
 
-    const panelClass = wrapper.find('[data-ds-modal-panel]').attributes('class')
+    const panelClass = wrapper.find('[data-gr-modal-panel]').attributes('class')
 
     expect(panelClass).toContain('max-w-none')
     expect(panelClass).toContain('h-[100svh]')
@@ -224,23 +224,23 @@ describe('granularity/GrModal (unit)', () => {
   it('рендерит контент напрямую внутри панели без header/footer и кнопки закрытия', () => {
     const wrapper = mountHarness()
 
-    expect(wrapper.find('[data-ds-dialog-header]').exists()).toBe(false)
-    expect(wrapper.find('[data-ds-dialog-footer]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-dialog-header]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-dialog-footer]').exists()).toBe(false)
     expect(wrapper.find('button[aria-label="Close"]').exists()).toBe(false)
-    expect(wrapper.find('[data-ds-modal-panel] [data-testid="modal-body"]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-modal-panel] [data-testid="modal-body"]').exists()).toBe(true)
 
     wrapper.unmount()
   })
 
   it('рендерит слоты #title и #description как DialogTitle/Description, только если переданы', () => {
     const wrapperEmpty = mountHarness()
-    expect(wrapperEmpty.find('[data-ds-modal-title]').exists()).toBe(false)
-    expect(wrapperEmpty.find('[data-ds-modal-description]').exists()).toBe(false)
+    expect(wrapperEmpty.find('[data-gr-modal-title]').exists()).toBe(false)
+    expect(wrapperEmpty.find('[data-gr-modal-description]').exists()).toBe(false)
     wrapperEmpty.unmount()
 
     const wrapper = mountHarness({ withTitleSlot: true, withDescriptionSlot: true })
-    expect(wrapper.find('[data-ds-modal-title]').exists()).toBe(true)
-    expect(wrapper.find('[data-ds-modal-description]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-modal-title]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-modal-description]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="title-slot"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="description-slot"]').exists()).toBe(true)
     wrapper.unmount()

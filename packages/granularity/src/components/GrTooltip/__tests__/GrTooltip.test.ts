@@ -27,7 +27,7 @@ describe('GrTooltip', () => {
       },
     })
 
-    const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
+    const trigger = wrapper.get('[data-testid="gr-tooltip-trigger"]')
     expect(trigger.attributes('style')).toContain('color: var(--muted-fg)')
     expect(wrapper.get('[data-icon="info"]')).toBeTruthy()
 
@@ -44,7 +44,7 @@ describe('GrTooltip', () => {
       props: { text: 'Hint' },
     })
 
-    const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
+    const trigger = wrapper.get('[data-testid="gr-tooltip-trigger"]')
     const tooltip = document.body.querySelector('[role="tooltip"]')
 
     const describedBy = trigger.attributes('aria-describedby')
@@ -58,7 +58,7 @@ describe('GrTooltip', () => {
       props: { text: 'Hint' },
     })
 
-    const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
+    const trigger = wrapper.get('[data-testid="gr-tooltip-trigger"]')
     const tooltip = () => document.body.querySelector('[role="tooltip"]') as HTMLElement
 
     await trigger.trigger('mouseenter')
@@ -76,7 +76,7 @@ describe('GrTooltip', () => {
       props: { text: 'Hint' },
     })
 
-    const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
+    const trigger = wrapper.get('[data-testid="gr-tooltip-trigger"]')
     const tooltip = () => document.body.querySelector('[role="tooltip"]') as HTMLElement
 
     await trigger.trigger('focus')
@@ -100,7 +100,7 @@ describe('GrTooltip', () => {
       },
     })
 
-    const trigger = wrapper.get('[data-testid="ds-tooltip-trigger"]')
+    const trigger = wrapper.get('[data-testid="gr-tooltip-trigger"]')
     expect(trigger.attributes('style')).toContain('color: rgb(15, 23, 42)')
     expect(wrapper.get('[data-testid="custom-trigger"]').text()).toBe('?')
     expect(wrapper.find('[data-icon="info"]').exists()).toBe(false)

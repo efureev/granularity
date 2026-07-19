@@ -124,8 +124,8 @@ function onClick(tab: GrTab): void {
 <template>
   <div
     role="tablist"
-    data-ds-tabs
-    class="inline-flex flex-wrap gap-1 rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--muted)] p-1"
+    data-gr-tabs
+    class="inline-flex flex-wrap gap-1 rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--muted)] p-1"
     @keydown="onKeydown"
   >
     <button
@@ -134,7 +134,7 @@ function onClick(tab: GrTab): void {
       :ref="el => setButtonRef(el, index)"
       type="button"
       role="tab"
-      data-ds-tab
+      data-gr-tab
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :disabled="tab.disabled"

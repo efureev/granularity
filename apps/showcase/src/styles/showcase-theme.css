@@ -130,7 +130,7 @@
 .showcase-pill-active {
     background-color: var(--showcase-surface-raised);
     color: var(--fg);
-    box-shadow: var(--ds-shadow-1);
+    box-shadow: var(--gr-shadow-1);
 }
 
 .showcase-nav-item-active {

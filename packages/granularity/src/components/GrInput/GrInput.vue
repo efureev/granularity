@@ -189,9 +189,9 @@ const shellClass = computed(() => {
 
   const borderByState: Record<typeof state, string> = {
     default: 'border-[var(--brd)]',
-    success: 'border-[var(--ds-success)] focus-within:ring-[var(--ds-success)]',
-    warning: 'border-[var(--ds-warning)] focus-within:ring-[var(--ds-warning)]',
-    danger: 'border-[var(--ds-danger)] focus-within:ring-[var(--ds-danger)]',
+    success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
+    warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
+    danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
   }
 
   return [
@@ -220,7 +220,7 @@ function onInput(e: Event): void {
     <div
         v-if="$slots.prefix"
         ref="prefixEl"
-        data-testid="ds-input-prefix"
+        data-testid="gr-input-prefix"
         class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
         :style="prefixStyle"
         aria-hidden="true"
@@ -249,7 +249,7 @@ function onInput(e: Event): void {
     <div
         v-if="$slots.suffix"
         ref="suffixEl"
-        data-testid="ds-input-suffix"
+        data-testid="gr-input-suffix"
         class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
         :class="suffixFixed ? '[direction:rtl]' : ''"
         :style="suffixStyle"

@@ -41,9 +41,9 @@ function resolveTone(status: TreeItem['status']) {
     return 'bg-[color-mix(in_srgb,var(--destructive)_14%,transparent)] text-[var(--destructive)]'
 
   if (status === 'warning')
-    return 'bg-[var(--ds-warning-light)] text-[var(--ds-warning)]'
+    return 'bg-[var(--gr-warning-light)] text-[var(--gr-warning)]'
 
-  return 'bg-[var(--ds-success-light)] text-[var(--ds-success)]'
+  return 'bg-[var(--gr-success-light)] text-[var(--gr-success)]'
 }
 </script>
 

@@ -28,16 +28,16 @@ describe('showcase foundations content', () => {
     expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/unocss-preset-granular/node')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/granularity/granular-provider/node')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'localization')?.narrativeSource).toContain('GRANULARITY_I18N_BLOCK')
-    expect(showcaseFoundationGuides.find(guide => guide.id === 'tokens')?.narrativeSource).toContain('--ds-space-4')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'tokens')?.narrativeSource).toContain('--gr-space-4')
   })
 
   it('собирает текущий registry foundation tokens прямо из tokens.css', () => {
     expect(showcaseFoundationTokens.length).toBeGreaterThan(40)
-    expect(showcaseFoundationTokens.find(token => token.name === '--ds-slate-500')).toMatchObject({
+    expect(showcaseFoundationTokens.find(token => token.name === '--gr-slate-500')).toMatchObject({
       hexValue: '#64748b',
       section: 'Palette scale',
     })
-    expect(showcaseFoundationTokens.find(token => token.name === '--ds-font-ui')?.description).toContain('Основной стек шрифта')
+    expect(showcaseFoundationTokens.find(token => token.name === '--gr-font-ui')?.description).toContain('Основной стек шрифта')
     expect(showcaseFoundationTokens.find(token => token.name === '--primary-hover')?.value).toContain('color-mix')
   })
 
@@ -56,7 +56,7 @@ describe('showcase foundations content', () => {
     })
     expect(showcaseThemeTokens.find(token => token.name === '--primary')?.description).toContain('brand/action цвет')
     expect(showcaseThemeTokens.find(token => token.name === '--primary-hover')?.section).toBe('Fallbacks / action roles')
-    expect(showcaseThemeTokens.find(token => token.name === '--ds-category-tree-branch-line-active-color')).toMatchObject({
+    expect(showcaseThemeTokens.find(token => token.name === '--gr-category-tree-branch-line-active-color')).toMatchObject({
       section: 'Component semantic roles',
       values: {
         light: {

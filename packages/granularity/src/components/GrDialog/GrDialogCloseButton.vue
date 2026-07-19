@@ -12,7 +12,7 @@ defineOptions({
 const { t } = useGranularityTranslations()
 
 // A11y-лейбл: берём из атрибутов (родитель прокидывает `:aria-label="closeLabel"`)
-// или используем i18n-дефолт. Не хардкодим английское "Close" — DS должен быть i18n-friendly.
+// или используем i18n-дефолт. Не хардкодим английское "Close" — GR должен быть i18n-friendly.
 const attrs = useAttrs()
 const ariaLabel = computed(() => (attrs['aria-label'] as string | undefined) ?? t('gr.common.close', 'Close'))
 
@@ -24,7 +24,7 @@ defineEmits<{
 <template>
   <GrButton
     v-bind="attrs"
-    data-ds-dialog-close
+    data-gr-dialog-close
     variant="ghost"
     size="sm"
     square

@@ -6,7 +6,7 @@ export const grImageViewerExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Fullscreen gallery from thumbnails',
     description: 'Базовый media-flow: открываем `GrImageViewer` из gallery grid и синхронизируем `initialIndex` c выбранной thumbnail.',
     status: 'ready',
-    previewKey: 'ds-image-viewer-gallery',
+    previewKey: 'gr-image-viewer-gallery',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -30,7 +30,7 @@ const initialIndex = ref(0)
     title: 'Custom toolbar slot',
     description: 'Показываем slot-based composition: кастомный toolbar с action-кнопками и собственным progress/zoom summary поверх overlay.',
     status: 'ready',
-    previewKey: 'ds-image-viewer-toolbar-slot',
+    previewKey: 'gr-image-viewer-toolbar-slot',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -56,7 +56,7 @@ const open = ref(false)
     title: 'Real image size in toolbar',
     description: 'Картинка фиксированного размера (1000×1500): компонент сам отдаёт в slot natural-размер, фактический rendered-размер и реальный масштаб (`realScalePercent`), поэтому не нужно вручную читать DOM.',
     status: 'ready',
-    previewKey: 'ds-image-viewer-real-size',
+    previewKey: 'gr-image-viewer-real-size',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -84,7 +84,7 @@ const open = ref(false)
     title: 'Async gallery loading',
     description: 'Закрываем async/media use-case: сначала показываем loading/progress, затем открываем viewer после получения media payload.',
     status: 'ready',
-    previewKey: 'ds-image-viewer-async-media',
+    previewKey: 'gr-image-viewer-async-media',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 

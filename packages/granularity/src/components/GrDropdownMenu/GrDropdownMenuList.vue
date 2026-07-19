@@ -24,7 +24,7 @@ const className = computed(() => {
 </script>
 
 <template>
-  <div data-ds-dropdown-menu-list :class="className">
+  <div data-gr-dropdown-menu-list :class="className">
     <slot />
   </div>
 </template>

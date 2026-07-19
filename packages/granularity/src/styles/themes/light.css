@@ -23,30 +23,30 @@
   --destructive-fg: #ffffff;
 
   /* Status roles */
-  --ds-success: #10b981;
-  --ds-success-light: #d1fae5;
-  --ds-success-fg: #ffffff;
-  --ds-success-text: #065f46;
-  --ds-warning: #f97316;
-  --ds-warning-light: #ffedd5;
-  --ds-warning-fg: #ffffff;
-  --ds-warning-text: #7c2d12;
-  --ds-danger: #dc2626;
-  --ds-danger-light: #fee2e2;
-  --ds-danger-fg: #ffffff;
-  --ds-danger-text: #991b1b;
-  --ds-info: #5850ec;
-  --ds-info-light: #e0e7ff;
-  --ds-info-fg: #ffffff;
-  --ds-info-text: #3730a3;
-  --ds-slate: #475569;
-  --ds-slate-light: #e2e8f0;
-  --ds-slate-fg: #ffffff;
-  --ds-slate-text: #334155;
-  --ds-azure: #0ea5e9;
-  --ds-azure-light: #e0f2fe;
-  --ds-azure-fg: #ffffff;
-  --ds-azure-text: #075985;
+  --gr-success: #10b981;
+  --gr-success-light: #d1fae5;
+  --gr-success-fg: #ffffff;
+  --gr-success-text: #065f46;
+  --gr-warning: #f97316;
+  --gr-warning-light: #ffedd5;
+  --gr-warning-fg: #ffffff;
+  --gr-warning-text: #7c2d12;
+  --gr-danger: #dc2626;
+  --gr-danger-light: #fee2e2;
+  --gr-danger-fg: #ffffff;
+  --gr-danger-text: #991b1b;
+  --gr-info: #5850ec;
+  --gr-info-light: #e0e7ff;
+  --gr-info-fg: #ffffff;
+  --gr-info-text: #3730a3;
+  --gr-slate: #475569;
+  --gr-slate-light: #e2e8f0;
+  --gr-slate-fg: #ffffff;
+  --gr-slate-text: #334155;
+  --gr-azure: #0ea5e9;
+  --gr-azure-light: #e0f2fe;
+  --gr-azure-fg: #ffffff;
+  --gr-azure-text: #075985;
 
   /* Data visualization roles */
   --chart-1: #4f46e5;
@@ -79,20 +79,20 @@
     --destructive-active: #bb2427;
 
     /* Status role fallbacks */
-    --ds-success-hover: #10ac7a;
-    --ds-success-active: #109f73;
-    --ds-warning-hover: #e66c18;
-    --ds-warning-active: #d46419;
-    --ds-danger-hover: #cc2526;
-    --ds-danger-active: #bb2427;
-    --ds-info-hover: #5c60e1;
-    --ds-info-active: #5659d1;
-    --ds-slate-hover: #435062;
-    --ds-slate-active: #3d4a5b;
-    --ds-azure-hover: #0284c7;
-    --ds-azure-active: #0369a1;
+    --gr-success-hover: #10ac7a;
+    --gr-success-active: #109f73;
+    --gr-warning-hover: #e66c18;
+    --gr-warning-active: #d46419;
+    --gr-danger-hover: #cc2526;
+    --gr-danger-active: #bb2427;
+    --gr-info-hover: #5c60e1;
+    --gr-info-active: #5659d1;
+    --gr-slate-hover: #435062;
+    --gr-slate-active: #3d4a5b;
+    --gr-azure-hover: #0284c7;
+    --gr-azure-active: #0369a1;
 
     /* Component semantic fallbacks */
-    /*--ds-category-tree-branch-line-active-color: #c4cdf7;*/
+    /*--gr-category-tree-branch-line-active-color: #c4cdf7;*/
   }
 }

@@ -6,7 +6,7 @@ export const grInputTagExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic tag entry with live summary',
     description: 'Базовый live-demo фиксирует основной UX: ввод, `Enter`/separator commit и отражение списка тегов на стороне хоста.',
     status: 'ready',
-    previewKey: 'ds-input-tag-basic-flow',
+    previewKey: 'gr-input-tag-basic-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -35,7 +35,7 @@ const tags = ref(['critical', 'backend'])
     title: 'Controlled limit with semantic state',
     description: 'Отдельно документируем сценарий с `max`: компонент удобно использовать для curated lists и constrained profile metadata.',
     status: 'ready',
-    previewKey: 'ds-input-tag-max-state',
+    previewKey: 'gr-input-tag-max-state',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -72,7 +72,7 @@ const remaining = computed(() => 4 - skills.value.length)
     title: 'Custom tag slot for semantic badges',
     description: 'Через slot `tag` витрина показывает, как host-screen может переоформить tag-pill и добавить собственные маркеры статуса.',
     status: 'ready',
-    previewKey: 'ds-input-tag-custom-slot',
+    previewKey: 'gr-input-tag-custom-slot',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

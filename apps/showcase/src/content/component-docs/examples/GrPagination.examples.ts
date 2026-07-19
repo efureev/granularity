@@ -6,7 +6,7 @@ export const grPaginationExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic paging feedback loop',
     description: 'Минимальный сценарий для `GrPagination`: меняем страницу и размер выдачи, а рядом показываем, какой диапазон элементов реально видит пользователь.',
     status: 'ready',
-    previewKey: 'ds-pagination-basic-flow',
+    previewKey: 'gr-pagination-basic-flow',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -41,7 +41,7 @@ const visibleRange = computed(() => {
     title: 'Page-size changes with page clamping',
     description: 'Отдельно показываем защиту от типичного UX-багa: когда после смены `pageSize` текущая страница выходит за пределы нового количества страниц.',
     status: 'ready',
-    previewKey: 'ds-pagination-page-size-guard',
+    previewKey: 'gr-pagination-page-size-guard',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -94,7 +94,7 @@ function setTotal(nextTotal: number) {
     title: 'Composition with GrDataTable',
     description: 'Практический сценарий: `GrPagination` остаётся контролом навигации, а slicing данных и действия по строкам живут в page-level orchestration.',
     status: 'ready',
-    previewKey: 'ds-pagination-table-composition',
+    previewKey: 'gr-pagination-table-composition',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 

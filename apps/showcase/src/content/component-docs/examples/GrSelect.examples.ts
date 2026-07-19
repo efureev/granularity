@@ -6,7 +6,7 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Interactive select constructor',
     description: 'Живой playground для всех ключевых пропсов `GrSelect`: меняйте `view`, `size`, `optionsView`, `variant`, `underline` и состояния (multiple/clearable/disabled/allow-custom-value) без переключения между отдельными demo-картами.',
     status: 'ready',
-    previewKey: 'ds-select-builder',
+    previewKey: 'gr-select-builder',
     code: '',
     note: 'Лучший формат для дизайн-ревью и QA: один сценарий сразу покрывает весь контракт пропсов и помогает быстро проверить native/panel-режимы и link-стилизацию.',
   },
@@ -15,7 +15,7 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Native single and clearable',
     description: 'Базовый сценарий для `GrSelect`: обычный single-select и clearable режим в native-rendering без дополнительной composition-логики.',
     status: 'ready',
-    previewKey: 'ds-select-native-modes',
+    previewKey: 'gr-select-native-modes',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -59,7 +59,7 @@ const clearableValue = ref('beta')
     title: 'Panel mode for multiple selection',
     description: 'Отдельно показываем `optionsView="panel"` вместе с `multiple`, чтобы было видно поведение dropdown-панели как mini-picker.',
     status: 'ready',
-    previewKey: 'ds-select-panel-multiple',
+    previewKey: 'gr-select-panel-multiple',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -93,7 +93,7 @@ const selectedTeams = ref<string[]>(['design', 'platform'])
     title: 'Grouped options',
     description: 'Опции можно группировать в стандартном формате `{ label, options: [{ value, label }] }`. В `optionsView="native"` группы рендерятся как нативные `<optgroup>`, а в `optionsView="panel"` — как заголовки групп внутри dropdown-панели.',
     status: 'ready',
-    previewKey: 'ds-select-groups',
+    previewKey: 'gr-select-groups',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -147,7 +147,7 @@ const panelCity = ref('Chengdu')
     title: 'Custom value and value slot',
     description: 'Сложный режим для cases, где пользователь может добавить свой вариант и одновременно кастомизировать отображение выбранного значения.',
     status: 'ready',
-    previewKey: 'ds-select-custom-value',
+    previewKey: 'gr-select-custom-value',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

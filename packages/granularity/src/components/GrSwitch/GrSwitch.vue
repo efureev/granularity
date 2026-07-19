@@ -11,7 +11,7 @@ import {
 export type {GrSwitchSize} from './grSwitchStyles'
 
 /**
- * Пропсы публичного DS-примитива «Switch».
+ * Пропсы публичного GR-примитива «Switch».
  */
 export interface GrSwitchProps {
   modelValue: boolean
@@ -52,13 +52,13 @@ const trackStyle = computed(() => {
   const backgroundColor = customBackgroundColor ?? defaultBackgroundColor
 
   return {
-    '--ds-switch-track-bg': backgroundColor,
-    '--ds-switch-track-brd': customBackgroundColor
+    '--gr-switch-track-bg': backgroundColor,
+    '--gr-switch-track-brd': customBackgroundColor
         ? backgroundColor
         : isChecked
             ? 'var(--primary)'
             : 'var(--brd)',
-    backgroundColor: 'var(--ds-switch-track-bg)',
+    backgroundColor: 'var(--gr-switch-track-bg)',
   }
 })
 
@@ -79,7 +79,7 @@ function toggle(): void {
   <button
       type="button"
       role="switch"
-      data-ds-switch
+      data-gr-switch
       :aria-checked="modelValue ? 'true' : 'false'"
       :aria-label="ariaLabel"
       :disabled="disabled"
@@ -87,21 +87,21 @@ function toggle(): void {
       @click="toggle"
   >
     <span
-        data-testid="ds-switch-track"
-        data-ds-switch-track
+        data-testid="gr-switch-track"
+        data-gr-switch-track
         :class="trackClass"
         :style="trackStyle"
     >
       <span
-          data-testid="ds-switch-thumb"
-          data-ds-switch-thumb
+          data-testid="gr-switch-thumb"
+          data-gr-switch-thumb
           :class="thumbClass"
           aria-hidden="true"
       />
     </span>
     <span
         v-if="$slots.default"
-        data-ds-switch-label
+        data-gr-switch-label
         :class="labelClass"
     >
       <slot />

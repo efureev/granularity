@@ -6,7 +6,7 @@ export const grLinkExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Interactive link constructor',
     description: 'Соберите `GrLink` под ваш сценарий: переключайте tone, underline, size, навигационные атрибуты и сразу смотрите итоговый snippet.',
     status: 'ready',
-    previewKey: 'ds-link-builder',
+    previewKey: 'gr-link-builder',
     code: '',
   },
   {
@@ -14,7 +14,7 @@ export const grLinkExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Variants and underline modes',
     description: 'На витрине важно сравнить `tone`, `underline` и size contract, потому что `GrLink` часто используется как inline action вместо кнопки.',
     status: 'ready',
-    previewKey: 'ds-link-variants',
+    previewKey: 'gr-link-variants',
     code: `<script setup lang="ts">
 import { GrLink } from '@feugene/granularity'
 </script>
@@ -33,7 +33,7 @@ import { GrLink } from '@feugene/granularity'
     title: 'External navigation and inline icon',
     description: 'Показываем `external`-режим и composition с `GrIcon`, чтобы закрепить contract для внешних docs/source links.',
     status: 'ready',
-    previewKey: 'ds-link-external',
+    previewKey: 'gr-link-external',
     code: `<script setup lang="ts">
 import { GrIcon, GrLink } from '@feugene/granularity'
 </script>
@@ -55,7 +55,7 @@ import { GrIcon, GrLink } from '@feugene/granularity'
     title: 'Disabled and muted states',
     description: 'Отдельно показываем disabled/muted сценарии, чтобы было понятно, как `GrLink` деградирует до неинтерактивного inline элемента.',
     status: 'ready',
-    previewKey: 'ds-link-disabled-states',
+    previewKey: 'gr-link-disabled-states',
     code: `<script setup lang="ts">
 import { GrLink } from '@feugene/granularity'
 </script>

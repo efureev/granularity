@@ -38,7 +38,7 @@ describe('GrSidebar', () => {
       slots: { default: '<a href="#">Item</a>' },
     })
 
-    expect(wrapper.find('[data-ds-sidebar-header]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-sidebar-header]').exists()).toBe(false)
   })
 
   it('кнопка тогла сворачивает панель и эмитит update:collapsed', async () => {
@@ -46,13 +46,13 @@ describe('GrSidebar', () => {
       props: { title: 'Nav', showToggleButton: true },
     })
 
-    const toggle = wrapper.get('[data-ds-sidebar-toggle]')
+    const toggle = wrapper.get('[data-gr-sidebar-toggle]')
     await toggle.trigger('click')
 
     expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true])
     expect(wrapper.get('aside').attributes('data-collapsed')).toBe('true')
     // Заголовок скрывается в свёрнутом виде.
-    expect(wrapper.find('[data-ds-sidebar-title]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-sidebar-title]').exists()).toBe(false)
   })
 
   it('GrSidebarItem: в свёрнутом виде без иконки показывает первую букву метки', async () => {
@@ -75,7 +75,7 @@ describe('GrSidebar', () => {
     ;(wrapper.vm as unknown as { collapsed: boolean }).collapsed = true
     await nextTick()
 
-    const items = wrapper.findAll('[data-ds-sidebar-item]')
+    const items = wrapper.findAll('[data-gr-sidebar-item]')
     // «Billing» без иконки → первая буква «B», метка уходит в title.
     expect(items[0].text()).toBe('B')
     expect(items[0].attributes('title')).toBe('Billing')

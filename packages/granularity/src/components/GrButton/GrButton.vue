@@ -110,9 +110,9 @@ const className = computed(() => {
 <template>
   <component
     :is="renderAs"
-    data-ds-button
-    :data-ds-variant="props.variant"
-    :data-ds-tone="props.tone"
+    data-gr-button
+    :data-gr-variant="props.variant"
+    :data-gr-tone="props.tone"
     :type="renderAs === 'button' ? props.type : undefined"
     :disabled="nativeDisabled"
     :href="isLink && !props.disabled ? props.href : undefined"

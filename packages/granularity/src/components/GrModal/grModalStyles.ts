@@ -28,7 +28,7 @@ export const panelTransition = {
 } as const
 
 export const panelBase
-  = 'w-full overflow-hidden relative z-10 border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--ds-shadow-2)] outline-none'
+  = 'w-full overflow-hidden relative z-10 border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
 
 export const panelWidthBySize: Record<GrModalSize, string> = {
   sm: 'max-w-[420px]',
@@ -39,11 +39,11 @@ export const panelWidthBySize: Record<GrModalSize, string> = {
 }
 
 export const panelRadiusBySize: Record<GrModalSize, string> = {
-  sm: 'rounded-[var(--ds-radius-xl)]',
-  md: 'rounded-[var(--ds-radius-xl)]',
-  lg: 'rounded-[var(--ds-radius-xl)]',
-  xl: 'rounded-[var(--ds-radius-xl)]',
-  full: 'rounded-none sm:rounded-[var(--ds-radius-xl)]',
+  sm: 'rounded-[var(--gr-radius-xl)]',
+  md: 'rounded-[var(--gr-radius-xl)]',
+  lg: 'rounded-[var(--gr-radius-xl)]',
+  xl: 'rounded-[var(--gr-radius-xl)]',
+  full: 'rounded-none sm:rounded-[var(--gr-radius-xl)]',
 }
 
 // Для большинства размеров высота не задаётся — `Partial` + фильтрация пустых

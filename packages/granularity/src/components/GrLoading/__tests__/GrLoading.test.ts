@@ -8,8 +8,8 @@ describe('granularity/GrLoading (unit)', () => {
   it('рендерит дефолтный текст, дефолтный overlay-класс и анимированный спиннер', () => {
     const wrapper = mount(GrLoading)
 
-    const root = wrapper.get('[data-ds-loading]')
-    const spinner = root.find('.ds-loading__spinner')
+    const root = wrapper.get('[data-gr-loading]')
+    const spinner = root.find('.gr-loading__spinner')
 
     expect(root.attributes('class')).toContain('absolute')
     expect(root.attributes('class')).toContain('inset-0')
@@ -18,7 +18,7 @@ describe('granularity/GrLoading (unit)', () => {
     expect(root.attributes('role')).toBe('status')
     expect(root.attributes('aria-live')).toBe('polite')
     expect(wrapper.text()).toContain('Loading...')
-    expect(spinner.attributes('class')).toContain('ds-loading__spinner--animated')
+    expect(spinner.attributes('class')).toContain('gr-loading__spinner--animated')
   })
 
   it('поддерживает fullscreen, custom background, zIndex и скрытие текста', () => {
@@ -34,8 +34,8 @@ describe('granularity/GrLoading (unit)', () => {
       },
     })
 
-    const root = wrapper.get('[data-ds-loading]')
-    const spinner = root.find('.ds-loading__spinner')
+    const root = wrapper.get('[data-gr-loading]')
+    const spinner = root.find('.gr-loading__spinner')
 
     expect(root.attributes('class')).toContain('fixed')
     expect(root.attributes('class')).toContain('z-50')
@@ -45,7 +45,7 @@ describe('granularity/GrLoading (unit)', () => {
     expect(root.attributes('style')).toContain('z-index: 777;')
     expect(root.find('.text-sm').exists()).toBe(false)
     expect(spinner.attributes('class')).toContain('custom-spinner')
-    expect(spinner.attributes('class')).not.toContain('ds-loading__spinner--animated')
+    expect(spinner.attributes('class')).not.toContain('gr-loading__spinner--animated')
   })
 
   it('рендерит кастомный spinner-компонент', () => {

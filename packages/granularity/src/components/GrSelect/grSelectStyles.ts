@@ -32,7 +32,7 @@ export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = 
   primary: 'text-[var(--primary)] hover:text-[var(--primary-hover)] active:text-[var(--primary-active)]',
   default: 'text-[var(--fg)] hover:text-[var(--primary)] active:text-[var(--primary-active)]',
   muted: 'text-[var(--muted-fg)] hover:text-[var(--fg)] active:text-[var(--fg)]',
-  danger: 'text-[var(--ds-danger)] hover:text-[var(--ds-danger-hover)] active:text-[var(--ds-danger-active)]',
+  danger: 'text-[var(--gr-danger)] hover:text-[var(--gr-danger-hover)] active:text-[var(--gr-danger-active)]',
 }
 
 /**
@@ -44,7 +44,7 @@ export const selectLinkNativeLabelVariantClassByVariant: Record<GrSelectVariant,
   primary: 'text-[var(--primary)] peer-hover:text-[var(--primary-hover)] peer-active:text-[var(--primary-active)]',
   default: 'text-[var(--fg)] peer-hover:text-[var(--primary)] peer-active:text-[var(--primary-active)]',
   muted: 'text-[var(--muted-fg)] peer-hover:text-[var(--fg)] peer-active:text-[var(--fg)]',
-  danger: 'text-[var(--ds-danger)] peer-hover:text-[var(--ds-danger-hover)] peer-active:text-[var(--ds-danger-active)]',
+  danger: 'text-[var(--gr-danger)] peer-hover:text-[var(--gr-danger-hover)] peer-active:text-[var(--gr-danger-active)]',
 }
 
 function selectLinkUnderlineClass(options: { underline: GrSelectUnderline, disabled: boolean }): string {
@@ -160,4 +160,4 @@ export function grSelectTriggerClass(options: {
   ].join(' ')
 }
 
-export const grSelectPanelClasses = 'rounded-[var(--ds-radius-xl)] border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--ds-shadow-2)] overflow-hidden'
+export const grSelectPanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'

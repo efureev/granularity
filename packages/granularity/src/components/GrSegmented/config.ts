@@ -8,11 +8,11 @@ export const grSegmentedConfig = defineGranularComponent(import.meta.url, {
     tokenDefinitions: {
         light: {
             selector: ':root',
-            tokens: {'ds-segmented-indicator-highlight-shadow': '0 0 0 0 transparent'}
+            tokens: {'gr-segmented-indicator-highlight-shadow': '0 0 0 0 transparent'}
         },
         dark: {
             selector: '.dark',
-            tokens: {'ds-segmented-indicator-highlight-shadow': '0 0 0 1px rgba(248, 250, 252, 0.08)'}
+            tokens: {'gr-segmented-indicator-highlight-shadow': '0 0 0 1px rgba(248, 250, 252, 0.08)'}
         },
     }
 })

@@ -31,7 +31,7 @@ describe('GrFileUpload', () => {
 
     const file = new File(['hello'], 'hello.txt', { type: 'text/plain' })
 
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [file],
         dropEffect: 'copy',
@@ -63,7 +63,7 @@ describe('GrFileUpload', () => {
 
     const bigFile = new File([new ArrayBuffer(2 * 1024 * 1024)], 'big.bin', { type: 'application/octet-stream' })
 
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [bigFile],
       },
@@ -87,11 +87,11 @@ describe('GrFileUpload', () => {
       },
     })
 
-    await wrapper.get('[data-ds-file-upload]').trigger('click')
+    await wrapper.get('[data-gr-file-upload]').trigger('click')
     expect(clickSpy).not.toHaveBeenCalled()
 
     const file = new File(['x'], 'x.txt', { type: 'text/plain' })
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [file],
       },
@@ -115,11 +115,11 @@ describe('GrFileUpload', () => {
       },
     })
 
-    expect(wrapper.get('[data-ds-file-upload]').attributes('role')).toBeUndefined()
+    expect(wrapper.get('[data-gr-file-upload]').attributes('role')).toBeUndefined()
     expect(wrapper.find('[data-icon="arrow-up"]').exists()).toBe(false)
 
     const file = new File(['hello'], 'hello.txt', { type: 'text/plain' })
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [file],
       },
@@ -147,7 +147,7 @@ describe('GrFileUpload', () => {
     const a = new File(['a'], 'a.txt', { type: 'text/plain' })
     const b = new File(['b'], 'b.txt', { type: 'text/plain' })
 
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [a, b],
       },
@@ -174,7 +174,7 @@ describe('GrFileUpload', () => {
     })
 
     const file = new File(['x'], 'x.txt', { type: 'text/plain' })
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [file],
       },
@@ -198,7 +198,7 @@ describe('GrFileUpload', () => {
     })
 
     const file = new File(['x'], 'x.txt', { type: 'text/plain' })
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: {
         files: [file],
       },
@@ -244,7 +244,7 @@ describe('GrFileUpload', () => {
         },
       })
 
-      await actionWrapper.get('[data-ds-file-upload]').trigger('drop', {
+      await actionWrapper.get('[data-gr-file-upload]').trigger('drop', {
         dataTransfer: {
           files: [file],
         },
@@ -275,7 +275,7 @@ describe('GrFileUpload', () => {
     })
 
     const file = new File(['hello'], 'hello.txt', { type: 'text/plain' })
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: { files: [file] },
     })
 
@@ -310,7 +310,7 @@ describe('GrFileUpload', () => {
     })
 
     const file = new File(['x'], 'x.txt', { type: 'text/plain' })
-    await wrapper.get('[data-ds-file-upload]').trigger('drop', {
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
       dataTransfer: { files: [file] },
     })
 

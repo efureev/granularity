@@ -6,7 +6,7 @@ export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Single select with path display',
     description: 'Базовый сценарий для `GrTreeSelect`: single-value режим с `valueDisplay="path"`, когда пользователю нужен контекст полной ветки.',
     status: 'ready',
-    previewKey: 'ds-tree-select-path-display',
+    previewKey: 'gr-tree-select-path-display',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -38,7 +38,7 @@ const value = ref(122)
     title: 'Multiple selection with filtering',
     description: 'Показываем наиболее ценный complex-flow: multi-select режим, встроенный filter и `closeOnSelect=false` для пакетного выбора узлов.',
     status: 'ready',
-    previewKey: 'ds-tree-select-multiple-filter',
+    previewKey: 'gr-tree-select-multiple-filter',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -67,7 +67,7 @@ const selectedValues = ref([12, 21])
     title: 'Custom trigger value and node slots',
     description: 'Документируем slot API компонента: кастомный value-preview в trigger и enriched node rendering внутри dropdown-tree.',
     status: 'ready',
-    previewKey: 'ds-tree-select-custom-slots',
+    previewKey: 'gr-tree-select-custom-slots',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

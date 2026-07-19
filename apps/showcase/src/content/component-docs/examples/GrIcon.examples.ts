@@ -6,7 +6,7 @@ export const grIconExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Size scale',
     description: 'На странице важно показать, как `GrIcon` ведёт себя на разных размерах и почему он удобен как sizing-wrapper вокруг inline svg.',
     status: 'ready',
-    previewKey: 'ds-icon-size-scale',
+    previewKey: 'gr-icon-size-scale',
     code: `<script setup lang="ts">
 import { GrIcon } from '@feugene/granularity'
 
@@ -28,7 +28,7 @@ const sizes = [12, 16, 20, 28, 36]
     title: 'Inline copy and link helpers',
     description: 'Показываем, что `GrIcon` можно встраивать в copy blocks, helper rows и рядом с `GrLink`, не ломая baseline текста.',
     status: 'ready',
-    previewKey: 'ds-icon-inline-copy',
+    previewKey: 'gr-icon-inline-copy',
     code: `<script setup lang="ts">
 import { GrIcon, GrLink } from '@feugene/granularity'
 </script>
@@ -56,7 +56,7 @@ import { GrIcon, GrLink } from '@feugene/granularity'
     title: 'Status cards and KPI tiles',
     description: 'Отдельный сценарий для dashboards: `GrIcon` помогает собирать status cards и KPI summaries с предсказуемым tone/size contract.',
     status: 'ready',
-    previewKey: 'ds-icon-status-card',
+    previewKey: 'gr-icon-status-card',
     code: `<script setup lang="ts">
 import { GrBadge, GrCard, GrIcon } from '@feugene/granularity'
 </script>

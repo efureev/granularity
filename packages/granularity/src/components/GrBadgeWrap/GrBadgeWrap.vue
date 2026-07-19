@@ -14,13 +14,13 @@ const props = withDefaults(defineProps<{
 
     <span
       v-if="props.dot"
-      class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-[var(--ds-danger)]"
+      class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-[var(--gr-danger)]"
       aria-hidden="true"
     />
 
     <span
       v-else-if="props.value !== undefined"
-      class="absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-[var(--ds-danger)] text-[var(--destructive-fg)] text-[11px] font-700 inline-flex items-center justify-center"
+      class="absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-[var(--gr-danger)] text-[var(--destructive-fg)] text-[11px] font-700 inline-flex items-center justify-center"
       aria-hidden="true"
     >
       {{ props.value }}

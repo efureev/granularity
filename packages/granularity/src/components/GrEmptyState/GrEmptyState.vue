@@ -22,8 +22,8 @@ withDefaults(defineProps<GrEmptyStateProps>(), {
 
 <template>
   <div
-    data-ds-empty-state
-    class="rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] p-6 text-center"
+    data-gr-empty-state
+    class="rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--card)] p-6 text-center"
   >
     <div class="flex justify-center">
       <div class="h-12 w-12 rounded-[12px] bg-[var(--muted)] border border-[var(--brd)] flex items-center justify-center text-[var(--muted-fg)]">

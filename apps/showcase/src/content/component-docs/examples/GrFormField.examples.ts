@@ -6,7 +6,7 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic label and `forId` wiring',
     description: 'Минимальный сценарий показывает, как `GrFormField` связывает label и control, не навязывая конкретный input-тип.',
     status: 'ready',
-    previewKey: 'ds-form-field-basic-label',
+    previewKey: 'gr-form-field-basic-label',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -26,7 +26,7 @@ const name = ref('Operations dashboard')
     title: 'Inline validation message',
     description: 'Отдельно документируем ответственность `GrFormField` за error copy, когда сам control лишь сигнализирует invalid-state.',
     status: 'ready',
-    previewKey: 'ds-form-field-error-state',
+    previewKey: 'gr-form-field-error-state',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -55,7 +55,7 @@ const error = computed(() => {
     title: 'Section-style labels via `labelClass`',
     description: 'Компонент можно использовать и как мини-секцию формы: label становится heading-строкой, а внутри slot живёт уже более сложная композиция.',
     status: 'ready',
-    previewKey: 'ds-form-field-custom-label',
+    previewKey: 'gr-form-field-custom-label',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

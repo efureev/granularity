@@ -25,7 +25,7 @@ const rootClass = computed(() => [
 </script>
 
 <template>
-  <div data-ds-dialog-footer :class="rootClass">
+  <div data-gr-dialog-footer :class="rootClass">
     <slot />
   </div>
 </template>

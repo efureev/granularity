@@ -36,10 +36,10 @@ export function grDropdownOriginClass(placement: Placement): string {
 
 export function grDropdownContentClass(contentClass?: string): string {
   return [
-    'rounded-[var(--ds-radius-xl)]',
+    'rounded-[var(--gr-radius-xl)]',
     'border border-[var(--brd)]',
     'bg-[var(--card)] text-[var(--card-fg)]',
-    'shadow-[var(--ds-shadow-2)]',
+    'shadow-[var(--gr-shadow-2)]',
     'p-1',
     contentClass,
   ].filter(Boolean).join(' ')

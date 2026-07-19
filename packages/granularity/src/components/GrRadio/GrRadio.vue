@@ -135,8 +135,8 @@ function onButtonClick(): void {
 <template>
   <div
     v-if="variant === 'button'"
-    data-ds-button
-    data-ds-radio
+    data-gr-button
+    data-gr-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
@@ -166,7 +166,7 @@ function onButtonClick(): void {
 
   <div
     v-else
-    data-ds-radio
+    data-gr-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
@@ -193,13 +193,13 @@ function onButtonClick(): void {
     >
 
     <span
-      data-ds-radio-control
+      data-gr-radio-control
       aria-hidden="true"
       class="h-4 w-4 rounded-full border flex items-center justify-center transition-colors duration-150"
       :class="controlClassName"
     >
       <span
-        data-ds-radio-dot
+        data-gr-radio-dot
         :class="[grRadioDotBaseClass, dotClassName]"
       />
     </span>

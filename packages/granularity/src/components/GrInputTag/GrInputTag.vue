@@ -236,8 +236,8 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
 
 <template>
   <div
-    data-ds-input-tag
-    data-testid="ds-input-tag"
+    data-gr-input-tag
+    data-testid="gr-input-tag"
     class="w-full flex flex-wrap items-center rounded-md border bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
     :class="wrapperClassName"
     @click="focus"
@@ -249,8 +249,8 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
       :dark="tagDark"
       :size="tagSize"
       :radius="tagRadius"
-      data-ds-input-tag-item
-      data-testid="ds-input-tag-item"
+      data-gr-input-tag-item
+      data-testid="gr-input-tag-item"
       :data-index="i"
     >
       <span class="inline-flex items-center gap-1 align-middle">
@@ -263,8 +263,8 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
           type="button"
           class="-mr-0.5 shrink-0 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
           :aria-label="resolvedRemoveTagLabel"
-          data-ds-input-tag-remove
-          data-testid="ds-input-tag-remove"
+          data-gr-input-tag-remove
+          data-testid="gr-input-tag-remove"
           :data-index="i"
           @mousedown.prevent.stop
           @click.stop="removeAt(i)"
@@ -278,8 +278,8 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
 
     <input
       ref="inputEl"
-      data-ds-input-tag-input
-      data-testid="ds-input-tag-input"
+      data-gr-input-tag-input
+      data-testid="gr-input-tag-input"
       :value="inputValue"
       :disabled="disabled || isMaxed"
       :readonly="readonly"

@@ -74,7 +74,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
           class="flex min-w-0 items-center gap-3"
         >
           <div
-              class="h-9 w-9 rounded-[12px] border border-[var(--brd)] bg-[var(--card)] flex items-center justify-center shadow-[var(--ds-shadow-1)]"
+              class="h-9 w-9 rounded-[12px] border border-[var(--brd)] bg-[var(--card)] flex items-center justify-center shadow-[var(--gr-shadow-1)]"
               aria-hidden="true"
           >
             <IconLayers class="h-4 w-4 text-[var(--muted-fg)]" />
@@ -98,7 +98,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
             v-for="item in topNavigationItems"
             :key="item.name"
             :to="item.path"
-            class="rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
+            class="rounded-full border px-4 py-2 text-xs font-semibold transition-colors"
             :class="getTopNavigationItemClass(item)"
           >
             {{ item.shortTitle }}

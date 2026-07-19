@@ -1,96 +1,96 @@
 :root {
   /* Foundations: neutral palette */
-  --ds-slate-0: #ffffff;
-  --ds-slate-50: #f8fafc;
-  --ds-slate-100: #f1f5f9;
-  --ds-slate-200: #e2e8f0;
-  --ds-slate-300: #cbd5e1;
-  --ds-slate-400: #94a3b8;
-  --ds-slate-500: #64748b;
-  --ds-slate-600: #475569;
-  --ds-slate-700: #334155;
-  --ds-slate-800: #1e293b;
-  --ds-slate-900: #0f172a;
+  --gr-slate-0: #ffffff;
+  --gr-slate-50: #f8fafc;
+  --gr-slate-100: #f1f5f9;
+  --gr-slate-200: #e2e8f0;
+  --gr-slate-300: #cbd5e1;
+  --gr-slate-400: #94a3b8;
+  --gr-slate-500: #64748b;
+  --gr-slate-600: #475569;
+  --gr-slate-700: #334155;
+  --gr-slate-800: #1e293b;
+  --gr-slate-900: #0f172a;
 
   /* Typography: font families */
-  --ds-font-ui: Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  --ds-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  --gr-font-ui: Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  --gr-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
   /* Typography: font sizes */
-  --ds-text-xs: 12px;
-  --ds-text-sm: 14px;
-  --ds-text-base: 16px;
-  --ds-text-lg: 18px;
-  --ds-text-xl: 20px;
-  --ds-text-2xl: 24px;
-  --ds-text-3xl: 30px;
-  --ds-text-4xl: 36px;
+  --gr-text-xs: 12px;
+  --gr-text-sm: 14px;
+  --gr-text-base: 16px;
+  --gr-text-lg: 18px;
+  --gr-text-xl: 20px;
+  --gr-text-2xl: 24px;
+  --gr-text-3xl: 30px;
+  --gr-text-4xl: 36px;
 
   /* Typography: line heights */
-  --ds-leading-tight: 1.25;
-  --ds-leading-normal: 1.5;
-  --ds-leading-relaxed: 1.625;
+  --gr-leading-tight: 1.25;
+  --gr-leading-normal: 1.5;
+  --gr-leading-relaxed: 1.625;
 
   /* Typography: font weights */
-  --ds-font-regular: 400;
-  --ds-font-medium: 500;
-  --ds-font-semibold: 600;
-  --ds-font-bold: 700;
+  --gr-font-regular: 400;
+  --gr-font-medium: 500;
+  --gr-font-semibold: 600;
+  --gr-font-bold: 700;
 
   /* Layout: spacing scale */
-  --ds-space-0: 0px;
-  --ds-space-1: 4px;
-  --ds-space-2: 8px;
-  --ds-space-3: 12px;
-  --ds-space-4: 16px;
-  --ds-space-5: 20px;
-  --ds-space-6: 24px;
-  --ds-space-8: 32px;
-  --ds-space-10: 40px;
-  --ds-space-12: 48px;
-  --ds-space-16: 64px;
-  --ds-space-20: 80px;
-  --ds-space-24: 96px;
-  --ds-space-32: 128px;
-  --ds-space-40: 160px;
-  --ds-space-48: 192px;
-  --ds-space-64: 256px;
+  --gr-space-0: 0px;
+  --gr-space-1: 4px;
+  --gr-space-2: 8px;
+  --gr-space-3: 12px;
+  --gr-space-4: 16px;
+  --gr-space-5: 20px;
+  --gr-space-6: 24px;
+  --gr-space-8: 32px;
+  --gr-space-10: 40px;
+  --gr-space-12: 48px;
+  --gr-space-16: 64px;
+  --gr-space-20: 80px;
+  --gr-space-24: 96px;
+  --gr-space-32: 128px;
+  --gr-space-40: 160px;
+  --gr-space-48: 192px;
+  --gr-space-64: 256px;
 
   /* Layout: containers */
-  --ds-container-max: 1280px;
-  --ds-container-max-2xl: 1440px;
-  --ds-container-padding-mobile: 16px;
-  --ds-container-padding-tablet: 24px;
-  --ds-container-padding-desktop: 32px;
+  --gr-container-max: 1280px;
+  --gr-container-max-2xl: 1440px;
+  --gr-container-padding-mobile: 16px;
+  --gr-container-padding-tablet: 24px;
+  --gr-container-padding-desktop: 32px;
 
   /* Layout: breakpoints */
-  --ds-bp-sm: 640px;
-  --ds-bp-md: 768px;
-  --ds-bp-lg: 1024px;
-  --ds-bp-xl: 1280px;
-  --ds-bp-2xl: 1536px;
+  --gr-bp-sm: 640px;
+  --gr-bp-md: 768px;
+  --gr-bp-lg: 1024px;
+  --gr-bp-xl: 1280px;
+  --gr-bp-2xl: 1536px;
 
   /* Shapes: radii and compatibility aliases */
   --radius: 0.5rem;
-  --ds-radius-none: 0px;
-  --ds-radius-sm: 4px;
-  --ds-radius-md: 8px;
-  --ds-radius-lg: 12px;
-  --ds-radius-xl: 16px;
-  --ds-radius-full: 9999px;
+  --gr-radius-none: 0px;
+  --gr-radius-sm: 4px;
+  --gr-radius-md: 8px;
+  --gr-radius-lg: 12px;
+  --gr-radius-xl: 16px;
+  --gr-radius-full: 9999px;
 
   /* Elevation */
-  --ds-shadow-0: none;
-  --ds-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
-  --ds-shadow-2: 0 8px 24px rgba(15, 23, 42, 0.14);
-  --ds-shadow-3: 0 16px 48px rgba(15, 23, 42, 0.20);
+  --gr-shadow-0: none;
+  --gr-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --gr-shadow-2: 0 8px 24px rgba(15, 23, 42, 0.14);
+  --gr-shadow-3: 0 16px 48px rgba(15, 23, 42, 0.20);
 
   /* Motion */
-  --ds-duration-fast: 150ms;
-  --ds-duration-base: 200ms;
-  --ds-duration-slow: 300ms;
-  --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ds-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --gr-duration-fast: 150ms;
+  --gr-duration-base: 200ms;
+  --gr-duration-slow: 300ms;
+  --gr-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --gr-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 
   /*
    * Z-index layering scale.
@@ -120,16 +120,16 @@
   --destructive-active: color-mix(in srgb, var(--destructive) 84%, var(--fg));
 
   /* Derived interaction formulas: status roles */
-  --ds-success-hover: color-mix(in srgb, var(--ds-success) 92%, var(--fg));
-  --ds-success-active: color-mix(in srgb, var(--ds-success) 84%, var(--fg));
-  --ds-warning-hover: color-mix(in srgb, var(--ds-warning) 92%, var(--fg));
-  --ds-warning-active: color-mix(in srgb, var(--ds-warning) 84%, var(--fg));
-  --ds-danger-hover: color-mix(in srgb, var(--ds-danger) 92%, var(--fg));
-  --ds-danger-active: color-mix(in srgb, var(--ds-danger) 84%, var(--fg));
-  --ds-info-hover: color-mix(in srgb, var(--ds-info) 92%, var(--fg));
-  --ds-info-active: color-mix(in srgb, var(--ds-info) 84%, var(--fg));
-  --ds-slate-hover: color-mix(in srgb, var(--ds-slate) 92%, var(--fg));
-  --ds-slate-active: color-mix(in srgb, var(--ds-slate) 84%, var(--fg));
-  --ds-azure-hover: color-mix(in srgb, var(--ds-azure) 92%, var(--fg));
-  --ds-azure-active: color-mix(in srgb, var(--ds-azure) 84%, var(--fg));
+  --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--fg));
+  --gr-success-active: color-mix(in srgb, var(--gr-success) 84%, var(--fg));
+  --gr-warning-hover: color-mix(in srgb, var(--gr-warning) 92%, var(--fg));
+  --gr-warning-active: color-mix(in srgb, var(--gr-warning) 84%, var(--fg));
+  --gr-danger-hover: color-mix(in srgb, var(--gr-danger) 92%, var(--fg));
+  --gr-danger-active: color-mix(in srgb, var(--gr-danger) 84%, var(--fg));
+  --gr-info-hover: color-mix(in srgb, var(--gr-info) 92%, var(--fg));
+  --gr-info-active: color-mix(in srgb, var(--gr-info) 84%, var(--fg));
+  --gr-slate-hover: color-mix(in srgb, var(--gr-slate) 92%, var(--fg));
+  --gr-slate-active: color-mix(in srgb, var(--gr-slate) 84%, var(--fg));
+  --gr-azure-hover: color-mix(in srgb, var(--gr-azure) 92%, var(--fg));
+  --gr-azure-active: color-mix(in srgb, var(--gr-azure) 84%, var(--fg));
 }

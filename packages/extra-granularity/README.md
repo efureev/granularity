@@ -1,58 +1,62 @@
 # `@feugene/extra-granularity`
 
-Надстройка над [`@feugene/granularity`](../granularity/README.md): коллекция
-**композитных компонентов**, собранных из базовых примитивов дизайн-системы
-(`DsFormField`, `DsInput`, `DsButton`, …). Пакет не дублирует ни один компонент
-granularity — он только склеивает их в готовые к использованию формы, списки,
-диалоги и т. п.
+> ⚠️ **Test/reference package.** `extra-granularity` is not a production component library — it's a minimal
+> **integration harness** that exercises [`@feugene/granularity`](../granularity/README.md) and
+> [`@feugene/unocss-preset-granular`](../../..) together as a *second, independent consumer*. It proves that the
+> granular contract (subpath exports, `dependencies` in `config.ts`, the `granular-provider` registry, tree-shaking)
+> actually works end-to-end for a package built *on top of* granularity, not just inside it.
 
-## Зачем отдельный пакет
+It ships exactly one deliberately small composite component — `XgQuickForm` — assembled from granularity primitives
+(`GrFormField`, `GrInput`, `GrButton`). The component doesn't reimplement anything; it only wires three primitives
+together, which is precisely the scenario this harness needs to validate.
 
-- `@feugene/granularity` остаётся **минимальным рантаймом** из атомарных
-  примитивов; ничего «композитного» туда не попадает.
-- `@feugene/extra-granularity` публикуется отдельно, имеет собственный
-  релизный цикл и `peerDependency` на granularity — значит его можно
-  версионировать и обновлять независимо.
-- **Tree-shaking сохраняется** на обоих уровнях:
-  - внутри `extra-granularity` каждый компонент — свой sub-path
-    (`@feugene/extra-granularity/components/<Name>`);
-  - внутри `granularity` сабпаты `components/<Name>` и `directives/<name>`
-    используются напрямую, поэтому в бандл попадают только реально
-    использованные примитивы.
-- Стили каждого композита (`styles.css`) отмечены через
-  `sideEffects: ["**/*.css"]` и подтягиваются только для реально
-  импортированного компонента.
+## Why this package exists
 
-## Установка
+- **Validates the granular contract from the outside.** `@feugene/granularity` is easy to get right when you're
+  editing it directly. `extra-granularity` is a separate workspace package with its own `peerDependency` on
+  granularity — the same setup a real downstream consumer would have. If subpath exports, `granular-provider`
+  dependency resolution, or tree-shaking silently break, this package is where it shows up first.
+- **Proves composite packages are a valid pattern.** `@feugene/granularity` stays a **minimal runtime** of atomic
+  primitives — nothing composite belongs there. `extra-granularity` demonstrates the alternative: a downstream
+  package that composes primitives into ready-made building blocks, with its own release cycle and versioning.
+- **Tree-shaking is exercised at both levels:**
+  - inside `extra-granularity`, the composite is its own sub-path
+    (`@feugene/extra-granularity/components/XgQuickForm`);
+  - inside `granularity`, the sub-paths `components/<Name>` are consumed directly, so only the primitives actually
+    used by the composite end up in the bundle.
+- **Composite styles are opt-in.** `XgQuickForm`'s `styles.css` is marked via `sideEffects: ["**/*.css"]` and is only
+  pulled in when the component is actually imported.
+
+## Installation
 
 ```bash
 yarn add @feugene/granularity @feugene/extra-granularity
 ```
 
-`@feugene/granularity` и `vue` объявлены как `peerDependencies` — одна версия
-рантайма на всё приложение, без дублирования.
+`@feugene/granularity`, `@feugene/unocss-preset-granular`, and `vue` are declared as `peerDependencies` — a single
+shared runtime version across the app, no duplication.
 
-## Состав пакета
+## What's inside
 
-| Компонент | Sub-path | Построен из |
+| Component | Sub-path | Built from |
 |---|---|---|
-| `XgQuickForm` | `@feugene/extra-granularity/components/XgQuickForm` | `DsFormField` + `DsInput` + `DsButton` |
+| `XgQuickForm` | `@feugene/extra-granularity/components/XgQuickForm` | `GrFormField` + `GrInput` + `GrButton` |
 
-> Префикс `Xg` (eXtra Granularity) специально отличается от `Ds*`, чтобы
-> композитные компоненты не пересекались с резолвером
-> `@feugene/unplugin-granularity` (он по умолчанию резолвит только `Ds*`).
-> При желании для `extra-granularity` можно сделать собственный резолвер.
+> The `Xg` prefix (e**X**tra **G**ranularity) is intentionally different from granularity's `Gr*` prefix so composite
+> components don't collide with `@feugene/unplugin-granularity`'s `GranularityResolver`, whose default `prefix` is
+> `'Gr'`. If you want auto-import for `Xg*` components too, configure a second resolver instance with
+> `prefix: 'Xg'` (see [Usage notes](#usage-notes) below).
 
-## Использование
+## Usage
 
 ```ts
 // main.ts
 import { createApp } from 'vue'
 import '@feugene/granularity/foundation.css'
-// только стили примитивов, которые реально использует XgQuickForm:
-import '@feugene/granularity/components/DsFormField/styles.css'
-import '@feugene/granularity/components/DsInput/styles.css'
-import '@feugene/granularity/components/DsButton/styles.css'
+// only the styles of the primitives XgQuickForm actually uses:
+import '@feugene/granularity/components/GrFormField/styles.css'
+import '@feugene/granularity/components/GrInput/styles.css'
+import '@feugene/granularity/components/GrButton/styles.css'
 import '@feugene/extra-granularity/components/XgQuickForm/styles.css'
 
 import App from './App.vue'
@@ -73,50 +77,52 @@ function onSubmit(value: string) {
 
 <template>
   <XgQuickForm
-    label="Добавить задачу"
-    placeholder="Введите текст…"
-    submit-label="Добавить"
+    label="Add a task"
+    placeholder="Type something…"
+    submit-label="Add"
     @submit="onSubmit"
   />
 </template>
 ```
 
-### API `XgQuickForm`
+### `XgQuickForm` API
 
-| Prop | Тип | По умолчанию | Описание |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `modelValue` | `string` | `''` | Двустороннее связывание значения инпута. |
-| `label` | `string?` | — | Лейбл поля (пробрасывается в `DsFormField`). |
-| `placeholder` | `string?` | — | Плейсхолдер `DsInput`. |
-| `submitLabel` | `string` | `'Submit'` | Текст кнопки по умолчанию (можно переопределить слотом `submit`). |
-| `error` | `string?` | — | Сообщение об ошибке под полем; включает `invalid`-состояние. |
-| `disabled` | `boolean` | `false` | Блокирует форму целиком. |
-| `loading` | `boolean` | `false` | Переводит кнопку в состояние загрузки и блокирует ввод. |
-| `raw` | `boolean` | `false` | Не делать `.trim()` значения при submit. |
+| `modelValue` | `string` | `''` | Two-way binding for the input value. |
+| `label` | `string?` | — | Field label (forwarded to `GrFormField`). |
+| `placeholder` | `string?` | — | `GrInput` placeholder. |
+| `submitLabel` | `string` | `'Submit'` | Default button text (override via the `submit` slot). |
+| `error` | `string?` | — | Error message under the field; enables the `invalid` state. |
+| `disabled` | `boolean` | `false` | Disables the whole form. |
+| `loading` | `boolean` | `false` | Puts the button into a loading state and blocks input. |
+| `raw` | `boolean` | `false` | Skip `.trim()` on the value at submit. |
 
-| Событие | Payload | Описание |
+| Event | Payload | Description |
 |---|---|---|
-| `update:modelValue` | `string` | Изменение значения. |
-| `submit` | `string` | Отправка формы (по Enter или клику по кнопке). |
+| `update:modelValue` | `string` | Value changed. |
+| `submit` | `string` | Form submitted (Enter or button click). |
 
-| Слот | Описание |
+| Slot | Description |
 |---|---|
-| `submit` | Кастомное содержимое кнопки submit (по умолчанию — `submitLabel`). |
+| `submit` | Custom content for the submit button (defaults to `submitLabel`). |
 
-## Нюансы
+## Usage notes
 
-- 🟢 **Tree-shaking:** в бандле окажутся только использованные композиты **и
-  те примитивы granularity**, которые они реально импортируют.
-- 🟢 **Пакет не навязывает стили:** подключение `foundation.css` и CSS
-  примитивов — ответственность приложения (как и для самого `granularity`).
-- 🟡 **Авто-импорт `unplugin-vue-components`:** стандартный
-  `GranularityResolver` резолвит только `Ds*`. Для `Xg*` можно завести
-  собственный резолвер (`from: '@feugene/extra-granularity/components/<Name>'`)
-  либо импортировать композиты вручную.
-- 🔴 **Не добавляйте сюда примитивы.** Всё, что можно сделать одним `Ds*` из
-  granularity, должно жить там. В этом пакете — только композиция.
+- 🟢 **Tree-shaking:** only the composites you actually import end up in the bundle — **along with the granularity
+  primitives they depend on**, nothing more.
+- 🟢 **No forced styles:** wiring up `foundation.css` and primitive CSS is the application's responsibility, exactly
+  as with `granularity` itself.
+- 🟡 **`unplugin-vue-components` auto-import:** the standard `GranularityResolver` only resolves the `Gr*` prefix. For
+  `Xg*` components, either register a second resolver instance (`prefix: 'Xg'`, `from: '@feugene/extra-granularity/components/<Name>'`)
+  or import composites manually.
+- 🔴 **Don't add primitives here.** Anything achievable with a single `Gr*` component from granularity belongs in
+  granularity. This package is composition only.
+- 🔵 **This is a test harness, not a product library.** Treat `XgQuickForm` as a reference implementation for how a
+  downstream composite package should be structured (`config.ts` dependencies, granular-provider wiring, subpath
+  exports) — not as a component meant to grow a large surface area.
 
-## Скрипты
+## Scripts
 
 ```bash
 yarn workspace @feugene/extra-granularity build

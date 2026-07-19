@@ -147,13 +147,13 @@ function cellValue(row: TRow, key: string): unknown {
 </script>
 
 <template>
-  <GrTable v-bind="tableProps" data-ds-datatable>
+  <GrTable v-bind="tableProps" data-gr-datatable>
     <template v-if="$slots.caption" #caption>
       <slot name="caption" />
     </template>
 
     <template #head>
-      <tr data-ds-datatable-header>
+      <tr data-gr-datatable-header>
         <th
           v-for="col in columns"
           :key="col.key"
@@ -187,7 +187,7 @@ function cellValue(row: TRow, key: string): unknown {
     </template>
 
     <template v-if="isEmpty">
-      <tr data-ds-datatable-empty>
+      <tr data-gr-datatable-empty>
         <td :colspan="columns.length" class="px-4 py-6 text-center text-[var(--muted-fg)]">
           <slot name="empty">
 Нет данных
@@ -200,7 +200,7 @@ function cellValue(row: TRow, key: string): unknown {
       v-else
       :key="rowKeyValue(row)"
       class="border-t border-[var(--brd)]"
-      data-ds-datatable-row
+      data-gr-datatable-row
     >
       <td
         v-for="col in columns"

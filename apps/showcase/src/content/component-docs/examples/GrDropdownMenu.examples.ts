@@ -6,7 +6,7 @@ export const grDropdownMenuExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Quick actions menu',
     description: 'Строим компактное action-menu поверх `GrDropdownMenu`, сохраняя привычный trigger/content contract от `GrDropdown`.',
     status: 'ready',
-    previewKey: 'ds-dropdown-menu-quick-actions',
+    previewKey: 'gr-dropdown-menu-quick-actions',
     code: `<script setup lang="ts">
 import { GrButton, GrDropdownMenu, GrDropdownMenuItem } from '@feugene/granularity'
 </script>
@@ -30,7 +30,7 @@ import { GrButton, GrDropdownMenu, GrDropdownMenuItem } from '@feugene/granulari
     title: 'Grouped sections with danger zone',
     description: 'Для richer menus используем `GrDropdownMenuGroup` и `GrDropdownMenuDivider`, чтобы отделять publish-flow и destructive actions.',
     status: 'ready',
-    previewKey: 'ds-dropdown-menu-grouped-actions',
+    previewKey: 'gr-dropdown-menu-grouped-actions',
     code: `<script setup lang="ts">
 import {
   GrButton,
@@ -65,7 +65,7 @@ import {
     title: 'Shortcut cheat-sheet grid',
     description: 'Минималистичный cheat-sheet хоткеев: `GrDropdownMenuHeader` + одноколоночный `GrDropdownMenuList`, где в каждой строке действие слева и хоткей-чипы справа (`justify-between`) — без вертикальных разделителей.',
     status: 'ready',
-    previewKey: 'ds-dropdown-menu-shortcut-grid',
+    previewKey: 'gr-dropdown-menu-shortcut-grid',
     code: `<script setup lang="ts">
 import {
   GrButton,

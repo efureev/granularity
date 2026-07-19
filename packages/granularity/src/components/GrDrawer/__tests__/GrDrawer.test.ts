@@ -90,8 +90,8 @@ describe('granularity/GrDrawer (unit)', () => {
   it('рендерит правую панель по умолчанию с md-размером и заголовком', () => {
     const wrapper = mountHarness({ closeOnBackdrop: true })
 
-    const overlay = wrapper.find('[data-ds-drawer-overlay]')
-    const panel = wrapper.find('[data-ds-drawer-panel]')
+    const overlay = wrapper.find('[data-gr-drawer-overlay]')
+    const panel = wrapper.find('[data-gr-drawer-panel]')
 
     expect(overlay.exists()).toBe(true)
     expect(overlay.attributes('class')).toContain('bg-black/40')
@@ -109,13 +109,13 @@ describe('granularity/GrDrawer (unit)', () => {
   it('закрывается по backdrop и ESC, если closeOnBackdrop=true', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: true, side: 'left', size: 'lg' })
 
-    expect(wrapper.find('[data-ds-drawer-panel]').attributes('class')).toContain('left-0')
-    expect(wrapper.find('[data-ds-drawer-panel]').attributes('class')).toContain('w-[560px]')
+    expect(wrapper.find('[data-gr-drawer-panel]').attributes('class')).toContain('left-0')
+    expect(wrapper.find('[data-gr-drawer-panel]').attributes('class')).toContain('w-[560px]')
 
-    await wrapper.find('[data-ds-drawer-overlay]').trigger('click')
+    await wrapper.find('[data-gr-drawer-overlay]').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('[data-ds-drawer-panel]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
 
     wrapper.unmount()
 
@@ -124,7 +124,7 @@ describe('granularity/GrDrawer (unit)', () => {
     await escWrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
     await nextTick()
 
-    expect(escWrapper.find('[data-ds-drawer-panel]').exists()).toBe(false)
+    expect(escWrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
 
     escWrapper.unmount()
   })
@@ -132,17 +132,17 @@ describe('granularity/GrDrawer (unit)', () => {
   it('не закрывается по backdrop-close, если closeOnBackdrop=false, но кнопка закрытия работает', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: false, size: 'full' })
 
-    expect(wrapper.find('[data-ds-drawer-panel]').attributes('class')).toContain('w-[100vw]')
+    expect(wrapper.find('[data-gr-drawer-panel]').attributes('class')).toContain('w-[100vw]')
 
-    await wrapper.find('[data-ds-drawer-overlay]').trigger('click')
+    await wrapper.find('[data-gr-drawer-overlay]').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('[data-ds-drawer-panel]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(true)
 
     await wrapper.find('button[aria-label="Close"]').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('[data-ds-drawer-panel]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
 
     wrapper.unmount()
   })

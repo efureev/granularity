@@ -14,7 +14,7 @@ const navItems = ['Overview', 'Deployments', 'Billing', 'Settings']
     открывает off-canvas панель навигации. На десктопе кнопку прячут (`sm:hidden`),
     а разделы живут в боковой панели.
   -->
-  <div class="relative overflow-hidden rounded-2xl border border-[var(--brd)] bg-[var(--bg)] shadow-[var(--ds-shadow-1)]">
+  <div class="relative overflow-hidden rounded-2xl border border-[var(--brd)] bg-[var(--bg)] shadow-[var(--gr-shadow-1)]">
     <GrNavbar
       title="Mobile shell"
       show-menu-button

@@ -6,7 +6,7 @@ export const grButtonGroupExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Segmented view switcher',
     description: 'Базовый composition-сценарий: `GrButtonGroup` собирает несколько adjacent actions в единый segmented control для view-mode и similar state switches.',
     status: 'ready',
-    previewKey: 'ds-button-group-segmented',
+    previewKey: 'gr-button-group-segmented',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -34,7 +34,7 @@ const currentView = ref('board')
     title: 'Compact toolbar cluster',
     description: 'Показываем `GrButtonGroup` как контейнер для плотной action-toolbar, где важна визуальная связность соседних кнопок.',
     status: 'ready',
-    previewKey: 'ds-button-group-toolbar',
+    previewKey: 'gr-button-group-toolbar',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -62,7 +62,7 @@ const activeTools = ref(['bold'])
     title: 'Filter rail composition',
     description: 'Группа подходит и для shallow filters: рядом с cards/list states можно быстро переключать сегменты без отдельного tabs-компонента.',
     status: 'ready',
-    previewKey: 'ds-button-group-filter-rail',
+    previewKey: 'gr-button-group-filter-rail',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

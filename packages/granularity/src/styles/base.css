@@ -1,5 +1,5 @@
 /*
- * DS-базовый слой.
+ * GR-базовый слой.
  *
  * Глобальный сброс страницы (`body`, `box-sizing`) вынесен в опциональный
  * `preflight.css` — здесь он лишь подключается для обратной совместимости
@@ -8,14 +8,14 @@
  * сайд-эффекты не нужны, может подключить `tokens.css` + тему и пропустить
  * `base.css`/`preflight.css`.
  *
- * Ниже — только низкоспецифичные (`:where()`) дефолты самой DS, которые
+ * Ниже — только низкоспецифичные (`:where()`) дефолты самой GR, которые
  * безопасно накладываются на приложение и легко переопределяются.
  */
 @import './preflight.css';
 
 /*
  * UnoCSS tailwind-compat reset intentionally does not force `background-color: transparent` for buttons
- * (to avoid breaking component libraries). In our DS we want plain buttons/links to be transparent by default.
+ * (to avoid breaking component libraries). In our GR we want plain buttons/links to be transparent by default.
  */
 :where(a, button) {
     background-color: transparent;
@@ -28,5 +28,5 @@
 code,
 pre,
 kbd {
-    font-family: var(--ds-font-mono);
+    font-family: var(--gr-font-mono);
 }

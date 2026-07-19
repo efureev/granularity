@@ -37,7 +37,7 @@ const emit = defineEmits<{
 
 const attrs = useAttrs()
 
-// Маппинг DS-режима на флаги `@vuepic/vue-datepicker`. Единственный источник
+// Маппинг GR-режима на флаги `@vuepic/vue-datepicker`. Единственный источник
 // правды — проп `mode`; ниже он раскладывается в конкретные булевы флаги пакета.
 const isTimeOnly = computed(() => props.mode === 'time')
 const enableTimePicker = computed(() => props.mode === 'datetime')
@@ -54,10 +54,10 @@ const effectiveUi = computed<Record<string, unknown>>(() => {
   const base: Record<string, unknown> = {
     // `@vuepic/vue-datepicker` рендерит иконки (календарь/очистка) внутри
     // input-обёртки. Держим достаточный left/right padding, чтобы текст не
-    // налезал на иконки, и мапим визуал на DS-токены.
+    // налезал на иконки, и мапим визуал на GR-токены.
     input:
       'h-10 w-full rounded-md border border-[var(--brd)] bg-[var(--bg)] pl-10 pr-12 text-[14px] text-[var(--fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed',
-    menu: 'shadow-[var(--ds-shadow-2)]',
+    menu: 'shadow-[var(--gr-shadow-2)]',
   }
 
   return props.ui ? { ...base, ...props.ui } : base
@@ -70,9 +70,9 @@ const passthrough = computed<Record<string, unknown>>(() => ({
   ...(props.datepickerProps ?? {}),
 }))
 
-// Адаптерный слой. DS-контракт намеренно шире (допускает `null`/`number`),
+// Адаптерный слой. GR-контракт намеренно шире (допускает `null`/`number`),
 // чем строгие типы `@vuepic/vue-datepicker`. Приводим значения к типам пакета
-// ровно на границе интеграции — так публичный API остаётся DS-owned, а утечки
+// ровно на границе интеграции — так публичный API остаётся GR-owned, а утечки
 // vuepic-типов наружу нет. Каст локализован здесь и только здесь.
 const pickerModel = computed<ModelValue>(() => props.modelValue as ModelValue)
 const pickerMinDate = computed(() => (props.minDate ?? undefined) as Date | string | undefined)
@@ -119,7 +119,7 @@ function onUpdateModelValue(value: GrDateTimeModel) {
 
 <style scoped>
 .gr-date-time-picker {
-  /* Маппинг тем-переменных VueDatePicker на DS-токены. */
+  /* Маппинг тем-переменных VueDatePicker на GR-токены. */
   --dp-background-color: var(--bg);
   --dp-text-color: var(--fg);
 
@@ -142,11 +142,11 @@ function onUpdateModelValue(value: GrDateTimeModel) {
   --dp-disabled-color: var(--muted);
   --dp-disabled-color-text: var(--muted-fg);
 
-  --dp-success-color: var(--ds-success);
+  --dp-success-color: var(--gr-success);
   --dp-danger-color: var(--destructive);
 
-  --dp-font-family: var(--ds-font-ui);
-  --dp-font-size: var(--ds-text-sm);
-  --dp-border-radius: var(--ds-radius-md);
+  --dp-font-family: var(--gr-font-ui);
+  --dp-font-size: var(--gr-text-sm);
+  --dp-border-radius: var(--gr-radius-md);
 }
 </style>

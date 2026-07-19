@@ -6,7 +6,7 @@ export const grTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic row rendering',
     description: 'Для базовой страницы показываем canonical table markup: `#head` slot, body rows и composition с badges.',
     status: 'ready',
-    previewKey: 'ds-table-basic-rows',
+    previewKey: 'gr-table-basic-rows',
     code: `<script setup lang="ts">
 import { GrBadge, GrTable } from '@feugene/granularity'
 </script>
@@ -32,7 +32,7 @@ import { GrBadge, GrTable } from '@feugene/granularity'
     title: 'Loading rows with skeletons',
     description: 'Закрываем data-display edge case: таблица должна выглядеть предсказуемо и в loading-state, когда данные ещё не приехали.',
     status: 'ready',
-    previewKey: 'ds-table-loading-state',
+    previewKey: 'gr-table-loading-state',
     code: `<script setup lang="ts">
 import { GrSkeleton, GrTable } from '@feugene/granularity'
 </script>
@@ -58,7 +58,7 @@ import { GrSkeleton, GrTable } from '@feugene/granularity'
     title: 'Empty state inside tbody',
     description: 'Показываем, как `GrTable` может содержать `GrEmptyState` внутри `tbody`, не теряя table semantics и visual shell.',
     status: 'ready',
-    previewKey: 'ds-table-empty-state',
+    previewKey: 'gr-table-empty-state',
     code: `<script setup lang="ts">
 import { GrButton, GrEmptyState, GrTable } from '@feugene/granularity'
 </script>

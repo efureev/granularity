@@ -6,7 +6,7 @@ export const grEmptyStateExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Primary CTA inside card surface',
     description: 'Классический empty-state с title/description и основной CTA-кнопкой в default slot.',
     status: 'ready',
-    previewKey: 'ds-empty-state-primary-action',
+    previewKey: 'gr-empty-state-primary-action',
     code: `<script setup lang="ts">
 import { GrButton, GrEmptyState } from '@feugene/granularity'
 </script>
@@ -22,7 +22,7 @@ import { GrButton, GrEmptyState } from '@feugene/granularity'
     title: 'Search/filter zero-results flow',
     description: 'Data-display сценарий для zero-results: input/filter сверху и действия по сбросу фильтра или созданию нового объекта.',
     status: 'ready',
-    previewKey: 'ds-empty-state-search-flow',
+    previewKey: 'gr-empty-state-search-flow',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -44,7 +44,7 @@ const description = computed(() => 'No saved views match “' + query.value + '�
     title: 'Embedded inside split layout',
     description: 'Показываем, что `GrEmptyState` можно использовать не только полноширинно, но и внутри card/layout composition.',
     status: 'ready',
-    previewKey: 'ds-empty-state-split-layout',
+    previewKey: 'gr-empty-state-split-layout',
     code: `<script setup lang="ts">
 import { GrButton, GrCard, GrEmptyState } from '@feugene/granularity'
 </script>

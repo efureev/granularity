@@ -6,7 +6,7 @@ export const grResponseErrorBannerExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Универсальный баннер — пресеты ошибок',
     description: 'Базовый сценарий: классификация и отображение разных типов ошибок (network, abort, Laravel/JSON:API validation, RFC 7807, client/server, file validation, plain string) через `useResponseError()`.',
     status: 'ready',
-    previewKey: 'ds-response-error-banner-presets',
+    previewKey: 'gr-response-error-banner-presets',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -44,7 +44,7 @@ function onRetry(_info: ResponseErrorInfo) {
     title: 'Фильтрация по `kind` — баннер реагирует только на нужные ошибки',
     description: 'Whitelist через `autoHideKinds`: разрешаем `network` и `validation` (включая Laravel 422 с `errors`). Остальные ошибки (`client`, `server`, `aborted`) тихо проглатываются — `setRaw()` возвращает `null` и баннер не рендерится. Чекбоксы в демо позволяют менять whitelist на лету.',
     status: 'ready',
-    previewKey: 'ds-response-error-banner-kind-filter',
+    previewKey: 'gr-response-error-banner-kind-filter',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -79,7 +79,7 @@ async function handle(raw: unknown) {
     title: 'GrUploadErrorBanner — пресет для загрузки файлов',
     description: 'Тонкая обёртка над `GrResponseErrorBanner` с текстами под «загрузка», `canRetry=true` и опциональным prop `files`, попадающим в payload события `retry`.',
     status: 'ready',
-    previewKey: 'ds-response-error-banner-upload',
+    previewKey: 'gr-response-error-banner-upload',
     code: `<script setup lang="ts">
 import { shallowRef } from 'vue'
 
@@ -111,7 +111,7 @@ async function onUploadFailed(raw: unknown) {
     title: 'GrFormErrorBanner — пресет для формы',
     description: 'Обёртка для формы: `showFieldLabels=true`, `canRetry=false`, validation tone = warning, `fieldLabels` для человекочитаемых подписей полей в списке ошибок.',
     status: 'ready',
-    previewKey: 'ds-response-error-banner-form',
+    previewKey: 'gr-response-error-banner-form',
     code: `<script setup lang="ts">
 import { shallowRef } from 'vue'
 

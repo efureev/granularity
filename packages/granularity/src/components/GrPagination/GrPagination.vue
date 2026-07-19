@@ -129,7 +129,7 @@ function last(): void {
 <template>
   <div
     class="flex flex-wrap items-center justify-end gap-3"
-    data-ds-pagination
+    data-gr-pagination
     role="navigation"
     :aria-label="t('gr.pagination.label', 'Pagination')"
   >
@@ -141,11 +141,11 @@ function last(): void {
       />
     </div>
 
-    <GrButton variant="ghost" size="sm" :disabled="page <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-ds-pagination-first @click="first">
+    <GrButton variant="ghost" size="sm" :disabled="page <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
       «
     </GrButton>
 
-    <GrButton variant="ghost" size="sm" :disabled="page <= 1" data-ds-pagination-prev @click="prev">
+    <GrButton variant="ghost" size="sm" :disabled="page <= 1" data-gr-pagination-prev @click="prev">
       {{ t('gr.pagination.prev', 'Prev') }}
     </GrButton>
 
@@ -153,14 +153,14 @@ function last(): void {
       <template v-for="(item, index) in items" :key="index">
         <span
           v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
-          data-ds-pagination-ellipsis
+          data-gr-pagination-ellipsis
           aria-hidden="true"
           class="h-8 min-w-8 px-1 grid place-items-center text-sm text-[var(--muted-fg)]"
         >…</span>
         <button
           v-else
           type="button"
-          data-ds-pagination-page
+          data-gr-pagination-page
           :aria-current="item === page ? 'page' : undefined"
           :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
           class="h-8 min-w-8 px-2 rounded-md text-sm font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
@@ -172,11 +172,11 @@ function last(): void {
       </template>
     </div>
 
-    <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" data-ds-pagination-next @click="next">
+    <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" data-gr-pagination-next @click="next">
       {{ t('gr.pagination.next', 'Next') }}
     </GrButton>
 
-    <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-ds-pagination-last @click="last">
+    <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
       »
     </GrButton>
   </div>

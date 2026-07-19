@@ -7,6 +7,7 @@ import {GrBadge, GrCard, GrLink, GrSwitch} from '@feugene/granularity'
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
+import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 import {
   showcaseFoundationGuides,
   showcaseFoundationTokens,
@@ -85,6 +86,71 @@ function toggleThemeTokenSection(section: string) {
 
 function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
   return `${i18n.t(`showcase.foundationsPage.${isCollapsed ? 'expandSection' : 'collapseSection'}`)} ${section}`
+}
+
+// --- Integration (объединено сюда из бывшей отдельной страницы «Интеграция») ---
+const { localizePageByName } = useShowcasePageI18n()
+const foundationsPage = computed(() => localizePageByName('foundations'))
+const integrationSectionIds = new Set(['vue-plugin', 'unplugin', 'when-to-use'])
+const integrationSections = computed(() =>
+  foundationsPage.value.sections.filter(section => integrationSectionIds.has(section.id)),
+)
+
+// Bare-спецификаторы разбиты через интерполяцию, чтобы сканер зависимостей
+// Vite/rolldown не принял эти doc-сниппеты за настоящие импорты.
+const appVueSpecifier = `.${'/App.vue'}`
+const granularitySpecifier = `@feugene${'/granularity'}`
+const granularityVueSpecifier = `${granularitySpecifier}/vue`
+const granularityDirectivesSpecifier = `${granularitySpecifier}/directives`
+const unpluginGranularitySpecifier = `@feugene${'/unplugin-granularity'}`
+const vuePluginCode = `import { createApp } from 'vue'
+import { GrButton, GrInput } from '${granularitySpecifier}'
+import { createGranularity } from '${granularityVueSpecifier}'
+import { vHotkey } from '${granularityDirectivesSpecifier}'
+
+import App from '${appVueSpecifier}'
+
+createApp(App)
+  .use(createGranularity({
+    components: [GrButton, GrInput],
+    directives: [{ name: 'hotkey', directive: vHotkey }],
+    provides: [{ key: Symbol.for('app.theme'), value: { mode: 'light' } }],
+    globalProperties: { $appVersion: '0.2.0' },
+  }))
+  .mount('#app')`
+
+const unpluginCode = `// vite.config.ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import Components from 'unplugin-vue-components/vite'
+import { GranularityResolver } from '${unpluginGranularitySpecifier}'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    Components({
+      resolvers: [GranularityResolver({
+        prefix: 'Gr',
+        importStyle: true,
+        directives: true,
+      })],
+    }),
+  ],
+})`
+
+const unpluginTemplateCode = `<template>
+  <GrInput v-model="value" v-hotkey.enter="submit" />
+  <GrButton @click="submit">Go</GrButton>
+</template>`
+
+const integrationCodeSamples: Record<string, Array<{ code: string, language: string, title?: string }>> = {
+  'vue-plugin': [
+    { code: vuePluginCode, language: 'ts', title: 'main.ts' },
+  ],
+  'unplugin': [
+    { code: unpluginCode, language: 'ts', title: 'vite.config.ts' },
+    { code: unpluginTemplateCode, language: 'vue', title: 'App.vue' },
+  ],
 }
 </script>
 
@@ -415,6 +481,51 @@ function getSectionToggleAriaLabel(section: string, isCollapsed: boolean) {
               :language="sample.language"
               :title="sample.title"
           />
+        </div>
+      </GrCard>
+    </section>
+
+    <section
+        v-for="section in integrationSections"
+        :id="section.id"
+        :key="section.id"
+        class="scroll-mt-28"
+    >
+      <GrCard class="showcase-panel rounded-3xl border p-6 lg:p-7">
+        <div class="space-y-5">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-3">
+              <h2 class="text-2xl font-semibold">
+                {{ section.title }}
+              </h2>
+              <GrLink :href="`#${section.id}`" variant="muted" class="px-1 text-xs">
+                <IconHash/>
+              </GrLink>
+            </div>
+            <p class="showcase-text-muted text-base leading-7">
+              <InlineRichText :text="section.description"/>
+            </p>
+          </div>
+
+          <ul class="grid gap-3">
+            <li
+                v-for="(bullet, index) in section.bullets"
+                :key="index"
+                class="showcase-inline-surface rounded-2xl border px-4 py-3 text-sm leading-6"
+            >
+              <InlineRichText :text="bullet"/>
+            </li>
+          </ul>
+
+          <div v-if="integrationCodeSamples[section.id]" class="grid gap-4">
+            <CodeBlock
+                v-for="sample in integrationCodeSamples[section.id]"
+                :key="sample.title ?? sample.language"
+                :code="sample.code"
+                :language="sample.language"
+                :title="sample.title"
+            />
+          </div>
         </div>
       </GrCard>
     </section>

@@ -39,7 +39,7 @@ const alignClass = computed(() => {
 
 const variantClass = computed(() => {
   if (props.variant === 'danger')
-    return 'text-[var(--ds-danger)]'
+    return 'text-[var(--gr-danger)]'
 
   return 'text-[var(--fg)]'
 })
@@ -88,7 +88,7 @@ function onClickCapture(e: MouseEvent) {
   <component
     :is="as"
     v-bind="attrs"
-    data-ds-dropdown-menu-item
+    data-gr-dropdown-menu-item
     :class="className"
     :type="isNativeButton ? (attrs.type as any) ?? 'button' : undefined"
     :disabled="isNativeButton ? disabled : undefined"

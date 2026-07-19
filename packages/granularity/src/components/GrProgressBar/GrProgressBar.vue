@@ -32,7 +32,7 @@ const fillClassName = computed(() => grProgressBarFillClass(props.tone))
 
 <template>
   <div
-    data-ds-progress-bar
+    data-gr-progress-bar
     role="progressbar"
     :aria-label="ariaLabel"
     :aria-valuenow="safe"
@@ -41,7 +41,7 @@ const fillClassName = computed(() => grProgressBarFillClass(props.tone))
     class="h-2 w-full rounded-full bg-[var(--muted)] border border-[var(--brd)] overflow-hidden"
   >
     <div
-      data-ds-progress-bar-fill
+      data-gr-progress-bar-fill
       class="h-full"
       :class="fillClassName"
       :style="{ width: `${safe}%` }"

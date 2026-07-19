@@ -151,7 +151,7 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
   const restorePosition = ensurePositionedContainer(target, fullscreen)
   const restoreOverflow = ensureClippedContainer(target, fullscreen)
   const mountEl = document.createElement('div')
-  mountEl.setAttribute('data-ds-loading-host', '')
+  mountEl.setAttribute('data-gr-loading-host', '')
   if (!fullscreen) {
     // Host wraps the overlay; make sure rounded corners of the target cascade
     // down to the overlay via `border-radius: inherit`.

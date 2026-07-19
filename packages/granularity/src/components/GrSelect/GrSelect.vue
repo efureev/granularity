@@ -39,7 +39,7 @@ export type {
 } from './grSelectStyles'
 
 /**
- * Пропсы публичного DS-примитива «Select».
+ * Пропсы публичного GR-примитива «Select».
  */
 export interface GrSelectProps {
   modelValue: GrSelectModelValue
@@ -444,7 +444,7 @@ function clearSelection(): void {
 <template>
   <div
     v-if="effectiveOptionsView === 'native'"
-    data-ds-select
+    data-gr-select
     :class="rootClass"
   >
     <!--
@@ -453,7 +453,7 @@ function clearSelection(): void {
       отражает программное изменение модели. `onChange` читает выбор из DOM.
     -->
     <select
-      data-ds-select-native
+      data-gr-select-native
       :multiple="multiple"
       :disabled="disabled"
       :aria-label="ariaLabel"
@@ -494,14 +494,14 @@ function clearSelection(): void {
 
     <span
       v-if="isLinkNative"
-      data-ds-select-link-label
+      data-gr-select-link-label
       aria-hidden="true"
       :class="linkNativeLabelClassName"
     >{{ linkNativeDisplayText }}</span>
 
     <span
       v-if="showNativeChevron"
-      data-testid="ds-select-chevron"
+      data-testid="gr-select-chevron"
       class="absolute top-1/2 -translate-y-1/2 right-3 flex items-center text-[var(--muted-fg)] pointer-events-none"
     >
       <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
@@ -512,12 +512,12 @@ function clearSelection(): void {
     v-else
     ref="rootEl"
     v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
-    data-ds-select
+    data-gr-select
     :class="rootClass"
   >
     <button
-      data-testid="ds-select-trigger"
-      data-ds-select-trigger
+      data-testid="gr-select-trigger"
+      data-gr-select-trigger
       type="button"
       :disabled="disabled"
       :aria-label="ariaLabel"
@@ -553,7 +553,7 @@ function clearSelection(): void {
 
       <span
         v-else
-        data-testid="ds-select-chevron"
+        data-testid="gr-select-chevron"
         class="shrink-0 flex items-center text-[var(--muted-fg)] pointer-events-none"
       >
         <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
@@ -562,8 +562,8 @@ function clearSelection(): void {
 
     <button
       v-if="panelClearVisible"
-      data-testid="ds-select-clear"
-      data-ds-select-clear
+      data-testid="gr-select-clear"
+      data-gr-select-clear
       type="button"
       class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
       :disabled="disabled"
@@ -585,8 +585,8 @@ function clearSelection(): void {
         <div
           v-show="open"
           ref="panelEl"
-          data-testid="ds-select-panel"
-          data-ds-select-panel
+          data-testid="gr-select-panel"
+          data-gr-select-panel
           :style="floatingStyle"
         >
           <div :class="panelClasses">
@@ -594,7 +594,7 @@ function clearSelection(): void {
               <GrInput
                 ref="customInputRef"
                 v-model="customValue"
-                data-testid="ds-select-custom-input"
+                data-testid="gr-select-custom-input"
                 type="text"
                 :placeholder="resolvedCustomValuePlaceholder"
                 size="sm"
@@ -603,7 +603,7 @@ function clearSelection(): void {
             </div>
 
             <div
-              data-ds-select-listbox
+              data-gr-select-listbox
               class="p-1 overflow-auto"
               :style="{ maxHeight: `${dropdownMaxHeight}px` }"
               role="listbox"
@@ -611,8 +611,8 @@ function clearSelection(): void {
             >
               <button
                 v-if="canAddCustom"
-                data-testid="ds-select-add-option"
-                data-ds-select-add-option
+                data-testid="gr-select-add-option"
+                data-gr-select-add-option
                 type="button"
                 class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
                   view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
@@ -625,7 +625,7 @@ function clearSelection(): void {
               <template v-for="item in panelItems" :key="item.key">
                 <div
                   v-if="item.kind === 'group'"
-                  data-ds-select-group-label
+                  data-gr-select-group-label
                   role="presentation"
                   class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
@@ -636,7 +636,7 @@ function clearSelection(): void {
 
                 <button
                   v-else
-                  data-ds-select-option
+                  data-gr-select-option
                   type="button"
                   role="option"
                   :disabled="item.option.disabled"

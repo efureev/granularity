@@ -6,7 +6,7 @@ export const grNumberInputExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Vertical and horizontal controls',
     description: 'Показываем базовый capability-scenario числового поля: инкремент/декремент, prefix/suffix slots и разную ориентацию controls.',
     status: 'ready',
-    previewKey: 'ds-number-input-controls',
+    previewKey: 'gr-number-input-controls',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -44,7 +44,7 @@ const quantity = ref('3')
     title: 'Decimal separator, precision and range guards',
     description: 'Этот сценарий показывает локализованный ввод с запятой и одновременную работу `min`/`max`/`step`/`precision`.',
     status: 'ready',
-    previewKey: 'ds-number-input-decimal-separator',
+    previewKey: 'gr-number-input-decimal-separator',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -89,7 +89,7 @@ const percentage = ref('42,5')
     title: 'Text alignment with long add-ons',
     description: 'Карточка подчёркивает ещё один важный сценарий: числовое поле в финансовых формах с правым выравниванием и длинными suffix-элементами.',
     status: 'ready',
-    previewKey: 'ds-number-input-alignment-addons',
+    previewKey: 'gr-number-input-alignment-addons',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

@@ -6,7 +6,7 @@ type GrSwitchThumbClassOptions = {
 }
 
 export const trackBase =
-    'relative inline-flex shrink-0 items-center rounded-full border border-[var(--ds-switch-track-brd)] transition-colors duration-150'
+    'relative inline-flex shrink-0 items-center rounded-full border border-[var(--gr-switch-track-brd)] transition-colors duration-150'
 
 export const trackSizes: Record<GrSwitchSize, string> = {
     sm: 'h-5 w-9',
@@ -15,7 +15,7 @@ export const trackSizes: Record<GrSwitchSize, string> = {
 }
 
 export const thumbBase =
-    'inline-block shrink-0 rounded-full bg-[var(--card)] shadow-[var(--ds-shadow-1)] transition-transform duration-150'
+    'inline-block shrink-0 rounded-full bg-[var(--card)] shadow-[var(--gr-shadow-1)] transition-transform duration-150'
 
 export const thumbSizes: Record<GrSwitchSize, string> = {
     sm: 'h-4 w-4',

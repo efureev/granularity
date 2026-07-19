@@ -6,7 +6,7 @@ export const grSegmentedExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Pills variant for compact view switching',
     description: 'Базовый happy-path для `GrSegmented`: лёгкий pills-control с moving indicator и выбором одного значения.',
     status: 'ready',
-    previewKey: 'ds-segmented-basic-pills',
+    previewKey: 'gr-segmented-basic-pills',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -30,7 +30,7 @@ const options = [
     title: 'Button variant with runtime size control',
     description: 'Button-like режим подходит для toolbar и view-switcher сценариев, но сохраняет общий segmented UX и анимацию индикатора.',
     status: 'ready',
-    previewKey: 'ds-segmented-button-variant',
+    previewKey: 'gr-segmented-button-variant',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -54,7 +54,7 @@ const options = [
     title: 'Icon + label and icon-only content',
     description: 'Компонент умеет работать и с `icon + label`, и с компактным icon-only рендерингом через scoped slot без раздувания API.',
     status: 'ready',
-    previewKey: 'ds-segmented-content',
+    previewKey: 'gr-segmented-content',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -79,7 +79,7 @@ const options = [
     title: 'Disabled items, block layout and language switcher',
     description: 'Собираем реальные product-like сценарии: language pills, full-width layout и disabled item внутри группы без потери читаемости.',
     status: 'ready',
-    previewKey: 'ds-segmented-states',
+    previewKey: 'gr-segmented-states',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

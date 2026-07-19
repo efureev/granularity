@@ -74,7 +74,7 @@ describe('GrCollapse', () => {
       },
     })
 
-    const triggers = wrapper.findAll('[data-ds-collapse-trigger]')
+    const triggers = wrapper.findAll('[data-gr-collapse-trigger]')
     const regions = wrapper.findAll('[role="region"]')
 
     expect(triggers[0].attributes('aria-expanded')).toBe('true')
@@ -100,7 +100,7 @@ describe('GrCollapse', () => {
       },
     })
 
-    const triggers = wrapper.findAll('[data-ds-collapse-trigger]')
+    const triggers = wrapper.findAll('[data-gr-collapse-trigger]')
 
     await triggers[1].trigger('click')
     await triggers[1].trigger('click')
@@ -120,7 +120,7 @@ describe('GrCollapse', () => {
       },
     })
 
-    const triggers = wrapper.findAll('[data-ds-collapse-trigger]')
+    const triggers = wrapper.findAll('[data-gr-collapse-trigger]')
 
     expect(triggers[1].attributes('disabled')).toBeDefined()
 

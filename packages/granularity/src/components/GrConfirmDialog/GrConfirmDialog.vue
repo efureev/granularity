@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrConfirmDialog — DS-примитив диалога подтверждения поверх `GrDialog`.
+ * GrConfirmDialog — GR-примитив диалога подтверждения поверх `GrDialog`.
  *
  * Синхронизирован с `GrDialog`/`GrPromptDialog` по набору проп-проксирования:
  * `size`, `closeOnBackdrop`, `closeOnEsc`, `showHeader`, `showCloseButton`,
@@ -138,11 +138,11 @@ function onConfirm(): void {
     <template #footer>
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
-          <GrButton data-testid="ds-confirm-cancel" variant="outline" :size="buttonSize" @click="onCancel">
+          <GrButton data-testid="gr-confirm-cancel" variant="outline" :size="buttonSize" @click="onCancel">
             {{ resolvedCancelText }}
           </GrButton>
           <GrButton
-            data-testid="ds-confirm-confirm"
+            data-testid="gr-confirm-confirm"
             :variant="confirmVariant"
             :tone="confirmTone"
             :size="buttonSize"

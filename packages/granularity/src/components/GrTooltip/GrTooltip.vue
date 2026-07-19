@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrTooltip — DS-примитив инлайн-подсказки на hover/focus.
+ * GrTooltip — GR-примитив инлайн-подсказки на hover/focus.
  *
  * По умолчанию триггер — иконка info; можно заменить через слот.
  * A11y:
@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<GrTooltipProps>(), {
   iconColor: 'var(--muted-fg)',
 })
 
-const tooltipId = `ds-tooltip-${useId()}`
+const tooltipId = `gr-tooltip-${useId()}`
 
 const triggerStyle = computed(() => ({ color: props.iconColor }))
 
@@ -76,11 +76,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <span data-ds-tooltip class="relative inline-flex">
+  <span data-gr-tooltip class="relative inline-flex">
     <span
       ref="triggerEl"
-      data-ds-tooltip-trigger
-      data-testid="ds-tooltip-trigger"
+      data-gr-tooltip-trigger
+      data-testid="gr-tooltip-trigger"
       tabindex="0"
       :aria-describedby="tooltipId"
       class="inline-flex items-center justify-center focus:outline-none"
@@ -111,8 +111,8 @@ onUnmounted(() => {
           :id="tooltipId"
           ref="panelEl"
           role="tooltip"
-          data-ds-tooltip-panel
-          class="pointer-events-none max-w-[280px] rounded-md border border-[var(--brd)] bg-[var(--popover)] px-2 py-1 text-[12px] text-[var(--popover-fg)] shadow-[var(--ds-shadow-1)]"
+          data-gr-tooltip-panel
+          class="pointer-events-none max-w-[280px] rounded-md border border-[var(--brd)] bg-[var(--popover)] px-2 py-1 text-[12px] text-[var(--popover-fg)] shadow-[var(--gr-shadow-1)]"
           :style="floatingStyle"
         >
           {{ text }}

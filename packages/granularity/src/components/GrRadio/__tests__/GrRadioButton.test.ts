@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import GrRadio from '../GrRadio.vue'
 
 describe('GrRadio (button)', () => {
-  it('выглядит как DS-кнопка и отражает выбранное состояние через aria-checked', () => {
+  it('выглядит как GR-кнопка и отражает выбранное состояние через aria-checked', () => {
     const wrapper = mount(GrRadio, {
       props: {
         modelValue: 'a',
@@ -17,8 +17,8 @@ describe('GrRadio (button)', () => {
       },
     })
 
-    const btn = wrapper.get('[data-ds-radio]')
-    expect(btn.attributes('data-ds-button')).toBeDefined()
+    const btn = wrapper.get('[data-gr-radio]')
+    expect(btn.attributes('data-gr-button')).toBeDefined()
     expect(btn.attributes('role')).toBe('radio')
     expect(btn.attributes('aria-checked')).toBe('true')
 
@@ -28,7 +28,7 @@ describe('GrRadio (button)', () => {
     expect(btn.attributes('class')).toContain('items-center')
     expect(btn.attributes('class')).toContain('rounded-md')
     expect(btn.attributes('class')).toContain('h-11')
-    expect(btn.attributes('class')).toContain('bg-[var(--ds-button-primary-bg,var(--primary))]')
+    expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg,var(--primary))]')
   })
 
   it('эмитит update:modelValue при клике (standalone v-model)', async () => {
@@ -43,7 +43,7 @@ describe('GrRadio (button)', () => {
       },
     })
 
-    await wrapper.get('[data-ds-radio]').trigger('click')
+    await wrapper.get('[data-gr-radio]').trigger('click')
 
     const events = wrapper.emitted('update:modelValue')
     expect(events).toBeTruthy()

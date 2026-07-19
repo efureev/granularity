@@ -59,7 +59,7 @@ const rootClass = computed(() => [
 <template>
   <component
     :is="rootTag"
-    data-ds-sidebar-item
+    data-gr-sidebar-item
     :type="rootTag === 'button' ? 'button' : undefined"
     :href="rootTag === 'a' ? href : undefined"
     :aria-current="active ? 'page' : undefined"

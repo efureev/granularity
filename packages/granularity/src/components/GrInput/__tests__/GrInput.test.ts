@@ -122,11 +122,11 @@ describe('GrInput', () => {
       },
     })
 
-    const prefix = wrapper.get('[data-testid="ds-input-prefix"]').element as HTMLElement
+    const prefix = wrapper.get('[data-testid="gr-input-prefix"]').element as HTMLElement
     expect(prefix.style.minWidth).toBe('1rem')
     expect(prefix.style.maxWidth).toBe('3rem')
 
-    const suffix = wrapper.get('[data-testid="ds-input-suffix"]').element as HTMLElement
+    const suffix = wrapper.get('[data-testid="gr-input-suffix"]').element as HTMLElement
     expect(suffix.style.minWidth).toBe('2rem')
     expect(suffix.style.maxWidth).toBe('4rem')
   })
@@ -142,7 +142,7 @@ describe('GrInput', () => {
       },
     })
 
-    const prefix = wrapper.get('[data-testid="ds-input-prefix"]').element as HTMLElement
+    const prefix = wrapper.get('[data-testid="gr-input-prefix"]').element as HTMLElement
     prefix.getBoundingClientRect = () => ({
       width: 120,
       height: 0,

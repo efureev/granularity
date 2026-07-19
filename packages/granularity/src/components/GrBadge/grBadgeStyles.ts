@@ -19,25 +19,25 @@ export const lightToneClassByTone: Record<GrBadgeTone, string> = {
   neutral: 'bg-[var(--muted)] text-[var(--fg)] border-[var(--brd)]',
   primary:
     'bg-[var(--accent)] text-[var(--accent-fg)] border-[color-mix(in_srgb,var(--primary)_30%,var(--accent))]',
-  success: 'bg-[var(--ds-success-light)] text-[var(--ds-success)] border-[color-mix(in_srgb,var(--ds-success)_30%,var(--ds-success-light))]',
-  warning: 'bg-[var(--ds-warning-light)] text-[var(--ds-warning)] border-[color-mix(in_srgb,var(--ds-warning)_30%,var(--ds-warning-light))]',
-  danger: 'bg-[var(--ds-danger-light)] text-[var(--ds-danger)] border-[color-mix(in_srgb,var(--ds-danger)_30%,var(--ds-danger-light))]',
-  info: 'bg-[var(--ds-info-light)] text-[var(--ds-info)] border-[color-mix(in_srgb,var(--ds-info)_30%,var(--ds-info-light))]',
-  slate: 'bg-[var(--ds-slate-light)] text-[var(--ds-slate-text)] border-[color-mix(in_srgb,var(--ds-slate)_30%,var(--ds-slate-light))]',
-  azure: 'bg-[var(--ds-azure-light)] text-[var(--ds-azure-text)] border-[color-mix(in_srgb,var(--ds-azure)_30%,var(--ds-azure-light))]',
+  success: 'bg-[var(--gr-success-light)] text-[var(--gr-success)] border-[color-mix(in_srgb,var(--gr-success)_30%,var(--gr-success-light))]',
+  warning: 'bg-[var(--gr-warning-light)] text-[var(--gr-warning)] border-[color-mix(in_srgb,var(--gr-warning)_30%,var(--gr-warning-light))]',
+  danger: 'bg-[var(--gr-danger-light)] text-[var(--gr-danger)] border-[color-mix(in_srgb,var(--gr-danger)_30%,var(--gr-danger-light))]',
+  info: 'bg-[var(--gr-info-light)] text-[var(--gr-info)] border-[color-mix(in_srgb,var(--gr-info)_30%,var(--gr-info-light))]',
+  slate: 'bg-[var(--gr-slate-light)] text-[var(--gr-slate-text)] border-[color-mix(in_srgb,var(--gr-slate)_30%,var(--gr-slate-light))]',
+  azure: 'bg-[var(--gr-azure-light)] text-[var(--gr-azure-text)] border-[color-mix(in_srgb,var(--gr-azure)_30%,var(--gr-azure-light))]',
 }
 export const darkToneClassByTone: Record<GrBadgeTone, string> = {
   neutral: 'bg-[var(--fg)] text-[var(--bg)] border-[color-mix(in_srgb,var(--fg)_35%,var(--brd))]',
   primary: 'bg-[var(--primary)] text-[var(--primary-fg)] border-[var(--primary)]',
-  success: 'bg-[var(--ds-success)] text-white border-[var(--ds-success)]',
-  warning: 'bg-[var(--ds-warning)] text-white border-[var(--ds-warning)]',
-  danger: 'bg-[var(--ds-danger)] text-white border-[var(--ds-danger)]',
-  info: 'bg-[var(--ds-info)] text-white border-[var(--ds-info)]',
-  slate: 'bg-[var(--ds-slate)] text-[var(--ds-slate-fg)] border-[var(--ds-slate)]',
-  azure: 'bg-[var(--ds-azure)] text-[var(--ds-azure-fg)] border-[var(--ds-azure)]',
+  success: 'bg-[var(--gr-success)] text-white border-[var(--gr-success)]',
+  warning: 'bg-[var(--gr-warning)] text-white border-[var(--gr-warning)]',
+  danger: 'bg-[var(--gr-danger)] text-white border-[var(--gr-danger)]',
+  info: 'bg-[var(--gr-info)] text-white border-[var(--gr-info)]',
+  slate: 'bg-[var(--gr-slate)] text-[var(--gr-slate-fg)] border-[var(--gr-slate)]',
+  azure: 'bg-[var(--gr-azure)] text-[var(--gr-azure-fg)] border-[var(--gr-azure)]',
 }
 function radiusClass(radius: GrBadgeRadius, size: GrBadgeSize): string {
-  if (radius === 'square') return 'rounded-[var(--ds-radius-none)]'
+  if (radius === 'square') return 'rounded-[var(--gr-radius-none)]'
   if (radius === 'semi') return semiRadiusClassBySize[size]
   return 'rounded-full'
 }

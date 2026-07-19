@@ -32,7 +32,7 @@ describe('granularity/GrFormField (unit)', () => {
       .find(element => element.text() === 'Email обязателен.')
 
     expect(errorEl).toBeTruthy()
-    expect(errorEl!.attributes('class')).toContain('text-[var(--ds-danger)]')
+    expect(errorEl!.attributes('class')).toContain('text-[var(--gr-danger)]')
     expect(wrapper.get('input').attributes('id')).toBe('email')
   })
 

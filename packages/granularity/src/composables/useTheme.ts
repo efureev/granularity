@@ -51,7 +51,7 @@ function applyTheme(theme: ThemeName) {
   if (typeof document === 'undefined') return
 
   const root = document.documentElement
-  // Канон DS — атрибут `[data-theme]` на `<html>` (см. docs/styling.md → «Темизация»).
+  // Канон GR — атрибут `[data-theme]` на `<html>` (см. docs/styling.md → «Темизация»).
   // `useTheme`/`initThemeEarly` — единственный рантайм-API переключения темы.
   root.dataset.theme = theme
   // Класс `.theme-dark` — deprecated-алиас для обратной совместимости; в новом коде

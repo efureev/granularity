@@ -11,7 +11,7 @@ withDefaults(
 
 <template>
   <div
-      data-ds-button-group
+      data-gr-button-group
       class="inline-flex items-stretch"
       role="group"
       :aria-label="ariaLabel"
@@ -20,32 +20,32 @@ withDefaults(
   </div>
 </template>
 <style>
-[data-ds-button-group] {
-  --ds-button-group-radius: 0.375rem;
+[data-gr-button-group] {
+  --gr-button-group-radius: 0.375rem;
 }
 
-[data-ds-button-group] > [data-ds-button] {
+[data-gr-button-group] > [data-gr-button] {
   border-radius: 0;
   position: relative;
 }
 
-[data-ds-button-group] > [data-ds-button] + [data-ds-button] {
+[data-gr-button-group] > [data-gr-button] + [data-gr-button] {
   margin-inline-start: -1px;
 }
 
-[data-ds-button-group] > [data-ds-button]:hover,
-[data-ds-button-group] > [data-ds-button]:focus-visible {
+[data-gr-button-group] > [data-gr-button]:hover,
+[data-gr-button-group] > [data-gr-button]:focus-visible {
   z-index: 1;
 }
 
-[data-ds-button-group] > [data-ds-button]:first-child {
-  border-start-start-radius: var(--ds-button-group-radius);
-  border-end-start-radius: var(--ds-button-group-radius);
+[data-gr-button-group] > [data-gr-button]:first-child {
+  border-start-start-radius: var(--gr-button-group-radius);
+  border-end-start-radius: var(--gr-button-group-radius);
 }
 
-[data-ds-button-group] > [data-ds-button]:last-child {
-  border-start-end-radius: var(--ds-button-group-radius);
-  border-end-end-radius: var(--ds-button-group-radius);
+[data-gr-button-group] > [data-gr-button]:last-child {
+  border-start-end-radius: var(--gr-button-group-radius);
+  border-end-end-radius: var(--gr-button-group-radius);
 }
 
 </style>

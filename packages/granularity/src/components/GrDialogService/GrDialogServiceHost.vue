@@ -272,7 +272,7 @@ const sharedProps = computed(() => {
       <template #footer>
         <div class="flex items-center justify-end gap-3">
           <GrButton
-            data-testid="ds-alert-confirm"
+            data-testid="gr-alert-confirm"
             :variant="sharedProps.confirmVariant ?? 'primary'"
             :tone="sharedProps.confirmTone ?? 'primary'"
             :size="sharedProps.buttonSize"

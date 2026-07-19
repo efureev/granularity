@@ -27,7 +27,7 @@ export interface GrTableProps {
 }
 
 /**
- * `GrTable` — «тонкий» DS-контейнер для табличных данных.
+ * `GrTable` — «тонкий» GR-контейнер для табличных данных.
  *
  * Рендерит `<table>` внутри скролл-обёртки и даёт слоты `#caption`, `#head`,
  * default (tbody) и `#foot`. Стили ячеек (`<th>`/`<td>` паддинги, выравнивание)
@@ -52,14 +52,14 @@ const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.captio
 
 <template>
   <div
-    data-ds-table-scroll
+    data-gr-table-scroll
     :role="regionLabel ? 'region' : undefined"
     :aria-label="regionLabel"
     :tabindex="regionLabel ? 0 : undefined"
-    class="overflow-x-auto rounded-[var(--ds-radius-lg)] border border-[var(--brd)] bg-[var(--card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+    class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
   >
     <table
-      data-ds-table
+      data-gr-table
       class="min-w-full" :class="[tableTextClass]"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"

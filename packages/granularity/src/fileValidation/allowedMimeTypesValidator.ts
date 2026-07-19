@@ -26,7 +26,7 @@ export function allowedMimeTypesValidator(
       const fileType = (file.type || '').toLowerCase()
 
       if (isFallbackType(fileType)) {
-        // Legacy behavior in DS: fallback types are not rejected by MIME allow-list.
+        // Legacy behavior in GR: fallback types are not rejected by MIME allow-list.
         // If consumer needs strictness, it can explicitly forbid fallback types.
         if (options.allowFallbackByExtension === false) {
           issues.push({

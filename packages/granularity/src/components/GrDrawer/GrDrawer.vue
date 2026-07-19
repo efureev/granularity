@@ -84,7 +84,7 @@ function onKeydown(e: KeyboardEvent): void {
     <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"
-        data-ds-drawer
+        data-gr-drawer
         class="fixed inset-0 z-50"
         :static="true"
         :aria-labelledby="titleId"
@@ -102,7 +102,7 @@ function onKeydown(e: KeyboardEvent): void {
             leave-to="opacity-0"
           >
             <div
-              data-ds-drawer-overlay
+              data-gr-drawer-overlay
               class="fixed inset-0 bg-black/40"
               aria-hidden="true"
               @click="onOverlayClick"
@@ -119,16 +119,16 @@ function onKeydown(e: KeyboardEvent): void {
             :leave-to="panelEnterFrom"
           >
             <DialogPanel
-              data-ds-drawer-panel
+              data-gr-drawer-panel
               tabindex="-1"
               class="fixed inset-y-0 flex flex-col"
               :class="panelClass"
             >
               <div
-                data-ds-drawer-header
+                data-gr-drawer-header
                 class="px-5 py-4 border-b border-[var(--brd)] flex items-center justify-between gap-4"
               >
-                <DialogTitle :id="titleId" as="div" data-ds-drawer-title class="text-[14px] font-700 min-w-0 truncate">
+                <DialogTitle :id="titleId" as="div" data-gr-drawer-title class="text-[14px] font-700 min-w-0 truncate">
                   <slot name="title">
                     {{ resolvedTitle }}
                   </slot>
@@ -147,7 +147,7 @@ function onKeydown(e: KeyboardEvent): void {
                 </GrButton>
               </div>
 
-              <div data-ds-drawer-body class="flex-1 overflow-y-auto">
+              <div data-gr-drawer-body class="flex-1 overflow-y-auto">
                 <div class="p-5">
                   <slot />
                 </div>
@@ -155,7 +155,7 @@ function onKeydown(e: KeyboardEvent): void {
 
               <div
                 v-if="$slots.footer"
-                data-ds-drawer-footer
+                data-gr-drawer-footer
                 class="px-5 py-4 border-t border-[var(--brd)]"
               >
                 <slot name="footer" />

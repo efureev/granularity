@@ -4,19 +4,19 @@ import { ref } from 'vue'
 import { GrInput, GrTooltip } from '@feugene/granularity'
 
 const tooltipText = ref('Escalation policy will be applied to new alerts only.')
-const iconColor = ref('var(--ds-warning)')
+const iconColor = ref('var(--gr-warning)')
 
 // Пресеты цвета иконки из палитры GrTone: клик подставляет валидную CSS-переменную
 // темы в инпут `icon-color` (раньше в демо был несуществующий `var(--warning)`).
 const tonePresets: Array<{ tone: string, value: string }> = [
   { tone: 'primary', value: 'var(--primary)' },
   { tone: 'neutral', value: 'var(--muted-fg)' },
-  { tone: 'success', value: 'var(--ds-success)' },
-  { tone: 'warning', value: 'var(--ds-warning)' },
-  { tone: 'danger', value: 'var(--ds-danger)' },
-  { tone: 'info', value: 'var(--ds-info)' },
-  { tone: 'slate', value: 'var(--ds-slate)' },
-  { tone: 'azure', value: 'var(--ds-azure)' },
+  { tone: 'success', value: 'var(--gr-success)' },
+  { tone: 'warning', value: 'var(--gr-warning)' },
+  { tone: 'danger', value: 'var(--gr-danger)' },
+  { tone: 'info', value: 'var(--gr-info)' },
+  { tone: 'slate', value: 'var(--gr-slate)' },
+  { tone: 'azure', value: 'var(--gr-azure)' },
 ]
 </script>
 
@@ -48,7 +48,7 @@ const tonePresets: Array<{ tone: string, value: string }> = [
 
     <div class="grid gap-3 md:grid-cols-2">
       <GrInput v-model="tooltipText" placeholder="Tooltip text" />
-      <GrInput v-model="iconColor" placeholder="var(--ds-warning) / #f59e0b" />
+      <GrInput v-model="iconColor" placeholder="var(--gr-warning) / #f59e0b" />
     </div>
   </div>
 </template>

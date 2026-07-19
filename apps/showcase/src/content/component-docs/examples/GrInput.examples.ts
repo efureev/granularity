@@ -6,7 +6,7 @@ export const grInputExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Validation states and native input types',
     description: 'Одна карточка показывает сразу базовый текстовый сценарий, email-валидацию и search-mode, чтобы было видно native-поведение без потери design-system оболочки.',
     status: 'ready',
-    previewKey: 'ds-input-validation-states',
+    previewKey: 'gr-input-validation-states',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -59,7 +59,7 @@ const invalid = ref(false)
     title: 'Prefix and suffix add-ons',
     description: 'Статичные add-on-слоты (валюта, единицы измерения) внутри поля — общий layout поля при этом не меняется.',
     status: 'ready',
-    previewKey: 'ds-input-addons-basic',
+    previewKey: 'gr-input-addons-basic',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -92,7 +92,7 @@ const weight = ref('68')
     title: 'Add-on slots: fixed (clip) vs stretch',
     description: 'Длинный контент в prefix/suffix больше не вылезает за рамки: в fixed-режиме аддон держит ширину и обрезает контент (prefix — справа, suffix — слева), в stretch — растягивается под контент. Два поля слева реактивно управляют содержимым аддонов.',
     status: 'ready',
-    previewKey: 'ds-input-addon-slots',
+    previewKey: 'gr-input-addon-slots',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -135,7 +135,7 @@ const fixed = ref(true)
     title: 'Size scale and text alignment',
     description: 'Показываем, что `GrInput` умеет жить и в компактных toolbars, и в крупных form-layout, а выравнивание текста настраивается отдельно от размера.',
     status: 'ready',
-    previewKey: 'ds-input-size-and-alignment',
+    previewKey: 'gr-input-size-and-alignment',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

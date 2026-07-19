@@ -32,7 +32,7 @@ type IndicatorGeometry = {
 }
 
 /**
- * Пропсы публичного DS-примитива «Segmented».
+ * Пропсы публичного GR-примитива «Segmented».
  */
 export interface GrSegmentedProps {
   modelValue: GrSegmentedValue
@@ -68,7 +68,7 @@ const emit = defineEmits<{
 }>()
 
 const instance = getCurrentInstance()
-const fallbackName = `ds-segmented-${instance?.uid ?? Math.random()}`
+const fallbackName = `gr-segmented-${instance?.uid ?? Math.random()}`
 
 const rootRef = ref<HTMLElement | null>(null)
 const itemRefs = ref(new Map<string, HTMLElement>())
@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="rootRef"
-    data-ds-segmented
+    data-gr-segmented
     :data-variant="variant"
     role="radiogroup"
     :aria-label="ariaLabel"
@@ -399,7 +399,7 @@ onBeforeUnmount(() => {
   >
     <span
       v-if="hasIndicator"
-      data-ds-segmented-indicator
+      data-gr-segmented-indicator
       aria-hidden="true"
       :class="indicatorClassName"
       :style="indicatorStyle"
@@ -409,7 +409,7 @@ onBeforeUnmount(() => {
       v-for="(option, index) in options"
       :key="option.value"
       :ref="element => setItemRef(option.value, element)"
-      data-ds-segmented-item
+      data-gr-segmented-item
       :data-value="String(option.value)"
       type="button"
       role="radio"

@@ -31,15 +31,15 @@ describe('GrNavbar', () => {
       props: { title: 'Dashboard' },
     })
     expect(wrapper.text()).toContain('Dashboard')
-    expect(wrapper.find('[data-ds-navbar-menu]').exists()).toBe(false)
-    expect(wrapper.find('[data-ds-navbar]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-navbar-menu]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-navbar]').exists()).toBe(true)
   })
 
   it('рендерит кнопку меню при showMenuButton и эмитит `menu` по клику', async () => {
     const wrapper = mount(GrNavbar, {
       props: { title: 'Dashboard', showMenuButton: true, menuButtonClass: 'sm:hidden' },
     })
-    const btn = wrapper.find('[data-ds-navbar-menu]')
+    const btn = wrapper.find('[data-gr-navbar-menu]')
     expect(btn.exists()).toBe(true)
     expect(btn.classes()).toContain('sm:hidden')
     expect(wrapper.find('[data-icon="menu"]').exists()).toBe(true)
@@ -56,7 +56,7 @@ describe('GrNavbar', () => {
         },
       },
     })
-    expect(wrapper.find('[data-ds-navbar-menu]').attributes('aria-label')).toBe('Открыть меню')
+    expect(wrapper.find('[data-gr-navbar-menu]').attributes('aria-label')).toBe('Открыть меню')
   })
 
   it('поддерживает слот #title и default slot для правых действий', () => {

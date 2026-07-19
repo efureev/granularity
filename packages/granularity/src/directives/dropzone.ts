@@ -52,7 +52,7 @@ function normalize(value: DropzoneBindingValue | undefined): NormalizedOptions {
       onFiles: value,
       onError: undefined,
       onStateChange: undefined,
-      overClass: 'ds-dropzone--over',
+      overClass: 'gr-dropzone--over',
     }
   }
 
@@ -66,7 +66,7 @@ function normalize(value: DropzoneBindingValue | undefined): NormalizedOptions {
       onFiles: value.onFiles,
       onError: value.onError,
       onStateChange: value.onStateChange,
-      overClass: value.overClass ?? 'ds-dropzone--over',
+      overClass: value.overClass ?? 'gr-dropzone--over',
     }
   }
 
@@ -79,7 +79,7 @@ function normalize(value: DropzoneBindingValue | undefined): NormalizedOptions {
     onFiles: undefined,
     onError: undefined,
     onStateChange: undefined,
-    overClass: 'ds-dropzone--over',
+    overClass: 'gr-dropzone--over',
   }
 }
 

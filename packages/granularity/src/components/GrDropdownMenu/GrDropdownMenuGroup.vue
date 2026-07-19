@@ -27,7 +27,7 @@ const itemsClass = computed(() => {
 </script>
 
 <template>
-  <div data-ds-dropdown-menu-group class="w-full">
+  <div data-gr-dropdown-menu-group class="w-full">
     <GrDropdownMenuHeader
       v-if="title"
       :title="title"

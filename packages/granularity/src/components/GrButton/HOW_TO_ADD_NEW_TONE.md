@@ -8,27 +8,27 @@
 
 1. `packages/granularity/src/styles/themes/light.css`
    - Добавь semantic token'ы светлой темы:
-     - `--ds-<tone>`
-     - `--ds-<tone>-light`
-     - `--ds-<tone>-foreground`
-     - `--ds-<tone>-text`
+     - `--gr-<tone>`
+     - `--gr-<tone>-light`
+     - `--gr-<tone>-foreground`
+     - `--gr-<tone>-text`
 2. `packages/granularity/src/styles/themes/dark.css`
    - Добавь те же token'ы для тёмной темы.
 3. `packages/granularity/src/styles/tokens.css`
    - Добавь derived token'ы для interaction state:
-     - `--ds-<tone>-hover`
-     - `--ds-<tone>-active`
+     - `--gr-<tone>-hover`
+     - `--gr-<tone>-active`
    - Если проект поддерживает fallback внутри `@supports not (color: color-mix(...))`, добавь и fallback-значения в theme-файлы.
 4. `packages/granularity/src/components/GrButton/tokens.css`
    - Добавь component-level token'ы для `GrButton`:
-     - `--ds-button-<tone>-background`
-     - `--ds-button-<tone>-background-hover`
-     - `--ds-button-<tone>-background-active`
-     - `--ds-button-<tone>-foreground`
-     - `--ds-button-<tone>-soft-background`
-     - `--ds-button-<tone>-soft-background-hover`
-     - `--ds-button-<tone>-soft-background-active`
-   - При необходимости задай button-specific filled background, если прямое использование `--ds-<tone>` не даёт нужный контраст для белого/тёмного текста.
+     - `--gr-button-<tone>-background`
+     - `--gr-button-<tone>-background-hover`
+     - `--gr-button-<tone>-background-active`
+     - `--gr-button-<tone>-foreground`
+     - `--gr-button-<tone>-soft-background`
+     - `--gr-button-<tone>-soft-background-hover`
+     - `--gr-button-<tone>-soft-background-active`
+   - При необходимости задай button-specific filled background, если прямое использование `--gr-<tone>` не даёт нужный контраст для белого/тёмного текста.
 5. `packages/granularity/src/components/GrButton/grButtonStyles.ts`
    - Добавь новый `tone` в тип `GrButtonTone`.
    - Добавь новую запись в объект `tones`.
@@ -64,48 +64,48 @@
 
 ```css
 /* light.css */
---ds-brand-alt: #0ea5e9;
---ds-brand-alt-light: #e0f2fe;
---ds-brand-alt-fg: #ffffff;
---ds-brand-alt-text: #075985;
+--gr-brand-alt: #0ea5e9;
+--gr-brand-alt-light: #e0f2fe;
+--gr-brand-alt-fg: #ffffff;
+--gr-brand-alt-text: #075985;
 ```
 
 ```css
 /* dark.css */
---ds-brand-alt: #38bdf8;
---ds-brand-alt-light: #0c4a6e;
---ds-brand-alt-fg: #0f172a;
---ds-brand-alt-text: #bae6fd;
+--gr-brand-alt: #38bdf8;
+--gr-brand-alt-light: #0c4a6e;
+--gr-brand-alt-fg: #0f172a;
+--gr-brand-alt-text: #bae6fd;
 ```
 
 #### 2. Interaction formula token'ы
 
 ```css
 /* src/styles/tokens.css */
---ds-brand-alt-hover: color-mix(in srgb, var(--ds-brand-alt) 92%, var(--fg));
---ds-brand-alt-active: color-mix(in srgb, var(--ds-brand-alt) 84%, var(--fg));
+--gr-brand-alt-hover: color-mix(in srgb, var(--gr-brand-alt) 92%, var(--fg));
+--gr-brand-alt-active: color-mix(in srgb, var(--gr-brand-alt) 84%, var(--fg));
 ```
 
 #### 3. Component token'ы для `GrButton`
 
 ```css
 /* GrButton/tokens.css */
---ds-button-brand-alt-bg: var(--ds-brand-alt);
---ds-button-brand-alt-bg-hover: var(--ds-brand-alt-hover);
---ds-button-brand-alt-bg-active: var(--ds-brand-alt-active);
---ds-button-brand-alt-fg: var(--ds-brand-alt-fg);
---ds-button-brand-alt-soft-bg: var(--ds-brand-alt-light);
---ds-button-brand-alt-soft-bg-hover: color-mix(in srgb, var(--ds-brand-alt) 20%, var(--bg));
---ds-button-brand-alt-soft-bg-active: color-mix(in srgb, var(--ds-brand-alt) 26%, var(--bg));
+--gr-button-brand-alt-bg: var(--gr-brand-alt);
+--gr-button-brand-alt-bg-hover: var(--gr-brand-alt-hover);
+--gr-button-brand-alt-bg-active: var(--gr-brand-alt-active);
+--gr-button-brand-alt-fg: var(--gr-brand-alt-fg);
+--gr-button-brand-alt-soft-bg: var(--gr-brand-alt-light);
+--gr-button-brand-alt-soft-bg-hover: color-mix(in srgb, var(--gr-brand-alt) 20%, var(--bg));
+--gr-button-brand-alt-soft-bg-active: color-mix(in srgb, var(--gr-brand-alt) 26%, var(--bg));
 ```
 
-Если filled-кнопка с `var(--ds-brand-alt)` не проходит контраст, как это уже сделано для отдельных tone в `GrButton`, можно задать более тёмные button-specific значения:
+Если filled-кнопка с `var(--gr-brand-alt)` не проходит контраст, как это уже сделано для отдельных tone в `GrButton`, можно задать более тёмные button-specific значения:
 
 ```css
---ds-button-brand-alt-bg: #0369a1;
---ds-button-brand-alt-bg-hover: #075985;
---ds-button-brand-alt-bg-active: #0c4a6e;
---ds-button-brand-alt-fg: #ffffff;
+--gr-button-brand-alt-bg: #0369a1;
+--gr-button-brand-alt-bg-hover: #075985;
+--gr-button-brand-alt-bg-active: #0c4a6e;
+--gr-button-brand-alt-fg: #ffffff;
 ```
 
 #### 4. Подключение в `grButtonStyles.ts`
@@ -126,18 +126,18 @@ export type GrButtonTone =
 ```ts
 const tones = {
   'brand-alt': {
-    solidBackground: 'var(--ds-button-brand-alt-bg,var(--ds-brand-alt))',
-    solidBackgroundHover: 'var(--ds-button-brand-alt-bg-hover,var(--ds-brand-alt-hover))',
-    solidBackgroundActive: 'var(--ds-button-brand-alt-bg-active,var(--ds-brand-alt-active))',
-    solidForeground: 'var(--ds-button-brand-alt-fg,var(--ds-brand-alt-fg,var(--fg)))',
-    accentText: 'var(--ds-brand-alt-text,var(--ds-brand-alt))',
-    softBackground: 'var(--ds-button-brand-alt-soft-bg)',
-    softBackgroundHover: 'var(--ds-button-brand-alt-soft-bg-hover)',
-    softBackgroundActive: 'var(--ds-button-brand-alt-soft-bg-active)',
-    softForeground: 'var(--ds-brand-alt-text,var(--ds-brand-alt))',
-    border: 'var(--ds-brand-alt)',
-    borderHover: 'var(--ds-brand-alt-hover)',
-    borderActive: 'var(--ds-brand-alt-active)',
+    solidBackground: 'var(--gr-button-brand-alt-bg,var(--gr-brand-alt))',
+    solidBackgroundHover: 'var(--gr-button-brand-alt-bg-hover,var(--gr-brand-alt-hover))',
+    solidBackgroundActive: 'var(--gr-button-brand-alt-bg-active,var(--gr-brand-alt-active))',
+    solidForeground: 'var(--gr-button-brand-alt-fg,var(--gr-brand-alt-fg,var(--fg)))',
+    accentText: 'var(--gr-brand-alt-text,var(--gr-brand-alt))',
+    softBackground: 'var(--gr-button-brand-alt-soft-bg)',
+    softBackgroundHover: 'var(--gr-button-brand-alt-soft-bg-hover)',
+    softBackgroundActive: 'var(--gr-button-brand-alt-soft-bg-active)',
+    softForeground: 'var(--gr-brand-alt-text,var(--gr-brand-alt))',
+    border: 'var(--gr-brand-alt)',
+    borderHover: 'var(--gr-brand-alt-hover)',
+    borderActive: 'var(--gr-brand-alt-active)',
   },
 }
 ```

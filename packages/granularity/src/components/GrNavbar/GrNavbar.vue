@@ -38,13 +38,13 @@ const menuAriaLabel = computed(() => t('gr.navbar.openMenu', 'Open menu'))
 
 <template>
   <header
-    data-ds-navbar
+    data-gr-navbar
     class="h-[56px] border-b border-[var(--brd)] bg-[var(--bg)] flex items-center justify-between px-4 sm:px-6"
   >
     <div class="flex items-center gap-3">
       <GrButton
         v-if="showMenuButton"
-        data-ds-navbar-menu
+        data-gr-navbar-menu
         variant="ghost"
         size="sm"
         square
@@ -56,7 +56,7 @@ const menuAriaLabel = computed(() => t('gr.navbar.openMenu', 'Open menu'))
           <IconMenu aria-hidden="true" />
         </GrIcon>
       </GrButton>
-      <div data-ds-navbar-title class="text-[14px] font-700">
+      <div data-gr-navbar-title class="text-[14px] font-700">
         <slot name="title">
           {{ title }}
         </slot>

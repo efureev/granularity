@@ -6,7 +6,7 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Interactive toaster constructor',
     description: 'Живой playground для ключевых пропсов `GrToaster` и payload `useToast.push`: меняйте `tone`, `placement`, `timeoutMs`, тексты и проверяйте поведение без переключения между отдельными demo-карточками.',
     status: 'ready',
-    previewKey: 'ds-toaster-builder',
+    previewKey: 'gr-toaster-builder',
     code: '',
     note: 'Удобный формат для дизайн-ревью и QA: один сценарий покрывает все пропсы и shared-store контракт `useToast`.',
   },
@@ -15,7 +15,7 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Sticky toast and manual clear',
     description: 'Демонстрация `timeoutMs = 0` и ручного очищения shared store для уведомлений, которые не должны исчезать автоматически.',
     status: 'ready',
-    previewKey: 'ds-toaster-sticky-host',
+    previewKey: 'gr-toaster-sticky-host',
     code: `<script setup lang="ts">
 import { GrButton, GrToaster, useToast } from '@feugene/granularity'
 
@@ -38,7 +38,7 @@ const { push, clear } = useToast()
     title: 'Queued workflow feedback',
     description: 'Отдельный workflow-сценарий: пушим несколько toast подряд, чтобы проверить stacking и ручные sticky warnings.',
     status: 'ready',
-    previewKey: 'ds-toaster-queue-flow',
+    previewKey: 'gr-toaster-queue-flow',
     code: `<script setup lang="ts">
 import { GrButton, GrToaster, useToast } from '@feugene/granularity'
 

@@ -6,7 +6,7 @@ export const grDropdownExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic actions menu',
     description: 'Стартовый сценарий для `GrDropdown`: trigger/content slots, короткий action list и автоматическое закрытие по клику.',
     status: 'ready',
-    previewKey: 'ds-dropdown-basic-menu',
+    previewKey: 'gr-dropdown-basic-menu',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -48,7 +48,7 @@ function select(action: string) {
     title: 'Alignment and width presets',
     description: 'Отдельно сравниваем `align` и `width`, чтобы быстро проверить positioning и ожидаемую ширину выпадающего контента.',
     status: 'ready',
-    previewKey: 'ds-dropdown-alignment-width',
+    previewKey: 'gr-dropdown-alignment-width',
     code: `<script setup lang="ts">
 import { GrButton, GrDropdown } from '@feugene/granularity'
 </script>
@@ -100,7 +100,7 @@ import { GrButton, GrDropdown } from '@feugene/granularity'
     title: 'Persistent content with manual close',
     description: 'Показываем `closeOnContentClick=false`, когда внутри dropdown есть mini-form/filter pane и компонент не должен закрываться после каждого клика.',
     status: 'ready',
-    previewKey: 'ds-dropdown-persistent-content',
+    previewKey: 'gr-dropdown-persistent-content',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

@@ -6,7 +6,7 @@ export const grDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic dialog shell',
     description: 'Показываем базовый слой над `GrModal`: готовый header/footer shell для review, approval и confirm-like сценариев.',
     status: 'ready',
-    previewKey: 'ds-dialog-basic-flow',
+    previewKey: 'gr-dialog-basic-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -39,7 +39,7 @@ const open = ref(false)
     title: 'Section config and internal state',
     description: 'Демонстрируем `headerConfig` / `footerConfig` и локальное состояние формы внутри dialog-shell.',
     status: 'ready',
-    previewKey: 'ds-dialog-section-config',
+    previewKey: 'gr-dialog-section-config',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -76,7 +76,7 @@ const confirmed = ref(false)
     title: 'Guarded backdrop for critical flows',
     description: 'Отдельный сценарий для `closeOnBackdrop=false`, когда закрытие должно происходить только по явным действиям.',
     status: 'ready',
-    previewKey: 'ds-dialog-guarded-backdrop',
+    previewKey: 'gr-dialog-guarded-backdrop',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

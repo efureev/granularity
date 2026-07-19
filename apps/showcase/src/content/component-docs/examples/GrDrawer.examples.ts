@@ -6,7 +6,7 @@ export const grDrawerExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Filter panel drawer',
     description: 'Базовый application-shell сценарий: drawer справа открывает форму фильтров без ухода со страницы.',
     status: 'ready',
-    previewKey: 'ds-drawer-filter-panel',
+    previewKey: 'gr-drawer-filter-panel',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -33,7 +33,7 @@ const open = ref(false)
     title: 'Left-side navigation rail',
     description: 'Показываем `side="left"` для responsive-navigation и utility-rail сценариев.',
     status: 'ready',
-    previewKey: 'ds-drawer-left-rail',
+    previewKey: 'gr-drawer-left-rail',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -58,7 +58,7 @@ const activeItem = ref('Overview')
     title: 'Size switcher with guarded backdrop',
     description: 'Сравниваем `size` и одновременно показываем guarded overlay flow для review/inspector сценариев.',
     status: 'ready',
-    previewKey: 'ds-drawer-guarded-size',
+    previewKey: 'gr-drawer-guarded-size',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

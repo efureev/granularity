@@ -9,7 +9,7 @@
  * хотите глобального сброса. `index.css` и granular-provider (через `base.css`)
  * включают preflight по умолчанию для обратной совместимости.
  *
- * Требует переменных из `tokens.css` (`--ds-font-ui`) и темы (`--bg`, `--fg`),
+ * Требует переменных из `tokens.css` (`--gr-font-ui`) и темы (`--bg`, `--fg`),
  * поэтому подключается ПОСЛЕ них.
  */
 html,
@@ -19,7 +19,7 @@ body {
 
 body {
   margin: 0;
-  font-family: var(--ds-font-ui);
+  font-family: var(--gr-font-ui);
   background: var(--bg);
   color: var(--fg);
 }

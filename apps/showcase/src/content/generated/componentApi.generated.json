@@ -2820,7 +2820,7 @@
           },
           {
             "name": "animated",
-            "description": "When `true` (default), the default spinner rotates via `@keyframes ds-loading-spin`.",
+            "description": "When `true` (default), the default spinner rotates via `@keyframes gr-loading-spin`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"

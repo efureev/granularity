@@ -6,7 +6,7 @@ export const grProgressBarExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Interactive determinate progress',
     description: 'Базовый сценарий: меняем `value`, переключаем `tone` и рядом выводим фактический процент выполнения.',
     status: 'ready',
-    previewKey: 'ds-progress-bar-basic-flow',
+    previewKey: 'gr-progress-bar-basic-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -51,7 +51,7 @@ const tones = GR_TONES
     title: 'Out-of-range inputs are clamped',
     description: 'Документируем важный edge-case: отрицательные и слишком большие значения безопасно ограничиваются диапазоном 0–100.',
     status: 'ready',
-    previewKey: 'ds-progress-bar-clamped-values',
+    previewKey: 'gr-progress-bar-clamped-values',
     code: `<script setup lang="ts">
 import { GrBadge, GrProgressBar } from '@feugene/granularity'
 
@@ -76,7 +76,7 @@ const rows = [
     title: 'Stack of workflow stages',
     description: 'Data-display сценарий для pipelines/checklists: несколько progress bars в списке статусов одного workflow с семантическим `tone` у каждого этапа.',
     status: 'ready',
-    previewKey: 'ds-progress-bar-pipeline-stages',
+    previewKey: 'gr-progress-bar-pipeline-stages',
     code: `<script setup lang="ts">
 import { GrBadge, GrProgressBar } from '@feugene/granularity'
 

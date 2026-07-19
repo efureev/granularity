@@ -46,8 +46,8 @@ const resolvedName = computed<GrCollapseValue>(() => {
 const resolvedDisabled = computed(() => collapseContext.disabled.value || props.disabled)
 const expanded = computed(() => collapseContext.isActive(resolvedName.value))
 
-const headerId = `ds-collapse-header-${uid}`
-const panelId = `ds-collapse-panel-${uid}`
+const headerId = `gr-collapse-header-${uid}`
+const panelId = `gr-collapse-panel-${uid}`
 
 const triggerEl = ref<HTMLElement | null>(null)
 
@@ -59,11 +59,11 @@ function onToggle(): void {
 }
 
 function getAllTriggers(): HTMLElement[] {
-  const root = triggerEl.value?.closest('[data-ds-collapse]')
+  const root = triggerEl.value?.closest('[data-gr-collapse]')
   if (!root)
     return []
 
-  return Array.prototype.slice.call(root.querySelectorAll<HTMLElement>('[data-ds-collapse-trigger]')) as HTMLElement[]
+  return Array.prototype.slice.call(root.querySelectorAll<HTMLElement>('[data-gr-collapse-trigger]')) as HTMLElement[]
 }
 
 function focusRelative(direction: 1 | -1): void {
@@ -122,14 +122,14 @@ function onKeydown(event: KeyboardEvent): void {
 
 <template>
   <div
-    data-ds-collapse-item
+    data-gr-collapse-item
     class="text-[var(--fg)]"
   >
     <h3 class="m-0">
       <button
         :id="headerId"
         ref="triggerEl"
-        data-ds-collapse-trigger
+        data-gr-collapse-trigger
         type="button"
         :aria-expanded="expanded ? 'true' : 'false'"
         :aria-controls="panelId"
@@ -150,7 +150,7 @@ function onKeydown(event: KeyboardEvent): void {
         <GrIcon
           size="sm"
           aria-hidden="true"
-          data-ds-collapse-chevron
+          data-gr-collapse-chevron
           class="shrink-0 transition-transform duration-150 text-[var(--muted-fg)]"
           :class="expanded ? 'rotate-180' : ''"
         >

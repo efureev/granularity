@@ -6,7 +6,7 @@ export const grLoadingExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Inline section overlay',
     description: 'Базовый сценарий для `GrLoading`: временно перекрываем card/section поверх уже существующего контента.',
     status: 'ready',
-    previewKey: 'ds-loading-inline-overlay',
+    previewKey: 'gr-loading-inline-overlay',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -30,7 +30,7 @@ const loading = ref(false)
     title: 'Custom appearance and z-index',
     description: 'Демонстрируем настройку `background`, `spinnerClass`, `animated` и `zIndex` для branded overlays.',
     status: 'ready',
-    previewKey: 'ds-loading-custom-appearance',
+    previewKey: 'gr-loading-custom-appearance',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -61,7 +61,7 @@ const loading = ref(false)
     title: 'Fullscreen async cycle',
     description: 'Отдельно показываем global overlay режим `fullscreen` для коротких cross-page sync/reset операций.',
     status: 'ready',
-    previewKey: 'ds-loading-fullscreen',
+    previewKey: 'gr-loading-fullscreen',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

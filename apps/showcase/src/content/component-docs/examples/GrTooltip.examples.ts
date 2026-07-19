@@ -6,7 +6,7 @@ export const grTooltipExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Inline help near form labels',
     description: 'Самый частый сценарий для `GrTooltip` — короткое пояснение рядом с label или small helper-control.',
     status: 'ready',
-    previewKey: 'ds-tooltip-inline-help',
+    previewKey: 'gr-tooltip-inline-help',
     code: `<script setup lang="ts">
 import { GrTooltip } from '@feugene/granularity'
 </script>
@@ -25,7 +25,7 @@ import { GrTooltip } from '@feugene/granularity'
     title: 'Custom trigger via default slot',
     description: 'Показываем, что tooltip не ограничен встроенной info-иконкой: любой trigger можно прокинуть через default slot.',
     status: 'ready',
-    previewKey: 'ds-tooltip-custom-trigger',
+    previewKey: 'gr-tooltip-custom-trigger',
     code: `<script setup lang="ts">
 import { GrTooltip } from '@feugene/granularity'
 </script>
@@ -43,7 +43,7 @@ import { GrTooltip } from '@feugene/granularity'
     title: 'Editable copy and icon tone',
     description: 'Выделяем вторую важную возможность компонента: управлять plain-text сообщением и цветом trigger-иконки из внешнего state.',
     status: 'ready',
-    previewKey: 'ds-tooltip-custom-tone',
+    previewKey: 'gr-tooltip-custom-tone',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

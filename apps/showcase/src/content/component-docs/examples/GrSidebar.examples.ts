@@ -6,7 +6,7 @@ export const grSidebarExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic section rail',
     description: 'Базовый desktop-shell: `GrSidebar` с `v-model:collapsed` и `show-toggle-button`, а навигация собрана из `GrSidebarItem` (иконка, badge, active-состояние). В свёрнутом виде пункты сохраняют иконку, а «Billing» без иконки показывает первую букву.',
     status: 'ready',
-    previewKey: 'ds-sidebar-basic-sections',
+    previewKey: 'gr-sidebar-basic-sections',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -67,7 +67,7 @@ const sections = [
     title: 'Documentation anchors',
     description: 'Sidebar как rail для doc anchors: кастомные `<button>`-пункты с active-подсветкой через `--sidebar-*` токены и badge-маркером якоря.',
     status: 'ready',
-    previewKey: 'ds-sidebar-documentation-nav',
+    previewKey: 'gr-sidebar-documentation-nav',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -120,7 +120,7 @@ const activeSection = computed(() => {
     title: 'Filter rail composition',
     description: 'Sidebar как persistent container для фильтров и переключателей: набор `GrSwitch`, чьё состояние отражается справа через `GrBadge`.',
     status: 'ready',
-    previewKey: 'ds-sidebar-filter-rail',
+    previewKey: 'gr-sidebar-filter-rail',
     code: `<script setup lang="ts">
 import { reactive } from 'vue'
 

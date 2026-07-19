@@ -395,14 +395,14 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
   <div
     ref="rootEl"
     v-click-outside="{ handler: onClickOutside, enabled: open, exclude: clickOutsideExclude }"
-    data-ds-tree-select
+    data-gr-tree-select
     class="relative"
   >
     <div class="relative">
       <input
         ref="triggerEl"
-        data-testid="ds-tree-select-trigger"
-        data-ds-tree-select-trigger
+        data-testid="gr-tree-select-trigger"
+        data-gr-tree-select-trigger
         type="text"
         :value="displayValue"
         :placeholder="placeholder"
@@ -422,8 +422,8 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
 
       <button
         v-if="clearable && hasSelection"
-        data-testid="ds-tree-select-clear"
-        data-ds-tree-select-clear
+        data-testid="gr-tree-select-clear"
+        data-gr-tree-select-clear
         type="button"
         class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
         :disabled="disabled"
@@ -435,8 +435,8 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
 
       <span
         v-else
-        data-testid="ds-tree-select-chevron"
-        data-ds-tree-select-chevron
+        data-testid="gr-tree-select-chevron"
+        data-gr-tree-select-chevron
         class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
       >
         <span
@@ -471,8 +471,8 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
         <div
           v-show="open"
           ref="panelEl"
-          data-testid="ds-tree-select-panel"
-          data-ds-tree-select-panel
+          data-testid="gr-tree-select-panel"
+          data-gr-tree-select-panel
           :style="floatingStyle"
         >
           <div :class="panelClasses">
@@ -480,8 +480,8 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
             <GrInput
               ref="filterInputRef"
               v-model="filterValue"
-              data-testid="ds-tree-select-filter"
-              data-ds-tree-select-filter
+              data-testid="gr-tree-select-filter"
+              data-gr-tree-select-filter
               type="search"
               :inputmode="filterInputmode"
               :placeholder="resolvedFilterPlaceholder"

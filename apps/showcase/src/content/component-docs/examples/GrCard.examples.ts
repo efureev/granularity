@@ -6,7 +6,7 @@ export const grCardExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic surface with host-controlled spacing',
     description: 'Показываем главный contract `GrCard`: компонент отвечает за surface/border, а внутренние spacing/layout decisions остаются у страницы через `class`.',
     status: 'ready',
-    previewKey: 'ds-card-basic-surface',
+    previewKey: 'gr-card-basic-surface',
     code: `<script setup lang="ts">
 import { GrButton, GrCard } from '@feugene/granularity'
 </script>
@@ -30,7 +30,7 @@ import { GrButton, GrCard } from '@feugene/granularity'
     title: 'Cards as metric tiles',
     description: 'Один из самых частых use-case — KPI/stat tiles, где `GrCard` даёт единый surface для компактных dashboard-блоков.',
     status: 'ready',
-    previewKey: 'ds-card-kpi-grid',
+    previewKey: 'gr-card-kpi-grid',
     code: `<script setup lang="ts">
 import { GrBadge, GrCard } from '@feugene/granularity'
 </script>
@@ -50,7 +50,7 @@ import { GrBadge, GrCard } from '@feugene/granularity'
     title: 'Action panel with badges and CTA group',
     description: 'Документируем composed pattern, где карточка работает контейнером для actions, helper badges и explanatory copy.',
     status: 'ready',
-    previewKey: 'ds-card-action-panel',
+    previewKey: 'gr-card-action-panel',
     code: `<script setup lang="ts">
 import { GrBadge, GrButton, GrCard } from '@feugene/granularity'
 </script>

@@ -1,7 +1,7 @@
 import { GR_TONES, type GrTone } from '../shared/tones'
 
 /**
- * Архитектура цвета GrLink (согласована с остальной DS, ср. GrButton):
+ * Архитектура цвета GrLink (согласована с остальной GR, ср. GrButton):
  *
  * - `tone` — семантический ЦВЕТ из общей палитры `GrTone`
  *   (`primary | neutral | success | warning | danger | info | slate | azure`).
@@ -41,12 +41,12 @@ export const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
   primary: { base: 'var(--primary)', hover: 'var(--primary-hover)', active: 'var(--primary-active)' },
   // Нейтральная ссылка: читаемый `--fg` в покое, акцент `--primary` при наведении.
   neutral: { base: 'var(--fg)', hover: 'var(--primary)', active: 'var(--primary-active)' },
-  success: { base: 'var(--ds-success)', hover: 'var(--ds-success-hover)', active: 'var(--ds-success-active)' },
-  warning: { base: 'var(--ds-warning)', hover: 'var(--ds-warning-hover)', active: 'var(--ds-warning-active)' },
-  danger: { base: 'var(--ds-danger)', hover: 'var(--ds-danger-hover)', active: 'var(--ds-danger-active)' },
-  info: { base: 'var(--ds-info)', hover: 'var(--ds-info-hover)', active: 'var(--ds-info-active)' },
-  slate: { base: 'var(--ds-slate)', hover: 'var(--ds-slate-hover)', active: 'var(--ds-slate-active)' },
-  azure: { base: 'var(--ds-azure)', hover: 'var(--ds-azure-hover)', active: 'var(--ds-azure-active)' },
+  success: { base: 'var(--gr-success)', hover: 'var(--gr-success-hover)', active: 'var(--gr-success-active)' },
+  warning: { base: 'var(--gr-warning)', hover: 'var(--gr-warning-hover)', active: 'var(--gr-warning-active)' },
+  danger: { base: 'var(--gr-danger)', hover: 'var(--gr-danger-hover)', active: 'var(--gr-danger-active)' },
+  info: { base: 'var(--gr-info)', hover: 'var(--gr-info-hover)', active: 'var(--gr-info-active)' },
+  slate: { base: 'var(--gr-slate)', hover: 'var(--gr-slate-hover)', active: 'var(--gr-slate-active)' },
+  azure: { base: 'var(--gr-azure)', hover: 'var(--gr-azure-hover)', active: 'var(--gr-azure-active)' },
 }
 
 /** Инлайновые CSS-переменные цвета для текущей комбинации `tone` × `variant`. */

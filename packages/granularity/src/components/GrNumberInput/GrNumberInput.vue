@@ -321,7 +321,7 @@ function stepBy(dir: 1 | -1): void {
 
 <template>
   <div
-    data-ds-number-input
+    data-gr-number-input
     class="relative w-full overflow-hidden rounded-md border bg-[var(--bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
     :class="shellClassName"
   >
@@ -329,7 +329,7 @@ function stepBy(dir: 1 | -1): void {
       v-if="$slots.prefix"
       ref="prefixEl"
       data-testid="number-input-prefix"
-      data-ds-number-input-prefix
+      data-gr-number-input-prefix
       class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
       :style="prefixStyle"
       aria-hidden="true"
@@ -360,7 +360,7 @@ function stepBy(dir: 1 | -1): void {
       v-if="$slots.suffix"
       ref="suffixEl"
       data-testid="number-input-suffix"
-      data-ds-number-input-suffix
+      data-gr-number-input-suffix
       class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
       :class="suffixFixed ? '[direction:rtl]' : ''"
       :style="suffixStyle"
@@ -372,7 +372,7 @@ function stepBy(dir: 1 | -1): void {
     <div
       v-if="hasVerticalControls"
       data-testid="number-input-controls-vertical"
-      data-ds-number-input-controls="vertical"
+      data-gr-number-input-controls="vertical"
       class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)]"
       :style="verticalControlsStyle"
     >
@@ -419,7 +419,7 @@ function stepBy(dir: 1 | -1): void {
     <div
       v-if="hasHorizontalControls"
       data-testid="number-input-controls-horizontal-left"
-      data-ds-number-input-controls="horizontal-left"
+      data-gr-number-input-controls="horizontal-left"
       class="absolute inset-y-0 flex items-stretch justify-center border-r border-[var(--brd)]"
       :style="horizontalLeftControlsStyle"
     >
@@ -446,7 +446,7 @@ function stepBy(dir: 1 | -1): void {
     <div
       v-if="hasHorizontalControls"
       data-testid="number-input-controls-horizontal-right"
-      data-ds-number-input-controls="horizontal-right"
+      data-gr-number-input-controls="horizontal-right"
       class="absolute inset-y-0 flex items-stretch justify-center border-l border-[var(--brd)]"
       :style="horizontalRightControlsStyle"
     >

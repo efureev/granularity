@@ -6,7 +6,7 @@ export const grRadioExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Standalone radios with shared model',
     description: 'Минимальный контролируемый сценарий без group-wrapper, полезный там, где нужно вручную разложить отдельные radio по кастомному layout.',
     status: 'ready',
-    previewKey: 'ds-radio-standalone-controlled',
+    previewKey: 'gr-radio-standalone-controlled',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
@@ -53,7 +53,7 @@ const selectedLabel = computed(() => {
     title: 'Button tone for segmented controls',
     description: 'Отдельный пример для `tone="button"`: по API это всё тот же radio, но визуально он работает как сегментированный toolbar-control.',
     status: 'ready',
-    previewKey: 'ds-radio-button-variant',
+    previewKey: 'gr-radio-button-variant',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -87,7 +87,7 @@ const density = ref('balanced')
     title: 'Inherited name, size and disabled state from `GrRadioGroup`',
     description: 'Этот сценарий важен именно для `GrRadio`: компонент должен корректно читать group-context и не дублировать базовые props на каждом элементе.',
     status: 'ready',
-    previewKey: 'ds-radio-group-inheritance',
+    previewKey: 'gr-radio-group-inheritance',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

@@ -6,7 +6,7 @@ export const grSwitchExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Interactive switch constructor',
     description: 'Соберите `GrSwitch` под ваш сценарий: меняйте состояние, size, подпись и локальные color overrides, сразу получая итоговый snippet.',
     status: 'ready',
-    previewKey: 'ds-switch-builder',
+    previewKey: 'gr-switch-builder',
     code: '',
   },
   {
@@ -14,7 +14,7 @@ export const grSwitchExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Size scale from compact to prominent',
     description: 'Один сценарий показывает, как переключатель масштабируется от компактных control bars до больших form-sections без изменения поведения.',
     status: 'ready',
-    previewKey: 'ds-switch-size-scale',
+    previewKey: 'gr-switch-size-scale',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -38,7 +38,7 @@ const lgValue = ref(true)
     title: 'Labeled switches and disabled state',
     description: 'Показываем, что label живёт в default slot, а disabled-режим одинаково корректно работает и для управляемого, и для статически включённого switch.',
     status: 'ready',
-    previewKey: 'ds-switch-disabled-labeled',
+    previewKey: 'gr-switch-disabled-labeled',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -72,7 +72,7 @@ const disabled = ref(false)
     title: 'Custom active and inactive colors',
     description: 'Фиксируем одну из ключевых интеграционных возможностей компонента: локально переопределять цвета трека без изменения глобальной темы.',
     status: 'ready',
-    previewKey: 'ds-switch-custom-colors',
+    previewKey: 'gr-switch-custom-colors',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

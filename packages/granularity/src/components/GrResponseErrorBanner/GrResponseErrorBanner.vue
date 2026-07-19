@@ -211,7 +211,7 @@ function onDismiss(): void {
       <div class="flex flex-wrap items-center gap-2">
         <span
           v-if="props.showStatus && typeof props.error.status === 'number'"
-          class="inline-flex items-center rounded-[var(--ds-radius-sm)] bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-1.5 py-0.5 text-[11px] font-700 leading-none"
+          class="inline-flex items-center rounded-[var(--gr-radius-sm)] bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-1.5 py-0.5 text-[11px] font-700 leading-none"
           :data-testid="`${props.testIdPrefix}-status`"
         >
           HTTP {{ props.error.status }}

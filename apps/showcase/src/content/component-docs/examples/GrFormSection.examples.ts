@@ -6,7 +6,7 @@ export const grFormSectionExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Section heading with profile fields',
     description: 'Показываем базовую роль `GrFormSection`: лёгкий heading-wrapper для связанных полей и описания секции.',
     status: 'ready',
-    previewKey: 'ds-form-section-profile-layout',
+    previewKey: 'gr-form-section-profile-layout',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -38,7 +38,7 @@ const summary = ref('Coordinates deployments, release notes and service health u
     title: 'Grouped controls inside one section',
     description: 'Отдельный пример фиксирует composition-паттерн, где `GrFormSection` оборачивает и form fields, и более свободные control groups.',
     status: 'ready',
-    previewKey: 'ds-form-section-nested-groups',
+    previewKey: 'gr-form-section-nested-groups',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -76,7 +76,7 @@ const requireApproval = ref(false)
     title: 'Stacked multi-section flow',
     description: 'Такой сценарий показывает, что несколько `GrFormSection` подряд могут собирать skeleton полноценной settings-страницы без тяжёлой layout-обвязки.',
     status: 'ready',
-    previewKey: 'ds-form-section-stacked-flow',
+    previewKey: 'gr-form-section-stacked-flow',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 

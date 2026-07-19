@@ -6,7 +6,7 @@ export const grFileUploadExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Validation bridge with upload request',
     description: 'Главный сценарий для `GrFileUpload`: validators, upload lifecycle и понятное отображение последнего результата загрузки.',
     status: 'ready',
-    previewKey: 'ds-file-upload-validation',
+    previewKey: 'gr-file-upload-validation',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -43,7 +43,7 @@ async function request(files: File[], ctx: { extraData?: Record<string, string> 
     title: 'Custom trigger UI',
     description: 'Показываем режим без стандартной dropzone-разметки: `GrFileUpload` остаётся orchestrator-слоем, а UI можно собрать из других компонентов пакета.',
     status: 'ready',
-    previewKey: 'ds-file-upload-custom-ui',
+    previewKey: 'gr-file-upload-custom-ui',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -72,7 +72,7 @@ async function request(selected: File[]) {
     title: 'Disabled and guarded states',
     description: 'Отдельно фиксируем не happy-path режимы: disabled, limit guard и обратную связь через `onExceed`.',
     status: 'ready',
-    previewKey: 'ds-file-upload-disabled-and-limit',
+    previewKey: 'gr-file-upload-disabled-and-limit',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -106,7 +106,7 @@ function onExceed(files: File[], limit: number) {
     title: 'Upload progress with default bar',
     description: 'Дефолтный `GrProgressBar` в зарезервированной зоне: переключение `idle ↔ uploading ↔ success` без layout shift. Прогресс приходит из `ctx.onProgress`, который вызывает пользовательский `request` — этот контракт совместим с `axios.onUploadProgress`.',
     status: 'ready',
-    previewKey: 'ds-file-upload-progress',
+    previewKey: 'gr-file-upload-progress',
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
@@ -152,7 +152,7 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
     title: 'Custom progress via scoped slot',
     description: 'Кастомный круговой индикатор и кнопка отмены — через scoped-слот `progress`. Дефолтный бар выключен через `:show-progress="false"`.',
     status: 'ready',
-    previewKey: 'ds-file-upload-progress-slot',
+    previewKey: 'gr-file-upload-progress-slot',
     code: `<script setup lang="ts">
 import { GrButton, GrFileUpload } from '@feugene/granularity'
 import type { GrFileUploadRequestCtx } from '@feugene/granularity'
@@ -182,7 +182,7 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
     title: 'Action endpoint with real XHR progress',
     description: 'Сценарий `action`: компонент сам формирует `multipart/form-data` и отправляет POST через `XMLHttpRequest`, давая реальный `upload.onprogress` без какого-либо кода пользователя. Отмена — внутренний `AbortController`.',
     status: 'ready',
-    previewKey: 'ds-file-upload-action-xhr',
+    previewKey: 'gr-file-upload-action-xhr',
     code: `<script setup lang="ts">
 import { GrFileUpload } from '@feugene/granularity'
 </script>

@@ -457,7 +457,7 @@ defineExpose({
 
 <template>
   <div
-    data-ds-file-upload
+    data-gr-file-upload
     :role="hasCustomUi ? undefined : 'button'"
     :tabindex="hasCustomUi ? undefined : tabIndex"
     :aria-disabled="hasCustomUi ? undefined : disabled ? 'true' : 'false'"
@@ -465,7 +465,7 @@ defineExpose({
       hasCustomUi
         ? 'inline-block'
         : [
-            'relative w-full rounded-[var(--ds-radius-lg)] border border-dashed border-[var(--brd)] bg-[var(--card)] px-5 py-6 outline-none transition',
+            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--brd)] bg-[var(--card)] px-5 py-6 outline-none transition',
             disabled
               ? 'opacity-60 cursor-not-allowed'
               : 'cursor-pointer hover:bg-[var(--muted)] focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]',
@@ -481,7 +481,7 @@ defineExpose({
   >
     <input
       ref="inputRef"
-      data-ds-file-upload-input
+      data-gr-file-upload-input
       :style="hiddenInputStyle"
       type="file"
       tabindex="-1"
@@ -504,7 +504,7 @@ defineExpose({
 
     <div v-else class="flex items-start gap-4">
       <div
-        data-ds-file-upload-icon
+        data-gr-file-upload-icon
         class="h-12 w-12 shrink-0 rounded-[12px] bg-[var(--muted)] border border-[var(--brd)] flex items-center justify-center"
         aria-hidden="true"
       >
@@ -514,7 +514,7 @@ defineExpose({
       </div>
 
       <div class="min-w-0">
-        <div data-ds-file-upload-label class="text-[14px] font-700">
+        <div data-gr-file-upload-label class="text-[14px] font-700">
           <slot name="label">
             <slot>
               {{ resolvedPlaceholder }}
@@ -522,16 +522,16 @@ defineExpose({
           </slot>
         </div>
 
-        <div v-if="$slots.tip" data-ds-file-upload-tip class="mt-1 text-[13px] text-[var(--muted-fg)]">
+        <div v-if="$slots.tip" data-gr-file-upload-tip class="mt-1 text-[13px] text-[var(--muted-fg)]">
           <slot name="tip" />
         </div>
         <div v-else class="mt-1 text-[13px] text-[var(--muted-fg)]" />
 
-        <ul v-if="showFileList && lastFiles.length" data-ds-file-upload-list class="mt-3 space-y-1">
+        <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 space-y-1">
           <li
             v-for="file in lastFiles"
             :key="file.name"
-            data-ds-file-upload-item
+            data-gr-file-upload-item
             class="text-[13px]"
           >
             <span class="font-600">{{ file.name }}</span>
@@ -551,7 +551,7 @@ defineExpose({
         >
           <div
             v-if="showProgress"
-            data-ds-file-upload-progress
+            data-gr-file-upload-progress
             class="mt-3 transition-opacity duration-150"
             :class="progressVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'"
             :aria-hidden="!progressVisible"
@@ -563,7 +563,7 @@ defineExpose({
                 :aria-label="resolvedProgressLabel"
               />
               <span
-                data-ds-file-upload-progress-text
+                data-gr-file-upload-progress-text
                 class="text-[12px] text-[var(--muted-fg)] tabular-nums min-w-[3ch] text-right"
               >{{ progressText }}</span>
             </div>

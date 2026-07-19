@@ -54,11 +54,11 @@ describe('GrSegmented', () => {
     rectSpy = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect() {
       const element = this as HTMLElement
 
-      if (element.hasAttribute('data-ds-segmented')) {
+      if (element.hasAttribute('data-gr-segmented')) {
         return createRect({ left: 0, width: 260, height: 48 })
       }
 
-      if (element.hasAttribute('data-ds-segmented-item')) {
+      if (element.hasAttribute('data-gr-segmented-item')) {
         const value = element.getAttribute('data-value')
 
         if (value === 'list') {
@@ -104,7 +104,7 @@ describe('GrSegmented', () => {
     expect(radios[1].attributes('aria-checked')).toBe('true')
     expect(radios[1].attributes('tabindex')).toBe('0')
 
-    const indicator = wrapper.get('[data-ds-segmented-indicator]')
+    const indicator = wrapper.get('[data-gr-segmented-indicator]')
     expect(indicator.attributes('style')).toContain('width: 84px')
     expect(indicator.attributes('style')).toContain('height: 40px')
     expect(indicator.attributes('style')).toContain('translate3d(80px, 3px, 0)')
@@ -122,7 +122,7 @@ describe('GrSegmented', () => {
     await nextTick()
     await nextTick()
 
-    const indicator = wrapper.get('[data-ds-segmented-indicator]')
+    const indicator = wrapper.get('[data-gr-segmented-indicator]')
     expect(indicator.attributes('style')).toContain('transition-duration: 420ms')
   })
 
@@ -193,7 +193,7 @@ describe('GrSegmented', () => {
 
     await nextTick()
 
-    const group = wrapper.get('[data-ds-segmented]')
+    const group = wrapper.get('[data-gr-segmented]')
     expect(group.attributes('data-variant')).toBe('button')
     expect(group.attributes('class')).toContain('w-full')
     expect(group.attributes('style')).toContain('grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)')
@@ -207,9 +207,9 @@ describe('GrSegmented', () => {
       },
     })
 
-    const style = wrapper.get('[data-ds-segmented]').attributes('style')
+    const style = wrapper.get('[data-gr-segmented]').attributes('style')
 
-    expect(style).toContain('--ds-segmented-indicator-shadow: var(--ds-shadow-1), var(--ds-segmented-indicator-highlight-shadow, 0 0 0 0 transparent)')
+    expect(style).toContain('--gr-segmented-indicator-shadow: var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow, 0 0 0 0 transparent)')
   })
 
   it('использует одинаковый inset трека и компактные size-токены для sm и xs', () => {
@@ -229,31 +229,31 @@ describe('GrSegmented', () => {
       },
     })
 
-    const smStyle = smWrapper.get('[data-ds-segmented]').attributes('style')
-    const xsStyle = xsWrapper.get('[data-ds-segmented]').attributes('style')
+    const smStyle = smWrapper.get('[data-gr-segmented]').attributes('style')
+    const xsStyle = xsWrapper.get('[data-gr-segmented]').attributes('style')
     const mdStyle = mount(GrSegmented, {
       props: {
         modelValue: 'board',
         size: 'md',
         options: [...options],
       },
-    }).get('[data-ds-segmented]').attributes('style')
+    }).get('[data-gr-segmented]').attributes('style')
     const lgStyle = mount(GrSegmented, {
       props: {
         modelValue: 'board',
         size: 'lg',
         options: [...options],
       },
-    }).get('[data-ds-segmented]').attributes('style')
+    }).get('[data-gr-segmented]').attributes('style')
 
-    expect(smStyle).toContain('--ds-segmented-padding: 4px')
-    expect(smStyle).toContain('--ds-segmented-font-size: 0.75rem')
-    expect(smStyle).toContain('--ds-segmented-min-height: 28px')
-    expect(xsStyle).toContain('--ds-segmented-padding: 4px')
-    expect(xsStyle).toContain('--ds-segmented-item-px: 10px')
-    expect(xsStyle).toContain('--ds-segmented-min-height: 24px')
-    expect(mdStyle).toContain('--ds-segmented-padding: 4px')
-    expect(lgStyle).toContain('--ds-segmented-padding: 4px')
+    expect(smStyle).toContain('--gr-segmented-padding: 4px')
+    expect(smStyle).toContain('--gr-segmented-font-size: 0.75rem')
+    expect(smStyle).toContain('--gr-segmented-min-height: 28px')
+    expect(xsStyle).toContain('--gr-segmented-padding: 4px')
+    expect(xsStyle).toContain('--gr-segmented-item-px: 10px')
+    expect(xsStyle).toContain('--gr-segmented-min-height: 24px')
+    expect(mdStyle).toContain('--gr-segmented-padding: 4px')
+    expect(lgStyle).toContain('--gr-segmented-padding: 4px')
   })
 
   it('обновляет индикатор при controlled update без сброса в ноль', async () => {
@@ -270,7 +270,7 @@ describe('GrSegmented', () => {
     await nextTick()
     await nextTick()
 
-    const indicator = wrapper.get('[data-ds-segmented-indicator]')
+    const indicator = wrapper.get('[data-gr-segmented-indicator]')
     const style = indicator.attributes('style')
     expect(style).toContain('translate3d(168px, 3px, 0)')
     expect(style).not.toContain('translate3d(0px, 0px, 0px)')

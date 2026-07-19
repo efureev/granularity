@@ -75,44 +75,44 @@ const SOFT_TONE_STYLES: Record<GrAlertTone, GrAlertResolvedStyles> = {
     Icon: IconInfo,
   },
   info: {
-    bg: 'var(--ds-info-light)',
-    border: 'color-mix(in srgb, var(--ds-info) 22%, var(--brd))',
-    icon: 'var(--ds-info)',
+    bg: 'var(--gr-info-light)',
+    border: 'color-mix(in srgb, var(--gr-info) 22%, var(--brd))',
+    icon: 'var(--gr-info)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
   success: {
-    bg: 'var(--ds-success-light)',
-    border: 'color-mix(in srgb, var(--ds-success) 22%, var(--brd))',
-    icon: 'var(--ds-success)',
+    bg: 'var(--gr-success-light)',
+    border: 'color-mix(in srgb, var(--gr-success) 22%, var(--brd))',
+    icon: 'var(--gr-success)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconCheck,
   },
   warning: {
-    bg: 'var(--ds-warning-light)',
-    border: 'color-mix(in srgb, var(--ds-warning) 22%, var(--brd))',
-    icon: 'var(--ds-warning)',
+    bg: 'var(--gr-warning-light)',
+    border: 'color-mix(in srgb, var(--gr-warning) 22%, var(--brd))',
+    icon: 'var(--gr-warning)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconWarning,
   },
   danger: {
-    bg: 'var(--ds-danger-light)',
-    border: 'color-mix(in srgb, var(--ds-danger) 22%, var(--brd))',
-    icon: 'var(--ds-danger)',
+    bg: 'var(--gr-danger-light)',
+    border: 'color-mix(in srgb, var(--gr-danger) 22%, var(--brd))',
+    icon: 'var(--gr-danger)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconError,
   },
   slate: {
-    bg: 'var(--ds-slate-light)',
-    border: 'color-mix(in srgb, var(--ds-slate) 22%, var(--brd))',
-    icon: 'var(--ds-slate)',
+    bg: 'var(--gr-slate-light)',
+    border: 'color-mix(in srgb, var(--gr-slate) 22%, var(--brd))',
+    icon: 'var(--gr-slate)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
   azure: {
-    bg: 'var(--ds-azure-light)',
-    border: 'color-mix(in srgb, var(--ds-azure) 22%, var(--brd))',
-    icon: 'var(--ds-azure)',
+    bg: 'var(--gr-azure-light)',
+    border: 'color-mix(in srgb, var(--gr-azure) 22%, var(--brd))',
+    icon: 'var(--gr-azure)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
@@ -148,31 +148,31 @@ const styles = computed<GrAlertResolvedStyles>(() => {
 })
 
 const rootStyle = computed(() => ({
-  '--ds-alert-bg': styles.value.bg,
-  '--ds-alert-brd': styles.value.border,
-  '--ds-alert-icon-color': styles.value.icon,
-  '--ds-alert-title-color': styles.value.title,
-  '--ds-alert-text-color': styles.value.text,
-  '--ds-alert-close-color': styles.value.close,
-  '--ds-alert-close-hover-color': styles.value.closeHover,
-  background: 'var(--ds-alert-bg)',
-  borderColor: 'var(--ds-alert-brd)',
+  '--gr-alert-bg': styles.value.bg,
+  '--gr-alert-brd': styles.value.border,
+  '--gr-alert-icon-color': styles.value.icon,
+  '--gr-alert-title-color': styles.value.title,
+  '--gr-alert-text-color': styles.value.text,
+  '--gr-alert-close-color': styles.value.close,
+  '--gr-alert-close-hover-color': styles.value.closeHover,
+  background: 'var(--gr-alert-bg)',
+  borderColor: 'var(--gr-alert-brd)',
 }))
 </script>
 
 <template>
   <div
     role="alert"
-    class="rounded-[var(--ds-radius-lg)] border px-4 py-3"
+    class="rounded-[var(--gr-radius-lg)] border px-4 py-3"
     :style="rootStyle"
   >
     <div class="flex items-start gap-3">
-      <component :is="styles.Icon" class="mt-0.5 h-5 w-5 text-[var(--ds-alert-icon-color)]" aria-hidden="true" />
+      <component :is="styles.Icon" class="mt-0.5 h-5 w-5 text-[var(--gr-alert-icon-color)]" aria-hidden="true" />
       <div class="min-w-0 flex-1">
-        <div v-if="props.title" class="text-[14px] font-700 text-[var(--ds-alert-title-color)]">
+        <div v-if="props.title" class="text-[14px] font-700 text-[var(--gr-alert-title-color)]">
           {{ props.title }}
         </div>
-        <div class="mt-0.5 text-[13px] text-[var(--ds-alert-text-color)]">
+        <div class="mt-0.5 text-[13px] text-[var(--gr-alert-text-color)]">
           <slot />
         </div>
       </div>
@@ -180,7 +180,7 @@ const rootStyle = computed(() => ({
       <button
         v-if="props.closable"
         type="button"
-        class="-mr-1 -mt-1 rounded-[var(--ds-radius-md)] p-1 text-[var(--ds-alert-close-color)] transition-colors hover:text-[var(--ds-alert-close-hover-color)]"
+        class="-mr-1 -mt-1 rounded-[var(--gr-radius-md)] p-1 text-[var(--gr-alert-close-color)] transition-colors hover:text-[var(--gr-alert-close-hover-color)]"
         :aria-label="t('gr.common.close', 'Close')"
         @click="emit('close')"
       >

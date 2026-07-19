@@ -56,7 +56,7 @@ describe('GrTree', () => {
       },
     })
 
-    const rows = wrapper.findAll('.ds-tree__row')
+    const rows = wrapper.findAll('.gr-tree__row')
     expect(rows).toHaveLength(3)
     expect(wrapper.text()).toContain('Parent#1')
     expect(wrapper.text()).toContain('Child A#2')
@@ -77,11 +77,11 @@ describe('GrTree', () => {
     expect(items).toHaveLength(3)
 
     const parentItem = items[0]
-    const parentRow = parentItem.get('.ds-tree__row')
-    const childrenWrap = parentItem.get('.ds-tree__children-wrap')
+    const parentRow = parentItem.get('.gr-tree__row')
+    const childrenWrap = parentItem.get('.gr-tree__children-wrap')
 
     expect(parentRow.attributes('style')).toBeUndefined()
-    expect(childrenWrap.findAll('.ds-tree__row')).toHaveLength(2)
+    expect(childrenWrap.findAll('.gr-tree__row')).toHaveLength(2)
   })
 
   it('не показывает полосу ветки по умолчанию', () => {
@@ -94,8 +94,8 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWrap = wrapper.get('.ds-tree__children-wrap')
-    expect(childrenWrap.classes()).not.toContain('ds-tree__children-wrap--with-branch')
+    const childrenWrap = wrapper.get('.gr-tree__children-wrap')
+    expect(childrenWrap.classes()).not.toContain('gr-tree__children-wrap--with-branch')
   })
 
   it('включает полосу ветки и активирует её для выбранной ноды и её прямых детей', async () => {
@@ -110,22 +110,22 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWrap = wrapper.get('.ds-tree__children-wrap')
-    expect(childrenWrap.classes()).toContain('ds-tree__children-wrap--with-branch')
-    expect(childrenWrap.attributes('style')).toContain('--ds-tree-branch-line-color: var(--ds-tree-branch-line-default-color, #e2e8f0)')
-    expect(childrenWrap.attributes('style')).not.toContain('--ds-tree-branch-line-left')
+    const childrenWrap = wrapper.get('.gr-tree__children-wrap')
+    expect(childrenWrap.classes()).toContain('gr-tree__children-wrap--with-branch')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, #e2e8f0)')
+    expect(childrenWrap.attributes('style')).not.toContain('--gr-tree-branch-line-left')
 
     ;(wrapper.vm as any).setCurrentKey(1)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--ds-tree-branch-line-color: rgb(239, 68, 68)')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: rgb(239, 68, 68)')
 
     ;(wrapper.vm as any).setCurrentKey(2)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--ds-tree-branch-line-color: rgb(239, 68, 68)')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: rgb(239, 68, 68)')
 
     ;(wrapper.vm as any).setCurrentKey(undefined)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--ds-tree-branch-line-color: var(--ds-tree-branch-line-default-color, #e2e8f0)')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, #e2e8f0)')
   })
 
   it('поддерживает вычисление своих цветов полосы для каждой папки и не активирует предков глубже прямого уровня', async () => {
@@ -141,16 +141,16 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWraps = wrapper.findAll('.ds-tree__children-wrap')
+    const childrenWraps = wrapper.findAll('.gr-tree__children-wrap')
     expect(childrenWraps).toHaveLength(2)
-    expect(childrenWraps[0].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(226, 232, 240)')
-    expect(childrenWraps[1].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(254, 205, 211)')
+    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
+    expect(childrenWraps[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(254, 205, 211)')
 
     ;(wrapper.vm as any).setCurrentKey(4)
     await nextTick()
 
-    expect(childrenWraps[0].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(226, 232, 240)')
-    expect(childrenWraps[1].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(244, 63, 94)')
+    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
+    expect(childrenWraps[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(244, 63, 94)')
   })
 
   it('переносит active-полосу с родителя на выбранную раскрытую папку', async () => {
@@ -166,14 +166,14 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWraps = wrapper.findAll('.ds-tree__children-wrap')
+    const childrenWraps = wrapper.findAll('.gr-tree__children-wrap')
     expect(childrenWraps).toHaveLength(2)
 
     ;(wrapper.vm as any).setCurrentKey(2)
     await nextTick()
 
-    expect(childrenWraps[0].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(226, 232, 240)')
-    expect(childrenWraps[1].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(14, 165, 233)')
+    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
+    expect(childrenWraps[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(14, 165, 233)')
   })
 
   it('оставляет active-полосу на родителе, если выбранная папка ещё не раскрыта', async () => {
@@ -189,13 +189,13 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWraps = wrapper.findAll('.ds-tree__children-wrap')
+    const childrenWraps = wrapper.findAll('.gr-tree__children-wrap')
     expect(childrenWraps).toHaveLength(1)
 
     ;(wrapper.vm as any).setCurrentKey(2)
     await nextTick()
 
-    expect(childrenWraps[0].attributes('style')).toContain('--ds-tree-branch-line-color: rgb(14, 165, 233)')
+    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(14, 165, 233)')
   })
 
   it('поддерживает фильтрацию через `expose.filter()` (показывает match + ancestor)', async () => {
@@ -209,13 +209,13 @@ describe('GrTree', () => {
     })
 
     // Only root is visible initially.
-    expect(wrapper.findAll('.ds-tree__row')).toHaveLength(1)
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(1)
 
     ;(wrapper.vm as any).filter('Child B')
     await nextTick()
 
     // Parent + matched child.
-    const rowsAfter = wrapper.findAll('.ds-tree__row')
+    const rowsAfter = wrapper.findAll('.gr-tree__row')
     expect(rowsAfter).toHaveLength(2)
     expect(wrapper.text()).toContain('Parent')
     expect(wrapper.text()).toContain('Child B')
@@ -252,7 +252,7 @@ describe('GrTree', () => {
     await nextTick()
     expect(data[0].children?.map(item => item.id)).toEqual([5, 3, 6, 4])
     expect(vm.getNode(2)).toBeUndefined()
-    const labels = wrapper.findAll('.ds-tree__label').map(node => node.text())
+    const labels = wrapper.findAll('.gr-tree__label').map(node => node.text())
     expect(labels).toEqual(['Parent', 'Child Before B', 'Child B', 'Child After B', 'Child C'])
   })
 
@@ -318,7 +318,7 @@ describe('GrTree', () => {
       },
     })
 
-    await wrapper.get('.ds-tree__row').trigger('click')
+    await wrapper.get('.gr-tree__row').trigger('click')
     const e = wrapper.emitted('nodeClick')
     expect(e).toBeTruthy()
     expect(e![0][0]).toMatchObject({ id: 1, label: 'Parent' })
@@ -337,32 +337,32 @@ describe('GrTree', () => {
       },
     })
 
-    const rows = wrapper.findAll('.ds-tree__row')
+    const rows = wrapper.findAll('.gr-tree__row')
     const parentRow = rows[0]
     const childRow = rows[1]
     const parentChildren = Array.from(parentRow.element.children)
 
-    expect(parentChildren[0]?.classList.contains('ds-tree__drag-handle')).toBe(true)
-    expect(parentChildren[1]?.classList.contains('ds-tree__toggle')).toBe(true)
+    expect(parentChildren[0]?.classList.contains('gr-tree__drag-handle')).toBe(true)
+    expect(parentChildren[1]?.classList.contains('gr-tree__toggle')).toBe(true)
 
-    const parentHandle = parentRow.get('.ds-tree__drag-handle')
-    expect(parentHandle.classes()).not.toContain('ds-tree__drag-handle--visible')
+    const parentHandle = parentRow.get('.gr-tree__drag-handle')
+    expect(parentHandle.classes()).not.toContain('gr-tree__drag-handle--visible')
 
     await parentRow.trigger('mouseenter')
-    expect(parentHandle.classes()).toContain('ds-tree__drag-handle--visible')
+    expect(parentHandle.classes()).toContain('gr-tree__drag-handle--visible')
 
     await parentRow.trigger('mouseleave')
-    expect(parentHandle.classes()).not.toContain('ds-tree__drag-handle--visible')
+    expect(parentHandle.classes()).not.toContain('gr-tree__drag-handle--visible')
 
     ;(wrapper.vm as any).setCurrentKey(1)
     await nextTick()
 
     await parentRow.trigger('mouseenter')
-    expect(parentHandle.classes()).toContain('ds-tree__drag-handle--visible')
+    expect(parentHandle.classes()).toContain('gr-tree__drag-handle--visible')
 
-    const childHandle = childRow.get('.ds-tree__drag-handle')
+    const childHandle = childRow.get('.gr-tree__drag-handle')
     await childRow.trigger('mouseenter')
-    expect(childHandle.classes()).toContain('ds-tree__drag-handle--visible')
+    expect(childHandle.classes()).toContain('gr-tree__drag-handle--visible')
   })
 
   it('эмитит `nodeDrop` при DnD (prev/inner/next)', async () => {
@@ -376,11 +376,11 @@ describe('GrTree', () => {
       },
     })
 
-    const rows = wrapper.findAll('.ds-tree__row')
+    const rows = wrapper.findAll('.gr-tree__row')
     const dragRow = rows[1]
     const dropRow = rows[2]
 
-    const dragHandle = dragRow.get('.ds-tree__drag-handle')
+    const dragHandle = dragRow.get('.gr-tree__drag-handle')
 
     const stubTransfer = {
       effectAllowed: 'move',
@@ -423,11 +423,11 @@ describe('GrTree', () => {
       },
     })
 
-    const rows = wrapper.findAll('.ds-tree__row')
+    const rows = wrapper.findAll('.gr-tree__row')
     const dragRow = rows[2]
     const dropRow = rows[1]
 
-    const dragHandle = dragRow.get('.ds-tree__drag-handle')
+    const dragHandle = dragRow.get('.gr-tree__drag-handle')
 
     const stubTransfer = {
       effectAllowed: 'move',
@@ -453,7 +453,7 @@ describe('GrTree', () => {
     await nextTick()
 
     expect(data[0].children?.map(item => item.id)).toEqual([3, 2])
-    expect(wrapper.findAll('.ds-tree__row').map(row => row.text())).toEqual([
+    expect(wrapper.findAll('.gr-tree__row').map(row => row.text())).toEqual([
       'Parent',
       'Child B',
       'Child A',
@@ -472,11 +472,11 @@ describe('GrTree', () => {
       },
     })
 
-    const rows = wrapper.findAll('.ds-tree__row')
+    const rows = wrapper.findAll('.gr-tree__row')
     const dragRow = rows[1]
     const dropRow = rows[2]
 
-    const dragHandle = dragRow.get('.ds-tree__drag-handle')
+    const dragHandle = dragRow.get('.gr-tree__drag-handle')
 
     const stubTransfer = {
       effectAllowed: 'move',

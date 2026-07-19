@@ -244,13 +244,13 @@ watch(
 <template>
   <div
     v-dropzone="dropzone"
-    data-ds-form-file
-    class="rounded-[var(--ds-radius-md)]"
+    data-gr-form-file
+    class="rounded-[var(--gr-radius-md)]"
     :class="disabled ? 'opacity-60 cursor-not-allowed' : ''"
   >
     <input
       ref="inputRef"
-      data-ds-form-file-input
+      data-gr-form-file-input
       type="file"
       tabindex="-1"
       aria-hidden="true"
@@ -266,7 +266,7 @@ watch(
         <GrButton
           variant="secondary"
           size="sm"
-          data-ds-form-file-upload-btn
+          data-gr-form-file-upload-btn
           :disabled="disabled"
           @click.prevent="openDialog"
         >
@@ -280,7 +280,7 @@ watch(
           v-if="hasFiles && !multiple"
           variant="secondary"
           size="sm"
-          data-ds-form-file-clear-btn
+          data-gr-form-file-clear-btn
           :disabled="disabled"
           @click.prevent="clearAll"
         >
@@ -294,7 +294,7 @@ watch(
           v-if="multiple && hasFiles"
           variant="secondary"
           size="sm"
-          data-ds-form-file-clear-all-btn
+          data-gr-form-file-clear-all-btn
           :disabled="disabled"
           @click.prevent="clearAll"
         >
@@ -307,7 +307,7 @@ watch(
         <span
           v-if="!multiple && hasFiles"
           class="text-sm text-[var(--muted-fg)] truncate max-w-[240px]"
-          data-ds-form-file-single-name
+          data-gr-form-file-single-name
           :title="files[0]?.name"
         >
           {{ files[0]?.name }}
@@ -316,7 +316,7 @@ watch(
         <span
           v-if="!hasFiles"
           class="text-sm text-[var(--muted-fg)]"
-          data-ds-form-file-placeholder
+          data-gr-form-file-placeholder
         >
           {{ resolvedPlaceholder }}
         </span>
@@ -327,12 +327,12 @@ watch(
           v-for="(file, index) in files"
           :key="`${file.name}-${file.size}-${index}`"
           class="flex items-center gap-2"
-          data-ds-form-file-item
+          data-gr-form-file-item
         >
           <span
             class="text-sm text-[var(--muted-fg)] truncate max-w-[240px]"
             :title="file.name"
-            data-ds-form-file-item-name
+            data-gr-form-file-item-name
           >
             {{ file.name }}
           </span>
@@ -340,7 +340,7 @@ watch(
           <button
             type="button"
             class="text-xs text-[var(--muted-fg)] hover:text-[var(--fg)]"
-            data-ds-form-file-item-remove
+            data-gr-form-file-item-remove
             :disabled="disabled"
             @click.prevent="removeAt(index)"
           >
@@ -350,8 +350,8 @@ watch(
       </div>
 
       <slot name="errors" :errors="localErrors">
-        <div v-if="localErrors.length" class="text-sm text-[var(--ds-danger)]" data-ds-form-file-errors>
-          <div v-for="(e, i) in localErrors" :key="i" data-ds-form-file-error>
+        <div v-if="localErrors.length" class="text-sm text-[var(--gr-danger)]" data-gr-form-file-errors>
+          <div v-for="(e, i) in localErrors" :key="i" data-gr-form-file-error>
             {{ issueMessage(e) }}
           </div>
         </div>
@@ -361,7 +361,7 @@ watch(
 </template>
 
 <style scoped>
-[data-ds-form-file].ds-dropzone--over {
+[data-gr-form-file].gr-dropzone--over {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }

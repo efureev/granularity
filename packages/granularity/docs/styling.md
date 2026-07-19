@@ -126,7 +126,7 @@
 
 Примеры:
 
-- `--ds-space-4`, `--ds-radius-md`, `--ds-duration-fast` → `tokens`;
+- `--gr-space-4`, `--gr-radius-md`, `--gr-duration-fast` → `tokens`;
 - `--bg`, `--primary`, `--brd`, `--ring` → `theme`;
 - производные значения вроде `--primary-hover`, если они рассчитываются от semantic-переменных, логично держать рядом с токенами, а не дублировать по темам.
 

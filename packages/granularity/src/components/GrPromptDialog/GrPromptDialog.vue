@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * GrPromptDialog — DS-примитив диалога ввода значения поверх `GrDialog`.
+ * GrPromptDialog — GR-примитив диалога ввода значения поверх `GrDialog`.
  *
  * Синхронизирован с `GrDialog` по набору проп-проксирования:
  * `size`, `closeOnBackdrop`, `closeOnEsc`, `showHeader`, `showCloseButton`,
@@ -187,12 +187,12 @@ function onConfirm(): void {
         </div>
       </slot>
 
-      <GrFormField :label="resolvedLabel" :error="fieldErrorMessage" for-id="ds-prompt-input">
+      <GrFormField :label="resolvedLabel" :error="fieldErrorMessage" for-id="gr-prompt-input">
         <GrInput
-          id="ds-prompt-input"
+          id="gr-prompt-input"
           ref="inputRef"
           v-model="valueModel"
-          data-testid="ds-prompt-input"
+          data-testid="gr-prompt-input"
           :placeholder="placeholder"
           :invalid="!!fieldErrorMessage"
           @blur="touched = true"
@@ -207,11 +207,11 @@ function onConfirm(): void {
     <template #footer>
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
-          <GrButton data-testid="ds-prompt-cancel" variant="outline" :size="buttonSize" @click="onCancel">
+          <GrButton data-testid="gr-prompt-cancel" variant="outline" :size="buttonSize" @click="onCancel">
             {{ resolvedCancelText }}
           </GrButton>
           <GrButton
-            data-testid="ds-prompt-confirm"
+            data-testid="gr-prompt-confirm"
             :variant="confirmVariant"
             :tone="confirmTone"
             :size="buttonSize"

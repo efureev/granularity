@@ -2,7 +2,7 @@
 
 Если пакет `granularity` менять не нужно, цвет `GrButton` можно переопределить в конечном приложении через CSS custom properties.
 
-Текущая реализация `GrButton` уже читает значения из component token'ов вида `--ds-button-<tone>-...`, а они, в свою очередь, могут ссылаться на semantic token'ы `--ds-<tone>-...`.
+Текущая реализация `GrButton` уже читает значения из component token'ов вида `--gr-button-<tone>-...`, а они, в свою очередь, могут ссылаться на semantic token'ы `--gr-<tone>-...`.
 
 Это означает, что в приложении есть два безопасных уровня override:
 
@@ -19,12 +19,12 @@
 
 ```css
 :root {
-  --ds-azure: #0891b2;
-  --ds-azure-light: #cffafe;
-  --ds-azure-fg: #ffffff;
-  --ds-azure-text: #155e75;
-  --ds-azure-hover: #0e7490;
-  --ds-azure-active: #155e75;
+  --gr-azure: #0891b2;
+  --gr-azure-light: #cffafe;
+  --gr-azure-fg: #ffffff;
+  --gr-azure-text: #155e75;
+  --gr-azure-hover: #0e7490;
+  --gr-azure-active: #155e75;
 }
 ```
 
@@ -36,13 +36,13 @@
 
 ```css
 :root {
-  --ds-button-azure-bg: #0369a1;
-  --ds-button-azure-bg-hover: #075985;
-  --ds-button-azure-bg-active: #0c4a6e;
-  --ds-button-azure-fg: #ffffff;
-  --ds-button-azure-soft-bg: #e0f2fe;
-  --ds-button-azure-soft-bg-hover: color-mix(in srgb, #0ea5e9 20%, var(--bg));
-  --ds-button-azure-soft-bg-active: color-mix(in srgb, #0ea5e9 26%, var(--bg));
+  --gr-button-azure-bg: #0369a1;
+  --gr-button-azure-bg-hover: #075985;
+  --gr-button-azure-bg-active: #0c4a6e;
+  --gr-button-azure-fg: #ffffff;
+  --gr-button-azure-soft-bg: #e0f2fe;
+  --gr-button-azure-soft-bg-hover: color-mix(in srgb, #0ea5e9 20%, var(--bg));
+  --gr-button-azure-soft-bg-active: color-mix(in srgb, #0ea5e9 26%, var(--bg));
 }
 ```
 
@@ -55,17 +55,17 @@
 ```css
 /* app.css */
 :root {
-  --ds-button-info-bg: #0f766e;
-  --ds-button-info-bg-hover: #115e59;
-  --ds-button-info-bg-active: #134e4a;
-  --ds-button-info-fg: #ffffff;
+  --gr-button-info-bg: #0f766e;
+  --gr-button-info-bg-hover: #115e59;
+  --gr-button-info-bg-active: #134e4a;
+  --gr-button-info-fg: #ffffff;
 }
 
 .dark {
-  --ds-button-info-bg: #0f766e;
-  --ds-button-info-bg-hover: #115e59;
-  --ds-button-info-bg-active: #134e4a;
-  --ds-button-info-fg: #f8fafc;
+  --gr-button-info-bg: #0f766e;
+  --gr-button-info-bg-hover: #115e59;
+  --gr-button-info-bg-active: #134e4a;
+  --gr-button-info-fg: #f8fafc;
 }
 ```
 
@@ -84,13 +84,13 @@
 
 <style scoped>
 .custom-info-scope {
-  --ds-button-info-bg: #475569;
-  --ds-button-info-bg-hover: #334155;
-  --ds-button-info-bg-active: #1e293b;
-  --ds-button-info-fg: #ffffff;
-  --ds-button-info-soft-bg: #e2e8f0;
-  --ds-button-info-soft-bg-hover: color-mix(in srgb, #475569 20%, var(--bg));
-  --ds-button-info-soft-bg-active: color-mix(in srgb, #475569 26%, var(--bg));
+  --gr-button-info-bg: #475569;
+  --gr-button-info-bg-hover: #334155;
+  --gr-button-info-bg-active: #1e293b;
+  --gr-button-info-fg: #ffffff;
+  --gr-button-info-soft-bg: #e2e8f0;
+  --gr-button-info-soft-bg-hover: color-mix(in srgb, #475569 20%, var(--bg));
+  --gr-button-info-soft-bg-active: color-mix(in srgb, #475569 26%, var(--bg));
 }
 </style>
 ```
@@ -99,13 +99,13 @@
 
 Для каждого `tone` компонент читает такие token'ы:
 
-- `--ds-button-<tone>-background`
-- `--ds-button-<tone>-background-hover`
-- `--ds-button-<tone>-background-active`
-- `--ds-button-<tone>-foreground`
-- `--ds-button-<tone>-soft-background`
-- `--ds-button-<tone>-soft-background-hover`
-- `--ds-button-<tone>-soft-background-active`
+- `--gr-button-<tone>-background`
+- `--gr-button-<tone>-background-hover`
+- `--gr-button-<tone>-background-active`
+- `--gr-button-<tone>-foreground`
+- `--gr-button-<tone>-soft-background`
+- `--gr-button-<tone>-soft-background-hover`
+- `--gr-button-<tone>-soft-background-active`
 
 На сегодня в пакете уже есть такие tone:
 
@@ -121,13 +121,13 @@
 
 ### Когда override делать через semantic token, а когда через button token
 
-Переопределяй `--ds-<tone>` если:
+Переопределяй `--gr-<tone>` если:
 
 - цвет — часть общей продуктовой темы;
 - этот tone должен одинаково выглядеть в нескольких компонентах;
 - тебе не нужна special-case настройка именно под button contrast.
 
-Переопределяй `--ds-button-<tone>-...` если:
+Переопределяй `--gr-button-<tone>-...` если:
 
 - меняется только `GrButton`;
 - semantic color хороший, но для filled button недостаточно контрастен;

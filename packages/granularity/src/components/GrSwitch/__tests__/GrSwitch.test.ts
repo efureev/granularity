@@ -20,13 +20,13 @@ describe('GrSwitch', () => {
     expect(button.attributes('aria-checked')).toBe('true')
     expect(button.attributes('aria-label')).toBe('Notifications')
 
-    const track = wrapper.get('[data-testid="ds-switch-track"]')
+    const track = wrapper.get('[data-testid="gr-switch-track"]')
     expect(track.attributes('class')).toContain('h-6')
     expect(track.attributes('class')).toContain('w-11')
-    expect(track.attributes('style')).toContain('--ds-switch-track-bg: #10b981')
-    expect(track.attributes('style')).toContain('--ds-switch-track-brd: #10b981')
+    expect(track.attributes('style')).toContain('--gr-switch-track-bg: #10b981')
+    expect(track.attributes('style')).toContain('--gr-switch-track-brd: #10b981')
 
-    const thumb = wrapper.get('[data-testid="ds-switch-thumb"]')
+    const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
     expect(thumb.attributes('class')).toContain('translate-x-5')
     expect(wrapper.text()).toContain('Enabled')
   })
@@ -58,11 +58,11 @@ describe('GrSwitch', () => {
 
     await wrapper.get('[role="switch"]').trigger('click')
 
-    const track = wrapper.get('[data-testid="ds-switch-track"]')
+    const track = wrapper.get('[data-testid="gr-switch-track"]')
     expect(track.attributes('class')).toContain('h-7')
     expect(track.attributes('class')).toContain('w-14')
 
-    const thumb = wrapper.get('[data-testid="ds-switch-thumb"]')
+    const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
     expect(thumb.attributes('class')).toContain('h-6')
     expect(thumb.attributes('class')).toContain('w-6')
     expect(thumb.attributes('class')).toContain('translate-x-[28px]')

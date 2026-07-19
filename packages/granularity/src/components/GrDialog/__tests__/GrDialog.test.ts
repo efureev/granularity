@@ -77,10 +77,10 @@ describe('GrDialog', () => {
       </GrDialog>
     `)
 
-    const header = wrapper.find('[data-ds-dialog-header]')
+    const header = wrapper.find('[data-gr-dialog-header]')
     expect(header.exists()).toBe(true)
     expect(header.text()).toContain('Settings')
-    expect(wrapper.find('[data-ds-dialog-close]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-dialog-close]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="body"]').exists()).toBe(true)
   })
 
@@ -91,7 +91,7 @@ describe('GrDialog', () => {
       </GrDialog>
     `)
 
-    expect(wrapper.find('[data-ds-dialog-header]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-dialog-header]').exists()).toBe(false)
     const huTitle = wrapper.find('[data-testid="hu-title"]')
     expect(huTitle.exists()).toBe(true)
     expect(huTitle.text()).toBe('Hidden header title')
@@ -103,7 +103,7 @@ describe('GrDialog', () => {
     const withoutFooter = mountHarness(`
       <GrDialog v-model="open" title="T">Body</GrDialog>
     `)
-    expect(withoutFooter.find('[data-ds-dialog-footer]').exists()).toBe(false)
+    expect(withoutFooter.find('[data-gr-dialog-footer]').exists()).toBe(false)
 
     const withFooter = mountHarness(`
       <GrDialog v-model="open" title="T">
@@ -111,7 +111,7 @@ describe('GrDialog', () => {
         Body
       </GrDialog>
     `)
-    expect(withFooter.find('[data-ds-dialog-footer]').exists()).toBe(true)
+    expect(withFooter.find('[data-gr-dialog-footer]').exists()).toBe(true)
     expect(withFooter.find('[data-testid="ok"]').exists()).toBe(true)
   })
 
@@ -119,7 +119,7 @@ describe('GrDialog', () => {
     const wrapper = mountHarness(`
       <GrDialog v-model="open" title="T">Body</GrDialog>
     `)
-    await wrapper.find('[data-ds-dialog-close]').trigger('click')
+    await wrapper.find('[data-gr-dialog-close]').trigger('click')
     await nextTick()
     expect((wrapper.vm as any).open).toBe(false)
   })
@@ -128,7 +128,7 @@ describe('GrDialog', () => {
     const wrapper = mountHarness(`
       <GrDialog v-model="open" title="T" close-label="Закрыть">Body</GrDialog>
     `)
-    const btn = wrapper.find('[data-ds-dialog-close]')
+    const btn = wrapper.find('[data-gr-dialog-close]')
     expect(btn.attributes('aria-label')).toBe('Закрыть')
   })
 

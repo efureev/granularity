@@ -70,10 +70,10 @@ describe('GrConfirmDialog', () => {
 
     expect(wrapper.text()).toContain('Confirm')
     expect(wrapper.text()).toContain('Delete the current item?')
-    expect(wrapper.find('[data-testid="ds-confirm-cancel"]').text()).toBe('Cancel')
-    expect(wrapper.find('[data-testid="ds-confirm-confirm"]').text()).toBe('Confirm')
+    expect(wrapper.find('[data-testid="gr-confirm-cancel"]').text()).toBe('Cancel')
+    expect(wrapper.find('[data-testid="gr-confirm-confirm"]').text()).toBe('Confirm')
 
-    await wrapper.find('[data-testid="ds-confirm-cancel"]').trigger('click')
+    await wrapper.find('[data-testid="gr-confirm-cancel"]').trigger('click')
     await nextTick()
 
     expect((wrapper.vm as any).onCancel).toHaveBeenCalledTimes(1)
@@ -81,7 +81,7 @@ describe('GrConfirmDialog', () => {
 
     ;(wrapper.vm as any).open = true
     await nextTick()
-    await wrapper.find('[data-testid="ds-confirm-confirm"]').trigger('click')
+    await wrapper.find('[data-testid="gr-confirm-confirm"]').trigger('click')
     await nextTick()
 
     expect((wrapper.vm as any).onConfirm).toHaveBeenCalledTimes(1)
@@ -119,18 +119,18 @@ describe('GrConfirmDialog', () => {
       },
     )
 
-    expect(wrapper.find('[data-ds-dialog-header]').classes()).toContain('px-4')
-    expect(wrapper.find('[data-ds-dialog-header]').classes()).toContain('py-2')
-    expect(wrapper.find('[data-ds-dialog-header]').classes()).not.toContain('border-b')
+    expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('px-4')
+    expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('py-2')
+    expect(wrapper.find('[data-gr-dialog-header]').classes()).not.toContain('border-b')
 
-    expect(wrapper.find('[data-ds-dialog-footer]').classes()).toContain('px-3')
-    expect(wrapper.find('[data-ds-dialog-footer]').classes()).toContain('py-1')
-    expect(wrapper.find('[data-ds-dialog-footer]').classes()).not.toContain('border-t')
+    expect(wrapper.find('[data-gr-dialog-footer]').classes()).toContain('px-3')
+    expect(wrapper.find('[data-gr-dialog-footer]').classes()).toContain('py-1')
+    expect(wrapper.find('[data-gr-dialog-footer]').classes()).not.toContain('border-t')
 
-    expect(wrapper.find('[data-testid="ds-confirm-cancel"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="ds-confirm-cancel"]').classes()).toContain('px-2.5')
-    expect(wrapper.find('[data-testid="ds-confirm-confirm"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="ds-confirm-confirm"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-confirm-cancel"]').classes()).toContain('h-7')
+    expect(wrapper.find('[data-testid="gr-confirm-cancel"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-confirm-confirm"]').classes()).toContain('h-7')
+    expect(wrapper.find('[data-testid="gr-confirm-confirm"]').classes()).toContain('px-2.5')
 
     wrapper.unmount()
   })

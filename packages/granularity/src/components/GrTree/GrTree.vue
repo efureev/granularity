@@ -22,7 +22,7 @@ defineOptions({
   name: 'GrTree',
 })
 
-const DEFAULT_BRANCH_LINE_COLOR = 'var(--ds-tree-branch-line-default-color, #e2e8f0)'
+const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, #e2e8f0)'
 
 const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   props: () => ({
@@ -276,7 +276,7 @@ function resolveChildrenWrapStyle(row: GrTreeVisibleTreeRow<T>) {
     }
 
   return {
-    '--ds-tree-branch-line-color': resolveBranchLineColor(row.node),
+    '--gr-tree-branch-line-color': resolveBranchLineColor(row.node),
   }
 }
 
@@ -296,27 +296,27 @@ defineExpose<GrTreeInstance<T>>({
 
 <template>
   <div
-      :data-ds-tree="props.internalNested ? undefined : ''"
-      :class="props.internalNested ? 'ds-tree__children' : 'ds-tree'"
+      :data-gr-tree="props.internalNested ? undefined : ''"
+      :class="props.internalNested ? 'gr-tree__children' : 'gr-tree'"
       :role="props.internalNested ? 'group' : 'tree'"
   >
     <div
         v-for="row in visibleRows"
         :key="row.node.key"
-        data-ds-tree-node
+        data-gr-tree-node
         role="treeitem"
         :aria-level="row.node.level"
         :aria-expanded="row.isLeaf ? undefined : row.isExpanded"
     >
       <div
-          data-ds-tree-row
-          class="ds-tree__row py-2 px-2"
+          data-gr-tree-row
+          class="gr-tree__row py-2 px-2"
           :class="[
-          treeProps.highlightCurrent && currentKey === row.node.key ? 'ds-tree__row--current' : '',
-          row.isMatched ? 'ds-tree__row--matched' : '',
-          dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'inner' ? 'ds-tree__row--drop-inner' : '',
-          dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'prev' ? 'ds-tree__row--drop-prev' : '',
-          dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'next' ? 'ds-tree__row--drop-next' : '',
+          treeProps.highlightCurrent && currentKey === row.node.key ? 'gr-tree__row--current' : '',
+          row.isMatched ? 'gr-tree__row--matched' : '',
+          dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'inner' ? 'gr-tree__row--drop-inner' : '',
+          dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'prev' ? 'gr-tree__row--drop-prev' : '',
+          dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'next' ? 'gr-tree__row--drop-next' : '',
           resolveNodeClass(treeProps.rowClass, row),
         ]"
           tabindex="0"
@@ -329,11 +329,11 @@ defineExpose<GrTreeInstance<T>>({
         <button
             v-if="treeProps.draggable"
             type="button"
-            data-ds-tree-drag-handle
-            class="ds-tree__drag-handle"
+            data-gr-tree-drag-handle
+            class="gr-tree__drag-handle"
             :class="[
-            shouldShowDragHandle(row.node) ? 'ds-tree__drag-handle--visible' : '',
-            canDrag(row.node) ? '' : 'ds-tree__drag-handle--disabled',
+            shouldShowDragHandle(row.node) ? 'gr-tree__drag-handle--visible' : '',
+            canDrag(row.node) ? '' : 'gr-tree__drag-handle--disabled',
             resolveNodeClass(treeProps.dragHandleClass, row),
           ]"
             :aria-label="dragLabel"
@@ -343,47 +343,47 @@ defineExpose<GrTreeInstance<T>>({
             @dragstart="onDragStart($event, row.node)"
             @dragend="onDragEnd"
         >
-          <span class="ds-tree__drag-icon" :class="treeProps.dragHandleIcon" />
+          <span class="gr-tree__drag-icon" :class="treeProps.dragHandleIcon" />
         </button>
 
         <button
             v-if="!row.isLeaf"
-            data-ds-tree-toggle
+            data-gr-tree-toggle
             type="button"
-            class="ds-tree__toggle"
+            class="gr-tree__toggle"
             :class="resolveNodeClass(treeProps.toggleClass, row)"
             :aria-label="row.isExpanded ? collapseLabel : expandLabel"
             @click.stop="toggleExpand(row.node)"
         >
           <span
-              class="ds-tree__toggle-icon"
+              class="gr-tree__toggle-icon"
               :class="[
               row.isExpanded ? treeProps.collapseIcon : treeProps.expandIcon,
-              row.isExpanded && treeProps.toggleIconRotate ? 'ds-tree__toggle-icon--expanded' : '',
+              row.isExpanded && treeProps.toggleIconRotate ? 'gr-tree__toggle-icon--expanded' : '',
               resolveNodeClass(treeProps.toggleIconClass, row),
             ]"
           />
         </button>
         <span
             v-else
-            class="ds-tree__toggle-spacer"
+            class="gr-tree__toggle-spacer"
             :class="resolveNodeClass(treeProps.toggleSpacerClass, row)"
         />
 
-        <div class="ds-tree__content" :class="resolveNodeClass(treeProps.contentClass, row)">
+        <div class="gr-tree__content" :class="resolveNodeClass(treeProps.contentClass, row)">
           <slot
               :node="row.node"
               :data="row.node.data"
           >
-            <span class="ds-tree__label">{{ row.node.label }}</span>
+            <span class="gr-tree__label">{{ row.node.label }}</span>
           </slot>
         </div>
       </div>
 
       <div
           v-if="row.children.length"
-          class="ds-tree__children-wrap ml-6"
-          :class="treeProps.branchLine ? 'ds-tree__children-wrap--with-branch' : ''"
+          class="gr-tree__children-wrap ml-6"
+          :class="treeProps.branchLine ? 'gr-tree__children-wrap--with-branch' : ''"
           :style="resolveChildrenWrapStyle(row)"
       >
         <GrTree
@@ -396,7 +396,7 @@ defineExpose<GrTreeInstance<T>>({
         >
           <template #default="slotProps">
             <slot v-bind="slotProps">
-              <span class="ds-tree__label">{{ slotProps.node.label }}</span>
+              <span class="gr-tree__label">{{ slotProps.node.label }}</span>
             </slot>
           </template>
         </GrTree>
@@ -406,181 +406,181 @@ defineExpose<GrTreeInstance<T>>({
 </template>
 
 <style scoped>
-.ds-tree {
-    --ds-tree-gap: 2px;
-    --ds-tree-children-pl: 10px;
-    --ds-tree-row-min-height: 28px;
-    --ds-tree-row-radius: 8px;
-    --ds-tree-row-pr: 8px;
-    --ds-tree-row-color: var(--fg);
-    --ds-tree-row-hover-bg: color-mix(in srgb, var(--primary, #000) 10%, transparent);
-    --ds-tree-row-current-bg: color-mix(in srgb, var(--primary, #000) 5%, transparent);
-    --ds-tree-row-current-hover-bg: color-mix(in srgb, var(--primary, #000) 16%, transparent);
-    --ds-tree-drag-handle-size: 24px;
-    --ds-tree-drag-handle-mr: 0;
-    --ds-tree-drag-handle-radius: 6px;
-    --ds-tree-drag-handle-color: inherit;
-    --ds-tree-drag-handle-opacity: 0.55;
-    --ds-tree-drag-handle-hover-bg: color-mix(in srgb, var(--muted, #000) 22%, transparent);
-    --ds-tree-drag-handle-hover-color: var(--ds-tree-drag-handle-color);
-    --ds-tree-drag-handle-hover-opacity: 0.9;
-    --ds-tree-drag-handle-disabled-opacity: 0.25;
-    --ds-tree-toggle-size: 24px;
-    --ds-tree-toggle-mr: 0;
-    --ds-tree-toggle-radius: 6px;
-    --ds-tree-toggle-color: inherit;
-    --ds-tree-toggle-hover-bg: color-mix(in srgb, var(--muted, #000) 25%, transparent);
-    --ds-tree-toggle-hover-color: var(--ds-tree-toggle-color);
-    --ds-tree-icon-size: 16px;
-    --ds-tree-content-gap: 8px;
-    --ds-tree-branch-line-default-color: var(--ds-tree-row-current-bg);
-    --ds-tree-branch-line-width: 2px;
+.gr-tree {
+    --gr-tree-gap: 2px;
+    --gr-tree-children-pl: 10px;
+    --gr-tree-row-min-height: 28px;
+    --gr-tree-row-radius: 8px;
+    --gr-tree-row-pr: 8px;
+    --gr-tree-row-color: var(--fg);
+    --gr-tree-row-hover-bg: color-mix(in srgb, var(--primary, #000) 10%, transparent);
+    --gr-tree-row-current-bg: color-mix(in srgb, var(--primary, #000) 5%, transparent);
+    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--primary, #000) 16%, transparent);
+    --gr-tree-drag-handle-size: 24px;
+    --gr-tree-drag-handle-mr: 0;
+    --gr-tree-drag-handle-radius: 6px;
+    --gr-tree-drag-handle-color: inherit;
+    --gr-tree-drag-handle-opacity: 0.55;
+    --gr-tree-drag-handle-hover-bg: color-mix(in srgb, var(--muted, #000) 22%, transparent);
+    --gr-tree-drag-handle-hover-color: var(--gr-tree-drag-handle-color);
+    --gr-tree-drag-handle-hover-opacity: 0.9;
+    --gr-tree-drag-handle-disabled-opacity: 0.25;
+    --gr-tree-toggle-size: 24px;
+    --gr-tree-toggle-mr: 0;
+    --gr-tree-toggle-radius: 6px;
+    --gr-tree-toggle-color: inherit;
+    --gr-tree-toggle-hover-bg: color-mix(in srgb, var(--muted, #000) 25%, transparent);
+    --gr-tree-toggle-hover-color: var(--gr-tree-toggle-color);
+    --gr-tree-icon-size: 16px;
+    --gr-tree-content-gap: 8px;
+    --gr-tree-branch-line-default-color: var(--gr-tree-row-current-bg);
+    --gr-tree-branch-line-width: 2px;
     display: flex;
     flex-direction: column;
-    gap: var(--ds-tree-gap);
+    gap: var(--gr-tree-gap);
 }
 
-.ds-tree__children {
+.gr-tree__children {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-tree-gap);
+    gap: var(--gr-tree-gap);
 }
 
-.ds-tree__children-wrap {
-    --ds-tree-branch-line-color: var(--ds-tree-branch-line-default-color);
+.gr-tree__children-wrap {
+    --gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color);
     display: flex;
     flex-direction: column;
-    gap: var(--ds-tree-gap);
-    padding-left: var(--ds-tree-children-pl, 10px);
-    border-left: var(--ds-tree-branch-line-width) solid transparent;
+    gap: var(--gr-tree-gap);
+    padding-left: var(--gr-tree-children-pl, 10px);
+    border-left: var(--gr-tree-branch-line-width) solid transparent;
 }
 
-.ds-tree__children-wrap--with-branch {
-    border-left-color: var(--ds-tree-branch-line-color, var(--ds-tree-branch-line-default-color));
+.gr-tree__children-wrap--with-branch {
+    border-left-color: var(--gr-tree-branch-line-color, var(--gr-tree-branch-line-default-color));
 }
 
-.ds-tree__row {
+.gr-tree__row {
     position: relative;
     display: flex;
     align-items: center;
-    min-height: var(--ds-tree-row-min-height);
-    border-radius: var(--ds-tree-row-radius);
-    padding-right: var(--ds-tree-row-pr);
+    min-height: var(--gr-tree-row-min-height);
+    border-radius: var(--gr-tree-row-radius);
+    padding-right: var(--gr-tree-row-pr);
     cursor: default;
     user-select: none;
     outline: none;
-    color: var(--ds-tree-row-color);
+    color: var(--gr-tree-row-color);
 }
 
-.ds-tree__row:hover {
-    background: var(--ds-tree-row-hover-bg);
+.gr-tree__row:hover {
+    background: var(--gr-tree-row-hover-bg);
 }
 
-.ds-tree__row--current {
-    background: var(--ds-tree-row-current-bg);
+.gr-tree__row--current {
+    background: var(--gr-tree-row-current-bg);
 }
 
-.ds-tree__row--current:hover {
-    background: var(--ds-tree-row-current-hover-bg);
+.gr-tree__row--current:hover {
+    background: var(--gr-tree-row-current-hover-bg);
 }
 
-.ds-tree__row--matched .ds-tree__label {
+.gr-tree__row--matched .gr-tree__label {
     font-weight: 600;
 }
 
-.ds-tree__drag-handle {
-    width: var(--ds-tree-drag-handle-size);
-    height: var(--ds-tree-drag-handle-size);
+.gr-tree__drag-handle {
+    width: var(--gr-tree-drag-handle-size);
+    height: var(--gr-tree-drag-handle-size);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: var(--ds-tree-drag-handle-mr);
-    border-radius: var(--ds-tree-drag-handle-radius);
-    color: var(--ds-tree-drag-handle-color);
+    margin-right: var(--gr-tree-drag-handle-mr);
+    border-radius: var(--gr-tree-drag-handle-radius);
+    color: var(--gr-tree-drag-handle-color);
     cursor: grab;
     visibility: hidden;
     pointer-events: none;
     opacity: 0;
 }
 
-.ds-tree__drag-handle--visible {
+.gr-tree__drag-handle--visible {
     visibility: visible;
     pointer-events: auto;
-    opacity: var(--ds-tree-drag-handle-opacity);
+    opacity: var(--gr-tree-drag-handle-opacity);
 }
 
-.ds-tree__drag-handle:hover {
-    background: var(--ds-tree-drag-handle-hover-bg);
-    color: var(--ds-tree-drag-handle-hover-color);
-    opacity: var(--ds-tree-drag-handle-hover-opacity);
+.gr-tree__drag-handle:hover {
+    background: var(--gr-tree-drag-handle-hover-bg);
+    color: var(--gr-tree-drag-handle-hover-color);
+    opacity: var(--gr-tree-drag-handle-hover-opacity);
 }
 
-.ds-tree__drag-handle:active {
+.gr-tree__drag-handle:active {
     cursor: grabbing;
 }
 
-.ds-tree__drag-handle--disabled {
+.gr-tree__drag-handle--disabled {
     cursor: default;
-    opacity: var(--ds-tree-drag-handle-disabled-opacity);
+    opacity: var(--gr-tree-drag-handle-disabled-opacity);
 }
 
-.ds-tree__drag-icon {
-    width: var(--ds-tree-icon-size);
-    height: var(--ds-tree-icon-size);
+.gr-tree__drag-icon {
+    width: var(--gr-tree-icon-size);
+    height: var(--gr-tree-icon-size);
 }
 
-.ds-tree__toggle {
-    width: var(--ds-tree-toggle-size);
-    height: var(--ds-tree-toggle-size);
+.gr-tree__toggle {
+    width: var(--gr-tree-toggle-size);
+    height: var(--gr-tree-toggle-size);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: var(--ds-tree-toggle-mr);
-    border-radius: var(--ds-tree-toggle-radius);
-    color: var(--ds-tree-toggle-color);
+    margin-right: var(--gr-tree-toggle-mr);
+    border-radius: var(--gr-tree-toggle-radius);
+    color: var(--gr-tree-toggle-color);
 }
 
-.ds-tree__toggle:hover {
-    background: var(--ds-tree-toggle-hover-bg);
-    color: var(--ds-tree-toggle-hover-color);
+.gr-tree__toggle:hover {
+    background: var(--gr-tree-toggle-hover-bg);
+    color: var(--gr-tree-toggle-hover-color);
 }
 
-.ds-tree__toggle-icon {
-    width: var(--ds-tree-icon-size);
-    height: var(--ds-tree-icon-size);
+.gr-tree__toggle-icon {
+    width: var(--gr-tree-icon-size);
+    height: var(--gr-tree-icon-size);
     transition: transform 120ms ease;
 }
 
-.ds-tree__toggle-icon--expanded {
+.gr-tree__toggle-icon--expanded {
     transform: rotate(90deg);
 }
 
-.ds-tree__toggle-spacer {
-    width: var(--ds-tree-toggle-size);
-    height: var(--ds-tree-toggle-size);
-    margin-right: var(--ds-tree-toggle-mr);
+.gr-tree__toggle-spacer {
+    width: var(--gr-tree-toggle-size);
+    height: var(--gr-tree-toggle-size);
+    margin-right: var(--gr-tree-toggle-mr);
     display: inline-block;
 }
 
-.ds-tree__content {
+.gr-tree__content {
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: var(--ds-tree-content-gap);
+    gap: var(--gr-tree-content-gap);
 }
 
-.ds-tree__label {
+.gr-tree__label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.ds-tree__row--drop-inner {
+.gr-tree__row--drop-inner {
     outline: 2px solid color-mix(in srgb, var(--primary, #000) 40%, transparent);
 }
 
-.ds-tree__row--drop-prev::before,
-.ds-tree__row--drop-next::after {
+.gr-tree__row--drop-prev::before,
+.gr-tree__row--drop-next::after {
     content: '';
     position: absolute;
     left: 8px;
@@ -589,11 +589,11 @@ defineExpose<GrTreeInstance<T>>({
     background: color-mix(in srgb, var(--primary, #000) 55%, transparent);
 }
 
-.ds-tree__row--drop-prev::before {
+.gr-tree__row--drop-prev::before {
     top: 2px;
 }
 
-.ds-tree__row--drop-next::after {
+.gr-tree__row--drop-next::after {
     bottom: 2px;
 }
 </style>

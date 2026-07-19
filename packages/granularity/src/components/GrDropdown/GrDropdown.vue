@@ -90,11 +90,11 @@ function onContentClick(): void {
 </script>
 
 <template>
-  <div data-ds-dropdown>
+  <div data-gr-dropdown>
     <div
       ref="rootEl"
       v-click-outside="{ handler: close, enabled: open, exclude: clickOutsideExclude }"
-      data-ds-dropdown-trigger
+      data-gr-dropdown-trigger
       class="inline-block max-w-full"
       @click="toggle"
     >
@@ -113,12 +113,12 @@ function onContentClick(): void {
         <div
           v-show="open"
           ref="panelEl"
-          data-ds-dropdown-panel
+          data-gr-dropdown-panel
           :class="panelClasses"
           :style="floatingStyle"
           @click="onContentClick"
         >
-          <div data-ds-dropdown-content :class="contentClasses">
+          <div data-gr-dropdown-content :class="contentClasses">
             <slot name="content" :close="close" />
           </div>
         </div>
