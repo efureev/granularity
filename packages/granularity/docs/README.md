@@ -15,6 +15,7 @@
 - Если приложение уже использует `UnoCSS`: откройте [`unocss.md`](./unocss.md) и [`installation.md`](./installation.md).
 - Если нужен единый bootstrap-вход в Vue-приложение: откройте [`vue-plugin.md`](./vue-plugin.md).
 - Если хочется авто-импорта компонентов и директив: откройте [`unplugin.md`](./unplugin.md).
+- Если нужно собрать свой пакет-спутник поверх дизайн-системы: откройте [`companion-packages.md`](./companion-packages.md).
 - Если важно понять, как пакет ведёт себя в i18n-сценариях: откройте [`localization.md`](./localization.md).
 - Если нужны package-level утилиты кроме компонентов: откройте [`directives.md`](./directives.md) и [
   `file-validation.md`](./file-validation.md).
@@ -30,6 +31,8 @@
   `installGranularity`, `defineInstallable`.
 - [`unplugin.md`](./unplugin.md) — авто-импорт компонентов и директив через
   [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md).
+- [`companion-packages.md`](./companion-packages.md) — как собрать пакет-спутник (companion) с нуля:
+  упаковка, granular-provider и авто-импорт через `createGranularResolver`.
 - [`localization.md`](./localization.md) — как `granularity` работает с локализацией приложения и fallback-текстами.
 - [`directives.md`](./directives.md) — все опубликованные директивы и их назначение.
 - [`file-validation.md`](./file-validation.md) — `fileValidation` API и повторное использование логики валидации файлов.

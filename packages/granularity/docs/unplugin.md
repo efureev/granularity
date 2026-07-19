@@ -66,22 +66,45 @@ import '@feugene/granularity/components/GrInput/styles.css'
 
 ```ts
 GranularityResolver({
-  prefix: 'Ds',             // префикс компонентов, по умолчанию 'Ds'
+  prefix: 'Gr',             // префикс компонентов, по умолчанию 'Gr'
   importStyle: true,        // подключать component-level CSS, по умолчанию true
   directives: true,         // резолвить директивы из whitelist, по умолчанию true
-  exclude: [/^GrIcon$/],    // компоненты, которые резолвер игнорирует
+  exclude: /^GrIcon$/,      // компоненты/директивы, которые резолвер игнорирует
 })
 ```
 
 | Опция | Тип | По умолчанию | Описание |
 |-------|-----|--------------|----------|
-| `prefix` | `string` | `'Ds'` | Префикс, по которому резолвер узнаёт компоненты пакета. |
-| `importStyle` | `boolean` | `true` | Включать ли рядом с компонентом side-effect импорт `styles.css`. |
-| `directives` | `boolean \| string[]` | `true` | Whitelist директив. `false` — выключить, массив — ограничить явно. |
-| `exclude` | `(string \| RegExp)[]` | `[]` | Исключения: компоненты/директивы, которые резолвер пропустит. |
+| `prefix` | `string` | `'Gr'` | Префикс, по которому резолвер узнаёт компоненты пакета. |
+| `importStyle` | `boolean \| 'css'` | `true` | Включать ли рядом с компонентом side-effect импорт `styles.css`. |
+| `directives` | `boolean` | `true` | Резолвить ли директивы из встроенного whitelist. `false` — выключить. |
+| `exclude` | `RegExp` | — | Исключения: компоненты/директивы, которые резолвер пропустит. |
 
 Поддерживаемые из коробки директивы: `v-autofocus`, `v-autosize`, `v-click-outside`, `v-dropzone`, `v-hotkey`,
 `v-loading`.
+
+## Companion-пакеты и общая фабрика `createGranularResolver`
+
+Тот же авто-импорт можно включить для **пакетов-спутников** экосистемы (например
+[`@feugene/granularity-datepicker`](../../granularity-datepicker/README.md)). Их компоненты тоже
+начинаются на `Gr*`, поэтому жадный core-резолвер по префиксу перехватил бы их и попытался
+импортировать из несуществующего пути в `@feugene/granularity`. Решение — **whitelist-резолвер**,
+построенный на общей фабрике `createGranularResolver`, и правильный порядок регистрации:
+
+```ts
+import { GranularityResolver } from '@feugene/unplugin-granularity'
+import { GranularityDatepickerResolver } from '@feugene/granularity-datepicker/resolver'
+
+Components({
+  resolvers: [
+    GranularityDatepickerResolver(), // whitelist — раньше…
+    GranularityResolver(),           // …жадного Gr*-резолвера ядра
+  ],
+})
+```
+
+Как собрать собственный companion-пакет и его резолвер — см.
+[`companion-packages.md`](./companion-packages.md).
 
 ## Нюансы
 
