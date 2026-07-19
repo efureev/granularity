@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {computed, ref, useId} from 'vue'
-import {DsFormField} from '@feugene/granularity/components/DsFormField'
-import {DsInput} from '@feugene/granularity/components/DsInput'
-import {DsButton} from '@feugene/granularity/components/DsButton'
+import {GrFormField} from '@feugene/granularity/components/GrFormField'
+import {GrInput} from '@feugene/granularity/components/GrInput'
+import {GrButton} from '@feugene/granularity/components/GrButton'
 
 /**
  * `XgQuickForm` — single-line composite form built from granularity primitives:
- * `DsFormField` (label + error slot), `DsInput` (text field) and `DsButton`
+ * `GrFormField` (label + error slot), `GrInput` (text field) and `GrButton`
  * (submit). Keeps state locally via `v-model` and emits `submit` with the
  * trimmed value.
  *
@@ -63,22 +63,22 @@ function onSubmit() {
 
 <template>
   <form class="xg-quick-form" @submit.prevent="onSubmit">
-    <DsFormField :label="label" :for-id="inputId" :error="error">
-      <DsInput
+    <GrFormField :label="label" :for-id="inputId" :error="error">
+      <GrInput
           :id="inputId"
           v-model="value"
           :placeholder="placeholder"
           :disabled="disabled || loading"
           :invalid="Boolean(error)"
       />
-    </DsFormField>
-    <DsButton
+    </GrFormField>
+    <GrButton
         type="submit"
         :disabled="disabled"
         :loading="loading"
     >
       <slot name="submit">{{ submitLabel }}</slot>
-    </DsButton>
+    </GrButton>
   </form>
 </template>
 

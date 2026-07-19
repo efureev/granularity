@@ -1,6 +1,6 @@
 {
   "name": "@feugene/extra-granularity",
-  "description": "Composite Vue 3 components built on top of @feugene/granularity primitives (DsFormField, DsInput, DsButton, …).",
+  "description": "Composite Vue 3 components built on top of @feugene/granularity primitives (GrFormField, GrInput, GrButton, …). Serves as an integration test package validating @feugene/granularity and @feugene/unocss-preset-granular together.",
   "version": "0.2.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
