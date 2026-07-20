@@ -57,6 +57,17 @@ export interface GrNumberInputProps {
   max?: number
   precision?: number
 
+  /**
+   * BCP-47 локаль для отображения значения (группировка разрядов и разделители
+   * через `Intl.NumberFormat`). Работает вместе с `useGrouping`.
+   */
+  locale?: string
+  /**
+   * Группировать разряды при отображении (когда поле не в фокусе). При фокусе
+   * показывается «сырое» значение для редактирования. По умолчанию выключено.
+   */
+  useGrouping?: boolean
+
   /** Показывать кнопки +/-. */
   controls?: boolean
   controlsDirection?: GrNumberInputControlsDirection
@@ -97,6 +108,8 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   min: undefined,
   max: undefined,
   precision: undefined,
+  locale: undefined,
+  useGrouping: false,
 
   controls: false,
   controlsDirection: 'vertical',
@@ -383,6 +396,40 @@ function onKeydown(e: KeyboardEvent): void {
 
 // `aria-valuenow` — числовое значение для скринридеров; отсутствует, если поле пусто.
 const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
+
+// Локале-зависимое отображение: при фокусе показываем «сырое» значение для
+// редактирования, иначе — сгруппированное через `Intl.NumberFormat`.
+const isFocused = ref(false)
+
+function formatGrouped(value: string): string {
+  const num = toNumber(value)
+  if (num === null) return value
+  const sep = props.decimalSeparator || '.'
+  // formatToParts позволяет оставить локале-зависимый групповой разделитель,
+  // но принудительно подставить наш десятичный разделитель (`decimalSeparator`),
+  // корректно работая для любой локали (в т.ч. de-DE, где группа — '.').
+  return new Intl.NumberFormat(props.locale, {
+    useGrouping: true,
+    minimumFractionDigits: props.precision ?? 0,
+    maximumFractionDigits: props.precision ?? 20,
+  })
+    .formatToParts(num)
+    .map(part => (part.type === 'decimal' ? sep : part.value))
+    .join('')
+}
+
+const displayValue = computed(() => {
+  if (!props.useGrouping || isFocused.value) return props.modelValue
+  return formatGrouped(props.modelValue)
+})
+
+function onFocus(): void {
+  isFocused.value = true
+}
+
+function onBlur(): void {
+  isFocused.value = false
+}
 </script>
 
 <template>
@@ -413,7 +460,7 @@ const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
       :autocomplete="autocomplete"
       :placeholder="placeholder"
       :disabled="disabled"
-      :value="modelValue"
+      :value="displayValue"
       role="spinbutton"
       :aria-valuenow="ariaValueNow"
       :aria-valuemin="min"
@@ -425,6 +472,8 @@ const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
       @input="onInput"
       @change="onChange"
       @keydown="onKeydown"
+      @focus="onFocus"
+      @blur="onBlur"
     >
 
     <div

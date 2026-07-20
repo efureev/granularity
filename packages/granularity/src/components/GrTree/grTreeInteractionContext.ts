@@ -28,6 +28,8 @@ export type GrTreeInteractionEmitters<T> = {
 
 export type GrTreeInteractionContext<T> = {
   hoveredKey: Ref<GrTreeKey | undefined>
+  /** Клавиша узла, держащего roving-фокус (единственный tabindex=0 во всём дереве). */
+  focusedKey: Ref<GrTreeKey | undefined>
   draggingNode: ShallowRef<GrTreeNode<T> | null>
   dropTarget: ShallowRef<GrTreeDropTarget | null>
   canDrag: (node: GrTreeNode<T>) => boolean
@@ -44,6 +46,7 @@ export function createGrTreeInteractionContext<T>(
   emitters: GrTreeInteractionEmitters<T>,
 ): GrTreeInteractionContext<T> {
   const hoveredKey = ref<GrTreeKey | undefined>(undefined)
+  const focusedKey = ref<GrTreeKey | undefined>(undefined)
   const draggingNode = shallowRef<GrTreeNode<T> | null>(null)
   const dropTarget = shallowRef<GrTreeDropTarget | null>(null)
 
@@ -71,6 +74,7 @@ export function createGrTreeInteractionContext<T>(
 
   return {
     hoveredKey,
+    focusedKey,
     draggingNode,
     dropTarget,
     canDrag,

@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import type {
   GrTreeAllowDropType,
   GrTreeInstance,
@@ -22,7 +22,7 @@ defineOptions({
   name: 'GrTree',
 })
 
-const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, #e2e8f0)'
+const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, var(--brd))'
 
 const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   props: () => ({
@@ -88,7 +88,11 @@ const expandLabel = computed(() => treeProps.expandLabel ?? t('gr.tree.expand', 
 const collapseLabel = computed(() => treeProps.collapseLabel ?? t('gr.tree.collapse', 'Collapse'))
 const currentKey = treeStore.currentKey
 const hoveredKey = interactionContext.hoveredKey
+const focusedKey = interactionContext.focusedKey
 const dropTarget = interactionContext.dropTarget
+
+// Корневой элемент дерева — область для делегированной клавиатуры (WAI-ARIA tree).
+const treeRootEl = ref<HTMLElement | null>(null)
 
 const visibleRows = computed<GrTreeVisibleTreeRow<T>[]>(() => {
   if (props.internalRows)
@@ -125,7 +129,127 @@ const visibleRows = computed<GrTreeVisibleTreeRow<T>[]>(() => {
 
 function onRowClick(node: GrTreeNode<T>) {
   treeStore.setCurrentKey(node.key)
+  focusedKey.value = node.key
   interactionContext.emitNodeClick(node.data, node)
+}
+
+// ————— Клавиатурная навигация по WAI-ARIA tree pattern (только корневой инстанс).
+
+type FlatRow = { node: GrTreeNode<T>, isLeaf: boolean, isExpanded: boolean }
+
+// Плоский список видимых узлов в порядке отображения (для стрелочной навигации).
+const flatVisibleRows = computed<FlatRow[]>(() => {
+  const out: FlatRow[] = []
+  const walk = (rows: GrTreeVisibleTreeRow<T>[]) => {
+    for (const row of rows) {
+      out.push({ node: row.node, isLeaf: row.isLeaf, isExpanded: row.isExpanded })
+      if (row.children.length)
+        walk(row.children)
+    }
+  }
+  walk(visibleRows.value)
+  return out
+})
+
+// Один узел на всё дерево держит tabindex=0 (roving). `focusedKey` — общий для
+// всех вложенных инстансов, поэтому проверка одинаковая на любом уровне.
+function isRovingItem(key: GrTreeNode<T>['key']): boolean {
+  return focusedKey.value === key
+}
+
+function focusRow(key: GrTreeNode<T>['key']): void {
+  focusedKey.value = key
+  void nextTick(() => {
+    const root = treeRootEl.value
+    if (!root)
+      return
+    const target = String(key)
+    const el = Array.from(root.querySelectorAll<HTMLElement>('[data-gr-tree-node-key]'))
+      .find(node => node.getAttribute('data-gr-tree-node-key') === target)
+    el?.focus()
+  })
+}
+
+function onTreeKeydown(event: KeyboardEvent): void {
+  // Обрабатывает только корневой инстанс; событие всплывает от строки к корню.
+  if (props.internalNested)
+    return
+
+  const rows = flatVisibleRows.value
+  if (rows.length === 0)
+    return
+
+  const idx = Math.max(0, rows.findIndex(r => r.node.key === focusedKey.value))
+  const cur = rows[idx]
+
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault()
+      if (idx < rows.length - 1)
+        focusRow(rows[idx + 1].node.key)
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      if (idx > 0)
+        focusRow(rows[idx - 1].node.key)
+      break
+    case 'ArrowRight':
+      event.preventDefault()
+      if (!cur.isLeaf) {
+        if (!cur.isExpanded)
+          toggleExpand(cur.node)
+        else if (idx < rows.length - 1)
+          focusRow(rows[idx + 1].node.key)
+      }
+      break
+    case 'ArrowLeft':
+      event.preventDefault()
+      if (!cur.isLeaf && cur.isExpanded)
+        toggleExpand(cur.node)
+      else if (cur.node.parent && rows.some(r => r.node.key === cur.node.parent!.key))
+        focusRow(cur.node.parent.key)
+      break
+    case 'Home':
+      event.preventDefault()
+      focusRow(rows[0].node.key)
+      break
+    case 'End':
+      event.preventDefault()
+      focusRow(rows[rows.length - 1].node.key)
+      break
+    case 'Enter':
+    case ' ':
+      event.preventDefault()
+      onRowClick(cur.node)
+      break
+  }
+}
+
+// Нормализация roving-фокуса: держим `focusedKey` на видимом узле, чтобы ровно
+// один treeitem всегда имел tabindex=0 (даже после сворачивания родителя). Только корень.
+function normalizeFocusedKey(): void {
+  if (props.internalNested)
+    return
+
+  const rows = flatVisibleRows.value
+  if (rows.length === 0) {
+    focusedKey.value = undefined
+    return
+  }
+
+  const stillVisible = focusedKey.value !== undefined && rows.some(r => r.node.key === focusedKey.value)
+  if (stillVisible)
+    return
+
+  focusedKey.value = (currentKey.value != null && rows.some(r => r.node.key === currentKey.value))
+    ? currentKey.value
+    : rows[0].node.key
+}
+
+if (!props.internalNested) {
+  // Синхронно до первого рендера — чтобы roving tabindex был проставлен сразу.
+  normalizeFocusedKey()
+  watch(flatVisibleRows, normalizeFocusedKey, { flush: 'sync' })
 }
 
 function onRowMouseEnter(node: GrTreeNode<T>) {
@@ -296,17 +420,22 @@ defineExpose<GrTreeInstance<T>>({
 
 <template>
   <div
+      ref="treeRootEl"
       :data-gr-tree="props.internalNested ? undefined : ''"
       :class="props.internalNested ? 'gr-tree__children' : 'gr-tree'"
       :role="props.internalNested ? 'group' : 'tree'"
+      @keydown="onTreeKeydown"
   >
     <div
         v-for="row in visibleRows"
         :key="row.node.key"
         data-gr-tree-node
+        :data-gr-tree-node-key="row.node.key"
         role="treeitem"
         :aria-level="row.node.level"
         :aria-expanded="row.isLeaf ? undefined : row.isExpanded"
+        :aria-selected="currentKey === row.node.key ? 'true' : 'false'"
+        :tabindex="isRovingItem(row.node.key) ? 0 : -1"
     >
       <div
           data-gr-tree-row
@@ -319,7 +448,6 @@ defineExpose<GrTreeInstance<T>>({
           dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'next' ? 'gr-tree__row--drop-next' : '',
           resolveNodeClass(treeProps.rowClass, row),
         ]"
-          tabindex="0"
           @click="onRowClick(row.node)"
           @drop="onDrop($event, row.node)"
           @dragover="onDragOver($event, row.node, $event.currentTarget as HTMLElement)"
@@ -474,6 +602,15 @@ defineExpose<GrTreeInstance<T>>({
 
 .gr-tree__row:hover {
     background: var(--gr-tree-row-hover-bg);
+}
+
+[data-gr-tree-node] {
+    outline: none;
+}
+
+[data-gr-tree-node]:focus-visible > .gr-tree__row {
+    outline: 2px solid var(--primary, #000);
+    outline-offset: -2px;
 }
 
 .gr-tree__row--current {

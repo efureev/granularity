@@ -156,3 +156,34 @@ describe('GrDropdown', () => {
     expect(panel?.className).toContain('origin-top-right')
   })
 })
+describe('GrDropdown a11y (item 18)', () => {
+  it('exposes triggerProps (aria-haspopup/expanded) and opens via keyboard', async () => {
+    const { defineComponent } = await import('vue')
+    const Harness = defineComponent({
+      components: { GrDropdown },
+      template: `
+        <GrDropdown teleport-to="body">
+          <template #trigger="{ triggerProps }">
+            <button type="button" data-testid="trigger" v-bind="triggerProps">Open</button>
+          </template>
+          <template #content>
+            <button type="button" data-testid="item-1" role="menuitem">One</button>
+          </template>
+        </GrDropdown>
+      `,
+    })
+    const wrapper = mount(Harness, { attachTo: document.body })
+    const trigger = wrapper.get('[data-testid="trigger"]')
+
+    expect(trigger.attributes('aria-haspopup')).toBe('menu')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(document.body.querySelector('[data-gr-dropdown-panel]')?.getAttribute('role')).toBe('menu')
+
+    wrapper.unmount()
+  })
+})

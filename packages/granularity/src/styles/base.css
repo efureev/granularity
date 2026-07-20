@@ -1,17 +1,39 @@
 /*
  * GR-базовый слой.
  *
- * Глобальный сброс страницы (`body`, `box-sizing`) вынесен в опциональный
- * `preflight.css` — здесь он лишь подключается для обратной совместимости
- * (granular-provider отдаёт `base.css`, а `index.css` его импортирует, и оба
- * исторически ожидают полный сброс). Потребитель, которому глобальные
- * сайд-эффекты не нужны, может подключить `tokens.css` + тему и пропустить
- * `base.css`/`preflight.css`.
+ * Глобальный сброс страницы (`body`, `box-sizing`) продублирован из
+ * `preflight.css` НАПРЯМУЮ (а не через `@import`). Причина: granular-provider
+ * встраивает содержимое `base.css` как base64 `data:`-URL на этапе сборки пакета
+ * и отдаёт его в UnoCSS как preflight-строку. Вложенный `@import` в такой строке
+ * (а) не резолвится (относительный путь внутри data-URL) и (б) оказывается НЕ в
+ * начале финального CSS → PostCSS падает: «@import must precede all other
+ * statements». Поэтому reset инлайнится сюда. `preflight.css` остаётся отдельным
+ * публичным файлом (`./styles/preflight.css`) для standalone-потребителей —
+ * держите оба блока синхронными.
  *
- * Ниже — только низкоспецифичные (`:where()`) дефолты самой GR, которые
+ * Потребитель, которому глобальные сайд-эффекты не нужны, может подключить
+ * `tokens.css` + тему и пропустить `base.css`/`preflight.css`.
+ *
+ * Ниже, помимо reset, — низкоспецифичные (`:where()`) дефолты самой GR, которые
  * безопасно накладываются на приложение и легко переопределяются.
  */
-@import './preflight.css';
+
+/* --- reset (синхронизировано с preflight.css) --- */
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: var(--gr-font-ui);
+    background: var(--bg);
+    color: var(--fg);
+}
+
+* {
+    box-sizing: border-box;
+}
 
 /*
  * UnoCSS tailwind-compat reset intentionally does not force `background-color: transparent` for buttons

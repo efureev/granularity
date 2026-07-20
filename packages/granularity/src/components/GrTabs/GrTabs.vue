@@ -11,6 +11,12 @@ export type GrTab = {
 export type GrTabsProps = {
   modelValue: string
   tabs: GrTab[]
+  /**
+   * База id для ARIA-связки с `GrTabPanels`. Если задана, каждая вкладка
+   * получает `id="<idBase>-tab-<value>"` и `aria-controls="<idBase>-panel-<value>"`.
+   * Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.
+   */
+  idBase?: string
 }
 
 /**
@@ -135,6 +141,8 @@ function onClick(tab: GrTab): void {
       type="button"
       role="tab"
       data-gr-tab
+      :id="idBase ? `${idBase}-tab-${tab.value}` : undefined"
+      :aria-controls="idBase ? `${idBase}-panel-${tab.value}` : undefined"
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :disabled="tab.disabled"

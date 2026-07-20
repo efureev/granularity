@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
 import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { useGrFormFieldContext } from '../GrFormField/context'
 
 import {
   defaultBaseClass,
@@ -118,6 +119,14 @@ const rootClass = computed(() => props.view === 'link' ? 'relative inline-block 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: GrSelectModelValue): void
 }>()
+
+// Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required)
+// для связки с лейблом и сообщением об ошибке.
+const field = useGrFormFieldContext()
+const resolvedId = computed(() => field?.id.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const describedBy = computed(() => field?.describedById.value)
+const isRequired = computed(() => Boolean(field?.required.value))
 
 const optionsResolved = computed<GrSelectOptionOrGroup[]>(() => props.options ?? [])
 
@@ -235,22 +244,6 @@ watch(
   },
 )
 
-watch(
-  open,
-  async (isOpen) => {
-    if (!isOpen) {
-      customValue.value = ''
-      return
-    }
-
-    if (props.allowCustomValue) {
-      await nextTick()
-      customInputRef.value?.focus()
-    }
-  },
-  { immediate: true },
-)
-
 const panelClasses = computed(() => {
   return grSelectPanelClasses
 })
@@ -363,6 +356,133 @@ function addCustom(): void {
   toggleValue(v)
 }
 
+// ————— Клавиатурная навигация комбобокса (WAI-ARIA, aria-activedescendant).
+const listboxId = useId()
+const activeIndex = ref(-1)
+
+function optionDomId(value: string): string {
+  return `${listboxId}-opt-${value}`
+}
+
+// Навигируемые (видимые, не-disabled) опции панели в порядке рендера.
+const navigableValues = computed<string[]>(() =>
+  panelItems.value
+    .filter((item): item is Extract<GrSelectPanelItem, { kind: 'option' }> => item.kind === 'option' && !item.option.disabled)
+    .map(item => item.option.value),
+)
+
+const activeValue = computed(() => (activeIndex.value >= 0 ? navigableValues.value[activeIndex.value] : undefined))
+const activeDescendantId = computed(() =>
+  open.value && activeValue.value !== undefined ? optionDomId(activeValue.value) : undefined,
+)
+
+function clampActive(index: number): number {
+  const len = navigableValues.value.length
+  if (len === 0) return -1
+  return ((index % len) + len) % len
+}
+
+async function scrollActiveIntoView(): Promise<void> {
+  await nextTick()
+  const value = activeValue.value
+  if (value === undefined) return
+  const el = document.getElementById(optionDomId(value))
+  el?.scrollIntoView?.({ block: 'nearest' })
+}
+
+function setActive(index: number): void {
+  activeIndex.value = clampActive(index)
+  void scrollActiveIntoView()
+}
+
+function initActiveIndex(): void {
+  const selectedIdx = navigableValues.value.findIndex(v => isSelected(v))
+  activeIndex.value = selectedIdx >= 0 ? selectedIdx : (navigableValues.value.length ? 0 : -1)
+}
+
+function openDropdown(): void {
+  if (props.disabled || open.value) return
+  open.value = true
+}
+
+let typeaheadBuffer = ''
+let typeaheadTimer: ReturnType<typeof setTimeout> | null = null
+function typeahead(char: string): void {
+  typeaheadBuffer += char.toLowerCase()
+  if (typeaheadTimer) clearTimeout(typeaheadTimer)
+  typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, 600)
+
+  const idx = navigableValues.value.findIndex((v) => {
+    const opt = flatOptions.value.find(o => o.value === v)
+    return opt?.label.toLowerCase().startsWith(typeaheadBuffer)
+  })
+  if (idx >= 0) setActive(idx)
+}
+
+function onComboKeydown(event: KeyboardEvent): void {
+  if (props.disabled) return
+
+  if (!open.value) {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+      event.preventDefault()
+      openDropdown()
+    }
+    return
+  }
+
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault()
+      setActive(activeIndex.value + 1)
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      setActive(activeIndex.value - 1)
+      break
+    case 'Home':
+      event.preventDefault()
+      setActive(0)
+      break
+    case 'End':
+      event.preventDefault()
+      setActive(navigableValues.value.length - 1)
+      break
+    case 'Enter':
+      event.preventDefault()
+      if (props.allowCustomValue && canAddCustom.value)
+        addCustom()
+      else if (activeValue.value !== undefined)
+        toggleValue(activeValue.value)
+      break
+    case 'Tab':
+      closeDropdown()
+      break
+    default:
+      // typeahead — только без allowCustomValue (иначе мешает вводу в custom-инпут).
+      if (!props.allowCustomValue && event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey)
+        typeahead(event.key)
+  }
+}
+
+watch(
+  open,
+  async (isOpen) => {
+    if (!isOpen) {
+      customValue.value = ''
+      activeIndex.value = -1
+      return
+    }
+
+    initActiveIndex()
+
+    if (props.allowCustomValue) {
+      await nextTick()
+      customInputRef.value?.focus()
+    }
+  },
+  { immediate: true },
+)
+
 const showNativeChevron = computed(() => {
   return effectiveOptionsView.value === 'native' && props.view !== 'link' && !props.multiple
 })
@@ -453,10 +573,14 @@ function clearSelection(): void {
       отражает программное изменение модели. `onChange` читает выбор из DOM.
     -->
     <select
+      :id="resolvedId"
       data-gr-select-native
       :multiple="multiple"
       :disabled="disabled"
       :aria-label="ariaLabel"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-describedby="describedBy"
+      :aria-required="isRequired ? 'true' : undefined"
       :class="isLinkNative ? grSelectLinkNativeOverlayClass : [baseClassName, nativeClassName]"
       @change="onChange"
     >
@@ -516,16 +640,23 @@ function clearSelection(): void {
     :class="rootClass"
   >
     <button
+      :id="resolvedId"
       data-testid="gr-select-trigger"
       data-gr-select-trigger
       type="button"
       :disabled="disabled"
       :aria-label="ariaLabel"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-describedby="describedBy"
+      :aria-required="isRequired ? 'true' : undefined"
       role="combobox"
-      aria-readonly="true"
+      aria-haspopup="listbox"
+      :aria-controls="open ? listboxId : undefined"
+      :aria-activedescendant="activeDescendantId"
       :aria-expanded="open ? 'true' : 'false'"
       :class="[baseClassName, triggerClassName]"
       @click="toggleDropdown"
+      @keydown="onComboKeydown"
     >
       <span class="min-w-0 flex-1">
         <slot
@@ -598,11 +729,12 @@ function clearSelection(): void {
                 type="text"
                 :placeholder="resolvedCustomValuePlaceholder"
                 size="sm"
-                @keydown.enter.prevent="addCustom"
+                @keydown="onComboKeydown"
               />
             </div>
 
             <div
+              :id="listboxId"
               data-gr-select-listbox
               class="p-1 overflow-auto"
               :style="{ maxHeight: `${dropdownMaxHeight}px` }"
@@ -636,6 +768,7 @@ function clearSelection(): void {
 
                 <button
                   v-else
+                  :id="optionDomId(item.option.value)"
                   data-gr-select-option
                   type="button"
                   role="option"
@@ -645,8 +778,10 @@ function clearSelection(): void {
                   class="rounded-[10px] px-3 py-2 text-left text-[13px]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
                     item.option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]',
+                    activeValue === item.option.value && !item.option.disabled ? 'bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]' : '',
                   ]"
                   @click="toggleValue(item.option.value)"
+                  @mousemove="activeIndex = navigableValues.indexOf(item.option.value)"
                 >
                   <slot name="option" :option="item.option" :selected="isSelected(item.option.value)">
                     <span class="flex items-center gap-2 min-w-0">

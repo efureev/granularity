@@ -283,3 +283,36 @@ describe('GrNumberInput — ввод, клампинг, клавиатура и 
     expect(input.attributes('aria-valuemax')).toBe('100')
   })
 })
+
+describe('GrNumberInput — locale grouping (feature)', () => {
+  it('groups thousands via Intl when not focused, shows raw on focus', async () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '1234567', useGrouping: true, locale: 'en-US' } })
+    const input = wrapper.get('input')
+
+    // Не в фокусе — сгруппировано.
+    expect(input.element.value).toBe('1,234,567')
+
+    await input.trigger('focus')
+    await nextTick()
+    // В фокусе — сырое значение для редактирования.
+    expect(input.element.value).toBe('1234567')
+
+    await input.trigger('blur')
+    await nextTick()
+    expect(input.element.value).toBe('1,234,567')
+  })
+
+  it('does not group by default (useGrouping=false)', () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '1234567' } })
+    expect(wrapper.get('input').element.value).toBe('1234567')
+  })
+
+  it('уважает локале-разделители: de-DE (группа ".", десятичный ",")', () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '1234567,89', useGrouping: true, locale: 'de-DE', decimalSeparator: ',', precision: 2 },
+    })
+
+    // Группа '.', десятичный ',' — оба на своих местах (без затирания первого '.').
+    expect(wrapper.get('input').element.value).toBe('1.234.567,89')
+  })
+})

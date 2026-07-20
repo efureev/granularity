@@ -1,0 +1,6 @@
+export { default } from './GrTabPanels.vue'
+export { default as GrTabPanels } from './GrTabPanels.vue'
+export { default as GrTabPanel } from './GrTabPanel.vue'
+export type { GrTabPanelsContext } from './context'
+export { GR_TAB_PANELS_KEY } from './context'
+export { grTabPanelsConfig } from './config'

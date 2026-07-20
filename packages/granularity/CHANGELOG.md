@@ -9,11 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- New `GrKbd` — a `<kbd>` primitive for keys/shortcuts (`size="sm" | "md"`).
+- New `GrDivider` — content separator: horizontal line, optional centered/aligned label,
+  or `orientation="vertical"` for inline separation.
+- New `GrTabPanels` / `GrTabPanel` — accessible companion to `GrTabs`: pass a shared `idBase`
+  to both and the panels link to their tabs via ARIA (`role="tabpanel"`, `aria-labelledby`
+  ↔ tab `aria-controls`). `GrTabs` gained an optional `idBase` prop for this.
+- `GrFormField`: now auto-generates the control `id` (linked to the label) and provides a
+  field context so `GrInput` / `GrSelect` / `GrTextarea` inside it receive `aria-describedby`
+  (hint + error), `aria-invalid` and `aria-required` automatically — no manual `forId`. Added
+  `hint` (+ `#hint` slot) and `required` (marker), and the error now uses `role="alert"`.
 - `GrDataTable`: controlled sort via `v-model:sortKey` / `v-model:sortDir` and a
   `sort-change` event, plus an `externalSort` prop that disables internal sorting for
   server-side / URL-synced sorting.
 - `GrNumberInput`: WAI-ARIA spinbutton semantics (`role="spinbutton"`,
   `aria-valuenow`/`min`/`max`) and keyboard support (Arrow to step, Home/End to `min`/`max`).
+- `GrNumberInput`: locale-aware display formatting — `useGrouping` groups thousands via
+  `Intl.NumberFormat` (with an optional `locale`), showing the grouped value when blurred and
+  the raw value on focus for editing.
+- `GrInput`: `clearable` (clear button), `showCount` + `maxlength` character counter,
+  `passwordToggle` (show/hide password visibility) and a `readonly` state. Clear/show-password
+  labels are localized and overridable (`clearLabel` / `passwordShowLabel` / `passwordHideLabel`).
+
+### Changed
+
+- `GrImageViewer`: decomposed the 822-line SFC into composables (`useZoomPan`,
+  `useWheelGesture`, `useViewerKeyboard`) — behaviour unchanged, now testable in isolation.
 
 ### Fixed
 
@@ -27,6 +48,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `GrNumberInput`: `min`/`max` are now clamped on manual input (on `change`), a leading `-`
   can be typed for negative values, and the caret no longer jumps to the end when editing the
   middle of a number; large values are no longer formatted in scientific notation.
+- `GrSelect` (panel mode): implemented the WAI-ARIA combobox/listbox pattern — keyboard
+  navigation (Arrow/Home/End, Enter to select, typeahead), `aria-activedescendant` active-option
+  tracking, `aria-haspopup="listbox"` + `aria-controls`, and removed the invalid `aria-readonly`.
+- `GrDropdown`: now keyboard-accessible — exposes `triggerProps` (with `aria-haspopup="menu"`,
+  `aria-expanded`, `aria-controls` and `@keydown`) to bind on a real trigger button; the menu
+  supports Arrow/Home/End navigation and returns focus to the trigger on close.
+- `GrTree`: implemented the WAI-ARIA tree pattern — roving `tabindex`, Arrow navigation with
+  expand/collapse (Left/Right), Home/End, Enter/Space to select, and `aria-selected` on nodes;
+  the default branch-line color now derives from `var(--brd)` so it adapts to dark themes.
 
 ## [v0.11.0] 2026-07-19
 

@@ -593,3 +593,70 @@ describe('GrSelect', () => {
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
   })
 })
+
+describe('GrSelect — combobox a11y (item 14)', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  function mountPanel() {
+    return mount(GrSelect, {
+      attachTo: document.body,
+      props: {
+        modelValue: 'USD',
+        optionsView: 'panel',
+        ariaLabel: 'Currency',
+        options: [
+          { value: 'USD', label: 'USD' },
+          { value: 'EUR', label: 'EUR' },
+          { value: 'GBP', label: 'GBP' },
+        ],
+      },
+    })
+  }
+
+  it('триггер имеет комбобокс-семантику: haspopup=listbox, без aria-readonly', () => {
+    const wrapper = mountPanel()
+    const trigger = wrapper.get('[data-testid="gr-select-trigger"]')
+
+    expect(trigger.attributes('role')).toBe('combobox')
+    expect(trigger.attributes('aria-haspopup')).toBe('listbox')
+    expect(trigger.attributes('aria-readonly')).toBeUndefined()
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+  })
+
+  it('ArrowDown открывает панель и связывает aria-controls/activedescendant', async () => {
+    const wrapper = mountPanel()
+    const trigger = wrapper.get('[data-testid="gr-select-trigger"]')
+
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    await nextTick()
+
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+
+    const listboxId = trigger.attributes('aria-controls')
+    expect(listboxId).toBeTruthy()
+    expect(document.getElementById(listboxId!)?.getAttribute('role')).toBe('listbox')
+
+    // Активный потомок указывает на существующую опцию.
+    const activeId = trigger.attributes('aria-activedescendant')
+    expect(activeId).toBeTruthy()
+    expect(document.getElementById(activeId!)?.getAttribute('role')).toBe('option')
+  })
+
+  it('стрелки перемещают активную опцию, Enter выбирает её', async () => {
+    const wrapper = mountPanel()
+    const trigger = wrapper.get('[data-testid="gr-select-trigger"]')
+
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    // Начальный active — на выбранном USD; шагаем к EUR.
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    await trigger.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['EUR'])
+  })
+})

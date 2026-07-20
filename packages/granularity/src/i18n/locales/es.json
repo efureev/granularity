@@ -122,5 +122,10 @@
     "validationMessage": "Algunos archivos no cumplen los requisitos.",
     "serverTitle": "Error de carga en el servidor",
     "serverMessage": "El servidor no pudo procesar la carga. Inténtalo de nuevo."
+  },
+  "input": {
+    "clear": "Borrar",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   }
 }

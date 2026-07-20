@@ -162,3 +162,38 @@ describe('GrInput', () => {
     expect(inputEl.style.paddingLeft).toBe('132px')
   })
 })
+describe('GrInput — clearable / password / readonly / count (feature)', () => {
+  it('readonly: ставит readonly-атрибут', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'x', readonly: true } })
+    expect((wrapper.get('input').element as HTMLInputElement).readOnly).toBe(true)
+  })
+
+  it('clearable: показывает кнопку при значении и эмитит пустую строку', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'hello', clearable: true } })
+    const clearBtn = wrapper.find('[data-gr-input-clear]')
+    expect(clearBtn.exists()).toBe(true)
+
+    await clearBtn.trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
+  })
+
+  it('clearable: кнопки нет при пустом значении или readonly', () => {
+    expect(mount(GrInput, { props: { modelValue: '', clearable: true } }).find('[data-gr-input-clear]').exists()).toBe(false)
+    expect(mount(GrInput, { props: { modelValue: 'x', clearable: true, readonly: true } }).find('[data-gr-input-clear]').exists()).toBe(false)
+  })
+
+  it('passwordToggle: переключает type password ↔ text', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'secret', type: 'password', passwordToggle: true } })
+    const input = wrapper.get('input')
+    expect(input.attributes('type')).toBe('password')
+
+    await wrapper.get('[data-gr-input-password-toggle]').trigger('click')
+    expect(input.attributes('type')).toBe('text')
+  })
+
+  it('showCount + maxlength: показывает счётчик и ограничивает длину', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'abc', showCount: true, maxlength: 10 } })
+    expect(wrapper.get('[data-gr-input-count]').text()).toBe('3 / 10')
+    expect(wrapper.get('input').attributes('maxlength')).toBe('10')
+  })
+})

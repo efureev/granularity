@@ -108,6 +108,9 @@ export default defineConfig({
         'components/GrDialogService/index': fileURLToPath(
           new URL('./src/components/GrDialogService/index.ts', import.meta.url),
         ),
+        'components/GrDivider/index': fileURLToPath(
+          new URL('./src/components/GrDivider/index.ts', import.meta.url),
+        ),
         'components/GrDrawer/index': fileURLToPath(
           new URL('./src/components/GrDrawer/index.ts', import.meta.url),
         ),
@@ -143,6 +146,9 @@ export default defineConfig({
         ),
         'components/GrInputTag/index': fileURLToPath(
           new URL('./src/components/GrInputTag/index.ts', import.meta.url),
+        ),
+        'components/GrKbd/index': fileURLToPath(
+          new URL('./src/components/GrKbd/index.ts', import.meta.url),
         ),
         'components/GrLink/index': fileURLToPath(
           new URL('./src/components/GrLink/index.ts', import.meta.url),
@@ -197,6 +203,9 @@ export default defineConfig({
         ),
         'components/GrTable/index': fileURLToPath(
           new URL('./src/components/GrTable/index.ts', import.meta.url),
+        ),
+        'components/GrTabPanels/index': fileURLToPath(
+          new URL('./src/components/GrTabPanels/index.ts', import.meta.url),
         ),
         'components/GrTabs/index': fileURLToPath(
           new URL('./src/components/GrTabs/index.ts', import.meta.url),

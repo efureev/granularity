@@ -33,6 +33,7 @@
 - `GrConfirmDialog`
 - `GrDataTable`
 - `GrDialog`
+- `GrDivider`
 - `GrDrawer`
 - `GrDropdown`
 - `GrDropdownMenu`
@@ -45,6 +46,7 @@
 - `GrImageViewer`
 - `GrInput`
 - `GrInputTag`
+- `GrKbd`
 - `GrLink`
 - `GrList`
 - `GrLoading`
@@ -61,6 +63,7 @@
 - `GrSkeleton`
 - `GrSwitch`
 - `GrTable`
+- `GrTabPanels`
 - `GrTabs`
 - `GrTextarea`
 - `GrToaster`

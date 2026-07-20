@@ -122,5 +122,10 @@
     "validationMessage": "Some of the files do not meet the requirements.",
     "serverTitle": "Upload error on the server",
     "serverMessage": "The server could not process the upload. Please try again."
+  },
+  "input": {
+    "clear": "Clear",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   }
 }

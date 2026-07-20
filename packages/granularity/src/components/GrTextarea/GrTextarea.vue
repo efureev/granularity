@@ -8,6 +8,7 @@
  */
 import { computed } from 'vue'
 import { type GrTextareaState, grTextareaClass } from './grTextareaStyles'
+import { useGrFormFieldContext } from '../GrFormField/context'
 
 const props = withDefaults(defineProps<{
   modelValue: string
@@ -36,9 +37,16 @@ const emit = defineEmits<{
 
 export type GrTextareaProps = typeof props
 
+// Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
+const field = useGrFormFieldContext()
+const resolvedId = computed(() => props.id ?? field?.id.value)
+const isInvalid = computed(() => props.invalid || Boolean(field?.invalid.value))
+const describedBy = computed(() => field?.describedById.value)
+const isRequired = computed(() => Boolean(field?.required.value))
+
 const className = computed(() => grTextareaClass({
   state: props.state,
-  invalid: props.invalid,
+  invalid: isInvalid.value,
 }))
 
 function onInput(e: Event): void {
@@ -48,7 +56,7 @@ function onInput(e: Event): void {
 
 <template>
   <textarea
-    :id="id"
+    :id="resolvedId"
     data-gr-textarea
     :name="name"
     :rows="rows"
@@ -56,7 +64,9 @@ function onInput(e: Event): void {
     :placeholder="placeholder"
     :disabled="disabled"
     :value="modelValue"
-    :aria-invalid="invalid ? 'true' : undefined"
+    :aria-invalid="isInvalid ? 'true' : undefined"
+    :aria-describedby="describedBy"
+    :aria-required="isRequired ? 'true' : undefined"
     class="w-full rounded-md border bg-[var(--bg)] px-3 py-2 text-[14px] text-[var(--fg)] placeholder:text-[var(--muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
     :class="className"
     @input="onInput"

@@ -112,7 +112,7 @@ describe('GrTree', () => {
 
     const childrenWrap = wrapper.get('.gr-tree__children-wrap')
     expect(childrenWrap.classes()).toContain('gr-tree__children-wrap--with-branch')
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, #e2e8f0)')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--brd))')
     expect(childrenWrap.attributes('style')).not.toContain('--gr-tree-branch-line-left')
 
     ;(wrapper.vm as any).setCurrentKey(1)
@@ -125,7 +125,7 @@ describe('GrTree', () => {
 
     ;(wrapper.vm as any).setCurrentKey(undefined)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, #e2e8f0)')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--brd))')
   })
 
   it('поддерживает вычисление своих цветов полосы для каждой папки и не активирует предков глубже прямого уровня', async () => {
@@ -504,5 +504,92 @@ describe('GrTree', () => {
     expect(data[0].children?.map(item => item.id)).toEqual([2, 3])
     expect(data[0].children?.[0].children?.map(item => item.id)).toEqual([4])
     expect(wrapper.emitted('nodeDrop')).toBeFalsy()
+  })
+})
+
+describe('GrTree — WAI-ARIA tree pattern (item 23)', () => {
+  it('использует roving tabindex: ровно один treeitem с tabindex=0', () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+      },
+    })
+
+    const items = wrapper.findAll('[role="treeitem"]')
+    const focusable = items.filter(i => i.attributes('tabindex') === '0')
+    expect(focusable).toHaveLength(1)
+    // Остальные — недостижимы табом (roving).
+    expect(items.filter(i => i.attributes('tabindex') === '-1')).toHaveLength(items.length - 1)
+  })
+
+  it('проставляет aria-selected на выбранном узле', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+      },
+    })
+
+    ;(wrapper.vm as any).setCurrentKey(2)
+    await nextTick()
+
+    const selected = wrapper.findAll('[role="treeitem"]').filter(i => i.attributes('aria-selected') === 'true')
+    expect(selected).toHaveLength(1)
+    expect(selected[0].attributes('data-gr-tree-node-key')).toBe('2')
+  })
+
+  it('ArrowRight раскрывает свёрнутую папку, ArrowLeft — сворачивает', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [],
+      },
+    })
+
+    // Свёрнуто: видна только корневая нода.
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(1)
+
+    const tree$ = wrapper.get('[role="tree"]')
+    await tree$.trigger('keydown', { key: 'ArrowRight' })
+    await nextTick()
+    expect(wrapper.emitted('nodeExpand')).toBeTruthy()
+    expect(wrapper.findAll('.gr-tree__row').length).toBeGreaterThan(1)
+
+    await tree$.trigger('keydown', { key: 'ArrowLeft' })
+    await nextTick()
+    expect(wrapper.emitted('nodeCollapse')).toBeTruthy()
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('Enter выбирает узел, на котором roving-фокус', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+      },
+    })
+
+    const tree$ = wrapper.get('[role="tree"]')
+    // Из корня шагаем вниз к первому ребёнку и выбираем.
+    await tree$.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    await tree$.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    expect(wrapper.emitted('nodeClick')?.at(-1)?.[0]).toMatchObject({ id: 2 })
+    wrapper.unmount()
   })
 })

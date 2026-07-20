@@ -107,6 +107,10 @@
       "types": "./dist/types/src/components/GrDialogService/index.d.ts",
       "import": "./dist/components/GrDialogService/index.js"
     },
+    "./components/GrDivider": {
+      "types": "./dist/types/src/components/GrDivider/index.d.ts",
+      "import": "./dist/components/GrDivider/index.js"
+    },
     "./components/GrDrawer": {
       "types": "./dist/types/src/components/GrDrawer/index.d.ts",
       "import": "./dist/components/GrDrawer/index.js"
@@ -154,6 +158,10 @@
     "./components/GrInputTag": {
       "types": "./dist/types/src/components/GrInputTag/index.d.ts",
       "import": "./dist/components/GrInputTag/index.js"
+    },
+    "./components/GrKbd": {
+      "types": "./dist/types/src/components/GrKbd/index.d.ts",
+      "import": "./dist/components/GrKbd/index.js"
     },
     "./components/GrLink": {
       "types": "./dist/types/src/components/GrLink/index.d.ts",
@@ -230,6 +238,10 @@
     "./components/GrTabs": {
       "types": "./dist/types/src/components/GrTabs/index.d.ts",
       "import": "./dist/components/GrTabs/index.js"
+    },
+    "./components/GrTabPanels": {
+      "types": "./dist/types/src/components/GrTabPanels/index.d.ts",
+      "import": "./dist/components/GrTabPanels/index.js"
     },
     "./components/GrTextarea": {
       "types": "./dist/types/src/components/GrTextarea/index.d.ts",

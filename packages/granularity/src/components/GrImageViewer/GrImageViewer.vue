@@ -4,6 +4,9 @@ import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessu
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
+import { useZoomPan } from './composables/useZoomPan'
+import { useWheelGesture } from './composables/useWheelGesture'
+import { useViewerKeyboard } from './composables/useViewerKeyboard'
 
 /**
  * Usage:
@@ -15,6 +18,10 @@ import { useScrollLock } from '../../composables/internal/useScrollLock'
  *   show-progress
  *   hide-on-click-modal
  * />
+ *
+ * Логика вынесена в composables: `useZoomPan` (масштаб/поворот/пан + метрики),
+ * `useWheelGesture` (зум колесом/трекпадом с rAF-батчингом), `useViewerKeyboard`
+ * (клавиатура). Сам SFC отвечает за оверлей, индекс изображений и композицию.
  */
 const props = withDefaults(
   defineProps<{
@@ -125,224 +132,98 @@ type GrImageViewerSlotProps = {
 }
 
 const DEFAULT_Z_INDEX = 2000
-const TRAILING_ZERO_DECIMAL_RE = /\.0$/
-// Чувствительность масштабирования колесом/трекпадом: чем больше — тем резче реакция.
-const WHEEL_ZOOM_SENSITIVITY = 0.0015
-// Сколько ms простоя после последнего wheel-события считаем «зум завершён»
-// (после этого возвращаем плавный CSS-переход).
-const WHEEL_IDLE_MS = 120
 
 const open = computed(() => props.modelValue)
 
 // SSR-guard для teleport + общий reference-counted scroll-lock (как в GrModal/GrDrawer).
 const isClient = typeof window !== 'undefined'
 const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
+
 const total = computed(() => props.urlList.length)
 const hasImages = computed(() => total.value > 0)
 
 const currentIndex = ref(0)
-const scale = ref(1)
-const rotation = ref(0)
-const offsetX = ref(0)
-const offsetY = ref(0)
-
 const imageEl = ref<HTMLImageElement | null>(null)
 
-// Флаг активного зума колесом/трекпадом. Пока true — CSS-переход отключён,
-// чтобы непрерывное масштабирование не «наслаивалось» и не дёргалось.
-const isWheelZooming = ref(false)
-
-// Накопленный deltaY между кадрами и id запланированного rAF.
-let pendingWheelDelta = 0
-let wheelFrameId: number | null = null
-let wheelIdleTimer: ReturnType<typeof setTimeout> | null = null
-
-// Флаг активного перетаскивания (pan) картинки мышью.
-const isDragging = ref(false)
-
-// Координаты указателя и offset на момент начала перетаскивания.
-let dragStartX = 0
-let dragStartY = 0
-let dragOffsetStartX = 0
-let dragOffsetStartY = 0
-
-// Натуральный (исходный) размер картинки, читается из `<img>` при загрузке.
-const naturalWidth = ref(0)
-const naturalHeight = ref(0)
-
-// Layout-размер вписанного (`object-contain`) изображения без учёта CSS transform/scale.
-const fittedWidth = ref(0)
-const fittedHeight = ref(0)
-
-let resizeObserver: ResizeObserver | null = null
-
-const currentUrl = computed(() => {
-  if (!hasImages.value) {
-    return undefined
-  }
-
-  return props.urlList[currentIndex.value]
+// Масштаб / поворот / панорамирование + метрики изображения.
+const {
+  scale,
+  rotation,
+  isDragging,
+  naturalWidth,
+  naturalHeight,
+  renderedWidth,
+  renderedHeight,
+  realScale,
+  realScalePercent,
+  imageStyle,
+  zoomValueText,
+  setScale,
+  zoomIn,
+  zoomOut,
+  rotateLeft,
+  rotateRight,
+  resetTransform,
+  resetImageMetrics,
+  onImageLoad,
+  startObservingImage,
+  stopObservingImage,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+} = useZoomPan({
+  minScale: () => props.minScale,
+  maxScale: () => props.maxScale,
+  zoomRate: () => props.zoomRate,
+  draggable: () => props.draggable,
+  imageEl,
+  onRotate: deg => emit('rotate', deg),
 })
 
-const displayIndex = computed(() => {
-  if (!hasImages.value) {
-    return 0
-  }
-
-  return currentIndex.value + 1
+// Зум колесом мыши / жестом трекпада.
+const { isWheelZooming, onWheel, endWheelZoom } = useWheelGesture({
+  enabled: () => props.wheelZoom && hasImages.value,
+  applyZoomFactor: factor => setScale(scale.value * factor),
 })
+
+const currentUrl = computed(() => (hasImages.value ? props.urlList[currentIndex.value] : undefined))
+const displayIndex = computed(() => (hasImages.value ? currentIndex.value + 1 : 0))
 
 const viewerStyle = computed(() => ({
   zIndex: String(Number.isFinite(props.zIndex) ? props.zIndex : DEFAULT_Z_INDEX),
 }))
 
-const imageStyle = computed(() => ({
-  transform: `translate3d(${offsetX.value}px, ${offsetY.value}px, 0) scale(${scale.value}) rotate(${rotation.value}deg)`,
-}))
-
-// Плавный CSS-переход transform только для дискретных зумов (кнопки/клавиши).
-// При непрерывном зуме колесом и при перетаскивании переход отключаем —
-// иначе картинка «дёргается»/наслаивается и тянется за курсором с задержкой.
+// Плавный CSS-переход только для дискретных зумов; при wheel-зуме/перетаскивании отключаем.
 const imageTransitionClass = computed(() =>
   isWheelZooming.value || isDragging.value ? '' : 'transition-transform duration-150 ease-out',
 )
 
-// Курсор «рука» при наведении (grab) и при зажатии (grabbing), только если включён drag.
+// Курсор «рука» (grab/grabbing), только если включён drag.
 const imageCursorClass = computed(() => {
-  if (!props.draggable) {
+  if (!props.draggable)
     return ''
-  }
-
   return isDragging.value ? 'cursor-grabbing' : 'cursor-grab'
 })
 
-function formatPercent(value: number): string {
-  if (Number.isInteger(value)) {
-    return String(value)
-  }
-
-  return value.toFixed(1).replace(TRAILING_ZERO_DECIMAL_RE, '')
-}
-
-const zoomValueText = computed(() => formatPercent(scale.value * 100))
-
-// Фактический размер изображения на экране вдоль его осей (footprint), c учётом scale.
-const renderedWidth = computed(() => Math.round(fittedWidth.value * scale.value))
-const renderedHeight = computed(() => Math.round(fittedHeight.value * scale.value))
-
-// Реальный масштаб относительно натурального размера (доля). Не зависит от rotation,
-// так как scale равномерный по осям картинки.
-const realScale = computed(() => {
-  if (!naturalWidth.value) {
-    return 0
-  }
-
-  return (fittedWidth.value * scale.value) / naturalWidth.value
-})
-
-const realScalePercent = computed(() => formatPercent(realScale.value * 100))
-
-const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
-  index: currentIndex.value,
-  displayIndex: displayIndex.value,
-  total: total.value,
-  scale: scale.value,
-  rotation: rotation.value,
-  naturalWidth: naturalWidth.value,
-  naturalHeight: naturalHeight.value,
-  renderedWidth: renderedWidth.value,
-  renderedHeight: renderedHeight.value,
-  realScale: realScale.value,
-  realScalePercent: realScalePercent.value,
-  actions: toolbarActions,
-}))
-
 function normalizeIndex(value: number): number {
-  if (!hasImages.value) {
+  if (!hasImages.value)
     return 0
-  }
-
   const normalized = Number.isFinite(value) ? Math.trunc(value) : 0
-
   return ((normalized % total.value) + total.value) % total.value
-}
-
-function resetTransform(): void {
-  scale.value = 1
-  rotation.value = 0
-  offsetX.value = 0
-  offsetY.value = 0
-  isDragging.value = false
-}
-
-function resetImageMetrics(): void {
-  naturalWidth.value = 0
-  naturalHeight.value = 0
-  fittedWidth.value = 0
-  fittedHeight.value = 0
-}
-
-function measureFitted(): void {
-  const el = imageEl.value
-
-  if (!el) {
-    return
-  }
-
-  // offsetWidth/Height — layout-размер вписанного изображения, без учёта CSS transform.
-  fittedWidth.value = el.offsetWidth
-  fittedHeight.value = el.offsetHeight
-}
-
-function onImageLoad(event: Event): void {
-  const el = event.target as HTMLImageElement
-
-  naturalWidth.value = el.naturalWidth
-  naturalHeight.value = el.naturalHeight
-  measureFitted()
-}
-
-function startObservingImage(): void {
-  const el = imageEl.value
-
-  if (!el || typeof ResizeObserver === 'undefined') {
-    return
-  }
-
-  if (!resizeObserver) {
-    resizeObserver = new ResizeObserver(() => measureFitted())
-  }
-
-  resizeObserver.observe(el)
-
-  // Если картинка уже в кэше и `load` не сработал — считаем метрики сразу.
-  if (el.complete && el.naturalWidth) {
-    naturalWidth.value = el.naturalWidth
-    naturalHeight.value = el.naturalHeight
-  }
-
-  measureFitted()
-}
-
-function stopObservingImage(): void {
-  resizeObserver?.disconnect()
 }
 
 function setIndex(nextIndex: number, options?: { emitSwitch?: boolean }): void {
   const normalizedIndex = normalizeIndex(nextIndex)
-
-  if (normalizedIndex === currentIndex.value) {
+  if (normalizedIndex === currentIndex.value)
     return
-  }
 
   currentIndex.value = normalizedIndex
   resetTransform()
   resetImageMetrics()
   endWheelZoom()
 
-  if (options?.emitSwitch !== false) {
+  if (options?.emitSwitch !== false)
     emit('switch', normalizedIndex)
-  }
 }
 
 function syncIndexFromInitial(): void {
@@ -350,7 +231,6 @@ function syncIndexFromInitial(): void {
     currentIndex.value = 0
     return
   }
-
   currentIndex.value = normalizeIndex(props.initialIndex)
   resetTransform()
   resetImageMetrics()
@@ -359,11 +239,8 @@ function syncIndexFromInitial(): void {
 
 function preloadAt(index: number): void {
   const url = props.urlList[index]
-
-  if (!url) {
+  if (!url)
     return
-  }
-
   const image = new Image()
   image.decoding = 'async'
   image.src = url
@@ -382,132 +259,6 @@ function next(): void {
   setIndex(currentIndex.value + 1)
 }
 
-function setScale(value: number): void {
-  const clamped = Math.min(props.maxScale, Math.max(props.minScale, value))
-
-  scale.value = Number(clamped.toFixed(4))
-}
-
-function zoomIn(): void {
-  setScale(scale.value * props.zoomRate)
-}
-
-function zoomOut(): void {
-  setScale(scale.value / props.zoomRate)
-}
-
-function cancelWheelFrame(): void {
-  if (wheelFrameId !== null) {
-    cancelAnimationFrame(wheelFrameId)
-    wheelFrameId = null
-  }
-}
-
-function endWheelZoom(): void {
-  if (wheelIdleTimer !== null) {
-    clearTimeout(wheelIdleTimer)
-    wheelIdleTimer = null
-  }
-
-  isWheelZooming.value = false
-  pendingWheelDelta = 0
-  cancelWheelFrame()
-}
-
-// Применяем накопленный за кадр deltaY одним обновлением scale — так рендер
-// происходит не чаще одного раза в кадр (без «дёрганья» от частых обновлений).
-function flushWheelZoom(): void {
-  wheelFrameId = null
-
-  const delta = pendingWheelDelta
-  pendingWheelDelta = 0
-
-  if (!delta) {
-    return
-  }
-
-  // Экспоненциальный шаг — плавно и одинаково ощущается и для колеса, и для трекпада.
-  // delta < 0 (от себя / scroll up) — приближение, delta > 0 — отдаление.
-  const factor = Math.exp(-delta * WHEEL_ZOOM_SENSITIVITY)
-
-  setScale(scale.value * factor)
-}
-
-function onWheel(event: WheelEvent): void {
-  if (!props.wheelZoom || !hasImages.value) {
-    return
-  }
-
-  // Не даём странице/оверлею проскроллиться — колесо отдаём под зум.
-  event.preventDefault()
-
-  // Во время непрерывного зума отключаем CSS-переход: плавность даёт само
-  // покадровое обновление, а transition на каждом микрошаге вызывает лаг/наслоение.
-  isWheelZooming.value = true
-
-  pendingWheelDelta += event.deltaY
-
-  if (wheelFrameId === null) {
-    wheelFrameId = requestAnimationFrame(flushWheelZoom)
-  }
-
-  if (wheelIdleTimer !== null) {
-    clearTimeout(wheelIdleTimer)
-  }
-
-  // По завершении жеста возвращаем плавный переход для последующих дискретных зумов.
-  wheelIdleTimer = setTimeout(() => {
-    wheelIdleTimer = null
-    isWheelZooming.value = false
-  }, WHEEL_IDLE_MS)
-}
-
-function onPointerDown(event: PointerEvent): void {
-  // Тянем только основной кнопкой и только если drag включён и есть картинка.
-  if (!props.draggable || !hasImages.value || event.button !== 0) {
-    return
-  }
-
-  event.preventDefault()
-
-  isDragging.value = true
-  dragStartX = event.clientX
-  dragStartY = event.clientY
-  dragOffsetStartX = offsetX.value
-  dragOffsetStartY = offsetY.value
-
-  // Захватываем указатель, чтобы движение/отпускание ловились даже за пределами картинки.
-  ;(event.currentTarget as Element).setPointerCapture?.(event.pointerId)
-}
-
-function onPointerMove(event: PointerEvent): void {
-  if (!isDragging.value) {
-    return
-  }
-
-  offsetX.value = dragOffsetStartX + (event.clientX - dragStartX)
-  offsetY.value = dragOffsetStartY + (event.clientY - dragStartY)
-}
-
-function onPointerUp(event: PointerEvent): void {
-  if (!isDragging.value) {
-    return
-  }
-
-  isDragging.value = false
-  ;(event.currentTarget as Element).releasePointerCapture?.(event.pointerId)
-}
-
-function rotateLeft(): void {
-  rotation.value -= 90
-  emit('rotate', rotation.value)
-}
-
-function rotateRight(): void {
-  rotation.value += 90
-  emit('rotate', rotation.value)
-}
-
 const toolbarActions: GrImageViewerToolbarActions = {
   close: closeViewer,
   prev,
@@ -519,57 +270,31 @@ const toolbarActions: GrImageViewerToolbarActions = {
   rotateRight,
 }
 
-function onBackdropClick(): void {
-  if (!props.hideOnClickModal) {
-    return
-  }
+const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
+  index: currentIndex.value,
+  displayIndex: displayIndex.value,
+  total: total.value,
+  scale: scale.value,
+  rotation: rotation.value,
+  naturalWidth: naturalWidth.value,
+  naturalHeight: naturalHeight.value,
+  renderedWidth: renderedWidth.value,
+  renderedHeight: renderedHeight.value,
+  realScale: realScale.value,
+  realScalePercent: realScalePercent.value,
+  actions: toolbarActions,
+}))
 
+function onBackdropClick(): void {
+  if (!props.hideOnClickModal)
+    return
   closeViewer()
 }
 
-function onKeydown(event: KeyboardEvent): void {
-  switch (event.key) {
-    case 'Escape':
-      if (!props.closeOnPressEscape) {
-        return
-      }
-
-      event.preventDefault()
-      closeViewer()
-      return
-
-    case 'ArrowLeft':
-      event.preventDefault()
-      prev()
-      return
-
-    case 'ArrowRight':
-      event.preventDefault()
-      next()
-      return
-
-    case '+':
-    case '=':
-    case 'Add':
-      event.preventDefault()
-      zoomIn()
-      return
-
-    case '-':
-    case '_':
-    case 'Subtract':
-      event.preventDefault()
-      zoomOut()
-      return
-
-    case '0':
-      event.preventDefault()
-      resetTransform()
-      break
-
-    default:
-  }
-}
+const { onKeydown } = useViewerKeyboard({
+  closeOnEscape: () => props.closeOnPressEscape,
+  actions: { close: closeViewer, prev, next, zoomIn, zoomOut, reset: resetTransform },
+})
 
 watch(
   () => props.modelValue,
@@ -593,10 +318,8 @@ watch(
 watch(
   () => props.initialIndex,
   () => {
-    if (!props.modelValue) {
+    if (!props.modelValue)
       return
-    }
-
     syncIndexFromInitial()
   },
 )
@@ -604,10 +327,8 @@ watch(
 watch(
   () => props.urlList,
   () => {
-    if (!props.modelValue) {
+    if (!props.modelValue)
       return
-    }
-
     syncIndexFromInitial()
   },
   { deep: true },
@@ -616,10 +337,8 @@ watch(
 watch(
   currentIndex,
   (index) => {
-    if (!hasImages.value || total.value < 2) {
+    if (!hasImages.value || total.value < 2)
       return
-    }
-
     preloadAt(normalizeIndex(index - 1))
     preloadAt(normalizeIndex(index + 1))
   },

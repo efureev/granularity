@@ -36,6 +36,7 @@ import { grConfirmDialogConfig } from '../components/GrConfirmDialog/config'
 import { grDataTableConfig } from '../components/GrDataTable/config'
 import { grDialogConfig } from '../components/GrDialog/config'
 import { grDialogServiceConfig } from '../components/GrDialogService/config'
+import { grDividerConfig } from '../components/GrDivider/config'
 import { grDrawerConfig } from '../components/GrDrawer/config'
 import { grDropdownConfig } from '../components/GrDropdown/config'
 import { grDropdownMenuConfig } from '../components/GrDropdownMenu/config'
@@ -48,6 +49,7 @@ import { grIconConfig } from '../components/GrIcon/config'
 import { grImageViewerConfig } from '../components/GrImageViewer/config'
 import { grInputConfig } from '../components/GrInput/config'
 import { grInputTagConfig } from '../components/GrInputTag/config'
+import { grKbdConfig } from '../components/GrKbd/config'
 import { grLinkConfig } from '../components/GrLink/config'
 import { grListConfig } from '../components/GrList/config'
 import { grLoadingConfig } from '../components/GrLoading/config'
@@ -66,6 +68,7 @@ import { grSidebarConfig } from '../components/GrSidebar/config'
 import { grSkeletonConfig } from '../components/GrSkeleton/config'
 import { grSwitchConfig } from '../components/GrSwitch/config'
 import { grTableConfig } from '../components/GrTable/config'
+import { grTabPanelsConfig } from '../components/GrTabPanels/config'
 import { grTabsConfig } from '../components/GrTabs/config'
 import { grTextareaConfig } from '../components/GrTextarea/config'
 import { grToasterConfig } from '../components/GrToaster/config'
@@ -129,6 +132,7 @@ export const granularityComponentConfigs = {
   GrDataTable: grDataTableConfig,
   GrDialog: grDialogConfig,
   GrDialogService: grDialogServiceConfig,
+  GrDivider: grDividerConfig,
   GrDrawer: grDrawerConfig,
   GrDropdown: grDropdownConfig,
   GrDropdownMenu: grDropdownMenuConfig,
@@ -141,6 +145,7 @@ export const granularityComponentConfigs = {
   GrImageViewer: grImageViewerConfig,
   GrInput: grInputConfig,
   GrInputTag: grInputTagConfig,
+  GrKbd: grKbdConfig,
   GrLink: grLinkConfig,
   GrList: grListConfig,
   GrLoading: grLoadingConfig,
@@ -159,6 +164,7 @@ export const granularityComponentConfigs = {
   GrSkeleton: grSkeletonConfig,
   GrSwitch: grSwitchConfig,
   GrTable: grTableConfig,
+  GrTabPanels: grTabPanelsConfig,
   GrTabs: grTabsConfig,
   GrTextarea: grTextareaConfig,
   GrToaster: grToasterConfig,
