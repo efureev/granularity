@@ -15,7 +15,18 @@
     "input-size-and-alignment": {
       "title": "Шкала размеров и выравнивание текста",
       "description": "Показываем, что `GrInput` умеет жить и в компактных toolbars, и в крупных form-layout, а выравнивание текста настраивается отдельно от размера."
+    },
+    "input-enhancements": {
+      "title": "Clearable, переключатель пароля, счётчик и readonly",
+      "description": "Встроенные удобства поля: кнопка очистки (`clearable`), переключатель видимости пароля (`passwordToggle`), счётчик символов с `maxlength` (`showCount`) и `readonly`-состояние. Метки кнопок локализованы."
     }
+  },
+  "enhancements": {
+    "clearableLabel": "Очищаемое поле",
+    "clearablePlaceholder": "Введите для поиска",
+    "passwordLabel": "Пароль с переключателем видимости",
+    "countLabel": "Счётчик символов (maxlength)",
+    "readonlyLabel": "Только для чтения"
   },
   "addons": {
     "currencyLabel": "Поле суммы",

@@ -6,10 +6,10 @@ import type {
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
-  navigation: ['GrBottomNav', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTooltip'],
+  navigation: ['GrBottomNav', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPromptDialog'],
   forms: ['GrCheckbox', 'GrFileUpload', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrIcon', 'GrList', 'GrTable', 'GrTree'],
+  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrTable', 'GrTree'],
 } as const satisfies Record<string, readonly string[]>
 
 // Fallback-сводки компонентов (базовая локаль en). Переводы — в блоке `showcase`
@@ -24,6 +24,9 @@ const componentSummaryOverrides = {
   GrButton: 'Triggers the primary action in a form, dialog or panel.',
   GrButtonGroup: 'Groups related buttons into a compact action cluster.',
   GrCard: 'A container for a meaningful block of content and actions.',
+  GrDivider: 'Separates content with a line, optionally with a centered label.',
+  GrKbd: 'Displays a keyboard key or shortcut in a `<kbd>` element.',
+  GrTabPanels: 'Renders tab panels linked to `GrTabs` by ARIA for accessible tabs.',
   GrCheckbox: 'Lets you toggle independent options and select multiple items.',
   GrCollapse: 'Collapses and expands additional content on demand.',
   GrConfirmDialog: 'Asks to confirm a potentially important or dangerous action.',

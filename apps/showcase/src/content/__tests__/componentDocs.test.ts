@@ -159,11 +159,11 @@ describe('component docs metadata', () => {
     const textareaDoc = getShowcaseComponentDoc(textareaEntity!)
     const switchDoc = getShowcaseComponentDoc(switchEntity!)
 
-    expect(inputDoc.examples).toHaveLength(4)
+    expect(inputDoc.examples).toHaveLength(5)
     expect(inputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(inputDoc.examples.every(example => example.previewKey?.startsWith('gr-input'))).toBe(true)
 
-    expect(numberInputDoc.examples).toHaveLength(3)
+    expect(numberInputDoc.examples).toHaveLength(4)
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 

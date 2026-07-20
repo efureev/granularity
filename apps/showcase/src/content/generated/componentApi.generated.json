@@ -1206,6 +1206,64 @@
       }
     ]
   },
+  "GrDivider": {
+    "name": "GrDivider",
+    "sourcePath": "packages/granularity/src/components/GrDivider/GrDivider.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "orientation",
+            "description": "",
+            "type": "GrDividerOrientation | undefined",
+            "required": false,
+            "default": "\"horizontal\""
+          },
+          {
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "align",
+            "description": "",
+            "type": "GrDividerAlign | undefined",
+            "required": false,
+            "default": "\"center\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrDrawer": {
     "name": "GrDrawer",
     "sourcePath": "packages/granularity/src/components/GrDrawer/GrDrawer.vue",
@@ -1362,7 +1420,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; onKeydown: (event: KeyboardEvent) => void; }; }"
           },
           {
             "name": "content",
@@ -1460,7 +1518,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; onKeydown: (event: KeyboardEvent) => void; }; }"
           },
           {
             "name": "default",
@@ -1778,6 +1836,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "required",
+            "description": "Помечает поле обязательным (маркер `*` + `aria-required` у контрола).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "error",
             "description": "",
             "type": "string | undefined",
@@ -1793,7 +1858,14 @@
           },
           {
             "name": "forId",
-            "description": "",
+            "description": "Явный id контрола. Если не задан — генерируется автоматически.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "hint",
+            "description": "Подсказка под лейблом/над контролом (можно также через слот `#hint`).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1812,6 +1884,11 @@
         "title": "Slots",
         "origin": "generated",
         "items": [
+          {
+            "name": "hint",
+            "description": "",
+            "type": "{}"
+          },
           {
             "name": "default",
             "description": "",
@@ -2362,11 +2439,67 @@
             "default": "undefined"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и выделяемо, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "invalid",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "clearable",
+            "description": "Показывать кнопку очистки, когда есть значение (и не disabled/readonly).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "clearLabel",
+            "description": "i18n aria-label кнопки очистки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxlength",
+            "description": "Ограничение длины + основа для счётчика символов.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showCount",
+            "description": "Показывать счётчик символов (`len` или `len/maxlength`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "passwordToggle",
+            "description": "Кнопка показать/скрыть пароль (только при `type=\"password\"`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "passwordShowLabel",
+            "description": "i18n aria-label кнопки показать/скрыть пароль.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "passwordHideLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "textAlign",
@@ -2514,14 +2647,14 @@
             "default": "\"default\""
           },
           {
-            "name": "invalid",
+            "name": "readonly",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
-            "name": "readonly",
+            "name": "invalid",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
@@ -2660,6 +2793,50 @@
             "type": "() => void"
           }
         ]
+      }
+    ]
+  },
+  "GrKbd": {
+    "name": "GrKbd",
+    "sourcePath": "packages/granularity/src/components/GrKbd/GrKbd.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrKbdSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
       }
     ]
   },
@@ -3215,6 +3392,20 @@
             "default": "undefined"
           },
           {
+            "name": "locale",
+            "description": "BCP-47 локаль для отображения значения (группировка разрядов и разделители через `Intl.NumberFormat`). Работает вместе с `useGrouping`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "useGrouping",
+            "description": "Группировать разряды при отображении (когда поле не в фокусе). При фокусе показывается «сырое» значение для редактирования. По умолчанию выключено.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "controls",
             "description": "Показывать кнопки +/-.",
             "type": "boolean | undefined",
@@ -3591,14 +3782,14 @@
             "default": "true"
           },
           {
-            "name": "placeholder",
+            "name": "label",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "label",
+            "name": "placeholder",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -4223,6 +4414,20 @@
             "default": "undefined"
           },
           {
+            "name": "clearable",
+            "description": "Разрешает очистку выбранного значения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "clearLabel",
+            "description": "i18n-label для кнопки очистки (`aria-label`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "underline",
             "description": "Подчёркивание для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
             "type": "GrSelectUnderline | undefined",
@@ -4277,20 +4482,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "clearable",
-            "description": "Разрешает очистку выбранного значения.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "clearLabel",
-            "description": "i18n-label для кнопки очистки (`aria-label`).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "modelValue",
@@ -4670,6 +4861,56 @@
       }
     ]
   },
+  "GrTabPanels": {
+    "name": "GrTabPanels",
+    "sourcePath": "packages/granularity/src/components/GrTabPanels/GrTabPanels.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "idBase",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrTabs": {
     "name": "GrTabs",
     "sourcePath": "packages/granularity/src/components/GrTabs/GrTabs.vue",
@@ -4684,6 +4925,12 @@
             "description": "",
             "type": "string",
             "required": true
+          },
+          {
+            "name": "idBase",
+            "description": "База id для ARIA-связки с `GrTabPanels`. Если задана, каждая вкладка получает `id=\"<idBase>-tab-<value>\"` и `aria-controls=\"<idBase>-panel-<value>\"`. Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.",
+            "type": "string | undefined",
+            "required": false
           },
           {
             "name": "tabs",

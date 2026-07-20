@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 49 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 52 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -517,6 +517,17 @@
     "searchableContent": "grdialog grdialog a dialog for confirmations, forms and focused scenarios. overlays component /components/gr-dialog packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grdialog generated public-api components components gr-dialog gr dialog"
   },
   {
+    "id": "entity:component:GrDivider",
+    "title": "GrDivider",
+    "description": "Separates content with a line, optionally with a centered label.",
+    "href": "/components/gr-divider",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grdivider",
+    "searchableContent": "grdivider grdivider separates content with a line, optionally with a centered label. data component /components/gr-divider packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grdivider generated public-api components components gr-divider gr divider"
+  },
+  {
     "id": "entity:component:GrDrawer",
     "title": "GrDrawer",
     "description": "A sliding panel for secondary content and quick actions.",
@@ -647,6 +658,17 @@
     "context": "forms / component",
     "searchableTitle": "grinputtag",
     "searchableContent": "grinputtag grinputtag lets you enter and edit a list of tags or values. forms component /components/gr-input-tag packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grinputtag generated public-api components components gr-input-tag gr input tag"
+  },
+  {
+    "id": "entity:component:GrKbd",
+    "title": "GrKbd",
+    "description": "Displays a keyboard key or shortcut in a `<kbd>` element.",
+    "href": "/components/gr-kbd",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grkbd",
+    "searchableContent": "grkbd grkbd displays a keyboard key or shortcut in a `<kbd>` element. data component /components/gr-kbd packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grkbd generated public-api components components gr-kbd gr kbd"
   },
   {
     "id": "entity:component:GrLink",
@@ -845,6 +867,17 @@
     "context": "data / component",
     "searchableTitle": "grtable",
     "searchableContent": "grtable grtable a simple table for compact display of structured data. data component /components/gr-table packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grtable generated public-api components components gr-table gr table"
+  },
+  {
+    "id": "entity:component:GrTabPanels",
+    "title": "GrTabPanels",
+    "description": "Renders tab panels linked to `GrTabs` by ARIA for accessible tabs.",
+    "href": "/components/gr-tab-panels",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "navigation / component",
+    "searchableTitle": "grtabpanels",
+    "searchableContent": "grtabpanels grtabpanels renders tab panels linked to `grtabs` by aria for accessible tabs. navigation component /components/gr-tab-panels packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grtabpanels generated public-api components components gr-tab-panels gr tab panels"
   },
   {
     "id": "entity:component:GrTabs",
@@ -1705,6 +1738,50 @@
     "searchableContent": "grdialog a dialog for confirmations, forms and focused scenarios. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
+    "id": "entity:component:GrDivider:section:overview",
+    "title": "GrDivider / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-divider#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDivider",
+    "searchableTitle": "grdivider component overview",
+    "searchableContent": "grdivider separates content with a line, optionally with a centered label. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrDivider:section:live-examples",
+    "title": "GrDivider / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-divider#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDivider",
+    "searchableTitle": "grdivider live examples",
+    "searchableContent": "grdivider separates content with a line, optionally with a centered label. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrDivider:section:api",
+    "title": "GrDivider / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-divider#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDivider",
+    "searchableTitle": "grdivider generated api",
+    "searchableContent": "grdivider separates content with a line, optionally with a centered label. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrDivider:section:integration-notes",
+    "title": "GrDivider / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-divider#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDivider",
+    "searchableTitle": "grdivider integration notes",
+    "searchableContent": "grdivider separates content with a line, optionally with a centered label. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
     "id": "entity:component:GrDrawer:section:overview",
     "title": "GrDrawer / Component overview",
     "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
@@ -2231,6 +2308,50 @@
     "context": "GrInputTag",
     "searchableTitle": "grinputtag integration notes",
     "searchableContent": "grinputtag lets you enter and edit a list of tags or values. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrKbd:section:overview",
+    "title": "GrKbd / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-kbd#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrKbd",
+    "searchableTitle": "grkbd component overview",
+    "searchableContent": "grkbd displays a keyboard key or shortcut in a `<kbd>` element. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrKbd:section:live-examples",
+    "title": "GrKbd / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-kbd#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrKbd",
+    "searchableTitle": "grkbd live examples",
+    "searchableContent": "grkbd displays a keyboard key or shortcut in a `<kbd>` element. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrKbd:section:api",
+    "title": "GrKbd / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-kbd#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrKbd",
+    "searchableTitle": "grkbd generated api",
+    "searchableContent": "grkbd displays a keyboard key or shortcut in a `<kbd>` element. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrKbd:section:integration-notes",
+    "title": "GrKbd / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-kbd#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrKbd",
+    "searchableTitle": "grkbd integration notes",
+    "searchableContent": "grkbd displays a keyboard key or shortcut in a `<kbd>` element. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrLink:section:overview",
@@ -3023,6 +3144,50 @@
     "context": "GrTable",
     "searchableTitle": "grtable integration notes",
     "searchableContent": "grtable a simple table for compact display of structured data. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrTabPanels:section:overview",
+    "title": "GrTabPanels / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-tab-panels#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTabPanels",
+    "searchableTitle": "grtabpanels component overview",
+    "searchableContent": "grtabpanels renders tab panels linked to `grtabs` by aria for accessible tabs. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrTabPanels:section:live-examples",
+    "title": "GrTabPanels / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-tab-panels#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTabPanels",
+    "searchableTitle": "grtabpanels live examples",
+    "searchableContent": "grtabpanels renders tab panels linked to `grtabs` by aria for accessible tabs. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrTabPanels:section:api",
+    "title": "GrTabPanels / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-tab-panels#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTabPanels",
+    "searchableTitle": "grtabpanels generated api",
+    "searchableContent": "grtabpanels renders tab panels linked to `grtabs` by aria for accessible tabs. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrTabPanels:section:integration-notes",
+    "title": "GrTabPanels / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-tab-panels#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTabPanels",
+    "searchableTitle": "grtabpanels integration notes",
+    "searchableContent": "grtabpanels renders tab panels linked to `grtabs` by aria for accessible tabs. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrTabs:section:overview",

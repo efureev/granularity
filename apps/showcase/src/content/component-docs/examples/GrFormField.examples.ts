@@ -2,6 +2,29 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'form-field-context',
+    title: 'Auto id, hint, required and error linking',
+    description: 'Поле само генерирует `id` (связка с `label for`) и через provide/inject отдаёт контролу `aria-describedby` (hint + error), `aria-invalid` и `aria-required` — без ручного `forId`. Ошибка анонсируется через `role="alert"`.',
+    status: 'ready',
+    previewKey: 'gr-form-field-context',
+    code: `<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { GrFormField, GrInput } from '@feugene/granularity'
+
+const email = ref('john')
+const error = computed(() =>
+  email.value && !email.value.includes('@') ? 'Enter a valid email address' : undefined,
+)
+</script>
+
+<template>
+  <GrFormField label="Email" required hint="We'll never share your email." :error="error">
+    <GrInput v-model="email" type="email" placeholder="you@example.com" />
+  </GrFormField>
+</template>`,
+    note: 'GrInput / GrSelect / GrTextarea внутри `GrFormField` подхватывают контекст автоматически — id/aria прокидывать не нужно.',
+  },
+  {
     id: 'form-field-basic-label',
     title: 'Basic label and `forId` wiring',
     description: 'Минимальный сценарий показывает, как `GrFormField` связывает label и control, не навязывая конкретный input-тип.',

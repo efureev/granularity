@@ -15,7 +15,18 @@
     "input-size-and-alignment": {
       "title": "Size scale and text alignment",
       "description": "Shows that `GrInput` can live both in compact toolbars and large form layouts, and text alignment is configured separately from size."
+    },
+    "input-enhancements": {
+      "title": "Clearable, password toggle, counter and readonly",
+      "description": "Built-in field affordances: a clear button (`clearable`), password visibility toggle (`passwordToggle`), character counter with `maxlength` (`showCount`) and a `readonly` state. Button labels are localized."
     }
+  },
+  "enhancements": {
+    "clearableLabel": "Clearable",
+    "clearablePlaceholder": "Type to search",
+    "passwordLabel": "Password with visibility toggle",
+    "countLabel": "Character counter (maxlength)",
+    "readonlyLabel": "Read-only"
   },
   "addons": {
     "currencyLabel": "Currency input",
