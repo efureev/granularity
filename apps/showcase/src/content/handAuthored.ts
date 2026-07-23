@@ -8,7 +8,7 @@ const componentGroups = {
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPromptDialog'],
-  forms: ['GrCheckbox', 'GrFileUpload', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrFileUpload', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrTable', 'GrTree'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -17,6 +17,7 @@ const componentGroups = {
 // `useShowcasePageI18n().localizeEntity` / `localizeEntitySummary`.
 const componentSummaryOverrides = {
   GrAlert: 'Shows an important message, warning or action status.',
+  GrAutocomplete: 'A combobox with type-ahead search over options, async loading and multi-select chips.',
   GrAvatar: 'Displays a user photo, or initials / a fallback when it is missing.',
   GrBadge: 'A short label for a status, category or counter.',
   GrBadgeWrap: 'Adds a status or count badge on top of an element.',
@@ -60,6 +61,7 @@ const componentSummaryOverrides = {
   GrSelect: 'Selection of one or several values from a list of options.',
   GrSidebar: 'Side navigation for sections, filters and supporting actions.',
   GrSkeleton: 'A temporary interface skeleton while the content is still loading.',
+  GrSlider: 'Pick a number or a range by dragging a thumb, with steps, marks and keyboard support.',
   GrSwitch: 'Quickly turns a binary setting on and off.',
   GrTable: 'A simple table for compact display of structured data.',
   GrTabs: 'Switches between related content sections without leaving the page.',
@@ -103,6 +105,14 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
         status: 'planned',
       },
     ],
+  },
+  'component:GrAutocomplete': {
+    group: 'forms',
+    tags: ['featured', 'complex'],
+  },
+  'component:GrSlider': {
+    group: 'forms',
+    tags: ['featured'],
   },
   'component:GrSelect': {
     group: 'forms',

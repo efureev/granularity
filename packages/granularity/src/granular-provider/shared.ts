@@ -23,6 +23,7 @@ import {
   type GranularProvider,
 } from '@feugene/unocss-preset-granular/contract'
 import { grAlertConfig } from '../components/GrAlert/config'
+import { grAutocompleteConfig } from '../components/GrAutocomplete/config'
 import { grAvatarConfig } from '../components/GrAvatar/config'
 import { grBadgeConfig } from '../components/GrBadge/config'
 import { grBadgeWrapConfig } from '../components/GrBadgeWrap/config'
@@ -66,6 +67,7 @@ import { grSegmentedConfig } from '../components/GrSegmented/config'
 import { grSelectConfig } from '../components/GrSelect/config'
 import { grSidebarConfig } from '../components/GrSidebar/config'
 import { grSkeletonConfig } from '../components/GrSkeleton/config'
+import { grSliderConfig } from '../components/GrSlider/config'
 import { grSwitchConfig } from '../components/GrSwitch/config'
 import { grTableConfig } from '../components/GrTable/config'
 import { grTabPanelsConfig } from '../components/GrTabPanels/config'
@@ -119,6 +121,7 @@ const theme = {
  */
 export const granularityComponentConfigs = {
   GrAlert: grAlertConfig,
+  GrAutocomplete: grAutocompleteConfig,
   GrAvatar: grAvatarConfig,
   GrBadge: grBadgeConfig,
   GrBadgeWrap: grBadgeWrapConfig,
@@ -162,6 +165,7 @@ export const granularityComponentConfigs = {
   GrSelect: grSelectConfig,
   GrSidebar: grSidebarConfig,
   GrSkeleton: grSkeletonConfig,
+  GrSlider: grSliderConfig,
   GrSwitch: grSwitchConfig,
   GrTable: grTableConfig,
   GrTabPanels: grTabPanelsConfig,

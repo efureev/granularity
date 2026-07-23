@@ -5,3 +5,7 @@ yarn.lock
 junit-report.xml
 .env
 .eslintcache
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache

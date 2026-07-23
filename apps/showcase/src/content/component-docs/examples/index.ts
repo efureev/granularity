@@ -1,5 +1,7 @@
 export { grButtonExamples } from './GrButton.examples'
+export { grAutocompleteExamples } from './GrAutocomplete.examples'
 export { grSelectExamples } from './GrSelect.examples'
+export { grSliderExamples } from './GrSlider.examples'
 export { grFileUploadExamples } from './GrFileUpload.examples'
 export { grModalExamples } from './GrModal.examples'
 export { grDialogExamples } from './GrDialog.examples'

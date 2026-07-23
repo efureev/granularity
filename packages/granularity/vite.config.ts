@@ -69,6 +69,9 @@ export default defineConfig({
         'components/GrAlert/index': fileURLToPath(
           new URL('./src/components/GrAlert/index.ts', import.meta.url),
         ),
+        'components/GrAutocomplete/index': fileURLToPath(
+          new URL('./src/components/GrAutocomplete/index.ts', import.meta.url),
+        ),
         'components/GrAvatar/index': fileURLToPath(
           new URL('./src/components/GrAvatar/index.ts', import.meta.url),
         ),
@@ -197,6 +200,9 @@ export default defineConfig({
         ),
         'components/GrSkeleton/index': fileURLToPath(
           new URL('./src/components/GrSkeleton/index.ts', import.meta.url),
+        ),
+        'components/GrSlider/index': fileURLToPath(
+          new URL('./src/components/GrSlider/index.ts', import.meta.url),
         ),
         'components/GrSwitch/index': fileURLToPath(
           new URL('./src/components/GrSwitch/index.ts', import.meta.url),

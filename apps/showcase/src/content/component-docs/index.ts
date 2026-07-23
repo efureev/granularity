@@ -25,6 +25,7 @@ export function getShowcaseComponentDoc(entity: ShowcaseEntityRegistryItem): Sho
 
   return {
     sections: override?.sections ?? showcaseComponentDetailSections,
+    overview: override?.overview,
     examples: override?.examples ?? createFallbackExamples(entity),
   }
 }

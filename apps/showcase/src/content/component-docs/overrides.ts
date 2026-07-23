@@ -2,7 +2,9 @@ import { showcaseComponentDetailSections } from '../../app/showcase'
 
 import {
   grButtonExamples,
+  grAutocompleteExamples,
   grSelectExamples,
+  grSliderExamples,
   grFileUploadExamples,
   grModalExamples,
   grDialogExamples,
@@ -54,17 +56,53 @@ import {
   grListExamples,
   grTableExamples,
 } from './examples'
-import type { ShowcaseComponentDocMeta, ShowcaseComponentExampleDoc } from './types'
+import type { ShowcaseComponentDocMeta, ShowcaseComponentExampleDoc, ShowcaseComponentOverviewDoc } from './types'
 
-function createComponentDocMeta(examples: ShowcaseComponentExampleDoc[]): ShowcaseComponentDocMeta {
+function createComponentDocMeta(
+  examples: ShowcaseComponentExampleDoc[],
+  overview?: ShowcaseComponentOverviewDoc,
+): ShowcaseComponentDocMeta {
   return {
     sections: showcaseComponentDetailSections,
+    overview,
     examples,
   }
 }
 
+const grAutocompleteOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Поле поиска, которое помогает выбрать нужное за секунды. Пользователь начинает печатать — список сам сужается до подходящих вариантов. Идеально, когда опций много: пользователи, города, теги, репозитории, в том числе с подгрузкой с сервера.',
+    'Это отдельный компонент, а не режим `GrSelect`: там пользователь выбирает из готового списка, а здесь — ищет вводом. Разные задачи — свой компонент, заточенный под поиск, чтобы оба оставались простыми и предсказуемыми.',
+  ],
+  features: [
+    'Живой поиск по мере ввода — мгновенная фильтрация вариантов.',
+    'Подгрузка вариантов с сервера со спиннером и состояниями «ничего не найдено» / «введите ещё пару символов».',
+    'Множественный выбор тегами: удобно добавлять и удалять, в том числе с клавиатуры.',
+    'Можно разрешить свои значения, которых нет в списке.',
+    'Полностью управляется с клавиатуры и доступен для скринридеров.',
+    'Кнопка очистки, кастомизация вида опций и пустых состояний, аккуратная интеграция с формами.',
+  ],
+}
+
+const grSliderOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Ползунок для выбора числа перетаскиванием — быстрый и наглядный способ задать громкость, цену, яркость или любой параметр в понятных границах. Значение всегда видно, а «прилипание» к шагу не даёт промахнуться.',
+    'Работает и как выбор диапазона: включите `range` — и получите два бегунка «от и до», которые не мешают друг другу. Всё управляется мышью, тачем и клавиатурой, и доступно для скринридеров.',
+  ],
+  features: [
+    'Одно значение или диапазон «от–до» двумя бегунками.',
+    'Шаг, границы `min`/`max` и метки делений с подписями.',
+    'Всплывающее значение над бегунком с любым форматом (проценты, валюта…).',
+    'Полное управление с клавиатуры: стрелки, PageUp/Down, Home/End.',
+    'Размеры `sm` / `md` / `lg` и состояние `disabled`.',
+    'Доступность из коробки: `role="slider"` с корректными границами для скринридеров.',
+  ],
+}
+
 export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocMeta>> = {
   GrButton: createComponentDocMeta(grButtonExamples),
+  GrAutocomplete: createComponentDocMeta(grAutocompleteExamples, grAutocompleteOverview),
+  GrSlider: createComponentDocMeta(grSliderExamples, grSliderOverview),
   GrSelect: createComponentDocMeta(grSelectExamples),
   GrFileUpload: createComponentDocMeta(grFileUploadExamples),
   GrModal: createComponentDocMeta(grModalExamples),

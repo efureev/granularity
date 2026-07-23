@@ -12,6 +12,7 @@ import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
 import EventsTable from '../components/doc/EventsTable.vue'
 import ExampleCard from '../components/doc/ExampleCard.vue'
 import InfoSectionCard from '../components/doc/InfoSectionCard.vue'
+import InlineRichText from '../components/content/InlineRichText.vue'
 import MethodsTable from '../components/doc/MethodsTable.vue'
 import PropsTable from '../components/doc/PropsTable.vue'
 import SlotsTable from '../components/doc/SlotsTable.vue'
@@ -56,6 +57,9 @@ const previewRegistry = {
   'gr-alert-closable-flow': defineAsyncComponent(() => import('../demos/components/gr-alert/GrAlertClosableDemo.vue')),
   'gr-alert-custom-colors': defineAsyncComponent(() => import('../demos/components/gr-alert/GrAlertCustomColorsDemo.vue')),
   'gr-alert-variant-matrix': defineAsyncComponent(() => import('../demos/components/gr-alert/GrAlertVariantsDemo.vue')),
+  'gr-autocomplete-basic': defineAsyncComponent(() => import('../demos/components/gr-autocomplete/GrAutocompleteBasicDemo.vue')),
+  'gr-autocomplete-multiple': defineAsyncComponent(() => import('../demos/components/gr-autocomplete/GrAutocompleteMultipleDemo.vue')),
+  'gr-autocomplete-async': defineAsyncComponent(() => import('../demos/components/gr-autocomplete/GrAutocompleteAsyncDemo.vue')),
   'gr-avatar-image-fallback': defineAsyncComponent(() => import('../demos/components/gr-avatar/GrAvatarImageFallbackDemo.vue')),
   'gr-avatar-size-shape': defineAsyncComponent(() => import('../demos/components/gr-avatar/GrAvatarSizeShapeDemo.vue')),
   'gr-avatar-team-row': defineAsyncComponent(() => import('../demos/components/gr-avatar/GrAvatarTeamRowDemo.vue')),
@@ -192,6 +196,9 @@ const previewRegistry = {
   'gr-skeleton-dashboard-layout': defineAsyncComponent(() => import('../demos/components/gr-skeleton/GrSkeletonDashboardDemo.vue')),
   'gr-skeleton-list-placeholder': defineAsyncComponent(() => import('../demos/components/gr-skeleton/GrSkeletonListDemo.vue')),
   'gr-skeleton-text-card': defineAsyncComponent(() => import('../demos/components/gr-skeleton/GrSkeletonTextCardDemo.vue')),
+  'gr-slider-basic': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderBasicDemo.vue')),
+  'gr-slider-range': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderRangeDemo.vue')),
+  'gr-slider-marks': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderMarksDemo.vue')),
   'gr-switch-builder': defineAsyncComponent(() => import('../demos/components/gr-switch/GrSwitchBuilderDemo.vue')),
   'gr-switch-custom-colors': defineAsyncComponent(() => import('../demos/components/gr-switch/GrSwitchColorsDemo.vue')),
   'gr-switch-disabled-labeled': defineAsyncComponent(() => import('../demos/components/gr-switch/GrSwitchDisabledDemo.vue')),
@@ -261,6 +268,27 @@ const localizedExamples = computed(() => {
   })
 })
 
+// Расширенный обзор (что за компонент, для чего, чем отличается) + список фич.
+// Локализуемо: `components.<Name>.overview.{paragraphs,features}` (массивы строк);
+// при отсутствии переводов используем контент из override (`*.overrides.ts`).
+const componentOverview = computed(() => {
+  const doc = componentDoc.value
+  const name = componentEntity.value?.name
+  if (!doc?.overview || !name)
+    return undefined
+
+  const localizeList = (field: 'paragraphs' | 'features', fallback: string[] | undefined): string[] => {
+    const key = `components.${name}.overview.${field}`
+    const result = t(key)
+    return Array.isArray(result) ? result as string[] : (fallback ?? [])
+  }
+
+  return {
+    paragraphs: localizeList('paragraphs', doc.overview.paragraphs),
+    features: localizeList('features', doc.overview.features),
+  }
+})
+
 const accessibilityItems = computed(() => createAccessibilityItems(componentEntity.value, t))
 const dependencyItems = computed(() => createDependencyItems(componentEntity.value, t))
 const relatedLinks = computed(() => createRelatedLinks(componentEntity.value, t))
@@ -302,6 +330,42 @@ onUnmounted(() => {
         </p>
       </div>
     </div>
+
+    <section
+        v-if="componentOverview"
+        id="about"
+        class="scroll-mt-28 space-y-4"
+    >
+      <h2 class="text-2xl font-semibold">
+        {{ t('showcase.detailPage.about.title') }}
+      </h2>
+
+      <div class="space-y-3 max-w-3xl">
+        <p
+            v-for="(paragraph, index) in componentOverview.paragraphs"
+            :key="index"
+            class="showcase-text-muted text-base leading-7"
+        >
+          <InlineRichText :text="paragraph"/>
+        </p>
+      </div>
+
+      <div v-if="componentOverview.features.length" class="space-y-2">
+        <h3 class="text-lg font-semibold">
+          {{ t('showcase.detailPage.about.featuresTitle') }}
+        </h3>
+        <ul class="grid gap-2 max-w-3xl">
+          <li
+              v-for="(feature, index) in componentOverview.features"
+              :key="index"
+              class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
+          >
+            <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--primary)]" aria-hidden="true"/>
+            <span><InlineRichText :text="feature"/></span>
+          </li>
+        </ul>
+      </div>
+    </section>
 
     <section id="live-examples" class="scroll-mt-28 space-y-4">
       <div class="space-y-2">

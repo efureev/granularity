@@ -92,6 +92,198 @@
       }
     ]
   },
+  "GrAutocomplete": {
+    "name": "GrAutocomplete",
+    "sourcePath": "packages/granularity/src/components/GrAutocomplete/GrAutocomplete.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "filter",
+            "description": "Кастомный матчер локальной фильтрации. По умолчанию — подстрока в `label`/`value`.",
+            "type": "((option: GrAutocompleteOption, query: string) => boolean) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "options",
+            "description": "Доступные опции. Для локального режима — полный список (фильтруется на клиенте). Для remote-режима (`filterable=false`) — список, который родитель обновляет в ответ на событие `search`.",
+            "type": "GrAutocompleteOption[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "multiple",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrAutocompleteSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearable",
+            "description": "Кнопка очистки выбранного значения/запроса.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loading",
+            "description": "Внешне управляемое состояние загрузки (для async-сценариев).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "filterable",
+            "description": "Локальная фильтрация опций по введённому запросу. Отключите (`false`) для чисто удалённого поиска — тогда `options` показываются как есть, а фильтрацию выполняет сервер по событию `search`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "minQueryLength",
+            "description": "Минимальная длина запроса до эмита `search` (для дебаунса remote-загрузки).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "debounce",
+            "description": "Задержка дебаунса события `search`, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "250"
+          },
+          {
+            "name": "allowCustomValue",
+            "description": "Разрешить ввод/коммит значения, которого нет в `options`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "closeOnSelect",
+            "description": "Закрывать панель после выбора (single всегда закрывает).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "dropdownMaxHeight",
+            "description": "Максимальная высота панели, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "280"
+          },
+          {
+            "name": "loadingText",
+            "description": "i18n-тексты состояний панели / aria.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "noResultsText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "Выбранное значение (single — строка, multiple — массив строк).",
+            "type": "GrAutocompleteModelValue",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "option",
+            "description": "",
+            "type": "{ option: GrAutocompleteOption; selected: boolean; }"
+          },
+          {
+            "name": "loading",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: GrAutocompleteModelValue]",
+            "signature": "(event: \"update:modelValue\", value: GrAutocompleteModelValue): void"
+          },
+          {
+            "name": "search",
+            "description": "",
+            "type": "[query: string]",
+            "signature": "(event: \"search\", query: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrAvatar": {
     "name": "GrAvatar",
     "sourcePath": "packages/granularity/src/components/GrAvatar/GrAvatar.vue",
@@ -354,6 +546,13 @@
             "default": "\"button\""
           },
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrButtonSize | undefined",
@@ -361,11 +560,11 @@
             "default": "\"md\""
           },
           {
-            "name": "square",
+            "name": "ariaLabel",
             "description": "",
-            "type": "boolean | undefined",
+            "type": "string | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "loading",
@@ -375,18 +574,11 @@
             "default": "false"
           },
           {
-            "name": "disabled",
+            "name": "square",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "ariaLabel",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "as",
@@ -541,14 +733,14 @@
         "origin": "generated",
         "items": [
           {
-            "name": "value",
+            "name": "modelValue",
             "description": "",
-            "type": "string | undefined",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "\"on\""
+            "default": "false"
           },
           {
-            "name": "modelValue",
+            "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
@@ -562,11 +754,11 @@
             "default": "false"
           },
           {
-            "name": "disabled",
+            "name": "value",
             "description": "",
-            "type": "boolean | undefined",
+            "type": "string | undefined",
             "required": false,
-            "default": "false"
+            "default": "\"on\""
           },
           {
             "name": "name",
@@ -1606,11 +1798,25 @@
         "origin": "generated",
         "items": [
           {
+            "name": "multiple",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "placeholder",
+            "description": "i18n: надпись-подсказка в дефолтном UI.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "name",
@@ -1632,13 +1838,6 @@
             "type": "GrFileUploadRequest | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "multiple",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "limit",
@@ -1693,13 +1892,6 @@
             "name": "uploadExtraData",
             "description": "",
             "type": "((files: File[]) => GrFileUploadExtraData | undefined) | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "placeholder",
-            "description": "i18n: надпись-подсказка в дефолтном UI.",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -1920,13 +2112,6 @@
         "origin": "generated",
         "items": [
           {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "multiple",
             "description": "",
             "type": "boolean | undefined",
@@ -1934,16 +2119,23 @@
             "default": "false"
           },
           {
-            "name": "validators",
+            "name": "disabled",
             "description": "",
-            "type": "FileValidator[] | undefined",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "false"
           },
           {
             "name": "placeholder",
             "description": "",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "validators",
+            "description": "",
+            "type": "FileValidator[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2383,6 +2575,13 @@
             "default": "\"text\""
           },
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrInputSize | undefined",
@@ -2390,11 +2589,25 @@
             "default": "\"md\""
           },
           {
-            "name": "disabled",
+            "name": "placeholder",
             "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearable",
+            "description": "Показывать кнопку очистки, когда есть значение (и не disabled/readonly).",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "clearLabel",
+            "description": "i18n aria-label кнопки очистки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "name",
@@ -2405,13 +2618,6 @@
           },
           {
             "name": "id",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "placeholder",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -2451,20 +2657,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "clearable",
-            "description": "Показывать кнопку очистки, когда есть значение (и не disabled/readonly).",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "clearLabel",
-            "description": "i18n aria-label кнопки очистки.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "maxlength",
@@ -2612,13 +2804,6 @@
         "origin": "generated",
         "items": [
           {
-            "name": "size",
-            "description": "",
-            "type": "GrInputSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -2626,11 +2811,11 @@
             "default": "false"
           },
           {
-            "name": "trim",
+            "name": "size",
             "description": "",
-            "type": "boolean | undefined",
+            "type": "GrInputSize | undefined",
             "required": false,
-            "default": "true"
+            "default": "\"md\""
           },
           {
             "name": "placeholder",
@@ -2638,6 +2823,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "trim",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           },
           {
             "name": "state",
@@ -2864,18 +3056,18 @@
             "default": "\"default\""
           },
           {
-            "name": "size",
-            "description": "",
-            "type": "GrLinkSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrLinkSize | undefined",
+            "required": false,
+            "default": "\"md\""
           },
           {
             "name": "ariaLabel",
@@ -3245,6 +3437,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrNumberInputSize | undefined",
@@ -3252,11 +3451,11 @@
             "default": "\"md\""
           },
           {
-            "name": "disabled",
+            "name": "placeholder",
             "description": "",
-            "type": "boolean | undefined",
+            "type": "string | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "name",
@@ -3267,13 +3466,6 @@
           },
           {
             "name": "id",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "placeholder",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -3649,6 +3841,13 @@
             "default": "\"md\""
           },
           {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "required",
             "description": "",
             "type": "boolean | undefined",
@@ -3789,13 +3988,6 @@
             "default": "undefined"
           },
           {
-            "name": "placeholder",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "requiredErrorText",
             "description": "Текст ошибки для пустого значения при `required=true` (i18n).",
             "type": "string | undefined",
@@ -3810,15 +4002,15 @@
             "default": "null"
           },
           {
-            "name": "value",
-            "description": "",
-            "type": "string",
-            "required": true
-          },
-          {
             "name": "modelValue",
             "description": "",
             "type": "boolean",
+            "required": true
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "string",
             "required": true
           }
         ]
@@ -3901,6 +4093,20 @@
             "default": "\"radiobox\""
           },
           {
+            "name": "modelValue",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrButtonSize | undefined",
@@ -3908,7 +4114,7 @@
             "default": "undefined"
           },
           {
-            "name": "modelValue",
+            "name": "ariaLabel",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -3920,20 +4126,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "ariaLabel",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "name",
@@ -4042,11 +4234,11 @@
             "default": "\"radiobox\""
           },
           {
-            "name": "size",
+            "name": "options",
             "description": "",
-            "type": "GrButtonSize | undefined",
+            "type": "GrRadioGroupOption[] | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "disabled",
@@ -4054,6 +4246,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrButtonSize | undefined",
+            "required": false,
+            "default": "\"md\""
           },
           {
             "name": "ariaLabel",
@@ -4066,13 +4265,6 @@
             "name": "name",
             "description": "",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "options",
-            "description": "",
-            "type": "GrRadioGroupOption[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4268,18 +4460,18 @@
             "default": "\"pills\""
           },
           {
-            "name": "size",
-            "description": "",
-            "type": "GrSegmentedSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSegmentedSize | undefined",
+            "required": false,
+            "default": "\"md\""
           },
           {
             "name": "ariaLabel",
@@ -4379,23 +4571,9 @@
             "default": "\"primary\""
           },
           {
-            "name": "size",
-            "description": "",
-            "type": "GrSelectSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "ariaLabel",
-            "description": "",
-            "type": "string | undefined",
+            "name": "options",
+            "description": "Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`).",
+            "type": "GrSelectOptionOrGroup[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4407,8 +4585,29 @@
             "default": "false"
           },
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSelectSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
             "name": "placeholder",
             "description": "Placeholder (показывается, когда значение не выбрано).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -4419,6 +4618,27 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "allowCustomValue",
+            "description": "Разрешает ввод/выбор значения, которого нет в `options`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "closeOnSelect",
+            "description": "Закрывать панель после выбора (только в `optionsView=\"panel\"`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "dropdownMaxHeight",
+            "description": "Максимальная высота панели (только в `optionsView=\"panel\"`).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "280"
           },
           {
             "name": "clearLabel",
@@ -4435,13 +4655,6 @@
             "default": "\"auto\""
           },
           {
-            "name": "options",
-            "description": "Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`).",
-            "type": "GrSelectOptionOrGroup[] | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "view",
             "description": "",
             "type": "GrSelectView | undefined",
@@ -4456,32 +4669,11 @@
             "default": "\"native\""
           },
           {
-            "name": "allowCustomValue",
-            "description": "Разрешает ввод/выбор значения, которого нет в `options`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "customValuePlaceholder",
             "description": "Placeholder для инпута кастомного значения (только в `optionsView=\"panel\"`). i18n-friendly: если не задан — берётся из адаптера перевода (`gr.select.customValuePlaceholder`), иначе — встроенный fallback.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "dropdownMaxHeight",
-            "description": "Максимальная высота панели (только в `optionsView=\"panel\"`).",
-            "type": "number | undefined",
-            "required": false,
-            "default": "280"
-          },
-          {
-            "name": "closeOnSelect",
-            "description": "Закрывать панель после выбора (только в `optionsView=\"panel\"`).",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
           },
           {
             "name": "modelValue",
@@ -4689,6 +4881,126 @@
       }
     ]
   },
+  "GrSlider": {
+    "name": "GrSlider",
+    "sourcePath": "packages/granularity/src/components/GrSlider/GrSlider.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSliderSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "100"
+          },
+          {
+            "name": "step",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "min",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "range",
+            "description": "Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "marks",
+            "description": "Метки делений: `{ [value]: label }` или массив значений.",
+            "type": "GrSliderMarks | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showTooltip",
+            "description": "Всплывающее значение над бегунком: `true`/`'hover'` — при hover/drag/focus, `'always'` — всегда.",
+            "type": "boolean | \"always\" | \"hover\" | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "formatTooltip",
+            "description": "Форматирование значения в tooltip.",
+            "type": "((value: number) => string) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "`number` — одиночное значение; `[lo, hi]` — диапазон (при `range=true`).",
+            "type": "GrSliderModelValue",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: GrSliderModelValue]",
+            "signature": "(event: \"update:modelValue\", value: GrSliderModelValue): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: GrSliderModelValue]",
+            "signature": "(event: \"change\", value: GrSliderModelValue): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrSwitch": {
     "name": "GrSwitch",
     "sourcePath": "packages/granularity/src/components/GrSwitch/GrSwitch.vue",
@@ -4699,18 +5011,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "size",
-            "description": "",
-            "type": "GrSwitchSize | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSwitchSize | undefined",
+            "required": false,
+            "default": "\"md\""
           },
           {
             "name": "ariaLabel",
@@ -4984,6 +5296,13 @@
             "default": "false"
           },
           {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
@@ -5003,13 +5322,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "4"
-          },
-          {
-            "name": "placeholder",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "state",

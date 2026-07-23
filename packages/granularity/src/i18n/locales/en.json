@@ -23,6 +23,12 @@
     "addOption": "Add \"{value}\"",
     "clearOption": "None"
   },
+  "autocomplete": {
+    "loading": "Loading…",
+    "noResults": "No results",
+    "addOption": "Add \"{value}\"",
+    "typeMore": "Type at least {n} characters"
+  },
   "dialog": {
     "confirm": {
       "title": "Confirm"

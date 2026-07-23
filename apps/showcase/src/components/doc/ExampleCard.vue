@@ -24,7 +24,10 @@ defineProps<{
       </p>
     </div>
 
-    <div class="showcase-empty-state mt-5 min-w-0 overflow-hidden rounded-2xl border border-dashed px-4 py-6 text-sm">
+    <div
+      data-example-preview
+      class="showcase-empty-state mt-5 min-w-0 overflow-hidden rounded-2xl border border-dashed px-4 py-6 text-sm"
+    >
       <slot name="preview">
         {{ $t('showcase.detailPage.preview.fallbackComponent') }}
       </slot>

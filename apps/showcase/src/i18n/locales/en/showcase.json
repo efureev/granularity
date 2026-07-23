@@ -356,6 +356,10 @@
   },
   "detailPage": {
     "backTo": "Back to {target}",
+    "about": {
+      "title": "About the component",
+      "featuresTitle": "Features"
+    },
     "liveExamples": {
       "title": "Live examples",
       "descriptionComponent": "Short usage scenarios showing the component inside a real interface.",

@@ -5,6 +5,53 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [v0.13.0] 2026-07-23
+
+### Added
+
+- New `GrSlider` — a WAI-ARIA slider for picking a number or a range by dragging. Supports single
+  value and `range` (two thumbs that never cross), `step`, `min`/`max`, tick `marks` with labels, a
+  value tooltip (`show-tooltip` + `format-tooltip`), sizes (`sm`/`md`/`lg`) and `disabled`. Each thumb
+  is `role="slider"` with `aria-valuemin`/`max`/`now` and full keyboard support (Arrow, PageUp/Down,
+  Home/End); clicking the track moves and focuses the nearest thumb. Integrates with `GrFormField`.
+- New `GrAutocomplete` — a WAI-ARIA *editable combobox* for type-ahead search over options. Unlike
+  `GrSelect` (a select-only combobox with a button trigger), here the text `<input role="combobox">`
+  itself is the combobox: the typed text is the search query and choosing an option fills the field.
+  Features:
+  - Local filtering (`filterable`, default on) with an optional custom matcher (`filter`).
+  - Remote / async loading via a debounced `search` event (`debounce`, `minQueryLength`) plus an
+    externally-controlled `loading` prop — the component renders the spinner and the
+    loading / no-results / "type at least N characters" states, the consumer owns the data fetch.
+  - Free-text values (`allowCustomValue`) — commit a value that is not in `options` with Enter.
+  - `multiple` with removable **chips** before the input (Backspace on an empty query removes the
+    last one), replacing `GrSelect`'s "a, b, c" string presentation for multi-select.
+  - Full keyboard support with `aria-activedescendant` (Arrow / Home / End / Enter), `clearable`,
+    `#option` / `#empty` / `#loading` slots, and `GrFormField` integration (`id` /
+    `aria-describedby` / `aria-invalid` / `aria-required`).
+
+  It reuses the shared floating/dismiss infrastructure (`useFloating`, `useEscapeToClose`,
+  `vClickOutside`) and does not depend on `GrSelect`. The search/async concerns were split out of
+  `GrSelect` deliberately: the two components implement different ARIA patterns (select-only vs.
+  editable combobox) and merging remote loading, races and min-query handling into `GrSelect` would
+  overload its focus/aria semantics.
+- `GrAutocomplete` translations (`gr.autocomplete.*`: `loading` / `noResults` / `addOption` /
+  `typeMore`) added to the `en` / `ru` / `es` locale payloads.
+
+### Testing / infrastructure
+
+- Added an end-to-end **accessibility (axe) + visual-regression (Playwright)** layer in `apps/showcase`
+  (`e2e/`, scripts `test:e2e` / `test:a11y` / `test:visual`). It runs against every component's live
+  demos, so each new component is covered automatically (the list is derived from the generated API
+  contract).
+  - **a11y:** `axe-core` scans each component's rendered preview (`[data-example-preview]`) and gates
+    on `serious`/`critical` violations minus a recorded baseline (`e2e/a11y-baseline.ts`) — catching
+    regressions, new components with a11y gaps and debt growth, while existing debt is tracked openly
+    for burn-down. `color-contrast` is handled as a separate design-token track (the `--muted-fg`
+    token). Manual-ARIA components (`GrSlider`, `GrAutocomplete`, `GrTabs`, `GrTree`, `GrDropdown`,
+    `GrModal`) pass the gate clean.
+  - **visual:** screenshots the "Live examples" region of a representative component set in both light
+    and dark themes, with committed baselines, to catch unintended token/style drift.
+
 ## [v0.12.0] 2026-07-20
 
 ### Added

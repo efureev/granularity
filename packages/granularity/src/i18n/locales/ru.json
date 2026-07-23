@@ -23,6 +23,12 @@
     "addOption": "Добавить «{value}»",
     "clearOption": "Не выбрано"
   },
+  "autocomplete": {
+    "loading": "Загрузка…",
+    "noResults": "Ничего не найдено",
+    "addOption": "Добавить «{value}»",
+    "typeMore": "Введите минимум {n} символа(ов)"
+  },
   "dialog": {
     "confirm": {
       "title": "Подтверждение"
