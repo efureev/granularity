@@ -20,7 +20,7 @@ const resolvedConfig = computed(() => resolveGrDialogSectionConfig(props.config,
 const rootClass = computed(() => [
   resolvedConfig.value.paddingX,
   resolvedConfig.value.paddingY,
-  resolvedConfig.value.bordered ? 'border-t border-[var(--brd)]' : '',
+  resolvedConfig.value.bordered ? 'border-t border-[var(--gr-brd)]' : '',
 ])
 </script>
 

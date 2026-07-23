@@ -18,9 +18,9 @@ export interface GrSwitchProps {
   disabled?: boolean
   ariaLabel?: string
   size?: GrSwitchSize
-  /** Кастомный цвет фона в активном состоянии. Если не задан — `var(--primary)`. */
+  /** Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`. */
   activeBackgroundColor?: string
-  /** Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--muted)`. */
+  /** Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--gr-muted)`. */
   inactiveBackgroundColor?: string
 }
 
@@ -45,7 +45,7 @@ const trackClass = computed(() => grSwitchTrackClass(props.size))
 
 const trackStyle = computed(() => {
   const isChecked = props.modelValue
-  const defaultBackgroundColor = isChecked ? 'var(--primary)' : 'var(--muted)'
+  const defaultBackgroundColor = isChecked ? 'var(--gr-primary)' : 'var(--gr-muted)'
   const customBackgroundColor = getCustomColor(
       isChecked ? props.activeBackgroundColor : props.inactiveBackgroundColor,
   )
@@ -56,8 +56,8 @@ const trackStyle = computed(() => {
     '--gr-switch-track-brd': customBackgroundColor
         ? backgroundColor
         : isChecked
-            ? 'var(--primary)'
-            : 'var(--brd)',
+            ? 'var(--gr-primary)'
+            : 'var(--gr-brd)',
     backgroundColor: 'var(--gr-switch-track-bg)',
   }
 })

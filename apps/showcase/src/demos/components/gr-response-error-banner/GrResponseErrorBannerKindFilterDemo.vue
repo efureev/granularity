@@ -125,7 +125,7 @@ function toggleKind(kind: ResponseErrorKind) {
 <template>
   <GrCard class="grid gap-3 p-4">
     <div class="grid gap-2">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         {{ t(`${NS}.filter.whitelistLabel`) }}
       </div>
       <div class="flex flex-wrap gap-2">
@@ -142,7 +142,7 @@ function toggleKind(kind: ResponseErrorKind) {
           <span>{{ kind }}</span>
         </label>
       </div>
-      <div class="text-[12px] text-[var(--muted-fg)]">
+      <div class="text-[12px] text-[var(--gr-muted-fg)]">
         {{ t(`${NS}.filter.hint`) }}
       </div>
     </div>
@@ -167,10 +167,10 @@ function toggleKind(kind: ResponseErrorKind) {
     />
 
     <div class="grid gap-1">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         {{ t(`${NS}.Event log`) }}
       </div>
-      <pre class="max-h-[160px] overflow-auto rounded bg-[var(--muted)] p-3 text-[12px]">{{ eventLog.join('\n') || '—' }}</pre>
+      <pre class="max-h-[160px] overflow-auto rounded bg-[var(--gr-muted)] p-3 text-[12px]">{{ eventLog.join('\n') || '—' }}</pre>
     </div>
   </GrCard>
 </template>

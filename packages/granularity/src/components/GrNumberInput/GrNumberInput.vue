@@ -435,7 +435,7 @@ function onBlur(): void {
 <template>
   <div
     data-gr-number-input
-    class="relative w-full overflow-hidden rounded-md border bg-[var(--bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
+    class="relative w-full overflow-hidden rounded-md border bg-[var(--gr-bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
     :class="shellClassName"
   >
     <div
@@ -443,7 +443,7 @@ function onBlur(): void {
       ref="prefixEl"
       data-testid="number-input-prefix"
       data-gr-number-input-prefix
-      class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+      class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
       :style="prefixStyle"
       aria-hidden="true"
     >
@@ -466,7 +466,7 @@ function onBlur(): void {
       :aria-valuemin="min"
       :aria-valuemax="max"
       :aria-invalid="invalid ? 'true' : undefined"
-      class="w-full bg-transparent text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
+      class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
       :class="inputClassName"
       :style="inputStyle"
       @input="onInput"
@@ -481,7 +481,7 @@ function onBlur(): void {
       ref="suffixEl"
       data-testid="number-input-suffix"
       data-gr-number-input-suffix
-      class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+      class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
       :class="suffixFixed ? '[direction:rtl]' : ''"
       :style="suffixStyle"
       aria-hidden="true"
@@ -493,13 +493,13 @@ function onBlur(): void {
       v-if="hasVerticalControls"
       data-testid="number-input-controls-vertical"
       data-gr-number-input-controls="vertical"
-      class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--brd)]"
+      class="absolute inset-y-0 flex items-center justify-center border-l border-[var(--gr-brd)]"
       :style="verticalControlsStyle"
     >
       <div class="flex flex-col justify-center gap-1">
         <button
           type="button"
-          class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed"
+          class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="disabled"
           :aria-label="resolvedIncreaseLabel"
           @mousedown.prevent
@@ -517,7 +517,7 @@ function onBlur(): void {
         </button>
         <button
           type="button"
-          class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed"
+          class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="disabled"
           :aria-label="resolvedDecreaseLabel"
           @mousedown.prevent
@@ -540,12 +540,12 @@ function onBlur(): void {
       v-if="hasHorizontalControls"
       data-testid="number-input-controls-horizontal-left"
       data-gr-number-input-controls="horizontal-left"
-      class="absolute inset-y-0 flex items-stretch justify-center border-r border-[var(--brd)]"
+      class="absolute inset-y-0 flex items-stretch justify-center border-r border-[var(--gr-brd)]"
       :style="horizontalLeftControlsStyle"
     >
       <button
         type="button"
-        class="h-full w-full inline-flex items-center justify-center text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+        class="h-full w-full inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :disabled="disabled"
         :aria-label="resolvedDecreaseLabel"
         @mousedown.prevent
@@ -567,12 +567,12 @@ function onBlur(): void {
       v-if="hasHorizontalControls"
       data-testid="number-input-controls-horizontal-right"
       data-gr-number-input-controls="horizontal-right"
-      class="absolute inset-y-0 flex items-stretch justify-center border-l border-[var(--brd)]"
+      class="absolute inset-y-0 flex items-stretch justify-center border-l border-[var(--gr-brd)]"
       :style="horizontalRightControlsStyle"
     >
       <button
         type="button"
-        class="h-full w-full inline-flex items-center justify-center text-[var(--muted-fg)] hover:bg-[var(--muted)] active:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+        class="h-full w-full inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :disabled="disabled"
         :aria-label="resolvedIncreaseLabel"
         @mousedown.prevent

@@ -7,7 +7,7 @@ const tones: GrLinkTone[] = ['primary', 'neutral', 'success', 'warning', 'danger
 <template>
   <div class="grid gap-5 text-sm">
     <div class="grid gap-2">
-      <div class="text-xs font-600 uppercase tracking-wide text-[var(--muted-fg)]">
+      <div class="text-xs font-600 uppercase tracking-wide text-[var(--gr-muted-fg)]">
         variant="default" — colored by tone
       </div>
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -18,7 +18,7 @@ const tones: GrLinkTone[] = ['primary', 'neutral', 'success', 'warning', 'danger
     </div>
 
     <div class="grid gap-2">
-      <div class="text-xs font-600 uppercase tracking-wide text-[var(--muted-fg)]">
+      <div class="text-xs font-600 uppercase tracking-wide text-[var(--gr-muted-fg)]">
         variant="muted" — subdued, tone appears on hover
       </div>
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">

@@ -23,7 +23,7 @@ const remaining = computed(() => 4 - skills.value.length)
       tag-radius="round"
     />
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Use `max` to keep curated lists compact in profile or filter forms.
     </div>
   </div>

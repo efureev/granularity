@@ -27,8 +27,8 @@ body {
 body {
     margin: 0;
     font-family: var(--gr-font-ui);
-    background: var(--bg);
-    color: var(--fg);
+    background: var(--gr-bg);
+    color: var(--gr-fg);
 }
 
 * {

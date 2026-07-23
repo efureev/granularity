@@ -82,8 +82,8 @@
 
 ```css
 /* src/styles/tokens.css */
---gr-brand-alt-hover: color-mix(in srgb, var(--gr-brand-alt) 92%, var(--fg));
---gr-brand-alt-active: color-mix(in srgb, var(--gr-brand-alt) 84%, var(--fg));
+--gr-brand-alt-hover: color-mix(in srgb, var(--gr-brand-alt) 92%, var(--gr-fg));
+--gr-brand-alt-active: color-mix(in srgb, var(--gr-brand-alt) 84%, var(--gr-fg));
 ```
 
 #### 3. Component token'ы для `GrButton`
@@ -95,8 +95,8 @@
 --gr-button-brand-alt-bg-active: var(--gr-brand-alt-active);
 --gr-button-brand-alt-fg: var(--gr-brand-alt-fg);
 --gr-button-brand-alt-soft-bg: var(--gr-brand-alt-light);
---gr-button-brand-alt-soft-bg-hover: color-mix(in srgb, var(--gr-brand-alt) 20%, var(--bg));
---gr-button-brand-alt-soft-bg-active: color-mix(in srgb, var(--gr-brand-alt) 26%, var(--bg));
+--gr-button-brand-alt-soft-bg-hover: color-mix(in srgb, var(--gr-brand-alt) 20%, var(--gr-bg));
+--gr-button-brand-alt-soft-bg-active: color-mix(in srgb, var(--gr-brand-alt) 26%, var(--gr-bg));
 ```
 
 Если filled-кнопка с `var(--gr-brand-alt)` не проходит контраст, как это уже сделано для отдельных tone в `GrButton`, можно задать более тёмные button-specific значения:
@@ -129,7 +129,7 @@ const tones = {
     solidBackground: 'var(--gr-button-brand-alt-bg,var(--gr-brand-alt))',
     solidBackgroundHover: 'var(--gr-button-brand-alt-bg-hover,var(--gr-brand-alt-hover))',
     solidBackgroundActive: 'var(--gr-button-brand-alt-bg-active,var(--gr-brand-alt-active))',
-    solidForeground: 'var(--gr-button-brand-alt-fg,var(--gr-brand-alt-fg,var(--fg)))',
+    solidForeground: 'var(--gr-button-brand-alt-fg,var(--gr-brand-alt-fg,var(--gr-fg)))',
     accentText: 'var(--gr-brand-alt-text,var(--gr-brand-alt))',
     softBackground: 'var(--gr-button-brand-alt-soft-bg)',
     softBackgroundHover: 'var(--gr-button-brand-alt-soft-bg-hover)',

@@ -36,7 +36,7 @@ const tones = GR_TONES
     <div class="grid gap-2">
       <div class="flex items-center justify-between text-sm">
         <span>Verification progress</span>
-        <span class="text-[var(--muted-fg)]">{{ progress }}% · {{ tone }}</span>
+        <span class="text-[var(--gr-muted-fg)]">{{ progress }}% · {{ tone }}</span>
       </div>
       <GrProgressBar :value="progress" :tone="tone" aria-label="Verification progress" />
     </div>

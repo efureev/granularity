@@ -47,7 +47,7 @@ async function triggerUploadDemo() {
 
 <template>
   <GrCard class="grid gap-3 p-4">
-    <p class="text-[12px] text-[var(--muted-fg)]">
+    <p class="text-[12px] text-[var(--gr-muted-fg)]">
       {{ t(`${NS}.upload.description`) }}
     </p>
 
@@ -68,10 +68,10 @@ async function triggerUploadDemo() {
     />
 
     <div class="grid gap-1">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         {{ t(`${NS}.Event log`) }}
       </div>
-      <pre class="max-h-[120px] overflow-auto rounded bg-[var(--muted)] p-3 text-[12px]">{{ events.join('\n') || '—' }}</pre>
+      <pre class="max-h-[120px] overflow-auto rounded bg-[var(--gr-muted)] p-3 text-[12px]">{{ events.join('\n') || '—' }}</pre>
     </div>
   </GrCard>
 </template>

@@ -34,10 +34,10 @@ const filters = [
         class="flex items-center justify-between gap-3 p-4"
       >
         <div>
-          <div class="text-sm font-600 text-[var(--fg)]">
+          <div class="text-sm font-600 text-[var(--gr-fg)]">
             {{ filter.label }}
           </div>
-          <div class="text-xs text-[var(--muted-fg)]">
+          <div class="text-xs text-[var(--gr-muted-fg)]">
             Queue segment
           </div>
         </div>

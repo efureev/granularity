@@ -38,8 +38,8 @@ function clearStickyToast() {
       </GrButton>
     </div>
 
-    <div class="text-xs text-[var(--muted-fg)]">
-      Last sticky id: <span class="font-medium text-[var(--fg)]">{{ lastId || '—' }}</span>
+    <div class="text-xs text-[var(--gr-muted-fg)]">
+      Last sticky id: <span class="font-medium text-[var(--gr-fg)]">{{ lastId || '—' }}</span>
     </div>
 
     <GrToaster v-if="isActiveHost" />

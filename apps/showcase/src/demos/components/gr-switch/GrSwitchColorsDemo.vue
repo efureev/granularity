@@ -21,8 +21,8 @@ const inactiveBackgroundColor = ref('#e5e7eb')
     </GrSwitch>
 
     <div class="grid gap-3 md:grid-cols-2">
-      <GrInput v-model="activeBackgroundColor" placeholder="#22c55e / var(--primary)" />
-      <GrInput v-model="inactiveBackgroundColor" placeholder="#e5e7eb / var(--muted)" />
+      <GrInput v-model="activeBackgroundColor" placeholder="#22c55e / var(--gr-primary)" />
+      <GrInput v-model="inactiveBackgroundColor" placeholder="#e5e7eb / var(--gr-muted)" />
     </div>
   </div>
 </template>

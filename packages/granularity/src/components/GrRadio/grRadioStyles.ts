@@ -12,9 +12,9 @@ export const grRadioDisabledClass = 'opacity-50 cursor-not-allowed'
 export const grRadioEnabledClass = 'cursor-pointer'
 export const grRadioRootDisabledClass = 'cursor-not-allowed opacity-70'
 export const grRadioRootEnabledClass = 'cursor-pointer'
-export const grRadioControlCheckedClass = 'border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_10%,var(--bg))]'
-export const grRadioControlUncheckedClass = 'border-[var(--brd)] bg-[var(--bg)]'
-export const grRadioDotCheckedClass = 'bg-[var(--primary)] opacity-100 scale-100'
+export const grRadioControlCheckedClass = 'border-[var(--gr-primary)] bg-[color-mix(in_srgb,var(--gr-primary)_10%,var(--gr-bg))]'
+export const grRadioControlUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'
+export const grRadioDotCheckedClass = 'bg-[var(--gr-primary)] opacity-100 scale-100'
 export const grRadioDotUncheckedClass = 'bg-transparent opacity-0 scale-75'
 // Базовые классы «точки» внутри radiobox — нестандартные (`h-[6px]`, `w-[6px]`, произвольный transition).
 // Вынесены сюда, чтобы `safelist` мог гарантировать их присутствие в сборке даже при tree-shaking шаблона.

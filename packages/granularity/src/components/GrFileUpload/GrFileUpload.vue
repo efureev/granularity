@@ -465,11 +465,11 @@ defineExpose({
       hasCustomUi
         ? 'inline-block'
         : [
-            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--brd)] bg-[var(--card)] px-5 py-6 outline-none transition',
+            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] bg-[var(--gr-card)] px-5 py-6 outline-none transition',
             disabled
               ? 'opacity-60 cursor-not-allowed'
-              : 'cursor-pointer hover:bg-[var(--muted)] focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]',
-            isOver && !disabled ? 'border-[var(--ring)] bg-[var(--muted)]' : '',
+              : 'cursor-pointer hover:bg-[var(--gr-muted)] focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]',
+            isOver && !disabled ? 'border-[var(--gr-ring)] bg-[var(--gr-muted)]' : '',
           ]
     "
     @click="onRootClick"
@@ -505,10 +505,10 @@ defineExpose({
     <div v-else class="flex items-start gap-4">
       <div
         data-gr-file-upload-icon
-        class="h-12 w-12 shrink-0 rounded-[12px] bg-[var(--muted)] border border-[var(--brd)] flex items-center justify-center"
+        class="h-12 w-12 shrink-0 rounded-[12px] bg-[var(--gr-muted)] border border-[var(--gr-brd)] flex items-center justify-center"
         aria-hidden="true"
       >
-        <GrIcon class="h-6 w-6 text-[var(--muted-fg)]">
+        <GrIcon class="h-6 w-6 text-[var(--gr-muted-fg)]">
           <IconArrowUp />
         </GrIcon>
       </div>
@@ -522,10 +522,10 @@ defineExpose({
           </slot>
         </div>
 
-        <div v-if="$slots.tip" data-gr-file-upload-tip class="mt-1 text-[13px] text-[var(--muted-fg)]">
+        <div v-if="$slots.tip" data-gr-file-upload-tip class="mt-1 text-[13px] text-[var(--gr-muted-fg)]">
           <slot name="tip" />
         </div>
-        <div v-else class="mt-1 text-[13px] text-[var(--muted-fg)]" />
+        <div v-else class="mt-1 text-[13px] text-[var(--gr-muted-fg)]" />
 
         <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 space-y-1">
           <li
@@ -535,7 +535,7 @@ defineExpose({
             class="text-[13px]"
           >
             <span class="font-600">{{ file.name }}</span>
-            <span class="text-[var(--muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
+            <span class="text-[var(--gr-muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
           </li>
         </ul>
 
@@ -564,7 +564,7 @@ defineExpose({
               />
               <span
                 data-gr-file-upload-progress-text
-                class="text-[12px] text-[var(--muted-fg)] tabular-nums min-w-[3ch] text-right"
+                class="text-[12px] text-[var(--gr-muted-fg)] tabular-nums min-w-[3ch] text-right"
               >{{ progressText }}</span>
             </div>
           </div>

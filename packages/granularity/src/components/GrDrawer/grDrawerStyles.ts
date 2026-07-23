@@ -22,8 +22,8 @@ export function grDrawerPanelClass(options: { side: GrDrawerSide, size: GrDrawer
   return [
     panelSideClass[options.side],
     panelWidthBySize[options.size],
-    'border-[var(--brd)]',
-    'bg-[var(--card)] text-[var(--card-fg)]',
+    'border-[var(--gr-brd)]',
+    'bg-[var(--gr-card)] text-[var(--gr-card-fg)]',
     'shadow-[var(--gr-shadow-2)] outline-none',
   ].join(' ')
 }

@@ -21,7 +21,7 @@ function queueWorkflowToasts() {
       Queue workflow toasts
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
+    <div class="text-xs text-[var(--gr-muted-fg)]">
       One active `GrToaster` host is enough because `useToast` shares a global reactive store.
     </div>
 

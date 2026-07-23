@@ -24,7 +24,7 @@ function openDrawer(nextSize: 'md' | 'lg') {
     </div>
 
     <GrDrawer v-model="open" :title="`Escalation summary (${size})`" :size="size" :close-on-backdrop="false">
-      <div class="grid gap-3 text-sm text-[var(--muted-fg)]">
+      <div class="grid gap-3 text-sm text-[var(--gr-muted-fg)]">
         <p>Размер drawer удобно переключать под compact review или широкие inspector-сценарии.</p>
         <p>Backdrop закрытие отключено, чтобы случайный клик не сбрасывал прогресс.</p>
       </div>

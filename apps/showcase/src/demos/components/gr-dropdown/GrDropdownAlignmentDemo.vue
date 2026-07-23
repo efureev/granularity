@@ -15,7 +15,7 @@ const { t } = useFintI18n()
       <template #content>
         <div class="grid gap-1 px-3 py-2 text-sm">
           <div class="font-semibold">{{ t('components.GrDropdown.alignment.leftAligned') }}</div>
-          <div class="text-[var(--muted-fg)]">
+          <div class="text-[var(--gr-muted-fg)]">
             {{ t('components.GrDropdown.alignment.leftHint') }}
           </div>
         </div>
@@ -30,7 +30,7 @@ const { t } = useFintI18n()
       <template #content>
         <div class="grid gap-1 px-3 py-2 text-sm">
           <div class="font-semibold">{{ t('components.GrDropdown.alignment.centerAligned') }}</div>
-          <div class="text-[var(--muted-fg)]">
+          <div class="text-[var(--gr-muted-fg)]">
             {{ t('components.GrDropdown.alignment.centerHint') }}
           </div>
         </div>

@@ -149,7 +149,7 @@ const previewCode = computed(() => {
         <GrFormField :label="t('components.GrSwitch.builder.activeColor')">
           <GrInput
               v-model="activeBackgroundColor"
-              placeholder="#22c55e / var(--primary)"
+              placeholder="#22c55e / var(--gr-primary)"
               :aria-label="t('components.GrSwitch.builder.activeColorAria')"
           />
         </GrFormField>
@@ -157,13 +157,13 @@ const previewCode = computed(() => {
         <GrFormField :label="t('components.GrSwitch.builder.inactiveColor')">
           <GrInput
               v-model="inactiveBackgroundColor"
-              placeholder="#e5e7eb / var(--muted)"
+              placeholder="#e5e7eb / var(--gr-muted)"
               :aria-label="t('components.GrSwitch.builder.inactiveColorAria')"
           />
         </GrFormField>
       </div>
 
-      <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+      <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
         <GrSwitch v-model="checked" size="sm">
           {{ t('components.GrSwitch.builder.checked') }}
         </GrSwitch>

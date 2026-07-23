@@ -123,7 +123,7 @@ function onKeydown(event: KeyboardEvent): void {
 <template>
   <div
     data-gr-collapse-item
-    class="text-[var(--fg)]"
+    class="text-[var(--gr-fg)]"
   >
     <h3 class="m-0">
       <button
@@ -134,8 +134,8 @@ function onKeydown(event: KeyboardEvent): void {
         :aria-expanded="expanded ? 'true' : 'false'"
         :aria-controls="panelId"
         :disabled="resolvedDisabled"
-        class="w-full px-4 py-3 flex items-center justify-between gap-4 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="resolvedDisabled ? '' : 'hover:bg-[var(--muted)]'"
+        class="w-full px-4 py-3 flex items-center justify-between gap-4 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="resolvedDisabled ? '' : 'hover:bg-[var(--gr-muted)]'"
         @click="onToggle"
         @keydown="onKeydown"
       >
@@ -151,7 +151,7 @@ function onKeydown(event: KeyboardEvent): void {
           size="sm"
           aria-hidden="true"
           data-gr-collapse-chevron
-          class="shrink-0 transition-transform duration-150 text-[var(--muted-fg)]"
+          class="shrink-0 transition-transform duration-150 text-[var(--gr-muted-fg)]"
           :class="expanded ? 'rotate-180' : ''"
         >
           <ChevronDownIcon />
@@ -167,7 +167,7 @@ function onKeydown(event: KeyboardEvent): void {
       :class="expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
     >
       <div class="overflow-hidden">
-        <div class="px-4 pb-4 text-sm text-[var(--muted-fg)]">
+        <div class="px-4 pb-4 text-sm text-[var(--gr-muted-fg)]">
           <slot />
         </div>
       </div>

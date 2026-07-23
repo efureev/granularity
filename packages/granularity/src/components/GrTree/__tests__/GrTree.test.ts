@@ -112,7 +112,7 @@ describe('GrTree', () => {
 
     const childrenWrap = wrapper.get('.gr-tree__children-wrap')
     expect(childrenWrap.classes()).toContain('gr-tree__children-wrap--with-branch')
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--brd))')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--gr-brd))')
     expect(childrenWrap.attributes('style')).not.toContain('--gr-tree-branch-line-left')
 
     ;(wrapper.vm as any).setCurrentKey(1)
@@ -125,7 +125,7 @@ describe('GrTree', () => {
 
     ;(wrapper.vm as any).setCurrentKey(undefined)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--brd))')
+    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--gr-brd))')
   })
 
   it('поддерживает вычисление своих цветов полосы для каждой папки и не активирует предков глубже прямого уровня', async () => {

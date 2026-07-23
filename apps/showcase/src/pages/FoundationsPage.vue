@@ -336,7 +336,7 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                                   :style="{
                                     backgroundColor: token.hexValue ?? 'var(--showcase-surface-muted)',
                                     borderColor: token.hexValue
-                                      ? 'color-mix(in srgb, var(--fg) 12%, transparent)'
+                                      ? 'color-mix(in srgb, var(--gr-fg) 12%, transparent)'
                                       : 'var(--showcase-brd-strong)',
                                   }"
                               />
@@ -442,7 +442,7 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                                   :style="{
                                     backgroundColor: getActiveThemeTokenValue(token).hexValue ?? 'var(--showcase-surface-muted)',
                                     borderColor: getActiveThemeTokenValue(token).hexValue
-                                      ? 'color-mix(in srgb, var(--fg) 12%, transparent)'
+                                      ? 'color-mix(in srgb, var(--gr-fg) 12%, transparent)'
                                       : 'var(--showcase-brd-strong)',
                                   }"
                               />

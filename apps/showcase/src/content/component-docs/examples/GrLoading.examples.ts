@@ -48,8 +48,8 @@ const loading = ref(false)
     <GrLoading
       v-if="loading"
       text="Preparing migration plan..."
-      background="color-mix(in srgb, var(--fg) 78%, transparent)"
-      spinner-class="text-[var(--bg)] h-8 w-8"
+      background="color-mix(in srgb, var(--gr-fg) 78%, transparent)"
+      spinner-class="text-[var(--gr-bg)] h-8 w-8"
       :animated="false"
       :z-index="20"
     />

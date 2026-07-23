@@ -57,7 +57,7 @@ async function onSearch(query: string): Promise<void> {
       @search="onSearch"
     />
 
-    <p class="text-sm text-[var(--muted-fg)]">
+    <p class="text-sm text-[var(--gr-muted-fg)]">
       Options are fetched remotely via the debounced <code>@search</code> event; <code>:loading</code>
       drives the spinner and loading row. Stale responses are discarded to avoid races.
     </p>

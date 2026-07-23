@@ -1,57 +1,57 @@
 :root {
-  --gr-button-primary-bg: var(--primary);
-  --gr-button-primary-bg-hover: var(--primary-hover);
-  --gr-button-primary-bg-active: var(--primary-active);
-  --gr-button-primary-fg: var(--primary-fg);
-  --gr-button-primary-soft-bg: color-mix(in srgb, var(--primary) 14%, var(--bg));
-  --gr-button-primary-soft-bg-hover: color-mix(in srgb, var(--primary) 18%, var(--bg));
-  --gr-button-primary-soft-bg-active: color-mix(in srgb, var(--primary) 24%, var(--bg));
+  --gr-button-primary-bg: var(--gr-primary);
+  --gr-button-primary-bg-hover: var(--gr-primary-hover);
+  --gr-button-primary-bg-active: var(--gr-primary-active);
+  --gr-button-primary-fg: var(--gr-primary-fg);
+  --gr-button-primary-soft-bg: color-mix(in srgb, var(--gr-primary) 14%, var(--gr-bg));
+  --gr-button-primary-soft-bg-hover: color-mix(in srgb, var(--gr-primary) 18%, var(--gr-bg));
+  --gr-button-primary-soft-bg-active: color-mix(in srgb, var(--gr-primary) 24%, var(--gr-bg));
 
   --gr-button-success-bg: #047857;
   --gr-button-success-bg-hover: #036c4d;
   --gr-button-success-bg-active: #025f44;
   --gr-button-success-fg: var(--gr-success-fg);
   --gr-button-success-soft-bg: var(--gr-success-light);
-  --gr-button-success-soft-bg-hover: color-mix(in srgb, var(--gr-success) 20%, var(--bg));
-  --gr-button-success-soft-bg-active: color-mix(in srgb, var(--gr-success) 26%, var(--bg));
+  --gr-button-success-soft-bg-hover: color-mix(in srgb, var(--gr-success) 20%, var(--gr-bg));
+  --gr-button-success-soft-bg-active: color-mix(in srgb, var(--gr-success) 26%, var(--gr-bg));
 
   --gr-button-warning-bg: #c2410c;
   --gr-button-warning-bg-hover: #b53b0a;
   --gr-button-warning-bg-active: #9f3307;
   --gr-button-warning-fg: var(--gr-warning-fg);
   --gr-button-warning-soft-bg: var(--gr-warning-light);
-  --gr-button-warning-soft-bg-hover: color-mix(in srgb, var(--gr-warning) 20%, var(--bg));
-  --gr-button-warning-soft-bg-active: color-mix(in srgb, var(--gr-warning) 26%, var(--bg));
+  --gr-button-warning-soft-bg-hover: color-mix(in srgb, var(--gr-warning) 20%, var(--gr-bg));
+  --gr-button-warning-soft-bg-active: color-mix(in srgb, var(--gr-warning) 26%, var(--gr-bg));
 
   --gr-button-danger-bg: var(--gr-danger);
   --gr-button-danger-bg-hover: var(--gr-danger-hover);
   --gr-button-danger-bg-active: var(--gr-danger-active);
   --gr-button-danger-fg: var(--gr-danger-fg);
   --gr-button-danger-soft-bg: var(--gr-danger-light);
-  --gr-button-danger-soft-bg-hover: color-mix(in srgb, var(--gr-danger) 20%, var(--bg));
-  --gr-button-danger-soft-bg-active: color-mix(in srgb, var(--gr-danger) 26%, var(--bg));
+  --gr-button-danger-soft-bg-hover: color-mix(in srgb, var(--gr-danger) 20%, var(--gr-bg));
+  --gr-button-danger-soft-bg-active: color-mix(in srgb, var(--gr-danger) 26%, var(--gr-bg));
 
   --gr-button-info-bg: var(--gr-info);
   --gr-button-info-bg-hover: var(--gr-info-hover);
   --gr-button-info-bg-active: var(--gr-info-active);
   --gr-button-info-fg: var(--gr-info-fg);
   --gr-button-info-soft-bg: var(--gr-info-light);
-  --gr-button-info-soft-bg-hover: color-mix(in srgb, var(--gr-info) 20%, var(--bg));
-  --gr-button-info-soft-bg-active: color-mix(in srgb, var(--gr-info) 26%, var(--bg));
+  --gr-button-info-soft-bg-hover: color-mix(in srgb, var(--gr-info) 20%, var(--gr-bg));
+  --gr-button-info-soft-bg-active: color-mix(in srgb, var(--gr-info) 26%, var(--gr-bg));
 
   --gr-button-slate-bg: var(--gr-slate);
   --gr-button-slate-bg-hover: var(--gr-slate-hover);
   --gr-button-slate-bg-active: var(--gr-slate-active);
   --gr-button-slate-fg: var(--gr-slate-fg);
   --gr-button-slate-soft-bg: var(--gr-slate-light);
-  --gr-button-slate-soft-bg-hover: color-mix(in srgb, var(--gr-slate) 20%, var(--bg));
-  --gr-button-slate-soft-bg-active: color-mix(in srgb, var(--gr-slate) 26%, var(--bg));
+  --gr-button-slate-soft-bg-hover: color-mix(in srgb, var(--gr-slate) 20%, var(--gr-bg));
+  --gr-button-slate-soft-bg-active: color-mix(in srgb, var(--gr-slate) 26%, var(--gr-bg));
 
   --gr-button-azure-bg: #0369a1;
   --gr-button-azure-bg-hover: #075985;
   --gr-button-azure-bg-active: #0c4a6e;
   --gr-button-azure-fg: #ffffff;
   --gr-button-azure-soft-bg: var(--gr-azure-light);
-  --gr-button-azure-soft-bg-hover: color-mix(in srgb, var(--gr-azure) 20%, var(--bg));
-  --gr-button-azure-soft-bg-active: color-mix(in srgb, var(--gr-azure) 26%, var(--bg));
+  --gr-button-azure-soft-bg-hover: color-mix(in srgb, var(--gr-azure) 20%, var(--gr-bg));
+  --gr-button-azure-soft-bg-active: color-mix(in srgb, var(--gr-azure) 26%, var(--gr-bg));
 }

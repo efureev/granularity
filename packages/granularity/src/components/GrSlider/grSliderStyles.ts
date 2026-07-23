@@ -25,10 +25,10 @@ export const sliderPaddingBySize: Record<GrSliderSize, string> = {
   lg: 'py-2.5',
 }
 
-export const sliderRailClass = 'absolute inset-0 rounded-full bg-[color-mix(in_srgb,var(--muted)_45%,transparent)]'
-export const sliderFillClass = 'absolute top-0 bottom-0 rounded-full bg-[var(--primary)]'
+export const sliderRailClass = 'absolute inset-0 rounded-full bg-[color-mix(in_srgb,var(--gr-muted)_45%,transparent)]'
+export const sliderFillClass = 'absolute top-0 bottom-0 rounded-full bg-[var(--gr-primary)]'
 
-export const sliderThumbBaseClass = 'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--primary)] bg-[var(--bg)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]'
+export const sliderThumbBaseClass = 'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--gr-primary)] bg-[var(--gr-bg)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
 
 export function sliderThumbClass(options: { size: GrSliderSize, disabled: boolean }): string {
   return [
@@ -38,10 +38,10 @@ export function sliderThumbClass(options: { size: GrSliderSize, disabled: boolea
   ].join(' ')
 }
 
-export const sliderTooltipClass = 'pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-[6px] bg-[var(--fg)] px-1.5 py-0.5 text-[11px] font-medium leading-tight text-[var(--bg)] shadow-[var(--gr-shadow-2)]'
+export const sliderTooltipClass = 'pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-[6px] bg-[var(--gr-fg)] px-1.5 py-0.5 text-[11px] font-medium leading-tight text-[var(--gr-bg)] shadow-[var(--gr-shadow-2)]'
 
-export const sliderMarkTickClass = 'absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--bg)] ring-1 ring-[var(--brd)]'
-export const sliderMarkLabelClass = 'absolute top-full mt-1.5 -translate-x-1/2 text-[11px] leading-none text-[var(--muted-fg)]'
+export const sliderMarkTickClass = 'absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--gr-bg)] ring-1 ring-[var(--gr-brd)]'
+export const sliderMarkLabelClass = 'absolute top-full mt-1.5 -translate-x-1/2 text-[11px] leading-none text-[var(--gr-muted-fg)]'
 
 export function sliderRootClass(options: { size: GrSliderSize, disabled: boolean }): string {
   return [

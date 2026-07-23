@@ -9,7 +9,7 @@ const sizes = [12, 16, 20, 28, 36]
     <div
         v-for="size in sizes"
         :key="size"
-        class="flex flex-col items-center gap-2 text-xs text-[var(--muted-fg)]"
+        class="flex flex-col items-center gap-2 text-xs text-[var(--gr-muted-fg)]"
     >
       <GrIcon :size="size">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-full w-full">

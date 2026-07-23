@@ -37,8 +37,8 @@ export function grDropdownOriginClass(placement: Placement): string {
 export function grDropdownContentClass(contentClass?: string): string {
   return [
     'rounded-[var(--gr-radius-xl)]',
-    'border border-[var(--brd)]',
-    'bg-[var(--card)] text-[var(--card-fg)]',
+    'border border-[var(--gr-brd)]',
+    'bg-[var(--gr-card)] text-[var(--gr-card-fg)]',
     'shadow-[var(--gr-shadow-2)]',
     'p-1',
     contentClass,

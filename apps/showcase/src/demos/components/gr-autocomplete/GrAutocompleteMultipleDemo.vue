@@ -28,7 +28,7 @@ const teams = ref<string[]>(['design', 'platform'])
       aria-label="Add teams"
     />
 
-    <p class="text-sm text-[var(--muted-fg)]">
+    <p class="text-sm text-[var(--gr-muted-fg)]">
       Backspace on an empty query removes the last tag. Type a new value and press Enter to add a custom team.
     </p>
   </div>

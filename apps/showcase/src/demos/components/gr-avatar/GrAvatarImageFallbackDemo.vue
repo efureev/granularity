@@ -21,8 +21,8 @@ const avatarImageSrc = `data:image/svg+xml;charset=UTF-8,${avatarSvg}`
       <GrAvatar :size="72" shape="square" :src="avatarImageSrc" alt="Alex Doe" />
     </div>
 
-    <GrCard class="grid gap-2 p-4 text-sm text-[var(--muted-fg)]">
-      <div class="font-semibold text-[var(--fg)]">
+    <GrCard class="grid gap-2 p-4 text-sm text-[var(--gr-muted-fg)]">
+      <div class="font-semibold text-[var(--gr-fg)]">
         Fallback contract
       </div>
       <div>

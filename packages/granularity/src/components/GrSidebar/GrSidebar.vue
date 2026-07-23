@@ -79,13 +79,13 @@ const resolvedToggleLabel = computed(() =>
   <aside
     data-gr-sidebar
     :data-collapsed="collapsedState ? 'true' : undefined"
-    class="flex flex-col border-r border-[var(--sidebar-brd)] bg-[var(--sidebar)] text-[var(--sidebar-fg)] transition-[width] duration-200 ease-out"
+    class="flex flex-col border-r border-[var(--gr-sidebar-brd)] bg-[var(--gr-sidebar)] text-[var(--gr-sidebar-fg)] transition-[width] duration-200 ease-out"
     :style="asideStyle"
   >
     <div
       v-if="showHeader"
       data-gr-sidebar-header
-      class="flex items-center gap-2 border-b border-[var(--sidebar-brd)] px-3 py-4"
+      class="flex items-center gap-2 border-b border-[var(--gr-sidebar-brd)] px-3 py-4"
       :class="collapsedState ? 'justify-center' : 'justify-between'"
     >
       <div
@@ -95,7 +95,7 @@ const resolvedToggleLabel = computed(() =>
         <div
           v-if="$slots.subtitle || hasSubtitle"
           data-gr-sidebar-subtitle
-          class="truncate text-[14px] text-[var(--muted-fg)]"
+          class="truncate text-[14px] text-[var(--gr-muted-fg)]"
         >
           <slot name="subtitle">
             {{ subtitle }}

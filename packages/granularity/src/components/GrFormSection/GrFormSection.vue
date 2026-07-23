@@ -34,7 +34,7 @@ const descriptionId = useId()
       <div
         v-if="description"
         :id="descriptionId"
-        class="mt-1 text-[13px] text-[var(--muted-fg)]"
+        class="mt-1 text-[13px] text-[var(--gr-muted-fg)]"
       >
         {{ description }}
       </div>

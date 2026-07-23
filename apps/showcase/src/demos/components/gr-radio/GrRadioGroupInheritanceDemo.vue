@@ -15,12 +15,12 @@ const disabled = ref(false)
       <GrRadio value="production">Production</GrRadio>
     </GrRadioGroup>
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <GrSwitch v-model="disabled" size="sm">
         Disable full group
       </GrSwitch>
-      <div class="text-sm text-[var(--muted-fg)]">
-        Active target: <span class="font-semibold text-[var(--fg)]">{{ environment }}</span>
+      <div class="text-sm text-[var(--gr-muted-fg)]">
+        Active target: <span class="font-semibold text-[var(--gr-fg)]">{{ environment }}</span>
       </div>
     </div>
   </div>

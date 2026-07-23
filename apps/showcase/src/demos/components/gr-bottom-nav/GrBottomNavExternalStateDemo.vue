@@ -26,7 +26,7 @@ const items = [
     </div>
 
     <GrCard class="p-4">
-      <div class="text-sm text-[var(--muted-fg)]">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         `v-model` keeps the bottom navigation in sync with external actions.
       </div>
       <div class="mt-2 text-base font-semibold capitalize">

@@ -38,12 +38,12 @@ function openAt(index: number) {
         v-for="(slide, index) in slides"
         :key="slide.title"
         type="button"
-        class="group overflow-hidden rounded-xl border border-[var(--brd)] bg-[var(--bg)] text-left transition-transform hover:-translate-y-0.5"
+        class="group overflow-hidden rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-left transition-transform hover:-translate-y-0.5"
         @click="openAt(index)"
       >
         <img :src="slide.url" :alt="slide.title" class="h-36 w-full object-cover" >
         <div class="flex items-center justify-between gap-3 p-3">
-          <span class="text-sm font-600 text-[var(--fg)]">{{ slide.title }}</span>
+          <span class="text-sm font-600 text-[var(--gr-fg)]">{{ slide.title }}</span>
           <GrBadge size="sm" tone="neutral">
             Preview
           </GrBadge>

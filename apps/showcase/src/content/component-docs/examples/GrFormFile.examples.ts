@@ -35,7 +35,7 @@ const summary = computed(() => {
       />
     </GrFormField>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
       {{ summary }}
     </div>
   </div>
@@ -93,9 +93,9 @@ function validateFiles(files: File[]) {
       />
     </GrFormField>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Latest validation status:
-      <span class="font-semibold text-[var(--fg)]">
+      <span class="font-semibold text-[var(--gr-fg)]">
         {{ validationMessages[0] ?? 'Ready for upload review' }}
       </span>
     </div>
@@ -138,7 +138,7 @@ const totalSizeLabel = computed(() => {
       clear-all-text="Clear queue"
     />
 
-    <div class="rounded-2xl border border-dashed border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
       This scenario mirrors incident-report attachments where reviewers build a small queue before submitting the form.
     </div>
   </div>

@@ -45,7 +45,7 @@ const hasDescription = computed(() => !!slots.description || !!props.description
       </div>
       <div
         v-if="hasDescription"
-        class="text-[13px] text-[var(--muted-fg)] mt-0.5"
+        class="text-[13px] text-[var(--gr-muted-fg)] mt-0.5"
       >
         <slot name="description">
 {{ description }}

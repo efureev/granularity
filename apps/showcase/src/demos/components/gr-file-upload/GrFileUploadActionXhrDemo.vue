@@ -36,12 +36,12 @@ function onError(error: unknown) {
       @error="onError"
     />
 
-    <div class="text-sm text-[var(--muted-fg)] tabular-nums">
+    <div class="text-sm text-[var(--gr-muted-fg)] tabular-nums">
       phase: <strong>{{ phase }}</strong>
       <span v-if="lastError" class="text-[var(--danger)]"> · {{ lastError }}</span>
     </div>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Endpoint: <code>{{ ENDPOINT }}</code>. Прогресс приходит из
       <code>XMLHttpRequest.upload.onprogress</code>, отмена — через
       внутренний <code>AbortController</code>.

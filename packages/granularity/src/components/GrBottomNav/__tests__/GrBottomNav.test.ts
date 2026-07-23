@@ -18,8 +18,8 @@ describe('GrBottomNav', () => {
     const buttons = wrapper.findAll('button')
 
     expect(buttons).toHaveLength(2)
-    expect(buttons[0].classes()).toContain('text-[var(--primary)]')
-    expect(buttons[1].classes()).toContain('text-[var(--muted-fg)]')
+    expect(buttons[0].classes()).toContain('text-[var(--gr-primary)]')
+    expect(buttons[1].classes()).toContain('text-[var(--gr-muted-fg)]')
   })
 
   it('эмитит update:modelValue по клику', async () => {

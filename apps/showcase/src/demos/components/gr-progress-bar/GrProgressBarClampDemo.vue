@@ -13,7 +13,7 @@ const rows = [
     <div
       v-for="row in rows"
       :key="row.label"
-      class="grid gap-2 rounded-xl border border-[var(--brd)] bg-[var(--card)] p-3"
+      class="grid gap-2 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-3"
     >
       <div class="flex items-center justify-between gap-3 text-sm">
         <span>{{ row.label }}</span>

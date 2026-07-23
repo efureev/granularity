@@ -8,7 +8,7 @@ export type GrAutocompleteModelValue = string | string[]
  * т.к. фокус живёт на вложенном `<input role="combobox">`. Flex-контейнер с
  * `flex-wrap` — чтобы chips в multiple-режиме переносились и коробка росла в высоту.
  */
-export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-md border bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]'
+export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 // Размеры совпадают с `GrInput`/`GrSelect` (h → min-h, чтобы multiple мог расти).
 export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
@@ -19,7 +19,7 @@ export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
 }
 
 // Chip (multiple): удаляемый тег выбранного значения перед инпутом.
-export const autocompleteChipClass = 'inline-flex max-w-full items-center gap-1 rounded-[6px] bg-[color-mix(in_srgb,var(--muted)_35%,transparent)] px-1.5 py-0.5 text-[12px] leading-tight text-[var(--fg)]'
+export const autocompleteChipClass = 'inline-flex max-w-full items-center gap-1 rounded-[6px] bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)] px-1.5 py-0.5 text-[12px] leading-tight text-[var(--gr-fg)]'
 
 export function autocompleteShellClass(options: {
   size: GrAutocompleteSize
@@ -29,7 +29,7 @@ export function autocompleteShellClass(options: {
   return [
     autocompleteShellBase,
     autocompleteSizeClassBySize[options.size],
-    options.invalid ? 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]' : 'border-[var(--brd)]',
+    options.invalid ? 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]' : 'border-[var(--gr-brd)]',
     options.disabled ? 'cursor-not-allowed opacity-50' : '',
   ]
     .filter(Boolean)
@@ -41,4 +41,4 @@ export function autocompleteShellClass(options: {
  * (card + бордер + shadow-2 + скругление). Держим локальную копию строки,
  * чтобы не тянуть зависимость от `GrSelect` (компоненты гранулярно независимы).
  */
-export const autocompletePanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+export const autocompletePanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'

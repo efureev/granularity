@@ -172,7 +172,7 @@ function onButtonClick(): void {
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :tabindex="resolvedDisabled ? -1 : 0"
-    class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--ring),0_0_0_4px_var(--bg)]"
+    class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     :class="rootClassName"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
@@ -204,7 +204,7 @@ function onButtonClick(): void {
       />
     </span>
 
-    <span class="text-sm text-[var(--muted-fg)]">
+    <span class="text-sm text-[var(--gr-muted-fg)]">
       <slot />
     </span>
   </div>

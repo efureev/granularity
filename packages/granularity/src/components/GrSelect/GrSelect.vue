@@ -626,7 +626,7 @@ function clearSelection(): void {
     <span
       v-if="showNativeChevron"
       data-testid="gr-select-chevron"
-      class="absolute top-1/2 -translate-y-1/2 right-3 flex items-center text-[var(--muted-fg)] pointer-events-none"
+      class="absolute top-1/2 -translate-y-1/2 right-3 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
     >
       <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
     </span>
@@ -669,7 +669,7 @@ function clearSelection(): void {
         >
           <span
             class="block truncate"
-            :class="!hasSelection ? 'text-[var(--muted-fg)]' : ''"
+            :class="!hasSelection ? 'text-[var(--gr-muted-fg)]' : ''"
           >
             {{ displayText }}
           </span>
@@ -685,7 +685,7 @@ function clearSelection(): void {
       <span
         v-else
         data-testid="gr-select-chevron"
-        class="shrink-0 flex items-center text-[var(--muted-fg)] pointer-events-none"
+        class="shrink-0 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
       >
         <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
       </span>
@@ -696,7 +696,7 @@ function clearSelection(): void {
       data-testid="gr-select-clear"
       data-gr-select-clear
       type="button"
-      class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
+      class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)] disabled:opacity-50"
       :disabled="disabled"
       :aria-label="resolvedClearLabel"
       @click.stop="clearSelection"
@@ -721,7 +721,7 @@ function clearSelection(): void {
           :style="floatingStyle"
         >
           <div :class="panelClasses">
-            <div v-if="allowCustomValue" class="p-2 border-b border-[var(--brd)]">
+            <div v-if="allowCustomValue" class="p-2 border-b border-[var(--gr-brd)]">
               <GrInput
                 ref="customInputRef"
                 v-model="customValue"
@@ -746,7 +746,7 @@ function clearSelection(): void {
                 data-testid="gr-select-add-option"
                 data-gr-select-add-option
                 type="button"
-                class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]" :class="[
+                class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]" :class="[
                   view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
                 ]"
                 @click="addCustom"
@@ -759,7 +759,7 @@ function clearSelection(): void {
                   v-if="item.kind === 'group'"
                   data-gr-select-group-label
                   role="presentation"
-                  class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted-fg)]" :class="[
+                  class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
                   ]"
                 >
@@ -777,8 +777,8 @@ function clearSelection(): void {
                   :aria-disabled="item.option.disabled ? 'true' : undefined"
                   class="rounded-[10px] px-3 py-2 text-left text-[13px]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
-                    item.option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]',
-                    activeValue === item.option.value && !item.option.disabled ? 'bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]' : '',
+                    item.option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]',
+                    activeValue === item.option.value && !item.option.disabled ? 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]' : '',
                   ]"
                   @click="toggleValue(item.option.value)"
                   @mousemove="activeIndex = navigableValues.indexOf(item.option.value)"
@@ -787,7 +787,7 @@ function clearSelection(): void {
                     <span class="flex items-center gap-2 min-w-0">
                       <span
                         class="inline-block h-4 w-4 shrink-0"
-                        :class="isSelected(item.option.value) ? 'i-lucide-check text-[var(--primary)]' : ''"
+                        :class="isSelected(item.option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
                         aria-hidden="true"
                       />
                       <span class="truncate">{{ item.option.label }}</span>

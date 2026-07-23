@@ -14,7 +14,7 @@ import { GrIcon, GrLink } from '@feugene/granularity'
       </GrIcon>
     </GrLink>
 
-    <div class="rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4 text-[var(--muted-fg)]">
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-muted-fg)]">
       Use `external` when the link should automatically resolve `target="_blank"` и безопасный `rel`.
     </div>
   </div>

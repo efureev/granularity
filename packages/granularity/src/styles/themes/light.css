@@ -1,26 +1,26 @@
 :root {
   /* Surface roles */
-  --bg: #f8fafc;
-  --fg: #0f172a;
-  --card: #ffffff;
-  --card-fg: #0f172a;
-  --popover: #ffffff;
-  --popover-fg: #0f172a;
-  --muted: #f1f5f9;
-  --muted-fg: #64748b;
-  --secondary: #e2e8f0;
-  --secondary-fg: #1e293b;
-  --brd: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #6366f1;
+  --gr-bg: #f8fafc;
+  --gr-fg: #0f172a;
+  --gr-card: #ffffff;
+  --gr-card-fg: #0f172a;
+  --gr-popover: #ffffff;
+  --gr-popover-fg: #0f172a;
+  --gr-muted: #f1f5f9;
+  --gr-muted-fg: #64748b;
+  --gr-secondary: #e2e8f0;
+  --gr-secondary-fg: #1e293b;
+  --gr-brd: #e2e8f0;
+  --gr-input: #e2e8f0;
+  --gr-ring: #6366f1;
 
   /* Action roles */
-  --primary: #4f46e5;
-  --primary-fg: #ffffff;
-  --accent: #eef2ff;
-  --accent-fg: #3730a3;
-  --destructive: #dc2626;
-  --destructive-fg: #ffffff;
+  --gr-primary: #4f46e5;
+  --gr-primary-fg: #ffffff;
+  --gr-accent: #eef2ff;
+  --gr-accent-fg: #3730a3;
+  --gr-destructive: #dc2626;
+  --gr-destructive-fg: #ffffff;
 
   /* Status roles */
   --gr-success: #10b981;
@@ -49,34 +49,34 @@
   --gr-azure-text: #075985;
 
   /* Data visualization roles */
-  --chart-1: #4f46e5;
-  --chart-2: #10b981;
-  --chart-3: #f97316;
-  --chart-4: #6366f1;
-  --chart-5: #8b5cf6;
+  --gr-chart-1: #4f46e5;
+  --gr-chart-2: #10b981;
+  --gr-chart-3: #f97316;
+  --gr-chart-4: #6366f1;
+  --gr-chart-5: #8b5cf6;
 
   /* Navigation roles */
-  --sidebar: #ffffff;
-  --sidebar-fg: #0f172a;
-  --sidebar-primary: #4f46e5;
-  --sidebar-primary-fg: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-fg: #1e293b;
-  --sidebar-brd: #e2e8f0;
-  --sidebar-ring: #6366f1;
+  --gr-sidebar: #ffffff;
+  --gr-sidebar-fg: #0f172a;
+  --gr-sidebar-primary: #4f46e5;
+  --gr-sidebar-primary-fg: #ffffff;
+  --gr-sidebar-accent: #f1f5f9;
+  --gr-sidebar-accent-fg: #1e293b;
+  --gr-sidebar-brd: #e2e8f0;
+  --gr-sidebar-ring: #6366f1;
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
   :root {
     /* Action role fallbacks */
-    --primary-hover: #4a42d6;
-    --primary-active: #453ec7;
-    --secondary-hover: #d1d7e0;
-    --secondary-active: #c0c7d0;
-    --brd-hover: #a3a9b5;
-    --brd-active: #838a97;
-    --destructive-hover: #cc2526;
-    --destructive-active: #bb2427;
+    --gr-primary-hover: #4a42d6;
+    --gr-primary-active: #453ec7;
+    --gr-secondary-hover: #d1d7e0;
+    --gr-secondary-active: #c0c7d0;
+    --gr-brd-hover: #a3a9b5;
+    --gr-brd-active: #838a97;
+    --gr-destructive-hover: #cc2526;
+    --gr-destructive-active: #bb2427;
 
     /* Status role fallbacks */
     --gr-success-hover: #10ac7a;

@@ -21,7 +21,7 @@ export const textAlignClassByAlign: Record<GrNumberInputTextAlign, string> = {
 }
 
 export const borderClassByState: Record<GrNumberInputState, string> = {
-  default: 'border-[var(--brd)]',
+  default: 'border-[var(--gr-brd)]',
   success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',

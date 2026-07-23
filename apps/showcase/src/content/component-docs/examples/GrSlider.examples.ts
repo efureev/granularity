@@ -4,7 +4,7 @@ export const grSliderExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'slider-basic',
     title: 'Single value with tooltip',
-    description: 'Базовый ползунок: `v-model` (число), диапазон `min`/`max`, всплывающее значение (`show-tooltip` + `format-tooltip`). Полная клавиатура: ← / → меняют на `step`, PageUp/PageDown — крупный шаг, Home/End — к границам.',
+    description: 'Базовый ползунок: `v-model` (число), диапазон `min`/`max`, всплывающее значение (`show-tooltip` + `format-tooltip`). Полная клавиатура: стрелки меняют на `step`, PageUp/PageDown — крупный шаг, Home/End — к границам.',
     status: 'ready',
     previewKey: 'gr-slider-basic',
     code: `<script setup lang="ts">

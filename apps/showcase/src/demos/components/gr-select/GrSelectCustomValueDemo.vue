@@ -27,11 +27,11 @@ const region = ref('')
           <GrBadge>custom</GrBadge>
           <span class="truncate">{{ displayLabel }}</span>
         </span>
-        <span v-else class="text-[var(--muted-fg)]">{{ placeholder }}</span>
+        <span v-else class="text-[var(--gr-muted-fg)]">{{ placeholder }}</span>
       </template>
     </GrSelect>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       current value: {{ region || '—' }}
     </div>
   </div>

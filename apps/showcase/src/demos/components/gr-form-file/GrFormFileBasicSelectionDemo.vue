@@ -26,7 +26,7 @@ const summary = computed(() => {
       />
     </GrFormField>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
       {{ summary }}
     </div>
   </div>

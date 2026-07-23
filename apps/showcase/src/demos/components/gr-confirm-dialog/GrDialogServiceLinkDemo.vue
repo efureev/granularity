@@ -6,7 +6,7 @@ import { GrButton } from '@feugene/granularity'
 
 <template>
   <div class="grid gap-3">
-    <p class="text-sm text-[var(--muted-fg)]">
+    <p class="text-sm text-[var(--gr-muted-fg)]">
       Императивные вызовы диалогов (confirm / prompt / alert) из script/ts-секции без вставки
       компонента в шаблон вынесены на отдельную страницу сервиса useDialogService.
     </p>

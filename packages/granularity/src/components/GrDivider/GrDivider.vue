@@ -37,7 +37,7 @@ const hasLabel = computed(() =>
     data-gr-divider
     role="separator"
     aria-orientation="vertical"
-    class="inline-block w-px self-stretch bg-[var(--brd)]"
+    class="inline-block w-px self-stretch bg-[var(--gr-brd)]"
   />
 
   <div
@@ -45,16 +45,16 @@ const hasLabel = computed(() =>
     data-gr-divider
     role="separator"
     aria-orientation="horizontal"
-    class="flex w-full items-center gap-3 text-xs text-[var(--muted-fg)]"
+    class="flex w-full items-center gap-3 text-xs text-[var(--gr-muted-fg)]"
   >
-    <span v-if="align !== 'start'" class="h-px flex-1 bg-[var(--brd)]" />
+    <span v-if="align !== 'start'" class="h-px flex-1 bg-[var(--gr-brd)]" />
     <span class="shrink-0"><slot>{{ label }}</slot></span>
-    <span v-if="align !== 'end'" class="h-px flex-1 bg-[var(--brd)]" />
+    <span v-if="align !== 'end'" class="h-px flex-1 bg-[var(--gr-brd)]" />
   </div>
 
   <hr
     v-else
     data-gr-divider
-    class="h-px w-full border-0 bg-[var(--brd)]"
+    class="h-px w-full border-0 bg-[var(--gr-brd)]"
   >
 </template>

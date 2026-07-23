@@ -151,7 +151,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations themes",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. themes themes встроенные `light`/`dark` темы отделены от foundation-токенов. theme layer задае т semantic-значения (`--bg`, `--primary`, `--brd`) и статусные роли. интерактивныи просмотр текущего theme-реестра прямо на странице."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. themes themes встроенные `light`/`dark` темы отделены от foundation-токенов. theme layer задае т semantic-значения (`--gr-bg`, `--gr-primary`, `--gr-brd`) и статусные роли. интерактивныи просмотр текущего theme-реестра прямо на странице."
   },
   {
     "id": "page:foundations:section:tokens",

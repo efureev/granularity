@@ -7,8 +7,8 @@ function withVar(token: string): string {
 }
 
 const toneVars: Record<GrProgressBarTone, string> = {
-  primary: 'var(--pb-bg,var(--primary))',
-  neutral: 'var(--pb-neutral-bg,var(--secondary))',
+  primary: 'var(--pb-bg,var(--gr-primary))',
+  neutral: 'var(--pb-neutral-bg,var(--gr-secondary))',
   success: 'var(--pb-success-bg,var(--gr-success))',
   warning: 'var(--pb-warning-bg,var(--gr-warning))',
   danger: 'var(--pb-danger-bg,var(--gr-danger))',

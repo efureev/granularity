@@ -23,10 +23,10 @@ withDefaults(defineProps<GrEmptyStateProps>(), {
 <template>
   <div
     data-gr-empty-state
-    class="rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--card)] p-6 text-center"
+    class="rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-6 text-center"
   >
     <div class="flex justify-center">
-      <div class="h-12 w-12 rounded-[12px] bg-[var(--muted)] border border-[var(--brd)] flex items-center justify-center text-[var(--muted-fg)]">
+      <div class="h-12 w-12 rounded-[12px] bg-[var(--gr-muted)] border border-[var(--gr-brd)] flex items-center justify-center text-[var(--gr-muted-fg)]">
         <slot name="icon">
           <GrIcon :size="24">
             <IconInbox aria-hidden="true" />
@@ -39,7 +39,7 @@ withDefaults(defineProps<GrEmptyStateProps>(), {
       {{ title }}
     </div>
 
-    <div v-if="description" class="mt-1 text-[13px] text-[var(--muted-fg)]">
+    <div v-if="description" class="mt-1 text-[13px] text-[var(--gr-muted-fg)]">
       {{ description }}
     </div>
 

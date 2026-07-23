@@ -99,7 +99,7 @@ const open = ref(false)
   </GrButton>
 
   <GrConfirmDialog v-model="open" title="Archive sprint" confirm-text="Archive">
-    <ul class="list-disc pl-5 text-sm text-[var(--muted-fg)]">
+    <ul class="list-disc pl-5 text-sm text-[var(--gr-muted-fg)]">
       <li>18 tasks will move to history</li>
       <li>2 blocked items will stay pinned</li>
     </ul>

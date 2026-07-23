@@ -4,7 +4,7 @@ import { GrBadgeWrap, GrButton } from '@feugene/granularity'
 
 <template>
   <div class="grid gap-4">
-    <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <GrBadgeWrap :value="2">
         <GrButton size="sm" variant="ghost-border">Inbox</GrButton>
       </GrBadgeWrap>
@@ -16,7 +16,7 @@ import { GrBadgeWrap, GrButton } from '@feugene/granularity'
       <GrButton size="sm" variant="ghost-border">Audit log</GrButton>
     </div>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Because `GrBadgeWrap` is slot-based, it can decorate buttons, tabs, icons or avatars without changing their internals.
     </div>
   </div>

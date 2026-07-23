@@ -455,7 +455,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
             v-if="!disabled"
             type="button"
             data-gr-autocomplete-chip-remove
-            class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[var(--muted-fg)] hover:text-[var(--fg)]"
+            class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             :aria-label="t('gr.inputTag.removeTag', 'Remove tag')"
             tabindex="-1"
             @click="removeValue(option.value)"
@@ -486,7 +486,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
         :aria-controls="open ? listboxId : undefined"
         :aria-activedescendant="activeDescendantId"
         :aria-expanded="open ? 'true' : 'false'"
-        class="min-w-0 flex-1 bg-transparent text-inherit placeholder:text-[var(--muted-fg)] focus:outline-none disabled:cursor-not-allowed"
+        class="min-w-0 flex-1 bg-transparent text-inherit placeholder:text-[var(--gr-muted-fg)] focus:outline-none disabled:cursor-not-allowed"
         @input="onInput"
         @focus="onFocus"
         @keydown="onKeydown"
@@ -496,7 +496,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
       <span
         v-if="loading"
         data-gr-autocomplete-spinner
-        class="shrink-0 flex items-center text-[var(--muted-fg)]"
+        class="shrink-0 flex items-center text-[var(--gr-muted-fg)]"
       >
         <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" aria-hidden="true" />
       </span>
@@ -506,7 +506,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
         type="button"
         data-testid="gr-autocomplete-clear"
         data-gr-autocomplete-clear
-        class="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)]"
+        class="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
         :aria-label="resolvedClearLabel"
         tabindex="-1"
         @click="clearSelection"
@@ -517,7 +517,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
       <span
         v-else
         data-testid="gr-autocomplete-chevron"
-        class="shrink-0 flex items-center text-[var(--muted-fg)] pointer-events-none"
+        class="shrink-0 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
       >
         <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
       </span>
@@ -554,7 +554,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
                 type="button"
                 data-testid="gr-autocomplete-add-option"
                 data-gr-autocomplete-add-option
-                class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]"
+                class="w-full rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]"
                 @click="commitCustom"
               >
                 {{ t('gr.autocomplete.addOption', 'Add "{value}"', { value: query.trim() }) }}
@@ -571,8 +571,8 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
                 :aria-selected="isSelected(option.value) ? 'true' : 'false'"
                 :aria-disabled="option.disabled ? 'true' : undefined"
                 class="w-full rounded-[10px] px-3 py-2 text-left text-[13px]" :class="[
-                  option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]',
-                  activeValue === option.value && !option.disabled ? 'bg-[color-mix(in_srgb,var(--muted)_30%,transparent)]' : '',
+                  option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]',
+                  activeValue === option.value && !option.disabled ? 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]' : '',
                 ]"
                 @click="chooseOption(option)"
                 @mousemove="activeIndex = navigableValues.indexOf(option.value)"
@@ -581,7 +581,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
                   <span class="flex items-center gap-2 min-w-0">
                     <span
                       class="inline-block h-4 w-4 shrink-0"
-                      :class="isSelected(option.value) ? 'i-lucide-check text-[var(--primary)]' : ''"
+                      :class="isSelected(option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
                       aria-hidden="true"
                     />
                     <span class="truncate">{{ option.label }}</span>
@@ -593,7 +593,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
               <div
                 v-if="showLoading"
                 data-gr-autocomplete-loading
-                class="flex items-center gap-2 px-3 py-2 text-[13px] text-[var(--muted-fg)]"
+                class="flex items-center gap-2 px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]"
               >
                 <slot name="loading">
                   <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" aria-hidden="true" />
@@ -604,7 +604,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
               <div
                 v-else-if="showEmpty && belowMinQuery"
                 data-gr-autocomplete-hint
-                class="px-3 py-2 text-[13px] text-[var(--muted-fg)]"
+                class="px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]"
               >
                 {{ resolvedTypeMoreText }}
               </div>
@@ -612,7 +612,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
               <div
                 v-else-if="showEmpty"
                 data-gr-autocomplete-empty
-                class="px-3 py-2 text-[13px] text-[var(--muted-fg)]"
+                class="px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]"
               >
                 <slot name="empty">
                   {{ resolvedNoResultsText }}

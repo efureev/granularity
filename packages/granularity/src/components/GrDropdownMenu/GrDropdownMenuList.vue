@@ -16,9 +16,9 @@ const props = withDefaults(defineProps<GrDropdownMenuListProps>(), {
 const className = computed(() => {
   return [
     'w-full',
-    props.dividers ? 'divide-y divide-[var(--brd)]' : '',
-    props.borderTop ? 'border-t border-[var(--brd)]' : '',
-    props.borderBottom ? 'border-b border-[var(--brd)]' : '',
+    props.dividers ? 'divide-y divide-[var(--gr-brd)]' : '',
+    props.borderTop ? 'border-t border-[var(--gr-brd)]' : '',
+    props.borderBottom ? 'border-b border-[var(--gr-brd)]' : '',
   ].filter(Boolean).join(' ')
 })
 </script>

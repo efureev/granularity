@@ -25,16 +25,16 @@ const statusLabel = computed(() => statusOptions.find(option => option.value ===
 
 <template>
   <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
-    <div class="grid gap-4 rounded-[24px] border border-[var(--brd)] bg-[var(--card)] p-5">
+    <div class="grid gap-4 rounded-[24px] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
       <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrSegmented.states.languageSwitcher') }}
         </div>
         <GrSegmented v-model="locale" :options="localeOptions" size="sm" :indicator-duration="220" :aria-label="t('components.GrSegmented.states.languageAria')" />
       </div>
 
       <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrSegmented.states.blockLayout') }}
         </div>
         <GrSegmented
@@ -48,9 +48,9 @@ const statusLabel = computed(() => statusOptions.find(option => option.value ===
       </div>
     </div>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
       {{ t('components.GrSegmented.states.selectedState') }}
-      <div class="mt-2 text-base font-semibold text-[var(--fg)]">
+      <div class="mt-2 text-base font-semibold text-[var(--gr-fg)]">
         {{ statusLabel }}
       </div>
       <div class="mt-3 text-sm">

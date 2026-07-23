@@ -30,7 +30,7 @@ const activeLabel = computed(() => {
 
 <template>
   <div class="grid gap-3">
-    <div class="flex items-center gap-2 text-sm text-[var(--muted-fg)]">
+    <div class="flex items-center gap-2 text-sm text-[var(--gr-muted-fg)]">
       <span>Open panel:</span>
       <GrBadge tone="secondary">{{ activeLabel }}</GrBadge>
     </div>

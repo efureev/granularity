@@ -14,7 +14,7 @@ const navItems = ['Overview', 'Deployments', 'Billing', 'Settings']
     открывает off-canvas панель навигации. На десктопе кнопку прячут (`sm:hidden`),
     а разделы живут в боковой панели.
   -->
-  <div class="relative overflow-hidden rounded-2xl border border-[var(--brd)] bg-[var(--bg)] shadow-[var(--gr-shadow-1)]">
+  <div class="relative overflow-hidden rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] shadow-[var(--gr-shadow-1)]">
     <GrNavbar
       title="Mobile shell"
       show-menu-button
@@ -31,13 +31,13 @@ const navItems = ['Overview', 'Deployments', 'Billing', 'Settings']
       >
         <nav
           v-if="isMenuOpen"
-          class="absolute inset-y-0 left-0 z-10 w-52 border-r border-[var(--brd)] bg-[var(--card)] p-3"
+          class="absolute inset-y-0 left-0 z-10 w-52 border-r border-[var(--gr-brd)] bg-[var(--gr-card)] p-3"
         >
           <button
             v-for="item in navItems"
             :key="item"
             type="button"
-            class="block w-full rounded-lg px-3 py-2 text-left text-sm text-[var(--fg)] transition-colors hover:bg-[var(--muted)]"
+            class="block w-full rounded-lg px-3 py-2 text-left text-sm text-[var(--gr-fg)] transition-colors hover:bg-[var(--gr-muted)]"
             @click="isMenuOpen = false"
           >
             {{ item }}
@@ -45,7 +45,7 @@ const navItems = ['Overview', 'Deployments', 'Billing', 'Settings']
         </nav>
       </transition>
 
-      <div class="p-5 text-sm text-[var(--muted-fg)]">
+      <div class="p-5 text-sm text-[var(--gr-muted-fg)]">
         {{ isMenuOpen ? 'Navigation drawer is open — pick a section.' : 'Tap the hamburger to open the navigation drawer.' }}
       </div>
     </div>

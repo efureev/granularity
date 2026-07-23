@@ -28,7 +28,7 @@ describe('GrRadio (button)', () => {
     expect(btn.attributes('class')).toContain('items-center')
     expect(btn.attributes('class')).toContain('rounded-md')
     expect(btn.attributes('class')).toContain('h-11')
-    expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg,var(--primary))]')
+    expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg,var(--gr-primary))]')
   })
 
   it('эмитит update:modelValue при клике (standalone v-model)', async () => {

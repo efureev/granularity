@@ -8,7 +8,7 @@ const expanded = ref<Array<string | number>>(['summary', 'alerts'])
 
 <template>
   <div class="grid gap-3">
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Multi-expand mode works well for dense dashboards where several sections should stay visible together.
     </div>
 

@@ -42,7 +42,7 @@ const resolvedConfig = computed(() =>
 const rootClass = computed(() => [
   resolvedConfig.value.paddingX,
   resolvedConfig.value.paddingY,
-  resolvedConfig.value.bordered ? 'border-b border-[var(--brd)]' : '',
+  resolvedConfig.value.bordered ? 'border-b border-[var(--gr-brd)]' : '',
   'flex items-center justify-between gap-4',
 ])
 

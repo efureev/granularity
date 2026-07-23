@@ -23,12 +23,12 @@ import IconInfo from '~icons/lucide/info'
 
 export interface GrTooltipProps {
   text: string
-  /** Цвет триггер-иконки (CSS color). По умолчанию — `var(--muted-fg)`. */
+  /** Цвет триггер-иконки (CSS color). По умолчанию — `var(--gr-muted-fg)`. */
   iconColor?: string
 }
 
 const props = withDefaults(defineProps<GrTooltipProps>(), {
-  iconColor: 'var(--muted-fg)',
+  iconColor: 'var(--gr-muted-fg)',
 })
 
 const tooltipId = `gr-tooltip-${useId()}`
@@ -112,7 +112,7 @@ onUnmounted(() => {
           ref="panelEl"
           role="tooltip"
           data-gr-tooltip-panel
-          class="pointer-events-none max-w-[280px] rounded-md border border-[var(--brd)] bg-[var(--popover)] px-2 py-1 text-[12px] text-[var(--popover-fg)] shadow-[var(--gr-shadow-1)]"
+          class="pointer-events-none max-w-[280px] rounded-md border border-[var(--gr-brd)] bg-[var(--gr-popover)] px-2 py-1 text-[12px] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
           :style="floatingStyle"
         >
           {{ text }}

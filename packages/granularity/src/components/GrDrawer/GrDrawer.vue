@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
             >
               <div
                 data-gr-drawer-header
-                class="px-5 py-4 border-b border-[var(--brd)] flex items-center justify-between gap-4"
+                class="px-5 py-4 border-b border-[var(--gr-brd)] flex items-center justify-between gap-4"
               >
                 <DialogTitle :id="titleId" as="div" data-gr-drawer-title class="text-[14px] font-700 min-w-0 truncate">
                   <slot name="title">
@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
               <div
                 v-if="$slots.footer"
                 data-gr-drawer-footer
-                class="px-5 py-4 border-t border-[var(--brd)]"
+                class="px-5 py-4 border-t border-[var(--gr-brd)]"
               >
                 <slot name="footer" />
               </div>

@@ -46,7 +46,7 @@ async function triggerFormDemo() {
 
 <template>
   <GrCard class="grid gap-3 p-4">
-    <p class="text-[12px] text-[var(--muted-fg)]">
+    <p class="text-[12px] text-[var(--gr-muted-fg)]">
       {{ t(`${NS}.form.description`) }}
     </p>
 

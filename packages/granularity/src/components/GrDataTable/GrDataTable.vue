@@ -206,7 +206,7 @@ function cellValue(row: TRow, key: string): unknown {
             <button
               v-if="col.sortable"
               type="button"
-              class="inline-flex items-center gap-2 text-[var(--muted-fg)] hover:text-[var(--fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
+              class="inline-flex items-center gap-2 text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
               :aria-label="sortButtonLabel(col)"
               @click="toggleSort(col)"
             >
@@ -220,7 +220,7 @@ function cellValue(row: TRow, key: string): unknown {
                 </GrIcon>
               </span>
             </button>
-            <span v-else class="text-[var(--muted-fg)]">{{ col.label }}</span>
+            <span v-else class="text-[var(--gr-muted-fg)]">{{ col.label }}</span>
           </div>
         </th>
       </tr>
@@ -228,7 +228,7 @@ function cellValue(row: TRow, key: string): unknown {
 
     <template v-if="isEmpty">
       <tr data-gr-datatable-empty>
-        <td :colspan="columns.length" class="px-4 py-6 text-center text-[var(--muted-fg)]">
+        <td :colspan="columns.length" class="px-4 py-6 text-center text-[var(--gr-muted-fg)]">
           <slot name="empty">
 Нет данных
 </slot>
@@ -239,7 +239,7 @@ function cellValue(row: TRow, key: string): unknown {
       v-for="row in sortedRows"
       v-else
       :key="rowKeyValue(row)"
-      class="border-t border-[var(--brd)]"
+      class="border-t border-[var(--gr-brd)]"
       data-gr-datatable-row
     >
       <td

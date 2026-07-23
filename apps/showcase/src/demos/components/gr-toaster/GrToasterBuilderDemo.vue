@@ -143,8 +143,8 @@ const previewCode = computed(() => {
             </GrButton>
           </div>
 
-          <div class="text-xs text-[var(--muted-fg)]">
-            Active host: <span class="font-medium text-[var(--fg)]">{{ isActiveHost ? 'this preview' : 'another preview' }}</span>
+          <div class="text-xs text-[var(--gr-muted-fg)]">
+            Active host: <span class="font-medium text-[var(--gr-fg)]">{{ isActiveHost ? 'this preview' : 'another preview' }}</span>
           </div>
 
           <div
@@ -200,9 +200,9 @@ const previewCode = computed(() => {
         </GrFormField>
       </div>
 
-      <GrCard class="grid gap-2 p-4 text-xs text-[var(--muted-fg)]">
+      <GrCard class="grid gap-2 p-4 text-xs text-[var(--gr-muted-fg)]">
         <div>
-          <span class="font-medium text-[var(--fg)]">Tip:</span> set timeout to 0 for warnings that require acknowledgement.
+          <span class="font-medium text-[var(--gr-fg)]">Tip:</span> set timeout to 0 for warnings that require acknowledgement.
         </div>
         <div>
           Active host pattern keeps a single `GrToaster` rendered for the shared `useToast` store.

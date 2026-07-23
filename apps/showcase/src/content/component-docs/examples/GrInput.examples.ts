@@ -40,14 +40,14 @@ const invalid = ref(false)
       </GrFormField>
     </div>
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Validation toggle
       </div>
       <GrSwitch v-model="invalid" size="sm">
         Show invalid email state
       </GrSwitch>
-      <div class="text-sm text-[var(--muted-fg)]">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         Search query: {{ search || '—' }}
       </div>
     </div>
@@ -195,8 +195,8 @@ const sizeValues = {
 
 <template>
   <div class="grid gap-4">
-    <div class="grid gap-2 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+    <div class="grid gap-2 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Text alignment
       </div>
       <GrRadioGroup v-model="alignment" :options="alignmentOptions" variant="button" size="sm" />
@@ -205,19 +205,19 @@ const sizeValues = {
 
     <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--muted-fg)]">xs</div>
+        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">xs</div>
         <GrInput v-model="sizeValues.xs.value" size="xs" placeholder="Extra small" />
       </div>
       <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--muted-fg)]">sm</div>
+        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">sm</div>
         <GrInput v-model="sizeValues.sm.value" size="sm" placeholder="Small" />
       </div>
       <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--muted-fg)]">md</div>
+        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">md</div>
         <GrInput v-model="sizeValues.md.value" size="md" placeholder="Medium" />
       </div>
       <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--muted-fg)]">lg</div>
+        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">lg</div>
         <GrInput v-model="sizeValues.lg.value" size="lg" placeholder="Large" />
       </div>
     </div>

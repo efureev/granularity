@@ -95,7 +95,7 @@ describe('GrSelect', () => {
 
     const linkLabel = linkWrapper.get('[data-gr-select-link-label]')
     expect(linkLabel.attributes('class')).toContain('inline-block')
-    expect(linkLabel.attributes('class')).toContain('text-[var(--muted-fg)]')
+    expect(linkLabel.attributes('class')).toContain('text-[var(--gr-muted-fg)]')
     expect(linkLabel.attributes('class')).toContain('no-underline')
 
     const defaultWrapper = mount(GrSelect, {
@@ -107,7 +107,7 @@ describe('GrSelect', () => {
     })
 
     const defaultSelect = defaultWrapper.get('select')
-    expect(defaultSelect.attributes('class')).toContain('border-[var(--brd)]')
+    expect(defaultSelect.attributes('class')).toContain('border-[var(--gr-brd)]')
   })
 
   it('в native-режиме добавляет option для modelValue, которого нет в options, когда allowCustomValue=true', () => {

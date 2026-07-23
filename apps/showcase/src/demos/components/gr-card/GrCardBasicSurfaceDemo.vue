@@ -4,8 +4,8 @@ import {GrCard, GrButton} from "@feugene/granularity";
 <template>
   <GrCard class="grid gap-4 p-5">
     <div>
-      <div class="text-sm font-semibold text-[var(--fg)]">Basic card</div>
-      <div class="mt-1 text-sm text-[var(--muted-fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">Basic card</div>
+      <div class="mt-1 text-sm text-[var(--gr-muted-fg)]">
         Use cards to group related content and keep border/background treatment consistent across the app shell.
       </div>
     </div>

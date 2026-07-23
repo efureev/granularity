@@ -27,7 +27,7 @@ const fixed = ref(true)
     </div>
 
     <div class="grid content-start gap-2">
-      <div class="text-xs font-600 uppercase tracking-wide text-[var(--muted-fg)]">
+      <div class="text-xs font-600 uppercase tracking-wide text-[var(--gr-muted-fg)]">
         Target field
       </div>
 
@@ -43,7 +43,7 @@ const fixed = ref(true)
         <template #suffix>{{ suffixText }}</template>
       </GrInput>
 
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         <template v-if="fixed">
           Fixed: аддоны держат заданную ширину, лишний текст обрезается — prefix с правого
           края, suffix с левого. Контент никогда не вылезает за рамки поля.

@@ -100,7 +100,7 @@ provide(GR_COLLAPSE_CONTEXT, context)
 
 <template>
   <GrCard data-gr-collapse>
-    <div :class="divided ? 'divide-y divide-[var(--brd)]' : ''">
+    <div :class="divided ? 'divide-y divide-[var(--gr-brd)]' : ''">
       <slot />
     </div>
   </GrCard>

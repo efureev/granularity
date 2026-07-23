@@ -10,7 +10,7 @@ const open = ref(false)
 
 <template>
   <div class="grid gap-3">
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       {{ t('components.GrModal.guarded.hint') }}
     </div>
 
@@ -21,15 +21,15 @@ const open = ref(false)
     <GrModal v-model="open" :close-on-backdrop="false" size="md">
       <div class="grid gap-4">
         <div class="grid gap-1">
-          <div class="text-sm font-semibold text-[var(--fg)]">
+          <div class="text-sm font-semibold text-[var(--gr-fg)]">
             {{ t('components.GrModal.guarded.protectionTitle') }}
           </div>
-          <div class="text-sm text-[var(--muted-fg)]">
+          <div class="text-sm text-[var(--gr-muted-fg)]">
             {{ t('components.GrModal.guarded.protectionBody') }}
           </div>
         </div>
 
-        <div class="rounded-2xl border border-[var(--brd)] bg-[var(--muted)]/40 p-3 text-sm text-[var(--muted-fg)]">
+        <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-muted)]/40 p-3 text-sm text-[var(--gr-muted-fg)]">
           {{ t('components.GrModal.guarded.unsavedChanges') }}
         </div>
 

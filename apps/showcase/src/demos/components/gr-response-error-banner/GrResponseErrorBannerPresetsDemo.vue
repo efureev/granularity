@@ -195,18 +195,18 @@ const currentJson = computed(() => currentError.value ? JSON.stringify(currentEr
         @dismiss="onDismiss"
     />
 
-    <details class="text-[12px] text-[var(--muted-fg)]">
+    <details class="text-[12px] text-[var(--gr-muted-fg)]">
       <summary class="cursor-pointer">
         {{ t(`${NS}.Current ResponseErrorInfo (JSON)`) }}
       </summary>
-      <pre class="mt-2 overflow-x-auto rounded bg-[var(--muted)] p-3">{{ currentJson }}</pre>
+      <pre class="mt-2 overflow-x-auto rounded bg-[var(--gr-muted)] p-3">{{ currentJson }}</pre>
     </details>
 
     <div class="grid gap-1">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         {{ t(`${NS}.Event log`) }}
       </div>
-      <pre class="max-h-[160px] overflow-auto rounded bg-[var(--muted)] p-3 text-[12px]">{{
+      <pre class="max-h-[160px] overflow-auto rounded bg-[var(--gr-muted)] p-3 text-[12px]">{{
           eventLog.join('\n') || '—'
         }}</pre>
     </div>

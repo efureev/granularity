@@ -25,8 +25,8 @@ const invalid = ref(false)
       </GrFormField>
     </div>
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Validation toggle
       </div>
       <GrSwitch v-model="invalid" size="sm">

@@ -29,7 +29,7 @@ const panelCity = ref('Chengdu')
 <template>
   <div class="grid gap-4 lg:grid-cols-2">
     <div class="grid gap-2">
-      <span class="text-sm text-[var(--muted-fg)]">Native (optgroup)</span>
+      <span class="text-sm text-[var(--gr-muted-fg)]">Native (optgroup)</span>
       <GrSelect
         v-model="nativeCity"
         :options="groupedOptions"
@@ -39,7 +39,7 @@ const panelCity = ref('Chengdu')
     </div>
 
     <div class="grid gap-2">
-      <span class="text-sm text-[var(--muted-fg)]">Panel (group headers)</span>
+      <span class="text-sm text-[var(--gr-muted-fg)]">Panel (group headers)</span>
       <GrSelect
         v-model="panelCity"
         optionsView="panel"

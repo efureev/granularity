@@ -33,7 +33,7 @@ const budget = ref('240000')
         <template #suffix>Monthly recurring revenue</template>
       </GrNumberInput>
 
-      <div class="rounded-2xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/40 p-4 text-sm text-[var(--muted-fg)]">
+      <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/40 p-4 text-sm text-[var(--gr-muted-fg)]">
         `textAlign` помогает согласовать числовые поля с табличными layout и формами с денежными значениями.
       </div>
     </div>

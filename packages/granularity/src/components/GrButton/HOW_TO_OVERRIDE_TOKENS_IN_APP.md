@@ -41,8 +41,8 @@
   --gr-button-azure-bg-active: #0c4a6e;
   --gr-button-azure-fg: #ffffff;
   --gr-button-azure-soft-bg: #e0f2fe;
-  --gr-button-azure-soft-bg-hover: color-mix(in srgb, #0ea5e9 20%, var(--bg));
-  --gr-button-azure-soft-bg-active: color-mix(in srgb, #0ea5e9 26%, var(--bg));
+  --gr-button-azure-soft-bg-hover: color-mix(in srgb, #0ea5e9 20%, var(--gr-bg));
+  --gr-button-azure-soft-bg-active: color-mix(in srgb, #0ea5e9 26%, var(--gr-bg));
 }
 ```
 
@@ -89,8 +89,8 @@
   --gr-button-info-bg-active: #1e293b;
   --gr-button-info-fg: #ffffff;
   --gr-button-info-soft-bg: #e2e8f0;
-  --gr-button-info-soft-bg-hover: color-mix(in srgb, #475569 20%, var(--bg));
-  --gr-button-info-soft-bg-active: color-mix(in srgb, #475569 26%, var(--bg));
+  --gr-button-info-soft-bg-hover: color-mix(in srgb, #475569 20%, var(--gr-bg));
+  --gr-button-info-soft-bg-active: color-mix(in srgb, #475569 26%, var(--gr-bg));
 }
 </style>
 ```
@@ -117,7 +117,7 @@
 - `slate`
 - `azure`
 
-Отдельно `neutral` в `GrButton` использует общие surface token'ы (`--secondary`, `--secondary-hover`, `--secondary-active`, `--secondary-fg`, `--brd`).
+Отдельно `neutral` в `GrButton` использует общие surface token'ы (`--gr-secondary`, `--gr-secondary-hover`, `--gr-secondary-active`, `--gr-secondary-fg`, `--gr-brd`).
 
 ### Когда override делать через semantic token, а когда через button token
 

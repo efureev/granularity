@@ -110,26 +110,26 @@
   --gr-z-toast: 1200;
 
   /* Derived interaction formulas: action roles */
-  --primary-hover: color-mix(in srgb, var(--primary) 92%, var(--fg));
-  --primary-active: color-mix(in srgb, var(--primary) 84%, var(--fg));
-  --secondary-hover: color-mix(in srgb, var(--secondary) 92%, var(--fg));
-  --secondary-active: color-mix(in srgb, var(--secondary) 84%, var(--fg));
-  --brd-hover: color-mix(in srgb, var(--brd) 70%, var(--fg));
-  --brd-active: color-mix(in srgb, var(--brd) 55%, var(--fg));
-  --destructive-hover: color-mix(in srgb, var(--destructive) 92%, var(--fg));
-  --destructive-active: color-mix(in srgb, var(--destructive) 84%, var(--fg));
+  --gr-primary-hover: color-mix(in srgb, var(--gr-primary) 92%, var(--gr-fg));
+  --gr-primary-active: color-mix(in srgb, var(--gr-primary) 84%, var(--gr-fg));
+  --gr-secondary-hover: color-mix(in srgb, var(--gr-secondary) 92%, var(--gr-fg));
+  --gr-secondary-active: color-mix(in srgb, var(--gr-secondary) 84%, var(--gr-fg));
+  --gr-brd-hover: color-mix(in srgb, var(--gr-brd) 70%, var(--gr-fg));
+  --gr-brd-active: color-mix(in srgb, var(--gr-brd) 55%, var(--gr-fg));
+  --gr-destructive-hover: color-mix(in srgb, var(--gr-destructive) 92%, var(--gr-fg));
+  --gr-destructive-active: color-mix(in srgb, var(--gr-destructive) 84%, var(--gr-fg));
 
   /* Derived interaction formulas: status roles */
-  --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--fg));
-  --gr-success-active: color-mix(in srgb, var(--gr-success) 84%, var(--fg));
-  --gr-warning-hover: color-mix(in srgb, var(--gr-warning) 92%, var(--fg));
-  --gr-warning-active: color-mix(in srgb, var(--gr-warning) 84%, var(--fg));
-  --gr-danger-hover: color-mix(in srgb, var(--gr-danger) 92%, var(--fg));
-  --gr-danger-active: color-mix(in srgb, var(--gr-danger) 84%, var(--fg));
-  --gr-info-hover: color-mix(in srgb, var(--gr-info) 92%, var(--fg));
-  --gr-info-active: color-mix(in srgb, var(--gr-info) 84%, var(--fg));
-  --gr-slate-hover: color-mix(in srgb, var(--gr-slate) 92%, var(--fg));
-  --gr-slate-active: color-mix(in srgb, var(--gr-slate) 84%, var(--fg));
-  --gr-azure-hover: color-mix(in srgb, var(--gr-azure) 92%, var(--fg));
-  --gr-azure-active: color-mix(in srgb, var(--gr-azure) 84%, var(--fg));
+  --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--gr-fg));
+  --gr-success-active: color-mix(in srgb, var(--gr-success) 84%, var(--gr-fg));
+  --gr-warning-hover: color-mix(in srgb, var(--gr-warning) 92%, var(--gr-fg));
+  --gr-warning-active: color-mix(in srgb, var(--gr-warning) 84%, var(--gr-fg));
+  --gr-danger-hover: color-mix(in srgb, var(--gr-danger) 92%, var(--gr-fg));
+  --gr-danger-active: color-mix(in srgb, var(--gr-danger) 84%, var(--gr-fg));
+  --gr-info-hover: color-mix(in srgb, var(--gr-info) 92%, var(--gr-fg));
+  --gr-info-active: color-mix(in srgb, var(--gr-info) 84%, var(--gr-fg));
+  --gr-slate-hover: color-mix(in srgb, var(--gr-slate) 92%, var(--gr-fg));
+  --gr-slate-active: color-mix(in srgb, var(--gr-slate) 84%, var(--gr-fg));
+  --gr-azure-hover: color-mix(in srgb, var(--gr-azure) 92%, var(--gr-fg));
+  --gr-azure-active: color-mix(in srgb, var(--gr-azure) 84%, var(--gr-fg));
 }

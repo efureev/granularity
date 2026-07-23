@@ -30,9 +30,9 @@ function select(action: string) {
 
       <template #content>
         <div class="grid gap-1">
-          <button type="button" class="rounded-xl px-3 py-2 text-left hover:bg-[var(--accent)]" @click="select('Preview')">Preview</button>
-          <button type="button" class="rounded-xl px-3 py-2 text-left hover:bg-[var(--accent)]" @click="select('Duplicate')">Duplicate</button>
-          <button type="button" class="rounded-xl px-3 py-2 text-left hover:bg-[var(--accent)]" @click="select('Archive')">Archive</button>
+          <button type="button" class="rounded-xl px-3 py-2 text-left hover:bg-[var(--gr-accent)]" @click="select('Preview')">Preview</button>
+          <button type="button" class="rounded-xl px-3 py-2 text-left hover:bg-[var(--gr-accent)]" @click="select('Duplicate')">Duplicate</button>
+          <button type="button" class="rounded-xl px-3 py-2 text-left hover:bg-[var(--gr-accent)]" @click="select('Archive')">Archive</button>
         </div>
       </template>
     </GrDropdown>
@@ -63,7 +63,7 @@ import { GrButton, GrDropdown } from '@feugene/granularity'
       <template #content>
         <div class="grid gap-2 px-3 py-2 text-sm">
           <div class="font-semibold">Left aligned</div>
-          <div class="text-[var(--muted-fg)]">Хорошо подходит для меню, привязанных к левому краю toolbar.</div>
+          <div class="text-[var(--gr-muted-fg)]">Хорошо подходит для меню, привязанных к левому краю toolbar.</div>
         </div>
       </template>
     </GrDropdown>
@@ -76,7 +76,7 @@ import { GrButton, GrDropdown } from '@feugene/granularity'
       <template #content>
         <div class="grid gap-2 px-3 py-2 text-sm">
           <div class="font-semibold">Center aligned</div>
-          <div class="text-[var(--muted-fg)]">Удобно для компактных launchers и emoji/filter pickers.</div>
+          <div class="text-[var(--gr-muted-fg)]">Удобно для компактных launchers и emoji/filter pickers.</div>
         </div>
       </template>
     </GrDropdown>

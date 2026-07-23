@@ -13,7 +13,7 @@
  * `@import`) — см. комментарий там о data-URL/preflight. Держите оба блока
  * синхронными.
  *
- * Требует переменных из `tokens.css` (`--gr-font-ui`) и темы (`--bg`, `--fg`),
+ * Требует переменных из `tokens.css` (`--gr-font-ui`) и темы (`--gr-bg`, `--gr-fg`),
  * поэтому подключается ПОСЛЕ них.
  */
 html,
@@ -24,8 +24,8 @@ body {
 body {
   margin: 0;
   font-family: var(--gr-font-ui);
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--gr-bg);
+  color: var(--gr-fg);
 }
 
 * {

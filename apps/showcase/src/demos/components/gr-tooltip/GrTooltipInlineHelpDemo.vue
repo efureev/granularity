@@ -4,12 +4,12 @@ import { GrTooltip } from '@feugene/granularity'
 
 <template>
   <div class="grid gap-4">
-    <label class="inline-flex items-center gap-2 text-sm font-600 text-[var(--fg)]">
+    <label class="inline-flex items-center gap-2 text-sm font-600 text-[var(--gr-fg)]">
       Notification email
       <GrTooltip text="We use this address only for billing alerts and incident updates." />
     </label>
 
-    <div class="rounded-2xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/60 p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/60 p-4 text-sm text-[var(--gr-muted-fg)]">
       Hover or focus the info icon to inspect the help copy.
     </div>
   </div>

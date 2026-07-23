@@ -15,8 +15,8 @@ const items = ['Overview', 'Approvals', 'Members', 'Security']
       Open left rail
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
-      Active section: <span class="font-medium text-[var(--fg)]">{{ activeItem }}</span>
+    <div class="text-xs text-[var(--gr-muted-fg)]">
+      Active section: <span class="font-medium text-[var(--gr-fg)]">{{ activeItem }}</span>
     </div>
 
     <GrDrawer v-model="open" title="Workspace sections" side="left" size="sm">
@@ -26,7 +26,7 @@ const items = ['Overview', 'Approvals', 'Members', 'Security']
           :key="item"
           type="button"
           class="rounded-lg px-3 py-2 text-left text-sm transition"
-          :class="item === activeItem ? 'bg-[var(--accent)] text-[var(--accent-fg)]' : 'border border-[var(--brd)] text-[var(--muted-fg)]'"
+          :class="item === activeItem ? 'bg-[var(--gr-accent)] text-[var(--gr-accent-fg)]' : 'border border-[var(--gr-brd)] text-[var(--gr-muted-fg)]'"
           @click="activeItem = item"
         >
           {{ item }}

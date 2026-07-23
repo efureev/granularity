@@ -13,16 +13,16 @@ const items = [
     <div
       v-for="item in items"
       :key="item"
-      class="flex items-start gap-3 rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4"
+      class="flex items-start gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4"
     >
-      <GrIcon size="md" class="mt-0.5 text-[var(--primary)]">
+      <GrIcon size="md" class="mt-0.5 text-[var(--gr-primary)]">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-full w-full">
           <path d="M4 12h16" />
           <path d="m12 5 7 7-7 7" />
         </svg>
       </GrIcon>
 
-      <div class="min-w-0 text-sm text-[var(--fg)]">
+      <div class="min-w-0 text-sm text-[var(--gr-fg)]">
         {{ item }}
       </div>
     </div>

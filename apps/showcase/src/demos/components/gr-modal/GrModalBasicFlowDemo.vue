@@ -16,10 +16,10 @@ const open = ref(false)
 
     <GrModal v-model="open" size="sm">
       <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrModal.basic.shellTitle') }}
         </div>
-        <div class="text-sm text-[var(--muted-fg)]">
+        <div class="text-sm text-[var(--gr-muted-fg)]">
           {{ t('components.GrModal.basic.shellBody') }}
         </div>
         <GrButton class="justify-self-start" @click="open = false">

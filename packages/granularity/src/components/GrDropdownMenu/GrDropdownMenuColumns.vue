@@ -21,7 +21,7 @@ const colsClass = computed(() => {
 <template>
   <div
     data-gr-dropdown-menu-columns
-    class="w-full grid divide-x divide-[var(--brd)]"
+    class="w-full grid divide-x divide-[var(--gr-brd)]"
     :class="colsClass"
   >
     <slot />

@@ -25,13 +25,13 @@ function openFileDialog() {
         <GrButton type="button" @click="openFileDialog">
           Select files
         </GrButton>
-        <span class="text-sm text-[var(--muted-fg)]">
+        <span class="text-sm text-[var(--gr-muted-fg)]">
           {{ files.length ? files.join(', ') : 'No files selected yet' }}
         </span>
       </div>
     </GrFileUpload>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       В этом режиме библиотека отвечает за file-handling, а триггер можно строить из любых UI primitives пакета.
     </div>
   </div>

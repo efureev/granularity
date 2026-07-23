@@ -14,7 +14,7 @@ export const inputSizeClassBySize: Record<GrInputTagSize, string> = {
   lg: 'text-[16px]',
 }
 export const wrapperBorderClassByState: Record<GrInputTagState, string> = {
-  default: 'border-[var(--brd)]',
+  default: 'border-[var(--gr-brd)]',
   success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',

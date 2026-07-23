@@ -39,9 +39,9 @@ const selectedLabel = computed(() => {
       </GrRadio>
     </div>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
       Current delivery cadence:
-      <div class="mt-2 text-base font-semibold text-[var(--fg)]">
+      <div class="mt-2 text-base font-semibold text-[var(--gr-fg)]">
         {{ selectedLabel }}
       </div>
     </div>
@@ -76,7 +76,7 @@ const density = ref('balanced')
       </GrRadio>
     </div>
 
-    <div class="rounded-2xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/35 p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/35 p-4 text-sm text-[var(--gr-muted-fg)]">
       Button-like radios keep the same v-model contract while matching toolbar and segmented-control layouts.
     </div>
   </div>
@@ -105,12 +105,12 @@ const disabled = ref(false)
       <GrRadio value="production">Production</GrRadio>
     </GrRadioGroup>
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <GrSwitch v-model="disabled" size="sm">
         Disable full group
       </GrSwitch>
-      <div class="text-sm text-[var(--muted-fg)]">
-        Active target: <span class="font-semibold text-[var(--fg)]">{{ environment }}</span>
+      <div class="text-sm text-[var(--gr-muted-fg)]">
+        Active target: <span class="font-semibold text-[var(--gr-fg)]">{{ environment }}</span>
       </div>
     </div>
   </div>

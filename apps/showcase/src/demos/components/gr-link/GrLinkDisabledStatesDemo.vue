@@ -16,7 +16,7 @@ import { GrCard, GrLink } from '@feugene/granularity'
       </GrLink>
     </div>
 
-    <p class="text-[var(--muted-fg)]">
+    <p class="text-[var(--gr-muted-fg)]">
       Disabled mode рендерится как неинтерактивный текстовый элемент и сохраняет тот же layout внутри forms, cards и inline toolbars.
     </p>
   </GrCard>

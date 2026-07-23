@@ -19,7 +19,7 @@ const tabs: GrTab[] = [
     <GrTabPanels
       v-model="active"
       id-base="demo-tabs"
-      class="rounded-xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--fg)]"
+      class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-fg)]"
     >
       <GrTabPanel value="overview">Overview: a summary of the workspace.</GrTabPanel>
       <GrTabPanel value="activity">Activity: 3 new items since your last visit.</GrTabPanel>

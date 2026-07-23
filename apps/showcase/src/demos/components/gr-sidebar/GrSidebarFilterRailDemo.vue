@@ -29,7 +29,7 @@ const filters = reactive({
       </div>
     </GrSidebar>
 
-    <div class="rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
       <div class="flex flex-wrap gap-2">
         <GrBadge :tone="filters.active ? 'primary' : 'neutral'">
           Active: {{ filters.active ? 'on' : 'off' }}

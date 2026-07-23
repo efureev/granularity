@@ -24,7 +24,7 @@ describe('granularity/GrFormField (unit)', () => {
     const label = wrapper.get('label')
     expect(label.text()).toBe('Email')
     expect(label.attributes('for')).toBe('email')
-    expect(label.attributes('class')).toContain('text-[var(--muted-fg)]')
+    expect(label.attributes('class')).toContain('text-[var(--gr-muted-fg)]')
     expect(label.attributes('class')).toContain('font-medium')
 
     const errorEl = wrapper

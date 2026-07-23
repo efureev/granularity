@@ -230,7 +230,7 @@ const shellClass = computed(() => {
   const state = props.state
 
   const borderByState: Record<typeof state, string> = {
-    default: 'border-[var(--brd)]',
+    default: 'border-[var(--gr-brd)]',
     success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
     warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
     danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
@@ -288,14 +288,14 @@ function togglePassword(): void {
 <template>
   <div data-gr-input class="w-full">
     <div
-        class="relative w-full overflow-hidden rounded-md border bg-[var(--bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
+        class="relative w-full overflow-hidden rounded-md border bg-[var(--gr-bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
         :class="shellClass"
     >
       <div
           v-if="$slots.prefix"
           ref="prefixEl"
           data-testid="gr-input-prefix"
-          class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+          class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
           :style="prefixStyle"
           aria-hidden="true"
       >
@@ -318,7 +318,7 @@ function togglePassword(): void {
           :aria-invalid="isInvalid ? 'true' : undefined"
           :aria-describedby="describedBy"
           :aria-required="isRequired ? 'true' : undefined"
-          class="w-full bg-transparent text-[var(--fg)] placeholder:text-[var(--muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
+          class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
           :class="className"
           :style="inputStyle"
           @input="onInput"
@@ -334,7 +334,7 @@ function togglePassword(): void {
             type="button"
             data-gr-input-clear
             :aria-label="resolvedClearLabel"
-            class="flex h-6 w-6 items-center justify-center rounded text-[var(--muted-fg)] transition-colors hover:bg-[var(--muted)] hover:text-[var(--fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            class="flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
             tabindex="-1"
             @click="clear"
         >
@@ -347,7 +347,7 @@ function togglePassword(): void {
             data-gr-input-password-toggle
             :aria-label="passwordVisible ? resolvedPasswordHideLabel : resolvedPasswordShowLabel"
             :aria-pressed="passwordVisible ? 'true' : 'false'"
-            class="flex h-6 w-6 items-center justify-center rounded text-[var(--muted-fg)] transition-colors hover:bg-[var(--muted)] hover:text-[var(--fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            class="flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
             tabindex="-1"
             @click="togglePassword"
         >
@@ -360,7 +360,7 @@ function togglePassword(): void {
           v-if="$slots.suffix"
           ref="suffixEl"
           data-testid="gr-input-suffix"
-          class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--brd)] px-2 text-[var(--muted-fg)] pointer-events-none select-none truncate"
+          class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
           :class="suffixFixed ? '[direction:rtl]' : ''"
           :style="suffixStyle"
           aria-hidden="true"
@@ -372,7 +372,7 @@ function togglePassword(): void {
     <div
         v-if="showCount"
         data-gr-input-count
-        class="mt-1 text-right text-xs text-[var(--muted-fg)] tabular-nums"
+        class="mt-1 text-right text-xs text-[var(--gr-muted-fg)] tabular-nums"
     >
       {{ countText }}
     </div>

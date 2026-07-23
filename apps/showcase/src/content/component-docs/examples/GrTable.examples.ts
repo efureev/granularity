@@ -20,7 +20,7 @@ import { GrBadge, GrTable } from '@feugene/granularity'
       </tr>
     </template>
 
-    <tr class="border-t border-[var(--brd)]">
+    <tr class="border-t border-[var(--gr-brd)]">
       <td class="px-4 py-3">Spring onboarding</td>
       <td class="px-4 py-3"><GrBadge size="sm" tone="secondary">Ready</GrBadge></td>
     </tr>
@@ -46,7 +46,7 @@ import { GrSkeleton, GrTable } from '@feugene/granularity'
       </tr>
     </template>
 
-    <tr class="border-t border-[var(--brd)]">
+    <tr class="border-t border-[var(--gr-brd)]">
       <td class="px-4 py-3"><GrSkeleton class="h-4 w-32" /></td>
       <td class="px-4 py-3"><GrSkeleton class="h-4 w-24" /></td>
     </tr>
@@ -72,7 +72,7 @@ import { GrButton, GrEmptyState, GrTable } from '@feugene/granularity'
       </tr>
     </template>
 
-    <tr class="border-t border-[var(--brd)]">
+    <tr class="border-t border-[var(--gr-brd)]">
       <td colspan="2" class="px-4 py-6">
         <GrEmptyState title="No preset rows" description="Load sample data to replace the placeholder.">
           <GrButton size="sm">Load sample data</GrButton>

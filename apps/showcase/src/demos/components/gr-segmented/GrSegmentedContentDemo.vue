@@ -29,8 +29,8 @@ const iconOnlyOptions: GrSegmentedOption[] = [
 
 <template>
   <div class="grid gap-5 lg:grid-cols-2">
-    <div class="grid gap-3 rounded-[24px] border border-[var(--brd)] bg-[var(--card)] p-5">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+    <div class="grid gap-3 rounded-[24px] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         {{ t('components.GrSegmented.content.iconLabel') }}
       </div>
       <GrSegmented
@@ -41,8 +41,8 @@ const iconOnlyOptions: GrSegmentedOption[] = [
       />
     </div>
 
-    <div class="grid gap-3 rounded-[24px] border border-[var(--brd)] bg-[var(--card)] p-5">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+    <div class="grid gap-3 rounded-[24px] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         {{ t('components.GrSegmented.content.iconOnly') }}
       </div>
       <GrSegmented

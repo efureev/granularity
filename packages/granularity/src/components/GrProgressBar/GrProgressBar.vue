@@ -38,7 +38,7 @@ const fillClassName = computed(() => grProgressBarFillClass(props.tone))
     :aria-valuenow="safe"
     aria-valuemin="0"
     aria-valuemax="100"
-    class="h-2 w-full rounded-full bg-[var(--muted)] border border-[var(--brd)] overflow-hidden"
+    class="h-2 w-full rounded-full bg-[var(--gr-muted)] border border-[var(--gr-brd)] overflow-hidden"
   >
     <div
       data-gr-progress-bar-fill

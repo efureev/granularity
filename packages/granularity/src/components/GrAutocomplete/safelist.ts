@@ -5,6 +5,6 @@ import { autocompleteSizeClassBySize } from './grAutocompleteStyles'
 // в safelist кладём только классы, собираемые из вычисляемых мап/строк.
 export const grAutocompleteSafelist = [...new Set([
   ...Object.values(autocompleteSizeClassBySize).flatMap(splitClassTokens),
-  ...splitClassTokens('border-[var(--brd)] border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]'),
+  ...splitClassTokens('border-[var(--gr-brd)] border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]'),
   ...splitClassTokens('cursor-not-allowed opacity-50'),
 ])]

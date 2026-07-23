@@ -21,7 +21,7 @@ const open = ref(false)
   </GrButton>
 
   <GrDrawer v-model="open" title="Report filters" size="sm">
-    <div class="grid gap-3 text-sm text-[var(--muted-fg)]">
+    <div class="grid gap-3 text-sm text-[var(--gr-muted-fg)]">
       <div>Owner</div>
       <div>Date range</div>
     </div>

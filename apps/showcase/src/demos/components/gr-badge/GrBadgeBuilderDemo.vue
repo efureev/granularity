@@ -106,7 +106,7 @@ const previewCode = computed(() => {
               <span :class="previewLabelClass">{{ uppercase ? badgeText.toUpperCase() : badgeText }}</span>
             </GrBadge>
 
-            <span class="showcase-demo-text text-sm text-[var(--muted-fg)]">
+            <span class="showcase-demo-text text-sm text-[var(--gr-muted-fg)]">
               {{ t('components.GrBadge.builder.slaStatus') }}
             </span>
           </div>
@@ -145,7 +145,7 @@ const previewCode = computed(() => {
         </GrFormField>
       </div>
 
-      <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+      <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
         <GrSwitch v-model="dark" size="sm">
           {{ t('components.GrBadge.builder.filledMode') }}
         </GrSwitch>

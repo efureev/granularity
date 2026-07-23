@@ -20,10 +20,10 @@ function runFullscreenSync() {
       Simulate global sync
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
+    <div class="text-xs text-[var(--gr-muted-fg)]">
       Fullscreen overlay closes automatically after a short async cycle.
     </div>
 
-    <GrLoading v-if="loading" fullscreen text="Syncing workspace data..." style="--muted-fg: white;" />
+    <GrLoading v-if="loading" fullscreen text="Syncing workspace data..." style="--gr-muted-fg: white;" />
   </div>
 </template>

@@ -15,7 +15,7 @@ export const trackSizes: Record<GrSwitchSize, string> = {
 }
 
 export const thumbBase =
-    'inline-block shrink-0 rounded-full bg-[var(--card)] shadow-[var(--gr-shadow-1)] transition-transform duration-150'
+    'inline-block shrink-0 rounded-full bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-transform duration-150'
 
 export const thumbSizes: Record<GrSwitchSize, string> = {
     sm: 'h-4 w-4',
@@ -38,7 +38,7 @@ export const thumbTranslations: Record<GrSwitchSize, { checked: string, unchecke
     },
 }
 
-export const labelBase = 'text-[var(--muted-fg)]'
+export const labelBase = 'text-[var(--gr-muted-fg)]'
 
 export const labelSizes: Record<GrSwitchSize, string> = {
     sm: 'text-sm',

@@ -24,12 +24,12 @@ const enabledCount = computed(() => [weeklyDigest.value, incidentAlerts.value].f
       </GrCheckbox>
     </div>
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <div>
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           Selection summary
         </div>
-        <div class="text-sm text-[var(--muted-fg)]">
+        <div class="text-sm text-[var(--gr-muted-fg)]">
           {{ enabledCount }} of 2 optional channels are active.
         </div>
       </div>

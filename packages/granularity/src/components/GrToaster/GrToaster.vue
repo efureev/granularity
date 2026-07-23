@@ -45,8 +45,8 @@ interface ToneMeta {
 // Единый маппинг по tone'у: иконка, цвет, a11y-роль. На уровне модуля —
 // чтобы не пересоздавать объект на каждый рендер.
 const TONE_META: Record<GrToastTone, ToneMeta> = {
-  primary: { icon: IconInfo, color: 'var(--primary)', role: 'status' },
-  neutral: { icon: IconInfo, color: 'var(--muted-fg)', role: 'status' },
+  primary: { icon: IconInfo, color: 'var(--gr-primary)', role: 'status' },
+  neutral: { icon: IconInfo, color: 'var(--gr-muted-fg)', role: 'status' },
   info: { icon: IconInfo, color: 'var(--gr-info)', role: 'status' },
   success: { icon: IconCheck, color: 'var(--gr-success)', role: 'status' },
   warning: { icon: IconWarning, color: 'var(--gr-warning)', role: 'alert' },
@@ -141,7 +141,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
             :data-tone="toast.tone"
             :role="metaFor(toast.tone).role"
             aria-atomic="true"
-            class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--card)] px-4 py-3 shadow-[var(--gr-shadow-2)]"
+            class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)]"
         >
           <div class="flex items-start gap-3">
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }" aria-hidden="true">
@@ -151,7 +151,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
               <div class="text-[13px] font-700">
                 {{ toast.title }}
               </div>
-              <div v-if="toast.message" class="mt-0.5 text-[13px] text-[var(--muted-fg)]">
+              <div v-if="toast.message" class="mt-0.5 text-[13px] text-[var(--gr-muted-fg)]">
                 {{ toast.message }}
               </div>
             </div>

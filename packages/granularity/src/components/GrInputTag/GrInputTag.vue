@@ -238,7 +238,7 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
   <div
     data-gr-input-tag
     data-testid="gr-input-tag"
-    class="w-full flex flex-wrap items-center rounded-md border bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--ring)]"
+    class="w-full flex flex-wrap items-center rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
     :class="wrapperClassName"
     @click="focus"
   >
@@ -261,7 +261,7 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
         <button
           v-if="showRemove"
           type="button"
-          class="-mr-0.5 shrink-0 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          class="-mr-0.5 shrink-0 inline-flex items-center justify-center rounded-[6px] p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
           :aria-label="resolvedRemoveTagLabel"
           data-gr-input-tag-remove
           data-testid="gr-input-tag-remove"
@@ -285,7 +285,7 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
       :readonly="readonly"
       :placeholder="placeholderText"
       :aria-invalid="invalid ? 'true' : undefined"
-      class="flex-1 min-w-[120px] bg-transparent border-none outline-none placeholder:text-[var(--muted-fg)]"
+      class="flex-1 min-w-[120px] bg-transparent border-none outline-none placeholder:text-[var(--gr-muted-fg)]"
       :class="inputClassName"
       @input="onInput"
       @keydown="onKeydown"

@@ -360,7 +360,7 @@ onUnmounted(() => {
               :key="index"
               class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
           >
-            <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--primary)]" aria-hidden="true"/>
+            <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true"/>
             <span><InlineRichText :text="feature"/></span>
           </li>
         </ul>

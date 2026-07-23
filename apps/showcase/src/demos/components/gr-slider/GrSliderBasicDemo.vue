@@ -17,8 +17,8 @@ const volume = ref(40)
       aria-label="Volume"
     />
 
-    <p class="text-sm text-[var(--muted-fg)]">
-      Value: <code>{{ volume }}</code> — drag the thumb or use ← / → , Home / End, PageUp / PageDown.
+    <p class="text-sm text-[var(--gr-muted-fg)]">
+      Value: <code>{{ volume }}</code> — drag the thumb or use arrow keys, Home / End, PageUp / PageDown.
     </p>
   </div>
 </template>

@@ -31,7 +31,7 @@ const className = computed(() => {
 </script>
 
 <template>
-  <span :style="style" class="inline-flex items-center justify-center overflow-hidden border border-[var(--brd)] bg-[var(--muted)] text-[var(--muted-fg)] font-700" :class="className">
+  <span :style="style" class="inline-flex items-center justify-center overflow-hidden border border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] font-700" :class="className">
     <img v-if="props.src" :src="props.src" :alt="props.alt" class="h-full w-full object-cover">
     <slot v-else />
   </span>

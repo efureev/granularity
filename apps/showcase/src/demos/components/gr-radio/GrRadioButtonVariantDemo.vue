@@ -20,7 +20,7 @@ const density = ref('balanced')
       </GrRadio>
     </div>
 
-    <div class="rounded-2xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/35 p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/35 p-4 text-sm text-[var(--gr-muted-fg)]">
       Button-like radios keep the same `v-model` contract while matching toolbar and segmented-control layouts.
     </div>
   </div>

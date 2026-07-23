@@ -48,10 +48,10 @@ function toggleTool(tool: string) {
       </div>
     </div>
 
-    <p class="text-sm text-[var(--fg)]">
+    <p class="text-sm text-[var(--gr-fg)]">
       Release note title
     </p>
-    <p class="text-sm text-[var(--muted-fg)]">
+    <p class="text-sm text-[var(--gr-muted-fg)]">
       Button groups удобно использовать в компактных toolbars, где важна предсказуемая ширина и визуальная связность соседних действий.
     </p>
   </GrCard>

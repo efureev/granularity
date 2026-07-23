@@ -25,10 +25,10 @@ type GrAlertResolvedStyles = {
 }
 
 const DEFAULT_TEXT_COLORS = {
-  title: 'var(--fg)',
-  text: 'var(--muted-fg)',
-  close: 'var(--muted-fg)',
-  closeHover: 'var(--fg)',
+  title: 'var(--gr-fg)',
+  text: 'var(--gr-muted-fg)',
+  close: 'var(--gr-muted-fg)',
+  closeHover: 'var(--gr-fg)',
 } as const
 
 const WARNING_LIGHT_TEXT_COLOR = '#92400e'
@@ -61,57 +61,57 @@ const getCustomColor = (value?: string) => value?.trim() || undefined
 
 const SOFT_TONE_STYLES: Record<GrAlertTone, GrAlertResolvedStyles> = {
   primary: {
-    bg: 'var(--accent)',
-    border: 'color-mix(in srgb, var(--primary) 22%, var(--brd))',
-    icon: 'var(--primary)',
+    bg: 'var(--gr-accent)',
+    border: 'color-mix(in srgb, var(--gr-primary) 22%, var(--gr-brd))',
+    icon: 'var(--gr-primary)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
   neutral: {
-    bg: 'var(--muted)',
-    border: 'var(--brd)',
-    icon: 'var(--muted-fg)',
+    bg: 'var(--gr-muted)',
+    border: 'var(--gr-brd)',
+    icon: 'var(--gr-muted-fg)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
   info: {
     bg: 'var(--gr-info-light)',
-    border: 'color-mix(in srgb, var(--gr-info) 22%, var(--brd))',
+    border: 'color-mix(in srgb, var(--gr-info) 22%, var(--gr-brd))',
     icon: 'var(--gr-info)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
   success: {
     bg: 'var(--gr-success-light)',
-    border: 'color-mix(in srgb, var(--gr-success) 22%, var(--brd))',
+    border: 'color-mix(in srgb, var(--gr-success) 22%, var(--gr-brd))',
     icon: 'var(--gr-success)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconCheck,
   },
   warning: {
     bg: 'var(--gr-warning-light)',
-    border: 'color-mix(in srgb, var(--gr-warning) 22%, var(--brd))',
+    border: 'color-mix(in srgb, var(--gr-warning) 22%, var(--gr-brd))',
     icon: 'var(--gr-warning)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconWarning,
   },
   danger: {
     bg: 'var(--gr-danger-light)',
-    border: 'color-mix(in srgb, var(--gr-danger) 22%, var(--brd))',
+    border: 'color-mix(in srgb, var(--gr-danger) 22%, var(--gr-brd))',
     icon: 'var(--gr-danger)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconError,
   },
   slate: {
     bg: 'var(--gr-slate-light)',
-    border: 'color-mix(in srgb, var(--gr-slate) 22%, var(--brd))',
+    border: 'color-mix(in srgb, var(--gr-slate) 22%, var(--gr-brd))',
     icon: 'var(--gr-slate)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,
   },
   azure: {
     bg: 'var(--gr-azure-light)',
-    border: 'color-mix(in srgb, var(--gr-azure) 22%, var(--brd))',
+    border: 'color-mix(in srgb, var(--gr-azure) 22%, var(--gr-brd))',
     icon: 'var(--gr-azure)',
     ...DEFAULT_TEXT_COLORS,
     Icon: IconInfo,

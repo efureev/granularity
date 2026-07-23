@@ -73,7 +73,7 @@ describe('GrPagination', () => {
     expect(numericButtons.map(button => button.text())).toEqual(['1', '5', '6', '7', '12'])
     // активная страница подсвечена
     const active = numericButtons.find(button => button.text() === '6')!
-    expect(active.classes()).toContain('bg-[var(--primary)]')
+    expect(active.classes()).toContain('bg-[var(--gr-primary)]')
     // есть многоточия (с обеих сторон)
     expect(wrapper.findAll('[data-gr-pagination-ellipsis]').length).toBe(2)
   })

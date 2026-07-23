@@ -43,18 +43,18 @@ function phaseLabel(state: GrUploadState): string {
     <template #progress="{ percent, indeterminate, phase, abort }">
       <div
         v-if="phase !== 'idle'"
-        class="mt-3 flex items-center gap-3 rounded-md border border-[var(--brd)] bg-[var(--muted)] p-3"
+        class="mt-3 flex items-center gap-3 rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] p-3"
       >
         <div
           class="relative h-10 w-10 shrink-0 rounded-full"
           :style="{
             background: indeterminate
-              ? 'conic-gradient(var(--primary) 0 25%, var(--muted) 0)'
-              : `conic-gradient(var(--primary) 0 ${percent}%, var(--muted) 0)`,
+              ? 'conic-gradient(var(--gr-primary) 0 25%, var(--gr-muted) 0)'
+              : `conic-gradient(var(--gr-primary) 0 ${percent}%, var(--gr-muted) 0)`,
             transition: 'background 120ms linear',
           }"
         >
-          <div class="absolute inset-1 rounded-full bg-[var(--bg)] grid place-items-center text-[10px] tabular-nums">
+          <div class="absolute inset-1 rounded-full bg-[var(--gr-bg)] grid place-items-center text-[10px] tabular-nums">
             {{ indeterminate ? '…' : `${Math.round(percent)}%` }}
           </div>
         </div>
@@ -63,7 +63,7 @@ function phaseLabel(state: GrUploadState): string {
           <div class="font-medium">
             {{ phaseLabel({ phase, percent, indeterminate } as GrUploadState) }}
           </div>
-          <div class="text-[var(--muted-fg)]">
+          <div class="text-[var(--gr-muted-fg)]">
             Custom circular indicator via <code>#progress</code> slot
           </div>
         </div>

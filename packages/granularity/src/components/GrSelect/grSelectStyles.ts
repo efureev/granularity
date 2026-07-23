@@ -10,8 +10,8 @@ export type GrSelectOptionGroup = { label: string, options: GrSelectOption[] }
 export type GrSelectOptionOrGroup = GrSelectOption | GrSelectOptionGroup
 export type GrSelectModelValue = string | string[]
 
-export const defaultBaseClass = 'w-full rounded-md border border-[var(--brd)] bg-[var(--bg)] text-[var(--fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'
-export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'
+export const defaultBaseClass = 'w-full rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
@@ -29,9 +29,9 @@ export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
 }
 
 export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = {
-  primary: 'text-[var(--primary)] hover:text-[var(--primary-hover)] active:text-[var(--primary-active)]',
-  default: 'text-[var(--fg)] hover:text-[var(--primary)] active:text-[var(--primary-active)]',
-  muted: 'text-[var(--muted-fg)] hover:text-[var(--fg)] active:text-[var(--fg)]',
+  primary: 'text-[var(--gr-primary)] hover:text-[var(--gr-primary-hover)] active:text-[var(--gr-primary-active)]',
+  default: 'text-[var(--gr-fg)] hover:text-[var(--gr-primary)] active:text-[var(--gr-primary-active)]',
+  muted: 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] active:text-[var(--gr-fg)]',
   danger: 'text-[var(--gr-danger)] hover:text-[var(--gr-danger-hover)] active:text-[var(--gr-danger-active)]',
 }
 
@@ -41,9 +41,9 @@ export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = 
  * т.к. видимая метка имеет `pointer-events-none` и не получает hover напрямую.
  */
 export const selectLinkNativeLabelVariantClassByVariant: Record<GrSelectVariant, string> = {
-  primary: 'text-[var(--primary)] peer-hover:text-[var(--primary-hover)] peer-active:text-[var(--primary-active)]',
-  default: 'text-[var(--fg)] peer-hover:text-[var(--primary)] peer-active:text-[var(--primary-active)]',
-  muted: 'text-[var(--muted-fg)] peer-hover:text-[var(--fg)] peer-active:text-[var(--fg)]',
+  primary: 'text-[var(--gr-primary)] peer-hover:text-[var(--gr-primary-hover)] peer-active:text-[var(--gr-primary-active)]',
+  default: 'text-[var(--gr-fg)] peer-hover:text-[var(--gr-primary)] peer-active:text-[var(--gr-primary-active)]',
+  muted: 'text-[var(--gr-muted-fg)] peer-hover:text-[var(--gr-fg)] peer-active:text-[var(--gr-fg)]',
   danger: 'text-[var(--gr-danger)] peer-hover:text-[var(--gr-danger-hover)] peer-active:text-[var(--gr-danger-active)]',
 }
 
@@ -90,8 +90,8 @@ export function grSelectLinkNativeLabelClass(options: {
     selectLinkSizeClassBySize[options.size],
     selectLinkNativeLabelUnderlineClass({ underline: options.underline, disabled: options.disabled }),
     selectLinkNativeLabelVariantClassByVariant[options.variant],
-    options.disabled ? 'opacity-60 text-[var(--muted-fg)] no-underline' : '',
-    'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--ring)]',
+    options.disabled ? 'opacity-60 text-[var(--gr-muted-fg)] no-underline' : '',
+    'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--gr-ring)]',
   ]
     .filter(Boolean)
     .join(' ')
@@ -109,7 +109,7 @@ export function grSelectClass(options: {
       selectLinkSizeClassBySize[options.size],
       selectLinkUnderlineClass({ underline: options.underline, disabled: options.disabled }),
       selectLinkVariantClassByVariant[options.variant],
-      'disabled:opacity-60 disabled:cursor-not-allowed disabled:text-[var(--muted-fg)] disabled:no-underline',
+      'disabled:opacity-60 disabled:cursor-not-allowed disabled:text-[var(--gr-muted-fg)] disabled:no-underline',
     ].join(' ')
   }
 
@@ -160,4 +160,4 @@ export function grSelectTriggerClass(options: {
   ].join(' ')
 }
 
-export const grSelectPanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+export const grSelectPanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'

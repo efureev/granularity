@@ -128,7 +128,7 @@ function actionLabel(status: string) {
       </template>
     </GrDataTable>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       {{ lastAction }}
     </div>
   </div>

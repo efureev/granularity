@@ -16,7 +16,7 @@ withDefaults(defineProps<GrListProps>(), {
     <div
       v-if="divided"
       role="list"
-      class="divide-y divide-[var(--brd)]"
+      class="divide-y divide-[var(--gr-brd)]"
     >
       <slot />
     </div>

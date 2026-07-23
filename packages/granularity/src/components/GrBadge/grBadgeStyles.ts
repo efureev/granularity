@@ -16,9 +16,9 @@ export const semiRadiusClassBySize: Record<GrBadgeSize, string> = {
   lg: 'rounded-[7px]',
 }
 export const lightToneClassByTone: Record<GrBadgeTone, string> = {
-  neutral: 'bg-[var(--muted)] text-[var(--fg)] border-[var(--brd)]',
+  neutral: 'bg-[var(--gr-muted)] text-[var(--gr-fg)] border-[var(--gr-brd)]',
   primary:
-    'bg-[var(--accent)] text-[var(--accent-fg)] border-[color-mix(in_srgb,var(--primary)_30%,var(--accent))]',
+    'bg-[var(--gr-accent)] text-[var(--gr-accent-fg)] border-[color-mix(in_srgb,var(--gr-primary)_30%,var(--gr-accent))]',
   success: 'bg-[var(--gr-success-light)] text-[var(--gr-success)] border-[color-mix(in_srgb,var(--gr-success)_30%,var(--gr-success-light))]',
   warning: 'bg-[var(--gr-warning-light)] text-[var(--gr-warning)] border-[color-mix(in_srgb,var(--gr-warning)_30%,var(--gr-warning-light))]',
   danger: 'bg-[var(--gr-danger-light)] text-[var(--gr-danger)] border-[color-mix(in_srgb,var(--gr-danger)_30%,var(--gr-danger-light))]',
@@ -27,8 +27,8 @@ export const lightToneClassByTone: Record<GrBadgeTone, string> = {
   azure: 'bg-[var(--gr-azure-light)] text-[var(--gr-azure-text)] border-[color-mix(in_srgb,var(--gr-azure)_30%,var(--gr-azure-light))]',
 }
 export const darkToneClassByTone: Record<GrBadgeTone, string> = {
-  neutral: 'bg-[var(--fg)] text-[var(--bg)] border-[color-mix(in_srgb,var(--fg)_35%,var(--brd))]',
-  primary: 'bg-[var(--primary)] text-[var(--primary-fg)] border-[var(--primary)]',
+  neutral: 'bg-[var(--gr-fg)] text-[var(--gr-bg)] border-[color-mix(in_srgb,var(--gr-fg)_35%,var(--gr-brd))]',
+  primary: 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)] border-[var(--gr-primary)]',
   success: 'bg-[var(--gr-success)] text-white border-[var(--gr-success)]',
   warning: 'bg-[var(--gr-warning)] text-white border-[var(--gr-warning)]',
   danger: 'bg-[var(--gr-danger)] text-white border-[var(--gr-danger)]',

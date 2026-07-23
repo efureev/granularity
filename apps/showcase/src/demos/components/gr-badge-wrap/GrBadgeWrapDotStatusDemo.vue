@@ -12,7 +12,7 @@ import { GrAvatar, GrBadgeWrap, GrCard } from '@feugene/granularity'
       <GrAvatar :size="40" shape="square">QA</GrAvatar>
     </GrBadgeWrap>
 
-    <GrCard class="p-4 text-sm text-[var(--muted-fg)]">
+    <GrCard class="p-4 text-sm text-[var(--gr-muted-fg)]">
       Dot mode is useful when the exact count is less important than “requires attention now”.
     </GrCard>
   </div>

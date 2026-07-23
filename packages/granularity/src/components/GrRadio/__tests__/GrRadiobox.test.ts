@@ -30,7 +30,7 @@ describe('GrRadio (radiobox)', () => {
     expect(native.checked).toBe(true)
 
     const dot = wrapper.get('[data-gr-radio-dot]')
-    expect(dot.attributes('class')).toContain('bg-[var(--primary)]')
+    expect(dot.attributes('class')).toContain('bg-[var(--gr-primary)]')
   })
 
   it('скрывает dot когда не выбрано', () => {

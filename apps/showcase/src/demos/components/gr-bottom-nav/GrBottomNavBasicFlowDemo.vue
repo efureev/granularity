@@ -20,7 +20,7 @@ const activeLabel = computed(() => {
     <GrCard class="p-4">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <div class="text-sm text-[var(--muted-fg)]">
+          <div class="text-sm text-[var(--gr-muted-fg)]">
             Active section
           </div>
           <div class="text-base font-semibold">

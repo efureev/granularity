@@ -59,7 +59,7 @@ const disabled = ref(false)
       </GrSwitch>
     </div>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <GrSwitch v-model="disabled" size="sm">
         Disable labeled switch
       </GrSwitch>
@@ -94,8 +94,8 @@ const inactiveBackgroundColor = ref('#e5e7eb')
     </GrSwitch>
 
     <div class="grid gap-3 md:grid-cols-2">
-      <GrInput v-model="activeBackgroundColor" placeholder="#22c55e / var(--primary)" />
-      <GrInput v-model="inactiveBackgroundColor" placeholder="#e5e7eb / var(--muted)" />
+      <GrInput v-model="activeBackgroundColor" placeholder="#22c55e / var(--gr-primary)" />
+      <GrInput v-model="inactiveBackgroundColor" placeholder="#e5e7eb / var(--gr-muted)" />
     </div>
   </div>
 </template>`,

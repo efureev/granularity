@@ -27,9 +27,9 @@ const selectedOption = computed(() => options.find(option => option.value === st
   <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
     <GrRadioGroup v-model="status" :options="options" />
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
       Selected state:
-      <div class="mt-2 text-base font-semibold text-[var(--fg)]">
+      <div class="mt-2 text-base font-semibold text-[var(--gr-fg)]">
         {{ selectedOption }}
       </div>
     </div>
@@ -66,7 +66,7 @@ const viewOptions = [
 <template>
   <div class="grid gap-4">
     <div class="grid gap-3 md:max-w-[220px]">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Button size
       </div>
       <GrSelect v-model="size" :options="sizeOptions" />
@@ -113,8 +113,8 @@ const channel = ref('slack')
       </GrRadio>
     </GrRadioGroup>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
-      Routed through: <span class="font-semibold text-[var(--fg)]">{{ channel }}</span>
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
+      Routed through: <span class="font-semibold text-[var(--gr-fg)]">{{ channel }}</span>
     </div>
   </div>
 </template>`,

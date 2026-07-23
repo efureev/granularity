@@ -30,7 +30,7 @@ describe('GrSidebar', () => {
     })
 
     expect(wrapper.text()).toContain('Workspace')
-    expect(wrapper.find('.text-\\[var\\(--muted-fg\\)\\]').exists()).toBe(false)
+    expect(wrapper.find('.text-\\[var\\(--gr-muted-fg\\)\\]').exists()).toBe(false)
   })
 
   it('не рендерит header, если нет ни title, ни subtitle, ни кнопки тогла', () => {

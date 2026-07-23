@@ -28,6 +28,6 @@ describe('GrFormSection', () => {
     })
 
     expect(wrapper.text()).toContain('Security')
-    expect(wrapper.find('.text-\\[var\\(--muted-fg\\)\\]').exists()).toBe(false)
+    expect(wrapper.find('.text-\\[var\\(--gr-muted-fg\\)\\]').exists()).toBe(false)
   })
 })

@@ -33,12 +33,12 @@ const enabledCount = computed(() => [weeklyDigest.value, incidentAlerts.value].f
       </GrCheckbox>
     </div>
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <div>
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           Selection summary
         </div>
-        <div class="text-sm text-[var(--muted-fg)]">
+        <div class="text-sm text-[var(--gr-muted-fg)]">
           {{ enabledCount }} of 2 optional channels are active.
         </div>
       </div>
@@ -71,7 +71,7 @@ const previewOpens = ref(0)
       <span class="inline-flex flex-wrap items-center gap-2 text-sm">
         I accept the rollout policy and reviewed the
         <a
-          class="font-medium text-[var(--primary)] underline underline-offset-2"
+          class="font-medium text-[var(--gr-primary)] underline underline-offset-2"
           href="https://example.com/policy"
           target="_blank"
           rel="noreferrer"
@@ -81,7 +81,7 @@ const previewOpens = ref(0)
         </a>
         <button
           type="button"
-          class="rounded-full border border-[var(--brd)] px-2 py-1 text-xs font-medium text-[var(--fg)] transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
+          class="rounded-full border border-[var(--gr-brd)] px-2 py-1 text-xs font-medium text-[var(--gr-fg)] transition hover:border-[var(--gr-primary)] hover:text-[var(--gr-primary)]"
           @click.stop="previewOpens += 1"
         >
           Preview changes
@@ -89,8 +89,8 @@ const previewOpens = ref(0)
       </span>
     </GrCheckbox>
 
-    <div class="rounded-2xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/35 p-4 text-sm text-[var(--muted-fg)]">
-      Checkbox value: <span class="font-semibold text-[var(--fg)]">{{ accepted ? 'accepted' : 'pending' }}</span> ·
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/35 p-4 text-sm text-[var(--gr-muted-fg)]">
+      Checkbox value: <span class="font-semibold text-[var(--gr-fg)]">{{ accepted ? 'accepted' : 'pending' }}</span> ·
       Preview clicked {{ previewOpens }} times.
     </div>
   </div>
@@ -135,7 +135,7 @@ function onSubmit(event: SubmitEvent): void {
       </div>
     </form>
 
-    <pre class="overflow-x-auto rounded-2xl border border-[var(--brd)] bg-[var(--fg)] p-4 text-xs text-[var(--bg)]">{{ submission }}</pre>
+    <pre class="overflow-x-auto rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-fg)] p-4 text-xs text-[var(--gr-bg)]">{{ submission }}</pre>
   </div>
 </template>`,
   },

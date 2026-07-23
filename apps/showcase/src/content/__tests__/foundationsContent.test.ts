@@ -38,12 +38,12 @@ describe('showcase foundations content', () => {
       section: 'Palette scale',
     })
     expect(showcaseFoundationTokens.find(token => token.name === '--gr-font-ui')?.description).toContain('Основной стек шрифта')
-    expect(showcaseFoundationTokens.find(token => token.name === '--primary-hover')?.value).toContain('color-mix')
+    expect(showcaseFoundationTokens.find(token => token.name === '--gr-primary-hover')?.value).toContain('color-mix')
   })
 
   it('собирает current theme token registry из light.css и dark.css', () => {
     expect(showcaseThemeTokens.length).toBeGreaterThan(30)
-    expect(showcaseThemeTokens.find(token => token.name === '--bg')).toMatchObject({
+    expect(showcaseThemeTokens.find(token => token.name === '--gr-bg')).toMatchObject({
       section: 'Surface roles',
       values: {
         light: {
@@ -54,8 +54,8 @@ describe('showcase foundations content', () => {
         },
       },
     })
-    expect(showcaseThemeTokens.find(token => token.name === '--primary')?.description).toContain('brand/action цвет')
-    expect(showcaseThemeTokens.find(token => token.name === '--primary-hover')?.section).toBe('Fallbacks / action roles')
+    expect(showcaseThemeTokens.find(token => token.name === '--gr-primary')?.description).toContain('brand/action цвет')
+    expect(showcaseThemeTokens.find(token => token.name === '--gr-primary-hover')?.section).toBe('Fallbacks / action roles')
     expect(showcaseThemeTokens.find(token => token.name === '--gr-category-tree-branch-line-active-color')).toMatchObject({
       section: 'Component semantic roles',
       values: {

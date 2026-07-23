@@ -8,7 +8,7 @@ import { GR_TONES, type GrTone } from '../shared/tones'
  * - `variant` — уровень акцента (СТРУКТУРА), независимый от цвета:
  *   - `default` — текст окрашен в `tone` в покое, `tone-hover`/`tone-active` при
  *     наведении/нажатии (обычная акцентная ссылка);
- *   - `muted` — приглушённый текст (`--muted-fg`) в покое, окрашивается в `tone`
+ *   - `muted` — приглушённый текст (`--gr-muted-fg`) в покое, окрашивается в `tone`
  *     при наведении (вторичные/inline-ссылки в плотных областях).
  *
  * Раньше `variant` смешивал цвет и акцент (`primary/default/muted/muted-primary/danger`).
@@ -22,7 +22,7 @@ export type GrLinkSize = 'sm' | 'md' | 'lg'
 // Базовые классы корневого элемента (`<a>`/`<span>`). Вынесены сюда,
 // чтобы быть единственным источником истины как для шаблона, так и для safelist.
 export const baseRootClass = 'inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150'
-export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]'
+export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const sizeClassBySize: Record<GrLinkSize, string> = {
   sm: 'text-[13px]',
@@ -38,9 +38,9 @@ type GrLinkToneColors = { base: string, hover: string, active: string }
 
 // Пары «цвет / hover / active» на каждый тон из ролей темы.
 export const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
-  primary: { base: 'var(--primary)', hover: 'var(--primary-hover)', active: 'var(--primary-active)' },
-  // Нейтральная ссылка: читаемый `--fg` в покое, акцент `--primary` при наведении.
-  neutral: { base: 'var(--fg)', hover: 'var(--primary)', active: 'var(--primary-active)' },
+  primary: { base: 'var(--gr-primary)', hover: 'var(--gr-primary-hover)', active: 'var(--gr-primary-active)' },
+  // Нейтральная ссылка: читаемый `--gr-fg` в покое, акцент `--gr-primary` при наведении.
+  neutral: { base: 'var(--gr-fg)', hover: 'var(--gr-primary)', active: 'var(--gr-primary-active)' },
   success: { base: 'var(--gr-success)', hover: 'var(--gr-success-hover)', active: 'var(--gr-success-active)' },
   warning: { base: 'var(--gr-warning)', hover: 'var(--gr-warning-hover)', active: 'var(--gr-warning-active)' },
   danger: { base: 'var(--gr-danger)', hover: 'var(--gr-danger-hover)', active: 'var(--gr-danger-active)' },
@@ -57,7 +57,7 @@ export function grLinkColorStyle(options: { tone: GrLinkTone, variant: GrLinkVar
 
   if (options.variant === 'muted') {
     return {
-      '--gr-link-color': 'var(--muted-fg)',
+      '--gr-link-color': 'var(--gr-muted-fg)',
       '--gr-link-color-hover': colors.base,
       '--gr-link-color-active': colors.active,
     }
@@ -70,7 +70,7 @@ export function grLinkColorStyle(options: { tone: GrLinkTone, variant: GrLinkVar
   }
 }
 
-export const disabledStateClass = 'cursor-not-allowed opacity-60 text-[var(--muted-fg)]'
+export const disabledStateClass = 'cursor-not-allowed opacity-60 text-[var(--gr-muted-fg)]'
 
 const UNDERLINE_VALUES: readonly GrLinkUnderline[] = ['auto', 'always', 'none']
 

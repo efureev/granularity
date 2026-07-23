@@ -35,7 +35,7 @@ const rows = [
         <tr
           v-for="row in 3"
           :key="row"
-          class="border-t border-[var(--brd)]"
+          class="border-t border-[var(--gr-brd)]"
         >
           <td class="px-4 py-3"><GrSkeleton class="h-4 w-32" /></td>
           <td class="px-4 py-3"><GrSkeleton class="h-4 w-24" /></td>
@@ -47,11 +47,11 @@ const rows = [
         <tr
           v-for="row in rows"
           :key="row.title"
-          class="border-t border-[var(--brd)]"
+          class="border-t border-[var(--gr-brd)]"
         >
           <td class="px-4 py-3">{{ row.title }}</td>
           <td class="px-4 py-3">{{ row.state }}</td>
-          <td class="px-4 py-3 text-[var(--muted-fg)]">{{ row.updated }}</td>
+          <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.updated }}</td>
         </tr>
       </template>
     </GrTable>

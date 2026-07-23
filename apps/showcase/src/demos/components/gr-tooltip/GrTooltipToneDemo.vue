@@ -9,8 +9,8 @@ const iconColor = ref('var(--gr-warning)')
 // Пресеты цвета иконки из палитры GrTone: клик подставляет валидную CSS-переменную
 // темы в инпут `icon-color` (раньше в демо был несуществующий `var(--warning)`).
 const tonePresets: Array<{ tone: string, value: string }> = [
-  { tone: 'primary', value: 'var(--primary)' },
-  { tone: 'neutral', value: 'var(--muted-fg)' },
+  { tone: 'primary', value: 'var(--gr-primary)' },
+  { tone: 'neutral', value: 'var(--gr-muted-fg)' },
   { tone: 'success', value: 'var(--gr-success)' },
   { tone: 'warning', value: 'var(--gr-warning)' },
   { tone: 'danger', value: 'var(--gr-danger)' },
@@ -23,11 +23,11 @@ const tonePresets: Array<{ tone: string, value: string }> = [
 <template>
   <div class="grid gap-4">
     <div class="flex flex-wrap items-center gap-3">
-      <span class="text-sm font-600 text-[var(--fg)]">
+      <span class="text-sm font-600 text-[var(--gr-fg)]">
         Custom tone
       </span>
       <GrTooltip :text="tooltipText" :icon-color="iconColor" />
-      <code class="rounded bg-[var(--muted)] px-2 py-1 text-xs text-[var(--muted-fg)]">
+      <code class="rounded bg-[var(--gr-muted)] px-2 py-1 text-xs text-[var(--gr-muted-fg)]">
         icon-color="{{ iconColor }}"
       </code>
     </div>
@@ -37,8 +37,8 @@ const tonePresets: Array<{ tone: string, value: string }> = [
         v-for="preset in tonePresets"
         :key="preset.tone"
         type="button"
-        class="inline-flex items-center gap-2 rounded-full border border-[var(--brd)] px-3 py-1 text-xs font-600 transition-colors hover:bg-[var(--muted)]"
-        :class="iconColor === preset.value ? 'ring-2 ring-[var(--ring)]' : ''"
+        class="inline-flex items-center gap-2 rounded-full border border-[var(--gr-brd)] px-3 py-1 text-xs font-600 transition-colors hover:bg-[var(--gr-muted)]"
+        :class="iconColor === preset.value ? 'ring-2 ring-[var(--gr-ring)]' : ''"
         @click="iconColor = preset.value"
       >
         <span class="h-3 w-3 rounded-full" :style="{ backgroundColor: preset.value }" />

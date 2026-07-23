@@ -45,9 +45,9 @@ function validateFiles(files: File[]): FileValidationIssue[] {
       />
     </GrFormField>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Latest validation status:
-      <span class="font-semibold text-[var(--fg)]">
+      <span class="font-semibold text-[var(--gr-fg)]">
         {{ validationMessages[0] ?? 'Ready for upload review' }}
       </span>
     </div>

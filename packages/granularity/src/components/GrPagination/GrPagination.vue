@@ -155,7 +155,7 @@ function last(): void {
           v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
           data-gr-pagination-ellipsis
           aria-hidden="true"
-          class="h-8 min-w-8 px-1 grid place-items-center text-sm text-[var(--muted-fg)]"
+          class="h-8 min-w-8 px-1 grid place-items-center text-sm text-[var(--gr-muted-fg)]"
         >…</span>
         <button
           v-else
@@ -163,8 +163,8 @@ function last(): void {
           data-gr-pagination-page
           :aria-current="item === page ? 'page' : undefined"
           :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
-          class="h-8 min-w-8 px-2 rounded-md text-sm font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-          :class="item === page ? 'bg-[var(--primary)] text-[var(--primary-fg)]' : 'text-[var(--muted-fg)] hover:bg-[var(--muted)] hover:text-[var(--fg)]'"
+          class="h-8 min-w-8 px-2 rounded-md text-sm font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+          :class="item === page ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]'"
           @click="goTo(item)"
         >
           {{ item }}

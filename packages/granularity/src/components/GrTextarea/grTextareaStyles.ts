@@ -1,7 +1,7 @@
 export type GrTextareaState = 'default' | 'success' | 'warning' | 'danger'
 
 export const borderClassByState: Record<GrTextareaState, string> = {
-  default: 'border-[var(--brd)]',
+  default: 'border-[var(--gr-brd)]',
   success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [v0.13.0] 2026-07-23
 
+### Changed
+
+- **Unified CSS token namespace under `--gr-*`.** The previously unprefixed shadcn-style semantic roles
+  (`--bg`, `--fg`, `--card`, `--muted`, `--brd`, `--ring`, `--primary`, `--secondary`, `--accent`,
+  `--destructive`, `--chart-*`, `--sidebar-*` and their `-fg`/`-hover`/`-active` variants) could collide
+  with the consuming app's own CSS variables. Every token now lives in a single `--gr-*` namespace with
+  three layers (primitives → semantic roles → per-component tokens), defined in the themes
+  (`light.css`/`dark.css`) and formulas (`tokens.css`); all components reference only `--gr-*`. Theme
+  customization is done via `--gr-*` (e.g. set `--gr-primary` to re-theme).
+
 ### Added
 
 - New `GrSlider` — a WAI-ARIA slider for picking a number or a range by dragging. Supports single

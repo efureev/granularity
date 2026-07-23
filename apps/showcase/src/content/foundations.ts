@@ -193,7 +193,7 @@ function getFoundationTokenDescription(name: string, section: string) {
     return `Кривая ускорения \`${easing}\` для motion-паттернов дизайн-системы.`
   }
 
-  if (name.startsWith('--primary-') || name.startsWith('--secondary-') || name.startsWith('--brd-') || name.startsWith('--destructive-'))
+  if (name.startsWith('--gr-primary-') || name.startsWith('--gr-secondary-') || name.startsWith('--gr-brd-') || name.startsWith('--gr-destructive-'))
     return 'Производное interaction-состояние, вычисляемое из semantic theme roles для hover/active поведения.'
 
   if (name.startsWith('--gr-success-') || name.startsWith('--gr-warning-') || name.startsWith('--gr-danger-') || name.startsWith('--gr-info-'))
@@ -204,25 +204,25 @@ function getFoundationTokenDescription(name: string, section: string) {
 
 function getThemeTokenDescription(name: string, section: string) {
   const descriptions: Record<string, string> = {
-    '--bg': 'Базовый фон приложения и крупных layout-поверхностей текущей темы.',
-    '--fg': 'Основной цвет текста и иконок поверх базового фона текущей темы.',
-    '--card': 'Фон карточек, панелей и других поднятых поверхностей.',
-    '--card-fg': 'Цвет контента внутри карточек и raised surface-блоков.',
-    '--popover': 'Фон popover-, dropdown- и overlay-поверхностей.',
-    '--popover-fg': 'Цвет текста и иконок внутри popover-слоёв.',
-    '--muted': 'Приглушённая поверхность для вторичных блоков, плашек и заполнений.',
-    '--muted-fg': 'Вторичный текстовый цвет для helper-копии и менее важных подписей.',
-    '--secondary': 'Нейтральная secondary action/surface-подложка без сильного бренд-акцента.',
-    '--secondary-fg': 'Контрастный текст для secondary-кнопок и поверхностей.',
-    '--brd': 'Базовый цвет бордеров и разделителей текущей темы.',
-    '--input': 'Цвет рамки и фона input-like контролов в состоянии покоя.',
-    '--ring': 'Цвет focus-ring и акцентного outline для интерактивных компонентов.',
-    '--primary': 'Главный brand/action цвет темы для primary CTA и ключевых акцентов.',
-    '--primary-fg': 'Контрастный текст и иконки поверх primary-заливки.',
-    '--accent': 'Мягкая акцентная поверхность для selected/hovered областей и подсветок.',
-    '--accent-fg': 'Цвет текста поверх accent-подложек.',
-    '--destructive': 'Цвет destructive action-сценариев и критических состояний.',
-    '--destructive-fg': 'Контрастный текст и иконки поверх destructive-заливки.',
+    '--gr-bg': 'Базовый фон приложения и крупных layout-поверхностей текущей темы.',
+    '--gr-fg': 'Основной цвет текста и иконок поверх базового фона текущей темы.',
+    '--gr-card': 'Фон карточек, панелей и других поднятых поверхностей.',
+    '--gr-card-fg': 'Цвет контента внутри карточек и raised surface-блоков.',
+    '--gr-popover': 'Фон popover-, dropdown- и overlay-поверхностей.',
+    '--gr-popover-fg': 'Цвет текста и иконок внутри popover-слоёв.',
+    '--gr-muted': 'Приглушённая поверхность для вторичных блоков, плашек и заполнений.',
+    '--gr-muted-fg': 'Вторичный текстовый цвет для helper-копии и менее важных подписей.',
+    '--gr-secondary': 'Нейтральная secondary action/surface-подложка без сильного бренд-акцента.',
+    '--gr-secondary-fg': 'Контрастный текст для secondary-кнопок и поверхностей.',
+    '--gr-brd': 'Базовый цвет бордеров и разделителей текущей темы.',
+    '--gr-input': 'Цвет рамки и фона input-like контролов в состоянии покоя.',
+    '--gr-ring': 'Цвет focus-ring и акцентного outline для интерактивных компонентов.',
+    '--gr-primary': 'Главный brand/action цвет темы для primary CTA и ключевых акцентов.',
+    '--gr-primary-fg': 'Контрастный текст и иконки поверх primary-заливки.',
+    '--gr-accent': 'Мягкая акцентная поверхность для selected/hovered областей и подсветок.',
+    '--gr-accent-fg': 'Цвет текста поверх accent-подложек.',
+    '--gr-destructive': 'Цвет destructive action-сценариев и критических состояний.',
+    '--gr-destructive-fg': 'Контрастный текст и иконки поверх destructive-заливки.',
     '--gr-success': 'Основной semantic success-цвет для статусов, бейджей и уведомлений.',
     '--gr-success-light': 'Облегчённая success-подложка для мягких статусов и подсветок.',
     '--gr-success-fg': 'Контрастный текст и иконки поверх success-заливки.',
@@ -247,28 +247,28 @@ function getThemeTokenDescription(name: string, section: string) {
     '--gr-azure-light': 'Облегчённая azure-подложка для мягких informational поверхностей.',
     '--gr-azure-fg': 'Контрастный текст и иконки поверх azure-заливки.',
     '--gr-azure-text': 'Текстовый оттенок для azure-плашек и спокойных informational блоков.',
-    '--chart-1': 'Первый цвет серии для графиков и data-visualization элементов.',
-    '--chart-2': 'Второй цвет серии для графиков и data-visualization элементов.',
-    '--chart-3': 'Третий цвет серии для графиков и data-visualization элементов.',
-    '--chart-4': 'Четвёртый цвет серии для графиков и data-visualization элементов.',
-    '--chart-5': 'Пятый цвет серии для графиков и data-visualization элементов.',
-    '--sidebar': 'Фон sidebar/navigation rail области текущей темы.',
-    '--sidebar-fg': 'Основной текст и иконки внутри sidebar.',
-    '--sidebar-primary': 'Акцентный цвет активных/ключевых элементов внутри sidebar.',
-    '--sidebar-primary-fg': 'Контрастный текст поверх sidebar primary-акцентов.',
-    '--sidebar-accent': 'Мягкий accent-фон для hover/selected состояний в sidebar.',
-    '--sidebar-accent-fg': 'Цвет текста поверх sidebar accent-подложек.',
-    '--sidebar-brd': 'Бордеры и разделители sidebar-области.',
-    '--sidebar-ring': 'Focus-ring для интерактивных элементов внутри sidebar.',
+    '--gr-chart-1': 'Первый цвет серии для графиков и data-visualization элементов.',
+    '--gr-chart-2': 'Второй цвет серии для графиков и data-visualization элементов.',
+    '--gr-chart-3': 'Третий цвет серии для графиков и data-visualization элементов.',
+    '--gr-chart-4': 'Четвёртый цвет серии для графиков и data-visualization элементов.',
+    '--gr-chart-5': 'Пятый цвет серии для графиков и data-visualization элементов.',
+    '--gr-sidebar': 'Фон sidebar/navigation rail области текущей темы.',
+    '--gr-sidebar-fg': 'Основной текст и иконки внутри sidebar.',
+    '--gr-sidebar-primary': 'Акцентный цвет активных/ключевых элементов внутри sidebar.',
+    '--gr-sidebar-primary-fg': 'Контрастный текст поверх sidebar primary-акцентов.',
+    '--gr-sidebar-accent': 'Мягкий accent-фон для hover/selected состояний в sidebar.',
+    '--gr-sidebar-accent-fg': 'Цвет текста поверх sidebar accent-подложек.',
+    '--gr-sidebar-brd': 'Бордеры и разделители sidebar-области.',
+    '--gr-sidebar-ring': 'Focus-ring для интерактивных элементов внутри sidebar.',
     '--gr-category-tree-branch-line-active-color': 'Semantic цвет активной ветки category tree и подобных композитных компонентов.',
-    '--primary-hover': 'Fallback-цвет hover-состояния для primary action без поддержки `color-mix`.',
-    '--primary-active': 'Fallback-цвет active-состояния для primary action без поддержки `color-mix`.',
-    '--secondary-hover': 'Fallback-цвет hover-состояния для secondary action без поддержки `color-mix`.',
-    '--secondary-active': 'Fallback-цвет active-состояния для secondary action без поддержки `color-mix`.',
-    '--brd-hover': 'Fallback-цвет hover-состояния для border/outline-элементов без поддержки `color-mix`.',
-    '--brd-active': 'Fallback-цвет active-состояния для border/outline-элементов без поддержки `color-mix`.',
-    '--destructive-hover': 'Fallback-цвет hover-состояния для destructive action без поддержки `color-mix`.',
-    '--destructive-active': 'Fallback-цвет active-состояния для destructive action без поддержки `color-mix`.',
+    '--gr-primary-hover': 'Fallback-цвет hover-состояния для primary action без поддержки `color-mix`.',
+    '--gr-primary-active': 'Fallback-цвет active-состояния для primary action без поддержки `color-mix`.',
+    '--gr-secondary-hover': 'Fallback-цвет hover-состояния для secondary action без поддержки `color-mix`.',
+    '--gr-secondary-active': 'Fallback-цвет active-состояния для secondary action без поддержки `color-mix`.',
+    '--gr-brd-hover': 'Fallback-цвет hover-состояния для border/outline-элементов без поддержки `color-mix`.',
+    '--gr-brd-active': 'Fallback-цвет active-состояния для border/outline-элементов без поддержки `color-mix`.',
+    '--gr-destructive-hover': 'Fallback-цвет hover-состояния для destructive action без поддержки `color-mix`.',
+    '--gr-destructive-active': 'Fallback-цвет active-состояния для destructive action без поддержки `color-mix`.',
     '--gr-success-hover': 'Fallback-цвет hover-состояния для success-ролей без поддержки `color-mix`.',
     '--gr-success-active': 'Fallback-цвет active-состояния для success-ролей без поддержки `color-mix`.',
     '--gr-warning-hover': 'Fallback-цвет hover-состояния для warning-ролей без поддержки `color-mix`.',
@@ -603,49 +603,49 @@ const tokensCssSource = `:root {
   --gr-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 
   /* Derived interaction formulas: action roles */
-  --primary-hover: color-mix(in srgb, var(--primary) 92%, var(--fg));
-  --primary-active: color-mix(in srgb, var(--primary) 84%, var(--fg));
-  --secondary-hover: color-mix(in srgb, var(--secondary) 92%, var(--fg));
-  --secondary-active: color-mix(in srgb, var(--secondary) 84%, var(--fg));
-  --brd-hover: color-mix(in srgb, var(--brd) 70%, var(--fg));
-  --brd-active: color-mix(in srgb, var(--brd) 55%, var(--fg));
-  --destructive-hover: color-mix(in srgb, var(--destructive) 92%, var(--fg));
-  --destructive-active: color-mix(in srgb, var(--destructive) 84%, var(--fg));
+  --gr-primary-hover: color-mix(in srgb, var(--gr-primary) 92%, var(--gr-fg));
+  --gr-primary-active: color-mix(in srgb, var(--gr-primary) 84%, var(--gr-fg));
+  --gr-secondary-hover: color-mix(in srgb, var(--gr-secondary) 92%, var(--gr-fg));
+  --gr-secondary-active: color-mix(in srgb, var(--gr-secondary) 84%, var(--gr-fg));
+  --gr-brd-hover: color-mix(in srgb, var(--gr-brd) 70%, var(--gr-fg));
+  --gr-brd-active: color-mix(in srgb, var(--gr-brd) 55%, var(--gr-fg));
+  --gr-destructive-hover: color-mix(in srgb, var(--gr-destructive) 92%, var(--gr-fg));
+  --gr-destructive-active: color-mix(in srgb, var(--gr-destructive) 84%, var(--gr-fg));
 
   /* Derived interaction formulas: status roles */
-  --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--fg));
-  --gr-success-active: color-mix(in srgb, var(--gr-success) 84%, var(--fg));
-  --gr-warning-hover: color-mix(in srgb, var(--gr-warning) 92%, var(--fg));
-  --gr-warning-active: color-mix(in srgb, var(--gr-warning) 84%, var(--fg));
-  --gr-danger-hover: color-mix(in srgb, var(--gr-danger) 92%, var(--fg));
-  --gr-danger-active: color-mix(in srgb, var(--gr-danger) 84%, var(--fg));
-  --gr-info-hover: color-mix(in srgb, var(--gr-info) 92%, var(--fg));
-  --gr-info-active: color-mix(in srgb, var(--gr-info) 84%, var(--fg));
+  --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--gr-fg));
+  --gr-success-active: color-mix(in srgb, var(--gr-success) 84%, var(--gr-fg));
+  --gr-warning-hover: color-mix(in srgb, var(--gr-warning) 92%, var(--gr-fg));
+  --gr-warning-active: color-mix(in srgb, var(--gr-warning) 84%, var(--gr-fg));
+  --gr-danger-hover: color-mix(in srgb, var(--gr-danger) 92%, var(--gr-fg));
+  --gr-danger-active: color-mix(in srgb, var(--gr-danger) 84%, var(--gr-fg));
+  --gr-info-hover: color-mix(in srgb, var(--gr-info) 92%, var(--gr-fg));
+  --gr-info-active: color-mix(in srgb, var(--gr-info) 84%, var(--gr-fg));
 }`
 
 const lightThemeCssSource = `:root {
   /* Surface roles */
-  --bg: #f8fafc;
-  --fg: #0f172a;
-  --card: #ffffff;
-  --card-fg: #0f172a;
-  --popover: #ffffff;
-  --popover-fg: #0f172a;
-  --muted: #f1f5f9;
-  --muted-fg: #64748b;
-  --secondary: #e2e8f0;
-  --secondary-fg: #1e293b;
-  --brd: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #6366f1;
+  --gr-bg: #f8fafc;
+  --gr-fg: #0f172a;
+  --gr-card: #ffffff;
+  --gr-card-fg: #0f172a;
+  --gr-popover: #ffffff;
+  --gr-popover-fg: #0f172a;
+  --gr-muted: #f1f5f9;
+  --gr-muted-fg: #64748b;
+  --gr-secondary: #e2e8f0;
+  --gr-secondary-fg: #1e293b;
+  --gr-brd: #e2e8f0;
+  --gr-input: #e2e8f0;
+  --gr-ring: #6366f1;
 
   /* Action roles */
-  --primary: #4f46e5;
-  --primary-fg: #ffffff;
-  --accent: #eef2ff;
-  --accent-fg: #3730a3;
-  --destructive: #dc2626;
-  --destructive-fg: #ffffff;
+  --gr-primary: #4f46e5;
+  --gr-primary-fg: #ffffff;
+  --gr-accent: #eef2ff;
+  --gr-accent-fg: #3730a3;
+  --gr-destructive: #dc2626;
+  --gr-destructive-fg: #ffffff;
 
   /* Status roles */
   --gr-success: #10b981;
@@ -674,37 +674,37 @@ const lightThemeCssSource = `:root {
   --gr-azure-text: #075985;
 
   /* Data visualization roles */
-  --chart-1: #4f46e5;
-  --chart-2: #10b981;
-  --chart-3: #f97316;
-  --chart-4: #6366f1;
-  --chart-5: #8b5cf6;
+  --gr-chart-1: #4f46e5;
+  --gr-chart-2: #10b981;
+  --gr-chart-3: #f97316;
+  --gr-chart-4: #6366f1;
+  --gr-chart-5: #8b5cf6;
 
   /* Navigation roles */
-  --sidebar: #ffffff;
-  --sidebar-fg: #0f172a;
-  --sidebar-primary: #4f46e5;
-  --sidebar-primary-fg: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-fg: #1e293b;
-  --sidebar-brd: #e2e8f0;
-  --sidebar-ring: #6366f1;
+  --gr-sidebar: #ffffff;
+  --gr-sidebar-fg: #0f172a;
+  --gr-sidebar-primary: #4f46e5;
+  --gr-sidebar-primary-fg: #ffffff;
+  --gr-sidebar-accent: #f1f5f9;
+  --gr-sidebar-accent-fg: #1e293b;
+  --gr-sidebar-brd: #e2e8f0;
+  --gr-sidebar-ring: #6366f1;
 
   /* Component semantic roles */
-  --gr-category-tree-branch-line-active-color: color-mix(in srgb, var(--primary) 20%, var(--brd));
+  --gr-category-tree-branch-line-active-color: color-mix(in srgb, var(--gr-primary) 20%, var(--gr-brd));
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
   :root {
     /* Action role fallbacks */
-    --primary-hover: #4a42d6;
-    --primary-active: #453ec7;
-    --secondary-hover: #d1d7e0;
-    --secondary-active: #c0c7d0;
-    --brd-hover: #a3a9b5;
-    --brd-active: #838a97;
-    --destructive-hover: #cc2526;
-    --destructive-active: #bb2427;
+    --gr-primary-hover: #4a42d6;
+    --gr-primary-active: #453ec7;
+    --gr-secondary-hover: #d1d7e0;
+    --gr-secondary-active: #c0c7d0;
+    --gr-brd-hover: #a3a9b5;
+    --gr-brd-active: #838a97;
+    --gr-destructive-hover: #cc2526;
+    --gr-destructive-active: #bb2427;
 
     /* Status role fallbacks */
     --gr-success-hover: #10ac7a;
@@ -729,27 +729,27 @@ const darkThemeCssSource = `.theme-dark,
 .dark,
 [data-theme='dark'] {
   /* Surface roles */
-  --bg: #0f172a;
-  --fg: #f8fafc;
-  --card: #1e293b;
-  --card-fg: #f8fafc;
-  --popover: #1e293b;
-  --popover-fg: #f8fafc;
-  --muted: #334155;
-  --muted-fg: #94a3b8;
-  --secondary: #334155;
-  --secondary-fg: #f1f5f9;
-  --brd: #334155;
-  --input: #334155;
-  --ring: #818cf8;
+  --gr-bg: #0f172a;
+  --gr-fg: #f8fafc;
+  --gr-card: #1e293b;
+  --gr-card-fg: #f8fafc;
+  --gr-popover: #1e293b;
+  --gr-popover-fg: #f8fafc;
+  --gr-muted: #334155;
+  --gr-muted-fg: #94a3b8;
+  --gr-secondary: #334155;
+  --gr-secondary-fg: #f1f5f9;
+  --gr-brd: #334155;
+  --gr-input: #334155;
+  --gr-ring: #818cf8;
 
   /* Action roles */
-  --primary: #6366f1;
-  --primary-fg: #ffffff;
-  --accent: #1e1b4b;
-  --accent-fg: #c7d2fe;
-  --destructive: #ef4444;
-  --destructive-fg: #ffffff;
+  --gr-primary: #6366f1;
+  --gr-primary-fg: #ffffff;
+  --gr-accent: #1e1b4b;
+  --gr-accent-fg: #c7d2fe;
+  --gr-destructive: #ef4444;
+  --gr-destructive-fg: #ffffff;
 
   /* Status roles */
   --gr-success: #34d399;
@@ -778,24 +778,24 @@ const darkThemeCssSource = `.theme-dark,
   --gr-azure-text: #bae6fd;
 
   /* Data visualization roles */
-  --chart-1: #6366f1;
-  --chart-2: #34d399;
-  --chart-3: #fb923c;
-  --chart-4: #818cf8;
-  --chart-5: #a78bfa;
+  --gr-chart-1: #6366f1;
+  --gr-chart-2: #34d399;
+  --gr-chart-3: #fb923c;
+  --gr-chart-4: #818cf8;
+  --gr-chart-5: #a78bfa;
 
   /* Navigation roles */
-  --sidebar: #1e293b;
-  --sidebar-fg: #f8fafc;
-  --sidebar-primary: #6366f1;
-  --sidebar-primary-fg: #ffffff;
-  --sidebar-accent: #334155;
-  --sidebar-accent-fg: #f1f5f9;
-  --sidebar-brd: #334155;
-  --sidebar-ring: #818cf8;
+  --gr-sidebar: #1e293b;
+  --gr-sidebar-fg: #f8fafc;
+  --gr-sidebar-primary: #6366f1;
+  --gr-sidebar-primary-fg: #ffffff;
+  --gr-sidebar-accent: #334155;
+  --gr-sidebar-accent-fg: #f1f5f9;
+  --gr-sidebar-brd: #334155;
+  --gr-sidebar-ring: #818cf8;
 
   /* Component semantic roles */
-  --gr-category-tree-branch-line-active-color: color-mix(in srgb, var(--primary) 38%, var(--brd));
+  --gr-category-tree-branch-line-active-color: color-mix(in srgb, var(--gr-primary) 38%, var(--gr-brd));
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
@@ -803,14 +803,14 @@ const darkThemeCssSource = `.theme-dark,
   .dark,
   [data-theme='dark'] {
     /* Action role fallbacks */
-    --primary-hover: #6f72f2;
-    --primary-active: #7b7ef3;
-    --secondary-hover: #435062;
-    --secondary-active: #535f70;
-    --brd-hover: #6e7987;
-    --brd-active: #8c94a0;
-    --destructive-hover: #f05353;
-    --destructive-active: #f06161;
+    --gr-primary-hover: #6f72f2;
+    --gr-primary-active: #7b7ef3;
+    --gr-secondary-hover: #435062;
+    --gr-secondary-active: #535f70;
+    --gr-brd-hover: #6e7987;
+    --gr-brd-active: #8c94a0;
+    --gr-destructive-hover: #f05353;
+    --gr-destructive-active: #f06161;
 
     /* Status role fallbacks */
     --gr-success-hover: #44d6a1;
@@ -848,8 +848,8 @@ body {
 body {
   margin: 0;
   font-family: var(--gr-font-ui);
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--gr-bg);
+  color: var(--gr-fg);
 }
 
 :where(a, button) {
@@ -857,14 +857,14 @@ body {
 }`
 
 const lightThemeCssExcerpt = `:root {
-  --bg: #f8fafc;
-  --fg: #0f172a;
-  --card: #ffffff;
-  --muted: #f1f5f9;
-  --brd: #e2e8f0;
-  --ring: #6366f1;
-  --primary: #4f46e5;
-  --primary-fg: #ffffff;
+  --gr-bg: #f8fafc;
+  --gr-fg: #0f172a;
+  --gr-card: #ffffff;
+  --gr-muted: #f1f5f9;
+  --gr-brd: #e2e8f0;
+  --gr-ring: #6366f1;
+  --gr-primary: #4f46e5;
+  --gr-primary-fg: #ffffff;
   --gr-success: #10b981;
   --gr-warning: #f97316;
   --gr-danger: #dc2626;
@@ -874,14 +874,14 @@ const lightThemeCssExcerpt = `:root {
 const darkThemeCssExcerpt = `.theme-dark,
 .dark,
 [data-theme='dark'] {
-  --bg: #0f172a;
-  --fg: #f8fafc;
-  --card: #1e293b;
-  --muted: #334155;
-  --brd: #334155;
-  --ring: #818cf8;
-  --primary: #6366f1;
-  --primary-fg: #ffffff;
+  --gr-bg: #0f172a;
+  --gr-fg: #f8fafc;
+  --gr-card: #1e293b;
+  --gr-muted: #334155;
+  --gr-brd: #334155;
+  --gr-ring: #818cf8;
+  --gr-primary: #6366f1;
+  --gr-primary-fg: #ffffff;
   --gr-success: #34d399;
   --gr-warning: #fb923c;
   --gr-danger: #f87171;
@@ -989,7 +989,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     id: 'themes',
     title: 'Themes',
     summary: 'Встроенные `light` и `dark` темы отделены от foundation-токенов и могут жить рядом с кастомными theme layers приложения.',
-    description: 'Theme layer определяет semantic значения вроде `--bg`, `--primary`, `--brd` и статусные роли. Это позволяет использовать один набор foundations и переключать только визуальный режим.',
+    description: 'Theme layer определяет semantic значения вроде `--gr-bg`, `--gr-primary`, `--gr-brd` и статусные роли. Это позволяет использовать один набор foundations и переключать только визуальный режим.',
     narrativeSource: takeHeadingBlock(stylingDocSource, '## Встроенные темы'),
     sourcePath: 'packages/granularity/docs/styling.md',
     keyPoints: [
@@ -1030,7 +1030,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     keyPoints: [
       `В \`tokens.css\` уже вынесено ${foundationTokenCount} токенов и производных формул.`,
       'Практическое правило из docs: всё, что одинаково для тем, живёт в `tokens`, а не в theme files.',
-      'Производные interaction values вроде `--primary-hover` считаются от semantic-переменных и не требуют копирования по темам.',
+      'Производные interaction values вроде `--gr-primary-hover` считаются от semantic-переменных и не требуют копирования по темам.',
     ],
     recommendations: [
       'Не переносите theme-specific цвета в foundation tokens — это усложнит поддержку `light`/`dark`.',

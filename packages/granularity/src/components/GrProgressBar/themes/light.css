@@ -1,6 +1,6 @@
 :root {
-  --pb-bg: var(--primary);
-  --pb-neutral-bg: var(--secondary);
+  --pb-bg: var(--gr-primary);
+  --pb-neutral-bg: var(--gr-secondary);
   --pb-success-bg: var(--gr-success);
   --pb-warning-bg: var(--gr-warning);
   --pb-danger-bg: var(--gr-danger);

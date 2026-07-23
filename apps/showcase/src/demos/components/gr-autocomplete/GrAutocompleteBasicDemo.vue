@@ -27,7 +27,7 @@ const framework = ref('')
       aria-label="Search a framework"
     />
 
-    <p class="text-sm text-[var(--muted-fg)]">
+    <p class="text-sm text-[var(--gr-muted-fg)]">
       Selected: <code>{{ framework || '—' }}</code>
     </p>
   </div>

@@ -32,7 +32,7 @@ const titleAlignClass = computed(() => {
   <div
     v-if="isVisible"
     data-gr-dropdown-menu-header
-    class="px-4 py-2 text-[11px] tracking-wide text-[var(--muted-fg)]"
+    class="px-4 py-2 text-[11px] tracking-wide text-[var(--gr-muted-fg)]"
     :class="[titleAlignClass, { uppercase }]"
   >
     <slot>{{ title }}</slot>

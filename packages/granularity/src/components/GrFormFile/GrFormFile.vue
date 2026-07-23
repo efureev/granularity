@@ -306,7 +306,7 @@ watch(
 
         <span
           v-if="!multiple && hasFiles"
-          class="text-sm text-[var(--muted-fg)] truncate max-w-[240px]"
+          class="text-sm text-[var(--gr-muted-fg)] truncate max-w-[240px]"
           data-gr-form-file-single-name
           :title="files[0]?.name"
         >
@@ -315,7 +315,7 @@ watch(
 
         <span
           v-if="!hasFiles"
-          class="text-sm text-[var(--muted-fg)]"
+          class="text-sm text-[var(--gr-muted-fg)]"
           data-gr-form-file-placeholder
         >
           {{ resolvedPlaceholder }}
@@ -330,7 +330,7 @@ watch(
           data-gr-form-file-item
         >
           <span
-            class="text-sm text-[var(--muted-fg)] truncate max-w-[240px]"
+            class="text-sm text-[var(--gr-muted-fg)] truncate max-w-[240px]"
             :title="file.name"
             data-gr-form-file-item-name
           >
@@ -339,7 +339,7 @@ watch(
 
           <button
             type="button"
-            class="text-xs text-[var(--muted-fg)] hover:text-[var(--fg)]"
+            class="text-xs text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             data-gr-form-file-item-remove
             :disabled="disabled"
             @click.prevent="removeAt(index)"
@@ -362,7 +362,7 @@ watch(
 
 <style scoped>
 [data-gr-form-file].gr-dropzone--over {
-  outline: 2px solid var(--ring);
+  outline: 2px solid var(--gr-ring);
   outline-offset: 2px;
 }
 </style>

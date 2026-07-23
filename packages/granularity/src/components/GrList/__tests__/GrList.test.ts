@@ -52,7 +52,7 @@ describe('GrListItem', () => {
 
     expect(wrapper.text()).toContain('Security')
     expect(wrapper.text()).toContain('Status')
-    expect(wrapper.find('.text-\\[var\\(--muted-fg\\)\\]').exists()).toBe(false)
+    expect(wrapper.find('.text-\\[var\\(--gr-muted-fg\\)\\]').exists()).toBe(false)
     expect(wrapper.attributes('role')).toBe('listitem')
   })
 

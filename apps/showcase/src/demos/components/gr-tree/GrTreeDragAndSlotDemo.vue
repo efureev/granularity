@@ -38,7 +38,7 @@ const lastDrop = ref(t('components.GrTree.drag.hint'))
 
 function resolveTone(status: TreeItem['status']) {
   if (status === 'critical')
-    return 'bg-[color-mix(in_srgb,var(--destructive)_14%,transparent)] text-[var(--destructive)]'
+    return 'bg-[color-mix(in_srgb,var(--gr-destructive)_14%,transparent)] text-[var(--gr-destructive)]'
 
   if (status === 'warning')
     return 'bg-[var(--gr-warning-light)] text-[var(--gr-warning)]'

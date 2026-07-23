@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<GrDropdownMenuGroupProps>(), {
 const itemsClass = computed(() => {
   return [
     'w-full',
-    props.dividers ? 'divide-y divide-[var(--brd)]' : '',
+    props.dividers ? 'divide-y divide-[var(--gr-brd)]' : '',
   ].filter(Boolean).join(' ')
 })
 </script>

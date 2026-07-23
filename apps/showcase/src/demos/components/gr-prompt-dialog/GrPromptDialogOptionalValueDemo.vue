@@ -14,8 +14,8 @@ const lastSubmitted = ref(note.value)
       Open optional prompt
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
-      Last submitted note: <span class="font-medium text-[var(--fg)]">{{ lastSubmitted || '—' }}</span>
+    <div class="text-xs text-[var(--gr-muted-fg)]">
+      Last submitted note: <span class="font-medium text-[var(--gr-fg)]">{{ lastSubmitted || '—' }}</span>
     </div>
 
     <GrPromptDialog

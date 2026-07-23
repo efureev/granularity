@@ -35,14 +35,14 @@ const shortcuts = [
       <div
         v-for="shortcut in shortcuts"
         :key="shortcut.action"
-        class="flex items-center justify-between gap-6 px-4 py-2 text-[13px] text-[var(--fg)]"
+        class="flex items-center justify-between gap-6 px-4 py-2 text-[13px] text-[var(--gr-fg)]"
       >
         <span class="truncate">{{ shortcut.action }}</span>
         <span class="flex shrink-0 items-center gap-1">
           <kbd
             v-for="(key, index) in shortcut.keys"
             :key="index"
-            class="min-w-[20px] rounded-md border border-[var(--brd)] bg-[var(--muted)] px-1.5 py-0.5 text-center text-[11px] font-medium text-[var(--muted-fg)] tabular-nums"
+            class="min-w-[20px] rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] px-1.5 py-0.5 text-center text-[11px] font-medium text-[var(--gr-muted-fg)] tabular-nums"
           >
             {{ key }}
           </kbd>

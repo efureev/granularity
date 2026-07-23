@@ -59,7 +59,7 @@ provide(GR_FORM_FIELD_KEY, {
     <label
       v-if="props.label"
       :for="fieldId"
-      class="text-sm text-[var(--muted-fg)]"
+      class="text-sm text-[var(--gr-muted-fg)]"
       :class="props.labelClass"
     >
       {{ props.label }}
@@ -70,7 +70,7 @@ provide(GR_FORM_FIELD_KEY, {
       v-if="hasHint"
       :id="hintId"
       data-gr-form-field-hint
-      class="text-xs text-[var(--muted-fg)]"
+      class="text-xs text-[var(--gr-muted-fg)]"
     >
       <slot name="hint">{{ props.hint }}</slot>
     </p>

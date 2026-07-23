@@ -22,7 +22,7 @@ withDefaults(defineProps<GrSkeletonProps>(), {
   <div
       data-gr-skeleton
       aria-hidden="true"
-      class="bg-[var(--muted)] border border-[var(--brd)]"
+      class="bg-[var(--gr-muted)] border border-[var(--gr-brd)]"
       :style="{ height, width, borderRadius: rounded }"
   />
 </template>

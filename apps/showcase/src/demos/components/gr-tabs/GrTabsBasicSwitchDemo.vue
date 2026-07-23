@@ -25,7 +25,7 @@ const panelContent = computed(() => {
   <div class="grid gap-3">
     <GrTabs v-model="currentTab" :tabs="tabs" />
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--fg)] shadow-[var(--gr-shadow-1)]">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-fg)] shadow-[var(--gr-shadow-1)]">
       {{ panelContent }}
     </div>
 

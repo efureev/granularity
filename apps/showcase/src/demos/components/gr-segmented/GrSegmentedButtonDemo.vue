@@ -34,14 +34,14 @@ const viewOptions: GrSegmentedOption[] = [
   <div class="grid gap-4">
     <div class="grid gap-4 md:grid-cols-2 md:max-w-[520px]">
       <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrSegmented.button.sizeLabel') }}
         </div>
         <GrSelect v-model="size" :options="sizeOptions" />
       </div>
 
       <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrSegmented.button.speedLabel') }}
         </div>
         <GrSelect v-model="indicatorDuration" :options="durationOptions" />

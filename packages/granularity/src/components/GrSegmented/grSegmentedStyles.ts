@@ -22,7 +22,7 @@ export const indicatorVariantClassMap: Record<GrSegmentedVariant, string> = {
   button: 'border border-[var(--gr-segmented-indicator-brd)] bg-[var(--gr-segmented-indicator-bg)] shadow-[var(--gr-segmented-indicator-shadow)]',
 }
 export const itemBaseClass =
-  'group/segmented-item relative z-[1] inline-flex min-h-[var(--gr-segmented-min-height)] min-w-0 items-center justify-center gap-2 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] px-[var(--gr-segmented-item-px)] py-[var(--gr-segmented-item-py)] text-[length:var(--gr-segmented-font-size)] leading-[var(--gr-segmented-line-height)] font-[var(--gr-segmented-font-weight)] text-[var(--gr-segmented-item-color)] transition-colors duration-150 select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--ring),0_0_0_4px_var(--bg)]'
+  'group/segmented-item relative z-[1] inline-flex min-h-[var(--gr-segmented-min-height)] min-w-0 items-center justify-center gap-2 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] px-[var(--gr-segmented-item-px)] py-[var(--gr-segmented-item-py)] text-[length:var(--gr-segmented-font-size)] leading-[var(--gr-segmented-line-height)] font-[var(--gr-segmented-font-weight)] text-[var(--gr-segmented-item-color)] transition-colors duration-150 select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
 export const itemVariantClassMap: Record<GrSegmentedVariant, string> = {
   pills: '',
   button: '',
@@ -77,26 +77,26 @@ const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
 }
 const rootVariantStyles: Record<GrSegmentedVariant, Record<string, string>> = {
   pills: {
-    '--gr-segmented-track-bg': 'var(--muted)',
-    '--gr-segmented-track-brd': 'var(--brd)',
+    '--gr-segmented-track-bg': 'var(--gr-muted)',
+    '--gr-segmented-track-brd': 'var(--gr-brd)',
     '--gr-segmented-track-shadow': 'none',
-    '--gr-segmented-indicator-bg': 'var(--card)',
-    '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--card) 84%, var(--brd) 16%)',
+    '--gr-segmented-indicator-bg': 'var(--gr-card)',
+    '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--gr-card) 84%, var(--gr-brd) 16%)',
     '--gr-segmented-indicator-shadow': 'var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow, 0 0 0 0 transparent)',
-    '--gr-segmented-item-color': 'var(--muted-fg)',
-    '--gr-segmented-item-selected-color': 'var(--fg)',
-    '--gr-segmented-item-hover-color': 'var(--fg)',
+    '--gr-segmented-item-color': 'var(--gr-muted-fg)',
+    '--gr-segmented-item-selected-color': 'var(--gr-fg)',
+    '--gr-segmented-item-hover-color': 'var(--gr-fg)',
   },
   button: {
-    '--gr-segmented-track-bg': 'var(--card)',
-    '--gr-segmented-track-brd': 'var(--brd)',
+    '--gr-segmented-track-bg': 'var(--gr-card)',
+    '--gr-segmented-track-brd': 'var(--gr-brd)',
     '--gr-segmented-track-shadow': 'var(--gr-shadow-1)',
-    '--gr-segmented-indicator-bg': 'var(--primary)',
-    '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--primary) 88%, var(--brd) 12%)',
+    '--gr-segmented-indicator-bg': 'var(--gr-primary)',
+    '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--gr-primary) 88%, var(--gr-brd) 12%)',
     '--gr-segmented-indicator-shadow': 'var(--gr-shadow-2)',
-    '--gr-segmented-item-color': 'var(--muted-fg)',
-    '--gr-segmented-item-selected-color': 'var(--primary-fg)',
-    '--gr-segmented-item-hover-color': 'var(--fg)',
+    '--gr-segmented-item-color': 'var(--gr-muted-fg)',
+    '--gr-segmented-item-selected-color': 'var(--gr-primary-fg)',
+    '--gr-segmented-item-hover-color': 'var(--gr-fg)',
   },
 }
 export function grSegmentedRootClass(options: { variant: GrSegmentedVariant, block: boolean, disabled: boolean }): string {

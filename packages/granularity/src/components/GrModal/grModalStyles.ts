@@ -28,7 +28,7 @@ export const panelTransition = {
 } as const
 
 export const panelBase
-  = 'w-full overflow-hidden relative z-10 border border-[var(--brd)] bg-[var(--card)] text-[var(--card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
+  = 'w-full overflow-hidden relative z-10 border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
 
 export const panelWidthBySize: Record<GrModalSize, string> = {
   sm: 'max-w-[420px]',

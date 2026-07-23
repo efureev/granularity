@@ -29,20 +29,20 @@ function openWithSize(size: 'sm' | 'lg') {
       <div class="grid gap-4">
         <div class="flex items-center justify-between gap-3">
           <div>
-            <div class="text-sm font-semibold text-[var(--fg)]">
+            <div class="text-sm font-semibold text-[var(--gr-fg)]">
               {{ t('components.GrModal.size.activeSize', { size: activeSize }) }}
             </div>
-            <div class="text-sm text-[var(--muted-fg)]">
+            <div class="text-sm text-[var(--gr-muted-fg)]">
               {{ t('components.GrModal.size.body') }}
             </div>
           </div>
         </div>
 
         <div class="grid gap-3 sm:grid-cols-2">
-          <div class="rounded-2xl border border-[var(--brd)] p-3 text-sm">
+          <div class="rounded-2xl border border-[var(--gr-brd)] p-3 text-sm">
             {{ t('components.GrModal.size.summaryBlock') }}
           </div>
-          <div class="rounded-2xl border border-[var(--brd)] p-3 text-sm">
+          <div class="rounded-2xl border border-[var(--gr-brd)] p-3 text-sm">
             {{ t('components.GrModal.size.secondaryBlock') }}
           </div>
         </div>

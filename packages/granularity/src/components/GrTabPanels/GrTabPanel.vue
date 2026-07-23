@@ -35,7 +35,7 @@ const tabId = computed(() => (ctx ? `${ctx.idBase}-tab-${props.value}` : undefin
     :aria-labelledby="tabId"
     :hidden="keepAlive && !isActive ? true : undefined"
     :tabindex="isActive ? 0 : undefined"
-    class="rounded-[var(--gr-radius-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+    class="rounded-[var(--gr-radius-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
   >
     <slot />
   </div>

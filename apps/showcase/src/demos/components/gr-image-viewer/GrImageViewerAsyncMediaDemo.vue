@@ -76,8 +76,8 @@ onBeforeUnmount(() => {
       </GrBadge>
     </div>
 
-    <div class="rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
-      <div class="mb-3 text-sm text-[var(--muted-fg)]">
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
+      <div class="mb-3 text-sm text-[var(--gr-muted-fg)]">
         Используйте viewer после загрузки gallery payload — так проще показать loading/progress state до fullscreen modal.
       </div>
 

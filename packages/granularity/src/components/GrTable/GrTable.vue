@@ -56,7 +56,7 @@ const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.captio
     :role="regionLabel ? 'region' : undefined"
     :aria-label="regionLabel"
     :tabindex="regionLabel ? 0 : undefined"
-    class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--brd)] bg-[var(--card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+    class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
   >
     <table
       data-gr-table
@@ -69,13 +69,13 @@ const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.captio
 {{ caption }}
 </slot>
       </caption>
-      <thead class="bg-[var(--muted)] text-[var(--muted-fg)]">
+      <thead class="bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]">
         <slot name="head" />
       </thead>
-      <tbody class="text-[var(--fg)]">
+      <tbody class="text-[var(--gr-fg)]">
         <slot />
       </tbody>
-      <tfoot v-if="slots.foot" class="text-[var(--fg)]">
+      <tfoot v-if="slots.foot" class="text-[var(--gr-fg)]">
         <slot name="foot" />
       </tfoot>
     </table>

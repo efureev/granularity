@@ -103,7 +103,7 @@ function onClick(e: MouseEvent): void {
 <template>
   <div
     data-gr-checkbox
-    class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--ring),0_0_0_4px_var(--bg)]"
+    class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     role="checkbox"
     :aria-checked="indeterminate ? 'mixed' : (modelValue ? 'true' : 'false')"
     :aria-disabled="disabled ? 'true' : undefined"
@@ -132,22 +132,22 @@ function onClick(e: MouseEvent): void {
       aria-hidden="true"
       class="h-4 w-4 rounded border flex items-center justify-center transition-colors duration-150"
       :class="(modelValue || indeterminate)
-        ? 'border-[var(--primary)] bg-[var(--primary)]'
-        : 'border-[var(--brd)] bg-[var(--bg)]'"
+        ? 'border-[var(--gr-primary)] bg-[var(--gr-primary)]'
+        : 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'"
     >
       <IconMinus
         v-if="indeterminate"
-        class="gr-checkbox-icon h-3.5 w-3.5 text-[var(--primary-fg)]"
+        class="gr-checkbox-icon h-3.5 w-3.5 text-[var(--gr-primary-fg)]"
       />
       <IconCheck
         v-else
         class="gr-checkbox-icon h-3.5 w-3.5 transition-transform transition-opacity duration-150"
         :class="modelValue
-          ? 'opacity-100 scale-100 text-[var(--primary-fg)]'
+          ? 'opacity-100 scale-100 text-[var(--gr-primary-fg)]'
           : 'opacity-0 scale-75 text-transparent'"
       />
     </span>
-    <span class="text-sm text-[var(--muted-fg)]">
+    <span class="text-sm text-[var(--gr-muted-fg)]">
       <slot />
     </span>
   </div>

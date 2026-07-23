@@ -13,15 +13,15 @@ const open = ref(false)
     </GrButton>
 
     <GrDrawer v-model="open" title="Report filters" size="sm">
-      <div class="grid gap-4 text-sm text-[var(--muted-fg)]">
+      <div class="grid gap-4 text-sm text-[var(--gr-muted-fg)]">
         <label class="grid gap-2">
-          <span class="text-[var(--fg)]">Owner</span>
-          <input class="rounded-lg border border-[var(--brd)] bg-transparent px-3 py-2" value="Operations" />
+          <span class="text-[var(--gr-fg)]">Owner</span>
+          <input class="rounded-lg border border-[var(--gr-brd)] bg-transparent px-3 py-2" value="Operations" />
         </label>
 
         <label class="grid gap-2">
-          <span class="text-[var(--fg)]">Date range</span>
-          <input class="rounded-lg border border-[var(--brd)] bg-transparent px-3 py-2" value="Last 30 days" />
+          <span class="text-[var(--gr-fg)]">Date range</span>
+          <input class="rounded-lg border border-[var(--gr-brd)] bg-transparent px-3 py-2" value="Last 30 days" />
         </label>
       </div>
 

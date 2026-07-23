@@ -23,13 +23,13 @@ function select(action: string) {
 
       <template #content>
         <div class="grid gap-1">
-          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select(t('components.GrDropdown.basic.preview'))">
+          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select(t('components.GrDropdown.basic.preview'))">
             {{ t('components.GrDropdown.basic.preview') }}
           </button>
-          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select(t('components.GrDropdown.basic.duplicate'))">
+          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select(t('components.GrDropdown.basic.duplicate'))">
             {{ t('components.GrDropdown.basic.duplicate') }}
           </button>
-          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--accent)]" @click="select(t('components.GrDropdown.basic.archive'))">
+          <button type="button" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select(t('components.GrDropdown.basic.archive'))">
             {{ t('components.GrDropdown.basic.archive') }}
           </button>
         </div>

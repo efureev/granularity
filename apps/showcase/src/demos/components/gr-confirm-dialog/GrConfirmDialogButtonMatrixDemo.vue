@@ -13,8 +13,8 @@ const approved = ref(false)
       Open compact confirm
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
-      Approved in current session: <span class="font-medium text-[var(--fg)]">{{ approved ? 'yes' : 'no' }}</span>
+    <div class="text-xs text-[var(--gr-muted-fg)]">
+      Approved in current session: <span class="font-medium text-[var(--gr-fg)]">{{ approved ? 'yes' : 'no' }}</span>
     </div>
 
     <GrConfirmDialog

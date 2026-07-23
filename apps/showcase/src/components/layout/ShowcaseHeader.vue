@@ -74,10 +74,10 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
           class="flex min-w-0 items-center gap-3"
         >
           <div
-              class="h-9 w-9 rounded-[12px] border border-[var(--brd)] bg-[var(--card)] flex items-center justify-center shadow-[var(--gr-shadow-1)]"
+              class="h-9 w-9 rounded-[12px] border border-[var(--gr-brd)] bg-[var(--gr-card)] flex items-center justify-center shadow-[var(--gr-shadow-1)]"
               aria-hidden="true"
           >
-            <IconLayers class="h-4 w-4 text-[var(--muted-fg)]" />
+            <IconLayers class="h-4 w-4 text-[var(--gr-muted-fg)]" />
           </div>
           <div class="min-w-0">
             <p class="flex items-center gap-2 truncate text-base font-semibold">

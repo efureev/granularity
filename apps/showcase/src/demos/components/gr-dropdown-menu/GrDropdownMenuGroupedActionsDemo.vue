@@ -40,12 +40,12 @@ const selectedAction = ref('Publish now')
       </GrDropdownMenuGroup>
     </GrDropdownMenu>
 
-    <div class="rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
-      <div class="text-sm text-[var(--muted-fg)]">
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         Selected action
       </div>
       <div class="mt-2 flex items-center gap-3">
-        <div class="text-sm font-600 text-[var(--fg)]">
+        <div class="text-sm font-600 text-[var(--gr-fg)]">
           {{ selectedAction }}
         </div>
         <GrBadge size="sm" tone="primary">

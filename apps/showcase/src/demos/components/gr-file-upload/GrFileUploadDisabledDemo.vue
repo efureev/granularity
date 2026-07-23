@@ -18,7 +18,7 @@ function onExceed(files: File[], limit: number) {
 <template>
   <div class="grid gap-4 lg:grid-cols-2">
     <div class="grid gap-2">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Limit guard
       </div>
       <GrFileUpload
@@ -34,7 +34,7 @@ function onExceed(files: File[], limit: number) {
     </div>
 
     <div class="grid gap-2">
-      <div class="text-sm font-semibold text-[var(--fg)]">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Disabled state
       </div>
       <GrFileUpload disabled :request="request">
@@ -44,7 +44,7 @@ function onExceed(files: File[], limit: number) {
       </GrFileUpload>
     </div>
 
-    <div class="lg:col-span-2 text-sm text-[var(--muted-fg)]">
+    <div class="lg:col-span-2 text-sm text-[var(--gr-muted-fg)]">
       {{ message }}
     </div>
   </div>

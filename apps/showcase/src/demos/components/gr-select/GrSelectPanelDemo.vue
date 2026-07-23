@@ -29,7 +29,7 @@ const selectedTeams = ref<string[]>(['design', 'platform'])
       <GrBadge v-for="team in selectedTeams" :key="team">
         {{ team }}
       </GrBadge>
-      <span v-if="selectedTeams.length === 0" class="text-sm text-[var(--muted-fg)]">
+      <span v-if="selectedTeams.length === 0" class="text-sm text-[var(--gr-muted-fg)]">
         Nothing selected yet
       </span>
     </div>

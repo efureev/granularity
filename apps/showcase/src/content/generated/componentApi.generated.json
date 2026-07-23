@@ -5033,14 +5033,14 @@
           },
           {
             "name": "activeBackgroundColor",
-            "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--primary)`.",
+            "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "inactiveBackgroundColor",
-            "description": "Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--muted)`.",
+            "description": "Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--gr-muted)`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5449,10 +5449,10 @@
         "items": [
           {
             "name": "iconColor",
-            "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--muted-fg)`.",
+            "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--gr-muted-fg)`.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"var(--muted-fg)\""
+            "default": "\"var(--gr-muted-fg)\""
           },
           {
             "name": "text",

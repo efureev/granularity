@@ -25,7 +25,7 @@ const open = ref(false)
       <div class="text-sm font-semibold">
         Bare modal
       </div>
-      <div class="text-sm text-[var(--muted-fg)]">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         <code>GrModal</code> даёт только overlay, panel и focus management — остальную структуру вы собираете сами.
       </div>
       <GrButton class="justify-self-start" @click="open = false">
@@ -59,7 +59,7 @@ const open = ref(false)
       <div class="text-sm font-semibold">
         Draft protection
       </div>
-      <div class="text-sm text-[var(--muted-fg)]">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         Клик по backdrop не закрывает окно — закройте его явной кнопкой.
       </div>
       <div class="flex flex-wrap gap-3">
@@ -110,7 +110,7 @@ function openWithSize(size: 'sm' | 'lg') {
       <div class="text-sm font-semibold">
         Active size: {{ activeSize }}
       </div>
-      <div class="grid gap-2 text-sm text-[var(--muted-fg)]">
+      <div class="grid gap-2 text-sm text-[var(--gr-muted-fg)]">
         <div>Используйте <code>sm</code> для коротких решений и <code>lg</code> для review/panel-потока.</div>
         <div>Контент внутри полностью ваш — компонент отвечает только за modal-shell.</div>
       </div>
@@ -186,7 +186,7 @@ async function promptFromModal() {
           prompt
         </GrButton>
       </div>
-      <div class="text-sm text-[var(--muted-fg)]">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         {{ result || 'Вызовите любой диалог — окно останется открытым.' }}
       </div>
       <GrButton variant="outline" class="justify-self-start" @click="open = false">

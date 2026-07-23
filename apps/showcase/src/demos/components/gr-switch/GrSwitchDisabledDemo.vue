@@ -20,7 +20,7 @@ const disabled = ref(false)
       </GrSwitch>
     </div>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <GrSwitch v-model="disabled" size="sm">
         {{ t('components.GrSwitch.disabled.disableLabeled') }}
       </GrSwitch>

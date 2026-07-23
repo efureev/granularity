@@ -24,8 +24,8 @@ const activeFilter = ref<'all' | 'failed' | 'review'>('all')
       </GrButton>
     </GrButtonGroup>
 
-    <GrCard class="p-4 text-sm text-[var(--muted-fg)]">
-      {{ t('components.GrBadge.toolbar.activeFilter') }} <span class="font-semibold text-[var(--fg)]">{{ activeFilter }}</span>
+    <GrCard class="p-4 text-sm text-[var(--gr-muted-fg)]">
+      {{ t('components.GrBadge.toolbar.activeFilter') }} <span class="font-semibold text-[var(--gr-fg)]">{{ activeFilter }}</span>
     </GrCard>
   </div>
 </template>

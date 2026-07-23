@@ -46,7 +46,7 @@ const sections = [
       </div>
     </GrSidebar>
 
-    <div class="flex-1 rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
+    <div class="flex-1 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
       <div class="flex items-center justify-between gap-3">
         <div class="text-base font-semibold capitalize">
           {{ currentSection }}
@@ -55,7 +55,7 @@ const sections = [
           {{ collapsed ? 'Collapsed' : 'Expanded' }}
         </GrBadge>
       </div>
-      <p class="mt-2 text-sm text-[var(--muted-fg)]">
+      <p class="mt-2 text-sm text-[var(--gr-muted-fg)]">
         Toggle the sidebar: collapsed items keep their icon, and «Billing» (no icon) falls back to its first letter.
       </p>
     </div>
@@ -65,7 +65,7 @@ const sections = [
   {
     id: 'sidebar-documentation-nav',
     title: 'Documentation anchors',
-    description: 'Sidebar как rail для doc anchors: кастомные `<button>`-пункты с active-подсветкой через `--sidebar-*` токены и badge-маркером якоря.',
+    description: 'Sidebar как rail для doc anchors: кастомные `<button>`-пункты с active-подсветкой через `--gr-sidebar-*` токены и badge-маркером якоря.',
     status: 'ready',
     previewKey: 'gr-sidebar-documentation-nav',
     code: `<script setup lang="ts">
@@ -95,7 +95,7 @@ const activeSection = computed(() => {
           :key="section.value"
           type="button"
           class="flex items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors"
-          :class="section.value === currentSection ? 'bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-fg)]' : 'hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-fg)]'"
+          :class="section.value === currentSection ? 'bg-[var(--gr-sidebar-primary)] text-[var(--gr-sidebar-primary-fg)]' : 'hover:bg-[var(--gr-sidebar-accent)] hover:text-[var(--gr-sidebar-accent-fg)]'"
           @click="currentSection = section.value"
         >
           <span>{{ section.label }}</span>
@@ -104,8 +104,8 @@ const activeSection = computed(() => {
       </div>
     </GrSidebar>
 
-    <div class="rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
-      <div class="text-sm text-[var(--muted-fg)]">
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
         Current anchor target
       </div>
       <div class="mt-1 text-base font-semibold">
@@ -152,7 +152,7 @@ const filters = reactive({
       </div>
     </GrSidebar>
 
-    <div class="rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
       <div class="flex flex-wrap gap-2">
         <GrBadge :tone="filters.active ? 'primary' : 'neutral'">
           Active: {{ filters.active ? 'on' : 'off' }}

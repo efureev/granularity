@@ -49,11 +49,11 @@ function onStateChange(state: { phase: 'idle' | 'uploading' | 'success' | 'error
       @state-change="onStateChange"
     />
 
-    <div class="text-sm text-[var(--muted-fg)] tabular-nums">
+    <div class="text-sm text-[var(--gr-muted-fg)] tabular-nums">
       phase: <strong>{{ phase }}</strong> · last progress: <strong>{{ Math.round(lastPercent) }}%</strong>
     </div>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Дефолтный `GrProgressBar` рендерится в зарезервированной зоне — переключение
       `idle ↔ uploading ↔ success` не вызывает layout shift. Прогресс приходит из
       `ctx.onProgress`, который пользователь сам вызывает в своём `request`.

@@ -412,7 +412,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
         aria-readonly="true"
         :aria-expanded="open ? 'true' : 'false'"
         :aria-invalid="invalid ? 'true' : undefined"
-        class="w-full rounded-md border bg-[var(--bg)] text-[var(--fg)] placeholder:text-[var(--muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
         @pointerdown="onTriggerPointerDown"
         @click="toggleDropdown"
@@ -425,7 +425,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
         data-testid="gr-tree-select-clear"
         data-gr-tree-select-clear
         type="button"
-        class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50"
+        class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)] disabled:opacity-50"
         :disabled="disabled"
         :aria-label="t('gr.common.clear', 'Clear')"
         @click.stop="clear"
@@ -437,7 +437,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
         v-else
         data-testid="gr-tree-select-chevron"
         data-gr-tree-select-chevron
-        class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--muted-fg)] pointer-events-none"
+        class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--gr-muted-fg)] pointer-events-none"
       >
         <span
           class="i-lucide-chevron-down inline-block h-4 w-4 transition-transform duration-150"
@@ -476,7 +476,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
           :style="floatingStyle"
         >
           <div :class="panelClasses">
-          <div v-if="filterable" class="p-2 border-b border-[var(--brd)]">
+          <div v-if="filterable" class="p-2 border-b border-[var(--gr-brd)]">
             <GrInput
               ref="filterInputRef"
               v-model="filterValue"
@@ -493,7 +493,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
             class="p-1 overflow-auto"
             :style="{ maxHeight: `${dropdownMaxHeight}px` }"
           >
-            <div v-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--muted-fg)]">
+            <div v-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]">
               <slot name="empty">
                 {{ t('gr.treeSelect.empty', 'No data') }}
               </slot>
@@ -520,7 +520,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
                   <div class="flex items-center gap-2 min-w-0">
                     <span
                       class="inline-block h-4 w-4 shrink-0"
-                      :class="selectedKeySet.has(node.key) ? 'i-lucide-check text-[var(--primary)]' : ''"
+                      :class="selectedKeySet.has(node.key) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
                       aria-hidden="true"
                     />
                     <span class="truncate">{{ node.label }}</span>

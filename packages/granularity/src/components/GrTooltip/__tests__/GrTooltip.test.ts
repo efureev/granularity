@@ -28,7 +28,7 @@ describe('GrTooltip', () => {
     })
 
     const trigger = wrapper.get('[data-testid="gr-tooltip-trigger"]')
-    expect(trigger.attributes('style')).toContain('color: var(--muted-fg)')
+    expect(trigger.attributes('style')).toContain('color: var(--gr-muted-fg)')
     expect(wrapper.get('[data-icon="info"]')).toBeTruthy()
 
     const tooltip = document.body.querySelector('[role="tooltip"]')

@@ -217,7 +217,7 @@ export const showcasePages: ShowcasePage[] = [
         title: 'Themes',
         description: 'Встроенные `light`/`dark` темы отделены от foundation-токенов.',
         bullets: [
-          'Theme layer задаёт semantic-значения (`--bg`, `--primary`, `--brd`) и статусные роли.',
+          'Theme layer задаёт semantic-значения (`--gr-bg`, `--gr-primary`, `--gr-brd`) и статусные роли.',
           'Интерактивный просмотр текущего theme-реестра прямо на странице.',
         ],
       },

@@ -3,7 +3,7 @@ import { GrBadge, GrButton, GrNavbar } from '@feugene/granularity'
 </script>
 
 <template>
-  <div class="grid gap-3 rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-3">
+  <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-3">
     <GrNavbar title="Ignored by slot">
       <template #title>
         <div class="flex items-center gap-2">
@@ -19,7 +19,7 @@ import { GrBadge, GrButton, GrNavbar } from '@feugene/granularity'
       </GrButton>
     </GrNavbar>
 
-    <div class="px-4 py-3 text-sm text-[var(--muted-fg)]">
+    <div class="px-4 py-3 text-sm text-[var(--gr-muted-fg)]">
       Слот <code>#title</code> заменяет текстовый заголовок на брендинг, статус-бейдж или
       контекстные хлебные крошки текущего раздела — это единственная «левая» зона хедера
       (иконка меню + заголовок). Сложную межстраничную навигацию сюда не кладут.

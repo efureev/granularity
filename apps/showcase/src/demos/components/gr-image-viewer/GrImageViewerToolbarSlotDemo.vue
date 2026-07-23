@@ -24,7 +24,7 @@ const open = ref(false)
 
 <template>
   <div class="grid gap-3">
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       `toolbar` slot подходит для брендинга, кастомных shortcuts и встроенных action-clusters поверх fullscreen overlay.
     </div>
 
@@ -42,13 +42,13 @@ const open = ref(false)
       :show-zoom-value="false"
     >
       <template #toolbar="{ displayIndex, total, scale, rotation, actions }">
-        <div class="flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--bg)_20%,transparent)] bg-[color-mix(in_srgb,var(--fg)_45%,transparent)] px-2 py-1 text-[var(--bg)] backdrop-blur-sm">
+        <div class="flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--gr-bg)_20%,transparent)] bg-[color-mix(in_srgb,var(--gr-fg)_45%,transparent)] px-2 py-1 text-[var(--gr-bg)] backdrop-blur-sm">
           <span class="px-2 text-xs font-600">{{ displayIndex }} / {{ total }}</span>
-          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--bg)_10%,transparent)]" @click="actions.prev">Prev</button>
-          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--bg)_10%,transparent)]" @click="actions.next">Next</button>
-          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--bg)_10%,transparent)]" @click="actions.zoomIn">+</button>
-          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--bg)_10%,transparent)]" @click="actions.reset">Reset</button>
-          <span class="px-2 text-xs text-[color-mix(in_srgb,var(--bg)_75%,transparent)]">{{ Math.round(scale * 100) }}% / {{ rotation }}°</span>
+          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--gr-bg)_10%,transparent)]" @click="actions.prev">Prev</button>
+          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--gr-bg)_10%,transparent)]" @click="actions.next">Next</button>
+          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--gr-bg)_10%,transparent)]" @click="actions.zoomIn">+</button>
+          <button type="button" class="rounded-full px-3 py-1 text-xs transition-colors hover:bg-[color-mix(in_srgb,var(--gr-bg)_10%,transparent)]" @click="actions.reset">Reset</button>
+          <span class="px-2 text-xs text-[color-mix(in_srgb,var(--gr-bg)_75%,transparent)]">{{ Math.round(scale * 100) }}% / {{ rotation }}°</span>
         </div>
       </template>
     </GrImageViewer>

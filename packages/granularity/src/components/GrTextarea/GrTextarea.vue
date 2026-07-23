@@ -67,7 +67,7 @@ function onInput(e: Event): void {
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-describedby="describedBy"
     :aria-required="isRequired ? 'true' : undefined"
-    class="w-full rounded-md border bg-[var(--bg)] px-3 py-2 text-[14px] text-[var(--fg)] placeholder:text-[var(--muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+    class="w-full rounded-md border bg-[var(--gr-bg)] px-3 py-2 text-[14px] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
     :class="className"
     @input="onInput"
   />

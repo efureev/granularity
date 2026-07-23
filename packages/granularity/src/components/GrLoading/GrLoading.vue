@@ -78,16 +78,16 @@ const spinnerClassName = computed(() => props.spinnerClass)
   >
     <div
       data-gr-loading-panel
-      class="flex flex-col items-center justify-center gap-2 text-center rounded-lg bg-[var(--bg)]/55 px-5 py-4 shadow-lg"
+      class="flex flex-col items-center justify-center gap-2 text-center rounded-lg bg-[var(--gr-bg)]/55 px-5 py-4 shadow-lg"
     >
       <component
         :is="Spinner"
         data-gr-loading-spinner
-        class="gr-loading__spinner h-7 w-7 text-[var(--muted-fg)]"
+        class="gr-loading__spinner h-7 w-7 text-[var(--gr-muted-fg)]"
         :class="[animated ? 'gr-loading__spinner--animated' : '', spinnerClassName]"
         aria-hidden="true"
       />
-      <div v-if="displayText" data-gr-loading-text class="text-sm text-[var(--muted-fg)]">
+      <div v-if="displayText" data-gr-loading-text class="text-sm text-[var(--gr-muted-fg)]">
         {{ displayText }}
       </div>
     </div>

@@ -7,8 +7,8 @@ import {GrAvatar, GrCard} from "@feugene/granularity";
       <div class="flex items-center gap-3">
         <GrAvatar :size="44">AD</GrAvatar>
         <div>
-          <div class="text-sm font-semibold text-[var(--fg)]">Alex Doe</div>
-          <div class="text-sm text-[var(--muted-fg)]">Engineering lead</div>
+          <div class="text-sm font-semibold text-[var(--gr-fg)]">Alex Doe</div>
+          <div class="text-sm text-[var(--gr-muted-fg)]">Engineering lead</div>
         </div>
       </div>
     </GrCard>
@@ -17,8 +17,8 @@ import {GrAvatar, GrCard} from "@feugene/granularity";
       <div class="flex items-center gap-3">
         <GrAvatar :size="44" shape="square">QA</GrAvatar>
         <div>
-          <div class="text-sm font-semibold text-[var(--fg)]">Quality squad</div>
-          <div class="text-sm text-[var(--muted-fg)]">Square avatars help differentiate team entities from
+          <div class="text-sm font-semibold text-[var(--gr-fg)]">Quality squad</div>
+          <div class="text-sm text-[var(--gr-muted-fg)]">Square avatars help differentiate team entities from
             people.
           </div>
         </div>

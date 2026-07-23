@@ -29,8 +29,8 @@ const channel = ref('slack')
       </GrRadio>
     </GrRadioGroup>
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
-      Routed through: <span class="font-semibold text-[var(--fg)]">{{ channel }}</span>
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
+      Routed through: <span class="font-semibold text-[var(--gr-fg)]">{{ channel }}</span>
     </div>
   </div>
 </template>

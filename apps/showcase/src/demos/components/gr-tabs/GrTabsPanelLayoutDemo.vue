@@ -27,13 +27,13 @@ const sectionTitle = computed(() => {
   <div class="grid gap-4">
     <GrTabs v-model="currentTab" :tabs="tabs" />
 
-    <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 shadow-[var(--gr-shadow-1)]">
+    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 shadow-[var(--gr-shadow-1)]">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div class="text-sm font-600 text-[var(--fg)]">
+          <div class="text-sm font-600 text-[var(--gr-fg)]">
             {{ sectionTitle }}
           </div>
-          <div class="text-sm text-[var(--muted-fg)]">
+          <div class="text-sm text-[var(--gr-muted-fg)]">
             Tabs stay presentation-focused while the page decides which panel to render.
           </div>
         </div>

@@ -39,7 +39,7 @@ const menuAriaLabel = computed(() => t('gr.navbar.openMenu', 'Open menu'))
 <template>
   <header
     data-gr-navbar
-    class="h-[56px] border-b border-[var(--brd)] bg-[var(--bg)] flex items-center justify-between px-4 sm:px-6"
+    class="h-[56px] border-b border-[var(--gr-brd)] bg-[var(--gr-bg)] flex items-center justify-between px-4 sm:px-6"
   >
     <div class="flex items-center gap-3">
       <GrButton

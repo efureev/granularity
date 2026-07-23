@@ -18,7 +18,7 @@ const requireApproval = ref(false)
         <GrInput id="notify-channel" v-model="channel" placeholder="release-updates" />
       </GrFormField>
 
-      <div class="grid gap-3 rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4">
+      <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
         <GrCheckbox v-model="includeStakeholders">
           Include business stakeholders in the launch message
         </GrCheckbox>

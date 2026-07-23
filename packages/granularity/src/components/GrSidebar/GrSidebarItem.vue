@@ -46,13 +46,13 @@ const rootTag = computed<string | Component>(() => {
 })
 
 const rootClass = computed(() => [
-  'group relative flex w-full items-center rounded-lg text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]',
+  'group relative flex w-full items-center rounded-lg text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
   collapsed.value ? 'justify-center px-0 py-2' : 'gap-3 px-3 py-2',
   props.disabled
     ? 'cursor-not-allowed opacity-50'
     : props.active
-      ? 'bg-[var(--muted)] font-600 text-[var(--fg)]'
-      : 'text-[var(--sidebar-fg)] hover:bg-[color-mix(in_srgb,var(--sidebar-fg)_8%,transparent)]',
+      ? 'bg-[var(--gr-muted)] font-600 text-[var(--gr-fg)]'
+      : 'text-[var(--gr-sidebar-fg)] hover:bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_8%,transparent)]',
 ])
 </script>
 
@@ -78,7 +78,7 @@ const rootClass = computed(() => [
       <span class="min-w-0 flex-1 truncate text-left">{{ label }}</span>
       <span
         v-if="badge != null"
-        class="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--sidebar-fg)_12%,transparent)] px-1.5 py-0.5 text-[11px] font-600"
+        class="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_12%,transparent)] px-1.5 py-0.5 text-[11px] font-600"
       >{{ badge }}</span>
     </template>
   </component>

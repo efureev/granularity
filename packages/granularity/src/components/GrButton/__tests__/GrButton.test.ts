@@ -101,7 +101,7 @@ function resolveColorExpression(
   const value = expression.trim()
 
   if (value === 'transparent') {
-    return resolveColorExpression('var(--bg)', vars, derivedVars, stack)
+    return resolveColorExpression('var(--gr-bg)', vars, derivedVars, stack)
   }
 
   if (value.startsWith('var(')) {
@@ -199,7 +199,7 @@ function getButtonColors(variant: GrButtonVariant, tone: GrButtonTone, state: (t
   })
 
   const text = getColorClassExpression(className, 'text-[')
-  const restBackground = getColorClassExpression(className, 'bg-[') ?? getColorClassExpression(className, 'bg-') ?? 'var(--bg)'
+  const restBackground = getColorClassExpression(className, 'bg-[') ?? getColorClassExpression(className, 'bg-') ?? 'var(--gr-bg)'
 
   if (!text) {
     throw new Error(`Missing text color class for ${variant}/${tone}`)
@@ -233,8 +233,8 @@ describe('GrButton', () => {
 
     expect(button.attributes('data-gr-variant')).toBe('primary')
     expect(button.attributes('data-gr-tone')).toBe('primary')
-    expect(button.classes()).toContain('bg-[var(--gr-button-primary-bg,var(--primary))]')
-    expect(button.classes()).toContain('text-[var(--gr-button-primary-fg,var(--primary-fg))]')
+    expect(button.classes()).toContain('bg-[var(--gr-button-primary-bg,var(--gr-primary))]')
+    expect(button.classes()).toContain('text-[var(--gr-button-primary-fg,var(--gr-primary-fg))]')
   })
 
   it('поддерживает semantic tone для filled tone', () => {
@@ -253,7 +253,7 @@ describe('GrButton', () => {
     expect(button.attributes('data-gr-variant')).toBe('primary')
     expect(button.attributes('data-gr-tone')).toBe('success')
     expect(button.classes()).toContain('bg-[var(--gr-button-success-bg,var(--gr-success))]')
-    expect(button.classes()).toContain('text-[var(--gr-button-success-fg,var(--gr-success-fg,var(--fg)))]')
+    expect(button.classes()).toContain('text-[var(--gr-button-success-fg,var(--gr-success-fg,var(--gr-fg)))]')
     expect(button.classes()).toContain('hover:bg-[var(--gr-button-success-bg-hover,var(--gr-success-hover))]')
     expect(button.classes()).toContain('active:bg-[var(--gr-button-success-bg-active,var(--gr-success-active))]')
   })
@@ -304,7 +304,7 @@ describe('GrButton', () => {
 
     expect(slate.attributes('data-gr-tone')).toBe('slate')
     expect(slate.classes()).toContain('bg-[var(--gr-button-slate-bg,var(--gr-slate))]')
-    expect(slate.classes()).toContain('text-[var(--gr-button-slate-fg,var(--gr-slate-fg,var(--fg)))]')
+    expect(slate.classes()).toContain('text-[var(--gr-button-slate-fg,var(--gr-slate-fg,var(--gr-fg)))]')
     expect(slate.classes()).toContain('hover:bg-[var(--gr-button-slate-bg-hover,var(--gr-slate-hover))]')
 
     const azureClassName = azure.attributes('class') ?? ''

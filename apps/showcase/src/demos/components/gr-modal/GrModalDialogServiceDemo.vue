@@ -52,7 +52,7 @@ async function promptFromModal(): Promise<void> {
 
 <template>
   <div class="grid gap-3">
-    <p class="text-sm text-[var(--muted-fg)]">
+    <p class="text-sm text-[var(--gr-muted-fg)]">
       {{ t('components.GrModal.service.intro') }}
     </p>
 
@@ -63,10 +63,10 @@ async function promptFromModal(): Promise<void> {
     <GrModal v-model="open" :close-on-backdrop="false" size="md">
       <div class="grid gap-4">
         <div class="grid gap-1">
-          <div class="text-sm font-semibold text-[var(--fg)]">
+          <div class="text-sm font-semibold text-[var(--gr-fg)]">
             {{ t('components.GrModal.service.settingsTitle') }}
           </div>
-          <div class="text-sm text-[var(--muted-fg)]">
+          <div class="text-sm text-[var(--gr-muted-fg)]">
             {{ t('components.GrModal.service.settingsBody') }}
           </div>
         </div>
@@ -83,16 +83,16 @@ async function promptFromModal(): Promise<void> {
           </GrButton>
         </div>
 
-        <div class="rounded-2xl border border-[var(--brd)] bg-[var(--muted)]/40 p-3 text-sm">
-          <div class="mb-1 font-medium text-[var(--fg)]">
+        <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-muted)]/40 p-3 text-sm">
+          <div class="mb-1 font-medium text-[var(--gr-fg)]">
             {{ t('components.GrModal.service.resultsTitle') }}
           </div>
-          <ul v-if="log.length" class="grid gap-1 text-[var(--muted-fg)]">
+          <ul v-if="log.length" class="grid gap-1 text-[var(--gr-muted-fg)]">
             <li v-for="(entry, index) in log" :key="index">
               {{ entry }}
             </li>
           </ul>
-          <div v-else class="text-[var(--muted-fg)]">
+          <div v-else class="text-[var(--gr-muted-fg)]">
             {{ t('components.GrModal.service.empty') }}
           </div>
         </div>

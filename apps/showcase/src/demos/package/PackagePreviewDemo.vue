@@ -266,7 +266,7 @@ async function runNetworkDemo() {
       </GrButton>
 
       <GrDialog v-model="dialogOpen" title="Invite teammate" size="sm">
-        <div class="grid gap-3 text-sm text-[var(--muted-fg)]" v-autofocus="{ selector: 'input', preventScroll: true }">
+        <div class="grid gap-3 text-sm text-[var(--gr-muted-fg)]" v-autofocus="{ selector: 'input', preventScroll: true }">
           <p>После открытия dialog фокус попадёт в первое поле ввода.</p>
           <GrInput model-value="" placeholder="name@company.com" />
           <GrInput model-value="" placeholder="Role" />
@@ -281,7 +281,7 @@ async function runNetworkDemo() {
         :rows="2"
         placeholder="Type a long note to see autosize in action"
       />
-      <p class="text-xs text-[var(--muted-fg)]">
+      <p class="text-xs text-[var(--gr-muted-fg)]">
         Контейнер ограничен только шириной, а высота textarea растёт по содержимому.
       </p>
     </template>
@@ -295,7 +295,7 @@ async function runNetworkDemo() {
             </GrButton>
           </template>
           <template #content>
-            <p class="text-sm leading-6 text-[var(--muted-fg)]">
+            <p class="text-sm leading-6 text-[var(--gr-muted-fg)]">
               Клик вне панели закроет dropdown, но клики по exclude-зоне будут считаться внутренними.
             </p>
           </template>
@@ -309,11 +309,11 @@ async function runNetworkDemo() {
     <template v-else-if="previewKey === 'v-dropzone-validation'">
       <div
         v-dropzone="dropzoneBinding"
-        class="rounded-3xl border border-dashed border-[var(--brd)] bg-[var(--muted)]/40 p-6 transition"
+        class="rounded-3xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/40 p-6 transition"
       >
         <div class="flex items-center gap-3">
           <GrBadge>{{ isDropOver ? 'drag-over' : 'idle' }}</GrBadge>
-          <span class="text-sm text-[var(--muted-fg)]">
+          <span class="text-sm text-[var(--gr-muted-fg)]">
             {{ dropzoneState }}
           </span>
         </div>
@@ -330,7 +330,7 @@ async function runNetworkDemo() {
         class="grid gap-3"
       >
         <GrInput model-value="" placeholder="Focus here and press Escape" />
-        <p class="text-sm text-[var(--muted-fg)]">
+        <p class="text-sm text-[var(--gr-muted-fg)]">
           {{ hotkeyLog }}
         </p>
       </div>
@@ -343,12 +343,12 @@ async function runNetworkDemo() {
         </GrButton>
         <GrCard
           v-loading="{ loading: cardLoading, text: 'Refreshing segment metrics…' }"
-          class="rounded-3xl border border-[var(--brd)] bg-[var(--card)]/90 p-5 shadow-sm"
+          class="rounded-3xl border border-[var(--gr-brd)] bg-[var(--gr-card)]/90 p-5 shadow-sm"
         >
           <h4 class="text-base font-semibold">
             Revenue snapshot
           </h4>
-          <p class="mt-2 text-sm leading-6 text-[var(--muted-fg)]">
+          <p class="mt-2 text-sm leading-6 text-[var(--gr-muted-fg)]">
             Overlay таргетится в текущую карточку и не блокирует весь экран.
           </p>
         </GrCard>
@@ -359,7 +359,7 @@ async function runNetworkDemo() {
       <GrButton class="justify-self-start" @click="startImperativeLoading">
         Run imperative overlay
       </GrButton>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ imperativeStatus }}
       </p>
     </template>
@@ -371,7 +371,7 @@ async function runNetworkDemo() {
         </GrButton>
         <GrBadge>{{ runtimeTheme.isDark.value ? 'dark' : 'light' }}</GrBadge>
       </div>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         Demo использует `persist: false`, поэтому не пишет состояние в localStorage и подходит для embedded flows.
       </p>
     </template>
@@ -391,7 +391,7 @@ async function runNetworkDemo() {
           Clear all
         </GrButton>
       </div>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ toastStatus }} Сейчас в очереди: {{ toasts.list.value.length }}.
       </p>
       <GrToaster />
@@ -402,7 +402,7 @@ async function runNetworkDemo() {
         <GrButton class="justify-self-start" @click="runFileValidationDemo">
           Run validator pipeline
         </GrButton>
-        <p class="text-sm text-[var(--muted-fg)]">
+        <p class="text-sm text-[var(--gr-muted-fg)]">
           {{ fileValidationStatus }}
         </p>
       </div>
@@ -421,7 +421,7 @@ async function runNetworkDemo() {
             mime
           </GrButton>
         </div>
-        <p class="text-sm text-[var(--muted-fg)]">
+        <p class="text-sm text-[var(--gr-muted-fg)]">
           {{ validatorPreviewStatus }}
         </p>
       </div>
@@ -442,7 +442,7 @@ async function runNetworkDemo() {
           @change="handleUploadSelection"
           @error="handleUploadValidationError"
         />
-        <p class="text-sm text-[var(--muted-fg)]">
+        <p class="text-sm text-[var(--gr-muted-fg)]">
           {{ uploadBridgeStatus }}
         </p>
       </div>
@@ -452,7 +452,7 @@ async function runNetworkDemo() {
       <GrButton class="justify-self-start" variant="primary" tone="danger" @click="runConfirmDemo">
         Delete workspace (confirm)
       </GrButton>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
       </p>
     </template>
@@ -461,7 +461,7 @@ async function runNetworkDemo() {
       <GrButton class="justify-self-start" variant="outline" @click="runPromptDemo">
         Rename project (prompt)
       </GrButton>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
       </p>
     </template>
@@ -470,7 +470,7 @@ async function runNetworkDemo() {
       <GrButton class="justify-self-start" variant="ghost" @click="runAlertDemo">
         Show alert
       </GrButton>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
       </p>
     </template>
@@ -479,13 +479,13 @@ async function runNetworkDemo() {
       <GrButton class="justify-self-start" variant="primary" @click="runNetworkDemo">
         Invite teammate (async onConfirm)
       </GrButton>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ networkStatus }}
       </p>
     </template>
 
     <template v-else>
-      <p class="text-sm text-[var(--muted-fg)]">
+      <p class="text-sm text-[var(--gr-muted-fg)]">
         Preview for `{{ previewKey }}` is not connected yet.
       </p>
     </template>

@@ -30,7 +30,7 @@ const rows = [
         </tr>
       </template>
 
-      <tr v-if="empty" class="border-t border-[var(--brd)]">
+      <tr v-if="empty" class="border-t border-[var(--gr-brd)]">
         <td colspan="3" class="px-4 py-6">
           <GrEmptyState
             :title="t('components.GrTable.empty.emptyTitle')"
@@ -47,10 +47,10 @@ const rows = [
         <tr
           v-for="row in rows"
           :key="row.name"
-          class="border-t border-[var(--brd)]"
+          class="border-t border-[var(--gr-brd)]"
         >
           <td class="px-4 py-3">{{ row.name }}</td>
-          <td class="px-4 py-3 text-[var(--muted-fg)]">{{ row.owner }}</td>
+          <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.owner }}</td>
           <td class="px-4 py-3">{{ row.value }}</td>
         </tr>
       </template>

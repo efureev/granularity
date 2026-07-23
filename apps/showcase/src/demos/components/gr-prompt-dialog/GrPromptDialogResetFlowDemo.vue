@@ -19,8 +19,8 @@ function openDialog() {
       Edit billing company
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
-      Persisted value: <span class="font-medium text-[var(--fg)]">{{ savedCompany }}</span>
+    <div class="text-xs text-[var(--gr-muted-fg)]">
+      Persisted value: <span class="font-medium text-[var(--gr-fg)]">{{ savedCompany }}</span>
     </div>
 
     <GrPromptDialog

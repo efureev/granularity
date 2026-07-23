@@ -57,7 +57,7 @@ import { GrAvatar, GrCard } from '@feugene/granularity'
     <GrAvatar :size="44">AD</GrAvatar>
     <div>
       <div class="text-sm font-semibold">Alex Doe</div>
-      <div class="text-sm text-[var(--muted-fg)]">Engineering lead</div>
+      <div class="text-sm text-[var(--gr-muted-fg)]">Engineering lead</div>
     </div>
   </GrCard>
 </template>`,

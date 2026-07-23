@@ -24,8 +24,8 @@ const tags = ref(['critical', 'backend'])
       :separators="[',', ';']"
     />
 
-    <div class="rounded-2xl border border-[var(--brd)] bg-[var(--card)] p-4 text-sm text-[var(--muted-fg)]">
-      Current tags: <span class="font-semibold text-[var(--fg)]">{{ tags.join(', ') || 'none' }}</span>
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
+      Current tags: <span class="font-semibold text-[var(--gr-fg)]">{{ tags.join(', ') || 'none' }}</span>
     </div>
   </div>
 </template>`,
@@ -61,7 +61,7 @@ const remaining = computed(() => 4 - skills.value.length)
       tag-radius="round"
     />
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Use \`max\` to keep curated lists compact in profile or filter forms.
     </div>
   </div>
@@ -97,7 +97,7 @@ const environments = ref(['production', 'staging'])
       </template>
     </GrInputTag>
 
-    <div class="text-sm text-[var(--muted-fg)]">
+    <div class="text-sm text-[var(--gr-muted-fg)]">
       Custom tag slot lets host screens inject status markers, counters or semantic labels.
     </div>
   </div>

@@ -28,10 +28,10 @@ const stats = [
       </div>
 
       <div>
-        <div class="text-2xl font-700 text-[var(--fg)]">
+        <div class="text-2xl font-700 text-[var(--gr-fg)]">
           {{ stat.value }}
         </div>
-        <div class="text-sm text-[var(--muted-fg)]">
+        <div class="text-sm text-[var(--gr-muted-fg)]">
           {{ stat.label }}
         </div>
       </div>

@@ -37,7 +37,7 @@ const sections = [
       </div>
     </GrSidebar>
 
-    <div class="flex-1 rounded-xl border border-[var(--brd)] bg-[var(--bg)] p-4">
+    <div class="flex-1 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
       <div class="flex items-center justify-between gap-3">
         <div class="text-base font-semibold capitalize">
           {{ currentSection }}
@@ -46,7 +46,7 @@ const sections = [
           {{ collapsed ? 'Collapsed' : 'Expanded' }}
         </GrBadge>
       </div>
-      <p class="mt-2 text-sm text-[var(--muted-fg)]">
+      <p class="mt-2 text-sm text-[var(--gr-muted-fg)]">
         Toggle the sidebar: collapsed items keep their icon, and «Billing» (no icon) falls back to its first letter.
       </p>
     </div>

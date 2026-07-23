@@ -22,7 +22,7 @@ defineOptions({
   name: 'GrTree',
 })
 
-const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, var(--brd))'
+const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, var(--gr-brd))'
 
 const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   props: () => ({
@@ -540,16 +540,16 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-row-min-height: 28px;
     --gr-tree-row-radius: 8px;
     --gr-tree-row-pr: 8px;
-    --gr-tree-row-color: var(--fg);
-    --gr-tree-row-hover-bg: color-mix(in srgb, var(--primary, #000) 10%, transparent);
-    --gr-tree-row-current-bg: color-mix(in srgb, var(--primary, #000) 5%, transparent);
-    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--primary, #000) 16%, transparent);
+    --gr-tree-row-color: var(--gr-fg);
+    --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-primary, #000) 10%, transparent);
+    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary, #000) 5%, transparent);
+    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--gr-primary, #000) 16%, transparent);
     --gr-tree-drag-handle-size: 24px;
     --gr-tree-drag-handle-mr: 0;
     --gr-tree-drag-handle-radius: 6px;
     --gr-tree-drag-handle-color: inherit;
     --gr-tree-drag-handle-opacity: 0.55;
-    --gr-tree-drag-handle-hover-bg: color-mix(in srgb, var(--muted, #000) 22%, transparent);
+    --gr-tree-drag-handle-hover-bg: color-mix(in srgb, var(--gr-muted, #000) 22%, transparent);
     --gr-tree-drag-handle-hover-color: var(--gr-tree-drag-handle-color);
     --gr-tree-drag-handle-hover-opacity: 0.9;
     --gr-tree-drag-handle-disabled-opacity: 0.25;
@@ -557,7 +557,7 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-toggle-mr: 0;
     --gr-tree-toggle-radius: 6px;
     --gr-tree-toggle-color: inherit;
-    --gr-tree-toggle-hover-bg: color-mix(in srgb, var(--muted, #000) 25%, transparent);
+    --gr-tree-toggle-hover-bg: color-mix(in srgb, var(--gr-muted, #000) 25%, transparent);
     --gr-tree-toggle-hover-color: var(--gr-tree-toggle-color);
     --gr-tree-icon-size: 16px;
     --gr-tree-content-gap: 8px;
@@ -609,7 +609,7 @@ defineExpose<GrTreeInstance<T>>({
 }
 
 [data-gr-tree-node]:focus-visible > .gr-tree__row {
-    outline: 2px solid var(--primary, #000);
+    outline: 2px solid var(--gr-primary, #000);
     outline-offset: -2px;
 }
 
@@ -713,7 +713,7 @@ defineExpose<GrTreeInstance<T>>({
 }
 
 .gr-tree__row--drop-inner {
-    outline: 2px solid color-mix(in srgb, var(--primary, #000) 40%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--gr-primary, #000) 40%, transparent);
 }
 
 .gr-tree__row--drop-prev::before,
@@ -723,7 +723,7 @@ defineExpose<GrTreeInstance<T>>({
     left: 8px;
     right: 8px;
     height: 2px;
-    background: color-mix(in srgb, var(--primary, #000) 55%, transparent);
+    background: color-mix(in srgb, var(--gr-primary, #000) 55%, transparent);
 }
 
 .gr-tree__row--drop-prev::before {

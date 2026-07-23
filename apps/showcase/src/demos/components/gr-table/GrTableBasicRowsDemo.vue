@@ -33,10 +33,10 @@ const rows: TableRow[] = [
     <tr
         v-for="row in rows"
         :key="row.campaign"
-        class="border-t border-[var(--brd)]"
+        class="border-t border-[var(--gr-brd)]"
     >
       <td class="px-4 py-3">{{ row.campaign }}</td>
-      <td class="px-4 py-3 text-[var(--muted-fg)]">{{ row.owner }}</td>
+      <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.owner }}</td>
       <td class="px-4 py-3">
         <GrBadge size="sm" :tone="row.tag">
           {{ row.status }}

@@ -20,8 +20,8 @@ function openDialog() {
       {{ t('components.GrDialog.section.open') }}
     </GrButton>
 
-    <div class="text-xs text-[var(--muted-fg)]">
-      {{ t('components.GrDialog.section.footerEnabled') }} <span class="font-medium text-[var(--fg)]">{{ confirmed ? t('components.GrDialog.section.yes') : t('components.GrDialog.section.no') }}</span>
+    <div class="text-xs text-[var(--gr-muted-fg)]">
+      {{ t('components.GrDialog.section.footerEnabled') }} <span class="font-medium text-[var(--gr-fg)]">{{ confirmed ? t('components.GrDialog.section.yes') : t('components.GrDialog.section.no') }}</span>
     </div>
 
     <GrDialog
@@ -30,12 +30,12 @@ function openDialog() {
         :header-config="{ paddingX: 'px-4', paddingY: 'py-3' }"
         :footer-config="{ paddingX: 'px-4', paddingY: 'py-3', bordered: false }"
     >
-      <div class="grid gap-4 text-sm text-[var(--muted-fg)]">
+      <div class="grid gap-4 text-sm text-[var(--gr-muted-fg)]">
         <p>
           {{ t('components.GrDialog.section.body') }}
         </p>
 
-        <div class="flex items-start gap-3 rounded-lg border border-[var(--brd)] p-3 text-[var(--fg)]">
+        <div class="flex items-start gap-3 rounded-lg border border-[var(--gr-brd)] p-3 text-[var(--gr-fg)]">
           <GrCheckbox v-model="confirmed">{{ t('components.GrDialog.section.checkbox') }}</GrCheckbox>
         </div>
       </div>

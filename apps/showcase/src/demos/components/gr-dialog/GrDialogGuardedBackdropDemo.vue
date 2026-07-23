@@ -15,7 +15,7 @@ const open = ref(false)
     </GrButton>
 
     <GrDialog v-model="open" :title="t('components.GrDialog.guarded.title')" :close-on-backdrop="false" :show-close-button="false">
-      <div class="grid gap-3 text-sm text-[var(--muted-fg)]">
+      <div class="grid gap-3 text-sm text-[var(--gr-muted-fg)]">
         <p>
           {{ t('components.GrDialog.guarded.body') }}
         </p>

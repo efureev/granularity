@@ -21,16 +21,16 @@ const visible = ref(true)
       {{ t('components.GrAlert.closable.message') }}
     </GrAlert>
 
-    <GrCard v-else class="flex min-h-[92px] items-center justify-center p-4 text-sm text-[var(--muted-fg)]">
+    <GrCard v-else class="flex min-h-[92px] items-center justify-center p-4 text-sm text-[var(--gr-muted-fg)]">
       {{ t('components.GrAlert.closable.dismissed') }}
     </GrCard>
 
     <GrCard class="grid gap-3 p-4">
       <div>
-        <div class="text-sm font-semibold text-[var(--fg)]">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrAlert.closable.eventTitle') }}
         </div>
-        <div class="text-sm text-[var(--muted-fg)]">
+        <div class="text-sm text-[var(--gr-muted-fg)]">
           {{ t('components.GrAlert.closable.eventDescription') }}
         </div>
       </div>
