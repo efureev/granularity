@@ -5,7 +5,7 @@ import { useGrFormFieldContext } from '../GrFormField/context'
 
 import {
   sliderFillClass,
-  sliderMarkLabelClass,
+  sliderMarkLabelClassFor,
   sliderMarkTickClass,
   sliderRailClass,
   sliderRootClass,
@@ -261,7 +261,7 @@ function thumbAriaLabel(index: number): string | undefined {
 <template>
   <div
     data-gr-slider
-    :class="sliderRootClass({ size, disabled })"
+    :class="sliderRootClass({ size, disabled, hasMarks: normalizedMarks.length > 0 })"
   >
     <div
       ref="trackEl"
@@ -283,7 +283,7 @@ function thumbAriaLabel(index: number): string | undefined {
         />
         <span
           data-gr-slider-mark-label
-          :class="sliderMarkLabelClass"
+          :class="sliderMarkLabelClassFor(percent(mark.value))"
           :style="{ left: `${percent(mark.value)}%` }"
         >
           {{ mark.label }}

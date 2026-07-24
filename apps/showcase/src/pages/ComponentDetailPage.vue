@@ -207,6 +207,7 @@ const previewRegistry = {
   'gr-slider-basic': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderBasicDemo.vue')),
   'gr-slider-range': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderRangeDemo.vue')),
   'gr-slider-marks': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderMarksDemo.vue')),
+  'gr-slider-custom': defineAsyncComponent(() => import('../demos/components/gr-slider/GrSliderCustomDemo.vue')),
   'gr-switch-builder': defineAsyncComponent(() => import('../demos/components/gr-switch/GrSwitchBuilderDemo.vue')),
   'gr-switch-custom-colors': defineAsyncComponent(() => import('../demos/components/gr-switch/GrSwitchColorsDemo.vue')),
   'gr-switch-disabled-labeled': defineAsyncComponent(() => import('../demos/components/gr-switch/GrSwitchDisabledDemo.vue')),
