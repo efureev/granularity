@@ -410,14 +410,6 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.3.0.tgz#dfd44e77cb320b6ea9b4bab618eba5ef0863a6f2"
   integrity sha512-d5X2rJgrSDX8OM9Ne14ztuW7alEzADT0xHcMKIKUkCr8WF9Za+oN0qxUY6GYkF+jNI7UP8tonoDSpcYn+tiTFA==
 
-"@feugene/granularity@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@feugene/granularity/-/granularity-0.12.0.tgz#5a095d14e08597de9fd71f484dafac934a65e0fb"
-  integrity sha512-enXMbmQVMQBKgXWs1pHnXHPJIHC0SU3oLpDu+AUB4+Z9xdA9vGDDCETaXWb/RRPzQZygv50Rp+oBZy012BttEw==
-  dependencies:
-    "@floating-ui/dom" "^1.8.0"
-    "@headlessui/vue" "^1.7.23"
-
 "@feugene/unocss-mini-extra-rules@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.3.0.tgz#91e1920fe0765860115dc7a8136907235f0ce989"

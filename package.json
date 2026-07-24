@@ -6,9 +6,6 @@
     "packages/*",
     "apps/*"
   ],
-  "resolutions": {
-    "typescript": "6.0.2"
-  },
   "scripts": {
     "build": "yarn build:granularity && yarn build:showcase",
     "build:granularity": "yarn workspace @feugene/granularity build",
