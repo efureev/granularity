@@ -34,7 +34,7 @@ describe('component docs metadata', () => {
     const selectDoc = getShowcaseComponentDoc(selectEntity!)
     const fileUploadDoc = getShowcaseComponentDoc(fileUploadEntity!)
 
-    expect(selectDoc.examples).toHaveLength(5)
+    expect(selectDoc.examples).toHaveLength(6)
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
@@ -64,7 +64,7 @@ describe('component docs metadata', () => {
     expect(dropdownDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown'))).toBe(true)
 
-    expect(dataTableDoc.examples).toHaveLength(4)
+    expect(dataTableDoc.examples).toHaveLength(5)
     expect(dataTableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('gr-data-table'))).toBe(true)
   })
@@ -82,7 +82,7 @@ describe('component docs metadata', () => {
     const tabsDoc = getShowcaseComponentDoc(tabsEntity!)
     const tooltipDoc = getShowcaseComponentDoc(tooltipEntity!)
 
-    expect(paginationDoc.examples).toHaveLength(3)
+    expect(paginationDoc.examples).toHaveLength(4)
     expect(paginationDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('gr-pagination'))).toBe(true)
 
@@ -240,7 +240,7 @@ describe('component docs metadata', () => {
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-prompt-dialog'))).toBe(true)
 
-    expect(toasterDoc.examples).toHaveLength(3)
+    expect(toasterDoc.examples).toHaveLength(4)
     expect(toasterDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('gr-toaster'))).toBe(true)
 
