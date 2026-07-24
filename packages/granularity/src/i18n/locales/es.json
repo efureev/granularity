@@ -21,7 +21,17 @@
   "select": {
     "customValuePlaceholder": "Añadir valor…",
     "addOption": "Añadir «{value}»",
-    "clearOption": "Ninguno"
+    "clearOption": "Ninguno",
+    "searchPlaceholder": "Buscar…",
+    "loading": "Cargando…",
+    "noResults": "Sin resultados",
+    "removeTag": "Quitar {label}"
+  },
+  "dataTable": {
+    "loading": "Cargando…",
+    "empty": "Sin datos",
+    "selectAll": "Seleccionar todas las filas",
+    "selectRow": "Seleccionar fila"
   },
   "autocomplete": {
     "loading": "Cargando…",

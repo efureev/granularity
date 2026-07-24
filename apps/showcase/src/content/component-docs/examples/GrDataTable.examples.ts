@@ -188,4 +188,55 @@ const visibleRows = computed(() => {
   </div>
 </template>`,
   },
+  {
+    id: 'data-table-selection-sticky',
+    title: 'Row selection, sticky header and loading',
+    description: '`selectable` добавляет ведущую колонку с чекбоксами и «выбрать все» в шапке (модель — `v-model:selected` по ключам строк). `sticky-header` + `max-height` держат заголовок видимым при вертикальном скролле. `loading` заменяет тело строкой-индикатором.',
+    status: 'ready',
+    previewKey: 'gr-data-table-selection-sticky',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import type { GrDataColumn } from '@feugene/granularity'
+import { GrBadge, GrButton, GrDataTable } from '@feugene/granularity'
+
+const columns: GrDataColumn[] = [
+  { key: 'name', label: 'Name', sortable: true },
+  { key: 'role', label: 'Role', sortable: true },
+  { key: 'city', label: 'City' },
+]
+
+const rows = Array.from({ length: 24 }, (_, i) => ({
+  id: i + 1,
+  name: 'Person ' + (i + 1),
+  role: ['Engineer', 'Designer', 'PM'][i % 3],
+  city: ['Berlin', 'Lisbon', 'Warsaw'][i % 3],
+}))
+
+const selected = ref<Array<string | number>>([2, 5])
+const loading = ref(false)
+
+function simulateReload() {
+  loading.value = true
+  setTimeout(() => { loading.value = false }, 1400)
+}
+</script>
+
+<template>
+  <GrButton size="sm" variant="outline" @click="simulateReload">Simulate reload</GrButton>
+  <GrBadge>{{ selected.length }} selected</GrBadge>
+
+  <GrDataTable
+    v-model:selected="selected"
+    :rows="rows"
+    :columns="columns"
+    row-key="id"
+    selectable
+    sticky-header
+    :max-height="280"
+    :loading="loading"
+  />
+</template>`,
+    note: '«Выбрать все» оперирует только видимыми строками и сохраняет внешние ключи; при клиентской сортировке выбор остаётся по ключам, а не по позициям.',
+  },
 ]

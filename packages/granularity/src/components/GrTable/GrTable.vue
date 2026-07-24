@@ -24,6 +24,16 @@ export interface GrTableProps {
    * Если не задан — region-роль не включается.
    */
   regionLabel?: string
+  /**
+   * Прилипающий заголовок: `<thead>` остаётся видимым при вертикальном скролле.
+   * Осмысленно вместе с `maxHeight` (иначе таблица не скроллится вертикально).
+   */
+  stickyHeader?: boolean
+  /**
+   * Максимальная высота скролл-контейнера (включает вертикальный скролл).
+   * Число трактуется как пиксели. Нужен для работы `stickyHeader`.
+   */
+  maxHeight?: string | number
 }
 
 /**
@@ -42,12 +52,28 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   ariaLabel: undefined,
   ariaLabelledby: undefined,
   regionLabel: undefined,
+  stickyHeader: false,
+  maxHeight: undefined,
 })
 
 const slots = useSlots()
 
 const tableTextClass = computed(() => (props.density === 'compact' ? 'text-[13px]' : 'text-sm'))
 const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.caption))
+
+const scrollStyle = computed(() => {
+  if (props.maxHeight === undefined)
+    return undefined
+  const value = typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight
+  return { maxHeight: value, overflowY: 'auto' as const }
+})
+
+// Прилипающий заголовок: `<thead>` на `position: sticky`; фон обязателен, иначе
+// сквозь него будут просвечивать строки при скролле.
+const theadClass = computed(() => [
+  'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]',
+  props.stickyHeader ? 'sticky top-0 z-[1]' : '',
+].filter(Boolean).join(' '))
 </script>
 
 <template>
@@ -57,6 +83,7 @@ const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.captio
     :aria-label="regionLabel"
     :tabindex="regionLabel ? 0 : undefined"
     class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+    :style="scrollStyle"
   >
     <table
       data-gr-table
@@ -69,7 +96,7 @@ const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.captio
 {{ caption }}
 </slot>
       </caption>
-      <thead class="bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]">
+      <thead :class="theadClass">
         <slot name="head" />
       </thead>
       <tbody class="text-[var(--gr-fg)]">

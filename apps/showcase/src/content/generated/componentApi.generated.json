@@ -1177,6 +1177,34 @@
             "default": "false"
           },
           {
+            "name": "selectable",
+            "description": "Выбор строк: добавляет ведущую колонку с чекбоксами (+ «выбрать все» в шапке). Выбранные ключи строк — через `v-model:selected`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "selected",
+            "description": "Контролируемый список выбранных ключей строк: `v-model:selected`.",
+            "type": "(string | number)[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Состояние загрузки: тело таблицы заменяется строкой-индикатором. `empty`-состояние при этом не показывается.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loadingText",
+            "description": "Текст индикатора загрузки. i18n: fallback `gr.dataTable.loading`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "density",
             "description": "",
             "type": "GrTableDensity | undefined",
@@ -1208,6 +1236,20 @@
             "name": "regionLabel",
             "description": "",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "stickyHeader",
+            "description": "Прилипающий заголовок при вертикальном скролле (нужен `maxHeight`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Максимальная высота таблицы (вертикальный скролл). Число — в пикселях.",
+            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           }
@@ -1257,6 +1299,12 @@
             "description": "",
             "type": "[{ key: string; dir: \"asc\" | \"desc\"; }]",
             "signature": "(e: \"sort-change\", value: { key: string; dir: \"asc\" | \"desc\"; }): void"
+          },
+          {
+            "name": "update:selected",
+            "description": "",
+            "type": "[(string | number)[]]",
+            "signature": "(e: \"update:selected\", value: (string | number)[]): void"
           }
         ]
       },
@@ -4765,6 +4813,20 @@
             "default": "false"
           },
           {
+            "name": "loading",
+            "description": "Состояние загрузки: вместо списка опций панель показывает индикатор загрузки. Полезно для удалённой подгрузки опций. Форсит `optionsView=\"panel\"`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "filterable",
+            "description": "Поиск/фильтрация опций по вводу (независимо от `allowCustomValue`). Показывает поле поиска над списком и фильтрует опции. Работает только в `optionsView=\"panel\"` (при `native` панель форсится автоматически).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "allowCustomValue",
             "description": "Разрешает ввод/выбор значения, которого нет в `options`.",
             "type": "boolean | undefined",
@@ -4784,6 +4846,20 @@
             "type": "number | undefined",
             "required": false,
             "default": "280"
+          },
+          {
+            "name": "loadingText",
+            "description": "Текст индикатора загрузки. i18n: fallback `gr.select.loading`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "noResultsText",
+            "description": "Текст пустого результата фильтрации. i18n: fallback `gr.select.noResults`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "clearLabel",
@@ -4812,6 +4888,20 @@
             "type": "GrSelectOptionsView | undefined",
             "required": false,
             "default": "\"native\""
+          },
+          {
+            "name": "filterPlaceholder",
+            "description": "Placeholder поля поиска (`filterable`). i18n: fallback `gr.select.searchPlaceholder`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "tags",
+            "description": "Режим тегов для `multiple`: выбранные значения показываются как удаляемые chips в триггере (вместо строки «a, b, c»). Форсит `optionsView=\"panel\"`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "customValuePlaceholder",
@@ -5272,6 +5362,20 @@
             "name": "regionLabel",
             "description": "ARIA-label для скролл-контейнера (`role=\"region\"` + `tabindex=\"0\"`). Позволяет клавиатурным пользователям проскроллить широкую таблицу. Если не задан — region-роль не включается.",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "stickyHeader",
+            "description": "Прилипающий заголовок: `<thead>` остаётся видимым при вертикальном скролле. Осмысленно вместе с `maxHeight` (иначе таблица не скроллится вертикально).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
+            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           }

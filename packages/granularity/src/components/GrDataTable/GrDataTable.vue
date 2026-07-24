@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import GrTable from '../GrTable/GrTable.vue'
 import type { GrTableDensity } from '../GrTable'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
 import IconArrowDown from '~icons/lucide/arrow-down'
@@ -39,12 +40,30 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
    * `sort-change`. `rows` при этом должны приходить уже отсортированными.
    */
   externalSort?: boolean
+  /**
+   * Выбор строк: добавляет ведущую колонку с чекбоксами (+ «выбрать все» в шапке).
+   * Выбранные ключи строк — через `v-model:selected`.
+   */
+  selectable?: boolean
+  /** Контролируемый список выбранных ключей строк: `v-model:selected`. */
+  selected?: Array<string | number>
+  /**
+   * Состояние загрузки: тело таблицы заменяется строкой-индикатором.
+   * `empty`-состояние при этом не показывается.
+   */
+  loading?: boolean
+  /** Текст индикатора загрузки. i18n: fallback `gr.dataTable.loading`. */
+  loadingText?: string
   // Прокси к GrTable:
   density?: GrTableDensity
   caption?: string
   ariaLabel?: string
   ariaLabelledby?: string
   regionLabel?: string
+  /** Прилипающий заголовок при вертикальном скролле (нужен `maxHeight`). */
+  stickyHeader?: boolean
+  /** Максимальная высота таблицы (вертикальный скролл). Число — в пикселях. */
+  maxHeight?: string | number
 }
 
 /**
@@ -61,18 +80,28 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   sortKey: undefined,
   sortDir: undefined,
   externalSort: false,
+  selectable: false,
+  selected: undefined,
+  loading: false,
+  loadingText: undefined,
   density: 'regular',
   caption: undefined,
   ariaLabel: undefined,
   ariaLabelledby: undefined,
   regionLabel: undefined,
+  stickyHeader: false,
+  maxHeight: undefined,
 })
 
 const emit = defineEmits<{
   (e: 'update:sortKey', value: string): void
   (e: 'update:sortDir', value: 'asc' | 'desc'): void
   (e: 'sort-change', value: { key: string, dir: 'asc' | 'desc' }): void
+  (e: 'update:selected', value: Array<string | number>): void
 }>()
+
+const { t } = useGranularityTranslations()
+const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.dataTable.loading', 'Loading…'))
 
 // Uncontrolled-состояние; в controlled-режиме перекрывается пропами `sortKey`/`sortDir`.
 const internalSortKey = ref<string>(props.initialSortKey ?? '')
@@ -177,12 +206,59 @@ const tableProps = computed(() => ({
   ariaLabel: props.ariaLabel,
   ariaLabelledby: props.ariaLabelledby,
   regionLabel: props.regionLabel,
+  stickyHeader: props.stickyHeader,
+  maxHeight: props.maxHeight,
 }))
 
 const isEmpty = computed(() => sortedRows.value.length === 0)
 
+// Общее число колонок с учётом ведущей чекбокс-колонки — для `colspan`
+// строк loading/empty.
+const totalColumns = computed(() => props.columns.length + (props.selectable ? 1 : 0))
+
 function cellValue(row: TRow, key: string): unknown {
   return (row as Record<string, unknown>)[key]
+}
+
+// ————— Выбор строк.
+const selectedKeys = computed<Set<string | number>>(() => new Set(props.selected ?? []))
+
+function isRowSelected(row: TRow): boolean {
+  return selectedKeys.value.has(rowKeyValue(row))
+}
+
+const allSelected = computed(() =>
+  sortedRows.value.length > 0 && sortedRows.value.every(isRowSelected),
+)
+const someSelected = computed(() =>
+  sortedRows.value.some(isRowSelected) && !allSelected.value,
+)
+
+function emitSelected(next: Set<string | number>): void {
+  emit('update:selected', [...next])
+}
+
+function toggleRow(row: TRow): void {
+  const key = rowKeyValue(row)
+  const next = new Set(selectedKeys.value)
+  if (next.has(key))
+    next.delete(key)
+  else
+    next.add(key)
+  emitSelected(next)
+}
+
+function toggleAll(): void {
+  if (allSelected.value) {
+    // Снимаем выбор только с видимых строк, сохраняя внешние ключи.
+    const next = new Set(selectedKeys.value)
+    for (const row of sortedRows.value) next.delete(rowKeyValue(row))
+    emitSelected(next)
+    return
+  }
+  const next = new Set(selectedKeys.value)
+  for (const row of sortedRows.value) next.add(rowKeyValue(row))
+  emitSelected(next)
 }
 </script>
 
@@ -194,6 +270,22 @@ function cellValue(row: TRow, key: string): unknown {
 
     <template #head>
       <tr data-gr-datatable-header>
+        <th
+          v-if="selectable"
+          class="w-10 px-4 py-3 text-left"
+          scope="col"
+        >
+          <input
+            type="checkbox"
+            data-gr-datatable-select-all
+            class="h-4 w-4 cursor-pointer accent-[var(--gr-primary)] align-middle"
+            :checked="allSelected"
+            :indeterminate="someSelected"
+            :aria-label="t('gr.dataTable.selectAll', 'Select all rows')"
+            :disabled="loading || isEmpty"
+            @change="toggleAll"
+          >
+        </th>
         <th
           v-for="col in columns"
           :key="col.key"
@@ -226,12 +318,22 @@ function cellValue(row: TRow, key: string): unknown {
       </tr>
     </template>
 
-    <template v-if="isEmpty">
+    <template v-if="loading">
+      <tr data-gr-datatable-loading>
+        <td :colspan="totalColumns" class="px-4 py-6 text-center text-[var(--gr-muted-fg)]">
+          <span class="inline-flex items-center gap-2" role="status">
+            <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+            <span>{{ resolvedLoadingText }}</span>
+          </span>
+        </td>
+      </tr>
+    </template>
+    <template v-else-if="isEmpty">
       <tr data-gr-datatable-empty>
-        <td :colspan="columns.length" class="px-4 py-6 text-center text-[var(--gr-muted-fg)]">
+        <td :colspan="totalColumns" class="px-4 py-6 text-center text-[var(--gr-muted-fg)]">
           <slot name="empty">
-Нет данных
-</slot>
+            {{ t('gr.dataTable.empty', 'No data') }}
+          </slot>
         </td>
       </tr>
     </template>
@@ -240,8 +342,20 @@ function cellValue(row: TRow, key: string): unknown {
       v-else
       :key="rowKeyValue(row)"
       class="border-t border-[var(--gr-brd)]"
+      :class="isRowSelected(row) ? 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]' : ''"
       data-gr-datatable-row
+      :data-selected="selectable && isRowSelected(row) ? 'true' : undefined"
     >
+      <td v-if="selectable" class="w-10 px-4 py-3 text-left">
+        <input
+          type="checkbox"
+          data-gr-datatable-select-row
+          class="h-4 w-4 cursor-pointer accent-[var(--gr-primary)] align-middle"
+          :checked="isRowSelected(row)"
+          :aria-label="t('gr.dataTable.selectRow', 'Select row')"
+          @change="toggleRow(row)"
+        >
+      </td>
       <td
         v-for="col in columns"
         :key="col.key"

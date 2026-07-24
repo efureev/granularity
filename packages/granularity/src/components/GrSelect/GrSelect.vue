@@ -58,6 +58,28 @@ export interface GrSelectProps {
   optionsView?: GrSelectOptionsView
   /** Разрешает ввод/выбор значения, которого нет в `options`. */
   allowCustomValue?: boolean
+  /**
+   * Поиск/фильтрация опций по вводу (независимо от `allowCustomValue`). Показывает
+   * поле поиска над списком и фильтрует опции. Работает только в `optionsView="panel"`
+   * (при `native` панель форсится автоматически).
+   */
+  filterable?: boolean
+  /** Placeholder поля поиска (`filterable`). i18n: fallback `gr.select.searchPlaceholder`. */
+  filterPlaceholder?: string
+  /**
+   * Состояние загрузки: вместо списка опций панель показывает индикатор загрузки.
+   * Полезно для удалённой подгрузки опций. Форсит `optionsView="panel"`.
+   */
+  loading?: boolean
+  /** Текст индикатора загрузки. i18n: fallback `gr.select.loading`. */
+  loadingText?: string
+  /** Текст пустого результата фильтрации. i18n: fallback `gr.select.noResults`. */
+  noResultsText?: string
+  /**
+   * Режим тегов для `multiple`: выбранные значения показываются как удаляемые
+   * chips в триггере (вместо строки «a, b, c»). Форсит `optionsView="panel"`.
+   */
+  tags?: boolean
   /** Placeholder для инпута кастомного значения (только в `optionsView="panel"`). i18n-friendly: если не задан — берётся из адаптера перевода (`gr.select.customValuePlaceholder`), иначе — встроенный fallback. */
   customValuePlaceholder?: string
   /** Максимальная высота панели (только в `optionsView="panel"`). */
@@ -94,6 +116,12 @@ const props = withDefaults(
 
     optionsView: 'native',
     allowCustomValue: false,
+    filterable: false,
+    filterPlaceholder: undefined,
+    loading: false,
+    loadingText: undefined,
+    noResultsText: undefined,
+    tags: false,
     customValuePlaceholder: undefined,
     dropdownMaxHeight: 280,
     closeOnSelect: true,
@@ -111,6 +139,13 @@ const resolvedCustomValuePlaceholder = computed(() => {
 })
 
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.common.clear', 'Clear'))
+const resolvedFilterPlaceholder = computed(() => props.filterPlaceholder ?? t('gr.select.searchPlaceholder', 'Search…'))
+const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.select.loading', 'Loading…'))
+const resolvedNoResultsText = computed(() => props.noResultsText ?? t('gr.select.noResults', 'No results'))
+// В search-инпуте: при allowCustomValue — «Add value…», иначе (чистый filterable) — «Search…».
+const resolvedSearchPlaceholder = computed(() =>
+  props.allowCustomValue ? resolvedCustomValuePlaceholder.value : resolvedFilterPlaceholder.value,
+)
 
 const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : defaultBaseClass)
 
@@ -195,8 +230,19 @@ const displayText = computed(() => {
 const effectiveOptionsView = computed<GrSelectOptionsView>(() => {
   if (props.view === 'link' && props.multiple && props.optionsView === 'native')
     return 'panel'
+  // Поиск/загрузка/теги невозможны в нативном `<select>` — форсим кастомную панель.
+  if ((props.filterable || props.loading || props.tags) && props.optionsView === 'native')
+    return 'panel'
   return props.optionsView
 })
+
+// Поле поиска в панели: показываем при `filterable` ИЛИ `allowCustomValue`.
+const showSearchInput = computed(() =>
+  (props.filterable || props.allowCustomValue) && effectiveOptionsView.value === 'panel',
+)
+
+// Показывать chips вместо строки «a, b, c» (только multiple + tags).
+const showTags = computed(() => props.multiple && props.tags && effectiveOptionsView.value === 'panel')
 
 const nativeCustomOptionVisible = computed(() => {
   if (!props.allowCustomValue) return false
@@ -262,7 +308,7 @@ type GrSelectPanelItem =
   | { kind: 'option', option: GrSelectOption, key: string }
 
 const panelItems = computed<GrSelectPanelItem[]>(() => {
-  const q = props.allowCustomValue ? customValue.value.trim().toLowerCase() : ''
+  const q = (props.allowCustomValue || props.filterable) ? customValue.value.trim().toLowerCase() : ''
   const items: GrSelectPanelItem[] = []
 
   // Опция для кастомного значения, которого нет в options (single).
@@ -354,6 +400,17 @@ function addCustom(): void {
   const v = customValue.value.trim()
   if (!v) return
   toggleValue(v)
+}
+
+// Удаление одного значения из multiple-выбора (клик по «×» на chip).
+function removeValue(value: string): void {
+  if (props.disabled) return
+  if (!props.multiple) return
+  emitValue(selectedValues.value.filter(v => v !== value))
+}
+
+function tagRemoveLabel(option: GrSelectOption): string {
+  return t('gr.select.removeTag', 'Remove {label}', { label: option.label })
 }
 
 // ————— Клавиатурная навигация комбобокса (WAI-ARIA, aria-activedescendant).
@@ -458,8 +515,8 @@ function onComboKeydown(event: KeyboardEvent): void {
       closeDropdown()
       break
     default:
-      // typeahead — только без allowCustomValue (иначе мешает вводу в custom-инпут).
-      if (!props.allowCustomValue && event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey)
+      // typeahead — только когда нет поля ввода (иначе мешает вводу в search/custom-инпут).
+      if (!showSearchInput.value && event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey)
         typeahead(event.key)
   }
 }
@@ -475,7 +532,7 @@ watch(
 
     initActiveIndex()
 
-    if (props.allowCustomValue) {
+    if (showSearchInput.value) {
       await nextTick()
       customInputRef.value?.focus()
     }
@@ -654,7 +711,7 @@ function clearSelection(): void {
       :aria-controls="open ? listboxId : undefined"
       :aria-activedescendant="activeDescendantId"
       :aria-expanded="open ? 'true' : 'false'"
-      :class="[baseClassName, triggerClassName]"
+      :class="[baseClassName, triggerClassName, showTags && hasSelection ? '!h-auto min-h-10 !py-1.5' : '']"
       @click="toggleDropdown"
       @keydown="onComboKeydown"
     >
@@ -667,7 +724,35 @@ function clearSelection(): void {
           :placeholder="placeholder"
           :has-selection="hasSelection"
         >
+          <!-- Теги-режим: удаляемые chips вместо строки «a, b, c». -->
           <span
+            v-if="showTags && hasSelection"
+            data-gr-select-tags
+            class="flex flex-wrap gap-1 py-0.5"
+          >
+            <span
+              v-for="opt in selectedOptions"
+              :key="opt.value"
+              data-gr-select-tag
+              class="inline-flex items-center gap-1 rounded-[6px] bg-[var(--gr-muted)] pl-2 pr-1 py-0.5 text-[12px] text-[var(--gr-fg)] max-w-full"
+            >
+              <span class="truncate">{{ opt.label }}</span>
+              <span
+                v-if="!disabled"
+                data-gr-select-tag-remove
+                role="button"
+                tabindex="-1"
+                :aria-label="tagRemoveLabel(opt)"
+                class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-fg)_12%,transparent)]"
+                @click.stop="removeValue(opt.value)"
+              >
+                <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
+              </span>
+            </span>
+          </span>
+
+          <span
+            v-else
             class="block truncate"
             :class="!hasSelection ? 'text-[var(--gr-muted-fg)]' : ''"
           >
@@ -721,19 +806,32 @@ function clearSelection(): void {
           :style="floatingStyle"
         >
           <div :class="panelClasses">
-            <div v-if="allowCustomValue" class="p-2 border-b border-[var(--gr-brd)]">
+            <div v-if="showSearchInput" class="p-2 border-b border-[var(--gr-brd)]">
               <GrInput
                 ref="customInputRef"
                 v-model="customValue"
                 data-testid="gr-select-custom-input"
+                data-gr-select-search
                 type="text"
-                :placeholder="resolvedCustomValuePlaceholder"
+                :placeholder="resolvedSearchPlaceholder"
                 size="sm"
                 @keydown="onComboKeydown"
               />
             </div>
 
+            <!-- Состояние загрузки: вместо списка — индикатор. -->
             <div
+              v-if="loading"
+              data-gr-select-loading
+              class="flex items-center justify-center gap-2 px-3 py-4 text-[13px] text-[var(--gr-muted-fg)]"
+              role="status"
+            >
+              <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+              <span>{{ resolvedLoadingText }}</span>
+            </div>
+
+            <div
+              v-else
               :id="listboxId"
               data-gr-select-listbox
               class="p-1 overflow-auto"
@@ -795,6 +893,15 @@ function clearSelection(): void {
                   </slot>
                 </button>
               </template>
+
+              <!-- Пустой результат фильтрации (без add-custom-варианта). -->
+              <div
+                v-if="!panelItems.length && !canAddCustom"
+                data-gr-select-empty
+                class="px-3 py-4 text-center text-[13px] text-[var(--gr-muted-fg)]"
+              >
+                {{ resolvedNoResultsText }}
+              </div>
             </div>
           </div>
         </div>

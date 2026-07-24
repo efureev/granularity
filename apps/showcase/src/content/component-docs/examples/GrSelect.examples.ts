@@ -182,4 +182,74 @@ const region = ref('')
 </template>`,
     note: 'Именно этот режим критичен для демо complex-компонента: здесь одновременно видны custom input, panel dropdown и slot-based composition.',
   },
+  {
+    id: 'select-filter-loading-tags',
+    title: 'Filter, loading and tag mode',
+    description: 'Три доработки panel-режима: `filterable` добавляет поле поиска над списком (независимо от `allow-custom-value`), `loading` показывает индикатор загрузки вместо опций (для удалённой подгрузки), а `tags` рендерит выбор `multiple` как удаляемые chips вместо строки «a, b, c».',
+    status: 'ready',
+    previewKey: 'gr-select-filter-loading-tags',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrSelect } from '@feugene/granularity'
+
+const countries = [
+  { value: 'us', label: 'United States' },
+  { value: 'gb', label: 'United Kingdom' },
+  { value: 'de', label: 'Germany' },
+  { value: 'fr', label: 'France' },
+  { value: 'es', label: 'Spain' },
+]
+
+const country = ref('')
+const teams = ref<string[]>(['us', 'de'])
+
+const asyncOptions = ref<Array<{ value: string, label: string }>>([])
+const loading = ref(false)
+
+function loadOptions() {
+  loading.value = true
+  asyncOptions.value = []
+  setTimeout(() => {
+    asyncOptions.value = countries
+    loading.value = false
+  }, 1200)
+}
+</script>
+
+<template>
+  <!-- Поиск по опциям -->
+  <GrSelect
+    v-model="country"
+    options-view="panel"
+    filterable
+    clearable
+    :options="countries"
+    placeholder="Pick a country"
+  />
+
+  <!-- Загрузка опций -->
+  <GrSelect
+    v-model="country"
+    options-view="panel"
+    filterable
+    :loading="loading"
+    :options="asyncOptions"
+    placeholder="Open to load…"
+  />
+
+  <!-- Теги (multiple как chips) -->
+  <GrSelect
+    v-model="teams"
+    multiple
+    tags
+    filterable
+    options-view="panel"
+    :close-on-select="false"
+    :options="countries"
+    placeholder="Pick countries"
+  />
+</template>`,
+    note: 'filterable/loading/tags форсят panel-режим (в нативном `<select>` они невозможны). Поиск и подгрузка комбинируются: пока `loading` — список скрыт, дальше работает клиентская фильтрация.',
+  },
 ]

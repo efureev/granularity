@@ -21,7 +21,17 @@
   "select": {
     "customValuePlaceholder": "Добавить значение…",
     "addOption": "Добавить «{value}»",
-    "clearOption": "Не выбрано"
+    "clearOption": "Не выбрано",
+    "searchPlaceholder": "Поиск…",
+    "loading": "Загрузка…",
+    "noResults": "Ничего не найдено",
+    "removeTag": "Удалить {label}"
+  },
+  "dataTable": {
+    "loading": "Загрузка…",
+    "empty": "Нет данных",
+    "selectAll": "Выбрать все строки",
+    "selectRow": "Выбрать строку"
   },
   "autocomplete": {
     "loading": "Загрузка…",

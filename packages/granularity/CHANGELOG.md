@@ -7,17 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Added
-
-- **`GrToaster` action button.** `useToast().push` now accepts an optional
-  `action: { label, onClick, dismissOnClick? }` — the toast renders a button in its body. By default a
-  click runs `onClick` and dismisses the toast; `dismissOnClick: false` keeps it open (e.g. a "Retry"
-  action on a sticky error). New exported type `ToastAction`.
-- **`GrPagination` compact variant and page jumper.** New `compact` prop replaces the numbered page
-  buttons with a "current / total" indicator for tight spots (mobile, table toolbars). New `show-jumper`
-  prop adds a "go to page" input that jumps on Enter/blur, clamping the value to `[1, pageCount]`
-  (label via `jumper-label` / the new `gr.pagination.jumpTo` string, localized en/ru/es).
-
 ## [v0.13.0] 2026-07-23
 
 ### Changed
@@ -69,6 +58,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   overload its focus/aria semantics.
 - `GrAutocomplete` translations (`gr.autocomplete.*`: `loading` / `noResults` / `addOption` /
   `typeMore`) added to the `en` / `ru` / `es` locale payloads.
+
+- **`GrToaster` action button.** `useToast().push` now accepts an optional
+  `action: { label, onClick, dismissOnClick? }` — the toast renders a button in its body. By default a
+  click runs `onClick` and dismisses the toast; `dismissOnClick: false` keeps it open (e.g. a "Retry"
+  action on a sticky error). New exported type `ToastAction`.
+- **`GrPagination` compact variant and page jumper.** New `compact` prop replaces the numbered page
+  buttons with a "current / total" indicator for tight spots (mobile, table toolbars). New `show-jumper`
+  prop adds a "go to page" input that jumps on Enter/blur, clamping the value to `[1, pageCount]`
+  (label via `jumper-label` / the new `gr.pagination.jumpTo` string, localized en/ru/es).
+- **`GrSelect` filtering, loading and tag mode (panel view).** New `filterable` prop shows a search box
+  over the option list independent of `allow-custom-value` (with a `no results` state); `loading` +
+  `loading-text` render a spinner instead of options for async option loading; `tags` renders a
+  `multiple` selection as removable chips (with per-chip remove) instead of the "a, b, c" string. All
+  three force `options-view="panel"` (impossible in a native `<select>`). New `gr.select.*`
+  strings (`searchPlaceholder` / `loading` / `noResults` / `removeTag`), localized en/ru/es.
+- **`GrTable` / `GrDataTable` sticky header, row selection and loading.** `GrTable` gained
+  `sticky-header` + `max-height` (header stays visible on vertical scroll). `GrDataTable` gained
+  `selectable` with a leading checkbox column and a "select all" header checkbox (model via
+  `v-model:selected` by row key, with indeterminate state), plus a `loading` prop that swaps the body
+  for a spinner row. Its built-in empty text is now localized (`gr.dataTable.*`, en/ru/es).
 
 ### Testing / infrastructure
 
