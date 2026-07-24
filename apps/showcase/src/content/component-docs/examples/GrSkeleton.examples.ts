@@ -12,11 +12,13 @@ import { GrCard, GrSkeleton } from '@feugene/granularity'
 </script>
 
 <template>
-  <GrCard class="grid gap-4">
+  <GrCard class="grid gap-4 p-4">
     <GrSkeleton width="38%" height="20px" rounded="12px" />
-    <GrSkeleton />
-    <GrSkeleton width="92%" />
-    <GrSkeleton width="76%" />
+    <div class="grid gap-2">
+      <GrSkeleton />
+      <GrSkeleton width="92%" />
+      <GrSkeleton width="76%" />
+    </div>
   </GrCard>
 </template>`,
   },
@@ -33,10 +35,14 @@ const rows = [1, 2, 3]
 </script>
 
 <template>
-  <div class="grid gap-3">
+  <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
     <div v-for="row in rows" :key="row" class="flex items-center gap-3">
       <GrSkeleton width="44px" height="44px" rounded="9999px" />
-      <GrSkeleton width="44%" />
+      <div class="min-w-0 flex-1 grid gap-2">
+        <GrSkeleton width="44%" />
+        <GrSkeleton width="72%" />
+      </div>
+      <GrSkeleton width="72px" height="28px" rounded="10px" />
     </div>
   </div>
 </template>`,
@@ -53,8 +59,18 @@ import { GrSkeleton } from '@feugene/granularity'
 
 <template>
   <div class="grid gap-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-    <GrSkeleton height="160px" rounded="18px" />
-    <GrSkeleton v-for="row in 4" :key="row" width="100%" height="12px" rounded="9999px" />
+    <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+      <GrSkeleton width="26%" height="18px" rounded="12px" />
+      <GrSkeleton height="160px" rounded="18px" />
+      <div class="grid gap-2 sm:grid-cols-3">
+        <GrSkeleton v-for="card in 3" :key="card" height="72px" rounded="16px" />
+      </div>
+    </div>
+
+    <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+      <GrSkeleton width="48%" height="18px" rounded="12px" />
+      <GrSkeleton v-for="row in 4" :key="row" width="100%" height="12px" rounded="9999px" />
+    </div>
   </div>
 </template>`,
   },

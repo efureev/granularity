@@ -1,6 +1,7 @@
 import { computed, getCurrentInstance, inject, reactive } from 'vue'
 import type { App, InjectionKey } from 'vue'
 
+import type { GrButtonSize, GrButtonVariant } from '../components/GrButton/grButtonStyles'
 import type { GrTone } from '../components/shared/tones'
 
 export type GrToastTone = GrTone
@@ -8,13 +9,17 @@ export type GrToastTone = GrTone
 /**
  * Опциональная action-кнопка тоста: `label` — текст, `onClick` — обработчик.
  * По клику вызывается `onClick`, затем тост закрывается (если `dismissOnClick`
- * не установлен в `false`).
+ * не установлен в `false`). `size`/`variant` настраивают вид кнопки.
  */
 export type ToastAction = {
   label: string
   onClick: () => void
   /** Закрывать ли тост после клика по действию. По умолчанию `true`. */
   dismissOnClick?: boolean
+  /** Размер кнопки действия. По умолчанию `sm`. */
+  size?: GrButtonSize
+  /** Вариант кнопки действия. По умолчанию `outline`. */
+  variant?: GrButtonVariant
 }
 
 export type ToastInput = {
@@ -26,8 +31,10 @@ export type ToastInput = {
    * (до явного вызова `dismiss(id)` / `clear()`). По умолчанию: `3500`.
    */
   timeoutMs?: number
-  /** Action-кнопка в теле тоста (например «Отменить», «Повторить»). */
+  /** Одна action-кнопка в теле тоста (шорткат для `actions: [action]`). */
   action?: ToastAction
+  /** Несколько action-кнопок в теле тоста. Рендерятся после `action`. */
+  actions?: ToastAction[]
 }
 
 export type Toast = {
@@ -37,8 +44,10 @@ export type Toast = {
   tone: GrToastTone
   /** Исходный таймаут автозакрытия, мс (`0` — без автозакрытия). Нужен для progress-бара. */
   timeoutMs: number
-  /** Action-кнопка в теле тоста. */
+  /** Одна action-кнопка в теле тоста. */
   action?: ToastAction
+  /** Несколько action-кнопок в теле тоста. */
+  actions?: ToastAction[]
 }
 
 const DEFAULT_TIMEOUT_MS = 3500
@@ -150,6 +159,7 @@ export function useToast() {
       tone: input.tone ?? 'info',
       timeoutMs: timeout > 0 ? timeout : 0,
       action: input.action,
+      actions: input.actions,
     }
 
     state.toasts.unshift(toast)

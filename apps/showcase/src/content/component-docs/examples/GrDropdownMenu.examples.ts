@@ -63,7 +63,7 @@ import {
   {
     id: 'dropdown-menu-shortcut-grid',
     title: 'Shortcut cheat-sheet grid',
-    description: 'Минималистичный cheat-sheet хоткеев: `GrDropdownMenuHeader` + одноколоночный `GrDropdownMenuList`, где в каждой строке действие слева и хоткей-чипы справа (`justify-between`) — без вертикальных разделителей.',
+    description: 'Минималистичный cheat-sheet хоткеев: `GrDropdownMenuHeader` + одноколоночный `GrDropdownMenuList`, где в каждой строке действие слева и хоткей-чипы справа (`justify-between`). Клавиши рендерим компонентом `GrKbd` — без ручной вёрстки `<kbd>`.',
     status: 'ready',
     previewKey: 'gr-dropdown-menu-shortcut-grid',
     code: `<script setup lang="ts">
@@ -72,8 +72,11 @@ import {
   GrDropdownMenu,
   GrDropdownMenuHeader,
   GrDropdownMenuList,
+  GrKbd,
 } from '@feugene/granularity'
 
+// Каждый хоткей — массив клавиш: рендерим их как отдельные \`GrKbd\`-чипы,
+// так «⌘ K» читается чище, чем слипшееся «⌘K».
 const shortcuts = [
   { action: 'Search', keys: ['⌘', 'K'] },
   { action: 'Save draft', keys: ['⌘', 'S'] },
@@ -83,9 +86,15 @@ const shortcuts = [
 </script>
 
 <template>
+  <!--
+    Минималистичный cheat-sheet: одна колонка, в каждой строке действие слева и
+    хоткей справа (\`justify-between\`). Клавиши — компонент \`GrKbd\` (дефолтный размер).
+  -->
   <GrDropdownMenu width="64" align="left" :close-on-content-click="false">
     <template #trigger="{ open }">
-      <GrButton variant="outline">{{ open ? 'Hide shortcuts' : 'Keyboard shortcuts' }}</GrButton>
+      <GrButton variant="outline">
+        {{ open ? 'Hide shortcuts' : 'Keyboard shortcuts' }}
+      </GrButton>
     </template>
 
     <GrDropdownMenuHeader title="Keyboard shortcuts" />
@@ -98,11 +107,12 @@ const shortcuts = [
       >
         <span class="truncate">{{ shortcut.action }}</span>
         <span class="flex shrink-0 items-center gap-1">
-          <kbd
+          <GrKbd
             v-for="(key, index) in shortcut.keys"
             :key="index"
-            class="min-w-[20px] rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] px-1.5 py-0.5 text-center text-[11px] font-medium text-[var(--gr-muted-fg)] tabular-nums"
-          >{{ key }}</kbd>
+          >
+            {{ key }}
+          </GrKbd>
         </span>
       </div>
     </GrDropdownMenuList>

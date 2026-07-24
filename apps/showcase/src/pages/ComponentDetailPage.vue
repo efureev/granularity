@@ -229,6 +229,7 @@ const previewRegistry = {
   'gr-toaster-queue-flow': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterQueueDemo.vue')),
   'gr-toaster-sticky-host': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterStickyDemo.vue')),
   'gr-toaster-action': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterActionDemo.vue')),
+  'gr-toaster-action-slot': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterActionSlotDemo.vue')),
   'gr-tree-drag-and-slot': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeDragAndSlotDemo.vue')),
   'gr-tree-expanded-state': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeExpandedStateDemo.vue')),
   'gr-tree-filtering': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeFilteringDemo.vue')),

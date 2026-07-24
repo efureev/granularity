@@ -4,9 +4,10 @@ import {
   GrDropdownMenu,
   GrDropdownMenuHeader,
   GrDropdownMenuList,
+  GrKbd,
 } from '@feugene/granularity'
 
-// Каждый хоткей — массив клавиш: рендерим их как отдельные <kbd>-чипы,
+// Каждый хоткей — массив клавиш: рендерим их как отдельные `GrKbd`-чипы,
 // так «⌘ K» читается чище, чем слипшееся «⌘K».
 const shortcuts = [
   { action: 'Search', keys: ['⌘', 'K'] },
@@ -19,8 +20,7 @@ const shortcuts = [
 <template>
   <!--
     Минималистичный cheat-sheet: одна колонка, в каждой строке действие слева и
-    хоткей справа (`justify-between`). Никаких вертикальных разделителей и «плавающих»
-    полос — выравнивание держит сама строка.
+    хоткей справа (`justify-between`). Клавиши — компонент `GrKbd` (дефолтный размер).
   -->
   <GrDropdownMenu width="64" align="left" :close-on-content-click="false">
     <template #trigger="{ open }">
@@ -39,13 +39,12 @@ const shortcuts = [
       >
         <span class="truncate">{{ shortcut.action }}</span>
         <span class="flex shrink-0 items-center gap-1">
-          <kbd
+          <GrKbd
             v-for="(key, index) in shortcut.keys"
             :key="index"
-            class="min-w-[20px] rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] px-1.5 py-0.5 text-center text-[11px] font-medium text-[var(--gr-muted-fg)] tabular-nums"
           >
             {{ key }}
-          </kbd>
+          </GrKbd>
         </span>
       </div>
     </GrDropdownMenuList>

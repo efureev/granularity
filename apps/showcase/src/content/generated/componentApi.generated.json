@@ -5671,7 +5671,13 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "actions",
+            "description": "",
+            "type": "{ toast: Toast; dismiss: () => void; }"
+          }
+        ]
       },
       {
         "key": "events",

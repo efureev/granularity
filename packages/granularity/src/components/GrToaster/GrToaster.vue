@@ -18,12 +18,12 @@
  *   визуализируется прогресс-баром до закрытия;
  * - `placement` настраивает угол экрана; слой — `--gr-z-toast`.
  */
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, useSlots, watchEffect } from 'vue'
 import type { Component } from 'vue'
 
 import { useToast } from '../../composables/useToast'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import type { GrToastTone } from '../../composables/useToast'
+import type { GrToastTone, Toast, ToastAction } from '../../composables/useToast'
 import GrButton from '../GrButton'
 import GrIcon from '../GrIcon'
 import { PLACEMENT_CLASS, type GrToasterPlacement } from './grToasterStyles'
@@ -73,17 +73,33 @@ const props = withDefaults(defineProps<GrToasterProps>(), {
   regionLabel: undefined,
 })
 
+/**
+ * Слот `actions` полностью заменяет дефолтные action-кнопки тоста. Получает сам
+ * `toast` и `dismiss` — функцию, закрывающую именно этот тост.
+ */
+defineSlots<{
+  actions?: (props: { toast: Toast, dismiss: () => void }) => unknown
+}>()
+
 const { t } = useGranularityTranslations()
+const slots = useSlots()
 const resolvedDismissLabel = computed(() => props.dismissLabel ?? t('gr.toaster.dismiss', 'Dismiss'))
 const resolvedRegionLabel = computed(() => props.regionLabel ?? t('gr.toaster.region', 'Notifications'))
 
 const { list, dismiss, pause, resume } = useToast()
 
-// Клик по action-кнопке тоста: вызываем обработчик и (по умолчанию) закрываем тост.
-function onAction(toast: (typeof list.value)[number]): void {
-  const action = toast.action
-  if (!action) return
+// Единый список кнопок тоста: `action` (шорткат) + массив `actions`.
+function toastActions(toast: Toast): ToastAction[] {
+  return [...(toast.action ? [toast.action] : []), ...(toast.actions ?? [])]
+}
 
+// Показываем блок действий, если есть кнопки или задан слот `actions`.
+function hasActions(toast: Toast): boolean {
+  return Boolean(slots.actions) || toastActions(toast).length > 0
+}
+
+// Клик по action-кнопке тоста: вызываем обработчик и (по умолчанию) закрываем тост.
+function onAction(toast: Toast, action: ToastAction): void {
   action.onClick()
   if (action.dismissOnClick !== false)
     dismiss(toast.id)
@@ -165,16 +181,21 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
                 {{ toast.message }}
               </div>
 
-              <!-- Action-кнопка тоста: например «Отменить»/«Повторить». -->
-              <div v-if="toast.action" class="mt-2">
-                <GrButton
-                    variant="outline"
-                    size="sm"
-                    data-gr-toast-action
-                    @click="onAction(toast)"
-                >
-                  {{ toast.action.label }}
-                </GrButton>
+              <!-- Action-кнопки тоста: например «Отменить»/«Повторить». Можно
+                   задать массивом (`actions`) или переопределить слотом. -->
+              <div v-if="hasActions(toast)" class="mt-2 flex flex-wrap gap-2">
+                <slot name="actions" :toast="toast" :dismiss="() => dismiss(toast.id)">
+                  <GrButton
+                      v-for="(action, index) in toastActions(toast)"
+                      :key="index"
+                      :variant="action.variant ?? 'outline'"
+                      :size="action.size ?? 'sm'"
+                      data-gr-toast-action
+                      @click="onAction(toast, action)"
+                  >
+                    {{ action.label }}
+                  </GrButton>
+                </slot>
               </div>
             </div>
             <GrButton

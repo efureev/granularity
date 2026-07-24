@@ -61,8 +61,8 @@ function queueWorkflowToasts() {
   },
   {
     id: 'toaster-action',
-    title: 'Toast with an action button',
-    description: 'Payload `useToast.push` принимает `action: { label, onClick }` — тост рендерит кнопку в теле. По умолчанию клик выполняет обработчик и закрывает тост; `dismissOnClick: false` оставляет тост открытым (например, «Retry» для sticky-ошибки).',
+    title: 'Action buttons: size, variant, multiple',
+    description: 'Payload `useToast.push` принимает `action: { label, onClick }` для одной кнопки или `actions: [...]` для нескольких. У каждой кнопки настраиваются `size` и `variant`; `dismissOnClick: false` оставляет тост открытым (например, «Retry» для sticky-ошибки).',
     status: 'ready',
     previewKey: 'gr-toaster-action',
     code: `<script setup lang="ts">
@@ -76,10 +76,11 @@ function archiveWithUndo() {
     message: 'Moved to archive. You can still undo this.',
     tone: 'info',
     timeoutMs: 6000,
-    action: {
-      label: 'Undo',
-      onClick: () => restoreMessage(),
-    },
+    // Несколько кнопок с разными variant/size.
+    actions: [
+      { label: 'Undo', variant: 'primary', size: 'sm', onClick: () => restoreMessage() },
+      { label: 'View archive', variant: 'ghost', size: 'sm', dismissOnClick: false, onClick: () => openArchive() },
+    ],
   })
 }
 
@@ -90,6 +91,7 @@ function failedUpload() {
     timeoutMs: 0,
     action: {
       label: 'Retry',
+      size: 'md', // более крупная кнопка для основного действия
       dismissOnClick: false, // держим тост открытым во время повтора
       onClick: () => retryUpload(),
     },
@@ -104,5 +106,43 @@ function failedUpload() {
   <GrToaster />
 </template>`,
     note: '`action.onClick` вызывается синхронно перед закрытием — удобно для undo/retry-паттернов, где важно успеть отменить операцию.',
+  },
+  {
+    id: 'toaster-action-slot',
+    title: 'Custom action buttons via slot',
+    description: 'Слот `#actions` полностью заменяет дефолтные кнопки: он получает сам `toast` и функцию `dismiss`, которая закрывает именно этот тост. Так можно рендерить любые контролы и самому решать, когда закрывать уведомление.',
+    status: 'ready',
+    previewKey: 'gr-toaster-action-slot',
+    code: `<script setup lang="ts">
+import { GrButton, GrToaster, useToast } from '@feugene/granularity'
+
+const { push } = useToast()
+
+function notify() {
+  push({
+    title: 'Deploy ready',
+    message: 'Review the build and promote it to production.',
+    tone: 'success',
+    timeoutMs: 0,
+  })
+}
+</script>
+
+<template>
+  <GrButton size="sm" @click="notify">Notify with custom actions</GrButton>
+
+  <GrToaster>
+    <!-- Кнопки действий через слот; \`dismiss\` закрывает этот тост. -->
+    <template #actions="{ toast, dismiss }">
+      <GrButton size="sm" variant="primary" @click="() => { promote(toast); dismiss() }">
+        Promote
+      </GrButton>
+      <GrButton size="sm" variant="ghost" @click="dismiss">
+        Later
+      </GrButton>
+    </template>
+  </GrToaster>
+</template>`,
+    note: 'Слот задаётся один раз на `GrToaster` и применяется ко всем тостам; внутри доступен `toast` (title/message/tone/…) и `dismiss()`.',
   },
 ]

@@ -23,13 +23,27 @@ function notifyWithUndo() {
     message: 'Moved to archive. You can still undo this.',
     tone: 'info',
     timeoutMs: 6000,
-    action: {
-      label: 'Undo',
-      onClick: () => {
-        archived.value = false
-        lastAction.value = 'Undo — message restored'
+    // Массив кнопок с разными variant/size.
+    actions: [
+      {
+        label: 'Undo',
+        variant: 'primary',
+        size: 'sm',
+        onClick: () => {
+          archived.value = false
+          lastAction.value = 'Undo — message restored'
+        },
       },
-    },
+      {
+        label: 'View archive',
+        variant: 'ghost',
+        size: 'sm',
+        dismissOnClick: false,
+        onClick: () => {
+          lastAction.value = 'Opened archive'
+        },
+      },
+    ],
   })
 }
 
@@ -46,6 +60,9 @@ function notifyWithRetry() {
     timeoutMs: 0,
     action: {
       label: 'Retry',
+      // Более крупная кнопка для основного sticky-действия.
+      size: 'md',
+      variant: 'outline',
       // dismissOnClick: false — оставляем тост открытым, чтобы показать «повтор».
       dismissOnClick: false,
       onClick: () => {
