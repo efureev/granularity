@@ -9,6 +9,7 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-form-field-context',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
+
 import { GrFormField, GrInput } from '@feugene/granularity'
 
 const email = ref('john')
@@ -18,9 +19,20 @@ const error = computed(() =>
 </script>
 
 <template>
-  <GrFormField label="Email" required hint="We'll never share your email." :error="error">
-    <GrInput v-model="email" type="email" placeholder="you@example.com" />
-  </GrFormField>
+  <!--
+    Контрол сам получает id (связка с label \`for\`), aria-describedby (hint + error),
+    aria-invalid и aria-required через inject-контекст \`GrFormField\` — без \`forId\` вручную.
+  -->
+  <div class="grid max-w-sm gap-4">
+    <GrFormField
+      label="Email"
+      required
+      hint="We'll never share your email."
+      :error="error"
+    >
+      <GrInput v-model="email" type="email" placeholder="you@example.com" />
+    </GrFormField>
+  </div>
 </template>`,
     note: 'GrInput / GrSelect / GrTextarea внутри `GrFormField` подхватывают контекст автоматически — id/aria прокидывать не нужно.',
   },
@@ -102,5 +114,98 @@ const approvals = ref(false)
     </div>
   </GrFormField>
 </template>`,
+  },
+  {
+    id: 'form-field-custom-control',
+    title: 'Custom control + custom rule (no GrForm)',
+    description: 'Даже без `GrForm` поле связывает свой контрол и ошибку: кастомный контрол (звёздный рейтинг) читает контекст через `useGrFormFieldContext()`, а валидация делается вручную — своя функция-правило вычисляет `:error`, который `GrFormField` показывает через `role="alert"`.',
+    status: 'ready',
+    previewKey: 'gr-form-field-custom-control',
+    code: `<!-- StarRatingInput.vue — кастомный контрол -->
+<script setup lang="ts">
+import { computed } from 'vue'
+
+import { useGrFormFieldContext } from '@feugene/granularity'
+
+const model = defineModel<number>({ default: 0 })
+
+// Даже без GrForm кастомный контрол читает контекст GrFormField, чтобы получить
+// id (label \`for\`), aria-describedby (hint + error) и aria-invalid.
+const field = useGrFormFieldContext()
+const invalid = computed(() => Boolean(field?.invalid.value))
+const stars = [1, 2, 3, 4, 5]
+</script>
+
+<template>
+  <div
+    :id="field?.id.value"
+    role="radiogroup"
+    :aria-describedby="field?.describedById.value"
+    :aria-invalid="invalid || undefined"
+    :aria-required="field?.required.value || undefined"
+    class="flex gap-1"
+  >
+    <button
+      v-for="star in stars"
+      :key="star"
+      type="button"
+      role="radio"
+      :aria-checked="model === star"
+      :aria-label="\`\${star} stars\`"
+      class="text-2xl leading-none transition-transform hover:scale-110"
+      :class="star <= model ? 'text-[var(--gr-warning)]' : 'text-[var(--gr-muted-fg)]'"
+      @click="model = star"
+    >
+      ★
+    </button>
+  </div>
+</template>
+
+<!-- Demo.vue -->
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+
+import { GrButton, GrFormField } from '@feugene/granularity'
+
+import StarRatingInput from './StarRatingInput.vue'
+
+const rating = ref(0)
+const touched = ref(false)
+
+// Кастомное правило без GrForm: валидируем сами и отдаём текст в \`:error\`.
+function validateRating(value: number): string | undefined {
+  if (value < 1)
+    return 'Please pick a rating.'
+  if (value < 3)
+    return 'We would love at least 3 stars 🙂'
+  return undefined
+}
+
+const error = computed(() => (touched.value ? validateRating(rating.value) : undefined))
+
+function submit() {
+  touched.value = true
+}
+</script>
+
+<template>
+  <div class="grid max-w-sm gap-4">
+    <GrFormField
+      label="Satisfaction"
+      required
+      hint="Custom control + custom rule, without GrForm."
+      :error="error"
+    >
+      <StarRatingInput v-model="rating" />
+    </GrFormField>
+
+    <div>
+      <GrButton type="button" @click="submit">
+        Send feedback
+      </GrButton>
+    </div>
+  </div>
+</template>`,
+    note: 'Тот же приём (чтение `useGrFormFieldContext()`) делает любой контрол совместимым и с `GrForm` — тогда правило описывается декларативно в `rules`, а не вручную.',
   },
 ]

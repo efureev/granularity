@@ -48,7 +48,7 @@ function reset() {
       <GrButton type="submit">
         Sign up
       </GrButton>
-      <GrButton variant="default" type="button" @click="reset">
+      <GrButton variant="secondary" type="button" @click="reset">
         Reset
       </GrButton>
     </div>

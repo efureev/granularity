@@ -12,11 +12,20 @@ export type ShowcaseComponentExampleDoc = {
   previewKey?: string
 }
 
+export type ShowcaseComponentOverviewList = {
+  /** Заголовок списка (напр. «Совместимые контролы» или «Встроенные правила»). */
+  title: string
+  /** Пункты списка (поддерживают inline-`code` через backticks). */
+  items: string[]
+}
+
 export type ShowcaseComponentOverviewDoc = {
   /** Абзацы описания: что за компонент и для чего он нужен. */
   paragraphs: string[]
   /** Список ключевых фич компонента (bullets). */
   features?: string[]
+  /** Доп. тематические списки под фичами (напр. совместимые контролы, встроенные правила). */
+  lists?: ShowcaseComponentOverviewList[]
 }
 
 export type ShowcaseComponentDocMeta = {

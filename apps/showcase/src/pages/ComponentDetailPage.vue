@@ -119,7 +119,9 @@ const previewRegistry = {
   'gr-file-upload-validation': defineAsyncComponent(() => import('../demos/components/gr-file-upload/GrFileUploadValidationDemo.vue')),
   'gr-form-validation': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormValidationDemo.vue')),
   'gr-form-mixed-controls': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormMixedControlsDemo.vue')),
+  'gr-form-custom-control': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormCustomControlDemo.vue')),
   'gr-form-field-context': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldContextDemo.vue')),
+  'gr-form-field-custom-control': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldCustomControlDemo.vue')),
   'gr-form-field-basic-label': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldBasicDemo.vue')),
   'gr-kbd-basic': defineAsyncComponent(() => import('../demos/components/gr-kbd/GrKbdBasicDemo.vue')),
   'gr-divider-basic': defineAsyncComponent(() => import('../demos/components/gr-divider/GrDividerBasicDemo.vue')),
@@ -129,6 +131,7 @@ const previewRegistry = {
   'gr-form-file-basic-selection': defineAsyncComponent(() => import('../demos/components/gr-form-file/GrFormFileBasicSelectionDemo.vue')),
   'gr-form-file-custom-validation': defineAsyncComponent(() => import('../demos/components/gr-form-file/GrFormFileValidationDemo.vue')),
   'gr-form-file-multiple-queue': defineAsyncComponent(() => import('../demos/components/gr-form-file/GrFormFileMultipleQueueDemo.vue')),
+  'gr-form-section-bordered': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionBorderedDemo.vue')),
   'gr-form-section-nested-groups': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionNestedGroupsDemo.vue')),
   'gr-form-section-profile-layout': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionProfileDemo.vue')),
   'gr-form-section-stacked-flow': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionStackedFlowDemo.vue')),
@@ -292,6 +295,7 @@ const componentOverview = computed(() => {
   return {
     paragraphs: localizeList('paragraphs', doc.overview.paragraphs),
     features: localizeList('features', doc.overview.features),
+    lists: doc.overview.lists ?? [],
   }
 })
 
@@ -368,6 +372,26 @@ onUnmounted(() => {
           >
             <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true"/>
             <span><InlineRichText :text="feature"/></span>
+          </li>
+        </ul>
+      </div>
+
+      <div
+          v-for="(list, listIndex) in componentOverview.lists"
+          :key="`list-${listIndex}`"
+          class="space-y-2"
+      >
+        <h3 class="text-lg font-semibold">
+          {{ list.title }}
+        </h3>
+        <ul class="grid gap-2 max-w-3xl">
+          <li
+              v-for="(item, index) in list.items"
+              :key="index"
+              class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
+          >
+            <span class="i-lucide-dot mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true"/>
+            <span><InlineRichText :text="item"/></span>
           </li>
         </ul>
       </div>

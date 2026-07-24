@@ -114,6 +114,33 @@ const grFormOverview: ShowcaseComponentOverviewDoc = {
     'Императивный API через ref: `validate()`, `validateField()`, `clearValidate()`, `resetFields()`.',
     'Локализованные сообщения по умолчанию (`gr.form.*`, en/ru/es), перекрываются своим текстом.',
   ],
+  lists: [
+    {
+      title: 'Контролы, совместимые с GrForm',
+      items: [
+        '`GrInput` — текст, email, пароль и другие нативные типы.',
+        '`GrTextarea` — многострочный ввод.',
+        '`GrSelect` — выбор из списка (в т.ч. множественный).',
+        '`GrAutocomplete` — поиск с подсказками и тегами.',
+        '`GrSlider` — число или диапазон.',
+        'Любой свой контрол, который читает `useGrFormFieldContext()` — интегрируется без правок формы (см. пример «Custom control + custom validator»).',
+      ],
+    },
+    {
+      title: 'Встроенные правила (rules)',
+      items: [
+        '`required` — значение не должно быть пустым (пустая строка/массив/`null`).',
+        '`min` / `max` — граница длины строки/массива или величины числа.',
+        '`len` — точная длина строки/массива или точное значение числа.',
+        '`pattern` — соответствие `RegExp` (проверяется по `String(value)`).',
+        '`type: "email"` — валидный email-адрес.',
+        '`type: "url"` — валидный URL.',
+        '`validator` — своя (в т.ч. async) функция `(value, model) => true | string`; получает всю модель.',
+        '`message` — переопределяет дефолтный текст ошибки для правила.',
+        '`trigger` — когда правило срабатывает: `blur` | `change` | `submit` (без него — на любом).',
+      ],
+    },
+  ],
 }
 
 export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocMeta>> = {
