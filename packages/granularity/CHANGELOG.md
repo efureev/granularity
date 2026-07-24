@@ -5,6 +5,19 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **`GrToaster` action button.** `useToast().push` now accepts an optional
+  `action: { label, onClick, dismissOnClick? }` — the toast renders a button in its body. By default a
+  click runs `onClick` and dismisses the toast; `dismissOnClick: false` keeps it open (e.g. a "Retry"
+  action on a sticky error). New exported type `ToastAction`.
+- **`GrPagination` compact variant and page jumper.** New `compact` prop replaces the numbered page
+  buttons with a "current / total" indicator for tight spots (mobile, table toolbars). New `show-jumper`
+  prop adds a "go to page" input that jumps on Enter/blur, clamping the value to `[1, pageCount]`
+  (label via `jumper-label` / the new `gr.pagination.jumpTo` string, localized en/ru/es).
+
 ## [v0.13.0] 2026-07-23
 
 ### Changed

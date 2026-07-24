@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
@@ -22,6 +22,15 @@ export interface GrPaginationProps {
   siblingCount?: number
   /** Сколько крайних страниц всегда показывать с каждого края. По умолчанию `1`. */
   boundaryCount?: number
+  /**
+   * Компактный вариант: вместо нумерованных страниц показывается индикатор
+   * «текущая / всего» — удобно для узких мест (мобайл, тулбары таблиц).
+   */
+  compact?: boolean
+  /** Показывать поле «перейти к странице» с быстрым переходом по вводу номера. */
+  showJumper?: boolean
+  /** i18n-подпись перед полем перехода. По умолчанию — `gr.pagination.jumpTo`. */
+  jumperLabel?: string
 }
 
 const { t } = useGranularityTranslations()
@@ -30,6 +39,9 @@ const props = withDefaults(defineProps<GrPaginationProps>(), {
   pageSizes: () => [10, 20, 50],
   siblingCount: 1,
   boundaryCount: 1,
+  compact: false,
+  showJumper: false,
+  jumperLabel: undefined,
 })
 
 const emit = defineEmits<{
@@ -124,6 +136,21 @@ function first(): void {
 function last(): void {
   goTo(pageCount.value)
 }
+
+// «Перейти к странице»: клампим введённый номер к диапазону [1, pageCount]
+// и сбрасываем поле после перехода.
+const jumperValue = ref('')
+
+function submitJumper(): void {
+  const parsed = Number.parseInt(jumperValue.value, 10)
+  jumperValue.value = ''
+  if (Number.isNaN(parsed))
+    return
+
+  goTo(Math.min(pageCount.value, Math.max(1, parsed)))
+}
+
+const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination.jumpTo', 'Go to'))
 </script>
 
 <template>
@@ -149,7 +176,17 @@ function last(): void {
       {{ t('gr.pagination.prev', 'Prev') }}
     </GrButton>
 
-    <div class="flex items-center gap-1">
+    <!-- Компактный вариант: индикатор «текущая / всего» вместо нумерованных страниц. -->
+    <div
+      v-if="compact"
+      data-gr-pagination-compact
+      class="px-2 text-sm text-[var(--gr-fg)] tabular-nums"
+      aria-live="polite"
+    >
+      {{ page }} / {{ pageCount }}
+    </div>
+
+    <div v-else class="flex items-center gap-1">
       <template v-for="(item, index) in items" :key="index">
         <span
           v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
@@ -179,5 +216,22 @@ function last(): void {
     <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
       »
     </GrButton>
+
+    <!-- «Перейти к странице»: Enter или blur применяют введённый номер. -->
+    <div v-if="showJumper" class="flex items-center gap-2 text-sm text-[var(--gr-muted-fg)]">
+      <span>{{ resolvedJumperLabel }}</span>
+      <input
+        v-model="jumperValue"
+        type="number"
+        min="1"
+        :max="pageCount"
+        inputmode="numeric"
+        data-gr-pagination-jumper
+        :aria-label="resolvedJumperLabel"
+        class="h-8 w-14 rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-sm text-[var(--gr-fg)] tabular-nums transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        @keydown.enter="submitJumper"
+        @blur="submitJumper"
+      >
+    </div>
   </div>
 </template>

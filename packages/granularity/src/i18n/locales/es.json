@@ -56,7 +56,8 @@
     "next": "Siguiente",
     "page": "Página {n}",
     "first": "Primera página",
-    "last": "Última página"
+    "last": "Última página",
+    "jumpTo": "Ir a"
   },
   "navbar": {
     "openMenu": "Abrir menú"

@@ -5,6 +5,18 @@ import type { GrTone } from '../components/shared/tones'
 
 export type GrToastTone = GrTone
 
+/**
+ * Опциональная action-кнопка тоста: `label` — текст, `onClick` — обработчик.
+ * По клику вызывается `onClick`, затем тост закрывается (если `dismissOnClick`
+ * не установлен в `false`).
+ */
+export type ToastAction = {
+  label: string
+  onClick: () => void
+  /** Закрывать ли тост после клика по действию. По умолчанию `true`. */
+  dismissOnClick?: boolean
+}
+
 export type ToastInput = {
   title: string
   message?: string
@@ -14,6 +26,8 @@ export type ToastInput = {
    * (до явного вызова `dismiss(id)` / `clear()`). По умолчанию: `3500`.
    */
   timeoutMs?: number
+  /** Action-кнопка в теле тоста (например «Отменить», «Повторить»). */
+  action?: ToastAction
 }
 
 export type Toast = {
@@ -23,6 +37,8 @@ export type Toast = {
   tone: GrToastTone
   /** Исходный таймаут автозакрытия, мс (`0` — без автозакрытия). Нужен для progress-бара. */
   timeoutMs: number
+  /** Action-кнопка в теле тоста. */
+  action?: ToastAction
 }
 
 const DEFAULT_TIMEOUT_MS = 3500
@@ -133,6 +149,7 @@ export function useToast() {
       message: input.message,
       tone: input.tone ?? 'info',
       timeoutMs: timeout > 0 ? timeout : 0,
+      action: input.action,
     }
 
     state.toasts.unshift(toast)

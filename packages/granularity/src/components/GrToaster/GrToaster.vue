@@ -79,6 +79,16 @@ const resolvedRegionLabel = computed(() => props.regionLabel ?? t('gr.toaster.re
 
 const { list, dismiss, pause, resume } = useToast()
 
+// Клик по action-кнопке тоста: вызываем обработчик и (по умолчанию) закрываем тост.
+function onAction(toast: (typeof list.value)[number]): void {
+  const action = toast.action
+  if (!action) return
+
+  action.onClick()
+  if (action.dismissOnClick !== false)
+    dismiss(toast.id)
+}
+
 // SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
 const isClient = typeof window !== 'undefined'
 
@@ -153,6 +163,18 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
               </div>
               <div v-if="toast.message" class="mt-0.5 text-[13px] text-[var(--gr-muted-fg)]">
                 {{ toast.message }}
+              </div>
+
+              <!-- Action-кнопка тоста: например «Отменить»/«Повторить». -->
+              <div v-if="toast.action" class="mt-2">
+                <GrButton
+                    variant="outline"
+                    size="sm"
+                    data-gr-toast-action
+                    @click="onAction(toast)"
+                >
+                  {{ toast.action.label }}
+                </GrButton>
               </div>
             </div>
             <GrButton

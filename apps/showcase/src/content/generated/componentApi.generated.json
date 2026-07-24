@@ -3817,6 +3817,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "compact",
+            "description": "Компактный вариант: вместо нумерованных страниц показывается индикатор «текущая / всего» — удобно для узких мест (мобайл, тулбары таблиц).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "pageSizes",
             "description": "",
             "type": "number[] | undefined",
@@ -3836,6 +3843,20 @@
             "type": "number | undefined",
             "required": false,
             "default": "1"
+          },
+          {
+            "name": "showJumper",
+            "description": "Показывать поле «перейти к странице» с быстрым переходом по вводу номера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "jumperLabel",
+            "description": "i18n-подпись перед полем перехода. По умолчанию — `gr.pagination.jumpTo`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "total",

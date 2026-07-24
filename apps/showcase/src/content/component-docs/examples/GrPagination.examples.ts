@@ -160,4 +160,39 @@ function clampPage() {
 </template>`,
     note: 'Этот пример полезен как recipe: пагинация не знает о таблице, а таблица не знает о page-size логике — связка собирается наверху.',
   },
+  {
+    id: 'pagination-compact-jumper',
+    title: 'Compact variant and page jumper',
+    description: 'Для узких мест (мобайл, тулбары) `compact` заменяет ряд номеров индикатором «текущая / всего», а `show-jumper` добавляет поле быстрого перехода: ввод номера + Enter (или blur) прыгает на страницу с клампингом к диапазону.',
+    status: 'ready',
+    previewKey: 'gr-pagination-compact-jumper',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrBadge, GrPagination } from '@feugene/granularity'
+
+const total = ref(482)
+const page = ref(7)
+const pageSize = ref(20)
+</script>
+
+<template>
+  <div class="grid gap-6">
+    <!-- Компактный индикатор вместо номеров -->
+    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact />
+
+    <!-- Поле «перейти к странице» -->
+    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" show-jumper />
+
+    <!-- Оба режима вместе -->
+    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact show-jumper />
+
+    <div class="flex flex-wrap gap-2">
+      <GrBadge>Page {{ page }}</GrBadge>
+      <GrBadge>Total {{ total }}</GrBadge>
+    </div>
+  </div>
+</template>`,
+    note: 'Jumper клампит ввод к [1, pageCount] и очищает поле после перехода; компонент остаётся контролируемым — страницу двигает `v-model:page`.',
+  },
 ]

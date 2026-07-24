@@ -59,4 +59,50 @@ function queueWorkflowToasts() {
   <GrToaster />
 </template>`,
   },
+  {
+    id: 'toaster-action',
+    title: 'Toast with an action button',
+    description: 'Payload `useToast.push` принимает `action: { label, onClick }` — тост рендерит кнопку в теле. По умолчанию клик выполняет обработчик и закрывает тост; `dismissOnClick: false` оставляет тост открытым (например, «Retry» для sticky-ошибки).',
+    status: 'ready',
+    previewKey: 'gr-toaster-action',
+    code: `<script setup lang="ts">
+import { GrButton, GrToaster, useToast } from '@feugene/granularity'
+
+const { push } = useToast()
+
+function archiveWithUndo() {
+  push({
+    title: 'Message archived',
+    message: 'Moved to archive. You can still undo this.',
+    tone: 'info',
+    timeoutMs: 6000,
+    action: {
+      label: 'Undo',
+      onClick: () => restoreMessage(),
+    },
+  })
+}
+
+function failedUpload() {
+  push({
+    title: 'Upload failed',
+    tone: 'danger',
+    timeoutMs: 0,
+    action: {
+      label: 'Retry',
+      dismissOnClick: false, // держим тост открытым во время повтора
+      onClick: () => retryUpload(),
+    },
+  })
+}
+</script>
+
+<template>
+  <GrButton size="sm" @click="archiveWithUndo">Archive with Undo</GrButton>
+  <GrButton size="sm" variant="outline" @click="failedUpload">Failed upload (Retry)</GrButton>
+
+  <GrToaster />
+</template>`,
+    note: '`action.onClick` вызывается синхронно перед закрытием — удобно для undo/retry-паттернов, где важно успеть отменить операцию.',
+  },
 ]
