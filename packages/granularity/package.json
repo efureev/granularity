@@ -135,6 +135,10 @@
       "types": "./dist/types/src/components/GrFileUpload/index.d.ts",
       "import": "./dist/components/GrFileUpload/index.js"
     },
+    "./components/GrForm": {
+      "types": "./dist/types/src/components/GrForm/index.d.ts",
+      "import": "./dist/components/GrForm/index.js"
+    },
     "./components/GrFormField": {
       "types": "./dist/types/src/components/GrFormField/index.d.ts",
       "import": "./dist/components/GrFormField/index.js"

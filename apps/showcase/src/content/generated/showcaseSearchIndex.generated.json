@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 54 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 55 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -592,6 +592,17 @@
     "context": "forms / component",
     "searchableTitle": "grfileupload",
     "searchableContent": "grfileupload grfileupload accepts files via selection or drag-and-drop and shows their state. forms component /components/gr-file-upload packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grfileupload generated public-api featured integration components components gr-file-upload gr file upload"
+  },
+  {
+    "id": "entity:component:GrForm",
+    "title": "GrForm",
+    "description": "Orchestrates form validation via declarative rules and the GrFormField context.",
+    "href": "/components/gr-form",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "forms / component",
+    "searchableTitle": "grform",
+    "searchableContent": "grform grform orchestrates form validation via declarative rules and the grformfield context. forms component /components/gr-form packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grform generated public-api featured complex components components gr-form gr form"
   },
   {
     "id": "entity:component:GrFormField",
@@ -2066,6 +2077,50 @@
     "context": "GrFileUpload",
     "searchableTitle": "grfileupload integration notes",
     "searchableContent": "grfileupload accepts files via selection or drag-and-drop and shows their state. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrForm:section:overview",
+    "title": "GrForm / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-form#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrForm",
+    "searchableTitle": "grform component overview",
+    "searchableContent": "grform orchestrates form validation via declarative rules and the grformfield context. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrForm:section:live-examples",
+    "title": "GrForm / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-form#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrForm",
+    "searchableTitle": "grform live examples",
+    "searchableContent": "grform orchestrates form validation via declarative rules and the grformfield context. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrForm:section:api",
+    "title": "GrForm / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-form#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrForm",
+    "searchableTitle": "grform generated api",
+    "searchableContent": "grform orchestrates form validation via declarative rules and the grformfield context. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrForm:section:integration-notes",
+    "title": "GrForm / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-form#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrForm",
+    "searchableTitle": "grform integration notes",
+    "searchableContent": "grform orchestrates form validation via declarative rules and the grformfield context. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrFormField:section:overview",

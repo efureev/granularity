@@ -29,6 +29,16 @@
     "addOption": "Add \"{value}\"",
     "typeMore": "Type at least {n} characters"
   },
+  "form": {
+    "required": "This field is required",
+    "min": "Minimum is {min}",
+    "max": "Maximum is {max}",
+    "len": "Length must be {len}",
+    "pattern": "Invalid format",
+    "email": "Enter a valid email",
+    "url": "Enter a valid URL",
+    "invalid": "Invalid value"
+  },
   "dialog": {
     "confirm": {
       "title": "Confirm"

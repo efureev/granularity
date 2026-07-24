@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- New `GrForm` — form validation orchestration on top of `GrFormField`. Takes a reactive `model` and
+  declarative `rules` keyed by field name (`required`, `min`/`max`/`len`, `pattern`, `type` email/url,
+  and custom/async `validator` with access to the whole model). `GrFormField` gained a `name` prop:
+  inside a `GrForm` it auto-sources its error message and required marker from the form and triggers
+  validation on blur — so the actual controls (`GrInput` / `GrSelect` / `GrAutocomplete` / …) need **no
+  changes**, they keep reading `invalid` / `id` / `aria-describedby` from the field context as before.
+  Validation triggers (blur / change / submit) are configurable per form and per rule; `submit` only
+  fires when valid; validation scrolls/focuses the first invalid field. Imperative API via template
+  ref: `validate()` / `validateField()` / `clearValidate()` / `resetFields()` / `scrollToField()`.
+  Default messages (`gr.form.*`) are localized (en/ru/es) and overridable per rule.
 - New `GrSlider` — a WAI-ARIA slider for picking a number or a range by dragging. Supports single
   value and `range` (two thumbs that never cross), `step`, `min`/`max`, tick `marks` with labels, a
   value tooltip (`show-tooltip` + `format-tooltip`), sizes (`sm`/`md`/`lg`) and `disabled`. Each thumb

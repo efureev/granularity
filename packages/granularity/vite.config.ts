@@ -129,6 +129,9 @@ export default defineConfig({
         'components/GrFileUpload/index': fileURLToPath(
           new URL('./src/components/GrFileUpload/index.ts', import.meta.url),
         ),
+        'components/GrForm/index': fileURLToPath(
+          new URL('./src/components/GrForm/index.ts', import.meta.url),
+        ),
         'components/GrFormField/index': fileURLToPath(
           new URL('./src/components/GrFormField/index.ts', import.meta.url),
         ),

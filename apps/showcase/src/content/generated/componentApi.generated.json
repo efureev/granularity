@@ -2018,6 +2018,123 @@
       }
     ]
   },
+  "GrForm": {
+    "name": "GrForm",
+    "sourcePath": "packages/granularity/src/components/GrForm/GrForm.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "rules",
+            "description": "Правила валидации по имени поля: `{ email: [{ required: true, type: 'email' }] }`.",
+            "type": "GrFormRules | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "validateOnBlur",
+            "description": "Валидировать поле при потере фокуса.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "validateOnChange",
+            "description": "Валидировать поле при каждом изменении значения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "scrollToError",
+            "description": "Скроллить к первому невалидному полю после `validate()`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "scrollBehavior",
+            "description": "",
+            "type": "ScrollBehavior | undefined",
+            "required": false,
+            "default": "\"smooth\""
+          },
+          {
+            "name": "model",
+            "description": "Реактивный объект данных формы. Поля адресуются по `name` (`GrFormField`), в т.ч. dot-path.",
+            "type": "Record<string, unknown>",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ validate: () => Promise<boolean>; errors: Record<string, string | undefined>; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "submit",
+            "description": "",
+            "type": "[model: Record<string, unknown>]",
+            "signature": "(event: \"submit\", model: Record<string, unknown>): void"
+          },
+          {
+            "name": "validate",
+            "description": "",
+            "type": "[name: string, valid: boolean, message: string | undefined]",
+            "signature": "(event: \"validate\", name: string, valid: boolean, message: string | undefined): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "validate",
+            "description": "",
+            "type": "() => Promise<boolean>"
+          },
+          {
+            "name": "validateField",
+            "description": "",
+            "type": "(name: string, trigger?: GrFormTrigger | undefined) => Promise<boolean>"
+          },
+          {
+            "name": "clearValidate",
+            "description": "",
+            "type": "(names?: string | string[] | undefined) => void"
+          },
+          {
+            "name": "resetFields",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "scrollToField",
+            "description": "",
+            "type": "(name: string) => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrFormField": {
     "name": "GrFormField",
     "sourcePath": "packages/granularity/src/components/GrFormField/GrFormField.vue",
@@ -2035,8 +2152,15 @@
             "default": "false"
           },
           {
+            "name": "name",
+            "description": "Имя поля в модели `GrForm` (в т.ч. dot-path `address.city`). Когда поле внутри `GrForm` и задан `name`, ошибка и признак обязательности берутся из формы по этому имени, а потеря фокуса триггерит валидацию поля.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "error",
-            "description": "",
+            "description": "Явная ошибка. Перекрывает ошибку из `GrForm` (ручной режим без формы — тоже здесь).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2140,6 +2264,13 @@
             "default": "undefined"
           },
           {
+            "name": "validate",
+            "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
+            "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "accept",
             "description": "W3C `accept` для `<input type=\"file\">` + sugar к `acceptValidator(...)`.",
             "type": "string | undefined",
@@ -2171,13 +2302,6 @@
             "name": "clearAllText",
             "description": "",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "validate",
-            "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
-            "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",
             "required": false,
             "default": "undefined"
           },

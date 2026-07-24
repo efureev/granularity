@@ -8,7 +8,7 @@ const componentGroups = {
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPromptDialog'],
-  forms: ['GrAutocomplete', 'GrCheckbox', 'GrFileUpload', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrTable', 'GrTree'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -39,6 +39,7 @@ const componentSummaryOverrides = {
   GrEmptyState: 'Explains an empty state and suggests the user’s next step.',
   GrFileUpload: 'Accepts files via selection or drag-and-drop and shows their state.',
   GrFormFile: 'Binds file uploads to a form field and validation.',
+  GrForm: 'Orchestrates form validation via declarative rules and the GrFormField context.',
   GrFormField: 'Combines label, control, hint and error into a single field.',
   GrFormSection: 'Groups related form fields into a clear, meaningful section.',
   GrIcon: 'Renders an icon as a standalone interface element.',
@@ -107,6 +108,10 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
     ],
   },
   'component:GrAutocomplete': {
+    group: 'forms',
+    tags: ['featured', 'complex'],
+  },
+  'component:GrForm': {
     group: 'forms',
     tags: ['featured', 'complex'],
   },

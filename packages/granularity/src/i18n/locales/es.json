@@ -29,6 +29,16 @@
     "addOption": "Añadir «{value}»",
     "typeMore": "Escribe al menos {n} caracteres"
   },
+  "form": {
+    "required": "Este campo es obligatorio",
+    "min": "Mínimo {min}",
+    "max": "Máximo {max}",
+    "len": "La longitud debe ser {len}",
+    "pattern": "Formato no válido",
+    "email": "Introduce un correo válido",
+    "url": "Introduce una URL válida",
+    "invalid": "Valor no válido"
+  },
   "dialog": {
     "confirm": {
       "title": "Confirmar"

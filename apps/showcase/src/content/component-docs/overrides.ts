@@ -36,6 +36,7 @@ import {
   grRadioGroupExamples,
   grResponseErrorBannerExamples,
   grSegmentedExamples,
+  grFormExamples,
   grFormFieldExamples,
   grFormFileExamples,
   grFormSectionExamples,
@@ -99,7 +100,24 @@ const grSliderOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grFormOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Оркестратор форм: собирает поля, проверяет их по декларативным правилам и не даёт отправить форму, пока всё не валидно. Экономит рутину — не нужно вручную развешивать ошибки по каждому полю.',
+    'Главное — как это устроено: сами контролы (`GrInput`, `GrSelect`, `GrAutocomplete`, …) ничего не знают про форму. Оркестрация подключается через `GrFormField` (по `name`), который уже связан с контролами. Поэтому любой существующий контрол попадает в валидацию без единой правки.',
+  ],
+  features: [
+    'Декларативные правила по имени поля: `required`, `min`/`max`/`len`, `pattern`, `type` (email/url).',
+    'Кастомные и async-валидаторы с доступом ко всей модели (например, совпадение паролей).',
+    'Ошибки и маркер обязательности сами появляются в `GrFormField` — контролы не трогаем.',
+    'Триггеры валидации: on-blur, on-change, on-submit (настраивается на форме и на правиле).',
+    'Скролл и фокус к первой ошибке после отправки.',
+    'Императивный API через ref: `validate()`, `validateField()`, `clearValidate()`, `resetFields()`.',
+    'Локализованные сообщения по умолчанию (`gr.form.*`, en/ru/es), перекрываются своим текстом.',
+  ],
+}
+
 export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocMeta>> = {
+  GrForm: createComponentDocMeta(grFormExamples, grFormOverview),
   GrButton: createComponentDocMeta(grButtonExamples),
   GrAutocomplete: createComponentDocMeta(grAutocompleteExamples, grAutocompleteOverview),
   GrSlider: createComponentDocMeta(grSliderExamples, grSliderOverview),
