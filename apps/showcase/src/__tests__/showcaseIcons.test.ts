@@ -26,10 +26,15 @@ const iconFiles = [
   },
 ] as const
 
+// Запрет нацелен на символы, подменяющие иконки в UI (см. `iconFiles` ниже).
+// Стрелка внутри прозаического текста — другая история: там она читается как
+// «дальше», а не как кнопка. Такие места перечислены здесь поимённо.
 const allowedSymbolUsage = new Map([
   ['content/component-docs/examples/GrTree.examples.ts', new Set(['→'])],
   ['content/component-docs/examples/GrFileUpload.examples.ts', new Set(['→'])],
   ['content/foundations.ts', new Set(['→'])],
+  // Цепочка приоритетов в описании `GrConfigProvider`: «локальный проп → конфиг → md».
+  ['content/component-docs/overrides.ts', new Set(['→'])],
   ['demos/components/gr-tree/GrTreeDragAndSlotDemo.vue', new Set(['→'])],
 ])
 
