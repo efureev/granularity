@@ -118,7 +118,7 @@
     "kindLabel": "Section",
     "context": "Overview",
     "searchableTitle": "overview roadmap",
-    "searchableContent": "overview landing-страница витрины: позиционирование showcase, быстрыи старт по интеграции и карта следующих этапов наполнения. roadmap roadmap показывает ближаи шие продуктовые этапы наполнения showcase после foundations. сначала сценарные страницы для grautocomplete, grbutton, grfileupload. затем интерактивные сценарии для vloading и createloading. utility coverage начне тся с runfilevalidators и acceptvalidator."
+    "searchableContent": "overview landing-страница витрины: позиционирование showcase, быстрыи старт по интеграции и карта следующих этапов наполнения. roadmap roadmap показывает ближаи шие продуктовые этапы наполнения showcase после foundations. сначала сценарные страницы для grautocomplete, grbutton, grcommandpalette. затем интерактивные сценарии для vloading и createloading. utility coverage начне тся с runfilevalidators и acceptvalidator."
   },
   {
     "id": "page:foundations:section:installation",
@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 55 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 59 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components live demos",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. live-demos live demos каждая компонентная страница будет раскрывать реальные сценарии использования, а не просто набор всех props. первые hand-authored demo-сценарии уже зарезервированы для grautocomplete, grbutton, grfileupload. отдельное покрытие состоянии , composition cases и сложных сценариев. код примеров и live preview будут жить рядом."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. live-demos live demos каждая компонентная страница будет раскрывать реальные сценарии использования, а не просто набор всех props. первые hand-authored demo-сценарии уже зарезервированы для grautocomplete, grbutton, grcommandpalette. отдельное покрытие состоянии , composition cases и сложных сценариев. код примеров и live preview будут жить рядом."
   },
   {
     "id": "page:components:section:api-sync",
@@ -493,6 +493,28 @@
     "context": "overlays / component",
     "searchableTitle": "grcollapse",
     "searchableContent": "grcollapse grcollapse collapses and expands additional content on demand. overlays component /components/gr-collapse packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcollapse generated public-api components components gr-collapse gr collapse"
+  },
+  {
+    "id": "entity:component:GrCommandPalette",
+    "title": "GrCommandPalette",
+    "description": "Opens a ⌘K search over app commands with groups and shortcuts.",
+    "href": "/components/gr-command-palette",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "navigation / component",
+    "searchableTitle": "grcommandpalette",
+    "searchableContent": "grcommandpalette grcommandpalette opens a k search over app commands with groups and shortcuts. navigation component /components/gr-command-palette packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcommandpalette generated public-api featured complex components components gr-command-palette gr command palette"
+  },
+  {
+    "id": "entity:component:GrConfigProvider",
+    "title": "GrConfigProvider",
+    "description": "Provides global defaults (size, z-index base, per-component props, i18n) to nested components.",
+    "href": "/components/gr-config-provider",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "utilities / component",
+    "searchableTitle": "grconfigprovider",
+    "searchableContent": "grconfigprovider grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. utilities component /components/gr-config-provider packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grconfigprovider generated public-api featured components components gr-config-provider gr config provider"
   },
   {
     "id": "entity:component:GrConfirmDialog",
@@ -814,6 +836,17 @@
     "searchableContent": "grradiogroup grradiogroup combines radio options into a single-choice selection flow. forms component /components/gr-radio-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grradiogroup generated public-api components components gr-radio-group gr radio group"
   },
   {
+    "id": "entity:component:GrRating",
+    "title": "GrRating",
+    "description": "Collect and display a star rating, with half steps and a read-only mode.",
+    "href": "/components/gr-rating",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "forms / component",
+    "searchableTitle": "grrating",
+    "searchableContent": "grrating grrating collect and display a star rating, with half steps and a read-only mode. forms component /components/gr-rating packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grrating generated public-api featured components components gr-rating gr rating"
+  },
+  {
     "id": "entity:component:GrResponseErrorBanner",
     "title": "GrResponseErrorBanner",
     "description": "A universal generic banner for server or network response errors: it takes a raw error/response, runs it through a chain of parsers (HTTP statuses, Laravel/JSON:API/RFC 7807 validation, file/network/abort) and renders a title, main message, an optional list of per-field details and retry/dismiss actions — without knowing anything about a specific feature (file upload, forms, transactions).",
@@ -878,6 +911,17 @@
     "context": "forms / component",
     "searchableTitle": "grslider",
     "searchableContent": "grslider grslider pick a number or a range by dragging a thumb, with steps, marks and keyboard support. forms component /components/gr-slider packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grslider generated public-api featured components components gr-slider gr slider"
+  },
+  {
+    "id": "entity:component:GrStatistic",
+    "title": "GrStatistic",
+    "description": "Highlights a key metric with a caption, formatting and a trend line.",
+    "href": "/components/gr-statistic",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grstatistic",
+    "searchableContent": "grstatistic grstatistic highlights a key metric with a caption, formatting and a trend line. data component /components/gr-statistic packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grstatistic generated public-api components components gr-statistic gr statistic"
   },
   {
     "id": "entity:component:GrSwitch",
@@ -1681,6 +1725,94 @@
     "context": "GrCollapse",
     "searchableTitle": "grcollapse integration notes",
     "searchableContent": "grcollapse collapses and expands additional content on demand. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrCommandPalette:section:overview",
+    "title": "GrCommandPalette / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-command-palette#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCommandPalette",
+    "searchableTitle": "grcommandpalette component overview",
+    "searchableContent": "grcommandpalette opens a k search over app commands with groups and shortcuts. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrCommandPalette:section:live-examples",
+    "title": "GrCommandPalette / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-command-palette#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCommandPalette",
+    "searchableTitle": "grcommandpalette live examples",
+    "searchableContent": "grcommandpalette opens a k search over app commands with groups and shortcuts. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrCommandPalette:section:api",
+    "title": "GrCommandPalette / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-command-palette#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCommandPalette",
+    "searchableTitle": "grcommandpalette generated api",
+    "searchableContent": "grcommandpalette opens a k search over app commands with groups and shortcuts. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrCommandPalette:section:integration-notes",
+    "title": "GrCommandPalette / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-command-palette#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCommandPalette",
+    "searchableTitle": "grcommandpalette integration notes",
+    "searchableContent": "grcommandpalette opens a k search over app commands with groups and shortcuts. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrConfigProvider:section:overview",
+    "title": "GrConfigProvider / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-config-provider#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrConfigProvider",
+    "searchableTitle": "grconfigprovider component overview",
+    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrConfigProvider:section:live-examples",
+    "title": "GrConfigProvider / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-config-provider#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrConfigProvider",
+    "searchableTitle": "grconfigprovider live examples",
+    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrConfigProvider:section:api",
+    "title": "GrConfigProvider / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-config-provider#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrConfigProvider",
+    "searchableTitle": "grconfigprovider generated api",
+    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrConfigProvider:section:integration-notes",
+    "title": "GrConfigProvider / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-config-provider#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrConfigProvider",
+    "searchableTitle": "grconfigprovider integration notes",
+    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrConfirmDialog:section:overview",
@@ -2959,6 +3091,50 @@
     "searchableContent": "grradiogroup combines radio options into a single-choice selection flow. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
+    "id": "entity:component:GrRating:section:overview",
+    "title": "GrRating / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-rating#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrRating",
+    "searchableTitle": "grrating component overview",
+    "searchableContent": "grrating collect and display a star rating, with half steps and a read-only mode. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrRating:section:live-examples",
+    "title": "GrRating / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-rating#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrRating",
+    "searchableTitle": "grrating live examples",
+    "searchableContent": "grrating collect and display a star rating, with half steps and a read-only mode. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrRating:section:api",
+    "title": "GrRating / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-rating#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrRating",
+    "searchableTitle": "grrating generated api",
+    "searchableContent": "grrating collect and display a star rating, with half steps and a read-only mode. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrRating:section:integration-notes",
+    "title": "GrRating / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-rating#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrRating",
+    "searchableTitle": "grrating integration notes",
+    "searchableContent": "grrating collect and display a star rating, with half steps and a read-only mode. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
     "id": "entity:component:GrResponseErrorBanner:section:overview",
     "title": "GrResponseErrorBanner / Component overview",
     "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
@@ -3221,6 +3397,50 @@
     "context": "GrSlider",
     "searchableTitle": "grslider integration notes",
     "searchableContent": "grslider pick a number or a range by dragging a thumb, with steps, marks and keyboard support. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrStatistic:section:overview",
+    "title": "GrStatistic / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-statistic#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrStatistic",
+    "searchableTitle": "grstatistic component overview",
+    "searchableContent": "grstatistic highlights a key metric with a caption, formatting and a trend line. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrStatistic:section:live-examples",
+    "title": "GrStatistic / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-statistic#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrStatistic",
+    "searchableTitle": "grstatistic live examples",
+    "searchableContent": "grstatistic highlights a key metric with a caption, formatting and a trend line. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrStatistic:section:api",
+    "title": "GrStatistic / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-statistic#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrStatistic",
+    "searchableTitle": "grstatistic generated api",
+    "searchableContent": "grstatistic highlights a key metric with a caption, formatting and a trend line. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrStatistic:section:integration-notes",
+    "title": "GrStatistic / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-statistic#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrStatistic",
+    "searchableTitle": "grstatistic integration notes",
+    "searchableContent": "grstatistic highlights a key metric with a caption, formatting and a trend line. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrSwitch:section:overview",

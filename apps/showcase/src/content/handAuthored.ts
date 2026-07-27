@@ -6,10 +6,11 @@ import type {
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
-  navigation: ['GrBottomNav', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
+  navigation: ['GrBottomNav', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPromptDialog'],
-  forms: ['GrAutocomplete', 'GrCheckbox', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrTable', 'GrTree'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTree'],
+  utilities: ['GrConfigProvider'],
 } as const satisfies Record<string, readonly string[]>
 
 // Fallback-сводки компонентов (базовая локаль en). Переводы — в блоке `showcase`
@@ -25,6 +26,7 @@ const componentSummaryOverrides = {
   GrButton: 'Triggers the primary action in a form, dialog or panel.',
   GrButtonGroup: 'Groups related buttons into a compact action cluster.',
   GrCard: 'A container for a meaningful block of content and actions.',
+  GrConfigProvider: 'Provides global defaults (size, z-index base, per-component props, i18n) to nested components.',
   GrDivider: 'Separates content with a line, optionally with a centered label.',
   GrKbd: 'Displays a keyboard key or shortcut in a `<kbd>` element.',
   GrTabPanels: 'Renders tab panels linked to `GrTabs` by ARIA for accessible tabs.',
@@ -63,6 +65,9 @@ const componentSummaryOverrides = {
   GrSidebar: 'Side navigation for sections, filters and supporting actions.',
   GrSkeleton: 'A temporary interface skeleton while the content is still loading.',
   GrSlider: 'Pick a number or a range by dragging a thumb, with steps, marks and keyboard support.',
+  GrRating: 'Collect and display a star rating, with half steps and a read-only mode.',
+  GrStatistic: 'Highlights a key metric with a caption, formatting and a trend line.',
+  GrCommandPalette: 'Opens a ⌘K search over app commands with groups and shortcuts.',
   GrSwitch: 'Quickly turns a binary setting on and off.',
   GrTable: 'A simple table for compact display of structured data.',
   GrTabs: 'Switches between related content sections without leaving the page.',
@@ -83,6 +88,10 @@ export function resolveHandAuthoredComponentGroup(componentName: string): string
 }
 
 export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetadataOverride> = {
+  'component:GrConfigProvider': {
+    group: 'utilities',
+    tags: ['featured'],
+  },
   'component:GrButton': {
     group: 'actions',
     tags: ['featured', 'starter'],
@@ -118,6 +127,17 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
   'component:GrSlider': {
     group: 'forms',
     tags: ['featured'],
+  },
+  'component:GrRating': {
+    group: 'forms',
+    tags: ['featured'],
+  },
+  'component:GrStatistic': {
+    group: 'data',
+  },
+  'component:GrCommandPalette': {
+    group: 'navigation',
+    tags: ['featured', 'complex'],
   },
   'component:GrSelect': {
     group: 'forms',

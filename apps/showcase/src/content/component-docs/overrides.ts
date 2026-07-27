@@ -14,6 +14,7 @@ import {
   grToasterExamples,
   grLoadingExamples,
   grCollapseExamples,
+  grConfigProviderExamples,
   grEmptyStateExamples,
   grProgressBarExamples,
   grSkeletonExamples,
@@ -56,6 +57,9 @@ import {
   grLinkExamples,
   grListExamples,
   grTableExamples,
+  grRatingExamples,
+  grStatisticExamples,
+  grCommandPaletteExamples,
 } from './examples'
 import type { ShowcaseComponentDocMeta, ShowcaseComponentExampleDoc, ShowcaseComponentOverviewDoc } from './types'
 
@@ -157,11 +161,96 @@ const grFormOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grConfigProviderOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Одно место для глобальных дефолтов дизайн-системы: размер контролов, база z-index для оверлеев, per-component дефолтные пропсы и адаптер переводов. Не нужно повторять `size` в каждом вызове и вручную инжектить i18n — задали один раз на `GrConfigProvider`, и всё поддерево это подхватывает.',
+    'Работает через provide/inject и рендерится прозрачно (`display: contents`), поэтому не влияет на разметку. Провайдеры можно вкладывать: дочерний мержится поверх родительского, так что глобальную тему легко точечно переопределить в отдельном поддереве.',
+  ],
+  features: [
+    '`size` — дефолтный размер вложенных контролов; локальный проп всегда побеждает.',
+    '`zIndexBase` — база z-index для оверлеев (пробрасывается как CSS-переменная `--gr-z-base`).',
+    '`componentDefaults` — дефолтные пропсы по имени компонента: `{ GrButton: { variant: "secondary" } }`.',
+    '`i18n` — адаптер переводов, прокидывается вложенным компонентам без ручного inject.',
+    'Вложенные провайдеры мержатся с родительским (наследование + точечное переопределение).',
+    'Прозрачный рендер (`display: contents`) — не ломает flex/grid-разметку.',
+  ],
+  lists: [
+    {
+      title: 'Как компонент подключается к конфигу',
+      items: [
+        '`useGrConfig()` — читает конфиг ближайшего провайдера (или пустой, если провайдера нет).',
+        '`useGrComponentSize(() => props.size)` — эффективный размер: локальный проп → конфиг → `md`.',
+        '`useGrComponentDefaults("GrButton")` — дефолтные пропсы компонента из провайдера.',
+        'Проп `size` из провайдера уже читают `GrButton` и `GrInput`; остальные контролы можно подключить тем же хелпером.',
+      ],
+    },
+  ],
+}
+
+const grRatingOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Оценка звёздами — самый привычный способ спросить «как вам?» и показать, что ответили другие. Один клик ставит оценку, повторный её снимает, а половинки дают ту самую точность «4,5».',
+    'Тот же компонент работает и как витрина чужих оценок: режим `readonly` показывает результат, не притворяясь полем ввода. Символ, цвет и размер меняются под бренд без единой строчки CSS.',
+  ],
+  features: [
+    'Целые и половинчатые оценки, сброс повторным кликом.',
+    'Предпросмотр под курсором — видно, что получится, ещё до клика.',
+    'Режимы `readonly` и `disabled` для показа чужих оценок.',
+    'Любой символ вместо звезды: иконка пропом `icon` или свой слот.',
+    'Тона, размеры `sm` / `md` / `lg` и цвет через `--gr-rating-color`.',
+    'Клавиатура и скринридеры из коробки: стрелки, Home/End, «4 из 5» голосом.',
+  ],
+  lists: [
+    {
+      title: 'CSS-переменные для кастомизации',
+      items: [
+        '`--gr-rating-color` — цвет залитых символов. По умолчанию — из пропа `tone`.',
+        '`--gr-rating-void-color` — цвет пустых символов.',
+        '`--gr-rating-symbol-size` — размер символа. По умолчанию — из пропа `size`.',
+      ],
+    },
+  ],
+}
+
+const grStatisticOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Ключевая цифра, которую видно с другого конца комнаты: выручка, число пользователей, конверсия. Подпись, приписки и форматирование разрядов — уже внутри, считать и склеивать строки не нужно.',
+    'Строка динамики со стрелкой и цветом сразу отвечает на вопрос «стало лучше или хуже», а состояние загрузки держит высоту блока, чтобы дашборд не прыгал при обновлении данных.',
+  ],
+  features: [
+    'Форматирование чисел: точность, разделители разрядов и дробной части.',
+    'Префикс и суффикс — валюта, проценты, единицы измерения.',
+    'Строка динамики `up` / `down` / `flat` со стрелкой и цветом.',
+    'Иконка показателя и тон значения под смысл метрики.',
+    'Состояние загрузки без скачков вёрстки.',
+    'Нечисловые значения («2 ч 15 мин», «—») выводятся как есть.',
+  ],
+}
+
+const grCommandPaletteOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Один ⌘K — и всё приложение под рукой: команды, разделы, документы. Пользователю не нужно помнить, где спрятан пункт меню, достаточно начать печатать.',
+    'Команды группируются, показывают свои сочетания клавиш и ищутся по метке, описанию и синонимам. Поиск можно оставить локальным или отдать серверу — палитра одинаково хорошо работает в обоих режимах.',
+  ],
+  features: [
+    'Открытие глобальным сочетанием (⌘K / Ctrl+K) или программно.',
+    'Группы, иконки, описания и подсказки сочетаний у команд.',
+    'Поиск по метке, описанию, группе и ключевым словам-синонимам.',
+    'Удалённый поиск: событие `search` + внешние `items` и `loading`.',
+    'Слоты для своей строки команды, пустого состояния и подвала.',
+    'Клавиатура целиком: стрелки, Home/End, Enter, Esc — фокус не покидает поиск.',
+  ],
+}
+
 export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocMeta>> = {
+  GrConfigProvider: createComponentDocMeta(grConfigProviderExamples, grConfigProviderOverview),
   GrForm: createComponentDocMeta(grFormExamples, grFormOverview),
   GrButton: createComponentDocMeta(grButtonExamples),
   GrAutocomplete: createComponentDocMeta(grAutocompleteExamples, grAutocompleteOverview),
   GrSlider: createComponentDocMeta(grSliderExamples, grSliderOverview),
+  GrRating: createComponentDocMeta(grRatingExamples, grRatingOverview),
+  GrStatistic: createComponentDocMeta(grStatisticExamples, grStatisticOverview),
+  GrCommandPalette: createComponentDocMeta(grCommandPaletteExamples, grCommandPaletteOverview),
   GrSelect: createComponentDocMeta(grSelectExamples),
   GrFileUpload: createComponentDocMeta(grFileUploadExamples),
   GrModal: createComponentDocMeta(grModalExamples),

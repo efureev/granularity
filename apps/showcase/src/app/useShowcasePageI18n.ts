@@ -35,6 +35,7 @@ const componentGroupTranslationKeys: Record<string, string> = {
     overlays: 'overlays',
     forms: 'forms',
     data: 'data',
+    utilities: 'utilities',
     misc: 'misc',
 }
 

@@ -557,7 +557,7 @@
             "description": "",
             "type": "GrButtonSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -892,6 +892,234 @@
             "signature": "(event: \"change\", value: GrCollapseModelValue): void"
           }
         ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrCommandPalette": {
+    "name": "GrCommandPalette",
+    "sourcePath": "packages/granularity/src/components/GrCommandPalette/GrCommandPalette.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "filter",
+            "description": "Кастомный матчер локальной фильтрации.",
+            "type": "GrCommandFilter | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrCommandPaletteSize | undefined",
+            "required": false,
+            "default": "\"lg\""
+          },
+          {
+            "name": "placeholder",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Внешне управляемое состояние загрузки (для remote-поиска).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "filterable",
+            "description": "Локальная фильтрация по запросу. `false` — фильтрует владелец по событию `search`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnSelect",
+            "description": "Закрывать палитру после выбора команды.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "items",
+            "description": "Плоский список команд; группировка — по полю `group` самой команды.",
+            "type": "GrCommandItem[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "hotkey",
+            "description": "Глобальное сочетание открытия. `null` — не вешать слушатель.",
+            "type": "string | null | undefined",
+            "required": false,
+            "default": "\"mod+k\""
+          },
+          {
+            "name": "maxHeight",
+            "description": "Максимальная высота списка, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "360"
+          },
+          {
+            "name": "showHotkeyHint",
+            "description": "Показывать подсказку сочетания в поле ввода.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "emptyText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "Открыта ли палитра.",
+            "type": "boolean",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "item",
+            "description": "",
+            "type": "{ item: GrCommandItem; active: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{ query: string; }"
+          },
+          {
+            "name": "footer",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "search",
+            "description": "",
+            "type": "[query: string]",
+            "signature": "(event: \"search\", query: string): void"
+          },
+          {
+            "name": "select",
+            "description": "",
+            "type": "[item: GrCommandItem]",
+            "signature": "(event: \"select\", item: GrCommandItem): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrConfigProvider": {
+    "name": "GrConfigProvider",
+    "sourcePath": "packages/granularity/src/components/GrConfigProvider/GrConfigProvider.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "Дефолтный размер контролов для вложенных компонентов.",
+            "type": "GrComponentSize | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "zIndexBase",
+            "description": "База z-index для оверлеев. Пробрасывается как `--gr-z-base`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "componentDefaults",
+            "description": "Дефолтные пропсы по компонентам: `{ GrButton: { variant: 'secondary' } }`.",
+            "type": "Partial<Record<string, Record<string, unknown>>> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "i18n",
+            "description": "Адаптер переводов (fint-i18n-совместимый). Прокидывается вложенным компонентам.",
+            "type": "GranularityI18nAdapter | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "tag",
+            "description": "Тег обёртки. По умолчанию прозрачный `<div style=\"display:contents\">`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"div\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
       },
       {
         "key": "methods",
@@ -2521,6 +2749,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "emptyText",
+            "description": "i18n: текст в пустом состоянии (нет изображений).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeLabel",
             "description": "i18n: aria-label кнопки закрытия.",
             "type": "string | undefined",
@@ -2654,13 +2889,6 @@
             "default": "undefined"
           },
           {
-            "name": "emptyText",
-            "description": "i18n: текст в пустом состоянии (нет изображений).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "modelValue",
             "description": "",
             "type": "boolean",
@@ -2758,7 +2986,7 @@
             "description": "",
             "type": "GrInputSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -4502,6 +4730,150 @@
       }
     ]
   },
+  "GrRating": {
+    "name": "GrRating",
+    "sourcePath": "packages/granularity/src/components/GrRating/GrRating.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "Тон заливки; точечно перекрывается переменной `--gr-rating-color`.",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"warning\""
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrRatingSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearable",
+            "description": "Повторный клик по текущей оценке сбрасывает её в `0`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только показ: без ввода и фокуса.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "max",
+            "description": "Количество символов шкалы.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "5"
+          },
+          {
+            "name": "allowHalf",
+            "description": "Половинчатые оценки: клик по левой половине символа даёт `.5`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "icon",
+            "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showText",
+            "description": "Показывать числовую подпись справа от шкалы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "formatText",
+            "description": "Формат подписи. По умолчанию — само значение.",
+            "type": "((value: number) => string) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "Текущая оценка. Дробная (`3.5`) поддерживается при `allowHalf`.",
+            "type": "number",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "symbol",
+            "description": "",
+            "type": "{ index: number; filled: boolean; }"
+          },
+          {
+            "name": "text",
+            "description": "",
+            "type": "{ value: number; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: number]",
+            "signature": "(event: \"update:modelValue\", value: number): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: number]",
+            "signature": "(event: \"change\", value: number): void"
+          },
+          {
+            "name": "hoverChange",
+            "description": "",
+            "type": "[value: number | null]",
+            "signature": "(event: \"hoverChange\", value: number | null): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrResponseErrorBanner": {
     "name": "GrResponseErrorBanner",
     "sourcePath": "packages/granularity/src/components/GrResponseErrorBanner/GrResponseErrorBanner.vue",
@@ -5236,6 +5608,158 @@
       }
     ]
   },
+  "GrStatistic": {
+    "name": "GrStatistic",
+    "sourcePath": "packages/granularity/src/components/GrStatistic/GrStatistic.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "Тон значения; точечно перекрывается `--gr-statistic-value-color`.",
+            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "title",
+            "description": "Подпись над значением.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrStatisticSize | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "loading",
+            "description": "Состояние загрузки: вместо значения — плейсхолдер.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "decimalSeparator",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\".\""
+          },
+          {
+            "name": "precision",
+            "description": "Число знаков после запятой.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "icon",
+            "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "groupSeparator",
+            "description": "Разделитель разрядов (по умолчанию — узкий пробел).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\" \""
+          },
+          {
+            "name": "prefix",
+            "description": "Приписка перед значением (валюта, знак).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffix",
+            "description": "Приписка после значения (единица измерения, `%`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "trend",
+            "description": "Направление динамики — задаёт цвет и иконку строки под значением.",
+            "type": "GrStatisticTrend | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "trendText",
+            "description": "Текст динамики (например `+12,5% к прошлой неделе`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Значение показателя. Нечисловая строка выводится как есть.",
+            "type": "string | number",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "icon",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "prefix",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "suffix",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "trend",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrSwitch": {
     "name": "GrSwitch",
     "sourcePath": "packages/granularity/src/components/GrSwitch/GrSwitch.vue",
@@ -5338,6 +5862,13 @@
             "default": "undefined"
           },
           {
+            "name": "maxHeight",
+            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "density",
             "description": "Плотность таблицы — влияет на базовый размер шрифта. Паддинги ячеек оставлены за консьюмером (GrTable — «тонкий» контейнер).",
             "type": "GrTableDensity | undefined",
@@ -5371,13 +5902,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "maxHeight",
-            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
-            "type": "string | number | undefined",
-            "required": false,
-            "default": "undefined"
           }
         ]
       },
