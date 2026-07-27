@@ -21,6 +21,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- New `GrCommandPalette` — a ⌘K command palette: a modal search over the application's commands with
+  groups, icons, per-command shortcut hints and keyboard navigation. Opens on a global hotkey
+  (`hotkey`, default `mod+k` — Cmd on macOS, Ctrl elsewhere; pass `null` to drive it purely through
+  `v-model`). Search covers a command's label, description, group and `keywords` synonyms; set
+  `:filterable="false"` to hand filtering over to the owner via the `search` event with externally
+  supplied `items` and `loading` (remote search). Slots `#item` / `#empty` / `#footer` for a custom
+  command row, empty state and footer. A11y: the input is `role="combobox"`, the list is
+  `role="listbox"` and the active command is pointed at with `aria-activedescendant`, so focus never
+  leaves the search field (Arrow / Home / End / Enter). It renders inside `GrModal`, reusing its Esc
+  stack, focus trap and body scroll lock; the pure parts — filtering/grouping (`filtering.ts`) and
+  hotkey parsing/matching (`hotkey.ts`) — live in separate modules and are tested without mounting.
+- New `GrRating` — a symbol rating scale for both collecting a score and displaying someone else's.
+  Supports whole and half values (`allow-half`), reset on a repeated click (`clearable`), a hover
+  preview of the score, `readonly` / `disabled`, an optional numeric caption (`show-text` +
+  `format-text`), tones and sizes. The default symbol is an inline SVG star; pass any UnoCSS icon
+  class through `icon` or take over rendering with the `#symbol` slot. A11y: the editable scale is a
+  WAI-ARIA slider (`role="slider"` with `aria-valuemin`/`max`/`now`/`valuetext`, Arrow / Home / End),
+  while `readonly` renders as `role="img"` with the score in its label — it is not a control, so it
+  stays out of the tab order. Integrates with `GrFormField`.
+- New `GrStatistic` — a large key metric with a caption: number formatting (`precision`,
+  `group-separator`, `decimal-separator`), `prefix` / `suffix`, an icon, a value tone, a trend line
+  (`trend` `up`/`down`/`flat` + `trend-text`) and a `loading` state that keeps the block's height so
+  dashboards do not jump. Non-numeric values (`"2 h 15 min"`, `"—"`) are rendered as-is. Formatting
+  is a pure exported function, `formatStatisticValue()`. Slots: `#icon`, `#title`, `#prefix`,
+  `#suffix`, `#trend` and the default slot for the value itself.
 - New `GrForm` — form validation orchestration on top of `GrFormField`. Takes a reactive `model` and
   declarative `rules` keyed by field name (`required`, `min`/`max`/`len`, `pattern`, `type` email/url,
   and custom/async `validator` with access to the whole model). `GrFormField` gained a `name` prop:

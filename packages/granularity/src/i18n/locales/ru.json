@@ -154,5 +154,15 @@
     "clear": "Очистить",
     "showPassword": "Показать пароль",
     "hidePassword": "Скрыть пароль"
+  },
+  "rating": {
+    "label": "Оценка",
+    "valueText": "{value} из {max}"
+  },
+  "commandPalette": {
+    "label": "Палитра команд",
+    "placeholder": "Введите команду или запрос…",
+    "empty": "Ничего не найдено",
+    "loading": "Загрузка…"
   }
 }

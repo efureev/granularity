@@ -33,6 +33,8 @@ import { grButtonGroupConfig } from '../components/GrButtonGroup/config'
 import { grCardConfig } from '../components/GrCard/config'
 import { grCheckboxConfig } from '../components/GrCheckbox/config'
 import { grCollapseConfig } from '../components/GrCollapse/config'
+import { grCommandPaletteConfig } from '../components/GrCommandPalette/config'
+import { grConfigProviderConfig } from '../components/GrConfigProvider/config'
 import { grConfirmDialogConfig } from '../components/GrConfirmDialog/config'
 import { grDataTableConfig } from '../components/GrDataTable/config'
 import { grDialogConfig } from '../components/GrDialog/config'
@@ -63,12 +65,14 @@ import { grProgressBarConfig } from '../components/GrProgressBar/config'
 import { grPromptDialogConfig } from '../components/GrPromptDialog/config'
 import { grRadioConfig } from '../components/GrRadio/config'
 import { grRadioGroupConfig } from '../components/GrRadioGroup/config'
+import { grRatingConfig } from '../components/GrRating/config'
 import { grResponseErrorBannerConfig } from '../components/GrResponseErrorBanner/config'
 import { grSegmentedConfig } from '../components/GrSegmented/config'
 import { grSelectConfig } from '../components/GrSelect/config'
 import { grSidebarConfig } from '../components/GrSidebar/config'
 import { grSkeletonConfig } from '../components/GrSkeleton/config'
 import { grSliderConfig } from '../components/GrSlider/config'
+import { grStatisticConfig } from '../components/GrStatistic/config'
 import { grSwitchConfig } from '../components/GrSwitch/config'
 import { grTableConfig } from '../components/GrTable/config'
 import { grTabPanelsConfig } from '../components/GrTabPanels/config'
@@ -132,6 +136,8 @@ export const granularityComponentConfigs = {
   GrCard: grCardConfig,
   GrCheckbox: grCheckboxConfig,
   GrCollapse: grCollapseConfig,
+  GrCommandPalette: grCommandPaletteConfig,
+  GrConfigProvider: grConfigProviderConfig,
   GrConfirmDialog: grConfirmDialogConfig,
   GrDataTable: grDataTableConfig,
   GrDialog: grDialogConfig,
@@ -162,12 +168,14 @@ export const granularityComponentConfigs = {
   GrPromptDialog: grPromptDialogConfig,
   GrRadio: grRadioConfig,
   GrRadioGroup: grRadioGroupConfig,
+  GrRating: grRatingConfig,
   GrResponseErrorBanner: grResponseErrorBannerConfig,
   GrSegmented: grSegmentedConfig,
   GrSelect: grSelectConfig,
   GrSidebar: grSidebarConfig,
   GrSkeleton: grSkeletonConfig,
   GrSlider: grSliderConfig,
+  GrStatistic: grStatisticConfig,
   GrSwitch: grSwitchConfig,
   GrTable: grTableConfig,
   GrTabPanels: grTabPanelsConfig,

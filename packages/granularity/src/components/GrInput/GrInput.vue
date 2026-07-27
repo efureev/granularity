@@ -2,6 +2,7 @@
 import {computed, ref, useSlots} from 'vue'
 
 import {addLen, useAddonMeasurement} from '../../composables/internal/useAddonMeasurement'
+import {useGrComponentSize} from '../GrConfigProvider/context'
 import {useGrFormFieldContext} from '../GrFormField/context'
 import {useGranularityTranslations} from '../../internal/granularityI18n'
 import type {InputHTMLAttributes} from 'vue'
@@ -73,7 +74,7 @@ const props = withDefaults(
       state: 'default',
       name: undefined,
       id: undefined,
-      size: 'md',
+      size: undefined,
 
       clearable: false,
       clearLabel: undefined,
@@ -101,6 +102,10 @@ const emit = defineEmits<{
 // Контекст `GrFormField` (если инпут внутри него): даёт id/aria-describedby/
 // invalid/required как fallback, чтобы не прокидывать `forId` вручную.
 const field = useGrFormFieldContext()
+
+// Эффективный размер: проп `size` → дефолт из `GrConfigProvider` → `md`.
+const resolvedSize = useGrComponentSize(() => props.size)
+
 const resolvedId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid || Boolean(field?.invalid.value))
 const describedBy = computed(() => field?.describedById.value)
@@ -129,7 +134,7 @@ const defaultAddonMinWidth = computed(() => {
     lg: '3rem', // w-12
   }
 
-  return map[props.size]
+  return map[resolvedSize.value]
 })
 
 const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
@@ -150,7 +155,7 @@ const basePaddingXLen = computed(() => {
     lg: '16px', // px-4
   }
 
-  return map[props.size]
+  return map[resolvedSize.value]
 })
 
 const inputStyle = computed(() => {
@@ -212,7 +217,7 @@ const sizeClass = computed(() => {
     lg: 'h-11 px-4 text-[16px]',
   }
 
-  return map[props.size]
+  return map[resolvedSize.value]
 })
 
 const textAlignClass = computed(() => {

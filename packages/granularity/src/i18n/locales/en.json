@@ -154,5 +154,15 @@
     "clear": "Clear",
     "showPassword": "Show password",
     "hidePassword": "Hide password"
+  },
+  "rating": {
+    "label": "Rating",
+    "valueText": "{value} of {max}"
+  },
+  "commandPalette": {
+    "label": "Command palette",
+    "placeholder": "Type a command or search…",
+    "empty": "Nothing found",
+    "loading": "Loading…"
   }
 }

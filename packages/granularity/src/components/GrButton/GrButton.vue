@@ -3,6 +3,8 @@ import { computed, markRaw, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 
 import {
@@ -34,7 +36,7 @@ const props = withDefaults(
   {
     variant: 'primary',
     tone: 'primary',
-    size: 'md',
+    size: undefined,
     loading: false,
     disabled: false,
     square: false,
@@ -49,6 +51,9 @@ const props = withDefaults(
 )
 
 const isSquare = computed(() => props.square)
+
+// Эффективный размер: проп `size` → дефолт из `GrConfigProvider` → `md`.
+const resolvedSize = useGrComponentSize(() => props.size)
 
 // Полиморфный корень: `as` → `<a href>` → `<button>`.
 const isLink = computed(() => Boolean(props.as || props.href))
@@ -82,9 +87,9 @@ const squareStyle = computed(() => {
   if (!isSquare.value) return undefined
 
   const px = (() => {
-    if (props.size === 'xs') return 28
-    if (props.size === 'sm') return 32
-    if (props.size === 'lg') return 44
+    if (resolvedSize.value === 'xs') return 28
+    if (resolvedSize.value === 'sm') return 32
+    if (resolvedSize.value === 'lg') return 44
     return 40
   })()
 
@@ -101,7 +106,7 @@ const className = computed(() => {
   return grButtonClass({
     variant: props.variant,
     tone: props.tone,
-    size: props.size,
+    size: resolvedSize.value,
     square: isSquare.value,
   })
 })

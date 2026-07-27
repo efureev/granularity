@@ -154,5 +154,15 @@
     "clear": "Borrar",
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña"
+  },
+  "rating": {
+    "label": "Valoración",
+    "valueText": "{value} de {max}"
+  },
+  "commandPalette": {
+    "label": "Paleta de comandos",
+    "placeholder": "Escribe un comando o busca…",
+    "empty": "No se ha encontrado nada",
+    "loading": "Cargando…"
   }
 }

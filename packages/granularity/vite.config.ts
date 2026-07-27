@@ -99,6 +99,12 @@ export default defineConfig({
         'components/GrCollapse/index': fileURLToPath(
           new URL('./src/components/GrCollapse/index.ts', import.meta.url),
         ),
+        'components/GrCommandPalette/index': fileURLToPath(
+          new URL('./src/components/GrCommandPalette/index.ts', import.meta.url),
+        ),
+        'components/GrConfigProvider/index': fileURLToPath(
+          new URL('./src/components/GrConfigProvider/index.ts', import.meta.url),
+        ),
         'components/GrConfirmDialog/index': fileURLToPath(
           new URL('./src/components/GrConfirmDialog/index.ts', import.meta.url),
         ),
@@ -189,6 +195,9 @@ export default defineConfig({
         'components/GrRadioGroup/index': fileURLToPath(
           new URL('./src/components/GrRadioGroup/index.ts', import.meta.url),
         ),
+        'components/GrRating/index': fileURLToPath(
+          new URL('./src/components/GrRating/index.ts', import.meta.url),
+        ),
         'components/GrResponseErrorBanner/index': fileURLToPath(
           new URL('./src/components/GrResponseErrorBanner/index.ts', import.meta.url),
         ),
@@ -206,6 +215,9 @@ export default defineConfig({
         ),
         'components/GrSlider/index': fileURLToPath(
           new URL('./src/components/GrSlider/index.ts', import.meta.url),
+        ),
+        'components/GrStatistic/index': fileURLToPath(
+          new URL('./src/components/GrStatistic/index.ts', import.meta.url),
         ),
         'components/GrSwitch/index': fileURLToPath(
           new URL('./src/components/GrSwitch/index.ts', import.meta.url),

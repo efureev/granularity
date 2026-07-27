@@ -95,6 +95,14 @@
       "types": "./dist/types/src/components/GrCollapse/index.d.ts",
       "import": "./dist/components/GrCollapse/index.js"
     },
+    "./components/GrCommandPalette": {
+      "types": "./dist/types/src/components/GrCommandPalette/index.d.ts",
+      "import": "./dist/components/GrCommandPalette/index.js"
+    },
+    "./components/GrConfigProvider": {
+      "types": "./dist/types/src/components/GrConfigProvider/index.d.ts",
+      "import": "./dist/components/GrConfigProvider/index.js"
+    },
     "./components/GrConfirmDialog": {
       "types": "./dist/types/src/components/GrConfirmDialog/index.d.ts",
       "import": "./dist/components/GrConfirmDialog/index.js"
@@ -215,6 +223,10 @@
       "types": "./dist/types/src/components/GrRadioGroup/index.d.ts",
       "import": "./dist/components/GrRadioGroup/index.js"
     },
+    "./components/GrRating": {
+      "types": "./dist/types/src/components/GrRating/index.d.ts",
+      "import": "./dist/components/GrRating/index.js"
+    },
     "./components/GrResponseErrorBanner": {
       "types": "./dist/types/src/components/GrResponseErrorBanner/index.d.ts",
       "import": "./dist/components/GrResponseErrorBanner/index.js"
@@ -238,6 +250,10 @@
     "./components/GrSlider": {
       "types": "./dist/types/src/components/GrSlider/index.d.ts",
       "import": "./dist/components/GrSlider/index.js"
+    },
+    "./components/GrStatistic": {
+      "types": "./dist/types/src/components/GrStatistic/index.d.ts",
+      "import": "./dist/components/GrStatistic/index.js"
     },
     "./components/GrSwitch": {
       "types": "./dist/types/src/components/GrSwitch/index.d.ts",
