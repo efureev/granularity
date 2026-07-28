@@ -25,11 +25,11 @@ dist/assets/index-*.js   ~2 KB    само приложение
 yarn build:playground-empty
 yarn workspace @feugene/granularity-playground-empty dev
 yarn workspace @feugene/granularity-playground-empty build:analyze   # treemap в dist/stats.html
+yarn workspace @feugene/granularity-playground-empty test:run        # охраняет инварианты стенда
 ```
 
-## Заметки
+## Тест
 
-- В `package.json` есть скрипты `test`/`test:run`, но `vitest.config.ts` в приложении
-  нет — запустить их сейчас нельзя. Либо завести конфиг, либо убрать скрипты.
-- `base` в `vite.config.ts` — `/playground/`, как у `apps/playground`. Локально это
-  безвредно (деплоится только витрина), но при публикации стенды столкнулись бы.
+`src/__tests__/config.test.ts` держит стенд нулевым: проверяет, что в зависимостях нет
+ничего кроме `vue`, что `vue` уезжает в отдельный чанк (иначе runtime не отделить от
+кода приложения) и что `base` не совпадает с соседними стендами.

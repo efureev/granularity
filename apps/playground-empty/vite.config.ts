@@ -3,18 +3,21 @@ import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {visualizer} from 'rollup-plugin-visualizer'
 
+export const playgroundEmptyBase = '/playground-empty/'
+export const playgroundEmptyVueChunkGroup = {
+    name: 'vue',
+    test: /node_modules[\\/](?:vue|@vue)[\\/]/,
+}
+
 export default defineConfig(({mode}) => ({
     root: fileURLToPath(new URL('./', import.meta.url)),
-    base: '/playground/',
+    base: playgroundEmptyBase,
     build: {
         rolldownOptions: {
             output: {
                 codeSplitting: {
                     groups: [
-                        {
-                            name: 'vue',
-                            test: /node_modules[\\/](?:vue|@vue)[\\/]/,
-                        },
+                        playgroundEmptyVueChunkGroup,
                     ],
                 },
             },
