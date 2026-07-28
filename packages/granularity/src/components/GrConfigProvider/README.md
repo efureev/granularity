@@ -22,7 +22,7 @@ Providers nest — a child merges over its parent down to the individual prop.
 
 | Prop | Type | Description |
 | --- | --- | --- |
-| `size` | `'xs' \| 'sm' \| 'md' \| 'lg'` | Default size for nested controls. |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg'` | Default size for nested form controls. |
 | `componentDefaults` | `GrComponentDefaults` | Default props keyed by component name. |
 | `i18n` | `GranularityI18nAdapter \| null` | Translation adapter. Provided only when set, so it never shadows an adapter installed higher up. |
 | `tag` | `string` (default `'div'`) | Wrapper tag. |
@@ -49,6 +49,16 @@ The set is closed on purpose: the config shapes appearance only, never a
 | `GrButton` | `variant`, `tone`, `size`, `square` |
 | `GrInput` | `size`, `clearable` |
 | `GrBadge` | `tone`, `size`, `radius` |
+| `GrSelect`, `GrAutocomplete`, `GrNumberInput`, `GrSegmented`, `GrSlider`, `GrRating`, `GrSwitch`, `GrRadio`, `GrRadioGroup` | `size` |
+
+The global `size` prop is read by the form controls above. `GrBadge` deliberately
+stays out of it — a badge is a display element, so its size follows
+`componentDefaults.GrBadge.size` only and does not inflate when the surrounding
+controls grow. `GrTextarea` and `GrCheckbox` have no `size` prop at all.
+
+Inside a `GrRadioGroup` the group resolves the size once and passes it down, so a
+nested `GrRadio` gets it from the group; a standalone `GrRadio` reads the provider
+itself.
 
 ## Where the contract lives
 

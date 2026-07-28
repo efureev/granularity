@@ -134,7 +134,7 @@
             "description": "",
             "type": "GrAutocompleteSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -1069,7 +1069,7 @@
           {
             "name": "size",
             "description": "Дефолтный размер контролов для вложенных компонентов.",
-            "type": "\"md\" | \"xs\" | \"sm\" | \"lg\" | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -3841,7 +3841,7 @@
             "description": "",
             "type": "GrNumberInputSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -4666,7 +4666,7 @@
             "description": "",
             "type": "GrButtonSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -4751,7 +4751,7 @@
             "description": "",
             "type": "GrRatingSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -5029,7 +5029,7 @@
             "description": "",
             "type": "GrSegmentedSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -5154,7 +5154,7 @@
             "description": "",
             "type": "GrSelectSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -5502,7 +5502,7 @@
             "description": "",
             "type": "GrSliderSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -5774,7 +5774,7 @@
             "description": "",
             "type": "GrSwitchSize | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",

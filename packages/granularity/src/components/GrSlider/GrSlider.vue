@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import { useGrFormFieldContext } from '../GrFormField/context'
 
 import {
@@ -58,13 +60,19 @@ const props = withDefaults(
     step: 1,
     range: false,
     disabled: false,
-    size: 'md',
+    size: undefined,
     marks: undefined,
     showTooltip: false,
     formatTooltip: undefined,
     ariaLabel: undefined,
   },
 )
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, {
+  component: 'GrSlider',
+  supported: ['sm', 'md', 'lg'],
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: GrSliderModelValue): void
@@ -261,13 +269,13 @@ function thumbAriaLabel(index: number): string | undefined {
 <template>
   <div
     data-gr-slider
-    :class="sliderRootClass({ size, disabled, hasMarks: normalizedMarks.length > 0 })"
+    :class="sliderRootClass({ size: resolvedSize, disabled, hasMarks: normalizedMarks.length > 0 })"
   >
     <div
       ref="trackEl"
       data-gr-slider-track
       class="relative w-full"
-      :class="sliderTrackHeightBySize[size]"
+      :class="sliderTrackHeightBySize[resolvedSize]"
       @pointerdown="onTrackPointerDown"
     >
       <div :class="sliderRailClass" />
@@ -298,7 +306,7 @@ function thumbAriaLabel(index: number): string | undefined {
         :ref="(el) => { if (el) thumbEls[index] = el as HTMLElement }"
         data-gr-slider-thumb
         :data-testid="`gr-slider-thumb-${index}`"
-        :class="sliderThumbClass({ size, disabled })"
+        :class="sliderThumbClass({ size: resolvedSize, disabled })"
         :style="{ left: `${percent(value)}%` }"
         role="slider"
         :tabindex="disabled ? -1 : 0"

@@ -1,6 +1,8 @@
 export { default } from './GrRadioGroup.vue'
 export { default as GrRadioGroup } from './GrRadioGroup.vue'
 export { grRadioGroupConfig } from './config'
+// Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
+export type { GrRadioGroupConfigurableProps } from './defaults'
 export type {
   GrRadioGroupOption,
   GrRadioGroupProps,

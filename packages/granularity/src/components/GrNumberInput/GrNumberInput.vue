@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { InputHTMLAttributes } from 'vue'
+
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { computed, ref, useSlots } from 'vue'
 
 import {
@@ -99,7 +101,7 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   state: 'default',
   name: undefined,
   id: undefined,
-  size: 'md',
+  size: undefined,
 
   textAlign: 'left',
 
@@ -124,6 +126,9 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   increaseLabel: undefined,
   decreaseLabel: undefined,
 })
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrNumberInput' })
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -152,9 +157,9 @@ const hasSuffix = computed(() => Boolean(slots.suffix))
 const hasHorizontalControls = computed(() => props.controls && props.controlsDirection === 'horizontal')
 const hasVerticalControls = computed(() => props.controls && props.controlsDirection === 'vertical')
 
-const addonPx = computed(() => ADDON_PX_BY_SIZE[props.size])
+const addonPx = computed(() => ADDON_PX_BY_SIZE[resolvedSize.value])
 const addonLen = computed(() => px(addonPx.value))
-const basePaddingXLen = computed(() => BASE_PADDING_X_LEN_BY_SIZE[props.size])
+const basePaddingXLen = computed(() => BASE_PADDING_X_LEN_BY_SIZE[resolvedSize.value])
 
 const defaultAddonMinWidth = computed(() => addonLen.value)
 const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
@@ -244,7 +249,7 @@ const shellClassName = computed(() => {
 
 const inputClassName = computed(() => {
   return grNumberInputInputClass({
-    size: props.size,
+    size: resolvedSize.value,
     textAlign: props.textAlign,
   })
 })

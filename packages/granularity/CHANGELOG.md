@@ -13,7 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   subtree via `provide`/`inject` and rendered transparently (`display: contents`), so it never
   affects layout. Providers nest: a child merges over its parent down to the individual prop, which
   lets you set a global rule and override one detail deeper in the tree.
-  - `size` — the default size for nested controls. Read by `GrButton` and `GrInput`.
+  - `size` — the default size for nested form controls. Read by `GrButton`, `GrInput`, `GrSelect`,
+    `GrAutocomplete`, `GrNumberInput`, `GrSegmented`, `GrSlider`, `GrRating`, `GrSwitch`, `GrRadio` and
+    `GrRadioGroup`. `GrBadge` deliberately opts out — a badge is a display element and should not grow with
+    the surrounding controls; its size is configurable per component instead.
   - `componentDefaults` — default props keyed by component name, e.g.
     `{ GrButton: { variant: 'outline' } }`. The set of configurable props is deliberately closed —
     `GrButton` (`variant`, `tone`, `size`, `square`), `GrInput` (`size`, `clearable`), `GrBadge`
@@ -43,7 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   able to override them. Rendering is unchanged, but reading such a prop from the outside (through
   a template ref or a wrapper) now yields `undefined` until it is explicitly passed: `variant`,
   `tone`, `size`, `square` on `GrButton`; `size`, `clearable` on `GrInput`; `tone`, `size`, `radius`
-  on `GrBadge`.
+  on `GrBadge`; `size` on `GrSelect`, `GrAutocomplete`, `GrNumberInput`, `GrSegmented`, `GrSlider`,
+  `GrRating`, `GrSwitch` and `GrRadioGroup`.
 
 ## [v0.13.0] 2026-07-23
 

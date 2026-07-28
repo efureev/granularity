@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import {
   grSwitchLabelClass,
   grSwitchThumbClass,
@@ -31,17 +33,23 @@ const props = withDefaults(
     {
       disabled: false,
       ariaLabel: undefined,
-      size: 'md',
+      size: undefined,
       activeBackgroundColor: undefined,
       inactiveBackgroundColor: undefined,
     },
 )
 
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, {
+  component: 'GrSwitch',
+  supported: ['sm', 'md', 'lg'],
+})
+
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
 }>()
 
-const trackClass = computed(() => grSwitchTrackClass(props.size))
+const trackClass = computed(() => grSwitchTrackClass(resolvedSize.value))
 
 const trackStyle = computed(() => {
   const isChecked = props.modelValue
@@ -62,9 +70,9 @@ const trackStyle = computed(() => {
   }
 })
 
-const thumbClass = computed(() => grSwitchThumbClass({size: props.size, checked: props.modelValue}))
+const thumbClass = computed(() => grSwitchThumbClass({size: resolvedSize.value, checked: props.modelValue}))
 
-const labelClass = computed(() => grSwitchLabelClass(props.size))
+const labelClass = computed(() => grSwitchLabelClass(resolvedSize.value))
 
 function toggle(): void {
   if (props.disabled) {

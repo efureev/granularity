@@ -6,6 +6,14 @@ import GrBadge from '../../GrBadge/GrBadge.vue'
 import GrButton from '../../GrButton/GrButton.vue'
 import GrConfigProvider from '../GrConfigProvider.vue'
 import GrInput from '../../GrInput/GrInput.vue'
+import GrAutocomplete from '../../GrAutocomplete/GrAutocomplete.vue'
+import GrNumberInput from '../../GrNumberInput/GrNumberInput.vue'
+import GrRadioGroup from '../../GrRadioGroup/GrRadioGroup.vue'
+import GrSegmented from '../../GrSegmented/GrSegmented.vue'
+import GrSelect from '../../GrSelect/GrSelect.vue'
+import GrSwitch from '../../GrSwitch/GrSwitch.vue'
+import GrRating from '../../GrRating/GrRating.vue'
+import GrSlider from '../../GrSlider/GrSlider.vue'
 import { resetUnsupportedSizeWarnings, useGrComponentSize, useGrConfig } from '../context'
 
 // Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.
@@ -228,4 +236,97 @@ describe('componentDefaults: дефолтные пропсы по компоне
     expect(button.attributes('data-gr-tone')).toBe('danger')
   })
 
+})
+
+// Контролы, подключённые к провайдеру. Проверяем не конкретные utility-классы
+// (они меняются от вёрстки), а поведенческое равенство: «размер из провайдера»
+// обязан давать ровно тот же рендер, что и тот же размер, переданный пропом.
+const wiredControls = [
+  ['GrSelect', GrSelect, { modelValue: '' }],
+  ['GrNumberInput', GrNumberInput, { modelValue: '1' }],
+  ['GrAutocomplete', GrAutocomplete, { modelValue: '' }],
+  ['GrSegmented', GrSegmented, { modelValue: 'a', options: [{ value: 'a', label: 'A' }] }],
+  ['GrSlider', GrSlider, { modelValue: 10 }],
+  ['GrRating', GrRating, { modelValue: 3 }],
+  ['GrSwitch', GrSwitch, { modelValue: false }],
+  // `variant: 'button'` не для красоты: в дефолтном `radiobox` точка имеет
+  // фиксированный размер, и `size` на неё не влияет — сравнивать было бы нечего.
+  ['GrRadioGroup', GrRadioGroup, { modelValue: 'a', variant: 'button', options: [{ value: 'a', label: 'A' }] }],
+] as const
+
+// Автогенерируемые id/name (`useId`) различаются от монтирования к монтированию
+// и к размеру отношения не имеют — обнуляем, иначе сравнивать разметку нельзя.
+const GENERATED_ID_ATTRS = /(id|for|name|aria-labelledby|aria-describedby|aria-controls|aria-activedescendant)="[^"]*"/g
+
+function normalizeIds(html: string): string {
+  return html.replace(GENERATED_ID_ATTRS, (match, attr: string) => `${attr}="__id__"`)
+}
+
+function renderWithProvider(component: unknown, componentProps: object, providerProps: object) {
+  const wrapper = mount(GrConfigProvider, {
+    props: providerProps,
+    slots: { default: () => h(component as never, componentProps) },
+  })
+
+  // Именно разметка самого контрола, без обёртки провайдера — иначе сравнивать
+  // с отдельно смонтированным компонентом было бы нечего.
+  return normalizeIds(wrapper.findComponent(component as never).html())
+}
+
+function renderStandalone(component: unknown, componentProps: object) {
+  return normalizeIds(mount(component as never, { props: componentProps as never }).html())
+}
+
+describe('глобальный size доезжает до контролов', () => {
+  it.each(wiredControls)('%s: size из провайдера === size пропом', (_name, component, componentProps: object) => {
+    const fromProvider = renderWithProvider(component, componentProps, { size: 'lg' })
+    const fromProp = renderStandalone(component, { ...componentProps, size: 'lg' })
+    const untouched = renderStandalone(component, componentProps)
+
+    expect(fromProvider).toBe(fromProp)
+    // И это действительно что-то поменяло, а не совпало с дефолтом.
+    expect(fromProvider).not.toBe(untouched)
+  })
+
+  it.each(wiredControls)('%s: локальный проп сильнее провайдера', (_name, component, componentProps: object) => {
+    const conflicting = renderWithProvider(component, { ...componentProps, size: 'sm' }, { size: 'lg' })
+
+    expect(conflicting).toBe(renderStandalone(component, { ...componentProps, size: 'sm' }))
+  })
+
+  it('componentDefaults точечно перебивает глобальный size', () => {
+    const targeted = renderWithProvider(GrSelect, { modelValue: '' }, {
+      size: 'lg',
+      componentDefaults: { GrSelect: { size: 'xs' } },
+    })
+
+    expect(targeted).toBe(renderStandalone(GrSelect, { modelValue: '', size: 'xs' }))
+  })
+
+  it('усечённая шкала: `xs` из конфига игнорируется в пользу дефолта компонента', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    resetUnsupportedSizeWarnings()
+
+    // У `GrSwitch` нет `xs`: без guard\'а получили бы элемент без размерных классов.
+    const fromProvider = renderWithProvider(GrSwitch, { modelValue: false }, { size: 'xs' })
+
+    expect(fromProvider).toBe(renderStandalone(GrSwitch, { modelValue: false }))
+    expect(warn).toHaveBeenCalledTimes(1)
+    warn.mockRestore()
+  })
+
+  it('GrRadio внутри группы берёт размер, разрешённый группой', () => {
+    const fromProvider = renderWithProvider(
+      GrRadioGroup,
+      { modelValue: 'a', variant: 'button', options: [{ value: 'a', label: 'A' }] },
+      { size: 'lg' },
+    )
+
+    expect(fromProvider).toBe(renderStandalone(GrRadioGroup, {
+      modelValue: 'a',
+      variant: 'button',
+      options: [{ value: 'a', label: 'A' }],
+      size: 'lg',
+    }))
+  })
 })

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
@@ -109,7 +111,7 @@ const props = withDefaults(
     disabled: false,
     ariaLabel: undefined,
     view: 'default',
-    size: 'md',
+    size: undefined,
 
     placeholder: undefined,
     multiple: false,
@@ -131,6 +133,9 @@ const props = withDefaults(
     underline: 'auto',
   },
 )
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSelect' })
 
 const { t } = useGranularityTranslations()
 
@@ -562,7 +567,7 @@ const panelClearVisible = computed(() => {
 const nativeClassName = computed(() => {
   return grSelectNativeClass({
     view: props.view,
-    size: props.size,
+    size: resolvedSize.value,
     disabled: props.disabled,
     variant: props.variant,
     underline: props.underline,
@@ -579,7 +584,7 @@ const nativeClassName = computed(() => {
 const isLinkNative = computed(() => props.view === 'link' && effectiveOptionsView.value === 'native')
 
 const linkNativeLabelClassName = computed(() => grSelectLinkNativeLabelClass({
-  size: props.size,
+  size: resolvedSize.value,
   variant: props.variant,
   underline: props.underline,
   disabled: props.disabled,
@@ -593,7 +598,7 @@ const triggerClassName = computed(() => {
   return grSelectTriggerClass({
     view: props.view,
     optionsView: effectiveOptionsView.value,
-    size: props.size,
+    size: resolvedSize.value,
     disabled: props.disabled,
     variant: props.variant,
     underline: props.underline,

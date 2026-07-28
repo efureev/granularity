@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
 import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
@@ -79,7 +81,7 @@ const props = withDefaults(
     options: undefined,
     multiple: false,
     disabled: false,
-    size: 'md',
+    size: undefined,
     placeholder: undefined,
     ariaLabel: undefined,
     clearable: false,
@@ -96,6 +98,9 @@ const props = withDefaults(
     clearLabel: undefined,
   },
 )
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrAutocomplete' })
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: GrAutocompleteModelValue): void
@@ -439,7 +444,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
   >
     <div
       data-gr-autocomplete-shell
-      :class="autocompleteShellClass({ size, disabled, invalid: isInvalid })"
+      :class="autocompleteShellClass({ size: resolvedSize, disabled, invalid: isInvalid })"
       @mousedown.self.prevent="focusInput"
     >
       <!-- Chips выбранных значений (multiple). -->

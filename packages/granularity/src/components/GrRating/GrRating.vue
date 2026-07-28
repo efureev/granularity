@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 
@@ -59,7 +61,7 @@ const props = withDefaults(
   defineProps<GrRatingProps>(),
   {
     max: 5,
-    size: 'md',
+    size: undefined,
     tone: 'warning',
     allowHalf: false,
     readonly: false,
@@ -71,6 +73,12 @@ const props = withDefaults(
     ariaLabel: undefined,
   },
 )
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, {
+  component: 'GrRating',
+  supported: ['sm', 'md', 'lg'],
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: number): void
@@ -199,7 +207,7 @@ function onKeydown(event: KeyboardEvent): void {
       :id="resolvedId"
       data-gr-rating-scale
       data-testid="gr-rating-scale"
-      :class="ratingRootClass({ size, disabled, interactive })"
+      :class="ratingRootClass({ size: resolvedSize, disabled, interactive })"
       :role="asSlider ? 'slider' : 'img'"
       :tabindex="asSlider ? (disabled ? -1 : 0) : undefined"
       :aria-label="asSlider ? resolvedAriaLabel : `${resolvedAriaLabel}: ${valueText}`"
@@ -219,7 +227,7 @@ function onKeydown(event: KeyboardEvent): void {
         :key="index"
         data-gr-rating-symbol
         :data-testid="`gr-rating-symbol-${index}`"
-        :class="ratingSymbolClass(size)"
+        :class="ratingSymbolClass(resolvedSize)"
         @click="onSymbolClick(index, $event)"
         @mousemove="onSymbolMouseMove(index, $event)"
       >
@@ -240,7 +248,7 @@ function onKeydown(event: KeyboardEvent): void {
           :style="{ width: `${fillRatio(index) * 100}%` }"
           aria-hidden="true"
         >
-          <span :class="ratingSymbolClass(size)">
+          <span :class="ratingSymbolClass(resolvedSize)">
             <slot name="symbol" :index="index" :filled="true">
               <span v-if="icon" class="block h-full w-full" :class="icon" />
               <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full">
@@ -256,7 +264,7 @@ function onKeydown(event: KeyboardEvent): void {
       v-if="showText || $slots.text"
       data-gr-rating-text
       class="text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
-      :class="ratingTextSizeBySize[size]"
+      :class="ratingTextSizeBySize[resolvedSize]"
     >
       <slot name="text" :value="displayValue">{{ text }}</slot>
     </span>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, provide } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
 import GrRadio from '../GrRadio/GrRadio.vue'
@@ -30,9 +32,14 @@ const props = withDefaults(defineProps<GrRadioGroupProps>(), {
   name: undefined,
   disabled: false,
   variant: 'radiobox',
-  size: 'md',
+  size: undefined,
   ariaLabel: undefined,
 })
+
+// Эффективный размер группы: локальный проп → `GrConfigProvider` → `md`.
+// Дочерние `GrRadio` получают уже разрешённое значение через контекст, поэтому
+// провайдер работает и для них — без второго чтения конфига.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrRadioGroup' })
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -48,7 +55,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),
   name: computed(() => props.name),
   disabled: computed(() => props.disabled),
-  size: computed(() => props.size),
+  size: resolvedSize,
   setValue,
 })
 </script>
@@ -75,7 +82,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
           :key="opt.value"
           :value="opt.value"
           variant="button"
-          :size="size"
+          :size="resolvedSize"
         >
           {{ opt.label }}
         </GrRadio>

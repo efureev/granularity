@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 
 import {
@@ -90,12 +92,12 @@ const resolvedName = computed(() => {
   return group?.name.value
 })
 
-const resolvedSize = computed<GrButtonSize>(() => {
-  if (props.size)
-    return props.size
-
-  return group?.size.value ?? 'md'
-})
+// Приоритет: локальный проп → размер группы → `GrConfigProvider` → `md`.
+// Группа специфичнее конфига, поэтому её значение подаётся как «локальное».
+const resolvedSize = useGrComponentSize(
+  () => props.size ?? group?.size.value,
+  { component: 'GrRadio' },
+)
 
 const checked = computed(() => resolvedModelValue.value === props.value)
 

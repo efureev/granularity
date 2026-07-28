@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
 import type { ComponentPublicInstance } from 'vue'
 
 import {
@@ -53,7 +55,7 @@ const props = withDefaults(
   defineProps<GrSegmentedProps>(),
   {
     variant: 'pills',
-    size: 'md',
+    size: undefined,
     indicatorDuration: 300,
     block: false,
     disabled: false,
@@ -61,6 +63,9 @@ const props = withDefaults(
     ariaLabel: undefined,
   },
 )
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmented' })
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: GrSegmentedValue): void
@@ -92,7 +97,7 @@ const rootClassName = computed(() => grSegmentedRootClass({
 const rootStyle = computed<Record<string, string>>(() => ({
   ...grSegmentedRootStyle({
     variant: props.variant,
-    size: props.size,
+    size: resolvedSize.value,
   }),
   gridTemplateColumns: props.options.length > 0
     ? props.options.map(() => props.block ? 'minmax(0,1fr)' : 'minmax(0,max-content)').join(' ')
@@ -375,7 +380,7 @@ function onKeydown(event: KeyboardEvent, index: number): void {
 watch(() => props.modelValue, () => scheduleMeasure())
 watch(() => props.options, () => scheduleMeasure(), { deep: true })
 watch(() => props.variant, () => scheduleMeasure())
-watch(() => props.size, () => scheduleMeasure())
+watch(resolvedSize, () => scheduleMeasure())
 watch(() => props.block, () => scheduleMeasure())
 
 onMounted(() => scheduleMeasure())
