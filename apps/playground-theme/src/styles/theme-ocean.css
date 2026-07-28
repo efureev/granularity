@@ -1,0 +1,105 @@
+/*
+ * Тема `ocean` — пример из `packages/granularity/docs/theming.md`.
+ *
+ * Объявляет ТОЛЬКО семантические роли. Примитивы (`--gr-space-*`, `--gr-radius-*`,
+ * `--gr-text-*`, `--gr-z-*`) от темы не зависят, а производные состояния
+ * (`--gr-primary-hover` и т. п.) выведены формулой `color-mix` от ролей ниже и
+ * подстроятся сами.
+ *
+ * Полнота набора и контраст проверяются тестом `src/__tests__/theme.test.ts` —
+ * он же служит образцом такой проверки для приложения.
+ *
+ * Тема тёмная, поэтому действует конвенция тёмной темы пакета: заливка тоном
+ * СВЕТЛЕЕ фона, а текст на ней (`-fg`) — тёмный.
+ */
+[data-theme='ocean'] {
+  /* Surface roles */
+  --gr-bg: #041e2b;
+  --gr-fg: #e8f4fa;
+  --gr-card: #0a2f42;
+  --gr-card-fg: #e8f4fa;
+  --gr-popover: #0a2f42;
+  --gr-popover-fg: #e8f4fa;
+  --gr-muted: #123f56;
+  /*
+   * Вторичный текст живёт не на `--gr-bg`, а на `--gr-muted`/`--gr-secondary` —
+   * в чипах, таблицах и панелях. Значение выверено по самому светлому из этих
+   * фонов, а не по фону страницы (ловушка №1 из docs/theming.md).
+   */
+  --gr-muted-fg: #a8c4d4;
+  --gr-secondary: #123f56;
+  --gr-secondary-fg: #e8f4fa;
+  --gr-brd: #1c5470;
+  --gr-input: #1c5470;
+  --gr-ring: #38bdf8;
+
+  /* Action roles */
+  --gr-primary: #4fd1e0;
+  --gr-primary-fg: #041e2b;
+  --gr-accent: #0d3a52;
+  --gr-accent-fg: #a5e4f2;
+  --gr-destructive: #fb8a8a;
+  --gr-destructive-fg: #041e2b;
+
+  /* Status roles */
+  --gr-success: #45d6a3;
+  --gr-success-light: #06463a;
+  --gr-success-fg: #041e2b;
+  --gr-success-text: #7ee7c0;
+  --gr-warning: #fbbf24;
+  --gr-warning-light: #5a3608;
+  --gr-warning-fg: #041e2b;
+  --gr-warning-text: #fcd34d;
+  --gr-danger: #fb8a8a;
+  --gr-danger-light: #5f1a1a;
+  --gr-danger-fg: #041e2b;
+  --gr-danger-text: #fcb0b0;
+  --gr-info: #7dd3fc;
+  --gr-info-light: #0b3f5c;
+  --gr-info-fg: #041e2b;
+  --gr-info-text: #bae6fd;
+  --gr-slate: #9db4c4;
+  --gr-slate-light: #17364a;
+  --gr-slate-fg: #041e2b;
+  --gr-slate-text: #cbdae4;
+  --gr-azure: #38bdf8;
+  --gr-azure-light: #0b3f5c;
+  --gr-azure-fg: #041e2b;
+  --gr-azure-text: #bae6fd;
+
+  /* Data visualization roles */
+  --gr-chart-1: #4fd1e0;
+  --gr-chart-2: #45d6a3;
+  --gr-chart-3: #fbbf24;
+  --gr-chart-4: #7dd3fc;
+  --gr-chart-5: #c4b5fd;
+
+  /* Navigation roles */
+  --gr-sidebar: #072634;
+  --gr-sidebar-fg: #e8f4fa;
+  --gr-sidebar-primary: #4fd1e0;
+  --gr-sidebar-primary-fg: #041e2b;
+  --gr-sidebar-accent: #123f56;
+  --gr-sidebar-accent-fg: #e8f4fa;
+  --gr-sidebar-brd: #1c5470;
+  --gr-sidebar-ring: #38bdf8;
+
+  /*
+   * Покомпонентные токены: `GrButton` заливается СОБСТВЕННЫМ тоном, а не
+   * глобальным `--gr-success`, поэтому смена палитры до кнопок сама не доедет
+   * (см. docs/theming.md → «Что тема может не покрыть»). Переопределяем то, что
+   * иначе осталось бы в цветах пакета.
+   */
+  --gr-button-primary-bg: var(--gr-primary);
+  --gr-button-primary-bg-hover: var(--gr-primary-hover);
+  --gr-button-primary-bg-active: var(--gr-primary-active);
+  --gr-button-primary-fg: var(--gr-primary-fg);
+  --gr-button-success-bg: var(--gr-success);
+  --gr-button-success-bg-hover: var(--gr-success-hover);
+  --gr-button-success-bg-active: var(--gr-success-active);
+  --gr-button-success-fg: var(--gr-success-fg);
+  --gr-button-warning-bg: var(--gr-warning);
+  --gr-button-warning-bg-hover: var(--gr-warning-hover);
+  --gr-button-warning-bg-active: var(--gr-warning-active);
+  --gr-button-warning-fg: var(--gr-warning-fg);
+}

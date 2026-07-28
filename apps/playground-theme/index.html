@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>granularity — кастомная тема</title>
+    <!--
+      Тема ставится ДО первого рендера, иначе пользователь увидит вспышку
+      чужой темы. Тот же приём описан в docs/ssr.md.
+    -->
+    <script>
+      try {
+        var stored = localStorage.getItem('playground-theme')
+        var theme = stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        document.documentElement.dataset.theme = theme
+        document.documentElement.classList.toggle('theme-dark', theme === 'dark')
+      } catch (error) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

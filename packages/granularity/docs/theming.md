@@ -88,33 +88,65 @@ const required = grThemeTokens.map(token => token.name)
 
 ## Подключение
 
-### Вариант 1: через preset (рекомендуется)
+### Третья тема: свой CSS-слой приложения
+
+Новая тема — это просто CSS приложения, подключённый после foundation-слоя
+пакета:
+
+```ts
+// src/main.ts
+await import('./reset')
+await import('./granularity')          // foundation пакета (tokens + light/dark)
+await import('./styles/theme-ocean.css') // тема приложения
+await import('./app-styles')
+```
+
+Конфликта селекторов нет: `[data-theme='ocean']` и `[data-theme='dark']` никогда
+не матчатся одновременно, поэтому порядок важен только для читаемости.
+
+**Чего делать НЕ надо:** пытаться добавить тему через `themes.themeFiles`
+пресета. Вопреки тому, что можно предположить по названию, это карта
+«имя темы → файл», которая **заменяет** CSS уже существующей темы. Темы
+приходят пересечением `themes.names` с тем, что объявил провайдер, — имени
+`ocean` там взяться неоткуда.
+
+### Перекрасить встроенную тему
+
+Если тем по-прежнему две, а поменять надо только цвета — вот здесь `themeFiles`
+и уместен:
 
 ```ts
 presetGranularNode({
   providers: [granularityProvider],
-  // оставить только нужные встроенные темы …
-  themes: { names: ['light'] },
-  // … и добавить свою
-  themeFiles: ['./src/styles/theme-ocean.css'],
+  themes: {
+    names: ['light', 'dark'],
+    themeFiles: {
+      // CSS пакета для `dark` не попадёт в сборку — его заменит ваш файл
+      dark: fileURLToPath(new URL('./src/styles/dark-rebrand.css', import.meta.url)),
+    },
+  },
 })
 ```
 
-Тема попадёт в собранный CSS вместе с foundation-слоем; отдельный импорт не
-нужен. Опции пресета описаны в [`unocss.md`](./unocss.md).
+Проверено сборкой: с таким override встроенные значения тёмной темы из бандла
+пропадают целиком, остаётся только ваш файл. Значит он обязан объявлять **все**
+роли — см. проверку полноты ниже.
 
-### Вариант 2: ручная композиция CSS
+### Точечный override без своего файла
 
-Порядок обязателен: роли — раньше формул, формулы — раньше базового слоя.
+Если нужно поменять две-три роли, целый файл заводить не обязательно:
 
 ```ts
-import '@feugene/granularity/styles/tokens.css'  // примитивы + color-mix-формулы
-import './styles/theme-ocean.css'                // ваши роли
-import '@feugene/granularity/styles/base.css'    // базовый слой
+themes: {
+  names: ['light', 'dark'],
+  tokenOverrides: {
+    dark: { '--gr-primary': '#4fd1e0' },
+  },
+}
 ```
 
-Полностью заменить встроенные темы можно и через опции `tokens` / `baseFile`
-пресета — см. [`styling.md`](./styling.md).
+Работающий пример — приложение [`apps/playground-theme`](../../../apps/playground-theme/README.md):
+тема `ocean` третьим слоем, свой контроллер переключения и автопроверка темы.
 
 ## Переключение в рантайме
 
