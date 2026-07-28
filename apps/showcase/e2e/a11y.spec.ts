@@ -20,6 +20,11 @@ import { componentNames, componentPath } from './components'
 
 const IMPACT_BLOCKLIST = ['serious', 'critical']
 
+// `A11Y_AUDIT=1` игнорирует baseline: прогон падает на ВСЁМ долге и печатает его
+// списком. Так проверяется, какие строки `a11y-baseline.ts` уже протухли после
+// починки — гейт для этого не годится, он про регрессии и молчит на долге.
+const auditMode = process.env.A11Y_AUDIT === '1'
+
 async function analyze(page: import('@playwright/test').Page) {
   // Сканируем только области живых демо (`[data-example-preview]`), т.е. сам
   // отрендеренный компонент — а не хром витрины (код-сниппеты, prose-описания).
@@ -43,7 +48,7 @@ for (const name of componentNames) {
     await page.locator('#live-examples').waitFor()
 
     const results = await analyze(page)
-    const known = new Set(knownIssuesFor(name))
+    const known = new Set(auditMode ? [] : knownIssuesFor(name))
 
     const regressions = results.violations
       .filter(v => IMPACT_BLOCKLIST.includes(v.impact ?? ''))

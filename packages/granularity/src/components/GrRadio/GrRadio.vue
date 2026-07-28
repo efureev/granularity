@@ -23,6 +23,13 @@ import { GR_RADIO_GROUP_CONTEXT } from './grRadioGroupContext'
  *
  * @prop value — значение этого элемента, сравнивается с `modelValue` группы.
  * @prop variant — визуальное представление: `radiobox` (круг+dot) или `button` (стиль `GrButton`).
+ *
+ * Доступным контролом является сам элемент с `role="radio"`: он держит фокус,
+ * `aria-checked` и клавиатуру. Внутрь него ничего интерактивного не вкладывается —
+ * `role="radio"` объявляет потомков презентационными, и вложенный native `<input>`
+ * (даже скрытый и с `tabindex="-1"`) ломает виджет для скринридеров и падает
+ * в axe на `nested-interactive`. Для отправки нативной формой рядом рендерится
+ * `input[type="hidden"]` — он не фокусируется и не является интерактивным.
  */
 export interface GrRadioProps {
   value: string
@@ -40,14 +47,6 @@ export interface GrRadioProps {
   selectedButtonTone?: GrButtonTone
   ariaLabel?: string
 }
-
-const hiddenInputStyle = {
-  position: 'absolute',
-  opacity: '0',
-  width: '0',
-  height: '0',
-  pointerEvents: 'none',
-} as const
 
 const props = withDefaults(defineProps<GrRadioProps>(), {
   modelValue: undefined,
@@ -101,6 +100,12 @@ const resolvedSize = useGrComponentSize(
 
 const checked = computed(() => resolvedModelValue.value === props.value)
 
+// Нативная форма получает значение только от выбранного и не-disabled элемента —
+// ровно как поступил бы native radio. Без `name` отправлять нечего.
+const submitsValue = computed(
+  () => checked.value && !resolvedDisabled.value && Boolean(resolvedName.value),
+)
+
 const buttonClassName = computed(() => {
   return grRadioButtonClass({
     checked: checked.value,
@@ -137,12 +142,14 @@ function onButtonClick(): void {
 <template>
   <div
     v-if="variant === 'button'"
+    :id="id"
     data-gr-button
     data-gr-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
+    :aria-required="required ? 'true' : undefined"
     :tabindex="resolvedDisabled ? -1 : 0"
     :class="buttonClassName"
     @click="onButtonClick"
@@ -150,17 +157,11 @@ function onButtonClick(): void {
     @keydown.enter.prevent="onButtonClick"
   >
     <input
-      :id="id"
-      type="radio"
-      :checked="checked"
-      :disabled="resolvedDisabled"
+      v-if="submitsValue"
+      type="hidden"
       :name="resolvedName"
       :value="value"
-      :required="required"
       :form="form"
-      tabindex="-1"
-      aria-hidden="true"
-      :style="hiddenInputStyle"
     >
 
     <slot />
@@ -168,11 +169,13 @@ function onButtonClick(): void {
 
   <div
     v-else
+    :id="id"
     data-gr-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
+    :aria-required="required ? 'true' : undefined"
     :tabindex="resolvedDisabled ? -1 : 0"
     class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     :class="rootClassName"
@@ -181,17 +184,11 @@ function onButtonClick(): void {
     @keydown.enter.prevent="onButtonClick"
   >
     <input
-      :id="id"
-      type="radio"
-      :checked="checked"
-      :disabled="resolvedDisabled"
+      v-if="submitsValue"
+      type="hidden"
       :name="resolvedName"
       :value="value"
-      :required="required"
       :form="form"
-      tabindex="-1"
-      aria-hidden="true"
-      :style="hiddenInputStyle"
     >
 
     <span

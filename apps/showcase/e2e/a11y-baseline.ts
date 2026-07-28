@@ -13,37 +13,41 @@
  * `--gr-muted-fg`, из-за которого правило раньше было выключено, исправлен в
  * обеих темах.
  *
+ * С 2026-07-28 (ANALYSIS §53) снят главный пункт долга: `nested-interactive` у
+ * `GrRadio`/`GrSegmented`. Корень был в паттерне «элемент с `role="radio"` + вложенный
+ * скрытый native `<input type="radio">`»: роль объявляет потомков презентационными,
+ * поэтому вложенный контрол ломал виджет. Обе реализации перешли на
+ * `input[type="hidden"]` для отправки формой — 9 компонентов ушли из baseline'а
+ * (GrBadge, GrButton, GrInput, GrLink, GrNumberInput, GrRadio, GrSelect, GrSwitch,
+ * GrToaster: они держали долг только из-за этих контролов в builder-демо).
+ *
  * Что стоит за оставшимися пунктами:
- *  - `nested-interactive` — паттерн `GrRadio` в button/segmented-режиме
- *    (`<div role="radio">` + вложенный native `<input>`); тиражирован в builder-демо
- *    витрины как переключатели пропсов. Чинится централизованно в `GrRadio`.
+ *  - `nested-interactive` — тот же паттерн в `GrCheckbox` (`role="checkbox"` + native
+ *    `<input>`) и его тираж в демо GrFormField/GrFormSection/GrFileUpload. Разошлось с
+ *    GrRadio в одном: id живёт на нативном input, и внешний `<label for="…">`
+ *    переключает чекбокс. Убрать input — потерять эту связку, поэтому нужна отдельная
+ *    правка с заменой механики label, а не копия решения GrRadio.
  *  - `button-name` / `select-name` / `label` — точечные icon-only кнопки и нативные
  *    контролы без доступного имени в отдельных компонентах/демо.
  *  - `scrollable-region-focusable` — скролл-контейнер без доступа с клавиатуры.
+ *
+ * Чем проверять, не протух ли список: `A11Y_AUDIT=1` в прогоне `test:a11y` игнорирует
+ * baseline и печатает весь долг — обычный гейт про регрессии и на долге молчит.
  *
  * ВНИМАНИЕ: список сознательно НЕ содержит `GrSlider`, `GrAutocomplete`, `GrTabs`,
  * `GrTree`, `GrDropdown`, `GrModal` и др. — они проходят гейт начисто.
  */
 export const a11yKnownIssues: Record<string, string[]> = {
-  GrBadge: ['nested-interactive'],
-  GrButton: ['nested-interactive'],
   GrCheckbox: ['nested-interactive', 'scrollable-region-focusable'],
   GrDataTable: ['button-name'],
   GrFileUpload: ['nested-interactive'],
   GrFormField: ['nested-interactive'],
   GrFormSection: ['nested-interactive'],
-  GrInput: ['nested-interactive'],
   GrInputTag: ['label'],
-  GrLink: ['nested-interactive'],
   GrList: ['button-name'],
-  GrNumberInput: ['nested-interactive'],
-  GrRadio: ['nested-interactive'],
-  GrRadioGroup: ['nested-interactive', 'select-name'],
+  GrRadioGroup: ['select-name'],
   GrResponseErrorBanner: ['select-name'],
-  GrSegmented: ['nested-interactive', 'button-name', 'select-name'],
-  GrSelect: ['nested-interactive'],
-  GrSwitch: ['nested-interactive'],
-  GrToaster: ['nested-interactive', 'scrollable-region-focusable'],
+  GrSegmented: ['button-name', 'select-name'],
 }
 
 export function knownIssuesFor(componentName: string): string[] {

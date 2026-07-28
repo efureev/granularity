@@ -18,14 +18,6 @@ import {
   type GrSegmentedVariant,
 } from './grSegmentedStyles'
 
-const hiddenInputStyle = {
-  position: 'absolute',
-  opacity: '0',
-  width: '0',
-  height: '0',
-  pointerEvents: 'none',
-} as const
-
 type IndicatorGeometry = {
   width: number
   height: number
@@ -403,6 +395,18 @@ onBeforeUnmount(() => {
     :class="rootClassName"
     :style="rootStyle"
   >
+    <!-- Значение для нативной формы. Раньше в каждый `role="radio"`-элемент
+         вкладывался скрытый native `<input type="radio">`: роль объявляет потомков
+         презентационными, поэтому вложенный интерактивный контрол ломал виджет для
+         скринридеров (axe: `nested-interactive`). Скрытый input не фокусируется
+         и интерактивным не считается — отправка формы сохранена. -->
+    <input
+      v-if="selectedOption && !resolveOptionDisabled(selectedOption)"
+      type="hidden"
+      :name="resolvedName"
+      :value="String(selectedOption.value)"
+    >
+
     <span
       v-if="hasIndicator"
       data-gr-segmented-indicator
@@ -432,17 +436,6 @@ onBeforeUnmount(() => {
       @click="emitValue(option)"
       @keydown="onKeydown($event, index)"
     >
-      <input
-        type="radio"
-        tabindex="-1"
-        aria-hidden="true"
-        :name="resolvedName"
-        :value="option.value"
-        :checked="isOptionSelected(option)"
-        :disabled="resolveOptionDisabled(option)"
-        :style="hiddenInputStyle"
-      >
-
       <slot
         :option="option"
         :selected="isOptionSelected(option)"

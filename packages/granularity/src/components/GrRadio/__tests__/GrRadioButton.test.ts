@@ -22,13 +22,30 @@ describe('GrRadio (button)', () => {
     expect(btn.attributes('role')).toBe('radio')
     expect(btn.attributes('aria-checked')).toBe('true')
 
-    const native = wrapper.get('input[type="radio"]').element as HTMLInputElement
-    expect(native.checked).toBe(true)
     expect(btn.attributes('class')).toContain('inline-flex')
     expect(btn.attributes('class')).toContain('items-center')
     expect(btn.attributes('class')).toContain('rounded-md')
     expect(btn.attributes('class')).toContain('h-11')
     expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg,var(--gr-primary))]')
+  })
+
+  // См. GrRadiobox.test.ts: в button-режиме тот же контракт — никакого вложенного
+  // native input внутри `role="radio"`, значение формы уходит скрытым input'ом.
+  it('в button-режиме тоже не вкладывает интерактивный контрол внутрь radio', () => {
+    const wrapper = mount(GrRadio, {
+      props: {
+        modelValue: 'a',
+        value: 'a',
+        variant: 'button',
+        name: 'plan',
+      },
+      slots: {
+        default: 'Option A',
+      },
+    })
+
+    expect(wrapper.find('input[type="radio"]').exists()).toBe(false)
+    expect(wrapper.get('input[type="hidden"]').attributes('name')).toBe('plan')
   })
 
   it('эмитит update:modelValue при клике (standalone v-model)', async () => {
