@@ -650,11 +650,11 @@ const lightThemeCssSource = `:root {
   /* Status roles */
   --gr-success: #10b981;
   --gr-success-light: #d1fae5;
-  --gr-success-fg: #ffffff;
+  --gr-success-fg: #0f172a;
   --gr-success-text: #065f46;
   --gr-warning: #f97316;
   --gr-warning-light: #ffedd5;
-  --gr-warning-fg: #ffffff;
+  --gr-warning-fg: #0f172a;
   --gr-warning-text: #7c2d12;
   --gr-danger: #dc2626;
   --gr-danger-light: #fee2e2;
@@ -668,7 +668,7 @@ const lightThemeCssSource = `:root {
   --gr-slate-light: #e2e8f0;
   --gr-slate-fg: #ffffff;
   --gr-slate-text: #334155;
-  --gr-azure: #0ea5e9;
+  --gr-azure: #0077b6;
   --gr-azure-light: #e0f2fe;
   --gr-azure-fg: #ffffff;
   --gr-azure-text: #075985;

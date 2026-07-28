@@ -16,7 +16,9 @@ describe('GrBadge', () => {
 
     expect(wrapper.text()).toContain('Success')
     expect(wrapper.attributes('class')).toContain('bg-[var(--gr-success-light)]')
-    expect(wrapper.attributes('class')).toContain('text-[var(--gr-success)]')
+    // Именно `-text`, а не `--gr-success`: насыщенный тон на своей же светлой
+    // подложке даёт 2.24:1.
+    expect(wrapper.attributes('class')).toContain('text-[var(--gr-success-text)]')
   })
 
   it('поддерживает size: sm / md / lg', () => {
@@ -62,7 +64,9 @@ describe('GrBadge', () => {
     })
 
     expect(wrapper.attributes('class')).toContain('bg-[var(--gr-success)]')
-    expect(wrapper.attributes('class')).toContain('text-white')
+    // `-fg`, а не захардкоженный `text-white`: тот не знал полярности заливки
+    // и давал 2.54:1 в light и 1.92:1 в dark.
+    expect(wrapper.attributes('class')).toContain('text-[var(--gr-success-fg)]')
     expect(wrapper.attributes('class')).toContain('rounded-[7px]')
   })
 

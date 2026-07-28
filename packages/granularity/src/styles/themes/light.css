@@ -23,13 +23,21 @@
   --gr-destructive-fg: #ffffff;
 
   /* Status roles */
+  /*
+   * `-fg` — цвет текста НА сплошной заливке тоном. У светлых заливок он обязан
+   * быть тёмным: белый на `--gr-success` даёт 2.54:1, на `--gr-warning` 2.80:1
+   * при пороге AA 4.5 — а это solid-кнопки и бейджи (`grButtonStyles.ts`,
+   * `grBadgeStyles.ts`). С `--gr-fg` получаем 7.04 и 6.37, и hover/active,
+   * которые уводят заливку в тёмную сторону, остаются выше порога (5.30 / 4.79).
+   * В `dark.css` эти токены уже тёмные — там заливки светлее фона.
+   */
   --gr-success: #10b981;
   --gr-success-light: #d1fae5;
-  --gr-success-fg: #ffffff;
+  --gr-success-fg: #0f172a;
   --gr-success-text: #065f46;
   --gr-warning: #f97316;
   --gr-warning-light: #ffedd5;
-  --gr-warning-fg: #ffffff;
+  --gr-warning-fg: #0f172a;
   --gr-warning-text: #7c2d12;
   --gr-danger: #dc2626;
   --gr-danger-light: #fee2e2;
@@ -43,7 +51,16 @@
   --gr-slate-light: #e2e8f0;
   --gr-slate-fg: #ffffff;
   --gr-slate-text: #334155;
-  --gr-azure: #0ea5e9;
+  /*
+   * Azure — единственный тон, который не чинится сменой `-fg`. Тёмный текст
+   * проходит на базе (6.44), но hover/active уводят заливку вниз и ломают его
+   * (4.36 / 3.01); белый же не проходит на базе (2.77). Выход один — сама
+   * заливка: sky-500 `#0ea5e9` слишком светлая для белого текста. `#0077b6` —
+   * самое светлое значение, дающее запас по всем трём состояниям
+   * (4.87 / 5.44 / 6.02) и заодно поднимающее azure-иконку на `-light`
+   * подложке с 2.42 до 4.24. Оттенок остаётся отличимым от `--gr-info`.
+   */
+  --gr-azure: #0077b6;
   --gr-azure-light: #e0f2fe;
   --gr-azure-fg: #ffffff;
   --gr-azure-text: #075985;
@@ -89,8 +106,8 @@
     --gr-info-active: #5659d1;
     --gr-slate-hover: #435062;
     --gr-slate-active: #3d4a5b;
-    --gr-azure-hover: #0284c7;
-    --gr-azure-active: #0369a1;
+    --gr-azure-hover: #016fab;
+    --gr-azure-active: #0268a0;
 
     /* Component semantic fallbacks */
     /*--gr-category-tree-branch-line-active-color: #c4cdf7;*/

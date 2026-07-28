@@ -7,10 +7,21 @@
   --gr-button-primary-soft-bg-hover: color-mix(in srgb, var(--gr-primary) 18%, var(--gr-bg));
   --gr-button-primary-soft-bg-active: color-mix(in srgb, var(--gr-primary) 24%, var(--gr-bg));
 
+  /*
+   * ВНИМАНИЕ: этот файл парсится контраст-тестом наивным регэкспом по всему
+   * тексту, включая комментарии. Не писать здесь имя токена с двоеточием сразу
+   * после — такая строка будет прочитана как объявление и съест следующее.
+   *
+   * Кнопка заливается СОБСТВЕННЫМ затемнённым тоном (#047857 вместо светлого
+   * глобального success), поэтому и текст берёт собственный белый. Глобальный
+   * success-fg парен со светлой заливкой и потому тёмный — на тёмной заливке
+   * кнопки он дал бы 3.26:1. Белый здесь даёт 5.48 / 6.45 / 7.71.
+   * Так же устроен azure ниже.
+   */
   --gr-button-success-bg: #047857;
   --gr-button-success-bg-hover: #036c4d;
   --gr-button-success-bg-active: #025f44;
-  --gr-button-success-fg: var(--gr-success-fg);
+  --gr-button-success-fg: #ffffff;
   --gr-button-success-soft-bg: var(--gr-success-light);
   --gr-button-success-soft-bg-hover: color-mix(in srgb, var(--gr-success) 20%, var(--gr-bg));
   --gr-button-success-soft-bg-active: color-mix(in srgb, var(--gr-success) 26%, var(--gr-bg));
@@ -18,7 +29,8 @@
   --gr-button-warning-bg: #c2410c;
   --gr-button-warning-bg-hover: #b53b0a;
   --gr-button-warning-bg-active: #9f3307;
-  --gr-button-warning-fg: var(--gr-warning-fg);
+  /* Тот же случай: белый на #c2410c — 5.18, тёмный дал бы 3.45. */
+  --gr-button-warning-fg: #ffffff;
   --gr-button-warning-soft-bg: var(--gr-warning-light);
   --gr-button-warning-soft-bg-hover: color-mix(in srgb, var(--gr-warning) 20%, var(--gr-bg));
   --gr-button-warning-soft-bg-active: color-mix(in srgb, var(--gr-warning) 26%, var(--gr-bg));
