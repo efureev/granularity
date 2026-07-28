@@ -20,10 +20,12 @@ const dashboardOptions: GrSegmentedOption[] = [
   { value: 'calendar', label: 'Calendar', icon: IconCalendarDays },
 ]
 
+// Icon-only: иконка декоративна, поэтому имя сегмента задаётся явно —
+// иначе скринридер объявит три пустые кнопки.
 const iconOnlyOptions: GrSegmentedOption[] = [
-  { value: 'board', icon: IconLayoutGrid },
-  { value: 'timeline', icon: IconRows3 },
-  { value: 'calendar', icon: IconCalendarDays },
+  { value: 'board', icon: IconLayoutGrid, ariaLabel: 'Board' },
+  { value: 'timeline', icon: IconRows3, ariaLabel: 'Timeline' },
+  { value: 'calendar', icon: IconCalendarDays, ariaLabel: 'Calendar' },
 ]
 </script>
 

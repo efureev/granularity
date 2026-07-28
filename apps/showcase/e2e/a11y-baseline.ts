@@ -23,7 +23,12 @@
  *
  * Что стоит за оставшимися пунктами:
  *  - `button-name` / `select-name` / `label` — точечные icon-only кнопки и нативные
- *    контролы без доступного имени в отдельных компонентах/демо.
+ *    контролы без доступного имени в отдельных компонентах/демо. У `GrSegmented` оба
+ *    пункта закрыты 2026-07-29: в `GrSegmentedOption` появилось поле `ariaLabel` для
+ *    icon-only сегментов, а подписи селектов в демо переведены с самодельного `div`
+ *    на `GrFormField` (он и выдаёт контролу id, и связывает с ним `<label for>`).
+ *    Оставшиеся `select-name` у `GrRadioGroup`/`GrResponseErrorBanner` — тот же
+ *    дефект демо и лечится так же.
  *  - `scrollable-region-focusable` — скролл-контейнер без доступа с клавиатуры.
  *
  * Чем проверять, не протух ли список: `A11Y_AUDIT=1` в прогоне `test:a11y` игнорирует
@@ -38,7 +43,6 @@ export const a11yKnownIssues: Record<string, string[]> = {
   GrList: ['button-name'],
   GrRadioGroup: ['select-name'],
   GrResponseErrorBanner: ['select-name'],
-  GrSegmented: ['button-name', 'select-name'],
   GrToaster: ['scrollable-region-focusable'],
 }
 

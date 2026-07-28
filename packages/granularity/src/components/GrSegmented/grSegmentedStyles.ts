@@ -7,6 +7,12 @@ export type GrSegmentedOption = {
   label?: string
   icon?: Component
   disabled?: boolean
+  /**
+   * Доступное имя сегмента. Обязательно для icon-only опций: иконка декоративна
+   * (`aria-hidden`), и без этого у сегмента нет имени вовсе — скринридер объявит
+   * пустую кнопку. Когда есть `label`, имя берётся из него, и поле не нужно.
+   */
+  ariaLabel?: string
 }
 export const rootBaseClass =
   'relative inline-grid min-w-0 grid-flow-col items-stretch rounded-[var(--gr-segmented-radius)] p-[var(--gr-segmented-padding)] transition-colors duration-150'

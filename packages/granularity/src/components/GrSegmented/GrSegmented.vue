@@ -423,6 +423,7 @@ onBeforeUnmount(() => {
       :data-value="String(option.value)"
       type="button"
       role="radio"
+      :aria-label="option.ariaLabel"
       :aria-checked="isOptionSelected(option) ? 'true' : 'false'"
       :aria-disabled="resolveOptionDisabled(option) ? 'true' : undefined"
       :disabled="resolveOptionDisabled(option)"

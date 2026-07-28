@@ -68,10 +68,24 @@ const options = [
   { value: 'board', label: 'Board', icon: IconLayoutGrid },
   { value: 'timeline', label: 'Timeline', icon: IconRows3 },
 ]
+
+// Icon-only: иконка декоративна, имя сегменту задаётся через \`ariaLabel\`.
+const iconOnlyOptions = [
+  { value: 'board', icon: IconLayoutGrid, ariaLabel: 'Board' },
+  { value: 'timeline', icon: IconRows3, ariaLabel: 'Timeline' },
+]
 </script>
 
 <template>
-  <GrSegmented v-model="value" :options="options" aria-label="View" />
+  <div class="grid gap-4">
+    <GrSegmented v-model="value" :options="options" aria-label="View" />
+
+    <GrSegmented v-model="value" :options="iconOnlyOptions" size="sm" aria-label="Compact view">
+      <template #default="{ option }">
+        <component :is="option.icon" class="h-4 w-4" />
+      </template>
+    </GrSegmented>
+  </div>
 </template>`,
   },
   {

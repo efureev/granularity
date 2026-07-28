@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 import type { GrSegmentedOption, GrSelectOption } from '@feugene/granularity'
-import { GrSegmented, GrSelect, type GrSegmentedSize } from '@feugene/granularity'
+import { GrFormField, GrSegmented, GrSelect, type GrSegmentedSize } from '@feugene/granularity'
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 const { t } = useFintI18n()
@@ -32,20 +32,17 @@ const viewOptions: GrSegmentedOption[] = [
 
 <template>
   <div class="grid gap-4">
+    <!-- Подписи через GrFormField, а не отдельным div: он выдаёт контролу id и
+         связывает с ним `<label for>`. Нарисованный рядом текст доступным именем
+         не становится — селект остаётся безымянным для скринридера. -->
     <div class="grid gap-4 md:grid-cols-2 md:max-w-[520px]">
-      <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--gr-fg)]">
-          {{ t('components.GrSegmented.button.sizeLabel') }}
-        </div>
+      <GrFormField :label="t('components.GrSegmented.button.sizeLabel')">
         <GrSelect v-model="size" :options="sizeOptions" />
-      </div>
+      </GrFormField>
 
-      <div class="grid gap-3">
-        <div class="text-sm font-semibold text-[var(--gr-fg)]">
-          {{ t('components.GrSegmented.button.speedLabel') }}
-        </div>
+      <GrFormField :label="t('components.GrSegmented.button.speedLabel')">
         <GrSelect v-model="indicatorDuration" :options="durationOptions" />
-      </div>
+      </GrFormField>
     </div>
 
     <GrSegmented

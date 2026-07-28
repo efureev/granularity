@@ -110,6 +110,28 @@ describe('GrSegmented', () => {
     expect(indicator.attributes('style')).toContain('translate3d(80px, 3px, 0)')
   })
 
+  // Icon-only сегмент иначе остаётся безымянной кнопкой: иконка `aria-hidden`,
+  // текста нет, имя брать неоткуда (axe: `button-name`).
+  it('отдаёт сегменту доступное имя из option.ariaLabel', async () => {
+    const wrapper = mount(GrSegmented, {
+      props: {
+        modelValue: 'board',
+        options: [
+          { value: 'board', ariaLabel: 'Board' },
+          { value: 'timeline', label: 'Timeline' },
+        ],
+        ariaLabel: 'View mode',
+      },
+    })
+
+    await nextTick()
+
+    const radios = wrapper.findAll('[role="radio"]')
+    expect(radios[0].attributes('aria-label')).toBe('Board')
+    // У сегмента с текстом имя берётся из содержимого — своё `aria-label` его бы перебило.
+    expect(radios[1].attributes('aria-label')).toBeUndefined()
+  })
+
   it('применяет indicatorDuration через inline transitionDuration', async () => {
     const wrapper = mount(GrSegmented, {
       props: {
