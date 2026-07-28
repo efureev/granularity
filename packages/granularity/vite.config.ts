@@ -66,6 +66,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        // <granularity:components> — блок генерируется `yarn generate:registry`
         'components/GrAlert/index': fileURLToPath(
           new URL('./src/components/GrAlert/index.ts', import.meta.url),
         ),
@@ -246,6 +247,7 @@ export default defineConfig({
         'components/GrTreeSelect/index': fileURLToPath(
           new URL('./src/components/GrTreeSelect/index.ts', import.meta.url),
         ),
+        // </granularity:components>
         'composables/useTheme': fileURLToPath(
           new URL('./src/composables/useTheme.ts', import.meta.url),
         ),

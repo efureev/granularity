@@ -264,13 +264,13 @@
       "types": "./dist/types/src/components/GrTable/index.d.ts",
       "import": "./dist/components/GrTable/index.js"
     },
-    "./components/GrTabs": {
-      "types": "./dist/types/src/components/GrTabs/index.d.ts",
-      "import": "./dist/components/GrTabs/index.js"
-    },
     "./components/GrTabPanels": {
       "types": "./dist/types/src/components/GrTabPanels/index.d.ts",
       "import": "./dist/components/GrTabPanels/index.js"
+    },
+    "./components/GrTabs": {
+      "types": "./dist/types/src/components/GrTabs/index.d.ts",
+      "import": "./dist/components/GrTabs/index.js"
     },
     "./components/GrTextarea": {
       "types": "./dist/types/src/components/GrTextarea/index.d.ts",
@@ -400,7 +400,8 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
     "test:run": "vitest run --config vitest.config.ts",
-    "generate:tokens": "node scripts/generate-tokens.mjs"
+    "generate:tokens": "node scripts/generate-tokens.mjs",
+    "generate:registry": "node scripts/generate-registry.mjs"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",

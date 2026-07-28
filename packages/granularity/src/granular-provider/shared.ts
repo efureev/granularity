@@ -22,6 +22,7 @@ import {
   type GranularComponentDescriptor,
   type GranularProvider,
 } from '@feugene/unocss-preset-granular/contract'
+// <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grAlertConfig } from '../components/GrAlert/config'
 import { grAutocompleteConfig } from '../components/GrAutocomplete/config'
 import { grAvatarConfig } from '../components/GrAvatar/config'
@@ -82,6 +83,7 @@ import { grToasterConfig } from '../components/GrToaster/config'
 import { grTooltipConfig } from '../components/GrTooltip/config'
 import { grTreeConfig } from '../components/GrTree/config'
 import { grTreeSelectConfig } from '../components/GrTreeSelect/config'
+// </granularity:components:imports>
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_PROVIDER_ID = '@feugene/granularity'
@@ -125,6 +127,7 @@ const theme = {
  * и `./node.ts` (node).
  */
 export const granularityComponentConfigs = {
+  // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrAlert: grAlertConfig,
   GrAutocomplete: grAutocompleteConfig,
   GrAvatar: grAvatarConfig,
@@ -185,6 +188,7 @@ export const granularityComponentConfigs = {
   GrTooltip: grTooltipConfig,
   GrTree: grTreeConfig,
   GrTreeSelect: grTreeSelectConfig,
+  // </granularity:components:registry>
 }
 
 export type GranularityComponentName = keyof typeof granularityComponentConfigs

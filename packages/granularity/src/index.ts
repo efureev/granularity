@@ -1,3 +1,4 @@
+// <granularity:components> — блок генерируется `yarn generate:registry` из `src/components/`
 export * from './components/GrAlert'
 export * from './components/GrAutocomplete'
 export * from './components/GrAvatar'
@@ -58,6 +59,7 @@ export * from './components/GrToaster'
 export * from './components/GrTooltip'
 export * from './components/GrTree'
 export * from './components/GrTreeSelect'
+// </granularity:components>
 
 // Runtime composables, публикуемые пакетом через root-barrel
 export { initThemeEarly, useTheme } from './composables/useTheme'

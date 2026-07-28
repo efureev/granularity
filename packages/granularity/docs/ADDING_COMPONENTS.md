@@ -170,52 +170,50 @@ export { default as GrIcon } from './GrIcon.vue'
 
 ## Что обязательно обновить вне папки компонента
 
-### 1. `src/granular-provider/shared.ts`
+### Реестры — генератором
 
-Подключите новый `config.ts` в `granularityComponentConfigs` (browser-safe `./config.ts`).
-
-Если у компонента есть node-only вариант конфига (например, чтение токенов
-с диска через `tokenDefinitionsFromCssSync` — как у `GrButton`),
-переопределите его в `src/granular-provider/node.ts` через массив
-`overrides`, передаваемый в `createGranularityProvider(...)`. Для браузера
-в `src/granular-provider/index.ts` аналогично передаётся `./config.ts`-вариант.
-
-Именно из этого реестра потом строятся:
-
-- `resolveGranularityComponentNames(...)`;
-- зависимости между компонентами;
-- `granularityComponents` и общий safelist;
-- `granularityStyleAssets`;
-- extra CSS assets в `vite.config.ts`.
-
-### 2. `src/index.ts`
-
-Добавьте экспорт компонента в общий пакетный entrypoint.
-
-Минимум:
-
-```ts
-export * from './components/GrIcon'
+```bash
+yarn workspace @feugene/granularity generate:registry
 ```
 
-### 3. `package.json`
+Скрипт `scripts/generate-registry.mjs` находит компонент по признаку
+«директория `Gr*` c `index.ts` **и** `config.ts`» и прописывает его сразу в
+четыре реестра:
 
-Subpath exports пакета задаются вручную в `packages/granularity/package.json`.
+| Реестр | Что появляется |
+| --- | --- |
+| `src/index.ts` | `export * from './components/GrX'` |
+| `package.json#exports` | subpath `./components/GrX` |
+| `vite.config.ts` | entry `components/GrX/index` |
+| `src/granular-provider/shared.ts` | импорт `grXConfig` + запись в `granularityComponentConfigs` |
 
-Если компонент должен быть доступен как отдельный импорт, добавьте export для:
+Блоки в TS-файлах размечены маркерами `// <granularity:components>`; править
+внутри них руками бессмысленно — следующий запуск затрёт. Порядок записей
+(регистронезависимый алфавитный) держит генератор.
 
-- `./components/<ComponentName>`;
-- `./components/<ComponentName>/styles.css`.
+Имя экспорта конфига обязано выводиться из имени компонента (`GrX` → `grXConfig`),
+иначе генератор остановится с ошибкой.
 
-Пример:
+Рассинхрон ловит тест `src/__tests__/registry.generated.test.ts` — он падает и
+когда компонент создан без запуска генератора, и когда компонент удалён, а
+записи остались.
 
-```json
-"./components/GrIcon": {
-  "types": "./dist/types/src/components/GrIcon/index.d.ts",
-  "import": "./dist/components/GrIcon/index.js"
-},
-"./components/GrIcon/styles.css": "./dist/components/GrIcon/styles.css"
-```
+### Что генератор НЕ делает
+
+- **node-only конфиг.** Если у компонента есть `config.node.ts` (например,
+  `GrButton` читает токены с диска через `tokenDefinitionsFromCssSync`),
+  подключите его в `src/granular-provider/node.ts` через массив `overrides`
+  для `createGranularityProvider(...)`.
+- **CSS-subpath.** `./components/<Name>/styles.css` в `package.json#exports`
+  добавляется вручную, если компоненту нужен отдельный CSS-импорт:
+
+  ```json
+  "./components/GrIcon/styles.css": "./dist/components/GrIcon/styles.css"
+  ```
+
+Из реестра провайдера дальше строятся `resolveGranularityComponentNames(...)`,
+зависимости между компонентами, `granularityComponents` и общий safelist,
+`granularityStyleAssets` и extra CSS assets в `vite.config.ts`.
 
 ### 4. `package` CSS-exports
 
@@ -250,7 +248,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 
 В текущем коде там проверяются:
 
-- подключение нового `config.ts` в `granularityComponentConfigs` (`src/granular-provider/shared.ts`);
+- запуск `yarn generate:registry` после добавления компонента (реестры не синхронизируются сами);
 - safelist компонента в `granularityComponents` и `getGranularitySafelist(...)`;
 - зависимости `dependencies`, если они есть;
 - `styleAssetFileName`;
@@ -262,8 +260,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 ## Что проверить перед завершением задачи
 
 1. У компонента есть минимум `config.ts`, `index.ts` и основной `.vue`-файл.
-2. Компонент зарегистрирован в `src/granular-provider/shared.ts` (browser-конфиг); node-only конфиг, если нужен, подключён в `src/granular-provider/node.ts`.
-3. Компонент экспортируется из `src/index.ts`.
+2. Прогнан `yarn generate:registry`, и тест `registry.generated.test.ts` зелёный; node-only конфиг, если нужен, подключён в `src/granular-provider/node.ts` вручную.
 4. При необходимости обновлён `packages/granularity/package.json`.
 5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.
 6. Обновлён `src/__tests__/presetGranularity.test.ts` и связанные component tests, если они нужны.
@@ -294,6 +291,6 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 3. При необходимости вынести style/helper-логику в локальные `ds*.ts` и/или `safelist.ts`.
 4. При необходимости добавить `styles.css`, `tokens.css` и перечислить нужные файлы в `config.ts`.
 5. Подключить компонент в `src/registry/components.ts`.
-6. Обновить `src/index.ts` и `packages/granularity/package.json`, если нужен публичный subpath export.
+6. Прогнать `yarn generate:registry` — он обновит `src/index.ts`, `package.json#exports`, `vite.config.ts` и реестр провайдера.
 7. Обновить `src/__tests__/presetGranularity.test.ts` и сопутствующие тесты.
 8. Проверить, что новый компонент или директива корректно подключены в публичный API пакета.
