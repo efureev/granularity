@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.13.0] 2026-07-28
+
+### Changed
+
+- **`GrButton`, `GrInput` and `GrBadge` no longer declare their configurable props' defaults in
+  `withDefaults`** — the defaults moved into the resolvers, which is what makes `GrConfigProvider`
+  able to override them. Rendering is unchanged, but reading such a prop from the outside (through
+  a template ref or a wrapper) now yields `undefined` until it is explicitly passed: `variant`,
+  `tone`, `size`, `square` on `GrButton`; `size`, `clearable` on `GrInput`; `tone`, `size`, `radius`
+  on `GrBadge`; `size`, `variant`, `underline`, `clearable` on `GrSelect`; `size`, `clearable` on
+  `GrAutocomplete`; `size`, `variant` on `GrSegmented`; `size` on `GrNumberInput`, `GrSlider`,
+  `GrRating`, `GrSwitch` and `GrRadioGroup`.
+- **Unified CSS token namespace under `--gr-*`.** The previously unprefixed shadcn-style semantic roles
+  (`--bg`, `--fg`, `--card`, `--muted`, `--brd`, `--ring`, `--primary`, `--secondary`, `--accent`,
+  `--destructive`, `--chart-*`, `--sidebar-*` and their `-fg`/`-hover`/`-active` variants) could collide
+  with the consuming app's own CSS variables. Every token now lives in a single `--gr-*` namespace with
+  three layers (primitives → semantic roles → per-component tokens), defined in the themes
+  (`light.css`/`dark.css`) and formulas (`tokens.css`); all components reference only `--gr-*`. Theme
+  customization is done via `--gr-*` (e.g. set `--gr-primary` to re-theme).
+
 ### Added
 
 - New `GrConfigProvider` — one place for the design system's global defaults, provided to the whole
@@ -52,32 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   actually implements (`GrSlider`, `GrRating`, `GrSwitch`, `GrLink` and `GrStatistic` have no `xs`).
   A size coming from the provider that the component does not support is ignored in favour of the
   component's own default instead of silently producing an element with no size classes.
-
-### Changed
-
-- **`GrButton`, `GrInput` and `GrBadge` no longer declare their configurable props' defaults in
-  `withDefaults`** — the defaults moved into the resolvers, which is what makes `GrConfigProvider`
-  able to override them. Rendering is unchanged, but reading such a prop from the outside (through
-  a template ref or a wrapper) now yields `undefined` until it is explicitly passed: `variant`,
-  `tone`, `size`, `square` on `GrButton`; `size`, `clearable` on `GrInput`; `tone`, `size`, `radius`
-  on `GrBadge`; `size`, `variant`, `underline`, `clearable` on `GrSelect`; `size`, `clearable` on
-  `GrAutocomplete`; `size`, `variant` on `GrSegmented`; `size` on `GrNumberInput`, `GrSlider`,
-  `GrRating`, `GrSwitch` and `GrRadioGroup`.
-
-## [v0.13.0] 2026-07-23
-
-### Changed
-
-- **Unified CSS token namespace under `--gr-*`.** The previously unprefixed shadcn-style semantic roles
-  (`--bg`, `--fg`, `--card`, `--muted`, `--brd`, `--ring`, `--primary`, `--secondary`, `--accent`,
-  `--destructive`, `--chart-*`, `--sidebar-*` and their `-fg`/`-hover`/`-active` variants) could collide
-  with the consuming app's own CSS variables. Every token now lives in a single `--gr-*` namespace with
-  three layers (primitives → semantic roles → per-component tokens), defined in the themes
-  (`light.css`/`dark.css`) and formulas (`tokens.css`); all components reference only `--gr-*`. Theme
-  customization is done via `--gr-*` (e.g. set `--gr-primary` to re-theme).
-
-### Added
-
 - New `GrCommandPalette` — a ⌘K command palette: a modal search over the application's commands with
   groups, icons, per-command shortcut hints and keyboard navigation. Opens on a global hotkey
   (`hotkey`, default `mod+k` — Cmd on macOS, Ctrl elsewhere; pass `null` to drive it purely through
