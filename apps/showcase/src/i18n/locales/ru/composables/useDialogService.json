@@ -1,0 +1,44 @@
+{
+  "status": {
+    "idle": "Запустите императивный вызов, чтобы увидеть результат Promise.",
+    "confirmResolved": "confirm вернул: {value}",
+    "promptCancelled": "prompt отменён",
+    "promptResolved": "prompt вернул: {value}",
+    "alertAcknowledged": "alert закрыт"
+  },
+  "confirm": {
+    "trigger": "Удалить рабочее пространство (confirm)",
+    "title": "Удалить рабочее пространство?",
+    "message": "Действие необратимо.",
+    "confirmText": "Удалить",
+    "cancelText": "Оставить"
+  },
+  "prompt": {
+    "trigger": "Переименовать проект (prompt)",
+    "title": "Переименовать проект",
+    "message": "Выберите новое имя проекта.",
+    "label": "Имя проекта",
+    "placeholder": "Например: Atlas",
+    "confirmText": "Сохранить"
+  },
+  "alert": {
+    "trigger": "Показать alert",
+    "title": "Сохранено",
+    "message": "Настройки рабочего пространства сохранены.",
+    "confirmText": "Понятно"
+  },
+  "network": {
+    "trigger": "Пригласить коллегу (async onConfirm)",
+    "title": "Пригласить коллегу",
+    "message": "Отправьте приглашение коллеге.",
+    "label": "Рабочая почта",
+    "placeholder": "name@company.com",
+    "confirmText": "Отправить приглашение",
+    "idle": "Откройте диалог: 1-я попытка вернёт серверную валидацию (422), 2-я — обрыв сети, 3-я завершится успехом.",
+    "opened": "Диалог открыт. Жмите «Отправить приглашение», чтобы пройти сценарии loading → валидация → сеть → успех.",
+    "serverMessage": "Переданные данные некорректны.",
+    "fieldError": "Этот адрес уже приглашён.",
+    "cancelled": "prompt отменён (после {attempts} попыток)",
+    "sent": "приглашение отправлено: {email} (успех с {attempts}-й попытки)"
+  }
+}

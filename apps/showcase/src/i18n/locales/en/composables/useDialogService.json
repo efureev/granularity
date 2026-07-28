@@ -1,0 +1,44 @@
+{
+  "status": {
+    "idle": "Run an imperative call to see the resolved Promise.",
+    "confirmResolved": "confirm resolved: {value}",
+    "promptCancelled": "prompt cancelled",
+    "promptResolved": "prompt resolved: {value}",
+    "alertAcknowledged": "alert acknowledged"
+  },
+  "confirm": {
+    "trigger": "Delete workspace (confirm)",
+    "title": "Delete workspace?",
+    "message": "This action cannot be undone.",
+    "confirmText": "Delete",
+    "cancelText": "Keep"
+  },
+  "prompt": {
+    "trigger": "Rename project (prompt)",
+    "title": "Rename project",
+    "message": "Pick a new project name.",
+    "label": "Project name",
+    "placeholder": "e.g. Atlas",
+    "confirmText": "Save"
+  },
+  "alert": {
+    "trigger": "Show alert",
+    "title": "Saved",
+    "message": "Your workspace settings have been saved.",
+    "confirmText": "Got it"
+  },
+  "network": {
+    "trigger": "Invite teammate (async onConfirm)",
+    "title": "Invite teammate",
+    "message": "Send an invite to a teammate.",
+    "label": "Work email",
+    "placeholder": "name@company.com",
+    "confirmText": "Send invite",
+    "idle": "Open the dialog: the 1st attempt returns server validation (422), the 2nd drops the network, the 3rd succeeds.",
+    "opened": "Dialog is open. Press “Send invite” to walk through loading → validation → network → success.",
+    "serverMessage": "The given data was invalid.",
+    "fieldError": "This email is already invited.",
+    "cancelled": "prompt cancelled (after {attempts} attempts)",
+    "sent": "invite sent: {email} (succeeded on attempt {attempts})"
+  }
+}
