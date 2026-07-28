@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrRadioGroup, GrSelect } from '@feugene/granularity'
+import { GrFormField, GrRadioGroup, GrSelect } from '@feugene/granularity'
 
 const view = ref('board')
 const size = ref<'sm' | 'md' | 'lg'>('md')
@@ -21,11 +21,12 @@ const viewOptions = [
 
 <template>
   <div class="grid gap-4">
-    <div class="grid gap-3 md:max-w-[220px]">
-      <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        Button size
-      </div>
-      <GrSelect v-model="size" :options="sizeOptions" />
+    <!-- GrFormField, а не отдельный div с текстом: он выдаёт селекту id и связывает
+         с ним `<label for>`. Нарисованная рядом подпись доступным именем не становится. -->
+    <div class="md:max-w-[220px]">
+      <GrFormField label="Button size">
+        <GrSelect v-model="size" :options="sizeOptions" />
+      </GrFormField>
     </div>
 
     <GrRadioGroup v-model="view" :options="viewOptions" variant="button" :size="size" />

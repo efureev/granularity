@@ -12,6 +12,7 @@ import { ref } from 'vue'
 
 import {
   GrButton,
+  GrFormField,
   GrResponseErrorBanner,
   GrSelect,
   type ResponseErrorInfo,
@@ -34,7 +35,9 @@ function onRetry(_info: ResponseErrorInfo) {
 </script>
 
 <template>
-  <GrSelect v-model="selectedPreset" :options="presetOptions" />
+  <GrFormField label="Пресет ошибки">
+    <GrSelect v-model="selectedPreset" :options="presetOptions" />
+  </GrFormField>
   <GrButton size="sm" @click="trigger">Бросить ошибку</GrButton>
   <GrResponseErrorBanner :error="currentError" can-retry @retry="onRetry" @dismiss="dismiss" />
 </template>`,

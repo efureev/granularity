@@ -13,6 +13,7 @@
   "preset.server-500": "Server error (500)",
   "preset.file-validation": "FileValidationError (local)",
   "preset.plain-string": "Plain string",
+  "presetLabel": "Error preset",
   "mock.laravel.message": "Uploading the file field failed.",
   "mock.laravel.file.required": "File is required.",
   "mock.laravel.file.size": "File must not exceed 5 MB.",

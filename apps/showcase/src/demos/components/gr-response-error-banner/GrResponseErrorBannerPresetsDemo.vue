@@ -4,6 +4,7 @@ import {computed, ref, shallowRef} from 'vue'
 import {
   GrButton,
   GrCard,
+  GrFormField,
   GrResponseErrorBanner,
   GrSelect,
   type ResponseErrorInfo,
@@ -178,7 +179,11 @@ const currentJson = computed(() => currentError.value ? JSON.stringify(currentEr
   <GrCard class="grid gap-3 p-4">
     <div class="flex flex-wrap items-end gap-3">
       <div class="min-w-[260px] flex-1">
-        <GrSelect v-model="selectedPreset" :options="presetOptions"/>
+        <!-- Подпись через GrFormField: она даёт селекту доступное имя, а не просто
+             рисуется рядом. -->
+        <GrFormField :label="t(`${NS}.presetLabel`)">
+          <GrSelect v-model="selectedPreset" :options="presetOptions" />
+        </GrFormField>
       </div>
       <GrButton size="sm" variant="primary" @click="trigger">
         {{ t(`${NS}.Throw error`) }}

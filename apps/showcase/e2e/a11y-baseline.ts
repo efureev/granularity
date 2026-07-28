@@ -22,13 +22,15 @@
  * снята вовсе — доступным контролом стал сам нативный `<input type="file">`.
  *
  * Что стоит за оставшимися пунктами:
- *  - `button-name` / `select-name` / `label` — точечные icon-only кнопки и нативные
- *    контролы без доступного имени в отдельных компонентах/демо. У `GrSegmented` оба
- *    пункта закрыты 2026-07-29: в `GrSegmentedOption` появилось поле `ariaLabel` для
- *    icon-only сегментов, а подписи селектов в демо переведены с самодельного `div`
- *    на `GrFormField` (он и выдаёт контролу id, и связывает с ним `<label for>`).
- *    Оставшиеся `select-name` у `GrRadioGroup`/`GrResponseErrorBanner` — тот же
- *    дефект демо и лечится так же.
+ *  - `button-name` / `label` — точечные icon-only кнопки и нативные контролы без
+ *    доступного имени в отдельных компонентах/демо.
+ *
+ * `select-name` выжжен полностью 2026-07-29. Дефект был не в `GrSelect`, а в демо:
+ * подпись рисовалась отдельным `div`, а нарисованный рядом текст доступным именем не
+ * становится — `GrSelect` берёт id только из `GrFormField`. Все три места
+ * (GrSegmented, GrRadioGroup, GrResponseErrorBanner) переведены на `GrFormField`.
+ * Тогда же у `GrSegmented` закрыт `button-name`: в `GrSegmentedOption` появилось поле
+ * `ariaLabel` для icon-only сегментов.
  *  - `scrollable-region-focusable` — скролл-контейнер без доступа с клавиатуры.
  *
  * Чем проверять, не протух ли список: `A11Y_AUDIT=1` в прогоне `test:a11y` игнорирует
@@ -41,8 +43,6 @@ export const a11yKnownIssues: Record<string, string[]> = {
   GrDataTable: ['button-name'],
   GrInputTag: ['label'],
   GrList: ['button-name'],
-  GrRadioGroup: ['select-name'],
-  GrResponseErrorBanner: ['select-name'],
   GrToaster: ['scrollable-region-focusable'],
 }
 
