@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
+
+import { GR_CONFIG_KEY } from '../../GrConfigProvider/context'
 
 vi.mock('~icons/lucide/info', () => {
   return {
@@ -81,7 +83,7 @@ describe('GrAlert', () => {
     expect(wrapper.emitted('close')?.length).toBe(1)
   })
 
-  it('применяет amber-цвета для tone warning с variant light', () => {
+  it('устаревший variant light рендерится как soft, без hex-литералов', () => {
     const wrapper = mount(GrAlert, {
       props: {
         tone: 'warning',
@@ -94,14 +96,13 @@ describe('GrAlert', () => {
       },
     })
 
-    const alert = wrapper.get('[role="alert"]').element as HTMLDivElement
+    const alert = wrapper.element as HTMLDivElement
 
-    expect(alert.style.getPropertyValue('--gr-alert-bg')).toBe('#fffbeb')
-    expect(alert.style.getPropertyValue('--gr-alert-brd')).toBe('#fcd34d')
-    expect(alert.style.getPropertyValue('--gr-alert-icon-color')).toBe('#92400e')
-    expect(alert.style.getPropertyValue('--gr-alert-title-color')).toBe('#92400e')
-    expect(alert.style.getPropertyValue('--gr-alert-text-color')).toBe('#92400e')
-    expect(alert.style.getPropertyValue('--gr-alert-close-color')).toBe('#92400e')
+    expect(alert.style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-warning-light)')
+    expect(alert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-warning-text)')
+    expect(alert.style.getPropertyValue('--gr-alert-title-color')).toBe('var(--gr-warning-text)')
+    expect(alert.style.getPropertyValue('--gr-alert-text-color')).toBe('var(--gr-warning-text)')
+    expect(alert.getAttribute('style')).not.toMatch(/#[0-9a-f]{3,8}\b/i)
   })
 
   it('позволяет переопределить цвета через пропсы', () => {
@@ -119,7 +120,7 @@ describe('GrAlert', () => {
       },
     })
 
-    const alert = wrapper.get('[role="alert"]').element as HTMLDivElement
+    const alert = wrapper.element as HTMLDivElement
 
     expect(alert.style.getPropertyValue('--gr-alert-bg')).toBe('#111827')
     expect(alert.style.getPropertyValue('--gr-alert-brd')).toBe('#22c55e')
@@ -130,30 +131,80 @@ describe('GrAlert', () => {
   })
 
   it('поддерживает tones slate и azure', () => {
-    const slate = mount(GrAlert, {
-      props: {
-        tone: 'slate',
-      },
-      slots: {
-        default: 'Slate body',
-      },
-    })
+    const slate = mount(GrAlert, { props: { tone: 'slate' }, slots: { default: 'Slate body' } })
+    const azure = mount(GrAlert, { props: { tone: 'azure' }, slots: { default: 'Azure body' } })
 
-    const azure = mount(GrAlert, {
-      props: {
-        tone: 'azure',
-      },
-      slots: {
-        default: 'Azure body',
-      },
-    })
-
-    const slateAlert = slate.get('[role="alert"]').element as HTMLDivElement
-    const azureAlert = azure.get('[role="alert"]').element as HTMLDivElement
+    const slateAlert = slate.element as HTMLDivElement
+    const azureAlert = azure.element as HTMLDivElement
 
     expect(slateAlert.style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-slate-light)')
-    expect(slateAlert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-slate)')
+    expect(slateAlert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-slate-text)')
     expect(azureAlert.style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-azure-light)')
-    expect(azureAlert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-azure)')
+    expect(azureAlert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-azure-text)')
+  })
+
+  describe('live-регион', () => {
+    it('warning и danger объявляются assertive (role=alert)', () => {
+      for (const tone of ['warning', 'danger'] as const) {
+        const wrapper = mount(GrAlert, { props: { tone }, slots: { default: 'Body' } })
+        expect(wrapper.attributes('role'), tone).toBe('alert')
+      }
+    })
+
+    it('спокойные тоны не перебивают речь (role=status)', () => {
+      for (const tone of ['info', 'success', 'primary', 'neutral', 'slate', 'azure'] as const) {
+        const wrapper = mount(GrAlert, { props: { tone }, slots: { default: 'Body' } })
+        expect(wrapper.attributes('role'), tone).toBe('status')
+      }
+    })
+
+    it('проп live перекрывает вывод по тону', () => {
+      expect(mount(GrAlert, { props: { tone: 'danger', live: 'polite' } }).attributes('role')).toBe('status')
+      expect(mount(GrAlert, { props: { tone: 'info', live: 'assertive' } }).attributes('role')).toBe('alert')
+      expect(mount(GrAlert, { props: { tone: 'info', live: 'off' } }).attributes('role')).toBeUndefined()
+    })
+  })
+
+  it('кнопка закрытия фокусируема с клавиатуры и имеет видимый фокус', () => {
+    const wrapper = mount(GrAlert, { props: { closable: true }, slots: { default: 'Body' } })
+    const btn = wrapper.get('button[aria-label="Close"]')
+
+    expect(btn.attributes('type')).toBe('button')
+    expect(btn.classes().join(' ')).toContain('focus-visible:ring-2')
+  })
+
+  it('читает дефолты из GrConfigProvider', () => {
+    const wrapper = mount(GrAlert, {
+      props: { closable: undefined },
+      slots: { default: 'Body' },
+      global: {
+        provide: {
+          [GR_CONFIG_KEY as symbol]: {
+            size: computed(() => undefined),
+            componentDefaults: computed(() => ({ GrAlert: { tone: 'danger', closable: true } })),
+          },
+        },
+      },
+    })
+
+    expect((wrapper.element as HTMLDivElement).style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-danger-light)')
+    expect(wrapper.find('button[aria-label="Close"]').exists()).toBe(true)
+  })
+
+  it('локальный проп сильнее дефолта из провайдера', () => {
+    const wrapper = mount(GrAlert, {
+      props: { tone: 'success' },
+      slots: { default: 'Body' },
+      global: {
+        provide: {
+          [GR_CONFIG_KEY as symbol]: {
+            size: computed(() => undefined),
+            componentDefaults: computed(() => ({ GrAlert: { tone: 'danger' } })),
+          },
+        },
+      },
+    })
+
+    expect((wrapper.element as HTMLDivElement).style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-success-light)')
   })
 })

@@ -11,16 +11,16 @@
           {
             "name": "tone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
-            "default": "\"info\""
+            "default": "undefined"
           },
           {
             "name": "variant",
             "description": "",
-            "type": "GrAlertVariant | undefined",
+            "type": "GrAlertVariantInput | undefined",
             "required": false,
-            "default": "\"soft\""
+            "default": "undefined"
           },
           {
             "name": "title",
@@ -34,7 +34,14 @@
             "description": "",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
+          },
+          {
+            "name": "live",
+            "description": "",
+            "type": "GrAlertLive | undefined",
+            "required": false,
+            "default": "\"auto\""
           },
           {
             "name": "backgroundColor",
@@ -361,7 +368,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -527,7 +534,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -1239,7 +1246,7 @@
           {
             "name": "confirmTone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -2174,7 +2181,7 @@
           {
             "name": "progressTone",
             "description": "Цветовой тон полосы прогресса в фазе `uploading`.",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -3283,7 +3290,7 @@
           {
             "name": "tagTone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
@@ -3437,7 +3444,7 @@
           {
             "name": "tone",
             "description": "Семантический цвет ссылки из палитры `GrTone`.",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -4192,7 +4199,7 @@
           {
             "name": "tone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -4362,7 +4369,7 @@
           {
             "name": "confirmTone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -4572,7 +4579,7 @@
           {
             "name": "buttonTone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
@@ -4586,7 +4593,7 @@
           {
             "name": "selectedButtonTone",
             "description": "",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
@@ -4735,7 +4742,7 @@
           {
             "name": "tone",
             "description": "Тон заливки; точечно перекрывается переменной `--gr-rating-color`.",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"warning\""
           },
@@ -5613,7 +5620,7 @@
           {
             "name": "tone",
             "description": "Тон значения; точечно перекрывается `--gr-statistic-value-color`.",
-            "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },

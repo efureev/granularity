@@ -41,7 +41,6 @@ const visible = ref(true)
     v-if="visible"
     title="Maintenance window"
     tone="warning"
-    variant="light"
     closable
     @close="visible = false"
   >

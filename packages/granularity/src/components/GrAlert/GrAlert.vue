@@ -1,4 +1,13 @@
 <script setup lang="ts">
+/**
+ * GrAlert — блочное сообщение с тоном, иконкой и опциональным закрытием.
+ *
+ * Цветовая модель вынесена в `grAlertStyles.ts` и выражена **только токенами**
+ * `--gr-*`: компонент одинаково корректен в light и dark без единого hex-литерала.
+ *
+ * Точки кастомизации — переменные `--gr-alert-*` (см. `grAlertCssVars`); пропы
+ * `backgroundColor`/`textColor`/`borderColor` — тот же контракт, но точечно.
+ */
 import { computed } from 'vue'
 
 import IconWarning from '~icons/lucide/alert-triangle'
@@ -7,49 +16,56 @@ import IconInfo from '~icons/lucide/info'
 import IconClose from '~icons/lucide/x'
 import IconError from '~icons/lucide/x-circle'
 
+import type { Component } from 'vue'
 import type { GrTone } from '../shared/tones'
+import type { GrAlertIconKey, GrAlertVariantInput } from './grAlertStyles'
+
+import { useGrComponentProp } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import {
+  applyGrAlertOverrides,
+  grAlertCssVars,
+  grAlertIconKey,
+  normalizeGrAlertVariant,
+  resolveGrAlertColors,
+} from './grAlertStyles'
+
+import './defaults'
 
 export type GrAlertTone = GrTone
-export type GrAlertVariant = 'soft' | 'light'
+export type { GrAlertVariant, GrAlertVariantInput } from './grAlertStyles'
 
-type GrAlertResolvedStyles = {
-  bg: string
-  border: string
-  icon: string
-  title: string
-  text: string
-  close: string
-  closeHover: string
-  Icon: unknown
+/**
+ * Режим объявления сообщения скринридеру.
+ * `auto` — по тону: `warning`/`danger` перебивают речь (`role="alert"`),
+ * остальные ждут паузы (`role="status"`).
+ */
+export type GrAlertLive = 'auto' | 'assertive' | 'polite' | 'off'
+
+export interface GrAlertProps {
+  tone?: GrAlertTone
+  variant?: GrAlertVariantInput
+  title?: string
+  closable?: boolean
+  live?: GrAlertLive
+  backgroundColor?: string
+  textColor?: string
+  borderColor?: string
 }
-
-const DEFAULT_TEXT_COLORS = {
-  title: 'var(--gr-fg)',
-  text: 'var(--gr-muted-fg)',
-  close: 'var(--gr-muted-fg)',
-  closeHover: 'var(--gr-fg)',
-} as const
-
-const WARNING_LIGHT_TEXT_COLOR = '#92400e'
 
 const emit = defineEmits<{
   (event: 'close'): void
 }>()
 
-const props = withDefaults(defineProps<{
-  tone?: GrAlertTone
-  variant?: GrAlertVariant
-  title?: string
-  closable?: boolean
-  backgroundColor?: string
-  textColor?: string
-  borderColor?: string
-}>(), {
-  tone: 'info',
-  variant: 'soft',
+// Дефолты tone/variant/closable намеренно `undefined`: «настоящий» дефолт
+// переехал в `useGrComponentProp`, иначе `GrConfigProvider` не смог бы отличить
+// заданный пользователем проп от подставленного Vue.
+const props = withDefaults(defineProps<GrAlertProps>(), {
+  tone: undefined,
+  variant: undefined,
   title: undefined,
-  closable: false,
+  closable: undefined,
+  live: 'auto',
   backgroundColor: undefined,
   textColor: undefined,
   borderColor: undefined,
@@ -57,130 +73,80 @@ const props = withDefaults(defineProps<{
 
 const { t } = useGranularityTranslations()
 
-const getCustomColor = (value?: string) => value?.trim() || undefined
+const tone = useGrComponentProp('GrAlert', 'tone', () => props.tone, 'info')
+const variantInput = useGrComponentProp('GrAlert', 'variant', () => props.variant, 'soft')
+const closable = useGrComponentProp('GrAlert', 'closable', () => props.closable, false)
 
-const SOFT_TONE_STYLES: Record<GrAlertTone, GrAlertResolvedStyles> = {
-  primary: {
-    bg: 'var(--gr-accent)',
-    border: 'color-mix(in srgb, var(--gr-primary) 22%, var(--gr-brd))',
-    icon: 'var(--gr-primary)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconInfo,
-  },
-  neutral: {
-    bg: 'var(--gr-muted)',
-    border: 'var(--gr-brd)',
-    icon: 'var(--gr-muted-fg)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconInfo,
-  },
-  info: {
-    bg: 'var(--gr-info-light)',
-    border: 'color-mix(in srgb, var(--gr-info) 22%, var(--gr-brd))',
-    icon: 'var(--gr-info)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconInfo,
-  },
-  success: {
-    bg: 'var(--gr-success-light)',
-    border: 'color-mix(in srgb, var(--gr-success) 22%, var(--gr-brd))',
-    icon: 'var(--gr-success)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconCheck,
-  },
-  warning: {
-    bg: 'var(--gr-warning-light)',
-    border: 'color-mix(in srgb, var(--gr-warning) 22%, var(--gr-brd))',
-    icon: 'var(--gr-warning)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconWarning,
-  },
-  danger: {
-    bg: 'var(--gr-danger-light)',
-    border: 'color-mix(in srgb, var(--gr-danger) 22%, var(--gr-brd))',
-    icon: 'var(--gr-danger)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconError,
-  },
-  slate: {
-    bg: 'var(--gr-slate-light)',
-    border: 'color-mix(in srgb, var(--gr-slate) 22%, var(--gr-brd))',
-    icon: 'var(--gr-slate)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconInfo,
-  },
-  azure: {
-    bg: 'var(--gr-azure-light)',
-    border: 'color-mix(in srgb, var(--gr-azure) 22%, var(--gr-brd))',
-    icon: 'var(--gr-azure)',
-    ...DEFAULT_TEXT_COLORS,
-    Icon: IconInfo,
-  },
+const variant = computed(() => normalizeGrAlertVariant(variantInput.value))
+
+const ICONS: Record<GrAlertIconKey, Component> = {
+  info: IconInfo,
+  success: IconCheck,
+  warning: IconWarning,
+  danger: IconError,
 }
 
-const LIGHT_TONE_STYLES: Partial<Record<GrAlertTone, GrAlertResolvedStyles>> = {
-  warning: {
-    bg: '#fffbeb',
-    border: '#fcd34d',
-    icon: WARNING_LIGHT_TEXT_COLOR,
-    title: WARNING_LIGHT_TEXT_COLOR,
-    text: WARNING_LIGHT_TEXT_COLOR,
-    close: WARNING_LIGHT_TEXT_COLOR,
-    closeHover: WARNING_LIGHT_TEXT_COLOR,
-    Icon: IconWarning,
-  },
-}
+const icon = computed<Component>(() => ICONS[grAlertIconKey(tone.value)])
 
-const styles = computed<GrAlertResolvedStyles>(() => {
-  const base = (props.variant === 'light' ? LIGHT_TONE_STYLES[props.tone] : undefined) ?? SOFT_TONE_STYLES[props.tone]
-  const customTextColor = getCustomColor(props.textColor)
-
-  return {
-    ...base,
-    bg: getCustomColor(props.backgroundColor) ?? base.bg,
-    border: getCustomColor(props.borderColor) ?? base.border,
-    icon: customTextColor ?? base.icon,
-    title: customTextColor ?? base.title,
-    text: customTextColor ?? base.text,
-    close: customTextColor ?? base.close,
-    closeHover: customTextColor ?? base.closeHover,
-  }
-})
+const colors = computed(() => applyGrAlertOverrides(
+  resolveGrAlertColors(tone.value, variant.value),
+  props,
+))
 
 const rootStyle = computed(() => ({
-  '--gr-alert-bg': styles.value.bg,
-  '--gr-alert-brd': styles.value.border,
-  '--gr-alert-icon-color': styles.value.icon,
-  '--gr-alert-title-color': styles.value.title,
-  '--gr-alert-text-color': styles.value.text,
-  '--gr-alert-close-color': styles.value.close,
-  '--gr-alert-close-hover-color': styles.value.closeHover,
+  ...grAlertCssVars(colors.value),
   background: 'var(--gr-alert-bg)',
   borderColor: 'var(--gr-alert-brd)',
 }))
+
+/**
+ * `role="alert"` — assertive-регион: он прерывает чтение. Вешать его на любое
+ * информационное сообщение значит превращать спокойную подсказку в тревогу,
+ * поэтому по умолчанию его получают только `warning` и `danger`.
+ */
+const role = computed(() => {
+  const mode = props.live === 'auto'
+    ? (tone.value === 'danger' || tone.value === 'warning' ? 'assertive' : 'polite')
+    : props.live
+
+  if (mode === 'off') return undefined
+  return mode === 'assertive' ? 'alert' : 'status'
+})
 </script>
 
 <template>
   <div
-    role="alert"
+    :role="role"
+    data-gr-alert
     class="rounded-[var(--gr-radius-lg)] border px-4 py-3"
     :style="rootStyle"
   >
     <div class="flex items-start gap-3">
-      <component :is="styles.Icon" class="mt-0.5 h-5 w-5 text-[var(--gr-alert-icon-color)]" aria-hidden="true" />
+      <component
+        :is="icon"
+        class="mt-0.5 h-5 w-5 shrink-0 text-[var(--gr-alert-icon-color)]"
+        aria-hidden="true"
+      />
+
       <div class="min-w-0 flex-1">
-        <div v-if="props.title" class="text-[14px] font-700 text-[var(--gr-alert-title-color)]">
+        <div
+          v-if="props.title"
+          class="text-[length:var(--gr-text-sm)] font-600 text-[var(--gr-alert-title-color)]"
+        >
           {{ props.title }}
         </div>
-        <div class="mt-0.5 text-[13px] text-[var(--gr-alert-text-color)]">
+        <div
+          class="text-[length:var(--gr-text-sm)] leading-relaxed text-[var(--gr-alert-text-color)]"
+          :class="props.title ? 'mt-1' : ''"
+        >
           <slot />
         </div>
       </div>
 
       <button
-        v-if="props.closable"
+        v-if="closable"
         type="button"
-        class="-mr-1 -mt-1 rounded-[var(--gr-radius-md)] p-1 text-[var(--gr-alert-close-color)] transition-colors hover:text-[var(--gr-alert-close-hover-color)]"
+        class="-mr-1.5 -mt-1.5 shrink-0 rounded-[var(--gr-radius-md)] p-1.5 text-[var(--gr-alert-close-color)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] hover:bg-[var(--gr-alert-close-hover-bg)] hover:text-[var(--gr-alert-close-hover-color)]"
         :aria-label="t('gr.common.close', 'Close')"
         @click="emit('close')"
       >

@@ -14,7 +14,6 @@ const visible = ref(true)
       v-if="visible"
       :title="t('components.GrAlert.closable.title')"
       tone="warning"
-      variant="light"
       closable
       @close="visible = false"
     >
