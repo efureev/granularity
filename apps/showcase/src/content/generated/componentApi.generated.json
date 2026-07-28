@@ -754,6 +754,13 @@
             "default": "false"
           },
           {
+            "name": "ariaLabel",
+            "description": "Имя контрола, когда подписи в слоте нет (или она чисто визуальная).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "required",
             "description": "",
             "type": "boolean | undefined",

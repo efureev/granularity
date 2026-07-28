@@ -103,6 +103,60 @@ describe('GrCheckbox', () => {
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
   })
 
+  // Роль `checkbox` объявляет потомков презентационными: ни нативный input, ни
+  // интерактивная подпись не могут жить внутри — скринридер их теряет, axe падает
+  // на `nested-interactive`. Поэтому роль висит только на контроле.
+  it('не держит внутри role="checkbox" ни нативный input, ни содержимое слота', () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false },
+      slots: { default: '<a href="https://example.com">policy</a>' },
+    })
+
+    const control = wrapper.get('[role="checkbox"]')
+    expect(control.find('input').exists()).toBe(false)
+    expect(control.find('a').exists()).toBe(false)
+    expect(wrapper.find('a').exists()).toBe(true)
+  })
+
+  it('берёт имя из подписи через aria-labelledby, а без слота — из ariaLabel', () => {
+    const withLabel = mount(GrCheckbox, {
+      props: { modelValue: false },
+      slots: { default: 'Terms' },
+    })
+
+    const labelledBy = withLabel.get('[role="checkbox"]').attributes('aria-labelledby')
+    expect(labelledBy).toBeTruthy()
+    expect(withLabel.get(`[id="${labelledBy}"]`).text()).toBe('Terms')
+
+    const withAriaLabel = mount(GrCheckbox, {
+      props: { modelValue: false, ariaLabel: 'Select row' },
+    })
+
+    const control = withAriaLabel.get('[role="checkbox"]')
+    expect(control.attributes('aria-label')).toBe('Select row')
+    expect(control.attributes('aria-labelledby')).toBeUndefined()
+  })
+
+  it('переносит required на контрол как aria-required, сохраняя его на нативном input', () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false, required: true },
+      slots: { default: 'Terms' },
+    })
+
+    expect(wrapper.get('[role="checkbox"]').attributes('aria-required')).toBe('true')
+    expect(wrapper.get('input[type="checkbox"]').attributes('required')).toBeDefined()
+  })
+
+  it('клик по подписи переключает значение', async () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false },
+      slots: { default: 'Terms' },
+    })
+
+    await wrapper.get('[data-gr-checkbox] > span:last-child').trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
+  })
+
   it('Enter больше не переключает (нестандартно для чекбокса), Space — переключает', async () => {
     const wrapper = mount(GrCheckbox, {
       props: { modelValue: false },

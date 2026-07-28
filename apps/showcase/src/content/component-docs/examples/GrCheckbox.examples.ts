@@ -135,7 +135,13 @@ function onSubmit(event: SubmitEvent): void {
       </div>
     </form>
 
-    <pre class="overflow-x-auto rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-fg)] p-4 text-xs text-[var(--gr-bg)]">{{ submission }}</pre>
+    <!-- tabindex: скроллящийся блок обязан быть достижим с клавиатуры,
+         иначе его содержимое недоступно без мыши (axe: scrollable-region-focusable). -->
+    <pre
+      tabindex="0"
+      aria-label="Submitted form data"
+      class="overflow-x-auto rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-fg)] p-4 text-xs text-[var(--gr-bg)]"
+    >{{ submission }}</pre>
   </div>
 </template>`,
   },

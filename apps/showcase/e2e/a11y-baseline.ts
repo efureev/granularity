@@ -13,20 +13,17 @@
  * `--gr-muted-fg`, из-за которого правило раньше было выключено, исправлен в
  * обеих темах.
  *
- * С 2026-07-28 (ANALYSIS §53) снят главный пункт долга: `nested-interactive` у
- * `GrRadio`/`GrSegmented`. Корень был в паттерне «элемент с `role="radio"` + вложенный
- * скрытый native `<input type="radio">`»: роль объявляет потомков презентационными,
- * поэтому вложенный контрол ломал виджет. Обе реализации перешли на
- * `input[type="hidden"]` для отправки формой — 9 компонентов ушли из baseline'а
- * (GrBadge, GrButton, GrInput, GrLink, GrNumberInput, GrRadio, GrSelect, GrSwitch,
- * GrToaster: они держали долг только из-за этих контролов в builder-демо).
+ * С 2026-07-28 (ANALYSIS §53) снят главный пункт долга — `nested-interactive`:
+ * с 14 компонентов до одного. Корень был в паттерне «элемент с виджет-ролью +
+ * вложенный скрытый native input»: роль объявляет потомков презентационными, поэтому
+ * вложенный контрол ломал виджет. `GrRadio`/`GrSegmented` перешли на
+ * `input[type="hidden"]`, у `GrCheckbox` роль сужена до самого контрола, а подпись
+ * (вместе с её ссылками и кнопками) вынесена наружу и связана `aria-labelledby`.
  *
  * Что стоит за оставшимися пунктами:
- *  - `nested-interactive` — тот же паттерн в `GrCheckbox` (`role="checkbox"` + native
- *    `<input>`) и его тираж в демо GrFormField/GrFormSection/GrFileUpload. Разошлось с
- *    GrRadio в одном: id живёт на нативном input, и внешний `<label for="…">`
- *    переключает чекбокс. Убрать input — потерять эту связку, поэтому нужна отдельная
- *    правка с заменой механики label, а не копия решения GrRadio.
+ *  - `nested-interactive` у `GrFileUpload` — drop-zone `role="button"` с нативным
+ *    `<input type="file">` внутри. Лечится тем же приёмом, что и остальные, но у
+ *    file-input своя механика открытия диалога — нужна отдельная правка.
  *  - `button-name` / `select-name` / `label` — точечные icon-only кнопки и нативные
  *    контролы без доступного имени в отдельных компонентах/демо.
  *  - `scrollable-region-focusable` — скролл-контейнер без доступа с клавиатуры.
@@ -38,16 +35,14 @@
  * `GrTree`, `GrDropdown`, `GrModal` и др. — они проходят гейт начисто.
  */
 export const a11yKnownIssues: Record<string, string[]> = {
-  GrCheckbox: ['nested-interactive', 'scrollable-region-focusable'],
   GrDataTable: ['button-name'],
   GrFileUpload: ['nested-interactive'],
-  GrFormField: ['nested-interactive'],
-  GrFormSection: ['nested-interactive'],
   GrInputTag: ['label'],
   GrList: ['button-name'],
   GrRadioGroup: ['select-name'],
   GrResponseErrorBanner: ['select-name'],
   GrSegmented: ['button-name', 'select-name'],
+  GrToaster: ['scrollable-region-focusable'],
 }
 
 export function knownIssuesFor(componentName: string): string[] {
