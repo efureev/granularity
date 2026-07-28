@@ -1,4 +1,8 @@
 /*
+ * СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
+ * Менять значения и комментарии нужно в JSON, затем перегенерировать.
+ */
+/*
  * Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит
  * `useTheme`/`initThemeEarly`). Селекторы `.theme-dark` и `.dark` — DEPRECATED-алиасы
  * для обратной совместимости; в новом коде используйте `[data-theme]`.
@@ -14,8 +18,10 @@
   --gr-popover: #1e293b;
   --gr-popover-fg: #f8fafc;
   --gr-muted: #334155;
-  /* Симметрично light: минимум по фону `--gr-muted`/`--gr-secondary` (#334155).
-     Прежний #94a3b8 давал там 4.04, #aab6c7 даёт 5.04. */
+  /*
+   * Симметрично light: минимум по фону `--gr-muted`/`--gr-secondary` (#334155).
+   * Прежний #94a3b8 давал там 4.04, #aab6c7 даёт 5.04.
+   */
   --gr-muted-fg: #aab6c7;
   --gr-secondary: #334155;
   --gr-secondary-fg: #f1f5f9;
@@ -86,9 +92,9 @@
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
+  [data-theme='dark'],
   .theme-dark,
-  .dark,
-  [data-theme='dark'] {
+  .dark {
     /* Action role fallbacks */
     --gr-primary-hover: #a494fa;
     --gr-primary-active: #ac9dfa;
@@ -108,12 +114,9 @@
     --gr-danger-active: #f88787;
     --gr-info-hover: #8b95f8;
     --gr-info-active: #949ef9;
-    --gr-slate-hover: #9faec0;
-    --gr-slate-active: #aab7c8;
-    --gr-azure-hover: #4bc3f9;
-    --gr-azure-active: #5dcbf9;
-
-    /* Component semantic fallbacks */
-    /*--gr-category-tree-branch-line-active-color: #505b8c;*/
+    --gr-slate-hover: #9caabd;
+    --gr-slate-active: #a4b1c3;
+    --gr-azure-hover: #47c2f8;
+    --gr-azure-active: #57c7f9;
   }
 }

@@ -25,6 +25,7 @@
 
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
 - [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы и порядок импортов.
+- [`tokens.md`](./tokens.md) — справочник токенов (генерируется из `tokens/*.json`, руками не править).
 - [`unocss.md`](./unocss.md) — интеграция с `UnoCSS` через `presetGranularNode` из `@feugene/unocss-preset-granular/node`
   и granular-провайдер `@feugene/granularity/granular-provider/node`.
 - [`vue-plugin.md`](./vue-plugin.md) — runtime-адаптер `@feugene/granularity/vue`: `createGranularity`,

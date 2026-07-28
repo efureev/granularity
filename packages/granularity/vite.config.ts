@@ -291,6 +291,11 @@ export default defineConfig({
         'granular-provider-node': fileURLToPath(
           new URL('./src/granular-provider/node.ts', import.meta.url),
         ),
+        // Справочник токенов (данные из `tokens/*.json`) — отдельной entry,
+        // чтобы не попадать в основной бандл: он нужен докам и инструментам.
+        'tokens': fileURLToPath(
+          new URL('./src/tokens/index.ts', import.meta.url),
+        ),
       },
       formats: ['es'],
       fileName: (_format, entryName) => `${entryName}.js`,

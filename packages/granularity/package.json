@@ -39,7 +39,8 @@
   "types": "./dist/types/src/index.d.ts",
   "web-types": "./dist/web-types.json",
   "files": [
-    "dist"
+    "dist",
+    "tokens"
   ],
   "sideEffects": [
     "**/*.css"
@@ -352,7 +353,13 @@
       "types": "./dist/types/src/granular-provider/node.d.ts",
       "import": "./dist/granular-provider-node.js",
       "default": "./dist/granular-provider-node.js"
-    }
+    },
+    "./tokens": {
+      "types": "./dist/types/src/tokens/index.d.ts",
+      "import": "./dist/tokens.js",
+      "default": "./dist/tokens.js"
+    },
+    "./tokens/*.json": "./tokens/*.json"
   },
   "peerDependencies": {
     "@feugene/fint-i18n": "^0.3.0",
@@ -392,7 +399,8 @@
     "lint:fix": "eslint . --cache --fix",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
-    "test:run": "vitest run --config vitest.config.ts"
+    "test:run": "vitest run --config vitest.config.ts",
+    "generate:tokens": "node scripts/generate-tokens.mjs"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",

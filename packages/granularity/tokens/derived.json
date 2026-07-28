@@ -1,0 +1,156 @@
+{
+  "groups": [
+    {
+      "title": "Derived interaction formulas: action roles",
+      "fallbackTitle": "Action role fallbacks",
+      "tokens": [
+        {
+          "name": "--gr-primary-hover",
+          "description": "Hover-состояние primary action: подмес `--gr-fg` 8% в `--gr-primary`.",
+          "base": "--gr-primary",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-primary-active",
+          "description": "Active-состояние primary action: подмес `--gr-fg` 16% в `--gr-primary`.",
+          "base": "--gr-primary",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-secondary-hover",
+          "description": "Hover-состояние secondary action: подмес `--gr-fg` 8% в `--gr-secondary`.",
+          "base": "--gr-secondary",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-secondary-active",
+          "description": "Active-состояние secondary action: подмес `--gr-fg` 16% в `--gr-secondary`.",
+          "base": "--gr-secondary",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-brd-hover",
+          "description": "Hover-состояние бордеров и outline-элементов: подмес `--gr-fg` 30% в `--gr-brd`.",
+          "base": "--gr-brd",
+          "amount": 70,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-brd-active",
+          "description": "Active-состояние бордеров и outline-элементов: подмес `--gr-fg` 45% в `--gr-brd`.",
+          "base": "--gr-brd",
+          "amount": 55,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-destructive-hover",
+          "description": "Hover-состояние destructive action: подмес `--gr-fg` 8% в `--gr-destructive`.",
+          "base": "--gr-destructive",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-destructive-active",
+          "description": "Active-состояние destructive action: подмес `--gr-fg` 16% в `--gr-destructive`.",
+          "base": "--gr-destructive",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        }
+      ]
+    },
+    {
+      "title": "Derived interaction formulas: status roles",
+      "fallbackTitle": "Status role fallbacks",
+      "tokens": [
+        {
+          "name": "--gr-success-hover",
+          "description": "Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`.",
+          "base": "--gr-success",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-success-active",
+          "description": "Active-состояние success-ролей: подмес `--gr-fg` 16% в `--gr-success`.",
+          "base": "--gr-success",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-warning-hover",
+          "description": "Hover-состояние warning-ролей: подмес `--gr-fg` 8% в `--gr-warning`.",
+          "base": "--gr-warning",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-warning-active",
+          "description": "Active-состояние warning-ролей: подмес `--gr-fg` 16% в `--gr-warning`.",
+          "base": "--gr-warning",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-danger-hover",
+          "description": "Hover-состояние danger-ролей: подмес `--gr-fg` 8% в `--gr-danger`.",
+          "base": "--gr-danger",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-danger-active",
+          "description": "Active-состояние danger-ролей: подмес `--gr-fg` 16% в `--gr-danger`.",
+          "base": "--gr-danger",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-info-hover",
+          "description": "Hover-состояние info-ролей: подмес `--gr-fg` 8% в `--gr-info`.",
+          "base": "--gr-info",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-info-active",
+          "description": "Active-состояние info-ролей: подмес `--gr-fg` 16% в `--gr-info`.",
+          "base": "--gr-info",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-slate-hover",
+          "description": "Hover-состояние slate-ролей: подмес `--gr-fg` 8% в `--gr-slate`.",
+          "base": "--gr-slate",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-slate-active",
+          "description": "Active-состояние slate-ролей: подмес `--gr-fg` 16% в `--gr-slate`.",
+          "base": "--gr-slate",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-azure-hover",
+          "description": "Hover-состояние azure-ролей: подмес `--gr-fg` 8% в `--gr-azure`.",
+          "base": "--gr-azure",
+          "amount": 92,
+          "mixWith": "--gr-fg"
+        },
+        {
+          "name": "--gr-azure-active",
+          "description": "Active-состояние azure-ролей: подмес `--gr-fg` 16% в `--gr-azure`.",
+          "base": "--gr-azure",
+          "amount": 84,
+          "mixWith": "--gr-fg"
+        }
+      ]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import {
   showcaseQuickStartCards,
   showcaseThemeTokens,
 } from '../foundations'
+import { grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
 
 describe('showcase foundations content', () => {
   it('собирает полный foundations coverage для styling, themes, tokens, unocss и localization', () => {
@@ -31,7 +32,7 @@ describe('showcase foundations content', () => {
     expect(showcaseFoundationGuides.find(guide => guide.id === 'tokens')?.narrativeSource).toContain('--gr-space-4')
   })
 
-  it('собирает текущий registry foundation tokens прямо из tokens.css', () => {
+  it('собирает текущий registry foundation tokens из данных пакета', () => {
     expect(showcaseFoundationTokens.length).toBeGreaterThan(40)
     expect(showcaseFoundationTokens.find(token => token.name === '--gr-slate-500')).toMatchObject({
       hexValue: '#64748b',
@@ -41,7 +42,7 @@ describe('showcase foundations content', () => {
     expect(showcaseFoundationTokens.find(token => token.name === '--gr-primary-hover')?.value).toContain('color-mix')
   })
 
-  it('собирает current theme token registry из light.css и dark.css', () => {
+  it('собирает current theme token registry из данных пакета', () => {
     expect(showcaseThemeTokens.length).toBeGreaterThan(30)
     expect(showcaseThemeTokens.find(token => token.name === '--gr-bg')).toMatchObject({
       section: 'Surface roles',
@@ -56,17 +57,24 @@ describe('showcase foundations content', () => {
     })
     expect(showcaseThemeTokens.find(token => token.name === '--gr-primary')?.description).toContain('brand/action цвет')
     expect(showcaseThemeTokens.find(token => token.name === '--gr-primary-hover')?.section).toBe('Fallbacks / action roles')
-    expect(showcaseThemeTokens.find(token => token.name === '--gr-category-tree-branch-line-active-color')).toMatchObject({
-      section: 'Component semantic roles',
-      values: {
-        light: {
-          hexValue: '#c4cdf7',
-        },
-        dark: {
-          hexValue: '#505b8c',
-        },
-      },
-    })
+  })
+
+  // Страница Foundations раньше держала копии `tokens.css`/`themes/*.css` литералами
+  // и молча их протухала. Теперь источник один — данные пакета; проверяем, что
+  // витрина показывает ровно их, а не собственную версию.
+  it('не расходится с данными пакета', () => {
+    for (const token of grThemeTokens) {
+      const shown = showcaseThemeTokens.find(item => item.name === token.name)
+
+      expect(shown, token.name).toBeDefined()
+      expect(shown!.values.light.value, `${token.name} (light)`).toBe(token.values.light)
+      expect(shown!.values.dark.value, `${token.name} (dark)`).toBe(token.values.dark)
+    }
+
+    for (const token of grFoundationTokens) {
+      expect(showcaseFoundationTokens.find(item => item.name === token.name)?.value, token.name)
+        .toBe(token.value)
+    }
   })
 
   it('даёт quick-start snippets и обзорные метрики для landing/foundations страниц', () => {

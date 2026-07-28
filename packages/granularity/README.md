@@ -38,6 +38,7 @@ strategies.
   - `@feugene/granularity/components/<ComponentName>/styles.css` — `foundation` plus styles for a specific component and its dependencies;
 - low-level foundation exports: `@feugene/granularity/styles/tokens.css`, `@feugene/granularity/styles/base.css`, `@feugene/granularity/styles/themes/light.css`, `@feugene/granularity/styles/themes/dark.css`;
 - package-level API: `@feugene/granularity/directives`, `@feugene/granularity/fileValidation`;
+- design tokens as data: `@feugene/granularity/tokens` (typed registry) and the raw `@feugene/granularity/tokens/*.json` source the CSS is generated from;
 - two `UnoCSS` integration scenarios:
     - `@feugene/granularity/uno` — browser-safe preset;
     - `@feugene/granularity/uno-node` — node-oriented preset with CSS/preflight helpers.
@@ -70,6 +71,7 @@ If you need a more precise CSS setup, use `@feugene/granularity/foundation.css` 
 - [`docs/README.md`](./docs/README.md) — overview and documentation map
 - [`docs/installation.md`](./docs/installation.md) — installation, public entrypoints, and adoption strategies
 - [`docs/styling.md`](./docs/styling.md) — style layers, themes, and import order
+- [`docs/tokens.md`](./docs/tokens.md) — design token reference (generated from `tokens/*.json`)
 - [`docs/unocss.md`](./docs/unocss.md) — `UnoCSS` integration
 - [`docs/localization.md`](./docs/localization.md) — how the package plugs into application localization
 - [`docs/directives.md`](./docs/directives.md) — package-level directives

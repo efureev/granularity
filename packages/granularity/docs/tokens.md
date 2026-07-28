@@ -1,0 +1,278 @@
+<!-- СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются. -->
+
+# Токены дизайн-системы
+
+Источник истины — `tokens/*.json` в пакете. Из них генерируются `src/styles/tokens.css`,
+`src/styles/themes/*.css`, TS-справочник `@feugene/granularity/tokens` и этот документ.
+Правка CSS руками бессмысленна: следующая генерация её затрёт.
+
+## Примитивы
+
+Не зависят от темы, живут в `:root`.
+
+### Foundations: neutral palette
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-slate-0` | `#ffffff` | Нейтральный оттенок slate 0 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-50` | `#f8fafc` | Нейтральный оттенок slate 50 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-100` | `#f1f5f9` | Нейтральный оттенок slate 100 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-200` | `#e2e8f0` | Нейтральный оттенок slate 200 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-300` | `#cbd5e1` | Нейтральный оттенок slate 300 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-400` | `#94a3b8` | Нейтральный оттенок slate 400 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-500` | `#64748b` | Нейтральный оттенок slate 500 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-600` | `#475569` | Нейтральный оттенок slate 600 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-700` | `#334155` | Нейтральный оттенок slate 700 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-800` | `#1e293b` | Нейтральный оттенок slate 800 для базовой palette scale, поверхностей и бордеров. |
+| `--gr-slate-900` | `#0f172a` | Нейтральный оттенок slate 900 для базовой palette scale, поверхностей и бордеров. |
+
+### Typography: font families
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-font-ui` | `Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif` | Основной стек шрифта для интерфейсного текста и большинства компонентных подписей. |
+| `--gr-font-mono` | `'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace` | Моноширинный стек для кода, числовых значений и технических подписей. |
+
+### Typography: font sizes
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-text-xs` | `12px` | Размер шрифта `xs` из типографической шкалы foundation tokens. |
+| `--gr-text-sm` | `14px` | Размер шрифта `sm` из типографической шкалы foundation tokens. |
+| `--gr-text-base` | `16px` | Размер шрифта `base` из типографической шкалы foundation tokens. |
+| `--gr-text-lg` | `18px` | Размер шрифта `lg` из типографической шкалы foundation tokens. |
+| `--gr-text-xl` | `20px` | Размер шрифта `xl` из типографической шкалы foundation tokens. |
+| `--gr-text-2xl` | `24px` | Размер шрифта `2xl` из типографической шкалы foundation tokens. |
+| `--gr-text-3xl` | `30px` | Размер шрифта `3xl` из типографической шкалы foundation tokens. |
+| `--gr-text-4xl` | `36px` | Размер шрифта `4xl` из типографической шкалы foundation tokens. |
+
+### Typography: line heights
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-leading-tight` | `1.25` | Коэффициент межстрочного интервала `tight` для текстовых блоков и подписей. |
+| `--gr-leading-normal` | `1.5` | Коэффициент межстрочного интервала `normal` для текстовых блоков и подписей. |
+| `--gr-leading-relaxed` | `1.625` | Коэффициент межстрочного интервала `relaxed` для текстовых блоков и подписей. |
+
+### Typography: font weights
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-font-regular` | `400` | Вес шрифта `regular` для типографической иерархии интерфейса. |
+| `--gr-font-medium` | `500` | Вес шрифта `medium` для типографической иерархии интерфейса. |
+| `--gr-font-semibold` | `600` | Вес шрифта `semibold` для типографической иерархии интерфейса. |
+| `--gr-font-bold` | `700` | Вес шрифта `bold` для типографической иерархии интерфейса. |
+
+### Layout: spacing scale
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-space-0` | `0px` | Шаг spacing scale `0` для отступов, gap и внутренних paddings. |
+| `--gr-space-1` | `4px` | Шаг spacing scale `1` для отступов, gap и внутренних paddings. |
+| `--gr-space-2` | `8px` | Шаг spacing scale `2` для отступов, gap и внутренних paddings. |
+| `--gr-space-3` | `12px` | Шаг spacing scale `3` для отступов, gap и внутренних paddings. |
+| `--gr-space-4` | `16px` | Шаг spacing scale `4` для отступов, gap и внутренних paddings. |
+| `--gr-space-5` | `20px` | Шаг spacing scale `5` для отступов, gap и внутренних paddings. |
+| `--gr-space-6` | `24px` | Шаг spacing scale `6` для отступов, gap и внутренних paddings. |
+| `--gr-space-8` | `32px` | Шаг spacing scale `8` для отступов, gap и внутренних paddings. |
+| `--gr-space-10` | `40px` | Шаг spacing scale `10` для отступов, gap и внутренних paddings. |
+| `--gr-space-12` | `48px` | Шаг spacing scale `12` для отступов, gap и внутренних paddings. |
+| `--gr-space-16` | `64px` | Шаг spacing scale `16` для отступов, gap и внутренних paddings. |
+| `--gr-space-20` | `80px` | Шаг spacing scale `20` для отступов, gap и внутренних paddings. |
+| `--gr-space-24` | `96px` | Шаг spacing scale `24` для отступов, gap и внутренних paddings. |
+| `--gr-space-32` | `128px` | Шаг spacing scale `32` для отступов, gap и внутренних paddings. |
+| `--gr-space-40` | `160px` | Шаг spacing scale `40` для отступов, gap и внутренних paddings. |
+| `--gr-space-48` | `192px` | Шаг spacing scale `48` для отступов, gap и внутренних paddings. |
+| `--gr-space-64` | `256px` | Шаг spacing scale `64` для отступов, gap и внутренних paddings. |
+
+### Layout: containers
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-container-max` | `1280px` | Максимальная ширина layout-контейнера для контентных страниц и shell-структур. |
+| `--gr-container-max-2xl` | `1440px` | Максимальная ширина layout-контейнера для контентных страниц и shell-структур. |
+| `--gr-container-padding-mobile` | `16px` | Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария. |
+| `--gr-container-padding-tablet` | `24px` | Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария. |
+| `--gr-container-padding-desktop` | `32px` | Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария. |
+
+### Layout: breakpoints
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-bp-sm` | `640px` | Foundation breakpoint `sm` для адаптивных layout-решений. |
+| `--gr-bp-md` | `768px` | Foundation breakpoint `md` для адаптивных layout-решений. |
+| `--gr-bp-lg` | `1024px` | Foundation breakpoint `lg` для адаптивных layout-решений. |
+| `--gr-bp-xl` | `1280px` | Foundation breakpoint `xl` для адаптивных layout-решений. |
+| `--gr-bp-2xl` | `1536px` | Foundation breakpoint `2xl` для адаптивных layout-решений. |
+
+### Shapes: radii and compatibility aliases
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--radius` | `0.5rem` | Совместимый alias базового радиуса для интеграций, ожидающих shadcn-style token contract. |
+| `--gr-radius-none` | `0px` | Радиус скругления `none` для углов компонентов и поверхностей. |
+| `--gr-radius-sm` | `4px` | Радиус скругления `sm` для углов компонентов и поверхностей. |
+| `--gr-radius-md` | `8px` | Радиус скругления `md` для углов компонентов и поверхностей. |
+| `--gr-radius-lg` | `12px` | Радиус скругления `lg` для углов компонентов и поверхностей. |
+| `--gr-radius-xl` | `16px` | Радиус скругления `xl` для углов компонентов и поверхностей. |
+| `--gr-radius-full` | `9999px` | Радиус скругления `full` для углов компонентов и поверхностей. |
+
+### Elevation
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-shadow-0` | `none` | Уровень elevation `0` для карточек, popover-слоёв и акцентных поверхностей. |
+| `--gr-shadow-1` | `0 1px 2px rgba(15, 23, 42, 0.08)` | Уровень elevation `1` для карточек, popover-слоёв и акцентных поверхностей. |
+| `--gr-shadow-2` | `0 8px 24px rgba(15, 23, 42, 0.14)` | Уровень elevation `2` для карточек, popover-слоёв и акцентных поверхностей. |
+| `--gr-shadow-3` | `0 16px 48px rgba(15, 23, 42, 0.20)` | Уровень elevation `3` для карточек, popover-слоёв и акцентных поверхностей. |
+
+### Motion
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-duration-fast` | `150ms` | Базовая длительность анимации `fast` для transitions и state changes. |
+| `--gr-duration-base` | `200ms` | Базовая длительность анимации `base` для transitions и state changes. |
+| `--gr-duration-slow` | `300ms` | Базовая длительность анимации `slow` для transitions и state changes. |
+| `--gr-ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | Кривая ускорения `out` для motion-паттернов дизайн-системы. |
+| `--gr-ease-in` | `cubic-bezier(0.7, 0, 0.84, 0)` | Кривая ускорения `in` для motion-паттернов дизайн-системы. |
+
+### Layering: z-index scale
+
+Единый источник истины для слоёв всех компонентов, использующих `position: fixed`
+поверх остального контента. Правило: чем выше в UI-стеке слой обязан оказаться,
+тем больше значение. Floating-панели (dropdown/select/tree-select/tooltip) стоят
+ниже модалок, чтобы поповер, открытый ВНУТРИ модалки, не потерялся под ней, но
+сам этот поповер не обязан перекрывать модалку снаружи — за пределы своего дерева
+floating-компоненты не выходят по построению (v-click-outside/portal рядом с триггером).
+Тосты — единственный слой, который обязан быть виден поверх абсолютно всего,
+включая открытые модалки (это уведомление уровня приложения).
+
+| Токен | Значение | Назначение |
+| --- | --- | --- |
+| `--gr-z-dropdown` | `1000` | Слой якорных floating-панелей: dropdown, select, tree-select. |
+| `--gr-z-tooltip` | `1050` | Слой тултипов — выше floating-панелей, ниже модалок. |
+| `--gr-z-modal` | `1100` | Слой модальных окон и диалогов. |
+| `--gr-z-toast` | `1200` | Слой тостов — единственный, обязанный быть виден поверх всего, включая открытые модалки. |
+
+## Семантические роли по темам
+
+Переключаются селектором темы. Значения выверены по контрасту — см. примечания.
+
+### Surface roles
+
+| Токен | light | dark | Назначение |
+| --- | --- | --- | --- |
+| `--gr-bg` | `#f8fafc` | `#0f172a` | Базовый фон приложения и крупных layout-поверхностей текущей темы. |
+| `--gr-fg` | `#0f172a` | `#f8fafc` | Основной цвет текста и иконок поверх базового фона текущей темы. |
+| `--gr-card` | `#ffffff` | `#1e293b` | Фон карточек, панелей и других поднятых поверхностей. |
+| `--gr-card-fg` | `#0f172a` | `#f8fafc` | Цвет контента внутри карточек и raised surface-блоков. |
+| `--gr-popover` | `#ffffff` | `#1e293b` | Фон popover-, dropdown- и overlay-поверхностей. |
+| `--gr-popover-fg` | `#0f172a` | `#f8fafc` | Цвет текста и иконок внутри popover-слоёв. |
+| `--gr-muted` | `#f1f5f9` | `#334155` | Приглушённая поверхность для вторичных блоков, плашек и заполнений. |
+| `--gr-muted-fg` | `#556275` | `#aab6c7` | Вторичный текстовый цвет для helper-копии и менее важных подписей. |
+| `--gr-secondary` | `#e2e8f0` | `#334155` | Нейтральная secondary action/surface-подложка без сильного бренд-акцента. |
+| `--gr-secondary-fg` | `#1e293b` | `#f1f5f9` | Контрастный текст для secondary-кнопок и поверхностей. |
+| `--gr-brd` | `#e2e8f0` | `#334155` | Базовый цвет бордеров и разделителей текущей темы. |
+| `--gr-input` | `#e2e8f0` | `#334155` | Цвет рамки и фона input-like контролов в состоянии покоя. |
+| `--gr-ring` | `#6366f1` | `#818cf8` | Цвет focus-ring и акцентного outline для интерактивных компонентов. |
+
+> **`--gr-muted-fg` (light).** Вторичный текст обязан проходить AA на САМОМ ТЁМНОМ из фонов, на которых он появляется, а это не страница, а `--gr-secondary` (#e2e8f0). Прежний #64748b держался только на `--gr-bg` (4.55) и `--gr-card` (4.76), но проваливался на `--gr-muted` (4.34) и `--gr-secondary` (3.86) — то есть ровно там, где вторичный текст и живёт: чипы, таблицы, подписи в панелях. #556275 даёт минимум 5.02 по всем четырём фонам.
+
+> **`--gr-muted-fg` (dark).** Симметрично light: минимум по фону `--gr-muted`/`--gr-secondary` (#334155). Прежний #94a3b8 давал там 4.04, #aab6c7 даёт 5.04.
+
+### Action roles
+
+| Токен | light | dark | Назначение |
+| --- | --- | --- | --- |
+| `--gr-primary` | `#4f46e5` | `#9d8bfa` | Главный brand/action цвет темы для primary CTA и ключевых акцентов. |
+| `--gr-primary-fg` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх primary-заливки. |
+| `--gr-accent` | `#eef2ff` | `#1e1b4b` | Мягкая акцентная поверхность для selected/hovered областей и подсветок. |
+| `--gr-accent-fg` | `#3730a3` | `#c7d2fe` | Цвет текста поверх accent-подложек. |
+| `--gr-destructive` | `#dc2626` | `#ef4444` | Цвет destructive action-сценариев и критических состояний. |
+| `--gr-destructive-fg` | `#ffffff` | `#ffffff` | Контрастный текст и иконки поверх destructive-заливки. |
+
+> **`--gr-primary` (dark).** Primary был единственным тоном, выпадавшим из конвенции тёмной темы (светлая заливка + тёмный текст, как у success/warning/danger/info/azure): оставался светло-тёмным индиго #6366f1 с белым текстом и проваливал сразу все три роли — текст на фоне 4.00, текст на карточке 3.27, белый на заливке 4.47. Светлый индиго с тёмным `-fg` даёт 6.38 / 5.23 / 6.38. Не indigo-400 (#818cf8): это ровно `--gr-info` тёмной темы, и solid-бейджи Primary и Info стали бы неотличимы. Кнопок не касается: GrButton задаёт свой `--gr-button-primary-bg`.
+
+### Status roles
+
+| Токен | light | dark | Назначение |
+| --- | --- | --- | --- |
+| `--gr-success` | `#10b981` | `#34d399` | Основной semantic success-цвет для статусов, бейджей и уведомлений. |
+| `--gr-success-light` | `#d1fae5` | `#064e3b` | Облегчённая success-подложка для мягких статусов и подсветок. |
+| `--gr-success-fg` | `#0f172a` | `#0f172a` | Контрастный текст и иконки поверх success-заливки. |
+| `--gr-success-text` | `#065f46` | `#6ee7b7` | Текстовый оттенок для success-сообщений на светлой подложке. |
+| `--gr-warning` | `#f97316` | `#fb923c` | Основной semantic warning-цвет для предупреждений и промежуточных статусов. |
+| `--gr-warning-light` | `#ffedd5` | `#7c2d12` | Облегчённая warning-подложка для мягких warning-состояний. |
+| `--gr-warning-fg` | `#0f172a` | `#0f172a` | Контрастный текст и иконки поверх warning-заливки. |
+| `--gr-warning-text` | `#7c2d12` | `#fdba74` | Текстовый оттенок для warning-сообщений на мягкой warning-подложке. |
+| `--gr-danger` | `#dc2626` | `#f87171` | Semantic danger-цвет для ошибок, рисков и критических сообщений. |
+| `--gr-danger-light` | `#fee2e2` | `#7f1d1d` | Облегчённая danger-подложка для мягких error-состояний. |
+| `--gr-danger-fg` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх danger-заливки. |
+| `--gr-danger-text` | `#991b1b` | `#fca5a5` | Текстовый оттенок для error-сообщений на мягкой danger-подложке. |
+| `--gr-info` | `#5850ec` | `#818cf8` | Semantic info-цвет для нейтральных уведомлений и информационных акцентов. |
+| `--gr-info-light` | `#e0e7ff` | `#312e81` | Облегчённая info-подложка для спокойных информационных блоков. |
+| `--gr-info-fg` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх info-заливки. |
+| `--gr-info-text` | `#3730a3` | `#c7d2fe` | Текстовый оттенок для спокойных info-сообщений и подсказок. |
+| `--gr-slate` | `#475569` | `#94a3b8` | Нейтральный semantic slate-цвет для subdued индикаторов и secondary статусов. |
+| `--gr-slate-light` | `#e2e8f0` | `#334155` | Облегчённая slate-подложка для мягких нейтральных состояний. |
+| `--gr-slate-fg` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх slate-заливки. |
+| `--gr-slate-text` | `#334155` | `#cbd5e1` | Текстовый оттенок для нейтральных slate-сообщений и плашек. |
+| `--gr-azure` | `#0077b6` | `#38bdf8` | Semantic azure-цвет для информационных акцентов и вспомогательных статусов. |
+| `--gr-azure-light` | `#e0f2fe` | `#0c4a6e` | Облегчённая azure-подложка для мягких informational поверхностей. |
+| `--gr-azure-fg` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх azure-заливки. |
+| `--gr-azure-text` | `#075985` | `#bae6fd` | Текстовый оттенок для azure-плашек и спокойных informational блоков. |
+
+> **`--gr-success` (light).** `-fg` — цвет текста НА сплошной заливке тоном. У светлых заливок он обязан быть тёмным: белый на `--gr-success` даёт 2.54:1, на `--gr-warning` 2.80:1 при пороге AA 4.5 — а это solid-кнопки и бейджи (`grButtonStyles.ts`, `grBadgeStyles.ts`). С `--gr-fg` получаем 7.04 и 6.37, и hover/active, которые уводят заливку в тёмную сторону, остаются выше порога (5.30 / 4.79). В тёмной теме эти токены уже тёмные — там заливки светлее фона.
+
+> **`--gr-azure` (light).** Azure — единственный тон, который не чинится сменой `-fg`. Тёмный текст проходит на базе (6.44), но hover/active уводят заливку вниз и ломают его (4.36 / 3.01); белый же не проходит на базе (2.77). Выход один — сама заливка: sky-500 `#0ea5e9` слишком светлая для белого текста. `#0077b6` — самое светлое значение, дающее запас по всем трём состояниям (4.87 / 5.44 / 6.02) и заодно поднимающее azure-иконку на `-light` подложке с 2.42 до 4.24. Оттенок остаётся отличимым от `--gr-info`.
+
+### Data visualization roles
+
+| Токен | light | dark | Назначение |
+| --- | --- | --- | --- |
+| `--gr-chart-1` | `#4f46e5` | `#6366f1` | Первый цвет серии для графиков и data-visualization элементов. |
+| `--gr-chart-2` | `#10b981` | `#34d399` | Второй цвет серии для графиков и data-visualization элементов. |
+| `--gr-chart-3` | `#f97316` | `#fb923c` | Третий цвет серии для графиков и data-visualization элементов. |
+| `--gr-chart-4` | `#6366f1` | `#818cf8` | Четвёртый цвет серии для графиков и data-visualization элементов. |
+| `--gr-chart-5` | `#8b5cf6` | `#a78bfa` | Пятый цвет серии для графиков и data-visualization элементов. |
+
+### Navigation roles
+
+| Токен | light | dark | Назначение |
+| --- | --- | --- | --- |
+| `--gr-sidebar` | `#ffffff` | `#1e293b` | Фон sidebar/navigation rail области текущей темы. |
+| `--gr-sidebar-fg` | `#0f172a` | `#f8fafc` | Основной текст и иконки внутри sidebar. |
+| `--gr-sidebar-primary` | `#4f46e5` | `#6366f1` | Акцентный цвет активных/ключевых элементов внутри sidebar. |
+| `--gr-sidebar-primary-fg` | `#ffffff` | `#ffffff` | Контрастный текст поверх sidebar primary-акцентов. |
+| `--gr-sidebar-accent` | `#f1f5f9` | `#334155` | Мягкий accent-фон для hover/selected состояний в sidebar. |
+| `--gr-sidebar-accent-fg` | `#1e293b` | `#f1f5f9` | Цвет текста поверх sidebar accent-подложек. |
+| `--gr-sidebar-brd` | `#e2e8f0` | `#334155` | Бордеры и разделители sidebar-области. |
+| `--gr-sidebar-ring` | `#6366f1` | `#818cf8` | Focus-ring для интерактивных элементов внутри sidebar. |
+
+## Производные состояния
+
+Объявлены формулой `color-mix`; для браузеров без её поддержки генератор
+вычисляет тот же результат заранее и кладёт в блок `@supports not (color-mix)`.
+
+| Токен | Формула | light (fallback) | dark (fallback) | Назначение |
+| --- | --- | --- | --- | --- |
+| `--gr-primary-hover` | `92% --gr-primary` + `--gr-fg` | `#4a42d6` | `#a494fa` | Hover-состояние primary action: подмес `--gr-fg` 8% в `--gr-primary`. |
+| `--gr-primary-active` | `84% --gr-primary` + `--gr-fg` | `#453ec7` | `#ac9dfa` | Active-состояние primary action: подмес `--gr-fg` 16% в `--gr-primary`. |
+| `--gr-secondary-hover` | `92% --gr-secondary` + `--gr-fg` | `#d1d7e0` | `#435062` | Hover-состояние secondary action: подмес `--gr-fg` 8% в `--gr-secondary`. |
+| `--gr-secondary-active` | `84% --gr-secondary` + `--gr-fg` | `#c0c7d0` | `#535f70` | Active-состояние secondary action: подмес `--gr-fg` 16% в `--gr-secondary`. |
+| `--gr-brd-hover` | `70% --gr-brd` + `--gr-fg` | `#a3a9b5` | `#6e7987` | Hover-состояние бордеров и outline-элементов: подмес `--gr-fg` 30% в `--gr-brd`. |
+| `--gr-brd-active` | `55% --gr-brd` + `--gr-fg` | `#838a97` | `#8c94a0` | Active-состояние бордеров и outline-элементов: подмес `--gr-fg` 45% в `--gr-brd`. |
+| `--gr-destructive-hover` | `92% --gr-destructive` + `--gr-fg` | `#cc2526` | `#f05353` | Hover-состояние destructive action: подмес `--gr-fg` 8% в `--gr-destructive`. |
+| `--gr-destructive-active` | `84% --gr-destructive` + `--gr-fg` | `#bb2427` | `#f06161` | Active-состояние destructive action: подмес `--gr-fg` 16% в `--gr-destructive`. |
+| `--gr-success-hover` | `92% --gr-success` + `--gr-fg` | `#10ac7a` | `#44d6a1` | Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`. |
+| `--gr-success-active` | `84% --gr-success` + `--gr-fg` | `#109f73` | `#53d9a9` | Active-состояние success-ролей: подмес `--gr-fg` 16% в `--gr-success`. |
+| `--gr-warning-hover` | `92% --gr-warning` + `--gr-fg` | `#e66c18` | `#fb9a4b` | Hover-состояние warning-ролей: подмес `--gr-fg` 8% в `--gr-warning`. |
+| `--gr-warning-active` | `84% --gr-warning` + `--gr-fg` | `#d46419` | `#fba35b` | Active-состояние warning-ролей: подмес `--gr-fg` 16% в `--gr-warning`. |
+| `--gr-danger-hover` | `92% --gr-danger` + `--gr-fg` | `#cc2526` | `#f87c7c` | Hover-состояние danger-ролей: подмес `--gr-fg` 8% в `--gr-danger`. |
+| `--gr-danger-active` | `84% --gr-danger` + `--gr-fg` | `#bb2427` | `#f88787` | Active-состояние danger-ролей: подмес `--gr-fg` 16% в `--gr-danger`. |
+| `--gr-info-hover` | `92% --gr-info` + `--gr-fg` | `#524bdc` | `#8b95f8` | Hover-состояние info-ролей: подмес `--gr-fg` 8% в `--gr-info`. |
+| `--gr-info-active` | `84% --gr-info` + `--gr-fg` | `#4c47cd` | `#949ef9` | Active-состояние info-ролей: подмес `--gr-fg` 16% в `--gr-info`. |
+| `--gr-slate-hover` | `92% --gr-slate` + `--gr-fg` | `#435064` | `#9caabd` | Hover-состояние slate-ролей: подмес `--gr-fg` 8% в `--gr-slate`. |
+| `--gr-slate-active` | `84% --gr-slate` + `--gr-fg` | `#3e4b5f` | `#a4b1c3` | Active-состояние slate-ролей: подмес `--gr-fg` 16% в `--gr-slate`. |
+| `--gr-azure-hover` | `92% --gr-azure` + `--gr-fg` | `#016fab` | `#47c2f8` | Hover-состояние azure-ролей: подмес `--gr-fg` 8% в `--gr-azure`. |
+| `--gr-azure-active` | `84% --gr-azure` + `--gr-fg` | `#0268a0` | `#57c7f9` | Active-состояние azure-ролей: подмес `--gr-fg` 16% в `--gr-azure`. |

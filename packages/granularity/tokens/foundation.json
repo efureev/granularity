@@ -1,0 +1,440 @@
+{
+  "groups": [
+    {
+      "title": "Foundations: neutral palette",
+      "tokens": [
+        {
+          "name": "--gr-slate-0",
+          "value": "#ffffff",
+          "description": "Нейтральный оттенок slate 0 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-50",
+          "value": "#f8fafc",
+          "description": "Нейтральный оттенок slate 50 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-100",
+          "value": "#f1f5f9",
+          "description": "Нейтральный оттенок slate 100 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-200",
+          "value": "#e2e8f0",
+          "description": "Нейтральный оттенок slate 200 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-300",
+          "value": "#cbd5e1",
+          "description": "Нейтральный оттенок slate 300 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-400",
+          "value": "#94a3b8",
+          "description": "Нейтральный оттенок slate 400 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-500",
+          "value": "#64748b",
+          "description": "Нейтральный оттенок slate 500 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-600",
+          "value": "#475569",
+          "description": "Нейтральный оттенок slate 600 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-700",
+          "value": "#334155",
+          "description": "Нейтральный оттенок slate 700 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-800",
+          "value": "#1e293b",
+          "description": "Нейтральный оттенок slate 800 для базовой palette scale, поверхностей и бордеров."
+        },
+        {
+          "name": "--gr-slate-900",
+          "value": "#0f172a",
+          "description": "Нейтральный оттенок slate 900 для базовой palette scale, поверхностей и бордеров."
+        }
+      ]
+    },
+    {
+      "title": "Typography: font families",
+      "tokens": [
+        {
+          "name": "--gr-font-ui",
+          "value": "Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif",
+          "description": "Основной стек шрифта для интерфейсного текста и большинства компонентных подписей."
+        },
+        {
+          "name": "--gr-font-mono",
+          "value": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
+          "description": "Моноширинный стек для кода, числовых значений и технических подписей."
+        }
+      ]
+    },
+    {
+      "title": "Typography: font sizes",
+      "tokens": [
+        {
+          "name": "--gr-text-xs",
+          "value": "12px",
+          "description": "Размер шрифта `xs` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-sm",
+          "value": "14px",
+          "description": "Размер шрифта `sm` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-base",
+          "value": "16px",
+          "description": "Размер шрифта `base` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-lg",
+          "value": "18px",
+          "description": "Размер шрифта `lg` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-xl",
+          "value": "20px",
+          "description": "Размер шрифта `xl` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-2xl",
+          "value": "24px",
+          "description": "Размер шрифта `2xl` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-3xl",
+          "value": "30px",
+          "description": "Размер шрифта `3xl` из типографической шкалы foundation tokens."
+        },
+        {
+          "name": "--gr-text-4xl",
+          "value": "36px",
+          "description": "Размер шрифта `4xl` из типографической шкалы foundation tokens."
+        }
+      ]
+    },
+    {
+      "title": "Typography: line heights",
+      "tokens": [
+        {
+          "name": "--gr-leading-tight",
+          "value": "1.25",
+          "description": "Коэффициент межстрочного интервала `tight` для текстовых блоков и подписей."
+        },
+        {
+          "name": "--gr-leading-normal",
+          "value": "1.5",
+          "description": "Коэффициент межстрочного интервала `normal` для текстовых блоков и подписей."
+        },
+        {
+          "name": "--gr-leading-relaxed",
+          "value": "1.625",
+          "description": "Коэффициент межстрочного интервала `relaxed` для текстовых блоков и подписей."
+        }
+      ]
+    },
+    {
+      "title": "Typography: font weights",
+      "tokens": [
+        {
+          "name": "--gr-font-regular",
+          "value": "400",
+          "description": "Вес шрифта `regular` для типографической иерархии интерфейса."
+        },
+        {
+          "name": "--gr-font-medium",
+          "value": "500",
+          "description": "Вес шрифта `medium` для типографической иерархии интерфейса."
+        },
+        {
+          "name": "--gr-font-semibold",
+          "value": "600",
+          "description": "Вес шрифта `semibold` для типографической иерархии интерфейса."
+        },
+        {
+          "name": "--gr-font-bold",
+          "value": "700",
+          "description": "Вес шрифта `bold` для типографической иерархии интерфейса."
+        }
+      ]
+    },
+    {
+      "title": "Layout: spacing scale",
+      "tokens": [
+        {
+          "name": "--gr-space-0",
+          "value": "0px",
+          "description": "Шаг spacing scale `0` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-1",
+          "value": "4px",
+          "description": "Шаг spacing scale `1` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-2",
+          "value": "8px",
+          "description": "Шаг spacing scale `2` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-3",
+          "value": "12px",
+          "description": "Шаг spacing scale `3` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-4",
+          "value": "16px",
+          "description": "Шаг spacing scale `4` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-5",
+          "value": "20px",
+          "description": "Шаг spacing scale `5` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-6",
+          "value": "24px",
+          "description": "Шаг spacing scale `6` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-8",
+          "value": "32px",
+          "description": "Шаг spacing scale `8` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-10",
+          "value": "40px",
+          "description": "Шаг spacing scale `10` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-12",
+          "value": "48px",
+          "description": "Шаг spacing scale `12` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-16",
+          "value": "64px",
+          "description": "Шаг spacing scale `16` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-20",
+          "value": "80px",
+          "description": "Шаг spacing scale `20` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-24",
+          "value": "96px",
+          "description": "Шаг spacing scale `24` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-32",
+          "value": "128px",
+          "description": "Шаг spacing scale `32` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-40",
+          "value": "160px",
+          "description": "Шаг spacing scale `40` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-48",
+          "value": "192px",
+          "description": "Шаг spacing scale `48` для отступов, gap и внутренних paddings."
+        },
+        {
+          "name": "--gr-space-64",
+          "value": "256px",
+          "description": "Шаг spacing scale `64` для отступов, gap и внутренних paddings."
+        }
+      ]
+    },
+    {
+      "title": "Layout: containers",
+      "tokens": [
+        {
+          "name": "--gr-container-max",
+          "value": "1280px",
+          "description": "Максимальная ширина layout-контейнера для контентных страниц и shell-структур."
+        },
+        {
+          "name": "--gr-container-max-2xl",
+          "value": "1440px",
+          "description": "Максимальная ширина layout-контейнера для контентных страниц и shell-структур."
+        },
+        {
+          "name": "--gr-container-padding-mobile",
+          "value": "16px",
+          "description": "Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария."
+        },
+        {
+          "name": "--gr-container-padding-tablet",
+          "value": "24px",
+          "description": "Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария."
+        },
+        {
+          "name": "--gr-container-padding-desktop",
+          "value": "32px",
+          "description": "Горизонтальный контейнерный отступ для соответствующего breakpoint-сценария."
+        }
+      ]
+    },
+    {
+      "title": "Layout: breakpoints",
+      "tokens": [
+        {
+          "name": "--gr-bp-sm",
+          "value": "640px",
+          "description": "Foundation breakpoint `sm` для адаптивных layout-решений."
+        },
+        {
+          "name": "--gr-bp-md",
+          "value": "768px",
+          "description": "Foundation breakpoint `md` для адаптивных layout-решений."
+        },
+        {
+          "name": "--gr-bp-lg",
+          "value": "1024px",
+          "description": "Foundation breakpoint `lg` для адаптивных layout-решений."
+        },
+        {
+          "name": "--gr-bp-xl",
+          "value": "1280px",
+          "description": "Foundation breakpoint `xl` для адаптивных layout-решений."
+        },
+        {
+          "name": "--gr-bp-2xl",
+          "value": "1536px",
+          "description": "Foundation breakpoint `2xl` для адаптивных layout-решений."
+        }
+      ]
+    },
+    {
+      "title": "Shapes: radii and compatibility aliases",
+      "tokens": [
+        {
+          "name": "--radius",
+          "value": "0.5rem",
+          "description": "Совместимый alias базового радиуса для интеграций, ожидающих shadcn-style token contract."
+        },
+        {
+          "name": "--gr-radius-none",
+          "value": "0px",
+          "description": "Радиус скругления `none` для углов компонентов и поверхностей."
+        },
+        {
+          "name": "--gr-radius-sm",
+          "value": "4px",
+          "description": "Радиус скругления `sm` для углов компонентов и поверхностей."
+        },
+        {
+          "name": "--gr-radius-md",
+          "value": "8px",
+          "description": "Радиус скругления `md` для углов компонентов и поверхностей."
+        },
+        {
+          "name": "--gr-radius-lg",
+          "value": "12px",
+          "description": "Радиус скругления `lg` для углов компонентов и поверхностей."
+        },
+        {
+          "name": "--gr-radius-xl",
+          "value": "16px",
+          "description": "Радиус скругления `xl` для углов компонентов и поверхностей."
+        },
+        {
+          "name": "--gr-radius-full",
+          "value": "9999px",
+          "description": "Радиус скругления `full` для углов компонентов и поверхностей."
+        }
+      ]
+    },
+    {
+      "title": "Elevation",
+      "tokens": [
+        {
+          "name": "--gr-shadow-0",
+          "value": "none",
+          "description": "Уровень elevation `0` для карточек, popover-слоёв и акцентных поверхностей."
+        },
+        {
+          "name": "--gr-shadow-1",
+          "value": "0 1px 2px rgba(15, 23, 42, 0.08)",
+          "description": "Уровень elevation `1` для карточек, popover-слоёв и акцентных поверхностей."
+        },
+        {
+          "name": "--gr-shadow-2",
+          "value": "0 8px 24px rgba(15, 23, 42, 0.14)",
+          "description": "Уровень elevation `2` для карточек, popover-слоёв и акцентных поверхностей."
+        },
+        {
+          "name": "--gr-shadow-3",
+          "value": "0 16px 48px rgba(15, 23, 42, 0.20)",
+          "description": "Уровень elevation `3` для карточек, popover-слоёв и акцентных поверхностей."
+        }
+      ]
+    },
+    {
+      "title": "Motion",
+      "tokens": [
+        {
+          "name": "--gr-duration-fast",
+          "value": "150ms",
+          "description": "Базовая длительность анимации `fast` для transitions и state changes."
+        },
+        {
+          "name": "--gr-duration-base",
+          "value": "200ms",
+          "description": "Базовая длительность анимации `base` для transitions и state changes."
+        },
+        {
+          "name": "--gr-duration-slow",
+          "value": "300ms",
+          "description": "Базовая длительность анимации `slow` для transitions и state changes."
+        },
+        {
+          "name": "--gr-ease-out",
+          "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "description": "Кривая ускорения `out` для motion-паттернов дизайн-системы."
+        },
+        {
+          "name": "--gr-ease-in",
+          "value": "cubic-bezier(0.7, 0, 0.84, 0)",
+          "description": "Кривая ускорения `in` для motion-паттернов дизайн-системы."
+        }
+      ]
+    },
+    {
+      "title": "Layering: z-index scale",
+      "note": "Единый источник истины для слоёв всех компонентов, использующих `position: fixed`\nповерх остального контента. Правило: чем выше в UI-стеке слой обязан оказаться,\nтем больше значение. Floating-панели (dropdown/select/tree-select/tooltip) стоят\nниже модалок, чтобы поповер, открытый ВНУТРИ модалки, не потерялся под ней, но\nсам этот поповер не обязан перекрывать модалку снаружи — за пределы своего дерева\nfloating-компоненты не выходят по построению (v-click-outside/portal рядом с триггером).\nТосты — единственный слой, который обязан быть виден поверх абсолютно всего,\nвключая открытые модалки (это уведомление уровня приложения).",
+      "tokens": [
+        {
+          "name": "--gr-z-dropdown",
+          "value": "1000",
+          "description": "Слой якорных floating-панелей: dropdown, select, tree-select."
+        },
+        {
+          "name": "--gr-z-tooltip",
+          "value": "1050",
+          "description": "Слой тултипов — выше floating-панелей, ниже модалок."
+        },
+        {
+          "name": "--gr-z-modal",
+          "value": "1100",
+          "description": "Слой модальных окон и диалогов."
+        },
+        {
+          "name": "--gr-z-toast",
+          "value": "1200",
+          "description": "Слой тостов — единственный, обязанный быть виден поверх всего, включая открытые модалки."
+        }
+      ]
+    }
+  ]
+}

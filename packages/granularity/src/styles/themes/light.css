@@ -1,3 +1,7 @@
+/*
+ * СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
+ * Менять значения и комментарии нужно в JSON, затем перегенерировать.
+ */
 :root {
   /* Surface roles */
   --gr-bg: #f8fafc;
@@ -37,7 +41,7 @@
    * при пороге AA 4.5 — а это solid-кнопки и бейджи (`grButtonStyles.ts`,
    * `grBadgeStyles.ts`). С `--gr-fg` получаем 7.04 и 6.37, и hover/active,
    * которые уводят заливку в тёмную сторону, остаются выше порога (5.30 / 4.79).
-   * В `dark.css` эти токены уже тёмные — там заливки светлее фона.
+   * В тёмной теме эти токены уже тёмные — там заливки светлее фона.
    */
   --gr-success: #10b981;
   --gr-success-light: #d1fae5;
@@ -110,14 +114,11 @@
     --gr-warning-active: #d46419;
     --gr-danger-hover: #cc2526;
     --gr-danger-active: #bb2427;
-    --gr-info-hover: #5c60e1;
-    --gr-info-active: #5659d1;
-    --gr-slate-hover: #435062;
-    --gr-slate-active: #3d4a5b;
+    --gr-info-hover: #524bdc;
+    --gr-info-active: #4c47cd;
+    --gr-slate-hover: #435064;
+    --gr-slate-active: #3e4b5f;
     --gr-azure-hover: #016fab;
     --gr-azure-active: #0268a0;
-
-    /* Component semantic fallbacks */
-    /*--gr-category-tree-branch-line-active-color: #c4cdf7;*/
   }
 }

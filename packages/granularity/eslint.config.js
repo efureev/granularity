@@ -8,6 +8,8 @@ export default antfu(
       'node_modules/**',
       'coverage/**',
       'uno.config.ts',
+      // Сгенерирован `yarn generate:tokens` — правится только генератор.
+      'src/tokens/generated.ts',
     ],
     vue: {
       vueVersion: 3,

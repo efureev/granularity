@@ -1,3 +1,7 @@
+/*
+ * СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
+ * Менять значения и комментарии нужно в JSON, затем перегенерировать.
+ */
 :root {
   /* Foundations: neutral palette */
   --gr-slate-0: #ffffff;
@@ -93,7 +97,7 @@
   --gr-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 
   /*
-   * Z-index layering scale.
+   * Layering: z-index scale
    *
    * Единый источник истины для слоёв всех компонентов, использующих `position: fixed`
    * поверх остального контента. Правило: чем выше в UI-стеке слой обязан оказаться,

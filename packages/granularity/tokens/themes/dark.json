@@ -1,0 +1,318 @@
+{
+  "name": "dark",
+  "selectors": [
+    "[data-theme='dark']",
+    ".theme-dark",
+    ".dark"
+  ],
+  "note": "Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит\n`useTheme`/`initThemeEarly`). Селекторы `.theme-dark` и `.dark` — DEPRECATED-алиасы\nдля обратной совместимости; в новом коде используйте `[data-theme]`.",
+  "groups": [
+    {
+      "title": "Surface roles",
+      "tokens": [
+        {
+          "name": "--gr-bg",
+          "value": "#0f172a",
+          "description": "Базовый фон приложения и крупных layout-поверхностей текущей темы."
+        },
+        {
+          "name": "--gr-fg",
+          "value": "#f8fafc",
+          "description": "Основной цвет текста и иконок поверх базового фона текущей темы."
+        },
+        {
+          "name": "--gr-card",
+          "value": "#1e293b",
+          "description": "Фон карточек, панелей и других поднятых поверхностей."
+        },
+        {
+          "name": "--gr-card-fg",
+          "value": "#f8fafc",
+          "description": "Цвет контента внутри карточек и raised surface-блоков."
+        },
+        {
+          "name": "--gr-popover",
+          "value": "#1e293b",
+          "description": "Фон popover-, dropdown- и overlay-поверхностей."
+        },
+        {
+          "name": "--gr-popover-fg",
+          "value": "#f8fafc",
+          "description": "Цвет текста и иконок внутри popover-слоёв."
+        },
+        {
+          "name": "--gr-muted",
+          "value": "#334155",
+          "description": "Приглушённая поверхность для вторичных блоков, плашек и заполнений."
+        },
+        {
+          "name": "--gr-muted-fg",
+          "value": "#aab6c7",
+          "description": "Вторичный текстовый цвет для helper-копии и менее важных подписей.",
+          "note": "Симметрично light: минимум по фону `--gr-muted`/`--gr-secondary` (#334155).\nПрежний #94a3b8 давал там 4.04, #aab6c7 даёт 5.04."
+        },
+        {
+          "name": "--gr-secondary",
+          "value": "#334155",
+          "description": "Нейтральная secondary action/surface-подложка без сильного бренд-акцента."
+        },
+        {
+          "name": "--gr-secondary-fg",
+          "value": "#f1f5f9",
+          "description": "Контрастный текст для secondary-кнопок и поверхностей."
+        },
+        {
+          "name": "--gr-brd",
+          "value": "#334155",
+          "description": "Базовый цвет бордеров и разделителей текущей темы."
+        },
+        {
+          "name": "--gr-input",
+          "value": "#334155",
+          "description": "Цвет рамки и фона input-like контролов в состоянии покоя."
+        },
+        {
+          "name": "--gr-ring",
+          "value": "#818cf8",
+          "description": "Цвет focus-ring и акцентного outline для интерактивных компонентов."
+        }
+      ]
+    },
+    {
+      "title": "Action roles",
+      "tokens": [
+        {
+          "name": "--gr-primary",
+          "value": "#9d8bfa",
+          "description": "Главный brand/action цвет темы для primary CTA и ключевых акцентов.",
+          "note": "Primary был единственным тоном, выпадавшим из конвенции тёмной темы\n(светлая заливка + тёмный текст, как у success/warning/danger/info/azure):\nоставался светло-тёмным индиго #6366f1 с белым текстом и проваливал сразу\nвсе три роли — текст на фоне 4.00, текст на карточке 3.27, белый на\nзаливке 4.47. Светлый индиго с тёмным `-fg` даёт 6.38 / 5.23 / 6.38.\nНе indigo-400 (#818cf8): это ровно `--gr-info` тёмной темы, и solid-бейджи\nPrimary и Info стали бы неотличимы.\nКнопок не касается: GrButton задаёт свой `--gr-button-primary-bg`."
+        },
+        {
+          "name": "--gr-primary-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх primary-заливки."
+        },
+        {
+          "name": "--gr-accent",
+          "value": "#1e1b4b",
+          "description": "Мягкая акцентная поверхность для selected/hovered областей и подсветок."
+        },
+        {
+          "name": "--gr-accent-fg",
+          "value": "#c7d2fe",
+          "description": "Цвет текста поверх accent-подложек."
+        },
+        {
+          "name": "--gr-destructive",
+          "value": "#ef4444",
+          "description": "Цвет destructive action-сценариев и критических состояний."
+        },
+        {
+          "name": "--gr-destructive-fg",
+          "value": "#ffffff",
+          "description": "Контрастный текст и иконки поверх destructive-заливки."
+        }
+      ]
+    },
+    {
+      "title": "Status roles",
+      "tokens": [
+        {
+          "name": "--gr-success",
+          "value": "#34d399",
+          "description": "Основной semantic success-цвет для статусов, бейджей и уведомлений."
+        },
+        {
+          "name": "--gr-success-light",
+          "value": "#064e3b",
+          "description": "Облегчённая success-подложка для мягких статусов и подсветок."
+        },
+        {
+          "name": "--gr-success-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх success-заливки."
+        },
+        {
+          "name": "--gr-success-text",
+          "value": "#6ee7b7",
+          "description": "Текстовый оттенок для success-сообщений на светлой подложке."
+        },
+        {
+          "name": "--gr-warning",
+          "value": "#fb923c",
+          "description": "Основной semantic warning-цвет для предупреждений и промежуточных статусов."
+        },
+        {
+          "name": "--gr-warning-light",
+          "value": "#7c2d12",
+          "description": "Облегчённая warning-подложка для мягких warning-состояний."
+        },
+        {
+          "name": "--gr-warning-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх warning-заливки."
+        },
+        {
+          "name": "--gr-warning-text",
+          "value": "#fdba74",
+          "description": "Текстовый оттенок для warning-сообщений на мягкой warning-подложке."
+        },
+        {
+          "name": "--gr-danger",
+          "value": "#f87171",
+          "description": "Semantic danger-цвет для ошибок, рисков и критических сообщений."
+        },
+        {
+          "name": "--gr-danger-light",
+          "value": "#7f1d1d",
+          "description": "Облегчённая danger-подложка для мягких error-состояний."
+        },
+        {
+          "name": "--gr-danger-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх danger-заливки."
+        },
+        {
+          "name": "--gr-danger-text",
+          "value": "#fca5a5",
+          "description": "Текстовый оттенок для error-сообщений на мягкой danger-подложке."
+        },
+        {
+          "name": "--gr-info",
+          "value": "#818cf8",
+          "description": "Semantic info-цвет для нейтральных уведомлений и информационных акцентов."
+        },
+        {
+          "name": "--gr-info-light",
+          "value": "#312e81",
+          "description": "Облегчённая info-подложка для спокойных информационных блоков."
+        },
+        {
+          "name": "--gr-info-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх info-заливки."
+        },
+        {
+          "name": "--gr-info-text",
+          "value": "#c7d2fe",
+          "description": "Текстовый оттенок для спокойных info-сообщений и подсказок."
+        },
+        {
+          "name": "--gr-slate",
+          "value": "#94a3b8",
+          "description": "Нейтральный semantic slate-цвет для subdued индикаторов и secondary статусов."
+        },
+        {
+          "name": "--gr-slate-light",
+          "value": "#334155",
+          "description": "Облегчённая slate-подложка для мягких нейтральных состояний."
+        },
+        {
+          "name": "--gr-slate-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх slate-заливки."
+        },
+        {
+          "name": "--gr-slate-text",
+          "value": "#cbd5e1",
+          "description": "Текстовый оттенок для нейтральных slate-сообщений и плашек."
+        },
+        {
+          "name": "--gr-azure",
+          "value": "#38bdf8",
+          "description": "Semantic azure-цвет для информационных акцентов и вспомогательных статусов."
+        },
+        {
+          "name": "--gr-azure-light",
+          "value": "#0c4a6e",
+          "description": "Облегчённая azure-подложка для мягких informational поверхностей."
+        },
+        {
+          "name": "--gr-azure-fg",
+          "value": "#0f172a",
+          "description": "Контрастный текст и иконки поверх azure-заливки."
+        },
+        {
+          "name": "--gr-azure-text",
+          "value": "#bae6fd",
+          "description": "Текстовый оттенок для azure-плашек и спокойных informational блоков."
+        }
+      ]
+    },
+    {
+      "title": "Data visualization roles",
+      "tokens": [
+        {
+          "name": "--gr-chart-1",
+          "value": "#6366f1",
+          "description": "Первый цвет серии для графиков и data-visualization элементов."
+        },
+        {
+          "name": "--gr-chart-2",
+          "value": "#34d399",
+          "description": "Второй цвет серии для графиков и data-visualization элементов."
+        },
+        {
+          "name": "--gr-chart-3",
+          "value": "#fb923c",
+          "description": "Третий цвет серии для графиков и data-visualization элементов."
+        },
+        {
+          "name": "--gr-chart-4",
+          "value": "#818cf8",
+          "description": "Четвёртый цвет серии для графиков и data-visualization элементов."
+        },
+        {
+          "name": "--gr-chart-5",
+          "value": "#a78bfa",
+          "description": "Пятый цвет серии для графиков и data-visualization элементов."
+        }
+      ]
+    },
+    {
+      "title": "Navigation roles",
+      "tokens": [
+        {
+          "name": "--gr-sidebar",
+          "value": "#1e293b",
+          "description": "Фон sidebar/navigation rail области текущей темы."
+        },
+        {
+          "name": "--gr-sidebar-fg",
+          "value": "#f8fafc",
+          "description": "Основной текст и иконки внутри sidebar."
+        },
+        {
+          "name": "--gr-sidebar-primary",
+          "value": "#6366f1",
+          "description": "Акцентный цвет активных/ключевых элементов внутри sidebar."
+        },
+        {
+          "name": "--gr-sidebar-primary-fg",
+          "value": "#ffffff",
+          "description": "Контрастный текст поверх sidebar primary-акцентов."
+        },
+        {
+          "name": "--gr-sidebar-accent",
+          "value": "#334155",
+          "description": "Мягкий accent-фон для hover/selected состояний в sidebar."
+        },
+        {
+          "name": "--gr-sidebar-accent-fg",
+          "value": "#f1f5f9",
+          "description": "Цвет текста поверх sidebar accent-подложек."
+        },
+        {
+          "name": "--gr-sidebar-brd",
+          "value": "#334155",
+          "description": "Бордеры и разделители sidebar-области."
+        },
+        {
+          "name": "--gr-sidebar-ring",
+          "value": "#818cf8",
+          "description": "Focus-ring для интерактивных элементов внутри sidebar."
+        }
+      ]
+    }
+  ]
+}
