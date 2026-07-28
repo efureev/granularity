@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
+
+import { GR_CONFIG_KEY } from '../../GrConfigProvider/context'
 
 vi.mock('~icons/lucide/check', () => {
   return {
@@ -168,5 +170,65 @@ describe('GrCheckbox', () => {
 
     await wrapper.get('[role="checkbox"]').trigger('keydown', { key: ' ' })
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
+  })
+
+  it('масштабирует контрол, иконку и подпись пропом size', () => {
+    const sizes = {
+      xs: { control: 'h-3', icon: 'h-2.5', label: 'text-xs' },
+      sm: { control: 'h-3.5', icon: 'h-3', label: 'text-sm' },
+      md: { control: 'h-4', icon: 'h-3.5', label: 'text-sm' },
+      lg: { control: 'h-5', icon: 'h-4', label: 'text-base' },
+    } as const
+
+    for (const [size, expected] of Object.entries(sizes)) {
+      const wrapper = mount(GrCheckbox, {
+        props: { modelValue: true, size: size as keyof typeof sizes },
+        slots: { default: 'Label' },
+      })
+
+      expect(wrapper.get('[role="checkbox"]').classes()).toContain(expected.control)
+      expect(wrapper.get('[data-icon="check"]').classes()).toContain(expected.icon)
+      expect(wrapper.get('[data-gr-checkbox] > span:last-child').classes()).toContain(expected.label)
+    }
+  })
+
+  it('без пропа size берёт размер из GrConfigProvider, локальный проп сильнее', () => {
+    const provide = {
+      [GR_CONFIG_KEY as symbol]: {
+        size: computed(() => 'lg'),
+        componentDefaults: computed(() => ({})),
+      },
+    }
+
+    const fromConfig = mount(GrCheckbox, {
+      props: { modelValue: true },
+      slots: { default: 'Label' },
+      global: { provide },
+    })
+    expect(fromConfig.get('[role="checkbox"]').classes()).toContain('h-5')
+
+    const localWins = mount(GrCheckbox, {
+      props: { modelValue: true, size: 'xs' },
+      slots: { default: 'Label' },
+      global: { provide },
+    })
+    expect(localWins.get('[role="checkbox"]').classes()).toContain('h-3')
+  })
+
+  it('точечный componentDefaults.GrCheckbox.size сильнее глобального size провайдера', () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: true },
+      slots: { default: 'Label' },
+      global: {
+        provide: {
+          [GR_CONFIG_KEY as symbol]: {
+            size: computed(() => 'lg'),
+            componentDefaults: computed(() => ({ GrCheckbox: { size: 'sm' } })),
+          },
+        },
+      },
+    })
+
+    expect(wrapper.get('[role="checkbox"]').classes()).toContain('h-3.5')
   })
 })

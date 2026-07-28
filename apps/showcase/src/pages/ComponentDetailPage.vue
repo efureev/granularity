@@ -60,6 +60,7 @@ const previewRegistry = {
   'gr-card-kpi-grid': defineAsyncComponent(() => import('../demos/components/gr-card/GrCardKpiGridDemo.vue')),
   'gr-checkbox-interactive-label': defineAsyncComponent(() => import('../demos/components/gr-checkbox/GrCheckboxInteractiveLabelDemo.vue')),
   'gr-checkbox-native-form': defineAsyncComponent(() => import('../demos/components/gr-checkbox/GrCheckboxNativeFormDemo.vue')),
+  'gr-checkbox-sizes': defineAsyncComponent(() => import('../demos/components/gr-checkbox/GrCheckboxSizesDemo.vue')),
   'gr-checkbox-state-matrix': defineAsyncComponent(() => import('../demos/components/gr-checkbox/GrCheckboxStatesDemo.vue')),
   'gr-collapse-accordion-flow': defineAsyncComponent(() => import('../demos/components/gr-collapse/GrCollapseAccordionDemo.vue')),
   'gr-collapse-disabled-state': defineAsyncComponent(() => import('../demos/components/gr-collapse/GrCollapseDisabledStateDemo.vue')),

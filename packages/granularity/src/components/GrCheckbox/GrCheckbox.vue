@@ -22,6 +22,19 @@ import { computed, onMounted, ref, useId, useSlots, watch } from 'vue'
 import IconCheck from '~icons/lucide/check'
 import IconMinus from '~icons/lucide/minus'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+
+import {
+  grCheckboxCheckIconClass,
+  grCheckboxControlClass,
+  grCheckboxIndeterminateIconClass,
+  grCheckboxLabelClass,
+  grCheckboxRootClass,
+  type GrCheckboxSize,
+} from './grCheckboxStyles'
+
+export type { GrCheckboxSize } from './grCheckboxStyles'
+
 export interface GrCheckboxProps {
   modelValue?: boolean
   disabled?: boolean
@@ -35,6 +48,8 @@ export interface GrCheckboxProps {
   indeterminate?: boolean
   /** Имя контрола, когда подписи в слоте нет (или она чисто визуальная). */
   ariaLabel?: string
+  /** Размер контрола. Не задан — берётся из `GrConfigProvider`, иначе `md`. */
+  size?: GrCheckboxSize
 }
 
 const hiddenInputStyle = {
@@ -55,6 +70,7 @@ const props = withDefaults(defineProps<GrCheckboxProps>(), {
   id: undefined,
   indeterminate: false,
   ariaLabel: undefined,
+  size: undefined,
 })
 
 const emit = defineEmits<{
@@ -65,6 +81,28 @@ const slots = useSlots()
 
 const labelId = useId()
 const hasLabel = computed(() => Boolean(slots.default))
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → `md`.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCheckbox' })
+
+const rootClassName = computed(() => grCheckboxRootClass({
+  size: resolvedSize.value,
+  disabled: props.disabled,
+}))
+
+const controlClassName = computed(() => grCheckboxControlClass({
+  size: resolvedSize.value,
+  active: props.modelValue || props.indeterminate,
+}))
+
+const indeterminateIconClassName = computed(() => grCheckboxIndeterminateIconClass(resolvedSize.value))
+
+const checkIconClassName = computed(() => grCheckboxCheckIconClass({
+  size: resolvedSize.value,
+  checked: props.modelValue,
+}))
+
+const labelClassName = computed(() => grCheckboxLabelClass(resolvedSize.value))
 
 // Держим `.checked` на нативном input синхронно с пропом — `:checked`-биндинг
 // на скрытом элементе иногда отстаёт при программных обновлениях.
@@ -125,8 +163,7 @@ function onClick(e: MouseEvent): void {
 <template>
   <div
     data-gr-checkbox
-    class="inline-flex items-center gap-2 select-none"
-    :class="disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'"
+    :class="rootClassName"
     @click="onClick"
   >
     <input
@@ -155,28 +192,22 @@ function onClick(e: MouseEvent): void {
       :aria-label="ariaLabel"
       :aria-labelledby="!ariaLabel && hasLabel ? labelId : undefined"
       :tabindex="disabled ? -1 : 0"
-      class="h-4 w-4 rounded border flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
-      :class="(modelValue || indeterminate)
-        ? 'border-[var(--gr-primary)] bg-[var(--gr-primary)]'
-        : 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'"
+      :class="controlClassName"
       @keydown.space.prevent="toggle"
     >
       <IconMinus
         v-if="indeterminate"
-        class="gr-checkbox-icon h-3.5 w-3.5 text-[var(--gr-primary-fg)]"
+        :class="indeterminateIconClassName"
       />
       <IconCheck
         v-else
-        class="gr-checkbox-icon h-3.5 w-3.5 transition-transform transition-opacity duration-150"
-        :class="modelValue
-          ? 'opacity-100 scale-100 text-[var(--gr-primary-fg)]'
-          : 'opacity-0 scale-75 text-transparent'"
+        :class="checkIconClassName"
       />
     </span>
     <span
       v-if="hasLabel"
       :id="labelId"
-      class="text-sm text-[var(--gr-muted-fg)]"
+      :class="labelClassName"
     >
       <slot />
     </span>
