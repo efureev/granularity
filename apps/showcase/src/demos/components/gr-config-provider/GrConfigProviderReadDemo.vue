@@ -12,7 +12,6 @@ import ConfigReader from './ConfigReader.vue'
       </div>
       <GrConfigProvider
         size="lg"
-        :z-index-base="2000"
         :component-defaults="{ GrButton: { variant: 'secondary' } }"
       >
         <ConfigReader />

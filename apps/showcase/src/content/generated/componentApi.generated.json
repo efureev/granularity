@@ -363,14 +363,14 @@
             "description": "",
             "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
-            "default": "\"neutral\""
+            "default": "undefined"
           },
           {
             "name": "size",
             "description": "",
             "type": "GrBadgeSize | undefined",
             "required": false,
-            "default": "\"sm\""
+            "default": "undefined"
           },
           {
             "name": "dark",
@@ -384,7 +384,7 @@
             "description": "",
             "type": "GrBadgeRadius | undefined",
             "required": false,
-            "default": "\"round\""
+            "default": "undefined"
           }
         ]
       },
@@ -529,14 +529,14 @@
             "description": "",
             "type": "\"info\" | \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"slate\" | \"azure\" | undefined",
             "required": false,
-            "default": "\"primary\""
+            "default": "undefined"
           },
           {
             "name": "variant",
             "description": "",
             "type": "GrButtonVariant | undefined",
             "required": false,
-            "default": "\"primary\""
+            "default": "undefined"
           },
           {
             "name": "type",
@@ -578,7 +578,7 @@
             "description": "",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "as",
@@ -1069,21 +1069,14 @@
           {
             "name": "size",
             "description": "Дефолтный размер контролов для вложенных компонентов.",
-            "type": "GrComponentSize | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "zIndexBase",
-            "description": "База z-index для оверлеев. Пробрасывается как `--gr-z-base`.",
-            "type": "number | undefined",
+            "type": "\"md\" | \"xs\" | \"sm\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "componentDefaults",
             "description": "Дефолтные пропсы по компонентам: `{ GrButton: { variant: 'secondary' } }`.",
-            "type": "Partial<Record<string, Record<string, unknown>>> | undefined",
+            "type": "GrComponentDefaults | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -3000,7 +2993,7 @@
             "description": "Показывать кнопку очистки, когда есть значение (и не disabled/readonly).",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "clearLabel",

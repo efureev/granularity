@@ -27,7 +27,7 @@ const sizes: GrComponentSize[] = ['xs', 'sm', 'md', 'lg']
     <!-- Ни у одного контрола ниже нет пропа `size` — он приходит из провайдера. -->
     <GrConfigProvider :size="size">
       <div class="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-        <GrInput v-model="value" class="max-w-[16rem]" />
+        <GrInput v-model="value" class="max-w-[16rem]" aria-label="Config-driven input" />
         <GrButton>Save</GrButton>
         <GrButton variant="outline">Cancel</GrButton>
       </div>

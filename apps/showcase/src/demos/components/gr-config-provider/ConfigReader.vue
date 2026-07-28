@@ -12,10 +12,6 @@ const config = useGrConfig()
       <GrBadge tone="info">{{ config.size.value ?? '—' }}</GrBadge>
     </div>
     <div class="flex items-center gap-2">
-      <span class="text-[var(--gr-muted-fg)]">zIndexBase</span>
-      <GrBadge tone="slate">{{ config.zIndexBase.value ?? '—' }}</GrBadge>
-    </div>
-    <div class="flex items-center gap-2">
       <span class="text-[var(--gr-muted-fg)]">GrButton default variant</span>
       <GrBadge tone="success">{{ config.componentDefaults.value.GrButton?.variant ?? '—' }}</GrBadge>
     </div>

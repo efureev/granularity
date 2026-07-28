@@ -36,7 +36,7 @@ const sizes: GrComponentSize[] = ['xs', 'sm', 'md', 'lg']
     <!-- Ни у одного контрола ниже нет пропа \`size\` — он приходит из провайдера. -->
     <GrConfigProvider :size="size">
       <div class="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-        <GrInput v-model="value" class="max-w-[16rem]" />
+        <GrInput v-model="value" class="max-w-[16rem]" aria-label="Config-driven input" />
         <GrButton>Save</GrButton>
         <GrButton variant="outline">Cancel</GrButton>
       </div>
@@ -52,7 +52,7 @@ const sizes: GrComponentSize[] = ['xs', 'sm', 'md', 'lg']
   {
     id: 'config-provider-nested',
     title: 'Nested providers merge',
-    description: 'Провайдеры можно вкладывать: дочерний мержится поверх родительского. Здесь внешний задаёт `size="lg"`, а внутренний переопределяет его на `sm` только для своего поддерева — остальные значения (`zIndexBase`, `componentDefaults`, i18n) наследуются.',
+    description: 'Провайдеры можно вкладывать: дочерний мержится поверх родительского. Здесь внешний задаёт `size="lg"`, а внутренний переопределяет его на `sm` только для своего поддерева — остальные значения (`componentDefaults`, i18n) наследуются.',
     status: 'ready',
     previewKey: 'gr-config-provider-nested',
     code: `<script setup lang="ts">
@@ -88,9 +88,62 @@ import { GrButton, GrConfigProvider, GrInput } from '@feugene/granularity'
 </template>`,
   },
   {
+    id: 'config-provider-defaults',
+    title: 'Default props per component',
+    description: '`componentDefaults` задаёт дефолтные пропсы по имени компонента: оформление всего поддерева описывается одним объектом, а у самих компонентов пропы не указаны. Локальный проп всегда побеждает конфиг. Набор настраиваемых пропов закрытый (`GrButton` — `variant`/`tone`/`size`/`square`, `GrInput` — `size`/`clearable`, `GrBadge` — `tone`/`size`/`radius`): через конфиг настраивается оформление, но не `modelValue` и не обработчики.',
+    status: 'ready',
+    previewKey: 'gr-config-provider-defaults',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import {
+  GrBadge,
+  GrButton,
+  GrConfigProvider,
+  GrInput,
+  type GrComponentDefaults,
+} from '@feugene/granularity'
+
+const value = ref('Igor Petrov')
+
+// Оформление всего поддерева задаётся одним объектом: у самих компонентов
+// ни \`variant\`, ни \`tone\`, ни \`clearable\` не указаны.
+const brandDefaults: GrComponentDefaults = {
+  GrButton: { variant: 'outline', tone: 'azure' },
+  GrInput: { clearable: true },
+  GrBadge: { tone: 'azure', radius: 'semi' },
+}
+
+const enabled = ref(true)
+</script>
+
+<template>
+  <div class="grid gap-4">
+    <GrButton size="sm" variant="ghost" @click="enabled = !enabled">
+      {{ enabled ? 'Turn defaults off' : 'Turn defaults on' }}
+    </GrButton>
+
+    <GrConfigProvider :component-defaults="enabled ? brandDefaults : undefined">
+      <div class="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+        <GrInput v-model="value" class="max-w-[16rem]" aria-label="Full name" />
+        <GrButton>Invite</GrButton>
+        <GrButton>Copy link</GrButton>
+        <GrBadge>Pro</GrBadge>
+      </div>
+    </GrConfigProvider>
+
+    <p class="text-sm text-[var(--gr-muted-fg)]">
+      Локальный проп всегда сильнее конфига — у кнопки-переключателя выше явно задан
+      <code>variant="ghost"</code>, и она не меняется.
+    </p>
+  </div>
+</template>`,
+    note: 'Чтобы компонент умел читать конфиг, его настраиваемый проп обязан иметь дефолт `undefined`, а «настоящий» дефолт — жить в резолвере `useGrComponentProp`. Иначе Vue подставит дефолт раньше, чем компонент заглянет в конфиг, и отличить «пользователь передал значение» от «сработал дефолт» будет невозможно.',
+  },
+  {
     id: 'config-provider-read',
     title: 'Read the config in your own component',
-    description: 'Любой компонент читает конфиг ближайшего провайдера через `useGrConfig()` — так подключаются собственные контролы. Провайдер отдаёт `size`, `zIndexBase` и `componentDefaults` (per-component дефолтные пропсы); вне провайдера всё разрешается в fallback-значения.',
+    description: 'Любой компонент читает конфиг ближайшего провайдера через `useGrConfig()` — так подключаются собственные контролы. Провайдер отдаёт `size` и `componentDefaults` (per-component дефолтные пропсы); вне провайдера всё разрешается в fallback-значения.',
     status: 'ready',
     previewKey: 'gr-config-provider-read',
     code: `<!-- ConfigReader.vue -->
@@ -106,10 +159,6 @@ const config = useGrConfig()
     <div class="flex items-center gap-2">
       <span class="text-[var(--gr-muted-fg)]">size</span>
       <GrBadge tone="info">{{ config.size.value ?? '—' }}</GrBadge>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-[var(--gr-muted-fg)]">zIndexBase</span>
-      <GrBadge tone="slate">{{ config.zIndexBase.value ?? '—' }}</GrBadge>
     </div>
     <div class="flex items-center gap-2">
       <span class="text-[var(--gr-muted-fg)]">GrButton default variant</span>
@@ -133,7 +182,6 @@ import ConfigReader from './ConfigReader.vue'
       </div>
       <GrConfigProvider
         size="lg"
-        :z-index-base="2000"
         :component-defaults="{ GrButton: { variant: 'secondary' } }"
       >
         <ConfigReader />
