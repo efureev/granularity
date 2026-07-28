@@ -155,7 +155,7 @@
             "description": "Кнопка очистки выбранного значения/запроса.",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "loading",
@@ -5015,7 +5015,7 @@
             "description": "",
             "type": "GrSegmentedVariant | undefined",
             "required": false,
-            "default": "\"pills\""
+            "default": "undefined"
           },
           {
             "name": "disabled",
@@ -5126,7 +5126,7 @@
             "description": "Цвет/вариант ссылки для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
             "type": "GrSelectVariant | undefined",
             "required": false,
-            "default": "\"primary\""
+            "default": "undefined"
           },
           {
             "name": "options",
@@ -5175,7 +5175,7 @@
             "description": "Разрешает очистку выбранного значения.",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "loading",
@@ -5238,7 +5238,7 @@
             "description": "Подчёркивание для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
             "type": "GrSelectUnderline | undefined",
             "required": false,
-            "default": "\"auto\""
+            "default": "undefined"
           },
           {
             "name": "view",

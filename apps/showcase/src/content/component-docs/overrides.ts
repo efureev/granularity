@@ -187,8 +187,11 @@ const grConfigProviderOverview: ShowcaseComponentOverviewDoc = {
       title: 'Что настраивается через componentDefaults',
       items: [
         '`GrButton` — `variant`, `tone`, `size`, `square`.',
-        '`GrInput` — `size`, `clearable`.',
+        '`GrSelect` — `size`, `variant`, `underline`, `clearable`.',
+        '`GrInput`, `GrAutocomplete` — `size`, `clearable`.',
+        '`GrSegmented` — `size`, `variant`.',
         '`GrBadge` — `tone`, `size`, `radius`.',
+        '`GrNumberInput`, `GrSlider`, `GrRating`, `GrSwitch`, `GrRadio`/`GrRadioGroup` — `size`.',
         'Список закрытый: через конфиг настраивается только оформление, но не `modelValue` и не обработчики.',
         'Контракт объявляет сам компонент — в своей папке (`GrButton/defaults.ts`), а провайдер про конкретные компоненты не знает. Поэтому `componentDefaults` типизирован ровно теми компонентами, которые вы импортировали.',
       ],
