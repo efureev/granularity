@@ -219,8 +219,6 @@ function handleProgress(info: GrUploadProgressInfo) {
   emit('progress', info.percent, info)
 }
 
-const tabIndex = computed(() => (props.disabled ? -1 : 0))
-
 const hiddenInputStyle = {
   position: 'fixed',
   top: '-9999px',
@@ -414,24 +412,16 @@ async function onInputChange(event: Event) {
   await handleFiles(files, 'input')
 }
 
-function onKeydown(event: KeyboardEvent) {
+// Клавиатуры на зоне нет: Enter/Space обрабатывает сам file-input, на котором и
+// стоит фокус. Собственный обработчик здесь только дублировал бы нативный и
+// открывал диалог дважды.
+function onRootClick(event: MouseEvent) {
   if (hasCustomUi.value) return
-  if (props.disabled) return
+  // `openDialog` кликает по input программно, и этот клик всплывает обратно сюда.
+  // Без отсечки зона открывала бы диалог по кругу.
+  if (event.target === inputRef.value) return
 
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault()
-    openDialog()
-  }
-}
-
-function onRootClick() {
-  if (hasCustomUi.value) return
   openDialog()
-}
-
-function onRootKeydown(event: KeyboardEvent) {
-  if (hasCustomUi.value) return
-  onKeydown(event)
 }
 
 const effectiveProgressTone = computed<GrProgressBarTone>(() => {
@@ -456,36 +446,49 @@ defineExpose({
 </script>
 
 <template>
+  <!-- Drop-zone намеренно БЕЗ `role="button"` и `tabindex`: доступным контролом
+       служит сам нативный `<input type="file">`. Роль-виджет объявляет потомков
+       презентационными, поэтому input внутри неё терялся для скринридеров и падал
+       в axe на `nested-interactive`; а обёртывать его в собственный «button» —
+       значит вручную переизобретать то, что file-input уже умеет нативно
+       (открытие диалога с клавиатуры, объявление «кнопка выбора файла»).
+       Зона остаётся кликабельной и принимает drag&drop, фокус input'а показывает
+       через `focus-within`.
+
+       Disabled показываем фоном, а не `opacity`: прозрачность разбавляет выверенные
+       на AA токены текста и роняет контраст (та же грабля, что с
+       `--showcase-text-subtle` в ANALYSIS §54). Раньше это пряталось за ролью-виджетом:
+       axe не проверяет содержимое презентационных потомков. -->
   <div
     data-gr-file-upload
-    :role="hasCustomUi ? undefined : 'button'"
-    :tabindex="hasCustomUi ? undefined : tabIndex"
-    :aria-disabled="hasCustomUi ? undefined : disabled ? 'true' : 'false'"
     :class="
       hasCustomUi
         ? 'inline-block'
         : [
-            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] bg-[var(--gr-card)] px-5 py-6 outline-none transition',
+            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] px-5 py-6 outline-none transition',
             disabled
-              ? 'opacity-60 cursor-not-allowed'
-              : 'cursor-pointer hover:bg-[var(--gr-muted)] focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]',
+              ? 'bg-[var(--gr-muted)] cursor-not-allowed'
+              : 'bg-[var(--gr-card)] cursor-pointer hover:bg-[var(--gr-muted)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]',
             isOver && !disabled ? 'border-[var(--gr-ring)] bg-[var(--gr-muted)]' : '',
           ]
     "
     @click="onRootClick"
-    @keydown="onRootKeydown"
     @dragenter="onDragEnter"
     @dragover="onDragOver"
     @dragleave="onDragLeave"
     @drop="onDrop"
   >
+    <!-- В custom-UI контрол рисует слот (он и вызывает `openDialog`), поэтому там
+         input прячется и от таба, и от дерева доступности — иначе получим два
+         контрола на один смысл. -->
     <input
       ref="inputRef"
       data-gr-file-upload-input
       :style="hiddenInputStyle"
       type="file"
-      tabindex="-1"
-      aria-hidden="true"
+      :tabindex="hasCustomUi || disabled ? -1 : 0"
+      :aria-hidden="hasCustomUi ? 'true' : undefined"
+      :aria-label="hasCustomUi ? undefined : resolvedPlaceholder"
       :name="name"
       :multiple="multiple"
       :disabled="disabled"

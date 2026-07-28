@@ -104,6 +104,56 @@ describe('GrFileUpload', () => {
     expect(wrapper.emitted('error')).toBeFalsy()
   })
 
+  // Роль-виджет на drop-зоне объявляла бы потомков презентационными, и нативный
+  // file-input внутри терялся для скринридеров (axe: `nested-interactive`).
+  // Поэтому доступный контрол — сам input, а зона остаётся просто зоной.
+  it('доступным контролом делает нативный input, а не drop-зону', () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn() },
+    })
+
+    const zone = wrapper.get('[data-gr-file-upload]')
+    expect(zone.attributes('role')).toBeUndefined()
+    expect(zone.attributes('tabindex')).toBeUndefined()
+
+    const input = wrapper.get('[data-gr-file-upload-input]')
+    expect(input.attributes('tabindex')).toBe('0')
+    expect(input.attributes('aria-hidden')).toBeUndefined()
+    expect(input.attributes('aria-label')).toBeTruthy()
+  })
+
+  it('в custom UI прячет input от таба и дерева доступности — контрол рисует слот', () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn() },
+      slots: {
+        default: ({ openDialog }: any) => h('button', { type: 'button', onClick: openDialog }, 'Upload'),
+      },
+    })
+
+    const input = wrapper.get('[data-gr-file-upload-input]')
+    expect(input.attributes('tabindex')).toBe('-1')
+    expect(input.attributes('aria-hidden')).toBe('true')
+    expect(input.attributes('aria-label')).toBeUndefined()
+  })
+
+  it('всплывший клик от самого input не открывает диалог повторно', async () => {
+    // Спай общий на прототип, а `restoreMocks` в конфиге нет — считаем от своей отметки.
+    const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click')
+    clickSpy.mockClear()
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn() },
+    })
+
+    await wrapper.get('[data-gr-file-upload-input]').trigger('click')
+    expect(clickSpy).not.toHaveBeenCalled()
+
+    await wrapper.get('[data-gr-file-upload]').trigger('click')
+    expect(clickSpy).toHaveBeenCalledTimes(1)
+
+    clickSpy.mockClear()
+  })
+
   it('элементный default-slot переводит компонент в custom UI режим', async () => {
     const request = vi.fn().mockResolvedValue({ ok: true })
     const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click')
