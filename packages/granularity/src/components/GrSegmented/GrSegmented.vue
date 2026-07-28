@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import type { ComponentPublicInstance } from 'vue'
 
@@ -54,7 +54,7 @@ export interface GrSegmentedProps {
 const props = withDefaults(
   defineProps<GrSegmentedProps>(),
   {
-    variant: 'pills',
+    variant: undefined,
     size: undefined,
     indicatorDuration: 300,
     block: false,
@@ -66,6 +66,7 @@ const props = withDefaults(
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmented' })
+const resolvedVariant = useGrComponentProp('GrSegmented', 'variant', () => props.variant, 'pills')
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: GrSegmentedValue): void
@@ -90,20 +91,20 @@ const selectedOption = computed(() => props.options[selectedIndex.value] ?? null
 const enabledOptions = computed(() => props.options.filter(option => !resolveOptionDisabled(option)))
 const indicatorDuration = computed(() => Math.max(0, Math.round(props.indicatorDuration)))
 const rootClassName = computed(() => grSegmentedRootClass({
-  variant: props.variant,
+  variant: resolvedVariant.value,
   block: props.block,
   disabled: props.disabled,
 }))
 const rootStyle = computed<Record<string, string>>(() => ({
   ...grSegmentedRootStyle({
-    variant: props.variant,
+    variant: resolvedVariant.value,
     size: resolvedSize.value,
   }),
   gridTemplateColumns: props.options.length > 0
     ? props.options.map(() => props.block ? 'minmax(0,1fr)' : 'minmax(0,max-content)').join(' ')
     : 'none',
 }))
-const indicatorClassName = computed(() => grSegmentedIndicatorClass(props.variant))
+const indicatorClassName = computed(() => grSegmentedIndicatorClass(resolvedVariant.value))
 const resolvedName = computed(() => props.name ?? fallbackName)
 const hasIndicator = computed(() => selectedIndex.value !== -1 && indicatorGeometry.value !== null)
 
@@ -379,7 +380,7 @@ function onKeydown(event: KeyboardEvent, index: number): void {
 
 watch(() => props.modelValue, () => scheduleMeasure())
 watch(() => props.options, () => scheduleMeasure(), { deep: true })
-watch(() => props.variant, () => scheduleMeasure())
+watch(resolvedVariant, () => scheduleMeasure())
 watch(resolvedSize, () => scheduleMeasure())
 watch(() => props.block, () => scheduleMeasure())
 
@@ -395,7 +396,7 @@ onBeforeUnmount(() => {
   <div
     ref="rootRef"
     data-gr-segmented
-    :data-variant="variant"
+    :data-variant="resolvedVariant"
     role="radiogroup"
     :aria-label="ariaLabel"
     :aria-disabled="disabled ? 'true' : undefined"
@@ -423,7 +424,7 @@ onBeforeUnmount(() => {
       :disabled="resolveOptionDisabled(option)"
       :tabindex="isFocusableOption(option, index) ? 0 : -1"
       :class="grSegmentedItemClass({
-        variant,
+        variant: resolvedVariant,
         selected: isOptionSelected(option),
         disabled: resolveOptionDisabled(option),
         iconOnly: isIconOnlyOption(option),

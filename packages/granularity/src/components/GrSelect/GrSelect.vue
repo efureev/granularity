@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
@@ -127,15 +127,18 @@ const props = withDefaults(
     customValuePlaceholder: undefined,
     dropdownMaxHeight: 280,
     closeOnSelect: true,
-    clearable: false,
+    clearable: undefined,
     clearLabel: undefined,
-    variant: 'primary',
-    underline: 'auto',
+    variant: undefined,
+    underline: undefined,
   },
 )
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSelect' })
+const resolvedVariant = useGrComponentProp('GrSelect', 'variant', () => props.variant, 'primary')
+const resolvedUnderline = useGrComponentProp('GrSelect', 'underline', () => props.underline, 'auto')
+const resolvedClearable = useGrComponentProp('GrSelect', 'clearable', () => props.clearable, false)
 
 const { t } = useGranularityTranslations()
 
@@ -550,7 +553,7 @@ const showNativeChevron = computed(() => {
 })
 
 const nativeClearOptionVisible = computed(() => {
-  if (!props.clearable) return false
+  if (!resolvedClearable.value) return false
   if (effectiveOptionsView.value !== 'native') return false
   if (props.multiple) return false
   if (!props.options) return true
@@ -558,7 +561,7 @@ const nativeClearOptionVisible = computed(() => {
 })
 
 const panelClearVisible = computed(() => {
-  if (!props.clearable) return false
+  if (!resolvedClearable.value) return false
   if (effectiveOptionsView.value !== 'panel') return false
   if (props.view === 'link') return false
   return hasSelection.value
@@ -569,8 +572,8 @@ const nativeClassName = computed(() => {
     view: props.view,
     size: resolvedSize.value,
     disabled: props.disabled,
-    variant: props.variant,
-    underline: props.underline,
+    variant: resolvedVariant.value,
+    underline: resolvedUnderline.value,
     showNativeChevron: showNativeChevron.value,
   })
 })
@@ -585,8 +588,8 @@ const isLinkNative = computed(() => props.view === 'link' && effectiveOptionsVie
 
 const linkNativeLabelClassName = computed(() => grSelectLinkNativeLabelClass({
   size: resolvedSize.value,
-  variant: props.variant,
-  underline: props.underline,
+  variant: resolvedVariant.value,
+  underline: resolvedUnderline.value,
   disabled: props.disabled,
 }))
 
@@ -600,8 +603,8 @@ const triggerClassName = computed(() => {
     optionsView: effectiveOptionsView.value,
     size: resolvedSize.value,
     disabled: props.disabled,
-    variant: props.variant,
-    underline: props.underline,
+    variant: resolvedVariant.value,
+    underline: resolvedUnderline.value,
   })
 })
 

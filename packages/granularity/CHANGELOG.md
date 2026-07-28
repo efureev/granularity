@@ -19,9 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
     the surrounding controls; its size is configurable per component instead.
   - `componentDefaults` — default props keyed by component name, e.g.
     `{ GrButton: { variant: 'outline' } }`. The set of configurable props is deliberately closed —
-    `GrButton` (`variant`, `tone`, `size`, `square`), `GrInput` (`size`, `clearable`), `GrBadge`
-    (`tone`, `size`, `radius`) — so the config can shape appearance but never a `modelValue` or an
-    event handler, and a typo in a component or prop name is a type error.
+    `GrButton` (`variant`, `tone`, `size`, `square`), `GrSelect` (`size`, `variant`, `underline`,
+    `clearable`), `GrInput` and `GrAutocomplete` (`size`, `clearable`), `GrSegmented` (`size`,
+    `variant`), `GrBadge` (`tone`, `size`, `radius`), and `size` alone for `GrNumberInput`,
+    `GrSlider`, `GrRating`, `GrSwitch`, `GrRadio` and `GrRadioGroup` — so the config can shape
+    appearance but never a `modelValue` or an event handler, and a typo in a component or prop name
+    is a type error.
 
     Each component declares its own contract in its folder (`GrButton/defaults.ts`) and registers it
     through declaration merging, so `GrConfigProvider` knows nothing about concrete components. The
@@ -46,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   able to override them. Rendering is unchanged, but reading such a prop from the outside (through
   a template ref or a wrapper) now yields `undefined` until it is explicitly passed: `variant`,
   `tone`, `size`, `square` on `GrButton`; `size`, `clearable` on `GrInput`; `tone`, `size`, `radius`
-  on `GrBadge`; `size` on `GrSelect`, `GrAutocomplete`, `GrNumberInput`, `GrSegmented`, `GrSlider`,
+  on `GrBadge`; `size`, `variant`, `underline`, `clearable` on `GrSelect`; `size`, `clearable` on
+  `GrAutocomplete`; `size`, `variant` on `GrSegmented`; `size` on `GrNumberInput`, `GrSlider`,
   `GrRating`, `GrSwitch` and `GrRadioGroup`.
 
 ## [v0.13.0] 2026-07-23

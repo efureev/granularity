@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
@@ -84,7 +84,7 @@ const props = withDefaults(
     size: undefined,
     placeholder: undefined,
     ariaLabel: undefined,
-    clearable: false,
+    clearable: undefined,
     loading: false,
     filterable: true,
     filter: undefined,
@@ -101,6 +101,7 @@ const props = withDefaults(
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrAutocomplete' })
+const resolvedClearable = useGrComponentProp('GrAutocomplete', 'clearable', () => props.clearable, false)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: GrAutocompleteModelValue): void
@@ -348,7 +349,7 @@ function clearSelection(): void {
 }
 
 const showClear = computed(() =>
-  props.clearable && !props.disabled && (hasSelection.value || query.value.length > 0),
+  resolvedClearable.value && !props.disabled && (hasSelection.value || query.value.length > 0),
 )
 
 // ————— Клавиатура.

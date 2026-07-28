@@ -1,4 +1,4 @@
-import type { GrSegmentedSize } from './grSegmentedStyles'
+import type { GrSegmentedSize, GrSegmentedVariant } from './grSegmentedStyles'
 
 /**
  * Пропы `GrSegmented`, настраиваемые глобально через
@@ -7,6 +7,7 @@ import type { GrSegmentedSize } from './grSegmentedStyles'
  */
 export interface GrSegmentedConfigurableProps {
   size: GrSegmentedSize
+  variant: GrSegmentedVariant
 }
 
 declare module '../GrConfigProvider/context' {

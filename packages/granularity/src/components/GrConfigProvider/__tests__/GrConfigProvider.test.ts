@@ -330,3 +330,37 @@ describe('глобальный size доезжает до контролов', (
     }))
   })
 })
+
+// Не только `size`: у части контролов через конфиг настраивается и оформление.
+// Проверяем тем же способом — «из конфига» обязано совпасть с «пропом».
+describe('componentDefaults: оформительские пропы контролов', () => {
+  it.each([
+    // `view: 'link'` обязателен: в обычном виде `variant`/`underline` на разметку
+    // не влияют, и сравнивать было бы нечего.
+    ['GrSelect.variant', GrSelect, { modelValue: '', view: 'link' }, { GrSelect: { variant: 'muted' } }, { variant: 'muted' }],
+    ['GrSelect.underline', GrSelect, { modelValue: '', view: 'link' }, { GrSelect: { underline: 'always' } }, { underline: 'always' }],
+    ['GrSelect.clearable', GrSelect, { modelValue: 'a', options: [{ value: 'a', label: 'A' }] }, { GrSelect: { clearable: true } }, { clearable: true }],
+    ['GrAutocomplete.clearable', GrAutocomplete, { modelValue: 'a' }, { GrAutocomplete: { clearable: true } }, { clearable: true }],
+    ['GrSegmented.variant', GrSegmented, { modelValue: 'a', options: [{ value: 'a', label: 'A' }] }, { GrSegmented: { variant: 'button' } }, { variant: 'button' }],
+  ])('%s: из конфига === пропом', (_name, component, componentProps: object, componentDefaults, propOverride) => {
+    const fromConfig = renderWithProvider(component, componentProps, { componentDefaults })
+    const fromProp = renderStandalone(component, { ...componentProps, ...propOverride })
+
+    expect(fromConfig).toBe(fromProp)
+    expect(fromConfig).not.toBe(renderStandalone(component, componentProps))
+  })
+
+  it('локальный проп сильнее componentDefaults', () => {
+    const conflicting = renderWithProvider(
+      GrSegmented,
+      { modelValue: 'a', variant: 'pills', options: [{ value: 'a', label: 'A' }] },
+      { componentDefaults: { GrSegmented: { variant: 'button' } } },
+    )
+
+    expect(conflicting).toBe(renderStandalone(GrSegmented, {
+      modelValue: 'a',
+      variant: 'pills',
+      options: [{ value: 'a', label: 'A' }],
+    }))
+  })
+})

@@ -49,7 +49,10 @@ The set is closed on purpose: the config shapes appearance only, never a
 | `GrButton` | `variant`, `tone`, `size`, `square` |
 | `GrInput` | `size`, `clearable` |
 | `GrBadge` | `tone`, `size`, `radius` |
-| `GrSelect`, `GrAutocomplete`, `GrNumberInput`, `GrSegmented`, `GrSlider`, `GrRating`, `GrSwitch`, `GrRadio`, `GrRadioGroup` | `size` |
+| `GrSelect` | `size`, `variant`, `underline`, `clearable` |
+| `GrAutocomplete` | `size`, `clearable` |
+| `GrSegmented` | `size`, `variant` |
+| `GrNumberInput`, `GrSlider`, `GrRating`, `GrSwitch`, `GrRadio`, `GrRadioGroup` | `size` |
 
 The global `size` prop is read by the form controls above. `GrBadge` deliberately
 stays out of it — a badge is a display element, so its size follows
