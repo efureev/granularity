@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, unref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrBadge from '../../GrBadge/GrBadge.vue'
@@ -362,5 +362,43 @@ describe('componentDefaults: оформительские пропы контр�
       variant: 'pills',
       options: [{ value: 'a', label: 'A' }],
     }))
+  })
+})
+
+describe('пустой конфиг (без провайдера)', () => {
+  it('остаётся рефами — переживает unref/watch у потребителя', () => {
+    const Consumer = defineComponent({
+      setup() {
+        const config = useGrConfig()
+        return () => h('span', { class: 'unref' }, String(unref(config.componentDefaults) === config.componentDefaults.value))
+      },
+    })
+
+    expect(mount(Consumer).find('.unref').text()).toBe('true')
+  })
+
+  it('нельзя испортить: пустые дефолты заморожены и общие для всего приложения', () => {
+    const Consumer = defineComponent({
+      setup() {
+        const config = useGrConfig()
+        // Один потребитель без провайдера не должен уметь подменить дефолты
+        // остальным: `computed` без зависимостей отдаёт всем один объект.
+        expect(() => {
+          (config.componentDefaults.value as Record<string, unknown>).GrButton = { variant: 'ghost' }
+        }).toThrow()
+        return () => h('span')
+      },
+    })
+
+    mount(Consumer)
+
+    const second = mount(defineComponent({
+      setup() {
+        const config = useGrConfig()
+        return () => h('span', { class: 'keys' }, Object.keys(config.componentDefaults.value).join(','))
+      },
+    }))
+
+    expect(second.find('.keys').text()).toBe('')
   })
 })

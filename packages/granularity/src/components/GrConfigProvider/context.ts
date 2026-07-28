@@ -68,11 +68,25 @@ export interface GrConfigContext {
 
 export const GR_CONFIG_KEY: InjectionKey<GrConfigContext> = Symbol('gr-config')
 
-// Пустой конфиг: когда провайдера в дереве нет, всё разрешается в `undefined`,
-// а компоненты падают на собственные дефолты.
+/**
+ * Пустой конфиг: когда провайдера в дереве нет, всё разрешается в `undefined`,
+ * а компоненты падают на собственные дефолты.
+ *
+ * `computed` здесь не роскошь: контекст типизирован рефами, и потребитель вправе
+ * прогнать `size` через `unref()` или `watch()`. Плоский объект `{ value: … }`
+ * не пройдёт проверку `isRef`, и такой код молча получит сам объект вместо
+ * значения — поэтому «просто константа» тут не подходит.
+ *
+ * А вот пустые значения заморожены, и это не педантизм: `computed` без
+ * зависимостей вычисляется один раз и отдаёт **один и тот же** объект всем
+ * компонентам без провайдера. Незамороженный, он позволил бы одному потребителю
+ * записать в него ключ и тем самым подменить дефолты всему приложению.
+ */
+const EMPTY_COMPONENT_DEFAULTS: GrComponentDefaults = Object.freeze({})
+
 const EMPTY_CONFIG: GrConfigContext = {
   size: computed(() => undefined),
-  componentDefaults: computed(() => ({})),
+  componentDefaults: computed(() => EMPTY_COMPONENT_DEFAULTS),
 }
 
 /** Возвращает ближайший `GrConfigProvider` или пустой конфиг, если провайдера нет. */
@@ -173,7 +187,7 @@ export function useGrComponentDefaults<TComponent extends GrConfigurableComponen
   name: TComponent,
 ): ComputedRef<GrDefaultsOf<TComponent>> {
   const config = useGrConfig()
-  return computed(() => (config.componentDefaults.value[name] ?? {}) as GrDefaultsOf<TComponent>)
+  return computed(() => (config.componentDefaults.value[name] ?? EMPTY_COMPONENT_DEFAULTS) as GrDefaultsOf<TComponent>)
 }
 
 /**
