@@ -14,7 +14,9 @@
   --gr-popover: #1e293b;
   --gr-popover-fg: #f8fafc;
   --gr-muted: #334155;
-  --gr-muted-fg: #94a3b8;
+  /* Симметрично light: минимум по фону `--gr-muted`/`--gr-secondary` (#334155).
+     Прежний #94a3b8 давал там 4.04, #aab6c7 даёт 5.04. */
+  --gr-muted-fg: #aab6c7;
   --gr-secondary: #334155;
   --gr-secondary-fg: #f1f5f9;
   --gr-brd: #334155;
@@ -22,8 +24,18 @@
   --gr-ring: #818cf8;
 
   /* Action roles */
-  --gr-primary: #6366f1;
-  --gr-primary-fg: #ffffff;
+  /*
+   * Primary был единственным тоном, выпадавшим из конвенции тёмной темы
+   * (светлая заливка + тёмный текст, как у success/warning/danger/info/azure):
+   * оставался светло-тёмным индиго #6366f1 с белым текстом и проваливал сразу
+   * все три роли — текст на фоне 4.00, текст на карточке 3.27, белый на
+   * заливке 4.47. Светлый индиго с тёмным `-fg` даёт 6.38 / 5.23 / 6.38.
+   * Не indigo-400 (#818cf8): это ровно `--gr-info` тёмной темы, и solid-бейджи
+   * Primary и Info стали бы неотличимы.
+   * Кнопок не касается: GrButton задаёт свой `--gr-button-primary-bg`.
+   */
+  --gr-primary: #9d8bfa;
+  --gr-primary-fg: #0f172a;
   --gr-accent: #1e1b4b;
   --gr-accent-fg: #c7d2fe;
   --gr-destructive: #ef4444;
@@ -78,8 +90,8 @@
   .dark,
   [data-theme='dark'] {
     /* Action role fallbacks */
-    --gr-primary-hover: #6f72f2;
-    --gr-primary-active: #7b7ef3;
+    --gr-primary-hover: #a494fa;
+    --gr-primary-active: #ac9dfa;
     --gr-secondary-hover: #435062;
     --gr-secondary-active: #535f70;
     --gr-brd-hover: #6e7987;

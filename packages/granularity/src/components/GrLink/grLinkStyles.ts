@@ -36,17 +36,36 @@ export const colorClass = 'text-[var(--gr-link-color)] visited:text-[var(--gr-li
 
 type GrLinkToneColors = { base: string, hover: string, active: string }
 
-// Пары «цвет / hover / active» на каждый тон из ролей темы.
+/**
+ * Пары «цвет / hover / active» на каждый тон из ролей темы.
+ *
+ * Ссылка — это ТЕКСТ на фоне страницы, поэтому тона берутся из `-text`, а не
+ * из насыщенного `--gr-{tone}`: последний под текст не рассчитан
+ * (`--gr-success` на `--gr-bg` — 2.2:1). Готовых `-text-hover/-active` в
+ * системе нет, поэтому они выводятся тем же приёмом, что и `--gr-{tone}-hover`
+ * в `tokens.css` — подмесом `--gr-fg`. В светлой теме это делает ссылку темнее
+ * при наведении, в тёмной — светлее, то есть в обеих контраст растёт.
+ */
+function toneTextColors(tone: string): GrLinkToneColors {
+  const base = `var(--gr-${tone}-text)`
+
+  return {
+    base,
+    hover: `color-mix(in srgb, ${base} 92%, var(--gr-fg))`,
+    active: `color-mix(in srgb, ${base} 84%, var(--gr-fg))`,
+  }
+}
+
 export const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
   primary: { base: 'var(--gr-primary)', hover: 'var(--gr-primary-hover)', active: 'var(--gr-primary-active)' },
   // Нейтральная ссылка: читаемый `--gr-fg` в покое, акцент `--gr-primary` при наведении.
   neutral: { base: 'var(--gr-fg)', hover: 'var(--gr-primary)', active: 'var(--gr-primary-active)' },
-  success: { base: 'var(--gr-success)', hover: 'var(--gr-success-hover)', active: 'var(--gr-success-active)' },
-  warning: { base: 'var(--gr-warning)', hover: 'var(--gr-warning-hover)', active: 'var(--gr-warning-active)' },
-  danger: { base: 'var(--gr-danger)', hover: 'var(--gr-danger-hover)', active: 'var(--gr-danger-active)' },
-  info: { base: 'var(--gr-info)', hover: 'var(--gr-info-hover)', active: 'var(--gr-info-active)' },
-  slate: { base: 'var(--gr-slate)', hover: 'var(--gr-slate-hover)', active: 'var(--gr-slate-active)' },
-  azure: { base: 'var(--gr-azure)', hover: 'var(--gr-azure-hover)', active: 'var(--gr-azure-active)' },
+  success: toneTextColors('success'),
+  warning: toneTextColors('warning'),
+  danger: toneTextColors('danger'),
+  info: toneTextColors('info'),
+  slate: toneTextColors('slate'),
+  azure: toneTextColors('azure'),
 }
 
 /** Инлайновые CSS-переменные цвета для текущей комбинации `tone` × `variant`. */

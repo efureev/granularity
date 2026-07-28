@@ -36,14 +36,16 @@ const treeData = ref<TreeItem[]>([
 
 const lastDrop = ref(t('components.GrTree.drag.hint'))
 
+// Текст на тонированной подложке — из `-text`, а не из насыщенного тона:
+// `--gr-success` на `--gr-success-light` даёт 2.24:1.
 function resolveTone(status: TreeItem['status']) {
   if (status === 'critical')
-    return 'bg-[color-mix(in_srgb,var(--gr-destructive)_14%,transparent)] text-[var(--gr-destructive)]'
+    return 'bg-[var(--gr-danger-light)] text-[var(--gr-danger-text)]'
 
   if (status === 'warning')
-    return 'bg-[var(--gr-warning-light)] text-[var(--gr-warning)]'
+    return 'bg-[var(--gr-warning-light)] text-[var(--gr-warning-text)]'
 
-  return 'bg-[var(--gr-success-light)] text-[var(--gr-success)]'
+  return 'bg-[var(--gr-success-light)] text-[var(--gr-success-text)]'
 }
 </script>
 

@@ -1,190 +1,22 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrButton from '../GrButton.vue'
 import { grButtonClass, type GrButtonTone, type GrButtonVariant } from '../grButtonStyles'
+import {
+  derivedThemeVars,
+  getColorClassExpression,
+  getContrastRatio,
+  getLuminance,
+  readComponentThemeVars,
+  resolveColorExpression,
+  themeVarsByName,
+} from '../../../__tests__/cssContrast'
 
-type RgbColor = {
-  r: number
-  g: number
-  b: number
-}
-
-function parseVars(content: string): Record<string, string> {
-  return Object.fromEntries(
-    [...content.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, key, value]) => [`--${key}`, value.trim()]),
-  )
-}
-
-function extractCssBlock(content: string, selector: string): string {
-  const start = content.indexOf(selector)
-
-  if (start === -1) {
-    throw new Error(`CSS block not found for selector: ${selector}`)
-  }
-
-  const openBrace = content.indexOf('{', start)
-
-  if (openBrace === -1) {
-    throw new Error(`CSS block has no opening brace: ${selector}`)
-  }
-
-  let depth = 0
-
-  for (let index = openBrace; index < content.length; index += 1) {
-    if (content[index] === '{') depth += 1
-    if (content[index] === '}') depth -= 1
-
-    if (depth === 0) {
-      return content.slice(openBrace + 1, index)
-    }
-  }
-
-  throw new Error(`CSS block has no closing brace: ${selector}`)
-}
-
-function splitTopLevel(input: string): string[] {
-  const parts: string[] = []
-  let buffer = ''
-  let depth = 0
-
-  for (const char of input) {
-    if (char === ',' && depth === 0) {
-      parts.push(buffer.trim())
-      buffer = ''
-      continue
-    }
-
-    if (char === '(') depth += 1
-    if (char === ')') depth -= 1
-    buffer += char
-  }
-
-  if (buffer.trim()) parts.push(buffer.trim())
-
-  return parts
-}
-
-function hexToRgb(hex: string): RgbColor {
-  let value = hex.trim().slice(1)
-
-  if (value.length === 3) {
-    value = value.split('').map(char => char + char).join('')
-  }
-
-  const numeric = Number.parseInt(value, 16)
-
-  return {
-    r: (numeric >> 16) & 255,
-    g: (numeric >> 8) & 255,
-    b: numeric & 255,
-  }
-}
-
-function mixColors(left: RgbColor, right: RgbColor, leftAmount: number): RgbColor {
-  return {
-    r: left.r * leftAmount + right.r * (1 - leftAmount),
-    g: left.g * leftAmount + right.g * (1 - leftAmount),
-    b: left.b * leftAmount + right.b * (1 - leftAmount),
-  }
-}
-
-function resolveColorExpression(
-  expression: string,
-  vars: Record<string, string>,
-  derivedVars: Record<string, string>,
-  stack: string[] = [],
-): RgbColor {
-  const value = expression.trim()
-
-  if (value === 'transparent') {
-    return resolveColorExpression('var(--gr-bg)', vars, derivedVars, stack)
-  }
-
-  if (value.startsWith('var(')) {
-    const [key, fallback] = splitTopLevel(value.slice(4, -1))
-
-    if (stack.includes(key)) {
-      throw new Error(`Circular var() reference: ${[...stack, key].join(' -> ')}`)
-    }
-
-    const resolved = vars[key] ?? derivedVars[key] ?? fallback
-
-    if (!resolved) {
-      throw new Error(`Unknown CSS var: ${key}`)
-    }
-
-    return resolveColorExpression(resolved, vars, derivedVars, [...stack, key])
-  }
-
-  if (value.startsWith('color-mix(')) {
-    const [space, left, right] = splitTopLevel(value.slice('color-mix('.length, -1))
-    const leftMatch = left.match(/^(.+?)\s+(\d+)%$/)
-
-    if (space !== 'in srgb' || !leftMatch) {
-      throw new Error(`Unsupported color-mix() expression: ${value}`)
-    }
-
-    return mixColors(
-      resolveColorExpression(leftMatch[1], vars, derivedVars, stack),
-      resolveColorExpression(right, vars, derivedVars, stack),
-      Number.parseInt(leftMatch[2], 10) / 100,
-    )
-  }
-
-  if (value.startsWith('#')) {
-    return hexToRgb(value)
-  }
-
-  throw new Error(`Unsupported color expression: ${value}`)
-}
-
-function getLuminance(color: RgbColor): number {
-  const [red, green, blue] = [color.r, color.g, color.b].map(channel => {
-    const normalized = channel / 255
-    return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
-  })
-
-  return 0.2126 * red + 0.7152 * green + 0.0722 * blue
-}
-
-function getContrastRatio(foreground: RgbColor, background: RgbColor): number {
-  const first = getLuminance(foreground)
-  const second = getLuminance(background)
-  const [lighter, darker] = first > second ? [first, second] : [second, first]
-
-  return (lighter + 0.05) / (darker + 0.05)
-}
-
-function getColorClassExpression(className: string, prefix: string): string | undefined {
-  const transparentToken = `${prefix}transparent`
-
-  if (className.includes(transparentToken)) return 'transparent'
-
-  const start = className.indexOf(prefix)
-
-  if (start === -1) return undefined
-
-  const valueStart = start + prefix.length
-  const valueEnd = className.indexOf(']', valueStart)
-
-  if (valueEnd === -1) return undefined
-
-  return className.slice(valueStart, valueEnd)
-}
-
-const lightThemeContent = readFileSync(resolve(process.cwd(), 'src/styles/themes/light.css'), 'utf8')
-const darkThemeContent = readFileSync(resolve(process.cwd(), 'src/styles/themes/dark.css'), 'utf8')
-const grButtonLightThemeContent = readFileSync(resolve(process.cwd(), 'src/components/GrButton/themes/light.css'), 'utf8')
-const grButtonDarkThemeContent = readFileSync(resolve(process.cwd(), 'src/components/GrButton/themes/dark.css'), 'utf8')
-const lightThemeVars = parseVars(lightThemeContent)
-const darkThemeVars = parseVars(darkThemeContent)
-const derivedThemeVars = parseVars(readFileSync(resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8'))
-const grButtonLightThemeVars = parseVars(extractCssBlock(grButtonLightThemeContent, ':root'))
-const grButtonDarkThemeVars = parseVars(extractCssBlock(grButtonDarkThemeContent, '.theme-dark,'))
+const lightThemeVars = themeVarsByName.light
+const darkThemeVars = themeVarsByName.dark
+const grButtonLightThemeVars = readComponentThemeVars('GrButton', 'light')
+const grButtonDarkThemeVars = readComponentThemeVars('GrButton', 'dark')
 const variants: GrButtonVariant[] = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border']
 const tones: GrButtonTone[] = ['primary', 'neutral', 'success', 'warning', 'danger', 'info', 'slate', 'azure']
 const filledTones: GrButtonTone[] = ['primary', 'success', 'warning', 'danger', 'info', 'slate', 'azure']

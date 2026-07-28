@@ -45,21 +45,26 @@ export const statisticTrendSizeBySize: Record<GrStatisticSize, string> = {
 }
 
 // Цвет значения по тону. `neutral` наследует основной цвет текста.
+//
+// Тона берутся из `-text`, а не из насыщенного `--gr-{tone}`: значение — это
+// ТЕКСТ на фоне страницы, а насыщенный тон для этого не предназначен
+// (`--gr-success` на `--gr-bg` — 2.2:1, ниже даже послабления 3:1 для крупного
+// текста). `-text` — ровно роль «тон как текст».
 export const statisticValueClassByTone: Record<GrStatisticTone, string> = {
   neutral: 'text-[var(--gr-statistic-value-color,var(--gr-fg))]',
   primary: 'text-[var(--gr-statistic-value-color,var(--gr-primary))]',
-  success: 'text-[var(--gr-statistic-value-color,var(--gr-success))]',
-  warning: 'text-[var(--gr-statistic-value-color,var(--gr-warning))]',
-  danger: 'text-[var(--gr-statistic-value-color,var(--gr-danger))]',
-  info: 'text-[var(--gr-statistic-value-color,var(--gr-info))]',
-  slate: 'text-[var(--gr-statistic-value-color,var(--gr-slate))]',
-  azure: 'text-[var(--gr-statistic-value-color,var(--gr-azure))]',
+  success: 'text-[var(--gr-statistic-value-color,var(--gr-success-text))]',
+  warning: 'text-[var(--gr-statistic-value-color,var(--gr-warning-text))]',
+  danger: 'text-[var(--gr-statistic-value-color,var(--gr-danger-text))]',
+  info: 'text-[var(--gr-statistic-value-color,var(--gr-info-text))]',
+  slate: 'text-[var(--gr-statistic-value-color,var(--gr-slate-text))]',
+  azure: 'text-[var(--gr-statistic-value-color,var(--gr-azure-text))]',
 }
 
 // Строка динамики: рост — успех, падение — опасность, без изменений — приглушённый.
 export const statisticTrendClassByTrend: Record<GrStatisticTrend, string> = {
-  up: 'text-[var(--gr-success)]',
-  down: 'text-[var(--gr-danger)]',
+  up: 'text-[var(--gr-success-text)]',
+  down: 'text-[var(--gr-danger-text)]',
   flat: 'text-[var(--gr-muted-fg)]',
 }
 

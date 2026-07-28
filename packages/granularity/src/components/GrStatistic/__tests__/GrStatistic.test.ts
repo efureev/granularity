@@ -17,11 +17,11 @@ describe('GrStatistic', () => {
 
   it('строка динамики окрашивается по направлению', () => {
     const up = mount(GrStatistic, { props: { value: 10, trend: 'up', trendText: '+12%' } })
-    expect(up.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-success)')
+    expect(up.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-success-text)')
     expect(up.get('[data-testid="gr-statistic-trend"]').html()).toContain('i-lucide-trending-up')
 
     const down = mount(GrStatistic, { props: { value: 10, trend: 'down', trendText: '-3%' } })
-    expect(down.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-danger)')
+    expect(down.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-danger-text)')
   })
 
   it('без trend/trendText строка динамики не рендерится', () => {
@@ -49,6 +49,6 @@ describe('GrStatistic', () => {
 
   it('тон меняет цвет значения', () => {
     const wrapper = mount(GrStatistic, { props: { value: 1, tone: 'danger' } })
-    expect(wrapper.get('[data-testid="gr-statistic-value"]').html()).toContain('var(--gr-danger)')
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').html()).toContain('var(--gr-danger-text)')
   })
 })

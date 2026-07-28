@@ -11,7 +11,10 @@
     --showcase-text-code: color-mix(in srgb, var(--gr-bg) 94%, var(--gr-fg) 6%);
     --showcase-text-code-muted: color-mix(in srgb, var(--gr-bg) 72%, var(--gr-muted-fg) 28%);
     --showcase-text-muted: color-mix(in srgb, var(--gr-fg) 72%, var(--gr-muted-fg) 28%);
-    --showcase-text-subtle: color-mix(in srgb, var(--gr-muted-fg) 84%, transparent);
+    /* Без разбавления: `--gr-muted-fg` уже И ЕСТЬ роль приглушённого текста и
+       выверен по AA на всех фонах системы. Прежний подмес 16% прозрачности
+       сводил этот запас на нет — подписи демо валили axe `color-contrast`. */
+    --showcase-text-subtle: var(--gr-muted-fg);
     --showcase-link-muted: color-mix(in srgb, var(--gr-fg) 60%, var(--gr-muted-fg) 40%);
     --showcase-shadow-soft: 0 24px 80px color-mix(in srgb, var(--gr-fg) 10%, transparent);
     --showcase-shadow-raised: 0 18px 40px color-mix(in srgb, var(--gr-fg) 8%, transparent);
