@@ -74,7 +74,11 @@ describe('showcase page smoke coverage', () => {
 
     expect(exampleCardSource).toContain('class="showcase-panel min-w-0 rounded-3xl border p-6"')
     expect(codeBlockSource).toContain('class="showcase-code-surface min-w-0 max-w-full overflow-hidden rounded-3xl border"')
-    expect(codeBlockSource).toContain('<pre class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6"><code>{{ code }}</code></pre>')
+    // Проверяем инварианты, а не точную разметку тега: `pre` не должен распирать
+    // страницу по горизонтали и обязан скроллиться сам. Атрибуты сворачивания
+    // (`id`/`style`) к этому инварианту отношения не имеют.
+    expect(codeBlockSource).toContain('class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6"')
+    expect(codeBlockSource).toContain('<code>{{ code }}</code></pre>')
   })
 
   it('рендерит package-level api и сохраняет fallback для missing entity', () => {

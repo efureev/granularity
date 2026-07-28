@@ -34,7 +34,14 @@
 
 [data-theme='dark'] {
     --showcase-surface-code: color-mix(in srgb, var(--gr-card) 82%, var(--gr-fg) 15%);
-    --showcase-surface-code-brd: color-mix(in srgb, var(--gr-primary) 22%, var(--gr-brd) 78%);
+    /*
+     * Рамка строится ОТ поверхности кода, а не от `--gr-brd`. В тёмной теме
+     * поверхность кода светлее страницы, а `--gr-brd` темнее их обеих: такая
+     * рамка не читалась ни изнутри (контраст 1.05), ни снаружи (1.72) —
+     * блок выглядел без границ вовсе. Подмешивание `--gr-fg` делает её светлее
+     * поверхности, и она видна с обеих сторон.
+     */
+    --showcase-surface-code-brd: color-mix(in srgb, var(--gr-fg) 26%, var(--showcase-surface-code) 74%);
     --showcase-text-code: color-mix(in srgb, var(--gr-fg) 94%, var(--gr-bg) 6%);
     --showcase-text-code-muted: color-mix(in srgb, var(--gr-muted-fg) 68%, var(--gr-fg) 32%);
 }
@@ -74,6 +81,68 @@
 
 .showcase-code-muted {
     color: var(--showcase-text-code-muted);
+}
+
+/*
+ * Обрыв свёрнутого сниппета. Градиент выходит на сплошной фон уже к 55% высоты:
+ * подпись под ним должна лежать на чистом фоне, иначе сквозь неё просвечивает код
+ * и обрыв читается как дефект рендера, а не как приём.
+ */
+.showcase-code-fade {
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        color-mix(in srgb, var(--showcase-surface-code) 55%, transparent) 35%,
+        var(--showcase-surface-code) 72%
+    );
+}
+
+.showcase-code-fade__label {
+    color: var(--showcase-text-code-muted);
+    background-color: color-mix(in srgb, var(--showcase-text-code) 8%, transparent);
+    transition: color 150ms ease, background-color 150ms ease;
+}
+
+.showcase-code-fade:hover .showcase-code-fade__label {
+    color: var(--showcase-text-code);
+    background-color: color-mix(in srgb, var(--showcase-text-code) 16%, transparent);
+}
+
+.showcase-code-fade:focus-visible {
+    outline: none;
+}
+
+.showcase-code-fade:focus-visible .showcase-code-fade__label {
+    color: var(--showcase-text-code);
+    outline: 2px solid var(--gr-ring);
+    outline-offset: 2px;
+}
+
+/*
+ * Единый тихий стиль для действий в шапке (копирование, сворачивание). Оба —
+ * вспомогательные: герой блока это код, а не кнопки.
+ */
+.showcase-code-action {
+    color: var(--showcase-text-code-muted);
+    background-color: transparent;
+    transition: color 150ms ease, background-color 150ms ease;
+}
+
+.showcase-code-action:hover {
+    color: var(--showcase-text-code);
+    background-color: color-mix(in srgb, var(--showcase-text-code) 12%, transparent);
+}
+
+.showcase-code-action:focus-visible {
+    outline: 2px solid var(--gr-ring);
+    outline-offset: 2px;
+}
+
+/* Подтверждение копирования — единственный цветной акцент внутри блока. */
+.showcase-code-action--done,
+.showcase-code-action--done:hover {
+    color: var(--gr-success);
+    background-color: color-mix(in srgb, var(--gr-success) 16%, transparent);
 }
 
 .showcase-border-strong {

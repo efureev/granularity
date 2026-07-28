@@ -440,7 +440,10 @@
   "docComponents": {
     "codeBlock": {
       "copy": "Copy code",
-      "copied": "Code copied"
+      "copied": "Code copied",
+      "expand": "Show code",
+      "collapse": "Hide code",
+      "lines": "{count} lines"
     },
     "apiTable": {
       "head": {

@@ -185,7 +185,7 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet"/>
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
