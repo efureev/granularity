@@ -11,15 +11,17 @@ const settings = reactive({
 </script>
 
 <template>
+  <!-- Заголовок пункта переключателю не принадлежит: он живёт рядом, а не в его
+       разметке. Без aria-label скринридер объявит просто «переключатель». -->
   <GrList>
     <GrListItem title="Realtime alerts" description="Push incidents to the operations inbox.">
-      <GrSwitch v-model="settings.alerts" />
+      <GrSwitch v-model="settings.alerts" aria-label="Realtime alerts" />
     </GrListItem>
     <GrListItem title="Weekly summaries" description="Send a digest to workspace owners every Monday.">
-      <GrSwitch v-model="settings.summaries" />
+      <GrSwitch v-model="settings.summaries" aria-label="Weekly summaries" />
     </GrListItem>
     <GrListItem title="Approval reminders" description="Remind approvers about stale payout requests.">
-      <GrSwitch v-model="settings.approvals" />
+      <GrSwitch v-model="settings.approvals" aria-label="Approval reminders" />
     </GrListItem>
   </GrList>
 </template>

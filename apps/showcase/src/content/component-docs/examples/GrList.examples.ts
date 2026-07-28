@@ -18,7 +18,7 @@ const settings = reactive({ alerts: true })
 <template>
   <GrList>
     <GrListItem title="Realtime alerts" description="Push incidents to the operations inbox.">
-      <GrSwitch v-model="settings.alerts" />
+      <GrSwitch v-model="settings.alerts" aria-label="Realtime alerts" />
     </GrListItem>
   </GrList>
 </template>`,

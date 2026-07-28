@@ -45,7 +45,15 @@ function statusVariant(status: unknown): 'success' | 'warning' | 'danger' {
           <GrButton size="sm" variant="ghost" @click="lastAction = 'Viewed ' + row.service">
             View
           </GrButton>
-          <GrButton size="sm" square variant="outline" tone="danger" @click="lastAction = 'Escalated ' + row.service">
+          <!-- Icon-only: иконка декоративна, имя кнопки задаётся явно. -->
+          <GrButton
+            size="sm"
+            square
+            variant="outline"
+            tone="danger"
+            :aria-label="'Escalate ' + row.service"
+            @click="lastAction = 'Escalated ' + row.service"
+          >
             <IconTrash />
           </GrButton>
         </div>
