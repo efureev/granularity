@@ -11,6 +11,7 @@ const environments = ref(['production', 'staging'])
     <GrInputTag
       v-model="environments"
       placeholder="Environment alias"
+      aria-label="Environment aliases"
       tag-tone="warning"
       tag-dark
     >

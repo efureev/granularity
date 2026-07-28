@@ -19,6 +19,7 @@ const remaining = computed(() => 4 - skills.value.length)
       :max="4"
       state="success"
       placeholder="Add skill tags"
+      aria-label="Skill tags"
       tag-tone="primary"
       tag-radius="round"
     />

@@ -76,8 +76,10 @@ describe('showcase page smoke coverage', () => {
     expect(codeBlockSource).toContain('class="showcase-code-surface min-w-0 max-w-full overflow-hidden rounded-3xl border"')
     // Проверяем инварианты, а не точную разметку тега: `pre` не должен распирать
     // страницу по горизонтали и обязан скроллиться сам. Атрибуты сворачивания
-    // (`id`/`style`) к этому инварианту отношения не имеют.
-    expect(codeBlockSource).toContain('class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6"')
+    // (`id`/`style`) и оформление фокуса к этому инварианту отношения не имеют.
+    expect(codeBlockSource).toMatch(/class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6/)
+    // Скроллящийся блок обязан быть достижим с клавиатуры (axe: scrollable-region-focusable).
+    expect(codeBlockSource).toContain('tabindex="0"')
     expect(codeBlockSource).toContain('<code>{{ code }}</code></pre>')
   })
 

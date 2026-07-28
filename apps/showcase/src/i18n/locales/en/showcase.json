@@ -442,7 +442,8 @@
       "copied": "Code copied",
       "expand": "Show code",
       "collapse": "Hide code",
-      "lines": "{count} lines"
+      "lines": "{count} lines",
+      "regionLabel": "{language} code, scrollable region"
     },
     "apiTable": {
       "head": {

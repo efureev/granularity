@@ -442,7 +442,8 @@
       "copied": "Код скопирован",
       "expand": "Показать код",
       "collapse": "Свернуть код",
-      "lines": "строк: {count}"
+      "lines": "строк: {count}",
+      "regionLabel": "Код на {language}, прокручиваемая область"
     },
     "apiTable": {
       "head": {

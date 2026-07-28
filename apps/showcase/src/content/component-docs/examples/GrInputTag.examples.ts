@@ -20,6 +20,7 @@ const tags = ref(['critical', 'backend'])
     <GrInputTag
       v-model="tags"
       placeholder="Type a tag and press Enter"
+      aria-label="Incident tags"
       add-on-blur
       :separators="[',', ';']"
     />
@@ -57,6 +58,7 @@ const remaining = computed(() => 4 - skills.value.length)
       :max="4"
       state="success"
       placeholder="Add skill tags"
+      aria-label="Skill tags"
       tag-tone="secondary"
       tag-radius="round"
     />
@@ -86,6 +88,7 @@ const environments = ref(['production', 'staging'])
     <GrInputTag
       v-model="environments"
       placeholder="Environment alias"
+      aria-label="Environment aliases"
       tag-tone="warning"
       tag-dark
     >

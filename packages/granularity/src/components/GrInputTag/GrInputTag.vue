@@ -5,6 +5,7 @@ import GrBadge from '../GrBadge/GrBadge.vue'
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconClose from '~icons/lucide/x'
+import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -44,6 +45,12 @@ export interface GrInputTagProps {
   tagClosable?: boolean
   /** i18n-friendly aria-label for the per-tag remove button. */
   removeTagLabel?: string
+  /**
+   * Имя контрола, когда он используется вне `GrFormField`. Внутри поля имя даёт
+   * связка с его `<label for>` — там проп не нужен. Без того и другого у инпута
+   * нет доступного имени вовсе: placeholder именем не считается.
+   */
+  ariaLabel?: string
 }
 
 const props = withDefaults(
@@ -67,6 +74,7 @@ const props = withDefaults(
     tagRadius: 'round',
     tagClosable: true,
     removeTagLabel: undefined,
+    ariaLabel: undefined,
   },
 )
 
@@ -75,6 +83,14 @@ const emit = defineEmits<{
   (e: 'add', value: string): void
   (e: 'remove', value: string, index: number): void
 }>()
+
+// Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required) —
+// как у GrInput и GrSelect: контрол не знает про форму, знает только про поле.
+const field = useGrFormFieldContext()
+const resolvedId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => props.invalid || Boolean(field?.invalid.value))
+const isRequired = computed(() => Boolean(field?.required.value))
 
 const { t } = useGranularityTranslations()
 const resolvedRemoveTagLabel = computed(() => props.removeTagLabel ?? t('gr.inputTag.removeTag', 'Remove tag'))
@@ -277,6 +293,7 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
     </GrBadge>
 
     <input
+      :id="resolvedId"
       ref="inputEl"
       data-gr-input-tag-input
       data-testid="gr-input-tag-input"
@@ -284,7 +301,10 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
       :disabled="disabled || isMaxed"
       :readonly="readonly"
       :placeholder="placeholderText"
-      :aria-invalid="invalid ? 'true' : undefined"
+      :aria-label="ariaLabel"
+      :aria-describedby="describedBy"
+      :aria-required="isRequired ? 'true' : undefined"
+      :aria-invalid="isInvalid ? 'true' : undefined"
       class="flex-1 min-w-[120px] bg-transparent border-none outline-none placeholder:text-[var(--gr-muted-fg)]"
       :class="inputClassName"
       @input="onInput"

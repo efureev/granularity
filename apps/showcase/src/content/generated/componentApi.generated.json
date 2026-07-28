@@ -3232,6 +3232,13 @@
             "default": "undefined"
           },
           {
+            "name": "ariaLabel",
+            "description": "Имя контрола, когда он используется вне `GrFormField`. Внутри поля имя даёт связка с его `<label for>` — там проп не нужен. Без того и другого у инпута нет доступного имени вовсе: placeholder именем не считается.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "trim",
             "description": "",
             "type": "boolean | undefined",

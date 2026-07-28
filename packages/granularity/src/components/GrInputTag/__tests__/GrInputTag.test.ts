@@ -11,6 +11,7 @@ vi.mock('~icons/lucide/x', () => {
   }
 })
 
+import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrInputTag from '../GrInputTag.vue'
 
 describe('GrInputTag', () => {
@@ -90,6 +91,38 @@ describe('GrInputTag', () => {
     await input.trigger('keydown', { key: 'Enter' })
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  // Placeholder именем не считается: до этой правки задать имя было нечем вообще —
+  // ни пропа, ни связки с `GrFormField` (axe: `label`).
+  it('берёт доступное имя из ariaLabel вне GrFormField', () => {
+    const wrapper = mount(GrInputTag, {
+      props: { modelValue: [], ariaLabel: 'Incident tags' },
+    })
+
+    expect(wrapper.get('[data-gr-input-tag-input]').attributes('aria-label')).toBe('Incident tags')
+  })
+
+  it('внутри GrFormField получает id, aria-describedby и aria-invalid из контекста', () => {
+    const Harness = defineComponent({
+      components: { GrFormField, GrInputTag },
+      data: () => ({ tags: [] as string[] }),
+      template: `
+        <GrFormField label="Skills" hint="Через запятую" error="Обязательное поле" required>
+          <GrInputTag v-model="tags" />
+        </GrFormField>
+      `,
+    })
+
+    const wrapper = mount(Harness)
+    const input = wrapper.get('[data-gr-input-tag-input]')
+    const id = input.attributes('id')
+
+    expect(id).toBeTruthy()
+    expect(wrapper.get(`label[for="${id}"]`).text()).toContain('Skills')
+    expect(input.attributes('aria-describedby')).toBeTruthy()
+    expect(input.attributes('aria-invalid')).toBe('true')
+    expect(input.attributes('aria-required')).toBe('true')
   })
 
   it('не редактируется в disabled состоянии', async () => {

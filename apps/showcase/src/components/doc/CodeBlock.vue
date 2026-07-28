@@ -122,9 +122,14 @@ function toggle(): void {
     </div>
 
     <div class="relative">
+      <!-- tabindex: длинные строки дают горизонтальный скролл, а скроллящийся блок
+           обязан быть достижим с клавиатуры — иначе часть кода недоступна без мыши
+           (axe: scrollable-region-focusable). -->
       <pre
         :id="codeId"
-        class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6"
+        tabindex="0"
+        :aria-label="t('showcase.docComponents.codeBlock.regionLabel', { language })"
+        class="max-w-full overflow-x-auto px-4 py-4 text-sm leading-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :style="isCollapsible && !isExpanded ? { maxHeight: collapsedMaxHeight, overflowY: 'hidden' } : undefined"
       ><code>{{ code }}</code></pre>
 

@@ -11,6 +11,7 @@ const tags = ref(['critical', 'backend'])
     <GrInputTag
       v-model="tags"
       placeholder="Type a tag and press Enter"
+      aria-label="Incident tags"
       add-on-blur
       :separators="[',', ';']"
     />
