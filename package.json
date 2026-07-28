@@ -16,13 +16,16 @@
     "build:playground-config": "yarn workspace @feugene/granularity-playground-config build",
     "build:playground-theme": "yarn workspace @feugene/granularity-playground-theme build",
     "dev:playground": "yarn workspace @feugene/granularity-playground dev",
+    "build:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr build",
     "dev:playground-theme": "yarn workspace @feugene/granularity-playground-theme dev",
+    "dev:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr dev",
     "dev:showcase": "yarn workspace @feugene/granularity-showcase dev",
-    "test": "yarn test:granularity && yarn test:playground && yarn test:playground-theme",
+    "test": "yarn test:granularity && yarn test:playground && yarn test:playground-theme && yarn test:playground-ssr",
     "test:granularity": "yarn workspace @feugene/granularity test:run",
     "coverage:granularity": "yarn workspace @feugene/granularity test:coverage",
     "test:playground": "yarn workspace @feugene/granularity-playground test:run",
     "test:playground-theme": "yarn workspace @feugene/granularity-playground-theme test:run",
+    "test:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr test:run",
     "test:showcase": "yarn workspace @feugene/granularity-showcase test:run",
     "typecheck:playground-config": "yarn workspace @feugene/granularity-playground-config typecheck"
   }
