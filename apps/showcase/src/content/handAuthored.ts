@@ -26,7 +26,7 @@ const componentSummaryOverrides = {
   GrButton: 'Triggers the primary action in a form, dialog or panel.',
   GrButtonGroup: 'Groups related buttons into a compact action cluster.',
   GrCard: 'A container for a meaningful block of content and actions.',
-  GrConfigProvider: 'Provides global defaults (size, z-index base, per-component props, i18n) to nested components.',
+  GrConfigProvider: 'Provides global defaults (control size, per-component props, i18n) to nested components — imperative dialogs included.',
   GrDivider: 'Separates content with a line, optionally with a centered label.',
   GrKbd: 'Displays a keyboard key or shortcut in a `<kbd>` element.',
   GrTabPanels: 'Renders tab panels linked to `GrTabs` by ARIA for accessible tabs.',

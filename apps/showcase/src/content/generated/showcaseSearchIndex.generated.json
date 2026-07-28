@@ -508,13 +508,13 @@
   {
     "id": "entity:component:GrConfigProvider",
     "title": "GrConfigProvider",
-    "description": "Provides global defaults (size, z-index base, per-component props, i18n) to nested components.",
+    "description": "Provides global defaults (control size, per-component props, i18n) to nested components — imperative dialogs included.",
     "href": "/components/gr-config-provider",
     "kind": "entity",
     "kindLabel": "component",
     "context": "utilities / component",
     "searchableTitle": "grconfigprovider",
-    "searchableContent": "grconfigprovider grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. utilities component /components/gr-config-provider packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grconfigprovider generated public-api featured components components gr-config-provider gr config provider"
+    "searchableContent": "grconfigprovider grconfigprovider provides global defaults (control size, per-component props, i18n) to nested components imperative dialogs included. utilities component /components/gr-config-provider packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grconfigprovider generated public-api featured components components gr-config-provider gr config provider"
   },
   {
     "id": "entity:component:GrConfirmDialog",
@@ -1779,7 +1779,7 @@
     "kindLabel": "Section",
     "context": "GrConfigProvider",
     "searchableTitle": "grconfigprovider component overview",
-    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+    "searchableContent": "grconfigprovider provides global defaults (control size, per-component props, i18n) to nested components imperative dialogs included. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
   },
   {
     "id": "entity:component:GrConfigProvider:section:live-examples",
@@ -1790,7 +1790,7 @@
     "kindLabel": "Section",
     "context": "GrConfigProvider",
     "searchableTitle": "grconfigprovider live examples",
-    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+    "searchableContent": "grconfigprovider provides global defaults (control size, per-component props, i18n) to nested components imperative dialogs included. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
   },
   {
     "id": "entity:component:GrConfigProvider:section:api",
@@ -1801,7 +1801,7 @@
     "kindLabel": "Section",
     "context": "GrConfigProvider",
     "searchableTitle": "grconfigprovider generated api",
-    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+    "searchableContent": "grconfigprovider provides global defaults (control size, per-component props, i18n) to nested components imperative dialogs included. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
   },
   {
     "id": "entity:component:GrConfigProvider:section:integration-notes",
@@ -1812,7 +1812,7 @@
     "kindLabel": "Section",
     "context": "GrConfigProvider",
     "searchableTitle": "grconfigprovider integration notes",
-    "searchableContent": "grconfigprovider provides global defaults (size, z-index base, per-component props, i18n) to nested components. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+    "searchableContent": "grconfigprovider provides global defaults (control size, per-component props, i18n) to nested components imperative dialogs included. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrConfirmDialog:section:overview",

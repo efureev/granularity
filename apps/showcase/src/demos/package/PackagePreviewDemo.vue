@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 import {
   GrBadge,
@@ -173,55 +174,58 @@ function handleUploadValidationError(error: unknown) {
   uploadBridgeStatus.value = String(error)
 }
 
+const { t } = useFintI18n()
 const dialog = useDialogService()
-const dialogStatus = ref('Запустите imperative-вызов, чтобы увидеть результат Promise.')
+const dialogStatus = ref(t('composables.useDialogService.status.idle'))
 
 async function runConfirmDemo() {
-  const ok = await dialog.confirm('This action cannot be undone.', {
-    title: 'Delete workspace?',
+  const ok = await dialog.confirm(t('composables.useDialogService.confirm.message'), {
+    title: t('composables.useDialogService.confirm.title'),
     size: 'sm',
-    confirmText: 'Delete',
-    cancelText: 'Keep',
+    confirmText: t('composables.useDialogService.confirm.confirmText'),
+    cancelText: t('composables.useDialogService.confirm.cancelText'),
     confirmTone: 'danger',
   })
-  dialogStatus.value = `confirm resolved: ${ok}`
+  dialogStatus.value = t('composables.useDialogService.status.confirmResolved', { value: String(ok) })
 }
 
 async function runPromptDemo() {
-  const name = await dialog.prompt('Pick a new project name.', {
-    title: 'Rename project',
+  const name = await dialog.prompt(t('composables.useDialogService.prompt.message'), {
+    title: t('composables.useDialogService.prompt.title'),
     size: 'md',
-    label: 'Project name',
-    placeholder: 'e.g. Atlas',
+    label: t('composables.useDialogService.prompt.label'),
+    placeholder: t('composables.useDialogService.prompt.placeholder'),
     required: true,
-    confirmText: 'Save',
+    confirmText: t('composables.useDialogService.prompt.confirmText'),
   })
-  dialogStatus.value = name === null ? 'prompt cancelled' : `prompt resolved: ${name}`
+  dialogStatus.value = name === null
+    ? t('composables.useDialogService.status.promptCancelled')
+    : t('composables.useDialogService.status.promptResolved', { value: name })
 }
 
 async function runAlertDemo() {
-  await dialog.alert('Your workspace settings have been saved.', {
-    title: 'Saved',
+  await dialog.alert(t('composables.useDialogService.alert.message'), {
+    title: t('composables.useDialogService.alert.title'),
     size: 'lg',
-    confirmText: 'Got it',
+    confirmText: t('composables.useDialogService.alert.confirmText'),
   })
-  dialogStatus.value = 'alert acknowledged'
+  dialogStatus.value = t('composables.useDialogService.status.alertAcknowledged')
 }
 
-const networkStatus = ref('Откройте диалог: 1-я попытка вернёт серверную валидацию (422), 2-я — обрыв сети, 3-я завершится успехом.')
+const networkStatus = ref(t('composables.useDialogService.network.idle'))
 let networkAttempt = 0
 
 async function runNetworkDemo() {
   networkAttempt = 0
-  networkStatus.value = 'Dialog открыт. Жмите «Send invite», чтобы пройти сценарии loading -> validation -> network -> success.'
+  networkStatus.value = t('composables.useDialogService.network.opened')
 
-  const email = await dialog.prompt('Send an invite to a teammate.', {
-    title: 'Invite teammate',
+  const email = await dialog.prompt(t('composables.useDialogService.network.message'), {
+    title: t('composables.useDialogService.network.title'),
     size: 'md',
-    label: 'Work email',
-    placeholder: 'name@company.com',
+    label: t('composables.useDialogService.network.label'),
+    placeholder: t('composables.useDialogService.network.placeholder'),
     required: true,
-    confirmText: 'Send invite',
+    confirmText: t('composables.useDialogService.network.confirmText'),
     // Подключаем Laravel-пресет поверх ядра: fieldErrors лягут на поле `value`.
     errorParsers: presets => [...presets.core, presets.laravel],
     async onConfirm(ctx) {
@@ -233,8 +237,8 @@ async function runNetworkDemo() {
         // Серверная валидация (HTTP 422): баннер + ошибка под полем ввода.
         await ctx.setRawError(
           new Response(JSON.stringify({
-            message: 'The given data was invalid.',
-            errors: { value: ['This email is already invited.'] },
+            message: t('composables.useDialogService.network.serverMessage'),
+            errors: { value: [t('composables.useDialogService.network.fieldError')] },
           }), {
             status: 422,
             headers: { 'Content-Type': 'application/json' },
@@ -253,8 +257,8 @@ async function runNetworkDemo() {
   })
 
   networkStatus.value = email === null
-    ? `prompt cancelled (после ${networkAttempt} попыток)`
-    : `invite sent: ${email} (успех с ${networkAttempt}-й попытки)`
+    ? t('composables.useDialogService.network.cancelled', { attempts: networkAttempt })
+    : t('composables.useDialogService.network.sent', { email, attempts: networkAttempt })
 }
 </script>
 
@@ -450,7 +454,7 @@ async function runNetworkDemo() {
 
     <template v-else-if="previewKey === 'use-dialog-service-confirm'">
       <GrButton class="justify-self-start" variant="primary" tone="danger" @click="runConfirmDemo">
-        Delete workspace (confirm)
+        {{ t('composables.useDialogService.confirm.trigger') }}
       </GrButton>
       <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
@@ -459,7 +463,7 @@ async function runNetworkDemo() {
 
     <template v-else-if="previewKey === 'use-dialog-service-prompt'">
       <GrButton class="justify-self-start" variant="outline" @click="runPromptDemo">
-        Rename project (prompt)
+        {{ t('composables.useDialogService.prompt.trigger') }}
       </GrButton>
       <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
@@ -468,7 +472,7 @@ async function runNetworkDemo() {
 
     <template v-else-if="previewKey === 'use-dialog-service-alert'">
       <GrButton class="justify-self-start" variant="ghost" @click="runAlertDemo">
-        Show alert
+        {{ t('composables.useDialogService.alert.trigger') }}
       </GrButton>
       <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
@@ -477,7 +481,7 @@ async function runNetworkDemo() {
 
     <template v-else-if="previewKey === 'use-dialog-service-network'">
       <GrButton class="justify-self-start" variant="primary" @click="runNetworkDemo">
-        Invite teammate (async onConfirm)
+        {{ t('composables.useDialogService.network.trigger') }}
       </GrButton>
       <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ networkStatus }}

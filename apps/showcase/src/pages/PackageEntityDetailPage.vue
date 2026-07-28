@@ -12,6 +12,7 @@ import {
   getShowcasePageByPath,
 } from '../app/showcase'
 import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
+import { useEntityI18nBlock } from '../app/useEntityI18nBlock'
 import CodeBlock from '../components/doc/CodeBlock.vue'
 import ApiTable from '../components/doc/ApiTable.vue'
 import ExampleCard from '../components/doc/ExampleCard.vue'
@@ -40,6 +41,12 @@ const page = computed(() => {
 
   return currentPage ? localizePage(currentPage) : undefined
 })
+// Блок переводов страницы: `composables.useDialogService`, `directives.vLoading` и т. п.
+// Демо на этой странице берут строки диалогов и подписи именно оттуда.
+const i18nBlockName = computed(() => (entity.value ? `${entity.value.kind}s.${entity.value.name}` : null))
+
+useEntityI18nBlock(i18nBlockName)
+
 const entityDoc = computed(() => entity.value ? getShowcasePackageDoc(entity.value) : undefined)
 const usageSnippet = computed(() => createUsageSnippet(entity.value))
 const dependencyItems = computed(() => createDependencyItems(entity.value))

@@ -33,10 +33,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - `i18n` — the translation adapter, passed down without a manual `inject`. Only provided when
     given explicitly, so it never shadows an adapter the application installed higher up.
 
+  Imperative dialogs inherit the config too. `useDialogService` mounts its host outside the component
+  tree, where `inject` can only see `app.provide()` values, so the service captures the config at the
+  point where `useDialogService()` is called and the host hands it to the dialog. Capture happens in
+  `useDialogService()`, not in `confirm()` — obtain the service in `setup` of a component inside the
+  provider; a module-level singleton has no tree to read. Priority inside a dialog: call options →
+  `useDialogService(defaults)` → provider → component defaults. Teleported overlays (`GrModal`,
+  `GrDrawer`, the `GrSelect` panel) were never affected: they keep the component chain.
+
   A local prop always wins over the config; the config wins over the component's own default. To
   make a prop configurable a component resolves it through `useGrComponentSize()` /
   `useGrComponentProp()` and declares its `withDefaults` entry as `undefined` — otherwise Vue would
   substitute the default before the component ever looks at the config.
+- `resolveGrConfig(source)` — reads the config where `inject` is unavailable (directives, imperative
+  services, utilities): from an explicit context, from a source's `provides`, or from `inject` when an
+  instance is active. Mirrors the existing `resolveGranularityI18n()`.
 - `useGrComponentSize()` gained a `supported` option so a component can declare the size scale it
   actually implements (`GrSlider`, `GrRating`, `GrSwitch`, `GrLink` and `GrStatistic` have no `xs`).
   A size coming from the provider that the component does not support is ignored in favour of the

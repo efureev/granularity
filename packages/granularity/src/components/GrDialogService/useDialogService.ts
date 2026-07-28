@@ -1,7 +1,9 @@
-import { createVNode, getCurrentInstance, render } from 'vue'
-import type { AppContext } from 'vue'
+import { createVNode, getCurrentInstance, markRaw, render } from 'vue'
+import type { AppContext, Raw } from 'vue'
 
 import GrDialogServiceHost from './GrDialogServiceHost.vue'
+import { useGrConfig, type GrConfigContext } from '../GrConfigProvider/context'
+import { resolveGranularityI18n, type GranularityI18nLike } from '../../internal/granularityI18n'
 import { dialogQueue, makeDialogId } from './store'
 import type { DialogRequest } from './store'
 import type {
@@ -56,7 +58,17 @@ export function teardownDialogService(): void {
     container = null
   }
   mounted = false
+  // Сбрасываем и кэш контекста приложения: без этого он переживает teardown и
+  // протекает в следующее приложение (в тестах — в следующий тест), из-за чего
+  // диалог может подхватить чужие provides и проверка соврёт.
+  cachedAppContext = null
   dialogQueue.splice(0, dialogQueue.length)
+}
+
+/** Контекст, захваченный вызовом `useDialogService()` внутри `setup`. */
+type CapturedContext = {
+  config: Raw<GrConfigContext> | null
+  i18n: Raw<GranularityI18nLike> | null
 }
 
 function enqueue(
@@ -64,6 +76,7 @@ function enqueue(
   message: string,
   options: DialogBaseOptions,
   onConfirm: DialogOnConfirm<any> | undefined,
+  captured: CapturedContext,
 ): { promise: Promise<DialogResult<any>>, close: () => void } {
   // Императивный сервис клиент-only: монтирует хост в `document.body`. В SSR
   // выполнять его нельзя — модульная очередь (`dialogQueue`) мутировалась бы на
@@ -90,6 +103,8 @@ function enqueue(
     options: { ...options, message },
     onConfirm,
     resolve: resolveFn,
+    config: captured.config,
+    i18n: captured.i18n,
   }
 
   dialogQueue.push(request)
@@ -144,21 +159,39 @@ export function useDialogService(defaults: DialogServiceDefaults = {}): DialogSe
     cachedAppContext = instance.appContext
   }
 
+  // Конфиг и i18n захватываем здесь и только здесь: `inject` работает лишь в
+  // `setup`, а хост монтируется вне дерева и сам до провайдера не дотянется.
+  // Храним в замыкании сервиса, а не в модульной переменной, — иначе два
+  // поддерева с разными провайдерами делили бы конфиг первого.
+  // i18n захватываем не «на всякий случай»: дочерний `GrConfirmDialog` сам зовёт
+  // `useGranularityTranslations()`, но его `inject` из хоста уходит в
+  // `appContext.provides` — то есть видит только установку через `app.use()`.
+  // Адаптер, переданный пропом `<GrConfigProvider i18n>`, живёт в дереве, и без
+  // захвата диалог откатился бы на встроенные английские строки.
+  //
+  // `markRaw` — потому что дальше контекст ложится в `reactive`-очередь, а она
+  // разворачивает вложенные рефы (см. комментарий в `store.ts`).
+  const capturedI18n = instance ? resolveGranularityI18n() : null
+  const captured: CapturedContext = {
+    config: instance ? markRaw(useGrConfig()) : null,
+    i18n: capturedI18n ? markRaw(capturedI18n) : null,
+  }
+
   function confirm(message: string, options: DialogConfirmOptions = {}): DialogPromise<boolean> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue('confirm', message, merged, options.onConfirm)
+    const { promise, close } = enqueue('confirm', message, merged, options.onConfirm, captured)
     return withClose(promise.then(r => r.action === 'confirm'), close)
   }
 
   function alert(message: string, options: DialogAlertOptions = {}): DialogPromise<void> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue('alert', message, merged, options.onConfirm)
+    const { promise, close } = enqueue('alert', message, merged, options.onConfirm, captured)
     return withClose(promise.then(() => undefined), close)
   }
 
   function prompt(message: string, options: DialogPromptOptions = {}): DialogPromise<string | null> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue('prompt', message, merged, options.onConfirm)
+    const { promise, close } = enqueue('prompt', message, merged, options.onConfirm, captured)
     return withClose(
       promise.then(r => (r.action === 'confirm' ? ((r.value as string) ?? '') : null)),
       close,
@@ -171,7 +204,7 @@ export function useDialogService(defaults: DialogServiceDefaults = {}): DialogSe
     options: DialogBaseOptions = {},
   ): DialogPromise<DialogResult<V>> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue(kind, message, merged, (options as DialogConfirmOptions).onConfirm)
+    const { promise, close } = enqueue(kind, message, merged, (options as DialogConfirmOptions).onConfirm, captured)
     return withClose(promise as Promise<DialogResult<V>>, close)
   }
 

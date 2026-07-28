@@ -103,6 +103,41 @@ config outside that list is ignored in favour of the component's own default, wi
 dev-only console warning, instead of silently rendering an element with no size
 classes.
 
+## Imperatively mounted components
+
+`useDialogService` mounts its host into `document.body` with `render()`, outside the
+component tree. Vue resolves `inject` for such a root from `appContext.provides`,
+which holds only what `app.provide()` put there — a `<GrConfigProvider>` living in
+the tree is invisible to it.
+
+The package closes this itself: `useDialogService()` captures the config **at the
+point of call** (in `setup`, where the calling component is still inside the
+provider) and the host hands it down to the dialog. Nothing is required from the
+application.
+
+```vue
+<script setup lang="ts">
+// Inside <GrConfigProvider size="sm"> — the dialog's buttons will be `sm` too.
+const dialogs = useDialogService()
+</script>
+```
+
+Two consequences worth knowing:
+
+- **Capture happens in `useDialogService()`, not on the call.** Get the service in
+  `setup`. A service obtained outside a component (a module-level singleton, a
+  store, a plain `.ts` helper) has no tree to read, so its dialogs fall back to the
+  component defaults.
+- **Each service instance carries its own config.** Two subtrees with different
+  providers keep their own — the host is shared, the config is not.
+
+Priority inside a dialog: call options → `useDialogService(defaults)` → provider →
+component defaults. Service defaults are more specific than the provider on purpose.
+
+`v-loading` / `createLoading` are the same kind of imperative API, but `GrLoading`
+has no configurable props, so there is nothing to inherit today. When it gets them,
+the same capture applies.
+
 ## Exports
 
 `GrConfigProvider`, `useGrConfig`, `useGrComponentSize`, `useGrComponentProp`,
@@ -121,3 +156,6 @@ classes.
   degrades to `{}`, which TypeScript lets any object literal satisfy. Key checking
   starts with the first imported configurable component.
 - The contract is verified end-to-end by `apps/playground-config`.
+- Teleports are **not** affected: `GrModal`, `GrDrawer` and the `GrSelect` panel move
+  the DOM but keep the component chain, so `inject` reaches them normally. The gap
+  is specific to components rendered without a parent component.

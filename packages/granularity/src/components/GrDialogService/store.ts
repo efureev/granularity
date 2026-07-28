@@ -1,4 +1,8 @@
 import { reactive } from 'vue'
+import type { Raw } from 'vue'
+
+import type { GrConfigContext } from '../GrConfigProvider/context'
+import type { GranularityI18nLike } from '../../internal/granularityI18n'
 
 import type {
   DialogBaseOptions,
@@ -20,6 +24,21 @@ export interface DialogRequest {
   onConfirm?: DialogOnConfirm<any>
   /** Резолвит промис вызова детальным результатом `{ action, value }`. */
   resolve: (result: DialogResult<any>) => void
+  /**
+   * Конфиг и i18n, захваченные в месте вызова сервиса (в `setup`, где вызывающий
+   * компонент ещё находится внутри дерева провайдера). Хост монтируется в
+   * `document.body` вне дерева, поэтому сам их не увидит — см.
+   * `SPEC-GrConfig-resolver.md`.
+   *
+   * Лежат в запросе, а не в модульной переменной: два поддерева с разными
+   * провайдерами должны получать каждое свой конфиг.
+   *
+   * `Raw<…>` обязателен: очередь — `reactive`, а он разворачивает вложенные рефы.
+   * Без `markRaw` контекст превратился бы в объект значений, `size.value` стало
+   * бы `undefined`, и мост молча перестал бы работать.
+   */
+  config?: Raw<GrConfigContext> | null
+  i18n?: Raw<GranularityI18nLike> | null
 }
 
 /**

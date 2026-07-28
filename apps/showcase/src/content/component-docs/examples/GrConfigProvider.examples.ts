@@ -141,6 +141,83 @@ const enabled = ref(true)
     note: 'Чтобы компонент умел читать конфиг, его настраиваемый проп обязан иметь дефолт `undefined`, а «настоящий» дефолт — жить в резолвере `useGrComponentProp`. Иначе Vue подставит дефолт раньше, чем компонент заглянет в конфиг, и отличить «пользователь передал значение» от «сработал дефолт» будет невозможно.',
   },
   {
+    id: 'config-provider-dialog',
+    title: 'Imperative dialogs inherit the config',
+    description: '`useDialogService` монтирует хост в `body`, вне дерева компонентов, — обычный `inject` туда не дотягивается. Пакет закрывает это сам: сервис захватывает конфиг в момент вызова `useDialogService()`, и диалог получает те же дефолты, что и контролы вокруг. От приложения ничего не требуется.',
+    status: 'ready',
+    previewKey: 'gr-config-provider-dialog',
+    code: `<!-- DialogCaller.vue -->
+<script setup lang="ts">
+import { GrButton, useDialogService } from '@feugene/granularity'
+
+/**
+ * Отдельный компонент здесь по существу, а не для красоты: \`useDialogService()\`
+ * захватывает конфиг в \`setup\`, поэтому вызывать его нужно там, где компонент
+ * уже находится внутри \`GrConfigProvider\`.
+ */
+const emit = defineEmits<{ (e: 'answer', value: string): void }>()
+
+const dialogs = useDialogService()
+
+async function ask(): Promise<void> {
+  const confirmed = await dialogs.confirm('Удалить черновик? Действие необратимо.')
+  emit('answer', confirmed ? 'подтвердил' : 'отменил')
+}
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
+    <GrButton @click="ask">
+      Открыть диалог
+    </GrButton>
+    <span class="text-sm text-[var(--gr-muted-fg)]">
+      кнопка снаружи — для сравнения размеров
+    </span>
+  </div>
+</template>
+
+<!-- Demo.vue -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrButton, GrConfigProvider } from '@feugene/granularity'
+
+import DialogCaller from './DialogCaller.vue'
+
+const size = ref<'sm' | 'lg'>('sm')
+const lastAnswer = ref<string | null>(null)
+</script>
+
+<template>
+  <div class="grid gap-4">
+    <div class="flex items-center gap-3">
+      <span class="text-sm font-medium">Размер в провайдере:</span>
+      <GrButton
+        v-for="s in (['sm', 'lg'] as const)"
+        :key="s"
+        size="sm"
+        :variant="size === s ? 'primary' : 'outline'"
+        @click="size = s"
+      >
+        {{ s }}
+      </GrButton>
+    </div>
+
+    <!-- Вызывающий компонент внутри провайдера — значит и диалог унаследует конфиг. -->
+    <GrConfigProvider :size="size">
+      <DialogCaller @answer="lastAnswer = $event" />
+    </GrConfigProvider>
+
+    <p class="text-sm text-[var(--gr-muted-fg)]">
+      Диалог монтируется в <code>body</code>, вне дерева провайдера, но кнопки в нём
+      приходят того же размера, что и контролы вокруг. Последний ответ:
+      <code>{{ lastAnswer ?? '—' }}</code>
+    </p>
+  </div>
+</template>`,
+    note: 'Захват происходит в `useDialogService()`, а не при вызове `confirm()`. Поэтому сервис нужно получать в `setup` компонента, находящегося внутри провайдера: сервис-синглтон из модуля или стора дерева не видит и откатится на дефолты компонентов. Приоритет внутри диалога: опции вызова → `useDialogService(defaults)` → провайдер → дефолты компонентов.',
+  },
+  {
     id: 'config-provider-read',
     title: 'Read the config in your own component',
     description: 'Любой компонент читает конфиг ближайшего провайдера через `useGrConfig()` — так подключаются собственные контролы. Провайдер отдаёт `size` и `componentDefaults` (per-component дефолтные пропсы); вне провайдера всё разрешается в fallback-значения.',

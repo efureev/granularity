@@ -32,6 +32,8 @@ const iconFiles = [
 const allowedSymbolUsage = new Map([
   ['content/component-docs/examples/GrTree.examples.ts', new Set(['→'])],
   ['content/component-docs/examples/GrFileUpload.examples.ts', new Set(['→'])],
+  // Цепочка приоритетов в примере `GrConfigProvider`: «опции → сервис → провайдер → дефолт».
+  ['content/component-docs/examples/GrConfigProvider.examples.ts', new Set(['→'])],
   ['content/foundations.ts', new Set(['→'])],
   // Цепочка приоритетов в описании `GrConfigProvider`: «локальный проп → конфиг → md».
   ['content/component-docs/overrides.ts', new Set(['→'])],

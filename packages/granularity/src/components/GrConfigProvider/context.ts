@@ -1,4 +1,4 @@
-import { computed, inject, type ComputedRef, type InjectionKey } from 'vue'
+import { computed, getCurrentInstance, inject, type ComputedRef, type InjectionKey } from 'vue'
 
 /**
  * Контекст `GrConfigProvider` — глобальные дефолты для вложенных GR-компонентов:
@@ -92,6 +92,41 @@ const EMPTY_CONFIG: GrConfigContext = {
 /** Возвращает ближайший `GrConfigProvider` или пустой конфиг, если провайдера нет. */
 export function useGrConfig(): GrConfigContext {
   return inject(GR_CONFIG_KEY, EMPTY_CONFIG)
+}
+
+/**
+ * Источник конфига для {@link resolveGrConfig}: сам контекст, `AppContext` или
+ * инстанс компонента — у двух последних читается `provides`.
+ */
+export type GrConfigSource = GrConfigContext | { provides?: Record<symbol | string, unknown> }
+
+function isGrConfigContext(source: unknown): source is GrConfigContext {
+  return typeof (source as GrConfigContext | null)?.componentDefaults?.value === 'object'
+}
+
+/**
+ * Конфиг там, где `inject` недоступен — вне `setup`: в директивах, императивных
+ * сервисах, утилитах. Порядок: явный контекст → `provides` источника → `inject`
+ * (если есть активный инстанс) → пустой конфиг.
+ *
+ * Важно понимать границу: `provides` у `AppContext` содержит только то, что
+ * роздано через `app.provide()`. Значения от `<GrConfigProvider>` живут в дереве
+ * компонентов, и достать их можно лишь оттуда, где это дерево ещё есть — то есть
+ * захватом в `setup`. Просто передать `appContext` в отрыве от дерева
+ * недостаточно; см. `SPEC-GrConfig-resolver.md`.
+ */
+export function resolveGrConfig(source?: GrConfigSource | null): GrConfigContext {
+  if (isGrConfigContext(source)) return source
+
+  const provides = source?.provides
+  if (provides) {
+    const fromProvides = provides[GR_CONFIG_KEY as symbol] as GrConfigContext | undefined
+    return isGrConfigContext(fromProvides) ? fromProvides : EMPTY_CONFIG
+  }
+
+  if (getCurrentInstance()) return inject(GR_CONFIG_KEY, EMPTY_CONFIG)
+
+  return EMPTY_CONFIG
 }
 
 export type UseGrComponentSizeOptions<TSize extends string> = {

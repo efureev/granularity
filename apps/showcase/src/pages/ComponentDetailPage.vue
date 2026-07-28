@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import {computed, defineAsyncComponent, onUnmounted, watch} from 'vue'
+import {computed, defineAsyncComponent} from 'vue'
 import {RouterLink, useRoute} from 'vue-router'
 
 import {useFintI18n} from '@feugene/fint-i18n/vue'
+
 import {GrCard} from '@feugene/granularity'
 
 import {
   getShowcaseComponentBySlug,
 } from '../app/showcase'
 import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
+import {useEntityI18nBlock} from '../app/useEntityI18nBlock'
 import EventsTable from '../components/doc/EventsTable.vue'
 import ExampleCard from '../components/doc/ExampleCard.vue'
 import InfoSectionCard from '../components/doc/InfoSectionCard.vue'
@@ -24,34 +26,9 @@ import {
 import {getShowcaseComponentDoc} from '../content/componentDocs'
 
 const route = useRoute()
-const i18n = useFintI18n()
-const {t} = i18n
+const {t} = useFintI18n()
 const {localizePageByName, localizeEntitySummary} = useShowcasePageI18n()
 
-
-// Каждый компонент — отдельный i18n-блок (`components.<Name>`). Блок грузится
-// лениво при открытии страницы компонента и выгружается при уходе на другой
-// компонент, чтобы не держать в памяти переводы всех компонентов сразу.
-let activeI18nBlock: string | null = null
-
-function setActiveI18nBlock(blockName: string | null) {
-  if (blockName === activeI18nBlock)
-    return
-
-  const previous = activeI18nBlock
-  activeI18nBlock = blockName
-
-  if (previous) {
-    i18n.unregisterUsage(previous)
-    for (const locale of i18n.getKnownLocales())
-      i18n.unloadBlock(previous, locale)
-  }
-
-  if (blockName) {
-    i18n.registerUsage(blockName)
-    void i18n.loadBlock(blockName)
-  }
-}
 
 const previewRegistry = {
   'gr-alert-closable-flow': defineAsyncComponent(() => import('../demos/components/gr-alert/GrAlertClosableDemo.vue')),
@@ -92,6 +69,7 @@ const previewRegistry = {
   'gr-config-provider-size': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderSizeDemo.vue')),
   'gr-config-provider-nested': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderNestedDemo.vue')),
   'gr-config-provider-defaults': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderDefaultsDemo.vue')),
+  'gr-config-provider-dialog': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderDialogDemo.vue')),
   'gr-config-provider-read': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderReadDemo.vue')),
   'gr-confirm-dialog-button-matrix': defineAsyncComponent(() => import('../demos/components/gr-confirm-dialog/GrConfirmDialogButtonMatrixDemo.vue')),
   'gr-confirm-dialog-custom-body': defineAsyncComponent(() => import('../demos/components/gr-confirm-dialog/GrConfirmDialogCustomBodyDemo.vue')),
@@ -328,13 +306,11 @@ function resolvePreviewComponent(previewKey?: string) {
   return previewRegistry[previewKey as keyof typeof previewRegistry]
 }
 
-watch(componentEntity, () => {
-  setActiveI18nBlock(componentEntity.value ? 'components.' + componentEntity.value.name : null)
-}, {immediate: true})
-
-onUnmounted(() => {
-  setActiveI18nBlock(null)
-})
+// Блок переводов компонента (`components.<Name>`) грузится лениво при открытии
+// страницы и выгружается при уходе — см. `useEntityI18nBlock`.
+useEntityI18nBlock(computed(() =>
+  componentEntity.value ? `components.${componentEntity.value.name}` : null,
+))
 </script>
 
 <template>

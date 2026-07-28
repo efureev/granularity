@@ -8,7 +8,7 @@
  * загрузки и ошибок во время async-`onConfirm`, прогоняя «сырые» ответы
  * сервера через цепочку парсеров `GrResponseErrorBanner`.
  */
-import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, provide, ref, shallowRef, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrConfirmDialog from '../GrConfirmDialog/GrConfirmDialog.vue'
@@ -20,11 +20,51 @@ import {
 } from '../GrResponseErrorBanner'
 import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 
+import { GR_CONFIG_KEY, type GrComponentDefaults, type GrConfigContext } from '../GrConfigProvider/context'
+import { GRANULARITY_I18N_KEY } from '../../i18n/adapter'
+import { resolveGranularityI18n } from '../../internal/granularityI18n'
+
 import { dialogQueue } from './store'
 import type { DialogRequest } from './store'
 import type { DialogCloseAction, DialogConfirmContext } from './types'
 
 const active = computed<DialogRequest | null>(() => dialogQueue[0] ?? null)
+
+// ————— Мост конфига и i18n.
+//
+// Хост рендерится через `render(vnode, container)` в `document.body`, то есть вне
+// дерева компонентов. Vue в этом случае берёт `provides` только из `appContext`,
+// куда попадает лишь `app.provide()` — значения от `<GrConfigProvider>` до сюда
+// не доходят. Поэтому вызов сервиса захватывает их в `setup` и кладёт в запрос, а
+// хост раздаёт вниз конфиг **активного** запроса.
+//
+// Раздаём производный контекст, а не захваченный объект: хост один на всё
+// приложение и живёт между вызовами, а запросы приходят из разных поддеревьев с
+// разными провайдерами. Реактивность при этом сохраняется — внутри лежат те же
+// рефы, что и у исходного провайдера.
+const EMPTY_DEFAULTS: GrComponentDefaults = Object.freeze({})
+
+provide<GrConfigContext>(GR_CONFIG_KEY, {
+  size: computed(() => active.value?.config?.size.value),
+  componentDefaults: computed(() => active.value?.config?.componentDefaults.value ?? EMPTY_DEFAULTS),
+})
+
+// i18n: тот же приём. Адаптер хоста (из `appContext`) остаётся запасным вариантом,
+// если вызов пришёл без захваченного — так установка через `app.use()` продолжает
+// работать как раньше.
+const hostI18n = resolveGranularityI18n()
+
+provide(GRANULARITY_I18N_KEY, {
+  t: (key: string, params?: Record<string, unknown>) => {
+    const adapter = active.value?.i18n ?? hostI18n
+    // Вернуть сам ключ — принятый в пакете сигнал «перевода нет»: потребитель
+    // подставит свой fallback-текст (см. `useGranularityTranslations`).
+    return adapter?.t(key, params) ?? key
+  },
+  get locale() {
+    return (active.value?.i18n ?? hostI18n)?.locale
+  },
+})
 
 const open = ref(false)
 const loading = ref(false)
