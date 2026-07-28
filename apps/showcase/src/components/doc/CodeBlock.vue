@@ -65,7 +65,10 @@ function toggle(): void {
 
 <template>
   <div class="showcase-code-surface min-w-0 max-w-full overflow-hidden rounded-3xl border">
-    <div class="showcase-code-divider flex items-center justify-between gap-3 border-b px-4 py-3">
+    <div
+      class="showcase-code-divider flex items-center justify-between gap-3 border-b px-4"
+      :class="title ? 'py-3' : 'py-2'"
+    >
       <div class="min-w-0">
         <p
           v-if="title"
@@ -73,8 +76,11 @@ function toggle(): void {
         >
           {{ title }}
         </p>
-        <p class="showcase-code-muted mt-0.5 text-[11px] uppercase tracking-[0.14em]">
-          {{ language }}<template v-if="isCollapsible"> · {{ t('showcase.docComponents.codeBlock.lines', { count: lineCount }) }}</template>
+        <p
+          class="showcase-code-meta"
+          :class="title ? 'mt-0.5' : ''"
+        >
+          <b>{{ language }}</b><template v-if="isCollapsible"> · {{ t('showcase.docComponents.codeBlock.lines', { count: lineCount }) }}</template>
         </p>
       </div>
 

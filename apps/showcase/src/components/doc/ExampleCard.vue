@@ -38,7 +38,6 @@ defineProps<{
       class="mt-5"
       :code="code"
       language="vue"
-      :title="$t('showcase.detailPage.snippetTitle')"
     />
 
     <p

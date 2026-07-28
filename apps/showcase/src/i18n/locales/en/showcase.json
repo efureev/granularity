@@ -421,7 +421,6 @@
       "fallbackComponent": "Preview area is reserved for the live demo of the next iteration.",
       "fallbackPackage": "Preview area reserved for the next iteration."
     },
-    "snippetTitle": "Snippet",
     "docPageExampleNote": "In upcoming stages this card will receive a live preview and the source snippet of a specific scenario.",
     "sectionAnchorLink": "link",
     "notFoundComponent": {

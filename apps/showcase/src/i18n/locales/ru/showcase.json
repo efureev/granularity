@@ -421,7 +421,6 @@
       "fallbackComponent": "Preview area зарезервирован под live demo следующего этапа.",
       "fallbackPackage": "Preview area зарезервирован под следующую итерацию."
     },
-    "snippetTitle": "Фрагмент кода",
     "docPageExampleNote": "На следующих этапах эта карточка получит живой preview и source snippet конкретного сценария.",
     "sectionAnchorLink": "ссылка",
     "notFoundComponent": {
