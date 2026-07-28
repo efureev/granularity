@@ -4,8 +4,11 @@ export type { GrComponentDefaults, GrComponentSize } from './GrConfigProvider.vu
 export {
   GR_COMPONENT_SIZES,
   GR_CONFIG_KEY,
+  type GrComponentDefaultsRegistry,
   type GrConfigContext,
+  type GrConfigurableComponent,
   useGrComponentDefaults,
+  useGrComponentProp,
   useGrComponentSize,
   type UseGrComponentSizeOptions,
   useGrConfig,

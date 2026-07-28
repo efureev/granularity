@@ -4,7 +4,6 @@
  *
  * Даёт единое место для:
  * - `size` — дефолтного размера контролов (не нужно повторять `size` в каждом вызове);
- * - `zIndexBase` — базы z-index для оверлеев (пробрасывается как CSS-переменная `--gr-z-base`);
  * - `componentDefaults` — per-component дефолтных пропсов;
  * - `i18n` — адаптера переводов (иначе приложение инжектит его вручную).
  *
@@ -30,8 +29,6 @@ const props = withDefaults(
   defineProps<{
     /** Дефолтный размер контролов для вложенных компонентов. */
     size?: GrComponentSize
-    /** База z-index для оверлеев. Пробрасывается как `--gr-z-base`. */
-    zIndexBase?: number
     /** Дефолтные пропсы по компонентам: `{ GrButton: { variant: 'secondary' } }`. */
     componentDefaults?: GrComponentDefaults
     /** Адаптер переводов (fint-i18n-совместимый). Прокидывается вложенным компонентам. */
@@ -41,7 +38,6 @@ const props = withDefaults(
   }>(),
   {
     size: undefined,
-    zIndexBase: undefined,
     componentDefaults: undefined,
     i18n: undefined,
     tag: 'div',
@@ -52,23 +48,27 @@ const props = withDefaults(
 const parent = useGrConfig()
 
 const size = computed(() => props.size ?? parent.size.value)
-const zIndexBase = computed(() => props.zIndexBase ?? parent.zIndexBase.value)
-const componentDefaults = computed<GrComponentDefaults>(() => ({
-  ...parent.componentDefaults.value,
-  ...(props.componentDefaults ?? {}),
-}))
+const componentDefaults = computed<GrComponentDefaults>(() => {
+  const inherited = parent.componentDefaults.value as Record<string, Record<string, unknown>>
+  const own = (props.componentDefaults ?? {}) as Record<string, Record<string, unknown>>
 
-provide<GrConfigContext>(GR_CONFIG_KEY, { size, zIndexBase, componentDefaults })
+  // Мержим на уровне пропов, а не компонентов: иначе вложенный провайдер,
+  // переопределяющий один `variant`, стирал бы у родителя весь блок `GrButton`.
+  const merged: Record<string, Record<string, unknown>> = { ...inherited }
+  for (const [component, componentProps] of Object.entries(own))
+    merged[component] = { ...(inherited[component] ?? {}), ...componentProps }
+
+  return merged
+})
+
+provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults })
 
 // i18n-адаптер прокидываем детям только если он задан явно — иначе не затеняем
 // адаптер, установленный приложением выше по дереву (fint-i18n).
 if (props.i18n != null)
   provide(GRANULARITY_I18N_KEY, props.i18n)
 
-const wrapperStyle = computed(() => ({
-  display: 'contents',
-  ...(zIndexBase.value != null ? { '--gr-z-base': String(zIndexBase.value) } : {}),
-}))
+const wrapperStyle = { display: 'contents' } as const
 </script>
 
 <template>

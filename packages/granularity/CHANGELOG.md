@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- New `GrConfigProvider` — one place for the design system's global defaults, provided to the whole
+  subtree via `provide`/`inject` and rendered transparently (`display: contents`), so it never
+  affects layout. Providers nest: a child merges over its parent down to the individual prop, which
+  lets you set a global rule and override one detail deeper in the tree.
+  - `size` — the default size for nested controls. Read by `GrButton` and `GrInput`.
+  - `componentDefaults` — default props keyed by component name, e.g.
+    `{ GrButton: { variant: 'outline' } }`. The set of configurable props is deliberately closed —
+    `GrButton` (`variant`, `tone`, `size`, `square`), `GrInput` (`size`, `clearable`), `GrBadge`
+    (`tone`, `size`, `radius`) — so the config can shape appearance but never a `modelValue` or an
+    event handler, and a typo in a component or prop name is a type error.
+
+    Each component declares its own contract in its folder (`GrButton/defaults.ts`) and registers it
+    through declaration merging, so `GrConfigProvider` knows nothing about concrete components. The
+    practical consequence for consumers: `componentDefaults` is typed with exactly the components you
+    imported — pull in only `GrButton` and `GrBadge`'s types never enter your project.
+  - `i18n` — the translation adapter, passed down without a manual `inject`. Only provided when
+    given explicitly, so it never shadows an adapter the application installed higher up.
+
+  A local prop always wins over the config; the config wins over the component's own default. To
+  make a prop configurable a component resolves it through `useGrComponentSize()` /
+  `useGrComponentProp()` and declares its `withDefaults` entry as `undefined` — otherwise Vue would
+  substitute the default before the component ever looks at the config.
+- `useGrComponentSize()` gained a `supported` option so a component can declare the size scale it
+  actually implements (`GrSlider`, `GrRating`, `GrSwitch`, `GrLink` and `GrStatistic` have no `xs`).
+  A size coming from the provider that the component does not support is ignored in favour of the
+  component's own default instead of silently producing an element with no size classes.
+
+### Changed
+
+- **`GrButton`, `GrInput` and `GrBadge` no longer declare their configurable props' defaults in
+  `withDefaults`** — the defaults moved into the resolvers, which is what makes `GrConfigProvider`
+  able to override them. Rendering is unchanged, but reading such a prop from the outside (through
+  a template ref or a wrapper) now yields `undefined` until it is explicitly passed: `variant`,
+  `tone`, `size`, `square` on `GrButton`; `size`, `clearable` on `GrInput`; `tone`, `size`, `radius`
+  on `GrBadge`.
+
 ## [v0.13.0] 2026-07-23
 
 ### Changed

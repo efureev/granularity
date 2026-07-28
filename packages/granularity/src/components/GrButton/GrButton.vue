@@ -3,7 +3,7 @@ import { computed, markRaw, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 
@@ -34,12 +34,15 @@ const props = withDefaults(
     external?: boolean
   }>(),
   {
-    variant: 'primary',
-    tone: 'primary',
+    // `variant`/`tone`/`size`/`square` настраиваются через `GrConfigProvider`,
+    // поэтому их дефолты живут в резолверах ниже, а не здесь: Vue подставил бы
+    // дефолт до того, как компонент успеет заглянуть в конфиг.
+    variant: undefined,
+    tone: undefined,
     size: undefined,
     loading: false,
     disabled: false,
-    square: false,
+    square: undefined,
     type: 'button',
     ariaLabel: undefined,
     as: undefined,
@@ -50,10 +53,11 @@ const props = withDefaults(
   },
 )
 
-const isSquare = computed(() => props.square)
-
-// Эффективный размер: проп `size` → дефолт из `GrConfigProvider` → `md`.
-const resolvedSize = useGrComponentSize(() => props.size)
+// Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrButton' })
+const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant, 'primary')
+const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone, 'primary')
+const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
 
 // Полиморфный корень: `as` → `<a href>` → `<button>`.
 const isLink = computed(() => Boolean(props.as || props.href))
@@ -104,8 +108,8 @@ const squareStyle = computed(() => {
 
 const className = computed(() => {
   return grButtonClass({
-    variant: props.variant,
-    tone: props.tone,
+    variant: resolvedVariant.value,
+    tone: resolvedTone.value,
     size: resolvedSize.value,
     square: isSquare.value,
   })
@@ -116,8 +120,8 @@ const className = computed(() => {
   <component
     :is="renderAs"
     data-gr-button
-    :data-gr-variant="props.variant"
-    :data-gr-tone="props.tone"
+    :data-gr-variant="resolvedVariant"
+    :data-gr-tone="resolvedTone"
     :type="renderAs === 'button' ? props.type : undefined"
     :disabled="nativeDisabled"
     :href="isLink && !props.disabled ? props.href : undefined"

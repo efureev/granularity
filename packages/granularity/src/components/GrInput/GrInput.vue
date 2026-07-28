@@ -2,7 +2,7 @@
 import {computed, ref, useSlots} from 'vue'
 
 import {addLen, useAddonMeasurement} from '../../composables/internal/useAddonMeasurement'
-import {useGrComponentSize} from '../GrConfigProvider/context'
+import {useGrComponentProp, useGrComponentSize} from '../GrConfigProvider/context'
 import {useGrFormFieldContext} from '../GrFormField/context'
 import {useGranularityTranslations} from '../../internal/granularityI18n'
 import type {InputHTMLAttributes} from 'vue'
@@ -76,7 +76,8 @@ const props = withDefaults(
       id: undefined,
       size: undefined,
 
-      clearable: false,
+      // Настраивается через `GrConfigProvider`; дефолт — в резолвере ниже.
+      clearable: undefined,
       clearLabel: undefined,
       maxlength: undefined,
       showCount: false,
@@ -103,8 +104,9 @@ const emit = defineEmits<{
 // invalid/required как fallback, чтобы не прокидывать `forId` вручную.
 const field = useGrFormFieldContext()
 
-// Эффективный размер: проп `size` → дефолт из `GrConfigProvider` → `md`.
-const resolvedSize = useGrComponentSize(() => props.size)
+// Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrInput' })
+const resolvedClearable = useGrComponentProp('GrInput', 'clearable', () => props.clearable, false)
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid || Boolean(field?.invalid.value))
@@ -269,7 +271,7 @@ const passwordVisible = ref(false)
 const resolvedType = computed(() => (props.type === 'password' && passwordVisible.value ? 'text' : props.type))
 
 const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !props.disabled)
-const showClear = computed(() => props.clearable && props.modelValue.length > 0 && !props.disabled && !props.readonly)
+const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !props.readonly)
 
 const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))

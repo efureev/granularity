@@ -2,7 +2,7 @@ import { computed, inject, type ComputedRef, type InjectionKey } from 'vue'
 
 /**
  * Контекст `GrConfigProvider` — глобальные дефолты для вложенных GR-компонентов:
- * размер контролов, база z-index для оверлеев и per-component дефолтные пропсы.
+ * размер контролов и per-component дефолтные пропсы.
  *
  * Компоненты читают его через {@link useGrConfig} (или хелперы ниже) и используют
  * как fallback, когда соответствующий проп не задан на самом компоненте. Провайдер
@@ -18,14 +18,50 @@ export const GR_COMPONENT_SIZES = ['xs', 'sm', 'md', 'lg'] as const
 
 export type GrComponentSize = typeof GR_COMPONENT_SIZES[number]
 
-/** Дефолтные пропсы по имени компонента: `{ GrButton: { variant: 'secondary' } }`. */
-export type GrComponentDefaults = Partial<Record<string, Record<string, unknown>>>
+/**
+ * Открытый реестр компонентов, у которых есть настраиваемые через конфиг пропы.
+ *
+ * Пустой по умолчанию: каждый компонент дополняет его **из своей папки** через
+ * declaration merging (`GrButton/defaults.ts` и т. п.). Так провайдер не знает
+ * ни имён, ни типов конкретных компонентов — контракт объявляет тот, кто им
+ * владеет, а не общий модуль.
+ *
+ * Практическое следствие: реестр состоит ровно из тех компонентов, которые
+ * попали в граф типов потребителя. Импортировали только `GrButton` — в
+ * `componentDefaults` типизирована только кнопка, типы `GrBadge` в проект не
+ * приезжают.
+ *
+ * ```ts
+ * // GrButton/defaults.ts
+ * declare module '../GrConfigProvider/context' {
+ *   interface GrComponentDefaultsRegistry {
+ *     GrButton: GrButtonConfigurableProps
+ *   }
+ * }
+ * ```
+ */
+export interface GrComponentDefaultsRegistry {}
+
+/** Имя компонента, у которого есть настраиваемые через конфиг пропы. */
+export type GrConfigurableComponent = keyof GrComponentDefaultsRegistry
+
+/**
+ * Дефолтные пропсы по имени компонента: `{ GrButton: { variant: 'secondary' } }`.
+ *
+ * Набор ключей закрыт реестром, а не `Record<string, unknown>`: через конфиг
+ * должны настраиваться только «оформительские» пропы. Пустить туда что угодно —
+ * значит разрешить задать глобальный `modelValue` или обработчик и получить баг,
+ * который ищется часами.
+ */
+export type GrComponentDefaults = {
+  [TComponent in GrConfigurableComponent]?: Partial<GrComponentDefaultsRegistry[TComponent]>
+}
+
+type GrDefaultsOf<TComponent extends GrConfigurableComponent> = Partial<GrComponentDefaultsRegistry[TComponent]>
 
 export interface GrConfigContext {
   /** Дефолтный размер контролов (если проп `size` не задан на компоненте). */
   size: ComputedRef<GrComponentSize | undefined>
-  /** База z-index для оверлеев (модалки/тосты/дропдауны). */
-  zIndexBase: ComputedRef<number | undefined>
   /** Дефолтные пропсы по компонентам. */
   componentDefaults: ComputedRef<GrComponentDefaults>
 }
@@ -36,7 +72,6 @@ export const GR_CONFIG_KEY: InjectionKey<GrConfigContext> = Symbol('gr-config')
 // а компоненты падают на собственные дефолты.
 const EMPTY_CONFIG: GrConfigContext = {
   size: computed(() => undefined),
-  zIndexBase: computed(() => undefined),
   componentDefaults: computed(() => ({})),
 }
 
@@ -46,6 +81,11 @@ export function useGrConfig(): GrConfigContext {
 }
 
 export type UseGrComponentSizeOptions<TSize extends string> = {
+  /**
+   * Имя компонента, чтобы учесть точечный `componentDefaults[Component].size`.
+   * Без него читается только глобальный `size` провайдера.
+   */
+  component?: GrConfigurableComponent
   /** Размер, когда ни проп, ни конфиг ничего не дали. По умолчанию `md`. */
   fallback?: TSize
   /**
@@ -81,7 +121,12 @@ function warnUnsupportedSize(size: string, supported: readonly string[]): void {
 }
 
 /**
- * Эффективный размер компонента: локальный проп → конфиг провайдера → `fallback`.
+ * Эффективный размер компонента. Приоритет:
+ * локальный проп → `componentDefaults[Component].size` → глобальный `size`
+ * провайдера → `fallback`. Точечная настройка компонента должна побеждать
+ * общую — иначе `componentDefaults` нельзя было бы использовать как исключение
+ * из глобального правила.
+ *
  * Передавайте `size` геттером, чтобы сохранить реактивность.
  *
  * Локальный проп не проверяется по `supported`: он уже сужен типом пропа самого
@@ -93,14 +138,18 @@ export function useGrComponentSize<TSize extends string = GrComponentSize>(
   options: UseGrComponentSizeOptions<TSize> = {},
 ): ComputedRef<TSize> {
   // Все size-шкалы пакета содержат `md`, поэтому он безопасен как общий дефолт.
-  const { fallback = 'md' as TSize, supported } = options
+  const { component, fallback = 'md' as TSize, supported } = options
   const config = useGrConfig()
 
   return computed(() => {
     const local = localSize()
     if (local !== undefined) return local
 
-    const fromConfig = config.size.value
+    const fromComponentDefaults = component
+      ? (config.componentDefaults.value[component] as { size?: TSize } | undefined)?.size
+      : undefined
+
+    const fromConfig = fromComponentDefaults ?? config.size.value
     if (fromConfig === undefined) return fallback
 
     if (supported && !supported.includes(fromConfig as TSize)) {
@@ -120,7 +169,42 @@ export function useGrComponentSize<TSize extends string = GrComponentSize>(
 }
 
 /** Дефолтные пропсы конкретного компонента из ближайшего провайдера. */
-export function useGrComponentDefaults(name: string): ComputedRef<Record<string, unknown>> {
+export function useGrComponentDefaults<TComponent extends GrConfigurableComponent>(
+  name: TComponent,
+): ComputedRef<GrDefaultsOf<TComponent>> {
   const config = useGrConfig()
-  return computed(() => config.componentDefaults.value[name] ?? {})
+  return computed(() => (config.componentDefaults.value[name] ?? {}) as GrDefaultsOf<TComponent>)
+}
+
+/**
+ * Эффективное значение «оформительского» пропа: локальный проп →
+ * `componentDefaults[Component][prop]` → собственный дефолт компонента.
+ *
+ * Обязательное условие на стороне компонента: у такого пропа в `withDefaults`
+ * должен стоять `undefined`, а «настоящий» дефолт — переехать сюда, в `fallback`.
+ * Иначе конфиг не сработает никогда: Vue отдаёт `props.x` уже с подставленным
+ * дефолтом, и отличить «пользователь передал значение» от «сработал дефолт»
+ * изнутри компонента невозможно.
+ */
+export function useGrComponentProp<
+  TComponent extends GrConfigurableComponent,
+  TProp extends keyof GrDefaultsOf<TComponent>,
+>(
+  component: TComponent,
+  prop: TProp,
+  localValue: () => GrDefaultsOf<TComponent>[TProp],
+  fallback: NonNullable<GrDefaultsOf<TComponent>[TProp]>,
+): ComputedRef<NonNullable<GrDefaultsOf<TComponent>[TProp]>> {
+  const config = useGrConfig()
+
+  return computed(() => {
+    const local = localValue()
+    if (local !== undefined) return local as NonNullable<GrDefaultsOf<TComponent>[TProp]>
+
+    // Промежуточная аннотация (а не `as`) нужна, чтобы TS не разворачивал
+    // `GrComponentDefaults[TComponent]` в объединение всех блоков — по нему
+    // generic-ключ `TProp` уже не проиндексировать.
+    const defaults: GrDefaultsOf<TComponent> | undefined = config.componentDefaults.value[component]
+    return defaults?.[prop] ?? fallback
+  })
 }

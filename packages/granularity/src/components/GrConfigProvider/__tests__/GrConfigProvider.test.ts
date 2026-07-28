@@ -2,10 +2,13 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import GrBadge from '../../GrBadge/GrBadge.vue'
+import GrButton from '../../GrButton/GrButton.vue'
 import GrConfigProvider from '../GrConfigProvider.vue'
+import GrInput from '../../GrInput/GrInput.vue'
 import { resetUnsupportedSizeWarnings, useGrComponentSize, useGrConfig } from '../context'
 
-// Тестовый потребитель конфига: рендерит разрешённый размер и zIndexBase.
+// Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.
 const Consumer = defineComponent({
   setup() {
     const config = useGrConfig()
@@ -13,7 +16,6 @@ const Consumer = defineComponent({
     return () =>
       h('div', [
         h('span', { class: 'size' }, size.value),
-        h('span', { class: 'z' }, String(config.zIndexBase.value)),
         h('span', { class: 'variant' }, String(config.componentDefaults.value.GrButton?.variant)),
       ])
   },
@@ -25,27 +27,26 @@ describe('GrConfigProvider', () => {
     expect(wrapper.find('.size').text()).toBe('md')
   })
 
-  it('пробрасывает size/zIndexBase/componentDefaults вложенным компонентам', () => {
+  it('пробрасывает size/componentDefaults вложенным компонентам', () => {
     const wrapper = mount(GrConfigProvider, {
-      props: { size: 'lg', zIndexBase: 2000, componentDefaults: { GrButton: { variant: 'secondary' } } },
+      props: { size: 'lg', componentDefaults: { GrButton: { variant: 'secondary' } } },
       slots: { default: () => h(Consumer) },
     })
     expect(wrapper.find('.size').text()).toBe('lg')
-    expect(wrapper.find('.z').text()).toBe('2000')
     expect(wrapper.find('.variant').text()).toBe('secondary')
   })
 
   it('вложенный провайдер мержится поверх родительского', () => {
     const wrapper = mount(GrConfigProvider, {
-      props: { size: 'lg', zIndexBase: 2000 },
+      props: { size: 'lg', componentDefaults: { GrButton: { variant: 'secondary' } } },
       slots: {
         default: () =>
           h(GrConfigProvider, { size: 'sm' }, { default: () => h(Consumer) }),
       },
     })
-    // size переопределён дочерним, zIndexBase унаследован от родителя.
+    // size переопределён дочерним, componentDefaults унаследован от родителя.
     expect(wrapper.find('.size').text()).toBe('sm')
-    expect(wrapper.find('.z').text()).toBe('2000')
+    expect(wrapper.find('.variant').text()).toBe('secondary')
   })
 
   it('рендерится прозрачно (display: contents) и показывает слот', () => {
@@ -136,4 +137,95 @@ describe('useGrComponentSize: усечённая size-шкала', () => {
 
     expect(wrapper.find('.size').text()).toBe('lg')
   })
+})
+
+describe('componentDefaults: дефолтные пропсы по компонентам', () => {
+  let warn: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    resetUnsupportedSizeWarnings()
+  })
+
+  afterEach(() => {
+    warn.mockRestore()
+  })
+
+  function mountWithDefaults(componentDefaults: Record<string, unknown>, inner: () => unknown, extraProps = {}) {
+    return mount(GrConfigProvider, {
+      props: { componentDefaults, ...extraProps },
+      slots: { default: inner as () => never },
+    })
+  }
+
+  it('подменяет встроенный дефолт компонента (GrButton)', () => {
+    const wrapper = mountWithDefaults(
+      { GrButton: { variant: 'outline', tone: 'danger' } },
+      () => h(GrButton, null, { default: () => 'Ok' }),
+    )
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-variant')).toBe('outline')
+    expect(button.attributes('data-gr-tone')).toBe('danger')
+  })
+
+  it('локальный проп побеждает конфиг', () => {
+    const wrapper = mountWithDefaults(
+      { GrButton: { variant: 'outline' } },
+      () => h(GrButton, { variant: 'ghost' }, { default: () => 'Ok' }),
+    )
+
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-variant')).toBe('ghost')
+  })
+
+  it('без провайдера компонент использует собственный дефолт', () => {
+    const wrapper = mount(GrButton, { slots: { default: () => 'Ok' } })
+
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-variant')).toBe('primary')
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-tone')).toBe('primary')
+  })
+
+  it('точечный componentDefaults[Component].size побеждает глобальный size', () => {
+    const wrapper = mount(GrConfigProvider, {
+      props: { size: 'lg', componentDefaults: { GrButton: { size: 'xs' } } },
+      slots: { default: () => [h(GrButton, null, { default: () => 'Ok' }), h(GrInput, { modelValue: '' })] },
+    })
+
+    // Кнопке достался точечный xs, инпуту — глобальный lg.
+    expect(wrapper.get('[data-gr-button]').classes().join(' ')).toContain('h-7')
+    expect(wrapper.get('input').classes().join(' ')).toContain('h-11')
+  })
+
+  it('работает для GrBadge и GrInput', () => {
+    const badge = mountWithDefaults(
+      { GrBadge: { tone: 'success', radius: 'square' } },
+      () => h(GrBadge, null, { default: () => 'New' }),
+    )
+    expect(badge.get('.gr-badge').classes().join(' ')).toContain('var(--gr-success-light)')
+
+    const input = mountWithDefaults(
+      { GrInput: { clearable: true } },
+      () => h(GrInput, { modelValue: 'text' }),
+    )
+    expect(input.find('[data-gr-input-clear]').exists()).toBe(true)
+  })
+
+  it('вложенный провайдер мержит на уровне пропов, а не стирает блок компонента', () => {
+    const wrapper = mount(GrConfigProvider, {
+      props: { componentDefaults: { GrButton: { variant: 'outline', tone: 'danger' } } },
+      slots: {
+        default: () => h(
+          GrConfigProvider,
+          { componentDefaults: { GrButton: { variant: 'ghost' } } },
+          { default: () => h(GrButton, null, { default: () => 'Ok' }) },
+        ),
+      },
+    })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-variant')).toBe('ghost')
+    // tone унаследован от родителя, хотя дочерний блок GrButton его не упоминает.
+    expect(button.attributes('data-gr-tone')).toBe('danger')
+  })
+
 })

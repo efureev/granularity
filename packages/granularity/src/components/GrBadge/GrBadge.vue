@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { useGrComponentProp } from '../GrConfigProvider/context'
+
 export type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from './grBadgeStyles'
 
 import {
@@ -18,19 +20,26 @@ const props = withDefaults(
       radius?: GrBadgeRadius
     }>(),
     {
-      tone: 'neutral',
+      // `tone`/`size`/`radius` настраиваются через `GrConfigProvider`, поэтому
+      // их дефолты живут в резолверах ниже, а не в `withDefaults`.
+      tone: undefined,
       dark: false,
-      size: 'sm',
-      radius: 'round',
+      size: undefined,
+      radius: undefined,
     },
 )
 
+// Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedTone = useGrComponentProp('GrBadge', 'tone', () => props.tone, 'neutral')
+const resolvedSize = useGrComponentProp('GrBadge', 'size', () => props.size, 'sm')
+const resolvedRadius = useGrComponentProp('GrBadge', 'radius', () => props.radius, 'round')
+
 const className = computed(() => {
   return grBadgeClass({
-    tone: props.tone,
+    tone: resolvedTone.value,
     dark: props.dark,
-    size: props.size,
-    radius: props.radius,
+    size: resolvedSize.value,
+    radius: resolvedRadius.value,
   })
 })
 </script>
