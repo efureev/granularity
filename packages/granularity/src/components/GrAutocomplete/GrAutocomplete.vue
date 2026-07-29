@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import { vClickOutside } from '../../directives'
@@ -434,6 +436,10 @@ watch(open, (isOpen) => {
 })
 
 const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list'))
+
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 </script>
 
 <template>
@@ -529,7 +535,7 @@ const ariaAutocomplete = computed(() => (props.allowCustomValue ? 'both' : 'list
       </span>
     </div>
 
-    <teleport to="body">
+    <teleport to="body" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"

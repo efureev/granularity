@@ -17,21 +17,19 @@ import {
   GrTooltip,
 } from '@feugene/granularity'
 
-import ClientOnly from './ClientOnly.vue'
-
 /**
  * Страница разделена по тому, как компонент ведёт себя при серверном рендере:
  *
  *  1. изоморфные (`GrCard`, `GrBadge`, `GrTable`, `GrInput`, …) — приходят с
  *     сервера целиком и гидрируются без единого расхождения;
  *  2. телепортирующие (`GrSelect` в режиме `panel`, `GrAutocomplete`,
- *     `GrDropdown`, `GrTooltip`, `GrModal`) — на сервере их разметка не
- *     совпадает с клиентской, поэтому обёрнуты в `ClientOnly`;
+ *     `GrDropdown`, `GrTooltip`, `GrModal`) — их панели на сервере рендерятся
+ *     на месте, а в `body` уезжают уже после гидрации;
  *  3. `GrSelect` по умолчанию — нативный `<select>`, телепорта нет вовсе.
  *
- * Почему пункт 2 именно так — доказано тестами в `src/__tests__/`:
- * без обёртки Vue сообщает hydration mismatch, а в браузере страница
- * пропадает целиком (см. README и ANALYSIS §60).
+ * До починки ANALYSIS §60 пункт 2 ломал гидрацию, и эту секцию приходилось
+ * заворачивать в client-only. Теперь она рендерится как есть — а тесты в
+ * `src/__tests__/` следят, чтобы дефект не вернулся.
  */
 
 const projectName = ref('SSR')
@@ -66,8 +64,8 @@ const modalOpen = ref(false)
           Серверный рендер и гидрация
         </h1>
         <p class="mt-2 text-sm text-[var(--gr-muted-fg)]">
-          Смотрите <b>исходный HTML</b> страницы, а не DOM в инспекторе: секции 1 и 3
-          пришли с сервера, секция 2 на сервере пуста намеренно.
+          Смотрите <b>исходный HTML</b> страницы, а не DOM в инспекторе: инспектор
+          покажет уже гидрированное дерево, и разница потеряется.
         </p>
       </header>
 
@@ -142,69 +140,61 @@ const modalOpen = ref(false)
       <GrCard class="p-5">
         <div class="flex flex-col gap-4">
           <h2 class="text-base font-semibold">
-            2. Требуют client-only
+            2. Телепортирующие компоненты
           </h2>
 
           <p class="text-sm text-[var(--gr-muted-fg)]">
-            Их панели телепортируются, и серверная разметка не совпадает с
-            клиентской. Без обёртки страница ломается целиком: стили панели
-            «прилипают» к контейнеру приложения. Поэтому здесь — рабочий обход,
-            <code>ClientOnly</code>: на сервере пусто, рендер после гидрации.
+            Панель рендерится на сервере <b>на месте</b>, а в <code>&lt;body&gt;</code>
+            уезжает уже после гидрации — поэтому первый клиентский рендер совпадает
+            с серверным. Раньше здесь был обязателен client-only: без него
+            стили панели «прилипали» к контейнеру приложения и страница исчезала.
           </p>
 
-          <ClientOnly>
-            <template #fallback>
-              <div class="text-sm text-[var(--gr-muted-fg)]">
-                Здесь на сервере намеренно пусто.
-              </div>
-            </template>
+          <div class="flex flex-col gap-4">
+            <GrFormField label="Фреймворк (optionsView=panel)">
+              <GrSelect
+                v-model="frameworkPanel"
+                :options="frameworks"
+                options-view="panel"
+              />
+            </GrFormField>
 
-            <div class="flex flex-col gap-4">
-              <GrFormField label="Фреймворк (optionsView=panel)">
-                <GrSelect
-                  v-model="frameworkPanel"
-                  :options="frameworks"
-                  options-view="panel"
-                />
-              </GrFormField>
+            <GrFormField label="Рендерер (автокомплит)">
+              <GrAutocomplete v-model="renderer" :options="renderers" />
+            </GrFormField>
 
-              <GrFormField label="Рендерер (автокомплит)">
-                <GrAutocomplete v-model="renderer" :options="renderers" />
-              </GrFormField>
-
-              <GrDropdown>
-                <template #trigger="{ triggerProps }">
-                  <GrButton v-bind="triggerProps" variant="outline" size="sm">
-                    Меню
-                  </GrButton>
-                </template>
-                <template #content>
-                  <div class="px-3 py-2 text-sm">
-                    Пункт меню
-                  </div>
-                </template>
-              </GrDropdown>
-
-              <GrTooltip text="Подсказка появится после гидрации">
-                <GrButton variant="ghost" size="sm">
-                  Наведи или сфокусируй
+            <GrDropdown>
+              <template #trigger="{ triggerProps }">
+                <GrButton v-bind="triggerProps" variant="outline" size="sm">
+                  Меню
                 </GrButton>
-              </GrTooltip>
+              </template>
+              <template #content>
+                <div class="px-3 py-2 text-sm">
+                  Пункт меню
+                </div>
+              </template>
+            </GrDropdown>
 
-              <div>
-                <GrButton size="sm" @click="modalOpen = true">
-                  Открыть модалку
-                </GrButton>
-              </div>
+            <GrTooltip text="Подсказка появится после гидрации">
+              <GrButton variant="ghost" size="sm">
+                Наведи или сфокусируй
+              </GrButton>
+            </GrTooltip>
 
-              <GrModal v-model="modalOpen">
-                <template #title>
-                  Модалка
-                </template>
-                Оверлеи тоже телепортируют — и тоже требуют client-only.
-              </GrModal>
+            <div>
+              <GrButton size="sm" @click="modalOpen = true">
+                Открыть модалку
+              </GrButton>
             </div>
-          </ClientOnly>
+
+            <GrModal v-model="modalOpen">
+              <template #title>
+                Модалка
+              </template>
+              Оверлеи телепортируют так же — и тоже безопасны при SSR.
+            </GrModal>
+          </div>
         </div>
       </GrCard>
 

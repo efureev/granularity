@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import ProblemPage from '../ProblemPage.vue'
+import TeleportPage from '../TeleportPage.vue'
 import { render } from '../entry-server'
 
 /**
@@ -10,6 +10,14 @@ import { render } from '../entry-server'
  * До появления этого приложения классификация компонентов в документе держалась
  * на чтении кода — здесь она становится исполняемой.
  */
+/**
+ * Отключённый телепорт всё равно оставляет в «ведре» якоря-комментарии — по ним
+ * клиент находит целевой контейнер. Содержимого там быть не должно.
+ */
+function teleportedContent(teleports: Record<string, string>): string {
+  return Object.values(teleports).join('').replace(/<!--[\s\S]*?-->/g, '').trim()
+}
+
 describe('серверный рендер', () => {
   it('проходит без исключений', async () => {
     await expect(render()).resolves.toBeDefined()
@@ -44,13 +52,11 @@ describe('серверный рендер', () => {
    * Пусто на сервере они дают по другой причине — потому что закрыты.
    */
   it('оверлеи с гардом рендерятся на месте, а не в teleports', async () => {
-    const { html, teleports } = await render(ProblemPage)
-    const teleported = Object.values(teleports).join('')
-
+    const { html, teleports } = await render(TeleportPage)
     // GrTooltip: панель-элемент присутствует в HTML компонента (скрытая,
     // без текста) и НЕ уходит в телепорты.
     expect(html).toMatch(/data-gr-tooltip-panel/)
-    expect(teleported).not.toMatch(/data-gr-tooltip-panel/)
+    expect(teleportedContent(teleports)).not.toMatch(/data-gr-tooltip-panel/)
   })
 
   /**
@@ -69,44 +75,37 @@ describe('серверный рендер', () => {
     const { html, teleports } = await render()
 
     expect(html).not.toContain('Модалка закрыта на сервере')
-    expect(Object.values(teleports).join('')).not.toContain('Модалка закрыта на сервере')
+    expect(teleportedContent(teleports)).not.toContain('Модалка закрыта на сервере')
   })
 
   /**
-   * Ключевая проверка. `GrSelect`/`GrDropdown` держат панель на `v-show`, а
-   * телепорт не отключают, поэтому на сервере он выполняется: содержимое уходит
-   * в `ssrContext.teleports`, а не в HTML компонента.
+   * Контракт после починки ANALYSIS §60: телепорт включается только ПОСЛЕ
+   * монтирования. Значит на сервере он выключен, а `:disabled` у телепорта
+   * означает «рендерить на месте» — панели приходят внутри HTML компонента, и
+   * `ssrContext.teleports` остаётся пустым.
    *
-   * Тест фиксирует ФАКТ, а не желаемое: если контракт когда-нибудь приведут к
-   * общему виду (см. ANALYSIS §60), тест упадёт и его нужно будет обновить
-   * вместе с `docs/ssr.md`.
+   * Если этот тест упадёт с непустыми `teleports` — значит кто-то вернул
+   * телепорт, включённый на первом рендере, и гидрация снова сломана.
    */
-  it('floating-панели уходят в ssrContext.teleports, а не в HTML компонента', async () => {
-    const { html, teleports } = await render(ProblemPage)
+  it('панели приходят на месте, а не в ssrContext.teleports', async () => {
+    const { html, teleports } = await render(TeleportPage)
 
-    expect(Object.keys(teleports).length, 'ожидались телепорты от GrSelect/GrDropdown')
-      .toBeGreaterThan(0)
+    expect(teleportedContent(teleports), 'в «ведре» только якоря, без содержимого').toBe('')
 
-    const teleported = Object.values(teleports).join('')
+    expect(html).toMatch(/data-gr-select-panel/)
+    expect(html).toMatch(/data-gr-dropdown-panel/)
+    expect(html).toMatch(/data-gr-tooltip-panel/)
 
-    // Панель селекта (`optionsView="panel"`) и меню дропдауна — в «ведре»,
-    // а не в HTML компонента.
-    expect(teleported).toMatch(/data-gr-select-panel/)
-    expect(teleported).toMatch(/data-gr-dropdown-panel/)
-    expect(html).not.toMatch(/data-gr-select-panel/)
-    expect(html).not.toMatch(/data-gr-dropdown-panel/)
-
-    // Триггеры при этом на месте — первый экран не «прыгает».
+    // Триггеры, разумеется, тоже на месте — первый экран не «прыгает».
     expect(html).toContain('Меню')
     expect(html).toMatch(/aria-haspopup/)
   })
 
   it('панель селекта приходит скрытой, а не видимой', async () => {
-    const { teleports } = await render(ProblemPage)
-    const teleported = Object.values(teleports).join('')
+    const { html } = await render(TeleportPage)
 
     // `v-show="false"` рендерится инлайновым `display:none`. Если бы этого не
     // было, до гидрации пользователь увидел бы раскрытый список.
-    expect(teleported).toMatch(/display\s*:\s*none/)
+    expect(html).toMatch(/display\s*:\s*none/)
   })
 })

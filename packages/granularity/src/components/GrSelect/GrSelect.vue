@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import GrInput from '../GrInput/GrInput.vue'
@@ -624,6 +626,10 @@ function clearSelection(): void {
   if (props.disabled) return
   emitValue(props.multiple ? [] : '')
 }
+
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 </script>
 
 <template>
@@ -797,7 +803,7 @@ function clearSelection(): void {
       <span class="i-lucide-x inline-block h-4 w-4" aria-hidden="true" />
     </button>
 
-    <teleport to="body">
+    <teleport to="body" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"

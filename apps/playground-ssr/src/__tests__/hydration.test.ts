@@ -6,7 +6,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
-import ProblemPage from '../ProblemPage.vue'
+import TeleportPage from '../TeleportPage.vue'
 
 /**
  * Гидрация настоящего серверного HTML в jsdom.
@@ -29,7 +29,7 @@ interface SsrSnapshot {
 // В jsdom `import.meta.url` не file-scheme, поэтому путь — от cwd приложения.
 const snapshots = JSON.parse(
   readFileSync(resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json'), 'utf8'),
-) as { app: SsrSnapshot, problem: SsrSnapshot }
+) as { app: SsrSnapshot, teleport: SsrSnapshot }
 
 function captureConsole(): string[] {
   const messages: string[] = []
@@ -49,7 +49,7 @@ function hydrationProblems(messages: readonly string[]): string[] {
 
 async function hydrate(
   snapshot: SsrSnapshot,
-  options: { root?: typeof ProblemPage, injectTeleports?: boolean } = {},
+  options: { root?: typeof TeleportPage, injectTeleports?: boolean } = {},
 ): Promise<string[]> {
   document.body.innerHTML = `<div id="app">${snapshot.html}</div>`
 
@@ -89,52 +89,60 @@ describe('гидрация страницы приложения', () => {
     expect(document.querySelector('[data-testid="isomorphic-alert"]')).not.toBeNull()
   })
 
-  it('client-only секция появляется после монтирования', async () => {
-    // На сервере её нет вовсе — в этом и смысл обхода.
-    expect(snapshots.app.html).not.toMatch(/data-gr-select-panel/)
-    expect(snapshots.app.html).toContain('Здесь на сервере намеренно пусто')
+  it('панель приезжает в body после гидрации — ровно одна', async () => {
+    // На сервере панель пришла НА МЕСТЕ, внутри компонента.
+    expect(snapshots.app.html).toMatch(/data-gr-select-panel/)
 
     await hydrate(snapshots.app)
 
-    expect(document.querySelector('[data-gr-select-panel]')).not.toBeNull()
+    const panels = document.querySelectorAll('[data-gr-select-panel]')
+    expect(panels).toHaveLength(1)
+    // После монтирования телепорт включился и увёз панель в `body`.
+    expect(panels[0].closest('#app')).toBeNull()
   })
 })
 
 /**
- * Доказательная база под ANALYSIS §60 — воспроизведение, а не рассуждение.
+ * Регрессионный гейт к ANALYSIS §60 (починен 2026-07-29).
  *
- * `ProblemPage.vue` использует те же компоненты БЕЗ обёртки `ClientOnly`.
- * Когда дефект починят, эти тесты упадут — и это правильный сигнал: тогда
- * ожидания меняются на «расхождений нет», обход из `App.vue` убирается, а
- * `docs/ssr.md` обновляется следом.
+ * `TeleportPage.vue` — сжатый набор из одних телепортирующих компонентов.
+ * До починки он давал `Hydration node mismatch`, дубль панели в DOM и — в
+ * браузере — исчезающую страницу. Теперь обязан гидрироваться начисто.
+ *
+ * Контракт, который это держит: телепорт включается в `onMounted`
+ * (`useTeleportEnabled`), поэтому первый клиентский рендер повторяет серверный.
  */
-describe('гидрация без client-only (улика §60)', () => {
-  it('телепорт без гарда даёт hydration mismatch', async () => {
-    const problems = hydrationProblems(await hydrate(snapshots.problem, { root: ProblemPage }))
+describe('гидрация телепортирующих компонентов (регрессия §60)', () => {
+  it('проходит без расхождений', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.teleport, { root: TeleportPage }))
 
-    expect(problems.join('\n')).toMatch(/Hydration node mismatch/)
+    expect(problems, problems.join('\n')).toEqual([])
   })
 
-  it('вставка teleports смягчает, но не устраняет расхождение', async () => {
-    const withTeleports = hydrationProblems(
-      await hydrate(snapshots.problem, { root: ProblemPage, injectTeleports: true }),
-    )
-    const withoutTeleports = hydrationProblems(
-      await hydrate(snapshots.problem, { root: ProblemPage, injectTeleports: false }),
-    )
+  it('не оставляет дублей панелей', async () => {
+    await hydrate(snapshots.teleport, { root: TeleportPage })
 
-    // Абсолютные числа зависят от версии Vue, поэтому проверяем соотношение:
-    // вставлять `ssrContext.teleports` всё равно надо, но проблему это не решает.
-    expect(withTeleports.length).toBeGreaterThan(0)
-    expect(withTeleports.length).toBeLessThan(withoutTeleports.length)
+    expect(document.querySelectorAll('[data-gr-select-panel]')).toHaveLength(1)
+    expect(document.querySelectorAll('[data-gr-dropdown-panel]')).toHaveLength(1)
   })
 
-  it('серверная панель остаётся в DOM сиротой — появляется дубль', async () => {
-    await hydrate(snapshots.problem, { root: ProblemPage })
+  /**
+   * Раньше сервер складывал панели в `ssrContext.teleports`, и приложению
+   * приходилось вставлять их в разметку, чтобы уменьшить число расхождений.
+   * Теперь вставлять нечего — и это правильный признак починки.
+   */
+  it('серверу нечего класть в ssrContext.teleports, кроме якорей', async () => {
+    const content = Object.values(snapshots.teleport.teleports)
+      .join('')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .trim()
 
-    // Vue не переиспользовал серверную панель, а создал свою: в DOM их две.
-    // Обе скрыты, поэтому пользователь дубля не видит — но это мёртвый DOM и
-    // прямое доказательство, что расхождение не «косметическое».
-    expect(document.querySelectorAll('[data-gr-select-panel]').length).toBe(2)
+    expect(content, 'содержимое панелей должно приходить на месте').toBe('')
+
+    const problems = hydrationProblems(
+      await hydrate(snapshots.teleport, { root: TeleportPage, injectTeleports: false }),
+    )
+
+    expect(problems, problems.join('\n')).toEqual([])
   })
 })

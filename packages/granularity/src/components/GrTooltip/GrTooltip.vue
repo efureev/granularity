@@ -16,6 +16,8 @@
  */
 import { computed, onUnmounted, ref, useId, watch } from 'vue'
 
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+
 import GrIcon from '../GrIcon'
 import { useFloating } from '../../composables/internal/useFloating'
 
@@ -35,7 +37,9 @@ const tooltipId = `gr-tooltip-${useId()}`
 
 const triggerStyle = computed(() => ({ color: props.iconColor }))
 
-const isClient = typeof window !== 'undefined'
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 
 const open = ref(false)
 const triggerEl = ref<HTMLElement | null>(null)
@@ -97,7 +101,7 @@ onUnmounted(() => {
       </slot>
     </span>
 
-    <teleport to="body" :disabled="!isClient">
+    <teleport to="body" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition-opacity duration-150"
         enter-from-class="opacity-0"

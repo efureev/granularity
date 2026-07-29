@@ -1,6 +1,8 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -389,6 +391,10 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
     closeDropdown()
   }
 }
+
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 </script>
 
 <template>
@@ -459,7 +465,7 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
       </div>
     </div>
 
-    <teleport to="body">
+    <teleport to="body" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"

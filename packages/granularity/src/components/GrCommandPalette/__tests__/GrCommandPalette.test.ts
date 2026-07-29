@@ -35,6 +35,19 @@ const items: GrCommandItem[] = [
   { id: 'archive', label: 'Архивировать', group: 'Настройки', disabled: true },
 ]
 
+/**
+ * Атрибут читаем по свежему запросу, а не по сохранённой обёртке.
+ *
+ * `stubs: { teleport: true }` подменяет телепорт компонентом-заглушкой, и когда
+ * `GrModal` включает телепорт после монтирования (гидрационно-безопасный
+ * контракт, см. `useTeleportEnabled`), заглушка пересоздаёт поддомен. В живом
+ * браузере узел тот же — Vue его перемещает, — но в тесте сохранённая ссылка
+ * протухает и показывает старые атрибуты.
+ */
+function activeDescendantOf(wrapper: ReturnType<typeof mountPalette>): string | undefined {
+  return wrapper.get('[data-testid="gr-command-palette-input"]').attributes('aria-activedescendant')
+}
+
 function mountPalette(props: Record<string, unknown> = {}) {
   return mount(GrCommandPalette, {
     props: { modelValue: true, items, ...props },
@@ -65,7 +78,7 @@ describe('GrCommandPalette', () => {
     expect(first.attributes('aria-selected')).toBe('true')
 
     await input.trigger('keydown', { key: 'ArrowDown' })
-    expect(input.attributes('aria-activedescendant'))
+    expect(activeDescendantOf(wrapper))
       .toBe(wrapper.get('[data-testid="gr-command-palette-item-open"]').attributes('id'))
   })
 
@@ -75,15 +88,15 @@ describe('GrCommandPalette', () => {
 
     await input.trigger('keydown', { key: 'End' })
     // Последняя выбираемая — 'theme': 'archive' отключена.
-    expect(input.attributes('aria-activedescendant'))
+    expect(activeDescendantOf(wrapper))
       .toBe(wrapper.get('[data-testid="gr-command-palette-item-theme"]').attributes('id'))
 
     await input.trigger('keydown', { key: 'ArrowDown' })
-    expect(input.attributes('aria-activedescendant'))
+    expect(activeDescendantOf(wrapper))
       .toBe(wrapper.get('[data-testid="gr-command-palette-item-new"]').attributes('id'))
 
     await input.trigger('keydown', { key: 'ArrowUp' })
-    expect(input.attributes('aria-activedescendant'))
+    expect(activeDescendantOf(wrapper))
       .toBe(wrapper.get('[data-testid="gr-command-palette-item-theme"]').attributes('id'))
   })
 

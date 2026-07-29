@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
-import ProblemPage from '../src/ProblemPage.vue'
+import TeleportPage from '../src/TeleportPage.vue'
 import { render } from '../src/entry-server'
 
 /**
@@ -20,10 +20,10 @@ import { render } from '../src/entry-server'
 export const SSR_SNAPSHOT_PATH = resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json')
 
 export default async function setup(): Promise<void> {
-  // `app` — страница приложения (обход через `ClientOnly`),
-  // `problem` — те же компоненты без обхода, как улика для теста гидрации.
-  const [app, problem] = await Promise.all([render(), render(ProblemPage)])
+  // `app` — демо-страница целиком, `teleport` — сжатый набор только из
+  // телепортирующих компонентов (регрессионный гейт к ANALYSIS §60).
+  const [app, teleport] = await Promise.all([render(), render(TeleportPage)])
 
   await mkdir(dirname(SSR_SNAPSHOT_PATH), { recursive: true })
-  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, problem }), 'utf8')
+  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport }), 'utf8')
 }

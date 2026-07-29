@@ -19,6 +19,8 @@
  * - `placement` настраивает угол экрана; слой — `--gr-z-toast`.
  */
 import { computed, ref, useSlots, watchEffect } from 'vue'
+
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import type { Component } from 'vue'
 
 import { useToast } from '../../composables/useToast'
@@ -106,7 +108,9 @@ function onAction(toast: Toast, action: ToastAction): void {
 }
 
 // SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
-const isClient = typeof window !== 'undefined'
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 
 // Видимые тосты (не больше `maxVisible`); остальные — в очереди.
 const visibleToasts = computed(() => list.value.slice(0, Math.max(1, props.maxVisible)))
@@ -134,7 +138,7 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
 </script>
 
 <template>
-  <teleport to="body" :disabled="!isClient">
+  <teleport to="body" :disabled="!teleportEnabled">
     <div
         data-gr-toaster
         role="region"

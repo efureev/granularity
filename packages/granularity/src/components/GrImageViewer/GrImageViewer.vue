@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -136,7 +138,9 @@ const DEFAULT_Z_INDEX = 2000
 const open = computed(() => props.modelValue)
 
 // SSR-guard для teleport + общий reference-counted scroll-lock (как в GrModal/GrDrawer).
-const isClient = typeof window !== 'undefined'
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
 const total = computed(() => props.urlList.length)
@@ -353,7 +357,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <teleport to="body" :disabled="!isClient">
+  <teleport to="body" :disabled="!teleportEnabled">
     <TransitionRoot :show="open" as="template">
       <Dialog
         as="div"

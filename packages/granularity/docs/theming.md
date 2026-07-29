@@ -137,12 +137,15 @@ presetGranularNode({
 Если нужно поменять две-три роли, целый файл заводить не обязательно:
 
 ```ts
-themes: {
-  names: ['light', 'dark'],
-  tokenOverrides: {
-    dark: { '--gr-primary': '#4fd1e0' },
+presetGranularNode({
+  providers: [granularityProvider],
+  themes: {
+    names: ['light', 'dark'],
+    tokenOverrides: {
+      dark: { '--gr-primary': '#4fd1e0' },
+    },
   },
-}
+})
 ```
 
 Работающий пример — приложение [`apps/playground-theme`](../../../apps/playground-theme/README.md):

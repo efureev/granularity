@@ -4,11 +4,11 @@ import { ref } from 'vue'
 import { GrDropdown, GrSelect, GrTooltip, GrButton, GrFormField } from '@feugene/granularity'
 
 /**
- * Страница-улика: те же компоненты, но БЕЗ обёртки `ClientOnly`.
+ * Страница только из телепортирующих компонентов — сжатый набор для тестов.
  *
- * В приложении так делать не надо — она существует только для тестов
- * (`src/__tests__/hydration.test.ts`), которые доказывают дефект из
- * ANALYSIS §60 воспроизведением, а не рассуждением.
+ * Раньше называлась «улика»: до починки ANALYSIS §60 она воспроизводила
+ * hydration mismatch. Теперь служит регрессионным гейтом — гидрация обязана
+ * проходить чисто.
  */
 const framework = ref('vue')
 

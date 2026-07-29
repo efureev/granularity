@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/internal/useFloating'
 import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
@@ -186,6 +188,10 @@ function onContentClick(): void {
     close()
   }
 }
+
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 </script>
 
 <template>
@@ -200,7 +206,7 @@ function onContentClick(): void {
       <slot name="trigger" :open="open" :toggle="toggle" :close="close" :triggerProps="triggerProps" />
     </div>
 
-    <teleport :to="teleportTo">
+    <teleport :to="teleportTo" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"

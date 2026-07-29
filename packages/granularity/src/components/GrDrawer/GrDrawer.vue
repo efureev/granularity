@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, useId, watch } from 'vue'
+
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import GrButton from '../GrButton/GrButton.vue'
@@ -57,7 +59,9 @@ const titleId = useId()
 // SSR-guard: на сервере `document.body` недоступен — отключаем teleport
 // (в клиенте включаем после маунта). Раньше `<teleport to="body">` без
 // `:disabled` падал при SSR — расхождение с GrModal.
-const isClient = typeof window !== 'undefined'
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 
 const panelClass = computed(() => {
   return grDrawerPanelClass({ side: props.side, size: props.size })
@@ -120,7 +124,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <teleport to="body" :disabled="!isClient">
+  <teleport to="body" :disabled="!teleportEnabled">
     <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"

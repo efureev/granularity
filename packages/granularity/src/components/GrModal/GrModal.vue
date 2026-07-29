@@ -20,6 +20,8 @@
  * источник закрытия различается через ref `closeReason`.
  */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+
+import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { pushGrModalEsc, removeGrModalEsc } from './grModalEscStack'
@@ -75,7 +77,9 @@ const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : un
 
 // SSR-guard: на сервере `document.body` недоступен — отключаем teleport,
 // а в клиенте включаем после маунта.
-const isClient = typeof window !== 'undefined'
+// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
+// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+const teleportEnabled = useTeleportEnabled()
 
 // Источник закрытия от HeadlessUI `<Dialog>` — либо Esc, либо клик по оверлею.
 // Различаем их, чтобы `closeOnBackdrop` и `closeOnEsc` работали независимо.
@@ -174,7 +178,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <teleport to="body" :disabled="!isClient">
+  <teleport to="body" :disabled="!teleportEnabled">
     <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"
