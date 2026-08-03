@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
+import RiskyPage from '../src/RiskyPage.vue'
 import TeleportPage from '../src/TeleportPage.vue'
 import { render } from '../src/entry-server'
 
@@ -21,9 +22,14 @@ export const SSR_SNAPSHOT_PATH = resolve(process.cwd(), 'node_modules/.cache/ssr
 
 export default async function setup(): Promise<void> {
   // `app` — демо-страница целиком, `teleport` — сжатый набор только из
-  // телепортирующих компонентов (регрессионный гейт к ANALYSIS §60).
-  const [app, teleport] = await Promise.all([render(), render(TeleportPage)])
+  // телепортирующих компонентов (регрессионный гейт к ANALYSIS §60),
+  // `risky` — компоненты с браузерным API, `navigator` и авто-id в setup.
+  const [app, teleport, risky] = await Promise.all([
+    render(),
+    render(TeleportPage),
+    render(RiskyPage),
+  ])
 
   await mkdir(dirname(SSR_SNAPSHOT_PATH), { recursive: true })
-  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport }), 'utf8')
+  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky }), 'utf8')
 }

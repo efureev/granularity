@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, getCurrentInstance, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -65,8 +65,8 @@ const emit = defineEmits<{
   (event: 'change', value: GrSegmentedValue, option: GrSegmentedOption): void
 }>()
 
-const instance = getCurrentInstance()
-const fallbackName = `gr-segmented-${instance?.uid ?? Math.random()}`
+// `useId()` стабилен между сервером и клиентом, в отличие от `instance.uid`.
+const fallbackName = `gr-segmented-${useId()}`
 
 const rootRef = ref<HTMLElement | null>(null)
 const itemRefs = ref(new Map<string, HTMLElement>())

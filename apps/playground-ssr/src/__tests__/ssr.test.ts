@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import RiskyPage from '../RiskyPage.vue'
 import TeleportPage from '../TeleportPage.vue'
 import { render } from '../entry-server'
 
@@ -107,5 +108,57 @@ describe('серверный рендер', () => {
     // `v-show="false"` рендерится инлайновым `display:none`. Если бы этого не
     // было, до гидрации пользователь увидел бы раскрытый список.
     expect(html).toMatch(/display\s*:\s*none/)
+  })
+})
+
+/**
+ * Компоненты, которые ломает не телепорт, а браузерный API, `navigator` и
+ * авто-id в setup. До починки первый же тест здесь падал `ReferenceError:
+ * Image is not defined` — и вместе с ним весь рендер страницы.
+ */
+describe('серверный рендер: браузерные API и авто-id', () => {
+  it('проходит без исключений при закрытом GrImageViewer', async () => {
+    // `new Image()` в setup ронял рендер страницы, где просмотрщик просто
+    // присутствует в шаблоне закрытым — состояние `modelValue` роли не играло.
+    await expect(render(RiskyPage)).resolves.toBeDefined()
+  })
+
+  /**
+   * Почему подсказки хоткея нет в серверном HTML вообще: `GrCommandPalette`
+   * живёт внутри `GrModal`, а тот построен на `Dialog`/`TransitionRoot` из
+   * HeadlessUI — они не рендерят содержимое на сервере даже при `show=true`.
+   *
+   * Это и есть причина, по которой `isAppleDevice()` в первом рендере не давал
+   * наблюдаемого расхождения гидрации. Тест закрепляет именно это допущение:
+   * если HeadlessUI (или `GrModal`) начнёт рендериться на сервере, подсказка
+   * станет реальным риском расхождения — и тест об этом сообщит.
+   */
+  it('содержимое модальных оверлеев на сервер не попадает', async () => {
+    const { html } = await render(RiskyPage)
+
+    expect(html).not.toContain('⌘')
+    expect(html).not.toContain('Ctrl')
+    // Пункт палитры — тоже внутри модалки.
+    expect(html).not.toContain('Открыть файл')
+  })
+
+  it('id строятся из useId(), а не из сквозного счётчика инстансов', async () => {
+    const { html } = await render(RiskyPage)
+
+    const ids = [...html.matchAll(/gr-collapse-header-([\w-]+)/g)].map(match => match[1])
+
+    expect(ids.length).toBeGreaterThan(0)
+    // `useId()` даёт префикс `v-`; `instance.uid` дал бы голое число, которое
+    // на сервере растёт между запросами, а на клиенте стартует с нуля.
+    expect(ids.every(id => id.startsWith('v-')), ids.join(', ')).toBe(true)
+    expect(html).toMatch(/name="gr-segmented-v-/)
+  })
+
+  it('GrToaster на сервере требует плагин и с ним рендерится', async () => {
+    // `useToast` намеренно запрещает модульный синглтон на сервере: он тёк бы
+    // между запросами. Контракт держится тем, что `app.ts` ставит плагин.
+    const { html } = await render(RiskyPage)
+
+    expect(html).toContain('data-gr-toaster')
   })
 })

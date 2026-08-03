@@ -119,6 +119,32 @@ jobs:
           name: granularity-dist
           path: packages/granularity/dist/
 
+  # SSR-стенд: серверный рендер + гидрация настоящего серверного HTML.
+  # Ловит то, что юнит-тесты в jsdom увидеть не могут: браузерный API в setup,
+  # окружение в первом рендере, нестабильные id. Работает по собранному `dist`.
+  test-playground-ssr:
+    needs:
+      - build-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Test SSR playground
+        run: yarn test:playground-ssr
+
   test-showcase:
     # Витрина использует авто-импорт `unplugin-vue-components` через резолверы из
     # @feugene/unplugin-granularity и @feugene/granularity-datepicker/resolver —

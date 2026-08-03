@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
@@ -338,16 +338,22 @@ watch(
   { deep: true },
 )
 
-watch(
-  currentIndex,
-  (index) => {
-    if (!hasImages.value || total.value < 2)
-      return
-    preloadAt(normalizeIndex(index - 1))
-    preloadAt(normalizeIndex(index + 1))
-  },
-  { immediate: true },
-)
+// `new Image()` существует только в браузере, поэтому предзагрузка соседей
+// стартует с `onMounted`, а не с `immediate: true`: иначе она выполнялась бы
+// синхронно в setup и роняла серверный рендер страницы, где просмотрщик просто
+// присутствует закрытым.
+function preloadNeighbours(index: number): void {
+  if (!hasImages.value || total.value < 2)
+    return
+  preloadAt(normalizeIndex(index - 1))
+  preloadAt(normalizeIndex(index + 1))
+}
+
+watch(currentIndex, preloadNeighbours)
+
+onMounted(() => {
+  preloadNeighbours(currentIndex.value)
+})
 
 onBeforeUnmount(() => {
   unlockBodyScroll()

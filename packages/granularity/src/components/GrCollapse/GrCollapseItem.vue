@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ChevronDownIcon from '~icons/lucide/chevron-down'
-import { computed, getCurrentInstance, inject, ref } from 'vue'
+import { computed, inject, ref, useId } from 'vue'
 
 import GrIcon from '../GrIcon'
 
@@ -33,8 +33,7 @@ if (!collapse) {
 
 const collapseContext = collapse
 
-const instance = getCurrentInstance()
-const uid = instance?.uid ?? Math.random()
+const uid = useId()
 
 const resolvedName = computed<GrCollapseValue>(() => {
   if (typeof props.name === 'string' || typeof props.name === 'number')

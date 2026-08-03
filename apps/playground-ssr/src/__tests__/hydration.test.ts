@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
+import RiskyPage from '../RiskyPage.vue'
 import TeleportPage from '../TeleportPage.vue'
 
 /**
@@ -29,7 +30,7 @@ interface SsrSnapshot {
 // В jsdom `import.meta.url` не file-scheme, поэтому путь — от cwd приложения.
 const snapshots = JSON.parse(
   readFileSync(resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json'), 'utf8'),
-) as { app: SsrSnapshot, teleport: SsrSnapshot }
+) as { app: SsrSnapshot, teleport: SsrSnapshot, risky: SsrSnapshot }
 
 function captureConsole(): string[] {
   const messages: string[] = []
@@ -144,5 +145,52 @@ describe('гидрация телепортирующих компонентов
     )
 
     expect(problems, problems.join('\n')).toEqual([])
+  })
+})
+
+/**
+ * Гейт к трём дефектам, которые телепорт не покрывает: браузерный API в setup,
+ * `navigator` в первом рендере и авто-id из сквозного счётчика инстансов.
+ */
+describe('гидрация страницы с браузерными API и авто-id', () => {
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.risky, { root: RiskyPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  /**
+   * Платформа определяется после монтирования, поэтому на macOS гидрация обязана
+   * пройти чисто, а подсказка — стать `⌘` уже на клиенте.
+   *
+   * Оговорка о силе этого теста: сама модалка на сервер ничего не отдаёт
+   * (см. `ssr.test.ts`), так что расхождения тут не было бы и со старым кодом.
+   * Тест закрепляет клиентское поведение и подстраховывает на случай, если
+   * содержимое оверлеев когда-нибудь начнёт рендериться сервером.
+   */
+  it('на macOS подсказка хоткея появляется после монтирования', async () => {
+    const platform = Object.getOwnPropertyDescriptor(globalThis.navigator, 'platform')
+    Object.defineProperty(globalThis.navigator, 'platform', { value: 'MacIntel', configurable: true })
+
+    try {
+      const problems = hydrationProblems(await hydrate(snapshots.risky, { root: RiskyPage }))
+
+      expect(problems, problems.join('\n')).toEqual([])
+      expect(document.body.textContent).toContain('⌘')
+    }
+    finally {
+      if (platform) Object.defineProperty(globalThis.navigator, 'platform', platform)
+    }
+  })
+
+  it('id секций совпадают с серверными, а не перегенерируются', async () => {
+    const serverIds = [...snapshots.risky.html.matchAll(/gr-collapse-header-([\w-]+)/g)].map(m => m[1])
+
+    await hydrate(snapshots.risky, { root: RiskyPage })
+
+    const clientIds = [...document.querySelectorAll('[id^="gr-collapse-header-"]')]
+      .map(element => element.id.replace('gr-collapse-header-', ''))
+
+    expect(clientIds).toEqual([...new Set(serverIds)])
   })
 })

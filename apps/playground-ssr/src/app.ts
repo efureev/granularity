@@ -1,5 +1,7 @@
 import { createSSRApp, type Component } from 'vue'
 
+import { granularityToastPlugin } from '@feugene/granularity'
+
 import App from './App.vue'
 
 /**
@@ -10,5 +12,12 @@ import App from './App.vue'
  * (`ProblemPage.vue`) с компонентами без обёртки `ClientOnly`.
  */
 export function createApp(root: Component = App) {
-  return createSSRApp(root)
+  const app = createSSRApp(root)
+
+  // Обязательно для SSR: `useToast` намеренно запрещает модульный синглтон на
+  // сервере — одно mutable-состояние на модуль текло бы между запросами.
+  // Без плагина `GrToaster` роняет рендер с внятной ошибкой.
+  app.use(granularityToastPlugin)
+
+  return app
 }

@@ -14,6 +14,7 @@ import {
 } from './filtering'
 import {
   formatCommandHotkey,
+  isAppleDevice,
   matchesCommandHotkey,
   parseCommandHotkey,
 } from './hotkey'
@@ -219,19 +220,25 @@ watch(
 // ————— Глобальное сочетание открытия.
 const parsedHotkey = computed(() => (props.hotkey ? parseCommandHotkey(props.hotkey) : null))
 
+// Платформа определяется только после монтирования: на сервере `navigator` нет,
+// и первый рендер обязан совпасть с серверным. Иначе сервер отдаёт `Ctrl`,
+// клиент на macOS рисует `⌘`, и гидрация расходится по тексту подсказки.
+const isApple = ref(false)
+
 const hotkeyHint = computed(() =>
-  props.showHotkeyHint && parsedHotkey.value ? formatCommandHotkey(parsedHotkey.value) : [],
+  props.showHotkeyHint && parsedHotkey.value ? formatCommandHotkey(parsedHotkey.value, isApple.value) : [],
 )
 
 function onWindowKeydown(event: KeyboardEvent): void {
   const hotkey = parsedHotkey.value
-  if (!hotkey || !matchesCommandHotkey(event, hotkey)) return
+  if (!hotkey || !matchesCommandHotkey(event, hotkey, isApple.value)) return
   event.preventDefault()
   emit('update:modelValue', !props.modelValue)
 }
 
 onMounted(() => {
   if (typeof window === 'undefined') return
+  isApple.value = isAppleDevice()
   window.addEventListener('keydown', onWindowKeydown)
 })
 

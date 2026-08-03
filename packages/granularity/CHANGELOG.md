@@ -25,6 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrImageViewer` no longer crashes server-side rendering.** A `watch(…, { immediate: true })` ran
+  `new Image()` synchronously during `setup`, regardless of `modelValue` — so any SSR page that
+  merely *contained* a closed viewer died with `ReferenceError: Image is not defined`. Neighbour
+  preloading now starts in `onMounted`.
+- **`GrCollapseItem` and `GrSegmented` build their ids with `useId()`** instead of `instance.uid`.
+  The old counter is application-wide: it keeps growing between requests on the server and restarts
+  from zero on the client, so `id`, `aria-controls`, `aria-labelledby` and the hidden input's `name`
+  silently diverged on hydration.
+- **`GrCommandPalette` resolves the platform in `onMounted`.** `isAppleDevice()` used to be read
+  during the first render, which would make the server print `Ctrl` and a macOS client `⌘`. In
+  practice the mismatch was unreachable — HeadlessUI withholds modal content from SSR entirely — so
+  this is hardening, not a user-visible fix.
 - **Granular imports no longer lose colours, shadows and focus rings.** `GrSelect`, `GrSlider`,
   `GrAutocomplete`, `GrDropdown`, `GrDrawer` and `GrRating` declared only part of their utility
   classes in `safelist`; the rest lived as string literals in `*Styles.ts` helpers, which the
@@ -45,6 +57,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **SSR gate in CI** (`test-playground-ssr`). The stand grew a third page covering the components
+  where the risks actually were — `GrImageViewer`, `GrCommandPalette`, `GrCollapse`, `GrSegmented`,
+  `GrDrawer`, `GrTreeSelect`, `GrSlider`, `GrTree`, `GrDataTable`, `GrFileUpload`, `GrToaster` — and
+  asserts both a clean `renderToString` and a hydration free of mismatches.
 - **Safelist gate** (`src/__tests__/safelist.test.ts`): every utility class written as a string
   literal in a component's `.ts` helpers must be declared in that component's `safelist`. The rule
   is deliberately stated over sources rather than over `dist` — a gate reading `dist` would stay
