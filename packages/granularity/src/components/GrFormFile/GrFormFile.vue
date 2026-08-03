@@ -6,6 +6,7 @@ import IconX from '~icons/lucide/x'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { useGrFormFieldContext } from '../GrFormField/context'
 import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
@@ -64,6 +65,15 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useGranularityTranslations()
+
+// Контекст `GrFormField`. Виджет здесь — кнопка выбора файла, а не нативный
+// `<input type="file">`: он `aria-hidden` и вне таб-порядка, id на нём увёл бы
+// `<label for>` в невидимый элемент.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const isRequired = computed(() => Boolean(field?.required.value))
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
 const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
@@ -264,9 +274,13 @@ watch(
     <div class="flex flex-col gap-2">
       <div class="flex flex-wrap items-center gap-3">
         <GrButton
+          :id="fieldId"
           variant="secondary"
           size="sm"
           data-gr-form-file-upload-btn
+          :aria-describedby="describedBy"
+          :aria-invalid="isInvalid ? 'true' : undefined"
+          :aria-required="isRequired ? 'true' : undefined"
           :disabled="disabled"
           @click.prevent="openDialog"
         >

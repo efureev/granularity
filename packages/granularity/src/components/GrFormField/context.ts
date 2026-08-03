@@ -9,6 +9,12 @@ import { inject, type ComputedRef, type InjectionKey } from 'vue'
 export interface GrFormFieldContext {
   /** Сгенерированный (или переданный `forId`) id контрола. */
   id: ComputedRef<string | undefined>
+  /**
+   * Id элемента подписи. Нужен контролам, чей виджет — не labelable-элемент
+   * (`span[role="checkbox"]`, `div[role="radiogroup"]`): к ним `<label for>`
+   * не применяется, и имя приходит через `aria-labelledby`.
+   */
+  labelId: ComputedRef<string | undefined>
   /** `aria-describedby`: id подсказки и/или сообщения об ошибке. */
   describedById: ComputedRef<string | undefined>
   /** Невалидно ли поле (есть `error`). */

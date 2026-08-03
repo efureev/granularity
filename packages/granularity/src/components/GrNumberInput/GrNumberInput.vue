@@ -12,6 +12,7 @@ import {
   type GrNumberInputState,
   type GrNumberInputTextAlign,
 } from './grNumberInputStyles'
+import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
 
@@ -92,6 +93,9 @@ export interface GrNumberInputProps {
   decreaseLabel?: string
 }
 
+// Контекст `GrFormField` — fallback для id/описания/невалидности, как в `GrInput`.
+const field = useGrFormFieldContext()
+
 const props = withDefaults(defineProps<GrNumberInputProps>(), {
   placeholder: undefined,
   autocomplete: undefined,
@@ -129,6 +133,11 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrNumberInput' })
+
+const resolvedId = computed(() => props.id ?? field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const isRequired = computed(() => Boolean(field?.required.value))
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -456,7 +465,7 @@ function onBlur(): void {
     </div>
 
     <input
-      :id="id"
+      :id="resolvedId"
       ref="inputEl"
       v-bind="$attrs"
       :name="name"
@@ -470,7 +479,9 @@ function onBlur(): void {
       :aria-valuenow="ariaValueNow"
       :aria-valuemin="min"
       :aria-valuemax="max"
-      :aria-invalid="invalid ? 'true' : undefined"
+      :aria-invalid="invalid || isInvalid ? 'true' : undefined"
+      :aria-describedby="describedBy"
+      :aria-required="isRequired ? 'true' : undefined"
       class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
       :class="inputClassName"
       :style="inputStyle"

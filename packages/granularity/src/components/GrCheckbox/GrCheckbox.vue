@@ -23,6 +23,7 @@ import IconCheck from '~icons/lucide/check'
 import IconMinus from '~icons/lucide/minus'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrFormFieldContext } from '../GrFormField/context'
 
 import {
   grCheckboxCheckIconClass,
@@ -81,6 +82,22 @@ const slots = useSlots()
 
 const labelId = useId()
 const hasLabel = computed(() => Boolean(slots.default))
+
+// Контекст `GrFormField`. Id поля вешается на `span[role="checkbox"]` — именно он
+// виджет и держит фокус; на скрытом `aria-hidden`-инпуте он был бы бесполезен
+// (клик по подписи уводил бы фокус в невидимый элемент). Роль-виджет не является
+// labelable-элементом, поэтому имя от подписи поля приходит через `aria-labelledby`.
+const field = useGrFormFieldContext()
+const fieldControlId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const isFieldRequired = computed(() => Boolean(field?.required.value))
+
+const labelledBy = computed(() => {
+  if (props.ariaLabel) return undefined
+  if (hasLabel.value) return labelId
+  return field?.labelId.value
+})
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → `md`.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCheckbox' })
@@ -185,12 +202,15 @@ function onClick(e: MouseEvent): void {
     <span
       ref="control"
       data-gr-checkbox-indicator
+      :id="fieldControlId"
       role="checkbox"
       :aria-checked="indeterminate ? 'mixed' : (modelValue ? 'true' : 'false')"
       :aria-disabled="disabled ? 'true' : undefined"
-      :aria-required="required ? 'true' : undefined"
+      :aria-required="required || isFieldRequired ? 'true' : undefined"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-describedby="describedBy"
       :aria-label="ariaLabel"
-      :aria-labelledby="!ariaLabel && hasLabel ? labelId : undefined"
+      :aria-labelledby="labelledBy"
       :tabindex="disabled ? -1 : 0"
       :class="controlClassName"
       @keydown.space.prevent="toggle"

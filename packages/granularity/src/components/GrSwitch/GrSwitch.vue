@@ -2,6 +2,7 @@
 import {computed} from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrFormFieldContext } from '../GrFormField/context'
 
 import {
   grSwitchLabelClass,
@@ -25,6 +26,14 @@ export interface GrSwitchProps {
   /** Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--gr-muted)`. */
   inactiveBackgroundColor?: string
 }
+
+// Контекст `GrFormField`: id для `<label for>`, описание ошибкой, невалидность.
+// `<button>` — labelable-элемент, поэтому клик по подписи фокусирует переключатель.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const isRequired = computed(() => Boolean(field?.required.value))
 
 const getCustomColor = (value?: string) => value?.trim() || undefined
 
@@ -85,11 +94,15 @@ function toggle(): void {
 
 <template>
   <button
+      :id="fieldId"
       type="button"
       role="switch"
       data-gr-switch
       :aria-checked="modelValue ? 'true' : 'false'"
       :aria-label="ariaLabel"
+      :aria-describedby="describedBy"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-required="isRequired ? 'true' : undefined"
       :disabled="disabled"
       class="inline-flex items-center gap-2 select-none disabled:opacity-50 disabled:cursor-not-allowed"
       @click="toggle"

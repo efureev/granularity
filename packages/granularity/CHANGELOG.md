@@ -25,6 +25,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrFormField` now really labels every control it wraps.** The contract — label association,
+  `aria-describedby` carrying the error text, `aria-invalid` — was honoured by 7 of 13 controls;
+  for the rest `<label for>` pointed at nothing, so clicking the label focused nothing and the error
+  message was linked to no field at all. `GrCheckbox`, `GrSwitch`, `GrRadioGroup`, `GrNumberInput`,
+  `GrFormFile` and `GrFileUpload` now read the field context.
+
+  Where the widget is a labelable element (`GrSwitch`'s `<button>`, `GrNumberInput`'s and
+  `GrFileUpload`'s `<input>`, `GrFormFile`'s upload button) it takes the field's `id`, so clicking
+  the label focuses it. Where it is not — `GrCheckbox` (`span[role="checkbox"]`) and `GrRadioGroup`
+  (`div[role="radiogroup"]`) — the name arrives via `aria-labelledby` pointing at the label, which is
+  why the context gained a `labelId`. Notably, `GrCheckbox` takes the id on the widget itself rather
+  than on its hidden native input: that input is `aria-hidden` and outside the tab order, so a label
+  pointing at it led into an invisible element.
 - **Escape now closes the overlay you actually see.** A dropdown, select, tree-select, tooltip or
   autocomplete panel opened **inside a modal** used to close the modal instead of itself: modals
   listened on `window` in the capture phase and swallowed the event with `stopImmediatePropagation`,

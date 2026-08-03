@@ -74,8 +74,12 @@ const describedById = computed(() => {
   return ids.length ? ids.join(' ') : undefined
 })
 
+const labelElementId = useId()
+const labelId = computed(() => (props.label ? labelElementId : undefined))
+
 provide(GR_FORM_FIELD_KEY, {
   id: fieldId,
+  labelId,
   describedById,
   invalid: hasError,
   required: isRequired,
@@ -106,6 +110,7 @@ function onFocusOut(): void {
   >
     <label
       v-if="props.label"
+      :id="labelId"
       :for="fieldId"
       class="text-sm text-[var(--gr-muted-fg)]"
       :class="props.labelClass"

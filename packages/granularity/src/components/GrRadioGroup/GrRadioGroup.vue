@@ -2,6 +2,7 @@
 import { computed, provide } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrFormFieldContext } from '../GrFormField/context'
 
 import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
@@ -41,6 +42,15 @@ const props = withDefaults(defineProps<GrRadioGroupProps>(), {
 // провайдер работает и для них — без второго чтения конфига.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrRadioGroup' })
 
+// Контекст `GrFormField`. Группа — не labelable-элемент, поэтому имя приходит
+// через `aria-labelledby` на подпись поля, а не через `<label for>`.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const isRequired = computed(() => Boolean(field?.required.value))
+const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
+
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
@@ -62,9 +72,14 @@ provide(GR_RADIO_GROUP_CONTEXT, {
 
 <template>
   <div
+    :id="fieldId"
     data-gr-radio-group
     role="radiogroup"
     :aria-label="ariaLabel"
+    :aria-labelledby="labelledBy"
+    :aria-describedby="describedBy"
+    :aria-invalid="isInvalid ? 'true' : undefined"
+    :aria-required="isRequired ? 'true' : undefined"
     :aria-disabled="disabled ? 'true' : undefined"
   >
     <template v-if="$slots.default">

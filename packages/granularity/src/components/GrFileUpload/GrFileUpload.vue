@@ -13,6 +13,7 @@ import type { GrUploadState } from './uploadState'
 import { FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { GR_UPLOAD_STATE_IDLE } from './uploadState'
+import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type GrFileUploadExtraDataValue = string | Blob
@@ -101,6 +102,14 @@ const emit = defineEmits<{
 const slots = useSlots()
 
 const { t } = useGranularityTranslations()
+
+// Контекст `GrFormField`: доступным контролом служит сам нативный
+// `<input type="file">` — он и остаётся целью `<label for>`.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const isInvalid = computed(() => Boolean(field?.invalid.value))
+const isRequired = computed(() => Boolean(field?.required.value))
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
 const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
@@ -482,6 +491,7 @@ defineExpose({
          input прячется и от таба, и от дерева доступности — иначе получим два
          контрола на один смысл. -->
     <input
+      :id="fieldId"
       ref="inputRef"
       data-gr-file-upload-input
       :style="hiddenInputStyle"
@@ -489,6 +499,9 @@ defineExpose({
       :tabindex="hasCustomUi || disabled ? -1 : 0"
       :aria-hidden="hasCustomUi ? 'true' : undefined"
       :aria-label="hasCustomUi ? undefined : resolvedPlaceholder"
+      :aria-describedby="describedBy"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-required="isRequired ? 'true' : undefined"
       :name="name"
       :multiple="multiple"
       :disabled="disabled"
