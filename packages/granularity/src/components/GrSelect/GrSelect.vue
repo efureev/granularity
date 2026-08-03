@@ -11,6 +11,7 @@ import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import {
   defaultBaseClass,
@@ -51,6 +52,12 @@ export interface GrSelectProps {
   /** Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`). */
   options?: GrSelectOptionOrGroup[]
   disabled?: boolean
+  /** Только для чтения: значение видно и уходит в форму, но не меняется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   ariaLabel?: string
   view?: GrSelectView
   size?: GrSelectSize
@@ -111,6 +118,9 @@ const props = withDefaults(
   {
     options: undefined,
     disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
     ariaLabel: undefined,
     view: 'default',
     size: undefined,
@@ -169,9 +179,22 @@ const emit = defineEmits<{
 // для связки с лейблом и сообщением об ошибке.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+
+const nativeSelectEl = ref<HTMLSelectElement | null>(null)
+const triggerButtonEl = ref<HTMLElement | null>(null)
+
+// Виджет зависит от режима: нативный `<select>` или кастомный триггер панели.
+function focus(): void {
+  (nativeSelectEl.value ?? triggerButtonEl.value)?.focus()
+}
+
+function blur(): void {
+  (nativeSelectEl.value ?? triggerButtonEl.value)?.blur()
+}
+
+defineExpose({ focus, blur })
 const describedBy = computed(() => field?.describedById.value)
-const isRequired = computed(() => Boolean(field?.required.value))
 
 const optionsResolved = computed<GrSelectOptionOrGroup[]>(() => props.options ?? [])
 
@@ -645,6 +668,7 @@ const teleportEnabled = useTeleportEnabled()
     -->
     <select
       :id="resolvedId"
+      ref="nativeSelectEl"
       data-gr-select-native
       :multiple="multiple"
       :disabled="disabled"
@@ -652,6 +676,7 @@ const teleportEnabled = useTeleportEnabled()
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       :class="isLinkNative ? grSelectLinkNativeOverlayClass : [baseClassName, nativeClassName]"
       @change="onChange"
     >
@@ -712,6 +737,7 @@ const teleportEnabled = useTeleportEnabled()
   >
     <button
       :id="resolvedId"
+      ref="triggerButtonEl"
       data-testid="gr-select-trigger"
       data-gr-select-trigger
       type="button"
@@ -720,6 +746,7 @@ const teleportEnabled = useTeleportEnabled()
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       role="combobox"
       aria-haspopup="listbox"
       :aria-controls="open ? listboxId : undefined"

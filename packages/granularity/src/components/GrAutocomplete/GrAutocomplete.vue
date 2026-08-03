@@ -10,6 +10,7 @@ import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import {
   autocompleteChipClass,
@@ -46,6 +47,12 @@ export interface GrAutocompleteProps {
   options?: GrAutocompleteOption[]
   multiple?: boolean
   disabled?: boolean
+  /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   size?: GrAutocompleteSize
   placeholder?: string
   ariaLabel?: string
@@ -83,6 +90,9 @@ const props = withDefaults(
     options: undefined,
     multiple: false,
     disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
     size: undefined,
     placeholder: undefined,
     ariaLabel: undefined,
@@ -123,9 +133,8 @@ const resolvedTypeMoreText = computed(() =>
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
-const isRequired = computed(() => Boolean(field?.required.value))
 
 const optionsResolved = computed<GrAutocompleteOption[]>(() => props.options ?? [])
 
@@ -162,6 +171,16 @@ const activeIndex = ref(-1)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const inputEl = ref<HTMLInputElement | null>(null)
+
+function focus(): void {
+  inputEl.value?.focus()
+}
+
+function blur(): void {
+  inputEl.value?.blur()
+}
+
+defineExpose({ focus, blur })
 const clickOutsideExclude = [() => panelEl.value]
 
 const { floatingStyle } = useFloating(rootEl, panelEl, open, {
@@ -493,6 +512,8 @@ const teleportEnabled = useTeleportEnabled()
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-describedby="describedBy"
         :aria-required="isRequired ? 'true' : undefined"
+        :aria-readonly="isReadonly ? 'true' : undefined"
+        :readonly="isReadonly"
         aria-haspopup="listbox"
         :aria-autocomplete="ariaAutocomplete"
         :aria-controls="open ? listboxId : undefined"

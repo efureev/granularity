@@ -40,29 +40,6 @@ function hasAttr(root: Element, selector: string): boolean {
   return root.matches?.(selector) || root.querySelector?.(selector) !== null
 }
 
-/**
- * Контролы, ещё не переведённые на контракт (шаг 2 в работе). Список закрытый и
- * убывающий: пока имя здесь, проверки для него пропускаются, но сам факт долга
- * виден. Удаление имени — единственный способ «закрыть» контрол, и тогда гейт
- * начинает его проверять.
- *
- * Порядок миграции задан сложностью: сперва контролы с нативным элементом,
- * потом виджеты с ARIA-ролью, последними — составные (`GrSelect`,
- * `GrTreeSelect`, `GrFileUpload`), где виджет выбирается по режиму.
- */
-const PENDING = new Set([
-  'GrSelect',
-  'GrAutocomplete',
-  'GrTreeSelect',
-  'GrInputTag',
-  'GrRadioGroup',
-  'GrSlider',
-  'GrRating',
-  'GrSegmented',
-  'GrFormFile',
-  'GrFileUpload',
-])
-
 type Control = {
   name: string
   props: Record<string, unknown>
@@ -92,7 +69,7 @@ const controls: { component: unknown, meta: Control }[] = [
 
 describe('контракт форм-контрола', () => {
   for (const { component, meta } of controls) {
-    describe.skipIf(PENDING.has(meta.name))(meta.name, () => {
+    describe(meta.name, () => {
       // Объявленную поверхность пропов проверяем по `component.props`, а не по DOM:
       // необъявленный проп «протекает» на корень через fallthrough и в разметке
       // выглядит реализованным. `ariaLabel` Vue вдобавок сама нормализует в

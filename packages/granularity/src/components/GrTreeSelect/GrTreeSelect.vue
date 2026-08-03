@@ -6,6 +6,8 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
+import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrInput from '../GrInput/GrInput.vue'
 import GrTree, {
@@ -29,6 +31,9 @@ const props = withDefaults(
     placeholder: undefined,
     size: 'md',
     invalid: false,
+    readonly: false,
+    required: false,
+    ariaLabel: undefined,
     state: 'default',
     multiple: false,
     clearable: false,
@@ -63,6 +68,22 @@ defineSlots<{
 
 const rootEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLInputElement | null>(null)
+
+// Контекст `GrFormField` + общий контракт форм-контрола.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+
+function focus(): void {
+  triggerEl.value?.focus()
+}
+
+function blur(): void {
+  triggerEl.value?.blur()
+}
+
+defineExpose({ focus, blur })
 const filterInputRef = ref<InstanceType<typeof GrInput> | null>(null)
 const treeRef = ref<GrTreeInstance | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
@@ -219,7 +240,7 @@ const panelClasses = computed(() => {
 })
 
 function setOpen(next: boolean) {
-  if (props.disabled)
+  if (props.disabled || isReadonly.value)
     return
 
   if (open.value === next)
@@ -392,6 +413,7 @@ const teleportEnabled = useTeleportEnabled()
     <div class="relative">
       <input
         ref="triggerEl"
+        :id="fieldId"
         data-testid="gr-tree-select-trigger"
         data-gr-tree-select-trigger
         type="text"
@@ -402,7 +424,10 @@ const teleportEnabled = useTeleportEnabled()
         role="combobox"
         aria-readonly="true"
         :aria-expanded="open ? 'true' : 'false'"
-        :aria-invalid="invalid ? 'true' : undefined"
+        :aria-invalid="isInvalid ? 'true' : undefined"
+        :aria-required="isRequired ? 'true' : undefined"
+        :aria-describedby="describedBy"
+        :aria-label="ariaLabel"
         class="w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
         @pointerdown="onTriggerPointerDown"

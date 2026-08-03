@@ -4,6 +4,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import {
   sliderFillClass,
@@ -42,6 +43,12 @@ export interface GrSliderProps {
   /** Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`. */
   range?: boolean
   disabled?: boolean
+  /** Только для чтения: значение видно, но не меняется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   size?: GrSliderSize
   /** Метки делений: `{ [value]: label }` или массив значений. */
   marks?: GrSliderMarks
@@ -60,6 +67,9 @@ const props = withDefaults(
     step: 1,
     range: false,
     disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
     size: undefined,
     marks: undefined,
     showTooltip: false,
@@ -83,12 +93,22 @@ const emit = defineEmits<{
 // Контекст `GrFormField`: id/aria-describedby/invalid/required как fallback.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
-const isRequired = computed(() => Boolean(field?.required.value))
 
 const trackEl = ref<HTMLElement | null>(null)
+
 const thumbEls = ref<HTMLElement[]>([])
+
+function focus(): void {
+  thumbEls.value[0]?.focus()
+}
+
+function blur(): void {
+  thumbEls.value[0]?.blur()
+}
+
+defineExpose({ focus, blur })
 
 // Нормализованные границы (гард от max<=min).
 const span = computed(() => (props.max > props.min ? props.max - props.min : 1))
@@ -180,7 +200,7 @@ function nearestThumb(value: number): number {
 }
 
 function onTrackPointerDown(event: PointerEvent): void {
-  if (props.disabled) return
+  if (props.disabled || isReadonly.value) return
   const value = valueFromClientX(event.clientX)
   const index = nearestThumb(value)
   activeThumb.value = index
@@ -221,7 +241,7 @@ function bigStep(): number {
 }
 
 function onThumbKeydown(event: KeyboardEvent, index: number): void {
-  if (props.disabled) return
+  if (props.disabled || isReadonly.value) return
   const current = values.value[index]
   let next: number | null = null
 
@@ -319,6 +339,7 @@ function thumbAriaLabel(index: number): string | undefined {
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-describedby="index === 0 ? describedBy : undefined"
         :aria-required="isRequired && index === 0 ? 'true' : undefined"
+        :aria-readonly="isReadonly ? 'true' : undefined"
         @keydown="onThumbKeydown($event, index)"
         @mouseenter="hoveredThumb = index"
         @mouseleave="hoveredThumb = null"

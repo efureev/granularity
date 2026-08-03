@@ -3,6 +3,7 @@ import { computed, provide, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
@@ -24,6 +25,12 @@ export interface GrRadioGroupProps {
   options?: GrRadioGroupOption[]
   name?: string
   disabled?: boolean
+  /** Только для чтения: выбор видно, но он не меняется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   variant?: GrRadioGroupVariant
   size?: GrButtonSize
   ariaLabel?: string
@@ -33,6 +40,9 @@ const props = withDefaults(defineProps<GrRadioGroupProps>(), {
   options: undefined,
   name: undefined,
   disabled: false,
+  readonly: false,
+  invalid: false,
+  required: false,
   variant: 'radiobox',
   size: undefined,
   ariaLabel: undefined,
@@ -48,8 +58,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrRadioG
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
-const isRequired = computed(() => Boolean(field?.required.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
 const emit = defineEmits<{
@@ -57,10 +66,22 @@ const emit = defineEmits<{
 }>()
 
 function setValue(next: string): void {
-  if (props.disabled)
+  if (props.disabled || isReadonly.value)
     return
   emit('update:modelValue', next)
 }
+
+const rootEl = ref<HTMLElement | null>(null)
+
+function focus(): void {
+  rootEl.value?.querySelector<HTMLElement>('[role="radio"][tabindex="0"]')?.focus()
+}
+
+function blur(): void {
+  rootEl.value?.querySelector<HTMLElement>('[role="radio"][tabindex="0"]')?.blur()
+}
+
+defineExpose({ focus, blur })
 
 const entries = ref<GrRadioEntry[]>([])
 
@@ -108,6 +129,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
 <template>
   <div
     :id="fieldId"
+    ref="rootEl"
     data-gr-radio-group
     role="radiogroup"
     :aria-label="ariaLabel"
@@ -115,6 +137,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
     :aria-describedby="describedBy"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-required="isRequired ? 'true' : undefined"
+    :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-disabled="disabled ? 'true' : undefined"
   >
     <template v-if="$slots.default">

@@ -7,6 +7,7 @@ import IconX from '~icons/lucide/x'
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
@@ -28,6 +29,14 @@ export interface GrFormFileProps {
   modelValue: File | File[] | null
   multiple?: boolean
   disabled?: boolean
+  /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
+  /** Доступное имя вне `GrFormField`. */
+  ariaLabel?: string
   /** W3C `accept` для `<input type="file">` + sugar к `acceptValidator(...)`. */
   accept?: string
   validators?: FileValidator[]
@@ -45,6 +54,10 @@ const props = withDefaults(
   {
     multiple: false,
     disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
+    ariaLabel: undefined,
     accept: undefined,
     uploadText: undefined,
     changeText: undefined,
@@ -72,8 +85,7 @@ const { t } = useGranularityTranslations()
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
-const isRequired = computed(() => Boolean(field?.required.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
 const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
@@ -82,6 +94,17 @@ const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.formFile.p
 
 const inputRef = ref<HTMLInputElement | null>(null)
 const localErrors = ref<GrFormFileError[]>([])
+const uploadBtnEl = ref<HTMLElement | null>(null)
+
+function focus(): void {
+  uploadBtnEl.value?.focus()
+}
+
+function blur(): void {
+  uploadBtnEl.value?.blur()
+}
+
+defineExpose({ focus, blur })
 
 const files = computed<File[]>(() => {
   if (props.multiple) {
@@ -110,7 +133,7 @@ function clearErrors() {
 }
 
 function openDialog() {
-  if (props.disabled) return
+  if (props.disabled || isReadonly.value) return
   inputRef.value?.click()
 }
 
@@ -275,12 +298,15 @@ watch(
       <div class="flex flex-wrap items-center gap-3">
         <GrButton
           :id="fieldId"
+          ref="uploadBtnEl"
           variant="secondary"
           size="sm"
           data-gr-form-file-upload-btn
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid ? 'true' : undefined"
           :aria-required="isRequired ? 'true' : undefined"
+          :aria-readonly="isReadonly ? 'true' : undefined"
+          :aria-label="ariaLabel"
           :disabled="disabled"
           @click.prevent="openDialog"
         >

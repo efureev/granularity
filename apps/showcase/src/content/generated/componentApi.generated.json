@@ -137,6 +137,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrAutocompleteSize | undefined",
@@ -287,7 +308,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -754,6 +786,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: состояние видно, но не переключается.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "Размер контрола. Не задан — берётся из `GrConfigProvider`, иначе `md`.",
             "type": "GrButtonSize | undefined",
@@ -768,13 +821,6 @@
             "default": "undefined"
           },
           {
-            "name": "required",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "value",
             "description": "",
             "type": "string | undefined",
@@ -787,20 +833,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "readonly",
-            "description": "Только для чтения: состояние видно, но не переключается.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "Визуальное и ARIA-состояние ошибки.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "form",
@@ -2127,8 +2159,36 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "placeholder",
             "description": "i18n: надпись-подсказка в дефолтном UI.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2310,6 +2370,16 @@
         "origin": "generated",
         "items": [
           {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          },
+          {
             "name": "uploadFiles",
             "description": "",
             "type": "(files: File[], source?: FileValidatorSource) => Promise<void>"
@@ -2460,6 +2530,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "readonly",
+            "description": "Всё поле только для чтения: контролы внутри перестают редактироваться.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "required",
             "description": "Помечает поле обязательным (маркер `*` + `aria-required` у контрола).",
             "type": "boolean | undefined",
@@ -2472,13 +2549,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "readonly",
-            "description": "Всё поле только для чтения: контролы внутри перестают редактироваться.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "error",
@@ -2572,8 +2642,36 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "placeholder",
             "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2688,7 +2786,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -3028,6 +3137,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и выделяемо, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrInputSize | undefined",
@@ -3063,32 +3193,11 @@
             "default": "undefined"
           },
           {
-            "name": "required",
-            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "readonly",
-            "description": "Только для чтения: значение видно и выделяемо, но не редактируется.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "id",
@@ -3276,6 +3385,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrInputSize | undefined",
@@ -3302,20 +3432,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "readonly",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "state",
@@ -3453,6 +3569,11 @@
         "items": [
           {
             "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
             "description": "",
             "type": "() => void"
           }
@@ -3916,6 +4037,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrNumberInputSize | undefined",
@@ -3937,32 +4079,11 @@
             "default": "undefined"
           },
           {
-            "name": "required",
-            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "readonly",
-            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "id",
@@ -4353,6 +4474,13 @@
             "default": "undefined"
           },
           {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrDialogSize | undefined",
@@ -4365,13 +4493,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "required",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
           },
           {
             "name": "description",
@@ -4626,6 +4747,13 @@
             "default": "undefined"
           },
           {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrButtonSize | undefined",
@@ -4638,13 +4766,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "required",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "name",
@@ -4767,6 +4888,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: выбор видно, но он не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrButtonSize | undefined",
@@ -4824,7 +4966,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -4852,6 +5005,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только показ: без ввода и фокуса.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrRatingSize | undefined",
@@ -4868,13 +5042,6 @@
           {
             "name": "clearable",
             "description": "Повторный клик по текущей оценке сбрасывает её в `0`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "readonly",
-            "description": "Только показ: без ввода и фокуса.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -4968,7 +5135,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -5130,6 +5308,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: выбор видно, но он не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrSegmentedSize | undefined",
@@ -5213,7 +5412,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -5250,6 +5460,27 @@
           {
             "name": "disabled",
             "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -5427,7 +5658,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -5603,6 +5845,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно, но не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "GrSliderSize | undefined",
@@ -5702,7 +5965,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -5875,27 +6149,6 @@
             "default": "false"
           },
           {
-            "name": "size",
-            "description": "",
-            "type": "GrSwitchSize | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "ariaLabel",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "required",
-            "description": "Обязательное поле (`aria-required`).",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "readonly",
             "description": "Только для чтения: состояние видно, но не переключается.",
             "type": "boolean | undefined",
@@ -5908,6 +6161,27 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "GrSwitchSize | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "activeBackgroundColor",
@@ -6199,6 +6473,27 @@
             "default": "false"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "placeholder",
             "description": "",
             "type": "string | undefined",
@@ -6213,32 +6508,11 @@
             "default": "undefined"
           },
           {
-            "name": "required",
-            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "readonly",
-            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "id",
@@ -6758,6 +7032,27 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно, но не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "state",

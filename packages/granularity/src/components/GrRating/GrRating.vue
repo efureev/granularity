@@ -5,6 +5,7 @@ import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import {
   ratingFillClassByTone,
@@ -46,6 +47,10 @@ export interface GrRatingProps {
   /** Только показ: без ввода и фокуса. */
   readonly?: boolean
   disabled?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   /** Повторный клик по текущей оценке сбрасывает её в `0`. */
   clearable?: boolean
   /** UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`). */
@@ -66,6 +71,8 @@ const props = withDefaults(
     allowHalf: false,
     readonly: false,
     disabled: false,
+    invalid: false,
+    required: false,
     clearable: false,
     icon: undefined,
     showText: false,
@@ -93,12 +100,23 @@ const { t } = useGranularityTranslations()
 // Контекст `GrFormField`: id/aria-describedby/invalid/required как fallback.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
-const isRequired = computed(() => Boolean(field?.required.value))
+
+const rootEl = ref<HTMLElement | null>(null)
+
+function focus(): void {
+  rootEl.value?.querySelector<HTMLElement>('[data-gr-rating-scale]')?.focus()
+}
+
+function blur(): void {
+  rootEl.value?.querySelector<HTMLElement>('[data-gr-rating-scale]')?.blur()
+}
+
+defineExpose({ focus, blur })
 
 /** Ввод возможен: не readonly и не disabled. */
-const interactive = computed(() => !props.readonly && !props.disabled)
+const interactive = computed(() => !isReadonly.value && !props.disabled)
 
 /**
  * Роль контрола (`slider`) сохраняется и в `disabled` — отключённый слайдер это
@@ -199,6 +217,7 @@ function onKeydown(event: KeyboardEvent): void {
 
 <template>
   <div
+    ref="rootEl"
     data-gr-rating
     class="inline-flex items-center gap-2"
     @mouseleave="onMouseLeave"
@@ -220,6 +239,7 @@ function onKeydown(event: KeyboardEvent): void {
       :aria-invalid="asSlider && isInvalid ? 'true' : undefined"
       :aria-describedby="asSlider ? describedBy : undefined"
       :aria-required="asSlider && isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       @keydown="onKeydown"
     >
       <span

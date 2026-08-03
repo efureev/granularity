@@ -14,6 +14,7 @@ import { FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { GR_UPLOAD_STATE_IDLE } from './uploadState'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type GrFileUploadExtraDataValue = string | Blob
@@ -51,6 +52,14 @@ export interface GrFileUploadProps {
   beforeUpload?: (file: File) => boolean | Promise<unknown>
   validators?: FileValidator[]
   disabled?: boolean
+  /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
+  /** Доступное имя вне `GrFormField`. */
+  ariaLabel?: string
   headers?: Record<string, string>
   withCredentials?: boolean
   showFileList?: boolean
@@ -79,6 +88,10 @@ const props = withDefaults(
     beforeUpload: undefined,
     validators: undefined,
     disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
+    ariaLabel: undefined,
     headers: undefined,
     withCredentials: false,
     showFileList: false,
@@ -108,8 +121,7 @@ const { t } = useGranularityTranslations()
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
-const isRequired = computed(() => Boolean(field?.required.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
 const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
@@ -156,6 +168,7 @@ const hasCustomUi = computed(() => {
 
 const inputRef = ref<HTMLInputElement | null>(null)
 const isOver = ref(false)
+
 let overCounter = 0
 
 const lastFiles = ref<File[]>([])
@@ -446,7 +459,17 @@ const progressText = computed(() => {
   return `${Math.round(progressPercent.value)}%`
 })
 
+function focus(): void {
+  inputRef.value?.focus()
+}
+
+function blur(): void {
+  inputRef.value?.blur()
+}
+
 defineExpose({
+  focus,
+  blur,
   uploadFiles: handleFiles,
   abort,
   openDialog,
@@ -498,10 +521,11 @@ defineExpose({
       type="file"
       :tabindex="hasCustomUi || disabled ? -1 : 0"
       :aria-hidden="hasCustomUi ? 'true' : undefined"
-      :aria-label="hasCustomUi ? undefined : resolvedPlaceholder"
+      :aria-label="ariaLabel ?? (hasCustomUi ? undefined : resolvedPlaceholder)"
       :aria-describedby="describedBy"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       :name="name"
       :multiple="multiple"
       :disabled="disabled"

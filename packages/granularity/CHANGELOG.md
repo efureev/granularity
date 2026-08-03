@@ -103,9 +103,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   "read-only form" no longer means reaching into every control — or abusing `disabled`, which also
   stops the value from being submitted.
 
-  **Migrated so far: `GrInput`, `GrTextarea`, `GrNumberInput`, `GrCheckbox`, `GrSwitch`.** The other
-  ten controls are listed as explicit debt in `src/__tests__/formControlContract.test.ts`; their
-  checks are skipped until each is migrated. All props are additive — nothing breaks.
+  **All 15 controls now honour it** — `GrInput`, `GrTextarea`, `GrNumberInput`, `GrSelect`,
+  `GrAutocomplete`, `GrTreeSelect`, `GrInputTag`, `GrCheckbox`, `GrRadioGroup`, `GrSwitch`,
+  `GrSlider`, `GrRating`, `GrSegmented`, `GrFormFile`, `GrFileUpload`. Before this, `readonly`
+  existed on 3 of them, `required` on 2, `focus()` on 3 and `blur()` on none. All props are
+  additive — nothing breaks.
 - **Tests for the seven components that had none** — `GrResponseErrorBanner`, `GrTabPanels`,
   `GrDropdownMenu`, `GrDivider`, `GrKbd`, `GrIcon`, `GrButtonGroup` (+52 tests). Every component in
   the package now has a test file. The error-banner suite exercises the parser chain directly,

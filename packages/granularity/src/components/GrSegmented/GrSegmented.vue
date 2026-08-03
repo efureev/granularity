@@ -2,6 +2,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import type { ComponentPublicInstance } from 'vue'
 
@@ -38,6 +40,12 @@ export interface GrSegmentedProps {
   /** Растягивать сегмент на всю ширину контейнера. */
   block?: boolean
   disabled?: boolean
+  /** Только для чтения: выбор видно, но он не меняется. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   /** Имя скрытых radio-inputs для интеграции с нативной формой. */
   name?: string
   ariaLabel?: string
@@ -51,6 +59,9 @@ const props = withDefaults(
     indicatorDuration: 300,
     block: false,
     disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
     name: undefined,
     ariaLabel: undefined,
   },
@@ -68,7 +79,24 @@ const emit = defineEmits<{
 // `useId()` стабилен между сервером и клиентом, в отличие от `instance.uid`.
 const fallbackName = `gr-segmented-${useId()}`
 
+// Контекст `GrFormField` + общий контракт форм-контрола.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
+const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+
 const rootRef = ref<HTMLElement | null>(null)
+
+function focus(): void {
+  rootRef.value?.querySelector<HTMLElement>('[data-gr-segmented-item][tabindex="0"]')?.focus()
+}
+
+function blur(): void {
+  rootRef.value?.querySelector<HTMLElement>('[data-gr-segmented-item][tabindex="0"]')?.blur()
+}
+
+defineExpose({ focus, blur })
 const itemRefs = ref(new Map<string, HTMLElement>())
 const indicatorGeometry = ref<IndicatorGeometry | null>(null)
 const indicatorReady = ref(false)
@@ -303,7 +331,7 @@ function focusIndex(index: number): void {
 }
 
 function onKeydown(event: KeyboardEvent, index: number): void {
-  if (props.disabled) {
+  if (props.disabled || isReadonly.value) {
     return
   }
 
@@ -386,11 +414,17 @@ onBeforeUnmount(() => {
 
 <template>
   <div
+    :id="fieldId"
     ref="rootRef"
     data-gr-segmented
     :data-variant="resolvedVariant"
     role="radiogroup"
     :aria-label="ariaLabel"
+    :aria-labelledby="labelledBy"
+    :aria-describedby="describedBy"
+    :aria-invalid="isInvalid ? 'true' : undefined"
+    :aria-required="isRequired ? 'true' : undefined"
+    :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-disabled="disabled ? 'true' : undefined"
     :class="rootClassName"
     :style="rootStyle"

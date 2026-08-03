@@ -23,6 +23,12 @@ export interface GrTreeSelectProps<T extends object = any> {
   placeholder?: string
   size?: GrInputSize
   invalid?: boolean
+  /** Только для чтения: значение видно, но не меняется. */
+  readonly?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
+  /** Доступное имя вне `GrFormField`. */
+  ariaLabel?: string
   state?: GrTreeSelectState
 
   multiple?: boolean

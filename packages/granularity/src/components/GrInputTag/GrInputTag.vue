@@ -6,6 +6,7 @@ import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconClose from '~icons/lucide/x'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -30,6 +31,8 @@ export interface GrInputTagProps {
   disabled?: boolean
   readonly?: boolean
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
+  required?: boolean
   state?: GrInputTagState
   size?: GrInputTagSize
   separators?: string[]
@@ -60,6 +63,7 @@ const props = withDefaults(
     disabled: false,
     readonly: false,
     invalid: false,
+    required: false,
     state: 'default',
     size: 'md',
     separators: () => [','],
@@ -89,8 +93,11 @@ const emit = defineEmits<{
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => props.invalid || Boolean(field?.invalid.value))
-const isRequired = computed(() => Boolean(field?.required.value))
+const {
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 const { t } = useGranularityTranslations()
 const resolvedRemoveTagLabel = computed(() => props.removeTagLabel ?? t('gr.inputTag.removeTag', 'Remove tag'))
@@ -102,10 +109,14 @@ function focus(): void {
   inputEl.value?.focus()
 }
 
-defineExpose({ focus })
+function blur(): void {
+  inputEl.value?.blur()
+}
+
+defineExpose({ focus, blur })
 
 const isMaxed = computed(() => props.max !== undefined && props.modelValue.length >= props.max)
-const canEdit = computed(() => !props.disabled && !props.readonly)
+const canEdit = computed(() => !props.disabled && !isReadonly.value)
 const showRemove = computed(() => props.tagClosable && canEdit.value)
 
 function escapeRegexChar(ch: string): string {
@@ -304,6 +315,7 @@ const placeholderText = computed(() => props.modelValue.length > 0 ? undefined :
       :aria-label="ariaLabel"
       :aria-describedby="describedBy"
       :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-invalid="isInvalid ? 'true' : undefined"
       class="flex-1 min-w-[120px] bg-transparent border-none outline-none placeholder:text-[var(--gr-muted-fg)]"
       :class="inputClassName"
