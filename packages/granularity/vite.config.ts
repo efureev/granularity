@@ -3,7 +3,8 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
-import { granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granularAssetFileNames, granularChunkFileNames, granularCssAssetsPlugin } from '@feugene/unocss-preset-granular/vite'
+import { granularityProvider } from './src/granular-provider'
 import {libInjectCss} from "vite-plugin-lib-inject-css";
 
 /**
@@ -45,6 +46,10 @@ export default defineConfig({
     libInjectCss(),
     Icons({ compiler: 'vue3', autoInstall: false }),
     copyStylesPlugin(),
+    // Кладёт в `dist` CSS, объявленный в `tokenDefinitionsRef` строкой:
+    // бандлер такие ссылки не эмитит, а node-слой пресета ищет файл по
+    // `assetName`.
+    granularCssAssetsPlugin({ providers: [granularityProvider] }),
   ],
   build: {
     target: 'esnext',
@@ -311,7 +316,9 @@ export default defineConfig({
       ],
       output: {
         chunkFileNames: granularChunkFileNames(),
-        assetFileNames: assetInfo => assetInfo.name ?? '[name][extname]',
+        // Без списка компонентов: дефолтная эвристика `^[A-Z][\w-]*\.css$`
+        // покрывает все `Gr*`, а `index.css` оставляет на месте.
+        assetFileNames: granularAssetFileNames(),
       },
     },
   },

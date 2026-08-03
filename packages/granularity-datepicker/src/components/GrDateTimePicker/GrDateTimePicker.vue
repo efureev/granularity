@@ -56,7 +56,7 @@ const effectiveUi = computed<Record<string, unknown>>(() => {
     // input-обёртки. Держим достаточный left/right padding, чтобы текст не
     // налезал на иконки, и мапим визуал на GR-токены.
     input:
-      'h-10 w-full rounded-md border border-[var(--brd)] bg-[var(--bg)] pl-10 pr-12 text-[14px] text-[var(--fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed',
+      'h-10 w-full rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] pl-10 pr-12 text-[14px] text-[var(--gr-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed',
     menu: 'shadow-[var(--gr-shadow-2)]',
   }
 
@@ -120,30 +120,30 @@ function onUpdateModelValue(value: GrDateTimeModel) {
 <style scoped>
 .gr-date-time-picker {
   /* Маппинг тем-переменных VueDatePicker на GR-токены. */
-  --dp-background-color: var(--bg);
-  --dp-text-color: var(--fg);
+  --dp-background-color: var(--gr-bg);
+  --dp-text-color: var(--gr-fg);
 
-  --dp-hover-color: var(--muted);
-  --dp-hover-text-color: var(--fg);
-  --dp-hover-icon-color: var(--muted-fg);
-  --dp-icon-color: var(--muted-fg);
+  --dp-hover-color: var(--gr-muted);
+  --dp-hover-text-color: var(--gr-fg);
+  --dp-hover-icon-color: var(--gr-muted-fg);
+  --dp-icon-color: var(--gr-muted-fg);
 
-  --dp-primary-color: var(--primary);
-  --dp-primary-disabled-color: var(--primary-hover);
-  --dp-primary-text-color: var(--primary-fg);
+  --dp-primary-color: var(--gr-primary);
+  --dp-primary-disabled-color: var(--gr-primary-hover);
+  --dp-primary-text-color: var(--gr-primary-fg);
 
-  --dp-secondary-color: var(--muted-fg);
+  --dp-secondary-color: var(--gr-muted-fg);
 
-  --dp-border-color: var(--brd);
-  --dp-menu-border-color: var(--brd);
-  --dp-border-color-hover: var(--brd-hover);
-  --dp-border-color-focus: var(--ring);
+  --dp-border-color: var(--gr-brd);
+  --dp-menu-border-color: var(--gr-brd);
+  --dp-border-color-hover: var(--gr-brd-hover);
+  --dp-border-color-focus: var(--gr-ring);
 
-  --dp-disabled-color: var(--muted);
-  --dp-disabled-color-text: var(--muted-fg);
+  --dp-disabled-color: var(--gr-muted);
+  --dp-disabled-color-text: var(--gr-muted-fg);
 
   --dp-success-color: var(--gr-success);
-  --dp-danger-color: var(--destructive);
+  --dp-danger-color: var(--gr-destructive);
 
   --dp-font-family: var(--gr-font-ui);
   --dp-font-size: var(--gr-text-sm);

@@ -1,14 +1,8 @@
-// Общий код browser- и node-entry granular-provider'а `@feugene/granularity-datepicker`.
-//
-// Оба entry (`./index.ts`, `./node.ts`) отличаются только инстансом
-// `granularityProvider`, который попадает в `dependencies`: browser-entry
-// использует browser-вариант из `@feugene/granularity/granular-provider`,
-// node-entry — FS-aware вариант из `.../granular-provider/node`. Всё
-// остальное (id, `packageBaseUrl`, список компонентов) идентично и живёт
-// здесь, в фабрике `createGranularityDatepickerProvider`.
+// `id`, `packageBaseUrl` и список компонентов провайдера.
 import {
   defineGranularProvider,
   type GranularProvider,
+  resolvePackageBaseUrl,
 } from '@feugene/unocss-preset-granular/contract'
 
 import { grDateTimePickerConfig } from '../components/GrDateTimePicker/config'
@@ -19,13 +13,9 @@ import { grDateRangePickerConfig } from '../components/GrDateRangePicker/config'
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_DATEPICKER_PROVIDER_ID = '@feugene/granularity-datepicker'
 
-// runtime-concat: литерал `new URL('..', import.meta.url)` rolldown заменяет
-// на `data:`-URL, поэтому собираем корень пакета из `import.meta.url` вручную
-// (отрезая два последних сегмента: имя файла и каталог `granular-provider/`).
-const packageBaseUrl = `${import.meta.url.slice(
-  0,
-  import.meta.url.lastIndexOf('/', import.meta.url.lastIndexOf('/') - 1) + 1,
-)}`
+// Не заменять на `new URL('..', import.meta.url)`: Vite и rolldown распознают
+// этот литерал и подставляют `data:`-URL, после чего scan-директории пустеют.
+const packageBaseUrl = resolvePackageBaseUrl(import.meta.url)
 
 /**
  * Собирает granular-provider пакета `@feugene/granularity-datepicker`.

@@ -10,6 +10,7 @@ import {
 import {granularContent, type PresetGranularNodeOptions} from '@feugene/unocss-preset-granular/node'
 import {presetGranularNode} from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
+import datepickerProvider from '@feugene/granularity-datepicker/granular-provider/node'
 import {
     animationPreflights,
     animationRules,
@@ -20,7 +21,7 @@ import {
 } from '@feugene/unocss-mini-extra-rules'
 
 export const showcaseGranularOptions: PresetGranularNodeOptions = {
-    providers: [granularityProvider],
+    providers: [granularityProvider, datepickerProvider],
     components: 'all',
     themes: {names: ['light', 'dark']},
     layer: 'granular' as const,

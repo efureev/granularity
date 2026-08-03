@@ -1,6 +1,8 @@
 import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
 
 export const grDialogServiceConfig = defineGranularComponent(import.meta.url, {
-    name: 'GrDialogServiceHost',
+    // Совпадает с именем директории: из него пресет строит scan-glob
+    // `dist/components/<name>/**`.
+    name: 'GrDialogService',
     dependencies: ['GrButton', 'GrDialog', 'GrConfirmDialog', 'GrPromptDialog', 'GrResponseErrorBanner'],
 })

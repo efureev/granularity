@@ -1,7 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granularAssetFileNames, granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
 import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
 /**
@@ -15,6 +15,8 @@ import { libInjectCss } from 'vite-plugin-lib-inject-css'
  *   сканировать шаблоны через `content.filesystem` пресета `presetGranularNode`;
  * — деклараций `.d.ts` эмитит `vue-tsc -p tsconfig.build.json`.
  */
+const EXTRA_COMPONENTS = ['XgQuickForm'] as const
+
 export default defineConfig({
   plugins: [vue(), libInjectCss()],
   build: {
@@ -48,7 +50,7 @@ export default defineConfig({
       ],
       output: {
         chunkFileNames: granularChunkFileNames(),
-        assetFileNames: assetInfo => assetInfo.name ?? '[name][extname]',
+        assetFileNames: granularAssetFileNames({ components: EXTRA_COMPONENTS }),
       },
     },
   },

@@ -200,10 +200,11 @@ yarn workspace @feugene/granularity generate:registry
 
 ### Что генератор НЕ делает
 
-- **node-only конфиг.** Если у компонента есть `config.node.ts` (например,
-  `GrButton` читает токены с диска через `tokenDefinitionsFromCssSync`),
-  подключите его в `src/granular-provider/node.ts` через массив `overrides`
-  для `createGranularityProvider(...)`.
+- **Токены темы из CSS.** Если компонент отдаёт структурные токены
+  (`GrButton`, `GrProgressBar`), объявите их в `config.ts` через
+  `tokenDefinitionsRef` — это просто ссылка на CSS, файл читает node-слой
+  пресета. Отдельный `config.node.ts` с `tokenDefinitionsFromCssSync` больше
+  не нужен и в клиентский бандл `node:fs` не тянет.
 - **CSS-subpath.** `./components/<Name>/styles.css` в `package.json#exports`
   добавляется вручную, если компоненту нужен отдельный CSS-импорт:
 
@@ -260,7 +261,10 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 ## Что проверить перед завершением задачи
 
 1. У компонента есть минимум `config.ts`, `index.ts` и основной `.vue`-файл.
-2. Прогнан `yarn generate:registry`, и тест `registry.generated.test.ts` зелёный; node-only конфиг, если нужен, подключён в `src/granular-provider/node.ts` вручную.
+2. Прогнан `yarn generate:registry`, и тест `registry.generated.test.ts` зелёный.
+3. `name` в `config.ts` совпадает с ИМЕНЕМ ДИРЕКТОРИИ компонента — из него
+   строится scan-glob `dist/components/<name>/**`. Расхождение = классы
+   компонента молча не попадают в CSS; ловится `granular doctor --strict`.
 4. При необходимости обновлён `packages/granularity/package.json`.
 5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.
 6. Обновлён `src/__tests__/presetGranularity.test.ts` и связанные component tests, если они нужны.

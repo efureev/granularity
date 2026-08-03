@@ -1,7 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granularAssetFileNames, granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
 import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
 /**
@@ -21,6 +21,13 @@ import { libInjectCss } from 'vite-plugin-lib-inject-css'
  *   пикера (см. `sideEffects` в package.json);
  * — декларации `.d.ts` эмитит `vue-tsc -p tsconfig.build.json`.
  */
+const DATEPICKER_COMPONENTS = [
+  'GrDatePicker',
+  'GrDateRangePicker',
+  'GrDateTimePicker',
+  'GrTimePicker',
+] as const
+
 export default defineConfig({
   plugins: [vue(), libInjectCss()],
   build: {
@@ -72,7 +79,7 @@ export default defineConfig({
       ],
       output: {
         chunkFileNames: granularChunkFileNames(),
-        assetFileNames: assetInfo => assetInfo.name ?? '[name][extname]',
+        assetFileNames: granularAssetFileNames({ components: DATEPICKER_COMPONENTS }),
       },
     },
   },

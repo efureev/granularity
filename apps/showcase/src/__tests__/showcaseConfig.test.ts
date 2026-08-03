@@ -102,13 +102,18 @@ describe('showcase bootstrap config', () => {
   })
 
   it('сканирует только исходники showcase и включает пакетный Uno preset через package exports', () => {
-    expect(showcaseGranularOptions.providers.length).toBeGreaterThan(0)
+    // Незарегистрированный провайдер — тихий дефект: сборка проходит, а
+    // SFC-чанки его компонентов не сканируются и классы выпадают из CSS.
+    expect(showcaseGranularOptions.providers.map(provider => provider.id)).toEqual([
+      '@feugene/granularity',
+      '@feugene/granularity-datepicker',
+    ])
     expect(showcaseGranularOptions.components).toBe('all')
     expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
     expect(showcaseUnoConfig).toContain("from '@feugene/unocss-preset-granular/node'")
     expect(showcaseUnoConfig).toContain("presetGranularNode")
     expect(showcaseUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
-    expect(showcaseUnoConfig).toContain('providers: [granularityProvider]')
+    expect(showcaseUnoConfig).toContain("import datepickerProvider from '@feugene/granularity-datepicker/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("names: ['light', 'dark']")
   })
 })

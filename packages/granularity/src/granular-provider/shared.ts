@@ -1,26 +1,17 @@
-// Общий код browser- и node-entry granular-provider'а.
+// `id`, `theme.*`, `packageBaseUrl` и реестр компонентов провайдера.
 //
-// Оба entry (`./index.ts`, `./node.ts`) отличаются только списком
-// компонентов, у которых есть node-only вариант конфига (например,
-// `GrButton`, чей `config.node.ts` использует `tokenDefinitionsFromCssSync`
-// и тянет `node:fs`). Browser-вариант таких компонентов берёт облегчённый
-// `./config.ts`, node-вариант — `./config.node.ts`. Всё остальное — `id`,
-// `theme.*`, `packageBaseUrl` и полный список browser-safe компонентов —
-// живёт здесь.
+// Все `new URL('../styles/...', import.meta.url)` обязаны лежать именно здесь:
+// `shared.ts` в одной директории с `index.ts` / `node.ts`, поэтому
+// относительные пути совпадают. Для браузера безопасно — бандлеры
+// транслируют такие литералы в статические asset-URL.
 //
-// ВАЖНО: все `new URL('../styles/...', import.meta.url)` намеренно находятся
-// здесь — `shared.ts` лежит в той же директории, что и `index.ts` / `node.ts`,
-// поэтому относительные пути идентичны. Это ОК для браузера: бандлеры
-// транслируют такие конструкции в статические asset-URL и `node:*` в бандл
-// не утаскивают.
-//
-// `apps/showcase/scripts/generate-component-api.mjs` берёт список компонентов из
-// `Object.keys(granularityComponentConfigs)` (импорт модуля через vite SSR),
-// поэтому спецформат строк реестра больше не является API — можно свободно рефакторить.
+// `apps/showcase/scripts/generate-component-api.mjs` читает список компонентов
+// из `Object.keys(granularityComponentConfigs)` через vite SSR.
 import {
   defineGranularProvider,
   type GranularComponentDescriptor,
   type GranularProvider,
+  resolvePackageBaseUrl,
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grAlertConfig } from '../components/GrAlert/config'
@@ -88,13 +79,9 @@ import { grTreeSelectConfig } from '../components/GrTreeSelect/config'
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_PROVIDER_ID = '@feugene/granularity'
 
-// runtime-concat: литерал `new URL('..', import.meta.url)` rolldown заменяет
-// на `data:`-URL, поэтому собираем корень пакета из `import.meta.url` вручную
-// (отрезая два последних сегмента: имя файла и каталог `granular-provider/`).
-const packageBaseUrl = `${import.meta.url.slice(
-  0,
-  import.meta.url.lastIndexOf('/', import.meta.url.lastIndexOf('/') - 1) + 1,
-)}`
+// Не заменять на `new URL('..', import.meta.url)`: Vite и rolldown распознают
+// этот литерал и подставляют `data:`-URL, после чего scan-директории пустеют.
+const packageBaseUrl = resolvePackageBaseUrl(import.meta.url)
 
 /** Встроенные темы пакета. Единственный источник правды о списке тем. */
 export const granularityThemeNames = ['light', 'dark'] as const
@@ -114,17 +101,8 @@ const theme = {
 } as const
 
 /**
- * Полный реестр публичных компонентов пакета `@feugene/granularity`.
- *
- * Ключи — имена компонентов (совпадают с публичным subpath‑экспортом
- * `@feugene/granularity/components/<Name>`). Значения — browser‑safe
- * `ds<Name>Config` из `./config.ts` рядом с SFC.
- *
- * Для компонентов, у которых есть node-only вариант конфига
- * (например, `GrButton` с `tokenDefinitionsFromCssSync`), browser‑конфиг
- * остаётся здесь, а node‑вариант подставляется снаружи через
- * `createGranularityProvider(overrides)` — см. `./index.ts` (browser)
- * и `./node.ts` (node).
+ * Реестр публичных компонентов. Ключи совпадают с subpath-экспортом
+ * `@feugene/granularity/components/<Name>`.
  */
 export const granularityComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
@@ -193,19 +171,16 @@ export const granularityComponentConfigs = {
 
 export type GranularityComponentName = keyof typeof granularityComponentConfigs
 
-/** Базовый (browser-safe) набор компонентов в порядке реестра. */
+/** Базовый набор компонентов в порядке реестра. */
 const baseComponents: readonly GranularComponentDescriptor[] = Object.values(
   granularityComponentConfigs,
 )
 
 /**
- * Собирает granular-provider пакета `@feugene/granularity`.
+ * Собирает granular-provider пакета.
  *
- * Принимает массив `GranularComponentDescriptor`'ов — это компоненты,
- * у которых есть node-only вариант конфига (например, `GrButton` с
- * `tokenDefinitionsFromCssSync`). Дескрипторы с именем, которое уже
- * присутствует в базовом наборе, переопределяют его (побеждает
- * переданный снаружи), остальные — добавляются в конец списка.
+ * `overrides` — точка расширения для потребителя: дескриптор с именем из
+ * базового реестра заменяет его, остальные дописываются в конец.
  */
 export function createGranularityProvider(
   overrides: readonly GranularComponentDescriptor[] = [],

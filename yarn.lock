@@ -415,10 +415,10 @@
   resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.3.0.tgz#91e1920fe0765860115dc7a8136907235f0ce989"
   integrity sha512-t0/jBvhSkwgmizCY8S021Zto7AqONAP0XWnjbg6cO9WCiC398Im9EOH4JWrxzPO2LTnkF0sv7dFRhNWUHlKeVg==
 
-"@feugene/unocss-preset-granular@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.4.0.tgz#fa6f0e35641d6f425964947eda4c10e46b34721d"
-  integrity sha512-DxWbL0Yfi2mSVcasKMSloxKNwZ9K/BDODP6pyDfwc4T4kBihy5aepFzNikoQkrSuFs1HnrNomrTRRXSE4SIV4g==
+"@feugene/unocss-preset-granular@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.6.0.tgz#6ed8f770080475f4200b756d7d0bb5d5fea8db0f"
+  integrity sha512-TivivV3BFl0pWBk0qARsbevPYGY0QPGl1LxHxBpVkOttCy338qUrd/MaDHyLywtRDePqPuYBqzvFTIe637RB8w==
 
 "@floating-ui/core@^1.8.0":
   version "1.8.0"

@@ -8,7 +8,7 @@
     "@feugene/granularity": "^0.13.0",
     "@feugene/granularity-datepicker": "^0.1.1",
     "@feugene/unocss-mini-extra-rules": "^0.3.0",
-    "@feugene/unocss-preset-granular": "^0.4.0",
+    "@feugene/unocss-preset-granular": "^0.6.0",
     "vue": "^3.5.40",
     "vue-router": "^4.6.3"
   },
