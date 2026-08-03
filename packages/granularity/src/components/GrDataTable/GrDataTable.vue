@@ -121,6 +121,9 @@ function applySort(key: string, dir: 'asc' | 'desc'): void {
 
   emit('update:sortKey', key)
   emit('update:sortDir', dir)
+  // Имя эмита — часть публичного API; приведение к camelCase запланировано
+  // одним проходом по пакету как ломающее изменение до 1.0.
+  // eslint-disable-next-line vue/custom-event-name-casing
   emit('sort-change', { key, dir })
 }
 

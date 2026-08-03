@@ -136,12 +136,12 @@ function onClick(tab: GrTab): void {
   >
     <button
       v-for="(tab, index) in tabs"
+      :id="idBase ? `${idBase}-tab-${tab.value}` : undefined"
       :key="tab.value"
       :ref="el => setButtonRef(el, index)"
       type="button"
       role="tab"
       data-gr-tab
-      :id="idBase ? `${idBase}-tab-${tab.value}` : undefined"
       :aria-controls="idBase ? `${idBase}-panel-${tab.value}` : undefined"
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"

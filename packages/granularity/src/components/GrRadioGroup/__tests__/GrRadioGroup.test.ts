@@ -46,7 +46,7 @@ describe('GrRadioGroup', () => {
       },
     })
 
-    expect(wrapper.get('[data-gr-button-group]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-button-group]').exists()).toBe(true)
     expect(wrapper.findAll('[data-gr-button][role="radio"]').length).toBe(2)
   })
 })

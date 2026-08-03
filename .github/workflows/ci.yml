@@ -18,20 +18,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-#  lint:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v6
-#      - uses: actions/setup-node@v6
-#        with:
-#          node-version: 24
-#          cache: yarn
-#
-#      - name: Install dependencies
-#        run: yarn install --frozen-lockfile
-#
-#      - name: Lint package
-#        run: yarn workspace @feugene/granularity lint
+  quality-granularity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint package
+        run: yarn lint:granularity
+
+      # `vue-tsc` эмитит `.d.ts` на сборке — красный typecheck ломает публикацию типов.
+      - name: Typecheck package
+        if: always()
+        run: yarn typecheck:granularity
 
   test-granularity:
     runs-on: ubuntu-latest
@@ -88,7 +93,7 @@ jobs:
 
   build-granularity:
     needs:
-#      - lint
+      - quality-granularity
       - test-granularity
     runs-on: ubuntu-latest
     steps:
@@ -228,7 +233,7 @@ jobs:
   # (например, @feugene/fint-i18n) не блокировали публикацию @feugene/granularity.
   publish-npm:
     needs:
-#      - lint
+      - quality-granularity
       - test-granularity
       - build-granularity
     if: startsWith(github.ref, 'refs/tags/v')
@@ -316,7 +321,7 @@ jobs:
   # и для последующей публикации по тегу `unplugin-granularity-v*`.
   build-unplugin-granularity:
     needs:
-#      - lint
+      - quality-granularity
       - build-granularity
     runs-on: ubuntu-latest
     steps:
@@ -439,7 +444,7 @@ jobs:
   # построен entry `./resolver`. Поэтому скачиваем оба dist-артефакта.
   build-granularity-datepicker:
     needs:
-#      - lint
+      - quality-granularity
       - build-granularity
       - build-unplugin-granularity
     runs-on: ubuntu-latest

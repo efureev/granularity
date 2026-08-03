@@ -22,6 +22,8 @@
     "dev:showcase": "yarn workspace @feugene/granularity-showcase dev",
     "test": "yarn test:granularity && yarn test:playground && yarn test:playground-theme && yarn test:playground-ssr",
     "test:granularity": "yarn workspace @feugene/granularity test:run",
+    "lint:granularity": "yarn workspace @feugene/granularity lint",
+    "typecheck:granularity": "yarn workspace @feugene/granularity typecheck",
     "coverage:granularity": "yarn workspace @feugene/granularity test:coverage",
     "test:playground": "yarn workspace @feugene/granularity-playground test:run",
     "test:playground-theme": "yarn workspace @feugene/granularity-playground-theme test:run",

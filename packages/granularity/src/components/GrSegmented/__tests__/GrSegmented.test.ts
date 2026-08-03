@@ -51,15 +51,13 @@ describe('GrSegmented', () => {
     ResizeObserverMock.instances = []
     globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
 
-    rectSpy = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect() {
-      const element = this as HTMLElement
-
-      if (element.hasAttribute('data-gr-segmented')) {
+    rectSpy = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect(this: HTMLElement) {
+      if (this.hasAttribute('data-gr-segmented')) {
         return createRect({ left: 0, width: 260, height: 48 })
       }
 
-      if (element.hasAttribute('data-gr-segmented-item')) {
-        const value = element.getAttribute('data-value')
+      if (this.hasAttribute('data-gr-segmented-item')) {
+        const value = this.getAttribute('data-value')
 
         if (value === 'list') {
           return createRect({ left: 4, top: 4, width: 72, height: 40 })

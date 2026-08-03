@@ -203,7 +203,7 @@ const teleportEnabled = useTeleportEnabled()
       class="inline-block max-w-full"
       @click="toggle"
     >
-      <slot name="trigger" :open="open" :toggle="toggle" :close="close" :triggerProps="triggerProps" />
+      <slot name="trigger" :open="open" :toggle="toggle" :close="close" :trigger-props="triggerProps" />
     </div>
 
     <teleport :to="teleportTo" :disabled="!teleportEnabled">

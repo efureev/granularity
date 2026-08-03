@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`typecheck` is green again** — 14 `vue-tsc` errors in the package's own test suite are fixed
+  (`GrNumberInput`, `GrDataTable`, `GrDropdown`, `GrRadioGroup`, `GrSegmented`, `GrSlider`,
+  `GrTreeSelect`). Since `.d.ts` files are emitted by `vue-tsc` at build time, a red typecheck was a
+  standing risk to the published types.
+
+### Changed
+
+- **CI now runs `lint` and `typecheck`** (job `quality-granularity`), and both gate every build and
+  publish job. `lint` had been commented out and `typecheck` never ran at all.
+
 ## [v0.13.0] 2026-07-28
 
 ### Changed

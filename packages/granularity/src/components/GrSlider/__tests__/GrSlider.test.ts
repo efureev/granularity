@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import GrSlider from '../GrSlider.vue'
+import type { GrSliderModelValue } from '../GrSlider.vue'
 
 describe('GrSlider', () => {
   it('рендерит бегунок с WAI-ARIA slider-контрактом', () => {
@@ -69,7 +70,7 @@ describe('GrSlider', () => {
     // Slider контролируемый: синхронизируем модель после каждого шага (как v-model).
     for (let i = 0; i < 10; i++) {
       await thumbs[0].trigger('keydown', { key: 'ArrowRight' })
-      const last = wrapper.emitted('update:modelValue')?.at(-1)?.[0]
+      const last = wrapper.emitted<[GrSliderModelValue]>('update:modelValue')?.at(-1)?.[0]
       await wrapper.setProps({ modelValue: last })
     }
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[60, 60]])

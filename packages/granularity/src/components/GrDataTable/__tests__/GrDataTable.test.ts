@@ -21,13 +21,15 @@ vi.mock('~icons/lucide/arrow-down', () => {
 
 import GrDataTable from '../GrDataTable.vue'
 
+type Row = { id: number, name: string, score: number, note: string }
+
 describe('GrDataTable', () => {
   const columns = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'score', label: 'Score', sortable: true, align: 'right' as const },
     { key: 'note', label: 'Note' },
   ]
-  const rows = [
+  const rows: Row[] = [
     { id: 1, name: 'Charlie', score: 20, note: 'c' },
     { id: 2, name: 'Alice', score: 10, note: 'a' },
     { id: 3, name: 'Bob', score: 15, note: 'b' },
@@ -55,9 +57,9 @@ describe('GrDataTable', () => {
   })
 
   it('поддерживает initial sort и scoped slot ячейки', () => {
-    const wrapper = mount(GrDataTable, {
+    const wrapper = mount(GrDataTable<Row>, {
       props: { columns, rows, initialSortKey: 'name' },
-      slots: { 'cell-score': ({ row }: { row: { score: number } }) => `#${row.score}` },
+      slots: { 'cell-score': ({ row }: { row: Row }) => `#${row.score}` },
     })
     expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual([
       'Alice#10a',
@@ -109,11 +111,11 @@ describe('GrDataTable', () => {
   })
 
   it('поддерживает rowKey как функцию', () => {
-    const wrapper = mount(GrDataTable, {
+    const wrapper = mount(GrDataTable<Row>, {
       props: {
         columns,
         rows,
-        rowKey: (row: { id: number }) => `row-${row.id}`,
+        rowKey: (row: Row) => `row-${row.id}`,
       },
     })
     expect(wrapper.findAll('[data-gr-datatable-row]')).toHaveLength(3)

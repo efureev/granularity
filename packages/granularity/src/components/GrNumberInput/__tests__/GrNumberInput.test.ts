@@ -15,7 +15,7 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('input').setValue('12a3,4.5')
 
-    expect(wrapper.emitted()['update:modelValue']?.[0]?.[0]).toBe('123,45')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('123,45')
   })
 
   it('при вводе точки или запятой подставляет заданный decimalSeparator', async () => {
@@ -28,7 +28,7 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('input').setValue('12,34')
 
-    expect(wrapper.emitted()['update:modelValue']?.[0]?.[0]).toBe('12.34')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('12.34')
   })
 
   it('по умолчанию использует size=md и поддерживает textAlign', () => {
@@ -120,7 +120,7 @@ describe('GrNumberInput', () => {
     expect(inputEl.style.paddingRight).toBe('92px')
     expect(wrapper.get('[data-testid="number-input-controls-horizontal-left"]').attributes('style')).toContain('left: 40px')
     expect(wrapper.get('[data-testid="number-input-controls-horizontal-right"]').attributes('style')).toContain('right: 40px')
-    expect(wrapper.get('div[aria-hidden="true"][style*="right: 0px"]').exists()).toBe(true)
+    expect(wrapper.find('div[aria-hidden="true"][style*="right: 0px"]').exists()).toBe(true)
   })
 
   it('controls: stepBy увеличивает значение с учётом decimalSeparator', async () => {
@@ -134,8 +134,8 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('button[aria-label="Increase"]').trigger('click')
 
-    expect(wrapper.emitted()['update:modelValue']?.[0]?.[0]).toBe('2,5')
-    expect(wrapper.emitted().change?.[0]?.[0]).toBe('2,5')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('2,5')
+    expect(wrapper.emitted('change')?.[0]?.[0]).toBe('2,5')
   })
 
   it('controls: по умолчанию использует step=1 и учитывает min/max', async () => {
@@ -150,7 +150,7 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('button[aria-label="Decrease"]').trigger('click')
 
-    expect(wrapper.emitted()['update:modelValue']?.[0]?.[0]).toBe('10')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('10')
   })
 
   it('controls: precision округляет значение при инкременте/декременте', async () => {
@@ -166,7 +166,7 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('button[aria-label="Increase"]').trigger('click')
 
-    expect(wrapper.emitted()['update:modelValue']?.[0]?.[0]).toBe('1,33')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('1,33')
   })
 
   it('позволяет ограничить ширину prefix/suffix через min/max props', () => {

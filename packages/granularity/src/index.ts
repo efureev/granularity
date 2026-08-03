@@ -64,7 +64,7 @@ export * from './components/GrTreeSelect'
 // Runtime composables, публикуемые пакетом через root-barrel
 export { initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
-export { granularityToastPlugin, GRANULARITY_TOAST_STATE, useToast } from './composables/useToast'
+export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'
 export type { GrToastTone, Toast, ToastInput, ToastState } from './composables/useToast'
 // Единый перечень дизайн-тонов для прикладного кода: `GR_TONES`/`GrTone`.
 // Используется как источник истины и для типов, и для рантайм‑итераций

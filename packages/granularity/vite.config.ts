@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
 import { granularAssetFileNames, granularChunkFileNames, granularCssAssetsPlugin } from '@feugene/unocss-preset-granular/vite'
 import { granularityProvider } from './src/granular-provider'
-import {libInjectCss} from "vite-plugin-lib-inject-css";
+import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
 /**
  * Копирует сырые CSS-токены/темы/preflight (`src/styles/*`) в `dist/styles/`,

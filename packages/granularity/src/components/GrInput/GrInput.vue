@@ -148,6 +148,16 @@ const suffixFixedWidth = computed(() => props.suffixMaxWidth ?? props.suffixMinW
 
 const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
 
+const passwordVisible = ref(false)
+// Тип поля с учётом переключателя пароля.
+const resolvedType = computed(() => (props.type === 'password' && passwordVisible.value ? 'text' : props.type))
+
+const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !props.disabled)
+const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !props.readonly)
+
+const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0))
+const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
+
 const basePaddingXLen = computed(() => {
   // Must mirror `sizeClass` horizontal padding (px-*) because inline paddings override class paddings.
   const map: Record<NonNullable<typeof props.size>, string> = {
@@ -265,16 +275,6 @@ const { t } = useGranularityTranslations()
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
 const resolvedPasswordShowLabel = computed(() => props.passwordShowLabel ?? t('gr.input.showPassword', 'Show password'))
 const resolvedPasswordHideLabel = computed(() => props.passwordHideLabel ?? t('gr.input.hidePassword', 'Hide password'))
-
-const passwordVisible = ref(false)
-// Тип поля с учётом переключателя пароля.
-const resolvedType = computed(() => (props.type === 'password' && passwordVisible.value ? 'text' : props.type))
-
-const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !props.disabled)
-const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !props.readonly)
-
-const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0))
-const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
 
 // Счётчик символов: `len` или `len / maxlength`.
 const countText = computed(() =>

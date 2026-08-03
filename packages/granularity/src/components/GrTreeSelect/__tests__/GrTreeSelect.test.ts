@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrTreeSelect from '../GrTreeSelect.vue'
+import type { GrTreeSelectProps } from '../grTreeSelectTypes'
 
 type Row = { id: number; label: string; children?: Row[] }
 
@@ -29,7 +30,7 @@ function createGranularityTestI18n(locale: 'en' | 'ru'): GranularityI18nAdapter 
 }
 
 async function mountHarness(
-  props?: Partial<InstanceType<typeof GrTreeSelect>['$props']>,
+  props?: Partial<GrTreeSelectProps>,
   options?: { locale?: 'en' | 'ru'; data?: Row[] },
 ) {
   const i18n = options?.locale

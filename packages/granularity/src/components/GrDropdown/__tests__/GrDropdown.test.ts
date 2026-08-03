@@ -77,7 +77,7 @@ describe('GrDropdown', () => {
   })
 
   it('привязывает правый край панели к trigger без измерения ширины панели', async () => {
-    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect() {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect(this: HTMLElement) {
       const text = this.textContent ?? ''
 
       if (text.includes('Открыть') && !text.includes('Элемент меню')) {

@@ -313,9 +313,11 @@ i18n-entries в сборку. `sideEffects` не должен блокирова
 ```
 
 ```ts
-// vite.config.ts — lib.entry
-'i18n/index': fileURLToPath(new URL('./src/i18n/index.ts', import.meta.url)),
-'i18n/all':   fileURLToPath(new URL('./src/i18n/all.ts',   import.meta.url)),
+// vite.config.ts
+const entry = {
+  'i18n/index': fileURLToPath(new URL('./src/i18n/index.ts', import.meta.url)),
+  'i18n/all': fileURLToPath(new URL('./src/i18n/all.ts', import.meta.url)),
+}
 // rolldownOptions.external — держите fint-i18n снаружи бандла:
 //   /^@feugene\/fint-i18n(\/.*)?$/
 ```
