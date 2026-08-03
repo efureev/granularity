@@ -97,6 +97,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Tests for the seven components that had none** — `GrResponseErrorBanner`, `GrTabPanels`,
+  `GrDropdownMenu`, `GrDivider`, `GrKbd`, `GrIcon`, `GrButtonGroup` (+52 tests). Every component in
+  the package now has a test file. The error-banner suite exercises the parser chain directly,
+  without mounting: what is hard there is parser order and priorities (abort stops the chain, field
+  errors outrank the status code, the core preset makes no backend-specific assumptions), not
+  rendering three paragraphs.
 - **`useDismissible()` and `useFloating()` are public** — root barrel and
   `@feugene/granularity/composables/*` subpaths. A consumer's own popover or menu can now be built
   on the same positioning engine and, crucially, register in the same dismiss stack; otherwise its
