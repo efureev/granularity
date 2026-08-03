@@ -1,6 +1,8 @@
+import type { GrControlState } from '../shared/sizes'
+
 import type { GrInputSize } from '../GrInput'
 
-export type GrTreeSelectState = 'default' | 'success' | 'warning' | 'danger'
+export type GrTreeSelectState = GrControlState
 
 export const sizeClassBySize: Record<GrInputSize, string> = {
   xs: 'h-7 px-2.5 text-[12px]',

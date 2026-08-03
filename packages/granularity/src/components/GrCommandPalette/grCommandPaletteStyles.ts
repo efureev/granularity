@@ -1,4 +1,6 @@
-export type GrCommandPaletteSize = 'md' | 'lg' | 'xl'
+import type { GrOverlaySize } from '../shared/sizes'
+
+export type GrCommandPaletteSize = GrOverlaySize
 
 /**
  * Кастомизация через CSS-переменные:
@@ -8,10 +10,12 @@ export type GrCommandPaletteSize = 'md' | 'lg' | 'xl'
  */
 
 // Размер палитры ложится на размеры панели `GrModal` — палитра не изобретает свои ширины.
-export const commandPaletteModalSizeBySize: Record<GrCommandPaletteSize, 'md' | 'lg' | 'xl'> = {
+export const commandPaletteModalSizeBySize: Record<GrCommandPaletteSize, GrOverlaySize> = {
+  sm: 'sm',
   md: 'md',
   lg: 'lg',
   xl: 'xl',
+  full: 'full',
 }
 
 export const commandSearchRowClass = 'flex items-center gap-2 border-b border-[var(--gr-brd)] px-4'

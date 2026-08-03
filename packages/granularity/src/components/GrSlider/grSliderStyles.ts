@@ -1,4 +1,6 @@
-export type GrSliderSize = 'sm' | 'md' | 'lg'
+import type { GrComponentSize } from '../shared/sizes'
+
+export type GrSliderSize = GrComponentSize
 /** Значение: число (single) или кортеж `[lo, hi]` (range при `range=true`). */
 export type GrSliderModelValue = number | [number, number]
 /** Метка деления: словарь `value → label` или просто массив значений (label = значение). */
@@ -19,6 +21,7 @@ export type GrSliderMarks = Record<number, string> | number[]
 
 // Высота дорожки (rail/fill) по размеру — дефолт для `--gr-slider-track-height`.
 export const sliderTrackHeightBySize: Record<GrSliderSize, string> = {
+  xs: 'h-[var(--gr-slider-track-height,0.1875rem)]',
   sm: 'h-[var(--gr-slider-track-height,0.25rem)]',
   md: 'h-[var(--gr-slider-track-height,0.375rem)]',
   lg: 'h-[var(--gr-slider-track-height,0.5rem)]',
@@ -26,6 +29,7 @@ export const sliderTrackHeightBySize: Record<GrSliderSize, string> = {
 
 // Размер «бегунка» (thumb) по размеру — дефолт для `--gr-slider-thumb-size`.
 export const sliderThumbSizeBySize: Record<GrSliderSize, string> = {
+  xs: 'h-[var(--gr-slider-thumb-size,0.75rem)] w-[var(--gr-slider-thumb-size,0.75rem)]',
   sm: 'h-[var(--gr-slider-thumb-size,0.875rem)] w-[var(--gr-slider-thumb-size,0.875rem)]',
   md: 'h-[var(--gr-slider-thumb-size,1rem)] w-[var(--gr-slider-thumb-size,1rem)]',
   lg: 'h-[var(--gr-slider-thumb-size,1.25rem)] w-[var(--gr-slider-thumb-size,1.25rem)]',
@@ -33,6 +37,7 @@ export const sliderThumbSizeBySize: Record<GrSliderSize, string> = {
 
 // Вертикальный отступ обёртки, чтобы thumb не обрезался краями дорожки.
 export const sliderPaddingBySize: Record<GrSliderSize, string> = {
+  xs: 'py-1',
   sm: 'py-1.5',
   md: 'py-2',
   lg: 'py-2.5',

@@ -1,6 +1,8 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 import type { Component } from 'vue'
 export type GrSegmentedVariant = 'pills' | 'button'
-export type GrSegmentedSize = 'xs' | 'sm' | 'md' | 'lg'
+export type GrSegmentedSize = GrComponentSize
 export type GrSegmentedValue = string | number
 export type GrSegmentedOption = {
   value: GrSegmentedValue

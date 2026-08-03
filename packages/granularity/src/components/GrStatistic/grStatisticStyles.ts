@@ -1,6 +1,8 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 import type { GrTone } from '../shared/tones'
 
-export type GrStatisticSize = 'sm' | 'md' | 'lg'
+export type GrStatisticSize = GrComponentSize
 export type GrStatisticTone = GrTone
 /** Направление динамики показателя. */
 export type GrStatisticTrend = 'up' | 'down' | 'flat'
@@ -13,18 +15,21 @@ export type GrStatisticTrend = 'up' | 'down' | 'flat'
  */
 
 export const statisticTitleSizeBySize: Record<GrStatisticSize, string> = {
+  xs: 'text-[10px]',
   sm: 'text-[11px]',
   md: 'text-[12px]',
   lg: 'text-[13px]',
 }
 
 export const statisticValueSizeBySize: Record<GrStatisticSize, string> = {
+  xs: 'text-[16px] leading-6',
   sm: 'text-[20px] leading-7',
   md: 'text-[28px] leading-9',
   lg: 'text-[36px] leading-tight',
 }
 
 export const statisticAffixSizeBySize: Record<GrStatisticSize, string> = {
+  xs: 'text-[12px]',
   sm: 'text-[13px]',
   md: 'text-[16px]',
   lg: 'text-[20px]',
@@ -33,12 +38,14 @@ export const statisticAffixSizeBySize: Record<GrStatisticSize, string> = {
 // Высота плейсхолдера загрузки повторяет строку значения — блок не «прыгает».
 // Значение отдаётся в `GrSkeleton` пропом, поэтому это px, а не класс.
 export const statisticPlaceholderHeightBySize: Record<GrStatisticSize, string> = {
+  xs: '22px',
   sm: '28px',
   md: '36px',
   lg: '44px',
 }
 
 export const statisticTrendSizeBySize: Record<GrStatisticSize, string> = {
+  xs: 'text-[10px]',
   sm: 'text-[11px]',
   md: 'text-[12px]',
   lg: 'text-[13px]',

@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **One `size` scale for the whole package.** There were five incompatible ones, so
+  `<GrConfigProvider size="xs">` could not apply to half the package and `size="xl"` compiled
+  against one component and failed against its neighbour. Now:
+
+  - **controls** use `GrComponentSize` (`xs | sm | md | lg`) — `GrIcon`, `GrKbd`, `GrLink`,
+    `GrRating`, `GrSlider`, `GrStatistic` and `GrSwitch` gained `xs`, which is additive;
+  - **overlays** use the new `GrOverlaySize` (`sm | md | lg | xl | full`) — `GrDrawer` gained `xl`,
+    `GrCommandPalette` gained `sm` and `full`, also additive;
+  - `GrAvatar.size` moves from a raw `number` to `GrComponentSize | number`. **This is the only
+    real break, and it is source-compatible**: `size={40}` still renders 40 px, and the new default
+    `md` is 40 px too, so nothing shifts. The number stays as an escape hatch — an avatar has always
+    had an arbitrary diameter and there is no point breaking that for uniformity.
+
+  `GrTextareaState`, `GrInputTagState`, `GrNumberInputState` and `GrTreeSelectState` are now aliases
+  of one `GrControlState`; they were four independent copies of the same union, so a divergence would
+  only have surfaced at runtime. A gate (`src/__tests__/sizeScale.test.ts`) fails on any component
+  that declares its own scale or state again.
+
+- **`GrConfigProvider` now reaches `GrIcon`, `GrKbd`, `GrLink`, `GrStatistic` and `GrAvatar`** —
+  they had no `defaults.ts` and stayed outside the provider entirely.
+
 - **`@headlessui/vue` and `@floating-ui/dom` moved from `dependencies` to `peerDependencies`** and are
   now `external` in the build, so they are no longer bundled into `dist`. Install them alongside the
   package:

@@ -160,7 +160,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrAutocompleteSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -334,10 +334,10 @@
         "items": [
           {
             "name": "size",
-            "description": "",
-            "type": "number | undefined",
+            "description": "Размер по канонической шкале (`xs|sm|md|lg`) — тогда работает `GrConfigProvider`. Число остаётся как escape-hatch: у аватара исторически был произвольный диаметр, и ломать это ради единообразия смысла нет.",
+            "type": "GrSizeWithPx | undefined",
             "required": false,
-            "default": "40"
+            "default": "undefined"
           },
           {
             "name": "src",
@@ -407,7 +407,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrBadgeSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -594,7 +594,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrButtonSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -809,7 +809,7 @@
           {
             "name": "size",
             "description": "Размер контрола. Не задан — берётся из `GrConfigProvider`, иначе `md`.",
-            "type": "GrButtonSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -998,7 +998,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrCommandPaletteSize | undefined",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "\"lg\""
           },
@@ -1219,7 +1219,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrDialogSize | undefined",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -1289,7 +1289,7 @@
           {
             "name": "buttonSize",
             "description": "",
-            "type": "GrButtonSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -1634,7 +1634,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrDialogSize | undefined",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -1822,7 +1822,7 @@
           {
             "name": "size",
             "description": "Размер панели.",
-            "type": "GrDrawerSize | undefined",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -2863,7 +2863,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "number | GrIconSize | undefined",
+            "type": "number | \"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false
           }
         ]
@@ -3160,7 +3160,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrInputSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -3408,7 +3408,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrInputSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -3436,7 +3436,7 @@
           {
             "name": "state",
             "description": "",
-            "type": "GrInputTagState | undefined",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
@@ -3492,7 +3492,7 @@
           {
             "name": "tagSize",
             "description": "",
-            "type": "GrBadgeSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -3593,9 +3593,9 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrKbdSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           }
         ]
       },
@@ -3658,9 +3658,9 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrLinkSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -3882,7 +3882,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrModalSize | undefined",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -4060,7 +4060,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrNumberInputSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4095,7 +4095,7 @@
           {
             "name": "state",
             "description": "",
-            "type": "GrNumberInputState | undefined",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
@@ -4483,7 +4483,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrDialogSize | undefined",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -4560,7 +4560,7 @@
           {
             "name": "buttonSize",
             "description": "",
-            "type": "GrButtonSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4756,7 +4756,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrButtonSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4911,7 +4911,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrButtonSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5028,7 +5028,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrRatingSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5331,7 +5331,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrSegmentedSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5488,7 +5488,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrSelectSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5868,7 +5868,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrSliderSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -6006,9 +6006,9 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrStatisticSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "loading",
@@ -6172,7 +6172,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrSwitchSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -6531,7 +6531,7 @@
           {
             "name": "state",
             "description": "",
-            "type": "GrTextareaState | undefined",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
@@ -7022,7 +7022,7 @@
           {
             "name": "size",
             "description": "",
-            "type": "GrInputSize | undefined",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"md\""
           },
@@ -7057,7 +7057,7 @@
           {
             "name": "state",
             "description": "",
-            "type": "GrTreeSelectState | undefined",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },

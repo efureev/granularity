@@ -1,8 +1,10 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 import type { GrTone } from '../shared/tones'
 
 export type GrButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-border'
 export type GrButtonTone = GrTone
-export type GrButtonSize = 'xs' | 'sm' | 'md' | 'lg'
+export type GrButtonSize = GrComponentSize
 
 export type GrButtonClassOptions = {
   variant: GrButtonVariant

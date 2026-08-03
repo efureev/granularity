@@ -3,21 +3,46 @@ import { computed } from 'vue'
 
 import { grAvatarClass } from './grAvatarStyles'
 import type { GrAvatarShape } from './grAvatarStyles'
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import type { GrSizeWithPx } from '../shared/sizes'
+
+/** Диаметр аватара для каждой ступени канонической шкалы. */
+const GR_AVATAR_SIZE_PX = {
+  xs: 24,
+  sm: 32,
+  md: 40,
+  lg: 56,
+} as const
 
 const props = withDefaults(defineProps<{
-  size?: number
+  /**
+   * Размер по канонической шкале (`xs|sm|md|lg`) — тогда работает
+   * `GrConfigProvider`. Число остаётся как escape-hatch: у аватара исторически
+   * был произвольный диаметр, и ломать это ради единообразия смысла нет.
+   */
+  size?: GrSizeWithPx
   src?: string
   alt?: string
   shape?: GrAvatarShape
 }>(), {
-  size: 40,
+  size: undefined,
   src: undefined,
   alt: '',
   shape: 'circle',
 })
 
+// Числовой размер — «локальное» значение мимо конфига; шкала идёт через провайдер.
+const resolvedScaleSize = useGrComponentSize(
+  () => (typeof props.size === 'number' ? undefined : props.size),
+  { component: 'GrAvatar' },
+)
+
+const sizePx = computed(() => (
+  typeof props.size === 'number' ? props.size : GR_AVATAR_SIZE_PX[resolvedScaleSize.value]
+))
+
 const style = computed(() => {
-  const px = `${props.size}px`
+  const px = `${sizePx.value}px`
 
   return {
     width: px,

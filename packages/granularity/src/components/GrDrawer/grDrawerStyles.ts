@@ -1,10 +1,13 @@
+import type { GrOverlaySize } from '../shared/sizes'
+
 export type GrDrawerSide = 'left' | 'right'
-export type GrDrawerSize = 'sm' | 'md' | 'lg' | 'full'
+export type GrDrawerSize = GrOverlaySize
 
 export const panelWidthBySize: Record<GrDrawerSize, string> = {
   sm: 'w-[360px] max-w-[90vw]',
   md: 'w-[420px] max-w-[92vw]',
   lg: 'w-[560px] max-w-[94vw]',
+  xl: 'w-[720px] max-w-[96vw]',
   full: 'w-[100vw]',
 }
 

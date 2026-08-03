@@ -1,4 +1,6 @@
-export type GrTextareaState = 'default' | 'success' | 'warning' | 'danger'
+import type { GrControlState } from '../shared/sizes'
+
+export type GrTextareaState = GrControlState
 
 export const borderClassByState: Record<GrTextareaState, string> = {
   default: 'border-[var(--gr-brd)]',

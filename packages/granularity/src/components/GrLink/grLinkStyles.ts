@@ -1,3 +1,5 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 import { GR_TONES, type GrTone } from '../shared/tones'
 
 /**
@@ -17,7 +19,7 @@ import { GR_TONES, type GrTone } from '../shared/tones'
 export type GrLinkTone = GrTone
 export type GrLinkVariant = 'default' | 'muted'
 export type GrLinkUnderline = 'auto' | 'always' | 'none'
-export type GrLinkSize = 'sm' | 'md' | 'lg'
+export type GrLinkSize = GrComponentSize
 
 // Базовые классы корневого элемента (`<a>`/`<span>`). Вынесены сюда,
 // чтобы быть единственным источником истины как для шаблона, так и для safelist.
@@ -25,6 +27,7 @@ export const baseRootClass = 'inline-flex items-center gap-1 rounded-[6px] trans
 export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const sizeClassBySize: Record<GrLinkSize, string> = {
+  xs: 'text-[12px]',
   sm: 'text-[13px]',
   md: 'text-[14px]',
   lg: 'text-[16px]',

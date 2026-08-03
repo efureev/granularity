@@ -1,5 +1,8 @@
-export type GrNumberInputState = 'default' | 'success' | 'warning' | 'danger'
-export type GrNumberInputSize = 'xs' | 'sm' | 'md' | 'lg'
+import type { GrComponentSize, GrControlState  } from '../shared/sizes'
+
+
+export type GrNumberInputState = GrControlState
+export type GrNumberInputSize = GrComponentSize
 export type GrNumberInputControlsDirection = 'vertical' | 'horizontal'
 export type GrNumberInputTextAlign = 'left' | 'center' | 'right'
 

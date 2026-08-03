@@ -1,6 +1,8 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 import type { GrTone } from '../shared/tones'
 
-export type GrRatingSize = 'sm' | 'md' | 'lg'
+export type GrRatingSize = GrComponentSize
 export type GrRatingTone = GrTone
 
 /**
@@ -13,18 +15,21 @@ export type GrRatingTone = GrTone
 
 // Размер символа — дефолт для `--gr-rating-symbol-size`.
 export const ratingSymbolSizeBySize: Record<GrRatingSize, string> = {
+  xs: 'h-[var(--gr-rating-symbol-size,0.875rem)] w-[var(--gr-rating-symbol-size,0.875rem)]',
   sm: 'h-[var(--gr-rating-symbol-size,1rem)] w-[var(--gr-rating-symbol-size,1rem)]',
   md: 'h-[var(--gr-rating-symbol-size,1.25rem)] w-[var(--gr-rating-symbol-size,1.25rem)]',
   lg: 'h-[var(--gr-rating-symbol-size,1.5rem)] w-[var(--gr-rating-symbol-size,1.5rem)]',
 }
 
 export const ratingGapBySize: Record<GrRatingSize, string> = {
+  xs: 'gap-0.5',
   sm: 'gap-0.5',
   md: 'gap-1',
   lg: 'gap-1.5',
 }
 
 export const ratingTextSizeBySize: Record<GrRatingSize, string> = {
+  xs: 'text-[11px]',
   sm: 'text-[12px]',
   md: 'text-[13px]',
   lg: 'text-[15px]',

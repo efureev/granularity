@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import type { GrComponentSize } from '../shared/sizes'
 import {computed} from 'vue'
+import { useGrComponentSize } from '../GrConfigProvider/context'
 
-export type GrIconSize = 'sm' | 'md' | 'lg'
+export type GrIconSize = GrComponentSize
 
 const GR_ICON_SIZE_MAP: Record<GrIconSize, number> = {
+  xs: 14,
   sm: 16,
   md: 18,
   lg: 20,
@@ -18,7 +21,13 @@ const props = defineProps<{
   size?: GrIconSize | number
 }>()
 
-const resolvedSize = computed(() => props.size ?? 'md')
+// Число — «локальный» escape-hatch мимо конфига; шкала идёт через провайдер.
+const resolvedScaleSize = useGrComponentSize(
+  () => (typeof props.size === 'number' ? undefined : props.size),
+  { component: 'GrIcon' },
+)
+
+const resolvedSize = computed(() => (typeof props.size === 'number' ? props.size : resolvedScaleSize.value))
 
 const iconStyle = computed(() => {
   return {

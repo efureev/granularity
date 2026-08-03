@@ -1,4 +1,6 @@
-export type GrAutocompleteSize = 'xs' | 'sm' | 'md' | 'lg'
+import type { GrComponentSize } from '../shared/sizes'
+
+export type GrAutocompleteSize = GrComponentSize
 /** Опция автокомплита. Значение и метка — строки (как у `GrSelect`). */
 export type GrAutocompleteOption = { value: string, label: string, disabled?: boolean }
 export type GrAutocompleteModelValue = string | string[]

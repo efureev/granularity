@@ -119,6 +119,9 @@ defineExpose({ focus, blur })
 const interactive = computed(() => !isReadonly.value && !props.disabled)
 
 /**
+ * `aria-readonly`, `aria-invalid` и `aria-required` вешаются только в
+ * slider-режиме: на `role="img"` они не разрешены и дают critical в axe.
+ *
  * Роль контрола (`slider`) сохраняется и в `disabled` — отключённый слайдер это
  * штатный ARIA-паттерн. А вот `readonly` — это уже не контрол, а картинка с
  * подписью: на `role="img"` атрибуты `aria-value*`/`aria-disabled` запрещены
@@ -239,7 +242,7 @@ function onKeydown(event: KeyboardEvent): void {
       :aria-invalid="asSlider && isInvalid ? 'true' : undefined"
       :aria-describedby="asSlider ? describedBy : undefined"
       :aria-required="asSlider && isRequired ? 'true' : undefined"
-      :aria-readonly="isReadonly ? 'true' : undefined"
+      :aria-readonly="asSlider && isReadonly ? 'true' : undefined"
       @keydown="onKeydown"
     >
       <span

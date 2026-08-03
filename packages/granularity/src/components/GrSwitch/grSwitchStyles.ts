@@ -1,4 +1,6 @@
-export type GrSwitchSize = 'sm' | 'md' | 'lg'
+import type { GrComponentSize } from '../shared/sizes'
+
+export type GrSwitchSize = GrComponentSize
 
 type GrSwitchThumbClassOptions = {
     checked: boolean
@@ -9,7 +11,8 @@ export const trackBase =
     'relative inline-flex shrink-0 items-center rounded-full border border-[var(--gr-switch-track-brd)] transition-colors duration-150'
 
 export const trackSizes: Record<GrSwitchSize, string> = {
-    sm: 'h-5 w-9',
+    xs: 'h-4 w-7',
+  sm: 'h-5 w-9',
     md: 'h-6 w-11',
     lg: 'h-7 w-14',
 }
@@ -18,12 +21,17 @@ export const thumbBase =
     'inline-block shrink-0 rounded-full bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-transform duration-150'
 
 export const thumbSizes: Record<GrSwitchSize, string> = {
-    sm: 'h-4 w-4',
+    xs: 'h-3 w-3',
+  sm: 'h-4 w-4',
     md: 'h-5 w-5',
     lg: 'h-6 w-6',
 }
 
 export const thumbTranslations: Record<GrSwitchSize, { checked: string, unchecked: string }> = {
+    xs: {
+        checked: 'translate-x-[13px]',
+        unchecked: 'translate-x-[2px]',
+    },
     sm: {
         checked: 'translate-x-[17px]',
         unchecked: 'translate-x-[2px]',
@@ -41,6 +49,7 @@ export const thumbTranslations: Record<GrSwitchSize, { checked: string, unchecke
 export const labelBase = 'text-[var(--gr-muted-fg)]'
 
 export const labelSizes: Record<GrSwitchSize, string> = {
+    xs: 'text-xs',
     sm: 'text-sm',
     md: 'text-sm',
     lg: 'text-base',

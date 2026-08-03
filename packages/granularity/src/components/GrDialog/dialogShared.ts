@@ -1,4 +1,6 @@
-export type GrDialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
+import type { GrOverlaySize } from '../shared/sizes'
+
+export type GrDialogSize = GrOverlaySize
 
 export interface GrDialogSectionConfig {
   paddingX?: string

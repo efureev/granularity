@@ -10,3 +10,5 @@ export type {
   GrStatisticTrend,
 } from './GrStatistic.vue'
 export { grStatisticSafelist } from './safelist'
+// Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
+export type { GrStatisticConfigurableProps } from './defaults'

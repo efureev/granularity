@@ -412,8 +412,8 @@ const teleportEnabled = useTeleportEnabled()
   >
     <div class="relative">
       <input
-        ref="triggerEl"
         :id="fieldId"
+        ref="triggerEl"
         data-testid="gr-tree-select-trigger"
         data-gr-tree-select-trigger
         type="text"

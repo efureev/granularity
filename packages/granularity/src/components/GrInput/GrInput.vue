@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GrComponentSize } from '../shared/sizes'
 import {computed, ref, useSlots} from 'vue'
 
 import {addLen, useAddonMeasurement} from '../../composables/internal/useAddonMeasurement'
@@ -16,7 +17,7 @@ defineOptions({
   inheritAttrs: false,
 })
 
-export type GrInputSize = 'xs' | 'sm' | 'md' | 'lg'
+export type GrInputSize = GrComponentSize
 export type GrInputTextAlign = 'left' | 'center' | 'right'
 
 const props = withDefaults(

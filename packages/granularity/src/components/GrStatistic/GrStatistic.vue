@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { computed } from 'vue'
 
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
@@ -70,7 +71,7 @@ const props = withDefaults(
     prefix: undefined,
     suffix: undefined,
     icon: undefined,
-    size: 'md',
+    size: undefined,
     tone: 'neutral',
     trend: undefined,
     trendText: undefined,
@@ -83,6 +84,8 @@ const formatted = computed(() => formatStatisticValue(props.value, {
   groupSeparator: props.groupSeparator,
   decimalSeparator: props.decimalSeparator,
 }))
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatistic' })
 </script>
 
 <template>
@@ -101,7 +104,7 @@ const formatted = computed(() => formatStatisticValue(props.value, {
       <div
         v-if="title || $slots.title"
         data-gr-statistic-title
-        :class="[statisticTitleClass, statisticTitleSizeBySize[size]]"
+        :class="[statisticTitleClass, statisticTitleSizeBySize[resolvedSize]]"
       >
         <slot name="title">
           {{ title }}
@@ -119,7 +122,7 @@ const formatted = computed(() => formatStatisticValue(props.value, {
       >
         <GrSkeleton
           width="6rem"
-          :height="statisticPlaceholderHeightBySize[size]"
+          :height="statisticPlaceholderHeightBySize[resolvedSize]"
           rounded="var(--gr-radius-md)"
         />
       </div>
@@ -134,12 +137,12 @@ const formatted = computed(() => formatStatisticValue(props.value, {
           v-if="prefix || $slots.prefix"
           data-gr-statistic-prefix
           class="text-[var(--gr-muted-fg)]"
-          :class="statisticAffixSizeBySize[size]"
+          :class="statisticAffixSizeBySize[resolvedSize]"
         >
           <slot name="prefix">{{ prefix }}</slot>
         </span>
 
-        <span :class="statisticValueClass({ size, tone })">
+        <span :class="statisticValueClass({ size: resolvedSize, tone })">
           <slot>{{ formatted }}</slot>
         </span>
 
@@ -147,7 +150,7 @@ const formatted = computed(() => formatStatisticValue(props.value, {
           v-if="suffix || $slots.suffix"
           data-gr-statistic-suffix
           class="text-[var(--gr-muted-fg)]"
-          :class="statisticAffixSizeBySize[size]"
+          :class="statisticAffixSizeBySize[resolvedSize]"
         >
           <slot name="suffix">{{ suffix }}</slot>
         </span>
@@ -158,7 +161,7 @@ const formatted = computed(() => formatStatisticValue(props.value, {
         data-gr-statistic-trend
         data-testid="gr-statistic-trend"
         class="mt-1 inline-flex items-center gap-1"
-        :class="[statisticTrendSizeBySize[size], statisticTrendClassByTrend[trend ?? 'flat']]"
+        :class="[statisticTrendSizeBySize[resolvedSize], statisticTrendClassByTrend[trend ?? 'flat']]"
       >
         <slot name="trend">
           <span

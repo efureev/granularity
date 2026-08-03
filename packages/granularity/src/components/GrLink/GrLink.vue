@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGrComponentSize } from '../GrConfigProvider/context'
 /**
  * GrLink — GR-примитив ссылки.
  *
@@ -63,7 +64,7 @@ const props = withDefaults(defineProps<{
   tone: 'primary',
   variant: 'default',
   underline: 'auto',
-  size: 'md',
+  size: undefined,
 })
 
 const attrs = useAttrs()
@@ -105,9 +106,11 @@ const resolvedRel = computed(() => {
   return undefined
 })
 
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrLink' })
+
 const rootClass = computed(() => {
   const variantClass = grLinkClass({
-    size: props.size,
+    size: resolvedSize.value,
     underline: props.underline,
     disabled: props.disabled,
   })

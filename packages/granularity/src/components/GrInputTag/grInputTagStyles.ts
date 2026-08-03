@@ -1,6 +1,8 @@
+import type { GrControlState } from '../shared/sizes'
+
 import type { GrInputSize } from '../GrInput/GrInput.vue'
 export type GrInputTagSize = GrInputSize
-export type GrInputTagState = 'default' | 'success' | 'warning' | 'danger'
+export type GrInputTagState = GrControlState
 export const wrapperSizeClassBySize: Record<GrInputTagSize, string> = {
   xs: 'min-h-7 px-2.5 py-1 gap-1.5',
   sm: 'min-h-8 px-3 py-1 gap-1.5',

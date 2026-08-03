@@ -1,7 +1,9 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 import type { GrTone } from '../shared/tones'
 
 export type GrBadgeTone = GrTone
-export type GrBadgeSize = 'xs' | 'sm' | 'md' | 'lg'
+export type GrBadgeSize = GrComponentSize
 export type GrBadgeRadius = 'square' | 'semi' | 'round'
 export const sizeClassBySize: Record<GrBadgeSize, string> = {
   xs: 'px-2 py-0.4 text-[11px]',

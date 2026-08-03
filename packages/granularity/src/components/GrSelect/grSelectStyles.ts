@@ -1,5 +1,7 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 export type GrSelectView = 'default' | 'link'
-export type GrSelectSize = 'xs' | 'sm' | 'md' | 'lg'
+export type GrSelectSize = GrComponentSize
 export type GrSelectVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type GrSelectUnderline = 'auto' | 'always' | 'none'
 export type GrSelectOptionsView = 'native' | 'panel'

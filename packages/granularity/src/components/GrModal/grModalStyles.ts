@@ -1,4 +1,6 @@
-export type GrModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
+import type { GrOverlaySize } from '../shared/sizes'
+
+export type GrModalSize = GrOverlaySize
 
 // Корневые утилитарные классы, используемые шаблоном `GrModal.vue`.
 // Они же являются единственным источником истины для safelist.
