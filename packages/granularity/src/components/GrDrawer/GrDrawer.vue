@@ -7,9 +7,9 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-// Переиспользуем инфраструктуру оверлеев GrModal: общий Esc-стек (Esc закрывает
-// верхний оверлей независимо от дерева рендера) и reference-counted scroll-lock.
-import { pushGrModalEsc, removeGrModalEsc } from '../GrModal/grModalEscStack'
+// Общий стек dismissible-слоёв (Esc закрывает верхний оверлей независимо от
+// дерева рендера) и reference-counted scroll-lock.
+import { pushDismissLayer, removeDismissLayer } from '../../composables/internal/dismissStack'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
 import {
   grDrawerPanelClass,
@@ -90,7 +90,7 @@ let escEntryId: number | null = null
 
 function registerEsc(): void {
   if (escEntryId !== null) return
-  escEntryId = pushGrModalEsc({
+  escEntryId = pushDismissLayer({
     shouldClose: () => props.closeOnEsc,
     close,
   })
@@ -98,7 +98,7 @@ function registerEsc(): void {
 
 function unregisterEsc(): void {
   if (escEntryId === null) return
-  removeGrModalEsc(escEntryId)
+  removeDismissLayer(escEntryId)
   escEntryId = null
 }
 

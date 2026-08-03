@@ -8,27 +8,23 @@ export interface ViewerKeyboardActions {
 }
 
 export interface UseViewerKeyboardOptions {
-  /** Закрывать ли по Escape (проп `closeOnPressEscape`). */
-  closeOnEscape: () => boolean
   actions: ViewerKeyboardActions
 }
 
 /**
- * useViewerKeyboard — клавиатурное управление просмотрщиком:
- * Esc — закрыть, стрелки — переключение, `+`/`-`/`0` — зум/сброс.
+ * useViewerKeyboard — клавиатурное управление просмотрщиком: стрелки —
+ * переключение, `+`/`-`/`0` — зум/сброс.
+ *
+ * Esc сюда не входит: он идёт через общий стек dismissible-слоёв
+ * (`useDismissible`), иначе просмотрщик, открытый поверх модалки, закрывал бы
+ * не себя. Локальный `@keydown` до него всё равно не дошёл бы — стек гасит
+ * событие в capture-фазе.
  */
 export function useViewerKeyboard(options: UseViewerKeyboardOptions) {
   const { actions } = options
 
   function onKeydown(event: KeyboardEvent): void {
     switch (event.key) {
-      case 'Escape':
-        if (!options.closeOnEscape())
-          return
-        event.preventDefault()
-        actions.close()
-        return
-
       case 'ArrowLeft':
         event.preventDefault()
         actions.prev()

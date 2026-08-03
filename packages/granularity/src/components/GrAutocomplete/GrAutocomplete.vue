@@ -6,8 +6,8 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import { vClickOutside } from '../../directives'
-import { useFloating } from '../../composables/internal/useFloating'
-import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
+import { useFloating } from '../../composables/useFloating'
+import { useDismissible } from '../../composables/useDismissible'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 
@@ -170,7 +170,7 @@ const { floatingStyle } = useFloating(rootEl, panelEl, open, {
   zIndexVar: '--gr-z-dropdown',
 })
 
-useEscapeToClose(open, closeDropdown)
+useDismissible(open, closeDropdown)
 
 // ————— Фильтрация.
 const searchQuery = computed(() => {

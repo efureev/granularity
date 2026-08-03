@@ -25,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Escape now closes the overlay you actually see.** A dropdown, select, tree-select, tooltip or
+  autocomplete panel opened **inside a modal** used to close the modal instead of itself: modals
+  listened on `window` in the capture phase and swallowed the event with `stopImmediatePropagation`,
+  while the floating components listened on `document` in the bubble phase and never got their turn.
+  All dismissible overlays now share one stack, so Escape addresses the topmost layer and the next
+  Escape closes the one below. `GrImageViewer` joined the stack too — its local handler meant that a
+  viewer opened over a modal closed the modal.
 - **`GrImageViewer` no longer crashes server-side rendering.** A `watch(…, { immediate: true })` ran
   `new Image()` synchronously during `setup`, regardless of `modelValue` — so any SSR page that
   merely *contained* a closed viewer died with `ReferenceError: Image is not defined`. Neighbour
@@ -57,6 +64,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`useDismissible()` and `useFloating()` are public** — root barrel and
+  `@feugene/granularity/composables/*` subpaths. A consumer's own popover or menu can now be built
+  on the same positioning engine and, crucially, register in the same dismiss stack; otherwise its
+  layers drift apart from the library's on Escape.
 - **SSR gate in CI** (`test-playground-ssr`). The stand grew a third page covering the components
   where the risks actually were — `GrImageViewer`, `GrCommandPalette`, `GrCollapse`, `GrSegmented`,
   `GrDrawer`, `GrTreeSelect`, `GrSlider`, `GrTree`, `GrDataTable`, `GrFileUpload`, `GrToaster` — and

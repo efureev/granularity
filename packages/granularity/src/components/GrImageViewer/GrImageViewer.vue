@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { useDismissible } from '../../composables/useDismissible'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -296,9 +297,15 @@ function onBackdropClick(): void {
 }
 
 const { onKeydown } = useViewerKeyboard({
-  closeOnEscape: () => props.closeOnPressEscape,
   actions: { close: closeViewer, prev, next, zoomIn, zoomOut, reset: resetTransform },
 })
+
+// Esc — через общий стек слоёв: просмотрщик поверх модалки обязан закрывать себя.
+useDismissible(
+  computed(() => props.modelValue),
+  closeViewer,
+  { closeOnEscape: () => props.closeOnPressEscape },
+)
 
 watch(
   () => props.modelValue,

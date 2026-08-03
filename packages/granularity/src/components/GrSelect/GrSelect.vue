@@ -7,8 +7,8 @@ import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/cont
 
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
-import { useFloating } from '../../composables/internal/useFloating'
-import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
+import { useFloating } from '../../composables/useFloating'
+import { useDismissible } from '../../composables/useDismissible'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 
@@ -289,7 +289,7 @@ function toggleDropdown(): void {
   open.value = !open.value
 }
 
-useEscapeToClose(open, closeDropdown)
+useDismissible(open, closeDropdown)
 
 // `view` определяет режим `matchWidth` (см. выше) — пересчитываем позицию/ширину
 // панели, если он меняется, пока панель открыта.

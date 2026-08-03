@@ -11,11 +11,12 @@
  *   `DialogTitle` / `DialogDescription` (связь через `aria-labelledby` /
  *   `aria-describedby` ставится HeadlessUI автоматически).
  *
- * Esc обрабатывается через общий стек открытых модалок (`grModalEscStack`):
- * единый capture-обработчик на `window` закрывает только верхнюю (последнюю
- * открытую) модалку и опережает window-обработчик Escape HeadlessUI. Это
- * чинит кейс, когда поверх `GrModal` открыт диалог `useDialogService` (другое
- * дерево рендера): Esc закрывает именно верхний диалог, а не нижнее окно.
+ * Esc обрабатывается через общий стек dismissible-слоёв (`dismissStack`), куда
+ * регистрируются все оверлеи пакета — и модалки, и панели селектов, дропдаунов,
+ * подсказок. Единый capture-обработчик на `window` закрывает только верхний
+ * слой и опережает window-обработчик Escape HeadlessUI. Это чинит два кейса:
+ * диалог `useDialogService` поверх `GrModal` (другое дерево рендера) и панель,
+ * открытую внутри модалки, — Esc адресуется тому, что видит пользователь.
  * Клик по оверлею (backdrop) по-прежнему идёт через `@close` HeadlessUI;
  * источник закрытия различается через ref `closeReason`.
  */
@@ -24,7 +25,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
-import { pushGrModalEsc, removeGrModalEsc } from './grModalEscStack'
+import { pushDismissLayer, removeDismissLayer } from '../../composables/internal/dismissStack'
 import { pushGrModalTop, removeGrModalTop } from './grModalTopStack'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
 
@@ -115,7 +116,7 @@ let topEntryId: number | null = null
 
 function registerEsc(): void {
   if (escEntryId !== null) return
-  escEntryId = pushGrModalEsc({
+  escEntryId = pushDismissLayer({
     shouldClose: () => props.closeOnEsc,
     close,
   })
@@ -123,7 +124,7 @@ function registerEsc(): void {
 
 function unregisterEsc(): void {
   if (escEntryId === null) return
-  removeGrModalEsc(escEntryId)
+  removeDismissLayer(escEntryId)
   escEntryId = null
 }
 

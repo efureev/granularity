@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  pushGrModalEsc,
-  removeGrModalEsc,
-  resetGrModalEscStack,
-} from '../grModalEscStack'
+  pushDismissLayer,
+  removeDismissLayer,
+  resetDismissStack,
+} from '../dismissStack'
 
 function pressEscape(): KeyboardEvent {
   const event = new KeyboardEvent('keydown', {
@@ -16,17 +16,17 @@ function pressEscape(): KeyboardEvent {
   return event
 }
 
-describe('granularity/GrModal grModalEscStack (unit)', () => {
+describe('стек dismissible-слоёв (unit)', () => {
   afterEach(() => {
-    resetGrModalEscStack()
+    resetDismissStack()
   })
 
-  it('Esc закрывает только верхнюю (последнюю зарегистрированную) модалку', () => {
+  it('Esc закрывает только верхний (последний зарегистрированный) слой', () => {
     const closeBottom = vi.fn()
     const closeTop = vi.fn()
 
-    pushGrModalEsc({ shouldClose: () => true, close: closeBottom })
-    pushGrModalEsc({ shouldClose: () => true, close: closeTop })
+    pushDismissLayer({ shouldClose: () => true, close: closeBottom })
+    pushDismissLayer({ shouldClose: () => true, close: closeTop })
 
     pressEscape()
 
@@ -34,27 +34,27 @@ describe('granularity/GrModal grModalEscStack (unit)', () => {
     expect(closeBottom).not.toHaveBeenCalled()
   })
 
-  it('после закрытия верхней модалки Esc адресуется следующей по стеку', () => {
+  it('после закрытия верхнего слоя Esc адресуется следующему по стеку', () => {
     const closeBottom = vi.fn()
     const closeTop = vi.fn()
 
-    pushGrModalEsc({ shouldClose: () => true, close: closeBottom })
-    const topId = pushGrModalEsc({ shouldClose: () => true, close: closeTop })
+    pushDismissLayer({ shouldClose: () => true, close: closeBottom })
+    const topId = pushDismissLayer({ shouldClose: () => true, close: closeTop })
 
     pressEscape()
-    removeGrModalEsc(topId)
+    removeDismissLayer(topId)
     pressEscape()
 
     expect(closeTop).toHaveBeenCalledTimes(1)
     expect(closeBottom).toHaveBeenCalledTimes(1)
   })
 
-  it('Esc гасится (preventDefault), но не закрывает верхнюю модалку при shouldClose=false', () => {
+  it('Esc гасится (preventDefault), но не закрывает верхний слой при shouldClose=false', () => {
     const closeBottom = vi.fn()
     const closeTop = vi.fn()
 
-    pushGrModalEsc({ shouldClose: () => true, close: closeBottom })
-    pushGrModalEsc({ shouldClose: () => false, close: closeTop })
+    pushDismissLayer({ shouldClose: () => true, close: closeBottom })
+    pushDismissLayer({ shouldClose: () => false, close: closeTop })
 
     const event = pressEscape()
 
@@ -65,8 +65,8 @@ describe('granularity/GrModal grModalEscStack (unit)', () => {
 
   it('после опустошения стека обработчик снимается и Esc игнорируется', () => {
     const close = vi.fn()
-    const id = pushGrModalEsc({ shouldClose: () => true, close })
-    removeGrModalEsc(id)
+    const id = pushDismissLayer({ shouldClose: () => true, close })
+    removeDismissLayer(id)
 
     pressEscape()
 

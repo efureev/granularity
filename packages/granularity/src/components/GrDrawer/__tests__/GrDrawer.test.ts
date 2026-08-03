@@ -32,10 +32,10 @@ vi.mock('@headlessui/vue', async () => {
 })
 
 import GrDrawer from '../GrDrawer.vue'
-import { resetGrModalEscStack } from '../../GrModal/grModalEscStack'
+import { resetDismissStack } from '../../../composables/internal/dismissStack'
 
 afterEach(() => {
-  resetGrModalEscStack()
+  resetDismissStack()
 })
 
 function mountHarness(options: { closeOnBackdrop: boolean, side?: 'left' | 'right', size?: 'sm' | 'md' | 'lg' | 'full' }) {

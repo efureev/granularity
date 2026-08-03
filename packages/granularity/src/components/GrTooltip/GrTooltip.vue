@@ -14,12 +14,13 @@
  * по умолчанию сверху по центру, но `flip` переворачивает подсказку вниз, если
  * места над триггером не хватает, а `shift` не даёт ей вылезти за края viewport.
  */
-import { computed, onUnmounted, ref, useId, watch } from 'vue'
+import { computed, ref, useId } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
 import GrIcon from '../GrIcon'
-import { useFloating } from '../../composables/internal/useFloating'
+import { useFloating } from '../../composables/useFloating'
+import { useDismissible } from '../../composables/useDismissible'
 
 import IconInfo from '~icons/lucide/info'
 
@@ -58,25 +59,7 @@ function hide(): void {
   open.value = false
 }
 
-function closeOnEscape(e: KeyboardEvent): void {
-  if (e.key === 'Escape') hide()
-}
-
-watch(
-  open,
-  (isOpen) => {
-    if (typeof document === 'undefined') return
-
-    document.removeEventListener('keydown', closeOnEscape)
-    if (isOpen) document.addEventListener('keydown', closeOnEscape)
-  },
-  { immediate: true },
-)
-
-onUnmounted(() => {
-  if (typeof document === 'undefined') return
-  document.removeEventListener('keydown', closeOnEscape)
-})
+useDismissible(open, hide)
 </script>
 
 <template>

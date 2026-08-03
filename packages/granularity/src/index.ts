@@ -62,6 +62,13 @@ export * from './components/GrTreeSelect'
 // </granularity:components>
 
 // Runtime composables, публикуемые пакетом через root-barrel
+// Примитивы оверлеев: на них построены все всплывающие компоненты пакета, и
+// потребитель строит свои поповеры/меню на тех же — иначе его слои разъедутся
+// с библиотечными по Esc и по позиционированию.
+export { useDismissible } from './composables/useDismissible'
+export type { UseDismissibleOptions } from './composables/useDismissible'
+export { useFloating } from './composables/useFloating'
+export type { UseFloatingOptions, UseFloatingPlacement, UseFloatingReturn } from './composables/useFloating'
 export { initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'

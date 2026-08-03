@@ -1,10 +1,11 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
 import { vClickOutside } from '../../directives'
-import { useFloating } from '../../composables/internal/useFloating'
+import { useFloating } from '../../composables/useFloating'
+import { useDismissible } from '../../composables/useDismissible'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrInput from '../GrInput/GrInput.vue'
 import GrTree, {
@@ -263,24 +264,14 @@ function onTriggerFocus(): void {
   openDropdown()
 }
 
-function closeOnEscape(e: KeyboardEvent): void {
-  if (e.key === 'Escape') {
-    closeDropdown()
-    nextTick(() => triggerEl.value?.focus())
-  }
-}
+useDismissible(open, () => {
+  closeDropdown()
+  void nextTick(() => triggerEl.value?.focus())
+})
 
 watch(
   open,
   async (isOpen) => {
-    if (typeof document === 'undefined')
-      return
-
-    document.removeEventListener('keydown', closeOnEscape)
-
-    if (isOpen)
-      document.addEventListener('keydown', closeOnEscape)
-
     if (!isOpen)
       return
 
@@ -299,12 +290,6 @@ watch(
   },
   { immediate: true },
 )
-
-onUnmounted(() => {
-  if (typeof document === 'undefined')
-    return
-  document.removeEventListener('keydown', closeOnEscape)
-})
 
 watch(
   () => props.modelValue,

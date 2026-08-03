@@ -68,15 +68,22 @@ describe('GrImageViewer (decomposed)', () => {
     expect(wrapper.find('[data-gr-image-viewer-progress]').text()).toBe('2 / 2')
   })
 
-  it('keyboard: ArrowRight switches, Escape closes (useViewerKeyboard)', async () => {
+  it('keyboard: ArrowRight switches (useViewerKeyboard)', async () => {
     const wrapper = mountViewer()
     const dialog = wrapper.find('[data-testid="hu-dialog"]')
 
     await dialog.trigger('keydown', { key: 'ArrowRight' })
     expect(wrapper.find('[data-gr-image-viewer-image]').attributes('src')).toBe('/b.jpg')
+  })
 
-    await dialog.trigger('keydown', { key: 'Escape' })
+  // Esc идёт через общий стек слоёв, а не через локальный `@keydown`, поэтому
+  // и проверяется настоящим событием на `window`, а не триггером по элементу.
+  it('Escape закрывает просмотрщик через общий стек слоёв', async () => {
+    const wrapper = mountViewer()
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
     await nextTick()
+
     expect(wrapper.find('[data-gr-image-viewer-image]').exists()).toBe(false)
   })
 

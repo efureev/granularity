@@ -4,8 +4,8 @@ import { computed, nextTick, ref, useId, watch } from 'vue'
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
 import { vClickOutside } from '../../directives'
-import { useFloating } from '../../composables/internal/useFloating'
-import { useEscapeToClose } from '../../composables/internal/useEscapeToClose'
+import { useFloating } from '../../composables/useFloating'
+import { useDismissible } from '../../composables/useDismissible'
 import {
   grDropdownContentClass,
   grDropdownOriginClass,
@@ -166,7 +166,7 @@ function close(): void {
     returnFocusToTrigger()
 }
 
-useEscapeToClose(open, close)
+useDismissible(open, close)
 
 watch(
   () => props.align,

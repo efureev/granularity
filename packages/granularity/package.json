@@ -292,6 +292,14 @@
       "types": "./dist/types/src/components/GrTreeSelect/index.d.ts",
       "import": "./dist/components/GrTreeSelect/index.js"
     },
+    "./composables/useDismissible": {
+      "types": "./dist/types/src/composables/useDismissible.d.ts",
+      "import": "./dist/composables/useDismissible.js"
+    },
+    "./composables/useFloating": {
+      "types": "./dist/types/src/composables/useFloating.d.ts",
+      "import": "./dist/composables/useFloating.js"
+    },
     "./composables/useTheme": {
       "types": "./dist/types/src/composables/useTheme.d.ts",
       "import": "./dist/composables/useTheme.js"
