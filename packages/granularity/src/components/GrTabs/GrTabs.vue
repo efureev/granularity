@@ -45,6 +45,17 @@ function setButtonRef(el: unknown, index: number): void {
 
 const activeIndex = computed(() => props.tabs.findIndex(t => t.value === props.modelValue))
 
+// Roving tabindex обязан всегда держать ровно один элемент с `0`. Если
+// `modelValue` не совпал ни с одной вкладкой (пустое начальное значение,
+// асинхронный список, удалённая активная вкладка), в таб-порядке остаётся
+// первая доступная — иначе tablist выпадает из него целиком и молча.
+const rovingIndex = computed(() => {
+  if (activeIndex.value >= 0) return activeIndex.value
+
+  const firstEnabled = props.tabs.findIndex(tab => !tab.disabled)
+  return firstEnabled >= 0 ? firstEnabled : 0
+})
+
 function isEnabled(tab: GrTab): boolean {
   return !tab.disabled
 }
@@ -146,7 +157,7 @@ function onClick(tab: GrTab): void {
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :disabled="tab.disabled"
-      :tabindex="tab.value === modelValue ? 0 : -1"
+      :tabindex="index === rovingIndex ? 0 : -1"
       class="h-9 px-3 rounded-[10px] text-sm font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-60 disabled:cursor-not-allowed"
       :class="tab.value === modelValue
         ? 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]'

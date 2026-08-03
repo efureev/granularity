@@ -89,6 +89,7 @@ function onClickCapture(e: MouseEvent) {
     :is="as"
     v-bind="attrs"
     data-gr-dropdown-menu-item
+    role="menuitem"
     :class="className"
     :type="isNativeButton ? (attrs.type as any) ?? 'button' : undefined"
     :disabled="isNativeButton ? disabled : undefined"

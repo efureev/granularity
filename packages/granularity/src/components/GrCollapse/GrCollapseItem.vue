@@ -45,6 +45,12 @@ const resolvedName = computed<GrCollapseValue>(() => {
 const resolvedDisabled = computed(() => collapseContext.disabled.value || props.disabled)
 const expanded = computed(() => collapseContext.isActive(resolvedName.value))
 
+// Свёрнутая панель схлопывается визуально (`grid-rows-[0fr]`), но это не
+// скрытие: без `inert` ссылки и кнопки внутри неё ловятся Tab'ом, фокус уезжает
+// в невидимую область нулевой высоты, а скринридер читает содержимое всех
+// закрытых секций подряд — прямо вопреки `aria-expanded="false"` на триггере.
+// `inert` убирает поддерево и из таб-порядка, и из дерева доступности, при этом
+// (в отличие от `hidden`/`display:none`) не ломает анимацию раскрытия.
 const headerId = `gr-collapse-header-${uid}`
 const panelId = `gr-collapse-panel-${uid}`
 
@@ -162,6 +168,7 @@ function onKeydown(event: KeyboardEvent): void {
       :id="panelId"
       role="region"
       :aria-labelledby="headerId"
+      :inert="expanded ? undefined : true"
       class="grid transition-[grid-template-rows] duration-200"
       :class="expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
     >

@@ -224,7 +224,15 @@ function cellValue(row: TRow, key: string): unknown {
 }
 
 // ————— Выбор строк.
-const selectedKeys = computed<Set<string | number>>(() => new Set(props.selected ?? []))
+// Uncontrolled-режим, как у сортировки выше: без `v-model:selected` чекбоксы
+// рисовались, кликались и никогда не отмечались — состояние выбора целиком
+// выводилось из пропа, а внутреннего не было вовсе.
+const internalSelected = ref<Array<string | number>>([])
+const isSelectedControlled = computed(() => props.selected !== undefined)
+
+const selectedKeys = computed<Set<string | number>>(
+  () => new Set(props.selected ?? internalSelected.value),
+)
 
 function isRowSelected(row: TRow): boolean {
   return selectedKeys.value.has(rowKeyValue(row))
@@ -238,6 +246,9 @@ const someSelected = computed(() =>
 )
 
 function emitSelected(next: Set<string | number>): void {
+  if (!isSelectedControlled.value)
+    internalSelected.value = [...next]
+
   emit('update:selected', [...next])
 }
 

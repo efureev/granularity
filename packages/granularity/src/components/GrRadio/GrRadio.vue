@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed, inject, nextTick, onUnmounted, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -137,11 +137,46 @@ function setValue(next: string): void {
 function onButtonClick(): void {
   setValue(props.value)
 }
+
+// Паттерн radiogroup: группа — одна остановка Tab, внутрь попадают стрелками.
+// Вне группы (одиночный `GrRadio`) переключатель остаётся обычной остановкой.
+const rovingTabindex = computed(() => {
+  if (resolvedDisabled.value) return -1
+  if (!group) return 0
+  return group.rovingValue.value === props.value ? 0 : -1
+})
+
+const rootEl = ref<HTMLElement | null>(null)
+
+function onArrow(direction: 1 | -1, event: KeyboardEvent): void {
+  if (!group || resolvedDisabled.value) return
+
+  event.preventDefault()
+  const next = group.moveSelection(props.value, direction)
+  if (next === undefined) return
+
+  // Фокус переезжает вслед за выбором — иначе следующая стрелка отсчитывалась бы
+  // от прежнего элемента.
+  void nextTick(() => {
+    rootEl.value
+      ?.closest('[data-gr-radio-group]')
+      ?.querySelector<HTMLElement>(`[data-gr-radio][data-value="${next}"]`)
+      ?.focus()
+  })
+}
+
+const unregister = group?.register({
+  value: () => props.value,
+  disabled: () => resolvedDisabled.value,
+})
+
+onUnmounted(() => unregister?.())
 </script>
 
 <template>
   <div
     v-if="variant === 'button'"
+    ref="rootEl"
     :id="id"
     data-gr-button
     data-gr-radio
@@ -150,11 +185,16 @@ function onButtonClick(): void {
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :aria-required="required ? 'true' : undefined"
-    :tabindex="resolvedDisabled ? -1 : 0"
+    :data-value="value"
+    :tabindex="rovingTabindex"
     :class="buttonClassName"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"
+    @keydown.down="onArrow(1, $event)"
+    @keydown.right="onArrow(1, $event)"
+    @keydown.up="onArrow(-1, $event)"
+    @keydown.left="onArrow(-1, $event)"
   >
     <input
       v-if="submitsValue"
@@ -169,6 +209,7 @@ function onButtonClick(): void {
 
   <div
     v-else
+    ref="rootEl"
     :id="id"
     data-gr-radio
     role="radio"
@@ -176,12 +217,17 @@ function onButtonClick(): void {
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :aria-required="required ? 'true' : undefined"
-    :tabindex="resolvedDisabled ? -1 : 0"
+    :data-value="value"
+    :tabindex="rovingTabindex"
     class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     :class="rootClassName"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"
+    @keydown.down="onArrow(1, $event)"
+    @keydown.right="onArrow(1, $event)"
+    @keydown.up="onArrow(-1, $event)"
+    @keydown.left="onArrow(-1, $event)"
   >
     <input
       v-if="submitsValue"

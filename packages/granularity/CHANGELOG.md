@@ -25,6 +25,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrDataTable`: `selectable` now works without `v-model:selected`.** There was no internal
+  selection state at all — checkboxes rendered, took clicks and never got checked. Selection now has
+  an uncontrolled mode, like sorting in the same component always had.
+- **`GrFormFile`: the remove button in multiple mode had no label.** `{{ removeText }}` (the raw
+  prop, `undefined` by default) was rendered instead of `{{ resolvedRemoveText }}` — an empty button
+  on screen and a button with no accessible name for screen readers.
+- **`GrRadioGroup` implements the radio pattern's keyboard contract.** Arrows (`↓`/`→`, `↑`/`←`) move
+  the selection and the focus around the group, and the group is a single `Tab` stop via roving
+  tabindex. Previously every radio was its own tab stop and arrows did nothing.
+- **`GrTabs` no longer drops out of the tab order entirely.** With a `modelValue` matching no tab —
+  an empty initial value, an async list, a removed active tab — every tab got `tabindex="-1"` and the
+  whole tablist became unreachable by keyboard, silently. Roving tabindex now always keeps exactly
+  one tab reachable.
+- **`GrCollapse`: a collapsed panel is now `inert`.** Collapsing was purely visual
+  (`grid-rows-[0fr]`), so links and buttons inside closed sections were still focusable — focus
+  travelled into a zero-height invisible area — and screen readers read every closed section, which
+  directly contradicted `aria-expanded="false"` on the trigger.
+- **`GrDropdownMenuItem` declares `role="menuitem"`.** The panel declares `role="menu"`, which makes
+  children presentational: without the role a screen reader announced neither the item nor its
+  position in the menu. `GrDropdown`'s own keyboard navigation also looks for `[role="menuitem"]`.
 - **`GrFormField` now really labels every control it wraps.** The contract — label association,
   `aria-describedby` carrying the error text, `aria-invalid` — was honoured by 7 of 13 controls;
   for the rest `<label for>` pointed at nothing, so clicking the label focused nothing and the error

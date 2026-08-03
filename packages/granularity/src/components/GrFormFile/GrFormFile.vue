@@ -358,7 +358,7 @@ watch(
             :disabled="disabled"
             @click.prevent="removeAt(index)"
           >
-            {{ removeText }}
+            {{ resolvedRemoveText }}
           </button>
         </div>
       </div>

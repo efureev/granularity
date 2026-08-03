@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide } from 'vue'
+import { computed, provide, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
@@ -8,6 +8,7 @@ import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
 import GrRadio from '../GrRadio/GrRadio.vue'
 import { GR_RADIO_GROUP_CONTEXT } from '../GrRadio'
+import type { GrRadioEntry } from '../GrRadio/grRadioGroupContext'
 
 export type GrRadioGroupVariant = 'radiobox' | 'button'
 export interface GrRadioGroupOption { value: string, label: string }
@@ -61,12 +62,46 @@ function setValue(next: string): void {
   emit('update:modelValue', next)
 }
 
+const entries = ref<GrRadioEntry[]>([])
+
+function register(entry: GrRadioEntry): () => void {
+  entries.value.push(entry)
+  return () => {
+    const index = entries.value.indexOf(entry)
+    if (index >= 0) entries.value.splice(index, 1)
+  }
+}
+
+const enabledValues = computed(() =>
+  entries.value.filter(entry => !entry.disabled()).map(entry => entry.value()),
+)
+
+const rovingValue = computed(() => {
+  if (enabledValues.value.includes(props.modelValue)) return props.modelValue
+  return enabledValues.value[0]
+})
+
+function moveSelection(from: string, direction: 1 | -1): string | undefined {
+  const values = enabledValues.value
+  if (values.length === 0) return undefined
+
+  const current = values.indexOf(from)
+  // Стрелки зациклены — это требование паттерна radiogroup.
+  const next = values[(current + direction + values.length) % values.length]
+
+  if (next !== undefined) setValue(next)
+  return next
+}
+
 provide(GR_RADIO_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),
   name: computed(() => props.name),
   disabled: computed(() => props.disabled),
   size: resolvedSize,
   setValue,
+  register,
+  rovingValue,
+  moveSelection,
 })
 </script>
 

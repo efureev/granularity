@@ -49,7 +49,7 @@ Enter не переключает состояние, а сабмитит фор
 | Компонент | Клавиши | Паттерн |
 | --- | --- | --- |
 | `GrCheckbox` | `Space` — переключить (в т.ч. из `indeterminate` → включено) | checkbox |
-| `GrRadio`, `GrRadioGroup` | `Space`, `Enter` — выбрать | radio |
+| `GrRadio`, `GrRadioGroup` | `Space`, `Enter` — выбрать; `↓`/`→` — следующий, `↑`/`←` — предыдущий (выбор едет вместе с фокусом, по кругу). Группа — одна остановка `Tab` | radio |
 | `GrSwitch` | `Space`, `Enter` — переключить (нативная `<button role="switch">`) | switch |
 | `GrNumberInput` | `↑`/`↓` — шаг, `Home`/`End` — к `min`/`max` | spinbutton |
 | `GrSlider` | `←`/`↓` — шаг вниз, `→`/`↑` — шаг вверх, `PageUp`/`PageDown` — крупный шаг, `Home`/`End` — к краям | slider |
@@ -77,7 +77,7 @@ Enter не переключает состояние, а сабмитит фор
 | Компонент | Клавиши | Паттерн |
 | --- | --- | --- |
 | `GrTabs` | `←`/`→` — циклично по вкладкам, `Home`/`End` — к первой/последней | tabs |
-| `GrCollapse` / `GrCollapseItem` | `Space`/`Enter` — раскрыть-свернуть, `↓` — к следующему заголовку | accordion |
+| `GrCollapse` / `GrCollapseItem` | `Space`/`Enter` — раскрыть-свернуть, `↓` — к следующему заголовку. Содержимое свёрнутой секции `inert`: `Tab` в него не заходит | accordion |
 | `GrPagination` | `Enter` — перейти на введённую страницу | — |
 
 ### Оверлеи
