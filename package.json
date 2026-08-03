@@ -29,6 +29,9 @@
     "test:playground-theme": "yarn workspace @feugene/granularity-playground-theme test:run",
     "test:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr test:run",
     "test:showcase": "yarn workspace @feugene/granularity-showcase test:run",
+    "test:a11y": "yarn workspace @feugene/granularity-showcase test:a11y",
+    "test:visual": "yarn workspace @feugene/granularity-showcase test:visual",
+    "test:visual:update:linux": "yarn workspace @feugene/granularity-showcase test:visual:update:linux",
     "typecheck:playground-config": "yarn workspace @feugene/granularity-playground-config typecheck"
   }
 }

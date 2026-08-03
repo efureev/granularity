@@ -185,6 +185,112 @@ jobs:
       - name: Test showcase
         run: yarn test:showcase
 
+  # Axe-гейт по всем 59 компонентам витрины. Baseline (`e2e/a11y-baseline.ts`) пуст,
+  # поэтому падает любое новое serious/critical нарушение. Платформонезависим:
+  # axe анализирует дерево доступности, а не рендер.
+  test-a11y:
+    needs:
+      - build-granularity
+      - build-unplugin-granularity
+      - build-granularity-datepicker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Download granularity-datepicker dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datepicker-dist
+          path: packages/granularity-datepicker/dist
+
+      - name: Install Playwright browsers
+        working-directory: apps/showcase
+        run: npx playwright install --with-deps chromium
+
+      - name: A11y gate
+        run: yarn test:a11y
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: a11y-report
+          path: apps/showcase/playwright-report/
+          if-no-files-found: ignore
+
+  # Визуальная регрессия. В отличие от a11y, зависит от платформы: шрифты и
+  # сглаживание на Linux и macOS разные, а допуски намеренно строгие
+  # (`threshold: 0`). Поэтому job идёт в официальном контейнере Playwright — так
+  # рендер воспроизводим, — и сравнивается с эталонами `*-chromium-linux.png`.
+  # Снять их: `yarn test:visual:update:linux` (нужен Docker), закоммитить.
+  test-visual:
+    needs:
+      - build-granularity
+      - build-unplugin-granularity
+      - build-granularity-datepicker
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Download granularity-datepicker dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datepicker-dist
+          path: packages/granularity-datepicker/dist
+
+      - name: Visual gate
+        run: yarn test:visual
+
+      - name: Upload diff report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-report
+          path: |
+            apps/showcase/playwright-report/
+            apps/showcase/test-results/
+          if-no-files-found: ignore
+
   build-showcase:
     needs:
       - test-showcase
