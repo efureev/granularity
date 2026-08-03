@@ -20,6 +20,8 @@
 - **Node ≥ 22**
 - **ESM only** (`"type": "module"` в `package.json` приложения)
 - [`vue`][vue] `^3` — peer-зависимость пакета (устанавливает приложение).
+- [`@headlessui/vue`][headlessui] `^1.7` и [`@floating-ui/dom`][floating-ui] `^1.8` —
+  **обязательные** runtime peer-зависимости пакета (устанавливает приложение).
 - [`unocss`][unocss] `≥ 66` и [`@unocss/preset-wind4`][preset-wind4]
   (или `@unocss/preset-mini`) — peer-зависимости пресета (устанавливает
   приложение, на build-time).
@@ -29,7 +31,7 @@
 В **приложении**:
 
 ```bash
-yarn add vue @feugene/granularity
+yarn add vue @feugene/granularity @headlessui/vue @floating-ui/dom
 yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-mini
 ```
 
@@ -37,6 +39,21 @@ yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-mini
 
 - компоненты и директивы пакета импортируются из исходников приложения и
   попадают в runtime-бандл.
+
+Почему `@headlessui/vue` и `@floating-ui/dom` стоят в `dependencies` приложения,
+а не внутри пакета:
+
+- на HeadlessUI построены оверлеи (`GrModal`, `GrDrawer`, `GrDialog`,
+  `GrImageViewer`), на floating-ui — позиционирование (`GrDropdown`, `GrSelect`,
+  `GrAutocomplete`, `GrTreeSelect`, `GrTooltip`); обе библиотеки исполняются в
+  рантайме приложения;
+- пакет держит их в `external` и не бандлит внутрь `dist`. Иначе приложение,
+  которое само использует HeadlessUI, получало бы вторую копию — а разъехавшиеся
+  версии дают разное поведение фокус-ловушки. Установка их приложением
+  гарантирует одну копию на весь бандл.
+
+Установить их нужно **обязательно**: без них приложение упадёт на первом же
+импорте оверлея или выпадающего списка.
 
 Почему `@feugene/unocss-preset-granular`, `unocss` и `@unocss/preset-mini` / `@unocss/preset-wind4`
 стоят в `devDependencies`:
@@ -218,6 +235,7 @@ createApp(App).mount('#app')
   ([docs/ru][preset-docs])
 - [`unocss`][unocss] и [`@unocss/preset-wind4`][preset-wind4]
 - [`vue`][vue]
+- [`@headlessui/vue`][headlessui] и [`@floating-ui/dom`][floating-ui]
 - [`unplugin-vue-components`][unplugin-vue-components]
 
 [granularity-repo]: https://github.com/efureev/unocss-preset-granular
@@ -228,4 +246,6 @@ createApp(App).mount('#app')
 [unocss]: https://github.com/unocss/unocss
 [preset-wind4]: https://github.com/unocss/unocss/tree/main/packages-presets/preset-wind4
 [vue]: https://github.com/vuejs/core
+[headlessui]: https://github.com/tailwindlabs/headlessui
+[floating-ui]: https://github.com/floating-ui/floating-ui
 [unplugin-vue-components]: https://github.com/unplugin/unplugin-vue-components

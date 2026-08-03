@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed — BREAKING
+
+- **`@headlessui/vue` and `@floating-ui/dom` moved from `dependencies` to `peerDependencies`** and are
+  now `external` in the build, so they are no longer bundled into `dist`. Install them alongside the
+  package:
+
+  ```bash
+  yarn add @feugene/granularity vue @headlessui/vue @floating-ui/dom
+  ```
+
+  Previously both were bundled **and** installed as runtime dependencies: an application already
+  using HeadlessUI shipped two copies, and once the versions drifted, so did focus-trap behaviour.
+  Nothing changes at the source level — the same components, the same API. `dist` drops from 890 KB
+  to 797 KB of JavaScript (−93 KB): `chunks/useScrollLock-*.js` 51 KB → 1.6 KB,
+  `chunks/useFloating-*.js` 48 KB → 4.5 KB.
+
 ### Fixed
 
 - **Granular imports no longer lose colours, shadows and focus rings.** `GrSelect`, `GrSlider`,

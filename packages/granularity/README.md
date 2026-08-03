@@ -46,8 +46,14 @@ strategies.
 ## Quick start
 
 ```bash
-yarn add @feugene/granularity vue
+yarn add @feugene/granularity vue @headlessui/vue @floating-ui/dom
 ```
+
+`@headlessui/vue` and `@floating-ui/dom` are required peer dependencies, not bundled ones. The
+overlay components (`GrModal`, `GrDrawer`, `GrDialog`, `GrImageViewer`) are built on HeadlessUI, and
+positioning (`GrDropdown`, `GrSelect`, `GrAutocomplete`, `GrTreeSelect`, `GrTooltip`) on floating-ui. Keeping them
+external means an application that already uses either one ends up with a single copy — and a single
+focus trap, whose behaviour would otherwise differ between versions.
 
 If the application uses `UnoCSS`:
 

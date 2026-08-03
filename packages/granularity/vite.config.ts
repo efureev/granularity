@@ -313,6 +313,11 @@ export default defineConfig({
         'vue',
         /^@feugene\/unocss-preset-granular(\/.*)?$/,
         /^@feugene\/fint-i18n(\/.*)?$/,
+        // Держим снаружи бандла: обе — peer-зависимости. Иначе потребитель,
+        // который сам их использует, получает вторую копию, а разъехавшиеся
+        // версии дают разное поведение фокус-ловушки.
+        /^@headlessui\/vue(\/.*)?$/,
+        /^@floating-ui\/dom(\/.*)?$/,
       ],
       output: {
         chunkFileNames: granularChunkFileNames(),
