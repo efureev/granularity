@@ -1,14 +1,15 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  dropdownContentBaseClass,
   originClassByPlacement,
   widthClassByWidth,
 } from './grDropdownStyles'
 
-// В safelist кладём только динамические токены, выбираемые по ключам в рантайме
-// (`width`/`resolvedPlacement`). Литералы content-класса (`rounded-*`, `border`,
-// `bg-*` и пр.) прописаны статически в исходнике `grDropdownStyles.ts` и находятся
-// UnoCSS'ом сканом.
+// И динамические токены (`width`/`resolvedPlacement`), и литералы отделки панели:
+// `grDropdownStyles.ts` уезжает в общий `dist/chunks/`, вне области скана
+// компонента — гейт `src/__tests__/safelist.test.ts`.
 export const grDropdownSafelist = [...new Set([
   ...Object.values(widthClassByWidth).flatMap(splitClassTokens),
   ...Object.values(originClassByPlacement).flatMap(v => splitClassTokens(v ?? '')),
+  ...splitClassTokens(dropdownContentBaseClass),
 ])]

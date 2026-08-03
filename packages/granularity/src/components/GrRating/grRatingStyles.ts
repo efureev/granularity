@@ -45,9 +45,11 @@ export const ratingFillClassByTone: Record<GrRatingTone, string> = {
 // «Пустой» символ: приглушённая заливка, чтобы шкала читалась целиком.
 export const ratingVoidClass = 'text-[var(--gr-rating-void-color,color-mix(in_srgb,var(--gr-muted-fg)_35%,transparent))]'
 
+export const ratingRootBaseClass = 'inline-flex items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]'
+
 export function ratingRootClass(options: { size: GrRatingSize, disabled: boolean, interactive: boolean }): string {
   return [
-    'inline-flex items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]',
+    ratingRootBaseClass,
     ratingGapBySize[options.size],
     options.disabled ? 'cursor-not-allowed opacity-50' : (options.interactive ? 'cursor-pointer' : ''),
   ]

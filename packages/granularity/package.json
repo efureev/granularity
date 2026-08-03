@@ -385,6 +385,7 @@
     "globals": "^17.7.0",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.2",
+    "unocss": "^66.7.5",
     "unplugin-icons": "^23.0.1",
     "vite": "^8.1.5",
     "vite-plugin-lib-inject-css": "^2.2.2",

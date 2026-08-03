@@ -79,6 +79,10 @@ export const grSelectLinkNativeOverlayClass = 'peer absolute inset-0 w-full h-fu
  * Классы видимой метки для `view="link"` + `optionsView="native"` (поверх прозрачного `<select>`).
  * Получает все link-стили (size/variant/underline), а также focus-ring через `peer-focus-visible`.
  */
+export const grSelectLinkNativeLabelBaseClass = 'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[6px] transition-colors duration-150'
+export const grSelectLinkNativeLabelDisabledClass = 'opacity-60 text-[var(--gr-muted-fg)] no-underline'
+export const grSelectLinkNativeLabelFocusClass = 'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--gr-ring)]'
+
 export function grSelectLinkNativeLabelClass(options: {
   size: GrSelectSize
   variant: GrSelectVariant
@@ -86,12 +90,12 @@ export function grSelectLinkNativeLabelClass(options: {
   disabled: boolean
 }): string {
   return [
-    'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[6px] transition-colors duration-150',
+    grSelectLinkNativeLabelBaseClass,
     selectLinkSizeClassBySize[options.size],
     selectLinkNativeLabelUnderlineClass({ underline: options.underline, disabled: options.disabled }),
     selectLinkNativeLabelVariantClassByVariant[options.variant],
-    options.disabled ? 'opacity-60 text-[var(--gr-muted-fg)] no-underline' : '',
-    'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--gr-ring)]',
+    options.disabled ? grSelectLinkNativeLabelDisabledClass : '',
+    grSelectLinkNativeLabelFocusClass,
   ]
     .filter(Boolean)
     .join(' ')

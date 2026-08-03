@@ -67,9 +67,11 @@ export function sliderMarkLabelClassFor(pct: number): string {
   return `${sliderMarkLabelClass} ${align}`
 }
 
+export const sliderRootBaseClass = 'relative w-full select-none'
+
 export function sliderRootClass(options: { size: GrSliderSize, disabled: boolean, hasMarks?: boolean }): string {
   return [
-    'relative w-full select-none',
+    sliderRootBaseClass,
     sliderPaddingBySize[options.size],
     // Резервируем место под подписи меток, чтобы они не наезжали на соседний контент.
     options.hasMarks ? 'mb-7' : '',

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Granular imports no longer lose colours, shadows and focus rings.** `GrSelect`, `GrSlider`,
+  `GrAutocomplete`, `GrDropdown`, `GrDrawer` and `GrRating` declared only part of their utility
+  classes in `safelist`; the rest lived as string literals in `*Styles.ts` helpers, which the
+  bundler hoists into the shared `dist/chunks/` — outside the `dist/components/<Name>/**` directory
+  the preset scans. A consumer importing `@feugene/granularity/components/GrSelect` alone got a
+  select with no focus ring and a panel with no background or shadow. The showcase hid the defect,
+  because neighbouring components on the page generated the same utilities.
+
 - **`typecheck` is green again** — 14 `vue-tsc` errors in the package's own test suite are fixed
   (`GrNumberInput`, `GrDataTable`, `GrDropdown`, `GrRadioGroup`, `GrSegmented`, `GrSlider`,
   `GrTreeSelect`). Since `.d.ts` files are emitted by `vue-tsc` at build time, a red typecheck was a
@@ -18,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - **CI now runs `lint` and `typecheck`** (job `quality-granularity`), and both gate every build and
   publish job. `lint` had been commented out and `typecheck` never ran at all.
+
+### Added
+
+- **Safelist gate** (`src/__tests__/safelist.test.ts`): every utility class written as a string
+  literal in a component's `.ts` helpers must be declared in that component's `safelist`. The rule
+  is deliberately stated over sources rather than over `dist` — a gate reading `dist` would stay
+  green only until the next change in chunking.
 
 ## [v0.13.0] 2026-07-28
 

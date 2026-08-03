@@ -18,13 +18,13 @@ export const panelTransitionClass: Record<GrDrawerSide, string> = {
   right: 'translate-x-full',
 }
 
+export const panelBaseClass = 'border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
+
 export function grDrawerPanelClass(options: { side: GrDrawerSide, size: GrDrawerSize }): string {
   return [
     panelSideClass[options.side],
     panelWidthBySize[options.size],
-    'border-[var(--gr-brd)]',
-    'bg-[var(--gr-card)] text-[var(--gr-card-fg)]',
-    'shadow-[var(--gr-shadow-2)] outline-none',
+    panelBaseClass,
   ].join(' ')
 }
 

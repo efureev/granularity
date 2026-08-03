@@ -1,15 +1,30 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  defaultBaseClass,
+  grSelectLinkNativeLabelBaseClass,
+  grSelectLinkNativeLabelDisabledClass,
+  grSelectLinkNativeLabelFocusClass,
+  grSelectLinkNativeOverlayClass,
+  grSelectPanelClasses,
+  linkBaseClass,
   selectLinkNativeLabelVariantClassByVariant,
   selectLinkSizeClassBySize,
   selectLinkVariantClassByVariant,
   selectSizeClassBySize,
 } from './grSelectStyles'
 
-// Правило: литералы из шаблонов (`defaultBaseClass`/`linkBaseClass`/`grSelectPanelClasses`
-// и прочие статические строки) в safelist не дублируем — UnoCSS находит их сканом.
+// Всё, что живёт в `grSelectStyles.ts`: и вычисляемые мапы, и строковые литералы
+// оболочки, link-режима, native-overlay и панели. Хелпер уезжает в общий
+// `dist/chunks/`, вне области скана компонента — гейт `src/__tests__/safelist.test.ts`.
 export const grSelectSafelist = [...new Set([
   ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
+  ...splitClassTokens(defaultBaseClass),
+  ...splitClassTokens(linkBaseClass),
+  ...splitClassTokens(grSelectLinkNativeOverlayClass),
+  ...splitClassTokens(grSelectLinkNativeLabelBaseClass),
+  ...splitClassTokens(grSelectLinkNativeLabelDisabledClass),
+  ...splitClassTokens(grSelectLinkNativeLabelFocusClass),
+  ...splitClassTokens(grSelectPanelClasses),
   ...Object.values(selectLinkSizeClassBySize).flatMap(splitClassTokens),
   ...Object.values(selectLinkVariantClassByVariant).flatMap(splitClassTokens),
   ...Object.values(selectLinkNativeLabelVariantClassByVariant).flatMap(splitClassTokens),
