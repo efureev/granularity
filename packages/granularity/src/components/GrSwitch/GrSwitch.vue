@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import {
   grSwitchLabelClass,
@@ -19,6 +20,12 @@ export type {GrSwitchSize} from './grSwitchStyles'
 export interface GrSwitchProps {
   modelValue: boolean
   disabled?: boolean
+  /** Только для чтения: состояние видно, но не переключается. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). */
+  required?: boolean
   ariaLabel?: string
   size?: GrSwitchSize
   /** Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`. */
@@ -27,26 +34,44 @@ export interface GrSwitchProps {
   inactiveBackgroundColor?: string
 }
 
-// Контекст `GrFormField`: id для `<label for>`, описание ошибкой, невалидность.
-// `<button>` — labelable-элемент, поэтому клик по подписи фокусирует переключатель.
-const field = useGrFormFieldContext()
-const fieldId = computed(() => field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
-const isRequired = computed(() => Boolean(field?.required.value))
-
 const getCustomColor = (value?: string) => value?.trim() || undefined
 
 const props = withDefaults(
     defineProps<GrSwitchProps>(),
     {
       disabled: false,
+      readonly: false,
+      invalid: false,
+      required: false,
       ariaLabel: undefined,
       size: undefined,
       activeBackgroundColor: undefined,
       inactiveBackgroundColor: undefined,
     },
 )
+
+// Контекст `GrFormField`: id для `<label for>`, описание ошибкой, невалидность.
+// `<button>` — labelable-элемент, поэтому клик по подписи фокусирует переключатель.
+const field = useGrFormFieldContext()
+const fieldId = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedById.value)
+const {
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
+
+const rootEl = ref<HTMLButtonElement | null>(null)
+
+function focus(): void {
+  rootEl.value?.focus()
+}
+
+function blur(): void {
+  rootEl.value?.blur()
+}
+
+defineExpose({ focus, blur })
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, {
@@ -84,7 +109,7 @@ const thumbClass = computed(() => grSwitchThumbClass({size: resolvedSize.value, 
 const labelClass = computed(() => grSwitchLabelClass(resolvedSize.value))
 
 function toggle(): void {
-  if (props.disabled) {
+  if (props.disabled || isReadonly.value) {
     return
   }
 
@@ -95,6 +120,7 @@ function toggle(): void {
 <template>
   <button
       :id="fieldId"
+      ref="rootEl"
       type="button"
       role="switch"
       data-gr-switch
@@ -103,6 +129,7 @@ function toggle(): void {
       :aria-describedby="describedBy"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       :disabled="disabled"
       class="inline-flex items-center gap-2 select-none disabled:opacity-50 disabled:cursor-not-allowed"
       @click="toggle"

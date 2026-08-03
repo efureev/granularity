@@ -4,6 +4,7 @@ import {computed, ref, useSlots} from 'vue'
 import {addLen, useAddonMeasurement} from '../../composables/internal/useAddonMeasurement'
 import {useGrComponentProp, useGrComponentSize} from '../GrConfigProvider/context'
 import {useGrFormFieldContext} from '../GrFormField/context'
+import {useGrFormControl} from '../../composables/useGrFormControl'
 import {useGranularityTranslations} from '../../internal/granularityI18n'
 import type {InputHTMLAttributes} from 'vue'
 
@@ -29,6 +30,10 @@ const props = withDefaults(
       /** Только для чтения: значение видно и выделяемо, но не редактируется. */
       readonly?: boolean
       invalid?: boolean
+      /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
+      required?: boolean
+      /** Доступное имя вне `GrFormField`. */
+      ariaLabel?: string
       state?: 'default' | 'success' | 'warning' | 'danger'
       name?: string
       id?: string
@@ -71,6 +76,8 @@ const props = withDefaults(
       disabled: false,
       readonly: false,
       invalid: false,
+      required: false,
+      ariaLabel: undefined,
       state: 'default',
       name: undefined,
       id: undefined,
@@ -109,9 +116,12 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrInput'
 const resolvedClearable = useGrComponentProp('GrInput', 'clearable', () => props.clearable, false)
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
-const isInvalid = computed(() => props.invalid || Boolean(field?.invalid.value))
 const describedBy = computed(() => field?.describedById.value)
-const isRequired = computed(() => Boolean(field?.required.value))
+const {
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 const inputEl = ref<HTMLInputElement | null>(null)
 
@@ -119,8 +129,13 @@ function focus(): void {
   inputEl.value?.focus()
 }
 
+function blur(): void {
+  inputEl.value?.blur()
+}
+
 defineExpose({
   focus,
+  blur,
 })
 
 const slots = useSlots()
@@ -153,7 +168,7 @@ const passwordVisible = ref(false)
 const resolvedType = computed(() => (props.type === 'password' && passwordVisible.value ? 'text' : props.type))
 
 const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !props.disabled)
-const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !props.readonly)
+const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !isReadonly.value)
 
 const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
@@ -319,12 +334,14 @@ function togglePassword(): void {
           :autocomplete="props.autocomplete"
           :placeholder="props.placeholder"
           :disabled="props.disabled"
-          :readonly="props.readonly"
+          :readonly="isReadonly"
           :maxlength="props.maxlength"
           :value="props.modelValue"
           :aria-invalid="isInvalid ? 'true' : undefined"
           :aria-describedby="describedBy"
           :aria-required="isRequired ? 'true' : undefined"
+          :aria-readonly="isReadonly ? 'true' : undefined"
+          :aria-label="ariaLabel"
           class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
           :class="className"
           :style="inputStyle"

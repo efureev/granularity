@@ -116,7 +116,7 @@ HeadlessUI держит собственный стек на каждое дер
 `GrModal`. У Esc-стека публичный вход есть — композабл `useDismissible()`:
 
 ```ts
-import { useDismissible, useFloating } from '@feugene/granularity'
+import { useDismissible } from '@feugene/granularity'
 
 const open = ref(false)
 useDismissible(open, () => { open.value = false })

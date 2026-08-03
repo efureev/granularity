@@ -21,6 +21,13 @@ export interface GrFormFieldContext {
   invalid: ComputedRef<boolean>
   /** Обязательное ли поле. */
   required: ComputedRef<boolean>
+  /**
+   * Поле только для чтения. Отличается от `disabled`: значение видно, уходит в
+   * форму и доступно скринридеру — просто не редактируется. Ставится на всё
+   * поле целиком, чтобы «форма только на чтение» не требовала обходить контролы
+   * по одному.
+   */
+  readonly: ComputedRef<boolean>
 }
 
 export const GR_FORM_FIELD_KEY: InjectionKey<GrFormFieldContext> = Symbol('gr-form-field')

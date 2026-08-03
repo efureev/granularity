@@ -23,6 +23,8 @@ const props = withDefaults(
     hint?: string
     /** Помечает поле обязательным (маркер `*` + `aria-required` у контрола). */
     required?: boolean
+    /** Всё поле только для чтения: контролы внутри перестают редактироваться. */
+    readonly?: boolean
     labelClass?: LabelClass
   }>(),
   {
@@ -32,6 +34,7 @@ const props = withDefaults(
     error: undefined,
     hint: undefined,
     required: false,
+    readonly: false,
     labelClass: undefined,
   },
 )
@@ -80,6 +83,7 @@ const labelId = computed(() => (props.label ? labelElementId : undefined))
 provide(GR_FORM_FIELD_KEY, {
   id: fieldId,
   labelId,
+  readonly: computed(() => props.readonly),
   describedById,
   invalid: hasError,
   required: isRequired,

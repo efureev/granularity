@@ -97,6 +97,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **A form-control contract, and `useGrFormControl()` to implement it** — `disabled`, `readonly`,
+  `invalid`, `required`, `ariaLabel` merged from the control's own props and the surrounding
+  `GrFormField`, plus `focus()`/`blur()` exposed. `GrFormField` gained a `readonly` prop, so
+  "read-only form" no longer means reaching into every control — or abusing `disabled`, which also
+  stops the value from being submitted.
+
+  **Migrated so far: `GrInput`, `GrTextarea`, `GrNumberInput`, `GrCheckbox`, `GrSwitch`.** The other
+  ten controls are listed as explicit debt in `src/__tests__/formControlContract.test.ts`; their
+  checks are skipped until each is migrated. All props are additive — nothing breaks.
 - **Tests for the seven components that had none** — `GrResponseErrorBanner`, `GrTabPanels`,
   `GrDropdownMenu`, `GrDivider`, `GrKbd`, `GrIcon`, `GrButtonGroup` (+52 tests). Every component in
   the package now has a test file. The error-banner suite exercises the parser chain directly,

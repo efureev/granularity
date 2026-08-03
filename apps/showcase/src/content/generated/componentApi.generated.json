@@ -789,6 +789,20 @@
             "default": "undefined"
           },
           {
+            "name": "readonly",
+            "description": "Только для чтения: состояние видно, но не переключается.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "form",
             "description": "",
             "type": "string | undefined",
@@ -840,7 +854,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -2449,6 +2474,13 @@
             "default": "undefined"
           },
           {
+            "name": "readonly",
+            "description": "Всё поле только для чтения: контролы внутри перестают редактироваться.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "error",
             "description": "Явная ошибка. Перекрывает ошибку из `GrForm` (ручной режим без формы — тоже здесь).",
             "type": "string | undefined",
@@ -3010,6 +3042,13 @@
             "default": "undefined"
           },
           {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "clearable",
             "description": "Показывать кнопку очистки, когда есть значение (и не disabled/readonly).",
             "type": "boolean | undefined",
@@ -3024,11 +3063,32 @@
             "default": "undefined"
           },
           {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и выделяемо, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "id",
@@ -3057,20 +3117,6 @@
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "readonly",
-            "description": "Только для чтения: значение видно и выделяемо, но не редактируется.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "maxlength",
@@ -3203,6 +3249,11 @@
             "name": "focus",
             "description": "",
             "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
           }
         ]
       }
@@ -3253,13 +3304,6 @@
             "default": "true"
           },
           {
-            "name": "state",
-            "description": "",
-            "type": "GrInputTagState | undefined",
-            "required": false,
-            "default": "\"default\""
-          },
-          {
             "name": "readonly",
             "description": "",
             "type": "boolean | undefined",
@@ -3272,6 +3316,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "state",
+            "description": "",
+            "type": "GrInputTagState | undefined",
+            "required": false,
+            "default": "\"default\""
           },
           {
             "name": "separators",
@@ -3879,11 +3930,39 @@
             "default": "undefined"
           },
           {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "id",
@@ -3912,13 +3991,6 @@
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "\"decimal\""
-          },
-          {
-            "name": "invalid",
-            "description": "Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "textAlign",
@@ -4097,6 +4169,11 @@
         "items": [
           {
             "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
             "description": "",
             "type": "() => void"
           }
@@ -5812,6 +5889,27 @@
             "default": "undefined"
           },
           {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: состояние видно, но не переключается.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "activeBackgroundColor",
             "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`.",
             "type": "string | undefined",
@@ -5862,7 +5960,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -6097,11 +6206,39 @@
             "default": "undefined"
           },
           {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "id",
@@ -6130,13 +6267,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "invalid",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "modelValue",
@@ -6169,7 +6299,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },

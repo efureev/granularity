@@ -24,6 +24,7 @@ import IconMinus from '~icons/lucide/minus'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import {
   grCheckboxCheckIconClass,
@@ -42,6 +43,10 @@ export interface GrCheckboxProps {
   name?: string
   value?: string
   required?: boolean
+  /** Только для чтения: состояние видно, но не переключается. */
+  readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки. */
+  invalid?: boolean
   form?: string
   /** Пробрасывается на скрытый нативный `<input>`, чтобы работал `<label for="...">`. */
   id?: string
@@ -67,6 +72,8 @@ const props = withDefaults(defineProps<GrCheckboxProps>(), {
   name: undefined,
   value: 'on',
   required: false,
+  readonly: false,
+  invalid: false,
   form: undefined,
   id: undefined,
   indeterminate: false,
@@ -90,8 +97,11 @@ const hasLabel = computed(() => Boolean(slots.default))
 const field = useGrFormFieldContext()
 const fieldControlId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
-const isFieldRequired = computed(() => Boolean(field?.required.value))
+const {
+  invalid: isInvalid,
+  required: isFieldRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 const labelledBy = computed(() => {
   if (props.ariaLabel) return undefined
@@ -142,7 +152,7 @@ watch(() => props.indeterminate, syncIndeterminate)
 onMounted(syncIndeterminate)
 
 function setChecked(next: boolean): void {
-  if (props.disabled)
+  if (props.disabled || isReadonly.value)
     return
   emit('update:modelValue', next)
 }
@@ -163,6 +173,16 @@ function onNativeChange(e: Event): void {
 function onNativeFocus(): void {
   control.value?.focus()
 }
+
+function focus(): void {
+  control.value?.focus()
+}
+
+function blur(): void {
+  control.value?.blur()
+}
+
+defineExpose({ focus, blur })
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null
@@ -200,13 +220,14 @@ function onClick(e: MouseEvent): void {
       @focus="onNativeFocus"
     >
     <span
+      :id="fieldControlId"
       ref="control"
       data-gr-checkbox-indicator
-      :id="fieldControlId"
       role="checkbox"
       :aria-checked="indeterminate ? 'mixed' : (modelValue ? 'true' : 'false')"
       :aria-disabled="disabled ? 'true' : undefined"
       :aria-required="required || isFieldRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-label="ariaLabel"

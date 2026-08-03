@@ -176,8 +176,8 @@ onUnmounted(() => unregister?.())
 <template>
   <div
     v-if="variant === 'button'"
-    ref="rootEl"
     :id="id"
+    ref="rootEl"
     data-gr-button
     data-gr-radio
     role="radio"
@@ -209,8 +209,8 @@ onUnmounted(() => unregister?.())
 
   <div
     v-else
-    ref="rootEl"
     :id="id"
+    ref="rootEl"
     data-gr-radio
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"

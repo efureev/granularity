@@ -13,6 +13,7 @@ import {
   type GrNumberInputTextAlign,
 } from './grNumberInputStyles'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
 
@@ -47,6 +48,12 @@ export interface GrNumberInputProps {
   disabled?: boolean
   /** Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`. */
   invalid?: boolean
+  /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
+  readonly?: boolean
+  /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
+  required?: boolean
+  /** Доступное имя вне `GrFormField`. */
+  ariaLabel?: string
   state?: GrNumberInputState
   name?: string
   id?: string
@@ -102,6 +109,9 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   inputmode: 'decimal',
   disabled: false,
   invalid: false,
+  readonly: false,
+  required: false,
+  ariaLabel: undefined,
   state: 'default',
   name: undefined,
   id: undefined,
@@ -136,8 +146,11 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrNumber
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const isInvalid = computed(() => Boolean(field?.invalid.value))
-const isRequired = computed(() => Boolean(field?.required.value))
+const {
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -150,9 +163,11 @@ function focus(): void {
   inputEl.value?.focus()
 }
 
-defineExpose({
-  focus,
-})
+function blur(): void {
+  inputEl.value?.blur()
+}
+
+defineExpose({ focus, blur })
 
 const slots = useSlots()
 
@@ -482,6 +497,9 @@ function onBlur(): void {
       :aria-invalid="invalid || isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
+      :aria-label="ariaLabel"
+      :readonly="isReadonly"
       class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
       :class="inputClassName"
       :style="inputStyle"
