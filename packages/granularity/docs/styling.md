@@ -210,8 +210,9 @@ import '@feugene/granularity/styles/base.css'
 
 - **`[data-theme="dark"]` / `[data-theme="light"]`** — единственный рекомендуемый
   механизм. Его выставляют `useTheme()` / `initThemeEarly()`.
-- **`.theme-dark`, `.dark`** — DEPRECATED-алиасы в `themes/dark.css` для обратной
-  совместимости. В новом коде на них не ориентируйтесь.
+- **`.dark`** — дополнительный селектор в `themes/dark.css` для интеропа с
+  class-стратегией Tailwind/UnoCSS: если приложение уже переключает тему этим
+  классом, токены подхватятся. Класс `.theme-dark` снят.
 
 Единственный рантайм-API переключения темы — `useTheme()` (реактивное состояние,
 persistence, синхронизация между вкладками и с `prefers-color-scheme`) и

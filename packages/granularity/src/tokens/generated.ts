@@ -522,26 +522,6 @@ export const grDerivedTokens: GrDerivedToken[] = [
     }
   },
   {
-    "name": "--gr-destructive-hover",
-    "section": "Derived interaction formulas: action roles",
-    "description": "Hover-состояние destructive action: подмес `--gr-fg` 8% в `--gr-destructive`.",
-    "formula": "color-mix(in srgb, var(--gr-destructive) 92%, var(--gr-fg))",
-    "values": {
-      "light": "#cc2526",
-      "dark": "#f05353"
-    }
-  },
-  {
-    "name": "--gr-destructive-active",
-    "section": "Derived interaction formulas: action roles",
-    "description": "Active-состояние destructive action: подмес `--gr-fg` 16% в `--gr-destructive`.",
-    "formula": "color-mix(in srgb, var(--gr-destructive) 84%, var(--gr-fg))",
-    "values": {
-      "light": "#bb2427",
-      "dark": "#f06161"
-    }
-  },
-  {
     "name": "--gr-success-hover",
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`.",
@@ -815,24 +795,6 @@ export const grThemeTokens: GrThemeToken[] = [
     "values": {
       "light": "#3730a3",
       "dark": "#c7d2fe"
-    }
-  },
-  {
-    "name": "--gr-destructive",
-    "section": "Action roles",
-    "description": "Цвет destructive action-сценариев и критических состояний.",
-    "values": {
-      "light": "#dc2626",
-      "dark": "#ef4444"
-    }
-  },
-  {
-    "name": "--gr-destructive-fg",
-    "section": "Action roles",
-    "description": "Контрастный текст и иконки поверх destructive-заливки.",
-    "values": {
-      "light": "#ffffff",
-      "dark": "#ffffff"
     }
   },
   {

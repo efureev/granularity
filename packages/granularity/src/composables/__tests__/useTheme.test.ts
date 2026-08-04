@@ -36,13 +36,13 @@ describe('useTheme (helpers)', () => {
   it('initThemeEarly should apply the preferred theme to the document', () => {
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
     initThemeEarly()
-    expect(document.documentElement.classList.contains('theme-dark')).toBe(false)
     expect(document.documentElement.dataset.theme).toBe('light')
 
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'dark')
     initThemeEarly()
-    expect(document.documentElement.classList.contains('theme-dark')).toBe(true)
     expect(document.documentElement.dataset.theme).toBe('dark')
+    // Класс `.theme-dark` снят: тема выражается только data-атрибутом.
+    expect(document.documentElement.classList.contains('theme-dark')).toBe(false)
   })
 
   it('initThemeEarly should read from localStorage first', () => {
@@ -91,7 +91,6 @@ describe('useTheme (helpers)', () => {
     expect(window.localStorage.getItem('app-theme')).toBe('dark')
     expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe(null)
     expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(document.documentElement.classList.contains('theme-dark')).toBe(true)
   })
 
   it('useTheme should not touch localStorage when persist=false', () => {
@@ -113,6 +112,5 @@ describe('useTheme (helpers)', () => {
     const { setTheme } = useTheme({ storageKey: 'app-theme' })
     expect(() => setTheme('dark')).not.toThrow()
     expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(document.documentElement.classList.contains('theme-dark')).toBe(true)
   })
 })

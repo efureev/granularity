@@ -473,7 +473,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     sourcePath: 'packages/granularity/docs/styling.md',
     keyPoints: [
       `Пакет публикует встроенные темы: ${granularityThemeNames.join(', ')}.`,
-      '`light.css` использует `:root`, а `dark.css` поддерживает `.theme-dark`, `.dark` и `[data-theme=\'dark\']`.',
+      '`light.css` использует `:root`, а `dark.css` — `[data-theme=\'dark\']` и `.dark` (интероп с class-стратегией Tailwind/UnoCSS).',
       '`useTheme()` и `initThemeEarly()` уже дают базовый runtime-контракт для переключения темы.',
     ],
     recommendations: [

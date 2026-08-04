@@ -16,14 +16,11 @@ import type { GrTone } from '../shared/tones'
  *
  * `light` (устаревший) нормализуется в `soft`: раньше он существовал ровно для
  * одного тона (`warning`) и был набран hex-литералами, то есть не реагировал на
- * смену темы. См. {@link normalizeGrAlertVariant}.
+
  */
 export const GR_ALERT_VARIANTS = ['soft', 'outline'] as const
 
 export type GrAlertVariant = typeof GR_ALERT_VARIANTS[number]
-
-/** То, что компонент принимает в проп `variant`, включая устаревший алиас. */
-export type GrAlertVariantInput = GrAlertVariant | 'light'
 
 /** Ключ иконки тона. Сама иконка резолвится в SFC — модуль остаётся чистым. */
 export type GrAlertIconKey = 'info' | 'success' | 'warning' | 'danger'
@@ -79,10 +76,6 @@ export type GrAlertColorOverrides = {
   backgroundColor?: string
   textColor?: string
   borderColor?: string
-}
-
-export function normalizeGrAlertVariant(variant: GrAlertVariantInput): GrAlertVariant {
-  return variant === 'light' ? 'soft' : variant
 }
 
 export function grAlertIconKey(tone: GrTone): GrAlertIconKey {

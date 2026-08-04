@@ -18,7 +18,7 @@ import IconError from '~icons/lucide/x-circle'
 
 import type { Component } from 'vue'
 import type { GrTone } from '../shared/tones'
-import type { GrAlertIconKey, GrAlertVariantInput } from './grAlertStyles'
+import type { GrAlertIconKey, GrAlertVariant } from './grAlertStyles'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -26,14 +26,13 @@ import {
   applyGrAlertOverrides,
   grAlertCssVars,
   grAlertIconKey,
-  normalizeGrAlertVariant,
   resolveGrAlertColors,
 } from './grAlertStyles'
 
 import './defaults'
 
 export type GrAlertTone = GrTone
-export type { GrAlertVariant, GrAlertVariantInput } from './grAlertStyles'
+export type { GrAlertVariant } from './grAlertStyles'
 
 /**
  * Режим объявления сообщения скринридеру.
@@ -44,7 +43,7 @@ export type GrAlertLive = 'auto' | 'assertive' | 'polite' | 'off'
 
 export interface GrAlertProps {
   tone?: GrAlertTone
-  variant?: GrAlertVariantInput
+  variant?: GrAlertVariant
   title?: string
   closable?: boolean
   live?: GrAlertLive
@@ -77,7 +76,7 @@ const tone = useGrComponentProp('GrAlert', 'tone', () => props.tone, 'info')
 const variantInput = useGrComponentProp('GrAlert', 'variant', () => props.variant, 'soft')
 const closable = useGrComponentProp('GrAlert', 'closable', () => props.closable, false)
 
-const variant = computed(() => normalizeGrAlertVariant(variantInput.value))
+const variant = variantInput
 
 const ICONS: Record<GrAlertIconKey, Component> = {
   info: IconInfo,

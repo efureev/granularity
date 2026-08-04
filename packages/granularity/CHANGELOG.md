@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **Four deprecated aliases removed** — each one would have been permanent after 1.0:
+
+  - **`--pb-*` → `--gr-progress-*`** (`GrProgressBar`). It was the package's only non-canonical
+    token prefix.
+  - **`--gr-destructive*` merged into `--gr-danger*`.** Two semantically identical roles had drifted
+    apart: in the dark theme `danger` was `#f87171` while `destructive` was `#ef4444`. **This
+    uncovered a contrast bug**: `GrBadgeWrap` painted its background from `--gr-danger` and its text
+    from `--gr-destructive-fg`, giving white on `#f87171` — **2.77:1**, below the 4.5:1 AA
+    threshold. On the merged role it is **6.45:1**.
+  - **`.theme-dark` selector removed.** The theme is expressed by `[data-theme='dark']`; `useTheme`
+    no longer toggles the class. `.dark` stays — not as a deprecated alias but as interop with the
+    Tailwind/UnoCSS class strategy, and the docs now say so.
+  - **`GrAlert` no longer accepts `variant="light"`.** The alias is gone, and with it
+    `normalizeGrAlertVariant` and `GrAlertVariantInput` — without an alias the normaliser was an
+    identity function.
+
+  A gate (`src/__tests__/deprecatedApi.test.ts`) fails if any of the four comes back.
+
 - **`GrDataTable`'s `sort-change` event is now `sortChange`.** It was the only kebab-case emit in the
   package against seven camelCase ones (`visibleChange`, `nodeClick`, `stateChange`, …), so in a
   template the two read as different kinds of event and the IDE offered no help.

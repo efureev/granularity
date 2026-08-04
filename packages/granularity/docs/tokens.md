@@ -188,8 +188,6 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-primary-fg` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх primary-заливки. |
 | `--gr-accent` | `#eef2ff` | `#1e1b4b` | Мягкая акцентная поверхность для selected/hovered областей и подсветок. |
 | `--gr-accent-fg` | `#3730a3` | `#c7d2fe` | Цвет текста поверх accent-подложек. |
-| `--gr-destructive` | `#dc2626` | `#ef4444` | Цвет destructive action-сценариев и критических состояний. |
-| `--gr-destructive-fg` | `#ffffff` | `#ffffff` | Контрастный текст и иконки поверх destructive-заливки. |
 
 > **`--gr-primary` (dark).** Primary был единственным тоном, выпадавшим из конвенции тёмной темы (светлая заливка + тёмный текст, как у success/warning/danger/info/azure): оставался светло-тёмным индиго #6366f1 с белым текстом и проваливал сразу все три роли — текст на фоне 4.00, текст на карточке 3.27, белый на заливке 4.47. Светлый индиго с тёмным `-fg` даёт 6.38 / 5.23 / 6.38. Не indigo-400 (#818cf8): это ровно `--gr-info` тёмной темы, и solid-бейджи Primary и Info стали бы неотличимы. Кнопок не касается: GrButton задаёт свой `--gr-button-primary-bg`.
 
@@ -262,8 +260,6 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-secondary-active` | `84% --gr-secondary` + `--gr-fg` | `#c0c7d0` | `#535f70` | Active-состояние secondary action: подмес `--gr-fg` 16% в `--gr-secondary`. |
 | `--gr-brd-hover` | `70% --gr-brd` + `--gr-fg` | `#a3a9b5` | `#6e7987` | Hover-состояние бордеров и outline-элементов: подмес `--gr-fg` 30% в `--gr-brd`. |
 | `--gr-brd-active` | `55% --gr-brd` + `--gr-fg` | `#838a97` | `#8c94a0` | Active-состояние бордеров и outline-элементов: подмес `--gr-fg` 45% в `--gr-brd`. |
-| `--gr-destructive-hover` | `92% --gr-destructive` + `--gr-fg` | `#cc2526` | `#f05353` | Hover-состояние destructive action: подмес `--gr-fg` 8% в `--gr-destructive`. |
-| `--gr-destructive-active` | `84% --gr-destructive` + `--gr-fg` | `#bb2427` | `#f06161` | Active-состояние destructive action: подмес `--gr-fg` 16% в `--gr-destructive`. |
 | `--gr-success-hover` | `92% --gr-success` + `--gr-fg` | `#10ac7a` | `#44d6a1` | Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`. |
 | `--gr-success-active` | `84% --gr-success` + `--gr-fg` | `#109f73` | `#53d9a9` | Active-состояние success-ролей: подмес `--gr-fg` 16% в `--gr-success`. |
 | `--gr-warning-hover` | `92% --gr-warning` + `--gr-fg` | `#e66c18` | `#fb9a4b` | Hover-состояние warning-ролей: подмес `--gr-fg` 8% в `--gr-warning`. |

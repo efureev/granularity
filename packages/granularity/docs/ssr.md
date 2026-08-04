@@ -110,12 +110,11 @@ DOM-механика у них — в `GrModal`, на котором они по
     var t = localStorage.getItem('gr-theme')
       || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     document.documentElement.dataset.theme = t
-    document.documentElement.classList.toggle('theme-dark', t === 'dark')
   } catch {}
 </script>
 ```
 
-Ключ `gr-theme` и оба селектора — тот же контракт, что использует `useTheme()`
+Ключ `gr-theme` и атрибут — тот же контракт, что использует `useTheme()`
 (см. [`theming.md`](./theming.md)).
 
 ## CSS в SSR

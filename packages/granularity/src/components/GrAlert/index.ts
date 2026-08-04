@@ -9,7 +9,6 @@ export {
   GR_ALERT_VARIANTS,
   grAlertCssVars,
   grAlertIconKey,
-  normalizeGrAlertVariant,
   resolveGrAlertColors,
 } from './grAlertStyles'
 export type {
@@ -17,5 +16,4 @@ export type {
   GrAlertColors,
   GrAlertIconKey,
   GrAlertVariant,
-  GrAlertVariantInput,
 } from './grAlertStyles'

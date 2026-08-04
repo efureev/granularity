@@ -53,7 +53,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
       'В feature/demo контекстах можно использовать `persist: false`, чтобы не загрязнять глобальный storage продукта.',
     ],
     caveats: [
-      'Composable пишет тему в `document.documentElement.dataset.theme` и `theme-dark` class, поэтому app-shell стили должны опираться на эти маркеры.',
+      'Composable пишет тему в `document.documentElement.dataset.theme`, поэтому app-shell стили должны опираться на этот маркер.',
       'Несколько независимых вызовов `useTheme` влияют на один и тот же DOM-root; если нужна строгая изоляция, нужен отдельный host/document.',
     ],
     integrationNotes: [

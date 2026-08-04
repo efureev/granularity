@@ -83,28 +83,6 @@ describe('GrAlert', () => {
     expect(wrapper.emitted('close')?.length).toBe(1)
   })
 
-  it('устаревший variant light рендерится как soft, без hex-литералов', () => {
-    const wrapper = mount(GrAlert, {
-      props: {
-        tone: 'warning',
-        variant: 'light',
-        title: 'Warning light',
-        closable: true,
-      },
-      slots: {
-        default: 'Body',
-      },
-    })
-
-    const alert = wrapper.element as HTMLDivElement
-
-    expect(alert.style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-warning-light)')
-    expect(alert.style.getPropertyValue('--gr-alert-icon-color')).toBe('var(--gr-warning-text)')
-    expect(alert.style.getPropertyValue('--gr-alert-title-color')).toBe('var(--gr-warning-text)')
-    expect(alert.style.getPropertyValue('--gr-alert-text-color')).toBe('var(--gr-warning-text)')
-    expect(alert.getAttribute('style')).not.toMatch(/#[0-9a-f]{3,8}\b/i)
-  })
-
   it('позволяет переопределить цвета через пропсы', () => {
     const wrapper = mount(GrAlert, {
       props: {

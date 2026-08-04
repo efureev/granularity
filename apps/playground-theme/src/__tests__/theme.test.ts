@@ -118,7 +118,7 @@ describe('тема ocean', () => {
   })
 
   it('`-fg` читается на своей заливке — включая hover и active', () => {
-    const fills = ['--gr-primary', '--gr-destructive', ...TONES.map(tone => `--gr-${tone}`)]
+    const fills = ['--gr-primary', ...TONES.map(tone => `--gr-${tone}`)]
 
     for (const fill of fills) {
       const fg = value(`${fill}-fg`)

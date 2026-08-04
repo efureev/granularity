@@ -1,10 +1,10 @@
 :root {
-  --pb-bg: var(--gr-primary);
-  --pb-neutral-bg: var(--gr-secondary);
-  --pb-success-bg: var(--gr-success);
-  --pb-warning-bg: var(--gr-warning);
-  --pb-danger-bg: var(--gr-danger);
-  --pb-info-bg: var(--gr-info);
-  --pb-slate-bg: var(--gr-slate);
-  --pb-azure-bg: var(--gr-azure);
+  --gr-progress-bg: var(--gr-primary);
+  --gr-progress-neutral-bg: var(--gr-secondary);
+  --gr-progress-success-bg: var(--gr-success);
+  --gr-progress-warning-bg: var(--gr-warning);
+  --gr-progress-danger-bg: var(--gr-danger);
+  --gr-progress-info-bg: var(--gr-info);
+  --gr-progress-slate-bg: var(--gr-slate);
+  --gr-progress-azure-bg: var(--gr-azure);
 }

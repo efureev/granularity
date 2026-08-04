@@ -215,9 +215,9 @@ export type ThemeName = keyof typeof themeVarsByName
 
 /**
  * Токены компонентной темы (`components/GrX/themes/*.css`). В light-файле
- * блок объявлен на `:root`, в dark — на `.theme-dark,`.
+ * блок объявлен на `:root`, в dark — на `.dark,`.
  */
 export function readComponentThemeVars(component: string, theme: ThemeName): Record<string, string> {
   const content = readSrc(`src/components/${component}/themes/${theme}.css`)
-  return parseVars(extractCssBlock(content, theme === 'light' ? ':root' : '.theme-dark,'))
+  return parseVars(extractCssBlock(content, theme === 'light' ? ':root' : '.dark,'))
 }

@@ -45,20 +45,6 @@
           "base": "--gr-brd",
           "amount": 55,
           "mixWith": "--gr-fg"
-        },
-        {
-          "name": "--gr-destructive-hover",
-          "description": "Hover-состояние destructive action: подмес `--gr-fg` 8% в `--gr-destructive`.",
-          "base": "--gr-destructive",
-          "amount": 92,
-          "mixWith": "--gr-fg"
-        },
-        {
-          "name": "--gr-destructive-active",
-          "description": "Active-состояние destructive action: подмес `--gr-fg` 16% в `--gr-destructive`.",
-          "base": "--gr-destructive",
-          "amount": 84,
-          "mixWith": "--gr-fg"
         }
       ]
     },

@@ -2,10 +2,9 @@
   "name": "dark",
   "selectors": [
     "[data-theme='dark']",
-    ".theme-dark",
     ".dark"
   ],
-  "note": "Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит\n`useTheme`/`initThemeEarly`). Селекторы `.theme-dark` и `.dark` — DEPRECATED-алиасы\nдля обратной совместимости; в новом коде используйте `[data-theme]`.",
+  "note": "Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит\n`useTheme`/`initThemeEarly`). Селектор `.dark` оставлен для интеропа с\nclass-стратегией Tailwind/UnoCSS: приложение может уже переключать тему им.",
   "groups": [
     {
       "title": "Surface roles",
@@ -101,16 +100,6 @@
           "name": "--gr-accent-fg",
           "value": "#c7d2fe",
           "description": "Цвет текста поверх accent-подложек."
-        },
-        {
-          "name": "--gr-destructive",
-          "value": "#ef4444",
-          "description": "Цвет destructive action-сценариев и критических состояний."
-        },
-        {
-          "name": "--gr-destructive-fg",
-          "value": "#ffffff",
-          "description": "Контрастный текст и иконки поверх destructive-заливки."
         }
       ]
     },

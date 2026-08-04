@@ -5,7 +5,6 @@ import {
   applyGrAlertOverrides,
   GR_ALERT_VARIANTS,
   grAlertCssVars,
-  normalizeGrAlertVariant,
   resolveGrAlertColors,
 } from '../grAlertStyles'
 
@@ -53,12 +52,6 @@ describe('grAlertStyles', () => {
       bg: 'var(--gr-muted)',
       text: 'var(--gr-fg)',
     })
-  })
-
-  it('устаревший variant light нормализуется в soft', () => {
-    expect(normalizeGrAlertVariant('light')).toBe('soft')
-    expect(normalizeGrAlertVariant('soft')).toBe('soft')
-    expect(normalizeGrAlertVariant('outline')).toBe('outline')
   })
 
   it('textColor перекрывает весь текстовый слой целиком', () => {

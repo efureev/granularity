@@ -1,5 +1,5 @@
 import type { GrTone } from '../shared/tones'
-import type { GrAlertVariantInput } from './grAlertStyles'
+import type { GrAlertVariant } from './grAlertStyles'
 
 /**
  * Пропы `GrAlert`, настраиваемые глобально через
@@ -8,7 +8,7 @@ import type { GrAlertVariantInput } from './grAlertStyles'
  */
 export interface GrAlertConfigurableProps {
   tone: GrTone
-  variant: GrAlertVariantInput
+  variant: GrAlertVariant
   closable: boolean
 }
 

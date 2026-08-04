@@ -120,8 +120,6 @@
   --gr-secondary-active: color-mix(in srgb, var(--gr-secondary) 84%, var(--gr-fg));
   --gr-brd-hover: color-mix(in srgb, var(--gr-brd) 70%, var(--gr-fg));
   --gr-brd-active: color-mix(in srgb, var(--gr-brd) 55%, var(--gr-fg));
-  --gr-destructive-hover: color-mix(in srgb, var(--gr-destructive) 92%, var(--gr-fg));
-  --gr-destructive-active: color-mix(in srgb, var(--gr-destructive) 84%, var(--gr-fg));
 
   /* Derived interaction formulas: status roles */
   --gr-success-hover: color-mix(in srgb, var(--gr-success) 92%, var(--gr-fg));

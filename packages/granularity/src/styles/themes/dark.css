@@ -4,11 +4,10 @@
  */
 /*
  * Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит
- * `useTheme`/`initThemeEarly`). Селекторы `.theme-dark` и `.dark` — DEPRECATED-алиасы
- * для обратной совместимости; в новом коде используйте `[data-theme]`.
+ * `useTheme`/`initThemeEarly`). Селектор `.dark` оставлен для интеропа с
+ * class-стратегией Tailwind/UnoCSS: приложение может уже переключать тему им.
  */
 [data-theme='dark'],
-.theme-dark,
 .dark {
   /* Surface roles */
   --gr-bg: #0f172a;
@@ -44,8 +43,6 @@
   --gr-primary-fg: #0f172a;
   --gr-accent: #1e1b4b;
   --gr-accent-fg: #c7d2fe;
-  --gr-destructive: #ef4444;
-  --gr-destructive-fg: #ffffff;
 
   /* Status roles */
   --gr-success: #34d399;
@@ -93,7 +90,6 @@
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
   [data-theme='dark'],
-  .theme-dark,
   .dark {
     /* Action role fallbacks */
     --gr-primary-hover: #a494fa;
@@ -102,8 +98,6 @@
     --gr-secondary-active: #535f70;
     --gr-brd-hover: #6e7987;
     --gr-brd-active: #8c94a0;
-    --gr-destructive-hover: #f05353;
-    --gr-destructive-active: #f06161;
 
     /* Status role fallbacks */
     --gr-success-hover: #44d6a1;

@@ -54,9 +54,6 @@ function applyTheme(theme: ThemeName) {
   // Канон GR — атрибут `[data-theme]` на `<html>` (см. docs/styling.md → «Темизация»).
   // `useTheme`/`initThemeEarly` — единственный рантайм-API переключения темы.
   root.dataset.theme = theme
-  // Класс `.theme-dark` — deprecated-алиас для обратной совместимости; в новом коде
-  // ориентируйтесь на `[data-theme]`.
-  root.classList.toggle('theme-dark', theme === 'dark')
 }
 
 // Модульный shared-синглтон состояния темы: единый источник истины для ВСЕХ

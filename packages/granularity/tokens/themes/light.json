@@ -97,16 +97,6 @@
           "name": "--gr-accent-fg",
           "value": "#3730a3",
           "description": "Цвет текста поверх accent-подложек."
-        },
-        {
-          "name": "--gr-destructive",
-          "value": "#dc2626",
-          "description": "Цвет destructive action-сценариев и критических состояний."
-        },
-        {
-          "name": "--gr-destructive-fg",
-          "value": "#ffffff",
-          "description": "Контрастный текст и иконки поверх destructive-заливки."
         }
       ]
     },
