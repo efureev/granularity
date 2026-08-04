@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TValue extends GrAutocompleteValue = string">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
@@ -18,6 +18,7 @@ import {
   autocompleteShellClass,
   type GrAutocompleteModelValue,
   type GrAutocompleteOption,
+  type GrAutocompleteValue,
   type GrAutocompleteSize,
 } from './grAutocompleteStyles'
 
@@ -25,6 +26,7 @@ export type {
   GrAutocompleteModelValue,
   GrAutocompleteOption,
   GrAutocompleteSize,
+  GrAutocompleteValue,
 } from './grAutocompleteStyles'
 
 /**
@@ -36,15 +38,15 @@ export type {
  * удалённую (async) загрузку через событие `search` + внешний проп `loading`,
  * произвольные значения (`allowCustomValue`) и multiple с удаляемыми chips.
  */
-export interface GrAutocompleteProps {
+export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string> {
   /** Выбранное значение (single — строка, multiple — массив строк). */
-  modelValue: GrAutocompleteModelValue
+  modelValue: GrAutocompleteModelValue<TValue>
   /**
    * Доступные опции. Для локального режима — полный список (фильтруется на клиенте).
    * Для remote-режима (`filterable=false`) — список, который родитель обновляет
    * в ответ на событие `search`.
    */
-  options?: GrAutocompleteOption[]
+  options?: GrAutocompleteOption<TValue>[]
   multiple?: boolean
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
@@ -67,7 +69,7 @@ export interface GrAutocompleteProps {
    */
   filterable?: boolean
   /** Кастомный матчер локальной фильтрации. По умолчанию — подстрока в `label`/`value`. */
-  filter?: (option: GrAutocompleteOption, query: string) => boolean
+  filter?: (option: GrAutocompleteOption<TValue>, query: string) => boolean
   /** Минимальная длина запроса до эмита `search` (для дебаунса remote-загрузки). */
   minQueryLength?: number
   /** Задержка дебаунса события `search`, мс. */
@@ -85,7 +87,7 @@ export interface GrAutocompleteProps {
 }
 
 const props = withDefaults(
-  defineProps<GrAutocompleteProps>(),
+  defineProps<GrAutocompleteProps<TValue>>(),
   {
     options: undefined,
     multiple: false,
@@ -116,7 +118,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrAutoco
 const resolvedClearable = useGrComponentProp('GrAutocomplete', 'clearable', () => props.clearable, false)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrAutocompleteModelValue): void
+  (e: 'update:modelValue', value: GrAutocompleteModelValue<TValue>): void
   /** Дебаунснутый поисковый запрос — точка входа для удалённой загрузки опций. */
   (e: 'search', query: string): void
 }>()
@@ -136,28 +138,36 @@ const resolvedId = computed(() => field?.id.value)
 const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
-const optionsResolved = computed<GrAutocompleteOption[]>(() => props.options ?? [])
+const optionsResolved = computed<GrAutocompleteOption<TValue>[]>(() => props.options ?? [])
 
-function toArray(value: GrAutocompleteModelValue): string[] {
+/** `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy. */
+function isEmptyValue(value: unknown): boolean {
+  return value === undefined || value === null || value === ''
+}
+
+function toArray(value: GrAutocompleteModelValue<TValue>): TValue[] {
   if (Array.isArray(value)) return value
-  if (!value) return []
+  if (isEmptyValue(value)) return []
   return [value]
 }
 
-const modelSingle = computed(() => (Array.isArray(props.modelValue) ? (props.modelValue[0] ?? '') : props.modelValue))
-const selectedValues = computed(() => (props.multiple ? toArray(props.modelValue) : (modelSingle.value ? [modelSingle.value] : [])))
+const modelSingle = computed<TValue | ''>(() => {
+  const raw = Array.isArray(props.modelValue) ? props.modelValue[0] : props.modelValue
+  return isEmptyValue(raw) ? '' : (raw as TValue)
+})
+const selectedValues = computed(() => (props.multiple ? toArray(props.modelValue) : (isEmptyValue(modelSingle.value) ? [] : [modelSingle.value as TValue])))
 const hasSelection = computed(() => selectedValues.value.length > 0)
 
-function labelFor(value: string): string {
-  return optionsResolved.value.find(o => o.value === value)?.label ?? value
+function labelFor(value: GrAutocompleteValue): string {
+  return optionsResolved.value.find(o => o.value === value)?.label ?? String(value)
 }
 
 /** Опции выбранных значений (для chips в multiple). Неизвестные значения показываем как есть. */
-const selectedOptions = computed<GrAutocompleteOption[]>(() =>
-  selectedValues.value.map(v => optionsResolved.value.find(o => o.value === v) ?? { value: v, label: v }),
+const selectedOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
+  selectedValues.value.map(v => optionsResolved.value.find(o => o.value === v) ?? { value: v, label: String(v) }),
 )
 
-const singleSelectedLabel = computed(() => (props.multiple || !modelSingle.value ? '' : labelFor(modelSingle.value)))
+const singleSelectedLabel = computed(() => (props.multiple || isEmptyValue(modelSingle.value) ? '' : labelFor(modelSingle.value)))
 
 // ————— Состояние.
 const query = ref('')
@@ -199,25 +209,27 @@ const searchQuery = computed(() => {
   return query.value.trim()
 })
 
-function defaultFilter(option: GrAutocompleteOption, q: string): boolean {
+function defaultFilter(option: GrAutocompleteOption<TValue>, q: string): boolean {
   const needle = q.toLowerCase()
-  return option.label.toLowerCase().includes(needle) || option.value.toLowerCase().includes(needle)
+  return option.label.toLowerCase().includes(needle) || String(option.value).toLowerCase().includes(needle)
 }
 
-const filteredOptions = computed<GrAutocompleteOption[]>(() => {
+const filteredOptions = computed<GrAutocompleteOption<TValue>[]>(() => {
   const q = searchQuery.value
   if (!q) return optionsResolved.value
   const matcher = props.filter ?? defaultFilter
   return optionsResolved.value.filter(o => matcher(o, q))
 })
 
-const navigableValues = computed<string[]>(() =>
+const navigableValues = computed<TValue[]>(() =>
   filteredOptions.value.filter(o => !o.disabled).map(o => o.value),
 )
 
 const canAddCustom = computed(() => {
   if (!props.allowCustomValue) return false
-  const v = query.value.trim()
+  // Кастомное значение набирается текстом — оно строковое по природе;
+  // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
+  const v = query.value.trim() as TValue
   if (!v) return false
   if (props.multiple && selectedValues.value.includes(v)) return false
   if (!props.multiple && v === modelSingle.value) return false
@@ -235,7 +247,7 @@ const showEmpty = computed(() =>
 // ————— Панель: id/aria-activedescendant.
 const listboxId = useId()
 
-function optionDomId(value: string): string {
+function optionDomId(value: GrAutocompleteValue): string {
   return `${listboxId}-opt-${value}`
 }
 
@@ -244,7 +256,7 @@ const activeDescendantId = computed(() =>
   open.value && activeValue.value !== undefined ? optionDomId(activeValue.value) : undefined,
 )
 
-function isSelected(value: string): boolean {
+function isSelected(value: TValue): boolean {
   return selectedValues.value.includes(value)
 }
 
@@ -326,13 +338,13 @@ function setQuery(value: string): void {
 }
 
 // ————— Выбор значений.
-function selectSingle(value: string, label: string): void {
+function selectSingle(value: TValue, label: string): void {
   emit('update:modelValue', value)
   setQuery(label)
   closeDropdown()
 }
 
-function toggleMultiple(value: string): void {
+function toggleMultiple(value: TValue): void {
   const next = selectedValues.value.slice()
   const idx = next.indexOf(value)
   if (idx >= 0) next.splice(idx, 1)
@@ -343,20 +355,21 @@ function toggleMultiple(value: string): void {
   else void nextTick(focusInput)
 }
 
-function chooseOption(option: GrAutocompleteOption): void {
+function chooseOption(option: GrAutocompleteOption<TValue>): void {
   if (option.disabled) return
   if (props.multiple) toggleMultiple(option.value)
   else selectSingle(option.value, option.label)
 }
 
 function commitCustom(): void {
-  const v = query.value.trim()
+  // Кастомное значение строковое по природе — см. `canAddCustom`.
+  const v = query.value.trim() as TValue
   if (!v) return
   if (props.multiple) toggleMultiple(v)
-  else selectSingle(v, v)
+  else selectSingle(v, String(v))
 }
 
-function removeValue(value: string): void {
+function removeValue(value: TValue): void {
   const next = selectedValues.value.filter(v => v !== value)
   emit('update:modelValue', next)
   void nextTick(focusInput)
@@ -364,7 +377,7 @@ function removeValue(value: string): void {
 
 function clearSelection(): void {
   if (props.disabled) return
-  emit('update:modelValue', props.multiple ? [] : '')
+  emit('update:modelValue', (props.multiple ? [] : '') as GrAutocompleteModelValue<TValue>)
   setQuery('')
   void nextTick(focusInput)
 }

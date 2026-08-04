@@ -109,16 +109,15 @@
         "origin": "generated",
         "items": [
           {
-            "name": "filter",
-            "description": "Кастомный матчер локальной фильтрации. По умолчанию — подстрока в `label`/`value`.",
-            "type": "((option: GrAutocompleteOption, query: string) => boolean) | undefined",
-            "required": false,
-            "default": "undefined"
+            "name": "modelValue",
+            "description": "Выбранное значение (single — строка, multiple — массив строк).",
+            "type": "GrAutocompleteModelValue<TValue>",
+            "required": true
           },
           {
             "name": "options",
             "description": "Доступные опции. Для локального режима — полный список (фильтруется на клиенте). Для remote-режима (`filterable=false`) — список, который родитель обновляет в ответ на событие `search`.",
-            "type": "GrAutocompleteOption[] | undefined",
+            "type": "GrAutocompleteOption<TValue>[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -200,6 +199,13 @@
             "default": "true"
           },
           {
+            "name": "filter",
+            "description": "Кастомный матчер локальной фильтрации. По умолчанию — подстрока в `label`/`value`.",
+            "type": "((option: GrAutocompleteOption<TValue>, query: string) => boolean) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "minQueryLength",
             "description": "Минимальная длина запроса до эмита `search` (для дебаунса remote-загрузки).",
             "type": "number | undefined",
@@ -254,12 +260,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "modelValue",
-            "description": "Выбранное значение (single — строка, multiple — массив строк).",
-            "type": "GrAutocompleteModelValue",
-            "required": true
           }
         ]
       },
@@ -271,7 +271,7 @@
           {
             "name": "option",
             "description": "",
-            "type": "{ option: GrAutocompleteOption; selected: boolean; }"
+            "type": "{ option: GrAutocompleteOption<TValue>; selected: boolean; }"
           },
           {
             "name": "loading",
@@ -293,14 +293,14 @@
           {
             "name": "update:modelValue",
             "description": "",
-            "type": "[value: GrAutocompleteModelValue]",
-            "signature": "(event: \"update:modelValue\", value: GrAutocompleteModelValue): void"
+            "type": "[GrAutocompleteModelValue<TValue>]",
+            "signature": "(e: \"update:modelValue\", value: GrAutocompleteModelValue<TValue>): void"
           },
           {
             "name": "search",
-            "description": "",
-            "type": "[query: string]",
-            "signature": "(event: \"search\", query: string): void"
+            "description": "Дебаунснутый поисковый запрос — точка входа для удалённой загрузки опций.",
+            "type": "[string]",
+            "signature": "(e: \"search\", query: string): void"
           }
         ]
       },
@@ -308,18 +308,7 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": [
-          {
-            "name": "focus",
-            "description": "",
-            "type": "() => void"
-          },
-          {
-            "name": "blur",
-            "description": "",
-            "type": "() => void"
-          }
-        ]
+        "items": []
       }
     ]
   },
@@ -5437,25 +5426,17 @@
         "origin": "generated",
         "items": [
           {
-            "name": "variant",
-            "description": "Цвет/вариант ссылки для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
-            "type": "GrSelectVariant | undefined",
-            "required": false,
-            "default": "undefined"
+            "name": "modelValue",
+            "description": "",
+            "type": "GrSelectModelValue<TValue>",
+            "required": true
           },
           {
             "name": "options",
             "description": "Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`).",
-            "type": "GrSelectOptionOrGroup[] | undefined",
+            "type": "GrSelectOptionOrGroup<TValue>[] | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "multiple",
-            "description": "Multiple selection.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "disabled",
@@ -5486,6 +5467,20 @@
             "default": "false"
           },
           {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "view",
+            "description": "",
+            "type": "GrSelectView | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
@@ -5500,22 +5495,22 @@
             "default": "undefined"
           },
           {
-            "name": "ariaLabel",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "clearable",
-            "description": "Разрешает очистку выбранного значения.",
+            "name": "multiple",
+            "description": "Multiple selection.",
             "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "false"
           },
           {
-            "name": "loading",
-            "description": "Состояние загрузки: вместо списка опций панель показывает индикатор загрузки. Полезно для удалённой подгрузки опций. Форсит `optionsView=\"panel\"`.",
+            "name": "optionsView",
+            "description": "Как отображать список опций: нативный `<select>` или кастомная панель.",
+            "type": "GrSelectOptionsView | undefined",
+            "required": false,
+            "default": "\"native\""
+          },
+          {
+            "name": "allowCustomValue",
+            "description": "Разрешает ввод/выбор значения, которого нет в `options`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -5528,25 +5523,18 @@
             "default": "false"
           },
           {
-            "name": "allowCustomValue",
-            "description": "Разрешает ввод/выбор значения, которого нет в `options`.",
+            "name": "filterPlaceholder",
+            "description": "Placeholder поля поиска (`filterable`). i18n: fallback `gr.select.searchPlaceholder`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Состояние загрузки: вместо списка опций панель показывает индикатор загрузки. Полезно для удалённой подгрузки опций. Форсит `optionsView=\"panel\"`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "closeOnSelect",
-            "description": "Закрывать панель после выбора (только в `optionsView=\"panel\"`).",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "dropdownMaxHeight",
-            "description": "Максимальная высота панели (только в `optionsView=\"panel\"`).",
-            "type": "number | undefined",
-            "required": false,
-            "default": "280"
           },
           {
             "name": "loadingText",
@@ -5558,41 +5546,6 @@
           {
             "name": "noResultsText",
             "description": "Текст пустого результата фильтрации. i18n: fallback `gr.select.noResults`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "clearLabel",
-            "description": "i18n-label для кнопки очистки (`aria-label`).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "underline",
-            "description": "Подчёркивание для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
-            "type": "GrSelectUnderline | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "view",
-            "description": "",
-            "type": "GrSelectView | undefined",
-            "required": false,
-            "default": "\"default\""
-          },
-          {
-            "name": "optionsView",
-            "description": "Как отображать список опций: нативный `<select>` или кастомная панель.",
-            "type": "GrSelectOptionsView | undefined",
-            "required": false,
-            "default": "\"native\""
-          },
-          {
-            "name": "filterPlaceholder",
-            "description": "Placeholder поля поиска (`filterable`). i18n: fallback `gr.select.searchPlaceholder`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5612,10 +5565,46 @@
             "default": "undefined"
           },
           {
-            "name": "modelValue",
-            "description": "",
-            "type": "GrSelectModelValue",
-            "required": true
+            "name": "dropdownMaxHeight",
+            "description": "Максимальная высота панели (только в `optionsView=\"panel\"`).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "280"
+          },
+          {
+            "name": "closeOnSelect",
+            "description": "Закрывать панель после выбора (только в `optionsView=\"panel\"`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "clearable",
+            "description": "Разрешает очистку выбранного значения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearLabel",
+            "description": "i18n-label для кнопки очистки (`aria-label`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "variant",
+            "description": "Цвет/вариант ссылки для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
+            "type": "GrSelectVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "underline",
+            "description": "Подчёркивание для `view=\"link\"` (аналогично `GrLink`). В `view=\"default\"` не используется.",
+            "type": "GrSelectUnderline | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -5632,12 +5621,12 @@
           {
             "name": "value",
             "description": "",
-            "type": "{ selectedOptions: GrSelectOption[]; selectedValues: string[]; displayLabel: string; placeholder: string | undefined; hasSelection: boolean; }"
+            "type": "{ selectedOptions: GrSelectOption<TValue>[]; selectedValues: TValue[]; displayLabel: string | TValue; placeholder: string | undefined; hasSelection: boolean; }"
           },
           {
             "name": "option",
             "description": "",
-            "type": "{ option: GrSelectOption; selected: boolean; }"
+            "type": "{ option: GrSelectOption<TValue>; selected: boolean; }"
           }
         ]
       },
@@ -5649,8 +5638,8 @@
           {
             "name": "update:modelValue",
             "description": "",
-            "type": "[value: GrSelectModelValue]",
-            "signature": "(event: \"update:modelValue\", value: GrSelectModelValue): void"
+            "type": "[GrSelectModelValue<TValue>]",
+            "signature": "(e: \"update:modelValue\", value: GrSelectModelValue<TValue>): void"
           }
         ]
       },
@@ -5658,18 +5647,7 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": [
-          {
-            "name": "focus",
-            "description": "",
-            "type": "() => void"
-          },
-          {
-            "name": "blur",
-            "description": "",
-            "type": "() => void"
-          }
-        ]
+        "items": []
       }
     ]
   },

@@ -1,9 +1,19 @@
 import type { GrComponentSize } from '../shared/sizes'
 
 export type GrAutocompleteSize = GrComponentSize
-/** Опция автокомплита. Значение и метка — строки (как у `GrSelect`). */
-export type GrAutocompleteOption = { value: string, label: string, disabled?: boolean }
-export type GrAutocompleteModelValue = string | string[]
+/**
+ * Тип значения опции — те же примитивы, что у `GrSelect`: значение должно
+ * однозначно восстанавливаться из строкового представления.
+ */
+export type GrAutocompleteValue = string | number
+
+/** Опция автокомплита. Метка — строка, значение параметризуется. */
+export type GrAutocompleteOption<TValue extends GrAutocompleteValue = string> = {
+  value: TValue
+  label: string
+  disabled?: boolean
+}
+export type GrAutocompleteModelValue<TValue extends GrAutocompleteValue = string> = TValue | TValue[]
 
 /**
  * Оболочка (визуально повторяет `GrInput`): бордер + focus-ring по `focus-within`,

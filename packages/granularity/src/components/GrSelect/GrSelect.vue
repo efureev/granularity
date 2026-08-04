@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TValue extends GrSelectValue = string">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
@@ -22,6 +22,7 @@ import {
   grSelectTriggerClass,
   linkBaseClass,
   type GrSelectModelValue,
+  type GrSelectValue,
   type GrSelectOption,
   type GrSelectOptionGroup,
   type GrSelectOptionOrGroup,
@@ -40,6 +41,7 @@ export type {
   GrSelectOptionsView,
   GrSelectSize,
   GrSelectUnderline,
+  GrSelectValue,
   GrSelectVariant,
   GrSelectView,
 } from './grSelectStyles'
@@ -47,10 +49,10 @@ export type {
 /**
  * Пропсы публичного GR-примитива «Select».
  */
-export interface GrSelectProps {
-  modelValue: GrSelectModelValue
+export interface GrSelectProps<TValue extends GrSelectValue = string> {
+  modelValue: GrSelectModelValue<TValue>
   /** Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`). */
-  options?: GrSelectOptionOrGroup[]
+  options?: GrSelectOptionOrGroup<TValue>[]
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не меняется. */
   readonly?: boolean
@@ -114,7 +116,7 @@ export interface GrSelectProps {
 }
 
 const props = withDefaults(
-  defineProps<GrSelectProps>(),
+  defineProps<GrSelectProps<TValue>>(),
   {
     options: undefined,
     disabled: false,
@@ -172,7 +174,7 @@ const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : def
 const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full')
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrSelectModelValue): void
+  (e: 'update:modelValue', value: GrSelectModelValue<TValue>): void
 }>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required)
@@ -196,15 +198,15 @@ function blur(): void {
 defineExpose({ focus, blur })
 const describedBy = computed(() => field?.describedById.value)
 
-const optionsResolved = computed<GrSelectOptionOrGroup[]>(() => props.options ?? [])
+const optionsResolved = computed<GrSelectOptionOrGroup<TValue>[]>(() => props.options ?? [])
 
-function isOptionGroup(item: GrSelectOptionOrGroup): item is GrSelectOptionGroup {
+function isOptionGroup(item: GrSelectOptionOrGroup<TValue>): item is GrSelectOptionGroup<TValue> {
   return Array.isArray((item as GrSelectOptionGroup).options)
 }
 
 /** Плоский список всех опций (группы «развёрнуты»). Используется для всех вычислений по значениям. */
-const flatOptions = computed<GrSelectOption[]>(() => {
-  const result: GrSelectOption[] = []
+const flatOptions = computed<GrSelectOption<TValue>[]>(() => {
+  const result: GrSelectOption<TValue>[] = []
   for (const item of optionsResolved.value) {
     if (isOptionGroup(item)) result.push(...item.options)
     else result.push(item)
@@ -212,27 +214,55 @@ const flatOptions = computed<GrSelectOption[]>(() => {
   return result
 })
 
-function modelToArray(value: GrSelectModelValue): string[] {
+/**
+ * `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy:
+ * прежняя проверка `if (!value)` теряла ноль вместе с пустой строкой.
+ */
+function isEmptyValue(value: unknown): boolean {
+  return value === undefined || value === null || value === ''
+}
+
+function modelToArray(value: GrSelectModelValue<TValue>): TValue[] {
   if (Array.isArray(value)) return value
-  if (!value) return []
+  if (isEmptyValue(value)) return []
   return [value]
 }
 
-const modelSingle = computed(() => {
-  return Array.isArray(props.modelValue) ? (props.modelValue[0] ?? '') : props.modelValue
+const modelSingle = computed<TValue | ''>(() => {
+  const raw = Array.isArray(props.modelValue) ? props.modelValue[0] : props.modelValue
+  return isEmptyValue(raw) ? '' : (raw as TValue)
 })
 
 const modelMultiple = computed(() => modelToArray(props.modelValue))
 
 const selectedValues = computed(() => {
-  return props.multiple ? modelMultiple.value : (modelSingle.value ? [modelSingle.value] : [])
+  return props.multiple ? modelMultiple.value : (isEmptyValue(modelSingle.value) ? [] : [modelSingle.value as TValue])
 })
 
 const hasSelection = computed(() => selectedValues.value.length > 0)
 
-const selectedOptions = computed<GrSelectOption[]>(() => {
+/**
+ * Нативный `<select>` хранит в `option.value` строку, поэтому значение,
+ * вернувшееся из DOM, нужно восстановить в исходный тип. Карта строится по
+ * опциям: `String(value)` — ключ, само значение — результат.
+ */
+const valueByDomKey = computed<Map<string, TValue>>(() => {
+  const map = new Map<string, TValue>()
+  for (const option of flatOptions.value) map.set(String(option.value), option.value)
+  return map
+})
+
+/** Восстанавливает типизированное значение из строки, пришедшей из DOM. */
+function fromDomValue(raw: string): TValue {
+  const known = valueByDomKey.value.get(raw)
+  if (known !== undefined) return known
+  // Значения нет среди опций — это `allowCustomValue`, а он по природе строковый.
+  return raw as TValue
+}
+
+const selectedOptions = computed<GrSelectOption<TValue>[]>(() => {
   const byValue = new Map(flatOptions.value.map(o => [o.value, o]))
-  return selectedValues.value.map((v) => byValue.get(v) ?? { value: v, label: v })
+  return selectedValues.value.map(v => byValue.get(v) ?? { value: v, label: String(v) })
 })
 
 const hasModelInOptions = computed(() => {
@@ -327,26 +357,26 @@ const panelClasses = computed(() => {
   return grSelectPanelClasses
 })
 
-function matchesQuery(option: GrSelectOption, query: string): boolean {
+function matchesQuery(option: GrSelectOption<TValue>, query: string): boolean {
   if (!query) return true
-  return option.label.toLowerCase().includes(query) || option.value.toLowerCase().includes(query)
+  return option.label.toLowerCase().includes(query) || String(option.value).toLowerCase().includes(query)
 }
 
 /**
  * Элемент рендера панели: либо заголовок группы, либо опция.
  * Группировка сохраняется, фильтрация по `customValue` скрывает пустые группы.
  */
-type GrSelectPanelItem =
+type GrSelectPanelItem<TItemValue extends GrSelectValue> =
   | { kind: 'group', label: string, key: string }
-  | { kind: 'option', option: GrSelectOption, key: string }
+  | { kind: 'option', option: GrSelectOption<TItemValue>, key: string }
 
-const panelItems = computed<GrSelectPanelItem[]>(() => {
+const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
   const q = (props.allowCustomValue || props.filterable) ? customValue.value.trim().toLowerCase() : ''
-  const items: GrSelectPanelItem[] = []
+  const items: GrSelectPanelItem<TValue>[] = []
 
   // Опция для кастомного значения, которого нет в options (single).
   if (props.allowCustomValue && !props.multiple && modelSingle.value !== '' && !hasModelInOptions.value) {
-    const custom: GrSelectOption = { value: modelSingle.value, label: modelSingle.value }
+    const custom: GrSelectOption<TValue> = { value: modelSingle.value as TValue, label: String(modelSingle.value) }
     if (matchesQuery(custom, q)) {
       items.push({ kind: 'option', option: custom, key: `__custom__${custom.value}` })
     }
@@ -375,7 +405,9 @@ const panelItems = computed<GrSelectPanelItem[]>(() => {
 const canAddCustom = computed(() => {
   if (!props.allowCustomValue) return false
   if (effectiveOptionsView.value !== 'panel') return false
-  const v = customValue.value.trim()
+  // Кастомное значение набирается текстом, поэтому оно строковое —
+  // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
+  const v = customValue.value.trim() as TValue
   if (!v) return false
 
   if (props.multiple) {
@@ -387,26 +419,26 @@ const canAddCustom = computed(() => {
   return !flatOptions.value.some((o) => o.value === v)
 })
 
-function emitValue(value: GrSelectModelValue): void {
+function emitValue(value: GrSelectModelValue<TValue>): void {
   emit('update:modelValue', value)
 }
 
-function isSelected(value: string): boolean {
+function isSelected(value: TValue): boolean {
   return selectedValues.value.includes(value)
 }
 
-function isOptionDisabled(value: string): boolean {
+function isOptionDisabled(value: TValue): boolean {
   return flatOptions.value.find(o => o.value === value)?.disabled === true
 }
 
-function selectValue(value: string): void {
+function selectValue(value: TValue): void {
   emitValue(value)
   if (props.closeOnSelect) {
     closeDropdown()
   }
 }
 
-function toggleValue(value: string): void {
+function toggleValue(value: TValue): void {
   if (isOptionDisabled(value)) return
 
   if (!props.multiple) {
@@ -430,19 +462,21 @@ function toggleValue(value: string): void {
 }
 
 function addCustom(): void {
-  const v = customValue.value.trim()
+  // Кастомное значение набирается текстом, поэтому оно строковое —
+  // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
+  const v = customValue.value.trim() as TValue
   if (!v) return
   toggleValue(v)
 }
 
 // Удаление одного значения из multiple-выбора (клик по «×» на chip).
-function removeValue(value: string): void {
+function removeValue(value: TValue): void {
   if (props.disabled) return
   if (!props.multiple) return
   emitValue(selectedValues.value.filter(v => v !== value))
 }
 
-function tagRemoveLabel(option: GrSelectOption): string {
+function tagRemoveLabel(option: GrSelectOption<TValue>): string {
   return t('gr.select.removeTag', 'Remove {label}', { label: option.label })
 }
 
@@ -450,14 +484,14 @@ function tagRemoveLabel(option: GrSelectOption): string {
 const listboxId = useId()
 const activeIndex = ref(-1)
 
-function optionDomId(value: string): string {
+function optionDomId(value: GrSelectValue): string {
   return `${listboxId}-opt-${value}`
 }
 
 // Навигируемые (видимые, не-disabled) опции панели в порядке рендера.
-const navigableValues = computed<string[]>(() =>
+const navigableValues = computed<TValue[]>(() =>
   panelItems.value
-    .filter((item): item is Extract<GrSelectPanelItem, { kind: 'option' }> => item.kind === 'option' && !item.option.disabled)
+    .filter((item): item is Extract<GrSelectPanelItem<TValue>, { kind: 'option' }> => item.kind === 'option' && !item.option.disabled)
     .map(item => item.option.value),
 )
 
@@ -637,17 +671,17 @@ function onChange(e: Event): void {
   const el = e.target as HTMLSelectElement
 
   if (props.multiple) {
-    const values = Array.from(el.selectedOptions, o => o.value)
-    emit('update:modelValue', values)
+    emit('update:modelValue', Array.from(el.selectedOptions, o => fromDomValue(o.value)))
     return
   }
 
-  emit('update:modelValue', el.value)
+  // Пустая строка — это «очистить», а не значение: восстанавливать её не нужно.
+  emit('update:modelValue', (el.value === '' ? '' : fromDomValue(el.value)) as TValue)
 }
 
 function clearSelection(): void {
   if (props.disabled) return
-  emitValue(props.multiple ? [] : '')
+  emitValue((props.multiple ? [] : '') as GrSelectModelValue<TValue>)
 }
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский

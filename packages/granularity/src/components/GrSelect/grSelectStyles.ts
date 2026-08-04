@@ -5,12 +5,29 @@ export type GrSelectSize = GrComponentSize
 export type GrSelectVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type GrSelectUnderline = 'auto' | 'always' | 'none'
 export type GrSelectOptionsView = 'native' | 'panel'
-export type GrSelectOption = { value: string, label: string, disabled?: boolean }
+/**
+ * Тип значения опции. Ограничен примитивами, которые переживают путь через DOM:
+ * нативный `<select>` хранит в `option.value` только строку, поэтому значение
+ * должно однозначно восстанавливаться из своего строкового представления.
+ * Объектные модели потребовали бы отдельного key-экстрактора — см. `docs/components.md`.
+ */
+export type GrSelectValue = string | number
+
+export type GrSelectOption<TValue extends GrSelectValue = string> = {
+  value: TValue
+  label: string
+  disabled?: boolean
+}
 /** Группа опций: заголовок `label` + вложенные опции `options`. */
-export type GrSelectOptionGroup = { label: string, options: GrSelectOption[] }
+export type GrSelectOptionGroup<TValue extends GrSelectValue = string> = {
+  label: string
+  options: GrSelectOption<TValue>[]
+}
 /** Элемент списка опций: либо одиночная опция, либо группа опций. */
-export type GrSelectOptionOrGroup = GrSelectOption | GrSelectOptionGroup
-export type GrSelectModelValue = string | string[]
+export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string> =
+  | GrSelectOption<TValue>
+  | GrSelectOptionGroup<TValue>
+export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
 export const defaultBaseClass = 'w-full rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'

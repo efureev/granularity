@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **`GrSelect` and `GrAutocomplete` are generic over their value.** `GrSelectModelValue` and
+  `GrAutocompleteModelValue` used to be `string | string[]`, so a numeric id — the common case —
+  required `String(id)` on the way in and back. Now:
+
+  ```vue
+  <GrSelect v-model="userId" :options="users" />   <!-- userId: number -->
+  ```
+
+  The string case is unchanged and needs no type argument (`TValue` defaults to `string`), so
+  existing code keeps compiling. Two defects surfaced and were fixed along the way:
+
+  - the native `<select>` carries only strings in the DOM, so `@change` emitted `"42"` instead of
+    `42` — the value is now decoded back through the option list;
+  - emptiness was tested with a falsy check, so `0` counted as "nothing selected". It is now an
+    explicit `undefined | null | ''` test.
+
+  Values are constrained to `string | number` (`GrSelectValue`): they must survive the round trip
+  through a DOM string. Object models would need a key extractor and are out of scope. Custom values
+  (`allowCustomValue`) are typed text and therefore stay strings.
+
 - **One `size` scale for the whole package.** There were five incompatible ones, so
   `<GrConfigProvider size="xs">` could not apply to half the package and `size="xl"` compiled
   against one component and failed against its neighbour. Now:
