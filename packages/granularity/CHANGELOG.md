@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **`GrDataTable`'s `sort-change` event is now `sortChange`.** It was the only kebab-case emit in the
+  package against seven camelCase ones (`visibleChange`, `nodeClick`, `stateChange`, …), so in a
+  template the two read as different kinds of event and the IDE offered no help.
+
+  **Template listeners keep working**: `@sort-change` compiles to the `onSortChange` prop, which both
+  spellings resolve to. Only a literal `onSort-change` prop in a render function breaks. For the same
+  reason there is deliberately **no transitional double emit** — emitting both names would resolve to
+  the same handler and call it twice.
+
+  A gate (`src/__tests__/emitNaming.test.ts`) fails on any new kebab-case emit.
+
 - **`GrSelect` and `GrAutocomplete` are generic over their value.** `GrSelectModelValue` and
   `GrAutocompleteModelValue` used to be `string | string[]`, so a numeric id — the common case —
   required `String(id)` on the way in and back. Now:

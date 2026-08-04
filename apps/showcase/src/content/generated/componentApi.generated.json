@@ -1459,7 +1459,7 @@
           },
           {
             "name": "externalSort",
-            "description": "Внешняя сортировка (например серверная): компонент НЕ сортирует `rows` сам, а только сообщает о смене через `update:sortKey`/`update:sortDir`/ `sort-change`. `rows` при этом должны приходить уже отсортированными.",
+            "description": "Внешняя сортировка (например серверная): компонент НЕ сортирует `rows` сам, а только сообщает о смене через `update:sortKey`/`update:sortDir`/ `sortChange`. `rows` при этом должны приходить уже отсортированными.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -1583,10 +1583,10 @@
             "signature": "(e: \"update:sortDir\", value: \"asc\" | \"desc\"): void"
           },
           {
-            "name": "sort-change",
+            "name": "sortChange",
             "description": "",
             "type": "[{ key: string; dir: \"asc\" | \"desc\"; }]",
-            "signature": "(e: \"sort-change\", value: { key: string; dir: \"asc\" | \"desc\"; }): void"
+            "signature": "(e: \"sortChange\", value: { key: string; dir: \"asc\" | \"desc\"; }): void"
           },
           {
             "name": "update:selected",

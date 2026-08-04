@@ -37,7 +37,7 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   /**
    * Внешняя сортировка (например серверная): компонент НЕ сортирует `rows`
    * сам, а только сообщает о смене через `update:sortKey`/`update:sortDir`/
-   * `sort-change`. `rows` при этом должны приходить уже отсортированными.
+   * `sortChange`. `rows` при этом должны приходить уже отсортированными.
    */
   externalSort?: boolean
   /**
@@ -96,7 +96,7 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
 const emit = defineEmits<{
   (e: 'update:sortKey', value: string): void
   (e: 'update:sortDir', value: 'asc' | 'desc'): void
-  (e: 'sort-change', value: { key: string, dir: 'asc' | 'desc' }): void
+  (e: 'sortChange', value: { key: string, dir: 'asc' | 'desc' }): void
   (e: 'update:selected', value: Array<string | number>): void
 }>()
 
@@ -121,10 +121,7 @@ function applySort(key: string, dir: 'asc' | 'desc'): void {
 
   emit('update:sortKey', key)
   emit('update:sortDir', dir)
-  // Имя эмита — часть публичного API; приведение к camelCase запланировано
-  // одним проходом по пакету как ломающее изменение до 1.0.
-  // eslint-disable-next-line vue/custom-event-name-casing
-  emit('sort-change', { key, dir })
+  emit('sortChange', { key, dir })
 }
 
 const sortedRows = computed(() => {

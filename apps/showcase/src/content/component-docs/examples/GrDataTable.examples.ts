@@ -4,7 +4,7 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'data-table-controlled-sort',
     title: 'Controlled / external sort',
-    description: 'Управляемая сортировка через `v-model:sortKey` / `v-model:sortDir` + событие `@sort-change`. С `external-sort` таблица не сортирует `rows` сама — данные приходят уже отсортированными (серверная сортировка, синхронизация с URL).',
+    description: 'Управляемая сортировка через `v-model:sortKey` / `v-model:sortDir` + событие `@sortChange`. С `external-sort` таблица не сортирует `rows` сама — данные приходят уже отсортированными (серверная сортировка, синхронизация с URL).',
     status: 'ready',
     previewKey: 'gr-data-table-controlled-sort',
     code: `<script setup lang="ts">
@@ -44,7 +44,7 @@ const sortedRows = computed(() => {
     :columns="columns"
     row-key="id"
     external-sort
-    @sort-change="(e) => console.log(e.key, e.dir)"
+    @sortChange="(e) => console.log(e.key, e.dir)"
   />
 </template>`,
     note: 'Контролируемый режим нужен для серверной сортировки и синхронизации состояния с URL; без пропов `sortKey`/`sortDir` таблица работает в uncontrolled-режиме как прежде.',

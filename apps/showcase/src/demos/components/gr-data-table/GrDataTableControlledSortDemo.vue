@@ -47,7 +47,7 @@ function onSortChange(event: { key: string, dir: 'asc' | 'desc' }) {
     <div class="flex flex-wrap items-center gap-2 text-sm">
       <span class="showcase-demo-text opacity-70">Controlled sort:</span>
       <GrBadge tone="primary">{{ sortKey }} · {{ sortDir }}</GrBadge>
-      <span v-if="lastChange" class="showcase-demo-text opacity-70">@sort-change: {{ lastChange }}</span>
+      <span v-if="lastChange" class="showcase-demo-text opacity-70">@sortChange: {{ lastChange }}</span>
     </div>
 
     <GrDataTable
@@ -57,7 +57,7 @@ function onSortChange(event: { key: string, dir: 'asc' | 'desc' }) {
       :columns="columns"
       row-key="id"
       external-sort
-      @sort-change="onSortChange"
+      @sortChange="onSortChange"
     />
   </div>
 </template>
