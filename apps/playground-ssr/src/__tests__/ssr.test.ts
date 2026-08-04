@@ -24,6 +24,18 @@ describe('серверный рендер', () => {
     await expect(render()).resolves.toBeDefined()
   })
 
+  it('серверное окружение остаётся без браузерных глобалов', () => {
+    // Стенд ловит браузерный API в `setup()` ровно до тех пор, пока сервер
+    // действительно «не браузер». `test/setup-dom.ts` добирает недостающее для
+    // jsdom и обязан молчать здесь: `setupFiles` выполняется и для этого файла
+    // тоже. Определись там хоть один браузерный глобал — гарды вида
+    // `typeof ResizeObserver === 'undefined'` увели бы код в клиентскую ветку
+    // прямо во время серверного рендера, и стенд перестал бы что-либо ловить.
+    expect(typeof window).toBe('undefined')
+    expect(typeof document).toBe('undefined')
+    expect(typeof ResizeObserver).toBe('undefined')
+  })
+
   it('изоморфные компоненты приходят в серверном HTML целиком', async () => {
     const { html } = await render()
 

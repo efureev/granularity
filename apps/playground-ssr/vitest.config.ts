@@ -11,6 +11,9 @@ export default defineConfig({
     // Снимок серверного HTML делается в настоящем Node (без jsdom) — иначе
     // гарды `typeof window === 'undefined'` считают себя клиентом.
     globalSetup: ['./test/ssr-snapshot.ts'],
+    // Добирает то, чего нет в jsdom. Сам файл ничего не делает в
+    // `environment: 'node'` — см. комментарий внутри.
+    setupFiles: ['./test/setup-dom.ts'],
     server: {
       deps: {
         // Пакет собран с `libInjectCss`: его чанки импортируют `.css`, чего
