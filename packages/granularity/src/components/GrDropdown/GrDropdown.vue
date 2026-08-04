@@ -5,7 +5,7 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
-import { useDismissible } from '../../composables/useDismissible'
+import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import {
   grDropdownContentClass,
   grDropdownOriginClass,
@@ -42,9 +42,6 @@ const clickOutsideExclude = [() => panelEl.value]
 
 const panelId = useId()
 
-// Элемент триггера, которому вернём фокус при закрытии (клавиатурный сценарий).
-let triggerFocusEl: HTMLElement | null = null
-
 // Фокусируемые пункты панели для клавиатурной навигации (roving-фокус).
 function panelItems(): HTMLElement[] {
   const root = panelEl.value
@@ -63,16 +60,9 @@ function focusItemAt(index: number): void {
 }
 
 async function openWithFocus(first: boolean): Promise<void> {
-  triggerFocusEl = (document.activeElement as HTMLElement) ?? null
   open.value = true
   await nextTick()
   focusItemAt(first ? 0 : -1)
-}
-
-function returnFocusToTrigger(): void {
-  const target = triggerFocusEl
-  triggerFocusEl = null
-  target?.focus?.()
 }
 
 /**
@@ -159,14 +149,14 @@ function toggle(): void {
 }
 
 function close(): void {
-  const wasOpen = open.value
   open.value = false
-  // Возвращаем фокус на триггер только если панель была открыта с клавиатуры.
-  if (wasOpen)
-    returnFocusToTrigger()
 }
 
-useDismissible(open, close)
+// Возврат фокуса — из контракта слоя: он запоминает активный элемент при
+// открытии и возвращает фокус, только если на момент закрытия тот всё ещё
+// внутри панели. Прежняя эвристика «возвращать, если открыли с клавиатуры»
+// промахивалась в обе стороны.
+useOverlayLayer(open, close, { root: panelEl })
 
 watch(
   () => props.align,

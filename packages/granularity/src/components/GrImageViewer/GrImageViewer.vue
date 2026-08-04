@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
-import { useDismissible } from '../../composables/useDismissible'
+import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -301,10 +301,20 @@ const { onKeydown } = useViewerKeyboard({
 })
 
 // Esc — через общий стек слоёв: просмотрщик поверх модалки обязан закрывать себя.
-useDismissible(
+// Просмотрщик — модальный класс: бэкдроп, scroll-lock, фокус-ловушка HeadlessUI.
+// Значит он и участвует в вычислении `inert` наравне с модалками и drawer'ом.
+const isTopmost = ref(true)
+const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : undefined))
+
+useOverlayLayer(
   computed(() => props.modelValue),
   closeViewer,
-  { closeOnEscape: () => props.closeOnPressEscape },
+  {
+    modal: true,
+    closeOnEscape: () => props.closeOnPressEscape,
+    onTopmostChange: (value) => { isTopmost.value = value },
+    restoreFocus: false,
+  },
 )
 
 watch(
@@ -374,6 +384,7 @@ onBeforeUnmount(() => {
     <TransitionRoot :show="open" as="template">
       <Dialog
         as="div"
+        :inert="inertAttr"
         class="fixed inset-0"
         :style="viewerStyle"
         role="dialog"

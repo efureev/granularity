@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 import { resetScrollLock } from '../../../composables/internal/useScrollLock'
 
 vi.mock('@headlessui/vue', async () => {
@@ -21,7 +22,10 @@ vi.mock('@headlessui/vue', async () => {
 
 import GrImageViewer from '../GrImageViewer.vue'
 
-afterEach(() => resetScrollLock())
+afterEach(() => {
+  resetScrollLock()
+  resetOverlayStack()
+})
 
 function mountViewer(extra: Record<string, unknown> = {}) {
   const Harness = defineComponent({
@@ -38,6 +42,19 @@ function mountViewer(extra: Record<string, unknown> = {}) {
 }
 
 describe('GrImageViewer (decomposed)', () => {
+
+  it('помечает корень inert, когда поверх открыт другой модальный слой', async () => {
+    const wrapper = mountViewer()
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBeUndefined()
+
+    pushOverlayLayer({ modal: true, shouldClose: () => true, close: () => {} })
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBe('')
+
+    wrapper.unmount()
+  })
   it('renders the current image, progress and zoom value', () => {
     const wrapper = mountViewer()
     expect(wrapper.find('[data-gr-image-viewer-image]').attributes('src')).toBe('/a.jpg')

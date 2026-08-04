@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
@@ -7,9 +7,9 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-// Общий стек dismissible-слоёв (Esc закрывает верхний оверлей независимо от
-// дерева рендера) и reference-counted scroll-lock.
-import { pushDismissLayer, removeDismissLayer } from '../../composables/internal/dismissStack'
+// Единый стек слоёв: Esc верхнему, `inert` нижним модалкам. Drawer — модальный
+// класс (бэкдроп + scroll-lock), поэтому регистрируется как `modal`.
+import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
 import {
   grDrawerPanelClass,
@@ -86,32 +86,29 @@ function onOverlayClick(): void {
 // ————— Esc через общий стек оверлеев + scroll-lock, синхронно с открытием.
 const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
-let escEntryId: number | null = null
+const isTopmost = ref(true)
+// Нижние модальные слои уходят в `inert`, освобождая фокус верхнему.
+const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : undefined))
 
-function registerEsc(): void {
-  if (escEntryId !== null) return
-  escEntryId = pushDismissLayer({
-    shouldClose: () => props.closeOnEsc,
-    close,
-  })
-}
-
-function unregisterEsc(): void {
-  if (escEntryId === null) return
-  removeDismissLayer(escEntryId)
-  escEntryId = null
-}
+useOverlayLayer(
+  computed(() => props.modelValue),
+  close,
+  {
+    modal: true,
+    closeOnEscape: () => props.closeOnEsc,
+    onTopmostChange: (value) => { isTopmost.value = value },
+    restoreFocus: false,
+  },
+)
 
 watch(
   () => props.modelValue,
   (value) => {
     if (value) {
       lockBodyScroll()
-      registerEsc()
     }
     else {
       unlockBodyScroll()
-      unregisterEsc()
     }
   },
   { immediate: true },
@@ -119,7 +116,6 @@ watch(
 
 onBeforeUnmount(() => {
   unlockBodyScroll()
-  unregisterEsc()
 })
 </script>
 
@@ -131,6 +127,7 @@ onBeforeUnmount(() => {
         data-gr-drawer
         class="fixed inset-0 z-50"
         :static="true"
+        :inert="inertAttr"
         :aria-labelledby="titleId"
         @close="onDialogClose"
       >

@@ -1,7 +1,6 @@
 import type { Ref } from 'vue'
-import { onUnmounted, watch } from 'vue'
 
-import { pushDismissLayer, removeDismissLayer } from './internal/dismissStack'
+import { useOverlayLayer } from './useOverlayLayer'
 
 export interface UseDismissibleOptions {
   /**
@@ -39,30 +38,12 @@ export function useDismissible(
   onDismiss: () => void,
   options: UseDismissibleOptions = {},
 ): void {
-  let layerId: number | null = null
-
-  function register(): void {
-    if (layerId !== null) return
-    layerId = pushDismissLayer({
-      shouldClose: () => options.closeOnEscape?.() ?? true,
-      close: onDismiss,
-    })
-  }
-
-  function unregister(): void {
-    if (layerId === null) return
-    removeDismissLayer(layerId)
-    layerId = null
-  }
-
-  watch(
-    open,
-    (isOpen) => {
-      if (isOpen) register()
-      else unregister()
-    },
-    { immediate: true },
-  )
-
-  onUnmounted(unregister)
+  // Немодальный слой того же стека: очередь Esc общая с модалками, но `inert`
+  // поповер ни на что не ставит и фокус не возвращает — им управляет сам
+  // компонент (у меню это roving-фокус по пунктам).
+  useOverlayLayer(open, onDismiss, {
+    modal: false,
+    closeOnEscape: options.closeOnEscape,
+    restoreFocus: false,
+  })
 }

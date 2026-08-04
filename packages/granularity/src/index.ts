@@ -67,6 +67,8 @@ export * from './components/GrTreeSelect'
 // с библиотечными по Esc и по позиционированию.
 export { useDismissible } from './composables/useDismissible'
 export type { UseDismissibleOptions } from './composables/useDismissible'
+export { useOverlayLayer } from './composables/useOverlayLayer'
+export type { UseOverlayLayerOptions } from './composables/useOverlayLayer'
 export { useFloating } from './composables/useFloating'
 export type { UseFloatingOptions, UseFloatingPlacement, UseFloatingReturn } from './composables/useFloating'
 export { initThemeEarly, useTheme } from './composables/useTheme'

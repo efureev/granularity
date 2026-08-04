@@ -259,6 +259,9 @@ export default defineConfig({
         'composables/useFloating': fileURLToPath(
           new URL('./src/composables/useFloating.ts', import.meta.url),
         ),
+        'composables/useOverlayLayer': fileURLToPath(
+          new URL('./src/composables/useOverlayLayer.ts', import.meta.url),
+        ),
         'composables/useTheme': fileURLToPath(
           new URL('./src/composables/useTheme.ts', import.meta.url),
         ),

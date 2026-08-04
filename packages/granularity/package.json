@@ -300,6 +300,10 @@
       "types": "./dist/types/src/composables/useFloating.d.ts",
       "import": "./dist/composables/useFloating.js"
     },
+    "./composables/useOverlayLayer": {
+      "types": "./dist/types/src/composables/useOverlayLayer.d.ts",
+      "import": "./dist/composables/useOverlayLayer.js"
+    },
     "./composables/useTheme": {
       "types": "./dist/types/src/composables/useTheme.d.ts",
       "import": "./dist/composables/useTheme.js"

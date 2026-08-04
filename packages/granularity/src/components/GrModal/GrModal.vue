@@ -11,7 +11,7 @@
  *   `DialogTitle` / `DialogDescription` (связь через `aria-labelledby` /
  *   `aria-describedby` ставится HeadlessUI автоматически).
  *
- * Esc обрабатывается через общий стек dismissible-слоёв (`dismissStack`), куда
+ * Esc обрабатывается через общий стек слоёв (`useOverlayLayer`), куда
  * регистрируются все оверлеи пакета — и модалки, и панели селектов, дропдаунов,
  * подсказок. Единый capture-обработчик на `window` закрывает только верхний
  * слой и опережает window-обработчик Escape HeadlessUI. Это чинит два кейса:
@@ -25,8 +25,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
-import { pushDismissLayer, removeDismissLayer } from '../../composables/internal/dismissStack'
-import { pushGrModalTop, removeGrModalTop } from './grModalTopStack'
+import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
 
 import {
@@ -111,36 +110,19 @@ function onRootKeydown(event: KeyboardEvent): void {
 // ————— Esc-стек: гарантирует, что Esc закрывает именно верхнюю (последнюю
 // открытую) модалку, даже если окна живут в разных деревьях рендера
 // (например, диалоги `useDialogService` поверх `GrModal`).
-let escEntryId: number | null = null
-let topEntryId: number | null = null
-
-function registerEsc(): void {
-  if (escEntryId !== null) return
-  escEntryId = pushDismissLayer({
-    shouldClose: () => props.closeOnEsc,
-    close,
-  })
-}
-
-function unregisterEsc(): void {
-  if (escEntryId === null) return
-  removeDismissLayer(escEntryId)
-  escEntryId = null
-}
-
-function registerTop(): void {
-  if (topEntryId !== null) return
-  topEntryId = pushGrModalTop({
-    setTopmost: (value) => { isTopmost.value = value },
-  })
-}
-
-function unregisterTop(): void {
-  if (topEntryId === null) return
-  removeGrModalTop(topEntryId)
-  topEntryId = null
-  isTopmost.value = true
-}
+// Единый стек слоёв: Esc верхнему слою и `inert` нижним модалкам выводятся из
+// одного списка. Фокус-ловушку даёт `Dialog` из HeadlessUI — стек её не дублирует.
+useOverlayLayer(
+  computed(() => props.modelValue),
+  close,
+  {
+    modal: true,
+    closeOnEscape: () => props.closeOnEsc,
+    onTopmostChange: (value) => { isTopmost.value = value },
+    // Фокус возвращает HeadlessUI: у него есть `initialFocus` и restore.
+    restoreFocus: false,
+  },
+)
 
 function onOverlayPointerDown(): void {
   closeReason.value = 'backdrop'
@@ -158,13 +140,9 @@ watch(
   (value) => {
     if (value) {
       lockBodyScroll()
-      registerEsc()
-      registerTop()
     }
     else {
       unlockBodyScroll()
-      unregisterEsc()
-      unregisterTop()
     }
   },
   { immediate: true },
@@ -172,8 +150,6 @@ watch(
 
 onBeforeUnmount(() => {
   unlockBodyScroll()
-  unregisterEsc()
-  unregisterTop()
 })
 
 </script>

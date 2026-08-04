@@ -5,7 +5,7 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
-import { useDismissible } from '../../composables/useDismissible'
+import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -285,10 +285,8 @@ function onTriggerFocus(): void {
   openDropdown()
 }
 
-useDismissible(open, () => {
-  closeDropdown()
-  void nextTick(() => triggerEl.value?.focus())
-})
+// Возврат фокуса на триггер — из контракта слоя, а не руками через `nextTick`.
+useOverlayLayer(open, closeDropdown, { root: panelEl })
 
 watch(
   open,

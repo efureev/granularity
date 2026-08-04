@@ -48,7 +48,7 @@ vi.mock('@headlessui/vue', async () => {
 })
 
 import GrModal from '../GrModal.vue'
-import { pushGrModalTop, resetGrModalTopStack } from '../grModalTopStack'
+import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 
 interface HarnessOptions {
   closeOnBackdrop?: boolean
@@ -113,7 +113,7 @@ describe('granularity/GrModal (unit)', () => {
   afterEach(() => {
     document.body.innerHTML = ''
     document.body.style.overflow = ''
-    resetGrModalTopStack()
+    resetOverlayStack()
   })
 
   it('помечает корень inert, когда поверх открыта другая модалка (не верхнее окно)', async () => {
@@ -124,7 +124,7 @@ describe('granularity/GrModal (unit)', () => {
     expect(dialog.attributes('inert')).toBeUndefined()
 
     // Открываем «поверх» ещё одну модалку: текущее окно перестаёт быть верхним.
-    pushGrModalTop({ setTopmost: () => {} })
+    pushOverlayLayer({ modal: true, shouldClose: () => true, close: () => {} })
     await nextTick()
 
     expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBe('')

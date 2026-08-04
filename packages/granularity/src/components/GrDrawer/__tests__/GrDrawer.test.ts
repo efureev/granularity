@@ -32,10 +32,10 @@ vi.mock('@headlessui/vue', async () => {
 })
 
 import GrDrawer from '../GrDrawer.vue'
-import { resetDismissStack } from '../../../composables/internal/dismissStack'
+import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 
 afterEach(() => {
-  resetDismissStack()
+  resetOverlayStack()
 })
 
 function mountHarness(options: { closeOnBackdrop: boolean, side?: 'left' | 'right', size?: 'sm' | 'md' | 'lg' | 'full' }) {
@@ -90,6 +90,19 @@ function mountHarness(options: { closeOnBackdrop: boolean, side?: 'left' | 'righ
 describe('granularity/GrDrawer (unit)', () => {
   afterEach(() => {
     document.body.innerHTML = ''
+  })
+
+  it('помечает корень inert, когда поверх открыт другой модальный слой', async () => {
+    const wrapper = mountHarness({ closeOnBackdrop: true })
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBeUndefined()
+
+    pushOverlayLayer({ modal: true, shouldClose: () => true, close: () => {} })
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBe('')
+
+    wrapper.unmount()
   })
 
   it('рендерит правую панель по умолчанию с md-размером и заголовком', () => {

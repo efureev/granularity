@@ -93,6 +93,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   to 797 KB of JavaScript (−93 KB): `chunks/useScrollLock-*.js` 51 KB → 1.6 KB,
   `chunks/useFloating-*.js` 48 KB → 4.5 KB.
 
+### Added
+
+- **`useOverlayLayer()` — one contract for overlay layering: Esc order, `inert`, restore focus.**
+  Exported from the root barrel and as `@feugene/granularity/composables/useOverlayLayer`.
+  `useDismissible()` stays as a narrow facade over it for non-modal popovers, so nothing built on it
+  needs changing. The two internal stacks it replaces (`dismissStack`, `grModalTopStack`) are gone.
+
+  They were **two registries of the same list** — every open overlay, in open order — answering two
+  different questions: who gets Esc, and which modals to mark `inert`. Registries like that drift
+  apart silently, and they had: **`GrDrawer` and `GrImageViewer` were in neither**, so a drawer
+  opened over a modal never released focus to it, and a modal over a drawer never released focus
+  either. Both are modal layers of the unified stack now and get `inert` for the first time.
+
+  One list, but the two tops it yields are deliberately **different**: Esc goes to the last layer of
+  *any* kind (a dropdown inside a modal closes itself first — that's what the user sees on top),
+  while `inert` applies to modals below the last *modal* layer. Demoting a modal by any layer above
+  it would send the window inert together with its own open dropdown and freeze it.
+
+  The composable does **not** implement a focus trap, on purpose: HeadlessUI `Dialog` provides one
+  for every modal-class overlay in the package, a second trap on top would only fight it, and a
+  popover must not trap at all — Tab has to leave and close it. What is unified is focus **restore**:
+  three hand-written implementations collapse into one rule — restore only if focus is still inside
+  the layer when it closes. `GrDropdown`'s old heuristic ("restore if it was opened from the
+  keyboard") missed in both directions: a mouse-opened panel never restored, and a keyboard-opened
+  one stole focus back from wherever the user had moved it.
+
+  Gate: `src/__tests__/overlayLayer.test.ts`.
+
 ### Fixed
 
 - **`GrDataTable`: `selectable` now works without `v-model:selected`.** There was no internal
