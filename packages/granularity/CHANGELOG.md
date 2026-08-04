@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **New `GrPopover`** — an anchored, non-modal overlay holding whatever content you give it: a short
+  form, settings, a confirmation. Until now that role was forced onto `GrDropdown`, which hard-codes
+  `role="menu"`, `aria-haspopup="menu"` and roving focus over items — the wrong semantics for a form.
+
+  The primitive owns positioning, the overlay layer and dismissal; the keyboard pattern *inside* the
+  panel stays with the consumer, which is why `role` is a prop (`dialog` by default, plus `menu`,
+  `listbox`, `grid`, `group`, `none`). `GrMenu` / `GrContextMenu` / `GrColorPicker` are meant to be
+  built on it.
+
+  Props: `open` (optional — without it the component manages its own state), `placement`, `offsetPx`,
+  `size`, `role`, `ariaLabel` / `labelledBy`, `trigger` (`click` | `manual`), `closeOnEsc`,
+  `closeOnClickOutside`, `closeOnContentClick`, `autoFocus`, `teleportTo`, `contentClass`,
+  `disabled`. Slots: `#trigger` (receives `triggerProps` to bind on a real focusable element) and
+  `#content` (receives `close`). Exposes `open()` / `close()` / `toggle()`.
+
+  **Accessibility.** The trigger gets `aria-haspopup` / `aria-expanded` / `aria-controls`; the panel
+  is a `dialog` with a required accessible name and `tabindex="-1"`. Esc closes the topmost layer of
+  the shared overlay stack, so a popover opened inside a modal closes itself rather than the modal;
+  focus returns to the trigger only if it was still inside the panel when it closed.
+  **There is deliberately no focus trap** — Tab must be able to leave a non-modal layer, otherwise it
+  strands the user on a page that was never blocked. `autoFocus` moves focus to the panel itself, not
+  to the first control inside: focusing an input on the user's behalf is the content's decision.
+
+  A click inside the panel does **not** close it by default (`closeOnContentClick: false`) — with a
+  form inside, the first field would otherwise dismiss it.
+
 ### Fixed
 
 - **File validators no longer hard-code English.** All six returned a fixed English `message` and
@@ -55,10 +83,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- **Plural-ready messages.** Plural forms now live in the bundled dictionaries in the syntax shared
-  by `@feugene/fint-i18n` 0.4.0 and `vue-i18n` — `one:{n} символ | few:… | many:… | other:…` — and
-  components pass the count under both conventional names (`n` for fint-i18n and vue-i18n, `count`
-  for i18next).
+- **Plural-ready messages, on `@feugene/fint-i18n` 0.6.0.** Plural forms live in the bundled
+  dictionaries as objects keyed by CLDR category (`one`, `few`, `many`, `other`) or exact value
+  (`=0`), and components pass the count under both conventional names (`n` for fint-i18n and
+  vue-i18n, `count` for i18next).
 
   **Selecting the form, and formatting numbers, dates and currency, stay with the application's
   translator.** The package deliberately implements none of it: a second `Intl` inside a UI library
@@ -66,8 +94,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   renders its built-in English fallback as-is — one form, unformatted.
 
   Russian is why the dictionaries carry four forms: `one`/`other` is not enough — `21` falls into
-  `one` and `11` into `many`, so the rule does not reduce to the last digit. Verified end to end
-  against a real `fint-i18n` instance, not a mock adapter.
+  `one` and `11` into `many`, so the rule does not reduce to the last digit. Spanish carries `many`
+  too, the category it uses for millions. Verified end to end against a real `fint-i18n` instance,
+  not a mock adapter — which is how the 0.5.0 syntax change was caught before release.
+
+- **`te()` is used when the adapter provides it.** Whether a translation exists was previously
+  inferred from `t(key) === key`, which lies on dictionaries of codes and identifiers whose value
+  equals its own key: such a translation counted as missing and was replaced by the built-in English
+  fallback. Adapters without `te()` keep the old heuristic.
+
+- **`yarn check:messages`** — the dictionary checker shipped with `fint-i18n`. It verifies that the
+  three locales agree on keys and that every set of plural forms covers the CLDR categories its
+  locale actually uses, which no runtime can report: a missing category falls back silently.
 
 - **`prefers-reduced-motion` respected package-wide.** Support existed in exactly one place
   (`GrSkeleton`) against 78 `transition-*` utilities, 7 `animate-spin`, the `<transition>` wrappers

@@ -16,6 +16,7 @@ import {
   grCollapseExamples,
   grConfigProviderExamples,
   grEmptyStateExamples,
+  grPopoverExamples,
   grProgressBarExamples,
   grSkeletonExamples,
   grDropdownExamples,
@@ -267,6 +268,19 @@ const grCommandPaletteOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grPopoverOverview = {
+  paragraphs: [
+    'Anchored panel with any content you like: settings, a short form, a confirmation. It positions itself against the trigger, flips near the viewport edge and closes on Esc or a click outside.',
+  ],
+  features: [
+    'Any content — the panel is a container, not a fixed layout',
+    'Placement on all four sides, with automatic flip and shift at the edge',
+    'Closes on Esc and on a click outside; a click inside keeps it open',
+    'Controlled via v-model:open or left to manage itself',
+    'Role is a prop — build a menu, a listbox or a colour picker on top of it',
+  ],
+}
+
 export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocMeta>> = {
   GrConfigProvider: createComponentDocMeta(grConfigProviderExamples, grConfigProviderOverview),
   GrForm: createComponentDocMeta(grFormExamples, grFormOverview),
@@ -287,6 +301,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrLoading: createComponentDocMeta(grLoadingExamples),
   GrCollapse: createComponentDocMeta(grCollapseExamples),
   GrEmptyState: createComponentDocMeta(grEmptyStateExamples),
+  GrPopover: createComponentDocMeta(grPopoverExamples, grPopoverOverview),
   GrProgressBar: createComponentDocMeta(grProgressBarExamples),
   GrSkeleton: createComponentDocMeta(grSkeletonExamples),
   GrDropdown: createComponentDocMeta(grDropdownExamples),

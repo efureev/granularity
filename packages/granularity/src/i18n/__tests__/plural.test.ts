@@ -44,4 +44,31 @@ describe('число передаётся переводчику', () => {
 
     expect(t('k', 'Name | Email')).toBe('Name | Email')
   })
+
+  it('перевод, совпадающий с ключом, не считается отсутствующим', () => {
+    // Ровно тот случай, ради которого в 0.6.0 появился `te()`: словари кодов и
+    // идентификаторов, где значение равно ключу. Эвристика `t(key) === key`
+    // подменила бы такой перевод встроенным английским текстом.
+    const { t } = useGranularityTranslations({
+      t: key => key,
+      te: () => true,
+    })
+
+    expect(t('gr.common.ok', 'Fallback')).toBe('gr.common.ok')
+  })
+
+  it('без `te()` остаётся прежняя эвристика', () => {
+    const { t } = useGranularityTranslations({ t: key => key })
+
+    expect(t('gr.common.ok', 'Fallback')).toBe('Fallback')
+  })
+
+  it('`te()` говорит «нет» — показывается fallback', () => {
+    const { t } = useGranularityTranslations({
+      t: () => 'не должно попасть в вывод',
+      te: () => false,
+    })
+
+    expect(t('gr.common.ok', 'Fallback {n}', { n: 2 })).toBe('Fallback 2')
+  })
 })

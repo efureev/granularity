@@ -40,7 +40,11 @@
     "loading": "Cargando…",
     "noResults": "Sin resultados",
     "addOption": "Añadir «{value}»",
-    "typeMore": "one:Escriba al menos {n} carácter | other:Escriba al menos {n} caracteres"
+    "typeMore": {
+      "one": "Escriba al menos {n} carácter",
+      "many": "Escriba al menos {n} de caracteres",
+      "other": "Escriba al menos {n} caracteres"
+    }
   },
   "form": {
     "required": "Este campo es obligatorio",

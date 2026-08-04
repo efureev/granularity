@@ -53,6 +53,7 @@ import { grModalConfig } from '../components/GrModal/config'
 import { grNavbarConfig } from '../components/GrNavbar/config'
 import { grNumberInputConfig } from '../components/GrNumberInput/config'
 import { grPaginationConfig } from '../components/GrPagination/config'
+import { grPopoverConfig } from '../components/GrPopover/config'
 import { grProgressBarConfig } from '../components/GrProgressBar/config'
 import { grPromptDialogConfig } from '../components/GrPromptDialog/config'
 import { grRadioConfig } from '../components/GrRadio/config'
@@ -145,6 +146,7 @@ export const granularityComponentConfigs = {
   GrNavbar: grNavbarConfig,
   GrNumberInput: grNumberInputConfig,
   GrPagination: grPaginationConfig,
+  GrPopover: grPopoverConfig,
   GrProgressBar: grProgressBarConfig,
   GrPromptDialog: grPromptDialogConfig,
   GrRadio: grRadioConfig,

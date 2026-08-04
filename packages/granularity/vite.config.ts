@@ -189,6 +189,9 @@ export default defineConfig({
         'components/GrPagination/index': fileURLToPath(
           new URL('./src/components/GrPagination/index.ts', import.meta.url),
         ),
+        'components/GrPopover/index': fileURLToPath(
+          new URL('./src/components/GrPopover/index.ts', import.meta.url),
+        ),
         'components/GrProgressBar/index': fileURLToPath(
           new URL('./src/components/GrProgressBar/index.ts', import.meta.url),
         ),

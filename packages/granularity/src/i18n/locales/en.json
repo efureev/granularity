@@ -40,7 +40,10 @@
     "loading": "Loading…",
     "noResults": "No results",
     "addOption": "Add \"{value}\"",
-    "typeMore": "one:Type at least {n} character | other:Type at least {n} characters"
+    "typeMore": {
+      "one": "Type at least {n} character",
+      "other": "Type at least {n} characters"
+    }
   },
   "form": {
     "required": "This field is required",

@@ -208,6 +208,10 @@
       "types": "./dist/types/src/components/GrPagination/index.d.ts",
       "import": "./dist/components/GrPagination/index.js"
     },
+    "./components/GrPopover": {
+      "types": "./dist/types/src/components/GrPopover/index.d.ts",
+      "import": "./dist/components/GrPopover/index.js"
+    },
     "./components/GrProgressBar": {
       "types": "./dist/types/src/components/GrProgressBar/index.d.ts",
       "import": "./dist/components/GrProgressBar/index.js"
@@ -374,7 +378,7 @@
     "./tokens/*.json": "./tokens/*.json"
   },
   "peerDependencies": {
-    "@feugene/fint-i18n": "^0.4.0",
+    "@feugene/fint-i18n": "^0.6.0",
     "@feugene/unocss-preset-granular": "^0.6.2",
     "@floating-ui/dom": "^1.8.0",
     "@headlessui/vue": "^1.7.23",
@@ -393,7 +397,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
-    "@feugene/fint-i18n": "^0.4.0",
+    "@feugene/fint-i18n": "^0.6.0",
     "@feugene/unocss-preset-granular": "^0.6.2",
     "@floating-ui/dom": "^1.8.0",
     "@headlessui/vue": "^1.7.23",
@@ -417,13 +421,14 @@
   },
   "scripts": {
     "build": "vite build && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json",
+    "check:messages": "fint-i18n-check-messages src/i18n/locales",
     "dev": "vite build --watch",
+    "generate:registry": "node scripts/generate-registry.mjs",
+    "generate:tokens": "node scripts/generate-tokens.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
     "test:run": "vitest run --config vitest.config.ts",
-    "generate:tokens": "node scripts/generate-tokens.mjs",
-    "generate:registry": "node scripts/generate-registry.mjs"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   }
 }

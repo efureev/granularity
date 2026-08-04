@@ -4416,6 +4416,171 @@
       }
     ]
   },
+  "GrPopover": {
+    "name": "GrPopover",
+    "sourcePath": "packages/granularity/src/components/GrPopover/GrPopover.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя панели. Обязательно для `role=\"dialog\"` без видимого заголовка.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "open",
+            "description": "Открыт ли поповер. Без этого пропа компонент ведёт состояние сам (uncontrolled), с ним — слушайте `update:open`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "closeOnContentClick",
+            "description": "Закрывать по клику внутри панели — удобно для меню, вредно для формы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "contentClass",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "teleportTo",
+            "description": "",
+            "type": "string | HTMLElement | undefined",
+            "required": false,
+            "default": "\"body\""
+          },
+          {
+            "name": "trigger",
+            "description": "`manual` — открывать только программно (через `v-model:open`). Нужно для контекстного меню и подтверждений, где момент открытия решает потребитель.",
+            "type": "\"click\" | \"manual\" | undefined",
+            "required": false,
+            "default": "\"click\""
+          },
+          {
+            "name": "role",
+            "description": "Роль панели. Меняется теми, кто строит поверх примитива своё меню/список.",
+            "type": "GrPopoverRole | undefined",
+            "required": false,
+            "default": "\"dialog\""
+          },
+          {
+            "name": "placement",
+            "description": "",
+            "type": "Placement | undefined",
+            "required": false,
+            "default": "\"bottom-start\""
+          },
+          {
+            "name": "offsetPx",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "8"
+          },
+          {
+            "name": "labelledBy",
+            "description": "`id` видимого заголовка внутри панели — альтернатива `ariaLabel`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closeOnClickOutside",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "autoFocus",
+            "description": "Переносить фокус на панель при открытии. Именно на панель, а не на первый контрол внутри: сфокусировать поле ввода за пользователя — решение содержимого, а не оболочки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "trigger",
+            "description": "",
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"dialog\" | \"listbox\" | \"grid\" | \"group\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
+          },
+          {
+            "name": "content",
+            "description": "",
+            "type": "{ close: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "toggle",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrProgressBar": {
     "name": "GrProgressBar",
     "sourcePath": "packages/granularity/src/components/GrProgressBar/GrProgressBar.vue",
@@ -6624,18 +6789,18 @@
             "default": "undefined"
           },
           {
-            "name": "dismissLabel",
-            "description": "A11y-лейбл кнопки закрытия (i18n).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "placement",
             "description": "Угол экрана для стека уведомлений.",
             "type": "GrToasterPlacement | undefined",
             "required": false,
             "default": "\"top-right\""
+          },
+          {
+            "name": "dismissLabel",
+            "description": "A11y-лейбл кнопки закрытия (i18n).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "maxVisible",

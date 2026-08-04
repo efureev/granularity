@@ -88,6 +88,14 @@ export function useGranularityTranslations(context?: AppContext | GranularityI18
       return interpolateFallback(fallback, params)
     }
 
+    // `te()` — единственный честный способ спросить «есть ли перевод».
+    // Сравнение `t(key) === key` врёт на словаре, где значение совпадает с
+    // ключом: такой перевод считался бы отсутствующим. Оставляем эвристику
+    // только для адаптеров, которые `te()` не умеют.
+    if (i18n.te) {
+      return i18n.te(key) ? i18n.t(key, params) : interpolateFallback(fallback, params)
+    }
+
     const result = i18n.t(key, params)
     return result === key ? interpolateFallback(fallback, params) : result
   }

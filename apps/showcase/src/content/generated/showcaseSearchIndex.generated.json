@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 59 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 60 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -790,6 +790,17 @@
     "context": "navigation / component",
     "searchableTitle": "grpagination",
     "searchableContent": "grpagination grpagination splits a long list into pages and manages navigation between them. navigation component /components/gr-pagination packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grpagination generated public-api components components gr-pagination gr pagination"
+  },
+  {
+    "id": "entity:component:GrPopover",
+    "title": "GrPopover",
+    "description": "An anchored panel for a short form, settings or a confirmation right next to the trigger.",
+    "href": "/components/gr-popover",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "overlays / component",
+    "searchableTitle": "grpopover",
+    "searchableContent": "grpopover grpopover an anchored panel for a short form, settings or a confirmation right next to the trigger. overlays component /components/gr-popover packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grpopover generated public-api components components gr-popover gr popover"
   },
   {
     "id": "entity:component:GrProgressBar",
@@ -2913,6 +2924,50 @@
     "context": "GrPagination",
     "searchableTitle": "grpagination integration notes",
     "searchableContent": "grpagination splits a long list into pages and manages navigation between them. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrPopover:section:overview",
+    "title": "GrPopover / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-popover#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrPopover",
+    "searchableTitle": "grpopover component overview",
+    "searchableContent": "grpopover an anchored panel for a short form, settings or a confirmation right next to the trigger. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrPopover:section:live-examples",
+    "title": "GrPopover / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-popover#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrPopover",
+    "searchableTitle": "grpopover live examples",
+    "searchableContent": "grpopover an anchored panel for a short form, settings or a confirmation right next to the trigger. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrPopover:section:api",
+    "title": "GrPopover / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-popover#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrPopover",
+    "searchableTitle": "grpopover generated api",
+    "searchableContent": "grpopover an anchored panel for a short form, settings or a confirmation right next to the trigger. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrPopover:section:integration-notes",
+    "title": "GrPopover / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-popover#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrPopover",
+    "searchableTitle": "grpopover integration notes",
+    "searchableContent": "grpopover an anchored panel for a short form, settings or a confirmation right next to the trigger. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrProgressBar:section:overview",

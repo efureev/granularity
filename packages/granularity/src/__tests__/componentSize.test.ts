@@ -20,6 +20,7 @@ import GrKbd from '../components/GrKbd/GrKbd.vue'
 import GrLink from '../components/GrLink/GrLink.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrPagination from '../components/GrPagination/GrPagination.vue'
+import GrPopover from '../components/GrPopover/GrPopover.vue'
 import GrProgressBar from '../components/GrProgressBar/GrProgressBar.vue'
 import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrRadioGroup from '../components/GrRadioGroup/GrRadioGroup.vue'
@@ -91,6 +92,10 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrLink', render: () => h(GrLink, { href: '#' }, { default: () => 'L' }) },
   { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: '' }) },
   { name: 'GrPagination', render: () => h(GrPagination, { page: 1, pageSize: 10, total: 100 }) },
+  {
+    name: 'GrPopover',
+    render: () => h(GrPopover, { open: true, ariaLabel: 'P' }, { content: () => 'C' }),
+  },
   { name: 'GrProgressBar', render: () => h(GrProgressBar, { value: 50 }) },
   { name: 'GrRadio', render: () => h(GrRadio, { modelValue: 'a', value: 'a' }) },
   {
