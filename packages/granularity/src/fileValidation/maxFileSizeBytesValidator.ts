@@ -13,6 +13,7 @@ export function maxFileSizeBytesValidator(maxBytes: number | undefined): FileVal
         fileName: file.name,
         code: 'maxFileSize',
         message: `File "${file.name}" is too large (${file.size} bytes), maxBytes=${maxBytes}`,
+        i18nParams: { fileName: file.name, size: file.size, maxBytes },
         meta: { maxBytes },
       })
     }

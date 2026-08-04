@@ -31,13 +31,16 @@
     "loading": "Загрузка…",
     "empty": "Нет данных",
     "selectAll": "Выбрать все строки",
-    "selectRow": "Выбрать строку"
+    "selectRow": "Выбрать строку",
+    "sortBy": "Сортировать по «{column}»",
+    "sortedAsc": "Отсортировано по «{column}» по возрастанию, нажмите для сортировки по убыванию",
+    "sortedDesc": "Отсортировано по «{column}» по убыванию, нажмите для сортировки по возрастанию"
   },
   "autocomplete": {
     "loading": "Загрузка…",
     "noResults": "Ничего не найдено",
     "addOption": "Добавить «{value}»",
-    "typeMore": "Введите минимум {n} символа(ов)"
+    "typeMore": "one:Введите минимум {n} символ | few:Введите минимум {n} символа | many:Введите минимум {n} символов | other:Введите минимум {n} символа"
   },
   "form": {
     "required": "Обязательное поле",
@@ -164,5 +167,14 @@
     "placeholder": "Введите команду или запрос…",
     "empty": "Ничего не найдено",
     "loading": "Загрузка…"
+  },
+  "fileValidation": {
+    "accept": "Файл «{fileName}» не подходит под accept=\"{accept}\"",
+    "extension": "У файла «{fileName}» недопустимое расширение «.{extension}»",
+    "mimeType": "У файла «{fileName}» недопустимый тип «{mimeType}»",
+    "mimeTypeFallback": "У файла «{fileName}» неопределённый тип «{mimeType}»",
+    "maxFileSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
+    "maxSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
+    "maxTotalSize": "Суммарный размер файлов слишком большой ({total} байт), максимум {maxBytes}"
   }
 }

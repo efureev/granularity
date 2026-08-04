@@ -31,13 +31,16 @@
     "loading": "Loading…",
     "empty": "No data",
     "selectAll": "Select all rows",
-    "selectRow": "Select row"
+    "selectRow": "Select row",
+    "sortBy": "Sort by {column}",
+    "sortedAsc": "Sorted by {column} ascending, activate to sort descending",
+    "sortedDesc": "Sorted by {column} descending, activate to sort ascending"
   },
   "autocomplete": {
     "loading": "Loading…",
     "noResults": "No results",
     "addOption": "Add \"{value}\"",
-    "typeMore": "Type at least {n} characters"
+    "typeMore": "one:Type at least {n} character | other:Type at least {n} characters"
   },
   "form": {
     "required": "This field is required",
@@ -164,5 +167,14 @@
     "placeholder": "Type a command or search…",
     "empty": "Nothing found",
     "loading": "Loading…"
+  },
+  "fileValidation": {
+    "accept": "File \"{fileName}\" does not match accept=\"{accept}\"",
+    "extension": "File \"{fileName}\" has disallowed extension \".{extension}\"",
+    "mimeType": "File \"{fileName}\" has disallowed mime type \"{mimeType}\"",
+    "mimeTypeFallback": "File \"{fileName}\" has fallback mime type \"{mimeType}\"",
+    "maxFileSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
+    "maxSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
+    "maxTotalSize": "Total files size is too large ({total} bytes), maxTotalSizeBytes={maxBytes}"
   }
 }

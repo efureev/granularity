@@ -405,10 +405,10 @@
   resolved "https://registry.yarnpkg.com/@exodus/bytes/-/bytes-1.15.1.tgz#b13bc464ca162c17abf0837fb3a11aeab79e45d1"
   integrity sha512-S6mL0yNB/Abt9Ei4tq8gDhcczc4S3+vQ4ra7vxnAf+YHC02srtqxKKZghx2Dq6p0e66THKwR6r8N6P95wEty7Q==
 
-"@feugene/fint-i18n@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.3.0.tgz#dfd44e77cb320b6ea9b4bab618eba5ef0863a6f2"
-  integrity sha512-d5X2rJgrSDX8OM9Ne14ztuW7alEzADT0xHcMKIKUkCr8WF9Za+oN0qxUY6GYkF+jNI7UP8tonoDSpcYn+tiTFA==
+"@feugene/fint-i18n@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.4.0.tgz#a684bd3a4b2d5bce5701b19c5e88a6e0046a6f77"
+  integrity sha512-kQFPnTO2Zm4HvWL2Ri+75cUEmAUNqa68V8DXR/eyCtbOAElo5z8hM83x6LdGudpOHMbIt/gn5OutDIgqfAs+Bg==
 
 "@feugene/unocss-mini-extra-rules@^0.4.0":
   version "0.4.0"

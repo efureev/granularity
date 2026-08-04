@@ -31,13 +31,16 @@
     "loading": "Cargando…",
     "empty": "Sin datos",
     "selectAll": "Seleccionar todas las filas",
-    "selectRow": "Seleccionar fila"
+    "selectRow": "Seleccionar fila",
+    "sortBy": "Ordenar por «{column}»",
+    "sortedAsc": "Ordenado por «{column}» de forma ascendente, active para ordenar de forma descendente",
+    "sortedDesc": "Ordenado por «{column}» de forma descendente, active para ordenar de forma ascendente"
   },
   "autocomplete": {
     "loading": "Cargando…",
     "noResults": "Sin resultados",
     "addOption": "Añadir «{value}»",
-    "typeMore": "Escribe al menos {n} caracteres"
+    "typeMore": "one:Escriba al menos {n} carácter | other:Escriba al menos {n} caracteres"
   },
   "form": {
     "required": "Este campo es obligatorio",
@@ -164,5 +167,14 @@
     "placeholder": "Escribe un comando o busca…",
     "empty": "No se ha encontrado nada",
     "loading": "Cargando…"
+  },
+  "fileValidation": {
+    "accept": "El archivo «{fileName}» no coincide con accept=\"{accept}\"",
+    "extension": "El archivo «{fileName}» tiene una extensión no permitida «.{extension}»",
+    "mimeType": "El archivo «{fileName}» tiene un tipo MIME no permitido «{mimeType}»",
+    "mimeTypeFallback": "El archivo «{fileName}» tiene un tipo MIME indefinido «{mimeType}»",
+    "maxFileSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
+    "maxSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
+    "maxTotalSize": "El tamaño total de los archivos es demasiado grande ({total} bytes), máximo {maxBytes}"
   }
 }

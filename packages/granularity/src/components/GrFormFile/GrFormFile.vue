@@ -20,7 +20,7 @@ import {
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { vDropzone } from '../../directives'
-import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
+import { acceptValidator, FileValidationError, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
@@ -243,8 +243,16 @@ function removeAt(index: number) {
 }
 
 function issueMessage(issue: GrFormFileError): string {
-  if (issue.fileName) return `${issue.fileName}: ${issue.message}`
-  return issue.message
+  const text = resolveFileValidationMessage(issue, t)
+
+  // Префикс с именем файла нужен только тем сообщениям, которые сами его не
+  // называют, — то есть валидаторам потребителя. Встроенные передают `fileName`
+  // параметром и подставляют его в текст, и приписка давала бы «photo.png:
+  // Файл «photo.png» …». Признак — наличие параметра, а не поиск подстроки.
+  if (issue.fileName && issue.i18nParams?.fileName === undefined)
+    return `${issue.fileName}: ${text}`
+
+  return text
 }
 
 const dropzone = computed(() => {

@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **File validators no longer hard-code English.** All six returned a fixed English `message` and
+  offered no other channel, so a Russian app displayed `File "photo.png" does not match accept="…"`
+  and could do nothing about it. Every issue now carries `i18nParams` (and, where needed, an explicit
+  `i18nKey`), and `resolveFileValidationMessage(issue, t)` builds the text. The key is derived from
+  `code` — `gr.fileValidation.<code>` — so a new built-in validator is localised by adding one string.
+
+  **Not a breaking change**: `message` stays required and is still the fallback, so a consumer's own
+  validator keeps rendering unchanged. English strings are byte-identical to the previous `message`,
+  so behaviour without i18n is untouched.
+
+  Fixed along the way: `GrFormFile` printed `photo.png: File "photo.png" …` — the built-in messages
+  already name the file, so the prefix is now added only for messages that do not (detected by the
+  absence of a `fileName` param, not by substring matching).
+
+- **`GrDataTable` sort labels are translatable.** Three English strings (`Sort by …`) were baked into
+  the component and read out by screen readers in English regardless of the app's language.
+
+- A gate (`src/i18n/__tests__/localeCompleteness.test.ts`) now checks that `ru`/`es` cover every `en`
+  key, carry no orphans, use the same placeholders, and that every plural block has an `other` branch.
+  A missing translation used to be invisible: `t()` silently returned the English fallback.
+
 - **Utilities the components used but that never produced CSS.** `presetMini` does not ship
   `animate-*`, `space-*`, `divide-*`, `backdrop-*` or the `text-transform` family, so for anyone
   whose `uno.config.ts` followed `docs/installation.md` those classes stayed in the markup with no
@@ -31,7 +52,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the **documented** consumer config. A mismatch between "how the showcase builds" and "how a
   consumer builds" is invisible to every other check.
 
+
 ### Added
+
+- **Plural-ready messages.** Plural forms now live in the bundled dictionaries in the syntax shared
+  by `@feugene/fint-i18n` 0.4.0 and `vue-i18n` — `one:{n} символ | few:… | many:… | other:…` — and
+  components pass the count under both conventional names (`n` for fint-i18n and vue-i18n, `count`
+  for i18next).
+
+  **Selecting the form, and formatting numbers, dates and currency, stay with the application's
+  translator.** The package deliberately implements none of it: a second `Intl` inside a UI library
+  would eventually disagree with the app's own rules. With no translator installed a component
+  renders its built-in English fallback as-is — one form, unformatted.
+
+  Russian is why the dictionaries carry four forms: `one`/`other` is not enough — `21` falls into
+  `one` and `11` into `many`, so the rule does not reduce to the last digit. Verified end to end
+  against a real `fint-i18n` instance, not a mock adapter.
 
 - **`prefers-reduced-motion` respected package-wide.** Support existed in exactly one place
   (`GrSkeleton`) against 78 `transition-*` utilities, 7 `animate-spin`, the `<transition>` wrappers

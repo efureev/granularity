@@ -15,6 +15,7 @@ export function acceptValidator(accept: string | undefined): FileValidator {
         fileName: file.name,
         code: 'accept',
         message: `File "${file.name}" does not match accept="${accept}"`,
+        i18nParams: { fileName: file.name, accept },
       })
     }
 

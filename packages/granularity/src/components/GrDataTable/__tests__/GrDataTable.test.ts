@@ -161,4 +161,35 @@ describe('GrDataTable — controlled sort (item 27)', () => {
     expect(wrapper.findAll('tbody tr').map(r => r.text())).toEqual(['Alice10', 'Bob15', 'Charlie20'])
     expect(wrapper.emitted('sortChange')?.at(-1)).toEqual([{ key: 'score', dir: 'asc' }])
   })
+
+  it('подпись кнопки сортировки берётся из локали, а не из хардкода', async () => {
+    // Раньше три строки («Sort by …») были вшиты в компонент английским
+    // текстом: приложение на другом языке озвучивало их скринридеру по-английски.
+    const messages: Record<string, string> = {
+      'gr.dataTable.sortBy': 'Сортировать по «{column}»',
+      'gr.dataTable.sortedAsc': 'Отсортировано по «{column}» по возрастанию',
+    }
+    const wrapper = mount(GrDataTable, {
+      props: {
+        rows: [{ id: 1, name: 'Alice' }],
+        columns: [{ key: 'name', label: 'Имя', sortable: true }],
+      },
+      global: {
+        provide: {
+          [Symbol.for('FintI18n')]: {
+            t: (key: string, params?: Record<string, unknown>) =>
+              (messages[key] ?? key).replace(/\{(\w+)\}/g, (m, n) => String(params?.[n] ?? m)),
+          },
+        },
+      },
+    })
+
+    const button = wrapper.find('thead button')
+    expect(button.attributes('aria-label')).toBe('Сортировать по «Имя»')
+
+    await button.trigger('click')
+    expect(wrapper.find('thead button').attributes('aria-label')).toBe(
+      'Отсортировано по «Имя» по возрастанию',
+    )
+  })
 })

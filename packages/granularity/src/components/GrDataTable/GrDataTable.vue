@@ -209,10 +209,19 @@ function ariaSortFor(col: GrDataColumn): 'ascending' | 'descending' | 'none' | u
 
 function sortButtonLabel(col: GrDataColumn): string {
   if (currentSortKey.value !== col.key)
-    return `Sort by ${col.label}`
+    return t('gr.dataTable.sortBy', 'Sort by {column}', { column: col.label })
+
   return currentSortDir.value === 'asc'
-    ? `Sorted by ${col.label} ascending, activate to sort descending`
-    : `Sorted by ${col.label} descending, activate to sort ascending`
+    ? t(
+        'gr.dataTable.sortedAsc',
+        'Sorted by {column} ascending, activate to sort descending',
+        { column: col.label },
+      )
+    : t(
+        'gr.dataTable.sortedDesc',
+        'Sorted by {column} descending, activate to sort ascending',
+        { column: col.label },
+      )
 }
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrDataTable' })

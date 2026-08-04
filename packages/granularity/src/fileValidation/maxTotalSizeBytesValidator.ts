@@ -10,6 +10,7 @@ export function maxTotalSizeBytesValidator(maxBytes: number | undefined): FileVa
     const issue: FileValidationIssue = {
       code: 'maxTotalSize',
       message: `Total files size is too large (${total} bytes), maxTotalSizeBytes=${maxBytes}`,
+      i18nParams: { total, maxBytes },
       meta: { total, maxBytes },
     }
 

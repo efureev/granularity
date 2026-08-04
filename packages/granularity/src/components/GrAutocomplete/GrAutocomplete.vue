@@ -128,8 +128,14 @@ const { t } = useGranularityTranslations()
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.autocomplete.loading', 'Loading…'))
 const resolvedNoResultsText = computed(() => props.noResultsText ?? t('gr.autocomplete.noResults', 'No results'))
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.common.clear', 'Clear'))
+// Число уходит под двумя общепринятыми именами: `n` читают `@feugene/fint-i18n`
+// и `vue-i18n`, `count` — `i18next`. Формы для каждого языка лежат в словаре,
+// выбирает их переводчик; встроенный fallback — одна английская строка.
 const resolvedTypeMoreText = computed(() =>
-  t('gr.autocomplete.typeMore', 'Type at least {n} characters', { n: props.minQueryLength }),
+  t('gr.autocomplete.typeMore', 'Type at least {n} characters', {
+    n: props.minQueryLength,
+    count: props.minQueryLength,
+  }),
 )
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).

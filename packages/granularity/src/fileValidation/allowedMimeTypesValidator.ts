@@ -1,5 +1,7 @@
 import type { FileValidationIssue, FileValidator } from './types'
 
+import { fileValidationI18nKey } from './i18n'
+
 export type AllowedMimeTypesValidatorOptions = {
   /**
    * Если `true`, то для fallback-типа (`''`/`application/octet-stream`) валидация по MIME пропускается,
@@ -33,6 +35,10 @@ export function allowedMimeTypesValidator(
             fileName: file.name,
             code: 'mimeType',
             message: `File "${file.name}" has fallback mime type "${fileType}"`,
+            // Тот же `code`, что и у запрещённого типа ниже — ветка обработчика
+            // одна, — но формулировка другая, поэтому ключ задан явно.
+            i18nKey: fileValidationI18nKey('mimeTypeFallback'),
+            i18nParams: { fileName: file.name, mimeType: fileType },
           })
         }
 
@@ -44,6 +50,7 @@ export function allowedMimeTypesValidator(
           fileName: file.name,
           code: 'mimeType',
           message: `File "${file.name}" has disallowed mime type "${fileType}"`,
+          i18nParams: { fileName: file.name, mimeType: fileType },
         })
       }
     }

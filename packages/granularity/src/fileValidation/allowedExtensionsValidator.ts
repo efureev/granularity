@@ -29,6 +29,7 @@ export function allowedExtensionsValidator(exts: string[]): FileValidator {
           fileName: file.name,
           code: 'extension',
           message: `File "${file.name}" has disallowed extension ".${ext}"`,
+          i18nParams: { fileName: file.name, extension: ext },
         })
       }
     }

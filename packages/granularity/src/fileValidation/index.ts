@@ -4,6 +4,7 @@ export { FileValidationError } from './FileValidationError'
 export { normalizeFiles, runFileValidators } from './runFileValidators'
 
 export { matchAccept } from './matchAccept'
+export { FILE_VALIDATION_I18N_NAMESPACE, fileValidationI18nKey, resolveFileValidationMessage } from './i18n'
 
 export { acceptValidator } from './acceptValidator'
 export { allowedExtensionsValidator } from './allowedExtensionsValidator'

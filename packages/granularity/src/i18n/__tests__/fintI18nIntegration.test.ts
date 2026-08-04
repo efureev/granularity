@@ -39,4 +39,25 @@ describe('granularity + fint-i18n (реальный инстанс)', () => {
     const pageLabels = wrapper.findAll('[data-gr-pagination-page]').map(b => b.attributes('aria-label'))
     expect(pageLabels).toContain('Страница 6')
   })
+
+  it('плюрализация словаря пакета работает на настоящем fint-i18n', async () => {
+    // Формы записаны синтаксисом библиотеки (`|` + метки CLDR) и выбираются её
+    // движком. Мок-адаптер этого не поймал бы: он проверяет только наш разбор
+    // fallback-строки, а не совпадение форматов словаря и библиотеки.
+    const i18n = createFintI18n({ locale: 'ru', loaders: [ru] })
+    i18n.registerBlocks([GRANULARITY_I18N_BLOCK])
+    await i18n.loadUsedBlocks('ru')
+
+    const forms = [1, 2, 5, 21, 11].map(n =>
+      i18n.t('gr.autocomplete.typeMore', { n }),
+    )
+
+    expect(forms).toEqual([
+      'Введите минимум 1 символ',
+      'Введите минимум 2 символа',
+      'Введите минимум 5 символов',
+      'Введите минимум 21 символ',
+      'Введите минимум 11 символов',
+    ])
+  })
 })
