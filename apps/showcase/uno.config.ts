@@ -11,14 +11,6 @@ import {granularContent, type PresetGranularNodeOptions} from '@feugene/unocss-p
 import {presetGranularNode} from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
 import datepickerProvider from '@feugene/granularity-datepicker/granular-provider/node'
-import {
-    animationPreflights,
-    animationRules,
-    colorOpacityRules,
-    filterRules,
-    spacingRules,
-    spacingVariants,
-} from '@feugene/unocss-mini-extra-rules'
 
 export const showcaseGranularOptions: PresetGranularNodeOptions = {
     providers: [granularityProvider, datepickerProvider],
@@ -29,22 +21,11 @@ export const showcaseGranularOptions: PresetGranularNodeOptions = {
 
 export default defineConfig({
     content: granularContent(showcaseGranularOptions),
-    // Дополнительные правила поверх preset-mini из
-    // `@feugene/unocss-mini-extra-rules`: spinner-анимация, bracket‑color с
-    // `/NN` opacity, расширенные filter/backdrop‑filter утилиты и
-    // Tailwind‑совместимые `space-*` / `divide-*`.
-    rules: [
-        ...animationRules,
-        ...colorOpacityRules,
-        ...filterRules,
-        ...spacingRules,
-    ],
-    variants: [
-        ...spacingVariants,
-    ],
-    preflights: [
-        ...animationPreflights,
-    ],
+    // Правила поверх presetMini (`animate-*`, `space-*`, `divide-*`, `backdrop-*`)
+    // подмешивает сам `presetGranularNode` начиная с 0.6.1 — руками их
+    // перечислять больше не нужно. Витрина держала их у себя и тем самым
+    // маскировала дефект: у потребителя, собравшего конфиг по документации,
+    // этих утилит не было вовсе.
     presets: [
         presetMini(),
         presetGranularNode(showcaseGranularOptions),

@@ -410,15 +410,20 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.3.0.tgz#dfd44e77cb320b6ea9b4bab618eba5ef0863a6f2"
   integrity sha512-d5X2rJgrSDX8OM9Ne14ztuW7alEzADT0xHcMKIKUkCr8WF9Za+oN0qxUY6GYkF+jNI7UP8tonoDSpcYn+tiTFA==
 
-"@feugene/unocss-mini-extra-rules@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.3.0.tgz#91e1920fe0765860115dc7a8136907235f0ce989"
-  integrity sha512-t0/jBvhSkwgmizCY8S021Zto7AqONAP0XWnjbg6cO9WCiC398Im9EOH4JWrxzPO2LTnkF0sv7dFRhNWUHlKeVg==
+"@feugene/unocss-mini-extra-rules@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.4.0.tgz#97828cd2f0982ab3d2f6cd758a0a28beaf3cda08"
+  integrity sha512-9zsr01rwjaySn417QfcoadGuhNM0Ly2oZC1SqRaci5EZ3N8g9PkKJn/0kZNIbn0xDD+3wxo4cy9qc6ioTURCag==
+  dependencies:
+    "@unocss/preset-mini" "^66.7.5"
+    "@unocss/rule-utils" "^66.7.5"
 
-"@feugene/unocss-preset-granular@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.6.0.tgz#6ed8f770080475f4200b756d7d0bb5d5fea8db0f"
-  integrity sha512-TivivV3BFl0pWBk0qARsbevPYGY0QPGl1LxHxBpVkOttCy338qUrd/MaDHyLywtRDePqPuYBqzvFTIe637RB8w==
+"@feugene/unocss-preset-granular@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.6.2.tgz#fb212660c6c707a375dc891f1246fff5c77afedc"
+  integrity sha512-zWRRThTAugplBD8qM52rvaNnoTDCIZuoclalZ1TGowmr56t9eGcX4BGweLE9npk+NqKAFx7DsfPlMse1LHUksA==
+  dependencies:
+    "@feugene/unocss-mini-extra-rules" "^0.4.0"
 
 "@floating-ui/core@^1.8.0":
   version "1.8.0"
@@ -1100,7 +1105,7 @@
     "@unocss/core" "66.7.5"
     ofetch "^1.5.1"
 
-"@unocss/preset-mini@66.7.5":
+"@unocss/preset-mini@66.7.5", "@unocss/preset-mini@^66.7.5":
   version "66.7.5"
   resolved "https://registry.yarnpkg.com/@unocss/preset-mini/-/preset-mini-66.7.5.tgz#c463fbc68f1791a7bfeaaf61ca1a1a116e3621f5"
   integrity sha512-o37TSl4ecT0dKu+3/TYuTYht75h82SEwDNl476m9ve0KW4Pv1O2tT/9TWd7N5cutEpySr8/YtjMwtWBD+drxBg==
@@ -1171,7 +1176,7 @@
   resolved "https://registry.yarnpkg.com/@unocss/reset/-/reset-66.7.5.tgz#bccf9919e2c6d9d7be8e417545cb3e928b5c9cc7"
   integrity sha512-z3wbt2cuQPjtT6w5xzRYZYFIIlUPzhVKz8yIcE9fvu7BgR3hO7uVsg/5mzDoGwQ96Ya3Sk68rpmI/gLYl4bJag==
 
-"@unocss/rule-utils@66.7.5":
+"@unocss/rule-utils@66.7.5", "@unocss/rule-utils@^66.7.5":
   version "66.7.5"
   resolved "https://registry.yarnpkg.com/@unocss/rule-utils/-/rule-utils-66.7.5.tgz#320c16dcfcc7e9353f2637549cc45ce77637964d"
   integrity sha512-/AKHBRF6ZOexE3EDDv8ZEYh40P5e2Eha41IYUbE1wjigW7++ssmvimSTdufJzZvU5DGP++E3B3WEsFPprZMjAg==

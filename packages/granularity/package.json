@@ -375,7 +375,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": "^0.3.0",
-    "@feugene/unocss-preset-granular": "^0.6.0",
+    "@feugene/unocss-preset-granular": "^0.6.2",
     "@floating-ui/dom": "^1.8.0",
     "@headlessui/vue": "^1.7.23",
     "vue": "^3.5.40"
@@ -394,7 +394,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.3.0",
-    "@feugene/unocss-preset-granular": "^0.6.0",
+    "@feugene/unocss-preset-granular": "^0.6.2",
     "@floating-ui/dom": "^1.8.0",
     "@headlessui/vue": "^1.7.23",
     "@iconify-json/lucide": "^1.2.117",

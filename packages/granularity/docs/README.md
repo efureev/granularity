@@ -21,6 +21,7 @@
   `file-validation.md`](./file-validation.md).
 - Если нужен обзор опубликованных компонентов: откройте [`components.md`](./components.md).
 - Если нужно масштабировать контролы целиком: откройте [`sizes.md`](./sizes.md).
+- Если важно поведение анимаций при «уменьшить движение»: откройте [`motion.md`](./motion.md).
 
 ## Карта документации
 
@@ -30,6 +31,7 @@
 - [`theming.md`](./theming.md) — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, подключение, проверка контраста.
 - [`keyboard.md`](./keyboard.md) — клавиатурный контракт: общие правила и таблица по компонентам.
 - [`sizes.md`](./sizes.md) — шкала размеров: кто на ней, порядок разрешения `size`, отклонения.
+- [`motion.md`](./motion.md) — контракт движения и `prefers-reduced-motion`: что гасится, почему не `motion-safe:`.
 - [`z-index.md`](./z-index.md) — шкала слоёв и стек оверлеев (Esc, фокус, `inert`).
 - [`ssr.md`](./ssr.md) — какие компоненты безопасны при серверном рендере и где нужны оговорки.
 - [`unocss.md`](./unocss.md) — интеграция с `UnoCSS` через `presetGranularNode` из `@feugene/unocss-preset-granular/node`

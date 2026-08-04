@@ -7,7 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Utilities the components used but that never produced CSS.** `presetMini` does not ship
+  `animate-*`, `space-*`, `divide-*`, `backdrop-*` or the `text-transform` family, so for anyone
+  whose `uno.config.ts` followed `docs/installation.md` those classes stayed in the markup with no
+  rule behind them: spinners did not spin, list dividers were not painted, `GrDropdownMenu` headers
+  were not upper-cased. The build succeeded and the tests were green — the showcase kept the missing
+  rules in its own config and so hid the defect.
+
+  Fixed upstream rather than by rewriting component markup: `@feugene/unocss-preset-granular` now
+  bundles the gap-fill rules (0.6.1), and the two remaining families were added to
+  `@feugene/unocss-mini-extra-rules` 0.4.0 — `typographyRules` plus a divider **colour** built on
+  presetMini's own `colorResolver`, so `divide-<colour>` accepts exactly what `border-*` does. The
+  package now requires the preset `^0.6.2`.
+
+  **Visible change**: `GrDropdownMenu` headers are upper-cased (the `uppercase` prop defaults to
+  `true` and finally applies), and dividers in `GrList` / `GrDropdownMenu` take `--gr-brd` instead of
+  the tailwind-compat default. 18 visual baselines re-recorded.
+
+  A gate (`src/__tests__/documentedConfig.test.ts`) now runs every safelisted class — and every
+  `animate-*` / `space-*` / `divide-*` / `backdrop-*` literal found in component sources — through
+  the **documented** consumer config. A mismatch between "how the showcase builds" and "how a
+  consumer builds" is invisible to every other check.
+
 ### Added
+
+- **`prefers-reduced-motion` respected package-wide.** Support existed in exactly one place
+  (`GrSkeleton`) against 78 `transition-*` utilities, 7 `animate-spin`, the `<transition>` wrappers
+  of six overlays and three component-level `@keyframes`. A single clamp in `styles/base.css`
+  (mirrored in `preflight.css`) now covers all of them — plus code not written yet.
+
+  **The `motion-safe:` approach was rejected on evidence, not taste**: under `presetMini` the
+  `motion-safe:` / `motion-reduce:` variants generate **no CSS at all** (verified against the
+  generator). Spread across 85 call sites it would have produced the package's classic silent bug —
+  class present, CSS absent, animation still playing. A library ships *classes*; the consumer's
+  config compiles them, so an accessibility contract cannot depend on which variants that config
+  happens to enable.
+
+  Durations collapse to `0.01ms` rather than `none` so `transitionend` / `animationend` still fire —
+  with `none` a listener would wait forever and strand the UI mid-state. Delays are zeroed too.
+
+  Spinners do **not** freeze at a random angle: with no `animation-fill-mode` they return to
+  `transform: none`, i.e. a clean static icon (verified in a browser under emulated `reduce`). No
+  replacement pulse is introduced — any infinite animation is motion the user asked not to see.
+
+- **`GrToaster`'s progress bar is hidden under reduced motion.** It is the one animation the global
+  clamp gets wrong: `animation-fill-mode: forwards` pins it at the final `scaleX(0)` frame instead
+  of reverting, so the timer would read as expired while the toast is still on screen. Auto-dismiss
+  is driven by a JS timer and is unaffected; the element is already `aria-hidden`.
+
+- **`docs/motion.md`** — the motion contract, why the global block, per-animation behaviour and the
+  rule for new components.
+
+- A gate (`src/__tests__/reducedMotion.test.ts`) checks the block's presence and contents, that every
+  component `@keyframes` is either handled or recorded as clamp-safe, and — closing a long-standing
+  hole — that `base.css` and `preflight.css` stay **synchronised**, which until now rested on a
+  comment alone.
 
 - **`size` on the nine components that lacked it** — `GrTextarea`, `GrTabs`, `GrPagination`,
   `GrTable`, `GrDataTable`, `GrTree`, `GrProgressBar`, `GrTooltip`, `GrFormFile`, `GrFileUpload`.

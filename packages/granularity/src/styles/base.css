@@ -36,6 +36,38 @@ body {
 }
 
 /*
+ * Уважение к `prefers-reduced-motion` — единственный работающий канал на весь пакет.
+ *
+ * Вариант `motion-safe:`/`motion-reduce:` под presetMini НЕ генерирует CSS вовсе
+ * (проверено генератором), поэтому расставлять его по 78 `transition-*` и 7
+ * `animate-spin` нельзя — классы умрут молча, а анимация останется. Отсюда
+ * глобальный блок: он покрывает и утилиты, и `<transition>` Vue, и покомпонентные
+ * `@keyframes`, и код, которого ещё нет.
+ *
+ * Длительность гасится до `0.01ms`, а не до `none`: событие `transitionend` /
+ * `animationend` обязано состояться, иначе слушатель на стороне потребителя
+ * никогда не дождётся его и оставит интерфейс в промежуточном состоянии.
+ *
+ * Задержки обнуляются вместе с длительностями — иначе `delay` в пару секунд
+ * вернул бы ожидание, ради устранения которого всё и делается.
+ *
+ * `!important` здесь обязателен: селектор `*` имеет нулевую специфичность и без
+ * него проиграет любому классу-утилите и инлайновому стилю.
+ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-delay: 0ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-delay: 0ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/*
  * UnoCSS tailwind-compat reset intentionally does not force `background-color: transparent` for buttons
  * (to avoid breaking component libraries). In our GR we want plain buttons/links to be transparent by default.
  */
