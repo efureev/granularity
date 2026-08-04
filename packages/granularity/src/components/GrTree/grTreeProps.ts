@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'vue'
 
 import type { GrTreeInteractionContext } from './grTreeInteractionContext'
+import type { GrTreeSize } from './grTreeStyles'
 import type { GrTreeStore } from './grTreeStore'
 import type {
   GrTreeAllowDropType,
@@ -42,6 +43,8 @@ export type GrTreeDataProps<T extends object> = {
 }
 
 export type GrTreeViewProps<T extends object> = {
+  /** Размер строки: высота, отступы, иконки и кегль подписи. */
+  size?: GrTreeSize
   highlightCurrent?: boolean
   expandIcon?: string
   collapseIcon?: string

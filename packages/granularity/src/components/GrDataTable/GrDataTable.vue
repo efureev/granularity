@@ -3,9 +3,20 @@
 import { computed, ref } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
-import type { GrTableDensity } from '../GrTable'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import {
+  type GrDataTableSize,
+  cellPaddings,
+  checkboxSizes,
+  headerGaps,
+  headerTextSizes,
+  placeholderPaddings,
+  selectColumnWidths,
+  sortIconSizes,
+  spinnerSizes,
+} from './grDataTableStyles'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
 import IconArrowDown from '~icons/lucide/arrow-down'
@@ -54,8 +65,12 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   loading?: boolean
   /** Текст индикатора загрузки. i18n: fallback `gr.dataTable.loading`. */
   loadingText?: string
+  /**
+   * Размер таблицы: кегль, паддинги ячеек, стрелки сортировки и чекбоксы.
+   * Прокидывается в `GrTable`.
+   */
+  size?: GrDataTableSize
   // Прокси к GrTable:
-  density?: GrTableDensity
   caption?: string
   ariaLabel?: string
   ariaLabelledby?: string
@@ -84,7 +99,7 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   selected: undefined,
   loading: false,
   loadingText: undefined,
-  density: 'regular',
+  size: undefined,
   caption: undefined,
   ariaLabel: undefined,
   ariaLabelledby: undefined,
@@ -200,8 +215,19 @@ function sortButtonLabel(col: GrDataColumn): string {
     : `Sorted by ${col.label} descending, activate to sort ascending`
 }
 
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrDataTable' })
+
+const cellClass = computed(() => cellPaddings[resolvedSize.value])
+const placeholderClass = computed(() => placeholderPaddings[resolvedSize.value])
+const headerTextClass = computed(() => headerTextSizes[resolvedSize.value])
+const headerGapClass = computed(() => headerGaps[resolvedSize.value])
+const checkboxClass = computed(() => checkboxSizes[resolvedSize.value])
+const selectColumnClass = computed(() => selectColumnWidths[resolvedSize.value])
+const spinnerClass = computed(() => spinnerSizes[resolvedSize.value])
+const sortIconSize = computed(() => sortIconSizes[resolvedSize.value])
+
 const tableProps = computed(() => ({
-  density: props.density,
+  size: resolvedSize.value,
   caption: props.caption,
   ariaLabel: props.ariaLabel,
   ariaLabelledby: props.ariaLabelledby,
@@ -283,13 +309,15 @@ function toggleAll(): void {
       <tr data-gr-datatable-header>
         <th
           v-if="selectable"
-          class="w-10 px-4 py-3 text-left"
+          class="text-left"
+          :class="[selectColumnClass, cellClass]"
           scope="col"
         >
           <input
             type="checkbox"
             data-gr-datatable-select-all
-            class="h-4 w-4 cursor-pointer accent-[var(--gr-primary)] align-middle"
+            class="cursor-pointer accent-[var(--gr-primary)] align-middle"
+            :class="checkboxClass"
             :checked="allSelected"
             :indeterminate="someSelected"
             :aria-label="t('gr.dataTable.selectAll', 'Select all rows')"
@@ -300,25 +328,26 @@ function toggleAll(): void {
         <th
           v-for="col in columns"
           :key="col.key"
-          class="font-700 text-xs px-4 py-3"
-          :class="cellAlign(col)"
+          class="font-700"
+          :class="[headerTextClass, cellClass, cellAlign(col)]"
           :aria-sort="ariaSortFor(col)"
           scope="col"
         >
-          <div class="inline-flex items-center gap-2">
+          <div class="inline-flex items-center" :class="headerGapClass">
             <button
               v-if="col.sortable"
               type="button"
-              class="inline-flex items-center gap-2 text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
+              class="inline-flex items-center text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
+              :class="headerGapClass"
               :aria-label="sortButtonLabel(col)"
               @click="toggleSort(col)"
             >
               <span>{{ col.label }}</span>
               <span class="inline-flex">
-                <GrIcon v-if="currentSortKey === col.key && currentSortDir === 'asc'" size="sm" aria-hidden="true">
+                <GrIcon v-if="currentSortKey === col.key && currentSortDir === 'asc'" :size="sortIconSize" aria-hidden="true">
                   <IconArrowUp />
                 </GrIcon>
-                <GrIcon v-else-if="currentSortKey === col.key && currentSortDir === 'desc'" size="sm" aria-hidden="true">
+                <GrIcon v-else-if="currentSortKey === col.key && currentSortDir === 'desc'" :size="sortIconSize" aria-hidden="true">
                   <IconArrowDown />
                 </GrIcon>
               </span>
@@ -331,9 +360,9 @@ function toggleAll(): void {
 
     <template v-if="loading">
       <tr data-gr-datatable-loading>
-        <td :colspan="totalColumns" class="px-4 py-6 text-center text-[var(--gr-muted-fg)]">
+        <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
           <span class="inline-flex items-center gap-2" role="status">
-            <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+            <span class="i-lucide-loader-circle block animate-spin" :class="spinnerClass" aria-hidden="true" />
             <span>{{ resolvedLoadingText }}</span>
           </span>
         </td>
@@ -341,7 +370,7 @@ function toggleAll(): void {
     </template>
     <template v-else-if="isEmpty">
       <tr data-gr-datatable-empty>
-        <td :colspan="totalColumns" class="px-4 py-6 text-center text-[var(--gr-muted-fg)]">
+        <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
           <slot name="empty">
             {{ t('gr.dataTable.empty', 'No data') }}
           </slot>
@@ -357,11 +386,12 @@ function toggleAll(): void {
       data-gr-datatable-row
       :data-selected="selectable && isRowSelected(row) ? 'true' : undefined"
     >
-      <td v-if="selectable" class="w-10 px-4 py-3 text-left">
+      <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]">
         <input
           type="checkbox"
           data-gr-datatable-select-row
-          class="h-4 w-4 cursor-pointer accent-[var(--gr-primary)] align-middle"
+          class="cursor-pointer accent-[var(--gr-primary)] align-middle"
+          :class="checkboxClass"
           :checked="isRowSelected(row)"
           :aria-label="t('gr.dataTable.selectRow', 'Select row')"
           @change="toggleRow(row)"
@@ -370,8 +400,7 @@ function toggleAll(): void {
       <td
         v-for="col in columns"
         :key="col.key"
-        class="px-4 py-3"
-        :class="cellAlign(col)"
+        :class="[cellClass, cellAlign(col)]"
       >
         <slot :name="`cell-${col.key}`" :row="row">
           <span>{{ cellValue(row, col.key) }}</span>

@@ -9,6 +9,8 @@ import type {
 import { createGrTreeDataAdapter } from './grTreeDataAdapter'
 import { createGrTreeInteractionContext } from './grTreeInteractionContext'
 import { createGrTreeStore } from './grTreeStore'
+import { treeSizeVars } from './grTreeStyles'
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type {
   GrTreeBranchLineColor,
@@ -31,6 +33,7 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   }),
   nodeKey: 'id' as any,
   defaultExpandedKeys: () => [],
+  size: undefined,
   highlightCurrent: true,
   indent: 0,
   expandIcon: 'i-lucide-chevron-right',
@@ -404,6 +407,12 @@ function resolveChildrenWrapStyle(row: GrTreeVisibleTreeRow<T>) {
   }
 }
 
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTree' })
+
+// Переменные ставим и вложенным уровням тоже: `v-bind="props"` доносит до них
+// `size`, а значения одинаковые — наследование от корня не нарушается.
+const sizeStyle = computed(() => treeSizeVars[resolvedSize.value])
+
 defineExpose<GrTreeInstance<T>>({
   appendNode: treeStore.appendNode,
   filter,
@@ -424,6 +433,7 @@ defineExpose<GrTreeInstance<T>>({
       :data-gr-tree="props.internalNested ? undefined : ''"
       :class="props.internalNested ? 'gr-tree__children' : 'gr-tree'"
       :role="props.internalNested ? 'group' : 'tree'"
+      :style="sizeStyle"
       @keydown="onTreeKeydown"
   >
     <div
@@ -439,7 +449,7 @@ defineExpose<GrTreeInstance<T>>({
     >
       <div
           data-gr-tree-row
-          class="gr-tree__row py-2 px-2"
+          class="gr-tree__row"
           :class="[
           treeProps.highlightCurrent && currentKey === row.node.key ? 'gr-tree__row--current' : '',
           row.isMatched ? 'gr-tree__row--matched' : '',
@@ -539,7 +549,10 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-children-pl: 10px;
     --gr-tree-row-min-height: 28px;
     --gr-tree-row-radius: 8px;
-    --gr-tree-row-pr: 8px;
+    --gr-tree-row-px: 8px;
+    --gr-tree-row-py: 8px;
+    --gr-tree-row-pr: var(--gr-tree-row-px);
+    --gr-tree-font-size: inherit;
     --gr-tree-row-color: var(--gr-fg);
     --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-primary, #000) 10%, transparent);
     --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary, #000) 5%, transparent);
@@ -593,7 +606,8 @@ defineExpose<GrTreeInstance<T>>({
     align-items: center;
     min-height: var(--gr-tree-row-min-height);
     border-radius: var(--gr-tree-row-radius);
-    padding-right: var(--gr-tree-row-pr);
+    padding: var(--gr-tree-row-py) var(--gr-tree-row-pr) var(--gr-tree-row-py) var(--gr-tree-row-px);
+    font-size: var(--gr-tree-font-size);
     cursor: default;
     user-select: none;
     outline: none;

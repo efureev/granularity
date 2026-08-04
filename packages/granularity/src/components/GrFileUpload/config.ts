@@ -1,6 +1,9 @@
 import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
+import { grFileUploadSafelist } from './safelist'
+
 export const grFileUploadConfig = defineGranularComponent(import.meta.url, {
   name: 'GrFileUpload',
-  dependencies: ['GrIcon'],
+  dependencies: ['GrIcon', 'GrProgressBar'],
+  safelist: grFileUploadSafelist,
 })

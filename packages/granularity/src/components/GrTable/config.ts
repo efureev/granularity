@@ -1,6 +1,8 @@
 import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
-// Все классы GrTable — статические литералы в шаблоне, UnoCSS найдёт их сканом.
+import { grTableSafelist } from './safelist'
+
 export const grTableConfig = defineGranularComponent(import.meta.url, {
   name: 'GrTable',
+  safelist: grTableSafelist,
 })

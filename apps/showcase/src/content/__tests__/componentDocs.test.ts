@@ -38,7 +38,7 @@ describe('component docs metadata', () => {
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
-    expect(fileUploadDoc.examples).toHaveLength(6)
+    expect(fileUploadDoc.examples).toHaveLength(7)
     expect(fileUploadDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(fileUploadDoc.examples.every(example => example.previewKey?.startsWith('gr-file-upload'))).toBe(true)
   })
@@ -64,7 +64,7 @@ describe('component docs metadata', () => {
     expect(dropdownDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown'))).toBe(true)
 
-    expect(dataTableDoc.examples).toHaveLength(5)
+    expect(dataTableDoc.examples).toHaveLength(6)
     expect(dataTableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('gr-data-table'))).toBe(true)
   })
@@ -82,15 +82,15 @@ describe('component docs metadata', () => {
     const tabsDoc = getShowcaseComponentDoc(tabsEntity!)
     const tooltipDoc = getShowcaseComponentDoc(tooltipEntity!)
 
-    expect(paginationDoc.examples).toHaveLength(4)
+    expect(paginationDoc.examples).toHaveLength(5)
     expect(paginationDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('gr-pagination'))).toBe(true)
 
-    expect(tabsDoc.examples).toHaveLength(3)
+    expect(tabsDoc.examples).toHaveLength(4)
     expect(tabsDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tabsDoc.examples.every(example => example.previewKey?.startsWith('gr-tabs'))).toBe(true)
 
-    expect(tooltipDoc.examples).toHaveLength(3)
+    expect(tooltipDoc.examples).toHaveLength(4)
     expect(tooltipDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tooltipDoc.examples.every(example => example.previewKey?.startsWith('gr-tooltip'))).toBe(true)
   })
@@ -105,7 +105,7 @@ describe('component docs metadata', () => {
     const treeDoc = getShowcaseComponentDoc(treeEntity!)
     const treeSelectDoc = getShowcaseComponentDoc(treeSelectEntity!)
 
-    expect(treeDoc.examples).toHaveLength(3)
+    expect(treeDoc.examples).toHaveLength(4)
     expect(treeDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeDoc.examples.every(example => example.previewKey?.startsWith('gr-tree'))).toBe(true)
 
@@ -167,7 +167,7 @@ describe('component docs metadata', () => {
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 
-    expect(textareaDoc.examples).toHaveLength(3)
+    expect(textareaDoc.examples).toHaveLength(4)
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 
@@ -273,7 +273,7 @@ describe('component docs metadata', () => {
     expect(emptyStateDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(emptyStateDoc.examples.every(example => example.previewKey?.startsWith('gr-empty-state'))).toBe(true)
 
-    expect(progressBarDoc.examples).toHaveLength(3)
+    expect(progressBarDoc.examples).toHaveLength(4)
     expect(progressBarDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(progressBarDoc.examples.every(example => example.previewKey?.startsWith('gr-progress-bar'))).toBe(true)
 
@@ -295,7 +295,7 @@ describe('component docs metadata', () => {
     const formSectionDoc = getShowcaseComponentDoc(formSectionEntity!)
     const inputTagDoc = getShowcaseComponentDoc(inputTagEntity!)
 
-    expect(formFileDoc.examples).toHaveLength(3)
+    expect(formFileDoc.examples).toHaveLength(4)
     expect(formFileDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(formFileDoc.examples.every(example => example.previewKey?.startsWith('gr-form-file'))).toBe(true)
 
@@ -350,7 +350,7 @@ describe('component docs metadata', () => {
     expect(listDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(listDoc.examples.every(example => example.previewKey?.startsWith('gr-list'))).toBe(true)
 
-    expect(tableDoc.examples).toHaveLength(3)
+    expect(tableDoc.examples).toHaveLength(4)
     expect(tableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tableDoc.examples.every(example => example.previewKey?.startsWith('gr-table'))).toBe(true)
   })

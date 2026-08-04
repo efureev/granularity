@@ -7,7 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`size` on the nine components that lacked it** — `GrTextarea`, `GrTabs`, `GrPagination`,
+  `GrTable`, `GrDataTable`, `GrTree`, `GrProgressBar`, `GrTooltip`, `GrFormFile`, `GrFileUpload`.
+  The scale (`xs | sm | md | lg`) and the provider were already package-wide; these components
+  simply were not wired to them, so `<GrConfigProvider size="sm">` scaled a `GrInput` and left the
+  `GrTextarea` beside it untouched — the form fell apart visually.
+
+  **`size="md"` renders exactly as before** for every one of them: the prop adds steps, it does not
+  restyle existing markup.
+
+  Composite components pass the resolved size down instead of hardcoding it: `GrPagination` to its
+  `GrButton`/`GrSelect`, `GrDataTable` to `GrTable` and the sort icons, `GrFormFile` to its
+  buttons and icons, `GrFileUpload` to its `GrProgressBar`. `GrTree` expresses the size through its
+  existing `--gr-tree-*` custom properties rather than a second, competing channel.
+
+  A gate (`src/__tests__/componentSize.test.ts`) checks the rendered DOM — not that the composable
+  was called — for every component declaring `size` in its `defaults.ts`, and takes that list from
+  the filesystem so the next such component cannot drop out of the scale silently.
+
+  **The gate immediately found four more**, left as-is because each needs a separate look-and-feel
+  decision and none is in scope here (recorded in `AUDIT.md` and `docs/sizes.md`): `GrBadge` never
+  sees the provider's global `size`; `GrKbd` is typed on four steps and implements two; `GrRadio`
+  and `GrRadioGroup` scale only in `variant="button"`.
+
+- **`docs/sizes.md`** — the scales, the resolution order, who is on the scale and the deviations.
+
 ### Changed — BREAKING
+
+- **`GrTable` and `GrDataTable`: `density` replaced by `size`.** The prop did exactly and only what
+  `size` should do — set the font scale — so keeping both would have meant two props for one axis.
+  Migration is 1:1 and mechanical:
+
+  ```diff
+  - <GrDataTable :rows="rows" density="compact" />
+  + <GrDataTable :rows="rows" size="sm" />
+  ```
+
+  `compact` → `sm`, `regular` (the default) → `md`; `xs` and `lg` are new. In `GrDataTable` the size
+  now also drives cell padding, sort-arrow and checkbox metrics, which `density` never touched.
+  `GrTableDensity` is no longer exported. `GrListItem` keeps its own unrelated `density` — there it
+  means padding, not type scale.
 
 - **Four deprecated aliases removed** — each one would have been permanent after 1.0:
 

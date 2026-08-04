@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import { type GrTabsSize, tabBadgeSizes, tablistSizes, tabSizes } from './grTabsStyles'
+
 export type GrTab = {
   value: string
   label: string
@@ -17,6 +20,7 @@ export type GrTabsProps = {
    * Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.
    */
   idBase?: string
+  size?: GrTabsSize
 }
 
 /**
@@ -35,6 +39,12 @@ const props = defineProps<GrTabsProps>()
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTabs' })
+
+const tablistClass = computed(() => tablistSizes[resolvedSize.value])
+const tabClass = computed(() => tabSizes[resolvedSize.value])
+const badgeClass = computed(() => tabBadgeSizes[resolvedSize.value])
 
 const buttonRefs = ref<HTMLButtonElement[]>([])
 
@@ -142,7 +152,8 @@ function onClick(tab: GrTab): void {
   <div
     role="tablist"
     data-gr-tabs
-    class="inline-flex flex-wrap gap-1 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] p-1"
+    class="inline-flex flex-wrap rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)]"
+    :class="tablistClass"
     @keydown="onKeydown"
   >
     <button
@@ -158,17 +169,21 @@ function onClick(tab: GrTab): void {
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :disabled="tab.disabled"
       :tabindex="index === rovingIndex ? 0 : -1"
-      class="h-9 px-3 rounded-[10px] text-sm font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-60 disabled:cursor-not-allowed"
-      :class="tab.value === modelValue
-        ? 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]'
-        : 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-card)_70%,transparent)]'"
+      class="rounded-[10px] font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-60 disabled:cursor-not-allowed"
+      :class="[
+        tabClass,
+        tab.value === modelValue
+          ? 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]'
+          : 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-card)_70%,transparent)]',
+      ]"
       @click="onClick(tab)"
     >
       <span class="inline-flex items-center gap-2">
         <span>{{ tab.label }}</span>
         <span
           v-if="tab.badge"
-          class="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--gr-secondary)] text-[var(--gr-secondary-fg)]"
+          class="rounded-full bg-[var(--gr-secondary)] text-[var(--gr-secondary-fg)]"
+          :class="badgeClass"
         >
           {{ tab.badge }}
         </span>

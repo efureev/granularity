@@ -18,4 +18,7 @@ export type {
   GrTreeVisibleTreeRow,
 } from './grTreeProps'
 export { grTreeConfig } from './config'
+// Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
+export type { GrTreeConfigurableProps } from './defaults'
+export type { GrTreeSize } from './grTreeStyles'
 export { grTreeSafelist } from './safelist'

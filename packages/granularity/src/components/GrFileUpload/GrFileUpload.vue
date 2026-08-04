@@ -10,6 +10,18 @@ import type { FileValidator, FileValidatorSource } from '../../fileValidation'
 import type { GrUploadProgressInfo } from './uploadViaXhr'
 import type { GrUploadState } from './uploadState'
 
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import {
+  type GrFileUploadSize,
+  hintSizes,
+  iconGlyphSizes,
+  iconTileSizes,
+  labelSizes,
+  progressBarSizes,
+  progressTextSizes,
+  zoneGaps,
+  zonePaddings,
+} from './grFileUploadStyles'
 import { FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { GR_UPLOAD_STATE_IDLE } from './uploadState'
@@ -74,6 +86,8 @@ export interface GrFileUploadProps {
   progressLabel?: string
   /** Через сколько мс после `success` скрыть прогресс-бар. `0` — не скрывать. */
   hideProgressOnSuccess?: number
+  /** Размер дефолтного UI: поля дроп-зоны, плитка иконки, кегль подписей. */
+  size?: GrFileUploadSize
 }
 
 const props = withDefaults(
@@ -101,8 +115,20 @@ const props = withDefaults(
     progressTone: 'primary',
     progressLabel: undefined,
     hideProgressOnSuccess: 800,
+    size: undefined,
   },
 )
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrFileUpload' })
+
+const zoneClass = computed(() => zonePaddings[resolvedSize.value])
+const zoneGapClass = computed(() => zoneGaps[resolvedSize.value])
+const iconTileClass = computed(() => iconTileSizes[resolvedSize.value])
+const iconGlyphSize = computed(() => iconGlyphSizes[resolvedSize.value])
+const labelClass = computed(() => labelSizes[resolvedSize.value])
+const hintClass = computed(() => hintSizes[resolvedSize.value])
+const progressTextClass = computed(() => progressTextSizes[resolvedSize.value])
+const progressBarSize = computed(() => progressBarSizes[resolvedSize.value])
 
 const emit = defineEmits<{
   (e: 'success', payload: any): void
@@ -497,7 +523,8 @@ defineExpose({
       hasCustomUi
         ? 'inline-block'
         : [
-            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] px-5 py-6 outline-none transition',
+            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] outline-none transition',
+            zoneClass,
             disabled
               ? 'bg-[var(--gr-muted)] cursor-not-allowed'
               : 'bg-[var(--gr-card)] cursor-pointer hover:bg-[var(--gr-muted)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]',
@@ -542,19 +569,20 @@ defineExpose({
       :state="state"
     />
 
-    <div v-else class="flex items-start gap-4">
+    <div v-else class="flex items-start" :class="zoneGapClass">
       <div
         data-gr-file-upload-icon
-        class="h-12 w-12 shrink-0 rounded-[12px] bg-[var(--gr-muted)] border border-[var(--gr-brd)] flex items-center justify-center"
+        class="shrink-0 bg-[var(--gr-muted)] border border-[var(--gr-brd)] flex items-center justify-center"
+        :class="iconTileClass"
         aria-hidden="true"
       >
-        <GrIcon class="h-6 w-6 text-[var(--gr-muted-fg)]">
+        <GrIcon class="text-[var(--gr-muted-fg)]" :size="iconGlyphSize">
           <IconArrowUp />
         </GrIcon>
       </div>
 
       <div class="min-w-0">
-        <div data-gr-file-upload-label class="text-[14px] font-700">
+        <div data-gr-file-upload-label class="font-700" :class="labelClass">
           <slot name="label">
             <slot>
               {{ resolvedPlaceholder }}
@@ -562,17 +590,17 @@ defineExpose({
           </slot>
         </div>
 
-        <div v-if="$slots.tip" data-gr-file-upload-tip class="mt-1 text-[13px] text-[var(--gr-muted-fg)]">
+        <div v-if="$slots.tip" data-gr-file-upload-tip class="mt-1 text-[var(--gr-muted-fg)]" :class="hintClass">
           <slot name="tip" />
         </div>
-        <div v-else class="mt-1 text-[13px] text-[var(--gr-muted-fg)]" />
+        <div v-else class="mt-1 text-[var(--gr-muted-fg)]" :class="hintClass" />
 
         <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 space-y-1">
           <li
             v-for="file in lastFiles"
             :key="file.name"
             data-gr-file-upload-item
-            class="text-[13px]"
+            :class="hintClass"
           >
             <span class="font-600">{{ file.name }}</span>
             <span class="text-[var(--gr-muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
@@ -600,11 +628,13 @@ defineExpose({
               <GrProgressBar
                 :value="progressPercent"
                 :tone="effectiveProgressTone"
+                :size="progressBarSize"
                 :aria-label="resolvedProgressLabel"
               />
               <span
                 data-gr-file-upload-progress-text
-                class="text-[12px] text-[var(--gr-muted-fg)] tabular-nums min-w-[3ch] text-right"
+                class="text-[var(--gr-muted-fg)] tabular-nums min-w-[3ch] text-right"
+                :class="progressTextClass"
               >{{ progressText }}</span>
             </div>
           </div>

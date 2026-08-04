@@ -4,6 +4,18 @@ import { computed, ref, watch } from 'vue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
 import GrSelect from '../GrSelect/GrSelect.vue'
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import {
+  type GrPaginationSize,
+  ellipsisSizes,
+  jumperSizes,
+  labelSizes,
+  navButtonSizes,
+  pageListGaps,
+  pageSizes,
+  pageSizeSelectWidths,
+  rowGaps,
+} from './grPaginationStyles'
 
 /**
  * Пропы пагинации.
@@ -31,6 +43,7 @@ export interface GrPaginationProps {
   showJumper?: boolean
   /** i18n-подпись перед полем перехода. По умолчанию — `gr.pagination.jumpTo`. */
   jumperLabel?: string
+  size?: GrPaginationSize
 }
 
 const { t } = useGranularityTranslations()
@@ -42,7 +55,19 @@ const props = withDefaults(defineProps<GrPaginationProps>(), {
   compact: false,
   showJumper: false,
   jumperLabel: undefined,
+  size: undefined,
 })
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPagination' })
+
+const rowClass = computed(() => rowGaps[resolvedSize.value])
+const pageListClass = computed(() => pageListGaps[resolvedSize.value])
+const pageClass = computed(() => pageSizes[resolvedSize.value])
+const jumperClass = computed(() => jumperSizes[resolvedSize.value])
+const ellipsisClass = computed(() => ellipsisSizes[resolvedSize.value])
+const labelClass = computed(() => labelSizes[resolvedSize.value])
+const selectWrapClass = computed(() => pageSizeSelectWidths[resolvedSize.value])
+const navButtonSize = computed(() => navButtonSizes[resolvedSize.value])
 
 const emit = defineEmits<{
   (e: 'update:page', value: number): void
@@ -155,24 +180,26 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
 
 <template>
   <div
-    class="flex flex-wrap items-center justify-end gap-3"
+    class="flex flex-wrap items-center justify-end"
+    :class="rowClass"
     data-gr-pagination
     role="navigation"
     :aria-label="t('gr.pagination.label', 'Pagination')"
   >
-    <div class="min-w-[100px]">
+    <div :class="selectWrapClass">
       <GrSelect
         v-model="pageSizeModel"
         :options="pageSizeOptions"
+        :size="resolvedSize"
         :aria-label="t('gr.pagination.pageSize', 'Page size')"
       />
     </div>
 
-    <GrButton variant="ghost" size="sm" :disabled="page <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="page <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
       «
     </GrButton>
 
-    <GrButton variant="ghost" size="sm" :disabled="page <= 1" data-gr-pagination-prev @click="prev">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="page <= 1" data-gr-pagination-prev @click="prev">
       {{ t('gr.pagination.prev', 'Prev') }}
     </GrButton>
 
@@ -180,19 +207,21 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
     <div
       v-if="compact"
       data-gr-pagination-compact
-      class="px-2 text-sm text-[var(--gr-fg)] tabular-nums"
+      class="px-2 text-[var(--gr-fg)] tabular-nums"
+      :class="labelClass"
       aria-live="polite"
     >
       {{ page }} / {{ pageCount }}
     </div>
 
-    <div v-else class="flex items-center gap-1">
+    <div v-else class="flex items-center" :class="pageListClass">
       <template v-for="(item, index) in items" :key="index">
         <span
           v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
           data-gr-pagination-ellipsis
           aria-hidden="true"
-          class="h-8 min-w-8 px-1 grid place-items-center text-sm text-[var(--gr-muted-fg)]"
+          class="grid place-items-center text-[var(--gr-muted-fg)]"
+          :class="ellipsisClass"
         >…</span>
         <button
           v-else
@@ -200,8 +229,11 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
           data-gr-pagination-page
           :aria-current="item === page ? 'page' : undefined"
           :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
-          class="h-8 min-w-8 px-2 rounded-md text-sm font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-          :class="item === page ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]'"
+          class="rounded-md font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+          :class="[
+            pageClass,
+            item === page ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]',
+          ]"
           @click="goTo(item)"
         >
           {{ item }}
@@ -209,16 +241,16 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
       </template>
     </div>
 
-    <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" data-gr-pagination-next @click="next">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="page >= pageCount" data-gr-pagination-next @click="next">
       {{ t('gr.pagination.next', 'Next') }}
     </GrButton>
 
-    <GrButton variant="ghost" size="sm" :disabled="page >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="page >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
       »
     </GrButton>
 
     <!-- «Перейти к странице»: Enter или blur применяют введённый номер. -->
-    <div v-if="showJumper" class="flex items-center gap-2 text-sm text-[var(--gr-muted-fg)]">
+    <div v-if="showJumper" class="flex items-center gap-2 text-[var(--gr-muted-fg)]" :class="labelClass">
       <span>{{ resolvedJumperLabel }}</span>
       <input
         v-model="jumperValue"
@@ -228,7 +260,8 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
         inputmode="numeric"
         data-gr-pagination-jumper
         :aria-label="resolvedJumperLabel"
-        class="h-8 w-14 rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-sm text-[var(--gr-fg)] tabular-nums transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] tabular-nums transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        :class="jumperClass"
         @keydown.enter="submitJumper"
         @blur="submitJumper"
       >

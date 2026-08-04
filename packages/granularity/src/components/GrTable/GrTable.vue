@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 
-export type GrTableDensity = 'compact' | 'regular'
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import { type GrTableSize, tableSizes } from './grTableStyles'
 
 export interface GrTableProps {
   /**
-   * Плотность таблицы — влияет на базовый размер шрифта.
-   * Паддинги ячеек оставлены за консьюмером (GrTable — «тонкий» контейнер).
+   * Размер таблицы — базовый кегль текста. Паддинги ячеек оставлены за
+   * консьюмером (GrTable — «тонкий» контейнер).
    */
-  density?: GrTableDensity
+  size?: GrTableSize
   /**
    * Текст caption для screen reader'ов. Рендерится как `<caption class="sr-only">`,
    * если не передан слот `#caption`.
@@ -47,7 +48,7 @@ export interface GrTableProps {
  * консьюмеру нужны `white-space: nowrap` на ячейках или явные ширины колонок.
  */
 const props = withDefaults(defineProps<GrTableProps>(), {
-  density: 'regular',
+  size: undefined,
   caption: undefined,
   ariaLabel: undefined,
   ariaLabelledby: undefined,
@@ -58,7 +59,8 @@ const props = withDefaults(defineProps<GrTableProps>(), {
 
 const slots = useSlots()
 
-const tableTextClass = computed(() => (props.density === 'compact' ? 'text-[13px]' : 'text-sm'))
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTable' })
+const tableTextClass = computed(() => tableSizes[resolvedSize.value])
 const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.caption))
 
 const scrollStyle = computed(() => {

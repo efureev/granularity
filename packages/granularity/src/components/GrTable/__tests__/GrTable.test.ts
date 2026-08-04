@@ -87,14 +87,23 @@ describe('GrTable', () => {
     expect(wrapperBy.find('table').attributes('aria-label')).toBeUndefined()
   })
 
-  it('меняет размер текста по density', () => {
-    const regular = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
-    expect(regular.find('table').classes()).toContain('text-sm')
+  it('меняет размер текста по size', () => {
+    const defaultSize = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
+    expect(defaultSize.find('table').classes()).toContain('text-sm')
 
-    const compact = mount(GrTable, {
-      props: { density: 'compact' },
-      slots: { default: '<tr><td>x</td></tr>' },
-    })
-    expect(compact.find('table').classes()).toContain('text-[13px]')
+    const expected: Record<string, string> = {
+      xs: 'text-[12px]',
+      sm: 'text-[13px]',
+      md: 'text-sm',
+      lg: 'text-base',
+    }
+
+    for (const [size, className] of Object.entries(expected)) {
+      const wrapper = mount(GrTable, {
+        props: { size: size as 'xs' | 'sm' | 'md' | 'lg' },
+        slots: { default: '<tr><td>x</td></tr>' },
+      })
+      expect(wrapper.find('table').classes(), size).toContain(className)
+    }
   })
 })

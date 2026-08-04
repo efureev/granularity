@@ -20,6 +20,7 @@
 - Если нужны package-level утилиты кроме компонентов: откройте [`directives.md`](./directives.md) и [
   `file-validation.md`](./file-validation.md).
 - Если нужен обзор опубликованных компонентов: откройте [`components.md`](./components.md).
+- Если нужно масштабировать контролы целиком: откройте [`sizes.md`](./sizes.md).
 
 ## Карта документации
 
@@ -28,6 +29,7 @@
 - [`tokens.md`](./tokens.md) — справочник токенов (генерируется из `tokens/*.json`, руками не править).
 - [`theming.md`](./theming.md) — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, подключение, проверка контраста.
 - [`keyboard.md`](./keyboard.md) — клавиатурный контракт: общие правила и таблица по компонентам.
+- [`sizes.md`](./sizes.md) — шкала размеров: кто на ней, порядок разрешения `size`, отклонения.
 - [`z-index.md`](./z-index.md) — шкала слоёв и стек оверлеев (Esc, фокус, `inert`).
 - [`ssr.md`](./ssr.md) — какие компоненты безопасны при серверном рендере и где нужны оговорки.
 - [`unocss.md`](./unocss.md) — интеграция с `UnoCSS` через `presetGranularNode` из `@feugene/unocss-preset-granular/node`

@@ -7,7 +7,8 @@
  * - `invalid`: форсирует `danger`-состояние и проставляет `aria-invalid="true"`.
  */
 import { computed, ref } from 'vue'
-import { type GrTextareaState, grTextareaClass } from './grTextareaStyles'
+import { type GrTextareaSize, type GrTextareaState, grTextareaClass, sizes } from './grTextareaStyles'
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<{
   name?: string
   id?: string
   rows?: number
+  size?: GrTextareaSize
 }>(), {
   placeholder: undefined,
   autocomplete: undefined,
@@ -39,6 +41,7 @@ const props = withDefaults(defineProps<{
   name: undefined,
   id: undefined,
   rows: 4,
+  size: undefined,
 })
 
 const emit = defineEmits<{
@@ -69,10 +72,15 @@ function blur(): void {
 
 defineExpose({ focus, blur })
 
-const className = computed(() => grTextareaClass({
-  state: props.state,
-  invalid: isInvalid.value,
-}))
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextarea' })
+
+const className = computed(() => [
+  sizes[resolvedSize.value],
+  grTextareaClass({
+    state: props.state,
+    invalid: isInvalid.value,
+  }),
+].join(' '))
 
 function onInput(e: Event): void {
   emit('update:modelValue', (e.target as HTMLTextAreaElement).value)
@@ -96,7 +104,7 @@ function onInput(e: Event): void {
     :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-label="ariaLabel"
     :readonly="isReadonly"
-    class="w-full rounded-md border bg-[var(--gr-bg)] px-3 py-2 text-[14px] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+    class="w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
     :class="className"
     @input="onInput"
   />

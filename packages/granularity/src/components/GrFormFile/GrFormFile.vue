@@ -6,6 +6,17 @@ import IconX from '~icons/lucide/x'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import {
+  type GrFormFileSize,
+  buttonSizes,
+  iconOffsets,
+  iconSizes,
+  removeTextSizes,
+  rowGaps,
+  stackGaps,
+  textSizes,
+} from './grFormFileStyles'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { vDropzone } from '../../directives'
@@ -45,6 +56,8 @@ export interface GrFormFileProps {
   removeText?: string
   clearAllText?: string
   placeholder?: string
+  /** Размер кнопок, иконок и подписей. */
+  size?: GrFormFileSize
   /** Дополнительная (кастомная) валидация на стороне потребителя. */
   validate?: (files: File[]) => GrFormFileError[] | Promise<GrFormFileError[]>
 }
@@ -64,10 +77,21 @@ const props = withDefaults(
     removeText: undefined,
     clearAllText: undefined,
     placeholder: undefined,
+    size: undefined,
     validators: undefined,
     validate: undefined,
   },
 )
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrFormFile' })
+
+const rowClass = computed(() => rowGaps[resolvedSize.value])
+const stackClass = computed(() => stackGaps[resolvedSize.value])
+const textClass = computed(() => textSizes[resolvedSize.value])
+const removeTextClass = computed(() => removeTextSizes[resolvedSize.value])
+const iconOffsetClass = computed(() => iconOffsets[resolvedSize.value])
+const buttonSize = computed(() => buttonSizes[resolvedSize.value])
+const iconSize = computed(() => iconSizes[resolvedSize.value])
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: File | File[] | null): void
@@ -294,13 +318,13 @@ watch(
       @change="onInputChange"
     >
 
-    <div class="flex flex-col gap-2">
-      <div class="flex flex-wrap items-center gap-3">
+    <div class="flex flex-col" :class="stackClass">
+      <div class="flex flex-wrap items-center" :class="rowClass">
         <GrButton
           :id="fieldId"
           ref="uploadBtnEl"
           variant="secondary"
-          size="sm"
+          :size="buttonSize"
           data-gr-form-file-upload-btn
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid ? 'true' : undefined"
@@ -310,43 +334,44 @@ watch(
           :disabled="disabled"
           @click.prevent="openDialog"
         >
-          <GrIcon size="sm" aria-hidden="true">
+          <GrIcon :size="iconSize" aria-hidden="true">
             <IconUpload />
           </GrIcon>
-          <span class="ml-2">{{ hasFiles ? resolvedChangeText : resolvedUploadText }}</span>
+          <span :class="iconOffsetClass">{{ hasFiles ? resolvedChangeText : resolvedUploadText }}</span>
         </GrButton>
 
         <GrButton
           v-if="hasFiles && !multiple"
           variant="secondary"
-          size="sm"
+          :size="buttonSize"
           data-gr-form-file-clear-btn
           :disabled="disabled"
           @click.prevent="clearAll"
         >
-          <GrIcon size="sm" aria-hidden="true">
+          <GrIcon :size="iconSize" aria-hidden="true">
             <IconX />
           </GrIcon>
-          <span class="ml-2">{{ resolvedRemoveText }}</span>
+          <span :class="iconOffsetClass">{{ resolvedRemoveText }}</span>
         </GrButton>
 
         <GrButton
           v-if="multiple && hasFiles"
           variant="secondary"
-          size="sm"
+          :size="buttonSize"
           data-gr-form-file-clear-all-btn
           :disabled="disabled"
           @click.prevent="clearAll"
         >
-          <GrIcon size="sm" aria-hidden="true">
+          <GrIcon :size="iconSize" aria-hidden="true">
             <IconX />
           </GrIcon>
-          <span class="ml-2">{{ resolvedClearAllText }}</span>
+          <span :class="iconOffsetClass">{{ resolvedClearAllText }}</span>
         </GrButton>
 
         <span
           v-if="!multiple && hasFiles"
-          class="text-sm text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+          class="text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+          :class="textClass"
           data-gr-form-file-single-name
           :title="files[0]?.name"
         >
@@ -355,14 +380,15 @@ watch(
 
         <span
           v-if="!hasFiles"
-          class="text-sm text-[var(--gr-muted-fg)]"
+          class="text-[var(--gr-muted-fg)]"
+          :class="textClass"
           data-gr-form-file-placeholder
         >
           {{ resolvedPlaceholder }}
         </span>
       </div>
 
-      <div v-if="multiple && hasFiles" class="flex flex-col gap-2">
+      <div v-if="multiple && hasFiles" class="flex flex-col" :class="stackClass">
         <div
           v-for="(file, index) in files"
           :key="`${file.name}-${file.size}-${index}`"
@@ -370,7 +396,8 @@ watch(
           data-gr-form-file-item
         >
           <span
-            class="text-sm text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+            class="text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+            :class="textClass"
             :title="file.name"
             data-gr-form-file-item-name
           >
@@ -379,7 +406,8 @@ watch(
 
           <button
             type="button"
-            class="text-xs text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+            class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+            :class="removeTextClass"
             data-gr-form-file-item-remove
             :disabled="disabled"
             @click.prevent="removeAt(index)"
@@ -390,7 +418,7 @@ watch(
       </div>
 
       <slot name="errors" :errors="localErrors">
-        <div v-if="localErrors.length" class="text-sm text-[var(--gr-danger)]" data-gr-form-file-errors>
+        <div v-if="localErrors.length" class="text-[var(--gr-danger)]" :class="textClass" data-gr-form-file-errors>
           <div v-for="(e, i) in localErrors" :key="i" data-gr-form-file-error>
             {{ issueMessage(e) }}
           </div>

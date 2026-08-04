@@ -1493,11 +1493,11 @@
             "default": "undefined"
           },
           {
-            "name": "density",
-            "description": "",
-            "type": "GrTableDensity | undefined",
+            "name": "size",
+            "description": "Размер таблицы: кегль, паддинги ячеек, стрелки сортировки и чекбоксы. Прокидывается в `GrTable`.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "\"regular\""
+            "default": "undefined"
           },
           {
             "name": "caption",
@@ -2169,6 +2169,13 @@
             "default": "false"
           },
           {
+            "name": "size",
+            "description": "Размер дефолтного UI: поля дроп-зоны, плитка иконки, кегль подписей.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "placeholder",
             "description": "i18n: надпись-подсказка в дефолтном UI.",
             "type": "string | undefined",
@@ -2554,6 +2561,13 @@
             "default": "undefined"
           },
           {
+            "name": "labelClass",
+            "description": "",
+            "type": "LabelClass | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "forId",
             "description": "Явный id контрола. Если не задан — генерируется автоматически.",
             "type": "string | undefined",
@@ -2564,13 +2578,6 @@
             "name": "hint",
             "description": "Подсказка под лейблом/над контролом (можно также через слот `#hint`).",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "labelClass",
-            "description": "",
-            "type": "LabelClass | undefined",
             "required": false,
             "default": "undefined"
           }
@@ -2650,6 +2657,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "Размер кнопок, иконок и подписей.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -3782,6 +3796,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "spinnerClass",
+            "description": "Extra classes for the spinner element.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "text",
             "description": "Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`.",
             "type": "string | undefined",
@@ -3799,13 +3820,6 @@
             "name": "spinner",
             "description": "Custom spinner component (rendered instead of the default loader icon).",
             "type": "Component | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "spinnerClass",
-            "description": "Extra classes for the spinner element.",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4301,11 +4315,11 @@
         "origin": "generated",
         "items": [
           {
-            "name": "compact",
-            "description": "Компактный вариант: вместо нумерованных страниц показывается индикатор «текущая / всего» — удобно для узких мест (мобайл, тулбары таблиц).",
-            "type": "boolean | undefined",
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "pageSizes",
@@ -4327,6 +4341,13 @@
             "type": "number | undefined",
             "required": false,
             "default": "1"
+          },
+          {
+            "name": "compact",
+            "description": "Компактный вариант: вместо нумерованных страниц показывается индикатор «текущая / всего» — удобно для узких мест (мобайл, тулбары таблиц).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "showJumper",
@@ -4410,6 +4431,13 @@
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -6237,6 +6265,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "size",
+            "description": "Размер таблицы — базовый кегль текста. Паддинги ячеек оставлены за консьюмером (GrTable — «тонкий» контейнер).",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "ariaLabel",
             "description": "Прямой ARIA-label для `<table>`. Игнорируется, если задан `ariaLabelledby`.",
             "type": "string | undefined",
@@ -6249,13 +6284,6 @@
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "density",
-            "description": "Плотность таблицы — влияет на базовый размер шрифта. Паддинги ячеек оставлены за консьюмером (GrTable — «тонкий» контейнер).",
-            "type": "GrTableDensity | undefined",
-            "required": false,
-            "default": "\"regular\""
           },
           {
             "name": "caption",
@@ -6394,6 +6422,12 @@
             "required": true
           },
           {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false
+          },
+          {
             "name": "idBase",
             "description": "База id для ARIA-связки с `GrTabPanels`. Если задана, каждая вкладка получает `id=\"<idBase>-tab-<value>\"` и `aria-controls=\"<idBase>-panel-<value>\"`. Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.",
             "type": "string | undefined",
@@ -6470,6 +6504,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -6641,6 +6682,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "size",
+            "description": "Размер панели и дефолтной триггер-иконки.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "iconColor",
             "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--gr-muted-fg)`.",
             "type": "string | undefined",
@@ -6722,6 +6770,13 @@
             "description": "",
             "type": "GrTreeFilterNodeMethod<T> | undefined",
             "required": false
+          },
+          {
+            "name": "size",
+            "description": "Размер строки: высота, отступы, иконки и кегль подписи.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "highlightCurrent",

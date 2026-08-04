@@ -21,6 +21,8 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 import GrIcon from '../GrIcon'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
+import { useGrComponentSize } from '../GrConfigProvider/context'
+import { type GrTooltipSize, panelSizes, panelWidths, triggerIconSizes } from './grTooltipStyles'
 
 import IconInfo from '~icons/lucide/info'
 
@@ -28,11 +30,22 @@ export interface GrTooltipProps {
   text: string
   /** Цвет триггер-иконки (CSS color). По умолчанию — `var(--gr-muted-fg)`. */
   iconColor?: string
+  /** Размер панели и дефолтной триггер-иконки. */
+  size?: GrTooltipSize
 }
 
 const props = withDefaults(defineProps<GrTooltipProps>(), {
   iconColor: 'var(--gr-muted-fg)',
+  size: undefined,
 })
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTooltip' })
+
+const panelClass = computed(() => [
+  panelSizes[resolvedSize.value],
+  panelWidths[resolvedSize.value],
+].join(' '))
+const triggerIconSize = computed(() => triggerIconSizes[resolvedSize.value])
 
 const tooltipId = `gr-tooltip-${useId()}`
 
@@ -78,7 +91,7 @@ useDismissible(open, hide)
       @blur="hide"
     >
       <slot>
-        <GrIcon size="sm" aria-hidden="true">
+        <GrIcon :size="triggerIconSize" aria-hidden="true">
           <IconInfo />
         </GrIcon>
       </slot>
@@ -99,7 +112,8 @@ useDismissible(open, hide)
           ref="panelEl"
           role="tooltip"
           data-gr-tooltip-panel
-          class="pointer-events-none max-w-[280px] rounded-md border border-[var(--gr-brd)] bg-[var(--gr-popover)] px-2 py-1 text-[12px] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
+          class="pointer-events-none rounded-md border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
+          :class="panelClass"
           :style="floatingStyle"
         >
           {{ text }}
