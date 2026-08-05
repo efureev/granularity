@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.14.0] 2026-08-05
+
 ### Added
 
 - **New `GrPopover`** — an anchored, non-modal overlay holding whatever content you give it: a short
