@@ -118,7 +118,14 @@
     "region": "Уведомления"
   },
   "inputTag": {
-    "removeTag": "Удалить тег"
+    "removeTag": "Удалить тег",
+    "removeTagNamed": "Удалить тег {tag}",
+    "clearAll": "Удалить все теги",
+    "added": "Добавлен тег: {tag}",
+    "addedMany": "Добавлено тегов: {count}",
+    "removed": "Удалён тег: {tag}",
+    "cleared": "Все теги удалены",
+    "limitReached": "Достигнут предел тегов"
   },
   "fileUpload": {
     "placeholder": "Перетащите файлы сюда или нажмите для выбора",

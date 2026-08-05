@@ -117,7 +117,14 @@
     "region": "Notificaciones"
   },
   "inputTag": {
-    "removeTag": "Eliminar etiqueta"
+    "removeTag": "Eliminar etiqueta",
+    "removeTagNamed": "Eliminar etiqueta {tag}",
+    "clearAll": "Eliminar todas las etiquetas",
+    "added": "Etiqueta añadida: {tag}",
+    "addedMany": "Etiquetas añadidas: {count}",
+    "removed": "Etiqueta eliminada: {tag}",
+    "cleared": "Todas las etiquetas eliminadas",
+    "limitReached": "Límite de etiquetas alcanzado"
   },
   "fileUpload": {
     "placeholder": "Arrastra archivos aquí o haz clic para seleccionar",

@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   ввод; `select()` присоединяется к `focus()`/`blur()` в `defineExpose`; `type` принимает `tel` и `url`.
   Счётчик символов теперь связан с полем через `aria-describedby`, а исчерпание лимита объявляется
   живым регионом (новый ключ `gr.input.limitReached`).
+- **`GrInputTag`: проверка тега, `clearable`, `loading` и размер из провайдера.** `beforeAdd` отсеивает
+  тег до добавления (в том числе асинхронно — со спиннером и `aria-busy`, устаревшая проверка не
+  дописывает свой результат), отказ уходит в событие `reject`. `clearable` добавляет кнопку «снести
+  все» и событие `clear`, `clear()` появился в `defineExpose`. `size` и `clearable` читаются из
+  `GrConfigProvider` (новый `defaults.ts`). Добавление, удаление, очистка и исчерпание `max`
+  объявляются живым регионом (`gr.inputTag.added`, `.addedMany`, `.removed`, `.cleared`,
+  `.limitReached`).
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
@@ -64,6 +71,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   also had no accessible name at all (`aria-dialog-name`), and every image was `alt=""` with no way
   to pass a description. `useZoomPan`, `useWheelGesture` and `useViewerKeyboard` are now covered by
   tests.
+- **`GrInputTag` запирал клавиатуру на пределе набора и врал о валидности.** При достижении `max`
+  инпут получал `disabled`: он выпадал из таб-порядка и переставал принимать `Backspace` — единственный
+  способ убрать тег с клавиатуры, так что выйти из тупика можно было только мышью. Поле остаётся живым,
+  лишние теги просто не добавляются. Рамка красилась сырым пропом `invalid`, тогда как `aria-invalid`
+  брался из контекста: внутри `GrFormField` с ошибкой поле было объявлено невалидным для скринридера и
+  выглядело обычным; `readonly` поля до инпута не доходил вовсе. Крестики чипов переведены на roving
+  tabindex (двадцать тегов давали двадцать одну остановку `Tab`): между ними ходят `←`/`→`, `Home`/`End`,
+  удаляет `Delete`, а из пустого поля на последний чип уводит `←`. Кнопка удаления называет свой тег,
+  набор объявлен списком (`role="list"`/`listitem`). Заблокированное поле гасится фоном `--gr-muted`
+  вместо `opacity-50`, крестик чипа больше не теряет контраст на тёмном тоне, а `safelist.ts` ссылается
+  на классы хелпера вместо строковых копий.
 - **`GrInput` не отдавал очистку и показ пароля клавиатуре.** На обеих trailing-кнопках стоял
   `tabindex="-1"`: виджет был объявлен доступным (`aria-label`, `aria-pressed`), но воспользоваться им
   без мыши было нельзя — очистить поле или посмотреть введённый пароль клавиатурный пользователь не мог.

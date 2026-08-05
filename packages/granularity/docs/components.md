@@ -53,7 +53,7 @@
 - `GrIcon`
 - [`GrImageViewer`](./components/GrImageViewer.md)
 - [`GrInput`](./components/GrInput.md)
-- `GrInputTag`
+- [`GrInputTag`](./components/GrInputTag.md)
 - `GrKbd`
 - `GrLink`
 - `GrList`

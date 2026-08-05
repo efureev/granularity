@@ -145,6 +145,7 @@ const previewRegistry = {
   'gr-input-events-and-loading': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputEventsDemo.vue')),
   'gr-input-addon-slots': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputAddonSlotsDemo.vue')),
   'gr-input-size-and-alignment': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputSizingDemo.vue')),
+  'gr-input-tag-validation': defineAsyncComponent(() => import('../demos/components/gr-input-tag/GrInputTagValidationDemo.vue')),
   'gr-input-tag-basic-flow': defineAsyncComponent(() => import('../demos/components/gr-input-tag/GrInputTagBasicFlowDemo.vue')),
   'gr-input-tag-custom-slot': defineAsyncComponent(() => import('../demos/components/gr-input-tag/GrInputTagCustomTagDemo.vue')),
   'gr-input-tag-max-state': defineAsyncComponent(() => import('../demos/components/gr-input-tag/GrInputTagMaxStateDemo.vue')),

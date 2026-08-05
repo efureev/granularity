@@ -42,6 +42,7 @@ import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
 import GrIcon from '../components/GrIcon/GrIcon.vue'
 import GrInput from '../components/GrInput/GrInput.vue'
+import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
 import GrKbd from '../components/GrKbd/GrKbd.vue'
 import GrLink from '../components/GrLink/GrLink.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
@@ -131,6 +132,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrFormFile', render: () => h(GrFormFile, { modelValue: null }) },
   { name: 'GrIcon', render: () => h(GrIcon) },
   { name: 'GrInput', render: () => h(GrInput, { modelValue: '' }) },
+  { name: 'GrInputTag', render: () => h(GrInputTag, { modelValue: ['a'] }) },
   { name: 'GrKbd', render: () => h(GrKbd, null, { default: () => 'K' }) },
   { name: 'GrLink', render: () => h(GrLink, { href: '#' }, { default: () => 'L' }) },
   { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: '' }) },

@@ -3883,7 +3883,7 @@
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -3898,6 +3898,20 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "clearable",
+            "description": "Кнопка «снести все теги». Настраивается через `GrConfigProvider`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Фоновая работа: спиннер + `aria-busy`. Асинхронный `beforeAdd` поднимает его сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "trim",
@@ -3949,6 +3963,13 @@
             "default": "true"
           },
           {
+            "name": "beforeAdd",
+            "description": "Проверка тега перед добавлением. Может быть асинхронной (проверка на сервере). Отклонённый тег не добавляется и уходит в событие `reject`.",
+            "type": "((tag: string) => boolean | Promise<boolean>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "tagTone",
             "description": "",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -3991,6 +4012,13 @@
             "default": "undefined"
           },
           {
+            "name": "clearAllLabel",
+            "description": "i18n aria-label кнопки «снести все».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "string[]",
@@ -4022,10 +4050,22 @@
             "signature": "(event: \"update:modelValue\", value: string[]): void"
           },
           {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
+          },
+          {
             "name": "add",
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"add\", value: string): void"
+          },
+          {
+            "name": "reject",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"reject\", value: string): void"
           },
           {
             "name": "remove",
@@ -4047,6 +4087,11 @@
           },
           {
             "name": "blur",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "clear",
             "description": "",
             "type": "() => void"
           }

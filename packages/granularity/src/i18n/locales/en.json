@@ -116,7 +116,14 @@
     "region": "Notifications"
   },
   "inputTag": {
-    "removeTag": "Remove tag"
+    "removeTag": "Remove tag",
+    "removeTagNamed": "Remove tag {tag}",
+    "clearAll": "Clear all tags",
+    "added": "Tag added: {tag}",
+    "addedMany": "{count} tags added",
+    "removed": "Tag removed: {tag}",
+    "cleared": "All tags removed",
+    "limitReached": "Tag limit reached"
   },
   "fileUpload": {
     "placeholder": "Drag files here or click to select",
