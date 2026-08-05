@@ -1045,6 +1045,13 @@
             "default": "false"
           },
           {
+            "name": "size",
+            "description": "Размер секций. Не задан — берётся из `GrConfigProvider`, иначе `md`.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "accordion",
             "description": "",
             "type": "boolean | undefined",
@@ -1056,7 +1063,35 @@
             "description": "",
             "type": "boolean | undefined",
             "required": false,
-            "default": "true"
+            "default": "undefined"
+          },
+          {
+            "name": "borderless",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "headingLevel",
+            "description": "Уровень заголовков секций (`h2`…`h6`) — под структуру страницы.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "expandIconPosition",
+            "description": "Сторона шеврона относительно заголовка.",
+            "type": "\"end\" | \"start\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "beforeChange",
+            "description": "",
+            "type": "GrCollapseBeforeChange | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },

@@ -11,6 +11,8 @@ import GrBadge from '../components/GrBadge/GrBadge.vue'
 import GrButton from '../components/GrButton/GrButton.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
 import GrCheckboxGroup from '../components/GrCheckboxGroup/GrCheckboxGroup.vue'
+import GrCollapse from '../components/GrCollapse/GrCollapse.vue'
+import GrCollapseItem from '../components/GrCollapse/GrCollapseItem.vue'
 import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
@@ -83,6 +85,12 @@ const harnesses: { name: string, render: () => unknown }[] = [
     render: () => h(GrCheckboxGroup, {
       modelValue: [],
       options: [{ value: 'a', label: 'A' }],
+    }),
+  },
+  {
+    name: 'GrCollapse',
+    render: () => h(GrCollapse, { modelValue: ['a'] }, {
+      default: () => h(GrCollapseItem, { name: 'a', title: 'A' }, { default: () => 'body' }),
     }),
   },
   {

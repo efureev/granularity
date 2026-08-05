@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
+- **`GrCollapse`: `borderless`, `headingLevel`, `expandIconPosition`, `beforeChange`, `size`** plus
+  the `#extra` and `#icon` slots on `GrCollapseItem`. The accordion now reads `GrConfigProvider`
+  (`size`, `divided`, `borderless`, `expandIconPosition`, `headingLevel`).
 
 ### Fixed
 
@@ -20,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   control) and is declared through `aria-required`; validation belongs to `GrForm` rules. Disabled
   is now painted with background tokens instead of `opacity`, and `invalid` is visible, not just
   announced.
+- **`GrCollapse` arrow keys no longer jump into a nested accordion.** `↑`/`↓`/`Home`/`End` now walk
+  only the headers of their own `[data-gr-collapse]`; a nested collapse inside an expanded panel was
+  part of the same roving list. Disabled headers are painted with background tokens instead of
+  `opacity-50`, and the keyboard contract, ARIA wiring and `inert` panel are finally covered by
+  tests (the suite only checked the model before).
 
 - **`config.dependencies` no longer under-declares what a component renders.** `GrSidebar` declared
   no dependencies at all while rendering `GrButton` and `GrIcon`; `GrConfirmDialog` and

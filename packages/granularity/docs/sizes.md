@@ -54,7 +54,7 @@ size="xs">` физически не мог примениться к полов�
 Читают провайдер и различают все четыре ступени:
 
 `GrAutocomplete`, `GrAvatar`, `GrButton`, `GrCheckbox`, `GrCheckboxGroup`,
-`GrDataTable`, `GrFileUpload`, `GrFormFile`, `GrIcon`, `GrInput`, `GrLink`, `GrNumberInput`,
+`GrCollapse`, `GrDataTable`, `GrFileUpload`, `GrFormFile`, `GrIcon`, `GrInput`, `GrLink`, `GrNumberInput`,
 `GrPagination`, `GrProgressBar`, `GrRating`, `GrSegmented`, `GrSelect`,
 `GrSlider`, `GrStatistic`, `GrSwitch`, `GrTable`, `GrTabs`, `GrTextarea`,
 `GrTooltip`, `GrTree`.

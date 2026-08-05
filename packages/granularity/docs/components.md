@@ -116,6 +116,45 @@ const rules: GrFormRules = {
 кнопка, вложенный `<label>`) работает само по себе и состояние не меняет — для
 того подпись и вынесена наружу роли-виджета.
 
+## Аккордеон: уровень заголовка, вложенность и guard
+
+`GrCollapse` рисует заголовок секции тегом `h3`, а `headingLevel` подгоняет его
+под структуру страницы: в разделе `<h4>` аккордеон обязан начинаться с `h5`,
+иначе навигация по заголовкам получает разрыв уровней. Кнопка остаётся внутри
+заголовка — этого требует APG для accordion.
+
+`borderless` убирает обёртку в `GrCard`: аккордеон внутри карточки, сайдбара
+или панели фильтров иначе получает вторую рамку и вторую тень.
+
+```vue
+<GrCollapse v-model="open" borderless :heading-level="5" expand-icon-position="start">
+  <GrCollapseItem name="filters" title="Фильтры">
+    <template #extra>
+      <GrBadge size="sm">3</GrBadge>
+    </template>
+    …
+  </GrCollapseItem>
+</GrCollapse>
+```
+
+Слот `#extra` рендерится **рядом** с триггером, а не внутри: `<button>` внутри
+`<button>` — невалидная разметка, и axe ловит её как `nested-interactive`.
+
+`beforeChange(name, expanding)` — async-guard: `false` отменяет переключение.
+Пока guard не ответил, повторный клик по тому же заголовку игнорируется, поэтому
+подтверждение не откроется дважды.
+
+```ts
+async function beforeChange(name: GrCollapseValue, expanding: boolean): Promise<boolean> {
+  if (expanding) return true
+  return confirmDiscardChanges(name)
+}
+```
+
+Стрелки `↑`/`↓` и `Home`/`End` ходят только по заголовкам **своего**
+аккордеона: вложенный `GrCollapse` внутри раскрытой панели в обход не попадает.
+Свёрнутая панель помечена `inert` — ни `Tab`, ни скринридер в неё не заходят.
+
 ## Стили компонентов
 
 Для каждого опубликованного компонента можно подключать component-level CSS через путь вида:
