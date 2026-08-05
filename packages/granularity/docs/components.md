@@ -28,7 +28,7 @@
 - `GrBadge`
 - `GrBadgeWrap`
 - `GrBottomNav`
-- `GrButton`
+- [`GrButton`](./components/GrButton.md)
 - `GrButtonGroup`
 - [`GrCard`](./components/GrCard.md)
 - [`GrCheckbox`](./components/GrCheckbox.md)

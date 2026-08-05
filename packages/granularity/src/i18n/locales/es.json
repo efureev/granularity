@@ -211,5 +211,8 @@
   },
   "list": {
     "empty": "Todavía no hay nada"
+  },
+  "button": {
+    "loading": "Cargando…"
   }
 }

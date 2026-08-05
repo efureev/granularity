@@ -35,4 +35,13 @@
   --gr-button-azure-bg-hover: #075985;
   --gr-button-azure-bg-active: #0c4a6e;
   --gr-button-azure-fg: #f8fafc;
+
+  /*
+   * Отключённая кнопка. Гасится собственной парой токенов, а не `opacity` —
+   * прозрачность разбавляет выверенные на AA цвета, а кнопка чаще всего стоит
+   * на цветной подложке, где разбавленный текст проваливается первым.
+   */
+  --gr-button-disabled-bg: var(--gr-muted);
+  --gr-button-disabled-fg: var(--gr-muted-fg);
+  --gr-button-disabled-brd: var(--gr-brd);
 }

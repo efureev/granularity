@@ -11,6 +11,9 @@ export type GrButtonClassOptions = {
   tone: GrButtonTone
   size: GrButtonSize
   square: boolean
+  /** Необязательные: `grButtonClass` — публичный хелпер, его зовёт и `GrRadio`. */
+  disabled?: boolean
+  block?: boolean
 }
 
 export type GrButtonToneTokens = {
@@ -29,7 +32,29 @@ export type GrButtonToneTokens = {
 }
 
 export const base =
-  'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-md transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed'
+  'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-md transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+
+/** Кнопка на всю ширину контейнера. */
+export const blockClass = 'w-full'
+
+/**
+ * Отключённая кнопка гасится токенами, а не `opacity`: прозрачность разбавляет
+ * выверенные на AA цвета, а кнопка чаще всего оказывается на цветной подложке,
+ * где разбавленный текст проваливается первым.
+ *
+ * Классы применяются ВМЕСТО вариантных, а не поверх: два `bg-*` одной
+ * специфичности разрулил бы порядок в сгенерированном CSS, а не порядок в
+ * списке классов. Отсюда же и разбиение по вариантам: у прозрачных
+ * (`outline`, `ghost`, `ghost-border`) заливки нет и в отключённом виде —
+ * иначе стрелка пагинации превращалась бы в залитую плашку.
+ */
+export const disabledClassByVariant: Record<GrButtonVariant, string> = {
+  primary: 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
+  secondary: 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
+  outline: 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
+  ghost: 'bg-transparent text-[var(--gr-button-disabled-fg)] cursor-not-allowed',
+  'ghost-border': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-transparent cursor-not-allowed',
+}
 
 export const grButtonBaseClass = base
 
@@ -40,11 +65,17 @@ export const sizes: Record<GrButtonSize, string> = {
   lg: 'h-11 text-base px-5',
 }
 
+/**
+ * Квадратный режим — через `--gr-button-square-size` с размерным дефолтом в
+ * fallback: потребитель задаёт переменную в своём CSS и подгоняет кнопку под
+ * свою сетку (приём из `GrSlider`). Раньше размер жил дважды — здесь классами и
+ * инлайн-стилем в SFC, который эти классы перекрывал.
+ */
 export const squareSizes: Record<GrButtonSize, string> = {
-  xs: 'h-7 w-7 p-0',
-  sm: 'h-8 w-8 p-0',
-  md: 'h-10 w-10 p-0',
-  lg: 'h-11 w-11 p-0',
+  xs: 'h-[var(--gr-button-square-size,1.75rem)] w-[var(--gr-button-square-size,1.75rem)] min-w-[var(--gr-button-square-size,1.75rem)] p-0',
+  sm: 'h-[var(--gr-button-square-size,2rem)] w-[var(--gr-button-square-size,2rem)] min-w-[var(--gr-button-square-size,2rem)] p-0',
+  md: 'h-[var(--gr-button-square-size,2.5rem)] w-[var(--gr-button-square-size,2.5rem)] min-w-[var(--gr-button-square-size,2.5rem)] p-0',
+  lg: 'h-[var(--gr-button-square-size,2.75rem)] w-[var(--gr-button-square-size,2.75rem)] min-w-[var(--gr-button-square-size,2.75rem)] p-0',
 }
 
 export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
@@ -237,6 +268,9 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
 export function grButtonClass(options: GrButtonClassOptions): string {
   return [
     options.square ? squareSizes[options.size] : sizes[options.size],
-    variantClass(options.variant, options.tone),
-  ].join(' ')
+    options.block ? blockClass : '',
+    // `loading` сюда не входит: у него свой спиннер, и выглядеть отключённым он
+    // не должен.
+    options.disabled ? disabledClassByVariant[options.variant] : variantClass(options.variant, options.tone),
+  ].filter(Boolean).join(' ')
 }

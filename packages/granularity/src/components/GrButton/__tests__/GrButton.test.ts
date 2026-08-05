@@ -28,6 +28,8 @@ function getButtonColors(variant: GrButtonVariant, tone: GrButtonTone, state: (t
     tone,
     size: 'md',
     square: false,
+    disabled: false,
+    block: false,
   })
 
   const text = getColorClassExpression(className, 'text-[')
@@ -279,5 +281,136 @@ describe('GrButton', () => {
     expect(el.attributes('href')).toBe('https://example.com')
     expect(el.attributes('target')).toBe('_blank')
     expect(el.attributes('rel')).toBe('noopener noreferrer')
+  })
+})
+
+describe('GrButton — отключённое состояние', () => {
+  // `opacity` разбавляет выверенные на AA цвета, а кнопка чаще всего стоит на
+  // цветной подложке — там разбавленный текст проваливается первым.
+  it('гасится токенами, а не прозрачностью', () => {
+    const wrapper = mount(GrButton, { props: { disabled: true }, slots: { default: 'Save' } })
+    const classes = wrapper.get('[data-gr-button]').classes()
+
+    expect(classes).toContain('bg-[var(--gr-button-disabled-bg)]')
+    expect(classes).toContain('text-[var(--gr-button-disabled-fg)]')
+    expect(classes.some(cls => cls.includes('opacity-'))).toBe(false)
+  })
+
+  // Вариантные классы не остаются под disabled: два `bg-*` одной специфичности
+  // разрулил бы порядок в сгенерированном CSS, а не порядок в списке классов.
+  it('вариантные цвета не остаются под disabled', () => {
+    const wrapper = mount(GrButton, {
+      props: { disabled: true, tone: 'danger' },
+      slots: { default: 'Delete' },
+    })
+
+    expect(wrapper.get('[data-gr-button]').classes().some(cls => cls.includes('--gr-danger'))).toBe(false)
+  })
+
+  // Ссылке нативный `disabled` не достаётся, поэтому раньше она не гасла вовсе.
+  it('кнопка-ссылка приглушается так же, как кнопка', () => {
+    const link = mount(GrButton, {
+      props: { href: 'https://example.com', disabled: true },
+      slots: { default: 'Docs' },
+    })
+
+    expect(link.element.tagName).toBe('A')
+    expect(link.get('[data-gr-button]').classes()).toContain('bg-[var(--gr-button-disabled-bg)]')
+    expect(link.attributes('aria-disabled')).toBe('true')
+  })
+
+  // Прозрачные варианты не должны превращаться в залитую плашку: поймано
+  // визуальным гейтом на стрелках `GrPagination`.
+  it('ghost и outline остаются прозрачными в отключённом виде', () => {
+    const ghost = mount(GrButton, { props: { disabled: true, variant: 'ghost' }, slots: { default: 'Next' } })
+    expect(ghost.get('[data-gr-button]').classes()).toContain('bg-transparent')
+    expect(ghost.get('[data-gr-button]').classes()).toContain('text-[var(--gr-button-disabled-fg)]')
+
+    const outline = mount(GrButton, { props: { disabled: true, variant: 'outline' }, slots: { default: 'Next' } })
+    expect(outline.get('[data-gr-button]').classes()).toContain('bg-transparent')
+    expect(outline.get('[data-gr-button]').classes()).toContain('border-[var(--gr-button-disabled-brd)]')
+  })
+
+  it('loading отключённым не выглядит — у него свой спиннер', () => {
+    const wrapper = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } })
+
+    expect(wrapper.get('[data-gr-button]').classes()).not.toContain('bg-[var(--gr-button-disabled-bg)]')
+  })
+
+  it('пара токенов disabled сохраняет контраст в обеих темах', () => {
+    for (const [themeName, themeVars] of Object.entries({
+      light: { ...lightThemeVars, ...grButtonLightThemeVars },
+      dark: { ...darkThemeVars, ...grButtonLightThemeVars, ...grButtonDarkThemeVars },
+    })) {
+      const contrast = getContrastRatio(
+        resolveColorExpression('var(--gr-button-disabled-fg)', themeVars, derivedThemeVars),
+        resolveColorExpression('var(--gr-button-disabled-bg)', themeVars, derivedThemeVars),
+      )
+
+      expect(contrast, `${themeName}: ${contrast.toFixed(2)}`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+})
+
+describe('GrButton — квадратный режим', () => {
+  // Размер жил дважды: картой классов и инлайн-стилем, который её перекрывал.
+  it('задан переменной с размерным дефолтом, без инлайн-стиля', () => {
+    const wrapper = mount(GrButton, { props: { square: true, ariaLabel: 'Search' } })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.classes()).toContain('h-[var(--gr-button-square-size,2.5rem)]')
+    expect(button.classes()).toContain('w-[var(--gr-button-square-size,2.5rem)]')
+    expect(button.attributes('style')).toBeUndefined()
+  })
+
+  it('дефолт зависит от размера', () => {
+    const xs = mount(GrButton, { props: { square: true, size: 'xs', ariaLabel: 'a' } })
+    const lg = mount(GrButton, { props: { square: true, size: 'lg', ariaLabel: 'a' } })
+
+    expect(xs.get('[data-gr-button]').classes()).toContain('h-[var(--gr-button-square-size,1.75rem)]')
+    expect(lg.get('[data-gr-button]').classes()).toContain('h-[var(--gr-button-square-size,2.75rem)]')
+  })
+})
+
+describe('GrButton — block, слоты и объявление загрузки', () => {
+  it('block растягивает кнопку на ширину контейнера', () => {
+    const wrapper = mount(GrButton, { props: { block: true }, slots: { default: 'Save' } })
+
+    expect(wrapper.get('[data-gr-button]').classes()).toContain('w-full')
+  })
+
+  it('prefix и suffix рендерятся вокруг содержимого', () => {
+    const wrapper = mount(GrButton, {
+      slots: {
+        prefix: '<i data-testid="pre" />',
+        default: 'Save',
+        suffix: '<i data-testid="suf" />',
+      },
+    })
+
+    expect(wrapper.find('[data-testid="pre"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="suf"]').exists()).toBe(true)
+  })
+
+  // Спиннер и иконка префикса рядом читались бы как ошибка вёрстки.
+  it('во время загрузки спиннер занимает место префикса', () => {
+    const wrapper = mount(GrButton, {
+      props: { loading: true },
+      slots: { prefix: '<i data-testid="pre" />', default: 'Save' },
+    })
+
+    expect(wrapper.find('[data-testid="pre"]').exists()).toBe(false)
+  })
+
+  // `aria-busy` сам по себе часть AT не объявляет.
+  it('загрузка добавляет скрытый текст к имени кнопки', async () => {
+    const wrapper = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } })
+    expect(wrapper.get('.sr-only').text()).toBe('Loading…')
+
+    await wrapper.setProps({ loadingText: 'Сохраняем отчёт' })
+    expect(wrapper.get('.sr-only').text()).toBe('Сохраняем отчёт')
+
+    await wrapper.setProps({ loading: false })
+    expect(wrapper.find('.sr-only').exists()).toBe(false)
   })
 })

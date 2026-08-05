@@ -4,6 +4,7 @@ import { computed, markRaw, type Component } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 
@@ -21,8 +22,12 @@ const props = withDefaults(
     tone?: GrButtonTone
     size?: GrButtonSize
     loading?: boolean
+    /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
+    loadingText?: string
     disabled?: boolean
     square?: boolean
+    /** Кнопка на всю ширину контейнера. */
+    block?: boolean
     type?: 'button' | 'submit' | 'reset'
     ariaLabel?: string
     /** Полиморфизм: кастомный корневой тег/компонент (например, RouterLink). */
@@ -41,8 +46,10 @@ const props = withDefaults(
     tone: undefined,
     size: undefined,
     loading: false,
+    loadingText: undefined,
     disabled: false,
     square: undefined,
+    block: false,
     type: 'button',
     ariaLabel: undefined,
     as: undefined,
@@ -58,6 +65,9 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrButton
 const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant, 'primary')
 const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone, 'primary')
 const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
+
+const { t } = useGranularityTranslations()
+const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.button.loading', 'Loading…'))
 
 // Полиморфный корень: `as` → `<a href>` → `<button>`.
 const isLink = computed(() => Boolean(props.as || props.href))
@@ -87,31 +97,14 @@ function onClickCapture(e: MouseEvent): void {
   }
 }
 
-const squareStyle = computed(() => {
-  if (!isSquare.value) return undefined
-
-  const px = (() => {
-    if (resolvedSize.value === 'xs') return 28
-    if (resolvedSize.value === 'sm') return 32
-    if (resolvedSize.value === 'lg') return 44
-    return 40
-  })()
-
-  const v = `${px}px`
-  return {
-    width: v,
-    minWidth: v,
-    height: v,
-    padding: '0px',
-  } as const
-})
-
 const className = computed(() => {
   return grButtonClass({
     variant: resolvedVariant.value,
     tone: resolvedTone.value,
     size: resolvedSize.value,
     square: isSquare.value,
+    disabled: props.disabled,
+    block: props.block,
   })
 })
 </script>
@@ -132,10 +125,16 @@ const className = computed(() => {
     :aria-label="props.ariaLabel"
     :tabindex="isLink && props.disabled ? -1 : undefined"
     :class="[grButtonBaseClass, className, blocked ? 'cursor-not-allowed' : '']"
-    :style="squareStyle"
     @click.capture="onClickCapture"
   >
+    <!-- Спиннер занимает место префикса: две иконки рядом читались бы как ошибка. -->
     <IconLoader v-if="props.loading" class="h-4 w-4 animate-spin" aria-hidden="true" />
+    <slot v-else name="prefix" />
+
     <slot />
+
+    <slot name="suffix" />
+
+    <span v-if="props.loading" class="sr-only">{{ resolvedLoadingText }}</span>
   </component>
 </template>

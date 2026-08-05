@@ -1,6 +1,8 @@
 import {splitClassTokens} from '../shared/classTokens'
 import {
     base,
+    blockClass,
+    disabledClassByVariant,
     sizes,
     squareSizes,
     tones,
@@ -19,6 +21,7 @@ export const grButtonClassTokens = {
     sizes: Object.values(sizes).flatMap(splitClassTokens),
     squareSizes: Object.values(squareSizes).flatMap(splitClassTokens),
     variants: variantTokens,
+    states: [...splitClassTokens(blockClass), ...Object.values(disabledClassByVariant).flatMap(splitClassTokens)],
 } as const
 
 export const grButtonSafelist = [...new Set([
@@ -26,4 +29,5 @@ export const grButtonSafelist = [...new Set([
     ...grButtonClassTokens.sizes,
     ...grButtonClassTokens.squareSizes,
     ...grButtonClassTokens.variants,
+    ...grButtonClassTokens.states,
 ])]

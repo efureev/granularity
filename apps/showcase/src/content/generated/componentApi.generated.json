@@ -602,11 +602,25 @@
             "default": "false"
           },
           {
+            "name": "loadingText",
+            "description": "i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "square",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "block",
+            "description": "Кнопка на всю ширину контейнера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "as",
@@ -651,7 +665,17 @@
         "origin": "generated",
         "items": [
           {
+            "name": "prefix",
+            "description": "",
+            "type": "{}"
+          },
+          {
             "name": "default",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "suffix",
             "description": "",
             "type": "{}"
           }
@@ -6180,6 +6204,13 @@
             "default": "undefined"
           },
           {
+            "name": "block",
+            "description": "Растягивать сегмент на всю ширину контейнера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "name",
             "description": "Имя скрытых radio-inputs для интеграции с нативной формой.",
             "type": "string | undefined",
@@ -6192,13 +6223,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "300"
-          },
-          {
-            "name": "block",
-            "description": "Растягивать сегмент на всю ширину контейнера.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "modelValue",

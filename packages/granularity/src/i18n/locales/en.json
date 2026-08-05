@@ -210,5 +210,8 @@
   },
   "list": {
     "empty": "Nothing here yet"
+  },
+  "button": {
+    "loading": "Loading…"
   }
 }

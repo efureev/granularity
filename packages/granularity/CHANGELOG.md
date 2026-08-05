@@ -50,6 +50,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `as`, `clickable`, `hoverable`, `disabled` и событие `click`: строка сама становится ссылкой или
   кнопкой, а `role="listitem"` остаётся на обёртке — обёртка-кнопка снаружи пункта (так это делалось
   раньше) разрывала связку `role="list"` с `role="listitem"`.
+- **`GrButton` гасил отключённое состояние прозрачностью — и только у `<button>`.** `disabled:opacity-50`
+  разбавляет выверенные на AA цвета, а кнопка чаще других стоит на цветной подложке, где разбавленный
+  текст проваливается первым; кнопке-ссылке нативный `disabled` вообще не достаётся, поэтому она не
+  гасла никак. Появились токены `--gr-button-disabled-bg` / `-fg` / `-brd`, и классы применяются вместо
+  вариантных, а не поверх (два `bg-*` одной специфичности разрулил бы порядок в сгенерированном CSS).
+  Прозрачные варианты остаются прозрачными: у `ghost`/`outline` отключённая кнопка не превращается в
+  залитую плашку — поймано визуальным гейтом на стрелках `GrPagination`. Квадратный режим перестал
+  задаваться дважды: инлайн-стиль с px-литералами убран, размер приходит из
+  `--gr-button-square-size` с размерным дефолтом в fallback, так что его можно переопределить из CSS
+  приложения.
 - **`GrCard` перестал быть семью строками шаблона.** Появились `padding`
   (`none`/`sm`/`md`/`lg`), `variant` (`elevated`/`outlined`/`ghost`), слоты `#header`/`#footer` с
   разделителями, `bodyClass`, полиморфный корень (`as` → `href` → `clickable`) и `hoverable`.
@@ -57,6 +67,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   карточка рендерит тот же единственный `<div>` с теми же классами — на ней стоят `GrCollapse` и
   `GrList`, и сдвинутый дефолт поехал бы у них (зафиксировано тестом и визуальными эталонами,
   которые у обоих остались байт в байт).
+- **`GrButton`: `block`, `#prefix`/`#suffix`, `loadingText`.** Кнопка на всю ширину контейнера; иконка и
+  текст больше не валятся в один слот (во время загрузки спиннер занимает место префикса — две иконки
+  рядом читались бы как ошибка); `aria-busy` дополнен скрытым текстом, потому что сам по себе его
+  объявляет не всякая AT (`loadingText` или ключ `gr.button.loading`).
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).

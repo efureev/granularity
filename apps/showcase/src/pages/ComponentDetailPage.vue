@@ -53,6 +53,7 @@ const previewRegistry = {
   'gr-button-group-filter-rail': defineAsyncComponent(() => import('../demos/components/gr-button-group/GrButtonGroupFilterRailDemo.vue')),
   'gr-button-group-segmented': defineAsyncComponent(() => import('../demos/components/gr-button-group/GrButtonGroupSegmentedDemo.vue')),
   'gr-button-group-toolbar': defineAsyncComponent(() => import('../demos/components/gr-button-group/GrButtonGroupToolbarDemo.vue')),
+  'gr-button-slots-and-states': defineAsyncComponent(() => import('../demos/components/gr-button/GrButtonSlotsDemo.vue')),
   'gr-button-builder': defineAsyncComponent(() => import('../demos/components/gr-button/GrButtonBuilderDemo.vue')),
   'gr-button-state-matrix': defineAsyncComponent(() => import('../demos/components/gr-button/GrButtonMatrixDemo.vue')),
   'gr-card-action-panel': defineAsyncComponent(() => import('../demos/components/gr-card/GrCardActionPanelDemo.vue')),

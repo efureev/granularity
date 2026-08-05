@@ -19,7 +19,7 @@ describe('component docs metadata', () => {
       'api',
       'integration-notes',
     ])
-    expect(doc.examples).toHaveLength(2)
+    expect(doc.examples).toHaveLength(3)
     expect(doc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(doc.examples.every(example => example.previewKey?.startsWith('gr-button'))).toBe(true)
   })
