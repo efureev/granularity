@@ -50,6 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `as`, `clickable`, `hoverable`, `disabled` и событие `click`: строка сама становится ссылкой или
   кнопкой, а `role="listitem"` остаётся на обёртке — обёртка-кнопка снаружи пункта (так это делалось
   раньше) разрывала связку `role="list"` с `role="listitem"`.
+- **`GrCard` перестал быть семью строками шаблона.** Появились `padding`
+  (`none`/`sm`/`md`/`lg`), `variant` (`elevated`/`outlined`/`ghost`), слоты `#header`/`#footer` с
+  разделителями, `bodyClass`, полиморфный корень (`as` → `href` → `clickable`) и `hoverable`.
+  `padding` и `variant` читаются из `GrConfigProvider`. Дефолт неизменен намеренно: без пропов
+  карточка рендерит тот же единственный `<div>` с теми же классами — на ней стоят `GrCollapse` и
+  `GrList`, и сдвинутый дефолт поехал бы у них (зафиксировано тестом и визуальными эталонами,
+  которые у обоих остались байт в байт).
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).

@@ -56,6 +56,7 @@ const previewRegistry = {
   'gr-button-builder': defineAsyncComponent(() => import('../demos/components/gr-button/GrButtonBuilderDemo.vue')),
   'gr-button-state-matrix': defineAsyncComponent(() => import('../demos/components/gr-button/GrButtonMatrixDemo.vue')),
   'gr-card-action-panel': defineAsyncComponent(() => import('../demos/components/gr-card/GrCardActionPanelDemo.vue')),
+  'gr-card-variants': defineAsyncComponent(() => import('../demos/components/gr-card/GrCardVariantsDemo.vue')),
   'gr-card-basic-surface': defineAsyncComponent(() => import('../demos/components/gr-card/GrCardBasicSurfaceDemo.vue')),
   'gr-card-kpi-grid': defineAsyncComponent(() => import('../demos/components/gr-card/GrCardKpiGridDemo.vue')),
   'gr-checkbox-interactive-label': defineAsyncComponent(() => import('../demos/components/gr-checkbox/GrCheckboxInteractiveLabelDemo.vue')),
