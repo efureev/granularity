@@ -109,6 +109,14 @@ jobs:
       - name: Build package
         run: yarn build:granularity
 
+      # Сверяет `config.dependencies` с импортами, реально присутствующими в
+      # `dist`. Юнит-гейт `componentDependencies.test.ts` делает то же от
+      # исходников, но не видит рёбер, возникших из-за чанкинга бандлера.
+      # `--strict` роняет шаг и на warn-диагностиках (конфликты токенов, темы).
+      - name: Granular doctor
+        working-directory: packages/granularity
+        run: yarn doctor
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity
         run: npx --yes publint@latest --pack npm
@@ -605,6 +613,10 @@ jobs:
       - name: Build package
         run: yarn workspace @feugene/granularity-datepicker build
 
+      - name: Granular doctor
+        working-directory: packages/granularity-datepicker
+        run: yarn doctor
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-datepicker
         run: npx --yes publint@latest --pack npm
@@ -696,3 +708,34 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+  # `extra-granularity` — композитный провайдер над примитивами granularity,
+  # заявленный как интеграционная проверка связки «библиотека + пресет».
+  # До сих пор в CI его не было вовсе; собирается ради `granular doctor`,
+  # которому нужен `dist`: именно межпакетные рёбра тут и проверяются.
+  check-extra-granularity:
+    needs:
+      - build-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Build package
+        run: yarn workspace @feugene/extra-granularity build
+
+      - name: Granular doctor
+        working-directory: packages/extra-granularity
+        run: yarn doctor

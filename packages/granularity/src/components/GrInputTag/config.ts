@@ -4,6 +4,6 @@ import { grInputTagSafelist } from './safelist'
 
 export const grInputTagConfig = defineGranularComponent(import.meta.url, {
   name: 'GrInputTag',
-  dependencies: ['GrBadge', 'GrIcon', 'GrInput'],
+  dependencies: ['GrBadge', 'GrIcon'],
   safelist: grInputTagSafelist,
 })

@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`config.dependencies` no longer under-declares what a component renders.** `GrSidebar` declared
+  no dependencies at all while rendering `GrButton` and `GrIcon`; `GrConfirmDialog` and
+  `GrPromptDialog` rendered `GrResponseErrorBanner` without declaring it. Nothing failed at build
+  time — but a consumer selecting only `GrSidebar` got a scan limited to
+  `dist/components/GrSidebar/**` and an empty safelist, so the collapse button inside it rendered
+  with no background and no focus ring. With the fix that selection resolves to
+  `GrButton, GrIcon, GrSidebar` and 173 safelist entries.
+
+  Stale declarations removed in the other direction: `GrInputTag` no longer claims `GrInput` (it
+  stopped using it), and `GrDialogService` no longer repeats `GrDialog` /
+  `GrResponseErrorBanner` — both come transitively through `GrConfirmDialog` / `GrPromptDialog`,
+  and the preset expands the graph itself.
+
+  New package gate `src/__tests__/componentDependencies.test.ts` derives the dependency set from
+  sources and asserts it matches each `config.ts` in both directions, so the lists cannot drift
+  again silently.
+
+### Changed
+
+- **`@feugene/unocss-preset-granular` bumped to `^0.7.0`** (peer and dev), which adds the
+  `undeclared-dependency` diagnostic to `granular doctor` — the same defect class as above, but
+  checked against the built `dist` rather than the sources. It sees what source analysis cannot:
+  an edge that only exists because the bundler routed it through a shared chunk.
+
+  Wired in as a second gate: `granular.options.mjs` + `yarn doctor`
+  (`components: 'all'`, `--strict`), run in CI right after the build. It is complementary, not a
+  replacement — the unit gate catches *surplus* declarations, which leave no trace in `dist` and
+  are therefore invisible to `doctor`. A run over all 61 components reports zero findings.
+
+  The dependency criterion is now normative upstream (`docs/SPEC.md` §4.1): the edge is "the built
+  code imports another component's directory and something renders from it" — which also covers a
+  lazy `import()`, previously invisible to the unit gate and now recognised by it. The converse is
+  explicit too: importing a constant, a type or a composable is **not** a dependency, and declaring
+  it ships the donor's entire CSS and safelist to every consumer.
+
 ## [v0.14.0] 2026-08-05
 
 ### Added

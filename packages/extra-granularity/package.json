@@ -64,12 +64,12 @@
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.12.0 <1.0.0",
-    "@feugene/unocss-preset-granular": "^0.6.2",
+    "@feugene/unocss-preset-granular": "^0.7.0",
     "vue": "^3.5.40"
   },
   "devDependencies": {
     "@feugene/granularity": "^0.14.0",
-    "@feugene/unocss-preset-granular": "^0.6.2",
+    "@feugene/unocss-preset-granular": "^0.7.0",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
@@ -81,6 +81,7 @@
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
+    "doctor": "granular doctor ./granular.options.mjs --strict",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   }
 }

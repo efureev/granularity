@@ -4,5 +4,5 @@ export const grDialogServiceConfig = defineGranularComponent(import.meta.url, {
     // Совпадает с именем директории: из него пресет строит scan-glob
     // `dist/components/<name>/**`.
     name: 'GrDialogService',
-    dependencies: ['GrButton', 'GrDialog', 'GrConfirmDialog', 'GrPromptDialog', 'GrResponseErrorBanner'],
+    dependencies: ['GrButton', 'GrConfirmDialog', 'GrPromptDialog'],
 })
