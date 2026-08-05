@@ -9,10 +9,10 @@ import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
 import GrRadio from '../GrRadio/GrRadio.vue'
 import { GR_RADIO_GROUP_CONTEXT } from '../GrRadio'
-import type { GrRadioEntry } from '../GrRadio/grRadioGroupContext'
+import type { GrRadioEntry, GrRadioValue } from '../GrRadio/grRadioGroupContext'
 
 export type GrRadioGroupVariant = 'radiobox' | 'button'
-export interface GrRadioGroupOption { value: string, label: string }
+export interface GrRadioGroupOption { value: GrRadioValue, label: string }
 
 /**
  * GrRadioGroup — контейнер группы `GrRadio`.
@@ -21,7 +21,7 @@ export interface GrRadioGroupOption { value: string, label: string }
  * Предоставляет дочерним `GrRadio` общий `modelValue`/`disabled`/`size`/`name` через `inject`.
  */
 export interface GrRadioGroupProps {
-  modelValue: string
+  modelValue: GrRadioValue
   options?: GrRadioGroupOption[]
   name?: string
   disabled?: boolean
@@ -62,10 +62,10 @@ const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGr
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
+  (e: 'update:modelValue', value: GrRadioValue): void
 }>()
 
-function setValue(next: string): void {
+function setValue(next: GrRadioValue): void {
   if (props.disabled || isReadonly.value)
     return
   emit('update:modelValue', next)
@@ -102,7 +102,7 @@ const rovingValue = computed(() => {
   return enabledValues.value[0]
 })
 
-function moveSelection(from: string, direction: 1 | -1): string | undefined {
+function moveSelection(from: GrRadioValue, direction: 1 | -1): GrRadioValue | undefined {
   const values = enabledValues.value
   if (values.length === 0) return undefined
 
@@ -114,15 +114,26 @@ function moveSelection(from: string, direction: 1 | -1): string | undefined {
   return next
 }
 
+/** `Home`/`End` — на края набора; как в `GrSegmented`, где паттерн реализован целиком. */
+function selectEdge(edge: 'first' | 'last'): GrRadioValue | undefined {
+  const values = enabledValues.value
+  const next = edge === 'first' ? values[0] : values.at(-1)
+
+  if (next !== undefined) setValue(next)
+  return next
+}
+
 provide(GR_RADIO_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),
   name: computed(() => props.name),
   disabled: computed(() => props.disabled),
+  invalid: isInvalid,
   size: resolvedSize,
   setValue,
   register,
   rovingValue,
   moveSelection,
+  selectEdge,
 })
 </script>
 
@@ -152,7 +163,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
       <GrButtonGroup v-if="variant === 'button'">
         <GrRadio
           v-for="opt in options ?? []"
-          :key="opt.value"
+          :key="String(opt.value)"
           :value="opt.value"
           variant="button"
           :size="resolvedSize"
@@ -161,7 +172,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
         </GrRadio>
       </GrButtonGroup>
       <div v-else class="grid gap-2">
-        <GrRadio v-for="opt in options ?? []" :key="opt.value" :value="opt.value">
+        <GrRadio v-for="opt in options ?? []" :key="String(opt.value)" :value="opt.value">
           {{ opt.label }}
         </GrRadio>
       </div>

@@ -50,7 +50,7 @@ Enter не переключает состояние, а сабмитит фор
 | --- | --- | --- |
 | `GrCheckbox` | `Space` — переключить (в т.ч. из `indeterminate` → включено) | checkbox |
 | `GrCheckboxGroup` | стрелок нет: каждый чекбокс — своя остановка `Tab`, как у набора нативных `<input type="checkbox">` | group |
-| `GrRadio`, `GrRadioGroup` | `Space`, `Enter` — выбрать; `↓`/`→` — следующий, `↑`/`←` — предыдущий (выбор едет вместе с фокусом, по кругу). Группа — одна остановка `Tab` | radio |
+| `GrRadio`, `GrRadioGroup` | `Space`, `Enter` — выбрать; `↓`/`→` — следующий, `↑`/`←` — предыдущий (выбор едет вместе с фокусом, по кругу); `Home`/`End` — первый/последний доступный. Группа — одна остановка `Tab`, отключённые варианты пропускаются | radio |
 | `GrSwitch` | `Space`, `Enter` — переключить (нативная `<button role="switch">`) | switch |
 | `GrNumberInput` | `↑`/`↓` — шаг, `Home`/`End` — к `min`/`max` | spinbutton |
 | `GrSlider` | `←`/`↓` — шаг вниз, `→`/`↑` — шаг вверх, `PageUp`/`PageDown` — крупный шаг, `Home`/`End` — к краям | slider |

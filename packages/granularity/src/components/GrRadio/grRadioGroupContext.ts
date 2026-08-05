@@ -2,17 +2,27 @@ import type { ComputedRef, InjectionKey } from 'vue'
 
 import type { GrButtonSize } from '../GrButton/grButtonStyles'
 
+/**
+ * Значение переключателя. Не только строка: перечисления в реальных формах —
+ * это id числом или флаг. Объекты сюда намеренно не входят: значение уходит в
+ * `data-value` и в скрытый input нативной формы, а значит должно иметь
+ * однозначное строковое представление.
+ */
+export type GrRadioValue = string | number | boolean
+
 export type GrRadioEntry = {
-  value: () => string
+  value: () => GrRadioValue
   disabled: () => boolean
 }
 
 export type GrRadioGroupContext = {
-  modelValue: ComputedRef<string>
+  modelValue: ComputedRef<GrRadioValue>
   name: ComputedRef<string | undefined>
   disabled: ComputedRef<boolean>
+  /** Ошибка группы: до вида переключателя она доходит только через контекст. */
+  invalid: ComputedRef<boolean>
   size: ComputedRef<GrButtonSize>
-  setValue: (value: string) => void
+  setValue: (value: GrRadioValue) => void
   /**
    * Регистрация переключателя в группе. Порядок регистрации совпадает с
    * порядком в документе (setup детей идёт сверху вниз), поэтому группа знает
@@ -24,9 +34,11 @@ export type GrRadioGroupContext = {
    * WAI-ARIA: группа — одна остановка Tab, внутрь попадают стрелками. Если не
    * выбрано ничего, остановкой становится первый доступный переключатель.
    */
-  rovingValue: ComputedRef<string | undefined>
+  rovingValue: ComputedRef<GrRadioValue | undefined>
   /** Переводит выбор на соседний доступный переключатель (стрелки). */
-  moveSelection: (from: string, direction: 1 | -1) => string | undefined
+  moveSelection: (from: GrRadioValue, direction: 1 | -1) => GrRadioValue | undefined
+  /** Переводит выбор на первый или последний доступный (`Home`/`End`). */
+  selectEdge: (edge: 'first' | 'last') => GrRadioValue | undefined
 }
 
 export const GR_RADIO_GROUP_CONTEXT: InjectionKey<GrRadioGroupContext> = Symbol('GR_RADIO_GROUP_CONTEXT')

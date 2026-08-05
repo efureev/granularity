@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onUnmounted, ref } from 'vue'
+import { computed, inject, nextTick, onUnmounted, ref, useId, useSlots } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -8,18 +8,22 @@ import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import {
   grRadioButtonClass,
   grRadioControlClass,
+  grRadioDescriptionClass,
   grRadioDotBaseClass,
   grRadioDotClass,
+  grRadioLabelTextClass,
   grRadioRootClass,
   type GrRadioVariant,
 } from './grRadioStyles'
-import { GR_RADIO_GROUP_CONTEXT } from './grRadioGroupContext'
+import { GR_RADIO_GROUP_CONTEXT, type GrRadioValue } from './grRadioGroupContext'
+
+export type { GrRadioValue } from './grRadioGroupContext'
 
 /**
  * GrRadio — одиночный элемент группы выбора.
  *
  * Может работать автономно (через `v-model`) либо внутри `GrRadioGroup`
- * (тогда `modelValue`/`disabled`/`size`/`name` приходят через `inject`).
+ * (тогда `modelValue`/`disabled`/`size`/`name`/`invalid` приходят через `inject`).
  *
  * @prop value — значение этого элемента, сравнивается с `modelValue` группы.
  * @prop variant — визуальное представление: `radiobox` (круг+dot) или `button` (стиль `GrButton`).
@@ -32,9 +36,11 @@ import { GR_RADIO_GROUP_CONTEXT } from './grRadioGroupContext'
  * `input[type="hidden"]` — он не фокусируется и не является интерактивным.
  */
 export interface GrRadioProps {
-  value: string
-  modelValue?: string
+  value: GrRadioValue
+  modelValue?: GrRadioValue
   disabled?: boolean
+  /** Визуальное и ARIA-состояние ошибки. Складывается с `invalid` группы. */
+  invalid?: boolean
   name?: string
   required?: boolean
   form?: string
@@ -51,6 +57,7 @@ export interface GrRadioProps {
 const props = withDefaults(defineProps<GrRadioProps>(), {
   modelValue: undefined,
   disabled: undefined,
+  invalid: false,
   name: undefined,
   required: false,
   form: undefined,
@@ -65,9 +72,10 @@ const props = withDefaults(defineProps<GrRadioProps>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
+  (e: 'update:modelValue', value: GrRadioValue): void
 }>()
 
+const slots = useSlots()
 const group = inject(GR_RADIO_GROUP_CONTEXT, null)
 
 const resolvedModelValue = computed(() => {
@@ -83,6 +91,9 @@ const resolvedDisabled = computed(() => {
 
   return group?.disabled.value ?? false
 })
+
+// «Или», а не `??`: ошибку может объявить и группа, и сам переключатель.
+const resolvedInvalid = computed(() => props.invalid || (group?.invalid.value ?? false))
 
 const resolvedName = computed(() => {
   if (props.name)
@@ -100,11 +111,17 @@ const resolvedSize = useGrComponentSize(
 
 const checked = computed(() => resolvedModelValue.value === props.value)
 
+/** В DOM значение живёт строкой: `data-value` и скрытый input иначе не умеют. */
+const domValue = computed(() => String(props.value))
+
 // Нативная форма получает значение только от выбранного и не-disabled элемента —
 // ровно как поступил бы native radio. Без `name` отправлять нечего.
 const submitsValue = computed(
   () => checked.value && !resolvedDisabled.value && Boolean(resolvedName.value),
 )
+
+const descriptionId = useId()
+const hasDescription = computed(() => Boolean(slots.description))
 
 const buttonClassName = computed(() => {
   return grRadioButtonClass({
@@ -119,10 +136,18 @@ const buttonClassName = computed(() => {
 })
 
 const rootClassName = computed(() => grRadioRootClass(resolvedDisabled.value))
-const controlClassName = computed(() => grRadioControlClass(checked.value))
-const dotClassName = computed(() => grRadioDotClass(checked.value))
+const controlClassName = computed(() => grRadioControlClass({
+  checked: checked.value,
+  disabled: resolvedDisabled.value,
+  invalid: resolvedInvalid.value,
+}))
+const dotClassName = computed(() => grRadioDotClass({
+  checked: checked.value,
+  disabled: resolvedDisabled.value,
+}))
+const labelClassName = computed(() => grRadioLabelTextClass(checked.value))
 
-function setValue(next: string): void {
+function setValue(next: GrRadioValue): void {
   if (resolvedDisabled.value)
     return
 
@@ -148,21 +173,34 @@ const rovingTabindex = computed(() => {
 
 const rootEl = ref<HTMLElement | null>(null)
 
+/**
+ * Фокус переезжает вслед за выбором — иначе следующая стрелка отсчитывалась бы
+ * от прежнего элемента.
+ */
+function focusValue(next: GrRadioValue | undefined): void {
+  if (next === undefined) return
+
+  void nextTick(() => {
+    const group = rootEl.value?.closest('[data-gr-radio-group]')
+    const target = [...(group?.querySelectorAll<HTMLElement>('[data-gr-radio]') ?? [])]
+      .find(el => el.dataset.value === String(next))
+
+    target?.focus()
+  })
+}
+
 function onArrow(direction: 1 | -1, event: KeyboardEvent): void {
   if (!group || resolvedDisabled.value) return
 
   event.preventDefault()
-  const next = group.moveSelection(props.value, direction)
-  if (next === undefined) return
+  focusValue(group.moveSelection(props.value, direction))
+}
 
-  // Фокус переезжает вслед за выбором — иначе следующая стрелка отсчитывалась бы
-  // от прежнего элемента.
-  void nextTick(() => {
-    rootEl.value
-      ?.closest('[data-gr-radio-group]')
-      ?.querySelector<HTMLElement>(`[data-gr-radio][data-value="${next}"]`)
-      ?.focus()
-  })
+function onEdge(edge: 'first' | 'last', event: KeyboardEvent): void {
+  if (!group || resolvedDisabled.value) return
+
+  event.preventDefault()
+  focusValue(group.selectEdge(edge))
 }
 
 const unregister = group?.register({
@@ -184,8 +222,9 @@ onUnmounted(() => unregister?.())
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
+    :aria-invalid="resolvedInvalid ? 'true' : undefined"
     :aria-required="required ? 'true' : undefined"
-    :data-value="value"
+    :data-value="domValue"
     :tabindex="rovingTabindex"
     :class="buttonClassName"
     @click="onButtonClick"
@@ -195,12 +234,14 @@ onUnmounted(() => unregister?.())
     @keydown.right="onArrow(1, $event)"
     @keydown.up="onArrow(-1, $event)"
     @keydown.left="onArrow(-1, $event)"
+    @keydown.home="onEdge('first', $event)"
+    @keydown.end="onEdge('last', $event)"
   >
     <input
       v-if="submitsValue"
       type="hidden"
       :name="resolvedName"
-      :value="value"
+      :value="domValue"
       :form="form"
     >
 
@@ -216,10 +257,12 @@ onUnmounted(() => unregister?.())
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
+    :aria-invalid="resolvedInvalid ? 'true' : undefined"
     :aria-required="required ? 'true' : undefined"
-    :data-value="value"
+    :aria-describedby="hasDescription ? descriptionId : undefined"
+    :data-value="domValue"
     :tabindex="rovingTabindex"
-    class="inline-flex items-center gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
+    class="inline-flex items-start gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     :class="rootClassName"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
@@ -228,19 +271,21 @@ onUnmounted(() => unregister?.())
     @keydown.right="onArrow(1, $event)"
     @keydown.up="onArrow(-1, $event)"
     @keydown.left="onArrow(-1, $event)"
+    @keydown.home="onEdge('first', $event)"
+    @keydown.end="onEdge('last', $event)"
   >
     <input
       v-if="submitsValue"
       type="hidden"
       :name="resolvedName"
-      :value="value"
+      :value="domValue"
       :form="form"
     >
 
     <span
       data-gr-radio-control
       aria-hidden="true"
-      class="h-4 w-4 rounded-full border flex items-center justify-center transition-colors duration-150"
+      class="mt-0.5 h-4 w-4 shrink-0 rounded-full border flex items-center justify-center transition-colors duration-150"
       :class="controlClassName"
     >
       <span
@@ -249,8 +294,19 @@ onUnmounted(() => unregister?.())
       />
     </span>
 
-    <span class="text-sm text-[var(--gr-muted-fg)]">
-      <slot />
+    <span class="grid gap-0.5">
+      <span data-gr-radio-label :class="labelClassName">
+        <slot />
+      </span>
+
+      <span
+        v-if="hasDescription"
+        :id="descriptionId"
+        data-gr-radio-description
+        :class="grRadioDescriptionClass"
+      >
+        <slot name="description" />
+      </span>
     </span>
   </div>
 </template>

@@ -50,6 +50,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `as`, `clickable`, `hoverable`, `disabled` и событие `click`: строка сама становится ссылкой или
   кнопкой, а `role="listitem"` остаётся на обёртке — обёртка-кнопка снаружи пункта (так это делалось
   раньше) разрывала связку `role="list"` с `role="listitem"`.
+- **`GrRadio` не выделял выбранный вариант текстом и гасил disabled прозрачностью.** Подпись всегда была
+  `--gr-muted-fg`, в том числе у выбранного: приглушённый токен на основном контенте — это ещё и вопрос
+  к контрасту. Теперь выбранная подпись — `--gr-fg`. Прозрачность (`opacity-50`/`opacity-70`) заменена
+  токенами; отключённая кнопка-радио при этом **сохраняет видимый выбор** — вид `GrButton`-а состояние
+  стирает, поэтому у радио своя пара классов (поймано визуальным гейтом на отключённой группе в
+  конструкторе `GrSelect`).
 - **`GrButton` гасил отключённое состояние прозрачностью — и только у `<button>`.** `disabled:opacity-50`
   разбавляет выверенные на AA цвета, а кнопка чаще других стоит на цветной подложке, где разбавленный
   текст проваливается первым; кнопке-ссылке нативный `disabled` вообще не достаётся, поэтому она не
@@ -71,6 +77,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   текст больше не валятся в один слот (во время загрузки спиннер занимает место префикса — две иконки
   рядом читались бы как ошибка); `aria-busy` дополнен скрытым текстом, потому что сам по себе его
   объявляет не всякая AT (`loadingText` или ключ `gr.button.loading`).
+- **`GrRadio`: `Home`/`End`, `invalid`, слот `#description` и значения не только строкой.** Клавиатура
+  дополнена краями набора (отключённые варианты пропускаются, как и на стрелках); `invalid` можно
+  поставить переключателю или всей группе — состояния складываются по «или»; описание под подписью
+  связывается через `aria-describedby`; `value`/`modelValue` принимают `string | number | boolean`
+  (`GrRadioValue`) — перечисления в формах это обычно id числом.
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).

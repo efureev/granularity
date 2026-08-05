@@ -197,6 +197,7 @@ const previewRegistry = {
   'gr-radio-group-custom-slots': defineAsyncComponent(() => import('../demos/components/gr-radio-group/GrRadioGroupCustomSlotsDemo.vue')),
   'gr-radio-group-inheritance': defineAsyncComponent(() => import('../demos/components/gr-radio/GrRadioGroupInheritanceDemo.vue')),
   'gr-radio-group-options': defineAsyncComponent(() => import('../demos/components/gr-radio-group/GrRadioGroupOptionsDemo.vue')),
+  'gr-radio-descriptions': defineAsyncComponent(() => import('../demos/components/gr-radio/GrRadioDescriptionsDemo.vue')),
   'gr-radio-standalone-controlled': defineAsyncComponent(() => import('../demos/components/gr-radio/GrRadioStandaloneDemo.vue')),
   'gr-segmented-basic-pills': defineAsyncComponent(() => import('../demos/components/gr-segmented/GrSegmentedBasicDemo.vue')),
   'gr-segmented-button-variant': defineAsyncComponent(() => import('../demos/components/gr-segmented/GrSegmentedButtonDemo.vue')),
