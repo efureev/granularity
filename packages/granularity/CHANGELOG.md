@@ -30,6 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `GrConfigProvider` (новый `defaults.ts`). Добавление, удаление, очистка и исчерпание `max`
   объявляются живым регионом (`gr.inputTag.added`, `.addedMany`, `.removed`, `.cleared`,
   `.limitReached`).
+- **`GrKbd`: сочетание одним пропом и платформозависимый `mod`.** `keys` принимает строку
+  (`"mod+shift+K"`) или набор токенов и рисует сочетание вложенными `<kbd>` — склеивать `⌘` и `K`
+  из двух компонентов и `<span>+</span>` больше не нужно. Токен `mod` показывается как Cmd на macOS и
+  как Ctrl на остальных платформах; `platform` (`auto` / `apple` / `other`) фиксирует её вручную.
+  `separator` управляет разделителем. Символьные клавиши получают скрытое читаемое имя
+  (`gr.kbd.*`) — без него диктор произносит `⌘` как значок. Разбор сочетаний переехал в общий
+  `components/shared/hotkey.ts`, откуда его берёт и `GrCommandPalette`.
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
@@ -71,6 +78,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   also had no accessible name at all (`aria-dialog-name`), and every image was `alt=""` with no way
   to pass a description. `useZoomPan`, `useWheelGesture` and `useViewerKeyboard` are now covered by
   tests.
+- **`GrKbd` знал только два размера из четырёх.** Проп обещал шкалу пакета (`xs…lg`), а в разметке
+  стояло `size === 'sm' ? … : …`: `xs` и `lg` молча рендерились как `md`. Шкала полная, классы уехали в
+  `grKbdStyles.ts` с safelist, а компонент вышел из списка неполных шкал в `componentSize.test.ts`.
 - **`GrInputTag` запирал клавиатуру на пределе набора и врал о валидности.** При достижении `max`
   инпут получал `disabled`: он выпадал из таб-порядка и переставал принимать `Backspace` — единственный
   способ убрать тег с клавиатуры, так что выйти из тупика можно было только мышью. Поле остаётся живым,

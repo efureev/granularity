@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatCommandHotkey,
+  formatHotkeyToken,
   matchesCommandHotkey,
   parseCommandHotkey,
+  splitHotkeyCombo,
 } from '../hotkey'
 
 function keydown(init: KeyboardEventInit): KeyboardEvent {
@@ -56,5 +58,34 @@ describe('formatCommandHotkey', () => {
   it('разворачивает все модификаторы', () => {
     const combo = parseCommandHotkey('ctrl+alt+shift+p')!
     expect(formatCommandHotkey(combo, false)).toEqual(['Ctrl', 'Alt', 'Shift', 'P'])
+  })
+})
+
+describe('formatHotkeyToken', () => {
+  it('mod зависит от платформы', () => {
+    expect(formatHotkeyToken('mod', true)).toEqual({ label: '⌘', name: 'command' })
+    expect(formatHotkeyToken('mod', false)).toEqual({ label: 'Ctrl' })
+  })
+
+  // Имя нужно символу: `⌘` диктор читает как знак, а `Ctrl` — как слово.
+  it('читаемое имя добавляется только символам', () => {
+    expect(formatHotkeyToken('shift', true)).toEqual({ label: '⇧', name: 'shift' })
+    expect(formatHotkeyToken('shift', false)).toEqual({ label: 'Shift' })
+    expect(formatHotkeyToken('ctrl', false).name).toBeUndefined()
+  })
+
+  it('одиночная буква приводится к заглавной', () => {
+    expect(formatHotkeyToken('k', false)).toEqual({ label: 'K' })
+    expect(formatHotkeyToken('Esc', false)).toEqual({ label: 'Esc', name: 'escape' })
+  })
+
+  it('незнакомый токен отдаётся как есть', () => {
+    expect(formatHotkeyToken('F5', false)).toEqual({ label: 'F5' })
+  })
+})
+
+describe('splitHotkeyCombo', () => {
+  it('режет комбинацию и чистит пробелы', () => {
+    expect(splitHotkeyCombo(' mod + shift + K ')).toEqual(['mod', 'shift', 'K'])
   })
 })

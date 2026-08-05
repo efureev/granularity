@@ -9,6 +9,7 @@ import {
   GrDrawer,
   GrFileUpload,
   GrImageViewer,
+  GrKbd,
   GrSegmented,
   GrSlider,
   GrToaster,
@@ -83,6 +84,9 @@ const images = [
     <GrImageViewer v-model="viewerOpen" :url-list="images" />
 
     <GrCommandPalette v-model="paletteOpen" :items="commands" hotkey="mod+k" />
+
+    <!-- Тот же дефект в отдельном примитиве: `mod` рисуется по `navigator`. -->
+    <GrKbd keys="mod+k" />
 
     <GrDrawer v-model="drawerOpen">
       Содержимое drawer'а.

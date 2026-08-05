@@ -96,7 +96,7 @@ const PROBE_SIZES = ['xs', 'lg'] as const
  * Список закрытый и проверяется на протухание: как только компонент начинает
  * различать края шкалы, тест требует убрать его отсюда.
  */
-const KNOWN_FLAT_SIZE = new Set(['GrBadge', 'GrKbd', 'GrRadio', 'GrRadioGroup'])
+const KNOWN_FLAT_SIZE = new Set(['GrBadge', 'GrRadio', 'GrRadioGroup'])
 
 const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrAutocomplete', render: () => h(GrAutocomplete, { modelValue: '', options: [] }) },

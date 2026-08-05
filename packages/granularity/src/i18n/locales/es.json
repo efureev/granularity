@@ -197,5 +197,13 @@
     "maxSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
     "maxCount": "Se han seleccionado demasiados archivos ({count}), máximo: {maxCount}",
     "maxTotalSize": "El tamaño total de los archivos es demasiado grande ({total} bytes), máximo {maxBytes}"
+  },
+  "kbd": {
+    "command": "Command",
+    "option": "Opción",
+    "shift": "Mayús",
+    "control": "Control",
+    "enter": "Intro",
+    "escape": "Escape"
   }
 }

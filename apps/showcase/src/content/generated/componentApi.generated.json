@@ -4109,11 +4109,32 @@
         "origin": "generated",
         "items": [
           {
+            "name": "keys",
+            "description": "Сочетание: строкой (`\"mod+shift+K\"`) или набором токенов (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.",
+            "type": "string | string[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "separator",
+            "description": "Разделитель между клавишами сочетания. Пустая строка — только зазор.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"+\""
+          },
+          {
+            "name": "platform",
+            "description": "",
+            "type": "GrKbdPlatform | undefined",
+            "required": false,
+            "default": "\"auto\""
           }
         ]
       },

@@ -149,9 +149,23 @@ describe('серверный рендер: браузерные API и авто-
     const { html } = await render(RiskyPage)
 
     expect(html).not.toContain('⌘')
-    expect(html).not.toContain('Ctrl')
+    expect(html).not.toContain('data-gr-command-palette')
     // Пункт палитры — тоже внутри модалки.
     expect(html).not.toContain('Открыть файл')
+  })
+
+  /**
+   * `GrKbd` с токеном `mod` — тот же риск, но снаружи оверлея: серверный HTML
+   * обязан прийти в не-Apple варианте, а `⌘` появиться только после
+   * монтирования. Пришёл бы `⌘` с сервера — значит `navigator` читается в
+   * `setup`, и на Windows гидрация разъехалась бы.
+   */
+  it('GrKbd отдаёт с сервера платформонезависимый вариант', async () => {
+    const { html } = await render(RiskyPage)
+
+    expect(html).toContain('data-gr-kbd-combo')
+    expect(html).toContain('>Ctrl<')
+    expect(html).not.toContain('⌘')
   })
 
   it('id строятся из useId(), а не из сквозного счётчика инстансов', async () => {

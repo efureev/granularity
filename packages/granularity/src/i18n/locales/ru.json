@@ -198,5 +198,13 @@
     "maxSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
     "maxCount": "Выбрано слишком много файлов ({count}), максимум — {maxCount}",
     "maxTotalSize": "Суммарный размер файлов слишком большой ({total} байт), максимум {maxBytes}"
+  },
+  "kbd": {
+    "command": "Command",
+    "option": "Option",
+    "shift": "Shift",
+    "control": "Control",
+    "enter": "Enter",
+    "escape": "Escape"
   }
 }

@@ -17,7 +17,7 @@ import {
   isAppleDevice,
   matchesCommandHotkey,
   parseCommandHotkey,
-} from './hotkey'
+} from '../shared/hotkey'
 import {
   commandEmptyClass,
   commandFooterClass,
@@ -285,8 +285,8 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
         <span v-if="loading" class="shrink-0 text-[var(--gr-muted-fg)]">
           <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" :aria-label="loadingText" />
         </span>
-        <span v-else-if="hotkeyHint.length" class="shrink-0 flex items-center gap-1" aria-hidden="true">
-          <GrKbd v-for="key in hotkeyHint" :key="key" size="sm">{{ key }}</GrKbd>
+        <span v-else-if="hotkeyHint.length" class="shrink-0" aria-hidden="true">
+          <GrKbd :keys="hotkeyHint" separator="" size="sm" />
         </span>
       </div>
 
@@ -336,8 +336,8 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
                     {{ item.description }}
                   </span>
                 </span>
-                <span v-if="item.shortcut?.length" class="shrink-0 flex items-center gap-1">
-                  <GrKbd v-for="key in item.shortcut" :key="key" size="sm">{{ key }}</GrKbd>
+                <span v-if="item.shortcut?.length" class="shrink-0">
+                  <GrKbd :keys="item.shortcut" separator="" size="sm" />
                 </span>
               </slot>
             </div>

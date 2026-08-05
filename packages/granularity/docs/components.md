@@ -54,7 +54,7 @@
 - [`GrImageViewer`](./components/GrImageViewer.md)
 - [`GrInput`](./components/GrInput.md)
 - [`GrInputTag`](./components/GrInputTag.md)
-- `GrKbd`
+- [`GrKbd`](./components/GrKbd.md)
 - `GrLink`
 - `GrList`
 - `GrLoading`

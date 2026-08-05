@@ -196,5 +196,13 @@
     "maxSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
     "maxCount": "Too many files selected ({count}), maxCount={maxCount}",
     "maxTotalSize": "Total files size is too large ({total} bytes), maxTotalSizeBytes={maxBytes}"
+  },
+  "kbd": {
+    "command": "Command",
+    "option": "Option",
+    "shift": "Shift",
+    "control": "Control",
+    "enter": "Enter",
+    "escape": "Escape"
   }
 }
