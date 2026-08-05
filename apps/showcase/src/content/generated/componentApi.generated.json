@@ -3293,6 +3293,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "ariaLabel",
+            "description": "Доступное имя слоя. Модальный диалог без имени — нарушение `aria-dialog-name`: диктор объявит «диалог» и замолчит.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "emptyText",
             "description": "i18n: текст в пустом состоянии (нет изображений).",
             "type": "string | undefined",
@@ -3378,7 +3385,7 @@
           },
           {
             "name": "zIndex",
-            "description": "",
+            "description": "Слой поверх шкалы. По умолчанию — `--gr-z-modal`, как у остальных модальных оверлеев.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
@@ -3440,8 +3447,8 @@
           },
           {
             "name": "urlList",
-            "description": "",
-            "type": "string[]",
+            "description": "Кадры. Строка — только адрес; объект `{ src, alt }` даёт изображению альтернативный текст: без него просмотрщик пуст для незрячего пользователя, а придумать текст за потребителя компонент не может.",
+            "type": "GrImageViewerSource[]",
             "required": true
           }
         ]
@@ -3454,12 +3461,12 @@
           {
             "name": "toolbar",
             "description": "",
-            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
+            "type": "{ index: number; src?: string | undefined; alt: string; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
           },
           {
             "name": "toolbar-actions",
             "description": "",
-            "type": "{ index: number; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
+            "type": "{ index: number; src?: string | undefined; alt: string; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
           }
         ]
       },
@@ -3481,10 +3488,10 @@
             "signature": "(event: \"update:modelValue\", value: boolean): void"
           },
           {
-            "name": "switch",
+            "name": "change",
             "description": "",
             "type": "[newIndex: number]",
-            "signature": "(event: \"switch\", newIndex: number): void"
+            "signature": "(event: \"change\", newIndex: number): void"
           },
           {
             "name": "rotate",
@@ -3498,7 +3505,48 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "prev",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "next",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "zoomIn",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "zoomOut",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "reset",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "rotateLeft",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "rotateRight",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },

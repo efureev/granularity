@@ -1,0 +1,17 @@
+/*
+ * Хром просмотрщика остаётся тёмным на любой теме: рядом с фотографией светлая
+ * панель спорит с содержимым и подсвечивает края кадра. Поэтому значения здесь
+ * одинаковые в обеих темах — токены нужны не для смены на тёмную, а чтобы
+ * потребитель мог перекрасить хром под свой продукт.
+ */
+.dark,
+[data-theme='dark'] {
+  --gr-image-viewer-scrim: rgb(0 0 0 / 0.6);
+  --gr-image-viewer-chrome-bg: rgb(0 0 0 / 0.35);
+  --gr-image-viewer-chrome-bg-hover: rgb(0 0 0 / 0.55);
+  --gr-image-viewer-chrome-bg-soft: rgb(255 255 255 / 0.1);
+  --gr-image-viewer-chrome-fg: rgb(255 255 255 / 0.95);
+  --gr-image-viewer-chrome-fg-muted: rgb(255 255 255 / 0.8);
+  --gr-image-viewer-chrome-brd: rgb(255 255 255 / 0.2);
+  --gr-image-viewer-ring: rgb(255 255 255 / 0.8);
+}

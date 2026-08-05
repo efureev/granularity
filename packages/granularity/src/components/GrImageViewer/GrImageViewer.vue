@@ -7,6 +7,25 @@ import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessu
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
+import IconChevronLeft from '~icons/lucide/chevron-left'
+import IconChevronRight from '~icons/lucide/chevron-right'
+import IconMinus from '~icons/lucide/minus'
+import IconPlus from '~icons/lucide/plus'
+import IconRotateCcw from '~icons/lucide/rotate-ccw'
+import IconRotateCw from '~icons/lucide/rotate-cw'
+import IconX from '~icons/lucide/x'
+
+import GrIcon from '../GrIcon/GrIcon.vue'
+
+import {
+  badgeClass,
+  chromeButtonClass,
+  emptyStateClass,
+  scrimClass,
+  toolbarButtonClass,
+  toolbarSeparatorClass,
+  toolbarShellClass,
+} from './grImageViewerStyles'
 import { useZoomPan } from './composables/useZoomPan'
 import { useWheelGesture } from './composables/useWheelGesture'
 import { useViewerKeyboard } from './composables/useViewerKeyboard'
@@ -26,10 +45,19 @@ import { useViewerKeyboard } from './composables/useViewerKeyboard'
  * `useWheelGesture` (зум колесом/трекпадом с rAF-батчингом), `useViewerKeyboard`
  * (клавиатура). Сам SFC отвечает за оверлей, индекс изображений и композицию.
  */
+/** Кадр просмотрщика: только адрес или адрес с альтернативным текстом. */
+export type GrImageViewerItem = { src: string, alt?: string }
+export type GrImageViewerSource = string | GrImageViewerItem
+
 const props = withDefaults(
   defineProps<{
     modelValue: boolean
-    urlList: string[]
+    /**
+     * Кадры. Строка — только адрес; объект `{ src, alt }` даёт изображению
+     * альтернативный текст: без него просмотрщик пуст для незрячего
+     * пользователя, а придумать текст за потребителя компонент не может.
+     */
+    urlList: GrImageViewerSource[]
     initialIndex?: number
     zoomRate?: number
     minScale?: number
@@ -42,6 +70,7 @@ const props = withDefaults(
     wheelZoom?: boolean
     /** Включает перетаскивание (pan) картинки мышью. При наведении курсор «рука». По умолчанию выключено. */
     draggable?: boolean
+    /** Слой поверх шкалы. По умолчанию — `--gr-z-modal`, как у остальных модальных оверлеев. */
     zIndex?: number
     /** i18n: aria-label кнопки закрытия. */
     closeLabel?: string
@@ -61,6 +90,11 @@ const props = withDefaults(
     rotateRightLabel?: string
     /** i18n: текст в пустом состоянии (нет изображений). */
     emptyText?: string
+    /**
+     * Доступное имя слоя. Модальный диалог без имени — нарушение
+     * `aria-dialog-name`: диктор объявит «диалог» и замолчит.
+     */
+    ariaLabel?: string
   }>(),
   {
     initialIndex: 0,
@@ -83,6 +117,7 @@ const props = withDefaults(
     rotateLeftLabel: undefined,
     rotateRightLabel: undefined,
     emptyText: undefined,
+    ariaLabel: undefined,
   },
 )
 
@@ -96,11 +131,13 @@ const resolvedResetZoomLabel = computed(() => props.resetZoomLabel ?? t('gr.imag
 const resolvedRotateLeftLabel = computed(() => props.rotateLeftLabel ?? t('gr.imageViewer.rotateLeft', 'Rotate left'))
 const resolvedRotateRightLabel = computed(() => props.rotateRightLabel ?? t('gr.imageViewer.rotateRight', 'Rotate right'))
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.imageViewer.empty', 'No image'))
+const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.imageViewer.label', 'Image viewer'))
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
   (e: 'close'): void
-  (e: 'switch', newIndex: number): void
+  /** Показан другой кадр. */
+  (e: 'change', newIndex: number): void
   (e: 'rotate', deg: number): void
 }>()
 
@@ -117,6 +154,9 @@ type GrImageViewerToolbarActions = {
 
 type GrImageViewerSlotProps = {
   index: number
+  /** Текущий кадр — адрес и альтернативный текст. */
+  src?: string
+  alt: string
   displayIndex: number
   total: number
   scale: number
@@ -134,8 +174,6 @@ type GrImageViewerSlotProps = {
   actions: GrImageViewerToolbarActions
 }
 
-const DEFAULT_Z_INDEX = 2000
-
 const open = computed(() => props.modelValue)
 
 // SSR-guard для teleport + общий reference-counted scroll-lock (как в GrModal/GrDrawer).
@@ -144,7 +182,11 @@ const open = computed(() => props.modelValue)
 const teleportEnabled = useTeleportEnabled()
 const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
-const total = computed(() => props.urlList.length)
+const items = computed<GrImageViewerItem[]>(() =>
+  props.urlList.map(item => (typeof item === 'string' ? { src: item } : item)),
+)
+
+const total = computed(() => items.value.length)
 const hasImages = computed(() => total.value > 0)
 
 const currentIndex = ref(0)
@@ -191,11 +233,29 @@ const { isWheelZooming, onWheel, endWheelZoom } = useWheelGesture({
   applyZoomFactor: factor => setScale(scale.value * factor),
 })
 
-const currentUrl = computed(() => (hasImages.value ? props.urlList[currentIndex.value] : undefined))
+const currentItem = computed(() => (hasImages.value ? items.value[currentIndex.value] : undefined))
+const currentUrl = computed(() => currentItem.value?.src)
+const currentAlt = computed(() => currentItem.value?.alt ?? '')
 const displayIndex = computed(() => (hasImages.value ? currentIndex.value + 1 : 0))
 
+/**
+ * Живой регион пуст до первой смены кадра: регион, который появляется сразу с
+ * текстом, часть AT не объявляет вовсе, а объявлять «изображение 1 из 5» в
+ * момент открытия и незачем — это скажет имя диалога.
+ */
+const liveMessage = ref('')
+
+watch(displayIndex, (index) => {
+  liveMessage.value = hasImages.value
+    ? t('gr.imageViewer.position', 'Image {index} of {total}', { index, total: total.value })
+    : ''
+})
+
+// Просмотрщик — оверлей модального класса, значит и слой у него модальный.
+// Константа 2000 ставила его выше тостов: уведомление уровня приложения
+// оказывалось под картинкой. Проп остаётся escape-hatch’ем.
 const viewerStyle = computed(() => ({
-  zIndex: String(Number.isFinite(props.zIndex) ? props.zIndex : DEFAULT_Z_INDEX),
+  zIndex: Number.isFinite(props.zIndex) ? String(props.zIndex) : 'var(--gr-z-modal)',
 }))
 
 // Плавный CSS-переход только для дискретных зумов; при wheel-зуме/перетаскивании отключаем.
@@ -228,7 +288,7 @@ function setIndex(nextIndex: number, options?: { emitSwitch?: boolean }): void {
   endWheelZoom()
 
   if (options?.emitSwitch !== false)
-    emit('switch', normalizedIndex)
+    emit('change', normalizedIndex)
 }
 
 function syncIndexFromInitial(): void {
@@ -243,7 +303,7 @@ function syncIndexFromInitial(): void {
 }
 
 function preloadAt(index: number): void {
-  const url = props.urlList[index]
+  const url = items.value[index]?.src
   if (!url)
     return
   const image = new Image()
@@ -275,8 +335,15 @@ const toolbarActions: GrImageViewerToolbarActions = {
   rotateRight,
 }
 
+// Наружу отдаём тот же набор, что получает слот тулбара. Открытия здесь нет
+// намеренно: оно принадлежит `v-model`, и вторая точка входа рассинхронизировала
+// бы состояние с моделью.
+defineExpose(toolbarActions)
+
 const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
   index: currentIndex.value,
+  src: currentUrl.value,
+  alt: currentAlt.value,
   displayIndex: displayIndex.value,
   total: total.value,
   scale: scale.value,
@@ -345,12 +412,43 @@ watch(
   },
 )
 
+/**
+ * Список кадров меняется у живой галереи постоянно: догрузилась следующая
+ * страница, заменили один url. Раньше на любое такое изменение просмотрщик
+ * дёргал `syncIndexFromInitial()` — то есть выбрасывал пользователя на
+ * `initialIndex` и сбрасывал зум с поворотом.
+ *
+ * Держимся кадра, а не позиции: если текущий `src` остался в наборе, идём за
+ * ним (и трансформации не трогаем). Исчез — остаёмся на своём месте в списке,
+ * прижав индекс к границам, и только тогда сбрасываем трансформации: показываем
+ * уже другую картинку.
+ */
 watch(
-  () => props.urlList,
-  () => {
+  items,
+  (next, prev) => {
     if (!props.modelValue)
       return
-    syncIndexFromInitial()
+
+    if (!next.length) {
+      currentIndex.value = 0
+      resetTransform()
+      resetImageMetrics()
+      endWheelZoom()
+      return
+    }
+
+    const shownSrc = prev?.[currentIndex.value]?.src
+    const keptIndex = shownSrc ? next.findIndex(item => item.src === shownSrc) : -1
+
+    if (keptIndex >= 0) {
+      currentIndex.value = keptIndex
+      return
+    }
+
+    currentIndex.value = Math.min(currentIndex.value, next.length - 1)
+    resetTransform()
+    resetImageMetrics()
+    endWheelZoom()
   },
   { deep: true },
 )
@@ -389,6 +487,7 @@ onBeforeUnmount(() => {
         :style="viewerStyle"
         role="dialog"
         aria-modal="true"
+        :aria-label="resolvedAriaLabel"
         :static="true"
         @keydown="onKeydown"
       >
@@ -404,7 +503,7 @@ onBeforeUnmount(() => {
           >
             <div
               data-gr-image-viewer-overlay
-              class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              :class="scrimClass"
               aria-hidden="true"
               @click="onBackdropClick"
             />
@@ -430,15 +529,24 @@ onBeforeUnmount(() => {
                     <div
                       v-if="showProgress"
                       data-gr-image-viewer-progress
-                      class="rounded-full bg-black/35 px-3 py-1 text-xs font-600 text-white/95 sm:text-sm"
+                      class="font-600"
+                      :class="badgeClass"
                     >
                       {{ displayIndex }} / {{ total }}
                     </div>
 
+                    <span
+                      data-gr-image-viewer-live
+                      class="sr-only"
+                      role="status"
+                      aria-live="polite"
+                    >{{ liveMessage }}</span>
+
                     <div
                       v-if="showZoomValue"
                       data-gr-image-viewer-zoom-value
-                      class="rounded-full bg-black/35 px-3 py-1 text-xs font-700 text-white/95 sm:text-sm"
+                      class="font-700"
+                      :class="badgeClass"
                     >
                       {{ zoomValueText }}%
                     </div>
@@ -448,10 +556,13 @@ onBeforeUnmount(() => {
                     type="button"
                     data-gr-image-viewer-close
                     :aria-label="resolvedCloseLabel"
-                    class="h-11 w-11 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                    class="h-11 w-11"
+                    :class="chromeButtonClass"
                     @click="closeViewer"
                   >
-                    <span aria-hidden="true" class="text-lg leading-none">✕</span>
+                    <GrIcon size="md" aria-hidden="true">
+                      <IconX />
+                    </GrIcon>
                   </button>
                 </div>
               </div>
@@ -465,10 +576,13 @@ onBeforeUnmount(() => {
                   type="button"
                   data-gr-image-viewer-prev
                   :aria-label="resolvedPrevLabel"
-                  class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:left-6"
+                  class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 sm:left-6"
+                  :class="chromeButtonClass"
                   @click="prev"
                 >
-                  <span aria-hidden="true" class="text-xl leading-none">‹</span>
+                  <GrIcon size="lg" aria-hidden="true">
+                    <IconChevronLeft />
+                  </GrIcon>
                 </button>
 
                 <button
@@ -476,10 +590,13 @@ onBeforeUnmount(() => {
                   type="button"
                   data-gr-image-viewer-next
                   :aria-label="resolvedNextLabel"
-                  class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 flex items-center justify-center rounded-full border border-white/20 bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-6"
+                  class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 sm:right-6"
+                  :class="chromeButtonClass"
                   @click="next"
                 >
-                  <span aria-hidden="true" class="text-xl leading-none">›</span>
+                  <GrIcon size="lg" aria-hidden="true">
+                    <IconChevronRight />
+                  </GrIcon>
                 </button>
 
                 <div class="h-full w-full flex items-center justify-center">
@@ -488,7 +605,7 @@ onBeforeUnmount(() => {
                     ref="imageEl"
                     data-gr-image-viewer-image
                     :src="currentUrl"
-                    alt=""
+                    :alt="currentAlt"
                     draggable="false"
                     class="max-h-full max-w-full select-none object-contain will-change-transform"
                     :class="[imageTransitionClass, imageCursorClass]"
@@ -502,7 +619,7 @@ onBeforeUnmount(() => {
 
                   <div
                     v-else
-                    class="rounded-[var(--gr-radius-xl)] border border-white/20 bg-black/25 px-4 py-3 text-sm text-white/80"
+                    :class="emptyStateClass"
                   >
                     {{ resolvedEmptyText }}
                   </div>
@@ -515,22 +632,26 @@ onBeforeUnmount(() => {
                     name="toolbar"
                     v-bind="toolbarSlotProps"
                   >
-                    <div class="rounded-full border border-white/20 bg-black/35 p-1 backdrop-blur-sm flex items-center gap-1">
+                    <div :class="toolbarShellClass">
                       <button
                         type="button"
                         data-gr-image-viewer-zoom-out
                         :aria-label="resolvedZoomOutLabel"
-                        class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        class="h-11 min-w-11 px-2 text-sm font-600"
+                        :class="toolbarButtonClass"
                         @click="zoomOut"
                       >
-                        −
+                        <GrIcon size="sm" aria-hidden="true">
+                          <IconMinus />
+                        </GrIcon>
                       </button>
 
                       <button
                         type="button"
                         data-gr-image-viewer-zoom-reset
                         :aria-label="resolvedResetZoomLabel"
-                        class="h-11 min-w-11 px-3 flex items-center justify-center rounded-full text-xs font-700 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        class="h-11 min-w-11 px-3 text-xs font-700"
+                        :class="toolbarButtonClass"
                         @click="resetTransform"
                       >
                         100%
@@ -540,43 +661,52 @@ onBeforeUnmount(() => {
                         type="button"
                         data-gr-image-viewer-zoom-in
                         :aria-label="resolvedZoomInLabel"
-                        class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        class="h-11 min-w-11 px-2 text-sm font-600"
+                        :class="toolbarButtonClass"
                         @click="zoomIn"
                       >
-                        +
+                        <GrIcon size="sm" aria-hidden="true">
+                          <IconPlus />
+                        </GrIcon>
                       </button>
 
                       <template v-if="$slots['toolbar-actions']">
-                        <div class="mx-1 h-6 w-px bg-white/25" aria-hidden="true" />
+                        <div :class="toolbarSeparatorClass" aria-hidden="true" />
 
                         <slot
                           name="toolbar-actions"
                           v-bind="toolbarSlotProps"
                         />
 
-                        <div class="mx-1 h-6 w-px bg-white/25" aria-hidden="true" />
+                        <div :class="toolbarSeparatorClass" aria-hidden="true" />
                       </template>
 
-                      <div v-else class="mx-1 h-6 w-px bg-white/25" aria-hidden="true" />
+                      <div v-else :class="toolbarSeparatorClass" aria-hidden="true" />
 
                       <button
                         type="button"
                         data-gr-image-viewer-rotate-left
                         :aria-label="resolvedRotateLeftLabel"
-                        class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        class="h-11 min-w-11 px-2 text-sm font-600"
+                        :class="toolbarButtonClass"
                         @click="rotateLeft"
                       >
-                        ↺
+                        <GrIcon size="sm" aria-hidden="true">
+                          <IconRotateCcw />
+                        </GrIcon>
                       </button>
 
                       <button
                         type="button"
                         data-gr-image-viewer-rotate-right
                         :aria-label="resolvedRotateRightLabel"
-                        class="h-11 min-w-11 px-2 flex items-center justify-center rounded-full text-sm font-600 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                        class="h-11 min-w-11 px-2 text-sm font-600"
+                        :class="toolbarButtonClass"
                         @click="rotateRight"
                       >
-                        ↻
+                        <GrIcon size="sm" aria-hidden="true">
+                          <IconRotateCw />
+                        </GrIcon>
                       </button>
                     </div>
                   </slot>

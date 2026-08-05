@@ -26,7 +26,6 @@ function readComponentSources(): { path: string, source: string }[] {
  */
 const KNOWN_OFF_SCALE = new Set([
   'GrLoading/grLoadingStyles.ts', // fullscreen-оверлей на z-50
-  'GrImageViewer/GrImageViewer.vue', // DEFAULT_Z_INDEX = 2000, выше тостов
 ])
 
 describe('слоирование (docs/z-index.md)', () => {

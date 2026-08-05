@@ -146,7 +146,9 @@
     "resetZoom": "Restablecer zoom",
     "rotateLeft": "Girar a la izquierda",
     "rotateRight": "Girar a la derecha",
-    "empty": "Sin imagen"
+    "empty": "Sin imagen",
+    "label": "Visor de imágenes",
+    "position": "Imagen {index} de {total}"
   },
   "formErrorBanner": {
     "validationTitle": "Revisa los campos del formulario",

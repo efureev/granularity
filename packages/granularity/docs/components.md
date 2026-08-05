@@ -51,7 +51,7 @@
 - [`GrFormFile`](./components/GrFormFile.md)
 - `GrFormSection`
 - `GrIcon`
-- `GrImageViewer`
+- [`GrImageViewer`](./components/GrImageViewer.md)
 - `GrInput`
 - `GrInputTag`
 - `GrKbd`

@@ -147,7 +147,9 @@
     "resetZoom": "Сбросить масштаб",
     "rotateLeft": "Повернуть влево",
     "rotateRight": "Повернуть вправо",
-    "empty": "Нет изображения"
+    "empty": "Нет изображения",
+    "label": "Просмотр изображений",
+    "position": "Изображение {index} из {total}"
   },
   "formErrorBanner": {
     "validationTitle": "Проверьте поля формы",

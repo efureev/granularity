@@ -136,6 +136,7 @@ const previewRegistry = {
   'gr-icon-inline-copy': defineAsyncComponent(() => import('../demos/components/gr-icon/GrIconInlineCopyDemo.vue')),
   'gr-icon-size-scale': defineAsyncComponent(() => import('../demos/components/gr-icon/GrIconSizeScaleDemo.vue')),
   'gr-icon-status-card': defineAsyncComponent(() => import('../demos/components/gr-icon/GrIconStatusCardDemo.vue')),
+  'gr-image-viewer-alt-and-append': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerAltAndAppendDemo.vue')),
   'gr-image-viewer-async-media': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerAsyncMediaDemo.vue')),
   'gr-image-viewer-gallery': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerGalleryDemo.vue')),
   'gr-image-viewer-real-size': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerRealSizeDemo.vue')),

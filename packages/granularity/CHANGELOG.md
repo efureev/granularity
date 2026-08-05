@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrImageViewer`: alt text, an accessible name and an imperative API.** `urlList` now takes
+  `{ src, alt }` next to a plain string (mixed lists included), and `alt` reaches both the `<img>`
+  and the toolbar slot; the layer names itself from the locale or from the new `ariaLabel` prop; a
+  live region announces the current frame ("Image 2 of 5", new `gr.imageViewer.position` key); a
+  template ref exposes `close`, `prev`, `next`, `zoomIn`, `zoomOut`, `reset`, `rotateLeft`,
+  `rotateRight`. The chrome is painted by per-component tokens (`--gr-image-viewer-scrim`,
+  `-chrome-bg`, `-chrome-bg-hover`, `-chrome-bg-soft`, `-chrome-fg`, `-chrome-fg-muted`,
+  `-chrome-brd`, `-ring`), and its buttons use `GrIcon` instead of the text glyphs `✕ ‹ › − ↺ ↻`.
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
@@ -40,6 +48,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrImageViewer` threw the user back to the first frame and painted over toasts.** Any change to
+  `urlList` — a gallery loading its next page — reset the index to `initialIndex` together with zoom
+  and rotation; the viewer now holds on to the *frame*, keeping it on screen even when it shifts
+  position, and clamps to the list bounds only when the frame is gone. Its layer moved from the
+  hard-coded `z-index: 2000` (above the toast layer, the one thing that must stay visible) to
+  `--gr-z-modal`, with the `zIndex` prop left as an escape hatch — the entry is gone from the
+  `layering.test.ts` allowlist and from the deviations table in `docs/z-index.md`. The modal layer
+  also had no accessible name at all (`aria-dialog-name`), and every image was `alt=""` with no way
+  to pass a description. `useZoomPan`, `useWheelGesture` and `useViewerKeyboard` are now covered by
+  tests.
 - **`GrFormField` announced errors unreliably and validated too eagerly.** The error box appeared
   and disappeared with `v-if` while the control's `aria-describedby` changed composition at the same
   moment — assistive tech that does not re-read the description after an attribute change stayed
@@ -134,6 +152,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrImageViewer` renamed the `switch` event to `change`.** The old name came from Element Plus
+  and matched nothing else in the package (`update:*` / `change` / `sortChange`). The payload is
+  unchanged — the new frame index.
 - **`GrFormFile` no longer emits `validation`.** It carried exactly the same payload as
   `update:errors`; the remaining channel is `update:errors`, now backed by a real `errors` prop, so
   `v-model:errors` reads as well as writes.

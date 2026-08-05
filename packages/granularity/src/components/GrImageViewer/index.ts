@@ -1,3 +1,5 @@
 export { default } from './GrImageViewer.vue'
 export { default as GrImageViewer } from './GrImageViewer.vue'
+export type { GrImageViewerItem, GrImageViewerSource } from './GrImageViewer.vue'
 export { grImageViewerConfig } from './config'
+export { grImageViewerSafelist } from './safelist'
