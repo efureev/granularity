@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { grDropdownMenuListClass } from './grDropdownMenuStyles'
+
+/**
+ * `role="none"` на обёртке обязателен: `role="menu"` у панели объявляет своих
+ * потомков презентационными, и любой div между панелью и пунктом ломает
+ * `aria-required-children`, а пункты теряют принадлежность к меню.
+ */
+
 export interface GrDropdownMenuListProps {
   dividers?: boolean
   borderTop?: boolean
@@ -13,18 +21,19 @@ const props = withDefaults(defineProps<GrDropdownMenuListProps>(), {
   borderBottom: false,
 })
 
-const className = computed(() => {
-  return [
-    'w-full',
-    props.dividers ? 'divide-y divide-[var(--gr-brd)]' : '',
-    props.borderTop ? 'border-t border-[var(--gr-brd)]' : '',
-    props.borderBottom ? 'border-b border-[var(--gr-brd)]' : '',
-  ].filter(Boolean).join(' ')
-})
+const className = computed(() => grDropdownMenuListClass({
+  dividers: props.dividers,
+  borderTop: props.borderTop,
+  borderBottom: props.borderBottom,
+}))
 </script>
 
 <template>
-  <div data-gr-dropdown-menu-list :class="className">
+  <div
+    data-gr-dropdown-menu-list
+    role="none"
+    :class="className"
+  >
     <slot />
   </div>
 </template>

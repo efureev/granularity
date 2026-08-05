@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 
 import GrDropdownMenuHeader from './GrDropdownMenuHeader.vue'
-import type { GrDropdownMenuHeaderAlign } from './GrDropdownMenuHeader.vue'
+import { dividersClass, listBaseClass, type GrDropdownMenuHeaderAlign } from './grDropdownMenuStyles'
 
 export interface GrDropdownMenuGroupProps {
   title?: string
@@ -18,23 +18,31 @@ const props = withDefaults(defineProps<GrDropdownMenuGroupProps>(), {
   uppercase: true,
 })
 
-const itemsClass = computed(() => {
-  return [
-    'w-full',
-    props.dividers ? 'divide-y divide-[var(--gr-brd)]' : '',
-  ].filter(Boolean).join(' ')
-})
+const titleId = useId()
+// Имя группы читается диктором при входе в неё; без заголовка называть нечем.
+const labelledBy = computed(() => (props.title ? titleId : undefined))
+
+const itemsClass = computed(() => [
+  listBaseClass,
+  props.dividers ? dividersClass : '',
+].filter(Boolean).join(' '))
 </script>
 
 <template>
-  <div data-gr-dropdown-menu-group class="w-full">
+  <div
+    data-gr-dropdown-menu-group
+    role="group"
+    :aria-labelledby="labelledBy"
+    class="w-full"
+  >
     <GrDropdownMenuHeader
       v-if="title"
+      :id="titleId"
       :title="title"
       :align="titleAlign"
       :uppercase="uppercase"
     />
-    <div :class="itemsClass">
+    <div role="none" :class="itemsClass">
       <slot />
     </div>
   </div>

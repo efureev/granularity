@@ -43,7 +43,7 @@
 - `GrDivider`
 - [`GrDrawer`](./components/GrDrawer.md)
 - `GrDropdown`
-- `GrDropdownMenu`
+- [`GrDropdownMenu`](./components/GrDropdownMenu.md)
 - `GrEmptyState`
 - `GrFileUpload`
 - `GrForm`

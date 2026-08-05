@@ -25,9 +25,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `GrConfigProvider` through `componentDefaults`.
 - **`--gr-overlay-bg`** — the scrim token behind modal layers, shared by `GrModal` and `GrDrawer`
   and darker in the dark theme.
+- **`GrDropdownMenu` can be built from a model**: `:items` accepts actions, groups and dividers and
+  emits `select`; items gained `role="menuitemcheckbox"` / `menuitemradio` with `aria-checked`,
+  plus `icon` and `shortcut` (props or slots). Composition of the sub-components stays for
+  everything a model cannot express.
 
 ### Fixed
 
+- **`GrDropdownMenu` wrappers broke the menu pattern.** `role="menu"` on the panel makes every
+  descendant presentational, so the list, columns, column, group and header divs sitting between
+  the panel and its items violated `aria-required-children` — the items lost their menu. They are
+  now `role="none"` / `presentation`, and a group is a real `role="group"` named by its header.
+  The catalog also got its missing `safelist.ts`: its class maps live in a `.ts` helper the bundler
+  moves into a shared chunk, outside the component's scan area, so alignment, columns and colors
+  would have silently vanished for an isolated consumer. `variant="danger"` now uses
+  `--gr-danger-text` instead of the saturated tone, disabled is painted with background tokens
+  instead of `opacity-60`, and a disabled item is no longer activated by handlers bound on the item
+  itself (`stopImmediatePropagation`, matching `GrButton`).
 - **`GrDrawer` sat below the whole z-index scale.** The panel used a literal `z-50`, so a dropdown
   or select panel (`--gr-z-dropdown` = 1000) painted over the open drawer and its backdrop did not
   cover them. It now uses `--gr-z-modal`, like every other modal layer — the entry is gone from the

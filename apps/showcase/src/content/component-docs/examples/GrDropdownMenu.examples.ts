@@ -8,21 +8,41 @@ export const grDropdownMenuExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-dropdown-menu-quick-actions',
     code: `<script setup lang="ts">
-import { GrButton, GrDropdownMenu, GrDropdownMenuItem } from '@feugene/granularity'
+import { ref } from 'vue'
+
+import { GrBadge, GrButton, GrDropdownMenu, GrDropdownMenuItem } from '@feugene/granularity'
+
+const lastAction = ref('Not selected yet')
+
+const actions = [
+  'Duplicate page',
+  'Move to archive',
+  'Copy public URL',
+]
 </script>
 
 <template>
-  <GrDropdownMenu align="left" width="60">
-    <template #trigger="{ open }">
-      <GrButton variant="outline">
-        {{ open ? 'Close quick actions' : 'Open quick actions' }}
-      </GrButton>
-    </template>
+  <div class="flex flex-wrap items-start gap-3">
+    <GrDropdownMenu align="left" width="60">
+      <template #trigger="{ open }">
+        <GrButton variant="outline">
+          {{ open ? 'Close quick actions' : 'Open quick actions' }}
+        </GrButton>
+      </template>
 
-    <GrDropdownMenuItem>Duplicate page</GrDropdownMenuItem>
-    <GrDropdownMenuItem>Move to archive</GrDropdownMenuItem>
-    <GrDropdownMenuItem>Copy public URL</GrDropdownMenuItem>
-  </GrDropdownMenu>
+      <GrDropdownMenuItem
+        v-for="action in actions"
+        :key="action"
+        @click="lastAction = action"
+      >
+        {{ action }}
+      </GrDropdownMenuItem>
+    </GrDropdownMenu>
+
+    <GrBadge tone="neutral">
+      Last action: {{ lastAction }}
+    </GrBadge>
+  </div>
 </template>`,
   },
   {
@@ -32,32 +52,61 @@ import { GrButton, GrDropdownMenu, GrDropdownMenuItem } from '@feugene/granulari
     status: 'ready',
     previewKey: 'gr-dropdown-menu-grouped-actions',
     code: `<script setup lang="ts">
+import { ref } from 'vue'
+
 import {
+  GrBadge,
   GrButton,
   GrDropdownMenu,
   GrDropdownMenuDivider,
   GrDropdownMenuGroup,
   GrDropdownMenuItem,
 } from '@feugene/granularity'
+
+const selectedAction = ref('Publish now')
 </script>
 
 <template>
-  <GrDropdownMenu width="64">
-    <template #trigger>
-      <GrButton>Workspace actions</GrButton>
-    </template>
+  <div class="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-start">
+    <GrDropdownMenu width="64">
+      <template #trigger="{ open }">
+        <GrButton>
+          {{ open ? 'Hide workspace actions' : 'Workspace actions' }}
+        </GrButton>
+      </template>
 
-    <GrDropdownMenuGroup title="Publish" :uppercase="false" dividers>
-      <GrDropdownMenuItem>Publish now</GrDropdownMenuItem>
-      <GrDropdownMenuItem>Schedule for review</GrDropdownMenuItem>
-    </GrDropdownMenuGroup>
+      <GrDropdownMenuGroup title="Publish" :uppercase="false" dividers>
+        <GrDropdownMenuItem @click="selectedAction = 'Publish now'">
+          Publish now
+        </GrDropdownMenuItem>
+        <GrDropdownMenuItem @click="selectedAction = 'Schedule for review'">
+          Schedule for review
+        </GrDropdownMenuItem>
+      </GrDropdownMenuGroup>
 
-    <GrDropdownMenuDivider />
+      <GrDropdownMenuDivider />
 
-    <GrDropdownMenuGroup title="Danger zone" :uppercase="false" dividers>
-      <GrDropdownMenuItem variant="danger">Delete draft</GrDropdownMenuItem>
-    </GrDropdownMenuGroup>
-  </GrDropdownMenu>
+      <GrDropdownMenuGroup title="Danger zone" :uppercase="false" dividers>
+        <GrDropdownMenuItem variant="danger" @click="selectedAction = 'Delete draft'">
+          Delete draft
+        </GrDropdownMenuItem>
+      </GrDropdownMenuGroup>
+    </GrDropdownMenu>
+
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">
+      <div class="text-sm text-[var(--gr-muted-fg)]">
+        Selected action
+      </div>
+      <div class="mt-2 flex items-center gap-3">
+        <div class="text-sm font-600 text-[var(--gr-fg)]">
+          {{ selectedAction }}
+        </div>
+        <GrBadge size="sm" tone="primary">
+          grouped menu
+        </GrBadge>
+      </div>
+    </div>
+  </div>
 </template>`,
   },
   {
@@ -117,6 +166,71 @@ const shortcuts = [
       </div>
     </GrDropdownMenuList>
   </GrDropdownMenu>
+</template>`,
+  },
+  {
+    id: 'dropdown-menu-declarative',
+    title: 'Menu from a model',
+    description: 'Пункты, группы и разделители задаются массивом `items`, а `menuitemcheckbox`/`menuitemradio` дают состояние прямо в меню — композиция подкомпонентов остаётся для нестандартных случаев.',
+    status: 'ready',
+    previewKey: 'gr-dropdown-menu-declarative',
+    code: `<script setup lang="ts">
+import { computed, ref } from 'vue'
+
+import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '@feugene/granularity'
+import { GrButton, GrDropdownMenu } from '@feugene/granularity'
+
+const density = ref<'compact' | 'cozy'>('cozy')
+const showArchived = ref(false)
+const lastAction = ref('—')
+
+// Модель вместо композиции: девять меню из десяти однотипны, и собирать их
+// из пяти компонентов вручную незачем.
+const items = computed<GrDropdownMenuEntry[]>(() => [
+  { key: 'rename', label: 'Rename', shortcut: '⌘R' },
+  { key: 'duplicate', label: 'Duplicate', shortcut: '⌘D' },
+  { type: 'divider' },
+  {
+    type: 'group',
+    title: 'View',
+    items: [
+      { key: 'compact', label: 'Compact rows', role: 'menuitemradio', checked: density.value === 'compact' },
+      { key: 'cozy', label: 'Cozy rows', role: 'menuitemradio', checked: density.value === 'cozy' },
+      { key: 'archived', label: 'Show archived', role: 'menuitemcheckbox', checked: showArchived.value },
+    ],
+  },
+  { type: 'divider' },
+  { key: 'export', label: 'Export…', disabled: true },
+  { key: 'delete', label: 'Delete', variant: 'danger', shortcut: '⌫' },
+])
+
+function onSelect(item: GrDropdownMenuAction): void {
+  if (item.key === 'compact' || item.key === 'cozy')
+    density.value = item.key
+
+  if (item.key === 'archived')
+    showArchived.value = !showArchived.value
+
+  lastAction.value = item.label
+}
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrDropdownMenu :items="items" align="left" width="60" @select="onSelect">
+      <template #trigger="{ open }">
+        <GrButton variant="outline">
+          {{ open ? 'Close board actions' : 'Board actions' }}
+        </GrButton>
+      </template>
+    </GrDropdownMenu>
+
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] p-3 text-sm text-[var(--gr-muted-fg)]">
+      Density: <span class="font-semibold text-[var(--gr-fg)]">{{ density }}</span> ·
+      archived: <span class="font-semibold text-[var(--gr-fg)]">{{ showArchived ? 'shown' : 'hidden' }}</span> ·
+      last action: <span class="font-semibold text-[var(--gr-fg)]">{{ lastAction }}</span>
+    </div>
+  </div>
 </template>`,
   },
 ]

@@ -8,6 +8,18 @@ export { default as GrDropdownMenuHeader } from './GrDropdownMenuHeader.vue'
 export { default as GrDropdownMenuItem } from './GrDropdownMenuItem.vue'
 export { default as GrDropdownMenuList } from './GrDropdownMenuList.vue'
 export { grDropdownMenuConfig } from './config'
+export { grDropdownMenuSafelist } from './safelist'
+export {
+  isMenuAction,
+  isMenuSection,
+  isMenuSeparator,
+} from './menuModel'
+export type {
+  GrDropdownMenuAction,
+  GrDropdownMenuEntry,
+  GrDropdownMenuSection,
+  GrDropdownMenuSeparator,
+} from './menuModel'
 export type {
   GrDropdownMenuAlign,
   GrDropdownMenuProps,
@@ -27,6 +39,7 @@ export type {
 export type {
   GrDropdownMenuItemAlign,
   GrDropdownMenuItemProps,
+  GrDropdownMenuItemRole,
   GrDropdownMenuItemVariant,
 } from './GrDropdownMenuItem.vue'
 export type { GrDropdownMenuListProps } from './GrDropdownMenuList.vue'

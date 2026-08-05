@@ -2272,6 +2272,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "items",
+            "description": "Декларативное меню: пункты, группы и разделители массивом. Слот по умолчанию сильнее — он для меню, которое из модели не собирается.",
+            "type": "GrDropdownMenuEntry[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "align",
             "description": "Выравнивание панели относительно триггера.",
             "type": "GrDropdownMenuAlign | undefined",
@@ -2350,7 +2357,14 @@
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "select",
+            "description": "",
+            "type": "[item: GrDropdownMenuAction]",
+            "signature": "(event: \"select\", item: GrDropdownMenuAction): void"
+          }
+        ]
       },
       {
         "key": "methods",

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 
-export type GrDropdownMenuHeaderAlign = 'left' | 'center' | 'right'
+import { headerClass, textAlignClass, type GrDropdownMenuHeaderAlign } from './grDropdownMenuStyles'
+
+export type { GrDropdownMenuHeaderAlign } from './grDropdownMenuStyles'
 
 export interface GrDropdownMenuHeaderProps {
   title?: string
@@ -15,25 +17,21 @@ const props = withDefaults(defineProps<GrDropdownMenuHeaderProps>(), {
   uppercase: true,
 })
 
+/**
+ * Заголовок — подпись, а не пункт меню: `role="presentation"` убирает его из
+ * числа потомков `role="menu"`. Имя группе он даёт через `aria-labelledby`
+ * у `GrDropdownMenuGroup`.
+ */
 const slots = useSlots()
 const isVisible = computed(() => Boolean(props.title) || Boolean(slots.default))
-
-const titleAlignClass = computed(() => {
-  const map: Record<GrDropdownMenuHeaderAlign, string> = {
-    left: 'text-left',
-    center: 'text-center',
-    right: 'text-right',
-  }
-  return map[props.align]
-})
 </script>
 
 <template>
   <div
     v-if="isVisible"
     data-gr-dropdown-menu-header
-    class="px-4 py-2 text-[11px] tracking-wide text-[var(--gr-muted-fg)]"
-    :class="[titleAlignClass, { uppercase }]"
+    role="presentation"
+    :class="[headerClass, textAlignClass[align], { uppercase }]"
   >
     <slot>{{ title }}</slot>
   </div>

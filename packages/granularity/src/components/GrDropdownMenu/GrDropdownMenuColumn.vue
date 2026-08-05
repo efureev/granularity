@@ -1,5 +1,7 @@
 <script setup lang="ts">
-export type GrDropdownMenuColumnAlign = 'left' | 'center' | 'right'
+import { alignClass, columnBaseClass, type GrDropdownMenuColumnAlign } from './grDropdownMenuStyles'
+
+export type { GrDropdownMenuColumnAlign } from './grDropdownMenuStyles'
 
 export interface GrDropdownMenuColumnProps {
   align?: GrDropdownMenuColumnAlign
@@ -8,19 +10,13 @@ export interface GrDropdownMenuColumnProps {
 withDefaults(defineProps<GrDropdownMenuColumnProps>(), {
   align: 'center',
 })
-
-const alignClass: Record<GrDropdownMenuColumnAlign, string> = {
-  left: 'justify-start text-left',
-  center: 'justify-center text-center',
-  right: 'justify-end text-right',
-}
 </script>
 
 <template>
   <div
     data-gr-dropdown-menu-column
-    class="px-3 py-2 flex items-center"
-    :class="alignClass[align]"
+    role="none"
+    :class="[columnBaseClass, alignClass[align]]"
   >
     <slot />
   </div>
