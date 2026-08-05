@@ -56,13 +56,13 @@
 гидрации. Практический вывод: на первый экран и в SEO содержимое модалки не
 попадает, а расхождения гидрации внутри неё в принципе невозможны.
 
-## Полностью изоморфные (47)
+## Полностью изоморфные (48)
 
 Ни одного обращения к DOM или браузерным API:
 
 `GrAlert`, `GrAvatar`, `GrBadge`, `GrBadgeWrap`, `GrBottomNav`, `GrButton`,
-`GrButtonGroup`, `GrCard`, `GrCheckbox`, `GrCollapse`, `GrConfigProvider`,
-`GrConfirmDialog`, `GrDataTable`, `GrDialog`, `GrDivider`, `GrDropdownMenu`,
+`GrButtonGroup`, `GrCard`, `GrCheckbox`, `GrCheckboxGroup`, `GrCollapse`,
+`GrConfigProvider`, `GrConfirmDialog`, `GrDataTable`, `GrDialog`, `GrDivider`, `GrDropdownMenu`,
 `GrEmptyState`, `GrFileUpload`, `GrForm`, `GrFormField`, `GrFormFile`,
 `GrFormSection`, `GrIcon`, `GrInput`, `GrInputTag`, `GrKbd`, `GrLink`, `GrList`,
 `GrLoading`, `GrNavbar`, `GrNumberInput`, `GrPagination`, `GrProgressBar`,

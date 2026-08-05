@@ -6,6 +6,8 @@ import { GrCheckbox, GrSwitch } from '@feugene/granularity'
 const weeklyDigest = ref(true)
 const incidentAlerts = ref(false)
 const controlsDisabled = ref(false)
+const terms = ref(false)
+const compactRow = ref(true)
 
 const enabledCount = computed(() => [weeklyDigest.value, incidentAlerts.value].filter(Boolean).length)
 </script>
@@ -21,6 +23,12 @@ const enabledCount = computed(() => [weeklyDigest.value, incidentAlerts.value].f
       </GrCheckbox>
       <GrCheckbox :model-value="true" disabled>
         Security bulletins are always enabled
+      </GrCheckbox>
+      <GrCheckbox v-model="terms" :invalid="!terms" required>
+        Accept the notification policy
+      </GrCheckbox>
+      <GrCheckbox v-model="compactRow" label-position="start">
+        Label before the control
       </GrCheckbox>
     </div>
 

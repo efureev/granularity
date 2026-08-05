@@ -8,7 +8,7 @@ const componentGroups = {
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
-  forms: ['GrAutocomplete', 'GrCheckbox', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTree'],
   utilities: ['GrConfigProvider'],
 } as const satisfies Record<string, readonly string[]>
@@ -31,6 +31,7 @@ const componentSummaryOverrides = {
   GrKbd: 'Displays a keyboard key or shortcut in a `<kbd>` element.',
   GrTabPanels: 'Renders tab panels linked to `GrTabs` by ARIA for accessible tabs.',
   GrCheckbox: 'Lets you toggle independent options and select multiple items.',
+  GrCheckboxGroup: 'Collects checkboxes into one multi-select field with a shared model and states.',
   GrCollapse: 'Collapses and expands additional content on demand.',
   GrConfirmDialog: 'Asks to confirm a potentially important or dangerous action.',
   GrDataTable: 'A table for large data sets with sorting and filtering.',

@@ -139,14 +139,87 @@ describe('GrCheckbox', () => {
     expect(control.attributes('aria-labelledby')).toBeUndefined()
   })
 
-  it('переносит required на контрол как aria-required, сохраняя его на нативном input', () => {
+  // Нативный `required` на скрытом `aria-hidden`-инпуте не «мешает отправить», а
+  // ломает отправку: Chrome отменяет сабмит формы с невалидным нефокусируемым
+  // контролом и пишет в консоль «An invalid form control … is not focusable».
+  it('объявляет required только через aria-required, не вешая его на скрытый input', () => {
     const wrapper = mount(GrCheckbox, {
       props: { modelValue: false, required: true },
       slots: { default: 'Terms' },
     })
 
     expect(wrapper.get('[role="checkbox"]').attributes('aria-required')).toBe('true')
-    expect(wrapper.get('input[type="checkbox"]').attributes('required')).toBeDefined()
+
+    const native = wrapper.get('input[type="checkbox"]')
+    expect(native.attributes('required')).toBeUndefined()
+    expect((native.element as HTMLInputElement).validity.valid).toBe(true)
+  })
+
+  it('невалидность показывает бордером ошибки и объявляет через aria-invalid', () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false, invalid: true },
+      slots: { default: 'Terms' },
+    })
+
+    const control = wrapper.get('[role="checkbox"]')
+    expect(control.attributes('aria-invalid')).toBe('true')
+    expect(control.classes()).toContain('border-[var(--gr-danger)]')
+  })
+
+  // Disabled гасится фоном, а не `opacity`: прозрачность разбавляет выверенные на AA
+  // токены текста и роняет контраст подписи и галочки.
+  it('disabled показывает фоном-токеном, без opacity', () => {
+    const unchecked = mount(GrCheckbox, {
+      props: { modelValue: false, disabled: true },
+      slots: { default: 'Terms' },
+    })
+
+    const root = unchecked.get('[data-gr-checkbox]')
+    expect(root.classes()).toContain('cursor-not-allowed')
+    expect(root.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+
+    const control = unchecked.get('[role="checkbox"]')
+    expect(control.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(control.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(control.attributes('tabindex')).toBe('-1')
+
+    const checked = mount(GrCheckbox, {
+      props: { modelValue: true, disabled: true },
+      slots: { default: 'Terms' },
+    })
+    expect(checked.get('[role="checkbox"]').classes()).toContain('bg-[var(--gr-muted-fg)]')
+  })
+
+  it('readonly: состояние видно, но не меняется — ни кликом, ни от внешнего label', async () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: true, readonly: true },
+      slots: { default: 'Terms' },
+    })
+
+    const control = wrapper.get('[role="checkbox"]')
+    expect(control.attributes('aria-readonly')).toBe('true')
+    expect(wrapper.get('input[type="checkbox"]').attributes('disabled')).toBeUndefined()
+
+    await control.trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+
+    // Клик по внешнему `<label for>` уже переключил нативный input — он обязан
+    // вернуться к модели, иначе форма отправит непринятое значение.
+    const native = wrapper.get('input[type="checkbox"]')
+    ;(native.element as HTMLInputElement).checked = false
+    await native.trigger('change')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect((native.element as HTMLInputElement).checked).toBe(true)
+  })
+
+  it('labelPosition="start" переставляет подпись перед контролом', () => {
+    const wrapper = mount(GrCheckbox, {
+      props: { modelValue: false, labelPosition: 'start' },
+      slots: { default: 'Terms' },
+    })
+
+    expect(wrapper.get('[data-gr-checkbox]').classes()).toContain('flex-row-reverse')
   })
 
   it('клик по подписи переключает значение', async () => {

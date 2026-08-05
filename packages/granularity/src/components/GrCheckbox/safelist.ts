@@ -3,6 +3,10 @@ import { splitClassTokens } from '../shared/classTokens'
 import {
     controlBase,
     controlCheckedClass,
+    controlDisabledCheckedClass,
+    controlDisabledUncheckedClass,
+    controlInvalidCheckedClass,
+    controlInvalidUncheckedClass,
     controlSizes,
     controlUncheckedClass,
     iconCheckHiddenClass,
@@ -16,6 +20,7 @@ import {
     rootDisabledClass,
     rootEnabledClass,
     rootGaps,
+    rootLabelStartClass,
 } from './grCheckboxStyles'
 
 export const grCheckboxClassTokens = {
@@ -24,12 +29,17 @@ export const grCheckboxClassTokens = {
     rootState: [
         ...splitClassTokens(rootDisabledClass),
         ...splitClassTokens(rootEnabledClass),
+        ...splitClassTokens(rootLabelStartClass),
     ],
     controlBase: splitClassTokens(controlBase),
     controlSizes: Object.values(controlSizes).flatMap(splitClassTokens),
     controlState: [
         ...splitClassTokens(controlCheckedClass),
         ...splitClassTokens(controlUncheckedClass),
+        ...splitClassTokens(controlInvalidCheckedClass),
+        ...splitClassTokens(controlInvalidUncheckedClass),
+        ...splitClassTokens(controlDisabledCheckedClass),
+        ...splitClassTokens(controlDisabledUncheckedClass),
     ],
     iconSizes: Object.values(iconSizes).flatMap(splitClassTokens),
     iconState: [

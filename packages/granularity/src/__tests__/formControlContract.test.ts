@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
+import GrCheckboxGroup from '../components/GrCheckboxGroup/GrCheckboxGroup.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
 import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
@@ -58,6 +59,7 @@ const controls: { component: unknown, meta: Control }[] = [
   { component: GrTreeSelect, meta: { name: 'GrTreeSelect', props: { modelValue: null, data: [], nodeKey: 'id' }, widget: '[data-gr-tree-select-trigger]' } },
   { component: GrInputTag, meta: { name: 'GrInputTag', props: { modelValue: [] }, widget: 'input' } },
   { component: GrCheckbox, meta: { name: 'GrCheckbox', props: { modelValue: false }, widget: '[role="checkbox"]' } },
+  { component: GrCheckboxGroup, meta: { name: 'GrCheckboxGroup', props: { modelValue: [], options: [{ value: 'a', label: 'A' }] }, widget: '[role="group"]' } },
   { component: GrRadioGroup, meta: { name: 'GrRadioGroup', props: { modelValue: 'a', options: [{ value: 'a', label: 'A' }] }, widget: '[role="radiogroup"]' } },
   { component: GrSwitch, meta: { name: 'GrSwitch', props: { modelValue: false }, widget: '[role="switch"]' } },
   { component: GrSlider, meta: { name: 'GrSlider', props: { modelValue: 0 }, widget: '[role="slider"]' } },

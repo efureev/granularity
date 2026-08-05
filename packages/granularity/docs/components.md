@@ -29,6 +29,7 @@
 - `GrButtonGroup`
 - `GrCard`
 - `GrCheckbox`
+- `GrCheckboxGroup`
 - `GrCollapse`
 - `GrConfirmDialog`
 - `GrDataTable`
@@ -70,6 +71,50 @@
 - `GrTooltip`
 - `GrTree`
 - `GrTreeSelect`
+
+## Чекбоксы: обязательность и множественный выбор
+
+`required` у `GrCheckbox` и `GrCheckboxGroup` — **объявление, а не нативная
+проверка**: он доезжает до `aria-required` на виджете и не выставляется на
+скрытом `<input type="checkbox">`. Нативная проверка потребовала бы от браузера
+сфокусировать невалидный контрол, а он невидим и `aria-hidden`, — Chrome в таком
+случае отменяет отправку всей формы и пишет в консоль «An invalid form control
+… is not focusable». Проверять обязательность нужно правилом формы:
+
+```vue
+<script setup lang="ts">
+// `required` пустым считает `null`/`''`/`[]`, но не `false`: снятый чекбокс —
+// это законное значение поля. «Согласие обязательно» — это `validator`.
+const rules: GrFormRules = {
+  terms: [{ validator: value => value === true || 'Примите условия' }],
+  channels: [{ required: true, message: 'Выберите хотя бы один канал' }],
+}
+</script>
+
+<template>
+  <GrForm :model="model" :rules="rules">
+    <GrFormField name="terms" label="Условия">
+      <GrCheckbox v-model="model.terms" required />
+    </GrFormField>
+
+    <GrFormField name="channels" label="Каналы">
+      <GrCheckboxGroup v-model="model.channels" :options="options" required />
+    </GrFormField>
+  </GrForm>
+</template>
+```
+
+Множественный выбор — `GrCheckboxGroup` с моделью `string[]`. Он раздаёт
+вложенным `GrCheckbox` выбранные значения, `name`, `size` и состояния
+`disabled`/`readonly`/`invalid`, поэтому собственный `v-model` им не нужен:
+
+```vue
+<GrCheckboxGroup v-model="channels" name="channels" :options="options" />
+```
+
+Клик по подписи переключает чекбокс, но её интерактивное содержимое (ссылка,
+кнопка, вложенный `<label>`) работает само по себе и состояние не меняет — для
+того подпись и вынесена наружу роли-виджета.
 
 ## Стили компонентов
 

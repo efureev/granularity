@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * GrCheckbox — GR-примитив чекбокса с нативным скрытым `<input type="checkbox">`
- * для интеграции с HTML-формами (`FormData`, `required`, `form`).
+ * для интеграции с HTML-формами (`FormData`, `form`).
  *
  * Источник истины — нативный input: клик по нему (в т.ч. по внешнему
  * `<label for="...">`) слушается через `@change` и эмитит модель. Клик по видимой
@@ -17,31 +17,43 @@
  *    жить внутри: скринридер теряет их, axe падает на `nested-interactive`;
  *  - имя виджета берётся из подписи через `aria-labelledby`, что и позволяет держать
  *    её снаружи вместе со всем её интерактивным содержимым.
+ *
+ * `required` объявляется только через `aria-required`, на скрытый input он не уходит.
+ * Нативная проверка потребовала бы фокуса на невалидном контроле, а он невидим и
+ * `aria-hidden` — Chrome в таком случае молча отменяет сабмит всей формы
+ * («An invalid form control … is not focusable»). Обязательность проверяет
+ * `GrForm` правилом `required` — см. `docs/components.md`.
+ *
+ * Внутри `GrCheckboxGroup` значение приходит из группы: свой `modelValue` не
+ * задаётся, а `value` сравнивается с массивом выбранных.
  */
-import { computed, onMounted, ref, useId, useSlots, watch } from 'vue'
+import { computed, inject, onMounted, ref, useId, useSlots, watch } from 'vue'
 import IconCheck from '~icons/lucide/check'
 import IconMinus from '~icons/lucide/minus'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
-import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 
+import { GR_CHECKBOX_GROUP_CONTEXT } from './grCheckboxGroupContext'
 import {
   grCheckboxCheckIconClass,
   grCheckboxControlClass,
   grCheckboxIndeterminateIconClass,
   grCheckboxLabelClass,
   grCheckboxRootClass,
+  type GrCheckboxLabelPosition,
   type GrCheckboxSize,
 } from './grCheckboxStyles'
 
-export type { GrCheckboxSize } from './grCheckboxStyles'
+export type { GrCheckboxLabelPosition, GrCheckboxSize } from './grCheckboxStyles'
 
 export interface GrCheckboxProps {
+  /** Не задан внутри `GrCheckboxGroup` — состояние берётся из группы. */
   modelValue?: boolean
   disabled?: boolean
   name?: string
   value?: string
+  /** Обязательное поле: объявляется как `aria-required`, нативной проверки нет. */
   required?: boolean
   /** Только для чтения: состояние видно, но не переключается. */
   readonly?: boolean
@@ -54,7 +66,9 @@ export interface GrCheckboxProps {
   indeterminate?: boolean
   /** Имя контрола, когда подписи в слоте нет (или она чисто визуальная). */
   ariaLabel?: string
-  /** Размер контрола. Не задан — берётся из `GrConfigProvider`, иначе `md`. */
+  /** Сторона подписи относительно контрола. */
+  labelPosition?: GrCheckboxLabelPosition
+  /** Размер контрола. Не задан — берётся из группы, затем из `GrConfigProvider`, иначе `md`. */
   size?: GrCheckboxSize
 }
 
@@ -67,8 +81,8 @@ const hiddenInputStyle = {
 } as const
 
 const props = withDefaults(defineProps<GrCheckboxProps>(), {
-  modelValue: false,
-  disabled: false,
+  modelValue: undefined,
+  disabled: undefined,
   name: undefined,
   value: 'on',
   required: false,
@@ -78,6 +92,7 @@ const props = withDefaults(defineProps<GrCheckboxProps>(), {
   id: undefined,
   indeterminate: false,
   ariaLabel: undefined,
+  labelPosition: 'end',
   size: undefined,
 })
 
@@ -90,53 +105,86 @@ const slots = useSlots()
 const labelId = useId()
 const hasLabel = computed(() => Boolean(slots.default))
 
+const group = inject(GR_CHECKBOX_GROUP_CONTEXT, null)
+
+const checked = computed(() => {
+  if (props.modelValue !== undefined)
+    return props.modelValue
+
+  if (group)
+    return group.modelValue.value.includes(props.value)
+
+  return false
+})
+
+const resolvedDisabled = computed(() => props.disabled ?? group?.disabled.value ?? false)
+const resolvedName = computed(() => props.name ?? group?.name.value)
+
 // Контекст `GrFormField`. Id поля вешается на `span[role="checkbox"]` — именно он
 // виджет и держит фокус; на скрытом `aria-hidden`-инпуте он был бы бесполезен
 // (клик по подписи уводил бы фокус в невидимый элемент). Роль-виджет не является
 // labelable-элементом, поэтому имя от подписи поля приходит через `aria-labelledby`.
-const field = useGrFormFieldContext()
-const fieldControlId = computed(() => field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
 const {
-  invalid: isInvalid,
-  required: isFieldRequired,
-  readonly: isReadonly,
+  id: fieldControlId,
+  labelId: fieldLabelId,
+  describedBy,
+  invalid: fieldInvalid,
+  required: fieldRequired,
+  readonly: fieldReadonly,
 } = useGrFormControl(() => props)
+
+// `role="group"` не поддерживает `aria-required` и `aria-readonly` — объявлять
+// обязательность и режим чтения группы обязаны сами чекбоксы.
+const isRequired = computed(() => fieldRequired.value || Boolean(group?.required.value))
+
+const isReadonly = computed(() => fieldReadonly.value || Boolean(group?.readonly.value))
+
+// Ошибка группы красит чекбоксы, но не объявляется на каждом из них: `aria-invalid`
+// уже висит на самой группе, и дублировать его на всех пунктах — значит заставить
+// диктор повторить «неверное значение» столько раз, сколько в группе чекбоксов.
+const isInvalid = computed(() => fieldInvalid.value)
+const showsInvalid = computed(() => isInvalid.value || Boolean(group?.invalid.value))
 
 const labelledBy = computed(() => {
   if (props.ariaLabel) return undefined
   if (hasLabel.value) return labelId
-  return field?.labelId.value
+  return fieldLabelId.value
 })
 
-// Эффективный размер: локальный проп → `GrConfigProvider` → `md`.
-const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCheckbox' })
+// Эффективный размер: локальный проп → группа → `GrConfigProvider` → `md`.
+const resolvedSize = useGrComponentSize(
+  () => props.size ?? group?.size.value,
+  { component: 'GrCheckbox' },
+)
 
 const rootClassName = computed(() => grCheckboxRootClass({
   size: resolvedSize.value,
-  disabled: props.disabled,
+  disabled: resolvedDisabled.value,
+  labelPosition: props.labelPosition,
 }))
 
 const controlClassName = computed(() => grCheckboxControlClass({
   size: resolvedSize.value,
-  active: props.modelValue || props.indeterminate,
+  active: checked.value || props.indeterminate,
+  disabled: resolvedDisabled.value,
+  invalid: showsInvalid.value,
 }))
 
 const indeterminateIconClassName = computed(() => grCheckboxIndeterminateIconClass(resolvedSize.value))
 
 const checkIconClassName = computed(() => grCheckboxCheckIconClass({
   size: resolvedSize.value,
-  checked: props.modelValue,
+  checked: checked.value,
 }))
 
 const labelClassName = computed(() => grCheckboxLabelClass(resolvedSize.value))
 
-// Держим `.checked` на нативном input синхронно с пропом — `:checked`-биндинг
+// Держим `.checked` на нативном input синхронно с состоянием — `:checked`-биндинг
 // на скрытом элементе иногда отстаёт при программных обновлениях.
 const nativeInput = ref<HTMLInputElement | null>(null)
 const control = ref<HTMLElement | null>(null)
 watch(
-  () => props.modelValue,
+  checked,
   (value) => {
     if (nativeInput.value && nativeInput.value.checked !== value)
       nativeInput.value.checked = value
@@ -152,14 +200,25 @@ watch(() => props.indeterminate, syncIndeterminate)
 onMounted(syncIndeterminate)
 
 function setChecked(next: boolean): void {
-  if (props.disabled || isReadonly.value)
+  if (resolvedDisabled.value || isReadonly.value) {
+    // Нативный input мог уже переключиться от клика по внешнему `<label for>` —
+    // возвращаем его к состоянию модели, иначе форма отправит непринятое значение.
+    if (nativeInput.value)
+      nativeInput.value.checked = checked.value
     return
-  emit('update:modelValue', next)
+  }
+
+  if (props.modelValue !== undefined || !group) {
+    emit('update:modelValue', next)
+    return
+  }
+
+  group.toggle(props.value, next)
 }
 
 function toggle(): void {
   // Из промежуточного состояния переключаемся во «включено» (стандартное поведение).
-  setChecked(props.indeterminate ? true : !props.modelValue)
+  setChecked(props.indeterminate ? true : !checked.value)
 }
 
 // Клик по нативному input (в т.ч. по внешнему `<label for="...">`) уже переключил его
@@ -184,6 +243,10 @@ function blur(): void {
 
 defineExpose({ focus, blur })
 
+// Подпись держится снаружи роли-виджета именно для того, чтобы могла содержать
+// ссылки и кнопки, — поэтому клик по её интерактивному содержимому чекбокс не
+// переключает. Вложенный `<label>` считается интерактивным: он адресует
+// собственный контрол, и переключение чекбокса «заодно» было бы сюрпризом.
 function isInteractiveTarget(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null
   if (!el)
@@ -207,11 +270,10 @@ function onClick(e: MouseEvent): void {
       :id="id"
       ref="nativeInput"
       type="checkbox"
-      :checked="modelValue"
-      :disabled="disabled"
-      :name="name"
+      :checked="checked"
+      :disabled="resolvedDisabled"
+      :name="resolvedName"
       :value="value"
-      :required="required"
       :form="form"
       tabindex="-1"
       aria-hidden="true"
@@ -224,15 +286,15 @@ function onClick(e: MouseEvent): void {
       ref="control"
       data-gr-checkbox-indicator
       role="checkbox"
-      :aria-checked="indeterminate ? 'mixed' : (modelValue ? 'true' : 'false')"
-      :aria-disabled="disabled ? 'true' : undefined"
-      :aria-required="required || isFieldRequired ? 'true' : undefined"
+      :aria-checked="indeterminate ? 'mixed' : (checked ? 'true' : 'false')"
+      :aria-disabled="resolvedDisabled ? 'true' : undefined"
+      :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
-      :tabindex="disabled ? -1 : 0"
+      :tabindex="resolvedDisabled ? -1 : 0"
       :class="controlClassName"
       @keydown.space.prevent="toggle"
     >

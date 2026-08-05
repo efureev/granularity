@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 60 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 61 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -482,6 +482,17 @@
     "context": "forms / component",
     "searchableTitle": "grcheckbox",
     "searchableContent": "grcheckbox grcheckbox lets you toggle independent options and select multiple items. forms component /components/gr-checkbox packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcheckbox generated public-api components components gr-checkbox gr checkbox"
+  },
+  {
+    "id": "entity:component:GrCheckboxGroup",
+    "title": "GrCheckboxGroup",
+    "description": "Collects checkboxes into one multi-select field with a shared model and states.",
+    "href": "/components/gr-checkbox-group",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "forms / component",
+    "searchableTitle": "grcheckboxgroup",
+    "searchableContent": "grcheckboxgroup grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. forms component /components/gr-checkbox-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcheckboxgroup generated public-api components components gr-checkbox-group gr checkbox group"
   },
   {
     "id": "entity:component:GrCollapse",
@@ -1692,6 +1703,50 @@
     "context": "GrCheckbox",
     "searchableTitle": "grcheckbox integration notes",
     "searchableContent": "grcheckbox lets you toggle independent options and select multiple items. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrCheckboxGroup:section:overview",
+    "title": "GrCheckboxGroup / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-checkbox-group#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCheckboxGroup",
+    "searchableTitle": "grcheckboxgroup component overview",
+    "searchableContent": "grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrCheckboxGroup:section:live-examples",
+    "title": "GrCheckboxGroup / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-checkbox-group#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCheckboxGroup",
+    "searchableTitle": "grcheckboxgroup live examples",
+    "searchableContent": "grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrCheckboxGroup:section:api",
+    "title": "GrCheckboxGroup / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-checkbox-group#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCheckboxGroup",
+    "searchableTitle": "grcheckboxgroup generated api",
+    "searchableContent": "grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrCheckboxGroup:section:integration-notes",
+    "title": "GrCheckboxGroup / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-checkbox-group#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCheckboxGroup",
+    "searchableTitle": "grcheckboxgroup integration notes",
+    "searchableContent": "grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrCollapse:section:overview",

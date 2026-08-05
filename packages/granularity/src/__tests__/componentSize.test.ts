@@ -10,6 +10,7 @@ import GrAvatar from '../components/GrAvatar/GrAvatar.vue'
 import GrBadge from '../components/GrBadge/GrBadge.vue'
 import GrButton from '../components/GrButton/GrButton.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
+import GrCheckboxGroup from '../components/GrCheckboxGroup/GrCheckboxGroup.vue'
 import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
@@ -77,6 +78,13 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrBadge', render: () => h(GrBadge, null, { default: () => 'B' }) },
   { name: 'GrButton', render: () => h(GrButton, null, { default: () => 'B' }) },
   { name: 'GrCheckbox', render: () => h(GrCheckbox, { modelValue: false }) },
+  {
+    name: 'GrCheckboxGroup',
+    render: () => h(GrCheckboxGroup, {
+      modelValue: [],
+      options: [{ value: 'a', label: 'A' }],
+    }),
+  },
   {
     name: 'GrDataTable',
     render: () => h(GrDataTable, {

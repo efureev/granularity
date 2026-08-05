@@ -24,6 +24,7 @@ import { grButtonConfig } from '../components/GrButton/config'
 import { grButtonGroupConfig } from '../components/GrButtonGroup/config'
 import { grCardConfig } from '../components/GrCard/config'
 import { grCheckboxConfig } from '../components/GrCheckbox/config'
+import { grCheckboxGroupConfig } from '../components/GrCheckboxGroup/config'
 import { grCollapseConfig } from '../components/GrCollapse/config'
 import { grCommandPaletteConfig } from '../components/GrCommandPalette/config'
 import { grConfigProviderConfig } from '../components/GrConfigProvider/config'
@@ -117,6 +118,7 @@ export const granularityComponentConfigs = {
   GrButtonGroup: grButtonGroupConfig,
   GrCard: grCardConfig,
   GrCheckbox: grCheckboxConfig,
+  GrCheckboxGroup: grCheckboxGroupConfig,
   GrCollapse: grCollapseConfig,
   GrCommandPalette: grCommandPaletteConfig,
   GrConfigProvider: grConfigProviderConfig,

@@ -3,6 +3,10 @@ import type { GrButtonSize } from '../GrButton/grButtonStyles'
 /** Размерная шкала общая с формным рядом (`GrRadio`, `GrInput`, `GrButton`). */
 export type GrCheckboxSize = GrButtonSize
 
+/** Сторона подписи относительно контрола — логическая, не физическая (RTL). */
+export const GR_CHECKBOX_LABEL_POSITIONS = ['start', 'end'] as const
+export type GrCheckboxLabelPosition = typeof GR_CHECKBOX_LABEL_POSITIONS[number]
+
 export const rootBase = 'inline-flex items-center select-none'
 
 export const rootGaps: Record<GrCheckboxSize, string> = {
@@ -12,8 +16,13 @@ export const rootGaps: Record<GrCheckboxSize, string> = {
     lg: 'gap-2',
 }
 
-export const rootDisabledClass = 'cursor-not-allowed opacity-70'
+export const rootDisabledClass = 'cursor-not-allowed'
 export const rootEnabledClass = 'cursor-pointer'
+
+// Подпись слева от контрола — порядком флекса, а не физическими отступами.
+// `justify-end` обязателен: в `row-reverse` главная ось идёт справа налево, и
+// без него растянутая строка (внутри `grid`/`w-full`) прижалась бы к правому краю.
+export const rootLabelStartClass = 'flex-row-reverse justify-end'
 
 export const controlBase = 'rounded border flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
 
@@ -26,6 +35,13 @@ export const controlSizes: Record<GrCheckboxSize, string> = {
 
 export const controlCheckedClass = 'border-[var(--gr-primary)] bg-[var(--gr-primary)]'
 export const controlUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'
+export const controlInvalidCheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-danger)]'
+export const controlInvalidUncheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
+
+// Disabled показываем фоном, а не `opacity`: прозрачность разбавляет выверенные
+// на AA токены и роняет контраст галочки на заливке.
+export const controlDisabledCheckedClass = 'border-[var(--gr-muted-fg)] bg-[var(--gr-muted-fg)]'
+export const controlDisabledUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-muted)]'
 
 // Цвет задаётся состоянием, а не базой: `text-transparent` и `text-[var(--gr-primary-fg)]`
 // генерируют одно и то же свойство, и победит не тот, кто правее в атрибуте, а тот,
@@ -54,20 +70,42 @@ export const labelSizes: Record<GrCheckboxSize, string> = {
     lg: 'text-base',
 }
 
-export function grCheckboxRootClass(options: { size: GrCheckboxSize, disabled: boolean }): string {
+export function grCheckboxRootClass(options: {
+    size: GrCheckboxSize
+    disabled: boolean
+    labelPosition: GrCheckboxLabelPosition
+}): string {
     return [
         rootBase,
         rootGaps[options.size],
         options.disabled ? rootDisabledClass : rootEnabledClass,
-    ].join(' ')
+        options.labelPosition === 'start' ? rootLabelStartClass : '',
+    ].filter(Boolean).join(' ')
 }
 
-export function grCheckboxControlClass(options: { size: GrCheckboxSize, active: boolean }): string {
+// Порядок состояний — приоритет: недоступный контрол не показывает ни ошибку,
+// ни акцент, иначе «выключено» читается как «требует внимания».
+export function grCheckboxControlClass(options: {
+    size: GrCheckboxSize
+    active: boolean
+    disabled?: boolean
+    invalid?: boolean
+}): string {
     return [
         controlBase,
         controlSizes[options.size],
-        options.active ? controlCheckedClass : controlUncheckedClass,
+        grCheckboxControlStateClass(options),
     ].join(' ')
+}
+
+function grCheckboxControlStateClass(options: { active: boolean, disabled?: boolean, invalid?: boolean }): string {
+    if (options.disabled)
+        return options.active ? controlDisabledCheckedClass : controlDisabledUncheckedClass
+
+    if (options.invalid)
+        return options.active ? controlInvalidCheckedClass : controlInvalidUncheckedClass
+
+    return options.active ? controlCheckedClass : controlUncheckedClass
 }
 
 export function grCheckboxIndeterminateIconClass(size: GrCheckboxSize): string {

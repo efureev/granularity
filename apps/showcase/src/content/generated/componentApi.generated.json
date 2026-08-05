@@ -762,17 +762,17 @@
         "items": [
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Не задан внутри `GrCheckboxGroup` — состояние берётся из группы.",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
-            "default": "false"
+            "default": "undefined"
           },
           {
             "name": "readonly",
@@ -790,14 +790,14 @@
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Обязательное поле: объявляется как `aria-required`, нативной проверки нет.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "size",
-            "description": "Размер контрола. Не задан — берётся из `GrConfigProvider`, иначе `md`.",
+            "description": "Размер контрола. Не задан — берётся из группы, затем из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -843,6 +843,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "labelPosition",
+            "description": "Сторона подписи относительно контрола.",
+            "type": "\"end\" | \"start\" | undefined",
+            "required": false,
+            "default": "\"end\""
           }
         ]
       },
@@ -868,6 +875,130 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"update:modelValue\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
+  "GrCheckboxGroup": {
+    "name": "GrCheckboxGroup",
+    "sourcePath": "packages/granularity/src/components/GrCheckboxGroup/GrCheckboxGroup.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "options",
+            "description": "",
+            "type": "GrCheckboxGroupOption[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: выбор видно, но он не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки для всей группы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательная группа: `aria-required` объявляют сами чекбоксы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Общее имя для нативной формы: значения уйдут как повторяющиеся поля.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "direction",
+            "description": "",
+            "type": "GrCheckboxGroupDirection | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{}"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string[]]",
+            "signature": "(event: \"update:modelValue\", value: string[]): void"
           }
         ]
       },

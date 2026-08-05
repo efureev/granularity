@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
+  `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
+  `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
+
 ### Fixed
+
+- **`GrCheckbox` no longer breaks native form submit when `required` is set.** The attribute is
+  gone from the hidden `aria-hidden` input (Chrome cancels the submit for a non-focusable invalid
+  control) and is declared through `aria-required`; validation belongs to `GrForm` rules. Disabled
+  is now painted with background tokens instead of `opacity`, and `invalid` is visible, not just
+  announced.
 
 - **`config.dependencies` no longer under-declares what a component renders.** `GrSidebar` declared
   no dependencies at all while rendering `GrButton` and `GrIcon`; `GrConfirmDialog` and

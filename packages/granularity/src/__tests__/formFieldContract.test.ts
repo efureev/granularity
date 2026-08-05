@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
+import GrCheckboxGroup from '../components/GrCheckboxGroup/GrCheckboxGroup.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
 import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
@@ -35,7 +36,7 @@ const ERROR_TEXT = 'Поле обязательно'
 const LABEL_TEXT = 'Подпись поля'
 
 /** Контролы, у которых виджет — не labelable-элемент (span/div с ARIA-ролью). */
-const ARIA_LABELLED = new Set(['GrCheckbox', 'GrRadioGroup'])
+const ARIA_LABELLED = new Set(['GrCheckbox', 'GrCheckboxGroup', 'GrRadioGroup'])
 
 const controls: { name: string, render: () => unknown }[] = [
   { name: 'GrInput', render: () => h(GrInput, { modelValue: '' }) },
@@ -47,6 +48,13 @@ const controls: { name: string, render: () => unknown }[] = [
   { name: 'GrSlider', render: () => h(GrSlider, { modelValue: 0 }) },
   { name: 'GrRating', render: () => h(GrRating, { modelValue: 0 }) },
   { name: 'GrCheckbox', render: () => h(GrCheckbox, { modelValue: false }) },
+  {
+    name: 'GrCheckboxGroup',
+    render: () => h(GrCheckboxGroup, {
+      modelValue: [],
+      options: [{ value: 'a', label: 'A' }],
+    }),
+  },
   { name: 'GrSwitch', render: () => h(GrSwitch, { modelValue: false }) },
   {
     name: 'GrRadioGroup',

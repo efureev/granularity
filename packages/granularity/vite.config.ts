@@ -102,6 +102,9 @@ export default defineConfig({
         'components/GrCheckbox/index': fileURLToPath(
           new URL('./src/components/GrCheckbox/index.ts', import.meta.url),
         ),
+        'components/GrCheckboxGroup/index': fileURLToPath(
+          new URL('./src/components/GrCheckboxGroup/index.ts', import.meta.url),
+        ),
         'components/GrCollapse/index': fileURLToPath(
           new URL('./src/components/GrCollapse/index.ts', import.meta.url),
         ),
