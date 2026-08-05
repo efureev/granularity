@@ -2880,6 +2880,13 @@
             "default": "false"
           },
           {
+            "name": "size",
+            "description": "Размер подписи, подсказки и ошибки. Не задан — из `GrConfigProvider`, иначе `md`.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "name",
             "description": "Имя поля в модели `GrForm` (в т.ч. dot-path `address.city`). Когда поле внутри `GrForm` и задан `name`, ошибка и признак обязательности берутся из формы по этому имени, а потеря фокуса триггерит валидацию поля.",
             "type": "string | undefined",
@@ -2887,9 +2894,16 @@
             "default": "undefined"
           },
           {
+            "name": "labelPosition",
+            "description": "Подпись сверху (по умолчанию) или сбоку — для плотных форм.",
+            "type": "\"start\" | \"top\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "error",
-            "description": "Явная ошибка. Перекрывает ошибку из `GrForm` (ручной режим без формы — тоже здесь).",
-            "type": "string | undefined",
+            "description": "Явная ошибка (или несколько). Перекрывает ошибку из `GrForm` — ручной режим без формы тоже здесь. Массив нужен там, где источник ошибок один, а претензий несколько: ответ сервера, валидация файла.",
+            "type": "string | string[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2920,6 +2934,20 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "showMessage",
+            "description": "Показывать текст ошибки. `false` — поле остаётся невалидным для контрола и AT (`aria-invalid`), но сообщение не занимает места: так делают в плотных таблицах-формах, где ошибка объясняется сводкой сверху.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "labelWidth",
+            "description": "Ширина колонки подписи при `labelPosition=\"start\"`. Число — пиксели.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -2929,6 +2957,11 @@
         "origin": "generated",
         "items": [
           {
+            "name": "label",
+            "description": "",
+            "type": "{}"
+          },
+          {
             "name": "hint",
             "description": "",
             "type": "{}"
@@ -2937,6 +2970,11 @@
             "name": "default",
             "description": "",
             "type": "{}"
+          },
+          {
+            "name": "error",
+            "description": "",
+            "type": "{ errors: string[]; }"
           }
         ]
       },

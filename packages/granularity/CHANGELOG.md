@@ -35,9 +35,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **`GrFormFile`: `v-model:errors` and `limit`**, file size in the list, and a remove button that
   names its file. `maxCountValidator` joins the public `fileValidation` API — `limit` is sugar on
   top of it.
+- **`GrFormField`: `size`, `labelPosition` / `labelWidth`, `showMessage`, an array of `error`s**, and
+  the `#label` / `#error` slots. `size` and `labelPosition` are readable from `GrConfigProvider`.
 
 ### Fixed
 
+- **`GrFormField` announced errors unreliably and validated too eagerly.** The error box appeared
+  and disappeared with `v-if` while the control's `aria-describedby` changed composition at the same
+  moment — assistive tech that does not re-read the description after an attribute change stayed
+  silent. The box now lives in the DOM permanently (visually hidden while empty) and only its text
+  changes, so the attribute is stable. Blur validation no longer fires when focus moves *within* the
+  field (input → its own clear button, checkbox → checkbox), which used to flag a field before it
+  was filled in. The required marker and the error text moved from the saturated `--gr-danger` to
+  `--gr-danger-text`, and a field whose control never read the context now warns in dev — until now
+  `<label for>` silently pointed at nothing.
 - **`GrFormFile` validation errors were invisible to assistive tech.** The error list had no
   `role="alert"` and was not tied to the control, so "dropped the wrong file type" produced red
   text and nothing else — on the component whose headline feature is validation. Errors are now

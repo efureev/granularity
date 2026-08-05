@@ -38,6 +38,7 @@ import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vu
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
 import GrDrawer from '../components/GrDrawer/GrDrawer.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
+import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
 import GrIcon from '../components/GrIcon/GrIcon.vue'
 import GrInput from '../components/GrInput/GrInput.vue'
@@ -123,6 +124,10 @@ const harnesses: { name: string, render: () => unknown }[] = [
     }),
   },
   { name: 'GrFileUpload', render: () => h(GrFileUpload) },
+  {
+    name: 'GrFormField',
+    render: () => h(GrFormField, { label: 'L', hint: 'H', error: 'E' }, { default: () => h('input') }),
+  },
   { name: 'GrFormFile', render: () => h(GrFormFile, { modelValue: null }) },
   { name: 'GrIcon', render: () => h(GrIcon) },
   { name: 'GrInput', render: () => h(GrInput, { modelValue: '' }) },

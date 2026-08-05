@@ -43,8 +43,13 @@ const requiredRules: GrFormRules = {
   name: [{ required: true }],
 }
 
+/**
+ * Видимые тексты ошибок. Контейнер ошибки у `GrFormField` живёт в DOM всегда
+ * (иначе AT не перечитывает описание после смены `aria-describedby`), поэтому
+ * пустые отбрасываем — интересны сообщения, а не узлы.
+ */
 function errorTexts(wrapper: ReturnType<typeof mount>): string[] {
-  return wrapper.findAll('[data-gr-form-field-error]').map(w => w.text())
+  return wrapper.findAll('[data-gr-form-field-error]').map(w => w.text()).filter(Boolean)
 }
 
 describe('GrForm', () => {

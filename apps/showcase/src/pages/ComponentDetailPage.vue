@@ -117,6 +117,7 @@ const previewRegistry = {
   'gr-form-custom-control': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormCustomControlDemo.vue')),
   'gr-form-field-context': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldContextDemo.vue')),
   'gr-form-field-custom-control': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldCustomControlDemo.vue')),
+  'gr-form-field-inline-label': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldInlineLabelDemo.vue')),
   'gr-form-field-basic-label': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldBasicDemo.vue')),
   'gr-kbd-basic': defineAsyncComponent(() => import('../demos/components/gr-kbd/GrKbdBasicDemo.vue')),
   'gr-divider-basic': defineAsyncComponent(() => import('../demos/components/gr-divider/GrDividerBasicDemo.vue')),
