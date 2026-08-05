@@ -25,7 +25,6 @@ function readComponentSources(): { path: string, source: string }[] {
  * новый компонент со своим числом уронит тест.
  */
 const KNOWN_OFF_SCALE = new Set([
-  'GrDrawer/GrDrawer.vue', // z-50 на оверлее — ниже всей шкалы
   'GrLoading/grLoadingStyles.ts', // fullscreen-оверлей на z-50
   'GrImageViewer/GrImageViewer.vue', // DEFAULT_Z_INDEX = 2000, выше тостов
 ])

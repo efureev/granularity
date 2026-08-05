@@ -41,7 +41,7 @@
 - `GrDialog`
 - `GrDialogService`
 - `GrDivider`
-- `GrDrawer`
+- [`GrDrawer`](./components/GrDrawer.md)
 - `GrDropdown`
 - `GrDropdownMenu`
 - `GrEmptyState`

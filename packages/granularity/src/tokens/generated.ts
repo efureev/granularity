@@ -735,6 +735,15 @@ export const grThemeTokens: GrThemeToken[] = [
     }
   },
   {
+    "name": "--gr-overlay-bg",
+    "section": "Surface roles",
+    "description": "Подложка модальных слоёв (модалка, drawer): затемняет страницу, оставляя её узнаваемой.",
+    "values": {
+      "light": "rgb(15 23 42 / 0.45)",
+      "dark": "rgb(2 6 23 / 0.65)"
+    }
+  },
+  {
     "name": "--gr-brd",
     "section": "Surface roles",
     "description": "Базовый цвет бордеров и разделителей текущей темы.",

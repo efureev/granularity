@@ -7,7 +7,7 @@ export type GrModalSize = GrOverlaySize
 export const root = 'fixed inset-0 z-[var(--gr-z-modal)]'
 export const shell = 'fixed inset-0 overflow-y-auto p-4 sm:p-6'
 export const layout = 'min-h-full flex items-center justify-center'
-export const overlay = 'fixed inset-0 z-0 bg-black/40'
+export const overlay = 'fixed inset-0 z-0 bg-[var(--gr-overlay-bg)]'
 
 // Классы для `<TransitionChild :enter="..." :enter-from="..." ...>`.
 // Разбиты по фазам транзишна, чтобы не склеивать их в «мешок токенов».

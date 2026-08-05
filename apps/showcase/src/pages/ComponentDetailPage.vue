@@ -98,6 +98,7 @@ const previewRegistry = {
   'gr-dropdown-menu-shortcut-grid': defineAsyncComponent(() => import('../demos/components/gr-dropdown-menu/GrDropdownMenuShortcutGridDemo.vue')),
   'gr-drawer-filter-panel': defineAsyncComponent(() => import('../demos/components/gr-drawer/GrDrawerFilterPanelDemo.vue')),
   'gr-drawer-guarded-size': defineAsyncComponent(() => import('../demos/components/gr-drawer/GrDrawerGuardedSizeDemo.vue')),
+  'gr-drawer-persistent-form': defineAsyncComponent(() => import('../demos/components/gr-drawer/GrDrawerPersistentFormDemo.vue')),
   'gr-drawer-left-rail': defineAsyncComponent(() => import('../demos/components/gr-drawer/GrDrawerLeftRailDemo.vue')),
   'gr-empty-state-primary-action': defineAsyncComponent(() => import('../demos/components/gr-empty-state/GrEmptyStateActionDemo.vue')),
   'gr-empty-state-search-flow': defineAsyncComponent(() => import('../demos/components/gr-empty-state/GrEmptyStateSearchDemo.vue')),

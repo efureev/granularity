@@ -3,7 +3,28 @@ import { resolve } from 'node:path'
 
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+// HeadlessUI-диалог (его использует `GrDrawer`) требует `ResizeObserver`, которого
+// в jsdom нет. Гейт смотрит на размерные классы, а не на механику оверлея, —
+// поэтому подменяем прозрачными обёртками, как в тестах самого `GrDrawer`.
+vi.mock('@headlessui/vue', async () => {
+  const { defineComponent: define } = await import('vue')
+  const passthrough = (name: string) => define({ name, template: '<div><slot /></div>' })
+
+  return {
+    Dialog: define({ name: 'Dialog', emits: ['close'], template: '<div><slot /></div>' }),
+    DialogPanel: passthrough('DialogPanel'),
+    DialogTitle: passthrough('DialogTitle'),
+    DialogDescription: passthrough('DialogDescription'),
+    TransitionRoot: define({
+      name: 'TransitionRoot',
+      props: { show: { type: Boolean, default: false } },
+      template: '<div v-if="show"><slot /></div>',
+    }),
+    TransitionChild: passthrough('TransitionChild'),
+  }
+})
 
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrAvatar from '../components/GrAvatar/GrAvatar.vue'
@@ -15,6 +36,7 @@ import GrCollapse from '../components/GrCollapse/GrCollapse.vue'
 import GrCollapseItem from '../components/GrCollapse/GrCollapseItem.vue'
 import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
+import GrDrawer from '../components/GrDrawer/GrDrawer.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
 import GrIcon from '../components/GrIcon/GrIcon.vue'
@@ -144,6 +166,23 @@ const harnesses: { name: string, render: () => unknown }[] = [
 ]
 
 /**
+ * Компоненты на шкале **оверлеев** (`sm…full`), а не контролов. Глобальный
+ * `size` провайдера к ним неприменим по построению: он про кегль контролов, а
+ * не про ширину панели, и `<GrConfigProvider size="xs">` не обязан ничего
+ * менять у выезжающей панели. Канал у них один — точечный `componentDefaults`,
+ * поэтому и проверяются они иначе.
+ */
+const overlayHarnesses: { name: string, render: () => unknown }[] = [
+  {
+    name: 'GrDrawer',
+    render: () => h(GrDrawer, { modelValue: true, title: 'D' }, { default: () => 'content' }),
+  },
+]
+
+/** Края оверлейной шкалы. */
+const OVERLAY_PROBE_SIZES = ['sm', 'full'] as const
+
+/**
  * Компоненты, объявившие `size` в `defaults.ts`, — это ровно те, кто обещал
  * потребителю настройку через провайдер. Список берём из файловой системы,
  * иначе следующий такой компонент снова тихо выпадет из шкалы.
@@ -163,17 +202,21 @@ function componentsWithConfigurableSize(): string[] {
     .map(entry => entry.name)
 }
 
+// `teleport` стабится: оверлеи уносят панель в `body`, и без стаба `html()`
+// вернул бы пустую обёртку — сравнение размеров стало бы всегда истинным.
+const MOUNT_OPTIONS = { attachTo: document.body, global: { stubs: { teleport: true } } }
+
 function renderWithConfig(render: () => unknown, config: Record<string, unknown>): string {
   const Harness = defineComponent({
     render: () => h(GrConfigProvider, config, { default: () => render() }),
   })
 
-  return mount(Harness, { attachTo: document.body }).html()
+  return mount(Harness, MOUNT_OPTIONS).html()
 }
 
 describe('контракт размера', () => {
   it('каждый компонент с настраиваемым `size` покрыт гейтом', () => {
-    const covered = new Set(harnesses.map(item => item.name))
+    const covered = new Set([...harnesses, ...overlayHarnesses].map(item => item.name))
     const missing = componentsWithConfigurableSize().filter(name => !covered.has(name))
 
     expect(missing, `нет стенда в этом гейте: ${missing.join(', ')}`).toEqual([])
@@ -221,8 +264,41 @@ describe('контракт размера', () => {
           return vnode
         },
       }),
-    }), { attachTo: document.body }).html()
+    }), MOUNT_OPTIONS).html()
 
     expect(local).not.toBe(fromConfig)
+  })
+
+  describe('шкала оверлеев', () => {
+    it.each(overlayHarnesses)('$name: componentDefaults задаёт размер панели', ({ name, render }) => {
+      const [small, large] = OVERLAY_PROBE_SIZES.map(size =>
+        renderWithConfig(render, { componentDefaults: { [name]: { size } } }),
+      )
+
+      expect(small).not.toBe(large)
+    })
+
+    it.each(overlayHarnesses)('$name: локальный проп побеждает componentDefaults', ({ name, render }) => {
+      const fromConfig = renderWithConfig(render, { componentDefaults: { [name]: { size: 'sm' } } })
+      const local = mount(defineComponent({
+        render: () => h(GrConfigProvider, { componentDefaults: { [name]: { size: 'sm' } } }, {
+          default: () => {
+            const vnode = render() as { props?: Record<string, unknown> }
+            vnode.props = { ...vnode.props, size: 'full' }
+            return vnode
+          },
+        }),
+      }), MOUNT_OPTIONS).html()
+
+      expect(local).not.toBe(fromConfig)
+    })
+
+    // Шкалы не смешиваются: `size="xs"` у провайдера — про контролы, и панель
+    // оверлея он менять не должен, иначе `xs` пришлось бы объявлять и здесь.
+    it.each(overlayHarnesses)('$name: глобальный size провайдера его не трогает', ({ render }) => {
+      const [small, large] = PROBE_SIZES.map(size => renderWithConfig(render, { size }))
+
+      expect(small).toBe(large)
+    })
   })
 })

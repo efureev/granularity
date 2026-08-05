@@ -2022,10 +2022,10 @@
           },
           {
             "name": "size",
-            "description": "Размер панели.",
+            "description": "Размер панели. Не задан — берётся из `GrConfigProvider`, иначе `md`.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "closeOnBackdrop",
@@ -2042,6 +2042,41 @@
             "default": "true"
           },
           {
+            "name": "showHeader",
+            "description": "Рендерить ли хедер (заголовок + кнопка закрытия).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "showCloseButton",
+            "description": "Рендерить ли кнопку закрытия в хедере.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "headerConfig",
+            "description": "Паддинги и рамка секций — как у `GrDialog`.",
+            "type": "GrDrawerSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "footerConfig",
+            "description": "",
+            "type": "GrDrawerSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "bodyConfig",
+            "description": "",
+            "type": "GrDrawerSectionConfig | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeLabel",
             "description": "i18n-friendly aria-label для кнопки закрытия.",
             "type": "string | undefined",
@@ -2049,11 +2084,32 @@
             "default": "undefined"
           },
           {
+            "name": "persistent",
+            "description": "Запрет закрытия «мягкими» способами (бэкдроп, Esc) — на время операции, которую нельзя бросить на полпути. Кнопка закрытия при этом остаётся: панель без единого выхода — ловушка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "side",
             "description": "Сторона, с которой выезжает панель.",
             "type": "GrDrawerSide | undefined",
             "required": false,
-            "default": "\"right\""
+            "default": "undefined"
+          },
+          {
+            "name": "width",
+            "description": "Произвольная ширина панели. Число трактуется как пиксели; сильнее `size`.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
           },
           {
             "name": "modelValue",
@@ -2069,19 +2125,19 @@
         "origin": "generated",
         "items": [
           {
-            "name": "title",
-            "description": "",
-            "type": "{}"
-          },
-          {
             "name": "default",
             "description": "",
-            "type": "{}"
+            "type": "any"
+          },
+          {
+            "name": "title",
+            "description": "",
+            "type": "any"
           },
           {
             "name": "footer",
             "description": "",
-            "type": "{}"
+            "type": "any"
           }
         ]
       },
@@ -2095,6 +2151,18 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "opened",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"opened\"): void"
+          },
+          {
+            "name": "closed",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"closed\"): void"
           }
         ]
       },
@@ -2102,7 +2170,18 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "close",
+            "description": "Закрыть панель (эквивалент `v-model = false`), минуя `persistent`.",
+            "type": "() => void"
+          },
+          {
+            "name": "focus",
+            "description": "Вернуть фокус на панель — например после операции, уведшей его наружу.",
+            "type": "() => void | undefined"
+          }
+        ]
       }
     ]
   },

@@ -228,7 +228,7 @@ describe('component docs metadata', () => {
     expect(dialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dialogDoc.examples.every(example => example.previewKey?.startsWith('gr-dialog'))).toBe(true)
 
-    expect(drawerDoc.examples).toHaveLength(3)
+    expect(drawerDoc.examples).toHaveLength(4)
     expect(drawerDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(drawerDoc.examples.every(example => example.previewKey?.startsWith('gr-drawer'))).toBe(true)
 

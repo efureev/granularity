@@ -19,9 +19,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `sortCycle="asc-desc-none"`, the `#header-<key>` and `#loading` slots**, and an imperative API
   (`scrollToRow`, `scrollTo`, `clearSort`, `toggleAll`). Columns are now typed against the row
   (`GrDataColumn<TRow>`), so a typo in `key` is a type error instead of a silently empty column.
+- **`GrDrawer` caught up with `GrDialog`**: `showHeader`, `showCloseButton`,
+  `headerConfig` / `bodyConfig` / `footerConfig`, plus `persistent`, `width`, `initialFocus`,
+  `@opened` / `@closed` and an imperative `close()` / `focus()`. `size` and `side` now come from
+  `GrConfigProvider` through `componentDefaults`.
+- **`--gr-overlay-bg`** — the scrim token behind modal layers, shared by `GrModal` and `GrDrawer`
+  and darker in the dark theme.
 
 ### Fixed
 
+- **`GrDrawer` sat below the whole z-index scale.** The panel used a literal `z-50`, so a dropdown
+  or select panel (`--gr-z-dropdown` = 1000) painted over the open drawer and its backdrop did not
+  cover them. It now uses `--gr-z-modal`, like every other modal layer — the entry is gone from the
+  `layering.test.ts` allowlist and from the deviations table in `docs/z-index.md`. The backdrop
+  moved from the hard-coded `bg-black/40` to `--gr-overlay-bg`, and an empty `title` no longer
+  renders the word "Drawer" as a heading (the header is dropped, the layer keeps an
+  `aria-label`). Focus, scroll-lock, `persistent` and the interaction with other overlays are now
+  covered by tests.
 - **`GrDataTable` no longer gives every keyless row the same key.** With the default
   `rowKey: 'id'` a row without `id` resolved to `''`, so Vue reused DOM across rows and selecting
   one row marked all of them selected. Such rows now get a stable synthetic key (plus a dev
