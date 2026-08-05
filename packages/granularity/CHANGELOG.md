@@ -43,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `rel="noopener noreferrer"`. Иконка выключается `:external-icon="false"` и включается вручную для
   внутренних ссылок; текст подсказки — `newTabLabel` или ключ `gr.link.opensInNewTab`. Заданный
   `ariaLabel` больше не съедает предупреждение: имя собирается вместе с ним.
+- **`GrList`: пустое состояние, загрузка и кликабельные строки.** Пустоту список определяет сам по
+  содержимому слота — `v-if` вокруг него больше не нужен; слот `#empty`, `emptyText` (ключ
+  `gr.list.empty`) и проп `empty` как escape-hatch. `loading` рисует `loadingRows` строк-скелетонов и
+  помечает контейнер `aria-busy`; слот `#loading` заменяет их целиком. `GrListItem` получил `href`,
+  `as`, `clickable`, `hoverable`, `disabled` и событие `click`: строка сама становится ссылкой или
+  кнопкой, а `role="listitem"` остаётся на обёртке — обёртка-кнопка снаружи пункта (так это делалось
+  раньше) разрывала связку `role="list"` с `role="listitem"`.
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
@@ -84,6 +91,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   also had no accessible name at all (`aria-dialog-name`), and every image was `alt=""` with no way
   to pass a description. `useZoomPan`, `useWheelGesture` and `useViewerKeyboard` are now covered by
   tests.
+- **`GrList` держал safelist рукописными строками.** `config.ts` перечислял `'px-4'`, `'py-2'`, `'py-3'`
+  копией карты плотности из `GrListItem.vue` — расходиться они могли молча. Классы уехали в
+  `grListStyles.ts`, safelist собирается от них. Разбор слотов (`flattenSlotNodes`,
+  `isWhitespaceTextNode`) переехал из `GrFileUpload` в общий `components/shared/slotNodes.ts`:
+  импорт из чужой компонентной директории дал бы на сборке ребро между компонентами, которого в
+  разметке нет.
 - **`GrLink` гасил отключённую ссылку прозрачностью.** `opacity-60` поверх `--gr-muted-fg` разбавляла
   выверенный на AA токен и роняла контраст ниже нормы; остался только цвет. Заодно из
   `grLinkStyles.ts` убран комментарий-история (правило «Комментарии в коде» из `CLAUDE.md`) и снят

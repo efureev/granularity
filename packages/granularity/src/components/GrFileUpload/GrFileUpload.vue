@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Comment, computed, Fragment, nextTick, onBeforeUnmount, reactive, ref, Text, useSlots, type VNode } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, Text, useSlots, type VNode } from 'vue'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
 import IconClose from '~icons/lucide/x'
@@ -12,6 +12,7 @@ import type { GrUploadProgressInfo } from './uploadViaXhr'
 import type { GrUploadState } from './uploadState'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { flattenSlotNodes, meaningfulSlotNodes } from '../shared/slotNodes'
 import {
   type GrFileUploadSize,
   hintSizes,
@@ -172,29 +173,8 @@ const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGr
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
 const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
-function flattenSlotNodes(nodes: VNode[]): VNode[] {
-  const out: VNode[] = []
-
-  for (const node of nodes) {
-    if (node.type === Fragment && Array.isArray(node.children)) {
-      out.push(...flattenSlotNodes(node.children as VNode[]))
-      continue
-    }
-
-    out.push(node)
-  }
-
-  return out
-}
-
-function isWhitespaceTextNode(node: VNode): boolean {
-  if (node.type !== Text) return false
-  return typeof node.children === 'string' && node.children.trim().length === 0
-}
-
 function slotIsTextOnly(nodes: VNode[]): boolean {
-  const flat = flattenSlotNodes(nodes)
-  const meaningful = flat.filter(node => node.type !== Comment && !isWhitespaceTextNode(node))
+  const meaningful = meaningfulSlotNodes(nodes)
 
   if (meaningful.length === 0) return true
 

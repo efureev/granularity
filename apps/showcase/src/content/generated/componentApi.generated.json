@@ -4302,11 +4302,39 @@
         "origin": "generated",
         "items": [
           {
+            "name": "loading",
+            "description": "Идёт загрузка: вместо пунктов — строки-скелетоны, контейнер помечен `aria-busy`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "divided",
             "description": "Показывать ли горизонтальные разделители между элементами (по умолчанию — да).",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loadingRows",
+            "description": "Сколько строк-заглушек показать при `loading`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "empty",
+            "description": "Список пуст. По умолчанию определяется сам — по содержимому слота; проп нужен там, где потребитель знает лучше (например, слот заполнен заголовками групп, а данных в них нет).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -4315,6 +4343,16 @@
         "title": "Slots",
         "origin": "generated",
         "items": [
+          {
+            "name": "loading",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{}"
+          },
           {
             "name": "default",
             "description": "",

@@ -156,6 +156,7 @@ const previewRegistry = {
   'gr-link-disabled-states': defineAsyncComponent(() => import('../demos/components/gr-link/GrLinkDisabledStatesDemo.vue')),
   'gr-link-external': defineAsyncComponent(() => import('../demos/components/gr-link/GrLinkExternalDemo.vue')),
   'gr-link-variants': defineAsyncComponent(() => import('../demos/components/gr-link/GrLinkVariantsDemo.vue')),
+  'gr-list-navigation': defineAsyncComponent(() => import('../demos/components/gr-list/GrListNavigationDemo.vue')),
   'gr-list-empty-state': defineAsyncComponent(() => import('../demos/components/gr-list/GrListEmptyStateDemo.vue')),
   'gr-list-queue-actions': defineAsyncComponent(() => import('../demos/components/gr-list/GrListQueueActionsDemo.vue')),
   'gr-list-settings': defineAsyncComponent(() => import('../demos/components/gr-list/GrListSettingsDemo.vue')),

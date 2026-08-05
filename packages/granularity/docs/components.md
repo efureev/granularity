@@ -56,7 +56,7 @@
 - [`GrInputTag`](./components/GrInputTag.md)
 - [`GrKbd`](./components/GrKbd.md)
 - [`GrLink`](./components/GrLink.md)
-- `GrList`
+- [`GrList`](./components/GrList.md)
 - `GrLoading`
 - `GrModal`
 - `GrNavbar`

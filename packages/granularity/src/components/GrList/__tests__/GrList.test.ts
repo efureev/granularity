@@ -79,3 +79,146 @@ describe('GrListItem', () => {
     expect(regular.attributes('class')).toContain('py-3')
   })
 })
+
+describe('GrList — пустое состояние', () => {
+  // Пустоту компонент видит сам: `v-for` по пустому массиву оставляет фрагмент
+  // без узлов, `v-if` — комментарий, и ни то ни другое пунктом не является.
+  it('определяет пустоту по содержимому слота', () => {
+    const wrapper = mount(GrList, { slots: { default: '<!-- v-if -->' } })
+
+    expect(wrapper.get('[data-gr-list-empty]').text()).toBe('Nothing here yet')
+    expect(wrapper.get('[data-gr-list]').attributes('role')).toBe('list')
+  })
+
+  it('со списком пунктов пустое состояние не показывается', () => {
+    const wrapper = mount(GrList, {
+      global: { components: { GrListItem } },
+      slots: { default: '<GrListItem title="A" />' },
+    })
+
+    expect(wrapper.find('[data-gr-list-empty]').exists()).toBe(false)
+  })
+
+  it('слот #empty сильнее текста', () => {
+    const wrapper = mount(GrList, {
+      slots: { empty: '<button data-testid="cta">Добавить</button>' },
+    })
+
+    expect(wrapper.find('[data-testid="cta"]').exists()).toBe(true)
+  })
+
+  it('emptyText перекрывает текст из локали', () => {
+    const wrapper = mount(GrList, { props: { emptyText: 'Нет заявок' } })
+
+    expect(wrapper.get('[data-gr-list-empty]').text()).toBe('Нет заявок')
+  })
+
+  it('проп empty остаётся escape-hatch’ем в обе стороны', () => {
+    const forced = mount(GrList, {
+      props: { empty: true },
+      global: { components: { GrListItem } },
+      slots: { default: '<GrListItem title="A" />' },
+    })
+    expect(forced.find('[data-gr-list-empty]').exists()).toBe(true)
+
+    const suppressed = mount(GrList, { props: { empty: false } })
+    expect(suppressed.find('[data-gr-list-empty]').exists()).toBe(false)
+  })
+
+  // Разделители между пунктами; в пустой ветке линия висела бы сама по себе.
+  it('в пустой ветке нет divide-y', () => {
+    const wrapper = mount(GrList)
+
+    expect(wrapper.get('[data-gr-list]').classes()).not.toContain('divide-y')
+  })
+})
+
+describe('GrList — загрузка', () => {
+  it('показывает скелетоны и помечает контейнер aria-busy', () => {
+    const wrapper = mount(GrList, {
+      props: { loading: true },
+      global: { components: { GrListItem } },
+      slots: { default: '<GrListItem title="A" />' },
+    })
+
+    expect(wrapper.get('[data-gr-list]').attributes('aria-busy')).toBe('true')
+    expect(wrapper.findAll('[data-gr-list-loading-row]')).toHaveLength(3)
+    expect(wrapper.findAll('[data-gr-skeleton]')).toHaveLength(3)
+    expect(wrapper.find('[data-gr-list-item]').exists()).toBe(false)
+  })
+
+  it('число строк настраивается, слот #loading сильнее', () => {
+    expect(mount(GrList, { props: { loading: true, loadingRows: 5 } })
+      .findAll('[data-gr-list-loading-row]')).toHaveLength(5)
+
+    const custom = mount(GrList, {
+      props: { loading: true },
+      slots: { loading: '<div data-testid="spinner" />' },
+    })
+    expect(custom.find('[data-testid="spinner"]').exists()).toBe(true)
+    expect(custom.find('[data-gr-list-loading-row]').exists()).toBe(false)
+  })
+
+  it('загрузка сильнее пустоты — иначе пустой список мигал бы текстом', () => {
+    const wrapper = mount(GrList, { props: { loading: true } })
+
+    expect(wrapper.find('[data-gr-list-empty]').exists()).toBe(false)
+  })
+})
+
+describe('GrListItem — кликабельная строка', () => {
+  // Роль остаётся на обёртке: `<a role="listitem">` потерял бы роль ссылки,
+  // а интерактив снаружи разорвал бы связку list → listitem.
+  it('href делает строку ссылкой, не ломая роль пункта', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Docs', href: '/docs' } })
+
+    expect(wrapper.attributes('role')).toBe('listitem')
+    const action = wrapper.get('[data-gr-list-item-action]')
+    expect(action.element.tagName).toBe('A')
+    expect(action.attributes('href')).toBe('/docs')
+  })
+
+  it('clickable даёт button и событие click', async () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', clickable: true } })
+    const action = wrapper.get('[data-gr-list-item-action]')
+
+    expect(action.element.tagName).toBe('BUTTON')
+    expect(action.attributes('type')).toBe('button')
+
+    await action.trigger('click')
+    expect(wrapper.emitted('click')).toHaveLength(1)
+  })
+
+  it('as подменяет тег строки', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'span', clickable: true } })
+
+    expect(wrapper.get('[data-gr-list-item-action]').element.tagName).toBe('SPAN')
+  })
+
+  it('disabled не делает строку интерактивной и не эмитит click', async () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', href: '/docs', disabled: true } })
+
+    expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
+    expect(wrapper.attributes('aria-disabled')).toBe('true')
+    expect(wrapper.classes()).toContain('cursor-not-allowed')
+    expect(wrapper.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+
+    await wrapper.trigger('click')
+    expect(wrapper.emitted('click')).toBeUndefined()
+  })
+
+  it('обычный пункт остаётся одиночным div без лишней вложенности', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row' } })
+
+    expect(wrapper.attributes('role')).toBe('listitem')
+    expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
+    expect(wrapper.classes()).toContain('px-4')
+  })
+
+  it('hoverable подсвечивает строку, не делая её кнопкой', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', hoverable: true } })
+
+    expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
+    expect(wrapper.classes()).toContain('hover:bg-[var(--gr-muted)]')
+  })
+})

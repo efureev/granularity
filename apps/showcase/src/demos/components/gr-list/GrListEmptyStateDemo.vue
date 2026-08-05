@@ -1,34 +1,50 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-import { GrButton, GrEmptyState, GrList, GrListItem } from '@feugene/granularity'
+import { GrButton, GrList, GrListItem, GrSegmented } from '@feugene/granularity'
 
-const archived = ref(false)
+type Mode = 'items' | 'empty' | 'loading'
+
+const mode = ref<Mode>('items')
+
+const presets = computed(() => (mode.value === 'items'
+  ? [
+      { id: 'retention', title: 'Retention policy', description: 'Archive old reports after 90 days.' },
+      { id: 'export', title: 'Export history', description: 'Keep downloadable exports for 30 days.' },
+    ]
+  : []))
 </script>
 
 <template>
   <div class="grid gap-3">
-    <div>
-      <GrButton size="sm" variant="outline" @click="archived = !archived">
-        {{ archived ? 'Show active items' : 'Show empty state' }}
-      </GrButton>
-    </div>
+    <GrSegmented
+      v-model="mode"
+      size="sm"
+      :options="[
+        { value: 'items', label: 'Пункты' },
+        { value: 'empty', label: 'Пусто' },
+        { value: 'loading', label: 'Загрузка' },
+      ]"
+    />
 
-    <GrList :divided="!archived">
-      <template v-if="!archived">
-        <GrListItem title="Retention policy" description="Archive old reports after 90 days." />
-        <GrListItem title="Export history" description="Keep downloadable exports for 30 days." />
+    <!-- Ни `v-if` вокруг списка, ни ручного переключения `divided`: пустоту
+         список видит по слоту сам. -->
+    <GrList :loading="mode === 'loading'">
+      <GrListItem
+        v-for="preset in presets"
+        :key="preset.id"
+        :title="preset.title"
+        :description="preset.description"
+      />
+
+      <template #empty>
+        <div class="grid justify-items-center gap-2">
+          <span>Ни одного архивного пресета</span>
+          <GrButton size="sm" @click="mode = 'items'">
+            Показать примеры
+          </GrButton>
+        </div>
       </template>
-
-      <GrEmptyState
-        v-else
-        title="No archived presets"
-        description="Use undivided mode when the list needs to host a richer placeholder instead of row separators."
-      >
-        <GrButton size="sm" @click="archived = false">
-          Restore examples
-        </GrButton>
-      </GrEmptyState>
     </GrList>
   </div>
 </template>

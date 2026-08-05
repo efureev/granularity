@@ -208,5 +208,8 @@
   },
   "link": {
     "opensInNewTab": "se abre en una pestaña nueva"
+  },
+  "list": {
+    "empty": "Todavía no hay nada"
   }
 }
