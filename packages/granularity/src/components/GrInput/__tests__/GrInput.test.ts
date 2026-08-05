@@ -197,3 +197,165 @@ describe('GrInput — clearable / password / readonly / count (feature)', () => 
     expect(wrapper.get('input').attributes('maxlength')).toBe('10')
   })
 })
+
+describe('GrInput — клавиатура trailing-кнопок', () => {
+  // `tabindex="-1"` объявлял кнопки доступными (`aria-label`, `aria-pressed`)
+  // и одновременно недостижимыми: очистить поле или посмотреть пароль
+  // клавиатурой было нельзя.
+  it('кнопки очистки и показа пароля остаются в таб-порядке', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: 'secret', type: 'password', passwordToggle: true, clearable: true },
+    })
+
+    expect(wrapper.get('[data-gr-input-clear]').attributes('tabindex')).toBeUndefined()
+    expect(wrapper.get('[data-gr-input-password-toggle]').attributes('tabindex')).toBeUndefined()
+  })
+
+  it('после очистки фокус возвращается в поле — кнопка исчезает вместе со значением', async () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: 'hello', clearable: true },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-input-clear]').trigger('click')
+
+    expect(document.activeElement).toBe(wrapper.get('input').element)
+    wrapper.unmount()
+  })
+
+  it('переключатель пароля возвращает фокус в поле', async () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: 'secret', type: 'password', passwordToggle: true },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-input-password-toggle]').trigger('click')
+
+    expect(document.activeElement).toBe(wrapper.get('input').element)
+    wrapper.unmount()
+  })
+})
+
+describe('GrInput — disabled', () => {
+  // `opacity-50` разбавляла выверенные на AA токены текста: гасим фоном.
+  it('гасится токенами фона, а не прозрачностью', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'x', disabled: true } })
+    const shell = wrapper.get('[data-gr-input] > div')
+
+    expect(shell.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(shell.classes()).toContain('cursor-not-allowed')
+    expect(shell.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+  })
+
+  // Контраст сохраняем, но disabled обязан читаться как disabled: без этого
+  // заблокированное поле выглядело обычным (поймано визуальным гейтом GrSelect).
+  it('приглушает и текст значения, а не только фон', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'x', disabled: true } })
+    expect(wrapper.get('input').classes()).toContain('disabled:text-[var(--gr-muted-fg)]')
+  })
+
+  it('включённое поле остаётся на фоне поверхности', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'x' } })
+    const shell = wrapper.get('[data-gr-input] > div')
+
+    expect(shell.classes()).toContain('bg-[var(--gr-bg)]')
+    expect(shell.classes()).not.toContain('bg-[var(--gr-muted)]')
+  })
+})
+
+describe('GrInput — счётчик символов', () => {
+  it('связан с полем через aria-describedby', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'abc', showCount: true, maxlength: 10 } })
+
+    const countId = wrapper.get('[data-gr-input-count]').attributes('id')
+    expect(countId).toBeTruthy()
+    expect(wrapper.get('input').attributes('aria-describedby')).toBe(countId)
+  })
+
+  it('без showCount описание поля не появляется из ниоткуда', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'abc', maxlength: 10 } })
+    expect(wrapper.get('input').attributes('aria-describedby')).toBeUndefined()
+  })
+
+  it('живой регион молчит до исчерпания лимита', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'abc', showCount: true, maxlength: 5 } })
+    const live = wrapper.get('[data-gr-input-live]')
+
+    expect(live.attributes('role')).toBe('status')
+    expect(live.text()).toBe('')
+
+    await wrapper.setProps({ modelValue: 'abcde' })
+    expect(wrapper.get('[data-gr-input-live]').text()).toBe('Character limit reached')
+  })
+})
+
+describe('GrInput — события и императивный API', () => {
+  it('эмитит change со строкой', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'a' } })
+    const input = wrapper.get('input')
+    ;(input.element as HTMLInputElement).value = 'ab'
+
+    await input.trigger('change')
+    expect(wrapper.emitted('change')?.at(-1)).toEqual(['ab'])
+  })
+
+  it('эмитит focus и blur', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: '' } })
+    const input = wrapper.get('input')
+
+    await input.trigger('focus')
+    await input.trigger('blur')
+
+    expect(wrapper.emitted('focus')).toHaveLength(1)
+    expect(wrapper.emitted('blur')).toHaveLength(1)
+  })
+
+  // Ручное стирание и очистку кнопкой по `update:modelValue` не различить.
+  it('очистка кнопкой отдельно объявляется событием clear', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'hello', clearable: true } })
+
+    await wrapper.get('[data-gr-input-clear]').trigger('click')
+
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
+  })
+
+  it('expose отдаёт focus/blur/select', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'hello' }, attachTo: document.body })
+    const api = wrapper.vm as unknown as { focus: () => void, blur: () => void, select: () => void }
+    const input = wrapper.get('input').element as HTMLInputElement
+
+    api.focus()
+    expect(document.activeElement).toBe(input)
+
+    api.select()
+    expect(input.selectionStart).toBe(0)
+    expect(input.selectionEnd).toBe('hello'.length)
+
+    api.blur()
+    expect(document.activeElement).not.toBe(input)
+    wrapper.unmount()
+  })
+})
+
+describe('GrInput — loading', () => {
+  it('показывает спиннер и объявляет занятость, не блокируя ввод', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'x', loading: true } })
+
+    expect(wrapper.find('[data-gr-input-spinner]').exists()).toBe(true)
+    expect(wrapper.get('input').attributes('aria-busy')).toBe('true')
+    expect((wrapper.get('input').element as HTMLInputElement).disabled).toBe(false)
+  })
+
+  it('спиннер резервирует место справа наравне с кнопками', () => {
+    const idle = mount(GrInput, { props: { modelValue: 'x' } })
+    const busy = mount(GrInput, { props: { modelValue: 'x', loading: true } })
+
+    expect((idle.get('input').element as HTMLInputElement).style.paddingRight).toBe('')
+    expect((busy.get('input').element as HTMLInputElement).style.paddingRight).not.toBe('')
+  })
+
+  it('без loading спиннера нет', () => {
+    expect(mount(GrInput, { props: { modelValue: 'x' } }).find('[data-gr-input-spinner]').exists()).toBe(false)
+  })
+})

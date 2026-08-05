@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { GrComponentSize } from '../shared/sizes'
-import {computed, ref, useSlots} from 'vue'
+import {computed, ref, useId, useSlots} from 'vue'
 
 import {addLen, useAddonMeasurement} from '../../composables/internal/useAddonMeasurement'
 import {useGrComponentProp, useGrComponentSize} from '../GrConfigProvider/context'
@@ -9,6 +9,9 @@ import {useGrFormControl} from '../../composables/useGrFormControl'
 import {useGranularityTranslations} from '../../internal/granularityI18n'
 import type {InputHTMLAttributes} from 'vue'
 
+import { grInputFieldClass, grInputShellClass, paddingX } from './grInputStyles'
+
+import IconLoader from '~icons/lucide/loader-2'
 import IconX from '~icons/lucide/x'
 import IconEye from '~icons/lucide/eye'
 import IconEyeOff from '~icons/lucide/eye-off'
@@ -23,7 +26,7 @@ export type GrInputTextAlign = 'left' | 'center' | 'right'
 const props = withDefaults(
     defineProps<{
       modelValue: string
-      type?: 'text' | 'email' | 'password' | 'number' | 'search'
+      type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
       placeholder?: string
       autocomplete?: string
       inputmode?: InputHTMLAttributes['inputmode']
@@ -48,6 +51,12 @@ const props = withDefaults(
       maxlength?: number
       /** Показывать счётчик символов (`len` или `len/maxlength`). */
       showCount?: boolean
+      /**
+       * Фоновая работа по полю (проверка занятости логина, автосохранение):
+       * спиннер в trailing-области + `aria-busy`. Ввод не блокируется —
+       * для этого есть `disabled`/`readonly`.
+       */
+      loading?: boolean
       /** Кнопка показать/скрыть пароль (только при `type="password"`). */
       passwordToggle?: boolean
       /** i18n aria-label кнопки показать/скрыть пароль. */
@@ -89,6 +98,7 @@ const props = withDefaults(
       clearLabel: undefined,
       maxlength: undefined,
       showCount: false,
+      loading: false,
       passwordToggle: false,
       passwordShowLabel: undefined,
       passwordHideLabel: undefined,
@@ -106,6 +116,15 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  /** Значение зафиксировано нативным `change` — по `blur` или `Enter`. */
+  (e: 'change', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+  /**
+   * Значение стёрто кнопкой очистки. Отдельное событие потому, что по
+   * `update:modelValue` программную очистку от ручного стирания не отличить.
+   */
+  (e: 'clear'): void
 }>()
 
 // Контекст `GrFormField` (если инпут внутри него): даёт id/aria-describedby/
@@ -117,7 +136,15 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrInput'
 const resolvedClearable = useGrComponentProp('GrInput', 'clearable', () => props.clearable, false)
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
+
+// Счётчик обязан быть частью описания поля: иначе «12 / 60» видно глазами, но
+// не слышно — при том, что ограничение длины и есть смысл счётчика.
+const countId = useId()
+const describedBy = computed(() =>
+  [field?.describedById.value, props.showCount ? countId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
 const {
   invalid: isInvalid,
   required: isRequired,
@@ -134,9 +161,15 @@ function blur(): void {
   inputEl.value?.blur()
 }
 
+/** Выделить содержимое — спутник `focus()` для «подставили значение, перезапишите». */
+function select(): void {
+  inputEl.value?.select()
+}
+
 defineExpose({
   focus,
   blur,
+  select,
 })
 
 const slots = useSlots()
@@ -171,20 +204,10 @@ const resolvedType = computed(() => (props.type === 'password' && passwordVisibl
 const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !props.disabled)
 const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !isReadonly.value)
 
-const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0))
+const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0) + (props.loading ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
 
-const basePaddingXLen = computed(() => {
-  // Must mirror `sizeClass` horizontal padding (px-*) because inline paddings override class paddings.
-  const map: Record<NonNullable<typeof props.size>, string> = {
-    xs: '10px', // px-2.5
-    sm: '12px', // px-3
-    md: '12px', // px-3
-    lg: '16px', // px-4
-  }
-
-  return map[resolvedSize.value]
-})
+const basePaddingXLen = computed(() => paddingX[resolvedSize.value])
 
 const inputStyle = computed(() => {
   const leftReserved = hasPrefix.value
@@ -237,53 +260,34 @@ const suffixStyle = computed(() => {
   } as Record<string, string | undefined>
 })
 
-const sizeClass = computed(() => {
-  const map: Record<NonNullable<typeof props.size>, string> = {
-    xs: 'h-7 px-2.5 text-[12px]',
-    sm: 'h-8 px-3 text-[13px]',
-    md: 'h-10 px-3 text-[14px]',
-    lg: 'h-11 px-4 text-[16px]',
-  }
-
-  return map[resolvedSize.value]
-})
-
-const textAlignClass = computed(() => {
-  const map: Record<NonNullable<typeof props.textAlign>, string> = {
-    left: 'text-left',
-    center: 'text-center',
-    right: 'text-right',
-  }
-
-  return map[props.textAlign]
-})
-
 // Border/ring/disabled — на оболочке (`focus-within`), размеры/выравнивание — на инпуте.
-const shellClass = computed(() => {
-  const state = props.state
+const shellClass = computed(() => grInputShellClass({
+  state: props.state,
+  invalid: isInvalid.value,
+  disabled: props.disabled,
+}))
 
-  const borderByState: Record<typeof state, string> = {
-    default: 'border-[var(--gr-brd)]',
-    success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
-    warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
-    danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
-  }
-
-  return [
-    isInvalid.value ? borderByState.danger : borderByState[state],
-    props.disabled ? 'opacity-50 cursor-not-allowed' : '',
-  ].filter(Boolean).join(' ')
-})
-
-const className = computed(() => {
-  return [
-    sizeClass.value,
-    textAlignClass.value,
-  ].join(' ')
-})
+const className = computed(() => grInputFieldClass({
+  size: resolvedSize.value,
+  align: props.textAlign,
+}))
 
 function onInput(e: Event): void {
   emit('update:modelValue', (e.target as HTMLInputElement).value)
+}
+
+// Объявленный emit уходит из `$attrs`, поэтому нативные события переизлучаем
+// руками — иначе `@change`/`@focus`/`@blur` у потребителя перестали бы работать.
+function onChange(e: Event): void {
+  emit('change', (e.target as HTMLInputElement).value)
+}
+
+function onFocus(e: FocusEvent): void {
+  emit('focus', e)
+}
+
+function onBlur(e: FocusEvent): void {
+  emit('blur', e)
 }
 
 // ————— Trailing-контролы: очистка, переключатель пароля, счётчик символов.
@@ -297,8 +301,21 @@ const countText = computed(() =>
   props.maxlength !== undefined ? `${props.modelValue.length} / ${props.maxlength}` : String(props.modelValue.length),
 )
 
+/**
+ * Живой регион объявляет только исчерпание лимита. Читать вслух каждый символ
+ * нельзя — диктор захлебнётся, а сам счётчик и так связан с полем через
+ * `aria-describedby` и читается при фокусе.
+ */
+const limitReached = computed(() =>
+  props.maxlength !== undefined && props.modelValue.length >= props.maxlength,
+)
+const liveMessage = computed(() =>
+  limitReached.value ? t('gr.input.limitReached', 'Character limit reached') : '',
+)
+
 function clear(): void {
   emit('update:modelValue', '')
+  emit('clear')
   inputEl.value?.focus()
 }
 
@@ -310,10 +327,7 @@ function togglePassword(): void {
 
 <template>
   <div data-gr-input class="w-full">
-    <div
-        class="relative w-full overflow-hidden rounded-md border bg-[var(--gr-bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
-        :class="shellClass"
-    >
+    <div :class="shellClass">
       <div
           v-if="$slots.prefix"
           ref="prefixEl"
@@ -343,10 +357,14 @@ function togglePassword(): void {
           :aria-required="isRequired ? 'true' : undefined"
           :aria-readonly="isReadonly ? 'true' : undefined"
           :aria-label="ariaLabel"
-          class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
+          :aria-busy="props.loading ? 'true' : undefined"
+          class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed disabled:text-[var(--gr-muted-fg)]"
           :class="className"
           :style="inputStyle"
           @input="onInput"
+          @change="onChange"
+          @focus="onFocus"
+          @blur="onBlur"
       >
 
       <div
@@ -354,13 +372,21 @@ function togglePassword(): void {
           data-gr-input-trailing
           class="absolute inset-y-0 right-1 flex items-center gap-0.5"
       >
+        <span
+            v-if="loading"
+            data-gr-input-spinner
+            class="flex h-6 w-6 items-center justify-center text-[var(--gr-muted-fg)]"
+            aria-hidden="true"
+        >
+          <IconLoader class="h-4 w-4 animate-spin" />
+        </span>
+
         <button
             v-if="showClear"
             type="button"
             data-gr-input-clear
             :aria-label="resolvedClearLabel"
             class="flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-            tabindex="-1"
             @click="clear"
         >
           <IconX class="h-4 w-4" aria-hidden="true" />
@@ -373,7 +399,6 @@ function togglePassword(): void {
             :aria-label="passwordVisible ? resolvedPasswordHideLabel : resolvedPasswordShowLabel"
             :aria-pressed="passwordVisible ? 'true' : 'false'"
             class="flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-            tabindex="-1"
             @click="togglePassword"
         >
           <IconEyeOff v-if="passwordVisible" class="h-4 w-4" aria-hidden="true" />
@@ -396,10 +421,19 @@ function togglePassword(): void {
 
     <div
         v-if="showCount"
+        :id="countId"
         data-gr-input-count
         class="mt-1 text-right text-xs text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
     >
       {{ countText }}
     </div>
+
+    <span
+        v-if="showCount"
+        data-gr-input-live
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+    >{{ liveMessage }}</span>
   </div>
 </template>

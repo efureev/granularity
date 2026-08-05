@@ -168,7 +168,8 @@
   "input": {
     "clear": "Borrar",
     "showPassword": "Mostrar contraseña",
-    "hidePassword": "Ocultar contraseña"
+    "hidePassword": "Ocultar contraseña",
+    "limitReached": "Límite de caracteres alcanzado"
   },
   "rating": {
     "label": "Valoración",

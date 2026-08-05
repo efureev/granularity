@@ -167,7 +167,8 @@
   "input": {
     "clear": "Clear",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "limitReached": "Character limit reached"
   },
   "rating": {
     "label": "Rating",

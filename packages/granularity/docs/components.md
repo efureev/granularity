@@ -52,7 +52,7 @@
 - `GrFormSection`
 - `GrIcon`
 - [`GrImageViewer`](./components/GrImageViewer.md)
-- `GrInput`
+- [`GrInput`](./components/GrInput.md)
 - `GrInputTag`
 - `GrKbd`
 - `GrLink`

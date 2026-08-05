@@ -142,6 +142,7 @@ const previewRegistry = {
   'gr-image-viewer-real-size': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerRealSizeDemo.vue')),
   'gr-image-viewer-toolbar-slot': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerToolbarSlotDemo.vue')),
   'gr-input-addons-basic': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputAddonsDemo.vue')),
+  'gr-input-events-and-loading': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputEventsDemo.vue')),
   'gr-input-addon-slots': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputAddonSlotsDemo.vue')),
   'gr-input-size-and-alignment': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputSizingDemo.vue')),
   'gr-input-tag-basic-flow': defineAsyncComponent(() => import('../demos/components/gr-input-tag/GrInputTagBasicFlowDemo.vue')),

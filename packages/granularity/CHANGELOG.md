@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `rotateRight`. The chrome is painted by per-component tokens (`--gr-image-viewer-scrim`,
   `-chrome-bg`, `-chrome-bg-hover`, `-chrome-bg-soft`, `-chrome-fg`, `-chrome-fg-muted`,
   `-chrome-brd`, `-ring`), and its buttons use `GrIcon` instead of the text glyphs `✕ ‹ › − ↺ ↻`.
+- **`GrInput`: события, `loading`, `select()` и новые типы.** Поле объявляет `change` (по blur/Enter),
+  `focus`, `blur` и отдельный `clear` — по одному лишь `update:modelValue` очистку кнопкой от ручного
+  стирания не отличить. `loading` рисует спиннер в trailing-области и ставит `aria-busy`, не блокируя
+  ввод; `select()` присоединяется к `focus()`/`blur()` в `defineExpose`; `type` принимает `tel` и `url`.
+  Счётчик символов теперь связан с полем через `aria-describedby`, а исчерпание лимита объявляется
+  живым регионом (новый ключ `gr.input.limitReached`).
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
@@ -58,6 +64,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   also had no accessible name at all (`aria-dialog-name`), and every image was `alt=""` with no way
   to pass a description. `useZoomPan`, `useWheelGesture` and `useViewerKeyboard` are now covered by
   tests.
+- **`GrInput` не отдавал очистку и показ пароля клавиатуре.** На обеих trailing-кнопках стоял
+  `tabindex="-1"`: виджет был объявлен доступным (`aria-label`, `aria-pressed`), но воспользоваться им
+  без мыши было нельзя — очистить поле или посмотреть введённый пароль клавиатурный пользователь не мог.
+  Атрибут снят, обе кнопки после нажатия возвращают фокус в поле. Заблокированное поле гасится фоном
+  `--gr-muted` с текстом `--gr-muted-fg` вместо `opacity-50`, которая разбавляла выверенные на AA токены.
+  Заодно ожил `grInputStyles.ts`: карты размеров, выравнивания и состояний были продублированы инлайн в
+  SFC, копии разошлись (`focus-visible:` против `focus-within:`), и safelist декларировал классы,
+  которых в разметке нет.
 - **`GrFormField` announced errors unreliably and validated too eagerly.** The error box appeared
   and disappeared with `v-if` while the control's `aria-describedby` changed composition at the same
   moment — assistive tech that does not re-read the description after an attribute change stayed

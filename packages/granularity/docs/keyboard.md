@@ -55,6 +55,7 @@ Enter не переключает состояние, а сабмитит фор
 | `GrNumberInput` | `↑`/`↓` — шаг, `Home`/`End` — к `min`/`max` | spinbutton |
 | `GrSlider` | `←`/`↓` — шаг вниз, `→`/`↑` — шаг вверх, `PageUp`/`PageDown` — крупный шаг, `Home`/`End` — к краям | slider |
 | `GrRating` | `→`/`↑` — больше, `←`/`↓` — меньше, `Home`/`End` — к краям | slider (интерактивный) / img (readonly) |
+| `GrInput` | `Tab` из поля — на кнопку очистки, затем на переключатель пароля (обе активируются `Enter`/`Space` и возвращают фокус в поле) | — |
 | `GrInputTag` | `Enter` — добавить тег, `Backspace` в пустом поле — удалить последний | — |
 | `GrSegmented` | `←`/`→`/`↑`/`↓` — по сегментам, `Home`/`End` — к краям, `Space`/`Enter` — выбрать | radiogroup |
 

@@ -169,7 +169,8 @@
   "input": {
     "clear": "Очистить",
     "showPassword": "Показать пароль",
-    "hidePassword": "Скрыть пароль"
+    "hidePassword": "Скрыть пароль",
+    "limitReached": "Достигнут предел символов"
   },
   "rating": {
     "label": "Оценка",

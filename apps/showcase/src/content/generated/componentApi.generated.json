@@ -3562,7 +3562,7 @@
           {
             "name": "type",
             "description": "",
-            "type": "\"number\" | \"search\" | \"text\" | \"email\" | \"password\" | undefined",
+            "type": "\"number\" | \"search\" | \"text\" | \"email\" | \"password\" | \"tel\" | \"url\" | undefined",
             "required": false,
             "default": "\"text\""
           },
@@ -3621,6 +3621,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Фоновая работа по полю (проверка занятости логина, автосохранение): спиннер в trailing-области + `aria-busy`. Ввод не блокируется — для этого есть `disabled`/`readonly`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "clearLabel",
@@ -3783,6 +3790,30 @@
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
           }
         ]
       },
@@ -3798,6 +3829,11 @@
           },
           {
             "name": "blur",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "select",
             "description": "",
             "type": "() => void"
           }
