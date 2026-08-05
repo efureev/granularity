@@ -22,7 +22,7 @@
  * Нативная проверка потребовала бы фокуса на невалидном контроле, а он невидим и
  * `aria-hidden` — Chrome в таком случае молча отменяет сабмит всей формы
  * («An invalid form control … is not focusable»). Обязательность проверяет
- * `GrForm` правилом `required` — см. `docs/components.md`.
+ * `GrForm` правилом `required` — см. `docs/components/GrCheckbox.md`.
  *
  * Внутри `GrCheckboxGroup` значение приходит из группы: свой `modelValue` не
  * задаётся, а `value` сравнивается с массивом выбранных.

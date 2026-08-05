@@ -18,9 +18,12 @@
 
 ## Опубликованные компоненты
 
-По текущему component registry пакет публикует следующие компоненты:
+По текущему component registry пакет публикует следующие компоненты. Имя-ссылка
+означает, что у компонента есть своя страница в [`components/`](./components/) —
+там его особенности, оговорки и примеры.
 
 - `GrAlert`
+- `GrAutocomplete`
 - `GrAvatar`
 - `GrBadge`
 - `GrBadgeWrap`
@@ -28,18 +31,22 @@
 - `GrButton`
 - `GrButtonGroup`
 - `GrCard`
-- `GrCheckbox`
-- `GrCheckboxGroup`
-- `GrCollapse`
+- [`GrCheckbox`](./components/GrCheckbox.md)
+- [`GrCheckboxGroup`](./components/GrCheckboxGroup.md)
+- [`GrCollapse`](./components/GrCollapse.md)
+- `GrCommandPalette`
+- `GrConfigProvider`
 - `GrConfirmDialog`
 - `GrDataTable`
 - `GrDialog`
+- `GrDialogService`
 - `GrDivider`
 - `GrDrawer`
 - `GrDropdown`
 - `GrDropdownMenu`
 - `GrEmptyState`
 - `GrFileUpload`
+- `GrForm`
 - `GrFormField`
 - `GrFormFile`
 - `GrFormSection`
@@ -55,13 +62,19 @@
 - `GrNavbar`
 - `GrNumberInput`
 - `GrPagination`
+- `GrPopover`
 - `GrProgressBar`
 - `GrPromptDialog`
 - `GrRadio`
 - `GrRadioGroup`
+- `GrRating`
+- `GrResponseErrorBanner`
+- `GrSegmented`
 - `GrSelect`
 - `GrSidebar`
 - `GrSkeleton`
+- `GrSlider`
+- `GrStatistic`
 - `GrSwitch`
 - `GrTable`
 - `GrTabPanels`
@@ -72,88 +85,37 @@
 - `GrTree`
 - `GrTreeSelect`
 
-## Чекбоксы: обязательность и множественный выбор
+## Страница компонента: что туда писать
 
-`required` у `GrCheckbox` и `GrCheckboxGroup` — **объявление, а не нативная
-проверка**: он доезжает до `aria-required` на виджете и не выставляется на
-скрытом `<input type="checkbox">`. Нативная проверка потребовала бы от браузера
-сфокусировать невалидный контрол, а он невидим и `aria-hidden`, — Chrome в таком
-случае отменяет отправку всей формы и пишет в консоль «An invalid form control
-… is not focusable». Проверять обязательность нужно правилом формы:
+Этот файл — каталог и общие правила импорта. Описание конкретного компонента
+живёт в `components/GrX.md`, один компонент — один файл.
 
-```vue
-<script setup lang="ts">
-// `required` пустым считает `null`/`''`/`[]`, но не `false`: снятый чекбокс —
-// это законное значение поля. «Согласие обязательно» — это `validator`.
-const rules: GrFormRules = {
-  terms: [{ validator: value => value === true || 'Примите условия' }],
-  channels: [{ required: true, message: 'Выберите хотя бы один канал' }],
-}
-</script>
+**Правило:** правка, меняющая поведение или API компонента, описывается на его
+странице. Файла ещё нет — он заводится этой же правкой, а имя в списке выше
+становится ссылкой.
 
-<template>
-  <GrForm :model="model" :rules="rules">
-    <GrFormField name="terms" label="Условия">
-      <GrCheckbox v-model="model.terms" required />
-    </GrFormField>
+Что писать на странице:
 
-    <GrFormField name="channels" label="Каналы">
-      <GrCheckboxGroup v-model="model.channels" :options="options" required />
-    </GrFormField>
-  </GrForm>
-</template>
-```
+- назначение одной фразой — зачем компонент, а не из чего состоит;
+- неочевидные решения и их причины: почему подпись снаружи роли, почему
+  `required` не уходит в нативный инпут, почему панель `inert`. Это то, чего из
+  сигнатуры пропа не видно и что иначе сломает следующий читатель;
+- оговорки и границы применимости: что компонент не делает и чем это лечится;
+- примеры на сценарий (`vue`/`ts`), а не на каждый проп.
 
-Множественный выбор — `GrCheckboxGroup` с моделью `string[]`. Он раздаёт
-вложенным `GrCheckbox` выбранные значения, `name`, `size` и состояния
-`disabled`/`readonly`/`invalid`, поэтому собственный `v-model` им не нужен:
+Чего на странице быть не должно:
 
-```vue
-<GrCheckboxGroup v-model="channels" name="channels" :options="options" />
-```
-
-Клик по подписи переключает чекбокс, но её интерактивное содержимое (ссылка,
-кнопка, вложенный `<label>`) работает само по себе и состояние не меняет — для
-того подпись и вынесена наружу роли-виджета.
-
-## Аккордеон: уровень заголовка, вложенность и guard
-
-`GrCollapse` рисует заголовок секции тегом `h3`, а `headingLevel` подгоняет его
-под структуру страницы: в разделе `<h4>` аккордеон обязан начинаться с `h5`,
-иначе навигация по заголовкам получает разрыв уровней. Кнопка остаётся внутри
-заголовка — этого требует APG для accordion.
-
-`borderless` убирает обёртку в `GrCard`: аккордеон внутри карточки, сайдбара
-или панели фильтров иначе получает вторую рамку и вторую тень.
-
-```vue
-<GrCollapse v-model="open" borderless :heading-level="5" expand-icon-position="start">
-  <GrCollapseItem name="filters" title="Фильтры">
-    <template #extra>
-      <GrBadge size="sm">3</GrBadge>
-    </template>
-    …
-  </GrCollapseItem>
-</GrCollapse>
-```
-
-Слот `#extra` рендерится **рядом** с триггером, а не внутри: `<button>` внутри
-`<button>` — невалидная разметка, и axe ловит её как `nested-interactive`.
-
-`beforeChange(name, expanding)` — async-guard: `false` отменяет переключение.
-Пока guard не ответил, повторный клик по тому же заголовку игнорируется, поэтому
-подтверждение не откроется дважды.
-
-```ts
-async function beforeChange(name: GrCollapseValue, expanding: boolean): Promise<boolean> {
-  if (expanding) return true
-  return confirmDiscardChanges(name)
-}
-```
-
-Стрелки `↑`/`↓` и `Home`/`End` ходят только по заголовкам **своего**
-аккордеона: вложенный `GrCollapse` внутри раскрытой панели в обход не попадает.
-Свёрнутая панель помечена `inert` — ни `Tab`, ни скринридер в неё не заходят.
+- **полного перечня пропов, слотов и эмитов** — он генерируется из исходников
+  в витрину (`componentApi.generated.json`) и в `web-types.json`; список,
+  написанный руками, разойдётся с кодом молча;
+- того, что уже описано сквозным документом: клавиатура —
+  [`keyboard.md`](./keyboard.md), размеры — [`sizes.md`](./sizes.md), токены и
+  темы — [`tokens.md`](./tokens.md) и [`theming.md`](./theming.md), слои —
+  [`z-index.md`](./z-index.md), серверный рендер — [`ssr.md`](./ssr.md),
+  движение — [`motion.md`](./motion.md). В сквозном документе компонент
+  упоминается строкой, на его странице — ссылка на неё;
+- истории правки («раньше было…», «до 0.5.0 работало так») — её место в
+  `CHANGELOG.md`.
 
 ## Стили компонентов
 

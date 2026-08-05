@@ -19,7 +19,8 @@
 - Если важно понять, как пакет ведёт себя в i18n-сценариях: откройте [`localization.md`](./localization.md).
 - Если нужны package-level утилиты кроме компонентов: откройте [`directives.md`](./directives.md) и [
   `file-validation.md`](./file-validation.md).
-- Если нужен обзор опубликованных компонентов: откройте [`components.md`](./components.md).
+- Если нужен обзор опубликованных компонентов: откройте [`components.md`](./components.md),
+  особенности конкретного — [`components/GrX.md`](./components/).
 - Если нужно масштабировать контролы целиком: откройте [`sizes.md`](./sizes.md).
 - Если важно поведение анимаций при «уменьшить движение»: откройте [`motion.md`](./motion.md).
 
@@ -45,7 +46,8 @@
 - [`localization.md`](./localization.md) — как `granularity` работает с локализацией приложения и fallback-текстами.
 - [`directives.md`](./directives.md) — все опубликованные директивы и их назначение.
 - [`file-validation.md`](./file-validation.md) — `fileValidation` API и повторное использование логики валидации файлов.
-- [`components.md`](./components.md) — каталог опубликованных компонентов и импортов.
+- [`components.md`](./components.md) — каталог опубликованных компонентов, импорты и правило
+  ведения страниц; [`components/`](./components/) — страница на компонент с его особенностями.
 - [`ADDING_COMPONENTS.md`](./ADDING_COMPONENTS.md) — внутренний процесс добавления нового компонента в пакет.
 
 ## Как подключать
