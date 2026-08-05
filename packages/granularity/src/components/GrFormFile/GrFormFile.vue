@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import IconUpload from '~icons/lucide/upload'
 import IconX from '~icons/lucide/x'
@@ -20,7 +20,7 @@ import {
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { vDropzone } from '../../directives'
-import { acceptValidator, FileValidationError, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
+import { acceptValidator, FileValidationError, maxCountValidator, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
@@ -51,6 +51,8 @@ export interface GrFormFileProps {
   /** W3C `accept` для `<input type="file">` + sugar к `acceptValidator(...)`. */
   accept?: string
   validators?: FileValidator[]
+  /** Максимум файлов в наборе. Лишние не обрезаются молча — набор отбивается ошибкой. */
+  limit?: number
   uploadText?: string
   changeText?: string
   removeText?: string
@@ -60,6 +62,12 @@ export interface GrFormFileProps {
   size?: GrFormFileSize
   /** Дополнительная (кастомная) валидация на стороне потребителя. */
   validate?: (files: File[]) => GrFormFileError[] | Promise<GrFormFileError[]>
+  /**
+   * Контролируемый список ошибок: `v-model:errors`. Задан — показывается он, и
+   * внутренняя валидация его не перетирает. Сюда же кладутся ошибки, пришедшие
+   * с сервера. Не задан — компонент держит свои ошибки сам.
+   */
+  errors?: GrFormFileError[]
 }
 
 const props = withDefaults(
@@ -72,6 +80,7 @@ const props = withDefaults(
     required: false,
     ariaLabel: undefined,
     accept: undefined,
+    limit: undefined,
     uploadText: undefined,
     changeText: undefined,
     removeText: undefined,
@@ -80,6 +89,7 @@ const props = withDefaults(
     size: undefined,
     validators: undefined,
     validate: undefined,
+    errors: undefined,
   },
 )
 
@@ -97,7 +107,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: File | File[] | null): void
   (e: 'change', value: File | File[] | null): void
   (e: 'clear'): void
-  (e: 'validation', errors: GrFormFileError[]): void
+  /** Результат валидации. Канал один: `validation` дублировал эту же нагрузку. */
   (e: 'update:errors', errors: GrFormFileError[]): void
 }>()
 
@@ -108,7 +118,6 @@ const { t } = useGranularityTranslations()
 // `<label for>` в невидимый элемент.
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
 const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
@@ -119,6 +128,23 @@ const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.formFile.p
 const inputRef = ref<HTMLInputElement | null>(null)
 const localErrors = ref<GrFormFileError[]>([])
 const uploadBtnEl = ref<HTMLElement | null>(null)
+
+// Собственные ошибки компонент обязан и объявить (`role="alert"`), и связать с
+// контролом: до этого «уронил файл не того типа» для скринридера выглядело как
+// «ничего не произошло». Ошибка поля из `GrFormField` при этом остаётся —
+// `aria-describedby` держит оба id.
+const errorsId = useId()
+// Контролируемый список сильнее внутреннего — как `sortKey` у `GrDataTable`.
+const displayedErrors = computed(() => props.errors ?? localErrors.value)
+const hasLocalErrors = computed(() => displayedErrors.value.length > 0)
+
+const describedByIds = computed(() => {
+  return [field?.describedById.value, hasLocalErrors.value ? errorsId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined
+})
+
+const showsInvalid = computed(() => isInvalid.value || hasLocalErrors.value)
 
 function focus(): void {
   uploadBtnEl.value?.focus()
@@ -140,6 +166,24 @@ const files = computed<File[]>(() => {
 
 const hasFiles = computed(() => files.value.length > 0)
 
+/**
+ * Один набор валидаторов на оба пути ввода. Раньше он собирался дословно дважды
+ * — в `applyFiles` и в `dropzone`; такая копия разъезжается при первой же
+ * правке, и выбор через диалог начинает вести себя иначе, чем перетаскивание.
+ */
+const effectiveValidators = computed<FileValidator[]>(() => {
+  const customValidator: FileValidator | undefined = props.validate
+    ? async ({ files }) => (await props.validate?.(files)) ?? []
+    : undefined
+
+  return [
+    acceptValidator(props.accept),
+    maxCountValidator(props.limit),
+    ...(props.validators ?? []),
+    ...(customValidator ? [customValidator] : []),
+  ]
+})
+
 function clearInputValue() {
   if (!inputRef.value) return
   inputRef.value.value = ''
@@ -147,12 +191,11 @@ function clearInputValue() {
 
 function setErrors(next: GrFormFileError[]) {
   localErrors.value = next
-  emit('validation', next)
   emit('update:errors', next)
 }
 
 function clearErrors() {
-  if (localErrors.value.length === 0) return
+  if (displayedErrors.value.length === 0) return
   setErrors([])
 }
 
@@ -175,17 +218,7 @@ async function applyFiles(nextFiles: File[]) {
     return !!value && typeof (value as any).then === 'function'
   }
 
-  const customValidator: FileValidator | undefined = props.validate
-    ? async ({ files }) => (await props.validate?.(files)) ?? []
-    : undefined
-
-  const validators: FileValidator[] = [
-    acceptValidator(props.accept),
-    ...(props.validators ?? []),
-    ...(customValidator ? [customValidator] : []),
-  ]
-
-  const res = runFileValidators(nextFiles, validators, {
+  const res = runFileValidators(nextFiles, effectiveValidators.value, {
     source: 'input',
     multiple: props.multiple,
   })
@@ -242,6 +275,11 @@ function removeAt(index: number) {
   emit('change', next)
 }
 
+/** Размер файла в строке списка — как в `GrFileUpload`: без него список не отвечает «сколько». */
+function formatFileSize(file: File): string {
+  return `${Math.ceil(file.size / 1024)} KB`
+}
+
 function issueMessage(issue: GrFormFileError): string {
   const text = resolveFileValidationMessage(issue, t)
 
@@ -256,20 +294,10 @@ function issueMessage(issue: GrFormFileError): string {
 }
 
 const dropzone = computed(() => {
-  const customValidator: FileValidator | undefined = props.validate
-    ? async ({ files }) => (await props.validate?.(files)) ?? []
-    : undefined
-
-  const validators: FileValidator[] = [
-    acceptValidator(props.accept),
-    ...(props.validators ?? []),
-    ...(customValidator ? [customValidator] : []),
-  ]
-
   return {
     enabled: !props.disabled,
     multiple: props.multiple,
-    validators,
+    validators: effectiveValidators.value,
     onFiles: async (dropped: File[]) => {
       // `v-dropzone` уже выполнил валидаторы и нормализацию по `multiple`.
       clearErrors()
@@ -311,7 +339,7 @@ watch(
     v-dropzone="dropzone"
     data-gr-form-file
     class="rounded-[var(--gr-radius-md)]"
-    :class="disabled ? 'opacity-60 cursor-not-allowed' : ''"
+    :class="disabled ? 'cursor-not-allowed' : ''"
   >
     <input
       ref="inputRef"
@@ -334,8 +362,8 @@ watch(
           variant="secondary"
           :size="buttonSize"
           data-gr-form-file-upload-btn
-          :aria-describedby="describedBy"
-          :aria-invalid="isInvalid ? 'true' : undefined"
+          :aria-describedby="describedByIds"
+          :aria-invalid="showsInvalid ? 'true' : undefined"
           :aria-required="isRequired ? 'true' : undefined"
           :aria-readonly="isReadonly ? 'true' : undefined"
           :aria-label="ariaLabel"
@@ -412,12 +440,19 @@ watch(
             {{ file.name }}
           </span>
 
+          <span
+            class="text-[var(--gr-muted-fg)] shrink-0"
+            :class="removeTextClass"
+            data-gr-form-file-item-size
+          >{{ formatFileSize(file) }}</span>
+
           <button
             type="button"
             class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             :class="removeTextClass"
             data-gr-form-file-item-remove
             :disabled="disabled"
+            :aria-label="t('gr.formFile.removeFile', 'Remove {fileName}', { fileName: file.name })"
             @click.prevent="removeAt(index)"
           >
             {{ resolvedRemoveText }}
@@ -425,9 +460,16 @@ watch(
         </div>
       </div>
 
-      <slot name="errors" :errors="localErrors">
-        <div v-if="localErrors.length" class="text-[var(--gr-danger)]" :class="textClass" data-gr-form-file-errors>
-          <div v-for="(e, i) in localErrors" :key="i" data-gr-form-file-error>
+      <slot name="errors" :errors="displayedErrors">
+        <div
+          v-if="hasLocalErrors"
+          :id="errorsId"
+          class="text-[var(--gr-danger-text)]"
+          :class="textClass"
+          data-gr-form-file-errors
+          role="alert"
+        >
+          <div v-for="(e, i) in displayedErrors" :key="i" data-gr-form-file-error>
             {{ issueMessage(e) }}
           </div>
         </div>

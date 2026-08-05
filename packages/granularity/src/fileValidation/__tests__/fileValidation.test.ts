@@ -7,6 +7,7 @@ import {
   allowedMimeTypesValidator,
   maxFileSizeBytesValidator,
   maxSizeMbValidator,
+  maxCountValidator,
   maxTotalSizeBytesValidator,
   matchAccept,
   normalizeFiles,
@@ -47,5 +48,38 @@ describe('fileValidation', () => {
     const error = new FileValidationError(issues, files)
     expect(error).toBeInstanceOf(FileValidationError)
     expect(error.code).toBe('maxTotalSize')
+  })
+})
+
+describe('maxCountValidator', () => {
+  const file = (name: string) => new File(['x'], name, { type: 'text/plain' })
+
+  it('пропускает набор в пределах лимита', () => {
+    const issues = maxCountValidator(2)({
+      files: [file('a.txt'), file('b.txt')],
+      context: { source: 'input', multiple: true },
+    })
+
+    expect(issues).toEqual([])
+  })
+
+  it('отбивает лишние файлы одной ошибкой с параметрами', () => {
+    const issues = maxCountValidator(2)({
+      files: [file('a.txt'), file('b.txt'), file('c.txt')],
+      context: { source: 'drop', multiple: true },
+    }) as { code: string, i18nParams?: Record<string, unknown> }[]
+
+    expect(issues).toHaveLength(1)
+    expect(issues[0].code).toBe('maxCount')
+    expect(issues[0].i18nParams).toEqual({ count: 3, maxCount: 2 })
+  })
+
+  it('бессмысленный лимит выключает правило, а не запрещает всё', () => {
+    const files = [file('a.txt')]
+    const context = { source: 'input' as const, multiple: true }
+
+    expect(maxCountValidator(0)({ files, context })).toEqual([])
+    expect(maxCountValidator(Number.NaN)({ files, context })).toEqual([])
+    expect(maxCountValidator(undefined)({ files, context })).toEqual([])
   })
 })

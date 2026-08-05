@@ -295,7 +295,7 @@ describe('component docs metadata', () => {
     const formSectionDoc = getShowcaseComponentDoc(formSectionEntity!)
     const inputTagDoc = getShowcaseComponentDoc(inputTagEntity!)
 
-    expect(formFileDoc.examples).toHaveLength(4)
+    expect(formFileDoc.examples).toHaveLength(5)
     expect(formFileDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(formFileDoc.examples.every(example => example.previewKey?.startsWith('gr-form-file'))).toBe(true)
 

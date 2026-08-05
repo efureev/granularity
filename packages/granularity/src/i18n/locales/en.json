@@ -133,7 +133,8 @@
     "remove": "Remove",
     "clearAll": "Clear all",
     "placeholder": "No files selected",
-    "validateError": "Failed to validate dropped files"
+    "validateError": "Failed to validate dropped files",
+    "removeFile": "Remove {fileName}"
   },
   "imageViewer": {
     "close": "Close image viewer",
@@ -183,6 +184,7 @@
     "mimeTypeFallback": "File \"{fileName}\" has fallback mime type \"{mimeType}\"",
     "maxFileSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
     "maxSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
+    "maxCount": "Too many files selected ({count}), maxCount={maxCount}",
     "maxTotalSize": "Total files size is too large ({total} bytes), maxTotalSizeBytes={maxBytes}"
   }
 }

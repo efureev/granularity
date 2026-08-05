@@ -135,7 +135,8 @@
     "remove": "Удалить",
     "clearAll": "Очистить всё",
     "placeholder": "Файлы не выбраны",
-    "validateError": "Не удалось проверить перетащенные файлы"
+    "validateError": "Не удалось проверить перетащенные файлы",
+    "removeFile": "Убрать {fileName}"
   },
   "imageViewer": {
     "close": "Закрыть просмотрщик",
@@ -185,6 +186,7 @@
     "mimeTypeFallback": "У файла «{fileName}» неопределённый тип «{mimeType}»",
     "maxFileSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
     "maxSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
+    "maxCount": "Выбрано слишком много файлов ({count}), максимум — {maxCount}",
     "maxTotalSize": "Суммарный размер файлов слишком большой ({total} байт), максимум {maxBytes}"
   }
 }

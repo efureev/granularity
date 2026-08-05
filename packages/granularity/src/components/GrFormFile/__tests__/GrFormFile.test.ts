@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrFormFile from '../GrFormFile.vue'
 import type { GrFormFileError } from '../GrFormFile.vue'
@@ -141,5 +141,202 @@ describe('GrFormFile', () => {
 
     expect((wrapper.vm as any).model).toHaveLength(0)
     expect(wrapper.text()).toContain('Empty')
+  })
+})
+
+describe('GrFormFile — ошибки валидации', () => {
+  function mountHost(props: Record<string, unknown> = {}) {
+    const Host = defineComponent({
+      components: { GrFormFile },
+      setup: () => ({ model: ref<File | File[] | null>(null), extra: props }),
+      template: `
+        <GrFormFile v-model="model" accept="application/pdf,.pdf" v-bind="extra" />
+      `,
+    })
+
+    return mount(Host, { attachTo: document.body })
+  }
+
+  async function pickFile(wrapper: ReturnType<typeof mount>, file: File) {
+    const input = wrapper.get('[data-gr-form-file-input]').element as HTMLInputElement
+    setInputFiles(input, [file])
+    await wrapper.get('[data-gr-form-file-input]').trigger('change')
+    await nextTick()
+    await nextTick()
+  }
+
+  // Уронил файл не того типа — визуально появлялся красный текст, а для
+  // скринридера не происходило ничего: ни роли, ни связи с контролом.
+  it('список ошибок объявляется и связан с кнопкой выбора', async () => {
+    const wrapper = mountHost()
+
+    await pickFile(wrapper, new File(['x'], 'notes.txt', { type: 'text/plain' }))
+
+    const errors = wrapper.get('[data-gr-form-file-errors]')
+    expect(errors.attributes('role')).toBe('alert')
+
+    const errorsId = errors.attributes('id')
+    expect(errorsId).toBeTruthy()
+
+    const describedBy = wrapper.get('[data-gr-form-file-upload-btn]').attributes('aria-describedby') ?? ''
+    expect(describedBy.split(/\s+/)).toContain(errorsId)
+
+    wrapper.unmount()
+  })
+
+  it('невалидность объявляется на кнопке, пока ошибки не сняты', async () => {
+    const wrapper = mountHost()
+
+    await pickFile(wrapper, new File(['x'], 'notes.txt', { type: 'text/plain' }))
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('aria-invalid')).toBe('true')
+
+    await pickFile(wrapper, new File(['x'], 'doc.pdf', { type: 'application/pdf' }))
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('aria-invalid')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('текст ошибки берёт текстовую роль токена, а не насыщенный тон', async () => {
+    const wrapper = mountHost()
+
+    await pickFile(wrapper, new File(['x'], 'notes.txt', { type: 'text/plain' }))
+
+    const errors = wrapper.get('[data-gr-form-file-errors]')
+    expect(errors.classes()).toContain('text-[var(--gr-danger-text)]')
+    expect(errors.classes()).not.toContain('text-[var(--gr-danger)]')
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrFormFile — disabled', () => {
+  it('гасится курсором и состоянием кнопок, а не прозрачностью контейнера', () => {
+    // `opacity-60` на контейнере разбавлял и подписи, и имена файлов: выверенные
+    // на AA токены текста уходили ниже порога.
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: null, disabled: true },
+    })
+
+    const root = wrapper.get('[data-gr-form-file]')
+    expect(root.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(root.classes()).toContain('cursor-not-allowed')
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('disabled')).toBeDefined()
+  })
+})
+
+describe('GrFormFile — валидаторы', () => {
+  // Сборка валидаторов была скопирована в два места: выбор через диалог и drop
+  // могли разъехаться по поведению при первой же правке.
+  it('кастомный `validate` действует и на выбор через диалог, и на drop', async () => {
+    const validate = vi.fn().mockResolvedValue([{ code: 'accept', message: 'nope' }])
+
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: null, validate },
+      attachTo: document.body,
+    })
+
+    const input = wrapper.get('[data-gr-form-file-input]')
+    setInputFiles(input.element as HTMLInputElement, [new File(['x'], 'a.pdf', { type: 'application/pdf' })])
+    await input.trigger('change')
+    // Кастомный валидатор асинхронный: `nextTick` его не дожидается.
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(validate).toHaveBeenCalledTimes(1)
+    expect(wrapper.find('[data-gr-form-file-errors]').exists()).toBe(true)
+
+    // Тот же самый массив уходит в `v-dropzone`: директива валидирует им же,
+    // поэтому drop не может разойтись с выбором через диалог.
+    const dropzoneBinding = wrapper.get('[data-gr-form-file]').element as HTMLElement
+    expect(dropzoneBinding.classList.contains('gr-dropzone--over')).toBe(false)
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrFormFile — ошибки как контролируемое значение', () => {
+  // `validation` и `update:errors` эмитились вместе с одинаковой нагрузкой, при
+  // этом пропа `errors` не было: `v-model:errors` умел только писать.
+  it('внешние ошибки показываются и объявляются', async () => {
+    const wrapper = mount(GrFormFile, {
+      props: {
+        modelValue: null,
+        errors: [{ code: 'accept', message: 'Сервер отклонил файл' }] as GrFormFileError[],
+      },
+    })
+
+    const errors = wrapper.get('[data-gr-form-file-errors]')
+    expect(errors.text()).toContain('Сервер отклонил файл')
+    expect(errors.attributes('role')).toBe('alert')
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('aria-invalid')).toBe('true')
+
+    await wrapper.setProps({ errors: [] })
+    expect(wrapper.find('[data-gr-form-file-errors]').exists()).toBe(false)
+  })
+
+  it('внутренняя валидация по-прежнему уходит в update:errors', async () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: null, accept: 'application/pdf' },
+      attachTo: document.body,
+    })
+
+    const input = wrapper.get('[data-gr-form-file-input]')
+    setInputFiles(input.element as HTMLInputElement, [new File(['x'], 'a.txt', { type: 'text/plain' })])
+    await input.trigger('change')
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+
+    const emitted = wrapper.emitted('update:errors') as GrFormFileError[][][]
+    expect(emitted.at(-1)![0]).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrFormFile — список файлов', () => {
+  function mountMultiple(files: File[]) {
+    return mount(GrFormFile, { props: { modelValue: files, multiple: true } })
+  }
+
+  // Три кнопки подряд с именем «Удалить» — для скринридера неразличимы.
+  it('кнопка удаления называет свой файл', () => {
+    const wrapper = mountMultiple([
+      new File(['a'], 'first.pdf', { type: 'application/pdf' }),
+      new File(['b'], 'second.pdf', { type: 'application/pdf' }),
+    ])
+
+    const labels = wrapper.findAll('[data-gr-form-file-item-remove]').map(btn => btn.attributes('aria-label'))
+    expect(labels).toEqual(['Remove first.pdf', 'Remove second.pdf'])
+  })
+
+  it('в строке файла виден его размер', () => {
+    const wrapper = mountMultiple([new File([new ArrayBuffer(2048)], 'big.pdf', { type: 'application/pdf' })])
+
+    expect(wrapper.get('[data-gr-form-file-item]').text()).toContain('2 KB')
+  })
+})
+
+describe('GrFormFile — limit', () => {
+  it('лишние файлы отбиваются валидатором, а не молча обрезаются', async () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: [], multiple: true, limit: 2 },
+      attachTo: document.body,
+    })
+
+    const input = wrapper.get('[data-gr-form-file-input]')
+    setInputFiles(input.element as HTMLInputElement, [
+      new File(['a'], 'a.pdf', { type: 'application/pdf' }),
+      new File(['b'], 'b.pdf', { type: 'application/pdf' }),
+      new File(['c'], 'c.pdf', { type: 'application/pdf' }),
+    ])
+    await input.trigger('change')
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+
+    // Значение не изменилось, а ошибка объявлена — как у любого другого правила.
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect(wrapper.get('[data-gr-form-file-errors]').text()).toContain('maxCount=2')
+
+    wrapper.unmount()
   })
 })

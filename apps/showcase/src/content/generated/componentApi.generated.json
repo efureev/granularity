@@ -3020,6 +3020,13 @@
             "default": "undefined"
           },
           {
+            "name": "limit",
+            "description": "Максимум файлов в наборе. Лишние не обрезаются молча — набор отбивается ошибкой.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "validators",
             "description": "",
             "type": "FileValidator[] | undefined",
@@ -3037,6 +3044,13 @@
             "name": "validate",
             "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
             "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "errors",
+            "description": "Контролируемый список ошибок: `v-model:errors`. Задан — показывается он, и внутренняя валидация его не перетирает. Сюда же кладутся ошибки, пришедшие с сервера. Не задан — компонент держит свои ошибки сам.",
+            "type": "FileValidationIssue[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -3084,7 +3098,7 @@
           {
             "name": "errors",
             "description": "",
-            "type": "{ errors: { fileName?: string | undefined; code: FileValidationIssueCode; message: string; meta?: Record<string, unknown> | undefined; i18nKey?: string | undefined; i18nParams?: Record<string, unknown> | undefined; }[]; }"
+            "type": "{ errors: FileValidationIssue[]; }"
           }
         ]
       },
@@ -3110,12 +3124,6 @@
             "description": "",
             "type": "[value: File | File[] | null]",
             "signature": "(event: \"change\", value: File | File[] | null): void"
-          },
-          {
-            "name": "validation",
-            "description": "",
-            "type": "[errors: FileValidationIssue[]]",
-            "signature": "(event: \"validation\", errors: FileValidationIssue[]): void"
           },
           {
             "name": "update:errors",

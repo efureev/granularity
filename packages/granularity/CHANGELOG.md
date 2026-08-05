@@ -32,9 +32,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **`GrFileUpload`: `accept`, `capture`, `directory`**, an `exceed` event, and control over the
   selected set — `retry()`, `removeFile()` and a remove button in `showFileList`, plus `retry` /
   `removeFile` in the slot scopes.
+- **`GrFormFile`: `v-model:errors` and `limit`**, file size in the list, and a remove button that
+  names its file. `maxCountValidator` joins the public `fileValidation` API — `limit` is sugar on
+  top of it.
 
 ### Fixed
 
+- **`GrFormFile` validation errors were invisible to assistive tech.** The error list had no
+  `role="alert"` and was not tied to the control, so "dropped the wrong file type" produced red
+  text and nothing else — on the component whose headline feature is validation. Errors are now
+  announced, referenced from the upload button through `aria-describedby` (next to the field's own
+  description) and reflected in `aria-invalid`. The error text moved from the saturated
+  `--gr-danger` to `--gr-danger-text`, the container no longer dims itself with `opacity-60`, and
+  the validator chain is assembled once instead of being duplicated between the file dialog and
+  drag&drop — the two could drift apart on the first edit.
 - **`GrFileUpload` kept working after it was gone.** Unmounting left the XHR running and the
   "hide progress on success" timer armed, so a finished upload called `emit` on a destroyed
   instance — the everyday case is "upload succeeds, user leaves the page". Both are now released in
@@ -112,6 +123,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrFormFile` no longer emits `validation`.** It carried exactly the same payload as
+  `update:errors`; the remaining channel is `update:errors`, now backed by a real `errors` prop, so
+  `v-model:errors` reads as well as writes.
 - **`gr.dataTable` sort keys replaced.** `sortBy` / `sortedAsc` / `sortedDesc` (sentences with a
   `{column}` placeholder) are gone; the hint is now column-agnostic — `sortAsc` / `sortDesc` /
   `sortNone`. Applications that overrode the old keys need to move their text over.

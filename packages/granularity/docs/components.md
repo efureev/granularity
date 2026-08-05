@@ -48,7 +48,7 @@
 - [`GrFileUpload`](./components/GrFileUpload.md)
 - `GrForm`
 - `GrFormField`
-- `GrFormFile`
+- [`GrFormFile`](./components/GrFormFile.md)
 - `GrFormSection`
 - `GrIcon`
 - `GrImageViewer`

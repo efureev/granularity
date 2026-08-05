@@ -17,6 +17,7 @@ Entrypoint:
 - `acceptValidator`
 - `allowedExtensionsValidator`
 - `allowedMimeTypesValidator`
+- `maxCountValidator`
 - `maxFileSizeBytesValidator`
 - `maxSizeMbValidator`
 - `maxTotalSizeBytesValidator`
@@ -79,6 +80,7 @@ if (result.issues.length > 0) {
 - `allowedMimeTypesValidator` — если важен whitelisting по MIME type.
 - `maxFileSizeBytesValidator` / `maxSizeMbValidator` — если нужно ограничение на размер одного файла.
 - `maxTotalSizeBytesValidator` — если нужно ограничение на суммарный размер набора файлов.
+- `maxCountValidator` — если нужно ограничение на количество файлов в наборе (`limit` у `GrFormFile` — сахар к нему).
 
 ## Связь с `GrFileUpload` и `vDropzone`
 

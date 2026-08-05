@@ -134,7 +134,8 @@
     "remove": "Eliminar",
     "clearAll": "Limpiar todo",
     "placeholder": "Ningún archivo seleccionado",
-    "validateError": "No se pudieron validar los archivos soltados"
+    "validateError": "No se pudieron validar los archivos soltados",
+    "removeFile": "Quitar {fileName}"
   },
   "imageViewer": {
     "close": "Cerrar el visor de imágenes",
@@ -184,6 +185,7 @@
     "mimeTypeFallback": "El archivo «{fileName}» tiene un tipo MIME indefinido «{mimeType}»",
     "maxFileSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
     "maxSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
+    "maxCount": "Se han seleccionado demasiados archivos ({count}), máximo: {maxCount}",
     "maxTotalSize": "El tamaño total de los archivos es demasiado grande ({total} bytes), máximo {maxBytes}"
   }
 }
