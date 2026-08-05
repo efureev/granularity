@@ -4,5 +4,6 @@ import { grLinkSafelist } from './safelist'
 
 export const grLinkConfig = defineGranularComponent(import.meta.url, {
   name: 'GrLink',
+  dependencies: ['GrIcon'],
   safelist: grLinkSafelist,
 })

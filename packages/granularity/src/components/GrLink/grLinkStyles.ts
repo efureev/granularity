@@ -1,6 +1,6 @@
 import type { GrComponentSize } from '../shared/sizes'
 
-import { GR_TONES, type GrTone } from '../shared/tones'
+import type { GrTone } from '../shared/tones'
 
 /**
  * Архитектура цвета GrLink (согласована с остальной GR, ср. GrButton):
@@ -13,8 +13,8 @@ import { GR_TONES, type GrTone } from '../shared/tones'
  *   - `muted` — приглушённый текст (`--gr-muted-fg`) в покое, окрашивается в `tone`
  *     при наведении (вторичные/inline-ссылки в плотных областях).
  *
- * Раньше `variant` смешивал цвет и акцент (`primary/default/muted/muted-primary/danger`).
- * Теперь это ортогональные оси: `tone` × `variant`.
+ * Оси ортогональны намеренно: «красная ссылка» и «приглушённая ссылка» —
+ * независимые решения, и любая их комбинация осмысленна.
  */
 export type GrLinkTone = GrTone
 export type GrLinkVariant = 'default' | 'muted'
@@ -59,7 +59,7 @@ function toneTextColors(tone: string): GrLinkToneColors {
   }
 }
 
-export const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
+const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
   primary: { base: 'var(--gr-primary)', hover: 'var(--gr-primary-hover)', active: 'var(--gr-primary-active)' },
   // Нейтральная ссылка: читаемый `--gr-fg` в покое, акцент `--gr-primary` при наведении.
   neutral: { base: 'var(--gr-fg)', hover: 'var(--gr-primary)', active: 'var(--gr-primary-active)' },
@@ -92,7 +92,11 @@ export function grLinkColorStyle(options: { tone: GrLinkTone, variant: GrLinkVar
   }
 }
 
-export const disabledStateClass = 'cursor-not-allowed opacity-60 text-[var(--gr-muted-fg)]'
+/**
+ * Отключённая ссылка гасится цветом, а не `opacity`: прозрачность разбавляет
+ * выверенный на AA `--gr-muted-fg` и роняет контраст ниже нормы.
+ */
+export const disabledStateClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 
 const UNDERLINE_VALUES: readonly GrLinkUnderline[] = ['auto', 'always', 'none']
 
@@ -119,6 +123,3 @@ export function grLinkClass(options: { size: GrLinkSize, underline: GrLinkUnderl
     .filter(Boolean)
     .join(' ')
 }
-
-// Реэкспорт палитры тонов для потребителей/демо.
-export { GR_TONES }

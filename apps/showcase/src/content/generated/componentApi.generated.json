@@ -4249,6 +4249,20 @@
             "type": "GrLinkUnderline | undefined",
             "required": false,
             "default": "\"auto\""
+          },
+          {
+            "name": "externalIcon",
+            "description": "Иконка внешней ссылки. По умолчанию показывается у любой ссылки, которая открывается в новой вкладке, — не только при `external`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "newTabLabel",
+            "description": "i18n: скрытая подсказка «откроется в новой вкладке».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },

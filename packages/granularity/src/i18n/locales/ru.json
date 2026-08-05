@@ -206,5 +206,8 @@
     "control": "Control",
     "enter": "Enter",
     "escape": "Escape"
+  },
+  "link": {
+    "opensInNewTab": "откроется в новой вкладке"
   }
 }

@@ -205,5 +205,8 @@
     "control": "Control",
     "enter": "Intro",
     "escape": "Escape"
+  },
+  "link": {
+    "opensInNewTab": "se abre en una pestaña nueva"
   }
 }

@@ -37,6 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `separator` управляет разделителем. Символьные клавиши получают скрытое читаемое имя
   (`gr.kbd.*`) — без него диктор произносит `⌘` как значок. Разбор сочетаний переехал в общий
   `components/shared/hotkey.ts`, откуда его берёт и `GrCommandPalette`.
+- **`GrLink` объявляет смену контекста (WCAG 3.2.5).** Ссылка, открывающаяся в новой вкладке,
+  получает иконку внешней ссылки и скрытую подсказку «откроется в новой вкладке» — условием служит
+  фактическое поведение (`target="_blank"`), а не проп `external`, ровно как у автоматического
+  `rel="noopener noreferrer"`. Иконка выключается `:external-icon="false"` и включается вручную для
+  внутренних ссылок; текст подсказки — `newTabLabel` или ключ `gr.link.opensInNewTab`. Заданный
+  `ariaLabel` больше не съедает предупреждение: имя собирается вместе с ним.
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).
@@ -78,6 +84,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   also had no accessible name at all (`aria-dialog-name`), and every image was `alt=""` with no way
   to pass a description. `useZoomPan`, `useWheelGesture` and `useViewerKeyboard` are now covered by
   tests.
+- **`GrLink` гасил отключённую ссылку прозрачностью.** `opacity-60` поверх `--gr-muted-fg` разбавляла
+  выверенный на AA токен и роняла контраст ниже нормы; остался только цвет. Заодно из
+  `grLinkStyles.ts` убран комментарий-история (правило «Комментарии в коде» из `CLAUDE.md`) и снят
+  экспорт `linkToneColors` вместе с лишним реэкспортом `GR_TONES` — оба использовались только внутри
+  модуля, но утекали в публичный `.d.ts`.
 - **`GrKbd` знал только два размера из четырёх.** Проп обещал шкалу пакета (`xs…lg`), а в разметке
   стояло `size === 'sm' ? … : …`: `xs` и `lg` молча рендерились как `md`. Шкала полная, классы уехали в
   `grKbdStyles.ts` с safelist, а компонент вышел из списка неполных шкал в `componentSize.test.ts`.
@@ -194,6 +205,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrLink` с `external` теперь рисует иконку.** Раньше её приходилось вкладывать в слот руками (так
+  и было сделано в витрине). Вид существующих внешних ссылок изменится — вернуть прежний можно
+  пропом `:external-icon="false"`.
 - **`GrImageViewer` renamed the `switch` event to `change`.** The old name came from Element Plus
   and matched nothing else in the package (`update:*` / `change` / `sortChange`). The payload is
   unchanged — the new frame index.

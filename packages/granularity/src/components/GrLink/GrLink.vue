@@ -20,6 +20,10 @@ import { useGrComponentSize } from '../GrConfigProvider/context'
  */
 import { computed, markRaw, useAttrs, type Component } from 'vue'
 
+import GrIcon from '../GrIcon/GrIcon.vue'
+import IconExternal from '~icons/lucide/external-link'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+
 import {
   baseRootClass,
   focusRingClass,
@@ -53,6 +57,13 @@ const props = withDefaults(defineProps<{
   variant?: GrLinkVariant
   underline?: GrLinkUnderline
   size?: GrLinkSize
+  /**
+   * Иконка внешней ссылки. По умолчанию показывается у любой ссылки, которая
+   * открывается в новой вкладке, — не только при `external`.
+   */
+  externalIcon?: boolean
+  /** i18n: скрытая подсказка «откроется в новой вкладке». */
+  newTabLabel?: string
 }>(), {
   as: undefined,
   href: undefined,
@@ -65,6 +76,8 @@ const props = withDefaults(defineProps<{
   variant: 'default',
   underline: 'auto',
   size: undefined,
+  externalIcon: undefined,
+  newTabLabel: undefined,
 })
 
 const attrs = useAttrs()
@@ -108,6 +121,31 @@ const resolvedRel = computed(() => {
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrLink' })
 
+const { t } = useGranularityTranslations()
+
+/**
+ * Смена контекста должна быть объявлена (WCAG 3.2.5). Условие — ссылка реально
+ * открывается в новой вкладке, а не наличие пропа `external`: `target="_blank"`
+ * снаружи даёт ровно тот же сюрприз (та же генерализация, что у `rel`).
+ */
+const opensInNewTab = computed(() => isInteractive.value && resolvedTarget.value === '_blank')
+const newTabHint = computed(() => props.newTabLabel ?? t('gr.link.opensInNewTab', 'opens in a new tab'))
+
+const showExternalIcon = computed(() => props.externalIcon ?? opensInNewTab.value)
+
+/**
+ * `aria-label` перекрывает содержимое целиком — вместе со скрытой подсказкой.
+ * Поэтому, если имя задано руками, подсказка дописывается к нему.
+ */
+const resolvedAriaLabel = computed(() => {
+  if (!props.ariaLabel)
+    return undefined
+
+  return opensInNewTab.value ? `${props.ariaLabel}, ${newTabHint.value}` : props.ariaLabel
+})
+
+const iconSize = computed(() => (resolvedSize.value === 'lg' ? 'sm' : 'xs'))
+
 const rootClass = computed(() => {
   const variantClass = grLinkClass({
     size: resolvedSize.value,
@@ -137,11 +175,18 @@ const colorStyle = computed(() => grLinkColorStyle({
     :href="isInteractive ? href : undefined"
     :target="isInteractive ? resolvedTarget : undefined"
     :rel="isInteractive ? resolvedRel : undefined"
-    :aria-label="ariaLabel"
+    :aria-label="resolvedAriaLabel"
     :aria-disabled="disabled ? 'true' : undefined"
     :class="rootClass"
     :style="colorStyle"
   >
     <slot />
+
+    <GrIcon v-if="showExternalIcon" :size="iconSize" aria-hidden="true">
+      <IconExternal />
+    </GrIcon>
+
+    <!-- Подсказка не дублируется, когда её уже вобрал `aria-label`. -->
+    <span v-if="opensInNewTab && !ariaLabel" class="sr-only">({{ newTabHint }})</span>
   </component>
 </template>

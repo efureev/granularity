@@ -30,24 +30,34 @@ import { GrLink } from '@feugene/granularity'
   },
   {
     id: 'link-external',
-    title: 'External navigation and inline icon',
-    description: 'Показываем `external`-режим и composition с `GrIcon`, чтобы закрепить contract для внешних docs/source links.',
+    title: 'Внешние ссылки и смена контекста',
+    description: 'Ссылка, открывающаяся в новой вкладке, сама получает иконку, безопасный `rel` и скрытое предупреждение о смене контекста (WCAG 3.2.5).',
     status: 'ready',
     previewKey: 'gr-link-external',
     code: `<script setup lang="ts">
-import { GrIcon, GrLink } from '@feugene/granularity'
+import { GrLink } from '@feugene/granularity'
 </script>
 
 <template>
-  <GrLink href="https://example.com/docs/showcase" external size="md">
-    Open external documentation
-    <GrIcon size="sm">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-full w-full">
-        <path d="M7 17 17 7" />
-        <path d="M9 7h8v8" />
-      </svg>
-    </GrIcon>
-  </GrLink>
+  <div class="grid gap-3 text-sm">
+    <GrLink href="https://example.com/docs/showcase" external size="md">
+      Open external documentation
+    </GrLink>
+
+    <!-- Условие — фактическое поведение ссылки, а не проп \`external\`. -->
+    <GrLink href="https://example.com/changelog" target="_blank" size="md">
+      Changelog в новой вкладке
+    </GrLink>
+
+    <GrLink href="https://example.com/rss" external :external-icon="false" size="md">
+      Без иконки, но с предупреждением для скринридера
+    </GrLink>
+
+    <div class="rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-muted-fg)]">
+      Ссылка, открывающаяся в новой вкладке, сама получает иконку, безопасный \`rel\` и скрытую
+      подсказку «откроется в новой вкладке» — предупреждение о смене контекста (WCAG 3.2.5).
+    </div>
+  </div>
 </template>`,
   },
   {
