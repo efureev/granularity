@@ -2523,15 +2523,8 @@
             "default": "undefined"
           },
           {
-            "name": "onExceed",
-            "description": "",
-            "type": "((files: File[], limit: number) => void) | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "beforeUpload",
-            "description": "",
+            "description": "Guard перед отправкой. Остаётся пропом, а не эмитом, осознанно: эмит не возвращает значения, а этот колбэк обязан ответить «пускать или нет». Уведомления — `exceed`, `success`, `error`, `progress` — эмиты.",
             "type": "((file: File) => boolean | Promise<unknown>) | undefined",
             "required": false,
             "default": "undefined"
@@ -2542,6 +2535,27 @@
             "type": "FileValidator[] | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "accept",
+            "description": "W3C `accept` для `<input type=\"file\">` — и sugar к `acceptValidator(...)`. Только атрибута мало: он фильтрует системный диалог, но не drag&drop — перетащить можно что угодно. Поэтому то же значение уходит и в валидаторы, как в `GrFormFile`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "capture",
+            "description": "`capture` для мобильной камеры/микрофона.",
+            "type": "\"user\" | \"environment\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "directory",
+            "description": "Выбор каталога целиком (`webkitdirectory`). Поддержка — Chromium и Safari.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "headers",
@@ -2609,7 +2623,7 @@
           {
             "name": "default",
             "description": "",
-            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; }"
+            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; }"
           },
           {
             "name": "label",
@@ -2624,7 +2638,7 @@
           {
             "name": "progress",
             "description": "",
-            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"idle\" | \"uploading\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; }"
+            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"idle\" | \"uploading\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; retry: () => Promise<void>; }"
           }
         ]
       },
@@ -2662,6 +2676,12 @@
             "description": "",
             "type": "[percent: number, info?: GrUploadProgressInfo | undefined]",
             "signature": "(event: \"progress\", percent: number, info?: GrUploadProgressInfo | undefined): void"
+          },
+          {
+            "name": "exceed",
+            "description": "",
+            "type": "[files: File[], limit: number]",
+            "signature": "(event: \"exceed\", files: File[], limit: number): void"
           }
         ]
       },
@@ -2699,6 +2719,21 @@
             "name": "state",
             "description": "",
             "type": "GrUploadState"
+          },
+          {
+            "name": "files",
+            "description": "Текущий набор файлов — тот, что показан в списке и уйдёт в `retry`.",
+            "type": "{ readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]"
+          },
+          {
+            "name": "retry",
+            "description": "",
+            "type": "() => Promise<void>"
+          },
+          {
+            "name": "removeFile",
+            "description": "",
+            "type": "(file: File) => void"
           }
         ]
       }
@@ -2992,16 +3027,16 @@
             "default": "undefined"
           },
           {
-            "name": "validate",
-            "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
-            "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",
+            "name": "accept",
+            "description": "W3C `accept` для `<input type=\"file\">` + sugar к `acceptValidator(...)`.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "accept",
-            "description": "W3C `accept` для `<input type=\"file\">` + sugar к `acceptValidator(...)`.",
-            "type": "string | undefined",
+            "name": "validate",
+            "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
+            "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -3531,7 +3566,7 @@
           {
             "name": "inputmode",
             "description": "",
-            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "type": "\"search\" | \"text\" | \"none\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4424,7 +4459,7 @@
           {
             "name": "inputmode",
             "description": "",
-            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "type": "\"search\" | \"text\" | \"none\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "\"decimal\""
           },
@@ -5750,16 +5785,16 @@
         "origin": "generated",
         "items": [
           {
-            "name": "dismiss",
-            "description": "",
-            "type": "[]",
-            "signature": "(event: \"dismiss\"): void"
-          },
-          {
             "name": "retry",
             "description": "",
             "type": "[error: ResponseErrorInfo]",
             "signature": "(event: \"retry\", error: ResponseErrorInfo): void"
+          },
+          {
+            "name": "dismiss",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"dismiss\"): void"
           }
         ]
       },
@@ -7602,7 +7637,7 @@
           {
             "name": "filterInputmode",
             "description": "",
-            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "type": "\"search\" | \"text\" | \"none\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "undefined"
           },

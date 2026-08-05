@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Comment, computed, Fragment, nextTick, reactive, ref, Text, useSlots, type VNode } from 'vue'
+import { Comment, computed, Fragment, nextTick, onBeforeUnmount, reactive, ref, Text, useSlots, type VNode } from 'vue'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
+import IconClose from '~icons/lucide/x'
 
 import GrIcon from '../GrIcon/GrIcon.vue'
 import GrProgressBar from '../GrProgressBar/GrProgressBar.vue'
@@ -22,7 +23,7 @@ import {
   zoneGaps,
   zonePaddings,
 } from './grFileUploadStyles'
-import { FileValidationError, runFileValidators } from '../../fileValidation'
+import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { GR_UPLOAD_STATE_IDLE } from './uploadState'
 import { useGrFormFieldContext } from '../GrFormField/context'
@@ -60,9 +61,25 @@ export interface GrFileUploadProps {
   name?: string
   multiple?: boolean
   limit?: number
-  onExceed?: (files: File[], limit: number) => void
+  /**
+   * Guard перед отправкой. Остаётся пропом, а не эмитом, осознанно: эмит не
+   * возвращает значения, а этот колбэк обязан ответить «пускать или нет».
+   * Уведомления — `exceed`, `success`, `error`, `progress` — эмиты.
+   */
   beforeUpload?: (file: File) => boolean | Promise<unknown>
   validators?: FileValidator[]
+  /**
+   * W3C `accept` для `<input type="file">` — и sugar к `acceptValidator(...)`.
+   *
+   * Только атрибута мало: он фильтрует системный диалог, но не drag&drop —
+   * перетащить можно что угодно. Поэтому то же значение уходит и в валидаторы,
+   * как в `GrFormFile`.
+   */
+  accept?: string
+  /** `capture` для мобильной камеры/микрофона. */
+  capture?: 'user' | 'environment'
+  /** Выбор каталога целиком (`webkitdirectory`). Поддержка — Chromium и Safari. */
+  directory?: boolean
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
@@ -98,9 +115,11 @@ const props = withDefaults(
     name: 'file',
     multiple: false,
     limit: undefined,
-    onExceed: undefined,
     beforeUpload: undefined,
     validators: undefined,
+    accept: undefined,
+    capture: undefined,
+    directory: false,
     disabled: false,
     readonly: false,
     invalid: false,
@@ -131,6 +150,8 @@ const progressTextClass = computed(() => progressTextSizes[resolvedSize.value])
 const progressBarSize = computed(() => progressBarSizes[resolvedSize.value])
 
 const emit = defineEmits<{
+  /** Выбрано больше файлов, чем разрешает `limit`. Загрузка не стартует. */
+  (e: 'exceed', files: File[], limit: number): void
   (e: 'success', payload: any): void
   (e: 'error', error: unknown): void
   (e: 'progress', percent: number, info?: GrUploadProgressInfo): void
@@ -293,6 +314,10 @@ function abort() {
   activeController = null
 }
 
+function totalSizeOf(files: File[]): number {
+  return files.reduce((sum, file) => sum + file.size, 0)
+}
+
 function normalizeLimit(limit: number | undefined): number | undefined {
   if (typeof limit !== 'number') return undefined
   if (!Number.isFinite(limit)) return undefined
@@ -337,21 +362,43 @@ async function runBeforeUpload(files: File[]): Promise<'ok' | { aborted: true; r
   return 'ok'
 }
 
+/**
+ * `accept` идёт первым валидатором: атрибут на input фильтрует только диалог,
+ * а drop мимо него проходит.
+ */
+function effectiveValidators(): FileValidator[] {
+  return [acceptValidator(props.accept), ...(props.validators ?? [])]
+}
+
+/**
+ * Номер запуска. Валидация и `beforeUpload` асинхронны, поэтому два быстрых
+ * выбора подряд идут внахлёст: без номера «побеждал» тот, чьи валидаторы
+ * отработали позже, — он же обрывал уже стартовавшую загрузку соседа.
+ * Актуален всегда последний выбор, остальные тихо сходят с дистанции.
+ */
+let runCounter = 0
+
 async function handleFiles(files: File[], source: FileValidatorSource = 'input') {
   if (props.disabled) return
   if (!files.length) return
 
+  runCounter += 1
+  const runId = runCounter
+  const isStale = (): boolean => runId !== runCounter
+
   const normalizedLimit = normalizeLimit(props.limit)
   if (props.multiple && normalizedLimit && files.length > normalizedLimit) {
-    props.onExceed?.(files, normalizedLimit)
+    emit('exceed', files, normalizedLimit)
     emit('error', new Error(`Too many files selected, limit=${normalizedLimit}`))
     return
   }
 
-  const { files: valid, issues } = await runFileValidators(files, props.validators ?? [], {
+  const { files: valid, issues } = await runFileValidators(files, effectiveValidators(), {
     source,
     multiple: props.multiple,
   })
+
+  if (isStale()) return
 
   if (issues.length > 0) {
     emit('error', new FileValidationError(issues, valid))
@@ -363,6 +410,8 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   lastFiles.value = valid
 
   const before = await runBeforeUpload(valid)
+  if (isStale()) return
+
   if (before !== 'ok') {
     emit('error', before.reason)
     return
@@ -390,7 +439,11 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
       ? await props.request(valid, { signal: controller.signal, extraData, onProgress: handleProgress })
       : await uploadViaAction(valid, controller.signal, extraData)
 
-    const finalLoaded = state.phase === 'uploading' ? state.total || state.loaded : 0
+    // Кастомный `request` не обязан звать `onProgress` — тогда байты неизвестны.
+    // Сумма размеров выбранных файлов честнее нуля: «100%» при `total: 0`
+    // потребитель прочитает как «загружено ноль».
+    const measured = state.phase === 'uploading' ? state.total || state.loaded : 0
+    const finalLoaded = measured || totalSizeOf(valid)
     setStateSuccess({ loaded: finalLoaded, total: finalLoaded })
     emit('success', payload)
     emit('change', valid)
@@ -478,12 +531,64 @@ const effectiveProgressTone = computed<GrProgressBarTone>(() => {
   return props.progressTone
 })
 
+/**
+ * Живой регион существует с первого рендера и пуст, пока объявлять нечего:
+ * регион, появляющийся сразу с текстом, часть AT не объявляет вовсе. Прогресс
+ * в процентах сюда не идёт — диктор захлебнётся; объявляются только фазы.
+ */
+const liveMessage = computed(() => {
+  if (state.phase === 'uploading') return t('gr.fileUpload.uploading', 'Uploading…')
+  if (state.phase === 'success') return t('gr.fileUpload.success', 'Upload complete')
+  if (state.phase === 'error') return t('gr.fileUpload.error', 'Upload failed')
+  return ''
+})
+
 const progressVisible = computed(() => state.phase !== 'idle')
 const progressPercent = computed(() => (state.phase === 'uploading' && state.indeterminate ? 0 : state.percent))
 const progressText = computed(() => {
   if (state.phase === 'uploading' && state.indeterminate) return ''
   return `${Math.round(progressPercent.value)}%`
 })
+
+/**
+ * Стабильный ключ файла для списка. По имени ключ дублировался: два
+ * одноимённых файла из разных папок ломали переиспользование `<li>` — заметно
+ * стало ровно тогда, когда в строке появилась кнопка удаления.
+ */
+const fileKeys = new WeakMap<File, string>()
+let fileKeyCounter = 0
+
+function fileKey(file: File): string {
+  const existing = fileKeys.get(file)
+  if (existing !== undefined) return existing
+
+  fileKeyCounter += 1
+  const key = `gr-file-${fileKeyCounter}`
+  fileKeys.set(file, key)
+  return key
+}
+
+/** Повторить загрузку текущего набора — после ошибки выбирать файлы заново незачем. */
+async function retry(): Promise<void> {
+  if (!lastFiles.value.length) return
+
+  await handleFiles([...lastFiles.value], 'input')
+}
+
+/**
+ * Убрать файл из набора. Идущая загрузка при этом обрывается: она была про
+ * прежний набор, и её результат к новому отношения не имеет.
+ */
+function removeFile(file: File): void {
+  const next = lastFiles.value.filter(item => item !== file)
+  if (next.length === lastFiles.value.length) return
+
+  abort()
+  clearHideSuccessTimer()
+  lastFiles.value = next
+
+  if (state.phase !== 'idle') setStateIdle()
+}
 
 function focus(): void {
   inputRef.value?.focus()
@@ -493,6 +598,14 @@ function blur(): void {
   inputRef.value?.blur()
 }
 
+// Незакрытые хвосты компонента: XHR продолжал качать файл, а таймер скрытия
+// успеха — дёргать `setStateIdle()` уже на уничтоженном инстансе. Классический
+// сценарий: успешная загрузка и уход со страницы сразу после неё.
+onBeforeUnmount(() => {
+  clearHideSuccessTimer()
+  abort()
+})
+
 defineExpose({
   focus,
   blur,
@@ -500,6 +613,10 @@ defineExpose({
   abort,
   openDialog,
   state,
+  /** Текущий набор файлов — тот, что показан в списке и уйдёт в `retry`. */
+  files: lastFiles,
+  retry,
+  removeFile,
 })
 </script>
 
@@ -554,10 +671,20 @@ defineExpose({
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
       :name="name"
+      :accept="accept"
+      :capture="capture"
+      :webkitdirectory="directory || undefined"
       :multiple="multiple"
       :disabled="disabled"
       @change="onInputChange"
     >
+
+    <span
+      data-gr-file-upload-live
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    >{{ liveMessage }}</span>
 
     <slot
       v-if="hasCustomUi"
@@ -567,6 +694,8 @@ defineExpose({
       :files="lastFiles"
       :is-over="isOver"
       :state="state"
+      :retry="retry"
+      :remove-file="removeFile"
     />
 
     <div v-else class="flex items-start" :class="zoneGapClass">
@@ -598,12 +727,25 @@ defineExpose({
         <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 space-y-1">
           <li
             v-for="file in lastFiles"
-            :key="file.name"
+            :key="fileKey(file)"
             data-gr-file-upload-item
+            class="flex items-center gap-2"
             :class="hintClass"
           >
             <span class="font-600">{{ file.name }}</span>
             <span class="text-[var(--gr-muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
+            <button
+              v-if="!disabled && !isReadonly"
+              data-gr-file-upload-remove
+              type="button"
+              class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
+              :aria-label="t('gr.fileUpload.remove', 'Remove {fileName}', { fileName: file.name })"
+              @click.stop="removeFile(file)"
+            >
+              <GrIcon :size="iconGlyphSize" aria-hidden="true">
+                <IconClose />
+              </GrIcon>
+            </button>
           </li>
         </ul>
 
@@ -616,6 +758,7 @@ defineExpose({
           :phase="state.phase"
           :files="lastFiles"
           :abort="abort"
+          :retry="retry"
         >
           <div
             v-if="showProgress"

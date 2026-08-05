@@ -38,7 +38,7 @@ describe('component docs metadata', () => {
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
-    expect(fileUploadDoc.examples).toHaveLength(7)
+    expect(fileUploadDoc.examples).toHaveLength(8)
     expect(fileUploadDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(fileUploadDoc.examples.every(example => example.previewKey?.startsWith('gr-file-upload'))).toBe(true)
   })

@@ -10,6 +10,7 @@ export const grFileUploadExamples: ShowcaseComponentExampleDoc[] = [
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
+import type { GrFileUploadExtraData, GrFileUploadRequestCtx } from '@feugene/granularity'
 import {
   GrFileUpload,
   acceptValidator,
@@ -18,23 +19,50 @@ import {
 
 const lastResult = ref('No uploads yet')
 
-async function request(files: File[], ctx: { extraData?: Record<string, string> }) {
-  await new Promise(resolve => setTimeout(resolve, 300))
+async function request(files: File[], ctx: GrFileUploadRequestCtx) {
+  await new Promise(resolve => window.setTimeout(resolve, 250))
+
   return {
     count: files.length,
     names: files.map(file => file.name),
     extraData: ctx.extraData,
   }
 }
+
+function onSuccess(payload: { count: number; names: string[]; extraData?: GrFileUploadExtraData }) {
+  const bucketValue = payload.extraData?.bucket
+  const bucketLabel = typeof bucketValue === 'string' ? bucketValue : 'n/a'
+  lastResult.value = \`uploaded \${payload.count} file(s): \${payload.names.join(', ') || '—'} · bucket=\${bucketLabel}\`
+}
+
+function onError(error: unknown) {
+  lastResult.value = error instanceof Error ? error.message : String(error)
+}
 </script>
 
 <template>
-  <GrFileUpload
-    :request="request"
-    :validators="[acceptValidator('image/*,.pdf'), maxSizeMbValidator(2)]"
-    :upload-extra-data="() => ({ bucket: 'showcase' })"
-    show-file-list
-  />
+  <div class="grid gap-3">
+    <GrFileUpload
+      :request="request"
+      :validators="[acceptValidator('image/*,.pdf'), maxSizeMbValidator(2)]"
+      :upload-extra-data="() => ({ bucket: 'showcase' })"
+      show-file-list
+      @success="onSuccess"
+      @error="onError"
+    >
+      <template #label>
+        Upload a file for validation demo
+      </template>
+
+      <template #tip>
+        image/* or .pdf · max 2 Mb
+      </template>
+    </GrFileUpload>
+
+    <div class="text-sm text-[var(--gr-muted-fg)]">
+      {{ lastResult }}
+    </div>
+  </div>
 </template>`,
     note: 'Покрывает основной integration-case между компонентом и utility-слоем `fileValidation`.',
   },
@@ -49,22 +77,38 @@ import { ref } from 'vue'
 
 import { GrButton, GrFileUpload } from '@feugene/granularity'
 
+type GrFileUploadInstance = InstanceType<typeof GrFileUpload>
+
+const uploader = ref<GrFileUploadInstance | null>(null)
 const files = ref<string[]>([])
 
 async function request(selected: File[]) {
   files.value = selected.map(file => file.name)
   return { uploaded: selected.length }
 }
+
+function openFileDialog() {
+  uploader.value?.openDialog()
+}
 </script>
 
 <template>
-  <GrFileUpload :request="request">
-    <template #default="{ openDialog }">
-      <GrButton type="button" @click="openDialog">
-        Select files
-      </GrButton>
-    </template>
-  </GrFileUpload>
+  <div class="grid gap-3">
+    <GrFileUpload ref="uploader" :request="request">
+      <div class="flex flex-wrap items-center gap-3">
+        <GrButton type="button" @click="openFileDialog">
+          Select files
+        </GrButton>
+        <span class="text-sm text-[var(--gr-muted-fg)]">
+          {{ files.length ? files.join(', ') : 'No files selected yet' }}
+        </span>
+      </div>
+    </GrFileUpload>
+
+    <div class="text-sm text-[var(--gr-muted-fg)]">
+      В этом режиме библиотека отвечает за file-handling, а триггер можно строить из любых UI primitives пакета.
+    </div>
+  </div>
 </template>`,
   },
   {
@@ -78,26 +122,51 @@ import { ref } from 'vue'
 
 import { GrFileUpload } from '@feugene/granularity'
 
-const message = ref('Try selecting more than one file')
+const message = ref('Try selecting more than one file in the active uploader')
 
 async function request(files: File[]) {
-  message.value = 'Uploaded ' + files.length + ' file(s)'
+  message.value = \`Uploaded \${files.length} file(s)\`
   return { ok: true }
 }
 
 function onExceed(files: File[], limit: number) {
-  message.value = 'Received ' + files.length + ' files, limit is ' + limit
+  message.value = \`Received \${files.length} files, limit is \${limit}\`
 }
 </script>
 
 <template>
-  <GrFileUpload
-    :request="request"
-    :limit="1"
-    :on-exceed="onExceed"
-  />
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid gap-2">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
+        Limit guard
+      </div>
+      <GrFileUpload
+        :request="request"
+        multiple
+        :limit="1"
+        :on-exceed="onExceed"
+      >
+        <template #tip>
+          Limit is 1 file
+        </template>
+      </GrFileUpload>
+    </div>
 
-  <GrFileUpload disabled :request="request" />
+    <div class="grid gap-2">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
+        Disabled state
+      </div>
+      <GrFileUpload disabled :request="request">
+        <template #tip>
+          Interactions are blocked in disabled mode
+        </template>
+      </GrFileUpload>
+    </div>
+
+    <div class="lg:col-span-2 text-sm text-[var(--gr-muted-fg)]">
+      {{ message }}
+    </div>
+  </div>
 </template>`,
     note: 'Не-happy-path нужен отдельно, чтобы быстро проверить доступность, disable-state и защиту от превышения лимита.',
   },
@@ -111,11 +180,15 @@ function onExceed(files: File[], limit: number) {
 import { ref } from 'vue'
 
 import { GrFileUpload } from '@feugene/granularity'
-import type { GrFileUploadRequestCtx, GrUploadState } from '@feugene/granularity'
+import type { GrFileUploadRequestCtx } from '@feugene/granularity'
 
 const lastPercent = ref(0)
-const phase = ref<GrUploadState['phase']>('idle')
+const phase = ref<'idle' | 'uploading' | 'success' | 'error'>('idle')
 
+/**
+ * Имитация загрузки с реальным прогрессом: пользовательский \`request\` вызывает
+ * \`ctx.onProgress\` так же, как это делает \`axios.onUploadProgress\` или \`xhr.upload.onprogress\`.
+ */
 async function request(files: File[], ctx: GrFileUploadRequestCtx) {
   const total = files.reduce((sum, file) => sum + file.size, 0) || 1
   let loaded = 0
@@ -135,15 +208,35 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
 
   return { uploaded: files.length }
 }
+
+function onProgress(percent: number) {
+  lastPercent.value = percent
+}
+
+function onStateChange(state: { phase: 'idle' | 'uploading' | 'success' | 'error' }) {
+  phase.value = state.phase
+}
 </script>
 
 <template>
-  <GrFileUpload
-    :request="request"
-    multiple
-    @progress="(percent) => (lastPercent = percent)"
-    @state-change="(state) => (phase = state.phase)"
-  />
+  <div class="grid gap-3">
+    <GrFileUpload
+      :request="request"
+      multiple
+      @progress="onProgress"
+      @state-change="onStateChange"
+    />
+
+    <div class="text-sm text-[var(--gr-muted-fg)] tabular-nums">
+      phase: <strong>{{ phase }}</strong> · last progress: <strong>{{ Math.round(lastPercent) }}%</strong>
+    </div>
+
+    <div class="text-sm text-[var(--gr-muted-fg)]">
+      Дефолтный \`GrProgressBar\` рендерится в зарезервированной зоне — переключение
+      \`idle ↔ uploading ↔ success\` не вызывает layout shift. Прогресс приходит из
+      \`ctx.onProgress\`, который пользователь сам вызывает в своём \`request\`.
+    </div>
+  </div>
 </template>`,
     note: 'Покрывает связку `ctx.onProgress` → `state-change` → дефолтный `GrProgressBar`. Без слотов.',
   },
@@ -155,20 +248,80 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
     previewKey: 'gr-file-upload-progress-slot',
     code: `<script setup lang="ts">
 import { GrButton, GrFileUpload } from '@feugene/granularity'
-import type { GrFileUploadRequestCtx } from '@feugene/granularity'
+import type { GrFileUploadRequestCtx, GrUploadState } from '@feugene/granularity'
 
+/**
+ * Кастомный UI прогресса через scoped-слот \`progress\`.
+ * Полностью отключаем дефолтный \`GrProgressBar\` через \`:show-progress="false"\`.
+ */
 async function request(files: File[], ctx: GrFileUploadRequestCtx) {
-  // … вызывает ctx.onProgress(...) по мере загрузки
-  return { ok: true }
+  const total = files.reduce((sum, file) => sum + file.size, 0) || 1
+  let loaded = 0
+  const step = Math.max(1, Math.floor(total / 25))
+
+  while (loaded < total) {
+    if (ctx.signal.aborted) throw new Error('aborted')
+    await new Promise(resolve => setTimeout(resolve, 60))
+    loaded = Math.min(total, loaded + step)
+    ctx.onProgress?.({
+      percent: (loaded / total) * 100,
+      loaded,
+      total,
+      indeterminate: false,
+    })
+  }
+
+  return { uploaded: files.length }
+}
+
+function phaseLabel(state: GrUploadState): string {
+  if (state.phase === 'uploading') return state.indeterminate ? 'Sending…' : 'Uploading'
+  if (state.phase === 'success') return 'Done'
+  if (state.phase === 'error') return 'Failed'
+  return 'Idle'
 }
 </script>
 
 <template>
-  <GrFileUpload :request="request" :show-progress="false" multiple>
+  <GrFileUpload
+    :request="request"
+    :show-progress="false"
+    multiple
+  >
     <template #progress="{ percent, indeterminate, phase, abort }">
-      <div v-if="phase !== 'idle'" class="flex items-center gap-3">
-        <span class="tabular-nums">{{ indeterminate ? '…' : Math.round(percent) + '%' }}</span>
-        <GrButton v-if="phase === 'uploading'" size="sm" variant="ghost" @click="abort">
+      <div
+        v-if="phase !== 'idle'"
+        class="mt-3 flex items-center gap-3 rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] p-3"
+      >
+        <div
+          class="relative h-10 w-10 shrink-0 rounded-full"
+          :style="{
+            background: indeterminate
+              ? 'conic-gradient(var(--gr-primary) 0 25%, var(--gr-muted) 0)'
+              : \`conic-gradient(var(--gr-primary) 0 \${percent}%, var(--gr-muted) 0)\`,
+            transition: 'background 120ms linear',
+          }"
+        >
+          <div class="absolute inset-1 rounded-full bg-[var(--gr-bg)] grid place-items-center text-[10px] tabular-nums">
+            {{ indeterminate ? '…' : \`\${Math.round(percent)}%\` }}
+          </div>
+        </div>
+
+        <div class="flex-1 text-sm">
+          <div class="font-medium">
+            {{ phaseLabel({ phase, percent, indeterminate } as GrUploadState) }}
+          </div>
+          <div class="text-[var(--gr-muted-fg)]">
+            Custom circular indicator via <code>#progress</code> slot
+          </div>
+        </div>
+
+        <GrButton
+          v-if="phase === 'uploading'"
+          size="sm"
+          variant="ghost"
+          @click="abort"
+        >
           Cancel
         </GrButton>
       </div>
@@ -184,16 +337,54 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
     status: 'ready',
     previewKey: 'gr-file-upload-action-xhr',
     code: `<script setup lang="ts">
+import { ref } from 'vue'
+
 import { GrFileUpload } from '@feugene/granularity'
+import type { GrUploadState } from '@feugene/granularity'
+
+/**
+ * Сценарий \`action\`: компонент сам шлёт POST \`multipart/form-data\` через XHR.
+ * \`xhr.upload.onprogress\` даёт реальный процент без какого-либо кода со стороны
+ * пользователя. Здесь используется публичный echo-endpoint — для просмотра
+ * прогресса лучше загружать файлы потяжелее.
+ */
+const ENDPOINT = 'https://httpbin.org/post'
+
+const phase = ref<GrUploadState['phase']>('idle')
+const lastError = ref<string | null>(null)
+
+function onStateChange(state: GrUploadState) {
+  phase.value = state.phase
+  if (state.phase !== 'error') lastError.value = null
+}
+
+function onError(error: unknown) {
+  lastError.value = error instanceof Error ? error.message : String(error)
+}
 </script>
 
 <template>
-  <GrFileUpload
-    action="https://httpbin.org/post"
-    name="file"
-    multiple
-    :upload-extra-data="() => ({ source: 'granularity-showcase' })"
-  />
+  <div class="grid gap-3">
+    <GrFileUpload
+      :action="ENDPOINT"
+      name="file"
+      multiple
+      :upload-extra-data="() => ({ source: 'granularity-showcase' })"
+      @state-change="onStateChange"
+      @error="onError"
+    />
+
+    <div class="text-sm text-[var(--gr-muted-fg)] tabular-nums">
+      phase: <strong>{{ phase }}</strong>
+      <span v-if="lastError" class="text-[var(--danger)]"> · {{ lastError }}</span>
+    </div>
+
+    <div class="text-sm text-[var(--gr-muted-fg)]">
+      Endpoint: <code>{{ ENDPOINT }}</code>. Прогресс приходит из
+      <code>XMLHttpRequest.upload.onprogress</code>, отмена — через
+      внутренний <code>AbortController</code>.
+    </div>
+  </div>
 </template>`,
     note: 'Подтверждает миграцию с `fetch` на `XMLHttpRequest`: для action-режима теперь доступен реальный процент. Для просмотра прогресса используй файлы >1 МБ.',
   },
@@ -221,6 +412,65 @@ const sizes = ['xs', 'sm', 'md', 'lg'] as const
           PDF or PNG, up to 10 MB
         </template>
       </GrFileUpload>
+    </div>
+  </div>
+</template>`,
+  },
+  {
+    id: 'file-upload-retry',
+    title: 'Accept, remove and retry',
+    description: '`accept` фильтрует и диалог, и перетаскивание; набор файлов после ошибки остаётся, лишний убирается из списка, а `retry()` повторяет загрузку без повторного выбора.',
+    status: 'ready',
+    previewKey: 'gr-file-upload-retry',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrButton, GrFileUpload } from '@feugene/granularity'
+
+type GrFileUploadInstance = InstanceType<typeof GrFileUpload>
+
+const uploader = ref<GrFileUploadInstance>()
+const failNext = ref(true)
+const status = ref('—')
+
+// Первая попытка падает намеренно: показываем, что после ошибки набор файлов
+// остаётся и повторить можно без повторного выбора.
+async function request(files: File[]): Promise<{ ok: true }> {
+  await new Promise(resolve => setTimeout(resolve, 600))
+
+  if (failNext.value) {
+    failNext.value = false
+    throw new Error(\`Server rejected \${files.length} file(s)\`)
+  }
+
+  return { ok: true }
+}
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrFileUpload
+      ref="uploader"
+      :request="request"
+      accept="image/*,.pdf"
+      multiple
+      show-file-list
+      @error="status = String($event)"
+      @success="status = 'uploaded'"
+    />
+
+    <div class="flex flex-wrap items-center gap-3">
+      <GrButton size="sm" variant="outline" @click="uploader?.retry()">
+        Retry upload
+      </GrButton>
+      <span class="text-sm text-[var(--gr-muted-fg)]">
+        Status: <span class="font-semibold text-[var(--gr-fg)]">{{ status }}</span>
+      </span>
+    </div>
+
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] p-3 text-sm text-[var(--gr-muted-fg)]">
+      \`accept\` фильтрует и системный диалог, и перетаскивание. Лишний файл убирается крестиком в списке —
+      повтор уйдёт уже без него.
     </div>
   </div>
 </template>`,

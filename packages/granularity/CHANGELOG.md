@@ -29,9 +29,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   emits `select`; items gained `role="menuitemcheckbox"` / `menuitemradio` with `aria-checked`,
   plus `icon` and `shortcut` (props or slots). Composition of the sub-components stays for
   everything a model cannot express.
+- **`GrFileUpload`: `accept`, `capture`, `directory`**, an `exceed` event, and control over the
+  selected set — `retry()`, `removeFile()` and a remove button in `showFileList`, plus `retry` /
+  `removeFile` in the slot scopes.
 
 ### Fixed
 
+- **`GrFileUpload` kept working after it was gone.** Unmounting left the XHR running and the
+  "hide progress on success" timer armed, so a finished upload called `emit` on a destroyed
+  instance — the everyday case is "upload succeeds, user leaves the page". Both are now released in
+  `onBeforeUnmount`.
+- **`GrFileUpload` ignored `accept` and lost races.** The attribute was never bound, so a consumer's
+  `accept` landed on the root `<div>` and the file dialog showed everything; it is now a prop that
+  goes both to the input and into the validator chain (the dialog filters, drag&drop does not).
+  Two quick selections in a row overlapped: the one whose validators finished *later* won and
+  aborted the upload already started by the newer one — each run now carries a sequence number.
+  A custom `request` that never calls `onProgress` no longer reports "100%" with `total: 0`, the
+  file list keys by identity instead of by name, and the upload phase is announced through a live
+  region.
 - **`GrDropdownMenu` wrappers broke the menu pattern.** `role="menu"` on the panel makes every
   descendant presentational, so the list, columns, column, group and header divs sitting between
   the panel and its items violated `aria-required-children` — the items lost their menu. They are

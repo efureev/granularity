@@ -121,7 +121,12 @@
   },
   "fileUpload": {
     "placeholder": "Arrastra archivos aquí o haz clic para seleccionar",
-    "progress": "Progreso de carga"
+    "progress": "Progreso de carga",
+    "uploading": "Subiendo…",
+    "success": "Carga completada",
+    "error": "Error al cargar",
+    "remove": "Quitar {fileName}",
+    "retry": "Reintentar la carga"
   },
   "formFile": {
     "upload": "Subir archivo",

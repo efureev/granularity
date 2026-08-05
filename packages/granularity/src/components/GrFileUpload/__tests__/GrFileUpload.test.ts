@@ -181,7 +181,7 @@ describe('GrFileUpload', () => {
     expect(clickSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('multiple+limit вызывает onExceed и не стартует загрузку', async () => {
+  it('multiple+limit эмитит exceed и не стартует загрузку', async () => {
     const request = vi.fn().mockResolvedValue({ ok: true })
     const onExceed = vi.fn()
 
@@ -205,9 +205,16 @@ describe('GrFileUpload', () => {
 
     await flushPromises()
 
+    // `:on-exceed` продолжает работать: у Vue эмит и приходит пропом-слушателем.
     expect(onExceed).toHaveBeenCalledTimes(1)
     expect(onExceed.mock.calls[0][0]).toHaveLength(2)
     expect(onExceed.mock.calls[0][1]).toBe(1)
+
+    const exceed = wrapper.emitted('exceed') as [File[], number][]
+    expect(exceed).toHaveLength(1)
+    expect(exceed[0][0]).toHaveLength(2)
+    expect(exceed[0][1]).toBe(1)
+
     expect(request).not.toHaveBeenCalled()
     expect(wrapper.emitted('error')).toBeTruthy()
   })
@@ -370,5 +377,318 @@ describe('GrFileUpload', () => {
     expect(node.attributes('data-phase')).toBe('success')
     expect(node.text()).toContain('100')
     expect(node.text()).toContain('success')
+  })
+})
+
+describe('GrFileUpload — размонтирование', () => {
+  function dropFile(wrapper: ReturnType<typeof mount>, name = 'hello.txt') {
+    return wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['hello'], name, { type: 'text/plain' })] },
+    })
+  }
+
+  // XHR продолжал качать файл и по завершении дёргал `setStateSuccess`/`emit`
+  // уже мёртвого компонента.
+  it('аборт активной загрузки при размонтировании', async () => {
+    let capturedSignal: AbortSignal | undefined
+    const request = vi.fn((_files: File[], ctx: { signal: AbortSignal }) => {
+      capturedSignal = ctx.signal
+      return new Promise(() => {})
+    })
+
+    const wrapper = mount(GrFileUpload, { props: { request } })
+    await dropFile(wrapper)
+    await flushPromises()
+
+    expect(capturedSignal?.aborted).toBe(false)
+
+    wrapper.unmount()
+
+    expect(capturedSignal?.aborted).toBe(true)
+  })
+
+  // Таймер на `hideProgressOnSuccess` переживал компонент и вызывал
+  // `setStateIdle()` → `emit('stateChange')` на уничтоженном инстансе.
+  it('таймер скрытия успеха снимается при размонтировании', async () => {
+    vi.useFakeTimers()
+
+    try {
+      const request = vi.fn().mockResolvedValue({ ok: true })
+      const wrapper = mount(GrFileUpload, { props: { request, hideProgressOnSuccess: 800 } })
+
+      await dropFile(wrapper)
+      await vi.advanceTimersByTimeAsync(0)
+
+      // Массив событий VTU мутирует на месте, поэтому держим ссылку: после
+      // `unmount()` сам `emitted()` уже недоступен.
+      const events = wrapper.emitted('stateChange') as unknown[]
+      const beforeUnmount = events.length
+      expect(beforeUnmount).toBeGreaterThan(0)
+
+      wrapper.unmount()
+      await vi.advanceTimersByTimeAsync(1000)
+
+      expect(events.length).toBe(beforeUnmount)
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
+describe('GrFileUpload — accept', () => {
+  // Атрибут не биндился вовсе, а `inheritAttrs` включён — `accept`, переданный
+  // потребителем, оседал на корневом `<div>` и в системный диалог не попадал.
+  it('accept доезжает до нативного input, а не до корневой зоны', () => {
+    const wrapper = mount(GrFileUpload, { props: { accept: 'image/*,.pdf' } })
+
+    expect(wrapper.get('[data-gr-file-upload-input]').attributes('accept')).toBe('image/*,.pdf')
+    expect(wrapper.get('[data-gr-file-upload]').attributes('accept')).toBeUndefined()
+  })
+
+  // Диалог `accept` фильтрует, а drag&drop — нет: перетащить можно что угодно.
+  it('accept отсеивает файл при drop, а не после отправки', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(GrFileUpload, { props: { request, accept: 'image/*' } })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'notes.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+
+    expect(request).not.toHaveBeenCalled()
+    expect(wrapper.emitted('error')).toBeTruthy()
+  })
+
+  it('capture и webkitdirectory тоже уходят на input', () => {
+    const wrapper = mount(GrFileUpload, { props: { capture: 'environment', directory: true } })
+    const input = wrapper.get('[data-gr-file-upload-input]')
+
+    expect(input.attributes('capture')).toBe('environment')
+    expect(input.attributes('webkitdirectory')).toBeDefined()
+  })
+})
+
+describe('GrFileUpload — гонка при повторном выборе', () => {
+  function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  // `lastFiles` писался до `await`-ов, а `abort()` вызывался после валидации:
+  // если валидаторы второго набора отработают быстрее, «победит» первый —
+  // он же оборвёт уже стартовавшую загрузку второго.
+  it('выигрывает последний выбор, даже если его валидаторы быстрее', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const slowValidator = async ({ files }: { files: File[] }) => {
+      await delay(files[0]?.name === 'slow.txt' ? 30 : 0)
+      return []
+    }
+
+    const wrapper = mount(GrFileUpload, { props: { request, validators: [slowValidator] } })
+    const zone = wrapper.get('[data-gr-file-upload]')
+
+    void zone.trigger('drop', {
+      dataTransfer: { files: [new File(['a'], 'slow.txt', { type: 'text/plain' })] },
+    })
+    void zone.trigger('drop', {
+      dataTransfer: { files: [new File(['b'], 'fast.txt', { type: 'text/plain' })] },
+    })
+
+    await delay(60)
+
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(request.mock.calls[0][0][0].name).toBe('fast.txt')
+
+    const changes = wrapper.emitted('change') as File[][][]
+    expect(changes).toHaveLength(1)
+    expect(changes[0][0][0].name).toBe('fast.txt')
+  })
+})
+
+describe('GrFileUpload — список файлов', () => {
+  // `:key="file.name"` давал дубль ключа для двух одноимённых файлов из разных
+  // папок: Vue переиспользовал не тот `<li>`, а в dev-режиме ругался на дубль.
+  it('одноимённые файлы не путаются между собой при перевыборе', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const request = vi.fn().mockResolvedValue({ ok: true })
+      const wrapper = mount(GrFileUpload, {
+        props: { request, multiple: true, showFileList: true },
+      })
+      const zone = wrapper.get('[data-gr-file-upload]')
+
+      await zone.trigger('drop', {
+        dataTransfer: {
+          files: [
+            new File(['a'], 'report.pdf', { type: 'application/pdf' }),
+            new File(['bbbbb'], 'report.pdf', { type: 'application/pdf' }),
+          ],
+        },
+      })
+      await flushPromises()
+
+      expect(wrapper.findAll('[data-gr-file-upload-item]')).toHaveLength(2)
+
+      // Перевыбор: у Vue это patch списка, и на дублирующихся ключах он и
+      // ругается, и переиспользует не тот `<li>`.
+      await zone.trigger('drop', {
+        dataTransfer: {
+          files: [new File(['ccccccccc'], 'report.pdf', { type: 'application/pdf' })],
+        },
+      })
+      await flushPromises()
+
+      const items = wrapper.findAll('[data-gr-file-upload-item]')
+      expect(items).toHaveLength(1)
+      expect(items[0].text()).toContain('1 KB')
+      expect(warn.mock.calls.map(call => String(call[0])).filter(text => text.includes('Duplicate keys'))).toEqual([])
+    }
+    finally {
+      warn.mockRestore()
+    }
+  })
+})
+
+describe('GrFileUpload — объявление статуса', () => {
+  // Прогресс-бар скрыт `aria-hidden`, а завершение и ошибка не объявлялись
+  // ничем: пользователь скринридера не узнавал, чем кончилась загрузка.
+  it('живой регион существует с первого рендера и объявляет фазы', async () => {
+    let resolveRequest: ((value: unknown) => void) | undefined
+    const request = vi.fn(() => new Promise((resolve) => {
+      resolveRequest = resolve
+    }))
+
+    const wrapper = mount(GrFileUpload, { props: { request } })
+
+    const live = wrapper.get('[data-gr-file-upload-live]')
+    expect(live.attributes('role')).toBe('status')
+    expect(live.text()).toBe('')
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'a.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[data-gr-file-upload-live]').text()).toBe('Uploading…')
+
+    resolveRequest?.({ ok: true })
+    await flushPromises()
+
+    expect(wrapper.get('[data-gr-file-upload-live]').text()).toBe('Upload complete')
+  })
+
+  it('ошибка тоже объявляется', async () => {
+    const request = vi.fn().mockRejectedValue(new Error('boom'))
+    const wrapper = mount(GrFileUpload, { props: { request } })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'a.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[data-gr-file-upload-live]').text()).toBe('Upload failed')
+  })
+})
+
+describe('GrFileUpload — итоговый объём', () => {
+  // Кастомный `request` не обязан звать `onProgress`. Раньше в этом случае
+  // success приходил с `loaded: 0, total: 0` при «100%» — payload врал.
+  it('без onProgress итог берётся из размеров файлов, а не из нуля', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(GrFileUpload, { props: { request, multiple: true } })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: {
+        files: [
+          new File(['12345'], 'a.txt', { type: 'text/plain' }),
+          new File(['123'], 'b.txt', { type: 'text/plain' }),
+        ],
+      },
+    })
+    await flushPromises()
+
+    const states = wrapper.emitted('stateChange') as { phase: string, loaded: number, total: number }[][]
+    const success = states.map(call => call[0]).find(item => item.phase === 'success')
+
+    expect(success).toMatchObject({ loaded: 8, total: 8, percent: 100 })
+  })
+})
+
+describe('GrFileUpload — управление набором файлов', () => {
+  function dropTwo(wrapper: ReturnType<typeof mount>) {
+    return wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: {
+        files: [
+          new File(['a'], 'a.txt', { type: 'text/plain' }),
+          new File(['b'], 'b.txt', { type: 'text/plain' }),
+        ],
+      },
+    })
+  }
+
+  // `showFileList` был декоративным списком имён: убрать лишний файл или
+  // повторить упавшую загрузку было нечем — только выбирать всё заново.
+  it('файл убирается из набора кнопкой в списке', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, showFileList: true },
+    })
+
+    await dropTwo(wrapper)
+    await flushPromises()
+
+    expect(wrapper.findAll('[data-gr-file-upload-item]')).toHaveLength(2)
+
+    await wrapper.findAll('[data-gr-file-upload-remove]')[0].trigger('click')
+
+    const items = wrapper.findAll('[data-gr-file-upload-item]')
+    expect(items).toHaveLength(1)
+    expect(items[0].text()).toContain('b.txt')
+  })
+
+  it('retry повторяет загрузку текущего набора', async () => {
+    const request = vi.fn()
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce({ ok: true })
+
+    const wrapper = mount(GrFileUpload, { props: { request, multiple: true } })
+
+    await dropTwo(wrapper)
+    await flushPromises()
+
+    expect(wrapper.emitted('error')).toBeTruthy()
+
+    const api = wrapper.vm as unknown as { retry: () => Promise<void> }
+    await api.retry()
+    await flushPromises()
+
+    expect(request).toHaveBeenCalledTimes(2)
+    expect(request.mock.calls[1][0]).toHaveLength(2)
+    expect(wrapper.emitted('success')).toBeTruthy()
+  })
+
+  it('удаление последнего файла возвращает состояние в idle', async () => {
+    const request = vi.fn().mockRejectedValue(new Error('boom'))
+    const wrapper = mount(GrFileUpload, { props: { request, showFileList: true } })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['a'], 'a.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+
+    const api = wrapper.vm as unknown as {
+      files: File[]
+      removeFile: (file: File) => void
+      state: { phase: string }
+    }
+    expect(api.state.phase).toBe('error')
+
+    api.removeFile(api.files[0])
+    await wrapper.vm.$nextTick()
+
+    // Показывать ошибку от набора, которого больше нет, не о чем.
+    expect(api.state.phase).toBe('idle')
+    expect(wrapper.find('[data-gr-file-upload-item]').exists()).toBe(false)
   })
 })

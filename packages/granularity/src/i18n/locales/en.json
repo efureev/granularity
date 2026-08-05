@@ -120,7 +120,12 @@
   },
   "fileUpload": {
     "placeholder": "Drag files here or click to select",
-    "progress": "Upload progress"
+    "progress": "Upload progress",
+    "uploading": "Uploading…",
+    "success": "Upload complete",
+    "error": "Upload failed",
+    "remove": "Remove {fileName}",
+    "retry": "Retry upload"
   },
   "formFile": {
     "upload": "Upload file",
