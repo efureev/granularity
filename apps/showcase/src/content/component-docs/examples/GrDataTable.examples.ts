@@ -9,43 +9,66 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-data-table-controlled-sort',
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
-import { GrDataTable } from '@feugene/granularity'
+
 import type { GrDataColumn } from '@feugene/granularity'
+import { GrBadge, GrDataTable } from '@feugene/granularity'
 
 const rows = [
-  { id: 1, service: 'Auth', incidents: 2 },
-  { id: 2, service: 'Billing', incidents: 0 },
-  { id: 3, service: 'Search', incidents: 7 },
+  { id: 1, service: 'Auth', incidents: 2, updatedAt: 3 },
+  { id: 2, service: 'Billing', incidents: 0, updatedAt: 1 },
+  { id: 3, service: 'Search', incidents: 7, updatedAt: 2 },
 ]
+
 const columns: GrDataColumn[] = [
   { key: 'service', label: 'Service', sortable: true },
   { key: 'incidents', label: 'Incidents', sortable: true, align: 'right' },
+  { key: 'updatedAt', label: 'Updated', sortable: true, align: 'right' },
 ]
 
+// Контролируемое состояние сортировки (v-model:sortKey / v-model:sortDir).
 const sortKey = ref('incidents')
 const sortDir = ref<'asc' | 'desc'>('desc')
+const lastChange = ref('')
 
-// external-sort: сортируем «снаружи» (например на сервере).
+// \`external-sort\`: таблица сама не сортирует — сортируем «снаружи» (как это делал бы
+// сервер). Здесь имитируем это локально, но \`rows\` приходят уже отсортированными.
 const sortedRows = computed(() => {
   const key = sortKey.value
+  if (!key) return rows
   const dir = sortDir.value
   return [...rows].sort((a, b) => {
-    const res = Number(a[key as 'incidents']) - Number(b[key as 'incidents'])
+    const av = (a as Record<string, unknown>)[key]
+    const bv = (b as Record<string, unknown>)[key]
+    const res = typeof av === 'number' && typeof bv === 'number'
+      ? av - bv
+      : String(av ?? '').localeCompare(String(bv ?? ''))
     return dir === 'asc' ? res : -res
   })
 })
+
+function onSortChange(event: { key: string, dir: 'asc' | 'desc' }) {
+  lastChange.value = \`\${event.key} · \${event.dir}\`
+}
 </script>
 
 <template>
-  <GrDataTable
-    v-model:sort-key="sortKey"
-    v-model:sort-dir="sortDir"
-    :rows="sortedRows"
-    :columns="columns"
-    row-key="id"
-    external-sort
-    @sortChange="(e) => console.log(e.key, e.dir)"
-  />
+  <div class="grid gap-3">
+    <div class="flex flex-wrap items-center gap-2 text-sm">
+      <span class="showcase-demo-text opacity-70">Controlled sort:</span>
+      <GrBadge tone="primary">{{ sortKey }} · {{ sortDir }}</GrBadge>
+      <span v-if="lastChange" class="showcase-demo-text opacity-70">@sortChange: {{ lastChange }}</span>
+    </div>
+
+    <GrDataTable
+      v-model:sort-key="sortKey"
+      v-model:sort-dir="sortDir"
+      :rows="sortedRows"
+      :columns="columns"
+      row-key="id"
+      external-sort
+      @sortChange="onSortChange"
+    />
+  </div>
 </template>`,
     note: 'Контролируемый режим нужен для серверной сортировки и синхронизации состояния с URL; без пропов `sortKey`/`sortDir` таблица работает в uncontrolled-режиме как прежде.',
   },
@@ -56,6 +79,7 @@ const sortedRows = computed(() => {
     status: 'ready',
     previewKey: 'gr-data-table-sortable-columns',
     code: `<script setup lang="ts">
+import type { GrDataColumn } from '@feugene/granularity'
 import { GrDataTable } from '@feugene/granularity'
 
 const rows = [
@@ -64,7 +88,7 @@ const rows = [
   { id: 3, name: 'Gamma', incidents: 7, owner: 'Support' },
 ]
 
-const columns = [
+const columns: GrDataColumn[] = [
   { key: 'name', label: 'Workspace', sortable: true },
   { key: 'owner', label: 'Owner', sortable: true },
   { key: 'incidents', label: 'Incidents', sortable: true, align: 'right' },
@@ -89,7 +113,9 @@ const columns = [
     code: `<script setup lang="ts">
 import { ref } from 'vue'
 
+import type { GrDataColumn } from '@feugene/granularity'
 import { GrBadge, GrButton, GrDataTable } from '@feugene/granularity'
+import IconTrash from '~icons/lucide/trash2'
 
 const lastAction = ref('No actions yet')
 
@@ -99,15 +125,21 @@ const rows = [
   { id: 3, service: 'Notifier', status: 'danger', owner: 'Growth' },
 ]
 
-const columns = [
+const columns: GrDataColumn[] = [
   { key: 'service', label: 'Service', sortable: true },
   { key: 'owner', label: 'Owner' },
   { key: 'status', label: 'Status' },
   { key: 'actions', label: 'Actions', align: 'right' },
 ]
 
-function actionLabel(status: string) {
-  return status === 'ok' ? 'success' : status === 'warning' ? 'warning' : 'danger'
+function statusVariant(status: unknown): 'success' | 'warning' | 'danger' {
+  if (status === 'ok')
+    return 'success'
+
+  if (status === 'warning')
+    return 'warning'
+
+  return 'danger'
 }
 </script>
 
@@ -115,15 +147,27 @@ function actionLabel(status: string) {
   <div class="grid gap-3">
     <GrDataTable :rows="rows" :columns="columns" row-key="id">
       <template #cell-status="{ row }">
-        <GrBadge :tone="actionLabel(String(row.status)) as 'success' | 'warning' | 'danger'">
+        <GrBadge size="lg" :tone="statusVariant(row.status)">
           {{ row.status }}
         </GrBadge>
       </template>
 
       <template #cell-actions="{ row }">
         <div class="flex justify-end gap-2">
-          <GrButton size="sm" variant="ghost" @click="lastAction = 'Viewed ' + row.service">View</GrButton>
-          <GrButton size="sm" variant="outline" @click="lastAction = 'Escalated ' + row.service">Escalate</GrButton>
+          <GrButton size="sm" variant="ghost" @click="lastAction = 'Viewed ' + row.service">
+            View
+          </GrButton>
+          <!-- Icon-only: иконка декоративна, имя кнопки задаётся явно. -->
+          <GrButton
+            size="sm"
+            square
+            variant="outline"
+            tone="danger"
+            :aria-label="'Escalate ' + row.service"
+            @click="lastAction = 'Escalated ' + row.service"
+          >
+            <IconTrash />
+          </GrButton>
         </div>
       </template>
     </GrDataTable>
@@ -144,6 +188,7 @@ function actionLabel(status: string) {
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
+import type { GrDataColumn } from '@feugene/granularity'
 import { GrButton, GrDataTable } from '@feugene/granularity'
 
 const activeFilter = ref<'all' | 'critical'>('all')
@@ -154,7 +199,7 @@ const rows = [
   { id: 3, name: 'Webhook retries', severity: 'critical', updatedAt: '09:57' },
 ]
 
-const columns = [
+const columns: GrDataColumn[] = [
   { key: 'name', label: 'Signal', sortable: true },
   { key: 'severity', label: 'Severity', sortable: true },
   { key: 'updatedAt', label: 'Updated', align: 'right', sortable: true },
@@ -206,36 +251,62 @@ const columns: GrDataColumn[] = [
   { key: 'city', label: 'City' },
 ]
 
+const roles = ['Engineer', 'Designer', 'PM', 'Analyst', 'Support']
+const cities = ['Berlin', 'Lisbon', 'Warsaw', 'Madrid', 'Milan', 'Amsterdam']
+
 const rows = Array.from({ length: 24 }, (_, i) => ({
   id: i + 1,
-  name: 'Person ' + (i + 1),
-  role: ['Engineer', 'Designer', 'PM'][i % 3],
-  city: ['Berlin', 'Lisbon', 'Warsaw'][i % 3],
+  name: \`Person \${i + 1}\`,
+  role: roles[i % roles.length],
+  city: cities[i % cities.length],
 }))
 
+// Row selection via v-model:selected
 const selected = ref<Array<string | number>>([2, 5])
-const loading = ref(false)
 
+// Loading toggle
+const loading = ref(false)
 function simulateReload() {
   loading.value = true
-  setTimeout(() => { loading.value = false }, 1400)
+  window.setTimeout(() => {
+    loading.value = false
+  }, 1400)
 }
 </script>
 
 <template>
-  <GrButton size="sm" variant="outline" @click="simulateReload">Simulate reload</GrButton>
-  <GrBadge>{{ selected.length }} selected</GrBadge>
+  <div class="grid gap-3">
+    <div class="flex flex-wrap items-center gap-2">
+      <GrButton size="sm" variant="outline" @click="simulateReload">
+        Simulate reload (loading)
+      </GrButton>
+      <GrButton size="sm" variant="ghost" @click="selected = []">
+        Clear selection
+      </GrButton>
+      <GrBadge>{{ selected.length }} selected</GrBadge>
+    </div>
 
-  <GrDataTable
-    v-model:selected="selected"
-    :rows="rows"
-    :columns="columns"
-    row-key="id"
-    selectable
-    sticky-header
-    :max-height="280"
-    :loading="loading"
-  />
+    <GrDataTable
+      v-model:selected="selected"
+      :rows="rows"
+      :columns="columns"
+      row-key="id"
+      selectable
+      sticky-header
+      :max-height="280"
+      :loading="loading"
+    >
+      <template #cell-role="{ row }">
+        <GrBadge tone="slate">
+          {{ row.role }}
+        </GrBadge>
+      </template>
+    </GrDataTable>
+
+    <div class="text-sm text-[var(--gr-muted-fg)]">
+      Selected ids: {{ selected.length ? selected.join(', ') : 'none' }}
+    </div>
+  </div>
 </template>`,
     note: '«Выбрать все» оперирует только видимыми строками и сохраняет внешние ключи; при клиентской сортировке выбор остаётся по ключам, а не по позициям.',
   },
@@ -276,6 +347,86 @@ const rows = [
         selectable
         aria-label="Members"
       />
+    </div>
+  </div>
+</template>`,
+  },
+  {
+    id: 'data-table-row-guards',
+    title: 'Row guards, tri-state sorting and row click',
+    description: 'Строка может быть невыбираемой (`selectableRow`), подсвеченной (`rowClass`) и кликабельной (`@row-click`), а третий клик по заголовку снимает сортировку — `sortCycle="asc-desc-none"`.',
+    status: 'ready',
+    previewKey: 'gr-data-table-row-guards',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import type { GrDataColumn } from '@feugene/granularity'
+import { GrBadge, GrDataTable } from '@feugene/granularity'
+
+type Invoice = {
+  id: number
+  number: string
+  client: string
+  total: number
+  status: 'draft' | 'sent' | 'paid'
+}
+
+const columns: GrDataColumn<Invoice>[] = [
+  { key: 'number', label: 'Invoice', sortable: true },
+  { key: 'client', label: 'Client', sortable: true },
+  { key: 'total', label: 'Total', sortable: true, align: 'right' },
+  { key: 'status', label: 'Status' },
+]
+
+const rows: Invoice[] = [
+  { id: 1, number: 'INV-1043', client: 'Northwind', total: 1280, status: 'sent' },
+  { id: 2, number: 'INV-1044', client: 'Contoso', total: 640, status: 'paid' },
+  { id: 3, number: 'INV-1045', client: 'Fabrikam', total: 2190, status: 'draft' },
+  { id: 4, number: 'INV-1046', client: 'Adventure Works', total: 310, status: 'sent' },
+]
+
+const selected = ref<Array<string | number>>([])
+const lastClicked = ref('—')
+
+// Оплаченный счёт нельзя ни выбрать, ни отправить в массовое действие.
+function canSelect(row: Invoice): boolean {
+  return row.status !== 'paid'
+}
+
+function rowClass(row: Invoice): string | undefined {
+  return row.status === 'paid' ? 'text-[var(--gr-muted-fg)]' : undefined
+}
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrDataTable
+      v-model:selected="selected"
+      :rows="rows"
+      :columns="columns"
+      row-key="id"
+      selectable
+      sort-cycle="asc-desc-none"
+      :selectable-row="canSelect"
+      :row-class="rowClass"
+      empty-text="No invoices for this period"
+      @row-click="lastClicked = $event.row.number"
+    >
+      <template #cell-total="{ row }">
+        {{ row.total.toLocaleString('en-US', { style: 'currency', currency: 'EUR' }) }}
+      </template>
+
+      <template #cell-status="{ row }">
+        <GrBadge :tone="row.status === 'paid' ? 'success' : row.status === 'draft' ? 'slate' : 'primary'" size="sm">
+          {{ row.status }}
+        </GrBadge>
+      </template>
+    </GrDataTable>
+
+    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] p-3 text-sm text-[var(--gr-muted-fg)]">
+      Third click on a header clears sorting · last clicked row:
+      <span class="font-semibold text-[var(--gr-fg)]">{{ lastClicked }}</span> ·
+      selected: <span class="font-semibold text-[var(--gr-fg)]">{{ selected.length ? selected.join(', ') : 'none' }}</span>
     </div>
   </div>
 </template>`,

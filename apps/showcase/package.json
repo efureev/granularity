@@ -7,7 +7,7 @@
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.14.0",
     "@feugene/granularity-datepicker": "^0.1.1",
-    "@feugene/unocss-preset-granular": "^0.7.0",
+    "@feugene/unocss-preset-granular": "^0.7.1",
     "@floating-ui/dom": "^1.8.0",
     "@headlessui/vue": "^1.7.23",
     "vue": "^3.5.40",

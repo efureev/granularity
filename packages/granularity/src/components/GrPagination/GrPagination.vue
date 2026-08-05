@@ -207,7 +207,7 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
     <div
       v-if="compact"
       data-gr-pagination-compact
-      class="px-2 text-[var(--gr-fg)] tabular-nums"
+      class="px-2 text-[var(--gr-fg)] [font-variant-numeric:tabular-nums]"
       :class="labelClass"
       aria-live="polite"
     >
@@ -260,7 +260,7 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
         inputmode="numeric"
         data-gr-pagination-jumper
         :aria-label="resolvedJumperLabel"
-        class="rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] tabular-nums transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] [font-variant-numeric:tabular-nums] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="jumperClass"
         @keydown.enter="submitJumper"
         @blur="submitJumper"

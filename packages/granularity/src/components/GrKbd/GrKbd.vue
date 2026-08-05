@@ -18,7 +18,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrKbd' }
 <template>
   <kbd
     data-gr-kbd
-    class="inline-flex items-center justify-center rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] font-medium leading-none text-[var(--gr-muted-fg)] shadow-[var(--gr-shadow-1)] tabular-nums"
+    class="inline-flex items-center justify-center rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] font-medium leading-none text-[var(--gr-muted-fg)] shadow-[var(--gr-shadow-1)] [font-variant-numeric:tabular-nums]"
     :class="resolvedSize === 'sm'
       ? 'min-w-[1.5rem] h-6 px-1.5 text-xs'
       : 'min-w-[1.75rem] h-7 px-2 text-sm'"

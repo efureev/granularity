@@ -1585,7 +1585,7 @@
           {
             "name": "columns",
             "description": "",
-            "type": "GrDataColumn[]",
+            "type": "GrDataColumn<TRow>[]",
             "required": true
           },
           {
@@ -1593,7 +1593,7 @@
             "description": "Ключ строки или функция-резолвер. По умолчанию — поле `'id'`.",
             "type": "GrDataTableRowKey<TRow> | undefined",
             "required": false,
-            "default": "\"id\" as never"
+            "default": "\"id\" as GrDataTableRowKey<TRow>"
           },
           {
             "name": "initialSortKey",
@@ -1605,7 +1605,7 @@
           {
             "name": "initialSortDir",
             "description": "Направление начальной сортировки (uncontrolled-режим).",
-            "type": "\"asc\" | \"desc\" | undefined",
+            "type": "GrDataTableSortDir | undefined",
             "required": false,
             "default": "\"asc\""
           },
@@ -1619,9 +1619,16 @@
           {
             "name": "sortDir",
             "description": "Контролируемое направление сортировки: `v-model:sortDir`.",
-            "type": "\"asc\" | \"desc\" | undefined",
+            "type": "GrDataTableSortDir | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "sortCycle",
+            "description": "Клик по заголовку: `asc → desc` или `asc → desc → без сортировки`.",
+            "type": "GrDataTableSortCycle | undefined",
+            "required": false,
+            "default": "\"asc-desc\""
           },
           {
             "name": "externalSort",
@@ -1645,6 +1652,13 @@
             "default": "undefined"
           },
           {
+            "name": "selectableRow",
+            "description": "Предикат «строку можно выбрать». Невыбираемые строки не попадают и в «выбрать все».",
+            "type": "((row: TRow) => boolean) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "loading",
             "description": "Состояние загрузки: тело таблицы заменяется строкой-индикатором. `empty`-состояние при этом не показывается.",
             "type": "boolean | undefined",
@@ -1655,6 +1669,27 @@
             "name": "loadingText",
             "description": "Текст индикатора загрузки. i18n: fallback `gr.dataTable.loading`.",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. i18n: fallback `gr.dataTable.empty`; слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rowClass",
+            "description": "Класс строки: общий для всех либо вычисляемый по строке.",
+            "type": "string | ((row: TRow, index: number) => string | undefined) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rowProps",
+            "description": "Произвольные атрибуты строки (`data-*`, `title`, …).",
+            "type": "((row: TRow, index: number) => Record<string, unknown> | undefined) | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -1720,6 +1755,11 @@
             "type": "{}"
           },
           {
+            "name": "loading",
+            "description": "",
+            "type": "{}"
+          },
+          {
             "name": "empty",
             "description": "",
             "type": "{}"
@@ -1745,20 +1785,26 @@
           {
             "name": "update:sortDir",
             "description": "",
-            "type": "[\"asc\" | \"desc\"]",
-            "signature": "(e: \"update:sortDir\", value: \"asc\" | \"desc\"): void"
+            "type": "[GrDataTableSortDir]",
+            "signature": "(e: \"update:sortDir\", value: GrDataTableSortDir): void"
           },
           {
             "name": "sortChange",
             "description": "",
-            "type": "[{ key: string; dir: \"asc\" | \"desc\"; }]",
-            "signature": "(e: \"sortChange\", value: { key: string; dir: \"asc\" | \"desc\"; }): void"
+            "type": "[{ key: string; dir: GrDataTableSortDir; }]",
+            "signature": "(e: \"sortChange\", value: { key: string; dir: GrDataTableSortDir; }): void"
           },
           {
             "name": "update:selected",
             "description": "",
             "type": "[(string | number)[]]",
             "signature": "(e: \"update:selected\", value: (string | number)[]): void"
+          },
+          {
+            "name": "rowClick",
+            "description": "",
+            "type": "[{ row: TRow; index: number; event: MouseEvent; }]",
+            "signature": "(e: \"rowClick\", payload: { row: TRow; index: number; event: MouseEvent; }): void"
           }
         ]
       },
@@ -4262,6 +4308,13 @@
             "default": "undefined"
           },
           {
+            "name": "locale",
+            "description": "BCP-47 локаль для отображения значения (группировка разрядов и разделители через `Intl.NumberFormat`). Работает вместе с `useGrouping`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -4363,13 +4416,6 @@
             "name": "precision",
             "description": "",
             "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "locale",
-            "description": "BCP-47 локаль для отображения значения (группировка разрядов и разделители через `Intl.NumberFormat`). Работает вместе с `useGrouping`.",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },

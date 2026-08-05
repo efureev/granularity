@@ -1,4 +1,4 @@
-import { getCurrentInstance, inject, type AppContext } from 'vue'
+import { computed, getCurrentInstance, inject, type AppContext } from 'vue'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../i18n/adapter'
 
@@ -103,5 +103,11 @@ export function useGranularityTranslations(context?: AppContext | GranularityI18
   return {
     i18n,
     t,
+    /**
+     * Активная локаль адаптера — для `Intl.*` и `localeCompare`. `undefined`,
+     * когда адаптера нет или он её не отдаёт: тогда сравнение уходит на локаль
+     * среды, как и было.
+     */
+    locale: computed(() => i18n?.locale?.value),
   }
 }

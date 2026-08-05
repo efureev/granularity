@@ -132,6 +132,20 @@ export default defineConfig({
 - `tokens` / `baseFile` — переопределить `tokens.css` и `base.css`
   пакета своими файлами из приложения.
 
+## Не выключайте `includeExtraRules`
+
+Компоненты пакета пользуются утилитами, которых в `presetMini` нет вовсе:
+`sr-only`, `animate-spin`, `divide-*`, `space-*`, `backdrop-*`, `uppercase`.
+Пресет добирает их из `@feugene/unocss-mini-extra-rules` — это включено по
+умолчанию (`includeExtraRules: true`) и является условием работоспособности, а
+не удобством.
+
+С `includeExtraRules: false` класс остаётся в разметке, CSS не появляется, и
+сборка молча проходит: спиннер не крутится, разделители не рисуются, а
+визуально скрытый текст (caption таблицы, a11y-заголовок диалога) показывается
+пользователю обычным текстом. Со стороны пакета связку держит гейт
+`src/__tests__/presetUtilities.test.ts`.
+
 ## Важно: UnoCSS и `content`
 
 `@unocss/vite` читает `content.filesystem` и `content.pipeline.include`

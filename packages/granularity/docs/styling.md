@@ -23,7 +23,8 @@
 - `@feugene/granularity/styles/themes/dark.css`
   - встроенная тёмная тема с semantic tokens.
 - `@feugene/granularity/styles/base.css`
-  - базовые правила поверх foundation tokens/themes.
+  - базовые правила поверх foundation tokens/themes: reset и кламп движения по
+    `prefers-reduced-motion`.
 
 ## Токены — генерируются, а не пишутся руками
 

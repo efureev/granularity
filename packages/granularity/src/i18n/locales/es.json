@@ -32,9 +32,9 @@
     "empty": "Sin datos",
     "selectAll": "Seleccionar todas las filas",
     "selectRow": "Seleccionar fila",
-    "sortBy": "Ordenar por «{column}»",
-    "sortedAsc": "Ordenado por «{column}» de forma ascendente, active para ordenar de forma descendente",
-    "sortedDesc": "Ordenado por «{column}» de forma descendente, active para ordenar de forma ascendente"
+    "sortAsc": "Active para ordenar de forma ascendente",
+    "sortDesc": "Active para ordenar de forma descendente",
+    "sortNone": "Active para quitar la ordenación"
   },
   "autocomplete": {
     "loading": "Cargando…",

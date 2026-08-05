@@ -4,6 +4,6 @@ import { grDataTableSafelist } from './safelist'
 
 export const grDataTableConfig = defineGranularComponent(import.meta.url, {
   name: 'GrDataTable',
-  dependencies: ['GrTable', 'GrIcon'],
+  dependencies: ['GrTable', 'GrIcon', 'GrCheckbox'],
   safelist: grDataTableSafelist,
 })

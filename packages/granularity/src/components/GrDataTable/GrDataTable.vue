@@ -1,18 +1,20 @@
 
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { sortRows, type GrDataTableSortDir } from './grDataTableSort'
 import {
   type GrDataTableSize,
   cellPaddings,
-  checkboxSizes,
   headerGaps,
   headerTextSizes,
   placeholderPaddings,
+  selectCheckboxSizes,
   selectColumnWidths,
   sortIconSizes,
   spinnerSizes,
@@ -21,8 +23,17 @@ import {
 import IconArrowUp from '~icons/lucide/arrow-up'
 import IconArrowDown from '~icons/lucide/arrow-down'
 
-export type GrDataColumn = {
-  key: string
+/**
+ * Ключ колонки. Собственные поля строки подсказываются автодополнением, но
+ * произвольная строка тоже допустима: колонка может быть вычисляемой и жить
+ * только в слоте `#cell-<key>`.
+ */
+export type GrDataColumnKey<TRow extends Record<string, unknown> = Record<string, unknown>> =
+  | Extract<keyof TRow, string>
+  | (string & {})
+
+export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, unknown>> = {
+  key: GrDataColumnKey<TRow>
   label: string
   sortable?: boolean
   align?: 'left' | 'center' | 'right'
@@ -32,19 +43,24 @@ export type GrDataTableRowKey<TRow extends Record<string, unknown> = Record<stri
   | string
   | ((row: TRow) => string | number)
 
+/** Порядок обхода состояний сортировки по клику на заголовок. */
+export type GrDataTableSortCycle = 'asc-desc' | 'asc-desc-none'
+
 export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<string, unknown>> {
   rows: TRow[]
-  columns: GrDataColumn[]
+  columns: GrDataColumn<TRow>[]
   /** Ключ строки или функция-резолвер. По умолчанию — поле `'id'`. */
   rowKey?: GrDataTableRowKey<TRow>
   /** Ключ колонки для начальной сортировки (uncontrolled-режим). */
   initialSortKey?: string
   /** Направление начальной сортировки (uncontrolled-режим). */
-  initialSortDir?: 'asc' | 'desc'
+  initialSortDir?: GrDataTableSortDir
   /** Контролируемый ключ сортировки: `v-model:sortKey`. Задаёт controlled-режим. */
   sortKey?: string
   /** Контролируемое направление сортировки: `v-model:sortDir`. */
-  sortDir?: 'asc' | 'desc'
+  sortDir?: GrDataTableSortDir
+  /** Клик по заголовку: `asc → desc` или `asc → desc → без сортировки`. */
+  sortCycle?: GrDataTableSortCycle
   /**
    * Внешняя сортировка (например серверная): компонент НЕ сортирует `rows`
    * сам, а только сообщает о смене через `update:sortKey`/`update:sortDir`/
@@ -58,6 +74,8 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   selectable?: boolean
   /** Контролируемый список выбранных ключей строк: `v-model:selected`. */
   selected?: Array<string | number>
+  /** Предикат «строку можно выбрать». Невыбираемые строки не попадают и в «выбрать все». */
+  selectableRow?: (row: TRow) => boolean
   /**
    * Состояние загрузки: тело таблицы заменяется строкой-индикатором.
    * `empty`-состояние при этом не показывается.
@@ -65,6 +83,12 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   loading?: boolean
   /** Текст индикатора загрузки. i18n: fallback `gr.dataTable.loading`. */
   loadingText?: string
+  /** Текст пустого состояния. i18n: fallback `gr.dataTable.empty`; слот `#empty` сильнее. */
+  emptyText?: string
+  /** Класс строки: общий для всех либо вычисляемый по строке. */
+  rowClass?: string | ((row: TRow, index: number) => string | undefined)
+  /** Произвольные атрибуты строки (`data-*`, `title`, …). */
+  rowProps?: (row: TRow, index: number) => Record<string, unknown> | undefined
   /**
    * Размер таблицы: кегль, паддинги ячеек, стрелки сортировки и чекбоксы.
    * Прокидывается в `GrTable`.
@@ -83,22 +107,28 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
 
 /**
  * `GrDataTable` — data-таблица поверх `GrTable` с сортировкой по клику
- * на заголовок и scoped-слотами ячеек (`#cell-<key>`), `#caption`, `#foot`, `#empty`.
+ * на заголовок и scoped-слотами ячеек (`#cell-<key>`), `#header-<key>`,
+ * `#caption`, `#foot`, `#empty`, `#loading`.
  *
- * Сортировка: если оба значения в колонке — числа (или парсятся как числа), сравнение
- * идёт численное; иначе — локальное строковое `localeCompare` с `sensitivity: 'base'`.
+ * Сортировка, включая крайние случаи с пустыми и смешанными значениями, живёт
+ * в `grDataTableSort.ts` — см. `docs/components/GrDataTable.md`.
  */
 const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
-  rowKey: 'id' as never,
+  rowKey: 'id' as GrDataTableRowKey<TRow>,
   initialSortKey: undefined,
   initialSortDir: 'asc',
   sortKey: undefined,
   sortDir: undefined,
+  sortCycle: 'asc-desc',
   externalSort: false,
   selectable: false,
   selected: undefined,
+  selectableRow: undefined,
   loading: false,
   loadingText: undefined,
+  emptyText: undefined,
+  rowClass: undefined,
+  rowProps: undefined,
   size: undefined,
   caption: undefined,
   ariaLabel: undefined,
@@ -110,25 +140,27 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
 
 const emit = defineEmits<{
   (e: 'update:sortKey', value: string): void
-  (e: 'update:sortDir', value: 'asc' | 'desc'): void
-  (e: 'sortChange', value: { key: string, dir: 'asc' | 'desc' }): void
+  (e: 'update:sortDir', value: GrDataTableSortDir): void
+  (e: 'sortChange', value: { key: string, dir: GrDataTableSortDir }): void
   (e: 'update:selected', value: Array<string | number>): void
+  (e: 'rowClick', payload: { row: TRow, index: number, event: MouseEvent }): void
 }>()
 
-const { t } = useGranularityTranslations()
+const { t, locale } = useGranularityTranslations()
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.dataTable.loading', 'Loading…'))
+const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.dataTable.empty', 'No data'))
 
 // Uncontrolled-состояние; в controlled-режиме перекрывается пропами `sortKey`/`sortDir`.
 const internalSortKey = ref<string>(props.initialSortKey ?? '')
-const internalSortDir = ref<'asc' | 'desc'>(props.initialSortDir)
+const internalSortDir = ref<GrDataTableSortDir>(props.initialSortDir)
 
 const isSortKeyControlled = computed(() => props.sortKey !== undefined)
 const isSortDirControlled = computed(() => props.sortDir !== undefined)
 
 const currentSortKey = computed(() => props.sortKey ?? internalSortKey.value)
-const currentSortDir = computed<'asc' | 'desc'>(() => props.sortDir ?? internalSortDir.value)
+const currentSortDir = computed<GrDataTableSortDir>(() => props.sortDir ?? internalSortDir.value)
 
-function applySort(key: string, dir: 'asc' | 'desc'): void {
+function applySort(key: string, dir: GrDataTableSortDir): void {
   if (!isSortKeyControlled.value)
     internalSortKey.value = key
   if (!isSortDirControlled.value)
@@ -140,36 +172,18 @@ function applySort(key: string, dir: 'asc' | 'desc'): void {
 }
 
 const sortedRows = computed(() => {
-  const items = [...props.rows]
   // Внешняя сортировка: `rows` уже отсортированы потребителем — не трогаем.
   if (props.externalSort)
-    return items
+    return [...props.rows]
 
   const key = currentSortKey.value
   if (!key)
-    return items
+    return [...props.rows]
 
-  const dir = currentSortDir.value
-
-  items.sort((a, b) => {
-    const av = (a as Record<string, unknown>)[key]
-    const bv = (b as Record<string, unknown>)[key]
-
-    const aNum = typeof av === 'number' ? av : Number(av)
-    const bNum = typeof bv === 'number' ? bv : Number(bv)
-    const bothNumbers = Number.isFinite(aNum) && Number.isFinite(bNum)
-
-    const res = bothNumbers
-      ? aNum - bNum
-      : String(av ?? '').localeCompare(String(bv ?? ''), undefined, { sensitivity: 'base' })
-
-    return dir === 'asc' ? res : -res
-  })
-
-  return items
+  return sortRows(props.rows, key, currentSortDir.value, locale.value)
 })
 
-function toggleSort(col: GrDataColumn): void {
+function toggleSort(col: GrDataColumn<TRow>): void {
   if (!col.sortable)
     return
 
@@ -178,10 +192,21 @@ function toggleSort(col: GrDataColumn): void {
     return
   }
 
-  applySort(col.key, currentSortDir.value === 'asc' ? 'desc' : 'asc')
+  if (currentSortDir.value === 'asc') {
+    applySort(col.key, 'desc')
+    return
+  }
+
+  // Третье состояние: сортировка снимается, порядок возвращается к исходному.
+  if (props.sortCycle === 'asc-desc-none') {
+    applySort('', 'asc')
+    return
+  }
+
+  applySort(col.key, 'asc')
 }
 
-function cellAlign(col: GrDataColumn): string {
+function cellAlign(col: GrDataColumn<TRow>): string {
   if (col.align === 'right')
     return 'text-right'
   if (col.align === 'center')
@@ -189,17 +214,54 @@ function cellAlign(col: GrDataColumn): string {
   return 'text-left'
 }
 
+/**
+ * Синтетические ключи для строк, у которых поле `rowKey` пустое.
+ *
+ * Раньше такая строка получала `String(undefined ?? '')`, то есть **один и тот
+ * же** ключ на всю таблицу: Vue переиспользовал DOM не по назначению, а выбор
+ * одной строки помечал выбранными все. Ключ привязан к идентичности объекта,
+ * поэтому переживает сортировку и не зависит от индекса.
+ */
+const syntheticKeys = new WeakMap<object, string>()
+let syntheticKeyCounter = 0
+const missingKeyWarned = ref(false)
+
+function syntheticRowKey(row: TRow): string {
+  const existing = syntheticKeys.get(row)
+  if (existing !== undefined)
+    return existing
+
+  syntheticKeyCounter += 1
+  const generated = `gr-row-${syntheticKeyCounter}`
+  syntheticKeys.set(row, generated)
+
+  if (!missingKeyWarned.value && process.env.NODE_ENV !== 'production') {
+    missingKeyWarned.value = true
+    console.warn(
+      `[GrDataTable] У строки нет значения по ключу "${String(props.rowKey)}". `
+      + 'Задайте `rowKey` (поле или функцию) — иначе выбор строк и переиспользование '
+      + 'DOM работают по синтетическому ключу, который не переживёт перезагрузку данных.',
+    )
+  }
+
+  return generated
+}
+
 function rowKeyValue(row: TRow): string | number {
   const rk = props.rowKey
   if (typeof rk === 'function')
     return rk(row)
-  const v = (row as Record<string, unknown>)[rk as string]
-  if (typeof v === 'string' || typeof v === 'number')
-    return v
-  return String(v ?? '')
+
+  const value = (row as Record<string, unknown>)[rk as string]
+  if (typeof value === 'string' && value !== '')
+    return value
+  if (typeof value === 'number')
+    return value
+
+  return syntheticRowKey(row)
 }
 
-function ariaSortFor(col: GrDataColumn): 'ascending' | 'descending' | 'none' | undefined {
+function ariaSortFor(col: GrDataColumn<TRow>): 'ascending' | 'descending' | 'none' | undefined {
   if (!col.sortable)
     return undefined
   if (currentSortKey.value !== col.key)
@@ -207,21 +269,23 @@ function ariaSortFor(col: GrDataColumn): 'ascending' | 'descending' | 'none' | u
   return currentSortDir.value === 'asc' ? 'ascending' : 'descending'
 }
 
-function sortButtonLabel(col: GrDataColumn): string {
+/**
+ * Подсказка «что сделает нажатие» — visually hidden текстом **после** подписи
+ * колонки, а не `aria-label`'ом на кнопке. `aria-label` подменял бы собой имя
+ * `<th>`, и AT при переходе по ячейкам вместо «Название» читала бы
+ * «Отсортировано по Название по возрастанию, нажмите…». Текущее состояние
+ * сортировки при этом объявляет `aria-sort` на самом `<th>`.
+ */
+function sortHint(col: GrDataColumn<TRow>): string {
   if (currentSortKey.value !== col.key)
-    return t('gr.dataTable.sortBy', 'Sort by {column}', { column: col.label })
+    return t('gr.dataTable.sortAsc', 'Activate to sort ascending')
 
-  return currentSortDir.value === 'asc'
-    ? t(
-        'gr.dataTable.sortedAsc',
-        'Sorted by {column} ascending, activate to sort descending',
-        { column: col.label },
-      )
-    : t(
-        'gr.dataTable.sortedDesc',
-        'Sorted by {column} descending, activate to sort ascending',
-        { column: col.label },
-      )
+  if (currentSortDir.value === 'asc')
+    return t('gr.dataTable.sortDesc', 'Activate to sort descending')
+
+  return props.sortCycle === 'asc-desc-none'
+    ? t('gr.dataTable.sortNone', 'Activate to remove sorting')
+    : t('gr.dataTable.sortAsc', 'Activate to sort ascending')
 }
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrDataTable' })
@@ -230,14 +294,13 @@ const cellClass = computed(() => cellPaddings[resolvedSize.value])
 const placeholderClass = computed(() => placeholderPaddings[resolvedSize.value])
 const headerTextClass = computed(() => headerTextSizes[resolvedSize.value])
 const headerGapClass = computed(() => headerGaps[resolvedSize.value])
-const checkboxClass = computed(() => checkboxSizes[resolvedSize.value])
 const selectColumnClass = computed(() => selectColumnWidths[resolvedSize.value])
 const spinnerClass = computed(() => spinnerSizes[resolvedSize.value])
 const sortIconSize = computed(() => sortIconSizes[resolvedSize.value])
+const checkboxSize = computed(() => selectCheckboxSizes[resolvedSize.value])
 
 const tableProps = computed(() => ({
   size: resolvedSize.value,
-  caption: props.caption,
   ariaLabel: props.ariaLabel,
   ariaLabelledby: props.ariaLabelledby,
   regionLabel: props.regionLabel,
@@ -251,8 +314,30 @@ const isEmpty = computed(() => sortedRows.value.length === 0)
 // строк loading/empty.
 const totalColumns = computed(() => props.columns.length + (props.selectable ? 1 : 0))
 
+/**
+ * Живой регион существует с первого рендера и пуст, пока объявлять нечего.
+ * Регион, который появляется уже с текстом, часть AT не объявляет вовсе —
+ * а именно так вело себя `role="status"` внутри строки загрузки.
+ */
+const liveMessage = computed(() => {
+  if (props.loading)
+    return resolvedLoadingText.value
+  if (isEmpty.value)
+    return resolvedEmptyText.value
+  return ''
+})
+
 function cellValue(row: TRow, key: string): unknown {
   return (row as Record<string, unknown>)[key]
+}
+
+function rowClassName(row: TRow, index: number): string | undefined {
+  const source = props.rowClass
+  return typeof source === 'function' ? source(row, index) : source
+}
+
+function onRowClick(row: TRow, index: number, event: MouseEvent): void {
+  emit('rowClick', { row, index, event })
 }
 
 // ————— Выбор строк.
@@ -266,15 +351,22 @@ const selectedKeys = computed<Set<string | number>>(
   () => new Set(props.selected ?? internalSelected.value),
 )
 
+function isRowSelectable(row: TRow): boolean {
+  return props.selectableRow ? props.selectableRow(row) : true
+}
+
 function isRowSelected(row: TRow): boolean {
   return selectedKeys.value.has(rowKeyValue(row))
 }
 
+/** «Выбрать все» работает по видимым и выбираемым строкам — они же считают состояние шапки. */
+const selectableRows = computed(() => sortedRows.value.filter(isRowSelectable))
+
 const allSelected = computed(() =>
-  sortedRows.value.length > 0 && sortedRows.value.every(isRowSelected),
+  selectableRows.value.length > 0 && selectableRows.value.every(isRowSelected),
 )
 const someSelected = computed(() =>
-  sortedRows.value.some(isRowSelected) && !allSelected.value,
+  selectableRows.value.some(isRowSelected) && !allSelected.value,
 )
 
 function emitSelected(next: Set<string | number>): void {
@@ -285,6 +377,9 @@ function emitSelected(next: Set<string | number>): void {
 }
 
 function toggleRow(row: TRow): void {
+  if (!isRowSelectable(row))
+    return
+
   const key = rowKeyValue(row)
   const next = new Set(selectedKeys.value)
   if (next.has(key))
@@ -295,23 +390,85 @@ function toggleRow(row: TRow): void {
 }
 
 function toggleAll(): void {
+  const next = new Set(selectedKeys.value)
+
   if (allSelected.value) {
     // Снимаем выбор только с видимых строк, сохраняя внешние ключи.
-    const next = new Set(selectedKeys.value)
-    for (const row of sortedRows.value) next.delete(rowKeyValue(row))
+    for (const row of selectableRows.value) next.delete(rowKeyValue(row))
     emitSelected(next)
     return
   }
-  const next = new Set(selectedKeys.value)
-  for (const row of sortedRows.value) next.add(rowKeyValue(row))
+
+  for (const row of selectableRows.value) next.add(rowKeyValue(row))
   emitSelected(next)
 }
+
+// ————— Императивный API.
+const tableRef = ref<InstanceType<typeof GrTable> | null>(null)
+const rootId = useId()
+
+function rootEl(): HTMLElement | null {
+  return (tableRef.value?.$el as HTMLElement | undefined) ?? null
+}
+
+/** Скролл-контейнер таблицы — он же элемент с `maxHeight`. */
+function scrollEl(): HTMLElement | null {
+  const root = rootEl()
+  return root?.matches('[data-gr-table-scroll]') ? root : root?.querySelector('[data-gr-table-scroll]') ?? null
+}
+
+function scrollToRow(key: string | number, options?: ScrollIntoViewOptions): boolean {
+  // Ключ строки — произвольная строка от потребителя, в селектор её не подставить:
+  // сравниваем через `dataset`, а не собираем `[data-row-key="…"]` конкатенацией.
+  const target = String(key)
+  const rows = rootEl()?.querySelectorAll<HTMLElement>('[data-gr-datatable-row]') ?? []
+  const row = Array.prototype.find.call(rows, (el: HTMLElement) => el.dataset.rowKey === target) as HTMLElement | undefined
+
+  if (!row)
+    return false
+
+  row.scrollIntoView(options ?? { block: 'nearest' })
+  return true
+}
+
+const scrollTo = (options: ScrollToOptions): void => {
+  scrollEl()?.scrollTo(options)
+}
+
+function clearSort(): void {
+  applySort('', 'asc')
+}
+
+defineExpose({
+  /** Прокрутить к строке по её ключу. `false` — строки нет в DOM. */
+  scrollToRow,
+  /** Прокрутить скролл-контейнер таблицы. */
+  scrollTo,
+  /** Снять сортировку (эквивалент третьего состояния). */
+  clearSort,
+  /** Отметить/снять все выбираемые строки. */
+  toggleAll,
+})
 </script>
 
 <template>
-  <GrTable v-bind="tableProps" data-gr-datatable>
-    <template v-if="$slots.caption" #caption>
-      <slot name="caption" />
+  <GrTable
+    v-bind="tableProps"
+    ref="tableRef"
+    data-gr-datatable
+  >
+    <!-- Caption рендерится всегда (у `GrTable` он `sr-only`): в нём живёт
+         постоянный live-регион, иначе объявлять загрузку было бы нечему. -->
+    <template #caption>
+      <slot name="caption">
+        {{ caption }}
+      </slot>
+      <span
+        :id="`${rootId}-live`"
+        data-gr-datatable-live
+        role="status"
+        aria-live="polite"
+      >{{ liveMessage }}</span>
     </template>
 
     <template #head>
@@ -322,17 +479,15 @@ function toggleAll(): void {
           :class="[selectColumnClass, cellClass]"
           scope="col"
         >
-          <input
-            type="checkbox"
+          <GrCheckbox
             data-gr-datatable-select-all
-            class="cursor-pointer accent-[var(--gr-primary)] align-middle"
-            :class="checkboxClass"
-            :checked="allSelected"
+            :model-value="allSelected"
             :indeterminate="someSelected"
+            :size="checkboxSize"
+            :disabled="loading || selectableRows.length === 0"
             :aria-label="t('gr.dataTable.selectAll', 'Select all rows')"
-            :disabled="loading || isEmpty"
-            @change="toggleAll"
-          >
+            @update:model-value="toggleAll"
+          />
         </th>
         <th
           v-for="col in columns"
@@ -346,22 +501,31 @@ function toggleAll(): void {
             <button
               v-if="col.sortable"
               type="button"
+              data-gr-datatable-sort
               class="inline-flex items-center text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
               :class="headerGapClass"
-              :aria-label="sortButtonLabel(col)"
               @click="toggleSort(col)"
             >
-              <span>{{ col.label }}</span>
-              <span class="inline-flex">
-                <GrIcon v-if="currentSortKey === col.key && currentSortDir === 'asc'" :size="sortIconSize" aria-hidden="true">
+              <span>
+                <slot :name="`header-${col.key}`" :column="col">
+                  {{ col.label }}
+                </slot>
+              </span>
+              <span class="sr-only">{{ sortHint(col) }}</span>
+              <span class="inline-flex" aria-hidden="true">
+                <GrIcon v-if="currentSortKey === col.key && currentSortDir === 'asc'" :size="sortIconSize">
                   <IconArrowUp />
                 </GrIcon>
-                <GrIcon v-else-if="currentSortKey === col.key && currentSortDir === 'desc'" :size="sortIconSize" aria-hidden="true">
+                <GrIcon v-else-if="currentSortKey === col.key && currentSortDir === 'desc'" :size="sortIconSize">
                   <IconArrowDown />
                 </GrIcon>
               </span>
             </button>
-            <span v-else class="text-[var(--gr-muted-fg)]">{{ col.label }}</span>
+            <span v-else class="text-[var(--gr-muted-fg)]">
+              <slot :name="`header-${col.key}`" :column="col">
+                {{ col.label }}
+              </slot>
+            </span>
           </div>
         </th>
       </tr>
@@ -370,10 +534,12 @@ function toggleAll(): void {
     <template v-if="loading">
       <tr data-gr-datatable-loading>
         <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
-          <span class="inline-flex items-center gap-2" role="status">
-            <span class="i-lucide-loader-circle block animate-spin" :class="spinnerClass" aria-hidden="true" />
-            <span>{{ resolvedLoadingText }}</span>
-          </span>
+          <slot name="loading">
+            <span class="inline-flex items-center gap-2">
+              <span class="i-lucide-loader-circle block animate-spin" :class="spinnerClass" aria-hidden="true" />
+              <span>{{ resolvedLoadingText }}</span>
+            </span>
+          </slot>
         </td>
       </tr>
     </template>
@@ -381,37 +547,42 @@ function toggleAll(): void {
       <tr data-gr-datatable-empty>
         <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
           <slot name="empty">
-            {{ t('gr.dataTable.empty', 'No data') }}
+            {{ resolvedEmptyText }}
           </slot>
         </td>
       </tr>
     </template>
     <tr
-      v-for="row in sortedRows"
+      v-for="(row, index) in sortedRows"
       v-else
       :key="rowKeyValue(row)"
       class="border-t border-[var(--gr-brd)]"
-      :class="isRowSelected(row) ? 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]' : ''"
+      :class="[
+        isRowSelected(row) ? 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]' : '',
+        rowClassName(row, index),
+      ]"
       data-gr-datatable-row
+      :data-row-key="rowKeyValue(row)"
       :data-selected="selectable && isRowSelected(row) ? 'true' : undefined"
+      v-bind="rowProps?.(row, index)"
+      @click="onRowClick(row, index, $event)"
     >
       <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]">
-        <input
-          type="checkbox"
+        <GrCheckbox
+          v-if="isRowSelectable(row)"
           data-gr-datatable-select-row
-          class="cursor-pointer accent-[var(--gr-primary)] align-middle"
-          :class="checkboxClass"
-          :checked="isRowSelected(row)"
+          :model-value="isRowSelected(row)"
+          :size="checkboxSize"
           :aria-label="t('gr.dataTable.selectRow', 'Select row')"
-          @change="toggleRow(row)"
-        >
+          @update:model-value="toggleRow(row)"
+        />
       </td>
       <td
         v-for="col in columns"
         :key="col.key"
         :class="[cellClass, cellAlign(col)]"
       >
-        <slot :name="`cell-${col.key}`" :row="row">
+        <slot :name="`cell-${col.key}`" :row="row" :index="index">
           <span>{{ cellValue(row, col.key) }}</span>
         </slot>
       </td>

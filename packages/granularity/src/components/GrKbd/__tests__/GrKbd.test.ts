@@ -26,10 +26,12 @@ describe('GrKbd', () => {
     expect(wrapper.classes().some(c => c.startsWith('min-w-'))).toBe(true)
   })
 
-  it('цифры не пляшут по ширине (tabular-nums)', () => {
+  // `tabular-nums` — утилита `presetWind`; на `presetMini`, где живёт пакет, она
+  // молча не генерируется. Тот же эффект даёт arbitrary-значение.
+  it('цифры не пляшут по ширине', () => {
     const wrapper = mount(GrKbd, { slots: { default: '1' } })
 
-    expect(wrapper.classes()).toContain('tabular-nums')
+    expect(wrapper.classes()).toContain('[font-variant-numeric:tabular-nums]')
   })
 
   it('оформление берётся из токенов, а не из хардкода', () => {

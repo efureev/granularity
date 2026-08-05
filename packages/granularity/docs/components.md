@@ -37,7 +37,7 @@
 - `GrCommandPalette`
 - `GrConfigProvider`
 - `GrConfirmDialog`
-- `GrDataTable`
+- [`GrDataTable`](./components/GrDataTable.md)
 - `GrDialog`
 - `GrDialogService`
 - `GrDivider`

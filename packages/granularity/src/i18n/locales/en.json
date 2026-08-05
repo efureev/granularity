@@ -32,9 +32,9 @@
     "empty": "No data",
     "selectAll": "Select all rows",
     "selectRow": "Select row",
-    "sortBy": "Sort by {column}",
-    "sortedAsc": "Sorted by {column} ascending, activate to sort descending",
-    "sortedDesc": "Sorted by {column} descending, activate to sort ascending"
+    "sortAsc": "Activate to sort ascending",
+    "sortDesc": "Activate to sort descending",
+    "sortNone": "Activate to remove sorting"
   },
   "autocomplete": {
     "loading": "Loading…",

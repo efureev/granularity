@@ -1,3 +1,4 @@
+import type { GrCheckboxSize } from '../GrCheckbox/grCheckboxStyles'
 import type { GrComponentSize } from '../shared/sizes'
 
 export type GrDataTableSize = GrComponentSize
@@ -26,11 +27,16 @@ export const headerTextSizes: Record<GrDataTableSize, string> = {
   lg: 'text-sm',
 }
 
-export const checkboxSizes: Record<GrDataTableSize, string> = {
-  xs: 'h-3 w-3',
-  sm: 'h-3.5 w-3.5',
-  md: 'h-4 w-4',
-  lg: 'h-5 w-5',
+/**
+ * Размер `GrCheckbox` в колонке выбора. Здесь не классы, а ступень шкалы:
+ * коробку рисует сам чекбокс — он же держит `indeterminate`, disabled без
+ * `opacity` и фокус-кольцо.
+ */
+export const selectCheckboxSizes: Record<GrDataTableSize, GrCheckboxSize> = {
+  xs: 'xs',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
 }
 
 /** Ширина колонки выбора: коробка чекбокса плюс горизонтальный паддинг ячейки. */

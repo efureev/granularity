@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { createGenerator, presetMini } from 'unocss'
+import { presetGranular } from '@feugene/unocss-preset-granular'
 import { describe, expect, it } from 'vitest'
 
 /**
@@ -81,10 +82,16 @@ async function declaredSafelist(component: string): Promise<Set<string>> {
 
 describe('safelist-контракт', () => {
   it('классы из `.ts`-хелперов компонента объявлены в его safelist', async () => {
-    // Оракул «это вообще утилита?»: `presetMini` — базовый пресет, на котором
-    // строится контракт пакета. Токен, из которого он не делает CSS, классом не
-    // считается, и safelist ему не нужен.
-    const uno = await createGenerator({ presets: [presetMini()] })
+    // Оракул «это вообще утилита?» — ровно та связка, которую собирает
+    // потребитель: `presetMini` плюс утилиты, которые `presetGranular` добирает
+    // из `@feugene/unocss-mini-extra-rules` (`animate-*`, `divide-*`, `sr-only`…).
+    // На чистом `presetMini` такой токен считался бы «не утилитой», а значит
+    // safelist ему не требовался — и у изолированного потребителя класс молча
+    // не сгенерировался бы. Токен, из которого CSS не делает никто, классом
+    // по-прежнему не считается.
+    const uno = await createGenerator({
+      presets: [presetMini(), presetGranular({ providers: [], components: [] })],
+    })
     const isUtility = new Map<string, boolean>()
 
     const violations: string[] = []
