@@ -15,10 +15,9 @@
  * один и тот же порядок и расходятся молча — достаточно оверлея, который
  * зарегистрировался в одном и забыл про другой.
  *
- * Фокус-ловушку стек не реализует — у модальных оверлеев пакета её даёт
- * `Dialog` из HeadlessUI. Стек решает то, чего HeadlessUI не может: он видит
- * слои из **разных деревьев рендера** (диалоги `useDialogService` монтируются
- * отдельным `render()` в `body`), где каждый `<Dialog>` считает себя верхним.
+ * Ловушку фокуса стек не реализует сам, но питает её (`useFocusTrap`): он
+ * видит слои из **разных деревьев рендера** (диалоги `useDialogService`
+ * монтируются отдельным `render()` в `body`) и знает их корни.
  */
 
 export interface OverlayLayer {
@@ -35,6 +34,12 @@ export interface OverlayLayer {
   close: () => void
   /** Уведомление «этот модальный слой сейчас верхний». Только для `modal`. */
   setTopmost?: (isTopmost: boolean) => void
+  /**
+   * Корень слоя. Ловушка фокуса нижнего слоя обязана считать его своим:
+   * панель селекта, открытого внутри модалки, телепортирована в `body` и лежит
+   * вне DOM-поддерева окна, но для пользователя это тот же слой.
+   */
+  root?: () => HTMLElement | null
 }
 
 const stack: OverlayLayer[] = []
@@ -67,7 +72,8 @@ function handleKeydown(event: KeyboardEvent): void {
 function startListening(): void {
   if (listening) return
   if (typeof window === 'undefined') return
-  // Capture-фаза опережает собственный window-обработчик Escape у HeadlessUI.
+  // Capture-фаза опережает любые локальные обработчики: Esc обязан достаться
+  // верхнему слою, а не тому, кто первым подписался.
   window.addEventListener('keydown', handleKeydown, true)
   listening = true
 }
@@ -94,6 +100,30 @@ export function removeOverlayLayer(id: number): void {
   if (index >= 0) stack.splice(index, 1)
   if (stack.length === 0) stopListening()
   syncTopmost()
+}
+
+/**
+ * Корни слоёв, открытых **поверх** данного.
+ *
+ * Ими ловушка фокуса дополняет свой контейнер: всё, что открыто изнутри слоя
+ * (панель селекта, меню, подсказка), лежит в `body` отдельным поддеревом, и
+ * без этого списка ловушка утаскивала бы из него фокус обратно в окно.
+ */
+export function layerRootsAbove(id: number): HTMLElement[] {
+  const index = stack.findIndex(layer => layer.id === id)
+  if (index < 0) return []
+
+  return stack
+    .slice(index + 1)
+    .map(layer => layer.root?.() ?? null)
+    .filter((root): root is HTMLElement => root !== null)
+}
+
+/** Корни всех зарегистрированных слоёв. */
+export function allLayerRoots(): HTMLElement[] {
+  return stack
+    .map(layer => layer.root?.() ?? null)
+    .filter((root): root is HTMLElement => root !== null)
 }
 
 /** Сколько слоёв открыто. Для тестов и диагностики. */

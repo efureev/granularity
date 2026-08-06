@@ -2,57 +2,15 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent, onBeforeUnmount, onMounted } = await import('vue')
-
-  return {
-    // Escape мок намеренно НЕ превращает в `@close`: общий стек слоёв гасит
-    // нажатие в capture-фазе на `window`, и до `<Dialog>` оно не доходит.
-    // Мок, эмулирующий обратное, проверял бы путь, которого в проде нет.
-    Dialog: defineComponent({
-      name: 'Dialog',
-      emits: ['close'],
-      props: {
-        as: { type: String, default: 'div' },
-        initialFocus: { type: Object, default: null },
-      },
-      template: '<div data-testid="hu-dialog"><slot /></div>',
-    }),
-    DialogPanel: defineComponent({
-      name: 'DialogPanel',
-      template: '<div data-testid="hu-panel"><slot /></div>',
-    }),
-    DialogTitle: defineComponent({
-      name: 'DialogTitle',
-      template: '<div data-testid="hu-title"><slot /></div>',
-    }),
-    DialogDescription: defineComponent({
-      name: 'DialogDescription',
-      template: '<div data-testid="hu-description"><slot /></div>',
-    }),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    // `after-enter`/`after-leave` мок эмитит сразу: настоящих транзишнов в
-    // jsdom нет, а проверяем мы проводку событий наружу, а не тайминг.
-    // `TransitionChild` монтируется вместе с открытием и размонтируется с
-    // закрытием, поэтому событие привязано к жизненному циклу, а не к пропу.
-    TransitionChild: defineComponent({
-      name: 'TransitionChild',
-      emits: ['after-enter', 'after-leave'],
-      setup(_, { emit }) {
-        onMounted(() => emit('after-enter'))
-        onBeforeUnmount(() => emit('after-leave'))
-      },
-      template: '<div><slot /></div>',
-    }),
-  }
-})
-
 import GrModal from '../GrModal.vue'
 import { overlayStackSize, pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
+import { resetScrollLock } from '../../../composables/internal/useScrollLock'
+
+/**
+ * Мока `@headlessui/vue` здесь больше нет — и это половина смысла файла.
+ * Пока он был, ловушка фокуса, `aria-modal`, `aria-labelledby` и клик по
+ * подложке проверялись против заглушки, то есть не проверялись вовсе.
+ */
 
 interface HarnessOptions {
   closeOnBackdrop?: boolean
@@ -74,7 +32,25 @@ function pressEscape(): void {
   }))
 }
 
-function mountHarness(options: HarnessOptions = {}) {
+/**
+ * Дожидается конца leave-анимации.
+ *
+ * Транзишн держит поддеревo до `@after-leave`, а Vue переключает фазы через
+ * `requestAnimationFrame` — одного `nextTick` для «панель исчезла» мало.
+ */
+async function settle(): Promise<void> {
+  for (let i = 0; i < 3; i++) {
+    await new Promise(resolve => requestAnimationFrame(() => resolve(null)))
+    await nextTick()
+  }
+}
+
+/**
+ * Хелпер асинхронный: поддерево слоя появляется на такт позже монтирования —
+ * телепорт включается только после маунта, чтобы серверный рендер и первый
+ * клиентский совпадали (см. `useTeleportEnabled`).
+ */
+async function mountHarness(options: HarnessOptions = {}) {
   const slots: Record<string, string> = {
     default: '<div data-testid="modal-body">Body</div>',
   }
@@ -121,7 +97,7 @@ function mountHarness(options: HarnessOptions = {}) {
     `,
   })
 
-  return mount(Harness, {
+  const wrapper = mount(Harness, {
     props: {
       closeOnBackdrop: options.closeOnBackdrop ?? true,
       closeOnEsc: options.closeOnEsc ?? true,
@@ -129,10 +105,30 @@ function mountHarness(options: HarnessOptions = {}) {
       scrollBehavior: options.scrollBehavior ?? 'outside',
       ariaLabel: options.ariaLabel,
     },
-    global: {
-      stubs: { teleport: true },
-    },
+    attachTo: document.body,
+    global: { stubs: { transition: false } },
   })
+
+  await nextTick()
+  return wrapper
+}
+
+/**
+ * Панель и подложка живут в `body` (телепорт), поэтому ищем их по документу:
+ * `wrapper.find` смотрит только внутрь дерева обёртки.
+ */
+function q<T extends Element = HTMLElement>(selector: string): T | null {
+  return document.querySelector<T>(selector)
+}
+
+function exists(selector: string): boolean {
+  return q(selector) !== null
+}
+
+/** Клик по подложке так, как его делает пользователь: mousedown и следом click. */
+function clickBackdrop(overlay: Element): void {
+  overlay.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+  overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 }
 
 describe('granularity/GrModal (unit)', () => {
@@ -140,102 +136,146 @@ describe('granularity/GrModal (unit)', () => {
     document.body.innerHTML = ''
     document.body.style.overflow = ''
     resetOverlayStack()
+    resetScrollLock()
+  })
+
+  it('объявляет себя модальным диалогом', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
+    const dialog = document.querySelector('[data-gr-overlay-root]')!
+
+    expect(dialog.getAttribute('role')).toBe('dialog')
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+
+    wrapper.unmount()
   })
 
   it('помечает корень inert, когда поверх открыта другая модалка (не верхнее окно)', async () => {
-    const wrapper = mountHarness()
-    const dialog = wrapper.find('[data-testid="hu-dialog"]')
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
+    const dialog = document.querySelector('[data-gr-overlay-root]')!
 
     // Пока окно верхнее — inert не выставлен.
-    expect(dialog.attributes('inert')).toBeUndefined()
+    expect(dialog.hasAttribute('inert')).toBe(false)
 
     // Открываем «поверх» ещё одну модалку: текущее окно перестаёт быть верхним.
     pushOverlayLayer({ modal: true, shouldClose: () => true, close: () => {} })
     await nextTick()
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBe('')
+    expect(dialog.hasAttribute('inert')).toBe(true)
 
     wrapper.unmount()
   })
 
-  it('рендерит оверлей ниже панели, aria-hidden и дефолтный размер md', () => {
-    const wrapper = mountHarness()
+  it('убирает остальную страницу из таб-порядка и дерева доступности', async () => {
+    const page = document.createElement('main')
+    page.innerHTML = '<button data-testid="page-button">под окном</button>'
+    document.body.appendChild(page)
 
-    const overlay = wrapper.find('[data-gr-modal-overlay]')
-    const panel = wrapper.find('[data-gr-modal-panel]')
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
+    await nextTick()
 
-    expect(overlay.exists()).toBe(true)
-    expect(panel.exists()).toBe(true)
+    expect(page.hasAttribute('inert')).toBe(true)
+    expect(page.getAttribute('aria-hidden')).toBe('true')
 
-    expect(overlay.attributes('class')).toContain('z-0')
-    expect(overlay.attributes('aria-hidden')).toBe('true')
+    wrapper.unmount()
+    await nextTick()
 
-    expect(panel.attributes('class')).toContain('relative')
-    expect(panel.attributes('class')).toContain('z-10')
-    expect(panel.attributes('class')).toContain('max-w-[560px]')
+    expect(page.hasAttribute('inert')).toBe(false)
+    expect(page.hasAttribute('aria-hidden')).toBe(false)
+  })
+
+  it('рендерит оверлей ниже панели, aria-hidden и дефолтный размер md', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
+
+    const overlay = q('[data-gr-modal-overlay]')!
+    const panel = q('[data-gr-modal-panel]')!
+
+    expect(overlay).not.toBeNull()
+    expect(panel).not.toBeNull()
+
+    expect(overlay.className).toContain('z-0')
+    expect(overlay.getAttribute('aria-hidden')).toBe('true')
+
+    expect(panel.className).toContain('relative')
+    expect(panel.className).toContain('z-10')
+    expect(panel.className).toContain('max-w-[560px]')
 
     wrapper.unmount()
   })
 
   it('закрывается по Esc, когда closeOnEsc=true (по умолчанию)', async () => {
-    const wrapper = mountHarness()
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
 
     pressEscape()
-    await nextTick()
+    await settle()
 
-    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
+    expect(exists('[data-gr-modal-panel]')).toBe(false)
 
     wrapper.unmount()
   })
 
   it('не закрывается по Esc, если closeOnEsc=false', async () => {
-    const wrapper = mountHarness({ closeOnEsc: false })
+    const wrapper = await mountHarness({ ariaLabel: 'X', closeOnEsc: false })
 
     pressEscape()
-    await nextTick()
+    await settle()
 
-    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(true)
+    expect(exists('[data-gr-modal-panel]')).toBe(true)
 
     wrapper.unmount()
   })
 
   it('Esc закрывает даже при closeOnBackdrop=false (независимость флагов)', async () => {
-    const wrapper = mountHarness({ closeOnBackdrop: false, closeOnEsc: true })
+    const wrapper = await mountHarness({ ariaLabel: 'X', closeOnBackdrop: false, closeOnEsc: true })
 
     pressEscape()
-    await nextTick()
+    await settle()
 
-    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
-
-    wrapper.unmount()
-  })
-
-  it('закрывается по клику на оверлей, если closeOnBackdrop=true', async () => {
-    const wrapper = mountHarness({ closeOnBackdrop: true })
-
-    wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
-    await nextTick()
-
-    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
+    expect(exists('[data-gr-modal-panel]')).toBe(false)
 
     wrapper.unmount()
   })
 
-  it('не закрывается по клику на оверлей, если closeOnBackdrop=false', async () => {
-    const wrapper = mountHarness({ closeOnBackdrop: false })
+  it('закрывается по клику на подложку, если closeOnBackdrop=true', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X', closeOnBackdrop: true })
 
-    wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
-    await nextTick()
+    clickBackdrop(q('[data-gr-modal-overlay]')!)
+    await settle()
 
-    expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(true)
+    expect(exists('[data-gr-modal-panel]')).toBe(false)
 
     wrapper.unmount()
   })
 
-  it('размер full раскрывает окно во весь экран: панель без полей и без радиуса', () => {
-    const wrapper = mountHarness({ size: 'full' })
+  it('не закрывается по клику на подложку, если closeOnBackdrop=false', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X', closeOnBackdrop: false })
 
-    const panelClass = wrapper.find('[data-gr-modal-panel]').attributes('class')
+    clickBackdrop(q('[data-gr-modal-overlay]')!)
+    await settle()
+
+    expect(exists('[data-gr-modal-panel]')).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('выделение текста, начатое в панели и отпущенное на подложке, окно не закрывает', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
+
+    const panel = q('[data-gr-modal-panel]')!
+    const overlay = q('[data-gr-modal-overlay]')!
+
+    panel.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await settle()
+
+    expect(exists('[data-gr-modal-panel]')).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('размер full раскрывает окно во весь экран: панель без полей и без радиуса', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X', size: 'full' })
+
+    const panelClass = q('[data-gr-modal-panel]')!.getAttribute('class')
 
     expect(panelClass).toContain('max-w-none')
     expect(panelClass).toContain('h-full')
@@ -243,43 +283,43 @@ describe('granularity/GrModal (unit)', () => {
 
     // Паддинг оболочки при `full` снимается: вместе с `h-full` он дал бы панель
     // выше вьюпорта и лишний скролл.
-    const shell = wrapper.find('[data-testid="hu-dialog"]').element.firstElementChild as HTMLElement
+    const shell = document.querySelector('[data-gr-overlay-root]')!.firstElementChild as HTMLElement
     expect(shell.className).not.toContain('p-4')
 
     wrapper.unmount()
   })
 
-  it('при остальных размерах оболочка сохраняет поля вокруг панели', () => {
-    const wrapper = mountHarness({ size: 'md' })
+  it('при остальных размерах оболочка сохраняет поля вокруг панели', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X', size: 'md' })
 
-    const shell = wrapper.find('[data-testid="hu-dialog"]').element.firstElementChild as HTMLElement
+    const shell = document.querySelector('[data-gr-overlay-root]')!.firstElementChild as HTMLElement
     expect(shell.className).toContain('p-4')
 
     wrapper.unmount()
   })
 
-  it('рендерит контент напрямую внутри панели без header/footer и кнопки закрытия', () => {
-    const wrapper = mountHarness()
+  it('рендерит контент напрямую внутри панели без header/footer и кнопки закрытия', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
 
-    expect(wrapper.find('[data-gr-dialog-header]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-dialog-footer]').exists()).toBe(false)
-    expect(wrapper.find('button[aria-label="Close"]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-modal-panel] [data-testid="modal-body"]').exists()).toBe(true)
+    expect(exists('[data-gr-dialog-header]')).toBe(false)
+    expect(exists('[data-gr-dialog-footer]')).toBe(false)
+    expect(exists('button[aria-label="Close"]')).toBe(false)
+    expect(exists('[data-gr-modal-panel] [data-testid="modal-body"]')).toBe(true)
 
     wrapper.unmount()
   })
 
-  it('рендерит слоты #title и #description как DialogTitle/Description, только если переданы', () => {
-    const wrapperEmpty = mountHarness()
-    expect(wrapperEmpty.find('[data-gr-modal-title]').exists()).toBe(false)
-    expect(wrapperEmpty.find('[data-gr-modal-description]').exists()).toBe(false)
+  it('рендерит слоты #title и #description, только если переданы', async () => {
+    const wrapperEmpty = await mountHarness({ ariaLabel: 'X' })
+    expect(exists('[data-gr-modal-title]')).toBe(false)
+    expect(exists('[data-gr-modal-description]')).toBe(false)
     wrapperEmpty.unmount()
 
-    const wrapper = mountHarness({ withTitleSlot: true, withDescriptionSlot: true })
-    expect(wrapper.find('[data-gr-modal-title]').exists()).toBe(true)
-    expect(wrapper.find('[data-gr-modal-description]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="title-slot"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="description-slot"]').exists()).toBe(true)
+    const wrapper = await mountHarness({ withTitleSlot: true, withDescriptionSlot: true })
+    expect(exists('[data-gr-modal-title]')).toBe(true)
+    expect(exists('[data-gr-modal-description]')).toBe(true)
+    expect(exists('[data-testid="title-slot"]')).toBe(true)
+    expect(exists('[data-testid="description-slot"]')).toBe(true)
     wrapper.unmount()
   })
 
@@ -292,12 +332,10 @@ describe('granularity/GrModal (unit)', () => {
         const open = ref(false)
         return { open }
       },
-      template: `<GrModal v-model="open"><div>body</div></GrModal>`,
+      template: `<GrModal v-model="open" aria-label="X"><div>body</div></GrModal>`,
     })
 
-    const wrapper = mount(Harness, {
-      global: { stubs: { teleport: true } },
-    })
+    const wrapper = mount(Harness, { attachTo: document.body, global: { stubs: { transition: false } } })
 
     expect(document.body.style.overflow).toBe('auto')
 
@@ -318,36 +356,199 @@ describe('GrModal — доступное имя', () => {
     document.body.innerHTML = ''
     document.body.style.overflow = ''
     resetOverlayStack()
+    resetScrollLock()
     vi.restoreAllMocks()
   })
 
-  it('со слотом #title имя даёт aria-labelledby, свой aria-label не ставится', () => {
-    const wrapper = mountHarness({ withTitleSlot: true })
+  it('со слотом #title имя даёт aria-labelledby, свой aria-label не ставится', async () => {
+    const wrapper = await mountHarness({ withTitleSlot: true })
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBeUndefined()
-    expect(wrapper.find('[data-gr-modal-title]').exists()).toBe(true)
+    const dialog = document.querySelector('[data-gr-overlay-root]')!
+    const title = q('[data-gr-modal-title]')!
 
-    wrapper.unmount()
-  })
-
-  it('без слота #title имя берётся из пропа ariaLabel', () => {
-    const wrapper = mountHarness({ ariaLabel: 'Настройки профиля' })
-
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Настройки профиля')
+    expect(dialog.getAttribute('aria-label')).toBeNull()
+    expect(dialog.getAttribute('aria-labelledby')).toBe(title.id)
+    expect(title.id).toBeTruthy()
 
     wrapper.unmount()
   })
 
-  it('без заголовка и без ariaLabel окно всё равно не остаётся безымянным', () => {
+  it('слот #description связывается через aria-describedby', async () => {
+    const wrapper = await mountHarness({ withTitleSlot: true, withDescriptionSlot: true })
+
+    const dialog = document.querySelector('[data-gr-overlay-root]')!
+    expect(dialog.getAttribute('aria-describedby'))
+      .toBe(q('[data-gr-modal-description]')!.getAttribute('id'))
+
+    wrapper.unmount()
+  })
+
+  it('без слота #title имя берётся из пропа ariaLabel', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'Настройки профиля' })
+
+    expect(document.querySelector('[data-gr-overlay-root]')!.getAttribute('aria-label'))
+      .toBe('Настройки профиля')
+
+    wrapper.unmount()
+  })
+
+  it('без заголовка и без ariaLabel окно всё равно не остаётся безымянным', async () => {
     // Иначе axe роняет `aria-dialog-name` (critical), а диктор объявляет
     // «диалог» без единого слова о том, какой именно.
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const wrapper = mountHarness()
+    const wrapper = await mountHarness()
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Dialog')
+    expect(document.querySelector('[data-gr-overlay-root]')!.getAttribute('aria-label')).toBe('Dialog')
     expect(warn).toHaveBeenCalledOnce()
 
     wrapper.unmount()
+  })
+})
+
+describe('GrModal — фокус', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
+    resetOverlayStack()
+    resetScrollLock()
+  })
+
+  async function mountWithFields(initialFocus: HTMLElement | null = null) {
+    const wrapper = mount(defineComponent({
+      components: { GrModal },
+      props: { target: { type: Object, default: null } },
+      setup: () => ({ open: ref(true) }),
+      template: `
+        <GrModal v-model="open" aria-label="X" :initial-focus="target">
+          <button data-testid="first">first</button>
+          <button data-testid="last">last</button>
+        </GrModal>
+      `,
+    }), {
+      props: { target: initialFocus as unknown as Record<string, unknown> },
+      attachTo: document.body,
+      global: { stubs: { transition: false } },
+    })
+
+    await nextTick()
+    return wrapper
+  }
+
+  it('по умолчанию фокус уходит на панель', async () => {
+    const wrapper = await mountWithFields()
+    await settle()
+
+    expect(document.activeElement).toBe(document.querySelector('[data-gr-modal-panel]'))
+
+    wrapper.unmount()
+  })
+
+  it('initialFocus перебивает панель по умолчанию', async () => {
+    const wrapper = mount(defineComponent({
+      components: { GrModal },
+      setup() {
+        const open = ref(true)
+        const target = ref<HTMLElement | null>(null)
+        return { open, target }
+      },
+      template: `
+        <GrModal v-model="open" aria-label="X" :initial-focus="target">
+          <button data-testid="first">first</button>
+          <button ref="target" data-testid="second">second</button>
+        </GrModal>
+      `,
+    }), { attachTo: document.body, global: { stubs: { transition: false } } })
+
+    // Ссылка на элемент внутри окна появляется только после его рендера,
+    // поэтому фокус проверяем после того, как слой устоялся.
+    await settle()
+
+    expect(document.activeElement).toBe(document.querySelector('[data-testid="second"]'))
+
+    wrapper.unmount()
+  })
+
+  it('Tab ходит по кругу внутри окна', async () => {
+    const wrapper = await mountWithFields()
+    await settle()
+
+    const first = document.querySelector<HTMLElement>('[data-testid="first"]')!
+    const last = document.querySelector<HTMLElement>('[data-testid="last"]')!
+
+    // С панели Tab заходит внутрь, а не выпрыгивает на страницу.
+    first.focus()
+    last.focus()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+    await nextTick()
+    expect(document.activeElement).toBe(first)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }))
+    await nextTick()
+    expect(document.activeElement).toBe(last)
+
+    wrapper.unmount()
+  })
+
+  it('фокус, утёкший наружу, возвращается в окно', async () => {
+    const outside = document.createElement('button')
+    document.body.appendChild(outside)
+
+    const wrapper = await mountWithFields()
+    await settle()
+
+    outside.focus()
+    await nextTick()
+
+    expect(document.activeElement).not.toBe(outside)
+    expect(document.querySelector('[data-gr-modal-panel]')!.contains(document.activeElement)).toBe(true)
+
+    wrapper.unmount()
+    outside.remove()
+  })
+
+  it('панель другого слоя, открытого изнутри окна, фокус сохраняет', async () => {
+    const wrapper = await mountWithFields()
+    await settle()
+
+    // Так ведёт себя панель `GrSelect`, открытая внутри модалки: она
+    // телепортирована в `body`, но принадлежит слою выше.
+    const panel = document.createElement('div')
+    panel.innerHTML = '<button data-testid="option">option</button>'
+    document.body.appendChild(panel)
+    pushOverlayLayer({ modal: false, shouldClose: () => true, close: () => {}, root: () => panel })
+
+    const option = panel.querySelector<HTMLElement>('[data-testid="option"]')!
+    option.focus()
+    await nextTick()
+
+    expect(document.activeElement).toBe(option)
+
+    wrapper.unmount()
+    panel.remove()
+  })
+
+  it('возвращает фокус на триггер при закрытии', async () => {
+    const trigger = document.createElement('button')
+    document.body.appendChild(trigger)
+    trigger.focus()
+
+    const wrapper = mount(defineComponent({
+      components: { GrModal },
+      setup: () => ({ open: ref(false) }),
+      template: '<GrModal v-model="open" aria-label="X"><button>inside</button></GrModal>',
+    }), { attachTo: document.body, global: { stubs: { transition: false } } })
+
+    wrapper.vm.open = true
+    await settle()
+    expect(document.activeElement).not.toBe(trigger)
+
+    wrapper.vm.open = false
+    await settle()
+
+    expect(document.activeElement).toBe(trigger)
+
+    wrapper.unmount()
+    trigger.remove()
   })
 })
 
@@ -356,103 +557,87 @@ describe('GrModal — жизненный цикл и раскладка', () => 
     document.body.innerHTML = ''
     document.body.style.overflow = ''
     resetOverlayStack()
+    resetScrollLock()
   })
 
   it('эмитит opened/closed после анимации', async () => {
-    // Без `teleport`-стаба: он пересоздаёт поддерево на каждом ре-рендере, и
-    // инстанс транзишна не доживает до перехода «открыто → закрыто».
     const wrapper = mount(GrModal, {
       attachTo: document.body,
       props: { modelValue: false, ariaLabel: 'X' },
       slots: { default: '<div />' },
+      global: { stubs: { transition: false } },
     })
 
     await wrapper.setProps({ modelValue: true })
+    await settle()
     expect(wrapper.emitted('opened')).toHaveLength(1)
     expect(wrapper.emitted('closed')).toBeUndefined()
 
     await wrapper.setProps({ modelValue: false })
+    await settle()
     expect(wrapper.emitted('closed')).toHaveLength(1)
 
     wrapper.unmount()
   })
 
-  it('initialFocus перебивает панель по умолчанию', () => {
-    const target = document.createElement('button')
-    document.body.appendChild(target)
+  it('scrollBehavior решает, кто скроллится: оверлей или сама панель', async () => {
+    const shellOf = () =>
+      document.querySelector('[data-gr-overlay-root]')!.firstElementChild as HTMLElement
 
-    const wrapper = mount(defineComponent({
-      components: { GrModal },
-      props: { target: { type: Object, default: null } },
-      setup: () => ({ open: ref(true) }),
-      template: '<GrModal v-model="open" aria-label="X" :initial-focus="target"><div /></GrModal>',
-    }), { props: { target }, global: { stubs: { teleport: true } } })
-
-    expect(wrapper.findComponent({ name: 'Dialog' }).props('initialFocus')).toBe(target)
-
-    wrapper.unmount()
-    target.remove()
-  })
-
-  it('scrollBehavior решает, кто скроллится: оверлей или сама панель', () => {
-    // Оболочка — первый потомок корня `<Dialog>`, за ней раскладка.
-    const shellOf = (w: ReturnType<typeof mountHarness>) =>
-      w.find('[data-testid="hu-dialog"]').element.firstElementChild as HTMLElement
-
-    const outside = mountHarness({ ariaLabel: 'X' })
-    expect(shellOf(outside).className).toContain('overflow-y-auto')
-    expect(outside.find('[data-gr-modal-panel]').attributes('class')).toContain('overflow-hidden')
+    const outside = await mountHarness({ ariaLabel: 'X' })
+    expect(shellOf().className).toContain('overflow-y-auto')
+    expect(q('[data-gr-modal-panel]')!.getAttribute('class')).toContain('overflow-hidden')
     outside.unmount()
 
-    const inside = mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside' })
-    expect(shellOf(inside).className).toContain('overflow-hidden')
-    expect(inside.find('[data-gr-modal-panel]').attributes('class')).toContain('max-h-full')
+    const inside = await mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside' })
+    expect(shellOf().className).toContain('overflow-hidden')
+    expect(q('[data-gr-modal-panel]')!.getAttribute('class')).toContain('max-h-full')
 
     // Скроллится тело, а не панель целиком: заголовок обязан остаться на месте.
-    expect(inside.find('[data-gr-modal-body]').attributes('class')).toContain('overflow-y-auto')
+    expect(q('[data-gr-modal-body]')!.getAttribute('class')).toContain('overflow-y-auto')
     inside.unmount()
   })
 
-  it('скроллящееся тело попадает в таб-порядок, нескроллящееся — нет', () => {
-    const inside = mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside' })
-    expect(inside.find('[data-gr-modal-body]').attributes('tabindex')).toBe('0')
+  it('скроллящееся тело попадает в таб-порядок, нескроллящееся — нет', async () => {
+    const inside = await mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside' })
+    expect(q('[data-gr-modal-body]')!.getAttribute('tabindex')).toBe('0')
     inside.unmount()
 
-    const outside = mountHarness({ ariaLabel: 'X' })
-    expect(outside.find('[data-gr-modal-body]').exists()).toBe(false)
+    const outside = await mountHarness({ ariaLabel: 'X' })
+    expect(exists('[data-gr-modal-body]')).toBe(false)
     outside.unmount()
   })
 
-  it('слоты #header и #footer рендерятся вне скроллящегося тела', () => {
-    const wrapper = mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside', withSectionSlots: true })
+  it('слоты #header и #footer рендерятся вне скроллящегося тела', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside', withSectionSlots: true })
 
-    const body = wrapper.find('[data-gr-modal-body]')
-    const header = wrapper.find('[data-gr-modal-header]')
-    const footer = wrapper.find('[data-gr-modal-footer]')
+    const body = q('[data-gr-modal-body]')!
+    const header = q('[data-gr-modal-header]')!
+    const footer = q('[data-gr-modal-footer]')!
 
-    expect(header.find('[data-testid="header-slot"]').exists()).toBe(true)
-    expect(footer.find('[data-testid="footer-slot"]').exists()).toBe(true)
-    expect(body.find('[data-testid="header-slot"]').exists()).toBe(false)
-    expect(body.find('[data-testid="footer-slot"]').exists()).toBe(false)
+    expect(header.querySelector('[data-testid="header-slot"]')).not.toBeNull()
+    expect(footer.querySelector('[data-testid="footer-slot"]')).not.toBeNull()
+    expect(body.querySelector('[data-testid="header-slot"]')).toBeNull()
+    expect(body.querySelector('[data-testid="footer-slot"]')).toBeNull()
 
     // Сжиматься в колонке должно тело, а не закреплённые секции.
-    expect(header.attributes('class')).toContain('shrink-0')
-    expect(footer.attributes('class')).toContain('shrink-0')
+    expect(header.className).toContain('shrink-0')
+    expect(footer.className).toContain('shrink-0')
 
     wrapper.unmount()
   })
 
-  it('без слотов секций обёртки шапки и подвала не появляются', () => {
-    const wrapper = mountHarness({ ariaLabel: 'X' })
+  it('без слотов секций обёртки шапки и подвала не появляются', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
 
-    expect(wrapper.find('[data-gr-modal-header]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-modal-footer]').exists()).toBe(false)
+    expect(exists('[data-gr-modal-header]')).toBe(false)
+    expect(exists('[data-gr-modal-footer]')).toBe(false)
 
     wrapper.unmount()
   })
 
-  it('снимает слой со стека при размонтировании без закрытия', () => {
-    const wrapper = mountHarness({ ariaLabel: 'X' })
+  it('снимает слой со стека при размонтировании без закрытия', async () => {
+    const wrapper = await mountHarness({ ariaLabel: 'X' })
     expect(overlayStackSize()).toBe(1)
 
     wrapper.unmount()

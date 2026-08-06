@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
@@ -10,7 +9,10 @@ import { useGrComponentProp, useGrThemeAttrs } from '../GrConfigProvider/context
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 // Единый стек слоёв: Esc верхнему, `inert` нижним модалкам. Drawer — модальный
 // класс (бэкдроп + scroll-lock), поэтому регистрируется как `modal`.
+import { useFocusTrap } from '../../composables/useFocusTrap'
+import { useInertOthers } from '../../composables/internal/useInertOthers'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
+import { useOverlayPresence } from '../../composables/internal/useOverlayPresence'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
 import {
   DEFAULT_GR_DRAWER_BODY_CONFIG,
@@ -38,7 +40,7 @@ export interface GrDrawerProps {
   modelValue: boolean
   /** Заголовок; если передан — покажется в хедере. Можно переопределить слотом `#title`. */
   title?: string
-  /** Закрывать при клике по бэкдропу / через HeadlessUI close. */
+  /** Закрывать при клике по бэкдропу. */
   closeOnBackdrop?: boolean
   /** Закрывать по Esc. */
   closeOnEsc?: boolean
@@ -174,12 +176,19 @@ function closeSoftly(): void {
   close()
 }
 
-function onDialogClose(): void {
-  if (!props.closeOnBackdrop) return
-  closeSoftly()
+// Клик по подложке считается только тем, что на ней и начался: иначе выделение
+// текста в панели, отпущенное за её границей, закрывало бы drawer.
+let pointerDownOnOverlay = false
+
+function onOverlayPointerDown(event: MouseEvent): void {
+  pointerDownOnOverlay = event.target === event.currentTarget
 }
 
-function onOverlayClick(): void {
+function onOverlayClick(event: MouseEvent): void {
+  const startedHere = pointerDownOnOverlay
+  pointerDownOnOverlay = false
+
+  if (!startedHere || event.target !== event.currentTarget) return
   if (!props.closeOnBackdrop) return
   closeSoftly()
 }
@@ -189,18 +198,45 @@ const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
 const isTopmost = ref(true)
 // Нижние модальные слои уходят в `inert`, освобождая фокус верхнему.
-const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : undefined))
+const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? true : undefined))
 
-useOverlayLayer(
+const rootEl = ref<HTMLElement | null>(null)
+
+const {
+  mounted: isMounted,
+  visible: isVisible,
+  onPanelAfterLeave: releasePresence,
+} = useOverlayPresence(computed(() => props.modelValue))
+
+function onPanelAfterLeave(): void {
+  releasePresence()
+  emit('closed')
+}
+
+const layer = useOverlayLayer(
   computed(() => props.modelValue),
   closeSoftly,
   {
     modal: true,
     closeOnEscape: () => props.closeOnEsc && !props.persistent,
     onTopmostChange: (value) => { isTopmost.value = value },
-    restoreFocus: false,
+    root: rootEl,
   },
 )
+
+// Ловушка молчит, пока панель не верхний слой; панели, открытые изнутри
+// (селект, дропдаун), телепортированы в `body` — их корни ловушка считает
+// своими.
+useFocusTrap(panelEl, {
+  active: () => props.modelValue && isTopmost.value,
+  initialFocus: () => props.initialFocus ?? panelEl.value,
+  fallbackFocus: () => panelEl.value,
+  containers: layer.rootsAbove,
+  // Возврат фокуса — за стеком слоёв, у него правило строже.
+  restoreFocus: false,
+})
+
+useInertOthers(rootEl, () => props.modelValue && isTopmost.value)
 
 watch(
   () => props.modelValue,
@@ -229,76 +265,71 @@ defineExpose({
 
 <template>
   <teleport to="body" :disabled="!teleportEnabled">
-    <TransitionRoot
-      :show="modelValue"
-      as="template"
-      @after-enter="emit('opened')"
-      @after-leave="emit('closed')"
+    <div
+      v-if="teleportEnabled && isMounted"
+      ref="rootEl"
+      data-gr-drawer
+      data-gr-overlay-root
+      role="dialog"
+      aria-modal="true"
+      :class="rootClass"
+      :inert="inertAttr"
+      :aria-labelledby="labelledBy"
+      :aria-label="ariaLabel"
     >
-      <Dialog
-        as="div"
-        data-gr-drawer
-        :class="rootClass"
-        :static="true"
-        :inert="inertAttr"
-        :initial-focus="initialFocus ?? undefined"
-        :aria-labelledby="labelledBy"
-        :aria-label="ariaLabel"
-        @close="onDialogClose"
-      >
-        <div class="fixed inset-0">
-          <TransitionChild
-            as="template"
-            enter="duration-200 ease-out"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="duration-150 ease-in"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-          >
-            <div
-              data-gr-drawer-overlay
-              :class="overlayClass"
-              aria-hidden="true"
-              @click="onOverlayClick"
-            />
-          </TransitionChild>
+      <div class="fixed inset-0">
+        <Transition
+          appear
+          enter-active-class="duration-200 ease-out"
+          enter-from-class="opacity-0"
+          leave-active-class="duration-150 ease-in"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="isVisible"
+            data-gr-drawer-overlay
+            :class="overlayClass"
+            aria-hidden="true"
+            @mousedown="onOverlayPointerDown"
+            @click="onOverlayClick"
+          />
+        </Transition>
 
-          <TransitionChild
-            as="template"
-            enter="duration-200 ease-out"
-            :enter-from="panelEnterFrom"
-            enter-to="translate-x-0"
-            leave="duration-150 ease-in"
-            leave-from="translate-x-0"
-            :leave-to="panelEnterFrom"
+        <Transition
+          appear
+          enter-active-class="duration-200 ease-out"
+          :enter-from-class="panelEnterFrom"
+          leave-active-class="duration-150 ease-in"
+          :leave-to-class="panelEnterFrom"
+          @after-enter="emit('opened')"
+          @after-leave="onPanelAfterLeave"
+        >
+          <div
+            v-if="isVisible"
+            ref="panelEl"
+            v-bind="themeAttrs"
+            data-gr-drawer-panel
+            tabindex="-1"
+            class="fixed inset-y-0 flex flex-col"
+            :class="panelClass"
+            :style="panelStyle"
           >
-            <DialogPanel
-              ref="panelEl"
-              v-bind="themeAttrs"
-              data-gr-drawer-panel
-              tabindex="-1"
-              class="fixed inset-y-0 flex flex-col"
-              :class="panelClass"
-              :style="panelStyle"
-            >
               <div
                 v-if="hasHeader"
                 data-gr-drawer-header
                 class="flex items-center justify-between gap-4"
                 :class="sectionClass(headerSection, headerBorderClass)"
               >
-                <DialogTitle
+                <div
                   v-if="hasTitle"
                   :id="titleId"
-                  as="div"
                   data-gr-drawer-title
                   :class="titleClass"
                 >
                   <slot name="title">
                     {{ resolvedTitle }}
                   </slot>
-                </DialogTitle>
+                </div>
                 <div v-else class="min-w-0 flex-1" />
 
                 <GrButton
@@ -329,10 +360,9 @@ defineExpose({
               >
                 <slot name="footer" />
               </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+          </div>
+        </Transition>
+      </div>
+    </div>
   </teleport>
 </template>

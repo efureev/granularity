@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`useFocusTrap` — the focus trap is now a primitive of this package.** Public, next to `useOverlayLayer` and
+  `useDismissible`, with its own subpath export (`@feugene/granularity/composables/useFocusTrap`). While active, Tab
+  cycles inside the layer and focus that leaks out comes back; `initialFocus` is a default rather than an order — a
+  focus the layer's own content has already placed (a dialog aiming at «Cancel», a prompt aiming at its field) is left
+  alone. It is built on `keydown`/`focusin` **without sentinel nodes**: the widespread two-focus-guard-buttons approach
+  puts interactive elements inside a container that carries an ARIA role, which the role forbids
+  (axe: `nested-interactive`).
+- **The overlay stack feeds the trap.** Every layer now registers its `root`, and `useOverlayLayer` returns
+  `rootsAbove()` — the roots of layers opened on top. A modal passes them to the trap as extra containers, so a
+  `GrSelect` panel opened inside a dialog keeps focus: in the DOM it is teleported to `body`, outside the dialog's
+  subtree, while for the user it is the same layer.
+- **A modal now takes the rest of the page out of the accessibility tree.** While a window is open, the other children
+  of `body` get `inert` and `aria-hidden`; covering the page visually was never enough — Tab still walked into a form
+  nobody could see, and a screen reader read it as usual. Roots of other layers (toasts, a panel opened from inside
+  the window) are deliberately left alone.
 - **`GrLoading`: `delay`, a panel slot and a spinner on the icon scale.** `delay` (ms) holds the overlay back, so a
   request that answers faster never flashes one; the countdown starts when the component mounts, and the content is
   not blocked until the overlay is actually shown. The default slot replaces the panel body as a whole — progress
@@ -558,6 +573,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **BREAKING. `@headlessui/vue` is no longer a peer dependency.** The modal family (`GrModal`, `GrDialog`,
+  `GrConfirmDialog`, `GrPromptDialog`, `GrCommandPalette`, `GrDrawer`, `GrImageViewer`) runs on the package's own
+  primitives: `useFocusTrap` for the trap, `useInertOthers` for the background, `useOverlayLayer` for Esc order and
+  focus return — all of which the package already owned — plus Vue's own `<Transition>`. **Remove the dependency from
+  the application:** `yarn remove @headlessui/vue`. Nothing changes in the components' API.
+
+  The reason is not the bundle — the dependency was `external` and never shipped inside `dist` — but ownership: the
+  focus behaviour of every dialog in the package was decided by a library we did not control and, worse, did not test.
+  All eight test files of the family mocked `@headlessui/vue` away, so the trap, `initialFocus`, focus restore,
+  `aria-modal` and `aria-labelledby` were being checked against a stub. The mocks are gone and the tests now assert
+  real markup, plus a new e2e gate opens a window for real and runs axe, Tab and Esc against it.
+- **`GrModal` names itself through its own context.** `#title` and `#description` (and `GrDialog`'s header deeper in
+  the tree) receive their ids from the window and only report that they rendered, which is what `aria-labelledby` and
+  `aria-describedby` are built from. Two titles on one window now warn in dev — previously the second one silently
+  lost.
+- **A click on the backdrop closes a window only if it started there.** Selecting text inside the panel and releasing
+  the button past its edge used to close the window together with the selection. Same for `GrDrawer` and
+  `GrImageViewer`.
+- **`useScrollLock` handles iOS.** `overscroll-behavior: contain`, a `touchmove` guard outside the overlay's own
+  scrollable areas and scroll-position restore — the part of the lock that used to come from the removed dependency.
+  Without it the page behind an open window starts rubber-banding on iOS Safari, and that is only visible on a device.
 - **BREAKING. `GrLoading`: `zIndex` → `zIndexVar`, fullscreen moved onto the scale.** The fullscreen overlay sat on
   `z-50` — below the whole layer scale, so a modal (`1100`) covered the loader that was supposed to block it. It now
   uses `z-[var(--gr-z-loading)]`, and the escape-hatch takes the name of a CSS variable instead of a raw number, the

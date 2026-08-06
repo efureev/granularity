@@ -14,7 +14,7 @@
  * у `GrForm`: третий частный случай валидации в пакете заводить незачем.
  */
 import { useGrComponentProp } from '../GrConfigProvider/context'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrDialog from '../GrDialog/GrDialog.vue'
@@ -303,13 +303,14 @@ function onEnter(): void {
 // поддерева диалога, и возврат его же пропом наверх замыкает рендер в цикл
 // («Maximum recursive updates» — проверено). Поэтому фокус ставит содержимое,
 // после отрисовки (`flush: 'post'` + кадр), то есть заведомо позже, чем
-// фокус-ловушка HeadlessUI переводит фокус на панель.
+// ловушка фокуса `GrModal` переводит фокус на панель.
+// Источник — не только `modelValue`, но и само поле: содержимое панели
+// появляется на такт позже открытия, и фокус по фиксированному `nextTick`
+// приходился на момент, когда фокусировать ещё нечего.
 watch(
-  () => props.modelValue,
-  async (isOpen) => {
-    if (!isOpen) return
-
-    await nextTick()
+  [() => props.modelValue, inputRef, textareaRef],
+  () => {
+    if (!props.modelValue) return
     focusField()
   },
   // `immediate`: окно могут смонтировать уже открытым — тогда смены пропа не

@@ -258,24 +258,27 @@ function onKeydown(event: KeyboardEvent): void {
   }
 }
 
-// ————— Открытие/закрытие: сброс запроса и фокус в поле.
-let focusTimer: ReturnType<typeof setTimeout> | null = null
-
+// ————— Открытие: сброс запроса и выбора.
 watch(
   () => props.modelValue,
   (open) => {
-    if (!open) {
-      if (focusTimer) clearTimeout(focusTimer)
-      return
-    }
+    if (!open) return
 
     query.value = ''
     activeIndex.value = 0
-    // `GrModal` отдаёт первичный фокус своей панели, поэтому переносим фокус в
-    // поле ввода следующим тиком макрозадачи — иначе HeadlessUI перебьёт его.
-    if (focusTimer) clearTimeout(focusTimer)
-    focusTimer = setTimeout(() => { inputEl.value?.focus() }, 0)
   },
+)
+
+// Фокус в поле — отдельным наблюдателем, и по появлению самого поля: содержимое
+// панели рождается вместе с ней, и по одному лишь пропу фокусировать нечего.
+// Ловушка фокуса `GrModal` этот выбор не перебивает — фокус, уже стоящий внутри
+// слоя, она считает осознанным.
+watch(
+  [() => props.modelValue, inputEl],
+  ([open]) => {
+    if (open) inputEl.value?.focus()
+  },
+  { flush: 'post' },
 )
 
 // ————— Глобальное сочетание открытия.
@@ -305,7 +308,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined') window.removeEventListener('keydown', onWindowKeydown)
-  if (focusTimer) clearTimeout(focusTimer)
 })
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.

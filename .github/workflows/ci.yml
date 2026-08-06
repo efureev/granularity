@@ -237,6 +237,12 @@ jobs:
       - name: A11y gate
         run: yarn test:a11y
 
+      # Оверлеи в открытом состоянии: axe по открытому окну, ловушка фокуса,
+      # `inert` фона. Обычный a11y-гейт сканирует страницу как есть, то есть
+      # окна на ней всегда закрыты.
+      - name: Overlay gate
+        run: yarn workspace @feugene/granularity-showcase test:overlay
+
       - name: Upload report
         if: failure()
         uses: actions/upload-artifact@v7

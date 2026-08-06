@@ -2236,7 +2236,7 @@
           },
           {
             "name": "closeOnBackdrop",
-            "description": "Закрывать при клике по бэкдропу / через HeadlessUI close.",
+            "description": "Закрывать при клике по бэкдропу.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -4834,7 +4834,7 @@
           },
           {
             "name": "ariaLabel",
-            "description": "Доступное имя окна, когда заголовка в слоте `#title` нет. Слот сильнее: при нём имя даёт `aria-labelledby` от `DialogTitle`.",
+            "description": "Доступное имя окна, когда заголовка в слоте `#title` нет. Слот сильнее: при нём имя даёт `aria-labelledby`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -4862,7 +4862,7 @@
           },
           {
             "name": "initialFocus",
-            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель: она фокусируема программно (`tabindex=\"-1\"`), диктор объявляет окно целиком, а первый Tab приводит в начало содержимого.",
             "type": "HTMLElement | null | undefined",
             "required": false,
             "default": "null"
@@ -5482,18 +5482,18 @@
             "default": "\"body\""
           },
           {
-            "name": "role",
-            "description": "Роль панели. Меняется теми, кто строит поверх примитива своё меню/список.",
-            "type": "GrPopoverRole | undefined",
-            "required": false,
-            "default": "\"dialog\""
-          },
-          {
             "name": "offsetPx",
             "description": "Зазор между триггером и панелью, px.",
             "type": "number | undefined",
             "required": false,
             "default": "8"
+          },
+          {
+            "name": "role",
+            "description": "Роль панели. Меняется теми, кто строит поверх примитива своё меню/список.",
+            "type": "GrPopoverRole | undefined",
+            "required": false,
+            "default": "\"dialog\""
           },
           {
             "name": "labelledBy",

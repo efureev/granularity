@@ -2,36 +2,6 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
-
-  return {
-    Dialog: defineComponent({
-      name: 'Dialog',
-      emits: ['close'],
-      props: { initialFocus: { type: Object, default: null } },
-      template: '<div data-testid="hu-dialog"><slot /></div>',
-    }),
-    DialogPanel: defineComponent({
-      name: 'DialogPanel',
-      template: '<div data-testid="hu-panel"><slot /></div>',
-    }),
-    DialogTitle: defineComponent({
-      name: 'DialogTitle',
-      template: '<div data-testid="hu-title"><slot /></div>',
-    }),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    TransitionChild: defineComponent({
-      name: 'TransitionChild',
-      template: '<div><slot /></div>',
-    }),
-  }
-})
-
 import GrPromptDialog from '../GrPromptDialog.vue'
 
 afterEach(() => {
@@ -62,6 +32,10 @@ describe('GrPromptDialog', () => {
       },
     })
 
+    // Телепорт застабан: содержимое в дереве обёртки, но появляется на такт
+    // позже монтирования.
+    await nextTick()
+
     expect(wrapper.find('[data-testid="gr-prompt-confirm"]').text()).toContain('Save')
 
     await wrapper.find('[data-testid="gr-prompt-confirm"]').trigger('click')
@@ -80,7 +54,7 @@ describe('GrPromptDialog', () => {
     wrapper.unmount()
   })
 
-  it('пробрасывает headerConfig и footerConfig в базовый GrDialog', () => {
+  it('пробрасывает headerConfig и footerConfig в базовый GrDialog', async () => {
     const wrapper = mount(
       defineComponent({
         name: 'HarnessPromptSectionConfig',
@@ -109,6 +83,10 @@ describe('GrPromptDialog', () => {
       },
     )
 
+    // Телепорт застабан: содержимое в дереве обёртки, но появляется на такт
+    // позже монтирования.
+    await nextTick()
+
     expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('px-4')
     expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('py-2')
     expect(wrapper.find('[data-gr-dialog-header]').classes()).not.toContain('border-b')
@@ -120,7 +98,7 @@ describe('GrPromptDialog', () => {
     wrapper.unmount()
   })
 
-  it('пробрасывает buttonSize в action-кнопки', () => {
+  it('пробрасывает buttonSize в action-кнопки', async () => {
     const wrapper = mount(
       defineComponent({
         name: 'HarnessPromptButtonSize',
@@ -140,6 +118,10 @@ describe('GrPromptDialog', () => {
         },
       },
     )
+
+    // Телепорт застабан: содержимое в дереве обёртки, но появляется на такт
+    // позже монтирования.
+    await nextTick()
 
     expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('h-7')
     expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('px-2.5')
@@ -177,6 +159,9 @@ async function mountPrompt(attrs = '', extra: Record<string, unknown> = {}) {
 
   const wrapper = mount(Harness, { attachTo: document.body })
   ;(wrapper.vm as unknown as { open: boolean }).open = true
+  // Тактов три: телепорт включается после маунта, затем появляется поддерево
+  // окна, и только потом содержимое диалога ставит фокус.
+  await nextTick()
   await nextTick()
   await nextTick()
 

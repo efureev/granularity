@@ -1,24 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 import { resetScrollLock } from '../../../composables/internal/useScrollLock'
-
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
-  const pass = (name: string, testid: string) => defineComponent({ name, template: `<div data-testid="${testid}"><slot /></div>` })
-  return {
-    Dialog: pass('Dialog', 'hu-dialog'),
-    DialogPanel: pass('DialogPanel', 'hu-panel'),
-    TransitionChild: pass('TransitionChild', 'hu-child'),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-  }
-})
 
 import GrImageViewer from '../GrImageViewer.vue'
 
@@ -27,7 +12,12 @@ afterEach(() => {
   resetOverlayStack()
 })
 
-function mountViewer(extra: Record<string, unknown> = {}) {
+/**
+ * Хелпер асинхронный: поддерево слоя появляется на такт позже монтирования —
+ * телепорт включается только после маунта, чтобы серверный рендер и первый
+ * клиентский совпадали (см. `useTeleportEnabled`).
+ */
+async function mountViewer(extra: Record<string, unknown> = {}) {
   const Harness = defineComponent({
     components: { GrImageViewer },
     setup() {
@@ -38,32 +28,34 @@ function mountViewer(extra: Record<string, unknown> = {}) {
     inheritAttrs: false,
   })
   // Стаб teleport: рендерим контент инлайн, чтобы `wrapper.find` его видел.
-  return mount(Harness, { attrs: extra, global: { stubs: { teleport: true } } })
+  const wrapper = mount(Harness, { attrs: extra, global: { stubs: { teleport: true } } })
+  await nextTick()
+  return wrapper
 }
 
 describe('GrImageViewer (decomposed)', () => {
 
   it('помечает корень inert, когда поверх открыт другой модальный слой', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBeUndefined()
+    expect(wrapper.find('[data-gr-overlay-root]').attributes('inert')).toBeUndefined()
 
     pushOverlayLayer({ modal: true, shouldClose: () => true, close: () => {} })
     await nextTick()
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('inert')).toBe('')
+    expect(wrapper.find('[data-gr-overlay-root]').attributes('inert')).toBeDefined()
 
     wrapper.unmount()
   })
-  it('renders the current image, progress and zoom value', () => {
-    const wrapper = mountViewer()
+  it('renders the current image, progress and zoom value', async () => {
+    const wrapper = await mountViewer()
     expect(wrapper.find('[data-gr-image-viewer-image]').attributes('src')).toBe('/a.jpg')
     expect(wrapper.find('[data-gr-image-viewer-progress]').text()).toBe('1 / 2')
     expect(wrapper.find('[data-gr-image-viewer-zoom-value]').text()).toBe('100%')
   })
 
   it('zoom in/out updates the zoom value (useZoomPan)', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
     await wrapper.find('[data-gr-image-viewer-zoom-in]').trigger('click')
     expect(wrapper.find('[data-gr-image-viewer-zoom-value]').text()).toBe('120%')
     await wrapper.find('[data-gr-image-viewer-zoom-reset]').trigger('click')
@@ -71,7 +63,7 @@ describe('GrImageViewer (decomposed)', () => {
   })
 
   it('rotate buttons emit rotate with cumulative degrees', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
     const viewer = wrapper.findComponent(GrImageViewer)
     await wrapper.find('[data-gr-image-viewer-rotate-right]').trigger('click')
     await wrapper.find('[data-gr-image-viewer-rotate-right]').trigger('click')
@@ -79,15 +71,15 @@ describe('GrImageViewer (decomposed)', () => {
   })
 
   it('switches image via next/prev (index management)', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
     await wrapper.find('[data-gr-image-viewer-next]').trigger('click')
     expect(wrapper.find('[data-gr-image-viewer-image]').attributes('src')).toBe('/b.jpg')
     expect(wrapper.find('[data-gr-image-viewer-progress]').text()).toBe('2 / 2')
   })
 
   it('keyboard: ArrowRight switches (useViewerKeyboard)', async () => {
-    const wrapper = mountViewer()
-    const dialog = wrapper.find('[data-testid="hu-dialog"]')
+    const wrapper = await mountViewer()
+    const dialog = wrapper.find('[data-gr-overlay-root]')
 
     await dialog.trigger('keydown', { key: 'ArrowRight' })
     expect(wrapper.find('[data-gr-image-viewer-image]').attributes('src')).toBe('/b.jpg')
@@ -96,7 +88,7 @@ describe('GrImageViewer (decomposed)', () => {
   // Esc идёт через общий стек слоёв, а не через локальный `@keydown`, поэтому
   // и проверяется настоящим событием на `window`, а не триггером по элементу.
   it('Escape закрывает просмотрщик через общий стек слоёв', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
     await nextTick()
@@ -105,7 +97,7 @@ describe('GrImageViewer (decomposed)', () => {
   })
 
   it('close button closes the viewer', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
     await wrapper.find('[data-gr-image-viewer-close]').trigger('click')
     await nextTick()
     expect(wrapper.find('[data-gr-image-viewer-image]').exists()).toBe(false)
@@ -115,39 +107,41 @@ describe('GrImageViewer (decomposed)', () => {
 describe('GrImageViewer — доступное имя слоя', () => {
   // `role="dialog" aria-modal="true"` без имени: диктор объявит «диалог» и всё,
   // axe роняет это как `aria-dialog-name`.
-  it('диалог называет себя из локали', () => {
-    const wrapper = mountViewer()
+  it('диалог называет себя из локали', async () => {
+    const wrapper = await mountViewer()
 
-    expect(wrapper.get('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Image viewer')
+    expect(wrapper.get('[data-gr-overlay-root]').attributes('aria-label')).toBe('Image viewer')
 
     wrapper.unmount()
   })
 
-  it('ariaLabel перекрывает имя из локали', () => {
-    const wrapper = mountViewer({ 'aria-label': undefined, 'ariaLabel': 'Фотографии объекта' })
+  it('ariaLabel перекрывает имя из локали', async () => {
+    const wrapper = await mountViewer({ 'aria-label': undefined, 'ariaLabel': 'Фотографии объекта' })
 
-    expect(wrapper.get('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Фотографии объекта')
+    expect(wrapper.get('[data-gr-overlay-root]').attributes('aria-label')).toBe('Фотографии объекта')
 
     wrapper.unmount()
   })
 })
 
 describe('GrImageViewer — альтернативный текст', () => {
-  function mountWith(urlList: unknown[]) {
+  async function mountWith(urlList: unknown[]) {
     const Harness = defineComponent({
       components: { GrImageViewer },
       setup: () => ({ open: ref(true), urlList }),
       template: '<GrImageViewer v-model="open" :url-list="urlList" show-progress />',
     })
 
-    return mount(Harness, { global: { stubs: { teleport: true } } })
+    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    await nextTick()
+    return wrapper
   }
 
   // `alt=""` был захардкожен, а `urlList: string[]` не позволял передать текст
   // в принципе: компонент, чьё содержимое — только картинка, был пуст для
   // незрячего пользователя.
-  it('объект {src, alt} доносит alt до изображения', () => {
-    const wrapper = mountWith([
+  it('объект {src, alt} доносит alt до изображения', async () => {
+    const wrapper = await mountWith([
       { src: '/plan.png', alt: 'План второго этажа' },
       { src: '/facade.png', alt: 'Фасад со стороны двора' },
     ])
@@ -157,8 +151,8 @@ describe('GrImageViewer — альтернативный текст', () => {
     wrapper.unmount()
   })
 
-  it('строки в списке продолжают работать — alt пустой', () => {
-    const wrapper = mountWith(['/a.jpg', '/b.jpg'])
+  it('строки в списке продолжают работать — alt пустой', async () => {
+    const wrapper = await mountWith(['/a.jpg', '/b.jpg'])
 
     const img = wrapper.get('[data-gr-image-viewer-image]')
     expect(img.attributes('src')).toBe('/a.jpg')
@@ -168,7 +162,7 @@ describe('GrImageViewer — альтернативный текст', () => {
   })
 
   it('смешанный список тоже допустим', async () => {
-    const wrapper = mountWith(['/a.jpg', { src: '/b.jpg', alt: 'Второй кадр' }])
+    const wrapper = await mountWith(['/a.jpg', { src: '/b.jpg', alt: 'Второй кадр' }])
 
     await wrapper.get('[data-gr-image-viewer-next]').trigger('click')
 
@@ -179,7 +173,7 @@ describe('GrImageViewer — альтернативный текст', () => {
 })
 
 describe('GrImageViewer — изменение списка', () => {
-  function mountGallery(initial: string[]) {
+  async function mountGallery(initial: string[]) {
     const urlList = ref<string[]>(initial)
     const Harness = defineComponent({
       components: { GrImageViewer },
@@ -188,13 +182,14 @@ describe('GrImageViewer — изменение списка', () => {
     })
 
     const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    await nextTick()
     return { wrapper, urlList }
   }
 
   // `watch(urlList, deep)` дергал `syncIndexFromInitial()`: догрузка следующей
   // страницы галереи отбрасывала на `initialIndex` и сбрасывала зум.
   it('догрузка кадров не сдвигает текущий и не сбрасывает зум', async () => {
-    const { wrapper, urlList } = mountGallery(['/a.jpg', '/b.jpg'])
+    const { wrapper, urlList } = await mountGallery(['/a.jpg', '/b.jpg'])
 
     await wrapper.get('[data-gr-image-viewer-next]').trigger('click')
     await wrapper.get('[data-gr-image-viewer-zoom-in]').trigger('click')
@@ -212,7 +207,7 @@ describe('GrImageViewer — изменение списка', () => {
   })
 
   it('кадр остаётся тем же, даже если сдвинулся по позиции', async () => {
-    const { wrapper, urlList } = mountGallery(['/a.jpg', '/b.jpg'])
+    const { wrapper, urlList } = await mountGallery(['/a.jpg', '/b.jpg'])
 
     await wrapper.get('[data-gr-image-viewer-next]').trigger('click')
 
@@ -226,7 +221,7 @@ describe('GrImageViewer — изменение списка', () => {
   })
 
   it('исчезнувший кадр — держимся позиции, а не прыгаем на initialIndex', async () => {
-    const { wrapper, urlList } = mountGallery(['/a.jpg', '/b.jpg', '/c.jpg'])
+    const { wrapper, urlList } = await mountGallery(['/a.jpg', '/b.jpg', '/c.jpg'])
 
     await wrapper.get('[data-gr-image-viewer-next]').trigger('click')
     await wrapper.get('[data-gr-image-viewer-next]').trigger('click')
@@ -246,18 +241,18 @@ describe('GrImageViewer — изменение списка', () => {
 describe('GrImageViewer — слой', () => {
   // `DEFAULT_Z_INDEX = 2000` был выше тостов: просмотрщик перекрывал уведомления
   // уровня приложения — единственный слой, который обязан быть виден поверх всего.
-  it('по умолчанию живёт на модальном слое шкалы', () => {
-    const wrapper = mountViewer()
+  it('по умолчанию живёт на модальном слое шкалы', async () => {
+    const wrapper = await mountViewer()
 
-    expect(wrapper.get('[data-testid="hu-dialog"]').attributes('style')).toContain('var(--gr-z-modal)')
+    expect(wrapper.get('[data-gr-overlay-root]').attributes('style')).toContain('var(--gr-z-modal)')
 
     wrapper.unmount()
   })
 
-  it('проп zIndex остаётся escape-hatch’ем', () => {
-    const wrapper = mountViewer({ zIndex: 4200 })
+  it('проп zIndex остаётся escape-hatch’ем', async () => {
+    const wrapper = await mountViewer({ zIndex: 4200 })
 
-    expect(wrapper.get('[data-testid="hu-dialog"]').attributes('style')).toContain('4200')
+    expect(wrapper.get('[data-gr-overlay-root]').attributes('style')).toContain('4200')
 
     wrapper.unmount()
   })
@@ -265,7 +260,7 @@ describe('GrImageViewer — слой', () => {
 
 describe('GrImageViewer — событие смены кадра и живой регион', () => {
   it('смена кадра эмитит change с новым индексом', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
     const viewer = wrapper.findComponent(GrImageViewer)
 
     await wrapper.find('[data-gr-image-viewer-next]').trigger('click')
@@ -278,7 +273,7 @@ describe('GrImageViewer — событие смены кадра и живой �
   // Регион существует с первого рендера и пуст: регион, появляющийся сразу с
   // текстом, часть AT не объявляет вовсе.
   it('живой регион пуст до первой смены и получает позицию после неё', async () => {
-    const wrapper = mountViewer()
+    const wrapper = await mountViewer()
     const live = wrapper.get('[data-gr-image-viewer-live]')
 
     expect(live.attributes('role')).toBe('status')

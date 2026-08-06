@@ -1,53 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
-// Мокаем HeadlessUI, чтобы избавиться от teleport/focus-trap. Escape мок в
-// `close` не превращает: общий стек слоёв гасит нажатие в capture-фазе на
-// `window`, и до `<Dialog>` оно не доходит (тот же контракт в тестах `GrModal`).
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent, onBeforeUnmount, onMounted } = await import('vue')
-  return {
-    Dialog: defineComponent({
-      name: 'Dialog',
-      emits: ['close'],
-      props: {
-        as: { type: String, default: 'div' },
-        initialFocus: { type: Object, default: null },
-      },
-      template: '<div data-testid="hu-dialog"><slot /></div>',
-    }),
-    DialogPanel: defineComponent({
-      name: 'DialogPanel',
-      template: '<div data-testid="hu-panel"><slot /></div>',
-    }),
-    DialogTitle: defineComponent({
-      name: 'DialogTitle',
-      template: '<div data-testid="hu-title"><slot /></div>',
-    }),
-    DialogDescription: defineComponent({
-      name: 'DialogDescription',
-      template: '<div data-testid="hu-description"><slot /></div>',
-    }),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    // `after-enter`/`after-leave` мок эмитит по жизненному циклу: настоящих
-    // транзишнов в jsdom нет, а проверяется проводка событий наружу.
-    TransitionChild: defineComponent({
-      name: 'TransitionChild',
-      emits: ['after-enter', 'after-leave'],
-      setup(_, { emit }) {
-        onMounted(() => emit('after-enter'))
-        onBeforeUnmount(() => emit('after-leave'))
-      },
-      template: '<div><slot /></div>',
-    }),
-  }
-})
-
+// Esc приходит так же, как в проде: общий стек слоёв ловит его в capture-фазе
+// на `window` и закрывает верхний слой (тот же контракт в тестах `GrModal`).
 import GrDialog from '../GrDialog.vue'
 
 afterEach(() => {
@@ -66,13 +22,24 @@ function makeHarness(template: string) {
   })
 }
 
-function mountHarness(template: string) {
-  return mount(makeHarness(template), { global: { stubs: { teleport: true } } })
+/**
+ * Хелпер асинхронный: поддерево окна появляется на такт позже монтирования —
+ * телепорт включается после маунта (см. `useTeleportEnabled`).
+ */
+async function mountHarness(template: string) {
+  // `transition: false` — VTU по умолчанию заглушает `<Transition>`, и тогда
+  // `@after-leave` не приходит: поддеревo окна остаётся смонтированным навсегда.
+  const wrapper = mount(makeHarness(template), {
+    global: { stubs: { teleport: true, transition: false } },
+  })
+
+  await nextTick()
+  return wrapper
 }
 
 describe('GrDialog', () => {
-  it('рендерит видимый title в хедере и кнопку закрытия по умолчанию', () => {
-    const wrapper = mountHarness(`
+  it('рендерит видимый title в хедере и кнопку закрытия по умолчанию', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="Settings">
         <div data-testid="body">Body</div>
       </GrDialog>
@@ -85,28 +52,28 @@ describe('GrDialog', () => {
     expect(wrapper.find('[data-testid="body"]').exists()).toBe(true)
   })
 
-  it('при showHeader=false хедер не рендерится, а sr-only title уходит в #title слот GrModal', () => {
-    const wrapper = mountHarness(`
+  it('при showHeader=false хедер не рендерится, а sr-only title уходит в #title слот GrModal', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="Hidden header title" :show-header="false">
         Body
       </GrDialog>
     `)
 
     expect(wrapper.find('[data-gr-dialog-header]').exists()).toBe(false)
-    const huTitle = wrapper.find('[data-testid="hu-title"]')
-    expect(huTitle.exists()).toBe(true)
-    expect(huTitle.text()).toBe('Hidden header title')
+    const modalTitle = wrapper.find('[data-gr-modal-title]')
+    expect(modalTitle.exists()).toBe(true)
+    expect(modalTitle.text()).toBe('Hidden header title')
     // sr-only класс навешен на обёртку заголовка.
-    expect(huTitle.html()).toContain('sr-only')
+    expect(modalTitle.html()).toContain('sr-only')
   })
 
-  it('футер рендерится только если передан слот #footer', () => {
-    const withoutFooter = mountHarness(`
+  it('футер рендерится только если передан слот #footer', async () => {
+    const withoutFooter = await mountHarness(`
       <GrDialog v-model="open" title="T">Body</GrDialog>
     `)
     expect(withoutFooter.find('[data-gr-dialog-footer]').exists()).toBe(false)
 
-    const withFooter = mountHarness(`
+    const withFooter = await mountHarness(`
       <GrDialog v-model="open" title="T">
         <template #footer><button data-testid="ok">OK</button></template>
         Body
@@ -117,7 +84,7 @@ describe('GrDialog', () => {
   })
 
   it('клик по кнопке закрытия эмитит update:modelValue=false', async () => {
-    const wrapper = mountHarness(`
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="T">Body</GrDialog>
     `)
     await wrapper.find('[data-gr-dialog-close]').trigger('click')
@@ -125,16 +92,16 @@ describe('GrDialog', () => {
     expect((wrapper.vm as any).open).toBe(false)
   })
 
-  it('проп closeLabel прокидывается на кнопку закрытия как aria-label', () => {
-    const wrapper = mountHarness(`
+  it('проп closeLabel прокидывается на кнопку закрытия как aria-label', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="T" close-label="Закрыть">Body</GrDialog>
     `)
     const btn = wrapper.find('[data-gr-dialog-close]')
     expect(btn.attributes('aria-label')).toBe('Закрыть')
   })
 
-  it('кастомный слот #header подменяет видимый заголовок; a11y-title остаётся через GrModal', () => {
-    const wrapper = mountHarness(`
+  it('кастомный слот #header подменяет видимый заголовок; a11y-title остаётся через GrModal', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="A11y only">
         <template #header="{ title }">
           <div data-testid="custom-header">Custom: {{ title }}</div>
@@ -147,12 +114,11 @@ describe('GrDialog', () => {
     expect(customHeader.exists()).toBe(true)
     expect(customHeader.text()).toBe('Custom: A11y only')
 
-    // sr-only title идёт через #title слот GrModal (проверяем, что это тот hu-title,
-    // который внутри GrModal DialogPanel, и у него есть `sr-only`).
-    const huTitles = wrapper.findAll('[data-testid="hu-title"]')
-    const srOnly = huTitles.find(w => w.html().includes('sr-only'))
-    expect(srOnly).toBeTruthy()
-    expect(srOnly!.text()).toBe('A11y only')
+    // sr-only title идёт через #title слот GrModal — он и даёт окну имя.
+    const modalTitle = wrapper.find('[data-gr-modal-title]')
+    expect(modalTitle.exists()).toBe(true)
+    expect(modalTitle.html()).toContain('sr-only')
+    expect(modalTitle.text()).toBe('A11y only')
   })
 
   it('Esc закрывает при closeOnEsc=true и не закрывает при closeOnEsc=false', async () => {
@@ -160,7 +126,7 @@ describe('GrDialog', () => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
     }
 
-    const withEsc = mountHarness(`
+    const withEsc = await mountHarness(`
       <GrDialog v-model="open" title="T">Body</GrDialog>
     `)
     pressEscape()
@@ -168,7 +134,7 @@ describe('GrDialog', () => {
     expect((withEsc.vm as any).open).toBe(false)
     withEsc.unmount()
 
-    const withoutEsc = mountHarness(`
+    const withoutEsc = await mountHarness(`
       <GrDialog v-model="open" title="T" :close-on-esc="false">Body</GrDialog>
     `)
     pressEscape()
@@ -177,28 +143,35 @@ describe('GrDialog', () => {
     withoutEsc.unmount()
   })
 
-  it('передаёт имя окна вниз, чтобы GrModal не подставлял обобщённое', () => {
-    const wrapper = mountHarness(`
+  it('передаёт имя окна вниз, чтобы GrModal не подставлял обобщённое', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="Профиль">Body</GrDialog>
     `)
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Профиль')
+    // Имя даёт видимый заголовок шапки через `aria-labelledby` — своего
+    // `aria-label` окно при этом не ставит, чтобы имён не было два.
+    const dialog = wrapper.find('[data-gr-overlay-root]')
+    const title = wrapper.find('[data-gr-dialog-title]')
+
+    expect(title.text()).toBe('Профиль')
+    expect(dialog.attributes('aria-labelledby')).toBe(title.attributes('id'))
+    expect(dialog.attributes('aria-label')).toBeUndefined()
     wrapper.unmount()
   })
 
-  it('ariaLabel даёт имя окну без заголовка вовсе', () => {
-    const wrapper = mountHarness(`
+  it('ariaLabel даёт имя окну без заголовка вовсе', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" :show-header="false" aria-label="Мастер импорта">Body</GrDialog>
     `)
 
-    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Мастер импорта')
+    expect(wrapper.find('[data-gr-overlay-root]').attributes('aria-label')).toBe('Мастер импорта')
     wrapper.unmount()
   })
 })
 
 describe('GrDialog — скролл, фокус и жизненный цикл', () => {
-  it('при scrollBehavior=inside шапка и подвал остаются вне скроллящегося тела', () => {
-    const wrapper = mountHarness(`
+  it('при scrollBehavior=inside шапка и подвал остаются вне скроллящегося тела', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="Настройки" scroll-behavior="inside">
         <div data-testid="body">Body</div>
         <template #footer><button data-testid="save">Save</button></template>
@@ -217,8 +190,8 @@ describe('GrDialog — скролл, фокус и жизненный цикл',
     wrapper.unmount()
   })
 
-  it('при scrollBehavior=outside скроллящегося тела нет вовсе', () => {
-    const wrapper = mountHarness(`
+  it('при scrollBehavior=outside скроллящегося тела нет вовсе', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="Настройки">
         <div data-testid="body">Body</div>
         <template #footer><button data-testid="save">Save</button></template>
@@ -232,8 +205,8 @@ describe('GrDialog — скролл, фокус и жизненный цикл',
     wrapper.unmount()
   })
 
-  it('size=full доходит до панели GrModal', () => {
-    const wrapper = mountHarness(`
+  it('size=full доходит до панели GrModal', async () => {
+    const wrapper = await mountHarness(`
       <GrDialog v-model="open" title="Мастер" size="full">Body</GrDialog>
     `)
 
@@ -244,25 +217,34 @@ describe('GrDialog — скролл, фокус и жизненный цикл',
     wrapper.unmount()
   })
 
-  it('initialFocus доходит до GrModal', () => {
-    const target = document.createElement('button')
-    document.body.appendChild(target)
-
+  it('initialFocus доходит до GrModal', async () => {
     const Harness = defineComponent({
       name: 'HarnessInitialFocus',
       components: { GrDialog },
       setup() {
+        const target = ref<HTMLElement | null>(null)
         return { open: ref(true), target }
       },
-      template: `<GrDialog v-model="open" title="X" :initial-focus="target">Body</GrDialog>`,
+      template: `
+        <GrDialog v-model="open" title="X" :initial-focus="target">
+          <button>первая</button>
+          <button ref="target" data-testid="focus-target">вторая</button>
+        </GrDialog>
+      `,
     })
 
-    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    const wrapper = mount(Harness, {
+      attachTo: document.body,
+      global: { stubs: { transition: false } },
+    })
 
-    expect(wrapper.findComponent({ name: 'Dialog' }).props('initialFocus')).toBe(target)
+    // Ловушка фокусирует на следующем тике после появления панели.
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement).toBe(document.querySelector('[data-testid="focus-target"]'))
 
     wrapper.unmount()
-    target.remove()
   })
 
   it('ретранслирует opened/closed от GrModal', async () => {
@@ -284,15 +266,29 @@ describe('GrDialog — скролл, фокус и жизненный цикл',
       `,
     })
 
-    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    // Без teleport-стаба: он пересоздаёт поддерево, и инстанс транзишна не
+    // доживает до перехода «открыто → закрыто».
+    const wrapper = mount(Harness, {
+      attachTo: document.body,
+      global: { stubs: { transition: false } },
+    })
     const vm = wrapper.vm as any
 
+    // `opened`/`closed` приходят по концу анимации панели, а Vue переключает её
+    // фазы через `requestAnimationFrame`.
+    async function settle(): Promise<void> {
+      for (let i = 0; i < 3; i++) {
+        await new Promise(resolve => requestAnimationFrame(() => resolve(null)))
+        await nextTick()
+      }
+    }
+
     vm.open = true
-    await nextTick()
+    await settle()
     expect(vm.events).toEqual(['opened'])
 
     vm.open = false
-    await nextTick()
+    await settle()
     expect(vm.events).toEqual(['opened', 'closed'])
 
     wrapper.unmount()

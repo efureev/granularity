@@ -619,7 +619,7 @@ describe('zIndexBase: шкала слоёв', () => {
 
 describe('оконное семейство читает провайдер', () => {
   // Отрендеренную панель проверяет гейт `src/__tests__/componentSize.test.ts`
-  // (группа «шкала оверлеев»); здесь — сама проводка резолвера, без HeadlessUI.
+  // (группа «шкала оверлеев»); здесь — сама проводка резолвера.
   const ModalSizeProbe = defineComponent({
     setup() {
       const size = useGrComponentProp('GrModal', 'size', () => undefined, 'md')

@@ -9,7 +9,6 @@
     "@feugene/granularity-datepicker": "^0.1.1",
     "@feugene/unocss-preset-granular": "^0.7.1",
     "@floating-ui/dom": "^1.8.0",
-    "@headlessui/vue": "^1.7.23",
     "vue": "^3.5.40",
     "vue-router": "^4.6.3"
   },
@@ -41,6 +40,7 @@
     "test:e2e": "yarn build && playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:a11y": "yarn build && playwright test e2e/a11y.spec.ts",
+    "test:overlay": "yarn build && playwright test e2e/overlay.spec.ts",
     "test:visual": "yarn build && playwright test e2e/visual.spec.ts",
     "test:visual:update": "yarn build && playwright test e2e/visual.spec.ts --update-snapshots",
     "test:visual:update:linux": "bash ./scripts/update-visual-linux.sh"

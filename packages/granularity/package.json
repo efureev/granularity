@@ -308,6 +308,10 @@
       "types": "./dist/types/src/composables/useFloating.d.ts",
       "import": "./dist/composables/useFloating.js"
     },
+    "./composables/useFocusTrap": {
+      "types": "./dist/types/src/composables/useFocusTrap.d.ts",
+      "import": "./dist/composables/useFocusTrap.js"
+    },
     "./composables/useOverlayLayer": {
       "types": "./dist/types/src/composables/useOverlayLayer.d.ts",
       "import": "./dist/composables/useOverlayLayer.js"
@@ -385,7 +389,6 @@
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/unocss-preset-granular": "^0.7.1",
     "@floating-ui/dom": "^1.8.0",
-    "@headlessui/vue": "^1.7.23",
     "vue": "^3.5.40"
   },
   "peerDependenciesMeta": {
@@ -394,9 +397,6 @@
     },
     "@floating-ui/dom": {
       "optional": false
-    },
-    "@headlessui/vue": {
-      "optional": false
     }
   },
   "devDependencies": {
@@ -404,7 +404,6 @@
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/unocss-preset-granular": "^0.7.1",
     "@floating-ui/dom": "^1.8.0",
-    "@headlessui/vue": "^1.7.23",
     "@iconify-json/lucide": "^1.2.117",
     "@types/node": "^25.9.5",
     "@unocss/eslint-plugin": "^66.7.5",

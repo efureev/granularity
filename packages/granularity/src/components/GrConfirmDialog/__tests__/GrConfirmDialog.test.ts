@@ -2,36 +2,6 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
-
-  return {
-    Dialog: defineComponent({
-      name: 'Dialog',
-      emits: ['close'],
-      props: { initialFocus: { type: Object, default: null } },
-      template: '<div data-testid="hu-dialog"><slot /></div>',
-    }),
-    DialogPanel: defineComponent({
-      name: 'DialogPanel',
-      template: '<div data-testid="hu-panel"><slot /></div>',
-    }),
-    DialogTitle: defineComponent({
-      name: 'DialogTitle',
-      template: '<div data-testid="hu-title"><slot /></div>',
-    }),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    TransitionChild: defineComponent({
-      name: 'TransitionChild',
-      template: '<div><slot /></div>',
-    }),
-  }
-})
-
 import GrConfirmDialog from '../GrConfirmDialog.vue'
 
 afterEach(() => {
@@ -68,6 +38,10 @@ describe('GrConfirmDialog', () => {
       },
     })
 
+    // Телепорт застабан: содержимое остаётся в дереве обёртки и появляется на
+    // такт позже монтирования.
+    await nextTick()
+
     expect(wrapper.text()).toContain('Confirm')
     expect(wrapper.text()).toContain('Delete the current item?')
     expect(wrapper.find('[data-testid="gr-confirm-cancel"]').text()).toBe('Cancel')
@@ -90,7 +64,7 @@ describe('GrConfirmDialog', () => {
     wrapper.unmount()
   })
 
-  it('пробрасывает headerConfig, footerConfig и buttonSize в базовые компоненты', () => {
+  it('пробрасывает headerConfig, footerConfig и buttonSize в базовые компоненты', async () => {
     const wrapper = mount(
       defineComponent({
         name: 'HarnessConfirmDialogConfig',
@@ -118,6 +92,10 @@ describe('GrConfirmDialog', () => {
         },
       },
     )
+
+    // Телепорт застабан: содержимое остаётся в дереве обёртки, но появляется
+    // на такт позже монтирования.
+    await nextTick()
 
     expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('px-4')
     expect(wrapper.find('[data-gr-dialog-header]').classes()).toContain('py-2')
@@ -166,6 +144,9 @@ async function mountConfirm(attrs = '', slots = '') {
 
   const wrapper = mount(Harness, { attachTo: document.body })
   ;(wrapper.vm as unknown as { open: boolean }).open = true
+  // Тактов три: телепорт включается после маунта, затем появляется поддерево
+  // окна, и только потом содержимое диалога ставит фокус.
+  await nextTick()
   await nextTick()
   await nextTick()
 
@@ -173,6 +154,7 @@ async function mountConfirm(attrs = '', slots = '') {
 }
 
 const byTestId = (id: string) => document.querySelector<HTMLElement>(`[data-testid="${id}"]`)
+
 
 describe('GrConfirmDialog — фокус при открытии', () => {
   it('по умолчанию фокус на «Отмена»: Enter сразу после открытия ничего не разрушает', async () => {
@@ -192,7 +174,7 @@ describe('GrConfirmDialog — фокус при открытии', () => {
   })
 
   it('focusAction="none" не уводит фокус на кнопки', async () => {
-    // Фокус на панели ставит фокус-ловушка HeadlessUI, а она здесь замокана —
+    // Фокус на панель ставит ловушка `GrModal` —
     // проверяем то, за что отвечает компонент: он не трогает фокус вовсе.
     const wrapper = await mountConfirm('focus-action="none"')
 

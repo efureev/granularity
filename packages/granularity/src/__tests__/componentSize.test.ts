@@ -2,37 +2,8 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
-
-// HeadlessUI-диалог (его использует `GrDrawer`) требует `ResizeObserver`, которого
-// в jsdom нет. Гейт смотрит на размерные классы, а не на механику оверлея, —
-// поэтому подменяем прозрачными обёртками, как в тестах самого `GrDrawer`.
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent: define } = await import('vue')
-  const passthrough = (name: string) => define({ name, template: '<div><slot /></div>' })
-
-  return {
-    // `initialFocus` обязан быть объявлен пропом, как у настоящего `Dialog`:
-    // необъявленный он уезжает на `<div>` атрибутом, а `setAttribute` с
-    // template-ref роняет jsdom необработанным исключением.
-    Dialog: define({
-      name: 'Dialog',
-      props: { initialFocus: { type: Object, default: undefined } },
-      emits: ['close'],
-      template: '<div><slot /></div>',
-    }),
-    DialogPanel: passthrough('DialogPanel'),
-    DialogTitle: passthrough('DialogTitle'),
-    DialogDescription: passthrough('DialogDescription'),
-    TransitionRoot: define({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    TransitionChild: passthrough('TransitionChild'),
-  }
-})
+import { defineComponent, h, nextTick } from 'vue'
+import { describe, expect, it } from 'vitest'
 
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrAvatar from '../components/GrAvatar/GrAvatar.vue'
@@ -251,12 +222,16 @@ function componentsWithConfigurableSize(): string[] {
 // вернул бы пустую обёртку — сравнение размеров стало бы всегда истинным.
 const MOUNT_OPTIONS = { attachTo: document.body, global: { stubs: { teleport: true } } }
 
-function renderWithConfig(render: () => unknown, config: Record<string, unknown>): string {
+async function renderWithConfig(render: () => unknown, config: Record<string, unknown>): Promise<string> {
   const Harness = defineComponent({
     render: () => h(GrConfigProvider, config, { default: () => render() }),
   })
 
-  return mount(Harness, MOUNT_OPTIONS).html()
+  const wrapper = mount(Harness, MOUNT_OPTIONS)
+  // Поддерево оверлея появляется на такт позже монтирования: телепорт
+  // включается после маунта, чтобы серверный рендер совпал с первым клиентским.
+  await nextTick()
+  return wrapper.html()
 }
 
 /**
@@ -276,40 +251,47 @@ describe('контракт размера', () => {
     expect(missing, `нет стенда в этом гейте: ${missing.join(', ')}`).toEqual([])
   })
 
-  it('список неполных шкал не протух', () => {
-    const stale = harnesses
-      .filter(({ name }) => KNOWN_FLAT_SIZE.has(name))
-      .filter(({ render }) => {
-        const [small, large] = PROBE_SIZES.map(size => renderWithConfig(render, { size }))
-        return small !== large
-      })
-      .map(({ name }) => name)
+  it('список неполных шкал не протух', async () => {
+    const checked = await Promise.all(
+      harnesses
+        .filter(({ name }) => KNOWN_FLAT_SIZE.has(name))
+        .map(async ({ name, render }) => {
+          const [small, large] = await Promise.all(
+            PROBE_SIZES.map(size => renderWithConfig(render, { size })),
+          )
+          return { name, scaled: small !== large }
+        }),
+    )
+
+    const stale = checked.filter(item => item.scaled).map(item => item.name)
 
     expect(stale, `шкала реализована — убрать из KNOWN_FLAT_SIZE: ${stale.join(', ')}`).toEqual([])
   })
 
   const scaled = harnesses.filter(({ name }) => !KNOWN_FLAT_SIZE.has(name))
 
-  it.each(scaled)('$name наследует размер от GrConfigProvider', ({ render }) => {
-    const [small, large] = PROBE_SIZES.map(size => renderWithConfig(render, { size }))
+  it.each(scaled)('$name наследует размер от GrConfigProvider', async ({ render }) => {
+    const [small, large] = await Promise.all(
+      PROBE_SIZES.map(size => renderWithConfig(render, { size })),
+    )
 
     expect(small).not.toBe(large)
   })
 
-  it.each(scaled)('$name: componentDefaults побеждает глобальный size', ({ name, render }) => {
-    const global = renderWithConfig(render, { size: 'xs' })
-    const pointed = renderWithConfig(render, {
+  it.each(scaled)('$name: componentDefaults побеждает глобальный size', async ({ name, render }) => {
+    const global = await renderWithConfig(render, { size: 'xs' })
+    const pointed = await renderWithConfig(render, {
       size: 'xs',
       componentDefaults: { [name]: { size: 'lg' } },
     })
-    const expected = renderWithConfig(render, { size: 'lg' })
+    const expected = await renderWithConfig(render, { size: 'lg' })
 
     expect(pointed).not.toBe(global)
     expect(pointed).toBe(expected)
   })
 
-  it.each(scaled)('$name: локальный проп побеждает провайдер', ({ render }) => {
-    const fromConfig = renderWithConfig(render, { size: 'xs' })
+  it.each(scaled)('$name: локальный проп побеждает провайдер', async ({ render }) => {
+    const fromConfig = await renderWithConfig(render, { size: 'xs' })
     const local = mount(defineComponent({
       render: () => h(GrConfigProvider, { size: 'xs' }, {
         default: () => {
@@ -318,23 +300,26 @@ describe('контракт размера', () => {
           return vnode
         },
       }),
-    }), MOUNT_OPTIONS).html()
+    }), MOUNT_OPTIONS)
+    await nextTick()
 
-    expect(local).not.toBe(fromConfig)
+    expect(local.html()).not.toBe(fromConfig)
   })
 
   describe('шкала оверлеев', () => {
-    it.each(overlayHarnesses)('$name: componentDefaults задаёт размер панели', ({ name, render }) => {
-      const [small, large] = OVERLAY_PROBE_SIZES.map(size =>
-        renderWithConfig(render, { componentDefaults: { [name]: { size } } }),
+    it.each(overlayHarnesses)('$name: componentDefaults задаёт размер панели', async ({ name, render }) => {
+      const [small, large] = await Promise.all(
+        OVERLAY_PROBE_SIZES.map(size =>
+          renderWithConfig(render, { componentDefaults: { [name]: { size } } }),
+        ),
       )
 
       expect(small).not.toBe(large)
     })
 
-    it.each(overlayHarnesses)('$name: локальный проп побеждает componentDefaults', ({ name, render }) => {
-      const fromConfig = renderWithConfig(render, { componentDefaults: { [name]: { size: 'sm' } } })
-      const local = mount(defineComponent({
+    it.each(overlayHarnesses)('$name: локальный проп побеждает componentDefaults', async ({ name, render }) => {
+      const fromConfig = await renderWithConfig(render, { componentDefaults: { [name]: { size: 'sm' } } })
+      const wrapper = mount(defineComponent({
         render: () => h(GrConfigProvider, { componentDefaults: { [name]: { size: 'sm' } } }, {
           default: () => {
             const vnode = render() as { props?: Record<string, unknown> }
@@ -342,9 +327,10 @@ describe('контракт размера', () => {
             return vnode
           },
         }),
-      }), MOUNT_OPTIONS).html()
+      }), MOUNT_OPTIONS)
+      await nextTick()
 
-      expect(local).not.toBe(fromConfig)
+      expect(wrapper.html()).not.toBe(fromConfig)
     })
 
     // Шкалы не смешиваются: `size="xs"` у провайдера — про контролы, и панель
@@ -353,8 +339,10 @@ describe('контракт размера', () => {
     // Сравниваем класс панели, а не всю разметку: внутри диалогов живут обычные
     // контролы (кнопки подвала), и они обязаны глобальный размер слушаться —
     // сравнение целиком запрещало бы им ровно то, ради чего провайдер и нужен.
-    it.each(overlayHarnesses)('$name: глобальный size провайдера его не трогает', ({ render }) => {
-      const [small, large] = PROBE_SIZES.map(size => panelMarkup(renderWithConfig(render, { size })))
+    it.each(overlayHarnesses)('$name: глобальный size провайдера его не трогает', async ({ render }) => {
+      const [small, large] = await Promise.all(
+        PROBE_SIZES.map(async size => panelMarkup(await renderWithConfig(render, { size }))),
+      )
 
       expect(small).toBe(large)
     })

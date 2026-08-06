@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { DialogTitle } from '@headlessui/vue'
 
 import GrDialogCloseButton from './GrDialogCloseButton.vue'
+import { useGrModalTitle } from '../GrModal/context'
 import {
   DEFAULT_GR_DIALOG_HEADER_CONFIG,
   type GrDialogSectionConfig,
@@ -46,10 +46,15 @@ const rootClass = computed(() => [
   'flex items-center justify-between gap-4',
 ])
 
-// Видимый `DialogTitle` рендерим только когда нет пользовательского слота:
+// Видимый заголовок рендерим только когда нет пользовательского слота:
 // если слот `#header` задан, a11y-title отдаётся через `GrModal #title`
 // на уровне `GrDialog` (см. JSDoc у `GrDialog.vue`).
 const showVisibleTitle = computed(() => !slots.default && !!resolvedTitle.value)
+
+// Имя окна: заголовок объявляет себя окну, и `GrModal` ставит на него
+// `aria-labelledby`. Вне `GrModal` регистрация — no-op, шапку можно
+// использовать и отдельно.
+const { titleId } = useGrModalTitle(() => showVisibleTitle.value)
 </script>
 
 <template>
@@ -59,13 +64,14 @@ const showVisibleTitle = computed(() => !slots.default && !!resolvedTitle.value)
         <slot :title="resolvedTitle" />
       </div>
     </template>
-    <DialogTitle
+    <div
       v-else-if="showVisibleTitle"
-      as="div"
+      :id="titleId"
+      data-gr-dialog-title
       class="flex-1 min-w-0 text-[14px] font-700"
     >
       {{ resolvedTitle }}
-    </DialogTitle>
+    </div>
     <div v-else class="flex-1 min-w-0" />
     <GrDialogCloseButton
       v-if="showCloseButton"

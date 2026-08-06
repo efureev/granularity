@@ -1,36 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-// HeadlessUI в jsdom не поднимается — та же заглушка, что в тестах `GrModal`.
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
-
-  return {
-    Dialog: defineComponent({
-      name: 'Dialog',
-      emits: ['close'],
-      props: { as: { type: String, default: 'div' }, initialFocus: { type: Object, default: null } },
-      setup(_, { emit }) {
-        function onKeydown(event: KeyboardEvent) {
-          if (event.key === 'Escape') emit('close')
-        }
-        return { onKeydown }
-      },
-      template: '<div data-testid="hu-dialog" @keydown="onKeydown"><slot /></div>',
-    }),
-    DialogPanel: defineComponent({ name: 'DialogPanel', template: '<div><slot /></div>' }),
-    DialogTitle: defineComponent({ name: 'DialogTitle', template: '<div><slot /></div>' }),
-    DialogDescription: defineComponent({ name: 'DialogDescription', template: '<div><slot /></div>' }),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    TransitionChild: defineComponent({ name: 'TransitionChild', template: '<div><slot /></div>' }),
-  }
-})
-
+// Телепорт в jsdom отключаем: содержимое окна остаётся в дереве обёртки.
 const GrDropdown = (await import('../components/GrDropdown/GrDropdown.vue')).default
 const GrModal = (await import('../components/GrModal/GrModal.vue')).default
 
@@ -73,7 +45,14 @@ const Harness = defineComponent({
   `,
 })
 
-/** Панель телепортируется в `body`, поэтому ищем её в документе, а не в wrapper. */
+/** Содержимое окна и панель телепортированы в `body` — ищем в документе. */
+function inDocument(selector: string): HTMLElement {
+  const el = document.querySelector<HTMLElement>(selector)
+  if (!el) throw new Error(`не найдено в документе: ${selector}`)
+  return el
+}
+
+
 function dropdownVisible(): boolean {
   const panel = document.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
   return panel !== null && panel.style.display !== 'none'
@@ -82,8 +61,11 @@ function dropdownVisible(): boolean {
 describe('слоение dismissible-оверлеев', () => {
   it('Esc закрывает дропдаун внутри модалки, а не модалку', async () => {
     const wrapper = mount(Harness, { attachTo: document.body })
+    // Поддерево окна появляется на такт позже монтирования: телепорт включается
+    // после маунта, чтобы серверный рендер совпал с первым клиентским.
+    await nextTick()
 
-    await wrapper.get('[data-testid="dd-trigger"]').trigger('click')
+    inDocument('[data-testid="dd-trigger"]').click()
     await nextTick()
     expect(dropdownVisible(), 'дропдаун открылся').toBe(true)
 
@@ -98,8 +80,11 @@ describe('слоение dismissible-оверлеев', () => {
 
   it('следующий Esc закрывает уже модалку', async () => {
     const wrapper = mount(Harness, { attachTo: document.body })
+    // Поддерево окна появляется на такт позже монтирования: телепорт включается
+    // после маунта, чтобы серверный рендер совпал с первым клиентским.
+    await nextTick()
 
-    await wrapper.get('[data-testid="dd-trigger"]').trigger('click')
+    inDocument('[data-testid="dd-trigger"]').click()
     await nextTick()
 
     pressEscape()

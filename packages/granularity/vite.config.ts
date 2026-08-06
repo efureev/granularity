@@ -265,6 +265,9 @@ export default defineConfig({
         'composables/useFloating': fileURLToPath(
           new URL('./src/composables/useFloating.ts', import.meta.url),
         ),
+        'composables/useFocusTrap': fileURLToPath(
+          new URL('./src/composables/useFocusTrap.ts', import.meta.url),
+        ),
         'composables/useOverlayLayer': fileURLToPath(
           new URL('./src/composables/useOverlayLayer.ts', import.meta.url),
         ),
@@ -328,10 +331,8 @@ export default defineConfig({
         'vue',
         /^@feugene\/unocss-preset-granular(\/.*)?$/,
         /^@feugene\/fint-i18n(\/.*)?$/,
-        // Держим снаружи бандла: обе — peer-зависимости. Иначе потребитель,
-        // который сам их использует, получает вторую копию, а разъехавшиеся
-        // версии дают разное поведение фокус-ловушки.
-        /^@headlessui\/vue(\/.*)?$/,
+        // Держим снаружи бандла: это peer-зависимость. Иначе потребитель,
+        // который сам её использует, получил бы вторую копию.
         /^@floating-ui\/dom(\/.*)?$/,
       ],
       output: {

@@ -142,6 +142,9 @@ describe('useOverlayLayer: возврат фокуса', () => {
     ;(wrapper.find('[data-testid="inside"]').element as HTMLElement).focus()
 
     pressEscape()
+    // Возврат отложен на тик: ловушка фокуса слоя снимает слушатели в том же
+    // флаше, и немедленный `focus()` она затащила бы обратно в слой.
+    await nextTick()
     await nextTick()
 
     expect(document.activeElement).toBe(trigger)

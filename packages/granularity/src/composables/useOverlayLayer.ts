@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
-import { onUnmounted, watch } from 'vue'
+import { nextTick, onUnmounted, watch } from 'vue'
 
-import { pushOverlayLayer, removeOverlayLayer } from './internal/overlayStack'
+import { layerRootsAbove, pushOverlayLayer, removeOverlayLayer } from './internal/overlayStack'
 
 export interface UseOverlayLayerOptions {
   /**
@@ -30,11 +30,21 @@ export interface UseOverlayLayerOptions {
    */
   restoreFocus?: boolean
   /**
-   * Корень слоя. Нужен для правила возврата фокуса: если на момент закрытия
-   * фокус уже вне слоя, значит пользователь ушёл сам — забирать фокус обратно
-   * нельзя.
+   * Корень слоя. Нужен дважды: для правила возврата фокуса (если на момент
+   * закрытия фокус уже вне слоя, пользователь ушёл сам — забирать нельзя) и
+   * для ловушки фокуса слоя под ним, которая обязана считать этот корень
+   * своим (панель селекта внутри модалки телепортирована в `body`).
    */
   root?: Ref<HTMLElement | null>
+}
+
+export interface OverlayLayerHandle {
+  /**
+   * Корни слоёв, открытых поверх этого. Передаётся в `useFocusTrap` как
+   * `containers`: пока панель, открытая изнутри окна, жива, фокус в ней
+   * законен.
+   */
+  rootsAbove: () => HTMLElement[]
 }
 
 /**
@@ -47,9 +57,9 @@ export interface UseOverlayLayerOptions {
  *  - **`inert`** — через `onTopmostChange` у модальных слоёв;
  *  - **возврат фокуса** — по единому правилу (см. ниже).
  *
- * Чего **не** делает: фокус-ловушку. У модальных оверлеев пакета её даёт
- * `Dialog` из HeadlessUI, и вторая ловушка поверх неё только конфликтовала бы.
- * Поповеру ловушка и не нужна: Tab обязан уводить фокус наружу и закрывать его.
+ * Чего **не** делает: фокус-ловушку — это `useFocusTrap`, отдельный примитив.
+ * Поповеру ловушка и не нужна: Tab обязан уводить фокус наружу и закрывать его,
+ * поэтому связка «слой + ловушка» собирается в компоненте, а не тут.
  *
  * Правило возврата фокуса: восстанавливаем, **только если на момент закрытия
  * фокус всё ещё внутри слоя**. Если пользователь кликнул в другое поле, фокус
@@ -61,7 +71,7 @@ export function useOverlayLayer(
   open: Ref<boolean>,
   onDismiss: () => void,
   options: UseOverlayLayerOptions = {},
-): void {
+): OverlayLayerHandle {
   let layerId: number | null = null
   let previouslyFocused: HTMLElement | null = null
 
@@ -76,6 +86,7 @@ export function useOverlayLayer(
       shouldClose: () => options.closeOnEscape?.() ?? true,
       close: onDismiss,
       setTopmost: options.onTopmostChange,
+      root: () => options.root?.value ?? null,
     })
   }
 
@@ -94,12 +105,18 @@ export function useOverlayLayer(
     if (options.restoreFocus === false || !target) return
     if (typeof document === 'undefined') return
 
-    // Фокус уже вне слоя — пользователь ушёл сам, отбирать нельзя.
+    // Фокус уже вне слоя — пользователь ушёл сам, отбирать нельзя. Решение
+    // принимаем сейчас, пока слой ещё в DOM, а применяем следующим тиком.
     const active = document.activeElement
     const root = options.root?.value
     if (root && active && active !== document.body && !root.contains(active)) return
 
-    target.focus?.()
+    // Возврат откладывается намеренно: ловушка фокуса того же слоя снимает свои
+    // слушатели в этом же флаше, и сфокусируй мы триггер сразу — она затащила бы
+    // фокус обратно в закрывающийся слой.
+    void nextTick(() => {
+      if (target.isConnected) target.focus?.()
+    })
   }
 
   watch(
@@ -112,4 +129,8 @@ export function useOverlayLayer(
   )
 
   onUnmounted(unregister)
+
+  return {
+    rootsAbove: () => (layerId === null ? [] : layerRootsAbove(layerId)),
+  }
 }

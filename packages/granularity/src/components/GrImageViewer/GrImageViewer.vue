@@ -2,8 +2,10 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { useFocusTrap } from '../../composables/useFocusTrap'
+import { useInertOthers } from '../../composables/internal/useInertOthers'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { useOverlayPresence } from '../../composables/internal/useOverlayPresence'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
@@ -365,9 +367,21 @@ const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
   actions: toolbarActions,
 }))
 
-function onBackdropClick(): void {
-  if (!props.hideOnClickModal)
-    return
+// Клик по подложке считается только тем, что на ней и начался: иначе
+// перетаскивание изображения, отпущенное за его границей, закрывало бы
+// просмотрщик.
+let pointerDownOnBackdrop = false
+
+function onBackdropPointerDown(event: MouseEvent): void {
+  pointerDownOnBackdrop = event.target === event.currentTarget
+}
+
+function onBackdropClick(event: MouseEvent): void {
+  const startedHere = pointerDownOnBackdrop
+  pointerDownOnBackdrop = false
+
+  if (!startedHere || event.target !== event.currentTarget) return
+  if (!props.hideOnClickModal) return
   closeViewer()
 }
 
@@ -376,21 +390,40 @@ const { onKeydown } = useViewerKeyboard({
 })
 
 // Esc — через общий стек слоёв: просмотрщик поверх модалки обязан закрывать себя.
-// Просмотрщик — модальный класс: бэкдроп, scroll-lock, фокус-ловушка HeadlessUI.
-// Значит он и участвует в вычислении `inert` наравне с модалками и drawer'ом.
+// Просмотрщик — модальный класс: бэкдроп, scroll-lock, ловушка фокуса. Значит
+// он и участвует в вычислении `inert` наравне с модалками и drawer'ом.
 const isTopmost = ref(true)
-const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : undefined))
+const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? true : undefined))
 
-useOverlayLayer(
-  computed(() => props.modelValue),
+const rootEl = ref<HTMLElement | null>(null)
+const panelEl = ref<HTMLElement | null>(null)
+
+const {
+  mounted: isMounted,
+  visible: isVisible,
+  onPanelAfterLeave: releasePresence,
+} = useOverlayPresence(open)
+
+const layer = useOverlayLayer(
+  open,
   closeViewer,
   {
     modal: true,
     closeOnEscape: () => props.closeOnPressEscape,
     onTopmostChange: (value) => { isTopmost.value = value },
-    restoreFocus: false,
+    root: rootEl,
   },
 )
+
+useFocusTrap(panelEl, {
+  active: () => props.modelValue && isTopmost.value,
+  fallbackFocus: () => panelEl.value,
+  containers: layer.rootsAbove,
+  // Возврат фокуса — за стеком слоёв, у него правило строже.
+  restoreFocus: false,
+})
+
+useInertOthers(rootEl, () => props.modelValue && isTopmost.value)
 
 watch(
   () => props.modelValue,
@@ -487,51 +520,52 @@ onBeforeUnmount(() => {
 
 <template>
   <teleport to="body" :disabled="!teleportEnabled">
-    <TransitionRoot :show="open" as="template">
-      <Dialog
-        as="div"
-        v-bind="themeAttrs"
-        :inert="inertAttr"
-        class="fixed inset-0"
-        :style="viewerStyle"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="resolvedAriaLabel"
-        :static="true"
-        @keydown="onKeydown"
-      >
-        <div class="fixed inset-0 overflow-hidden">
-          <TransitionChild
-            as="template"
-            enter="duration-150 ease-out"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="duration-120 ease-in"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-          >
-            <div
-              data-gr-image-viewer-overlay
-              :class="scrimClass"
-              aria-hidden="true"
-              @click="onBackdropClick"
-            />
-          </TransitionChild>
+    <div
+      v-if="teleportEnabled && isMounted"
+      ref="rootEl"
+      v-bind="themeAttrs"
+      data-gr-overlay-root
+      :inert="inertAttr"
+      class="fixed inset-0"
+      :style="viewerStyle"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="resolvedAriaLabel"
+      @keydown="onKeydown"
+    >
+      <div class="fixed inset-0 overflow-hidden">
+        <Transition
+          appear
+          enter-active-class="duration-150 ease-out"
+          enter-from-class="opacity-0"
+          leave-active-class="duration-120 ease-in"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="isVisible"
+            data-gr-image-viewer-overlay
+            :class="scrimClass"
+            aria-hidden="true"
+            @mousedown="onBackdropPointerDown"
+            @click="onBackdropClick"
+          />
+        </Transition>
 
-          <TransitionChild
-            as="template"
-            enter="duration-180 ease-out"
-            enter-from="opacity-0 scale-98"
-            enter-to="opacity-100 scale-100"
-            leave="duration-130 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-98"
+        <Transition
+          appear
+          enter-active-class="duration-180 ease-out"
+          enter-from-class="opacity-0 scale-98"
+          leave-active-class="duration-130 ease-in"
+          leave-to-class="opacity-0 scale-98"
+          @after-leave="releasePresence"
+        >
+          <div
+            v-if="isVisible"
+            ref="panelEl"
+            data-gr-image-viewer-panel
+            class="relative z-10 h-full w-full outline-none"
+            tabindex="-1"
           >
-            <DialogPanel
-              data-gr-image-viewer-panel
-              class="relative z-10 h-full w-full outline-none"
-              tabindex="-1"
-            >
               <div class="pointer-events-none absolute inset-x-0 top-0 z-30 px-3 py-3 sm:px-6">
                 <div class="pointer-events-auto flex items-center justify-between gap-3">
                   <div class="flex items-center gap-2">
@@ -721,10 +755,9 @@ onBeforeUnmount(() => {
                   </slot>
                 </div>
               </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+          </div>
+        </Transition>
+      </div>
+    </div>
   </teleport>
 </template>

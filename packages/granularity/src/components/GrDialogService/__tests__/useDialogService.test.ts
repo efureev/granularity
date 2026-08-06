@@ -1,36 +1,5 @@
 import { nextTick } from 'vue'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
-
-  return {
-    Dialog: defineComponent({
-      name: 'Dialog',
-      emits: ['close'],
-      props: { initialFocus: { type: Object, default: null } },
-      template: '<div data-testid="hu-dialog"><slot /></div>',
-    }),
-    DialogPanel: defineComponent({
-      name: 'DialogPanel',
-      template: '<div data-testid="hu-panel"><slot /></div>',
-    }),
-    DialogTitle: defineComponent({
-      name: 'DialogTitle',
-      template: '<div data-testid="hu-title"><slot /></div>',
-    }),
-    TransitionRoot: defineComponent({
-      name: 'TransitionRoot',
-      props: { show: { type: Boolean, default: false } },
-      template: '<div v-if="show"><slot /></div>',
-    }),
-    TransitionChild: defineComponent({
-      name: 'TransitionChild',
-      template: '<div><slot /></div>',
-    }),
-    // Teleport-подобные обёртки не нужны: хост сам в body.
-  }
-})
+import { afterEach, describe, expect, it } from 'vitest'
 
 const {
   dialogService,
@@ -410,7 +379,7 @@ describe('useDialogService — очередь, вложенность и при�
 
     // Нижнее окно помечено `inert` общим стеком слоёв — фокус и клики
     // достаются верхнему. Отдельного кода в сервисе на это нет и не нужно.
-    const layers = document.querySelectorAll('[data-testid="hu-dialog"]')
+    const layers = document.querySelectorAll('[data-gr-overlay-root]')
     expect(layers[0].hasAttribute('inert')).toBe(true)
     expect(layers[layers.length - 1].hasAttribute('inert')).toBe(false)
 

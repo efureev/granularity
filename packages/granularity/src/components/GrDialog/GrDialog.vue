@@ -11,7 +11,7 @@
  *   `GrDialogHeader`.
  * - В остальных случаях (`!showHeader`, либо `showHeader` со слотом `#header`)
  *   `GrDialog` отдаёт sr-only title в слот `#title` у `GrModal`, чтобы
- *   HeadlessUI корректно проставил `aria-labelledby` на панель.
+ *   `GrModal` корректно проставил `aria-labelledby` на корень окна.
  * - `aria-label` вниз уходит всегда: `GrModal` иначе не отличил бы «заголовок
  *   рисует `GrDialogHeader`» от «имени нет вовсе» и подставил бы обобщённое.
  */
@@ -112,7 +112,7 @@ const bodyClass = computed(() => {
 // Нужен ли sr-only title через `GrModal #title`:
 // - `!showHeader` — вообще нет заголовка в разметке;
 // - `showHeader && $slots.header` — кастомный хедер не обязан содержать DialogTitle.
-// В обоих случаях даём HeadlessUI a11y-title, не дублируя его визуально.
+// В обоих случаях даём окну a11y-title, не дублируя его визуально.
 const useModalSrOnlyTitle = computed(
   () => !!resolvedTitle.value && (!props.showHeader || !!slots.header),
 )

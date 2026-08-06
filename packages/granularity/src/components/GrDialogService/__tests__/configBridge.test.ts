@@ -2,18 +2,6 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@headlessui/vue', async () => {
-  const { defineComponent: dc } = await import('vue')
-
-  return {
-    Dialog: dc({ name: 'Dialog', emits: ['close'], props: { initialFocus: { type: Object, default: null } }, template: '<div><slot /></div>' }),
-    DialogPanel: dc({ name: 'DialogPanel', template: '<div><slot /></div>' }),
-    DialogTitle: dc({ name: 'DialogTitle', template: '<div><slot /></div>' }),
-    TransitionRoot: dc({ name: 'TransitionRoot', props: { show: { type: Boolean, default: false } }, template: '<div v-if="show"><slot /></div>' }),
-    TransitionChild: dc({ name: 'TransitionChild', template: '<div><slot /></div>' }),
-  }
-})
-
 const { dialogService, useDialogService, teardownDialogService } = await import('../useDialogService')
 const GrConfigProvider = (await import('../../GrConfigProvider/GrConfigProvider.vue')).default
 const { GRANULARITY_I18N_KEY } = await import('../../../i18n/adapter')

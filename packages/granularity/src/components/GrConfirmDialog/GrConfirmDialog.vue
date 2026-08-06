@@ -10,7 +10,7 @@
  * через `update:modelValue`.
  */
 import { useGrComponentProp } from '../GrConfigProvider/context'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrDialog from '../GrDialog/GrDialog.vue'
@@ -147,12 +147,13 @@ function focusAction(): void {
   else if (props.focusAction === 'cancel') cancelButtonRef.value?.focus()
 }
 
+// Источник — не только `modelValue`, но и сами кнопки: содержимое панели
+// появляется на такт позже открытия, и фокус по фиксированному `nextTick`
+// приходился на момент, когда фокусировать ещё нечего.
 watch(
-  () => props.modelValue,
-  async (isOpen) => {
-    if (!isOpen || props.focusAction === 'none') return
-
-    await nextTick()
+  [() => props.modelValue, cancelButtonRef, confirmButtonRef],
+  () => {
+    if (!props.modelValue || props.focusAction === 'none') return
     focusAction()
   },
   // `immediate`: окно могут смонтировать уже открытым — смены пропа тогда нет.
