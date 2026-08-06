@@ -206,6 +206,13 @@
             "default": "undefined"
           },
           {
+            "name": "fetchOptions",
+            "description": "Удалённая загрузка опций под управлением компонента: дебаунс, отмена устаревшего запроса и `loading` берёт на себя он. Ответ на отменённый запрос игнорируется — при быстром вводе в списке всегда результат последнего запроса, а не того, который вернулся позже. `signal` пробрасывается в `fetch`. Локальная фильтрация в этом режиме выключена: список фильтрует сервер. Альтернатива — событие `search`, если запрос ведёт само приложение.",
+            "type": "((query: string, signal: AbortSignal) => Promise<GrAutocompleteOption<TValue>[]>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "minQueryLength",
             "description": "Минимальная длина запроса до эмита `search` (для дебаунса remote-загрузки).",
             "type": "number | undefined",
@@ -301,6 +308,12 @@
             "description": "Дебаунснутый поисковый запрос — точка входа для удалённой загрузки опций.",
             "type": "[string]",
             "signature": "(e: \"search\", query: string): void"
+          },
+          {
+            "name": "searchError",
+            "description": "Запрос `fetchOptions` завершился ошибкой (отмена устаревшего сюда не приходит).",
+            "type": "[unknown]",
+            "signature": "(e: \"searchError\", error: unknown): void"
           }
         ]
       },
@@ -4422,16 +4435,16 @@
             "signature": "(event: \"update:modelValue\", value: string[]): void"
           },
           {
-            "name": "clear",
-            "description": "",
-            "type": "[]",
-            "signature": "(event: \"clear\"): void"
-          },
-          {
             "name": "add",
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"add\", value: string): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
           },
           {
             "name": "reject",
@@ -5463,6 +5476,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "open",
+            "description": "Открыт ли поповер. Без этого пропа компонент ведёт состояние сам (uncontrolled), с ним — слушайте `update:open`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -5480,13 +5500,6 @@
             "name": "ariaLabel",
             "description": "Доступное имя панели. Обязательно для `role=\"dialog\"` без видимого заголовка.",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "open",
-            "description": "Открыт ли поповер. Без этого пропа компонент ведёт состояние сам (uncontrolled), с ним — слушайте `update:open`.",
-            "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -8133,6 +8146,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "open",
+            "description": "Управляемая видимость. Без неё компонент ведёт видимость сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "disabled",
             "description": "Подсказка не показывается ничем — ни курсором, ни фокусом, ни `v-model:open`.",
             "type": "boolean | undefined",
@@ -8143,13 +8163,6 @@
             "name": "size",
             "description": "Размер панели и дефолтной триггер-иконки.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "open",
-            "description": "Управляемая видимость. Без неё компонент ведёт видимость сам.",
-            "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },

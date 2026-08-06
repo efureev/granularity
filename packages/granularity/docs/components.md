@@ -23,7 +23,7 @@
 там его особенности, оговорки и примеры.
 
 - `GrAlert`
-- `GrAutocomplete`
+- [`GrAutocomplete`](./components/GrAutocomplete.md)
 - `GrAvatar`
 - `GrBadge`
 - `GrBadgeWrap`

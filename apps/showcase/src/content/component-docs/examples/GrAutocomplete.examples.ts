@@ -72,7 +72,7 @@ const teams = ref<string[]>(['design', 'platform'])
   {
     id: 'autocomplete-async',
     title: 'Async remote loading',
-    description: 'Для удалённого поиска отключите локальную фильтрацию (`:filterable="false"`) и подпишитесь на дебаунснутое событие `search`: родитель загружает опции и управляет `:loading`. `min-query-length` откладывает запрос до нужной длины, а stale-ответы отбрасываются для защиты от гонок.',
+    description: 'Удалённый поиск ведёт сам компонент: `fetch-options` дебаунсится, предыдущий запрос отменяется через `AbortSignal`, а ответ на устаревший запрос игнорируется — при быстром вводе в списке всегда результат последнего запроса. Локальную фильтрацию и `loading` в этом режиме компонент берёт на себя, `min-query-length` откладывает запрос до нужной длины.',
     status: 'ready',
     previewKey: 'gr-autocomplete-async',
     code: `<script setup lang="ts">
@@ -80,40 +80,58 @@ import { ref } from 'vue'
 
 import { GrAutocomplete, type GrAutocompleteOption } from '@feugene/granularity'
 
+// Игрушечная «база» пользователей — эмулируем удалённый поиск с задержкой.
+const DIRECTORY: GrAutocompleteOption[] = [
+  { value: 'ada', label: 'Ada Lovelace' },
+  { value: 'alan', label: 'Alan Turing' },
+  { value: 'grace', label: 'Grace Hopper' },
+  { value: 'linus', label: 'Linus Torvalds' },
+  { value: 'margaret', label: 'Margaret Hamilton' },
+  { value: 'dennis', label: 'Dennis Ritchie' },
+  { value: 'ken', label: 'Ken Thompson' },
+  { value: 'barbara', label: 'Barbara Liskov' },
+]
+
 const user = ref('')
-const options = ref<GrAutocompleteOption[]>([])
-const loading = ref(false)
-let requestId = 0
 
-async function onSearch(query: string): Promise<void> {
-  if (!query) {
-    options.value = []
-    return
-  }
+// Разброс задержек нарочный: короткий запрос отвечает дольше длинного, поэтому
+// без отмены устаревшего в списке оказался бы ответ на предыдущий ввод.
+function latencyFor(query: string): number {
+  return Math.max(200, 900 - query.length * 150)
+}
 
-  const current = ++requestId
-  loading.value = true
-  const found = await fetchUsers(query) // ваш API-вызов
-  if (current !== requestId) return // отбросить устаревший ответ
+async function fetchPeople(query: string, signal: AbortSignal): Promise<GrAutocompleteOption[]> {
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, latencyFor(query))
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer)
+      reject(signal.reason)
+    })
+  })
 
-  options.value = found
-  loading.value = false
+  const needle = query.toLowerCase()
+  return DIRECTORY.filter(o => o.label.toLowerCase().includes(needle))
 }
 </script>
 
 <template>
-  <GrAutocomplete
-    v-model="user"
-    :options="options"
-    :loading="loading"
-    :filterable="false"
-    :min-query-length="1"
-    clearable
-    placeholder="Search people (async)…"
-    aria-label="Search people"
-    @search="onSearch"
-  />
+  <div class="grid gap-3">
+    <GrAutocomplete
+      v-model="user"
+      :fetch-options="fetchPeople"
+      :min-query-length="1"
+      clearable
+      placeholder="Search people (async)…"
+      aria-label="Search people"
+    />
+
+    <p class="text-sm text-[var(--gr-muted-fg)]">
+      Options are fetched by the component itself: <code>fetchOptions</code> is debounced, the
+      previous request is aborted through its <code>AbortSignal</code>, and a late answer to an
+      outdated query never wins.
+    </p>
+  </div>
 </template>`,
-    note: 'Компонент не завязан на конкретный транспорт: он лишь эмитит запрос и рендерит состояния loading / no-results, а загрузку данных полностью контролирует потребитель.',
+    note: 'Если запрос ведёт само приложение (свой стор, кэш, своя отмена), остаётся прежний путь — дебаунснутое событие `search` плюс внешние `:options` и `:loading`.',
   },
 ]

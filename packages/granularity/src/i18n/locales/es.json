@@ -41,6 +41,7 @@
     "loading": "Cargando…",
     "noResults": "Sin resultados",
     "addOption": "Añadir «{value}»",
+    "removeValue": "Quitar {label}",
     "typeMore": {
       "one": "Escriba al menos {n} carácter",
       "many": "Escriba al menos {n} de caracteres",

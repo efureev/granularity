@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrAutocomplete`: `fetchOptions` — remote search run by the component.** The prop takes
+  `(query, signal) => Promise<options>`: the component debounces it, aborts the previous request through its
+  `AbortController` and ignores the answer to an aborted one, so a slow reply to an earlier query can no longer
+  overwrite the list built for the current one. Until now the component only emitted a debounced `search` and gave the
+  consumer nothing to match a response against its request — the race was theirs to lose. Internal `loading` comes with
+  it, local filtering steps aside (the server filters), and a failure other than an abort is reported as `searchError`.
+  The `search` event stays for applications that own the request themselves.
+- **`GrAutocomplete`: keyboard access to individual chips, and `open`/`close` on the instance.** In `multiple`, `←`
+  from an empty query moves onto the last chip, arrows walk between them, `Delete`/`Backspace` removes the one under
+  focus and keeps focus on its neighbour, `Esc`/`→`/any printable character returns to the field. The remove buttons
+  stay out of the tab order on purpose: a combobox keeps focus on its `<input>`, and twenty selected values must not
+  mean twenty Tab stops. Until now only `Backspace` worked, and only on the last chip.
+
+  With `allowCustomValue`, the «Add …» entry became a real option of the list and a stop for the arrows — committing a
+  custom value from the keyboard was impossible whenever the filtered list was not empty, because Enter always went to
+  the active option.
+
 - **One portal for every overlay.** Modals, drawers, the image viewer, floating panels (select, autocomplete,
   tree-select, tooltip, popover, dropdown), toasts, the imperative dialog host and the fullscreen loader now mount
   into a single `<div id="gr-portal">` created in `body` on first use — nine independent `teleport to="body"` and two
@@ -351,6 +368,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrAutocomplete`: Tab used to walk into the option list instead of leaving the widget.** Options are
+  `<button role="option">` and were focusable, so Tab from the field went into the panel and then through every option
+  — the opposite of the combobox contract, where focus stays on the `<input>` and the active option is named by
+  `aria-activedescendant`. They are `tabindex="-1"` now, and `mousedown` on an option is prevented, which also fixes
+  the second half: picking an option with the mouse in single mode used to drop focus on `<body>`, because the button
+  holding it disappeared together with the panel.
+- **`GrAutocomplete`: the option list was not a valid `listbox`.** The «Add …» button and the loading, hint and empty
+  rows were direct children of `role="listbox"` (`aria-required-children`). The states moved out of the list into one
+  `role="status" aria-live="polite"` region below it — which also gives them the announcement they never had: loading,
+  «type at least N characters» and «no results» changed in complete silence for a screen reader.
+- **`GrAutocomplete`: `readonly` was an ARIA attribute with no behaviour, and `disabled` from `GrFormField` was
+  ignored by the markup.** The panel opened on focus, options were selectable and chips removable in a read-only
+  control; a field-level `disabled` left the shell looking enabled and kept the chip remove buttons in place. Both
+  states now lock the control the same way.
+- **`GrAutocomplete`: an option id was built from its value.** A value containing a space produced an invalid id, and
+  `aria-activedescendant` pointed at two tokens instead of one reference — the active option stopped being announced.
+  Ids follow the position in the list now.
+- **`GrAutocomplete`: disabled styling no longer uses `opacity`.** Transparency dilutes text tokens tuned for AA and
+  drops the contrast; the disabled shell and the disabled option are muted with tokens, like `GrInput`. The panel also
+  stopped hard-coding `text-[13px]` and `rounded-[10px]` instead of `--gr-text-sm` / `--gr-radius-md`, and the chip
+  remove button stopped borrowing `gr.inputTag.removeTag` from another component's namespace — it has its own
+  `gr.autocomplete.removeValue`, with the value in the label.
 - **Toasts, select panels and the imperative dialog host were being marked `inert` by an open modal.** The rule
   skipped only elements carrying `data-gr-overlay-root`, and exactly three components had it — so a toast raised while
   a dialog was open was silently removed from the accessibility tree and its action button became unreachable, which

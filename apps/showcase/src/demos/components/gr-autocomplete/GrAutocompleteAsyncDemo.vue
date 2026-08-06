@@ -16,30 +16,24 @@ const DIRECTORY: GrAutocompleteOption[] = [
 ]
 
 const user = ref('')
-const options = ref<GrAutocompleteOption[]>([])
-const loading = ref(false)
 
-let requestId = 0
+// Разброс задержек нарочный: короткий запрос отвечает дольше длинного, поэтому
+// без отмены устаревшего в списке оказался бы ответ на предыдущий ввод.
+function latencyFor(query: string): number {
+  return Math.max(200, 900 - query.length * 150)
+}
 
-async function onSearch(query: string): Promise<void> {
-  if (!query) {
-    options.value = []
-    loading.value = false
-    return
-  }
-
-  const current = ++requestId
-  loading.value = true
-
-  // Эмуляция сетевого запроса.
-  await new Promise(resolve => setTimeout(resolve, 500))
-
-  // Отбрасываем ответы, если пришёл более свежий запрос (защита от гонок).
-  if (current !== requestId) return
+async function fetchPeople(query: string, signal: AbortSignal): Promise<GrAutocompleteOption[]> {
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, latencyFor(query))
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer)
+      reject(signal.reason)
+    })
+  })
 
   const needle = query.toLowerCase()
-  options.value = DIRECTORY.filter(o => o.label.toLowerCase().includes(needle))
-  loading.value = false
+  return DIRECTORY.filter(o => o.label.toLowerCase().includes(needle))
 }
 </script>
 
@@ -47,19 +41,17 @@ async function onSearch(query: string): Promise<void> {
   <div class="grid gap-3">
     <GrAutocomplete
       v-model="user"
-      :options="options"
-      :loading="loading"
-      :filterable="false"
+      :fetch-options="fetchPeople"
       :min-query-length="1"
       clearable
       placeholder="Search people (async)…"
       aria-label="Search people"
-      @search="onSearch"
     />
 
     <p class="text-sm text-[var(--gr-muted-fg)]">
-      Options are fetched remotely via the debounced <code>@search</code> event; <code>:loading</code>
-      drives the spinner and loading row. Stale responses are discarded to avoid races.
+      Options are fetched by the component itself: <code>fetchOptions</code> is debounced, the
+      previous request is aborted through its <code>AbortSignal</code>, and a late answer to an
+      outdated query never wins.
     </p>
   </div>
 </template>

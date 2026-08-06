@@ -41,6 +41,7 @@
     "loading": "Loading…",
     "noResults": "No results",
     "addOption": "Add \"{value}\"",
+    "removeValue": "Remove {label}",
     "typeMore": {
       "one": "Type at least {n} character",
       "other": "Type at least {n} characters"

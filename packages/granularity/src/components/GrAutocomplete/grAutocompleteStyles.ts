@@ -20,7 +20,18 @@ export type GrAutocompleteModelValue<TValue extends GrAutocompleteValue = string
  * т.к. фокус живёт на вложенном `<input role="combobox">`. Flex-контейнер с
  * `flex-wrap` — чтобы chips в multiple-режиме переносились и коробка росла в высоту.
  */
-export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-md border text-[var(--gr-fg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+
+export const autocompleteShellEnabledClass = 'bg-[var(--gr-bg)]'
+
+/**
+ * Заблокированная оболочка гасится фоном, а не `opacity` (как `GrInput`):
+ * прозрачность разбавляет выверенные на AA токены текста и роняет контраст.
+ * Фон взаимоисключающий с `autocompleteShellEnabledClass` — два `bg-*` одной
+ * специфичности разрулил бы порядок в сгенерированном CSS, а не порядок в
+ * списке классов.
+ */
+export const autocompleteShellDisabledClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
 
 // Размеры совпадают с `GrInput`/`GrSelect` (h → min-h, чтобы multiple мог расти).
 export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
@@ -42,11 +53,33 @@ export function autocompleteShellClass(options: {
     autocompleteShellBase,
     autocompleteSizeClassBySize[options.size],
     options.invalid ? 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]' : 'border-[var(--gr-brd)]',
-    options.disabled ? 'cursor-not-allowed opacity-50' : '',
+    options.disabled ? autocompleteShellDisabledClass : autocompleteShellEnabledClass,
   ]
     .filter(Boolean)
     .join(' ')
 }
+
+/** Общая подсветка наведения и активной опции. */
+const autocompleteOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
+
+export const autocompleteOptionBaseClass = 'w-full rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)]'
+export const autocompleteOptionActiveClass = autocompleteOptionHighlight
+export const autocompleteOptionEnabledClass = `hover:${autocompleteOptionHighlight}`
+/** Выключенная опция гасится токеном текста — по той же причине, что и оболочка. */
+export const autocompleteOptionDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
+
+export function autocompleteOptionClass(options: { disabled: boolean, active: boolean }): string {
+  return [
+    autocompleteOptionBaseClass,
+    options.disabled ? autocompleteOptionDisabledClass : autocompleteOptionEnabledClass,
+    !options.disabled && options.active ? autocompleteOptionActiveClass : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+/** Строка состояния панели: загрузка, «введите ещё N», «ничего не найдено». */
+export const autocompleteStateClass = 'flex items-center gap-2 px-3 py-2 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
 
 /**
  * Панель списка опций — тот же «язык» поверхностей, что у `GrSelect`
