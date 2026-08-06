@@ -92,6 +92,8 @@ const resolvedDisabled = computed(() => {
   return group?.disabled.value ?? false
 })
 
+const resolvedReadonly = computed(() => group?.readonly.value ?? false)
+
 // «Или», а не `??`: ошибку может объявить и группа, и сам переключатель.
 const resolvedInvalid = computed(() => props.invalid || (group?.invalid.value ?? false))
 
@@ -127,6 +129,7 @@ const buttonClassName = computed(() => {
   return grRadioButtonClass({
     checked: checked.value,
     disabled: resolvedDisabled.value,
+    readonly: resolvedReadonly.value,
     size: resolvedSize.value,
     buttonVariant: props.buttonVariant,
     buttonTone: props.buttonTone,
@@ -135,7 +138,10 @@ const buttonClassName = computed(() => {
   })
 })
 
-const rootClassName = computed(() => grRadioRootClass(resolvedDisabled.value))
+const rootClassName = computed(() => grRadioRootClass({
+  disabled: resolvedDisabled.value,
+  readonly: resolvedReadonly.value,
+}))
 const controlClassName = computed(() => grRadioControlClass({
   checked: checked.value,
   disabled: resolvedDisabled.value,

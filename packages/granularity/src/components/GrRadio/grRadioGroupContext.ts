@@ -19,6 +19,12 @@ export type GrRadioGroupContext = {
   modelValue: ComputedRef<GrRadioValue>
   name: ComputedRef<string | undefined>
   disabled: ComputedRef<boolean>
+  /**
+   * Только для чтения: выбор видно, но он не меняется. У роли `radio` нет
+   * `aria-readonly` — состояние объявляет сама группа, переключателю остаётся
+   * не прикидываться кликабельным.
+   */
+  readonly: ComputedRef<boolean>
   /** Ошибка группы: до вида переключателя она доходит только через контекст. */
   invalid: ComputedRef<boolean>
   size: ComputedRef<GrButtonSize>

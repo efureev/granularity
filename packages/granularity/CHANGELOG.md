@@ -82,6 +82,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   поставить переключателю или всей группе — состояния складываются по «или»; описание под подписью
   связывается через `aria-describedby`; `value`/`modelValue` принимают `string | number | boolean`
   (`GrRadioValue`) — перечисления в формах это обычно id числом.
+- **`GrRadioGroup`: опции с `disabled`/`description`, `orientation` и `readonly` до переключателей.**
+  `GrRadioGroupOption` вырос до `{ value, label, disabled?, description? }` — отключить один вариант или
+  дать ему пояснение больше не значит переходить на слот. `orientation` (`vertical`/`horizontal`)
+  управляет раскладкой варианта `radiobox`; кнопочный собирает `GrButtonGroup`, и там раскладка своя.
+  `readonly` теперь виден и переключателям: группа объявляет `aria-readonly` (у роли `radio` такого
+  атрибута нет), а сами переключатели перестают обещать клик курсором.
 - **`GrCheckboxGroup`** — the multi-select counterpart of `GrRadioGroup`: `v-model: string[]`,
   `role="group"`, and shared `name` / `size` / `disabled` / `readonly` / `invalid` for the nested
   `GrCheckbox`. `GrCheckbox` also gains `labelPosition` (label before the control).

@@ -12,7 +12,15 @@ import { GR_RADIO_GROUP_CONTEXT } from '../GrRadio'
 import type { GrRadioEntry, GrRadioValue } from '../GrRadio/grRadioGroupContext'
 
 export type GrRadioGroupVariant = 'radiobox' | 'button'
-export interface GrRadioGroupOption { value: GrRadioValue, label: string }
+export type GrRadioGroupOrientation = 'vertical' | 'horizontal'
+export interface GrRadioGroupOption {
+  value: GrRadioValue
+  label: string
+  /** Отключить одну опцию, не переходя на слот. */
+  disabled?: boolean
+  /** Пояснение под подписью. Рисуется только в варианте `radiobox`. */
+  description?: string
+}
 
 /**
  * GrRadioGroup — контейнер группы `GrRadio`.
@@ -32,6 +40,11 @@ export interface GrRadioGroupProps {
   /** Обязательное поле (`aria-required`). */
   required?: boolean
   variant?: GrRadioGroupVariant
+  /**
+   * Раскладка варианта `radiobox`. Кнопочный вариант всегда горизонтальный —
+   * его собирает `GrButtonGroup`.
+   */
+  orientation?: GrRadioGroupOrientation
   size?: GrButtonSize
   ariaLabel?: string
 }
@@ -44,6 +57,7 @@ const props = withDefaults(defineProps<GrRadioGroupProps>(), {
   invalid: false,
   required: false,
   variant: 'radiobox',
+  orientation: 'vertical',
   size: undefined,
   ariaLabel: undefined,
 })
@@ -70,6 +84,10 @@ function setValue(next: GrRadioValue): void {
     return
   emit('update:modelValue', next)
 }
+
+const listClass = computed(() => (props.orientation === 'horizontal'
+  ? 'flex flex-wrap items-start gap-x-6 gap-y-2'
+  : 'grid gap-2'))
 
 const rootEl = ref<HTMLElement | null>(null)
 
@@ -127,6 +145,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),
   name: computed(() => props.name),
   disabled: computed(() => props.disabled),
+  readonly: isReadonly,
   invalid: isInvalid,
   size: resolvedSize,
   setValue,
@@ -155,7 +174,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
       <GrButtonGroup v-if="variant === 'button'">
         <slot />
       </GrButtonGroup>
-      <div v-else class="grid gap-2">
+      <div v-else :class="listClass">
         <slot />
       </div>
     </template>
@@ -165,15 +184,25 @@ provide(GR_RADIO_GROUP_CONTEXT, {
           v-for="opt in options ?? []"
           :key="String(opt.value)"
           :value="opt.value"
+          :disabled="opt.disabled"
           variant="button"
           :size="resolvedSize"
         >
           {{ opt.label }}
         </GrRadio>
       </GrButtonGroup>
-      <div v-else class="grid gap-2">
-        <GrRadio v-for="opt in options ?? []" :key="String(opt.value)" :value="opt.value">
+      <div v-else :class="listClass">
+        <GrRadio
+          v-for="opt in options ?? []"
+          :key="String(opt.value)"
+          :value="opt.value"
+          :disabled="opt.disabled"
+        >
           {{ opt.label }}
+
+          <template v-if="opt.description" #description>
+            {{ opt.description }}
+          </template>
         </GrRadio>
       </div>
     </template>

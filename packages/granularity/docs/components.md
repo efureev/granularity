@@ -66,7 +66,7 @@
 - `GrProgressBar`
 - `GrPromptDialog`
 - [`GrRadio`](./components/GrRadio.md)
-- `GrRadioGroup`
+- [`GrRadioGroup`](./components/GrRadioGroup.md)
 - `GrRating`
 - `GrResponseErrorBanner`
 - `GrSegmented`

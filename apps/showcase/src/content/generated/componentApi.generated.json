@@ -5803,6 +5803,13 @@
             "default": "undefined"
           },
           {
+            "name": "orientation",
+            "description": "Раскладка варианта `radiobox`. Кнопочный вариант всегда горизонтальный — его собирает `GrButtonGroup`.",
+            "type": "GrRadioGroupOrientation | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "GrRadioValue",

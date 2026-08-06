@@ -16,6 +16,7 @@ import {
   grRadioLabelCheckedClass,
   grRadioLabelClass,
   grRadioRootDisabledClass,
+  grRadioRootReadonlyClass,
   grRadioRootEnabledClass,
 } from './grRadioStyles'
 
@@ -26,6 +27,7 @@ export const grRadioSafelist = [...new Set([
   ...splitClassTokens(grRadioButtonDisabledCheckedClass),
   ...splitClassTokens(grRadioRootDisabledClass),
   ...splitClassTokens(grRadioRootEnabledClass),
+  ...splitClassTokens(grRadioRootReadonlyClass),
   ...splitClassTokens(grRadioControlCheckedClass),
   ...splitClassTokens(grRadioControlUncheckedClass),
   ...splitClassTokens(grRadioControlDisabledClass),

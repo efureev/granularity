@@ -25,6 +25,8 @@ export const grRadioButtonDisabledCheckedClass = 'cursor-not-allowed bg-[var(--g
  */
 export const grRadioRootDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 export const grRadioRootEnabledClass = 'cursor-pointer'
+/** Только для чтения: значение видно и читается, но курсор не обещает клика. */
+export const grRadioRootReadonlyClass = 'cursor-default'
 
 export const grRadioControlCheckedClass = 'border-[var(--gr-primary)] bg-[color-mix(in_srgb,var(--gr-primary)_10%,var(--gr-bg))]'
 export const grRadioControlUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'
@@ -46,6 +48,7 @@ export const grRadioDescriptionClass = 'text-[length:var(--gr-text-xs)] text-[va
 export function grRadioButtonClass(options: {
   checked: boolean
   disabled: boolean
+  readonly: boolean
   size: GrButtonSize
   buttonVariant: GrButtonVariant
   buttonTone: GrButtonTone
@@ -71,12 +74,13 @@ export function grRadioButtonClass(options: {
       size: options.size,
       square: false,
     }),
-    grRadioEnabledClass,
+    options.readonly ? grRadioRootReadonlyClass : grRadioEnabledClass,
   ].join(' ')
 }
 
-export function grRadioRootClass(disabled: boolean): string {
-  return disabled ? grRadioRootDisabledClass : grRadioRootEnabledClass
+export function grRadioRootClass(options: { disabled: boolean, readonly: boolean }): string {
+  if (options.disabled) return grRadioRootDisabledClass
+  return options.readonly ? grRadioRootReadonlyClass : grRadioRootEnabledClass
 }
 
 export function grRadioControlClass(options: {
