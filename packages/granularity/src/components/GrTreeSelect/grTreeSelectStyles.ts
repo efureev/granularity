@@ -18,10 +18,23 @@ export const borderClassByState: Record<GrTreeSelectState, string> = {
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
 }
 
-export function grTreeSelectClass(options: { size: GrInputSize, state: GrTreeSelectState, invalid: boolean }): string {
+/**
+ * Disabled красится фоном и цветом текста, а не прозрачностью: `opacity`
+ * разбавляет выверенные на AA токены и роняет контраст подписи.
+ */
+export const shellEnabledClass = 'bg-[var(--gr-bg)] text-[var(--gr-fg)]'
+export const shellDisabledClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
+
+export function grTreeSelectClass(options: {
+  size: GrInputSize
+  state: GrTreeSelectState
+  invalid: boolean
+  disabled?: boolean
+}): string {
   return [
     sizeClassBySize[options.size],
     'pr-9',
+    options.disabled ? shellDisabledClass : shellEnabledClass,
     options.invalid ? borderClassByState.danger : borderClassByState[options.state],
   ].join(' ')
 }

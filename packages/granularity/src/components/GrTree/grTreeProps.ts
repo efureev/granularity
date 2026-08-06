@@ -39,6 +39,11 @@ export type GrTreeDataProps<T extends object> = {
   props?: GrTreePropsMap
   nodeKey?: NodeKeyProp<T> | 'id'
   defaultExpandedKeys?: GrTreeKey[]
+  /**
+   * Раскрывать узлы, как только они появились в данных. Уже свёрнутое руками
+   * не раскрывается обратно на каждом обновлении `data`.
+   */
+  defaultExpandAll?: boolean
   filterNodeMethod?: GrTreeFilterNodeMethod<T>
 }
 
@@ -67,6 +72,10 @@ export type GrTreeViewProps<T extends object> = {
 }
 
 export type GrTreeInteractionProps<T extends object> = {
+  /** Клик по строке раскрывает/сворачивает узел, а не только выбирает его. */
+  expandOnClickNode?: boolean
+  /** На каждом уровне раскрыт максимум один узел. */
+  accordion?: boolean
   draggable?: boolean
   dragHandleIcon?: string
   allowDrop?: (draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, type: GrTreeAllowDropType) => boolean

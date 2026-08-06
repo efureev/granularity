@@ -7634,6 +7634,13 @@
             "default": "undefined"
           },
           {
+            "name": "width",
+            "description": "Ширина стека. Число — пиксели, строка — любая CSS-длина. Уезжает в `--gr-toaster-width`, поэтому то же самое можно задать и темой.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "placement",
             "description": "Угол экрана для стека уведомлений.",
             "type": "GrToasterPlacement | undefined",
@@ -7653,6 +7660,13 @@
             "type": "number | undefined",
             "required": false,
             "default": "4"
+          },
+          {
+            "name": "focusHotkey",
+            "description": "Клавиша перевода фокуса в стек уведомлений; `false` отключает хоткей. `F6` — рекомендация APG для перехода между «регионами» страницы.",
+            "type": "string | false | undefined",
+            "required": false,
+            "default": "\"F6\""
           }
         ]
       },
@@ -7678,7 +7692,13 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => boolean"
+          }
+        ]
       }
     ]
   },
@@ -7692,9 +7712,44 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "Подсказка не показывается ничем — ни курсором, ни фокусом, ни `v-model:open`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "Размер панели и дефолтной триггер-иконки.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "open",
+            "description": "Управляемая видимость. Без неё компонент ведёт видимость сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "text",
+            "description": "Текст подсказки. Разметка вместо текста — слот `#content`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placement",
+            "description": "Предпочтительная сторона панели; `flip` может её изменить.",
+            "type": "Placement | undefined",
+            "required": false,
+            "default": "\"top\""
+          },
+          {
+            "name": "offsetPx",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -7706,10 +7761,18 @@
             "default": "\"var(--gr-muted-fg)\""
           },
           {
-            "name": "text",
-            "description": "",
-            "type": "string",
-            "required": true
+            "name": "openDelay",
+            "description": "Задержка перед показом, мс. Спасает от мигания при проведении курсором по панели кнопок.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "closeDelay",
+            "description": "Задержка перед скрытием, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
           }
         ]
       },
@@ -7720,8 +7783,13 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Триггер. По умолчанию — иконка info.",
+            "type": "any"
+          },
+          {
+            "name": "content",
+            "description": "Содержимое подсказки; заменяет проп `text`.",
+            "type": "any"
           }
         ]
       },
@@ -7729,7 +7797,14 @@
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          }
+        ]
       },
       {
         "key": "methods",
@@ -7774,6 +7849,13 @@
             "type": "GrTreeKey[] | undefined",
             "required": false,
             "default": "[]"
+          },
+          {
+            "name": "defaultExpandAll",
+            "description": "Раскрывать узлы, как только они появились в данных. Уже свёрнутое руками не раскрывается обратно на каждом обновлении `data`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "filterNodeMethod",
@@ -7901,6 +7983,20 @@
             "default": "undefined"
           },
           {
+            "name": "expandOnClickNode",
+            "description": "Клик по строке раскрывает/сворачивает узел, а не только выбирает его.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "accordion",
+            "description": "На каждом уровне раскрыт максимум один узел.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "draggable",
             "description": "",
             "type": "boolean | undefined",
@@ -7995,6 +8091,12 @@
             "description": "",
             "type": "[GrTreeNode<T>, GrTreeNode<T>, GrTreeNodeDropType]",
             "signature": "(event: \"nodeDrop\", draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void"
+          },
+          {
+            "name": "nodeContextMenu",
+            "description": "",
+            "type": "[MouseEvent, T, GrTreeNode<T>]",
+            "signature": "(event: \"nodeContextMenu\", evt: MouseEvent, data: T, node: GrTreeNode<T>): void"
           }
         ]
       },
@@ -8067,7 +8169,14 @@
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Данные ещё едут. Панель показывает индикатор вместо «Нет данных» — иначе пустой ответ и незагруженный выглядят одинаково.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "invalid",
@@ -8187,6 +8296,11 @@
           {
             "name": "empty",
             "description": "Содержимое пустого состояния (когда нет данных).",
+            "type": "any"
+          },
+          {
+            "name": "loading",
+            "description": "Содержимое панели, пока данные едут.",
             "type": "any"
           }
         ]

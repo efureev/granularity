@@ -158,6 +158,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   top of it.
 - **`GrFormField`: `size`, `labelPosition` / `labelWidth`, `showMessage`, an array of `error`s**, and
   the `#label` / `#error` slots. `size` and `labelPosition` are readable from `GrConfigProvider`.
+- **`GrTooltip`: `placement`, задержки, слот и управление снаружи.** Появились `placement` и
+  `offsetPx` (`useFloating` умел их с самого начала, наружу они не выходили), `openDelay` /
+  `closeDelay` — на плотной панели кнопок подсказка перестаёт мигать, — `disabled`,
+  `v-model:open` и слот `#content` рядом с пропом `text`. На тач-устройствах, где нет hover,
+  подсказка открывается тапом и закрывается тапом вне.
+- **`GrToaster`: `F6` в стек уведомлений, ширина пропом, `focus()`.** Тосты телепортированы в конец
+  `body`, и кнопка «Отменить» лежала за пределами разумного числа нажатий `Tab`; `focusHotkey`
+  (по умолчанию `F6`) переводит фокус на верхний тост, дальше действия обходятся `Tab`. Сам тост
+  остановкой `Tab` не становится (`tabindex="-1"`). `width` (число или CSS-длина) уезжает в
+  `--gr-toaster-width`, `focus()` добавлен в `defineExpose`.
+- **`GrTree`: typeahead, `*`, режимы раскрытия и `focus()`.** Клавиатурный контракт паттерна tree
+  закрыт целиком: печатные символы переводят фокус по первым буквам (повтор одной буквы идёт по
+  кругу), `*` раскрывает всех соседей уровня. Добавлены `defaultExpandAll` (раскрывает узел в
+  момент появления в данных, не отменяя ручное сворачивание), `expandOnClickNode`, `accordion` и
+  событие `nodeContextMenu`. `focus(key?)` в `defineExpose` — им пользуется `GrTreeSelect`.
+- **`GrTreeSelect`: `loading` и размер из провайдера.** Панель показывает индикатор вместо «Нет
+  данных», пока данные едут (новый ключ `gr.treeSelect.loading`, слот `#loading`). `size` читается
+  через `useGrComponentSize()` (новый `defaults.ts`) и доезжает до дерева внутри панели.
 
 ### Fixed
 
@@ -295,6 +313,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   New package gate `src/__tests__/componentDependencies.test.ts` derives the dependency set from
   sources and asserts it matches each `config.ts` in both directions, so the lists cannot drift
   again silently.
+- **`GrTreeSelect` не давал добраться до дерева с клавиатуры.** `↓`/`↑`/`Enter`/`Space` на триггере
+  только открывали панель — фокус оставался на месте, а панель телепортирована в `body`, так что и
+  `Tab` вёл мимо. `docs/keyboard.md` при этом обещал «внутри дерева — клавиши `GrTree`». Теперь эти
+  клавиши открывают панель **и** переводят фокус в дерево (при `filterable` — сначала в поле поиска,
+  оттуда в дерево уводит `↓`/`↑`), `Tab` из панели её закрывает, а `Escape` закрывает и возвращает
+  фокус на триггер, не открывая панель заново этим же фокусом. Триггер получил `aria-haspopup="tree"`
+  и `aria-controls` на дерево, `disabled` красится токенами вместо `opacity-50`, `readonly` убирает
+  кнопку очистки. Мёртвая ветка `typeof window` в обработчике указателя и второй `watch(open, …)`
+  убраны.
+- **`GrToaster` вкладывал `role="alert"` внутрь `aria-live="polite"`.** Вложение live-регионов с
+  разной ассертивностью спецификацией не определено: браузеры и скринридеры расходятся вплоть до
+  потери объявления. Обёртка-live-region снята — объявляют себя сами тосты, контейнер остаётся
+  именованным `role="region"`.
+- **`GrTree`: `aria-selected` только на выбранном узле, фокус без обхода DOM, drop без дефолта
+  браузера.** `aria-selected="false"` на каждом узле заставлял диктора проговаривать «не выбрано» на
+  каждом шаге навигации. Навигация стрелками искала строку обходом всего поддерева DOM — теперь есть
+  общий реестр `key → element`. `onDrop` гасит дефолт браузера **до** всех проверок: иначе бросок
+  ссылки или файла на дерево уводил со страницы. Hex-фолбэки `var(--gr-primary, #000)` (8 мест)
+  убраны — чёрный фолбэк в тёмной теме давал непредсказуемый результат.
+- **`GrTooltip` со слотом давал два таб-стопа на один контрол.** Обёртка была `<span tabindex="0">`
+  без роли, а типовое употребление — подсказка у кнопки. Теперь при фокусируемом содержимом слота
+  `aria-describedby` уезжает на сам контрол, а обёртка теряет `tabindex`; если фокусироваться в
+  слоте нечему (текст, иконка), остановкой остаётся обёртка.
 
 ### Changed
 

@@ -1,11 +1,12 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -29,7 +30,8 @@ const props = withDefaults(
     defaultExpandedKeys: () => [],
     disabled: false,
     placeholder: undefined,
-    size: 'md',
+    size: undefined,
+    loading: false,
     invalid: false,
     readonly: false,
     required: false,
@@ -64,10 +66,13 @@ defineSlots<{
   node?: (props: { node: GrTreeNode<T>; data: T; selected: boolean }) => any
   /** Содержимое пустого состояния (когда нет данных). */
   empty?: () => any
+  /** Содержимое панели, пока данные едут. */
+  loading?: () => any
 }>()
 
 const rootEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLInputElement | null>(null)
+const treeId = `gr-tree-select-tree-${useId()}`
 
 // Контекст `GrFormField` + общий контракт форм-контрола.
 const field = useGrFormFieldContext()
@@ -223,15 +228,21 @@ const displayValue = computed(() => {
 
 const hasSelection = computed(() => selectedKeys.value.length > 0)
 
+/** Дерево рендерится только когда есть что показать — ссылаться иначе не на что. */
+const hasTree = computed(() => !props.loading && (props.data?.length ?? 0) > 0)
+
 const resolvedFilterPlaceholder = computed(() => {
   return props.filterPlaceholder ?? t('gr.treeSelect.filterPlaceholder', 'Search…')
 })
 
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTreeSelect' })
+
 const className = computed(() => {
   return grTreeSelectClass({
-    size: props.size,
+    size: resolvedSize.value,
     state: props.state,
-    invalid: props.invalid,
+    invalid: isInvalid.value,
+    disabled: props.disabled,
   })
 })
 
@@ -258,29 +269,36 @@ function openDropdown(): void {
   setOpen(true)
 }
 
+/**
+ * Стек слоёв возвращает фокус на триггер сразу после закрытия, а у триггера
+ * открытие висит на `focus`. Без флага `Escape` из дерева закрывал бы панель и
+ * тем же движением открывал её заново.
+ */
+let suppressFocusOpen = false
+
 function closeDropdown(): void {
+  suppressFocusOpen = true
   setOpen(false)
+  setTimeout(() => {
+    suppressFocusOpen = false
+  }, 0)
 }
 
 function toggleDropdown(): void {
   setOpen(!open.value)
 }
 
+// Клик по триггеру сам переключает панель через `@click`; флаг гасит открытие
+// по приходящему следом `focus`, иначе один клик открыл бы и тут же закрыл.
 function onTriggerPointerDown(): void {
   hadPointerDownOnTrigger = true
-  if (typeof window !== 'undefined') {
-    window.setTimeout(() => {
-      hadPointerDownOnTrigger = false
-    }, 0)
-  }
-  else {
-    // SSR / no window: reset sync
+  setTimeout(() => {
     hadPointerDownOnTrigger = false
-  }
+  }, 0)
 }
 
 function onTriggerFocus(): void {
-  if (hadPointerDownOnTrigger)
+  if (hadPointerDownOnTrigger || suppressFocusOpen)
     return
   openDropdown()
 }
@@ -291,17 +309,20 @@ useOverlayLayer(open, closeDropdown, { root: panelEl })
 watch(
   open,
   async (isOpen) => {
-    if (!isOpen)
+    if (!isOpen) {
+      if (filterValue.value.trim().length > 0)
+        filterValue.value = ''
       return
+    }
 
-    // sync tree highlight
+    // Подсветка дерева идёт за значением: панель могли открыть после того, как
+    // значение сменили снаружи.
     if (!props.multiple) {
       const v = props.modelValue
       if (v != null && !Array.isArray(v))
         treeRef.value?.setCurrentKey(v)
     }
 
-    // focus filter input
     if (props.filterable) {
       await nextTick()
       filterInputRef.value?.focus()
@@ -330,23 +351,13 @@ watch(
   },
 )
 
-watch(
-  open,
-  (isOpen) => {
-    if (isOpen)
-      return
-    if (filterValue.value.trim().length > 0)
-      filterValue.value = ''
-  },
-)
-
 function emitModel(next: GrTreeSelectModelValue) {
   emit('update:modelValue', next)
   emit('change', next)
 }
 
 function clear(): void {
-  if (props.disabled)
+  if (props.disabled || isReadonly.value)
     return
 
   const next: GrTreeSelectModelValue = props.multiple ? [] : null
@@ -356,18 +367,54 @@ function clear(): void {
     treeRef.value?.setCurrentKey(undefined)
 }
 
+/**
+ * Отдаёт клавиатуру дереву. Панель под `v-show`, поэтому дерево уже в DOM, но
+ * скрытый элемент сфокусировать нельзя — сначала открытие, потом кадр, потом
+ * фокус. Дальше работают клавиши `GrTree`, а `Escape` возвращает фокус на
+ * триггер силами общего стека слоёв.
+ */
+async function focusTree(): Promise<boolean> {
+  if (!open.value)
+    return false
+
+  await nextTick()
+  return treeRef.value?.focus() ?? false
+}
+
 function onTriggerKeydown(e: KeyboardEvent): void {
   if (props.disabled)
     return
 
-  if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    openDropdown()
-  }
   if (e.key === 'Escape') {
     e.preventDefault()
     closeDropdown()
+    return
   }
+
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    openDropdown()
+
+    // При `filterable` фокус уходит в поле поиска (см. watch на `open`), и
+    // дальше в дерево ведёт стрелка уже оттуда.
+    if (!props.filterable)
+      void focusTree()
+  }
+}
+
+/** Стрелка из поля поиска — единственный путь из фильтра в дерево. */
+function onFilterKeydown(e: KeyboardEvent): void {
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')
+    return
+
+  e.preventDefault()
+  void focusTree()
+}
+
+/** `Tab` уводит из панели — оставлять её открытой за спиной незачем. */
+function onPanelKeydown(e: KeyboardEvent): void {
+  if (e.key === 'Tab')
+    closeDropdown()
 }
 
 function onNodeClick(data: T, node: GrTreeNode<T>): void {
@@ -421,12 +468,14 @@ const teleportEnabled = useTeleportEnabled()
         readonly
         role="combobox"
         aria-readonly="true"
+        aria-haspopup="tree"
         :aria-expanded="open ? 'true' : 'false'"
+        :aria-controls="open && hasTree ? treeId : undefined"
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-required="isRequired ? 'true' : undefined"
         :aria-describedby="describedBy"
         :aria-label="ariaLabel"
-        class="w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full rounded-md border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
         @pointerdown="onTriggerPointerDown"
         @click="toggleDropdown"
@@ -435,12 +484,11 @@ const teleportEnabled = useTeleportEnabled()
       >
 
       <button
-        v-if="clearable && hasSelection"
+        v-if="clearable && hasSelection && !disabled && !isReadonly"
         data-testid="gr-tree-select-clear"
         data-gr-tree-select-clear
         type="button"
-        class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)] disabled:opacity-50"
-        :disabled="disabled"
+        class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)]"
         :aria-label="t('gr.common.clear', 'Clear')"
         @click.stop="clear"
       >
@@ -488,6 +536,7 @@ const teleportEnabled = useTeleportEnabled()
           data-testid="gr-tree-select-panel"
           data-gr-tree-select-panel
           :style="floatingStyle"
+          @keydown="onPanelKeydown"
         >
           <div :class="panelClasses">
           <div v-if="filterable" class="p-2 border-b border-[var(--gr-brd)]">
@@ -500,6 +549,7 @@ const teleportEnabled = useTeleportEnabled()
               :inputmode="filterInputmode"
               :placeholder="resolvedFilterPlaceholder"
               size="sm"
+              @keydown="onFilterKeydown"
             />
           </div>
 
@@ -507,7 +557,19 @@ const teleportEnabled = useTeleportEnabled()
             class="p-1 overflow-auto"
             :style="{ maxHeight: `${dropdownMaxHeight}px` }"
           >
-            <div v-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]">
+            <div
+              v-if="loading"
+              data-gr-tree-select-loading
+              role="status"
+              class="flex items-center gap-2 px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]"
+            >
+              <slot name="loading">
+                <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+                <span>{{ t('gr.treeSelect.loading', 'Loading…') }}</span>
+              </slot>
+            </div>
+
+            <div v-else-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]">
               <slot name="empty">
                 {{ t('gr.treeSelect.empty', 'No data') }}
               </slot>
@@ -515,7 +577,9 @@ const teleportEnabled = useTeleportEnabled()
 
             <GrTree
               v-else
+              :id="treeId"
               ref="treeRef"
+              :size="resolvedSize"
               :data="data"
               :props="props.props"
               :node-key="nodeKey as any"

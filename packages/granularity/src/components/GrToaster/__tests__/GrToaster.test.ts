@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi  } from 'vitest'
 
 
@@ -78,7 +78,7 @@ describe('GrToaster', () => {
     expect(region?.getAttribute('aria-label')).toBe('Уведомления')
   })
 
-  it('info/success — role=status, warning/danger — role=alert; список в постоянном live-region', async () => {
+  it('info/success — role=status, warning/danger — role=alert, и ни одного вложенного live-региона', async () => {
     const toast = useToast()
     toast.push({ title: 'Info', tone: 'info', timeoutMs: 0 })
     toast.push({ title: 'Danger', tone: 'danger', timeoutMs: 0 })
@@ -101,10 +101,9 @@ describe('GrToaster', () => {
     expect(byVariant.warning.getAttribute('role')).toBe('alert')
     expect(byVariant.danger.getAttribute('role')).toBe('alert')
 
-    // Постоянный live-region — на обёртке списка (существует до вставки тостов).
-    const liveRegion = document.body.querySelector('[data-gr-toaster] [aria-live="polite"]')
-    expect(liveRegion).not.toBeNull()
-    expect(liveRegion?.contains(byVariant.info)).toBe(true)
+    // Обёртки-live-region над тостами нет: `alert` внутри `polite` — не
+    // определённое спецификацией вложение регионов разной ассертивности.
+    expect(document.body.querySelector('[data-gr-toaster] [aria-live]')).toBeNull()
   })
 
   it('останавливает автозакрытие под курсором и возобновляет после ухода (WCAG 2.2.1)', async () => {
@@ -183,6 +182,14 @@ describe('GrToaster', () => {
     expect(document.body.textContent).not.toContain('Warning')
   })
 
+  it('ширина настраивается пропом через --gr-toaster-width', () => {
+    mount(GrToaster, { attachTo: document.body, props: { width: 480 } })
+
+    const region = document.body.querySelector('[data-gr-toaster]') as HTMLElement
+    expect(region.style.getPropertyValue('--gr-toaster-width')).toBe('480px')
+    expect(region.className).toContain('w-[var(--gr-toaster-width,360px)]')
+  })
+
   it('useToast.dismiss отменяет таймер авто-закрытия', async () => {
     vi.useFakeTimers()
     try {
@@ -200,5 +207,72 @@ describe('GrToaster', () => {
     finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('GrToaster — клавиатурный доступ к стеку', () => {
+  function pressF6(): void {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'F6', bubbles: true }))
+  }
+
+  it('F6 переводит фокус на верхний тост', async () => {
+    const toast = useToast()
+    toast.push({ title: 'Deleted', timeoutMs: 0, action: { label: 'Undo', onClick: () => {} } })
+
+    mount(GrToaster, { attachTo: document.body })
+    await nextTick()
+
+    pressF6()
+
+    const first = document.body.querySelector('[data-gr-toast]')
+    expect(document.activeElement).toBe(first)
+    // Из тоста кнопка «Undo» достижима обычным Tab — она следующая в порядке DOM.
+    expect(first?.querySelector('[data-gr-toast-action]')).not.toBeNull()
+  })
+
+  it('тост не становится собственной остановкой Tab', async () => {
+    const toast = useToast()
+    toast.push({ title: 'Saved', timeoutMs: 0 })
+
+    mount(GrToaster, { attachTo: document.body })
+    await nextTick()
+
+    expect(document.body.querySelector('[data-gr-toast]')?.getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('focusHotkey переопределяет клавишу, false отключает хоткей', async () => {
+    const toast = useToast()
+    toast.push({ title: 'Saved', timeoutMs: 0 })
+
+    const wrapper = mount(GrToaster, { attachTo: document.body, props: { focusHotkey: false } })
+    await nextTick()
+
+    pressF6()
+    expect(document.activeElement).not.toBe(document.body.querySelector('[data-gr-toast]'))
+
+    await wrapper.setProps({ focusHotkey: 'F8' })
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'F8', bubbles: true }))
+    expect(document.activeElement).toBe(document.body.querySelector('[data-gr-toast]'))
+  })
+
+  it('focus() из defineExpose доступен по ref и сообщает, было ли что фокусировать', async () => {
+    // Через реальный шаблонный `ref`: `wrapper.vm` отдаёт setup-состояние, а не
+    // экспонированный прокси, и `defineExpose` там не виден.
+    const Harness = defineComponent({
+      components: { GrToaster },
+      setup: () => ({ toaster: ref<{ focus: () => boolean } | null>(null) }),
+      template: '<GrToaster ref="toaster" />',
+    })
+
+    const wrapper = mount(Harness, { attachTo: document.body })
+    await nextTick()
+
+    expect(wrapper.vm.toaster?.focus()).toBe(false)
+
+    useToast().push({ title: 'Saved', timeoutMs: 0 })
+    await nextTick()
+
+    expect(wrapper.vm.toaster?.focus()).toBe(true)
+    expect(document.activeElement).toBe(document.body.querySelector('[data-gr-toast]'))
   })
 })

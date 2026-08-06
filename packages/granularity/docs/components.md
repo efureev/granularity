@@ -80,10 +80,10 @@
 - [`GrTabPanels`](./components/GrTabPanels.md)
 - [`GrTabs`](./components/GrTabs.md)
 - [`GrTextarea`](./components/GrTextarea.md)
-- `GrToaster`
-- `GrTooltip`
-- `GrTree`
-- `GrTreeSelect`
+- [`GrToaster`](./components/GrToaster.md)
+- [`GrTooltip`](./components/GrTooltip.md)
+- [`GrTree`](./components/GrTree.md)
+- [`GrTreeSelect`](./components/GrTreeSelect.md)
 
 ## Страница компонента: что туда писать
 

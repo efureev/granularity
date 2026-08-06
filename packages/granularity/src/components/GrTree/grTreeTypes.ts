@@ -16,6 +16,11 @@ export type GrTreeNodeTarget<T = any> = GrTreeKey | GrTreeNode<T> | T
 
 export type GrTreeInstance<T = any> = {
   filter: (value: string) => void
+  /**
+   * Фокус на узел (по умолчанию — на держателя roving tabindex).
+   * `false` — фокусировать было нечего: дерево пусто или всё отфильтровано.
+   */
+  focus: (key?: GrTreeKey) => boolean
   setCurrentKey: (key?: GrTreeKey) => void
   getCurrentKey: () => GrTreeKey | undefined
   appendNode: (data: T, parent: GrTreeNodeTarget<T>) => GrTreeNode<T> | undefined

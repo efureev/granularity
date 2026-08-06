@@ -90,7 +90,7 @@ describe('component docs metadata', () => {
     expect(tabsDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tabsDoc.examples.every(example => example.previewKey?.startsWith('gr-tabs'))).toBe(true)
 
-    expect(tooltipDoc.examples).toHaveLength(4)
+    expect(tooltipDoc.examples).toHaveLength(5)
     expect(tooltipDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tooltipDoc.examples.every(example => example.previewKey?.startsWith('gr-tooltip'))).toBe(true)
   })
@@ -105,11 +105,11 @@ describe('component docs metadata', () => {
     const treeDoc = getShowcaseComponentDoc(treeEntity!)
     const treeSelectDoc = getShowcaseComponentDoc(treeSelectEntity!)
 
-    expect(treeDoc.examples).toHaveLength(4)
+    expect(treeDoc.examples).toHaveLength(5)
     expect(treeDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeDoc.examples.every(example => example.previewKey?.startsWith('gr-tree'))).toBe(true)
 
-    expect(treeSelectDoc.examples).toHaveLength(3)
+    expect(treeSelectDoc.examples).toHaveLength(4)
     expect(treeSelectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeSelectDoc.examples.every(example => example.previewKey?.startsWith('gr-tree-select'))).toBe(true)
   })
@@ -240,7 +240,7 @@ describe('component docs metadata', () => {
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-prompt-dialog'))).toBe(true)
 
-    expect(toasterDoc.examples).toHaveLength(5)
+    expect(toasterDoc.examples).toHaveLength(6)
     expect(toasterDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('gr-toaster'))).toBe(true)
 

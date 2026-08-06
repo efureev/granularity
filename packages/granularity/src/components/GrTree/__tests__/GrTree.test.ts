@@ -593,3 +593,208 @@ describe('GrTree — WAI-ARIA tree pattern (item 23)', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTree — клавиатура сверх стрелок', () => {
+  function mountTree(props: Record<string, unknown> = {}) {
+    return mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: treeWithNestedFolder(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        ...props,
+      },
+    })
+  }
+
+  it('typeahead переводит фокус на узел по первым буквам', async () => {
+    const wrapper = mountTree()
+    const tree$ = wrapper.get('[role="tree"]')
+
+    await tree$.trigger('keydown', { key: 'c' })
+    await nextTick()
+
+    const focusable = wrapper.findAll('[role="treeitem"]').filter(i => i.attributes('tabindex') === '0')
+    expect(focusable).toHaveLength(1)
+    expect(focusable[0].attributes('data-gr-tree-node-key')).toBe('3')
+
+    wrapper.unmount()
+  })
+
+  it('повтор той же буквы идёт по кругу, а не ищет «ff»', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: [
+          { id: 1, label: 'Alpha' },
+          { id: 2, label: 'Foo' },
+          { id: 3, label: 'Fee' },
+        ] satisfies Item[],
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+      },
+    })
+    const tree$ = wrapper.get('[role="tree"]')
+    const focusedKey = () => wrapper.findAll('[role="treeitem"]')
+      .find(i => i.attributes('tabindex') === '0')
+      ?.attributes('data-gr-tree-node-key')
+
+    await tree$.trigger('keydown', { key: 'f' })
+    await nextTick()
+    expect(focusedKey()).toBe('2')
+
+    await tree$.trigger('keydown', { key: 'f' })
+    await nextTick()
+    expect(focusedKey()).toBe('3')
+
+    wrapper.unmount()
+  })
+
+  it('`*` раскрывает всех соседей уровня', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: [
+          { id: 1, label: 'One', children: [{ id: 11, label: 'One child' }] },
+          { id: 2, label: 'Two', children: [{ id: 21, label: 'Two child' }] },
+        ] satisfies Item[],
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+      },
+    })
+
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(2)
+
+    await wrapper.get('[role="tree"]').trigger('keydown', { key: '*' })
+    await nextTick()
+
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(4)
+    expect(wrapper.emitted('nodeExpand')).toHaveLength(2)
+
+    wrapper.unmount()
+  })
+
+  it('focus() из expose ставит фокус на узел', async () => {
+    const wrapper = mountTree()
+
+    const instance = wrapper.vm as unknown as { focus: (key?: number) => boolean }
+    expect(instance.focus(3)).toBe(true)
+    await nextTick()
+
+    expect((document.activeElement as HTMLElement).getAttribute('data-gr-tree-node-key')).toBe('3')
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrTree — раскрытие', () => {
+  it('defaultExpandAll раскрывает дерево целиком и не отменяет ручное сворачивание', async () => {
+    const data = treeWithNestedFolder()
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data,
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandAll: true,
+      },
+    })
+
+    // Parent + Folder + Grandchild + Child B.
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(4)
+
+    await wrapper.findAll('[data-gr-tree-toggle]')[0].trigger('click')
+    await nextTick()
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(1)
+
+    // Обновление данных не разворачивает свёрнутое обратно.
+    await wrapper.setProps({ data: [...data] })
+    await nextTick()
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(1)
+  })
+
+  it('expandOnClickNode раскрывает узел кликом по строке, Enter — по-прежнему только выбирает', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        expandOnClickNode: true,
+      },
+    })
+
+    await wrapper.get('.gr-tree__row').trigger('click')
+    await nextTick()
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(3)
+
+    await wrapper.get('[role="tree"]').trigger('keydown', { key: 'Enter' })
+    await nextTick()
+    // Enter не свернул узел обратно.
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(3)
+
+    wrapper.unmount()
+  })
+
+  it('accordion оставляет раскрытым один узел на уровне', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: [
+          { id: 1, label: 'One', children: [{ id: 11, label: 'One child' }] },
+          { id: 2, label: 'Two', children: [{ id: 21, label: 'Two child' }] },
+        ] satisfies Item[],
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        accordion: true,
+      },
+    })
+
+    const toggles = () => wrapper.findAll('[data-gr-tree-toggle]')
+    await toggles()[0].trigger('click')
+    await nextTick()
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(3)
+
+    await toggles()[1].trigger('click')
+    await nextTick()
+
+    // Первый узел свернулся сам, видимых строк по-прежнему три.
+    expect(wrapper.findAll('.gr-tree__row')).toHaveLength(3)
+    expect(wrapper.findAll('.gr-tree__row')[2].text()).toContain('Two child')
+  })
+
+  it('nodeContextMenu отдаёт событие, данные и узел', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+      },
+    })
+
+    await wrapper.get('.gr-tree__row').trigger('contextmenu')
+
+    const emitted = wrapper.emitted('nodeContextMenu')?.at(-1)
+    expect(emitted?.[1]).toMatchObject({ id: 1 })
+    expect((emitted?.[2] as { key: number }).key).toBe(1)
+  })
+})
+
+describe('GrTree — drag & drop', () => {
+  it('drop гасит дефолт браузера до всех проверок', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+      },
+    })
+
+    const event = new Event('drop', { bubbles: true, cancelable: true })
+    wrapper.get('.gr-tree__row').element.dispatchEvent(event)
+    await nextTick()
+
+    // Дерево не draggable, перетаскивания нет — но открывать бросённый файл
+    // поверх страницы браузер всё равно не должен.
+    expect(event.defaultPrevented).toBe(true)
+  })
+})

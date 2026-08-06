@@ -24,12 +24,20 @@ export type GrTreeInteractionEmitters<T> = {
   emitNodeExpand: (data: T, node: GrTreeNode<T>) => void
   emitNodeCollapse: (data: T, node: GrTreeNode<T>) => void
   emitNodeDrop: (draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType) => void
+  emitNodeContextMenu: (evt: MouseEvent, data: T, node: GrTreeNode<T>) => void
 }
 
 export type GrTreeInteractionContext<T> = {
   hoveredKey: Ref<GrTreeKey | undefined>
   /** Клавиша узла, держащего roving-фокус (единственный tabindex=0 во всём дереве). */
   focusedKey: Ref<GrTreeKey | undefined>
+  /**
+   * Реестр DOM-узлов строк, общий на все уровни дерева. Нужен клавиатуре: без
+   * него каждое нажатие стрелки обходило бы весь DOM поддерева в поисках
+   * строки по `data`-атрибуту.
+   */
+  nodeEls: Map<GrTreeKey, HTMLElement>
+  registerNodeEl: (key: GrTreeKey, el: HTMLElement | null) => void
   draggingNode: ShallowRef<GrTreeNode<T> | null>
   dropTarget: ShallowRef<GrTreeDropTarget | null>
   canDrag: (node: GrTreeNode<T>) => boolean
@@ -39,6 +47,7 @@ export type GrTreeInteractionContext<T> = {
   emitNodeExpand: (data: T, node: GrTreeNode<T>) => void
   emitNodeCollapse: (data: T, node: GrTreeNode<T>) => void
   emitNodeDrop: (draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType) => void
+  emitNodeContextMenu: (evt: MouseEvent, data: T, node: GrTreeNode<T>) => void
 }
 
 export function createGrTreeInteractionContext<T>(
@@ -49,6 +58,20 @@ export function createGrTreeInteractionContext<T>(
   const focusedKey = ref<GrTreeKey | undefined>(undefined)
   const draggingNode = shallowRef<GrTreeNode<T> | null>(null)
   const dropTarget = shallowRef<GrTreeDropTarget | null>(null)
+  const nodeEls = new Map<GrTreeKey, HTMLElement>()
+
+  function registerNodeEl(key: GrTreeKey, el: HTMLElement | null) {
+    if (el) {
+      nodeEls.set(key, el)
+      return
+    }
+
+    // Перенос узла в другую ветку размонтирует старый элемент уже после того,
+    // как зарегистрировался новый: снимаем запись, только если она протухла.
+    const previous = nodeEls.get(key)
+    if (previous && !previous.isConnected)
+      nodeEls.delete(key)
+  }
 
   function canDrag(node: GrTreeNode<T>): boolean {
     if (!options.draggable)
@@ -75,6 +98,8 @@ export function createGrTreeInteractionContext<T>(
   return {
     hoveredKey,
     focusedKey,
+    nodeEls,
+    registerNodeEl,
     draggingNode,
     dropTarget,
     canDrag,

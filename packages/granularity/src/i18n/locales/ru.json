@@ -11,7 +11,8 @@
   },
   "treeSelect": {
     "filterPlaceholder": "Поиск…",
-    "empty": "Нет данных"
+    "empty": "Нет данных",
+    "loading": "Загрузка…"
   },
   "tree": {
     "drag": "Перетащить",

@@ -340,3 +340,161 @@ describe('GrTreeSelect (unit)', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTreeSelect — клавиатура ведёт в дерево', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('ArrowDown с триггера открывает панель и отдаёт фокус дереву', async () => {
+    const wrapper = await mountHarness()
+
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    await nextTick()
+
+    expect(bodyExists('[data-gr-tree-select-panel]')).toBe(true)
+    const active = document.activeElement as HTMLElement
+    expect(active.getAttribute('role')).toBe('treeitem')
+
+    wrapper.unmount()
+  })
+
+  it('Enter с триггера ведёт туда же — дальше работают клавиши GrTree', async () => {
+    const wrapper = await mountHarness()
+
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
+    await trigger.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+    await nextTick()
+
+    const tree = document.body.querySelector('[role="tree"]') as HTMLElement
+    tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    expect((document.activeElement as HTMLElement).getAttribute('data-gr-tree-node-key')).toBe('2')
+
+    wrapper.unmount()
+  })
+
+  it('при filterable фокус идёт в поле поиска, а стрелка оттуда — в дерево', async () => {
+    const wrapper = await mountHarness({ filterable: true })
+
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    await nextTick()
+
+    const filter = document.body.querySelector('input[data-gr-tree-select-filter]') as HTMLInputElement
+    expect(document.activeElement).toBe(filter)
+
+    filter.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    expect((document.activeElement as HTMLElement).getAttribute('role')).toBe('treeitem')
+
+    wrapper.unmount()
+  })
+
+  it('Tab из панели закрывает её', async () => {
+    const wrapper = await mountHarness()
+
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const panel = document.body.querySelector('[data-gr-tree-select-panel]') as HTMLElement
+    panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+    await nextTick()
+
+    expect(panel.style.display).toBe('none')
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrTreeSelect — ARIA и состояния', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('комбобокс объявляет, что откроется дерево, и чем он управляет', async () => {
+    const wrapper = await mountHarness()
+
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
+    expect(trigger.attributes('aria-haspopup')).toBe('tree')
+    // Пока панель закрыта — ссылаться не на что.
+    expect(trigger.attributes('aria-controls')).toBeUndefined()
+
+    await trigger.trigger('click')
+    await nextTick()
+
+    const controls = trigger.attributes('aria-controls')
+    expect(controls).toBeTruthy()
+    expect(document.body.querySelector(`#${controls}`)?.getAttribute('role')).toBe('tree')
+
+    wrapper.unmount()
+  })
+
+  it('disabled красится токенами, а не прозрачностью', async () => {
+    const wrapper = await mountHarness({ disabled: true })
+
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
+    expect(trigger.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(trigger.classes()).toContain('text-[var(--gr-muted-fg)]')
+    expect(trigger.classes().join(' ')).not.toContain('opacity-50')
+
+    wrapper.unmount()
+  })
+
+  it('readonly не даёт очистить значение', async () => {
+    const wrapper = await mountHarness({ clearable: true, readonly: true, modelValue: 2 })
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="gr-tree-select-clear"]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('loading показывает индикатор вместо «нет данных»', async () => {
+    const wrapper = await mountHarness({ loading: true }, { data: [] })
+
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+
+    expect(bodyExists('[data-gr-tree-select-loading]')).toBe(true)
+    expect(document.body.textContent).not.toContain('No data')
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrTreeSelect — Escape из дерева', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('закрывает панель и не открывает её возвращённым фокусом', async () => {
+    const wrapper = await mountHarness()
+
+    const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
+    // Настоящий фокус на триггере: именно его стек слоёв запоминает при открытии.
+    ;(trigger.element as HTMLInputElement).focus()
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    await nextTick()
+
+    expect((document.activeElement as HTMLElement).getAttribute('role')).toBe('treeitem')
+
+    document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement).toBe(trigger.element)
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+
+    wrapper.unmount()
+  })
+})

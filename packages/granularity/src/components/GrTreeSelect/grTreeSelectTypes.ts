@@ -22,6 +22,11 @@ export interface GrTreeSelectProps<T extends object = any> {
 
   placeholder?: string
   size?: GrInputSize
+  /**
+   * Данные ещё едут. Панель показывает индикатор вместо «Нет данных» — иначе
+   * пустой ответ и незагруженный выглядят одинаково.
+   */
+  loading?: boolean
   invalid?: boolean
   /** Только для чтения: значение видно, но не меняется. */
   readonly?: boolean

@@ -254,17 +254,21 @@ const previewRegistry = {
   'gr-toaster-sticky-host': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterStickyDemo.vue')),
   'gr-toaster-action': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterActionDemo.vue')),
   'gr-toaster-action-slot': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterActionSlotDemo.vue')),
+  'gr-toaster-focus-hotkey': defineAsyncComponent(() => import('../demos/components/gr-toaster/GrToasterFocusHotkeyDemo.vue')),
   'gr-tree-drag-and-slot': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeDragAndSlotDemo.vue')),
   'gr-tree-expanded-state': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeExpandedStateDemo.vue')),
   'gr-tree-filtering': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeFilteringDemo.vue')),
   'gr-tree-sizes': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeSizesDemo.vue')),
+  'gr-tree-keyboard': defineAsyncComponent(() => import('../demos/components/gr-tree/GrTreeKeyboardDemo.vue')),
   'gr-tree-select-custom-slots': defineAsyncComponent(() => import('../demos/components/gr-tree-select/GrTreeSelectCustomSlotsDemo.vue')),
   'gr-tree-select-multiple-filter': defineAsyncComponent(() => import('../demos/components/gr-tree-select/GrTreeSelectMultipleFilterDemo.vue')),
   'gr-tree-select-path-display': defineAsyncComponent(() => import('../demos/components/gr-tree-select/GrTreeSelectPathDisplayDemo.vue')),
+  'gr-tree-select-keyboard': defineAsyncComponent(() => import('../demos/components/gr-tree-select/GrTreeSelectKeyboardDemo.vue')),
   'gr-tooltip-custom-tone': defineAsyncComponent(() => import('../demos/components/gr-tooltip/GrTooltipToneDemo.vue')),
   'gr-tooltip-custom-trigger': defineAsyncComponent(() => import('../demos/components/gr-tooltip/GrTooltipCustomTriggerDemo.vue')),
   'gr-tooltip-inline-help': defineAsyncComponent(() => import('../demos/components/gr-tooltip/GrTooltipInlineHelpDemo.vue')),
   'gr-tooltip-sizes': defineAsyncComponent(() => import('../demos/components/gr-tooltip/GrTooltipSizesDemo.vue')),
+  'gr-tooltip-placement': defineAsyncComponent(() => import('../demos/components/gr-tooltip/GrTooltipPlacementDemo.vue')),
 } as const
 
 const componentEntity = computed(() => {

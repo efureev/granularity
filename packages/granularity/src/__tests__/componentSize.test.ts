@@ -62,6 +62,7 @@ import GrTabs from '../components/GrTabs/GrTabs.vue'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTooltip from '../components/GrTooltip/GrTooltip.vue'
 import GrTree from '../components/GrTree/GrTree.vue'
+import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
 
 /**
  * Гейт контракта размера.
@@ -170,6 +171,10 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrTextarea', render: () => h(GrTextarea, { modelValue: '' }) },
   { name: 'GrTooltip', render: () => h(GrTooltip, { text: 'T' }) },
   { name: 'GrTree', render: () => h(GrTree, { data: [{ id: '1', label: 'A' }] }) },
+  {
+    name: 'GrTreeSelect',
+    render: () => h(GrTreeSelect, { modelValue: null, data: [{ id: '1', label: 'A' }] }),
+  },
 ]
 
 /**

@@ -1,8 +1,9 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import type {
   GrTreeAllowDropType,
   GrTreeInstance,
+  GrTreeKey,
   GrTreeNode,
   GrTreeNodeDropType,
 } from './grTreeTypes'
@@ -33,6 +34,9 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   }),
   nodeKey: 'id' as any,
   defaultExpandedKeys: () => [],
+  defaultExpandAll: false,
+  expandOnClickNode: false,
+  accordion: false,
   size: undefined,
   highlightCurrent: true,
   indent: 0,
@@ -63,6 +67,7 @@ const emit = defineEmits<{
   (event: 'nodeExpand', data: T, node: GrTreeNode<T>): void
   (event: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
   (event: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
+  (event: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
 }>()
 
 defineSlots<{
@@ -74,6 +79,7 @@ const treeStore = props.internalStore ?? createGrTreeStore({
   adapter: dataAdapter,
   data: () => props.data,
   defaultExpandedKeys: () => props.defaultExpandedKeys,
+  defaultExpandAll: () => props.defaultExpandAll,
   filterNodeMethod: () => props.filterNodeMethod,
 })
 const interactionContext = props.internalInteractionContext ?? createGrTreeInteractionContext(props, {
@@ -81,6 +87,7 @@ const interactionContext = props.internalInteractionContext ?? createGrTreeInter
   emitNodeExpand: (data, node) => emit('nodeExpand', data, node),
   emitNodeCollapse: (data, node) => emit('nodeCollapse', data, node),
   emitNodeDrop: (draggingNode, dropNode, dropType) => emit('nodeDrop', draggingNode, dropNode, dropType),
+  emitNodeContextMenu: (evt, data, node) => emit('nodeContextMenu', evt, data, node),
 })
 
 const treeProps = props as Readonly<GrTreeProps<T>>
@@ -136,6 +143,19 @@ function onRowClick(node: GrTreeNode<T>) {
   interactionContext.emitNodeClick(node.data, node)
 }
 
+// Клик мышью, в отличие от Enter, умеет ещё и раскрывать узел: `Enter` в
+// паттерне tree закреплён за выбором, и подмешивать в него раскрытие нельзя.
+function onRowActivate(row: GrTreeVisibleRow<T>) {
+  onRowClick(row.node)
+
+  if (treeProps.expandOnClickNode && !row.isLeaf)
+    toggleExpand(row.node)
+}
+
+function onRowContextMenu(evt: MouseEvent, node: GrTreeNode<T>) {
+  interactionContext.emitNodeContextMenu(evt, node.data, node)
+}
+
 // ————— Клавиатурная навигация по WAI-ARIA tree pattern (только корневой инстанс).
 
 type FlatRow = { node: GrTreeNode<T>, isLeaf: boolean, isExpanded: boolean }
@@ -162,15 +182,48 @@ function isRovingItem(key: GrTreeNode<T>['key']): boolean {
 
 function focusRow(key: GrTreeNode<T>['key']): void {
   focusedKey.value = key
-  void nextTick(() => {
-    const root = treeRootEl.value
-    if (!root)
+  void nextTick(() => interactionContext.nodeEls.get(key)?.focus())
+}
+
+/**
+ * Typeahead паттерна tree: печатные символы копятся в буфер и переводят фокус
+ * на первый подходящий видимый узел, начиная со следующего за текущим.
+ */
+const TYPEAHEAD_RESET_MS = 600
+let typeaheadBuffer = ''
+let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
+
+function onTypeahead(char: string, rows: FlatRow[], fromIndex: number): void {
+  clearTimeout(typeaheadTimer)
+  typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, TYPEAHEAD_RESET_MS)
+
+  // Повтор одной буквы — это «следующий на ту же букву», а не поиск «аа».
+  const repeat = typeaheadBuffer.length === 1 && typeaheadBuffer === char
+  typeaheadBuffer = repeat ? char : typeaheadBuffer + char
+
+  const query = typeaheadBuffer.toLowerCase()
+  const total = rows.length
+
+  for (let step = 1; step <= total; step += 1) {
+    const row = rows[(fromIndex + step) % total]
+    if (row.node.label.toLowerCase().startsWith(query)) {
+      focusRow(row.node.key)
       return
-    const target = String(key)
-    const el = Array.from(root.querySelectorAll<HTMLElement>('[data-gr-tree-node-key]'))
-      .find(node => node.getAttribute('data-gr-tree-node-key') === target)
-    el?.focus()
-  })
+    }
+  }
+}
+
+/** `*` — раскрыть всех соседей узла, на котором фокус (уровень целиком). */
+function expandSiblings(node: GrTreeNode<T>): void {
+  const siblings = node.parent ? node.parent.childNodes : treeStore.treeModel.value.roots
+
+  for (const sibling of siblings) {
+    if (sibling.childNodes.length === 0 || treeStore.isExpandedKey(sibling.key))
+      continue
+
+    treeStore.setExpandedKey(sibling.key, true)
+    interactionContext.emitNodeExpand(sibling.data, sibling)
+  }
 }
 
 function onTreeKeydown(event: KeyboardEvent): void {
@@ -184,6 +237,19 @@ function onTreeKeydown(event: KeyboardEvent): void {
 
   const idx = Math.max(0, rows.findIndex(r => r.node.key === focusedKey.value))
   const cur = rows[idx]
+
+  if (event.key === '*') {
+    event.preventDefault()
+    expandSiblings(cur.node)
+    return
+  }
+
+  // Печатный символ без модификаторов — typeahead, а не команда.
+  if (event.key.length === 1 && event.key !== ' ' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    event.preventDefault()
+    onTypeahead(event.key, rows, idx)
+    return
+  }
 
   switch (event.key) {
     case 'ArrowDown':
@@ -264,8 +330,24 @@ function onRowMouseLeave(node: GrTreeNode<T>) {
     hoveredKey.value = undefined
 }
 
+function collapseSiblings(node: GrTreeNode<T>) {
+  const siblings = node.parent ? node.parent.childNodes : treeStore.treeModel.value.roots
+
+  for (const sibling of siblings) {
+    if (sibling.key === node.key || !treeStore.isExpandedKey(sibling.key))
+      continue
+
+    treeStore.setExpandedKey(sibling.key, false)
+    interactionContext.emitNodeCollapse(sibling.data, sibling)
+  }
+}
+
 function toggleExpand(node: GrTreeNode<T>) {
   const expanded = !treeStore.isExpandedKey(node.key)
+
+  if (expanded && treeProps.accordion)
+    collapseSiblings(node)
+
   treeStore.toggleExpand(node)
 
   if (expanded)
@@ -336,12 +418,14 @@ function onDragOver(evt: DragEvent, node: GrTreeNode<T>, rowEl: HTMLElement) {
 }
 
 function onDrop(evt: DragEvent, node: GrTreeNode<T>) {
+  // Первым делом и безусловно: если drop до нас дошёл, дефолт браузера — это
+  // навигация по брошенной ссылке или открытие брошенного файла поверх страницы.
+  evt.preventDefault()
+
   const drag = interactionContext.draggingNode.value
   const target = interactionContext.dropTarget.value
   if (!treeProps.draggable || !drag || !target)
     return
-
-  evt.preventDefault()
 
   if (target.key === node.key && target.allowed) {
     const movedNode = treeStore.moveNode(drag, node, target.type)
@@ -413,9 +497,30 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTree' 
 // `size`, а значения одинаковые — наследование от корня не нарушается.
 const sizeStyle = computed(() => treeSizeVars[resolvedSize.value])
 
+/**
+ * Переводит фокус на узел (по умолчанию — на тот, что держит roving tabindex).
+ * Нужен снаружи: `GrTreeSelect` открывает панель и обязан отдать клавиатуру
+ * дереву, иначе стрелки из триггера никуда не ведут.
+ */
+function focus(key?: GrTreeKey): boolean {
+  const rows = flatVisibleRows.value
+  if (rows.length === 0)
+    return false
+
+  const target = key != null && rows.some(row => row.node.key === key)
+    ? key
+    : focusedKey.value ?? rows[0].node.key
+
+  focusRow(target)
+  return true
+}
+
+onUnmounted(() => clearTimeout(typeaheadTimer))
+
 defineExpose<GrTreeInstance<T>>({
   appendNode: treeStore.appendNode,
   filter,
+  focus,
   getCurrentNode: treeStore.getCurrentNode,
   setCurrentKey: treeStore.setCurrentKey,
   getCurrentKey: treeStore.getCurrentKey,
@@ -439,12 +544,13 @@ defineExpose<GrTreeInstance<T>>({
     <div
         v-for="row in visibleRows"
         :key="row.node.key"
+        :ref="el => interactionContext.registerNodeEl(row.node.key, el as HTMLElement | null)"
         data-gr-tree-node
         :data-gr-tree-node-key="row.node.key"
         role="treeitem"
         :aria-level="row.node.level"
         :aria-expanded="row.isLeaf ? undefined : row.isExpanded"
-        :aria-selected="currentKey === row.node.key ? 'true' : 'false'"
+        :aria-selected="currentKey === row.node.key ? 'true' : undefined"
         :tabindex="isRovingItem(row.node.key) ? 0 : -1"
     >
       <div
@@ -458,7 +564,8 @@ defineExpose<GrTreeInstance<T>>({
           dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'next' ? 'gr-tree__row--drop-next' : '',
           resolveNodeClass(treeProps.rowClass, row),
         ]"
-          @click="onRowClick(row.node)"
+          @click="onRowActivate(row)"
+          @contextmenu="onRowContextMenu($event, row.node)"
           @drop="onDrop($event, row.node)"
           @dragover="onDragOver($event, row.node, $event.currentTarget as HTMLElement)"
           @mouseenter="onRowMouseEnter(row.node)"
@@ -554,15 +661,15 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-row-pr: var(--gr-tree-row-px);
     --gr-tree-font-size: inherit;
     --gr-tree-row-color: var(--gr-fg);
-    --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-primary, #000) 10%, transparent);
-    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary, #000) 5%, transparent);
-    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--gr-primary, #000) 16%, transparent);
+    --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-primary) 10%, transparent);
+    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary) 5%, transparent);
+    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--gr-primary) 16%, transparent);
     --gr-tree-drag-handle-size: 24px;
     --gr-tree-drag-handle-mr: 0;
     --gr-tree-drag-handle-radius: 6px;
     --gr-tree-drag-handle-color: inherit;
     --gr-tree-drag-handle-opacity: 0.55;
-    --gr-tree-drag-handle-hover-bg: color-mix(in srgb, var(--gr-muted, #000) 22%, transparent);
+    --gr-tree-drag-handle-hover-bg: color-mix(in srgb, var(--gr-muted) 22%, transparent);
     --gr-tree-drag-handle-hover-color: var(--gr-tree-drag-handle-color);
     --gr-tree-drag-handle-hover-opacity: 0.9;
     --gr-tree-drag-handle-disabled-opacity: 0.25;
@@ -570,7 +677,7 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-toggle-mr: 0;
     --gr-tree-toggle-radius: 6px;
     --gr-tree-toggle-color: inherit;
-    --gr-tree-toggle-hover-bg: color-mix(in srgb, var(--gr-muted, #000) 25%, transparent);
+    --gr-tree-toggle-hover-bg: color-mix(in srgb, var(--gr-muted) 25%, transparent);
     --gr-tree-toggle-hover-color: var(--gr-tree-toggle-color);
     --gr-tree-icon-size: 16px;
     --gr-tree-content-gap: 8px;
@@ -623,7 +730,7 @@ defineExpose<GrTreeInstance<T>>({
 }
 
 [data-gr-tree-node]:focus-visible > .gr-tree__row {
-    outline: 2px solid var(--gr-primary, #000);
+    outline: 2px solid var(--gr-primary);
     outline-offset: -2px;
 }
 
@@ -727,7 +834,7 @@ defineExpose<GrTreeInstance<T>>({
 }
 
 .gr-tree__row--drop-inner {
-    outline: 2px solid color-mix(in srgb, var(--gr-primary, #000) 40%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--gr-primary) 40%, transparent);
 }
 
 .gr-tree__row--drop-prev::before,
@@ -737,7 +844,7 @@ defineExpose<GrTreeInstance<T>>({
     left: 8px;
     right: 8px;
     height: 2px;
-    background: color-mix(in srgb, var(--gr-primary, #000) 55%, transparent);
+    background: color-mix(in srgb, var(--gr-primary) 55%, transparent);
 }
 
 .gr-tree__row--drop-prev::before {

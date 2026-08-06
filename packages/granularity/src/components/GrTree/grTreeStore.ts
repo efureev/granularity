@@ -25,6 +25,7 @@ type FilterInfo = {
 export type GrTreeStoreOptions<T extends object> = {
   data: MaybeRefOrGetter<GrTreeDataProps<T>['data']>
   defaultExpandedKeys?: MaybeRefOrGetter<GrTreeDataProps<T>['defaultExpandedKeys']>
+  defaultExpandAll?: MaybeRefOrGetter<boolean | undefined>
   filterNodeMethod?: MaybeRefOrGetter<GrTreeFilterNodeMethod<T> | undefined>
   adapter: GrTreeDataAdapter<T>
 }
@@ -98,6 +99,30 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
       byData,
     }
   })
+
+  // `defaultExpandAll` раскрывает узел один раз — в момент его появления в
+  // данных. Иначе любое обновление `data` отменяло бы всё, что пользователь
+  // свернул руками.
+  const autoExpandedKeys = new Set<GrTreeKey>()
+  watch(treeModel, (model) => {
+    if (!toValue(options.defaultExpandAll))
+      return
+
+    const next = new Set(expandedKeys.value)
+    let changed = false
+
+    for (const key of model.byKey.keys()) {
+      if (autoExpandedKeys.has(key))
+        continue
+
+      autoExpandedKeys.add(key)
+      next.add(key)
+      changed = true
+    }
+
+    if (changed)
+      expandedKeys.value = next
+  }, { immediate: true })
 
   const filterInfo = computed<FilterInfo>(() => {
     const value = filterValue.value

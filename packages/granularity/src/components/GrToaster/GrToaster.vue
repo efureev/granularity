@@ -7,10 +7,14 @@
  *
  * A11y:
  * - контейнер — `role="region"` с `aria-label` (i18n-проп `regionLabel`);
- * - список обёрнут в ПОСТОЯННЫЙ live-region (`aria-live="polite"`), который
- *   существует до вставки тостов — иначе SR часто не озвучивают целиком
- *   вставленный узел с `aria-live`;
- * - критичные тосты (`warning`/`danger`) несут `role="alert"` (ассертивно).
+ * - объявляет каждый тост сам собой: `role="status"`, а критичные
+ *   (`warning`/`danger`) — ассертивный `role="alert"`. Обёртки-live-region над
+ *   ними нет намеренно: вложение регионов с разной ассертивностью
+ *   спецификацией не определено, браузеры и SR расходятся вплоть до потери
+ *   объявления;
+ * - стек достижим с клавиатуры по `focusHotkey` (по умолчанию `F6`) — тосты
+ *   телепортированы в конец `body`, и без хоткея кнопка «Отменить» лежала бы
+ *   за пределами разумного числа нажатий `Tab`.
  *
  * UX:
  * - `maxVisible` ограничивает стек; лишние ждут в очереди (их таймеры на паузе);
@@ -24,6 +28,7 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 import type { Component } from 'vue'
 
 import { useToast } from '../../composables/useToast'
+import { vHotkey } from '../../directives'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { GrToastTone, Toast, ToastAction } from '../../composables/useToast'
 import GrButton from '../GrButton'
@@ -66,6 +71,16 @@ export interface GrToasterProps {
   dismissLabel?: string
   /** A11y-лейбл контейнера-региона (i18n). */
   regionLabel?: string
+  /**
+   * Ширина стека. Число — пиксели, строка — любая CSS-длина. Уезжает в
+   * `--gr-toaster-width`, поэтому то же самое можно задать и темой.
+   */
+  width?: string | number
+  /**
+   * Клавиша перевода фокуса в стек уведомлений; `false` отключает хоткей.
+   * `F6` — рекомендация APG для перехода между «регионами» страницы.
+   */
+  focusHotkey?: string | false
 }
 
 const props = withDefaults(defineProps<GrToasterProps>(), {
@@ -73,6 +88,8 @@ const props = withDefaults(defineProps<GrToasterProps>(), {
   maxVisible: 4,
   dismissLabel: undefined,
   regionLabel: undefined,
+  width: undefined,
+  focusHotkey: 'F6',
 })
 
 /**
@@ -135,26 +152,58 @@ function metaFor(tone: GrToastTone): ToneMeta {
 }
 
 const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
+
+const containerStyle = computed(() => {
+  if (props.width === undefined) return undefined
+
+  return { '--gr-toaster-width': typeof props.width === 'number' ? `${props.width}px` : props.width }
+})
+
+const containerEl = ref<HTMLElement | null>(null)
+
+/**
+ * Переводит фокус на верхний тост. Тост фокусируем только программно
+ * (`tabindex="-1"`): собственной остановкой `Tab` стек быть не должен, иначе
+ * всплывающее уведомление перехватывало бы обход страницы.
+ */
+function focus(): boolean {
+  const target = containerEl.value?.querySelector<HTMLElement>('[data-gr-toast]')
+  if (!target) return false
+
+  target.focus()
+  return true
+}
+
+const hotkeyBinding = computed(() => ({
+  enabled: props.focusHotkey !== false && visibleToasts.value.length > 0,
+  handlers: { [props.focusHotkey || 'F6']: { handler: onFocusHotkey, allowInEditable: true } },
+}))
+
+function onFocusHotkey(event: KeyboardEvent): void {
+  if (focus()) event.preventDefault()
+}
+
+defineExpose({ focus })
 </script>
 
 <template>
   <teleport to="body" :disabled="!teleportEnabled">
     <div
+        ref="containerEl"
+        v-hotkey="hotkeyBinding"
         data-gr-toaster
         role="region"
         :aria-label="resolvedRegionLabel"
-        class="fixed z-[var(--gr-z-toast)] w-[360px] max-w-[calc(100vw-2rem)]"
+        class="fixed z-[var(--gr-z-toast)] w-[var(--gr-toaster-width,360px)] max-w-[calc(100vw-2rem)]"
         :class="containerClass"
+        :style="containerStyle"
         @mouseenter="paused = true"
         @mouseleave="paused = false"
         @focusin="paused = true"
         @focusout="paused = false"
     >
-      <!-- Постоянный live-region: существует всегда, поэтому вставленные тосты озвучиваются. -->
       <TransitionGroup
           tag="div"
-          aria-live="polite"
-          aria-atomic="false"
           class="grid gap-3"
           enter-active-class="transition duration-200 ease-out"
           enter-from-class="opacity-0 translate-y-2"
@@ -171,7 +220,8 @@ const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
             :data-tone="toast.tone"
             :role="metaFor(toast.tone).role"
             aria-atomic="true"
-            class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)]"
+            tabindex="-1"
+            class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)] focus-visible:outline-none focus-visible:shadow-[var(--gr-shadow-2),0_0_0_2px_var(--gr-ring)]"
         >
           <div class="flex items-start gap-3">
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }" aria-hidden="true">

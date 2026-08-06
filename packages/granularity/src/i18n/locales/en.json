@@ -11,7 +11,8 @@
   },
   "treeSelect": {
     "filterPlaceholder": "Search…",
-    "empty": "No data"
+    "empty": "No data",
+    "loading": "Loading…"
   },
   "tree": {
     "drag": "Drag",
