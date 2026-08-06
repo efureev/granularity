@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrConfirmDialog`: `focusAction` и `persistent`.** Фокус при открытии уходит на «Отмена»
+  (`focusAction`: `cancel` — по умолчанию, `confirm`, `none`), поэтому `Enter` сразу после открытия
+  больше не запускает подтверждаемое действие; со своим слотом `#footer` фокус тихо остаётся на
+  панели. `persistent` (есть и у `GrPromptDialog`) на время `confirmLoading` снимает `Esc` и клик по
+  бэкдропу, оставляя крестик и «Отмена»; `useDialogService` теперь просто включает его вместо
+  собственного расчёта в хосте. `GrButton` получил `focus()` в `defineExpose`.
 - **`GrImageViewer`: alt text, an accessible name and an imperative API.** `urlList` now takes
   `{ src, alt }` next to a plain string (mixed lists included), and `alt` reaches both the `<img>`
   and the toolbar slot; the layer names itself from the locale or from the new `ariaLabel` prop; a
@@ -183,6 +189,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   приходят **после** анимации: по `update:modelValue` размонтировать содержимое нельзя — оборвётся
   анимация закрытия. Слоты типизированы через `defineSlots`. Всё это уже умел `GrDrawer` —
   примитив, на котором стоит вся модальная семья, отставал от него.
+- **`GrPromptDialog`: `rules`, многострочный режим, тип поля и счётчик.** Проверки сверх `required`
+  описываются пропом `rules` — тем же движком, что у `GrForm` (`type`, `min`/`max`/`len`, `pattern`,
+  свой в том числе асинхронный `validator`); третьего частного случая валидации в пакете не
+  появилось. `multiline` переключает поле на `GrTextarea` (`rows`, `autosize`), есть `inputType`,
+  `inputmode`, `maxlength` и `showCount`. Всё это же доступно императивному
+  `useDialogService().prompt()`.
+- **`createGrFormMessageResolver` — публичный.** Дефолтный резолвер сообщений жил внутри
+  `GrForm.vue`, из-за чего публичный `runFieldRules` был снаружи бесполезен: прогнать те же правила
+  вне формы можно было только написав свой резолвер.
 - **`useDialogService`: `ctx.setFieldError` стал адресным, alert берёт подпись кнопки из локали.**
   Ошибки полей складываются в карту по именам (новый ключ `gr.dialog.ok` в трёх локалях вместо
   хардкода `'OK'`). `GrPromptDialog` показывает ошибку своего поля, а единственную запись — какой бы
@@ -347,6 +362,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   без роли, а типовое употребление — подсказка у кнопки. Теперь при фокусируемом содержимом слота
   `aria-describedby` уезжает на сам контрол, а обёртка теряет `tabindex`; если фокусироваться в
   слоте нечему (текст, иконка), остановкой остаётся обёртка.
+- **`GrPromptDialog` задавал полю литеральный `id="gr-prompt-input"`.** Единственное место во всём
+  пакете с захардкоженным `id` в `.vue`. Два открытых диалога — обычный и открытый через
+  `useDialogService` — давали дубликат DOM-id, и `<label for>` уводил на чужой инпут (axe:
+  `duplicate-id-active`). Атрибут снят целиком: `GrFormField` и так генерирует уникальный `id`, а
+  поле читает его из контекста, — хардкод был чистой избыточностью.
+- **`GrPromptDialog` открывался с фокусом на панели, а не в поле.** Диалог существует ровно ради
+  ввода, а требовал лишнего `Tab`. Фокус ставит содержимое после отрисовки: проп `initialFocus` у
+  `GrModal` тут не годится — элемент рождается внутри поддерева диалога, и возврат его же пропом
+  наверх замыкает рендер в цикл. Заодно `Enter` в однострочном поле теперь подтверждает (в
+  многострочном остаётся переводом строки).
+- **`GrTextarea` со `showCount` сажал атрибуты потребителя на обёртку счётчика.** `data-*`, `aria-*`
+  и `name` попадали на `div`, а не на само поле, — то есть набор атрибутов зависел от того, включён
+  ли счётчик. Добавлены `inheritAttrs: false` и `v-bind="$attrs"` на `<textarea>` в обеих ветках.
 - **`GrModal` без слота `#title` оставался вовсе без доступного имени.** HeadlessUI связывает
   `aria-labelledby` только при наличии `DialogTitle`, а `aria-label` компонент не выводил ничем:
   диктор объявлял безымянный «диалог», axe ловит это правилом `aria-dialog-name` (critical).

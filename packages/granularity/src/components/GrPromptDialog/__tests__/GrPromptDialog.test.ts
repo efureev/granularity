@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -145,6 +145,187 @@ describe('GrPromptDialog', () => {
     expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('px-2.5')
     expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('h-7')
     expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('px-2.5')
+
+    wrapper.unmount()
+  })
+})
+
+/**
+ * Стенд для новых сценариев.
+ *
+ * `teleport` намеренно **не** стабится: стаб VTU пересоздаёт поддерево на
+ * ре-рендере, и в тесте остаются мёртвые инстансы — шаблонный `ref` смотрит на
+ * один, а в документе висит другой, из-за чего молча не работают ни `@blur`,
+ * ни программный фокус. Ищем поэтому по документу.
+ *
+ * Открываем окно **после** монтирования, как в жизни: телепорт включается
+ * только после mount, и содержимое, отрисованное до него, переезжает в `body`,
+ * а переезд узла сбрасывает фокус.
+ */
+async function mountPrompt(attrs = '', extra: Record<string, unknown> = {}) {
+  const Harness = defineComponent({
+    name: 'HarnessPrompt',
+    components: { GrPromptDialog },
+    setup() {
+      const open = ref(false)
+      const value = ref('')
+      const onConfirm = vi.fn()
+      return { open, value, onConfirm, ...extra }
+    },
+    template: `<GrPromptDialog v-model="open" v-model:value="value" title="T" ${attrs} @confirm="onConfirm" />`,
+  })
+
+  const wrapper = mount(Harness, { attachTo: document.body })
+  ;(wrapper.vm as unknown as { open: boolean }).open = true
+  await nextTick()
+  await nextTick()
+
+  return wrapper
+}
+
+function byTestId(testId: string): DOMWrapper<HTMLElement> {
+  const el = document.querySelector<HTMLElement>(`[data-testid="${testId}"]`)
+  if (!el) throw new Error(`[test] элемент ${testId} не найден`)
+  return new DOMWrapper(el)
+}
+
+const promptField = () => byTestId('gr-prompt-input')
+const promptConfirm = () => byTestId('gr-prompt-confirm')
+const confirmSpy = (wrapper: { vm: unknown }) => (wrapper.vm as { onConfirm: ReturnType<typeof vi.fn> }).onConfirm
+
+describe('GrPromptDialog — уникальность id', () => {
+  it('два открытых диалога не делят id поля, и каждый label указывает на своё', async () => {
+    // Оба — в одном приложении: `useId()` нумерует внутри app, и два отдельных
+    // `mount()` дали бы одинаковые `v-0` у любых компонентов.
+    const Two = defineComponent({
+      components: { GrPromptDialog },
+      setup: () => ({ open: ref(false), a: ref(''), b: ref('') }),
+      template: `
+        <div>
+          <GrPromptDialog v-model="open" v-model:value="a" title="A" />
+          <GrPromptDialog v-model="open" v-model:value="b" title="B" />
+        </div>
+      `,
+    })
+
+    const wrapper = mount(Two, { attachTo: document.body })
+    ;(wrapper.vm as unknown as { open: boolean }).open = true
+    await nextTick()
+    await nextTick()
+
+    const inputs = [...document.querySelectorAll<HTMLInputElement>('[data-testid="gr-prompt-input"]')]
+    expect(inputs).toHaveLength(2)
+    expect(inputs[0].id).toBeTruthy()
+    // Хардкод `id="gr-prompt-input"` делал диалоги неразличимыми для
+    // `<label for>`: подпись второго уводила на инпут первого.
+    expect(inputs[0].id).not.toBe(inputs[1].id)
+
+    const labels = [...document.querySelectorAll<HTMLLabelElement>('label[for]')]
+    expect(labels.map(l => l.htmlFor).sort()).toEqual(inputs.map(i => i.id).sort())
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrPromptDialog — ввод', () => {
+  it('фокус при открытии уходит в поле, а не на панель', async () => {
+    const wrapper = await mountPrompt()
+
+    expect(document.activeElement).toBe(promptField().element)
+
+    wrapper.unmount()
+  })
+
+  it('Enter в однострочном поле подтверждает', async () => {
+    const wrapper = await mountPrompt()
+
+    await promptField().setValue('Аня')
+    await promptField().trigger('keydown.enter')
+    await nextTick()
+
+    expect(confirmSpy(wrapper)).toHaveBeenCalledWith('Аня')
+
+    wrapper.unmount()
+  })
+
+  it('multiline рисует textarea, и Enter там остаётся переводом строки', async () => {
+    // `show-count` здесь не для счётчика: со счётчиком у `GrTextarea` появляется
+    // обёртка, и без `inheritAttrs: false` атрибуты потребителя садились бы на
+    // неё вместо самого поля.
+    const wrapper = await mountPrompt('multiline :rows="5" :maxlength="100" show-count')
+
+    expect(promptField().element.tagName).toBe('TEXTAREA')
+    expect(promptField().attributes('rows')).toBe('5')
+
+    await promptField().setValue('первая строка')
+    await promptField().trigger('keydown.enter')
+    await nextTick()
+
+    expect(confirmSpy(wrapper)).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('inputType и maxlength доезжают до поля', async () => {
+    const wrapper = await mountPrompt('input-type="email" :maxlength="20"')
+
+    expect(promptField().attributes('type')).toBe('email')
+    expect(promptField().attributes('maxlength')).toBe('20')
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrPromptDialog — rules', () => {
+  it('правило движка GrForm держит диалог открытым и показывает сообщение', async () => {
+    const wrapper = await mountPrompt(':rules="rules"', { rules: { min: 5, message: 'Минимум 5 символов' } })
+
+    await promptField().setValue('abc')
+    await promptConfirm().trigger('click')
+    await nextTick()
+    await nextTick()
+
+    expect(confirmSpy(wrapper)).not.toHaveBeenCalled()
+    expect(document.body.textContent).toContain('Минимум 5 символов')
+
+    await promptField().setValue('abcdef')
+    await promptConfirm().trigger('click')
+    await nextTick()
+    await nextTick()
+
+    expect(confirmSpy(wrapper)).toHaveBeenCalledWith('abcdef')
+
+    wrapper.unmount()
+  })
+
+  it('устаревший ответ асинхронного правила не дописывает свою ошибку', async () => {
+    let resolveFirst!: (v: string | boolean) => void
+    let call = 0
+    const rules = {
+      validator: () => {
+        call += 1
+        if (call === 1) return new Promise<string | boolean>((resolve) => { resolveFirst = resolve })
+        return true
+      },
+    }
+
+    const wrapper = await mountPrompt(':rules="rules"', { rules })
+
+    await promptField().setValue('первое')
+    await promptField().trigger('blur')
+    await nextTick()
+
+    // Значение сменилось и запустило новый прогон — ответ первого устарел.
+    await promptField().setValue('второе')
+    await promptField().trigger('blur')
+    await nextTick()
+    await nextTick()
+
+    resolveFirst('Ошибка из устаревшего прогона')
+    await nextTick()
+    await nextTick()
+
+    expect(document.body.textContent).not.toContain('Ошибка из устаревшего прогона')
 
     wrapper.unmount()
   })

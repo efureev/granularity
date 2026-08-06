@@ -691,7 +691,13 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -1594,6 +1600,20 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "focusAction",
+            "description": "Какое действие получает фокус при открытии. По умолчанию «Отмена»: подтверждение бывает деструктивным, и `Enter` сразу после открытия не должен его запускать. `none` оставляет фокус на панели окна. Имя не `initialFocus` намеренно: у `GrModal`/`GrDrawer` так называется проп с элементом, а здесь выбирается действие.",
+            "type": "GrConfirmDialogFocusAction | undefined",
+            "required": false,
+            "default": "\"cancel\""
+          },
+          {
+            "name": "persistent",
+            "description": "Запрет закрытия «мягкими» способами (Esc, клик по бэкдропу), пока идёт подтверждение (`confirmLoading`). Кнопка закрытия и «Отмена» остаются: окно без единого выхода — ловушка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "modelValue",
@@ -5522,11 +5542,53 @@
             "default": "true"
           },
           {
+            "name": "persistent",
+            "description": "Запрет закрытия «мягкими» способами (Esc, клик по бэкдропу), пока идёт подтверждение или проверка `rules`. Кнопка закрытия и «Отмена» остаются: окно без единого выхода — ловушка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "rows",
+            "description": "Высота многострочного поля в строках.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "label",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "rules",
+            "description": "Правила проверки значения — те же, что у `GrForm` (`required`, `type`, `min`/`max`/`len`, `pattern`, свой в т.ч. асинхронный `validator`). Прогоняются на blur (после первого касания) и на подтверждении.",
+            "type": "GrFormRule | GrFormRule[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "inputmode",
+            "description": "Программная клавиатура на мобильных.",
+            "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxlength",
+            "description": "Ограничение длины; со `showCount` рисуется счётчик.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showCount",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "requiredErrorText",
@@ -5536,8 +5598,29 @@
             "default": "undefined"
           },
           {
+            "name": "inputType",
+            "description": "Тип однострочного поля. В многострочном режиме не применяется.",
+            "type": "GrInputType | undefined",
+            "required": false,
+            "default": "\"text\""
+          },
+          {
+            "name": "multiline",
+            "description": "Многострочный ввод: вместо `GrInput` рисуется `GrTextarea`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "autosize",
+            "description": "Автоподбор высоты многострочного поля под содержимое.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "fieldError",
-            "description": "Внешняя ошибка поля ввода (например, серверная валидация). Имеет приоритет над встроенной проверкой `required`. `null`/`undefined` — нет внешней ошибки.",
+            "description": "Внешняя ошибка поля ввода (например, серверная валидация). Имеет приоритет над встроенной проверкой. `null`/`undefined` — нет внешней ошибки.",
             "type": "string | null | undefined",
             "required": false,
             "default": "null"

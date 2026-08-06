@@ -26,7 +26,7 @@ import { resolveGranularityI18n, useGranularityTranslations } from '../../intern
 
 import { dialogQueue, removeDialogRequest, settleDialogRequest } from './store'
 import type { DialogRequest } from './store'
-import type { DialogCloseAction, DialogConfirmContext } from './types'
+import type { DialogCloseAction, DialogConfirmContext, DialogConfirmOptions, DialogPromptOptions } from './types'
 
 const active = computed<DialogRequest | null>(() => dialogQueue[0] ?? null)
 
@@ -291,17 +291,22 @@ function handleModelUpdate(value: boolean): void {
 
 onBeforeUnmount(teardownActiveRequest)
 
+// Опции веток читаются типизированно, без `as any` в шаблоне.
+const promptOptions = computed<DialogPromptOptions>(() => (active.value?.options ?? {}) as DialogPromptOptions)
+const confirmOptions = computed<DialogConfirmOptions>(() => (active.value?.options ?? {}) as DialogConfirmOptions)
+
 // Прокидываемые в дочерний диалог общие пропы.
 const sharedProps = computed(() => {
   const o = active.value?.options ?? {}
   return {
     title: o.title,
     size: o.size,
-    // Пока `onConfirm` в полёте, «мягкие» способы закрытия отключены: Esc или
-    // клик мимо окна оборвали бы операцию случайным движением. Кнопка закрытия
-    // в шапке остаётся — из окна с зависшим запросом должен быть явный выход.
-    closeOnBackdrop: loading.value ? false : o.closeOnBackdrop,
-    closeOnEsc: loading.value ? false : o.closeOnEsc,
+    closeOnBackdrop: o.closeOnBackdrop,
+    closeOnEsc: o.closeOnEsc,
+    // Подавление «мягкого» закрытия на время `onConfirm` считает сам диалог по
+    // `confirmLoading` — здесь только включаем режим, чтобы механизм жил в
+    // одном месте, а не дублировался хостом.
+    persistent: true,
     showHeader: o.showHeader,
     showCloseButton: o.showCloseButton,
     headerConfig: o.headerConfig,
@@ -325,11 +330,19 @@ const sharedProps = computed(() => {
       v-model:value="promptValue"
       :model-value="open"
       :description="active.options.message ?? active.options.description"
-      :label="(active.options as any).label"
-      :placeholder="(active.options as any).placeholder"
-      :required="(active.options as any).required ?? false"
-      :required-error-text="(active.options as any).requiredErrorText"
-      :cancel-text="(active.options as any).cancelText"
+      :label="promptOptions.label"
+      :placeholder="promptOptions.placeholder"
+      :required="promptOptions.required ?? false"
+      :required-error-text="promptOptions.requiredErrorText"
+      :cancel-text="promptOptions.cancelText"
+      :input-type="promptOptions.inputType"
+      :inputmode="promptOptions.inputmode"
+      :maxlength="promptOptions.maxlength"
+      :show-count="promptOptions.showCount"
+      :multiline="promptOptions.multiline"
+      :rows="promptOptions.rows"
+      :autosize="promptOptions.autosize"
+      :rules="promptOptions.rules"
       :error="currentError"
       :field-error="promptFieldError"
       :confirm-loading="loading"
@@ -373,7 +386,7 @@ const sharedProps = computed(() => {
       :model-value="open"
       v-bind="sharedProps"
       :description="active.options.message ?? active.options.description"
-      :cancel-text="(active.options as any).cancelText"
+      :cancel-text="confirmOptions.cancelText"
       :error="currentError"
       :confirm-loading="loading"
       :close-on-confirm="false"

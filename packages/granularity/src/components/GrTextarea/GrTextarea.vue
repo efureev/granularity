@@ -69,6 +69,12 @@ const props = withDefaults(defineProps<GrTextareaProps>(), {
   resize: 'vertical',
 })
 
+defineOptions({
+  // Иначе атрибуты потребителя (`data-*`, `aria-*`, `name`) садятся на корень,
+  // а корень со `showCount` — обёртка счётчика, а не само поле.
+  inheritAttrs: false,
+})
+
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
@@ -146,6 +152,7 @@ function onInput(e: Event): void {
       :readonly="isReadonly"
       class="w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
       :class="className"
+      v-bind="$attrs"
       @input="onInput"
     />
 
@@ -175,6 +182,7 @@ function onInput(e: Event): void {
     :readonly="isReadonly"
     class="w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
     :class="className"
+    v-bind="$attrs"
     @input="onInput"
   />
 </template>

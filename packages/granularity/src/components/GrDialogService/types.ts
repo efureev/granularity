@@ -1,7 +1,9 @@
-import type { AppContext } from 'vue'
+import type { AppContext, InputHTMLAttributes } from 'vue'
 
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
+import type { GrFormRule } from '../GrForm'
+import type { GrPromptDialogProps } from '../GrPromptDialog'
 import type {
   ResponseErrorInfo,
   ResponseErrorParser,
@@ -121,6 +123,19 @@ export interface DialogPromptOptions extends DialogBaseOptions {
   placeholder?: string
   required?: boolean
   requiredErrorText?: string
+  /** Тип однострочного поля (`email`, `password`, …). */
+  inputType?: GrPromptDialogProps['inputType']
+  /** Программная клавиатура на мобильных. */
+  inputmode?: InputHTMLAttributes['inputmode']
+  /** Ограничение длины; со `showCount` рисуется счётчик. */
+  maxlength?: number
+  showCount?: boolean
+  /** Многострочный ввод вместо однострочного. */
+  multiline?: boolean
+  rows?: number
+  autosize?: boolean
+  /** Правила проверки значения — те же, что у `GrForm`. */
+  rules?: GrFormRule | GrFormRule[]
   onConfirm?: DialogOnConfirm<string>
 }
 

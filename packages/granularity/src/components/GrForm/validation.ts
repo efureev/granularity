@@ -44,6 +44,36 @@ export type GrFormMessageResolver = (
   params: Record<string, unknown>,
 ) => string
 
+/** Подпись `t()` из `useGranularityTranslations()`: ключ, фолбэк, параметры. */
+export type GrFormMessageTranslate = (
+  key: string,
+  fallback: string,
+  params?: Record<string, unknown>,
+) => string
+
+const DEFAULT_MESSAGES: Record<GrFormRuleFailure, string> = {
+  required: 'This field is required',
+  min: 'Minimum is {min}',
+  max: 'Maximum is {max}',
+  len: 'Length must be {len}',
+  pattern: 'Invalid format',
+  email: 'Enter a valid email',
+  url: 'Enter a valid URL',
+  invalid: 'Invalid value',
+}
+
+/**
+ * Дефолтный резолвер сообщений: `rule.message` сильнее всего, иначе ключ
+ * `gr.form.<kind>` из локали, иначе английский фолбэк.
+ *
+ * Вынесен из `GrForm.vue` и экспортируется наружу не «на всякий случай»:
+ * `runFieldRules` публичен, но без резолвера бесполезен — любой, кто хочет
+ * прогнать те же правила вне формы, обязан был написать свой.
+ */
+export function createGrFormMessageResolver(t: GrFormMessageTranslate): GrFormMessageResolver {
+  return (kind, rule, params) => rule.message ?? t(`gr.form.${kind}`, DEFAULT_MESSAGES[kind], params)
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function isUrl(value: string): boolean {

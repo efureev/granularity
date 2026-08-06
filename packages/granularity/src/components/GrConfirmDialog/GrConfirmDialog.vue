@@ -9,7 +9,7 @@
  * Клик по «Confirm»/«Cancel» эмитит одноимённое событие и закрывает диалог
  * через `update:modelValue`.
  */
-import { computed } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrDialog from '../GrDialog/GrDialog.vue'
@@ -18,6 +18,9 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
 import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
+
+/** Какое действие получает фокус при открытии окна. */
+export type GrConfirmDialogFocusAction = 'confirm' | 'cancel' | 'none'
 
 export interface GrConfirmDialogProps {
   modelValue: boolean
@@ -54,6 +57,21 @@ export interface GrConfirmDialogProps {
    * (нужно `useDialogService`, который ждёт результат async-`onConfirm`).
    */
   closeOnConfirm?: boolean
+  /**
+   * Какое действие получает фокус при открытии. По умолчанию «Отмена»:
+   * подтверждение бывает деструктивным, и `Enter` сразу после открытия не
+   * должен его запускать. `none` оставляет фокус на панели окна.
+   *
+   * Имя не `initialFocus` намеренно: у `GrModal`/`GrDrawer` так называется
+   * проп с элементом, а здесь выбирается действие.
+   */
+  focusAction?: GrConfirmDialogFocusAction
+  /**
+   * Запрет закрытия «мягкими» способами (Esc, клик по бэкдропу), пока идёт
+   * подтверждение (`confirmLoading`). Кнопка закрытия и «Отмена» остаются:
+   * окно без единого выхода — ловушка.
+   */
+  persistent?: boolean
 }
 
 const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
@@ -77,6 +95,8 @@ const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
   confirmLoading: false,
   confirmDisabled: false,
   closeOnConfirm: true,
+  focusAction: 'cancel',
+  persistent: false,
 })
 
 const emit = defineEmits<{
@@ -97,6 +117,40 @@ const open = computed({
   set: (value: boolean) => emit('update:modelValue', value),
 })
 
+const confirmButtonRef = ref<InstanceType<typeof GrButton> | null>(null)
+const cancelButtonRef = ref<InstanceType<typeof GrButton> | null>(null)
+
+// Пока подтверждение в полёте, случайное движение не должно оборвать операцию.
+const softCloseBlocked = computed(() => props.persistent && props.confirmLoading)
+const resolvedCloseOnBackdrop = computed(() => (softCloseBlocked.value ? false : props.closeOnBackdrop))
+const resolvedCloseOnEsc = computed(() => (softCloseBlocked.value ? false : props.closeOnEsc))
+
+/**
+ * Фокус ставит содержимое после отрисовки, а не проп `initialFocus` у
+ * `GrModal`: кнопка рождается внутри поддерева диалога, и возврат её же пропом
+ * наверх замыкает рендер в цикл (проверено на `GrPromptDialog`).
+ *
+ * Молчит, когда фокусировать нечего: со своим слотом `#footer` кнопок с
+ * рефами в DOM нет, и фокус остаётся на панели — это корректный исход, а не
+ * повод падать.
+ */
+function focusAction(): void {
+  if (props.focusAction === 'confirm') confirmButtonRef.value?.focus()
+  else if (props.focusAction === 'cancel') cancelButtonRef.value?.focus()
+}
+
+watch(
+  () => props.modelValue,
+  async (isOpen) => {
+    if (!isOpen || props.focusAction === 'none') return
+
+    await nextTick()
+    focusAction()
+  },
+  // `immediate`: окно могут смонтировать уже открытым — смены пропа тогда нет.
+  { immediate: true, flush: 'post' },
+)
+
 function onCancel(): void {
   emit('cancel')
   emit('update:modelValue', false)
@@ -114,8 +168,8 @@ function onConfirm(): void {
     v-model="open"
     :title="resolvedTitle"
     :size="size"
-    :close-on-backdrop="closeOnBackdrop"
-    :close-on-esc="closeOnEsc"
+    :close-on-backdrop="resolvedCloseOnBackdrop"
+    :close-on-esc="resolvedCloseOnEsc"
     :show-header="showHeader"
     :show-close-button="showCloseButton"
     :header-config="headerConfig"
@@ -138,10 +192,11 @@ function onConfirm(): void {
     <template #footer>
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
-          <GrButton data-testid="gr-confirm-cancel" variant="outline" :size="buttonSize" @click="onCancel">
+          <GrButton ref="cancelButtonRef" data-testid="gr-confirm-cancel" variant="outline" :size="buttonSize" @click="onCancel">
             {{ resolvedCancelText }}
           </GrButton>
           <GrButton
+            ref="confirmButtonRef"
             data-testid="gr-confirm-confirm"
             :variant="confirmVariant"
             :tone="confirmTone"

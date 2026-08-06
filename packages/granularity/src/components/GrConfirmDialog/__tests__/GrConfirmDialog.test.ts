@@ -135,3 +135,145 @@ describe('GrConfirmDialog', () => {
     wrapper.unmount()
   })
 })
+/**
+ * Стенд для сценариев с фокусом и async-веткой.
+ *
+ * `teleport` намеренно **не** стабится: стаб VTU пересоздаёт поддерево на
+ * ре-рендере, и в тесте остаются мёртвые инстансы — шаблонный `ref` смотрит на
+ * один, а в документе висит другой, из-за чего молча не работает программный
+ * фокус. Ищем поэтому по документу.
+ *
+ * Открываем окно **после** монтирования, как в жизни: телепорт включается
+ * только после mount, и содержимое, отрисованное до него, переезжает в `body`,
+ * а переезд узла сбрасывает фокус.
+ */
+async function mountConfirm(attrs = '', slots = '') {
+  const Harness = defineComponent({
+    name: 'HarnessConfirm',
+    components: { GrConfirmDialog },
+    setup() {
+      const open = ref(false)
+      const onConfirm = vi.fn()
+      const onCancel = vi.fn()
+      return { open, onConfirm, onCancel }
+    },
+    template: `
+      <GrConfirmDialog v-model="open" ${attrs} @confirm="onConfirm" @cancel="onCancel">
+        ${slots}
+      </GrConfirmDialog>
+    `,
+  })
+
+  const wrapper = mount(Harness, { attachTo: document.body })
+  ;(wrapper.vm as unknown as { open: boolean }).open = true
+  await nextTick()
+  await nextTick()
+
+  return wrapper
+}
+
+const byTestId = (id: string) => document.querySelector<HTMLElement>(`[data-testid="${id}"]`)
+
+describe('GrConfirmDialog — фокус при открытии', () => {
+  it('по умолчанию фокус на «Отмена»: Enter сразу после открытия ничего не разрушает', async () => {
+    const wrapper = await mountConfirm()
+
+    expect(document.activeElement).toBe(byTestId('gr-confirm-cancel'))
+
+    wrapper.unmount()
+  })
+
+  it('focusAction="confirm" уводит фокус на подтверждение', async () => {
+    const wrapper = await mountConfirm('focus-action="confirm"')
+
+    expect(document.activeElement).toBe(byTestId('gr-confirm-confirm'))
+
+    wrapper.unmount()
+  })
+
+  it('focusAction="none" не уводит фокус на кнопки', async () => {
+    // Фокус на панели ставит фокус-ловушка HeadlessUI, а она здесь замокана —
+    // проверяем то, за что отвечает компонент: он не трогает фокус вовсе.
+    const wrapper = await mountConfirm('focus-action="none"')
+
+    expect(document.activeElement).not.toBe(byTestId('gr-confirm-cancel'))
+    expect(document.activeElement).not.toBe(byTestId('gr-confirm-confirm'))
+
+    wrapper.unmount()
+  })
+
+  it('со своим слотом #footer фокусировать нечего — молчим, а не падаем', async () => {
+    const wrapper = await mountConfirm('', '<template #footer><button data-testid="own">Своя</button></template>')
+
+    expect(byTestId('gr-confirm-cancel')).toBeNull()
+    expect(byTestId('own')).not.toBeNull()
+    // Ничего не сфокусировано насильно — фокус остаётся там, куда его поставит
+    // фокус-ловушка окна.
+    expect(document.activeElement).not.toBe(byTestId('own'))
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrConfirmDialog — async-ветка', () => {
+  it('closeOnConfirm=false оставляет окно открытым и отдаёт закрытие наружу', async () => {
+    const wrapper = await mountConfirm(':close-on-confirm="false"')
+
+    byTestId('gr-confirm-confirm')!.click()
+    await nextTick()
+
+    expect((wrapper.vm as unknown as { onConfirm: ReturnType<typeof vi.fn> }).onConfirm).toHaveBeenCalledTimes(1)
+    expect((wrapper.vm as unknown as { open: boolean }).open).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('persistent снимает Esc и бэкдроп, пока идёт подтверждение', async () => {
+    const wrapper = await mountConfirm('persistent :confirm-loading="true" :close-on-confirm="false"')
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+    await nextTick()
+    await nextTick()
+
+    expect((wrapper.vm as unknown as { open: boolean }).open).toBe(true)
+    // Явный выход остаётся: «Отмена» и крестик работают.
+    expect(byTestId('gr-confirm-cancel')).not.toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('без persistent Esc закрывает окно даже во время загрузки', async () => {
+    const wrapper = await mountConfirm(':confirm-loading="true" :close-on-confirm="false"')
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+    await nextTick()
+    await nextTick()
+
+    expect((wrapper.vm as unknown as { open: boolean }).open).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('confirmLoading и confirmDisabled доходят до кнопки подтверждения', async () => {
+    const loadingWrapper = await mountConfirm(':confirm-loading="true"')
+    expect(byTestId('gr-confirm-confirm')?.getAttribute('aria-busy')).toBe('true')
+    loadingWrapper.unmount()
+
+    const disabledWrapper = await mountConfirm(':confirm-disabled="true"')
+    expect((byTestId('gr-confirm-confirm') as HTMLButtonElement).disabled).toBe(true)
+    disabledWrapper.unmount()
+  })
+
+  it('баннер ошибки рисуется из пропа и переопределяется слотом', async () => {
+    const withBanner = await mountConfirm(':error="{ kind: \'unknown\', message: \'Сервер отказал\', raw: null }"')
+    expect(document.body.textContent).toContain('Сервер отказал')
+    withBanner.unmount()
+
+    const withSlot = await mountConfirm(
+      ':error="{ kind: \'unknown\', message: \'Сервер отказал\', raw: null }"',
+      '<template #error="{ error }"><div data-testid="own-error">Своя подача: {{ error.message }}</div></template>',
+    )
+    expect(byTestId('own-error')?.textContent).toContain('Своя подача: Сервер отказал')
+    withSlot.unmount()
+  })
+})

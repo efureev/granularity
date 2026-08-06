@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, markRaw, type Component } from 'vue'
+import { computed, markRaw, ref, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
@@ -97,6 +97,23 @@ function onClickCapture(e: MouseEvent): void {
   }
 }
 
+// Корень динамический (`as` принимает и тег, и компонент), поэтому ref может
+// оказаться как элементом, так и инстансом — например роутерной ссылкой.
+const rootEl = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
+
+/**
+ * Фокус на кнопку из кода. Нужен там, где окно обязано открываться с фокусом
+ * на конкретном действии (`GrConfirmDialog`), и потребителю не должно быть
+ * важно, тегом или компонентом отрисован корень.
+ */
+function focus(): void {
+  const root = rootEl.value
+  const el = root instanceof HTMLElement ? root : root?.$el
+  el?.focus?.()
+}
+
+defineExpose({ focus })
+
 const className = computed(() => {
   return grButtonClass({
     variant: resolvedVariant.value,
@@ -112,6 +129,7 @@ const className = computed(() => {
 <template>
   <component
     :is="renderAs"
+    ref="rootEl"
     data-gr-button
     :data-gr-variant="resolvedVariant"
     :data-gr-tone="resolvedTone"

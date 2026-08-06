@@ -5,12 +5,12 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { GR_FORM_KEY } from './context'
 import {
   getByPath,
+  createGrFormMessageResolver,
   rulesForTrigger,
   rulesRequired,
   runFieldRules,
   setByPath,
   toRuleArray,
-  type GrFormMessageResolver,
   type GrFormRule,
   type GrFormRules,
   type GrFormTrigger,
@@ -86,21 +86,9 @@ const requiredFields = computed(() => {
   return set
 })
 
-// Дефолтные i18n-сообщения (перекрываются `rule.message`).
-const resolveMessage: GrFormMessageResolver = (kind, rule, params) => {
-  if (rule.message) return rule.message
-  const fallback: Record<string, string> = {
-    required: 'This field is required',
-    min: 'Minimum is {min}',
-    max: 'Maximum is {max}',
-    len: 'Length must be {len}',
-    pattern: 'Invalid format',
-    email: 'Enter a valid email',
-    url: 'Enter a valid URL',
-    invalid: 'Invalid value',
-  }
-  return t(`gr.form.${kind}`, fallback[kind], params)
-}
+// Дефолтные i18n-сообщения (перекрываются `rule.message`) — общие с любым
+// потребителем движка правил, не только с формой.
+const resolveMessage = createGrFormMessageResolver(t)
 
 // ————— Валидация.
 async function validateField(name: string, trigger?: GrFormTrigger): Promise<boolean> {

@@ -36,7 +36,7 @@
 - [`GrCollapse`](./components/GrCollapse.md)
 - `GrCommandPalette`
 - `GrConfigProvider`
-- `GrConfirmDialog`
+- [`GrConfirmDialog`](./components/GrConfirmDialog.md)
 - [`GrDataTable`](./components/GrDataTable.md)
 - `GrDialog`
 - [`GrDialogService`](./components/GrDialogService.md)
@@ -64,7 +64,7 @@
 - `GrPagination`
 - `GrPopover`
 - `GrProgressBar`
-- `GrPromptDialog`
+- [`GrPromptDialog`](./components/GrPromptDialog.md)
 - [`GrRadio`](./components/GrRadio.md)
 - [`GrRadioGroup`](./components/GrRadioGroup.md)
 - `GrRating`

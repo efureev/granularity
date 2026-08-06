@@ -10,8 +10,10 @@ export type {
   GrFormValidatorResult,
 } from './GrForm.vue'
 export {
+  createGrFormMessageResolver,
   getByPath,
   type GrFormMessageResolver,
+  type GrFormMessageTranslate,
   type GrFormRuleFailure,
   isEmpty,
   runFieldRules,
