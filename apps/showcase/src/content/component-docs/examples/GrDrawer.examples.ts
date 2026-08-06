@@ -4,7 +4,7 @@ export const grDrawerExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'drawer-filter-panel',
     title: 'Filter panel drawer',
-    description: 'Базовый application-shell сценарий: drawer справа открывает форму фильтров без ухода со страницы.',
+    description: 'Базовый application-shell сценарий: панель справа открывает форму фильтров без ухода со страницы.',
     status: 'ready',
     previewKey: 'gr-drawer-filter-panel',
     code: `<script setup lang="ts">
@@ -49,9 +49,169 @@ const open = ref(false)
 </template>`,
   },
   {
+    id: 'drawer-bottom-sheet',
+    title: 'Bottom sheet',
+    description: '`side="bottom"` — панель выезжает снизу, и `size` для неё означает высоту, а не ширину.',
+    status: 'ready',
+    previewKey: 'gr-drawer-bottom-sheet',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrButton, GrDrawer, GrSegmented } from '@feugene/granularity'
+
+const open = ref(false)
+const sort = ref('recent')
+
+const options = [
+  { value: 'recent', label: 'Newest first' },
+  { value: 'amount', label: 'Largest amount' },
+  { value: 'status', label: 'By status' },
+]
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrButton class="justify-self-start" @click="open = true">
+      Open bottom sheet
+    </GrButton>
+
+    <!-- Сторона решает ось: \`size\` у нижней панели — это высота, а не ширина. -->
+    <GrDrawer v-model="open" side="bottom" size="sm" title="Sort orders">
+      <GrSegmented v-model="sort" :options="options" class="w-full" />
+
+      <template #footer>
+        <div class="flex justify-end">
+          <GrButton @click="open = false">
+            Apply
+          </GrButton>
+        </div>
+      </template>
+    </GrDrawer>
+  </div>
+</template>`,
+  },
+  {
+    id: 'drawer-non-modal',
+    title: 'Non-modal filters',
+    description: '`:modal="false"` — ни подложки, ни блокировки скролла, ни ловушки фокуса: с таблицей продолжают работать при открытой панели.',
+    status: 'ready',
+    previewKey: 'gr-drawer-non-modal',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrButton, GrCheckbox, GrDrawer, GrTable } from '@feugene/granularity'
+
+const open = ref(false)
+const onlyOverdue = ref(false)
+const clicks = ref(0)
+
+const rows = [
+  { id: 'INV-1042', client: 'Northwind', status: 'Overdue' },
+  { id: 'INV-1043', client: 'Contoso', status: 'Paid' },
+  { id: 'INV-1044', client: 'Fabrikam', status: 'Overdue' },
+]
+
+const visibleRows = () => (onlyOverdue.value ? rows.filter(row => row.status === 'Overdue') : rows)
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <GrButton class="justify-self-start" @click="open = true">
+        Open filters
+      </GrButton>
+      <!-- Страница под немодальной панелью остаётся живой: счётчик растёт. -->
+      <GrButton variant="outline" @click="clicks++">
+        Table still responds: {{ clicks }}
+      </GrButton>
+    </div>
+
+    <GrTable>
+      <template #head>
+        <tr>
+          <th class="px-4 py-2 text-left">Invoice</th>
+          <th class="px-4 py-2 text-left">Client</th>
+          <th class="px-4 py-2 text-left">Status</th>
+        </tr>
+      </template>
+
+      <tr v-for="row in visibleRows()" :key="row.id">
+        <td class="px-4 py-2">{{ row.id }}</td>
+        <td class="px-4 py-2">{{ row.client }}</td>
+        <td class="px-4 py-2">{{ row.status }}</td>
+      </tr>
+    </GrTable>
+
+    <!-- \`modal: false\` — ни подложки, ни блокировки скролла, ни ловушки фокуса:
+         с панелью работают, не закрывая её. Esc закрывает по-прежнему. -->
+    <GrDrawer v-model="open" :modal="false" size="sm" title="Invoice filters">
+      <GrCheckbox v-model="onlyOverdue">
+        Only overdue
+      </GrCheckbox>
+
+      <template #footer>
+        <GrButton variant="outline" class="w-full" @click="open = false">
+          Done
+        </GrButton>
+      </template>
+    </GrDrawer>
+  </div>
+</template>`,
+  },
+  {
+    id: 'drawer-custom-header',
+    title: 'Custom header',
+    description: 'Слот `#header` заменяет шапку целиком — поиск вместо заголовка и своя кнопка вместо крестика; имя слоя остаётся скрытым заголовком.',
+    status: 'ready',
+    previewKey: 'gr-drawer-custom-header',
+    code: `<script setup lang="ts">
+import { computed, ref } from 'vue'
+
+import { GrButton, GrDrawer, GrInput } from '@feugene/granularity'
+
+const open = ref(false)
+const query = ref('')
+
+const members = ['Ada Lovelace', 'Alan Turing', 'Grace Hopper', 'Edsger Dijkstra']
+const found = computed(() =>
+  members.filter(name => name.toLowerCase().includes(query.value.trim().toLowerCase())),
+)
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrButton class="justify-self-start" @click="open = true">
+      Open member picker
+    </GrButton>
+
+    <GrDrawer v-model="open" title="Team members" size="sm">
+      <!-- Своя шапка заменяет и заголовок, и крестик. Имя слоя при этом
+           остаётся: заголовок уходит в скрытый элемент. -->
+      <template #header="{ title, close }">
+        <div class="flex items-center gap-2">
+          <GrInput v-model="query" :placeholder="title" class="flex-1" />
+          <GrButton variant="ghost" size="sm" @click="close">
+            Done
+          </GrButton>
+        </div>
+      </template>
+
+      <ul class="grid gap-1 text-sm">
+        <li v-for="name in found" :key="name" class="rounded-md px-2 py-1.5 hover:bg-[var(--gr-muted)]">
+          {{ name }}
+        </li>
+        <li v-if="found.length === 0" class="px-2 py-1.5 text-[var(--gr-muted-fg)]">
+          Nobody matches “{{ query }}”
+        </li>
+      </ul>
+    </GrDrawer>
+  </div>
+</template>`,
+  },
+  {
     id: 'drawer-left-rail',
-    title: 'Left-side navigation rail',
-    description: 'Показываем `side="left"` для responsive-navigation и utility-rail сценариев.',
+    title: 'Left navigation rail',
+    description: '`side="left"` для навигации по разделам рабочего пространства.',
     status: 'ready',
     previewKey: 'gr-drawer-left-rail',
     code: `<script setup lang="ts">
@@ -94,8 +254,8 @@ const items = ['Overview', 'Approvals', 'Members', 'Security']
   },
   {
     id: 'drawer-guarded-size',
-    title: 'Size switcher with guarded backdrop',
-    description: 'Сравниваем `size` и одновременно показываем guarded overlay flow для review/inspector сценариев.',
+    title: 'Size switch with guarded backdrop',
+    description: 'Переключение шкалы размеров вместе с `closeOnBackdrop: false`.',
     status: 'ready',
     previewKey: 'gr-drawer-guarded-size',
     code: `<script setup lang="ts">
@@ -145,8 +305,8 @@ function openDrawer(nextSize: 'md' | 'lg') {
   },
   {
     id: 'drawer-persistent-form',
-    title: 'Persistent drawer with a form',
-    description: 'Панель блокируется на время сохранения (`persistent`), фокус уходит в первое поле (`initialFocus`), а хост слышит `@opened`/`@closed` и настраивает паддинги секций.',
+    title: 'Persistent form',
+    description: '`persistent` запрещает бэкдроп и Esc на время сохранения; кнопка закрытия остаётся.',
     status: 'ready',
     previewKey: 'gr-drawer-persistent-form',
     code: `<script setup lang="ts">

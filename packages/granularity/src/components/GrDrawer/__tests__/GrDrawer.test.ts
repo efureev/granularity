@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrDrawer from '../GrDrawer.vue'
@@ -19,8 +19,7 @@ type DrawerOptions = Record<string, unknown> & { componentDefaults?: Record<stri
 /**
  * Все пропы прокидываются как есть: тестам нужен не фиксированный набор, а
  * произвольная комбинация — от `persistent` до `headerConfig`.
- */
-/**
+ *
  * Хелпер асинхронный: поддерево слоя появляется на такт позже монтирования —
  * телепорт включается после маунта (см. `useTeleportEnabled`).
  */
@@ -61,6 +60,32 @@ async function mountHarness(options: DrawerOptions) {
     },
   })
 
+  await nextTick()
+  return wrapper
+}
+
+/** Стенд со своей шапкой: слот подменяет и заголовок, и кнопку закрытия. */
+async function mountHarnessWithHeader() {
+  const Harness = defineComponent({
+    components: { GrDrawer },
+    setup() {
+      const open = ref(true)
+      return { open }
+    },
+    template: `
+      <GrDrawer v-model="open" title="Filters">
+        <template #header="{ title, close }">
+          <div data-testid="custom-header">
+            <span>{{ title }}</span>
+            <button data-testid="custom-close" @click="close">×</button>
+          </div>
+        </template>
+        <div data-testid="drawer-body">Body</div>
+      </GrDrawer>
+    `,
+  })
+
+  const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
   await nextTick()
   return wrapper
 }
@@ -209,11 +234,20 @@ describe('granularity/GrDrawer (unit)', () => {
     wrapper.unmount()
   })
 
-  it('showHeader=false убирает хедер целиком, заголовок остаётся именем слоя', async () => {
+  it('showHeader=false убирает хедер, но имя слоя остаётся своим', async () => {
     const wrapper = await mountHarness({ closeOnBackdrop: true, title: 'Filters', showHeader: false })
 
     expect(wrapper.find('[data-gr-drawer-header]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-drawer]').attributes('aria-label')).toBe('Drawer')
+
+    // Заголовок рисуется скрытым: обобщённое «Drawer» из локали хуже, чем
+    // настоящее имя, которое автор уже передал.
+    const title = wrapper.find('[data-gr-drawer-title]')
+    expect(title.exists()).toBe(true)
+    expect(title.classes()).toContain('sr-only')
+    expect(title.text()).toBe('Filters')
+
+    expect(wrapper.find('[data-gr-drawer]').attributes('aria-labelledby')).toBe(title.attributes('id'))
+    expect(wrapper.find('[data-gr-drawer]').attributes('aria-label')).toBeUndefined()
 
     wrapper.unmount()
   })
@@ -259,5 +293,152 @@ describe('granularity/GrDrawer (unit)', () => {
     })
     expect(localWins.find('[data-gr-drawer-panel]').attributes('class')).toContain('w-[360px]')
     localWins.unmount()
+  })
+
+  it('тело попадает в таб-порядок: длинный текст без ссылок иначе не прокрутить', async () => {
+    const wrapper = await mountHarness({ closeOnBackdrop: true, title: 'Filters' })
+
+    expect(wrapper.find('[data-gr-drawer-body]').attributes('tabindex')).toBe('0')
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrDrawer — стороны', () => {
+  it('боковые стороны растянуты по вертикали и берут ширину из шкалы', async () => {
+    const right = await mountHarness({ title: 'F' })
+    const rightPanel = right.find('[data-gr-drawer-panel]').attributes('class')
+    expect(rightPanel).toContain('inset-y-0')
+    expect(rightPanel).toContain('right-0')
+    expect(rightPanel).toContain('w-[420px]')
+    right.unmount()
+
+    const left = await mountHarness({ title: 'F', side: 'left' })
+    expect(left.find('[data-gr-drawer-panel]').attributes('class')).toContain('left-0')
+    left.unmount()
+  })
+
+  it('верхняя и нижняя растянуты по горизонтали и берут из шкалы высоту', async () => {
+    const bottom = await mountHarness({ title: 'F', side: 'bottom' })
+    const bottomPanel = bottom.find('[data-gr-drawer-panel]').attributes('class')
+    expect(bottomPanel).toContain('inset-x-0')
+    expect(bottomPanel).toContain('bottom-0')
+    expect(bottomPanel).toContain('h-[360px]')
+    expect(bottomPanel).not.toContain('w-[420px]')
+    bottom.unmount()
+
+    const top = await mountHarness({ title: 'F', side: 'top', size: 'lg' })
+    const topPanel = top.find('[data-gr-drawer-panel]').attributes('class')
+    expect(topPanel).toContain('top-0')
+    expect(topPanel).toContain('h-[480px]')
+    top.unmount()
+  })
+
+  it('произвольный размер задаётся по оси панели', async () => {
+    const bottom = await mountHarness({ title: 'F', side: 'bottom', height: 320 })
+    const panel = bottom.find('[data-gr-drawer-panel]')
+    expect(panel.attributes('style')).toContain('height: 320px')
+    expect(panel.attributes('class')).not.toContain('h-[360px]')
+    bottom.unmount()
+  })
+
+  it('проп не своей оси не молчит, а ругается в dev', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = await mountHarness({ title: 'F', side: 'bottom', width: 400 })
+
+    expect(warn).toHaveBeenCalled()
+    expect(String(warn.mock.calls[0]?.[0])).toContain('width')
+    // Игнорируется он в любом случае — размер остаётся из шкалы по своей оси.
+    expect(wrapper.find('[data-gr-drawer-panel]').attributes('class')).toContain('h-[360px]')
+
+    wrapper.unmount()
+    warn.mockRestore()
+  })
+})
+
+describe('GrDrawer — своя шапка', () => {
+  it('слот #header подменяет содержимое шапки, а имя слоя остаётся', async () => {
+    const wrapper = await mountHarnessWithHeader()
+
+    expect(wrapper.find('[data-testid="custom-header"]').exists()).toBe(true)
+    // Штатной кнопки закрытия в своей шапке нет — её рисует потребитель.
+    expect(wrapper.find('[data-gr-drawer-close]').exists()).toBe(false)
+
+    const title = wrapper.find('[data-gr-drawer-title]')
+    expect(title.classes()).toContain('sr-only')
+    expect(wrapper.find('[data-gr-drawer]').attributes('aria-labelledby')).toBe(title.attributes('id'))
+
+    wrapper.unmount()
+  })
+
+  it('слот получает заголовок и функцию закрытия', async () => {
+    const wrapper = await mountHarnessWithHeader()
+
+    expect(wrapper.find('[data-testid="custom-header"]').text()).toContain('Filters')
+
+    await wrapper.find('[data-testid="custom-close"]').trigger('click')
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrDrawer — немодальный режим', () => {
+  it('не рисует подложку, не блокирует скролл и не гасит страницу', async () => {
+    const page = document.createElement('main')
+    document.body.appendChild(page)
+
+    const wrapper = await mountHarness({ title: 'Filters', modal: false })
+
+    expect(wrapper.find('[data-gr-drawer-overlay]').exists()).toBe(false)
+    expect(document.body.style.overflow).toBe('')
+    expect(page.hasAttribute('inert')).toBe(false)
+
+    // Корень растянут на весь экран ради позиционирования — но клики сквозь.
+    expect(wrapper.find('[data-gr-drawer]').attributes('class')).toContain('pointer-events-none')
+    expect(wrapper.find('[data-gr-drawer-panel]').attributes('class')).toContain('pointer-events-auto')
+
+    wrapper.unmount()
+    page.remove()
+  })
+
+  it('не объявляет себя модальным окном', async () => {
+    const wrapper = await mountHarness({ title: 'Filters', modal: false })
+
+    const root = wrapper.find('[data-gr-drawer]')
+    expect(root.attributes('role')).toBe('dialog')
+    expect(root.attributes('aria-modal')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('остаётся в очереди Esc', async () => {
+    const wrapper = await mountHarness({ title: 'Filters', modal: false })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('фокус не держит: он остаётся там, куда его увели', async () => {
+    const outside = document.createElement('button')
+    document.body.appendChild(outside)
+
+    const wrapper = await mountHarness({ title: 'Filters', modal: false })
+    await nextTick()
+
+    outside.focus()
+    await nextTick()
+
+    expect(document.activeElement).toBe(outside)
+
+    wrapper.unmount()
+    outside.remove()
   })
 })

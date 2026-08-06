@@ -2229,14 +2229,14 @@
           },
           {
             "name": "size",
-            "description": "Размер панели. Не задан — берётся из `GrConfigProvider`, иначе `md`.",
+            "description": "Размер панели по её оси: ширина у боковых, высота у верхней и нижней.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "closeOnBackdrop",
-            "description": "Закрывать при клике по бэкдропу.",
+            "description": "Закрывать при клике по бэкдропу. В немодальном режиме подложки нет.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -2305,6 +2305,13 @@
             "default": "null"
           },
           {
+            "name": "modal",
+            "description": "Модальная панель: подложка, блокировка скролла, `inert` остальной странице и ловушка фокуса. `false` — панель живёт рядом со страницей: с ней работают, не закрывая, а Tab уходит наружу.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "side",
             "description": "Сторона, с которой выезжает панель.",
             "type": "GrDrawerSide | undefined",
@@ -2313,7 +2320,14 @@
           },
           {
             "name": "width",
-            "description": "Произвольная ширина панели. Число трактуется как пиксели; сильнее `size`.",
+            "description": "Произвольная ширина боковой панели. Число трактуется как пиксели; сильнее `size`.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "height",
+            "description": "Произвольная высота верхней или нижней панели. Число трактуется как пиксели.",
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
@@ -2340,6 +2354,11 @@
             "name": "title",
             "description": "",
             "type": "any"
+          },
+          {
+            "name": "header",
+            "description": "Своя шапка целиком: заголовок, кнопка закрытия и всё, что нужно рядом.",
+            "type": "{ title?: string | undefined; close: () => void; }"
           },
           {
             "name": "footer",

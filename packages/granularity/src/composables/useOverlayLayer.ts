@@ -8,8 +8,11 @@ export interface UseOverlayLayerOptions {
    * Модальный слой: блокирует страницу, и модалки под ним получают `inert`.
    * Немодальные (поповеры, меню, подсказки) участвуют только в очереди Esc.
    * По умолчанию `false`.
+   *
+   * Геттером — там, где модальность включается пропом (`GrDrawer`): значение
+   * читается в момент регистрации, то есть при каждом открытии.
    */
-  modal?: boolean
+  modal?: boolean | (() => boolean)
   /**
    * Закрывать ли слой по Esc. Геттер, а не значение, — чтобы читать реактивный
    * проп (`closeOnEsc`). По умолчанию закрывается всегда.
@@ -82,7 +85,7 @@ export function useOverlayLayer(
       previouslyFocused = (document.activeElement as HTMLElement) ?? null
 
     layerId = pushOverlayLayer({
-      modal: options.modal ?? false,
+      modal: typeof options.modal === 'function' ? options.modal() : options.modal ?? false,
       shouldClose: () => options.closeOnEscape?.() ?? true,
       close: onDismiss,
       setTopmost: options.onTopmostChange,

@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDrawer`: sides `top`/`bottom`, a `#header` slot and a non-modal mode.** `side` now takes four values, and the
+  axis decides the rest: a side panel is stretched vertically and takes its **width** from the scale, a top or bottom
+  one is stretched horizontally and takes its **height** — so `size="sm"` on a bottom sheet means 280px tall, not
+  wide. A custom length follows the same axis: `width` for `left`/`right`, the new `height` for `top`/`bottom`; the
+  prop for the wrong axis is ignored **and warns in dev**, because silently doing nothing looks like a bug in the
+  component rather than a mistake in the call.
+
+  `#header` replaces the header as a whole — the close button included, which the consumer then draws themselves; the
+  slot receives `title` and `close`. `:modal="false"` drops the backdrop, the scroll lock, the `inert` and the focus
+  trap: the page keeps scrolling, clicking and taking Tab while the panel stays open, which is what a filter panel
+  over a table needs. What remains in that mode is a place in the layer stack (Esc still closes the top layer), focus
+  return to the trigger and `role="dialog"` — now without `aria-modal`. The layer root passes clicks through
+  (`pointer-events: none`); without that a «non-modal» panel would silently kill the whole page.
 - **`useFocusTrap` — the focus trap is now a primitive of this package.** Public, next to `useOverlayLayer` and
   `useDismissible`, with its own subpath export (`@feugene/granularity/composables/useFocusTrap`). While active, Tab
   cycles inside the layer and focus that leaks out comes back; `initialFocus` is a default rather than an order — a
@@ -321,6 +334,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrDrawer`: the scrollable body was unreachable from the keyboard.** `overflow-y-auto` without `tabindex="0"`
+  means a long text with no focusable element inside cannot be scrolled at all without a mouse (axe:
+  `scrollable-region-focusable`). `GrModal` has had this; the drawer had not.
+- **`GrDrawer` lost the window name when the header was hidden.** `<GrDrawer title="Filters" :show-header="false">`
+  announced itself as the generic «Drawer» from the locale instead of its own title, because the name was bound to the
+  header being rendered. The title is now rendered `sr-only` whenever the header is hidden or replaced by the
+  `#header` slot, and the generic name stays a fallback only for a panel with no title at all.
 - **A field marked `required` on `GrFormField` was never validated.** Validation walked `Object.keys(rules)` only, so
   such a field drew the asterisk, announced `aria-required` — and let submit through while empty. The field now
   registers its own requirement with the form, which applies an implicit `{ required: true }` with the same localized
