@@ -39,7 +39,7 @@
 - `GrConfirmDialog`
 - [`GrDataTable`](./components/GrDataTable.md)
 - `GrDialog`
-- `GrDialogService`
+- [`GrDialogService`](./components/GrDialogService.md)
 - `GrDivider`
 - [`GrDrawer`](./components/GrDrawer.md)
 - `GrDropdown`

@@ -22,9 +22,9 @@ import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 
 import { GR_CONFIG_KEY, type GrComponentDefaults, type GrConfigContext } from '../GrConfigProvider/context'
 import { GRANULARITY_I18N_KEY } from '../../i18n/adapter'
-import { resolveGranularityI18n } from '../../internal/granularityI18n'
+import { resolveGranularityI18n, useGranularityTranslations } from '../../internal/granularityI18n'
 
-import { dialogQueue } from './store'
+import { dialogQueue, removeDialogRequest, settleDialogRequest } from './store'
 import type { DialogRequest } from './store'
 import type { DialogCloseAction, DialogConfirmContext } from './types'
 
@@ -66,21 +66,47 @@ provide(GRANULARITY_I18N_KEY, {
   },
 })
 
+// Подвал alert-ветки хост рисует сам, поэтому и перевод кнопки достаёт сам.
+// Адаптер берём тот же, что раздан вниз: собственный `provide` компонента его
+// же `inject` не видит, и `useGranularityTranslations()` без аргумента ушёл бы
+// мимо захваченного вызовом адаптера — в фолбэк из `appContext`.
+const alertConfirmText = computed(() => {
+  const { t } = useGranularityTranslations(active.value?.i18n ?? hostI18n)
+  return t('gr.dialog.ok', 'OK')
+})
+
 const open = ref(false)
 const loading = ref(false)
 const currentError = shallowRef<ResponseErrorInfo | null>(null)
-const fieldError = ref<string | null>(null)
+/**
+ * Ошибки по именам полей. Карта, а не одна строка: `setFieldError(field, …)`
+ * обещает адресность, и обещание должно быть правдой ещё до того, как в
+ * диалоге появится второе поле.
+ */
+const fieldErrors = ref<Record<string, string>>({})
 const promptValue = ref('')
 
+/** Единственное поле `GrPromptDialog` называется `value`. */
+const PROMPT_FIELD = 'value'
+
+// Одна запись — её и показываем: адрес не важен, когда адресат один.
+const promptFieldError = computed<string | null>(() => {
+  const own = fieldErrors.value[PROMPT_FIELD]
+  if (own != null) return own
+
+  const entries = Object.values(fieldErrors.value)
+  return entries.length === 1 ? entries[0] : null
+})
+
+const hasFieldError = computed(() => Object.keys(fieldErrors.value).length > 0)
+
 let controller: AbortController | null = null
-let finishing = false
 let externalAbortCleanup: (() => void) | null = null
 
 function resetState(): void {
   loading.value = false
   currentError.value = null
-  fieldError.value = null
-  finishing = false
+  fieldErrors.value = {}
 }
 
 function buildClassifier(req: DialogRequest) {
@@ -99,7 +125,11 @@ function buildClassifier(req: DialogRequest) {
 watch(
   () => active.value?.id,
   (id) => {
-    cleanupExternalAbort()
+    // Демонтаж предыдущей заявки — здесь, и только здесь: смену головы видит
+    // ровно этот watcher, кем бы заявка ни была завершена. Раньше `abort()`
+    // висел внутри `finish()`, и закрытие через `close()` промиса оставляло
+    // in-flight `onConfirm` работать дальше.
+    teardownActiveRequest()
     resetState()
 
     const req = active.value
@@ -137,23 +167,27 @@ function cleanupExternalAbort(): void {
   externalAbortCleanup = null
 }
 
-function finish(action: DialogCloseAction, value?: unknown): void {
-  const req = active.value
-  if (!req || finishing) return
-  finishing = true
-
-  open.value = false
+/** Снимает всё, что заведено под текущую заявку: подписку на внешний сигнал и свой контроллер. */
+function teardownActiveRequest(): void {
+  cleanupExternalAbort()
   controller?.abort()
   controller = null
-  cleanupExternalAbort()
+}
 
-  req.resolve({ action, value })
+function finish(action: DialogCloseAction, value?: unknown, request?: DialogRequest): void {
+  // Заявку берём аргументом, если вызывающий её уже держит: между началом
+  // асинхронного `onConfirm` и его концом голова очереди могла смениться, и
+  // завершать тогда надо свою заявку, а не чужую.
+  const req = request ?? active.value
+  if (!req) return
 
-  // Снимаем «голову» очереди на следующем тике — watch откроет следующий диалог.
-  void nextTick(() => {
-    const index = dialogQueue.findIndex(item => item.id === req.id)
-    if (index >= 0) dialogQueue.splice(index, 1)
-  })
+  // Снятие головы откладываем на тик: окно должно успеть закрыться до того,
+  // как в панели окажется следующий диалог.
+  if (!settleDialogRequest(req, { action, value }, { removeFromQueue: false }))
+    return
+
+  open.value = false
+  void nextTick(() => removeDialogRequest(req))
 }
 
 function buildContext(req: DialogRequest, value: unknown): DialogConfirmContext<any> & { _errorSet: () => boolean } {
@@ -169,24 +203,29 @@ function buildContext(req: DialogRequest, value: unknown): DialogConfirmContext<
   }
 
   const setFieldError = (field: string, message: string | null): void => {
+    const next = { ...fieldErrors.value }
     if (message == null) {
-      fieldError.value = null
+      delete next[field]
+      fieldErrors.value = next
       return
     }
     errorSet = true
-    fieldError.value = message
+    next[field] = message
+    fieldErrors.value = next
   }
 
   const clearErrors = (): void => {
     currentError.value = null
-    fieldError.value = null
+    fieldErrors.value = {}
   }
 
   const setRawError = async (raw: unknown, meta?: Record<string, unknown>): Promise<ResponseErrorInfo | null> => {
     const info = await buildClassifier(req)(raw, meta)
-    if (req.kind === 'prompt' && info.fieldErrors?.length) {
-      const match = info.fieldErrors.find(f => f.field === 'value') ?? info.fieldErrors[0]
-      fieldError.value = match.messages.join(' ')
+    if (info.fieldErrors?.length) {
+      const next = { ...fieldErrors.value }
+      for (const entry of info.fieldErrors)
+        next[entry.field] = entry.messages.join(' ')
+      fieldErrors.value = next
     }
     currentError.value = info
     errorSet = true
@@ -201,7 +240,7 @@ function buildContext(req: DialogRequest, value: unknown): DialogConfirmContext<
     setFieldError,
     clearErrors,
     setLoading: (v: boolean) => { loading.value = v },
-    close: (action: DialogCloseAction = 'close') => finish(action),
+    close: (action: DialogCloseAction = 'close') => finish(action, undefined, req),
     _errorSet: () => errorSet,
   }
 }
@@ -213,27 +252,30 @@ async function handleConfirm(): Promise<void> {
   const value = req.kind === 'prompt' ? promptValue.value : undefined
 
   if (!req.onConfirm) {
-    finish('confirm', value)
+    finish('confirm', value, req)
     return
   }
 
   currentError.value = null
-  fieldError.value = null
+  fieldErrors.value = {}
   loading.value = true
 
   const ctx = buildContext(req, value)
 
   try {
     const result = await req.onConfirm(ctx)
+    // Сначала проверка «диалог ещё мой», потом запись состояния: за время
+    // `await` заявку мог завершить `ctx.close()` или `closeAll()`, и тогда
+    // `loading` уехал бы уже в состояние следующего диалога.
+    if (req.settled) return
     loading.value = false
-    if (finishing) return // ctx.close уже завершил диалог
     if (result === false) return // оставить открытым без ошибки
-    if (currentError.value || fieldError.value || ctx._errorSet()) return // есть ошибка — не закрывать
-    finish('confirm', value)
+    if (currentError.value || hasFieldError.value || ctx._errorSet()) return // есть ошибка — не закрывать
+    finish('confirm', value, req)
   }
   catch (error) {
+    if (req.settled) return
     loading.value = false
-    if (finishing) return
     if (!ctx._errorSet()) await ctx.setRawError(error)
     // оставить диалог открытым с показанной ошибкой
   }
@@ -247,10 +289,7 @@ function handleModelUpdate(value: boolean): void {
   if (!value) finish('close')
 }
 
-onBeforeUnmount(() => {
-  cleanupExternalAbort()
-  controller?.abort()
-})
+onBeforeUnmount(teardownActiveRequest)
 
 // Прокидываемые в дочерний диалог общие пропы.
 const sharedProps = computed(() => {
@@ -258,8 +297,11 @@ const sharedProps = computed(() => {
   return {
     title: o.title,
     size: o.size,
-    closeOnBackdrop: o.closeOnBackdrop,
-    closeOnEsc: o.closeOnEsc,
+    // Пока `onConfirm` в полёте, «мягкие» способы закрытия отключены: Esc или
+    // клик мимо окна оборвали бы операцию случайным движением. Кнопка закрытия
+    // в шапке остаётся — из окна с зависшим запросом должен быть явный выход.
+    closeOnBackdrop: loading.value ? false : o.closeOnBackdrop,
+    closeOnEsc: loading.value ? false : o.closeOnEsc,
     showHeader: o.showHeader,
     showCloseButton: o.showCloseButton,
     headerConfig: o.headerConfig,
@@ -289,7 +331,7 @@ const sharedProps = computed(() => {
       :required-error-text="(active.options as any).requiredErrorText"
       :cancel-text="(active.options as any).cancelText"
       :error="currentError"
-      :field-error="fieldError"
+      :field-error="promptFieldError"
       :confirm-loading="loading"
       :close-on-confirm="false"
       @update:model-value="handleModelUpdate"
@@ -319,7 +361,7 @@ const sharedProps = computed(() => {
             :loading="loading"
             @click="handleConfirm"
           >
-            {{ sharedProps.confirmText ?? 'OK' }}
+            {{ sharedProps.confirmText ?? alertConfirmText }}
           </GrButton>
         </div>
       </template>

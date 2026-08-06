@@ -65,7 +65,8 @@
       "title": "Aviso",
       "label": "Valor",
       "required": "Introduzca un valor."
-    }
+    },
+    "ok": "OK"
   },
   "pagination": {
     "label": "Paginación",

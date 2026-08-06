@@ -22,6 +22,13 @@ export interface DialogRequest {
   message: string
   options: DialogBaseOptions
   onConfirm?: DialogOnConfirm<any>
+  /**
+   * Заявка уже завершена. Флаг живёт на самой заявке, а не на хосте: завершить
+   * её могут трое (кнопка в хосте, `close()` промиса, `closeAll()`), и общее
+   * состояние на хосте означало бы, что второй и третий путь про первый не
+   * знают.
+   */
+  settled: boolean
   /** Резолвит промис вызова детальным результатом `{ action, value }`. */
   resolve: (result: DialogResult<any>) => void
   /**
@@ -53,4 +60,37 @@ let counter = 0
 export function makeDialogId(): string {
   counter += 1
   return `gr-dialog-${Date.now()}-${counter}`
+}
+
+/**
+ * Единственный способ завершить заявку: идемпотентно резолвит промис и снимает
+ * её из очереди.
+ *
+ * `removeFromQueue: false` нужен хосту: он гасит окно и даёт анимации
+ * закрытия доиграть, прежде чем голова сменится, — иначе текст следующего
+ * диалога подменился бы прямо в закрывающейся панели. Корректность от этой
+ * отсрочки не зависит: повторное завершение отсекается флагом на заявке.
+ */
+export function settleDialogRequest(
+  request: DialogRequest,
+  result: DialogResult<any>,
+  { removeFromQueue = true }: { removeFromQueue?: boolean } = {},
+): boolean {
+  if (request.settled)
+    return false
+
+  request.settled = true
+  request.resolve(result)
+
+  if (removeFromQueue)
+    removeDialogRequest(request)
+
+  return true
+}
+
+/** Снимает заявку из очереди, если она ещё там. */
+export function removeDialogRequest(request: DialogRequest): void {
+  const index = dialogQueue.findIndex(item => item.id === request.id)
+  if (index >= 0)
+    dialogQueue.splice(index, 1)
 }

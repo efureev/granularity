@@ -14,7 +14,7 @@ vi.mock('@headlessui/vue', async () => {
   }
 })
 
-const { useDialogService, teardownDialogService } = await import('../useDialogService')
+const { dialogService, useDialogService, teardownDialogService } = await import('../useDialogService')
 const GrConfigProvider = (await import('../../GrConfigProvider/GrConfigProvider.vue')).default
 const { GRANULARITY_I18N_KEY } = await import('../../../i18n/adapter')
 
@@ -27,6 +27,21 @@ async function flush(times = 6): Promise<void> {
 
 function confirmButton(): HTMLElement | null {
   return document.querySelector('[data-testid="gr-confirm-confirm"]')
+}
+
+/**
+ * Клик по кнопке диалога с обязательным тиком таймера перед ним — см.
+ * подробное объяснение в `useDialogService.test.ts`: Vue гасит обработчик,
+ * инвокер которого прикреплён в ту же миллисекунду, что и событие, а в jsdom
+ * «открыли → отрисовали → кликнули» укладывается в одну миллисекунду.
+ */
+async function clickConfirm(): Promise<void> {
+  const button = confirmButton()
+  if (!button)
+    throw new Error('[test] кнопка подтверждения не найдена')
+
+  await new Promise(resolve => setTimeout(resolve, 2))
+  button.click()
 }
 
 /** Класс высоты кнопки — по нему видно применённый размер. */
@@ -91,7 +106,7 @@ describe('GrDialogService: мост конфига', () => {
     await flush()
     expect(confirmSizeClass()).toContain('h-11')
 
-    confirmButton()!.click()
+    await clickConfirm()
     await flush()
 
     void service.value!.confirm('Delete?', { buttonSize: 'xs' })
@@ -109,7 +124,7 @@ describe('GrDialogService: мост конфига', () => {
     await flush()
     expect(confirmSizeClass()).toContain('h-8')
 
-    confirmButton()!.click()
+    await clickConfirm()
     await flush()
 
     void second.service.value!.confirm('Second?')
@@ -188,5 +203,32 @@ describe('GrDialogService: изоляция между приложениями'
     await flush()
 
     expect(confirmButton()?.textContent).not.toContain('ИЗ-ПЕРВОГО')
+  })
+})
+
+describe('GrDialogService: готовый синглтон', () => {
+  it('подхватывает контекст, захваченный вызовом из setup', async () => {
+    const adapter = { t: (key: string) => (key === 'gr.common.confirm' ? 'ИЗ-ПРОВАЙДЕРА' : key) }
+
+    // Синглтон создаётся на импорте модуля, вне `setup`, — своего контекста у
+    // него нет и быть не может. Раньше это значило «всегда английские строки».
+    mountCaller({ i18n: adapter, size: 'lg' })
+
+    void dialogService.confirm('Delete?')
+    await flush()
+
+    expect(confirmButton()?.textContent).toContain('ИЗ-ПРОВАЙДЕРА')
+    expect(confirmSizeClass()).toContain('h-11')
+  })
+
+  it('без единого вызова из setup ругается в dev и работает на дефолтах', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    void dialogService.confirm('Delete?')
+    await flush()
+
+    expect(warn).toHaveBeenCalledOnce()
+    expect(String(warn.mock.calls[0][0])).toContain('без контекста приложения')
+    warn.mockRestore()
   })
 })

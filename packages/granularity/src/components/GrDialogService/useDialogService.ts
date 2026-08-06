@@ -4,7 +4,7 @@ import type { AppContext, Raw } from 'vue'
 import GrDialogServiceHost from './GrDialogServiceHost.vue'
 import { useGrConfig, type GrConfigContext } from '../GrConfigProvider/context'
 import { resolveGranularityI18n, type GranularityI18nLike } from '../../internal/granularityI18n'
-import { dialogQueue, makeDialogId } from './store'
+import { dialogQueue, makeDialogId, settleDialogRequest } from './store'
 import type { DialogRequest } from './store'
 import type {
   DialogAlertOptions,
@@ -50,6 +50,40 @@ function ensureMounted(appContext?: AppContext | null): void {
   mounted = true
 }
 
+/** Контекст, захваченный вызовом `useDialogService()` внутри `setup`. */
+type CapturedContext = {
+  config: Raw<GrConfigContext> | null
+  i18n: Raw<GranularityI18nLike> | null
+}
+
+/**
+ * Последний контекст, захваченный вызовом `useDialogService()` из `setup`.
+ *
+ * Нужен готовому синглтону `dialogService`: он создаётся на импорте модуля, где
+ * `inject` не работает, и своего конфига с i18n не имеет никогда. Без этого
+ * фолбэка «удобный вариант» из доки всегда открывал бы диалоги с английскими
+ * строками и дефолтным размером — молча, без единой ошибки.
+ *
+ * Эвристика честная ровно настолько, насколько может быть честным контекст «из
+ * ниоткуда»: при двух поддеревьях с разными провайдерами возьмётся последнее.
+ * Точный ответ даёт `useDialogService()` в `setup` или явный `setAppContext`.
+ */
+let lastCapturedContext: CapturedContext | null = null
+
+let contextlessWarned = false
+
+function warnIfContextless(context: CapturedContext | null): void {
+  if (contextlessWarned || context?.config || context?.i18n) return
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return
+
+  contextlessWarned = true
+  console.warn(
+    '[granularity] useDialogService: диалог открыт без контекста приложения — '
+    + 'ни `GrConfigProvider`, ни адаптер i18n не найдены, будут использованы дефолты. '
+    + 'Вызовите `useDialogService()` внутри `setup` хотя бы один раз или передайте `setAppContext`.',
+  )
+}
+
 /** Тестовая/служебная очистка смонтированного хоста. */
 export function teardownDialogService(): void {
   if (container) {
@@ -62,13 +96,9 @@ export function teardownDialogService(): void {
   // протекает в следующее приложение (в тестах — в следующий тест), из-за чего
   // диалог может подхватить чужие provides и проверка соврёт.
   cachedAppContext = null
+  lastCapturedContext = null
+  contextlessWarned = false
   dialogQueue.splice(0, dialogQueue.length)
-}
-
-/** Контекст, захваченный вызовом `useDialogService()` внутри `setup`. */
-type CapturedContext = {
-  config: Raw<GrConfigContext> | null
-  i18n: Raw<GranularityI18nLike> | null
 }
 
 function enqueue(
@@ -96,24 +126,31 @@ function enqueue(
     resolveFn = resolve
   })
 
+  // Синглтон `dialogService` создаётся на импорте модуля, вне `setup`, и своего
+  // контекста не имеет в принципе. Берём последний захваченный — иначе такие
+  // вызовы навсегда остаются без i18n и без `GrConfigProvider`.
+  const context = captured.config || captured.i18n ? captured : lastCapturedContext
+  warnIfContextless(context)
+
   const request: DialogRequest = {
     id,
     kind,
     message,
     options: { ...options, message },
     onConfirm,
+    settled: false,
     resolve: resolveFn,
-    config: captured.config,
-    i18n: captured.i18n,
+    config: context?.config ?? null,
+    i18n: context?.i18n ?? null,
   }
 
   dialogQueue.push(request)
 
+  // Закрытие через промис идёт тем же путём, что и кнопка в хосте: заявка сама
+  // знает, завершена ли она, а хост по смене головы очереди свернёт всё, что
+  // под неё заведено (в т.ч. оборвёт in-flight `onConfirm` через `abort()`).
   const close = (): void => {
-    const index = dialogQueue.findIndex(item => item.id === id)
-    if (index < 0) return
-    dialogQueue.splice(index, 1)
-    resolveFn({ action: 'close' })
+    settleDialogRequest(request, { action: 'close' })
   }
 
   return { promise, close }
@@ -128,12 +165,13 @@ function withClose<T>(promise: Promise<T>, close: () => void): DialogPromise<T> 
 function mergeErrorDefaults(
   defaults: DialogServiceDefaults,
   options: DialogBaseOptions,
-): DialogBaseOptions {
+): DialogBaseOptions & Pick<DialogConfirmOptions, 'cancelText'> {
   return {
     size: defaults.size,
     confirmText: defaults.confirmText,
     confirmVariant: defaults.confirmVariant,
     confirmTone: defaults.confirmTone,
+    cancelText: defaults.cancelText,
     buttonSize: defaults.buttonSize,
     closeOnBackdrop: defaults.closeOnBackdrop,
     closeOnEsc: defaults.closeOnEsc,
@@ -177,6 +215,9 @@ export function useDialogService(defaults: DialogServiceDefaults = {}): DialogSe
     i18n: capturedI18n ? markRaw(capturedI18n) : null,
   }
 
+  if (captured.config || captured.i18n)
+    lastCapturedContext = captured
+
   function confirm(message: string, options: DialogConfirmOptions = {}): DialogPromise<boolean> {
     const merged = mergeErrorDefaults(defaults, options)
     const { promise, close } = enqueue('confirm', message, merged, options.onConfirm, captured)
@@ -208,11 +249,11 @@ export function useDialogService(defaults: DialogServiceDefaults = {}): DialogSe
     return withClose(promise as Promise<DialogResult<V>>, close)
   }
 
+  // Порядок разбора — FIFO, как и порядок показа: `pop()` резолвил промисы
+  // задом наперёд, и вызывающий получал результаты в обратном порядке.
   function closeAll(): void {
-    while (dialogQueue.length > 0) {
-      const request = dialogQueue.pop()!
-      request.resolve({ action: 'close' })
-    }
+    for (const request of [...dialogQueue])
+      settleDialogRequest(request, { action: 'close' })
   }
 
   function setAppContext(ctx: AppContext | null): void {

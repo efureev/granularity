@@ -64,7 +64,8 @@
       "title": "Prompt",
       "label": "Value",
       "required": "Enter a value."
-    }
+    },
+    "ok": "OK"
   },
   "pagination": {
     "label": "Pagination",
