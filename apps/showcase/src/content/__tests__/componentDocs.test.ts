@@ -338,7 +338,7 @@ describe('component docs metadata', () => {
     expect(dropdownMenuDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownMenuDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown-menu'))).toBe(true)
 
-    expect(iconDoc.examples).toHaveLength(3)
+    expect(iconDoc.examples).toHaveLength(4)
     expect(iconDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(iconDoc.examples.every(example => example.previewKey?.startsWith('gr-icon'))).toBe(true)
 

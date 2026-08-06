@@ -74,6 +74,20 @@
   --gr-bp-xl: 1280px;
   --gr-bp-2xl: 1536px;
 
+  /*
+   * Iconography: icon sizes
+   *
+   * Шкала размеров иконки (`GrIcon`). Значения совпадают со шкалой контролов
+   * (`xs…lg`) и живут токенами, а не литералами в компоненте: иконка обязана
+   * масштабироваться вместе с темой, а не вместе с пересборкой пакета.
+   * Произвольный размер задаётся числом прямо на компоненте — это escape-hatch,
+   * а не часть шкалы.
+   */
+  --gr-icon-size-xs: 14px;
+  --gr-icon-size-sm: 16px;
+  --gr-icon-size-md: 18px;
+  --gr-icon-size-lg: 20px;
+
   /* Shapes: radii and compatibility aliases */
   --radius: 0.5rem;
   --gr-radius-none: 0px;

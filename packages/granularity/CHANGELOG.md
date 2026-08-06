@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrIcon`: `label`, `tone`, `spin` and size tokens.** A meaningful icon no longer needs hand-written ARIA — `label`
+  turns it into `role="img"` with a name; `tone` paints it with the palette's **text** roles (a saturated tone as text
+  colour is forbidden in this package — contrast drops to about 2:1), and `spin` covers spinners. The size scale moved
+  from px literals in the component to `--gr-icon-size-xs…lg` tokens, so icons now scale with the theme rather than
+  with a rebuild. The component also got its own page, `docs/components/GrIcon.md`.
 - **`GrForm`: whole-form `disabled`, dirty/valid state and async-rule feedback.** `disabled` travels through the
   field context down to the controls, so «switch the form off while submitting» no longer means walking the controls
   by hand — and every control that reads `useGrFormControl` now honours the resolved value instead of only its own
@@ -539,6 +544,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **BREAKING. `GrIcon` is decorative by default.** It now sets `aria-hidden="true"` itself and drops it only when
+  `label` is given. Previously the semantics were left entirely to the caller, and the attribute was written by hand in
+  22 places inside the library — forgetting it once is enough for a screen reader to announce the `<title>` baked into
+  an SVG. Those redundant attributes were removed; a caller that needs the old behaviour can still pass
+  `aria-hidden="false"`, since a fallthrough attribute wins over the component's own binding.
 - **BREAKING. `GrDropdown`/`GrDropdownMenu`: `align` → `placement`, `width` — CSS-длина.** Вместо трёх
   вариантов «только снизу» — любое размещение floating-ui плюс `offset`; переворот при нехватке места
   работал и раньше. `width` перестал быть строкой tailwind-шкалы (`width="48"` → `w-48`) и принимает

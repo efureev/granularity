@@ -9,23 +9,21 @@ import GrIcon from '../GrIcon.vue'
  * проверяет именно переменную — класс тут ничего не решает.
  */
 describe('GrIcon', () => {
-  it('ставит --gr-icon-size из шкалы размеров', () => {
-    const sizes: [size: 'sm' | 'md' | 'lg', px: string][] = [
-      ['sm', '16px'],
-      ['md', '18px'],
-      ['lg', '20px'],
-    ]
+  it('ставит --gr-icon-size токеном шкалы, а не числом', () => {
+    // Значения живут в `tokens/foundation.json`: иконка обязана масштабироваться
+    // вместе с темой, а не вместе с пересборкой пакета.
+    const sizes: ('xs' | 'sm' | 'md' | 'lg')[] = ['xs', 'sm', 'md', 'lg']
 
-    for (const [size, px] of sizes) {
+    for (const size of sizes) {
       const wrapper = mount(GrIcon, { props: { size }, slots: { default: '<svg />' } })
-      expect(wrapper.attributes('style'), size).toContain(`--gr-icon-size: ${px}`)
+      expect(wrapper.attributes('style'), size).toContain(`--gr-icon-size: var(--gr-icon-size-${size})`)
     }
   })
 
   it('по умолчанию — md', () => {
     const wrapper = mount(GrIcon, { slots: { default: '<svg />' } })
 
-    expect(wrapper.attributes('style')).toContain('--gr-icon-size: 18px')
+    expect(wrapper.attributes('style')).toContain('--gr-icon-size: var(--gr-icon-size-md)')
   })
 
   it('числовой размер принимается как пиксели', () => {
@@ -40,21 +38,50 @@ describe('GrIcon', () => {
     expect(wrapper.find('[data-testid="glyph"]').exists()).toBe(true)
   })
 
-  it('роли не выдумывает — семантику задаёт потребитель', () => {
-    // Иконка бывает и значимой, и декоративной; навязанный `aria-hidden`
-    // или `role="img"` ломал бы одну из этих ролей.
+  it('без `label` иконка декоративна: скрыта от AT и без роли', () => {
+    // Решение развёрнуто осознанно. Раньше семантику полностью оставляли
+    // потребителю, и `aria-hidden` ставился руками в шести местах библиотеки:
+    // достаточно забыть один раз, чтобы диктор прочитал `<title>` из SVG.
+    // Безопасный дефолт — скрытая иконка, а значимой её делает `label`.
     const wrapper = mount(GrIcon, { slots: { default: '<svg />' } })
 
+    expect(wrapper.attributes('aria-hidden')).toBe('true')
     expect(wrapper.attributes('role')).toBeUndefined()
+  })
+
+  it('`label` делает иконку значимой: роль, имя и никакого скрытия', () => {
+    const wrapper = mount(GrIcon, { props: { label: 'Избранное' }, slots: { default: '<svg />' } })
+
+    expect(wrapper.attributes('role')).toBe('img')
+    expect(wrapper.attributes('aria-label')).toBe('Избранное')
     expect(wrapper.attributes('aria-hidden')).toBeUndefined()
   })
 
-  it('пробрасывает aria-hidden от потребителя', () => {
+  it('tone красит иконку токеном текста, `current` наследует цвет', () => {
+    const toned = mount(GrIcon, { props: { tone: 'danger' }, slots: { default: '<svg />' } })
+    expect(toned.classes()).toContain('text-[var(--gr-danger-text)]')
+
+    // Насыщенный тон как цвет текста запрещён правилами пакета — только `-text`.
+    expect(toned.classes()).not.toContain('text-[var(--gr-danger)]')
+
+    const inherited = mount(GrIcon, { slots: { default: '<svg />' } })
+    expect(inherited.classes().some(name => name.startsWith('text-['))).toBe(false)
+  })
+
+  it('spin включает вращение', () => {
+    expect(mount(GrIcon, { props: { spin: true }, slots: { default: '<svg />' } }).classes())
+      .toContain('animate-spin')
+    expect(mount(GrIcon, { slots: { default: '<svg />' } }).classes()).not.toContain('animate-spin')
+  })
+
+  it('потребитель может переопределить скрытие', () => {
+    // Fallthrough-атрибут сильнее собственной привязки: редкий случай «иконка
+    // значима, но имя даёт соседний элемент» остаётся выразимым.
     const wrapper = mount(GrIcon, {
-      attrs: { 'aria-hidden': 'true' },
+      attrs: { 'aria-hidden': 'false' },
       slots: { default: '<svg />' },
     })
 
-    expect(wrapper.attributes('aria-hidden')).toBe('true')
+    expect(wrapper.attributes('aria-hidden')).toBe('false')
   })
 })

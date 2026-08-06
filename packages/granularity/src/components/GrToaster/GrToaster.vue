@@ -233,7 +233,7 @@ defineExpose({ focus })
             class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)] focus-visible:outline-none focus-visible:shadow-[var(--gr-shadow-2),0_0_0_2px_var(--gr-ring)]"
         >
           <div class="flex items-start gap-3">
-            <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }" aria-hidden="true">
+            <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }">
               <component :is="metaFor(toast.tone).icon" />
             </GrIcon>
             <div class="min-w-0 flex-1">
@@ -268,7 +268,7 @@ defineExpose({ focus })
                 :aria-label="resolvedDismissLabel"
                 @click="dismiss(toast.id)"
             >
-              <GrIcon size="sm" aria-hidden="true">
+              <GrIcon size="sm">
                 <IconClose />
               </GrIcon>
             </GrButton>

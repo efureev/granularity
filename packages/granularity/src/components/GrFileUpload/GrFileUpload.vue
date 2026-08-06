@@ -970,7 +970,7 @@ defineExpose({
                 :aria-label="t('gr.fileUpload.abortFile', 'Cancel upload of {fileName}', { fileName: file.name })"
                 @click.stop="abortFile(file)"
               >
-                <GrIcon :size="iconGlyphSize" aria-hidden="true">
+                <GrIcon :size="iconGlyphSize">
                   <IconClose />
                 </GrIcon>
               </button>
@@ -995,7 +995,7 @@ defineExpose({
               :aria-label="t('gr.fileUpload.remove', 'Remove {fileName}', { fileName: file.name })"
               @click.stop="removeFile(file)"
             >
-              <GrIcon :size="iconGlyphSize" aria-hidden="true">
+              <GrIcon :size="iconGlyphSize">
                 <IconClose />
               </GrIcon>
             </button>

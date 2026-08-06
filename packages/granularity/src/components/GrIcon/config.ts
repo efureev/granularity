@@ -1,5 +1,8 @@
-import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+
+import { grIconSafelist } from './safelist'
 
 export const grIconConfig = defineGranularComponent(import.meta.url, {
-    name: 'GrIcon',
+  name: 'GrIcon',
+  safelist: grIconSafelist,
 })

@@ -569,7 +569,7 @@ onBeforeUnmount(() => {
                     :class="chromeButtonClass"
                     @click="closeViewer"
                   >
-                    <GrIcon size="md" aria-hidden="true">
+                    <GrIcon size="md">
                       <IconX />
                     </GrIcon>
                   </button>
@@ -589,7 +589,7 @@ onBeforeUnmount(() => {
                   :class="chromeButtonClass"
                   @click="prev"
                 >
-                  <GrIcon size="lg" aria-hidden="true">
+                  <GrIcon size="lg">
                     <IconChevronLeft />
                   </GrIcon>
                 </button>
@@ -603,7 +603,7 @@ onBeforeUnmount(() => {
                   :class="chromeButtonClass"
                   @click="next"
                 >
-                  <GrIcon size="lg" aria-hidden="true">
+                  <GrIcon size="lg">
                     <IconChevronRight />
                   </GrIcon>
                 </button>
@@ -650,7 +650,7 @@ onBeforeUnmount(() => {
                         :class="toolbarButtonClass"
                         @click="zoomOut"
                       >
-                        <GrIcon size="sm" aria-hidden="true">
+                        <GrIcon size="sm">
                           <IconMinus />
                         </GrIcon>
                       </button>
@@ -674,7 +674,7 @@ onBeforeUnmount(() => {
                         :class="toolbarButtonClass"
                         @click="zoomIn"
                       >
-                        <GrIcon size="sm" aria-hidden="true">
+                        <GrIcon size="sm">
                           <IconPlus />
                         </GrIcon>
                       </button>
@@ -700,7 +700,7 @@ onBeforeUnmount(() => {
                         :class="toolbarButtonClass"
                         @click="rotateLeft"
                       >
-                        <GrIcon size="sm" aria-hidden="true">
+                        <GrIcon size="sm">
                           <IconRotateCcw />
                         </GrIcon>
                       </button>
@@ -713,7 +713,7 @@ onBeforeUnmount(() => {
                         :class="toolbarButtonClass"
                         @click="rotateRight"
                       >
-                        <GrIcon size="sm" aria-hidden="true">
+                        <GrIcon size="sm">
                           <IconRotateCw />
                         </GrIcon>
                       </button>

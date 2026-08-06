@@ -182,7 +182,7 @@ const colorStyle = computed(() => grLinkColorStyle({
   >
     <slot />
 
-    <GrIcon v-if="showExternalIcon" :size="iconSize" aria-hidden="true">
+    <GrIcon v-if="showExternalIcon" :size="iconSize">
       <IconExternal />
     </GrIcon>
 

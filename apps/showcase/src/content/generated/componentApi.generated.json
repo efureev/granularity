@@ -3549,10 +3549,32 @@
         "origin": "generated",
         "items": [
           {
+            "name": "tone",
+            "description": "Цвет из палитры. `current` — наследовать цвет текста родителя.",
+            "type": "GrIconTone | undefined",
+            "required": false,
+            "default": "\"current\""
+          },
+          {
             "name": "size",
-            "description": "",
+            "description": "Размер по шкале пакета либо произвольный в пикселях.",
             "type": "number | \"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
-            "required": false
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "label",
+            "description": "Имя значимой иконки. Задан — иконка объявляется `role=\"img\"` и перестаёт быть скрытой. Не задан — иконка декоративна.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "spin",
+            "description": "Вращение — для спиннеров.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },

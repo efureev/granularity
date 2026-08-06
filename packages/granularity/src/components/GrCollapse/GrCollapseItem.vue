@@ -182,7 +182,7 @@ function onKeydown(event: KeyboardEvent): void {
           <GrIcon
             v-if="iconAtStart"
             :size="chevronSize"
-            aria-hidden="true"
+           
             data-gr-collapse-chevron
             :class="chevronClassName"
           >
@@ -202,7 +202,7 @@ function onKeydown(event: KeyboardEvent): void {
           <GrIcon
             v-if="!iconAtStart"
             :size="chevronSize"
-            aria-hidden="true"
+           
             data-gr-collapse-chevron
             :class="chevronClassName"
           >

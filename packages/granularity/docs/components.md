@@ -50,7 +50,7 @@
 - [`GrFormField`](./components/GrFormField.md)
 - [`GrFormFile`](./components/GrFormFile.md)
 - `GrFormSection`
-- `GrIcon`
+- [`GrIcon`](./components/GrIcon.md)
 - [`GrImageViewer`](./components/GrImageViewer.md)
 - [`GrInput`](./components/GrInput.md)
 - [`GrInputTag`](./components/GrInputTag.md)

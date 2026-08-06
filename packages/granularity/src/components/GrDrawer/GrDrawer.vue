@@ -310,7 +310,7 @@ defineExpose({
                   :aria-label="resolvedCloseLabel"
                   @click="close"
                 >
-                  <GrIcon size="sm" aria-hidden="true">
+                  <GrIcon size="sm">
                     <IconClose />
                   </GrIcon>
                 </GrButton>

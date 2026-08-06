@@ -1,25 +1,39 @@
 <script setup lang="ts">
-import type { GrComponentSize } from '../shared/sizes'
-import {computed} from 'vue'
+import { computed } from 'vue'
+
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import {
+  grIconToneClass,
+  iconBaseClass,
+  iconSizeVarBySize,
+  iconSpinClass,
+  type GrIconSize,
+  type GrIconTone,
+} from './grIconStyles'
 
-export type GrIconSize = GrComponentSize
+export type { GrIconSize, GrIconTone } from './grIconStyles'
 
-const GR_ICON_SIZE_MAP: Record<GrIconSize, number> = {
-  xs: 14,
-  sm: 16,
-  md: 18,
-  lg: 20,
-}
-
-function resolveGrIconSizePx(size: GrIconSize | number): number {
-  if (typeof size === 'number') return size
-  return GR_ICON_SIZE_MAP[size]
-}
-
-const props = defineProps<{
-  size?: GrIconSize | number
-}>()
+const props = withDefaults(
+  defineProps<{
+    /** Размер по шкале пакета либо произвольный в пикселях. */
+    size?: GrIconSize | number
+    /**
+     * Имя значимой иконки. Задан — иконка объявляется `role="img"` и перестаёт
+     * быть скрытой. Не задан — иконка декоративна.
+     */
+    label?: string
+    /** Цвет из палитры. `current` — наследовать цвет текста родителя. */
+    tone?: GrIconTone
+    /** Вращение — для спиннеров. */
+    spin?: boolean
+  }>(),
+  {
+    size: undefined,
+    label: undefined,
+    tone: 'current',
+    spin: false,
+  },
+)
 
 // Число — «локальный» escape-hatch мимо конфига; шкала идёт через провайдер.
 const resolvedScaleSize = useGrComponentSize(
@@ -27,33 +41,56 @@ const resolvedScaleSize = useGrComponentSize(
   { component: 'GrIcon' },
 )
 
-const resolvedSize = computed(() => (typeof props.size === 'number' ? props.size : resolvedScaleSize.value))
+const iconStyle = computed(() => ({
+  '--gr-icon-size': typeof props.size === 'number'
+    ? `${props.size}px`
+    : iconSizeVarBySize[resolvedScaleSize.value],
+} as Record<string, string>))
 
-const iconStyle = computed(() => {
-  return {
-    '--gr-icon-size': `${resolveGrIconSizePx(resolvedSize.value)}px`,
-  } as Record<string, string>
-})
+const iconClass = computed(() => [
+  iconBaseClass,
+  grIconToneClass(props.tone),
+  props.spin ? iconSpinClass : '',
+].filter(Boolean))
+
+/**
+ * Иконка декоративна по умолчанию.
+ *
+ * В библиотеке она почти всегда сопровождает текст, и каждое место вызова
+ * ставило `aria-hidden` вручную. Достаточно забыть один раз — и диктор
+ * прочитает `<title>` из SVG вместо ничего. Значимой иконку делает `label`:
+ * тогда у неё появляются роль и имя, а скрытие снимается.
+ *
+ * Переопределить это потребитель по-прежнему может: fallthrough-атрибут
+ * сильнее собственной привязки.
+ */
+const ariaHidden = computed(() => (props.label ? undefined : 'true'))
 </script>
 
 <template>
   <span
-      data-gr-icon
-      class="gr-icon inline-flex items-center justify-center align-middle"
-      :style="iconStyle"
+    data-gr-icon
+    :class="iconClass"
+    :style="iconStyle"
+    :role="label ? 'img' : undefined"
+    :aria-label="label"
+    :aria-hidden="ariaHidden"
   >
     <slot />
   </span>
 </template>
+
 <style>
 /*
- * GrIcon.
+ * Стиль намеренно глобальный, а не scoped: иконка приходит слотом (SVG
+ * потребителя), и scoped-правило до него не достаёт — пришлось бы писать
+ * `:deep` в каждом месте вызова.
  *
- * This must be global because icons are usually passed via slots (SVG),
- * and we want consistent sizing without relying on SFC scoped + :deep.
+ * Размер живёт в одной переменной: и обёртка, и вложенный SVG считают себя от
+ * неё, поэтому шкала настраивается темой, а не пропами разметки.
  */
 :where(.gr-icon) {
-  --gr-icon-size: 18px;
+  --gr-icon-size: var(--gr-icon-size-md, 18px);
   width: var(--gr-icon-size);
   min-width: var(--gr-icon-size);
   height: var(--gr-icon-size);

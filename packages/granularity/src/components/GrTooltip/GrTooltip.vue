@@ -222,7 +222,7 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
       @touchstart.passive="onTouch"
     >
       <slot>
-        <GrIcon :size="triggerIconSize" aria-hidden="true">
+        <GrIcon :size="triggerIconSize">
           <IconInfo />
         </GrIcon>
       </slot>

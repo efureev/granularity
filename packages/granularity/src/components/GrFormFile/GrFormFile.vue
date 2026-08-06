@@ -372,7 +372,7 @@ watch(
           :disabled="isDisabled"
           @click.prevent="openDialog"
         >
-          <GrIcon :size="iconSize" aria-hidden="true">
+          <GrIcon :size="iconSize">
             <IconUpload />
           </GrIcon>
           <span :class="iconOffsetClass">{{ hasFiles ? resolvedChangeText : resolvedUploadText }}</span>
@@ -386,7 +386,7 @@ watch(
           :disabled="isDisabled"
           @click.prevent="clearAll"
         >
-          <GrIcon :size="iconSize" aria-hidden="true">
+          <GrIcon :size="iconSize">
             <IconX />
           </GrIcon>
           <span :class="iconOffsetClass">{{ resolvedRemoveText }}</span>
@@ -400,7 +400,7 @@ watch(
           :disabled="isDisabled"
           @click.prevent="clearAll"
         >
-          <GrIcon :size="iconSize" aria-hidden="true">
+          <GrIcon :size="iconSize">
             <IconX />
           </GrIcon>
           <span :class="iconOffsetClass">{{ resolvedClearAllText }}</span>

@@ -339,6 +339,30 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Foundation breakpoint `2xl` для адаптивных layout-решений."
   },
   {
+    "name": "--gr-icon-size-xs",
+    "value": "14px",
+    "section": "Iconography: icon sizes",
+    "description": "Размер иконки `xs` — рядом с текстом `xs`/`sm`."
+  },
+  {
+    "name": "--gr-icon-size-sm",
+    "value": "16px",
+    "section": "Iconography: icon sizes",
+    "description": "Размер иконки `sm` — в компактных кнопках и строках списка."
+  },
+  {
+    "name": "--gr-icon-size-md",
+    "value": "18px",
+    "section": "Iconography: icon sizes",
+    "description": "Размер иконки `md` — значение по умолчанию."
+  },
+  {
+    "name": "--gr-icon-size-lg",
+    "value": "20px",
+    "section": "Iconography: icon sizes",
+    "description": "Размер иконки `lg` — в крупных кнопках и заголовках."
+  },
+  {
     "name": "--radius",
     "value": "0.5rem",
     "section": "Shapes: radii and compatibility aliases",

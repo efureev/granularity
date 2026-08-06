@@ -122,7 +122,7 @@ const resolvedToggleLabel = computed(() =>
         :aria-expanded="collapsedState ? 'false' : 'true'"
         @click="toggle"
       >
-        <GrIcon :size="16" aria-hidden="true">
+        <GrIcon :size="16">
           <IconChevronRight v-if="collapsedState" />
           <IconChevronLeft v-else />
         </GrIcon>

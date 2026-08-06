@@ -511,7 +511,7 @@ defineExpose({ focus, blur, clear: clearAll })
             @keydown="onTagKeydown($event, i)"
             @click.stop="removeAt(i)"
           >
-            <GrIcon size="sm" aria-hidden="true">
+            <GrIcon size="sm">
               <IconClose />
             </GrIcon>
           </button>
@@ -562,7 +562,7 @@ defineExpose({ focus, blur, clear: clearAll })
       @mousedown.prevent.stop
       @click.stop="clearAll"
     >
-      <GrIcon size="sm" aria-hidden="true">
+      <GrIcon size="sm">
         <IconClose />
       </GrIcon>
     </button>
