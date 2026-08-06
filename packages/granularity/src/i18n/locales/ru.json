@@ -95,6 +95,7 @@
     "serverMessage": "Произошла ошибка на сервере. Попробуйте ещё раз.",
     "unknownTitle": "Что-то пошло не так",
     "unknownMessage": "Не удалось выполнить операцию. Попробуйте ещё раз.",
+    "statusLabel": "HTTP {status}",
     "retryLabel": "Повторить",
     "dismissLabel": "Скрыть"
   },

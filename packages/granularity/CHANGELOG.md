@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrResponseErrorBanner`: the parser pipeline is finally covered by tests.** 17 tests became 85 across four
+  files: a table per parser (input → `kind`/`message`/`status`/`details`/`fieldErrors`/`stop`), transport cases
+  for `normalizeError` (axios, `fetch Response` incl. non-JSON bodies, `XMLHttpRequest`, abort, bare `Error`),
+  the `useResponseError` composable, and the banner itself together with both presets. Two defects surfaced
+  while writing them and are fixed below. The component also got its own page —
+  `docs/components/GrResponseErrorBanner.md` — replacing the two READMEs that lived inside the component folder.
 - **`GrDropdownMenu`: пункты стали пунктами меню, а не списком кнопок.** Roving tabindex (`tabindex="-1"`
   у пунктов, табируем только триггер) — раньше `Tab` ходил по пунктам мимо паттерна menu. Выключенный
   пункт больше не выпадает из обхода стрелками: вместо нативного `disabled` — `aria-disabled`, и
@@ -243,6 +249,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrResponseErrorBanner` silently dropped a server message that matched a default.** Fallback detection
+  compared strings against the built-in English texts, so a server literally answering `"Network error."` lost
+  its message to the translated default. `ResponseErrorInfo` now carries `isFallbackMessage`, set in exactly one
+  place — the classifier, when no parser supplied a message — and the banner substitutes a translation only for
+  such messages. Consequently parsers no longer fill `message` with generic `kind` texts: `httpStatus`, `abort`
+  and `network` return only what they learned, and the specialised ones (Laravel, JSON:API, Problem Details,
+  file validation) fall back to the classifier instead of hardcoding a text the banner could not translate.
+- **A transport error's message was shown as if it came from the server.** With an empty response body,
+  `plainMessageParser` picked up `Error.message` — for axios that is `Request failed with status 500`, so users
+  saw a technical English string instead of the localized text for the `kind`. That source is now used only when
+  there was no response at all (no status, no body).
+- **`useResponseError` wrapped the raw error in a reactive proxy.** `lastRaw` was a deep `ref`, which broke
+  identity comparisons and made a stored `Response` throw on `clone()` when handed back for a retry; it is a
+  `shallowRef` now, like `currentError`.
+- **The HTTP status badge was the last hardcoded string in the component.** It now reads `statusLabel` from the
+  texts (new `gr.responseError.statusLabel` key in all three locales), so it is both translatable and
+  overridable through the `texts` prop.
 - **`GrImageViewer` threw the user back to the first frame and painted over toasts.** Any change to
   `urlList` — a gallery loading its next page — reset the index to `initialIndex` together with zoom
   and rotation; the viewer now holds on to the *frame*, keeping it on screen even when it shifts

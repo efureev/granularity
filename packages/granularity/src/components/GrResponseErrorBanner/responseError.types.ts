@@ -56,6 +56,13 @@ export type ResponseErrorInfo = {
   raw: unknown
   /** Произвольный контекст, переданный потребителем (например, `{ files }`). */
   meta?: Record<string, unknown>
+  /**
+   * `message` не пришёл ни от одного парсера, и классификатор подставил свой
+   * текст по `kind`. Флаг нужен баннеру: только такое сообщение он вправе
+   * заменить переводом. Опознание фолбэка сравнением строк давало ложное
+   * срабатывание на сервере, вернувшем дословно тот же текст.
+   */
+  isFallbackMessage?: boolean
 }
 
 /**
@@ -127,6 +134,8 @@ export type ResponseErrorTexts = {
   serverMessage: string
   unknownTitle: string
   unknownMessage: string
+  /** Подпись бейджа HTTP-статуса. `{status}` подставляется компонентом. */
+  statusLabel: string
   retryLabel: string
   dismissLabel: string
 }

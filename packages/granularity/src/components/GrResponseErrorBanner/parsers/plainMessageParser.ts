@@ -8,7 +8,10 @@ import type { ResponseErrorParser } from '../responseError.types'
  * 1. `ctx.body` — если строка ⇒ message,
  * 2. `ctx.body[messageKey]` (default `'message'`),
  * 3. `ctx.body.error` (строка),
- * 4. `ctx.raw.message` (для голых `Error`).
+ * 4. `ctx.raw.message` — **только когда ответа не было вовсе** (нет ни статуса,
+ *    ни тела). Иначе это строка транспорта (`Request failed with status 500` у
+ *    axios), а не сообщение сервера: пользователь получил бы техническую фразу
+ *    на английском вместо переведённого текста по `kind`.
  *
  * Не выставляет `kind` — оставляет на усмотрение классификатора.
  * Использует ключ `messageKey` из `ctx.meta._messageKey`, если задан.
@@ -27,7 +30,8 @@ export const plainMessageParser: ResponseErrorParser = (ctx) => {
     if (typeof data.error === 'string' && data.error) return { message: data.error }
   }
 
-  if (ctx.raw instanceof Error && ctx.raw.message) {
+  const hadResponse = typeof ctx.status === 'number' || ctx.body != null
+  if (!hadResponse && ctx.raw instanceof Error && ctx.raw.message) {
     return { message: ctx.raw.message }
   }
 

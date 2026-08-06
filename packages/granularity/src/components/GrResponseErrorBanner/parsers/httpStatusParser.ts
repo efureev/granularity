@@ -11,20 +11,22 @@ import type { ResponseErrorParser } from '../responseError.types'
  * Не использует `stop` — даёт более специализированным парсерам
  * (Laravel/JSON:API/RFC 7807) уточнить сообщение и `fieldErrors`.
  *
- * `message` берёт из `ctx.texts` как осмысленный фолбэк.
+ * `message` **не** заполняет: общий текст по `kind` — работа классификатора,
+ * который помечает такое сообщение `isFallbackMessage`. Только по этому флагу
+ * баннер вправе заменить текст переводом.
  */
 export const httpStatusParser: ResponseErrorParser = (ctx) => {
   const status = ctx.status
   if (typeof status !== 'number') return null
 
   if (status >= 500) {
-    return { kind: 'server', status, message: ctx.texts.serverMessage }
+    return { kind: 'server', status }
   }
   if (status === 400 || status === 422) {
-    return { kind: 'validation', status, message: ctx.texts.validationMessage }
+    return { kind: 'validation', status }
   }
   if (status >= 400) {
-    return { kind: 'client', status, message: ctx.texts.clientMessage }
+    return { kind: 'client', status }
   }
   return null
 }

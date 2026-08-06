@@ -131,6 +131,9 @@ export function createResponseErrorClassifier(options: CreateResponseErrorClassi
 
     if (!kind) kind = 'unknown'
 
+    // Ни один парсер не дал сообщения — подставляем своё и помечаем это флагом:
+    // по нему (и только по нему) баннер вправе заменить текст переводом.
+    const isFallbackMessage = !message
     if (!message) message = resolveDefaultMessage(kind, texts)
 
     return {
@@ -141,6 +144,7 @@ export function createResponseErrorClassifier(options: CreateResponseErrorClassi
       fieldErrors,
       raw,
       meta,
+      isFallbackMessage,
     }
   }
 }

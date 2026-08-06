@@ -17,6 +17,7 @@ export const DEFAULT_RESPONSE_ERROR_TEXTS: ResponseErrorTexts = {
   serverMessage: 'A server error occurred. Please try again.',
   unknownTitle: 'Something went wrong',
   unknownMessage: 'The operation could not be completed. Please try again.',
+  statusLabel: 'HTTP {status}',
   retryLabel: 'Retry',
   dismissLabel: 'Dismiss',
 }

@@ -1,4 +1,4 @@
-import { computed, ref, shallowRef } from 'vue'
+import { computed, shallowRef } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 
 import { createResponseErrorClassifier, defaultResponseErrorParsers } from './parsers/createResponseErrorClassifier'
@@ -76,7 +76,10 @@ export type UseResponseErrorReturn = {
  */
 export function useResponseError(options: UseResponseErrorOptions = {}): UseResponseErrorReturn {
   const currentError = shallowRef<ResponseErrorInfo | null>(null)
-  const lastRaw = ref<unknown>(null)
+  // `shallowRef`, а не `ref`: сырая ошибка отдаётся потребителю как есть.
+  // Глубокая реактивность обернула бы её в прокси — сравнение по ссылке
+  // перестало бы работать, а `Response` уронил бы `clone()` на чужом `this`.
+  const lastRaw = shallowRef<unknown>(null)
 
   function getClassifier() {
     return createResponseErrorClassifier({

@@ -68,7 +68,7 @@
 - [`GrRadio`](./components/GrRadio.md)
 - [`GrRadioGroup`](./components/GrRadioGroup.md)
 - `GrRating`
-- `GrResponseErrorBanner`
+- [`GrResponseErrorBanner`](./components/GrResponseErrorBanner.md)
 - `GrSegmented`
 - [`GrSelect`](./components/GrSelect.md)
 - `GrSidebar`

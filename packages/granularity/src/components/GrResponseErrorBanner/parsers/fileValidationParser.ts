@@ -34,7 +34,7 @@ export const fileValidationParser: ResponseErrorParser = (ctx) => {
 
   return {
     kind: 'validation',
-    message: raw.message || ctx.texts.validationMessage,
+    message: raw.message || undefined,
     details: details.length ? details : undefined,
     stop: true,
   }

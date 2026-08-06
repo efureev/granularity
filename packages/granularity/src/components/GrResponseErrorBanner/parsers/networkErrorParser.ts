@@ -16,9 +16,9 @@ export const networkErrorParser: ResponseErrorParser = (ctx) => {
   if (ctx.isAbort) return null
 
   if (ctx.isNetwork) {
+    // Текст по `kind` подставит классификатор — и пометит его фолбэком.
     return {
       kind: 'network',
-      message: ctx.texts.networkMessage,
       stop: true,
     }
   }
@@ -29,7 +29,6 @@ export const networkErrorParser: ResponseErrorParser = (ctx) => {
     if (r.code === 'ERR_NETWORK' || (typeof r.message === 'string' && /network|failed to fetch/i.test(r.message))) {
       return {
         kind: 'network',
-        message: ctx.texts.networkMessage,
         stop: true,
       }
     }

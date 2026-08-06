@@ -123,21 +123,20 @@ const KIND_MESSAGE_KEY: Record<ResponseErrorKind, keyof ResponseErrorTexts> = {
   unknown: 'unknownMessage',
 }
 
-const DEFAULT_FALLBACK_MESSAGES = new Set<string>([
-  DEFAULT_RESPONSE_ERROR_TEXTS.networkMessage,
-  DEFAULT_RESPONSE_ERROR_TEXTS.abortedMessage,
-  DEFAULT_RESPONSE_ERROR_TEXTS.validationMessage,
-  DEFAULT_RESPONSE_ERROR_TEXTS.clientMessage,
-  DEFAULT_RESPONSE_ERROR_TEXTS.serverMessage,
-  DEFAULT_RESPONSE_ERROR_TEXTS.unknownMessage,
-])
+// Через `mergedTexts`, а не напрямую через `t`: подпись — такой же текст
+// баннера, как и остальные, и проп `texts` обязан её перебивать.
+const statusLabel = computed(() =>
+  mergedTexts.value.statusLabel.replace('{status}', String(props.error?.status ?? '')),
+)
 
 const message = computed(() => {
   const raw = props.error?.message ?? ''
   if (!props.error) return raw
-  // Если в `ResponseErrorInfo.message` сидит англ. дефолт-фолбэк классификатора,
-  // подменяем на i18n-перевод соответствующего kind.
-  if (!raw || DEFAULT_FALLBACK_MESSAGES.has(raw)) {
+
+  // Заменяем переводом только то сообщение, которое сам классификатор и
+  // подставил (`isFallbackMessage`). Прежнее опознание сравнением строк
+  // выбрасывало ответ сервера, если тот дословно совпал с дефолтом.
+  if (!raw || props.error.isFallbackMessage) {
     return mergedTexts.value[KIND_MESSAGE_KEY[props.error.kind]]
   }
   return raw
@@ -214,7 +213,7 @@ function onDismiss(): void {
           class="inline-flex items-center rounded-[var(--gr-radius-sm)] bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-1.5 py-0.5 text-[11px] font-700 leading-none"
           :data-testid="`${props.testIdPrefix}-status`"
         >
-          HTTP {{ props.error.status }}
+          {{ statusLabel }}
         </span>
         <span
           class="text-[13px]"

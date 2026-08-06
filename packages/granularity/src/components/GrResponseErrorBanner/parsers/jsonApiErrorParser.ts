@@ -58,7 +58,9 @@ export const jsonApiErrorParser: ResponseErrorParser = (ctx) => {
 
   return {
     kind,
-    message: message || (kind === 'validation' ? ctx.texts.validationMessage : ctx.texts.clientMessage),
+    // Без `title` сообщение не выдумываем: общий текст по `kind` — работа
+    // классификатора, и только он помечает такое сообщение фолбэком.
+    message,
     details,
     fieldErrors: fieldErrors.length ? fieldErrors : undefined,
   }

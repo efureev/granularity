@@ -25,7 +25,7 @@ export const problemDetailsParser: ResponseErrorParser = (ctx) => {
 
   if (!isProblemContentType && !hasShape) return null
 
-  const message = typeof data.title === 'string' ? data.title : ctx.texts.unknownMessage
+  const message = typeof data.title === 'string' ? data.title : undefined
   const details: string[] = []
   if (typeof data.detail === 'string' && data.detail) details.push(data.detail)
 

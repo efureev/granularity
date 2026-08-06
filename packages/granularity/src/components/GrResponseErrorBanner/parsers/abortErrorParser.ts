@@ -15,9 +15,9 @@ import type { ResponseErrorParser } from '../responseError.types'
  */
 export const abortErrorParser: ResponseErrorParser = (ctx) => {
   if (!ctx.isAbort) return null
+  // Текст по `kind` подставит классификатор — и пометит его фолбэком.
   return {
     kind: 'aborted',
-    message: ctx.texts.abortedMessage,
     stop: true,
   }
 }

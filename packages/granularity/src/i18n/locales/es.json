@@ -94,6 +94,7 @@
     "serverMessage": "Se produjo un error en el servidor. Inténtelo de nuevo.",
     "unknownTitle": "Algo salió mal",
     "unknownMessage": "No se pudo completar la operación. Inténtelo de nuevo.",
+    "statusLabel": "HTTP {status}",
     "retryLabel": "Reintentar",
     "dismissLabel": "Descartar"
   },

@@ -31,9 +31,11 @@ export const laravelValidationParser: ResponseErrorParser = (ctx) => {
 
   if (!fieldErrors.length) return null
 
+  // Только то, что действительно прислал сервер: не нашли — пусть общий текст
+  // подставит классификатор, пометив его фолбэком (иначе баннер не переведёт).
   const message = (typeof data.message === 'string' && data.message)
     || (typeof data.error === 'string' && data.error)
-    || ctx.texts.validationMessage
+    || undefined
 
   const details = fieldErrors.flatMap(fe => fe.messages)
 

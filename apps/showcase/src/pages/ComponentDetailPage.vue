@@ -242,6 +242,7 @@ const previewRegistry = {
   'gr-rating-half': defineAsyncComponent(() => import('../demos/components/gr-rating/GrRatingHalfDemo.vue')),
   'gr-rating-custom': defineAsyncComponent(() => import('../demos/components/gr-rating/GrRatingCustomDemo.vue')),
   'gr-response-error-banner-form': defineAsyncComponent(() => import('../demos/components/gr-response-error-banner/GrFormErrorBannerDemo.vue')),
+  'gr-response-error-banner-fallback': defineAsyncComponent(() => import('../demos/components/gr-response-error-banner/GrResponseErrorBannerFallbackDemo.vue')),
   'gr-response-error-banner-kind-filter': defineAsyncComponent(() => import('../demos/components/gr-response-error-banner/GrResponseErrorBannerKindFilterDemo.vue')),
   'gr-response-error-banner-presets': defineAsyncComponent(() => import('../demos/components/gr-response-error-banner/GrResponseErrorBannerPresetsDemo.vue')),
   'gr-response-error-banner-upload': defineAsyncComponent(() => import('../demos/components/gr-response-error-banner/GrUploadErrorBannerDemo.vue')),
