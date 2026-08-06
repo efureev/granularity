@@ -73,6 +73,7 @@ const previewRegistry = {
   'gr-collapse-multi-section': defineAsyncComponent(() => import('../demos/components/gr-collapse/GrCollapseMultiSectionDemo.vue')),
   'gr-command-palette-basic': defineAsyncComponent(() => import('../demos/components/gr-command-palette/GrCommandPaletteBasicDemo.vue')),
   'gr-command-palette-async': defineAsyncComponent(() => import('../demos/components/gr-command-palette/GrCommandPaletteAsyncDemo.vue')),
+  'gr-command-palette-recent': defineAsyncComponent(() => import('../demos/components/gr-command-palette/GrCommandPaletteRecentDemo.vue')),
   'gr-config-provider-size': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderSizeDemo.vue')),
   'gr-config-provider-nested': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderNestedDemo.vue')),
   'gr-config-provider-theme-island': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderThemeIslandDemo.vue')),

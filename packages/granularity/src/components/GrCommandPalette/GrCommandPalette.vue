@@ -8,8 +8,11 @@ import GrModal from '../GrModal/GrModal.vue'
 
 import {
   filterCommandItems,
+  findDuplicateCommandIds,
   groupCommandItems,
   matchCommandItem,
+  splitCommandMatch,
+  withRecentCommands,
   type GrCommandFilter,
   type GrCommandItem,
 } from './filtering'
@@ -24,6 +27,8 @@ import {
   commandFooterClass,
   commandGroupLabelClass,
   commandItemClass,
+  commandItemDescriptionClass,
+  commandMatchClass,
   commandPaletteModalSizeBySize,
   commandSearchInputClass,
   commandSearchRowClass,
@@ -51,6 +56,11 @@ export interface GrCommandPaletteProps {
   modelValue: boolean
   /** Плоский список команд; группировка — по полю `group` самой команды. */
   items?: GrCommandItem[]
+  /**
+   * Недавние команды: пока запрос пуст, они поднимаются отдельной группой
+   * наверх в этом порядке и не дублируются ниже.
+   */
+  recentIds?: string[]
   placeholder?: string
   size?: GrCommandPaletteSize
   /** Глобальное сочетание открытия. `null` — не вешать слушатель. */
@@ -77,6 +87,7 @@ const props = withDefaults(
   defineProps<GrCommandPaletteProps>(),
   {
     items: undefined,
+    recentIds: undefined,
     placeholder: undefined,
     // Дефолт `size` живёт в резолвере ниже, а не здесь: Vue подставил бы его
     // до того, как компонент заглянет в `GrConfigProvider`.
@@ -107,6 +118,7 @@ const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.commandPal
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.commandPalette.empty', 'Nothing found'))
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.commandPalette.label', 'Command palette'))
 const loadingText = computed(() => t('gr.commandPalette.loading', 'Loading…'))
+const recentTitle = computed(() => t('gr.commandPalette.recent', 'Recent'))
 
 const query = ref('')
 const activeIndex = ref(0)
@@ -121,10 +133,24 @@ const filteredItems = computed<GrCommandItem[]>(() =>
     : itemsResolved.value,
 )
 
-const groups = computed(() => groupCommandItems(filteredItems.value))
+const groups = computed(() => {
+  const grouped = groupCommandItems(filteredItems.value)
+
+  // С непустым запросом секции «недавние» нет: там правит релевантность, а не
+  // история — иначе первая же буква уводила бы взгляд не туда.
+  if (query.value.trim()) return grouped
+
+  return withRecentCommands(grouped, filteredItems.value, props.recentIds ?? [], recentTitle.value)
+})
+
+/**
+ * Порядок обхода стрелками совпадает с порядком на экране: «недавние» стоят
+ * первыми, значит и первая стрелка ведёт туда же.
+ */
+const orderedItems = computed(() => groups.value.flatMap(group => group.items))
 
 /** Плоский список того, что реально выбирается — по нему ходят стрелки. */
-const navigableItems = computed(() => filteredItems.value.filter(item => !item.disabled))
+const navigableItems = computed(() => orderedItems.value.filter(item => !item.disabled))
 
 const activeItem = computed<GrCommandItem | undefined>(() => navigableItems.value[activeIndex.value])
 
@@ -135,6 +161,11 @@ function itemDomId(id: string): string {
 const activeDescendantId = computed(() =>
   activeItem.value ? itemDomId(activeItem.value.id) : undefined,
 )
+
+/** Сегменты подсветки: совпавшее с запросом рисуется `<mark>`. */
+function matchSegments(text: string): ReturnType<typeof splitCommandMatch> {
+  return splitCommandMatch(text, props.filterable ? query.value : '')
+}
 
 function isActive(item: GrCommandItem): boolean {
   return activeItem.value?.id === item.id
@@ -153,8 +184,33 @@ function setActive(index: number): void {
   void scrollActiveIntoView()
 }
 
-// Список пересобрался (ввод запроса / remote-загрузка) — активной становится первая команда.
-watch(filteredItems, () => { activeIndex.value = 0 })
+// Активной становится первая команда, когда список изменился **по содержимому**.
+// Следить за идентичностью массива нельзя: родитель, отдающий `:items` инлайн-
+// выражением, пересоздаёт его на каждый посторонний ререндер — и выбранная
+// стрелками команда прыгала бы в начало.
+// Разделитель — пробел, а не запятая: `id` вправе её содержать, и «a,b» + «c»
+// дало бы тот же ключ, что «a» + «b,c».
+watch(
+  () => orderedItems.value.map(item => item.id).join(' '),
+  () => { activeIndex.value = 0 },
+)
+
+// `id` — ключ рендера и цель `aria-activedescendant`: дубли дают одинаковые
+// DOM-id, и фокус уезжает не на ту команду.
+watch(
+  itemsResolved,
+  (items) => {
+    if (process.env.NODE_ENV === 'production') return
+    const duplicates = findDuplicateCommandIds(items)
+    if (!duplicates.length) return
+
+    console.warn(
+      `[GrCommandPalette] повторяющиеся id команд: ${duplicates.join(', ')}. `
+      + 'Из-за одинаковых DOM-id `aria-activedescendant` укажет не на ту команду.',
+    )
+  },
+  { immediate: true },
+)
 
 function close(): void {
   emit('update:modelValue', false)
@@ -290,8 +346,8 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
           @keydown="onKeydown"
         >
 
-        <span v-if="loading" class="shrink-0 text-[var(--gr-muted-fg)]">
-          <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" :aria-label="loadingText" />
+        <span v-if="loading" class="shrink-0 text-[var(--gr-muted-fg)]" aria-hidden="true">
+          <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" />
         </span>
         <span v-else-if="hotkeyHint.length" class="shrink-0" aria-hidden="true">
           <GrKbd :keys="hotkeyHint" separator="" size="sm" />
@@ -307,17 +363,26 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
         role="listbox"
         :aria-label="resolvedAriaLabel"
       >
-        <template v-for="(group, groupIndex) in groups" :key="group.name ?? `__ungrouped-${groupIndex}`">
+        <!-- Прямыми потомками listbox могут быть только `role="group"`: заголовок
+             группы лежит внутри неё и объявлен презентационным (имя группе он
+             даёт через `aria-labelledby`), иначе ломается `aria-required-children`. -->
+        <div
+          v-for="(group, groupIndex) in groups"
+          :key="group.name ?? `__ungrouped-${groupIndex}`"
+          role="group"
+          :aria-labelledby="group.name ? `${listboxId}-group-${groupIndex}` : undefined"
+        >
           <div
             v-if="group.name"
             :id="`${listboxId}-group-${groupIndex}`"
             data-gr-command-palette-group
+            role="presentation"
             :class="commandGroupLabelClass"
           >
             {{ group.name }}
           </div>
 
-          <div role="group" :aria-labelledby="group.name ? `${listboxId}-group-${groupIndex}` : undefined">
+          <div>
             <div
               v-for="item in group.items"
               :id="itemDomId(item.id)"
@@ -339,9 +404,17 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
                   aria-hidden="true"
                 />
                 <span class="min-w-0 flex-1">
-                  <span class="block truncate">{{ item.label }}</span>
-                  <span v-if="item.description" class="block truncate text-[12px] text-[var(--gr-muted-fg)]">
-                    {{ item.description }}
+                  <span class="block truncate">
+                    <template v-for="(segment, index) in matchSegments(item.label)" :key="index">
+                      <mark v-if="segment.match" :class="commandMatchClass">{{ segment.text }}</mark>
+                      <template v-else>{{ segment.text }}</template>
+                    </template>
+                  </span>
+                  <span v-if="item.description" :class="commandItemDescriptionClass">
+                    <template v-for="(segment, index) in matchSegments(item.description)" :key="index">
+                      <mark v-if="segment.match" :class="commandMatchClass">{{ segment.text }}</mark>
+                      <template v-else>{{ segment.text }}</template>
+                    </template>
                   </span>
                 </span>
                 <span v-if="item.shortcut?.length" class="shrink-0">
@@ -350,18 +423,27 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
               </slot>
             </div>
           </div>
-        </template>
-
-        <div
-          v-if="!filteredItems.length"
-          data-gr-command-palette-empty
-          data-testid="gr-command-palette-empty"
-          :class="commandEmptyClass"
-        >
-          <slot name="empty" :query="query">
-            {{ resolvedEmptyText }}
-          </slot>
         </div>
+      </div>
+
+      <!-- Состояния объявляются живым регионом: `aria-label` на generic-элементе
+           большинство AT игнорируют, поэтому загрузка раньше не объявлялась
+           никак. Регион один на оба состояния и лежит вне listbox — иначе он
+           снова стал бы его недопустимым потомком. -->
+      <div
+        v-if="loading || !filteredItems.length"
+        data-gr-command-palette-empty
+        data-testid="gr-command-palette-empty"
+        role="status"
+        aria-live="polite"
+        :class="commandEmptyClass"
+      >
+        <template v-if="loading">
+          {{ loadingText }}
+        </template>
+        <slot v-else name="empty" :query="query">
+          {{ resolvedEmptyText }}
+        </slot>
       </div>
 
       <div v-if="$slots.footer" data-gr-command-palette-footer :class="commandFooterClass">

@@ -181,3 +181,132 @@ describe('GrCommandPalette', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 })
+
+describe('GrCommandPalette — структура listbox и состояния', () => {
+  it('прямые потомки listbox — только role="group"', () => {
+    const wrapper = mountPalette()
+    const list = wrapper.get('[data-testid="gr-command-palette-list"]')
+
+    const roles = [...list.element.children].map(child => child.getAttribute('role'))
+
+    // Заголовок группы и блок состояния прямыми потомками быть не могут:
+    // `role="listbox"` разрешает только option/group (axe: aria-required-children).
+    expect(roles).toEqual(roles.map(() => 'group'))
+    expect(roles.length).toBeGreaterThan(0)
+  })
+
+  it('заголовок группы лежит внутри неё и объявлен презентационным', () => {
+    const wrapper = mountPalette()
+    const group = wrapper.get('[role="group"]')
+    const label = group.get('[data-gr-command-palette-group]')
+
+    expect(label.attributes('role')).toBe('presentation')
+    // Имя группе он всё равно даёт — через aria-labelledby.
+    expect(group.attributes('aria-labelledby')).toBe(label.attributes('id'))
+  })
+
+  it('состояние объявляется живым регионом — и загрузка, и пустой результат', async () => {
+    const loading = mountPalette({ loading: true })
+    const region = loading.get('[data-testid="gr-command-palette-empty"]')
+
+    expect(region.attributes('role')).toBe('status')
+    expect(region.attributes('aria-live')).toBe('polite')
+    expect(region.text()).toBe('Loading…')
+
+    // Иконка спиннера декоративна: текст состояния читает регион.
+    expect(loading.find('.i-lucide-loader-2').attributes('aria-label')).toBeUndefined()
+
+    const empty = mountPalette()
+    await empty.get('[data-testid="gr-command-palette-input"]').setValue('ничего такого нет')
+
+    expect(empty.get('[data-testid="gr-command-palette-empty"]').text()).toBe('Nothing found')
+  })
+
+  it('регион состояния лежит вне listbox', () => {
+    const wrapper = mountPalette({ loading: true })
+    const list = wrapper.get('[data-testid="gr-command-palette-list"]')
+
+    expect(list.find('[data-testid="gr-command-palette-empty"]').exists()).toBe(false)
+  })
+})
+
+describe('GrCommandPalette — выбор, подсветка и недавние', () => {
+  it('новый массив с тем же содержимым не сбрасывает выбранную команду', async () => {
+    const wrapper = mountPalette()
+    const input = wrapper.get('[data-testid="gr-command-palette-input"]')
+
+    await input.trigger('keydown', { key: 'ArrowDown' })
+    const active = activeDescendantOf(wrapper)
+
+    // Родитель отдаёт `:items` инлайн-выражением: массив новый, содержимое то же.
+    await wrapper.setProps({ items: items.map(item => ({ ...item })) })
+
+    expect(activeDescendantOf(wrapper)).toBe(active)
+  })
+
+  it('изменившееся содержимое возвращает выбор в начало', async () => {
+    const wrapper = mountPalette()
+    const input = wrapper.get('[data-testid="gr-command-palette-input"]')
+
+    await input.trigger('keydown', { key: 'ArrowDown' })
+    const active = activeDescendantOf(wrapper)
+
+    // Список стал другим — активной снова становится первая команда, а она
+    // здесь уже не та, что была выбрана стрелкой.
+    await wrapper.setProps({ items: items.slice(2) })
+
+    expect(active).toContain('open')
+    expect(activeDescendantOf(wrapper)).toContain('theme')
+  })
+
+  it('совпадение с запросом подсвечивается, остальное — нет', async () => {
+    const wrapper = mountPalette()
+
+    await wrapper.get('[data-testid="gr-command-palette-input"]').setValue('нов')
+
+    const marks = wrapper.findAll('mark')
+    expect(marks).toHaveLength(1)
+    expect(marks[0].text()).toBe('Нов')
+    expect(wrapper.get('[data-testid="gr-command-palette-item-new"]').text()).toContain('Новый документ')
+  })
+
+  it('без запроса подсветки нет вовсе', () => {
+    expect(mountPalette().findAll('mark')).toHaveLength(0)
+  })
+
+  it('недавние идут первой группой и не дублируются ниже', () => {
+    const wrapper = mountPalette({ recentIds: ['theme', 'new'] })
+    const groups = wrapper.findAll('[role="group"]')
+
+    expect(groups[0].get('[data-gr-command-palette-group]').text()).toBe('Recent')
+    expect(groups[0].findAll('[data-gr-command-palette-item]').map(el => el.attributes('data-testid')))
+      .toEqual(['gr-command-palette-item-theme', 'gr-command-palette-item-new'])
+
+    expect(wrapper.findAll('[data-testid="gr-command-palette-item-new"]')).toHaveLength(1)
+  })
+
+  it('первая стрелка ведёт в недавние: порядок обхода совпадает с экранным', async () => {
+    const wrapper = mountPalette({ recentIds: ['theme'] })
+
+    await wrapper.get('[data-testid="gr-command-palette-input"]').trigger('keydown', { key: 'Home' })
+
+    expect(activeDescendantOf(wrapper)).toContain('theme')
+  })
+
+  it('с непустым запросом недавние исчезают — там правит релевантность', async () => {
+    const wrapper = mountPalette({ recentIds: ['theme'] })
+
+    await wrapper.get('[data-testid="gr-command-palette-input"]').setValue('открыть')
+
+    expect(wrapper.text()).not.toContain('Recent')
+  })
+
+  it('дубли id предупреждают: aria-activedescendant укажет не на ту команду', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mountPalette({ items: [...items, { id: 'new', label: 'Ещё один new' }] })
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('повторяющиеся id'))
+    warn.mockRestore()
+  })
+})

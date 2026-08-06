@@ -192,6 +192,7 @@
     "label": "Paleta de comandos",
     "placeholder": "Escribe un comando o busca…",
     "empty": "No se ha encontrado nada",
+    "recent": "Recientes",
     "loading": "Cargando…"
   },
   "fileValidation": {

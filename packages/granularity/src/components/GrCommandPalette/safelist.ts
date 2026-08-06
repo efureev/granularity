@@ -5,7 +5,9 @@ import {
   commandGroupLabelClass,
   commandItemActiveClass,
   commandItemBaseClass,
+  commandItemDescriptionClass,
   commandItemDisabledClass,
+  commandMatchClass,
   commandSearchInputClass,
   commandSearchRowClass,
 } from './grCommandPaletteStyles'
@@ -20,6 +22,8 @@ export const grCommandPaletteSafelist = [...new Set([
   ...splitClassTokens(commandItemBaseClass),
   ...splitClassTokens(commandItemActiveClass),
   ...splitClassTokens(commandItemDisabledClass),
+  ...splitClassTokens(commandItemDescriptionClass),
+  ...splitClassTokens(commandMatchClass),
   ...splitClassTokens(commandEmptyClass),
   ...splitClassTokens(commandFooterClass),
   ...splitClassTokens('cursor-pointer'),

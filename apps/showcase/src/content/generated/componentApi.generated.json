@@ -1297,6 +1297,13 @@
             "default": "undefined"
           },
           {
+            "name": "recentIds",
+            "description": "Недавние команды: пока запрос пуст, они поднимаются отдельной группой наверх в этом порядке и не дублируются ниже.",
+            "type": "string[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "hotkey",
             "description": "Глобальное сочетание открытия. `null` — не вешать слушатель.",
             "type": "string | null | undefined",

@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrCommandPalette`: recent commands and match highlighting.** `recentIds` lifts commands into a leading group —
+  in the order of that array, with no duplicates below — while the query is empty; the first typed character hands the
+  list back to relevance. Matched fragments of the label and description are wrapped in `<mark>` (tint via
+  `--gr-command-match-bg`); a custom `filter` that matches on `keywords` alone simply highlights nothing, because
+  there is nothing to highlight. Duplicate `item.id` now warns in dev: identical DOM ids make
+  `aria-activedescendant` point at the wrong command. The component finally has its own page,
+  `docs/components/GrCommandPalette.md`.
 - **`GrConfigProvider`: subtree theming, a layer-scale base and a `locale` prop.** `theme` puts `data-theme` on the
   wrapper — a dark island inside a light page needs no extra styles, because themes are declared with an attribute
   selector. Teleported panels leave the wrapper in the DOM but stay inside the component tree, so they now read the
@@ -261,6 +268,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrCommandPalette` violated `aria-required-children`, and the panel is always expanded.** The group heading and
+  the empty-state block sat as direct children of `role="listbox"`. The heading moved inside its `role="group"` and
+  is presentational now (it still names the group through `aria-labelledby`), and the state block left the listbox
+  entirely.
+- **The loading state was announced by nothing at all.** `aria-label` hung on a generic `<span>`, where most assistive
+  tech ignores it. Loading and «nothing found» now share one live region (`role="status"`, `aria-live="polite"`), and
+  the spinner icon is marked decorative.
+- **The arrow-key selection reset on any unrelated re-render.** The watcher fired on array *identity*, so a parent
+  passing `:items` as an inline expression threw the highlighted command back to the top of the list. It now watches
+  the content (ids joined by a space — an id may legitimately contain a comma).
 - **`GrConfigProvider` decided the fate of the i18n adapter once, in `setup`.** `if (props.i18n != null) provide(…)`
   meant an adapter created asynchronously — the usual «load the locale, then build the adapter» — never reached the
   children at all, and swapping adapters on a language change did not propagate either, because a value was provided
