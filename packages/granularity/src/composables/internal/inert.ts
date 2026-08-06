@@ -71,20 +71,41 @@ export function markInert(elements: HTMLElement[]): () => void {
 }
 
 /**
- * Соседи корня слоя, которых можно гасить.
+ * Что гасить, пока открыт модальный слой.
  *
- * Пропускаются корни других оверлеев (`data-gr-overlay-root`): тост обязан
+ * Правило одно: **инертно всё, кроме ветки, в которой живёт оверлей**. Идём от
+ * него вверх до `<body>` и на каждом уровне помечаем соседей. Наивное «все дети
+ * `body`, кроме портала» сломалось бы на `portalTarget` внутри контейнера
+ * приложения: `inert` наследуется вниз, и помеченный предок убил бы сам оверлей.
+ *
+ * Корни других оверлеев пропускаются (`data-gr-overlay-root`): тост обязан
  * оставаться видимым и озвученным поверх открытой модалки — ради этого он и
- * сидит на самом верхнем слое шкалы, — а панель, открытая изнутри окна, живёт
- * в `body` отдельным поддеревом и остаётся частью того же слоя.
+ * сидит на самом верхнем слое шкалы, — а панель селекта, открытая изнутри окна,
+ * принадлежит тому же слою. Порядок между самими оверлеями решает стек слоёв
+ * (`isTopmost`), а не этот модуль.
  */
-export function inertableSiblings(root: HTMLElement | null | undefined): HTMLElement[] {
-  const parent = root?.parentElement
-  if (!root || !parent) return []
+export function inertableOutside(root: HTMLElement | null | undefined): HTMLElement[] {
+  if (!root?.isConnected) return []
 
-  return Array.from(parent.children).filter((child): child is HTMLElement =>
-    child instanceof HTMLElement
-    && child !== root
-    && !child.hasAttribute('data-gr-overlay-root'),
-  )
+  const result: HTMLElement[] = []
+  const body = root.ownerDocument.body
+
+  let node: HTMLElement | null = root
+
+  while (node && node !== body) {
+    const parent: HTMLElement | null = node.parentElement
+    if (!parent) break
+
+    for (const sibling of Array.from(parent.children)) {
+      if (!(sibling instanceof HTMLElement)) continue
+      if (sibling === node) continue
+      if (sibling.hasAttribute('data-gr-overlay-root')) continue
+      if (sibling.hasAttribute('data-gr-portal')) continue
+      result.push(sibling)
+    }
+
+    node = parent
+  }
+
+  return result
 }

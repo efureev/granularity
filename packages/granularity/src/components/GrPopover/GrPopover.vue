@@ -22,7 +22,7 @@
  */
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { vClickOutside } from '../../directives'
@@ -64,6 +64,10 @@ export interface GrPopoverProps {
    * содержимого, а не оболочки.
    */
   autoFocus?: boolean
+  /**
+   * Точечное переопределение точки монтирования. По умолчанию — общий портал
+   * оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).
+   */
   teleportTo?: string | HTMLElement
   contentClass?: string
   disabled?: boolean
@@ -82,7 +86,7 @@ const props = withDefaults(defineProps<GrPopoverProps>(), {
   closeOnClickOutside: true,
   closeOnContentClick: false,
   autoFocus: true,
-  teleportTo: 'body',
+  teleportTo: undefined,
   contentClass: undefined,
   disabled: false,
 })
@@ -193,7 +197,7 @@ const panelClasses = computed(() =>
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский рендер
 // не совпадёт с серверным и сломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget(() => props.teleportTo)
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -222,7 +226,7 @@ defineExpose({ open, close, toggle })
       />
     </div>
 
-    <teleport :to="teleportTo" :disabled="!teleportEnabled">
+    <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"
@@ -237,6 +241,7 @@ defineExpose({ open, close, toggle })
           ref="panelEl"
           v-bind="themeAttrs"
           data-gr-popover-panel
+          data-gr-overlay-root
           :role="role === 'none' ? undefined : role"
           :aria-label="labelledBy ? undefined : ariaLabel"
           :aria-labelledby="labelledBy"

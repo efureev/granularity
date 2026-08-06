@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 import { resetScrollLock } from '../../../composables/internal/useScrollLock'
@@ -249,10 +249,11 @@ describe('GrImageViewer — слой', () => {
     wrapper.unmount()
   })
 
-  it('проп zIndex остаётся escape-hatch’ем', async () => {
-    const wrapper = await mountViewer({ zIndex: 4200 })
+  it('проп zIndexVar остаётся escape-hatch’ем', async () => {
+    const wrapper = await mountViewer({ zIndexVar: '--app-z-lightbox' })
 
-    expect(wrapper.get('[data-gr-overlay-root]').attributes('style')).toContain('4200')
+    expect(wrapper.get('[data-gr-overlay-root]').attributes('style'))
+      .toContain('z-index: var(--app-z-lightbox)')
 
     wrapper.unmount()
   })
@@ -328,6 +329,110 @@ describe('GrImageViewer — императивный API', () => {
     api.close()
     expect(viewer.emitted('update:modelValue')?.at(-1)).toEqual([false])
 
+    wrapper.unmount()
+  })
+})
+
+describe('GrImageViewer — предзагрузка соседей', () => {
+  /** Перехватываем `new Image()`: важен и адрес, и то, что загрузку обрывают. */
+  function trackImages() {
+    const created: { src: string, history: string[] }[] = []
+    const OriginalImage = globalThis.Image
+
+    class TrackedImage {
+      decoding = 'auto'
+      history: string[] = []
+      #src = ''
+
+      constructor() {
+        created.push(this)
+      }
+
+      get src(): string {
+        return this.#src
+      }
+
+      set src(value: string) {
+        this.#src = value
+        this.history.push(value)
+      }
+    }
+
+    globalThis.Image = TrackedImage as unknown as typeof Image
+    return { created, restore: () => { globalThis.Image = OriginalImage } }
+  }
+
+  it('закрытый просмотрщик не греет соседние кадры', async () => {
+    const { created, restore } = trackImages()
+
+    const wrapper = mount(defineComponent({
+      components: { GrImageViewer },
+      setup: () => ({ open: ref(false) }),
+      template: `<GrImageViewer v-model="open" :url-list="['/a.jpg','/b.jpg','/c.jpg']" />`,
+    }), { global: { stubs: { teleport: true } } })
+    await nextTick()
+
+    // Страница с закрытым просмотрщиком не должна тянуть полноразмерные кадры.
+    expect(created).toHaveLength(0)
+
+    wrapper.unmount()
+    restore()
+  })
+
+  it('открытие греет соседей, а смена кадра обрывает неактуальные загрузки', async () => {
+    const { created, restore } = trackImages()
+
+    const wrapper = mount(defineComponent({
+      components: { GrImageViewer },
+      setup: () => ({ open: ref(false) }),
+      template: `<GrImageViewer v-model="open" :url-list="['/a.jpg','/b.jpg','/c.jpg']" />`,
+    }), { global: { stubs: { teleport: true } } })
+
+    ;(wrapper.vm as unknown as { open: boolean }).open = true
+    await nextTick()
+    await nextTick()
+
+    expect(created.map(image => image.src).sort()).toEqual(['/b.jpg', '/c.jpg'])
+
+    const firstBatch = [...created]
+    ;(wrapper.vm as unknown as { open: boolean }).open = false
+    await nextTick()
+
+    // Пустой `src` — это и есть отмена: браузер обрывает незавершённый запрос.
+    expect(firstBatch.every(image => image.src === '')).toBe(true)
+
+    wrapper.unmount()
+    restore()
+  })
+})
+
+describe('GrImageViewer — скачивание', () => {
+  it('кнопки нет, пока её не попросили', async () => {
+    const wrapper = await mountViewer()
+
+    expect(wrapper.find('[data-gr-image-viewer-download]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('скачивает текущий кадр и сообщает об этом событием', async () => {
+    const clicks: string[] = []
+    const originalCreate = document.createElement.bind(document)
+
+    const createSpy = vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => {
+      const el = originalCreate(tag)
+      if (tag === 'a') el.click = () => { clicks.push((el as HTMLAnchorElement).href) }
+      return el
+    }))
+
+    const wrapper = await mountViewer({ showDownload: true })
+    await wrapper.get('[data-gr-image-viewer-download]').trigger('click')
+
+    const viewer = wrapper.findComponent(GrImageViewer)
+    expect(viewer.emitted('download')?.[0]).toEqual([{ src: '/a.jpg', alt: '', index: 0 }])
+    expect(clicks.some(href => href.endsWith('/a.jpg'))).toBe(true)
+
+    createSpy.mockRestore()
     wrapper.unmount()
   })
 })

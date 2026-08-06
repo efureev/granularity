@@ -34,6 +34,7 @@ export interface GrDropdownMenuProps {
   /** Меню не открывается ничем; триггер остаётся фокусируемым. */
   disabled?: boolean
   /** Куда телепортировать панель (`body` по умолчанию). */
+  /** Точечное переопределение точки монтирования; по умолчанию — общий портал. */
   teleportTo?: string | HTMLElement
   /** Закрывать по клику внутри content. */
   closeOnContentClick?: boolean
@@ -64,7 +65,7 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
   openDelay: 120,
   closeDelay: 160,
   disabled: false,
-  teleportTo: 'body',
+  teleportTo: undefined,
   closeOnContentClick: true,
   // В `GrDropdown` есть `p-1`, поэтому здесь по умолчанию обнуляем padding,
   // чтобы пункты меню могли растягиваться до границ.

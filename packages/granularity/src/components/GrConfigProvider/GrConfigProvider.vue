@@ -7,6 +7,7 @@
  * - `componentDefaults` — per-component дефолтных пропсов;
  * - `i18n` — адаптера переводов (иначе приложение инжектит его вручную);
  * - `theme` — темы поддерева;
+ * - `portalTarget` — точки монтирования оверлеев;
  * - `zIndexBase` — базы шкалы слоёв.
  *
  * Провайдеры можно вкладывать: дочерний мержится поверх родительского, поэтому
@@ -48,6 +49,12 @@ const props = withDefaults(
      */
     theme?: string
     /**
+     * Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в
+     * `body`. Своё значение нужно там, где приложение живёт в контейнере:
+     * микрофронтенд, shadow DOM, CSS-скоупинг под конкретным корнем.
+     */
+    portalTarget?: string | HTMLElement
+    /**
      * База шкалы слоёв. Переменные `--gr-z-*` пересчитываются от неё и ставятся
      * на `<html>`: панели телепортируются в `body`, и переменные поддерева до
      * них не доходят.
@@ -62,6 +69,7 @@ const props = withDefaults(
     i18n: undefined,
     locale: undefined,
     theme: undefined,
+    portalTarget: undefined,
     zIndexBase: undefined,
     tag: 'div',
   },
@@ -72,6 +80,9 @@ const parent = useGrConfig()
 
 const size = computed(() => props.size ?? parent.size.value)
 const theme = computed(() => props.theme ?? parent.theme?.value)
+// Цель портала наследуется вниз: вложенный провайдер без своего значения
+// оставляет оверлеи там же, где их ждёт родительское приложение.
+const portalTarget = computed(() => props.portalTarget ?? parent.portalTarget?.value)
 const componentDefaults = computed<GrComponentDefaults>(() => {
   const inherited = parent.componentDefaults.value as Record<string, Record<string, unknown>>
   const own = (props.componentDefaults ?? {}) as Record<string, Record<string, unknown>>
@@ -85,7 +96,7 @@ const componentDefaults = computed<GrComponentDefaults>(() => {
   return merged
 })
 
-provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, theme })
+provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, theme, portalTarget })
 
 // ————— i18n.
 //

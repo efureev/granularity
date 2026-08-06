@@ -609,6 +609,13 @@
             "default": "undefined"
           },
           {
+            "name": "target",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "square",
             "description": "",
             "type": "boolean | undefined",
@@ -632,13 +639,6 @@
           {
             "name": "href",
             "description": "Рендерит кнопку как `<a href>` (если не задан `as`).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "target",
-            "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1407,6 +1407,13 @@
             "name": "size",
             "description": "Дефолтный размер контролов для вложенных компонентов.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "portalTarget",
+            "description": "Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в `body`. Своё значение нужно там, где приложение живёт в контейнере: микрофронтенд, shadow DOM, CSS-скоупинг под конкретным корнем.",
+            "type": "string | HTMLElement | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2485,10 +2492,10 @@
           },
           {
             "name": "teleportTo",
-            "description": "Куда телепортировать панель (`body` по умолчанию).",
+            "description": "Точечное переопределение точки монтирования. По умолчанию — общий портал оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).",
             "type": "string | HTMLElement | undefined",
             "required": false,
-            "default": "\"body\""
+            "default": "undefined"
           }
         ]
       },
@@ -2604,10 +2611,10 @@
           },
           {
             "name": "teleportTo",
-            "description": "Куда телепортировать панель (`body` по умолчанию).",
+            "description": "Точечное переопределение точки монтирования; по умолчанию — общий портал.",
             "type": "string | HTMLElement | undefined",
             "required": false,
-            "default": "\"body\""
+            "default": "undefined"
           },
           {
             "name": "borderBottom",
@@ -3654,13 +3661,6 @@
             "default": "undefined"
           },
           {
-            "name": "zIndex",
-            "description": "Слой поверх шкалы. По умолчанию — `--gr-z-modal`, как у остальных модальных оверлеев.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "showProgress",
             "description": "",
             "type": "boolean | undefined",
@@ -3731,6 +3731,13 @@
             "default": "false"
           },
           {
+            "name": "zIndexVar",
+            "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-modal`. Сырое число компонент не принимает: слой задаётся шкалой, см. `docs/z-index.md`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "prevLabel",
             "description": "i18n: aria-label кнопки «предыдущее изображение».",
             "type": "string | undefined",
@@ -3775,6 +3782,20 @@
           {
             "name": "rotateRightLabel",
             "description": "i18n: aria-label кнопки «повернуть вправо».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showDownload",
+            "description": "Показывать кнопку скачивания текущего кадра.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "downloadLabel",
+            "description": "i18n: aria-label кнопки «скачать».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -3838,6 +3859,12 @@
             "description": "",
             "type": "[deg: number]",
             "signature": "(event: \"rotate\", deg: number): void"
+          },
+          {
+            "name": "download",
+            "description": "",
+            "type": "[payload: { src: string; alt: string; index: number; }]",
+            "signature": "(event: \"download\", payload: { src: string; alt: string; index: number; }): void"
           }
         ]
       },
@@ -3884,6 +3911,11 @@
           {
             "name": "rotateRight",
             "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "download",
+            "description": "Скачать текущий кадр — то же, что делает кнопка тулбара.",
             "type": "() => void"
           }
         ]
@@ -4549,6 +4581,13 @@
             "default": "undefined"
           },
           {
+            "name": "target",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "as",
             "description": "Кастомный корневой тег/компонент. Если передан и компонент не `disabled` — рендерится через `<component :is=\"as\">`. Игнорируется при `disabled`.",
             "type": "string | Component | undefined",
@@ -4557,13 +4596,6 @@
           },
           {
             "name": "href",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "target",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -4752,6 +4784,13 @@
             "default": "undefined"
           },
           {
+            "name": "zIndexVar",
+            "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "spinnerSize",
             "description": "Размер спиннера: шкала пакета либо произвольный в пикселях.",
             "type": "number | \"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
@@ -4778,13 +4817,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "zIndexVar",
-            "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "delay",
@@ -5495,10 +5527,10 @@
           },
           {
             "name": "teleportTo",
-            "description": "",
+            "description": "Точечное переопределение точки монтирования. По умолчанию — общий портал оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).",
             "type": "string | HTMLElement | undefined",
             "required": false,
-            "default": "\"body\""
+            "default": "undefined"
           },
           {
             "name": "offsetPx",

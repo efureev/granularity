@@ -165,6 +165,7 @@
     "resetZoom": "Reset zoom",
     "rotateLeft": "Rotate left",
     "rotateRight": "Rotate right",
+    "download": "Download image",
     "empty": "No image",
     "label": "Image viewer",
     "position": "Image {index} of {total}"

@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **One portal for every overlay.** Modals, drawers, the image viewer, floating panels (select, autocomplete,
+  tree-select, tooltip, popover, dropdown), toasts, the imperative dialog host and the fullscreen loader now mount
+  into a single `<div id="gr-portal">` created in `body` on first use — nine independent `teleport to="body"` and two
+  hand-rolled `body.appendChild` calls are gone. `GrConfigProvider` gained `portalTarget`, and the new public
+  `usePortalTarget()` resolves the destination for a consumer's own overlay: local prop → provider → shared root. A
+  layer that lives outside the portal branch gets marked `inert` together with the page the moment a modal opens, so
+  a custom overlay has to travel with the rest.
+
+  The portal root deliberately carries no styles and no classes: `transform`, `filter`, `contain` and friends create a
+  containing block for `position: fixed`, and every `useFloating` panel would start measuring against the portal
+  instead of the viewport.
+- **`GrImageViewer`: touch gestures, cursor-anchored zoom and a download button.** Two pointers pinch-zoom around the
+  point between them; a single pointer swipes between frames on a fitted image and pans a zoomed one — so a phone is
+  no longer limited to the chrome buttons. The wheel now zooms **into the point under the cursor** instead of the
+  centre, which is what makes reaching a corner of a zoomed image possible at all. `showDownload` adds a toolbar
+  button: it downloads the current frame (`<a download>`) and emits `download` with `{ src, alt, index }`; a
+  cross-origin address is not always downloadable, so signed links stay a job for `#toolbar-actions`.
 - **`GrDrawer`: sides `top`/`bottom`, a `#header` slot and a non-modal mode.** `side` now takes four values, and the
   axis decides the rest: a side panel is stretched vertically and takes its **width** from the scale, a top or bottom
   one is stretched horizontally and takes its **height** — so `size="sm"` on a bottom sheet means 280px tall, not
@@ -334,6 +351,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Toasts, select panels and the imperative dialog host were being marked `inert` by an open modal.** The rule
+  skipped only elements carrying `data-gr-overlay-root`, and exactly three components had it — so a toast raised while
+  a dialog was open was silently removed from the accessibility tree and its action button became unreachable, which
+  is the one thing the top layer of the z-index scale exists to prevent. Every overlay root is marked now, and the
+  rule itself walks from the layer up to `body` instead of assuming all overlays are direct children of it.
+- **`GrImageViewer` preloaded neighbours while closed.** `onMounted` warmed up two full-size images regardless of
+  `modelValue`, so any page that merely contained a viewer paid for it on load. Preloading now starts on open, and
+  outdated requests are aborted when the frame changes, on close and on unmount — fast paging through a gallery no
+  longer piles up downloads nobody needs.
+- **`GrImageViewer`: panning had no bounds.** The image could be dragged off-screen entirely and only reset would
+  bring it back. Offsets are now clamped to the frame's own overflow — as far as the picture sticks out of the
+  viewport, that far it moves — recomputed on zoom, rotation and resize. A zoomed frame is draggable regardless of
+  `draggable`, which previously left the default configuration (wheel zoom on, dragging off) unable to reach the
+  edges of a zoomed image.
 - **`GrDrawer`: the scrollable body was unreachable from the keyboard.** `overflow-y-auto` without `tabindex="0"`
   means a long text with no focusable element inside cannot be scrolled at all without a mouse (axe:
   `scrollable-region-focusable`). `GrModal` has had this; the drawer had not.
@@ -614,6 +645,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **`useScrollLock` handles iOS.** `overscroll-behavior: contain`, a `touchmove` guard outside the overlay's own
   scrollable areas and scroll-position restore — the part of the lock that used to come from the removed dependency.
   Without it the page behind an open window starts rubber-banding on iOS Safari, and that is only visible on a device.
+- **BREAKING. `GrImageViewer`: `zIndex` → `zIndexVar`.** The escape-hatch takes the name of a CSS variable instead of
+  a raw number, exactly like `GrLoading` and `useFloating`; the default is still `--gr-z-modal`. The package no longer
+  has two different ways of setting a layer.
 - **BREAKING. `GrLoading`: `zIndex` → `zIndexVar`, fullscreen moved onto the scale.** The fullscreen overlay sat on
   `z-50` — below the whole layer scale, so a modal (`1100`) covered the loader that was supposed to block it. It now
   uses `z-[var(--gr-z-loading)]`, and the escape-hatch takes the name of a CSS variable instead of a raw number, the

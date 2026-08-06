@@ -1,5 +1,7 @@
 import { ref } from 'vue'
 
+import type { ZoomAnchor } from './useZoomPan'
+
 // Чувствительность масштабирования колесом/трекпадом: чем больше — тем резче реакция.
 const WHEEL_ZOOM_SENSITIVITY = 0.0015
 // Сколько ms простоя после последнего wheel-события считаем «зум завершён»
@@ -9,8 +11,8 @@ const WHEEL_IDLE_MS = 120
 export interface UseWheelGestureOptions {
   /** Разрешён ли зум колесом (проп `wheelZoom` + наличие изображений). */
   enabled: () => boolean
-  /** Применить множитель масштаба (накопленный за кадр). */
-  applyZoomFactor: (factor: number) => void
+  /** Применить множитель масштаба (накопленный за кадр) с якорем в точке курсора. */
+  applyZoomFactor: (factor: number, anchor: ZoomAnchor) => void
 }
 
 /**
@@ -24,6 +26,9 @@ export function useWheelGesture(options: UseWheelGestureOptions) {
   let pendingWheelDelta = 0
   let wheelFrameId: number | null = null
   let wheelIdleTimer: ReturnType<typeof setTimeout> | null = null
+  // Якорь берётся из последнего события кадра: зум обязан идти в точку под
+  // курсором, а не от центра — иначе до угла увеличенного кадра не добраться.
+  let anchor: ZoomAnchor = { clientX: 0, clientY: 0 }
 
   function cancelWheelFrame(): void {
     if (wheelFrameId !== null) {
@@ -56,7 +61,7 @@ export function useWheelGesture(options: UseWheelGestureOptions) {
     // Экспоненциальный шаг — плавно и одинаково для колеса и трекпада.
     // delta < 0 (scroll up) — приближение, delta > 0 — отдаление.
     const factor = Math.exp(-delta * WHEEL_ZOOM_SENSITIVITY)
-    options.applyZoomFactor(factor)
+    options.applyZoomFactor(factor, anchor)
   }
 
   function onWheel(event: WheelEvent): void {
@@ -71,6 +76,7 @@ export function useWheelGesture(options: UseWheelGestureOptions) {
     isWheelZooming.value = true
 
     pendingWheelDelta += event.deltaY
+    anchor = { clientX: event.clientX, clientY: event.clientY }
 
     if (wheelFrameId === null)
       wheelFrameId = requestAnimationFrame(flushWheelZoom)

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 import { useFocusTrap } from '../../composables/useFocusTrap'
 import { useInertOthers } from '../../composables/internal/useInertOthers'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
@@ -11,6 +11,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
+import IconDownload from '~icons/lucide/download'
 import IconMinus from '~icons/lucide/minus'
 import IconPlus from '~icons/lucide/plus'
 import IconRotateCcw from '~icons/lucide/rotate-ccw'
@@ -30,6 +31,7 @@ import {
 } from './grImageViewerStyles'
 import { useZoomPan } from './composables/useZoomPan'
 import { useWheelGesture } from './composables/useWheelGesture'
+import { usePointerGestures } from './composables/usePointerGestures'
 import { useViewerKeyboard } from './composables/useViewerKeyboard'
 
 /**
@@ -74,8 +76,11 @@ const props = withDefaults(
     wheelZoom?: boolean
     /** Включает перетаскивание (pan) картинки мышью. При наведении курсор «рука». По умолчанию выключено. */
     draggable?: boolean
-    /** Слой поверх шкалы. По умолчанию — `--gr-z-modal`, как у остальных модальных оверлеев. */
-    zIndex?: number
+    /**
+     * Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-modal`. Сырое число
+     * компонент не принимает: слой задаётся шкалой, см. `docs/z-index.md`.
+     */
+    zIndexVar?: string
     /** i18n: aria-label кнопки закрытия. */
     closeLabel?: string
     /** i18n: aria-label кнопки «предыдущее изображение». */
@@ -92,6 +97,10 @@ const props = withDefaults(
     rotateLeftLabel?: string
     /** i18n: aria-label кнопки «повернуть вправо». */
     rotateRightLabel?: string
+    /** Показывать кнопку скачивания текущего кадра. */
+    showDownload?: boolean
+    /** i18n: aria-label кнопки «скачать». */
+    downloadLabel?: string
     /** i18n: текст в пустом состоянии (нет изображений). */
     emptyText?: string
     /**
@@ -111,7 +120,7 @@ const props = withDefaults(
     showZoomValue: true,
     wheelZoom: true,
     draggable: false,
-    zIndex: undefined,
+    zIndexVar: undefined,
     closeLabel: undefined,
     prevLabel: undefined,
     nextLabel: undefined,
@@ -120,6 +129,8 @@ const props = withDefaults(
     resetZoomLabel: undefined,
     rotateLeftLabel: undefined,
     rotateRightLabel: undefined,
+    showDownload: false,
+    downloadLabel: undefined,
     emptyText: undefined,
     ariaLabel: undefined,
   },
@@ -134,6 +145,7 @@ const resolvedZoomOutLabel = computed(() => props.zoomOutLabel ?? t('gr.imageVie
 const resolvedResetZoomLabel = computed(() => props.resetZoomLabel ?? t('gr.imageViewer.resetZoom', 'Reset zoom'))
 const resolvedRotateLeftLabel = computed(() => props.rotateLeftLabel ?? t('gr.imageViewer.rotateLeft', 'Rotate left'))
 const resolvedRotateRightLabel = computed(() => props.rotateRightLabel ?? t('gr.imageViewer.rotateRight', 'Rotate right'))
+const resolvedDownloadLabel = computed(() => props.downloadLabel ?? t('gr.imageViewer.download', 'Download image'))
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.imageViewer.empty', 'No image'))
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.imageViewer.label', 'Image viewer'))
 
@@ -143,6 +155,8 @@ const emit = defineEmits<{
   /** Показан другой кадр. */
   (e: 'change', newIndex: number): void
   (e: 'rotate', deg: number): void
+  /** Нажата кнопка скачивания. Само скачивание компонент уже запустил. */
+  (e: 'download', payload: { src: string, alt: string, index: number }): void
 }>()
 
 type GrImageViewerToolbarActions = {
@@ -154,6 +168,8 @@ type GrImageViewerToolbarActions = {
   reset: () => void
   rotateLeft: () => void
   rotateRight: () => void
+  /** Скачать текущий кадр — то же, что делает кнопка тулбара. */
+  download: () => void
 }
 
 type GrImageViewerSlotProps = {
@@ -183,7 +199,7 @@ const open = computed(() => props.modelValue)
 // SSR-guard для teleport + общий reference-counted scroll-lock (как в GrModal/GrDrawer).
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -201,6 +217,8 @@ const hasImages = computed(() => total.value > 0)
 
 const currentIndex = ref(0)
 const imageEl = ref<HTMLImageElement | null>(null)
+// Область кадра: система координат для якорного зума и границы перетаскивания.
+const stageEl = ref<HTMLElement | null>(null)
 
 // Масштаб / поворот / панорамирование + метрики изображения.
 const {
@@ -215,7 +233,6 @@ const {
   realScalePercent,
   imageStyle,
   zoomValueText,
-  setScale,
   zoomIn,
   zoomOut,
   rotateLeft,
@@ -225,22 +242,28 @@ const {
   onImageLoad,
   startObservingImage,
   stopObservingImage,
-  onPointerDown,
-  onPointerMove,
-  onPointerUp,
+  isPannable,
+  setScaleAt,
+  startPan,
+  movePan,
+  endPan,
+  onPointerDown: onPanPointerDown,
+  onPointerMove: onPanPointerMove,
+  onPointerUp: onPanPointerUp,
 } = useZoomPan({
   minScale: () => props.minScale,
   maxScale: () => props.maxScale,
   zoomRate: () => props.zoomRate,
   draggable: () => props.draggable,
   imageEl,
+  viewportEl: stageEl,
   onRotate: deg => emit('rotate', deg),
 })
 
-// Зум колесом мыши / жестом трекпада.
+// Зум колесом мыши / жестом трекпада — с якорем в точке под курсором.
 const { isWheelZooming, onWheel, endWheelZoom } = useWheelGesture({
   enabled: () => props.wheelZoom && hasImages.value,
-  applyZoomFactor: factor => setScale(scale.value * factor),
+  applyZoomFactor: (factor, anchor) => setScaleAt(scale.value * factor, anchor),
 })
 
 const currentItem = computed(() => (hasImages.value ? items.value[currentIndex.value] : undefined))
@@ -262,20 +285,55 @@ watch(displayIndex, (index) => {
 })
 
 // Просмотрщик — оверлей модального класса, значит и слой у него модальный.
-// Константа 2000 ставила его выше тостов: уведомление уровня приложения
-// оказывалось под картинкой. Проп остаётся escape-hatch’ем.
+// `zIndexVar` подменяет переменную слоя своей — тот же escape-hatch, что у
+// `useFloating` и `GrLoading`.
 const viewerStyle = computed(() => ({
-  zIndex: Number.isFinite(props.zIndex) ? String(props.zIndex) : 'var(--gr-z-modal)',
+  zIndex: `var(${props.zIndexVar ?? '--gr-z-modal'})`,
 }))
+
+// Сенсорные жесты: pinch двумя пальцами и свайп для листания. Мышь идёт мимо —
+// у неё своя ветка перетаскивания в `useZoomPan`.
+const {
+  isPinching,
+  onPointerDown: onGesturePointerDown,
+  onPointerMove: onGesturePointerMove,
+  onPointerUp: onGesturePointerUp,
+  reset: resetGestures,
+} = usePointerGestures({
+  enabled: () => hasImages.value,
+  scale: () => scale.value,
+  canSwipe: () => total.value > 1,
+  setScaleAt,
+  pan: { start: startPan, move: movePan, end: endPan },
+  onSwipeLeft: () => next(),
+  onSwipeRight: () => prev(),
+})
+
+function onPointerDown(event: PointerEvent): void {
+  onGesturePointerDown(event)
+  onPanPointerDown(event)
+}
+
+function onPointerMove(event: PointerEvent): void {
+  onGesturePointerMove(event)
+  onPanPointerMove(event)
+}
+
+function onPointerUp(event: PointerEvent): void {
+  onGesturePointerUp(event)
+  onPanPointerUp(event)
+}
 
 // Плавный CSS-переход только для дискретных зумов; при wheel-зуме/перетаскивании отключаем.
 const imageTransitionClass = computed(() =>
-  isWheelZooming.value || isDragging.value ? '' : 'transition-transform duration-150 ease-out',
+  isWheelZooming.value || isDragging.value || isPinching.value
+    ? ''
+    : 'transition-transform duration-150 ease-out',
 )
 
 // Курсор «рука» (grab/grabbing), только если включён drag.
 const imageCursorClass = computed(() => {
-  if (!props.draggable)
+  if (!isPannable.value)
     return ''
   return isDragging.value ? 'cursor-grabbing' : 'cursor-grab'
 })
@@ -312,6 +370,18 @@ function syncIndexFromInitial(): void {
   endWheelZoom()
 }
 
+/**
+ * Предзагруженные соседи. Держим ссылки, чтобы загрузку можно было оборвать:
+ * сброс `src` у `Image` отменяет незавершённый запрос. Без этого быстрое
+ * перелистывание галереи копит запросы, которые уже никому не нужны.
+ */
+let preloadedImages: HTMLImageElement[] = []
+
+function cancelPreload(): void {
+  for (const image of preloadedImages) image.src = ''
+  preloadedImages = []
+}
+
 function preloadAt(index: number): void {
   const url = items.value[index]?.src
   if (!url)
@@ -319,6 +389,7 @@ function preloadAt(index: number): void {
   const image = new Image()
   image.decoding = 'async'
   image.src = url
+  preloadedImages.push(image)
 }
 
 function closeViewer(): void {
@@ -343,6 +414,7 @@ const toolbarActions: GrImageViewerToolbarActions = {
   reset: resetTransform,
   rotateLeft,
   rotateRight,
+  download,
 }
 
 // Наружу отдаём тот же набор, что получает слот тулбара. Открытия здесь нет
@@ -383,6 +455,32 @@ function onBackdropClick(event: MouseEvent): void {
   if (!startedHere || event.target !== event.currentTarget) return
   if (!props.hideOnClickModal) return
   closeViewer()
+}
+
+/**
+ * Скачивание текущего кадра.
+ *
+ * Компонент делает очевидное — `<a download>` на текущий `src` — и сообщает о
+ * нажатии событием. Кросс-доменный адрес браузер всё равно скачает не всегда
+ * (атрибут `download` он там игнорирует), поэтому подписанные ссылки и свои
+ * запросы делаются иначе: `showDownload: false` плюс своя кнопка в слоте
+ * `#toolbar-actions`.
+ */
+function download(): void {
+  const item = currentItem.value
+  if (!item?.src) return
+
+  emit('download', { src: item.src, alt: item.alt ?? '', index: currentIndex.value })
+
+  if (typeof document === 'undefined') return
+
+  const link = document.createElement('a')
+  link.href = item.src
+  link.download = ''
+  link.rel = 'noopener'
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
 }
 
 const { onKeydown } = useViewerKeyboard({
@@ -432,6 +530,7 @@ watch(
       unlockBodyScroll()
       stopObservingImage()
       endWheelZoom()
+      resetGestures()
       isDragging.value = false
       return
     }
@@ -494,32 +593,35 @@ watch(
   { deep: true },
 )
 
-// `new Image()` существует только в браузере, поэтому предзагрузка соседей
-// стартует с `onMounted`, а не с `immediate: true`: иначе она выполнялась бы
-// синхронно в setup и роняла серверный рендер страницы, где просмотрщик просто
-// присутствует закрытым.
+/**
+ * Соседние кадры греются только у **открытого** просмотрщика: закрытый на
+ * странице не должен тянуть два полноразмерных изображения просто потому, что
+ * он там есть. `new Image()` существует только в браузере — на сервере эта
+ * ветка не выполняется, потому что закрытый просмотрщик до неё не доходит.
+ */
 function preloadNeighbours(index: number): void {
-  if (!hasImages.value || total.value < 2)
+  cancelPreload()
+
+  if (!props.modelValue || !hasImages.value || total.value < 2)
     return
+
   preloadAt(normalizeIndex(index - 1))
   preloadAt(normalizeIndex(index + 1))
 }
 
-watch(currentIndex, preloadNeighbours)
-
-onMounted(() => {
-  preloadNeighbours(currentIndex.value)
-})
+watch([currentIndex, open], ([index]) => preloadNeighbours(index), { immediate: true })
 
 onBeforeUnmount(() => {
   unlockBodyScroll()
   stopObservingImage()
   endWheelZoom()
+  cancelPreload()
+  resetGestures()
 })
 </script>
 
 <template>
-  <teleport to="body" :disabled="!teleportEnabled">
+  <teleport :to="portalTarget" :disabled="!teleportEnabled">
     <div
       v-if="teleportEnabled && isMounted"
       ref="rootEl"
@@ -566,195 +668,210 @@ onBeforeUnmount(() => {
             class="relative z-10 h-full w-full outline-none"
             tabindex="-1"
           >
-              <div class="pointer-events-none absolute inset-x-0 top-0 z-30 px-3 py-3 sm:px-6">
-                <div class="pointer-events-auto flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-2">
-                    <div
-                      v-if="showProgress"
-                      data-gr-image-viewer-progress
-                      class="font-600"
-                      :class="badgeClass"
-                    >
-                      {{ displayIndex }} / {{ total }}
-                    </div>
-
-                    <span
-                      data-gr-image-viewer-live
-                      class="sr-only"
-                      role="status"
-                      aria-live="polite"
-                    >{{ liveMessage }}</span>
-
-                    <div
-                      v-if="showZoomValue"
-                      data-gr-image-viewer-zoom-value
-                      class="font-700"
-                      :class="badgeClass"
-                    >
-                      {{ zoomValueText }}%
-                    </div>
+            <div class="pointer-events-none absolute inset-x-0 top-0 z-30 px-3 py-3 sm:px-6">
+              <div class="pointer-events-auto flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <div
+                    v-if="showProgress"
+                    data-gr-image-viewer-progress
+                    class="font-600"
+                    :class="badgeClass"
+                  >
+                    {{ displayIndex }} / {{ total }}
                   </div>
 
-                  <button
-                    type="button"
-                    data-gr-image-viewer-close
-                    :aria-label="resolvedCloseLabel"
-                    class="h-11 w-11"
-                    :class="chromeButtonClass"
-                    @click="closeViewer"
-                  >
-                    <GrIcon size="md">
-                      <IconX />
-                    </GrIcon>
-                  </button>
-                </div>
-              </div>
-
-              <div
-                class="relative z-10 h-full w-full flex items-center justify-center px-16 py-16 sm:px-24 sm:py-20"
-                @wheel="onWheel"
-              >
-                <button
-                  v-if="total > 1"
-                  type="button"
-                  data-gr-image-viewer-prev
-                  :aria-label="resolvedPrevLabel"
-                  class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 sm:left-6"
-                  :class="chromeButtonClass"
-                  @click="prev"
-                >
-                  <GrIcon size="lg">
-                    <IconChevronLeft />
-                  </GrIcon>
-                </button>
-
-                <button
-                  v-if="total > 1"
-                  type="button"
-                  data-gr-image-viewer-next
-                  :aria-label="resolvedNextLabel"
-                  class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 sm:right-6"
-                  :class="chromeButtonClass"
-                  @click="next"
-                >
-                  <GrIcon size="lg">
-                    <IconChevronRight />
-                  </GrIcon>
-                </button>
-
-                <div class="h-full w-full flex items-center justify-center">
-                  <img
-                    v-if="currentUrl"
-                    ref="imageEl"
-                    data-gr-image-viewer-image
-                    :src="currentUrl"
-                    :alt="currentAlt"
-                    draggable="false"
-                    class="max-h-full max-w-full select-none object-contain will-change-transform"
-                    :class="[imageTransitionClass, imageCursorClass]"
-                    :style="imageStyle"
-                    @load="onImageLoad"
-                    @pointerdown="onPointerDown"
-                    @pointermove="onPointerMove"
-                    @pointerup="onPointerUp"
-                    @pointercancel="onPointerUp"
-                  >
+                  <span
+                    data-gr-image-viewer-live
+                    class="sr-only"
+                    role="status"
+                    aria-live="polite"
+                  >{{ liveMessage }}</span>
 
                   <div
-                    v-else
-                    :class="emptyStateClass"
+                    v-if="showZoomValue"
+                    data-gr-image-viewer-zoom-value
+                    class="font-700"
+                    :class="badgeClass"
                   >
-                    {{ resolvedEmptyText }}
+                    {{ zoomValueText }}%
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  data-gr-image-viewer-close
+                  :aria-label="resolvedCloseLabel"
+                  class="h-11 w-11"
+                  :class="chromeButtonClass"
+                  @click="closeViewer"
+                >
+                  <GrIcon size="md">
+                    <IconX />
+                  </GrIcon>
+                </button>
               </div>
+            </div>
 
-              <div class="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-3 pb-3 sm:px-6 sm:pb-6">
-                <div class="pointer-events-auto mx-auto w-full max-w-max">
-                  <slot
-                    name="toolbar"
-                    v-bind="toolbarSlotProps"
-                  >
-                    <div :class="toolbarShellClass">
-                      <button
-                        type="button"
-                        data-gr-image-viewer-zoom-out
-                        :aria-label="resolvedZoomOutLabel"
-                        class="h-11 min-w-11 px-2 text-sm font-600"
-                        :class="toolbarButtonClass"
-                        @click="zoomOut"
-                      >
-                        <GrIcon size="sm">
-                          <IconMinus />
-                        </GrIcon>
-                      </button>
+            <div
+              ref="stageEl"
+              class="relative z-10 h-full w-full flex items-center justify-center px-16 py-16 sm:px-24 sm:py-20"
+              @wheel="onWheel"
+            >
+              <button
+                v-if="total > 1"
+                type="button"
+                data-gr-image-viewer-prev
+                :aria-label="resolvedPrevLabel"
+                class="absolute left-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 sm:left-6"
+                :class="chromeButtonClass"
+                @click="prev"
+              >
+                <GrIcon size="lg">
+                  <IconChevronLeft />
+                </GrIcon>
+              </button>
 
-                      <button
-                        type="button"
-                        data-gr-image-viewer-zoom-reset
-                        :aria-label="resolvedResetZoomLabel"
-                        class="h-11 min-w-11 px-3 text-xs font-700"
-                        :class="toolbarButtonClass"
-                        @click="resetTransform"
-                      >
-                        100%
-                      </button>
+              <button
+                v-if="total > 1"
+                type="button"
+                data-gr-image-viewer-next
+                :aria-label="resolvedNextLabel"
+                class="absolute right-3 top-1/2 z-20 h-12 w-12 -translate-y-1/2 sm:right-6"
+                :class="chromeButtonClass"
+                @click="next"
+              >
+                <GrIcon size="lg">
+                  <IconChevronRight />
+                </GrIcon>
+              </button>
 
-                      <button
-                        type="button"
-                        data-gr-image-viewer-zoom-in
-                        :aria-label="resolvedZoomInLabel"
-                        class="h-11 min-w-11 px-2 text-sm font-600"
-                        :class="toolbarButtonClass"
-                        @click="zoomIn"
-                      >
-                        <GrIcon size="sm">
-                          <IconPlus />
-                        </GrIcon>
-                      </button>
+              <div class="h-full w-full flex items-center justify-center">
+                <img
+                  v-if="currentUrl"
+                  ref="imageEl"
+                  data-gr-image-viewer-image
+                  :src="currentUrl"
+                  :alt="currentAlt"
+                  draggable="false"
+                  class="max-h-full max-w-full select-none object-contain will-change-transform [touch-action:none]"
+                  :class="[imageTransitionClass, imageCursorClass]"
+                  :style="imageStyle"
+                  @load="onImageLoad"
+                  @pointerdown="onPointerDown"
+                  @pointermove="onPointerMove"
+                  @pointerup="onPointerUp"
+                  @pointercancel="onPointerUp"
+                >
 
-                      <template v-if="$slots['toolbar-actions']">
-                        <div :class="toolbarSeparatorClass" aria-hidden="true" />
-
-                        <slot
-                          name="toolbar-actions"
-                          v-bind="toolbarSlotProps"
-                        />
-
-                        <div :class="toolbarSeparatorClass" aria-hidden="true" />
-                      </template>
-
-                      <div v-else :class="toolbarSeparatorClass" aria-hidden="true" />
-
-                      <button
-                        type="button"
-                        data-gr-image-viewer-rotate-left
-                        :aria-label="resolvedRotateLeftLabel"
-                        class="h-11 min-w-11 px-2 text-sm font-600"
-                        :class="toolbarButtonClass"
-                        @click="rotateLeft"
-                      >
-                        <GrIcon size="sm">
-                          <IconRotateCcw />
-                        </GrIcon>
-                      </button>
-
-                      <button
-                        type="button"
-                        data-gr-image-viewer-rotate-right
-                        :aria-label="resolvedRotateRightLabel"
-                        class="h-11 min-w-11 px-2 text-sm font-600"
-                        :class="toolbarButtonClass"
-                        @click="rotateRight"
-                      >
-                        <GrIcon size="sm">
-                          <IconRotateCw />
-                        </GrIcon>
-                      </button>
-                    </div>
-                  </slot>
+                <div
+                  v-else
+                  :class="emptyStateClass"
+                >
+                  {{ resolvedEmptyText }}
                 </div>
               </div>
+            </div>
+
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-3 pb-3 sm:px-6 sm:pb-6">
+              <div class="pointer-events-auto mx-auto w-full max-w-max">
+                <slot
+                  name="toolbar"
+                  v-bind="toolbarSlotProps"
+                >
+                  <div :class="toolbarShellClass">
+                    <button
+                      type="button"
+                      data-gr-image-viewer-zoom-out
+                      :aria-label="resolvedZoomOutLabel"
+                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      :class="toolbarButtonClass"
+                      @click="zoomOut"
+                    >
+                      <GrIcon size="sm">
+                        <IconMinus />
+                      </GrIcon>
+                    </button>
+
+                    <button
+                      type="button"
+                      data-gr-image-viewer-zoom-reset
+                      :aria-label="resolvedResetZoomLabel"
+                      class="h-11 min-w-11 px-3 text-xs font-700"
+                      :class="toolbarButtonClass"
+                      @click="resetTransform"
+                    >
+                      100%
+                    </button>
+
+                    <button
+                      type="button"
+                      data-gr-image-viewer-zoom-in
+                      :aria-label="resolvedZoomInLabel"
+                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      :class="toolbarButtonClass"
+                      @click="zoomIn"
+                    >
+                      <GrIcon size="sm">
+                        <IconPlus />
+                      </GrIcon>
+                    </button>
+
+                    <button
+                      v-if="showDownload"
+                      type="button"
+                      data-gr-image-viewer-download
+                      :aria-label="resolvedDownloadLabel"
+                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      :class="toolbarButtonClass"
+                      @click="download"
+                    >
+                      <GrIcon size="sm">
+                        <IconDownload />
+                      </GrIcon>
+                    </button>
+
+                    <template v-if="$slots['toolbar-actions']">
+                      <div :class="toolbarSeparatorClass" aria-hidden="true" />
+
+                      <slot
+                        name="toolbar-actions"
+                        v-bind="toolbarSlotProps"
+                      />
+
+                      <div :class="toolbarSeparatorClass" aria-hidden="true" />
+                    </template>
+
+                    <div v-else :class="toolbarSeparatorClass" aria-hidden="true" />
+
+                    <button
+                      type="button"
+                      data-gr-image-viewer-rotate-left
+                      :aria-label="resolvedRotateLeftLabel"
+                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      :class="toolbarButtonClass"
+                      @click="rotateLeft"
+                    >
+                      <GrIcon size="sm">
+                        <IconRotateCcw />
+                      </GrIcon>
+                    </button>
+
+                    <button
+                      type="button"
+                      data-gr-image-viewer-rotate-right
+                      :aria-label="resolvedRotateRightLabel"
+                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      :class="toolbarButtonClass"
+                      @click="rotateRight"
+                    >
+                      <GrIcon size="sm">
+                        <IconRotateCw />
+                      </GrIcon>
+                    </button>
+                  </div>
+                </slot>
+              </div>
+            </div>
           </div>
         </Transition>
       </div>

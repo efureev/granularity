@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { vClickOutside } from '../../directives'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
@@ -33,7 +33,10 @@ export interface GrDropdownProps {
   closeOnContentClick?: boolean
   /** Дополнительные классы контейнера content. */
   contentClass?: string
-  /** Куда телепортировать панель (`body` по умолчанию). */
+  /**
+   * Точечное переопределение точки монтирования. По умолчанию — общий портал
+   * оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).
+   */
   teleportTo?: string | HTMLElement
 }
 
@@ -49,7 +52,7 @@ const props = withDefaults(defineProps<GrDropdownProps>(), {
   disabled: false,
   closeOnContentClick: true,
   contentClass: '',
-  teleportTo: 'body',
+  teleportTo: undefined,
 })
 
 const open = ref(false)
@@ -326,7 +329,7 @@ onBeforeUnmount(() => {
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget(() => props.teleportTo)
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -348,7 +351,7 @@ const themeAttrs = useGrThemeAttrs()
       <slot name="trigger" :open="open" :toggle="toggle" :close="close" :trigger-props="triggerProps" />
     </div>
 
-    <teleport :to="teleportTo" :disabled="!teleportEnabled">
+    <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"
@@ -363,6 +366,7 @@ const themeAttrs = useGrThemeAttrs()
           ref="panelEl"
           v-bind="themeAttrs"
           data-gr-dropdown-panel
+          data-gr-overlay-root
           role="menu"
           tabindex="-1"
           :class="panelClasses"

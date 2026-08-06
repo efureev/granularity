@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { inertableSiblings, markInert } from '../internal/inert'
+import { inertableOutside, markInert } from '../internal/inert'
 
 afterEach(() => {
   document.body.innerHTML = ''
@@ -70,20 +70,44 @@ describe('inert', () => {
     expect(page.hasAttribute('inert')).toBe(false)
   })
 
-  it('соседи корня — всё, кроме него самого и других оверлеев', () => {
+  it('гасит всё вне ветки оверлея, кроме других оверлеев', () => {
     const { page, overlay, toast } = appendChildren()
 
-    const siblings = inertableSiblings(overlay)
+    const blocked = inertableOutside(overlay)
 
     // Тост обязан остаться видимым и озвученным поверх открытой модалки — ради
     // этого он и сидит на самом верхнем слое шкалы.
-    expect(siblings).toContain(page)
-    expect(siblings).not.toContain(overlay)
-    expect(siblings).not.toContain(toast)
+    expect(blocked).toContain(page)
+    expect(blocked).not.toContain(overlay)
+    expect(blocked).not.toContain(toast)
+  })
+
+  it('поднимается по всем уровням до `body`, а не только по соседям', () => {
+    // Портал внутри контейнера приложения: наивное «все дети body, кроме
+    // портала» пометило бы `#app`, а `inert` наследуется вниз — и убил бы сам
+    // оверлей вместе со страницей.
+    const app = document.createElement('div')
+    const page = document.createElement('main')
+    const portal = document.createElement('div')
+    portal.setAttribute('data-gr-portal', '')
+    const overlay = document.createElement('div')
+    overlay.setAttribute('data-gr-overlay-root', '')
+
+    const outside = document.createElement('aside')
+    portal.append(overlay)
+    app.append(page, portal)
+    document.body.append(app, outside)
+
+    const blocked = inertableOutside(overlay)
+
+    expect(blocked).toContain(page)
+    expect(blocked).toContain(outside)
+    expect(blocked).not.toContain(app)
+    expect(blocked).not.toContain(portal)
   })
 
   it('без корня или вне DOM гасить нечего', () => {
-    expect(inertableSiblings(null)).toEqual([])
-    expect(inertableSiblings(document.createElement('div'))).toEqual([])
+    expect(inertableOutside(null)).toEqual([])
+    expect(inertableOutside(document.createElement('div'))).toEqual([])
   })
 })

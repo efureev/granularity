@@ -379,7 +379,9 @@ describe('useDialogService — очередь, вложенность и при�
 
     // Нижнее окно помечено `inert` общим стеком слоёв — фокус и клики
     // достаются верхнему. Отдельного кода в сервисе на это нет и не нужно.
-    const layers = document.querySelectorAll('[data-gr-overlay-root]')
+    // Именно окна: маркер `data-gr-overlay-root` носит и хост сервиса — он
+    // тоже оверлей и гаситься чужой модалкой не должен.
+    const layers = document.querySelectorAll('[data-gr-overlay-root][aria-modal]')
     expect(layers[0].hasAttribute('inert')).toBe(true)
     expect(layers[layers.length - 1].hasAttribute('inert')).toBe(false)
 

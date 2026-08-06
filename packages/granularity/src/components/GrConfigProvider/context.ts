@@ -69,6 +69,11 @@ export interface GrConfigContext {
    * строят руками — например хост императивных диалогов.
    */
   theme?: ComputedRef<string | undefined>
+  /**
+   * Куда монтируются оверлеи поддерева (`usePortalTarget`). Необязательно, как
+   * и `theme`: контекст строят руками — например хост императивных диалогов.
+   */
+  portalTarget?: ComputedRef<string | HTMLElement | undefined>
 }
 
 export const GR_CONFIG_KEY: InjectionKey<GrConfigContext> = Symbol('gr-config')
@@ -93,6 +98,7 @@ const EMPTY_CONFIG: GrConfigContext = {
   size: computed(() => undefined),
   componentDefaults: computed(() => EMPTY_COMPONENT_DEFAULTS),
   theme: computed(() => undefined),
+  portalTarget: computed(() => undefined),
 }
 
 /** Возвращает ближайший `GrConfigProvider` или пустой конфиг, если провайдера нет. */

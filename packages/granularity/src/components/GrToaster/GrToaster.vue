@@ -24,7 +24,7 @@
  */
 import { computed, ref, useSlots, watchEffect } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 import type { Component } from 'vue'
 
 import { useToast } from '../../composables/useToast'
@@ -129,7 +129,7 @@ function onAction(toast: Toast, action: ToastAction): void {
 // SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -195,12 +195,13 @@ defineExpose({ focus })
 </script>
 
 <template>
-  <teleport to="body" :disabled="!teleportEnabled">
+  <teleport :to="portalTarget" :disabled="!teleportEnabled">
     <div
         ref="containerEl"
         v-hotkey="hotkeyBinding"
         v-bind="themeAttrs"
         data-gr-toaster
+        data-gr-overlay-root
         role="region"
         :aria-label="resolvedRegionLabel"
         class="fixed z-[var(--gr-z-toast)] w-[var(--gr-toaster-width,360px)] max-w-[calc(100vw-2rem)]"

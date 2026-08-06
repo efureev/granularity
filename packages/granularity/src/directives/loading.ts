@@ -1,6 +1,8 @@
 import type { AppContext, Component, Directive } from 'vue'
 import { createVNode, render } from 'vue'
 
+import { inertableOutside, markInert } from '../composables/internal/inert'
+import { ensurePortalRoot } from '../composables/internal/portalRoot'
 import GrLoading from '../components/GrLoading/GrLoading.vue'
 import type { GrIconSize, GrIconTone } from '../components/GrIcon/grIconStyles'
 
@@ -134,25 +136,32 @@ function ensureClippedContainer(target: HTMLElement, fullscreen: boolean): () =>
  * не трогается: снять его — значит вернуть в таб-порядок то, что скрыл кто-то
  * другой.
  */
-function blockContent(target: HTMLElement, overlayHost: HTMLElement): () => void {
+function blockContent(target: HTMLElement, overlayHost: HTMLElement, fullscreen: boolean): () => void {
   const previouslyFocused = document.activeElement
 
-  target.setAttribute('aria-busy', 'true')
+  // Занятость объявляет тот, чьё содержимое закрыто: у инлайнового лоадера это
+  // его контейнер, у полноэкранного — вся страница. Сам оверлей при этом живёт
+  // в портале, то есть в другой ветке.
+  const busyElement = fullscreen ? document.body : target
+  busyElement.setAttribute('aria-busy', 'true')
 
-  const inerted = Array.from(target.children).filter((child): child is HTMLElement =>
-    child !== overlayHost && isHTMLElement(child) && !child.hasAttribute('inert'),
-  )
-  for (const child of inerted) child.setAttribute('inert', '')
+  const blocked = fullscreen
+    ? inertableOutside(overlayHost)
+    : Array.from(target.children).filter((child): child is HTMLElement =>
+        child !== overlayHost && isHTMLElement(child),
+      )
+
+  const release = markInert(blocked)
 
   // Уже стоящий фокус браузер сам не забирает: Chrome оставляет его внутри
   // ставшего инертным поддерева, и пользователь продолжает печатать в поле под
   // оверлеем. Уводим фокус руками — вернём его при закрытии.
-  if (isHTMLElement(previouslyFocused) && inerted.some(child => child.contains(previouslyFocused)))
+  if (isHTMLElement(previouslyFocused) && blocked.some(child => child.contains(previouslyFocused)))
     previouslyFocused.blur()
 
   return () => {
-    target.removeAttribute('aria-busy')
-    for (const child of inerted) child.removeAttribute('inert')
+    busyElement.removeAttribute('aria-busy')
+    release()
 
     // `inert` сбрасывает фокус на `body`. Возвращаем его туда, где он был, но
     // только если пользователь не увёл его сам, пока шла загрузка.
@@ -191,7 +200,9 @@ function getState(el: HTMLElement): InternalLoadingState {
 export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTMLElement): LoadingController {
   const initialTarget = resolveTarget(options.target, fallbackTarget ?? document.body)
   const fullscreen = resolveFullscreen(options, initialTarget)
-  const target = fullscreen ? document.body : initialTarget
+  // Полноэкранный лоадер — оверлей, значит живёт в общей ветке портала: только
+  // так правило `inert` не пометит его вместе со страницей.
+  const target = fullscreen ? (ensurePortalRoot() ?? document.body) : initialTarget
 
   const appContext = options.appContext
 
@@ -199,6 +210,8 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
   const restoreOverflow = ensureClippedContainer(target, fullscreen)
   const mountEl = document.createElement('div')
   mountEl.setAttribute('data-gr-loading-host', '')
+  // Маркер оверлея: чужой модальный слой не должен гасить лоадер `inert`.
+  mountEl.setAttribute('data-gr-overlay-root', '')
   if (!fullscreen) {
     // Host wraps the overlay; make sure rounded corners of the target cascade
     // down to the overlay via `border-radius: inherit`.
@@ -228,7 +241,7 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
       // Блокируем контент ровно тогда, когда оверлей стал видимым: с `delay`
       // это происходит позже монтирования, а до показа блокировать нечего.
       onShow: () => {
-        unblockContent ??= blockContent(target, mountEl)
+        unblockContent ??= blockContent(target, mountEl, fullscreen)
       },
     })
 
@@ -289,7 +302,7 @@ function sync(el: HTMLElement, value: LoadingBindingValue | undefined, appContex
 
   const target = resolveTarget(options.target, el)
   const fullscreen = resolveFullscreen(options, target)
-  const normalizedTarget = fullscreen ? document.body : target
+  const normalizedTarget = fullscreen ? (ensurePortalRoot() ?? document.body) : target
 
   const shouldRecreate =
     !state.controller

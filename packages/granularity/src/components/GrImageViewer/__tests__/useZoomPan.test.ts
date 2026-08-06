@@ -3,9 +3,30 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { formatPercent, useZoomPan } from '../composables/useZoomPan'
 
-function setup(overrides: Partial<{ minScale: number, maxScale: number, zoomRate: number, draggable: boolean }> = {}) {
+/**
+ * Область кадра задаётся фиктивным элементом: якорный зум и границы пана
+ * считаются от её размеров, а не от вьюпорта — в jsdom раскладки нет.
+ */
+function stage(width = 400, height = 300) {
+  const el = document.createElement('div')
+  Object.defineProperty(el, 'clientWidth', { value: width })
+  Object.defineProperty(el, 'clientHeight', { value: height })
+  el.getBoundingClientRect = () => ({
+    left: 0, top: 0, width, height, right: width, bottom: height, x: 0, y: 0, toJSON: () => ({}),
+  })
+  return el
+}
+
+function setup(overrides: Partial<{
+  minScale: number
+  maxScale: number
+  zoomRate: number
+  draggable: boolean
+  viewport: HTMLElement | null
+}> = {}) {
   const onRotate = vi.fn()
   const imageEl = ref<HTMLImageElement | null>(null)
+  const viewportEl = ref<HTMLElement | null>(overrides.viewport === undefined ? stage() : overrides.viewport)
 
   const zoomPan = useZoomPan({
     minScale: () => overrides.minScale ?? 0.5,
@@ -13,10 +34,19 @@ function setup(overrides: Partial<{ minScale: number, maxScale: number, zoomRate
     zoomRate: () => overrides.zoomRate ?? 2,
     draggable: () => overrides.draggable ?? true,
     imageEl,
+    viewportEl,
     onRotate,
   })
 
-  return { zoomPan, onRotate, imageEl }
+  return { zoomPan, onRotate, imageEl, viewportEl }
+}
+
+/** `<img>` без раскладки: композаблу нужны только `offsetWidth`/`offsetHeight`. */
+function fittedImage(width: number, height: number): HTMLImageElement {
+  const el = document.createElement('img')
+  Object.defineProperty(el, 'offsetWidth', { value: width })
+  Object.defineProperty(el, 'offsetHeight', { value: height })
+  return el
 }
 
 /** Указатель без реального DOM: нужны только координаты и capture-методы. */
@@ -114,8 +144,14 @@ describe('useZoomPan: поворот', () => {
 })
 
 describe('useZoomPan: панорамирование', () => {
-  it('тянет картинку за указателем', () => {
-    const { zoomPan } = setup({ draggable: true })
+  it('тянет картинку за указателем в пределах её переполнения', () => {
+    const { zoomPan, imageEl } = setup({ draggable: true })
+
+    // Кадр 400×300 в области 400×300: при масштабе 2 он вылезает на 200×150 в
+    // каждую сторону — внутри этого и можно тянуть.
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+    zoomPan.setScale(2)
 
     zoomPan.onPointerDown(pointerEvent('pointerdown', 100, 100))
     expect(zoomPan.isDragging.value).toBe(true)
@@ -176,5 +212,102 @@ describe('useZoomPan: метрики', () => {
 
     expect(zoomPan.naturalWidth.value).toBe(0)
     expect(zoomPan.fittedHeight.value).toBe(0)
+  })
+})
+
+describe('useZoomPan: якорь зума и границы пана', () => {
+  it('зум с якорем оставляет точку под курсором на месте', () => {
+    const { zoomPan, imageEl } = setup({ zoomRate: 2 })
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+
+    // Область 400×300, курсор в её правом краю: центр области — (200, 150),
+    // то есть якорь смещён на +200 по X.
+    zoomPan.setScaleAt(2, { clientX: 400, clientY: 150 })
+
+    expect(zoomPan.scale.value).toBe(2)
+    // Точка остаётся на месте: смещение компенсирует удвоение вокруг центра.
+    expect(zoomPan.offsetX.value).toBe(-200)
+    expect(zoomPan.offsetY.value).toBe(0)
+  })
+
+  it('без якоря зум идёт от центра', () => {
+    const { zoomPan, imageEl } = setup({ zoomRate: 2 })
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+
+    zoomPan.zoomIn()
+
+    expect(zoomPan.offsetX.value).toBe(0)
+    expect(zoomPan.offsetY.value).toBe(0)
+  })
+
+  it('смещение не выпускает кадр за пределы его переполнения', () => {
+    const { zoomPan, imageEl } = setup()
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+    zoomPan.setScale(2)
+
+    zoomPan.startPan(0, 0)
+    zoomPan.movePan(10_000, 10_000)
+
+    // Кадр 800×600 в области 400×300 — запас ровно 200 и 150.
+    expect(zoomPan.offsetX.value).toBe(200)
+    expect(zoomPan.offsetY.value).toBe(150)
+  })
+
+  it('на вписанном кадре тянуть некуда', () => {
+    const { zoomPan, imageEl } = setup({ draggable: true })
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+
+    zoomPan.startPan(0, 0)
+    zoomPan.movePan(120, 90)
+
+    expect(zoomPan.offsetX.value).toBe(0)
+    expect(zoomPan.offsetY.value).toBe(0)
+  })
+
+  it('поворот на 90° меняет оси местами и пересчитывает границы', () => {
+    const { zoomPan, imageEl } = setup()
+    // Широкий кадр: по горизонтали запаса нет, по вертикали тем более.
+    imageEl.value = fittedImage(400, 200)
+    zoomPan.measureFitted()
+    zoomPan.setScale(1)
+
+    zoomPan.rotateRight()
+    zoomPan.startPan(0, 0)
+    zoomPan.movePan(0, 10_000)
+
+    // После поворота footprint стал 200×400 — по вертикали появился запас 50.
+    expect(zoomPan.offsetY.value).toBe(50)
+  })
+
+  it('уменьшение масштаба возвращает кадр в границы', () => {
+    const { zoomPan, imageEl } = setup({ zoomRate: 2 })
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+    zoomPan.setScale(2)
+
+    zoomPan.startPan(0, 0)
+    zoomPan.movePan(200, 150)
+    expect(zoomPan.offsetX.value).toBe(200)
+
+    zoomPan.setScale(1)
+
+    expect(zoomPan.offsetX.value).toBe(0)
+    expect(zoomPan.offsetY.value).toBe(0)
+  })
+
+  it('увеличенный кадр тянется и без пропа `draggable`', () => {
+    const { zoomPan, imageEl } = setup({ draggable: false })
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+
+    expect(zoomPan.isPannable.value).toBe(false)
+
+    zoomPan.setScale(2)
+
+    expect(zoomPan.isPannable.value).toBe(true)
   })
 })

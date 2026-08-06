@@ -268,6 +268,9 @@ export default defineConfig({
         'composables/useFocusTrap': fileURLToPath(
           new URL('./src/composables/useFocusTrap.ts', import.meta.url),
         ),
+        'composables/usePortalTarget': fileURLToPath(
+          new URL('./src/composables/usePortalTarget.ts', import.meta.url),
+        ),
         'composables/useOverlayLayer': fileURLToPath(
           new URL('./src/composables/useOverlayLayer.ts', import.meta.url),
         ),

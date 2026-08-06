@@ -157,6 +157,7 @@ const previewRegistry = {
   'gr-image-viewer-gallery': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerGalleryDemo.vue')),
   'gr-image-viewer-real-size': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerRealSizeDemo.vue')),
   'gr-image-viewer-toolbar-slot': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerToolbarSlotDemo.vue')),
+  'gr-image-viewer-zoom-download': defineAsyncComponent(() => import('../demos/components/gr-image-viewer/GrImageViewerZoomDownloadDemo.vue')),
   'gr-input-addons-basic': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputAddonsDemo.vue')),
   'gr-input-events-and-loading': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputEventsDemo.vue')),
   'gr-input-addon-slots': defineAsyncComponent(() => import('../demos/components/gr-input/GrInputAddonSlotsDemo.vue')),

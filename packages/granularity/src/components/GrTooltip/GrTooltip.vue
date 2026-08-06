@@ -16,7 +16,7 @@
  */
 import { computed, onMounted, onUnmounted, onUpdated, ref, useId, useSlots, watchEffect } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { vClickOutside } from '../../directives'
 import GrIcon from '../GrIcon'
@@ -89,7 +89,7 @@ const triggerStyle = computed(() => ({ color: props.iconColor }))
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -228,7 +228,7 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
       </slot>
     </span>
 
-    <teleport to="body" :disabled="!teleportEnabled">
+    <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition-opacity duration-150"
         enter-from-class="opacity-0"
@@ -244,6 +244,7 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
           role="tooltip"
           v-bind="themeAttrs"
           data-gr-tooltip-panel
+          data-gr-overlay-root
           class="pointer-events-none rounded-md border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
           :class="panelClass"
           :style="floatingStyle"

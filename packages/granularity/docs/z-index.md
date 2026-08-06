@@ -46,7 +46,7 @@ stacking-контекста. А поповер, открытый **снаруж�
 | `GrTooltip`                                                                                                            | `--gr-z-tooltip`  | `useFloating({ zIndexVar: '--gr-z-tooltip' })`            |
 | `GrModal` (и всё, что на нём: `GrDialog`, `GrConfirmDialog`, `GrPromptDialog`, `GrCommandPalette`, `useDialogService`) | `--gr-z-modal`    | `grModalStyles.ts`: `fixed inset-0 z-[var(--gr-z-modal)]` |
 | `GrDrawer`                                                                                                             | `--gr-z-modal`    | `grDrawerStyles.ts`: `fixed inset-0 z-[var(--gr-z-modal)]` |
-| `GrImageViewer`                                                                                                        | `--gr-z-modal`    | инлайн-стиль `z-index: var(--gr-z-modal)`; проп `zIndex` — escape-hatch |
+| `GrImageViewer`                                                                                                        | `--gr-z-modal`    | инлайн-стиль `z-index: var(--gr-z-modal)`; проп `zIndexVar` — escape-hatch |
 | `GrLoading` (fullscreen), директива `v-loading`                                                                        | `--gr-z-loading`  | `grLoadingStyles.ts`: `fixed inset-0 z-[var(--gr-z-loading)]`; проп/опция `zIndexVar` — escape-hatch |
 | `GrToaster`                                                                                                            | `--gr-z-toast`    | класс `z-[var(--gr-z-toast)]` на контейнере               |
 
@@ -76,6 +76,42 @@ stacking-контекста. А поповер, открытый **снаруж�
    новый слой — заводить токен в `tokens/foundation.json`, а не число в компоненте.
 4. **Порядок внутри компонента** (`z-0`, `z-[1]`, `z-10`) — литералы допустимы, пока значение меньше 50: это не
    глобальный слой. Гейт ловит именно диапазон страничных оверлеев.
+
+## Портал: одна точка монтирования
+
+Все оверлеи пакета уезжают в общий контейнер — `<div id="gr-portal">`, который
+создаётся в `body` при первом открытии чего угодно: модалки, панели селекта,
+тоста, императивного диалога, полноэкранной загрузки. Отдельных
+`teleport to="body"` у компонентов больше нет.
+
+Что это даёт:
+
+- **правило `inert` перестаёт быть договорённостью.** Раньше «гасим соседей
+  корня слоя в `body`» работало, только пока все оверлеи лежали ровно на один
+  уровень ниже `body`. Теперь правило простое: от корня оверлея вверх до `body`,
+  на каждом уровне гасим соседей, пропуская другие оверлеи
+  (`data-gr-overlay-root`) и сам портал;
+- **точку монтирования можно назвать своей** — `portalTarget` у
+  `GrConfigProvider` или проп `teleportTo` у отдельного компонента. Нужно там,
+  где приложение живёт в контейнере: микрофронтенд, shadow DOM, CSS-скоупинг;
+- **порядок в DOM совпадает с порядком открытия** — тем же, что держит стек
+  слоёв для Esc и `inert`. Внутри одного токена шкалы выше тот, кто открыт
+  позже.
+
+```ts
+import {usePortalTarget} from '@feugene/granularity'
+
+const {target, enabled} = usePortalTarget()
+// <teleport :to="target" :disabled="!enabled">…</teleport>
+```
+
+Свой оверлей потребителя обязан уезжать туда же: слой вне ветки портала будет
+помечен `inert` вместе со страницей, как только откроется модалка.
+
+**У корня портала не должно быть ни стилей, ни классов.** `transform`,
+`filter`, `contain`, `perspective`, `will-change` создают containing block для
+`position: fixed` — и панели `useFloating` начнут считать позицию от портала, а
+не от вьюпорта. Гейт на это — `src/composables/__tests__/usePortalTarget.test.ts`.
 
 ## Стек оверлеев: не только z-index
 

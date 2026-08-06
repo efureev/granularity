@@ -1,11 +1,11 @@
 import type { Ref } from 'vue'
 import { onScopeDispose, watch } from 'vue'
 
-import { inertableSiblings, markInert } from './inert'
+import { inertableOutside, markInert } from './inert'
 
 /**
- * Пока слой активен, всё остальное содержимое его контейнера (для
- * телепортированного оверлея это соседи в `body`) помечено `inert`.
+ * Пока слой активен, всё вне его ветки помечено `inert`: от корня оверлея вверх
+ * до `<body>`, на каждом уровне — соседи.
  *
  * Это вторая половина модальности: `z-index` перекрывает страницу глазами,
  * `inert` — клавиатурой и скринридером.
@@ -15,7 +15,7 @@ export function useInertOthers(root: Ref<HTMLElement | null>, active: () => bool
 
   function apply(): void {
     release?.()
-    release = markInert(inertableSiblings(root.value))
+    release = markInert(inertableOutside(root.value))
   }
 
   function clear(): void {

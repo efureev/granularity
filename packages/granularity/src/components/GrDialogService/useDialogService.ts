@@ -1,6 +1,7 @@
 import { createVNode, getCurrentInstance, inject, markRaw, render } from 'vue'
 import type { App, AppContext, InjectionKey } from 'vue'
 
+import { ensurePortalRoot } from '../../composables/internal/portalRoot'
 import GrDialogServiceHost from './GrDialogServiceHost.vue'
 import { useGrConfig } from '../GrConfigProvider/context'
 import { resolveGranularityI18n } from '../../internal/granularityI18n'
@@ -123,7 +124,10 @@ function ensureMounted(state: DialogServiceState, appContext?: AppContext | null
 
   const container = document.createElement('div')
   container.setAttribute('data-gr-dialog-service-host', '')
-  document.body.appendChild(container)
+  container.setAttribute('data-gr-overlay-root', '')
+  // Хост уезжает в общий портал оверлеев: он должен лежать в той же ветке, что
+  // и остальные слои, иначе правило `inert` пометит его вместе со страницей.
+  ;(ensurePortalRoot() ?? document.body).appendChild(container)
   state.container = container
 
   // Состояние отдаём пропом: хост монтируется вне дерева и своим `inject` до

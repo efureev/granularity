@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
@@ -158,7 +158,7 @@ const ariaLabel = computed(() => (labelledBy.value ? undefined : t('gr.drawer.ti
 // `:disabled` падал при SSR — расхождение с GrModal.
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -317,7 +317,7 @@ defineExpose({
 </script>
 
 <template>
-  <teleport to="body" :disabled="!teleportEnabled">
+  <teleport :to="portalTarget" :disabled="!teleportEnabled">
     <div
       v-if="teleportEnabled && isMounted"
       ref="rootEl"

@@ -33,7 +33,7 @@
 import { useGrComponentProp, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { computed, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { useFocusTrap } from '../../composables/useFocusTrap'
 import { useInertOthers } from '../../composables/internal/useInertOthers'
@@ -143,7 +143,7 @@ const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? true : 
 // а в клиенте включаем после маунта.
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -347,7 +347,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <teleport to="body" :disabled="!teleportEnabled">
+  <teleport :to="portalTarget" :disabled="!teleportEnabled">
     <div
       v-if="teleportEnabled && isMounted"
       ref="rootEl"

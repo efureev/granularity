@@ -8,13 +8,22 @@ export function formatPercent(value: number): string {
   return value.toFixed(1).replace(TRAILING_ZERO_DECIMAL_RE, '')
 }
 
+/** Точка в координатах вьюпорта — курсор или середина между пальцами. */
+export interface ZoomAnchor {
+  clientX: number
+  clientY: number
+}
+
 export interface UseZoomPanOptions {
   minScale: () => number
   maxScale: () => number
   zoomRate: () => number
+  /** Тянуть можно и на неувеличенном кадре. Увеличенный тянется всегда. */
   draggable: () => boolean
   /** Ссылка на `<img>` — для измерения layout-размера и подписки ResizeObserver. */
   imageEl: Ref<HTMLImageElement | null>
+  /** Область кадра: задаёт систему координат для якорного зума и границы пана. */
+  viewportEl: Ref<HTMLElement | null>
   /** Колбэк на поворот (эмит `rotate`). */
   onRotate: (deg: number) => void
 }
@@ -22,7 +31,6 @@ export interface UseZoomPanOptions {
 /**
  * useZoomPan — состояние и логика масштаба/поворота/панорамирования картинки,
  * а также метрики (натуральный/вписанный/фактический размер, реальный масштаб).
- * Вынесено из монолитного `GrImageViewer.vue`.
  */
 export function useZoomPan(options: UseZoomPanOptions) {
   const scale = ref(1)
@@ -62,26 +70,92 @@ export function useZoomPan(options: UseZoomPanOptions) {
   })
   const realScalePercent = computed(() => formatPercent(realScale.value * 100))
 
-  function setScale(value: number): void {
+  /** Увеличенный кадр тянется всегда: иначе до его краёв не добраться вовсе. */
+  const isPannable = computed(() => options.draggable() || scale.value > 1)
+
+  /**
+   * Граница смещения по осям экрана.
+   *
+   * Тянуть имеет смысл ровно настолько, насколько кадр вылез за область
+   * просмотра, — дальше пользователь утаскивает картинку в пустоту и достаёт её
+   * только сбросом. Поворот на 90°/270° меняет оси местами, поэтому границы
+   * считаются по bounding box повёрнутого footprint'а.
+   */
+  function panBounds(): { x: number, y: number } {
+    const viewport = options.viewportEl.value
+    if (!viewport) return { x: 0, y: 0 }
+
+    const quarterTurns = Math.abs(Math.round(rotation.value / 90) % 2)
+    const width = quarterTurns === 1 ? renderedHeight.value : renderedWidth.value
+    const height = quarterTurns === 1 ? renderedWidth.value : renderedHeight.value
+
+    return {
+      x: Math.max(0, (width - viewport.clientWidth) / 2),
+      y: Math.max(0, (height - viewport.clientHeight) / 2),
+    }
+  }
+
+  function clampOffsets(): void {
+    const bounds = panBounds()
+    offsetX.value = Math.min(bounds.x, Math.max(-bounds.x, offsetX.value))
+    offsetY.value = Math.min(bounds.y, Math.max(-bounds.y, offsetY.value))
+  }
+
+  function clampScale(value: number): number {
     const clamped = Math.min(options.maxScale(), Math.max(options.minScale(), value))
-    scale.value = Number(clamped.toFixed(4))
+    return Number(clamped.toFixed(4))
   }
 
-  function zoomIn(): void {
-    setScale(scale.value * options.zoomRate())
+  function setScale(value: number): void {
+    scale.value = clampScale(value)
+    clampOffsets()
   }
 
-  function zoomOut(): void {
-    setScale(scale.value / options.zoomRate())
+  /**
+   * Масштаб с якорем: точка под курсором (или между пальцами) остаётся на
+   * месте. Без этого зум всегда идёт от центра, и увеличить нужный угол кадра
+   * можно только зумом с последующим таскиванием.
+   */
+  function setScaleAt(value: number, anchor?: ZoomAnchor): void {
+    const viewport = options.viewportEl.value
+    const previous = scale.value
+    const next = clampScale(value)
+
+    if (next === previous) return
+
+    if (anchor && viewport) {
+      const rect = viewport.getBoundingClientRect()
+      // Координаты якоря относительно центра области — там же начало отсчёта
+      // трансформации картинки.
+      const anchorX = anchor.clientX - (rect.left + rect.width / 2)
+      const anchorY = anchor.clientY - (rect.top + rect.height / 2)
+      const ratio = next / previous
+
+      offsetX.value = anchorX - (anchorX - offsetX.value) * ratio
+      offsetY.value = anchorY - (anchorY - offsetY.value) * ratio
+    }
+
+    scale.value = next
+    clampOffsets()
+  }
+
+  function zoomIn(anchor?: ZoomAnchor): void {
+    setScaleAt(scale.value * options.zoomRate(), anchor)
+  }
+
+  function zoomOut(anchor?: ZoomAnchor): void {
+    setScaleAt(scale.value / options.zoomRate(), anchor)
   }
 
   function rotateLeft(): void {
     rotation.value -= 90
+    clampOffsets()
     options.onRotate(rotation.value)
   }
 
   function rotateRight(): void {
     rotation.value += 90
+    clampOffsets()
     options.onRotate(rotation.value)
   }
 
@@ -107,6 +181,7 @@ export function useZoomPan(options: UseZoomPanOptions) {
     // offsetWidth/Height — layout-размер вписанного изображения, без CSS transform.
     fittedWidth.value = el.offsetWidth
     fittedHeight.value = el.offsetHeight
+    clampOffsets()
   }
 
   function onImageLoad(event: Event): void {
@@ -139,33 +214,47 @@ export function useZoomPan(options: UseZoomPanOptions) {
     resizeObserver?.disconnect()
   }
 
+  /** Начало перетаскивания: используется и мышью, и жестами. */
+  function startPan(x: number, y: number): void {
+    isDragging.value = true
+    dragStartX = x
+    dragStartY = y
+    dragOffsetStartX = offsetX.value
+    dragOffsetStartY = offsetY.value
+  }
+
+  function movePan(x: number, y: number): void {
+    if (!isDragging.value)
+      return
+    offsetX.value = dragOffsetStartX + (x - dragStartX)
+    offsetY.value = dragOffsetStartY + (y - dragStartY)
+    clampOffsets()
+  }
+
+  function endPan(): void {
+    isDragging.value = false
+  }
+
   function onPointerDown(event: PointerEvent): void {
-    // Тянем только основной кнопкой и только если drag включён.
-    if (!options.draggable() || event.button !== 0)
+    // Тянем только основной кнопкой и только если тянуть вообще есть куда.
+    if (!isPannable.value || event.button !== 0)
       return
 
     event.preventDefault()
-    isDragging.value = true
-    dragStartX = event.clientX
-    dragStartY = event.clientY
-    dragOffsetStartX = offsetX.value
-    dragOffsetStartY = offsetY.value
+    startPan(event.clientX, event.clientY)
 
     // Захватываем указатель, чтобы движение/отпускание ловились за пределами картинки.
     ;(event.currentTarget as Element).setPointerCapture?.(event.pointerId)
   }
 
   function onPointerMove(event: PointerEvent): void {
-    if (!isDragging.value)
-      return
-    offsetX.value = dragOffsetStartX + (event.clientX - dragStartX)
-    offsetY.value = dragOffsetStartY + (event.clientY - dragStartY)
+    movePan(event.clientX, event.clientY)
   }
 
   function onPointerUp(event: PointerEvent): void {
     if (!isDragging.value)
       return
-    isDragging.value = false
+    endPan()
     ;(event.currentTarget as Element).releasePointerCapture?.(event.pointerId)
   }
 
@@ -175,6 +264,7 @@ export function useZoomPan(options: UseZoomPanOptions) {
     offsetX,
     offsetY,
     isDragging,
+    isPannable,
     naturalWidth,
     naturalHeight,
     fittedWidth,
@@ -186,6 +276,7 @@ export function useZoomPan(options: UseZoomPanOptions) {
     realScale,
     realScalePercent,
     setScale,
+    setScaleAt,
     zoomIn,
     zoomOut,
     rotateLeft,
@@ -193,9 +284,13 @@ export function useZoomPan(options: UseZoomPanOptions) {
     resetTransform,
     resetImageMetrics,
     measureFitted,
+    clampOffsets,
     onImageLoad,
     startObservingImage,
     stopObservingImage,
+    startPan,
+    movePan,
+    endPan,
     onPointerDown,
     onPointerMove,
     onPointerUp,

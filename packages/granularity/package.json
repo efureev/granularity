@@ -312,6 +312,10 @@
       "types": "./dist/types/src/composables/useFocusTrap.d.ts",
       "import": "./dist/composables/useFocusTrap.js"
     },
+    "./composables/usePortalTarget": {
+      "types": "./dist/types/src/composables/usePortalTarget.d.ts",
+      "import": "./dist/composables/usePortalTarget.js"
+    },
     "./composables/useOverlayLayer": {
       "types": "./dist/types/src/composables/useOverlayLayer.d.ts",
       "import": "./dist/composables/useOverlayLayer.js"

@@ -166,6 +166,7 @@
     "resetZoom": "Restablecer zoom",
     "rotateLeft": "Girar a la izquierda",
     "rotateRight": "Girar a la derecha",
+    "download": "Descargar imagen",
     "empty": "Sin imagen",
     "label": "Visor de imágenes",
     "position": "Imagen {index} de {total}"

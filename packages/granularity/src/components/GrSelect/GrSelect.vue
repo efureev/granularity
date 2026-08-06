@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="TValue extends GrSelectValue = string">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
-import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 
@@ -760,7 +760,7 @@ function clearSelection(): void {
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const teleportEnabled = useTeleportEnabled()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
 // есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
@@ -955,7 +955,7 @@ const themeAttrs = useGrThemeAttrs()
       <span class="i-lucide-x inline-block h-4 w-4" aria-hidden="true" />
     </button>
 
-    <teleport to="body" :disabled="!teleportEnabled">
+    <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
         enter-active-class="transition ease-out duration-150"
         enter-from-class="transform opacity-0 scale-95"
@@ -970,6 +970,7 @@ const themeAttrs = useGrThemeAttrs()
           data-testid="gr-select-panel"
           v-bind="themeAttrs"
           data-gr-select-panel
+          data-gr-overlay-root
           :style="floatingStyle"
         >
           <div :class="panelClasses">
