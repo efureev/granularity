@@ -27,6 +27,12 @@ export type GrDropdownMenuItemRole = 'menuitem' | 'menuitemcheckbox' | 'menuitem
 export interface GrDropdownMenuItemProps {
   as?: string | Component
   disabled?: boolean
+  /** Пункт-ссылка. У выключенного пункта не рендерится: ссылка осталась бы рабочей. */
+  href?: string
+  target?: string
+  rel?: string
+  /** Шорткат для `target="_blank"` + `rel="noopener noreferrer"`. */
+  external?: boolean
   align?: GrDropdownMenuItemAlign
   variant?: GrDropdownMenuItemVariant
   role?: GrDropdownMenuItemRole
@@ -41,6 +47,10 @@ export interface GrDropdownMenuItemProps {
 const props = withDefaults(defineProps<GrDropdownMenuItemProps>(), {
   as: 'button',
   disabled: false,
+  href: undefined,
+  target: undefined,
+  rel: undefined,
+  external: false,
   align: 'left',
   variant: 'default',
   role: 'menuitem',
@@ -51,7 +61,23 @@ const props = withDefaults(defineProps<GrDropdownMenuItemProps>(), {
 
 const attrs = useAttrs()
 
-const isNativeButton = computed(() => props.as === 'button' || props.as === undefined)
+// Полиморфный корень: явный `as` сильнее всего, иначе `href` сам делает пункт
+// ссылкой — как у `GrButton`, чтобы не приходилось задавать `as="a"` вручную.
+const renderAs = computed<string | Component>(() => {
+  if (props.as && props.as !== 'button')
+    return props.as
+  return props.href ? 'a' : 'button'
+})
+
+const isNativeButton = computed(() => renderAs.value === 'button')
+
+// Выключенный пункт остаётся ссылкой, если оставить ему `href`: средняя кнопка и
+// контекстное меню браузера обойдут любой перехват клика (тот же приём в `GrButton`).
+const resolvedHref = computed(() => (props.disabled ? undefined : props.href))
+const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
+const resolvedRel = computed(() =>
+  props.rel ?? (resolvedTarget.value === '_blank' ? 'noopener noreferrer' : undefined),
+)
 // Отметка занимает место всегда, когда пункт переключаемый: иначе строки
 // «включено» и «выключено» разъезжаются по горизонтали.
 const isCheckable = computed(() => props.role !== 'menuitem')
@@ -61,6 +87,17 @@ const className = computed(() => grDropdownMenuItemClass({
   variant: props.variant,
   disabled: props.disabled,
 }))
+
+/**
+ * Roving tabindex паттерна menu: табируемым остаётся триггер, а внутри панели
+ * фокусом распоряжаются стрелки (`GrDropdown` наводит его программно). Без
+ * этого `Tab` ходил бы по пунктам, и меню было бы списком кнопок, а не меню.
+ *
+ * Выключённый пункт из обхода **не** выпадает: `aria-disabled` вместо нативного
+ * `disabled` оставляет его фокусируемым, и пользователь узнаёт, что действие
+ * существует, но сейчас недоступно (рекомендация WAI-ARIA APG).
+ */
+const resolvedTabindex = computed(() => (attrs.tabindex as number | string | undefined) ?? -1)
 
 function onClickCapture(e: MouseEvent): void {
   if (!props.disabled)
@@ -76,16 +113,18 @@ function onClickCapture(e: MouseEvent): void {
 
 <template>
   <component
-    :is="as"
+    :is="renderAs"
     v-bind="attrs"
     data-gr-dropdown-menu-item
     :role="role"
     :class="className"
     :type="isNativeButton ? (attrs.type as any) ?? 'button' : undefined"
-    :disabled="isNativeButton ? disabled : undefined"
+    :href="resolvedHref"
+    :target="resolvedHref ? resolvedTarget : undefined"
+    :rel="resolvedHref ? resolvedRel : undefined"
     :aria-disabled="disabled ? 'true' : undefined"
     :aria-checked="isCheckable ? (checked ? 'true' : 'false') : undefined"
-    :tabindex="disabled ? -1 : (attrs.tabindex as any)"
+    :tabindex="resolvedTabindex"
     @click.capture="onClickCapture"
   >
     <span

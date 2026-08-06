@@ -2,6 +2,7 @@
 import GrDropdown from '../GrDropdown/GrDropdown.vue'
 // Типы размещения и ширины — из владельца API, а не переобъявлением: расхождение
 // обнаружилось бы только рантаймом.
+import type { GrDropdownTrigger } from '../GrDropdown/GrDropdown.vue'
 import type { GrDropdownWidth } from '../GrDropdown/grDropdownStyles'
 import type { UseFloatingPlacement } from '../../composables/useFloating'
 
@@ -24,6 +25,16 @@ export interface GrDropdownMenuProps {
   offset?: number
   /** Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту. */
   width?: GrDropdownWidth
+  /** Чем открывается панель. В любом режиме работают клик и клавиатура. */
+  trigger?: GrDropdownTrigger
+  /** Задержка открытия по наведению, мс. */
+  openDelay?: number
+  /** Задержка закрытия после ухода курсора, мс. */
+  closeDelay?: number
+  /** Меню не открывается ничем; триггер остаётся фокусируемым. */
+  disabled?: boolean
+  /** Куда телепортировать панель (`body` по умолчанию). */
+  teleportTo?: string | HTMLElement
   /** Закрывать по клику внутри content. */
   closeOnContentClick?: boolean
   /** Дополнительные классы content-контейнера; по умолчанию `p-0`. */
@@ -49,6 +60,11 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
   placement: 'bottom-end',
   offset: 8,
   width: '12rem',
+  trigger: 'click',
+  openDelay: 120,
+  closeDelay: 160,
+  disabled: false,
+  teleportTo: 'body',
   closeOnContentClick: true,
   // В `GrDropdown` есть `p-1`, поэтому здесь по умолчанию обнуляем padding,
   // чтобы пункты меню могли растягиваться до границ.
@@ -67,8 +83,10 @@ const emit = defineEmits<{
 
 function itemProps(item: GrDropdownMenuAction): Record<string, unknown> {
   return {
-    as: item.href ? 'a' : undefined,
     href: item.href,
+    target: item.target,
+    rel: item.rel,
+    external: item.external,
     disabled: item.disabled,
     variant: item.variant,
     role: item.role,
@@ -92,6 +110,11 @@ function onSelect(item: GrDropdownMenuAction): void {
     :placement="placement"
     :offset="offset"
     :width="width"
+    :trigger="trigger"
+    :open-delay="openDelay"
+    :close-delay="closeDelay"
+    :disabled="disabled"
+    :teleport-to="teleportTo"
     :close-on-content-click="closeOnContentClick"
     :content-class="contentClass"
   >

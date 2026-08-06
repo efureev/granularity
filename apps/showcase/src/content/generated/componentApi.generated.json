@@ -2486,6 +2486,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "Меню не открывается ничем; триггер остаётся фокусируемым.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "items",
             "description": "Декларативное меню: пункты, группы и разделители массивом. Слот по умолчанию сильнее — он для меню, которое из модели не собирается.",
             "type": "GrDropdownMenuEntry[] | undefined",
@@ -2514,6 +2521,27 @@
             "default": "8"
           },
           {
+            "name": "trigger",
+            "description": "Чем открывается панель. В любом режиме работают клик и клавиатура.",
+            "type": "GrDropdownTrigger | undefined",
+            "required": false,
+            "default": "\"click\""
+          },
+          {
+            "name": "openDelay",
+            "description": "Задержка открытия по наведению, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "120"
+          },
+          {
+            "name": "closeDelay",
+            "description": "Задержка закрытия после ухода курсора, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "160"
+          },
+          {
             "name": "closeOnContentClick",
             "description": "Закрывать по клику внутри content.",
             "type": "boolean | undefined",
@@ -2526,6 +2554,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"p-0\""
+          },
+          {
+            "name": "teleportTo",
+            "description": "Куда телепортировать панель (`body` по умолчанию).",
+            "type": "string | HTMLElement | undefined",
+            "required": false,
+            "default": "\"body\""
           },
           {
             "name": "borderBottom",

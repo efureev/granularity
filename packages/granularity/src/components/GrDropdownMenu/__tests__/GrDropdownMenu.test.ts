@@ -266,3 +266,116 @@ describe('GrDropdownMenu — декларативное меню', () => {
     expect(wrapper.findAll('[data-gr-dropdown-menu-item]')).toHaveLength(0)
   })
 })
+
+describe('GrDropdownMenuItem — фокус, ссылки и выключенное состояние', () => {
+  it('пункты не табируемы: внутри menu фокусом распоряжаются стрелки', () => {
+    const wrapper = mount(GrDropdownMenuItem, { slots: { default: 'Открыть' } })
+
+    expect(wrapper.attributes('tabindex')).toBe('-1')
+  })
+
+  it('явный tabindex от потребителя сильнее', () => {
+    const wrapper = mount(GrDropdownMenuItem, {
+      attrs: { tabindex: 0 },
+      slots: { default: 'Открыть' },
+    })
+
+    expect(wrapper.attributes('tabindex')).toBe('0')
+  })
+
+  it('выключенный пункт остаётся фокусируемым: нативного disabled на кнопке нет', () => {
+    const wrapper = mount(GrDropdownMenuItem, {
+      props: { disabled: true },
+      slots: { default: 'Недоступно' },
+    })
+
+    // Нативный `disabled` выкинул бы пункт и из фокуса, и из обхода стрелками —
+    // пользователь не узнал бы, что действие вообще существует.
+    expect(wrapper.attributes('disabled')).toBeUndefined()
+    expect(wrapper.attributes('aria-disabled')).toBe('true')
+    expect(wrapper.attributes('tabindex')).toBe('-1')
+  })
+
+  it('href делает пункт ссылкой без явного as', () => {
+    const wrapper = mount(GrDropdownMenuItem, {
+      props: { href: '/docs' },
+      slots: { default: 'Документация' },
+    })
+
+    expect(wrapper.element.tagName).toBe('A')
+    expect(wrapper.attributes('href')).toBe('/docs')
+  })
+
+  it('external даёт target и rel, а явные значения сильнее', () => {
+    const external = mount(GrDropdownMenuItem, {
+      props: { href: 'https://example.com', external: true },
+      slots: { default: 'Сайт' },
+    })
+    expect(external.attributes('target')).toBe('_blank')
+    expect(external.attributes('rel')).toBe('noopener noreferrer')
+
+    const explicit = mount(GrDropdownMenuItem, {
+      props: { href: 'https://example.com', target: '_self', rel: 'nofollow' },
+      slots: { default: 'Сайт' },
+    })
+    expect(explicit.attributes('target')).toBe('_self')
+    expect(explicit.attributes('rel')).toBe('nofollow')
+  })
+
+  it('у выключенной ссылки href снимается: перехват клика не спасает от средней кнопки', () => {
+    const wrapper = mount(GrDropdownMenuItem, {
+      props: { href: '/docs', disabled: true },
+      slots: { default: 'Документация' },
+    })
+
+    expect(wrapper.attributes('href')).toBeUndefined()
+    expect(wrapper.attributes('aria-disabled')).toBe('true')
+  })
+})
+
+describe('GrDropdownMenu — проброс в GrDropdown', () => {
+  it('режим открытия, задержки, disabled и teleportTo доезжают до примитива', () => {
+    const wrapper = mount(GrDropdownMenu, {
+      props: {
+        trigger: 'hover',
+        openDelay: 50,
+        closeDelay: 90,
+        disabled: true,
+        placement: 'top-start',
+        offset: 12,
+        width: '20rem',
+      },
+      global: { stubs: { teleport: true } },
+    })
+
+    const dropdown = wrapper.findComponent({ name: 'GrDropdown' })
+
+    expect(dropdown.props()).toMatchObject({
+      trigger: 'hover',
+      openDelay: 50,
+      closeDelay: 90,
+      disabled: true,
+      placement: 'top-start',
+      offset: 12,
+      width: '20rem',
+    })
+  })
+
+  it('модель отдаёт пункту ссылочные пропы', () => {
+    const wrapper = mount(GrDropdownMenu, {
+      props: {
+        items: [
+          { key: 'docs', label: 'Документация', href: 'https://example.com', external: true },
+        ] as GrDropdownMenuEntry[],
+      },
+      global: { stubs: { teleport: true } },
+    })
+
+    const item = wrapper.find('[data-gr-dropdown-menu-item]')
+
+    expect(item.element.tagName).toBe('A')
+    expect(item.attributes('href')).toBe('https://example.com')
+    expect(item.attributes('target')).toBe('_blank')
+    expect(item.attributes('rel')).toBe('noopener noreferrer')
+  })
+})

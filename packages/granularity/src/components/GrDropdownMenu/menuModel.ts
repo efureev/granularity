@@ -24,6 +24,10 @@ export interface GrDropdownMenuAction {
   checked?: boolean
   /** Пункт-ссылка: рендерится как `<a>` с этим `href`. */
   href?: string
+  target?: string
+  rel?: string
+  /** Шорткат для `target="_blank"` + `rel="noopener noreferrer"`. */
+  external?: boolean
 }
 
 export interface GrDropdownMenuSeparator {

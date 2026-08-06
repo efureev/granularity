@@ -24,7 +24,10 @@ const items = computed<GrDropdownMenuEntry[]>(() => [
     ],
   },
   { type: 'divider' },
+  // Выключенный пункт остаётся в обходе стрелками и объявляется как недоступный:
+  // пользователь узнаёт, что действие есть, но сейчас не работает.
   { key: 'export', label: 'Export…', disabled: true },
+  { key: 'docs', label: 'Open docs', href: 'https://github.com/fureev', external: true },
   { key: 'delete', label: 'Delete', variant: 'danger', shortcut: '⌫' },
 ])
 
