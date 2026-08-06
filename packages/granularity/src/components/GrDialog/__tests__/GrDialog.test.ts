@@ -2,9 +2,9 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-// Мокаем HeadlessUI, чтобы избавиться от teleport/focus-trap и иметь
-// возможность дёргать `close` через Esc. Эмулируем тот же контракт, что в
-// тестах `GrModal` (Esc → emit('close')).
+// Мокаем HeadlessUI, чтобы избавиться от teleport/focus-trap. Escape мок в
+// `close` не превращает: общий стек слоёв гасит нажатие в capture-фазе на
+// `window`, и до `<Dialog>` оно не доходит (тот же контракт в тестах `GrModal`).
 vi.mock('@headlessui/vue', async () => {
   const { defineComponent } = await import('vue')
   return {
@@ -15,13 +15,7 @@ vi.mock('@headlessui/vue', async () => {
         as: { type: String, default: 'div' },
         initialFocus: { type: Object, default: null },
       },
-      setup(_, { emit }) {
-        function onKeydown(event: KeyboardEvent) {
-          if (event.key === 'Escape') emit('close')
-        }
-        return { onKeydown }
-      },
-      template: '<div data-testid="hu-dialog" @keydown="onKeydown"><slot /></div>',
+      template: '<div data-testid="hu-dialog"><slot /></div>',
     }),
     DialogPanel: defineComponent({
       name: 'DialogPanel',
@@ -155,18 +149,42 @@ describe('GrDialog', () => {
   })
 
   it('Esc закрывает при closeOnEsc=true и не закрывает при closeOnEsc=false', async () => {
+    function pressEscape(): void {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+    }
+
     const withEsc = mountHarness(`
       <GrDialog v-model="open" title="T">Body</GrDialog>
     `)
-    await withEsc.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    pressEscape()
     await nextTick()
     expect((withEsc.vm as any).open).toBe(false)
+    withEsc.unmount()
 
     const withoutEsc = mountHarness(`
       <GrDialog v-model="open" title="T" :close-on-esc="false">Body</GrDialog>
     `)
-    await withoutEsc.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    pressEscape()
     await nextTick()
     expect((withoutEsc.vm as any).open).toBe(true)
+    withoutEsc.unmount()
+  })
+
+  it('передаёт имя окна вниз, чтобы GrModal не подставлял обобщённое', () => {
+    const wrapper = mountHarness(`
+      <GrDialog v-model="open" title="Профиль">Body</GrDialog>
+    `)
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Профиль')
+    wrapper.unmount()
+  })
+
+  it('ariaLabel даёт имя окну без заголовка вовсе', () => {
+    const wrapper = mountHarness(`
+      <GrDialog v-model="open" :show-header="false" aria-label="Мастер импорта">Body</GrDialog>
+    `)
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Мастер импорта')
+    wrapper.unmount()
   })
 })

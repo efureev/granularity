@@ -12,6 +12,8 @@
  * - В остальных случаях (`!showHeader`, либо `showHeader` со слотом `#header`)
  *   `GrDialog` отдаёт sr-only title в слот `#title` у `GrModal`, чтобы
  *   HeadlessUI корректно проставил `aria-labelledby` на панель.
+ * - `aria-label` вниз уходит всегда: `GrModal` иначе не отличил бы «заголовок
+ *   рисует `GrDialogHeader`» от «имени нет вовсе» и подставил бы обобщённое.
  */
 import { computed } from 'vue'
 
@@ -39,6 +41,11 @@ export interface GrDialogProps {
   bodyConfig?: GrDialogSectionConfig
   /** A11y-лейбл кнопки закрытия (i18n). */
   closeLabel?: string
+  /**
+   * Доступное имя окна, когда заголовка нет вовсе: `showHeader: false` без
+   * `title` и без слота `#header` оставил бы окно безымянным.
+   */
+  ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<GrDialogProps>(), {
@@ -52,6 +59,7 @@ const props = withDefaults(defineProps<GrDialogProps>(), {
   footerConfig: undefined,
   bodyConfig: undefined,
   closeLabel: undefined,
+  ariaLabel: undefined,
 })
 
 const emit = defineEmits<{
@@ -90,6 +98,7 @@ function close(): void {
     :size="size"
     :close-on-backdrop="closeOnBackdrop"
     :close-on-esc="closeOnEsc"
+    :aria-label="ariaLabel ?? resolvedTitle"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <template v-if="useModalSrOnlyTitle" #title>

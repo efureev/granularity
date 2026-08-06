@@ -3,11 +3,12 @@ import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
+  const { defineComponent, onBeforeUnmount, onMounted } = await import('vue')
 
   return {
-    // `Dialog` эмулирует поведение HeadlessUI: при нажатии Esc
-    // эмитит `close`, а сам `class`/`initial-focus` пробрасывает вниз.
+    // Escape мок намеренно НЕ превращает в `@close`: общий стек слоёв гасит
+    // нажатие в capture-фазе на `window`, и до `<Dialog>` оно не доходит.
+    // Мок, эмулирующий обратное, проверял бы путь, которого в проде нет.
     Dialog: defineComponent({
       name: 'Dialog',
       emits: ['close'],
@@ -15,13 +16,7 @@ vi.mock('@headlessui/vue', async () => {
         as: { type: String, default: 'div' },
         initialFocus: { type: Object, default: null },
       },
-      setup(_, { emit }) {
-        function onKeydown(event: KeyboardEvent) {
-          if (event.key === 'Escape') emit('close')
-        }
-        return { onKeydown }
-      },
-      template: '<div data-testid="hu-dialog" @keydown="onKeydown"><slot /></div>',
+      template: '<div data-testid="hu-dialog"><slot /></div>',
     }),
     DialogPanel: defineComponent({
       name: 'DialogPanel',
@@ -40,22 +35,42 @@ vi.mock('@headlessui/vue', async () => {
       props: { show: { type: Boolean, default: false } },
       template: '<div v-if="show"><slot /></div>',
     }),
+    // `after-enter`/`after-leave` мок эмитит сразу: настоящих транзишнов в
+    // jsdom нет, а проверяем мы проводку событий наружу, а не тайминг.
+    // `TransitionChild` монтируется вместе с открытием и размонтируется с
+    // закрытием, поэтому событие привязано к жизненному циклу, а не к пропу.
     TransitionChild: defineComponent({
       name: 'TransitionChild',
+      emits: ['after-enter', 'after-leave'],
+      setup(_, { emit }) {
+        onMounted(() => emit('after-enter'))
+        onBeforeUnmount(() => emit('after-leave'))
+      },
       template: '<div><slot /></div>',
     }),
   }
 })
 
 import GrModal from '../GrModal.vue'
-import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
+import { overlayStackSize, pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 
 interface HarnessOptions {
   closeOnBackdrop?: boolean
   closeOnEsc?: boolean
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  scrollBehavior?: 'outside' | 'inside'
+  ariaLabel?: string
   withTitleSlot?: boolean
   withDescriptionSlot?: boolean
+}
+
+/** Escape приходит так же, как в проде: через общий стек слоёв на `window`. */
+function pressEscape(): void {
+  window.dispatchEvent(new KeyboardEvent('keydown', {
+    key: 'Escape',
+    bubbles: true,
+    cancelable: true,
+  }))
 }
 
 function mountHarness(options: HarnessOptions = {}) {
@@ -74,6 +89,8 @@ function mountHarness(options: HarnessOptions = {}) {
       closeOnBackdrop: { type: Boolean, default: true },
       closeOnEsc: { type: Boolean, default: true },
       size: { type: String, default: 'md' },
+      scrollBehavior: { type: String, default: 'outside' },
+      ariaLabel: { type: String, default: undefined },
     },
     setup() {
       const open = ref(true)
@@ -85,6 +102,8 @@ function mountHarness(options: HarnessOptions = {}) {
         :close-on-backdrop="closeOnBackdrop"
         :close-on-esc="closeOnEsc"
         :size="size"
+        :scroll-behavior="scrollBehavior"
+        :aria-label="ariaLabel"
       >
         ${Object.entries(slots)
           .map(([name, html]) =>
@@ -102,6 +121,8 @@ function mountHarness(options: HarnessOptions = {}) {
       closeOnBackdrop: options.closeOnBackdrop ?? true,
       closeOnEsc: options.closeOnEsc ?? true,
       size: options.size ?? 'md',
+      scrollBehavior: options.scrollBehavior ?? 'outside',
+      ariaLabel: options.ariaLabel,
     },
     global: {
       stubs: { teleport: true },
@@ -154,7 +175,7 @@ describe('granularity/GrModal (unit)', () => {
   it('закрывается по Esc, когда closeOnEsc=true (по умолчанию)', async () => {
     const wrapper = mountHarness()
 
-    await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    pressEscape()
     await nextTick()
 
     expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
@@ -165,7 +186,7 @@ describe('granularity/GrModal (unit)', () => {
   it('не закрывается по Esc, если closeOnEsc=false', async () => {
     const wrapper = mountHarness({ closeOnEsc: false })
 
-    await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    pressEscape()
     await nextTick()
 
     expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(true)
@@ -176,7 +197,7 @@ describe('granularity/GrModal (unit)', () => {
   it('Esc закрывает даже при closeOnBackdrop=false (независимость флагов)', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: false, closeOnEsc: true })
 
-    await wrapper.find('[data-testid="hu-dialog"]').trigger('keydown', { key: 'Escape' })
+    pressEscape()
     await nextTick()
 
     expect(wrapper.find('[data-gr-modal-panel]').exists()).toBe(false)
@@ -187,7 +208,6 @@ describe('granularity/GrModal (unit)', () => {
   it('закрывается по клику на оверлей, если closeOnBackdrop=true', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: true })
 
-    await wrapper.find('[data-gr-modal-overlay]').trigger('pointerdown')
     wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
     await nextTick()
 
@@ -199,7 +219,6 @@ describe('granularity/GrModal (unit)', () => {
   it('не закрывается по клику на оверлей, если closeOnBackdrop=false', async () => {
     const wrapper = mountHarness({ closeOnBackdrop: false })
 
-    await wrapper.find('[data-gr-modal-overlay]').trigger('pointerdown')
     wrapper.findComponent({ name: 'Dialog' }).vm.$emit('close')
     await nextTick()
 
@@ -273,5 +292,114 @@ describe('granularity/GrModal (unit)', () => {
     expect(document.body.style.overflow).toBe('auto')
 
     wrapper.unmount()
+  })
+})
+
+describe('GrModal — доступное имя', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
+    resetOverlayStack()
+    vi.restoreAllMocks()
+  })
+
+  it('со слотом #title имя даёт aria-labelledby, свой aria-label не ставится', () => {
+    const wrapper = mountHarness({ withTitleSlot: true })
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBeUndefined()
+    expect(wrapper.find('[data-gr-modal-title]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('без слота #title имя берётся из пропа ariaLabel', () => {
+    const wrapper = mountHarness({ ariaLabel: 'Настройки профиля' })
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Настройки профиля')
+
+    wrapper.unmount()
+  })
+
+  it('без заголовка и без ariaLabel окно всё равно не остаётся безымянным', () => {
+    // Иначе axe роняет `aria-dialog-name` (critical), а диктор объявляет
+    // «диалог» без единого слова о том, какой именно.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mountHarness()
+
+    expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Dialog')
+    expect(warn).toHaveBeenCalledOnce()
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrModal — жизненный цикл и раскладка', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
+    resetOverlayStack()
+  })
+
+  it('эмитит opened/closed после анимации', async () => {
+    // Без `teleport`-стаба: он пересоздаёт поддерево на каждом ре-рендере, и
+    // инстанс транзишна не доживает до перехода «открыто → закрыто».
+    const wrapper = mount(GrModal, {
+      attachTo: document.body,
+      props: { modelValue: false, ariaLabel: 'X' },
+      slots: { default: '<div />' },
+    })
+
+    await wrapper.setProps({ modelValue: true })
+    expect(wrapper.emitted('opened')).toHaveLength(1)
+    expect(wrapper.emitted('closed')).toBeUndefined()
+
+    await wrapper.setProps({ modelValue: false })
+    expect(wrapper.emitted('closed')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('initialFocus перебивает панель по умолчанию', () => {
+    const target = document.createElement('button')
+    document.body.appendChild(target)
+
+    const wrapper = mount(defineComponent({
+      components: { GrModal },
+      props: { target: { type: Object, default: null } },
+      setup: () => ({ open: ref(true) }),
+      template: '<GrModal v-model="open" aria-label="X" :initial-focus="target"><div /></GrModal>',
+    }), { props: { target }, global: { stubs: { teleport: true } } })
+
+    expect(wrapper.findComponent({ name: 'Dialog' }).props('initialFocus')).toBe(target)
+
+    wrapper.unmount()
+    target.remove()
+  })
+
+  it('scrollBehavior решает, кто скроллится: оверлей или сама панель', () => {
+    // Оболочка — первый потомок корня `<Dialog>`, за ней раскладка.
+    const shellOf = (w: ReturnType<typeof mountHarness>) =>
+      w.find('[data-testid="hu-dialog"]').element.firstElementChild as HTMLElement
+
+    const outside = mountHarness({ ariaLabel: 'X' })
+    expect(shellOf(outside).className).toContain('overflow-y-auto')
+    expect(outside.find('[data-gr-modal-panel]').attributes('class')).toContain('overflow-hidden')
+    outside.unmount()
+
+    const inside = mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside' })
+    expect(shellOf(inside).className).toContain('overflow-hidden')
+    expect(inside.find('[data-gr-modal-panel]').attributes('class')).toContain('max-h-full')
+
+    // Скроллится тело, а не панель целиком: заголовок обязан остаться на месте.
+    expect(inside.find('[data-gr-modal-body]').attributes('class')).toContain('overflow-y-auto')
+    inside.unmount()
+  })
+
+  it('снимает слой со стека при размонтировании без закрытия', () => {
+    const wrapper = mountHarness({ ariaLabel: 'X' })
+    expect(overlayStackSize()).toBe(1)
+
+    wrapper.unmount()
+    expect(overlayStackSize()).toBe(0)
   })
 })

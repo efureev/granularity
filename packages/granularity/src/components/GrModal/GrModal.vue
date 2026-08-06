@@ -5,11 +5,18 @@
  * Публичный API:
  * - `modelValue` (v-model) — открыто/закрыто;
  * - `size` — размер панели (`sm | md | lg | xl | full`);
+ * - `scrollBehavior` — кто скроллится при длинном содержимом;
  * - `closeOnBackdrop` (default: true) — закрывать при клике по оверлею;
  * - `closeOnEsc` (default: true) — закрывать по Esc;
  * - слоты `#title` / `#description` — если переданы, оборачиваются в
  *   `DialogTitle` / `DialogDescription` (связь через `aria-labelledby` /
  *   `aria-describedby` ставится HeadlessUI автоматически).
+ *
+ * A11y: **имя у модального слоя обязательно**. HeadlessUI связывает
+ * `aria-labelledby` только при наличии `DialogTitle`, поэтому окно без слота
+ * `#title` осталось бы вовсе без доступного имени (axe: `aria-dialog-name`).
+ * Имя берётся из `#title`, иначе из пропа `ariaLabel`, иначе — из i18n, чтобы
+ * безымянного окна не получилось ни при каком употреблении.
  *
  * Esc обрабатывается через общий стек слоёв (`useOverlayLayer`), куда
  * регистрируются все оверлеи пакета — и модалки, и панели селектов, дропдаунов,
@@ -17,46 +24,84 @@
  * слой и опережает window-обработчик Escape HeadlessUI. Это чинит два кейса:
  * диалог `useDialogService` поверх `GrModal` (другое дерево рендера) и панель,
  * открытую внутри модалки, — Esc адресуется тому, что видит пользователь.
- * Клик по оверлею (backdrop) по-прежнему идёт через `@close` HeadlessUI;
- * источник закрытия различается через ref `closeReason`.
+ * Стек гасит Escape в capture-фазе на `window`, поэтому до `<Dialog>` нажатие
+ * не доходит вовсе: `@close` от HeadlessUI остаётся только у клика по оверлею
+ * и программного вызова, и оба подчиняются `closeOnBackdrop`.
  */
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, useSlots, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useScrollLock } from '../../composables/internal/useScrollLock'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
+  type GrModalScrollBehavior,
   type GrModalSize,
   getGrModalPanelClass,
-  layout,
+  layoutByScroll,
   overlay as overlayClass,
   overlayTransition,
+  panelBodyScrollClass,
   panelTransition,
   root as rootClass,
-  shell,
+  shellBase,
+  shellByScroll,
 } from './grModalStyles'
+
+export type { GrModalScrollBehavior }
 
 export interface GrModalProps {
   modelValue: boolean
   closeOnBackdrop?: boolean
   closeOnEsc?: boolean
   size?: GrModalSize
+  /**
+   * Кто скроллится при длинном содержимом: весь оверлей (`outside`) или сама
+   * панель (`inside` — окно остаётся на месте, шапка и подвал на виду).
+   */
+  scrollBehavior?: GrModalScrollBehavior
+  /**
+   * Доступное имя окна, когда заголовка в слоте `#title` нет. Слот сильнее:
+   * при нём имя даёт `aria-labelledby` от `DialogTitle`.
+   */
+  ariaLabel?: string
+  /**
+   * Элемент, получающий фокус при открытии. По умолчанию — сама панель.
+   */
+  initialFocus?: HTMLElement | null
 }
 
 const props = withDefaults(defineProps<GrModalProps>(), {
   closeOnBackdrop: true,
   closeOnEsc: true,
   size: 'md',
+  scrollBehavior: 'outside',
+  ariaLabel: undefined,
+  initialFocus: null,
 })
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
+  /** Окно открылось и анимация закончилась. */
+  (e: 'opened'): void
+  /** Окно закрылось и анимация закончилась — содержимое можно размонтировать. */
+  (e: 'closed'): void
 }>()
 
-const panelClass = computed(() => getGrModalPanelClass(props.size))
+defineSlots<{
+  default?: () => any
+  title?: () => any
+  description?: () => any
+}>()
+
+const slots = useSlots()
+
+const panelClass = computed(() => getGrModalPanelClass(props.size, props.scrollBehavior))
+const shellClass = computed(() => `${shellBase} ${shellByScroll[props.scrollBehavior]}`)
+const layoutClass = computed(() => layoutByScroll[props.scrollBehavior])
 
 // Ссылка на панель используется как `initialFocus` для HeadlessUI `<Dialog>`:
 // панель имеет `tabindex="-1"`, поэтому всегда фокусируема программно. Это
@@ -81,30 +126,44 @@ const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : un
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
 
-// Источник закрытия от HeadlessUI `<Dialog>` — либо Esc, либо клик по оверлею.
-// Различаем их, чтобы `closeOnBackdrop` и `closeOnEsc` работали независимо.
-const closeReason = ref<'backdrop' | 'esc' | null>(null)
+const { t } = useGranularityTranslations()
+
+// Заголовок в слоте — единственный, что HeadlessUI умеет связать сам.
+const hasTitle = computed(() => Boolean(slots.title))
+
+// Собственный `aria-label` ставим только в отсутствие заголовка: при обоих
+// атрибутах `aria-labelledby` всё равно сильнее, и второе имя было бы шумом.
+const ariaLabelAttr = computed(() => {
+  if (hasTitle.value) return undefined
+  return props.ariaLabel || t('gr.modal.title', 'Dialog')
+})
+
+// Обобщённое имя из локали спасает от безымянного окна, но осмысленное имя
+// знает только автор. Предупреждаем при первом открытии, а не при монтировании:
+// закрытая модалка ещё ничего не нарушила, и ругаться на неё рано.
+let missingNameWarned = false
+
+function warnMissingAccessibleName(): void {
+  if (missingNameWarned) return
+  if (process.env.NODE_ENV === 'production') return
+  if (hasTitle.value || props.ariaLabel) return
+
+  missingNameWarned = true
+  console.warn(
+    '[GrModal] Окно без доступного имени: передайте слот #title или проп ariaLabel. '
+    + 'Пока используется обобщённое имя из локали.',
+  )
+}
 
 function close(): void {
   emit('update:modelValue', false)
 }
 
+// Escape до `<Dialog>` не доходит — стек слоёв гасит его в capture-фазе на
+// `window`. Значит `@close` остаётся только за кликом по оверлею и программным
+// вызовом HeadlessUI, и различать источники больше нечем и незачем.
 function onDialogClose(): void {
-  const reason = closeReason.value
-  closeReason.value = null
-
-  if (reason === 'esc') {
-    if (props.closeOnEsc) close()
-    return
-  }
-
-  // По умолчанию (клик по оверлею или программный вызов `@close`)
-  // уважаем `closeOnBackdrop`.
   if (props.closeOnBackdrop) close()
-}
-
-function onRootKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Escape') closeReason.value = 'esc'
 }
 
 // ————— Esc-стек: гарантирует, что Esc закрывает именно верхнюю (последнюю
@@ -124,10 +183,6 @@ useOverlayLayer(
   },
 )
 
-function onOverlayPointerDown(): void {
-  closeReason.value = 'backdrop'
-}
-
 // ————— Scroll lock на `<body>` на время открытия.
 // HeadlessUI Vue этого не делает автоматически, а фон скроллится — для
 // GR-примитива это мешающий UX. Общий reference-counted lock корректно
@@ -139,6 +194,7 @@ watch(
   () => props.modelValue,
   (value) => {
     if (value) {
+      warnMissingAccessibleName()
       lockBodyScroll()
     }
     else {
@@ -160,13 +216,13 @@ onBeforeUnmount(() => {
       <Dialog
         as="div"
         :class="rootClass"
-        :initial-focus="panelRef"
+        :initial-focus="initialFocus ?? panelRef"
         :inert="inertAttr"
+        :aria-label="ariaLabelAttr"
         @close="onDialogClose"
-        @keydown.capture="onRootKeydown"
       >
-        <div :class="shell">
-          <div :class="layout">
+        <div :class="shellClass">
+          <div :class="layoutClass">
             <TransitionChild
               as="template"
               :enter="overlayTransition.enter"
@@ -180,10 +236,12 @@ onBeforeUnmount(() => {
                 data-gr-modal-overlay
                 :class="overlayClass"
                 aria-hidden="true"
-                @pointerdown="onOverlayPointerDown"
               />
             </TransitionChild>
 
+            <!-- `opened`/`closed` вешаем на транзишн панели, а не на корневой:
+                 анимация живёт здесь, и только её конец что-то значит для
+                 потребителя, который ждёт момента для размонтирования. -->
             <TransitionChild
               as="template"
               :enter="panelTransition.enter"
@@ -192,6 +250,8 @@ onBeforeUnmount(() => {
               :leave="panelTransition.leave"
               :leave-from="panelTransition.leaveFrom"
               :leave-to="panelTransition.leaveTo"
+              @after-enter="emit('opened')"
+              @after-leave="emit('closed')"
             >
               <DialogPanel
                 ref="panelRef"
@@ -205,7 +265,17 @@ onBeforeUnmount(() => {
                 <DialogDescription v-if="$slots.description" as="div" data-gr-modal-description>
                   <slot name="description" />
                 </DialogDescription>
-                <slot />
+
+                <!-- При `inside` тело едет отдельно от заголовка: иначе режим
+                     ничем не отличался бы от скролла всей панели. -->
+                <div
+                  v-if="scrollBehavior === 'inside'"
+                  data-gr-modal-body
+                  :class="panelBodyScrollClass"
+                >
+                  <slot />
+                </div>
+                <slot v-else />
               </DialogPanel>
             </TransitionChild>
           </div>

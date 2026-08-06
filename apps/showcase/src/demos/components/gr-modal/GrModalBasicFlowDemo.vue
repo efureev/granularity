@@ -14,7 +14,13 @@ const open = ref(false)
       {{ t('components.GrModal.basic.open') }}
     </GrButton>
 
-    <GrModal v-model="open" size="sm">
+    <!-- Модальный слой обязан иметь имя: заголовок здесь свёрстан в теле,
+         поэтому имя отдаём пропом. Альтернатива — слот #title. -->
+    <GrModal
+      v-model="open"
+      size="sm"
+      :aria-label="t('components.GrModal.basic.shellTitle')"
+    >
       <div class="grid gap-3">
         <div class="text-sm font-semibold text-[var(--gr-fg)]">
           {{ t('components.GrModal.basic.shellTitle') }}

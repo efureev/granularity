@@ -90,7 +90,7 @@ Enter не переключает состояние, а сабмитит фор
 
 | Компонент | Клавиши |
 | --- | --- |
-| `GrModal` и всё на нём (`GrDialog`, `GrConfirmDialog`, `GrPromptDialog`, `useDialogService`) | `Esc` — закрыть верхнее окно (если `closeOnEsc`), `Tab`/`Shift+Tab` — цикл внутри фокус-ловушки |
+| `GrModal` и всё на нём (`GrDialog`, `GrConfirmDialog`, `GrPromptDialog`, `GrCommandPalette`, `useDialogService`) | `Esc` — закрыть верхнее окно (если `closeOnEsc`), `Tab`/`Shift+Tab` — цикл внутри фокус-ловушки |
 | `GrDrawer` | то же |
 | `GrTooltip` | `Esc` — скрыть (мгновенно, минуя `closeDelay`); показывается по фокусу триггера, не только по наведению. Со слотом остановка `Tab` одна — сам контрол, а описание уезжает на него |
 | `GrImageViewer` | `Esc` — закрыть |

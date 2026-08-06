@@ -42,6 +42,25 @@ async function flush(times = 4): Promise<void> {
   }
 }
 
+/**
+ * Ждать состояния, а не фиксированного числа тиков.
+ *
+ * `onConfirm` асинхронный, его ошибка проходит через цепочку парсеров, и
+ * сколько микротасок займёт путь «клик → текст ошибки в DOM», зависит от того,
+ * сколько реактивных зависимостей у окна. Фиксированный `flush(6)` держался на
+ * этом числе: любое изменение `GrModal` — даже лишний `ref` — роняло тест,
+ * который к самому сервису диалогов отношения не имеет.
+ */
+async function flushUntil(predicate: () => boolean, times = 40): Promise<void> {
+  for (let i = 0; i < times; i += 1) {
+    if (predicate()) return
+    await nextTick()
+    // Классификатор ошибок асинхронный и может уйти в макротаску — одними
+    // микротасками его до конца не прогонишь.
+    await new Promise(resolve => setTimeout(resolve, 0))
+  }
+}
+
 function confirmButton(): HTMLElement | null {
   return document.querySelector('[data-testid="gr-confirm-confirm"]')
 }
@@ -78,7 +97,7 @@ describe('useDialogService', () => {
 
   it('alert: показывает одну кнопку и резолвит void', async () => {
     const p = dialogService.alert('Saved successfully')
-    await flush()
+    await flushUntil(() => document.body.textContent.includes('Saved successfully'))
 
     expect(document.body.textContent).toContain('Saved successfully')
     expect(document.querySelector('[data-testid="gr-confirm-cancel"]')).toBeNull()
@@ -120,7 +139,7 @@ describe('useDialogService', () => {
     await flush()
 
     confirmButton()!.click()
-    await flush(6)
+    await flushUntil(() => document.body.textContent.includes('Server rejected'))
 
     // Первый клик: ошибка показана, диалог открыт, промис не зарезолвлен.
     expect(document.body.textContent).toContain('Server rejected')
@@ -138,7 +157,7 @@ describe('useDialogService', () => {
     await flush()
 
     confirmButton()!.click()
-    await flush(6)
+    await flushUntil(() => document.body.textContent.includes('Boom failure'))
 
     expect(document.body.textContent).toContain('Boom failure')
 
@@ -150,14 +169,14 @@ describe('useDialogService', () => {
   it('очередь FIFO: второй диалог открывается после закрытия первого', async () => {
     const p1 = dialogService.confirm('First')
     const p2 = dialogService.confirm('Second')
-    await flush()
+    await flushUntil(() => document.body.textContent.includes('First'))
 
     expect(document.body.textContent).toContain('First')
     expect(document.body.textContent).not.toContain('Second')
 
     confirmButton()!.click()
     await p1
-    await flush()
+    await flushUntil(() => document.body.textContent.includes('Second'))
 
     expect(document.body.textContent).toContain('Second')
     confirmButton()!.click()

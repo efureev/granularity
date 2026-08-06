@@ -1931,6 +1931,13 @@
             "default": "\"md\""
           },
           {
+            "name": "ariaLabel",
+            "description": "Доступное имя окна, когда заголовка нет вовсе: `showHeader: false` без `title` и без слота `#header` оставил бы окно безымянным.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeOnBackdrop",
             "description": "",
             "type": "boolean | undefined",
@@ -4569,6 +4576,13 @@
             "default": "\"md\""
           },
           {
+            "name": "ariaLabel",
+            "description": "Доступное имя окна, когда заголовка в слоте `#title` нет. Слот сильнее: при нём имя даёт `aria-labelledby` от `DialogTitle`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeOnBackdrop",
             "description": "",
             "type": "boolean | undefined",
@@ -4581,6 +4595,20 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
+            "name": "scrollBehavior",
+            "description": "Кто скроллится при длинном содержимом: весь оверлей (`outside`) или сама панель (`inside` — окно остаётся на месте, шапка и подвал на виду).",
+            "type": "GrModalScrollBehavior | undefined",
+            "required": false,
+            "default": "\"outside\""
           },
           {
             "name": "modelValue",
@@ -4596,19 +4624,19 @@
         "origin": "generated",
         "items": [
           {
+            "name": "default",
+            "description": "",
+            "type": "any"
+          },
+          {
             "name": "title",
             "description": "",
-            "type": "{}"
+            "type": "any"
           },
           {
             "name": "description",
             "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "type": "any"
           }
         ]
       },
@@ -4622,6 +4650,18 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "opened",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"opened\"): void"
+          },
+          {
+            "name": "closed",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"closed\"): void"
           }
         ]
       },

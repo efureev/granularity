@@ -110,6 +110,9 @@
   "drawer": {
     "title": "Панель"
   },
+  "modal": {
+    "title": "Диалог"
+  },
   "numberInput": {
     "increase": "Увеличить",
     "decrease": "Уменьшить"

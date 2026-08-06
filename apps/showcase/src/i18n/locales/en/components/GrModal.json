@@ -15,6 +15,10 @@
     "modal-dialog-service": {
       "title": "Imperative dialogs from an open modal",
       "description": "Launch `useDialogService` (`confirm` / `alert` / `prompt`) straight from an open `GrModal`. The service mounts its own host in `document.body` on top of the window, so closing a dialog does not close the source modal — the decision is returned via a `Promise`."
+    },
+    "modal-scroll-lifecycle": {
+      "title": "Scrolling long content and lifecycle events",
+      "description": "`scrollBehavior` decides what scrolls — the panel or the whole overlay; `opened`/`closed` arrive after the animation, and only `closed` makes it safe to unmount the content."
     }
   },
   "basic": {
@@ -68,5 +72,17 @@
     "logAlert": "alert -> closed (modal not closed)",
     "logPromptCancel": "prompt -> cancelled",
     "logPrompt": "prompt -> \"{name}\""
+  },
+  "scroll": {
+    "open": "Open a long dialog",
+    "title": "Terms of use",
+    "body": "With `scrollBehavior=\"inside\"` the panel scrolls itself and the title stays put. With `outside` the whole overlay scrolls.",
+    "row": "Clause {index}",
+    "close": "Accept",
+    "phase": {
+      "idle": "Not opened yet",
+      "opened": "opened — enter animation finished",
+      "closed": "closed — content is safe to unmount"
+    }
   }
 }

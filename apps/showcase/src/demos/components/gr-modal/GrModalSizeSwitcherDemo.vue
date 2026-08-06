@@ -25,7 +25,11 @@ function openWithSize(size: 'sm' | 'lg') {
       </GrButton>
     </div>
 
-    <GrModal v-model="open" :size="activeSize">
+    <GrModal
+      v-model="open"
+      :size="activeSize"
+      :aria-label="t('components.GrModal.size.activeSize', { size: activeSize })"
+    >
       <div class="grid gap-4">
         <div class="flex items-center justify-between gap-3">
           <div>

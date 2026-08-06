@@ -2,12 +2,31 @@ import type { GrOverlaySize } from '../shared/sizes'
 
 export type GrModalSize = GrOverlaySize
 
+/**
+ * Кто скроллится при длинном содержимом: весь оверлей (`outside`, окно уезжает
+ * вверх вместе со страницей) или сама панель (`inside`, окно остаётся на месте,
+ * а шапка и подвал `GrDialog` — на виду).
+ */
+export type GrModalScrollBehavior = 'outside' | 'inside'
+
 // Корневые утилитарные классы, используемые шаблоном `GrModal.vue`.
 // Они же являются единственным источником истины для safelist.
 export const root = 'fixed inset-0 z-[var(--gr-z-modal)]'
-export const shell = 'fixed inset-0 overflow-y-auto p-4 sm:p-6'
-export const layout = 'min-h-full flex items-center justify-center'
 export const overlay = 'fixed inset-0 z-0 bg-[var(--gr-overlay-bg)]'
+
+export const shellBase = 'fixed inset-0 p-4 sm:p-6'
+
+// Скролл живёт ровно в одном месте: либо в оболочке, либо в панели. Держать
+// `overflow-y-auto` на обеих — значит получить два скроллбара на одно окно.
+export const shellByScroll: Record<GrModalScrollBehavior, string> = {
+  outside: 'overflow-y-auto',
+  inside: 'overflow-hidden',
+}
+
+export const layoutByScroll: Record<GrModalScrollBehavior, string> = {
+  outside: 'min-h-full flex items-center justify-center',
+  inside: 'h-full flex items-center justify-center',
+}
 
 // Классы для `<TransitionChild :enter="..." :enter-from="..." ...>`.
 // Разбиты по фазам транзишна, чтобы не склеивать их в «мешок токенов».
@@ -30,7 +49,18 @@ export const panelTransition = {
 } as const
 
 export const panelBase
-  = 'w-full overflow-hidden relative z-10 border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
+  = 'w-full relative z-10 border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
+
+// `overflow-hidden` панели нужен, чтобы её содержимое обрезалось по радиусу.
+// При `inside` панель становится колонкой: заголовок остаётся на месте, а
+// скроллится только тело — ради этого режим и заводят.
+export const panelOverflowByScroll: Record<GrModalScrollBehavior, string> = {
+  outside: 'overflow-hidden',
+  inside: 'max-h-full flex flex-col overflow-hidden',
+}
+
+/** Тело окна при `inside`. `min-h-0` — иначе flex-потомок не даст себя сжать. */
+export const panelBodyScrollClass = 'min-h-0 overflow-y-auto'
 
 export const panelWidthBySize: Record<GrModalSize, string> = {
   sm: 'max-w-[420px]',
@@ -54,11 +84,17 @@ export const panelHeightBySize: Partial<Record<GrModalSize, string>> = {
   full: 'h-[100svh] sm:h-auto',
 }
 
-export function getGrModalPanelClass(size: GrModalSize): string {
+export function getGrModalPanelClass(
+  size: GrModalSize,
+  scrollBehavior: GrModalScrollBehavior = 'outside',
+): string {
   return [
     panelBase,
+    panelOverflowByScroll[scrollBehavior],
     panelWidthBySize[size],
-    panelHeightBySize[size],
+    // При `inside` высоту задаёт `max-h-full`, а не размерная мапа: `h-[100svh]`
+    // у `full` вместе со скроллом панели дал бы окно выше вьюпорта.
+    scrollBehavior === 'inside' ? undefined : panelHeightBySize[size],
     panelRadiusBySize[size],
   ]
     .filter(Boolean)

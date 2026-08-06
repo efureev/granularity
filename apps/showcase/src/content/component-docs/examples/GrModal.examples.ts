@@ -20,7 +20,9 @@ const open = ref(false)
     Open bare modal
   </GrButton>
 
-  <GrModal v-model="open" size="sm">
+  <!-- Заголовок свёрстан в теле, поэтому имя окна отдаём пропом: без него
+       у модального слоя нет доступного имени. -->
+  <GrModal v-model="open" size="sm" aria-label="Bare modal">
     <div class="grid gap-3">
       <div class="text-sm font-semibold">
         Bare modal
@@ -105,7 +107,7 @@ function openWithSize(size: 'sm' | 'lg') {
     </GrButton>
   </div>
 
-  <GrModal v-model="open" :size="activeSize">
+  <GrModal v-model="open" :size="activeSize" :aria-label="'Active size: ' + activeSize">
     <div class="grid gap-4">
       <div class="text-sm font-semibold">
         Active size: {{ activeSize }}
@@ -196,5 +198,53 @@ async function promptFromModal() {
   </GrModal>
 </template>`,
     note: 'Закрытие confirm/alert/prompt не закрывает исходную модалку — это удобно для подтверждений и быстрых вводов внутри сложных форм.',
+  },
+  {
+    id: 'modal-scroll-lifecycle',
+    title: 'Scrolling long content and lifecycle events',
+    description: '`scrollBehavior` решает, кто скроллится — панель или весь оверлей; `opened`/`closed` приходят после анимации, и только по `closed` безопасно размонтировать содержимое.',
+    status: 'ready',
+    previewKey: 'gr-modal-scroll-lifecycle',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrButton, GrModal } from '@feugene/granularity'
+
+const open = ref(false)
+const phase = ref<'idle' | 'opened' | 'closed'>('idle')
+
+const clauses = Array.from({ length: 24 }, (_, index) => index + 1)
+</script>
+
+<template>
+  <GrButton @click="open = true">
+    Open a long dialog
+  </GrButton>
+  <span>{{ phase }}</span>
+
+  <GrModal
+    v-model="open"
+    size="md"
+    scroll-behavior="inside"
+    @opened="phase = 'opened'"
+    @closed="phase = 'closed'"
+  >
+    <!-- Слот #title — рекомендуемый путь: он и виден, и даёт окну имя. -->
+    <template #title>
+      <div class="border-b border-[var(--gr-brd)] px-4 py-3 text-sm font-semibold">
+        Terms of use
+      </div>
+    </template>
+
+    <div class="grid gap-2 p-4">
+      <div v-for="clause in clauses" :key="clause" class="rounded-xl border border-[var(--gr-brd)] px-3 py-2 text-sm">
+        Clause {{ clause }}
+      </div>
+      <GrButton class="justify-self-start" @click="open = false">
+        Accept
+      </GrButton>
+    </div>
+  </GrModal>
+</template>`,
   },
 ]

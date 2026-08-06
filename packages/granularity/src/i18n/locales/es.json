@@ -109,6 +109,9 @@
   "drawer": {
     "title": "Panel"
   },
+  "modal": {
+    "title": "Diálogo"
+  },
   "numberInput": {
     "increase": "Aumentar",
     "decrease": "Disminuir"

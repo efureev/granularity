@@ -108,6 +108,9 @@
   "drawer": {
     "title": "Drawer"
   },
+  "modal": {
+    "title": "Dialog"
+  },
   "numberInput": {
     "increase": "Increase",
     "decrease": "Decrease"

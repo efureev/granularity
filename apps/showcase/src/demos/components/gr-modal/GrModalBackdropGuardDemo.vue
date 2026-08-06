@@ -18,7 +18,12 @@ const open = ref(false)
       {{ t('components.GrModal.guarded.open') }}
     </GrButton>
 
-    <GrModal v-model="open" :close-on-backdrop="false" size="md">
+    <GrModal
+      v-model="open"
+      :close-on-backdrop="false"
+      size="md"
+      :aria-label="t('components.GrModal.guarded.protectionTitle')"
+    >
       <div class="grid gap-4">
         <div class="grid gap-1">
           <div class="text-sm font-semibold text-[var(--gr-fg)]">

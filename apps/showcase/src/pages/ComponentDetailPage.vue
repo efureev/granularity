@@ -170,6 +170,7 @@ const previewRegistry = {
   'gr-modal-basic-flow': defineAsyncComponent(() => import('../demos/components/gr-modal/GrModalBasicFlowDemo.vue')),
   'gr-modal-dialog-service': defineAsyncComponent(() => import('../demos/components/gr-modal/GrModalDialogServiceDemo.vue')),
   'gr-modal-size-switcher': defineAsyncComponent(() => import('../demos/components/gr-modal/GrModalSizeSwitcherDemo.vue')),
+  'gr-modal-scroll-lifecycle': defineAsyncComponent(() => import('../demos/components/gr-modal/GrModalScrollLifecycleDemo.vue')),
   'gr-navbar-actions-slot': defineAsyncComponent(() => import('../demos/components/gr-navbar/GrNavbarActionsDemo.vue')),
   'gr-navbar-menu-toggle': defineAsyncComponent(() => import('../demos/components/gr-navbar/GrNavbarMenuToggleDemo.vue')),
   'gr-navbar-title-slot': defineAsyncComponent(() => import('../demos/components/gr-navbar/GrNavbarTitleSlotDemo.vue')),
