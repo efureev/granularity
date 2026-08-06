@@ -119,6 +119,7 @@ const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const {
+  disabled: isDisabled,
   invalid: isInvalid,
   required: isRequired,
   readonly: isReadonly,
@@ -156,7 +157,7 @@ function blur(): void {
 }
 
 const isMaxed = computed(() => props.max !== undefined && props.modelValue.length >= props.max)
-const canEdit = computed(() => !props.disabled && !isReadonly.value)
+const canEdit = computed(() => !isDisabled.value && !isReadonly.value)
 const showRemove = computed(() => props.tagClosable && canEdit.value)
 
 /**
@@ -453,7 +454,7 @@ const wrapperClassName = computed(() => {
     size: resolvedSize.value,
     state: props.state,
     invalid: isInvalid.value,
-    disabled: props.disabled,
+    disabled: isDisabled.value,
   })
 })
 
@@ -524,7 +525,7 @@ defineExpose({ focus, blur, clear: clearAll })
       data-gr-input-tag-input
       data-testid="gr-input-tag-input"
       :value="inputValue"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :readonly="isReadonly"
       :placeholder="placeholderText"
       :aria-label="ariaLabel"

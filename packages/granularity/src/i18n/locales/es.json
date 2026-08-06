@@ -55,7 +55,8 @@
     "pattern": "Formato no válido",
     "email": "Introduce un correo válido",
     "url": "Introduce una URL válida",
-    "invalid": "Valor no válido"
+    "invalid": "Valor no válido",
+    "validating": "Comprobando…"
   },
   "dialog": {
     "confirm": {

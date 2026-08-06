@@ -56,6 +56,7 @@ const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const {
+  disabled: isDisabled,
   invalid: isInvalid,
   required: isRequired,
   readonly: isReadonly,
@@ -109,7 +110,7 @@ const thumbClass = computed(() => grSwitchThumbClass({size: resolvedSize.value, 
 const labelClass = computed(() => grSwitchLabelClass(resolvedSize.value))
 
 function toggle(): void {
-  if (props.disabled || isReadonly.value) {
+  if (isDisabled.value || isReadonly.value) {
     return
   }
 
@@ -130,7 +131,7 @@ function toggle(): void {
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
-      :disabled="disabled"
+      :disabled="isDisabled"
       class="inline-flex items-center gap-2 select-none disabled:opacity-50 disabled:cursor-not-allowed"
       @click="toggle"
   >

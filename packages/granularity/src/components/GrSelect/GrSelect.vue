@@ -201,7 +201,9 @@ const emit = defineEmits<{
 // для связки с лейблом и сообщением об ошибке.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 
 const nativeSelectEl = ref<HTMLSelectElement | null>(null)
 const triggerButtonEl = ref<HTMLElement | null>(null)
@@ -370,7 +372,7 @@ function closeDropdown(): void {
   open.value = false
 }
 
-const locked = computed(() => props.disabled || isReadonly.value)
+const locked = computed(() => isDisabled.value || isReadonly.value)
 
 function toggleDropdown(): void {
   if (locked.value) return
@@ -701,7 +703,7 @@ const nativeClassName = computed(() => {
   return grSelectNativeClass({
     view: props.view,
     size: resolvedSize.value,
-    disabled: props.disabled,
+    disabled: isDisabled.value,
     variant: resolvedVariant.value,
     underline: resolvedUnderline.value,
     showNativeChevron: showNativeChevron.value,
@@ -720,7 +722,7 @@ const linkNativeLabelClassName = computed(() => grSelectLinkNativeLabelClass({
   size: resolvedSize.value,
   variant: resolvedVariant.value,
   underline: resolvedUnderline.value,
-  disabled: props.disabled,
+  disabled: isDisabled.value,
 }))
 
 const linkNativeDisplayText = computed(() => {
@@ -732,7 +734,7 @@ const triggerClassName = computed(() => {
     view: props.view,
     optionsView: effectiveOptionsView.value,
     size: resolvedSize.value,
-    disabled: props.disabled,
+    disabled: isDisabled.value,
     variant: resolvedVariant.value,
     underline: resolvedUnderline.value,
   })
@@ -783,7 +785,7 @@ const themeAttrs = useGrThemeAttrs()
       ref="nativeSelectEl"
       data-gr-select-native
       :multiple="multiple"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :aria-label="ariaLabel"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
@@ -853,7 +855,7 @@ const themeAttrs = useGrThemeAttrs()
       data-testid="gr-select-trigger"
       data-gr-select-trigger
       type="button"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :aria-label="ariaLabel"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
@@ -946,7 +948,7 @@ const themeAttrs = useGrThemeAttrs()
       data-gr-select-clear
       type="button"
       class="absolute top-1/2 right-8 h-6 w-6 -translate-y-1/2 inline-flex items-center justify-center rounded-[var(--gr-radius-md)] text-[var(--gr-muted-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :aria-label="resolvedClearLabel"
       @click.stop="clearSelection"
     >

@@ -93,7 +93,9 @@ const emit = defineEmits<{
 // Контекст `GrFormField`: id/aria-describedby/invalid/required как fallback.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
 const trackEl = ref<HTMLElement | null>(null)
@@ -200,7 +202,7 @@ function nearestThumb(value: number): number {
 }
 
 function onTrackPointerDown(event: PointerEvent): void {
-  if (props.disabled || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value) return
   const value = valueFromClientX(event.clientX)
   const index = nearestThumb(value)
   activeThumb.value = index
@@ -241,7 +243,7 @@ function bigStep(): number {
 }
 
 function onThumbKeydown(event: KeyboardEvent, index: number): void {
-  if (props.disabled || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value) return
   const current = values.value[index]
   let next: number | null = null
 
@@ -335,7 +337,7 @@ function thumbAriaLabel(index: number): string | undefined {
         :aria-valuenow="value"
         :aria-orientation="'horizontal'"
         :aria-label="thumbAriaLabel(index)"
-        :aria-disabled="disabled ? 'true' : undefined"
+        :aria-disabled="isDisabled ? 'true' : undefined"
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-describedby="index === 0 ? describedBy : undefined"
         :aria-required="isRequired && index === 0 ? 'true' : undefined"

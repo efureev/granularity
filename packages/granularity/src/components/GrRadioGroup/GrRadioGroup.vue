@@ -72,7 +72,9 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrRadioG
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
 const emit = defineEmits<{
@@ -80,7 +82,7 @@ const emit = defineEmits<{
 }>()
 
 function setValue(next: GrRadioValue): void {
-  if (props.disabled || isReadonly.value)
+  if (isDisabled.value || isReadonly.value)
     return
   emit('update:modelValue', next)
 }
@@ -144,7 +146,7 @@ function selectEdge(edge: 'first' | 'last'): GrRadioValue | undefined {
 provide(GR_RADIO_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),
   name: computed(() => props.name),
-  disabled: computed(() => props.disabled),
+  disabled: computed(() => isDisabled.value),
   readonly: isReadonly,
   invalid: isInvalid,
   size: resolvedSize,
@@ -168,7 +170,7 @@ provide(GR_RADIO_GROUP_CONTEXT, {
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-required="isRequired ? 'true' : undefined"
     :aria-readonly="isReadonly ? 'true' : undefined"
-    :aria-disabled="disabled ? 'true' : undefined"
+    :aria-disabled="isDisabled ? 'true' : undefined"
   >
     <template v-if="$slots.default">
       <GrButtonGroup v-if="variant === 'button'">

@@ -118,7 +118,9 @@ const { t } = useGranularityTranslations()
 // `<label for>` в невидимый элемент.
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
 const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
@@ -200,7 +202,7 @@ function clearErrors() {
 }
 
 function openDialog() {
-  if (props.disabled || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value) return
   inputRef.value?.click()
 }
 
@@ -239,7 +241,7 @@ async function applyFiles(nextFiles: File[]) {
 }
 
 async function onInputChange(event: Event) {
-  if (props.disabled) return
+  if (isDisabled.value) return
 
   const target = event.target as HTMLInputElement | null
   const nextFiles = target?.files ? Array.prototype.slice.call(target.files) as File[] : []
@@ -252,7 +254,7 @@ async function onInputChange(event: Event) {
 }
 
 function clearAll() {
-  if (props.disabled) return
+  if (isDisabled.value) return
   clearErrors()
   clearInputValue()
   emit('clear')
@@ -262,7 +264,7 @@ function clearAll() {
 }
 
 function removeAt(index: number) {
-  if (props.disabled) return
+  if (isDisabled.value) return
   if (!props.multiple) {
     clearAll()
     return
@@ -295,7 +297,7 @@ function issueMessage(issue: GrFormFileError): string {
 
 const dropzone = computed(() => {
   return {
-    enabled: !props.disabled,
+    enabled: !isDisabled.value,
     multiple: props.multiple,
     validators: effectiveValidators.value,
     onFiles: async (dropped: File[]) => {
@@ -350,7 +352,7 @@ watch(
       class="absolute opacity-0 w-px h-px pointer-events-none"
       :multiple="multiple"
       :accept="accept"
-      :disabled="disabled"
+      :disabled="isDisabled"
       @change="onInputChange"
     >
 
@@ -367,7 +369,7 @@ watch(
           :aria-required="isRequired ? 'true' : undefined"
           :aria-readonly="isReadonly ? 'true' : undefined"
           :aria-label="ariaLabel"
-          :disabled="disabled"
+          :disabled="isDisabled"
           @click.prevent="openDialog"
         >
           <GrIcon :size="iconSize" aria-hidden="true">
@@ -381,7 +383,7 @@ watch(
           variant="secondary"
           :size="buttonSize"
           data-gr-form-file-clear-btn
-          :disabled="disabled"
+          :disabled="isDisabled"
           @click.prevent="clearAll"
         >
           <GrIcon :size="iconSize" aria-hidden="true">
@@ -395,7 +397,7 @@ watch(
           variant="secondary"
           :size="buttonSize"
           data-gr-form-file-clear-all-btn
-          :disabled="disabled"
+          :disabled="isDisabled"
           @click.prevent="clearAll"
         >
           <GrIcon :size="iconSize" aria-hidden="true">
@@ -451,7 +453,7 @@ watch(
             class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             :class="removeTextClass"
             data-gr-form-file-item-remove
-            :disabled="disabled"
+            :disabled="isDisabled"
             :aria-label="t('gr.formFile.removeFile', 'Remove {fileName}', { fileName: file.name })"
             @click.prevent="removeAt(index)"
           >

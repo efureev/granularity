@@ -78,7 +78,9 @@ const treeId = `gr-tree-select-tree-${useId()}`
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 
 function focus(): void {
   triggerEl.value?.focus()
@@ -242,7 +244,7 @@ const className = computed(() => {
     size: resolvedSize.value,
     state: props.state,
     invalid: isInvalid.value,
-    disabled: props.disabled,
+    disabled: isDisabled.value,
   })
 })
 
@@ -251,7 +253,7 @@ const panelClasses = computed(() => {
 })
 
 function setOpen(next: boolean) {
-  if (props.disabled || isReadonly.value)
+  if (isDisabled.value || isReadonly.value)
     return
 
   if (open.value === next)
@@ -357,7 +359,7 @@ function emitModel(next: GrTreeSelectModelValue) {
 }
 
 function clear(): void {
-  if (props.disabled || isReadonly.value)
+  if (isDisabled.value || isReadonly.value)
     return
 
   const next: GrTreeSelectModelValue = props.multiple ? [] : null
@@ -382,7 +384,7 @@ async function focusTree(): Promise<boolean> {
 }
 
 function onTriggerKeydown(e: KeyboardEvent): void {
-  if (props.disabled)
+  if (isDisabled.value)
     return
 
   if (e.key === 'Escape') {
@@ -420,7 +422,7 @@ function onPanelKeydown(e: KeyboardEvent): void {
 function onNodeClick(data: T, node: GrTreeNode<T>): void {
   emit('nodeClick', data, node)
 
-  if (props.disabled)
+  if (isDisabled.value)
     return
 
   if (props.multiple) {
@@ -470,7 +472,7 @@ const themeAttrs = useGrThemeAttrs()
         type="text"
         :value="displayValue"
         :placeholder="placeholder"
-        :disabled="disabled"
+        :disabled="isDisabled"
         readonly
         role="combobox"
         aria-readonly="true"

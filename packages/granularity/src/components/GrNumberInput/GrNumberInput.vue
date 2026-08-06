@@ -147,6 +147,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrNumber
 const resolvedId = computed(() => props.id ?? field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const {
+  disabled: isDisabled,
   invalid: isInvalid,
   required: isRequired,
   readonly: isReadonly,
@@ -266,7 +267,7 @@ const horizontalRightControlsStyle = computed(() => addonStyle('right', suffixLe
 
 const shellClassName = computed(() => {
   return grNumberInputShellClass({
-    disabled: props.disabled,
+    disabled: isDisabled.value,
     state: props.invalid ? 'danger' : props.state,
   })
 })
@@ -387,7 +388,7 @@ function setValue(n: number): void {
 }
 
 function stepBy(dir: 1 | -1): void {
-  if (props.disabled) return
+  if (isDisabled.value) return
 
   const current = toNumber(props.modelValue) ?? 0
   setValue(current + (props.step ?? 1) * dir)
@@ -397,7 +398,7 @@ function stepBy(dir: 1 | -1): void {
 // Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, Home/End —
 // к границам `min`/`max` (если заданы).
 function onKeydown(e: KeyboardEvent): void {
-  if (props.disabled) return
+  if (isDisabled.value) return
 
   switch (e.key) {
     case 'ArrowUp':
@@ -488,7 +489,7 @@ function onBlur(): void {
       :inputmode="inputmode"
       :autocomplete="autocomplete"
       :placeholder="placeholder"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :value="displayValue"
       role="spinbutton"
       :aria-valuenow="ariaValueNow"
@@ -534,7 +535,7 @@ function onBlur(): void {
         <button
           type="button"
           class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="disabled"
+          :disabled="isDisabled"
           :aria-label="resolvedIncreaseLabel"
           @mousedown.prevent
           @click="stepBy(1)"
@@ -552,7 +553,7 @@ function onBlur(): void {
         <button
           type="button"
           class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="disabled"
+          :disabled="isDisabled"
           :aria-label="resolvedDecreaseLabel"
           @mousedown.prevent
           @click="stepBy(-1)"
@@ -580,7 +581,7 @@ function onBlur(): void {
       <button
         type="button"
         class="h-full w-full inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-        :disabled="disabled"
+        :disabled="isDisabled"
         :aria-label="resolvedDecreaseLabel"
         @mousedown.prevent
         @click="stepBy(-1)"
@@ -607,7 +608,7 @@ function onBlur(): void {
       <button
         type="button"
         class="h-full w-full inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-        :disabled="disabled"
+        :disabled="isDisabled"
         :aria-label="resolvedIncreaseLabel"
         @mousedown.prevent
         @click="stepBy(1)"

@@ -141,7 +141,9 @@ const resolvedTypeMoreText = computed(() =>
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
 const optionsResolved = computed<GrAutocompleteOption<TValue>[]>(() => props.options ?? [])
@@ -298,7 +300,7 @@ watch(navigableValues, () => {
 
 // ————— Открытие/закрытие.
 function openDropdown(): void {
-  if (props.disabled || open.value) return
+  if (isDisabled.value || open.value) return
   open.value = true
 }
 
@@ -334,7 +336,7 @@ function onInput(event: Event): void {
 }
 
 function onFocus(): void {
-  if (props.disabled) return
+  if (isDisabled.value) return
   openDropdown()
 }
 
@@ -382,19 +384,19 @@ function removeValue(value: TValue): void {
 }
 
 function clearSelection(): void {
-  if (props.disabled) return
+  if (isDisabled.value) return
   emit('update:modelValue', (props.multiple ? [] : '') as GrAutocompleteModelValue<TValue>)
   setQuery('')
   void nextTick(focusInput)
 }
 
 const showClear = computed(() =>
-  resolvedClearable.value && !props.disabled && (hasSelection.value || query.value.length > 0),
+  resolvedClearable.value && !isDisabled.value && (hasSelection.value || query.value.length > 0),
 )
 
 // ————— Клавиатура.
 function onKeydown(event: KeyboardEvent): void {
-  if (props.disabled) return
+  if (isDisabled.value) return
 
   if (!open.value && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
     event.preventDefault()
@@ -531,7 +533,7 @@ const themeAttrs = useGrThemeAttrs()
         spellcheck="false"
         role="combobox"
         :value="query"
-        :disabled="disabled"
+        :disabled="isDisabled"
         :placeholder="hasSelection && multiple ? undefined : placeholder"
         :aria-label="ariaLabel"
         :aria-invalid="isInvalid ? 'true' : undefined"

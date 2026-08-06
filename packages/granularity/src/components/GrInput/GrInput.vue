@@ -146,6 +146,7 @@ const describedBy = computed(() =>
     .join(' ') || undefined,
 )
 const {
+  disabled: isDisabled,
   invalid: isInvalid,
   required: isRequired,
   readonly: isReadonly,
@@ -201,8 +202,8 @@ const passwordVisible = ref(false)
 // Тип поля с учётом переключателя пароля.
 const resolvedType = computed(() => (props.type === 'password' && passwordVisible.value ? 'text' : props.type))
 
-const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !props.disabled)
-const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !props.disabled && !isReadonly.value)
+const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !isDisabled.value)
+const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !isDisabled.value && !isReadonly.value)
 
 const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0) + (props.loading ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
@@ -264,7 +265,7 @@ const suffixStyle = computed(() => {
 const shellClass = computed(() => grInputShellClass({
   state: props.state,
   invalid: isInvalid.value,
-  disabled: props.disabled,
+  disabled: isDisabled.value,
 }))
 
 const className = computed(() => grInputFieldClass({
@@ -348,7 +349,7 @@ function togglePassword(): void {
           :inputmode="props.inputmode"
           :autocomplete="props.autocomplete"
           :placeholder="props.placeholder"
-          :disabled="props.disabled"
+          :disabled="isDisabled"
           :readonly="isReadonly"
           :maxlength="props.maxlength"
           :value="props.modelValue"

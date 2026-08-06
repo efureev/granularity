@@ -12,15 +12,39 @@ import type { GrFormTrigger } from './validation'
  * `name` и триггерит валидацию поля. Так оркестрация добавляется сверху, не трогая
  * ни один контрол.
  */
+export interface GrFormFieldRegistration {
+  /** Обязательно ли поле по собственному пропу `required`. */
+  required?: () => boolean
+}
+
 export interface GrFormContext {
   /** Реактивная карта ошибок по имени поля. */
   errors: Ref<Record<string, string | undefined>>
   /** Имена полей, у которых в правилах есть `required` (для маркера `*`). */
   requiredFields: ComputedRef<Set<string>>
+  /**
+   * Поля, у которых прямо сейчас идёт асинхронная проверка. Необязательны:
+   * тип публичный, и контекст строят руками (в тестах и в своих обёртках) —
+   * старая форма контекста продолжает работать.
+   */
+  validatingFields?: ComputedRef<Set<string>>
+  /** Форма выключена целиком: значение видно, но ничего не редактируется. */
+  disabled?: ComputedRef<boolean>
   /** Есть ли для поля правила (тогда `GrFormField` берёт ошибку из формы). */
   hasField: (name: string) => boolean
-  /** Регистрирует корневой элемент поля (для scroll-to-error). Возвращает unregister. */
-  registerField: (name: string, getEl: () => HTMLElement | null) => () => void
+  /**
+   * Регистрирует поле: корневой элемент (для scroll-to-error) и собственную
+   * обязательность. Возвращает unregister.
+   *
+   * Обязательность приходит именно отсюда, потому что источников у неё два:
+   * правило в `rules` и проп `required` у поля. Без регистрации второй источник
+   * рисовал бы звёздочку, но не мешал submit'у.
+   */
+  registerField: (
+    name: string,
+    getEl: () => HTMLElement | null,
+    registration?: GrFormFieldRegistration,
+  ) => () => void
   /** Валидирует одно поле (с учётом триггера и настроек формы). */
   validateField: (name: string, trigger?: GrFormTrigger) => Promise<boolean>
 }

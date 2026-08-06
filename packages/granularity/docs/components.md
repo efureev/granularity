@@ -46,7 +46,7 @@
 - [`GrDropdownMenu`](./components/GrDropdownMenu.md)
 - `GrEmptyState`
 - [`GrFileUpload`](./components/GrFileUpload.md)
-- `GrForm`
+- [`GrForm`](./components/GrForm.md)
 - [`GrFormField`](./components/GrFormField.md)
 - [`GrFormFile`](./components/GrFormFile.md)
 - `GrFormSection`

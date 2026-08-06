@@ -52,6 +52,12 @@ function errorTexts(wrapper: ReturnType<typeof mount>): string[] {
   return wrapper.findAll('[data-gr-form-field-error]').map(w => w.text()).filter(Boolean)
 }
 
+/** Валидация асинхронна: даём отработать промисам правил и перерисовке. */
+async function flushValidation(): Promise<void> {
+  await new Promise(resolve => setTimeout(resolve, 0))
+  await new Promise(resolve => setTimeout(resolve, 0))
+}
+
 describe('GrForm', () => {
   it('validate() раскладывает ошибки по полям и не эмитит submit при невалидной форме', async () => {
     const wrapper = mount(makeHarness(requiredRules))
@@ -150,5 +156,194 @@ describe('GrForm', () => {
     })
     const wrapper = mount(Harness)
     expect(errorTexts(wrapper)).toEqual(['Custom override'])
+  })
+})
+
+describe('GrForm — обязательность из поля', () => {
+  const Harness = defineComponent({
+    components: { GrForm, GrFormField, GrInput },
+    setup() {
+      const model = reactive({ nickname: '' })
+      const submitted = ref(0)
+      const invalidPayloads = ref<Record<string, string>[]>([])
+      return {
+        model,
+        submitted,
+        invalidPayloads,
+        onSubmit: () => { submitted.value++ },
+        onInvalid: (errors: Record<string, string>) => { invalidPayloads.value.push(errors) },
+      }
+    },
+    template: `
+      <GrForm :model="model" @submit="onSubmit" @invalid="onInvalid">
+        <GrFormField name="nickname" label="Nickname" required>
+          <GrInput v-model="model.nickname" />
+        </GrFormField>
+        <button type="submit">Submit</button>
+      </GrForm>
+    `,
+  })
+
+  it('`GrFormField required` без правила блокирует submit и показывает сообщение', async () => {
+    const wrapper = mount(Harness)
+
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    // Раньше звёздочка была, а submit проходил: обязательность и валидация
+    // жили в разных местах.
+    expect(wrapper.vm.submitted).toBe(0)
+    expect(errorTexts(wrapper)).toHaveLength(1)
+  })
+
+  it('заполненное поле пропускает submit', async () => {
+    const wrapper = mount(Harness)
+
+    wrapper.vm.model.nickname = 'gr'
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    expect(wrapper.vm.submitted).toBe(1)
+    expect(errorTexts(wrapper)).toHaveLength(0)
+  })
+
+  it('submit с ошибками эмитит invalid с картой сообщений', async () => {
+    const wrapper = mount(Harness)
+
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    expect(wrapper.vm.invalidPayloads).toHaveLength(1)
+    expect(Object.keys(wrapper.vm.invalidPayloads[0])).toEqual(['nickname'])
+  })
+})
+
+describe('GrForm — снимок, сброс и состояние', () => {
+  function editHarness() {
+    return defineComponent({
+      components: { GrForm, GrFormField, GrInput },
+      setup() {
+        const model = reactive<Record<string, unknown>>({ name: '' })
+        const formRef = ref<InstanceType<typeof GrForm>>()
+        return { model, formRef }
+      },
+      template: `
+        <GrForm ref="formRef" :model="model">
+          <GrFormField name="name" label="Name">
+            <GrInput v-model="model.name" />
+          </GrFormField>
+        </GrForm>
+      `,
+    })
+  }
+
+  it('setSnapshot делает resetFields осмысленным в форме редактирования', async () => {
+    const wrapper = mount(editHarness())
+
+    // Данные пришли с сервера уже после монтирования — снимок из `setup` пуст.
+    wrapper.vm.model.name = 'из базы'
+    wrapper.vm.formRef!.setSnapshot()
+
+    wrapper.vm.model.name = 'правка пользователя'
+    wrapper.vm.formRef!.resetFields()
+    await flushValidation()
+
+    expect(wrapper.vm.model.name).toBe('из базы')
+  })
+
+  it('ключ, появившийся после снимка, удаляется, а не превращается в undefined', async () => {
+    const wrapper = mount(editHarness())
+
+    wrapper.vm.model.extra = 'появилось позже'
+    wrapper.vm.formRef!.resetFields()
+    await flushValidation()
+
+    expect('extra' in wrapper.vm.model).toBe(false)
+  })
+
+  it('isDirty гаснет после сброса, isValid отражает известные ошибки', async () => {
+    const wrapper = mount(editHarness())
+    const form = wrapper.vm.formRef!
+
+    expect(form.isDirty).toBe(false)
+
+    wrapper.vm.model.name = 'изменено'
+    await flushValidation()
+    expect(form.isDirty).toBe(true)
+
+    form.resetFields()
+    await flushValidation()
+    expect(form.isDirty).toBe(false)
+    expect(form.isValid).toBe(true)
+  })
+})
+
+describe('GrForm — disabled и validating', () => {
+  it('disabled формы доезжает до контролов через контекст поля', async () => {
+    const Harness = defineComponent({
+      components: { GrForm, GrFormField, GrInput },
+      props: { disabled: { type: Boolean, default: false } },
+      setup() {
+        const model = reactive({ name: '' })
+        return { model }
+      },
+      template: `
+        <GrForm :model="model" :disabled="disabled">
+          <GrFormField name="name" label="Name">
+            <GrInput v-model="model.name" />
+          </GrFormField>
+        </GrForm>
+      `,
+    })
+
+    const wrapper = mount(Harness, { props: { disabled: true } })
+
+    expect(wrapper.get('input').attributes('disabled')).toBeDefined()
+
+    await wrapper.setProps({ disabled: false })
+    expect(wrapper.get('input').attributes('disabled')).toBeUndefined()
+  })
+
+  it('асинхронное правило показывает «проверяем» и aria-busy на поле', async () => {
+    let release: (() => void) | undefined
+    const rules: GrFormRules = {
+      login: [{
+        validator: () => new Promise<true>((resolve) => {
+          release = () => resolve(true)
+        }),
+      }],
+    }
+
+    const Harness = defineComponent({
+      components: { GrForm, GrFormField, GrInput },
+      setup() {
+        const model = reactive({ login: 'gr' })
+        const formRef = ref<InstanceType<typeof GrForm>>()
+        return { model, rules, formRef }
+      },
+      template: `
+        <GrForm ref="formRef" :model="model" :rules="rules">
+          <GrFormField name="login" label="Login">
+            <GrInput v-model="model.login" />
+          </GrFormField>
+        </GrForm>
+      `,
+    })
+
+    const wrapper = mount(Harness)
+    const validating = wrapper.vm.formRef!.validateField('login')
+    await flushValidation()
+
+    const field = wrapper.get('[data-gr-form-field]')
+    expect(field.attributes('aria-busy')).toBe('true')
+    expect(field.find('[data-gr-form-field-validating]').exists()).toBe(true)
+
+    release!()
+    await validating
+    await flushValidation()
+
+    // Проверка кончилась — состояние снимается, поле снова молчит.
+    expect(wrapper.get('[data-gr-form-field]').attributes('aria-busy')).toBeUndefined()
+    expect(wrapper.find('[data-gr-form-field-validating]').exists()).toBe(false)
   })
 })

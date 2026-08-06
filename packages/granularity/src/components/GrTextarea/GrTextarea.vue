@@ -96,6 +96,7 @@ const countText = computed(() =>
   props.maxlength !== undefined ? `${props.modelValue.length} / ${props.maxlength}` : String(props.modelValue.length),
 )
 const {
+  disabled: isDisabled,
   invalid: isInvalid,
   required: isRequired,
   readonly: isReadonly,
@@ -118,7 +119,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextar
 const className = computed(() => [
   sizes[resolvedSize.value],
   resizeClass[props.resize],
-  props.disabled ? disabledSurfaceClass : enabledSurfaceClass,
+  isDisabled.value ? disabledSurfaceClass : enabledSurfaceClass,
   grTextareaClass({
     state: props.state,
     invalid: isInvalid.value,
@@ -142,7 +143,7 @@ function onInput(e: Event): void {
       :maxlength="maxlength"
       :autocomplete="autocomplete"
       :placeholder="placeholder"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :value="modelValue"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
@@ -172,7 +173,7 @@ function onInput(e: Event): void {
     :maxlength="maxlength"
     :autocomplete="autocomplete"
     :placeholder="placeholder"
-    :disabled="disabled"
+    :disabled="isDisabled"
     :value="modelValue"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-describedby="describedBy"

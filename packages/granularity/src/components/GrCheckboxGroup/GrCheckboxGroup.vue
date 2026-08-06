@@ -70,6 +70,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCheckb
 // Контекст `GrFormField`. Группа — не labelable-элемент, поэтому имя приходит
 // через `aria-labelledby` на подпись поля, а не через `<label for>`.
 const {
+  disabled: isDisabled,
   id: fieldId,
   labelId: fieldLabelId,
   describedBy,
@@ -85,7 +86,7 @@ const layoutClass = computed(() =>
 )
 
 function toggle(value: string, checked: boolean): void {
-  if (props.disabled || isReadonly.value)
+  if (isDisabled.value || isReadonly.value)
     return
 
   if (checked) {
@@ -117,7 +118,7 @@ defineExpose({ focus, blur })
 provide(GR_CHECKBOX_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),
   name: computed(() => props.name),
-  disabled: computed(() => props.disabled),
+  disabled: computed(() => isDisabled.value),
   readonly: isReadonly,
   invalid: isInvalid,
   size: resolvedSize,
@@ -137,7 +138,7 @@ provide(GR_CHECKBOX_GROUP_CONTEXT, {
     :aria-labelledby="labelledBy"
     :aria-describedby="describedBy"
     :aria-invalid="isInvalid ? 'true' : undefined"
-    :aria-disabled="disabled ? 'true' : undefined"
+    :aria-disabled="isDisabled ? 'true' : undefined"
   >
     <slot>
       <GrCheckbox

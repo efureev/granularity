@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useId, us
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormContext } from '../GrForm/context'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { GR_FORM_FIELD_KEY } from './context'
 import {
   controlColumnClass,
@@ -48,6 +49,8 @@ const props = withDefaults(
     required?: boolean
     /** Всё поле только для чтения: контролы внутри перестают редактироваться. */
     readonly?: boolean
+    /** Поле недоступно. Складывается с `disabled` формы по «или». */
+    disabled?: boolean
     /**
      * Показывать текст ошибки. `false` — поле остаётся невалидным для контрола
      * и AT (`aria-invalid`), но сообщение не занимает места: так делают в
@@ -70,6 +73,7 @@ const props = withDefaults(
     hint: undefined,
     required: false,
     readonly: false,
+    disabled: false,
     showMessage: true,
     size: undefined,
     labelPosition: undefined,
@@ -109,6 +113,7 @@ const errorClassName = computed(() => [errorBaseClass, errorTexts[resolvedSize.v
 // Контекст `GrForm` (если поле внутри формы). Контролы про форму не знают —
 // оркестрация подключается здесь, на уровне поля.
 const form = useGrFormContext()
+const { t } = useGranularityTranslations()
 const boundToForm = computed(() => Boolean(form && props.name && form.hasField(props.name)))
 
 // Автогенерация id: контрол внутри читает его через inject и связывается с
@@ -140,11 +145,21 @@ const isRequired = computed(() => {
   return false
 })
 
+/** Идёт асинхронная проверка этого поля (правило ходит на сервер). */
+const isValidating = computed(() =>
+  Boolean(boundToForm.value && props.name && form?.validatingFields?.value.has(props.name)),
+)
+
+const validatingText = computed(() => t('gr.form.validating', 'Checking…'))
+
 const hasLabel = computed(() => Boolean(props.label) || Boolean(slots.label))
 const hasHint = computed(() => Boolean(props.hint) || Boolean(slots.hint))
 const hasError = computed(() => resolvedErrors.value.length > 0)
 // Текст можно скрыть, но невалидность поля от этого не исчезает.
 const showsMessage = computed(() => hasError.value && props.showMessage)
+// Пока идёт проверка, показываем её вместо старой ошибки: ошибка относится к
+// прежнему значению, и оставлять её на экране — врать про текущее.
+const showsValidating = computed(() => isValidating.value && props.showMessage)
 
 /**
  * `aria-describedby` контрола: подсказка и ошибка.
@@ -166,6 +181,9 @@ provide(GR_FORM_FIELD_KEY, {
   id: fieldId,
   labelId,
   readonly: computed(() => props.readonly),
+  // «Или», как и у контролов: форма вправе выключить поле, у которого своего
+  // `disabled` нет.
+  disabled: computed(() => props.disabled || Boolean(form?.disabled?.value)),
   describedById,
   invalid: hasError,
   required: isRequired,
@@ -176,7 +194,13 @@ const fieldRootEl = ref<HTMLElement | null>(null)
 let unregister: (() => void) | undefined
 
 onMounted(async () => {
-  if (form && props.name) unregister = form.registerField(props.name, () => fieldRootEl.value)
+  if (form && props.name) {
+    unregister = form.registerField(props.name, () => fieldRootEl.value, {
+      // Обязательность поля обязана дойти до валидации: иначе звёздочка есть,
+      // а submit проходит с пустым полем.
+      required: () => props.required,
+    })
+  }
 
   await nextTick()
   warnIfControlMissed()
@@ -231,6 +255,7 @@ function onFocusOut(event: FocusEvent): void {
     ref="fieldRootEl"
     data-gr-form-field
     :class="rootClass"
+    :aria-busy="isValidating ? 'true' : undefined"
     @focusout="onFocusOut"
   >
     <label
@@ -266,9 +291,12 @@ function onFocusOut(event: FocusEvent): void {
         :id="errorId"
         data-gr-form-field-error
         role="alert"
-        :class="showsMessage ? errorClassName : 'sr-only'"
+        :class="showsMessage || showsValidating ? errorClassName : 'sr-only'"
       >
-        <slot v-if="showsMessage" name="error" :errors="resolvedErrors">
+        <span v-if="showsValidating" data-gr-form-field-validating :class="hintClassName">
+          {{ validatingText }}
+        </span>
+        <slot v-else-if="showsMessage" name="error" :errors="resolvedErrors">
           <div
             v-for="(message, index) in resolvedErrors"
             :key="index"

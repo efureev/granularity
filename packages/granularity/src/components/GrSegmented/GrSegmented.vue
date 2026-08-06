@@ -84,7 +84,9 @@ const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 
 const rootRef = ref<HTMLElement | null>(null)
 
@@ -113,7 +115,7 @@ const indicatorDuration = computed(() => Math.max(0, Math.round(props.indicatorD
 const rootClassName = computed(() => grSegmentedRootClass({
   variant: resolvedVariant.value,
   block: props.block,
-  disabled: props.disabled,
+  disabled: isDisabled.value,
 }))
 const rootStyle = computed<Record<string, string>>(() => ({
   ...grSegmentedRootStyle({
@@ -154,7 +156,7 @@ function getOptionKey(value: GrSegmentedValue): string {
 }
 
 function resolveOptionDisabled(option: GrSegmentedOption): boolean {
-  return props.disabled || Boolean(option.disabled)
+  return isDisabled.value || Boolean(option.disabled)
 }
 
 function isOptionSelected(option: GrSegmentedOption): boolean {
@@ -331,7 +333,7 @@ function focusIndex(index: number): void {
 }
 
 function onKeydown(event: KeyboardEvent, index: number): void {
-  if (props.disabled || isReadonly.value) {
+  if (isDisabled.value || isReadonly.value) {
     return
   }
 
@@ -425,7 +427,7 @@ onBeforeUnmount(() => {
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-required="isRequired ? 'true' : undefined"
     :aria-readonly="isReadonly ? 'true' : undefined"
-    :aria-disabled="disabled ? 'true' : undefined"
+    :aria-disabled="isDisabled ? 'true' : undefined"
     :class="rootClassName"
     :style="rootStyle"
   >

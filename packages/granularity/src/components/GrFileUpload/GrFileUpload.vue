@@ -193,7 +193,9 @@ const { t } = useGranularityTranslations()
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
 const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
@@ -318,7 +320,7 @@ function setOver(next: boolean) {
 }
 
 function openDialog() {
-  if (props.disabled) return
+  if (isDisabled.value) return
   inputRef.value?.click()
 }
 
@@ -392,7 +394,7 @@ function effectiveValidators(): FileValidator[] {
 let runCounter = 0
 
 async function handleFiles(files: File[], source: FileValidatorSource = 'input') {
-  if (props.disabled) return
+  if (isDisabled.value) return
   if (!files.length) return
 
   runCounter += 1
@@ -606,7 +608,7 @@ function abortFile(file: File): void {
 
 function onDragEnter(event: DragEvent) {
   if (hasCustomUi.value) return
-  if (props.disabled) return
+  if (isDisabled.value) return
   event.preventDefault()
   overCounter += 1
   setOver(true)
@@ -614,14 +616,14 @@ function onDragEnter(event: DragEvent) {
 
 function onDragOver(event: DragEvent) {
   if (hasCustomUi.value) return
-  if (props.disabled) return
+  if (isDisabled.value) return
   event.preventDefault()
   if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy'
 }
 
 function onDragLeave(event: DragEvent) {
   if (hasCustomUi.value) return
-  if (props.disabled) return
+  if (isDisabled.value) return
   event.preventDefault()
   overCounter = Math.max(0, overCounter - 1)
   if (overCounter === 0) setOver(false)
@@ -629,7 +631,7 @@ function onDragLeave(event: DragEvent) {
 
 function onDrop(event: DragEvent) {
   if (hasCustomUi.value) return
-  if (props.disabled) return
+  if (isDisabled.value) return
   event.preventDefault()
   overCounter = 0
   setOver(false)
@@ -639,7 +641,7 @@ function onDrop(event: DragEvent) {
 }
 
 async function onInputChange(event: Event) {
-  if (props.disabled) return
+  if (isDisabled.value) return
 
   const target = event.target as HTMLInputElement | null
   const files = target?.files ? Array.prototype.slice.call(target.files) as File[] : []
@@ -881,7 +883,7 @@ defineExpose({
       :capture="capture"
       :webkitdirectory="directory || undefined"
       :multiple="multiple"
-      :disabled="disabled"
+      :disabled="isDisabled"
       @change="onInputChange"
     >
 
@@ -896,7 +898,7 @@ defineExpose({
       v-if="hasCustomUi"
       :open-dialog="openDialog"
       :abort="abort"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :files="lastFiles"
       :is-over="isOver"
       :state="state"

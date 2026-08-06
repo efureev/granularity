@@ -28,6 +28,12 @@ export interface GrFormFieldContext {
    * по одному.
    */
   readonly: ComputedRef<boolean>
+  /**
+   * Поле недоступно: не фокусируется и не отправляется. Приходит от самого
+   * поля или от формы целиком (`GrForm disabled`) — «выключить форму на время
+   * отправки» не должно требовать обхода контролов по одному.
+   */
+  disabled: ComputedRef<boolean>
 }
 
 export const GR_FORM_FIELD_KEY: InjectionKey<GrFormFieldContext> = Symbol('gr-form-field')

@@ -54,7 +54,8 @@
     "pattern": "Invalid format",
     "email": "Enter a valid email",
     "url": "Enter a valid URL",
-    "invalid": "Invalid value"
+    "invalid": "Invalid value",
+    "validating": "Checking…"
   },
   "dialog": {
     "confirm": {

@@ -3008,6 +3008,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "Выключить форму целиком — типично на время отправки. Доезжает до контролов через контекст поля, поэтому обходить их по одному не нужно.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "scrollBehavior",
             "description": "",
             "type": "ScrollBehavior | undefined",
@@ -3058,7 +3065,7 @@
           {
             "name": "default",
             "description": "",
-            "type": "{ validate: () => Promise<boolean>; errors: Record<string, string | undefined>; }"
+            "type": "{ validate: () => Promise<boolean>; errors: Record<string, string | undefined>; isDirty: boolean; isValid: boolean; validatingFields: Set<string> & Omit<Set<string>, keyof Set<any>>; resetFields: (names?: string | string[] | undefined) => void; setSnapshot: (model?: Record<string, unknown> | undefined) => void; }"
           }
         ]
       },
@@ -3067,6 +3074,12 @@
         "title": "Events",
         "origin": "generated",
         "items": [
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "[errors: Record<string, string>]",
+            "signature": "(event: \"invalid\", errors: Record<string, string>): void"
+          },
           {
             "name": "submit",
             "description": "",
@@ -3104,12 +3117,32 @@
           {
             "name": "resetFields",
             "description": "",
-            "type": "() => void"
+            "type": "(names?: string | string[] | undefined) => void"
           },
           {
             "name": "scrollToField",
             "description": "",
             "type": "(name: string) => void"
+          },
+          {
+            "name": "setSnapshot",
+            "description": "",
+            "type": "(model?: Record<string, unknown> | undefined) => void"
+          },
+          {
+            "name": "isDirty",
+            "description": "",
+            "type": "boolean"
+          },
+          {
+            "name": "isValid",
+            "description": "",
+            "type": "boolean"
+          },
+          {
+            "name": "validatingFields",
+            "description": "",
+            "type": "Set<string> & Omit<Set<string>, keyof Set<any>>"
           }
         ]
       }
@@ -3124,6 +3157,13 @@
         "title": "Props",
         "origin": "generated",
         "items": [
+          {
+            "name": "disabled",
+            "description": "Поле недоступно. Складывается с `disabled` формы по «или».",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
           {
             "name": "readonly",
             "description": "Всё поле только для чтения: контролы внутри перестают редактироваться.",

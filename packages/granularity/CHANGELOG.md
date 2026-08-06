@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrForm`: whole-form `disabled`, dirty/valid state and async-rule feedback.** `disabled` travels through the
+  field context down to the controls, so «switch the form off while submitting» no longer means walking the controls
+  by hand — and every control that reads `useGrFormControl` now honours the resolved value instead of only its own
+  prop. `setSnapshot()` re-takes the baseline (an editing form fills its model after the server answers, and the
+  snapshot taken in `setup` was empty), `isDirty` and `isValid` are exposed and passed to the default slot, and a
+  field with a running async rule is marked `aria-busy` and says so (new `gr.form.validating` key in all three
+  locales) instead of silently showing the previous error. The component also got its own page,
+  `docs/components/GrForm.md`.
+- **`GrForm` emits `invalid`.** A failed submit now reports the map of messages: «the form is invalid» and «nothing
+  happened» used to look identical from the outside.
 - **`GrFileUpload`: per-file uploads, a response generic and image previews.** `uploadMode="per-file"` sends every
   file with its own request — `request` is still called as `(files, ctx)`, just with a single-element array, so an
   existing uploader keeps working — and `concurrency` (default 3) caps parallel connections. Each row then carries its
@@ -277,6 +287,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **A field marked `required` on `GrFormField` was never validated.** Validation walked `Object.keys(rules)` only, so
+  such a field drew the asterisk, announced `aria-required` — and let submit through while empty. The field now
+  registers its own requirement with the form, which applies an implicit `{ required: true }` with the same localized
+  message as an explicit rule.
+- **`resetFields()` restored the wrong thing in editing forms.** The baseline was captured in `setup`, so a model
+  filled from a server response reset back to the empty object; there was no way to re-take it. Use `setSnapshot()`.
+  Reset also walks the union of snapshot and model keys now: a key added after the snapshot is **removed** instead of
+  being set to `undefined`.
+- **Per-field watchers were recreated on every render.** The watcher keyed on `Object.keys(props.rules)` — a new array
+  identity each time the getter recomputed. It now keys on the joined names.
 - **`GrCommandPalette` violated `aria-required-children`, and the panel is always expanded.** The group heading and
   the empty-state block sat as direct children of `role="listbox"`. The heading moved inside its `role="group"` and
   is presentational now (it still names the group through `aria-labelledby`), and the state block left the listbox

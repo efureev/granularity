@@ -100,7 +100,9 @@ const { t } = useGranularityTranslations()
 // Контекст `GrFormField`: id/aria-describedby/invalid/required как fallback.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const { invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+const {
+  disabled: isDisabled,
+  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
 const rootEl = ref<HTMLElement | null>(null)
@@ -116,7 +118,7 @@ function blur(): void {
 defineExpose({ focus, blur })
 
 /** Ввод возможен: не readonly и не disabled. */
-const interactive = computed(() => !isReadonly.value && !props.disabled)
+const interactive = computed(() => !isReadonly.value && !isDisabled.value)
 
 /**
  * `aria-readonly`, `aria-invalid` и `aria-required` вешаются только в

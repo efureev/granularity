@@ -14,9 +14,10 @@ import { useGrFormFieldContext } from '../components/GrFormField/context'
  *
  * Композабл сводит два источника — собственные пропы контрола и контекст
  * `GrFormField` — в одно состояние. Правило одно: **проп контрола сильнее**,
- * контекст работает как fallback. Исключение — `invalid` и `required`: там
- * источники складываются по «или», потому что поле может объявить ошибку,
- * о которой контрол не знает (правило формы), и наоборот.
+ * контекст работает как fallback. Исключение — `invalid`, `required` и
+ * `disabled`: там источники складываются по «или», потому что поле может
+ * объявить ошибку, о которой контрол не знает (правило формы), а форма —
+ * выключить себя целиком на время отправки.
  */
 
 export interface GrFormControlProps {
@@ -61,7 +62,7 @@ export function useGrFormControl(source: () => GrFormControlProps = () => ({})):
   // Везде «или», а не `??`: у контролов эти пропы объявлены с дефолтом `false`,
   // и `??` до контекста просто не доходил бы — поле не смогло бы включить
   // `readonly` контролу, у которого свой проп не выставлен.
-  const disabled = computed(() => Boolean(source().disabled))
+  const disabled = computed(() => Boolean(source().disabled) || Boolean(field?.disabled.value))
   const readonly = computed(() => Boolean(source().readonly) || Boolean(field?.readonly.value))
   const invalid = computed(() => Boolean(source().invalid) || Boolean(field?.invalid.value))
   const required = computed(() => Boolean(source().required) || Boolean(field?.required.value))

@@ -117,7 +117,6 @@ const checked = computed(() => {
   return false
 })
 
-const resolvedDisabled = computed(() => props.disabled ?? group?.disabled.value ?? false)
 const resolvedName = computed(() => props.name ?? group?.name.value)
 
 // Контекст `GrFormField`. Id поля вешается на `span[role="checkbox"]` — именно он
@@ -125,6 +124,7 @@ const resolvedName = computed(() => props.name ?? group?.name.value)
 // (клик по подписи уводил бы фокус в невидимый элемент). Роль-виджет не является
 // labelable-элементом, поэтому имя от подписи поля приходит через `aria-labelledby`.
 const {
+  disabled: isDisabled,
   id: fieldControlId,
   labelId: fieldLabelId,
   describedBy,
@@ -132,6 +132,10 @@ const {
   required: fieldRequired,
   readonly: fieldReadonly,
 } = useGrFormControl(() => props)
+
+// «Или», а не `??`: `isDisabled` уже сведён к булеву (свой проп + контекст
+// поля и формы), и `??` до группы просто не дошёл бы.
+const resolvedDisabled = computed(() => isDisabled.value || Boolean(group?.disabled.value))
 
 // `role="group"` не поддерживает `aria-required` и `aria-readonly` — объявлять
 // обязательность и режим чтения группы обязаны сами чекбоксы.
