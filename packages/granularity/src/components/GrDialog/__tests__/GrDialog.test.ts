@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 // `close` не превращает: общий стек слоёв гасит нажатие в capture-фазе на
 // `window`, и до `<Dialog>` оно не доходит (тот же контракт в тестах `GrModal`).
 vi.mock('@headlessui/vue', async () => {
-  const { defineComponent } = await import('vue')
+  const { defineComponent, onBeforeUnmount, onMounted } = await import('vue')
   return {
     Dialog: defineComponent({
       name: 'Dialog',
@@ -34,8 +34,15 @@ vi.mock('@headlessui/vue', async () => {
       props: { show: { type: Boolean, default: false } },
       template: '<div v-if="show"><slot /></div>',
     }),
+    // `after-enter`/`after-leave` мок эмитит по жизненному циклу: настоящих
+    // транзишнов в jsdom нет, а проверяется проводка событий наружу.
     TransitionChild: defineComponent({
       name: 'TransitionChild',
+      emits: ['after-enter', 'after-leave'],
+      setup(_, { emit }) {
+        onMounted(() => emit('after-enter'))
+        onBeforeUnmount(() => emit('after-leave'))
+      },
       template: '<div><slot /></div>',
     }),
   }
@@ -185,6 +192,109 @@ describe('GrDialog', () => {
     `)
 
     expect(wrapper.find('[data-testid="hu-dialog"]').attributes('aria-label')).toBe('Мастер импорта')
+    wrapper.unmount()
+  })
+})
+
+describe('GrDialog — скролл, фокус и жизненный цикл', () => {
+  it('при scrollBehavior=inside шапка и подвал остаются вне скроллящегося тела', () => {
+    const wrapper = mountHarness(`
+      <GrDialog v-model="open" title="Настройки" scroll-behavior="inside">
+        <div data-testid="body">Body</div>
+        <template #footer><button data-testid="save">Save</button></template>
+      </GrDialog>
+    `)
+
+    const body = wrapper.find('[data-gr-modal-body]')
+
+    expect(body.find('[data-testid="body"]').exists()).toBe(true)
+    expect(body.find('[data-gr-dialog-header]').exists()).toBe(false)
+    expect(body.find('[data-gr-dialog-footer]').exists()).toBe(false)
+
+    expect(wrapper.find('[data-gr-modal-header] [data-gr-dialog-header]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-modal-footer] [data-gr-dialog-footer]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('при scrollBehavior=outside скроллящегося тела нет вовсе', () => {
+    const wrapper = mountHarness(`
+      <GrDialog v-model="open" title="Настройки">
+        <div data-testid="body">Body</div>
+        <template #footer><button data-testid="save">Save</button></template>
+      </GrDialog>
+    `)
+
+    expect(wrapper.find('[data-gr-modal-body]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-dialog-header]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-dialog-footer]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('size=full доходит до панели GrModal', () => {
+    const wrapper = mountHarness(`
+      <GrDialog v-model="open" title="Мастер" size="full">Body</GrDialog>
+    `)
+
+    const panelClass = wrapper.find('[data-gr-modal-panel]').attributes('class')
+    expect(panelClass).toContain('max-w-none')
+    expect(panelClass).toContain('h-full')
+
+    wrapper.unmount()
+  })
+
+  it('initialFocus доходит до GrModal', () => {
+    const target = document.createElement('button')
+    document.body.appendChild(target)
+
+    const Harness = defineComponent({
+      name: 'HarnessInitialFocus',
+      components: { GrDialog },
+      setup() {
+        return { open: ref(true), target }
+      },
+      template: `<GrDialog v-model="open" title="X" :initial-focus="target">Body</GrDialog>`,
+    })
+
+    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+
+    expect(wrapper.findComponent({ name: 'Dialog' }).props('initialFocus')).toBe(target)
+
+    wrapper.unmount()
+    target.remove()
+  })
+
+  it('ретранслирует opened/closed от GrModal', async () => {
+    const Harness = defineComponent({
+      name: 'HarnessLifecycle',
+      components: { GrDialog },
+      setup() {
+        const open = ref(false)
+        const events: string[] = []
+        return { open, events }
+      },
+      template: `
+        <GrDialog
+          v-model="open"
+          title="X"
+          @opened="events.push('opened')"
+          @closed="events.push('closed')"
+        >Body</GrDialog>
+      `,
+    })
+
+    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    const vm = wrapper.vm as any
+
+    vm.open = true
+    await nextTick()
+    expect(vm.events).toEqual(['opened'])
+
+    vm.open = false
+    await nextTick()
+    expect(vm.events).toEqual(['opened', 'closed'])
+
     wrapper.unmount()
   })
 })

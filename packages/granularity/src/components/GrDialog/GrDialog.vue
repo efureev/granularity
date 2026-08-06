@@ -18,6 +18,7 @@
 import { computed } from 'vue'
 
 import GrModal from '../GrModal/GrModal.vue'
+import type { GrModalScrollBehavior } from '../GrModal/grModalStyles'
 import GrDialogFooter from './GrDialogFooter.vue'
 import GrDialogHeader from './GrDialogHeader.vue'
 import {
@@ -46,6 +47,19 @@ export interface GrDialogProps {
    * `title` и без слота `#header` оставил бы окно безымянным.
    */
   ariaLabel?: string
+  /**
+   * Кто скроллится при длинном содержимом. При `inside` шапка и подвал
+   * закреплены, а едет только тело.
+   */
+  scrollBehavior?: GrModalScrollBehavior
+  /**
+   * Элемент, получающий фокус при открытии. По умолчанию — панель окна.
+   * Элемент **из самого диалога** сюда передавать нельзя: проп, возвращающий
+   * наверх то, что рождено внутри поддерева, замыкает рендер в цикл. Фокус на
+   * своём содержимом ставится из содержимого — так это сделано в
+   * `GrPromptDialog`.
+   */
+  initialFocus?: HTMLElement | null
 }
 
 const props = withDefaults(defineProps<GrDialogProps>(), {
@@ -60,10 +74,16 @@ const props = withDefaults(defineProps<GrDialogProps>(), {
   bodyConfig: undefined,
   closeLabel: undefined,
   ariaLabel: undefined,
+  scrollBehavior: 'outside',
+  initialFocus: null,
 })
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
+  /** Окно открылось и анимация закончилась. */
+  (e: 'opened'): void
+  /** Окно закрылось и анимация закончилась — содержимое можно размонтировать. */
+  (e: 'closed'): void
 }>()
 
 const slots = defineSlots<{
@@ -96,18 +116,23 @@ function close(): void {
   <GrModal
     :model-value="modelValue"
     :size="size"
+    :scroll-behavior="scrollBehavior"
+    :initial-focus="initialFocus"
     :close-on-backdrop="closeOnBackdrop"
     :close-on-esc="closeOnEsc"
     :aria-label="ariaLabel ?? resolvedTitle"
     @update:model-value="emit('update:modelValue', $event)"
+    @opened="emit('opened')"
+    @closed="emit('closed')"
   >
     <template v-if="useModalSrOnlyTitle" #title>
       <span class="sr-only">{{ resolvedTitle }}</span>
     </template>
 
-    <div class="overflow-hidden rounded-[inherit]">
+    <!-- Шапка и подвал уходят в layout-слоты `GrModal`: при `inside` они
+         остаются вне скроллящегося тела. -->
+    <template v-if="showHeader" #header>
       <GrDialogHeader
-        v-if="showHeader"
         :title="resolvedTitle"
         :show-close-button="showCloseButton"
         :config="headerConfig"
@@ -118,14 +143,16 @@ function close(): void {
           <slot name="header" v-bind="slotProps" />
         </template>
       </GrDialogHeader>
+    </template>
 
-      <div :class="bodyClass">
-        <slot />
-      </div>
+    <div :class="bodyClass">
+      <slot />
+    </div>
 
-      <GrDialogFooter v-if="slots.footer" :config="footerConfig">
+    <template v-if="slots.footer" #footer>
+      <GrDialogFooter :config="footerConfig">
         <slot name="footer" />
       </GrDialogFooter>
-    </div>
+    </template>
   </GrModal>
 </template>

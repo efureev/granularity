@@ -14,7 +14,17 @@ export type GrModalScrollBehavior = 'outside' | 'inside'
 export const root = 'fixed inset-0 z-[var(--gr-z-modal)]'
 export const overlay = 'fixed inset-0 z-0 bg-[var(--gr-overlay-bg)]'
 
-export const shellBase = 'fixed inset-0 p-4 sm:p-6'
+export const shellBase = 'fixed inset-0'
+
+// Поля вокруг панели. У `full` их нет вовсе: размер означает «во весь экран», а
+// паддинг оболочки вместе с `h-full` панели дал бы окно выше вьюпорта.
+export const shellPaddingBySize: Record<GrModalSize, string> = {
+  sm: 'p-4 sm:p-6',
+  md: 'p-4 sm:p-6',
+  lg: 'p-4 sm:p-6',
+  xl: 'p-4 sm:p-6',
+  full: '',
+}
 
 // Скролл живёт ровно в одном месте: либо в оболочке, либо в панели. Держать
 // `overflow-y-auto` на обеих — значит получить два скроллбара на одно окно.
@@ -62,6 +72,9 @@ export const panelOverflowByScroll: Record<GrModalScrollBehavior, string> = {
 /** Тело окна при `inside`. `min-h-0` — иначе flex-потомок не даст себя сжать. */
 export const panelBodyScrollClass = 'min-h-0 overflow-y-auto'
 
+/** Шапка и подвал при `inside`: сжиматься должно тело, а не они. */
+export const panelSectionClass = 'shrink-0'
+
 export const panelWidthBySize: Record<GrModalSize, string> = {
   sm: 'max-w-[420px]',
   md: 'max-w-[560px]',
@@ -75,13 +88,13 @@ export const panelRadiusBySize: Record<GrModalSize, string> = {
   md: 'rounded-[var(--gr-radius-xl)]',
   lg: 'rounded-[var(--gr-radius-xl)]',
   xl: 'rounded-[var(--gr-radius-xl)]',
-  full: 'rounded-none sm:rounded-[var(--gr-radius-xl)]',
+  full: 'rounded-none',
 }
 
 // Для большинства размеров высота не задаётся — `Partial` + фильтрация пустых
 // значений в `getGrModalPanelClass` избавляют от двойных пробелов.
 export const panelHeightBySize: Partial<Record<GrModalSize, string>> = {
-  full: 'h-[100svh] sm:h-auto',
+  full: 'h-full',
 }
 
 export function getGrModalPanelClass(
@@ -92,11 +105,15 @@ export function getGrModalPanelClass(
     panelBase,
     panelOverflowByScroll[scrollBehavior],
     panelWidthBySize[size],
-    // При `inside` высоту задаёт `max-h-full`, а не размерная мапа: `h-[100svh]`
-    // у `full` вместе со скроллом панели дал бы окно выше вьюпорта.
-    scrollBehavior === 'inside' ? undefined : panelHeightBySize[size],
+    panelHeightBySize[size],
     panelRadiusBySize[size],
   ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+export function getGrModalShellClass(size: GrModalSize, scrollBehavior: GrModalScrollBehavior): string {
+  return [shellBase, shellPaddingBySize[size], shellByScroll[scrollBehavior]]
     .filter(Boolean)
     .join(' ')
 }

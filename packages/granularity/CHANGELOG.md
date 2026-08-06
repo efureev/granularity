@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDialog`: закреплённые шапка и подвал, фуллскрин, фокус и жизненный цикл.** `scrollBehavior="inside"`
+  оставляет шапку и подвал на месте и скроллит только тело — форма на двадцать полей больше не уносит
+  кнопки за экран; `initialFocus`, `opened` и `closed` пробрасываются в `GrModal`. Технически это два
+  новых layout-слота у `GrModal` — `#header` и `#footer` — вне скроллящегося тела, а само тело при
+  `inside` попадает в таб-порядок (`scrollable-region-focusable`). `size="full"` теперь означает «во
+  весь экран»: оболочка без полей, панель `h-full` без скруглений, лишний скролл на узком вьюпорте ушёл.
 - **`GrConfirmDialog`: `focusAction` и `persistent`.** Фокус при открытии уходит на «Отмена»
   (`focusAction`: `cancel` — по умолчанию, `confirm`, `none`), поэтому `Enter` сразу после открытия
   больше не запускает подтверждаемое действие; со своим слотом `#footer` фокус тихо остаётся на

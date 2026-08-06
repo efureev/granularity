@@ -38,7 +38,7 @@
 - `GrConfigProvider`
 - [`GrConfirmDialog`](./components/GrConfirmDialog.md)
 - [`GrDataTable`](./components/GrDataTable.md)
-- `GrDialog`
+- [`GrDialog`](./components/GrDialog.md)
 - [`GrDialogService`](./components/GrDialogService.md)
 - `GrDivider`
 - [`GrDrawer`](./components/GrDrawer.md)

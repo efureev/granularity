@@ -10,7 +10,10 @@
  * - `closeOnEsc` (default: true) — закрывать по Esc;
  * - слоты `#title` / `#description` — если переданы, оборачиваются в
  *   `DialogTitle` / `DialogDescription` (связь через `aria-labelledby` /
- *   `aria-describedby` ставится HeadlessUI автоматически).
+ *   `aria-describedby` ставится HeadlessUI автоматически);
+ * - слоты `#header` / `#footer` — пустые layout-области вне скроллящегося тела:
+ *   при `inside` они остаются на месте. Своей разметки примитив в них не
+ *   добавляет — шапку и подвал рисует `GrDialog`.
  *
  * A11y: **имя у модального слоя обязательно**. HeadlessUI связывает
  * `aria-labelledby` только при наличии `DialogTitle`, поэтому окно без слота
@@ -41,14 +44,14 @@ import {
   type GrModalScrollBehavior,
   type GrModalSize,
   getGrModalPanelClass,
+  getGrModalShellClass,
   layoutByScroll,
   overlay as overlayClass,
   overlayTransition,
   panelBodyScrollClass,
+  panelSectionClass,
   panelTransition,
   root as rootClass,
-  shellBase,
-  shellByScroll,
 } from './grModalStyles'
 
 export type { GrModalScrollBehavior }
@@ -95,13 +98,22 @@ defineSlots<{
   default?: () => any
   title?: () => any
   description?: () => any
+  /** Закреплённая шапка: при `inside` остаётся на месте, скроллится только тело. */
+  header?: () => any
+  /** Закреплённый подвал: там же, где и шапка, — вне скроллящегося тела. */
+  footer?: () => any
 }>()
 
 const slots = useSlots()
 
 const panelClass = computed(() => getGrModalPanelClass(props.size, props.scrollBehavior))
-const shellClass = computed(() => `${shellBase} ${shellByScroll[props.scrollBehavior]}`)
+const shellClass = computed(() => getGrModalShellClass(props.size, props.scrollBehavior))
 const layoutClass = computed(() => layoutByScroll[props.scrollBehavior])
+
+// Тело скроллится только при `inside`, и тогда же обязано попадать в таб-порядок:
+// длинное содержимое без единого фокусируемого элемента иначе недостижимо с
+// клавиатуры (axe: `scrollable-region-focusable`).
+const isBodyScrollable = computed(() => props.scrollBehavior === 'inside')
 
 // Ссылка на панель используется как `initialFocus` для HeadlessUI `<Dialog>`:
 // панель имеет `tabindex="-1"`, поэтому всегда фокусируема программно. Это
@@ -266,16 +278,25 @@ onBeforeUnmount(() => {
                   <slot name="description" />
                 </DialogDescription>
 
-                <!-- При `inside` тело едет отдельно от заголовка: иначе режим
-                     ничем не отличался бы от скролла всей панели. -->
+                <div v-if="$slots.header" data-gr-modal-header :class="panelSectionClass">
+                  <slot name="header" />
+                </div>
+
+                <!-- При `inside` тело едет отдельно от шапки и подвала: иначе
+                     режим ничем не отличался бы от скролла всей панели. -->
                 <div
-                  v-if="scrollBehavior === 'inside'"
+                  v-if="isBodyScrollable"
                   data-gr-modal-body
+                  tabindex="0"
                   :class="panelBodyScrollClass"
                 >
                   <slot />
                 </div>
                 <slot v-else />
+
+                <div v-if="$slots.footer" data-gr-modal-footer :class="panelSectionClass">
+                  <slot name="footer" />
+                </div>
               </DialogPanel>
             </TransitionChild>
           </div>

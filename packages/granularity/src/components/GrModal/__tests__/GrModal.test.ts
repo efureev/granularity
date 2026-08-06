@@ -62,6 +62,7 @@ interface HarnessOptions {
   ariaLabel?: string
   withTitleSlot?: boolean
   withDescriptionSlot?: boolean
+  withSectionSlots?: boolean
 }
 
 /** Escape приходит так же, как в проде: через общий стек слоёв на `window`. */
@@ -81,6 +82,10 @@ function mountHarness(options: HarnessOptions = {}) {
     slots.title = '<span data-testid="title-slot">Title</span>'
   if (options.withDescriptionSlot)
     slots.description = '<span data-testid="description-slot">Desc</span>'
+  if (options.withSectionSlots) {
+    slots.header = '<div data-testid="header-slot">Header</div>'
+    slots.footer = '<div data-testid="footer-slot">Footer</div>'
+  }
 
   const Harness = defineComponent({
     name: 'Harness',
@@ -227,15 +232,28 @@ describe('granularity/GrModal (unit)', () => {
     wrapper.unmount()
   })
 
-  it('применяет full-size модификатор для edge-case размера full', () => {
+  it('размер full раскрывает окно во весь экран: панель без полей и без радиуса', () => {
     const wrapper = mountHarness({ size: 'full' })
 
     const panelClass = wrapper.find('[data-gr-modal-panel]').attributes('class')
 
     expect(panelClass).toContain('max-w-none')
-    expect(panelClass).toContain('h-[100svh]')
-    expect(panelClass).toContain('sm:h-auto')
+    expect(panelClass).toContain('h-full')
     expect(panelClass).toContain('rounded-none')
+
+    // Паддинг оболочки при `full` снимается: вместе с `h-full` он дал бы панель
+    // выше вьюпорта и лишний скролл.
+    const shell = wrapper.find('[data-testid="hu-dialog"]').element.firstElementChild as HTMLElement
+    expect(shell.className).not.toContain('p-4')
+
+    wrapper.unmount()
+  })
+
+  it('при остальных размерах оболочка сохраняет поля вокруг панели', () => {
+    const wrapper = mountHarness({ size: 'md' })
+
+    const shell = wrapper.find('[data-testid="hu-dialog"]').element.firstElementChild as HTMLElement
+    expect(shell.className).toContain('p-4')
 
     wrapper.unmount()
   })
@@ -393,6 +411,44 @@ describe('GrModal — жизненный цикл и раскладка', () => 
     // Скроллится тело, а не панель целиком: заголовок обязан остаться на месте.
     expect(inside.find('[data-gr-modal-body]').attributes('class')).toContain('overflow-y-auto')
     inside.unmount()
+  })
+
+  it('скроллящееся тело попадает в таб-порядок, нескроллящееся — нет', () => {
+    const inside = mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside' })
+    expect(inside.find('[data-gr-modal-body]').attributes('tabindex')).toBe('0')
+    inside.unmount()
+
+    const outside = mountHarness({ ariaLabel: 'X' })
+    expect(outside.find('[data-gr-modal-body]').exists()).toBe(false)
+    outside.unmount()
+  })
+
+  it('слоты #header и #footer рендерятся вне скроллящегося тела', () => {
+    const wrapper = mountHarness({ ariaLabel: 'X', scrollBehavior: 'inside', withSectionSlots: true })
+
+    const body = wrapper.find('[data-gr-modal-body]')
+    const header = wrapper.find('[data-gr-modal-header]')
+    const footer = wrapper.find('[data-gr-modal-footer]')
+
+    expect(header.find('[data-testid="header-slot"]').exists()).toBe(true)
+    expect(footer.find('[data-testid="footer-slot"]').exists()).toBe(true)
+    expect(body.find('[data-testid="header-slot"]').exists()).toBe(false)
+    expect(body.find('[data-testid="footer-slot"]').exists()).toBe(false)
+
+    // Сжиматься в колонке должно тело, а не закреплённые секции.
+    expect(header.attributes('class')).toContain('shrink-0')
+    expect(footer.attributes('class')).toContain('shrink-0')
+
+    wrapper.unmount()
+  })
+
+  it('без слотов секций обёртки шапки и подвала не появляются', () => {
+    const wrapper = mountHarness({ ariaLabel: 'X' })
+
+    expect(wrapper.find('[data-gr-modal-header]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-modal-footer]').exists()).toBe(false)
+
+    wrapper.unmount()
   })
 
   it('снимает слой со стека при размонтировании без закрытия', () => {

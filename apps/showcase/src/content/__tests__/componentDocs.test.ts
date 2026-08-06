@@ -224,7 +224,7 @@ describe('component docs metadata', () => {
     const toasterDoc = getShowcaseComponentDoc(toasterEntity!)
     const loadingDoc = getShowcaseComponentDoc(loadingEntity!)
 
-    expect(dialogDoc.examples).toHaveLength(3)
+    expect(dialogDoc.examples).toHaveLength(4)
     expect(dialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dialogDoc.examples.every(example => example.previewKey?.startsWith('gr-dialog'))).toBe(true)
 

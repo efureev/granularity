@@ -6,6 +6,7 @@ import {
   panelBase,
   panelBodyScrollClass,
   panelHeightBySize,
+  panelSectionClass,
   panelOverflowByScroll,
   panelRadiusBySize,
   panelTransition,
@@ -13,6 +14,7 @@ import {
   root,
   shellBase,
   shellByScroll,
+  shellPaddingBySize,
 } from './grModalStyles'
 
 type GrModalClassTokens = {
@@ -34,7 +36,11 @@ function flattenTransition(stages: Record<string, string>): string[] {
 
 export const grModalClassTokens: GrModalClassTokens = {
   root: splitClassTokens(root),
-  shell: [...splitClassTokens(shellBase), ...Object.values(shellByScroll).flatMap(splitClassTokens)],
+  shell: [
+    ...splitClassTokens(shellBase),
+    ...Object.values(shellPaddingBySize).flatMap(splitClassTokens),
+    ...Object.values(shellByScroll).flatMap(splitClassTokens),
+  ],
   layout: Object.values(layoutByScroll).flatMap(splitClassTokens),
   overlay: splitClassTokens(overlay),
   overlayTransition: flattenTransition(overlayTransition),
@@ -42,6 +48,7 @@ export const grModalClassTokens: GrModalClassTokens = {
     ...splitClassTokens(panelBase),
     ...Object.values(panelOverflowByScroll).flatMap(splitClassTokens),
     ...splitClassTokens(panelBodyScrollClass),
+    ...splitClassTokens(panelSectionClass),
   ],
   panelTransition: flattenTransition(panelTransition),
   panelWidth: Object.values(panelWidthBySize).flatMap(splitClassTokens),

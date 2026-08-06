@@ -2014,6 +2014,20 @@
             "default": "undefined"
           },
           {
+            "name": "scrollBehavior",
+            "description": "Кто скроллится при длинном содержимом. При `inside` шапка и подвал закреплены, а едет только тело.",
+            "type": "GrModalScrollBehavior | undefined",
+            "required": false,
+            "default": "\"outside\""
+          },
+          {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — панель окна. Элемент **из самого диалога** сюда передавать нельзя: проп, возвращающий наверх то, что рождено внутри поддерева, замыкает рендер в цикл. Фокус на своём содержимом ставится из содержимого — так это сделано в `GrPromptDialog`.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "boolean",
@@ -2053,6 +2067,18 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "opened",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"opened\"): void"
+          },
+          {
+            "name": "closed",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"closed\"): void"
           }
         ]
       },
@@ -2209,6 +2235,13 @@
             "default": "false"
           },
           {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
             "name": "side",
             "description": "Сторона, с которой выезжает панель.",
             "type": "GrDrawerSide | undefined",
@@ -2221,13 +2254,6 @@
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "initialFocus",
-            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
-            "type": "HTMLElement | null | undefined",
-            "required": false,
-            "default": "null"
           },
           {
             "name": "modelValue",
@@ -2867,6 +2893,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "scrollBehavior",
+            "description": "",
+            "type": "ScrollBehavior | undefined",
+            "required": false,
+            "default": "\"smooth\""
+          },
+          {
             "name": "rules",
             "description": "Правила валидации по имени поля: `{ email: [{ required: true, type: 'email' }] }`.",
             "type": "GrFormRules | undefined",
@@ -2893,13 +2926,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "scrollBehavior",
-            "description": "",
-            "type": "ScrollBehavior | undefined",
-            "required": false,
-            "default": "\"smooth\""
           },
           {
             "name": "model",
@@ -4617,18 +4643,18 @@
             "default": "true"
           },
           {
-            "name": "initialFocus",
-            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
-            "type": "HTMLElement | null | undefined",
-            "required": false,
-            "default": "null"
-          },
-          {
             "name": "scrollBehavior",
             "description": "Кто скроллится при длинном содержимом: весь оверлей (`outside`) или сама панель (`inside` — окно остаётся на месте, шапка и подвал на виду).",
             "type": "GrModalScrollBehavior | undefined",
             "required": false,
             "default": "\"outside\""
+          },
+          {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
           },
           {
             "name": "modelValue",
@@ -4656,6 +4682,16 @@
           {
             "name": "description",
             "description": "",
+            "type": "any"
+          },
+          {
+            "name": "header",
+            "description": "Закреплённая шапка: при `inside` остаётся на месте, скроллится только тело.",
+            "type": "any"
+          },
+          {
+            "name": "footer",
+            "description": "Закреплённый подвал: там же, где и шапка, — вне скроллящегося тела.",
             "type": "any"
           }
         ]
