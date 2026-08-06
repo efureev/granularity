@@ -1,8 +1,3 @@
-import {splitClassTokens} from '../shared/classTokens'
-import {rootBackdropBlurClass, rootBackgroundClass, rootModeClass} from './grLoadingStyles'
+import {grLoadingClassTokens} from './grLoadingStyles'
 
-export const grLoadingSafelist = [...new Set([
-    ...Object.values(rootModeClass).flatMap(splitClassTokens),
-    ...splitClassTokens(rootBackgroundClass),
-    ...splitClassTokens(rootBackdropBlurClass),
-])]
+export const grLoadingSafelist = [...new Set(grLoadingClassTokens)]

@@ -24,9 +24,7 @@ function readComponentSources(): { path: string, source: string }[] {
  * образец — см. `docs/z-index.md`, раздел «Отклонения». Список закрытый:
  * новый компонент со своим числом уронит тест.
  */
-const KNOWN_OFF_SCALE = new Set([
-  'GrLoading/grLoadingStyles.ts', // fullscreen-оверлей на z-50
-])
+const KNOWN_OFF_SCALE = new Set<string>([])
 
 describe('слоирование (docs/z-index.md)', () => {
   it('шкала объявлена токенами', () => {
@@ -36,6 +34,7 @@ describe('слоирование (docs/z-index.md)', () => {
       '--gr-z-dropdown',
       '--gr-z-tooltip',
       '--gr-z-modal',
+      '--gr-z-loading',
       '--gr-z-toast',
     ])
 

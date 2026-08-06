@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrLoading`: `delay`, a panel slot and a spinner on the icon scale.** `delay` (ms) holds the overlay back, so a
+  request that answers faster never flashes one; the countdown starts when the component mounts, and the content is
+  not blocked until the overlay is actually shown. The default slot replaces the panel body as a whole — progress
+  with percentages, a cancel button for a long operation. `spinnerSize` and `spinnerTone` now go through `GrIcon`
+  (theme tokens instead of px literals in the markup), and the component's own `@keyframes gr-loading-spin` is gone:
+  the package spins one way. The component also got its own page, `docs/components/GrLoading.md`.
+- **`v-loading` blocks the content it covers.** Visually the overlay covered the container, but Tab still walked into
+  the form nobody could see and a screen reader read it as usual. The directive now marks the host `aria-busy` and
+  sets `inert` on its other children at the moment the overlay appears; on close it removes only what it added, and
+  focus — which Chrome leaves inside a subtree that just became inert — is taken out and returned where it was, unless
+  the user has moved it themselves.
+- **`--gr-z-loading` (`1150`).** A layer of its own between the modal (`1100`) and toasts (`1200`): a fullscreen
+  loader blocks the whole application, including an open dialog, but must not hide a notification about a background
+  failure.
 - **`GrIcon`: `label`, `tone`, `spin` and size tokens.** A meaningful icon no longer needs hand-written ARIA — `label`
   turns it into `role="img"` with a name; `tone` paints it with the palette's **text** roles (a saturated tone as text
   colour is forbidden in this package — contrast drops to about 2:1), and `spin` covers spinners. The size scale moved
@@ -544,6 +558,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **BREAKING. `GrLoading`: `zIndex` → `zIndexVar`, fullscreen moved onto the scale.** The fullscreen overlay sat on
+  `z-50` — below the whole layer scale, so a modal (`1100`) covered the loader that was supposed to block it. It now
+  uses `z-[var(--gr-z-loading)]`, and the escape-hatch takes the name of a CSS variable instead of a raw number, the
+  same shape `useFloating` uses. `zIndex: number` is gone from both the component and the `v-loading` options; the
+  inline mode keeps `z-10` — that is ordering inside its own container, not a global layer. With this the package has
+  no off-scale layers left, and the deviations table in `docs/z-index.md` is empty.
+- **`GrLoading` takes its default caption from the locale.** `'Loading...'` was hard-coded while
+  `gr.loading.defaultText` existed — and was tested — in all three locales, so a Russian user read English. Passing
+  `text` still wins, and an empty string still removes the caption.
 - **BREAKING. `GrIcon` is decorative by default.** It now sets `aria-hidden="true"` itself and drops it only when
   `label` is given. Previously the semantics were left entirely to the caller, and the attribute was written by hand in
   22 places inside the library — forgetting it once is enough for a screen reader to announce the `<title>` baked into

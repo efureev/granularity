@@ -15,17 +15,17 @@ const loading = ref(false)
     <div class="relative min-h-[180px] rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <div class="grid gap-2 text-sm text-[var(--gr-muted-fg)]">
         <div class="font-medium text-[var(--gr-fg)]">Brand migration</div>
-        <div>Custom background, z-index and static spinner help adapt the overlay to dense dashboards.</div>
+        <div>Custom background and a static, tinted spinner adapt the overlay to dense dashboards.</div>
       </div>
 
       <GrLoading
         v-if="loading"
         text="Preparing migration plan..."
         background="color-mix(in srgb, var(--gr-fg) 78%, transparent)"
-        spinner-class="text-[var(--gr-bg)] h-8 w-8"
         custom-class="rounded-xl"
+        spinner-tone="primary"
+        :spinner-size="36"
         :animated="false"
-        :z-index="20"
       />
     </div>
   </div>

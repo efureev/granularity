@@ -4,5 +4,6 @@ import { grLoadingSafelist } from './safelist'
 
 export const grLoadingConfig = defineGranularComponent(import.meta.url, {
   name: 'GrLoading',
+  dependencies: ['GrIcon'],
   safelist: grLoadingSafelist,
 })

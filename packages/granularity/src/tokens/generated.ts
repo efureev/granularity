@@ -477,6 +477,12 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Слой модальных окон и диалогов."
   },
   {
+    "name": "--gr-z-loading",
+    "value": "1150",
+    "section": "Layering: z-index scale",
+    "description": "Слой полноэкранного оверлея загрузки: выше модалок, потому что блокирует всё приложение целиком, но ниже тостов."
+  },
+  {
     "name": "--gr-z-toast",
     "value": "1200",
     "section": "Layering: z-index scale",

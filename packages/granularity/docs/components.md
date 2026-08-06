@@ -57,7 +57,7 @@
 - [`GrKbd`](./components/GrKbd.md)
 - [`GrLink`](./components/GrLink.md)
 - [`GrList`](./components/GrList.md)
-- `GrLoading`
+- [`GrLoading`](./components/GrLoading.md)
 - [`GrModal`](./components/GrModal.md)
 - `GrNavbar`
 - `GrNumberInput`

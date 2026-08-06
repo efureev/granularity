@@ -4706,56 +4706,77 @@
         "items": [
           {
             "name": "spinnerClass",
-            "description": "Extra classes for the spinner element.",
+            "description": "Дополнительные классы обёртки спиннера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "text",
-            "description": "Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`.",
+            "description": "Подпись под спиннером. Пустая строка убирает её совсем. По умолчанию — из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "spinner",
-            "description": "Custom spinner component (rendered instead of the default loader icon).",
+            "description": "Свой компонент спиннера вместо иконки по умолчанию.",
             "type": "Component | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "zIndex",
-            "description": "Custom `z-index`.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "background",
-            "description": "Custom CSS `background-color`. When set, disables the default `bg-black/25` dim.",
+            "description": "Свой `background-color`. Задан — дефолтное затемнение `bg-black/25` снимается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
+            "name": "spinnerSize",
+            "description": "Размер спиннера: шкала пакета либо произвольный в пикселях.",
+            "type": "number | \"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "28"
+          },
+          {
+            "name": "spinnerTone",
+            "description": "Тон спиннера из палитры.",
+            "type": "GrIconTone | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
             "name": "animated",
-            "description": "When `true` (default), the default spinner rotates via `@keyframes gr-loading-spin`.",
+            "description": "Вращение спиннера. По умолчанию включено.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "fullscreen",
-            "description": "Cover the whole viewport (`position: fixed`) instead of the nearest positioned ancestor.",
+            "description": "Накрыть весь экран (`position: fixed`) вместо ближайшего позиционированного предка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
+            "name": "zIndexVar",
+            "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "delay",
+            "description": "Задержка показа в миллисекундах: короткая загрузка не мигает оверлеем.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
             "name": "customClass",
-            "description": "Extra classes appended to the overlay root.",
+            "description": "Дополнительные классы корня оверлея.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -4766,13 +4787,26 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "default",
+            "description": "Содержимое панели целиком вместо спиннера с подписью.",
+            "type": "any"
+          }
+        ]
       },
       {
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "show",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"show\"): void"
+          }
+        ]
       },
       {
         "key": "methods",

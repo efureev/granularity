@@ -1,5 +1,14 @@
+import { splitClassTokens } from '../shared/classTokens'
+
+/**
+ * Полноэкранный оверлей сидит на собственном слое шкалы: он блокирует всё
+ * приложение целиком, поэтому обязан лечь выше модалки (`--gr-z-modal`), но
+ * ниже тоста — уведомление о фоновой ошибке загрузка прятать не должна.
+ * Инлайновый режим к шкале отношения не имеет: `z-10` — порядок внутри
+ * собственного контейнера.
+ */
 export const rootModeClass = {
-    fullscreen: 'fixed inset-0 z-50',
+    fullscreen: 'fixed inset-0 z-[var(--gr-z-loading)]',
     inline: 'absolute inset-0 z-10',
 } as const
 export const rootBackgroundClass = 'bg-black/25'
@@ -19,3 +28,9 @@ export function grLoadingRootClass(options: {
         .filter(Boolean)
         .join(' ')
 }
+
+export const grLoadingClassTokens = [
+    ...Object.values(rootModeClass).flatMap(splitClassTokens),
+    ...splitClassTokens(rootBackgroundClass),
+    ...splitClassTokens(rootBackdropBlurClass),
+]

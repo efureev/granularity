@@ -125,6 +125,7 @@
   --gr-z-dropdown: 1000;
   --gr-z-tooltip: 1050;
   --gr-z-modal: 1100;
+  --gr-z-loading: 1150;
   --gr-z-toast: 1200;
 
   /* Derived interaction formulas: action roles */

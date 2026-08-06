@@ -244,7 +244,7 @@ describe('component docs metadata', () => {
     expect(toasterDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('gr-toaster'))).toBe(true)
 
-    expect(loadingDoc.examples).toHaveLength(3)
+    expect(loadingDoc.examples).toHaveLength(5)
     expect(loadingDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(loadingDoc.examples.every(example => example.previewKey?.startsWith('gr-loading'))).toBe(true)
   })

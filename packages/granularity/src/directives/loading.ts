@@ -2,6 +2,7 @@ import type { AppContext, Component, Directive } from 'vue'
 import { createVNode, render } from 'vue'
 
 import GrLoading from '../components/GrLoading/GrLoading.vue'
+import type { GrIconSize, GrIconTone } from '../components/GrIcon/grIconStyles'
 
 export type LoadingTarget = string | HTMLElement
 
@@ -22,9 +23,14 @@ export type LoadingOptions = {
   text?: string
   spinner?: Component
   spinnerClass?: string
+  spinnerSize?: GrIconSize | number
+  spinnerTone?: GrIconTone
   animated?: boolean
   background?: string
-  zIndex?: number
+  /** Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`. */
+  zIndexVar?: string
+  /** Задержка показа в миллисекундах: короткая загрузка не мигает оверлеем. */
+  delay?: number
   customClass?: string
 
   /**
@@ -116,6 +122,47 @@ function ensureClippedContainer(target: HTMLElement, fullscreen: boolean): () =>
   }
 }
 
+/**
+ * Блокирует контент под оверлеем.
+ *
+ * Оверлей перекрывает контейнер визуально, но не для клавиатуры и не для
+ * скринридера: таб уходит в форму, которую пользователь уже не видит, а диктор
+ * читает её как обычную. `inert` снимает поддерево целиком — и фокус, и
+ * события указателя, и дерево доступности.
+ *
+ * Возвращает снятие блокировки. Чужой `inert` (элемент был инертен и до нас)
+ * не трогается: снять его — значит вернуть в таб-порядок то, что скрыл кто-то
+ * другой.
+ */
+function blockContent(target: HTMLElement, overlayHost: HTMLElement): () => void {
+  const previouslyFocused = document.activeElement
+
+  target.setAttribute('aria-busy', 'true')
+
+  const inerted = Array.from(target.children).filter((child): child is HTMLElement =>
+    child !== overlayHost && isHTMLElement(child) && !child.hasAttribute('inert'),
+  )
+  for (const child of inerted) child.setAttribute('inert', '')
+
+  // Уже стоящий фокус браузер сам не забирает: Chrome оставляет его внутри
+  // ставшего инертным поддерева, и пользователь продолжает печатать в поле под
+  // оверлеем. Уводим фокус руками — вернём его при закрытии.
+  if (isHTMLElement(previouslyFocused) && inerted.some(child => child.contains(previouslyFocused)))
+    previouslyFocused.blur()
+
+  return () => {
+    target.removeAttribute('aria-busy')
+    for (const child of inerted) child.removeAttribute('inert')
+
+    // `inert` сбрасывает фокус на `body`. Возвращаем его туда, где он был, но
+    // только если пользователь не увёл его сам, пока шла загрузка.
+    const active = document.activeElement
+    const focusLost = !active || active === document.body
+    if (focusLost && isHTMLElement(previouslyFocused) && previouslyFocused.isConnected)
+      previouslyFocused.focus()
+  }
+}
+
 function parseBinding(value: LoadingBindingValue | undefined): { loading: boolean; options: LoadingOptions } {
   if (value === true || value === false) {
     return { loading: value, options: {} }
@@ -158,10 +205,10 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
     mountEl.style.borderRadius = 'inherit'
   }
   target.appendChild(mountEl)
-  target.setAttribute('aria-busy', 'true')
 
   let current: LoadingOptions = { ...options }
   let disposed = false
+  let unblockContent: (() => void) | undefined
 
   function doRender(): void {
     if (disposed) return
@@ -170,11 +217,19 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
       text: current.text,
       spinner: current.spinner,
       spinnerClass: current.spinnerClass,
+      spinnerSize: current.spinnerSize,
+      spinnerTone: current.spinnerTone,
       animated: current.animated,
       background: current.background,
       customClass: current.customClass,
-      zIndex: current.zIndex,
+      zIndexVar: current.zIndexVar,
+      delay: current.delay,
       fullscreen,
+      // Блокируем контент ровно тогда, когда оверлей стал видимым: с `delay`
+      // это происходит позже монтирования, а до показа блокировать нечего.
+      onShow: () => {
+        unblockContent ??= blockContent(target, mountEl)
+      },
     })
 
     if (appContext) {
@@ -192,7 +247,8 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
     mountEl.remove()
     restoreOverflow()
     restorePosition()
-    target.removeAttribute('aria-busy')
+    unblockContent?.()
+    unblockContent = undefined
   }
 
   function setOptions(next: Partial<LoadingOptions>): void {

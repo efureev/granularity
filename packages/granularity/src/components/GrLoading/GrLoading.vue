@@ -1,33 +1,42 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
+import GrIcon from '../GrIcon/GrIcon.vue'
+import type { GrIconSize, GrIconTone } from '../GrIcon/grIconStyles'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { grLoadingRootClass } from './grLoadingStyles'
 
-const DEFAULT_LOADING_TEXT = 'Loading...'
-
 /**
- * Props for {@link GrLoading}.
- * Overlay primitive that renders a centered spinner with optional text above sibling content.
- * Use `fullscreen` to cover the whole viewport, otherwise overlays the nearest positioned ancestor.
+ * Пропы {@link GrLoading}.
+ *
+ * Оверлей загрузки: спиннер с подписью поверх соседнего контента. `fullscreen`
+ * накрывает весь экран, иначе оверлей ложится на ближайшего позиционированного
+ * предка.
  */
 export interface GrLoadingProps {
-  /** Text under the spinner. Pass an empty string to hide the text entirely. Defaults to `'Loading...'`. */
+  /** Подпись под спиннером. Пустая строка убирает её совсем. По умолчанию — из локали. */
   text?: string
-  /** Custom spinner component (rendered instead of the default loader icon). */
+  /** Свой компонент спиннера вместо иконки по умолчанию. */
   spinner?: Component
-  /** Extra classes for the spinner element. */
+  /** Дополнительные классы обёртки спиннера. */
   spinnerClass?: string
-  /** When `true` (default), the default spinner rotates via `@keyframes gr-loading-spin`. */
+  /** Размер спиннера: шкала пакета либо произвольный в пикселях. */
+  spinnerSize?: GrIconSize | number
+  /** Тон спиннера из палитры. */
+  spinnerTone?: GrIconTone
+  /** Вращение спиннера. По умолчанию включено. */
   animated?: boolean
-  /** Custom CSS `background-color`. When set, disables the default `bg-black/25` dim. */
+  /** Свой `background-color`. Задан — дефолтное затемнение `bg-black/25` снимается. */
   background?: string
-  /** Cover the whole viewport (`position: fixed`) instead of the nearest positioned ancestor. */
+  /** Накрыть весь экран (`position: fixed`) вместо ближайшего позиционированного предка. */
   fullscreen?: boolean
-  /** Custom `z-index`. */
-  zIndex?: number
-  /** Extra classes appended to the overlay root. */
+  /** Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`. */
+  zIndexVar?: string
+  /** Задержка показа в миллисекундах: короткая загрузка не мигает оверлеем. */
+  delay?: number
+  /** Дополнительные классы корня оверлея. */
   customClass?: string
 }
 
@@ -37,17 +46,38 @@ const props = withDefaults(
     text: undefined,
     spinner: undefined,
     spinnerClass: undefined,
+    // 28px не входит в шкалу иконок (14–20): спиннер загрузки — самостоятельный
+    // акцент панели, а не иконка рядом с текстом.
+    spinnerSize: 28,
+    spinnerTone: 'neutral',
     animated: true,
     background: undefined,
     fullscreen: false,
-    zIndex: undefined,
+    zIndexVar: undefined,
+    delay: 0,
     customClass: undefined,
   },
 )
 
+const emit = defineEmits<{
+  /**
+   * Оверлей появился на экране — сразу или по истечении `delay`. По этому
+   * событию директива блокирует контент под оверлеем: до показа блокировать
+   * нечего, иначе быстрый запрос молча «замораживал» бы форму.
+   */
+  (e: 'show'): void
+}>()
+
+defineSlots<{
+  /** Содержимое панели целиком вместо спиннера с подписью. */
+  default?: () => any
+}>()
+
+const { t } = useGranularityTranslations()
+
 const Spinner = computed(() => props.spinner ?? IconLoader)
 
-const displayText = computed(() => props.text ?? DEFAULT_LOADING_TEXT)
+const displayText = computed(() => props.text ?? t('gr.loading.defaultText', 'Loading...'))
 
 const rootClass = computed(() => {
   return grLoadingRootClass({
@@ -60,15 +90,36 @@ const rootClass = computed(() => {
 const rootStyle = computed(() => {
   return {
     backgroundColor: props.background,
-    zIndex: props.zIndex != null ? String(props.zIndex) : undefined,
+    zIndex: props.zIndexVar ? `var(${props.zIndexVar})` : undefined,
   } as Record<string, string | undefined>
 })
 
-const spinnerClassName = computed(() => props.spinnerClass)
+// Оверлей на быстром запросе успевает мигнуть и раздражает сильнее, чем его
+// отсутствие. Отсчёт начинается с монтирования: компонент создаётся ровно в
+// момент старта загрузки — и в `v-if`, и в директиве.
+const visible = ref(props.delay <= 0)
+let delayTimer: ReturnType<typeof setTimeout> | undefined
+
+onMounted(() => {
+  if (visible.value) {
+    emit('show')
+    return
+  }
+
+  delayTimer = setTimeout(() => {
+    visible.value = true
+    emit('show')
+  }, props.delay)
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(delayTimer)
+})
 </script>
 
 <template>
   <div
+    v-if="visible"
     data-gr-loading
     class="flex items-center justify-center cursor-wait select-none pointer-events-auto"
     :class="rootClass"
@@ -80,28 +131,20 @@ const spinnerClassName = computed(() => props.spinnerClass)
       data-gr-loading-panel
       class="flex flex-col items-center justify-center gap-2 text-center rounded-lg bg-[var(--gr-bg)]/55 px-5 py-4 shadow-lg"
     >
-      <component
-        :is="Spinner"
-        data-gr-loading-spinner
-        class="gr-loading__spinner h-7 w-7 text-[var(--gr-muted-fg)]"
-        :class="[animated ? 'gr-loading__spinner--animated' : '', spinnerClassName]"
-        aria-hidden="true"
-      />
-      <div v-if="displayText" data-gr-loading-text class="text-sm text-[var(--gr-muted-fg)]">
-        {{ displayText }}
-      </div>
+      <slot>
+        <GrIcon
+          data-gr-loading-spinner
+          :size="spinnerSize"
+          :tone="spinnerTone"
+          :spin="animated"
+          :class="spinnerClass"
+        >
+          <component :is="Spinner" />
+        </GrIcon>
+        <div v-if="displayText" data-gr-loading-text class="text-sm text-[var(--gr-muted-fg)]">
+          {{ displayText }}
+        </div>
+      </slot>
     </div>
   </div>
 </template>
-
-<style>
-@keyframes gr-loading-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.gr-loading__spinner--animated {
-  transform-origin: center;
-  animation: gr-loading-spin 1s linear infinite;
-}
-</style>

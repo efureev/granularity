@@ -41,7 +41,7 @@ const REQUIRED_DECLARATIONS = [
  * из-за чего кламп фиксировал бы её на `scaleX(0)` — таймер выглядел бы истёкшим
  * при живом тосте. Он обязан иметь собственный блок.
  */
-const CLAMP_SAFE_KEYFRAMES = new Set(['GrLoading'])
+const CLAMP_SAFE_KEYFRAMES = new Set<string>([])
 
 function readStyle(name: string): string {
   return readFileSync(resolve(stylesDir, name), 'utf8')

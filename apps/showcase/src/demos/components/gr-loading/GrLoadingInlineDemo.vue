@@ -16,9 +16,10 @@ const loading = ref(false)
       <div class="grid gap-2 text-sm text-[var(--gr-muted-fg)]">
         <div class="font-medium text-[var(--gr-fg)]">Invoice list</div>
         <div>Use `GrLoading` as an overlay above an existing card or section while async data is refreshing.</div>
+        <div>No `text` prop here: the caption comes from the active locale — switch RU/EN to see it change.</div>
       </div>
 
-      <GrLoading v-if="loading" text="Refreshing rows..." />
+      <GrLoading v-if="loading" />
     </div>
   </div>
 </template>

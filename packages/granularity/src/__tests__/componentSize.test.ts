@@ -13,7 +13,15 @@ vi.mock('@headlessui/vue', async () => {
   const passthrough = (name: string) => define({ name, template: '<div><slot /></div>' })
 
   return {
-    Dialog: define({ name: 'Dialog', emits: ['close'], template: '<div><slot /></div>' }),
+    // `initialFocus` обязан быть объявлен пропом, как у настоящего `Dialog`:
+    // необъявленный он уезжает на `<div>` атрибутом, а `setAttribute` с
+    // template-ref роняет jsdom необработанным исключением.
+    Dialog: define({
+      name: 'Dialog',
+      props: { initialFocus: { type: Object, default: undefined } },
+      emits: ['close'],
+      template: '<div><slot /></div>',
+    }),
     DialogPanel: passthrough('DialogPanel'),
     DialogTitle: passthrough('DialogTitle'),
     DialogDescription: passthrough('DialogDescription'),
