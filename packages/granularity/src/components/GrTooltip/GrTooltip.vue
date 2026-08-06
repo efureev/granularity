@@ -22,7 +22,7 @@ import { vClickOutside } from '../../directives'
 import GrIcon from '../GrIcon'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { type GrTooltipSize, panelSizes, panelWidths, triggerIconSizes } from './grTooltipStyles'
 
 import IconInfo from '~icons/lucide/info'
@@ -90,6 +90,12 @@ const triggerStyle = computed(() => ({ color: props.iconColor }))
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 
 const uncontrolledOpen = ref(false)
 const triggerEl = ref<HTMLElement | null>(null)
@@ -236,6 +242,7 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
           :id="tooltipId"
           ref="panelEl"
           role="tooltip"
+          v-bind="themeAttrs"
           data-gr-tooltip-panel
           class="pointer-events-none rounded-md border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
           :class="panelClass"

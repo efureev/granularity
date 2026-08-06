@@ -6,7 +6,7 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -446,6 +446,12 @@ function onNodeClick(data: T, node: GrTreeNode<T>): void {
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 </script>
 
 <template>
@@ -534,6 +540,7 @@ const teleportEnabled = useTeleportEnabled()
           v-show="open"
           ref="panelEl"
           data-testid="gr-tree-select-panel"
+          v-bind="themeAttrs"
           data-gr-tree-select-panel
           :style="floatingStyle"
           @keydown="onPanelKeydown"

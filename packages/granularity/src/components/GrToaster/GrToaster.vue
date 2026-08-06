@@ -83,6 +83,8 @@ export interface GrToasterProps {
   focusHotkey?: string | false
 }
 
+import { useGrThemeAttrs } from '../GrConfigProvider/context'
+
 const props = withDefaults(defineProps<GrToasterProps>(), {
   placement: 'top-right',
   maxVisible: 4,
@@ -128,6 +130,12 @@ function onAction(toast: Toast, action: ToastAction): void {
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 
 // Видимые тосты (не больше `maxVisible`); остальные — в очереди.
 const visibleToasts = computed(() => list.value.slice(0, Math.max(1, props.maxVisible)))
@@ -191,6 +199,7 @@ defineExpose({ focus })
     <div
         ref="containerEl"
         v-hotkey="hotkeyBinding"
+        v-bind="themeAttrs"
         data-gr-toaster
         role="region"
         :aria-label="resolvedRegionLabel"

@@ -36,7 +36,12 @@ import GrCollapse from '../components/GrCollapse/GrCollapse.vue'
 import GrCollapseItem from '../components/GrCollapse/GrCollapseItem.vue'
 import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
+import GrCommandPalette from '../components/GrCommandPalette/GrCommandPalette.vue'
+import GrConfirmDialog from '../components/GrConfirmDialog/GrConfirmDialog.vue'
+import GrDialog from '../components/GrDialog/GrDialog.vue'
 import GrDrawer from '../components/GrDrawer/GrDrawer.vue'
+import GrModal from '../components/GrModal/GrModal.vue'
+import GrPromptDialog from '../components/GrPromptDialog/GrPromptDialog.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
 import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
@@ -189,6 +194,26 @@ const overlayHarnesses: { name: string, render: () => unknown }[] = [
     name: 'GrDrawer',
     render: () => h(GrDrawer, { modelValue: true, title: 'D' }, { default: () => 'content' }),
   },
+  {
+    name: 'GrModal',
+    render: () => h(GrModal, { modelValue: true, ariaLabel: 'M' }, { default: () => 'content' }),
+  },
+  {
+    name: 'GrDialog',
+    render: () => h(GrDialog, { modelValue: true, title: 'D' }, { default: () => 'content' }),
+  },
+  {
+    name: 'GrConfirmDialog',
+    render: () => h(GrConfirmDialog, { modelValue: true, title: 'C', description: 'D' }),
+  },
+  {
+    name: 'GrPromptDialog',
+    render: () => h(GrPromptDialog, { modelValue: true, value: '', title: 'P', label: 'L' }),
+  },
+  {
+    name: 'GrCommandPalette',
+    render: () => h(GrCommandPalette, { modelValue: true, items: [{ id: 'a', label: 'A' }] }),
+  },
 ]
 
 /** Края оверлейной шкалы. */
@@ -224,6 +249,15 @@ function renderWithConfig(render: () => unknown, config: Record<string, unknown>
   })
 
   return mount(Harness, MOUNT_OPTIONS).html()
+}
+
+/**
+ * Класс панели оверлея из отрендеренной разметки. Размерная шкала оверлея живёт
+ * именно на панели, а всё остальное в окне — обычные контролы со своей шкалой.
+ */
+function panelMarkup(html: string): string {
+  const panel = html.match(/<[^>]*data-gr-(?:modal|drawer)-panel[^>]*>/)
+  return panel ? panel[0] : html
 }
 
 describe('контракт размера', () => {
@@ -307,8 +341,12 @@ describe('контракт размера', () => {
 
     // Шкалы не смешиваются: `size="xs"` у провайдера — про контролы, и панель
     // оверлея он менять не должен, иначе `xs` пришлось бы объявлять и здесь.
+    //
+    // Сравниваем класс панели, а не всю разметку: внутри диалогов живут обычные
+    // контролы (кнопки подвала), и они обязаны глобальный размер слушаться —
+    // сравнение целиком запрещало бы им ровно то, ради чего провайдер и нужен.
     it.each(overlayHarnesses)('$name: глобальный size провайдера его не трогает', ({ render }) => {
-      const [small, large] = PROBE_SIZES.map(size => renderWithConfig(render, { size }))
+      const [small, large] = PROBE_SIZES.map(size => panelMarkup(renderWithConfig(render, { size })))
 
       expect(small).toBe(large)
     })

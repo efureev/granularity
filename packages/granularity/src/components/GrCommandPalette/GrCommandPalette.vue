@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useGrComponentProp } from '../GrConfigProvider/context'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -70,12 +71,16 @@ export interface GrCommandPaletteProps {
   ariaLabel?: string
 }
 
+import './defaults'
+
 const props = withDefaults(
   defineProps<GrCommandPaletteProps>(),
   {
     items: undefined,
     placeholder: undefined,
-    size: 'lg',
+    // Дефолт `size` живёт в резолвере ниже, а не здесь: Vue подставил бы его
+    // до того, как компонент заглянет в `GrConfigProvider`.
+    size: undefined,
     hotkey: 'mod+k',
     filterable: true,
     filter: undefined,
@@ -247,7 +252,10 @@ onBeforeUnmount(() => {
   if (focusTimer) clearTimeout(focusTimer)
 })
 
-const modalSize = computed(() => commandPaletteModalSizeBySize[props.size])
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentProp('GrCommandPalette', 'size', () => props.size, 'lg')
+
+const modalSize = computed(() => commandPaletteModalSizeBySize[resolvedSize.value])
 const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height, ${props.maxHeight}px)` }))
 </script>
 

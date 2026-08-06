@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h, unref } from 'vue'
+import { defineComponent, h, inject, unref, type PropType } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrBadge from '../../GrBadge/GrBadge.vue'
@@ -14,7 +14,11 @@ import GrSelect from '../../GrSelect/GrSelect.vue'
 import GrSwitch from '../../GrSwitch/GrSwitch.vue'
 import GrRating from '../../GrRating/GrRating.vue'
 import GrSlider from '../../GrSlider/GrSlider.vue'
-import { resetUnsupportedSizeWarnings, useGrComponentSize, useGrConfig } from '../context'
+import GrTooltip from '../../GrTooltip/GrTooltip.vue'
+import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
+import { useGranularityTranslations } from '../../../internal/granularityI18n'
+import { resetUnsupportedSizeWarnings, useGrComponentProp, useGrComponentSize, useGrConfig } from '../context'
+import { resetGrZIndexOwner } from '../zIndexScale'
 
 // Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.
 const Consumer = defineComponent({
@@ -400,5 +404,248 @@ describe('пустой конфиг (без провайдера)', () => {
     }))
 
     expect(second.find('.keys').text()).toBe('')
+  })
+})
+
+describe('i18n: адаптер отдаётся реактивно', () => {
+  type TestAdapter = { t: (key: string) => string, te?: (key: string) => boolean }
+
+  function makeAdapter(dict: Record<string, string>, options: { withTe?: boolean } = {}) {
+    const adapter: Record<string, unknown> = {
+      t: (key: string) => dict[key] ?? key,
+    }
+    if (options.withTe) adapter.te = (key: string) => key in dict
+    return adapter as TestAdapter
+  }
+
+  /** Читает то же, что и любой компонент пакета: `t` с фолбэком. */
+  const Translated = defineComponent({
+    setup() {
+      const { t } = useGranularityTranslations()
+      return () => h('span', { class: 'text' }, t('gr.common.close', 'Close'))
+    },
+  })
+
+  it('адаптер, появившийся после первого рендера, доезжает до детей', async () => {
+    const Harness = defineComponent({
+      props: { adapter: { type: Object as PropType<TestAdapter | null>, default: null } },
+      setup(props) {
+        return () => h(GrConfigProvider, { i18n: props.adapter }, { default: () => h(Translated) })
+      },
+    })
+
+    const wrapper = mount(Harness, { props: { adapter: null } })
+    expect(wrapper.find('.text').text()).toBe('Close')
+
+    // Типичный сценарий: адаптер создаётся асинхронно после загрузки локали.
+    // Прежний `if (props.i18n != null) provide(…)` решал судьбу один раз в
+    // `setup`, и такой адаптер не приезжал уже никогда.
+    await wrapper.setProps({ adapter: makeAdapter({ 'gr.common.close': 'Закрыть' }) })
+
+    expect(wrapper.find('.text').text()).toBe('Закрыть')
+  })
+
+  it('подмена адаптера перерисовывает переводы', async () => {
+    const Harness = defineComponent({
+      props: { adapter: { type: Object as PropType<TestAdapter | null>, default: null } },
+      setup(props) {
+        return () => h(GrConfigProvider, { i18n: props.adapter }, { default: () => h(Translated) })
+      },
+    })
+
+    const wrapper = mount(Harness, {
+      props: { adapter: makeAdapter({ 'gr.common.close': 'Закрыть' }) },
+    })
+    expect(wrapper.find('.text').text()).toBe('Закрыть')
+
+    await wrapper.setProps({ adapter: makeAdapter({ 'gr.common.close': 'Cerrar' }) })
+    expect(wrapper.find('.text').text()).toBe('Cerrar')
+  })
+
+  it('te пробрасывается только когда его умеет сам адаптер', () => {
+    const Probe = defineComponent({
+      setup() {
+        const adapter = inject<{ te?: unknown } | null>(GRANULARITY_I18N_KEY, null)
+        return () => h('span', { class: 'te' }, String(typeof adapter?.te))
+      },
+    })
+
+    const withTe = mount(defineComponent({
+      setup: () => () => h(
+        GrConfigProvider,
+        { i18n: makeAdapter({}, { withTe: true }) },
+        { default: () => h(Probe) },
+      ),
+    }))
+    expect(withTe.find('.te').text()).toBe('function')
+
+    // Всегда определённый `te` означал бы «перевода нет» для каждого ключа:
+    // `useGranularityTranslations` спрашивает именно его наличие.
+    const withoutTe = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { i18n: makeAdapter({}) }, { default: () => h(Probe) }),
+    }))
+    expect(withoutTe.find('.te').text()).toBe('undefined')
+  })
+
+  it('проп locale просит адаптер переключиться', async () => {
+    const syncLocale = vi.fn()
+    const adapter = { t: (key: string) => key, syncLocale }
+
+    const wrapper = mount(defineComponent({
+      props: { locale: { type: String, default: undefined as string | undefined } },
+      setup(props) {
+        return () => h(GrConfigProvider, { i18n: adapter, locale: props.locale }, { default: () => h('div') })
+      },
+    }), { props: { locale: 'ru' } })
+
+    expect(syncLocale).toHaveBeenCalledWith('ru')
+
+    await wrapper.setProps({ locale: 'es' })
+    expect(syncLocale).toHaveBeenLastCalledWith('es')
+  })
+})
+
+describe('theme: тема поддерева', () => {
+  it('обёртка получает data-theme, вложенный провайдер перекрывает', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, {
+        default: () => h(GrConfigProvider, { theme: 'ocean' }, { default: () => h('span', 'x') }),
+      }),
+    }))
+
+    const providers = wrapper.findAll('[data-gr-config-provider]')
+    expect(providers[0].attributes('data-theme')).toBe('dark')
+    expect(providers[1].attributes('data-theme')).toBe('ocean')
+  })
+
+  it('тема наследуется вложенным провайдером, который её не задаёт', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, {
+        default: () => h(GrConfigProvider, null, { default: () => h('span', 'x') }),
+      }),
+    }))
+
+    expect(wrapper.findAll('[data-gr-config-provider]')[1].attributes('data-theme')).toBe('dark')
+  })
+
+  it('телепортированная панель ставит тему себе сама', () => {
+    // В DOM панель уезжает в `body`, вне обёртки провайдера, и `data-theme`
+    // с неё не наследуется. В дереве компонентов панель остаётся внутри.
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, {
+        default: () => h(GrTooltip, { content: 'Подсказка', open: true }, { default: () => h('button', 'T') }),
+      }),
+    }), { attachTo: document.body })
+
+    const panel = document.body.querySelector('[data-gr-tooltip-panel]')
+    expect(panel?.getAttribute('data-theme')).toBe('dark')
+
+    wrapper.unmount()
+  })
+
+  it('без темы атрибут не появляется вовсе', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, null, { default: () => h('span', 'x') }),
+    }))
+
+    expect(wrapper.find('[data-gr-config-provider]').attributes('data-theme')).toBeUndefined()
+  })
+})
+
+describe('zIndexBase: шкала слоёв', () => {
+  const NAMES = ['--gr-z-dropdown', '--gr-z-tooltip', '--gr-z-modal', '--gr-z-toast']
+
+  afterEach(() => {
+    for (const name of NAMES) document.documentElement.style.removeProperty(name)
+    resetGrZIndexOwner()
+    vi.restoreAllMocks()
+  })
+
+  function read(): string[] {
+    return NAMES.map(name => document.documentElement.style.getPropertyValue(name))
+  }
+
+  it('пишет шкалу от базы на <html> и возвращает прежние значения при размонтировании', async () => {
+    document.documentElement.style.setProperty('--gr-z-modal', '999')
+
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { zIndexBase: 5000 }, { default: () => h('span', 'x') }),
+    }))
+
+    // Смещения те же, что в токенах: 0 / 50 / 100 / 200.
+    expect(read()).toEqual(['5000', '5050', '5100', '5200'])
+
+    wrapper.unmount()
+
+    // Своё значение приложения возвращается, чужих остатков не остаётся.
+    expect(read()).toEqual(['', '', '999', ''])
+  })
+
+  it('на `:root`, а не на обёртку: панели телепортируются в body', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { zIndexBase: 4000 }, { default: () => h('span', 'x') }),
+    }))
+
+    expect(wrapper.find('[data-gr-config-provider]').attributes('style')).not.toContain('--gr-z-')
+
+    wrapper.unmount()
+  })
+
+  it('второй провайдер с базой предупреждает: шкала одна на документ', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { zIndexBase: 3000 }, {
+        default: () => h(GrConfigProvider, { zIndexBase: 7000 }, { default: () => h('span', 'x') }),
+      }),
+    }))
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('zIndexBase'))
+    expect(read()[0]).toBe('7000')
+
+    wrapper.unmount()
+  })
+
+  it('без пропа переменные не трогаются вовсе', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, null, { default: () => h('span', 'x') }),
+    }))
+
+    expect(read()).toEqual(['', '', '', ''])
+
+    wrapper.unmount()
+  })
+})
+
+describe('оконное семейство читает провайдер', () => {
+  // Отрендеренную панель проверяет гейт `src/__tests__/componentSize.test.ts`
+  // (группа «шкала оверлеев»); здесь — сама проводка резолвера, без HeadlessUI.
+  const ModalSizeProbe = defineComponent({
+    setup() {
+      const size = useGrComponentProp('GrModal', 'size', () => undefined, 'md')
+      return () => h('span', { class: 'modal-size' }, size.value)
+    },
+  })
+
+  it('размер окна берётся из componentDefaults, а не из шкалы контролов', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(
+        GrConfigProvider,
+        { size: 'xs', componentDefaults: { GrModal: { size: 'xl' } } },
+        { default: () => h(ModalSizeProbe) },
+      ),
+    }))
+
+    // Глобальный `size` — про контролы: у оверлеев своя шкала (`xl`/`full`),
+    // и смешивать их нельзя.
+    expect(wrapper.find('.modal-size').text()).toBe('xl')
+  })
+
+  it('без конфига остаётся собственный дефолт компонента', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { size: 'xs' }, { default: () => h(ModalSizeProbe) }),
+    }))
+
+    expect(wrapper.find('.modal-size').text()).toBe('md')
   })
 })

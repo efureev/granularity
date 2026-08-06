@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrConfigProvider`: subtree theming, a layer-scale base and a `locale` prop.** `theme` puts `data-theme` on the
+  wrapper — a dark island inside a light page needs no extra styles, because themes are declared with an attribute
+  selector. Teleported panels leave the wrapper in the DOM but stay inside the component tree, so they now read the
+  theme from context and set it on themselves (modal, drawer, dropdown, popover, tooltip, select, autocomplete,
+  tree-select, toaster, image viewer) — otherwise the island broke on the first open panel. `zIndexBase` recomputes
+  `--gr-z-*` from a base and writes them on `<html>`, restoring the previous values on unmount; it is deliberately
+  document-wide for the same teleport reason, and a second provider with its own base warns in dev. `locale` asks the
+  active adapter to switch (`syncLocale`) without becoming a second source of truth.
+- **The dialog family finally reads the provider.** `GrModal`, `GrDialog`, `GrConfirmDialog`, `GrPromptDialog` and
+  `GrCommandPalette` resolve `size` through `componentDefaults` like every other component; the control scale
+  (`size="xs"`) still does not touch overlay panels, since the two scales are different by design. The size gate now
+  covers them, comparing the panel markup so that buttons inside a dialog may keep following the control scale.
 - **`GrResponseErrorBanner`: the parser pipeline is finally covered by tests.** 17 tests became 85 across four
   files: a table per parser (input → `kind`/`message`/`status`/`details`/`fieldErrors`/`stop`), transport cases
   for `normalizeError` (axios, `fetch Response` incl. non-JSON bodies, `XMLHttpRequest`, abort, bare `Error`),
@@ -249,6 +261,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrConfigProvider` decided the fate of the i18n adapter once, in `setup`.** `if (props.i18n != null) provide(…)`
+  meant an adapter created asynchronously — the usual «load the locale, then build the adapter» — never reached the
+  children at all, and swapping adapters on a language change did not propagate either, because a value was provided
+  instead of a reactive source. The adapter is now always provided through a façade that delegates to a computed
+  source and falls back to the adapter installed higher up; `te` is forwarded by a getter, since an always-defined
+  `te` would mean «no translation» for every key.
 - **`GrResponseErrorBanner` silently dropped a server message that matched a default.** Fallback detection
   compared strings against the built-in English texts, so a server literally answering `"Network error."` lost
   its message to the translated default. `ResponseErrorInfo` now carries `isFallbackMessage`, set in exactly one

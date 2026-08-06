@@ -49,6 +49,8 @@ import { useViewerKeyboard } from './composables/useViewerKeyboard'
 export type GrImageViewerItem = { src: string, alt?: string }
 export type GrImageViewerSource = string | GrImageViewerItem
 
+import { useGrThemeAttrs } from '../GrConfigProvider/context'
+
 const props = withDefaults(
   defineProps<{
     modelValue: boolean
@@ -180,6 +182,12 @@ const open = computed(() => props.modelValue)
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
 const items = computed<GrImageViewerItem[]>(() =>
@@ -482,6 +490,7 @@ onBeforeUnmount(() => {
     <TransitionRoot :show="open" as="template">
       <Dialog
         as="div"
+        v-bind="themeAttrs"
         :inert="inertAttr"
         class="fixed inset-0"
         :style="viewerStyle"

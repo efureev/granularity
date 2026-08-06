@@ -9,6 +9,7 @@
  * Клик по «Confirm»/«Cancel» эмитит одноимённое событие и закрывает диалог
  * через `update:modelValue`.
  */
+import { useGrComponentProp } from '../GrConfigProvider/context'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
@@ -74,6 +75,8 @@ export interface GrConfirmDialogProps {
   persistent?: boolean
 }
 
+import './defaults'
+
 const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
   title: undefined,
   description: undefined,
@@ -81,7 +84,9 @@ const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
   closeOnEsc: true,
   showHeader: true,
   showCloseButton: true,
-  size: 'md',
+  // Дефолт `size` живёт в резолвере ниже, а не здесь: Vue подставил бы его
+  // до того, как компонент заглянет в `GrConfigProvider`.
+  size: undefined,
   headerConfig: undefined,
   footerConfig: undefined,
   bodyConfig: undefined,
@@ -98,6 +103,9 @@ const props = withDefaults(defineProps<GrConfirmDialogProps>(), {
   focusAction: 'cancel',
   persistent: false,
 })
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentProp('GrConfirmDialog', 'size', () => props.size, 'md')
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -167,7 +175,7 @@ function onConfirm(): void {
   <GrDialog
     v-model="open"
     :title="resolvedTitle"
-    :size="size"
+    :size="resolvedSize"
     :close-on-backdrop="resolvedCloseOnBackdrop"
     :close-on-esc="resolvedCloseOnEsc"
     :show-header="showHeader"

@@ -13,6 +13,7 @@
  * Проверки сверх `required` описываются пропом `rules` — тем же движком, что и
  * у `GrForm`: третий частный случай валидации в пакете заводить незачем.
  */
+import { useGrComponentProp } from '../GrConfigProvider/context'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
@@ -109,6 +110,8 @@ export interface GrPromptDialogProps {
   persistent?: boolean
 }
 
+import './defaults'
+
 const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   title: undefined,
   description: undefined,
@@ -118,7 +121,9 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   closeOnEsc: true,
   showHeader: true,
   showCloseButton: true,
-  size: 'md',
+  // Дефолт `size` живёт в резолвере ниже, а не здесь: Vue подставил бы его
+  // до того, как компонент заглянет в `GrConfigProvider`.
+  size: undefined,
   headerConfig: undefined,
   footerConfig: undefined,
   bodyConfig: undefined,
@@ -145,6 +150,9 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   closeOnConfirm: true,
   persistent: false,
 })
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentProp('GrPromptDialog', 'size', () => props.size, 'md')
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -314,7 +322,7 @@ watch(
   <GrDialog
     v-model="open"
     :title="resolvedTitle"
-    :size="size"
+    :size="resolvedSize"
     :close-on-backdrop="resolvedCloseOnBackdrop"
     :close-on-esc="resolvedCloseOnEsc"
     :show-header="showHeader"

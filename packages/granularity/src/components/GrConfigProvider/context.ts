@@ -64,6 +64,11 @@ export interface GrConfigContext {
   size: ComputedRef<GrComponentSize | undefined>
   /** Дефолтные пропсы по компонентам. */
   componentDefaults: ComputedRef<GrComponentDefaults>
+  /**
+   * Тема поддерева (`data-theme`). Необязательна: тип публичный, и контекст
+   * строят руками — например хост императивных диалогов.
+   */
+  theme?: ComputedRef<string | undefined>
 }
 
 export const GR_CONFIG_KEY: InjectionKey<GrConfigContext> = Symbol('gr-config')
@@ -87,6 +92,7 @@ const EMPTY_COMPONENT_DEFAULTS: GrComponentDefaults = Object.freeze({})
 const EMPTY_CONFIG: GrConfigContext = {
   size: computed(() => undefined),
   componentDefaults: computed(() => EMPTY_COMPONENT_DEFAULTS),
+  theme: computed(() => undefined),
 }
 
 /** Возвращает ближайший `GrConfigProvider` или пустой конфиг, если провайдера нет. */
@@ -255,5 +261,27 @@ export function useGrComponentProp<
     // generic-ключ `TProp` уже не проиндексировать.
     const defaults: GrDefaultsOf<TComponent> | undefined = config.componentDefaults.value[component]
     return defaults?.[prop] ?? fallback
+  })
+}
+
+/**
+ * Атрибут темы для **телепортируемого** корня панели.
+ *
+ * Панель уезжает в `body`, то есть вне DOM-поддерева провайдера, и `data-theme`
+ * с его обёртки на неё не наследуется. В дереве компонентов она при этом
+ * остаётся внутри — `inject` работает, — поэтому тему панель ставит себе сама.
+ * Без этого «тёмный остров» ломался бы на первом же открытом дропдауне.
+ *
+ * ```vue
+ * <teleport to="body">
+ *   <div v-bind="themeAttrs">…</div>
+ * </teleport>
+ * ```
+ */
+export function useGrThemeAttrs(): ComputedRef<{ 'data-theme'?: string }> {
+  const config = useGrConfig()
+  return computed(() => {
+    const theme = config.theme?.value
+    return theme ? { 'data-theme': theme } : {}
   })
 }

@@ -75,6 +75,7 @@ const previewRegistry = {
   'gr-command-palette-async': defineAsyncComponent(() => import('../demos/components/gr-command-palette/GrCommandPaletteAsyncDemo.vue')),
   'gr-config-provider-size': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderSizeDemo.vue')),
   'gr-config-provider-nested': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderNestedDemo.vue')),
+  'gr-config-provider-theme-island': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderThemeIslandDemo.vue')),
   'gr-config-provider-defaults': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderDefaultsDemo.vue')),
   'gr-config-provider-dialog': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderDialogDemo.vue')),
   'gr-config-provider-read': defineAsyncComponent(() => import('../demos/components/gr-config-provider/GrConfigProviderReadDemo.vue')),

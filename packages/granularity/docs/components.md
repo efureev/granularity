@@ -35,7 +35,7 @@
 - [`GrCheckboxGroup`](./components/GrCheckboxGroup.md)
 - [`GrCollapse`](./components/GrCollapse.md)
 - `GrCommandPalette`
-- `GrConfigProvider`
+- [`GrConfigProvider`](./components/GrConfigProvider.md)
 - [`GrConfirmDialog`](./components/GrConfirmDialog.md)
 - [`GrDataTable`](./components/GrDataTable.md)
 - [`GrDialog`](./components/GrDialog.md)

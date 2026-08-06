@@ -26,7 +26,7 @@ import { useTeleportEnabled } from '../../composables/internal/useTeleportEnable
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { vClickOutside } from '../../directives'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import {
   type GrPopoverRole,
   type GrPopoverSize,
@@ -195,6 +195,12 @@ const panelClasses = computed(() =>
 // не совпадёт с серверным и сломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
 
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
+
 defineExpose({ open, close, toggle })
 </script>
 
@@ -229,6 +235,7 @@ defineExpose({ open, close, toggle })
           v-show="isOpen"
           :id="panelId"
           ref="panelEl"
+          v-bind="themeAttrs"
           data-gr-popover-panel
           :role="role === 'none' ? undefined : role"
           :aria-label="labelledBy ? undefined : ariaLabel"

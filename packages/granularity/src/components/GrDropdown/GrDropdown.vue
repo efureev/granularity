@@ -37,6 +37,8 @@ export interface GrDropdownProps {
   teleportTo?: string | HTMLElement
 }
 
+import { useGrThemeAttrs } from '../GrConfigProvider/context'
+
 const props = withDefaults(defineProps<GrDropdownProps>(), {
   placement: 'bottom-end',
   offset: 8,
@@ -325,6 +327,12 @@ onBeforeUnmount(() => {
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 </script>
 
 <template>
@@ -353,6 +361,7 @@ const teleportEnabled = useTeleportEnabled()
           v-show="open"
           :id="panelId"
           ref="panelEl"
+          v-bind="themeAttrs"
           data-gr-dropdown-panel
           role="menu"
           tabindex="-1"

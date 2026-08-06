@@ -31,6 +31,7 @@
  * не доходит вовсе: `@close` от HeadlessUI остаётся только у клика по оверлею
  * и программного вызова, и оба подчиняются `closeOnBackdrop`.
  */
+import { useGrComponentProp, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { computed, onBeforeUnmount, ref, useSlots, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
@@ -77,10 +78,14 @@ export interface GrModalProps {
   initialFocus?: HTMLElement | null
 }
 
+import './defaults'
+
 const props = withDefaults(defineProps<GrModalProps>(), {
   closeOnBackdrop: true,
   closeOnEsc: true,
-  size: 'md',
+  // Дефолт `size` живёт в резолвере ниже, а не здесь: Vue подставил бы его
+  // до того, как компонент заглянет в `GrConfigProvider`.
+  size: undefined,
   scrollBehavior: 'outside',
   ariaLabel: undefined,
   initialFocus: null,
@@ -106,8 +111,11 @@ defineSlots<{
 
 const slots = useSlots()
 
-const panelClass = computed(() => getGrModalPanelClass(props.size, props.scrollBehavior))
-const shellClass = computed(() => getGrModalShellClass(props.size, props.scrollBehavior))
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+const resolvedSize = useGrComponentProp('GrModal', 'size', () => props.size, 'md')
+
+const panelClass = computed(() => getGrModalPanelClass(resolvedSize.value, props.scrollBehavior))
+const shellClass = computed(() => getGrModalShellClass(resolvedSize.value, props.scrollBehavior))
 const layoutClass = computed(() => layoutByScroll[props.scrollBehavior])
 
 // Тело скроллится только при `inside`, и тогда же обязано попадать в таб-порядок:
@@ -137,6 +145,12 @@ const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? '' : un
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 
 const { t } = useGranularityTranslations()
 
@@ -227,6 +241,7 @@ onBeforeUnmount(() => {
     <TransitionRoot :show="modelValue" as="template">
       <Dialog
         as="div"
+        v-bind="themeAttrs"
         :class="rootClass"
         :initial-focus="initialFocus ?? panelRef"
         :inert="inertAttr"

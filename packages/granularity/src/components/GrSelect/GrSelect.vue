@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
@@ -759,6 +759,12 @@ function clearSelection(): void {
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 </script>
 
 <template>
@@ -960,6 +966,7 @@ const teleportEnabled = useTeleportEnabled()
           v-show="open"
           ref="panelEl"
           data-testid="gr-select-panel"
+          v-bind="themeAttrs"
           data-gr-select-panel
           :style="floatingStyle"
         >

@@ -1252,7 +1252,7 @@
             "description": "",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
-            "default": "\"lg\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",
@@ -1418,6 +1418,27 @@
             "default": "undefined"
           },
           {
+            "name": "locale",
+            "description": "Просьба к адаптеру переключить язык (`syncLocale`). Источником истины остаётся сам адаптер — провайдер лишь передаёт ему намерение.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "theme",
+            "description": "Тема поддерева: значение уезжает в `data-theme`. Тема **документа** — работа `useTheme`/`initThemeEarly`, здесь именно остров.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "zIndexBase",
+            "description": "База шкалы слоёв. Переменные `--gr-z-*` пересчитываются от неё и ставятся на `<html>`: панели телепортируются в `body`, и переменные поддерева до них не доходят.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "tag",
             "description": "Тег обёртки. По умолчанию прозрачный `<div style=\"display:contents\">`.",
             "type": "string | undefined",
@@ -1473,7 +1494,7 @@
             "description": "",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "description",
@@ -1948,7 +1969,7 @@
             "description": "",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -4731,7 +4752,7 @@
             "description": "",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -5554,7 +5575,7 @@
             "description": "",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
-            "default": "\"md\""
+            "default": "undefined"
           },
           {
             "name": "placeholder",

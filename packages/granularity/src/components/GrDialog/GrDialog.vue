@@ -15,6 +15,7 @@
  * - `aria-label` вниз уходит всегда: `GrModal` иначе не отличил бы «заголовок
  *   рисует `GrDialogHeader`» от «имени нет вовсе» и подставил бы обобщённое.
  */
+import { useGrComponentProp } from '../GrConfigProvider/context'
 import { computed } from 'vue'
 
 import GrModal from '../GrModal/GrModal.vue'
@@ -62,13 +63,17 @@ export interface GrDialogProps {
   initialFocus?: HTMLElement | null
 }
 
+import './defaults'
+
 const props = withDefaults(defineProps<GrDialogProps>(), {
   title: undefined,
   closeOnBackdrop: true,
   closeOnEsc: true,
   showHeader: true,
   showCloseButton: true,
-  size: 'md',
+  // Дефолт `size` живёт в резолвере ниже, а не здесь: Vue подставил бы его
+  // до того, как компонент заглянет в `GrConfigProvider`.
+  size: undefined,
   headerConfig: undefined,
   footerConfig: undefined,
   bodyConfig: undefined,
@@ -91,6 +96,11 @@ const slots = defineSlots<{
   header?: (props: { title?: string }) => any
   footer?: () => any
 }>()
+
+// Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
+// Резолвим здесь, а не полагаемся на `GrModal`: иначе дефолт диалога затенил бы
+// конфиг раньше, чем примитив успел бы в него заглянуть.
+const resolvedSize = useGrComponentProp('GrDialog', 'size', () => props.size, 'md')
 
 const resolvedTitle = computed(() => resolveGrDialogTitle(props.title))
 
@@ -115,7 +125,7 @@ function close(): void {
 <template>
   <GrModal
     :model-value="modelValue"
-    :size="size"
+    :size="resolvedSize"
     :scroll-behavior="scrollBehavior"
     :initial-focus="initialFocus"
     :close-on-backdrop="closeOnBackdrop"

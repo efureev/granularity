@@ -6,7 +6,7 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 // Единый стек слоёв: Esc верхнему, `inert` нижним модалкам. Drawer — модальный
 // класс (бэкдроп + scroll-lock), поэтому регистрируется как `modal`.
@@ -127,6 +127,12 @@ const ariaLabel = computed(() => (labelledBy.value ? undefined : t('gr.drawer.ti
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
 const teleportEnabled = useTeleportEnabled()
+
+// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
+// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
+// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
+// сама.
+const themeAttrs = useGrThemeAttrs()
 
 const panelEl = ref<HTMLElement | null>(null)
 
@@ -269,6 +275,7 @@ defineExpose({
           >
             <DialogPanel
               ref="panelEl"
+              v-bind="themeAttrs"
               data-gr-drawer-panel
               tabindex="-1"
               class="fixed inset-y-0 flex flex-col"
