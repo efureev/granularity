@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.15.0] 2026-08-07
+
 ### Added
 
 - **`GrAutocomplete`: `fetchOptions` — remote search run by the component.** The prop takes
