@@ -2,7 +2,17 @@
 import { computed, useSlots } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
-import { type GrTableSize, tableSizes } from './grTableStyles'
+import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
+import { hasMeaningfulSlotContent } from '../shared/slotNodes'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+import {
+  emptyCellClass,
+  hoverableClass,
+  loadingRowCellClass,
+  stripedClass,
+  tableSizes,
+  type GrTableSize,
+} from './grTableStyles'
 
 export interface GrTableProps {
   /**
@@ -20,11 +30,24 @@ export interface GrTableProps {
   /** ID элемента-заголовка, связанного с `<table>` через `aria-labelledby`. */
   ariaLabelledby?: string
   /**
-   * ARIA-label для скролл-контейнера (`role="region"` + `tabindex="0"`).
-   * Позволяет клавиатурным пользователям проскроллить широкую таблицу.
-   * Если не задан — region-роль не включается.
+   * ARIA-label для скролл-контейнера. Включает `role="region"`; сам скролл
+   * достижим с клавиатуры всегда, независимо от метки.
    */
   regionLabel?: string
+  /** Идёт загрузка: вместо строк — скелетоны, контейнер помечен `aria-busy`. */
+  loading?: boolean
+  /** Сколько строк-заглушек показать при `loading`. */
+  loadingRows?: number
+  /** Сколько колонок занимает служебная строка (пустое состояние и скелетоны). */
+  columnCount?: number
+  /** Текст пустого состояния. Слот `#empty` сильнее. */
+  emptyText?: string
+  /** Таблица пуста. По умолчанию определяется по содержимому слота. */
+  empty?: boolean
+  /** Чередование строк. */
+  striped?: boolean
+  /** Подсветка строки под курсором. */
+  hoverable?: boolean
   /**
    * Прилипающий заголовок: `<thead>` остаётся видимым при вертикальном скролле.
    * Осмысленно вместе с `maxHeight` (иначе таблица не скроллится вертикально).
@@ -53,6 +76,13 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   ariaLabel: undefined,
   ariaLabelledby: undefined,
   regionLabel: undefined,
+  loading: false,
+  loadingRows: 3,
+  columnCount: 1,
+  emptyText: undefined,
+  empty: undefined,
+  striped: false,
+  hoverable: false,
   stickyHeader: false,
   maxHeight: undefined,
 })
@@ -62,6 +92,28 @@ const slots = useSlots()
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTable' })
 const tableTextClass = computed(() => tableSizes[resolvedSize.value])
 const hasCaption = computed(() => Boolean(slots.caption) || Boolean(props.caption))
+
+const { t } = useGranularityTranslations()
+const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.table.empty', 'Nothing here yet'))
+
+// Пустоту видно по слоту: `v-for` по пустому массиву оставляет фрагмент без
+// узлов, `v-if` — комментарий, и ни то ни другое строкой не является.
+const isEmpty = computed(() => {
+  if (props.empty !== undefined)
+    return props.empty
+
+  return !hasMeaningfulSlotContent(slots.default?.() ?? [])
+})
+
+const showRows = computed(() => !props.loading && !isEmpty.value)
+const loadingRowCount = computed(() => Math.max(1, Math.trunc(props.loadingRows)))
+const serviceColSpan = computed(() => Math.max(1, Math.trunc(props.columnCount)))
+
+const tbodyClass = computed(() => [
+  'text-[var(--gr-fg)]',
+  props.striped && showRows.value ? stripedClass : '',
+  props.hoverable && showRows.value ? hoverableClass : '',
+].filter(Boolean).join(' '))
 
 const scrollStyle = computed(() => {
   if (props.maxHeight === undefined)
@@ -83,7 +135,8 @@ const theadClass = computed(() => [
     data-gr-table-scroll
     :role="regionLabel ? 'region' : undefined"
     :aria-label="regionLabel"
-    :tabindex="regionLabel ? 0 : undefined"
+    :aria-busy="loading ? 'true' : undefined"
+    tabindex="0"
     class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
     :style="scrollStyle"
   >
@@ -101,8 +154,26 @@ const theadClass = computed(() => [
       <thead :class="theadClass">
         <slot name="head" />
       </thead>
-      <tbody class="text-[var(--gr-fg)]">
-        <slot />
+      <tbody :class="tbodyClass">
+        <template v-if="loading">
+          <slot name="loading">
+            <tr v-for="row in loadingRowCount" :key="row" data-gr-table-loading-row>
+              <td :colspan="serviceColSpan" :class="loadingRowCellClass">
+                <GrSkeleton />
+              </td>
+            </tr>
+          </slot>
+        </template>
+
+        <tr v-else-if="isEmpty" data-gr-table-empty>
+          <td :colspan="serviceColSpan" :class="emptyCellClass">
+            <slot name="empty">
+              {{ resolvedEmptyText }}
+            </slot>
+          </td>
+        </tr>
+
+        <slot v-else />
       </tbody>
       <tfoot v-if="slots.foot" class="text-[var(--gr-fg)]">
         <slot name="foot" />

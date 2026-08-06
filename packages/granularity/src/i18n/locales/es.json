@@ -214,5 +214,8 @@
   },
   "button": {
     "loading": "Cargando…"
+  },
+  "table": {
+    "empty": "Todavía no hay nada"
   }
 }

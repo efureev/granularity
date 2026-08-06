@@ -113,3 +113,56 @@ describe('GrTabPanels', () => {
     expect(wrapper.html()).toBeTruthy()
   })
 })
+
+describe('GrTabPanels — реактивный idBase и lazy', () => {
+  // `idBase` вычислялся один раз при setup: панели оставались со старыми id,
+  // `GrTabs` уезжал на новые, и связка разъезжалась молча.
+  const Harness = defineComponent({
+    props: {
+      idBase: { type: String, default: undefined },
+      modelValue: { type: String, default: 'a' },
+      keepAlive: { type: Boolean, default: false },
+      lazy: { type: Boolean, default: false },
+    },
+    render() {
+      return h(GrTabPanels, { modelValue: this.modelValue, idBase: this.idBase }, {
+        default: () => [
+          h(GrTabPanel, { value: 'a', keepAlive: this.keepAlive, lazy: this.lazy }, { default: () => 'A' }),
+          h(GrTabPanel, { value: 'b', keepAlive: this.keepAlive, lazy: this.lazy }, { default: () => 'B' }),
+        ],
+      })
+    },
+  })
+
+  it('смена idBase доезжает до панелей', async () => {
+    const wrapper = mount(Harness, { props: { idBase: 'first' } })
+
+    expect(wrapper.get('[data-gr-tab-panel]').attributes('id')).toBe('first-panel-a')
+    expect(wrapper.get('[data-gr-tab-panel]').attributes('aria-labelledby')).toBe('first-tab-a')
+
+    await wrapper.setProps({ idBase: 'second' })
+
+    expect(wrapper.get('[data-gr-tab-panel]').attributes('id')).toBe('second-panel-a')
+    expect(wrapper.get('[data-gr-tab-panel]').attributes('aria-labelledby')).toBe('second-tab-a')
+  })
+
+  it('lazy не монтирует панель до первого показа, дальше держит в DOM', async () => {
+    const wrapper = mount(Harness, { props: { keepAlive: true, lazy: true } })
+
+    expect(wrapper.findAll('[data-gr-tab-panel]')).toHaveLength(1)
+
+    await wrapper.setProps({ modelValue: 'b' })
+    expect(wrapper.findAll('[data-gr-tab-panel]')).toHaveLength(2)
+
+    // Вернулись на первую — вторая осталась в DOM скрытой.
+    await wrapper.setProps({ modelValue: 'a' })
+    const hidden = wrapper.findAll('[data-gr-tab-panel]').filter(el => el.attributes('hidden') !== undefined)
+    expect(hidden).toHaveLength(1)
+  })
+
+  it('keepAlive без lazy держит в DOM все панели сразу', () => {
+    const wrapper = mountPanels({}, { keepAlive: true })
+
+    expect(wrapper.findAll('[data-gr-tab-panel]')).toHaveLength(2)
+  })
+})

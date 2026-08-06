@@ -48,3 +48,41 @@ describe('GrTextarea', () => {
     expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-warning)]')
   })
 })
+
+describe('GrTextarea — паритет с GrInput', () => {
+  it('счётчик символов связан с полем через aria-describedby', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'abc', showCount: true, maxlength: 10 } })
+
+    const countId = wrapper.get('[data-gr-textarea-count]').attributes('id')
+    expect(wrapper.get('[data-gr-textarea-count]').text()).toBe('3 / 10')
+    expect(wrapper.get('textarea').attributes('aria-describedby')).toBe(countId)
+    expect(wrapper.get('textarea').attributes('maxlength')).toBe('10')
+  })
+
+  it('без showCount поле остаётся корневым элементом', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: '' } })
+
+    expect(wrapper.element.tagName).toBe('TEXTAREA')
+    expect(wrapper.find('[data-gr-textarea-count]').exists()).toBe(false)
+  })
+
+  it('resize управляется пропом', () => {
+    expect(mount(GrTextarea, { props: { modelValue: '' } }).classes()).toContain('resize-y')
+    expect(mount(GrTextarea, { props: { modelValue: '', resize: 'none' } }).classes()).toContain('resize-none')
+  })
+
+  // Прозрачность разбавляет выверенные на AA токены текста.
+  it('disabled гасится токенами, а не прозрачностью', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: '', disabled: true } })
+
+    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(wrapper.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+  })
+
+  it('readonly и size доходят до поля', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'x', readonly: true, size: 'lg' } })
+
+    expect((wrapper.element as HTMLTextAreaElement).readOnly).toBe(true)
+    expect(wrapper.classes()).toContain('text-[16px]')
+  })
+})

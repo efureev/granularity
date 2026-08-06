@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrEmptyState, GrTable } from '@feugene/granularity'
+import { GrButton, GrTable } from '@feugene/granularity'
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 const { t } = useFintI18n()
@@ -21,7 +21,8 @@ const rows = [
       </GrButton>
     </div>
 
-    <GrTable>
+    <!-- Ни `v-if` вокруг строк, ни ручного `colspan`: пустоту таблица видит по слоту сама. -->
+    <GrTable :column-count="3" striped hoverable>
       <template #head>
         <tr>
           <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headPreset') }}</th>
@@ -30,29 +31,19 @@ const rows = [
         </tr>
       </template>
 
-      <tr v-if="empty" class="border-t border-[var(--gr-brd)]">
-        <td colspan="3" class="px-4 py-6">
-          <GrEmptyState
-            :title="t('components.GrTable.empty.emptyTitle')"
-            :description="t('components.GrTable.empty.emptyDescription')"
-          >
-            <GrButton size="sm" @click="empty = false">
-              {{ t('components.GrTable.empty.loadSample') }}
-            </GrButton>
-          </GrEmptyState>
-        </td>
+      <tr v-for="row in (empty ? [] : rows)" :key="row.name" class="border-t border-[var(--gr-brd)]">
+        <td class="px-4 py-3">{{ row.name }}</td>
+        <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.owner }}</td>
+        <td class="px-4 py-3">{{ row.value }}</td>
       </tr>
 
-      <template v-else>
-        <tr
-          v-for="row in rows"
-          :key="row.name"
-          class="border-t border-[var(--gr-brd)]"
-        >
-          <td class="px-4 py-3">{{ row.name }}</td>
-          <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.owner }}</td>
-          <td class="px-4 py-3">{{ row.value }}</td>
-        </tr>
+      <template #empty>
+        <div class="grid justify-items-center gap-2">
+          <span>{{ t('components.GrTable.empty.emptyTitle') }}</span>
+          <GrButton size="sm" @click="empty = false">
+            {{ t('components.GrTable.empty.loadSample') }}
+          </GrButton>
+        </div>
       </template>
     </GrTable>
   </div>

@@ -34,23 +34,46 @@ import { GrBadge, GrTable } from '@feugene/granularity'
     status: 'ready',
     previewKey: 'gr-table-loading-state',
     code: `<script setup lang="ts">
-import { GrSkeleton, GrTable } from '@feugene/granularity'
+import { ref } from 'vue'
+
+import { GrButton, GrTable } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
+
+const { t } = useFintI18n()
+const loading = ref(true)
+
+const rows = [
+  { title: 'Ledger export', state: 'Completed', updated: '2 min ago' },
+  { title: 'Reconciliation', state: 'Processing', updated: '5 min ago' },
+  { title: 'Fraud review', state: 'Queued', updated: '12 min ago' },
+]
 </script>
 
 <template>
-  <GrTable>
-    <template #head>
-      <tr>
-        <th class="px-4 py-3 text-left font-600">Task</th>
-        <th class="px-4 py-3 text-left font-600">State</th>
-      </tr>
-    </template>
+  <div class="grid gap-3">
+    <div>
+      <GrButton size="sm" variant="outline" @click="loading = !loading">
+        {{ loading ? t('components.GrTable.loading.showResolved') : t('components.GrTable.loading.showLoading') }}
+      </GrButton>
+    </div>
 
-    <tr class="border-t border-[var(--gr-brd)]">
-      <td class="px-4 py-3"><GrSkeleton class="h-4 w-32" /></td>
-      <td class="px-4 py-3"><GrSkeleton class="h-4 w-24" /></td>
-    </tr>
-  </GrTable>
+    <!-- Скелетоны рисует сама таблица, контейнер при этом помечен \`aria-busy\`. -->
+    <GrTable :loading="loading" :loading-rows="3" :column-count="3">
+      <template #head>
+        <tr>
+          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.loading.headTask') }}</th>
+          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.loading.headState') }}</th>
+          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.loading.headUpdated') }}</th>
+        </tr>
+      </template>
+
+      <tr v-for="row in rows" :key="row.title" class="border-t border-[var(--gr-brd)]">
+        <td class="px-4 py-3">{{ row.title }}</td>
+        <td class="px-4 py-3">{{ row.state }}</td>
+        <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.updated }}</td>
+      </tr>
+    </GrTable>
+  </div>
 </template>`,
   },
   {
@@ -60,26 +83,54 @@ import { GrSkeleton, GrTable } from '@feugene/granularity'
     status: 'ready',
     previewKey: 'gr-table-empty-state',
     code: `<script setup lang="ts">
-import { GrButton, GrEmptyState, GrTable } from '@feugene/granularity'
+import { ref } from 'vue'
+
+import { GrButton, GrTable } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
+
+const { t } = useFintI18n()
+const empty = ref(true)
+
+const rows = [
+  { name: 'Risk alerts', owner: 'Ops team', value: 'Enabled' },
+  { name: 'Approval SLA', owner: 'Finance', value: '24 hours' },
+]
 </script>
 
 <template>
-  <GrTable>
-    <template #head>
-      <tr>
-        <th class="px-4 py-3 text-left font-600">Preset</th>
-        <th class="px-4 py-3 text-left font-600">Owner</th>
-      </tr>
-    </template>
+  <div class="grid gap-3">
+    <div>
+      <GrButton size="sm" variant="outline" @click="empty = !empty">
+        {{ empty ? t('components.GrTable.empty.showRows') : t('components.GrTable.empty.showEmpty') }}
+      </GrButton>
+    </div>
 
-    <tr class="border-t border-[var(--gr-brd)]">
-      <td colspan="2" class="px-4 py-6">
-        <GrEmptyState title="No preset rows" description="Load sample data to replace the placeholder.">
-          <GrButton size="sm">Load sample data</GrButton>
-        </GrEmptyState>
-      </td>
-    </tr>
-  </GrTable>
+    <!-- Ни \`v-if\` вокруг строк, ни ручного \`colspan\`: пустоту таблица видит по слоту сама. -->
+    <GrTable :column-count="3" striped hoverable>
+      <template #head>
+        <tr>
+          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headPreset') }}</th>
+          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headOwner') }}</th>
+          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headValue') }}</th>
+        </tr>
+      </template>
+
+      <tr v-for="row in (empty ? [] : rows)" :key="row.name" class="border-t border-[var(--gr-brd)]">
+        <td class="px-4 py-3">{{ row.name }}</td>
+        <td class="px-4 py-3 text-[var(--gr-muted-fg)]">{{ row.owner }}</td>
+        <td class="px-4 py-3">{{ row.value }}</td>
+      </tr>
+
+      <template #empty>
+        <div class="grid justify-items-center gap-2">
+          <span>{{ t('components.GrTable.empty.emptyTitle') }}</span>
+          <GrButton size="sm" @click="empty = false">
+            {{ t('components.GrTable.empty.loadSample') }}
+          </GrButton>
+        </div>
+      </template>
+    </GrTable>
+  </div>
 </template>`,
   },
   {

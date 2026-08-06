@@ -56,7 +56,10 @@ describe('GrTable', () => {
     expect(wrapper.find('caption').exists()).toBe(false)
   })
 
-  it('включает role="region" + tabindex при regionLabel', () => {
+  // Скролл обязан быть достижим с клавиатуры всегда (WCAG 2.1.1): раньше
+  // `tabindex` появлялся только вместе с `regionLabel`, и широкую таблицу без
+  // метки нельзя было проскроллить вообще.
+  it('скролл-контейнер в таб-порядке всегда, region — по наличию метки', () => {
     const withRegion = mount(GrTable, {
       props: { regionLabel: 'Scrollable users table' },
       slots: { default: '<tr><td>x</td></tr>' },
@@ -69,7 +72,7 @@ describe('GrTable', () => {
     const without = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
     const scrollNo = without.find('[data-gr-table-scroll]')
     expect(scrollNo.attributes('role')).toBeUndefined()
-    expect(scrollNo.attributes('tabindex')).toBeUndefined()
+    expect(scrollNo.attributes('tabindex')).toBe('0')
   })
 
   it('пробрасывает aria-label / aria-labelledby на <table>', () => {
@@ -105,5 +108,51 @@ describe('GrTable', () => {
       })
       expect(wrapper.find('table').classes(), size).toContain(className)
     }
+  })
+})
+
+describe('GrTable — состояния', () => {
+  it('пустоту определяет по содержимому слота', () => {
+    const wrapper = mount(GrTable, { props: { columnCount: 3 } })
+
+    const cell = wrapper.get('[data-gr-table-empty] td')
+    expect(cell.attributes('colspan')).toBe('3')
+    expect(cell.text()).toBe('Nothing here yet')
+  })
+
+  it('слот #empty и emptyText перекрывают текст', () => {
+    const withText = mount(GrTable, { props: { emptyText: 'Нет заявок' } })
+    expect(withText.get('[data-gr-table-empty]').text()).toBe('Нет заявок')
+
+    const withSlot = mount(GrTable, { slots: { empty: '<button data-testid="cta">Создать</button>' } })
+    expect(withSlot.find('[data-testid="cta"]').exists()).toBe(true)
+  })
+
+  it('со строками пустое состояние не показывается', () => {
+    const wrapper = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
+
+    expect(wrapper.find('[data-gr-table-empty]').exists()).toBe(false)
+  })
+
+  it('loading рисует скелетоны и помечает контейнер aria-busy', () => {
+    const wrapper = mount(GrTable, {
+      props: { loading: true, loadingRows: 4 },
+      slots: { default: '<tr><td>x</td></tr>' },
+    })
+
+    expect(wrapper.get('[data-gr-table-scroll]').attributes('aria-busy')).toBe('true')
+    expect(wrapper.findAll('[data-gr-table-loading-row]')).toHaveLength(4)
+    expect(wrapper.find('[data-gr-table-empty]').exists()).toBe(false)
+  })
+
+  it('striped и hoverable вешаются на tbody', () => {
+    const wrapper = mount(GrTable, {
+      props: { striped: true, hoverable: true },
+      slots: { default: '<tr><td>x</td></tr>' },
+    })
+
+    const tbody = wrapper.get('tbody')
+    expect(tbody.attributes('class')).toContain('nth-child(even)')
+    expect(tbody.attributes('class')).toContain('tr:hover')
   })
 })

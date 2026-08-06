@@ -6421,6 +6421,13 @@
             "default": "undefined"
           },
           {
+            "name": "search",
+            "description": "Текст поиска как контролируемое значение (`v-model:search`). Без него `loading` был декоративным: набранное пользователем наружу не выходило, и сходить за опциями на сервер было не с чем.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "loading",
             "description": "Состояние загрузки: вместо списка опций панель показывает индикатор загрузки. Полезно для удалённой подгрузки опций. Форсит `optionsView=\"panel\"`.",
             "type": "boolean | undefined",
@@ -6468,6 +6475,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "maxTagCount",
+            "description": "Сколько chips показать до сворачивания в «+N» (только `tags`).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "clearable",
@@ -6531,6 +6545,36 @@
             "description": "",
             "type": "[GrSelectModelValue<TValue>]",
             "signature": "(e: \"update:modelValue\", value: GrSelectModelValue<TValue>): void"
+          },
+          {
+            "name": "change",
+            "description": "Значение изменилось — тот же payload, что у `update:modelValue`.",
+            "type": "[GrSelectModelValue<TValue>]",
+            "signature": "(e: \"change\", value: GrSelectModelValue<TValue>): void"
+          },
+          {
+            "name": "clear",
+            "description": "Значение снято кнопкой очистки.",
+            "type": "[]",
+            "signature": "(e: \"clear\"): void"
+          },
+          {
+            "name": "visibleChange",
+            "description": "Панель открылась/закрылась.",
+            "type": "[boolean]",
+            "signature": "(e: \"visibleChange\", visible: boolean): void"
+          },
+          {
+            "name": "update:search",
+            "description": "Текст поиска как контролируемое значение (`v-model:search`).",
+            "type": "[string]",
+            "signature": "(e: \"update:search\", value: string): void"
+          },
+          {
+            "name": "search",
+            "description": "Пользователь набрал запрос — сигнал сходить за опциями.",
+            "type": "[string]",
+            "signature": "(e: \"search\", value: string): void"
           }
         ]
       },
@@ -7142,9 +7186,30 @@
             "default": "undefined"
           },
           {
+            "name": "loading",
+            "description": "Идёт загрузка: вместо строк — скелетоны, контейнер помечен `aria-busy`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "hoverable",
+            "description": "Подсветка строки под курсором.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "maxHeight",
             "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
             "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -7164,7 +7229,7 @@
           },
           {
             "name": "regionLabel",
-            "description": "ARIA-label для скролл-контейнера (`role=\"region\"` + `tabindex=\"0\"`). Позволяет клавиатурным пользователям проскроллить широкую таблицу. Если не задан — region-роль не включается.",
+            "description": "ARIA-label для скролл-контейнера. Включает `role=\"region\"`; сам скролл достижим с клавиатуры всегда, независимо от метки.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7172,6 +7237,34 @@
           {
             "name": "stickyHeader",
             "description": "Прилипающий заголовок: `<thead>` остаётся видимым при вертикальном скролле. Осмысленно вместе с `maxHeight` (иначе таблица не скроллится вертикально).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loadingRows",
+            "description": "Сколько строк-заглушек показать при `loading`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "empty",
+            "description": "Таблица пуста. По умолчанию определяется по содержимому слота.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "columnCount",
+            "description": "Сколько колонок занимает служебная строка (пустое состояние и скелетоны).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "striped",
+            "description": "Чередование строк.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -7190,6 +7283,16 @@
           },
           {
             "name": "head",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "loading",
+            "description": "",
+            "type": "{}"
+          },
+          {
+            "name": "empty",
             "description": "",
             "type": "{}"
           },
@@ -7279,22 +7382,38 @@
         "origin": "generated",
         "items": [
           {
-            "name": "modelValue",
-            "description": "",
-            "type": "string",
-            "required": true
-          },
-          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
-            "required": false
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "orientation",
+            "description": "Горизонтальный (по умолчанию) или вертикальный список вкладок.",
+            "type": "GrTabsOrientation | undefined",
+            "required": false,
+            "default": "\"horizontal\""
           },
           {
             "name": "idBase",
             "description": "База id для ARIA-связки с `GrTabPanels`. Если задана, каждая вкладка получает `id=\"<idBase>-tab-<value>\"` и `aria-controls=\"<idBase>-panel-<value>\"`. Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.",
             "type": "string | undefined",
-            "required": false
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "activationMode",
+            "description": "`automatic` (по умолчанию) — стрелка сразу переключает вкладку; `manual` — стрелка двигает только фокус, выбор подтверждается `Enter`/`Space`. Второй режим для вкладок с тяжёлой загрузкой: перебор стрелками иначе тянет каждую панель.",
+            "type": "GrTabsActivationMode | undefined",
+            "required": false,
+            "default": "\"automatic\""
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
           },
           {
             "name": "tabs",
@@ -7423,6 +7542,34 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "maxlength",
+            "description": "Ограничение длины + основа для счётчика символов.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showCount",
+            "description": "Показывать счётчик символов (`len` или `len/maxlength`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "autosize",
+            "description": "Подгонять высоту под содержимое (директива `v-autosize`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "resize",
+            "description": "Ручное изменение размера пользователем.",
+            "type": "GrTextareaResize | undefined",
+            "required": false,
+            "default": "\"vertical\""
           },
           {
             "name": "modelValue",

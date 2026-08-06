@@ -34,7 +34,7 @@ describe('component docs metadata', () => {
     const selectDoc = getShowcaseComponentDoc(selectEntity!)
     const fileUploadDoc = getShowcaseComponentDoc(fileUploadEntity!)
 
-    expect(selectDoc.examples).toHaveLength(6)
+    expect(selectDoc.examples).toHaveLength(7)
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
@@ -86,7 +86,7 @@ describe('component docs metadata', () => {
     expect(paginationDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('gr-pagination'))).toBe(true)
 
-    expect(tabsDoc.examples).toHaveLength(4)
+    expect(tabsDoc.examples).toHaveLength(5)
     expect(tabsDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tabsDoc.examples.every(example => example.previewKey?.startsWith('gr-tabs'))).toBe(true)
 
@@ -167,7 +167,7 @@ describe('component docs metadata', () => {
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 
-    expect(textareaDoc.examples).toHaveLength(4)
+    expect(textareaDoc.examples).toHaveLength(5)
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 

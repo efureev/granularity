@@ -6,13 +6,24 @@
  * - `state`: визуальный оттенок рамки (`default | success | warning | danger`).
  * - `invalid`: форсирует `danger`-состояние и проставляет `aria-invalid="true"`.
  */
-import { computed, ref } from 'vue'
-import { type GrTextareaSize, type GrTextareaState, grTextareaClass, sizes } from './grTextareaStyles'
+import { computed, ref, useId } from 'vue'
+import {
+  countClass,
+  disabledSurfaceClass,
+  enabledSurfaceClass,
+  grTextareaClass,
+  resizeClass,
+  sizes,
+  type GrTextareaResize,
+  type GrTextareaSize,
+  type GrTextareaState,
+} from './grTextareaStyles'
+import { vAutosize } from '../../directives'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 
-const props = withDefaults(defineProps<{
+export interface GrTextareaProps {
   modelValue: string
   placeholder?: string
   autocomplete?: string
@@ -29,7 +40,17 @@ const props = withDefaults(defineProps<{
   id?: string
   rows?: number
   size?: GrTextareaSize
-}>(), {
+  /** Ограничение длины + основа для счётчика символов. */
+  maxlength?: number
+  /** Показывать счётчик символов (`len` или `len/maxlength`). */
+  showCount?: boolean
+  /** Подгонять высоту под содержимое (директива `v-autosize`). */
+  autosize?: boolean
+  /** Ручное изменение размера пользователем. */
+  resize?: GrTextareaResize
+}
+
+const props = withDefaults(defineProps<GrTextareaProps>(), {
   placeholder: undefined,
   autocomplete: undefined,
   disabled: false,
@@ -42,18 +63,32 @@ const props = withDefaults(defineProps<{
   id: undefined,
   rows: 4,
   size: undefined,
+  maxlength: undefined,
+  showCount: false,
+  autosize: false,
+  resize: 'vertical',
 })
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-export type GrTextareaProps = typeof props
-
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => props.id ?? field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
+
+// Счётчик обязан быть частью описания поля: иначе «12 / 60» видно глазами, но
+// не слышно — при том что ограничение длины и есть его смысл.
+const countId = useId()
+const describedBy = computed(() =>
+  [field?.describedById.value, props.showCount ? countId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
+
+const countText = computed(() =>
+  props.maxlength !== undefined ? `${props.modelValue.length} / ${props.maxlength}` : String(props.modelValue.length),
+)
 const {
   invalid: isInvalid,
   required: isRequired,
@@ -76,6 +111,8 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextar
 
 const className = computed(() => [
   sizes[resolvedSize.value],
+  resizeClass[props.resize],
+  props.disabled ? disabledSurfaceClass : enabledSurfaceClass,
   grTextareaClass({
     state: props.state,
     invalid: isInvalid.value,
@@ -88,12 +125,44 @@ function onInput(e: Event): void {
 </script>
 
 <template>
+  <div v-if="showCount" data-gr-textarea-wrap class="w-full">
+    <textarea
+      :id="resolvedId"
+      ref="textareaEl"
+      v-autosize="autosize"
+      data-gr-textarea
+      :name="name"
+      :rows="rows"
+      :maxlength="maxlength"
+      :autocomplete="autocomplete"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :value="modelValue"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-describedby="describedBy"
+      :aria-required="isRequired ? 'true' : undefined"
+      :aria-readonly="isReadonly ? 'true' : undefined"
+      :aria-label="ariaLabel"
+      :readonly="isReadonly"
+      class="w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
+      :class="className"
+      @input="onInput"
+    />
+
+    <div :id="countId" data-gr-textarea-count :class="countClass">
+      {{ countText }}
+    </div>
+  </div>
+
   <textarea
+    v-else
     :id="resolvedId"
     ref="textareaEl"
+    v-autosize="autosize"
     data-gr-textarea
     :name="name"
     :rows="rows"
+    :maxlength="maxlength"
     :autocomplete="autocomplete"
     :placeholder="placeholder"
     :disabled="disabled"
@@ -104,7 +173,7 @@ function onInput(e: Event): void {
     :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-label="ariaLabel"
     :readonly="isReadonly"
-    class="w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-50 disabled:cursor-not-allowed"
+    class="w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
     :class="className"
     @input="onInput"
   />

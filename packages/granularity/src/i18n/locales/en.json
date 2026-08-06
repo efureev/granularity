@@ -213,5 +213,8 @@
   },
   "button": {
     "loading": "Loading…"
+  },
+  "table": {
+    "empty": "Nothing here yet"
   }
 }

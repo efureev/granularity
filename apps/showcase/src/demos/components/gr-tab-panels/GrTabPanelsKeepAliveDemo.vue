@@ -1,13 +1,4 @@
-import type { ShowcaseComponentExampleDoc } from '../types'
-
-export const grTabPanelsExamples: ShowcaseComponentExampleDoc[] = [
-  {
-    id: 'tab-panels-keep-alive',
-    title: 'keepAlive и ленивое монтирование',
-    description: 'Панель монтируется при первом показе (`lazy`) и дальше не разрушается (`keepAlive`) — состояние формы переживает переключение.',
-    status: 'ready',
-    previewKey: 'gr-tab-panels-keep-alive',
-    code: `<script setup lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue'
 
 import { GrInput, GrTabPanel, GrTabPanels, GrTabs } from '@feugene/granularity'
@@ -34,7 +25,7 @@ function markMounted(value: string): string {
   <div class="grid gap-4">
     <GrTabs v-model="tab" :tabs="tabs" id-base="keep-alive-demo" />
 
-    <!-- \`keepAlive\` + \`lazy\`: панель монтируется при первом показе и дальше живёт. -->
+    <!-- `keepAlive` + `lazy`: панель монтируется при первом показе и дальше живёт. -->
     <GrTabPanels v-model="tab" id-base="keep-alive-demo">
       <GrTabPanel value="draft" keep-alive lazy>
         <div class="grid gap-2 p-3">
@@ -61,34 +52,4 @@ function markMounted(value: string): string {
       Панель появляется в DOM при первом показе и дальше не разрушается.
     </div>
   </div>
-</template>`,
-  },
-  {
-    id: 'tab-panels-basic',
-    title: 'Accessible tabs with linked panels',
-    description: 'Companion к `GrTabs`: одинаковый `id-base` связывает вкладки и панели по ARIA (`aria-controls` ↔ `aria-labelledby`). Показывается панель активной вкладки; `keep-alive` оставляет неактивные в DOM.',
-    status: 'ready',
-    previewKey: 'gr-tab-panels-basic',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-import { GrTabPanel, GrTabPanels, GrTabs, type GrTab } from '@feugene/granularity'
-
-const active = ref('overview')
-const tabs: GrTab[] = [
-  { value: 'overview', label: 'Overview' },
-  { value: 'activity', label: 'Activity', badge: '3' },
-  { value: 'settings', label: 'Settings' },
-]
-</script>
-
-<template>
-  <GrTabs v-model="active" :tabs="tabs" id-base="tabs" />
-
-  <GrTabPanels v-model="active" id-base="tabs">
-    <GrTabPanel value="overview">Overview panel.</GrTabPanel>
-    <GrTabPanel value="activity">Activity panel.</GrTabPanel>
-    <GrTabPanel value="settings">Settings panel.</GrTabPanel>
-  </GrTabPanels>
-</template>`,
-  },
-]
+</template>

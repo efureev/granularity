@@ -24,7 +24,10 @@ const props = withDefaults(
 )
 
 const generatedIdBase = useId()
-const resolvedIdBase = props.idBase ?? generatedIdBase
+// `computed`, а не значение: `idBase` — реактивный проп, и вычисленный один раз
+// при setup он оставил бы панели со старыми id, пока `GrTabs` уехал бы на новые.
+// Связка `aria-controls` ↔ `aria-labelledby` разъезжается молча.
+const resolvedIdBase = computed(() => props.idBase ?? generatedIdBase)
 
 provide(GR_TAB_PANELS_KEY, {
   activeValue: computed(() => props.modelValue),

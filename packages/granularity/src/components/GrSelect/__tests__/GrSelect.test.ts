@@ -10,8 +10,10 @@ function getTeleportedElement<T extends Element = HTMLElement>(selector: string)
   return element as T
 }
 
+// Кнопка «добавить своё значение» тоже `role="option"` — иначе она была бы
+// чужеродным потомком `role="listbox"` (axe: `aria-required-children`).
 function getTeleportedOptions(): HTMLButtonElement[] {
-  return [...document.body.querySelectorAll<HTMLButtonElement>('button[role="option"]')]
+  return [...document.body.querySelectorAll<HTMLButtonElement>('button[role="option"]:not([data-gr-select-add-option])')]
 }
 
 describe('GrSelect', () => {
@@ -658,5 +660,223 @@ describe('GrSelect — combobox a11y (item 14)', () => {
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['EUR'])
+  })
+})
+
+describe('GrSelect — удалённая подгрузка и поиск', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  // Раньше набранный текст жил только внутри компонента: `loading` был
+  // декоративным пропом, сходить за опциями было не с чем.
+  it('текст поиска уходит наружу через update:search и search', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        filterable: true,
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }],
+      },
+    })
+
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const input = new DOMWrapper(getTeleportedElement<HTMLInputElement>('[data-testid="gr-select-custom-input"]'))
+    await input.setValue('alp')
+
+    expect(wrapper.emitted('update:search')?.at(-1)).toEqual(['alp'])
+    expect(wrapper.emitted('search')?.at(-1)).toEqual(['alp'])
+  })
+
+  it('контролируемый search сильнее внутреннего состояния', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        filterable: true,
+        search: 'beta',
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+      },
+    })
+
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
+    await nextTick()
+
+    expect(getTeleportedElement<HTMLInputElement>('[data-testid="gr-select-custom-input"]').value).toBe('beta')
+    expect(getTeleportedOptions().map(o => o.textContent?.trim())).toEqual(['Beta'])
+  })
+
+  // `aria-controls` указывал на listbox, которого при загрузке нет в DOM.
+  it('при loading ссылка на список не висит в пустоту', async () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: '', optionsView: 'panel', loading: true, ariaLabel: 'Select', options: [] },
+    })
+
+    const trigger = wrapper.get('[data-testid="gr-select-trigger"]')
+    await trigger.trigger('click')
+    await nextTick()
+
+    expect(trigger.attributes('aria-controls')).toBeUndefined()
+    expect(trigger.attributes('aria-busy')).toBe('true')
+    expect(document.body.querySelector('[data-gr-select-loading]')).toBeTruthy()
+  })
+})
+
+describe('GrSelect — активная опция и фокус', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  // `aria-activedescendant` работает только на элементе с фокусом: с полем
+  // поиска фокус уходит туда, и на триггере связка была немой.
+  it('с полем поиска активная опция объявляется на инпуте, а не на триггере', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        filterable: true,
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+      },
+    })
+
+    const trigger = wrapper.get('[data-testid="gr-select-trigger"]')
+    await trigger.trigger('click')
+    await nextTick()
+
+    const input = getTeleportedElement<HTMLInputElement>('[data-testid="gr-select-custom-input"]')
+    expect(input.getAttribute('role')).toBe('combobox')
+    expect(input.getAttribute('aria-activedescendant')).toBeTruthy()
+    expect(trigger.attributes('aria-activedescendant')).toBeUndefined()
+  })
+
+  it('без поля поиска связка остаётся на триггере', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: '',
+        optionsView: 'panel',
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }],
+      },
+    })
+
+    const trigger = wrapper.get('[data-testid="gr-select-trigger"]')
+    await trigger.trigger('click')
+    await nextTick()
+
+    expect(trigger.attributes('aria-activedescendant')).toBeTruthy()
+  })
+})
+
+describe('GrSelect — теги', () => {
+  const tagProps = {
+    modelValue: ['a', 'b', 'c'],
+    optionsView: 'panel' as const,
+    multiple: true,
+    tags: true,
+    ariaLabel: 'Select',
+    options: [
+      { value: 'a', label: 'Alpha' },
+      { value: 'b', label: 'Beta' },
+      { value: 'c', label: 'Gamma' },
+    ],
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  // Крестик был `<span tabindex="-1">` внутри `role="combobox"`: и вложенный
+  // интерактив, и полная недоступность с клавиатуры.
+  it('крестики тегов — настоящие кнопки вне комбобокса', () => {
+    const wrapper = mount(GrSelect, { props: tagProps })
+
+    const removes = wrapper.findAll('[data-gr-select-tag-remove]')
+    expect(removes).toHaveLength(3)
+    expect(removes[0].element.tagName).toBe('BUTTON')
+    expect(removes[0].attributes('tabindex')).toBeUndefined()
+    expect(wrapper.get('[data-gr-select-trigger]').find('[data-gr-select-tag-remove]').exists()).toBe(false)
+  })
+
+  it('крестик снимает значение', async () => {
+    const wrapper = mount(GrSelect, { props: tagProps })
+
+    await wrapper.findAll('[data-gr-select-tag-remove]')[1].trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a', 'c']])
+  })
+
+  it('maxTagCount сворачивает хвост в «+N»', () => {
+    const wrapper = mount(GrSelect, { props: { ...tagProps, maxTagCount: 2 } })
+
+    expect(wrapper.findAll('[data-gr-select-tag]')).toHaveLength(2)
+    expect(wrapper.get('[data-gr-select-tag-rest]').text()).toBe('+1')
+  })
+})
+
+describe('GrSelect — события и состояния', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('эмитит change, clear и visibleChange', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: 'a',
+        optionsView: 'panel',
+        clearable: true,
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+      },
+    })
+
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
+    expect(wrapper.emitted('visibleChange')?.at(-1)).toEqual([true])
+
+    const options = getTeleportedOptions()
+    options[1].click()
+    await nextTick()
+    expect(wrapper.emitted('change')?.at(-1)).toEqual(['b'])
+
+    await wrapper.get('[data-testid="gr-select-clear"]').trigger('click')
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+  })
+
+  // Поле с выбранным значением переставало выглядеть выпадающим списком.
+  it('шеврон виден вместе с кнопкой очистки', () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: 'a',
+        optionsView: 'panel',
+        clearable: true,
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }],
+      },
+    })
+
+    expect(wrapper.find('[data-testid="gr-select-clear"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="gr-select-chevron"]').exists()).toBe(true)
+  })
+
+  it('readonly не открывает панель и не меняет значение', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: 'a',
+        optionsView: 'panel',
+        readonly: true,
+        ariaLabel: 'Select',
+        options: [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+      },
+    })
+
+    await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
+    await nextTick()
+
+    expect(wrapper.get('[data-testid="gr-select-trigger"]').attributes('aria-expanded')).toBe('false')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 })

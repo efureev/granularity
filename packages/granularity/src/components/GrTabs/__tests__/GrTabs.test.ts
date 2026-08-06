@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
 import { describe, expect, it } from 'vitest'
 import GrTabs from '../GrTabs.vue'
 
@@ -49,21 +50,23 @@ describe('GrTabs', () => {
     expect(wrapper.emitted('update:modelValue')).toEqual([['settings']])
   })
 
+  // Стенд с настоящим `v-model`: фокус в tablist едет вместе с выбором, и без
+  // обновления модели вторая стрелка отсчитывалась бы от устаревшей вкладки.
   it('поддерживает клавиатурную навигацию с циклическим переходом', async () => {
-    const wrapper = mount(GrTabs, {
-      props: {
-        modelValue: 'settings',
-        tabs: [...tabs],
-      },
+    const Harness = defineComponent({
+      components: { GrTabs },
+      data: () => ({ value: 'settings', tabs: [...tabs] }),
+      template: '<GrTabs v-model="value" :tabs="tabs" />',
     })
 
-    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' })
-    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowLeft' })
+    const wrapper = mount(Harness)
+    const state = wrapper.vm as unknown as { value: string }
 
-    expect(wrapper.emitted('update:modelValue')).toEqual([
-      ['overview'],
-      ['history'],
-    ])
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' })
+    expect(state.value).toBe('overview')
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowLeft' })
+    expect(state.value).toBe('settings')
   })
 
   it('Home/End переводят на первую и последнюю вкладки', async () => {
@@ -118,9 +121,11 @@ describe('GrTabs', () => {
     await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' })
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['c'])
 
+    // APG: отключённая вкладка остаётся достижимой и объявленной. Нативный
+    // `disabled` убирал её и из таб-порядка, и из объявления скринридером.
     const disabledBtn = wrapper.findAll('[role="tab"]')[1]
     expect(disabledBtn.attributes('aria-disabled')).toBe('true')
-    expect(disabledBtn.attributes('disabled')).toBeDefined()
+    expect(disabledBtn.attributes('disabled')).toBeUndefined()
   })
 
   it('игнорирует стрелки при пустом списке вкладок', async () => {
@@ -133,5 +138,66 @@ describe('GrTabs', () => {
 
     await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' })
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+})
+
+describe('GrTabs — режимы активации и раскладка', () => {
+  const three = [
+    { value: 'a', label: 'A' },
+    { value: 'b', label: 'B' },
+    { value: 'c', label: 'C' },
+  ]
+
+  // Стрелка в automatic-режиме тянет каждую панель; для тяжёлых вкладок APG
+  // предлагает подтверждать выбор вручную.
+  it('manual двигает фокус, не меняя выбор до Enter', async () => {
+    const wrapper = mount(GrTabs, {
+      props: { modelValue: 'a', tabs: three, activationMode: 'manual' },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' })
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(wrapper.findAll('[role="tab"]')[1].attributes('tabindex')).toBe('0')
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'Enter' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['b'])
+
+    wrapper.unmount()
+  })
+
+  it('vertical переключает стрелки и объявляет ориентацию', async () => {
+    const wrapper = mount(GrTabs, {
+      props: { modelValue: 'a', tabs: three, orientation: 'vertical' },
+    })
+
+    expect(wrapper.get('[role="tablist"]').attributes('aria-orientation')).toBe('vertical')
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowDown' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['b'])
+  })
+
+  // Массив ref'ов копил отсоединённые узлы: focus() по сократившемуся списку
+  // молча проваливался в <body>.
+  it('сокращение списка вкладок не роняет фокус', async () => {
+    const Harness = defineComponent({
+      components: { GrTabs },
+      data: () => ({ value: 'a', tabs: [...three] }),
+      template: '<GrTabs v-model="value" :tabs="tabs" />',
+    })
+
+    const wrapper = mount(Harness, { attachTo: document.body })
+    const state = wrapper.vm as unknown as { value: string, tabs: typeof three }
+
+    state.tabs = three.slice(0, 2)
+    await wrapper.vm.$nextTick()
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' })
+    await wrapper.vm.$nextTick()
+
+    expect(state.value).toBe('b')
+    expect(document.activeElement).toBe(wrapper.findAll('[role="tab"]')[1].element)
+
+    wrapper.unmount()
   })
 })

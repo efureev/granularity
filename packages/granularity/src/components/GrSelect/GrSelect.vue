@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TValue extends GrSelectValue = string">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
@@ -80,6 +80,12 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   /** Placeholder поля поиска (`filterable`). i18n: fallback `gr.select.searchPlaceholder`. */
   filterPlaceholder?: string
   /**
+   * Текст поиска как контролируемое значение (`v-model:search`). Без него
+   * `loading` был декоративным: набранное пользователем наружу не выходило, и
+   * сходить за опциями на сервер было не с чем.
+   */
+  search?: string
+  /**
    * Состояние загрузки: вместо списка опций панель показывает индикатор загрузки.
    * Полезно для удалённой подгрузки опций. Форсит `optionsView="panel"`.
    */
@@ -99,6 +105,8 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   dropdownMaxHeight?: number
   /** Закрывать панель после выбора (только в `optionsView="panel"`). */
   closeOnSelect?: boolean
+  /** Сколько chips показать до сворачивания в «+N» (только `tags`). */
+  maxTagCount?: number
   /** Разрешает очистку выбранного значения. */
   clearable?: boolean
   /** i18n-label для кнопки очистки (`aria-label`). */
@@ -134,6 +142,7 @@ const props = withDefaults(
     allowCustomValue: false,
     filterable: false,
     filterPlaceholder: undefined,
+    search: undefined,
     loading: false,
     loadingText: undefined,
     noResultsText: undefined,
@@ -141,6 +150,7 @@ const props = withDefaults(
     customValuePlaceholder: undefined,
     dropdownMaxHeight: 280,
     closeOnSelect: true,
+    maxTagCount: undefined,
     clearable: undefined,
     clearLabel: undefined,
     variant: undefined,
@@ -175,6 +185,16 @@ const rootClass = computed(() => props.view === 'link' ? 'relative inline-block 
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: GrSelectModelValue<TValue>): void
+  /** Значение изменилось — тот же payload, что у `update:modelValue`. */
+  (e: 'change', value: GrSelectModelValue<TValue>): void
+  /** Значение снято кнопкой очистки. */
+  (e: 'clear'): void
+  /** Панель открылась/закрылась. */
+  (e: 'visibleChange', visible: boolean): void
+  /** Текст поиска как контролируемое значение (`v-model:search`). */
+  (e: 'update:search', value: string): void
+  /** Пользователь набрал запрос — сигнал сходить за опциями. */
+  (e: 'search', value: string): void
 }>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required)
@@ -316,7 +336,20 @@ const nativeCustomOptionVisible = computed(() => {
   return !hasModelInOptions.value
 })
 
-const customValue = ref('')
+/**
+ * Текст поиска: контролируемый `search` сильнее внутреннего состояния. Каждое
+ * изменение уходит наружу — без этого `loading` не с чем было связать.
+ */
+const internalSearch = ref('')
+const customValue = computed<string>({
+  get: () => props.search ?? internalSearch.value,
+  set: (next) => {
+    internalSearch.value = next
+    emit('update:search', next)
+    emit('search', next)
+  },
+})
+
 const open = ref(false)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
@@ -337,8 +370,10 @@ function closeDropdown(): void {
   open.value = false
 }
 
+const locked = computed(() => props.disabled || isReadonly.value)
+
 function toggleDropdown(): void {
-  if (props.disabled) return
+  if (locked.value) return
   open.value = !open.value
 }
 
@@ -368,7 +403,8 @@ function matchesQuery(option: GrSelectOption<TValue>, query: string): boolean {
  */
 type GrSelectPanelItem<TItemValue extends GrSelectValue> =
   | { kind: 'group', label: string, key: string }
-  | { kind: 'option', option: GrSelectOption<TItemValue>, key: string }
+  /** `groupKey` связывает опцию с заголовком её группы для скринридера. */
+  | { kind: 'option', option: GrSelectOption<TItemValue>, key: string, groupKey?: string }
 
 const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
   const q = (props.allowCustomValue || props.filterable) ? customValue.value.trim().toLowerCase() : ''
@@ -386,10 +422,11 @@ const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
     if (isOptionGroup(item)) {
       const matched = item.options.filter((o) => matchesQuery(o, q))
       if (!matched.length) return
-      items.push({ kind: 'group', label: item.label, key: `__group__${index}` })
+      const groupKey = `__group__${index}`
+      items.push({ kind: 'group', label: item.label, key: groupKey })
       for (const option of matched) {
         // Ключ с индексом группы — одинаковое `value` в разных группах больше не даёт дубликат.
-        items.push({ kind: 'option', option, key: `${index}:${option.value}` })
+        items.push({ kind: 'option', option, key: `${index}:${option.value}`, groupKey })
       }
       return
     }
@@ -420,7 +457,10 @@ const canAddCustom = computed(() => {
 })
 
 function emitValue(value: GrSelectModelValue<TValue>): void {
+  if (isReadonly.value) return
+
   emit('update:modelValue', value)
+  emit('change', value)
 }
 
 function isSelected(value: TValue): boolean {
@@ -471,10 +511,18 @@ function addCustom(): void {
 
 // Удаление одного значения из multiple-выбора (клик по «×» на chip).
 function removeValue(value: TValue): void {
-  if (props.disabled) return
+  if (locked.value) return
   if (!props.multiple) return
   emitValue(selectedValues.value.filter(v => v !== value))
 }
+
+const visibleTagOptions = computed(() => {
+  const limit = props.maxTagCount
+  if (limit === undefined || limit < 0) return selectedOptions.value
+  return selectedOptions.value.slice(0, limit)
+})
+
+const hiddenTagCount = computed(() => selectedOptions.value.length - visibleTagOptions.value.length)
 
 function tagRemoveLabel(option: GrSelectOption<TValue>): string {
   return t('gr.select.removeTag', 'Remove {label}', { label: option.label })
@@ -488,6 +536,11 @@ function optionDomId(value: GrSelectValue): string {
   return `${listboxId}-opt-${value}`
 }
 
+/** Заголовок группы читается вместе с опцией — через `aria-describedby`. */
+function groupLabelId(groupKey: string): string {
+  return `${listboxId}-${groupKey}`
+}
+
 // Навигируемые (видимые, не-disabled) опции панели в порядке рендера.
 const navigableValues = computed<TValue[]>(() =>
   panelItems.value
@@ -499,6 +552,17 @@ const activeValue = computed(() => (activeIndex.value >= 0 ? navigableValues.val
 const activeDescendantId = computed(() =>
   open.value && activeValue.value !== undefined ? optionDomId(activeValue.value) : undefined,
 )
+
+/**
+ * `aria-activedescendant` работает только на элементе, который держит фокус.
+ * С полем поиска фокус уходит в него, поэтому связка с активной опцией живёт
+ * там же; на триггере она осталась бы немой.
+ */
+const triggerActiveDescendant = computed(() => (showSearchInput.value ? undefined : activeDescendantId.value))
+const searchActiveDescendant = computed(() => (showSearchInput.value ? activeDescendantId.value : undefined))
+
+/** При `loading` списка в DOM нет — ссылаться на него нельзя. */
+const listboxIdIfRendered = computed(() => (open.value && !props.loading ? listboxId : undefined))
 
 function clampActive(index: number): number {
   const len = navigableValues.value.length
@@ -525,7 +589,7 @@ function initActiveIndex(): void {
 }
 
 function openDropdown(): void {
-  if (props.disabled || open.value) return
+  if (locked.value || open.value) return
   open.value = true
 }
 
@@ -544,7 +608,7 @@ function typeahead(char: string): void {
 }
 
 function onComboKeydown(event: KeyboardEvent): void {
-  if (props.disabled) return
+  if (locked.value) return
 
   if (!open.value) {
     if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
@@ -588,11 +652,18 @@ function onComboKeydown(event: KeyboardEvent): void {
   }
 }
 
+watch(open, isOpen => emit('visibleChange', isOpen))
+
+onBeforeUnmount(() => {
+  // Висячий таймер после размонтирования: буфер typeahead живёт 600 мс.
+  if (typeaheadTimer) clearTimeout(typeaheadTimer)
+})
+
 watch(
   open,
   async (isOpen) => {
     if (!isOpen) {
-      customValue.value = ''
+      internalSearch.value = ''
       activeIndex.value = -1
       return
     }
@@ -680,8 +751,9 @@ function onChange(e: Event): void {
 }
 
 function clearSelection(): void {
-  if (props.disabled) return
+  if (locked.value) return
   emitValue((props.multiple ? [] : '') as GrSelectModelValue<TValue>)
+  emit('clear')
 }
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
@@ -783,10 +855,11 @@ const teleportEnabled = useTeleportEnabled()
       :aria-readonly="isReadonly ? 'true' : undefined"
       role="combobox"
       aria-haspopup="listbox"
-      :aria-controls="open ? listboxId : undefined"
-      :aria-activedescendant="activeDescendantId"
+      :aria-controls="listboxIdIfRendered"
+      :aria-activedescendant="triggerActiveDescendant"
       :aria-expanded="open ? 'true' : 'false'"
-      :class="[baseClassName, triggerClassName, showTags && hasSelection ? '!h-auto min-h-10 !py-1.5' : '']"
+      :aria-busy="loading ? 'true' : undefined"
+      :class="[baseClassName, triggerClassName]"
       @click="toggleDropdown"
       @keydown="onComboKeydown"
     >
@@ -799,51 +872,25 @@ const teleportEnabled = useTeleportEnabled()
           :placeholder="placeholder"
           :has-selection="hasSelection"
         >
-          <!-- Теги-режим: удаляемые chips вместо строки «a, b, c». -->
           <span
-            v-if="showTags && hasSelection"
-            data-gr-select-tags
-            class="flex flex-wrap gap-1 py-0.5"
-          >
-            <span
-              v-for="opt in selectedOptions"
-              :key="opt.value"
-              data-gr-select-tag
-              class="inline-flex items-center gap-1 rounded-[6px] bg-[var(--gr-muted)] pl-2 pr-1 py-0.5 text-[12px] text-[var(--gr-fg)] max-w-full"
-            >
-              <span class="truncate">{{ opt.label }}</span>
-              <span
-                v-if="!disabled"
-                data-gr-select-tag-remove
-                role="button"
-                tabindex="-1"
-                :aria-label="tagRemoveLabel(opt)"
-                class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-fg)_12%,transparent)]"
-                @click.stop="removeValue(opt.value)"
-              >
-                <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
-              </span>
-            </span>
-          </span>
-
-          <span
-            v-else
             class="block truncate"
             :class="!hasSelection ? 'text-[var(--gr-muted-fg)]' : ''"
           >
-            {{ displayText }}
+            {{ showTags && hasSelection ? '' : displayText }}
           </span>
         </slot>
       </span>
 
+      <!-- Место под кнопку очистки: она лежит абсолютом поверх триггера. -->
       <span
         v-if="panelClearVisible"
-        class="shrink-0 h-4 w-4"
+        class="shrink-0 h-4 w-6"
         aria-hidden="true"
       />
 
+      <!-- Шеврон виден всегда: без него поле с выбранным значением переставало
+           выглядеть выпадающим списком. -->
       <span
-        v-else
         data-testid="gr-select-chevron"
         class="shrink-0 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
       >
@@ -851,12 +898,48 @@ const teleportEnabled = useTeleportEnabled()
       </span>
     </button>
 
+    <!--
+      Чипы живут РЯДОМ с кнопкой-комбобоксом, а не внутри неё: `role="combobox"`
+      объявляет потомков презентационными, и крестик внутри был недостижим с
+      клавиатуры (axe: `nested-interactive`).
+    -->
+    <div
+      v-if="showTags && hasSelection"
+      data-gr-select-tags
+      class="pointer-events-none absolute inset-y-0 left-0 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1 px-3 py-1.5"
+    >
+      <span
+        v-for="opt in visibleTagOptions"
+        :key="String(opt.value)"
+        data-gr-select-tag
+        class="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-[var(--gr-radius-sm)] bg-[var(--gr-muted)] py-0.5 pl-2 pr-1 text-[length:var(--gr-text-xs)] text-[var(--gr-fg)]"
+      >
+        <span class="truncate">{{ opt.label }}</span>
+        <button
+          v-if="!disabled && !isReadonly"
+          data-gr-select-tag-remove
+          type="button"
+          :aria-label="tagRemoveLabel(opt)"
+          class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--gr-radius-xs)] text-[var(--gr-muted-fg)] hover:bg-[color-mix(in_srgb,var(--gr-fg)_12%,transparent)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+          @click.stop="removeValue(opt.value)"
+        >
+          <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
+        </button>
+      </span>
+
+      <span
+        v-if="hiddenTagCount > 0"
+        data-gr-select-tag-rest
+        class="pointer-events-auto inline-flex items-center rounded-[var(--gr-radius-sm)] bg-[var(--gr-muted)] px-2 py-0.5 text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]"
+      >+{{ hiddenTagCount }}</span>
+    </div>
+
     <button
       v-if="panelClearVisible"
       data-testid="gr-select-clear"
       data-gr-select-clear
       type="button"
-      class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)] disabled:opacity-50"
+      class="absolute top-1/2 right-8 h-6 w-6 -translate-y-1/2 inline-flex items-center justify-center rounded-[var(--gr-radius-md)] text-[var(--gr-muted-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
       :disabled="disabled"
       :aria-label="resolvedClearLabel"
       @click.stop="clearSelection"
@@ -888,7 +971,13 @@ const teleportEnabled = useTeleportEnabled()
                 data-testid="gr-select-custom-input"
                 data-gr-select-search
                 type="text"
+                role="combobox"
+                aria-haspopup="listbox"
+                :aria-expanded="open ? 'true' : 'false'"
+                :aria-controls="listboxIdIfRendered"
+                :aria-activedescendant="searchActiveDescendant"
                 :placeholder="resolvedSearchPlaceholder"
+                :loading="loading"
                 size="sm"
                 @keydown="onComboKeydown"
               />
@@ -898,7 +987,7 @@ const teleportEnabled = useTeleportEnabled()
             <div
               v-if="loading"
               data-gr-select-loading
-              class="flex items-center justify-center gap-2 px-3 py-4 text-[13px] text-[var(--gr-muted-fg)]"
+              class="flex items-center justify-center gap-2 px-3 py-4 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
               role="status"
             >
               <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
@@ -919,7 +1008,9 @@ const teleportEnabled = useTeleportEnabled()
                 data-testid="gr-select-add-option"
                 data-gr-select-add-option
                 type="button"
-                class="rounded-[10px] px-3 py-2 text-left text-[13px] hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]" :class="[
+                role="option"
+                aria-selected="false"
+                class="rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]" :class="[
                   view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
                 ]"
                 @click="addCustom"
@@ -930,9 +1021,10 @@ const teleportEnabled = useTeleportEnabled()
               <template v-for="item in panelItems" :key="item.key">
                 <div
                   v-if="item.kind === 'group'"
+                  :id="groupLabelId(item.key)"
                   data-gr-select-group-label
                   role="presentation"
-                  class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
+                  class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
                   ]"
                 >
@@ -948,7 +1040,8 @@ const teleportEnabled = useTeleportEnabled()
                   :disabled="item.option.disabled"
                   :aria-selected="isSelected(item.option.value) ? 'true' : 'false'"
                   :aria-disabled="item.option.disabled ? 'true' : undefined"
-                  class="rounded-[10px] px-3 py-2 text-left text-[13px]" :class="[
+                  :aria-describedby="item.groupKey ? groupLabelId(item.groupKey) : undefined"
+                  class="rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)]" :class="[
                     view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
                     item.option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]',
                     activeValue === item.option.value && !item.option.disabled ? 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]' : '',
@@ -973,7 +1066,7 @@ const teleportEnabled = useTeleportEnabled()
               <div
                 v-if="!panelItems.length && !canAddCustom"
                 data-gr-select-empty
-                class="px-3 py-4 text-center text-[13px] text-[var(--gr-muted-fg)]"
+                class="px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
               >
                 {{ resolvedNoResultsText }}
               </div>

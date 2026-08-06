@@ -21,7 +21,19 @@ export type GrTabsProps = {
    */
   idBase?: string
   size?: GrTabsSize
+  /**
+   * `automatic` (по умолчанию) — стрелка сразу переключает вкладку;
+   * `manual` — стрелка двигает только фокус, выбор подтверждается
+   * `Enter`/`Space`. Второй режим для вкладок с тяжёлой загрузкой: перебор
+   * стрелками иначе тянет каждую панель.
+   */
+  activationMode?: GrTabsActivationMode
+  /** Горизонтальный (по умолчанию) или вертикальный список вкладок. */
+  orientation?: GrTabsOrientation
 }
+
+export type GrTabsActivationMode = 'automatic' | 'manual'
+export type GrTabsOrientation = 'horizontal' | 'vertical'
 
 /**
  * GrTabs — горизонтальная группа вкладок с паттерном WAI-ARIA `tablist`.
@@ -34,7 +46,12 @@ export type GrTabsProps = {
  *
  * Сам компонент не рендерит `tabpanel` — это ответственность консьюмера (по `aria-controls`/внешней разметке).
  */
-const props = defineProps<GrTabsProps>()
+const props = withDefaults(defineProps<GrTabsProps>(), {
+  idBase: undefined,
+  size: undefined,
+  activationMode: 'automatic',
+  orientation: 'horizontal',
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
@@ -48,9 +65,19 @@ const badgeClass = computed(() => tabBadgeSizes[resolvedSize.value])
 
 const buttonRefs = ref<HTMLButtonElement[]>([])
 
+/**
+ * Vue зовёт ref-функцию с `null`, когда узел исчез. Игнорировать такой вызов
+ * нельзя: в массиве оставались отсоединённые от DOM кнопки, и `focus()` по
+ * сократившемуся списку молча проваливался в `<body>`.
+ */
 function setButtonRef(el: unknown, index: number): void {
   if (el instanceof HTMLButtonElement)
     buttonRefs.value[index] = el
+  else
+    delete buttonRefs.value[index]
+
+  if (buttonRefs.value.length > props.tabs.length)
+    buttonRefs.value.length = props.tabs.length
 }
 
 const activeIndex = computed(() => props.tabs.findIndex(t => t.value === props.modelValue))
@@ -70,16 +97,25 @@ function isEnabled(tab: GrTab): boolean {
   return !tab.disabled
 }
 
+const focusedIndex = ref(-1)
+
+/** Роверная вкладка: при `manual` фокус может уехать вперёд выбора. */
+const rovingFocusIndex = computed(() => (focusedIndex.value >= 0 ? focusedIndex.value : rovingIndex.value))
+
+async function focusIndex(index: number): Promise<void> {
+  focusedIndex.value = index
+  await nextTick()
+  buttonRefs.value[index]?.focus()
+}
+
 async function selectByIndex(index: number, focus = false): Promise<void> {
   const tab = props.tabs[index]
   if (!tab || !isEnabled(tab))
     return
   if (tab.value !== props.modelValue)
     emit('update:modelValue', tab.value)
-  if (focus) {
-    await nextTick()
-    buttonRefs.value[index]?.focus()
-  }
+  if (focus)
+    await focusIndex(index)
 }
 
 function findNextEnabled(from: number, direction: 1 | -1): number {
@@ -113,14 +149,17 @@ function onKeydown(event: KeyboardEvent): void {
   if (props.tabs.length === 0)
     return
 
-  const currentIndex = activeIndex.value < 0 ? 0 : activeIndex.value
+  const currentIndex = focusedIndex.value >= 0 ? focusedIndex.value : (activeIndex.value < 0 ? 0 : activeIndex.value)
   let nextIndex = -1
 
+  const forward = props.orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight'
+  const backward = props.orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft'
+
   switch (event.key) {
-    case 'ArrowRight':
+    case forward:
       nextIndex = findNextEnabled(currentIndex, 1)
       break
-    case 'ArrowLeft':
+    case backward:
       nextIndex = findNextEnabled(currentIndex, -1)
       break
     case 'Home':
@@ -129,6 +168,14 @@ function onKeydown(event: KeyboardEvent): void {
     case 'End':
       nextIndex = lastEnabled()
       break
+    case 'Enter':
+    case ' ':
+      // В ручном режиме выбор подтверждается явно.
+      if (props.activationMode === 'manual' && focusedIndex.value >= 0) {
+        event.preventDefault()
+        void selectByIndex(focusedIndex.value, true)
+      }
+      return
     default:
       return
   }
@@ -137,12 +184,21 @@ function onKeydown(event: KeyboardEvent): void {
     return
 
   event.preventDefault()
+
+  if (props.activationMode === 'manual') {
+    void focusIndex(nextIndex)
+    return
+  }
+
   void selectByIndex(nextIndex, true)
 }
 
-function onClick(tab: GrTab): void {
+function onClick(tab: GrTab, index: number): void {
   if (!isEnabled(tab))
     return
+
+  focusedIndex.value = index
+
   if (tab.value !== props.modelValue)
     emit('update:modelValue', tab.value)
 }
@@ -152,8 +208,9 @@ function onClick(tab: GrTab): void {
   <div
     role="tablist"
     data-gr-tabs
-    class="inline-flex flex-wrap rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)]"
-    :class="tablistClass"
+    :aria-orientation="orientation"
+    class="inline-flex rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)]"
+    :class="[tablistClass, orientation === 'vertical' ? 'flex-col' : 'flex-wrap']"
     @keydown="onKeydown"
   >
     <button
@@ -167,16 +224,17 @@ function onClick(tab: GrTab): void {
       :aria-controls="idBase ? `${idBase}-panel-${tab.value}` : undefined"
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
-      :disabled="tab.disabled"
-      :tabindex="index === rovingIndex ? 0 : -1"
-      class="rounded-[10px] font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:opacity-60 disabled:cursor-not-allowed"
+      :tabindex="index === rovingFocusIndex ? 0 : -1"
+      class="rounded-[var(--gr-radius-md)] font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
       :class="[
         tabClass,
-        tab.value === modelValue
-          ? 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]'
-          : 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-card)_70%,transparent)]',
+        tab.disabled
+          ? 'cursor-not-allowed text-[var(--gr-muted-fg)]'
+          : tab.value === modelValue
+            ? 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]'
+            : 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-card)_70%,transparent)]',
       ]"
-      @click="onClick(tab)"
+      @click="onClick(tab, index)"
     >
       <span class="inline-flex items-center gap-2">
         <span>{{ tab.label }}</span>
