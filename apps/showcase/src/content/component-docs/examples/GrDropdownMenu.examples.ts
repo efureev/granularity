@@ -23,9 +23,9 @@ const actions = [
 
 <template>
   <div class="flex flex-wrap items-start gap-3">
-    <GrDropdownMenu align="left" width="60">
-      <template #trigger="{ open }">
-        <GrButton variant="outline">
+    <GrDropdownMenu placement="bottom-start" width="15rem">
+      <template #trigger="{ open, triggerProps }">
+        <GrButton v-bind="triggerProps" variant="outline">
           {{ open ? 'Close quick actions' : 'Open quick actions' }}
         </GrButton>
       </template>
@@ -68,9 +68,9 @@ const selectedAction = ref('Publish now')
 
 <template>
   <div class="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-start">
-    <GrDropdownMenu width="64">
-      <template #trigger="{ open }">
-        <GrButton>
+    <GrDropdownMenu width="16rem">
+      <template #trigger="{ open, triggerProps }">
+        <GrButton v-bind="triggerProps">
           {{ open ? 'Hide workspace actions' : 'Workspace actions' }}
         </GrButton>
       </template>
@@ -139,9 +139,9 @@ const shortcuts = [
     Минималистичный cheat-sheet: одна колонка, в каждой строке действие слева и
     хоткей справа (\`justify-between\`). Клавиши — компонент \`GrKbd\` (дефолтный размер).
   -->
-  <GrDropdownMenu width="64" align="left" :close-on-content-click="false">
-    <template #trigger="{ open }">
-      <GrButton variant="outline">
+  <GrDropdownMenu width="16rem" placement="bottom-start" :close-on-content-click="false">
+    <template #trigger="{ open, triggerProps }">
+      <GrButton v-bind="triggerProps" variant="outline">
         {{ open ? 'Hide shortcuts' : 'Keyboard shortcuts' }}
       </GrButton>
     </template>
@@ -217,9 +217,9 @@ function onSelect(item: GrDropdownMenuAction): void {
 
 <template>
   <div class="grid gap-3">
-    <GrDropdownMenu :items="items" align="left" width="60" @select="onSelect">
-      <template #trigger="{ open }">
-        <GrButton variant="outline">
+    <GrDropdownMenu :items="items" placement="bottom-start" width="15rem" @select="onSelect">
+      <template #trigger="{ open, triggerProps }">
+        <GrButton v-bind="triggerProps" variant="outline">
           {{ open ? 'Close board actions' : 'Board actions' }}
         </GrButton>
       </template>

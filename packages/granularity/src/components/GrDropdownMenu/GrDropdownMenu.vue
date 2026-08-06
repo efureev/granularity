@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import GrDropdown from '../GrDropdown/GrDropdown.vue'
+// Типы размещения и ширины — из владельца API, а не переобъявлением: расхождение
+// обнаружилось бы только рантаймом.
+import type { GrDropdownWidth } from '../GrDropdown/grDropdownStyles'
+import type { UseFloatingPlacement } from '../../composables/useFloating'
 
 import GrDropdownMenuDivider from './GrDropdownMenuDivider.vue'
 import GrDropdownMenuGroup from './GrDropdownMenuGroup.vue'
@@ -13,14 +17,13 @@ import {
   type GrDropdownMenuEntry,
 } from './menuModel'
 
-export type GrDropdownMenuAlign = 'left' | 'right' | 'center'
-export type GrDropdownMenuWidth = 'auto' | '20' | '48' | '60' | '64' | '80'
-
 export interface GrDropdownMenuProps {
-  /** Выравнивание панели относительно триггера. */
-  align?: GrDropdownMenuAlign
-  /** Ширина панели. */
-  width?: GrDropdownMenuWidth
+  /** Размещение панели относительно триггера; переворот при нехватке места остаётся. */
+  placement?: UseFloatingPlacement
+  /** Зазор между триггером и панелью, px. */
+  offset?: number
+  /** Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту. */
+  width?: GrDropdownWidth
   /** Закрывать по клику внутри content. */
   closeOnContentClick?: boolean
   /** Дополнительные классы content-контейнера; по умолчанию `p-0`. */
@@ -43,8 +46,9 @@ export interface GrDropdownMenuProps {
 }
 
 withDefaults(defineProps<GrDropdownMenuProps>(), {
-  align: 'right',
-  width: '48',
+  placement: 'bottom-end',
+  offset: 8,
+  width: '12rem',
   closeOnContentClick: true,
   // В `GrDropdown` есть `p-1`, поэтому здесь по умолчанию обнуляем padding,
   // чтобы пункты меню могли растягиваться до границ.
@@ -85,7 +89,8 @@ function onSelect(item: GrDropdownMenuAction): void {
 <template>
   <GrDropdown
     data-gr-dropdown-menu
-    :align="align"
+    :placement="placement"
+    :offset="offset"
     :width="width"
     :close-on-content-click="closeOnContentClick"
     :content-class="contentClass"

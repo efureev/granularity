@@ -60,7 +60,7 @@ describe('component docs metadata', () => {
     expect(modalDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(modalDoc.examples.every(example => example.previewKey?.startsWith('gr-modal'))).toBe(true)
 
-    expect(dropdownDoc.examples).toHaveLength(3)
+    expect(dropdownDoc.examples).toHaveLength(4)
     expect(dropdownDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown'))).toBe(true)
 

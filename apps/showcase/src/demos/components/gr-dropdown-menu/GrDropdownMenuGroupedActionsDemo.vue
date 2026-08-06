@@ -15,9 +15,9 @@ const selectedAction = ref('Publish now')
 
 <template>
   <div class="grid gap-3 sm:grid-cols-[auto_1fr] sm:items-start">
-    <GrDropdownMenu width="64">
-      <template #trigger="{ open }">
-        <GrButton>
+    <GrDropdownMenu width="16rem">
+      <template #trigger="{ open, triggerProps }">
+        <GrButton v-bind="triggerProps">
           {{ open ? 'Hide workspace actions' : 'Workspace actions' }}
         </GrButton>
       </template>

@@ -14,9 +14,9 @@ const actions = [
 
 <template>
   <div class="flex flex-wrap items-start gap-3">
-    <GrDropdownMenu align="left" width="60">
-      <template #trigger="{ open }">
-        <GrButton variant="outline">
+    <GrDropdownMenu placement="bottom-start" width="15rem">
+      <template #trigger="{ open, triggerProps }">
+        <GrButton v-bind="triggerProps" variant="outline">
           {{ open ? 'Close quick actions' : 'Open quick actions' }}
         </GrButton>
       </template>

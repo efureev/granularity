@@ -22,9 +22,9 @@ const shortcuts = [
     Минималистичный cheat-sheet: одна колонка, в каждой строке действие слева и
     хоткей справа (`justify-between`). Клавиши — компонент `GrKbd` (дефолтный размер).
   -->
-  <GrDropdownMenu width="64" align="left" :close-on-content-click="false">
-    <template #trigger="{ open }">
-      <GrButton variant="outline">
+  <GrDropdownMenu width="16rem" placement="bottom-start" :close-on-content-click="false">
+    <template #trigger="{ open, triggerProps }">
+      <GrButton v-bind="triggerProps" variant="outline">
         {{ open ? 'Hide shortcuts' : 'Keyboard shortcuts' }}
       </GrButton>
     </template>

@@ -41,9 +41,9 @@ function onSelect(item: GrDropdownMenuAction): void {
 
 <template>
   <div class="grid gap-3">
-    <GrDropdownMenu :items="items" align="left" width="60" @select="onSelect">
-      <template #trigger="{ open }">
-        <GrButton variant="outline">
+    <GrDropdownMenu :items="items" placement="bottom-start" width="15rem" @select="onSelect">
+      <template #trigger="{ open, triggerProps }">
+        <GrButton v-bind="triggerProps" variant="outline">
           {{ open ? 'Close board actions' : 'Board actions' }}
         </GrButton>
       </template>

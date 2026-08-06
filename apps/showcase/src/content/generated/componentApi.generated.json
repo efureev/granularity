@@ -2374,18 +2374,53 @@
         "origin": "generated",
         "items": [
           {
-            "name": "align",
-            "description": "Выравнивание панели относительно триггера.",
-            "type": "GrDropdownAlign | undefined",
+            "name": "disabled",
+            "description": "Панель не открывается ничем; триггер остаётся фокусируемым.",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "\"right\""
+            "default": "false"
           },
           {
             "name": "width",
-            "description": "Ширина панели (tailwind-токены `w-*` или `auto`).",
+            "description": "Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту.",
             "type": "GrDropdownWidth | undefined",
             "required": false,
-            "default": "\"48\""
+            "default": "\"12rem\""
+          },
+          {
+            "name": "placement",
+            "description": "Размещение панели относительно триггера; `flip` при нехватке места остаётся.",
+            "type": "Placement | undefined",
+            "required": false,
+            "default": "\"bottom-end\""
+          },
+          {
+            "name": "offset",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "8"
+          },
+          {
+            "name": "trigger",
+            "description": "Чем открывается панель. В любом режиме работают клик и клавиатура.",
+            "type": "GrDropdownTrigger | undefined",
+            "required": false,
+            "default": "\"click\""
+          },
+          {
+            "name": "openDelay",
+            "description": "Задержка открытия по наведению, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "120"
+          },
+          {
+            "name": "closeDelay",
+            "description": "Задержка закрытия после ухода курсора, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "160"
           },
           {
             "name": "closeOnContentClick",
@@ -2418,7 +2453,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; onKeydown: (event: KeyboardEvent) => void; }; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; 'aria-disabled': boolean | undefined; onClick: () => void; onKeydown: (event: KeyboardEvent) => void; }; }"
           },
           {
             "name": "content",
@@ -2458,18 +2493,25 @@
             "default": "undefined"
           },
           {
-            "name": "align",
-            "description": "Выравнивание панели относительно триггера.",
-            "type": "GrDropdownMenuAlign | undefined",
+            "name": "width",
+            "description": "Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту.",
+            "type": "GrDropdownWidth | undefined",
             "required": false,
-            "default": "\"right\""
+            "default": "\"12rem\""
           },
           {
-            "name": "width",
-            "description": "Ширина панели.",
-            "type": "GrDropdownMenuWidth | undefined",
+            "name": "placement",
+            "description": "Размещение панели относительно триггера; переворот при нехватке места остаётся.",
+            "type": "Placement | undefined",
             "required": false,
-            "default": "\"48\""
+            "default": "\"bottom-end\""
+          },
+          {
+            "name": "offset",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "8"
           },
           {
             "name": "closeOnContentClick",
@@ -2486,8 +2528,8 @@
             "default": "\"p-0\""
           },
           {
-            "name": "dividers",
-            "description": "Разделители между пунктами.",
+            "name": "borderBottom",
+            "description": "Нижний бордер контейнера списка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -2500,8 +2542,8 @@
             "default": "false"
           },
           {
-            "name": "borderBottom",
-            "description": "Нижний бордер контейнера списка.",
+            "name": "dividers",
+            "description": "Разделители между пунктами.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -2523,7 +2565,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; onKeydown: (event: KeyboardEvent) => void; }; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; 'aria-disabled': boolean | undefined; onClick: () => void; onKeydown: (event: KeyboardEvent) => void; }; }"
           },
           {
             "name": "default",
@@ -2845,16 +2887,16 @@
             "signature": "(event: \"error\", error: unknown): void"
           },
           {
-            "name": "stateChange",
-            "description": "",
-            "type": "[state: GrUploadState]",
-            "signature": "(event: \"stateChange\", state: GrUploadState): void"
-          },
-          {
             "name": "progress",
             "description": "",
             "type": "[percent: number, info?: GrUploadProgressInfo | undefined]",
             "signature": "(event: \"progress\", percent: number, info?: GrUploadProgressInfo | undefined): void"
+          },
+          {
+            "name": "stateChange",
+            "description": "",
+            "type": "[state: GrUploadState]",
+            "signature": "(event: \"stateChange\", state: GrUploadState): void"
           },
           {
             "name": "exceed",
@@ -3493,6 +3535,13 @@
             "default": "undefined"
           },
           {
+            "name": "zIndex",
+            "description": "Слой поверх шкалы. По умолчанию — `--gr-z-modal`, как у остальных модальных оверлеев.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "showProgress",
             "description": "",
             "type": "boolean | undefined",
@@ -3561,13 +3610,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "zIndex",
-            "description": "Слой поверх шкалы. По умолчанию — `--gr-z-modal`, как у остальных модальных оверлеев.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "prevLabel",
@@ -3830,6 +3872,13 @@
             "default": "undefined"
           },
           {
+            "name": "textAlign",
+            "description": "",
+            "type": "GrInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
+          },
+          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -3884,13 +3933,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "textAlign",
-            "description": "",
-            "type": "GrInputTextAlign | undefined",
-            "required": false,
-            "default": "\"left\""
           },
           {
             "name": "prefixMinWidth",
@@ -4577,6 +4619,13 @@
             "default": "undefined"
           },
           {
+            "name": "spinner",
+            "description": "Custom spinner component (rendered instead of the default loader icon).",
+            "type": "Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "zIndex",
             "description": "Custom `z-index`.",
             "type": "number | undefined",
@@ -4584,9 +4633,9 @@
             "default": "undefined"
           },
           {
-            "name": "spinner",
-            "description": "Custom spinner component (rendered instead of the default loader icon).",
-            "type": "Component | undefined",
+            "name": "background",
+            "description": "Custom CSS `background-color`. When set, disables the default `bg-black/25` dim.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4596,13 +4645,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "background",
-            "description": "Custom CSS `background-color`. When set, disables the default `bg-black/25` dim.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "fullscreen",
@@ -4913,6 +4955,13 @@
             "default": "undefined"
           },
           {
+            "name": "textAlign",
+            "description": "",
+            "type": "GrNumberInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
+          },
+          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -4932,13 +4981,6 @@
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "\"decimal\""
-          },
-          {
-            "name": "textAlign",
-            "description": "",
-            "type": "GrNumberInputTextAlign | undefined",
-            "required": false,
-            "default": "\"left\""
           },
           {
             "name": "prefixMinWidth",
@@ -5132,6 +5174,13 @@
             "default": "undefined"
           },
           {
+            "name": "compact",
+            "description": "Компактный вариант: вместо нумерованных страниц показывается индикатор «текущая / всего» — удобно для узких мест (мобайл, тулбары таблиц).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "pageSizes",
             "description": "",
             "type": "number[] | undefined",
@@ -5153,13 +5202,6 @@
             "default": "1"
           },
           {
-            "name": "compact",
-            "description": "Компактный вариант: вместо нумерованных страниц показывается индикатор «текущая / всего» — удобно для узких мест (мобайл, тулбары таблиц).",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "showJumper",
             "description": "Показывать поле «перейти к странице» с быстрым переходом по вводу номера.",
             "type": "boolean | undefined",
@@ -5174,13 +5216,13 @@
             "default": "undefined"
           },
           {
-            "name": "total",
+            "name": "page",
             "description": "",
             "type": "number",
             "required": true
           },
           {
-            "name": "page",
+            "name": "total",
             "description": "",
             "type": "number",
             "required": true
@@ -5271,6 +5313,20 @@
             "default": "true"
           },
           {
+            "name": "placement",
+            "description": "",
+            "type": "Placement | undefined",
+            "required": false,
+            "default": "\"bottom-start\""
+          },
+          {
+            "name": "trigger",
+            "description": "`manual` — открывать только программно (через `v-model:open`). Нужно для контекстного меню и подтверждений, где момент открытия решает потребитель.",
+            "type": "\"click\" | \"manual\" | undefined",
+            "required": false,
+            "default": "\"click\""
+          },
+          {
             "name": "closeOnContentClick",
             "description": "Закрывать по клику внутри панели — удобно для меню, вредно для формы.",
             "type": "boolean | undefined",
@@ -5292,25 +5348,11 @@
             "default": "\"body\""
           },
           {
-            "name": "trigger",
-            "description": "`manual` — открывать только программно (через `v-model:open`). Нужно для контекстного меню и подтверждений, где момент открытия решает потребитель.",
-            "type": "\"click\" | \"manual\" | undefined",
-            "required": false,
-            "default": "\"click\""
-          },
-          {
             "name": "role",
             "description": "Роль панели. Меняется теми, кто строит поверх примитива своё меню/список.",
             "type": "GrPopoverRole | undefined",
             "required": false,
             "default": "\"dialog\""
-          },
-          {
-            "name": "placement",
-            "description": "",
-            "type": "Placement | undefined",
-            "required": false,
-            "default": "\"bottom-start\""
           },
           {
             "name": "offsetPx",
@@ -5350,7 +5392,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"dialog\" | \"listbox\" | \"grid\" | \"group\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"listbox\" | \"grid\" | \"dialog\" | \"group\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
           },
           {
             "name": "content",
@@ -6121,6 +6163,13 @@
             "default": "false"
           },
           {
+            "name": "icon",
+            "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "max",
             "description": "Количество символов шкалы.",
             "type": "number | undefined",
@@ -6133,13 +6182,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "icon",
-            "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "showText",
@@ -6987,6 +7029,13 @@
             "default": "undefined"
           },
           {
+            "name": "range",
+            "description": "Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "max",
             "description": "",
             "type": "number | undefined",
@@ -7008,13 +7057,6 @@
             "default": "0"
           },
           {
-            "name": "range",
-            "description": "Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "marks",
             "description": "Метки делений: `{ [value]: label }` или массив значений.",
             "type": "GrSliderMarks | undefined",
@@ -7024,7 +7066,7 @@
           {
             "name": "showTooltip",
             "description": "Всплывающее значение над бегунком: `true`/`'hover'` — при hover/drag/focus, `'always'` — всегда.",
-            "type": "boolean | \"always\" | \"hover\" | undefined",
+            "type": "boolean | \"hover\" | \"always\" | undefined",
             "required": false,
             "default": "false"
           },
@@ -7125,6 +7167,13 @@
             "default": "false"
           },
           {
+            "name": "icon",
+            "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "decimalSeparator",
             "description": "",
             "type": "string | undefined",
@@ -7135,13 +7184,6 @@
             "name": "precision",
             "description": "Число знаков после запятой.",
             "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "icon",
-            "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -7436,6 +7478,13 @@
             "default": "false"
           },
           {
+            "name": "columnCount",
+            "description": "Сколько колонок занимает служебная строка (пустое состояние и скелетоны).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
             "name": "loadingRows",
             "description": "Сколько строк-заглушек показать при `loading`.",
             "type": "number | undefined",
@@ -7448,13 +7497,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "columnCount",
-            "description": "Сколько колонок занимает служебная строка (пустое состояние и скелетоны).",
-            "type": "number | undefined",
-            "required": false,
-            "default": "1"
           },
           {
             "name": "striped",
@@ -7724,6 +7766,13 @@
             "default": "4"
           },
           {
+            "name": "resize",
+            "description": "Ручное изменение размера пользователем.",
+            "type": "GrTextareaResize | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -7757,13 +7806,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "resize",
-            "description": "Ручное изменение размера пользователем.",
-            "type": "GrTextareaResize | undefined",
-            "required": false,
-            "default": "\"vertical\""
           },
           {
             "name": "modelValue",
@@ -7927,32 +7969,11 @@
             "default": "undefined"
           },
           {
-            "name": "text",
-            "description": "Текст подсказки. Разметка вместо текста — слот `#content`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "placement",
             "description": "Предпочтительная сторона панели; `flip` может её изменить.",
             "type": "Placement | undefined",
             "required": false,
             "default": "\"top\""
-          },
-          {
-            "name": "offsetPx",
-            "description": "Зазор между триггером и панелью, px.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "iconColor",
-            "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--gr-muted-fg)`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"var(--gr-muted-fg)\""
           },
           {
             "name": "openDelay",
@@ -7967,6 +7988,27 @@
             "type": "number | undefined",
             "required": false,
             "default": "0"
+          },
+          {
+            "name": "text",
+            "description": "Текст подсказки. Разметка вместо текста — слот `#content`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "offsetPx",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "iconColor",
+            "description": "Цвет триггер-иконки (CSS color). По умолчанию — `var(--gr-muted-fg)`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"var(--gr-muted-fg)\""
           }
         ]
       },

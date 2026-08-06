@@ -42,7 +42,7 @@
 - [`GrDialogService`](./components/GrDialogService.md)
 - [`GrDivider`](./components/GrDivider.md)
 - [`GrDrawer`](./components/GrDrawer.md)
-- `GrDropdown`
+- [`GrDropdown`](./components/GrDropdown.md)
 - [`GrDropdownMenu`](./components/GrDropdownMenu.md)
 - `GrEmptyState`
 - [`GrFileUpload`](./components/GrFileUpload.md)

@@ -30,9 +30,9 @@ function toggleOption(option: string) {
 
 <template>
   <div class="grid gap-3">
-    <GrDropdown :close-on-content-click="false" width="64">
-      <template #trigger>
-        <GrButton variant="outline">{{ t('components.GrDropdown.persistent.filters') }}</GrButton>
+    <GrDropdown :close-on-content-click="false" width="16rem">
+      <template #trigger="{ triggerProps }">
+        <GrButton variant="outline" v-bind="triggerProps">{{ t('components.GrDropdown.persistent.filters') }}</GrButton>
       </template>
 
       <template #content="{ close }">

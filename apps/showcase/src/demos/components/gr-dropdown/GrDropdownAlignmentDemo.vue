@@ -7,9 +7,9 @@ const { t } = useFintI18n()
 
 <template>
   <div class="grid gap-4 lg:grid-cols-3">
-    <GrDropdown align="left" width="48">
-      <template #trigger>
-        <GrButton variant="outline">{{ t('components.GrDropdown.alignment.left') }}</GrButton>
+    <GrDropdown placement="bottom-start" width="12rem">
+      <template #trigger="{ triggerProps }">
+        <GrButton variant="outline" v-bind="triggerProps">{{ t('components.GrDropdown.alignment.left') }}</GrButton>
       </template>
 
       <template #content>
@@ -22,9 +22,9 @@ const { t } = useFintI18n()
       </template>
     </GrDropdown>
 
-    <GrDropdown align="center" width="60">
-      <template #trigger>
-        <GrButton>{{ t('components.GrDropdown.alignment.center') }}</GrButton>
+    <GrDropdown placement="top" :offset="16" :width="240">
+      <template #trigger="{ triggerProps }">
+        <GrButton v-bind="triggerProps">{{ t('components.GrDropdown.alignment.center') }}</GrButton>
       </template>
 
       <template #content>
@@ -37,9 +37,9 @@ const { t } = useFintI18n()
       </template>
     </GrDropdown>
 
-    <GrDropdown align="right" width="auto">
-      <template #trigger>
-        <GrButton variant="ghost-border">{{ t('components.GrDropdown.alignment.autoWidth') }}</GrButton>
+    <GrDropdown placement="bottom-end" width="auto">
+      <template #trigger="{ triggerProps }">
+        <GrButton variant="ghost-border" v-bind="triggerProps">{{ t('components.GrDropdown.alignment.autoWidth') }}</GrButton>
       </template>
 
       <template #content>

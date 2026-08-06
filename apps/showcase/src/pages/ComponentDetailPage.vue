@@ -96,6 +96,7 @@ const previewRegistry = {
   'gr-dialog-scrollable-body': defineAsyncComponent(() => import('../demos/components/gr-dialog/GrDialogScrollableBodyDemo.vue')),
   'gr-dropdown-alignment-width': defineAsyncComponent(() => import('../demos/components/gr-dropdown/GrDropdownAlignmentDemo.vue')),
   'gr-dropdown-basic-menu': defineAsyncComponent(() => import('../demos/components/gr-dropdown/GrDropdownBasicMenuDemo.vue')),
+  'gr-dropdown-hover': defineAsyncComponent(() => import('../demos/components/gr-dropdown/GrDropdownHoverDemo.vue')),
   'gr-dropdown-persistent-content': defineAsyncComponent(() => import('../demos/components/gr-dropdown/GrDropdownPersistentContentDemo.vue')),
   'gr-dropdown-menu-grouped-actions': defineAsyncComponent(() => import('../demos/components/gr-dropdown-menu/GrDropdownMenuGroupedActionsDemo.vue')),
   'gr-dropdown-menu-quick-actions': defineAsyncComponent(() => import('../demos/components/gr-dropdown-menu/GrDropdownMenuQuickActionsDemo.vue')),

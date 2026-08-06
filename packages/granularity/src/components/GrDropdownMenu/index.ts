@@ -21,9 +21,7 @@ export type {
   GrDropdownMenuSeparator,
 } from './menuModel'
 export type {
-  GrDropdownMenuAlign,
   GrDropdownMenuProps,
-  GrDropdownMenuWidth,
 } from './GrDropdownMenu.vue'
 export type {
   GrDropdownMenuColumnAlign,

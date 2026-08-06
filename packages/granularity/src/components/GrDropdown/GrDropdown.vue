@@ -1,24 +1,34 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 import { useTeleportEnabled } from '../../composables/internal/useTeleportEnabled'
 
 import { vClickOutside } from '../../directives'
-import { useFloating } from '../../composables/useFloating'
+import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import {
   grDropdownContentClass,
   grDropdownOriginClass,
-  grDropdownWidthClass,
-  type GrDropdownAlign,
   type GrDropdownWidth,
 } from './grDropdownStyles'
 
+export type GrDropdownTrigger = 'click' | 'hover'
+
 export interface GrDropdownProps {
-  /** Выравнивание панели относительно триггера. */
-  align?: GrDropdownAlign
-  /** Ширина панели (tailwind-токены `w-*` или `auto`). */
+  /** Размещение панели относительно триггера; `flip` при нехватке места остаётся. */
+  placement?: UseFloatingPlacement
+  /** Зазор между триггером и панелью, px. */
+  offset?: number
+  /** Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту. */
   width?: GrDropdownWidth
+  /** Чем открывается панель. В любом режиме работают клик и клавиатура. */
+  trigger?: GrDropdownTrigger
+  /** Задержка открытия по наведению, мс. */
+  openDelay?: number
+  /** Задержка закрытия после ухода курсора, мс. */
+  closeDelay?: number
+  /** Панель не открывается ничем; триггер остаётся фокусируемым. */
+  disabled?: boolean
   /** Закрывать панель по клику внутри content. */
   closeOnContentClick?: boolean
   /** Дополнительные классы контейнера content. */
@@ -28,8 +38,13 @@ export interface GrDropdownProps {
 }
 
 const props = withDefaults(defineProps<GrDropdownProps>(), {
-  align: 'right',
-  width: '48',
+  placement: 'bottom-end',
+  offset: 8,
+  width: '12rem',
+  trigger: 'click',
+  openDelay: 120,
+  closeDelay: 160,
+  disabled: false,
   closeOnContentClick: true,
   contentClass: '',
   teleportTo: 'body',
@@ -60,6 +75,9 @@ function focusItemAt(index: number): void {
 }
 
 async function openWithFocus(first: boolean): Promise<void> {
+  if (props.disabled)
+    return
+
   open.value = true
   await nextTick()
   focusItemAt(first ? 0 : -1)
@@ -67,17 +85,25 @@ async function openWithFocus(first: boolean): Promise<void> {
 
 /**
  * Пропсы для реального фокусируемого триггера (кнопки). Консьюмер биндит их на
- * элемент внутри слота `#trigger`: `<button v-bind="triggerProps">`. Даёт
- * `aria-haspopup`/`aria-expanded`/`aria-controls` и клавиатуру (Enter/Space/стрелки).
+ * элемент внутри слота `#trigger`: `<GrButton v-bind="triggerProps">`. Даёт
+ * `aria-haspopup`/`aria-expanded`/`aria-controls`, клавиатуру и **клик**.
+ *
+ * Клик живёт здесь, а не на обёртке слота: обёртка ловила бы и клики по
+ * вложенным кнопкам и ссылкам, переключая панель мимо намерения пользователя.
  */
 const triggerProps = computed(() => ({
   'aria-haspopup': 'menu' as const,
   'aria-expanded': open.value,
   'aria-controls': open.value ? panelId : undefined,
+  'aria-disabled': props.disabled ? true : undefined,
+  'onClick': toggle,
   'onKeydown': onTriggerKeydown,
 }))
 
 function onTriggerKeydown(event: KeyboardEvent): void {
+  if (props.disabled)
+    return
+
   switch (event.key) {
     case 'Enter':
     case ' ':
@@ -98,6 +124,38 @@ function onTriggerKeydown(event: KeyboardEvent): void {
   }
 }
 
+/**
+ * Typeahead паттерна menu: печатные символы копятся в буфер и переводят фокус
+ * на первый подходящий пункт, начиная со следующего за текущим.
+ */
+const TYPEAHEAD_RESET_MS = 600
+let typeaheadBuffer = ''
+let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
+
+function onTypeahead(char: string): void {
+  clearTimeout(typeaheadTimer)
+  typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, TYPEAHEAD_RESET_MS)
+
+  // Повтор одной буквы — это «следующий на ту же букву», а не поиск «аа».
+  const repeat = typeaheadBuffer.length === 1 && typeaheadBuffer === char
+  typeaheadBuffer = repeat ? char : typeaheadBuffer + char
+
+  const query = typeaheadBuffer.toLowerCase()
+  const items = panelItems()
+  if (items.length === 0)
+    return
+
+  const currentIndex = items.indexOf(document.activeElement as HTMLElement)
+
+  for (let step = 1; step <= items.length; step += 1) {
+    const item = items[(currentIndex + step + items.length) % items.length]
+    if ((item.textContent ?? '').trim().toLowerCase().startsWith(query)) {
+      item.focus()
+      return
+    }
+  }
+}
+
 function onPanelKeydown(event: KeyboardEvent): void {
   const items = panelItems()
   const currentIndex = items.indexOf(document.activeElement as HTMLElement)
@@ -106,32 +164,29 @@ function onPanelKeydown(event: KeyboardEvent): void {
     case 'ArrowDown':
       event.preventDefault()
       focusItemAt(currentIndex + 1)
-      break
+      return
     case 'ArrowUp':
       event.preventDefault()
       focusItemAt(currentIndex - 1)
-      break
+      return
     case 'Home':
       event.preventDefault()
       focusItemAt(0)
-      break
+      return
     case 'End':
       event.preventDefault()
       focusItemAt(-1)
-      break
+      return
     case 'Tab':
       close()
-      break
+      return
   }
-}
 
-// `align='right'` — правый край панели совпадает с правым краем триггера (bottom-end);
-// `align='left'` — левые края (bottom-start); `align='center'` — floating-ui сам
-// центрирует панель под триггером при обычном `'bottom'` без суффикса.
-const placementByAlign: Record<GrDropdownAlign, 'bottom-start' | 'bottom-end' | 'bottom'> = {
-  left: 'bottom-start',
-  right: 'bottom-end',
-  center: 'bottom',
+  // Печатный символ без модификаторов — поиск по пунктам, а не команда.
+  if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    event.preventDefault()
+    onTypeahead(event.key)
+  }
 }
 
 const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = useFloating(
@@ -139,17 +194,52 @@ const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = use
   panelEl,
   open,
   {
-    placement: () => placementByAlign[props.align],
+    placement: () => props.placement,
+    // Геттер, а не значение: иначе проп замрёт на моменте `setup`.
+    get offsetPx() { return props.offset },
     zIndexVar: '--gr-z-dropdown',
   },
 )
 
+// ————— Открытие по наведению. Задержки нужны обе: без `openDelay` панель
+// выпрыгивает на любое пересечение курсором, без `closeDelay` её не удержать
+// при переходе с триггера на панель — между ними зазор `offset`.
+let hoverTimer: ReturnType<typeof setTimeout> | undefined
+
 function toggle(): void {
+  if (props.disabled)
+    return
+
+  clearTimeout(hoverTimer)
   open.value = !open.value
 }
 
 function close(): void {
+  clearTimeout(hoverTimer)
   open.value = false
+}
+
+function scheduleHover(next: boolean, delayMs: number): void {
+  clearTimeout(hoverTimer)
+
+  if (delayMs <= 0) {
+    open.value = next
+    return
+  }
+
+  hoverTimer = setTimeout(() => { open.value = next }, delayMs)
+}
+
+function onHoverEnter(): void {
+  if (props.disabled || props.trigger !== 'hover')
+    return
+  scheduleHover(true, props.openDelay)
+}
+
+function onHoverLeave(): void {
+  if (props.trigger !== 'hover')
+    return
+  scheduleHover(false, props.closeDelay)
 }
 
 // Возврат фокуса — из контракта слоя: он запоминает активный элемент при
@@ -159,25 +249,78 @@ function close(): void {
 useOverlayLayer(open, close, { root: panelEl })
 
 watch(
-  () => props.align,
+  () => [props.placement, props.offset],
   () => {
     if (open.value) updateFloatingPosition()
   },
 )
 
-const widthClass = computed(() => grDropdownWidthClass(props.width))
+watch(
+  () => props.disabled,
+  (value) => {
+    if (value) close()
+  },
+)
+
+function toCssLength(value: GrDropdownWidth): string | undefined {
+  if (value === 'auto')
+    return undefined
+  if (typeof value === 'number')
+    return `${value}px`
+
+  // Строка без единиц браузер просто отбросит, поэтому трактуем её как пиксели
+  // — и предупреждаем: раньше `width="48"` означало `w-48`, то есть 12rem.
+  const bare = value.trim()
+  if (/^\d+$/.test(bare)) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `[GrDropdown] width="${value}" трактуется как ${bare}px. `
+        + 'Шкалы tailwind-токенов (w-48) у пропа больше нет — укажите единицы: '
+        + `width="${bare}px" или :width="${bare}".`,
+      )
+    }
+    return `${bare}px`
+  }
+
+  return value
+}
+
+const panelStyle = computed(() => {
+  const width = toCssLength(props.width)
+  return width ? { ...floatingStyle.value, width } : floatingStyle.value
+})
 
 const contentClasses = computed(() => grDropdownContentClass(props.contentClass))
 
-const panelClasses = computed(() => {
-  return [widthClass.value, grDropdownOriginClass(resolvedPlacement.value)].filter(Boolean)
-})
+const panelClasses = computed(() => grDropdownOriginClass(resolvedPlacement.value))
 
 function onContentClick(): void {
   if (props.closeOnContentClick) {
     close()
   }
 }
+
+// Триггер без `v-bind="triggerProps"` — это триггер без клика, без клавиатуры и
+// без ARIA. Молчать об этом нельзя: панель просто не открывалась бы, и искать
+// причину пришлось бы в чужом коде.
+onMounted(() => {
+  if (process.env.NODE_ENV === 'production')
+    return
+  if (rootEl.value?.querySelector('[aria-haspopup]'))
+    return
+
+  console.warn(
+    '[GrDropdown] триггер не привязан: добавьте `v-bind="triggerProps"` на элемент '
+    + 'внутри слота #trigger — <template #trigger="{ triggerProps }">'
+    + '<GrButton v-bind="triggerProps">…</GrButton></template>. '
+    + 'Без этого у триггера нет ни клика, ни клавиатуры, ни aria-haspopup/aria-expanded.',
+  )
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(typeaheadTimer)
+  clearTimeout(hoverTimer)
+})
 
 // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
 // рендер не совпадает с серверным и ломается гидрация (см. композабл).
@@ -191,7 +334,8 @@ const teleportEnabled = useTeleportEnabled()
       v-click-outside="{ handler: close, enabled: open, exclude: clickOutsideExclude }"
       data-gr-dropdown-trigger
       class="inline-block max-w-full"
-      @click="toggle"
+      @mouseenter="onHoverEnter"
+      @mouseleave="onHoverLeave"
     >
       <slot name="trigger" :open="open" :toggle="toggle" :close="close" :trigger-props="triggerProps" />
     </div>
@@ -213,9 +357,11 @@ const teleportEnabled = useTeleportEnabled()
           role="menu"
           tabindex="-1"
           :class="panelClasses"
-          :style="floatingStyle"
+          :style="panelStyle"
           @click="onContentClick"
           @keydown="onPanelKeydown"
+          @mouseenter="onHoverEnter"
+          @mouseleave="onHoverLeave"
         >
           <div data-gr-dropdown-content :class="contentClasses">
             <slot name="content" :close="close" />
