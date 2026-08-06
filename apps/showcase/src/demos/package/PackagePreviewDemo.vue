@@ -212,6 +212,33 @@ async function runAlertDemo() {
   dialogStatus.value = t('composables.useDialogService.status.alertAcknowledged')
 }
 
+const nestedStatus = ref(t('composables.useDialogService.nested.idle'))
+
+async function runNestedDemo() {
+
+  // Второй диалог спрашивается из `onConfirm` первого — сервис показывает его
+  // поверх, потому что первый ждёт именно его ответа.
+  const deleted = await dialog.confirm(t('composables.useDialogService.nested.message'), {
+    title: t('composables.useDialogService.nested.title'),
+    confirmText: t('composables.useDialogService.nested.confirmText'),
+    cancelText: t('composables.useDialogService.nested.cancelText'),
+    confirmTone: 'danger',
+    async onConfirm() {
+      return await dialog.confirm(t('composables.useDialogService.nested.secondMessage'), {
+        title: t('composables.useDialogService.nested.secondTitle'),
+        size: 'sm',
+        confirmText: t('composables.useDialogService.nested.secondConfirmText'),
+        cancelText: t('composables.useDialogService.nested.secondCancelText'),
+        confirmTone: 'danger',
+      })
+    },
+  })
+
+  nestedStatus.value = deleted
+    ? t('composables.useDialogService.nested.done')
+    : t('composables.useDialogService.nested.aborted')
+}
+
 const networkStatus = ref(t('composables.useDialogService.network.idle'))
 let networkAttempt = 0
 
@@ -476,6 +503,15 @@ async function runNetworkDemo() {
       </GrButton>
       <p class="text-sm text-[var(--gr-muted-fg)]">
         {{ dialogStatus }}
+      </p>
+    </template>
+
+    <template v-else-if="previewKey === 'use-dialog-service-nested'">
+      <GrButton class="justify-self-start" variant="primary" tone="danger" @click="runNestedDemo">
+        {{ t('composables.useDialogService.nested.trigger') }}
+      </GrButton>
+      <p class="text-sm text-[var(--gr-muted-fg)]">
+        {{ nestedStatus }}
       </p>
     </template>
 

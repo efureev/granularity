@@ -1,11 +1,16 @@
-import { createVNode, getCurrentInstance, markRaw, render } from 'vue'
-import type { AppContext, Raw } from 'vue'
+import { createVNode, getCurrentInstance, inject, markRaw, render } from 'vue'
+import type { App, AppContext, InjectionKey } from 'vue'
 
 import GrDialogServiceHost from './GrDialogServiceHost.vue'
-import { useGrConfig, type GrConfigContext } from '../GrConfigProvider/context'
-import { resolveGranularityI18n, type GranularityI18nLike } from '../../internal/granularityI18n'
-import { dialogQueue, makeDialogId, settleDialogRequest } from './store'
-import type { DialogRequest } from './store'
+import { useGrConfig } from '../GrConfigProvider/context'
+import { resolveGranularityI18n } from '../../internal/granularityI18n'
+import {
+  createDialogServiceState,
+  enqueueDialogRequest,
+  makeDialogId,
+  settleDialogRequest,
+} from './store'
+import type { CapturedDialogContext, DialogRequest, DialogServiceState } from './store'
 import type {
   DialogAlertOptions,
   DialogBaseOptions,
@@ -26,57 +31,115 @@ import type {
  *
  * Поверх существующих `GrConfirmDialog`/`GrPromptDialog`: лениво монтирует
  * единый хост (`GrDialogServiceHost`) в `document.body`, наследуя контекст
- * приложения (i18n / тема / `granular-provider`). Диалоги сериализуются
- * очередью FIFO.
+ * приложения (i18n / тема / `granular-provider`).
  */
 
-let mounted = false
-let container: HTMLElement | null = null
-let cachedAppContext: AppContext | null = null
+/** Ключ provide/inject для app-scoped состояния сервиса (устанавливает плагин ниже). */
+export const GRANULARITY_DIALOG_SERVICE_STATE: InjectionKey<DialogServiceState>
+  = Symbol.for('@feugene/granularity/dialog-service-state')
 
-function ensureMounted(appContext?: AppContext | null): void {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return
+/**
+ * Инстансы, заведённые плагином. Реестр нужен готовому синглтону
+ * `dialogService`: он создаётся на импорте модуля, где `inject` не работает
+ * вовсе, и сам до app-scoped состояния не дотянется. Ровно один
+ * зарегистрированный — ответ однозначен; несколько — выбирать за пользователя
+ * нечего, и он получает предупреждение с модульным фолбэком.
+ */
+const registeredStates = new Set<DialogServiceState>()
 
-  if (appContext) cachedAppContext = appContext
-  if (mounted) return
+/**
+ * Vue-плагин: даёт каждому приложению собственное состояние сервиса и снимает
+ * его хост вместе с приложением. Обязателен для нескольких Vue-приложений на
+ * одной странице (микрофронтенды — иначе они делят одну очередь и один хост) и
+ * для HMR, где контейнер прошлого приложения иначе остаётся в `document.body`.
+ *
+ * ```ts
+ * app.use(granularityDialogServicePlugin)
+ * ```
+ */
+export const granularityDialogServicePlugin = {
+  install(app: App) {
+    const state = createDialogServiceState()
 
-  container = document.createElement('div')
-  container.setAttribute('data-gr-dialog-service-host', '')
-  document.body.appendChild(container)
+    app.provide(GRANULARITY_DIALOG_SERVICE_STATE, state)
+    registeredStates.add(state)
 
-  const vnode = createVNode(GrDialogServiceHost)
-  vnode.appContext = cachedAppContext ?? null
-  render(vnode, container)
-  mounted = true
+    app.onUnmount(() => {
+      teardownDialogServiceState(state)
+      registeredStates.delete(state)
+    })
+  },
 }
 
-/** Контекст, захваченный вызовом `useDialogService()` внутри `setup`. */
-type CapturedContext = {
-  config: Raw<GrConfigContext> | null
-  i18n: Raw<GranularityI18nLike> | null
+// Ленивый модульный фолбэк — канонический вариант для простого SPA без плагина.
+let moduleState: DialogServiceState | null = null
+
+function getModuleState(): DialogServiceState {
+  if (!moduleState)
+    moduleState = createDialogServiceState()
+
+  return moduleState
+}
+
+let ambiguousStateWarned = false
+
+function warnAmbiguousState(): void {
+  if (ambiguousStateWarned) return
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return
+
+  ambiguousStateWarned = true
+  console.warn(
+    '[granularity] useDialogService: плагин установлен в нескольких приложениях, '
+    + 'а сервис запрошен вне `setup` — какое из них имелось в виду, знать неоткуда. '
+    + 'Используется модульное состояние. Вызовите `useDialogService()` внутри `setup` нужного приложения.',
+  )
 }
 
 /**
- * Последний контекст, захваченный вызовом `useDialogService()` из `setup`.
- *
- * Нужен готовому синглтону `dialogService`: он создаётся на импорте модуля, где
- * `inject` не работает, и своего конфига с i18n не имеет никогда. Без этого
- * фолбэка «удобный вариант» из доки всегда открывал бы диалоги с английскими
- * строками и дефолтным размером — молча, без единой ошибки.
- *
- * Эвристика честная ровно настолько, насколько может быть честным контекст «из
- * ниоткуда»: при двух поддеревьях с разными провайдерами возьмётся последнее.
- * Точный ответ даёт `useDialogService()` в `setup` или явный `setAppContext`.
+ * Состояние текущего вызова: app-scoped (плагин) → единственный
+ * зарегистрированный инстанс → модульный фолбэк.
  */
-let lastCapturedContext: CapturedContext | null = null
+function resolveDialogServiceState(): DialogServiceState {
+  // `inject` работает только в `setup` — там ответ точный.
+  if (getCurrentInstance()) {
+    const provided = inject(GRANULARITY_DIALOG_SERVICE_STATE, null)
+    if (provided) return provided
+  }
 
-let contextlessWarned = false
+  if (registeredStates.size === 1)
+    return registeredStates.values().next().value!
 
-function warnIfContextless(context: CapturedContext | null): void {
-  if (contextlessWarned || context?.config || context?.i18n) return
+  if (registeredStates.size > 1)
+    warnAmbiguousState()
+
+  return getModuleState()
+}
+
+function ensureMounted(state: DialogServiceState, appContext?: AppContext | null): void {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return
+
+  if (appContext) state.appContext = appContext
+  if (state.mounted) return
+
+  const container = document.createElement('div')
+  container.setAttribute('data-gr-dialog-service-host', '')
+  document.body.appendChild(container)
+  state.container = container
+
+  // Состояние отдаём пропом: хост монтируется вне дерева и своим `inject` до
+  // app-scoped состояния не дотянулся бы. `markRaw` — чтобы Vue не пытался
+  // сделать реактивной саму обёртку: реактивна очередь внутри неё.
+  const vnode = createVNode(GrDialogServiceHost, { state: markRaw(state) })
+  vnode.appContext = state.appContext ?? null
+  render(vnode, container)
+  state.mounted = true
+}
+
+function warnIfContextless(state: DialogServiceState, context: CapturedDialogContext | null): void {
+  if (state.contextlessWarned || context?.config || context?.i18n) return
   if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return
 
-  contextlessWarned = true
+  state.contextlessWarned = true
   console.warn(
     '[granularity] useDialogService: диалог открыт без контекста приложения — '
     + 'ни `GrConfigProvider`, ни адаптер i18n не найдены, будут использованы дефолты. '
@@ -84,33 +147,44 @@ function warnIfContextless(context: CapturedContext | null): void {
   )
 }
 
-/** Тестовая/служебная очистка смонтированного хоста. */
-export function teardownDialogService(): void {
-  if (container) {
-    render(null, container)
-    container.remove()
-    container = null
+/** Снимает смонтированный хост и сбрасывает захваченный контекст одного инстанса. */
+function teardownDialogServiceState(state: DialogServiceState): void {
+  if (state.container) {
+    render(null, state.container)
+    state.container.remove()
+    state.container = null
   }
-  mounted = false
+  state.mounted = false
   // Сбрасываем и кэш контекста приложения: без этого он переживает teardown и
   // протекает в следующее приложение (в тестах — в следующий тест), из-за чего
   // диалог может подхватить чужие provides и проверка соврёт.
-  cachedAppContext = null
-  lastCapturedContext = null
-  contextlessWarned = false
-  dialogQueue.splice(0, dialogQueue.length)
+  state.appContext = null
+  state.lastCapturedContext = null
+  state.contextlessWarned = false
+  state.queue.splice(0, state.queue.length)
+  state.inFlight.splice(0, state.inFlight.length)
+}
+
+/**
+ * Тестовая/служебная очистка смонтированного хоста. Работает над тем же
+ * состоянием, что и сам сервис: app-scoped при вызове из `setup` или при
+ * единственном зарегистрированном приложении, иначе — модульным.
+ */
+export function teardownDialogService(): void {
+  teardownDialogServiceState(resolveDialogServiceState())
 }
 
 function enqueue(
+  state: DialogServiceState,
   kind: DialogKind,
   message: string,
   options: DialogBaseOptions,
   onConfirm: DialogOnConfirm<any> | undefined,
-  captured: CapturedContext,
+  captured: CapturedDialogContext,
 ): { promise: Promise<DialogResult<any>>, close: () => void } {
   // Императивный сервис клиент-only: монтирует хост в `document.body`. В SSR
-  // выполнять его нельзя — модульная очередь (`dialogQueue`) мутировалась бы на
-  // сервере и текла между запросами. Явно запрещаем вместо тихого no-op.
+  // выполнять его нельзя — очередь мутировалась бы на сервере и текла между
+  // запросами. Явно запрещаем вместо тихого no-op.
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error(
       '[granularity] useDialogService is client-only and cannot be called during SSR '
@@ -118,7 +192,7 @@ function enqueue(
     )
   }
 
-  ensureMounted(options.appContext ?? cachedAppContext)
+  ensureMounted(state, options.appContext ?? state.appContext)
 
   const id = makeDialogId()
   let resolveFn!: (result: DialogResult<any>) => void
@@ -129,8 +203,8 @@ function enqueue(
   // Синглтон `dialogService` создаётся на импорте модуля, вне `setup`, и своего
   // контекста не имеет в принципе. Берём последний захваченный — иначе такие
   // вызовы навсегда остаются без i18n и без `GrConfigProvider`.
-  const context = captured.config || captured.i18n ? captured : lastCapturedContext
-  warnIfContextless(context)
+  const context = captured.config || captured.i18n ? captured : state.lastCapturedContext
+  warnIfContextless(state, context)
 
   const request: DialogRequest = {
     id,
@@ -138,19 +212,21 @@ function enqueue(
     message,
     options: { ...options, message },
     onConfirm,
+    priority: options.priority ?? 0,
+    nested: false,
     settled: false,
     resolve: resolveFn,
     config: context?.config ?? null,
     i18n: context?.i18n ?? null,
   }
 
-  dialogQueue.push(request)
+  enqueueDialogRequest(state, request)
 
-  // Закрытие через промис идёт тем же путём, что и кнопка в хосте: заявка сама
-  // знает, завершена ли она, а хост по смене головы очереди свернёт всё, что
-  // под неё заведено (в т.ч. оборвёт in-flight `onConfirm` через `abort()`).
+  // Закрытие через промис идёт тем же путём, что и кнопка в окне: заявка сама
+  // знает, завершена ли она, а окно по её исчезновению свернёт всё, что под неё
+  // заведено (в т.ч. оборвёт in-flight `onConfirm` через `abort()`).
   const close = (): void => {
-    settleDialogRequest(request, { action: 'close' })
+    settleDialogRequest(state, request, { action: 'close' })
   }
 
   return { promise, close }
@@ -191,16 +267,18 @@ function mergeErrorDefaults(
  * `setup`. Для вызовов вне компонента используйте `setAppContext`.
  */
 export function useDialogService(defaults: DialogServiceDefaults = {}): DialogService {
+  const state = resolveDialogServiceState()
+
   // Авто-кэш appContext из текущего компонента (если вызвано в setup).
   const instance = getCurrentInstance()
-  if (instance?.appContext && !cachedAppContext) {
-    cachedAppContext = instance.appContext
+  if (instance?.appContext && !state.appContext) {
+    state.appContext = instance.appContext
   }
 
   // Конфиг и i18n захватываем здесь и только здесь: `inject` работает лишь в
   // `setup`, а хост монтируется вне дерева и сам до провайдера не дотянется.
-  // Храним в замыкании сервиса, а не в модульной переменной, — иначе два
-  // поддерева с разными провайдерами делили бы конфиг первого.
+  // Храним в замыкании сервиса, а не в состоянии, — иначе два поддерева с
+  // разными провайдерами делили бы конфиг первого.
   // i18n захватываем не «на всякий случай»: дочерний `GrConfirmDialog` сам зовёт
   // `useGranularityTranslations()`, но его `inject` из хоста уходит в
   // `appContext.provides` — то есть видит только установку через `app.use()`.
@@ -210,29 +288,29 @@ export function useDialogService(defaults: DialogServiceDefaults = {}): DialogSe
   // `markRaw` — потому что дальше контекст ложится в `reactive`-очередь, а она
   // разворачивает вложенные рефы (см. комментарий в `store.ts`).
   const capturedI18n = instance ? resolveGranularityI18n() : null
-  const captured: CapturedContext = {
+  const captured: CapturedDialogContext = {
     config: instance ? markRaw(useGrConfig()) : null,
     i18n: capturedI18n ? markRaw(capturedI18n) : null,
   }
 
   if (captured.config || captured.i18n)
-    lastCapturedContext = captured
+    state.lastCapturedContext = captured
 
   function confirm(message: string, options: DialogConfirmOptions = {}): DialogPromise<boolean> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue('confirm', message, merged, options.onConfirm, captured)
+    const { promise, close } = enqueue(state, 'confirm', message, merged, options.onConfirm, captured)
     return withClose(promise.then(r => r.action === 'confirm'), close)
   }
 
   function alert(message: string, options: DialogAlertOptions = {}): DialogPromise<void> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue('alert', message, merged, options.onConfirm, captured)
+    const { promise, close } = enqueue(state, 'alert', message, merged, options.onConfirm, captured)
     return withClose(promise.then(() => undefined), close)
   }
 
   function prompt(message: string, options: DialogPromptOptions = {}): DialogPromise<string | null> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue('prompt', message, merged, options.onConfirm, captured)
+    const { promise, close } = enqueue(state, 'prompt', message, merged, options.onConfirm, captured)
     return withClose(
       promise.then(r => (r.action === 'confirm' ? ((r.value as string) ?? '') : null)),
       close,
@@ -245,23 +323,37 @@ export function useDialogService(defaults: DialogServiceDefaults = {}): DialogSe
     options: DialogBaseOptions = {},
   ): DialogPromise<DialogResult<V>> {
     const merged = mergeErrorDefaults(defaults, options)
-    const { promise, close } = enqueue(kind, message, merged, (options as DialogConfirmOptions).onConfirm, captured)
+    const { promise, close } = enqueue(
+      state,
+      kind,
+      message,
+      merged,
+      (options as DialogConfirmOptions).onConfirm,
+      captured,
+    )
     return withClose(promise as Promise<DialogResult<V>>, close)
   }
 
   // Порядок разбора — FIFO, как и порядок показа: `pop()` резолвил промисы
   // задом наперёд, и вызывающий получал результаты в обратном порядке.
   function closeAll(): void {
-    for (const request of [...dialogQueue])
-      settleDialogRequest(request, { action: 'close' })
+    for (const request of [...state.queue])
+      settleDialogRequest(state, request, { action: 'close' })
   }
 
   function setAppContext(ctx: AppContext | null): void {
-    cachedAppContext = ctx
+    state.appContext = ctx
   }
 
   return { confirm, alert, prompt, open, closeAll, setAppContext }
 }
 
 /** Готовый синглтон-сервис с дефолтными настройками. */
-export const dialogService: DialogService = useDialogService()
+export const dialogService: DialogService = {
+  confirm: (message, options) => useDialogService().confirm(message, options),
+  alert: (message, options) => useDialogService().alert(message, options),
+  prompt: (message, options) => useDialogService().prompt(message, options),
+  open: (kind, message, options) => useDialogService().open(kind, message, options),
+  closeAll: () => useDialogService().closeAll(),
+  setAppContext: ctx => useDialogService().setAppContext(ctx),
+}

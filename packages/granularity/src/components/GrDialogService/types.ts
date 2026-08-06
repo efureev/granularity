@@ -102,6 +102,12 @@ export interface DialogBaseOptions extends DialogErrorOptions {
   confirmTone?: GrButtonTone
   /** Внешний `AbortSignal`: при abort диалог закрывается с `action: 'close'`. */
   signal?: AbortSignal
+  /**
+   * Место в очереди среди **ожидающих**: больше — раньше, по умолчанию `0`, при
+   * равенстве порядок FIFO. Уже показанное окно не прерывается — выдёргивать
+   * фокус-ловушку из-под пользователя хуже, чем задержка на одно окно.
+   */
+  priority?: number
   /** Наследование контекста приложения (i18n / тема / `granular-provider`). */
   appContext?: AppContext | null
 }

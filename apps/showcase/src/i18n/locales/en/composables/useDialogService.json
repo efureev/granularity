@@ -40,5 +40,19 @@
     "fieldError": "This email is already invited.",
     "cancelled": "prompt cancelled (after {attempts} attempts)",
     "sent": "invite sent: {email} (succeeded on attempt {attempts})"
+  },
+  "nested": {
+    "trigger": "Delete project (nested confirm)",
+    "title": "Delete project?",
+    "message": "Tasks, releases and webhooks will be removed.",
+    "confirmText": "Delete",
+    "cancelText": "Cancel",
+    "secondTitle": "Really delete?",
+    "secondMessage": "There is nothing to restore from — the second confirm opened on top of the first.",
+    "secondConfirmText": "Yes, delete",
+    "secondCancelText": "Go back",
+    "idle": "The first dialog waits for the second one, so the second opens on top instead of behind it.",
+    "done": "Project deleted",
+    "aborted": "Deletion cancelled on the second step"
   }
 }

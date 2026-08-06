@@ -221,6 +221,12 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
         status: 'ready',
       },
       {
+        id: 'use-dialog-service-nested',
+        title: 'Nested confirm on top',
+        description: 'A dialog opened from another dialog\'s `onConfirm` stacks on top instead of waiting behind the call that awaits it.',
+        status: 'ready',
+      },
+      {
         id: 'use-dialog-service-network',
         title: 'Async onConfirm with network errors',
         description: 'Loading, server validation (HTTP 422) and a network drop handled through `ctx.setRawError` without closing the dialog.',

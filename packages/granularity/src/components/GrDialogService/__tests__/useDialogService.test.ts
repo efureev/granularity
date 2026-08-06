@@ -32,7 +32,12 @@ vi.mock('@headlessui/vue', async () => {
   }
 })
 
-const { dialogService, teardownDialogService } = await import('../useDialogService')
+const {
+  dialogService,
+  granularityDialogServicePlugin,
+  teardownDialogService,
+  useDialogService,
+} = await import('../useDialogService')
 
 /** Дать движку прогнать монтирование/рендер и микротаски. */
 async function flush(times = 4): Promise<void> {
@@ -333,5 +338,165 @@ describe('useDialogService — завершение заявки', () => {
 
     release()
     await expect(p).resolves.toBe(true)
+  })
+})
+
+describe('useDialogService — очередь, вложенность и приоритет', () => {
+  function dialogTexts(): string[] {
+    return [...document.querySelectorAll('[data-gr-modal-panel]')]
+      .map(panel => panel.textContent?.trim() ?? '')
+  }
+
+  it('обычные вызовы показываются по одному, в порядке FIFO', async () => {
+    const first = dialogService.confirm('Первый')
+    const second = dialogService.confirm('Второй')
+    await flush()
+
+    expect(dialogTexts()).toHaveLength(1)
+    expect(document.body.textContent).toContain('Первый')
+
+    await clickDialogButton('gr-confirm-confirm')
+    await expect(first).resolves.toBe(true)
+    await flushUntil(() => document.body.textContent.includes('Второй'))
+
+    expect(dialogTexts()).toHaveLength(1)
+    await clickDialogButton('gr-confirm-cancel')
+    await expect(second).resolves.toBe(false)
+  })
+
+  it('priority двигает ожидающих, не трогая показанное окно', async () => {
+    const shown = dialogService.confirm('Показанный')
+    const low = dialogService.confirm('Фоновый')
+    const urgent = dialogService.confirm('Срочный', { priority: 10 })
+    await flush()
+
+    // Показанное окно не прерывается — приоритет живёт только среди ожидающих.
+    expect(document.body.textContent).toContain('Показанный')
+
+    await clickDialogButton('gr-confirm-confirm')
+    await expect(shown).resolves.toBe(true)
+    await flushUntil(() => document.body.textContent.includes('Срочный'))
+
+    expect(document.body.textContent).toContain('Срочный')
+    expect(document.body.textContent).not.toContain('Фоновый')
+
+    await clickDialogButton('gr-confirm-confirm')
+    await expect(urgent).resolves.toBe(true)
+    await flushUntil(() => document.body.textContent.includes('Фоновый'))
+
+    await clickDialogButton('gr-confirm-cancel')
+    await expect(low).resolves.toBe(false)
+  })
+
+  it('диалог из onConfirm открывается поверх, а не встаёт в очередь за ждущим', async () => {
+    let nestedAnswer: boolean | null = null
+
+    const outer = dialogService.confirm('Внешний', {
+      onConfirm: async () => {
+        nestedAnswer = await dialogService.confirm('Вложенный')
+        return nestedAnswer
+      },
+    })
+    await flush()
+
+    await clickDialogButton('gr-confirm-confirm')
+    await flushUntil(() => document.body.textContent.includes('Вложенный'))
+
+    // Оба окна на экране: внешнее ждёт ответа, вложенное его спрашивает.
+    const panels = dialogTexts()
+    expect(panels).toHaveLength(2)
+    expect(panels[0]).toContain('Внешний')
+    expect(panels[1]).toContain('Вложенный')
+
+    // Нижнее окно помечено `inert` общим стеком слоёв — фокус и клики
+    // достаются верхнему. Отдельного кода в сервисе на это нет и не нужно.
+    const layers = document.querySelectorAll('[data-testid="hu-dialog"]')
+    expect(layers[0].hasAttribute('inert')).toBe(true)
+    expect(layers[layers.length - 1].hasAttribute('inert')).toBe(false)
+
+    // Подтверждаем верхнее — оно последнее в разметке.
+    const buttons = document.querySelectorAll<HTMLElement>('[data-testid="gr-confirm-confirm"]')
+    await new Promise(resolve => setTimeout(resolve, 2))
+    buttons[buttons.length - 1].click()
+
+    await expect(outer).resolves.toBe(true)
+    expect(nestedAnswer).toBe(true)
+  })
+})
+
+describe('useDialogService — app-scoped состояние', () => {
+  it('плагин даёт приложению свою очередь и свой хост, а app.unmount() снимает его', async () => {
+    const { createApp, defineComponent, h } = await import('vue')
+
+    const hosts = () => document.querySelectorAll('[data-gr-dialog-service-host]').length
+
+    let firstService: ReturnType<typeof useDialogService> | null = null
+    let secondService: ReturnType<typeof useDialogService> | null = null
+
+    const makeApp = (assign: (service: ReturnType<typeof useDialogService>) => void) => {
+      const app = createApp(defineComponent({
+        setup() {
+          assign(useDialogService())
+          return () => h('div')
+        },
+      }))
+      app.use(granularityDialogServicePlugin)
+      const root = document.createElement('div')
+      document.body.appendChild(root)
+      app.mount(root)
+      return { app, root }
+    }
+
+    const first = makeApp((s) => { firstService = s })
+    const second = makeApp((s) => { secondService = s })
+
+    const a = firstService!.confirm('Из первого')
+    const b = secondService!.confirm('Из второго')
+    await flush()
+
+    // Очереди разные, поэтому оба окна видны одновременно: они головы разных
+    // очередей, а не два элемента одной.
+    expect(hosts()).toBe(2)
+    expect(document.body.textContent).toContain('Из первого')
+    expect(document.body.textContent).toContain('Из второго')
+
+    first.app.unmount()
+    await flush()
+
+    expect(hosts()).toBe(1)
+    expect(document.body.textContent).not.toContain('Из первого')
+
+    second.app.unmount()
+    await flush()
+    expect(hosts()).toBe(0)
+
+    a.close()
+    b.close()
+    first.root.remove()
+    second.root.remove()
+  })
+
+  it('готовый синглтон подхватывает единственный зарегистрированный инстанс', async () => {
+    const { createApp, defineComponent, h } = await import('vue')
+
+    const app = createApp(defineComponent({ setup: () => () => h('div') }))
+    app.use(granularityDialogServicePlugin)
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    app.mount(root)
+
+    const p = dialogService.confirm('Через синглтон')
+    await flush()
+
+    expect(document.body.textContent).toContain('Через синглтон')
+
+    // Хост принадлежит приложению, поэтому уходит вместе с ним.
+    p.close()
+    await flush()
+    app.unmount()
+    await flush()
+
+    expect(document.querySelectorAll('[data-gr-dialog-service-host]').length).toBe(0)
+    root.remove()
   })
 })
