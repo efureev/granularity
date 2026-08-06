@@ -2100,6 +2100,27 @@
         "origin": "generated",
         "items": [
           {
+            "name": "variant",
+            "description": "Начертание линии. Не задано — берётся из `GrConfigProvider`, иначе `solid`.",
+            "type": "GrDividerVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "length",
+            "description": "Длина линии: высота вертикального разделителя, ширина горизонтального. Нужна вертикальному вне flex-родителя — там ему не от чего растянуться.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя разделителя для скринридера. Подпись из слота строкой не выразить, поэтому имя задаётся отдельно; при `label` оно берётся из него.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "orientation",
             "description": "",
             "type": "GrDividerOrientation | undefined",
@@ -2119,6 +2140,20 @@
             "type": "GrDividerAlign | undefined",
             "required": false,
             "default": "\"center\""
+          },
+          {
+            "name": "spacing",
+            "description": "Отступы вокруг разделителя. Не задано — из `GrConfigProvider`, иначе `none`.",
+            "type": "GrDividerSpacing | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "thickness",
+            "description": "Толщина линии. Число трактуется как пиксели.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },

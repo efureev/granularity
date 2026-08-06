@@ -126,6 +126,7 @@ const previewRegistry = {
   'gr-kbd-hotkey-hints': defineAsyncComponent(() => import('../demos/components/gr-kbd/GrKbdHotkeyHintsDemo.vue')),
   'gr-kbd-basic': defineAsyncComponent(() => import('../demos/components/gr-kbd/GrKbdBasicDemo.vue')),
   'gr-divider-basic': defineAsyncComponent(() => import('../demos/components/gr-divider/GrDividerBasicDemo.vue')),
+  'gr-divider-variants': defineAsyncComponent(() => import('../demos/components/gr-divider/GrDividerVariantsDemo.vue')),
   'gr-tab-panels-keep-alive': defineAsyncComponent(() => import('../demos/components/gr-tab-panels/GrTabPanelsKeepAliveDemo.vue')),
   'gr-tab-panels-basic': defineAsyncComponent(() => import('../demos/components/gr-tab-panels/GrTabPanelsBasicDemo.vue')),
   'gr-form-field-custom-label': defineAsyncComponent(() => import('../demos/components/gr-form-field/GrFormFieldCustomLabelDemo.vue')),

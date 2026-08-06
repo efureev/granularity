@@ -40,7 +40,7 @@
 - [`GrDataTable`](./components/GrDataTable.md)
 - [`GrDialog`](./components/GrDialog.md)
 - [`GrDialogService`](./components/GrDialogService.md)
-- `GrDivider`
+- [`GrDivider`](./components/GrDivider.md)
 - [`GrDrawer`](./components/GrDrawer.md)
 - `GrDropdown`
 - [`GrDropdownMenu`](./components/GrDropdownMenu.md)

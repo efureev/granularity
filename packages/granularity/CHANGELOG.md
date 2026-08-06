@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDivider`: начертание, отступы, толщина, длина и имя для скринридера.** `variant`
+  (`solid`/`dashed`/`dotted`), `spacing` по шкале пакета (дефолт `none` — раскладки не едут),
+  `thickness` через `--gr-divider-thickness` и `length` для вертикального разделителя вне
+  flex-родителя, где ему не от чего растянуться. `variant` и `spacing` читаются из
+  `GrConfigProvider`. Подпись перестала пропадать из дерева доступности: `role="separator"`
+  делает потомков презентационными, поэтому имя теперь приходит атрибутом `aria-label` — из
+  `label` или из нового пропа `ariaLabel` для подписи, собранной слотом.
 - **`useDialogService`: изоляция по приложениям, вложенные окна и `priority`.**
   `granularityDialogServicePlugin` даёт приложению собственную очередь и собственный хост и снимает их
   по `app.unmount()` — модульные синглтоны `mounted`/`container`/`cachedAppContext` больше не общие на
