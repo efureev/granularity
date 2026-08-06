@@ -692,3 +692,223 @@ describe('GrFileUpload — управление набором файлов', ()
     expect(wrapper.find('[data-gr-file-upload-item]').exists()).toBe(false)
   })
 })
+
+describe('GrFileUpload — пофайловая загрузка', () => {
+  function dropFiles(wrapper: ReturnType<typeof mount>, files: File[]) {
+    return wrapper.get('[data-gr-file-upload]').trigger('drop', { dataTransfer: { files } })
+  }
+
+  const png = (name: string) => new File(['x'], name, { type: 'image/png' })
+
+  it('каждый файл уходит своим запросом, а `request` получает массив из одного', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, uploadMode: 'per-file', showFileList: true },
+    })
+
+    await dropFiles(wrapper, [png('a.png'), png('b.png')])
+    await flushPromises()
+
+    expect(request).toHaveBeenCalledTimes(2)
+    // Контракт не меняется: тот же `(files, ctx)`, просто с одним файлом.
+    expect(request.mock.calls.map(call => call[0].map((file: File) => file.name))).toEqual([['a.png'], ['b.png']])
+    expect(wrapper.emitted('success')).toHaveLength(2)
+    expect((wrapper.emitted('success')![0][1] as File).name).toBe('a.png')
+  })
+
+  it('concurrency ограничивает число одновременных запросов', async () => {
+    let inFlight = 0
+    let peak = 0
+    const release: Array<() => void> = []
+
+    const request = vi.fn(() => {
+      inFlight += 1
+      peak = Math.max(peak, inFlight)
+      return new Promise<void>((resolve) => {
+        release.push(() => { inFlight -= 1; resolve() })
+      })
+    })
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, uploadMode: 'per-file', concurrency: 2 },
+    })
+
+    await dropFiles(wrapper, [png('a.png'), png('b.png'), png('c.png'), png('d.png')])
+    await flushPromises()
+
+    expect(peak).toBe(2)
+
+    while (release.length) {
+      release.shift()!()
+      await flushPromises()
+    }
+
+    expect(request).toHaveBeenCalledTimes(4)
+  })
+
+  it('у каждого файла свой статус, а сводное состояние берёт худший исход', async () => {
+    const request = vi.fn((files: File[]) =>
+      files[0].name === 'bad.png' ? Promise.reject(new Error('boom')) : Promise.resolve({ ok: true }),
+    )
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, uploadMode: 'per-file', showFileList: true },
+    })
+
+    await dropFiles(wrapper, [png('good.png'), png('bad.png')])
+    await flushPromises()
+
+    const statuses = wrapper.findAll('[data-gr-file-upload-status]').map(el => el.attributes('data-status'))
+    expect(statuses).toEqual(['success', 'error'])
+
+    // Один упал — набор считается упавшим, даже если остальные успешны.
+    expect((wrapper.vm as any).state.phase).toBe('error')
+    expect(wrapper.emitted('error')).toHaveLength(1)
+    expect((wrapper.emitted('error')![0][1] as File).name).toBe('bad.png')
+  })
+
+  it('retryFile повторяет только свой файл', async () => {
+    let attempt = 0
+    const request = vi.fn((files: File[]) => {
+      if (files[0].name !== 'bad.png') return Promise.resolve({ ok: true })
+      attempt += 1
+      return attempt === 1 ? Promise.reject(new Error('boom')) : Promise.resolve({ ok: true })
+    })
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, uploadMode: 'per-file', showFileList: true },
+    })
+
+    await dropFiles(wrapper, [png('good.png'), png('bad.png')])
+    await flushPromises()
+
+    request.mockClear()
+    await wrapper.get('[data-gr-file-upload-retry-file]').trigger('click')
+    await flushPromises()
+
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(request.mock.calls[0][0][0].name).toBe('bad.png')
+    expect(wrapper.findAll('[data-gr-file-upload-status]').map(el => el.attributes('data-status')))
+      .toEqual(['success', 'success'])
+    expect((wrapper.vm as any).state.phase).toBe('success')
+  })
+
+  it('abortFile обрывает только свой файл, остальные догружаются', async () => {
+    const controllers: AbortSignal[] = []
+    const request = vi.fn((files: File[], ctx: { signal: AbortSignal }) => {
+      controllers.push(ctx.signal)
+      return new Promise((resolve, reject) => {
+        ctx.signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })))
+        if (files[0].name === 'fast.png') resolve({ ok: true })
+      })
+    })
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, uploadMode: 'per-file', showFileList: true },
+    })
+
+    await dropFiles(wrapper, [png('slow.png'), png('fast.png')])
+    await flushPromises()
+
+    await wrapper.get('[data-gr-file-upload-abort-file]').trigger('click')
+    await flushPromises()
+
+    // Отмена — не ошибка: строка возвращается в очередь, а сосед доезжает.
+    const statuses = wrapper.findAll('[data-gr-file-upload-status]').map(el => el.attributes('data-status'))
+    expect(statuses).toEqual(['pending', 'success'])
+    expect(controllers[1].aborted).toBe(false)
+  })
+
+  it('батчевый режим статусов по файлам не заводит', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, showFileList: true },
+    })
+
+    await dropFiles(wrapper, [png('a.png'), png('b.png')])
+    await flushPromises()
+
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(wrapper.findAll('[data-gr-file-upload-status]')).toHaveLength(0)
+    // Хвостового `file` в батче нет — говорить про отдельный файл нечем.
+    expect(wrapper.emitted('success')![0][1]).toBeUndefined()
+  })
+})
+
+describe('GrFileUpload — превью', () => {
+  const png = (name: string) => new File(['x'], name, { type: 'image/png' })
+
+  it('миниатюра создаётся для картинок и отзывается при удалении файла', async () => {
+    const createObjectURL = vi.fn(() => 'blob:preview')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL })
+
+    try {
+      const request = vi.fn().mockResolvedValue({ ok: true })
+      const wrapper = mount(GrFileUpload, {
+        props: { request, multiple: true, showFileList: true, preview: true },
+      })
+
+      await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+        dataTransfer: { files: [png('photo.png'), new File(['t'], 'notes.txt', { type: 'text/plain' })] },
+      })
+      await flushPromises()
+
+      // Только для картинок: у текстового файла показывать нечего.
+      expect(wrapper.findAll('[data-gr-file-upload-preview]')).toHaveLength(1)
+      expect(createObjectURL).toHaveBeenCalledTimes(1)
+
+      await wrapper.findAll('[data-gr-file-upload-remove]')[0].trigger('click')
+      await flushPromises()
+
+      // Без отзыва blob висел бы в памяти вкладки до перезагрузки.
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:preview')
+    }
+    finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('размонтирование отзывает оставшиеся ссылки', async () => {
+    const createObjectURL = vi.fn(() => 'blob:preview')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL })
+
+    try {
+      const request = vi.fn().mockResolvedValue({ ok: true })
+      const wrapper = mount(GrFileUpload, {
+        props: { request, showFileList: true, preview: true },
+      })
+
+      await wrapper.get('[data-gr-file-upload]').trigger('drop', { dataTransfer: { files: [png('photo.png')] } })
+      await flushPromises()
+
+      wrapper.unmount()
+
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:preview')
+    }
+    finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('без preview миниатюр нет и object URL не создаётся', async () => {
+    const createObjectURL = vi.fn(() => 'blob:preview')
+    vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL: vi.fn() })
+
+    try {
+      const wrapper = mount(GrFileUpload, {
+        props: { request: vi.fn().mockResolvedValue({}), showFileList: true },
+      })
+
+      await wrapper.get('[data-gr-file-upload]').trigger('drop', { dataTransfer: { files: [png('photo.png')] } })
+      await flushPromises()
+
+      expect(wrapper.findAll('[data-gr-file-upload-preview]')).toHaveLength(0)
+      expect(createObjectURL).not.toHaveBeenCalled()
+    }
+    finally {
+      vi.unstubAllGlobals()
+    }
+  })
+})

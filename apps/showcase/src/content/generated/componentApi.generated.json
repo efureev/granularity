@@ -2723,58 +2723,16 @@
         "origin": "generated",
         "items": [
           {
-            "name": "multiple",
+            "name": "action",
             "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "readonly",
-            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "invalid",
-            "description": "Визуальное и ARIA-состояние ошибки.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "required",
-            "description": "Обязательное поле (`aria-required`).",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "size",
-            "description": "Размер дефолтного UI: поля дроп-зоны, плитка иконки, кегль подписей.",
-            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "placeholder",
-            "description": "i18n: надпись-подсказка в дефолтном UI.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "ariaLabel",
-            "description": "Доступное имя вне `GrFormField`.",
-            "type": "string | undefined",
+            "name": "request",
+            "description": "",
+            "type": "GrFileUploadRequest<TResponse> | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2786,18 +2744,11 @@
             "default": "\"file\""
           },
           {
-            "name": "action",
+            "name": "multiple",
             "description": "",
-            "type": "string | undefined",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "request",
-            "description": "",
-            "type": "GrFileUploadRequest | undefined",
-            "required": false,
-            "default": "undefined"
+            "default": "false"
           },
           {
             "name": "limit",
@@ -2842,6 +2793,41 @@
             "default": "false"
           },
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: значение видно и уходит в форму, но не редактируется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "Визуальное и ARIA-состояние ошибки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "Обязательное поле (`aria-required`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя вне `GrFormField`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "headers",
             "description": "",
             "type": "Record<string, string> | undefined",
@@ -2866,6 +2852,13 @@
             "name": "uploadExtraData",
             "description": "",
             "type": "((files: File[]) => GrFileUploadExtraData | undefined) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "i18n: надпись-подсказка в дефолтном UI.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2896,6 +2889,34 @@
             "type": "number | undefined",
             "required": false,
             "default": "800"
+          },
+          {
+            "name": "size",
+            "description": "Размер дефолтного UI: поля дроп-зоны, плитка иконки, кегль подписей.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "uploadMode",
+            "description": "Как уходит набор файлов: - `batch` (по умолчанию) — весь набор одним запросом. Про отдельный файл сказать нечего, поэтому и статуса у него нет; - `per-file` — на каждый файл свой запрос (`request` зовётся с массивом из одного файла, контракт не меняется). Появляются статус и процент строки, `retryFile` и `abortFile`.",
+            "type": "GrFileUploadMode | undefined",
+            "required": false,
+            "default": "\"batch\""
+          },
+          {
+            "name": "concurrency",
+            "description": "Сколько файлов грузится одновременно в режиме `per-file`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "preview",
+            "description": "Миниатюры для `image/*` в списке файлов.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -2907,7 +2928,7 @@
           {
             "name": "default",
             "description": "",
-            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; }"
+            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; fileEntries: { file: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }; status: GrFileUploadStatus; percent: number; error?: unknown; }[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
           },
           {
             "name": "label",
@@ -2922,7 +2943,7 @@
           {
             "name": "progress",
             "description": "",
-            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"idle\" | \"uploading\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; retry: () => Promise<void>; }"
+            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"uploading\" | \"idle\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; retry: () => Promise<void>; fileEntries: { file: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }; status: GrFileUploadStatus; percent: number; error?: unknown; }[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
           }
         ]
       },
@@ -2932,40 +2953,40 @@
         "origin": "generated",
         "items": [
           {
-            "name": "success",
-            "description": "",
-            "type": "[payload: any]",
-            "signature": "(event: \"success\", payload: any): void"
+            "name": "exceed",
+            "description": "Выбрано больше файлов, чем разрешает `limit`. Загрузка не стартует.",
+            "type": "[File[], number]",
+            "signature": "(e: \"exceed\", files: File[], limit: number): void"
           },
           {
-            "name": "change",
-            "description": "",
-            "type": "[files: File[]]",
-            "signature": "(event: \"change\", files: File[]): void"
+            "name": "success",
+            "description": "`file` приходит только в режиме `per-file`: в батче отчитываться нечем.",
+            "type": "[TResponse, File | undefined]",
+            "signature": "(e: \"success\", payload: TResponse, file?: File | undefined): void"
           },
           {
             "name": "error",
             "description": "",
-            "type": "[error: unknown]",
-            "signature": "(event: \"error\", error: unknown): void"
+            "type": "[unknown, File | undefined]",
+            "signature": "(e: \"error\", error: unknown, file?: File | undefined): void"
           },
           {
             "name": "progress",
             "description": "",
-            "type": "[percent: number, info?: GrUploadProgressInfo | undefined]",
-            "signature": "(event: \"progress\", percent: number, info?: GrUploadProgressInfo | undefined): void"
+            "type": "[number, GrUploadProgressInfo | undefined, File | undefined]",
+            "signature": "(e: \"progress\", percent: number, info?: GrUploadProgressInfo | undefined, file?: File | undefined): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[File[]]",
+            "signature": "(e: \"change\", files: File[]): void"
           },
           {
             "name": "stateChange",
             "description": "",
-            "type": "[state: GrUploadState]",
-            "signature": "(event: \"stateChange\", state: GrUploadState): void"
-          },
-          {
-            "name": "exceed",
-            "description": "",
-            "type": "[files: File[], limit: number]",
-            "signature": "(event: \"exceed\", files: File[], limit: number): void"
+            "type": "[GrUploadState]",
+            "signature": "(e: \"stateChange\", state: GrUploadState): void"
           }
         ]
       },
@@ -2973,53 +2994,7 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": [
-          {
-            "name": "focus",
-            "description": "",
-            "type": "() => void"
-          },
-          {
-            "name": "blur",
-            "description": "",
-            "type": "() => void"
-          },
-          {
-            "name": "uploadFiles",
-            "description": "",
-            "type": "(files: File[], source?: FileValidatorSource) => Promise<void>"
-          },
-          {
-            "name": "abort",
-            "description": "",
-            "type": "() => void"
-          },
-          {
-            "name": "openDialog",
-            "description": "",
-            "type": "() => void"
-          },
-          {
-            "name": "state",
-            "description": "",
-            "type": "GrUploadState"
-          },
-          {
-            "name": "files",
-            "description": "Текущий набор файлов — тот, что показан в списке и уйдёт в `retry`.",
-            "type": "{ readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]"
-          },
-          {
-            "name": "retry",
-            "description": "",
-            "type": "() => Promise<void>"
-          },
-          {
-            "name": "removeFile",
-            "description": "",
-            "type": "(file: File) => void"
-          }
-        ]
+        "items": []
       }
     ]
   },

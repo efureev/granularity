@@ -140,7 +140,13 @@
     "success": "Загрузка завершена",
     "error": "Не удалось загрузить",
     "remove": "Убрать {fileName}",
-    "retry": "Повторить загрузку"
+    "retry": "Повторить загрузку",
+    "retryFile": "Повторить {fileName}",
+    "abortFile": "Отменить загрузку {fileName}",
+    "statusPending": "В очереди",
+    "statusUploading": "Загружается",
+    "statusSuccess": "Загружен",
+    "statusError": "Ошибка"
   },
   "formFile": {
     "upload": "Загрузить файл",

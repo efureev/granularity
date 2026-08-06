@@ -119,6 +119,7 @@ const previewRegistry = {
   'gr-file-upload-validation': defineAsyncComponent(() => import('../demos/components/gr-file-upload/GrFileUploadValidationDemo.vue')),
   'gr-file-upload-sizes': defineAsyncComponent(() => import('../demos/components/gr-file-upload/GrFileUploadSizesDemo.vue')),
   'gr-file-upload-retry': defineAsyncComponent(() => import('../demos/components/gr-file-upload/GrFileUploadRetryDemo.vue')),
+  'gr-file-upload-per-file': defineAsyncComponent(() => import('../demos/components/gr-file-upload/GrFileUploadPerFileDemo.vue')),
   'gr-form-validation': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormValidationDemo.vue')),
   'gr-form-mixed-controls': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormMixedControlsDemo.vue')),
   'gr-form-custom-control': defineAsyncComponent(() => import('../demos/components/gr-form/GrFormCustomControlDemo.vue')),

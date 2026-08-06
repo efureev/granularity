@@ -138,7 +138,13 @@
     "success": "Upload complete",
     "error": "Upload failed",
     "remove": "Remove {fileName}",
-    "retry": "Retry upload"
+    "retry": "Retry upload",
+    "retryFile": "Retry {fileName}",
+    "abortFile": "Cancel upload of {fileName}",
+    "statusPending": "Pending",
+    "statusUploading": "Uploading",
+    "statusSuccess": "Uploaded",
+    "statusError": "Failed"
   },
   "formFile": {
     "upload": "Upload file",

@@ -139,7 +139,13 @@
     "success": "Carga completada",
     "error": "Error al cargar",
     "remove": "Quitar {fileName}",
-    "retry": "Reintentar la carga"
+    "retry": "Reintentar la carga",
+    "retryFile": "Reintentar {fileName}",
+    "abortFile": "Cancelar la subida de {fileName}",
+    "statusPending": "En cola",
+    "statusUploading": "Subiendo",
+    "statusSuccess": "Subido",
+    "statusError": "Error"
   },
   "formFile": {
     "upload": "Subir archivo",

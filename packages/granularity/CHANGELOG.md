@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrFileUpload`: per-file uploads, a response generic and image previews.** `uploadMode="per-file"` sends every
+  file with its own request — `request` is still called as `(files, ctx)`, just with a single-element array, so an
+  existing uploader keeps working — and `concurrency` (default 3) caps parallel connections. Each row then carries its
+  own status and percent, plus `retryFile(file)` / `abortFile(file)`; `success`, `error` and `progress` gained an
+  optional trailing `file` argument that only appears in this mode. The aggregate state is derived from the rows by
+  the worst outcome, and cancelling one file is not an error — the row returns to the queue. `TResponse` is inferred
+  from `request` and types the `success` payload, removing `any` from the public signature. `preview` renders
+  thumbnails for `image/*` and revokes every object URL on removal, on a new selection and on unmount. A dev warning
+  now fires at mount when neither `action` nor `request` is set, instead of throwing on the first picked file.
 - **`GrCommandPalette`: recent commands and match highlighting.** `recentIds` lifts commands into a leading group —
   in the order of that array, with no duplicates below — while the query is empty; the first typed character hands the
   list back to relevance. Matched fragments of the label and description are wrapped in `<mark>` (tint via

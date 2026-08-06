@@ -3,10 +3,13 @@ export { default as GrFileUpload } from './GrFileUpload.vue'
 export type {
   GrFileUploadExtraData,
   GrFileUploadExtraDataValue,
+  GrFileUploadMode,
   GrFileUploadProps,
   GrFileUploadRequest,
   GrFileUploadRequestCtx,
 } from './GrFileUpload.vue'
+export type { GrFileUploadEntry, GrFileUploadStatus } from './fileEntry'
+export { createFileEntry, summarizeFileEntries } from './fileEntry'
 export { grFileUploadConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrFileUploadConfigurableProps } from './defaults'
