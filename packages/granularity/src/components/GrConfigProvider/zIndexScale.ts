@@ -15,6 +15,8 @@
  * вклиниться между слоями, а тосты стоят выше модалок.
  */
 export const GR_Z_INDEX_OFFSETS: Record<string, number> = {
+  // Шапка ниже якорных панелей: она перекрывает контент, но не выпадашки.
+  '--gr-z-navbar': -100,
   '--gr-z-dropdown': 0,
   '--gr-z-tooltip': 50,
   '--gr-z-modal': 100,

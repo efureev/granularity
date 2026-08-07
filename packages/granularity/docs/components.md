@@ -60,7 +60,7 @@
 - [`GrList`](./components/GrList.md)
 - [`GrLoading`](./components/GrLoading.md)
 - [`GrModal`](./components/GrModal.md)
-- `GrNavbar`
+- [`GrNavbar`](./components/GrNavbar.md)
 - [`GrNumberInput`](./components/GrNumberInput.md)
 - [`GrPagination`](./components/GrPagination.md)
 - `GrPopover`

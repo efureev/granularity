@@ -5202,6 +5202,20 @@
         "origin": "generated",
         "items": [
           {
+            "name": "title",
+            "description": "Заголовок строкой. Слот `#title` сильнее и позволяет обойтись без пропа.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "sticky",
+            "description": "Панель прилипает к верху при прокрутке. Слой — `--gr-z-navbar`: он ниже якорных панелей, чтобы открытый список не уезжал под шапку.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "showMenuButton",
             "description": "",
             "type": "boolean | undefined",
@@ -5214,12 +5228,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"\""
-          },
-          {
-            "name": "title",
-            "description": "",
-            "type": "string",
-            "required": true
           }
         ]
       },
@@ -5230,13 +5238,23 @@
         "items": [
           {
             "name": "title",
-            "description": "",
-            "type": "{}"
+            "description": "Заголовок целиком — вместо строки `title`.",
+            "type": "any"
+          },
+          {
+            "name": "left",
+            "description": "Зона сразу после заголовка: вкладки, переключатель раздела.",
+            "type": "any"
+          },
+          {
+            "name": "center",
+            "description": "Центральная зона: поиск, хлебные крошки.",
+            "type": "any"
           },
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Правая зона: действия, аватар.",
+            "type": "any"
           }
         ]
       },

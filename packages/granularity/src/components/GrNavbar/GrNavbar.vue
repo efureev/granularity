@@ -7,25 +7,53 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 
+import {
+  grNavbarRootClass,
+  navbarCenterClass,
+  navbarRightAlignClass,
+  navbarSideClass,
+  navbarSideGrowClass,
+  navbarTitleClass,
+} from './grNavbarStyles'
+
 /**
- * GrNavbar — верхняя панель приложения (header) с заголовком,
- * опциональной кнопкой меню (обычно — для мобильных) и правым слотом
- * для действий/аватара.
+ * GrNavbar — верхняя панель приложения (header) с тремя зонами: слева заголовок
+ * и кнопка меню, по центру — свободная зона (поиск, хлебные крошки), справа —
+ * действия и аватар.
  *
  * - Корень — `<header>` (landmark), без собственного `role`.
  * - `aria-label` кнопки меню локализуется через `useGranularityTranslations`.
  */
 export interface GrNavbarProps {
-  title: string
+  /** Заголовок строкой. Слот `#title` сильнее и позволяет обойтись без пропа. */
+  title?: string
   showMenuButton?: boolean
   /** Extra classes applied to the menu button wrapper (e.g. `sm:hidden`). */
   menuButtonClass?: string
+  /**
+   * Панель прилипает к верху при прокрутке. Слой — `--gr-z-navbar`: он ниже
+   * якорных панелей, чтобы открытый список не уезжал под шапку.
+   */
+  sticky?: boolean
 }
 
-withDefaults(defineProps<GrNavbarProps>(), {
+const props = withDefaults(defineProps<GrNavbarProps>(), {
+  title: undefined,
   showMenuButton: false,
   menuButtonClass: '',
+  sticky: false,
 })
+
+const slots = defineSlots<{
+  /** Заголовок целиком — вместо строки `title`. */
+  title?: () => unknown
+  /** Зона сразу после заголовка: вкладки, переключатель раздела. */
+  left?: () => unknown
+  /** Центральная зона: поиск, хлебные крошки. */
+  center?: () => unknown
+  /** Правая зона: действия, аватар. */
+  default?: () => unknown
+}>()
 
 const emit = defineEmits<{
   (e: 'menu'): void
@@ -34,14 +62,31 @@ const emit = defineEmits<{
 const { t } = useGranularityTranslations()
 
 const menuAriaLabel = computed(() => t('gr.navbar.openMenu', 'Open menu'))
+
+// Пустой блок заголовка съедал бы отступ ряда, поэтому рендерим его только при
+// наличии содержимого — проп `title` для этого не обязателен.
+const hasTitle = computed(() => Boolean(props.title || slots.title))
+
+const rootClass = computed(() => grNavbarRootClass(props.sticky))
+
+// С центральной зоной боковые делят остаток поровну — иначе «центр» уезжает
+// вслед за более широким боком. Без неё правая просто прижата к краю.
+const hasCenter = computed(() => Boolean(slots.center))
+
+const sideClass = computed(() => [navbarSideClass, hasCenter.value ? navbarSideGrowClass : ''])
+const rightClass = computed(() => [
+  navbarSideClass,
+  hasCenter.value ? `${navbarSideGrowClass} ${navbarRightAlignClass}` : 'ml-auto',
+])
 </script>
 
 <template>
   <header
     data-gr-navbar
-    class="h-[56px] border-b border-[var(--gr-brd)] bg-[var(--gr-bg)] flex items-center justify-between px-4 sm:px-6"
+    :data-sticky="sticky ? 'true' : undefined"
+    :class="rootClass"
   >
-    <div class="flex items-center gap-3">
+    <div data-gr-navbar-left :class="sideClass">
       <GrButton
         v-if="showMenuButton"
         data-gr-navbar-menu
@@ -56,14 +101,21 @@ const menuAriaLabel = computed(() => t('gr.navbar.openMenu', 'Open menu'))
           <IconMenu aria-hidden="true" />
         </GrIcon>
       </GrButton>
-      <div data-gr-navbar-title class="text-[14px] font-700">
+
+      <div v-if="hasTitle" data-gr-navbar-title :class="navbarTitleClass">
         <slot name="title">
           {{ title }}
         </slot>
       </div>
+
+      <slot name="left" />
     </div>
 
-    <div class="flex items-center gap-3">
+    <div v-if="hasCenter" data-gr-navbar-center :class="navbarCenterClass">
+      <slot name="center" />
+    </div>
+
+    <div data-gr-navbar-right :class="rightClass">
       <slot />
     </div>
   </header>

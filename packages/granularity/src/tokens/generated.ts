@@ -465,6 +465,12 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Кривая ускорения `in` для motion-паттернов дизайн-системы."
   },
   {
+    "name": "--gr-z-navbar",
+    "value": "900",
+    "section": "Layering: z-index scale",
+    "description": "Прилипшая шапка приложения. Ниже якорных панелей: шапка перекрывает контент, но не выпадашки, тултипы и модалки."
+  },
+  {
     "name": "--gr-z-dropdown",
     "value": "1000",
     "section": "Layering: z-index scale",

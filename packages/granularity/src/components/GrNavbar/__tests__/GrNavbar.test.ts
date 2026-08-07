@@ -72,3 +72,64 @@ describe('GrNavbar', () => {
     expect(wrapper.find('[data-action]').exists()).toBe(true)
   })
 })
+
+describe('GrNavbar — заголовок, зоны и прилипание', () => {
+  it('слот #title работает без пропа и не требует его', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrNavbar, {
+      slots: { title: '<a href="/">Granularity</a>' },
+    })
+
+    expect(wrapper.get('[data-gr-navbar-title]').text()).toBe('Granularity')
+    // Раньше `title` был обязательным, и разметка в слоте всё равно требовала строку.
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  it('без заголовка и слота блок заголовка не рендерится', () => {
+    const wrapper = mount(GrNavbar)
+
+    expect(wrapper.find('[data-gr-navbar-title]').exists()).toBe(false)
+  })
+
+  it('высота идёт от переменной, а не от литерала', () => {
+    const wrapper = mount(GrNavbar, { props: { title: 'App' } })
+
+    expect(wrapper.classes()).toContain('h-[var(--gr-navbar-height,56px)]')
+    expect(wrapper.html()).not.toMatch(/h-\[\d+px\]/)
+    expect(wrapper.get('[data-gr-navbar-title]').classes()).toContain('text-[length:var(--gr-text-sm)]')
+  })
+
+  it('sticky прилипает и берёт слой ниже якорных панелей', () => {
+    const plain = mount(GrNavbar, { props: { title: 'App' } })
+    expect(plain.classes()).not.toContain('sticky')
+    expect(plain.attributes('data-sticky')).toBeUndefined()
+
+    const sticky = mount(GrNavbar, { props: { title: 'App', sticky: true } })
+    expect(sticky.classes()).toContain('sticky')
+    expect(sticky.classes()).toContain('top-0')
+    // Не `--gr-z-modal`: шапка обязана оставаться под оверлеями.
+    expect(sticky.classes()).toContain('z-[var(--gr-z-navbar)]')
+  })
+
+  it('слоты #left и #center рендерятся, а без центра раскладка прежняя', () => {
+    const zoned = mount(GrNavbar, {
+      props: { title: 'App' },
+      slots: {
+        left: '<span data-test="left">Tabs</span>',
+        center: '<span data-test="center">Search</span>',
+        default: '<span data-test="right">Avatar</span>',
+      },
+    })
+
+    expect(zoned.get('[data-gr-navbar-left] [data-test="left"]').text()).toBe('Tabs')
+    expect(zoned.get('[data-gr-navbar-center] [data-test="center"]').text()).toBe('Search')
+    expect(zoned.get('[data-gr-navbar-right] [data-test="right"]').text()).toBe('Avatar')
+
+    const plain = mount(GrNavbar, { props: { title: 'App' }, slots: { default: '<span>Avatar</span>' } })
+    expect(plain.find('[data-gr-navbar-center]').exists()).toBe(false)
+    // Без центральной зоны правая всё равно прижата к краю.
+    expect(plain.get('[data-gr-navbar-right]').classes()).toContain('ml-auto')
+  })
+})

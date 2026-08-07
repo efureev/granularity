@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrNavbar`: `sticky`, `#left`/`#center` zones and a configurable height.** The bar can now stick to the top of the
+  page on the new `--gr-z-navbar` layer (900) — below anchored panels, so an open dropdown or modal covers the bar
+  instead of disappearing under it. `#center` adds a middle zone for search or breadcrumbs; when it is used the side
+  zones split the remainder evenly, because a lone `flex-1` centre is centred within the remainder and drifts after
+  the wider side. Height comes from `--gr-navbar-height` (default `56px`) instead of a hardcoded class.
 - **`GrNumberInput`: `clearable`, hold-to-repeat, `focus`/`blur`.** Holding a ± button now steps repeatedly (400 ms
   before the first repeat, then every 60 ms) and stops at the boundary, on release and when the pointer leaves;
   `clearable` adds a clear button that returns focus to the field and emits `clear`; `focus` and `blur` complete the
@@ -172,6 +177,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrNavbar` required a `title` even when its `#title` slot was used.** Markup in the slot still had to be paired
+  with a string prop, or Vue complained about a missing required prop — the showcase demo literally passed
+  `title="Ignored by slot"` to work around it. The prop is optional now, and without a title (string or slot) the
+  heading block is not rendered at all.
 - **`GrNumberInput`'s ± buttons stole focus.** `stepBy` ended with `focus()` on the field, so a keyboard user who
   tabbed to «+» lost the button after the first Enter and could not press it again. The step no longer touches focus;
   the field is focused only when the step came from the field itself.
