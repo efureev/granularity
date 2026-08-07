@@ -11,6 +11,7 @@ export type {
   GrSelectOptionsView,
   GrSelectProps,
   GrSelectSize,
+  GrSelectState,
   GrSelectUnderline,
   GrSelectVariant,
   GrSelectView,

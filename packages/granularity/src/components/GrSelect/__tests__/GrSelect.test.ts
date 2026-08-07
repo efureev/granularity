@@ -880,3 +880,49 @@ describe('GrSelect — события и состояния', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 })
+
+describe('GrSelect — визуальное состояние', () => {
+  const options = [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]
+
+  it('invalid красит рамку, а не только объявляет ошибку', () => {
+    const plain = mount(GrSelect, { props: { modelValue: 'a', options } })
+    expect(plain.get('select').classes()).toContain('border-[var(--gr-brd)]')
+
+    const invalid = mount(GrSelect, { props: { modelValue: 'a', options, invalid: true } })
+    const select = invalid.get('select')
+
+    expect(select.attributes('aria-invalid')).toBe('true')
+    // Раньше ошибка была слышна диктору, но не видна глазами.
+    expect(select.classes()).toContain('border-[var(--gr-danger)]')
+  })
+
+  it('state задаёт оттенок рамки, invalid его перебивает', () => {
+    const success = mount(GrSelect, { props: { modelValue: 'a', options, state: 'success' } })
+    expect(success.get('select').classes()).toContain('border-[var(--gr-success)]')
+
+    const warning = mount(GrSelect, { props: { modelValue: 'a', options, state: 'warning' } })
+    expect(warning.get('select').classes()).toContain('border-[var(--gr-warning)]')
+
+    const both = mount(GrSelect, { props: { modelValue: 'a', options, state: 'success', invalid: true } })
+    expect(both.get('select').classes()).toContain('border-[var(--gr-danger)]')
+    expect(both.get('select').classes()).not.toContain('border-[var(--gr-success)]')
+  })
+
+  it('в панельном режиме состояние достаётся триггеру', async () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: 'a', options, optionsView: 'panel', invalid: true },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.get('[data-gr-select-trigger]').classes()).toContain('border-[var(--gr-danger)]')
+    wrapper.unmount()
+  })
+
+  it('view="link" рамкой не красится — её там нет', () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: 'a', options, view: 'link', state: 'danger', invalid: true },
+    })
+
+    expect(wrapper.get('select').classes().some(cls => cls.startsWith('border-[var(--gr-danger)'))).toBe(false)
+  })
+})

@@ -41,6 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrSelect`: `state` and object values.** `state` (`default | success | warning | danger`) tints the border like
+  the rest of the form row, and `invalid` overrides it. Option values may now be objects: pass `valueKey` with the
+  name of the identifying field, and the component compares by that key instead of by reference — a model that arrives
+  from outside as a separate copy with the same `id` still matches its option. The object itself is emitted, not the
+  DOM string.
+- **`--gr-primary-text` joins the theme tokens.** The primary tone had no text-safe pair, so components painted text
+  with the saturated `--gr-primary`, which is not meant for it.
 - **`GrSegmented`: a segment can be busy.** `loading` on an option puts a spinner where its icon goes and marks the
   segment `aria-busy`; the segment stops accepting selection and arrow keys step over it. It deliberately does **not**
   get `aria-disabled` or the native `disabled`: a busy segment is available, it is just working — a distinction a
@@ -155,6 +162,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrSelect` showed an invalid field as a normal one.** `invalid` only ever reached `aria-invalid`: the border kept
+  its neutral colour, so an error was audible to a screen reader and invisible to everyone else. Every other control
+  of the form row has done this for a while.
+- **`GrSelect`: the `primary` link variant used the saturated tone as text colour.** It now uses `--gr-primary-text`,
+  hover and active included.
 - **`GrSegmented` ignored `readonly` on click.** The prop was declared, exposed as `aria-readonly` and honoured by the
   keyboard, but the click path never checked it — so a read-only control changed its value under the mouse. Both paths
   now share one guard.

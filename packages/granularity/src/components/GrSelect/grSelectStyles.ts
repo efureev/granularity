@@ -1,4 +1,4 @@
-import type { GrComponentSize } from '../shared/sizes'
+import type { GrComponentSize, GrControlState } from '../shared/sizes'
 
 export type GrSelectView = 'default' | 'link'
 export type GrSelectSize = GrComponentSize
@@ -11,7 +11,12 @@ export type GrSelectOptionsView = 'native' | 'panel'
  * должно однозначно восстанавливаться из своего строкового представления.
  * Объектные модели потребовали бы отдельного key-экстрактора — см. `docs/components.md`.
  */
-export type GrSelectValue = string | number
+/**
+ * Значение опции. Объект допустим, но тогда обязателен проп `valueKey`: в DOM
+ * значение живёт строкой, и без ключа объекты неотличимы друг от друга.
+ */
+export type GrSelectValue = string | number | object
+export type GrSelectState = GrControlState
 
 export type GrSelectOption<TValue extends GrSelectValue = string> = {
   value: TValue
@@ -29,7 +34,18 @@ export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string> =
   | GrSelectOptionGroup<TValue>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
-export const defaultBaseClass = 'w-full rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const defaultBaseClass = 'w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+/**
+ * Цвет рамки по состоянию — та же карта, что у `GrInput` и `GrTextarea`: поля
+ * одной формы обязаны показывать ошибку одинаково.
+ */
+export const borderClassByState: Record<GrSelectState, string> = {
+  default: 'border-[var(--gr-brd)]',
+  success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
+  warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
+  danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
+}
 export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 
@@ -51,15 +67,15 @@ export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
  * Ссылка — это ТЕКСТ на фоне страницы, поэтому опасный тон берётся из
  * `--gr-danger-text`, а не из насыщенного `--gr-danger` (последний под текст не
  * рассчитан). Hover/active выводятся подмесом `--gr-fg` — той же формулой, что
- * `GrLink`. У `primary` пары `-text` в системе нет, поэтому он остаётся на
- * `--gr-primary`, как и в `GrLink`.
+ * `GrLink`. `primary` берётся из `--gr-primary-text` по той же причине: на фоне
+ * страницы насыщенный `--gr-primary` под текст не рассчитан.
  *
  * Классы записаны литералами, а не собраны интерполяцией: safelist и скан
  * UnoCSS читают исходник, и вычисленная строка для них не класс.
  */
 export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = {
-  primary: 'text-[var(--gr-primary)] hover:text-[var(--gr-primary-hover)] active:text-[var(--gr-primary-active)]',
-  default: 'text-[var(--gr-fg)] hover:text-[var(--gr-primary)] active:text-[var(--gr-primary-active)]',
+  primary: 'text-[var(--gr-primary-text)] hover:text-[color-mix(in_srgb,var(--gr-primary-text)_92%,var(--gr-fg))] active:text-[color-mix(in_srgb,var(--gr-primary-text)_84%,var(--gr-fg))]',
+  default: 'text-[var(--gr-fg)] hover:text-[var(--gr-primary-text)] active:text-[color-mix(in_srgb,var(--gr-primary-text)_84%,var(--gr-fg))]',
   muted: 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] active:text-[var(--gr-fg)]',
   danger: 'text-[var(--gr-danger-text)] hover:text-[color-mix(in_srgb,var(--gr-danger-text)_92%,var(--gr-fg))] active:text-[color-mix(in_srgb,var(--gr-danger-text)_84%,var(--gr-fg))]',
 }
@@ -70,8 +86,8 @@ export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = 
  * т.к. видимая метка имеет `pointer-events-none` и не получает hover напрямую.
  */
 export const selectLinkNativeLabelVariantClassByVariant: Record<GrSelectVariant, string> = {
-  primary: 'text-[var(--gr-primary)] peer-hover:text-[var(--gr-primary-hover)] peer-active:text-[var(--gr-primary-active)]',
-  default: 'text-[var(--gr-fg)] peer-hover:text-[var(--gr-primary)] peer-active:text-[var(--gr-primary-active)]',
+  primary: 'text-[var(--gr-primary-text)] peer-hover:text-[color-mix(in_srgb,var(--gr-primary-text)_92%,var(--gr-fg))] peer-active:text-[color-mix(in_srgb,var(--gr-primary-text)_84%,var(--gr-fg))]',
+  default: 'text-[var(--gr-fg)] peer-hover:text-[var(--gr-primary-text)] peer-active:text-[color-mix(in_srgb,var(--gr-primary-text)_84%,var(--gr-fg))]',
   muted: 'text-[var(--gr-muted-fg)] peer-hover:text-[var(--gr-fg)] peer-active:text-[var(--gr-fg)]',
   danger: 'text-[var(--gr-danger-text)] peer-hover:text-[color-mix(in_srgb,var(--gr-danger-text)_92%,var(--gr-fg))] peer-active:text-[color-mix(in_srgb,var(--gr-danger-text)_84%,var(--gr-fg))]',
 }
@@ -136,6 +152,8 @@ export function grSelectClass(options: {
   disabled: boolean
   variant: GrSelectVariant
   underline: GrSelectUnderline
+  state?: GrSelectState
+  invalid?: boolean
 }): string {
   if (options.view === 'link') {
     return [
@@ -148,6 +166,8 @@ export function grSelectClass(options: {
 
   return [
     selectSizeClassBySize[options.size],
+    // `invalid` сильнее `state`: ошибка перекрывает любую другую подсветку.
+    options.invalid ? borderClassByState.danger : borderClassByState[options.state ?? 'default'],
     // Заблокированный контрол гасится фоном и цветом текста, а не `opacity`:
     // прозрачность разбавляет выверенные на AA токены и роняет контраст.
     'disabled:cursor-not-allowed disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-muted-fg)]',
@@ -161,6 +181,8 @@ export function grSelectNativeClass(options: {
   variant: GrSelectVariant
   underline: GrSelectUnderline
   showNativeChevron: boolean
+  state?: GrSelectState
+  invalid?: boolean
 }): string {
   return [
     grSelectClass(options),
@@ -177,6 +199,8 @@ export function grSelectTriggerClass(options: {
   disabled: boolean
   variant: GrSelectVariant
   underline: GrSelectUnderline
+  state?: GrSelectState
+  invalid?: boolean
 }): string {
   if (options.optionsView !== 'panel') {
     return grSelectClass(options)

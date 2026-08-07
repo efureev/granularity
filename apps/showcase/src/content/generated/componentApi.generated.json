@@ -7007,6 +7007,20 @@
             "default": "false"
           },
           {
+            "name": "state",
+            "description": "Визуальный оттенок рамки: `default | success | warning | danger`. `invalid` сильнее — ошибка перекрывает любую другую подсветку. В `view=\"link\"` рамки нет, и состояние туда не применяется.",
+            "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "valueKey",
+            "description": "Имя поля-идентификатора, когда значения опций — объекты. Без него объекты сравнивались бы по ссылке, и пришедшая снаружи копия с тем же `id` не совпала бы ни с одной опцией.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "required",
             "description": "Обязательное поле (`aria-required`).",
             "type": "boolean | undefined",

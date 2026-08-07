@@ -897,6 +897,15 @@ export const grThemeTokens: GrThemeToken[] = [
     }
   },
   {
+    "name": "--gr-primary-text",
+    "section": "Status roles",
+    "description": "Основной тон как ЦВЕТ ТЕКСТА на фоне страницы: насыщенный `--gr-primary` под текст не рассчитан и не проходит по контрасту.",
+    "values": {
+      "light": "#3730a3",
+      "dark": "#c7d2fe"
+    }
+  },
+  {
     "name": "--gr-success-text",
     "section": "Status roles",
     "description": "Текстовый оттенок для success-сообщений на светлой подложке.",

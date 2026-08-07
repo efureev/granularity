@@ -22,6 +22,7 @@ import {
   grSelectPanelClasses,
   grSelectTriggerClass,
   linkBaseClass,
+  type GrSelectState,
   type GrSelectModelValue,
   type GrSelectValue,
   type GrSelectOption,
@@ -41,6 +42,7 @@ export type {
   GrSelectOptionOrGroup,
   GrSelectOptionsView,
   GrSelectSize,
+  GrSelectState,
   GrSelectUnderline,
   GrSelectValue,
   GrSelectVariant,
@@ -59,6 +61,18 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   readonly?: boolean
   /** Визуальное и ARIA-состояние ошибки. */
   invalid?: boolean
+  /**
+   * Визуальный оттенок рамки: `default | success | warning | danger`. `invalid`
+   * сильнее — ошибка перекрывает любую другую подсветку. В `view="link"` рамки
+   * нет, и состояние туда не применяется.
+   */
+  state?: GrSelectState
+  /**
+   * Имя поля-идентификатора, когда значения опций — объекты. Без него объекты
+   * сравнивались бы по ссылке, и пришедшая снаружи копия с тем же `id` не
+   * совпала бы ни с одной опцией.
+   */
+  valueKey?: string
   /** Обязательное поле (`aria-required`). */
   required?: boolean
   ariaLabel?: string
@@ -131,6 +145,8 @@ const props = withDefaults(
     disabled: false,
     readonly: false,
     invalid: false,
+    state: 'default',
+    valueKey: undefined,
     required: false,
     ariaLabel: undefined,
     view: 'default',
@@ -238,6 +254,33 @@ const flatOptions = computed<GrSelectOption<TValue>[]>(() => {
 })
 
 /**
+ * Ключ значения: для объектов — поле `valueKey`, иначе само значение строкой.
+ * Через него идут все сравнения — `===` для объектов означал бы сравнение
+ * ссылок, а модель обычно приходит снаружи отдельной копией.
+ */
+function keyOf(value: unknown): string {
+  if (value !== null && typeof value === 'object') {
+    const key = props.valueKey
+    const own = key ? (value as Record<string, unknown>)[key] : undefined
+
+    if (own === undefined && import.meta.env?.DEV) {
+      console.warn(
+        '[granularity] GrSelect: объектные значения требуют `valueKey` с именем поля-идентификатора; '
+        + 'без него опции неотличимы друг от друга.',
+      )
+    }
+
+    return String(own ?? JSON.stringify(value))
+  }
+
+  return String(value)
+}
+
+function sameValue(a: unknown, b: unknown): boolean {
+  return keyOf(a) === keyOf(b)
+}
+
+/**
  * `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy:
  * прежняя проверка `if (!value)` теряла ноль вместе с пустой строкой.
  */
@@ -271,7 +314,7 @@ const hasSelection = computed(() => selectedValues.value.length > 0)
  */
 const valueByDomKey = computed<Map<string, TValue>>(() => {
   const map = new Map<string, TValue>()
-  for (const option of flatOptions.value) map.set(String(option.value), option.value)
+  for (const option of flatOptions.value) map.set(keyOf(option.value), option.value)
   return map
 })
 
@@ -284,24 +327,24 @@ function fromDomValue(raw: string): TValue {
 }
 
 const selectedOptions = computed<GrSelectOption<TValue>[]>(() => {
-  const byValue = new Map(flatOptions.value.map(o => [o.value, o]))
-  return selectedValues.value.map(v => byValue.get(v) ?? { value: v, label: String(v) })
+  const byValue = new Map(flatOptions.value.map(o => [keyOf(o.value), o]))
+  return selectedValues.value.map(v => byValue.get(keyOf(v)) ?? { value: v, label: keyOf(v) })
 })
 
 const hasModelInOptions = computed(() => {
   if (props.multiple) return false
-  return flatOptions.value.some((o) => o.value === modelSingle.value)
+  return flatOptions.value.some(o => sameValue(o.value, modelSingle.value))
 })
 
 const displayLabel = computed(() => {
   if (props.multiple) {
     if (!selectedValues.value.length) return ''
     return selectedValues.value
-      .map((v) => flatOptions.value.find((o) => o.value === v)?.label ?? v)
+      .map(v => flatOptions.value.find(o => sameValue(o.value, v))?.label ?? keyOf(v))
       .join(', ')
   }
 
-  return flatOptions.value.find((o) => o.value === modelSingle.value)?.label ?? modelSingle.value
+  return flatOptions.value.find(o => sameValue(o.value, modelSingle.value))?.label ?? modelSingle.value
 })
 
 const displayText = computed(() => {
@@ -494,12 +537,12 @@ const canAddCustom = computed(() => {
   if (!v) return false
 
   if (props.multiple) {
-    if (selectedValues.value.includes(v)) return false
-    return !flatOptions.value.some((o) => o.value === v)
+    if (selectedValues.value.some(selected => sameValue(selected, v))) return false
+    return !flatOptions.value.some(o => sameValue(o.value, v))
   }
 
-  if (v === modelSingle.value) return false
-  return !flatOptions.value.some((o) => o.value === v)
+  if (sameValue(v, modelSingle.value)) return false
+  return !flatOptions.value.some(o => sameValue(o.value, v))
 })
 
 function emitValue(value: GrSelectModelValue<TValue>): void {
@@ -510,11 +553,11 @@ function emitValue(value: GrSelectModelValue<TValue>): void {
 }
 
 function isSelected(value: TValue): boolean {
-  return selectedValues.value.includes(value)
+  return selectedValues.value.some(selected => sameValue(selected, value))
 }
 
 function isOptionDisabled(value: TValue): boolean {
-  return flatOptions.value.find(o => o.value === value)?.disabled === true
+  return flatOptions.value.find(o => sameValue(o.value, value))?.disabled === true
 }
 
 function selectValue(value: TValue): void {
@@ -533,7 +576,7 @@ function toggleValue(value: TValue): void {
   }
 
   const next = selectedValues.value.slice()
-  const idx = next.indexOf(value)
+  const idx = next.findIndex(selected => sameValue(selected, value))
   if (idx >= 0) {
     next.splice(idx, 1)
   }
@@ -606,6 +649,10 @@ const navigableItems = computed<{ value: TValue, index: number }[]>(() => {
 
 const navigableValues = computed<TValue[]>(() => navigableItems.value.map(item => item.value))
 
+function navigableIndexOf(value: TValue): number {
+  return navigableValues.value.findIndex(candidate => sameValue(candidate, value))
+}
+
 const activeItem = computed(() => (activeIndex.value >= 0 ? navigableItems.value[activeIndex.value] : undefined))
 const activeValue = computed(() => activeItem.value?.value)
 const activeDescendantId = computed(() =>
@@ -659,7 +706,7 @@ function typeahead(char: string): void {
   typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, 600)
 
   const idx = navigableValues.value.findIndex((v) => {
-    const opt = flatOptions.value.find(o => o.value === v)
+    const opt = flatOptions.value.find(o => sameValue(o.value, v))
     return opt?.label.toLowerCase().startsWith(typeaheadBuffer)
   })
   if (idx >= 0) setActive(idx)
@@ -759,7 +806,7 @@ const nativeClearOptionVisible = computed(() => {
   if (effectiveOptionsView.value !== 'native') return false
   if (props.multiple) return false
   if (!props.options) return true
-  return !flatOptions.value.some(o => o.value === '')
+  return !flatOptions.value.some(o => isEmptyValue(o.value))
 })
 
 const panelClearVisible = computed(() => {
@@ -777,6 +824,8 @@ const nativeClassName = computed(() => {
     variant: resolvedVariant.value,
     underline: resolvedUnderline.value,
     showNativeChevron: showNativeChevron.value,
+    state: props.state,
+    invalid: isInvalid.value,
   })
 })
 
@@ -807,6 +856,8 @@ const triggerClassName = computed(() => {
     disabled: isDisabled.value,
     variant: resolvedVariant.value,
     underline: resolvedUnderline.value,
+    state: props.state,
+    invalid: isInvalid.value,
   })
 })
 
@@ -869,16 +920,16 @@ const themeAttrs = useGrThemeAttrs()
       </option>
 
       <slot>
-        <option v-if="nativeCustomOptionVisible" :value="modelSingle" :selected="!multiple">
+        <option v-if="nativeCustomOptionVisible" :value="keyOf(modelSingle)" :selected="!multiple">
           {{ modelSingle }}
         </option>
         <template v-for="(item, index) in optionsResolved" :key="index">
           <optgroup v-if="isOptionGroup(item)" :label="item.label">
             <option
               v-for="opt in item.options"
-              :key="`${index}:${opt.value}`"
-              :value="opt.value"
-              :selected="multiple ? modelMultiple.includes(opt.value) : modelSingle === opt.value"
+              :key="`${index}:${keyOf(opt.value)}`"
+              :value="keyOf(opt.value)"
+              :selected="isSelected(opt.value)"
               :disabled="opt.disabled"
             >
               {{ opt.label }}
@@ -886,8 +937,8 @@ const themeAttrs = useGrThemeAttrs()
           </optgroup>
           <option
             v-else
-            :value="item.value"
-            :selected="multiple ? modelMultiple.includes(item.value) : modelSingle === item.value"
+            :value="keyOf(item.value)"
+            :selected="isSelected(item.value)"
             :disabled="item.disabled"
           >
             {{ item.label }}
@@ -988,7 +1039,7 @@ const themeAttrs = useGrThemeAttrs()
     >
       <span
         v-for="opt in visibleTagOptions"
-        :key="String(opt.value)"
+        :key="keyOf(opt.value)"
         data-gr-select-tag
         class="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-[var(--gr-radius-sm)] bg-[var(--gr-muted)] py-0.5 pl-2 pr-1 text-[length:var(--gr-text-xs)] text-[var(--gr-fg)]"
       >
@@ -1144,7 +1195,7 @@ const themeAttrs = useGrThemeAttrs()
                     })"
                     @mousedown.prevent
                     @click="toggleValue(child.option.value)"
-                    @mousemove="activeIndex = navigableValues.indexOf(child.option.value)"
+                    @mousemove="activeIndex = navigableIndexOf(child.option.value)"
                   >
                     <slot name="option" :option="child.option" :selected="isSelected(child.option.value)">
                       <span class="flex items-center gap-2 min-w-0">
@@ -1176,7 +1227,7 @@ const themeAttrs = useGrThemeAttrs()
                   })"
                   @mousedown.prevent
                   @click="toggleValue(row.option.value)"
-                  @mousemove="activeIndex = navigableValues.indexOf(row.option.value)"
+                  @mousemove="activeIndex = navigableIndexOf(row.option.value)"
                 >
                   <slot name="option" :option="row.option" :selected="isSelected(row.option.value)">
                     <span class="flex items-center gap-2 min-w-0">

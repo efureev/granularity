@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrSelect from '../GrSelect.vue'
 
@@ -87,5 +87,74 @@ describe('GrSelect<TValue> — числовые значения', () => {
     await wrapper.get('select').setValue('a')
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('a')
+  })
+})
+
+describe('GrSelect — объектные значения', () => {
+  type Team = { id: number, title: string }
+
+  const teams: Team[] = [
+    { id: 1, title: 'Platform' },
+    { id: 2, title: 'Growth' },
+  ]
+
+  const options = teams.map(team => ({ value: team, label: team.title }))
+
+  it('выбирает объект и показывает его метку', async () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: teams[0], options, valueKey: 'id' },
+    })
+
+    const select = wrapper.get('select')
+    expect((select.element as HTMLSelectElement).value).toBe('1')
+
+    await select.setValue('2')
+    // Наружу уходит сам объект, а не строка из DOM.
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([teams[1]])
+  })
+
+  it('сравнивает по ключу, а не по ссылке', () => {
+    // Модель обычно приходит отдельной копией — с `===` она не нашлась бы.
+    const copy = { id: 2, title: 'Growth' }
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: copy, options, valueKey: 'id' },
+    })
+
+    expect((wrapper.get('select').element as HTMLSelectElement).value).toBe('2')
+  })
+
+  it('множественный выбор снимает отметку с копии значения', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: [{ id: 1, title: 'Platform' }],
+        options,
+        valueKey: 'id',
+        multiple: true,
+        optionsView: 'panel',
+      },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+    await nextTick()
+
+    const first = document.body.querySelector('[role="option"]') as HTMLElement
+    expect(first.getAttribute('aria-selected')).toBe('true')
+
+    first.click()
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
+    wrapper.unmount()
+  })
+
+  it('без valueKey предупреждает и не склеивает объекты', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(GrSelect, { props: { modelValue: teams[0], options } })
+
+    expect(warn).toHaveBeenCalled()
+    expect(warn.mock.calls[0][0]).toContain('valueKey')
+    warn.mockRestore()
   })
 })

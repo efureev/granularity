@@ -1,5 +1,6 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  borderClassByState,
   defaultBaseClass,
   grSelectLinkNativeLabelBaseClass,
   grSelectLinkNativeLabelDisabledClass,
@@ -23,6 +24,7 @@ import {
 // оболочки, link-режима, native-overlay и панели. Хелпер уезжает в общий
 // `dist/chunks/`, вне области скана компонента — гейт `src/__tests__/safelist.test.ts`.
 export const grSelectSafelist = [...new Set([
+  ...Object.values(borderClassByState).flatMap(splitClassTokens),
   ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
   ...splitClassTokens(defaultBaseClass),
   ...splitClassTokens(linkBaseClass),
