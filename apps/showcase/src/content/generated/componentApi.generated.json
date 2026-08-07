@@ -4868,6 +4868,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "variant",
+            "description": "Поверхность списка — вариант карточки под ним. `ghost` убирает рамку и тень: список внутри уже существующей карточки не должен давать вторую.",
+            "type": "GrCardVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "loading",
             "description": "Идёт загрузка: вместо пунктов — строки-скелетоны, контейнер помечен `aria-busy`.",
             "type": "boolean | undefined",

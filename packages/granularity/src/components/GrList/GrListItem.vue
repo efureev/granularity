@@ -3,10 +3,12 @@ import { computed, markRaw, useSlots, type Component } from 'vue'
 
 import {
   grListItemPaddingClass,
+  itemDescriptionClass,
   itemDisabledClass,
   itemHoverClass,
   itemInteractiveClass,
   itemLayoutClass,
+  itemTitleClass,
   type GrListItemDensity,
 } from './grListStyles'
 
@@ -94,14 +96,14 @@ function onClick(event: MouseEvent): void {
         <slot name="prefix" />
       </div>
       <div class="min-w-0 flex-1">
-        <div v-if="hasTitle" class="text-[13px] font-700">
+        <div v-if="hasTitle" :class="itemTitleClass">
           <slot name="title">
 {{ title }}
 </slot>
         </div>
         <div
           v-if="hasDescription"
-          class="text-[13px] text-[var(--gr-muted-fg)] mt-0.5"
+          :class="itemDescriptionClass"
         >
           <slot name="description">
 {{ description }}
@@ -125,14 +127,14 @@ function onClick(event: MouseEvent): void {
       <slot name="prefix" />
     </div>
     <div class="min-w-0 flex-1">
-      <div v-if="hasTitle" class="text-[13px] font-700">
+      <div v-if="hasTitle" :class="itemTitleClass">
         <slot name="title">
 {{ title }}
 </slot>
       </div>
       <div
         v-if="hasDescription"
-        class="text-[13px] text-[var(--gr-muted-fg)] mt-0.5"
+        :class="itemDescriptionClass"
       >
         <slot name="description">
 {{ description }}

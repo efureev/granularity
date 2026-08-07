@@ -41,6 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrList`: the surface is now selectable.** `variant` reaches the `GrCard` the list draws underneath, so
+  `variant="ghost"` drops the border and the shadow for a list placed inside an existing card instead of stacking a
+  card in a card. Without the prop the card keeps resolving its variant from `GrConfigProvider`.
 - **i18n:** `gr.breadcrumbs.label` and `gr.breadcrumbs.expand` in all three locales.
 
 ### Changed
@@ -56,6 +59,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `region`, so five sections of one form produced five landmarks and buried the useful ones. The name is now attached
   only when `landmark` is set; structure is carried by the heading. The description keeps its `aria-describedby` link
   in both modes.
+- **`GrList`: the item title, the item description and the empty state moved from `13px` literals to
+  `--gr-text-sm`.** They are 1px larger than before and follow the theme's type scale; the hierarchy inside a row is
+  carried by weight and colour. Both class strings live in `grListStyles.ts` and are declared in the safelist, so the
+  two branches of a row cannot drift apart.
 - **`GrFormSection`: the description moved from a `13px` literal to `--gr-text-sm`.** It is 1px larger than before —
   the title and the description now share a size, and the hierarchy is carried by weight and colour.
 

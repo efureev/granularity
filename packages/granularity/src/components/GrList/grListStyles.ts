@@ -28,7 +28,11 @@ export const itemDisabledClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[
 
 export const dividedClass = 'divide-y divide-[var(--gr-brd)]'
 
-export const emptyClass = 'px-4 py-6 text-center text-[13px] text-[var(--gr-muted-fg)]'
+export const emptyClass = 'px-4 py-6 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
+
+/** Заголовок и описание строки. Оба нужны обеим веткам пункта — интерактивной и обычной. */
+export const itemTitleClass = 'text-[length:var(--gr-text-sm)] font-700'
+export const itemDescriptionClass = 'mt-0.5 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
 
 export const loadingRowClass = 'px-4 py-3'
 

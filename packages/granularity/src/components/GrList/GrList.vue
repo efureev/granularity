@@ -2,6 +2,7 @@
 import { computed, useSlots } from 'vue'
 
 import GrCard from '../GrCard'
+import type { GrCardVariant } from '../GrCard/grCardStyles'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -9,6 +10,11 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { dividedClass, emptyClass, loadingRowClass } from './grListStyles'
 
 export interface GrListProps {
+  /**
+   * Поверхность списка — вариант карточки под ним. `ghost` убирает рамку и
+   * тень: список внутри уже существующей карточки не должен давать вторую.
+   */
+  variant?: GrCardVariant
   /** Показывать ли горизонтальные разделители между элементами (по умолчанию — да). */
   divided?: boolean
   /** Идёт загрузка: вместо пунктов — строки-скелетоны, контейнер помечен `aria-busy`. */
@@ -26,6 +32,9 @@ export interface GrListProps {
 }
 
 const props = withDefaults(defineProps<GrListProps>(), {
+  // Дефолт живёт в `GrCard` (и его резолвере `GrConfigProvider`), поэтому здесь
+  // остаётся `undefined` — иначе список перебивал бы настройку карточки.
+  variant: undefined,
   divided: true,
   loading: false,
   loadingRows: 3,
@@ -57,7 +66,7 @@ const loadingRowCount = computed(() => Math.max(1, Math.trunc(props.loadingRows)
 </script>
 
 <template>
-  <GrCard>
+  <GrCard :variant="variant">
     <div
       data-gr-list
       role="list"

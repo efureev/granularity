@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrList, { GrListItem } from '..'
 
 describe('GrList', () => {
@@ -220,5 +222,51 @@ describe('GrListItem — кликабельная строка', () => {
 
     expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
     expect(wrapper.classes()).toContain('hover:bg-[var(--gr-muted)]')
+  })
+})
+
+describe('GrList — поверхность и типографика', () => {
+  const sizeToken = 'text-[length:var(--gr-text-sm)]'
+
+  it('variant доходит до карточки под списком', () => {
+    const wrapper = mount(GrList, { props: { variant: 'ghost' }, slots: { default: '<div>row</div>' } })
+
+    const card = wrapper.get('[data-gr-card]')
+    expect(card.classes()).not.toContain('shadow-sm')
+    expect(card.classes()).not.toContain('border')
+  })
+
+  it('без пропа вариант карточки берётся из GrConfigProvider', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrList },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrCard: { variant: 'outlined' } }">
+          <GrList><div>row</div></GrList>
+        </GrConfigProvider>
+      `,
+    })
+
+    const card = mount(Harness).get('[data-gr-card]')
+    expect(card.classes()).toContain('border')
+    expect(card.classes()).not.toContain('shadow-sm')
+  })
+
+  it('заголовок и описание строки размечены токеном --gr-text-sm в обеих ветках', () => {
+    const plain = mount(GrListItem, { props: { title: 'Row', description: 'Sub' } })
+    const interactive = mount(GrListItem, { props: { title: 'Row', description: 'Sub', href: '/docs' } })
+
+    // Заголовок и описание — по одному вхождению на каждую ветку: разметка
+    // веток продублирована, и счёт ловит их расхождение.
+    for (const wrapper of [plain, interactive]) {
+      const html = wrapper.html()
+      expect(html.split(sizeToken)).toHaveLength(3)
+      expect(html).not.toContain('text-[13px]')
+    }
+  })
+
+  it('пустое состояние тоже идёт от токена', () => {
+    const wrapper = mount(GrList)
+
+    expect(wrapper.get('[data-gr-list-empty]').classes()).toContain(sizeToken)
   })
 })
