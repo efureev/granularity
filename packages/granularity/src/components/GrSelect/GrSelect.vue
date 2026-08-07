@@ -18,6 +18,7 @@ import {
   grSelectLinkNativeLabelClass,
   grSelectLinkNativeOverlayClass,
   grSelectNativeClass,
+  grSelectOptionClass,
   grSelectPanelClasses,
   grSelectTriggerClass,
   linkBaseClass,
@@ -441,6 +442,49 @@ const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
   return items
 })
 
+/**
+ * Строки панели для рендера: заголовок группы больше не сосед опций, а их
+ * контейнер. Прямыми потомками `role="listbox"` обязаны быть только опции, а
+ * заголовок даёт имя группе через `aria-labelledby`.
+ *
+ * `index` — позиция опции в `panelItems`: из неё строится `id`, поэтому он не
+ * зависит от значения (значение с пробелом дало бы невалидный `id`).
+ */
+type GrSelectPanelOptionRow<TItemValue extends GrSelectValue> = {
+  option: GrSelectOption<TItemValue>
+  key: string
+  index: number
+}
+
+type GrSelectPanelRow<TItemValue extends GrSelectValue> =
+  | { kind: 'group', label: string, key: string, options: GrSelectPanelOptionRow<TItemValue>[] }
+  | ({ kind: 'option' } & GrSelectPanelOptionRow<TItemValue>)
+
+const panelRows = computed<GrSelectPanelRow<TValue>[]>(() => {
+  const rows: GrSelectPanelRow<TValue>[] = []
+  let currentGroup: Extract<GrSelectPanelRow<TValue>, { kind: 'group' }> | undefined
+
+  panelItems.value.forEach((item, index) => {
+    if (item.kind === 'group') {
+      currentGroup = { kind: 'group', label: item.label, key: item.key, options: [] }
+      rows.push(currentGroup)
+      return
+    }
+
+    const row: GrSelectPanelOptionRow<TValue> = { option: item.option, key: item.key, index }
+
+    if (item.groupKey && currentGroup && currentGroup.key === item.groupKey) {
+      currentGroup.options.push(row)
+      return
+    }
+
+    currentGroup = undefined
+    rows.push({ kind: 'option', ...row })
+  })
+
+  return rows
+})
+
 const canAddCustom = computed(() => {
   if (!props.allowCustomValue) return false
   if (effectiveOptionsView.value !== 'panel') return false
@@ -534,8 +578,12 @@ function tagRemoveLabel(option: GrSelectOption<TValue>): string {
 const listboxId = useId()
 const activeIndex = ref(-1)
 
-function optionDomId(value: GrSelectValue): string {
-  return `${listboxId}-opt-${value}`
+/**
+ * Id опции строится от позиции в списке: значение с пробелом дало бы невалидный
+ * `id`, а `aria-activedescendant` — два токена вместо одной ссылки.
+ */
+function optionDomId(index: number): string {
+  return `${listboxId}-opt-${index}`
 }
 
 /** Заголовок группы читается вместе с опцией — через `aria-describedby`. */
@@ -543,16 +591,25 @@ function groupLabelId(groupKey: string): string {
   return `${listboxId}-${groupKey}`
 }
 
-// Навигируемые (видимые, не-disabled) опции панели в порядке рендера.
-const navigableValues = computed<TValue[]>(() =>
-  panelItems.value
-    .filter((item): item is Extract<GrSelectPanelItem<TValue>, { kind: 'option' }> => item.kind === 'option' && !item.option.disabled)
-    .map(item => item.option.value),
-)
+// Навигируемые (видимые, не-disabled) опции панели в порядке рендера вместе с
+// их позицией в `panelItems` — по ней строится `id` для `aria-activedescendant`.
+const navigableItems = computed<{ value: TValue, index: number }[]>(() => {
+  const items: { value: TValue, index: number }[] = []
 
-const activeValue = computed(() => (activeIndex.value >= 0 ? navigableValues.value[activeIndex.value] : undefined))
+  panelItems.value.forEach((item, index) => {
+    if (item.kind === 'option' && !item.option.disabled)
+      items.push({ value: item.option.value, index })
+  })
+
+  return items
+})
+
+const navigableValues = computed<TValue[]>(() => navigableItems.value.map(item => item.value))
+
+const activeItem = computed(() => (activeIndex.value >= 0 ? navigableItems.value[activeIndex.value] : undefined))
+const activeValue = computed(() => activeItem.value?.value)
 const activeDescendantId = computed(() =>
-  open.value && activeValue.value !== undefined ? optionDomId(activeValue.value) : undefined,
+  open.value && activeItem.value ? optionDomId(activeItem.value.index) : undefined,
 )
 
 /**
@@ -574,10 +631,9 @@ function clampActive(index: number): number {
 
 async function scrollActiveIntoView(): Promise<void> {
   await nextTick()
-  const value = activeValue.value
-  if (value === undefined) return
-  const el = document.getElementById(optionDomId(value))
-  el?.scrollIntoView?.({ block: 'nearest' })
+  const id = activeDescendantId.value
+  if (!id) return
+  document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
 }
 
 function setActive(index: number): void {
@@ -663,10 +719,24 @@ onBeforeUnmount(() => {
 
 watch(
   open,
-  async (isOpen) => {
+  async (isOpen, wasOpen) => {
     if (!isOpen) {
       internalSearch.value = ''
       activeIndex.value = -1
+
+      // Панель с полем поиска забирает фокус себе; на закрытии поле исчезает, и
+      // без возврата фокус уезжает на `<body>` — клавиатурный пользователь
+      // оказывается в начале документа. Возвращаем только если фокус ещё внутри
+      // панели: пользователь мог уйти дальше сам.
+      //
+      // `wasOpen` отсекает первый вызов (`immediate: true`): на сервере DOM нет,
+      // да и красть фокус при монтировании компонент не должен.
+      if (wasOpen) {
+        const active = document.activeElement
+        if (active instanceof HTMLElement && panelEl.value?.contains(active))
+          focus()
+      }
+
       return
     }
 
@@ -999,9 +1069,12 @@ const themeAttrs = useGrThemeAttrs()
               data-gr-select-loading
               class="flex items-center justify-center gap-2 px-3 py-4 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
               role="status"
+              aria-live="polite"
             >
-              <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
-              <span>{{ resolvedLoadingText }}</span>
+              <slot name="loading">
+                <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+                <span>{{ resolvedLoadingText }}</span>
+              </slot>
             </div>
 
             <div
@@ -1013,6 +1086,12 @@ const themeAttrs = useGrThemeAttrs()
               role="listbox"
               :aria-multiselectable="multiple ? 'true' : undefined"
             >
+              <!--
+                Прямые потомки listbox — только опции и группы: роль объявляет
+                остальных недопустимыми детьми (`aria-required-children`).
+                `mousedown.prevent` держит фокус на триггере или в поле поиска —
+                контракт combobox с `aria-activedescendant`.
+              -->
               <button
                 v-if="canAddCustom"
                 data-testid="gr-select-add-option"
@@ -1020,66 +1099,113 @@ const themeAttrs = useGrThemeAttrs()
                 type="button"
                 role="option"
                 aria-selected="false"
-                class="rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]" :class="[
-                  view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
-                ]"
+                tabindex="-1"
+                :class="grSelectOptionClass({ view, disabled: false, active: false })"
+                @mousedown.prevent
                 @click="addCustom"
               >
                 {{ t('gr.select.addOption', 'Add "{value}"', { value: customValue.trim() }) }}
               </button>
 
-              <template v-for="item in panelItems" :key="item.key">
+              <template v-for="row in panelRows" :key="row.key">
+                <!-- Группа: заголовок внутри неё и даёт ей имя. -->
                 <div
-                  v-if="item.kind === 'group'"
-                  :id="groupLabelId(item.key)"
-                  data-gr-select-group-label
-                  role="presentation"
-                  class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
-                    view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
-                  ]"
+                  v-if="row.kind === 'group'"
+                  data-gr-select-group
+                  role="group"
+                  :aria-labelledby="groupLabelId(row.key)"
                 >
-                  {{ item.label }}
+                  <div
+                    :id="groupLabelId(row.key)"
+                    data-gr-select-group-label
+                    role="presentation"
+                    class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
+                      view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
+                    ]"
+                  >
+                    {{ row.label }}
+                  </div>
+
+                  <button
+                    v-for="child in row.options"
+                    :id="optionDomId(child.index)"
+                    :key="child.key"
+                    data-gr-select-option
+                    type="button"
+                    role="option"
+                    tabindex="-1"
+                    :disabled="child.option.disabled"
+                    :aria-selected="isSelected(child.option.value) ? 'true' : 'false'"
+                    :aria-disabled="child.option.disabled ? 'true' : undefined"
+                    :class="grSelectOptionClass({
+                      view,
+                      disabled: !!child.option.disabled,
+                      active: activeValue === child.option.value,
+                    })"
+                    @mousedown.prevent
+                    @click="toggleValue(child.option.value)"
+                    @mousemove="activeIndex = navigableValues.indexOf(child.option.value)"
+                  >
+                    <slot name="option" :option="child.option" :selected="isSelected(child.option.value)">
+                      <span class="flex items-center gap-2 min-w-0">
+                        <span
+                          class="inline-block h-4 w-4 shrink-0"
+                          :class="isSelected(child.option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
+                          aria-hidden="true"
+                        />
+                        <span class="truncate">{{ child.option.label }}</span>
+                      </span>
+                    </slot>
+                  </button>
                 </div>
 
                 <button
                   v-else
-                  :id="optionDomId(item.option.value)"
+                  :id="optionDomId(row.index)"
                   data-gr-select-option
                   type="button"
                   role="option"
-                  :disabled="item.option.disabled"
-                  :aria-selected="isSelected(item.option.value) ? 'true' : 'false'"
-                  :aria-disabled="item.option.disabled ? 'true' : undefined"
-                  :aria-describedby="item.groupKey ? groupLabelId(item.groupKey) : undefined"
-                  class="rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)]" :class="[
-                    view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : 'w-full',
-                    item.option.disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]',
-                    activeValue === item.option.value && !item.option.disabled ? 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]' : '',
-                  ]"
-                  @click="toggleValue(item.option.value)"
-                  @mousemove="activeIndex = navigableValues.indexOf(item.option.value)"
+                  tabindex="-1"
+                  :disabled="row.option.disabled"
+                  :aria-selected="isSelected(row.option.value) ? 'true' : 'false'"
+                  :aria-disabled="row.option.disabled ? 'true' : undefined"
+                  :class="grSelectOptionClass({
+                    view,
+                    disabled: !!row.option.disabled,
+                    active: activeValue === row.option.value,
+                  })"
+                  @mousedown.prevent
+                  @click="toggleValue(row.option.value)"
+                  @mousemove="activeIndex = navigableValues.indexOf(row.option.value)"
                 >
-                  <slot name="option" :option="item.option" :selected="isSelected(item.option.value)">
+                  <slot name="option" :option="row.option" :selected="isSelected(row.option.value)">
                     <span class="flex items-center gap-2 min-w-0">
                       <span
                         class="inline-block h-4 w-4 shrink-0"
-                        :class="isSelected(item.option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
+                        :class="isSelected(row.option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
                         aria-hidden="true"
                       />
-                      <span class="truncate">{{ item.option.label }}</span>
+                      <span class="truncate">{{ row.option.label }}</span>
                     </span>
                   </slot>
                 </button>
               </template>
+            </div>
 
-              <!-- Пустой результат фильтрации (без add-custom-варианта). -->
-              <div
-                v-if="!panelItems.length && !canAddCustom"
-                data-gr-select-empty
-                class="px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
-              >
+            <!--
+              Пустой результат живёт вне listbox — и объявляется, а не молчит:
+              `aria-label` на generic-элементе диктор игнорирует.
+            -->
+            <div
+              v-if="!loading && !panelItems.length && !canAddCustom"
+              data-gr-select-empty
+              class="px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
+              role="status"
+              aria-live="polite"
+            >
+              <slot name="empty">
                 {{ resolvedNoResultsText }}
-              </div>
+              </slot>
             </div>
           </div>
         </div>

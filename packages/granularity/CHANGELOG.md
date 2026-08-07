@@ -44,6 +44,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrSelect`: Tab used to walk into the option list instead of leaving the widget.** Options are
+  `<button role="option">` and were focusable, so Tab from the trigger went into the panel and then through every
+  option — the opposite of the combobox contract, where focus stays on the trigger and the active option is named by
+  `aria-activedescendant`. They are `tabindex="-1"` now, and `mousedown` on an option is prevented so picking with the
+  mouse cannot drop focus.
+- **`GrSelect`: the option list was not a valid `listbox`.** A group heading and the empty-result block were direct
+  children of `role="listbox"` (`aria-required-children`). Group options now live inside their own `role="group"` named
+  by the heading, and the empty result moved out into a `role="status" aria-live="polite"` region next to the loading
+  one — which also gives both states the announcement they never had. New slots `#empty` and `#loading` replace them.
+- **`GrSelect`: a filterable panel dropped focus on close.** The search field inside the panel takes focus while the
+  panel is open; when it closed, the field was destroyed and focus landed on `<body>`, putting a keyboard user back at
+  the start of the document. Focus returns to the trigger — but only if it is still inside the panel.
+- **`GrSelect`: an option id was built from its value.** A value containing a space produced an invalid id, and
+  `aria-activedescendant` pointed at two tokens instead of one reference. Ids follow the position in the list now.
+- **`GrSelect`: disabled styling no longer uses `opacity`.** The disabled control and the disabled option are muted
+  with tokens, like `GrInput`; the `danger` variant of `view="link"` moved from the saturated `--gr-danger` to the
+  paired `--gr-danger-text` (hover and active are derived from it the same way `GrLink` does it).
 - **`GrTree`: `appendNode` into a node without children didn't show up.** The adapter returned the freshly created array
   instead of reading it back through the data object, so `push` went past reactivity and the new child appeared only
   after an unrelated re-render.

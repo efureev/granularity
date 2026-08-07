@@ -47,11 +47,21 @@ export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
   lg: 'text-[16px]',
 }
 
+/**
+ * Ссылка — это ТЕКСТ на фоне страницы, поэтому опасный тон берётся из
+ * `--gr-danger-text`, а не из насыщенного `--gr-danger` (последний под текст не
+ * рассчитан). Hover/active выводятся подмесом `--gr-fg` — той же формулой, что
+ * `GrLink`. У `primary` пары `-text` в системе нет, поэтому он остаётся на
+ * `--gr-primary`, как и в `GrLink`.
+ *
+ * Классы записаны литералами, а не собраны интерполяцией: safelist и скан
+ * UnoCSS читают исходник, и вычисленная строка для них не класс.
+ */
 export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = {
   primary: 'text-[var(--gr-primary)] hover:text-[var(--gr-primary-hover)] active:text-[var(--gr-primary-active)]',
   default: 'text-[var(--gr-fg)] hover:text-[var(--gr-primary)] active:text-[var(--gr-primary-active)]',
   muted: 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] active:text-[var(--gr-fg)]',
-  danger: 'text-[var(--gr-danger)] hover:text-[var(--gr-danger-hover)] active:text-[var(--gr-danger-active)]',
+  danger: 'text-[var(--gr-danger-text)] hover:text-[color-mix(in_srgb,var(--gr-danger-text)_92%,var(--gr-fg))] active:text-[color-mix(in_srgb,var(--gr-danger-text)_84%,var(--gr-fg))]',
 }
 
 /**
@@ -63,7 +73,7 @@ export const selectLinkNativeLabelVariantClassByVariant: Record<GrSelectVariant,
   primary: 'text-[var(--gr-primary)] peer-hover:text-[var(--gr-primary-hover)] peer-active:text-[var(--gr-primary-active)]',
   default: 'text-[var(--gr-fg)] peer-hover:text-[var(--gr-primary)] peer-active:text-[var(--gr-primary-active)]',
   muted: 'text-[var(--gr-muted-fg)] peer-hover:text-[var(--gr-fg)] peer-active:text-[var(--gr-fg)]',
-  danger: 'text-[var(--gr-danger)] peer-hover:text-[var(--gr-danger-hover)] peer-active:text-[var(--gr-danger-active)]',
+  danger: 'text-[var(--gr-danger-text)] peer-hover:text-[color-mix(in_srgb,var(--gr-danger-text)_92%,var(--gr-fg))] peer-active:text-[color-mix(in_srgb,var(--gr-danger-text)_84%,var(--gr-fg))]',
 }
 
 function selectLinkUnderlineClass(options: { underline: GrSelectUnderline, disabled: boolean }): string {
@@ -99,7 +109,7 @@ export const grSelectLinkNativeOverlayClass = 'peer absolute inset-0 w-full h-fu
  * Получает все link-стили (size/variant/underline), а также focus-ring через `peer-focus-visible`.
  */
 export const grSelectLinkNativeLabelBaseClass = 'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[6px] transition-colors duration-150'
-export const grSelectLinkNativeLabelDisabledClass = 'opacity-60 text-[var(--gr-muted-fg)] no-underline'
+export const grSelectLinkNativeLabelDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)] no-underline'
 export const grSelectLinkNativeLabelFocusClass = 'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--gr-ring)]'
 
 export function grSelectLinkNativeLabelClass(options: {
@@ -132,13 +142,15 @@ export function grSelectClass(options: {
       selectLinkSizeClassBySize[options.size],
       selectLinkUnderlineClass({ underline: options.underline, disabled: options.disabled }),
       selectLinkVariantClassByVariant[options.variant],
-      'disabled:opacity-60 disabled:cursor-not-allowed disabled:text-[var(--gr-muted-fg)] disabled:no-underline',
+      'disabled:cursor-not-allowed disabled:text-[var(--gr-muted-fg)] disabled:no-underline',
     ].join(' ')
   }
 
   return [
     selectSizeClassBySize[options.size],
-    'disabled:opacity-50 disabled:cursor-not-allowed',
+    // Заблокированный контрол гасится фоном и цветом текста, а не `opacity`:
+    // прозрачность разбавляет выверенные на AA токены и роняет контраст.
+    'disabled:cursor-not-allowed disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-muted-fg)]',
   ].join(' ')
 }
 
@@ -184,3 +196,29 @@ export function grSelectTriggerClass(options: {
 }
 
 export const grSelectPanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+
+/** Общая подсветка наведения и активной опции панели. */
+const selectOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
+
+export const selectOptionBaseClass = 'rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)]'
+export const selectOptionLinkWidthClass = 'block min-w-full w-max whitespace-nowrap'
+export const selectOptionWidthClass = 'w-full'
+export const selectOptionEnabledClass = `hover:${selectOptionHighlight}`
+export const selectOptionActiveClass = selectOptionHighlight
+/** Выключенная опция гасится токеном текста — по той же причине, что и контрол. */
+export const selectOptionDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
+
+export function grSelectOptionClass(options: {
+  view: GrSelectView
+  disabled: boolean
+  active: boolean
+}): string {
+  return [
+    selectOptionBaseClass,
+    options.view === 'link' ? selectOptionLinkWidthClass : selectOptionWidthClass,
+    options.disabled ? selectOptionDisabledClass : selectOptionEnabledClass,
+    !options.disabled && options.active ? selectOptionActiveClass : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}

@@ -7079,9 +7079,19 @@
             "type": "{ selectedOptions: GrSelectOption<TValue>[]; selectedValues: TValue[]; displayLabel: string | TValue; placeholder: string | undefined; hasSelection: boolean; }"
           },
           {
+            "name": "loading",
+            "description": "",
+            "type": "{}"
+          },
+          {
             "name": "option",
             "description": "",
             "type": "{ option: GrSelectOption<TValue>; selected: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{}"
           }
         ]
       },

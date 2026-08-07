@@ -1,0 +1,170 @@
+import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { afterEach, describe, expect, it } from 'vitest'
+
+import GrSelect from '../GrSelect.vue'
+
+/**
+ * Контракт панели-combobox: фокус живёт на триггере (или в поле поиска), список
+ * состоит только из опций, состояния объявляются живым регионом. Всё через
+ * `document`, потому что панель уезжает телепортом.
+ */
+
+const OPTIONS = [
+  { value: 'vue', label: 'Vue' },
+  { value: 'react', label: 'React' },
+  { value: 'svelte', label: 'Svelte', disabled: true },
+]
+
+const GROUPED = [
+  { label: 'Frontend', options: [{ value: 'vue', label: 'Vue' }, { value: 'react', label: 'React' }] },
+  { label: 'Backend', options: [{ value: 'go', label: 'Go' }] },
+]
+
+afterEach(() => {
+  document.body.innerHTML = ''
+})
+
+function mountPanel(props: Record<string, unknown> = {}) {
+  return mount(GrSelect, {
+    props: {
+      modelValue: '',
+      optionsView: 'panel',
+      ariaLabel: 'Stack',
+      options: OPTIONS,
+      ...props,
+    },
+    attachTo: document.body,
+  })
+}
+
+function options(): HTMLButtonElement[] {
+  return [...document.querySelectorAll<HTMLButtonElement>('[data-gr-select-option]')]
+}
+
+describe('GrSelect — панель как listbox', () => {
+  it('опции не табируемы: Tab уходит из виджета, а не в панель', async () => {
+    const wrapper = mountPanel()
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    expect(options()).toHaveLength(3)
+    expect(options().every(el => el.getAttribute('tabindex') === '-1')).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('прямые потомки listbox — только опции', async () => {
+    const wrapper = mountPanel()
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    const listbox = document.querySelector('[data-gr-select-listbox]')!
+    expect([...listbox.children].map(child => child.getAttribute('role'))).toEqual(['option', 'option', 'option'])
+
+    wrapper.unmount()
+  })
+
+  it('группа объявлена группой и получает имя от своего заголовка', async () => {
+    const wrapper = mountPanel({ options: GROUPED })
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    const listbox = document.querySelector('[data-gr-select-listbox]')!
+    expect([...listbox.children].map(child => child.getAttribute('role'))).toEqual(['group', 'group'])
+
+    const group = listbox.querySelector('[role="group"]')!
+    const labelId = group.getAttribute('aria-labelledby')!
+    expect(document.getElementById(labelId)?.textContent?.trim()).toBe('Frontend')
+    expect(group.querySelectorAll('[role="option"]')).toHaveLength(2)
+
+    wrapper.unmount()
+  })
+
+  it('пустой результат живёт вне списка и объявляется', async () => {
+    const wrapper = mountPanel({ options: [] })
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    const empty = document.querySelector('[data-gr-select-empty]')!
+    expect(empty.getAttribute('role')).toBe('status')
+    expect(empty.getAttribute('aria-live')).toBe('polite')
+    expect(document.querySelector('[data-gr-select-listbox] [data-gr-select-empty]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('загрузка объявляется живым регионом', async () => {
+    const wrapper = mountPanel({ loading: true, options: [] })
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    const loading = document.querySelector('[data-gr-select-loading]')!
+    expect(loading.getAttribute('role')).toBe('status')
+    expect(loading.getAttribute('aria-live')).toBe('polite')
+
+    wrapper.unmount()
+  })
+
+  it('слоты `#empty` и `#loading` подменяют состояния', async () => {
+    const empty = mount(GrSelect, {
+      props: { modelValue: '', optionsView: 'panel', ariaLabel: 'S', options: [] },
+      slots: { empty: '<span data-custom-empty>Пусто</span>' },
+      attachTo: document.body,
+    })
+    await empty.get('[data-gr-select-trigger]').trigger('click')
+    expect(document.querySelector('[data-custom-empty]')).toBeTruthy()
+    empty.unmount()
+    document.body.innerHTML = ''
+
+    const loading = mount(GrSelect, {
+      props: { modelValue: '', optionsView: 'panel', ariaLabel: 'S', options: [], loading: true },
+      slots: { loading: '<span data-custom-loading>Грузим</span>' },
+      attachTo: document.body,
+    })
+    await loading.get('[data-gr-select-trigger]').trigger('click')
+    expect(document.querySelector('[data-custom-loading]')).toBeTruthy()
+    loading.unmount()
+  })
+
+  it('id опции не зависит от значения: пробел в значении не рвёт aria-activedescendant', async () => {
+    const wrapper = mountPanel({ options: [{ value: 'new york', label: 'New York' }] })
+    const trigger = wrapper.get('[data-gr-select-trigger]')
+
+    await trigger.trigger('click')
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+
+    const active = trigger.attributes('aria-activedescendant')!
+    expect(active).not.toContain(' ')
+    expect(document.getElementById(active)).toBe(options()[0])
+
+    wrapper.unmount()
+  })
+
+  it('выбор мышью не уводит фокус с триггера', async () => {
+    const wrapper = mountPanel()
+    const trigger = wrapper.get<HTMLElement>('[data-gr-select-trigger]')
+    trigger.element.focus()
+    await trigger.trigger('click')
+
+    // Нативная кнопка забрала бы фокус на mousedown — панель закрывается, и он
+    // уезжает на `<body>`.
+    const event = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    options()[0].dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+
+    options()[0].click()
+    await nextTick()
+
+    expect(document.activeElement).toBe(trigger.element)
+
+    wrapper.unmount()
+  })
+
+  it('выключенная опция гасится токеном, а не прозрачностью', async () => {
+    const wrapper = mountPanel()
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    const disabled = options()[2]
+    expect(disabled.className).toContain('text-[var(--gr-muted-fg)]')
+    expect(disabled.className).not.toContain('opacity-50')
+
+    wrapper.unmount()
+  })
+})

@@ -184,3 +184,64 @@ test.describe('панель автокомплита', () => {
     await expect(input).toBeFocused()
   })
 })
+
+/**
+ * Панель селекта: тот же случай, что и у автокомплита — сканирующий страницу
+ * axe до неё не доходит, потому что в закрытом виде она `display: none`.
+ */
+test.describe('панель селекта', () => {
+  async function openPanel(page: import('@playwright/test').Page) {
+    await page.goto(componentPath('GrSelect'))
+    await page.locator('#live-examples').waitFor()
+
+    // Демо приезжают асинхронно и сдвигают страницу: ждём весь набор и при
+    // промахе повторяем клик.
+    const triggers = page.locator('[data-gr-select-trigger]')
+    await expect.poll(async () => triggers.count()).toBeGreaterThan(3)
+
+    const trigger = triggers.first()
+    await expect.poll(async () => {
+      if (await trigger.getAttribute('aria-expanded') !== 'true') await trigger.click()
+      return trigger.getAttribute('aria-expanded')
+    }).toBe('true')
+
+    const listboxId = await trigger.getAttribute('aria-controls')
+    const panel = page.locator(`[data-gr-select-panel]:has(#${listboxId})`)
+    await expect(panel.locator('[data-gr-select-option]').first()).toBeVisible()
+
+    return { trigger, panel }
+  }
+
+  test('открытая панель проходит axe', async ({ page }) => {
+    const { panel } = await openPanel(page)
+
+    const results = await new AxeBuilder({ page })
+      .include('[data-gr-select-panel]')
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze()
+
+    const blocking = results.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))
+    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
+    await expect(panel).toBeVisible()
+  })
+
+  test('Tab уходит из виджета, а не в панель', async ({ page }) => {
+    const { trigger } = await openPanel(page)
+
+    await page.keyboard.press('Tab')
+
+    await expect(trigger).not.toBeFocused()
+    const focusedInPanel = await page.evaluate(() =>
+      Boolean(document.activeElement?.closest('[data-gr-select-panel]')),
+    )
+    expect(focusedInPanel).toBe(false)
+  })
+
+  test('выбор мышью оставляет фокус на триггере', async ({ page }) => {
+    const { trigger, panel } = await openPanel(page)
+
+    await panel.locator('[data-gr-select-option]').first().click()
+    await expect(panel).toBeHidden()
+    await expect(trigger).toBeFocused()
+  })
+})
