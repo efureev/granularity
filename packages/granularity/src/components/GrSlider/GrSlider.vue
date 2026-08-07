@@ -5,6 +5,7 @@ import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
   sliderFillClass,
@@ -15,14 +16,19 @@ import {
   sliderThumbClass,
   sliderTooltipClass,
   sliderTrackHeightBySize,
+  sliderTrackVerticalLengthClass,
+  sliderTrackWidthBySize,
+  sliderFillOrientationClass,
   type GrSliderMarks,
   type GrSliderModelValue,
+  type GrSliderOrientation,
   type GrSliderSize,
 } from './grSliderStyles'
 
 export type {
   GrSliderMarks,
   GrSliderModelValue,
+  GrSliderOrientation,
   GrSliderSize,
 } from './grSliderStyles'
 
@@ -54,8 +60,16 @@ export interface GrSliderProps {
   marks?: GrSliderMarks
   /** Всплывающее значение над бегунком: `true`/`'hover'` — при hover/drag/focus, `'always'` — всегда. */
   showTooltip?: boolean | 'always' | 'hover'
-  /** Форматирование значения в tooltip. */
+  /** Форматирование значения в tooltip. Оно же уходит в `aria-valuetext`. */
   formatTooltip?: (value: number) => string
+  /** Ориентация дорожки. В вертикальной минимум внизу. */
+  orientation?: GrSliderOrientation
+  /**
+   * Эмитить `update:modelValue` только по завершении жеста: во время
+   * перетаскивания значение ведёт сам слайдер. Клавиатура коммитит сразу —
+   * нажатие клавиши дискретно, придерживать его нечего.
+   */
+  lazy?: boolean
   ariaLabel?: string
 }
 
@@ -74,14 +88,20 @@ const props = withDefaults(
     marks: undefined,
     showTooltip: false,
     formatTooltip: undefined,
+    orientation: 'horizontal',
+    lazy: false,
     ariaLabel: undefined,
   },
 )
 
+const { t } = useGranularityTranslations()
+
+const isVertical = computed(() => props.orientation === 'vertical')
+
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, {
   component: 'GrSlider',
-  supported: ['sm', 'md', 'lg'],
+  supported: ['xs', 'sm', 'md', 'lg'],
 })
 
 const emit = defineEmits<{
@@ -134,8 +154,12 @@ function percent(value: number): number {
   return ((clamp(value) - props.min) / span.value) * 100
 }
 
+// Черновик жеста: при `lazy` значение до отпускания живёт здесь, а наружу не
+// уходит — иначе смысл режима теряется.
+const draftValues = ref<number[] | null>(null)
+
 // ————— Значения бегунков как массив (single = один бегунок).
-const values = computed<number[]>(() => {
+const modelValues = computed<number[]>(() => {
   if (props.range) {
     const v = Array.isArray(props.modelValue) ? props.modelValue : [props.min, props.min]
     return [snap(v[0] ?? props.min), snap(v[1] ?? props.min)]
@@ -144,13 +168,28 @@ const values = computed<number[]>(() => {
   return [snap(v)]
 })
 
+const values = computed<number[]>(() => draftValues.value ?? modelValues.value)
+
+const trackClass = computed(() => (isVertical.value
+  ? `${sliderTrackWidthBySize[resolvedSize.value]} ${sliderTrackVerticalLengthClass}`
+  : `w-full ${sliderTrackHeightBySize[resolvedSize.value]}`))
+
+/** Смещение вдоль дорожки: по горизонтали слева, по вертикали снизу. */
+function offsetStyle(value: number): Record<string, string> {
+  return isVertical.value ? { bottom: `${percent(value)}%` } : { left: `${percent(value)}%` }
+}
+
 const fillStyle = computed(() => {
-  if (props.range) {
-    const lo = Math.min(percent(values.value[0]), percent(values.value[1]))
-    const hi = Math.max(percent(values.value[0]), percent(values.value[1]))
-    return { left: `${lo}%`, right: `${100 - hi}%` }
-  }
-  return { left: '0%', right: `${100 - percent(values.value[0])}%` }
+  const start = props.range
+    ? Math.min(percent(values.value[0]), percent(values.value[1]))
+    : 0
+  const end = props.range
+    ? Math.max(percent(values.value[0]), percent(values.value[1]))
+    : percent(values.value[0])
+
+  return isVertical.value
+    ? { bottom: `${start}%`, top: `${100 - end}%` }
+    : { left: `${start}%`, right: `${100 - end}%` }
 })
 
 // ————— Метки делений.
@@ -182,6 +221,14 @@ function setThumb(index: number, value: number, commit: boolean): void {
     else next[1] = Math.max(next[1], next[0])
   }
 
+  // `lazy` придерживает только непрерывный жест: `commit` приходит от клавиатуры
+  // и от отпускания, и там значение уходит наружу как обычно.
+  if (props.lazy && !commit) {
+    draftValues.value = next
+    return
+  }
+
+  draftValues.value = null
   emitValue(next, commit)
 }
 
@@ -189,21 +236,39 @@ function setThumb(index: number, value: number, commit: boolean): void {
 const activeThumb = ref<number | null>(null)
 const hoveredThumb = ref<number | null>(null)
 
-function valueFromClientX(clientX: number): number {
+function valueFromPointer(event: { clientX: number, clientY: number }): number {
   const rect = trackEl.value?.getBoundingClientRect()
-  if (!rect || rect.width === 0) return props.min
-  const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
-  return props.min + ratio * span.value
+  if (!rect) return props.min
+
+  // В вертикали минимум внизу, поэтому доля отсчитывается от нижнего края.
+  const ratio = isVertical.value
+    ? (rect.height === 0 ? 0 : 1 - (event.clientY - rect.top) / rect.height)
+    : (rect.width === 0 ? 0 : (event.clientX - rect.left) / rect.width)
+
+  return props.min + Math.min(1, Math.max(0, ratio)) * span.value
 }
 
+/**
+ * Какой бегунок повезёт клик. При равенстве расстояний берём верхний: иначе
+ * схлопнувшийся в точку диапазон не развести мышью — нижний бегунок упирается
+ * в верхний и оба стоят на месте.
+ */
 function nearestThumb(value: number): number {
   if (!props.range) return 0
-  return Math.abs(value - values.value[0]) <= Math.abs(value - values.value[1]) ? 0 : 1
+
+  const [lo, hi] = values.value
+  if (value < lo) return 0
+  if (value > hi) return 1
+
+  return Math.abs(value - lo) < Math.abs(value - hi) ? 0 : 1
 }
 
 function onTrackPointerDown(event: PointerEvent): void {
   if (isDisabled.value || isReadonly.value) return
-  const value = valueFromClientX(event.clientX)
+  // Только основная кнопка: правый и средний клик перетаскиванием не считаются.
+  if (event.button !== 0) return
+
+  const value = valueFromPointer(event)
   const index = nearestThumb(value)
   activeThumb.value = index
   // Фокусируем активный бегунок сразу — чтобы клавиатура работала после клика по
@@ -218,13 +283,15 @@ function onTrackPointerDown(event: PointerEvent): void {
 function onPointerMove(event: PointerEvent): void {
   if (activeThumb.value === null) return
   event.preventDefault()
-  setThumb(activeThumb.value, valueFromClientX(event.clientX), false)
+  setThumb(activeThumb.value, valueFromPointer(event), false)
 }
 
 function onPointerUp(): void {
   if (activeThumb.value !== null) {
-    // Финальный commit значения.
-    emitValue(values.value.slice(), true)
+    // Финальный commit значения: у `lazy` он же и единственный `update:modelValue`.
+    const next = values.value.slice()
+    draftValues.value = null
+    emitValue(next, true)
   }
   activeThumb.value = null
   window.removeEventListener('pointermove', onPointerMove)
@@ -283,38 +350,55 @@ const showTooltipFor = (index: number): boolean => {
 }
 
 function thumbAriaLabel(index: number): string | undefined {
-  if (props.ariaLabel) return props.range ? `${props.ariaLabel} (${index === 0 ? 'min' : 'max'})` : props.ariaLabel
-  return undefined
+  if (!props.ariaLabel) return undefined
+  if (!props.range) return props.ariaLabel
+
+  const bound = index === 0 ? t('gr.slider.min', 'min') : t('gr.slider.max', 'max')
+  return `${props.ariaLabel} (${bound})`
+}
+
+// `aria-valuetext` нужен, только когда число само по себе не читается: «1200»
+// против «$1 200». Без своего формата атрибут не добавляем.
+function thumbValueText(value: number): string | undefined {
+  return props.formatTooltip ? props.formatTooltip(value) : undefined
 }
 </script>
 
 <template>
   <div
     data-gr-slider
-    :class="sliderRootClass({ size: resolvedSize, disabled, hasMarks: normalizedMarks.length > 0 })"
+    :data-orientation="orientation"
+    :class="sliderRootClass({ size: resolvedSize, disabled: isDisabled, hasMarks: normalizedMarks.length > 0, orientation })"
   >
     <div
       ref="trackEl"
       data-gr-slider-track
-      class="relative w-full"
-      :class="sliderTrackHeightBySize[resolvedSize]"
+      class="relative"
+      :class="trackClass"
       @pointerdown="onTrackPointerDown"
     >
       <div :class="sliderRailClass" />
-      <div data-gr-slider-fill :class="sliderFillClass" :style="fillStyle" />
+      <div
+        data-gr-slider-fill
+        :class="[sliderFillClass(isDisabled), sliderFillOrientationClass[orientation]]"
+        :style="fillStyle"
+      />
 
       <!-- Метки делений. -->
       <template v-for="mark in normalizedMarks" :key="mark.value">
         <span
           data-gr-slider-mark
-          :class="sliderMarkTickClass"
-          :style="{ left: `${percent(mark.value)}%` }"
+          :class="sliderMarkTickClass(orientation)"
+          :style="offsetStyle(mark.value)"
           aria-hidden="true"
         />
+        <!-- Подпись метки дублирует значение, которое диктор читает с бегунка:
+             как отдельный текст внутри слайдера она только мешает. -->
         <span
           data-gr-slider-mark-label
-          :class="sliderMarkLabelClassFor(percent(mark.value))"
-          :style="{ left: `${percent(mark.value)}%` }"
+          :class="sliderMarkLabelClassFor(percent(mark.value), { orientation, disabled: isDisabled })"
+          :style="offsetStyle(mark.value)"
+          aria-hidden="true"
         >
           {{ mark.label }}
         </span>
@@ -328,14 +412,15 @@ function thumbAriaLabel(index: number): string | undefined {
         :ref="(el) => { if (el) thumbEls[index] = el as HTMLElement }"
         data-gr-slider-thumb
         :data-testid="`gr-slider-thumb-${index}`"
-        :class="sliderThumbClass({ size: resolvedSize, disabled })"
-        :style="{ left: `${percent(value)}%` }"
+        :class="sliderThumbClass({ size: resolvedSize, disabled: isDisabled, orientation })"
+        :style="offsetStyle(value)"
         role="slider"
-        :tabindex="disabled ? -1 : 0"
+        :tabindex="isDisabled ? -1 : 0"
         :aria-valuemin="range && index === 1 ? values[0] : min"
         :aria-valuemax="range && index === 0 ? values[1] : max"
         :aria-valuenow="value"
-        :aria-orientation="'horizontal'"
+        :aria-valuetext="thumbValueText(value)"
+        :aria-orientation="orientation"
         :aria-label="thumbAriaLabel(index)"
         :aria-disabled="isDisabled ? 'true' : undefined"
         :aria-invalid="isInvalid ? 'true' : undefined"
@@ -351,7 +436,7 @@ function thumbAriaLabel(index: number): string | undefined {
         <span
           v-if="showTooltipFor(index)"
           data-gr-slider-tooltip
-          :class="sliderTooltipClass"
+          :class="sliderTooltipClass(orientation)"
         >
           {{ tooltipText(value) }}
         </span>

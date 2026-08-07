@@ -76,6 +76,10 @@
   "switch": {
     "loading": "Saving…"
   },
+  "slider": {
+    "min": "min",
+    "max": "max"
+  },
   "sidebar": {
     "expand": "Expand sidebar",
     "collapse": "Collapse sidebar"

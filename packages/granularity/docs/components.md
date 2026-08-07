@@ -74,7 +74,7 @@
 - [`GrSelect`](./components/GrSelect.md)
 - [`GrSidebar`](./components/GrSidebar.md)
 - `GrSkeleton`
-- `GrSlider`
+- [`GrSlider`](./components/GrSlider.md)
 - [`GrStatistic`](./components/GrStatistic.md)
 - [`GrSwitch`](./components/GrSwitch.md)
 - [`GrTable`](./components/GrTable.md)

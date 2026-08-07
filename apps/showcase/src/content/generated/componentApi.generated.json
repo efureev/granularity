@@ -7480,6 +7480,13 @@
             "default": "undefined"
           },
           {
+            "name": "orientation",
+            "description": "Ориентация дорожки. В вертикальной минимум внизу.",
+            "type": "\"horizontal\" | \"vertical\" | undefined",
+            "required": false,
+            "default": "\"horizontal\""
+          },
+          {
             "name": "range",
             "description": "Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`.",
             "type": "boolean | undefined",
@@ -7523,10 +7530,17 @@
           },
           {
             "name": "formatTooltip",
-            "description": "Форматирование значения в tooltip.",
+            "description": "Форматирование значения в tooltip. Оно же уходит в `aria-valuetext`.",
             "type": "((value: number) => string) | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "lazy",
+            "description": "Эмитить `update:modelValue` только по завершении жеста: во время перетаскивания значение ведёт сам слайдер. Клавиатура коммитит сразу — нажатие клавиши дискретно, придерживать его нечего.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "modelValue",

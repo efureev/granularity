@@ -77,6 +77,10 @@
   "switch": {
     "loading": "Guardando…"
   },
+  "slider": {
+    "min": "mínimo",
+    "max": "máximo"
+  },
   "sidebar": {
     "expand": "Expandir panel",
     "collapse": "Contraer panel"

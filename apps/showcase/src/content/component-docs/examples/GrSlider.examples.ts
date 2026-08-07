@@ -91,6 +91,8 @@ import { GrSlider } from '@feugene/granularity'
 const brand = ref(65)
 const accent = ref(40)
 const large = ref(70)
+const volume = ref(35)
+const budget = ref(1200)
 </script>
 
 <template>
@@ -127,6 +129,35 @@ const large = ref(70)
         '--gr-slider-track-height': '0.75rem',
       }"
     />
+
+    <div class="flex items-start gap-10">
+      <!-- Вертикальная дорожка: минимум внизу, длина — через --gr-slider-length. -->
+      <GrSlider
+        v-model="volume"
+        orientation="vertical"
+        aria-label="Volume"
+        show-tooltip
+        :marks="{ 0: 'Mute', 50: 'Half', 100: 'Max' }"
+        :style="{ '--gr-slider-length': '12rem' }"
+      />
+
+      <!-- lazy: значение уезжает наружу только на отпускании. -->
+      <div class="grid flex-1 gap-2">
+        <GrSlider
+          v-model="budget"
+          lazy
+          :min="0"
+          :max="5000"
+          :step="50"
+          aria-label="Monthly budget"
+          show-tooltip
+          :format-tooltip="(value) => \`$\${value.toLocaleString('en-US')}\`"
+        />
+        <div class="text-sm text-[var(--gr-muted-fg)]">
+          Committed value: <span class="font-medium text-[var(--gr-fg)]">\${{ budget.toLocaleString('en-US') }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>`,
     note: 'Переменные наследуются, поэтому одну тему слайдеров можно задать на контейнере формы, а отдельные слайдеры точечно переопределить.',

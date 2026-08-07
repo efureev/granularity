@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrSlider`: vertical orientation and `lazy`.** `orientation="vertical"` puts the minimum at the bottom, moves the
+  tooltip aside (above the thumb it would sit on the track) and the mark labels to the right; the track's length is a
+  new customisation point, `--gr-slider-length`. `lazy` holds `update:modelValue` until the gesture ends — one event on
+  release instead of one per mouse move — while the keyboard still commits immediately, because a key press is
+  discrete and there is nothing to hold back.
 - **New `GrSidebarGroup` — sections with a heading.** Fifteen navigation items in a row are unreadable; a group is
   announced as `role="group"` and tied to its heading through `aria-labelledby`. In a collapsed sidebar the heading has
   nowhere to go: it is removed (along with the `aria-labelledby` that would otherwise point at nothing) and the
@@ -106,6 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `app.use(granularityToastPlugin, { maxToasts: 50 })` — dropping the oldest ones and clearing their timers.
 - **`GrToaster`: the toast title and message moved from `13px` literals to `--gr-text-sm`.**
 - **`GrSidebar`: the header, the collapsed-item letter and the badge moved from px literals to `--gr-text-*`.**
+- **`GrSlider` accepts `xs` from `GrConfigProvider`.** The `xs` classes existed while the component still declared
+  `supported: ['sm', 'md', 'lg']`, so a global `size="xs"` silently fell back to `md`.
 - **`GrTreeSelect`: the panel's loading and empty rows moved from `13px` literals to `--gr-text-sm`.**
 - **`GrTabs` scrolls an overflowing row instead of wrapping it.** A wrapped row pushed tabs under the panel and broke
   the alignment; the row now scrolls horizontally with the scrollbar hidden, and the active tab pulls itself into view
@@ -144,6 +151,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrSlider` announced range bounds in English only.** «min» / «max» were baked into the thumb's accessible name
+  past the i18n layer, so a Russian user heard «Громкость (min)». They now come from `gr.slider.min` / `gr.slider.max`,
+  added to all three locales.
+- **A collapsed range could not be pulled apart with the mouse.** When both thumbs met at one point, a click always
+  went to the lower one, which was already blocked by the upper — so the range stayed collapsed unless you reached for
+  the keyboard. A click now goes to the thumb on the side you clicked.
+- **Right and middle clicks started a drag.** `pointerdown` did not check `event.button`; only the primary button
+  moves the slider now.
+- **`aria-valuetext` was missing.** With a `formatTooltip` of «$1 200» a screen reader still read the bare number; the
+  formatted text is now exposed. Without a custom format the attribute stays absent — a plain number needs no help.
+- **`aria-orientation` was hardcoded to `horizontal`** and now follows the prop.
+- **Mark labels were read out as stray text.** The ticks were `aria-hidden` but their labels were not, so a screen
+  reader announced them on top of the value it already reads from the thumb.
+- **`GrSlider` dimmed its disabled state with `opacity`.** The fill, the thumb and the mark labels now use the
+  `--gr-disabled-*` tokens.
 - **`GrSidebar`'s toggle button spoke English in every locale.** «Expand sidebar» / «Collapse sidebar» were hardcoded
   past the i18n layer, and the only way out was passing `toggleLabel` by hand. The default now comes from
   `gr.sidebar.expand` / `gr.sidebar.collapse`, added to all three locales.
