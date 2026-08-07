@@ -247,7 +247,6 @@
     "mimeType": "У файла «{fileName}» недопустимый тип «{mimeType}»",
     "mimeTypeFallback": "У файла «{fileName}» неопределённый тип «{mimeType}»",
     "maxFileSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
-    "maxSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
     "maxCount": "Выбрано слишком много файлов ({count}), максимум — {maxCount}",
     "maxTotalSize": "Суммарный размер файлов слишком большой ({total} байт), максимум {maxBytes}"
   },

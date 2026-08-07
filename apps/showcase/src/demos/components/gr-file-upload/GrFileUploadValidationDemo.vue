@@ -5,7 +5,7 @@ import type { GrFileUploadExtraData, GrFileUploadRequestCtx } from '@feugene/gra
 import {
   GrFileUpload,
   acceptValidator,
-  maxSizeMbValidator,
+  maxFileSize,
 } from '@feugene/granularity'
 
 const lastResult = ref('No uploads yet')
@@ -35,7 +35,7 @@ function onError(error: unknown) {
   <div class="grid gap-3">
     <GrFileUpload
       :request="request"
-      :validators="[acceptValidator('image/*,.pdf'), maxSizeMbValidator(2)]"
+      :validators="[acceptValidator('image/*,.pdf'), maxFileSize({ mb: 2 })]"
       :upload-extra-data="() => ({ bucket: 'showcase' })"
       show-file-list
       @success="onSuccess"

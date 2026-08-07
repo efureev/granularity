@@ -18,8 +18,7 @@ Entrypoint:
 - `allowedExtensionsValidator`
 - `allowedMimeTypesValidator`
 - `maxCountValidator`
-- `maxFileSizeBytesValidator`
-- `maxSizeMbValidator`
+- `maxFileSize`
 - `maxTotalSizeBytesValidator`
 - типы из `types.ts`, включая `FileValidator`, `FileValidatorInput`, `FileValidationIssue`, `FileValidationIssueCode`
 
@@ -51,13 +50,13 @@ Entrypoint:
 ```ts
 import {
   acceptValidator,
-  maxFileSizeBytesValidator,
+  maxFileSize,
   runFileValidators,
 } from '@feugene/granularity/fileValidation'
 
 const validators = [
   acceptValidator('image/*,.pdf'),
-  maxFileSizeBytesValidator(5 * 1024 * 1024),
+  maxFileSize({ mb: 5 }),
 ]
 
 const files = [file]
@@ -78,7 +77,9 @@ if (result.issues.length > 0) {
 - `acceptValidator` — если вы опираетесь на строку `accept` и хотите повторить браузерно-ожидаемое поведение на уровне логики.
 - `allowedExtensionsValidator` — если важен whitelisting по расширениям.
 - `allowedMimeTypesValidator` — если важен whitelisting по MIME type.
-- `maxFileSizeBytesValidator` / `maxSizeMbValidator` — если нужно ограничение на размер одного файла.
+- `maxFileSize` — если нужно ограничение на размер одного файла. Предел задаётся тем способом, каким он
+  приходит: `{ bytes }` из документации API, `{ mb }` из UI-конфига. Код ошибки один — `maxFileSize`, поэтому
+  обработчику потребителя не приходится ветвиться по тому, в чём набран лимит.
 - `maxTotalSizeBytesValidator` — если нужно ограничение на суммарный размер набора файлов.
 - `maxCountValidator` — если нужно ограничение на количество файлов в наборе (`limit` у `GrFormFile` — сахар к нему).
 

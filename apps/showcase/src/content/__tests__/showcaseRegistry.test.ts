@@ -99,8 +99,7 @@ describe('showcase content registry', () => {
       'acceptValidator',
       'allowedExtensionsValidator',
       'allowedMimeTypesValidator',
-      'maxFileSizeBytesValidator',
-      'maxSizeMbValidator',
+      'maxFileSize',
       'maxTotalSizeBytesValidator',
     ])
 

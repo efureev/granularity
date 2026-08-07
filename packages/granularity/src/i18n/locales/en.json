@@ -245,7 +245,6 @@
     "mimeType": "File \"{fileName}\" has disallowed mime type \"{mimeType}\"",
     "mimeTypeFallback": "File \"{fileName}\" has fallback mime type \"{mimeType}\"",
     "maxFileSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
-    "maxSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
     "maxCount": "Too many files selected ({count}), maxCount={maxCount}",
     "maxTotalSize": "Total files size is too large ({total} bytes), maxTotalSizeBytes={maxBytes}"
   },

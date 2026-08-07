@@ -246,7 +246,6 @@
     "mimeType": "El archivo «{fileName}» tiene un tipo MIME no permitido «{mimeType}»",
     "mimeTypeFallback": "El archivo «{fileName}» tiene un tipo MIME indefinido «{mimeType}»",
     "maxFileSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
-    "maxSize": "El archivo «{fileName}» es demasiado grande ({size} bytes), máximo {maxBytes}",
     "maxCount": "Se han seleccionado demasiados archivos ({count}), máximo: {maxCount}",
     "maxTotalSize": "El tamaño total de los archivos es demasiado grande ({total} bytes), máximo {maxBytes}"
   },

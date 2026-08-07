@@ -14,7 +14,7 @@ import type { GrFileUploadExtraData, GrFileUploadRequestCtx } from '@feugene/gra
 import {
   GrFileUpload,
   acceptValidator,
-  maxSizeMbValidator,
+  maxFileSize,
 } from '@feugene/granularity'
 
 const lastResult = ref('No uploads yet')
@@ -44,7 +44,7 @@ function onError(error: unknown) {
   <div class="grid gap-3">
     <GrFileUpload
       :request="request"
-      :validators="[acceptValidator('image/*,.pdf'), maxSizeMbValidator(2)]"
+      :validators="[acceptValidator('image/*,.pdf'), maxFileSize({ mb: 2 })]"
       :upload-extra-data="() => ({ bucket: 'showcase' })"
       show-file-list
       @success="onSuccess"
@@ -123,6 +123,7 @@ import { ref } from 'vue'
 import { GrFileUpload } from '@feugene/granularity'
 
 const message = ref('Try selecting more than one file in the active uploader')
+const submitted = ref([new File(['contract'], 'contract.pdf', { type: 'application/pdf' })])
 
 async function request(files: File[]) {
   message.value = \`Uploaded \${files.length} file(s)\`
@@ -135,7 +136,7 @@ function onExceed(files: File[], limit: number) {
 </script>
 
 <template>
-  <div class="grid gap-4 lg:grid-cols-2">
+  <div class="grid gap-4 lg:grid-cols-3">
     <div class="grid gap-2">
       <div class="text-sm font-semibold text-[var(--gr-fg)]">
         Limit guard
@@ -163,7 +164,23 @@ function onExceed(files: File[], limit: number) {
       </GrFileUpload>
     </div>
 
-    <div class="lg:col-span-2 text-sm text-[var(--gr-muted-fg)]">
+    <div class="grid gap-2">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
+        Readonly state
+      </div>
+      <GrFileUpload
+        v-model="submitted"
+        readonly
+        show-file-list
+        :request="request"
+      >
+        <template #tip>
+          The set stays visible and reaches the form, but cannot be changed
+        </template>
+      </GrFileUpload>
+    </div>
+
+    <div class="lg:col-span-3 text-sm text-[var(--gr-muted-fg)]">
       {{ message }}
     </div>
   </div>

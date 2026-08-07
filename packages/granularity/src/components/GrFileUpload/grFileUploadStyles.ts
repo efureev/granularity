@@ -12,10 +12,10 @@ export const zonePaddings: Record<GrFileUploadSize, string> = {
 
 /** Плитка с иконкой слева от подписи. */
 export const iconTileSizes: Record<GrFileUploadSize, string> = {
-  xs: 'h-8 w-8 rounded-[8px]',
-  sm: 'h-10 w-10 rounded-[10px]',
-  md: 'h-12 w-12 rounded-[12px]',
-  lg: 'h-14 w-14 rounded-[14px]',
+  xs: 'h-8 w-8 rounded-[var(--gr-radius-md)]',
+  sm: 'h-10 w-10 rounded-[var(--gr-radius-md)]',
+  md: 'h-12 w-12 rounded-[var(--gr-radius-lg)]',
+  lg: 'h-14 w-14 rounded-[var(--gr-radius-lg)]',
 }
 
 /**
@@ -31,26 +31,31 @@ export const iconGlyphSizes: Record<GrFileUploadSize, number> = {
   lg: 28,
 }
 
+/**
+ * Ступени кегля берутся из шкалы и потому местами совпадают: разница в 1px не
+ * воспринимается, а размер компонента несут падинги, гапы и глиф — они остаются
+ * четырёхступенчатыми.
+ */
 export const labelSizes: Record<GrFileUploadSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
-  md: 'text-[14px]',
-  lg: 'text-base',
+  xs: 'text-[length:var(--gr-text-xs)]',
+  sm: 'text-[length:var(--gr-text-xs)]',
+  md: 'text-[length:var(--gr-text-sm)]',
+  lg: 'text-[length:var(--gr-text-base)]',
 }
 
 /** Подсказка, список файлов и текст прогресса — мельче основной подписи. */
 export const hintSizes: Record<GrFileUploadSize, string> = {
-  xs: 'text-[11px]',
-  sm: 'text-[12px]',
-  md: 'text-[13px]',
-  lg: 'text-sm',
+  xs: 'text-[length:var(--gr-text-2xs)]',
+  sm: 'text-[length:var(--gr-text-xs)]',
+  md: 'text-[length:var(--gr-text-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)]',
 }
 
 export const progressTextSizes: Record<GrFileUploadSize, string> = {
-  xs: 'text-[10px]',
-  sm: 'text-[11px]',
-  md: 'text-[12px]',
-  lg: 'text-[13px]',
+  xs: 'text-[length:var(--gr-text-2xs)]',
+  sm: 'text-[length:var(--gr-text-2xs)]',
+  md: 'text-[length:var(--gr-text-xs)]',
+  lg: 'text-[length:var(--gr-text-xs)]',
 }
 
 export const zoneGaps: Record<GrFileUploadSize, string> = {
@@ -66,4 +71,41 @@ export const progressBarSizes: Record<GrFileUploadSize, GrComponentSize> = {
   sm: 'sm',
   md: 'md',
   lg: 'lg',
+}
+
+export const zoneBaseClass = 'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] outline-none transition'
+
+/**
+ * Недоступная зона гасится фоном, а не `opacity`: прозрачность разбавляет
+ * выверенные на AA токены текста и роняет контраст.
+ */
+export const zoneDisabledClass = 'bg-[var(--gr-muted)] cursor-not-allowed'
+
+/**
+ * `readonly` — не `disabled`: набор виден и уходит в форму, поэтому контраст
+ * остаётся обычным. Меняется только приглашение к вводу — курсор и ховер.
+ */
+export const zoneReadonlyClass = 'bg-[var(--gr-card)] cursor-default focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]'
+
+export const zoneIdleClass = 'bg-[var(--gr-card)] cursor-pointer hover:bg-[var(--gr-muted)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]'
+
+/** Файл над зоной: подсветка появляется только там, где drop реально примут. */
+export const zoneOverClass = 'border-[var(--gr-ring)] bg-[var(--gr-muted)]'
+
+export function grFileUploadZoneClass(options: {
+  size: GrFileUploadSize
+  disabled: boolean
+  readonly: boolean
+  over: boolean
+}): string {
+  const state = options.disabled
+    ? zoneDisabledClass
+    : options.readonly ? zoneReadonlyClass : zoneIdleClass
+
+  return [
+    zoneBaseClass,
+    zonePaddings[options.size],
+    state,
+    options.over && !options.disabled && !options.readonly ? zoneOverClass : '',
+  ].filter(Boolean).join(' ')
 }

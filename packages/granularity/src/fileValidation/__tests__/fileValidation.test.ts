@@ -5,8 +5,7 @@ import {
   acceptValidator,
   allowedExtensionsValidator,
   allowedMimeTypesValidator,
-  maxFileSizeBytesValidator,
-  maxSizeMbValidator,
+  maxFileSize,
   maxCountValidator,
   maxTotalSizeBytesValidator,
   matchAccept,
@@ -30,8 +29,7 @@ describe('fileValidation', () => {
         acceptValidator('image/*,.txt,.bin'),
         allowedExtensionsValidator(['png', '.txt', '.bin']),
         allowedMimeTypesValidator(['image/png', 'text/plain'], { allowFallbackByExtension: true }),
-        maxFileSizeBytesValidator(3 * 1024 * 1024),
-        maxSizeMbValidator(3),
+        maxFileSize({ bytes: 3 * 1024 * 1024 }),
         maxTotalSizeBytesValidator(2 * 1024 * 1024),
       ],
       {
@@ -81,5 +79,52 @@ describe('maxCountValidator', () => {
     expect(maxCountValidator(0)({ files, context })).toEqual([])
     expect(maxCountValidator(Number.NaN)({ files, context })).toEqual([])
     expect(maxCountValidator(undefined)({ files, context })).toEqual([])
+  })
+})
+
+describe('maxFileSize', () => {
+  const file = (name: string, size: number) => {
+    const item = new File(['x'], name, { type: 'text/plain' })
+    Object.defineProperty(item, 'size', { value: size })
+    return item
+  }
+  const context = { source: 'input' as const, multiple: true }
+
+  it('предел задаётся байтами или мегабайтами', () => {
+    const files = [file('big.bin', 2 * 1024 * 1024)]
+
+    expect(maxFileSize({ bytes: 1024 })({ files, context })).toHaveLength(1)
+    expect(maxFileSize({ mb: 1 })({ files, context })).toHaveLength(1)
+    expect(maxFileSize({ mb: 4 })({ files, context })).toEqual([])
+  })
+
+  it('при двух пределах действует меньший', () => {
+    const files = [file('mid.bin', 2 * 1024 * 1024)]
+
+    // Иначе один из двух объявленных пределов молча ничего не значил бы.
+    const issues = maxFileSize({ bytes: 1024, mb: 4 })({ files, context }) as { meta?: Record<string, unknown> }[]
+
+    expect(issues).toHaveLength(1)
+    expect(issues[0].meta).toEqual({ maxBytes: 1024 })
+  })
+
+  it('код один на оба способа задать предел', () => {
+    const files = [file('big.bin', 2 * 1024 * 1024)]
+
+    // Раздельные `maxSize` и `maxFileSize` заставляли обработчик потребителя
+    // ветвиться по тому, в чём автор набрал лимит.
+    const byBytes = maxFileSize({ bytes: 1 })({ files, context }) as { code: string }[]
+    const byMb = maxFileSize({ mb: 1 })({ files, context }) as { code: string }[]
+
+    expect(byBytes[0].code).toBe('maxFileSize')
+    expect(byMb[0].code).toBe('maxFileSize')
+  })
+
+  it('бессмысленный предел выключает правило, а не запрещает всё', () => {
+    const files = [file('a.txt', 10)]
+
+    expect(maxFileSize({})({ files, context })).toEqual([])
+    expect(maxFileSize({ bytes: 0 })({ files, context })).toEqual([])
+    expect(maxFileSize({ mb: Number.NaN })({ files, context })).toEqual([])
   })
 })

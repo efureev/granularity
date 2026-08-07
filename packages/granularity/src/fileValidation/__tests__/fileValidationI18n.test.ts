@@ -6,8 +6,7 @@ import {
   allowedExtensionsValidator,
   allowedMimeTypesValidator,
   fileValidationI18nKey,
-  maxFileSizeBytesValidator,
-  maxSizeMbValidator,
+  maxFileSize,
   maxTotalSizeBytesValidator,
   resolveFileValidationMessage,
 } from '..'
@@ -42,8 +41,7 @@ describe('ошибки валидации локализуемы', () => {
     ['accept', () => acceptValidator('.pdf'), [file('photo.png')], { fileName: 'photo.png', accept: '.pdf' }],
     ['extension', () => allowedExtensionsValidator(['pdf']), [file('photo.png')], { fileName: 'photo.png', extension: 'png' }],
     ['mimeType', () => allowedMimeTypesValidator(['application/pdf']), [file('photo.png')], { fileName: 'photo.png', mimeType: 'image/png' }],
-    ['maxFileSize', () => maxFileSizeBytesValidator(1), [file('big.png', 10)], { fileName: 'big.png', maxBytes: 1 }],
-    ['maxSize', () => maxSizeMbValidator(1), [file('big.png', 2 * 1024 * 1024)], { fileName: 'big.png' }],
+    ['maxFileSize', () => maxFileSize({ bytes: 1 }), [file('big.png', 10)], { fileName: 'big.png', maxBytes: 1 }],
     ['maxTotalSize', () => maxTotalSizeBytesValidator(1), [file('a.png', 10)], { maxBytes: 1 }],
   ])('%s отдаёт параметры, а не только текст', async (code, make, files, expected) => {
     const [issue] = await run(make(), files)
@@ -60,8 +58,7 @@ describe('ошибки валидации локализуемы', () => {
       ...await run(allowedExtensionsValidator(['pdf']), [file('a.png')]),
       ...await run(allowedMimeTypesValidator(['application/pdf']), [file('a.png')]),
       ...await run(allowedMimeTypesValidator(['application/pdf'], { allowFallbackByExtension: false }), [file('a.bin', 1, '')]),
-      ...await run(maxFileSizeBytesValidator(1), [file('a.png', 10)]),
-      ...await run(maxSizeMbValidator(1), [file('a.png', 2 * 1024 * 1024)]),
+      ...await run(maxFileSize({ bytes: 1 }), [file('a.png', 10)]),
       ...await run(maxTotalSizeBytesValidator(1), [file('a.png', 10)]),
     ]
     const block = en.fileValidation

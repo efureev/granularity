@@ -2,7 +2,6 @@ export type FileValidationIssueCode =
   | 'accept'
   | 'mimeType'
   | 'extension'
-  | 'maxSize'
   | 'maxCount'
   | 'maxFileSize'
   | 'maxTotalSize'

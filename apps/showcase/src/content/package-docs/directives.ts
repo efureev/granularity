@@ -190,11 +190,11 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
         previewKey: 'v-dropzone-validation',
         code: [
           "import { vDropzone } from '@feugene/granularity/directives'",
-          "import { maxSizeMbValidator } from '@feugene/granularity/fileValidation'",
+          "import { maxFileSize } from '@feugene/granularity/fileValidation'",
           '',
           '<section',
           '  v-dropzone="{',
-          '    validators: [maxSizeMbValidator(2)],',
+          '    validators: [maxFileSize({ mb: 2 })],',
           '    onFiles: uploadFiles,',
           '    onError: handleValidationError,',
           '    onStateChange: ({ isOver }) => over = isOver,',
@@ -236,7 +236,7 @@ export const directivePackageDocOverrides: Record<string, PackageDocOverride> = 
       'При асинхронном `onFiles` важно самостоятельно показывать pending/error state на уровне UI.',
     ],
     integrationNotes: [
-      'Хорошо сочетается с `runFileValidators`, `maxSizeMbValidator` и другими file-validation helpers.',
+      'Хорошо сочетается с `runFileValidators`, `maxFileSize` и другими file-validation helpers.',
       'Для richer UX можно держать единый набор validators и использовать его и в `vDropzone`, и в `GrFileUpload`.',
     ],
   },

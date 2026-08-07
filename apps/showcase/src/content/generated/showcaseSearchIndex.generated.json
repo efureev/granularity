@@ -349,7 +349,7 @@
     "kindLabel": "Section",
     "context": "Utilities",
     "searchableTitle": "utilities `filevalidation`",
-    "searchableContent": "utilities раздел для package-level утилит, начиная с `filevalidation` и прикладных сценариев использования. file-validation `filevalidation` на отдельнои странице будут показаны ключевые валидаторы и формат возвращаемых результатов. из public exports уже собраны 10 utility-сущностеи file validation слоя. практические ошибки валидации и ограничения. сравнение use-case без ui и вместе с `grfileupload`."
+    "searchableContent": "utilities раздел для package-level утилит, начиная с `filevalidation` и прикладных сценариев использования. file-validation `filevalidation` на отдельнои странице будут показаны ключевые валидаторы и формат возвращаемых результатов. из public exports уже собраны 9 utility-сущностеи file validation слоя. практические ошибки валидации и ограничения. сравнение use-case без ui и вместе с `grfileupload`."
   },
   {
     "id": "page:utilities:section:integration",
@@ -1243,26 +1243,15 @@
     "searchableContent": "allowedmimetypesvalidator allowedmimetypesvalidator публичная file validation utility allowedmimetypesvalidator из package exports. ungrouped utility /utilities/allowed-mime-types-validator packages/granularity/src/filevalidation/index.ts @feugene/granularity/filevalidation generated public-api utilities utilities allowed-mime-types-validator allowed mime types validator"
   },
   {
-    "id": "entity:utility:maxFileSizeBytesValidator",
-    "title": "maxFileSizeBytesValidator",
-    "description": "Публичная file validation utility maxFileSizeBytesValidator из package exports.",
-    "href": "/utilities/max-file-size-bytes-validator",
+    "id": "entity:utility:maxFileSize",
+    "title": "maxFileSize",
+    "description": "Публичная file validation utility maxFileSize из package exports.",
+    "href": "/utilities/max-file-size",
     "kind": "entity",
     "kindLabel": "utility",
     "context": "ungrouped / utility",
-    "searchableTitle": "maxfilesizebytesvalidator",
-    "searchableContent": "maxfilesizebytesvalidator maxfilesizebytesvalidator публичная file validation utility maxfilesizebytesvalidator из package exports. ungrouped utility /utilities/max-file-size-bytes-validator packages/granularity/src/filevalidation/index.ts @feugene/granularity/filevalidation generated public-api utilities utilities max-file-size-bytes-validator max file size bytes validator"
-  },
-  {
-    "id": "entity:utility:maxSizeMbValidator",
-    "title": "maxSizeMbValidator",
-    "description": "Публичная file validation utility maxSizeMbValidator из package exports.",
-    "href": "/utilities/max-size-mb-validator",
-    "kind": "entity",
-    "kindLabel": "utility",
-    "context": "ungrouped / utility",
-    "searchableTitle": "maxsizembvalidator",
-    "searchableContent": "maxsizembvalidator maxsizembvalidator публичная file validation utility maxsizembvalidator из package exports. ungrouped utility /utilities/max-size-mb-validator packages/granularity/src/filevalidation/index.ts @feugene/granularity/filevalidation generated public-api utilities utilities max-size-mb-validator max size mb validator"
+    "searchableTitle": "maxfilesize",
+    "searchableContent": "maxfilesize maxfilesize публичная file validation utility maxfilesize из package exports. ungrouped utility /utilities/max-file-size packages/granularity/src/filevalidation/index.ts @feugene/granularity/filevalidation generated public-api utilities utilities max-file-size max file size"
   },
   {
     "id": "entity:utility:maxTotalSizeBytesValidator",
@@ -4939,114 +4928,59 @@
     "searchableContent": "allowedmimetypesvalidator публичная file validation utility allowedmimetypesvalidator из package exports. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
   },
   {
-    "id": "entity:utility:maxFileSizeBytesValidator:section:overview",
-    "title": "maxFileSizeBytesValidator / Package overview",
+    "id": "entity:utility:maxFileSize:section:overview",
+    "title": "maxFileSize / Package overview",
     "description": "Краткий контекст по роли сущности, её месту в пакете и практическому применению.",
-    "href": "/utilities/max-file-size-bytes-validator#overview",
+    "href": "/utilities/max-file-size#overview",
     "kind": "section",
     "kindLabel": "Section",
-    "context": "maxFileSizeBytesValidator",
-    "searchableTitle": "maxfilesizebytesvalidator package overview",
-    "searchableContent": "maxfilesizebytesvalidator публичная file validation utility maxfilesizebytesvalidator из package exports. overview package overview краткии контекст по роли сущности, ее месту в пакете и практическому применению. фиксируем, какую задачу решает composable/directive/utility и где она полезна в продукте. показываем hand-authored summary и narrative notes, которых недостаточно в generated metadata. дае м быстрыи вход в api и практические integration patterns без переходов по нескольким страницам."
+    "context": "maxFileSize",
+    "searchableTitle": "maxfilesize package overview",
+    "searchableContent": "maxfilesize публичная file validation utility maxfilesize из package exports. overview package overview краткии контекст по роли сущности, ее месту в пакете и практическому применению. фиксируем, какую задачу решает composable/directive/utility и где она полезна в продукте. показываем hand-authored summary и narrative notes, которых недостаточно в generated metadata. дае м быстрыи вход в api и практические integration patterns без переходов по нескольким страницам."
   },
   {
-    "id": "entity:utility:maxFileSizeBytesValidator:section:examples",
-    "title": "maxFileSizeBytesValidator / Live examples",
+    "id": "entity:utility:maxFileSize:section:examples",
+    "title": "maxFileSize / Live examples",
     "description": "Каждая example-card показывает отдельный integration pattern и остаётся runnable reference.",
-    "href": "/utilities/max-file-size-bytes-validator#examples",
+    "href": "/utilities/max-file-size#examples",
     "kind": "section",
     "kindLabel": "Section",
-    "context": "maxFileSizeBytesValidator",
-    "searchableTitle": "maxfilesizebytesvalidator live examples",
-    "searchableContent": "maxfilesizebytesvalidator публичная file validation utility maxfilesizebytesvalidator из package exports. examples live examples каждая example-card показывает отдельныи integration pattern и остае тся runnable reference. примеры должны объяснять реальныи use-case, а не только синтаксис вызова. preview и snippet рядом позволяют быстро сравнить happy-path и edge cases. плановые сценарии остаются явно отмеченными, чтобы roadmap был виден прямо на detail page."
+    "context": "maxFileSize",
+    "searchableTitle": "maxfilesize live examples",
+    "searchableContent": "maxfilesize публичная file validation utility maxfilesize из package exports. examples live examples каждая example-card показывает отдельныи integration pattern и остае тся runnable reference. примеры должны объяснять реальныи use-case, а не только синтаксис вызова. preview и snippet рядом позволяют быстро сравнить happy-path и edge cases. плановые сценарии остаются явно отмеченными, чтобы roadmap был виден прямо на detail page."
   },
   {
-    "id": "entity:utility:maxFileSizeBytesValidator:section:api",
-    "title": "maxFileSizeBytesValidator / API",
+    "id": "entity:utility:maxFileSize:section:api",
+    "title": "maxFileSize / API",
     "description": "Package-level API документируется вручную и фокусируется на параметрах, return shape и error contract.",
-    "href": "/utilities/max-file-size-bytes-validator#api",
+    "href": "/utilities/max-file-size#api",
     "kind": "section",
     "kindLabel": "Section",
-    "context": "maxFileSizeBytesValidator",
-    "searchableTitle": "maxfilesizebytesvalidator api",
-    "searchableContent": "maxfilesizebytesvalidator публичная file validation utility maxfilesizebytesvalidator из package exports. api api package-level api документируется вручную и фокусируется на параметрах, return shape и error contract. команды видят не только сигнатуру, но и expected data shape для интеграции в feature-code. ошибки, caveats и ограничения держатся рядом с основнои api-таблицеи . структура остае тся совместимои с будущеи генерациеи metadata для package-level сущностеи ."
+    "context": "maxFileSize",
+    "searchableTitle": "maxfilesize api",
+    "searchableContent": "maxfilesize публичная file validation utility maxfilesize из package exports. api api package-level api документируется вручную и фокусируется на параметрах, return shape и error contract. команды видят не только сигнатуру, но и expected data shape для интеграции в feature-code. ошибки, caveats и ограничения держатся рядом с основнои api-таблицеи . структура остае тся совместимои с будущеи генерациеи metadata для package-level сущностеи ."
   },
   {
-    "id": "entity:utility:maxFileSizeBytesValidator:section:usage",
-    "title": "maxFileSizeBytesValidator / Usage",
+    "id": "entity:utility:maxFileSize:section:usage",
+    "title": "maxFileSize / Usage",
     "description": "Canonical import, практические рекомендации и caveats должны быть доступны в одном месте.",
-    "href": "/utilities/max-file-size-bytes-validator#usage",
+    "href": "/utilities/max-file-size#usage",
     "kind": "section",
     "kindLabel": "Section",
-    "context": "maxFileSizeBytesValidator",
-    "searchableTitle": "maxfilesizebytesvalidator usage",
-    "searchableContent": "maxfilesizebytesvalidator публичная file validation utility maxfilesizebytesvalidator из package exports. usage usage canonical import, практические рекомендации и caveats должны быть доступны в одном месте. copy-ready import и usage snippets сокращают время на старт интеграции. caveats показывают, где потребуется дополнительная бизнес-логика или ui-обвязка. этот блок остае тся главным bridge между docs и реальным application code."
+    "context": "maxFileSize",
+    "searchableTitle": "maxfilesize usage",
+    "searchableContent": "maxfilesize публичная file validation utility maxfilesize из package exports. usage usage canonical import, практические рекомендации и caveats должны быть доступны в одном месте. copy-ready import и usage snippets сокращают время на старт интеграции. caveats показывают, где потребуется дополнительная бизнес-логика или ui-обвязка. этот блок остае тся главным bridge между docs и реальным application code."
   },
   {
-    "id": "entity:utility:maxFileSizeBytesValidator:section:integration",
-    "title": "maxFileSizeBytesValidator / Integration notes",
+    "id": "entity:utility:maxFileSize:section:integration",
+    "title": "maxFileSize / Integration notes",
     "description": "Ссылки на исходники, docs и зависимости помогают быстрее разобраться в связанной экосистеме пакета.",
-    "href": "/utilities/max-file-size-bytes-validator#integration",
+    "href": "/utilities/max-file-size#integration",
     "kind": "section",
     "kindLabel": "Section",
-    "context": "maxFileSizeBytesValidator",
-    "searchableTitle": "maxfilesizebytesvalidator integration notes",
-    "searchableContent": "maxfilesizebytesvalidator публичная file validation utility maxfilesizebytesvalidator из package exports. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
-  },
-  {
-    "id": "entity:utility:maxSizeMbValidator:section:overview",
-    "title": "maxSizeMbValidator / Package overview",
-    "description": "Краткий контекст по роли сущности, её месту в пакете и практическому применению.",
-    "href": "/utilities/max-size-mb-validator#overview",
-    "kind": "section",
-    "kindLabel": "Section",
-    "context": "maxSizeMbValidator",
-    "searchableTitle": "maxsizembvalidator package overview",
-    "searchableContent": "maxsizembvalidator публичная file validation utility maxsizembvalidator из package exports. overview package overview краткии контекст по роли сущности, ее месту в пакете и практическому применению. фиксируем, какую задачу решает composable/directive/utility и где она полезна в продукте. показываем hand-authored summary и narrative notes, которых недостаточно в generated metadata. дае м быстрыи вход в api и практические integration patterns без переходов по нескольким страницам."
-  },
-  {
-    "id": "entity:utility:maxSizeMbValidator:section:examples",
-    "title": "maxSizeMbValidator / Live examples",
-    "description": "Каждая example-card показывает отдельный integration pattern и остаётся runnable reference.",
-    "href": "/utilities/max-size-mb-validator#examples",
-    "kind": "section",
-    "kindLabel": "Section",
-    "context": "maxSizeMbValidator",
-    "searchableTitle": "maxsizembvalidator live examples",
-    "searchableContent": "maxsizembvalidator публичная file validation utility maxsizembvalidator из package exports. examples live examples каждая example-card показывает отдельныи integration pattern и остае тся runnable reference. примеры должны объяснять реальныи use-case, а не только синтаксис вызова. preview и snippet рядом позволяют быстро сравнить happy-path и edge cases. плановые сценарии остаются явно отмеченными, чтобы roadmap был виден прямо на detail page."
-  },
-  {
-    "id": "entity:utility:maxSizeMbValidator:section:api",
-    "title": "maxSizeMbValidator / API",
-    "description": "Package-level API документируется вручную и фокусируется на параметрах, return shape и error contract.",
-    "href": "/utilities/max-size-mb-validator#api",
-    "kind": "section",
-    "kindLabel": "Section",
-    "context": "maxSizeMbValidator",
-    "searchableTitle": "maxsizembvalidator api",
-    "searchableContent": "maxsizembvalidator публичная file validation utility maxsizembvalidator из package exports. api api package-level api документируется вручную и фокусируется на параметрах, return shape и error contract. команды видят не только сигнатуру, но и expected data shape для интеграции в feature-code. ошибки, caveats и ограничения держатся рядом с основнои api-таблицеи . структура остае тся совместимои с будущеи генерациеи metadata для package-level сущностеи ."
-  },
-  {
-    "id": "entity:utility:maxSizeMbValidator:section:usage",
-    "title": "maxSizeMbValidator / Usage",
-    "description": "Canonical import, практические рекомендации и caveats должны быть доступны в одном месте.",
-    "href": "/utilities/max-size-mb-validator#usage",
-    "kind": "section",
-    "kindLabel": "Section",
-    "context": "maxSizeMbValidator",
-    "searchableTitle": "maxsizembvalidator usage",
-    "searchableContent": "maxsizembvalidator публичная file validation utility maxsizembvalidator из package exports. usage usage canonical import, практические рекомендации и caveats должны быть доступны в одном месте. copy-ready import и usage snippets сокращают время на старт интеграции. caveats показывают, где потребуется дополнительная бизнес-логика или ui-обвязка. этот блок остае тся главным bridge между docs и реальным application code."
-  },
-  {
-    "id": "entity:utility:maxSizeMbValidator:section:integration",
-    "title": "maxSizeMbValidator / Integration notes",
-    "description": "Ссылки на исходники, docs и зависимости помогают быстрее разобраться в связанной экосистеме пакета.",
-    "href": "/utilities/max-size-mb-validator#integration",
-    "kind": "section",
-    "kindLabel": "Section",
-    "context": "maxSizeMbValidator",
-    "searchableTitle": "maxsizembvalidator integration notes",
-    "searchableContent": "maxsizembvalidator публичная file validation utility maxsizembvalidator из package exports. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
+    "context": "maxFileSize",
+    "searchableTitle": "maxfilesize integration notes",
+    "searchableContent": "maxfilesize публичная file validation utility maxfilesize из package exports. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
   },
   {
     "id": "entity:utility:maxTotalSizeBytesValidator:section:overview",

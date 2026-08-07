@@ -3029,6 +3029,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "modelValue",
+            "description": "Набор файлов — тот, что показан в списке и уйдёт в `retry`. Проп **необязателен**: без него компонент держит набор сам, как и раньше. Передан — набор следует за ним, и потребитель может очистить или подменить список снаружи.",
+            "type": "File[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "action",
             "description": "",
             "type": "string | undefined",
@@ -3234,7 +3241,7 @@
           {
             "name": "default",
             "description": "",
-            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; fileEntries: { file: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }; status: GrFileUploadStatus; percent: number; error?: unknown; }[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
+            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; fileEntries: GrFileUploadEntry[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
           },
           {
             "name": "label",
@@ -3249,7 +3256,7 @@
           {
             "name": "progress",
             "description": "",
-            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"uploading\" | \"idle\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; retry: () => Promise<void>; fileEntries: { file: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }; status: GrFileUploadStatus; percent: number; error?: unknown; }[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
+            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"uploading\" | \"idle\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; retry: () => Promise<void>; fileEntries: GrFileUploadEntry[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
           }
         ]
       },
@@ -3258,6 +3265,12 @@
         "title": "Events",
         "origin": "generated",
         "items": [
+          {
+            "name": "update:modelValue",
+            "description": "Набор файлов сменился: новый выбор или удаление. Не путать с `change`.",
+            "type": "[File[]]",
+            "signature": "(e: \"update:modelValue\", files: File[]): void"
+          },
           {
             "name": "exceed",
             "description": "Выбрано больше файлов, чем разрешает `limit`. Загрузка не стартует.",

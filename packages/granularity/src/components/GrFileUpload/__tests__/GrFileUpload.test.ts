@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('~icons/lucide/arrow-up', () => {
@@ -11,8 +11,9 @@ vi.mock('~icons/lucide/arrow-up', () => {
   }
 })
 
+import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrFileUpload from '../GrFileUpload.vue'
-import { maxSizeMbValidator } from '../maxSizeMbValidator'
+import { maxFileSize } from '../maxFileSize'
 
 function flushPromises() {
   return new Promise(resolve => setTimeout(resolve, 0))
@@ -51,13 +52,13 @@ describe('GrFileUpload', () => {
     expect(wrapper.emitted('change')![0][0]).toHaveLength(1)
   })
 
-  it('maxSizeMb блокирует слишком большой файл и эмитит error', async () => {
+  it('maxFileSize блокирует слишком большой файл и эмитит error', async () => {
     const request = vi.fn().mockResolvedValue({ ok: true })
 
     const wrapper = mount(GrFileUpload, {
       props: {
         request,
-        validators: [maxSizeMbValidator(1)],
+        validators: [maxFileSize({ mb: 1 })],
       },
     })
 
@@ -592,8 +593,8 @@ describe('GrFileUpload — объявление статуса', () => {
 })
 
 describe('GrFileUpload — итоговый объём', () => {
-  // Кастомный `request` не обязан звать `onProgress`. Раньше в этом случае
-  // success приходил с `loaded: 0, total: 0` при «100%» — payload врал.
+  // Кастомный `request` не обязан звать `onProgress`. Без замера байтов
+  // «100%» при `loaded: 0, total: 0` потребитель прочитает как «загружено ноль».
   it('без onProgress итог берётся из размеров файлов, а не из нуля', async () => {
     const request = vi.fn().mockResolvedValue({ ok: true })
     const wrapper = mount(GrFileUpload, { props: { request, multiple: true } })
@@ -910,5 +911,196 @@ describe('GrFileUpload — превью', () => {
     finally {
       vi.unstubAllGlobals()
     }
+  })
+})
+
+describe('GrFileUpload — readonly', () => {
+  it('не открывает системный диалог ни зоной, ни самим input', async () => {
+    const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click')
+    const before = clickSpy.mock.calls.length
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn(), readonly: true },
+    })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('click')
+    expect(clickSpy.mock.calls.length).toBe(before)
+
+    // У `<input type="file">` атрибута `readonly` нет, поэтому диалог гасится
+    // отменой действия по умолчанию — иначе Enter на input открыл бы его.
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+    wrapper.get('[data-gr-file-upload-input]').element.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+  })
+
+  it('не принимает drop и не отправляет файлы', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(GrFileUpload, {
+      props: { request, readonly: true, showFileList: true },
+    })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'x.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+
+    expect(request).not.toHaveBeenCalled()
+    expect(wrapper.emitted('success')).toBeFalsy()
+  })
+
+  it('остаётся в порядке Tab и объявляется как только чтение', () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn(), readonly: true },
+    })
+    const input = wrapper.get('[data-gr-file-upload-input]')
+
+    // `readonly` — не `disabled`: контрол достижим, набор виден.
+    expect(input.attributes('tabindex')).toBe('0')
+    expect(input.attributes('disabled')).toBeUndefined()
+    expect(input.attributes('aria-readonly')).toBe('true')
+    expect(wrapper.get('[data-gr-file-upload]').classes()).not.toContain('cursor-pointer')
+  })
+})
+
+describe('GrFileUpload — состояние из GrFormField', () => {
+  async function mountInField(fieldProps: Record<string, unknown>) {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const wrapper = mount(defineComponent({
+      render: () => h(GrFormField, { label: 'Документы', ...fieldProps }, {
+        default: () => h(GrFileUpload, { request, showFileList: true }),
+      }),
+    }))
+    return { wrapper, request }
+  }
+
+  it('disabled поля гасит зону, а не только нативный input', async () => {
+    const { wrapper, request } = await mountInField({ disabled: true })
+    const zone = wrapper.get('[data-gr-file-upload]')
+
+    // Зона брала сырой проп компонента, поэтому выглядела рабочей: ховер,
+    // курсор-палец и фокус-кольцо при выключенном поле.
+    expect(zone.classes()).toContain('cursor-not-allowed')
+    expect(zone.classes()).not.toContain('cursor-pointer')
+    expect(wrapper.get('[data-gr-file-upload-input]').attributes('disabled')).toBeDefined()
+
+    await zone.trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'x.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+    expect(request).not.toHaveBeenCalled()
+  })
+
+  it('readonly поля запрещает ввод так же, как собственный проп', async () => {
+    const { wrapper, request } = await mountInField({ readonly: true })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'x.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+
+    expect(request).not.toHaveBeenCalled()
+    expect(wrapper.get('[data-gr-file-upload-input]').attributes('aria-readonly')).toBe('true')
+  })
+
+  it('кнопки удаления и повтора исчезают вместе с disabled поля', async () => {
+    const request = vi.fn().mockResolvedValue({ ok: true })
+    const disabled = ref(false)
+    const wrapper = mount(defineComponent({
+      render: () => h(GrFormField, { label: 'Документы', disabled: disabled.value }, {
+        default: () => h(GrFileUpload, { request, showFileList: true }),
+      }),
+    }))
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['x'], 'x.txt', { type: 'text/plain' })] },
+    })
+    await flushPromises()
+    expect(wrapper.find('[data-gr-file-upload-remove]').exists()).toBe(true)
+
+    disabled.value = true
+    await nextTick()
+    // Кнопка, которая осталась бы на месте, кликалась бы вхолостую: обработчик
+    // молча выходит по `locked`.
+    expect(wrapper.find('[data-gr-file-upload-remove]').exists()).toBe(false)
+  })
+})
+
+describe('GrFileUpload — modelValue', () => {
+  const txt = (name: string) => new File(['x'], name, { type: 'text/plain' })
+
+  it('без пропа компонент держит набор сам', async () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn().mockResolvedValue({}), showFileList: true },
+    })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [txt('a.txt')] },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[data-gr-file-upload-list]').text()).toContain('a.txt')
+  })
+
+  it('переданный набор показывается сразу, без выбора файлов', () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn(), showFileList: true, modelValue: [txt('report.pdf')] },
+    })
+
+    expect(wrapper.get('[data-gr-file-upload-list]').text()).toContain('report.pdf')
+  })
+
+  it('набор следует за пропом: снаружи его можно подменить и очистить', async () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn(), showFileList: true, modelValue: [txt('a.txt')] },
+    })
+
+    await wrapper.setProps({ modelValue: [txt('b.txt')] })
+    expect(wrapper.get('[data-gr-file-upload-list]').text()).toContain('b.txt')
+
+    await wrapper.setProps({ modelValue: [] })
+    expect(wrapper.find('[data-gr-file-upload-list]').exists()).toBe(false)
+  })
+
+  it('update:modelValue эмитится на выбор и на удаление', async () => {
+    const wrapper = mount(GrFileUpload, {
+      props: { request: vi.fn().mockResolvedValue({}), showFileList: true },
+    })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [txt('a.txt'), txt('b.txt')] },
+    })
+    await flushPromises()
+
+    const selected = wrapper.emitted('update:modelValue')
+    expect(selected).toHaveLength(1)
+    expect(selected![0][0]).toHaveLength(1)
+
+    await wrapper.get('[data-gr-file-upload-remove]').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toHaveLength(2)
+    expect(wrapper.emitted('update:modelValue')![1][0]).toEqual([])
+  })
+
+  it('update:modelValue и change — разные моменты', async () => {
+    let resolveUpload: (value: unknown) => void = () => {}
+    const request = vi.fn(() => new Promise((resolve) => { resolveUpload = resolve }))
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, showFileList: true },
+    })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [txt('a.txt')] },
+    })
+    await flushPromises()
+
+    // Набор уже сменился, а загрузка ещё идёт: `change` значит «загрузка
+    // завершилась», и слить его с моделью нельзя.
+    expect(wrapper.emitted('update:modelValue')).toHaveLength(1)
+    expect(wrapper.emitted('change')).toBeFalsy()
+
+    resolveUpload({ ok: true })
+    await flushPromises()
+    expect(wrapper.emitted('change')).toHaveLength(1)
   })
 })

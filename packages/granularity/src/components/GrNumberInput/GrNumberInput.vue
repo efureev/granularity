@@ -479,8 +479,8 @@ function onKeydown(e: KeyboardEvent): void {
 // `aria-valuenow` — числовое значение для скринридеров; отсутствует, если поле пусто.
 const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
 
-// Границы: на пределе кнопка ± гаснет. Раньше она оставалась активной и молча
-// ничего не делала — `clamp` съедал результат.
+// На пределе кнопка ± гаснет: активная кнопка, у которой `clamp` съедает
+// результат, читается как сломанная.
 const numericValue = computed(() => toNumber(props.modelValue))
 
 const canIncrease = computed(() => {

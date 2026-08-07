@@ -277,7 +277,7 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
         previewKey: 'run-file-validators-pipeline',
         code: [
           'const result = await runFileValidators(files, [',
-          '  maxFileSizeBytesValidator(512_000),',
+          '  maxFileSize({ bytes: 512_000 }),',
           '  maxTotalSizeBytesValidator(1_500_000),',
           '], {',
           "  source: 'input',",
@@ -371,20 +371,21 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       'Для пользовательских ошибок в UI обычно удобнее `acceptValidator`, а `matchAccept` оставлять низкоуровневой утилитой.',
     ],
   },
-  maxFileSizeBytesValidator: {
+  maxFileSize: {
     overview: [
-      '`maxFileSizeBytesValidator` проверяет максимальный размер каждого файла по отдельности в байтах.',
-      'Это самый точный per-file validator, когда лимит известен как backend/API constraint.',
+      '`maxFileSize` ограничивает размер **каждого** файла по отдельности.',
+      'Предел задаётся в байтах или в мегабайтах — что читается лучше в конкретном месте: `2 MB` понятнее, чем `2_097_152 bytes`, а backend-ограничение обычно приходит уже в байтах.',
     ],
     examples: createReadyExamples([
       {
-        id: 'max-file-size-bytes-validator',
-        title: 'Per-file byte limit',
-        description: 'Каждый файл сравнивается с лимитом независимо от остальных.',
+        id: 'max-file-size',
+        title: 'Per-file limit in bytes or megabytes',
+        description: 'Один валидатор и один код ошибки независимо от того, в чём задан предел.',
         code: [
-          "import { maxFileSizeBytesValidator } from '@feugene/granularity/fileValidation'",
+          "import { maxFileSize } from '@feugene/granularity/fileValidation'",
           '',
-          'const validator = maxFileSizeBytesValidator(512_000)',
+          'const fromBackend = maxFileSize({ bytes: 512_000 })',
+          'const fromConfig = maxFileSize({ mb: 2 })',
         ].join('\n'),
       },
     ]),
@@ -394,7 +395,8 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
         title: 'Parameters',
         origin: 'manual',
         items: [
-          { name: 'maxBytes', type: 'number', description: 'Максимальный допустимый размер одного файла в байтах.' },
+          { name: 'options.bytes', type: 'number | undefined', description: 'Максимальный размер одного файла в байтах.' },
+          { name: 'options.mb', type: 'number | undefined', description: 'То же ограничение в мегабайтах (1 МБ = 1024 × 1024).' },
         ],
       },
       {
@@ -407,64 +409,20 @@ export const utilityPackageDocOverrides: Record<string, PackageDocOverride> = {
       },
     ],
     usage: [
-      'Используйте, когда лимит приходит из backend или документации уже в байтах.',
+      'Задавайте предел тем способом, каким он приходит: из документации API — в байтах, из UI-конфига — в мегабайтах.',
     ],
     caveats: [
-      'Не контролирует суммарный размер нескольких файлов — для этого нужен `maxTotalSizeBytesValidator`.',
+      'Не контролирует суммарный размер набора — для этого нужен `maxTotalSizeBytesValidator`.',
+      'Если заданы оба предела, действует меньший: молча игнорировать один из двух объявленных хуже, чем применить строгий.',
     ],
     integrationNotes: [
       'Хорошая базовая пара для `maxTotalSizeBytesValidator` в multi-upload сценариях.',
     ],
   },
-  maxSizeMbValidator: {
-    overview: [
-      '`maxSizeMbValidator` — удобная обёртка над per-file size limit, когда лимит проще задавать в мегабайтах.',
-      'По смыслу он близок к `maxFileSizeBytesValidator`, но лучше читается в UI/configuration слоях.',
-    ],
-    examples: createReadyExamples([
-      {
-        id: 'max-size-mb-validator',
-        title: 'Readable megabyte limit',
-        description: 'Тот же per-file лимит, но в более удобной конфигурационной форме.',
-        code: [
-          "import { maxSizeMbValidator } from '@feugene/granularity/fileValidation'",
-          '',
-          'const validator = maxSizeMbValidator(2)',
-        ].join('\n'),
-      },
-    ]),
-    apiSections: [
-      {
-        key: 'parameters',
-        title: 'Parameters',
-        origin: 'manual',
-        items: [
-          { name: 'maxMb', type: 'number', description: 'Максимальный размер одного файла в мегабайтах.' },
-        ],
-      },
-      {
-        key: 'returns',
-        title: 'Returns / Errors',
-        origin: 'manual',
-        items: [
-          { name: 'validator', type: 'FileValidator', description: 'Возвращает issues с кодом `maxSize` для превышения лимита.' },
-        ],
-      },
-    ],
-    usage: [
-      'Подходит для продуктовых конфигов и docs, где лимит обычно обсуждается в мегабайтах.',
-    ],
-    caveats: [
-      'По-прежнему работает per-file; aggregate-limit нужно задавать отдельно.',
-    ],
-    integrationNotes: [
-      'Удобен в demos и UI-конфигах, где `2 MB` читается лучше, чем `2_097_152 bytes`.',
-    ],
-  },
   maxTotalSizeBytesValidator: {
     overview: [
       '`maxTotalSizeBytesValidator` проверяет суммарный размер всех файлов в одном batch, а не каждый файл по отдельности.',
-      'Это ключевое отличие от `maxFileSizeBytesValidator` и `maxSizeMbValidator`, которые смотрят на отдельный файл.',
+      'Это ключевое отличие от `maxFileSize`, который смотрит на отдельный файл.',
     ],
     examples: createReadyExamples([
       {

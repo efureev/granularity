@@ -41,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrFileUpload`: optional `v-model` for the file set.** `modelValue` is not required — without it the component
+  keeps the set itself, exactly as before; passed, the set follows the prop, so it can be replaced or cleared from the
+  outside once a form is submitted. `update:modelValue` fires when the set itself changes (a new selection, a removal);
+  `change` keeps its own meaning — «the upload finished» — because those are different moments.
 - **`GrEmptyState`: `variant`, `size`, `headingLevel` and content slots.** `variant="ghost"` drops the border, the
   background and the radius — inside an existing card (`GrDataTable #empty`, `GrList #empty`, any layout of your own)
   the default `outlined` drew a second border around the same surface; the vocabulary is `GrCard`'s, where `ghost`
@@ -159,6 +163,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   card in a card. Without the prop the card keeps resolving its variant from `GrConfigProvider`.
 - **i18n:** `gr.breadcrumbs.label` and `gr.breadcrumbs.expand` in all three locales.
 
+### Changed — BREAKING
+
+- **`maxSizeMbValidator` and `maxFileSizeBytesValidator` are replaced by a single `maxFileSize({ bytes?, mb? })`.** The
+  two were one check with two different `code` values (`maxSize` and `maxFileSize`), so an error handler on the
+  consumer's side had to branch on which unit the limit happened to be written in. The new validator always reports
+  `maxFileSize`; the limit is given in whichever unit reads better at the call site, and when both are given the
+  smaller one wins — silently ignoring one of two declared limits is worse than applying the stricter. The `maxSize`
+  code and its `gr.fileValidation.maxSize` key are gone from all three locales.
+
 ### Changed
 
 - **The toast queue is now capped.** `maxVisible` only ever limited the *visible* toasts while the queue behind them
@@ -207,9 +220,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrFileUpload` announced `readonly` and then ignored it.** `aria-readonly` was set and the remove/retry buttons
+  were hidden, but the file dialog still opened, drag&drop was still accepted and files were still uploaded: every
+  input handler guarded on `disabled` alone. They now use the `locked` state of the form-control contract, so a
+  read-only uploader shows its set and sends it with the form without letting anyone change it. `<input type="file">`
+  has no `readonly` attribute in HTML, so the system dialog is suppressed by preventing the default action — the input
+  stays in the `Tab` order and is still announced as read-only.
+- **`GrFileUpload` ignored `disabled` coming from `GrFormField` or `GrForm`.** Five places in the template read the raw
+  prop instead of the resolved state, so a field disabled through context dimmed only the native input: the zone kept
+  its pointer cursor, hover and focus ring, and the remove/retry buttons stayed clickable while their handlers silently
+  did nothing.
 - **`GrEmptyState`'s title was not a heading.** It rendered as a `<div class="font-700">`, so the one element that
   explains why the screen is empty could not be reached by heading navigation. It is now a real heading (`h3` by
   default) with the browser's bottom margin reset, which keeps the previous vertical rhythm exactly.
+- **`GrFileUpload` hardcoded its font sizes and radii.** Fourteen literals — `rounded-[8|10|12|14px]` and ten
+  `text-[10|11|12|13px]` — ignored the scales. They now come from `--gr-text-*` and `--gr-radius-*`. Steps coincide in
+  places, and deliberately so: a 1px difference in font size is not perceivable, and the size of the component is
+  carried by padding, gaps and the icon, which keep all four steps.
 - **`GrEmptyState` hardcoded its radius and font sizes.** `rounded-[12px]`, `text-[14px]` and `text-[13px]` ignored the
   scales; they now come from `--gr-radius-*` and `--gr-text-*`. The description moves from 13px to `--gr-text-sm`,
   because there is no 13px step and inventing one for a single component is worse than the round-off.

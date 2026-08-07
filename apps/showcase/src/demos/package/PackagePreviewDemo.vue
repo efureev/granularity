@@ -18,8 +18,7 @@ import {
   allowedMimeTypesValidator,
   createLoading,
   matchAccept,
-  maxFileSizeBytesValidator,
-  maxSizeMbValidator,
+  maxFileSize,
   maxTotalSizeBytesValidator,
   normalizeFiles,
   runFileValidators,
@@ -57,7 +56,7 @@ const dropzoneBinding = computed(() => ({
   onFiles: async (files: File[]) => {
     dropzoneState.value = `Accepted: ${files.map(file => file.name).join(', ')}`
   },
-  validators: [maxSizeMbValidator(2)],
+  validators: [maxFileSize({ mb: 2 })],
   onStateChange: ({ isOver }: { isOver: boolean }) => {
     isDropOver.value = isOver
   },
@@ -119,7 +118,7 @@ async function runFileValidationDemo() {
   const normalizedSingle = normalizeFiles(demoFiles, false)
   const acceptMatches = matchAccept(demoFiles[1]!, '.pdf,image/*')
   const result = await runFileValidators(demoFiles, [
-    maxFileSizeBytesValidator(512_000),
+    maxFileSize({ bytes: 512_000 }),
     maxTotalSizeBytesValidator(1_500_000),
   ], {
     source: 'input',
@@ -467,7 +466,7 @@ async function runNetworkDemo() {
             acceptValidator('.pdf,image/*'),
             allowedExtensionsValidator(['pdf', '.png']),
             allowedMimeTypesValidator(['image/png', 'application/pdf'], { allowFallbackByExtension: false }),
-            maxFileSizeBytesValidator(256_000),
+            maxFileSize({ bytes: 256_000 }),
             maxTotalSizeBytesValidator(512_000),
           ]"
           @change="handleUploadSelection"

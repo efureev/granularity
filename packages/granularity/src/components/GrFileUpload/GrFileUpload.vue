@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TResponse = unknown">
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, Text, useSlots, type VNode } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, Text, useSlots, watch, type VNode } from 'vue'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
 import IconClose from '~icons/lucide/x'
@@ -10,12 +10,17 @@ import type { GrProgressBarTone } from '../GrProgressBar/grStyle'
 import type { FileValidator, FileValidatorSource } from '../../fileValidation'
 import type { GrUploadProgressInfo } from './uploadViaXhr'
 import type { GrUploadState } from './uploadState'
-import { createFileEntry, summarizeFileEntries, type GrFileUploadEntry } from './fileEntry'
+import { summarizeFileEntries, type GrFileUploadEntry } from './fileEntry'
+import { useDropZone } from './useDropZone'
+import { useFilePreviews } from './useFilePreviews'
+import { usePerFileUpload } from './usePerFileUpload'
+import { useUploadState } from './useUploadState'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { flattenSlotNodes, meaningfulSlotNodes } from '../shared/slotNodes'
 import {
   type GrFileUploadSize,
+  grFileUploadZoneClass,
   hintSizes,
   iconGlyphSizes,
   iconTileSizes,
@@ -23,11 +28,9 @@ import {
   progressBarSizes,
   progressTextSizes,
   zoneGaps,
-  zonePaddings,
 } from './grFileUploadStyles'
 import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
-import { GR_UPLOAD_STATE_IDLE } from './uploadState'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -63,6 +66,14 @@ export type GrFileUploadRequest<TResponse = unknown> = (
  * `placeholder` — надпись в дефолтном UI-варианте (без слота default).
  */
 export interface GrFileUploadProps<TResponse = unknown> {
+  /**
+   * Набор файлов — тот, что показан в списке и уйдёт в `retry`.
+   *
+   * Проп **необязателен**: без него компонент держит набор сам, как и раньше.
+   * Передан — набор следует за ним, и потребитель может очистить или подменить
+   * список снаружи.
+   */
+  modelValue?: File[]
   action?: string
   request?: GrFileUploadRequest<TResponse>
   name?: string
@@ -131,6 +142,7 @@ export interface GrFileUploadProps<TResponse = unknown> {
 const props = withDefaults(
   defineProps<GrFileUploadProps<TResponse>>(),
   {
+    modelValue: undefined,
     action: undefined,
     request: undefined,
     name: 'file',
@@ -164,7 +176,6 @@ const props = withDefaults(
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrFileUpload' })
 
-const zoneClass = computed(() => zonePaddings[resolvedSize.value])
 const zoneGapClass = computed(() => zoneGaps[resolvedSize.value])
 const iconTileClass = computed(() => iconTileSizes[resolvedSize.value])
 const iconGlyphSize = computed(() => iconGlyphSizes[resolvedSize.value])
@@ -174,6 +185,8 @@ const progressTextClass = computed(() => progressTextSizes[resolvedSize.value])
 const progressBarSize = computed(() => progressBarSizes[resolvedSize.value])
 
 const emit = defineEmits<{
+  /** Набор файлов сменился: новый выбор или удаление. Не путать с `change`. */
+  (e: 'update:modelValue', files: File[]): void
   /** Выбрано больше файлов, чем разрешает `limit`. Загрузка не стартует. */
   (e: 'exceed', files: File[], limit: number): void
   /** `file` приходит только в режиме `per-file`: в батче отчитываться нечем. */
@@ -195,7 +208,13 @@ const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  readonly: isReadonly,
+  invalid: isInvalid,
+  required: isRequired,
+  // `locked` — «ввод не принимается»: `disabled` или `readonly`. Набор в
+  // `readonly` виден и уходит в форму, но поменять его нельзя.
+  locked: isLocked,
+} = useGrFormControl(() => props)
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
 const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
@@ -220,88 +239,92 @@ const hasCustomUi = computed(() => {
 })
 
 const inputRef = ref<HTMLInputElement | null>(null)
-const isOver = ref(false)
 
-let overCounter = 0
-
-const lastFiles = ref<File[]>([])
-
-const state = reactive<GrUploadState>({ ...GR_UPLOAD_STATE_IDLE }) as GrUploadState
+const lastFiles = ref<File[]>(props.modelValue ? [...props.modelValue] : [])
 
 /**
- * Состояние по файлам — только для `per-file`. В батче набор уходит одним
- * запросом, и статуса у отдельного файла не существует.
+ * Набор меняется только здесь: иначе `update:modelValue` рано или поздно
+ * разошёлся бы с тем, что показано в списке.
  */
-const fileEntries = ref<GrFileUploadEntry[]>([])
+function setFiles(next: File[]): void {
+  lastFiles.value = next
+  emit('update:modelValue', next)
+}
 
-/** Контроллер на файл: `abortFile` обязан обрывать свой запрос, а не соседний. */
-const fileControllers = new Map<File, AbortController>()
+// Контролируемый режим: проп задан — он и есть источник истины.
+watch(() => props.modelValue, (next) => {
+  if (next === undefined) return
+  if (next === lastFiles.value) return
+
+  lastFiles.value = [...next]
+}, { deep: false })
+
+const {
+  state,
+  setIdle: setStateIdle,
+  setUploading: setStateUploading,
+  setSuccess: setStateSuccess,
+  setError: setStateError,
+  applyProgress,
+  assign: assignState,
+  scheduleIdle,
+  clearScheduledIdle,
+} = useUploadState({ onChange: next => emit('stateChange', next) })
 
 let activeController: AbortController | null = null
-let hideSuccessTimer: ReturnType<typeof setTimeout> | null = null
-
-function clearHideSuccessTimer() {
-  if (hideSuccessTimer !== null) {
-    clearTimeout(hideSuccessTimer)
-    hideSuccessTimer = null
-  }
-}
-
-function assignState(next: GrUploadState) {
-  // мутируем через Object.assign, чтобы сохранить reactive ссылку
-  for (const key of Object.keys(state) as (keyof GrUploadState)[])
-    delete (state as any)[key]
-  Object.assign(state, next)
-  emit('stateChange', state as GrUploadState)
-}
-
-function setStateIdle() {
-  assignState({ ...GR_UPLOAD_STATE_IDLE })
-}
-
-function setStateUploading(info?: GrUploadProgressInfo) {
-  assignState({
-    phase: 'uploading',
-    percent: info?.percent ?? 0,
-    indeterminate: info?.indeterminate ?? true,
-    loaded: info?.loaded ?? 0,
-    total: info?.total ?? 0,
-  })
-}
-
-function setStateSuccess(info: { loaded: number, total: number }) {
-  assignState({
-    phase: 'success',
-    percent: 100,
-    indeterminate: false,
-    loaded: info.loaded,
-    total: info.total,
-  })
-}
-
-function setStateError(error: unknown) {
-  const prev = state
-  assignState({
-    phase: 'error',
-    percent: prev.phase === 'uploading' ? prev.percent : 0,
-    indeterminate: false,
-    loaded: prev.phase === 'uploading' ? prev.loaded : 0,
-    total: prev.phase === 'uploading' ? prev.total : 0,
-    error,
-  })
-}
 
 function handleProgress(info: GrUploadProgressInfo) {
-  if (state.phase !== 'uploading') return
-  assignState({
-    phase: 'uploading',
-    percent: info.percent,
-    indeterminate: info.indeterminate,
-    loaded: info.loaded,
-    total: info.total,
-  })
+  applyProgress(info)
   emit('progress', info.percent, info)
 }
+
+const { fileKey, previewUrl, revokePreview, revokeAllPreviews } = useFilePreviews({
+  enabled: () => props.preview,
+})
+
+/**
+ * `extraData` считается один раз на набор и не меняется между файлами, поэтому
+ * живёт рядом с очередью, а не путешествует через её контракт.
+ */
+let perFileExtraData: GrFileUploadExtraData | undefined
+
+const perFile = usePerFileUpload({
+  concurrency: () => props.concurrency,
+  send: (files, ctx) => (props.request
+    ? props.request(files, { signal: ctx.signal, extraData: perFileExtraData, onProgress: ctx.onProgress })
+    : uploadViaXhr({
+        url: props.action ?? '',
+        files,
+        name: props.name,
+        headers: props.headers,
+        withCredentials: props.withCredentials,
+        extraData: perFileExtraData,
+        signal: ctx.signal,
+        onProgress: ctx.onProgress,
+      })),
+  onSummary: assignState,
+  onProgress: (info, file) => emit('progress', info.percent, info, file),
+  onSuccess: (payload, file) => emit('success', payload as TResponse, file),
+  onError: (error, file) => emit('error', error, file),
+  onSetChange: files => emit('change', files),
+})
+
+const fileEntries = perFile.entries
+const { retryFile, abortFile } = perFile
+
+const dropZone = useDropZone({
+  locked: () => isLocked.value,
+  inactive: () => hasCustomUi.value,
+  onDrop: files => void handleFiles(files, 'drop'),
+})
+const isOver = dropZone.isOver
+
+const zoneClass = computed(() => grFileUploadZoneClass({
+  size: resolvedSize.value,
+  disabled: isDisabled.value,
+  readonly: isReadonly.value,
+  over: isOver.value,
+}))
 
 const hiddenInputStyle = {
   position: 'fixed',
@@ -314,13 +337,8 @@ const hiddenInputStyle = {
   pointerEvents: 'none',
 } as const satisfies Record<string, string>
 
-function setOver(next: boolean) {
-  if (isOver.value === next) return
-  isOver.value = next
-}
-
 function openDialog() {
-  if (isDisabled.value) return
+  if (isLocked.value) return
   inputRef.value?.click()
 }
 
@@ -394,7 +412,7 @@ function effectiveValidators(): FileValidator[] {
 let runCounter = 0
 
 async function handleFiles(files: File[], source: FileValidatorSource = 'input') {
-  if (isDisabled.value) return
+  if (isLocked.value) return
   if (!files.length) return
 
   runCounter += 1
@@ -424,7 +442,7 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
 
   // Набор сменился — миниатюры прежнего больше не нужны.
   revokeAllPreviews()
-  lastFiles.value = valid
+  setFiles(valid)
 
   const before = await runBeforeUpload(valid)
   if (isStale()) return
@@ -443,10 +461,11 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   }
 
   abort()
-  clearHideSuccessTimer()
+  clearScheduledIdle()
 
   if (props.uploadMode === 'per-file') {
-    await uploadPerFile(valid, extraData)
+    perFileExtraData = extraData
+    await perFile.run(valid)
     return
   }
 
@@ -454,7 +473,7 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   activeController = controller
 
   // Батч: пофайловых записей нет, показываем набор без статусов.
-  fileEntries.value = []
+  perFile.reset()
 
   setStateUploading()
   emit('progress', 0, { percent: 0, loaded: 0, total: 0, indeterminate: true })
@@ -476,12 +495,8 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
     emit('change', valid)
     emit('progress', 100, { percent: 100, loaded: finalLoaded, total: finalLoaded, indeterminate: false })
 
-    if (props.hideProgressOnSuccess && props.hideProgressOnSuccess > 0) {
-      hideSuccessTimer = setTimeout(() => {
-        if (state.phase === 'success') setStateIdle()
-        hideSuccessTimer = null
-      }, props.hideProgressOnSuccess)
-    }
+    if (props.hideProgressOnSuccess && props.hideProgressOnSuccess > 0)
+      scheduleIdle(props.hideProgressOnSuccess)
   } catch (error) {
     if (error instanceof GrUploadAbortError) {
       setStateIdle()
@@ -494,154 +509,17 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   }
 }
 
-/** Пересчитать сводное состояние из пофайловых записей. */
-function syncStateFromEntries(): void {
-  assignState(summarizeFileEntries(fileEntries.value))
-}
-
-function entryOf(file: File): GrFileUploadEntry | undefined {
-  return fileEntries.value.find(entry => entry.file === file)
-}
-
-function patchEntry(file: File, patch: Partial<GrFileUploadEntry>): void {
-  const entry = entryOf(file)
-  if (!entry) return
-
-  Object.assign(entry, patch)
-  syncStateFromEntries()
-}
-
-/** Загрузка одного файла: свой контроллер, свой прогресс, свой статус. */
-async function uploadSingleFile(file: File, extraData: GrFileUploadExtraData | undefined): Promise<void> {
-  const controller = new AbortController()
-  fileControllers.set(file, controller)
-  patchEntry(file, { status: 'uploading', percent: 0, error: undefined })
-
-  const onProgress = (info: GrUploadProgressInfo): void => {
-    patchEntry(file, { percent: info.indeterminate ? 0 : info.percent })
-    emit('progress', info.percent, info, file)
-  }
-
-  try {
-    const payload = props.request
-      ? await props.request([file], { signal: controller.signal, extraData, onProgress })
-      : await uploadViaXhr({
-          url: props.action ?? '',
-          files: [file],
-          name: props.name,
-          headers: props.headers,
-          withCredentials: props.withCredentials,
-          extraData,
-          signal: controller.signal,
-          onProgress,
-        }) as TResponse
-
-    patchEntry(file, { status: 'success', percent: 100, error: undefined })
-    emit('success', payload, file)
-    emit('progress', 100, { percent: 100, loaded: 0, total: 0, indeterminate: false }, file)
-  }
-  catch (error) {
-    // Отмена — не ошибка файла: строка возвращается в исходное состояние, а
-    // пользователь решает, повторять её или убрать.
-    if (error instanceof GrUploadAbortError || (error as { name?: string })?.name === 'AbortError') {
-      patchEntry(file, { status: 'pending', percent: 0, error: undefined })
-    }
-    else {
-      patchEntry(file, { status: 'error', error })
-    }
-    emit('error', error, file)
-  }
-  finally {
-    fileControllers.delete(file)
-  }
-}
-
 /**
- * Очередь с ограничением параллелизма. Без неё «пофайлово» означало бы «все
- * сразу»: сотня файлов открыла бы сотню соединений.
+ * `<input type="file">` не понимает `readonly` — атрибута для него в HTML нет.
+ * Поэтому системный диалог гасим отменой действия по умолчанию: input остаётся
+ * в порядке `Tab` и объявляется как «только чтение», но нового файла не примет.
  */
-async function runWithConcurrency(files: File[], extraData: GrFileUploadExtraData | undefined): Promise<void> {
-  const limit = Math.max(1, Math.floor(props.concurrency))
-  const queue = [...files]
-
-  const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
-    while (queue.length) {
-      const next = queue.shift()
-      if (!next) return
-      await uploadSingleFile(next, extraData)
-    }
-  })
-
-  await Promise.all(workers)
-}
-
-async function uploadPerFile(files: File[], extraData: GrFileUploadExtraData | undefined): Promise<void> {
-  fileEntries.value = files.map(createFileEntry)
-  syncStateFromEntries()
-
-  await runWithConcurrency(files, extraData)
-  emit('change', files)
-}
-
-/** Повторить один файл — соседей это не касается. */
-async function retryFile(file: File): Promise<void> {
-  if (props.uploadMode !== 'per-file') return
-  if (!entryOf(file)) return
-
-  let extraData: GrFileUploadExtraData | undefined
-  try {
-    extraData = props.uploadExtraData?.([file])
-  }
-  catch (error) {
-    emit('error', error, file)
-    return
-  }
-
-  await uploadSingleFile(file, extraData)
-}
-
-/** Оборвать загрузку одного файла. */
-function abortFile(file: File): void {
-  fileControllers.get(file)?.abort()
-  fileControllers.delete(file)
-}
-
-function onDragEnter(event: DragEvent) {
-  if (hasCustomUi.value) return
-  if (isDisabled.value) return
-  event.preventDefault()
-  overCounter += 1
-  setOver(true)
-}
-
-function onDragOver(event: DragEvent) {
-  if (hasCustomUi.value) return
-  if (isDisabled.value) return
-  event.preventDefault()
-  if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy'
-}
-
-function onDragLeave(event: DragEvent) {
-  if (hasCustomUi.value) return
-  if (isDisabled.value) return
-  event.preventDefault()
-  overCounter = Math.max(0, overCounter - 1)
-  if (overCounter === 0) setOver(false)
-}
-
-function onDrop(event: DragEvent) {
-  if (hasCustomUi.value) return
-  if (isDisabled.value) return
-  event.preventDefault()
-  overCounter = 0
-  setOver(false)
-
-  const files = event.dataTransfer?.files ? Array.prototype.slice.call(event.dataTransfer.files) as File[] : []
-  void handleFiles(files, 'drop')
+function onInputClick(event: MouseEvent) {
+  if (isReadonly.value && !isDisabled.value) event.preventDefault()
 }
 
 async function onInputChange(event: Event) {
-  if (isDisabled.value) return
+  if (isLocked.value) return
 
   const target = event.target as HTMLInputElement | null
   const files = target?.files ? Array.prototype.slice.call(target.files) as File[] : []
@@ -689,56 +567,6 @@ const progressText = computed(() => {
   return `${Math.round(progressPercent.value)}%`
 })
 
-/**
- * Стабильный ключ файла для списка. По имени ключ дублировался: два
- * одноимённых файла из разных папок ломали переиспользование `<li>` — заметно
- * стало ровно тогда, когда в строке появилась кнопка удаления.
- */
-const fileKeys = new WeakMap<File, string>()
-let fileKeyCounter = 0
-
-function fileKey(file: File): string {
-  const existing = fileKeys.get(file)
-  if (existing !== undefined) return existing
-
-  fileKeyCounter += 1
-  const key = `gr-file-${fileKeyCounter}`
-  fileKeys.set(file, key)
-  return key
-}
-
-/**
- * Миниатюры превью: `object URL` живёт ровно столько, сколько файл в наборе.
- * Без отзыва blob висит в памяти вкладки до перезагрузки — утечка тем заметнее,
- * чем чаще пользователь перевыбирает файлы.
- */
-const previewUrls = new Map<File, string>()
-
-function previewUrl(file: File): string | undefined {
-  if (!props.preview || !file.type.startsWith('image/')) return undefined
-
-  const existing = previewUrls.get(file)
-  if (existing) return existing
-
-  if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') return undefined
-
-  const url = URL.createObjectURL(file)
-  previewUrls.set(file, url)
-  return url
-}
-
-function revokePreview(file: File): void {
-  const url = previewUrls.get(file)
-  if (!url) return
-
-  URL.revokeObjectURL(url)
-  previewUrls.delete(file)
-}
-
-function revokeAllPreviews(): void {
-  for (const file of [...previewUrls.keys()]) revokePreview(file)
-}
-
 const isPerFile = computed(() => props.uploadMode === 'per-file')
 
 const statusTextByStatus = computed<Record<string, string>>(() => ({
@@ -750,7 +578,7 @@ const statusTextByStatus = computed<Record<string, string>>(() => ({
 
 /** Запись файла для разметки: в батчевом режиме её нет — и статуса тоже. */
 function entryFor(file: File): GrFileUploadEntry | undefined {
-  return isPerFile.value ? entryOf(file) : undefined
+  return isPerFile.value ? perFile.entryOf(file) : undefined
 }
 
 /** Повторить загрузку текущего набора — после ошибки выбирать файлы заново незачем. */
@@ -770,14 +598,14 @@ function removeFile(file: File): void {
 
   abortFile(file)
   abort()
-  clearHideSuccessTimer()
+  clearScheduledIdle()
   revokePreview(file)
-  lastFiles.value = next
-  fileEntries.value = fileEntries.value.filter(entry => entry.file !== file)
+  setFiles(next)
+  perFile.dropEntry(file)
 
   // В пофайловом режиме остальные файлы своих статусов не теряют: удалили один
   // — сводное состояние просто пересчитывается по оставшимся.
-  if (props.uploadMode === 'per-file' && fileEntries.value.length) syncStateFromEntries()
+  if (props.uploadMode === 'per-file' && fileEntries.value.length) assignState(summarizeFileEntries(fileEntries.value))
   else if (state.phase !== 'idle') setStateIdle()
 }
 
@@ -789,9 +617,6 @@ function blur(): void {
   inputRef.value?.blur()
 }
 
-// Незакрытые хвосты компонента: XHR продолжал качать файл, а таймер скрытия
-// успеха — дёргать `setStateIdle()` уже на уничтоженном инстансе. Классический
-// сценарий: успешная загрузка и уход со страницы сразу после неё.
 // Ни `action`, ни `request` — загружать некуда, и узнать об этом на первом же
 // выборе файла поздно. Выразить требование типом нельзя: `defineProps` в SFC
 // принимает объектный тип или интерфейс, но не discriminated union.
@@ -802,11 +627,13 @@ onMounted(() => {
   console.warn('[GrFileUpload] не задан ни `action`, ни `request`: отправлять файлы некуда.')
 })
 
+// Хвосты, переживающие размонтирование: незавершённый XHR продолжает качать
+// файл, а таймер скрытия успеха дёргает `setStateIdle()` на уничтоженном
+// инстансе. Сценарий обычный — успешная загрузка и уход со страницы сразу после.
 onBeforeUnmount(() => {
-  clearHideSuccessTimer()
+  clearScheduledIdle()
   abort()
-  for (const controller of fileControllers.values()) controller.abort()
-  fileControllers.clear()
+  perFile.abortAll()
   revokeAllPreviews()
 })
 
@@ -831,36 +658,20 @@ defineExpose({
 <template>
   <!-- Drop-zone намеренно БЕЗ `role="button"` и `tabindex`: доступным контролом
        служит сам нативный `<input type="file">`. Роль-виджет объявляет потомков
-       презентационными, поэтому input внутри неё терялся для скринридеров и падал
-       в axe на `nested-interactive`; а обёртывать его в собственный «button» —
-       значит вручную переизобретать то, что file-input уже умеет нативно
-       (открытие диалога с клавиатуры, объявление «кнопка выбора файла»).
+       презентационными, поэтому input внутри неё теряется для скринридеров и
+       падает в axe на `nested-interactive`; а обёртывать его в собственный
+       «button» — значит вручную переизобретать то, что file-input уже умеет
+       нативно (открытие диалога с клавиатуры, объявление «кнопка выбора файла»).
        Зона остаётся кликабельной и принимает drag&drop, фокус input'а показывает
-       через `focus-within`.
-
-       Disabled показываем фоном, а не `opacity`: прозрачность разбавляет выверенные
-       на AA токены текста и роняет контраст (та же грабля, что с
-       `--showcase-text-subtle` в ANALYSIS §54). Раньше это пряталось за ролью-виджетом:
-       axe не проверяет содержимое презентационных потомков. -->
+       через `focus-within`. -->
   <div
     data-gr-file-upload
-    :class="
-      hasCustomUi
-        ? 'inline-block'
-        : [
-            'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] outline-none transition',
-            zoneClass,
-            disabled
-              ? 'bg-[var(--gr-muted)] cursor-not-allowed'
-              : 'bg-[var(--gr-card)] cursor-pointer hover:bg-[var(--gr-muted)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]',
-            isOver && !disabled ? 'border-[var(--gr-ring)] bg-[var(--gr-muted)]' : '',
-          ]
-    "
+    :class="hasCustomUi ? 'inline-block' : zoneClass"
     @click="onRootClick"
-    @dragenter="onDragEnter"
-    @dragover="onDragOver"
-    @dragleave="onDragLeave"
-    @drop="onDrop"
+    @dragenter="dropZone.onDragEnter"
+    @dragover="dropZone.onDragOver"
+    @dragleave="dropZone.onDragLeave"
+    @drop="dropZone.onDropFiles"
   >
     <!-- В custom-UI контрол рисует слот (он и вызывает `openDialog`), поэтому там
          input прячется и от таба, и от дерева доступности — иначе получим два
@@ -871,7 +682,7 @@ defineExpose({
       data-gr-file-upload-input
       :style="hiddenInputStyle"
       type="file"
-      :tabindex="hasCustomUi || disabled ? -1 : 0"
+      :tabindex="hasCustomUi || isDisabled ? -1 : 0"
       :aria-hidden="hasCustomUi ? 'true' : undefined"
       :aria-label="ariaLabel ?? (hasCustomUi ? undefined : resolvedPlaceholder)"
       :aria-describedby="describedBy"
@@ -884,6 +695,7 @@ defineExpose({
       :webkitdirectory="directory || undefined"
       :multiple="multiple"
       :disabled="isDisabled"
+      @click="onInputClick"
       @change="onInputChange"
     >
 
@@ -976,7 +788,7 @@ defineExpose({
               </button>
 
               <button
-                v-else-if="entryFor(file)!.status === 'error' && !disabled && !isReadonly"
+                v-else-if="entryFor(file)!.status === 'error' && !isDisabled && !isReadonly"
                 data-gr-file-upload-retry-file
                 type="button"
                 class="ml-auto text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded underline"
@@ -988,7 +800,7 @@ defineExpose({
             </template>
 
             <button
-              v-if="!disabled && !isReadonly"
+              v-if="!isDisabled && !isReadonly"
               data-gr-file-upload-remove
               type="button"
               class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
