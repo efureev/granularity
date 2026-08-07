@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrTreeSelect`: checkboxes for multiple selection.** `show-checkbox` (together with `multiple`) swaps the
+  component's own tick for `GrTree`'s checkboxes: checking a parent cascades over its subtree and a partially checked
+  parent is announced as `aria-checked="mixed"`. The cascade is computed by the tree itself, so a click on the row, a
+  click on the box and `Space` all travel the same path and cannot double-toggle. `check-strictly` unlinks parents
+  from children. All checked keys — parents included — end up in `modelValue`.
 - **`toast.promise` and `toast.update`.** `promise(p, { loading, success, error })` runs a request's whole lifecycle
   in one toast — the loading toast is rewritten into the result instead of being closed in favour of a new one, so the
   stack does not jump. Messages may be strings, toast inputs, or functions of the resolved value / rejection reason.
@@ -91,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   spilled onto the user once the stack drained. The queue keeps at most 20 toasts by default — configurable with
   `app.use(granularityToastPlugin, { maxToasts: 50 })` — dropping the oldest ones and clearing their timers.
 - **`GrToaster`: the toast title and message moved from `13px` literals to `--gr-text-sm`.**
+- **`GrTreeSelect`: the panel's loading and empty rows moved from `13px` literals to `--gr-text-sm`.**
 - **`GrTabs` scrolls an overflowing row instead of wrapping it.** A wrapped row pushed tabs under the panel and broke
   the alignment; the row now scrolls horizontally with the scrollbar hidden, and the active tab pulls itself into view
   — including when it was selected from outside. Vertical orientation is unaffected.

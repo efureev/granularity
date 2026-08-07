@@ -52,6 +52,7 @@ const selectionLabel = computed(() => {
       v-model="selectedValues"
       :data="treeData"
       multiple
+      show-checkbox
       filterable
       clearable
       :close-on-select="false"

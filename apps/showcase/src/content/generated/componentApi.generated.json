@@ -9007,6 +9007,20 @@
             "default": "false"
           },
           {
+            "name": "showCheckbox",
+            "description": "Чекбоксы в дереве вместо собственной галочки: отметка родителя каскадом закрывает поддерево, полувыбранный родитель показывается `mixed`. Работает только вместе с `multiple`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "checkStrictly",
+            "description": "Отвязать родителей от детей: отметка перестаёт распространяться каскадом.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "clearable",
             "description": "",
             "type": "boolean | undefined",

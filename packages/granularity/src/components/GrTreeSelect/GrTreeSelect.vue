@@ -38,6 +38,8 @@ const props = withDefaults(
     ariaLabel: undefined,
     state: 'default',
     multiple: false,
+    showCheckbox: false,
+    checkStrictly: false,
     clearable: false,
     valueDisplay: 'label',
     filterable: false,
@@ -419,11 +421,31 @@ function onPanelKeydown(e: KeyboardEvent): void {
     closeDropdown()
 }
 
+// Чекбоксы осмысленны только в множественном выборе: одиночный уже подсвечен
+// текущим узлом.
+const checkboxMode = computed(() => props.multiple && props.showCheckbox)
+
+// В режиме чекбоксов каскад по родителям и детям считает `GrTree`, а не копия
+// его логики здесь: значение приходит обратно одним `update:checkedKeys`.
+function onCheckedKeys(keys: GrTreeKey[]): void {
+  if (isDisabled.value || isReadonly.value)
+    return
+
+  emitModel([...keys])
+}
+
 function onNodeClick(data: T, node: GrTreeNode<T>): void {
   emit('nodeClick', data, node)
 
   if (isDisabled.value)
     return
+
+  if (checkboxMode.value) {
+    // Клик по строке — тот же переключатель отметки, что и сам чекбокс;
+    // значение придёт через `update:checkedKeys`, поэтому здесь не эмитим.
+    treeRef.value?.setChecked(node.key, !selectedKeySet.value.has(node.key))
+    return
+  }
 
   if (props.multiple) {
     const next = new Set(selectedKeySet.value)
@@ -571,7 +593,7 @@ const themeAttrs = useGrThemeAttrs()
               v-if="loading"
               data-gr-tree-select-loading
               role="status"
-              class="flex items-center gap-2 px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]"
+              class="flex items-center gap-2 px-3 py-2 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
             >
               <slot name="loading">
                 <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
@@ -579,7 +601,7 @@ const themeAttrs = useGrThemeAttrs()
               </slot>
             </div>
 
-            <div v-else-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[13px] text-[var(--gr-muted-fg)]">
+            <div v-else-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]">
               <slot name="empty">
                 {{ t('gr.treeSelect.empty', 'No data') }}
               </slot>
@@ -596,7 +618,11 @@ const themeAttrs = useGrThemeAttrs()
               :default-expanded-keys="defaultExpandedKeys"
               :filter-node-method="filterNodeMethod"
               :highlight-current="!multiple"
+              :show-checkbox="checkboxMode"
+              :check-strictly="checkStrictly"
+              :checked-keys="selectedKeys"
               @node-click="onNodeClick"
+              @update:checked-keys="onCheckedKeys"
             >
               <template #default="{ node, data }">
                 <slot
@@ -606,7 +632,11 @@ const themeAttrs = useGrThemeAttrs()
                   :selected="selectedKeySet.has(node.key)"
                 >
                   <div class="flex items-center gap-2 min-w-0">
+                    <!-- Чекбокс дерева уже показывает отметку: вторая галочка
+                         рядом читалась бы как ошибка. -->
                     <span
+                      v-if="!checkboxMode"
+                      data-gr-tree-select-check
                       class="inline-block h-4 w-4 shrink-0"
                       :class="selectedKeySet.has(node.key) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
                       aria-hidden="true"

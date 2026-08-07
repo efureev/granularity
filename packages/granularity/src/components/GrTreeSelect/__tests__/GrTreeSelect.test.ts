@@ -498,3 +498,100 @@ describe('GrTreeSelect — Escape из дерева', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTreeSelect — чекбоксы при multiple', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  async function openWithCheckboxes(props: Partial<GrTreeSelectProps> = {}) {
+    const wrapper = await mountHarness({ multiple: true, showCheckbox: true, ...props })
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+    return wrapper
+  }
+
+  function rowByLabel(label: string): DOMWrapper<Element> {
+    const row = bodyFindAllRows().find(candidate => candidate.text().includes(label))
+    return row ?? new DOMWrapper(document.createElement('i'))
+  }
+
+  it('чекбоксы появляются только вместе с multiple', async () => {
+    const single = await mountHarness({ showCheckbox: true })
+    await single.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+    expect(bodyExists('[data-gr-tree-checkbox]')).toBe(false)
+    document.body.innerHTML = ''
+
+    await openWithCheckboxes()
+    expect(bodyExists('[data-gr-tree-checkbox]')).toBe(true)
+  })
+
+  it('отметка родителя каскадом уводит поддерево в modelValue', async () => {
+    const wrapper = await openWithCheckboxes()
+
+    await rowByLabel('Home').trigger('click')
+    await nextTick()
+
+    // Родитель и оба ребёнка: каскад считает `GrTree`, а не сам селект.
+    const model = wrapper.find('[data-testid="model"]').text()
+    for (const key of ['3', '31', '32'])
+      expect(model).toContain(key)
+  })
+
+  it('checkStrictly отвязывает родителя от детей', async () => {
+    const wrapper = await openWithCheckboxes({ checkStrictly: true })
+
+    await rowByLabel('Home').trigger('click')
+    await nextTick()
+
+    const model = JSON.parse(wrapper.find('[data-testid="model"]').text())
+    expect(model).toEqual([3])
+  })
+
+  it('полувыбранный родитель объявлен mixed', async () => {
+    // Поддерево должно быть раскрыто: иначе строки ребёнка в панели нет.
+    await openWithCheckboxes({ defaultExpandedKeys: [3] })
+
+    await rowByLabel('Rent').trigger('click')
+    await nextTick()
+
+    // `aria-checked` живёт на самом `treeitem`, а не на строке внутри него.
+    const parent = [...document.body.querySelectorAll('[data-gr-tree-node]')]
+      .find(node => node.textContent?.includes('Home'))
+    expect(parent?.getAttribute('aria-checked')).toBe('mixed')
+  })
+
+  it('клик по строке переключает отметку ровно один раз', async () => {
+    const wrapper = await openWithCheckboxes()
+    const model = () => wrapper.find('[data-testid="model"]').text()
+
+    await rowByLabel('Travel').trigger('click')
+    await nextTick()
+    expect(model()).toContain('2')
+
+    // Двойного переключения быть не должно: значение приходит одним путём —
+    // через `update:checkedKeys`.
+    await rowByLabel('Travel').trigger('click')
+    await nextTick()
+    expect(model()).not.toContain('2')
+  })
+
+  it('своя галочка при чекбоксах не рендерится', async () => {
+    await openWithCheckboxes()
+    await rowByLabel('Travel').trigger('click')
+    await nextTick()
+
+    // Галочка чекбокса `GrTree` остаётся — проверяем, что нет второй, своей.
+    expect(bodyExists('[data-gr-tree-select-check]')).toBe(false)
+  })
+
+  it('строки панели идут от токена --gr-text-sm', async () => {
+    const wrapper = await mountHarness({ loading: true })
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+
+    expect(document.body.innerHTML).toContain('text-[length:var(--gr-text-sm)]')
+    expect(document.body.innerHTML).not.toContain('text-[13px]')
+  })
+})

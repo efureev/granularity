@@ -37,6 +37,14 @@ export interface GrTreeSelectProps<T extends object = any> {
   state?: GrTreeSelectState
 
   multiple?: boolean
+  /**
+   * Чекбоксы в дереве вместо собственной галочки: отметка родителя каскадом
+   * закрывает поддерево, полувыбранный родитель показывается `mixed`. Работает
+   * только вместе с `multiple`.
+   */
+  showCheckbox?: boolean
+  /** Отвязать родителей от детей: отметка перестаёт распространяться каскадом. */
+  checkStrictly?: boolean
   clearable?: boolean
 
   /** Как отображать выбранное значение в single-режиме. */
