@@ -14,6 +14,16 @@
     "empty": "Sin datos",
     "loading": "Cargando…"
   },
+  "avatar": {
+    "group": "Personas",
+    "groupOverflow": "y {count} más",
+    "status": {
+      "online": "en línea",
+      "offline": "sin conexión",
+      "busy": "ocupado",
+      "away": "ausente"
+    }
+  },
   "tree": {
     "drag": "Arrastrar",
     "expand": "Expandir",

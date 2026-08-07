@@ -4,5 +4,6 @@ import { grAvatarSafelist } from './safelist'
 
 export const grAvatarConfig = defineGranularComponent(import.meta.url, {
   name: 'GrAvatar',
+  dependencies: ['GrSkeleton'],
   safelist: grAvatarSafelist,
 })

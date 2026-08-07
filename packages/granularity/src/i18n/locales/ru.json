@@ -14,6 +14,16 @@
     "empty": "Нет данных",
     "loading": "Загрузка…"
   },
+  "avatar": {
+    "group": "Участники",
+    "groupOverflow": "и ещё {count}",
+    "status": {
+      "online": "в сети",
+      "offline": "не в сети",
+      "busy": "занят",
+      "away": "отошёл"
+    }
+  },
   "tree": {
     "drag": "Перетащить",
     "expand": "Развернуть",

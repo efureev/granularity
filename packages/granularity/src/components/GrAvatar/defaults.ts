@@ -1,5 +1,7 @@
 import type { GrComponentSize } from '../shared/sizes'
 
+import type { GrAvatarShape } from './grAvatarStyles'
+
 /**
  * Пропы `GrAvatar`, настраиваемые глобально через
  * `<GrConfigProvider :component-defaults="{ GrAvatar: { … } }">`.
@@ -7,6 +9,7 @@ import type { GrComponentSize } from '../shared/sizes'
  */
 export interface GrAvatarConfigurableProps {
   size: GrComponentSize
+  shape: GrAvatarShape
 }
 
 declare module '../GrConfigProvider/context' {

@@ -349,18 +349,39 @@
             "default": "undefined"
           },
           {
+            "name": "fallbackSrc",
+            "description": "Резервная картинка: показывается, когда `src` не загрузился.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "alt",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"\""
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя участника: даёт инициалы и доступное имя аватара.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "shape",
             "description": "",
             "type": "GrAvatarShape | undefined",
             "required": false,
-            "default": "\"circle\""
+            "default": "undefined"
+          },
+          {
+            "name": "status",
+            "description": "Статус участника. Точка декоративна — рядом идёт скрытая подпись.",
+            "type": "\"online\" | \"offline\" | \"busy\" | \"away\" | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -371,8 +392,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое вместо картинки и инициалов.",
+            "type": "any"
           }
         ]
       },
@@ -6502,18 +6523,18 @@
             "default": "undefined"
           },
           {
-            "name": "orientation",
-            "description": "Раскладка варианта `radiobox`. Кнопочный вариант всегда горизонтальный — его собирает `GrButtonGroup`.",
-            "type": "GrRadioGroupOrientation | undefined",
-            "required": false,
-            "default": "\"vertical\""
-          },
-          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "orientation",
+            "description": "Раскладка варианта `radiobox`. Кнопочный вариант всегда горизонтальный — его собирает `GrButtonGroup`.",
+            "type": "GrRadioGroupOrientation | undefined",
+            "required": false,
+            "default": "\"vertical\""
           },
           {
             "name": "modelValue",
@@ -6943,18 +6964,18 @@
             "default": "undefined"
           },
           {
-            "name": "block",
-            "description": "Растягивать сегмент на всю ширину контейнера.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "name",
             "description": "Имя скрытых radio-inputs для интеграции с нативной формой.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "block",
+            "description": "Растягивать сегмент на всю ширину контейнера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "indicatorDuration",

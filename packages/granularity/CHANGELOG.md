@@ -41,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrAvatar`: `name`, `status`, `fallbackSrc` and a new `GrAvatarGroup`.** `name` produces the initials and the
+  accessible name — a circle of initials used to be nameless for a screen reader. `status` draws a dot and announces
+  it in words, because colour alone carries no meaning. `GrAvatarGroup` stacks avatars with a «+N» counter and names
+  itself along with the number of hidden people, instead of leaving a row of anonymous pictures.
 - **`GrNavbar`: `sticky`, `#left`/`#center` zones and a configurable height.** The bar can now stick to the top of the
   page on the new `--gr-z-navbar` layer (900) — below anchored panels, so an open dropdown or modal covers the bar
   instead of disappearing under it. `#center` adds a middle zone for search or breadcrumbs; when it is used the side
@@ -177,6 +181,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrAvatar` showed the browser's broken-image icon.** The `<img>` had no `@error` handler and the fallback slot
+  sat under `v-else` of `src`, so a dead CDN link — the usual failure for avatars — rendered a broken image and the
+  slot never appeared. The component now falls through `fallbackSrc` to initials, resets that state when `src`
+  changes, and holds the space with a skeleton while the image loads.
+- **`GrAvatar`'s `shape` could not be set globally** — it went past `useGrComponentProp` and is now part of
+  `componentDefaults.GrAvatar`.
 - **`GrNavbar` required a `title` even when its `#title` slot was used.** Markup in the slot still had to be paired
   with a string prop, or Vue complained about a missing required prop — the showcase demo literally passed
   `title="Ignored by slot"` to work around it. The prop is optional now, and without a title (string or slot) the

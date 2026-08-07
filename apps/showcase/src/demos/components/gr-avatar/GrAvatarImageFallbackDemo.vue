@@ -17,8 +17,12 @@ const avatarImageSrc = `data:image/svg+xml;charset=UTF-8,${avatarSvg}`
   <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
     <div class="flex flex-wrap items-center gap-4">
       <GrAvatar :size="40" :src="avatarImageSrc" alt="Alex Doe" />
-      <GrAvatar :size="56" :src="avatarImageSrc" alt="Alex Doe" />
+      <GrAvatar :size="56" :src="avatarImageSrc" alt="Alex Doe" status="online" />
       <GrAvatar :size="72" shape="square" :src="avatarImageSrc" alt="Alex Doe" />
+
+      <!-- Битая ссылка — основной сценарий отказа: показываются инициалы из `name`. -->
+      <GrAvatar :size="56" src="/broken-avatar.png" name="Alex Doe" />
+      <GrAvatar :size="56" src="/broken-avatar.png" :fallback-src="avatarImageSrc" name="Alex Doe" />
     </div>
 
     <GrCard class="grid gap-2 p-4 text-sm text-[var(--gr-muted-fg)]">
@@ -26,7 +30,8 @@ const avatarImageSrc = `data:image/svg+xml;charset=UTF-8,${avatarSvg}`
         Fallback contract
       </div>
       <div>
-        When `src` is omitted, the component renders the default slot so initials and icons remain accessible.
+        A broken `src` falls back to `fallbackSrc`, then to initials from `name` — the browser never shows its
+        broken-image icon. Without `src` the default slot is rendered as before.
       </div>
     </GrCard>
   </div>

@@ -24,7 +24,7 @@
 
 - `GrAlert`
 - [`GrAutocomplete`](./components/GrAutocomplete.md)
-- `GrAvatar`
+- [`GrAvatar`](./components/GrAvatar.md)
 - `GrBadge`
 - `GrBadgeWrap`
 - `GrBottomNav`
