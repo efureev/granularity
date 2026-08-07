@@ -201,7 +201,7 @@ describe('GrPagination — конфигурация', () => {
     expect(wrapper.get('[data-gr-pagination-jumper]').attributes('disabled')).toBeDefined()
     expect(wrapper.findComponent({ name: 'GrSelect' }).props('disabled')).toBe(true)
     for (const nav of ['next', 'last', 'prev', 'first'])
-      expect(wrapper.getComponent(`[data-gr-pagination-${nav}]`).props('disabled')).toBe(true)
+      expect(wrapper.get(`[data-gr-pagination-${nav}]`).attributes('disabled')).toBeDefined()
 
     await wrapper.findAll('[data-gr-pagination-page]')[0].trigger('click')
     expect(wrapper.emitted('update:page')).toBeFalsy()
@@ -246,12 +246,12 @@ describe('GrPagination — крайние значения и клавиатур
     const beyond = mountPagination({ props: { page: 99, pageSize: 20, total: 160 } })
     const beyondActive = beyond.findAll('[data-gr-pagination-page]').find(b => b.attributes('aria-current') === 'page')
     expect(beyondActive!.text()).toBe('8')
-    expect(beyond.getComponent('[data-gr-pagination-next]').props('disabled')).toBe(true)
+    expect(beyond.get('[data-gr-pagination-next]').attributes('disabled')).toBeDefined()
 
     const below = mountPagination({ props: { page: 0, pageSize: 20, total: 160 } })
     const belowActive = below.findAll('[data-gr-pagination-page]').find(b => b.attributes('aria-current') === 'page')
     expect(belowActive!.text()).toBe('1')
-    expect(below.getComponent('[data-gr-pagination-prev]').props('disabled')).toBe(true)
+    expect(below.get('[data-gr-pagination-prev]').attributes('disabled')).toBeDefined()
   })
 
   it('pageSize=0 не уводит расчёт страниц в бесконечность', () => {
@@ -281,13 +281,13 @@ describe('GrPagination — крайние значения и клавиатур
   it('на первой странице prev/first недоступны, на последней — next/last', async () => {
     const wrapper = mountPagination({ props: { page: 1, pageSize: 20, total: 160 } })
 
-    expect(wrapper.getComponent('[data-gr-pagination-prev]').props('disabled')).toBe(true)
-    expect(wrapper.getComponent('[data-gr-pagination-first]').props('disabled')).toBe(true)
-    expect(wrapper.getComponent('[data-gr-pagination-next]').props('disabled')).toBe(false)
+    expect(wrapper.get('[data-gr-pagination-prev]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-gr-pagination-first]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-gr-pagination-next]').attributes('disabled')).toBeUndefined()
 
     await wrapper.setProps({ page: 8 })
-    expect(wrapper.getComponent('[data-gr-pagination-next]').props('disabled')).toBe(true)
-    expect(wrapper.getComponent('[data-gr-pagination-last]').props('disabled')).toBe(true)
-    expect(wrapper.getComponent('[data-gr-pagination-prev]').props('disabled')).toBe(false)
+    expect(wrapper.get('[data-gr-pagination-next]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-gr-pagination-last]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-gr-pagination-prev]').attributes('disabled')).toBeUndefined()
   })
 })

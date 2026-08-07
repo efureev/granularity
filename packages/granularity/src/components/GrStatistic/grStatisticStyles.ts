@@ -15,24 +15,24 @@ export type GrStatisticTrend = 'up' | 'down' | 'flat'
  */
 
 export const statisticTitleSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[10px]',
-  sm: 'text-[11px]',
-  md: 'text-[12px]',
-  lg: 'text-[13px]',
+  xs: 'text-[length:var(--gr-text-2xs)]',
+  sm: 'text-[length:var(--gr-text-xs)]',
+  md: 'text-[length:var(--gr-text-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)]',
 }
 
 export const statisticValueSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[16px] leading-6',
-  sm: 'text-[20px] leading-7',
-  md: 'text-[28px] leading-9',
-  lg: 'text-[36px] leading-tight',
+  xs: 'text-[length:var(--gr-text-base)] leading-6',
+  sm: 'text-[length:var(--gr-text-xl)] leading-7',
+  md: 'text-[length:var(--gr-text-3xl)] leading-9',
+  lg: 'text-[length:var(--gr-text-4xl)] leading-tight',
 }
 
 export const statisticAffixSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
-  md: 'text-[16px]',
-  lg: 'text-[20px]',
+  xs: 'text-[length:var(--gr-text-xs)]',
+  sm: 'text-[length:var(--gr-text-xs)]',
+  md: 'text-[length:var(--gr-text-base)]',
+  lg: 'text-[length:var(--gr-text-xl)]',
 }
 
 // Высота плейсхолдера загрузки повторяет строку значения — блок не «прыгает».
@@ -45,10 +45,10 @@ export const statisticPlaceholderHeightBySize: Record<GrStatisticSize, string> =
 }
 
 export const statisticTrendSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[10px]',
-  sm: 'text-[11px]',
-  md: 'text-[12px]',
-  lg: 'text-[13px]',
+  xs: 'text-[length:var(--gr-text-2xs)]',
+  sm: 'text-[length:var(--gr-text-xs)]',
+  md: 'text-[length:var(--gr-text-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)]',
 }
 
 // Цвет значения по тону. `neutral` наследует основной цвет текста.

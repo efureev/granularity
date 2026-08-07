@@ -75,6 +75,11 @@
     },
     "ok": "ОК"
   },
+  "statistic": {
+    "trendUp": "Рост",
+    "trendDown": "Падение",
+    "trendFlat": "Без изменений"
+  },
   "pagination": {
     "label": "Пагинация",
     "pageSize": "Размер страницы",

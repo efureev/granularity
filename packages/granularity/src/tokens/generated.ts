@@ -87,6 +87,12 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Моноширинный стек для кода, числовых значений и технических подписей."
   },
   {
+    "name": "--gr-text-2xs",
+    "value": "10px",
+    "section": "Typography: font sizes",
+    "description": "Размер шрифта `2xs` из типографической шкалы foundation tokens: подписи и служебные строки, которые не должны конкурировать с основным текстом."
+  },
+  {
     "name": "--gr-text-xs",
     "value": "12px",
     "section": "Typography: font sizes",

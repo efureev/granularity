@@ -38,3 +38,32 @@ describe('formatStatisticValue', () => {
     expect(formatStatisticValue(Number.POSITIVE_INFINITY)).toBe('Infinity')
   })
 })
+
+describe('formatStatisticValue — локаль', () => {
+  it('локаль задаёт разделители: en-US и de-DE группируют по-разному', () => {
+    expect(formatStatisticValue(1234567.5, { precision: 2, locale: 'en-US' })).toBe('1,234,567.50')
+    expect(formatStatisticValue(1234567.5, { precision: 2, locale: 'de-DE' })).toBe('1.234.567,50')
+  })
+
+  it('явные разделители сильнее локали, а незаданные берутся из неё', () => {
+    // de-DE группирует точкой; свой десятичный разделитель подменяет только его часть.
+    expect(formatStatisticValue(1234.5, { precision: 1, locale: 'de-DE', decimalSeparator: '.' }))
+      .toBe('1.234.5')
+    expect(formatStatisticValue(1234567.5, { precision: 1, locale: 'de-DE', groupSeparator: ' ' }))
+      .toBe('1 234 567,5')
+  })
+
+  it('без точности локаль сохраняет дробную часть как есть', () => {
+    expect(formatStatisticValue(1234.567, { locale: 'en-US' })).toBe('1,234.567')
+    expect(formatStatisticValue(1234, { locale: 'en-US' })).toBe('1,234')
+  })
+
+  it('нечисловые значения локаль не трогает', () => {
+    expect(formatStatisticValue('2 ч 15 мин', { locale: 'ru-RU' })).toBe('2 ч 15 мин')
+    expect(formatStatisticValue('—', { locale: 'ru-RU' })).toBe('—')
+  })
+
+  it('точность больше 20 знаков не роняет Intl', () => {
+    expect(() => formatStatisticValue(1.5, { precision: 30, locale: 'en-US' })).not.toThrow()
+  })
+})

@@ -73,6 +73,11 @@
     },
     "ok": "OK"
   },
+  "statistic": {
+    "trendUp": "Increase",
+    "trendDown": "Decrease",
+    "trendFlat": "No change"
+  },
   "pagination": {
     "label": "Pagination",
     "pageSize": "Page size",

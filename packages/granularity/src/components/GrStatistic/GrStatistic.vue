@@ -2,6 +2,7 @@
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { computed } from 'vue'
 
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
 import { formatStatisticValue } from './formatStatisticValue'
@@ -41,9 +42,15 @@ export interface GrStatisticProps {
   title?: string
   /** Число знаков после запятой. */
   precision?: number
-  /** Разделитель разрядов (по умолчанию — узкий пробел). */
+  /** Разделитель разрядов. Сильнее локали; без него и без локали — узкий пробел. */
   groupSeparator?: string
+  /** Десятичный разделитель. Сильнее локали; без него и без локали — точка. */
   decimalSeparator?: string
+  /**
+   * BCP-47 локаль форматирования. Не задана — берётся из i18n-адаптера; нет и
+   * адаптера — работают ручные разделители.
+   */
+  locale?: string
   /** Приписка перед значением (валюта, знак). */
   prefix?: string
   /** Приписка после значения (единица измерения, `%`). */
@@ -66,8 +73,11 @@ const props = withDefaults(
   {
     title: undefined,
     precision: undefined,
-    groupSeparator: ' ',
-    decimalSeparator: '.',
+    // Дефолты живут в `formatStatisticValue`: иначе «пользователь задал пробел»
+    // было бы неотличимо от «сработал дефолт», и локаль не смогла бы победить.
+    groupSeparator: undefined,
+    decimalSeparator: undefined,
+    locale: undefined,
     prefix: undefined,
     suffix: undefined,
     icon: undefined,
@@ -79,13 +89,32 @@ const props = withDefaults(
   },
 )
 
+const { t, locale } = useGranularityTranslations()
+
+const resolvedLocale = computed(() => props.locale ?? locale.value)
+
 const formatted = computed(() => formatStatisticValue(props.value, {
   precision: props.precision,
   groupSeparator: props.groupSeparator,
   decimalSeparator: props.decimalSeparator,
+  locale: resolvedLocale.value,
 }))
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatistic' })
+
+// Иконка направления `aria-hidden`, а «+12,5 %» само по себе рост от падения не
+// отличает: направление доносит скрытая подпись.
+const trendLabel = computed(() => {
+  if (!props.trend) return undefined
+
+  const labels = {
+    up: () => t('gr.statistic.trendUp', 'Increase'),
+    down: () => t('gr.statistic.trendDown', 'Decrease'),
+    flat: () => t('gr.statistic.trendFlat', 'No change'),
+  }
+
+  return labels[props.trend]()
+})
 </script>
 
 <template>
@@ -125,6 +154,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatis
           :height="statisticPlaceholderHeightBySize[resolvedSize]"
           rounded="var(--gr-radius-md)"
         />
+        <span class="sr-only">{{ t('gr.loading.defaultText', 'Loading...') }}</span>
       </div>
 
       <div
@@ -163,6 +193,8 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatis
         class="mt-1 inline-flex items-center gap-1"
         :class="[statisticTrendSizeBySize[resolvedSize], statisticTrendClassByTrend[trend ?? 'flat']]"
       >
+        <span v-if="trendLabel" data-gr-statistic-trend-label class="sr-only">{{ trendLabel }}</span>
+
         <slot name="trend">
           <span
             v-if="trend"

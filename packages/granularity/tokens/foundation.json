@@ -79,6 +79,11 @@
       "title": "Typography: font sizes",
       "tokens": [
         {
+          "name": "--gr-text-2xs",
+          "value": "10px",
+          "description": "Размер шрифта `2xs` из типографической шкалы foundation tokens: подписи и служебные строки, которые не должны конкурировать с основным текстом."
+        },
+        {
           "name": "--gr-text-xs",
           "value": "12px",
           "description": "Размер шрифта `xs` из типографической шкалы foundation tokens."

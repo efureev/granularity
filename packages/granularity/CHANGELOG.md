@@ -41,6 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrStatistic`: `locale` and number formatting through `Intl`.** Separators now come from the locale — taken from
+  the i18n adapter automatically, overridable per card with `locale`, and still overridable outright with
+  `groupSeparator`/`decimalSeparator`, which replace only their own part and leave the rest of the locale's rules
+  (grouping style, minus sign) intact. Without an adapter and without the prop, formatting is byte-for-byte what it
+  was: a narrow space and a dot.
+- **`--gr-text-2xs` (10px) joins the type scale.** The smallest captions had no token to sit on, so components spelled
+  them out in px.
 - **`GrPagination`: `showTotal`, `ariaLabel` and `disabled`.** `showTotal` renders the visible range («41–60 of 137»)
   next to the navigation, and the `#total` slot replaces it with markup, receiving `from`, `to` and `total`.
   `ariaLabel` names the navigation landmark — without it two paginations around a table produce two identically named
@@ -53,6 +60,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrStatistic`: the four size ladders moved from px literals to `--gr-text-*`.** Captions and the trend line run
+  `2xs/xs/xs/sm`, affixes `xs/xs/base/xl`, the value `base/xl/3xl/4xl` — the value at `md` grows from 28px to 30px,
+  the only visual shift.
 - **`GrPagination` no longer renders the page-size select by default.** It is now behind `showPageSize`, because a
   bare pagination is «just the page numbers» far more often than not; add `show-page-size` to keep the previous look.
 - **`GrPagination` announces the page numbers as a list.** They moved into a `<ul role="list">` inside the navigation
@@ -74,6 +84,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `region`, so five sections of one form produced five landmarks and buried the useful ones. The name is now attached
   only when `landmark` is set; structure is carried by the heading. The description keeps its `aria-describedby` link
   in both modes.
+- **`GrStatistic` did not tell a screen reader whether the metric went up or down.** The trend icon is decorative and
+  «+12.5%» carries no direction on its own, so growth and decline were indistinguishable — colour conveys it to
+  sighted users only. The trend line now carries a visually hidden «Increase» / «Decrease» / «No change», which
+  survives a custom `#trend` slot.
+- **`GrStatistic`'s loading region announced nothing.** The placeholder was `role="status" aria-busy="true"` with no
+  text inside, so the live region stayed silent; it now holds a hidden loading string.
 - **`GrPagination` hung the tab on `pageSize: 0`.** The page count came out as `Infinity` and the loop building the
   number range never finished. The divisor is clamped to at least `1` now.
 - **`GrPagination` rendered no active page when `page` was out of range.** The clamp used to arrive only through a

@@ -7597,6 +7597,13 @@
             "default": "false"
           },
           {
+            "name": "locale",
+            "description": "BCP-47 локаль форматирования. Не задана — берётся из i18n-адаптера; нет и адаптера — работают ручные разделители.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "icon",
             "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
             "type": "string | undefined",
@@ -7605,10 +7612,10 @@
           },
           {
             "name": "decimalSeparator",
-            "description": "",
+            "description": "Десятичный разделитель. Сильнее локали; без него и без локали — точка.",
             "type": "string | undefined",
             "required": false,
-            "default": "\".\""
+            "default": "undefined"
           },
           {
             "name": "precision",
@@ -7619,10 +7626,10 @@
           },
           {
             "name": "groupSeparator",
-            "description": "Разделитель разрядов (по умолчанию — узкий пробел).",
+            "description": "Разделитель разрядов. Сильнее локали; без него и без локали — узкий пробел.",
             "type": "string | undefined",
             "required": false,
-            "default": "\" \""
+            "default": "undefined"
           },
           {
             "name": "prefix",

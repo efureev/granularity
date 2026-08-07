@@ -21,6 +21,7 @@
   --gr-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 
   /* Typography: font sizes */
+  --gr-text-2xs: 10px;
   --gr-text-xs: 12px;
   --gr-text-sm: 14px;
   --gr-text-base: 16px;
