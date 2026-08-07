@@ -465,6 +465,12 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Кривая ускорения `in` для motion-паттернов дизайн-системы."
   },
   {
+    "name": "--gr-z-bottom-nav",
+    "value": "850",
+    "section": "Layering: z-index scale",
+    "description": "Нижняя навигация приложения. Самый низкий слой шкалы: панель прижата к нижней кромке и обязана уходить под открытую выпадашку, тултип и модалку."
+  },
+  {
     "name": "--gr-z-navbar",
     "value": "900",
     "section": "Layering: z-index scale",

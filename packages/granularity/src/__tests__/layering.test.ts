@@ -31,6 +31,7 @@ describe('слоирование (docs/z-index.md)', () => {
     const scale = grFoundationTokens.filter(token => token.name.startsWith('--gr-z-'))
 
     expect(scale.map(token => token.name)).toEqual([
+      '--gr-z-bottom-nav',
       '--gr-z-navbar',
       '--gr-z-dropdown',
       '--gr-z-tooltip',

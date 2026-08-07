@@ -268,5 +268,9 @@
   },
   "table": {
     "empty": "Nothing here yet"
+  },
+  "bottomNav": {
+    "label": "Bottom navigation",
+    "badge": "{count} new"
   }
 }

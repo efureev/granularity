@@ -27,7 +27,7 @@
 - [`GrAvatar`](./components/GrAvatar.md)
 - `GrBadge`
 - [`GrBadgeWrap`](./components/GrBadgeWrap.md)
-- `GrBottomNav`
+- [`GrBottomNav`](./components/GrBottomNav.md)
 - [`GrBreadcrumbs`](./components/GrBreadcrumbs.md)
 - [`GrButton`](./components/GrButton.md)
 - [`GrButtonGroup`](./components/GrButtonGroup.md)

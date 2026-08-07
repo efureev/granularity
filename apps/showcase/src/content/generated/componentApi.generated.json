@@ -572,6 +572,34 @@
         "origin": "generated",
         "items": [
           {
+            "name": "ariaLabel",
+            "description": "Имя лендмарка. Не задано — берётся из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "as",
+            "description": "Компонент ссылки для пунктов с `to`: `RouterLink`, `NuxtLink`, `Link` Inertia.",
+            "type": "string | Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "hideAbove",
+            "description": "Брейкпоинт, начиная с которого панель скрывается. `none` — видна всегда.",
+            "type": "\"sm\" | \"md\" | \"lg\" | \"none\" | undefined",
+            "required": false,
+            "default": "\"sm\""
+          },
+          {
+            "name": "position",
+            "description": "`static` вынимает панель из фиксированного слоя — для встраивания в макет.",
+            "type": "\"fixed\" | \"static\" | undefined",
+            "required": false,
+            "default": "\"fixed\""
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "string",
@@ -7410,18 +7438,18 @@
             "default": "undefined"
           },
           {
-            "name": "width",
-            "description": "Ширина в развёрнутом состоянии.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"240px\""
-          },
-          {
             "name": "position",
             "description": "Сторона экрана: граница и направление шеврона зеркалятся.",
             "type": "\"left\" | \"right\" | undefined",
             "required": false,
             "default": "\"left\""
+          },
+          {
+            "name": "width",
+            "description": "Ширина в развёрнутом состоянии.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"240px\""
           },
           {
             "name": "landmark",

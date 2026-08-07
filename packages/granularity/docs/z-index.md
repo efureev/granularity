@@ -8,14 +8,15 @@
 Единственный источник истины — токены в `styles/tokens.css` (генерируются из
 `tokens/foundation.json`, группа `Layering: z-index scale`):
 
-| Токен             | Значение | Слой                                                                 |
-|-------------------|----------|----------------------------------------------------------------------|
-| `--gr-z-navbar`   | `900`    | прилипшая шапка приложения (`GrNavbar sticky`)                       |
-| `--gr-z-dropdown` | `1000`   | якорные floating-панели: dropdown, select, tree-select, autocomplete |
-| `--gr-z-tooltip`  | `1050`   | тултипы                                                              |
-| `--gr-z-modal`    | `1100`   | модальные окна и диалоги                                             |
-| `--gr-z-loading`  | `1150`   | полноэкранный оверлей загрузки                                       |
-| `--gr-z-toast`    | `1200`   | тосты                                                                |
+| Токен                | Значение | Слой                                                                 |
+|----------------------|----------|----------------------------------------------------------------------|
+| `--gr-z-bottom-nav`  | `850`    | нижняя навигация приложения (`GrBottomNav`)                          |
+| `--gr-z-navbar`      | `900`    | прилипшая шапка приложения (`GrNavbar sticky`)                       |
+| `--gr-z-dropdown`    | `1000`   | якорные floating-панели: dropdown, select, tree-select, autocomplete |
+| `--gr-z-tooltip`     | `1050`   | тултипы                                                              |
+| `--gr-z-modal`       | `1100`   | модальные окна и диалоги                                             |
+| `--gr-z-loading`     | `1150`   | полноэкранный оверлей загрузки                                       |
+| `--gr-z-toast`       | `1200`   | тосты                                                                |
 
 Шаг между слоями — 50: он оставляет место приложению вклиниться между уровнями (например, свой sticky-хедер под
 дропдауном), не переопределяя токены пакета.
@@ -43,8 +44,9 @@ stacking-контекста. А поповер, открытый **снаруж�
 
 | Компонент                                                                                                              | Слой              | Как задан                                                 |
 |------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
+| `GrBottomNav` c `position="fixed"`                                                                                     | `--gr-z-bottom-nav` | `grBottomNavStyles.ts`: `fixed bottom-0 … z-[var(--gr-z-bottom-nav)]` |
 | `GrNavbar` c `sticky`                                                                                                  | `--gr-z-navbar`   | `grNavbarStyles.ts`: `sticky top-0 z-[var(--gr-z-navbar)]` |
-| `GrDropdown`, `GrSelect`, `GrAutocomplete`, `GrTreeSelect`                                                             | `--gr-z-dropdown` | `useFloating({ zIndexVar })`                              |
+| `GrDropdown`, `GrSelect`, `GrAutocomplete`, `GrTreeSelect`                                                             | `--gr-z-dropdown`    | `useFloating({ zIndexVar })`                              |
 | `GrTooltip`                                                                                                            | `--gr-z-tooltip`  | `useFloating({ zIndexVar: '--gr-z-tooltip' })`            |
 | `GrModal` (и всё, что на нём: `GrDialog`, `GrConfirmDialog`, `GrPromptDialog`, `GrCommandPalette`, `useDialogService`) | `--gr-z-modal`    | `grModalStyles.ts`: `fixed inset-0 z-[var(--gr-z-modal)]` |
 | `GrDrawer`                                                                                                             | `--gr-z-modal`    | `grDrawerStyles.ts`: `fixed inset-0 z-[var(--gr-z-modal)]` |

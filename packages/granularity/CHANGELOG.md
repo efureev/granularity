@@ -41,6 +41,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrBottomNav`: icons, badges, disabled destinations, links, and a configurable breakpoint.** An item grows to
+  `{ label, value, icon?, badge?, badgeLabel?, disabled?, href?, to?, ariaLabel? }`: without icons a bottom bar does not
+  do its job, and the showcase used to work around that by hand. A numeric badge is announced in words — a bare «12»
+  means nothing to a screen reader. A `disabled` destination stays visible but leaves the `Tab` order and is dimmed with
+  `--gr-disabled-fg`. `href`, or the component-level `as` together with an item's `to`, turns items into real links, so
+  a right click and «open in new tab» work as anywhere else; `GrLink` is deliberately not imported, because the
+  dependency would ship its CSS for the sake of one tag. New props `hideAbove` (`sm` by default, plus `md`, `lg`,
+  `none`) and `position` (`fixed` by default, `static`) replace the hardcoded `sm:hidden`: a kiosk or PWA keeps the bar
+  on screen, and it can now be embedded in a layout instead of the viewport. New i18n keys `gr.bottomNav.label` and
+  `gr.bottomNav.badge` in all three locales.
+- **New `--gr-z-bottom-nav` token (850).** The lowest step of the layering scale: a bar pinned to the bottom edge must
+  go under an open dropdown, tooltip or modal.
 - **`GrBadgeWrap`: `max`, `showZero`, `tone` and `placement`.** `max` collapses a large count into «99+» while the
   screen reader still hears the real number — «99 plus» tells nobody anything. Zero is now hidden by default (an empty
   circle on an icon reads as a bug) and `showZero` brings it back where zero is a meaningful state. `tone` picks the
@@ -187,6 +199,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrBottomNav` could not say where the user was.** The active destination differed by colour alone
+  (`--gr-primary` against `--gr-muted-fg`) with no `aria-current`, `aria-pressed` or `aria-selected`: a screen reader
+  heard a row of identical buttons, and the distinction disappeared for anyone with monochrome vision (WCAG 1.4.1). The
+  active item is now announced with `aria-current="page"` and carries three cues at once — a pill background, a heavier
+  label and the accent colour, which moves to `--gr-primary-text` for AA contrast.
+- **`GrBottomNav`'s landmark had no name and no layer.** Two `<nav>` elements on a page were announced identically, and
+  the bar's `fixed bottom-0` sat outside the layering scale, so a sticky footer or tooltip covered it in DOM order. The
+  landmark now always has a name (`ariaLabel`, or the locale), and the bar sits on `--gr-z-bottom-nav`.
+- **`GrBottomNav` was invisible everywhere but a phone.** `fixed` combined with a hardcoded `sm:hidden` meant the
+  component rendered nothing above 640px — including in the showcase, where all three demos showed only their
+  description card. `hideAbove` and `position` make both decisions the application's.
 - **`GrBadgeWrap`'s counter did not exist for a screen reader.** The number was marked `aria-hidden` with no text
   alternative next to it, so «Inbox» was announced and «3 unread» was silently dropped — on the one component whose
   entire job is to report unread items. The number stays decorative, but a visually hidden label now carries the count
