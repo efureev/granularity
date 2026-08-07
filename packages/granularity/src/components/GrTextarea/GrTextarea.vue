@@ -77,6 +77,10 @@ defineOptions({
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  /** Значение зафиксировано нативным `change` — по `blur`. */
+  (e: 'change', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
 }>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
@@ -116,6 +120,8 @@ defineExpose({ focus, blur })
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextarea' })
 
+const baseClass = 'w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+
 const className = computed(() => [
   sizes[resolvedSize.value],
   resizeClass[props.resize],
@@ -126,35 +132,56 @@ const className = computed(() => [
   }),
 ].join(' '))
 
+// Обе ветки шаблона (со счётчиком и без) рендерят одно и то же поле, поэтому
+// атрибуты живут одним объектом: двадцать строк копипасты расходятся молча.
+const textareaAttrs = computed(() => ({
+  id: resolvedId.value,
+  'data-gr-textarea': '',
+  name: props.name,
+  rows: props.rows,
+  maxlength: props.maxlength,
+  autocomplete: props.autocomplete,
+  placeholder: props.placeholder,
+  disabled: isDisabled.value,
+  value: props.modelValue,
+  'aria-invalid': isInvalid.value ? ('true' as const) : undefined,
+  'aria-describedby': describedBy.value,
+  'aria-required': isRequired.value ? ('true' as const) : undefined,
+  'aria-readonly': isReadonly.value ? ('true' as const) : undefined,
+  'aria-label': props.ariaLabel,
+  readonly: isReadonly.value,
+  class: [baseClass, className.value],
+}))
+
 function onInput(e: Event): void {
   emit('update:modelValue', (e.target as HTMLTextAreaElement).value)
+}
+
+// Объявленный emit уходит из `$attrs`, поэтому нативные события переизлучаем
+// руками — иначе `@change`/`@focus`/`@blur` у потребителя перестали бы работать.
+function onChange(e: Event): void {
+  emit('change', (e.target as HTMLTextAreaElement).value)
+}
+
+function onFocus(e: FocusEvent): void {
+  emit('focus', e)
+}
+
+function onBlur(e: FocusEvent): void {
+  emit('blur', e)
 }
 </script>
 
 <template>
   <div v-if="showCount" data-gr-textarea-wrap class="w-full">
     <textarea
-      :id="resolvedId"
       ref="textareaEl"
       v-autosize="autosize"
-      data-gr-textarea
-      :name="name"
-      :rows="rows"
-      :maxlength="maxlength"
-      :autocomplete="autocomplete"
-      :placeholder="placeholder"
-      :disabled="isDisabled"
-      :value="modelValue"
-      :aria-invalid="isInvalid ? 'true' : undefined"
-      :aria-describedby="describedBy"
-      :aria-required="isRequired ? 'true' : undefined"
-      :aria-readonly="isReadonly ? 'true' : undefined"
-      :aria-label="ariaLabel"
-      :readonly="isReadonly"
-      class="w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
-      :class="className"
-      v-bind="$attrs"
+      v-bind="{ ...textareaAttrs, ...$attrs }"
       @input="onInput"
+      @change="onChange"
+      @focus="onFocus"
+      @blur="onBlur"
     />
 
     <div :id="countId" data-gr-textarea-count :class="countClass">
@@ -164,26 +191,12 @@ function onInput(e: Event): void {
 
   <textarea
     v-else
-    :id="resolvedId"
     ref="textareaEl"
     v-autosize="autosize"
-    data-gr-textarea
-    :name="name"
-    :rows="rows"
-    :maxlength="maxlength"
-    :autocomplete="autocomplete"
-    :placeholder="placeholder"
-    :disabled="isDisabled"
-    :value="modelValue"
-    :aria-invalid="isInvalid ? 'true' : undefined"
-    :aria-describedby="describedBy"
-    :aria-required="isRequired ? 'true' : undefined"
-    :aria-readonly="isReadonly ? 'true' : undefined"
-    :aria-label="ariaLabel"
-    :readonly="isReadonly"
-    class="w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
-    :class="className"
-    v-bind="$attrs"
+    v-bind="{ ...textareaAttrs, ...$attrs }"
     @input="onInput"
+    @change="onChange"
+    @focus="onFocus"
+    @blur="onBlur"
   />
 </template>

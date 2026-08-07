@@ -41,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrTextarea` emits `change`, `focus` and `blur`.** It used to emit only `update:modelValue`, so a wrapper around
+  the control could not be written the same way as one around `GrInput`, which has had the full set for a while. The
+  native events are re-emitted explicitly: a declared emit leaves `$attrs`, and without that `@change` on the
+  component would silently stop working.
 - **`GrTabs`: `variant`, tab icons and a `#tab` slot.** `variant="line"` renders the classic underlined row next to
   the existing `pills` (the name is shared with `GrSegmented`, which has the same role); it is also readable from
   `GrConfigProvider`. A tab may carry an `icon` class, and the `#tab` slot replaces the tab's content entirely,

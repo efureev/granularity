@@ -86,3 +86,87 @@ describe('GrTextarea — паритет с GrInput', () => {
     expect(wrapper.classes()).toContain('text-[16px]')
   })
 })
+
+describe('GrTextarea — контракт событий', () => {
+  it('change отдаёт значение по нативному событию', async () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'draft' } })
+    const textarea = wrapper.get('textarea')
+
+    ;(textarea.element as HTMLTextAreaElement).value = 'final'
+    await textarea.trigger('change')
+
+    expect(wrapper.emitted('change')).toEqual([['final']])
+  })
+
+  it('focus и blur переизлучаются с объектом события', async () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: '' } })
+    const textarea = wrapper.get('textarea')
+
+    await textarea.trigger('focus')
+    await textarea.trigger('blur')
+
+    // Объявленный emit уходит из `$attrs`, поэтому переизлучение — единственный
+    // способ сохранить `@focus`/`@blur` у потребителя.
+    expect(wrapper.emitted('focus')?.[0][0]).toBeInstanceOf(Event)
+    expect(wrapper.emitted('blur')?.[0][0]).toBeInstanceOf(Event)
+  })
+
+  it('события работают и в ветке со счётчиком', async () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: '', showCount: true, maxlength: 10 } })
+    const textarea = wrapper.get('textarea')
+
+    // `setValue` в VTU шлёт и `input`, и `change` — отдельно триггерить не нужно.
+    await textarea.setValue('hi')
+    await textarea.trigger('focus')
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([['hi']])
+    expect(wrapper.emitted('change')).toEqual([['hi']])
+    expect(wrapper.emitted('focus')).toHaveLength(1)
+  })
+})
+
+describe('GrTextarea — паритет веток', () => {
+  const props = {
+    modelValue: 'text',
+    name: 'bio',
+    rows: 6,
+    maxlength: 200,
+    placeholder: 'About you',
+    ariaLabel: 'Bio',
+    required: true,
+    readonly: true,
+  }
+
+  it('поле рендерится одинаково со счётчиком и без него', () => {
+    const plain = mount(GrTextarea, { props })
+    const counted = mount(GrTextarea, { props: { ...props, showCount: true } })
+
+    const attributesOf = (wrapper: ReturnType<typeof mount>) => {
+      const element = wrapper.get('textarea').element
+      return Object.fromEntries(
+        [...element.attributes]
+          // `aria-describedby` отличается намеренно: счётчик добавляет себя в описание.
+          .filter(attr => attr.name !== 'aria-describedby')
+          .map(attr => [attr.name, attr.value]),
+      )
+    }
+
+    expect(attributesOf(counted)).toEqual(attributesOf(plain))
+  })
+
+  it('атрибуты потребителя доходят до поля в обеих ветках', () => {
+    const attrs = { 'data-test': 'bio', 'spellcheck': 'false' }
+
+    const plain = mount(GrTextarea, { props: { modelValue: '' }, attrs })
+    const counted = mount(GrTextarea, { props: { modelValue: '', showCount: true }, attrs })
+
+    for (const wrapper of [plain, counted]) {
+      const textarea = wrapper.get('textarea')
+      expect(textarea.attributes('data-test')).toBe('bio')
+      expect(textarea.attributes('spellcheck')).toBe('false')
+    }
+
+    // Обёртка счётчика чужие атрибуты себе не забирает.
+    expect(counted.get('[data-gr-textarea-wrap]').attributes('data-test')).toBeUndefined()
+  })
+})
