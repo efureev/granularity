@@ -594,4 +594,29 @@ describe('GrTreeSelect — чекбоксы при multiple', () => {
     expect(document.body.innerHTML).toContain('text-[length:var(--gr-text-sm)]')
     expect(document.body.innerHTML).not.toContain('text-[13px]')
   })
+
+  // Скроллер должен быть один: при виртуализации его берёт дерево, и вторая
+  // полоса прокрутки на том же списке появиться не должна.
+  it('при `virtual` скроллит дерево, а не контейнер панели', async () => {
+    const wrapper = await mountHarness({ virtual: true, dropdownMaxHeight: 240 })
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const tree = document.querySelector('[data-gr-tree]') as HTMLElement
+    expect(tree.getAttribute('data-gr-tree-virtual')).toBe('')
+    expect(tree.getAttribute('style')).toContain('max-height: 240px')
+
+    const container = tree.parentElement!
+    expect(container.className).not.toContain('overflow-auto')
+  })
+
+  it('без `virtual` скроллит контейнер панели, как и раньше', async () => {
+    const wrapper = await mountHarness({ dropdownMaxHeight: 240 })
+    await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
+    await nextTick()
+
+    const container = (document.querySelector('[data-gr-tree]') as HTMLElement).parentElement!
+    expect(container.className).toContain('overflow-auto')
+    expect(container.getAttribute('style')).toContain('max-height: 240px')
+  })
 })

@@ -115,7 +115,12 @@ const images = [
 
     <GrSlider v-model="volume" :min="0" :max="100" aria-label="Громкость" />
 
-    <GrTree :data="treeData" node-key="id" />
+    <!--
+      `virtual` считает окно от `maxHeight` и оценки строки: контейнера на
+      сервере нет, замерить нечего, и первый клиентский рендер обязан
+      повторить серверный до последней строки.
+    -->
+    <GrTree :data="treeData" node-key="id" virtual :max-height="200" />
 
     <GrTreeSelect v-model="treeValue" :data="treeData" node-key="id" placeholder="Выберите узел" />
 

@@ -81,6 +81,9 @@ export type { UseFloatingOptions, UseFloatingPlacement, UseFloatingReturn } from
 // Общий живой регион: объявить событие скринридеру из любого места приложения.
 export { useAnnouncer } from './composables/useAnnouncer'
 export type { GrAnnounceOptions, GrAnnouncer, GrAnnouncerPoliteness } from './composables/useAnnouncer'
+// Виртуализация длинного списка: геометрия окна без своей разметки.
+export { useVirtualList } from './composables/useVirtualList'
+export type { GrVirtualAlign, UseVirtualListOptions, UseVirtualListReturn } from './composables/useVirtualList'
 export { initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'

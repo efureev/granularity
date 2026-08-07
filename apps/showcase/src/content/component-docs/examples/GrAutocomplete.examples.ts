@@ -134,4 +134,43 @@ async function fetchPeople(query: string, signal: AbortSignal): Promise<GrAutoco
 </template>`,
     note: 'Если запрос ведёт само приложение (свой стор, кэш, своя отмена), остаётся прежний путь — дебаунснутое событие `search` плюс внешние `:options` и `:loading`.',
   },
+  {
+    id: 'autocomplete-virtual',
+    title: 'Справочник на 10 000 позиций',
+    description: 'С `virtual` в DOM живёт только окно вокруг вьюпорта: панель одинаково отзывчива и на десяти опциях, и на десяти тысячах. Высоту окна задаёт `dropdownMaxHeight`.',
+    status: 'ready',
+    previewKey: 'gr-autocomplete-virtual',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrAutocomplete } from '@feugene/granularity'
+
+// Справочник, ради которого виртуализация и нужна: без неё каждая панель
+// рендерила бы все совпадения разом.
+const options = Array.from({ length: 10000 }, (_, index) => ({
+  value: \`city-\${index + 1}\`,
+  label: \`City \${index + 1}\`,
+}))
+
+const city = ref('')
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrAutocomplete
+      v-model="city"
+      :options="options"
+      virtual
+      clearable
+      placeholder="Search among 10 000 cities…"
+      aria-label="Search a city"
+    />
+
+    <p class="text-sm text-[var(--gr-muted-fg)]">
+      Selected: <code>{{ city || '—' }}</code>
+    </p>
+  </div>
+</template>`,
+    note: 'Размер набора уходит в `aria-setsize`/`aria-posinset`: при неполном наборе диктор иначе объявлял бы «1 из 12» на списке в десять тысяч. Строка «Add …» при `allowCustomValue` — такой же элемент набора и прокручивается вместе с ним.',
+  },
 ]

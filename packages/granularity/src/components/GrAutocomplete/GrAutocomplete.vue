@@ -8,6 +8,7 @@ import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrCo
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
+import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -93,6 +94,15 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   closeOnSelect?: boolean
   /** Максимальная высота панели, px. */
   dropdownMaxHeight?: number
+  /**
+   * Виртуализация панели: в DOM живёт только окно вокруг вьюпорта.
+   *
+   * Высоту окна задаёт `dropdownMaxHeight`. Включается осознанно: на сотне
+   * опций выигрыша нет, а в разметке остаётся только окно — вместе с ним
+   * меняется и то, что находит `querySelector` потребителя. Профильный
+   * сценарий — удалённый поиск по справочнику на тысячи позиций.
+   */
+  virtual?: boolean
   /** i18n-тексты состояний панели / aria. */
   loadingText?: string
   noResultsText?: string
@@ -121,6 +131,7 @@ const props = withDefaults(
     allowCustomValue: false,
     closeOnSelect: true,
     dropdownMaxHeight: 280,
+    virtual: false,
     loadingText: undefined,
     noResultsText: undefined,
     clearLabel: undefined,
@@ -219,6 +230,7 @@ const activeIndex = ref(-1)
 
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
+const listboxEl = ref<HTMLElement | null>(null)
 const inputEl = ref<HTMLInputElement | null>(null)
 
 function focus(): void {
@@ -299,6 +311,68 @@ function optionDomId(index: number): string {
 const addOptionDomId = computed(() => `${listboxId}-add`)
 
 /**
+ * Виртуализация панели.
+ *
+ * Набор — `[«Add …»?] + filteredOptions`, тот же, по которому ходит клавиатура
+ * (`navigableItems` ниже). Иначе верхняя распорка вытолкнула бы строку «Add …»
+ * вниз: она отрисована внутри listbox'а первой и является полноценной опцией.
+ */
+
+/** Оценка высоты опции: `py-2` вокруг строки кегля `sm`. Уточняется замером. */
+const OPTION_SIZE_ESTIMATE = 36
+
+const addOffset = computed(() => (canAddCustom.value ? 1 : 0))
+const virtualCount = computed(() => filteredOptions.value.length + addOffset.value)
+
+const virtualizer = useVirtualList({
+  container: listboxEl,
+  count: () => (props.virtual ? virtualCount.value : 0),
+  itemSize: OPTION_SIZE_ESTIMATE,
+  // Панель скрыта `v-show`, пока закрыта, поэтому `clientHeight` контейнера —
+  // ноль. Окно считается от объявленной высоты до первого настоящего замера.
+  viewportSize: () => props.dropdownMaxHeight,
+})
+
+/** Виден ли «Add …»: вне виртуального окна его рисовать нельзя — он элемент набора. */
+const showAddOption = computed(() => {
+  if (!canAddCustom.value) return false
+  return !props.virtual || virtualizer.range.value.start === 0
+})
+
+/** Опции к отрисовке вместе с их абсолютным индексом в `filteredOptions`. */
+const renderedOptions = computed(() => {
+  const all = filteredOptions.value
+  if (!props.virtual) return all.map((option, index) => ({ option, index }))
+
+  const { start, end } = virtualizer.range.value
+  const from = Math.max(0, start - addOffset.value)
+  const to = Math.max(0, end - addOffset.value)
+
+  return all.slice(from, to).map((option, offset) => ({ option, index: from + offset }))
+})
+
+/**
+ * Размер набора и позиция в нём объявляются только при виртуализации: в обычном
+ * режиме диктор выводит их из DOM, а при неполном наборе получил бы «3 из 15»
+ * на списке в десять тысяч.
+ */
+function optionSetProps(virtualIndex: number): Record<string, number> | undefined {
+  if (!props.virtual) return undefined
+  return { 'aria-setsize': virtualCount.value, 'aria-posinset': virtualIndex + 1 }
+}
+
+const listboxStyle = computed(() => {
+  const base: Record<string, string> = { maxHeight: `${props.dropdownMaxHeight}px` }
+  if (!props.virtual) return base
+
+  return {
+    ...base,
+    '--gr-autocomplete-virtual-before': `${virtualizer.offset.value}px`,
+    '--gr-autocomplete-virtual-after': `${virtualizer.offsetEnd.value}px`,
+  }
+})
+
+/**
  * Клавиатурная навигация ходит и по опциям, и по варианту «добавить своё»:
  * иначе при непустом списке Enter всегда уходил бы в активную опцию, и
  * закоммитить произвольное значение с клавиатуры было бы нечем.
@@ -340,7 +414,20 @@ function clampActive(index: number): number {
   return ((index % len) + len) % len
 }
 
+/** Позиция активного элемента в виртуальном наборе `[«Add …»?] + filteredOptions`. */
+const activeVirtualIndex = computed(() => {
+  const item = activeItem.value
+  if (!item) return -1
+  return item.kind === 'add' ? 0 : item.index + addOffset.value
+})
+
 async function scrollActiveIntoView(): Promise<void> {
+  // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
+  // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
+  // Поэтому сперва прокрутка виртуального списка, и только потом — доводка.
+  if (props.virtual && activeVirtualIndex.value >= 0)
+    virtualizer.scrollToIndex(activeVirtualIndex.value)
+
   await nextTick()
   const id = activeDescendantId.value
   if (!id) return
@@ -770,9 +857,12 @@ const themeAttrs = useGrThemeAttrs()
           <div :class="autocompletePanelClasses">
             <div
               :id="listboxId"
+              ref="listboxEl"
               data-gr-autocomplete-listbox
+              :data-gr-autocomplete-virtual="virtual ? '' : undefined"
               class="p-1 overflow-auto"
-              :style="{ maxHeight: `${dropdownMaxHeight}px` }"
+              :class="virtual ? 'flex flex-col' : ''"
+              :style="listboxStyle"
               role="listbox"
               :aria-multiselectable="multiple ? 'true' : undefined"
             >
@@ -783,12 +873,13 @@ const themeAttrs = useGrThemeAttrs()
                 фокус на `<input>` — контракт combobox с `aria-activedescendant`.
               -->
               <button
-                v-if="canAddCustom"
+                v-if="showAddOption"
                 :id="addOptionDomId"
                 type="button"
                 role="option"
                 aria-selected="false"
                 tabindex="-1"
+                v-bind="optionSetProps(0)"
                 data-testid="gr-autocomplete-add-option"
                 data-gr-autocomplete-add-option
                 :class="autocompleteOptionClass({ disabled: false, active: activeItem?.kind === 'add' })"
@@ -800,13 +891,15 @@ const themeAttrs = useGrThemeAttrs()
               </button>
 
               <button
-                v-for="(option, optionIndex) in filteredOptions"
+                v-for="{ option, index: optionIndex } in renderedOptions"
                 :id="optionDomId(optionIndex)"
                 :key="option.value"
+                :ref="(el) => virtual && virtualizer.measure(optionIndex + addOffset, el as Element | null)"
                 data-gr-autocomplete-option
                 type="button"
                 role="option"
                 tabindex="-1"
+                v-bind="optionSetProps(optionIndex + addOffset)"
                 :disabled="option.disabled"
                 :aria-selected="isSelected(option.value) ? 'true' : 'false'"
                 :aria-disabled="option.disabled ? 'true' : undefined"
@@ -868,3 +961,32 @@ const themeAttrs = useGrThemeAttrs()
     </teleport>
   </div>
 </template>
+
+<style scoped>
+/*
+ * Распорки виртуального списка.
+ *
+ * Не `padding` контейнера: `max-height` меряет ту же коробку, и распорка в
+ * десятки тысяч пикселей раздула бы панель. Не обёртка внутри listbox'а:
+ * прямыми потомками роли обязаны быть только опции (`aria-required-children`,
+ * гейт — `GrAutocomplete.a11y.test.ts`). Не отступы крайних опций: при прыжке
+ * прокрутки опции заменяются целиком, распорка исчезла бы вместе с ними, и
+ * браузер обрезал бы `scrollTop`.
+ *
+ * Псевдоэлементы не узлы DOM: их не за что размонтировать, детьми listbox'а
+ * они не считаются, а высота приезжает переменными в том же патче, что и опции.
+ */
+[data-gr-autocomplete-virtual]::before,
+[data-gr-autocomplete-virtual]::after {
+    content: '';
+    flex: none;
+}
+
+[data-gr-autocomplete-virtual]::before {
+    height: var(--gr-autocomplete-virtual-before, 0px);
+}
+
+[data-gr-autocomplete-virtual]::after {
+    height: var(--gr-autocomplete-virtual-after, 0px);
+}
+</style>

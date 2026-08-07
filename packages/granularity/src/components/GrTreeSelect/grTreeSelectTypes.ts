@@ -57,4 +57,11 @@ export interface GrTreeSelectProps<T extends object = any> {
 
   closeOnSelect?: boolean
   dropdownMaxHeight?: number
+  /**
+   * Виртуализация дерева в панели: в DOM живёт только окно вокруг вьюпорта.
+   *
+   * Скроллером в этом режиме становится само дерево, а не контейнер панели —
+   * два вложенных скроллера дали бы две полосы прокрутки на одном списке.
+   */
+  virtual?: boolean
 }

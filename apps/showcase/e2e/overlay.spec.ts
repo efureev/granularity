@@ -130,7 +130,7 @@ test.describe('панель автокомплита', () => {
     // страницу: клик, попавший в этот момент, уходит мимо поля. Ждём все три и
     // при промахе повторяем.
     const inputs = page.locator('[data-testid="gr-autocomplete-input"]')
-    await expect(inputs).toHaveCount(3)
+    await expect(inputs).toHaveCount(4)
 
     const input = inputs.first()
     await expect.poll(async () => {

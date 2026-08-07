@@ -13,6 +13,7 @@ import type { GrTreeCheckState } from './grTreeChecking'
 import { createGrTreeStore } from './grTreeStore'
 import { treeSizeVars } from './grTreeStyles'
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type {
   GrTreeBranchLineColor,
@@ -40,6 +41,8 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   size: undefined,
   highlightCurrent: true,
   indent: 0,
+  virtual: false,
+  maxHeight: undefined,
   showCheckbox: false,
   checkedKeys: undefined,
   defaultCheckedKeys: () => [],
@@ -182,8 +185,93 @@ function isRovingItem(key: GrTreeNode<T>['key']): boolean {
   return focusedKey.value === key
 }
 
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTree' })
+
+// Переменные ставим и вложенным уровням тоже: `v-bind="props"` доносит до них
+// `size`, а значения одинаковые — наследование от корня не нарушается.
+const sizeStyle = computed(() => treeSizeVars[resolvedSize.value])
+
+/**
+ * Виртуализация: в DOM живёт только окно вокруг вьюпорта.
+ *
+ * Корень дерева и есть скроллер — обёрток-распорок между `role="tree"` и
+ * `role="treeitem"` быть не должно, поэтому срезанное сверху и снизу держат
+ * отступы самого корня.
+ */
+const TREE_ROW_GAP = 2
+
+const rowEstimate = computed(() => Number.parseFloat(sizeStyle.value['--gr-tree-row-min-height']))
+
+const virtualMaxHeight = computed(() => {
+  const value = treeProps.maxHeight
+  if (value == null) return undefined
+  return typeof value === 'number' ? `${value}px` : value
+})
+
+const virtualizer = useVirtualList({
+  container: treeRootEl,
+  count: () => (treeProps.virtual ? visibleRows.value.length : 0),
+  itemSize: () => rowEstimate.value,
+  gap: TREE_ROW_GAP,
+  // Первый рендер обязан совпасть с серверным: контейнера ещё нет, и окно
+  // считается от объявленной высоты, а не от измеренной.
+  viewportSize: () => (typeof treeProps.maxHeight === 'number' ? treeProps.maxHeight : undefined),
+})
+
+/** Строки к отрисовке: при выключенной виртуализации — все. */
+const renderedRows = computed(() => {
+  if (!treeProps.virtual) return visibleRows.value
+
+  const { start, end } = virtualizer.range.value
+  return visibleRows.value.slice(start, end)
+})
+
+/**
+ * Срезанное сверху и снизу держат псевдоэлементы контейнера.
+ *
+ * Ни один из трёх напрашивающихся вариантов не годится:
+ *
+ *  - `padding` контейнера — `max-height` меряет ту же коробку, и распорка в сто
+ *    тысяч пикселей либо раздувает скроллер до той же сотни тысяч, либо съедает
+ *    всю его высоту;
+ *  - обёртка-распорка внутри — между `role="tree"` и `role="treeitem"` не должно
+ *    быть посторонних узлов, роль потеряла бы обязательных потомков;
+ *  - отступы крайних отрисованных строк — распорка исчезает ровно в тот момент,
+ *    когда строки заменяются целиком (прыжок прокрутки), содержимое схлопывается
+ *    до высоты окна, и браузер обрезает `scrollTop` до почти нуля.
+ *
+ * `::before`/`::after` не узлы DOM: их не за что размонтировать, в дереве
+ * доступности их нет, а высота приезжает переменными в том же патче, что и сами
+ * строки, — схлопнуться между кадрами нечему.
+ */
+const rootStyle = computed(() => {
+  if (!treeProps.virtual) return sizeStyle.value
+
+  return {
+    ...sizeStyle.value,
+    overflow: 'auto',
+    maxHeight: virtualMaxHeight.value,
+    '--gr-tree-virtual-before': `${virtualizer.offset.value}px`,
+    '--gr-tree-virtual-after': `${virtualizer.offsetEnd.value}px`,
+  }
+})
+
+/** Абсолютный индекс отрисованной строки: поиск по массиву стоил бы O(n) на строку. */
+function absoluteIndex(offsetInWindow: number): number {
+  return treeProps.virtual ? virtualizer.range.value.start + offsetInWindow : offsetInWindow
+}
+
 function focusRow(key: GrTreeNode<T>['key']): void {
   focusedKey.value = key
+
+  // При виртуализации узла вне окна в DOM нет: `nodeEls.get` вернул бы
+  // `undefined`, а фокус уехал бы на `body` вместе с размонтированной строкой.
+  // Поэтому сперва прокрутка, и только следующим тиком — фокус.
+  if (treeProps.virtual) {
+    const index = visibleRows.value.findIndex(row => row.node.key === key)
+    if (index >= 0) virtualizer.scrollToIndex(index)
+  }
+
   void nextTick(() => interactionContext.nodeEls.get(key)?.focus())
 }
 
@@ -540,12 +628,6 @@ function resolveBranchLineColor(node: GrTreeNode<T>) {
   return resolveBranchLineColorValue(treeProps.branchLineActiveColor, node) ?? defaultColor
 }
 
-const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTree' })
-
-// Переменные ставим и вложенным уровням тоже: `v-bind="props"` доносит до них
-// `size`, а значения одинаковые — наследование от корня не нарушается.
-const sizeStyle = computed(() => treeSizeVars[resolvedSize.value])
-
 /**
  * Переводит фокус на узел (по умолчанию — на тот, что держит roving tabindex).
  * Нужен снаружи: `GrTreeSelect` открывает панель и обязан отдать клавиатуру
@@ -598,15 +680,19 @@ defineExpose<GrTreeInstance<T>>({
       ref="treeRootEl"
       data-gr-tree
       class="gr-tree"
+      :data-gr-tree-virtual="treeProps.virtual ? '' : undefined"
       role="tree"
       :aria-multiselectable="treeProps.showCheckbox ? 'true' : undefined"
-      :style="sizeStyle"
+      :style="rootStyle"
       @keydown="onTreeKeydown"
   >
     <div
-        v-for="row in visibleRows"
+        v-for="(row, windowIndex) in renderedRows"
         :key="row.node.key"
-        :ref="el => interactionContext.registerNodeEl(row.node.key, el as HTMLElement | null)"
+        :ref="(el) => {
+          interactionContext.registerNodeEl(row.node.key, el as HTMLElement | null)
+          if (treeProps.virtual) virtualizer.measure(absoluteIndex(windowIndex), el as Element | null)
+        }"
         data-gr-tree-node
         :data-gr-tree-node-key="row.node.key"
         role="treeitem"
@@ -785,6 +871,20 @@ defineExpose<GrTreeInstance<T>>({
     display: flex;
     flex-direction: column;
     gap: var(--gr-tree-gap);
+}
+
+.gr-tree[data-gr-tree-virtual]::before,
+.gr-tree[data-gr-tree-virtual]::after {
+    content: '';
+    flex: none;
+}
+
+.gr-tree[data-gr-tree-virtual]::before {
+    height: var(--gr-tree-virtual-before, 0px);
+}
+
+.gr-tree[data-gr-tree-virtual]::after {
+    height: var(--gr-tree-virtual-after, 0px);
 }
 
 .gr-tree__row {

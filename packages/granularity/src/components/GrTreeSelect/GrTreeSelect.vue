@@ -48,6 +48,7 @@ const props = withDefaults(
     filterNodeMethod: undefined,
     closeOnSelect: undefined,
     dropdownMaxHeight: 320,
+    virtual: false,
   },
 )
 
@@ -585,9 +586,15 @@ const themeAttrs = useGrThemeAttrs()
             />
           </div>
 
+          <!--
+            Скроллер один. При виртуализации его берёт на себя дерево: своя
+            высота нужна ему, чтобы посчитать окно, а вложенный скроллер поверх
+            дал бы вторую полосу прокрутки на том же списке.
+          -->
           <div
-            class="p-1 overflow-auto"
-            :style="{ maxHeight: `${dropdownMaxHeight}px` }"
+            class="p-1"
+            :class="virtual ? '' : 'overflow-auto'"
+            :style="virtual ? undefined : { maxHeight: `${dropdownMaxHeight}px` }"
           >
             <div
               v-if="loading"
@@ -618,6 +625,8 @@ const themeAttrs = useGrThemeAttrs()
               :default-expanded-keys="defaultExpandedKeys"
               :filter-node-method="filterNodeMethod"
               :highlight-current="!multiple"
+              :virtual="virtual"
+              :max-height="dropdownMaxHeight"
               :show-checkbox="checkboxMode"
               :check-strictly="checkStrictly"
               :checked-keys="selectedKeys"
