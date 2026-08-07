@@ -41,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`toast.promise` and `toast.update`.** `promise(p, { loading, success, error })` runs a request's whole lifecycle
+  in one toast — the loading toast is rewritten into the result instead of being closed in favour of a new one, so the
+  stack does not jump. Messages may be strings, toast inputs, or functions of the resolved value / rejection reason.
+  The promise is returned as-is and **the rejection is not swallowed**: a toast does not replace error handling. If the
+  user dismissed the toast while the request was in flight, the result does not resurrect it. The underlying
+  `update(id, patch)` is public too and restarts the auto-dismiss timer when `timeoutMs` is part of the patch.
 - **`GrTextarea` emits `change`, `focus` and `blur`.** It used to emit only `update:modelValue`, so a wrapper around
   the control could not be written the same way as one around `GrInput`, which has had the full set for a while. The
   native events are re-emitted explicitly: a declared emit leaves `$attrs`, and without that `@change` on the
@@ -80,6 +86,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **The toast queue is now capped.** `maxVisible` only ever limited the *visible* toasts while the queue behind them
+  grew without bound, so a burst of events (a reconnecting socket, a loop of errors) piled up notifications that then
+  spilled onto the user once the stack drained. The queue keeps at most 20 toasts by default — configurable with
+  `app.use(granularityToastPlugin, { maxToasts: 50 })` — dropping the oldest ones and clearing their timers.
+- **`GrToaster`: the toast title and message moved from `13px` literals to `--gr-text-sm`.**
 - **`GrTabs` scrolls an overflowing row instead of wrapping it.** A wrapped row pushed tabs under the panel and broke
   the alignment; the row now scrolls horizontally with the scrollbar hidden, and the active tab pulls itself into view
   — including when it was selected from outside. Vertical orientation is unaffected.

@@ -144,6 +144,17 @@ describe('GrToaster', () => {
     expect(document.body.querySelectorAll('[data-gr-toast]').length).toBe(2)
   })
 
+  it('текст тоста идёт от токена --gr-text-sm, а не от px-литерала', () => {
+    const { push } = useToast()
+    push({ title: 'Заголовок', message: 'Описание', timeoutMs: 0 })
+
+    const wrapper = mount(GrToaster)
+    const html = wrapper.html()
+
+    expect(html.split('text-[length:var(--gr-text-sm)]')).toHaveLength(3)
+    expect(html).not.toContain('text-[13px]')
+  })
+
   it('placement применяет классы угла (bottom-left)', () => {
     mount(GrToaster, {
       attachTo: document.body,

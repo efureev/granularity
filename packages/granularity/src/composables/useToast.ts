@@ -37,6 +37,16 @@ export type ToastInput = {
   actions?: ToastAction[]
 }
 
+/**
+ * Сообщения для `promise`. Строка — шорткат для `{ title }`; функция получает
+ * результат промиса (или причину отказа), чтобы подставить его в текст.
+ */
+export type ToastPromiseMessages<T> = {
+  loading: string | ToastInput
+  success: string | ToastInput | ((value: T) => string | ToastInput)
+  error: string | ToastInput | ((reason: unknown) => string | ToastInput)
+}
+
 export type Toast = {
   id: string
   title: string
@@ -66,12 +76,27 @@ type ToastTimer = {
 export type ToastState = {
   toasts: Toast[]
   timers: Map<string, ToastTimer>
+  /** Потолок очереди: сверх него самые старые тосты вытесняются. */
+  maxToasts: number
 }
 
-function createToastState(): ToastState {
+/**
+ * Потолок очереди по умолчанию. `maxVisible` у `GrToaster` режет только видимые,
+ * поэтому без него поток событий (переподключение сокета, цикл ошибок) копил бы
+ * очередь и вываливал её на пользователя, когда стек освободится.
+ */
+const DEFAULT_MAX_TOASTS = 20
+
+export type GranularityToastPluginOptions = {
+  /** Потолок очереди. По умолчанию `20`. */
+  maxToasts?: number
+}
+
+function createToastState(maxToasts = DEFAULT_MAX_TOASTS): ToastState {
   return {
     toasts: reactive<Toast[]>([]),
     timers: new Map<string, ToastTimer>(),
+    maxToasts: Math.max(1, Math.trunc(maxToasts)),
   }
 }
 
@@ -86,11 +111,12 @@ export const GRANULARITY_TOAST_STATE: InjectionKey<ToastState> = Symbol.for('@fe
  *
  * ```ts
  * app.use(granularityToastPlugin)
+ * app.use(granularityToastPlugin, { maxToasts: 50 })
  * ```
  */
 export const granularityToastPlugin = {
-  install(app: App) {
-    app.provide(GRANULARITY_TOAST_STATE, createToastState())
+  install(app: App, options: GranularityToastPluginOptions = {}) {
+    app.provide(GRANULARITY_TOAST_STATE, createToastState(options.maxToasts))
   },
 }
 
@@ -163,6 +189,7 @@ export function useToast() {
     }
 
     state.toasts.unshift(toast)
+    trimQueue()
 
     if (toast.timeoutMs > 0) {
       const timer: ToastTimer = { handle: null, remaining: toast.timeoutMs, startedAt: now() }
@@ -171,6 +198,71 @@ export function useToast() {
     }
 
     return id
+  }
+
+  // Вытесняем с хвоста — там самые старые: при потоке событий устаревшее
+  // уведомление менее ценно, чем свежее. Таймеры снимаем, иначе остались бы
+  // висящие `setTimeout` на тосты, которых больше нет.
+  function trimQueue(): void {
+    while (state.toasts.length > state.maxToasts) {
+      const dropped = state.toasts.pop()
+      if (dropped)
+        clearTimer(dropped.id)
+    }
+  }
+
+  /**
+   * Меняет показанный тост на месте. `timeoutMs` в патче перезапускает таймер
+   * (`0` — снова «навсегда»), поэтому «вечный» loading может стать
+   * самозакрывающимся success.
+   *
+   * Возвращает `false`, если тоста уже нет: пользователь мог закрыть его руками,
+   * и воскрешать его нельзя.
+   */
+  function update(id: string, patch: Partial<ToastInput>): boolean {
+    const toast = state.toasts.find(item => item.id === id)
+    if (!toast) return false
+
+    if (patch.title !== undefined) toast.title = patch.title
+    if (patch.message !== undefined) toast.message = patch.message
+    if (patch.tone !== undefined) toast.tone = patch.tone
+    if (patch.action !== undefined) toast.action = patch.action
+    if (patch.actions !== undefined) toast.actions = patch.actions
+
+    if (patch.timeoutMs !== undefined) {
+      clearTimer(id)
+      toast.timeoutMs = patch.timeoutMs > 0 ? patch.timeoutMs : 0
+
+      if (toast.timeoutMs > 0) {
+        const timer: ToastTimer = { handle: null, remaining: toast.timeoutMs, startedAt: now() }
+        state.timers.set(id, timer)
+        armTimer(id, timer)
+      }
+    }
+
+    return true
+  }
+
+  /**
+   * Один тост на весь жизненный цикл промиса: «загружаем» переписывается в
+   * успех или ошибку, а не закрывается ради нового — стек не дёргается.
+   *
+   * Возвращает исходный промис и **не глотает отказ**: тост не заменяет
+   * обработку ошибки, вызывающий по-прежнему обязан её обработать.
+   */
+  function promise<T>(input: Promise<T>, messages: ToastPromiseMessages<T>): Promise<T> {
+    const id = push({ tone: 'info', ...toToastInput(messages.loading), timeoutMs: 0 })
+
+    input.then(
+      (value) => {
+        update(id, { tone: 'success', timeoutMs: DEFAULT_TIMEOUT_MS, ...resolveMessage(messages.success, value) })
+      },
+      (reason: unknown) => {
+        update(id, { tone: 'danger', timeoutMs: DEFAULT_TIMEOUT_MS, ...resolveMessage(messages.error, reason) })
+      },
+    )
+
+    return input
   }
 
   /** Останавливает отсчёт автозакрытия, сохраняя остаток (идемпотентно). */
@@ -206,9 +298,22 @@ export function useToast() {
   return {
     list,
     push,
+    update,
+    promise,
     dismiss,
     clear,
     pause,
     resume,
   }
+}
+
+function toToastInput(message: string | ToastInput): ToastInput {
+  return typeof message === 'string' ? { title: message } : message
+}
+
+function resolveMessage<T>(
+  message: string | ToastInput | ((value: T) => string | ToastInput),
+  value: T,
+): ToastInput {
+  return toToastInput(typeof message === 'function' ? message(value) : message)
 }

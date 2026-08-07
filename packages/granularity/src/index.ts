@@ -81,7 +81,14 @@ export type { UseFloatingOptions, UseFloatingPlacement, UseFloatingReturn } from
 export { initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'
-export type { GrToastTone, Toast, ToastInput, ToastState } from './composables/useToast'
+export type {
+  GranularityToastPluginOptions,
+  GrToastTone,
+  Toast,
+  ToastInput,
+  ToastPromiseMessages,
+  ToastState,
+} from './composables/useToast'
 // Единый перечень дизайн-тонов для прикладного кода: `GR_TONES`/`GrTone`.
 // Используется как источник истины и для типов, и для рантайм‑итераций
 // (валидация, фильтры, генерация safelist).

@@ -5,7 +5,7 @@ import { GrBadge, GrButton, GrToaster, useToast } from '@feugene/granularity'
 
 import { useShowcaseToasterHost } from './showcaseToasterHost'
 
-const { push, clear } = useToast()
+const { push, promise, clear } = useToast()
 const { isActiveHost, activateHost } = useShowcaseToasterHost('action')
 
 // Отслеживаем, что действие реально выполнилось (для наглядности демо).
@@ -72,6 +72,26 @@ function notifyWithRetry() {
   })
 }
 
+// Один тост на весь жизненный цикл запроса: «загружаем» переписывается в
+// результат, а не закрывается ради нового.
+function notifyWithPromise(shouldFail: boolean) {
+  activateHost()
+  clear()
+  lastAction.value = 'Syncing…'
+
+  const request = new Promise<{ files: number }>((resolve, reject) => {
+    setTimeout(() => (shouldFail ? reject(new Error('Gateway timeout')) : resolve({ files: 12 })), 1500)
+  })
+
+  promise(request, {
+    loading: { title: 'Syncing workspace', message: 'Uploading local changes…' },
+    success: result => ({ title: 'Workspace synced', message: `${result.files} files uploaded` }),
+    error: reason => ({ title: 'Sync failed', message: (reason as Error).message }),
+  })
+    .then(() => { lastAction.value = 'Sync finished' })
+    .catch(() => { lastAction.value = 'Sync failed' })
+}
+
 function clearStore() {
   activateHost()
   clear()
@@ -87,6 +107,12 @@ function clearStore() {
       </GrButton>
       <GrButton size="sm" variant="outline" @click="notifyWithRetry">
         Failed upload (Retry)
+      </GrButton>
+      <GrButton size="sm" variant="outline" @click="notifyWithPromise(false)">
+        Sync (promise)
+      </GrButton>
+      <GrButton size="sm" variant="outline" @click="notifyWithPromise(true)">
+        Sync that fails
       </GrButton>
       <GrButton size="sm" variant="ghost" @click="clearStore">
         Clear store
