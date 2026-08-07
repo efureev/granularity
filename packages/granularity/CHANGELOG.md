@@ -41,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrSegmented`: a segment can be busy.** `loading` on an option puts a spinner where its icon goes and marks the
+  segment `aria-busy`; the segment stops accepting selection and arrow keys step over it. It deliberately does **not**
+  get `aria-disabled` or the native `disabled`: a busy segment is available, it is just working — a distinction a
+  screen reader can hear. The default slot now also receives `loading`.
 - **`GrSlider`: vertical orientation and `lazy`.** `orientation="vertical"` puts the minimum at the bottom, moves the
   tooltip aside (above the thumb it would sit on the track) and the mark labels to the right; the track's length is a
   new customisation point, `--gr-slider-length`. `lazy` holds `update:modelValue` until the gesture ends — one event on
@@ -151,6 +155,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrSegmented` ignored `readonly` on click.** The prop was declared, exposed as `aria-readonly` and honoured by the
+  keyboard, but the click path never checked it — so a read-only control changed its value under the mouse. Both paths
+  now share one guard.
+- **`GrSegmented` dimmed disabled state with `opacity`.** The control and its segments now use `--gr-disabled-fg`.
 - **`GrSlider` announced range bounds in English only.** «min» / «max» were baked into the thumb's accessible name
   past the i18n layer, so a Russian user heard «Громкость (min)». They now come from `gr.slider.min` / `gr.slider.max`,
   added to all three locales.

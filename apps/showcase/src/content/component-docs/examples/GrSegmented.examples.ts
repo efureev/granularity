@@ -95,29 +95,76 @@ const iconOnlyOptions = [
     status: 'ready',
     previewKey: 'gr-segmented-states',
     code: `<script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-import { GrSegmented } from '@feugene/granularity'
+import type { GrSegmentedOption } from '@feugene/granularity'
+import { GrButton, GrSegmented } from '@feugene/granularity'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const locale = ref('ru')
-const status = ref('review')
+const { t } = useFintI18n()
+const locale = ref<'ru' | 'en'>('ru')
+const status = ref<'draft' | 'review' | 'published'>('review')
 
-const localeOptions = [
+const localeOptions: GrSegmentedOption[] = [
   { value: 'ru', label: 'RU' },
   { value: 'en', label: 'EN' },
 ]
 
-const statusOptions = [
+// \`syncing\` — сегмент занят: спиннер вместо иконки, выбор не принимается,
+// стрелки его перешагивают.
+const syncing = ref(false)
+
+const statusOptions = computed<GrSegmentedOption[]>(() => [
   { value: 'draft', label: 'Draft' },
-  { value: 'review', label: 'Review' },
+  { value: 'review', label: 'Review', loading: syncing.value },
   { value: 'published', label: 'Published', disabled: true },
-]
+])
+
+function syncReview() {
+  syncing.value = true
+  window.setTimeout(() => { syncing.value = false }, 2000)
+}
+
+const statusLabel = computed(() => statusOptions.value.find(option => option.value === status.value)?.label ?? status.value)
 </script>
 
 <template>
-  <div class="grid gap-4">
-    <GrSegmented v-model="locale" :options="localeOptions" size="sm" aria-label="Language" />
-    <GrSegmented v-model="status" :options="statusOptions" block variant="button" aria-label="Publishing status" />
+  <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
+    <div class="grid gap-4 rounded-[24px] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
+      <div class="grid gap-3">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
+          {{ t('components.GrSegmented.states.languageSwitcher') }}
+        </div>
+        <GrSegmented v-model="locale" :options="localeOptions" size="sm" :indicator-duration="220" :aria-label="t('components.GrSegmented.states.languageAria')" />
+      </div>
+
+      <div class="grid gap-3">
+        <div class="text-sm font-semibold text-[var(--gr-fg)]">
+          {{ t('components.GrSegmented.states.blockLayout') }}
+        </div>
+        <GrSegmented
+          v-model="status"
+          :options="statusOptions"
+          block
+          variant="button"
+          :indicator-duration="500"
+          :aria-label="t('components.GrSegmented.states.statusAria')"
+        />
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
+      {{ t('components.GrSegmented.states.selectedState') }}
+      <div class="mt-2 text-base font-semibold text-[var(--gr-fg)]">
+        {{ statusLabel }}
+      </div>
+      <div class="mt-3 text-sm">
+        {{ t('components.GrSegmented.states.disabledNote') }}
+      </div>
+      <GrButton class="mt-3" size="sm" variant="outline" :disabled="syncing" @click="syncReview">
+        Sync «Review» for 2s
+      </GrButton>
+    </div>
   </div>
 </template>`,
   },

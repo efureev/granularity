@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
-import { GrSegmented } from '@feugene/granularity'
+import { GrButton, GrSegmented } from '@feugene/granularity'
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 
 const { t } = useFintI18n()
@@ -14,13 +14,22 @@ const localeOptions: GrSegmentedOption[] = [
   { value: 'en', label: 'EN' },
 ]
 
-const statusOptions: GrSegmentedOption[] = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'review', label: 'Review' },
-  { value: 'published', label: 'Published', disabled: true },
-]
+// `syncing` — сегмент занят: спиннер вместо иконки, выбор не принимается,
+// стрелки его перешагивают.
+const syncing = ref(false)
 
-const statusLabel = computed(() => statusOptions.find(option => option.value === status.value)?.label ?? status.value)
+const statusOptions = computed<GrSegmentedOption[]>(() => [
+  { value: 'draft', label: 'Draft' },
+  { value: 'review', label: 'Review', loading: syncing.value },
+  { value: 'published', label: 'Published', disabled: true },
+])
+
+function syncReview() {
+  syncing.value = true
+  window.setTimeout(() => { syncing.value = false }, 2000)
+}
+
+const statusLabel = computed(() => statusOptions.value.find(option => option.value === status.value)?.label ?? status.value)
 </script>
 
 <template>
@@ -56,6 +65,9 @@ const statusLabel = computed(() => statusOptions.find(option => option.value ===
       <div class="mt-3 text-sm">
         {{ t('components.GrSegmented.states.disabledNote') }}
       </div>
+      <GrButton class="mt-3" size="sm" variant="outline" :disabled="syncing" @click="syncReview">
+        Sync «Review» for 2s
+      </GrButton>
     </div>
   </div>
 </template>

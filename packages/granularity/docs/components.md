@@ -70,7 +70,7 @@
 - [`GrRadioGroup`](./components/GrRadioGroup.md)
 - `GrRating`
 - [`GrResponseErrorBanner`](./components/GrResponseErrorBanner.md)
-- `GrSegmented`
+- [`GrSegmented`](./components/GrSegmented.md)
 - [`GrSelect`](./components/GrSelect.md)
 - [`GrSidebar`](./components/GrSidebar.md)
 - `GrSkeleton`

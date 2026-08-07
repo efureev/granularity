@@ -6,12 +6,14 @@ import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import type { ComponentPublicInstance } from 'vue'
+import IconLoader from '~icons/lucide/loader-circle'
 
 import {
   grSegmentedIndicatorClass,
   grSegmentedItemClass,
   grSegmentedItemIconClass,
   grSegmentedItemLabelClass,
+  grSegmentedItemSpinnerClass,
   grSegmentedRootClass,
   grSegmentedRootStyle,
   type GrSegmentedOption,
@@ -159,6 +161,19 @@ function resolveOptionDisabled(option: GrSegmentedOption): boolean {
   return isDisabled.value || Boolean(option.disabled)
 }
 
+/**
+ * Занятый сегмент не «недоступен», а работает: нативный `disabled` и
+ * `aria-disabled` ему не ставим — состояние несёт `aria-busy`. Но выбор он не
+ * принимает, поэтому блокировка считается отдельно от `disabled`.
+ */
+function isOptionBusy(option: GrSegmentedOption): boolean {
+  return Boolean(option.loading)
+}
+
+function isOptionBlocked(option: GrSegmentedOption): boolean {
+  return resolveOptionDisabled(option) || isOptionBusy(option)
+}
+
 function isOptionSelected(option: GrSegmentedOption): boolean {
   return option.value === props.modelValue
 }
@@ -298,7 +313,9 @@ function scheduleMeasure(): void {
 }
 
 function emitValue(option: GrSegmentedOption): void {
-  if (resolveOptionDisabled(option) || option.value === props.modelValue) {
+  // Один guard на все пути: раньше `readonly` проверяла только клавиатура, и
+  // клик по сегменту менял значение вопреки заявленному контракту.
+  if (isReadonly.value || isOptionBlocked(option) || option.value === props.modelValue) {
     return
   }
 
@@ -315,7 +332,7 @@ function getNextEnabledIndex(startIndex: number, direction: 1 | -1): number {
   for (let step = 0; step < props.options.length; step += 1) {
     cursor = (cursor + direction + props.options.length) % props.options.length
     const option = props.options[cursor]
-    if (option && !resolveOptionDisabled(option)) {
+    if (option && !isOptionBlocked(option)) {
       return cursor
     }
   }
@@ -431,11 +448,11 @@ onBeforeUnmount(() => {
     :class="rootClassName"
     :style="rootStyle"
   >
-    <!-- Значение для нативной формы. Раньше в каждый `role="radio"`-элемент
-         вкладывался скрытый native `<input type="radio">`: роль объявляет потомков
-         презентационными, поэтому вложенный интерактивный контрол ломал виджет для
-         скринридеров (axe: `nested-interactive`). Скрытый input не фокусируется
-         и интерактивным не считается — отправка формы сохранена. -->
+    <!-- Значение для нативной формы уходит одним скрытым полем рядом с
+         сегментами, а не вложенным в каждый `role="radio"`: роль объявляет своих
+         потомков презентационными, и вложенный интерактивный контрол ломает
+         виджет для скринридеров (axe: `nested-interactive`). Скрытое поле не
+         фокусируется и интерактивным не считается. -->
     <input
       v-if="selectedOption && !resolveOptionDisabled(selectedOption)"
       type="hidden"
@@ -462,6 +479,7 @@ onBeforeUnmount(() => {
       :aria-label="option.ariaLabel"
       :aria-checked="isOptionSelected(option) ? 'true' : 'false'"
       :aria-disabled="resolveOptionDisabled(option) ? 'true' : undefined"
+      :aria-busy="isOptionBusy(option) ? 'true' : undefined"
       :disabled="resolveOptionDisabled(option)"
       :tabindex="isFocusableOption(option, index) ? 0 : -1"
       :class="grSegmentedItemClass({
@@ -477,10 +495,18 @@ onBeforeUnmount(() => {
         :option="option"
         :selected="isOptionSelected(option)"
         :disabled="resolveOptionDisabled(option)"
+        :loading="isOptionBusy(option)"
       >
+        <!-- Спиннер занимает место иконки: две крутилки рядом читались бы как ошибка. -->
+        <IconLoader
+          v-if="isOptionBusy(option)"
+          data-gr-segmented-spinner
+          aria-hidden="true"
+          :class="grSegmentedItemSpinnerClass"
+        />
         <component
           :is="option.icon"
-          v-if="option.icon"
+          v-else-if="option.icon"
           aria-hidden="true"
           :class="grSegmentedItemIconClass"
         />

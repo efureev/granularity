@@ -6921,7 +6921,7 @@
           {
             "name": "default",
             "description": "",
-            "type": "{ option: GrSegmentedOption; selected: boolean; disabled: boolean; }"
+            "type": "{ option: GrSegmentedOption; selected: boolean; disabled: boolean; loading: boolean; }"
           }
         ]
       },

@@ -340,3 +340,82 @@ describe('GrSegmented', () => {
     expect(wrapper.text()).toContain('Board / selected / enabled')
   })
 })
+describe('GrSegmented — readonly и недоступность', () => {
+  it('readonly не даёт выбрать ни кликом, ни клавиатурой', async () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], readonly: true },
+    })
+    const items = wrapper.findAll('[data-gr-segmented-item]')
+
+    // Клик раньше проходил мимо guard'а: `readonly` проверяла только клавиатура.
+    await items[1].trigger('click')
+    await items[0].trigger('keydown', { key: 'ArrowRight' })
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect(wrapper.emitted('change')).toBeFalsy()
+    expect(wrapper.get('[role="radiogroup"]').attributes('aria-readonly')).toBe('true')
+  })
+
+  it('disabled гасится токенами, а не прозрачностью', () => {
+    const wrapper = mount(GrSegmented, {
+      props: {
+        modelValue: 'list',
+        options: [{ value: 'list', label: 'List' }, { value: 'board', label: 'Board', disabled: true }],
+        disabled: true,
+      },
+    })
+
+    expect(wrapper.html()).not.toMatch(/opacity-\d/)
+    expect(wrapper.get('[role="radiogroup"]').classes()).toContain('text-[var(--gr-disabled-fg)]')
+    expect(wrapper.findAll('[data-gr-segmented-item]')[1].classes()).toContain('text-[var(--gr-disabled-fg)]')
+  })
+})
+
+describe('GrSegmented — загружающийся сегмент', () => {
+  const busyOptions = [
+    { value: 'list', label: 'List' },
+    { value: 'board', label: 'Board', loading: true },
+    { value: 'calendar', label: 'Calendar' },
+  ]
+
+  it('показывает спиннер и объявляется занятым, но не недоступным', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: busyOptions } })
+    const busy = wrapper.findAll('[data-gr-segmented-item]')[1]
+
+    expect(busy.find('[data-gr-segmented-spinner]').exists()).toBe(true)
+    expect(busy.attributes('aria-busy')).toBe('true')
+    // Занят — не значит недоступен: `aria-disabled` и нативный `disabled` не ставим.
+    expect(busy.attributes('aria-disabled')).toBeUndefined()
+    expect(busy.attributes('disabled')).toBeUndefined()
+  })
+
+  it('выбор занятого сегмента не проходит', async () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: busyOptions } })
+
+    await wrapper.findAll('[data-gr-segmented-item]')[1].trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+  })
+
+  it('стрелки перешагивают занятый сегмент', async () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: busyOptions } })
+
+    await wrapper.findAll('[data-gr-segmented-item]')[0].trigger('keydown', { key: 'ArrowRight' })
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['calendar'])
+  })
+
+  it('слот получает состояние загрузки', () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'list', options: busyOptions },
+      slots: {
+        default: `<template #default="{ option, loading }">
+          <span class="custom">{{ option.label }}:{{ loading }}</span>
+        </template>`,
+      },
+    })
+
+    expect(wrapper.findAll('.custom').map(node => node.text()))
+      .toEqual(['List:false', 'Board:true', 'Calendar:false'])
+  })
+})

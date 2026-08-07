@@ -10,6 +10,11 @@ export type GrSegmentedOption = {
   icon?: Component
   disabled?: boolean
   /**
+   * Сегмент занят: вместо иконки крутится спиннер, выбор не принимается.
+   * От `disabled` отличается смыслом — сегмент доступен, но сейчас работает.
+   */
+  loading?: boolean
+  /**
    * Доступное имя сегмента. Обязательно для icon-only опций: иконка декоративна
    * (`aria-hidden`), и без этого у сегмента нет имени вовсе — скринридер объявит
    * пустую кнопку. Когда есть `label`, имя берётся из него, и поле не нужно.
@@ -23,6 +28,7 @@ export const rootVariantClassMap: Record<GrSegmentedVariant, string> = {
   button: 'border border-[var(--gr-segmented-track-brd)] bg-[var(--gr-segmented-track-bg)] text-[var(--gr-segmented-item-color)] shadow-[var(--gr-segmented-track-shadow)]',
 }
 export const rootBlockClass = 'w-full'
+export const rootDisabledClass = 'text-[var(--gr-disabled-fg)]'
 export const indicatorBaseClass =
   'pointer-events-none absolute left-0 top-0 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] transition-[transform,width,height,opacity] ease-out'
 export const indicatorVariantClassMap: Record<GrSegmentedVariant, string> = {
@@ -36,10 +42,15 @@ export const itemVariantClassMap: Record<GrSegmentedVariant, string> = {
   button: '',
 }
 export const itemSelectedClass = 'text-[var(--gr-segmented-item-selected-color)]'
-export const itemDisabledClass = 'cursor-not-allowed opacity-50'
+/**
+ * Недоступный сегмент гасится токеном, а не `opacity`: прозрачность разбавляет
+ * выверенные на AA токены текста и роняет контраст подписи.
+ */
+export const itemDisabledClass = 'cursor-not-allowed text-[var(--gr-disabled-fg)]'
 export const itemEnabledClass = 'cursor-pointer hover:text-[var(--gr-segmented-item-hover-color)]'
 export const itemLabelClass = 'truncate'
 export const itemIconClass = 'h-4 w-4 shrink-0'
+export const itemSpinnerClass = 'h-4 w-4 shrink-0 animate-spin'
 export const iconOnlyClass = 'gap-0'
 const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
   xs: {
@@ -112,7 +123,7 @@ export function grSegmentedRootClass(options: { variant: GrSegmentedVariant, blo
     rootBaseClass,
     rootVariantClassMap[options.variant],
     options.block ? rootBlockClass : '',
-    options.disabled ? 'opacity-70' : '',
+    options.disabled ? rootDisabledClass : '',
   ].filter(Boolean).join(' ')
 }
 export function grSegmentedRootStyle(options: { variant: GrSegmentedVariant, size: GrSegmentedSize }): Record<string, string> {
@@ -140,3 +151,4 @@ export function grSegmentedItemClass(options: {
 }
 export const grSegmentedItemLabelClass = itemLabelClass
 export const grSegmentedItemIconClass = itemIconClass
+export const grSegmentedItemSpinnerClass = itemSpinnerClass
