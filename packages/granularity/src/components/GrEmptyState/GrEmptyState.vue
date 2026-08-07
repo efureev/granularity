@@ -1,49 +1,121 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import IconInbox from '~icons/lucide/inbox'
 
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+
+import {
+  actionsBaseClass,
+  actionsBySize,
+  descriptionBaseClass,
+  descriptionBySize,
+  grEmptyStateRootClass,
+  iconBoxBaseClass,
+  iconBoxBySize,
+  iconSizeBySize,
+  titleBaseClass,
+  titleBySize,
+  type GrEmptyStateHeadingLevel,
+  type GrEmptyStateSize,
+  type GrEmptyStateVariant,
+} from './grEmptyStateStyles'
+
+export type {
+  GrEmptyStateHeadingLevel,
+  GrEmptyStateSize,
+  GrEmptyStateVariant,
+} from './grEmptyStateStyles'
 
 /**
- * GrEmptyState — карточка пустого состояния с иконкой, заголовком,
- * опциональным описанием и CTA-слотом.
+ * GrEmptyState — карточка пустого состояния: иконка, заголовок, описание и
+ * слот действий.
  *
- * - Иконка по умолчанию — `lucide/inbox`, кастомизируется через слот `#icon`.
- * - Default-слот рендерится как контейнер для действий (центрирован).
+ * Заголовок — настоящий heading: без него пустое состояние не находится
+ * навигацией по заголовкам, а именно оно и объясняет, почему на экране ничего
+ * нет.
  */
 export interface GrEmptyStateProps {
-  title: string
+  /** Заголовок. Не задан — берётся из локали; слот `#title` сильнее обоих. */
+  title?: string
   description?: string
+  size?: GrEmptyStateSize
+  /** `ghost` снимает рамку и фон: карточка внутри карточки рисует вторую рамку. */
+  variant?: GrEmptyStateVariant
+  headingLevel?: GrEmptyStateHeadingLevel
 }
 
-withDefaults(defineProps<GrEmptyStateProps>(), {
+const props = withDefaults(defineProps<GrEmptyStateProps>(), {
+  title: undefined,
   description: undefined,
+  size: undefined,
+  variant: undefined,
+  headingLevel: undefined,
 })
+
+const slots = defineSlots<{
+  /** Иконка вместо встроенной. */
+  icon?: () => unknown
+  /** Заголовок разметкой: ссылка, выделение, счётчик. */
+  title?: () => unknown
+  description?: () => unknown
+  /** Действия под текстом: центрируются. */
+  default?: () => unknown
+}>()
+
+const { t } = useGranularityTranslations()
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrEmptyState' })
+const resolvedVariant = useGrComponentProp('GrEmptyState', 'variant', () => props.variant, 'outlined')
+const headingLevel = useGrComponentProp('GrEmptyState', 'headingLevel', () => props.headingLevel, 3)
+
+const headingTag = computed(() => `h${headingLevel.value}`)
+const resolvedTitle = computed(() => props.title ?? t('gr.emptyState.title', 'Nothing here yet'))
+const hasDescription = computed(() => Boolean(props.description) || Boolean(slots.description))
 </script>
 
 <template>
   <div
     data-gr-empty-state
-    class="rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-6 text-center"
+    :class="grEmptyStateRootClass({ variant: resolvedVariant, size: resolvedSize })"
   >
     <div class="flex justify-center">
-      <div class="h-12 w-12 rounded-[12px] bg-[var(--gr-muted)] border border-[var(--gr-brd)] flex items-center justify-center text-[var(--gr-muted-fg)]">
+      <div data-gr-empty-state-icon :class="[iconBoxBaseClass, iconBoxBySize[resolvedSize]]">
         <slot name="icon">
-          <GrIcon :size="24">
+          <GrIcon :size="iconSizeBySize[resolvedSize]">
             <IconInbox aria-hidden="true" />
           </GrIcon>
         </slot>
       </div>
     </div>
 
-    <div class="mt-4 text-[14px] font-700">
-      {{ title }}
+    <component
+      :is="headingTag"
+      data-gr-empty-state-title
+      :class="[titleBaseClass, titleBySize[resolvedSize]]"
+    >
+      <slot name="title">
+        {{ resolvedTitle }}
+      </slot>
+    </component>
+
+    <div
+      v-if="hasDescription"
+      data-gr-empty-state-description
+      :class="[descriptionBaseClass, descriptionBySize[resolvedSize]]"
+    >
+      <slot name="description">
+        {{ description }}
+      </slot>
     </div>
 
-    <div v-if="description" class="mt-1 text-[13px] text-[var(--gr-muted-fg)]">
-      {{ description }}
-    </div>
-
-    <div v-if="$slots.default" class="mt-4 flex justify-center">
+    <div
+      v-if="$slots.default"
+      data-gr-empty-state-actions
+      :class="[actionsBaseClass, actionsBySize[resolvedSize]]"
+    >
       <slot />
     </div>
   </div>

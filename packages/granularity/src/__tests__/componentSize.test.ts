@@ -20,6 +20,7 @@ import GrCommandPalette from '../components/GrCommandPalette/GrCommandPalette.vu
 import GrConfirmDialog from '../components/GrConfirmDialog/GrConfirmDialog.vue'
 import GrDialog from '../components/GrDialog/GrDialog.vue'
 import GrDrawer from '../components/GrDrawer/GrDrawer.vue'
+import GrEmptyState from '../components/GrEmptyState/GrEmptyState.vue'
 import GrModal from '../components/GrModal/GrModal.vue'
 import GrPromptDialog from '../components/GrPromptDialog/GrPromptDialog.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
@@ -114,6 +115,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
       columns: [{ key: 'name', label: 'Name' }],
     }),
   },
+  { name: 'GrEmptyState', render: () => h(GrEmptyState, { title: 'E' }) },
   { name: 'GrFileUpload', render: () => h(GrFileUpload) },
   {
     name: 'GrFormField',

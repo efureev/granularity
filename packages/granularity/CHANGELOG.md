@@ -41,6 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrEmptyState`: `variant`, `size`, `headingLevel` and content slots.** `variant="ghost"` drops the border, the
+  background and the radius — inside an existing card (`GrDataTable #empty`, `GrList #empty`, any layout of your own)
+  the default `outlined` drew a second border around the same surface; the vocabulary is `GrCard`'s, where `ghost`
+  already means exactly that. `size` (`xs`…`lg`, readable from `GrConfigProvider`) scales the padding, the icon box,
+  the icon, the heading and the vertical rhythm, so a table cell or a dropdown panel no longer gets a full-page
+  placeholder. New slots `#title` and `#description` take markup where only strings used to fit, and `title` becomes
+  optional: without it and without the slot the heading falls back to the locale (`gr.emptyState.title`, all three
+  locales), so `<GrEmptyState />` is no longer an empty card.
 - **`GrBottomNav`: icons, badges, disabled destinations, links, and a configurable breakpoint.** An item grows to
   `{ label, value, icon?, badge?, badgeLabel?, disabled?, href?, to?, ariaLabel? }`: without icons a bottom bar does not
   do its job, and the showcase used to work around that by hand. A numeric badge is announced in words — a bare «12»
@@ -199,6 +207,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrEmptyState`'s title was not a heading.** It rendered as a `<div class="font-700">`, so the one element that
+  explains why the screen is empty could not be reached by heading navigation. It is now a real heading (`h3` by
+  default) with the browser's bottom margin reset, which keeps the previous vertical rhythm exactly.
+- **`GrEmptyState` hardcoded its radius and font sizes.** `rounded-[12px]`, `text-[14px]` and `text-[13px]` ignored the
+  scales; they now come from `--gr-radius-*` and `--gr-text-*`. The description moves from 13px to `--gr-text-sm`,
+  because there is no 13px step and inventing one for a single component is worse than the round-off.
 - **`GrBottomNav` could not say where the user was.** The active destination differed by colour alone
   (`--gr-primary` against `--gr-muted-fg`) with no `aria-current`, `aria-pressed` or `aria-selected`: a screen reader
   heard a row of identical buttons, and the distinction disappeared for anyone with monochrome vision (WCAG 1.4.1). The

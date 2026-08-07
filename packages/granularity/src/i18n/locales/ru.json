@@ -274,5 +274,8 @@
   "bottomNav": {
     "label": "Нижняя навигация",
     "badge": "{count} новых"
+  },
+  "emptyState": {
+    "title": "Пока пусто"
   }
 }

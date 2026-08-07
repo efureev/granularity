@@ -272,5 +272,8 @@
   "bottomNav": {
     "label": "Bottom navigation",
     "badge": "{count} new"
+  },
+  "emptyState": {
+    "title": "Nothing here yet"
   }
 }

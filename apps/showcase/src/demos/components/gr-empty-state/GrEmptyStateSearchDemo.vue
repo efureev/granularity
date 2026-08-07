@@ -14,7 +14,7 @@ const description = computed(() => {
   <div class="grid gap-3">
     <GrInput v-model="query" placeholder="Search views" />
 
-    <GrEmptyState title="Nothing found" :description="description">
+    <GrEmptyState size="sm" title="Nothing found" :description="description">
       <div class="flex flex-wrap justify-center gap-2">
         <GrButton size="sm" variant="outline">Clear filter</GrButton>
         <GrButton size="sm">Create view</GrButton>

@@ -8,7 +8,7 @@ import { GrButton, GrCard, GrEmptyState } from '@feugene/granularity'
       Left rail can keep filters, contextual hints or a compact KPI while the main area uses `GrEmptyState`.
     </div>
 
-    <GrEmptyState title="No team members invited" description="Use empty-state content inside larger layouts, not only as a full-page placeholder.">
+    <GrEmptyState variant="ghost" title="No team members invited" description="Inside an existing card the ghost variant drops the second border around the same surface.">
       <GrButton size="sm">Invite teammate</GrButton>
     </GrEmptyState>
   </GrCard>

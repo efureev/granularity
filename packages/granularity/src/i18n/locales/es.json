@@ -273,5 +273,8 @@
   "bottomNav": {
     "label": "Navegación inferior",
     "badge": "{count} nuevos"
+  },
+  "emptyState": {
+    "title": "Todavía no hay nada"
   }
 }

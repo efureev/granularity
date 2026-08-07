@@ -2942,17 +2942,39 @@
         "origin": "generated",
         "items": [
           {
-            "name": "description",
-            "description": "",
-            "type": "string | undefined",
+            "name": "variant",
+            "description": "`ghost` снимает рамку и фон: карточка внутри карточки рисует вторую рамку.",
+            "type": "\"ghost\" | \"outlined\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "title",
+            "description": "Заголовок. Не задан — берётся из локали; слот `#title` сильнее обоих.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
             "description": "",
-            "type": "string",
-            "required": true
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "headingLevel",
+            "description": "",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "description",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -2963,13 +2985,23 @@
         "items": [
           {
             "name": "icon",
+            "description": "Иконка вместо встроенной.",
+            "type": "any"
+          },
+          {
+            "name": "title",
+            "description": "Заголовок разметкой: ссылка, выделение, счётчик.",
+            "type": "any"
+          },
+          {
+            "name": "description",
             "description": "",
-            "type": "{}"
+            "type": "any"
           },
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Действия под текстом: центрируются.",
+            "type": "any"
           }
         ]
       },
