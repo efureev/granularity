@@ -807,6 +807,33 @@ export const grThemeTokens: GrThemeToken[] = [
     }
   },
   {
+    "name": "--gr-disabled-bg",
+    "section": "State roles",
+    "description": "Фон недоступного контрола: гасит его поверхностью, а не прозрачностью — `opacity` разбавляет выверенные на AA токены текста.",
+    "values": {
+      "light": "#f1f5f9",
+      "dark": "#273548"
+    }
+  },
+  {
+    "name": "--gr-disabled-fg",
+    "section": "State roles",
+    "description": "Цвет текста и иконок недоступного контрола.",
+    "values": {
+      "light": "#94a3b8",
+      "dark": "#64748b"
+    }
+  },
+  {
+    "name": "--gr-disabled-brd",
+    "section": "State roles",
+    "description": "Цвет рамки недоступного контрола.",
+    "values": {
+      "light": "#e2e8f0",
+      "dark": "#334155"
+    }
+  },
+  {
     "name": "--gr-primary",
     "section": "Action roles",
     "description": "Главный brand/action цвет темы для primary CTA и ключевых акцентов.",

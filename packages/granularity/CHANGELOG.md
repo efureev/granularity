@@ -41,6 +41,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrSwitch` can take part in a native form.** `name`, `value` (default `'on'`) and `form` render a hidden field
+  with checkbox semantics: a switch that is on submits its value, a switch that is off submits nothing, so the server
+  reads «off» from the missing key. The field is a sibling of the button rather than a child — interactive content
+  inside `<button>` is invalid — which makes the component's root a fragment; attributes a consumer passes still land
+  on the button.
+- **`GrSwitch`: `loading`, `labelPosition` and a `change` event.** `loading` puts a spinner in the thumb, marks the
+  control `aria-busy` and blocks toggling while a request is in flight; `loadingText` (default `gr.switch.loading`)
+  says what is being saved, because `aria-busy` alone is not announced. `labelPosition="start"` moves the label to the
+  left of the track by reversing the row, leaving the DOM order — and therefore the reading order — intact. `change`
+  is emitted alongside `update:modelValue`.
+- **`--gr-disabled-bg`, `--gr-disabled-fg` and `--gr-disabled-brd` join the theme tokens.** Disabled states had no
+  token to sit on, which is why eleven components dimmed themselves with `opacity` against the package's own rule.
 - **`GrStatistic`: `locale` and number formatting through `Intl`.** Separators now come from the locale — taken from
   the i18n adapter automatically, overridable per card with `locale`, and still overridable outright with
   `groupSeparator`/`decimalSeparator`, which replace only their own part and leave the rest of the locale's rules
@@ -60,6 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrSwitch` accepts `xs` from `GrConfigProvider`.** The `xs` classes existed, but the component still declared
+  `supported: ['sm', 'md', 'lg']`, so a global `size="xs"` silently fell back to `md`.
 - **`GrStatistic`: the four size ladders moved from px literals to `--gr-text-*`.** Captions and the trend line run
   `2xs/xs/xs/sm`, affixes `xs/xs/base/xl`, the value `base/xl/3xl/4xl` — the value at `md` grows from 28px to 30px,
   the only visual shift.
@@ -84,6 +98,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `region`, so five sections of one form produced five landmarks and buried the useful ones. The name is now attached
   only when `landmark` is set; structure is carried by the heading. The description keeps its `aria-describedby` link
   in both modes.
+- **`GrSwitch` dimmed its disabled state with `opacity`.** Transparency waters down text tokens that were tuned for
+  AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
+  `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
+  like a working one.
 - **`GrStatistic` did not tell a screen reader whether the metric went up or down.** The trend icon is decorative and
   «+12.5%» carries no direction on its own, so growth and decline were indistinguishable — colour conveys it to
   sighted users only. The trend line now carries a visually hidden «Increase» / «Decrease» / «No change», which

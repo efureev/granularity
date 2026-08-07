@@ -76,7 +76,7 @@
 - `GrSkeleton`
 - `GrSlider`
 - [`GrStatistic`](./components/GrStatistic.md)
-- `GrSwitch`
+- [`GrSwitch`](./components/GrSwitch.md)
 - [`GrTable`](./components/GrTable.md)
 - [`GrTabPanels`](./components/GrTabPanels.md)
 - [`GrTabs`](./components/GrTabs.md)

@@ -5,4 +5,4 @@ export { grSwitchConfig } from './config'
 export type { GrSwitchConfigurableProps } from './defaults'
 export { grSwitchSafelist } from './safelist'
 
-export type { GrSwitchProps, GrSwitchSize } from './GrSwitch.vue'
+export type { GrSwitchLabelPosition, GrSwitchProps, GrSwitchSize } from './GrSwitch.vue'

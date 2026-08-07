@@ -74,6 +74,9 @@
     },
     "ok": "OK"
   },
+  "switch": {
+    "loading": "Guardando…"
+  },
   "statistic": {
     "trendUp": "Aumento",
     "trendDown": "Descenso",

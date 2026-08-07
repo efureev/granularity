@@ -81,6 +81,26 @@
       ]
     },
     {
+      "title": "State roles",
+      "tokens": [
+        {
+          "name": "--gr-disabled-bg",
+          "value": "#f1f5f9",
+          "description": "Фон недоступного контрола: гасит его поверхностью, а не прозрачностью — `opacity` разбавляет выверенные на AA токены текста."
+        },
+        {
+          "name": "--gr-disabled-fg",
+          "value": "#94a3b8",
+          "description": "Цвет текста и иконок недоступного контрола."
+        },
+        {
+          "name": "--gr-disabled-brd",
+          "value": "#e2e8f0",
+          "description": "Цвет рамки недоступного контрола."
+        }
+      ]
+    },
+    {
       "title": "Action roles",
       "tokens": [
         {

@@ -73,6 +73,9 @@
     },
     "ok": "OK"
   },
+  "switch": {
+    "loading": "Saving…"
+  },
   "statistic": {
     "trendUp": "Increase",
     "trendDown": "Decrease",

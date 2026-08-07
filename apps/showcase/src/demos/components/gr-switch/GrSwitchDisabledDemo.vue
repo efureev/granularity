@@ -7,6 +7,17 @@ import { useFintI18n } from '@feugene/fint-i18n/vue'
 const { t } = useFintI18n()
 const notifications = ref(true)
 const disabled = ref(false)
+
+const syncing = ref(false)
+const backup = ref(false)
+
+function saveBackup(value: boolean): void {
+  syncing.value = true
+  window.setTimeout(() => {
+    backup.value = value
+    syncing.value = false
+  }, 1200)
+}
 </script>
 
 <template>
@@ -17,6 +28,14 @@ const disabled = ref(false)
       </GrSwitch>
       <GrSwitch :model-value="true" disabled>
         {{ t('components.GrSwitch.disabled.alwaysOn') }}
+      </GrSwitch>
+      <GrSwitch
+        :model-value="backup"
+        :loading="syncing"
+        label-position="start"
+        @change="saveBackup"
+      >
+        {{ t('components.GrSwitch.disabled.backup') }}
       </GrSwitch>
     </div>
 

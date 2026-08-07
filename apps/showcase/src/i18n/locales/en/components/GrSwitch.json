@@ -45,7 +45,8 @@
   "disabled": {
     "emailNotifications": "Email notifications",
     "alwaysOn": "Always on",
-    "disableLabeled": "Disable labeled switch"
+    "disableLabeled": "Disable labeled switch",
+    "backup": "Automatic backup"
   },
   "sizes": {
     "small": "Small",

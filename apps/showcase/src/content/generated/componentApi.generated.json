@@ -7770,6 +7770,48 @@
             "default": "undefined"
           },
           {
+            "name": "loading",
+            "description": "Идёт сохранение: бегунок показывает спиннер, переключение заблокировано.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loadingText",
+            "description": "i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Значение, уходящее в форму во включённом состоянии.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"on\""
+          },
+          {
+            "name": "name",
+            "description": "Имя поля для нативной отправки формы. Без него скрытое поле не рендерится.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "form",
+            "description": "`id` формы, если переключатель лежит вне неё.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "labelPosition",
+            "description": "Сторона подписи относительно дорожки.",
+            "type": "\"end\" | \"start\" | undefined",
+            "required": false,
+            "default": "\"end\""
+          },
+          {
             "name": "activeBackgroundColor",
             "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`.",
             "type": "string | undefined",
@@ -7813,6 +7855,12 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"change\", value: boolean): void"
           }
         ]
       },

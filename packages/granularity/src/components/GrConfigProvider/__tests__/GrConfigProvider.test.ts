@@ -72,8 +72,8 @@ describe('GrConfigProvider', () => {
   })
 })
 
-// Компоненты с усечённой size-шкалой (`GrSlider`, `GrRating`, `GrSwitch`,
-// `GrLink`, `GrStatistic` не знают про `xs`) объявляют её через `supported`.
+// Компонент с усечённой size-шкалой объявляет её через `supported`: сейчас так
+// живут `GrSlider` и `GrRating`.
 const NarrowConsumer = defineComponent({
   props: { size: { type: String as () => 'sm' | 'md' | 'lg' | undefined, default: undefined } },
   setup(props) {
@@ -307,14 +307,25 @@ describe('глобальный size доезжает до контролов', (
     expect(targeted).toBe(renderStandalone(GrSelect, { modelValue: '', size: 'xs' }))
   })
 
-  it('усечённая шкала: `xs` из конфига игнорируется в пользу дефолта компонента', () => {
+  it('усечённая шкала: неподдержанный размер из конфига игнорируется в пользу дефолта', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     resetUnsupportedSizeWarnings()
 
-    // У `GrSwitch` нет `xs`: без guard\'а получили бы элемент без размерных классов.
-    const fromProvider = renderWithProvider(GrSwitch, { modelValue: false }, { size: 'xs' })
+    // Проверяется сам guard, а не конкретный компонент: без него потребитель с
+    // усечённой шкалой получил бы элемент вовсе без размерных классов.
+    const TruncatedScale = defineComponent({
+      setup() {
+        const size = useGrComponentSize(() => undefined, { supported: ['md', 'lg'] })
+        return () => h('span', { class: 'size' }, size.value)
+      },
+    })
 
-    expect(fromProvider).toBe(renderStandalone(GrSwitch, { modelValue: false }))
+    const wrapper = mount(GrConfigProvider, {
+      props: { size: 'xs' },
+      slots: { default: () => h(TruncatedScale) },
+    })
+
+    expect(wrapper.find('.size').text()).toBe('md')
     expect(warn).toHaveBeenCalledTimes(1)
     warn.mockRestore()
   })

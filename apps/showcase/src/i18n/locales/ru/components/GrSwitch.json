@@ -45,7 +45,8 @@
   "disabled": {
     "emailNotifications": "Email-уведомления",
     "alwaysOn": "Всегда включено",
-    "disableLabeled": "Отключить переключатель с подписью"
+    "disableLabeled": "Отключить переключатель с подписью",
+    "backup": "Резервное копирование"
   },
   "sizes": {
     "small": "Маленький",

@@ -29,6 +29,11 @@
   --gr-input: #334155;
   --gr-ring: #818cf8;
 
+  /* State roles */
+  --gr-disabled-bg: #273548;
+  --gr-disabled-fg: #64748b;
+  --gr-disabled-brd: #334155;
+
   /* Action roles */
   /*
    * Primary был единственным тоном, выпадавшим из конвенции тёмной темы
