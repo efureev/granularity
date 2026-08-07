@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { InputHTMLAttributes } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
-import { computed, ref, useSlots } from 'vue'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { computed, nextTick, onBeforeUnmount, ref, useSlots } from 'vue'
 
 import {
+  clearButtonClass,
+  stepperCompactClass,
+  stepperWideClass,
   grNumberInputInputClass,
   grNumberInputShellClass,
   type GrNumberInputControlsDirection,
@@ -15,6 +18,12 @@ import {
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import GrIcon from '../GrIcon/GrIcon.vue'
+import IconChevronDown from '~icons/lucide/chevron-down'
+import IconChevronLeft from '~icons/lucide/chevron-left'
+import IconChevronRight from '~icons/lucide/chevron-right'
+import IconChevronUp from '~icons/lucide/chevron-up'
+import IconX from '~icons/lucide/x'
 import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
 
 defineOptions({
@@ -67,6 +76,10 @@ export interface GrNumberInputProps {
   max?: number
   precision?: number
 
+  /** Кнопка очистки значения. */
+  clearable?: boolean
+  /** A11y-подпись кнопки очистки. */
+  clearLabel?: string
   /**
    * BCP-47 локаль для отображения значения (группировка разрядов и разделители
    * через `Intl.NumberFormat`). Работает вместе с `useGrouping`.
@@ -126,6 +139,8 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   precision: undefined,
   locale: undefined,
   useGrouping: false,
+  clearable: undefined,
+  clearLabel: undefined,
 
   controls: false,
   controlsDirection: 'vertical',
@@ -156,9 +171,16 @@ const {
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'change', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+  /** Значение стёрто кнопкой очистки. */
+  (e: 'clear'): void
 }>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
+
+// В фокусе поле показывает «сырое» значение: группировка мешала бы правке.
+const isFocused = ref(false)
 
 function focus(): void {
   inputEl.value?.focus()
@@ -172,7 +194,13 @@ defineExpose({ focus, blur })
 
 const slots = useSlots()
 
-const { t } = useGranularityTranslations()
+const { t, locale } = useGranularityTranslations()
+
+/**
+ * Локаль форматирования: свой проп → локаль i18n-адаптера → окружение. Без
+ * второго шага мультиязычное приложение передавало бы `locale` каждому полю.
+ */
+const resolvedLocale = computed(() => props.locale ?? locale.value)
 const resolvedIncreaseLabel = computed(() => props.increaseLabel ?? t('gr.numberInput.increase', 'Increase'))
 const resolvedDecreaseLabel = computed(() => props.decreaseLabel ?? t('gr.numberInput.decrease', 'Decrease'))
 
@@ -262,6 +290,17 @@ const prefixStyle = computed(() => {
 })
 
 const verticalControlsStyle = computed(() => addonStyle('right', suffixLen.value))
+
+/**
+ * Крестик очистки живёт левее правой зоны (суффикс + кнопки ±) — иначе он лёг бы
+ * на них. Ширины там же, где их считает поле, поэтому переиспользуем расчёт.
+ */
+const clearButtonStyle = computed(() => {
+  const controlsCount = (hasHorizontalControls.value ? 1 : 0) + (hasVerticalControls.value ? 1 : 0)
+  const controls = controlsCount > 0 ? px(addonPx.value * controlsCount) : '0px'
+
+  return { right: addLen(addLen(suffixLen.value, controls), '6px') }
+})
 const horizontalLeftControlsStyle = computed(() => addonStyle('left', prefixLen.value))
 const horizontalRightControlsStyle = computed(() => addonStyle('right', suffixLen.value))
 
@@ -363,6 +402,15 @@ function onInput(e: Event): void {
   }
 
   emit('update:modelValue', next)
+
+  // Поле уже переписано напрямую (ради каретки). Если родитель модель не
+  // применит, DOM и vnode разъедутся — выравниваем поле по модели.
+  void nextTick(() => {
+    if (!isFocused.value) return
+    const current = inputEl.value
+    if (current && current.value !== props.modelValue && props.modelValue !== next)
+      current.value = props.modelValue
+  })
 }
 
 function commit(el: HTMLInputElement): void {
@@ -387,12 +435,16 @@ function setValue(n: number): void {
   emit('change', nextStr)
 }
 
+/**
+ * Шаг значения. Фокус не трогаем: кнопка ± обязана оставаться под фокусом,
+ * иначе клавиатурный пользователь после первого Enter теряет её и повторно
+ * нажать не может. Поле фокусирует тот, кто шагает от него самого.
+ */
 function stepBy(dir: 1 | -1): void {
-  if (isDisabled.value) return
+  if (isDisabled.value || isReadonly.value) return
 
   const current = toNumber(props.modelValue) ?? 0
   setValue(current + (props.step ?? 1) * dir)
-  focus()
 }
 
 // Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, Home/End —
@@ -427,10 +479,24 @@ function onKeydown(e: KeyboardEvent): void {
 // `aria-valuenow` — числовое значение для скринридеров; отсутствует, если поле пусто.
 const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
 
+// Границы: на пределе кнопка ± гаснет. Раньше она оставалась активной и молча
+// ничего не делала — `clamp` съедал результат.
+const numericValue = computed(() => toNumber(props.modelValue))
+
+const canIncrease = computed(() => {
+  if (props.max === undefined) return true
+  const current = numericValue.value
+  return current === null || normalize(current) < props.max
+})
+
+const canDecrease = computed(() => {
+  if (props.min === undefined) return true
+  const current = numericValue.value
+  return current === null || normalize(current) > props.min
+})
+
 // Локале-зависимое отображение: при фокусе показываем «сырое» значение для
 // редактирования, иначе — сгруппированное через `Intl.NumberFormat`.
-const isFocused = ref(false)
-
 function formatGrouped(value: string): string {
   const num = toNumber(value)
   if (num === null) return value
@@ -438,7 +504,7 @@ function formatGrouped(value: string): string {
   // formatToParts позволяет оставить локале-зависимый групповой разделитель,
   // но принудительно подставить наш десятичный разделитель (`decimalSeparator`),
   // корректно работая для любой локали (в т.ч. de-DE, где группа — '.').
-  return new Intl.NumberFormat(props.locale, {
+  return new Intl.NumberFormat(resolvedLocale.value, {
     useGrouping: true,
     minimumFractionDigits: props.precision ?? 0,
     maximumFractionDigits: props.precision ?? 20,
@@ -448,17 +514,88 @@ function formatGrouped(value: string): string {
     .join('')
 }
 
+/**
+ * `aria-valuetext` нужен только при группировке: без неё `aria-valuenow` уже
+ * несёт то же самое число, и дублировать его текстом незачем.
+ */
+const ariaValueText = computed(() => {
+  if (!props.useGrouping) return undefined
+  const num = toNumber(props.modelValue)
+  return num === null ? undefined : formatGrouped(props.modelValue)
+})
+
 const displayValue = computed(() => {
   if (!props.useGrouping || isFocused.value) return props.modelValue
   return formatGrouped(props.modelValue)
 })
 
-function onFocus(): void {
+function onFocus(event: FocusEvent): void {
   isFocused.value = true
+  emit('focus', event)
 }
 
-function onBlur(): void {
+function onBlur(event: FocusEvent): void {
   isFocused.value = false
+  emit('blur', event)
+  stopRepeat()
+}
+
+// ————— Удержание кнопки ±: шаг повторяется, пока кнопку держат.
+const REPEAT_DELAY_MS = 400
+const REPEAT_INTERVAL_MS = 60
+
+let repeatDelay: ReturnType<typeof setTimeout> | null = null
+let repeatTimer: ReturnType<typeof setInterval> | null = null
+
+function stopRepeat(): void {
+  if (repeatDelay !== null) {
+    clearTimeout(repeatDelay)
+    repeatDelay = null
+  }
+  if (repeatTimer !== null) {
+    clearInterval(repeatTimer)
+    repeatTimer = null
+  }
+}
+
+function canStep(dir: 1 | -1): boolean {
+  return dir === 1 ? canIncrease.value : canDecrease.value
+}
+
+/**
+ * `pointerdown`, а не `mousedown`: на тач-устройствах второго не бывает.
+ * Повтор останавливается на границе — иначе таймер крутился бы вхолостую.
+ */
+function startRepeat(dir: 1 | -1): void {
+  if (isDisabled.value || isReadonly.value) return
+
+  stopRepeat()
+  repeatDelay = setTimeout(() => {
+    repeatTimer = setInterval(() => {
+      if (!canStep(dir)) {
+        stopRepeat()
+        return
+      }
+      stepBy(dir)
+    }, REPEAT_INTERVAL_MS)
+  }, REPEAT_DELAY_MS)
+}
+
+onBeforeUnmount(stopRepeat)
+
+// ————— Очистка значения.
+const resolvedClearable = useGrComponentProp('GrNumberInput', 'clearable', () => props.clearable, false)
+const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
+
+const clearVisible = computed(() =>
+  resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== '',
+)
+
+function clear(): void {
+  emit('update:modelValue', '')
+  emit('change', '')
+  emit('clear')
+  focus()
 }
 </script>
 
@@ -495,6 +632,7 @@ function onBlur(): void {
       :aria-valuenow="ariaValueNow"
       :aria-valuemin="min"
       :aria-valuemax="max"
+      :aria-valuetext="ariaValueText"
       :aria-invalid="invalid || isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-required="isRequired ? 'true' : undefined"
@@ -524,6 +662,21 @@ function onBlur(): void {
       <slot name="suffix" />
     </div>
 
+    <button
+      v-if="clearVisible"
+      type="button"
+      data-gr-number-input-clear
+      :class="clearButtonClass"
+      :style="clearButtonStyle"
+      :aria-label="resolvedClearLabel"
+      @mousedown.prevent
+      @click="clear"
+    >
+      <GrIcon :size="14">
+        <IconX />
+      </GrIcon>
+    </button>
+
     <div
       v-if="hasVerticalControls"
       data-testid="number-input-controls-vertical"
@@ -534,39 +687,35 @@ function onBlur(): void {
       <div class="flex flex-col justify-center gap-1">
         <button
           type="button"
-          class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isDisabled"
+          data-gr-number-input-increase
+          :class="stepperCompactClass"
+          :disabled="isDisabled || !canIncrease"
           :aria-label="resolvedIncreaseLabel"
           @mousedown.prevent
+          @pointerdown="startRepeat(1)"
+          @pointerup="stopRepeat"
+          @pointerleave="stopRepeat"
           @click="stepBy(1)"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path
-              d="M7 14l5-5 5 5"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <GrIcon :size="12">
+            <IconChevronUp />
+          </GrIcon>
         </button>
         <button
           type="button"
-          class="h-4 w-7 inline-flex items-center justify-center rounded text-[10px] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isDisabled"
+          data-gr-number-input-decrease
+          :class="stepperCompactClass"
+          :disabled="isDisabled || !canDecrease"
           :aria-label="resolvedDecreaseLabel"
           @mousedown.prevent
+          @pointerdown="startRepeat(-1)"
+          @pointerup="stopRepeat"
+          @pointerleave="stopRepeat"
           @click="stepBy(-1)"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path
-              d="M7 10l5 5 5-5"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <GrIcon :size="12">
+            <IconChevronDown />
+          </GrIcon>
         </button>
       </div>
     </div>
@@ -580,21 +729,19 @@ function onBlur(): void {
     >
       <button
         type="button"
-        class="h-full w-full inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-        :disabled="isDisabled"
+        data-gr-number-input-decrease
+        :class="stepperWideClass"
+        :disabled="isDisabled || !canDecrease"
         :aria-label="resolvedDecreaseLabel"
         @mousedown.prevent
+        @pointerdown="startRepeat(-1)"
+        @pointerup="stopRepeat"
+        @pointerleave="stopRepeat"
         @click="stepBy(-1)"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path
-            d="M14 7l-5 5 5 5"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <GrIcon :size="12">
+          <IconChevronLeft />
+        </GrIcon>
       </button>
     </div>
 
@@ -607,21 +754,19 @@ function onBlur(): void {
     >
       <button
         type="button"
-        class="h-full w-full inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-        :disabled="isDisabled"
+        data-gr-number-input-increase
+        :class="stepperWideClass"
+        :disabled="isDisabled || !canIncrease"
         :aria-label="resolvedIncreaseLabel"
         @mousedown.prevent
+        @pointerdown="startRepeat(1)"
+        @pointerup="stopRepeat"
+        @pointerleave="stopRepeat"
         @click="stepBy(1)"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path
-            d="M10 7l5 5-5 5"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <GrIcon :size="12">
+          <IconChevronRight />
+        </GrIcon>
       </button>
     </div>
   </div>

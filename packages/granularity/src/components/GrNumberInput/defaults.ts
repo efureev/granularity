@@ -7,6 +7,7 @@ import type { GrNumberInputSize } from './grNumberInputStyles'
  */
 export interface GrNumberInputConfigurableProps {
   size: GrNumberInputSize
+  clearable: boolean
 }
 
 declare module '../GrConfigProvider/context' {

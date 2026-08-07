@@ -41,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrNumberInput`: `clearable`, hold-to-repeat, `focus`/`blur`.** Holding a ± button now steps repeatedly (400 ms
+  before the first repeat, then every 60 ms) and stops at the boundary, on release and when the pointer leaves;
+  `clearable` adds a clear button that returns focus to the field and emits `clear`; `focus` and `blur` complete the
+  event contract shared with `GrInput`.
+- **`GrNumberInput` reads its locale from the i18n adapter.** `Intl.NumberFormat` was only ever given the `locale`
+  prop, so a multilingual app had to pass it to every field.
 - **`GrRating`: labels per step and a compact read-only view.** `texts` gives each step a word, which goes both into
   the visible text and into `aria-valuetext` — «4 of 5, good» instead of a bare number, which is the whole point of a
   rating. `compact` (with `readonly`) draws only the filled symbols, for tables and lists where five stars per row eat
@@ -166,6 +172,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrNumberInput`'s ± buttons stole focus.** `stepBy` ended with `focus()` on the field, so a keyboard user who
+  tabbed to «+» lost the button after the first Enter and could not press it again. The step no longer touches focus;
+  the field is focused only when the step came from the field itself.
+- **`GrNumberInput`'s ± buttons stayed active at the boundary.** At `max` the «+» button did nothing visible — `clamp`
+  swallowed the result. Each button is now disabled on its own boundary.
+- **`GrNumberInput` could drift out of sync with its model.** `onInput` writes into `el.value` directly to preserve
+  the caret; if the parent did not apply `update:modelValue`, the DOM and the vnode disagreed and later renders never
+  reconciled the field. The field is realigned with the model on the next tick.
+- **`GrNumberInput` announced a raw number while showing a grouped one** — the formatted value now goes into
+  `aria-valuetext`.
+- **`GrNumberInput` dimmed its disabled state with `opacity`** and now uses the `--gr-disabled-*` tokens; its ±
+  buttons are drawn with `GrIcon` instead of inline SVG.
 - **`GrRating`'s preview stuck when the cursor moved onto its label.** `mouseleave` was bound to the outer container,
   which includes the text, so leaving the scale for the label never fired it. The handler now lives on the scale
   itself, and losing focus clears the preview too.

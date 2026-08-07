@@ -61,7 +61,7 @@
 - [`GrLoading`](./components/GrLoading.md)
 - [`GrModal`](./components/GrModal.md)
 - `GrNavbar`
-- `GrNumberInput`
+- [`GrNumberInput`](./components/GrNumberInput.md)
 - [`GrPagination`](./components/GrPagination.md)
 - `GrPopover`
 - `GrProgressBar`

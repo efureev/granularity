@@ -5320,6 +5320,20 @@
             "default": "undefined"
           },
           {
+            "name": "clearable",
+            "description": "Кнопка очистки значения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearLabel",
+            "description": "A11y-подпись кнопки очистки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
@@ -5515,6 +5529,24 @@
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
           },
           {
             "name": "change",

@@ -10,7 +10,7 @@ const quantity = ref('3')
 <template>
   <div class="grid gap-4 lg:grid-cols-2">
     <GrFormField label="Vertical controls">
-      <GrNumberInput v-model="amount" controls :precision="2" placeholder="0.00">
+      <GrNumberInput v-model="amount" controls clearable :precision="2" placeholder="0.00">
         <template #prefix>$</template>
       </GrNumberInput>
     </GrFormField>

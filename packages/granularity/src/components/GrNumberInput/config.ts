@@ -4,5 +4,6 @@ import { grNumberInputSafelist } from './safelist'
 
 export const grNumberInputConfig = defineGranularComponent(import.meta.url, {
   name: 'GrNumberInput',
+  dependencies: ['GrIcon'],
   safelist: grNumberInputSafelist,
 })

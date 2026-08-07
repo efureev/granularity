@@ -30,8 +30,21 @@ export const borderClassByState: Record<GrNumberInputState, string> = {
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
 }
 
-/** Динамические классы для disabled-состояния shell'а — выбираются в рантайме. */
-export const disabledShellClass = 'opacity-50 cursor-not-allowed'
+/**
+ * Недоступное поле гасится токенами, а не `opacity`: прозрачность разбавляет
+ * выверенные на AA токены текста и роняет контраст подписи.
+ */
+export const disabledShellClass = 'bg-[var(--gr-disabled-bg)] text-[var(--gr-disabled-fg)] cursor-not-allowed'
+
+const stepperBaseClass = 'inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:cursor-not-allowed disabled:text-[var(--gr-disabled-fg)] disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+/** Компактная кнопка вертикального стека ± . */
+export const stepperCompactClass = `h-4 w-7 rounded ${stepperBaseClass}`
+
+/** Кнопка бокового стека ± — занимает всю высоту поля. */
+export const stepperWideClass = `h-full w-full ${stepperBaseClass}`
+
+export const clearButtonClass = 'absolute top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-full text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export function grNumberInputShellClass(options: { disabled: boolean, state: GrNumberInputState }): string {
   return [

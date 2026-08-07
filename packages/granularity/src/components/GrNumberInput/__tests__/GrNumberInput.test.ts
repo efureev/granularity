@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrNumberInput from '../GrNumberInput.vue'
 
 describe('GrNumberInput', () => {
@@ -138,7 +139,7 @@ describe('GrNumberInput', () => {
     expect(wrapper.emitted('change')?.[0]?.[0]).toBe('2,5')
   })
 
-  it('controls: по умолчанию использует step=1 и учитывает min/max', async () => {
+  it('controls: на границе кнопка недоступна, а не молча бездействует', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
         modelValue: '10',
@@ -148,9 +149,11 @@ describe('GrNumberInput', () => {
       },
     })
 
-    await wrapper.get('button[aria-label="Decrease"]').trigger('click')
+    const decrease = wrapper.get('button[aria-label="Decrease"]')
+    expect(decrease.attributes('disabled')).toBeDefined()
 
-    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('10')
+    await decrease.trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 
   it('controls: precision округляет значение при инкременте/декременте', async () => {
@@ -314,5 +317,127 @@ describe('GrNumberInput — locale grouping (feature)', () => {
 
     // Группа '.', десятичный ',' — оба на своих местах (без затирания первого '.').
     expect(wrapper.get('input').element.value).toBe('1.234.567,89')
+  })
+})
+
+describe('GrNumberInput — фокус и границы', () => {
+  it('кнопка ± не забирает фокус себе', async () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '1', controls: true },
+      attachTo: document.body,
+    })
+
+    const increase = wrapper.get('button[aria-label="Increase"]')
+    ;(increase.element as HTMLButtonElement).focus()
+    await increase.trigger('click')
+
+    // Раньше `stepBy` заканчивался `focus()` поля, и повторный Enter по кнопке
+    // становился невозможен: фокус уезжал после первого же шага.
+    expect(document.activeElement).toBe(increase.element)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['2'])
+
+    wrapper.unmount()
+  })
+
+  it('кнопки гаснут только на своей границе', async () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '5', controls: true, min: 0, max: 5 },
+    })
+
+    expect(wrapper.get('button[aria-label="Increase"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('button[aria-label="Decrease"]').attributes('disabled')).toBeUndefined()
+
+    await wrapper.setProps({ modelValue: '0' })
+
+    expect(wrapper.get('button[aria-label="Increase"]').attributes('disabled')).toBeUndefined()
+    expect(wrapper.get('button[aria-label="Decrease"]').attributes('disabled')).toBeDefined()
+  })
+
+  it('удержание кнопки шагает повторно и замирает на границе', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '1', controls: true, max: 3 } })
+    const increase = wrapper.get('button[aria-label="Increase"]')
+
+    await increase.trigger('pointerdown')
+    await vi.advanceTimersByTimeAsync(400 + 60 * 3)
+
+    // Модель контролируемая и снаружи не меняется, поэтому каждый повтор шагает
+    // от того же значения — важно, что повтор вообще произошёл.
+    expect((wrapper.emitted('update:modelValue')?.length ?? 0)).toBeGreaterThan(1)
+
+    await increase.trigger('pointerup')
+    const afterRelease = wrapper.emitted('update:modelValue')?.length ?? 0
+    await vi.advanceTimersByTimeAsync(500)
+    expect(wrapper.emitted('update:modelValue')?.length).toBe(afterRelease)
+
+    vi.useRealTimers()
+  })
+})
+
+describe('GrNumberInput — озвучивание, очистка и события', () => {
+  it('aria-valuetext появляется только при группировке', () => {
+    const plain = mount(GrNumberInput, { props: { modelValue: '1234567' } })
+    expect(plain.get('input').attributes('aria-valuetext')).toBeUndefined()
+
+    const grouped = mount(GrNumberInput, { props: { modelValue: '1234567', useGrouping: true, locale: 'en-US' } })
+    expect(grouped.get('input').attributes('aria-valuetext')).toBe('1,234,567')
+  })
+
+  it('локаль берётся из адаптера, проп её перебивает', () => {
+    const i18n: GranularityI18nAdapter = { t: key => key, locale: ref('de-DE') }
+    const provide = { [GRANULARITY_I18N_KEY as symbol]: i18n }
+
+    const fromAdapter = mount(GrNumberInput, {
+      props: { modelValue: '1234567', useGrouping: true },
+      global: { provide },
+    })
+    expect(fromAdapter.get('input').attributes('aria-valuetext')).toBe('1.234.567')
+
+    const fromProp = mount(GrNumberInput, {
+      props: { modelValue: '1234567', useGrouping: true, locale: 'en-US' },
+      global: { provide },
+    })
+    expect(fromProp.get('input').attributes('aria-valuetext')).toBe('1,234,567')
+  })
+
+  it('clearable очищает значение и возвращает фокус в поле', async () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '42', clearable: true },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-number-input-clear]').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+    expect(document.activeElement).toBe(wrapper.get('input').element)
+
+    wrapper.unmount()
+  })
+
+  it('кнопка очистки не появляется в readonly и при пустом значении', () => {
+    const empty = mount(GrNumberInput, { props: { modelValue: '', clearable: true } })
+    expect(empty.find('[data-gr-number-input-clear]').exists()).toBe(false)
+
+    const readonly = mount(GrNumberInput, { props: { modelValue: '42', clearable: true, readonly: true } })
+    expect(readonly.find('[data-gr-number-input-clear]').exists()).toBe(false)
+  })
+
+  it('focus и blur переизлучаются', async () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '1' } })
+    const input = wrapper.get('input')
+
+    await input.trigger('focus')
+    await input.trigger('blur')
+
+    expect(wrapper.emitted('focus')).toHaveLength(1)
+    expect(wrapper.emitted('blur')).toHaveLength(1)
+  })
+
+  it('disabled гасится токенами, а не прозрачностью', () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: '1', disabled: true, controls: true } })
+
+    expect(wrapper.html()).not.toMatch(/opacity-\d/)
+    expect(wrapper.get('[data-gr-number-input]').classes()).toContain('text-[var(--gr-disabled-fg)]')
   })
 })
