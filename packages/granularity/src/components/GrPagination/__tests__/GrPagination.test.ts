@@ -2,16 +2,12 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
-import GrPagination from '../GrPagination.vue'
+import GrPagination, { type GrPaginationProps } from '../GrPagination.vue'
 
 type PaginationMountOptions = {
   locale?: 'en' | 'ru'
-  props?: {
-    page?: number
-    pageSize?: number
-    total?: number
-    pageSizes?: number[]
-  }
+  props?: Partial<GrPaginationProps>
+  slots?: Record<string, string>
 }
 
 function createGranularityTestI18n(locale: 'en' | 'ru'): GranularityI18nAdapter {
@@ -48,6 +44,7 @@ function mountPagination(options: PaginationMountOptions = {}) {
       pageSizes: [10, 20, 50],
       ...(options.props ?? {}),
     },
+    slots: options.slots,
     global: i18n
       ? {
           provide: {
@@ -115,6 +112,7 @@ describe('GrPagination', () => {
     const wrapper = mountPagination({
       props: {
         page: 2,
+        showPageSize: true,
       },
     })
     const select = wrapper.findComponent({ name: 'GrSelect' })
@@ -127,7 +125,7 @@ describe('GrPagination', () => {
   })
 
   it('использует переводы из granular i18n адаптера', () => {
-    const wrapper = mountPagination({ locale: 'ru' })
+    const wrapper = mountPagination({ locale: 'ru', props: { showPageSize: true } })
 
     expect(wrapper.text()).toContain('Назад')
     expect(wrapper.text()).toContain('Вперёд')
@@ -135,7 +133,7 @@ describe('GrPagination', () => {
   })
 
   it('aria-label региона навигации не путается с лейблом page-size селекта', () => {
-    const wrapper = mountPagination()
+    const wrapper = mountPagination({ props: { showPageSize: true } })
 
     // Регрессия: раньше aria-label всего `role="navigation"` ошибочно брался из ключа
     // `gr.pagination.pageSize` (лейбл `GrSelect` для размера страницы), а не из
@@ -155,5 +153,141 @@ describe('GrPagination', () => {
 
     // page 6 из 12: [1] … [5 6 7] … [12]
     expect(labels).toEqual(['Page 1', 'Page 5', 'Page 6', 'Page 7', 'Page 12'])
+  })
+})
+describe('GrPagination — конфигурация', () => {
+  it('селект размера страницы рендерится только по запросу', async () => {
+    const wrapper = mountPagination()
+
+    expect(wrapper.findComponent({ name: 'GrSelect' }).exists()).toBe(false)
+
+    await wrapper.setProps({ showPageSize: true })
+    expect(wrapper.findComponent({ name: 'GrSelect' }).exists()).toBe(true)
+  })
+
+  it('showTotal показывает диапазон, слот #total заменяет его целиком', () => {
+    const wrapper = mountPagination({ props: { page: 3, pageSize: 20, total: 137, showTotal: true } })
+
+    expect(wrapper.get('[data-gr-pagination-total]').text()).toBe('41–60 of 137')
+
+    const custom = mountPagination({
+      props: { page: 3, pageSize: 20, total: 137, showTotal: true },
+      slots: { total: '<template #total="{ from, to }">rows {{ from }}..{{ to }}</template>' },
+    })
+
+    expect(custom.get('[data-gr-pagination-total]').text()).toBe('rows 41..60')
+  })
+
+  it('последняя страница показывает неполный диапазон, пустой набор — нули', () => {
+    const last = mountPagination({ props: { page: 7, pageSize: 20, total: 137, showTotal: true } })
+    expect(last.get('[data-gr-pagination-total]').text()).toBe('121–137 of 137')
+
+    const empty = mountPagination({ props: { page: 1, pageSize: 20, total: 0, showTotal: true } })
+    expect(empty.get('[data-gr-pagination-total]').text()).toBe('0–0 of 0')
+  })
+
+  it('ariaLabel переопределяет имя лендмарка', () => {
+    const wrapper = mountPagination({ props: { ariaLabel: 'Заказы' } })
+
+    expect(wrapper.get('[role="navigation"]').attributes('aria-label')).toBe('Заказы')
+  })
+
+  it('disabled гасит номера, навигацию, селект и джампер', async () => {
+    const wrapper = mountPagination({
+      props: { disabled: true, showPageSize: true, showJumper: true },
+    })
+
+    expect(wrapper.findAll('[data-gr-pagination-page]').every(b => b.attributes('disabled') !== undefined)).toBe(true)
+    expect(wrapper.get('[data-gr-pagination-jumper]').attributes('disabled')).toBeDefined()
+    expect(wrapper.findComponent({ name: 'GrSelect' }).props('disabled')).toBe(true)
+    for (const nav of ['next', 'last', 'prev', 'first'])
+      expect(wrapper.getComponent(`[data-gr-pagination-${nav}]`).props('disabled')).toBe(true)
+
+    await wrapper.findAll('[data-gr-pagination-page]')[0].trigger('click')
+    expect(wrapper.emitted('update:page')).toBeFalsy()
+  })
+})
+
+describe('GrPagination — семантика и объявления', () => {
+  it('номера лежат в списке: по одному элементу на номер и на многоточие', () => {
+    const wrapper = mountPagination({ props: { page: 6, pageSize: 10, total: 120 } })
+
+    const list = wrapper.get('[data-gr-pagination-pages]')
+    expect(list.element.tagName).toBe('UL')
+    expect(list.attributes('role')).toBe('list')
+
+    // [1] … [5 6 7] … [12] — семь элементов, многоточия спрятаны от диктора.
+    const listItems = list.findAll('li')
+    expect(listItems).toHaveLength(7)
+    expect(listItems.filter(li => li.attributes('aria-hidden') === 'true')).toHaveLength(2)
+  })
+
+  it('смену страницы объявляет живая область: скрытая в обычном режиме, видимая в компактном', async () => {
+    const wrapper = mountPagination({ props: { page: 3, pageSize: 20, total: 160 } })
+
+    const status = wrapper.get('[data-gr-pagination-status]')
+    expect(status.attributes('role')).toBe('status')
+    expect(status.classes()).toContain('sr-only')
+    expect(status.text()).toBe('Page 3 of 8')
+
+    await wrapper.setProps({ page: 4 })
+    expect(wrapper.get('[data-gr-pagination-status]').text()).toBe('Page 4 of 8')
+
+    await wrapper.setProps({ compact: true })
+    expect(wrapper.find('[data-gr-pagination-status]').exists()).toBe(false)
+    const compact = wrapper.get('[data-gr-pagination-compact]')
+    expect(compact.attributes('role')).toBe('status')
+    expect(compact.text()).toBe('4 / 8')
+  })
+})
+
+describe('GrPagination — крайние значения и клавиатура', () => {
+  it('страница вне диапазона рендерится зажатой к границе', () => {
+    const beyond = mountPagination({ props: { page: 99, pageSize: 20, total: 160 } })
+    const beyondActive = beyond.findAll('[data-gr-pagination-page]').find(b => b.attributes('aria-current') === 'page')
+    expect(beyondActive!.text()).toBe('8')
+    expect(beyond.getComponent('[data-gr-pagination-next]').props('disabled')).toBe(true)
+
+    const below = mountPagination({ props: { page: 0, pageSize: 20, total: 160 } })
+    const belowActive = below.findAll('[data-gr-pagination-page]').find(b => b.attributes('aria-current') === 'page')
+    expect(belowActive!.text()).toBe('1')
+    expect(below.getComponent('[data-gr-pagination-prev]').props('disabled')).toBe(true)
+  })
+
+  it('pageSize=0 не уводит расчёт страниц в бесконечность', () => {
+    const wrapper = mountPagination({ props: { page: 1, pageSize: 0, total: 160 } })
+
+    // Делитель зажат к 1: 160 элементов — 160 страниц, а не Infinity.
+    expect(wrapper.get('[data-gr-pagination-status]').text()).toBe('Page 1 of 160')
+  })
+
+  it('джампер применяет номер по Enter и по уходу фокуса, клампя его к диапазону', async () => {
+    const wrapper = mountPagination({ props: { page: 1, pageSize: 20, total: 160, showJumper: true } })
+    const jumper = wrapper.get('[data-gr-pagination-jumper]')
+
+    await jumper.setValue('5')
+    await jumper.trigger('keydown.enter')
+    expect((jumper.element as HTMLInputElement).value).toBe('')
+
+    await jumper.setValue('99')
+    await jumper.trigger('blur')
+
+    await jumper.setValue('не число')
+    await jumper.trigger('keydown.enter')
+
+    expect(wrapper.emitted('update:page')).toEqual([[5], [8]])
+  })
+
+  it('на первой странице prev/first недоступны, на последней — next/last', async () => {
+    const wrapper = mountPagination({ props: { page: 1, pageSize: 20, total: 160 } })
+
+    expect(wrapper.getComponent('[data-gr-pagination-prev]').props('disabled')).toBe(true)
+    expect(wrapper.getComponent('[data-gr-pagination-first]').props('disabled')).toBe(true)
+    expect(wrapper.getComponent('[data-gr-pagination-next]').props('disabled')).toBe(false)
+
+    await wrapper.setProps({ page: 8 })
+    expect(wrapper.getComponent('[data-gr-pagination-next]').props('disabled')).toBe(true)
+    expect(wrapper.getComponent('[data-gr-pagination-last]').props('disabled')).toBe(true)
+    expect(wrapper.getComponent('[data-gr-pagination-prev]').props('disabled')).toBe(false)
   })
 })

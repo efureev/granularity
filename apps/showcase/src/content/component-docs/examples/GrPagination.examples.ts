@@ -4,34 +4,30 @@ export const grPaginationExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'pagination-basic-flow',
     title: 'Basic paging feedback loop',
-    description: 'Минимальный сценарий для `GrPagination`: меняем страницу и размер выдачи, а рядом показываем, какой диапазон элементов реально видит пользователь.',
+    description: 'Минимальный сценарий для `GrPagination`: меняем страницу, а компонент сам показывает диапазон видимых элементов — проп `show-total`.',
     status: 'ready',
     previewKey: 'gr-pagination-basic-flow',
     code: `<script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 import { GrBadge, GrPagination } from '@feugene/granularity'
 
 const total = ref(137)
 const page = ref(3)
 const pageSize = ref(10)
-
-const visibleRange = computed(() => {
-  const start = (page.value - 1) * pageSize.value + 1
-  const end = Math.min(total.value, page.value * pageSize.value)
-
-  return [start, end].join('-')
-})
 </script>
 
 <template>
   <div class="grid gap-3">
-    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" />
+    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" show-total />
 
     <div class="flex flex-wrap gap-2">
-      <GrBadge>Page {{ page }}</GrBadge>
-      <GrBadge>Page size {{ pageSize }}</GrBadge>
-      <GrBadge>Showing {{ visibleRange }} of {{ total }}</GrBadge>
+      <GrBadge>
+        Page {{ page }}
+      </GrBadge>
+      <GrBadge>
+        Page size {{ pageSize }}
+      </GrBadge>
     </div>
   </div>
 </template>`,
@@ -52,7 +48,9 @@ const page = ref(5)
 const pageSize = ref(12)
 const pageSizes = [6, 12, 24]
 
-const pageCount = computed(() => Math.max(1, Math.ceil(total.value / pageSize.value)))
+const pageCount = computed(() => {
+  return Math.max(1, Math.ceil(total.value / pageSize.value))
+})
 
 function clampPage() {
   page.value = Math.min(page.value, pageCount.value)
@@ -67,23 +65,36 @@ function setTotal(nextTotal: number) {
 <template>
   <div class="grid gap-4">
     <div class="flex flex-wrap gap-2">
-      <GrButton size="sm" :variant="total === 58 ? 'primary' : 'outline'" @click="setTotal(58)">58 items</GrButton>
-      <GrButton size="sm" :variant="total === 23 ? 'primary' : 'outline'" @click="setTotal(23)">23 items</GrButton>
-      <GrButton size="sm" :variant="total === 8 ? 'primary' : 'outline'" @click="setTotal(8)">8 items</GrButton>
+      <GrButton size="sm" :variant="total === 58 ? 'primary' : 'outline'" @click="setTotal(58)">
+        58 items
+      </GrButton>
+      <GrButton size="sm" :variant="total === 23 ? 'primary' : 'outline'" @click="setTotal(23)">
+        23 items
+      </GrButton>
+      <GrButton size="sm" :variant="total === 8 ? 'primary' : 'outline'" @click="setTotal(8)">
+        8 items
+      </GrButton>
     </div>
 
     <GrPagination
       v-model:page="page"
       v-model:page-size="pageSize"
       :page-sizes="pageSizes"
+      show-page-size
       :total="total"
       @update:page-size="clampPage"
     />
 
     <div class="flex flex-wrap gap-2">
-      <GrBadge>Total {{ total }}</GrBadge>
-      <GrBadge>Last available page {{ pageCount }}</GrBadge>
-      <GrBadge>Active page {{ page }}</GrBadge>
+      <GrBadge>
+        Total {{ total }}
+      </GrBadge>
+      <GrBadge>
+        Last available page {{ pageCount }}
+      </GrBadge>
+      <GrBadge>
+        Active page {{ page }}
+      </GrBadge>
     </div>
   </div>
 </template>`,
@@ -98,7 +109,12 @@ function setTotal(nextTotal: number) {
     code: `<script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrButton, GrDataTable, GrPagination } from '@feugene/granularity'
+import {
+  GrBadge,
+  GrButton,
+  GrDataTable,
+  GrPagination,
+} from '@feugene/granularity'
 
 const page = ref(1)
 const pageSize = ref(5)
@@ -107,7 +123,7 @@ const lastAction = ref('No row action yet')
 
 const rows = Array.from({ length: 18 }, (_, index) => ({
   id: index + 1,
-  customer: 'Customer ' + (index + 1),
+  customer: \`Customer \${index + 1}\`,
   plan: index % 2 === 0 ? 'Scale' : 'Starter',
   status: index % 3 === 0 ? 'attention' : 'healthy',
 }))
@@ -116,7 +132,7 @@ const columns = [
   { key: 'customer', label: 'Customer', sortable: true },
   { key: 'plan', label: 'Plan', sortable: true },
   { key: 'status', label: 'Status', sortable: true },
-  { key: 'actions', label: 'Actions', align: 'right' },
+  { key: 'actions', label: 'Actions', align: 'right' as const },
 ]
 
 const pagedRows = computed(() => {
@@ -142,7 +158,9 @@ function clampPage() {
 
       <template #cell-actions="{ row }">
         <div class="flex justify-end">
-          <GrButton size="sm" variant="ghost" @click="lastAction = 'Opened ' + row.customer">Open</GrButton>
+          <GrButton size="sm" variant="ghost" @click="lastAction = \`Opened \${row.customer}\`">
+            Open
+          </GrButton>
         </div>
       </template>
     </GrDataTable>
@@ -151,11 +169,14 @@ function clampPage() {
       v-model:page="page"
       v-model:page-size="pageSize"
       :page-sizes="pageSizes"
+      show-page-size
       :total="rows.length"
       @update:page-size="clampPage"
     />
 
-    <GrBadge>{{ lastAction }}</GrBadge>
+    <GrBadge>
+      {{ lastAction }}
+    </GrBadge>
   </div>
 </template>`,
     note: 'Этот пример полезен как recipe: пагинация не знает о таблице, а таблица не знает о page-size логике — связка собирается наверху.',
@@ -178,17 +199,30 @@ const pageSize = ref(20)
 
 <template>
   <div class="grid gap-6">
-    <!-- Компактный индикатор вместо номеров -->
-    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact />
+    <div class="grid gap-2">
+      <div class="showcase-demo-caption text-xs">
+        Compact — «current / total» indicator
+      </div>
+      <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact />
+    </div>
 
-    <!-- Поле «перейти к странице» -->
-    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" show-jumper />
+    <div class="grid gap-2">
+      <div class="showcase-demo-caption text-xs">
+        Jumper — type a page number and press Enter
+      </div>
+      <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" show-jumper />
+    </div>
 
-    <!-- Оба режима вместе -->
-    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact show-jumper />
+    <div class="grid gap-2">
+      <div class="showcase-demo-caption text-xs">
+        Compact + jumper together
+      </div>
+      <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact show-jumper />
+    </div>
 
     <div class="flex flex-wrap gap-2">
       <GrBadge>Page {{ page }}</GrBadge>
+      <GrBadge>Page size {{ pageSize }}</GrBadge>
       <GrBadge>Total {{ total }}</GrBadge>
     </div>
   </div>

@@ -82,7 +82,9 @@
     "page": "Página {n}",
     "first": "Primera página",
     "last": "Última página",
-    "jumpTo": "Ir a"
+    "jumpTo": "Ir a",
+    "total": "{from}–{to} de {total}",
+    "status": "Página {page} de {count}"
   },
   "navbar": {
     "openMenu": "Abrir menú"

@@ -5553,9 +5553,23 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "Гасит всю пагинацию: номера, кнопки, селект размера и поле перехода.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя навигационного лендмарка. По умолчанию — `gr.pagination.label`; задавать стоит там, где пагинаций на странице несколько и их надо различать.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5595,6 +5609,20 @@
             "default": "false"
           },
           {
+            "name": "showPageSize",
+            "description": "Показывать селект размера страницы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "showTotal",
+            "description": "Показывать диапазон показанных элементов — «1–20 из 137». Слот `#total` сильнее.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "jumperLabel",
             "description": "i18n-подпись перед полем перехода. По умолчанию — `gr.pagination.jumpTo`.",
             "type": "string | undefined",
@@ -5625,7 +5653,13 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "total",
+            "description": "Диапазон показанных элементов целиком — вместо строки из локали.",
+            "type": "{ from: number; to: number; total: number; }"
+          }
+        ]
       },
       {
         "key": "events",

@@ -41,8 +41,19 @@ export interface GrPaginationProps {
   compact?: boolean
   /** Показывать поле «перейти к странице» с быстрым переходом по вводу номера. */
   showJumper?: boolean
+  /** Показывать селект размера страницы. */
+  showPageSize?: boolean
+  /** Показывать диапазон показанных элементов — «1–20 из 137». Слот `#total` сильнее. */
+  showTotal?: boolean
   /** i18n-подпись перед полем перехода. По умолчанию — `gr.pagination.jumpTo`. */
   jumperLabel?: string
+  /**
+   * Имя навигационного лендмарка. По умолчанию — `gr.pagination.label`; задавать
+   * стоит там, где пагинаций на странице несколько и их надо различать.
+   */
+  ariaLabel?: string
+  /** Гасит всю пагинацию: номера, кнопки, селект размера и поле перехода. */
+  disabled?: boolean
   size?: GrPaginationSize
 }
 
@@ -54,9 +65,18 @@ const props = withDefaults(defineProps<GrPaginationProps>(), {
   boundaryCount: 1,
   compact: false,
   showJumper: false,
+  showPageSize: false,
+  showTotal: false,
   jumperLabel: undefined,
+  ariaLabel: undefined,
+  disabled: false,
   size: undefined,
 })
+
+defineSlots<{
+  /** Диапазон показанных элементов целиком — вместо строки из локали. */
+  total?: (props: { from: number, to: number, total: number }) => unknown
+}>()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPagination' })
 
@@ -74,7 +94,15 @@ const emit = defineEmits<{
   (e: 'update:pageSize', value: number): void
 }>()
 
-const pageCount = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)))
+// Делитель клампится: `pageSize: 0` дал бы `Infinity` страниц и бесконечный
+// цикл в `range()`.
+const resolvedPageSize = computed(() => Math.max(1, Math.trunc(props.pageSize)))
+const pageCount = computed(() => Math.max(1, Math.ceil(props.total / resolvedPageSize.value)))
+
+// Рендер идёт от зажатого номера: вотчер ниже просит родителя подтянуть `page`,
+// но на первом рендере он молчит, и без клампа пагинация осталась бы вовсе без
+// активной страницы.
+const currentPage = computed(() => Math.min(Math.max(Math.trunc(props.page), 1), pageCount.value))
 
 // Контролируемый компонент: если `total`/`pageSize` уменьшились и текущая `page`
 // вышла за диапазон — просим родителя подтянуть её к последней странице.
@@ -95,6 +123,9 @@ const pageSizeOptions = computed(() =>
   })),
 )
 
+const rangeFrom = computed(() => (props.total === 0 ? 0 : (currentPage.value - 1) * resolvedPageSize.value + 1))
+const rangeTo = computed(() => Math.min(currentPage.value * resolvedPageSize.value, props.total))
+
 type PaginationItem = number | 'ellipsis-start' | 'ellipsis-end'
 
 function range(start: number, end: number): number[] {
@@ -109,7 +140,7 @@ function range(start: number, end: number): number[] {
 // номер показываем как номер, а не как «…» (визуально ровнее).
 const items = computed<PaginationItem[]>(() => {
   const count = pageCount.value
-  const current = props.page
+  const current = currentPage.value
   const boundaryCount = Math.max(0, props.boundaryCount)
   const siblingCount = Math.max(0, props.siblingCount)
 
@@ -143,15 +174,18 @@ const items = computed<PaginationItem[]>(() => {
 })
 
 function goTo(page: number): void {
+  if (props.disabled)
+    return
+
   emit('update:page', page)
 }
 
 function prev(): void {
-  goTo(Math.max(1, props.page - 1))
+  goTo(Math.max(1, currentPage.value - 1))
 }
 
 function next(): void {
-  goTo(Math.min(pageCount.value, props.page + 1))
+  goTo(Math.min(pageCount.value, currentPage.value + 1))
 }
 
 function first(): void {
@@ -176,6 +210,13 @@ function submitJumper(): void {
 }
 
 const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination.jumpTo', 'Go to'))
+const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.pagination.label', 'Pagination'))
+const statusText = computed(() =>
+  t('gr.pagination.status', 'Page {page} of {count}', { page: currentPage.value, count: pageCount.value }),
+)
+const totalText = computed(() =>
+  t('gr.pagination.total', '{from}–{to} of {total}', { from: rangeFrom.value, to: rangeTo.value, total: props.total }),
+)
 </script>
 
 <template>
@@ -184,22 +225,34 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
     :class="rowClass"
     data-gr-pagination
     role="navigation"
-    :aria-label="t('gr.pagination.label', 'Pagination')"
+    :aria-label="resolvedAriaLabel"
   >
-    <div :class="selectWrapClass">
+    <div
+      v-if="showTotal"
+      data-gr-pagination-total
+      class="text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
+      :class="labelClass"
+    >
+      <slot name="total" :from="rangeFrom" :to="rangeTo" :total="total">
+        {{ totalText }}
+      </slot>
+    </div>
+
+    <div v-if="showPageSize" :class="selectWrapClass">
       <GrSelect
         v-model="pageSizeModel"
         :options="pageSizeOptions"
         :size="resolvedSize"
+        :disabled="disabled"
         :aria-label="t('gr.pagination.pageSize', 'Page size')"
       />
     </div>
 
-    <GrButton variant="ghost" :size="navButtonSize" :disabled="page <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
       «
     </GrButton>
 
-    <GrButton variant="ghost" :size="navButtonSize" :disabled="page <= 1" data-gr-pagination-prev @click="prev">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage <= 1" data-gr-pagination-prev @click="prev">
       {{ t('gr.pagination.prev', 'Prev') }}
     </GrButton>
 
@@ -209,43 +262,50 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
       data-gr-pagination-compact
       class="px-2 text-[var(--gr-fg)] [font-variant-numeric:tabular-nums]"
       :class="labelClass"
-      aria-live="polite"
+      role="status"
     >
-      {{ page }} / {{ pageCount }}
+      {{ currentPage }} / {{ pageCount }}
     </div>
 
-    <div v-else class="flex items-center" :class="pageListClass">
-      <template v-for="(item, index) in items" :key="index">
-        <span
-          v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
-          data-gr-pagination-ellipsis
-          aria-hidden="true"
-          class="grid place-items-center text-[var(--gr-muted-fg)]"
-          :class="ellipsisClass"
-        >…</span>
-        <button
-          v-else
-          type="button"
-          data-gr-pagination-page
-          :aria-current="item === page ? 'page' : undefined"
-          :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
-          class="rounded-md font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-          :class="[
-            pageClass,
-            item === page ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]',
-          ]"
-          @click="goTo(item)"
-        >
-          {{ item }}
-        </button>
-      </template>
-    </div>
+    <template v-else>
+      <ul class="flex items-center [list-style:none]" :class="pageListClass" data-gr-pagination-pages role="list">
+        <li v-for="(item, index) in items" :key="index" :aria-hidden="typeof item === 'string' ? 'true' : undefined">
+          <span
+            v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
+            data-gr-pagination-ellipsis
+            class="grid place-items-center text-[var(--gr-muted-fg)]"
+            :class="ellipsisClass"
+          >…</span>
+          <button
+            v-else
+            type="button"
+            data-gr-pagination-page
+            :disabled="disabled"
+            :aria-current="item === currentPage ? 'page' : undefined"
+            :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
+            class="rounded-md font-600 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
+            :class="[
+              pageClass,
+              item === currentPage ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]',
+            ]"
+            @click="goTo(item)"
+          >
+            {{ item }}
+          </button>
+        </li>
+      </ul>
 
-    <GrButton variant="ghost" :size="navButtonSize" :disabled="page >= pageCount" data-gr-pagination-next @click="next">
+      <!-- В компактном режиме смену страницы объявляет видимый индикатор. -->
+      <div data-gr-pagination-status role="status" class="sr-only">
+        {{ statusText }}
+      </div>
+    </template>
+
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage >= pageCount" data-gr-pagination-next @click="next">
       {{ t('gr.pagination.next', 'Next') }}
     </GrButton>
 
-    <GrButton variant="ghost" :size="navButtonSize" :disabled="page >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
+    <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
       »
     </GrButton>
 
@@ -259,8 +319,9 @@ const resolvedJumperLabel = computed(() => props.jumperLabel ?? t('gr.pagination
         :max="pageCount"
         inputmode="numeric"
         data-gr-pagination-jumper
+        :disabled="disabled"
         :aria-label="resolvedJumperLabel"
-        class="rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] [font-variant-numeric:tabular-nums] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] [font-variant-numeric:tabular-nums] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
         :class="jumperClass"
         @keydown.enter="submitJumper"
         @blur="submitJumper"

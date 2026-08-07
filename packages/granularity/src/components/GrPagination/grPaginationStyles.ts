@@ -4,33 +4,33 @@ export type GrPaginationSize = GrComponentSize
 
 /** Номер страницы и многоточие: одна и та же коробка, чтобы ряд не прыгал. */
 export const pageSizes: Record<GrPaginationSize, string> = {
-  xs: 'h-7 min-w-7 px-1.5 text-[12px]',
-  sm: 'h-8 min-w-8 px-2 text-[13px]',
-  md: 'h-8 min-w-8 px-2 text-sm',
-  lg: 'h-10 min-w-10 px-3 text-base',
+  xs: 'h-7 min-w-7 px-1.5 text-[length:var(--gr-text-xs)]',
+  sm: 'h-8 min-w-8 px-2 text-[length:var(--gr-text-xs)]',
+  md: 'h-8 min-w-8 px-2 text-[length:var(--gr-text-sm)]',
+  lg: 'h-10 min-w-10 px-3 text-[length:var(--gr-text-base)]',
 }
 
 /** Коробка та же, что у номера, но поле́ уже: многоточию не нужен клик-таргет. */
 export const ellipsisSizes: Record<GrPaginationSize, string> = {
-  xs: 'h-7 min-w-7 px-1 text-[12px]',
-  sm: 'h-8 min-w-8 px-1 text-[13px]',
-  md: 'h-8 min-w-8 px-1 text-sm',
-  lg: 'h-10 min-w-10 px-2 text-base',
+  xs: 'h-7 min-w-7 px-1 text-[length:var(--gr-text-xs)]',
+  sm: 'h-8 min-w-8 px-1 text-[length:var(--gr-text-xs)]',
+  md: 'h-8 min-w-8 px-1 text-[length:var(--gr-text-sm)]',
+  lg: 'h-10 min-w-10 px-2 text-[length:var(--gr-text-base)]',
 }
 
 /** Вспомогательный текст: индикатор «текущая / всего» и подпись у поля перехода. */
 export const labelSizes: Record<GrPaginationSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
-  md: 'text-sm',
-  lg: 'text-base',
+  xs: 'text-[length:var(--gr-text-xs)]',
+  sm: 'text-[length:var(--gr-text-xs)]',
+  md: 'text-[length:var(--gr-text-sm)]',
+  lg: 'text-[length:var(--gr-text-base)]',
 }
 
 export const jumperSizes: Record<GrPaginationSize, string> = {
-  xs: 'h-7 w-12 text-[12px]',
-  sm: 'h-8 w-14 text-[13px]',
-  md: 'h-8 w-14 text-sm',
-  lg: 'h-10 w-16 text-base',
+  xs: 'h-7 w-12 text-[length:var(--gr-text-xs)]',
+  sm: 'h-8 w-14 text-[length:var(--gr-text-xs)]',
+  md: 'h-8 w-14 text-[length:var(--gr-text-sm)]',
+  lg: 'h-10 w-16 text-[length:var(--gr-text-base)]',
 }
 
 export const rowGaps: Record<GrPaginationSize, string> = {

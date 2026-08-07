@@ -40,6 +40,7 @@ function setTotal(nextTotal: number) {
       v-model:page="page"
       v-model:page-size="pageSize"
       :page-sizes="pageSizes"
+      show-page-size
       :total="total"
       @update:page-size="clampPage"
     />

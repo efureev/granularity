@@ -61,6 +61,7 @@ function clampPage() {
       v-model:page="page"
       v-model:page-size="pageSize"
       :page-sizes="pageSizes"
+      show-page-size
       :total="rows.length"
       @update:page-size="clampPage"
     />

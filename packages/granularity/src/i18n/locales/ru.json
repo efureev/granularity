@@ -83,7 +83,9 @@
     "page": "Страница {n}",
     "first": "Первая страница",
     "last": "Последняя страница",
-    "jumpTo": "Перейти к"
+    "jumpTo": "Перейти к",
+    "total": "{from}–{to} из {total}",
+    "status": "Страница {page} из {count}"
   },
   "navbar": {
     "openMenu": "Открыть меню"

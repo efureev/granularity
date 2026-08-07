@@ -41,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrPagination`: `showTotal`, `ariaLabel` and `disabled`.** `showTotal` renders the visible range («41–60 of 137»)
+  next to the navigation, and the `#total` slot replaces it with markup, receiving `from`, `to` and `total`.
+  `ariaLabel` names the navigation landmark — without it two paginations around a table produce two identically named
+  landmarks in a screen reader's outline. `disabled` shuts the whole widget down at once: page numbers, the nav
+  buttons, the page-size select and the jumper.
 - **`GrList`: the surface is now selectable.** `variant` reaches the `GrCard` the list draws underneath, so
   `variant="ghost"` drops the border and the shadow for a list placed inside an existing card instead of stacking a
   card in a card. Without the prop the card keeps resolving its variant from `GrConfigProvider`.
@@ -48,6 +53,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrPagination` no longer renders the page-size select by default.** It is now behind `showPageSize`, because a
+  bare pagination is «just the page numbers» far more often than not; add `show-page-size` to keep the previous look.
+- **`GrPagination` announces the page numbers as a list.** They moved into a `<ul role="list">` inside the navigation
+  landmark, so a screen reader reports how many pages there are instead of reading a stream of buttons; the ellipses
+  are excluded from it. Page changes are announced through one live region — the visible indicator carries it in
+  `compact` mode, a visually hidden «Page N of M» does in the default one (`gr.pagination.status`).
+- **`GrPagination`: the size scale moved from px literals to `--gr-text-*`.** The `sm` step was `13px`, a value the
+  type scale does not have; it now shares `--gr-text-xs` with `xs` and stays distinguishable from `md` by box height
+  and weight.
+- **i18n:** `gr.pagination.total` and `gr.pagination.status` in all three locales.
 - **`GrTree` renders one flat list instead of nested component instances.** Every node is a `treeitem` in a single
   `role="tree"` container, indentation is the row's `padding-left`, and the hierarchy is carried by `aria-level`,
   `aria-posinset` and `aria-setsize`. Before, each expanded branch created a full `GrTree` instance with its own
@@ -59,6 +74,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `region`, so five sections of one form produced five landmarks and buried the useful ones. The name is now attached
   only when `landmark` is set; structure is carried by the heading. The description keeps its `aria-describedby` link
   in both modes.
+- **`GrPagination` hung the tab on `pageSize: 0`.** The page count came out as `Infinity` and the loop building the
+  number range never finished. The divisor is clamped to at least `1` now.
+- **`GrPagination` rendered no active page when `page` was out of range.** The clamp used to arrive only through a
+  watcher, which stays silent on the first render, so a stale page from a URL produced a pagination with nothing
+  highlighted and misleading prev/next states. The render is driven by the clamped page; the watcher still asks the
+  parent to catch up.
 - **`GrList`: the item title, the item description and the empty state moved from `13px` literals to
   `--gr-text-sm`.** They are 1px larger than before and follow the theme's type scale; the hierarchy inside a row is
   carried by weight and colour. Both class strings live in `grListStyles.ts` and are declared in the safelist, so the
