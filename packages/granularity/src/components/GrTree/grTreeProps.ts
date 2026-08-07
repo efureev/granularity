@@ -1,8 +1,6 @@
 import type { HTMLAttributes } from 'vue'
 
-import type { GrTreeInteractionContext } from './grTreeInteractionContext'
 import type { GrTreeSize } from './grTreeStyles'
-import type { GrTreeStore } from './grTreeStore'
 import type {
   GrTreeAllowDropType,
   GrTreeKey,
@@ -14,6 +12,8 @@ export type NodeKeyProp<T extends object> = Extract<keyof T, string>
 export type GrTreePropsMap = {
   children?: string
   label?: string
+  /** Поле данных «узел — лист». Нужно ленивому режиму: детей ещё нет, а раскрывать нечего. */
+  isLeaf?: string
 }
 
 export type GrTreeFilterNodeMethod<T extends object = any> = (value: string, data: T, node?: GrTreeNode<T>) => boolean
@@ -25,10 +25,16 @@ export type GrTreeVisibleRow<T extends object> = {
   isExpanded: boolean
   isLeaf: boolean
   isMatched: boolean
-}
-
-export type GrTreeVisibleTreeRow<T extends object> = GrTreeVisibleRow<T> & {
-  children: GrTreeVisibleTreeRow<T>[]
+  /**
+   * Место узла среди соседей. В плоском DOM группы нет, поэтому структуру
+   * дерева диктору сообщают `aria-level` + `aria-posinset` + `aria-setsize`.
+   */
+  posInSet: number
+  setSize: number
+  /** Идёт ли сейчас ленивая загрузка детей этого узла. */
+  isLoading: boolean
+  /** Цвета направляющих для уровней предков (пусто, если `branchLine` выключен). */
+  branchColors: string[]
 }
 
 export type GrTreeClassValue = HTMLAttributes['class']
@@ -45,11 +51,26 @@ export type GrTreeDataProps<T extends object> = {
    */
   defaultExpandAll?: boolean
   filterNodeMethod?: GrTreeFilterNodeMethod<T>
+  /**
+   * Ленивый режим: дети ветки приходят по её раскрытию через `load`.
+   * Узел считается разворачиваемым, пока не доказано обратное — полем `isLeaf`
+   * из карты `props`.
+   */
+  lazy?: boolean
+  /** Загрузчик ветки. `resolve` дописывает детей в данные узла. */
+  load?: GrTreeLoad<T>
 }
+
+export type GrTreeLoad<T extends object = any> = (
+  node: GrTreeNode<T>,
+  resolve: (children: T[]) => void,
+) => void
 
 export type GrTreeViewProps<T extends object> = {
   /** Размер строки: высота, отступы, иконки и кегль подписи. */
   size?: GrTreeSize
+  /** Шаг отступа уровня в пикселях. `0` — значение из темы (`--gr-tree-indent-step`). */
+  indent?: number
   highlightCurrent?: boolean
   expandIcon?: string
   collapseIcon?: string
@@ -82,14 +103,17 @@ export type GrTreeInteractionProps<T extends object> = {
   allowDrag?: (draggingNode: GrTreeNode<T>) => boolean
 }
 
-export type GrTreeInternalProps<T extends object> = {
-  internalRows?: GrTreeVisibleTreeRow<T>[]
-  internalNested?: boolean
-  internalStore?: GrTreeStore<T>
-  internalInteractionContext?: GrTreeInteractionContext<T>
+export type GrTreeSelectionProps = {
+  /** Чекбоксы у узлов: множественный выбор поверх дерева. */
+  showCheckbox?: boolean
+  /** Отмеченные ключи (`v-model:checked-keys`). */
+  checkedKeys?: GrTreeKey[]
+  defaultCheckedKeys?: GrTreeKey[]
+  /** Не связывать родителей и детей: каждый узел отмечается сам по себе. */
+  checkStrictly?: boolean
 }
 
 export type GrTreeProps<T extends object> = GrTreeDataProps<T>
   & GrTreeViewProps<T>
+  & GrTreeSelectionProps
   & GrTreeInteractionProps<T>
-  & GrTreeInternalProps<T>

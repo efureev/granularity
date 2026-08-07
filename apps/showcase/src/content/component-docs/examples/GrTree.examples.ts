@@ -140,6 +140,101 @@ const data = [
 </template>`,
   },
   {
+    id: 'tree-checkboxes',
+    title: 'Checkboxes and multiple selection',
+    description: 'Чекбоксы включаются пропом `show-checkbox`, набор ведётся через `v-model:checked-keys`. Родитель отмечается каскадом и показывает `mixed`, когда отмечена часть детей; `check-strictly` эту связь отключает. Состояние объявляется на самом узле (`aria-checked`), а квадратик остаётся декоративным — вкладывать интерактивный чекбокс внутрь роли `treeitem` нельзя.',
+    status: 'ready',
+    previewKey: 'gr-tree-checkboxes',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrBadge, GrTree } from '@feugene/granularity'
+
+type Permission = { id: string, label: string, children?: Permission[] }
+
+// Типовой сценарий чекбоксов в дереве — выдача прав по разделам.
+const permissions: Permission[] = [
+  {
+    id: 'billing',
+    label: 'Billing',
+    children: [
+      { id: 'billing.read', label: 'View invoices' },
+      { id: 'billing.write', label: 'Issue invoices' },
+      { id: 'billing.refund', label: 'Refund payments' },
+    ],
+  },
+  {
+    id: 'team',
+    label: 'Team',
+    children: [
+      { id: 'team.read', label: 'View members' },
+      { id: 'team.invite', label: 'Invite members' },
+    ],
+  },
+]
+
+const checkedKeys = ref<(string | number)[]>(['billing.read'])
+</script>
+
+<template>
+  <div class="grid gap-3">
+    <GrTree
+      v-model:checked-keys="checkedKeys"
+      :data="permissions"
+      node-key="id"
+      show-checkbox
+      :default-expanded-keys="['billing', 'team']"
+    />
+
+    <div class="flex flex-wrap items-center gap-2">
+      <GrBadge tone="neutral">
+        Отмечено: {{ checkedKeys.length }}
+      </GrBadge>
+      <GrBadge v-for="key in checkedKeys" :key="key" tone="info">
+        {{ key }}
+      </GrBadge>
+    </div>
+  </div>
+</template>`,
+  },
+  {
+    id: 'tree-lazy',
+    title: 'Lazy branches',
+    description: 'В режиме `lazy` дети ветки приходят по её раскрытию: `load` получает узел и `resolve`, на время запроса строка показывает спиннер и помечается `aria-busy`. Повторное раскрытие запрос не делает. Лист объявляется полем `isLeaf` в данных — иначе дерево считает ветку разворачиваемой, пока не доказано обратное.',
+    status: 'ready',
+    previewKey: 'gr-tree-lazy',
+    code: `<script setup lang="ts">
+import { GrTree, type GrTreeNode } from '@feugene/granularity'
+
+type Folder = { id: string, label: string, isLeaf?: boolean, children?: Folder[] }
+
+// Корень приходит с сервера сразу, ветки — по раскрытию.
+const roots: Folder[] = [
+  { id: 'src', label: 'src' },
+  { id: 'docs', label: 'docs' },
+  { id: 'README.md', label: 'README.md', isLeaf: true },
+]
+
+function loadChildren(node: GrTreeNode<Folder>, resolve: (children: Folder[]) => void): void {
+  window.setTimeout(() => {
+    resolve([
+      { id: \`\${node.key}/index.ts\`, label: 'index.ts', isLeaf: true },
+      { id: \`\${node.key}/nested\`, label: 'nested' },
+    ])
+  }, 600)
+}
+</script>
+
+<template>
+  <GrTree
+    :data="roots"
+    node-key="id"
+    lazy
+    :load="loadChildren"
+  />
+</template>`,
+  },
+  {
     id: 'tree-keyboard',
     title: 'Клавиатура и режимы раскрытия',
     description: 'Typeahead по первым буквам, `*` на весь уровень, плюс `accordion` и `expandOnClickNode` — то, чем дерево управляется без мыши.',

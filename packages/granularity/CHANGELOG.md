@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTree`: checkboxes and multiple selection.** `show-checkbox` turns on tri-state boxes,
+  `v-model:checked-keys` carries the set, `check-strictly` unlinks parents from children. A checked parent checks its
+  whole subtree, a partially checked one reports `aria-checked="mixed"`, and the incoming `checked-keys` may list only
+  leaves — parents are derived. The state is announced on the node itself; the visible box is decorative, because an
+  interactive checkbox inside `role="treeitem"` would make the widget disappear for a screen reader. `Space` toggles the
+  mark when boxes are on (`Enter` still selects). Instance API: `getCheckedKeys({ leafOnly })`, `setCheckedKeys()`,
+  `getHalfCheckedKeys()`, `setChecked()`; events `update:checkedKeys` and `check`.
+- **`GrTree`: lazy branches.** `lazy` + `load(node, resolve)` fetch children when a branch is first expanded — the row
+  shows a spinner and is marked `aria-busy` while the request is in flight, and re-expanding never asks again. A leaf is
+  declared by the `isLeaf` field of the data (its name is configurable through the `props` map); until proven a leaf, a
+  node stays expandable. Loaded children live in the component's own state instead of being written into `data`: the
+  prop is not required to be reactive, and the tree must show what it fetched either way.
 - **New `GrBreadcrumbs` — the path to the current page.** Built on `GrLink`, so any router plugs in the usual way:
   `as` takes the link component and each item's `to` reaches it as a prop. The last item is the current page: it is not
   a link and is announced with `aria-current="page"` (`linkCurrent` keeps it clickable without losing the announcement).
@@ -19,6 +31,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
 - **i18n:** `gr.breadcrumbs.label` and `gr.breadcrumbs.expand` in all three locales.
+
+### Changed
+
+- **`GrTree` renders one flat list instead of nested component instances.** Every node is a `treeitem` in a single
+  `role="tree"` container, indentation is the row's `padding-left`, and the hierarchy is carried by `aria-level`,
+  `aria-posinset` and `aria-setsize`. Before, each expanded branch created a full `GrTree` instance with its own
+  computations and subscriptions — 2 000 visible nodes meant 2 000 components. Two visible consequences: the row
+  highlight (hover, current node) now spans the full width at any depth instead of starting at the indent, and branch
+  lines are drawn per row rather than by a bordered wrapper. The `indent` prop became real — it was declared but never
+  used — and sets the indentation step in pixels (`--gr-tree-indent-step` in the theme).
+
+### Fixed
+
+- **`GrTree`: `appendNode` into a node without children didn't show up.** The adapter returned the freshly created array
+  instead of reading it back through the data object, so `push` went past reactivity and the new child appeared only
+  after an unrelated re-render.
 
 ## [v0.15.0] 2026-08-07
 

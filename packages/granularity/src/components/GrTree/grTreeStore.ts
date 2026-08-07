@@ -7,7 +7,15 @@ import type {
   GrTreeNodeTarget,
 } from './grTreeTypes'
 import type { GrTreeDataAdapter } from './grTreeDataAdapter'
-import type { GrTreeDataProps, GrTreeFilterNodeMethod } from './grTreeProps'
+import type { GrTreeDataProps, GrTreeFilterNodeMethod, GrTreeLoad } from './grTreeProps'
+import type { GrTreeCheckState, GrTreeCheckStates } from './grTreeChecking'
+import {
+  collectCheckedKeys,
+  collectHalfCheckedKeys,
+  pruneToTree,
+  resolveCheckStates,
+  toggleCheckedKeys,
+} from './grTreeChecking'
 
 type TreeModel<T extends object> = {
   roots: GrTreeNode<T>[]
@@ -27,12 +35,23 @@ export type GrTreeStoreOptions<T extends object> = {
   defaultExpandedKeys?: MaybeRefOrGetter<GrTreeDataProps<T>['defaultExpandedKeys']>
   defaultExpandAll?: MaybeRefOrGetter<boolean | undefined>
   filterNodeMethod?: MaybeRefOrGetter<GrTreeFilterNodeMethod<T> | undefined>
+  defaultCheckedKeys?: MaybeRefOrGetter<GrTreeKey[] | undefined>
+  /** Внешние отмеченные ключи (`v-model:checked-keys`), если потребитель их ведёт. */
+  checkedKeys?: MaybeRefOrGetter<GrTreeKey[] | undefined>
+  checkStrictly?: MaybeRefOrGetter<boolean | undefined>
+  lazy?: MaybeRefOrGetter<boolean | undefined>
+  load?: MaybeRefOrGetter<GrTreeLoad<T> | undefined>
   adapter: GrTreeDataAdapter<T>
 }
 
 export type GrTreeStore<T extends object> = {
   filterValue: Ref<string>
   expandedKeys: ShallowRef<Set<GrTreeKey>>
+  checkedKeys: ShallowRef<Set<GrTreeKey>>
+  checkStates: ComputedRef<GrTreeCheckStates>
+  loadingKeys: ShallowRef<Set<GrTreeKey>>
+  loadedKeys: ShallowRef<Set<GrTreeKey>>
+  loadedChildren: ShallowRef<Map<GrTreeKey, T[]>>
   currentKey: Ref<GrTreeKey | undefined>
   treeModel: ComputedRef<TreeModel<T>>
   filterInfo: ComputedRef<FilterInfo>
@@ -51,6 +70,17 @@ export type GrTreeStore<T extends object> = {
   removeNode: (node: GrTreeNodeTarget<T>) => boolean
   insertNodeBefore: (data: T, referenceNode: GrTreeNodeTarget<T>) => GrTreeNode<T> | undefined
   insertNodeAfter: (data: T, referenceNode: GrTreeNodeTarget<T>) => GrTreeNode<T> | undefined
+  getCheckState: (key: GrTreeKey) => GrTreeCheckState
+  setChecked: (node: GrTreeNodeTarget<T>, checked: boolean) => GrTreeNode<T> | undefined
+  toggleChecked: (node: GrTreeNode<T>) => GrTreeNode<T> | undefined
+  getCheckedKeys: (options?: { leafOnly?: boolean }) => GrTreeKey[]
+  setCheckedKeys: (keys: GrTreeKey[]) => void
+  getHalfCheckedKeys: () => GrTreeKey[]
+  /** Лист ли узел с точки зрения раскрытия: в ленивом режиме решают данные и факт загрузки. */
+  isLeafNode: (node: GrTreeNode<T>) => boolean
+  isLoadingKey: (key: GrTreeKey) => boolean
+  /** Грузит детей ветки, если это нужно и ещё не делалось. */
+  ensureLoaded: (node: GrTreeNode<T>) => void
 }
 
 export function createGrTreeStore<T extends Record<string, any> = any>(
@@ -58,6 +88,13 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
 ): GrTreeStore<T> {
   const filterValue = ref('')
   const expandedKeys = shallowRef<Set<GrTreeKey>>(new Set())
+  const checkedKeys = shallowRef<Set<GrTreeKey>>(new Set(toValue(options.defaultCheckedKeys) ?? []))
+  const loadingKeys = shallowRef<Set<GrTreeKey>>(new Set())
+  const loadedKeys = shallowRef<Set<GrTreeKey>>(new Set())
+  // Дети, пришедшие ленивой загрузкой, живут в сторе, а не в данных потребителя:
+  // `data` — обычный проп и реактивным быть не обязан, а дерево обязано
+  // показать загруженное в любом случае.
+  const loadedChildren = shallowRef<Map<GrTreeKey, T[]>>(new Map())
   const currentKey = ref<GrTreeKey | undefined>(undefined)
   const getData = () => toValue(options.data) ?? []
   const getFilterNodeMethod = () => toValue(options.filterNodeMethod)
@@ -66,6 +103,17 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     () => toValue(options.defaultExpandedKeys),
     (keys) => {
       expandedKeys.value = new Set(keys ?? [])
+    },
+    { immediate: true },
+  )
+
+  // Внешние отметки: компонент управляемый, пока проп задан. Не задан — ведёт
+  // набор сам, начиная с `defaultCheckedKeys`.
+  watch(
+    () => toValue(options.checkedKeys),
+    (keys) => {
+      if (keys)
+        checkedKeys.value = new Set(keys)
     },
     { immediate: true },
   )
@@ -87,7 +135,10 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
 
         byKey.set(node.key, node)
         byData.set(item, node)
-        node.childNodes = build(options.adapter.getChildren(item), node, level + 1)
+
+        const ownChildren = options.adapter.getChildren(item)
+        const lazyChildren = loadedChildren.value.get(node.key) ?? []
+        node.childNodes = build([...ownChildren, ...lazyChildren], node, level + 1)
 
         return node
       })
@@ -277,6 +328,10 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     const nextExpandedKeys = new Set(Array.from(expandedKeys.value).filter(key => byKey.has(key)))
     if (nextExpandedKeys.size !== expandedKeys.value.size)
       expandedKeys.value = nextExpandedKeys
+
+    const nextCheckedKeys = new Set(Array.from(checkedKeys.value).filter(key => byKey.has(key)))
+    if (nextCheckedKeys.size !== checkedKeys.value.size)
+      checkedKeys.value = nextCheckedKeys
   }
 
   function isExpandedKey(key: GrTreeKey): boolean {
@@ -434,6 +489,106 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     return resolveInsertedNode(data)
   }
 
+  // ————— Отметки (чекбоксы).
+
+  const checkStates = computed<GrTreeCheckStates>(() => resolveCheckStates(
+    treeModel.value.roots,
+    checkedKeys.value,
+    Boolean(toValue(options.checkStrictly)),
+  ))
+
+  function getCheckState(key: GrTreeKey): GrTreeCheckState {
+    return checkStates.value.get(key) ?? 'unchecked'
+  }
+
+  function setChecked(node: GrTreeNodeTarget<T>, checked: boolean) {
+    const targetNode = resolveNodeTarget(node)
+    if (!targetNode)
+      return undefined
+
+    checkedKeys.value = toggleCheckedKeys(
+      treeModel.value.roots,
+      checkedKeys.value,
+      targetNode,
+      checked,
+      Boolean(toValue(options.checkStrictly)),
+    )
+
+    return targetNode
+  }
+
+  function toggleChecked(node: GrTreeNode<T>) {
+    return setChecked(node, getCheckState(node.key) !== 'checked')
+  }
+
+  function getCheckedKeys(opts?: { leafOnly?: boolean }) {
+    return collectCheckedKeys(treeModel.value.roots, checkStates.value, Boolean(opts?.leafOnly))
+  }
+
+  function setCheckedKeys(keys: GrTreeKey[]) {
+    checkedKeys.value = pruneToTree(treeModel.value.roots, new Set(keys))
+  }
+
+  function getHalfCheckedKeys() {
+    return collectHalfCheckedKeys(checkStates.value)
+  }
+
+  // ————— Ленивая подгрузка ветки.
+
+  function isLeafNode(node: GrTreeNode<T>): boolean {
+    if (node.childNodes.length > 0)
+      return false
+
+    if (!toValue(options.lazy))
+      return true
+
+    const declared = options.adapter.getIsLeaf(node.data)
+    if (declared !== undefined)
+      return declared
+
+    // Данные молчат: пока ветку не грузили, считаем её разворачиваемой —
+    // иначе до первого запроса дело бы не дошло.
+    return loadedKeys.value.has(node.key)
+  }
+
+  function isLoadingKey(key: GrTreeKey): boolean {
+    return loadingKeys.value.has(key)
+  }
+
+  function markLoading(key: GrTreeKey, loading: boolean) {
+    const next = new Set(loadingKeys.value)
+    if (loading)
+      next.add(key)
+    else
+      next.delete(key)
+    loadingKeys.value = next
+  }
+
+  function ensureLoaded(node: GrTreeNode<T>) {
+    const load = toValue(options.load)
+    if (!toValue(options.lazy) || !load)
+      return
+
+    if (loadedKeys.value.has(node.key) || loadingKeys.value.has(node.key) || isLeafNode(node))
+      return
+
+    markLoading(node.key, true)
+
+    let settled = false
+    load(node, (children) => {
+      // Ответ приходит от потребителя: второй вызов `resolve` — его ошибка, но
+      // дублировать детей из-за неё дерево не обязано.
+      if (settled)
+        return
+      settled = true
+
+      const next = new Map(loadedChildren.value)
+      next.set(node.key, [...(children ?? [])])
+      loadedChildren.value = next
+      loadedKeys.value = new Set(loadedKeys.value).add(node.key)
+      markLoading(node.key, false)
+    })
+  }
   function filter(value: string) {
     filterValue.value = value
   }
@@ -441,6 +596,11 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
   return {
     filterValue,
     expandedKeys,
+    loadedChildren,
+    checkedKeys,
+    checkStates,
+    loadingKeys,
+    loadedKeys,
     currentKey,
     treeModel,
     filterInfo,
@@ -459,5 +619,14 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     removeNode,
     insertNodeBefore,
     insertNodeAfter,
+    getCheckState,
+    setChecked,
+    toggleChecked,
+    getCheckedKeys,
+    setCheckedKeys,
+    getHalfCheckedKeys,
+    isLeafNode,
+    isLoadingKey,
+    ensureLoaded,
   }
 }

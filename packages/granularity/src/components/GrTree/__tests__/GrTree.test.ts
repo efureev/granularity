@@ -63,7 +63,7 @@ describe('GrTree', () => {
     expect(wrapper.text()).toContain('Child B#3')
   })
 
-  it('вкладывает дочерние ноды в DOM-узел родительской ноды', () => {
+  it('рендерит плоский список строк и сообщает иерархию через aria', () => {
     const wrapper = mount(GrTree<Item>, {
       props: {
         data: tree(),
@@ -76,12 +76,28 @@ describe('GrTree', () => {
     const items = wrapper.findAll('[role="treeitem"]')
     expect(items).toHaveLength(3)
 
-    const parentItem = items[0]
-    const parentRow = parentItem.get('.gr-tree__row')
-    const childrenWrap = parentItem.get('.gr-tree__children-wrap')
+    // Вложенного DOM больше нет: строки лежат в одном списке, а уровень,
+    // позицию и размер набора несут ARIA-атрибуты.
+    expect(wrapper.findAll('[role="group"]')).toHaveLength(0)
+    expect(items.map(i => i.attributes('aria-level'))).toEqual(['1', '2', '2'])
+    expect(items.map(i => i.attributes('aria-posinset'))).toEqual(['1', '1', '2'])
+    expect(items.map(i => i.attributes('aria-setsize'))).toEqual(['1', '2', '2'])
+  })
 
-    expect(parentRow.attributes('style')).toBeUndefined()
-    expect(childrenWrap.findAll('.gr-tree__row')).toHaveLength(2)
+  it('отступ уровня задаётся строкой, шаг настраивается пропом `indent`', () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        indent: 20,
+      },
+    })
+
+    const rows = wrapper.findAll('[data-gr-tree-row]')
+    expect(rows[0].attributes('style')).toContain('--gr-tree-row-indent: calc(20px * 0)')
+    expect(rows[1].attributes('style')).toContain('--gr-tree-row-indent: calc(20px * 1)')
   })
 
   it('не показывает полосу ветки по умолчанию', () => {
@@ -94,8 +110,7 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWrap = wrapper.get('.gr-tree__children-wrap')
-    expect(childrenWrap.classes()).not.toContain('gr-tree__children-wrap--with-branch')
+    expect(wrapper.findAll('[data-gr-tree-branch-guide]')).toHaveLength(0)
   })
 
   it('включает полосу ветки и активирует её для выбранной ноды и её прямых детей', async () => {
@@ -110,22 +125,22 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWrap = wrapper.get('.gr-tree__children-wrap')
-    expect(childrenWrap.classes()).toContain('gr-tree__children-wrap--with-branch')
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--gr-brd))')
-    expect(childrenWrap.attributes('style')).not.toContain('--gr-tree-branch-line-left')
+    // Направляющая рисуется у каждого потомка — по одной на уровень предка.
+    const guides = () => wrapper.findAll('[data-gr-tree-branch-guide]')
+    expect(guides()).toHaveLength(2)
+    expect(guides()[0].attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--gr-brd))')
 
     ;(wrapper.vm as any).setCurrentKey(1)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: rgb(239, 68, 68)')
+    expect(guides()[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(239, 68, 68)')
 
     ;(wrapper.vm as any).setCurrentKey(2)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: rgb(239, 68, 68)')
+    expect(guides()[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(239, 68, 68)')
 
     ;(wrapper.vm as any).setCurrentKey(undefined)
     await nextTick()
-    expect(childrenWrap.attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--gr-brd))')
+    expect(guides()[0].attributes('style')).toContain('--gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color, var(--gr-brd))')
   })
 
   it('поддерживает вычисление своих цветов полосы для каждой папки и не активирует предков глубже прямого уровня', async () => {
@@ -141,16 +156,18 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWraps = wrapper.findAll('.gr-tree__children-wrap')
-    expect(childrenWraps).toHaveLength(2)
-    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
-    expect(childrenWraps[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(254, 205, 211)')
+    // У внука две направляющие: своя на каждого предка, цвет считается по нему.
+    const grandchild = wrapper.findAll('[data-gr-tree-node]')[2]
+    const guides = () => grandchild.findAll('[data-gr-tree-branch-guide]')
+    expect(guides()).toHaveLength(2)
+    expect(guides()[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
+    expect(guides()[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(254, 205, 211)')
 
     ;(wrapper.vm as any).setCurrentKey(4)
     await nextTick()
 
-    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
-    expect(childrenWraps[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(244, 63, 94)')
+    expect(guides()[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
+    expect(guides()[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(244, 63, 94)')
   })
 
   it('переносит active-полосу с родителя на выбранную раскрытую папку', async () => {
@@ -166,14 +183,13 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWraps = wrapper.findAll('.gr-tree__children-wrap')
-    expect(childrenWraps).toHaveLength(2)
-
     ;(wrapper.vm as any).setCurrentKey(2)
     await nextTick()
 
-    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
-    expect(childrenWraps[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(14, 165, 233)')
+    const grandchild = wrapper.findAll('[data-gr-tree-node]')[2]
+    const guides = grandchild.findAll('[data-gr-tree-branch-guide]')
+    expect(guides[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(226, 232, 240)')
+    expect(guides[1].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(14, 165, 233)')
   })
 
   it('оставляет active-полосу на родителе, если выбранная папка ещё не раскрыта', async () => {
@@ -189,13 +205,13 @@ describe('GrTree', () => {
       },
     })
 
-    const childrenWraps = wrapper.findAll('.gr-tree__children-wrap')
-    expect(childrenWraps).toHaveLength(1)
-
     ;(wrapper.vm as any).setCurrentKey(2)
     await nextTick()
 
-    expect(childrenWraps[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(14, 165, 233)')
+    const child = wrapper.findAll('[data-gr-tree-node]')[1]
+    const guides = child.findAll('[data-gr-tree-branch-guide]')
+    expect(guides).toHaveLength(1)
+    expect(guides[0].attributes('style')).toContain('--gr-tree-branch-line-color: rgb(14, 165, 233)')
   })
 
   it('поддерживает фильтрацию через `expose.filter()` (показывает match + ancestor)', async () => {

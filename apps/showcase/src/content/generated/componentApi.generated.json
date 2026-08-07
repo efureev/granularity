@@ -8414,11 +8414,32 @@
             "required": false
           },
           {
+            "name": "lazy",
+            "description": "Ленивый режим: дети ветки приходят по её раскрытию через `load`. Узел считается разворачиваемым, пока не доказано обратное — полем `isLeaf` из карты `props`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "load",
+            "description": "Загрузчик ветки. `resolve` дописывает детей в данные узла.",
+            "type": "GrTreeLoad<T> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "Размер строки: высота, отступы, иконки и кегль подписи.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "indent",
+            "description": "Шаг отступа уровня в пикселях. `0` — значение из темы (`--gr-tree-indent-step`).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
           },
           {
             "name": "highlightCurrent",
@@ -8533,6 +8554,34 @@
             "default": "undefined"
           },
           {
+            "name": "showCheckbox",
+            "description": "Чекбоксы у узлов: множественный выбор поверх дерева.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "checkedKeys",
+            "description": "Отмеченные ключи (`v-model:checked-keys`).",
+            "type": "GrTreeKey[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "defaultCheckedKeys",
+            "description": "",
+            "type": "GrTreeKey[] | undefined",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "checkStrictly",
+            "description": "Не связывать родителей и детей: каждый узел отмечается сам по себе.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "expandOnClickNode",
             "description": "Клик по строке раскрывает/сворачивает узел, а не только выбирает его.",
             "type": "boolean | undefined",
@@ -8570,33 +8619,6 @@
             "name": "allowDrag",
             "description": "",
             "type": "((draggingNode: GrTreeNode<T>) => boolean) | undefined",
-            "required": false
-          },
-          {
-            "name": "internalRows",
-            "description": "",
-            "type": "GrTreeVisibleTreeRow<T>[] | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "internalNested",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "internalStore",
-            "description": "",
-            "type": "GrTreeStore<T> | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "internalInteractionContext",
-            "description": "",
-            "type": "GrTreeInteractionContext<T> | undefined",
             "required": false
           }
         ]
@@ -8647,6 +8669,18 @@
             "description": "",
             "type": "[MouseEvent, T, GrTreeNode<T>]",
             "signature": "(event: \"nodeContextMenu\", evt: MouseEvent, data: T, node: GrTreeNode<T>): void"
+          },
+          {
+            "name": "update:checkedKeys",
+            "description": "",
+            "type": "[GrTreeKey[]]",
+            "signature": "(event: \"update:checkedKeys\", keys: GrTreeKey[]): void"
+          },
+          {
+            "name": "check",
+            "description": "",
+            "type": "[T, GrTreeNode<T>, { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }]",
+            "signature": "(event: \"check\", data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }): void"
           }
         ]
       },

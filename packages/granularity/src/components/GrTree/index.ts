@@ -11,12 +11,14 @@ export type {
 export type {
   GrTreeBranchLineColor,
   GrTreeFilterNodeMethod,
+  GrTreeLoad,
   GrTreeNodeClass,
   GrTreeProps,
   GrTreePropsMap,
+  GrTreeSelectionProps,
   GrTreeVisibleRow,
-  GrTreeVisibleTreeRow,
 } from './grTreeProps'
+export type { GrTreeCheckState } from './grTreeChecking'
 export { grTreeConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrTreeConfigurableProps } from './defaults'

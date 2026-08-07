@@ -6,6 +6,7 @@ import type {
 
 const DEFAULT_CHILDREN_KEY = 'children'
 const DEFAULT_LABEL_KEY = 'label'
+const DEFAULT_IS_LEAF_KEY = 'isLeaf'
 
 export type GrTreeDataAdapterOptions<T extends object> = Pick<GrTreeDataProps<T>, 'props' | 'nodeKey'>
 
@@ -14,6 +15,8 @@ export type GrTreeDataAdapter<T extends object> = {
   getChildrenKey: () => string
   getLabelKey: () => string
   getLabel: (data: T) => string
+  /** Признак «лист» из данных. `undefined` — данные молчат, решает вызывающий. */
+  getIsLeaf: (data: T) => boolean | undefined
   getChildren: (data: T) => T[]
   ensureChildren: (data: T) => T[]
   getNodeKey: (data: T, index: number, parentKey: GrTreeKey | undefined) => GrTreeKey
@@ -49,6 +52,12 @@ export function createGrTreeDataAdapter<T extends Record<string, any> = any>(
     return value == null ? '' : String(value)
   }
 
+  function getIsLeaf(data: T): boolean | undefined {
+    const key = resolveMapValue(options.props, 'isLeaf', DEFAULT_IS_LEAF_KEY)
+    const value = (data as Record<string, unknown>)[key]
+    return typeof value === 'boolean' ? value : undefined
+  }
+
   function getChildren(data: T): T[] {
     const key = getChildrenKey() as keyof T
     const value = data[key]
@@ -61,9 +70,13 @@ export function createGrTreeDataAdapter<T extends Record<string, any> = any>(
     if (Array.isArray(value))
       return value as T[]
 
-    const children: T[] = []
-    ;(data as Record<string, unknown>)[key] = children
-    return children
+    ;(data as Record<string, unknown>)[key] = []
+
+    // Читаем обратно, а не возвращаем только что созданный массив: у
+    // реактивных данных чтение отдаёт прокси, и только запись через него
+    // видна дереву. Иначе `push` уходит мимо реактивности, и добавленные
+    // дети не появляются на экране.
+    return (data as Record<string, unknown>)[key] as T[]
   }
 
   function getExplicitNodeKey(data: T): GrTreeKey | undefined {
@@ -88,6 +101,7 @@ export function createGrTreeDataAdapter<T extends Record<string, any> = any>(
     getChildrenKey,
     getLabelKey,
     getLabel,
+    getIsLeaf,
     getChildren,
     ensureChildren,
     getNodeKey,

@@ -14,6 +14,11 @@ export type GrTreeNode<T = any> = {
 
 export type GrTreeNodeTarget<T = any> = GrTreeKey | GrTreeNode<T> | T
 
+export type GrTreeCheckedKeysOptions = {
+  /** Только листья: родители, отмеченные каскадом, в выдачу не попадают. */
+  leafOnly?: boolean
+}
+
 export type GrTreeInstance<T = any> = {
   filter: (value: string) => void
   /**
@@ -30,4 +35,10 @@ export type GrTreeInstance<T = any> = {
   getCurrentNode: () => GrTreeNode<T> | undefined
   setCurrentNode: (node?: GrTreeNodeTarget<T>) => boolean
   getNode: (key: GrTreeKey) => GrTreeNode<T> | undefined
+  /** Отмеченные чекбоксами узлы. Без `leafOnly` включает родителей. */
+  getCheckedKeys: (options?: GrTreeCheckedKeysOptions) => GrTreeKey[]
+  setCheckedKeys: (keys: GrTreeKey[]) => void
+  /** Родители, у которых отмечена часть потомков (`aria-checked="mixed"`). */
+  getHalfCheckedKeys: () => GrTreeKey[]
+  setChecked: (node: GrTreeNodeTarget<T>, checked: boolean) => boolean
 }

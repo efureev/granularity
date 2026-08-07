@@ -9,6 +9,7 @@ import type {
 } from './grTreeTypes'
 import { createGrTreeDataAdapter } from './grTreeDataAdapter'
 import { createGrTreeInteractionContext } from './grTreeInteractionContext'
+import type { GrTreeCheckState } from './grTreeChecking'
 import { createGrTreeStore } from './grTreeStore'
 import { treeSizeVars } from './grTreeStyles'
 import { useGrComponentSize } from '../GrConfigProvider/context'
@@ -18,7 +19,6 @@ import type {
   GrTreeNodeClass,
   GrTreeProps,
   GrTreeVisibleRow,
-  GrTreeVisibleTreeRow,
 } from './grTreeProps'
 
 defineOptions({
@@ -40,6 +40,12 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   size: undefined,
   highlightCurrent: true,
   indent: 0,
+  showCheckbox: false,
+  checkedKeys: undefined,
+  defaultCheckedKeys: () => [],
+  checkStrictly: false,
+  lazy: false,
+  load: undefined,
   expandIcon: 'i-lucide-chevron-right',
   collapseIcon: 'i-lucide-chevron-right',
   toggleIconRotate: true,
@@ -57,9 +63,6 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   toggleIconClass: undefined,
   toggleSpacerClass: undefined,
   contentClass: undefined,
-  internalRows: undefined,
-  internalNested: false,
-  internalStore: undefined,
 })
 
 const emit = defineEmits<{
@@ -68,6 +71,8 @@ const emit = defineEmits<{
   (event: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
   (event: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
   (event: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
+  (event: 'update:checkedKeys', keys: GrTreeKey[]): void
+  (event: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
 }>()
 
 defineSlots<{
@@ -75,14 +80,19 @@ defineSlots<{
 }>()
 
 const dataAdapter = createGrTreeDataAdapter(props)
-const treeStore = props.internalStore ?? createGrTreeStore({
+const treeStore = createGrTreeStore({
   adapter: dataAdapter,
   data: () => props.data,
   defaultExpandedKeys: () => props.defaultExpandedKeys,
   defaultExpandAll: () => props.defaultExpandAll,
   filterNodeMethod: () => props.filterNodeMethod,
+  defaultCheckedKeys: () => props.defaultCheckedKeys,
+  checkedKeys: () => props.checkedKeys,
+  checkStrictly: () => props.checkStrictly,
+  lazy: () => props.lazy,
+  load: () => props.load,
 })
-const interactionContext = props.internalInteractionContext ?? createGrTreeInteractionContext(props, {
+const interactionContext = createGrTreeInteractionContext(props, {
   emitNodeClick: (data, node) => emit('nodeClick', data, node),
   emitNodeExpand: (data, node) => emit('nodeExpand', data, node),
   emitNodeCollapse: (data, node) => emit('nodeCollapse', data, node),
@@ -104,37 +114,45 @@ const dropTarget = interactionContext.dropTarget
 // Корневой элемент дерева — область для делегированной клавиатуры (WAI-ARIA tree).
 const treeRootEl = ref<HTMLElement | null>(null)
 
-const visibleRows = computed<GrTreeVisibleTreeRow<T>[]>(() => {
-  if (props.internalRows)
-    return props.internalRows
-
+/**
+ * Видимые строки одним плоским списком в порядке отображения.
+ *
+ * Плоско — потому что рекурсивный рендер стоил по инстансу компонента на каждый
+ * раскрытый узел: дерево на 2 000 видимых строк превращалось в 2 000
+ * компонентов со своими вычислениями и подписками. Иерархию несут `aria-level`,
+ * `aria-posinset` и `aria-setsize`, отступ — `padding-left` строки.
+ */
+const visibleRows = computed<GrTreeVisibleRow<T>[]>(() => {
   const { roots } = treeStore.treeModel.value
   const { isActive, subtreeHasMatch, matchedKeys, autoExpandKeys } = treeStore.filterInfo.value
+  const branch = treeProps.branchLine
+  const rows: GrTreeVisibleRow<T>[] = []
 
-  const walk = (nodes: GrTreeNode<T>[]): GrTreeVisibleTreeRow<T>[] => {
-    const rows: GrTreeVisibleTreeRow<T>[] = []
+  const walk = (nodes: GrTreeNode<T>[], ancestorColors: string[]): void => {
+    const siblings = isActive ? nodes.filter(node => subtreeHasMatch.get(node.key)) : nodes
 
-    for (const node of nodes) {
-      if (isActive && !subtreeHasMatch.get(node.key))
-        continue
-
-      const isLeaf = node.childNodes.length === 0
-      const isMatched = matchedKeys.has(node.key)
+    siblings.forEach((node, index) => {
+      const isLeaf = treeStore.isLeafNode(node)
       const isExpanded = treeStore.isExpandedKey(node.key) || (isActive && autoExpandKeys.has(node.key))
 
       rows.push({
         node,
         isExpanded,
         isLeaf,
-        isMatched,
-        children: isExpanded ? walk(node.childNodes) : [],
+        isMatched: matchedKeys.has(node.key),
+        posInSet: index + 1,
+        setSize: siblings.length,
+        isLoading: treeStore.isLoadingKey(node.key),
+        branchColors: ancestorColors,
       })
-    }
 
-    return rows
+      if (isExpanded && node.childNodes.length)
+        walk(node.childNodes, branch ? [...ancestorColors, resolveBranchLineColor(node)] : ancestorColors)
+    })
   }
 
-  return walk(roots)
+  walk(roots, [])
+  return rows
 })
 
 function onRowClick(node: GrTreeNode<T>) {
@@ -158,22 +176,6 @@ function onRowContextMenu(evt: MouseEvent, node: GrTreeNode<T>) {
 
 // ————— Клавиатурная навигация по WAI-ARIA tree pattern (только корневой инстанс).
 
-type FlatRow = { node: GrTreeNode<T>, isLeaf: boolean, isExpanded: boolean }
-
-// Плоский список видимых узлов в порядке отображения (для стрелочной навигации).
-const flatVisibleRows = computed<FlatRow[]>(() => {
-  const out: FlatRow[] = []
-  const walk = (rows: GrTreeVisibleTreeRow<T>[]) => {
-    for (const row of rows) {
-      out.push({ node: row.node, isLeaf: row.isLeaf, isExpanded: row.isExpanded })
-      if (row.children.length)
-        walk(row.children)
-    }
-  }
-  walk(visibleRows.value)
-  return out
-})
-
 // Один узел на всё дерево держит tabindex=0 (roving). `focusedKey` — общий для
 // всех вложенных инстансов, поэтому проверка одинаковая на любом уровне.
 function isRovingItem(key: GrTreeNode<T>['key']): boolean {
@@ -193,7 +195,7 @@ const TYPEAHEAD_RESET_MS = 600
 let typeaheadBuffer = ''
 let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
 
-function onTypeahead(char: string, rows: FlatRow[], fromIndex: number): void {
+function onTypeahead(char: string, rows: GrTreeVisibleRow<T>[], fromIndex: number): void {
   clearTimeout(typeaheadTimer)
   typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, TYPEAHEAD_RESET_MS)
 
@@ -227,11 +229,7 @@ function expandSiblings(node: GrTreeNode<T>): void {
 }
 
 function onTreeKeydown(event: KeyboardEvent): void {
-  // Обрабатывает только корневой инстанс; событие всплывает от строки к корню.
-  if (props.internalNested)
-    return
-
-  const rows = flatVisibleRows.value
+  const rows = visibleRows.value
   if (rows.length === 0)
     return
 
@@ -287,9 +285,17 @@ function onTreeKeydown(event: KeyboardEvent): void {
       focusRow(rows[rows.length - 1].node.key)
       break
     case 'Enter':
-    case ' ':
       event.preventDefault()
       onRowClick(cur.node)
+      break
+    // Space при чекбоксах переключает отметку — это и есть выбор в
+    // multi-select дереве; без них он остаётся вторым способом выбрать узел.
+    case ' ':
+      event.preventDefault()
+      if (treeProps.showCheckbox)
+        toggleChecked(cur.node)
+      else
+        onRowClick(cur.node)
       break
   }
 }
@@ -297,10 +303,7 @@ function onTreeKeydown(event: KeyboardEvent): void {
 // Нормализация roving-фокуса: держим `focusedKey` на видимом узле, чтобы ровно
 // один treeitem всегда имел tabindex=0 (даже после сворачивания родителя). Только корень.
 function normalizeFocusedKey(): void {
-  if (props.internalNested)
-    return
-
-  const rows = flatVisibleRows.value
+  const rows = visibleRows.value
   if (rows.length === 0) {
     focusedKey.value = undefined
     return
@@ -315,11 +318,9 @@ function normalizeFocusedKey(): void {
     : rows[0].node.key
 }
 
-if (!props.internalNested) {
-  // Синхронно до первого рендера — чтобы roving tabindex был проставлен сразу.
-  normalizeFocusedKey()
-  watch(flatVisibleRows, normalizeFocusedKey, { flush: 'sync' })
-}
+// Синхронно до первого рендера — чтобы roving tabindex был проставлен сразу.
+normalizeFocusedKey()
+watch(visibleRows, normalizeFocusedKey, { flush: 'sync' })
 
 function onRowMouseEnter(node: GrTreeNode<T>) {
   hoveredKey.value = node.key
@@ -348,12 +349,70 @@ function toggleExpand(node: GrTreeNode<T>) {
   if (expanded && treeProps.accordion)
     collapseSiblings(node)
 
+  // Ленивая ветка грузится по первому раскрытию; повторное ничего не запрашивает.
+  if (expanded)
+    treeStore.ensureLoaded(node)
+
   treeStore.toggleExpand(node)
 
   if (expanded)
     interactionContext.emitNodeExpand(node.data, node)
   else
     interactionContext.emitNodeCollapse(node.data, node)
+}
+
+// ————— Отметки (чекбоксы).
+
+function checkStateOf(key: GrTreeKey): GrTreeCheckState {
+  return treeStore.getCheckState(key)
+}
+
+function ariaCheckedOf(row: GrTreeVisibleRow<T>): 'true' | 'false' | 'mixed' | undefined {
+  if (!treeProps.showCheckbox)
+    return undefined
+
+  const state = checkStateOf(row.node.key)
+  return state === 'checked' ? 'true' : state === 'half' ? 'mixed' : 'false'
+}
+
+function emitCheck(node: GrTreeNode<T>): void {
+  const checkedKeys = treeStore.getCheckedKeys()
+  emit('update:checkedKeys', checkedKeys)
+  emit('check', node.data, node, { checkedKeys, halfCheckedKeys: treeStore.getHalfCheckedKeys() })
+}
+
+function toggleChecked(node: GrTreeNode<T>): void {
+  if (!treeProps.showCheckbox)
+    return
+
+  const changed = treeStore.toggleChecked(node)
+  if (changed)
+    emitCheck(changed)
+}
+
+// ————— Геометрия строки: отступ уровня и направляющие ветвей.
+
+function rowStyle(row: GrTreeVisibleRow<T>) {
+  const step = treeProps.indent && treeProps.indent > 0
+    ? `${treeProps.indent}px`
+    : 'var(--gr-tree-indent-step)'
+
+  return { '--gr-tree-row-indent': `calc(${step} * ${row.node.level - 1})` }
+}
+
+/**
+ * Направляющая уровня-предка. Считается от того же шага отступа, поэтому линия
+ * стоит ровно там, где раньше её рисовал `border-left` вложенной обёртки.
+ */
+function branchGuideStyle(row: GrTreeVisibleRow<T>, index: number) {
+  const step = treeProps.indent && treeProps.indent > 0
+    ? `${treeProps.indent}px`
+    : 'var(--gr-tree-indent-step)'
+
+  return {
+    'left': `calc(${step} * ${index} + var(--gr-tree-branch-line-offset))`,
+    '--gr-tree-branch-line-color': row.branchColors[index],
+  }
 }
 
 // Drag & drop
@@ -481,16 +540,6 @@ function resolveBranchLineColor(node: GrTreeNode<T>) {
   return resolveBranchLineColorValue(treeProps.branchLineActiveColor, node) ?? defaultColor
 }
 
-function resolveChildrenWrapStyle(row: GrTreeVisibleTreeRow<T>) {
-  if (!treeProps.branchLine)
-    return {
-    }
-
-  return {
-    '--gr-tree-branch-line-color': resolveBranchLineColor(row.node),
-  }
-}
-
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTree' })
 
 // Переменные ставим и вложенным уровням тоже: `v-bind="props"` доносит до них
@@ -503,7 +552,7 @@ const sizeStyle = computed(() => treeSizeVars[resolvedSize.value])
  * дереву, иначе стрелки из триггера никуда не ведут.
  */
 function focus(key?: GrTreeKey): boolean {
-  const rows = flatVisibleRows.value
+  const rows = visibleRows.value
   if (rows.length === 0)
     return false
 
@@ -519,6 +568,18 @@ onUnmounted(() => clearTimeout(typeaheadTimer))
 
 defineExpose<GrTreeInstance<T>>({
   appendNode: treeStore.appendNode,
+  getCheckedKeys: options => treeStore.getCheckedKeys(options),
+  setCheckedKeys: (keys) => {
+    treeStore.setCheckedKeys(keys)
+    emit('update:checkedKeys', treeStore.getCheckedKeys())
+  },
+  getHalfCheckedKeys: treeStore.getHalfCheckedKeys,
+  setChecked: (node, checked) => {
+    const changed = treeStore.setChecked(node, checked)
+    if (changed)
+      emitCheck(changed)
+    return Boolean(changed)
+  },
   filter,
   focus,
   getCurrentNode: treeStore.getCurrentNode,
@@ -535,9 +596,10 @@ defineExpose<GrTreeInstance<T>>({
 <template>
   <div
       ref="treeRootEl"
-      :data-gr-tree="props.internalNested ? undefined : ''"
-      :class="props.internalNested ? 'gr-tree__children' : 'gr-tree'"
-      :role="props.internalNested ? 'group' : 'tree'"
+      data-gr-tree
+      class="gr-tree"
+      role="tree"
+      :aria-multiselectable="treeProps.showCheckbox ? 'true' : undefined"
       :style="sizeStyle"
       @keydown="onTreeKeydown"
   >
@@ -549,8 +611,12 @@ defineExpose<GrTreeInstance<T>>({
         :data-gr-tree-node-key="row.node.key"
         role="treeitem"
         :aria-level="row.node.level"
+        :aria-posinset="row.posInSet"
+        :aria-setsize="row.setSize"
         :aria-expanded="row.isLeaf ? undefined : row.isExpanded"
         :aria-selected="currentKey === row.node.key ? 'true' : undefined"
+        :aria-checked="ariaCheckedOf(row)"
+        :aria-busy="row.isLoading ? 'true' : undefined"
         :tabindex="isRovingItem(row.node.key) ? 0 : -1"
     >
       <div
@@ -564,6 +630,7 @@ defineExpose<GrTreeInstance<T>>({
           dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'next' ? 'gr-tree__row--drop-next' : '',
           resolveNodeClass(treeProps.rowClass, row),
         ]"
+          :style="rowStyle(row)"
           @click="onRowActivate(row)"
           @contextmenu="onRowContextMenu($event, row.node)"
           @drop="onDrop($event, row.node)"
@@ -571,6 +638,20 @@ defineExpose<GrTreeInstance<T>>({
           @mouseenter="onRowMouseEnter(row.node)"
           @mouseleave="onRowMouseLeave(row.node)"
       >
+        <!--
+          Направляющие ветвей: по одной на каждый уровень предка. Вложенной
+          обёртки с `border-left` больше нет, поэтому линию рисует сама строка —
+          и заходит в зазор между строками, иначе она распалась бы на штрихи.
+        -->
+        <span
+            v-for="(color, guideIndex) in row.branchColors"
+            :key="guideIndex"
+            data-gr-tree-branch-guide
+            class="gr-tree__branch-guide"
+            :style="branchGuideStyle(row, guideIndex)"
+            aria-hidden="true"
+        />
+
         <button
             v-if="treeProps.draggable"
             type="button"
@@ -601,6 +682,12 @@ defineExpose<GrTreeInstance<T>>({
             @click.stop="toggleExpand(row.node)"
         >
           <span
+              v-if="row.isLoading"
+              data-gr-tree-loading
+              class="gr-tree__toggle-icon animate-spin i-lucide-loader-circle"
+          />
+          <span
+              v-else
               class="gr-tree__toggle-icon"
               :class="[
               row.isExpanded ? treeProps.collapseIcon : treeProps.expandIcon,
@@ -615,6 +702,29 @@ defineExpose<GrTreeInstance<T>>({
             :class="resolveNodeClass(treeProps.toggleSpacerClass, row)"
         />
 
+        <!--
+          Квадратик отметки декоративен: состояние живёт на самом `treeitem`
+          (`aria-checked`), а вложить интерактивный чекбокс внутрь роли-виджета
+          нельзя — роль объявляет потомков презентационными.
+        -->
+        <span
+            v-if="treeProps.showCheckbox"
+            data-gr-tree-checkbox
+            class="gr-tree__checkbox"
+            :class="[
+            checkStateOf(row.node.key) === 'checked' ? 'gr-tree__checkbox--checked' : '',
+            checkStateOf(row.node.key) === 'half' ? 'gr-tree__checkbox--half' : '',
+          ]"
+            aria-hidden="true"
+            @click.stop="toggleChecked(row.node)"
+        >
+          <span
+              v-if="checkStateOf(row.node.key) !== 'unchecked'"
+              class="gr-tree__checkbox-mark"
+              :class="checkStateOf(row.node.key) === 'half' ? 'i-lucide-minus' : 'i-lucide-check'"
+          />
+        </span>
+
         <div class="gr-tree__content" :class="resolveNodeClass(treeProps.contentClass, row)">
           <slot
               :node="row.node"
@@ -623,28 +733,6 @@ defineExpose<GrTreeInstance<T>>({
             <span class="gr-tree__label">{{ row.node.label }}</span>
           </slot>
         </div>
-      </div>
-
-      <div
-          v-if="row.children.length"
-          class="gr-tree__children-wrap ml-6"
-          :class="treeProps.branchLine ? 'gr-tree__children-wrap--with-branch' : ''"
-          :style="resolveChildrenWrapStyle(row)"
-      >
-        <GrTree
-            v-bind="props"
-            :data="[]"
-            :internal-rows="row.children"
-            internal-nested
-            :internal-store="treeStore"
-            :internal-interaction-context="interactionContext"
-        >
-          <template #default="slotProps">
-            <slot v-bind="slotProps">
-              <span class="gr-tree__label">{{ slotProps.node.label }}</span>
-            </slot>
-          </template>
-        </GrTree>
       </div>
     </div>
   </div>
@@ -683,28 +771,20 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-content-gap: 8px;
     --gr-tree-branch-line-default-color: var(--gr-tree-row-current-bg);
     --gr-tree-branch-line-width: 2px;
+    /* Шаг отступа уровня: тот же зазор, что раньше складывался из отступа
+       вложенной обёртки, её padding и толщины полосы. */
+    --gr-tree-indent-step: calc(24px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width));
+    --gr-tree-branch-line-offset: 24px;
+    --gr-tree-checkbox-size: 16px;
+    --gr-tree-checkbox-radius: 4px;
+    --gr-tree-checkbox-brd: var(--gr-brd);
+    --gr-tree-checkbox-bg: transparent;
+    --gr-tree-checkbox-checked-bg: var(--gr-primary);
+    --gr-tree-checkbox-checked-fg: var(--gr-primary-fg);
+    --gr-tree-checkbox-mr: 4px;
     display: flex;
     flex-direction: column;
     gap: var(--gr-tree-gap);
-}
-
-.gr-tree__children {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gr-tree-gap);
-}
-
-.gr-tree__children-wrap {
-    --gr-tree-branch-line-color: var(--gr-tree-branch-line-default-color);
-    display: flex;
-    flex-direction: column;
-    gap: var(--gr-tree-gap);
-    padding-left: var(--gr-tree-children-pl, 10px);
-    border-left: var(--gr-tree-branch-line-width) solid transparent;
-}
-
-.gr-tree__children-wrap--with-branch {
-    border-left-color: var(--gr-tree-branch-line-color, var(--gr-tree-branch-line-default-color));
 }
 
 .gr-tree__row {
@@ -713,7 +793,8 @@ defineExpose<GrTreeInstance<T>>({
     align-items: center;
     min-height: var(--gr-tree-row-min-height);
     border-radius: var(--gr-tree-row-radius);
-    padding: var(--gr-tree-row-py) var(--gr-tree-row-pr) var(--gr-tree-row-py) var(--gr-tree-row-px);
+    padding: var(--gr-tree-row-py) var(--gr-tree-row-pr) var(--gr-tree-row-py)
+        calc(var(--gr-tree-row-px) + var(--gr-tree-row-indent, 0px));
     font-size: var(--gr-tree-font-size);
     cursor: default;
     user-select: none;
@@ -724,6 +805,44 @@ defineExpose<GrTreeInstance<T>>({
 .gr-tree__row:hover {
     background: var(--gr-tree-row-hover-bg);
 }
+
+/* Направляющая тянется в зазор между строками: иначе линия ветки распалась бы
+   на штрихи по числу строк. */
+.gr-tree__branch-guide {
+    position: absolute;
+    top: calc(var(--gr-tree-gap) / -2);
+    bottom: calc(var(--gr-tree-gap) / -2);
+    width: var(--gr-tree-branch-line-width);
+    background: var(--gr-tree-branch-line-color, var(--gr-tree-branch-line-default-color));
+    pointer-events: none;
+}
+
+.gr-tree__checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--gr-tree-checkbox-size);
+    height: var(--gr-tree-checkbox-size);
+    margin-right: var(--gr-tree-checkbox-mr);
+    border: 1px solid var(--gr-tree-checkbox-brd);
+    border-radius: var(--gr-tree-checkbox-radius);
+    background: var(--gr-tree-checkbox-bg);
+    color: var(--gr-tree-checkbox-checked-fg);
+    cursor: pointer;
+}
+
+.gr-tree__checkbox--checked,
+.gr-tree__checkbox--half {
+    border-color: var(--gr-tree-checkbox-checked-bg);
+    background: var(--gr-tree-checkbox-checked-bg);
+}
+
+.gr-tree__checkbox-mark {
+    width: calc(var(--gr-tree-checkbox-size) - 4px);
+    height: calc(var(--gr-tree-checkbox-size) - 4px);
+}
+
 
 [data-gr-tree-node] {
     outline: none;

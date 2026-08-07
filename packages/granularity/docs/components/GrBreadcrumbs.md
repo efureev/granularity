@@ -7,11 +7,15 @@
 ## Роутер
 
 ```vue
-<GrBreadcrumbs :as="RouterLink" :items="[
+<GrBreadcrumbs :as="RouterLink" :items="items" />
+```
+
+```ts
+const items = [
   { label: 'Проекты', to: '/projects' },
   { label: 'Гранулярность', to: '/projects/granularity' },
   { label: 'Настройки' },
-]" />
+]
 ```
 
 `as` задаёт компонент ссылки на все пункты сразу, `to` уезжает в него пропом
