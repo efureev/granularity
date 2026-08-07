@@ -1545,6 +1545,13 @@
             "default": "true"
           },
           {
+            "name": "virtual",
+            "description": "Виртуализация списка: в DOM живёт только окно вокруг вьюпорта. Высоту окна задаёт `maxHeight`. Включается осознанно: на сотне команд выигрыша нет, а в разметке остаётся только окно — вместе с ним меняется и то, что находит `querySelector` потребителя. Профильный сценарий — палитра приложения на тысячи команд.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "items",
             "description": "Плоский список команд; группировка — по полю `group` самой команды.",
             "type": "GrCommandItem[] | undefined",
@@ -7338,6 +7345,13 @@
             "type": "number | undefined",
             "required": false,
             "default": "280"
+          },
+          {
+            "name": "virtual",
+            "description": "Виртуализация панели: в DOM живёт только окно вокруг вьюпорта. Высоту окна задаёт `dropdownMaxHeight`. Только для `optionsView=\"panel\"`: у нативного `<select>` панели нет вовсе. Несовместим с `view=\"link\"` — там ширина панели равна ширине отрисованной опции и прыгала бы при прокрутке.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "closeOnSelect",

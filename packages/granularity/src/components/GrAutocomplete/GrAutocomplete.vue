@@ -367,8 +367,7 @@ const listboxStyle = computed(() => {
 
   return {
     ...base,
-    '--gr-autocomplete-virtual-before': `${virtualizer.offset.value}px`,
-    '--gr-autocomplete-virtual-after': `${virtualizer.offsetEnd.value}px`,
+    ...virtualizer.spacerStyle.value,
   }
 })
 
@@ -859,7 +858,7 @@ const themeAttrs = useGrThemeAttrs()
               :id="listboxId"
               ref="listboxEl"
               data-gr-autocomplete-listbox
-              :data-gr-autocomplete-virtual="virtual ? '' : undefined"
+              :data-gr-virtual="virtual ? '' : undefined"
               class="p-1 overflow-auto"
               :class="virtual ? 'flex flex-col' : ''"
               :style="listboxStyle"
@@ -976,17 +975,18 @@ const themeAttrs = useGrThemeAttrs()
  * Псевдоэлементы не узлы DOM: их не за что размонтировать, детьми listbox'а
  * они не считаются, а высота приезжает переменными в том же патче, что и опции.
  */
-[data-gr-autocomplete-virtual]::before,
-[data-gr-autocomplete-virtual]::after {
+[data-gr-virtual]::before,
+[data-gr-virtual]::after {
     content: '';
+    display: block;
     flex: none;
 }
 
-[data-gr-autocomplete-virtual]::before {
-    height: var(--gr-autocomplete-virtual-before, 0px);
+[data-gr-virtual]::before {
+    height: var(--gr-virtual-before, 0px);
 }
 
-[data-gr-autocomplete-virtual]::after {
-    height: var(--gr-autocomplete-virtual-after, 0px);
+[data-gr-virtual]::after {
+    height: var(--gr-virtual-after, 0px);
 }
 </style>

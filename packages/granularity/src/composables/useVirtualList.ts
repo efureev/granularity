@@ -9,14 +9,14 @@ import { computed, onScopeDispose, ref, watch } from 'vue'
  * отрисованное (`offset`). Разметку строит потребитель: примитив ничего не
  * рендерит и ничего не знает про роли и клавиатуру своего списка.
  *
- * Скролл-протяжённость держат отступы контейнера, а не обёртки-распорки:
- * `paddingTop` за срезанное сверху, `paddingBottom` — за срезанное снизу. Так
+ * Скролл-протяжённость держат псевдоэлементы контейнера: `spacerStyle` отдаёт
+ * их высоты переменными, а правило живёт в `<style>` компонента. Так
  * отрисованные строки остаются **прямыми детьми** контейнера, и роль вроде
  * `tree` или `listbox` не теряет обязательных потомков.
  *
  * ```vue
  * const container = useTemplateRef('scroller')
- * const { range, totalSize, offset, offsetEnd, measure } = useVirtualList({
+ * const { range, spacerStyle, measure } = useVirtualList({
  *   container,
  *   count: () => rows.value.length,
  *   itemSize: 28,
@@ -26,11 +26,24 @@ import { computed, onScopeDispose, ref, watch } from 'vue'
  * <div
  *   ref="scroller"
  *   role="tree"
- *   :style="{ overflow: 'auto', maxHeight: '280px', paddingTop: `${offset}px`, paddingBottom: `${offsetEnd}px` }"
+ *   data-gr-virtual
+ *   :style="{ overflow: 'auto', maxHeight: '280px', ...spacerStyle }"
  * >
  *   <Row v-for="i in window" :key="…" :ref="el => measure(i, el)" />
  * </div>
+ *
+ * <style scoped>
+ * [data-gr-virtual]::before,
+ * [data-gr-virtual]::after { content: ''; display: block; flex: none; }
+ * [data-gr-virtual]::before { height: var(--gr-virtual-before, 0px); }
+ * [data-gr-virtual]::after { height: var(--gr-virtual-after, 0px); }
+ * </style>
  * ```
+ *
+ * Почему правило повторяется в каждом компоненте, а не лежит в одном файле:
+ * единственный глобальный стиль пакета (`styles/base.css`) потребитель вправе
+ * не подключать, и уехавшее туда правило молча ломало бы прокрутку. Сверяет
+ * копии гейт `src/__tests__/virtualSpacer.test.ts`.
  */
 
 /** Куда поставить элемент относительно вьюпорта при прокрутке к нему. */
@@ -75,6 +88,14 @@ export interface UseVirtualListReturn {
   offset: ComputedRef<number>
   /** Отступ снизу: высота срезанного после окна. */
   offsetEnd: ComputedRef<number>
+  /**
+   * Стиль контейнера под общий CSS-контракт распорок.
+   *
+   * Имена переменных приезжают готовыми, поэтому написать их руками — и
+   * разойтись с правилом в `<style>` — нельзя. Опечатка в имени давала бы
+   * список без прокрутки, и увидеть это можно было бы только глазами.
+   */
+  spacerStyle: ComputedRef<Record<string, string>>
   /** Регистрация отрисованного элемента: замер и подписка на изменение высоты. */
   measure: (index: number, el: Element | null) => void
   /** Прокрутка к элементу. Без выравнивания — минимальным движением. */
@@ -220,6 +241,11 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   const offset = computed(() => geometry.value.offset)
   const offsetEnd = computed(() => geometry.value.offsetEnd)
 
+  const spacerStyle = computed(() => ({
+    '--gr-virtual-before': `${geometry.value.offset}px`,
+    '--gr-virtual-after': `${geometry.value.offsetEnd}px`,
+  }))
+
   function syncScrollTop(): void {
     const el = options.container.value
     if (!el) return
@@ -347,5 +373,5 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     viewportObserver?.disconnect()
   })
 
-  return { range, totalSize: total, offset, offsetEnd, measure, scrollToIndex }
+  return { range, totalSize: total, offset, offsetEnd, spacerStyle, measure, scrollToIndex }
 }

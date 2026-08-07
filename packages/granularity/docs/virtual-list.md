@@ -4,12 +4,12 @@
 что рисовать, на сколько отступить сверху и на сколько снизу. Разметку строит потребитель:
 примитив ничего не рендерит и не знает ни ролей, ни клавиатуры вашего списка.
 
-В пакете на нём работают `GrTree` (проп `virtual`) и `GrAutocomplete`, а через дерево — `GrTreeSelect`.
+В пакете на нём работают `GrTree`, `GrAutocomplete`, `GrSelect` и `GrCommandPalette` (проп `virtual`), а через дерево — `GrTreeSelect`.
 
 ```ts
 import { useVirtualList } from '@feugene/granularity'
 
-const { range, totalSize, offset, offsetEnd, measure, scrollToIndex } = useVirtualList({
+const { range, spacerStyle, measure, scrollToIndex } = useVirtualList({
   container: scrollerRef,
   count: () => rows.value.length,
   itemSize: 28,
@@ -27,12 +27,8 @@ const { range, totalSize, offset, offsetEnd, measure, scrollToIndex } = useVirtu
 <div
   ref="scroller"
   role="tree"
-  :style="{
-    overflow: 'auto',
-    maxHeight: '300px',
-    '--spacer-before': `${offset}px`,
-    '--spacer-after': `${offsetEnd}px`,
-  }"
+  data-gr-virtual
+  :style="{ overflow: 'auto', maxHeight: '300px', ...spacerStyle }"
 >
   <Row
     v-for="(row, i) in rows.slice(range.start, range.end)"
@@ -42,10 +38,26 @@ const { range, totalSize, offset, offsetEnd, measure, scrollToIndex } = useVirtu
 </div>
 
 <style scoped>
-[data-virtual]::before { content: ''; flex: none; height: var(--spacer-before, 0px); }
-[data-virtual]::after  { content: ''; flex: none; height: var(--spacer-after, 0px); }
+[data-gr-virtual]::before,
+[data-gr-virtual]::after {
+    content: '';
+    display: block;
+    flex: none;
+}
+
+[data-gr-virtual]::before {
+    height: var(--gr-virtual-before, 0px);
+}
+
+[data-gr-virtual]::after {
+    height: var(--gr-virtual-after, 0px);
+}
 </style>
 ```
+
+Имена переменных не пишутся руками: `spacerStyle` отдаёт их готовыми. Разойдись имя в стиле
+с именем в правиле — распорка не создалась бы, список остался бы без прокрутки, и увидеть это
+можно было бы только глазами в браузере.
 
 Три напрашивающихся варианта не работают, и каждый ломается по-своему:
 
@@ -57,6 +69,17 @@ const { range, totalSize, offset, offsetEnd, measure, scrollToIndex } = useVirtu
 
 Псевдоэлементы свободны от всех трёх: они не узлы DOM (размонтировать нечего, детьми роли не
 считаются), а высота приезжает переменными в том же патче, что и сами строки.
+
+`display: block` в правиле обязателен, если контейнер — блочный поток, а не флекс:
+псевдоэлемент по умолчанию строчный, а строчная коробка игнорирует `height`, и распорка молча
+не создаётся вовсе. Во флекс-контейнере он безвреден — элементы там и так блокифицируются.
+
+**Правило повторяется в каждом компоненте намеренно.** Единственный глобальный стиль пакета
+(`styles/base.css`) потребитель вправе не подключать — это разрешает его собственная шапка, —
+и уехавшее туда правило молча ломало бы прокрутку у всех, кто так и сделал. Scoped-стиль SFC,
+наоборот, уезжает в чанк своего компонента, то есть доставляется ровно тем, кто компонент
+выбрал. Синхронность копий держит гейт `src/__tests__/virtualSpacer.test.ts`: он сверяет блок
+посимвольно у каждого, кто зовёт `useVirtualList`.
 
 ## Оценка и замер
 
@@ -100,7 +123,8 @@ const { range, totalSize, offset, offsetEnd, measure, scrollToIndex } = useVirtu
 | --- | --- |
 | `range` | полуинтервал индексов к отрисовке, `[start, end)` |
 | `totalSize` | полная высота содержимого |
-| `offset` / `offsetEnd` | отступы контейнера сверху и снизу |
+| `offset` / `offsetEnd` | высоты срезанного сверху и снизу, числом |
+| `spacerStyle` | те же высоты готовыми переменными общего CSS-контракта |
 | `measure(index, el)` | замер отрисованного элемента и подписка на его изменение |
 | `scrollToIndex(index, align?)` | `auto` (минимальное движение), `start`, `center`, `end` |
 
@@ -118,6 +142,11 @@ const { range, totalSize, offset, offsetEnd, measure, scrollToIndex } = useVirtu
 
 **Размер набора при этом объявляется явно.** Диктор выводит его из DOM, а в DOM только окно:
 без `aria-setsize`/`aria-posinset` список в десять тысяч объявляется как «1 из 12».
+
+Набор — не обязательно весь список. Опция внутри `role="group"` принадлежит набору своей
+группы, и отсчитывается от неё: у `GrSelect` со сгруппированными опциями `aria-setsize` равен
+размеру группы. Группа, начатая выше окна, при этом всё равно создаётся — но имя берёт через
+`aria-label`, потому что её заголовка в DOM уже нет.
 
 ## Ограничения
 

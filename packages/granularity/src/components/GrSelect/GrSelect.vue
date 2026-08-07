@@ -9,6 +9,7 @@ import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
+import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -118,6 +119,15 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   customValuePlaceholder?: string
   /** Максимальная высота панели (только в `optionsView="panel"`). */
   dropdownMaxHeight?: number
+  /**
+   * Виртуализация панели: в DOM живёт только окно вокруг вьюпорта. Высоту окна
+   * задаёт `dropdownMaxHeight`.
+   *
+   * Только для `optionsView="panel"`: у нативного `<select>` панели нет вовсе.
+   * Несовместим с `view="link"` — там ширина панели равна ширине отрисованной
+   * опции и прыгала бы при прокрутке.
+   */
+  virtual?: boolean
   /** Закрывать панель после выбора (только в `optionsView="panel"`). */
   closeOnSelect?: boolean
   /** Сколько chips показать до сворачивания в «+N» (только `tags`). */
@@ -166,6 +176,7 @@ const props = withDefaults(
     tags: false,
     customValuePlaceholder: undefined,
     dropdownMaxHeight: 280,
+    virtual: false,
     closeOnSelect: true,
     maxTagCount: undefined,
     clearable: undefined,
@@ -399,6 +410,7 @@ const customValue = computed<string>({
 const open = ref(false)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
+const listboxEl = ref<HTMLElement | null>(null)
 const customInputRef = ref<InstanceType<typeof GrInput> | null>(null)
 const clickOutsideExclude = [() => panelEl.value]
 
@@ -500,7 +512,20 @@ type GrSelectPanelOptionRow<TItemValue extends GrSelectValue> = {
 }
 
 type GrSelectPanelRow<TItemValue extends GrSelectValue> =
-  | { kind: 'group', label: string, key: string, options: GrSelectPanelOptionRow<TItemValue>[] }
+  | {
+    kind: 'group'
+    label: string
+    key: string
+    options: GrSelectPanelOptionRow<TItemValue>[]
+    /**
+     * Есть ли в этой отрисовке видимый заголовок. При виртуализации окно может
+     * начаться серединой группы: обёртка нужна всё равно, а заголовка нет —
+     * имя тогда идёт в `aria-label`.
+     */
+    labelVisible?: boolean
+    /** Позиция заголовка в `panelItems` — по ней его замеряет виртуализатор. */
+    labelIndex?: number
+  }
   | ({ kind: 'option' } & GrSelectPanelOptionRow<TItemValue>)
 
 const panelRows = computed<GrSelectPanelRow<TValue>[]>(() => {
@@ -634,6 +659,188 @@ function groupLabelId(groupKey: string): string {
   return `${listboxId}-${groupKey}`
 }
 
+/**
+ * Виртуализация панели.
+ *
+ * Набор — `[«Add …»?] + panelItems`, то есть заголовки групп идут в нём наравне
+ * с опциями: на экране они занимают такую же строку. Вложенную структуру групп
+ * рендер пересобирает уже из окна.
+ */
+
+/** Оценки высоты строк: опция крупнее заголовка группы. Уточняются замером. */
+const OPTION_SIZE_ESTIMATE = 36
+const GROUP_LABEL_SIZE_ESTIMATE = 28
+
+const virtualEnabled = computed(() => props.virtual && effectiveOptionsView.value === 'panel')
+const addOffset = computed(() => (canAddCustom.value ? 1 : 0))
+const virtualCount = computed(() => panelItems.value.length + addOffset.value)
+
+const virtualizer = useVirtualList({
+  container: listboxEl,
+  count: () => (virtualEnabled.value ? virtualCount.value : 0),
+  itemSize: (index) => {
+    const item = panelItems.value[index - addOffset.value]
+    return item?.kind === 'group' ? GROUP_LABEL_SIZE_ESTIMATE : OPTION_SIZE_ESTIMATE
+  },
+  // Панель закрыта — контейнера в раскладке нет, `clientHeight` нулевой.
+  viewportSize: () => props.dropdownMaxHeight,
+})
+
+/**
+ * Позиция и размер набора для каждой опции.
+ *
+ * Набор — не весь список: опция внутри `role="group"` принадлежит набору своей
+ * группы, и `aria-posinset` отсчитывается от неё. Опции вне групп вместе с
+ * кнопкой «Add …» образуют набор уровня listbox'а.
+ */
+const optionSets = computed(() => {
+  const sizes = new Map<string, number>()
+  const positions = new Map<number, { setKey: string, posInSet: number }>()
+  const ROOT = '__root__'
+
+  let rootCount = canAddCustom.value ? 1 : 0
+
+  panelItems.value.forEach((item, index) => {
+    if (item.kind === 'group') return
+
+    const setKey = item.groupKey ?? ROOT
+    const next = (sizes.get(setKey) ?? (setKey === ROOT ? rootCount : 0)) + 1
+    sizes.set(setKey, next)
+    positions.set(index, { setKey, posInSet: next })
+    if (setKey === ROOT) rootCount = next
+  })
+
+  if (canAddCustom.value && !sizes.has(ROOT)) sizes.set(ROOT, rootCount)
+
+  return { sizes, positions, ROOT }
+})
+
+/** ARIA набора: объявляем только при виртуализации — иначе набор виден по DOM. */
+function optionSetProps(index: number): Record<string, number> | undefined {
+  if (!virtualEnabled.value) return undefined
+
+  const position = optionSets.value.positions.get(index)
+  if (!position) return undefined
+
+  return {
+    'aria-setsize': optionSets.value.sizes.get(position.setKey) ?? 1,
+    'aria-posinset': position.posInSet,
+  }
+}
+
+/** ARIA для кнопки «Add …»: она первая в наборе уровня listbox'а. */
+const addOptionSetProps = computed<Record<string, number> | undefined>(() => {
+  if (!virtualEnabled.value) return undefined
+  return {
+    'aria-setsize': optionSets.value.sizes.get(optionSets.value.ROOT) ?? 1,
+    'aria-posinset': 1,
+  }
+})
+
+/** Метка группы по её ключу: окно может начаться ниже заголовка. */
+const groupLabels = computed(() => {
+  const labels = new Map<string, string>()
+  for (const item of panelItems.value) {
+    if (item.kind === 'group') labels.set(item.key, item.label)
+  }
+  return labels
+})
+
+/** Виден ли «Add …»: вне окна его рисовать нельзя — он элемент набора. */
+const showAddOption = computed(() => {
+  if (!canAddCustom.value) return false
+  return !virtualEnabled.value || virtualizer.range.value.start === 0
+})
+
+/**
+ * Строки к отрисовке. При виртуализации группы пересобираются из среза
+ * `panelItems`: группа, начатая выше окна, всё равно открывается — иначе её
+ * опции оказались бы прямыми детьми listbox'а и потеряли имя набора.
+ */
+const renderedPanelRows = computed<GrSelectPanelRow<TValue>[]>(() => {
+  if (!virtualEnabled.value) return panelRows.value
+
+  const items = panelItems.value
+  const { start, end } = virtualizer.range.value
+  const from = Math.max(0, start - addOffset.value)
+  const to = Math.min(items.length, Math.max(0, end - addOffset.value))
+
+  const rows: GrSelectPanelRow<TValue>[] = []
+  let currentGroup: Extract<GrSelectPanelRow<TValue>, { kind: 'group' }> | undefined
+
+  for (let index = from; index < to; index++) {
+    const item = items[index]!
+
+    if (item.kind === 'group') {
+      currentGroup = {
+        kind: 'group',
+        label: item.label,
+        key: item.key,
+        options: [],
+        labelVisible: true,
+        labelIndex: index,
+      }
+      rows.push(currentGroup)
+      continue
+    }
+
+    const row: GrSelectPanelOptionRow<TValue> = { option: item.option, key: item.key, index }
+
+    if (item.groupKey) {
+      if (!currentGroup || currentGroup.key !== item.groupKey) {
+        currentGroup = {
+          kind: 'group',
+          label: groupLabels.value.get(item.groupKey) ?? '',
+          key: item.groupKey,
+          options: [],
+          labelVisible: false,
+        }
+        rows.push(currentGroup)
+      }
+      currentGroup.options.push(row)
+      continue
+    }
+
+    currentGroup = undefined
+    rows.push({ kind: 'option', ...row })
+  }
+
+  return rows
+})
+
+const listboxStyle = computed(() => {
+  const base: Record<string, string> = { maxHeight: `${props.dropdownMaxHeight}px` }
+  if (!virtualEnabled.value) return base
+
+  return {
+    ...base,
+    ...virtualizer.spacerStyle.value,
+  }
+})
+
+if (import.meta.env?.DEV) {
+  watch(
+    () => [props.virtual, effectiveOptionsView.value, props.view] as const,
+    ([virtual, view, appearance]) => {
+      if (!virtual) return
+
+      if (view !== 'panel') {
+        console.warn(
+          '[granularity] GrSelect: `virtual` работает только с `optionsView="panel"` — '
+          + 'у нативного `<select>` своей панели нет, и виртуализировать нечего.',
+        )
+      }
+      else if (appearance === 'link') {
+        console.warn(
+          '[granularity] GrSelect: `virtual` не сочетается с `view="link"` — ширина панели '
+          + 'там равна ширине отрисованной опции и будет прыгать при прокрутке.',
+        )
+      }
+    },
+    { immediate: true },
+  )
+}
+
 // Навигируемые (видимые, не-disabled) опции панели в порядке рендера вместе с
 // их позицией в `panelItems` — по ней строится `id` для `aria-activedescendant`.
 const navigableItems = computed<{ value: TValue, index: number }[]>(() => {
@@ -677,6 +884,12 @@ function clampActive(index: number): number {
 }
 
 async function scrollActiveIntoView(): Promise<void> {
+  // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
+  // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
+  const active = activeItem.value
+  if (virtualEnabled.value && active)
+    virtualizer.scrollToIndex(active.index + addOffset.value)
+
   await nextTick()
   const id = activeDescendantId.value
   if (!id) return
@@ -1131,9 +1344,12 @@ const themeAttrs = useGrThemeAttrs()
             <div
               v-else
               :id="listboxId"
+              ref="listboxEl"
               data-gr-select-listbox
+              :data-gr-virtual="virtualEnabled ? '' : undefined"
               class="p-1 overflow-auto"
-              :style="{ maxHeight: `${dropdownMaxHeight}px` }"
+              :class="virtualEnabled ? 'flex flex-col' : ''"
+              :style="listboxStyle"
               role="listbox"
               :aria-multiselectable="multiple ? 'true' : undefined"
             >
@@ -1144,13 +1360,14 @@ const themeAttrs = useGrThemeAttrs()
                 контракт combobox с `aria-activedescendant`.
               -->
               <button
-                v-if="canAddCustom"
+                v-if="showAddOption"
                 data-testid="gr-select-add-option"
                 data-gr-select-add-option
                 type="button"
                 role="option"
                 aria-selected="false"
                 tabindex="-1"
+                v-bind="addOptionSetProps"
                 :class="grSelectOptionClass({ view, disabled: false, active: false })"
                 @mousedown.prevent
                 @click="addCustom"
@@ -1158,16 +1375,24 @@ const themeAttrs = useGrThemeAttrs()
                 {{ t('gr.select.addOption', 'Add "{value}"', { value: customValue.trim() }) }}
               </button>
 
-              <template v-for="row in panelRows" :key="row.key">
-                <!-- Группа: заголовок внутри неё и даёт ей имя. -->
+              <template v-for="row in renderedPanelRows" :key="row.key">
+                <!--
+                  Группа: заголовок внутри неё и даёт ей имя. При виртуализации
+                  окно может начаться ниже заголовка — тогда его в DOM нет, и
+                  имя группы идёт напрямую в `aria-label`.
+                -->
                 <div
                   v-if="row.kind === 'group'"
                   data-gr-select-group
                   role="group"
-                  :aria-labelledby="groupLabelId(row.key)"
+                  :class="virtualEnabled ? 'flex flex-col' : ''"
+                  :aria-labelledby="virtualEnabled ? undefined : groupLabelId(row.key)"
+                  :aria-label="virtualEnabled ? row.label : undefined"
                 >
                   <div
+                    v-if="row.labelVisible !== false"
                     :id="groupLabelId(row.key)"
+                    :ref="(el) => virtualEnabled && row.labelIndex !== undefined && virtualizer.measure(row.labelIndex + addOffset, el as Element | null)"
                     data-gr-select-group-label
                     role="presentation"
                     class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
@@ -1181,10 +1406,12 @@ const themeAttrs = useGrThemeAttrs()
                     v-for="child in row.options"
                     :id="optionDomId(child.index)"
                     :key="child.key"
+                    :ref="(el) => virtualEnabled && virtualizer.measure(child.index + addOffset, el as Element | null)"
                     data-gr-select-option
                     type="button"
                     role="option"
                     tabindex="-1"
+                    v-bind="optionSetProps(child.index)"
                     :disabled="child.option.disabled"
                     :aria-selected="isSelected(child.option.value) ? 'true' : 'false'"
                     :aria-disabled="child.option.disabled ? 'true' : undefined"
@@ -1213,10 +1440,12 @@ const themeAttrs = useGrThemeAttrs()
                 <button
                   v-else
                   :id="optionDomId(row.index)"
+                  :ref="(el) => virtualEnabled && virtualizer.measure(row.index + addOffset, el as Element | null)"
                   data-gr-select-option
                   type="button"
                   role="option"
                   tabindex="-1"
+                  v-bind="optionSetProps(row.index)"
                   :disabled="row.option.disabled"
                   :aria-selected="isSelected(row.option.value) ? 'true' : 'false'"
                   :aria-disabled="row.option.disabled ? 'true' : undefined"
@@ -1264,3 +1493,31 @@ const themeAttrs = useGrThemeAttrs()
     </teleport>
   </div>
 </template>
+
+<style scoped>
+/*
+ * Распорки виртуальной панели.
+ *
+ * Не `padding` контейнера: `max-height` меряет ту же коробку. Не обёртка внутри
+ * listbox'а: прямыми потомками роли обязаны быть только опции и группы. Не
+ * отступы крайних строк: при прыжке прокрутки строки заменяются целиком, и
+ * распорка исчезла бы вместе с ними.
+ *
+ * Псевдоэлементы не узлы DOM: размонтировать нечего, детьми роли не считаются,
+ * а высота приезжает переменными в том же патче, что и строки.
+ */
+[data-gr-virtual]::before,
+[data-gr-virtual]::after {
+    content: '';
+    display: block;
+    flex: none;
+}
+
+[data-gr-virtual]::before {
+    height: var(--gr-virtual-before, 0px);
+}
+
+[data-gr-virtual]::after {
+    height: var(--gr-virtual-after, 0px);
+}
+</style>

@@ -37,7 +37,7 @@ describe('GrTree — виртуализация', () => {
     const wrapper = mount(GrTree, { props: { data: flatTree(200), nodeKey: 'id' } })
 
     expect(nodes(wrapper)).toHaveLength(200)
-    expect(wrapper.get('[data-gr-tree]').attributes('data-gr-tree-virtual')).toBeUndefined()
+    expect(wrapper.get('[data-gr-tree]').attributes('data-gr-virtual')).toBeUndefined()
     wrapper.unmount()
   })
 
@@ -67,8 +67,8 @@ describe('GrTree — виртуализация', () => {
     // коробку), ни в отступах крайних строк: строки заменяются целиком при
     // прыжке прокрутки, и вместе с ними исчезла бы распорка.
     expect(style).not.toContain('padding')
-    expect(style).toContain('--gr-tree-virtual-before')
-    expect(style).toContain('--gr-tree-virtual-after')
+    expect(style).toContain('--gr-virtual-before')
+    expect(style).toContain('--gr-virtual-after')
 
     const rows = nodes(wrapper)
     expect(rows[rows.length - 1].attributes('style') ?? '').not.toContain('margin')

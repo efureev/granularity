@@ -222,6 +222,22 @@ describe('useVirtualList', () => {
     expect(list.offset.value + windowSize + list.offsetEnd.value).toBe(list.totalSize.value)
   })
 
+  it('`spacerStyle` отдаёт готовые переменные общего CSS-контракта', async () => {
+    const container = ref<HTMLElement | null>(createScroller(100))
+    const list = setup({ container, count: () => 100, itemSize: 20, overscan: 0 })
+    await nextTick()
+
+    scrollTo(container.value!, 400)
+    await nextTick()
+
+    // Имена приходят готовыми: потребитель не пишет их руками и не может
+    // разойтись с правилом в `<style>` — а разойдись, прокрутки бы не было.
+    expect(list.spacerStyle.value).toEqual({
+      '--gr-virtual-before': `${list.offset.value}px`,
+      '--gr-virtual-after': `${list.offsetEnd.value}px`,
+    })
+  })
+
   it('учитывает зазор между строками: замер коробки его не видит', async () => {
     const container = ref<HTMLElement | null>(createScroller(100))
     const list = setup({ container, count: () => 100, itemSize: 20, gap: 2, overscan: 0 })

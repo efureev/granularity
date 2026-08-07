@@ -63,7 +63,7 @@ describe('GrAutocomplete — виртуализация', () => {
     await wrapper.get('input').trigger('focus')
 
     expect(optionEls()).toHaveLength(300)
-    expect(listbox().getAttribute('data-gr-autocomplete-virtual')).toBeNull()
+    expect(listbox().getAttribute('data-gr-virtual')).toBeNull()
     wrapper.unmount()
   })
 

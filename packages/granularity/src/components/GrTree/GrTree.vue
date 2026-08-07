@@ -251,8 +251,7 @@ const rootStyle = computed(() => {
     ...sizeStyle.value,
     overflow: 'auto',
     maxHeight: virtualMaxHeight.value,
-    '--gr-tree-virtual-before': `${virtualizer.offset.value}px`,
-    '--gr-tree-virtual-after': `${virtualizer.offsetEnd.value}px`,
+    ...virtualizer.spacerStyle.value,
   }
 })
 
@@ -680,7 +679,7 @@ defineExpose<GrTreeInstance<T>>({
       ref="treeRootEl"
       data-gr-tree
       class="gr-tree"
-      :data-gr-tree-virtual="treeProps.virtual ? '' : undefined"
+      :data-gr-virtual="treeProps.virtual ? '' : undefined"
       role="tree"
       :aria-multiselectable="treeProps.showCheckbox ? 'true' : undefined"
       :style="rootStyle"
@@ -873,18 +872,19 @@ defineExpose<GrTreeInstance<T>>({
     gap: var(--gr-tree-gap);
 }
 
-.gr-tree[data-gr-tree-virtual]::before,
-.gr-tree[data-gr-tree-virtual]::after {
+[data-gr-virtual]::before,
+[data-gr-virtual]::after {
     content: '';
+    display: block;
     flex: none;
 }
 
-.gr-tree[data-gr-tree-virtual]::before {
-    height: var(--gr-tree-virtual-before, 0px);
+[data-gr-virtual]::before {
+    height: var(--gr-virtual-before, 0px);
 }
 
-.gr-tree[data-gr-tree-virtual]::after {
-    height: var(--gr-tree-virtual-after, 0px);
+[data-gr-virtual]::after {
+    height: var(--gr-virtual-after, 0px);
 }
 
 .gr-tree__row {

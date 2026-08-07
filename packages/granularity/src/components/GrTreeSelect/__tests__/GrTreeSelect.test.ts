@@ -603,7 +603,7 @@ describe('GrTreeSelect — чекбоксы при multiple', () => {
     await nextTick()
 
     const tree = document.querySelector('[data-gr-tree]') as HTMLElement
-    expect(tree.getAttribute('data-gr-tree-virtual')).toBe('')
+    expect(tree.getAttribute('data-gr-virtual')).toBe('')
     expect(tree.getAttribute('style')).toContain('max-height: 240px')
 
     const container = tree.parentElement!
