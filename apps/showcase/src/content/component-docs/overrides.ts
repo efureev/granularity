@@ -16,6 +16,7 @@ import {
   grCollapseExamples,
   grConfigProviderExamples,
   grEmptyStateExamples,
+  grBreadcrumbsExamples,
   grPopoverExamples,
   grProgressBarExamples,
   grSkeletonExamples,
@@ -269,6 +270,19 @@ const grCommandPaletteOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grBreadcrumbsOverview = {
+  paragraphs: [
+    'Shows where the user is and gives one click back to any level above. Built on GrLink, so it works with any router through `as`.',
+  ],
+  features: [
+    'The current page is announced as such — screen readers answer «where am I»',
+    'Long paths collapse in the middle; the ellipsis expands them in place',
+    'Icons, a custom separator and per-item labels',
+    'Any link component through `as`: Vue Router, Nuxt, Inertia',
+    'Size and separator come from GrConfigProvider — one setting for the whole app',
+  ],
+}
+
 const grPopoverOverview = {
   paragraphs: [
     'Anchored panel with any content you like: settings, a short form, a confirmation. It positions itself against the trigger, flips near the viewport edge and closes on Esc or a click outside.',
@@ -335,6 +349,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrBadgeWrap: createComponentDocMeta(grBadgeWrapExamples),
   GrCard: createComponentDocMeta(grCardExamples),
   GrBottomNav: createComponentDocMeta(grBottomNavExamples),
+  GrBreadcrumbs: createComponentDocMeta(grBreadcrumbsExamples, grBreadcrumbsOverview),
   GrNavbar: createComponentDocMeta(grNavbarExamples),
   GrSidebar: createComponentDocMeta(grSidebarExamples),
   GrButtonGroup: createComponentDocMeta(grButtonGroupExamples),

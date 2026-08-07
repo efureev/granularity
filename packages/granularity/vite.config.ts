@@ -90,6 +90,9 @@ export default defineConfig({
         'components/GrBottomNav/index': fileURLToPath(
           new URL('./src/components/GrBottomNav/index.ts', import.meta.url),
         ),
+        'components/GrBreadcrumbs/index': fileURLToPath(
+          new URL('./src/components/GrBreadcrumbs/index.ts', import.meta.url),
+        ),
         'components/GrButton/index': fileURLToPath(
           new URL('./src/components/GrButton/index.ts', import.meta.url),
         ),

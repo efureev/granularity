@@ -6,7 +6,7 @@ import type {
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
-  navigation: ['GrBottomNav', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
+  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTree'],
@@ -23,6 +23,7 @@ const componentSummaryOverrides = {
   GrBadge: 'A short label for a status, category or counter.',
   GrBadgeWrap: 'Adds a status or count badge on top of an element.',
   GrBottomNav: 'Bottom navigation for the key sections of a mobile interface.',
+  GrBreadcrumbs: 'Shows where the user is and lets them step back up the path.',
   GrButton: 'Triggers the primary action in a form, dialog or panel.',
   GrButtonGroup: 'Groups related buttons into a compact action cluster.',
   GrCard: 'A container for a meaningful block of content and actions.',
@@ -133,6 +134,9 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
   'component:GrRating': {
     group: 'forms',
     tags: ['featured'],
+  },
+  'component:GrBreadcrumbs': {
+    group: 'navigation',
   },
   'component:GrStatistic': {
     group: 'data',

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **New `GrBreadcrumbs` — the path to the current page.** Built on `GrLink`, so any router plugs in the usual way:
+  `as` takes the link component and each item's `to` reaches it as a prop. The last item is the current page: it is not
+  a link and is announced with `aria-current="page"` (`linkCurrent` keeps it clickable without losing the announcement).
+  A long path collapses in the middle — `maxItems`, `itemsBeforeCollapse`, `itemsAfterCollapse` — and the «…» button
+  expands it **in place**, then moves focus onto the first revealed item, because the button disappears together with
+  the collapse. Separators live in their own list items and are `aria-hidden`: the list already conveys the structure,
+  and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
+  `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
+  pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **i18n:** `gr.breadcrumbs.label` and `gr.breadcrumbs.expand` in all three locales.
+
 ## [v0.15.0] 2026-08-07
 
 ### Added

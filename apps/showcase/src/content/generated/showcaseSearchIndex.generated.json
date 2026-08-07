@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 61 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 62 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -438,6 +438,17 @@
     "context": "navigation / component",
     "searchableTitle": "grbottomnav",
     "searchableContent": "grbottomnav grbottomnav bottom navigation for the key sections of a mobile interface. navigation component /components/gr-bottom-nav packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grbottomnav generated public-api components components gr-bottom-nav gr bottom nav"
+  },
+  {
+    "id": "entity:component:GrBreadcrumbs",
+    "title": "GrBreadcrumbs",
+    "description": "Shows where the user is and lets them step back up the path.",
+    "href": "/components/gr-breadcrumbs",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "navigation / component",
+    "searchableTitle": "grbreadcrumbs",
+    "searchableContent": "grbreadcrumbs grbreadcrumbs shows where the user is and lets them step back up the path. navigation component /components/gr-breadcrumbs packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grbreadcrumbs generated public-api components components gr-breadcrumbs gr breadcrumbs"
   },
   {
     "id": "entity:component:GrButton",
@@ -1527,6 +1538,50 @@
     "context": "GrBottomNav",
     "searchableTitle": "grbottomnav integration notes",
     "searchableContent": "grbottomnav bottom navigation for the key sections of a mobile interface. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrBreadcrumbs:section:overview",
+    "title": "GrBreadcrumbs / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-breadcrumbs#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrBreadcrumbs",
+    "searchableTitle": "grbreadcrumbs component overview",
+    "searchableContent": "grbreadcrumbs shows where the user is and lets them step back up the path. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrBreadcrumbs:section:live-examples",
+    "title": "GrBreadcrumbs / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-breadcrumbs#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrBreadcrumbs",
+    "searchableTitle": "grbreadcrumbs live examples",
+    "searchableContent": "grbreadcrumbs shows where the user is and lets them step back up the path. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrBreadcrumbs:section:api",
+    "title": "GrBreadcrumbs / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-breadcrumbs#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrBreadcrumbs",
+    "searchableTitle": "grbreadcrumbs generated api",
+    "searchableContent": "grbreadcrumbs shows where the user is and lets them step back up the path. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrBreadcrumbs:section:integration-notes",
+    "title": "GrBreadcrumbs / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-breadcrumbs#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrBreadcrumbs",
+    "searchableTitle": "grbreadcrumbs integration notes",
+    "searchableContent": "grbreadcrumbs shows where the user is and lets them step back up the path. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrButton:section:overview",

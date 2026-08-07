@@ -20,6 +20,7 @@ import { grAvatarConfig } from '../components/GrAvatar/config'
 import { grBadgeConfig } from '../components/GrBadge/config'
 import { grBadgeWrapConfig } from '../components/GrBadgeWrap/config'
 import { grBottomNavConfig } from '../components/GrBottomNav/config'
+import { grBreadcrumbsConfig } from '../components/GrBreadcrumbs/config'
 import { grButtonConfig } from '../components/GrButton/config'
 import { grButtonGroupConfig } from '../components/GrButtonGroup/config'
 import { grCardConfig } from '../components/GrCard/config'
@@ -114,6 +115,7 @@ export const granularityComponentConfigs = {
   GrBadge: grBadgeConfig,
   GrBadgeWrap: grBadgeWrapConfig,
   GrBottomNav: grBottomNavConfig,
+  GrBreadcrumbs: grBreadcrumbsConfig,
   GrButton: grButtonConfig,
   GrButtonGroup: grButtonGroupConfig,
   GrCard: grCardConfig,

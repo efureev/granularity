@@ -76,6 +76,10 @@
       "types": "./dist/types/src/components/GrBottomNav/index.d.ts",
       "import": "./dist/components/GrBottomNav/index.js"
     },
+    "./components/GrBreadcrumbs": {
+      "types": "./dist/types/src/components/GrBreadcrumbs/index.d.ts",
+      "import": "./dist/components/GrBreadcrumbs/index.js"
+    },
     "./components/GrButton": {
       "types": "./dist/types/src/components/GrButton/index.d.ts",
       "import": "./dist/components/GrButton/index.js"

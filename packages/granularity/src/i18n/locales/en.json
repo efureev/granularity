@@ -37,6 +37,10 @@
     "sortDesc": "Activate to sort descending",
     "sortNone": "Activate to remove sorting"
   },
+  "breadcrumbs": {
+    "label": "Breadcrumb",
+    "expand": "Show hidden path"
+  },
   "autocomplete": {
     "loading": "Loading…",
     "noResults": "No results",

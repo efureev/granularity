@@ -556,6 +556,122 @@
       }
     ]
   },
+  "GrBreadcrumbs": {
+    "name": "GrBreadcrumbs",
+    "sourcePath": "packages/granularity/src/components/GrBreadcrumbs/GrBreadcrumbs.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя лендмарка. Не задано — берётся из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "as",
+            "description": "Компонент ссылки для всех пунктов: `RouterLink`, `NuxtLink`, `Link` Inertia.",
+            "type": "GrBreadcrumbsLinkComponent | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "separator",
+            "description": "Разделитель между пунктами. Декоративен: диктору не читается.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxItems",
+            "description": "С какого числа пунктов схлопывать середину в «…». `0`/не задано — показывать путь целиком.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "itemsBeforeCollapse",
+            "description": "Сколько пунктов оставить в начале при схлопывании.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "itemsAfterCollapse",
+            "description": "Сколько пунктов оставить в конце при схлопывании.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "linkCurrent",
+            "description": "Последний пункт остаётся ссылкой (текущая страница кликабельна).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "expandLabel",
+            "description": "i18n-метка кнопки раскрытия схлопнутого пути.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "items",
+            "description": "Путь от корня к текущей странице. Последний пункт — текущая страница.",
+            "type": "GrBreadcrumbItem[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "item",
+            "description": "Содержимое пункта целиком (иконка и подпись).",
+            "type": "{ item: GrBreadcrumbItem; index: number; isCurrent: boolean; }"
+          },
+          {
+            "name": "separator",
+            "description": "Разделитель между пунктами.",
+            "type": "any"
+          },
+          {
+            "name": "ellipsis",
+            "description": "Кнопка раскрытия схлопнутой середины.",
+            "type": "{ hiddenCount: number; expand: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrButton": {
     "name": "GrButton",
     "sourcePath": "packages/granularity/src/components/GrButton/GrButton.vue",
@@ -636,18 +752,18 @@
             "default": "undefined"
           },
           {
-            "name": "block",
-            "description": "Кнопка на всю ширину контейнера.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "as",
             "description": "Полиморфизм: кастомный корневой тег/компонент (например, RouterLink).",
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "block",
+            "description": "Кнопка на всю ширину контейнера.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "href",

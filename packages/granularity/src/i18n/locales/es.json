@@ -37,6 +37,10 @@
     "sortDesc": "Active para ordenar de forma descendente",
     "sortNone": "Active para quitar la ordenación"
   },
+  "breadcrumbs": {
+    "label": "Ruta de navegación",
+    "expand": "Mostrar la ruta oculta"
+  },
   "autocomplete": {
     "loading": "Cargando…",
     "noResults": "Sin resultados",

@@ -28,6 +28,7 @@
 - `GrBadge`
 - `GrBadgeWrap`
 - `GrBottomNav`
+- [`GrBreadcrumbs`](./components/GrBreadcrumbs.md)
 - [`GrButton`](./components/GrButton.md)
 - `GrButtonGroup`
 - [`GrCard`](./components/GrCard.md)
