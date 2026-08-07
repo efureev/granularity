@@ -26,7 +26,7 @@
 - [`GrAutocomplete`](./components/GrAutocomplete.md)
 - [`GrAvatar`](./components/GrAvatar.md)
 - `GrBadge`
-- `GrBadgeWrap`
+- [`GrBadgeWrap`](./components/GrBadgeWrap.md)
 - `GrBottomNav`
 - [`GrBreadcrumbs`](./components/GrBreadcrumbs.md)
 - [`GrButton`](./components/GrButton.md)

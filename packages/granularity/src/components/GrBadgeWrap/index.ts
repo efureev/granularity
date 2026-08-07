@@ -1,3 +1,7 @@
 export { default } from './GrBadgeWrap.vue'
 export { default as GrBadgeWrap } from './GrBadgeWrap.vue'
+export type { GrBadgeWrapProps } from './GrBadgeWrap.vue'
 export { grBadgeWrapConfig } from './config'
+export { formatBadgeValue, GR_BADGE_WRAP_PLACEMENTS } from './grBadgeWrapStyles'
+export type { GrBadgeWrapPlacement, GrBadgeWrapTone } from './grBadgeWrapStyles'
+export { grBadgeWrapSafelist } from './safelist'

@@ -14,6 +14,9 @@
     "empty": "Sin datos",
     "loading": "Cargando…"
   },
+  "badgeWrap": {
+    "count": "{count} nuevos"
+  },
   "avatar": {
     "group": "Personas",
     "groupOverflow": "y {count} más",

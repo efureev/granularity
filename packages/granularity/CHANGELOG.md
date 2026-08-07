@@ -41,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrBadgeWrap`: `max`, `showZero`, `tone` and `placement`.** `max` collapses a large count into «99+» while the
+  screen reader still hears the real number — «99 plus» tells nobody anything. Zero is now hidden by default (an empty
+  circle on an icon reads as a bug) and `showZero` brings it back where zero is a meaningful state. `tone` picks the
+  badge colour from the package scale instead of the hardcoded red, and `placement` moves the badge to any of the four
+  corners; the offset is a customisation point — `--gr-badge-wrap-offset-x/y`. The pure `formatBadgeValue(value, max)`
+  is exported. New i18n key `gr.badgeWrap.count` in all three locales.
 - **`GrAvatar`: `name`, `status`, `fallbackSrc` and a new `GrAvatarGroup`.** `name` produces the initials and the
   accessible name — a circle of initials used to be nameless for a screen reader. `status` draws a dot and announces
   it in words, because colour alone carries no meaning. `GrAvatarGroup` stacks avatars with a «+N» counter and names
@@ -181,6 +187,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrBadgeWrap`'s counter did not exist for a screen reader.** The number was marked `aria-hidden` with no text
+  alternative next to it, so «Inbox» was announced and «3 unread» was silently dropped — on the one component whose
+  entire job is to report unread items. The number stays decorative, but a visually hidden label now carries the count
+  in words; `ariaLabel` overrides the wording and also gives the dot mode a voice, which it never had.
+- **`GrBadgeWrap` hardcoded its font size and colour.** The counter used a literal `text-[11px]` and `--gr-danger`
+  regardless of context; it now takes the new `--gr-text-2xs` step and the tone scale, with the text colour coming from
+  the paired `--gr-<tone>-fg` token so the badge survives a theme switch.
 - **`GrAvatar` showed the browser's broken-image icon.** The `<img>` had no `@error` handler and the fallback slot
   sat under `v-else` of `src`, so a dead CDN link — the usual failure for avatars — rendered a broken image and the
   slot never appeared. The component now falls through `fallbackSrc` to initials, resets that state when `src`

@@ -4,11 +4,11 @@ import { GrAvatar, GrBadgeWrap, GrCard } from '@feugene/granularity'
 
 <template>
   <div class="flex flex-wrap items-center gap-6">
-    <GrBadgeWrap dot>
+    <GrBadgeWrap dot aria-label="Unread messages">
       <GrAvatar :size="40">AD</GrAvatar>
     </GrBadgeWrap>
 
-    <GrBadgeWrap dot>
+    <GrBadgeWrap dot tone="warning">
       <GrAvatar :size="40" shape="square">QA</GrAvatar>
     </GrBadgeWrap>
 

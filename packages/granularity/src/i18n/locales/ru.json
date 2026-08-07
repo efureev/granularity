@@ -14,6 +14,9 @@
     "empty": "Нет данных",
     "loading": "Загрузка…"
   },
+  "badgeWrap": {
+    "count": "{count} новых"
+  },
   "avatar": {
     "group": "Участники",
     "groupOverflow": "и ещё {count}",

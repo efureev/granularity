@@ -486,6 +486,20 @@
         "origin": "generated",
         "items": [
           {
+            "name": "tone",
+            "description": "",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"danger\""
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Подпись счётчика для скринридера. Не задана — берётся из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "value",
             "description": "",
             "type": "string | number | undefined",
@@ -494,10 +508,31 @@
           },
           {
             "name": "dot",
-            "description": "",
+            "description": "Точка вместо числа: чистая декорация, если не задан `ariaLabel`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "max",
+            "description": "Порог: значения больше него рисуются как «{max}+».",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showZero",
+            "description": "Показывать ли нулевое значение. По умолчанию ноль скрыт.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "placement",
+            "description": "",
+            "type": "\"top-right\" | \"top-left\" | \"bottom-right\" | \"bottom-left\" | undefined",
+            "required": false,
+            "default": "\"top-right\""
           }
         ]
       },
@@ -2620,18 +2655,18 @@
             "default": "false"
           },
           {
-            "name": "width",
-            "description": "Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту.",
-            "type": "GrDropdownWidth | undefined",
-            "required": false,
-            "default": "\"12rem\""
-          },
-          {
             "name": "placement",
             "description": "Размещение панели относительно триггера; `flip` при нехватке места остаётся.",
             "type": "Placement | undefined",
             "required": false,
             "default": "\"bottom-end\""
+          },
+          {
+            "name": "width",
+            "description": "Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту.",
+            "type": "GrDropdownWidth | undefined",
+            "required": false,
+            "default": "\"12rem\""
           },
           {
             "name": "offset",
@@ -2732,6 +2767,13 @@
             "default": "false"
           },
           {
+            "name": "placement",
+            "description": "Размещение панели относительно триггера; переворот при нехватке места остаётся.",
+            "type": "Placement | undefined",
+            "required": false,
+            "default": "\"bottom-end\""
+          },
+          {
             "name": "items",
             "description": "Декларативное меню: пункты, группы и разделители массивом. Слот по умолчанию сильнее — он для меню, которое из модели не собирается.",
             "type": "GrDropdownMenuEntry[] | undefined",
@@ -2744,13 +2786,6 @@
             "type": "GrDropdownWidth | undefined",
             "required": false,
             "default": "\"12rem\""
-          },
-          {
-            "name": "placement",
-            "description": "Размещение панели относительно триггера; переворот при нехватке места остаётся.",
-            "type": "Placement | undefined",
-            "required": false,
-            "default": "\"bottom-end\""
           },
           {
             "name": "offset",
@@ -4508,6 +4543,13 @@
             "default": "true"
           },
           {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -4527,13 +4569,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "max",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "addOnBlur",
@@ -5380,6 +5415,13 @@
             "default": "undefined"
           },
           {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "id",
             "description": "",
             "type": "string | undefined",
@@ -5462,13 +5504,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "max",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "decimalSeparator",
@@ -5797,18 +5832,18 @@
             "default": "undefined"
           },
           {
-            "name": "closeOnEsc",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
             "name": "placement",
             "description": "",
             "type": "Placement | undefined",
             "required": false,
             "default": "\"bottom-start\""
+          },
+          {
+            "name": "closeOnEsc",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           },
           {
             "name": "trigger",
@@ -6654,6 +6689,13 @@
             "default": "false"
           },
           {
+            "name": "max",
+            "description": "Количество символов шкалы.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "5"
+          },
+          {
             "name": "compact",
             "description": "Компактный вид: рисуются только заполненные символы. Осмысленно вместе с `readonly` — в списках и таблицах пять звёзд в каждой строке съедают ширину.",
             "type": "boolean | undefined",
@@ -6666,13 +6708,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "max",
-            "description": "Количество символов шкалы.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "5"
           },
           {
             "name": "allowHalf",
@@ -7579,6 +7614,13 @@
             "default": "undefined"
           },
           {
+            "name": "max",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "100"
+          },
+          {
             "name": "orientation",
             "description": "Ориентация дорожки. В вертикальной минимум внизу.",
             "type": "\"horizontal\" | \"vertical\" | undefined",
@@ -7591,13 +7633,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "max",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "100"
           },
           {
             "name": "step",
@@ -8513,6 +8548,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "placement",
+            "description": "Угол экрана для стека уведомлений.",
+            "type": "GrToasterPlacement | undefined",
+            "required": false,
+            "default": "\"top-right\""
+          },
+          {
             "name": "regionLabel",
             "description": "A11y-лейбл контейнера-региона (i18n).",
             "type": "string | undefined",
@@ -8525,13 +8567,6 @@
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "placement",
-            "description": "Угол экрана для стека уведомлений.",
-            "type": "GrToasterPlacement | undefined",
-            "required": false,
-            "default": "\"top-right\""
           },
           {
             "name": "dismissLabel",
