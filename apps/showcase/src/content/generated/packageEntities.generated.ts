@@ -1,4 +1,5 @@
 import {
+  useAnnouncer,
   useDialogService,
   useTheme,
   useToast,
@@ -35,6 +36,7 @@ const preferredUtilityExportOrder = [
 ] as const
 
 const publicComposableExports = {
+  useAnnouncer,
   useDialogService,
   useTheme,
   useToast,

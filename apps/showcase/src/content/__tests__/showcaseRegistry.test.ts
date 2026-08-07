@@ -20,7 +20,7 @@ describe('showcase content registry', () => {
   it('подтягивает package-level exports для directives, composables и fileValidation utilities', () => {
     expect(showcaseDirectiveEntities.map(entity => entity.name)).toContain('vLoading')
     expect(showcaseDirectiveEntities.map(entity => entity.name)).toContain('createLoading')
-    expect(showcaseComposableEntities.map(entity => entity.name)).toEqual(['useDialogService', 'useTheme', 'useToast'])
+    expect(showcaseComposableEntities.map(entity => entity.name)).toEqual(['useAnnouncer', 'useDialogService', 'useTheme', 'useToast'])
     expect(showcaseUtilityEntities.map(entity => entity.name)).toContain('runFileValidators')
     expect(showcaseUtilityEntities.map(entity => entity.name)).toContain('maxTotalSizeBytesValidator')
   })
@@ -71,6 +71,7 @@ describe('showcase content registry', () => {
       'vHotkey',
       'vLoading',
       'createLoading',
+      'useAnnouncer',
       'useTheme',
       'useToast',
       'acceptValidator',
@@ -90,7 +91,7 @@ describe('showcase content registry', () => {
       'vLoading',
       'createLoading',
     ])
-    expect(showcaseComposableEntities.map(entity => entity.name)).toEqual(['useDialogService', 'useTheme', 'useToast'])
+    expect(showcaseComposableEntities.map(entity => entity.name)).toEqual(['useAnnouncer', 'useDialogService', 'useTheme', 'useToast'])
     expect(utilityNames).toEqual([
       'FileValidationError',
       'normalizeFiles',

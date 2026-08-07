@@ -1,0 +1,18 @@
+{
+  "idle": "Nothing announced yet.",
+  "lastLabel": "Last announcement",
+  "regionLabel": "Region",
+  "hint": "A live region is invisible by nature — this card mirrors exactly what a screen reader would say.",
+  "polite": {
+    "trigger": "Copy link (polite)",
+    "message": "Link copied"
+  },
+  "assertive": {
+    "trigger": "Simulate a failure (assertive)",
+    "message": "Could not save: no connection"
+  },
+  "results": {
+    "trigger": "Filter the list",
+    "message": "{count} results found"
+  }
+}

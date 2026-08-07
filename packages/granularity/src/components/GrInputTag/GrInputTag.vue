@@ -8,6 +8,7 @@ import IconClose from '~icons/lucide/x'
 import IconLoader from '~icons/lucide/loader-2'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
@@ -160,15 +161,9 @@ const isMaxed = computed(() => props.max !== undefined && props.modelValue.lengt
 const canEdit = computed(() => !isDisabled.value && !isReadonly.value)
 const showRemove = computed(() => props.tagClosable && canEdit.value)
 
-/**
- * Живой регион существует с первого рендера и пуст, пока объявлять нечего:
- * регион, появляющийся сразу с текстом, часть AT не объявляет вовсе.
- */
-const liveMessage = ref('')
-
-function announce(message: string): void {
-  liveMessage.value = message
-}
+// Добавление, удаление и достигнутый предел — события, а не состояние виджета:
+// показывать их негде, объявить нужно. Это работа общего живого региона.
+const { announce } = useAnnouncer()
 
 /**
  * Roving tabindex по крестикам: двадцать тегов давали двадцать одну остановку
@@ -566,12 +561,5 @@ defineExpose({ focus, blur, clear: clearAll })
         <IconClose />
       </GrIcon>
     </button>
-
-    <span
-      data-gr-input-tag-live
-      class="sr-only"
-      role="status"
-      aria-live="polite"
-    >{{ liveMessage }}</span>
   </div>
 </template>

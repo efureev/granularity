@@ -175,6 +175,31 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
     group: 'overlays',
     tags: ['featured'],
   },
+  'composable:useAnnouncer': {
+    summary: 'One `aria-live` channel for the whole app: announce «copied», «row deleted» or «12 results» to a screen reader from any place in the code, with no markup of your own.',
+    group: 'runtime',
+    tags: ['featured', 'a11y'],
+    examples: [
+      {
+        id: 'use-announcer-polite',
+        title: 'Polite announcement',
+        description: 'A transient event with nowhere to render: the clipboard copy is announced and nothing changes on screen.',
+        status: 'ready',
+      },
+      {
+        id: 'use-announcer-assertive',
+        title: 'Assertive announcement',
+        description: 'A failure interrupts speech — reserved for what must not be missed.',
+        status: 'ready',
+      },
+      {
+        id: 'use-announcer-results',
+        title: 'Filter results with auto-clear',
+        description: 'The result count is announced and wiped afterwards so a virtual cursor never meets a stale number.',
+        status: 'ready',
+      },
+    ],
+  },
   'composable:useTheme': {
     summary: 'The composables showcase already uses `useTheme()` in the app shell, so it becomes the first runnable recipe.',
     group: 'runtime',

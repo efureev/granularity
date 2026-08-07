@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
+import { useAnnouncer } from '../../composables/useAnnouncer'
 import { usePortalTarget } from '../../composables/usePortalTarget'
 import { useFocusTrap } from '../../composables/useFocusTrap'
 import { useInertOthers } from '../../composables/internal/useInertOthers'
@@ -272,16 +273,17 @@ const currentAlt = computed(() => currentItem.value?.alt ?? '')
 const displayIndex = computed(() => (hasImages.value ? currentIndex.value + 1 : 0))
 
 /**
- * Живой регион пуст до первой смены кадра: регион, который появляется сразу с
- * текстом, часть AT не объявляет вовсе, а объявлять «изображение 1 из 5» в
- * момент открытия и незачем — это скажет имя диалога.
+ * Позицию объявляем только на смене кадра: при открытии её скажет имя диалога.
+ *
+ * Регион общий и живёт вне просмотрщика — он помечен `data-gr-live-region` и
+ * потому не гасится `inert`, которым просмотрщик накрывает страницу.
  */
-const liveMessage = ref('')
+const { announce } = useAnnouncer()
 
 watch(displayIndex, (index) => {
-  liveMessage.value = hasImages.value
-    ? t('gr.imageViewer.position', 'Image {index} of {total}', { index, total: total.value })
-    : ''
+  if (!hasImages.value) return
+
+  announce(t('gr.imageViewer.position', 'Image {index} of {total}', { index, total: total.value }))
 })
 
 // Просмотрщик — оверлей модального класса, значит и слой у него модальный.
@@ -679,13 +681,6 @@ onBeforeUnmount(() => {
                   >
                     {{ displayIndex }} / {{ total }}
                   </div>
-
-                  <span
-                    data-gr-image-viewer-live
-                    class="sr-only"
-                    role="status"
-                    aria-live="polite"
-                  >{{ liveMessage }}</span>
 
                   <div
                     v-if="showZoomValue"

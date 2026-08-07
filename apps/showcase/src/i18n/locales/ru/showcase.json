@@ -581,6 +581,7 @@
       "createLoading": "Helper-API рядом с `vLoading`, который требует отдельной демонстрации imperative сценариев."
     },
     "composable": {
+      "useAnnouncer": "Общий живой регион `aria-live`: объявить «скопировано», «строка удалена» или «найдено 12» скринридеру из любого места кода, не заводя своей разметки.",
       "useTheme": "Composables showcase уже использует `useTheme()` в app shell, поэтому он станет первым runnable recipe.",
       "useToast": "Toast orchestration composable для будущих feedback/demo сценариев.",
       "useDialogService": "Императивный сервис диалогов (в духе `ElMessageBox`): `confirm` / `prompt` / `alert` вызываются прямо из `<script>`/`.ts` без вставки компонента в шаблон и возвращают Promise."

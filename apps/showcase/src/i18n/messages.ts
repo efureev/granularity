@@ -17,6 +17,7 @@ export const showcaseLocaleLoaders = {
     ['components.GrInput']: () => import('./locales/en/components/GrInput.json'),
     ['components.GrSegmented']: () => import('./locales/en/components/GrSegmented.json'),
     ['components.GrSwitch']: () => import('./locales/en/components/GrSwitch.json'),
+    ['composables.useAnnouncer']: () => import('./locales/en/composables/useAnnouncer.json'),
     ['composables.useDialogService']: () => import('./locales/en/composables/useDialogService.json'),
   },
   ru: {
@@ -33,6 +34,7 @@ export const showcaseLocaleLoaders = {
     ['components.GrInput']: () => import('./locales/ru/components/GrInput.json'),
     ['components.GrSegmented']: () => import('./locales/ru/components/GrSegmented.json'),
     ['components.GrSwitch']: () => import('./locales/ru/components/GrSwitch.json'),
+    ['composables.useAnnouncer']: () => import('./locales/ru/composables/useAnnouncer.json'),
     ['composables.useDialogService']: () => import('./locales/ru/composables/useDialogService.json'),
   },
 } satisfies LocaleLoaderCollection

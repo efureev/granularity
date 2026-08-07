@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('~icons/lucide/x', () => {
   return {
@@ -22,7 +22,22 @@ vi.mock('~icons/lucide/loader-2', () => {
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
+import { resetAnnouncer } from '../../../composables/useAnnouncer'
 import GrInputTag from '../GrInputTag.vue'
+
+/**
+ * События набора уходят в общий живой регион (`useAnnouncer`), а не в узел
+ * компонента: текст там появляется отложенным макротаском — иначе повтор того
+ * же сообщения не давал бы мутации и не читался.
+ */
+async function announced(): Promise<string> {
+  await new Promise(resolve => setTimeout(resolve, 2))
+  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
+}
+
+afterEach(() => {
+  resetAnnouncer()
+})
 
 describe('GrInputTag', () => {
   it('добавляет тег по Enter', async () => {
@@ -173,7 +188,7 @@ describe('GrInputTag — предел набора', () => {
     await input.trigger('keydown', { key: 'Enter' })
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
-    expect(wrapper.get('[data-gr-input-tag-live]').text()).toBe('Tag limit reached')
+    expect(await announced()).toBe('Tag limit reached')
   })
 })
 
@@ -274,7 +289,7 @@ describe('GrInputTag — клавиатура по чипам', () => {
     await wrapper.findAll('[data-gr-input-tag-remove]')[1].trigger('keydown', { key: 'Delete' })
 
     expect(wrapper.emitted('remove')?.at(-1)).toEqual(['ts', 1])
-    expect(wrapper.get('[data-gr-input-tag-live]').text()).toBe('Tag removed: ts')
+    expect(await announced()).toBe('Tag removed: ts')
     wrapper.unmount()
   })
 
@@ -362,7 +377,7 @@ describe('GrInputTag — clearable и размер', () => {
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
     expect(wrapper.emitted('clear')).toHaveLength(1)
-    expect(wrapper.get('[data-gr-input-tag-live]').text()).toBe('All tags removed')
+    expect(await announced()).toBe('All tags removed')
   })
 
   it('кнопки нет на пустом наборе и в readonly', () => {

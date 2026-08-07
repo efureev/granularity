@@ -327,7 +327,7 @@
     "kindLabel": "Section",
     "context": "Composables",
     "searchableTitle": "composables `usetoast` scenarios",
-    "searchableContent": "composables страницы для `usetheme` и `usetoast` с runnable integration recipes. use-toast `usetoast` scenarios здесь появятся интерактивные примеры push/dismiss/clear и варианты уведомлении . текущии реестр composables уже содержит usedialogservice и usetheme и usetoast. очистка очереди и управление жизненным циклом toast-сообщении . пояснения по expected usage и интеграционным паттернам."
+    "searchableContent": "composables страницы для `usetheme` и `usetoast` с runnable integration recipes. use-toast `usetoast` scenarios здесь появятся интерактивные примеры push/dismiss/clear и варианты уведомлении . текущии реестр composables уже содержит useannouncer и usedialogservice и usetheme и usetoast. очистка очереди и управление жизненным циклом toast-сообщении . пояснения по expected usage и интеграционным паттернам."
   },
   {
     "id": "page:composables:section:integration-recipes",
@@ -1131,6 +1131,17 @@
     "context": "overlays / directive",
     "searchableTitle": "createloading",
     "searchableContent": "createloading createloading a helper api alongside `vloading` that needs a separate demonstration of imperative scenarios. overlays directive /directives/create-loading packages/granularity/src/directives/index.ts @feugene/granularity/directives generated public-api featured directives directives create-loading create loading"
+  },
+  {
+    "id": "entity:composable:useAnnouncer",
+    "title": "useAnnouncer",
+    "description": "One `aria-live` channel for the whole app: announce «copied», «row deleted» or «12 results» to a screen reader from any place in the code, with no markup of your own.",
+    "href": "/composables/use-announcer",
+    "kind": "entity",
+    "kindLabel": "composable",
+    "context": "runtime / composable",
+    "searchableTitle": "useannouncer",
+    "searchableContent": "useannouncer useannouncer one `aria-live` channel for the whole app: announce copied , row deleted or 12 results to a screen reader from any place in the code, with no markup of your own. runtime composable /composables/use-announcer packages/granularity/src/index.ts @feugene/granularity generated public-api featured a11y composables composables use-announcer use announcer"
   },
   {
     "id": "entity:composable:useDialogService",
@@ -4376,6 +4387,61 @@
     "context": "createLoading",
     "searchableTitle": "createloading integration notes",
     "searchableContent": "createloading a helper api alongside `vloading` that needs a separate demonstration of imperative scenarios. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
+  },
+  {
+    "id": "entity:composable:useAnnouncer:section:overview",
+    "title": "useAnnouncer / Package overview",
+    "description": "Краткий контекст по роли сущности, её месту в пакете и практическому применению.",
+    "href": "/composables/use-announcer#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useAnnouncer",
+    "searchableTitle": "useannouncer package overview",
+    "searchableContent": "useannouncer one `aria-live` channel for the whole app: announce copied , row deleted or 12 results to a screen reader from any place in the code, with no markup of your own. overview package overview краткии контекст по роли сущности, ее месту в пакете и практическому применению. фиксируем, какую задачу решает composable/directive/utility и где она полезна в продукте. показываем hand-authored summary и narrative notes, которых недостаточно в generated metadata. дае м быстрыи вход в api и практические integration patterns без переходов по нескольким страницам."
+  },
+  {
+    "id": "entity:composable:useAnnouncer:section:examples",
+    "title": "useAnnouncer / Live examples",
+    "description": "Каждая example-card показывает отдельный integration pattern и остаётся runnable reference.",
+    "href": "/composables/use-announcer#examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useAnnouncer",
+    "searchableTitle": "useannouncer live examples",
+    "searchableContent": "useannouncer one `aria-live` channel for the whole app: announce copied , row deleted or 12 results to a screen reader from any place in the code, with no markup of your own. examples live examples каждая example-card показывает отдельныи integration pattern и остае тся runnable reference. примеры должны объяснять реальныи use-case, а не только синтаксис вызова. preview и snippet рядом позволяют быстро сравнить happy-path и edge cases. плановые сценарии остаются явно отмеченными, чтобы roadmap был виден прямо на detail page."
+  },
+  {
+    "id": "entity:composable:useAnnouncer:section:api",
+    "title": "useAnnouncer / API",
+    "description": "Package-level API документируется вручную и фокусируется на параметрах, return shape и error contract.",
+    "href": "/composables/use-announcer#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useAnnouncer",
+    "searchableTitle": "useannouncer api",
+    "searchableContent": "useannouncer one `aria-live` channel for the whole app: announce copied , row deleted or 12 results to a screen reader from any place in the code, with no markup of your own. api api package-level api документируется вручную и фокусируется на параметрах, return shape и error contract. команды видят не только сигнатуру, но и expected data shape для интеграции в feature-code. ошибки, caveats и ограничения держатся рядом с основнои api-таблицеи . структура остае тся совместимои с будущеи генерациеи metadata для package-level сущностеи ."
+  },
+  {
+    "id": "entity:composable:useAnnouncer:section:usage",
+    "title": "useAnnouncer / Usage",
+    "description": "Canonical import, практические рекомендации и caveats должны быть доступны в одном месте.",
+    "href": "/composables/use-announcer#usage",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useAnnouncer",
+    "searchableTitle": "useannouncer usage",
+    "searchableContent": "useannouncer one `aria-live` channel for the whole app: announce copied , row deleted or 12 results to a screen reader from any place in the code, with no markup of your own. usage usage canonical import, практические рекомендации и caveats должны быть доступны в одном месте. copy-ready import и usage snippets сокращают время на старт интеграции. caveats показывают, где потребуется дополнительная бизнес-логика или ui-обвязка. этот блок остае тся главным bridge между docs и реальным application code."
+  },
+  {
+    "id": "entity:composable:useAnnouncer:section:integration",
+    "title": "useAnnouncer / Integration notes",
+    "description": "Ссылки на исходники, docs и зависимости помогают быстрее разобраться в связанной экосистеме пакета.",
+    "href": "/composables/use-announcer#integration",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "useAnnouncer",
+    "searchableTitle": "useannouncer integration notes",
+    "searchableContent": "useannouncer one `aria-live` channel for the whole app: announce copied , row deleted or 12 results to a screen reader from any place in the code, with no markup of your own. integration integration notes ссылки на исходники, docs и зависимости помогают быстрее разобраться в связаннои экосистеме пакета. source links должны вести к реальным package-фаи лам, а не к абстрактным import paths. related docs и registry links ускоряют discoverability для новых участников команды. dependencies и integration notes помогают увидеть контекст использования без чтения всего пакета."
   },
   {
     "id": "entity:composable:useDialogService:section:overview",

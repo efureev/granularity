@@ -2,6 +2,99 @@ import { createReadyExamples } from './shared'
 import type { PackageDocOverride } from './types'
 
 export const composablePackageDocOverrides: Record<string, PackageDocOverride> = {
+  useAnnouncer: {
+    overview: [
+      '`useAnnouncer` — общий живой регион (`aria-live`) пакета: один канал объявлений на документ, из которого приложение говорит скринридеру то, что произошло, но не отрисовалось.',
+      'Граница простая: состояние виджета («загружается», «осталось 12 символов») остаётся своим регионом внутри виджета, а событие («скопировано», «строка удалена») уходит объявителю — своего места в разметке у него нет.',
+      'Композабл не требует setup-контекста: его зовут из стора, обработчика или перехватчика запросов. Внутри пакета на нём уже работают `GrInputTag` и `GrImageViewer`.',
+    ],
+    examples: createReadyExamples([
+      {
+        id: 'use-announcer-polite',
+        title: 'Polite: событие без отражения в UI',
+        description: 'Копирование в буфер — классический случай: визуально не меняется ничего, и без объявления для незрячего пользователя нажатие выглядит как «ничего не произошло».',
+        previewKey: 'use-announcer-polite',
+        code: [
+          "import { useAnnouncer } from '@feugene/granularity'",
+          '',
+          'const { announce } = useAnnouncer()',
+          '',
+          'async function copyLink(url: string) {',
+          '  await navigator.clipboard.writeText(url)',
+          "  announce('Ссылка скопирована')",
+          '}',
+        ].join('\n'),
+        note: 'По умолчанию `polite`: диктор дочитает начатое и только потом скажет сообщение.',
+      },
+      {
+        id: 'use-announcer-assertive',
+        title: 'Assertive: то, что нельзя пропустить',
+        description: '`assertive` прерывает текущую речь. Уместен для отказа операции и потери соединения — и только для них: поток ассертивных объявлений делает страницу неработающей.',
+        previewKey: 'use-announcer-assertive',
+        code: [
+          "import { useAnnouncer } from '@feugene/granularity'",
+          '',
+          'const { announce } = useAnnouncer()',
+          '',
+          'function onSaveFailed(reason: string) {',
+          '  announce(`Не удалось сохранить: ${reason}`, { politeness: \'assertive\' })',
+          '}',
+        ].join('\n'),
+        note: 'Ассертивный регион — `role="alert"`; полайтный — `role="status"`. Оба стоят в документе заранее и пусты до первого сообщения.',
+      },
+      {
+        id: 'use-announcer-results',
+        title: 'Результат фильтрации с автоочисткой',
+        description: 'Число найденного меняется от ввода к вводу, поэтому объявление живёт недолго: `clearAfterMs` стирает текст, чтобы пользователь виртуального курсора не наткнулся на устаревшее число при обходе страницы.',
+        previewKey: 'use-announcer-results',
+        code: [
+          "import { useAnnouncer } from '@feugene/granularity'",
+          '',
+          'const { announce } = useAnnouncer()',
+          '',
+          'function onFiltered(count: number) {',
+          '  announce(`Найдено ${count}`, { clearAfterMs: 4000 })',
+          '}',
+        ].join('\n'),
+        note: '`clearAfterMs: 0` оставляет текст навсегда — так стоит делать только с тем, что остаётся правдой.',
+      },
+    ]),
+    apiSections: [
+      {
+        key: 'parameters',
+        title: 'announce(message, options)',
+        origin: 'manual',
+        items: [
+          { name: 'message', type: 'string', description: 'Текст объявления. Пустая строка игнорируется.' },
+          { name: 'politeness', type: "'polite' | 'assertive'", description: 'Куда писать: `status`-регион (по умолчанию) или `alert`-регион, прерывающий речь.' },
+          { name: 'clearAfterMs', type: 'number', description: 'Через сколько мс стереть текст. По умолчанию `7000`; `0` — не стирать.' },
+        ],
+      },
+      {
+        key: 'returns',
+        title: 'Returns',
+        origin: 'manual',
+        items: [
+          { name: 'announce(message, options?)', type: '(message: string, options?: GrAnnounceOptions) => void', description: 'Объявляет сообщение выбранным регионом.' },
+          { name: 'clear(politeness?)', type: "(politeness?: 'polite' | 'assertive') => void", description: 'Стирает текст региона; без аргумента — обоих.' },
+        ],
+      },
+    ],
+    usage: [
+      'Зовите `useAnnouncer()` в `setup`, если можете: регион встанет в документ заранее, а часть AT не объявляет регион, который появляется сразу с текстом.',
+      'Для события, у которого нет места в разметке, — объявитель. Для состояния, которое виджет и так рендерит, — свой регион рядом с содержимым.',
+      '`assertive` — только для отказа операции и потери соединения.',
+    ],
+    caveats: [
+      'Регион один на документ, а не на приложение: это сток в единственный канал AT страницы, и два региона не изолируют приложения, а рискуют объявить одно и то же дважды. Плагина у объявителя поэтому нет.',
+      'На сервере `announce()` — no-op: живой регион это узел документа, переносить между запросами нечего. Ни `ClientOnly`, ни клиентской проверки не нужно.',
+      'Хост помечен `data-gr-live-region` и не гасится `inert` при открытии модалки — иначе объявитель молчал бы ровно там, где «сохранено» и «ошибка сети» и нужны.',
+    ],
+    integrationNotes: [
+      'Внутри пакета на объявителе уже работают `GrInputTag` (добавление, удаление, предел набора) и `GrImageViewer` (смена кадра из-под собственного `inert`).',
+      'Восемь остальных живых регионов пакета остаются на местах намеренно: они рендерят состояние своего виджета, а не транзитивное событие.',
+    ],
+  },
   useTheme: {
     overview: [
       '`useTheme` хранит текущую тему приложения, переключает CSS-state на `document.documentElement` и умеет работать как с persistence, так и без неё.',

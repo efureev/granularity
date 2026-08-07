@@ -9,6 +9,7 @@ import {
   GrDrawer,
   GrFileUpload,
   GrImageViewer,
+  GrInputTag,
   GrKbd,
   GrSegmented,
   GrSlider,
@@ -28,7 +29,10 @@ import {
  *     хоткея из `navigator`: сервер отдавал `Ctrl`, клиент на macOS — `⌘`;
  *  3. **нестабильные id** — `GrCollapseItem` и `GrSegmented` строили id из
  *     `instance.uid`, сквозного счётчика приложения: на сервере он продолжает
- *     расти между запросами, на клиенте стартует с нуля.
+ *     расти между запросами, на клиенте стартует с нуля;
+ *  4. **DOM в setup композабла** — `GrInputTag` и `GrImageViewer` зовут
+ *     `useAnnouncer()`, а тот при первом обращении ставит живой регион в
+ *     документ. На сервере документа нет, и хост обязан не создаваться вовсе.
  *
  * Все три класса дефектов видны только в связке «настоящий серверный рендер +
  * гидрация», поэтому живут здесь, а не в юнит-тестах пакета.
@@ -43,6 +47,7 @@ const paletteOpen = ref(true)
 const drawerOpen = ref(false)
 const viewerOpen = ref(false)
 const treeValue = ref<number | null>(null)
+const tags = ref<string[]>(['ssr'])
 
 const views = [
   { label: 'Список', value: 'list' },
@@ -104,6 +109,9 @@ const images = [
 
     <!-- Без `name`: имя скрытого input'а берётся из авто-id. -->
     <GrSegmented v-model="view" :options="views" />
+
+    <!-- `useAnnouncer()` в setup: на сервере хост не должен даже пытаться встать. -->
+    <GrInputTag v-model="tags" aria-label="Теги" />
 
     <GrSlider v-model="volume" :min="0" :max="100" aria-label="Громкость" />
 

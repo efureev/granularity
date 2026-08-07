@@ -22,6 +22,7 @@ import {
   maxTotalSizeBytesValidator,
   normalizeFiles,
   runFileValidators,
+  useAnnouncer,
   useDialogService,
   useTheme,
   useToast,
@@ -236,6 +237,37 @@ async function runNestedDemo() {
   nestedStatus.value = deleted
     ? t('composables.useDialogService.nested.done')
     : t('composables.useDialogService.nested.aborted')
+}
+
+// Живой регион невидим по своей природе, поэтому демо дублирует объявление
+// обычным текстом: иначе превью выглядит как кнопка, которая ничего не делает.
+const { announce: announceToScreenReader } = useAnnouncer()
+const announcerLast = ref('')
+const announcerRegion = ref<'polite' | 'assertive' | ''>('')
+let announcerResults = 3
+
+function runAnnouncerPolite() {
+  const message = t('composables.useAnnouncer.polite.message')
+  announceToScreenReader(message)
+  announcerLast.value = message
+  announcerRegion.value = 'polite'
+}
+
+function runAnnouncerAssertive() {
+  const message = t('composables.useAnnouncer.assertive.message')
+  announceToScreenReader(message, { politeness: 'assertive' })
+  announcerLast.value = message
+  announcerRegion.value = 'assertive'
+}
+
+function runAnnouncerResults() {
+  // Число меняется от нажатия к нажатию: так видно, что повтор объявления
+  // работает и что `clearAfterMs` стирает устаревшее.
+  announcerResults = announcerResults === 3 ? 12 : 3
+  const message = t('composables.useAnnouncer.results.message', { count: announcerResults })
+  announceToScreenReader(message, { clearAfterMs: 4000 })
+  announcerLast.value = message
+  announcerRegion.value = 'polite'
 }
 
 const networkStatus = ref(t('composables.useDialogService.network.idle'))
@@ -479,6 +511,36 @@ async function runNetworkDemo() {
           {{ uploadBridgeStatus }}
         </p>
       </div>
+    </template>
+
+    <template v-else-if="previewKey.startsWith('use-announcer-')">
+      <GrButton
+        class="justify-self-start"
+        :variant="previewKey === 'use-announcer-assertive' ? 'primary' : 'outline'"
+        :tone="previewKey === 'use-announcer-assertive' ? 'danger' : undefined"
+        @click="previewKey === 'use-announcer-polite'
+          ? runAnnouncerPolite()
+          : previewKey === 'use-announcer-assertive' ? runAnnouncerAssertive() : runAnnouncerResults()"
+      >
+        {{ t(`composables.useAnnouncer.${previewKey.replace('use-announcer-', '')}.trigger`) }}
+      </GrButton>
+
+      <GrCard v-if="announcerLast" class="p-3 text-sm">
+        <div class="flex flex-wrap items-center gap-2">
+          <GrBadge :tone="announcerRegion === 'assertive' ? 'danger' : 'info'" size="sm">
+            {{ announcerRegion }}
+          </GrBadge>
+          <span class="text-[var(--gr-muted-fg)]">{{ t('composables.useAnnouncer.lastLabel') }}:</span>
+          <span class="font-600">{{ announcerLast }}</span>
+        </div>
+      </GrCard>
+      <p v-else class="text-sm text-[var(--gr-muted-fg)]">
+        {{ t('composables.useAnnouncer.idle') }}
+      </p>
+
+      <p class="text-sm text-[var(--gr-muted-fg)]">
+        {{ t('composables.useAnnouncer.hint') }}
+      </p>
     </template>
 
     <template v-else-if="previewKey === 'use-dialog-service-confirm'">

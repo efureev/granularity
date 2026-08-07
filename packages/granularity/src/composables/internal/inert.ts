@@ -83,6 +83,11 @@ export function markInert(elements: HTMLElement[]): () => void {
  * сидит на самом верхнем слое шкалы, — а панель селекта, открытая изнутри окна,
  * принадлежит тому же слою. Порядок между самими оверлеями решает стек слоёв
  * (`isTopmost`), а не этот модуль.
+ *
+ * По той же причине пропускается хост объявителя (`data-gr-live-region`):
+ * `inert` выбрасывает поддерево из дерева доступности, и общий живой регион
+ * замолчал бы ровно под открытым диалогом — там, где «сохранено» и «ошибка
+ * сети» и нужны.
  */
 export function inertableOutside(root: HTMLElement | null | undefined): HTMLElement[] {
   if (!root?.isConnected) return []
@@ -101,6 +106,7 @@ export function inertableOutside(root: HTMLElement | null | undefined): HTMLElem
       if (sibling === node) continue
       if (sibling.hasAttribute('data-gr-overlay-root')) continue
       if (sibling.hasAttribute('data-gr-portal')) continue
+      if (sibling.hasAttribute('data-gr-live-region')) continue
       result.push(sibling)
     }
 

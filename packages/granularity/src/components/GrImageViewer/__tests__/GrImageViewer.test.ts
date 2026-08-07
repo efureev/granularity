@@ -4,10 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { pushOverlayLayer, resetOverlayStack } from '../../../composables/internal/overlayStack'
 import { resetScrollLock } from '../../../composables/internal/useScrollLock'
+import { resetAnnouncer } from '../../../composables/useAnnouncer'
 
 import GrImageViewer from '../GrImageViewer.vue'
 
 afterEach(() => {
+  resetAnnouncer()
   resetScrollLock()
   resetOverlayStack()
 })
@@ -271,19 +273,34 @@ describe('GrImageViewer — событие смены кадра и живой �
     wrapper.unmount()
   })
 
-  // Регион существует с первого рендера и пуст: регион, появляющийся сразу с
-  // текстом, часть AT не объявляет вовсе.
-  it('живой регион пуст до первой смены и получает позицию после неё', async () => {
+  // Позиция уходит в общий живой регион: при открытии её говорить незачем —
+  // это скажет имя диалога, — а на смене кадра сказать больше нечем.
+  it('позиция объявляется только после смены кадра', async () => {
     const wrapper = await mountViewer()
-    const live = wrapper.get('[data-gr-image-viewer-live]')
+    const live = () => document.querySelector('[data-gr-announcer-region="polite"]')
 
-    expect(live.attributes('role')).toBe('status')
-    expect(live.attributes('aria-live')).toBe('polite')
-    expect(live.text()).toBe('')
+    expect(live()?.getAttribute('role')).toBe('status')
+    expect(live()?.textContent).toBe('')
 
     await wrapper.find('[data-gr-image-viewer-next]').trigger('click')
+    await new Promise(resolve => setTimeout(resolve, 2))
 
-    expect(wrapper.get('[data-gr-image-viewer-live]').text()).toBe('Image 2 of 2')
+    expect(live()?.textContent).toBe('Image 2 of 2')
+
+    wrapper.unmount()
+  })
+
+  // Просмотрщик накрывает страницу `inert`, а живой регион лежит вне него:
+  // без пропуска по `data-gr-live-region` объявление никто бы не услышал.
+  it('хост объявителя не гасится инертом просмотрщика', async () => {
+    const wrapper = await mountViewer()
+
+    await wrapper.find('[data-gr-image-viewer-next]').trigger('click')
+    await new Promise(resolve => setTimeout(resolve, 2))
+
+    const announcerHost = document.getElementById('gr-announcer')!
+    expect(announcerHost.hasAttribute('inert')).toBe(false)
+    expect(announcerHost.hasAttribute('aria-hidden')).toBe(false)
 
     wrapper.unmount()
   })
