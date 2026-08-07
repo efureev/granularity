@@ -217,7 +217,8 @@
   },
   "rating": {
     "label": "Valoración",
-    "valueText": "{value} de {max}"
+    "valueText": "{value} de {max}",
+    "valueTextWithLabel": "{value} de {max}, {label}"
   },
   "commandPalette": {
     "label": "Paleta de comandos",

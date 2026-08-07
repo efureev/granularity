@@ -218,7 +218,8 @@
   },
   "rating": {
     "label": "Оценка",
-    "valueText": "{value} из {max}"
+    "valueText": "{value} из {max}",
+    "valueTextWithLabel": "{value} из {max}, {label}"
   },
   "commandPalette": {
     "label": "Палитра команд",

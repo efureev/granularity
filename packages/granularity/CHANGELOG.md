@@ -41,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrRating`: labels per step and a compact read-only view.** `texts` gives each step a word, which goes both into
+  the visible text and into `aria-valuetext` — «4 of 5, good» instead of a bare number, which is the whole point of a
+  rating. `compact` (with `readonly`) draws only the filled symbols, for tables and lists where five stars per row eat
+  the width; a half counts as a symbol.
 - **`GrSelect`: `state` and object values.** `state` (`default | success | warning | danger`) tints the border like
   the rest of the form row, and `invalid` overrides it. Option values may now be objects: pass `valueKey` with the
   name of the identifying field, and the component compares by that key instead of by reference — a model that arrives
@@ -162,6 +166,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrRating`'s preview stuck when the cursor moved onto its label.** `mouseleave` was bound to the outer container,
+  which includes the text, so leaving the scale for the label never fired it. The handler now lives on the scale
+  itself, and losing focus clears the preview too.
+- **`GrRating` dimmed its disabled state with `opacity`** and now uses `--gr-disabled-fg`.
+- **`GrRating` accepts `xs` from `GrConfigProvider`.** With this the mismatch is gone from the package: no component
+  declares a truncated size scale while shipping the classes for it.
 - **`GrSelect` showed an invalid field as a normal one.** `invalid` only ever reached `aria-invalid`: the border kept
   its neutral colour, so an error was audible to a screen reader and invisible to everyone else. Every other control
   of the form row has done this for a while.

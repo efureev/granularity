@@ -68,7 +68,7 @@
 - [`GrPromptDialog`](./components/GrPromptDialog.md)
 - [`GrRadio`](./components/GrRadio.md)
 - [`GrRadioGroup`](./components/GrRadioGroup.md)
-- `GrRating`
+- [`GrRating`](./components/GrRating.md)
 - [`GrResponseErrorBanner`](./components/GrResponseErrorBanner.md)
 - [`GrSegmented`](./components/GrSegmented.md)
 - [`GrSelect`](./components/GrSelect.md)

@@ -216,7 +216,8 @@
   },
   "rating": {
     "label": "Rating",
-    "valueText": "{value} of {max}"
+    "valueText": "{value} of {max}",
+    "valueTextWithLabel": "{value} of {max}, {label}"
   },
   "commandPalette": {
     "label": "Command palette",

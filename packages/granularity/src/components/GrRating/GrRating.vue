@@ -57,8 +57,19 @@ export interface GrRatingProps {
   icon?: string
   /** Показывать числовую подпись справа от шкалы. */
   showText?: boolean
-  /** Формат подписи. По умолчанию — само значение. */
+  /** Формат подписи. По умолчанию — само значение. Сильнее `texts`. */
   formatText?: (value: number) => string
+  /**
+   * Подписи по делениям: «3 из 5, нормально» вместо «3 из 5». Уходят и в
+   * видимый текст, и в `aria-valuetext` — ради этого рейтинг и существует.
+   * Массив короче `max` оставляет верхние деления без подписи.
+   */
+  texts?: string[]
+  /**
+   * Компактный вид: рисуются только заполненные символы. Осмысленно вместе с
+   * `readonly` — в списках и таблицах пять звёзд в каждой строке съедают ширину.
+   */
+  compact?: boolean
   ariaLabel?: string
 }
 
@@ -77,6 +88,8 @@ const props = withDefaults(
     icon: undefined,
     showText: false,
     formatText: undefined,
+    texts: undefined,
+    compact: false,
     ariaLabel: undefined,
   },
 )
@@ -84,7 +97,7 @@ const props = withDefaults(
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, {
   component: 'GrRating',
-  supported: ['sm', 'md', 'lg'],
+  supported: ['xs', 'sm', 'md', 'lg'],
 })
 
 const emit = defineEmits<{
@@ -146,17 +159,34 @@ function fillRatio(index: number): number {
   return Math.min(1, Math.max(0, displayValue.value - index))
 }
 
-const symbols = computed(() => Array.from({ length: props.max }, (_, index) => index))
+const symbols = computed(() => {
+  // Компактный вид показывает только заполненную часть шкалы; половинка
+  // считается символом — иначе «2.5» потеряло бы половину звезды.
+  const length = props.compact ? Math.ceil(clamp(props.modelValue)) : props.max
+  return Array.from({ length }, (_, index) => index)
+})
 
-const valueText = computed(() =>
-  t('gr.rating.valueText', '{value} of {max}', { value: displayValue.value, max: props.max }),
-)
+/** Подпись деления под текущим значением: половинки округляются вверх. */
+const currentLabel = computed(() => {
+  if (!props.texts?.length || displayValue.value <= 0) return undefined
+  return props.texts[Math.ceil(displayValue.value) - 1]
+})
+
+const valueText = computed(() => {
+  const params = { value: displayValue.value, max: props.max }
+
+  // Порядок слов задаёт локаль, а не конкатенация в коде.
+  return currentLabel.value
+    ? t('gr.rating.valueTextWithLabel', '{value} of {max}, {label}', { ...params, label: currentLabel.value })
+    : t('gr.rating.valueText', '{value} of {max}', params)
+})
 
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.rating.label', 'Rating'))
 
-const text = computed(() =>
-  props.formatText ? props.formatText(displayValue.value) : String(displayValue.value),
-)
+const text = computed(() => {
+  if (props.formatText) return props.formatText(displayValue.value)
+  return currentLabel.value ?? String(displayValue.value)
+})
 
 /** Значение, соответствующее позиции курсора внутри символа `index`. */
 function valueAt(index: number, event: MouseEvent): number {
@@ -178,14 +208,18 @@ function onSymbolClick(index: number, event: MouseEvent): void {
 }
 
 function onSymbolMouseMove(index: number, event: MouseEvent): void {
-  if (!interactive.value) return
+  if (!interactive.value) {
+    // Режим сменился под курсором — оставлять подсветку от прошлого состояния нельзя.
+    resetHover()
+    return
+  }
   const next = valueAt(index, event)
   if (next === hoverValue.value) return
   hoverValue.value = next
   emit('hoverChange', next)
 }
 
-function onMouseLeave(): void {
+function resetHover(): void {
   if (hoverValue.value === null) return
   hoverValue.value = null
   emit('hoverChange', null)
@@ -225,7 +259,6 @@ function onKeydown(event: KeyboardEvent): void {
     ref="rootEl"
     data-gr-rating
     class="inline-flex items-center gap-2"
-    @mouseleave="onMouseLeave"
   >
     <div
       :id="resolvedId"
@@ -246,6 +279,8 @@ function onKeydown(event: KeyboardEvent): void {
       :aria-required="asSlider && isRequired ? 'true' : undefined"
       :aria-readonly="asSlider && isReadonly ? 'true' : undefined"
       @keydown="onKeydown"
+      @mouseleave="resetHover"
+      @blur="resetHover"
     >
       <span
         v-for="index in symbols"

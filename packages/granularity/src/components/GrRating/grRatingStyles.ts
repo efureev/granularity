@@ -50,13 +50,17 @@ export const ratingFillClassByTone: Record<GrRatingTone, string> = {
 // «Пустой» символ: приглушённая заливка, чтобы шкала читалась целиком.
 export const ratingVoidClass = 'text-[var(--gr-rating-void-color,color-mix(in_srgb,var(--gr-muted-fg)_35%,transparent))]'
 
+export const ratingDisabledClass = 'cursor-not-allowed text-[var(--gr-disabled-fg)]'
+
 export const ratingRootBaseClass = 'inline-flex items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]'
 
 export function ratingRootClass(options: { size: GrRatingSize, disabled: boolean, interactive: boolean }): string {
   return [
     ratingRootBaseClass,
     ratingGapBySize[options.size],
-    options.disabled ? 'cursor-not-allowed opacity-50' : (options.interactive ? 'cursor-pointer' : ''),
+    // Недоступная шкала гасится токеном, а не `opacity`: прозрачность
+    // разбавляет выверенные на AA токены и роняет контраст подписи.
+    options.disabled ? ratingDisabledClass : (options.interactive ? 'cursor-pointer' : ''),
   ]
     .filter(Boolean)
     .join(' ')

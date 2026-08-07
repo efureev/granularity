@@ -6583,6 +6583,13 @@
             "default": "false"
           },
           {
+            "name": "compact",
+            "description": "Компактный вид: рисуются только заполненные символы. Осмысленно вместе с `readonly` — в списках и таблицах пять звёзд в каждой строке съедают ширину.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "icon",
             "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
             "type": "string | undefined",
@@ -6612,8 +6619,15 @@
           },
           {
             "name": "formatText",
-            "description": "Формат подписи. По умолчанию — само значение.",
+            "description": "Формат подписи. По умолчанию — само значение. Сильнее `texts`.",
             "type": "((value: number) => string) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "texts",
+            "description": "Подписи по делениям: «3 из 5, нормально» вместо «3 из 5». Уходят и в видимый текст, и в `aria-valuetext` — ради этого рейтинг и существует. Массив короче `max` оставляет верхние деления без подписи.",
+            "type": "string[] | undefined",
             "required": false,
             "default": "undefined"
           },

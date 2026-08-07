@@ -89,6 +89,10 @@ import { GrRating } from '@feugene/granularity'
 const likes = ref(3)
 const difficulty = ref(2)
 const size = ref(4)
+
+// Подписи по делениям: диктор читает «4 из 5, хорошо», а не голое число.
+const service = ref(4)
+const serviceTexts = ['Ужасно', 'Плохо', 'Нормально', 'Хорошо', 'Отлично']
 </script>
 
 <template>
@@ -111,6 +115,24 @@ const size = ref(4)
         style="--gr-rating-color: var(--gr-info)"
         aria-label="Difficulty"
       />
+    </div>
+
+    <div class="grid gap-2">
+      <span class="text-sm font-medium">Labels per step</span>
+      <GrRating
+        v-model="service"
+        :texts="serviceTexts"
+        show-text
+        aria-label="Service quality"
+      />
+    </div>
+
+    <div class="grid gap-2">
+      <span class="text-sm font-medium">Compact read-only (for tables and lists)</span>
+      <div class="flex items-center gap-6">
+        <GrRating :model-value="3" readonly compact show-text aria-label="Compact rating" />
+        <GrRating :model-value="4.5" readonly compact allow-half show-text aria-label="Compact half rating" />
+      </div>
     </div>
 
     <div class="grid gap-2">

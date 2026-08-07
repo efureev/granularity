@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrRating from '../GrRating.vue'
 
 describe('GrRating', () => {
@@ -106,8 +108,113 @@ describe('GrRating', () => {
     expect(wrapper.emitted('hoverChange')?.at(-1)).toEqual([4])
     expect(wrapper.get('[data-testid="gr-rating-scale"]').attributes('aria-valuenow')).toBe('4')
 
-    await wrapper.get('[data-gr-rating]').trigger('mouseleave')
+    // Обработчик висит на самой шкале: уход курсора с неё снимает предпросмотр,
+    // даже если курсор остался внутри компонента — например, на подписи.
+    await wrapper.get('[data-testid="gr-rating-scale"]').trigger('mouseleave')
     expect(wrapper.emitted('hoverChange')?.at(-1)).toEqual([null])
     expect(wrapper.get('[data-testid="gr-rating-scale"]').attributes('aria-valuenow')).toBe('1')
+  })
+})
+
+describe('GrRating — предпросмотр', () => {
+  it('перевод курсора со шкалы на подпись снимает предпросмотр', async () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 1, showText: true } })
+
+    await wrapper.get('[data-testid="gr-rating-symbol-3"]').trigger('mousemove')
+    expect(wrapper.get('[data-gr-rating-text]').text()).toBe('4')
+
+    // Подпись лежит внутри `[data-gr-rating]`: раньше обработчик висел там, и
+    // курсор, ушедший на текст, из контейнера не выходил — предпросмотр залипал.
+    await wrapper.get('[data-testid="gr-rating-scale"]').trigger('mouseleave')
+
+    expect(wrapper.get('[data-gr-rating-text]').text()).toBe('1')
+    expect(wrapper.emitted('hoverChange')?.at(-1)).toEqual([null])
+  })
+
+  it('потеря фокуса тоже снимает предпросмотр', async () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 2 } })
+
+    await wrapper.get('[data-testid="gr-rating-symbol-4"]').trigger('mousemove')
+    await wrapper.get('[data-testid="gr-rating-scale"]').trigger('blur')
+
+    expect(wrapper.get('[data-testid="gr-rating-scale"]').attributes('aria-valuenow')).toBe('2')
+    expect(wrapper.emitted('hoverChange')?.at(-1)).toEqual([null])
+  })
+
+  it('в readonly предпросмотра нет', async () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 2, readonly: true } })
+
+    await wrapper.get('[data-testid="gr-rating-symbol-4"]').trigger('mousemove')
+
+    expect(wrapper.emitted('hoverChange')).toBeFalsy()
+  })
+})
+
+describe('GrRating — подписи делений и компактный вид', () => {
+  const texts = ['Плохо', 'Так себе', 'Нормально', 'Хорошо', 'Отлично']
+
+  it('подпись деления уходит и в текст, и в aria-valuetext', () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 3, texts, showText: true } })
+
+    expect(wrapper.get('[data-gr-rating-text]').text()).toBe('Нормально')
+    expect(wrapper.get('[data-testid="gr-rating-scale"]').attributes('aria-valuetext'))
+      .toBe('3 of 5, Нормально')
+  })
+
+  it('половинка округляется вверх до своего деления', () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 2.5, texts, allowHalf: true, showText: true } })
+
+    expect(wrapper.get('[data-gr-rating-text]').text()).toBe('Нормально')
+  })
+
+  it('formatText сильнее texts', () => {
+    const wrapper = mount(GrRating, {
+      props: { modelValue: 3, texts, showText: true, formatText: (value: number) => `${value}/5` },
+    })
+
+    expect(wrapper.get('[data-gr-rating-text]').text()).toBe('3/5')
+  })
+
+  it('короткий массив подписей не ломает шкалу', () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 5, texts: ['Плохо'], showText: true } })
+
+    expect(wrapper.get('[data-gr-rating-text]').text()).toBe('5')
+    expect(wrapper.get('[data-testid="gr-rating-scale"]').attributes('aria-valuetext')).toBe('5 of 5')
+  })
+
+  it('compact рисует только заполненные символы', () => {
+    const full = mount(GrRating, { props: { modelValue: 3, readonly: true } })
+    expect(full.findAll('[data-gr-rating-symbol]')).toHaveLength(5)
+
+    const compact = mount(GrRating, { props: { modelValue: 3, readonly: true, compact: true } })
+    expect(compact.findAll('[data-gr-rating-symbol]')).toHaveLength(3)
+
+    // Половинка — тоже символ: иначе «2.5» потеряло бы половину звезды.
+    const half = mount(GrRating, { props: { modelValue: 2.5, readonly: true, compact: true, allowHalf: true } })
+    expect(half.findAll('[data-gr-rating-symbol]')).toHaveLength(3)
+  })
+})
+
+describe('GrRating — оформление и размеры', () => {
+  it('disabled гасится токеном, а не прозрачностью', () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 3, disabled: true } })
+    const scale = wrapper.get('[data-testid="gr-rating-scale"]')
+
+    expect(scale.classes()).toContain('text-[var(--gr-disabled-fg)]')
+    expect(scale.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+  })
+
+  it('xs из GrConfigProvider доходит до шкалы', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrRating },
+      template: `
+        <GrConfigProvider size="xs">
+          <GrRating :model-value="3" />
+        </GrConfigProvider>
+      `,
+    })
+
+    const symbol = mount(Harness).get('[data-gr-rating-symbol]')
+    expect(symbol.classes().join(' ')).toContain('0.875rem')
   })
 })

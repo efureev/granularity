@@ -1,5 +1,6 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  ratingDisabledClass,
   ratingFillClassByTone,
   ratingGapBySize,
   ratingRootBaseClass,
@@ -18,6 +19,7 @@ export const grRatingSafelist = [...new Set([
   ...Object.values(ratingFillClassByTone).flatMap(splitClassTokens),
   ...splitClassTokens(ratingVoidClass),
   ...splitClassTokens(ratingRootBaseClass),
-  ...splitClassTokens('cursor-not-allowed cursor-pointer opacity-50'),
+  ...splitClassTokens(ratingDisabledClass),
+  ...splitClassTokens('cursor-pointer'),
   ...splitClassTokens('relative block shrink-0 [font-variant-numeric:tabular-nums]'),
 ])]
