@@ -330,7 +330,7 @@ describe('component docs metadata', () => {
     const listDoc = getShowcaseComponentDoc(listEntity!)
     const tableDoc = getShowcaseComponentDoc(tableEntity!)
 
-    expect(buttonGroupDoc.examples).toHaveLength(3)
+    expect(buttonGroupDoc.examples).toHaveLength(5)
     expect(buttonGroupDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(buttonGroupDoc.examples.every(example => example.previewKey?.startsWith('gr-button-group'))).toBe(true)
 

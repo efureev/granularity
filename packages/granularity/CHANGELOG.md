@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrButtonGroup`: shared styling, orientation and a spaced mode.** `size`, `variant` and `tone` set on the group
+  reach its buttons through context, so the props stop being repeated on every one of them; the resolution order is
+  button prop → group → `GrConfigProvider` → default, because the group sits closer to the button than a global
+  provider. `orientation="vertical"` stacks the buttons and moves the rounding to the top and bottom edges;
+  `:attached="false"` keeps the row but drops the gluing, leaving every button with its own radii and borders. The
+  group context is public — `useGrButtonGroup()` — for controls built on top of it.
 - **`GrTree`: checkboxes and multiple selection.** `show-checkbox` turns on tri-state boxes,
   `v-model:checked-keys` carries the set, `check-strictly` unlinks parents from children. A checked parent checks its
   whole subtree, a partially checked one reports `aria-checked="mixed"`, and the incoming `checked-keys` may list only
@@ -44,6 +50,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrButtonGroup` fell apart when a button was wrapped.** The gluing was written against direct children
+  (`> [data-gr-button]`), so a button inside a tooltip, a `v-if` wrapper or a router link kept its own radii and a
+  doubled border. It now works with «group links» — direct children that are a button *or* contain one — so wrappers no
+  longer break the row, and a non-button child (a divider, a label) no longer steals the rounding from the first
+  button: the edges are computed from link adjacency instead of `:first-child`/`:last-child`. Hover and focus raise the
+  button above its neighbours at any nesting depth, so the focus ring is not clipped by an overlapping border.
+- **`GrButtonGroup` duplicated the button radius as a literal.** Both the button and the group now read
+  `--gr-button-radius` (default `0.375rem`, exactly today's value), so a consumer can change the radius of buttons and
+  their groups with one variable instead of overriding two places that could drift apart.
 - **`GrSelect`: Tab used to walk into the option list instead of leaving the widget.** Options are
   `<button role="option">` and were focusable, so Tab from the trigger went into the panel and then through every
   option — the opposite of the combobox contract, where focus stays on the trigger and the active option is named by

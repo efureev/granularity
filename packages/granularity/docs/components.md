@@ -30,7 +30,7 @@
 - `GrBottomNav`
 - [`GrBreadcrumbs`](./components/GrBreadcrumbs.md)
 - [`GrButton`](./components/GrButton.md)
-- `GrButtonGroup`
+- [`GrButtonGroup`](./components/GrButtonGroup.md)
 - [`GrCard`](./components/GrCard.md)
 - [`GrCheckbox`](./components/GrCheckbox.md)
 - [`GrCheckboxGroup`](./components/GrCheckboxGroup.md)

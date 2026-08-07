@@ -4,6 +4,7 @@ import { computed, markRaw, ref, type Component } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrButtonGroup } from '../GrButtonGroup/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
@@ -60,10 +61,14 @@ const props = withDefaults(
   },
 )
 
-// Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
-const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrButton' })
-const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant, 'primary')
-const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone, 'primary')
+// Эффективные значения: проп кнопки → группа → `GrConfigProvider` → дефолт.
+// Группа ближе к кнопке, чем глобальный провайдер, поэтому она подставляется
+// как «локальное» значение — и побеждает конфиг, но не собственный проп.
+const group = useGrButtonGroup()
+
+const resolvedSize = useGrComponentSize(() => props.size ?? group?.size.value, { component: 'GrButton' })
+const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant ?? group?.variant.value, 'primary')
+const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone ?? group?.tone.value, 'primary')
 const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
 
 const { t } = useGranularityTranslations()

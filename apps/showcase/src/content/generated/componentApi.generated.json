@@ -840,11 +840,46 @@
         "origin": "generated",
         "items": [
           {
-            "name": "ariaLabel",
+            "name": "tone",
             "description": "",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "Оформление, общее для кнопок группы. Проп самой кнопки сильнее.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя группы: без него кнопки читаются как несвязанные.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "orientation",
+            "description": "",
+            "type": "GrButtonGroupOrientation | undefined",
+            "required": false,
+            "default": "\"horizontal\""
+          },
+          {
+            "name": "attached",
+            "description": "Склеивать кнопки в один блок. `false` — обычный ряд с зазором: каждая кнопка сохраняет свои радиусы и границы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           }
         ]
       },
@@ -6346,18 +6381,18 @@
             "default": "undefined"
           },
           {
-            "name": "name",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "orientation",
             "description": "Раскладка варианта `radiobox`. Кнопочный вариант всегда горизонтальный — его собирает `GrButtonGroup`.",
             "type": "GrRadioGroupOrientation | undefined",
             "required": false,
             "default": "\"vertical\""
+          },
+          {
+            "name": "name",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "modelValue",

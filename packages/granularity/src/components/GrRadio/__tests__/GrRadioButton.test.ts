@@ -24,7 +24,7 @@ describe('GrRadio (button)', () => {
 
     expect(btn.attributes('class')).toContain('inline-flex')
     expect(btn.attributes('class')).toContain('items-center')
-    expect(btn.attributes('class')).toContain('rounded-md')
+    expect(btn.attributes('class')).toContain('rounded-[var(--gr-button-radius,0.375rem)]')
     expect(btn.attributes('class')).toContain('h-11')
     expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg,var(--gr-primary))]')
   })

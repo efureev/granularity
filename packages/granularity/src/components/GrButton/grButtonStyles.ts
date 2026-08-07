@@ -32,7 +32,7 @@ export type GrButtonToneTokens = {
 }
 
 export const base =
-  'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-md transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+  'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-[var(--gr-button-radius,0.375rem)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
 
 /** Кнопка на всю ширину контейнера. */
 export const blockClass = 'w-full'

@@ -21,6 +21,7 @@ import { componentPath } from './components'
 const VISUAL_COMPONENTS = [
   // Форм-контролы: на них завязана бо́льшая часть цветовых токенов.
   'GrButton',
+  'GrButtonGroup',
   'GrInput',
   'GrTextarea',
   'GrNumberInput',
