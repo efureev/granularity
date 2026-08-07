@@ -1,8 +1,40 @@
 import { splitClassTokens } from '../shared/classTokens'
-import { tabBadgeSizes, tablistSizes, tabSizes } from './grTabsStyles'
+import {
+  tabBadgeBase,
+  tabBadgeSizes,
+  tabBase,
+  tabContentClass,
+  tabIconClass,
+  tablistBase,
+  tablistColumnClass,
+  tablistLineSizes,
+  tablistScrollClass,
+  tablistSizes,
+  tablistVariants,
+  tablistVerticalVariants,
+  tabSizes,
+  tabStateClasses,
+  tabVariantBase,
+} from './grTabsStyles'
 
 export const grTabsSafelist = [...new Set([
   ...Object.values(tabSizes).flatMap(splitClassTokens),
   ...Object.values(tabBadgeSizes).flatMap(splitClassTokens),
   ...Object.values(tablistSizes).flatMap(splitClassTokens),
+  ...Object.values(tablistLineSizes).flatMap(splitClassTokens),
+  ...Object.values(tablistVariants).flatMap(splitClassTokens),
+  ...Object.values(tablistVerticalVariants).flatMap(splitClassTokens),
+  ...Object.values(tabVariantBase).flatMap(splitClassTokens),
+  ...Object.values(tabStateClasses).flatMap(state => [
+    ...splitClassTokens(state.active),
+    ...splitClassTokens(state.idle),
+    ...splitClassTokens(state.disabled),
+  ]),
+  ...splitClassTokens(tablistBase),
+  ...splitClassTokens(tablistScrollClass),
+  ...splitClassTokens(tablistColumnClass),
+  ...splitClassTokens(tabBase),
+  ...splitClassTokens(tabBadgeBase),
+  ...splitClassTokens(tabContentClass),
+  ...splitClassTokens(tabIconClass),
 ])]

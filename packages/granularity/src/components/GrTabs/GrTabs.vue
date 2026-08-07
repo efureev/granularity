@@ -1,17 +1,28 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
-import { type GrTabsSize, tabBadgeSizes, tablistSizes, tabSizes } from './grTabsStyles'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import {
+  grTabsBadgeClass,
+  grTabsListClass,
+  grTabsTabClass,
+  tabContentClass,
+  tabIconClass,
+  type GrTabsOrientation,
+  type GrTabsSize,
+  type GrTabsVariant,
+} from './grTabsStyles'
 
-export type GrTab = {
+export interface GrTab {
   value: string
   label: string
   badge?: string
+  /** UnoCSS-класс иконки слева от подписи (например `i-lucide-user`). */
+  icon?: string
   disabled?: boolean
 }
 
-export type GrTabsProps = {
+export interface GrTabsProps {
   modelValue: string
   tabs: GrTab[]
   /**
@@ -21,6 +32,8 @@ export type GrTabsProps = {
    */
   idBase?: string
   size?: GrTabsSize
+  /** Вид ряда: обойма с таблетками или ряд с подчёркиванием. */
+  variant?: GrTabsVariant
   /**
    * `automatic` (по умолчанию) — стрелка сразу переключает вкладку;
    * `manual` — стрелка двигает только фокус, выбор подтверждается
@@ -33,7 +46,8 @@ export type GrTabsProps = {
 }
 
 export type GrTabsActivationMode = 'automatic' | 'manual'
-export type GrTabsOrientation = 'horizontal' | 'vertical'
+
+export type { GrTabsOrientation, GrTabsVariant } from './grTabsStyles'
 
 /**
  * GrTabs — горизонтальная группа вкладок с паттерном WAI-ARIA `tablist`.
@@ -49,19 +63,41 @@ export type GrTabsOrientation = 'horizontal' | 'vertical'
 const props = withDefaults(defineProps<GrTabsProps>(), {
   idBase: undefined,
   size: undefined,
+  // Дефолт живёт в резолвере: Vue подставил бы свой раньше, чем компонент
+  // заглянет в `GrConfigProvider`.
+  variant: undefined,
   activationMode: 'automatic',
   orientation: 'horizontal',
 })
+
+defineSlots<{
+  /** Содержимое вкладки целиком — вместо подписи, иконки и счётчика. */
+  tab?: (props: { tab: GrTab, active: boolean, disabled: boolean }) => unknown
+}>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTabs' })
+const resolvedVariant = useGrComponentProp('GrTabs', 'variant', () => props.variant, 'pills')
 
-const tablistClass = computed(() => tablistSizes[resolvedSize.value])
-const tabClass = computed(() => tabSizes[resolvedSize.value])
-const badgeClass = computed(() => tabBadgeSizes[resolvedSize.value])
+const tablistClass = computed(() => grTabsListClass({
+  variant: resolvedVariant.value,
+  size: resolvedSize.value,
+  orientation: props.orientation,
+}))
+
+function tabClass(tab: GrTab): string {
+  return grTabsTabClass({
+    variant: resolvedVariant.value,
+    size: resolvedSize.value,
+    active: tab.value === props.modelValue,
+    disabled: Boolean(tab.disabled),
+  })
+}
+
+const badgeClass = computed(() => grTabsBadgeClass(resolvedSize.value))
 
 const buttonRefs = ref<HTMLButtonElement[]>([])
 
@@ -106,7 +142,23 @@ async function focusIndex(index: number): Promise<void> {
   focusedIndex.value = index
   await nextTick()
   buttonRefs.value[index]?.focus()
+  scrollIntoView(index)
 }
+
+/**
+ * Ряд прокручивается, а не переносится, поэтому активная вкладка может уехать
+ * за край — например, когда её выбрали снаружи. `scrollIntoView` нет в jsdom и
+ * в старых движках, поэтому вызов необязательный.
+ */
+function scrollIntoView(index: number): void {
+  buttonRefs.value[index]?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+}
+
+watch(() => props.modelValue, async () => {
+  await nextTick()
+  if (activeIndex.value >= 0)
+    scrollIntoView(activeIndex.value)
+})
 
 async function selectByIndex(index: number, focus = false): Promise<void> {
   const tab = props.tabs[index]
@@ -209,8 +261,7 @@ function onClick(tab: GrTab, index: number): void {
     role="tablist"
     data-gr-tabs
     :aria-orientation="orientation"
-    class="inline-flex rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)]"
-    :class="[tablistClass, orientation === 'vertical' ? 'flex-col' : 'flex-wrap']"
+    :class="tablistClass"
     @keydown="onKeydown"
   >
     <button
@@ -225,26 +276,22 @@ function onClick(tab: GrTab, index: number): void {
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :tabindex="index === rovingFocusIndex ? 0 : -1"
-      class="rounded-[var(--gr-radius-md)] font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-      :class="[
-        tabClass,
-        tab.disabled
-          ? 'cursor-not-allowed text-[var(--gr-muted-fg)]'
-          : tab.value === modelValue
-            ? 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]'
-            : 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-card)_70%,transparent)]',
-      ]"
+      :class="tabClass(tab)"
       @click="onClick(tab, index)"
     >
-      <span class="inline-flex items-center gap-2">
-        <span>{{ tab.label }}</span>
-        <span
-          v-if="tab.badge"
-          class="rounded-full bg-[var(--gr-secondary)] text-[var(--gr-secondary-fg)]"
-          :class="badgeClass"
+      <span :class="tabContentClass">
+        <slot
+          name="tab"
+          :tab="tab"
+          :active="tab.value === modelValue"
+          :disabled="Boolean(tab.disabled)"
         >
-          {{ tab.badge }}
-        </span>
+          <span v-if="tab.icon" :class="[tabIconClass, tab.icon]" aria-hidden="true" />
+          <span>{{ tab.label }}</span>
+          <span v-if="tab.badge" :class="badgeClass">
+            {{ tab.badge }}
+          </span>
+        </slot>
       </span>
     </button>
   </div>

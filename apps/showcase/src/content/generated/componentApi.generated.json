@@ -8103,6 +8103,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "variant",
+            "description": "Вид ряда: обойма с таблетками или ряд с подчёркиванием.",
+            "type": "\"pills\" | \"line\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
@@ -8148,7 +8155,13 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "tab",
+            "description": "Содержимое вкладки целиком — вместо подписи, иконки и счётчика.",
+            "type": "{ tab: GrTab; active: boolean; disabled: boolean; }"
+          }
+        ]
       },
       {
         "key": "events",

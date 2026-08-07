@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
+
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrTabs from '../GrTabs.vue'
 
 const tabs = [
@@ -199,5 +201,102 @@ describe('GrTabs — режимы активации и раскладка', () 
     expect(document.activeElement).toBe(wrapper.findAll('[role="tab"]')[1].element)
 
     wrapper.unmount()
+  })
+})
+
+describe('GrTabs — вид и содержимое вкладки', () => {
+  const baseProps = { modelValue: 'overview', tabs: [...tabs] }
+
+  it('pills — обойма с рамкой, line — ряд с подчёркиванием активной', () => {
+    const pills = mount(GrTabs, { props: baseProps })
+    expect(pills.get('[role="tablist"]').classes()).toContain('bg-[var(--gr-muted)]')
+    expect(pills.get('[data-gr-tab]').classes()).toContain('bg-[var(--gr-card)]')
+
+    const line = mount(GrTabs, { props: { ...baseProps, variant: 'line' } })
+    const list = line.get('[role="tablist"]')
+    expect(list.classes()).toContain('border-b')
+    expect(list.classes()).not.toContain('bg-[var(--gr-muted)]')
+
+    const active = line.get('[data-gr-tab]')
+    expect(active.classes()).toContain('border-[var(--gr-primary)]')
+    expect(active.classes()).not.toContain('bg-[var(--gr-card)]')
+  })
+
+  it('вариант читается из GrConfigProvider, локальный проп сильнее', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrTabs },
+      props: { variant: { type: String, default: undefined } },
+      setup: () => ({ tabs: [...tabs] }),
+      template: `
+        <GrConfigProvider :component-defaults="{ GrTabs: { variant: 'line' } }">
+          <GrTabs model-value="overview" :tabs="tabs" :variant="variant" />
+        </GrConfigProvider>
+      `,
+    })
+
+    expect(mount(Harness).get('[role="tablist"]').classes()).toContain('border-b')
+    expect(mount(Harness, { props: { variant: 'pills' } }).get('[role="tablist"]').classes())
+      .toContain('bg-[var(--gr-muted)]')
+  })
+
+  it('иконка вкладки рендерится декоративной', () => {
+    const wrapper = mount(GrTabs, {
+      props: {
+        modelValue: 'overview',
+        tabs: [{ value: 'overview', label: 'Overview', icon: 'i-lucide-home' }],
+      },
+    })
+
+    const icon = wrapper.get('.i-lucide-home')
+    expect(icon.attributes('aria-hidden')).toBe('true')
+  })
+
+  it('слот #tab заменяет содержимое и получает состояние вкладки', () => {
+    const wrapper = mount(GrTabs, {
+      props: baseProps,
+      slots: {
+        tab: `<template #tab="{ tab, active, disabled }">
+          <span class="custom">{{ tab.label }}:{{ active }}:{{ disabled }}</span>
+        </template>`,
+      },
+    })
+
+    const rendered = wrapper.findAll('.custom').map(node => node.text())
+    expect(rendered).toEqual(['Overview:true:false', 'History:false:false', 'Settings:false:false'])
+    // Счётчик из пропа больше не рисуется: слот заменяет содержимое целиком.
+    expect(wrapper.text()).not.toContain('3')
+  })
+
+  it('горизонтальный ряд прокручивается, вертикальный — колонка', () => {
+    const horizontal = mount(GrTabs, { props: baseProps })
+    expect(horizontal.get('[role="tablist"]').classes()).toContain('overflow-x-auto')
+
+    const vertical = mount(GrTabs, { props: { ...baseProps, orientation: 'vertical' } })
+    const list = vertical.get('[role="tablist"]')
+    expect(list.classes()).toContain('flex-col')
+    expect(list.classes()).not.toContain('overflow-x-auto')
+  })
+
+  it('смена активной вкладки подтягивает её в видимую часть ряда', async () => {
+    const wrapper = mount(GrTabs, { props: baseProps, attachTo: document.body })
+    const scrolled: unknown[] = []
+    for (const button of wrapper.findAll('[data-gr-tab]'))
+      (button.element as HTMLElement).scrollIntoView = (...args: unknown[]) => scrolled.push(args)
+
+    await wrapper.setProps({ modelValue: 'settings' })
+    await nextTick()
+
+    expect(scrolled).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('кегли идут от токенов --gr-text-*', () => {
+    const xs = mount(GrTabs, { props: { ...baseProps, size: 'xs' } })
+    expect(xs.get('[data-gr-tab]').classes()).toContain('text-[length:var(--gr-text-xs)]')
+    expect(xs.html()).not.toMatch(/text-\[\d+px\]/)
+
+    const lg = mount(GrTabs, { props: { ...baseProps, size: 'lg' } })
+    expect(lg.get('[data-gr-tab]').classes()).toContain('text-[length:var(--gr-text-base)]')
+    expect(lg.html()).not.toMatch(/text-\[\d+px\]/)
   })
 })

@@ -4,5 +4,6 @@ export type { GrTab, GrTabsProps } from './GrTabs.vue'
 export { grTabsConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrTabsConfigurableProps } from './defaults'
-export type { GrTabsSize } from './grTabsStyles'
+export { GR_TABS_VARIANTS } from './grTabsStyles'
+export type { GrTabsOrientation, GrTabsSize, GrTabsVariant } from './grTabsStyles'
 export { grTabsSafelist } from './safelist'

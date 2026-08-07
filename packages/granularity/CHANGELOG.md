@@ -41,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **`GrTabs`: `variant`, tab icons and a `#tab` slot.** `variant="line"` renders the classic underlined row next to
+  the existing `pills` (the name is shared with `GrSegmented`, which has the same role); it is also readable from
+  `GrConfigProvider`. A tab may carry an `icon` class, and the `#tab` slot replaces the tab's content entirely,
+  receiving `{ tab, active, disabled }`.
 - **`GrSwitch` can take part in a native form.** `name`, `value` (default `'on'`) and `form` render a hidden field
   with checkbox semantics: a switch that is on submits its value, a switch that is off submits nothing, so the server
   reads «off» from the missing key. The field is a sibling of the button rather than a child — interactive content
@@ -72,6 +76,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrTabs` scrolls an overflowing row instead of wrapping it.** A wrapped row pushed tabs under the panel and broke
+  the alignment; the row now scrolls horizontally with the scrollbar hidden, and the active tab pulls itself into view
+  — including when it was selected from outside. Vertical orientation is unaffected.
+- **`GrTabs` declares its props as a named interface.** `GrTabsProps` was a type alias, so
+  `defineProps<GrTabsProps & {…}>` in a consumer's wrapper did not work.
+- **`GrTabs`: the size ladders moved from px literals to `--gr-text-*`.** Tabs run `xs/xs/sm/base`, the badge
+  `2xs/2xs/2xs/xs`; the `lg` tab grows from 15px to 16px and the `sm` tab shrinks from 13px to 12px.
 - **`GrSwitch` accepts `xs` from `GrConfigProvider`.** The `xs` classes existed, but the component still declared
   `supported: ['sm', 'md', 'lg']`, so a global `size="xs"` silently fell back to `md`.
 - **`GrStatistic`: the four size ladders moved from px literals to `--gr-text-*`.** Captions and the trend line run
