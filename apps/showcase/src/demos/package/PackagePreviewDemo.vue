@@ -289,7 +289,10 @@ async function runNetworkDemo() {
 </script>
 
 <template>
-  <div class="grid gap-4">
+  <!-- `data-preview-key` — опора e2e: на одной странице сущности лежит несколько
+       превью, а различать их позицией нельзя (порядок задаёт состав examples) и
+       подписью тоже (она приходит из локали). -->
+  <div :data-preview-key="previewKey" class="grid gap-4">
     <template v-if="previewKey === 'v-autofocus-dialog'">
       <GrButton class="justify-self-start" @click="dialogOpen = true">
         Open dialog

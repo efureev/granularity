@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-import { componentPath } from './components'
+import { SERVICE_ENTITIES, componentPath } from './components'
 
 /**
  * Модальный слой в открытом состоянии.
@@ -243,5 +243,123 @@ test.describe('панель селекта', () => {
     await panel.locator('[data-gr-select-option]').first().click()
     await expect(panel).toBeHidden()
     await expect(trigger).toBeFocused()
+  })
+})
+
+/**
+ * Сервис диалогов: единственный компонент пакета, чей UI живёт в собственном
+ * хосте вне `#app`, и единственный без страницы компонента — он документирован
+ * страницей композабла `useDialogService`.
+ *
+ * Юнит-тесты сервиса (`useDialogService.test.ts`) закрывают очередь, FIFO, `signal`
+ * и даже атрибут `inert` у нижнего окна. Но в jsdom `inert` — просто атрибут:
+ * фокус в помеченное поддерево всё равно ходит. Изоляция фона и ловушка фокуса
+ * проверяются только здесь.
+ */
+test.describe('сервис диалогов', () => {
+  const servicePage = SERVICE_ENTITIES.GrDialogService
+
+  /** Триггер конкретного demo: `data-preview-key` не зависит ни от порядка карточек, ни от локали. */
+  function previewTrigger(page: import('@playwright/test').Page, key: string) {
+    return page.locator(`[data-preview-key="${key}"] button`).first()
+  }
+
+  /** Окна сервиса. Хост тоже носит `data-gr-overlay-root`, поэтому сужаем по `aria-modal`. */
+  function dialogLayers(page: import('@playwright/test').Page) {
+    return page.locator('[data-gr-overlay-root][aria-modal]')
+  }
+
+  async function openDialog(page: import('@playwright/test').Page, key: string) {
+    await page.goto(servicePage.path)
+    await page.locator(servicePage.ready).waitFor()
+
+    const trigger = previewTrigger(page, key)
+    await trigger.click()
+
+    // Ждём конца enter-анимации: на полупрозрачной панели axe считает смешанный
+    // цвет и находит несуществующий контрастный дефект.
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('[data-gr-modal-panel]')
+      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
+    })
+
+    return trigger
+  }
+
+  test('открытый confirm проходит axe', async ({ page }) => {
+    await openDialog(page, 'use-dialog-service-confirm')
+    await expect(dialogLayers(page)).toHaveCount(1)
+
+    const results = await new AxeBuilder({ page })
+      .include('[data-gr-overlay-root][aria-modal]')
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze()
+
+    const blocking = results.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))
+    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
+  })
+
+  test('объявляет себя модальным и даёт себе имя', async ({ page }) => {
+    await openDialog(page, 'use-dialog-service-confirm')
+
+    const dialog = dialogLayers(page).first()
+    await expect(dialog).toHaveAttribute('role', 'dialog')
+    await expect(dialog).toHaveAttribute('aria-modal', 'true')
+
+    // Заголовок диалог получает от сервиса, но имя обязано быть при любом вызове.
+    const labelledBy = await dialog.getAttribute('aria-labelledby')
+    const label = await dialog.getAttribute('aria-label')
+    expect(Boolean(labelledBy) || Boolean(label)).toBe(true)
+  })
+
+  test('фон уходит из таб-порядка, а Tab не выходит за панель', async ({ page }) => {
+    await openDialog(page, 'use-dialog-service-confirm')
+
+    // Хост сервиса лежит в портале рядом с `#app`, поэтому страница гасится целиком.
+    await expect(page.locator('#app')).toHaveAttribute('inert', /.*/)
+
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press('Tab')
+      const insideLayer = await page.evaluate(() => {
+        const layer = document.querySelector('[data-gr-overlay-root][aria-modal]')
+        return Boolean(layer && document.activeElement && layer.contains(document.activeElement))
+      })
+      expect(insideLayer, `Tab №${i + 1} увёл фокус за пределы окна`).toBe(true)
+    }
+  })
+
+  test('Esc закрывает окно и возвращает фокус на триггер', async ({ page }) => {
+    const trigger = await openDialog(page, 'use-dialog-service-confirm')
+
+    await page.keyboard.press('Escape')
+    await expect(page.locator('[data-gr-modal-panel]')).toHaveCount(0)
+
+    await expect(trigger).toBeFocused()
+    await expect(page.locator('#app')).not.toHaveAttribute('inert', /.*/)
+  })
+
+  test('вложенный диалог не пускает фокус в нижний', async ({ page }) => {
+    await openDialog(page, 'use-dialog-service-nested')
+
+    // Второй диалог сервис спрашивает из `onConfirm` первого и показывает поверх:
+    // нижний остаётся на экране и ждёт ответа верхнего.
+    await page.locator('[data-testid="gr-confirm-confirm"]').first().click()
+    await expect(dialogLayers(page)).toHaveCount(2)
+
+    const layers = dialogLayers(page)
+    await expect(layers.first()).toHaveAttribute('inert', /.*/)
+    await expect(layers.last()).not.toHaveAttribute('inert', /.*/)
+
+    // Главное, чего не проверяет jsdom: `inert` реально запрещает фокус, поэтому
+    // обход по Tab не может свалиться в нижнее окно.
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press('Tab')
+      const inTopLayer = await page.evaluate(() => {
+        const all = document.querySelectorAll('[data-gr-overlay-root][aria-modal]')
+        const top = all[all.length - 1]
+        return Boolean(top && document.activeElement && top.contains(document.activeElement))
+      })
+      expect(inTopLayer, `Tab №${i + 1} ушёл из верхнего окна`).toBe(true)
+    }
   })
 })

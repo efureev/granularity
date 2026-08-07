@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { knownIssuesFor } from './a11y-baseline'
-import { componentNames, componentPath } from './components'
+import { registryComponentNames, scanTargets } from './components'
 
 /**
  * Доступностный слой: axe-core по страницам компонентов витрины.
@@ -14,8 +14,11 @@ import { componentNames, componentPath } from './components'
  * Модель гейта: для каждого компонента берём serious/critical нарушения axe,
  * вычитаем ЗАФИКСИРОВАННЫЙ долг (`a11y-baseline.ts`) и падаем на остатке. Значит
  * ловим: регрессии (новое нарушение в «чистом» компоненте), новые компоненты без
- * a11y, и рост долга. Список компонентов — из сгенерированного API-контракта, т.е.
- * новый компонент попадает под гейт автоматически.
+ * a11y, и рост долга.
+ *
+ * Список целей — `scanTargets` (`components.ts`): страницы компонентов витрины плюс
+ * сущности, документированные не своей страницей. Полноту списка относительно
+ * реестра пакета проверяет отдельный тест в конце файла.
  */
 
 const IMPACT_BLOCKLIST = ['serious', 'critical']
@@ -42,13 +45,13 @@ async function analyze(page: import('@playwright/test').Page) {
     .analyze()
 }
 
-for (const name of componentNames) {
-  test(`a11y: ${name} has no un-baselined serious/critical violations`, async ({ page }) => {
-    await page.goto(componentPath(name))
-    await page.locator('#live-examples').waitFor()
+for (const target of scanTargets) {
+  test(`a11y: ${target.name} has no un-baselined serious/critical violations`, async ({ page }) => {
+    await page.goto(target.path)
+    await page.locator(target.ready).waitFor()
 
     const results = await analyze(page)
-    const known = new Set(auditMode ? [] : knownIssuesFor(name))
+    const known = new Set(auditMode ? [] : knownIssuesFor(target.name))
 
     const regressions = results.violations
       .filter(v => IMPACT_BLOCKLIST.includes(v.impact ?? ''))
@@ -58,3 +61,19 @@ for (const name of componentNames) {
     expect(regressions, JSON.stringify(regressions, null, 2)).toEqual([])
   })
 }
+
+/**
+ * Сторож источника списка. Набор выше выводится из витрины, а обязателен —
+ * реестр пакета: компонент, до которого витрина не доросла, обязан ронять гейт,
+ * а не тихо выпадать из него. Так `GrDialogService` и потерялся — он есть в
+ * реестре, но не в `componentApi.generated.json`, откуда брался список.
+ */
+test('каждый компонент реестра покрыт e2e', () => {
+  const covered = new Set(scanTargets.map(target => target.name))
+  const uncovered = registryComponentNames.filter(name => !covered.has(name))
+
+  expect(
+    uncovered,
+    `Нет ни страницы витрины, ни записи в SERVICE_ENTITIES: ${uncovered.join(', ')}`,
+  ).toEqual([])
+})
