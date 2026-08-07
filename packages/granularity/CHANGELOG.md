@@ -41,6 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and a screen reader would otherwise read every slash out loud. `separator` and `size` are read from
   `GrConfigProvider`; slots `#item`, `#separator` and `#ellipsis` replace the parts. The layout is also exported as a
   pure `resolveBreadcrumbsLayout()` for anyone who wants to compute it outside the component.
+- **New `GrSidebarGroup` — sections with a heading.** Fifteen navigation items in a row are unreadable; a group is
+  announced as `role="group"` and tied to its heading through `aria-labelledby`. In a collapsed sidebar the heading has
+  nowhere to go: it is removed (along with the `aria-labelledby` that would otherwise point at nothing) and the
+  sections are separated by a rule instead, so the icons of neighbouring groups do not merge into one column.
+- **`GrSidebar`: `landmark`, `ariaLabel` and `position`.** The root renders as `<aside>` (`complementary`, the
+  default) or `<nav>` (`navigation`) — no nested `<nav>` inside `<aside>`, because two landmarks per panel clutter the
+  outline and a rail of filters is not navigation at all. `ariaLabel` names the landmark, which two sidebars on one
+  page need to be distinguishable. `position="right"` moves the border to the other side and mirrors the toggle
+  chevron: on a right-hand panel «collapse» points right.
 - **`GrTreeSelect`: checkboxes for multiple selection.** `show-checkbox` (together with `multiple`) swaps the
   component's own tick for `GrTree`'s checkboxes: checking a parent cascades over its subtree and a partially checked
   parent is announced as `aria-checked="mixed"`. The cascade is computed by the tree itself, so a click on the row, a
@@ -96,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   spilled onto the user once the stack drained. The queue keeps at most 20 toasts by default — configurable with
   `app.use(granularityToastPlugin, { maxToasts: 50 })` — dropping the oldest ones and clearing their timers.
 - **`GrToaster`: the toast title and message moved from `13px` literals to `--gr-text-sm`.**
+- **`GrSidebar`: the header, the collapsed-item letter and the badge moved from px literals to `--gr-text-*`.**
 - **`GrTreeSelect`: the panel's loading and empty rows moved from `13px` literals to `--gr-text-sm`.**
 - **`GrTabs` scrolls an overflowing row instead of wrapping it.** A wrapped row pushed tabs under the panel and broke
   the alignment; the row now scrolls horizontally with the scrollbar hidden, and the active tab pulls itself into view
@@ -134,6 +144,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   AA contrast, so the label of a disabled switch was harder to read than it should be. It is now dimmed with the new
   `--gr-disabled-*` tokens, and they take precedence over custom track colours — a disabled switch no longer looks
   like a working one.
+- **`GrSidebar`'s toggle button spoke English in every locale.** «Expand sidebar» / «Collapse sidebar» were hardcoded
+  past the i18n layer, and the only way out was passing `toggleLabel` by hand. The default now comes from
+  `gr.sidebar.expand` / `gr.sidebar.collapse`, added to all three locales.
+- **`GrSidebar`'s content could not be scrolled from the keyboard.** The scrolling container had no `tabindex`, so a
+  sidebar holding plain text was unreachable without a mouse; it is now a `Tab` stop with a visible focus ring.
+- **`GrSidebarItem` dimmed its disabled state with `opacity`.** It now uses the `--gr-disabled-fg` token, which does
+  not water down text tuned for AA contrast.
 - **`GrStatistic` did not tell a screen reader whether the metric went up or down.** The trend icon is decorative and
   «+12.5%» carries no direction on its own, so growth and decline were indistinguishable — colour conveys it to
   sighted users only. The trend line now carries a visually hidden «Increase» / «Decrease» / «No change», which

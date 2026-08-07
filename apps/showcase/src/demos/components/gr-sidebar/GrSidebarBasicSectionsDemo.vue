@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrSidebar, GrSidebarItem } from '@feugene/granularity'
+import { GrBadge, GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/granularity'
 
 const currentSection = ref('overview')
 const collapsed = ref(false)
 
 // icon — класс UnoCSS-иконки; у «Billing» иконки нет — в свёрнутом виде покажется буква «B».
-const sections = [
-  { label: 'Overview', value: 'overview', icon: 'i-lucide-layout-dashboard', badge: undefined as number | undefined },
-  { label: 'Team', value: 'team', icon: 'i-lucide-users', badge: 4 },
-  { label: 'Billing', value: 'billing', icon: undefined, badge: undefined },
-  { label: 'Settings', value: 'settings', icon: 'i-lucide-settings', badge: undefined },
+const groups = [
+  {
+    label: 'Workspace',
+    items: [
+      { label: 'Overview', value: 'overview', icon: 'i-lucide-layout-dashboard', badge: undefined as number | undefined },
+      { label: 'Team', value: 'team', icon: 'i-lucide-users', badge: 4 },
+    ],
+  },
+  {
+    label: 'Administration',
+    items: [
+      { label: 'Billing', value: 'billing', icon: undefined, badge: undefined },
+      { label: 'Settings', value: 'settings', icon: 'i-lucide-settings', badge: undefined },
+    ],
+  },
 ]
 </script>
 
@@ -22,19 +32,23 @@ const sections = [
       title="Workspace"
       subtitle="Navigation"
       show-toggle-button
+      landmark="navigation"
+      aria-label="Workspace sections"
       class="rounded-xl"
     >
-      <div class="grid gap-1">
-        <GrSidebarItem
-          v-for="section in sections"
-          :key="section.value"
-          :label="section.label"
-          :icon="section.icon"
-          :badge="section.badge"
-          :active="section.value === currentSection"
-          @click="currentSection = section.value"
-        />
-      </div>
+      <GrSidebarGroup v-for="group in groups" :key="group.label" :label="group.label">
+        <div class="grid gap-1">
+          <GrSidebarItem
+            v-for="section in group.items"
+            :key="section.value"
+            :label="section.label"
+            :icon="section.icon"
+            :badge="section.badge"
+            :active="section.value === currentSection"
+            @click="currentSection = section.value"
+          />
+        </div>
+      </GrSidebarGroup>
     </GrSidebar>
 
     <div class="flex-1 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4">

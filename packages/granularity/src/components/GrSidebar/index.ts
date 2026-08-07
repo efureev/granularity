@@ -1,4 +1,8 @@
 export { default } from './GrSidebar.vue'
 export { default as GrSidebar, type GrSidebarProps } from './GrSidebar.vue'
 export { default as GrSidebarItem } from './GrSidebarItem.vue'
+export { default as GrSidebarGroup, type GrSidebarGroupProps } from './GrSidebarGroup.vue'
 export { grSidebarConfig } from './config'
+export { GR_SIDEBAR_LANDMARKS, GR_SIDEBAR_POSITIONS } from './grSidebarStyles'
+export type { GrSidebarLandmark, GrSidebarPosition } from './grSidebarStyles'
+export { grSidebarSafelist } from './safelist'

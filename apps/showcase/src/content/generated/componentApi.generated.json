@@ -7269,11 +7269,32 @@
             "default": "undefined"
           },
           {
+            "name": "ariaLabel",
+            "description": "Имя лендмарка: без него две панели на странице неразличимы.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "width",
             "description": "Ширина в развёрнутом состоянии.",
             "type": "string | undefined",
             "required": false,
             "default": "\"240px\""
+          },
+          {
+            "name": "position",
+            "description": "Сторона экрана: граница и направление шеврона зеркалятся.",
+            "type": "\"left\" | \"right\" | undefined",
+            "required": false,
+            "default": "\"left\""
+          },
+          {
+            "name": "landmark",
+            "description": "Лендмарк корня. `complementary` (по умолчанию) — `<aside>`; `navigation` — `<nav>` для панели, которая действительно является навигацией. Вложенный `<nav>` внутрь `<aside>` не заводим: два лендмарка на одну панель засоряют обзор, а панель фильтров навигацией не является вовсе.",
+            "type": "\"complementary\" | \"navigation\" | undefined",
+            "required": false,
+            "default": "\"complementary\""
           },
           {
             "name": "subtitle",
@@ -7305,7 +7326,7 @@
           },
           {
             "name": "toggleLabel",
-            "description": "A11y-лейбл кнопки тогла.",
+            "description": "A11y-лейбл кнопки тогла. Не задан — берётся из локали (`gr.sidebar.*`).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

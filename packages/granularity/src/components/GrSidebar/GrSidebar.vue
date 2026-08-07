@@ -17,8 +17,21 @@ import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
+import {
+  contentBase,
+  grSidebarCollapseDirection,
+  grSidebarRootClass,
+  headerBase,
+  subtitleClass,
+  titleClass,
+  type GrSidebarLandmark,
+  type GrSidebarPosition,
+} from './grSidebarStyles'
 import { GR_SIDEBAR_KEY } from './sidebarContext'
+
+export type { GrSidebarLandmark, GrSidebarPosition } from './grSidebarStyles'
 
 export interface GrSidebarProps {
   title?: string
@@ -31,8 +44,19 @@ export interface GrSidebarProps {
   width?: string
   /** Ширина в свёрнутом состоянии. */
   collapsedWidth?: string
-  /** A11y-лейбл кнопки тогла. */
+  /** A11y-лейбл кнопки тогла. Не задан — берётся из локали (`gr.sidebar.*`). */
   toggleLabel?: string
+  /** Сторона экрана: граница и направление шеврона зеркалятся. */
+  position?: GrSidebarPosition
+  /**
+   * Лендмарк корня. `complementary` (по умолчанию) — `<aside>`; `navigation` —
+   * `<nav>` для панели, которая действительно является навигацией. Вложенный
+   * `<nav>` внутрь `<aside>` не заводим: два лендмарка на одну панель засоряют
+   * обзор, а панель фильтров навигацией не является вовсе.
+   */
+  landmark?: GrSidebarLandmark
+  /** Имя лендмарка: без него две панели на странице неразличимы. */
+  ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<GrSidebarProps>(), {
@@ -43,7 +67,12 @@ const props = withDefaults(defineProps<GrSidebarProps>(), {
   width: '240px',
   collapsedWidth: '64px',
   toggleLabel: undefined,
+  position: 'left',
+  landmark: 'complementary',
+  ariaLabel: undefined,
 })
+
+const { t } = useGranularityTranslations()
 
 const emit = defineEmits<{
   (e: 'update:collapsed', value: boolean): void
@@ -70,23 +99,31 @@ const asideStyle = computed(() => ({
   width: collapsedState.value ? props.collapsedWidth : props.width,
 }))
 
-const resolvedToggleLabel = computed(() =>
-  props.toggleLabel ?? (collapsedState.value ? 'Expand sidebar' : 'Collapse sidebar'),
-)
+const resolvedToggleLabel = computed(() => props.toggleLabel ?? (collapsedState.value
+  ? t('gr.sidebar.expand', 'Expand sidebar')
+  : t('gr.sidebar.collapse', 'Collapse sidebar')))
+
+const rootTag = computed(() => (props.landmark === 'navigation' ? 'nav' : 'aside'))
+const rootClass = computed(() => grSidebarRootClass(props.position))
+
+const collapseDirection = computed(() => grSidebarCollapseDirection(props.position, collapsedState.value))
+const collapseIcon = computed(() => (collapseDirection.value === 'right' ? IconChevronRight : IconChevronLeft))
 </script>
 
 <template>
-  <aside
+  <component
+    :is="rootTag"
     data-gr-sidebar
     :data-collapsed="collapsedState ? 'true' : undefined"
-    class="flex flex-col border-r border-[var(--gr-sidebar-brd)] bg-[var(--gr-sidebar)] text-[var(--gr-sidebar-fg)] transition-[width] duration-200 ease-out"
+    :data-position="position"
+    :aria-label="ariaLabel"
+    :class="rootClass"
     :style="asideStyle"
   >
     <div
       v-if="showHeader"
       data-gr-sidebar-header
-      class="flex items-center gap-2 border-b border-[var(--gr-sidebar-brd)] px-3 py-4"
-      :class="collapsedState ? 'justify-center' : 'justify-between'"
+      :class="[headerBase, collapsedState ? 'justify-center' : 'justify-between']"
     >
       <div
         v-if="!collapsedState && (hasTitle || hasSubtitle || $slots.title || $slots.subtitle)"
@@ -95,7 +132,7 @@ const resolvedToggleLabel = computed(() =>
         <div
           v-if="$slots.subtitle || hasSubtitle"
           data-gr-sidebar-subtitle
-          class="truncate text-[14px] text-[var(--gr-muted-fg)]"
+          :class="subtitleClass"
         >
           <slot name="subtitle">
             {{ subtitle }}
@@ -104,7 +141,7 @@ const resolvedToggleLabel = computed(() =>
         <div
           v-if="$slots.title || hasTitle"
           data-gr-sidebar-title
-          class="truncate text-[18px] font-700"
+          :class="titleClass"
         >
           <slot name="title">
             {{ title }}
@@ -120,17 +157,21 @@ const resolvedToggleLabel = computed(() =>
         square
         :aria-label="resolvedToggleLabel"
         :aria-expanded="collapsedState ? 'false' : 'true'"
+        :data-direction="collapseDirection"
         @click="toggle"
       >
         <GrIcon :size="16">
-          <IconChevronRight v-if="collapsedState" />
-          <IconChevronLeft v-else />
+          <component :is="collapseIcon" />
         </GrIcon>
       </GrButton>
     </div>
 
-    <div class="flex-1 overflow-y-auto" :class="collapsedState ? 'p-2' : 'p-3'">
+    <div
+      data-gr-sidebar-content
+      tabindex="0"
+      :class="[contentBase, collapsedState ? 'p-2' : 'p-3']"
+    >
       <slot />
     </div>
-  </aside>
+  </component>
 </template>

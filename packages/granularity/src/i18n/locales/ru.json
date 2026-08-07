@@ -78,6 +78,10 @@
   "switch": {
     "loading": "Сохраняем…"
   },
+  "sidebar": {
+    "expand": "Развернуть панель",
+    "collapse": "Свернуть панель"
+  },
   "statistic": {
     "trendUp": "Рост",
     "trendDown": "Падение",

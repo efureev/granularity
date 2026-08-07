@@ -1,0 +1,38 @@
+import { splitClassTokens } from '../shared/classTokens'
+import {
+  contentBase,
+  groupCollapsedClass,
+  groupLabelClass,
+  headerBase,
+  itemActiveClass,
+  itemBadgeClass,
+  itemBase,
+  itemCollapsedClass,
+  itemDisabledClass,
+  itemExpandedClass,
+  itemIdleClass,
+  itemLetterClass,
+  rootBase,
+  rootPositions,
+  subtitleClass,
+  titleClass,
+} from './grSidebarStyles'
+
+export const grSidebarSafelist = [...new Set([
+  ...splitClassTokens(rootBase),
+  ...Object.values(rootPositions).flatMap(splitClassTokens),
+  ...splitClassTokens(headerBase),
+  ...splitClassTokens(titleClass),
+  ...splitClassTokens(subtitleClass),
+  ...splitClassTokens(contentBase),
+  ...splitClassTokens(itemBase),
+  ...splitClassTokens(itemCollapsedClass),
+  ...splitClassTokens(itemExpandedClass),
+  ...splitClassTokens(itemDisabledClass),
+  ...splitClassTokens(itemActiveClass),
+  ...splitClassTokens(itemIdleClass),
+  ...splitClassTokens(itemLetterClass),
+  ...splitClassTokens(itemBadgeClass),
+  ...splitClassTokens(groupLabelClass),
+  ...splitClassTokens(groupCollapsedClass),
+])]

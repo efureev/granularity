@@ -12,6 +12,7 @@
  */
 import { computed, inject, markRaw, type Component } from 'vue'
 
+import { grSidebarItemClass, itemBadgeClass, itemLetterClass } from './grSidebarStyles'
 import { GR_SIDEBAR_KEY } from './sidebarContext'
 
 const props = withDefaults(defineProps<{
@@ -45,15 +46,11 @@ const rootTag = computed<string | Component>(() => {
   return props.href ? 'a' : 'button'
 })
 
-const rootClass = computed(() => [
-  'group relative flex w-full items-center rounded-lg text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
-  collapsed.value ? 'justify-center px-0 py-2' : 'gap-3 px-3 py-2',
-  props.disabled
-    ? 'cursor-not-allowed opacity-50'
-    : props.active
-      ? 'bg-[var(--gr-muted)] font-600 text-[var(--gr-fg)]'
-      : 'text-[var(--gr-sidebar-fg)] hover:bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_8%,transparent)]',
-])
+const rootClass = computed(() => grSidebarItemClass({
+  collapsed: collapsed.value,
+  disabled: props.disabled,
+  active: props.active,
+}))
 </script>
 
 <template>
@@ -71,15 +68,12 @@ const rootClass = computed(() => [
     <span class="flex h-5 w-5 shrink-0 items-center justify-center">
       <component :is="iconComponent" v-if="iconComponent" class="h-5 w-5" aria-hidden="true" />
       <span v-else-if="isStringIcon" :class="icon" class="block h-5 w-5" aria-hidden="true" />
-      <span v-else-if="collapsed" class="text-[13px] font-700 leading-none" aria-hidden="true">{{ firstLetter }}</span>
+      <span v-else-if="collapsed" :class="itemLetterClass" aria-hidden="true">{{ firstLetter }}</span>
     </span>
 
     <template v-if="!collapsed">
       <span class="min-w-0 flex-1 truncate text-left">{{ label }}</span>
-      <span
-        v-if="badge != null"
-        class="shrink-0 rounded-full bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_12%,transparent)] px-1.5 py-0.5 text-[11px] font-600"
-      >{{ badge }}</span>
+      <span v-if="badge != null" :class="itemBadgeClass">{{ badge }}</span>
     </template>
   </component>
 </template>

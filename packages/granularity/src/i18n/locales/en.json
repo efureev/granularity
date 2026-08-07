@@ -76,6 +76,10 @@
   "switch": {
     "loading": "Saving…"
   },
+  "sidebar": {
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar"
+  },
   "statistic": {
     "trendUp": "Increase",
     "trendDown": "Decrease",

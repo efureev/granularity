@@ -72,7 +72,7 @@
 - [`GrResponseErrorBanner`](./components/GrResponseErrorBanner.md)
 - `GrSegmented`
 - [`GrSelect`](./components/GrSelect.md)
-- `GrSidebar`
+- [`GrSidebar`](./components/GrSidebar.md)
 - `GrSkeleton`
 - `GrSlider`
 - [`GrStatistic`](./components/GrStatistic.md)

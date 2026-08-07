@@ -77,6 +77,10 @@
   "switch": {
     "loading": "Guardando…"
   },
+  "sidebar": {
+    "expand": "Expandir panel",
+    "collapse": "Contraer panel"
+  },
   "statistic": {
     "trendUp": "Aumento",
     "trendDown": "Descenso",
