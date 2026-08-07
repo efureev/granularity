@@ -299,7 +299,7 @@ describe('component docs metadata', () => {
     expect(formFileDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(formFileDoc.examples.every(example => example.previewKey?.startsWith('gr-form-file'))).toBe(true)
 
-    expect(formSectionDoc.examples).toHaveLength(4)
+    expect(formSectionDoc.examples).toHaveLength(5)
     expect(formSectionDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(formSectionDoc.examples.every(example => example.previewKey?.startsWith('gr-form-section'))).toBe(true)
 

@@ -3689,6 +3689,20 @@
         "origin": "generated",
         "items": [
           {
+            "name": "title",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "headingLevel",
+            "description": "Уровень заголовка под структуру страницы. Не задан — берётся из `GrConfigProvider`, иначе `3`.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "description",
             "description": "",
             "type": "string | undefined",
@@ -3696,10 +3710,11 @@
             "default": "undefined"
           },
           {
-            "name": "title",
-            "description": "",
-            "type": "string",
-            "required": true
+            "name": "landmark",
+            "description": "Объявить секцию лендмарком `region`. По умолчанию выключено: пять секций формы дали бы пять лендмарков и засорили обзор, а структуру и так несёт заголовок. Включать стоит там, где секция действительно крупная и к ней хочется прыгать как к региону.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -3710,8 +3725,23 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Контент секции.",
+            "type": "any"
+          },
+          {
+            "name": "title",
+            "description": "Заголовок целиком — вместо строки `title`.",
+            "type": "any"
+          },
+          {
+            "name": "description",
+            "description": "Описание целиком — вместо строки `description`.",
+            "type": "any"
+          },
+          {
+            "name": "actions",
+            "description": "Действия в правой части шапки: «Добавить», «Сбросить».",
+            "type": "any"
           }
         ]
       },

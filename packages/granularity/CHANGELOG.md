@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrFormSection`: heading level and header slots.** `headingLevel` (`h2`…`h6`, default `h3`, readable from
+  `GrConfigProvider`) makes the section title a real heading — that is how a long form is navigated by anyone using a
+  screen reader. New slots: `#title` and `#description` build those parts from markup instead of a string, `#actions`
+  puts controls («Add», «Reset») into the right side of the header, which now wraps under the title on a narrow screen.
+  Without a title, a description and actions the header is not rendered at all.
 - **`GrButtonGroup`: shared styling, orientation and a spaced mode.** `size`, `variant` and `tone` set on the group
   reach its buttons through context, so the props stop being repeated on every one of them; the resolution order is
   button prop → group → `GrConfigProvider` → default, because the group sits closer to the button than a global
@@ -47,6 +52,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   highlight (hover, current node) now spans the full width at any depth instead of starting at the indent, and branch
   lines are drawn per row rather than by a bordered wrapper. The `indent` prop became real — it was declared but never
   used — and sets the indentation step in pixels (`--gr-tree-indent-step` in the theme).
+- **`GrFormSection` is no longer a landmark by default.** A `<section>` with an accessible name is exposed as a
+  `region`, so five sections of one form produced five landmarks and buried the useful ones. The name is now attached
+  only when `landmark` is set; structure is carried by the heading. The description keeps its `aria-describedby` link
+  in both modes.
+- **`GrFormSection`: the description moved from a `13px` literal to `--gr-text-sm`.** It is 1px larger than before —
+  the title and the description now share a size, and the hierarchy is carried by weight and colour.
 
 ### Fixed
 

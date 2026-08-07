@@ -2,6 +2,57 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grFormSectionExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'form-section-actions',
+    title: 'Heading level, actions and slots',
+    description: 'Заголовок секции — настоящий `h2`…`h6` (`heading-level`, по умолчанию `h3`): именно по заголовкам незрячий пользователь обходит длинную форму. Слот `#title` собирает заголовок разметкой, `#actions` кладёт кнопки в правую часть шапки. Лендмарком секция становится только по пропу `landmark` — иначе пять секций дали бы пять регионов в обзоре.',
+    status: 'ready',
+    previewKey: 'gr-form-section-actions',
+    code: `<script setup lang="ts">
+import { ref } from 'vue'
+
+import { GrBadge, GrButton, GrCard, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
+
+const members = ref([
+  { id: 1, email: 'ada@example.com' },
+  { id: 2, email: 'grace@example.com' },
+])
+
+function addMember(): void {
+  members.value = [...members.value, { id: Date.now(), email: '' }]
+}
+</script>
+
+<template>
+  <GrCard class="p-4">
+    <!-- Заголовок секции — настоящий \`h4\`, поэтому форма обходится по заголовкам. -->
+    <GrFormSection
+      title="Участники проекта"
+      description="Приглашения уходят на почту сразу после сохранения."
+      :heading-level="4"
+    >
+      <template #title>
+        Участники проекта
+        <GrBadge tone="neutral">
+          {{ members.length }}
+        </GrBadge>
+      </template>
+
+      <template #actions>
+        <GrButton variant="outline" size="sm" @click="addMember">
+          Добавить
+        </GrButton>
+      </template>
+
+      <div class="grid gap-3">
+        <GrFormField v-for="(member, index) in members" :key="member.id" :label="\`Участник \${index + 1}\`">
+          <GrInput v-model="member.email" type="email" placeholder="name@example.com" />
+        </GrFormField>
+      </div>
+    </GrFormSection>
+  </GrCard>
+</template>`,
+  },
+  {
     id: 'form-section-profile-layout',
     title: 'Section heading with profile fields',
     description: 'Показываем базовую роль `GrFormSection`: лёгкий heading-wrapper для связанных полей и описания секции.',

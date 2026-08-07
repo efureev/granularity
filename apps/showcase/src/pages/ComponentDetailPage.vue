@@ -149,6 +149,7 @@ const previewRegistry = {
   'gr-form-file-multiple-queue': defineAsyncComponent(() => import('../demos/components/gr-form-file/GrFormFileMultipleQueueDemo.vue')),
   'gr-form-file-sizes': defineAsyncComponent(() => import('../demos/components/gr-form-file/GrFormFileSizesDemo.vue')),
   'gr-form-file-server-errors': defineAsyncComponent(() => import('../demos/components/gr-form-file/GrFormFileServerErrorsDemo.vue')),
+  'gr-form-section-actions': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionActionsDemo.vue')),
   'gr-form-section-bordered': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionBorderedDemo.vue')),
   'gr-form-section-nested-groups': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionNestedGroupsDemo.vue')),
   'gr-form-section-profile-layout': defineAsyncComponent(() => import('../demos/components/gr-form-section/GrFormSectionProfileDemo.vue')),
