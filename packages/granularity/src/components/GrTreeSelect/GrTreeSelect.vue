@@ -6,6 +6,7 @@ import { usePortalTarget } from '../../composables/usePortalTarget'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
+import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
@@ -123,11 +124,14 @@ const clickOutsideExclude = [() => panelEl.value]
 
 let hadPointerDownOnTrigger = false
 
-// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
-// (паттерн `GrPopover`). Имя `open` сохранено: читатели работают с computed-Ref.
-const internalOpen = ref(false)
-const isOpenControlled = computed(() => props.open !== undefined)
-const open = computed(() => props.open ?? internalOpen.value)
+// Имя `open` сохранено: читатели работают с computed-Ref.
+const { open, setOpen: setOpenState } = useControlledOpen(
+  () => props.open,
+  (next) => {
+    emit('update:open', next)
+    emit('visibleChange', next)
+  },
+)
 const filterValue = ref('')
 
 const { floatingStyle } = useFloating(rootEl, panelEl, open, {
@@ -284,16 +288,7 @@ function setOpen(next: boolean) {
   if (isDisabled.value || isReadonly.value)
     return
 
-  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
-  // `open`, и проверка после неё всегда была бы ложной.
-  if (open.value === next)
-    return
-
-  if (!isOpenControlled.value)
-    internalOpen.value = next
-
-  emit('update:open', next)
-  emit('visibleChange', next)
+  setOpenState(next)
 }
 
 function onClickOutside(): void {

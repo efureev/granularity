@@ -6,6 +6,7 @@ import { usePortalTarget } from '../../composables/usePortalTarget'
 import { vClickOutside } from '../../directives'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
+import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import {
   grDropdownContentClass,
   grDropdownOriginClass,
@@ -68,21 +69,11 @@ const props = withDefaults(defineProps<GrDropdownProps>(), {
 
 const emit = defineEmits<GrDropdownEmits>()
 
-// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
-// (паттерн `GrPopover`). Имя `isOpen` сохранено: читатели работают с computed-Ref.
-const internalOpen = ref(false)
-const isOpenControlled = computed(() => props.open !== undefined)
-const isOpen = computed(() => props.open ?? internalOpen.value)
-
-function setOpen(next: boolean): void {
-  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
-  // `isOpen`, и проверка после неё всегда была бы ложной.
-  if (next === isOpen.value) return
-
-  if (!isOpenControlled.value) internalOpen.value = next
-
-  emit('update:open', next)
-}
+// Имя `isOpen` сохранено: читатели работают с computed-Ref.
+const { open: isOpen, setOpen } = useControlledOpen(
+  () => props.open,
+  next => emit('update:open', next),
+)
 
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)

@@ -14,6 +14,8 @@ import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
+import { useControlledOpen } from '../../composables/internal/useControlledOpen'
+import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
 
 import {
   autocompleteChipClass,
@@ -246,23 +248,11 @@ const query = ref('')
 // открытии заполненного поля показать весь список (а не отфильтровать по метке
 // уже выбранной опции). Сбрасывается при программной установке `query`.
 const dirty = ref(false)
-// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
-// (паттерн `GrPopover`). Имя `open` сохранено: читатели работают с computed-Ref.
-const internalOpen = ref(false)
-const isOpenControlled = computed(() => props.open !== undefined)
-const open = computed(() => props.open ?? internalOpen.value)
-
-function setOpen(next: boolean): void {
-  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
-  // `open`, и проверка после неё всегда была бы ложной.
-  if (next === open.value) return
-
-  if (!isOpenControlled.value) internalOpen.value = next
-
-  emit('update:open', next)
-}
-
-const activeIndex = ref(-1)
+// Имя `open` сохранено: читатели работают с computed-Ref.
+const { open, setOpen } = useControlledOpen(
+  () => props.open,
+  next => emit('update:open', next),
+)
 
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
@@ -434,17 +424,6 @@ const navigableItems = computed<NavigableItem[]>(() => {
   return items
 })
 
-const activeItem = computed<NavigableItem | undefined>(() =>
-  activeIndex.value >= 0 ? navigableItems.value[activeIndex.value] : undefined,
-)
-const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.option.value : undefined))
-const activeDescendantId = computed(() => {
-  if (!open.value) return undefined
-  const item = activeItem.value
-  if (!item) return undefined
-  return item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
-})
-
 function isSelected(value: TValue): boolean {
   return selectedValues.value.includes(value)
 }
@@ -453,48 +432,34 @@ function navigableIndexOf(value: TValue): number {
   return navigableItems.value.findIndex(item => item.kind === 'option' && item.option.value === value)
 }
 
-function clampActive(index: number): number {
-  const len = navigableItems.value.length
-  if (len === 0) return -1
-  return ((index % len) + len) % len
-}
-
-/** Позиция активного элемента в виртуальном наборе `[«Add …»?] + filteredOptions`. */
-const activeVirtualIndex = computed(() => {
-  const item = activeItem.value
-  if (!item) return -1
-  return item.kind === 'add' ? 0 : item.index + addOffset.value
-})
-
-async function scrollActiveIntoView(): Promise<void> {
+/** Прокрутка к активному: сперва окно виртуального списка, затем доводка. */
+async function scrollActiveIntoView(item: NavigableItem): Promise<void> {
   // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
   // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
-  // Поэтому сперва прокрутка виртуального списка, и только потом — доводка.
-  if (props.virtual && activeVirtualIndex.value >= 0)
-    virtualizer.scrollToIndex(activeVirtualIndex.value)
+  if (props.virtual)
+    virtualizer.scrollToIndex(item.kind === 'add' ? 0 : item.index + addOffset.value)
 
   await nextTick()
-  const id = activeDescendantId.value
-  if (!id) return
+  const id = item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
   document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
 }
 
-function setActive(index: number): void {
-  activeIndex.value = clampActive(index)
-  void scrollActiveIntoView()
-}
-
-function initActiveIndex(): void {
-  const selectedIdx = navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.option.value))
-  activeIndex.value = selectedIdx >= 0 ? selectedIdx : (navigableItems.value.length ? 0 : -1)
-}
-
-// Пересчёт активной опции при изменении списка (фильтрация/remote-загрузка).
-watch(navigableItems, () => {
-  if (!open.value) return
-  if (activeIndex.value >= navigableItems.value.length) activeIndex.value = navigableItems.value.length - 1
-  if (activeIndex.value < 0 && navigableItems.value.length) activeIndex.value = 0
+const {
+  activeIndex,
+  activeItem,
+  activeDescendantId,
+  init: initActiveIndex,
+  reset: resetActive,
+  handleNavigationKeys,
+} = useComboboxNavigation<NavigableItem>({
+  items: () => navigableItems.value,
+  open: () => open.value,
+  idOf: item => (item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)),
+  initialIndex: () => navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.option.value)),
+  scrollTo: item => scrollActiveIntoView(item),
 })
+
+const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.option.value : undefined))
 
 // ————— Открытие/закрытие.
 function openDropdown(): void {
@@ -713,25 +678,10 @@ function onKeydown(event: KeyboardEvent): void {
     return
   }
 
+  // Только при открытой панели: в закрытом инпуте Home/End двигают каретку.
+  if (open.value && handleNavigationKeys(event)) return
+
   switch (event.key) {
-    case 'ArrowDown':
-      event.preventDefault()
-      setActive(activeIndex.value + 1)
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      setActive(activeIndex.value - 1)
-      break
-    case 'Home':
-      if (!open.value) break
-      event.preventDefault()
-      setActive(0)
-      break
-    case 'End':
-      if (!open.value) break
-      event.preventDefault()
-      setActive(navigableItems.value.length - 1)
-      break
     case 'Enter': {
       if (!open.value) break
       event.preventDefault()
@@ -771,7 +721,7 @@ watch(open, (isOpen) => {
     return
   }
   // Закрытие: сбрасываем активную опцию и «черновик».
-  activeIndex.value = -1
+  resetActive()
   if (props.multiple) {
     setQuery('')
   }

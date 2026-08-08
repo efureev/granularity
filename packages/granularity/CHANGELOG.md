@@ -276,6 +276,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **One combobox engine instead of four copies.** The active-option machinery — `activeIndex`, cyclic clamping,
+  `aria-activedescendant`, scroll-to-active, init-on-open — existed as four hand-written copies (`GrSelect`,
+  `GrAutocomplete`, `GrCommandPalette`, partially `GrDropdown`) and had already drifted apart badly enough to produce
+  the Select Enter bug. Two internal composables now hold it: `useControlledOpen` (the `v-model:open` contract, also
+  adopted by `GrPopover`/`GrTreeSelect`/`GrDropdown`) and `useComboboxNavigation` (active item + mechanical keys;
+  activation — Enter, typeahead — deliberately stays per-component). No behavioural or API change: the entire existing
+  test suite passes untouched.
 - **Comments no longer narrate their own edit history.** Twenty-six places across the package explained an invariant
   by telling what the code used to do («раньше каждый оверлей хранил…»); they now state the invariant in the present
   tense, and the story stays where it belongs — in git. Along the way one comment in `grAlertStyles.ts` turned out to

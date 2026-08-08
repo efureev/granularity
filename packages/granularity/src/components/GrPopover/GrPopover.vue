@@ -23,6 +23,7 @@
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
+import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { vClickOutside } from '../../directives'
@@ -99,29 +100,16 @@ const emit = defineEmits<GrPopoverEmits>()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPopover' })
 
-// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`.
-// Без него `v-model` был бы обязателен, а поповер без модели — самый частый
-// случай использования.
-const internalOpen = ref(false)
-const isControlled = computed(() => props.open !== undefined)
-const isOpen = computed(() => props.open ?? internalOpen.value)
+const { open: isOpen, setOpen } = useControlledOpen(
+  () => props.open,
+  next => emit('update:open', next),
+)
 
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const panelId = useId()
 
 const clickOutsideExclude = [() => panelEl.value]
-
-function setOpen(next: boolean): void {
-  // Сравнение — ДО мутации: в uncontrolled-режиме запись в `internalOpen`
-  // немедленно меняет `isOpen`, и проверка после неё всегда была бы ложной,
-  // то есть `update:open` не улетало бы никогда.
-  if (next === isOpen.value) return
-
-  if (!isControlled.value) internalOpen.value = next
-
-  emit('update:open', next)
-}
 
 function open(): void {
   if (props.disabled) return

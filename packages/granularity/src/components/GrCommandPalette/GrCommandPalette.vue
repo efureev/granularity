@@ -5,6 +5,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { isComposingEvent } from '../../internal/keyboard'
+import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
 import GrKbd from '../GrKbd/GrKbd.vue'
 import GrModal from '../GrModal/GrModal.vue'
 
@@ -136,7 +137,6 @@ const loadingText = computed(() => t('gr.commandPalette.loading', 'Loading…'))
 const recentTitle = computed(() => t('gr.commandPalette.recent', 'Recent'))
 
 const query = ref('')
-const activeIndex = ref(0)
 const inputEl = ref<HTMLInputElement | null>(null)
 const listboxId = useId()
 
@@ -167,15 +167,9 @@ const orderedItems = computed(() => groups.value.flatMap(group => group.items))
 /** Плоский список того, что реально выбирается — по нему ходят стрелки. */
 const navigableItems = computed(() => orderedItems.value.filter(item => !item.disabled))
 
-const activeItem = computed<GrCommandItem | undefined>(() => navigableItems.value[activeIndex.value])
-
 function itemDomId(id: string): string {
   return `${listboxId}-item-${id}`
 }
-
-const activeDescendantId = computed(() =>
-  activeItem.value ? itemDomId(activeItem.value.id) : undefined,
-)
 
 /**
  * Виртуализация списка.
@@ -291,14 +285,7 @@ function matchSegments(text: string): ReturnType<typeof splitCommandMatch> {
   return splitCommandMatch(text, props.filterable ? query.value : '')
 }
 
-function isActive(item: GrCommandItem): boolean {
-  return activeItem.value?.id === item.id
-}
-
-async function scrollActiveIntoView(): Promise<void> {
-  const item = activeItem.value
-  if (!item) return
-
+async function scrollActiveIntoView(item: GrCommandItem): Promise<void> {
   // Вне окна активной команды в DOM нет: `getElementById` вернул бы `null`,
   // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
   if (props.virtual) {
@@ -310,10 +297,24 @@ async function scrollActiveIntoView(): Promise<void> {
   document.getElementById(itemDomId(item.id))?.scrollIntoView?.({ block: 'nearest' })
 }
 
-function setActive(index: number): void {
-  const len = navigableItems.value.length
-  activeIndex.value = len === 0 ? 0 : ((index % len) + len) % len
-  void scrollActiveIntoView()
+const {
+  activeItem,
+  activeDescendantId,
+  setActive,
+  reset: resetActive,
+  handleNavigationKeys,
+} = useComboboxNavigation<GrCommandItem>({
+  items: () => navigableItems.value,
+  open: () => props.modelValue,
+  idOf: item => itemDomId(item.id),
+  scrollTo: item => scrollActiveIntoView(item),
+})
+
+// Палитра всегда стартует с первой команды — и при монтировании открытой тоже.
+resetActive(0)
+
+function isActive(item: GrCommandItem): boolean {
+  return activeItem.value?.id === item.id
 }
 
 // Активной становится первая команда, когда список изменился **по содержимому**.
@@ -324,7 +325,7 @@ function setActive(index: number): void {
 // дало бы тот же ключ, что «a» + «b,c».
 watch(
   () => orderedItems.value.map(item => item.id).join(' '),
-  () => { activeIndex.value = 0 },
+  () => resetActive(0),
 )
 
 // `id` — ключ рендера и цель `aria-activedescendant`: дубли дают одинаковые
@@ -377,23 +378,9 @@ function onKeydown(event: KeyboardEvent): void {
   // стрелки ходят по кандидатам.
   if (isComposingEvent(event)) return
 
+  if (handleNavigationKeys(event)) return
+
   switch (event.key) {
-    case 'ArrowDown':
-      event.preventDefault()
-      setActive(activeIndex.value + 1)
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      setActive(activeIndex.value - 1)
-      break
-    case 'Home':
-      event.preventDefault()
-      setActive(0)
-      break
-    case 'End':
-      event.preventDefault()
-      setActive(navigableItems.value.length - 1)
-      break
     case 'Enter':
       if (!activeItem.value) break
       event.preventDefault()
@@ -409,7 +396,7 @@ watch(
     if (!open) return
 
     query.value = ''
-    activeIndex.value = 0
+    resetActive(0)
   },
 )
 

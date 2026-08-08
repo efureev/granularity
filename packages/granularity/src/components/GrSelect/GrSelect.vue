@@ -15,6 +15,8 @@ import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
+import { useControlledOpen } from '../../composables/internal/useControlledOpen'
+import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
 
 import {
   defaultBaseClass,
@@ -431,22 +433,12 @@ const customValue = computed<string>({
   },
 })
 
-// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
-// (паттерн `GrPopover`). Имя `open` сохранено: все читатели — шаблон, watch,
-// `useDismissible`/`useFloating` — работают с computed-Ref как раньше.
-const internalOpen = ref(false)
-const isOpenControlled = computed(() => props.open !== undefined)
-const open = computed(() => props.open ?? internalOpen.value)
-
-function setOpen(next: boolean): void {
-  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
-  // `open`, и проверка после неё всегда была бы ложной.
-  if (next === open.value) return
-
-  if (!isOpenControlled.value) internalOpen.value = next
-
-  emit('update:open', next)
-}
+// Имя `open` сохранено: все читатели — шаблон, watch, `useDismissible`/
+// `useFloating` — работают с computed-Ref как раньше.
+const { open, setOpen } = useControlledOpen(
+  () => props.open,
+  next => emit('update:open', next),
+)
 
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
@@ -694,7 +686,6 @@ function tagRemoveLabel(option: GrSelectOption<TValue>): string {
 
 // ————— Клавиатурная навигация комбобокса (WAI-ARIA, aria-activedescendant).
 const listboxId = useId()
-const activeIndex = ref(-1)
 
 /**
  * Id опции строится от позиции в списке: значение с пробелом дало бы невалидный
@@ -917,22 +908,37 @@ function navigableIndexOf(value: TValue): number {
   return navigableItems.value.findIndex(item => item.kind === 'option' && sameValue(item.value, value))
 }
 
-const activeItem = computed(() => (activeIndex.value >= 0 ? navigableItems.value[activeIndex.value] : undefined))
-const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.value : undefined))
 const addOptionDomId = computed(() => `${listboxId}-add`)
-const activeDescendantId = computed(() => {
-  if (!open.value) return undefined
-  const item = activeItem.value
-  if (!item) return undefined
-  return item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
+
+/** Прокрутка к активному: у виртуализации окно, затем доводка `scrollIntoView`. */
+async function scrollActiveIntoView(item: GrSelectNavigableItem<TValue>): Promise<void> {
+  // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
+  // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
+  if (virtualEnabled.value)
+    virtualizer.scrollToIndex(item.kind === 'add' ? 0 : item.index + addOffset.value)
+
+  await nextTick()
+  const id = item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
+  document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
+}
+
+const {
+  activeIndex,
+  activeItem,
+  activeDescendantId,
+  setActive,
+  init: initActiveIndex,
+  reset: resetActive,
+  handleNavigationKeys,
+} = useComboboxNavigation<GrSelectNavigableItem<TValue>>({
+  items: () => navigableItems.value,
+  open: () => open.value,
+  idOf: item => (item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)),
+  initialIndex: () => navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.value)),
+  scrollTo: item => scrollActiveIntoView(item),
 })
 
-// Пересчёт активного элемента при изменении списка (фильтрация по вводу).
-watch(navigableItems, () => {
-  if (!open.value) return
-  if (activeIndex.value >= navigableItems.value.length) activeIndex.value = navigableItems.value.length - 1
-  if (activeIndex.value < 0 && navigableItems.value.length) activeIndex.value = 0
-})
+const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.value : undefined))
 
 /**
  * `aria-activedescendant` работает только на элементе, который держит фокус.
@@ -944,35 +950,6 @@ const searchActiveDescendant = computed(() => (showSearchInput.value ? activeDes
 
 /** При `loading` списка в DOM нет — ссылаться на него нельзя. */
 const listboxIdIfRendered = computed(() => (open.value && !props.loading ? listboxId : undefined))
-
-function clampActive(index: number): number {
-  const len = navigableItems.value.length
-  if (len === 0) return -1
-  return ((index % len) + len) % len
-}
-
-async function scrollActiveIntoView(): Promise<void> {
-  // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
-  // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
-  const active = activeItem.value
-  if (virtualEnabled.value && active)
-    virtualizer.scrollToIndex(active.kind === 'add' ? 0 : active.index + addOffset.value)
-
-  await nextTick()
-  const id = activeDescendantId.value
-  if (!id) return
-  document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
-}
-
-function setActive(index: number): void {
-  activeIndex.value = clampActive(index)
-  void scrollActiveIntoView()
-}
-
-function initActiveIndex(): void {
-  const selectedIdx = navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.value))
-  activeIndex.value = selectedIdx >= 0 ? selectedIdx : (navigableItems.value.length ? 0 : -1)
-}
 
 function openDropdown(): void {
   if (locked.value || open.value) return
@@ -1008,23 +985,9 @@ function onComboKeydown(event: KeyboardEvent): void {
     return
   }
 
+  if (handleNavigationKeys(event)) return
+
   switch (event.key) {
-    case 'ArrowDown':
-      event.preventDefault()
-      setActive(activeIndex.value + 1)
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      setActive(activeIndex.value - 1)
-      break
-    case 'Home':
-      event.preventDefault()
-      setActive(0)
-      break
-    case 'End':
-      event.preventDefault()
-      setActive(navigableItems.value.length - 1)
-      break
     case 'Enter': {
       event.preventDefault()
       // Активный элемент сильнее `canAddCustom`: пользователь подсветил опцию
@@ -1057,7 +1020,7 @@ watch(
   async (isOpen, wasOpen) => {
     if (!isOpen) {
       internalSearch.value = ''
-      activeIndex.value = -1
+      resetActive()
 
       // Панель с полем поиска забирает фокус себе; на закрытии поле исчезает, и
       // без возврата фокус уезжает на `<body>` — клавиатурный пользователь
