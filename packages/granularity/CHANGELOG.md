@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Overlays answer to `open()`, `close()` and `toggle()`.** `GrModal`, `GrDialog`, `GrDropdown` and
+  `GrCommandPalette` exposed nothing at all and could only be opened through `v-model`, while `GrPopover` had the three
+  methods all along — one layer of the library behaving two different ways, which a consumer only discovered by running
+  into it. The controlled ones (modal, dialog, palette) emit `update:modelValue`: the state stays in the parent's
+  `v-model`, because a second copy inside the component would drift from it. `GrDropdown` has no model and changes its
+  own state, and its `disabled` is not bypassed — an imperative call must not open what a click and the keyboard
+  cannot. The set is held by a gate (`src/__tests__/overlayImperativeApi.test.ts`).
 - **New `useVirtualList` — one virtualization primitive for the whole package.** Keeps only a window around the
   viewport in the DOM: the composable computes the geometry and returns what to render plus how much is cut above and
   below, while the consumer builds the markup — it renders nothing and knows neither the roles nor the keyboard of your
@@ -368,6 +375,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrCommandPalette` dimmed a disabled command with `opacity`.** It was the last such address in the package:
+  transparency dilutes text tokens that were checked against AA and drops the contrast. The command now sits on
+  `--gr-disabled-bg` with `--gr-disabled-fg`, and its icon and description follow it — left on `--gr-muted-fg` they
+  would have ended up darker than the label of the very row they belong to. The base class no longer sets a text
+  colour: two `text-[…]` in one class list are resolved by rule order in the generated CSS rather than by order in the
+  attribute, so the state token lost the moment it was added.
 - **`GrListItem` dropped `href` when `as` was a component.** The attribute was bound by the resolved tag being
   literally `'a'`, and `href` is a declared prop, so it does not leak through attribute fallthrough either:
   `<GrListItem :as="RouterLink" href="/x">` rendered a link with no address at all. It is now bound whenever the row is

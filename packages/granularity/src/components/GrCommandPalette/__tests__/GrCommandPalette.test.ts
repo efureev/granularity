@@ -287,6 +287,54 @@ describe('GrCommandPalette — выбор, подсветка и недавни�
     expect(wrapper.text()).not.toContain('Recent')
   })
 
+  it('императивные open/close/toggle правят модель, а не своё состояние', async () => {
+    const wrapper = await mountPalette({ modelValue: false })
+    const api = wrapper.vm as unknown as { open: () => void, close: () => void, toggle: () => void }
+
+    api.open()
+    api.toggle()
+    api.close()
+
+    // Палитра управляемая: методы только просят родителя — сама она `modelValue`
+    // не подменяет, иначе разошлась бы с источником правды.
+    expect(wrapper.emitted('update:modelValue')).toEqual([[true], [true], [false]])
+    expect(wrapper.find('[data-testid="gr-command-palette-input"]').exists()).toBe(false)
+  })
+
+  it('выключенная команда гасится токенами состояния, а не прозрачностью', async () => {
+    const wrapper = await mountPalette({
+      items: [{ id: 'off', label: 'Недоступно', disabled: true }],
+    })
+
+    // `opacity` разбавляет выверенные на AA токены текста и роняет контраст.
+    const item = wrapper.get('[data-gr-command-palette-item]')
+    expect(item.classes()).toContain('text-[var(--gr-disabled-fg)]')
+    expect(item.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    // Цвет метки задаётся ровно один раз: два `text-[…]` в одном списке
+    // разрешаются порядком правил в CSS, и токен состояния молча проигрывал бы.
+    expect(item.classes()).not.toContain('text-[var(--gr-fg)]')
+  })
+
+  it('иконка и описание выключенной команды гаснут вместе с ней', async () => {
+    const wrapper = await mountPalette({
+      items: [{
+        id: 'off',
+        label: 'Недоступно',
+        description: 'Нет прав',
+        icon: 'i-lucide-archive',
+        disabled: true,
+      }],
+    })
+
+    // Свой `--gr-muted-fg` оставил бы иконку темнее метки выключенной команды.
+    const description = '[class*="--gr-text-xs"]'
+    for (const selector of ['[aria-hidden="true"]', description]) {
+      const part = wrapper.get(`[data-gr-command-palette-item] ${selector}`)
+      expect(part.classes()).toContain('text-[var(--gr-disabled-fg)]')
+      expect(part.classes()).not.toContain('text-[var(--gr-muted-fg)]')
+    }
+  })
+
   it('дубли id предупреждают: aria-activedescendant укажет не на ту команду', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 

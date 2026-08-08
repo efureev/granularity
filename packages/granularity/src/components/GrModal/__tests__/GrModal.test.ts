@@ -644,3 +644,20 @@ describe('GrModal — жизненный цикл и раскладка', () => 
     expect(overlayStackSize()).toBe(0)
   })
 })
+
+
+describe('GrModal — императивный API', () => {
+  it('open/close/toggle просят родителя, а не подменяют модель', async () => {
+    const wrapper = mount(GrModal, { props: { modelValue: false, ariaLabel: 'X' } })
+    const api = wrapper.vm as unknown as { open: () => void, close: () => void, toggle: () => void }
+
+    api.open()
+    api.toggle()
+    api.close()
+
+    // Окно управляемое: источник правды — родительский `v-model`, и методы
+    // только просят его измениться. Своё состояние разошлось бы с ним.
+    expect(wrapper.emitted('update:modelValue')).toEqual([[true], [true], [false]])
+    wrapper.unmount()
+  })
+})

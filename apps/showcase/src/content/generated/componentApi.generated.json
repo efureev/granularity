@@ -1652,7 +1652,23 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "open",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "toggle",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -2390,7 +2406,23 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "open",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "toggle",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -2795,7 +2827,23 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "open",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "toggle",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },
@@ -5378,7 +5426,23 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "open",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "toggle",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
       }
     ]
   },

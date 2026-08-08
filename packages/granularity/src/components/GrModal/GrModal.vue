@@ -257,8 +257,16 @@ function warnDuplicateTitle(): void {
   )
 }
 
+function open(): void {
+  emit('update:modelValue', true)
+}
+
 function close(): void {
   emit('update:modelValue', false)
+}
+
+function toggle(): void {
+  emit('update:modelValue', !props.modelValue)
 }
 
 // ————— Клик по подложке.
@@ -344,6 +352,7 @@ onBeforeUnmount(() => {
   unlockBodyScroll()
 })
 
+defineExpose({ open, close, toggle })
 </script>
 
 <template>

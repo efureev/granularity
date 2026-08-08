@@ -425,3 +425,39 @@ describe('GrDropdown — триггер, размещение и ширина', 
     wrapper.unmount()
   })
 })
+
+
+describe('GrDropdown — императивный API', () => {
+  it('open/close/toggle правят собственное состояние: модели у меню нет', async () => {
+    const wrapper = mount(GrDropdown, {
+      slots: { trigger: '<button data-testid="trigger">Меню</button>', default: '<div>пункт</div>' },
+      attachTo: document.body,
+    })
+    const api = wrapper.vm as unknown as { open: () => void, close: () => void, toggle: () => void }
+
+    api.open()
+    await nextTick()
+    expect(document.body.querySelector('[data-gr-dropdown-panel]')).not.toBeNull()
+
+    api.close()
+    await nextTick()
+    expect(wrapper.find('[data-gr-dropdown-panel]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('заблокированное меню императивом не открыть', async () => {
+    const wrapper = mount(GrDropdown, {
+      props: { disabled: true },
+      slots: { trigger: '<button data-testid="trigger">Меню</button>', default: '<div>пункт</div>' },
+      attachTo: document.body,
+    })
+
+    ;(wrapper.vm as unknown as { open: () => void }).open()
+    await nextTick()
+
+    // Иначе императивный вызов обходил бы `disabled`, который держит клик и клавиатуру.
+    expect(wrapper.find('[data-gr-dropdown-panel]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<GrDropdownProps>(), {
   teleportTo: undefined,
 })
 
-const open = ref(false)
+const isOpen = ref(false)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const clickOutsideExclude = [() => panelEl.value]
@@ -83,7 +83,7 @@ async function openWithFocus(first: boolean): Promise<void> {
   if (props.disabled)
     return
 
-  open.value = true
+  isOpen.value = true
   await nextTick()
   focusItemAt(first ? 0 : -1)
 }
@@ -98,8 +98,8 @@ async function openWithFocus(first: boolean): Promise<void> {
  */
 const triggerProps = computed(() => ({
   'aria-haspopup': 'menu' as const,
-  'aria-expanded': open.value,
-  'aria-controls': open.value ? panelId : undefined,
+  'aria-expanded': isOpen.value,
+  'aria-controls': isOpen.value ? panelId : undefined,
   'aria-disabled': props.disabled ? true : undefined,
   'onClick': toggle,
   'onKeydown': onTriggerKeydown,
@@ -121,7 +121,7 @@ function onTriggerKeydown(event: KeyboardEvent): void {
       void openWithFocus(false)
       break
     case 'Escape':
-      if (open.value) {
+      if (isOpen.value) {
         event.preventDefault()
         close()
       }
@@ -197,7 +197,7 @@ function onPanelKeydown(event: KeyboardEvent): void {
 const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = useFloating(
   rootEl,
   panelEl,
-  open,
+  isOpen,
   {
     placement: () => props.placement,
     // Геттер, а не значение: иначе проп замрёт на моменте `setup`.
@@ -211,28 +211,36 @@ const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = use
 // при переходе с триггера на панель — между ними зазор `offset`.
 let hoverTimer: ReturnType<typeof setTimeout> | undefined
 
+function open(): void {
+  if (props.disabled)
+    return
+
+  clearTimeout(hoverTimer)
+  isOpen.value = true
+}
+
 function toggle(): void {
   if (props.disabled)
     return
 
   clearTimeout(hoverTimer)
-  open.value = !open.value
+  isOpen.value = !isOpen.value
 }
 
 function close(): void {
   clearTimeout(hoverTimer)
-  open.value = false
+  isOpen.value = false
 }
 
 function scheduleHover(next: boolean, delayMs: number): void {
   clearTimeout(hoverTimer)
 
   if (delayMs <= 0) {
-    open.value = next
+    isOpen.value = next
     return
   }
 
-  hoverTimer = setTimeout(() => { open.value = next }, delayMs)
+  hoverTimer = setTimeout(() => { isOpen.value = next }, delayMs)
 }
 
 function onHoverEnter(): void {
@@ -251,12 +259,12 @@ function onHoverLeave(): void {
 // открытии и возвращает фокус, только если на момент закрытия тот всё ещё
 // внутри панели. Прежняя эвристика «возвращать, если открыли с клавиатуры»
 // промахивалась в обе стороны.
-useOverlayLayer(open, close, { root: panelEl })
+useOverlayLayer(isOpen, close, { root: panelEl })
 
 watch(
   () => [props.placement, props.offset],
   () => {
-    if (open.value) updateFloatingPosition()
+    if (isOpen.value) updateFloatingPosition()
   },
 )
 
@@ -336,19 +344,21 @@ const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget(() =>
 // компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
 // сама.
 const themeAttrs = useGrThemeAttrs()
+
+defineExpose({ open, close, toggle })
 </script>
 
 <template>
   <div data-gr-dropdown>
     <div
       ref="rootEl"
-      v-click-outside="{ handler: close, enabled: open, exclude: clickOutsideExclude }"
+      v-click-outside="{ handler: close, enabled: isOpen, exclude: clickOutsideExclude }"
       data-gr-dropdown-trigger
       class="inline-block max-w-full"
       @mouseenter="onHoverEnter"
       @mouseleave="onHoverLeave"
     >
-      <slot name="trigger" :open="open" :toggle="toggle" :close="close" :trigger-props="triggerProps" />
+      <slot name="trigger" :open="isOpen" :toggle="toggle" :close="close" :trigger-props="triggerProps" />
     </div>
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
@@ -361,7 +371,7 @@ const themeAttrs = useGrThemeAttrs()
         leave-to-class="transform opacity-0 scale-95"
       >
         <div
-          v-show="open"
+          v-show="isOpen"
           :id="panelId"
           ref="panelEl"
           v-bind="themeAttrs"

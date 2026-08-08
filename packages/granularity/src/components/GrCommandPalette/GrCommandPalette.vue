@@ -29,6 +29,7 @@ import {
   commandGroupLabelClass,
   commandItemClass,
   commandItemDescriptionClass,
+  commandItemMutedClass,
   commandMatchClass,
   commandPaletteModalSizeBySize,
   commandSearchInputClass,
@@ -338,8 +339,16 @@ watch(
   { immediate: true },
 )
 
+function open(): void {
+  emit('update:modelValue', true)
+}
+
 function close(): void {
   emit('update:modelValue', false)
+}
+
+function toggle(): void {
+  emit('update:modelValue', !props.modelValue)
 }
 
 function selectItem(item: GrCommandItem): void {
@@ -423,7 +432,7 @@ function onWindowKeydown(event: KeyboardEvent): void {
   const hotkey = parsedHotkey.value
   if (!hotkey || !matchesCommandHotkey(event, hotkey, isApple.value)) return
   event.preventDefault()
-  emit('update:modelValue', !props.modelValue)
+  toggle()
 }
 
 onMounted(() => {
@@ -452,6 +461,7 @@ const listStyleWithSpacers = computed(() => {
   }
 })
 
+defineExpose({ open, close, toggle })
 </script>
 
 <template>
@@ -547,8 +557,8 @@ const listStyleWithSpacers = computed(() => {
               <slot name="item" :item="entry.item" :active="isActive(entry.item)">
                 <span
                   v-if="entry.item.icon"
-                  class="block h-4 w-4 shrink-0 text-[var(--gr-muted-fg)]"
-                  :class="entry.item.icon"
+                  class="block h-4 w-4 shrink-0"
+                  :class="[entry.item.icon, commandItemMutedClass(Boolean(entry.item.disabled))]"
                   aria-hidden="true"
                 />
                 <span class="min-w-0 flex-1">
@@ -558,7 +568,10 @@ const listStyleWithSpacers = computed(() => {
                       <template v-else>{{ segment.text }}</template>
                     </template>
                   </span>
-                  <span v-if="entry.item.description" :class="commandItemDescriptionClass">
+                  <span
+                    v-if="entry.item.description"
+                    :class="[commandItemDescriptionClass, commandItemMutedClass(Boolean(entry.item.disabled))]"
+                  >
                     <template v-for="(segment, index) in matchSegments(entry.item.description)" :key="index">
                       <mark v-if="segment.match" :class="commandMatchClass">{{ segment.text }}</mark>
                       <template v-else>{{ segment.text }}</template>
@@ -575,9 +588,9 @@ const listStyleWithSpacers = computed(() => {
       </div>
 
       <!-- Состояния объявляются живым регионом: `aria-label` на generic-элементе
-           большинство AT игнорируют, поэтому загрузка раньше не объявлялась
-           никак. Регион один на оба состояния и лежит вне listbox — иначе он
-           снова стал бы его недопустимым потомком. -->
+           большинство AT игнорируют, и загрузка осталась бы неозвученной. Регион
+           один на оба состояния и лежит вне listbox — внутри он стал бы его
+           недопустимым потомком. -->
       <div
         v-if="loading || !filteredItems.length"
         data-gr-command-palette-empty
