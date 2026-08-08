@@ -137,8 +137,11 @@ const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 // сама.
 const themeAttrs = useGrThemeAttrs()
 
-// Видимые тосты (не больше `maxVisible`); остальные — в очереди.
-const visibleToasts = computed(() => list.value.slice(0, Math.max(1, props.maxVisible)))
+// Видимые тосты (не больше `maxVisible`); остальные ждут в очереди. Список
+// хранится новейшими вперёд, поэтому «видимые дожинают, новые ждут» — это
+// хвост: старейшие N. Взяв голову, стек показывал бы новейшие, и каждый пуш
+// вытеснял бы с экрана тост, который пользователь ещё читает.
+const visibleToasts = computed(() => list.value.slice(-Math.max(1, props.maxVisible)))
 const visibleIds = computed(() => new Set(visibleToasts.value.map(toast => toast.id)))
 
 // Пауза под курсором/фокусом (WCAG 2.2.1). Один флаг на весь стек.

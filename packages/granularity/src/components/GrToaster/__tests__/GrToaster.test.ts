@@ -34,7 +34,7 @@ vi.mock('~icons/lucide/x', () => ({
   }),
 }))
 
-import { useToast } from '../../../composables/useToast'
+import { granularityToastPlugin, useToast } from '../../../composables/useToast'
 import GrToaster from '../GrToaster.vue'
 
 afterEach(() => {
@@ -285,5 +285,75 @@ describe('GrToaster — клавиатурный доступ к стеку', ()
 
     expect(wrapper.vm.toaster?.focus()).toBe(true)
     expect(document.activeElement).toBe(document.body.querySelector('[data-gr-toast]'))
+  })
+})
+
+describe('GrToaster — семантика очереди: видимые дожинают, новые ждут', () => {
+  /**
+   * App-scoped состояние через плагин: тостеры из соседних тестов не
+   * размонтированы (их watchEffect'ы живут после очистки DOM) и гоняют
+   * pause/resume по общему модульному стеку — изоляция состояния снимает
+   * интерференцию. `runWithContext` достаёт то же состояние, что видит
+   * смонтированный тостер.
+   */
+  function mountScoped(maxVisible: number) {
+    const wrapper = mount(GrToaster, {
+      attachTo: document.body,
+      props: { maxVisible },
+      global: { plugins: [granularityToastPlugin] },
+    })
+    const toast = wrapper.vm.$.appContext.app.runWithContext(() => useToast())
+    return { wrapper, toast }
+  }
+
+  // Тостер телепортирован; свой (смонтированный последним) — последний хост в документе.
+  function visibleTitles(): string[] {
+    const hosts = document.querySelectorAll('[data-gr-toaster]')
+    const host = hosts[hosts.length - 1]
+    return [...host.querySelectorAll('[data-gr-toast]')]
+      .map(el => el.querySelector('.font-700')?.textContent?.trim() ?? '')
+  }
+
+  it('видимые — старейшие; новый тост ждёт, а не вытесняет', async () => {
+    const { wrapper, toast } = mountScoped(2)
+    for (let i = 0; i < 5; i += 1) toast.push({ title: `T${i}`, timeoutMs: 0 })
+    await nextTick()
+
+    expect(visibleTitles().sort()).toEqual(['T0', 'T1'])
+
+    wrapper.unmount()
+  })
+
+  it('FIFO: закрытие видимого впускает самого раннего из ждущих', async () => {
+    const { wrapper, toast } = mountScoped(2)
+    const ids = Array.from({ length: 5 }, (_, i) => toast.push({ title: `T${i}`, timeoutMs: 0 }))
+    await nextTick()
+
+    toast.dismiss(ids[0])
+    await nextTick()
+
+    expect(visibleTitles().sort()).toEqual(['T1', 'T2'])
+
+    wrapper.unmount()
+  })
+
+  it('таймер ждущего стоит на паузе и стартует при появлении на экране', async () => {
+    vi.useFakeTimers()
+    const { wrapper, toast } = mountScoped(2)
+    for (let i = 0; i < 3; i += 1) toast.push({ title: `T${i}`, timeoutMs: 100 })
+    await nextTick()
+
+    // Видимые T0/T1 дожинают; ждущий T2 на паузе и переживает их таймаут.
+    // Проверяем состояние, а не DOM: leave-анимация под fake timers держит
+    // узлы закрытых тостов дольше, чем живёт их запись в списке.
+    await vi.advanceTimersByTimeAsync(150)
+    expect(toast.list.value.map(item => item.title)).toEqual(['T2'])
+
+    // Став видимым, T2 получает свой отсчёт и закрывается.
+    await vi.advanceTimersByTimeAsync(150)
+    expect(toast.list.value).toHaveLength(0)
+
+    wrapper.unmount()
+    vi.useRealTimers()
   })
 })

@@ -461,6 +461,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrToaster` showed the newest toasts and bumped the oldest visible one off screen.** The docs promised a queue —
+  "extras wait, their timers paused" — but the visible window was the newest `maxVisible` entries, so every push
+  displaced a toast the user might still be reading, which then came *back* later. The window is now the oldest
+  entries: visible toasts finish their countdown, new ones wait their turn and enter FIFO as slots free up. The
+  module-level cap of 20 stays a flood guard and may still evict a visible toast on overflow — a deliberate trade-off,
+  now stated in the code.
 - **Theme listeners outlived their application.** The app-scoped theme state subscribed to `storage` and
   `prefers-color-scheme` with anonymous closures and nothing ever removed them: every mount/unmount cycle of a
   micro-frontend left another pair of listeners on `window`, each holding its dead `ThemeState` alive.
