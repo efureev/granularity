@@ -82,6 +82,14 @@ export interface GrModalProps {
   initialFocus?: HTMLElement | null
 }
 
+export interface GrModalEmits {
+  (e: 'update:modelValue', value: boolean): void
+  /** Окно открылось и анимация закончилась. */
+  (e: 'opened'): void
+  /** Окно закрылось и анимация закончилась — содержимое можно размонтировать. */
+  (e: 'closed'): void
+}
+
 import './defaults'
 
 const props = withDefaults(defineProps<GrModalProps>(), {
@@ -95,13 +103,7 @@ const props = withDefaults(defineProps<GrModalProps>(), {
   initialFocus: null,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  /** Окно открылось и анимация закончилась. */
-  (e: 'opened'): void
-  /** Окно закрылось и анимация закончилась — содержимое можно размонтировать. */
-  (e: 'closed'): void
-}>()
+const emit = defineEmits<GrModalEmits>()
 
 defineSlots<{
   default?: () => any

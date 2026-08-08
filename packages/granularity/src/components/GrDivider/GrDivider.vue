@@ -28,32 +28,34 @@ import {
   type GrDividerVariant,
 } from './grDividerStyles'
 
+export interface GrDividerProps {
+  orientation?: GrDividerOrientation
+  label?: string
+  align?: GrDividerAlign
+  /** Начертание линии. Не задано — берётся из `GrConfigProvider`, иначе `solid`. */
+  variant?: GrDividerVariant
+  /** Отступы вокруг разделителя. Не задано — из `GrConfigProvider`, иначе `none`. */
+  spacing?: GrDividerSpacing
+  /** Толщина линии. Число трактуется как пиксели. */
+  thickness?: number | string
+  /**
+   * Длина линии: высота вертикального разделителя, ширина горизонтального.
+   * Нужна вертикальному вне flex-родителя — там ему не от чего растянуться.
+   */
+  length?: number | string
+  /**
+   * Имя разделителя для скринридера. Подпись из слота строкой не выразить,
+   * поэтому имя задаётся отдельно; при `label` оно берётся из него.
+   */
+  ariaLabel?: string
+}
+
 import './defaults'
 
 export type { GrDividerAlign, GrDividerOrientation, GrDividerSpacing, GrDividerVariant }
 
 const props = withDefaults(
-  defineProps<{
-    orientation?: GrDividerOrientation
-    label?: string
-    align?: GrDividerAlign
-    /** Начертание линии. Не задано — берётся из `GrConfigProvider`, иначе `solid`. */
-    variant?: GrDividerVariant
-    /** Отступы вокруг разделителя. Не задано — из `GrConfigProvider`, иначе `none`. */
-    spacing?: GrDividerSpacing
-    /** Толщина линии. Число трактуется как пиксели. */
-    thickness?: number | string
-    /**
-     * Длина линии: высота вертикального разделителя, ширина горизонтального.
-     * Нужна вертикальному вне flex-родителя — там ему не от чего растянуться.
-     */
-    length?: number | string
-    /**
-     * Имя разделителя для скринридера. Подпись из слота строкой не выразить,
-     * поэтому имя задаётся отдельно; при `label` оно берётся из него.
-     */
-    ariaLabel?: string
-  }>(),
+  defineProps<GrDividerProps>(),
   {
     orientation: 'horizontal',
     label: undefined,

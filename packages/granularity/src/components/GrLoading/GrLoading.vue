@@ -40,6 +40,15 @@ export interface GrLoadingProps {
   customClass?: string
 }
 
+export interface GrLoadingEmits {
+  /**
+   * Оверлей появился на экране — сразу или по истечении `delay`. По этому
+   * событию директива блокирует контент под оверлеем: до показа блокировать
+   * нечего, иначе быстрый запрос молча «замораживал» бы форму.
+   */
+  (e: 'show'): void
+}
+
 const props = withDefaults(
   defineProps<GrLoadingProps>(),
   {
@@ -59,14 +68,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<{
-  /**
-   * Оверлей появился на экране — сразу или по истечении `delay`. По этому
-   * событию директива блокирует контент под оверлеем: до показа блокировать
-   * нечего, иначе быстрый запрос молча «замораживал» бы форму.
-   */
-  (e: 'show'): void
-}>()
+const emit = defineEmits<GrLoadingEmits>()
 
 defineSlots<{
   /** Содержимое панели целиком вместо спиннера с подписью. */

@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrDrawerComponent from './GrDrawer.vue'
+
 export { default } from './GrDrawer.vue'
 export { default as GrDrawer } from './GrDrawer.vue'
 export { grDrawerConfig } from './config'
@@ -6,3 +9,5 @@ export type { GrDrawerConfigurableProps } from './defaults'
 export { grDrawerSafelist } from './safelist'
 export type { GrDrawerProps } from './GrDrawer.vue'
 export type { GrDrawerSectionConfig, GrDrawerSide, GrDrawerSize } from './grDrawerStyles'
+export type { GrDrawerEmits } from './GrDrawer.vue'
+export type GrDrawerInstance = ComponentExposed<typeof GrDrawerComponent>

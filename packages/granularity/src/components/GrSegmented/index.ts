@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrSegmentedComponent from './GrSegmented.vue'
+
 export { default } from './GrSegmented.vue'
 export { default as GrSegmented } from './GrSegmented.vue'
 export { grSegmentedConfig } from './config'
@@ -12,3 +15,5 @@ export type {
 } from './grSegmentedStyles'
 export type { GrSegmentedProps } from './GrSegmented.vue'
 export { grSegmentedSafelist } from './safelist'
+export type { GrSegmentedEmits } from './GrSegmented.vue'
+export type GrSegmentedInstance = ComponentExposed<typeof GrSegmentedComponent>

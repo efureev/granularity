@@ -43,6 +43,16 @@ describe('GrRating', () => {
     await wrapper.get('[data-testid="gr-rating-symbol-2"]').trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([0])
+    // Снятие оценки объявляется отдельно: по `update:modelValue` со значением 0
+    // потребитель не отличит сброс от честной нулевой оценки.
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+  })
+
+  it('без clearable сброса нет — и события тоже', async () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 3 } })
+    await wrapper.get('[data-testid="gr-rating-symbol-2"]').trigger('click')
+
+    expect(wrapper.emitted('clear')).toBeUndefined()
   })
 
   it('стрелки меняют оценку на шаг, Home/End — к границам', async () => {

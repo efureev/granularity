@@ -63,6 +63,14 @@ export interface GrDialogProps {
   initialFocus?: HTMLElement | null
 }
 
+export interface GrDialogEmits {
+  (e: 'update:modelValue', value: boolean): void
+  /** Окно открылось и анимация закончилась. */
+  (e: 'opened'): void
+  /** Окно закрылось и анимация закончилась — содержимое можно размонтировать. */
+  (e: 'closed'): void
+}
+
 import './defaults'
 
 const props = withDefaults(defineProps<GrDialogProps>(), {
@@ -83,13 +91,7 @@ const props = withDefaults(defineProps<GrDialogProps>(), {
   initialFocus: null,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  /** Окно открылось и анимация закончилась. */
-  (e: 'opened'): void
-  /** Окно закрылось и анимация закончилась — содержимое можно размонтировать. */
-  (e: 'closed'): void
-}>()
+const emit = defineEmits<GrDialogEmits>()
 
 const slots = defineSlots<{
   default?: () => any

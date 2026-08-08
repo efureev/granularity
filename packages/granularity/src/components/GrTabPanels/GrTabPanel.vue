@@ -3,13 +3,7 @@ import { computed, inject, onMounted, ref, watch } from 'vue'
 
 import { GR_TAB_PANELS_KEY } from './context'
 
-/**
- * GrTabPanel — одна панель внутри `GrTabPanels`. Показывается, когда её `value`
- * равно активной вкладке. `keepAlive` оставляет неактивные панели в DOM
- * (скрытыми через `hidden`) — полезно, чтобы не терять состояние форм.
- */
-const props = withDefaults(
-  defineProps<{
+export interface GrTabPanelProps {
     value: string
     keepAlive?: boolean
     /**
@@ -17,7 +11,15 @@ const props = withDefaults(
      * вместе с `keepAlive`: без него неактивная панель и так не в DOM.
      */
     lazy?: boolean
-  }>(),
+}
+
+/**
+ * GrTabPanel — одна панель внутри `GrTabPanels`. Показывается, когда её `value`
+ * равно активной вкладке. `keepAlive` оставляет неактивные панели в DOM
+ * (скрытыми через `hidden`) — полезно, чтобы не терять состояние форм.
+ */
+const props = withDefaults(
+  defineProps<GrTabPanelProps>(),
   {
     keepAlive: false,
     lazy: false,

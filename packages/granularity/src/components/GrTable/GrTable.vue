@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { computed, ref, useSlots } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
@@ -156,10 +156,20 @@ const theadClass = computed(() => [
   'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]',
   props.stickyHeader ? 'sticky top-0 z-[1]' : '',
 ].filter(Boolean).join(' '))
+
+const scrollEl = ref<HTMLElement | null>(null)
+
+/** Прокрутить скролл-контейнер таблицы — тот же контракт, что у `GrDataTable`. */
+function scrollTo(options: ScrollToOptions): void {
+  scrollEl.value?.scrollTo(options)
+}
+
+defineExpose({ scrollTo })
 </script>
 
 <template>
   <div
+    ref="scrollEl"
     data-gr-table-scroll
     :role="regionLabel ? 'region' : undefined"
     :aria-label="regionLabel"

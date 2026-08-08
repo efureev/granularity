@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrDataTableComponent from './GrDataTable.vue'
+
 export { default } from './GrDataTable.vue'
 export { default as GrDataTable } from './GrDataTable.vue'
 export type {
@@ -14,3 +17,5 @@ export { grDataTableConfig } from './config'
 export type { GrDataTableConfigurableProps } from './defaults'
 export type { GrDataTableSize } from './grDataTableStyles'
 export { grDataTableSafelist } from './safelist'
+export type { GrDataTableEmits } from './GrDataTable.vue'
+export type GrDataTableInstance = ComponentExposed<typeof GrDataTableComponent>

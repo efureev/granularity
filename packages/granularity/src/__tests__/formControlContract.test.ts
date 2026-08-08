@@ -69,6 +69,50 @@ const controls: { component: unknown, meta: Control }[] = [
   { component: GrFileUpload, meta: { name: 'GrFileUpload', props: {}, widget: '[data-gr-file-upload]' } },
 ]
 
+/**
+ * Состав эмитов контракта.
+ *
+ * До гейта родственные контролы расходились: полный набор был у двух, `focus` и
+ * `blur` — у трёх из шестнадцати, при том что методы `focus()`/`blur()` есть у
+ * всех. Потребитель не мог написать одну обёртку на все контролы.
+ *
+ * `clear` — односторонне: объявлен `clearable`, значит обязано быть и событие.
+ * Обратное неверно — `GrFormFile` очищается кнопкой всегда, когда файл выбран,
+ * и пропа-выключателя у него нет намеренно.
+ */
+const BASE_EMITS = ['update:modelValue', 'change', 'focus', 'blur'] as const
+
+function declaredEmits(component: unknown): string[] {
+  const emits = (component as { emits?: string[] | Record<string, unknown> }).emits ?? []
+  return Array.isArray(emits) ? emits : Object.keys(emits)
+}
+
+function declaredProps(component: unknown): string[] {
+  return Object.keys((component as { props?: Record<string, unknown> }).props ?? {})
+}
+
+describe('состав эмитов форм-контрола', () => {
+  it.each(controls.map(({ component, meta }) => [meta.name, component] as const))(
+    '%s объявляет update:modelValue, change, focus и blur',
+    (_name, component) => {
+      const emits = declaredEmits(component)
+
+      for (const emitName of BASE_EMITS) {
+        expect(emits, `нет эмита ${emitName}`).toContain(emitName)
+      }
+    },
+  )
+
+  it.each(controls.map(({ component, meta }) => [meta.name, component] as const))(
+    '%s объявляет clear, если у него есть clearable',
+    (_name, component) => {
+      if (!declaredProps(component).includes('clearable')) return
+
+      expect(declaredEmits(component)).toContain('clear')
+    },
+  )
+})
+
 describe('контракт форм-контрола', () => {
   for (const { component, meta } of controls) {
     describe(meta.name, () => {

@@ -110,6 +110,13 @@ export interface GrPromptDialogProps {
   persistent?: boolean
 }
 
+export interface GrPromptDialogEmits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'update:value', value: string): void
+  (e: 'confirm', value: string): void
+  (e: 'cancel'): void
+}
+
 import './defaults'
 
 const props = withDefaults(defineProps<GrPromptDialogProps>(), {
@@ -154,12 +161,7 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentProp('GrPromptDialog', 'size', () => props.size, 'md')
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'update:value', value: string): void
-  (e: 'confirm', value: string): void
-  (e: 'cancel'): void
-}>()
+const emit = defineEmits<GrPromptDialogEmits>()
 
 // Дефолты берём из общего i18n-блока пакета (fallback — англ.), а не хардкодим.
 const { t } = useGranularityTranslations()

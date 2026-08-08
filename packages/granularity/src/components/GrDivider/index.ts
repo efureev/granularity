@@ -9,3 +9,4 @@ export type {
 export type { GrDividerConfigurableProps } from './defaults'
 export { grDividerConfig } from './config'
 export { grDividerSafelist } from './safelist'
+export type { GrDividerProps } from './GrDivider.vue'

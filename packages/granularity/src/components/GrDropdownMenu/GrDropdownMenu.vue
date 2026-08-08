@@ -57,6 +57,11 @@ export interface GrDropdownMenuProps {
   listClass?: string
 }
 
+export interface GrDropdownMenuEmits {
+  /** Выбран пункт декларативного меню. */
+  (e: 'select', item: GrDropdownMenuAction): void
+}
+
 withDefaults(defineProps<GrDropdownMenuProps>(), {
   placement: 'bottom-end',
   offset: 8,
@@ -77,10 +82,7 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
   listClass: '',
 })
 
-const emit = defineEmits<{
-  /** Выбран пункт декларативного меню. */
-  (e: 'select', item: GrDropdownMenuAction): void
-}>()
+const emit = defineEmits<GrDropdownMenuEmits>()
 
 function itemProps(item: GrDropdownMenuAction): Record<string, unknown> {
   return {

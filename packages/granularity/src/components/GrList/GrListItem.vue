@@ -32,6 +32,10 @@ export interface GrListItemProps {
   disabled?: boolean
 }
 
+export interface GrListItemEmits {
+  (e: 'click', event: MouseEvent): void
+}
+
 const props = withDefaults(defineProps<GrListItemProps>(), {
   title: undefined,
   description: undefined,
@@ -43,9 +47,7 @@ const props = withDefaults(defineProps<GrListItemProps>(), {
   disabled: false,
 })
 
-const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void
-}>()
+const emit = defineEmits<GrListItemEmits>()
 
 const slots = useSlots()
 

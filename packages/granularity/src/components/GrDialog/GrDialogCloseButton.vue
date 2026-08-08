@@ -5,6 +5,10 @@ import GrButton from '../GrButton/GrButton.vue'
 import IconClose from '~icons/lucide/x'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
+export interface GrDialogCloseButtonEmits {
+  (e: 'click'): void
+}
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -16,9 +20,7 @@ const { t } = useGranularityTranslations()
 const attrs = useAttrs()
 const ariaLabel = computed(() => (attrs['aria-label'] as string | undefined) ?? t('gr.common.close', 'Close'))
 
-defineEmits<{
-  (e: 'click'): void
-}>()
+defineEmits<GrDialogCloseButtonEmits>()
 </script>
 
 <template>

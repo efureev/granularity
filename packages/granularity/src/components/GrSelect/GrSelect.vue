@@ -13,6 +13,7 @@ import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import {
   defaultBaseClass,
@@ -148,6 +149,22 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   underline?: GrSelectUnderline
 }
 
+export interface GrSelectEmits<TValue extends GrSelectValue = string> {
+  (e: 'update:modelValue', value: GrSelectModelValue<TValue>): void
+  /** Значение изменилось — тот же payload, что у `update:modelValue`. */
+  (e: 'change', value: GrSelectModelValue<TValue>): void
+  /** Значение снято кнопкой очистки. */
+  (e: 'clear'): void
+  /** Панель открылась/закрылась. */
+  (e: 'visibleChange', visible: boolean): void
+  /** Текст поиска как контролируемое значение (`v-model:search`). */
+  (e: 'update:search', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+  /** Пользователь набрал запрос — сигнал сходить за опциями. */
+  (e: 'search', value: string): void
+}
+
 const props = withDefaults(
   defineProps<GrSelectProps<TValue>>(),
   {
@@ -211,19 +228,7 @@ const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : def
 
 const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full')
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrSelectModelValue<TValue>): void
-  /** Значение изменилось — тот же payload, что у `update:modelValue`. */
-  (e: 'change', value: GrSelectModelValue<TValue>): void
-  /** Значение снято кнопкой очистки. */
-  (e: 'clear'): void
-  /** Панель открылась/закрылась. */
-  (e: 'visibleChange', visible: boolean): void
-  /** Текст поиска как контролируемое значение (`v-model:search`). */
-  (e: 'update:search', value: string): void
-  /** Пользователь набрал запрос — сигнал сходить за опциями. */
-  (e: 'search', value: string): void
-}>()
+const emit = defineEmits<GrSelectEmits<TValue>>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required)
 // для связки с лейблом и сообщением об ошибке.
@@ -411,6 +416,14 @@ const open = ref(false)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const listboxEl = ref<HTMLElement | null>(null)
+
+// Панель телепортирована в `body`, то есть лежит вне корня, но для пользователя
+// она часть контрола: без неё уход фокуса в панель читался бы как `blur`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+  containers: () => [panelEl.value],
+})
 const customInputRef = ref<InstanceType<typeof GrInput> | null>(null)
 const clickOutsideExclude = [() => panelEl.value]
 
@@ -1108,6 +1121,8 @@ const themeAttrs = useGrThemeAttrs()
     v-if="effectiveOptionsView === 'native'"
     data-gr-select
     :class="rootClass"
+     @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <!--
       Выбор задаём per-option через `:selected` (а не `:value` на `<select>`):

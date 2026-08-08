@@ -54,6 +54,10 @@ export interface GrBottomNavProps {
   ariaLabel?: string
 }
 
+export interface GrBottomNavEmits {
+  (e: 'update:modelValue', value: string): void
+}
+
 const props = withDefaults(defineProps<GrBottomNavProps>(), {
   as: undefined,
   hideAbove: 'sm',
@@ -61,9 +65,7 @@ const props = withDefaults(defineProps<GrBottomNavProps>(), {
   ariaLabel: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
+const emit = defineEmits<GrBottomNavEmits>()
 
 const { t } = useGranularityTranslations()
 

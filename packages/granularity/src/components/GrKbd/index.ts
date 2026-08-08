@@ -5,3 +5,4 @@ export { grKbdConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrKbdConfigurableProps } from './defaults'
 export { grKbdSafelist } from './safelist'
+export type { GrKbdProps } from './GrKbd.vue'

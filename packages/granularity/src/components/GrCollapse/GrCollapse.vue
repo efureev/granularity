@@ -44,6 +44,11 @@ export interface GrCollapseProps {
   size?: GrComponentSize
 }
 
+export interface GrCollapseEmits {
+  (e: 'update:modelValue', value: GrCollapseModelValue): void
+  (e: 'change', value: GrCollapseModelValue): void
+}
+
 // Дефолты оформления намеренно `undefined`: «настоящий» дефолт живёт в
 // `useGrComponentProp`, иначе `GrConfigProvider` не отличит заданный пользователем
 // проп от подставленного Vue.
@@ -59,10 +64,7 @@ const props = withDefaults(defineProps<GrCollapseProps>(), {
   size: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrCollapseModelValue): void
-  (e: 'change', value: GrCollapseModelValue): void
-}>()
+const emit = defineEmits<GrCollapseEmits>()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCollapse' })
 const divided = useGrComponentProp('GrCollapse', 'divided', () => props.divided, true)

@@ -4,6 +4,7 @@ import { computed, provide, ref } from 'vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
@@ -49,6 +50,13 @@ export interface GrRadioGroupProps {
   ariaLabel?: string
 }
 
+export interface GrRadioGroupEmits {
+  (e: 'update:modelValue', value: GrRadioValue): void
+  (e: 'change', value: GrRadioValue): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(defineProps<GrRadioGroupProps>(), {
   options: undefined,
   name: undefined,
@@ -77,14 +85,13 @@ const {
   invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrRadioValue): void
-}>()
+const emit = defineEmits<GrRadioGroupEmits>()
 
 function setValue(next: GrRadioValue): void {
   if (isDisabled.value || isReadonly.value)
     return
   emit('update:modelValue', next)
+  emit('change', next)
 }
 
 const listClass = computed(() => (props.orientation === 'horizontal'
@@ -92,6 +99,13 @@ const listClass = computed(() => (props.orientation === 'horizontal'
   : 'grid gap-2'))
 
 const rootEl = ref<HTMLElement | null>(null)
+
+// Фокус ходит между радиокнопками: без границы каждая стрелка давала бы
+// потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 
 function focus(): void {
   rootEl.value?.querySelector<HTMLElement>('[role="radio"][tabindex="0"]')?.focus()
@@ -171,6 +185,8 @@ provide(GR_RADIO_GROUP_CONTEXT, {
     :aria-required="isRequired ? 'true' : undefined"
     :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-disabled="isDisabled ? 'true' : undefined"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <template v-if="$slots.default">
       <GrButtonGroup v-if="variant === 'button'">

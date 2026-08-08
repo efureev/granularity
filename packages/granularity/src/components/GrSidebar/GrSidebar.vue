@@ -59,6 +59,10 @@ export interface GrSidebarProps {
   ariaLabel?: string
 }
 
+export interface GrSidebarEmits {
+  (e: 'update:collapsed', value: boolean): void
+}
+
 const props = withDefaults(defineProps<GrSidebarProps>(), {
   title: undefined,
   subtitle: undefined,
@@ -74,9 +78,7 @@ const props = withDefaults(defineProps<GrSidebarProps>(), {
 
 const { t } = useGranularityTranslations()
 
-const emit = defineEmits<{
-  (e: 'update:collapsed', value: boolean): void
-}>()
+const emit = defineEmits<GrSidebarEmits>()
 
 // Локальное состояние с синхронизацией из пропа — поддерживает и controlled
 // (`v-model:collapsed`), и uncontrolled (панель сама помнит состояние).

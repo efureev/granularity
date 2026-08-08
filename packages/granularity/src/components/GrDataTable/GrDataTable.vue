@@ -124,6 +124,14 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   maxHeight?: string | number
 }
 
+export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<string, unknown>> {
+  (e: 'update:sortKey', value: string): void
+  (e: 'update:sortDir', value: GrDataTableSortDir): void
+  (e: 'sortChange', value: { key: string, dir: GrDataTableSortDir }): void
+  (e: 'update:selected', value: Array<string | number>): void
+  (e: 'rowClick', payload: { row: TRow, index: number, event: MouseEvent }): void
+}
+
 /**
  * `GrDataTable` — data-таблица поверх `GrTable` с сортировкой по клику
  * на заголовок и scoped-слотами ячеек (`#cell-<key>`), `#header-<key>`,
@@ -158,13 +166,7 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   virtual: false,
 })
 
-const emit = defineEmits<{
-  (e: 'update:sortKey', value: string): void
-  (e: 'update:sortDir', value: GrDataTableSortDir): void
-  (e: 'sortChange', value: { key: string, dir: GrDataTableSortDir }): void
-  (e: 'update:selected', value: Array<string | number>): void
-  (e: 'rowClick', payload: { row: TRow, index: number, event: MouseEvent }): void
-}>()
+const emit = defineEmits<GrDataTableEmits<TRow>>()
 
 const { t, locale } = useGranularityTranslations()
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.dataTable.loading', 'Loading…'))

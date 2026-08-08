@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrSliderComponent from './GrSlider.vue'
+
 export { default } from './GrSlider.vue'
 export { default as GrSlider } from './GrSlider.vue'
 export { grSliderConfig } from './config'
@@ -10,3 +13,5 @@ export type {
   GrSliderSize,
 } from './GrSlider.vue'
 export { grSliderSafelist } from './safelist'
+export type { GrSliderEmits } from './GrSlider.vue'
+export type GrSliderInstance = ComponentExposed<typeof GrSliderComponent>

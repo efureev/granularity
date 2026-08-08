@@ -18,6 +18,10 @@ export interface GrDialogHeaderProps {
   closeLabel?: string
 }
 
+export interface GrDialogHeaderEmits {
+  (e: 'close'): void
+}
+
 const props = withDefaults(defineProps<GrDialogHeaderProps>(), {
   title: undefined,
   showCloseButton: true,
@@ -29,9 +33,7 @@ const slots = defineSlots<{
   default?: (props: { title?: string }) => any
 }>()
 
-defineEmits<{
-  (e: 'close'): void
-}>()
+defineEmits<GrDialogHeaderEmits>()
 
 const resolvedTitle = computed(() => resolveGrDialogTitle(props.title))
 

@@ -6,3 +6,4 @@ export type { GrLinkSize, GrLinkTone, GrLinkUnderline, GrLinkVariant } from './g
 export { grLinkSafelist } from './safelist'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrLinkConfigurableProps } from './defaults'
+export type { GrLinkProps } from './GrLink.vue'

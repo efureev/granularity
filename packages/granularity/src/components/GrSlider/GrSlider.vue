@@ -5,6 +5,7 @@ import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -73,6 +74,14 @@ export interface GrSliderProps {
   ariaLabel?: string
 }
 
+export interface GrSliderEmits {
+  (e: 'update:modelValue', value: GrSliderModelValue): void
+  /** Значение зафиксировано (отпущен бегунок / клавиша). */
+  (e: 'change', value: GrSliderModelValue): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrSliderProps>(),
   {
@@ -104,11 +113,7 @@ const resolvedSize = useGrComponentSize(() => props.size, {
   supported: ['xs', 'sm', 'md', 'lg'],
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrSliderModelValue): void
-  /** Значение зафиксировано (отпущен бегунок / клавиша). */
-  (e: 'change', value: GrSliderModelValue): void
-}>()
+const emit = defineEmits<GrSliderEmits>()
 
 // Контекст `GrFormField`: id/aria-describedby/invalid/required как fallback.
 const field = useGrFormFieldContext()
@@ -119,6 +124,14 @@ const {
 const describedBy = computed(() => field?.describedById.value)
 
 const trackEl = ref<HTMLElement | null>(null)
+const rootEl = ref<HTMLElement | null>(null)
+
+// У диапазона два бегунка, и фокус ходит между ними: без границы переход с
+// одного на другой давал бы потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 
 const thumbEls = ref<HTMLElement[]>([])
 
@@ -366,9 +379,12 @@ function thumbValueText(value: number): string | undefined {
 
 <template>
   <div
+    ref="rootEl"
     data-gr-slider
     :data-orientation="orientation"
     :class="sliderRootClass({ size: resolvedSize, disabled: isDisabled, hasMarks: normalizedMarks.length > 0, orientation })"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <div
       ref="trackEl"

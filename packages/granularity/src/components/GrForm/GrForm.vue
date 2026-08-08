@@ -51,6 +51,18 @@ export interface GrFormProps {
   disabled?: boolean
 }
 
+export interface GrFormEmits {
+  /** Форма прошла валидацию по submit. Отдаёт `model`. */
+  (e: 'submit', model: Record<string, unknown>): void
+  /** Результат валидации одного поля. */
+  (e: 'validate', name: string, valid: boolean, message: string | undefined): void
+  /**
+   * Submit не прошёл валидацию. Без этого события «форма невалидна» и «ничего
+   * не произошло» выглядят для потребителя одинаково.
+   */
+  (e: 'invalid', errors: Record<string, string>): void
+}
+
 const props = withDefaults(
   defineProps<GrFormProps>(),
   {
@@ -63,17 +75,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<{
-  /** Форма прошла валидацию по submit. Отдаёт `model`. */
-  (e: 'submit', model: Record<string, unknown>): void
-  /** Результат валидации одного поля. */
-  (e: 'validate', name: string, valid: boolean, message: string | undefined): void
-  /**
-   * Submit не прошёл валидацию. Без этого события «форма невалидна» и «ничего
-   * не произошло» выглядят для потребителя одинаково.
-   */
-  (e: 'invalid', errors: Record<string, string>): void
-}>()
+const emit = defineEmits<GrFormEmits>()
 
 const { t } = useGranularityTranslations()
 

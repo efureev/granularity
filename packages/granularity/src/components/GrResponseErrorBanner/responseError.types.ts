@@ -1,3 +1,5 @@
+import type { GrTone } from '../shared/tones'
+
 /**
  * Универсальные типы для отображения ошибок ответа сервера/сети.
  *
@@ -28,8 +30,8 @@ export type ResponseErrorKind =
     | 'server'
     | 'unknown'
 
-/** Визуальный тон баннера. Совпадает с `tone` у `GrAlert`. */
-export type ResponseErrorTone = 'info' | 'success' | 'warning' | 'danger' | 'slate' | 'azure' | 'primary' | 'neutral'
+/** Визуальный тон баннера — та же шкала, что у всех компонентов пакета. */
+export type ResponseErrorTone = GrTone
 
 /** Ошибка по конкретному полю (Laravel-style / JSON:API pointer / RFC 7807 errors). */
 export type ResponseErrorFieldError = {

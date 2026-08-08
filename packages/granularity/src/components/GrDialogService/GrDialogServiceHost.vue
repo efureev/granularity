@@ -19,14 +19,16 @@ import { visibleDialogRequests } from './store'
 import type { DialogRequest, DialogServiceState } from './store'
 import { GRANULARITY_DIALOG_SERVICE_STATE } from './useDialogService'
 
-const props = defineProps<{
+export interface GrDialogServiceHostProps {
   /**
    * Состояние инстанса сервиса. Приходит пропом при программном монтировании:
    * хост живёт вне дерева и своим `inject` до app-scoped состояния не дотянулся
    * бы. `inject` остаётся для случая, когда хост поставили в шаблон руками.
    */
   state?: DialogServiceState | null
-}>()
+}
+
+const props = defineProps<GrDialogServiceHostProps>()
 
 const injected = inject(GRANULARITY_DIALOG_SERVICE_STATE, null)
 

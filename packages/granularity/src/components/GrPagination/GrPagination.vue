@@ -57,6 +57,11 @@ export interface GrPaginationProps {
   size?: GrPaginationSize
 }
 
+export interface GrPaginationEmits {
+  (e: 'update:page', value: number): void
+  (e: 'update:pageSize', value: number): void
+}
+
 const { t } = useGranularityTranslations()
 
 const props = withDefaults(defineProps<GrPaginationProps>(), {
@@ -89,10 +94,7 @@ const labelClass = computed(() => labelSizes[resolvedSize.value])
 const selectWrapClass = computed(() => pageSizeSelectWidths[resolvedSize.value])
 const navButtonSize = computed(() => navButtonSizes[resolvedSize.value])
 
-const emit = defineEmits<{
-  (e: 'update:page', value: number): void
-  (e: 'update:pageSize', value: number): void
-}>()
+const emit = defineEmits<GrPaginationEmits>()
 
 // Делитель клампится: `pageSize: 0` дал бы `Infinity` страниц и бесконечный
 // цикл в `range()`.

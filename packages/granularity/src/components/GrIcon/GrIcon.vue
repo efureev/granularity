@@ -13,20 +13,22 @@ import {
 
 export type { GrIconSize, GrIconTone } from './grIconStyles'
 
+export interface GrIconProps {
+  /** Размер по шкале пакета либо произвольный в пикселях. */
+  size?: GrIconSize | number
+  /**
+   * Имя значимой иконки. Задан — иконка объявляется `role="img"` и перестаёт
+   * быть скрытой. Не задан — иконка декоративна.
+   */
+  label?: string
+  /** Цвет из палитры. `current` — наследовать цвет текста родителя. */
+  tone?: GrIconTone
+  /** Вращение — для спиннеров. */
+  spin?: boolean
+}
+
 const props = withDefaults(
-  defineProps<{
-    /** Размер по шкале пакета либо произвольный в пикселях. */
-    size?: GrIconSize | number
-    /**
-     * Имя значимой иконки. Задан — иконка объявляется `role="img"` и перестаёт
-     * быть скрытой. Не задан — иконка декоративна.
-     */
-    label?: string
-    /** Цвет из палитры. `current` — наследовать цвет текста родителя. */
-    tone?: GrIconTone
-    /** Вращение — для спиннеров. */
-    spin?: boolean
-  }>(),
+  defineProps<GrIconProps>(),
   {
     size: undefined,
     label: undefined,

@@ -16,6 +16,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `v-model`, because a second copy inside the component would drift from it. `GrDropdown` has no model and changes its
   own state, and its `disabled` is not bypassed — an imperative call must not open what a click and the keyboard
   cannot. The set is held by a gate (`src/__tests__/overlayImperativeApi.test.ts`).
+- **Every component exports the types of its props, events and instance.** `GrXProps` was missing from twelve SFCs —
+  `GrButton` and `GrInput` among them — so a wrapper written as `defineProps<GrInputProps & { … }>` was impossible
+  around the most-used components of the package. `GrXEmits` existed nowhere at all, and an instance type on exactly
+  one component. All three are now exported next to the component, and their presence is held by
+  `src/__tests__/publicTypes.test.ts`.
+
+  `GrXInstance` is derived from the component rather than written by hand, so it cannot drift from `defineExpose`. It
+  is also the only way to type a `ref` to a generic component — `InstanceType<typeof GrSelect>` does not work there,
+  because such a component compiles to a function rather than a class. `GrTreeInstance` stays hand-written: it is
+  parameterised (`GrTreeInstance<T>`), and a derived type would not be.
+- **Form controls answer to one set of events.** `update:modelValue`, `change`, `focus`, `blur` — and `clear`
+  wherever there is a `clearable` prop — are now declared by all sixteen of them. Before, the full set existed on two
+  controls and `focus`/`blur` on three, so a wrapper written over `GrInput` did not work over `GrCheckbox`. The
+  methods `focus()`/`blur()` had been unified long ago; this is the other half of the same contract, and the
+  composition is held by `src/__tests__/formControlContract.test.ts`.
+
+  For a group — a radio group, segments, a set of checkboxes, a range slider, tag input, a file drop zone — `focus`
+  and `blur` fire only when focus crosses the control's boundary. An arrow key moving focus from one item to the next
+  emits nothing; otherwise a wrapper would receive `blur` + `focus` on every keystroke. For the comboboxes the
+  teleported panel counts as part of the control, so moving into its filter field is not a `blur`.
+- **`GrTable` exposes `scrollTo()`.** The same signature `GrDataTable` has had; the table's own scroll container was
+  unreachable from the outside. `scrollToRow` is deliberately absent — rows come from a slot and the table knows no
+  row keys.
 - **New `granularityThemePlugin` gives each application its own theme state.** `useTheme()` kept its state at module
   level, which on a server is one state shared by every request. The plugin provides it through `app.provide`, the way
   `granularityToastPlugin` already does; `GRANULARITY_THEME_STATE` is exported for anyone building on top. A plain SPA
@@ -228,6 +251,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   in the rest; a reader of a neighbouring component had to decide each time whether the difference meant anything.
   `src/__tests__/emitNaming.test.ts` now holds the name — a formatting linter does not catch this, because it is not
   formatting.
+- **`ResponseErrorTone` is an alias of `GrTone`.** It used to spell the same eight tones out as a string union, so a
+  tone added to the scale would not have reached the banner and the divergence would have surfaced at runtime. The set
+  of values is unchanged, so nothing to migrate.
+- **`defineOptions({ name })` is gone from `GrFormFile` and `GrTree`.** The SFC compiler infers the name from the
+  filename and it survives minification; nothing in the package depended on the runtime name. Two declarations out of
+  eighty-two were noise either way.
 - **`GrListItem` renders one structure for every row.** The content block (prefix, title, description, default slot)
   used to be written twice — once inside the interactive branch, once inside the plain one — and the copies could
   drift apart in silence. Now the wrapper always carries `role="listitem"` and the row is always a nested element:

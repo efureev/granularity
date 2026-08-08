@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrFileUploadComponent from './GrFileUpload.vue'
+
 export { default } from './GrFileUpload.vue'
 export { default as GrFileUpload } from './GrFileUpload.vue'
 export type {
@@ -27,3 +30,5 @@ export type {
 } from './uploadState'
 export { GR_UPLOAD_STATE_IDLE } from './uploadState'
 export * from '../../fileValidation'
+export type { GrFileUploadEmits } from './GrFileUpload.vue'
+export type GrFileUploadInstance = ComponentExposed<typeof GrFileUploadComponent>

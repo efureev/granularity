@@ -34,6 +34,10 @@ export interface GrCardProps {
   bodyClass?: string
 }
 
+export interface GrCardEmits {
+  (e: 'click', event: MouseEvent): void
+}
+
 const props = withDefaults(defineProps<GrCardProps>(), {
   // Настраивается через `GrConfigProvider`; дефолты — в резолверах ниже.
   padding: undefined,
@@ -45,9 +49,7 @@ const props = withDefaults(defineProps<GrCardProps>(), {
   bodyClass: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void
-}>()
+const emit = defineEmits<GrCardEmits>()
 
 const slots = useSlots()
 

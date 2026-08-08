@@ -56,60 +56,72 @@ export type GrImageViewerSource = string | GrImageViewerItem
 
 import { useGrThemeAttrs } from '../GrConfigProvider/context'
 
+export interface GrImageViewerProps {
+  modelValue: boolean
+  /**
+   * Кадры. Строка — только адрес; объект `{ src, alt }` даёт изображению
+   * альтернативный текст: без него просмотрщик пуст для незрячего
+   * пользователя, а придумать текст за потребителя компонент не может.
+   */
+  urlList: GrImageViewerSource[]
+  initialIndex?: number
+  zoomRate?: number
+  minScale?: number
+  maxScale?: number
+  hideOnClickModal?: boolean
+  closeOnPressEscape?: boolean
+  showProgress?: boolean
+  showZoomValue?: boolean
+  /** Включает масштабирование колесом мыши / жестом на трекпаде. По умолчанию включено. */
+  wheelZoom?: boolean
+  /** Включает перетаскивание (pan) картинки мышью. При наведении курсор «рука». По умолчанию выключено. */
+  draggable?: boolean
+  /**
+   * Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-modal`. Сырое число
+   * компонент не принимает: слой задаётся шкалой, см. `docs/z-index.md`.
+   */
+  zIndexVar?: string
+  /** i18n: aria-label кнопки закрытия. */
+  closeLabel?: string
+  /** i18n: aria-label кнопки «предыдущее изображение». */
+  prevLabel?: string
+  /** i18n: aria-label кнопки «следующее изображение». */
+  nextLabel?: string
+  /** i18n: aria-label кнопки «увеличить». */
+  zoomInLabel?: string
+  /** i18n: aria-label кнопки «уменьшить». */
+  zoomOutLabel?: string
+  /** i18n: aria-label кнопки «сбросить масштаб». */
+  resetZoomLabel?: string
+  /** i18n: aria-label кнопки «повернуть влево». */
+  rotateLeftLabel?: string
+  /** i18n: aria-label кнопки «повернуть вправо». */
+  rotateRightLabel?: string
+  /** Показывать кнопку скачивания текущего кадра. */
+  showDownload?: boolean
+  /** i18n: aria-label кнопки «скачать». */
+  downloadLabel?: string
+  /** i18n: текст в пустом состоянии (нет изображений). */
+  emptyText?: string
+  /**
+   * Доступное имя слоя. Модальный диалог без имени — нарушение
+   * `aria-dialog-name`: диктор объявит «диалог» и замолчит.
+   */
+  ariaLabel?: string
+}
+
+export interface GrImageViewerEmits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'close'): void
+  /** Показан другой кадр. */
+  (e: 'change', newIndex: number): void
+  (e: 'rotate', deg: number): void
+  /** Нажата кнопка скачивания. Само скачивание компонент уже запустил. */
+  (e: 'download', payload: { src: string, alt: string, index: number }): void
+}
+
 const props = withDefaults(
-  defineProps<{
-    modelValue: boolean
-    /**
-     * Кадры. Строка — только адрес; объект `{ src, alt }` даёт изображению
-     * альтернативный текст: без него просмотрщик пуст для незрячего
-     * пользователя, а придумать текст за потребителя компонент не может.
-     */
-    urlList: GrImageViewerSource[]
-    initialIndex?: number
-    zoomRate?: number
-    minScale?: number
-    maxScale?: number
-    hideOnClickModal?: boolean
-    closeOnPressEscape?: boolean
-    showProgress?: boolean
-    showZoomValue?: boolean
-    /** Включает масштабирование колесом мыши / жестом на трекпаде. По умолчанию включено. */
-    wheelZoom?: boolean
-    /** Включает перетаскивание (pan) картинки мышью. При наведении курсор «рука». По умолчанию выключено. */
-    draggable?: boolean
-    /**
-     * Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-modal`. Сырое число
-     * компонент не принимает: слой задаётся шкалой, см. `docs/z-index.md`.
-     */
-    zIndexVar?: string
-    /** i18n: aria-label кнопки закрытия. */
-    closeLabel?: string
-    /** i18n: aria-label кнопки «предыдущее изображение». */
-    prevLabel?: string
-    /** i18n: aria-label кнопки «следующее изображение». */
-    nextLabel?: string
-    /** i18n: aria-label кнопки «увеличить». */
-    zoomInLabel?: string
-    /** i18n: aria-label кнопки «уменьшить». */
-    zoomOutLabel?: string
-    /** i18n: aria-label кнопки «сбросить масштаб». */
-    resetZoomLabel?: string
-    /** i18n: aria-label кнопки «повернуть влево». */
-    rotateLeftLabel?: string
-    /** i18n: aria-label кнопки «повернуть вправо». */
-    rotateRightLabel?: string
-    /** Показывать кнопку скачивания текущего кадра. */
-    showDownload?: boolean
-    /** i18n: aria-label кнопки «скачать». */
-    downloadLabel?: string
-    /** i18n: текст в пустом состоянии (нет изображений). */
-    emptyText?: string
-    /**
-     * Доступное имя слоя. Модальный диалог без имени — нарушение
-     * `aria-dialog-name`: диктор объявит «диалог» и замолчит.
-     */
-    ariaLabel?: string
-  }>(),
+  defineProps<GrImageViewerProps>(),
   {
     initialIndex: 0,
     zoomRate: 1.2,
@@ -150,15 +162,7 @@ const resolvedDownloadLabel = computed(() => props.downloadLabel ?? t('gr.imageV
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.imageViewer.empty', 'No image'))
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.imageViewer.label', 'Image viewer'))
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'close'): void
-  /** Показан другой кадр. */
-  (e: 'change', newIndex: number): void
-  (e: 'rotate', deg: number): void
-  /** Нажата кнопка скачивания. Само скачивание компонент уже запустил. */
-  (e: 'download', payload: { src: string, alt: string, index: number }): void
-}>()
+const emit = defineEmits<GrImageViewerEmits>()
 
 type GrImageViewerToolbarActions = {
   close: () => void

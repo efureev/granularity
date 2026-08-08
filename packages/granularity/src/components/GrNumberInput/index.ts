@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrNumberInputComponent from './GrNumberInput.vue'
+
 export { default } from './GrNumberInput.vue'
 export { default as GrNumberInput } from './GrNumberInput.vue'
 export { grNumberInputConfig } from './config'
@@ -13,3 +16,5 @@ export type {
   NumberInputControlsDirection,
   NumberInputSize,
 } from './grNumberInputStyles'
+export type { GrNumberInputEmits } from './GrNumberInput.vue'
+export type GrNumberInputInstance = ComponentExposed<typeof GrNumberInputComponent>

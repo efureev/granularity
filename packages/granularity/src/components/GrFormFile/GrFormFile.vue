@@ -19,14 +19,11 @@ import {
 } from './grFormFileStyles'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, maxCountValidator, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-
-defineOptions({
-  name: 'GrFormFile',
-})
 
 export type GrFormFileError = FileValidationIssue
 
@@ -70,6 +67,16 @@ export interface GrFormFileProps {
   errors?: GrFormFileError[]
 }
 
+export interface GrFormFileEmits {
+  (e: 'update:modelValue', value: File | File[] | null): void
+  (e: 'change', value: File | File[] | null): void
+  (e: 'clear'): void
+  /** Результат валидации. Канал один: `validation` дублировал эту же нагрузку. */
+  (e: 'update:errors', errors: GrFormFileError[]): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrFormFileProps>(),
   {
@@ -103,13 +110,7 @@ const iconOffsetClass = computed(() => iconOffsets[resolvedSize.value])
 const buttonSize = computed(() => buttonSizes[resolvedSize.value])
 const iconSize = computed(() => iconSizes[resolvedSize.value])
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: File | File[] | null): void
-  (e: 'change', value: File | File[] | null): void
-  (e: 'clear'): void
-  /** Результат валидации. Канал один: `validation` дублировал эту же нагрузку. */
-  (e: 'update:errors', errors: GrFormFileError[]): void
-}>()
+const emit = defineEmits<GrFormFileEmits>()
 
 const { t } = useGranularityTranslations()
 
@@ -128,6 +129,14 @@ const resolvedClearAllText = computed(() => props.clearAllText ?? t('gr.formFile
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.formFile.placeholder', 'No files selected'))
 
 const inputRef = ref<HTMLInputElement | null>(null)
+const rootEl = ref<HTMLElement | null>(null)
+
+// Внутри зоны фокус ходит между нативным input'ом и кнопками: без границы
+// каждое перемещение давало бы потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 const localErrors = ref<GrFormFileError[]>([])
 const uploadBtnEl = ref<HTMLElement | null>(null)
 
@@ -338,10 +347,13 @@ watch(
 
 <template>
   <div
+    ref="rootEl"
     v-dropzone="dropzone"
     data-gr-form-file
     class="rounded-[var(--gr-radius-md)]"
     :class="disabled ? 'cursor-not-allowed' : ''"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <input
       ref="inputRef"

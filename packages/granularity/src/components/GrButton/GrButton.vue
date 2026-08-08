@@ -17,28 +17,30 @@ import {
   type GrButtonVariant,
 } from './grButtonStyles'
 
+export interface GrButtonProps {
+  variant?: GrButtonVariant
+  tone?: GrButtonTone
+  size?: GrButtonSize
+  loading?: boolean
+  /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
+  loadingText?: string
+  disabled?: boolean
+  square?: boolean
+  /** Кнопка на всю ширину контейнера. */
+  block?: boolean
+  type?: 'button' | 'submit' | 'reset'
+  ariaLabel?: string
+  /** Полиморфизм: кастомный корневой тег/компонент (например, RouterLink). */
+  as?: string | Component
+  /** Рендерит кнопку как `<a href>` (если не задан `as`). */
+  href?: string
+  target?: string
+  rel?: string
+  external?: boolean
+}
+
 const props = withDefaults(
-  defineProps<{
-    variant?: GrButtonVariant
-    tone?: GrButtonTone
-    size?: GrButtonSize
-    loading?: boolean
-    /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
-    loadingText?: string
-    disabled?: boolean
-    square?: boolean
-    /** Кнопка на всю ширину контейнера. */
-    block?: boolean
-    type?: 'button' | 'submit' | 'reset'
-    ariaLabel?: string
-    /** Полиморфизм: кастомный корневой тег/компонент (например, RouterLink). */
-    as?: string | Component
-    /** Рендерит кнопку как `<a href>` (если не задан `as`). */
-    href?: string
-    target?: string
-    rel?: string
-    external?: boolean
-  }>(),
+  defineProps<GrButtonProps>(),
   {
     // `variant`/`tone`/`size`/`square` настраиваются через `GrConfigProvider`,
     // поэтому их дефолты живут в резолверах ниже, а не здесь: Vue подставил бы

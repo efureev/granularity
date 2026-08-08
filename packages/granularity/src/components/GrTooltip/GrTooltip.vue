@@ -50,6 +50,10 @@ export interface GrTooltipProps {
   open?: boolean
 }
 
+export interface GrTooltipEmits {
+  (e: 'update:open', value: boolean): void
+}
+
 const props = withDefaults(defineProps<GrTooltipProps>(), {
   text: undefined,
   iconColor: 'var(--gr-muted-fg)',
@@ -62,9 +66,7 @@ const props = withDefaults(defineProps<GrTooltipProps>(), {
   open: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-}>()
+const emit = defineEmits<GrTooltipEmits>()
 
 defineSlots<{
   /** Триггер. По умолчанию — иконка info. */

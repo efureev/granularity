@@ -23,3 +23,4 @@ export type {
   DialogService,
   DialogServiceDefaults,
 } from './types'
+export type { GrDialogServiceHostProps } from './GrDialogServiceHost.vue'

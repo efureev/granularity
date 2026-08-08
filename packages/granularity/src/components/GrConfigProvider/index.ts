@@ -16,3 +16,4 @@ export {
   useGrConfig,
 } from './context'
 export { grConfigProviderConfig } from './config'
+export type { GrConfigProviderProps } from './GrConfigProvider.vue'

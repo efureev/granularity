@@ -321,6 +321,30 @@
             "description": "Запрос `fetchOptions` завершился ошибкой (отмена устаревшего сюда не приходит).",
             "type": "[unknown]",
             "signature": "(e: \"searchError\", error: unknown): void"
+          },
+          {
+            "name": "change",
+            "description": "Значение зафиксировано выбором или снятием опции.",
+            "type": "[GrAutocompleteModelValue<TValue>]",
+            "signature": "(e: \"change\", value: GrAutocompleteModelValue<TValue>): void"
+          },
+          {
+            "name": "clear",
+            "description": "Значение снято кнопкой очистки; только при `clearable`.",
+            "type": "[]",
+            "signature": "(e: \"clear\"): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -1227,6 +1251,24 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"update:modelValue\", value: boolean): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"change\", value: boolean): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -1351,6 +1393,24 @@
             "description": "",
             "type": "[value: string[]]",
             "signature": "(event: \"update:modelValue\", value: string[]): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string[]]",
+            "signature": "(event: \"change\", value: string[]): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -3375,6 +3435,18 @@
             "description": "",
             "type": "[GrUploadState]",
             "signature": "(e: \"stateChange\", state: GrUploadState): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -3839,16 +3911,28 @@
             "signature": "(event: \"update:modelValue\", value: File | File[] | null): void"
           },
           {
+            "name": "change",
+            "description": "",
+            "type": "[value: File | File[] | null]",
+            "signature": "(event: \"change\", value: File | File[] | null): void"
+          },
+          {
             "name": "clear",
             "description": "",
             "type": "[]",
             "signature": "(event: \"clear\"): void"
           },
           {
-            "name": "change",
+            "name": "focus",
             "description": "",
-            "type": "[value: File | File[] | null]",
-            "signature": "(event: \"change\", value: File | File[] | null): void"
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           },
           {
             "name": "update:errors",
@@ -4556,6 +4640,18 @@
             "signature": "(event: \"update:modelValue\", value: string): void"
           },
           {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
+          },
+          {
             "name": "focus",
             "description": "",
             "type": "[event: FocusEvent]",
@@ -4566,18 +4662,6 @@
             "description": "",
             "type": "[event: FocusEvent]",
             "signature": "(event: \"blur\", event: FocusEvent): void"
-          },
-          {
-            "name": "clear",
-            "description": "",
-            "type": "[]",
-            "signature": "(event: \"clear\"): void"
-          },
-          {
-            "name": "change",
-            "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"change\", value: string): void"
           }
         ]
       },
@@ -4814,16 +4898,34 @@
             "signature": "(event: \"update:modelValue\", value: string[]): void"
           },
           {
-            "name": "add",
+            "name": "change",
             "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"add\", value: string): void"
+            "type": "[value: string[]]",
+            "signature": "(event: \"change\", value: string[]): void"
           },
           {
             "name": "clear",
             "description": "",
             "type": "[]",
             "signature": "(event: \"clear\"): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          },
+          {
+            "name": "add",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"add\", value: string): void"
           },
           {
             "name": "reject",
@@ -5803,6 +5905,18 @@
             "signature": "(event: \"update:modelValue\", value: string): void"
           },
           {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
+          },
+          {
             "name": "focus",
             "description": "",
             "type": "[event: FocusEvent]",
@@ -5813,18 +5927,6 @@
             "description": "",
             "type": "[event: FocusEvent]",
             "signature": "(event: \"blur\", event: FocusEvent): void"
-          },
-          {
-            "name": "clear",
-            "description": "",
-            "type": "[]",
-            "signature": "(event: \"clear\"): void"
-          },
-          {
-            "name": "change",
-            "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"change\", value: string): void"
           }
         ]
       },
@@ -6799,6 +6901,24 @@
             "description": "",
             "type": "[value: GrRadioValue]",
             "signature": "(event: \"update:modelValue\", value: GrRadioValue): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: GrRadioValue]",
+            "signature": "(event: \"change\", value: GrRadioValue): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -6978,6 +7098,24 @@
             "signature": "(event: \"change\", value: number): void"
           },
           {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          },
+          {
             "name": "hoverChange",
             "description": "",
             "type": "[value: number | null]",
@@ -7016,7 +7154,7 @@
           {
             "name": "tone",
             "description": "Жёсткий оверрайд тона. Бьёт `toneByKind`.",
-            "type": "ResponseErrorTone | undefined",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -7030,7 +7168,7 @@
           {
             "name": "toneByKind",
             "description": "Маппинг `kind` → `tone`. Мерджится с `DEFAULT_TONE_BY_KIND`.",
-            "type": "Partial<Record<ResponseErrorKind, ResponseErrorTone>> | undefined",
+            "type": "Partial<Record<ResponseErrorKind, \"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\">> | undefined",
             "required": false,
             "default": "{}"
           },
@@ -7259,6 +7397,18 @@
             "description": "",
             "type": "[value: GrSegmentedValue, option: GrSegmentedOption]",
             "signature": "(event: \"change\", value: GrSegmentedValue, option: GrSegmentedOption): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -7574,6 +7724,18 @@
             "description": "Текст поиска как контролируемое значение (`v-model:search`).",
             "type": "[string]",
             "signature": "(e: \"update:search\", value: string): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"blur\", event: FocusEvent): void"
           },
           {
             "name": "search",
@@ -7911,6 +8073,18 @@
             "description": "",
             "type": "[value: GrSliderModelValue]",
             "signature": "(event: \"change\", value: GrSliderModelValue): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -8235,6 +8409,18 @@
             "description": "",
             "type": "[value: boolean]",
             "signature": "(event: \"change\", value: boolean): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
           }
         ]
       },
@@ -8427,7 +8613,13 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "scrollTo",
+            "description": "",
+            "type": "(options: ScrollToOptions) => void"
+          }
+        ]
       }
     ]
   },
@@ -8719,6 +8911,12 @@
             "signature": "(event: \"update:modelValue\", value: string): void"
           },
           {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          },
+          {
             "name": "focus",
             "description": "",
             "type": "[event: FocusEvent]",
@@ -8729,12 +8927,6 @@
             "description": "",
             "type": "[event: FocusEvent]",
             "signature": "(event: \"blur\", event: FocusEvent): void"
-          },
-          {
-            "name": "change",
-            "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"change\", value: string): void"
           }
         ]
       },
@@ -9548,6 +9740,18 @@
             "description": "",
             "type": "[T, GrTreeNode<T>]",
             "signature": "(e: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"blur\", event: FocusEvent): void"
           }
         ]
       },

@@ -12,13 +12,15 @@ import {
   type GrBadgeTone,
 } from './grBadgeStyles'
 
+export interface GrBadgeProps {
+    tone?: GrBadgeTone
+    dark?: boolean
+    size?: GrBadgeSize
+    radius?: GrBadgeRadius
+}
+
 const props = withDefaults(
-    defineProps<{
-      tone?: GrBadgeTone
-      dark?: boolean
-      size?: GrBadgeSize
-      radius?: GrBadgeRadius
-    }>(),
+    defineProps<GrBadgeProps>(),
     {
       // `tone`/`size`/`radius` настраиваются через `GrConfigProvider`, поэтому
       // их дефолты живут в резолверах ниже, а не в `withDefaults`.

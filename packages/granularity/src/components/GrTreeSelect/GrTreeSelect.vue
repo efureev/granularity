@@ -8,6 +8,7 @@ import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrInput from '../GrInput/GrInput.vue'
@@ -18,6 +19,16 @@ import GrTree, {
 } from '../GrTree'
 import type { GrTreeSelectModelValue, GrTreeSelectProps } from './grTreeSelectTypes'
 import { grTreeSelectClass, grTreeSelectPanelClass } from './grTreeSelectStyles'
+
+export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
+  (e: 'update:modelValue', value: GrTreeSelectModelValue): void
+  (e: 'change', value: GrTreeSelectModelValue): void
+  (e: 'visibleChange', visible: boolean): void
+  (e: 'clear'): void
+  (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
 
 const props = withDefaults(
   defineProps<GrTreeSelectProps<T>>(),
@@ -54,13 +65,7 @@ const props = withDefaults(
 
 const { t } = useGranularityTranslations()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrTreeSelectModelValue): void
-  (e: 'change', value: GrTreeSelectModelValue): void
-  (e: 'visibleChange', visible: boolean): void
-  (e: 'clear'): void
-  (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
-}>()
+const emit = defineEmits<GrTreeSelectEmits<T>>()
 
 defineSlots<{
   /** Рендер значения внутри триггера (вместо дефолтного текста). */
@@ -97,6 +102,14 @@ defineExpose({ focus, blur })
 const filterInputRef = ref<InstanceType<typeof GrInput> | null>(null)
 const treeRef = ref<GrTreeInstance | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
+
+// Панель телепортирована в `body`, то есть лежит вне корня, но для пользователя
+// она часть контрола: без неё уход фокуса в панель читался бы как `blur`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+  containers: () => [panelEl.value],
+})
 
 const clickOutsideExclude = [() => panelEl.value]
 
@@ -485,6 +498,8 @@ const themeAttrs = useGrThemeAttrs()
     v-click-outside="{ handler: onClickOutside, enabled: open, exclude: clickOutsideExclude }"
     data-gr-tree-select
     class="relative"
+     @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <div class="relative">
       <input

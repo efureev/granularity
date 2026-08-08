@@ -8,6 +8,18 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import { grKbdComboClass, grKbdKeyClass, separatorClass } from './grKbdStyles'
 
+export interface GrKbdProps {
+  size?: GrKbdSize
+  /**
+   * Сочетание: строкой (`"mod+shift+K"`) или набором токенов
+   * (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.
+   */
+  keys?: string | string[]
+  /** Разделитель между клавишами сочетания. Пустая строка — только зазор. */
+  separator?: string
+  platform?: GrKbdPlatform
+}
+
 /**
  * GrKbd — GR-примитив для отображения клавиш и сочетаний (`<kbd>`).
  *
@@ -20,17 +32,7 @@ export type GrKbdSize = GrComponentSize
 export type GrKbdPlatform = 'auto' | 'apple' | 'other'
 
 const props = withDefaults(
-  defineProps<{
-    size?: GrKbdSize
-    /**
-     * Сочетание: строкой (`"mod+shift+K"`) или набором токенов
-     * (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.
-     */
-    keys?: string | string[]
-    /** Разделитель между клавишами сочетания. Пустая строка — только зазор. */
-    separator?: string
-    platform?: GrKbdPlatform
-  }>(),
+  defineProps<GrKbdProps>(),
   {
     size: undefined,
     keys: undefined,

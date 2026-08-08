@@ -25,7 +25,7 @@ export type {
   ResponseErrorTone,
 } from './responseError.types'
 
-const props = withDefaults(defineProps<{
+export interface GrResponseErrorBannerProps {
   /** Готовая структура ошибки. Если `null` — баннер не рендерится. */
   error: ResponseErrorInfo | null
   /** Частичный override текстов. Мерджится с `DEFAULT_RESPONSE_ERROR_TEXTS`. */
@@ -52,7 +52,14 @@ const props = withDefaults(defineProps<{
   showStatus?: boolean
   /** Префикс `data-testid`. */
   testIdPrefix?: string
-}>(), {
+}
+
+export interface GrResponseErrorBannerEmits {
+  (e: 'retry', error: ResponseErrorInfo): void
+  (e: 'dismiss'): void
+}
+
+const props = withDefaults(defineProps<GrResponseErrorBannerProps>(), {
   texts: () => ({}),
   tone: undefined,
   toneByKind: () => ({}),
@@ -67,10 +74,7 @@ const props = withDefaults(defineProps<{
   testIdPrefix: 'response-error',
 })
 
-const emit = defineEmits<{
-  (e: 'retry', error: ResponseErrorInfo): void
-  (e: 'dismiss'): void
-}>()
+const emit = defineEmits<GrResponseErrorBannerEmits>()
 
 const { t } = useGranularityTranslations()
 

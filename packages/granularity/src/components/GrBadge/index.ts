@@ -6,3 +6,4 @@ export type { GrBadgeConfigurableProps } from './defaults'
 
 export type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from './grBadgeStyles'
 export { grBadgeSafelist } from './safelist'
+export type { GrBadgeProps } from './GrBadge.vue'

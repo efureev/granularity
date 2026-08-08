@@ -35,15 +35,11 @@ import {
   grLinkColorStyle,
 } from './grLinkStyles'
 
-defineOptions({
-  inheritAttrs: false,
-})
-
-const props = withDefaults(defineProps<{
+export interface GrLinkProps {
   /**
-   * Кастомный корневой тег/компонент. Если передан и компонент не `disabled` —
-   * рендерится через `<component :is="as">`. Игнорируется при `disabled`.
-   */
+  * Кастомный корневой тег/компонент. Если передан и компонент не `disabled` —
+  * рендерится через `<component :is="as">`. Игнорируется при `disabled`.
+  */
   as?: string | Component
   href?: string
   external?: boolean
@@ -58,13 +54,19 @@ const props = withDefaults(defineProps<{
   underline?: GrLinkUnderline
   size?: GrLinkSize
   /**
-   * Иконка внешней ссылки. По умолчанию показывается у любой ссылки, которая
-   * открывается в новой вкладке, — не только при `external`.
-   */
+  * Иконка внешней ссылки. По умолчанию показывается у любой ссылки, которая
+  * открывается в новой вкладке, — не только при `external`.
+  */
   externalIcon?: boolean
   /** i18n: скрытая подсказка «откроется в новой вкладке». */
   newTabLabel?: string
-}>(), {
+}
+
+defineOptions({
+  inheritAttrs: false,
+})
+
+const props = withDefaults(defineProps<GrLinkProps>(), {
   as: undefined,
   href: undefined,
   external: false,

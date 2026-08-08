@@ -21,7 +21,7 @@ import type {
   ResponseErrorTone,
 } from './responseError.types'
 
-const props = withDefaults(defineProps<{
+export interface GrUploadErrorBannerProps {
   error: ResponseErrorInfo | null
   /** Файлы, которые пытались загрузить — пробрасываются в `retry` payload. */
   files?: File[]
@@ -32,7 +32,14 @@ const props = withDefaults(defineProps<{
   canDismiss?: boolean
   autoHideKinds?: ResponseErrorKind[]
   testIdPrefix?: string
-}>(), {
+}
+
+export interface GrUploadErrorBannerEmits {
+  (e: 'retry', payload: { error: ResponseErrorInfo, files: File[] }): void
+  (e: 'dismiss'): void
+}
+
+const props = withDefaults(defineProps<GrUploadErrorBannerProps>(), {
   files: () => [],
   texts: () => ({}),
   tone: undefined,
@@ -43,10 +50,7 @@ const props = withDefaults(defineProps<{
   testIdPrefix: 'upload-error',
 })
 
-const emit = defineEmits<{
-  (e: 'retry', payload: { error: ResponseErrorInfo, files: File[] }): void
-  (e: 'dismiss'): void
-}>()
+const emit = defineEmits<GrUploadErrorBannerEmits>()
 
 const { t } = useGranularityTranslations()
 

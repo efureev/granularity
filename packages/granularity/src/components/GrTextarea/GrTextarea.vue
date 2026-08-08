@@ -50,6 +50,14 @@ export interface GrTextareaProps {
   resize?: GrTextareaResize
 }
 
+export interface GrTextareaEmits {
+  (e: 'update:modelValue', value: string): void
+  /** Значение зафиксировано нативным `change` — по `blur`. */
+  (e: 'change', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(defineProps<GrTextareaProps>(), {
   placeholder: undefined,
   autocomplete: undefined,
@@ -75,13 +83,7 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  /** Значение зафиксировано нативным `change` — по `blur`. */
-  (e: 'change', value: string): void
-  (e: 'focus', event: FocusEvent): void
-  (e: 'blur', event: FocusEvent): void
-}>()
+const emit = defineEmits<GrTextareaEmits>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
 const field = useGrFormFieldContext()

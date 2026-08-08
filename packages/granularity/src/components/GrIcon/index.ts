@@ -5,3 +5,4 @@ export { grIconSafelist } from './safelist'
 export type { GrIconSize, GrIconTone } from './grIconStyles'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrIconConfigurableProps } from './defaults'
+export type { GrIconProps } from './GrIcon.vue'

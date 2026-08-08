@@ -81,6 +81,14 @@ export interface GrDrawerProps {
   closeLabel?: string
 }
 
+export interface GrDrawerEmits {
+  (e: 'update:modelValue', value: boolean): void
+  /** Панель выехала и анимация закончилась. */
+  (e: 'opened'): void
+  /** Панель уехала и анимация закончилась. */
+  (e: 'closed'): void
+}
+
 // Дефолты оформления намеренно `undefined`: «настоящий» дефолт живёт в
 // `useGrComponentProp`, иначе `GrConfigProvider` не отличит заданный
 // пользователем проп от подставленного Vue.
@@ -106,13 +114,7 @@ const props = withDefaults(defineProps<GrDrawerProps>(), {
 const { t } = useGranularityTranslations()
 const resolvedCloseLabel = computed(() => props.closeLabel ?? t('gr.common.close', 'Close'))
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  /** Панель выехала и анимация закончилась. */
-  (e: 'opened'): void
-  /** Панель уехала и анимация закончилась. */
-  (e: 'closed'): void
-}>()
+const emit = defineEmits<GrDrawerEmits>()
 
 const slots = defineSlots<{
   default?: () => any

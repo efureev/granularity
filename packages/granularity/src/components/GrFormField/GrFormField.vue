@@ -22,49 +22,51 @@ import {
   type GrFormFieldSize,
 } from './grFormFieldStyles'
 
+export interface GrFormFieldProps {
+  label?: string
+  /**
+   * Имя поля в модели `GrForm` (в т.ч. dot-path `address.city`). Когда поле внутри
+   * `GrForm` и задан `name`, ошибка и признак обязательности берутся из формы по
+   * этому имени, а потеря фокуса триггерит валидацию поля.
+   */
+  name?: string
+  /** Явный id контрола. Если не задан — генерируется автоматически. */
+  forId?: string
+  /**
+   * Явная ошибка (или несколько). Перекрывает ошибку из `GrForm` — ручной
+   * режим без формы тоже здесь. Массив нужен там, где источник ошибок один,
+   * а претензий несколько: ответ сервера, валидация файла.
+   */
+  error?: string | string[]
+  /** Подсказка под лейблом/над контролом (можно также через слот `#hint`). */
+  hint?: string
+  /** Помечает поле обязательным (маркер `*` + `aria-required` у контрола). */
+  required?: boolean
+  /** Всё поле только для чтения: контролы внутри перестают редактироваться. */
+  readonly?: boolean
+  /** Поле недоступно. Складывается с `disabled` формы по «или». */
+  disabled?: boolean
+  /**
+   * Показывать текст ошибки. `false` — поле остаётся невалидным для контрола
+   * и AT (`aria-invalid`), но сообщение не занимает места: так делают в
+   * плотных таблицах-формах, где ошибка объясняется сводкой сверху.
+   */
+  showMessage?: boolean
+  /** Размер подписи, подсказки и ошибки. Не задан — из `GrConfigProvider`, иначе `md`. */
+  size?: GrFormFieldSize
+  /** Подпись сверху (по умолчанию) или сбоку — для плотных форм. */
+  labelPosition?: GrFormFieldLabelPosition
+  /** Ширина колонки подписи при `labelPosition="start"`. Число — пиксели. */
+  labelWidth?: string | number
+  labelClass?: LabelClass
+}
+
 import './defaults'
 
 type LabelClass = string | string[] | Record<string, boolean>
 
 const props = withDefaults(
-  defineProps<{
-    label?: string
-    /**
-     * Имя поля в модели `GrForm` (в т.ч. dot-path `address.city`). Когда поле внутри
-     * `GrForm` и задан `name`, ошибка и признак обязательности берутся из формы по
-     * этому имени, а потеря фокуса триггерит валидацию поля.
-     */
-    name?: string
-    /** Явный id контрола. Если не задан — генерируется автоматически. */
-    forId?: string
-    /**
-     * Явная ошибка (или несколько). Перекрывает ошибку из `GrForm` — ручной
-     * режим без формы тоже здесь. Массив нужен там, где источник ошибок один,
-     * а претензий несколько: ответ сервера, валидация файла.
-     */
-    error?: string | string[]
-    /** Подсказка под лейблом/над контролом (можно также через слот `#hint`). */
-    hint?: string
-    /** Помечает поле обязательным (маркер `*` + `aria-required` у контрола). */
-    required?: boolean
-    /** Всё поле только для чтения: контролы внутри перестают редактироваться. */
-    readonly?: boolean
-    /** Поле недоступно. Складывается с `disabled` формы по «или». */
-    disabled?: boolean
-    /**
-     * Показывать текст ошибки. `false` — поле остаётся невалидным для контрола
-     * и AT (`aria-invalid`), но сообщение не занимает места: так делают в
-     * плотных таблицах-формах, где ошибка объясняется сводкой сверху.
-     */
-    showMessage?: boolean
-    /** Размер подписи, подсказки и ошибки. Не задан — из `GrConfigProvider`, иначе `md`. */
-    size?: GrFormFieldSize
-    /** Подпись сверху (по умолчанию) или сбоку — для плотных форм. */
-    labelPosition?: GrFormFieldLabelPosition
-    /** Ширина колонки подписи при `labelPosition="start"`. Число — пиксели. */
-    labelWidth?: string | number
-    labelClass?: LabelClass
-  }>(),
+  defineProps<GrFormFieldProps>(),
   {
     label: undefined,
     name: undefined,

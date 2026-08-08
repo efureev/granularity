@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrDialogComponent from './GrDialog.vue'
+
 export { default } from './GrDialog.vue'
 export { default as GrDialog, type GrDialogProps } from './GrDialog.vue'
 export { default as GrDialogHeader, type GrDialogHeaderProps } from './GrDialogHeader.vue'
@@ -13,3 +16,6 @@ export {
   resolveGrDialogTitle,
 } from './dialogShared'
 export { grDialogSafelist } from './safelist'
+export type { GrDialogEmits } from './GrDialog.vue'
+export type GrDialogInstance = ComponentExposed<typeof GrDialogComponent>
+export type { GrDialogCloseButtonEmits } from './GrDialogCloseButton.vue'

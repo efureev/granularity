@@ -45,6 +45,10 @@ export interface GrTabsProps {
   orientation?: GrTabsOrientation
 }
 
+export interface GrTabsEmits {
+  (e: 'update:modelValue', value: string): void
+}
+
 export type GrTabsActivationMode = 'automatic' | 'manual'
 
 export type { GrTabsOrientation, GrTabsVariant } from './grTabsStyles'
@@ -75,9 +79,7 @@ defineSlots<{
   tab?: (props: { tab: GrTab, active: boolean, disabled: boolean }) => unknown
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
+const emit = defineEmits<GrTabsEmits>()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTabs' })
 const resolvedVariant = useGrComponentProp('GrTabs', 'variant', () => props.variant, 'pills')

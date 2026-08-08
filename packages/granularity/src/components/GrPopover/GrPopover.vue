@@ -73,6 +73,10 @@ export interface GrPopoverProps {
   disabled?: boolean
 }
 
+export interface GrPopoverEmits {
+  (e: 'update:open', value: boolean): void
+}
+
 const props = withDefaults(defineProps<GrPopoverProps>(), {
   open: undefined,
   placement: 'bottom-start',
@@ -91,9 +95,7 @@ const props = withDefaults(defineProps<GrPopoverProps>(), {
   disabled: false,
 })
 
-const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-}>()
+const emit = defineEmits<GrPopoverEmits>()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPopover' })
 

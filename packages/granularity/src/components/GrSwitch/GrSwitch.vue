@@ -51,6 +51,13 @@ export interface GrSwitchProps {
   inactiveBackgroundColor?: string
 }
 
+export interface GrSwitchEmits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'change', value: boolean): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const getCustomColor = (value?: string) => value?.trim() || undefined
 
 // Скрытое поле — сосед кнопки, а не её потомок: интерактивный контент внутри
@@ -110,10 +117,7 @@ const resolvedSize = useGrComponentSize(() => props.size, {
   supported: ['xs', 'sm', 'md', 'lg'],
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'change', value: boolean): void
-}>()
+const emit = defineEmits<GrSwitchEmits>()
 
 const rootClass = computed(() => grSwitchRootClass(props.labelPosition))
 
@@ -195,6 +199,8 @@ function toggle(): void {
       :disabled="isDisabled"
       :class="rootClass"
       @click="toggle"
+      @focus="emit('focus', $event)"
+      @blur="emit('blur', $event)"
   >
     <span
         data-testid="gr-switch-track"

@@ -22,7 +22,7 @@ import type {
   ResponseErrorTone,
 } from './responseError.types'
 
-const props = withDefaults(defineProps<{
+export interface GrFormErrorBannerProps {
   error: ResponseErrorInfo | null
   fieldLabels?: Record<string, string>
   texts?: Partial<ResponseErrorTexts>
@@ -32,7 +32,14 @@ const props = withDefaults(defineProps<{
   canDismiss?: boolean
   autoHideKinds?: ResponseErrorKind[]
   testIdPrefix?: string
-}>(), {
+}
+
+export interface GrFormErrorBannerEmits {
+  (e: 'retry', error: ResponseErrorInfo): void
+  (e: 'dismiss'): void
+}
+
+const props = withDefaults(defineProps<GrFormErrorBannerProps>(), {
   fieldLabels: () => ({}),
   texts: () => ({}),
   tone: undefined,
@@ -43,10 +50,7 @@ const props = withDefaults(defineProps<{
   testIdPrefix: 'form-error',
 })
 
-const emit = defineEmits<{
-  (e: 'retry', error: ResponseErrorInfo): void
-  (e: 'dismiss'): void
-}>()
+const emit = defineEmits<GrFormErrorBannerEmits>()
 
 const { t } = useGranularityTranslations()
 

@@ -10,6 +10,7 @@ import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/cont
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -73,6 +74,20 @@ export interface GrInputTagProps {
   ariaLabel?: string
 }
 
+export interface GrInputTagEmits {
+  (e: 'update:modelValue', value: string[]): void
+  (e: 'add', value: string): void
+  (e: 'remove', value: string, index: number): void
+  /** Тег не прошёл `beforeAdd`. */
+  (e: 'reject', value: string): void
+  /** Набор снесён кнопкой «очистить». */
+  (e: 'clear'): void
+  /** Набор тегов изменился. */
+  (e: 'change', value: string[]): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrInputTagProps>(),
   {
@@ -104,15 +119,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string[]): void
-  (e: 'add', value: string): void
-  (e: 'remove', value: string, index: number): void
-  /** Тег не прошёл `beforeAdd`. */
-  (e: 'reject', value: string): void
-  /** Набор снесён кнопкой «очистить». */
-  (e: 'clear'): void
-}>()
+const emit = defineEmits<GrInputTagEmits>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required) —
 // как у GrInput и GrSelect: контрол не знает про форму, знает только про поле.
@@ -141,6 +148,14 @@ function removeTagLabelFor(tag: string): string {
 
 const inputValue = ref('')
 const inputEl = ref<HTMLInputElement | null>(null)
+const rootEl = ref<HTMLElement | null>(null)
+
+// Внутри корня фокус ходит между полем и кнопками удаления чипов: без границы
+// каждое такое перемещение давало бы потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 const removeEls = ref<HTMLButtonElement[]>([])
 
 function setRemoveEl(index: number) {
@@ -239,6 +254,7 @@ function addMany(rawTags: string[]): boolean {
     return false
 
   emit('update:modelValue', next)
+  emit('change', next)
   announce(added.length === 1
     ? t('gr.inputTag.added', 'Tag added: {tag}', { tag: added[0]! })
     : t('gr.inputTag.addedMany', '{count} tags added', { count: added.length }))
@@ -315,6 +331,7 @@ function removeAt(index: number): void {
 
   next.splice(index, 1)
   emit('update:modelValue', next)
+  emit('change', next)
   emit('remove', removed, index)
   announce(t('gr.inputTag.removed', 'Tag removed: {tag}', { tag: removed }))
 }
@@ -337,6 +354,7 @@ function clearAll(): void {
     return
 
   emit('update:modelValue', [])
+  emit('change', [])
   emit('clear')
   announce(t('gr.inputTag.cleared', 'All tags removed'))
   focus()
@@ -464,10 +482,13 @@ defineExpose({ focus, blur, clear: clearAll })
 
 <template>
   <div
+    ref="rootEl"
     data-gr-input-tag
     data-testid="gr-input-tag"
     :class="wrapperClassName"
     @click="focus"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <!--
       `display: contents` — список нужен ради роли, а не ради раскладки: чипы

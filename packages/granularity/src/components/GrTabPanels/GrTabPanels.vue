@@ -3,6 +3,11 @@ import { computed, provide, useId } from 'vue'
 
 import { GR_TAB_PANELS_KEY } from './context'
 
+export interface GrTabPanelsProps {
+  modelValue: string
+  idBase?: string
+}
+
 /**
  * GrTabPanels — контейнер `tabpanel`-ов, companion к `GrTabs`.
  *
@@ -14,10 +19,7 @@ import { GR_TAB_PANELS_KEY } from './context'
  * (`aria-controls` ↔ `aria-labelledby`).
  */
 const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    idBase?: string
-  }>(),
+  defineProps<GrTabPanelsProps>(),
   {
     idBase: undefined,
   },

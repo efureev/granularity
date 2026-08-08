@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrTextareaComponent from './GrTextarea.vue'
+
 export { default } from './GrTextarea.vue'
 export { default as GrTextarea } from './GrTextarea.vue'
 export type { GrTextareaProps } from './GrTextarea.vue'
@@ -6,3 +9,5 @@ export { grTextareaConfig } from './config'
 export type { GrTextareaConfigurableProps } from './defaults'
 export type { GrTextareaSize, GrTextareaState } from './grTextareaStyles'
 export { grTextareaSafelist } from './safelist'
+export type { GrTextareaEmits } from './GrTextarea.vue'
+export type GrTextareaInstance = ComponentExposed<typeof GrTextareaComponent>

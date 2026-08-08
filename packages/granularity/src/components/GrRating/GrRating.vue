@@ -73,6 +73,18 @@ export interface GrRatingProps {
   ariaLabel?: string
 }
 
+export interface GrRatingEmits {
+  (e: 'update:modelValue', value: number): void
+  /** Оценка зафиксирована (клик / клавиша). */
+  (e: 'change', value: number): void
+  /** Значение под курсором; `null` — курсор ушёл со шкалы. */
+  (e: 'hoverChange', value: number | null): void
+  /** Оценка снята повторным кликом; только при `clearable`. */
+  (e: 'clear'): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrRatingProps>(),
   {
@@ -100,13 +112,7 @@ const resolvedSize = useGrComponentSize(() => props.size, {
   supported: ['xs', 'sm', 'md', 'lg'],
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: number): void
-  /** Оценка зафиксирована (клик / клавиша). */
-  (e: 'change', value: number): void
-  /** Значение под курсором; `null` — курсор ушёл со шкалы. */
-  (e: 'hoverChange', value: number | null): void
-}>()
+const emit = defineEmits<GrRatingEmits>()
 
 const { t } = useGranularityTranslations()
 
@@ -195,6 +201,11 @@ function valueAt(index: number, event: MouseEvent): number {
   return rect.width > 0 && event.clientX - rect.left < rect.width / 2 ? index + 0.5 : index + 1
 }
 
+function onScaleBlur(event: FocusEvent): void {
+  resetHover()
+  emit('blur', event)
+}
+
 function commit(value: number): void {
   const next = clamp(value)
   if (next !== props.modelValue) emit('update:modelValue', next)
@@ -204,7 +215,10 @@ function commit(value: number): void {
 function onSymbolClick(index: number, event: MouseEvent): void {
   if (!interactive.value) return
   const next = valueAt(index, event)
-  commit(props.clearable && next === props.modelValue ? 0 : next)
+  const cleared = props.clearable && next === props.modelValue
+
+  commit(cleared ? 0 : next)
+  if (cleared) emit('clear')
 }
 
 function onSymbolMouseMove(index: number, event: MouseEvent): void {
@@ -280,7 +294,8 @@ function onKeydown(event: KeyboardEvent): void {
       :aria-readonly="asSlider && isReadonly ? 'true' : undefined"
       @keydown="onKeydown"
       @mouseleave="resetHover"
-      @blur="resetHover"
+      @focus="emit('focus', $event)"
+      @blur="onScaleBlur"
     >
       <span
         v-for="index in symbols"

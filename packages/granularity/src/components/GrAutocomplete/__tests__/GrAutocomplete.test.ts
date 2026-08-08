@@ -60,6 +60,28 @@ describe('GrAutocomplete', () => {
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['react'])
   })
 
+  it('выбор опции эмитит и change — контракт форм-контрола', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, ariaLabel: 'Framework' },
+    })
+    await getInput(wrapper).trigger('focus')
+    getTeleportedOptions()[1].click()
+    await nextTick()
+
+    expect(wrapper.emitted('change')?.[0]).toEqual(['react'])
+  })
+
+  it('clearable: очистка эмитит clear и change', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: 'react', options: OPTIONS, ariaLabel: 'Framework', clearable: true },
+    })
+
+    await wrapper.get('[data-gr-autocomplete-clear]').trigger('click')
+
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+    expect(wrapper.emitted('change')?.at(-1)).toEqual([''])
+  })
+
   it('поддерживает клавиатурную навигацию (ArrowDown + Enter)', async () => {
     const wrapper = mount(GrAutocomplete, {
       props: { modelValue: '', options: OPTIONS, ariaLabel: 'Framework' },

@@ -33,6 +33,7 @@ import { acceptValidator, FileValidationError, runFileValidators } from '../../f
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type GrFileUploadMode = 'batch' | 'per-file'
@@ -139,6 +140,21 @@ export interface GrFileUploadProps<TResponse = unknown> {
   preview?: boolean
 }
 
+export interface GrFileUploadEmits<TResponse = unknown> {
+  /** Набор файлов сменился: новый выбор или удаление. Не путать с `change`. */
+  (e: 'update:modelValue', files: File[]): void
+  /** Выбрано больше файлов, чем разрешает `limit`. Загрузка не стартует. */
+  (e: 'exceed', files: File[], limit: number): void
+  /** `file` приходит только в режиме `per-file`: в батче отчитываться нечем. */
+  (e: 'success', payload: TResponse, file?: File): void
+  (e: 'error', error: unknown, file?: File): void
+  (e: 'progress', percent: number, info?: GrUploadProgressInfo, file?: File): void
+  (e: 'change', files: File[]): void
+  (e: 'stateChange', state: GrUploadState): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrFileUploadProps<TResponse>>(),
   {
@@ -184,18 +200,7 @@ const hintClass = computed(() => hintSizes[resolvedSize.value])
 const progressTextClass = computed(() => progressTextSizes[resolvedSize.value])
 const progressBarSize = computed(() => progressBarSizes[resolvedSize.value])
 
-const emit = defineEmits<{
-  /** Набор файлов сменился: новый выбор или удаление. Не путать с `change`. */
-  (e: 'update:modelValue', files: File[]): void
-  /** Выбрано больше файлов, чем разрешает `limit`. Загрузка не стартует. */
-  (e: 'exceed', files: File[], limit: number): void
-  /** `file` приходит только в режиме `per-file`: в батче отчитываться нечем. */
-  (e: 'success', payload: TResponse, file?: File): void
-  (e: 'error', error: unknown, file?: File): void
-  (e: 'progress', percent: number, info?: GrUploadProgressInfo, file?: File): void
-  (e: 'change', files: File[]): void
-  (e: 'stateChange', state: GrUploadState): void
-}>()
+const emit = defineEmits<GrFileUploadEmits<TResponse>>()
 
 const slots = useSlots()
 
@@ -239,6 +244,14 @@ const hasCustomUi = computed(() => {
 })
 
 const inputRef = ref<HTMLInputElement | null>(null)
+const rootEl = ref<HTMLElement | null>(null)
+
+// Внутри зоны фокус ходит между нативным input'ом и кнопками списка файлов:
+// без границы каждое перемещение давало бы потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 
 const lastFiles = ref<File[]>(props.modelValue ? [...props.modelValue] : [])
 
@@ -665,9 +678,12 @@ defineExpose({
        Зона остаётся кликабельной и принимает drag&drop, фокус input'а показывает
        через `focus-within`. -->
   <div
+    ref="rootEl"
     data-gr-file-upload
     :class="hasCustomUi ? 'inline-block' : zoneClass"
     @click="onRootClick"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
     @dragenter="dropZone.onDragEnter"
     @dragover="dropZone.onDragOver"
     @dragleave="dropZone.onDragLeave"

@@ -52,9 +52,11 @@ export interface GrAlertProps {
   borderColor?: string
 }
 
-const emit = defineEmits<{
+export interface GrAlertEmits {
   (e: 'close'): void
-}>()
+}
+
+const emit = defineEmits<GrAlertEmits>()
 
 // Дефолты tone/variant/closable намеренно `undefined`: «настоящий» дефолт
 // переехал в `useGrComponentProp`, иначе `GrConfigProvider` не смог бы отличить

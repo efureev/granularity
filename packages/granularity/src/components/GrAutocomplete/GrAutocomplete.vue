@@ -12,6 +12,7 @@ import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import {
   autocompleteChipClass,
@@ -109,6 +110,20 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   clearLabel?: string
 }
 
+export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string> {
+  (e: 'update:modelValue', value: GrAutocompleteModelValue<TValue>): void
+  /** Дебаунснутый поисковый запрос — точка входа для удалённой загрузки опций. */
+  (e: 'search', query: string): void
+  /** Запрос `fetchOptions` завершился ошибкой (отмена устаревшего сюда не приходит). */
+  (e: 'searchError', error: unknown): void
+  /** Значение зафиксировано выбором или снятием опции. */
+  (e: 'change', value: GrAutocompleteModelValue<TValue>): void
+  /** Значение снято кнопкой очистки; только при `clearable`. */
+  (e: 'clear'): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrAutocompleteProps<TValue>>(),
   {
@@ -142,13 +157,7 @@ const props = withDefaults(
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrAutocomplete' })
 const resolvedClearable = useGrComponentProp('GrAutocomplete', 'clearable', () => props.clearable, false)
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrAutocompleteModelValue<TValue>): void
-  /** Дебаунснутый поисковый запрос — точка входа для удалённой загрузки опций. */
-  (e: 'search', query: string): void
-  /** Запрос `fetchOptions` завершился ошибкой (отмена устаревшего сюда не приходит). */
-  (e: 'searchError', error: unknown): void
-}>()
+const emit = defineEmits<GrAutocompleteEmits<TValue>>()
 
 const { t } = useGranularityTranslations()
 
@@ -231,6 +240,14 @@ const activeIndex = ref(-1)
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const listboxEl = ref<HTMLElement | null>(null)
+
+// Панель телепортирована в `body`, то есть лежит вне корня, но для пользователя
+// она часть контрола: без неё уход фокуса в панель читался бы как `blur`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+  containers: () => [panelEl.value],
+})
 const inputEl = ref<HTMLInputElement | null>(null)
 
 function focus(): void {
@@ -538,6 +555,7 @@ function setQuery(value: string): void {
 // ————— Выбор значений.
 function selectSingle(value: TValue, label: string): void {
   emit('update:modelValue', value)
+  emit('change', value as GrAutocompleteModelValue<TValue>)
   setQuery(label)
   closeDropdown()
 }
@@ -548,6 +566,7 @@ function toggleMultiple(value: TValue): void {
   if (idx >= 0) next.splice(idx, 1)
   else next.push(value)
   emit('update:modelValue', next)
+  emit('change', next as GrAutocompleteModelValue<TValue>)
   setQuery('')
   if (props.closeOnSelect) closeDropdown()
   else void nextTick(focusInput)
@@ -572,12 +591,16 @@ function removeValue(value: TValue, focusAfter: () => void = focusInput): void {
   if (locked.value) return
   const next = selectedValues.value.filter(v => v !== value)
   emit('update:modelValue', next)
+  emit('change', next as GrAutocompleteModelValue<TValue>)
   void nextTick(focusAfter)
 }
 
 function clearSelection(): void {
   if (locked.value) return
-  emit('update:modelValue', (props.multiple ? [] : '') as GrAutocompleteModelValue<TValue>)
+  const next = (props.multiple ? [] : '') as GrAutocompleteModelValue<TValue>
+  emit('update:modelValue', next)
+  emit('change', next)
+  emit('clear')
   setQuery('')
   void nextTick(focusInput)
 }
@@ -745,6 +768,8 @@ const themeAttrs = useGrThemeAttrs()
     v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
     data-gr-autocomplete
     class="relative w-full"
+     @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <div
       data-gr-autocomplete-shell

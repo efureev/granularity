@@ -54,6 +54,10 @@ export interface GrRadioProps {
   ariaLabel?: string
 }
 
+export interface GrRadioEmits {
+  (e: 'update:modelValue', value: GrRadioValue): void
+}
+
 const props = withDefaults(defineProps<GrRadioProps>(), {
   modelValue: undefined,
   disabled: undefined,
@@ -71,9 +75,7 @@ const props = withDefaults(defineProps<GrRadioProps>(), {
   ariaLabel: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrRadioValue): void
-}>()
+const emit = defineEmits<GrRadioEmits>()
 
 const slots = useSlots()
 const group = inject(GR_RADIO_GROUP_CONTEXT, null)

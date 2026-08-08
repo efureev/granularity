@@ -30,39 +30,41 @@ import {
 
 export type { GrComponentDefaults, GrComponentSize } from './context'
 
+export interface GrConfigProviderProps {
+  /** Дефолтный размер контролов для вложенных компонентов. */
+  size?: GrComponentSize
+  /** Дефолтные пропсы по компонентам: `{ GrButton: { variant: 'secondary' } }`. */
+  componentDefaults?: GrComponentDefaults
+  /** Адаптер переводов (fint-i18n-совместимый). Прокидывается вложенным компонентам. */
+  i18n?: GranularityI18nAdapter | null
+  /**
+   * Просьба к адаптеру переключить язык (`syncLocale`). Источником истины
+   * остаётся сам адаптер — провайдер лишь передаёт ему намерение.
+   */
+  locale?: string
+  /**
+   * Тема поддерева: значение уезжает в `data-theme`. Тема **документа** —
+   * работа `useTheme`/`initThemeEarly`, здесь именно остров.
+   */
+  theme?: string
+  /**
+   * Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в
+   * `body`. Своё значение нужно там, где приложение живёт в контейнере:
+   * микрофронтенд, shadow DOM, CSS-скоупинг под конкретным корнем.
+   */
+  portalTarget?: string | HTMLElement
+  /**
+   * База шкалы слоёв. Переменные `--gr-z-*` пересчитываются от неё и ставятся
+   * на `<html>`: панели телепортируются в `body`, и переменные поддерева до
+   * них не доходят.
+   */
+  zIndexBase?: number
+  /** Тег обёртки. По умолчанию прозрачный `<div style="display:contents">`. */
+  tag?: string
+}
+
 const props = withDefaults(
-  defineProps<{
-    /** Дефолтный размер контролов для вложенных компонентов. */
-    size?: GrComponentSize
-    /** Дефолтные пропсы по компонентам: `{ GrButton: { variant: 'secondary' } }`. */
-    componentDefaults?: GrComponentDefaults
-    /** Адаптер переводов (fint-i18n-совместимый). Прокидывается вложенным компонентам. */
-    i18n?: GranularityI18nAdapter | null
-    /**
-     * Просьба к адаптеру переключить язык (`syncLocale`). Источником истины
-     * остаётся сам адаптер — провайдер лишь передаёт ему намерение.
-     */
-    locale?: string
-    /**
-     * Тема поддерева: значение уезжает в `data-theme`. Тема **документа** —
-     * работа `useTheme`/`initThemeEarly`, здесь именно остров.
-     */
-    theme?: string
-    /**
-     * Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в
-     * `body`. Своё значение нужно там, где приложение живёт в контейнере:
-     * микрофронтенд, shadow DOM, CSS-скоупинг под конкретным корнем.
-     */
-    portalTarget?: string | HTMLElement
-    /**
-     * База шкалы слоёв. Переменные `--gr-z-*` пересчитываются от неё и ставятся
-     * на `<html>`: панели телепортируются в `body`, и переменные поддерева до
-     * них не доходят.
-     */
-    zIndexBase?: number
-    /** Тег обёртки. По умолчанию прозрачный `<div style="display:contents">`. */
-    tag?: string
-  }>(),
+  defineProps<GrConfigProviderProps>(),
   {
     size: undefined,
     componentDefaults: undefined,

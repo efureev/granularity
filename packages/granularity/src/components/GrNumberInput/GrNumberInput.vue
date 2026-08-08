@@ -113,6 +113,15 @@ export interface GrNumberInputProps {
   decreaseLabel?: string
 }
 
+export interface GrNumberInputEmits {
+  (e: 'update:modelValue', value: string): void
+  (e: 'change', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+  /** Значение стёрто кнопкой очистки. */
+  (e: 'clear'): void
+}
+
 // Контекст `GrFormField` — fallback для id/описания/невалидности, как в `GrInput`.
 const field = useGrFormFieldContext()
 
@@ -168,14 +177,7 @@ const {
   readonly: isReadonly,
 } = useGrFormControl(() => props)
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  (e: 'change', value: string): void
-  (e: 'focus', event: FocusEvent): void
-  (e: 'blur', event: FocusEvent): void
-  /** Значение стёрто кнопкой очистки. */
-  (e: 'clear'): void
-}>()
+const emit = defineEmits<GrNumberInputEmits>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
 

@@ -92,6 +92,14 @@ export interface GrCommandPaletteProps {
   ariaLabel?: string
 }
 
+export interface GrCommandPaletteEmits {
+  (e: 'update:modelValue', value: boolean): void
+  /** Команда выбрана (клик или Enter). */
+  (e: 'select', item: GrCommandItem): void
+  /** Поисковый запрос изменился — точка входа для remote-поиска. */
+  (e: 'search', query: string): void
+}
+
 import './defaults'
 
 const props = withDefaults(
@@ -116,13 +124,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  /** Команда выбрана (клик или Enter). */
-  (e: 'select', item: GrCommandItem): void
-  /** Поисковый запрос изменился — точка входа для remote-поиска. */
-  (e: 'search', query: string): void
-}>()
+const emit = defineEmits<GrCommandPaletteEmits>()
 
 const { t } = useGranularityTranslations()
 

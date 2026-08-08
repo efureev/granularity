@@ -17,6 +17,7 @@ import { computed, provide, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
 import { GR_CHECKBOX_GROUP_CONTEXT } from '../GrCheckbox/grCheckboxGroupContext'
@@ -47,6 +48,13 @@ export interface GrCheckboxGroupProps {
   ariaLabel?: string
 }
 
+export interface GrCheckboxGroupEmits {
+  (e: 'update:modelValue', value: string[]): void
+  (e: 'change', value: string[]): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(defineProps<GrCheckboxGroupProps>(), {
   options: undefined,
   name: undefined,
@@ -59,9 +67,7 @@ const props = withDefaults(defineProps<GrCheckboxGroupProps>(), {
   ariaLabel: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string[]): void
-}>()
+const emit = defineEmits<GrCheckboxGroupEmits>()
 
 // Эффективный размер группы: локальный проп → `GrConfigProvider` → `md`.
 // Дочерние чекбоксы получают уже разрешённое значение через контекст.
@@ -92,14 +98,26 @@ function toggle(value: string, checked: boolean): void {
   if (checked) {
     if (props.modelValue.includes(value))
       return
-    emit('update:modelValue', [...props.modelValue, value])
+    commit([...props.modelValue, value])
     return
   }
 
-  emit('update:modelValue', props.modelValue.filter(item => item !== value))
+  commit(props.modelValue.filter(item => item !== value))
+}
+
+function commit(next: string[]): void {
+  emit('update:modelValue', next)
+  emit('change', next)
 }
 
 const rootEl = ref<HTMLElement | null>(null)
+
+// Фокус ходит между чекбоксами группы: без границы каждый переход давал бы
+// потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 
 function firstCheckbox(): HTMLElement | null | undefined {
   return rootEl.value?.querySelector<HTMLElement>('[role="checkbox"]:not([aria-disabled="true"])')
@@ -139,6 +157,8 @@ provide(GR_CHECKBOX_GROUP_CONTEXT, {
     :aria-describedby="describedBy"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-disabled="isDisabled ? 'true' : undefined"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <slot>
       <GrCheckbox

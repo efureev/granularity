@@ -16,6 +16,74 @@ import IconX from '~icons/lucide/x'
 import IconEye from '~icons/lucide/eye'
 import IconEyeOff from '~icons/lucide/eye-off'
 
+export interface GrInputProps {
+    modelValue: string
+    type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
+    placeholder?: string
+    autocomplete?: string
+    inputmode?: InputHTMLAttributes['inputmode']
+    disabled?: boolean
+    /** Только для чтения: значение видно и выделяемо, но не редактируется. */
+    readonly?: boolean
+    invalid?: boolean
+    /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
+    required?: boolean
+    /** Доступное имя вне `GrFormField`. */
+    ariaLabel?: string
+    state?: 'default' | 'success' | 'warning' | 'danger'
+    name?: string
+    id?: string
+    size?: GrInputSize
+
+    /** Показывать кнопку очистки, когда есть значение (и не disabled/readonly). */
+    clearable?: boolean
+    /** i18n aria-label кнопки очистки. */
+    clearLabel?: string
+    /** Ограничение длины + основа для счётчика символов. */
+    maxlength?: number
+    /** Показывать счётчик символов (`len` или `len/maxlength`). */
+    showCount?: boolean
+    /**
+     * Фоновая работа по полю (проверка занятости логина, автосохранение):
+     * спиннер в trailing-области + `aria-busy`. Ввод не блокируется —
+     * для этого есть `disabled`/`readonly`.
+     */
+    loading?: boolean
+    /** Кнопка показать/скрыть пароль (только при `type="password"`). */
+    passwordToggle?: boolean
+    /** i18n aria-label кнопки показать/скрыть пароль. */
+    passwordShowLabel?: string
+    passwordHideLabel?: string
+
+    textAlign?: GrInputTextAlign
+
+    prefixMinWidth?: string
+    prefixMaxWidth?: string
+    suffixMinWidth?: string
+    suffixMaxWidth?: string
+    /**
+     * Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину
+     * (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю
+     * (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются»
+     * под контент (в пределах min/max), а излишек клипается оболочкой.
+     */
+    prefixFixed?: boolean
+    suffixFixed?: boolean
+}
+
+export interface GrInputEmits {
+  (e: 'update:modelValue', value: string): void
+  /** Значение зафиксировано нативным `change` — по `blur` или `Enter`. */
+  (e: 'change', value: string): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+  /**
+   * Значение стёрто кнопкой очистки. Отдельное событие потому, что по
+   * `update:modelValue` программную очистку от ручного стирания не отличить.
+   */
+  (e: 'clear'): void
+}
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -24,60 +92,7 @@ export type GrInputSize = GrComponentSize
 export type GrInputTextAlign = 'left' | 'center' | 'right'
 
 const props = withDefaults(
-    defineProps<{
-      modelValue: string
-      type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
-      placeholder?: string
-      autocomplete?: string
-      inputmode?: InputHTMLAttributes['inputmode']
-      disabled?: boolean
-      /** Только для чтения: значение видно и выделяемо, но не редактируется. */
-      readonly?: boolean
-      invalid?: boolean
-      /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
-      required?: boolean
-      /** Доступное имя вне `GrFormField`. */
-      ariaLabel?: string
-      state?: 'default' | 'success' | 'warning' | 'danger'
-      name?: string
-      id?: string
-      size?: GrInputSize
-
-      /** Показывать кнопку очистки, когда есть значение (и не disabled/readonly). */
-      clearable?: boolean
-      /** i18n aria-label кнопки очистки. */
-      clearLabel?: string
-      /** Ограничение длины + основа для счётчика символов. */
-      maxlength?: number
-      /** Показывать счётчик символов (`len` или `len/maxlength`). */
-      showCount?: boolean
-      /**
-       * Фоновая работа по полю (проверка занятости логина, автосохранение):
-       * спиннер в trailing-области + `aria-busy`. Ввод не блокируется —
-       * для этого есть `disabled`/`readonly`.
-       */
-      loading?: boolean
-      /** Кнопка показать/скрыть пароль (только при `type="password"`). */
-      passwordToggle?: boolean
-      /** i18n aria-label кнопки показать/скрыть пароль. */
-      passwordShowLabel?: string
-      passwordHideLabel?: string
-
-      textAlign?: GrInputTextAlign
-
-      prefixMinWidth?: string
-      prefixMaxWidth?: string
-      suffixMinWidth?: string
-      suffixMaxWidth?: string
-      /**
-       * Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину
-       * (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю
-       * (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются»
-       * под контент (в пределах min/max), а излишек клипается оболочкой.
-       */
-      prefixFixed?: boolean
-      suffixFixed?: boolean
-    }>(),
+    defineProps<GrInputProps>(),
     {
       type: 'text',
       placeholder: undefined,
@@ -114,18 +129,7 @@ const props = withDefaults(
     },
 )
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  /** Значение зафиксировано нативным `change` — по `blur` или `Enter`. */
-  (e: 'change', value: string): void
-  (e: 'focus', event: FocusEvent): void
-  (e: 'blur', event: FocusEvent): void
-  /**
-   * Значение стёрто кнопкой очистки. Отдельное событие потому, что по
-   * `update:modelValue` программную очистку от ручного стирания не отличить.
-   */
-  (e: 'clear'): void
-}>()
+const emit = defineEmits<GrInputEmits>()
 
 // Контекст `GrFormField` (если инпут внутри него): даёт id/aria-describedby/
 // invalid/required как fallback, чтобы не прокидывать `forId` вручную.

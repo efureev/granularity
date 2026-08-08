@@ -72,6 +72,13 @@ export interface GrCheckboxProps {
   size?: GrCheckboxSize
 }
 
+export interface GrCheckboxEmits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'change', value: boolean): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const hiddenInputStyle = {
   position: 'absolute',
   opacity: '0',
@@ -96,9 +103,7 @@ const props = withDefaults(defineProps<GrCheckboxProps>(), {
   size: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-}>()
+const emit = defineEmits<GrCheckboxEmits>()
 
 const slots = useSlots()
 
@@ -214,10 +219,12 @@ function setChecked(next: boolean): void {
 
   if (props.modelValue !== undefined || !group) {
     emit('update:modelValue', next)
+    emit('change', next)
     return
   }
 
   group.toggle(props.value, next)
+  emit('change', next)
 }
 
 function toggle(): void {
@@ -301,6 +308,8 @@ function onClick(e: MouseEvent): void {
       :tabindex="resolvedDisabled ? -1 : 0"
       :class="controlClassName"
       @keydown.space.prevent="toggle"
+      @focus="emit('focus', $event)"
+      @blur="emit('blur', $event)"
     >
       <IconMinus
         v-if="indeterminate"

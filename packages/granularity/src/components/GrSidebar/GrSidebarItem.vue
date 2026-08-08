@@ -15,7 +15,7 @@ import { computed, inject, markRaw, type Component } from 'vue'
 import { grSidebarItemClass, itemBadgeClass, itemLetterClass } from './grSidebarStyles'
 import { GR_SIDEBAR_KEY } from './sidebarContext'
 
-const props = withDefaults(defineProps<{
+export interface GrSidebarItemProps {
   label: string
   /** Иконка: класс UnoCSS-иконки (`'i-lucide-home'`) или Vue-компонент. */
   icon?: string | Component
@@ -24,7 +24,9 @@ const props = withDefaults(defineProps<{
   active?: boolean
   disabled?: boolean
   badge?: string | number
-}>(), {
+}
+
+const props = withDefaults(defineProps<GrSidebarItemProps>(), {
   icon: undefined,
   href: undefined,
   as: undefined,

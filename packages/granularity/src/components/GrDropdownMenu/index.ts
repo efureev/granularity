@@ -41,3 +41,4 @@ export type {
   GrDropdownMenuItemVariant,
 } from './GrDropdownMenuItem.vue'
 export type { GrDropdownMenuListProps } from './GrDropdownMenuList.vue'
+export type { GrDropdownMenuEmits } from './GrDropdownMenu.vue'

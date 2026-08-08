@@ -55,3 +55,9 @@ export type {
   ResponseErrorTexts,
   ResponseErrorTone,
 } from './responseError.types'
+export type { GrFormErrorBannerEmits } from './GrFormErrorBanner.vue'
+export type { GrResponseErrorBannerProps } from './GrResponseErrorBanner.vue'
+export type { GrResponseErrorBannerEmits } from './GrResponseErrorBanner.vue'
+export type { GrUploadErrorBannerEmits } from './GrUploadErrorBanner.vue'
+export type { GrFormErrorBannerProps } from './GrFormErrorBanner.vue'
+export type { GrUploadErrorBannerProps } from './GrUploadErrorBanner.vue'

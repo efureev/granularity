@@ -4,6 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import type { ComponentPublicInstance } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
@@ -53,6 +54,13 @@ export interface GrSegmentedProps {
   ariaLabel?: string
 }
 
+export interface GrSegmentedEmits {
+  (e: 'update:modelValue', value: GrSegmentedValue): void
+  (e: 'change', value: GrSegmentedValue, option: GrSegmentedOption): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
+}
+
 const props = withDefaults(
   defineProps<GrSegmentedProps>(),
   {
@@ -73,10 +81,7 @@ const props = withDefaults(
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmented' })
 const resolvedVariant = useGrComponentProp('GrSegmented', 'variant', () => props.variant, 'pills')
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: GrSegmentedValue): void
-  (e: 'change', value: GrSegmentedValue, option: GrSegmentedOption): void
-}>()
+const emit = defineEmits<GrSegmentedEmits>()
 
 // `useId()` стабилен между сервером и клиентом, в отличие от `instance.uid`.
 const fallbackName = `gr-segmented-${useId()}`
@@ -91,6 +96,13 @@ const {
   invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
 
 const rootRef = ref<HTMLElement | null>(null)
+
+// Фокус ходит между сегментами: без границы каждая стрелка давала бы
+// потребителю пару `blur` + `focus`.
+const { onFocusIn, onFocusOut } = useFocusWithin(rootRef, {
+  enter: event => emit('focus', event),
+  leave: event => emit('blur', event),
+})
 
 function focus(): void {
   rootRef.value?.querySelector<HTMLElement>('[data-gr-segmented-item][tabindex="0"]')?.focus()
@@ -447,6 +459,8 @@ onBeforeUnmount(() => {
     :aria-disabled="isDisabled ? 'true' : undefined"
     :class="rootClassName"
     :style="rootStyle"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <!-- Значение для нативной формы уходит одним скрытым полем рядом с
          сегментами, а не вложенным в каждый `role="radio"`: роль объявляет своих

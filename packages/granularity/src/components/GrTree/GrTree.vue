@@ -22,9 +22,15 @@ import type {
   GrTreeVisibleRow,
 } from './grTreeProps'
 
-defineOptions({
-  name: 'GrTree',
-})
+export interface GrTreeEmits<T extends Record<string, any> = any> {
+  (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
+  (e: 'nodeExpand', data: T, node: GrTreeNode<T>): void
+  (e: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
+  (e: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
+  (e: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
+  (e: 'update:checkedKeys', keys: GrTreeKey[]): void
+  (e: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
+}
 
 const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, var(--gr-brd))'
 
@@ -68,15 +74,7 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   contentClass: undefined,
 })
 
-const emit = defineEmits<{
-  (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
-  (e: 'nodeExpand', data: T, node: GrTreeNode<T>): void
-  (e: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
-  (e: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
-  (e: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
-  (e: 'update:checkedKeys', keys: GrTreeKey[]): void
-  (e: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
-}>()
+const emit = defineEmits<GrTreeEmits<T>>()
 
 defineSlots<{
   default?: (props: { node: GrTreeNode<T>; data: T }) => any

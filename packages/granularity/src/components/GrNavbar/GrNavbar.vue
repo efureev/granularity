@@ -37,6 +37,10 @@ export interface GrNavbarProps {
   sticky?: boolean
 }
 
+export interface GrNavbarEmits {
+  (e: 'menu'): void
+}
+
 const props = withDefaults(defineProps<GrNavbarProps>(), {
   title: undefined,
   showMenuButton: false,
@@ -55,9 +59,7 @@ const slots = defineSlots<{
   default?: () => unknown
 }>()
 
-const emit = defineEmits<{
-  (e: 'menu'): void
-}>()
+const emit = defineEmits<GrNavbarEmits>()
 
 const { t } = useGranularityTranslations()
 

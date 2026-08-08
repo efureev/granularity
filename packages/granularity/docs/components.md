@@ -16,6 +16,42 @@
 
 ```
 
+## Типы компонента
+
+Рядом с компонентом экспортируются три типа — их состав держит гейт
+`src/__tests__/publicTypes.test.ts`:
+
+| Тип | Что это | Когда нужен |
+| --- | --- | --- |
+| `GrXProps` | интерфейс пропсов | обёртка со своими пропами поверх пакетных |
+| `GrXEmits` | интерфейс эмитов | обёртка, переизлучающая события пакета один в один |
+| `GrXInstance` | то, что компонент отдал через `defineExpose` | `ref` на компонент и вызов его методов |
+
+```ts
+import { GrInput, GrSelect } from '@feugene/granularity'
+import type { GrInputEmits, GrInputProps, GrSelectInstance } from '@feugene/granularity'
+
+interface FieldProps extends GrInputProps {
+  hint?: string
+}
+
+defineProps<FieldProps>()
+defineEmits<GrInputEmits>()
+
+const select = ref<GrSelectInstance | null>(null)
+select.value?.focus()
+```
+
+`GrXInstance` выводится из самого компонента, а не пишется руками, поэтому
+разойтись с `defineExpose` не может. Он же — единственный способ типизировать
+`ref` на дженерик (`GrSelect`, `GrTree`, `GrDataTable`, …): `InstanceType<typeof
+GrSelect>` для них не работает, такой компонент компилируется в функцию, а не в
+класс.
+
+Исключение одно: `GrTreeInstance` объявлен явно и параметризован
+(`GrTreeInstance<T>`) — дерево типизирует свои узлы, и выводимый тип этого не
+умеет.
+
 ## Опубликованные компоненты
 
 По текущему component registry пакет публикует следующие компоненты. Имя-ссылка
@@ -117,6 +153,14 @@
   упоминается строкой, на его странице — ссылка на неё;
 - истории правки («раньше было…», «до 0.5.0 работало так») — её место в
   `CHANGELOG.md`.
+
+## Контракт форм-контрола
+
+Шестнадцать компонентов — форм-контролы, и у них общий контракт: пропы
+(`disabled`/`readonly`/`invalid`/`required`/`ariaLabel`), методы `focus()`/`blur()` и события
+`update:modelValue`/`change`/`focus`/`blur`/`clear`. Он существует ради того, чтобы обёртка,
+написанная над одним контролом, работала над любым — подробности в
+[`form-controls.md`](./form-controls.md).
 
 ## Стили компонентов
 
