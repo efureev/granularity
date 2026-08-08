@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `useVirtualList` — one virtualization primitive for the whole package.** Keeps only a window around the
+  viewport in the DOM: the composable computes the geometry and returns what to render plus how much is cut above and
+  below, while the consumer builds the markup — it renders nothing and knows neither the roles nor the keyboard of your
+  list. Row heights start from an estimate and are refined by measurement, with scroll compensated so a row measured
+  above the viewport does not jerk the content under the cursor. Browser scroll anchoring is switched off (
+  `overflow-anchor: none`): it holds a visible node in place by adjusting `scrollTop` when the height above it changes,
+  and the window changes exactly that on every frame — left on, the two fight each other and the list drifts further
+  the coarser the estimate. Docs: `docs/virtual-list.md`.
+- **`virtual` on `GrTree`, `GrAutocomplete`, `GrSelect`, `GrCommandPalette`, `GrDataTable` and `GrList`.** Off by
+  default — on a list of a hundred rows there is nothing to win, and the markup changes. Where the set in the DOM
+  becomes incomplete, its size is announced explicitly (`aria-setsize`/`aria-posinset`, and `aria-rowcount`/
+  `aria-rowindex` in the table): a screen reader derives it from the DOM, and the DOM now holds only the window. In
+  `GrDataTable` the spacers are service `<tr>` rows with `aria-hidden` and a full-width cell, because `<tbody>` ignores
+  `padding`; the layout is fixed (`GrTable` gained `rowCount` and `fixedLayout`, `GrDataColumn` gained `width`) so the
+  column widths stop being computed from the rendered window.
+- **`GrList`: data mode.** `items` + the `#item` scoped slot render the set without a hand-written `v-for`;
+  `itemKey` sets the key, `maxHeight` turns the container into a scroller reachable from the keyboard. `virtual`
+  requires both. The item is drawn by the consumer's slot, so the ARIA set arrives as the `aria` slot prop and is
+  passed on with `v-bind` — a forgotten bind is caught by a dev warning after mount instead of silently making a list
+  of five thousand announce «1 of 12». Instance API: `scrollToIndex(index, align?)`.
+- **New `useAnnouncer` — live regions for imperative announcements.** A single host with a polite and an assertive
+  region, shared by the whole package; the message is cleared before being written so a repeated string is announced
+  again. Docs: `docs/announcer.md`.
 - **`GrFormSection`: heading level and header slots.** `headingLevel` (`h2`…`h6`, default `h3`, readable from
   `GrConfigProvider`) makes the section title a real heading — that is how a long form is navigated by anyone using a
   screen reader. New slots: `#title` and `#description` build those parts from markup instead of a string, `#actions`
@@ -174,6 +197,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrListItem` renders one structure for every row.** The content block (prefix, title, description, default slot)
+  used to be written twice — once inside the interactive branch, once inside the plain one — and the copies could
+  drift apart in silence. Now the wrapper always carries `role="listitem"` and the row is always a nested element:
+  `<a>`, `<button>` or the tag from `as` when the row is clickable, a plain `<div>` when it is not; the two are told
+  apart by `data-gr-list-item-action`, which only a clickable row has. A plain row therefore gains one nested element —
+  worth knowing if you select `[data-gr-list-item] > *` from the outside. Rendering, spacing and dividers are
+  unchanged, down to the pixel.
 - **The toast queue is now capped.** `maxVisible` only ever limited the *visible* toasts while the queue behind them
   grew without bound, so a burst of events (a reconnecting socket, a loop of errors) piled up notifications that then
   spilled onto the user once the stack drained. The queue keeps at most 20 toasts by default — configurable with
@@ -338,6 +368,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrListItem` dropped `href` when `as` was a component.** The attribute was bound by the resolved tag being
+  literally `'a'`, and `href` is a declared prop, so it does not leak through attribute fallthrough either:
+  `<GrListItem :as="RouterLink" href="/x">` rendered a link with no address at all. It is now bound whenever the row is
+  interactive, the way `GrLink` has always done it.
+- **`GrListItem`: a non-interactive tag in `as` no longer passes in silence.** `as="span"` together with `clickable`
+  produces a control for the mouse and nothing else — a `<span>` is not in the tab order and does not answer `Enter`
+  (WCAG 2.1.1). A tag named as a string that cannot take focus (anything but `button` and `a` **with** an `href`) now
+  warns in a dev build. Router components stay silent: they render an `<a>`, and there is no way to know that before
+  the render.
 - **`GrButtonGroup` fell apart when a button was wrapped.** The gluing was written against direct children
   (`> [data-gr-button]`), so a button inside a tooltip, a `v-if` wrapper or a router link kept its own radii and a
   doubled border. It now works with «group links» — direct children that are a button *or* contain one — so wrappers no

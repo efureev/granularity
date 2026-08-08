@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, markRaw, useSlots, type Component } from 'vue'
+import { computed, markRaw, useSlots, watch, type Component } from 'vue'
 
 import {
   grListItemPaddingClass,
@@ -55,11 +55,15 @@ const hasDescription = computed(() => !!slots.description || !!props.description
 const isInteractive = computed(() => !props.disabled && (!!props.as || !!props.href || props.clickable))
 
 /**
- * `role="listitem"` остаётся на обёртке, а интерактивным становится вложенный
- * элемент во всю строку: `<a role="listitem">` потерял бы роль ссылки, а
- * интерактив снаружи разорвал бы связку `list` → `listitem`.
+ * `role="listitem"` остаётся на обёртке, а строка целиком — вложенный элемент:
+ * `<a role="listitem">` потерял бы роль ссылки, а интерактив снаружи разорвал бы
+ * связку `list` → `listitem`. Обычная строка идёт по той же схеме, чтобы
+ * разметка содержимого была написана один раз, а не по копии на ветку.
  */
-const interactiveTag = computed<string | Component>(() => {
+const rowTag = computed<string | Component>(() => {
+  if (!isInteractive.value)
+    return 'div'
+
   if (props.as)
     return typeof props.as === 'string' ? props.as : markRaw(props.as)
 
@@ -75,20 +79,49 @@ const rowClass = computed(() => [
 ].filter(Boolean).join(' '))
 
 function onClick(event: MouseEvent): void {
-  if (props.disabled)
+  // `disabled` сюда попадает вместе с обычной строкой: и то и другое —
+  // не-интерактив, а кликов не эмитит ни один.
+  if (!isInteractive.value)
     return
 
   emit('click', event)
 }
+
+/** Теги, попадающие в таб-порядок сами. `<a>` — только со ссылкой. */
+function isFocusableTag(tag: string): boolean {
+  return tag === 'button' || (tag === 'a' && !!props.href)
+}
+
+if (import.meta.env?.DEV) {
+  watch(
+    () => [isInteractive.value, props.as] as const,
+    ([interactive, as]) => {
+      // Компонент из `as` (`RouterLink`, Inertia `Link`) рендерит `<a>`, но узнать
+      // это до рендера нельзя — предупреждаем только по явно названному тегу.
+      if (!interactive || typeof as !== 'string' || isFocusableTag(as)) return
+
+      console.warn(
+        `[granularity] GrListItem: as="${as}" не попадает в таб-порядок — строка кликается `
+        + 'мышью, но не с клавиатуры. Возьмите тег, умеющий фокус (`button`, `a` со ссылкой), '
+        + 'или компонент роутера.',
+      )
+    },
+    { immediate: true },
+  )
+}
 </script>
 
 <template>
-  <div v-if="isInteractive" data-gr-list-item role="listitem">
+  <div
+    data-gr-list-item
+    role="listitem"
+    :aria-disabled="disabled ? 'true' : undefined"
+  >
     <component
-      :is="interactiveTag"
-      data-gr-list-item-action
-      :type="interactiveTag === 'button' ? 'button' : undefined"
-      :href="interactiveTag === 'a' ? href : undefined"
+      :is="rowTag"
+      :data-gr-list-item-action="isInteractive ? '' : undefined"
+      :type="rowTag === 'button' ? 'button' : undefined"
+      :href="isInteractive ? href : undefined"
       :class="rowClass"
       @click="onClick"
     >
@@ -114,35 +147,5 @@ function onClick(event: MouseEvent): void {
         <slot />
       </div>
     </component>
-  </div>
-
-  <div
-    v-else
-    data-gr-list-item
-    role="listitem"
-    :class="rowClass"
-    :aria-disabled="disabled ? 'true' : undefined"
-  >
-    <div v-if="$slots.prefix" class="shrink-0">
-      <slot name="prefix" />
-    </div>
-    <div class="min-w-0 flex-1">
-      <div v-if="hasTitle" :class="itemTitleClass">
-        <slot name="title">
-{{ title }}
-</slot>
-      </div>
-      <div
-        v-if="hasDescription"
-        :class="itemDescriptionClass"
-      >
-        <slot name="description">
-{{ description }}
-</slot>
-      </div>
-    </div>
-    <div v-if="$slots.default" class="shrink-0">
-      <slot />
-    </div>
   </div>
 </template>

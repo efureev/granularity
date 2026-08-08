@@ -110,6 +110,7 @@ describe('контракт распорок виртуального списк�
       'GrAutocomplete/GrAutocomplete.vue',
       'GrCommandPalette/GrCommandPalette.vue',
       'GrDataTable/GrDataTable.vue',
+      'GrList/GrList.vue',
       'GrSelect/GrSelect.vue',
       'GrTree/GrTree.vue',
     ])

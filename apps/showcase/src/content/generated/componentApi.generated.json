@@ -5025,13 +5025,6 @@
             "default": "undefined"
           },
           {
-            "name": "loading",
-            "description": "Идёт загрузка: вместо пунктов — строки-скелетоны, контейнер помечен `aria-busy`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "divided",
             "description": "Показывать ли горизонтальные разделители между элементами (по умолчанию — да).",
             "type": "boolean | undefined",
@@ -5039,11 +5032,11 @@
             "default": "true"
           },
           {
-            "name": "emptyText",
-            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
-            "type": "string | undefined",
+            "name": "loading",
+            "description": "Идёт загрузка: вместо пунктов — строки-скелетоны, контейнер помечен `aria-busy`.",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "false"
           },
           {
             "name": "loadingRows",
@@ -5058,6 +5051,48 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "items",
+            "description": "Данные списка. С ними пункты рисует слот `#item`, а не слот по умолчанию, — и только так список знает размер набора, то есть может его виртуализировать.",
+            "type": "T[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "itemKey",
+            "description": "Ключ пункта для `v-for`: имя поля или функция. Без него — индекс.",
+            "type": "string | ((item: T, index: number) => string | number) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Высота видимой части: контейнер становится скроллером. Число — пиксели.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "virtual",
+            "description": "Держать в DOM только окно вокруг вьюпорта. Требует `items` и `maxHeight`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "estimatedItemSize",
+            "description": "Оценка высоты пункта до замера. Уточняется по факту при первом рендере.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "56"
           }
         ]
       },
@@ -5075,6 +5110,11 @@
             "name": "empty",
             "description": "",
             "type": "{}"
+          },
+          {
+            "name": "item",
+            "description": "",
+            "type": "{ item: T; index: number; aria: Record<string, number>; }"
           },
           {
             "name": "default",

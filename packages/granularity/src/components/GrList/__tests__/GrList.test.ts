@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils'
+import { defineComponent, markRaw } from 'vue'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrList, { GrListItem } from '..'
@@ -41,6 +41,14 @@ describe('GrList', () => {
   })
 })
 
+/**
+ * Строка пункта — вложенный элемент, а не корень: роль `listitem` обязана
+ * остаться на обёртке, иначе `<a role="listitem">` потерял бы роль ссылки.
+ */
+function row(wrapper: VueWrapper): Omit<DOMWrapper<Element>, 'exists'> {
+  return wrapper.get('[data-gr-list-item] > *')
+}
+
 describe('GrListItem', () => {
   it('экспортируется и скрывает description, если он не передан', () => {
     const wrapper = mount(GrListItem, {
@@ -74,11 +82,11 @@ describe('GrListItem', () => {
 
   it('меняет вертикальный паддинг при density="compact"', () => {
     const compact = mount(GrListItem, { props: { title: 'T', density: 'compact' } })
-    expect(compact.attributes('class')).toContain('py-2')
-    expect(compact.attributes('class')).not.toContain('py-3')
+    expect(row(compact).attributes('class')).toContain('py-2')
+    expect(row(compact).attributes('class')).not.toContain('py-3')
 
     const regular = mount(GrListItem, { props: { title: 'T' } })
-    expect(regular.attributes('class')).toContain('py-3')
+    expect(row(regular).attributes('class')).toContain('py-3')
   })
 })
 
@@ -191,10 +199,60 @@ describe('GrListItem — кликабельная строка', () => {
     expect(wrapper.emitted('click')).toHaveLength(1)
   })
 
-  it('as подменяет тег строки', () => {
+  it('as подменяет тег строки, но неинтерактивный тег не проходит молча', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'span', clickable: true } })
 
     expect(wrapper.get('[data-gr-list-item-action]').element.tagName).toBe('SPAN')
+    // `<span>` не попадает в таб-порядок: строка кликается мышью и только ей.
+    expect(warn.mock.calls.flat().join(' ')).toContain('не попадает в таб-порядок')
+    warn.mockRestore()
+  })
+
+  it('компонент из as проходит молча и получает href', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const RouterLinkStub = defineComponent({
+      name: 'RouterLinkStub',
+      inheritAttrs: true,
+      template: '<a data-testid="router-link"><slot /></a>',
+    })
+
+    const wrapper = mount(GrListItem, {
+      // `markRaw` — из-за монтирования, а не из-за компонента: пропы, поданные
+      // в `mount`, реактивны, и Vue ругается на компонент внутри реактивного
+      // объекта. В шаблоне такого не бывает.
+      props: { title: 'Docs', as: markRaw(RouterLinkStub), href: '/docs' },
+    })
+
+    // Компонент роутера рендерит `<a>`, но узнать это до рендера нельзя —
+    // предупреждать по нему было бы ложной тревогой.
+    expect(warn).not.toHaveBeenCalled()
+    // `href` объявлен пропом и через fallthrough не протечёт: не привяжи его
+    // компонент явно — ссылка молча осталась бы без адреса.
+    expect(wrapper.get('[data-testid="router-link"]').attributes('href')).toBe('/docs')
+    warn.mockRestore()
+  })
+
+  it('строка достижима с клавиатуры своим тегом, а не tabindex', () => {
+    const clickable = mount(GrListItem, { props: { title: 'Row', clickable: true } })
+    const link = mount(GrListItem, { props: { title: 'Docs', href: '/docs' } })
+
+    // Нативные `<button>` и `<a href>` уже в таб-порядке; `tabindex` понадобился
+    // бы только неинтерактивному тегу — и был бы признаком, что что-то не так.
+    for (const [wrapper, tag] of [[clickable, 'BUTTON'], [link, 'A']] as const) {
+      const action = wrapper.get('[data-gr-list-item-action]')
+      expect(action.element.tagName).toBe(tag)
+      expect(action.attributes('tabindex')).toBeUndefined()
+    }
+  })
+
+  it('у отключённой строки фокусируемых потомков нет', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', href: '/docs', disabled: true } })
+
+    // Отключённая строка обязана выпасть из таб-порядка целиком: `aria-disabled`
+    // на фокусируемом элементе оставил бы её достижимой и мёртвой.
+    const focusable = wrapper.element.querySelectorAll('a[href], button, [tabindex]')
+    expect(focusable).toHaveLength(0)
   })
 
   it('disabled не делает строку интерактивной и не эмитит click', async () => {
@@ -202,26 +260,35 @@ describe('GrListItem — кликабельная строка', () => {
 
     expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
     expect(wrapper.attributes('aria-disabled')).toBe('true')
-    expect(wrapper.classes()).toContain('cursor-not-allowed')
-    expect(wrapper.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(row(wrapper).classes()).toContain('cursor-not-allowed')
+    expect(row(wrapper).classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
 
-    await wrapper.trigger('click')
+    await row(wrapper).trigger('click')
     expect(wrapper.emitted('click')).toBeUndefined()
   })
 
-  it('обычный пункт остаётся одиночным div без лишней вложенности', () => {
+  it('обычный пункт — та же структура, но строка не контрол', () => {
     const wrapper = mount(GrListItem, { props: { title: 'Row' } })
 
     expect(wrapper.attributes('role')).toBe('listitem')
+    expect(row(wrapper).element.tagName).toBe('DIV')
+    // Атрибут значит «строка — контрол», и у обычной его быть не должно.
     expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
-    expect(wrapper.classes()).toContain('px-4')
+    expect(row(wrapper).classes()).toContain('px-4')
+  })
+
+  it('обычная строка кликов не эмитит: для этого есть clickable', async () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row' } })
+
+    await row(wrapper).trigger('click')
+    expect(wrapper.emitted('click')).toBeUndefined()
   })
 
   it('hoverable подсвечивает строку, не делая её кнопкой', () => {
     const wrapper = mount(GrListItem, { props: { title: 'Row', hoverable: true } })
 
     expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
-    expect(wrapper.classes()).toContain('hover:bg-[var(--gr-muted)]')
+    expect(row(wrapper).classes()).toContain('hover:bg-[var(--gr-muted)]')
   })
 })
 

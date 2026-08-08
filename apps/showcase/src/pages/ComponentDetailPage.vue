@@ -185,6 +185,7 @@ const previewRegistry = {
   'gr-list-empty-state': defineAsyncComponent(() => import('../demos/components/gr-list/GrListEmptyStateDemo.vue')),
   'gr-list-queue-actions': defineAsyncComponent(() => import('../demos/components/gr-list/GrListQueueActionsDemo.vue')),
   'gr-list-settings': defineAsyncComponent(() => import('../demos/components/gr-list/GrListSettingsDemo.vue')),
+  'gr-list-virtual': defineAsyncComponent(() => import('../demos/components/gr-list/GrListVirtualDemo.vue')),
   'gr-loading-custom-appearance': defineAsyncComponent(() => import('../demos/components/gr-loading/GrLoadingCustomAppearanceDemo.vue')),
   'gr-loading-delay-slot': defineAsyncComponent(() => import('../demos/components/gr-loading/GrLoadingDelaySlotDemo.vue')),
   'gr-loading-directive': defineAsyncComponent(() => import('../demos/components/gr-loading/GrLoadingDirectiveDemo.vue')),
