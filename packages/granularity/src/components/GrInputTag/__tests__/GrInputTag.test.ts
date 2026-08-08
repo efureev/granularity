@@ -416,3 +416,17 @@ describe('GrInputTag — IME-композиция', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrInputTag — name (нативная форма)', () => {
+  it('с `name` рендерит hidden input на каждый тег; пустой набор — ни одного', async () => {
+    const wrapper = mount(GrInputTag, { props: { modelValue: ['vue', 'ts'], name: 'tags', ariaLabel: 'Tags' } })
+    const inputs = wrapper.findAll('input[type="hidden"]')
+    expect(inputs).toHaveLength(2)
+    expect(inputs.map(i => (i.element as HTMLInputElement).value)).toEqual(['vue', 'ts'])
+    expect(inputs.every(i => i.attributes('name') === 'tags')).toBe(true)
+
+    await wrapper.setProps({ modelValue: [] })
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

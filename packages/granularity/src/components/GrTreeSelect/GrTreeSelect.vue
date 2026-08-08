@@ -23,6 +23,12 @@ import { grTreeSelectClass, grTreeSelectPanelClass } from './grTreeSelectStyles'
 export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'update:modelValue', value: GrTreeSelectModelValue): void
   (e: 'change', value: GrTreeSelectModelValue): void
+  /** Панель открылась/закрылась (`v-model:open`). */
+  (e: 'update:open', value: boolean): void
+  /**
+   * Панель открылась/закрылась.
+   * @deprecated Используйте `update:open` (`v-model:open`); алиас будет снят после 1.0.
+   */
   (e: 'visibleChange', visible: boolean): void
   (e: 'clear'): void
   (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
@@ -52,6 +58,8 @@ const props = withDefaults(
     showCheckbox: false,
     checkStrictly: false,
     clearable: false,
+    open: undefined,
+    name: undefined,
     valueDisplay: 'label',
     filterable: false,
     filterPlaceholder: undefined,
@@ -115,7 +123,11 @@ const clickOutsideExclude = [() => panelEl.value]
 
 let hadPointerDownOnTrigger = false
 
-const open = ref(false)
+// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
+// (паттерн `GrPopover`). Имя `open` сохранено: читатели работают с computed-Ref.
+const internalOpen = ref(false)
+const isOpenControlled = computed(() => props.open !== undefined)
+const open = computed(() => props.open ?? internalOpen.value)
 const filterValue = ref('')
 
 const { floatingStyle } = useFloating(rootEl, panelEl, open, {
@@ -272,10 +284,15 @@ function setOpen(next: boolean) {
   if (isDisabled.value || isReadonly.value)
     return
 
+  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
+  // `open`, и проверка после неё всегда была бы ложной.
   if (open.value === next)
     return
 
-  open.value = next
+  if (!isOpenControlled.value)
+    internalOpen.value = next
+
+  emit('update:open', next)
   emit('visibleChange', next)
 }
 
@@ -501,6 +518,16 @@ const themeAttrs = useGrThemeAttrs()
      @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
+    <!-- Нативная форма: hidden на каждый выбранный ключ. -->
+    <template v-if="name">
+      <input
+        v-for="key in selectedKeys"
+        :key="`hidden-${String(key)}`"
+        type="hidden"
+        :name="name"
+        :value="String(key)"
+      >
+    </template>
     <div class="relative">
       <input
         :id="fieldId"

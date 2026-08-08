@@ -96,3 +96,8 @@ const items: GrDropdownMenuEntry[] = [
 Все классы каталога живут в `grDropdownMenuStyles.ts` и объявлены в safelist:
 `.ts`-хелпер бандлер выносит в общий чанк, вне области скана компонента, и без
 safelist у изолированного потребителя пропали бы выравнивание, колонки и цвета.
+
+## Управление извне: `v-model:open`
+
+Проп `open` и событие `update:open` прокидываются в обёрнутый `GrDropdown`
+как есть — контракт тот же, что у [`GrDropdown`](./GrDropdown.md).

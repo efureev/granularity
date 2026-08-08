@@ -620,3 +620,78 @@ describe('GrTreeSelect — чекбоксы при multiple', () => {
     expect(container.getAttribute('style')).toContain('max-height: 240px')
   })
 })
+
+describe('GrTreeSelect — v-model:open', () => {
+  const DATA = [
+    { id: 1, label: 'Food' },
+    { id: 2, label: 'Travel' },
+  ]
+
+  function isPanelVisible(): boolean {
+    const panel = document.querySelector<HTMLElement>('[data-gr-tree-select-panel]')
+    return Boolean(panel) && panel!.style.display !== 'none'
+  }
+
+  it('`:open="true"` показывает панель без клика', async () => {
+    const wrapper = mount(GrTreeSelect, {
+      props: { modelValue: null, data: DATA, nodeKey: 'id', open: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    expect(isPanelVisible()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('uncontrolled: открытие кликом эмитит `update:open` (и deprecated `visibleChange`)', async () => {
+    const wrapper = mount(GrTreeSelect, {
+      props: { modelValue: null, data: DATA, nodeKey: 'id' },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-tree-select-trigger]').trigger('click')
+
+    expect(isPanelVisible()).toBe(true)
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    expect(wrapper.emitted('visibleChange')?.at(-1)).toEqual([true])
+    wrapper.unmount()
+  })
+
+  it('в controlled-режиме состоянием владеет родитель', async () => {
+    const wrapper = mount(GrTreeSelect, {
+      props: { modelValue: null, data: DATA, nodeKey: 'id', open: false },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-tree-select-trigger]').trigger('click')
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    expect(isPanelVisible()).toBe(false)
+
+    await wrapper.setProps({ open: true })
+    expect(isPanelVisible()).toBe(true)
+    wrapper.unmount()
+  })
+})
+
+describe('GrTreeSelect — name (нативная форма)', () => {
+  it('hidden input(ы) по выбранным ключам; пусто — ни одного', async () => {
+    const wrapper = mount(GrTreeSelect, {
+      props: {
+        modelValue: [1, 2],
+        multiple: true,
+        data: [{ id: 1, label: 'Food' }, { id: 2, label: 'Travel' }],
+        nodeKey: 'id',
+        name: 'categories',
+      },
+      attachTo: document.body,
+    })
+    const inputs = wrapper.findAll('input[type="hidden"]')
+    expect(inputs.map(i => (i.element as HTMLInputElement).value)).toEqual(['1', '2'])
+    expect(inputs.every(i => i.attributes('name') === 'categories')).toBe(true)
+
+    await wrapper.setProps({ modelValue: [] })
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

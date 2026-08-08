@@ -274,6 +274,20 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы: hidden input по значению модели (не по тексту запроса).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -329,6 +343,12 @@
             "signature": "(e: \"change\", value: GrAutocompleteModelValue<TValue>): void"
           },
           {
+            "name": "update:open",
+            "description": "Панель открылась/закрылась (`v-model:open`).",
+            "type": "[boolean]",
+            "signature": "(e: \"update:open\", value: boolean): void"
+          },
+          {
             "name": "clear",
             "description": "Значение снято кнопкой очистки; только при `clearable`.",
             "type": "[]",
@@ -373,6 +393,13 @@
             "default": "undefined"
           },
           {
+            "name": "name",
+            "description": "Имя участника: даёт инициалы и доступное имя аватара.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "src",
             "description": "",
             "type": "string | undefined",
@@ -389,13 +416,6 @@
           {
             "name": "alt",
             "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "name",
-            "description": "Имя участника: даёт инициалы и доступное имя аватара.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1186,18 +1206,18 @@
             "default": "undefined"
           },
           {
-            "name": "value",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"on\""
-          },
-          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"on\""
           },
           {
             "name": "form",
@@ -2789,6 +2809,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "disabled",
             "description": "Панель не открывается ничем; триггер остаётся фокусируемым.",
             "type": "boolean | undefined",
@@ -2881,18 +2908,20 @@
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          }
+        ]
       },
       {
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
         "items": [
-          {
-            "name": "open",
-            "description": "",
-            "type": "() => void"
-          },
           {
             "name": "close",
             "description": "",
@@ -2916,6 +2945,13 @@
         "title": "Props",
         "origin": "generated",
         "items": [
+          {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`) — прокидывается в `GrDropdown`. Без пропа меню ведёт себя само (uncontrolled).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
           {
             "name": "disabled",
             "description": "Меню не открывается ничем; триггер остаётся фокусируемым.",
@@ -3045,6 +3081,12 @@
         "title": "Events",
         "origin": "generated",
         "items": [
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          },
           {
             "name": "select",
             "description": "",
@@ -4760,6 +4802,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы: hidden input на каждый тег.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "trim",
@@ -7007,6 +7056,13 @@
             "default": "false"
           },
           {
+            "name": "name",
+            "description": "Имя для нативной формы: hidden input со значением; `0` — «не выбрано», input не рендерится.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "max",
             "description": "Количество символов шкалы.",
             "type": "number | undefined",
@@ -7655,6 +7711,20 @@
             "type": "GrSelectUnderline | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп. Только для `optionsView=\"panel\"`: у нативного `<select>` панель браузерная.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы: в native-режиме уходит на сам `<select>`, в panel-режиме значения сериализуются hidden-инпутами (ключ — `keyOf`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -7712,6 +7782,12 @@
             "description": "Значение снято кнопкой очистки.",
             "type": "[]",
             "signature": "(e: \"clear\"): void"
+          },
+          {
+            "name": "update:open",
+            "description": "Панель открылась/закрылась (`v-model:open`).",
+            "type": "[boolean]",
+            "signature": "(e: \"update:open\", value: boolean): void"
           },
           {
             "name": "visibleChange",
@@ -7976,6 +8052,13 @@
           {
             "name": "ariaLabel",
             "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы: hidden input на значение, при `range` — два с одним именем.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -8332,18 +8415,18 @@
             "default": "undefined"
           },
           {
-            "name": "value",
-            "description": "Значение, уходящее в форму во включённом состоянии.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"on\""
-          },
-          {
             "name": "name",
             "description": "Имя поля для нативной отправки формы. Без него скрытое поле не рендерится.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Значение, уходящее в форму во включённом состоянии.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"on\""
           },
           {
             "name": "form",
@@ -8823,6 +8906,20 @@
             "default": "undefined"
           },
           {
+            "name": "clearable",
+            "description": "Кнопка очистки значения. Настраивается через `GrConfigProvider`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clearLabel",
+            "description": "A11y-подпись кнопки очистки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "name",
             "description": "",
             "type": "string | undefined",
@@ -8915,6 +9012,12 @@
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"change\", value: string): void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"clear\"): void"
           },
           {
             "name": "focus",
@@ -9622,6 +9725,20 @@
             "default": "false"
           },
           {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы: hidden input на каждый выбранный ключ.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "valueDisplay",
             "description": "Как отображать выбранное значение в single-режиме.",
             "type": "GrTreeSelectValueDisplay | undefined",
@@ -9724,8 +9841,14 @@
             "signature": "(e: \"change\", value: GrTreeSelectModelValue): void"
           },
           {
+            "name": "update:open",
+            "description": "Панель открылась/закрылась (`v-model:open`).",
+            "type": "[boolean]",
+            "signature": "(e: \"update:open\", value: boolean): void"
+          },
+          {
             "name": "visibleChange",
-            "description": "",
+            "description": "Панель открылась/закрылась.",
             "type": "[boolean]",
             "signature": "(e: \"visibleChange\", visible: boolean): void"
           },

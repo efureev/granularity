@@ -18,10 +18,12 @@ import {
   type GrTextareaSize,
   type GrTextareaState,
 } from './grTextareaStyles'
+import IconX from '~icons/lucide/x'
 import { vAutosize } from '../../directives'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export interface GrTextareaProps {
   modelValue: string
@@ -46,6 +48,10 @@ export interface GrTextareaProps {
   showCount?: boolean
   /** Подгонять высоту под содержимое (директива `v-autosize`). */
   autosize?: boolean
+  /** Кнопка очистки значения. Настраивается через `GrConfigProvider`. */
+  clearable?: boolean
+  /** A11y-подпись кнопки очистки. */
+  clearLabel?: string
   /** Ручное изменение размера пользователем. */
   resize?: GrTextareaResize
 }
@@ -54,6 +60,8 @@ export interface GrTextareaEmits {
   (e: 'update:modelValue', value: string): void
   /** Значение зафиксировано нативным `change` — по `blur`. */
   (e: 'change', value: string): void
+  /** Значение стёрто кнопкой очистки. */
+  (e: 'clear'): void
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
 }
@@ -74,6 +82,8 @@ const props = withDefaults(defineProps<GrTextareaProps>(), {
   maxlength: undefined,
   showCount: false,
   autosize: false,
+  clearable: undefined,
+  clearLabel: undefined,
   resize: 'vertical',
 })
 
@@ -121,6 +131,21 @@ function blur(): void {
 defineExpose({ focus, blur })
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextarea' })
+const resolvedClearable = useGrComponentProp('GrTextarea', 'clearable', () => props.clearable, false)
+
+const { t } = useGranularityTranslations()
+const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
+
+const showClear = computed(() =>
+  resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== '',
+)
+
+function clear(): void {
+  emit('update:modelValue', '')
+  emit('change', '')
+  emit('clear')
+  focus()
+}
 
 const baseClass = 'w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
 
@@ -175,7 +200,7 @@ function onBlur(e: FocusEvent): void {
 </script>
 
 <template>
-  <div v-if="showCount" data-gr-textarea-wrap class="w-full">
+  <div v-if="showCount" data-gr-textarea-wrap class="relative w-full">
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
@@ -186,9 +211,45 @@ function onBlur(e: FocusEvent): void {
       @blur="onBlur"
     />
 
+    <button
+      v-if="showClear"
+      type="button"
+      data-gr-textarea-clear
+      :aria-label="resolvedClearLabel"
+      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+      @click="clear"
+    >
+      <IconX class="h-4 w-4" aria-hidden="true" />
+    </button>
+
     <div :id="countId" data-gr-textarea-count :class="countClass">
       {{ countText }}
     </div>
+  </div>
+
+  <!-- Обёртка появляется только под кнопку очистки: без неё поле остаётся
+       корневым элементом — на этом стоит контракт fallthrough-атрибутов. -->
+  <div v-else-if="resolvedClearable" class="relative w-full">
+    <textarea
+      ref="textareaEl"
+      v-autosize="autosize"
+      v-bind="{ ...textareaAttrs, ...$attrs }"
+      @input="onInput"
+      @change="onChange"
+      @focus="onFocus"
+      @blur="onBlur"
+    />
+
+    <button
+      v-if="showClear"
+      type="button"
+      data-gr-textarea-clear
+      :aria-label="resolvedClearLabel"
+      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+      @click="clear"
+    >
+      <IconX class="h-4 w-4" aria-hidden="true" />
+    </button>
   </div>
 
   <textarea

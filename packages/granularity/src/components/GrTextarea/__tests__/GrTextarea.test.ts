@@ -170,3 +170,37 @@ describe('GrTextarea — паритет веток', () => {
     expect(counted.get('[data-gr-textarea-wrap]').attributes('data-test')).toBeUndefined()
   })
 })
+
+describe('GrTextarea — clearable', () => {
+  it('крестик виден при непустом значении, чистит и эмитит clear', async () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'черновик', clearable: true, ariaLabel: 'Note' } })
+
+    const button = wrapper.get('[data-gr-textarea-clear]')
+    await button.trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
+    expect(wrapper.emitted('change')?.at(-1)).toEqual([''])
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('скрыт при пустом значении, disabled и readonly', () => {
+    const empty = mount(GrTextarea, { props: { modelValue: '', clearable: true, ariaLabel: 'N' } })
+    expect(empty.find('[data-gr-textarea-clear]').exists()).toBe(false)
+    empty.unmount()
+
+    const disabled = mount(GrTextarea, { props: { modelValue: 'x', clearable: true, disabled: true, ariaLabel: 'N' } })
+    expect(disabled.find('[data-gr-textarea-clear]').exists()).toBe(false)
+    disabled.unmount()
+
+    const readonly = mount(GrTextarea, { props: { modelValue: 'x', clearable: true, readonly: true, ariaLabel: 'N' } })
+    expect(readonly.find('[data-gr-textarea-clear]').exists()).toBe(false)
+    readonly.unmount()
+  })
+
+  it('без clearable кнопки нет', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'x', ariaLabel: 'N' } })
+    expect(wrapper.find('[data-gr-textarea-clear]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

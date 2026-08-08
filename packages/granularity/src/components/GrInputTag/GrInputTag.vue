@@ -73,6 +73,8 @@ export interface GrInputTagProps {
    * нет доступного имени вовсе: placeholder именем не считается.
    */
   ariaLabel?: string
+  /** Имя для нативной формы: hidden input на каждый тег. */
+  name?: string
 }
 
 export interface GrInputTagEmits {
@@ -117,6 +119,7 @@ const props = withDefaults(
     removeTagLabel: undefined,
     clearAllLabel: undefined,
     ariaLabel: undefined,
+    name: undefined,
   },
 )
 
@@ -494,6 +497,16 @@ defineExpose({ focus, blur, clear: clearAll })
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
+    <!-- Нативная форма: hidden на каждый тег — стандартная сериализация набора. -->
+    <template v-if="name">
+      <input
+        v-for="(tag, tagIndex) in modelValue"
+        :key="`hidden-${tagIndex}`"
+        type="hidden"
+        :name="name"
+        :value="tag"
+      >
+    </template>
     <!--
       `display: contents` — список нужен ради роли, а не ради раскладки: чипы
       обязаны переноситься в одном потоке с полем ввода.

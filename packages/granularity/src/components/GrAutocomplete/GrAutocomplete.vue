@@ -109,6 +109,13 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   loadingText?: string
   noResultsText?: string
   clearLabel?: string
+  /**
+   * Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт
+   * себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.
+   */
+  open?: boolean
+  /** Имя для нативной формы: hidden input по значению модели (не по тексту запроса). */
+  name?: string
 }
 
 export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string> {
@@ -119,6 +126,8 @@ export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string
   (e: 'searchError', error: unknown): void
   /** Значение зафиксировано выбором или снятием опции. */
   (e: 'change', value: GrAutocompleteModelValue<TValue>): void
+  /** Панель открылась/закрылась (`v-model:open`). */
+  (e: 'update:open', value: boolean): void
   /** Значение снято кнопкой очистки; только при `clearable`. */
   (e: 'clear'): void
   (e: 'focus', event: FocusEvent): void
@@ -151,6 +160,8 @@ const props = withDefaults(
     loadingText: undefined,
     noResultsText: undefined,
     clearLabel: undefined,
+    open: undefined,
+    name: undefined,
   },
 )
 
@@ -235,7 +246,22 @@ const query = ref('')
 // открытии заполненного поля показать весь список (а не отфильтровать по метке
 // уже выбранной опции). Сбрасывается при программной установке `query`.
 const dirty = ref(false)
-const open = ref(false)
+// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
+// (паттерн `GrPopover`). Имя `open` сохранено: читатели работают с computed-Ref.
+const internalOpen = ref(false)
+const isOpenControlled = computed(() => props.open !== undefined)
+const open = computed(() => props.open ?? internalOpen.value)
+
+function setOpen(next: boolean): void {
+  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
+  // `open`, и проверка после неё всегда была бы ложной.
+  if (next === open.value) return
+
+  if (!isOpenControlled.value) internalOpen.value = next
+
+  emit('update:open', next)
+}
+
 const activeIndex = ref(-1)
 
 const rootEl = ref<HTMLElement | null>(null)
@@ -473,11 +499,11 @@ watch(navigableItems, () => {
 // ————— Открытие/закрытие.
 function openDropdown(): void {
   if (locked.value || open.value) return
-  open.value = true
+  setOpen(true)
 }
 
 function closeDropdown(): void {
-  open.value = false
+  setOpen(false)
 }
 
 function focusInput(): void {
@@ -865,6 +891,17 @@ const themeAttrs = useGrThemeAttrs()
         <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
       </span>
     </div>
+
+    <!-- Нативная форма: сериализуется модель, а не текст запроса. -->
+    <template v-if="name">
+      <input
+        v-for="value in selectedValues"
+        :key="`hidden-${String(value)}`"
+        type="hidden"
+        :name="name"
+        :value="String(value)"
+      >
+    </template>
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition

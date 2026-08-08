@@ -52,6 +52,10 @@
       "default": "./dist/index.js"
     },
     "./styles/*": "./dist/styles/*",
+    "./composables/useAnnouncer": {
+      "types": "./dist/types/src/composables/useAnnouncer.d.ts",
+      "import": "./dist/composables/useAnnouncer.js"
+    },
     "./components/GrAlert": {
       "types": "./dist/types/src/components/GrAlert/index.d.ts",
       "import": "./dist/components/GrAlert/index.js"
@@ -316,6 +320,10 @@
       "types": "./dist/types/src/composables/useFocusTrap.d.ts",
       "import": "./dist/composables/useFocusTrap.js"
     },
+    "./composables/useGrFormControl": {
+      "types": "./dist/types/src/composables/useGrFormControl.d.ts",
+      "import": "./dist/composables/useGrFormControl.js"
+    },
     "./composables/usePortalTarget": {
       "types": "./dist/types/src/composables/usePortalTarget.d.ts",
       "import": "./dist/composables/usePortalTarget.js"
@@ -327,6 +335,10 @@
     "./composables/useTheme": {
       "types": "./dist/types/src/composables/useTheme.d.ts",
       "import": "./dist/composables/useTheme.js"
+    },
+    "./composables/useVirtualList": {
+      "types": "./dist/types/src/composables/useVirtualList.d.ts",
+      "import": "./dist/composables/useVirtualList.js"
     },
     "./composables/useToast": {
       "types": "./dist/types/src/composables/useToast.d.ts",

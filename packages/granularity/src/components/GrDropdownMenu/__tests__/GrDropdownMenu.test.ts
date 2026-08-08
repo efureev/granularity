@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrDropdownMenu from '../GrDropdownMenu.vue'
@@ -377,5 +378,29 @@ describe('GrDropdownMenu — проброс в GrDropdown', () => {
     expect(item.attributes('href')).toBe('https://example.com')
     expect(item.attributes('target')).toBe('_blank')
     expect(item.attributes('rel')).toBe('noopener noreferrer')
+  })
+})
+
+describe('GrDropdownMenu — v-model:open (прокидка в GrDropdown)', () => {
+  it('`:open="true"` показывает меню, открытие кликом переэмитит `update:open`', async () => {
+    const opened = mount(GrDropdownMenu, {
+      attachTo: document.body,
+      props: { open: true, items: [{ key: 'item', label: 'Пункт' }] },
+      slots: { trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Меню</button>' },
+    })
+    await nextTick()
+    const content = document.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
+    expect(content?.style.display).not.toBe('none')
+    opened.unmount()
+    document.body.innerHTML = ''
+
+    const uncontrolled = mount(GrDropdownMenu, {
+      attachTo: document.body,
+      props: { items: [{ key: 'item', label: 'Пункт' }] },
+      slots: { trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Меню</button>' },
+    })
+    await uncontrolled.get('[data-testid="trigger"]').trigger('click')
+    expect(uncontrolled.emitted('update:open')?.at(-1)).toEqual([true])
+    uncontrolled.unmount()
   })
 })

@@ -461,3 +461,52 @@ describe('GrDropdown — императивный API', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrDropdown — v-model:open', () => {
+  function mountDropdown(props: Record<string, unknown> = {}) {
+    return mount(GrDropdown, {
+      attachTo: document.body,
+      props,
+      slots: {
+        trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Открыть</button>',
+        content: '<div id="dropdown-content">Пункт</div>',
+      },
+    })
+  }
+
+  function isPanelVisible(): boolean {
+    const content = document.querySelector<HTMLElement>('#dropdown-content')
+    return Boolean(content) && content!.closest('[style*="display: none"]') === null
+  }
+
+  it('`:open="true"` показывает панель без клика', async () => {
+    const wrapper = mountDropdown({ open: true })
+    await nextTick()
+
+    expect(isPanelVisible()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('uncontrolled: открытие кликом эмитит `update:open`', async () => {
+    const wrapper = mountDropdown()
+
+    await wrapper.get('[data-testid="trigger"]').trigger('click')
+
+    expect(isPanelVisible()).toBe(true)
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    wrapper.unmount()
+  })
+
+  it('в controlled-режиме состоянием владеет родитель', async () => {
+    const wrapper = mountDropdown({ open: false })
+
+    await wrapper.get('[data-testid="trigger"]').trigger('click')
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    expect(isPanelVisible()).toBe(false)
+
+    await wrapper.setProps({ open: true })
+    expect(isPanelVisible()).toBe(true)
+    wrapper.unmount()
+  })
+})

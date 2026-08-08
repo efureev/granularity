@@ -71,6 +71,8 @@ export interface GrRatingProps {
    */
   compact?: boolean
   ariaLabel?: string
+  /** Имя для нативной формы: hidden input со значением; `0` — «не выбрано», input не рендерится. */
+  name?: string
 }
 
 export interface GrRatingEmits {
@@ -103,6 +105,7 @@ const props = withDefaults(
     texts: undefined,
     compact: false,
     ariaLabel: undefined,
+    name: undefined,
   },
 )
 
@@ -274,6 +277,13 @@ function onKeydown(event: KeyboardEvent): void {
     data-gr-rating
     class="inline-flex items-center gap-2"
   >
+    <!-- Нативная форма: роль-виджет не labelable и в submit не попадает. -->
+    <input
+      v-if="name && modelValue > 0"
+      type="hidden"
+      :name="name"
+      :value="String(modelValue)"
+    >
     <div
       :id="resolvedId"
       data-gr-rating-scale

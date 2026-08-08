@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **One opening contract for panel overlays: `v-model:open`.** The package had three conventions at once: modal
+  surfaces used `v-model`, `GrPopover`/`GrTooltip` used `v-model:open`, `GrSelect`/`GrTreeSelect` only *notified* via
+  `visibleChange`, and `GrAutocomplete`/`GrDropdown` emitted nothing at all — a combobox could not be opened from the
+  outside, and identical panels were listened to differently. Now `GrSelect`, `GrTreeSelect`, `GrAutocomplete`,
+  `GrDropdown` and `GrDropdownMenu` follow the `GrPopover` pattern: an optional `open` prop (absent — uncontrolled, as
+  before), `update:open` on every change, and in controlled mode the parent owns the state. `visibleChange` on
+  Select/TreeSelect still fires but is deprecated and will be removed after 1.0.
+- **Native-form `name` on every value-bearing control.** Half the controls already submitted through hidden inputs
+  (checkbox, radio, segmented, switch); `GrSelect`, `GrAutocomplete`, `GrTreeSelect`, `GrInputTag`, `GrRating` and
+  `GrSlider` did not participate in `FormData` at all. Each now takes `name`: the native select gets it directly,
+  everything else renders hidden inputs — one per selected value (the standard repeated-key serialization), a `range`
+  slider submits two values under one name, an empty selection submits nothing.
+- **`GrTextarea` gains `clearable`** — the same anatomy as `GrInput`: a `×` button on a non-empty value, hidden under
+  `disabled`/`readonly`, the `clear` event, `clearLabel` for AT and a `GrConfigProvider` default. The bare textarea
+  stays the root element when the option is off — the attribute-fallthrough contract is untouched.
+- **Every public composable is a subpath again.** `useAnnouncer` and `useVirtualList` lived only in the root barrel,
+  and `useGrFormControl` — the form-control contract the repository rules point third-party controls to — was not
+  exported anywhere at all. All three got `package.json#exports` subpaths, vite entries and barrel exports, and a new
+  gate (`src/__tests__/composablesGranularity.test.ts`) keeps every file in `src/composables/*` present in all three
+  registries from now on.
+
 - **Overlays answer to `open()`, `close()` and `toggle()`.** `GrModal`, `GrDialog`, `GrDropdown` and
   `GrCommandPalette` exposed nothing at all and could only be opened through `v-model`, while `GrPopover` had the three
   methods all along — one layer of the library behaving two different ways, which a consumer only discovered by running

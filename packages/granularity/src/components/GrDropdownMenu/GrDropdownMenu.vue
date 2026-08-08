@@ -55,11 +55,18 @@ export interface GrDropdownMenuProps {
   borderBottom?: boolean
   /** Дополнительные классы для wrapper'а списка. */
   listClass?: string
+  /**
+   * Контролируемое состояние панели (`v-model:open`) — прокидывается в
+   * `GrDropdown`. Без пропа меню ведёт себя само (uncontrolled).
+   */
+  open?: boolean
 }
 
 export interface GrDropdownMenuEmits {
   /** Выбран пункт декларативного меню. */
   (e: 'select', item: GrDropdownMenuAction): void
+  /** Панель открылась/закрылась (`v-model:open`). */
+  (e: 'update:open', value: boolean): void
 }
 
 withDefaults(defineProps<GrDropdownMenuProps>(), {
@@ -80,6 +87,7 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
   borderTop: false,
   borderBottom: false,
   listClass: '',
+  open: undefined,
 })
 
 const emit = defineEmits<GrDropdownMenuEmits>()
@@ -120,6 +128,8 @@ function onSelect(item: GrDropdownMenuAction): void {
     :teleport-to="teleportTo"
     :close-on-content-click="closeOnContentClick"
     :content-class="contentClass"
+    :open="open"
+    @update:open="emit('update:open', $event)"
   >
     <template #trigger="slotProps">
       <slot name="trigger" v-bind="slotProps" />

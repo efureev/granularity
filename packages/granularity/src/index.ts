@@ -84,6 +84,10 @@ export type { GrAnnounceOptions, GrAnnouncer, GrAnnouncerPoliteness } from './co
 // Виртуализация длинного списка: геометрия окна без своей разметки.
 export { useVirtualList } from './composables/useVirtualList'
 export type { GrVirtualAlign, UseVirtualListOptions, UseVirtualListReturn } from './composables/useVirtualList'
+// Контракт форм-контрола: сведение собственных пропов с контекстом `GrFormField`.
+// Публичен ради сторонних контролов — без него контракт пакета не выполнить.
+export { useGrFormControl } from './composables/useGrFormControl'
+export type { GrFormControlProps, GrFormControlState } from './composables/useGrFormControl'
 export { GRANULARITY_THEME_STATE, granularityThemePlugin, initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'

@@ -72,6 +72,8 @@ export interface GrSliderProps {
    */
   lazy?: boolean
   ariaLabel?: string
+  /** Имя для нативной формы: hidden input на значение, при `range` — два с одним именем. */
+  name?: string
 }
 
 export interface GrSliderEmits {
@@ -100,6 +102,7 @@ const props = withDefaults(
     orientation: 'horizontal',
     lazy: false,
     ariaLabel: undefined,
+    name: undefined,
   },
 )
 
@@ -404,6 +407,17 @@ function thumbValueText(value: number): string | undefined {
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
+    <!-- Нативная форма: роль-виджет не labelable и в submit не попадает.
+         Сериализуется модель (snapped), а не черновик жеста. -->
+    <template v-if="name">
+      <input
+        v-for="(value, index) in modelValues"
+        :key="index"
+        type="hidden"
+        :name="name"
+        :value="String(value)"
+      >
+    </template>
     <div
       ref="trackEl"
       data-gr-slider-track

@@ -262,8 +262,17 @@ export default defineConfig({
           new URL('./src/components/GrTreeSelect/index.ts', import.meta.url),
         ),
         // </granularity:components>
+        'composables/useAnnouncer': fileURLToPath(
+          new URL('./src/composables/useAnnouncer.ts', import.meta.url),
+        ),
         'composables/useDismissible': fileURLToPath(
           new URL('./src/composables/useDismissible.ts', import.meta.url),
+        ),
+        'composables/useGrFormControl': fileURLToPath(
+          new URL('./src/composables/useGrFormControl.ts', import.meta.url),
+        ),
+        'composables/useVirtualList': fileURLToPath(
+          new URL('./src/composables/useVirtualList.ts', import.meta.url),
         ),
         'composables/useFloating': fileURLToPath(
           new URL('./src/composables/useFloating.ts', import.meta.url),

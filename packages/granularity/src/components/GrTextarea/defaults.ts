@@ -9,6 +9,8 @@ import type { GrComponentSize } from '../GrConfigProvider/context'
  */
 export interface GrTextareaConfigurableProps {
   size: GrComponentSize
+  /** Кнопка очистки значения. */
+  clearable: boolean
 }
 
 declare module '../GrConfigProvider/context' {

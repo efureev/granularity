@@ -228,3 +228,22 @@ describe('GrRating — оформление и размеры', () => {
     expect(symbol.classes().join(' ')).toContain('0.875rem')
   })
 })
+
+describe('GrRating — name (нативная форма)', () => {
+  it('с `name` рендерит hidden input со значением; 0 — «не выбрано», без input', async () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 3, name: 'score', ariaLabel: 'Score' } })
+    const hidden = wrapper.get('input[type="hidden"]')
+    expect(hidden.attributes('name')).toBe('score')
+    expect((hidden.element as HTMLInputElement).value).toBe('3')
+
+    await wrapper.setProps({ modelValue: 0 })
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('без `name` hidden input отсутствует', () => {
+    const wrapper = mount(GrRating, { props: { modelValue: 3, ariaLabel: 'Score' } })
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

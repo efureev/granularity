@@ -306,3 +306,28 @@ describe('GrSlider — оформление и размеры', () => {
     expect(track.classes()).toContain('h-[var(--gr-slider-track-height,0.1875rem)]')
   })
 })
+
+describe('GrSlider — name (нативная форма)', () => {
+  it('с `name` рендерит hidden input; range — два с одним именем', async () => {
+    const single = mount(GrSlider, { props: { modelValue: 30, name: 'volume', ariaLabel: 'Volume' } })
+    const hidden = single.get('input[type="hidden"]')
+    expect(hidden.attributes('name')).toBe('volume')
+    expect((hidden.element as HTMLInputElement).value).toBe('30')
+    single.unmount()
+
+    const range = mount(GrSlider, {
+      props: { modelValue: [20, 80] as GrSliderModelValue, range: true, name: 'span', ariaLabel: 'Span' },
+    })
+    const inputs = range.findAll('input[type="hidden"]')
+    expect(inputs).toHaveLength(2)
+    expect(inputs.map(i => (i.element as HTMLInputElement).value)).toEqual(['20', '80'])
+    expect(inputs.every(i => i.attributes('name') === 'span')).toBe(true)
+    range.unmount()
+  })
+
+  it('без `name` hidden input отсутствует', () => {
+    const wrapper = mount(GrSlider, { props: { modelValue: 30, ariaLabel: 'Volume' } })
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

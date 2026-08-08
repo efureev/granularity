@@ -162,3 +162,70 @@ describe('GrAutocomplete — IME-композиция', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrAutocomplete — v-model:open', () => {
+  it('`:open="true"` показывает панель без фокуса', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, ariaLabel: 'Framework', open: true },
+    })
+    await nextTick()
+
+    expect(getInput(wrapper).attributes('aria-expanded')).toBe('true')
+    expect(getTeleportedOptions().length).toBeGreaterThan(0)
+    wrapper.unmount()
+  })
+
+  it('uncontrolled: открытие фокусом эмитит `update:open`', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, ariaLabel: 'Framework' },
+    })
+
+    await getInput(wrapper).trigger('focus')
+
+    expect(getInput(wrapper).attributes('aria-expanded')).toBe('true')
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    wrapper.unmount()
+  })
+
+  it('в controlled-режиме состоянием владеет родитель', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, ariaLabel: 'Framework', open: false },
+    })
+
+    await getInput(wrapper).trigger('focus')
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    expect(getInput(wrapper).attributes('aria-expanded')).toBe('false')
+
+    await wrapper.setProps({ open: true })
+    expect(getInput(wrapper).attributes('aria-expanded')).toBe('true')
+    wrapper.unmount()
+  })
+})
+
+describe('GrAutocomplete — name (нативная форма)', () => {
+  it('single: hidden input со значением модели, а не с текстом запроса', () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: 'vue', options: OPTIONS, name: 'framework', ariaLabel: 'Framework' },
+    })
+    const hidden = wrapper.get('input[type="hidden"]')
+    expect(hidden.attributes('name')).toBe('framework')
+    expect((hidden.element as HTMLInputElement).value).toBe('vue')
+    wrapper.unmount()
+  })
+
+  it('multiple: hidden input на каждое значение; без name — ни одного', () => {
+    const withName = mount(GrAutocomplete, {
+      props: { modelValue: ['vue', 'react'], multiple: true, options: OPTIONS, name: 'fw', ariaLabel: 'F' },
+    })
+    expect(withName.findAll('input[type="hidden"]').map(i => (i.element as HTMLInputElement).value))
+      .toEqual(['vue', 'react'])
+    withName.unmount()
+
+    const without = mount(GrAutocomplete, {
+      props: { modelValue: ['vue'], multiple: true, options: OPTIONS, ariaLabel: 'F' },
+    })
+    expect(without.find('input[type="hidden"]').exists()).toBe(false)
+    without.unmount()
+  })
+})

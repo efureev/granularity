@@ -38,6 +38,16 @@ export interface GrDropdownProps {
    * оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).
    */
   teleportTo?: string | HTMLElement
+  /**
+   * Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт
+   * себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.
+   */
+  open?: boolean
+}
+
+export interface GrDropdownEmits {
+  /** Панель открылась/закрылась (`v-model:open`). */
+  (e: 'update:open', value: boolean): void
 }
 
 import { useGrThemeAttrs } from '../GrConfigProvider/context'
@@ -53,9 +63,27 @@ const props = withDefaults(defineProps<GrDropdownProps>(), {
   closeOnContentClick: true,
   contentClass: '',
   teleportTo: undefined,
+  open: undefined,
 })
 
-const isOpen = ref(false)
+const emit = defineEmits<GrDropdownEmits>()
+
+// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
+// (паттерн `GrPopover`). Имя `isOpen` сохранено: читатели работают с computed-Ref.
+const internalOpen = ref(false)
+const isOpenControlled = computed(() => props.open !== undefined)
+const isOpen = computed(() => props.open ?? internalOpen.value)
+
+function setOpen(next: boolean): void {
+  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
+  // `isOpen`, и проверка после неё всегда была бы ложной.
+  if (next === isOpen.value) return
+
+  if (!isOpenControlled.value) internalOpen.value = next
+
+  emit('update:open', next)
+}
+
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const clickOutsideExclude = [() => panelEl.value]
@@ -83,7 +111,7 @@ async function openWithFocus(first: boolean): Promise<void> {
   if (props.disabled)
     return
 
-  isOpen.value = true
+  setOpen(true)
   await nextTick()
   focusItemAt(first ? 0 : -1)
 }
@@ -216,7 +244,7 @@ function open(): void {
     return
 
   clearTimeout(hoverTimer)
-  isOpen.value = true
+  setOpen(true)
 }
 
 function toggle(): void {
@@ -224,23 +252,23 @@ function toggle(): void {
     return
 
   clearTimeout(hoverTimer)
-  isOpen.value = !isOpen.value
+  setOpen(!isOpen.value)
 }
 
 function close(): void {
   clearTimeout(hoverTimer)
-  isOpen.value = false
+  setOpen(false)
 }
 
 function scheduleHover(next: boolean, delayMs: number): void {
   clearTimeout(hoverTimer)
 
   if (delayMs <= 0) {
-    isOpen.value = next
+    setOpen(next)
     return
   }
 
-  hoverTimer = setTimeout(() => { isOpen.value = next }, delayMs)
+  hoverTimer = setTimeout(setOpen, delayMs, next)
 }
 
 function onHoverEnter(): void {

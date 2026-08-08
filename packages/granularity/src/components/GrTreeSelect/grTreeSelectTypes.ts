@@ -47,6 +47,15 @@ export interface GrTreeSelectProps<T extends object = any> {
   checkStrictly?: boolean
   clearable?: boolean
 
+  /**
+   * Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт
+   * себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.
+   */
+  open?: boolean
+
+  /** Имя для нативной формы: hidden input на каждый выбранный ключ. */
+  name?: string
+
   /** Как отображать выбранное значение в single-режиме. */
   valueDisplay?: GrTreeSelectValueDisplay
 

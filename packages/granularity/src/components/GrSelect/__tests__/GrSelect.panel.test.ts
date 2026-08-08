@@ -169,6 +169,49 @@ describe('GrSelect — панель как listbox', () => {
   })
 })
 
+describe('GrSelect — v-model:open', () => {
+  function isPanelVisible(): boolean {
+    const panel = document.querySelector<HTMLElement>('[data-gr-select-panel]')
+    return Boolean(panel) && panel!.style.display !== 'none'
+  }
+
+  it('`:open="true"` показывает панель без клика', async () => {
+    const wrapper = mountPanel({ open: true })
+    await nextTick()
+
+    expect(isPanelVisible()).toBe(true)
+    expect(wrapper.get('[data-gr-select-trigger]').attributes('aria-expanded')).toBe('true')
+
+    wrapper.unmount()
+  })
+
+  it('uncontrolled: открытие кликом эмитит `update:open`', async () => {
+    const wrapper = mountPanel()
+
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    expect(isPanelVisible()).toBe(true)
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+
+    wrapper.unmount()
+  })
+
+  it('в controlled-режиме состоянием владеет родитель', async () => {
+    const wrapper = mountPanel({ open: false })
+
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    // Событие ушло, но панель осталась закрытой: значение не менял никто.
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    expect(isPanelVisible()).toBe(false)
+
+    await wrapper.setProps({ open: true })
+    expect(isPanelVisible()).toBe(true)
+
+    wrapper.unmount()
+  })
+})
+
 describe('GrSelect — клавиатура при allowCustomValue', () => {
   function searchInput(): HTMLInputElement {
     return document.querySelector<HTMLInputElement>('input[data-gr-select-search]')!
@@ -234,6 +277,31 @@ describe('GrSelect — IME-композиция', () => {
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})
+
+describe('GrSelect — name (нативная форма)', () => {
+  it('panel-режим: hidden input(ы) по значениям; пусто — ни одного', async () => {
+    const wrapper = mountPanel({ name: 'stack', modelValue: 'vue' })
+    const hidden = wrapper.get('input[type="hidden"]')
+    expect(hidden.attributes('name')).toBe('stack')
+    expect((hidden.element as HTMLInputElement).value).toBe('vue')
+
+    await wrapper.setProps({ modelValue: ['vue', 'react'], multiple: true })
+    expect(wrapper.findAll('input[type="hidden"]').map(i => (i.element as HTMLInputElement).value))
+      .toEqual(['vue', 'react'])
+
+    await wrapper.setProps({ modelValue: [], multiple: true })
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('native-режим: `name` уходит на сам <select>', () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: 'vue', options: OPTIONS, name: 'stack', ariaLabel: 'Stack' },
+    })
+    expect(wrapper.get('select').attributes('name')).toBe('stack')
     wrapper.unmount()
   })
 })

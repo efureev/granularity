@@ -148,6 +148,17 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
    * В `view="default"` не используется.
    */
   underline?: GrSelectUnderline
+  /**
+   * Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт
+   * себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.
+   * Только для `optionsView="panel"`: у нативного `<select>` панель браузерная.
+   */
+  open?: boolean
+  /**
+   * Имя для нативной формы: в native-режиме уходит на сам `<select>`, в
+   * panel-режиме значения сериализуются hidden-инпутами (ключ — `keyOf`).
+   */
+  name?: string
 }
 
 export interface GrSelectEmits<TValue extends GrSelectValue = string> {
@@ -156,7 +167,12 @@ export interface GrSelectEmits<TValue extends GrSelectValue = string> {
   (e: 'change', value: GrSelectModelValue<TValue>): void
   /** Значение снято кнопкой очистки. */
   (e: 'clear'): void
-  /** Панель открылась/закрылась. */
+  /** Панель открылась/закрылась (`v-model:open`). */
+  (e: 'update:open', value: boolean): void
+  /**
+   * Панель открылась/закрылась.
+   * @deprecated Используйте `update:open` (`v-model:open`); алиас будет снят после 1.0.
+   */
   (e: 'visibleChange', visible: boolean): void
   /** Текст поиска как контролируемое значение (`v-model:search`). */
   (e: 'update:search', value: string): void
@@ -201,6 +217,8 @@ const props = withDefaults(
     clearLabel: undefined,
     variant: undefined,
     underline: undefined,
+    open: undefined,
+    name: undefined,
   },
 )
 
@@ -413,7 +431,23 @@ const customValue = computed<string>({
   },
 })
 
-const open = ref(false)
+// Uncontrolled-состояние; в controlled-режиме перекрывается пропом `open`
+// (паттерн `GrPopover`). Имя `open` сохранено: все читатели — шаблон, watch,
+// `useDismissible`/`useFloating` — работают с computed-Ref как раньше.
+const internalOpen = ref(false)
+const isOpenControlled = computed(() => props.open !== undefined)
+const open = computed(() => props.open ?? internalOpen.value)
+
+function setOpen(next: boolean): void {
+  // Сравнение — ДО мутации: в uncontrolled-режиме запись немедленно меняет
+  // `open`, и проверка после неё всегда была бы ложной.
+  if (next === open.value) return
+
+  if (!isOpenControlled.value) internalOpen.value = next
+
+  emit('update:open', next)
+}
+
 const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const listboxEl = ref<HTMLElement | null>(null)
@@ -439,14 +473,14 @@ const { floatingStyle, update: updateFloatingPosition } = useFloating(rootEl, pa
 })
 
 function closeDropdown(): void {
-  open.value = false
+  setOpen(false)
 }
 
 const locked = computed(() => isDisabled.value || isReadonly.value)
 
 function toggleDropdown(): void {
   if (locked.value) return
-  open.value = !open.value
+  setOpen(!open.value)
 }
 
 useDismissible(open, closeDropdown)
@@ -942,7 +976,7 @@ function initActiveIndex(): void {
 
 function openDropdown(): void {
   if (locked.value || open.value) return
-  open.value = true
+  setOpen(true)
 }
 
 let typeaheadBuffer = ''
@@ -1161,6 +1195,7 @@ const themeAttrs = useGrThemeAttrs()
       :id="resolvedId"
       ref="nativeSelectEl"
       data-gr-select-native
+      :name="name"
       :multiple="multiple"
       :disabled="isDisabled"
       :aria-label="ariaLabel"
@@ -1226,6 +1261,16 @@ const themeAttrs = useGrThemeAttrs()
     data-gr-select
     :class="rootClass"
   >
+    <!-- Нативная форма: панельный режим сериализуется hidden-инпутами по keyOf. -->
+    <template v-if="name">
+      <input
+        v-for="value in selectedValues"
+        :key="`hidden-${keyOf(value)}`"
+        type="hidden"
+        :name="name"
+        :value="keyOf(value)"
+      >
+    </template>
     <button
       :id="resolvedId"
       ref="triggerButtonEl"
