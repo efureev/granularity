@@ -469,6 +469,8 @@ onMounted(() => {
 const virtualizer = useVirtualList({
   container: scrollContainer,
   count: () => (props.virtual ? sortedRows.value.length : 0),
+  // Сортировка и замена rows раздают индексы заново — замеры сбрасываются.
+  source: () => sortedRows.value,
   itemSize: () => rowHeightEstimates[resolvedSize.value],
   // Скролл-контейнер живёт в `GrTable` и до монтирования недоступен: окно
   // первого рендера считается от объявленной высоты.

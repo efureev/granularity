@@ -179,7 +179,11 @@ export function useFloating(
       // `floatingEl` монтируется в том же тике, что и `open` переключается
       // (v-show уже в DOM, но teleport/переход могут ещё не отработать) —
       // ждём тик, чтобы `getBoundingClientRect` не читал нулевые размеры.
-      void nextTick(() => start())
+      // Перепроверка `open`: панель могли закрыть, пока `start()` ждал в
+      // очереди, — `stop()` уже отработал, и снимать подписку было бы некому.
+      void nextTick(() => {
+        if (open.value) start()
+      })
     },
     { immediate: true },
   )

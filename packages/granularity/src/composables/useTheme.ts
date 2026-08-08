@@ -1,4 +1,4 @@
-import { computed, getCurrentInstance, inject, ref } from 'vue'
+import { computed, hasInjectionContext, inject, ref } from 'vue'
 import type { App, InjectionKey, Ref } from 'vue'
 
 export type ThemeName = 'light' | 'dark'
@@ -84,6 +84,12 @@ type ThemeState = {
   /** Корень, получающий `data-theme`; не задан — `<html>`. */
   target?: () => HTMLElement | null
   listenersBound: boolean
+  /**
+   * Снимает window-слушатели состояния. Появляется после `bindListeners`;
+   * зовёт `app.onUnmount` у app-scoped состояний — модульный синглтон живёт со
+   * страницей, и снимать его незачем.
+   */
+  teardownListeners?: () => void
   /** Разрешена ли мутация — см. `resolveThemeState`. */
   writable: boolean
 }
@@ -124,18 +130,34 @@ export const GRANULARITY_THEME_STATE: InjectionKey<ThemeState> = Symbol.for('@fe
  * })
  * ```
  */
+// Где-то на странице установлен плагин: фолбэк в синглтон для такого приложения —
+// почти наверняка ошибка вызова, а не осознанный выбор.
+let appScopedThemeProvided = false
+let contextFallbackWarned = false
+
 export const granularityThemePlugin = {
   install(app: App, options: UseThemeOptions = {}) {
-    app.provide(GRANULARITY_THEME_STATE, createThemeState(options))
+    appScopedThemeProvided = true
+    const state = createThemeState(options)
+    app.provide(GRANULARITY_THEME_STATE, state)
+    // Слушатели `storage`/`prefers-color-scheme` держат состояние; без снятия
+    // каждый цикл mount/unmount микрофронтенда копил бы их на window навсегда.
+    app.onUnmount(() => state.teardownListeners?.())
   },
 }
 
 // Ленивый модульный синглтон — канонический фолбэк для простых SPA без плагина.
 let moduleThemeState: ThemeState | null = null
 
+/** Сброс dev-предупреждения о фолбэке. Внутреннее API — нужно тестам. */
+export function resetThemeContextWarning(): void {
+  contextFallbackWarned = false
+}
+
 function resolveThemeState(options: UseThemeOptions): ThemeState {
-  // App-scoped состояние (provide через плагин) доступно только в setup-контексте.
-  if (getCurrentInstance()) {
+  // App-scoped состояние (provide через плагин): setup-контекст ИЛИ
+  // `app.runWithContext(() => useTheme())` — `hasInjectionContext` покрывает оба.
+  if (hasInjectionContext()) {
     const provided = inject(GRANULARITY_THEME_STATE, null)
     if (provided) return provided
   }
@@ -145,6 +167,20 @@ function resolveThemeState(options: UseThemeOptions): ThemeState {
   // ронять на нём весь рендер нельзя: отдаём состояние на один вызов и запрещаем
   // мутацию — течёт именно она.
   if (IS_SERVER) return createThemeState(options, false)
+
+  // Дедуп и текст — инлайном под dev-гардом: бандлер потребителя сворачивает
+  // условие в `false` и выкидывает сообщение из продакшн-сборки.
+  if (
+    appScopedThemeProvided && !contextFallbackWarned
+    && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
+  ) {
+    contextFallbackWarned = true
+    console.warn(
+      '[granularity] useTheme() вызван вне setup/inject-контекста: app-scoped состояние '
+      + 'granularityThemePlugin недоступно, использован модульный синглтон. '
+      + 'Оберните вызов: app.runWithContext(() => useTheme()).',
+    )
+  }
 
   if (!moduleThemeState)
     moduleThemeState = createThemeState(options)
@@ -161,23 +197,32 @@ function bindListeners(state: ThemeState) {
   state.listenersBound = true
 
   // Cross-tab: другая вкладка записала тему в localStorage.
-  window.addEventListener?.('storage', (event: StorageEvent) => {
+  const onStorage = (event: StorageEvent): void => {
     if (!state.persist || event.key !== state.storageKey) return
     if (event.newValue === 'light' || event.newValue === 'dark') {
       state.theme.value = event.newValue
       applyTheme(event.newValue, state.target)
     }
-  })
+  }
+  window.addEventListener?.('storage', onStorage)
 
   // Системная смена `prefers-color-scheme` — следуем ей только если пользователь
   // НЕ выбрал тему явно (в storage ничего не сохранено).
   const mql = window.matchMedia?.('(prefers-color-scheme: dark)')
-  mql?.addEventListener?.('change', (event: MediaQueryListEvent) => {
+  const onSchemeChange = (event: MediaQueryListEvent): void => {
     if (readStoredTheme(state.storageKey, state.persist) !== null) return
     const next: ThemeName = event.matches ? 'dark' : 'light'
     state.theme.value = next
     applyTheme(next, state.target)
-  })
+  }
+  mql?.addEventListener?.('change', onSchemeChange)
+
+  state.teardownListeners = () => {
+    window.removeEventListener?.('storage', onStorage)
+    mql?.removeEventListener?.('change', onSchemeChange)
+    state.listenersBound = false
+    state.teardownListeners = undefined
+  }
 }
 
 /**

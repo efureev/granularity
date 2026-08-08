@@ -68,6 +68,16 @@ export interface UseVirtualListOptions {
    */
   viewportSize?: () => number | undefined
   /**
+   * Идентити-токен данных списка — обычно сам массив. Смена идентичности
+   * сбрасывает все замеры (`invalidate()`): они привязаны к индексам, и после
+   * сортировки или замены массива хранили бы высоты чужих строк.
+   *
+   * Правило потребителя: **мутация массива на месте сохраняет замеры, замена
+   * массива сбрасывает**. Append в тот же реактивный массив (инфинити-скролл)
+   * идентичность не меняет — префикс замеров остаётся валидным.
+   */
+  source?: () => unknown
+  /**
    * Зазор между элементами в пикселях (`gap` у flex/grid-контейнера).
    *
    * Замер элемента его не видит — `getBoundingClientRect` меряет коробку, а не
@@ -100,6 +110,13 @@ export interface UseVirtualListReturn {
   measure: (index: number, el: Element | null) => void
   /** Прокрутка к элементу. Без выравнивания — минимальным движением. */
   scrollToIndex: (index: number, align?: GrVirtualAlign) => void
+  /**
+   * Сбрасывает замеры с индекса `from` (по умолчанию — все) к оценкам.
+   * Видимые строки перемеряются первым же рендером; для смены данных обычно
+   * достаточно опции `source` — ручной вызов нужен, когда высоты строк
+   * изменились без замены массива (смена плотности, ресайз колонок).
+   */
+  invalidate: (from?: number) => void
 }
 
 const DEFAULT_OVERSCAN = 4
@@ -365,6 +382,19 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     recompute()
   })
 
+  function invalidate(from = 0): void {
+    for (const index of [...measured.keys()]) {
+      if (index >= from) measured.delete(index)
+    }
+    invalidateFrom(from)
+    recompute()
+  }
+
+  if (options.source) {
+    // Идентичность данных сменилась — замеры принадлежат прошлому набору.
+    watch(options.source, () => invalidate())
+  }
+
   function truncate(count: number): void {
     builtTo = count
     offsets = offsets.slice(0, count + 1)
@@ -379,5 +409,5 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     viewportObserver?.disconnect()
   })
 
-  return { range, totalSize: total, offset, offsetEnd, spacerStyle, measure, scrollToIndex }
+  return { range, totalSize: total, offset, offsetEnd, spacerStyle, measure, scrollToIndex, invalidate }
 }

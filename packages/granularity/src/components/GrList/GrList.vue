@@ -96,6 +96,8 @@ const virtualEnabled = computed(() => props.virtual && dataMode.value && props.m
 const virtualizer = useVirtualList({
   container: listEl,
   count: () => (virtualEnabled.value && showItems.value ? props.items!.length : 0),
+  // Замена массива сбрасывает замеры; append в тот же массив их сохраняет.
+  source: () => props.items,
   itemSize: () => props.estimatedItemSize,
   // Первый рендер обязан совпасть с серверным: контейнера ещё нет, и окно
   // считается от объявленной высоты, а не от измеренной.

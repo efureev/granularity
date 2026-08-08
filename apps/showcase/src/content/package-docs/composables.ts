@@ -150,6 +150,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
       'Composable пишет тему в `dataset.theme` корня (`<html>` либо `target`), поэтому app-shell стили должны опираться на этот маркер.',
       'Несколько приложений с независимыми темами обязаны передать каждому свой `target` через `granularityThemePlugin`: без него атрибут пишется в один `<html>` и побеждает последний.',
       'В SSR `setTheme`/`toggleTheme` требуют `app.use(granularityThemePlugin)`: без него состояние модульное, то есть общее на все запросы. Чтение `theme`/`isDark` на сервере работает и без плагина.',
+      'Вне setup-контекста при установленном плагине оборачивайте вызов в `app.runWithContext(() => useTheme())` — иначе вызов уйдёт в модульный синглтон мимо app-scoped состояния.',
     ],
     integrationNotes: [
       'Используйте как app-shell primitive для theme switcher, settings page и embedded preview flows.',
@@ -214,6 +215,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
     caveats: [
       '`useToast` использует общий reactive store, поэтому изменения видны всем consumers внутри приложения.',
       'Без host-компонента уведомления будут попадать в очередь, но пользователь их не увидит.',
+      'Вне setup-контекста (router guard, интерцептор) при установленном `granularityToastPlugin` оборачивайте вызов в `app.runWithContext(() => useToast())` — иначе тост уйдёт в модульный синглтон мимо app-scoped состояния (dev-сборка предупредит).',
     ],
     integrationNotes: [
       'Подходит для app-shell notifications, optimistic actions и feature-level feedback сообщений.',

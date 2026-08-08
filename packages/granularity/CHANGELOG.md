@@ -49,6 +49,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   getter (`() => HTMLElement | null`, the root is not mounted yet at `app.use(...)` time) naming the element that
   receives `data-theme`; the theme selector is attribute-based, so it works from any container. Cross-tab sync and the
   `prefers-color-scheme` listener follow the same root. Default is unchanged: `<html>`.
+- **`useVirtualList` gains `invalidate(from?)` and a `source` option.** Measurements are keyed by index, so sorting,
+  filtering or replacing the data array would leave them describing other rows' heights — and there was no way to
+  reset them at all. `source` names the data identity (usually the array itself): a new identity drops all
+  measurements, while mutating the same reactive array in place — the infinite-scroll append — keeps the still-valid
+  prefix. All six virtualized components pass their `source` themselves; `invalidate()` stays for heights that change
+  without the array being replaced (density switch, column resize). Docs: `docs/virtual-list.md`.
 - **New `useVirtualList` — one virtualization primitive for the whole package.** Keeps only a window around the
   viewport in the DOM: the composable computes the geometry and returns what to render plus how much is cut above and
   below, while the consumer builds the markup — it renders nothing and knows neither the roles nor the keyboard of your
@@ -434,6 +440,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Theme listeners outlived their application.** The app-scoped theme state subscribed to `storage` and
+  `prefers-color-scheme` with anonymous closures and nothing ever removed them: every mount/unmount cycle of a
+  micro-frontend left another pair of listeners on `window`, each holding its dead `ThemeState` alive.
+  `granularityThemePlugin` now tears them down in `app.onUnmount()`; the module singleton keeps its listeners — it
+  lives as long as the page does.
+- **`useToast()`/`useTheme()` outside setup silently bypassed the app plugin.** A call from a router guard or an axios
+  interceptor fell back to the module singleton even when the application had installed the plugin — the toast landed
+  in a state no `GrToaster` reads and vanished without a trace. Two changes: the resolvers now use
+  `hasInjectionContext()`, so `app.runWithContext(() => useToast())` reaches the app-scoped state; and when the
+  fallback still happens while a plugin is installed, a one-time dev warning names the fix instead of staying silent.
+- **`useFloating` kept its `autoUpdate` subscription on a panel closed before the deferred start.** Opening schedules
+  `start()` on the next tick; closing within that window ran `stop()` first — with nothing to stop — and the queued
+  `start()` then subscribed ResizeObserver/scroll listeners to a closed panel until the next open or unmount. The
+  deferred callback now re-checks `open` before starting.
+- **`toast.promise()` stages inherited leftovers from the loading stage.** `update()` is a patch — fields it does not
+  mention stay — so a success message shorter than the loading one kept the loading `message` and its action buttons
+  forever. A promise stage now *replaces* the toast content: what success/error does not set is cleared. The public
+  `update()` keeps its patch semantics — that is its contract.
 - **Keys pressed during IME composition were treated as commands.** Nothing in the package checked
   `event.isComposing`: the Esc that cancels a Japanese/Chinese/Korean composition closed the overlay on top of it, and
   the Enter that commits a composition selected an option in `GrSelect`/`GrAutocomplete`, added a tag in `GrInputTag`

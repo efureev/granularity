@@ -280,3 +280,71 @@ describe('useVirtualList', () => {
     }
   })
 })
+
+describe('useVirtualList — сброс замеров', () => {
+  it('invalidate() возвращает геометрию к оценкам', async () => {
+    const container = ref<HTMLElement | null>(createScroller(100))
+    const list = setup({ container, count: () => 10, itemSize: 20, overscan: 0 })
+    await nextTick()
+
+    list.measure(0, createRow(50))
+    expect(list.totalSize.value).toBe(50 + 9 * 20)
+
+    list.invalidate()
+    expect(list.totalSize.value).toBe(200)
+  })
+
+  it('invalidate(from) чистит только хвост замеров', async () => {
+    const container = ref<HTMLElement | null>(createScroller(100))
+    const list = setup({ container, count: () => 10, itemSize: 20, overscan: 0 })
+    await nextTick()
+
+    list.measure(0, createRow(50))
+    list.measure(5, createRow(60))
+    expect(list.totalSize.value).toBe(50 + 60 + 8 * 20)
+
+    list.invalidate(3)
+    expect(list.totalSize.value).toBe(50 + 9 * 20)
+  })
+
+  it('новая идентичность `source` при том же count сбрасывает замеры', async () => {
+    const items = ref(Array.from({ length: 10 }, (_, i) => i))
+    const container = ref<HTMLElement | null>(createScroller(100))
+    const list = setup({
+      container,
+      count: () => items.value.length,
+      itemSize: 20,
+      source: () => items.value,
+    })
+    await nextTick()
+
+    list.measure(0, createRow(50))
+    expect(list.totalSize.value).toBe(50 + 9 * 20)
+
+    // Сортировка/замена данных: тот же размер, другая идентичность массива.
+    items.value = [...items.value].reverse()
+    await nextTick()
+
+    expect(list.totalSize.value).toBe(200)
+  })
+
+  it('мутация массива на месте замеры сохраняет', async () => {
+    const items = ref(Array.from({ length: 10 }, (_, i) => i))
+    const container = ref<HTMLElement | null>(createScroller(100))
+    const list = setup({
+      container,
+      count: () => items.value.length,
+      itemSize: 20,
+      source: () => items.value,
+    })
+    await nextTick()
+
+    list.measure(0, createRow(50))
+
+    // Инфинити-скролл: append в тот же массив — префикс замеров валиден.
+    items.value.push(10)
+    await nextTick()
+
+    expect(list.totalSize.value).toBe(50 + 10 * 20)
+  })
+})

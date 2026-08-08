@@ -345,6 +345,8 @@ const virtualCount = computed(() => filteredOptions.value.length + addOffset.val
 const virtualizer = useVirtualList({
   container: listboxEl,
   count: () => (props.virtual ? virtualCount.value : 0),
+  // Фильтрация/remote-ответ пересобирают набор — замеры прошлого невалидны.
+  source: () => filteredOptions.value,
   itemSize: OPTION_SIZE_ESTIMATE,
   // Панель скрыта `v-show`, пока закрыта, поэтому `clientHeight` контейнера —
   // ноль. Окно считается от объявленной высоты до первого настоящего замера.

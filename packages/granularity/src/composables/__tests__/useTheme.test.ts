@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { createApp, defineComponent } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { granularityThemePlugin, initThemeEarly, useTheme, type UseThemeOptions } from '../useTheme'
@@ -200,6 +200,24 @@ describe('useTheme — состояние приложения', () => {
     rootB.remove()
   })
 
+  it('unmount приложения снимает window-слушатели app-scoped состояния', () => {
+    const root = document.createElement('div')
+    document.body.append(root)
+
+    const { wrapper, api } = mountWithTheme([granularityThemePlugin, { storageKey: 'dead-theme', target: () => root }])
+    expect(api.theme.value).toBe('light')
+
+    wrapper.unmount()
+
+    // Слушатель мёртвого приложения не должен ни менять состояние, ни трогать DOM.
+    window.dispatchEvent(new StorageEvent('storage', { key: 'dead-theme', newValue: 'dark' }))
+
+    expect(api.theme.value).toBe('light')
+    expect(root.dataset.theme).toBeUndefined()
+
+    root.remove()
+  })
+
   it('storage-событие другой вкладки применяет тему к `target`', () => {
     const root = document.createElement('div')
     document.body.append(root)
@@ -213,6 +231,23 @@ describe('useTheme — состояние приложения', () => {
     expect(document.documentElement.dataset.theme).toBeUndefined()
 
     wrapper.unmount()
+    root.remove()
+  })
+
+  it('app.runWithContext достаёт app-scoped тему', () => {
+    const root = document.createElement('div')
+    document.body.append(root)
+
+    const app = createApp({ render: () => null })
+    app.use(granularityThemePlugin, { persist: false, target: () => root })
+    app.mount(document.createElement('div'))
+
+    app.runWithContext(() => useTheme()).setTheme('dark')
+
+    expect(root.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBeUndefined()
+
+    app.unmount()
     root.remove()
   })
 

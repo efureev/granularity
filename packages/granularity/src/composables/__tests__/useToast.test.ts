@@ -1,6 +1,7 @@
+import { createApp, defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useToast } from '../useToast'
+import { granularityToastPlugin, resetToastContextWarning, useToast } from '../useToast'
 
 describe('useToast', () => {
   it('push добавляет toast, а dismiss удаляет его', () => {
@@ -114,6 +115,48 @@ describe('useToast — promise', () => {
     clear()
   })
 
+  it('стадия заменяет предыдущую целиком: message и action загрузки не наследуются', async () => {
+    const { list, promise, clear } = useToast()
+    clear()
+
+    const result = promise(Promise.resolve('ok'), {
+      loading: { title: 'Сохраняем', message: 'Не закрывайте вкладку', action: { label: 'Отмена', onClick: () => {} } },
+      success: 'Сохранено',
+      error: 'Не вышло',
+    })
+
+    expect(list.value[0]).toMatchObject({ message: 'Не закрывайте вкладку' })
+
+    await result
+
+    // Успех без message/action: от loading-стадии не должно остаться ничего.
+    expect(list.value[0]?.title).toBe('Сохранено')
+    expect(list.value[0]?.message).toBeUndefined()
+    expect(list.value[0]?.action).toBeUndefined()
+
+    clear()
+  })
+
+  it('стадия с собственными message и tone применяет их', async () => {
+    const { list, promise, clear } = useToast()
+    clear()
+
+    const failure = new Error('offline')
+    await expect(promise(Promise.reject(failure), {
+      loading: { title: 'Отправляем', message: 'ждём сеть' },
+      success: 'Отправлено',
+      error: () => ({ title: 'Не отправлено', message: 'Проверьте соединение', tone: 'warning' }),
+    })).rejects.toThrow('offline')
+
+    expect(list.value[0]).toMatchObject({
+      title: 'Не отправлено',
+      message: 'Проверьте соединение',
+      tone: 'warning',
+    })
+
+    clear()
+  })
+
   it('закрытый вручную тост промис не воскрешает', async () => {
     const { list, promise, dismiss, clear } = useToast()
     clear()
@@ -123,6 +166,49 @@ describe('useToast — promise', () => {
 
     await result
     expect(list.value).toHaveLength(0)
+  })
+})
+
+describe('useToast — вне setup-контекста', () => {
+  it('app.runWithContext достаёт app-scoped состояние плагина', () => {
+    let inSetup: ReturnType<typeof useToast> | null = null
+    const app = createApp(defineComponent({
+      setup() {
+        inSetup = useToast()
+        return () => null
+      },
+    }))
+    app.use(granularityToastPlugin)
+    app.mount(document.createElement('div'))
+
+    // Router guard / интерцептор: setup-контекста нет, но контекст приложения есть.
+    const fromGuard = app.runWithContext(() => useToast())
+    fromGuard.push({ title: 'guard-toast', timeoutMs: 0 })
+
+    expect(inSetup!.list.value.map(toast => toast.title)).toContain('guard-toast')
+
+    // Модульный синглтон не тронут: тост ушёл в состояние приложения.
+    expect(useToast().list.value.some(toast => toast.title === 'guard-toast')).toBe(false)
+
+    app.unmount()
+  })
+
+  it('фолбэк в синглтон при установленном плагине предупреждает, и только один раз', () => {
+    resetToastContextWarning()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const app = createApp({ render: () => null })
+    app.use(granularityToastPlugin)
+
+    useToast().clear()
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0][0]).toContain('runWithContext')
+
+    useToast().clear()
+    expect(warn).toHaveBeenCalledTimes(1)
+
+    warn.mockRestore()
+    app.unmount()
   })
 })
 

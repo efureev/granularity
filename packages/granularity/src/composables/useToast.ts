@@ -1,4 +1,4 @@
-import { computed, getCurrentInstance, inject, reactive } from 'vue'
+import { computed, hasInjectionContext, inject, reactive } from 'vue'
 import type { App, InjectionKey } from 'vue'
 
 import type { GrButtonSize, GrButtonVariant } from '../components/GrButton/grButtonStyles'
@@ -114,8 +114,14 @@ export const GRANULARITY_TOAST_STATE: InjectionKey<ToastState> = Symbol.for('@fe
  * app.use(granularityToastPlugin, { maxToasts: 50 })
  * ```
  */
+// Где-то на странице установлен плагин: фолбэк в синглтон для такого приложения —
+// почти наверняка ошибка вызова, а не осознанный выбор.
+let appScopedToastProvided = false
+let contextFallbackWarned = false
+
 export const granularityToastPlugin = {
   install(app: App, options: GranularityToastPluginOptions = {}) {
+    appScopedToastProvided = true
     app.provide(GRANULARITY_TOAST_STATE, createToastState(options.maxToasts))
   },
 }
@@ -123,9 +129,16 @@ export const granularityToastPlugin = {
 // Ленивый модульный синглтон — канонический фолбэк для простых SPA без плагина.
 let moduleToastState: ToastState | null = null
 
+/** Сброс dev-предупреждения о фолбэке. Внутреннее API — нужно тестам. */
+export function resetToastContextWarning(): void {
+  contextFallbackWarned = false
+}
+
 function resolveToastState(): ToastState {
-  // App-scoped состояние (provide через плагин) доступно только в setup-контексте.
-  if (getCurrentInstance()) {
+  // App-scoped состояние (provide через плагин): setup-контекст ИЛИ
+  // `app.runWithContext(() => useToast())` — `hasInjectionContext` покрывает оба,
+  // поэтому вызов из router guard / интерцептора достаёт состояние приложения.
+  if (hasInjectionContext()) {
     const provided = inject(GRANULARITY_TOAST_STATE, null)
     if (provided) return provided
   }
@@ -136,6 +149,20 @@ function resolveToastState(): ToastState {
     throw new Error(
       '[granularity] useToast requires `app.use(granularityToastPlugin)` during SSR — '
       + 'the module-singleton fallback is disabled server-side to avoid state leaking between requests.',
+    )
+  }
+
+  // Дедуп и текст — инлайном под dev-гардом: бандлер потребителя сворачивает
+  // условие в `false` и выкидывает сообщение из продакшн-сборки.
+  if (
+    appScopedToastProvided && !contextFallbackWarned
+    && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
+  ) {
+    contextFallbackWarned = true
+    console.warn(
+      '[granularity] useToast() вызван вне setup/inject-контекста: app-scoped состояние '
+      + 'granularityToastPlugin недоступно, использован модульный синглтон — эти тосты не попадут '
+      + 'в GrToaster приложения. Оберните вызов: app.runWithContext(() => useToast()).',
     )
   }
 
@@ -229,23 +256,49 @@ export function useToast() {
     if (patch.action !== undefined) toast.action = patch.action
     if (patch.actions !== undefined) toast.actions = patch.actions
 
-    if (patch.timeoutMs !== undefined) {
-      clearTimer(id)
-      toast.timeoutMs = patch.timeoutMs > 0 ? patch.timeoutMs : 0
-
-      if (toast.timeoutMs > 0) {
-        const timer: ToastTimer = { handle: null, remaining: toast.timeoutMs, startedAt: now() }
-        state.timers.set(id, timer)
-        armTimer(id, timer)
-      }
-    }
+    if (patch.timeoutMs !== undefined)
+      toast.timeoutMs = rearmTimer(id, patch.timeoutMs)
 
     return true
+  }
+
+  /** Перезапускает автозакрытие с нового таймаута; `0` и меньше — «навсегда». */
+  function rearmTimer(id: string, timeoutMs: number): number {
+    clearTimer(id)
+    const next = timeoutMs > 0 ? timeoutMs : 0
+
+    if (next > 0) {
+      const timer: ToastTimer = { handle: null, remaining: next, startedAt: now() }
+      state.timers.set(id, timer)
+      armTimer(id, timer)
+    }
+
+    return next
+  }
+
+  /**
+   * Полная замена стадии для `promise()`. В отличие от `update`, поле без
+   * значения очищается: успех не должен донашивать `message` и action-кнопки
+   * загрузки — патч-семантика оставляла бы их в тосте навсегда.
+   */
+  function applyStage(id: string, stage: ToastInput & { tone: GrToastTone, timeoutMs: number }): void {
+    const toast = state.toasts.find(item => item.id === id)
+    if (!toast) return
+
+    toast.title = stage.title
+    toast.message = stage.message
+    toast.tone = stage.tone
+    toast.action = stage.action
+    toast.actions = stage.actions
+    toast.timeoutMs = rearmTimer(id, stage.timeoutMs)
   }
 
   /**
    * Один тост на весь жизненный цикл промиса: «загружаем» переписывается в
    * успех или ошибку, а не закрывается ради нового — стек не дёргается.
+   *
+   * Каждая стадия **заменяет** предыдущую целиком: поле, не заданное в
+   * success/error, очищается, а не наследуется от loading.
    *
    * Возвращает исходный промис и **не глотает отказ**: тост не заменяет
    * обработку ошибки, вызывающий по-прежнему обязан её обработать.
@@ -255,10 +308,12 @@ export function useToast() {
 
     input.then(
       (value) => {
-        update(id, { tone: 'success', timeoutMs: DEFAULT_TIMEOUT_MS, ...resolveMessage(messages.success, value) })
+        const stage = resolveMessage(messages.success, value)
+        applyStage(id, { ...stage, tone: stage.tone ?? 'success', timeoutMs: stage.timeoutMs ?? DEFAULT_TIMEOUT_MS })
       },
       (reason: unknown) => {
-        update(id, { tone: 'danger', timeoutMs: DEFAULT_TIMEOUT_MS, ...resolveMessage(messages.error, reason) })
+        const stage = resolveMessage(messages.error, reason)
+        applyStage(id, { ...stage, tone: stage.tone ?? 'danger', timeoutMs: stage.timeoutMs ?? DEFAULT_TIMEOUT_MS })
       },
     )
 

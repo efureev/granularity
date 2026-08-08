@@ -694,6 +694,8 @@ const virtualCount = computed(() => panelItems.value.length + addOffset.value)
 const virtualizer = useVirtualList({
   container: listboxEl,
   count: () => (virtualEnabled.value ? virtualCount.value : 0),
+  // Фильтрация пересобирает набор строк — замеры прошлого набора невалидны.
+  source: () => panelItems.value,
   itemSize: (index) => {
     const item = panelItems.value[index - addOffset.value]
     return item?.kind === 'group' ? GROUP_LABEL_SIZE_ESTIMATE : OPTION_SIZE_ESTIMATE

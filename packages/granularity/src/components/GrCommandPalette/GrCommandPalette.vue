@@ -219,6 +219,8 @@ const paletteRows = computed<PaletteRow[]>(() => {
 const virtualizer = useVirtualList({
   container: listEl,
   count: () => (props.virtual ? paletteRows.value.length : 0),
+  // Запрос пересобирает набор строк — замеры прошлого набора невалидны.
+  source: () => paletteRows.value,
   itemSize: index => (paletteRows.value[index]?.kind === 'label' ? GROUP_LABEL_SIZE_ESTIMATE : ITEM_SIZE_ESTIMATE),
   // Список закрытой палитры не смонтирован вовсе: `clientHeight` взять неоткуда.
   // `maxHeight` можно перебить `--gr-command-list-max-height` — тогда точная

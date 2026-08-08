@@ -209,6 +209,8 @@ const virtualMaxHeight = computed(() => {
 const virtualizer = useVirtualList({
   container: treeRootEl,
   count: () => (treeProps.virtual ? visibleRows.value.length : 0),
+  // Раскрытие/фильтр сдвигают индексы строк — замеры прошлого набора невалидны.
+  source: () => visibleRows.value,
   itemSize: () => rowEstimate.value,
   gap: TREE_ROW_GAP,
   // Первый рендер обязан совпасть с серверным: контейнера ещё нет, и окно
