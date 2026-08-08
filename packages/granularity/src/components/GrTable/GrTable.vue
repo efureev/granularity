@@ -54,6 +54,25 @@ export interface GrTableProps {
    */
   stickyHeader?: boolean
   /**
+   * Полное число строк набора, включая строки заголовка (`aria-rowcount`).
+   *
+   * Нужен, когда в DOM не весь набор — например, при виртуализации: диктор
+   * считает строки по разметке и объявил бы «5 из 20» на таблице в десять
+   * тысяч. Строки при этом обязаны нести `aria-rowindex`.
+   */
+  rowCount?: number
+  /**
+   * Фиксированная раскладка (`table-layout: fixed`): ширины колонок берутся из
+   * первой строки, а не из содержимого всех.
+   *
+   * Обязателен, если в DOM не весь набор: иначе ширины считаются по
+   * отрисованному окну и прыгают на каждой прокрутке.
+   *
+   * Класс — arbitrary-значение, а не `table-fixed`: такого правила в
+   * `presetMini` нет, и класс молча не превратился бы в CSS.
+   */
+  fixedLayout?: boolean
+  /**
    * Максимальная высота скролл-контейнера (включает вертикальный скролл).
    * Число трактуется как пиксели. Нужен для работы `stickyHeader`.
    */
@@ -85,6 +104,8 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   hoverable: false,
   stickyHeader: false,
   maxHeight: undefined,
+  rowCount: undefined,
+  fixedLayout: false,
 })
 
 const slots = useSlots()
@@ -116,10 +137,17 @@ const tbodyClass = computed(() => [
 ].filter(Boolean).join(' '))
 
 const scrollStyle = computed(() => {
+  // Неполный набор в DOM (`rowCount`) означает виртуализацию, а с ней обязан
+  // быть выключен браузерный scroll anchoring: он подправляет `scrollTop`,
+  // когда меняется высота содержимого выше видимого узла, — а окно меняет её
+  // на каждом кадре прокрутки, и список уезжает.
+  const anchor = props.rowCount === undefined ? undefined : { overflowAnchor: 'none' as const }
+
   if (props.maxHeight === undefined)
-    return undefined
+    return anchor
+
   const value = typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight
-  return { maxHeight: value, overflowY: 'auto' as const }
+  return { ...anchor, maxHeight: value, overflowY: 'auto' as const }
 })
 
 // Прилипающий заголовок: `<thead>` на `position: sticky`; фон обязателен, иначе
@@ -142,9 +170,10 @@ const theadClass = computed(() => [
   >
     <table
       data-gr-table
-      class="min-w-full" :class="[tableTextClass]"
+      class="min-w-full" :class="[tableTextClass, fixedLayout ? '[table-layout:fixed]' : '']"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"
+      :aria-rowcount="rowCount"
     >
       <caption v-if="hasCaption" class="sr-only">
         <slot name="caption">

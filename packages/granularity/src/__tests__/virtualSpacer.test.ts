@@ -17,6 +17,12 @@ import { describe, expect, it } from 'vitest'
  * потому, что их контейнеры — флексы. Убери кто-нибудь флекс — псевдоэлемент
  * станет строчным, а строчная коробка игнорирует `height`.
  *
+ * **Контрактов два, и это не поблажка.** Списочные компоненты держат распорки
+ * псевдоэлементами контейнера, но в таблице так нельзя физически: `<tbody>`
+ * игнорирует `padding`, а псевдоэлемент внутри группы строк не образует строку
+ * с управляемой высотой. Там распорки — служебные `<tr>`. Гейт требует ровно
+ * один из двух контрактов: компонент, не подходящий ни под один, его роняет.
+ *
  * **Почему правило продублировано, а не лежит в одном файле.** Единственный
  * глобальный стиль пакета — `styles/base.css`, и он необязателен: его шапка
  * прямо разрешает потребителю подключить `tokens.css` с темой и пропустить
@@ -67,35 +73,91 @@ function componentFiles(): { name: string, path: string, source: string }[] {
 
 const consumers = componentFiles().filter(file => file.source.includes('useVirtualList('))
 
+/**
+ * Разметка строк-распорок целиком.
+ *
+ * Границы ищем сканированием, а не регэкспом по `<tr[^>]*`: в атрибутах строки
+ * живёт `v-if="… > 0"`, и класс «любой символ, кроме `>`» обрывается на нём.
+ */
+function spacerRows(source: string): string[] {
+  const rows: string[] = []
+  let at = source.indexOf('data-gr-datatable-spacer')
+
+  while (at >= 0) {
+    const start = source.lastIndexOf('<tr', at)
+    const end = source.indexOf('</tr>', at)
+    if (start >= 0 && end >= 0) rows.push(source.slice(start, end))
+
+    at = source.indexOf('data-gr-datatable-spacer', at + 1)
+  }
+
+  return rows
+}
+
+/** Каким контрактом распорок пользуется компонент. */
+function spacerContract(source: string): 'pseudo' | 'rows' | 'none' {
+  if (source.includes('data-gr-virtual')) return 'pseudo'
+  if (source.includes('data-gr-datatable-spacer')) return 'rows'
+  return 'none'
+}
+
+const pseudoConsumers = consumers.filter(file => spacerContract(file.source) === 'pseudo')
+const rowConsumers = consumers.filter(file => spacerContract(file.source) === 'rows')
+
 describe('контракт распорок виртуального списка', () => {
   it('потребители примитива вообще есть — иначе гейт молчал бы впустую', () => {
     expect(consumers.map(file => file.name).sort()).toEqual([
       'GrAutocomplete/GrAutocomplete.vue',
       'GrCommandPalette/GrCommandPalette.vue',
+      'GrDataTable/GrDataTable.vue',
       'GrSelect/GrSelect.vue',
       'GrTree/GrTree.vue',
     ])
   })
 
   it.each(consumers.map(file => [file.name, file] as const))(
-    '%s несёт канонический блок распорок',
+    '%s объявляет один из двух контрактов распорок',
+    (_name, file) => {
+      expect(spacerContract(file.source)).not.toBe('none')
+    },
+  )
+
+  it.each(pseudoConsumers.map(file => [file.name, file] as const))(
+    '%s (псевдоэлементы) несёт канонический блок',
     (_name, file) => {
       expect(file.source).toContain(CANONICAL_CSS)
     },
   )
 
-  it.each(consumers.map(file => [file.name, file] as const))(
-    '%s помечает контейнер общим атрибутом',
-    (_name, file) => {
-      expect(file.source).toContain('data-gr-virtual')
-    },
-  )
-
-  it.each(consumers.map(file => [file.name, file] as const))(
-    '%s не пишет имена переменных руками: их отдаёт `spacerStyle`',
+  it.each(pseudoConsumers.map(file => [file.name, file] as const))(
+    '%s (псевдоэлементы) не пишет имена переменных руками: их отдаёт `spacerStyle`',
     (_name, file) => {
       expect(file.source).toContain('spacerStyle')
       expect(file.source).not.toMatch(/'--gr-virtual-(?:before|after)'/)
+    },
+  )
+
+  it.each(rowConsumers.map(file => [file.name, file] as const))(
+    '%s (строки-распорки) скрывает их от AT и растягивает на все колонки',
+    (_name, file) => {
+      // Распорка — не строка данных: посчитанная диктором, она сместила бы
+      // нумерацию, а `colspan` меньше числа колонок сломал бы раскладку.
+      const spacers = spacerRows(file.source)
+      expect(spacers).toHaveLength(2)
+
+      for (const spacer of spacers) {
+        expect(spacer).toContain('aria-hidden="true"')
+        expect(spacer).toContain(':colspan="totalColumns"')
+      }
+    },
+  )
+
+  it.each(rowConsumers.map(file => [file.name, file] as const))(
+    '%s (строки-распорки) фиксирует раскладку таблицы',
+    (_name, file) => {
+      // Без этого ширины колонок считались бы по отрисованному окну и прыгали
+      // бы на каждой прокрутке.
+      expect(file.source).toContain('fixedLayout')
     },
   )
 

@@ -1,11 +1,12 @@
 
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
-import { computed, ref, useId } from 'vue'
+import { computed, nextTick, onMounted, ref, useId } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { sortRows, type GrDataTableSortDir } from './grDataTableSort'
 import {
@@ -14,6 +15,7 @@ import {
   headerGaps,
   headerTextSizes,
   placeholderPaddings,
+  rowHeightEstimates,
   selectCheckboxSizes,
   selectColumnWidths,
   sortIconSizes,
@@ -37,6 +39,13 @@ export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, u
   label: string
   sortable?: boolean
   align?: 'left' | 'center' | 'right'
+  /**
+   * Ширина колонки: число — пиксели, строка — как есть (`'40%'`, `'12rem'`).
+   *
+   * Уезжает в заголовочную ячейку: при фиксированной раскладке ширины колонок
+   * задаёт первая строка таблицы, а это и есть `<thead>`.
+   */
+  width?: string | number
 }
 
 export type GrDataTableRowKey<TRow extends Record<string, unknown> = Record<string, unknown>> =
@@ -101,6 +110,16 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   regionLabel?: string
   /** Прилипающий заголовок при вертикальном скролле (нужен `maxHeight`). */
   stickyHeader?: boolean
+  /**
+   * Виртуализация строк: в DOM живёт только окно вокруг вьюпорта. Высоту окна
+   * задаёт `maxHeight`, без него окна прокрутки не существует.
+   *
+   * Включает фиксированную раскладку таблицы: ширина колонки считается по
+   * содержимому всех строк, а в DOM их только окно — без фиксации колонки
+   * прыгали бы на каждой прокрутке. Ширины стоит задать через `width` у
+   * колонок, иначе фиксированная раскладка делит место поровну.
+   */
+  virtual?: boolean
   /** Максимальная высота таблицы (вертикальный скролл). Число — в пикселях. */
   maxHeight?: string | number
 }
@@ -136,6 +155,7 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   regionLabel: undefined,
   stickyHeader: false,
   maxHeight: undefined,
+  virtual: false,
 })
 
 const emit = defineEmits<{
@@ -299,6 +319,17 @@ const spinnerClass = computed(() => spinnerSizes[resolvedSize.value])
 const sortIconSize = computed(() => sortIconSizes[resolvedSize.value])
 const checkboxSize = computed(() => selectCheckboxSizes[resolvedSize.value])
 
+/**
+ * Номер строки и полное их число объявляем только при виртуализации: иначе
+ * диктор считает строки по разметке, а там всего окно. Заголовок — строка
+ * первая, поэтому строки набора начинаются со второй.
+ */
+const ariaRowCount = computed(() => (props.virtual ? sortedRows.value.length + 1 : undefined))
+
+function ariaRowIndex(index: number): number | undefined {
+  return props.virtual ? index + 2 : undefined
+}
+
 const tableProps = computed(() => ({
   size: resolvedSize.value,
   ariaLabel: props.ariaLabel,
@@ -306,6 +337,8 @@ const tableProps = computed(() => ({
   regionLabel: props.regionLabel,
   stickyHeader: props.stickyHeader,
   maxHeight: props.maxHeight,
+  rowCount: ariaRowCount.value,
+  fixedLayout: props.virtual,
 }))
 
 const isEmpty = computed(() => sortedRows.value.length === 0)
@@ -417,18 +450,80 @@ function scrollEl(): HTMLElement | null {
   return root?.matches('[data-gr-table-scroll]') ? root : root?.querySelector('[data-gr-table-scroll]') ?? null
 }
 
+/**
+ * Виртуализация строк.
+ *
+ * Распорки здесь не псевдоэлементы, как у списочных компонентов: `<tbody>`
+ * игнорирует `padding`, а псевдоэлемент внутри группы строк не образует строку
+ * с управляемой высотой. Поэтому срезанное держат две служебные `<tr>` — той же
+ * формы, что строки загрузки и пустоты у `GrTable`.
+ */
+const scrollContainer = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  scrollContainer.value = scrollEl()
+})
+
+const virtualizer = useVirtualList({
+  container: scrollContainer,
+  count: () => (props.virtual ? sortedRows.value.length : 0),
+  itemSize: () => rowHeightEstimates[resolvedSize.value],
+  // Скролл-контейнер живёт в `GrTable` и до монтирования недоступен: окно
+  // первого рендера считается от объявленной высоты.
+  viewportSize: () => (typeof props.maxHeight === 'number' ? props.maxHeight : undefined),
+})
+
+/** Строки к отрисовке вместе с их абсолютной позицией в наборе. */
+const renderedRows = computed(() => {
+  const rows = sortedRows.value
+  if (!props.virtual) return rows.map((row, index) => ({ row, index }))
+
+  const { start, end } = virtualizer.range.value
+  return rows.slice(start, end).map((row, offset) => ({ row, index: start + offset }))
+})
+
+const spacerBefore = computed(() => (props.virtual ? virtualizer.offset.value : 0))
+const spacerAfter = computed(() => (props.virtual ? virtualizer.offsetEnd.value : 0))
+
+/** Ширина колонки: число трактуем как пиксели. */
+function columnWidthStyle(width: string | number | undefined): Record<string, string> | undefined {
+  if (width === undefined) return undefined
+  return { width: typeof width === 'number' ? `${width}px` : width }
+}
+
 function scrollToRow(key: string | number, options?: ScrollIntoViewOptions): boolean {
   // Ключ строки — произвольная строка от потребителя, в селектор её не подставить:
   // сравниваем через `dataset`, а не собираем `[data-row-key="…"]` конкатенацией.
   const target = String(key)
-  const rows = rootEl()?.querySelectorAll<HTMLElement>('[data-gr-datatable-row]') ?? []
-  const row = Array.prototype.find.call(rows, (el: HTMLElement) => el.dataset.rowKey === target) as HTMLElement | undefined
 
+  // Строки вне окна в DOM нет: без прокрутки виртуального списка поиск по
+  // `dataset` вернул бы `undefined`, и метод молча отвечал бы «не нашёл».
+  if (props.virtual) {
+    const index = sortedRows.value.findIndex(row => String(rowKeyValue(row)) === target)
+    if (index < 0) return false
+
+    virtualizer.scrollToIndex(index)
+    void nextTick(() => {
+      // Вызов опциональный: отложенный `scrollIntoView` некому поймать, а в
+      // среде без него (jsdom) это дало бы необработанный отказ промиса.
+      findRowEl(target)?.scrollIntoView?.(options ?? { block: 'nearest' })
+    })
+    return true
+  }
+
+  const row = findRowEl(target)
   if (!row)
     return false
 
   row.scrollIntoView(options ?? { block: 'nearest' })
   return true
+}
+
+function findRowEl(rowKey: string): HTMLElement | undefined {
+  // Ключ строки — произвольная строка от потребителя, в селектор её не
+  // подставить: сравниваем через `dataset`, а не собираем селектор конкатенацией.
+  const rows = rootEl()?.querySelectorAll<HTMLElement>('[data-gr-datatable-row]') ?? []
+  return Array.prototype.find.call(rows, (el: HTMLElement) => el.dataset.rowKey === rowKey) as HTMLElement | undefined
 }
 
 const scrollTo = (options: ScrollToOptions): void => {
@@ -472,7 +567,7 @@ defineExpose({
     </template>
 
     <template #head>
-      <tr data-gr-datatable-header>
+      <tr data-gr-datatable-header :aria-rowindex="virtual ? 1 : undefined">
         <th
           v-if="selectable"
           class="text-left"
@@ -494,6 +589,7 @@ defineExpose({
           :key="col.key"
           class="font-700"
           :class="[headerTextClass, cellClass, cellAlign(col)]"
+          :style="columnWidthStyle(col.width)"
           :aria-sort="ariaSortFor(col)"
           scope="col"
         >
@@ -552,21 +648,38 @@ defineExpose({
         </td>
       </tr>
     </template>
-    <tr
-      v-for="(row, index) in sortedRows"
-      v-else
-      :key="rowKeyValue(row)"
-      class="border-t border-[var(--gr-brd)]"
-      :class="[
-        isRowSelected(row) ? 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]' : '',
-        rowClassName(row, index),
-      ]"
-      data-gr-datatable-row
-      :data-row-key="rowKeyValue(row)"
-      :data-selected="selectable && isRowSelected(row) ? 'true' : undefined"
-      v-bind="rowProps?.(row, index)"
-      @click="onRowClick(row, index, $event)"
-    >
+    <template v-else>
+      <!--
+        Распорки виртуального списка. У таблицы они строки, а не псевдоэлементы:
+        `<tbody>` игнорирует `padding`, а псевдоэлемент внутри группы строк не
+        образует строку с управляемой высотой. Форма та же, что у служебных
+        строк загрузки и пустоты.
+      -->
+      <tr
+        v-if="virtual && spacerBefore > 0"
+        aria-hidden="true"
+        data-gr-datatable-spacer="before"
+        :style="{ pointerEvents: 'none' }"
+      >
+        <td :colspan="totalColumns" :style="{ height: `${spacerBefore}px`, padding: '0', border: '0' }" />
+      </tr>
+
+      <tr
+        v-for="{ row, index } in renderedRows"
+        :key="rowKeyValue(row)"
+        :ref="(el) => virtual && virtualizer.measure(index, el as Element | null)"
+        class="border-t border-[var(--gr-brd)]"
+        :class="[
+          isRowSelected(row) ? 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]' : '',
+          rowClassName(row, index),
+        ]"
+        data-gr-datatable-row
+        :data-row-key="rowKeyValue(row)"
+        :data-selected="selectable && isRowSelected(row) ? 'true' : undefined"
+        :aria-rowindex="ariaRowIndex(index)"
+        v-bind="rowProps?.(row, index)"
+        @click="onRowClick(row, index, $event)"
+      >
       <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]">
         <GrCheckbox
           v-if="isRowSelectable(row)"
@@ -582,11 +695,21 @@ defineExpose({
         :key="col.key"
         :class="[cellClass, cellAlign(col)]"
       >
-        <slot :name="`cell-${col.key}`" :row="row" :index="index">
-          <span>{{ cellValue(row, col.key) }}</span>
-        </slot>
-      </td>
-    </tr>
+          <slot :name="`cell-${col.key}`" :row="row" :index="index">
+            <span>{{ cellValue(row, col.key) }}</span>
+          </slot>
+        </td>
+      </tr>
+
+      <tr
+        v-if="virtual && spacerAfter > 0"
+        aria-hidden="true"
+        data-gr-datatable-spacer="after"
+        :style="{ pointerEvents: 'none' }"
+      >
+        <td :colspan="totalColumns" :style="{ height: `${spacerAfter}px`, padding: '0', border: '0' }" />
+      </tr>
+    </template>
 
     <template v-if="$slots.foot" #foot>
       <slot name="foot" />

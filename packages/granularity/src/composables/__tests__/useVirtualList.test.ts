@@ -233,6 +233,9 @@ describe('useVirtualList', () => {
     // Имена приходят готовыми: потребитель не пишет их руками и не может
     // разойтись с правилом в `<style>` — а разойдись, прокрутки бы не было.
     expect(list.spacerStyle.value).toEqual({
+      // Без этого браузерный якорь прокрутки боролся бы с пересчётом окна и
+      // уводил список тем дальше, чем грубее оценка строки.
+      'overflow-anchor': 'none',
       '--gr-virtual-before': `${list.offset.value}px`,
       '--gr-virtual-after': `${list.offsetEnd.value}px`,
     })

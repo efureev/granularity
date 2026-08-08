@@ -431,4 +431,46 @@ function rowClass(row: Invoice): string | undefined {
   </div>
 </template>`,
   },
+  {
+    id: 'data-table-virtual',
+    title: 'Справочник на 10 000 строк',
+    description: 'С `virtual` в DOM живёт только окно вокруг вьюпорта. Распорки здесь — служебные строки, а не псевдоэлементы: `<tbody>` игнорирует отступы, и произвольную коробку в него не положить.',
+    status: 'ready',
+    previewKey: 'gr-data-table-virtual',
+    code: `<script setup lang="ts">
+import { GrDataTable, type GrDataColumn } from '@feugene/granularity'
+
+type Person = { id: number, name: string, email: string, team: string }
+
+// Ширины заданы намеренно: с виртуализацией раскладка таблицы фиксируется, и
+// без подсказок колонки поделили бы место поровну.
+const columns: GrDataColumn<Person>[] = [
+  { key: 'id', label: '#', width: 80, sortable: true },
+  { key: 'name', label: 'Name', width: '30%', sortable: true },
+  { key: 'email', label: 'Email' },
+  { key: 'team', label: 'Team', width: 140 },
+]
+
+const teams = ['Platform', 'Design', 'Growth', 'Support']
+
+const rows: Person[] = Array.from({ length: 10000 }, (_, index) => ({
+  id: index + 1,
+  name: \`Person \${index + 1}\`,
+  email: \`person\${index + 1}@example.com\`,
+  team: teams[index % teams.length]!,
+}))
+</script>
+
+<template>
+  <GrDataTable
+    :rows="rows"
+    :columns="columns"
+    virtual
+    sticky-header
+    :max-height="420"
+    aria-label="People directory"
+  />
+</template>`,
+    note: 'Виртуализация включает фиксированную раскладку: ширина колонки считается по содержимому всех строк, а в DOM их только окно — без фиксации колонки прыгали бы на каждой прокрутке. Полное число строк уходит в `aria-rowcount`, номер строки — в `aria-rowindex`.',
+  },
 ]

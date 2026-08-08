@@ -89,7 +89,7 @@ export interface UseVirtualListReturn {
   /** Отступ снизу: высота срезанного после окна. */
   offsetEnd: ComputedRef<number>
   /**
-   * Стиль контейнера под общий CSS-контракт распорок.
+   * Стиль контейнера: высоты распорок и выключенный scroll anchoring.
    *
    * Имена переменных приезжают готовыми, поэтому написать их руками — и
    * разойтись с правилом в `<style>` — нельзя. Опечатка в имени давала бы
@@ -242,6 +242,12 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   const offsetEnd = computed(() => geometry.value.offsetEnd)
 
   const spacerStyle = computed(() => ({
+    // Браузерный scroll anchoring обязан быть выключен. Он удерживает видимый
+    // узел на месте, подправляя `scrollTop`, когда меняется высота содержимого
+    // выше него, — а окно меняет её на каждом кадре прокрутки. Дальше пересчёт
+    // окна и якорь начинают двигать список навстречу друг другу, и прокрутка
+    // уезжает тем сильнее, чем дальше оценка строки от фактической высоты.
+    'overflow-anchor': 'none',
     '--gr-virtual-before': `${geometry.value.offset}px`,
     '--gr-virtual-after': `${geometry.value.offsetEnd}px`,
   }))

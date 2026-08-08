@@ -99,6 +99,7 @@ const previewRegistry = {
   'gr-data-table-sortable-columns': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableSortableColumnsDemo.vue')),
   'gr-data-table-selection-sticky': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableSelectionStickyDemo.vue')),
   'gr-data-table-sizes': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableSizesDemo.vue')),
+  'gr-data-table-virtual': defineAsyncComponent(() => import('../demos/components/gr-data-table/GrDataTableVirtualDemo.vue')),
   'gr-dialog-basic-flow': defineAsyncComponent(() => import('../demos/components/gr-dialog/GrDialogBasicFlowDemo.vue')),
   'gr-dialog-guarded-backdrop': defineAsyncComponent(() => import('../demos/components/gr-dialog/GrDialogGuardedBackdropDemo.vue')),
   'gr-dialog-section-config': defineAsyncComponent(() => import('../demos/components/gr-dialog/GrDialogSectionConfigDemo.vue')),

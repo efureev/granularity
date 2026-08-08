@@ -11,6 +11,18 @@ export const cellPaddings: Record<GrDataTableSize, string> = {
   lg: 'px-5 py-4',
 }
 
+/**
+ * Оценка высоты строки по размеру: два вертикальных отступа ячейки плюс строка
+ * текста и рамка. Виртуализация уточняет её замером — точное число здесь знать
+ * неоткуда, содержимое ячейки задаёт потребитель.
+ */
+export const rowHeightEstimates: Record<GrDataTableSize, number> = {
+  xs: 33,
+  sm: 41,
+  md: 49,
+  lg: 57,
+}
+
 /** Заглушки loading/empty: по горизонтали как ячейка, по вертикали просторнее. */
 export const placeholderPaddings: Record<GrDataTableSize, string> = {
   xs: 'px-2 py-3',
