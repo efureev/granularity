@@ -69,13 +69,13 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
 })
 
 const emit = defineEmits<{
-  (event: 'nodeClick', data: T, node: GrTreeNode<T>): void
-  (event: 'nodeExpand', data: T, node: GrTreeNode<T>): void
-  (event: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
-  (event: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
-  (event: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
-  (event: 'update:checkedKeys', keys: GrTreeKey[]): void
-  (event: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
+  (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
+  (e: 'nodeExpand', data: T, node: GrTreeNode<T>): void
+  (e: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
+  (e: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
+  (e: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
+  (e: 'update:checkedKeys', keys: GrTreeKey[]): void
+  (e: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
 }>()
 
 defineSlots<{
@@ -488,8 +488,8 @@ function rowStyle(row: GrTreeVisibleRow<T>) {
 }
 
 /**
- * Направляющая уровня-предка. Считается от того же шага отступа, поэтому линия
- * стоит ровно там, где раньше её рисовал `border-left` вложенной обёртки.
+ * Направляющая уровня-предка. Считается от того же шага отступа, что и сам
+ * отступ строки, — иначе линия и содержимое разъедутся на вложенных уровнях.
  */
 function branchGuideStyle(row: GrTreeVisibleRow<T>, index: number) {
   const step = treeProps.indent && treeProps.indent > 0
@@ -856,8 +856,8 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-content-gap: 8px;
     --gr-tree-branch-line-default-color: var(--gr-tree-row-current-bg);
     --gr-tree-branch-line-width: 2px;
-    /* Шаг отступа уровня: тот же зазор, что раньше складывался из отступа
-       вложенной обёртки, её padding и толщины полосы. */
+    /* Шаг отступа уровня: переключатель, отступ вложенного списка и толщина
+       направляющей — линия обязана попадать между ними. */
     --gr-tree-indent-step: calc(24px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width));
     --gr-tree-branch-line-offset: 24px;
     --gr-tree-checkbox-size: 16px;

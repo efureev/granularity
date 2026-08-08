@@ -169,9 +169,9 @@ const files = computed<File[]>(() => {
 const hasFiles = computed(() => files.value.length > 0)
 
 /**
- * Один набор валидаторов на оба пути ввода. Раньше он собирался дословно дважды
- * — в `applyFiles` и в `dropzone`; такая копия разъезжается при первой же
- * правке, и выбор через диалог начинает вести себя иначе, чем перетаскивание.
+ * Один набор валидаторов на оба пути ввода. Собери его отдельно в `applyFiles`
+ * и в `dropzone` — копии разъедутся при первой же правке, и выбор через диалог
+ * начнёт вести себя иначе, чем перетаскивание.
  */
 const effectiveValidators = computed<FileValidator[]>(() => {
   const customValidator: FileValidator | undefined = props.validate

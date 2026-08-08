@@ -282,7 +282,7 @@ function toCssLength(value: GrDropdownWidth): string | undefined {
     return `${value}px`
 
   // Строка без единиц браузер просто отбросит, поэтому трактуем её как пиксели
-  // — и предупреждаем: раньше `width="48"` означало `w-48`, то есть 12rem.
+  // — и предупреждаем: `width="48"` легко прочесть как токен шкалы `w-48`.
   const bare = value.trim()
   if (/^\d+$/.test(bare)) {
     if (process.env.NODE_ENV !== 'production') {

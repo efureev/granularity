@@ -1,6 +1,6 @@
-import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 export const grPromptDialogConfig = defineGranularComponent(import.meta.url, {
-    name: 'GrPromptDialog',
-    dependencies: ['GrButton', 'GrDialog', 'GrFormField', 'GrInput', 'GrResponseErrorBanner', 'GrTextarea'],
+  name: 'GrPromptDialog',
+  dependencies: ['GrButton', 'GrDialog', 'GrFormField', 'GrInput', 'GrResponseErrorBanner', 'GrTextarea'],
 })

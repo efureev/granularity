@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
@@ -17,7 +17,7 @@ import {
   type GrSwitchSize,
 } from './grSwitchStyles'
 
-export type {GrSwitchLabelPosition, GrSwitchSize} from './grSwitchStyles'
+export type { GrSwitchLabelPosition, GrSwitchSize } from './grSwitchStyles'
 
 /**
  * Пропсы публичного GR-примитива «Switch».

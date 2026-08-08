@@ -51,9 +51,9 @@ provide<GrConfigContext>(GR_CONFIG_KEY, {
   componentDefaults: computed(() => props.request.config?.componentDefaults.value ?? EMPTY_DEFAULTS),
 })
 
-// i18n: тот же приём. Адаптер хоста (из `appContext`) остаётся запасным вариантом,
-// если вызов пришёл без захваченного — так установка через `app.use()` продолжает
-// работать как раньше.
+// i18n: тот же приём. Адаптер хоста (из `appContext`) — запасной вариант для
+// вызова без захваченного: без него установка через `app.use()` осталась бы
+// незамеченной.
 const hostI18n = resolveGranularityI18n()
 
 provide(GRANULARITY_I18N_KEY, {

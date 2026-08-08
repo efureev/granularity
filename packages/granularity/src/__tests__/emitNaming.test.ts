@@ -24,21 +24,26 @@ import { describe, expect, it } from 'vitest'
 
 const componentsDir = resolve(process.cwd(), 'src/components')
 
-/** Имя эмита из `defineEmits<{ (e: 'name', …): void }>()`. */
-const EMIT_NAME = /\(\s*e(?:vent)?\s*:\s*'([^']+)'/g
+/** Объявление эмита вместе с именем его параметра: `(e: 'name', …): void`. */
+const EMIT_DECLARATION = /\(\s*(e|event)\s*:\s*'([^']+)'/g
 
-function emitNames(): { path: string, name: string }[] {
+function emitDeclarations(): { path: string, param: string, name: string }[] {
   return readdirSync(componentsDir, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && entry.name.startsWith('Gr'))
     .flatMap(entry => readdirSync(resolve(componentsDir, entry.name))
       .filter(file => file.endsWith('.vue') && !file.includes('.test.'))
       .flatMap((file) => {
         const source = readFileSync(resolve(componentsDir, entry.name, file), 'utf8')
-        return [...source.matchAll(EMIT_NAME)].map(match => ({
+        return [...source.matchAll(EMIT_DECLARATION)].map(match => ({
           path: `${entry.name}/${file}`,
-          name: match[1],
+          param: match[1],
+          name: match[2],
         }))
       }))
+}
+
+function emitNames(): { path: string, name: string }[] {
+  return emitDeclarations()
 }
 
 describe('нейминг эмитов', () => {
@@ -55,6 +60,17 @@ describe('нейминг эмитов', () => {
       .filter(({ name }) => !name.startsWith('update:'))
       .filter(({ name }) => /^[A-Z]/.test(name) || name.includes('_'))
       .map(({ path, name }) => `${path}: '${name}'`)
+
+    expect(offenders, offenders.join('\n')).toEqual([])
+  })
+
+  it('параметр объявления назван `e`, а не `event`', () => {
+    // Имя параметра наружу не видно, но в пакете сосуществовали оба, и читатель
+    // соседнего компонента каждый раз решал, есть ли между ними разница.
+    // Форматирующий линтер такое не ловит: это не форматирование.
+    const offenders = emitDeclarations()
+      .filter(({ param }) => param !== 'e')
+      .map(({ path, param, name }) => `${path}: (${param}: '${name}')`)
 
     expect(offenders, offenders.join('\n')).toEqual([])
   })

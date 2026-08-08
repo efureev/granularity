@@ -7,4 +7,4 @@ export type { GrButtonConfigurableProps } from './defaults'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 export { grButtonClass } from './grButtonStyles'
-export { grButtonClassTokens, grButtonSafelist } from './safelist'
+export { grButtonSafelist } from './safelist'

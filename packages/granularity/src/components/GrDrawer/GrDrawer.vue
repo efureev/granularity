@@ -130,7 +130,7 @@ const side = useGrComponentProp('GrDrawer', 'side', () => props.side, 'right')
 const axis = computed(() => grDrawerAxis(side.value))
 
 // Пустой/пробельный заголовок считается отсутствующим — иначе хедер занимал бы
-// место ради строки-заглушки. Раньше на его месте появлялось слово «Drawer».
+// место ради строки-заглушки.
 const resolvedTitle = computed(() => props.title?.trim() || undefined)
 const hasTitle = computed(() => Boolean(resolvedTitle.value) || Boolean(slots.title))
 const hasCustomHeader = computed(() => Boolean(slots.header))
@@ -153,11 +153,9 @@ const showSrOnlyTitle = computed(() => hasTitle.value && !showVisibleTitle.value
 const labelledBy = computed(() => (hasTitle.value ? titleId : undefined))
 const ariaLabel = computed(() => (labelledBy.value ? undefined : t('gr.drawer.title', 'Drawer')))
 
-// SSR-guard: на сервере `document.body` недоступен — отключаем teleport
-// (в клиенте включаем после маунта). Раньше `<teleport to="body">` без
-// `:disabled` падал при SSR — расхождение с GrModal.
-// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
-// рендер не совпадает с серверным и ломается гидрация (см. композабл).
+// Телепорт включается только ПОСЛЕ монтирования: на сервере `document.body`
+// недоступен, а первый клиентский рендер обязан совпасть с серверным — иначе
+// ломается гидрация (см. композабл).
 const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 // Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то

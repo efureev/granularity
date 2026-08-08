@@ -343,7 +343,7 @@
         "items": [
           {
             "name": "size",
-            "description": "Размер по канонической шкале (`xs|sm|md|lg`) — тогда работает `GrConfigProvider`. Число остаётся как escape-hatch: у аватара исторически был произвольный диаметр, и ломать это ради единообразия смысла нет.",
+            "description": "Размер по канонической шкале (`xs|sm|md|lg`) — тогда работает `GrConfigProvider`. Число — escape-hatch: аватар нужен произвольного диаметра (24px в строке списка, 96px в профиле), и четыре ступени шкалы этого не закрывают.",
             "type": "GrSizeWithPx | undefined",
             "required": false,
             "default": "undefined"
@@ -3099,7 +3099,7 @@
         "items": [
           {
             "name": "modelValue",
-            "description": "Набор файлов — тот, что показан в списке и уйдёт в `retry`. Проп **необязателен**: без него компонент держит набор сам, как и раньше. Передан — набор следует за ним, и потребитель может очистить или подменить список снаружи.",
+            "description": "Набор файлов — тот, что показан в списке и уйдёт в `retry`. Проп **необязателен**: без него компонент держит набор сам. Передан — набор следует за ним, и потребитель может очистить или подменить список снаружи.",
             "type": "File[] | undefined",
             "required": false,
             "default": "undefined"
@@ -9248,43 +9248,43 @@
             "name": "nodeClick",
             "description": "",
             "type": "[T, GrTreeNode<T>]",
-            "signature": "(event: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
+            "signature": "(e: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "nodeExpand",
             "description": "",
             "type": "[T, GrTreeNode<T>]",
-            "signature": "(event: \"nodeExpand\", data: T, node: GrTreeNode<T>): void"
+            "signature": "(e: \"nodeExpand\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "nodeCollapse",
             "description": "",
             "type": "[T, GrTreeNode<T>]",
-            "signature": "(event: \"nodeCollapse\", data: T, node: GrTreeNode<T>): void"
+            "signature": "(e: \"nodeCollapse\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "nodeDrop",
             "description": "",
             "type": "[GrTreeNode<T>, GrTreeNode<T>, GrTreeNodeDropType]",
-            "signature": "(event: \"nodeDrop\", draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void"
+            "signature": "(e: \"nodeDrop\", draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void"
           },
           {
             "name": "nodeContextMenu",
             "description": "",
             "type": "[MouseEvent, T, GrTreeNode<T>]",
-            "signature": "(event: \"nodeContextMenu\", evt: MouseEvent, data: T, node: GrTreeNode<T>): void"
+            "signature": "(e: \"nodeContextMenu\", evt: MouseEvent, data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "update:checkedKeys",
             "description": "",
             "type": "[GrTreeKey[]]",
-            "signature": "(event: \"update:checkedKeys\", keys: GrTreeKey[]): void"
+            "signature": "(e: \"update:checkedKeys\", keys: GrTreeKey[]): void"
           },
           {
             "name": "check",
             "description": "",
             "type": "[T, GrTreeNode<T>, { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }]",
-            "signature": "(event: \"check\", data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }): void"
+            "signature": "(e: \"check\", data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }): void"
           }
         ]
       },

@@ -1,5 +1,5 @@
-import type {LocaleLoaderCollection} from '@feugene/fint-i18n/core'
-import {GRANULARITY_I18N_BLOCK} from "./const";
+import type { LocaleLoaderCollection } from '@feugene/fint-i18n/core'
+import { GRANULARITY_I18N_BLOCK } from "./const";
 
 /**
  * English locale loaders for the playground app.

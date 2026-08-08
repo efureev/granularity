@@ -1,4 +1,4 @@
-import type {App, Component, Directive, Plugin} from 'vue'
+import type { App, Component, Directive, Plugin } from 'vue'
 
 /**
  * Лёгкий контейнер, который может быть зарегистрирован в Vue:

@@ -195,6 +195,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **Seven internal helpers are no longer exported from the package root.** `grButtonClassTokens`,
+  `grModalClassTokens`, `getGrModalPanelClass`, `resolveGrAlertColors`, `applyGrAlertOverrides`, `grAlertCssVars` and
+  `grAlertIconKey` were class maps and colour resolvers that the components use on themselves; none of them had a
+  single call site outside its own component, in this repository or in the docs. The types that only described their
+  signatures — `GrAlertColors`, `GrAlertColorOverrides`, `GrAlertIconKey` — go with them. What stays public is what a
+  consumer actually composes with: `grButtonClass`, `grXSafelist` (required by the UnoCSS preset contract),
+  `GR_ALERT_VARIANTS` and every prop type. `resolveBreadcrumbsLayout` also stays — computing the layout outside the
+  component is an advertised contract.
 - **`maxSizeMbValidator` and `maxFileSizeBytesValidator` are replaced by a single `maxFileSize({ bytes?, mb? })`.** The
   two were one check with two different `code` values (`maxSize` and `maxFileSize`), so an error handler on the
   consumer's side had to branch on which unit the limit happened to be written in. The new validator always reports
@@ -204,6 +212,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Comments no longer narrate their own edit history.** Twenty-six places across the package explained an invariant
+  by telling what the code used to do («раньше каждый оверлей хранил…»); they now state the invariant in the present
+  tense, and the story stays where it belongs — in git. Along the way one comment in `grAlertStyles.ts` turned out to
+  be truncated mid-sentence and to describe a `light` variant that has not existed for a while.
+- **Emit declarations name their parameter `e` everywhere.** Three components used `(event: 'x')` against `(e: 'x')`
+  in the rest; a reader of a neighbouring component had to decide each time whether the difference meant anything.
+  `src/__tests__/emitNaming.test.ts` now holds the name — a formatting linter does not catch this, because it is not
+  formatting.
 - **`GrListItem` renders one structure for every row.** The content block (prefix, title, description, default slot)
   used to be written twice — once inside the interactive branch, once inside the plain one — and the copies could
   drift apart in silence. Now the wrapper always carries `role="listitem"` and the row is always a nested element:

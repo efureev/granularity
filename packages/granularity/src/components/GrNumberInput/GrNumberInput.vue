@@ -425,7 +425,7 @@ function commit(el: HTMLInputElement): void {
 
 function onChange(e: Event): void {
   // Клампинг границ (`min`/`max`) и нормализация — на `change`/`blur`, а не только
-  // в кнопках: раньше ручной ввод «999» при `max=10` оставался невалидным.
+  // в кнопках: иначе ручной ввод «999» при `max=10` останется невалидным.
   commit(e.target as HTMLInputElement)
 }
 

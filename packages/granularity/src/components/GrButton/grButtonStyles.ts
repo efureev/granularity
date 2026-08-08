@@ -68,8 +68,8 @@ export const sizes: Record<GrButtonSize, string> = {
 /**
  * Квадратный режим — через `--gr-button-square-size` с размерным дефолтом в
  * fallback: потребитель задаёт переменную в своём CSS и подгоняет кнопку под
- * свою сетку (приём из `GrSlider`). Раньше размер жил дважды — здесь классами и
- * инлайн-стилем в SFC, который эти классы перекрывал.
+ * свою сетку (приём из `GrSlider`). Размер задаётся только здесь: инлайн-стиль
+ * в SFC перекрыл бы эти классы, и переменная перестала бы что-либо значить.
  */
 export const squareSizes: Record<GrButtonSize, string> = {
   xs: 'h-[var(--gr-button-square-size,1.75rem)] w-[var(--gr-button-square-size,1.75rem)] min-w-[var(--gr-button-square-size,1.75rem)] p-0',

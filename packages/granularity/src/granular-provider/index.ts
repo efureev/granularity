@@ -1,4 +1,4 @@
-import {createGranularityProvider} from './shared'
+import { createGranularityProvider } from './shared'
 
 export * from './shared'
 

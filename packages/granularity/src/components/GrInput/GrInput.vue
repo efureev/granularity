@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { GrComponentSize } from '../shared/sizes'
-import {computed, ref, useId, useSlots} from 'vue'
+import { computed, ref, useId, useSlots } from 'vue'
 
-import {addLen, useAddonMeasurement} from '../../composables/internal/useAddonMeasurement'
-import {useGrComponentProp, useGrComponentSize} from '../GrConfigProvider/context'
-import {useGrFormFieldContext} from '../GrFormField/context'
-import {useGrFormControl} from '../../composables/useGrFormControl'
-import {useGranularityTranslations} from '../../internal/granularityI18n'
-import type {InputHTMLAttributes} from 'vue'
+import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+import type { InputHTMLAttributes } from 'vue'
 
 import { grInputFieldClass, grInputShellClass, paddingX } from './grInputStyles'
 

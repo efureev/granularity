@@ -137,8 +137,8 @@ async function validateField(name: string, trigger?: GrFormTrigger): Promise<boo
   const rules = rulesForTrigger(effectiveRules(name), trigger)
   if (!rules.length) return !errors.value[name]
 
-  // Асинхронное правило (проверка на сервере) раньше не показывало ничего:
-  // поле молчало, пока ответ не приходил.
+  // Признак «идёт проверка» нужен именно асинхронным правилам: без него поле
+  // молчит до ответа сервера, и пользователь не знает, что что-то происходит.
   validatingSet.value = new Set(validatingSet.value).add(name)
   try {
     const message = await runFieldRules(getValue(name), rules, props.model, resolveMessage)

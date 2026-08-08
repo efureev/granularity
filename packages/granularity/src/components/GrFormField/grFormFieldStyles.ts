@@ -4,25 +4,25 @@ export type GrFormFieldSize = GrComponentSize
 
 /** Вертикальный ритм поля: подпись → подсказка → контрол → ошибка. */
 export const fieldGaps: Record<GrFormFieldSize, string> = {
-    xs: 'gap-1',
-    sm: 'gap-1.5',
-    md: 'gap-2',
-    lg: 'gap-2',
+  xs: 'gap-1',
+  sm: 'gap-1.5',
+  md: 'gap-2',
+  lg: 'gap-2',
 }
 
 export const labelTexts: Record<GrFormFieldSize, string> = {
-    xs: 'text-xs',
-    sm: 'text-sm',
-    md: 'text-sm',
-    lg: 'text-base',
+  xs: 'text-xs',
+  sm: 'text-sm',
+  md: 'text-sm',
+  lg: 'text-base',
 }
 
 /** Подсказка набирается на ступень мельче подписи — она вторична. */
 export const hintTexts: Record<GrFormFieldSize, string> = {
-    xs: 'text-xs',
-    sm: 'text-xs',
-    md: 'text-xs',
-    lg: 'text-sm',
+  xs: 'text-xs',
+  sm: 'text-xs',
+  md: 'text-xs',
+  lg: 'text-sm',
 }
 
 export const errorTexts: Record<GrFormFieldSize, string> = labelTexts

@@ -32,8 +32,9 @@ const GR_AVATAR_SIZE_PX = {
 export interface GrAvatarProps {
   /**
    * Размер по канонической шкале (`xs|sm|md|lg`) — тогда работает
-   * `GrConfigProvider`. Число остаётся как escape-hatch: у аватара исторически
-   * был произвольный диаметр, и ломать это ради единообразия смысла нет.
+   * `GrConfigProvider`. Число — escape-hatch: аватар нужен произвольного
+   * диаметра (24px в строке списка, 96px в профиле), и четыре ступени шкалы
+   * этого не закрывают.
    */
   size?: GrSizeWithPx
   src?: string

@@ -5,29 +5,29 @@ export type GrDropdownMenuColumnAlign = GrDropdownMenuItemAlign
 export type GrDropdownMenuColumnsCount = 2 | 3 | 4
 
 export const alignClass: Record<GrDropdownMenuItemAlign, string> = {
-    left: 'justify-start text-left',
-    center: 'justify-center text-center',
-    right: 'justify-end text-right',
+  left: 'justify-start text-left',
+  center: 'justify-center text-center',
+  right: 'justify-end text-right',
 }
 
 export const textAlignClass: Record<GrDropdownMenuHeaderAlign, string> = {
-    left: 'text-left',
-    center: 'text-center',
-    right: 'text-right',
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right',
 }
 
 export const colsClass: Record<GrDropdownMenuColumnsCount, string> = {
-    2: 'grid-cols-2',
-    3: 'grid-cols-3',
-    4: 'grid-cols-4',
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
 }
 
 export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 flex items-center gap-2 text-[length:var(--gr-text-sm)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Насыщенный тон как цвет текста запрещён — для текста есть `-text`-роль.
 export const itemVariantClass: Record<GrDropdownMenuItemVariant, string> = {
-    default: 'text-[var(--gr-fg)]',
-    danger: 'text-[var(--gr-danger-text)]',
+  default: 'text-[var(--gr-fg)]',
+  danger: 'text-[var(--gr-danger-text)]',
 }
 
 export const itemInteractiveClass = 'cursor-pointer hover:bg-[var(--gr-accent)] hover:text-[var(--gr-accent-fg)]'
@@ -53,27 +53,27 @@ export const dividerClass = 'border-t border-[var(--gr-brd)]'
 export const dividerInsetClass = 'mx-2'
 
 export function grDropdownMenuItemClass(options: {
-    align: GrDropdownMenuItemAlign
-    variant: GrDropdownMenuItemVariant
-    disabled: boolean
+  align: GrDropdownMenuItemAlign
+  variant: GrDropdownMenuItemVariant
+  disabled: boolean
 }): string {
-    return [
-        itemBaseClass,
-        alignClass[options.align],
-        options.disabled ? itemDisabledClass : itemVariantClass[options.variant],
-        options.disabled ? '' : itemInteractiveClass,
-    ].filter(Boolean).join(' ')
+  return [
+    itemBaseClass,
+    alignClass[options.align],
+    options.disabled ? itemDisabledClass : itemVariantClass[options.variant],
+    options.disabled ? '' : itemInteractiveClass,
+  ].filter(Boolean).join(' ')
 }
 
 export function grDropdownMenuListClass(options: {
-    dividers: boolean
-    borderTop: boolean
-    borderBottom: boolean
+  dividers: boolean
+  borderTop: boolean
+  borderBottom: boolean
 }): string {
-    return [
-        listBaseClass,
-        options.dividers ? dividersClass : '',
-        options.borderTop ? borderTopClass : '',
-        options.borderBottom ? borderBottomClass : '',
-    ].filter(Boolean).join(' ')
+  return [
+    listBaseClass,
+    options.dividers ? dividersClass : '',
+    options.borderTop ? borderTopClass : '',
+    options.borderBottom ? borderBottomClass : '',
+  ].filter(Boolean).join(' ')
 }

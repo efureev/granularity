@@ -74,8 +74,8 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmen
 const resolvedVariant = useGrComponentProp('GrSegmented', 'variant', () => props.variant, 'pills')
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: GrSegmentedValue): void
-  (event: 'change', value: GrSegmentedValue, option: GrSegmentedOption): void
+  (e: 'update:modelValue', value: GrSegmentedValue): void
+  (e: 'change', value: GrSegmentedValue, option: GrSegmentedOption): void
 }>()
 
 // `useId()` стабилен между сервером и клиентом, в отличие от `instance.uid`.
@@ -313,8 +313,8 @@ function scheduleMeasure(): void {
 }
 
 function emitValue(option: GrSegmentedOption): void {
-  // Один guard на все пути: раньше `readonly` проверяла только клавиатура, и
-  // клик по сегменту менял значение вопреки заявленному контракту.
+  // Один guard на все пути: проверяй `readonly` только клавиатура, и клик по
+  // сегменту менял бы значение вопреки заявленному контракту.
   if (isReadonly.value || isOptionBlocked(option) || option.value === props.modelValue) {
     return
   }

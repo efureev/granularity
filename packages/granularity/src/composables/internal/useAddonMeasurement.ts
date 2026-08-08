@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 
 /**
  * Измерение фактической ширины prefix/suffix add-on'ов через `ResizeObserver`.
- * Общая логика GrInput/GrNumberInput (раньше дублировалась ~60 строк в каждом).
+ * Общая логика GrInput/GrNumberInput.
  *
  * Потребитель вешает возвращённые `prefixEl`/`suffixEl` на DOM-элементы аддонов
  * и передаёт реактивные `hasPrefix`/`hasSuffix` (обычно — наличие слотов).

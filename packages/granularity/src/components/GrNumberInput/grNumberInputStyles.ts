@@ -1,4 +1,4 @@
-import type { GrComponentSize, GrControlState  } from '../shared/sizes'
+import type { GrComponentSize, GrControlState } from '../shared/sizes'
 
 
 export type GrNumberInputState = GrControlState

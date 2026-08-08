@@ -1,4 +1,4 @@
-import {defineGranularComponent} from '@feugene/unocss-preset-granular/contract'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 import { grTextareaSafelist } from './safelist'
 

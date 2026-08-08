@@ -53,7 +53,7 @@ export interface GrAlertProps {
 }
 
 const emit = defineEmits<{
-  (event: 'close'): void
+  (e: 'close'): void
 }>()
 
 // Дефолты tone/variant/closable намеренно `undefined`: «настоящий» дефолт

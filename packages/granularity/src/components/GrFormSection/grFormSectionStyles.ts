@@ -12,7 +12,7 @@ export const formSectionRootClass = 'grid gap-4'
 export const formSectionHeaderClass = 'flex flex-wrap items-start justify-between gap-3'
 
 // `m-0` — у нативного заголовка есть браузерные отступы, и без сброса секция
-// разъезжается по вертикали ровно там, где раньше был `div`.
+// разъезжается по вертикали.
 export const formSectionTitleClass = 'm-0 text-[length:var(--gr-text-sm)] font-700'
 
 export const formSectionDescriptionClass = 'mt-1 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'

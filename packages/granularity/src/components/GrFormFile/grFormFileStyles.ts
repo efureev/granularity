@@ -40,7 +40,7 @@ export const iconOffsets: Record<GrFormFileSize, string> = {
   lg: 'ml-2',
 }
 
-/** Кнопки берут размер из шкалы `GrButton`; на `md` это исторический `sm`. */
+/** Кнопки берут размер из шкалы `GrButton` — на ступень ниже самого поля. */
 export const buttonSizes: Record<GrFormFileSize, GrComponentSize> = {
   xs: 'xs',
   sm: 'xs',
