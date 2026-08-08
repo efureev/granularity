@@ -81,6 +81,13 @@ export function useOverlayLayer(
   function register(): void {
     if (layerId !== null) return
 
+    // Стек — браузерное понятие: Esc, `inert` и возврат фокуса на сервере
+    // бессмысленны. Регистрируйся слой и там — он остался бы в модульном массиве
+    // навсегда, потому что `onUnmounted` при `renderToString` не вызывается, и
+    // каждый серверный рендер открытого оверлея копил бы замыкание со ссылками
+    // на свои компоненты.
+    if (typeof window === 'undefined') return
+
     if (options.restoreFocus !== false && typeof document !== 'undefined')
       previouslyFocused = (document.activeElement as HTMLElement) ?? null
 

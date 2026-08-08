@@ -148,6 +148,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
     caveats: [
       'Composable пишет тему в `document.documentElement.dataset.theme`, поэтому app-shell стили должны опираться на этот маркер.',
       'Несколько независимых вызовов `useTheme` влияют на один и тот же DOM-root; если нужна строгая изоляция, нужен отдельный host/document.',
+      'В SSR `setTheme`/`toggleTheme` требуют `app.use(granularityThemePlugin)`: без него состояние модульное, то есть общее на все запросы. Чтение `theme`/`isDark` на сервере работает и без плагина.',
     ],
     integrationNotes: [
       'Используйте как app-shell primitive для theme switcher, settings page и embedded preview flows.',

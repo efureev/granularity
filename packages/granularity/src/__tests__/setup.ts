@@ -4,11 +4,16 @@
 // нигде не хватает места, — это ломает позиционирование floating-компонентов
 // (GrDropdown/GrSelect/GrTreeSelect/GrTooltip) во всех тестах, где панель открывается.
 // Значения ниже совпадают с дефолтными `window.innerWidth`/`innerHeight` в jsdom (1024×768).
-Object.defineProperty(document.documentElement, 'clientWidth', {
-  configurable: true,
-  get: () => window.innerWidth,
-})
-Object.defineProperty(document.documentElement, 'clientHeight', {
-  configurable: true,
-  get: () => window.innerHeight,
-})
+//
+// Файл общий на все тесты, а часть из них живёт в `environment: 'node'` — там
+// проверяется серверное поведение, и `document` отсутствует по построению.
+if (typeof document !== 'undefined') {
+  Object.defineProperty(document.documentElement, 'clientWidth', {
+    configurable: true,
+    get: () => window.innerWidth,
+  })
+  Object.defineProperty(document.documentElement, 'clientHeight', {
+    configurable: true,
+    get: () => window.innerHeight,
+  })
+}

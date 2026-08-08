@@ -84,7 +84,7 @@ export type { GrAnnounceOptions, GrAnnouncer, GrAnnouncerPoliteness } from './co
 // Виртуализация длинного списка: геометрия окна без своей разметки.
 export { useVirtualList } from './composables/useVirtualList'
 export type { GrVirtualAlign, UseVirtualListOptions, UseVirtualListReturn } from './composables/useVirtualList'
-export { initThemeEarly, useTheme } from './composables/useTheme'
+export { GRANULARITY_THEME_STATE, granularityThemePlugin, initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'
 export type {

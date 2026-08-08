@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
+import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
 import TeleportPage from '../TeleportPage.vue'
 
@@ -30,7 +31,7 @@ interface SsrSnapshot {
 // В jsdom `import.meta.url` не file-scheme, поэтому путь — от cwd приложения.
 const snapshots = JSON.parse(
   readFileSync(resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json'), 'utf8'),
-) as { app: SsrSnapshot, teleport: SsrSnapshot, risky: SsrSnapshot }
+) as { app: SsrSnapshot, teleport: SsrSnapshot, risky: SsrSnapshot, overlayStack: SsrSnapshot }
 
 function captureConsole(): string[] {
   const messages: string[] = []
@@ -192,5 +193,31 @@ describe('гидрация страницы с браузерными API и а�
       .map(element => element.id.replace('gr-collapse-header-', ''))
 
     expect(clientIds).toEqual([...new Set(serverIds)])
+  })
+})
+
+describe('гидрация страницы с двумя открытыми оверлеями', () => {
+  /**
+   * Страница появилась вместе с гардом стека слоёв: на сервере слой теперь не
+   * регистрируется, и надо было убедиться, что клиент от этого не разъезжается.
+   * Расхождения тут нет и не могло быть — `GrModal` рендерится только при
+   * включённом телепорте, то есть после монтирования, — но проверяется это
+   * теперь тестом, а не рассуждением.
+   */
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.overlayStack, { root: OverlayStackPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('после монтирования оба слоя на месте, а нижний — `inert`', async () => {
+    await hydrate(snapshots.overlayStack, { root: OverlayStackPage })
+
+    const overlays = document.querySelectorAll('[data-gr-overlay-root]')
+    expect(overlays).toHaveLength(2)
+
+    // Стек на клиенте продолжает работать: верхний слой гасит нижний.
+    const inert = [...overlays].filter(element => element.hasAttribute('inert'))
+    expect(inert).toHaveLength(1)
   })
 })

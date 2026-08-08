@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { useTheme } from '@feugene/granularity'
+
+import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
 import TeleportPage from '../TeleportPage.vue'
 import { render } from '../entry-server'
@@ -186,5 +189,47 @@ describe('серверный рендер: браузерные API и авто-
     const { html } = await render(RiskyPage)
 
     expect(html).toContain('data-gr-toaster')
+  })
+})
+
+describe('серверный рендер: стек слоёв и тема', () => {
+  /**
+   * Два открытых оверлея на сервере — сценарий, которого стенд не проверял:
+   * до этого здесь были только закрытые.
+   *
+   * Сам стек слоёв на сервере не заводится (`useOverlayLayer.server.test.ts` в
+   * пакете), но по отданному HTML это не видно: `GrModal` рендерится только при
+   * включённом телепорте, то есть после монтирования. Здесь проверяется, что
+   * такая страница вообще рендерится и не тащит содержимое оверлеев на сервер.
+   */
+  it('два открытых оверлея рендерятся, но содержимого на сервер не отдают', async () => {
+    const { html, teleports } = await render(OverlayStackPage)
+
+    expect(html).toContain('data-testid="theme-readout"')
+    expect(html).not.toContain('Нижний слой стека')
+    expect(teleportedContent(teleports)).not.toContain('Верхний слой стека')
+  })
+
+  it('тему можно читать без плагина, а писать — нет', async () => {
+    const { theme, isDark, setTheme, toggleTheme } = useTheme()
+
+    // Чтение на сервере — обычное дело: шаблон смотрит `isDark`.
+    expect(theme.value).toBe('light')
+    expect(isDark.value).toBe(false)
+
+    // А запись течёт между запросами, поэтому без плагина запрещена.
+    expect(() => setTheme('dark')).toThrow(/granularityThemePlugin/)
+    expect(() => toggleTheme()).toThrow(/granularityThemePlugin/)
+  })
+
+  it('тема, выставленная в одном рендере, не видна следующему', async () => {
+    const first = await render(OverlayStackPage)
+    expect(first.html).toContain('Тема тёмная: нет')
+
+    // Плагин ставит `app.ts`, поэтому внутри рендера запись разрешена — и обязана
+    // остаться внутри него.
+    const second = await render(OverlayStackPage)
+    expect(second.html).toContain('Тема тёмная: нет')
+    expect(second.html).toBe(first.html)
   })
 })

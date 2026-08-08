@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `v-model`, because a second copy inside the component would drift from it. `GrDropdown` has no model and changes its
   own state, and its `disabled` is not bypassed — an imperative call must not open what a click and the keyboard
   cannot. The set is held by a gate (`src/__tests__/overlayImperativeApi.test.ts`).
+- **New `granularityThemePlugin` gives each application its own theme state.** `useTheme()` kept its state at module
+  level, which on a server is one state shared by every request. The plugin provides it through `app.provide`, the way
+  `granularityToastPlugin` already does; `GRANULARITY_THEME_STATE` is exported for anyone building on top. A plain SPA
+  needs nothing — the module singleton is still the fallback.
 - **New `useVirtualList` — one virtualization primitive for the whole package.** Keeps only a window around the
   viewport in the DOM: the composable computes the geometry and returns what to render plus how much is cut above and
   below, while the consumer builds the markup — it renders nothing and knows neither the roles nor the keyboard of your
@@ -195,6 +199,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **`setTheme`/`toggleTheme` throw during SSR unless `granularityThemePlugin` is installed.** Reading the theme on the
+  server keeps working without it — `theme` and `isDark` return `light`, which is what a template that merely branches
+  on the theme needs. Only the mutation leaks between requests, so only the mutation is refused, and the error says
+  what to install. Client-side behaviour is unchanged.
 - **Seven internal helpers are no longer exported from the package root.** `grButtonClassTokens`,
   `grModalClassTokens`, `getGrModalPanelClass`, `resolveGrAlertColors`, `applyGrAlertOverrides`, `grAlertCssVars` and
   `grAlertIconKey` were class maps and colour resolvers that the components use on themselves; none of them had a
@@ -391,6 +399,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Two kinds of server state leaked between SSR requests.** The theme lived in a module-level `ref`, so a theme set
+  while rendering one request was visible to the next — one user's choice in another user's response. And an overlay
+  opened during SSR registered a layer in the module-level stack that nothing ever removed: `onUnmounted` does not run
+  under `renderToString`, so every server render of an open modal left behind a closure holding that request's
+  components. The theme is now application-scoped (see the plugin above) and the layer stack is not touched on the
+  server at all — Esc, `inert` and focus restoration are browser concepts, so nothing is lost. The overlay leak was
+  invisible in the rendered HTML, because overlays do not render on the server in the first place; it is now held by a
+  gate that runs in a real Node environment.
 - **`GrCommandPalette` dimmed a disabled command with `opacity`.** It was the last such address in the package:
   transparency dilutes text tokens that were checked against AA and drops the contrast. The command now sits on
   `--gr-disabled-bg` with `--gr-disabled-fg`, and its icon and description follow it — left on `--gr-muted-fg` they

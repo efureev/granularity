@@ -1,6 +1,6 @@
 import { createSSRApp, type Component } from 'vue'
 
-import { granularityToastPlugin } from '@feugene/granularity'
+import { granularityThemePlugin, granularityToastPlugin } from '@feugene/granularity'
 
 import App from './App.vue'
 
@@ -18,6 +18,10 @@ export function createApp(root: Component = App) {
   // сервере — одно mutable-состояние на модуль текло бы между запросами.
   // Без плагина `GrToaster` роняет рендер с внятной ошибкой.
   app.use(granularityToastPlugin)
+
+  // То же и для темы, но мягче: читать её на сервере можно и без плагина, а вот
+  // `setTheme` без него бросает — тема одного запроса уехала бы в ответ другому.
+  app.use(granularityThemePlugin)
 
   return app
 }
