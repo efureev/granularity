@@ -4,6 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { isComposingEvent } from '../../internal/keyboard'
 import GrKbd from '../GrKbd/GrKbd.vue'
 import GrModal from '../GrModal/GrModal.vue'
 
@@ -370,6 +371,10 @@ function onInput(event: Event): void {
 }
 
 function onKeydown(event: KeyboardEvent): void {
+  // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
+  // стрелки ходят по кандидатам.
+  if (isComposingEvent(event)) return
+
   switch (event.key) {
     case 'ArrowDown':
       event.preventDefault()

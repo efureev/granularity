@@ -178,6 +178,44 @@ describe('useTheme — состояние приложения', () => {
     second.wrapper.unmount()
   })
 
+  it('плагин с `target` пишет тему в корень приложения, а не в documentElement', () => {
+    const rootA = document.createElement('div')
+    const rootB = document.createElement('div')
+    document.body.append(rootA, rootB)
+
+    const first = mountWithTheme([granularityThemePlugin, { target: () => rootA, persist: false }])
+    const second = mountWithTheme([granularityThemePlugin, { target: () => rootB, persist: false }])
+
+    first.api.setTheme('dark')
+    second.api.setTheme('light')
+
+    // Ради этого target и существует: темы приложений не перетирают друг друга.
+    expect(rootA.dataset.theme).toBe('dark')
+    expect(rootB.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBeUndefined()
+
+    first.wrapper.unmount()
+    second.wrapper.unmount()
+    rootA.remove()
+    rootB.remove()
+  })
+
+  it('storage-событие другой вкладки применяет тему к `target`', () => {
+    const root = document.createElement('div')
+    document.body.append(root)
+
+    const { wrapper, api } = mountWithTheme([granularityThemePlugin, { storageKey: 'scoped-theme', target: () => root }])
+
+    window.dispatchEvent(new StorageEvent('storage', { key: 'scoped-theme', newValue: 'dark' }))
+
+    expect(api.theme.value).toBe('dark')
+    expect(root.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBeUndefined()
+
+    wrapper.unmount()
+    root.remove()
+  })
+
   it('плагин принимает свои `storageKey` и `persist`', () => {
     const { wrapper, api } = mountWithTheme([granularityThemePlugin, { storageKey: 'admin-theme' }])
 

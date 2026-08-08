@@ -97,7 +97,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
   },
   useTheme: {
     overview: [
-      '`useTheme` хранит текущую тему приложения, переключает CSS-state на `document.documentElement` и умеет работать как с persistence, так и без неё.',
+      '`useTheme` хранит текущую тему приложения, переключает CSS-state на `document.documentElement` (или на свой корень через `target`) и умеет работать как с persistence, так и без неё.',
       '`initThemeEarly` стоит использовать до монтирования Vue, чтобы избежать мигания темы при первом рендере.',
     ],
     examples: createReadyExamples([
@@ -125,6 +125,7 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
         items: [
           { name: 'storageKey', type: 'string', description: 'Ключ в `localStorage`, по умолчанию `gr-theme`.' },
           { name: 'persist', type: 'boolean', description: 'Если `false`, composable не работает с `localStorage` и подходит для SSR/embedded сценариев.' },
+          { name: 'target', type: '() => HTMLElement | null', description: 'Корень, получающий `data-theme`; по умолчанию `<html>`. Геттер — на момент `app.use(...)` корень ещё не смонтирован. Обязателен нескольким приложениям с независимыми темами.' },
         ],
       },
       {
@@ -146,8 +147,8 @@ export const composablePackageDocOverrides: Record<string, PackageDocOverride> =
       'В feature/demo контекстах можно использовать `persist: false`, чтобы не загрязнять глобальный storage продукта.',
     ],
     caveats: [
-      'Composable пишет тему в `document.documentElement.dataset.theme`, поэтому app-shell стили должны опираться на этот маркер.',
-      'Несколько независимых вызовов `useTheme` влияют на один и тот же DOM-root; если нужна строгая изоляция, нужен отдельный host/document.',
+      'Composable пишет тему в `dataset.theme` корня (`<html>` либо `target`), поэтому app-shell стили должны опираться на этот маркер.',
+      'Несколько приложений с независимыми темами обязаны передать каждому свой `target` через `granularityThemePlugin`: без него атрибут пишется в один `<html>` и побеждает последний.',
       'В SSR `setTheme`/`toggleTheme` требуют `app.use(granularityThemePlugin)`: без него состояние модульное, то есть общее на все запросы. Чтение `theme`/`isDark` на сервере работает и без плагина.',
     ],
     integrationNotes: [

@@ -11,6 +11,7 @@ import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
@@ -640,7 +641,9 @@ function addCustom(): void {
 function removeValue(value: TValue): void {
   if (locked.value) return
   if (!props.multiple) return
-  emitValue(selectedValues.value.filter(v => v !== value))
+  // Кнопка чипа держит объект из `options`, модель — свою копию: сравнение
+  // только через ключ, `!==` не удалил бы ничего.
+  emitValue(selectedValues.value.filter(v => !sameValue(v, value)))
 }
 
 const visibleTagOptions = computed(() => {
@@ -854,30 +857,46 @@ if (import.meta.env?.DEV) {
   )
 }
 
-// Навигируемые (видимые, не-disabled) опции панели в порядке рендера вместе с
-// их позицией в `panelItems` — по ней строится `id` для `aria-activedescendant`.
-const navigableItems = computed<{ value: TValue, index: number }[]>(() => {
-  const items: { value: TValue, index: number }[] = []
+/**
+ * Клавиатура ходит и по опциям, и по строке «Add …» (как в `GrAutocomplete`):
+ * иначе при непустом списке Enter не мог бы выбрать подсвеченную опцию, а при
+ * активной опции — закоммитить произвольное значение.
+ */
+type GrSelectNavigableItem<TItemValue extends GrSelectValue> =
+  | { kind: 'add' }
+  | { kind: 'option', value: TItemValue, index: number }
+
+const navigableItems = computed<GrSelectNavigableItem<TValue>[]>(() => {
+  const items: GrSelectNavigableItem<TValue>[] = canAddCustom.value ? [{ kind: 'add' }] : []
 
   panelItems.value.forEach((item, index) => {
     if (item.kind === 'option' && !item.option.disabled)
-      items.push({ value: item.option.value, index })
+      items.push({ kind: 'option', value: item.option.value, index })
   })
 
   return items
 })
 
-const navigableValues = computed<TValue[]>(() => navigableItems.value.map(item => item.value))
-
 function navigableIndexOf(value: TValue): number {
-  return navigableValues.value.findIndex(candidate => sameValue(candidate, value))
+  return navigableItems.value.findIndex(item => item.kind === 'option' && sameValue(item.value, value))
 }
 
 const activeItem = computed(() => (activeIndex.value >= 0 ? navigableItems.value[activeIndex.value] : undefined))
-const activeValue = computed(() => activeItem.value?.value)
-const activeDescendantId = computed(() =>
-  open.value && activeItem.value ? optionDomId(activeItem.value.index) : undefined,
-)
+const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.value : undefined))
+const addOptionDomId = computed(() => `${listboxId}-add`)
+const activeDescendantId = computed(() => {
+  if (!open.value) return undefined
+  const item = activeItem.value
+  if (!item) return undefined
+  return item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
+})
+
+// Пересчёт активного элемента при изменении списка (фильтрация по вводу).
+watch(navigableItems, () => {
+  if (!open.value) return
+  if (activeIndex.value >= navigableItems.value.length) activeIndex.value = navigableItems.value.length - 1
+  if (activeIndex.value < 0 && navigableItems.value.length) activeIndex.value = 0
+})
 
 /**
  * `aria-activedescendant` работает только на элементе, который держит фокус.
@@ -891,7 +910,7 @@ const searchActiveDescendant = computed(() => (showSearchInput.value ? activeDes
 const listboxIdIfRendered = computed(() => (open.value && !props.loading ? listboxId : undefined))
 
 function clampActive(index: number): number {
-  const len = navigableValues.value.length
+  const len = navigableItems.value.length
   if (len === 0) return -1
   return ((index % len) + len) % len
 }
@@ -901,7 +920,7 @@ async function scrollActiveIntoView(): Promise<void> {
   // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
   const active = activeItem.value
   if (virtualEnabled.value && active)
-    virtualizer.scrollToIndex(active.index + addOffset.value)
+    virtualizer.scrollToIndex(active.kind === 'add' ? 0 : active.index + addOffset.value)
 
   await nextTick()
   const id = activeDescendantId.value
@@ -915,8 +934,8 @@ function setActive(index: number): void {
 }
 
 function initActiveIndex(): void {
-  const selectedIdx = navigableValues.value.findIndex(v => isSelected(v))
-  activeIndex.value = selectedIdx >= 0 ? selectedIdx : (navigableValues.value.length ? 0 : -1)
+  const selectedIdx = navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.value))
+  activeIndex.value = selectedIdx >= 0 ? selectedIdx : (navigableItems.value.length ? 0 : -1)
 }
 
 function openDropdown(): void {
@@ -931,14 +950,18 @@ function typeahead(char: string): void {
   if (typeaheadTimer) clearTimeout(typeaheadTimer)
   typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, 600)
 
-  const idx = navigableValues.value.findIndex((v) => {
-    const opt = flatOptions.value.find(o => sameValue(o.value, v))
+  const idx = navigableItems.value.findIndex((item) => {
+    if (item.kind !== 'option') return false
+    const opt = flatOptions.value.find(o => sameValue(o.value, item.value))
     return opt?.label.toLowerCase().startsWith(typeaheadBuffer)
   })
   if (idx >= 0) setActive(idx)
 }
 
 function onComboKeydown(event: KeyboardEvent): void {
+  // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
+  // Esc отменяет, стрелки ходят по кандидатам.
+  if (isComposingEvent(event)) return
   if (locked.value) return
 
   if (!open.value) {
@@ -964,15 +987,18 @@ function onComboKeydown(event: KeyboardEvent): void {
       break
     case 'End':
       event.preventDefault()
-      setActive(navigableValues.value.length - 1)
+      setActive(navigableItems.value.length - 1)
       break
-    case 'Enter':
+    case 'Enter': {
       event.preventDefault()
-      if (props.allowCustomValue && canAddCustom.value)
-        addCustom()
-      else if (activeValue.value !== undefined)
-        toggleValue(activeValue.value)
+      // Активный элемент сильнее `canAddCustom`: пользователь подсветил опцию
+      // стрелками — Enter обязан выбрать её, а не добавить набранный запрос.
+      const item = activeItem.value
+      if (item?.kind === 'add') addCustom()
+      else if (item?.kind === 'option') toggleValue(item.value)
+      else if (canAddCustom.value) addCustom()
       break
+    }
     case 'Tab':
       closeDropdown()
       break
@@ -1376,6 +1402,7 @@ const themeAttrs = useGrThemeAttrs()
               -->
               <button
                 v-if="showAddOption"
+                :id="addOptionDomId"
                 data-testid="gr-select-add-option"
                 data-gr-select-add-option
                 type="button"
@@ -1383,9 +1410,10 @@ const themeAttrs = useGrThemeAttrs()
                 aria-selected="false"
                 tabindex="-1"
                 v-bind="addOptionSetProps"
-                :class="grSelectOptionClass({ view, disabled: false, active: false })"
+                :class="grSelectOptionClass({ view, disabled: false, active: activeItem?.kind === 'add' })"
                 @mousedown.prevent
                 @click="addCustom"
+                @mousemove="activeIndex = 0"
               >
                 {{ t('gr.select.addOption', 'Add "{value}"', { value: customValue.trim() }) }}
               </button>

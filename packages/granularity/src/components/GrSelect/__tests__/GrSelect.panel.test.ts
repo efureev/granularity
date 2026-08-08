@@ -168,3 +168,72 @@ describe('GrSelect — панель как listbox', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrSelect — клавиатура при allowCustomValue', () => {
+  function searchInput(): HTMLInputElement {
+    return document.querySelector<HTMLInputElement>('input[data-gr-select-search]')!
+  }
+
+  function pressOnSearch(key: string): void {
+    searchInput().dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+  }
+
+  async function mountWithQuery() {
+    const wrapper = mountPanel({ allowCustomValue: true })
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+    await nextTick()
+
+    searchInput().value = 'v'
+    searchInput().dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+
+    return wrapper
+  }
+
+  it('Enter выбирает подсвеченную стрелками опцию, а не добавляет запрос', async () => {
+    const wrapper = await mountWithQuery()
+
+    // Стрелка вниз уводит с «Add …» на первую отфильтрованную опцию (Vue).
+    pressOnSearch('Home')
+    await nextTick()
+    pressOnSearch('ArrowDown')
+    await nextTick()
+    pressOnSearch('Enter')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('vue')
+    wrapper.unmount()
+  })
+
+  it('строка «Add …» — часть навигации: активна по Home, Enter добавляет значение', async () => {
+    const wrapper = await mountWithQuery()
+
+    pressOnSearch('Home')
+    await nextTick()
+
+    const addOption = document.querySelector<HTMLElement>('[data-gr-select-add-option]')!
+    expect(addOption.id, 'у строки «Add …» есть id для aria-activedescendant').not.toBe('')
+    expect(searchInput().getAttribute('aria-activedescendant')).toBe(addOption.id)
+
+    pressOnSearch('Enter')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('v')
+    wrapper.unmount()
+  })
+})
+
+describe('GrSelect — IME-композиция', () => {
+  it('Enter во время композиции не выбирает опцию', async () => {
+    const wrapper = mountPanel()
+    await wrapper.get('[data-gr-select-trigger]').trigger('click')
+
+    wrapper.get('[data-gr-select-trigger]').element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
+    )
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})

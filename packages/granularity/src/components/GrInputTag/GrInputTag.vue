@@ -12,6 +12,7 @@ import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { isComposingEvent } from '../../internal/keyboard'
 
 import {
   clearButtonClass,
@@ -365,6 +366,9 @@ function onInput(e: Event): void {
 }
 
 function onKeydown(e: KeyboardEvent): void {
+  // Enter/сепаратор во время IME-композиции коммитят её, а не тег.
+  if (isComposingEvent(e))
+    return
   if (!canEdit.value)
     return
 

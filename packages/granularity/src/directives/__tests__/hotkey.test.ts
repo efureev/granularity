@@ -56,6 +56,46 @@ describe('vHotkey', () => {
     expect(handler).not.toHaveBeenCalled()
   })
 
+  it('комбо с модификатором срабатывает на нелатинской раскладке (по code)', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'Ctrl+K': handler })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'л', code: 'KeyK', ctrlKey: true, bubbles: true }))
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
+  it('одиночная клавиша без модификаторов остаётся раскладко-зависимой', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ k: handler })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'л', code: 'KeyK', bubbles: true }))
+    expect(handler).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('хоткей на символ, набираемый через Shift, срабатывает', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ '?': handler })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: '?', shiftKey: true, bubbles: true }))
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
+  it('событие во время IME-композиции игнорируется', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'Escape': handler })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', isComposing: true, bubbles: true }))
+    expect(handler).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
   it('смена scope на лету переносит слушатель', async () => {
     const handler = vi.fn()
     const wrapper = mountWithHotkey({ handlers: { 'Escape': handler }, scope: 'global' })

@@ -144,3 +144,21 @@ describe('GrAutocomplete', () => {
     expect(document.body.querySelector('[data-gr-autocomplete-empty]')).toBeTruthy()
   })
 })
+
+describe('GrAutocomplete — IME-композиция', () => {
+  it('Enter во время композиции не выбирает опцию', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, ariaLabel: 'Framework' },
+    })
+    const input = getInput(wrapper)
+    await input.trigger('focus')
+
+    input.element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
+    )
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})

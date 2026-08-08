@@ -22,14 +22,24 @@ import {
  *    своим же открытым дропдауном и перестало отвечать.
  */
 
-function pressEscape(): KeyboardEvent {
-  const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+function pressEscape(init: KeyboardEventInit = {}): KeyboardEvent {
+  const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true, ...init })
   window.dispatchEvent(event)
   return event
 }
 
 describe('стек слоёв оверлеев', () => {
   afterEach(() => resetOverlayStack())
+
+  it('Esc во время IME-композиции адресован композиции, а не слою', () => {
+    const close = vi.fn()
+    pushOverlayLayer({ modal: true, shouldClose: () => true, close })
+
+    const event = pressEscape({ isComposing: true })
+
+    expect(close).not.toHaveBeenCalled()
+    expect(event.defaultPrevented, 'событие остаётся IME').toBe(false)
+  })
 
   it('Esc адресуется последнему слою любого рода', () => {
     const closeModal = vi.fn()

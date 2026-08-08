@@ -148,6 +148,31 @@ describe('GrSelect — объектные значения', () => {
     wrapper.unmount()
   })
 
+  it('крестик чипа удаляет объектное значение, пришедшее копией', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        // Копии объектов с теми же ключами — ровно тот случай, ради которого
+        // существует `valueKey`: по ссылке они не совпали бы ни с чем.
+        modelValue: [{ id: 1, title: 'Platform' }, { id: 2, title: 'Growth' }],
+        options,
+        valueKey: 'id',
+        multiple: true,
+        tags: true,
+        optionsView: 'panel',
+      },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const removeButtons = wrapper.findAll('[data-gr-select-tag-remove]')
+    expect(removeButtons).toHaveLength(2)
+
+    await removeButtons[0].trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[{ id: 2, title: 'Growth' }]])
+    wrapper.unmount()
+  })
+
   it('без valueKey предупреждает и не склеивает объекты', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 

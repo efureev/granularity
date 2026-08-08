@@ -46,6 +46,15 @@ describe('matchesCommandHotkey', () => {
   it('регистр клавиши не важен', () => {
     expect(matchesCommandHotkey(keydown({ key: 'K', metaKey: true }), modK, true)).toBe(true)
   })
+
+  it('нелатинская раскладка: комбинация матчится по физическому коду', () => {
+    expect(matchesCommandHotkey(keydown({ key: 'л', code: 'KeyK', ctrlKey: true }), modK, false)).toBe(true)
+    expect(matchesCommandHotkey(keydown({ key: 'л', code: 'KeyJ', ctrlKey: true }), modK, false)).toBe(false)
+  })
+
+  it('событие во время IME-композиции не матчится', () => {
+    expect(matchesCommandHotkey(keydown({ key: 'k', metaKey: true, isComposing: true }), modK, true)).toBe(false)
+  })
 })
 
 describe('formatCommandHotkey', () => {

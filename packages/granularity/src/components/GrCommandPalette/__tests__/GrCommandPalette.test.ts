@@ -344,3 +344,17 @@ describe('GrCommandPalette — выбор, подсветка и недавни�
     warn.mockRestore()
   })
 })
+
+describe('GrCommandPalette — IME-композиция', () => {
+  it('Enter во время композиции не запускает команду', async () => {
+    const wrapper = await mountPalette()
+
+    wrapper.get('[data-testid="gr-command-palette-input"]').element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
+    )
+    await nextTick()
+
+    expect(wrapper.emitted('select')).toBeUndefined()
+    wrapper.unmount()
+  })
+})

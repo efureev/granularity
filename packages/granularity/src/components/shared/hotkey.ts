@@ -11,6 +11,8 @@
  * матчер на `window`, с тем же синтаксисом комбинаций плюс токен `mod`.
  */
 
+import { eventMatchesKey, isComposingEvent, shiftSatisfied } from '../../internal/keyboard'
+
 export type ParsedCommandHotkey = {
   key: string
   ctrl: boolean
@@ -58,17 +60,22 @@ export function matchesCommandHotkey(
   hotkey: ParsedCommandHotkey,
   apple = isAppleDevice(),
 ): boolean {
+  // Клавиша во время IME-композиции принадлежит композиции, а не сочетанию.
+  if (isComposingEvent(event)) return false
+
   const expectMeta = hotkey.meta || (hotkey.mod && apple)
   const expectCtrl = hotkey.ctrl || (hotkey.mod && !apple)
 
   if (event.metaKey !== expectMeta) return false
   if (event.ctrlKey !== expectCtrl) return false
   if (event.altKey !== hotkey.alt) return false
-  if (event.shiftKey !== hotkey.shift) return false
+  if (!shiftSatisfied(event, hotkey.key, hotkey.shift)) return false
 
-  return hotkey.key.length === 1
-    ? event.key.toLowerCase() === hotkey.key
-    : event.key === hotkey.key
+  // Комбинация с модификаторами матчится и по физическому коду: на нелатинской
+  // раскладке `mod+K` приходит как `key: 'л'`, и без кода сочетание мертво.
+  return eventMatchesKey(event, hotkey.key, {
+    codeFallback: expectMeta || expectCtrl || hotkey.alt,
+  })
 }
 
 /** Человекочитаемые клавиши для подсказки в поле ввода (`⌘` / `Ctrl`). */

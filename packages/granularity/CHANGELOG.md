@@ -43,6 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   level, which on a server is one state shared by every request. The plugin provides it through `app.provide`, the way
   `granularityToastPlugin` already does; `GRANULARITY_THEME_STATE` is exported for anyone building on top. A plain SPA
   needs nothing — the module singleton is still the fallback.
+- **`granularityThemePlugin` and `useTheme` accept a `target` root.** The plugin isolated the *state* of each
+  application, but `data-theme` was still always written to `<html>` — two applications with independent themes
+  overwrote one attribute and the last writer won, so the promised independence did not actually exist. `target` is a
+  getter (`() => HTMLElement | null`, the root is not mounted yet at `app.use(...)` time) naming the element that
+  receives `data-theme`; the theme selector is attribute-based, so it works from any container. Cross-tab sync and the
+  `prefers-color-scheme` listener follow the same root. Default is unchanged: `<html>`.
 - **New `useVirtualList` — one virtualization primitive for the whole package.** Keeps only a window around the
   viewport in the DOM: the composable computes the geometry and returns what to render plus how much is cut above and
   below, while the consumer builds the markup — it renders nothing and knows neither the roles nor the keyboard of your
@@ -428,6 +434,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Keys pressed during IME composition were treated as commands.** Nothing in the package checked
+  `event.isComposing`: the Esc that cancels a Japanese/Chinese/Korean composition closed the overlay on top of it, and
+  the Enter that commits a composition selected an option in `GrSelect`/`GrAutocomplete`, added a tag in `GrInputTag`
+  and ran a command in `GrCommandPalette`. A composition key now belongs to the composition alone — guarded in the
+  overlay stack, both hotkey matchers and the four input-owning components, via the shared `isComposingEvent()`
+  (`src/internal/keyboard.ts`).
+- **Hotkeys only worked on the Latin layout, and Shift-reached symbols could not be bound at all.** Both matchers —
+  `v-hotkey` and the command-palette one — compared `event.key` only, so on a Cyrillic layout `Ctrl/Cmd+K` arrived as
+  `key: 'л'` and matched nothing; combos with a modifier now also match the physical `event.code` (`KeyK`), while
+  single plain keys deliberately stay layout-dependent — they are typed, not positional. And a hotkey like `'?'` could
+  never fire, because the matcher demanded `shiftKey: false` for a symbol that cannot be typed without Shift; a
+  non-letter symbol equal to `event.key` now satisfies the check.
+- **`GrSelect`: removing a tag chip did nothing for object values.** Every comparison in the component goes through
+  `valueKey`, except the chip's remove button, which filtered the model with `!==` — and the model usually holds
+  copies of the option objects, so nothing ever matched and the «×» was dead. It now uses the same key comparison as
+  the rest of the component.
+- **`GrSelect`: Enter with `allowCustomValue` could not select the highlighted option.** The Enter branch checked
+  `canAddCustom` first, so typing “ap”, arrowing down to “Apple” and pressing Enter committed the raw “ap”. The «Add …»
+  row is now the first element of keyboard navigation — the model `GrAutocomplete` has always used: Enter activates
+  whatever is highlighted, the row got its own id for `aria-activedescendant`, active styling and mouse hover.
+- **`GrSlider` was uncontrollable by touch.** The track had no `touch-action`, so a finger drag started a page scroll,
+  the browser reclaimed the pointer with `pointercancel` — which the slider did not handle — and the gesture died with
+  the drag state stuck. The track now sets `[touch-action:none]` and `pointercancel` cleanly aborts the gesture: the
+  `lazy` draft is discarded without an emit and the thumb returns to the model value.
 - **Two kinds of server state leaked between SSR requests.** The theme lived in a module-level `ref`, so a theme set
   while rendering one request was visible to the next — one user's choice in another user's response. And an overlay
   opened during SSR registered a layer in the module-level stack that nothing ever removed: `onUnmounted` does not run

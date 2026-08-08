@@ -10,6 +10,7 @@ import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
@@ -664,6 +665,9 @@ function onChipKeydown(event: KeyboardEvent, index: number, value: TValue): void
 
 // ————— Клавиатура.
 function onKeydown(event: KeyboardEvent): void {
+  // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
+  // Esc отменяет, стрелки ходят по кандидатам.
+  if (isComposingEvent(event)) return
   if (locked.value) return
 
   // Курсор в начале пустого запроса — стрелка влево уходит к чипам, а не

@@ -400,3 +400,19 @@ describe('GrInputTag — clearable и размер', () => {
     expect(mount(Harness).get('[data-gr-input-tag]').classes()).toContain('min-h-7')
   })
 })
+
+describe('GrInputTag — IME-композиция', () => {
+  it('Enter во время композиции не добавляет тег', async () => {
+    const wrapper = mount(GrInputTag, { props: { modelValue: [], ariaLabel: 'Tags' } })
+    const input = wrapper.get('input')
+    await input.setValue('vue')
+
+    input.element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
+    )
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})

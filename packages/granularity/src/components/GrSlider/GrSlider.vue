@@ -183,9 +183,13 @@ const modelValues = computed<number[]>(() => {
 
 const values = computed<number[]>(() => draftValues.value ?? modelValues.value)
 
+// `[touch-action:none]` обязателен: без него вертикальный свайп по бегунку
+// уходит в скролл страницы, браузер шлёт `pointercancel`, и слайдер пальцем
+// неуправляем. Утилиты `touch-none` нет ни в `presetMini`, ни в extra-rules —
+// поэтому arbitrary-значение.
 const trackClass = computed(() => (isVertical.value
-  ? `${sliderTrackWidthBySize[resolvedSize.value]} ${sliderTrackVerticalLengthClass}`
-  : `w-full ${sliderTrackHeightBySize[resolvedSize.value]}`))
+  ? `[touch-action:none] ${sliderTrackWidthBySize[resolvedSize.value]} ${sliderTrackVerticalLengthClass}`
+  : `[touch-action:none] w-full ${sliderTrackHeightBySize[resolvedSize.value]}`))
 
 /** Смещение вдоль дорожки: по горизонтали слева, по вертикали снизу. */
 function offsetStyle(value: number): Record<string, string> {
@@ -291,6 +295,7 @@ function onTrackPointerDown(event: PointerEvent): void {
 
   window.addEventListener('pointermove', onPointerMove)
   window.addEventListener('pointerup', onPointerUp)
+  window.addEventListener('pointercancel', onPointerCancel)
 }
 
 function onPointerMove(event: PointerEvent): void {
@@ -299,21 +304,34 @@ function onPointerMove(event: PointerEvent): void {
   setThumb(activeThumb.value, valueFromPointer(event), false)
 }
 
-function onPointerUp(): void {
-  if (activeThumb.value !== null) {
+function endDrag(commit: boolean): void {
+  if (activeThumb.value !== null && commit) {
     // Финальный commit значения: у `lazy` он же и единственный `update:modelValue`.
     const next = values.value.slice()
     draftValues.value = null
     emitValue(next, true)
   }
+  // Оборванный жест (`pointercancel`: браузер забрал указатель) значения не
+  // коммитит — черновик просто отбрасывается, бегунок возвращается к модели.
+  draftValues.value = null
   activeThumb.value = null
   window.removeEventListener('pointermove', onPointerMove)
   window.removeEventListener('pointerup', onPointerUp)
+  window.removeEventListener('pointercancel', onPointerCancel)
+}
+
+function onPointerUp(): void {
+  endDrag(true)
+}
+
+function onPointerCancel(): void {
+  endDrag(false)
 }
 
 onBeforeUnmount(() => {
   window.removeEventListener('pointermove', onPointerMove)
   window.removeEventListener('pointerup', onPointerUp)
+  window.removeEventListener('pointercancel', onPointerCancel)
 })
 
 // ————— Клавиатура.

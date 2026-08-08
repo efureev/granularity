@@ -20,6 +20,8 @@
  * монтируются отдельным `render()` в `body`) и знает их корни.
  */
 
+import { isComposingEvent } from '../../internal/keyboard'
+
 export interface OverlayLayer {
   /** Уникальный id зарегистрированного слоя. */
   id: number
@@ -55,6 +57,8 @@ function syncTopmost(): void {
 
 function handleKeydown(event: KeyboardEvent): void {
   if (event.key !== 'Escape') return
+  // Esc во время IME-композиции отменяет её, а не закрывает слой.
+  if (isComposingEvent(event)) return
   if (stack.length === 0) return
 
   const top = stack[stack.length - 1]

@@ -1,5 +1,7 @@
 import type { Directive } from 'vue'
 
+import { eventMatchesKey, isComposingEvent, shiftSatisfied } from '../internal/keyboard'
+
 export type HotkeyHandler = (event: KeyboardEvent) => void
 
 export type HotkeyEntry =
@@ -111,10 +113,16 @@ function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
   return parsed
 }
 
-function matchKey(expected: string, eventKey: string): boolean {
-  if (expected === ' ') return eventKey === ' ' || eventKey === 'Spacebar'
-  if (expected.length === 1) return expected.toLowerCase() === eventKey.toLowerCase()
-  return expected === eventKey
+function matchesHotkey(event: KeyboardEvent, hk: ParsedHotkey): boolean {
+  if (hk.ctrl !== event.ctrlKey) return false
+  if (hk.meta !== event.metaKey) return false
+  if (hk.alt !== event.altKey) return false
+  if (!shiftSatisfied(event, hk.key, hk.shift)) return false
+
+  // По физическому коду матчатся только комбинации с модификаторами: там
+  // клавиша — позиция на клавиатуре, и `Ctrl+K` обязан работать на любой
+  // раскладке. Одиночная клавиша — печатная, её раскладка и определяет.
+  return eventMatchesKey(event, hk.key, { codeFallback: hk.ctrl || hk.meta || hk.alt })
 }
 
 function resolveEntry(entry: HotkeyEntry) {
@@ -163,15 +171,13 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
         const current = states.get(el)
         if (!current?.enabled) return
         if (!el.isConnected) return
+        // Клавиша во время IME-композиции принадлежит композиции, а не хоткею.
+        if (isComposingEvent(event)) return
 
         const editable = isEditableTarget(event.target)
 
         for (const hk of current.hotkeys) {
-          if (hk.ctrl !== event.ctrlKey) continue
-          if (hk.meta !== event.metaKey) continue
-          if (hk.alt !== event.altKey) continue
-          if (hk.shift !== event.shiftKey) continue
-          if (!matchKey(hk.key, event.key)) continue
+          if (!matchesHotkey(event, hk)) continue
 
           const entry = resolveEntry(hk.entry)
 

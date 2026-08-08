@@ -215,6 +215,38 @@ describe('GrSlider — вертикальная ориентация', () => {
   })
 })
 
+describe('GrSlider — жест на таче', () => {
+  it('дорожка запрещает браузерный pan: touch-action у трека', () => {
+    const wrapper = mount(GrSlider, { props: { modelValue: 10 } })
+    // Без этого вертикальный свайп по бегунку уходит в скролл страницы, браузер
+    // шлёт pointercancel — и слайдер пальцем неуправляем.
+    expect(wrapper.get('[data-gr-slider-track]').classes()).toContain('[touch-action:none]')
+  })
+
+  it('pointercancel обрывает жест: lazy-черновик откатывается без эмита', async () => {
+    const wrapper = mount(GrSlider, { props: { modelValue: 10, lazy: true }, attachTo: document.body })
+    stubTrackRect(wrapper, { width: 100 })
+
+    pointerDown(wrapper, { clientX: 60 })
+    await nextTick()
+    expect(wrapper.get('[data-gr-slider-thumb]').attributes('style')).toContain('left: 60%')
+
+    window.dispatchEvent(new Event('pointercancel'))
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect(wrapper.emitted('change')).toBeFalsy()
+    expect(wrapper.get('[data-gr-slider-thumb]').attributes('style')).toContain('left: 10%')
+
+    // Оборванный жест не продолжается движением указателя.
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 90 }))
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+})
+
 describe('GrSlider — lazy', () => {
   it('перетаскивание не отдаёт значение наружу до отпускания', async () => {
     const wrapper = mount(GrSlider, { props: { modelValue: 10, lazy: true }, attachTo: document.body })

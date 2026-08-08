@@ -15,6 +15,17 @@ export type UseThemeOptions = {
    * По умолчанию: `true`.
    */
   persist?: boolean
+
+  /**
+   * Куда писать `data-theme`. По умолчанию — `<html>` (канон одного приложения).
+   *
+   * Геттер, а не элемент: на момент `app.use(...)` корень приложения ещё не
+   * смонтирован. Обязателен нескольким приложениям с независимыми темами:
+   * селектор тем атрибутный (`[data-theme='dark']`), поэтому тема работает от
+   * любого контейнера, а без `target` все приложения писали бы в один `<html>`
+   * и побеждал бы последний.
+   */
+  target?: () => HTMLElement | null
 }
 
 const DEFAULT_STORAGE_KEY = 'gr-theme'
@@ -48,12 +59,13 @@ function getPreferredTheme(storageKey = DEFAULT_STORAGE_KEY, persist = true): Th
   return readStoredTheme(storageKey, persist) ?? getSystemTheme()
 }
 
-function applyTheme(theme: ThemeName) {
+function applyTheme(theme: ThemeName, target?: () => HTMLElement | null) {
   if (typeof document === 'undefined') return
 
-  const root = document.documentElement
-  // Канон GR — атрибут `[data-theme]` на `<html>` (см. docs/styling.md → «Темизация»).
+  // Канон GR — атрибут `[data-theme]`: на `<html>` (см. docs/styling.md →
+  // «Темизация») либо на корне приложения, когда состояние задало `target`.
   // `useTheme`/`initThemeEarly` — единственный рантайм-API переключения темы.
+  const root = target?.() ?? document.documentElement
   root.dataset.theme = theme
 }
 
@@ -69,6 +81,8 @@ type ThemeState = {
   theme: Ref<ThemeName>
   storageKey: string
   persist: boolean
+  /** Корень, получающий `data-theme`; не задан — `<html>`. */
+  target?: () => HTMLElement | null
   listenersBound: boolean
   /** Разрешена ли мутация — см. `resolveThemeState`. */
   writable: boolean
@@ -82,6 +96,7 @@ function createThemeState(options: UseThemeOptions = {}, writable = true): Theme
     theme: ref<ThemeName>(getPreferredTheme(storageKey, persist)),
     storageKey,
     persist,
+    target: options.target,
     listenersBound: false,
     writable,
   }
@@ -96,9 +111,17 @@ export const GRANULARITY_THEME_STATE: InjectionKey<ThemeState> = Symbol.for('@fe
  * сервере — иначе тема одного запроса уедет в ответ следующему, — и (б)
  * нескольких Vue-приложений на одной странице, которым нужны независимые темы.
  *
+ * Для (б) обязателен и `target` — корень, получающий `data-theme`: без него
+ * изолировано только состояние, а атрибут все приложения пишут в один `<html>`,
+ * и побеждает последний.
+ *
  * ```ts
  * app.use(granularityThemePlugin)
- * app.use(granularityThemePlugin, { storageKey: 'admin-theme', persist: false })
+ * app.use(granularityThemePlugin, {
+ *   storageKey: 'admin-theme',
+ *   persist: false,
+ *   target: () => document.getElementById('admin-app'),
+ * })
  * ```
  */
 export const granularityThemePlugin = {
@@ -142,7 +165,7 @@ function bindListeners(state: ThemeState) {
     if (!state.persist || event.key !== state.storageKey) return
     if (event.newValue === 'light' || event.newValue === 'dark') {
       state.theme.value = event.newValue
-      applyTheme(event.newValue)
+      applyTheme(event.newValue, state.target)
     }
   })
 
@@ -153,7 +176,7 @@ function bindListeners(state: ThemeState) {
     if (readStoredTheme(state.storageKey, state.persist) !== null) return
     const next: ThemeName = event.matches ? 'dark' : 'light'
     state.theme.value = next
-    applyTheme(next)
+    applyTheme(next, state.target)
   })
 }
 
@@ -186,6 +209,7 @@ export function useTheme(options: UseThemeOptions = {}) {
   // синглтона: слушателям нужно знать, какой ключ отслеживать.
   if (options.storageKey !== undefined) state.storageKey = options.storageKey
   if (options.persist !== undefined) state.persist = options.persist
+  if (options.target !== undefined) state.target = options.target
 
   bindListeners(state)
 
@@ -202,6 +226,7 @@ export function useTheme(options: UseThemeOptions = {}) {
     }
 
     theme.value = next
+    applyTheme(next, state.target)
 
     if (state.persist && typeof window !== 'undefined') {
       // См. комментарий в `readStoredTheme`: запись тоже может бросать.
@@ -214,8 +239,6 @@ export function useTheme(options: UseThemeOptions = {}) {
         // ignore
       }
     }
-
-    applyTheme(next)
   }
 
   function toggleTheme() {
@@ -223,7 +246,7 @@ export function useTheme(options: UseThemeOptions = {}) {
   }
 
   function initTheme() {
-    applyTheme(theme.value)
+    applyTheme(theme.value, state.target)
   }
 
   return {
