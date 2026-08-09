@@ -307,6 +307,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **One option matcher instead of three copies.** The same case-insensitive substring predicate was written three
+  times — `GrSelect`, `GrAutocomplete` and `GrCommandPalette` — and each copy normalized the query differently: one
+  lowercased it at the call site, another inside the matcher, the third trimmed and lowercased its own way. That kind
+  of drift is invisible until a user notices that search is case-sensitive in one component and not in another.
+  `components/shared/optionFilter.ts` now holds one normalization contract, the default matcher, flat filtering and
+  the values-to-chips lookup (which also stops being quadratic in `GrAutocomplete`). Public API is unchanged: the
+  `filter` prop still receives the raw trimmed query, and the entire existing test suite of all three components
+  passes untouched.
 - **Animations run on `--gr-duration-*` / `--gr-ease-*`.** Both token groups were generated and used exactly zero
   times: the package's motion looked configurable but was not. All 60 `duration-N` utilities and 30 `ease-in`/
   `ease-out` ones now read the tokens. Note the curve actually changes: `presetMini`'s `ease-out` is

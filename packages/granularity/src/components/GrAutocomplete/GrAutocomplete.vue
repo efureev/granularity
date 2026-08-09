@@ -16,6 +16,7 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
+import { filterOptions, resolveSelectedOptions } from '../shared/optionFilter'
 
 import {
   autocompleteChipClass,
@@ -256,7 +257,7 @@ function labelFor(value: GrAutocompleteValue): string {
 
 /** Опции выбранных значений (для chips в multiple). Неизвестные значения показываем как есть. */
 const selectedOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
-  selectedValues.value.map(v => optionsResolved.value.find(o => o.value === v) ?? { value: v, label: String(v) }),
+  resolveSelectedOptions(selectedValues.value, optionsResolved.value),
 )
 
 const singleSelectedLabel = computed(() => (props.multiple || isEmptyValue(modelSingle.value) ? '' : labelFor(modelSingle.value)))
@@ -320,17 +321,9 @@ const searchQuery = computed(() => {
   return query.value.trim()
 })
 
-function defaultFilter(option: GrAutocompleteOption<TValue>, q: string): boolean {
-  const needle = q.toLowerCase()
-  return option.label.toLowerCase().includes(needle) || String(option.value).toLowerCase().includes(needle)
-}
-
-const filteredOptions = computed<GrAutocompleteOption<TValue>[]>(() => {
-  const q = searchQuery.value
-  if (!q) return optionsResolved.value
-  const matcher = props.filter ?? defaultFilter
-  return optionsResolved.value.filter(o => matcher(o, q))
-})
+const filteredOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
+  filterOptions(optionsResolved.value, searchQuery.value, props.filter),
+)
 
 const belowMinQuery = computed(() => props.minQueryLength > 0 && query.value.trim().length < props.minQueryLength)
 

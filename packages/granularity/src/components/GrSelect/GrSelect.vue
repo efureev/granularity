@@ -17,6 +17,7 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
+import { matchesOptionQuery, normalizeOptionQuery, resolveSelectedOptions } from '../shared/optionFilter'
 
 import {
   defaultBaseClass,
@@ -363,10 +364,9 @@ function fromDomValue(raw: string): TValue {
   return raw as TValue
 }
 
-const selectedOptions = computed<GrSelectOption<TValue>[]>(() => {
-  const byValue = new Map(flatOptions.value.map(o => [keyOf(o.value), o]))
-  return selectedValues.value.map(v => byValue.get(keyOf(v)) ?? { value: v, label: keyOf(v) })
-})
+const selectedOptions = computed<GrSelectOption<TValue>[]>(() =>
+  resolveSelectedOptions(selectedValues.value, flatOptions.value, keyOf),
+)
 
 const hasModelInOptions = computed(() => {
   if (props.multiple) return false
@@ -490,11 +490,6 @@ const panelClasses = computed(() => {
   return grSelectPanelClasses
 })
 
-function matchesQuery(option: GrSelectOption<TValue>, query: string): boolean {
-  if (!query) return true
-  return option.label.toLowerCase().includes(query) || String(option.value).toLowerCase().includes(query)
-}
-
 /**
  * Элемент рендера панели: либо заголовок группы, либо опция.
  * Группировка сохраняется, фильтрация по `customValue` скрывает пустые группы.
@@ -505,20 +500,20 @@ type GrSelectPanelItem<TItemValue extends GrSelectValue> =
   | { kind: 'option', option: GrSelectOption<TItemValue>, key: string, groupKey?: string }
 
 const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
-  const q = (props.allowCustomValue || props.filterable) ? customValue.value.trim().toLowerCase() : ''
+  const q = (props.allowCustomValue || props.filterable) ? normalizeOptionQuery(customValue.value) : ''
   const items: GrSelectPanelItem<TValue>[] = []
 
   // Опция для кастомного значения, которого нет в options (single).
   if (props.allowCustomValue && !props.multiple && modelSingle.value !== '' && !hasModelInOptions.value) {
     const custom: GrSelectOption<TValue> = { value: modelSingle.value as TValue, label: String(modelSingle.value) }
-    if (matchesQuery(custom, q)) {
+    if (matchesOptionQuery(custom, q)) {
       items.push({ kind: 'option', option: custom, key: `__custom__${custom.value}` })
     }
   }
 
   optionsResolved.value.forEach((item, index) => {
     if (isOptionGroup(item)) {
-      const matched = item.options.filter((o) => matchesQuery(o, q))
+      const matched = item.options.filter(o => matchesOptionQuery(o, q))
       if (!matched.length) return
       const groupKey = `__group__${index}`
       items.push({ kind: 'group', label: item.label, key: groupKey })
@@ -529,7 +524,7 @@ const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
       return
     }
 
-    if (matchesQuery(item, q)) {
+    if (matchesOptionQuery(item, q)) {
       items.push({ kind: 'option', option: item, key: `${index}:${item.value}` })
     }
   })

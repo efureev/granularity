@@ -1,3 +1,5 @@
+import { matchesQueryParts, normalizeOptionQuery } from '../shared/optionFilter'
+
 /** Команда палитры. `id` обязателен — он же ключ рендера и цель `aria-activedescendant`. */
 export type GrCommandItem = {
   id: string
@@ -27,13 +29,14 @@ export type GrCommandFilter = (item: GrCommandItem, query: string) => boolean
 /**
  * Матчер по умолчанию: подстрока (без учёта регистра) в метке, описании,
  * названии группы или ключевых словах.
+ *
+ * Набор полей у команды шире, чем у опции списка, а сам подстрочный матч — тот
+ * же самый на весь пакет (`shared/optionFilter.ts`).
  */
 export function matchCommandItem(item: GrCommandItem, query: string): boolean {
-  const needle = query.trim().toLowerCase()
-  if (!needle) return true
+  const parts = [item.label, item.description, item.group, ...(item.keywords ?? [])]
 
-  const haystack = [item.label, item.description, item.group, ...(item.keywords ?? [])]
-  return haystack.some(part => part?.toLowerCase().includes(needle))
+  return matchesQueryParts(parts, normalizeOptionQuery(query))
 }
 
 export function filterCommandItems(
