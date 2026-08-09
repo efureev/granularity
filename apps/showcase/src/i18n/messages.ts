@@ -6,7 +6,6 @@ export const showcaseLocaleLoaders = {
   en: {
     [SHOWCASE_I18N_BLOCK]: () => import('./locales/en/showcase.json'),
     ['components.GrButton']: () => import('./locales/en/components/GrButton.json'),
-    ['components.GrResponseErrorBanner']: () => import('./locales/en/components/GrResponseErrorBanner.json'),
     ['components.GrAlert']: () => import('./locales/en/components/GrAlert.json'),
     ['components.GrBadge']: () => import('./locales/en/components/GrBadge.json'),
     ['components.GrDialog']: () => import('./locales/en/components/GrDialog.json'),
@@ -23,7 +22,6 @@ export const showcaseLocaleLoaders = {
   ru: {
     [SHOWCASE_I18N_BLOCK]: () => import('./locales/ru/showcase.json'),
     ['components.GrButton']: () => import('./locales/ru/components/GrButton.json'),
-    ['components.GrResponseErrorBanner']: () => import('./locales/ru/components/GrResponseErrorBanner.json'),
     ['components.GrAlert']: () => import('./locales/ru/components/GrAlert.json'),
     ['components.GrBadge']: () => import('./locales/ru/components/GrBadge.json'),
     ['components.GrDialog']: () => import('./locales/ru/components/GrDialog.json'),

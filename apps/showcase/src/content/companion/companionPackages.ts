@@ -12,8 +12,8 @@ export type CompanionExample = {
   id: string
   title: string
   description: string
+  /** Ключ демо в `src/demos/registry.ts`: и превью, и сниппет читаются из него. */
   previewKey: string
-  code: string
   note?: string
 }
 
@@ -125,45 +125,13 @@ export const companionPackages: CompanionPackage[] = [
             id: 'datetime-modes',
             title: 'Modes playground',
             description: 'Один компонент покрывает date / datetime / time / month / year — режим переключается пропом `mode`.',
-            previewKey: 'extra-datepicker-modes',
-            code: `<script setup lang="ts">
-import { ref } from 'vue'
-import { GrDateTimePicker } from '@feugene/granularity-datepicker'
-import type { GrDateTimeModel, GrDateTimePickerMode } from '@feugene/granularity-datepicker'
-
-const mode = ref<GrDateTimePickerMode>('datetime')
-const value = ref<GrDateTimeModel>(null)
-</script>
-
-<template>
-  <GrDateTimePicker v-model="value" :mode="mode" locale="en" placeholder="Pick a value" />
-</template>`,
-            note: 'Значение (де)сериализуется по `modelType`; по умолчанию — `Date`.',
+            previewKey: 'extra-datepicker-modes',            note: 'Значение (де)сериализуется по `modelType`; по умолчанию — `Date`.',
           },
           {
             id: 'datetime-localized',
             title: 'Localized datetime with seconds',
             description: 'Русская локаль, выбор времени с секундами и подтверждением выбора (`auto-apply=false`).',
-            previewKey: 'extra-datepicker-localized',
-            code: `<script setup lang="ts">
-import { ref } from 'vue'
-import { GrDateTimePicker } from '@feugene/granularity-datepicker'
-import type { GrDateTimeModel } from '@feugene/granularity-datepicker'
-
-const value = ref<GrDateTimeModel>(null)
-</script>
-
-<template>
-  <GrDateTimePicker
-    v-model="value"
-    mode="datetime"
-    locale="ru"
-    enable-seconds
-    :auto-apply="false"
-    placeholder="Выберите дату и время"
-  />
-</template>`,
-          },
+            previewKey: 'extra-datepicker-localized',          },
         ],
         apiSections: [commonPickerProps(), ...pickerEventsAndSlots()],
       },
@@ -178,19 +146,7 @@ const value = ref<GrDateTimeModel>(null)
             id: 'date-basic',
             title: 'Basic date',
             description: 'Одиночный выбор даты с кнопкой очистки.',
-            previewKey: 'extra-date-basic',
-            code: `<script setup lang="ts">
-import { ref } from 'vue'
-import { GrDatePicker } from '@feugene/granularity-datepicker'
-import type { GrDateTimeModel } from '@feugene/granularity-datepicker'
-
-const value = ref<GrDateTimeModel>(null)
-</script>
-
-<template>
-  <GrDatePicker v-model="value" locale="en" clearable placeholder="Pick a date" />
-</template>`,
-          },
+            previewKey: 'extra-date-basic',          },
         ],
         apiSections: [presetProps('`mode="date"`'), ...pickerEventsAndSlots()],
       },
@@ -205,19 +161,7 @@ const value = ref<GrDateTimeModel>(null)
             id: 'time-basic',
             title: 'Basic time',
             description: 'Выбор времени с секундами.',
-            previewKey: 'extra-time-basic',
-            code: `<script setup lang="ts">
-import { ref } from 'vue'
-import { GrTimePicker } from '@feugene/granularity-datepicker'
-import type { GrDateTimeModel } from '@feugene/granularity-datepicker'
-
-const value = ref<GrDateTimeModel>(null)
-</script>
-
-<template>
-  <GrTimePicker v-model="value" enable-seconds placeholder="Pick a time" />
-</template>`,
-          },
+            previewKey: 'extra-time-basic',          },
         ],
         apiSections: [presetProps('`mode="time"`'), ...pickerEventsAndSlots()],
       },
@@ -232,19 +176,7 @@ const value = ref<GrDateTimeModel>(null)
             id: 'date-range',
             title: 'Date range',
             description: 'Выбор диапазона дат; модель — `GrDateRangeValue` (массив границ).',
-            previewKey: 'extra-date-range',
-            code: `<script setup lang="ts">
-import { ref } from 'vue'
-import { GrDateRangePicker } from '@feugene/granularity-datepicker'
-import type { GrDateRangeValue } from '@feugene/granularity-datepicker'
-
-const value = ref<GrDateRangeValue>(null)
-</script>
-
-<template>
-  <GrDateRangePicker v-model="value" locale="en" placeholder="Pick a date range" />
-</template>`,
-          },
+            previewKey: 'extra-date-range',          },
         ],
         apiSections: [presetProps('`mode="date"` + `range`'), ...pickerEventsAndSlots()],
       },

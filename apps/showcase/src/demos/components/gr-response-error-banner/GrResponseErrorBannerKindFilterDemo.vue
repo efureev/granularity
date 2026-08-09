@@ -11,10 +11,6 @@ import {
   type ResponseErrorKind,
   useResponseError,
 } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
-const NS = 'components.GrResponseErrorBanner'
 
 class FakeHttpError extends Error {
   isAxiosError = true
@@ -52,21 +48,21 @@ type PresetId =
   | 'server-500'
 
 const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]>(() => [
-  { id: 'network', label: t(`${NS}.preset.network`), build: () => new FakeNetworkError() },
-  { id: 'aborted', label: t(`${NS}.preset.aborted`), build: () => new FakeAbortError() },
+  { id: 'network', label: 'Network (no connection)', build: () => new FakeNetworkError() },
+  { id: 'aborted', label: 'Aborted (cancelled by user)', build: () => new FakeAbortError() },
   {
     id: 'laravel-422',
-    label: t(`${NS}.preset.laravel-422`),
+    label: 'Laravel validation (422 + errors)',
     build: () => new FakeHttpError(422, {
-      message: t(`${NS}.mock.laravel.message`),
+      message: 'Uploading the file field failed.',
       errors: {
-        file: [t(`${NS}.mock.laravel.file.required`)],
-        amount: [t(`${NS}.mock.laravel.amount.positive`)],
+        file: ['File is required.'],
+        amount: ['Amount must be positive.'],
       },
     }),
   },
-  { id: 'client-404', label: t(`${NS}.preset.client-404`), build: () => new FakeHttpError(404, { message: 'Resource not found' }) },
-  { id: 'server-500', label: t(`${NS}.preset.server-500`), build: () => new FakeHttpError(500, { message: 'Internal Server Error' }) },
+  { id: 'client-404', label: 'Client error (404)', build: () => new FakeHttpError(404, { message: 'Resource not found' }) },
+  { id: 'server-500', label: 'Server error (500)', build: () => new FakeHttpError(500, { message: 'Internal Server Error' }) },
 ])
 
 const presetOptions = computed(() => presets.value.map(p => ({ label: p.label, value: p.id })))
@@ -102,9 +98,9 @@ async function trigger() {
   const raw = preset.build()
   const info = await setRaw(raw, { presetId: preset.id })
   if (info)
-    log(`${t(`${NS}.filter.shown`)} kind=${info.kind}${info.status ? `, status=${info.status}` : ''}`)
+    log(`${'shown:'} kind=${info.kind}${info.status ? `, status=${info.status}` : ''}`)
   else
-    log(t(`${NS}.filter.hidden`))
+    log('hidden (kind not in whitelist)')
 }
 
 function onRetry(info: ResponseErrorInfo) {
@@ -127,7 +123,7 @@ function toggleKind(kind: ResponseErrorKind) {
   <GrCard class="grid gap-3 p-4">
     <div class="grid gap-2">
       <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        {{ t(`${NS}.filter.whitelistLabel`) }}
+        Allowed kinds (whitelist for autoHideKinds)
       </div>
       <div class="flex flex-wrap gap-2">
         <label
@@ -144,7 +140,7 @@ function toggleKind(kind: ResponseErrorKind) {
         </label>
       </div>
       <div class="text-[12px] text-[var(--gr-muted-fg)]">
-        {{ t(`${NS}.filter.hint`) }}
+        All kinds that are not checked are silently swallowed: setRaw() returns null and the banner does not render.
       </div>
     </div>
 
@@ -152,15 +148,15 @@ function toggleKind(kind: ResponseErrorKind) {
       <div class="min-w-[260px] flex-1">
         <!-- Подпись через GrFormField: она даёт селекту доступное имя, а не просто
              рисуется рядом. -->
-        <GrFormField :label="t(`${NS}.presetLabel`)">
+        <GrFormField :label="'Error preset'">
           <GrSelect v-model="selectedPreset" :options="presetOptions" />
         </GrFormField>
       </div>
       <GrButton size="sm" variant="primary" @click="trigger">
-        {{ t(`${NS}.Throw error`) }}
+        Throw error
       </GrButton>
       <GrButton size="sm" variant="outline" @click="dismiss">
-        {{ t(`${NS}.Reset`) }}
+        Reset
       </GrButton>
     </div>
 
@@ -173,7 +169,7 @@ function toggleKind(kind: ResponseErrorKind) {
 
     <div class="grid gap-1">
       <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        {{ t(`${NS}.Event log`) }}
+        Event log
       </div>
       <pre class="max-h-[160px] overflow-auto rounded bg-[var(--gr-muted)] p-3 text-[12px]">{{ eventLog.join('\n') || '—' }}</pre>
     </div>

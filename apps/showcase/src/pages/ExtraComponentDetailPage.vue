@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue'
+import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
@@ -11,20 +11,13 @@ import EventsTable from '../components/doc/EventsTable.vue'
 import PropsTable from '../components/doc/PropsTable.vue'
 import SlotsTable from '../components/doc/SlotsTable.vue'
 import { getCompanionComponentBySlug } from '../content/companion/companionPackages'
+import { resolveDemoComponent } from '../demos/registry'
 import type { ShowcaseApiItemMeta } from '../content/model'
 import IconArrowLeft from '~icons/lucide/arrow-left'
 
 const route = useRoute()
 const { t } = useFintI18n()
 
-// Локальный preview-реестр companion-демо (изолирован от core `ComponentDetailPage`).
-const previewRegistry = {
-  'extra-datepicker-modes': defineAsyncComponent(() => import('../demos/extra/granularity-datepicker/GrDateTimePickerModesDemo.vue')),
-  'extra-datepicker-localized': defineAsyncComponent(() => import('../demos/extra/granularity-datepicker/GrDateTimePickerLocalizedDemo.vue')),
-  'extra-date-basic': defineAsyncComponent(() => import('../demos/extra/granularity-datepicker/GrDatePickerBasicDemo.vue')),
-  'extra-time-basic': defineAsyncComponent(() => import('../demos/extra/granularity-datepicker/GrTimePickerBasicDemo.vue')),
-  'extra-date-range': defineAsyncComponent(() => import('../demos/extra/granularity-datepicker/GrDateRangePickerDemo.vue')),
-} as const
 
 const component = computed(() => getCompanionComponentBySlug(String(route.params.componentSlug ?? '')))
 
@@ -36,11 +29,6 @@ function sectionItems(key: string): ShowcaseApiItemMeta[] {
   return component.value?.apiSections.find(section => section.key === key)?.items ?? []
 }
 
-function resolvePreviewComponent(previewKey?: string) {
-  if (!previewKey)
-    return undefined
-  return previewRegistry[previewKey as keyof typeof previewRegistry]
-}
 </script>
 
 <template>
@@ -79,11 +67,11 @@ function resolvePreviewComponent(previewKey?: string) {
           :key="example.id"
           :title="example.title"
           :description="example.description"
-          :code="example.code"
+          :preview-key="example.previewKey"
           :note="example.note"
         >
-          <template v-if="resolvePreviewComponent(example.previewKey)" #preview>
-            <component :is="resolvePreviewComponent(example.previewKey)" />
+          <template v-if="resolveDemoComponent(example.previewKey)" #preview>
+            <component :is="resolveDemoComponent(example.previewKey)" />
           </template>
         </ExampleCard>
       </div>

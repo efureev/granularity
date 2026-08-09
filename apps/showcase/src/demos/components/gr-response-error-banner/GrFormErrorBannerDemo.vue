@@ -8,10 +8,6 @@ import {
   type ResponseErrorInfo,
   useResponseError,
 } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
-const NS = 'components.GrResponseErrorBanner'
 
 class FakeHttpError extends Error {
   isAxiosError = true
@@ -28,16 +24,16 @@ const formClassifier = useResponseError()
 const fakeFormError = shallowRef<ResponseErrorInfo | null>(null)
 
 const fieldLabels = computed(() => ({
-  email: t(`${NS}.form.fieldLabel.email`),
-  password: t(`${NS}.form.fieldLabel.password`),
+  email: 'E-mail',
+  password: 'Password',
 }))
 
 async function triggerFormDemo() {
   const info = await formClassifier.classify(new FakeHttpError(422, {
-    message: t(`${NS}.form.mock.message`),
+    message: 'Validation error',
     errors: {
-      email: [t(`${NS}.form.mock.email`)],
-      password: [t(`${NS}.form.mock.password.short`), t(`${NS}.form.mock.password.digits`)],
+      email: ['Enter a valid email'],
+      password: ['Password is too short', 'Must contain digits'],
     },
   }))
   fakeFormError.value = info
@@ -47,15 +43,15 @@ async function triggerFormDemo() {
 <template>
   <GrCard class="grid gap-3 p-4">
     <p class="text-[12px] text-[var(--gr-muted-fg)]">
-      {{ t(`${NS}.form.description`) }}
+      showFieldLabels=true, canRetry=false, tone validation=warning, fieldLabels for nice field captions.
     </p>
 
     <div class="flex flex-wrap gap-2">
       <GrButton size="sm" @click="triggerFormDemo">
-        {{ t(`${NS}.form.triggerLabel`) }}
+        Simulate 422 form validation
       </GrButton>
       <GrButton size="sm" variant="outline" @click="fakeFormError = null">
-        {{ t(`${NS}.Hide`) }}
+        Hide
       </GrButton>
     </div>
 

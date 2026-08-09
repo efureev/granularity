@@ -2,9 +2,6 @@
 import { ref } from 'vue'
 
 import { GrBadge, GrTree } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
 
 type TreeItem = {
   id: number
@@ -34,7 +31,7 @@ const treeData = ref<TreeItem[]>([
   },
 ])
 
-const lastDrop = ref(t('components.GrTree.drag.hint'))
+const lastDrop = ref('Drag a row handle to reorder or nest nodes')
 
 // Текст на тонированной подложке — из `-text`, а не из насыщенного тона:
 // `--gr-success` на `--gr-success-light` даёт 2.24:1.

@@ -8,10 +8,6 @@ import {
   type ResponseErrorInfo,
   useResponseError,
 } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
-const NS = 'components.GrResponseErrorBanner'
 
 class FakeHttpError extends Error {
   isAxiosError = true
@@ -24,7 +20,7 @@ class FakeHttpError extends Error {
   }
 }
 
-const uploadClassifier = useResponseError({ texts: () => ({ retryLabel: t(`${NS}.upload.retryLabel`) }) })
+const uploadClassifier = useResponseError({ texts: () => ({ retryLabel: 'Upload again' }) })
 const fakeUploadError = shallowRef<ResponseErrorInfo | null>(null)
 const events = shallowRef<string[]>([])
 const uploadFiles = typeof File !== 'undefined' ? [new File([], 'photo.heic')] : []
@@ -36,8 +32,8 @@ function log(msg: string) {
 async function triggerUploadDemo() {
   const info = await uploadClassifier.classify(
     new FakeHttpError(413, {
-      message: t(`${NS}.upload.mock.message`),
-      errors: { file: [t(`${NS}.upload.mock.fileError`)] },
+      message: 'File is too large',
+      errors: { file: ['Maximum 5 MB'] },
     }),
   )
   fakeUploadError.value = info
@@ -48,15 +44,15 @@ async function triggerUploadDemo() {
 <template>
   <GrCard class="grid gap-3 p-4">
     <p class="text-[12px] text-[var(--gr-muted-fg)]">
-      {{ t(`${NS}.upload.description`) }}
+      Thin wrapper: text preset for "upload", canRetry=true, optional `files` prop in the retry payload.
     </p>
 
     <div class="flex flex-wrap gap-2">
       <GrButton size="sm" @click="triggerUploadDemo">
-        {{ t(`${NS}.upload.triggerLabel`) }}
+        Simulate 413 upload error
       </GrButton>
       <GrButton size="sm" variant="outline" @click="fakeUploadError = null">
-        {{ t(`${NS}.Hide`) }}
+        Hide
       </GrButton>
     </div>
 
@@ -69,7 +65,7 @@ async function triggerUploadDemo() {
 
     <div class="grid gap-1">
       <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        {{ t(`${NS}.Event log`) }}
+        Event log
       </div>
       <pre class="max-h-[120px] overflow-auto rounded bg-[var(--gr-muted)] p-3 text-[12px]">{{ events.join('\n') || '—' }}</pre>
     </div>

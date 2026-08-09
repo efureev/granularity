@@ -6,302 +6,35 @@ export const grInputExamples: ShowcaseComponentExampleDoc[] = [
     title: 'События поля и фоновая проверка',
     description: '`@change` по blur/Enter, отдельный `@clear` для очистки кнопкой, `loading` под асинхронную проверку и `focus()`/`select()` через ref.',
     status: 'ready',
-    previewKey: 'gr-input-events-and-loading',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrButton, GrFormField, GrInput } from '@feugene/granularity'
-
-type GrInputInstance = InstanceType<typeof GrInput>
-
-const login = ref('')
-const checking = ref(false)
-const log = ref<string[]>([])
-
-const field = ref<GrInputInstance>()
-
-function note(entry: string): void {
-  log.value = [entry, ...log.value].slice(0, 4)
-}
-
-// \`change\` приходит по blur/Enter — момент, когда значение можно проверять.
-async function onChange(value: string): Promise<void> {
-  note(\`change: \${value || '—'}\`)
-
-  if (!value) return
-
-  checking.value = true
-  await new Promise(resolve => setTimeout(resolve, 900))
-  checking.value = false
-  note(\`проверен: \${value}\`)
-}
-
-function prefill(): void {
-  login.value = 'granularity'
-  field.value?.focus()
-  field.value?.select()
-}
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <GrFormField label="Логин" hint="Проверка занятости уходит по blur или Enter">
-      <GrInput
-        ref="field"
-        v-model="login"
-        :loading="checking"
-        clearable
-        :maxlength="24"
-        show-count
-        placeholder="ваш-логин"
-        @change="onChange"
-        @clear="note('clear: очищено кнопкой')"
-        @focus="note('focus')"
-        @blur="note('blur')"
-      />
-    </GrFormField>
-
-    <div class="flex flex-wrap items-center gap-3">
-      <GrButton size="sm" variant="outline" @click="prefill">
-        Подставить и выделить
-      </GrButton>
-      <GrButton size="sm" variant="ghost" :disabled="!log.length" @click="log = []">
-        Очистить журнал
-      </GrButton>
-    </div>
-
-    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] p-3 text-sm text-[var(--gr-muted-fg)]">
-      <div v-if="!log.length">
-        Журнал событий пуст — поставьте фокус в поле.
-      </div>
-      <div v-for="entry in log" :key="entry">
-        {{ entry }}
-      </div>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-input-events-and-loading',  },
   {
     id: 'input-validation-states',
     title: 'Validation states and native input types',
     description: 'Одна карточка показывает сразу базовый текстовый сценарий, email-валидацию и search-mode, чтобы было видно native-поведение без потери design-system оболочки.',
     status: 'ready',
-    previewKey: 'gr-input-validation-states',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrInput, GrSwitch } from '@feugene/granularity'
-
-const displayName = ref('Ada Lovelace')
-const email = ref('ops@granularity.dev')
-const search = ref('')
-const invalid = ref(false)
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-    <div class="grid gap-3">
-      <GrFormField label="Display name">
-        <GrInput v-model="displayName" placeholder="Ada Lovelace" />
-      </GrFormField>
-
-      <GrFormField label="Work email" :error="invalid ? 'Use a valid email address' : undefined">
-        <GrInput
-          v-model="email"
-          type="email"
-          placeholder="name@example.com"
-          :invalid="invalid"
-          :state="invalid ? 'danger' : 'success'"
-        />
-      </GrFormField>
-
-      <GrFormField label="Search input">
-        <GrInput v-model="search" type="search" placeholder="Search components" />
-      </GrFormField>
-    </div>
-
-    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-      <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        Validation toggle
-      </div>
-      <GrSwitch v-model="invalid" size="sm">
-        Show invalid email state
-      </GrSwitch>
-      <div class="text-sm text-[var(--gr-muted-fg)]">
-        Search query: {{ search || '—' }}
-      </div>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-input-validation-states',  },
   {
     id: 'input-addons-basic',
     title: 'Prefix and suffix add-ons',
     description: 'Статичные add-on-слоты (валюта, единицы измерения) внутри поля — общий layout поля при этом не меняется.',
     status: 'ready',
-    previewKey: 'gr-input-addons-basic',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrInput } from '@feugene/granularity'
-
-const amount = ref('12 540')
-const weight = ref('68')
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-2">
-    <GrFormField label="Currency input">
-      <GrInput v-model="amount" placeholder="0.00">
-        <template #prefix>₽</template>
-        <template #suffix>RUB</template>
-      </GrInput>
-    </GrFormField>
-
-    <GrFormField label="Unit add-on">
-      <GrInput v-model="weight" placeholder="0">
-        <template #prefix>Weight</template>
-        <template #suffix>kg</template>
-      </GrInput>
-    </GrFormField>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-input-addons-basic',  },
   {
     id: 'input-addon-slots-fit',
     title: 'Add-on slots: fixed (clip) vs stretch',
     description: 'Длинный контент в prefix/suffix больше не вылезает за рамки: в fixed-режиме аддон держит ширину и обрезает контент (prefix — справа, suffix — слева), в stretch — растягивается под контент. Два поля слева реактивно управляют содержимым аддонов.',
     status: 'ready',
-    previewKey: 'gr-input-addon-slots',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrInput, GrSwitch } from '@feugene/granularity'
-
-const prefixText = ref('International account')
-const suffixText = ref('Primary settlement account')
-const targetValue = ref('DE89 3704 0044 0532 0130 00')
-const fixed = ref(true)
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-2">
-    <div class="grid gap-3">
-      <GrFormField label="Prefix content">
-        <GrInput v-model="prefixText" />
-      </GrFormField>
-      <GrFormField label="Suffix content">
-        <GrInput v-model="suffixText" />
-      </GrFormField>
-      <GrSwitch v-model="fixed" size="sm">Fixed width (clip content)</GrSwitch>
-    </div>
-
-    <GrInput
-      v-model="targetValue"
-      placeholder="IBAN"
-      :prefix-fixed="fixed"
-      :suffix-fixed="fixed"
-      prefix-max-width="7rem"
-      suffix-max-width="8rem"
-    >
-      <template #prefix>{{ prefixText }}</template>
-      <template #suffix>{{ suffixText }}</template>
-    </GrInput>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-input-addon-slots',  },
   {
     id: 'input-enhancements',
     title: 'Clearable, password toggle, counter and readonly',
     description: 'Встроенные удобства поля: кнопка очистки (`clearable`), переключатель видимости пароля (`passwordToggle`), счётчик символов с `maxlength` (`showCount`) и `readonly`-состояние. Метки кнопок локализованы.',
     status: 'ready',
-    previewKey: 'gr-input-enhancements',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrInput } from '@feugene/granularity'
-
-const search = ref('Granularity')
-const bio = ref('Design-system engineer')
-const password = ref('s3cr3t-pass')
-const token = ref('sk-live-4f2a90e2f')
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-2">
-    <GrFormField label="Clearable">
-      <GrInput v-model="search" clearable placeholder="Type to search" />
-    </GrFormField>
-
-    <GrFormField label="Password with visibility toggle">
-      <GrInput v-model="password" type="password" password-toggle />
-    </GrFormField>
-
-    <GrFormField label="Character counter (maxlength)">
-      <GrInput v-model="bio" :maxlength="60" show-count clearable />
-    </GrFormField>
-
-    <GrFormField label="Read-only">
-      <GrInput v-model="token" readonly />
-    </GrFormField>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-input-enhancements',  },
   {
     id: 'input-size-and-alignment',
     title: 'Size scale and text alignment',
     description: 'Показываем, что `GrInput` умеет жить и в компактных toolbars, и в крупных form-layout, а выравнивание текста настраивается отдельно от размера.',
     status: 'ready',
-    previewKey: 'gr-input-size-and-alignment',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrInput, GrRadioGroup } from '@feugene/granularity'
-
-const alignment = ref<'left' | 'center' | 'right'>('left')
-const alignmentOptions = [
-  { label: 'Left', value: 'left' },
-  { label: 'Center', value: 'center' },
-  { label: 'Right', value: 'right' },
-]
-
-const sizeValues = {
-  xs: ref('xs size'),
-  sm: ref('sm size'),
-  md: ref('md size'),
-  lg: ref('lg size'),
-}
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <div class="grid gap-2 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-      <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        Text alignment
-      </div>
-      <GrRadioGroup v-model="alignment" :options="alignmentOptions" variant="button" size="sm" />
-      <GrInput :model-value="'Aligned to ' + alignment" :text-align="alignment" placeholder="Editable content" />
-    </div>
-
-    <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">xs</div>
-        <GrInput v-model="sizeValues.xs.value" size="xs" placeholder="Extra small" />
-      </div>
-      <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">sm</div>
-        <GrInput v-model="sizeValues.sm.value" size="sm" placeholder="Small" />
-      </div>
-      <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">md</div>
-        <GrInput v-model="sizeValues.md.value" size="md" placeholder="Medium" />
-      </div>
-      <div class="grid gap-2">
-        <div class="text-xs uppercase tracking-[0.16em] text-[var(--gr-muted-fg)]">lg</div>
-        <GrInput v-model="sizeValues.lg.value" size="lg" placeholder="Large" />
-      </div>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-input-size-and-alignment',  },
 ]

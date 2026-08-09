@@ -14,12 +14,9 @@ import {
   useToast,
 } from '@feugene/granularity'
 
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
 import { useShowcaseToasterHost } from './showcaseToasterHost'
 
-const { t } = useFintI18n()
 const { push, clear } = useToast()
 const { isActiveHost, activateHost } = useShowcaseToasterHost('builder')
 
@@ -54,12 +51,12 @@ const effectiveMessage = computed(() => message.value.trim())
 
 const previewSummary = computed(() => {
   if (timeoutMs.value <= 0)
-    return t('components.GrToaster.Sticky toasts (timeoutMs ≤ 0) stay until the user dismisses them — handy for warnings that need acknowledgement')
+    return 'Sticky toasts (timeoutMs ≤ 0) stay until the user dismisses them — handy for warnings that need acknowledgement'
 
   if (tone.value === 'warning' || tone.value === 'danger')
-    return t('components.GrToaster.Warning and danger tones use role=alert and aria-live=assertive to interrupt the screen reader')
+    return 'Warning and danger tones use role=alert and aria-live=assertive to interrupt the screen reader'
 
-  return t('components.GrToaster.Tweak tone, placement and timeoutMs to validate the toast contract before wiring useToast into a real flow')
+  return 'Tweak tone, placement and timeoutMs to validate the toast contract before wiring useToast into a real flow'
 })
 
 function escapeAttribute(value: string) {
@@ -162,7 +159,7 @@ const previewCode = computed(() => {
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
       <div class="showcase-demo-title text-sm font-semibold">
-        {{ t('Properties') }}
+        Properties
       </div>
 
       <div class="grid gap-4">

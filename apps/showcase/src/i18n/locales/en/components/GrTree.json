@@ -12,18 +12,5 @@
       "title": "Drag-and-drop with custom row slot",
       "description": "Combines two important capabilities of a complex tree: rearrange drag-and-drop and custom row rendering through the default slot."
     }
-  },
-  "expanded": {
-    "expandAll": "Expand all groups",
-    "focusBilling": "Focus billing",
-    "expandedBadge": "Expanded: {key}"
-  },
-  "filtering": {
-    "placeholder": "Filter tree nodes by label or team",
-    "aria": "Filter tree nodes",
-    "matches": "Matches: {count}"
-  },
-  "drag": {
-    "hint": "Drag a row handle to reorder or nest nodes"
   }
 }

@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrButton, GrModal } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const activeSize = ref<'sm' | 'lg'>('sm')
 const open = ref(false)
 
@@ -18,41 +16,41 @@ function openWithSize(size: 'sm' | 'lg') {
   <div class="grid gap-3">
     <div class="flex flex-wrap gap-3">
       <GrButton variant="outline" @click="openWithSize('sm')">
-        {{ t('components.GrModal.size.compact') }}
+        Compact review
       </GrButton>
       <GrButton @click="openWithSize('lg')">
-        {{ t('components.GrModal.size.wide') }}
+        Wide review
       </GrButton>
     </div>
 
     <GrModal
       v-model="open"
       :size="activeSize"
-      :aria-label="t('components.GrModal.size.activeSize', { size: activeSize })"
+      :aria-label="`Active size: ${activeSize}`"
     >
       <div class="grid gap-4">
         <div class="flex items-center justify-between gap-3">
           <div>
             <div class="text-sm font-semibold text-[var(--gr-fg)]">
-              {{ t('components.GrModal.size.activeSize', { size: activeSize }) }}
+              Active size: {{ activeSize }}
             </div>
             <div class="text-sm text-[var(--gr-muted-fg)]">
-              {{ t('components.GrModal.size.body') }}
+              The same flow can scale for review, preview or a multi-column payload.
             </div>
           </div>
         </div>
 
         <div class="grid gap-3 sm:grid-cols-2">
           <div class="rounded-2xl border border-[var(--gr-brd)] p-3 text-sm">
-            {{ t('components.GrModal.size.summaryBlock') }}
+            Summary block
           </div>
           <div class="rounded-2xl border border-[var(--gr-brd)] p-3 text-sm">
-            {{ t('components.GrModal.size.secondaryBlock') }}
+            Secondary block
           </div>
         </div>
 
         <GrButton class="justify-self-start" @click="open = false">
-          {{ t('components.GrModal.size.done') }}
+          Done
         </GrButton>
       </div>
     </GrModal>

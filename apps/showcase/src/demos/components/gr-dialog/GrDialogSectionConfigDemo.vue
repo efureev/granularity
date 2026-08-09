@@ -2,9 +2,7 @@
 import {ref} from 'vue'
 
 import {GrButton, GrDialog, GrCheckbox} from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const open = ref(false)
 const confirmed = ref(false)
 
@@ -17,36 +15,36 @@ function openDialog() {
 <template>
   <div class="grid gap-3">
     <GrButton variant="outline" class="justify-self-start" @click="openDialog">
-      {{ t('components.GrDialog.section.open') }}
+      Open stateful dialog
     </GrButton>
 
     <div class="text-xs text-[var(--gr-muted-fg)]">
-      {{ t('components.GrDialog.section.footerEnabled') }} <span class="font-medium text-[var(--gr-fg)]">{{ confirmed ? t('components.GrDialog.section.yes') : t('components.GrDialog.section.no') }}</span>
+      Footer action enabled: <span class="font-medium text-[var(--gr-fg)]">{{ confirmed ? 'yes' : 'no' }}</span>
     </div>
 
     <GrDialog
         v-model="open"
-        :title="t('components.GrDialog.section.title')"
+        title="Share workspace"
         :header-config="{ paddingX: 'px-4', paddingY: 'py-3' }"
         :footer-config="{ paddingX: 'px-4', paddingY: 'py-3', bordered: false }"
     >
       <div class="grid gap-4 text-sm text-[var(--gr-muted-fg)]">
         <p>
-          {{ t('components.GrDialog.section.body') }}
+          The internal form state keeps living inside the dialog shell, while section config helps adapt density to compact workflows.
         </p>
 
         <div class="flex items-start gap-3 rounded-lg border border-[var(--gr-brd)] p-3 text-[var(--gr-fg)]">
-          <GrCheckbox v-model="confirmed">{{ t('components.GrDialog.section.checkbox') }}</GrCheckbox>
+          <GrCheckbox v-model="confirmed">I reviewed access levels and notification scope.</GrCheckbox>
         </div>
       </div>
 
       <template #footer>
         <div class="flex justify-end gap-3">
           <GrButton variant="outline" @click="open = false">
-            {{ t('components.GrDialog.section.later') }}
+            Later
           </GrButton>
           <GrButton :disabled="!confirmed" @click="open = false">
-            {{ t('components.GrDialog.section.share') }}
+            Share workspace
           </GrButton>
         </div>
       </template>

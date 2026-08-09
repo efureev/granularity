@@ -3,9 +3,7 @@ import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
 import { GrBadge, GrSegmented } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const period = ref<'day' | 'week' | 'month'>('week')
 
 const options: GrSegmentedOption[] = [
@@ -23,10 +21,10 @@ const selectionLabel = computed(() => options.find(option => option.value === pe
       <div class="flex items-center justify-between gap-3">
         <div>
           <div class="text-sm font-semibold text-[var(--gr-fg)]">
-            {{ t('components.GrSegmented.basic.revenueTitle') }}
+            Revenue snapshot
           </div>
           <div class="mt-1 text-sm text-[var(--gr-muted-fg)]">
-            {{ t('components.GrSegmented.basic.revenueSubtitle') }}
+            A switcher with a soft pills backing and an animated selected track.
           </div>
         </div>
         <GrBadge tone="success" size="sm">
@@ -34,11 +32,11 @@ const selectionLabel = computed(() => options.find(option => option.value === pe
         </GrBadge>
       </div>
 
-      <GrSegmented v-model="period" :options="options" :indicator-duration="360" :aria-label="t('components.GrSegmented.basic.periodAria')" />
+      <GrSegmented v-model="period" :options="options" :indicator-duration="360" aria-label="Period" />
     </div>
 
     <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
-      {{ t('components.GrSegmented.basic.activeSegment') }}
+      Active segment:
       <div class="mt-2 text-base font-semibold text-[var(--gr-fg)]">
         {{ selectionLabel }}
       </div>

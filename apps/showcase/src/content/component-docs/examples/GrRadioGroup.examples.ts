@@ -6,146 +6,17 @@ export const grRadioGroupExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Generated group from options list',
     description: 'Быстрый старт-сценарий для `options`: одна декларация массива сразу даёт полную radio-группу без ручного рендера каждого элемента.',
     status: 'ready',
-    previewKey: 'gr-radio-group-options',
-    code: `<script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import type { GrRadioGroupOrientation } from '@feugene/granularity'
-import { GrRadioGroup, GrSegmented } from '@feugene/granularity'
-
-const status = ref('review')
-const orientation = ref<GrRadioGroupOrientation>('vertical')
-const readonly = ref(false)
-
-// Опция умеет быть отключённой и нести пояснение — без перехода на слот.
-const options = [
-  { value: 'draft', label: 'Draft', description: 'Виден только автору' },
-  { value: 'review', label: 'In review', description: 'Ждёт решения редактора' },
-  { value: 'published', label: 'Published', description: 'Опубликовано на сайте' },
-  { value: 'archived', label: 'Archived', description: 'Доступно после снятия блокировки', disabled: true },
-]
-
-const selectedOption = computed(() => options.find(option => option.value === status.value)?.label ?? status.value)
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-    <div class="grid gap-4">
-      <div class="flex flex-wrap items-center gap-4">
-        <GrSegmented
-          v-model="orientation"
-          size="sm"
-          :options="[
-            { value: 'vertical', label: 'vertical' },
-            { value: 'horizontal', label: 'horizontal' },
-          ]"
-        />
-        <label class="flex items-center gap-2 text-sm text-[var(--gr-muted-fg)]">
-          <input v-model="readonly" type="checkbox">
-          readonly
-        </label>
-      </div>
-
-      <GrRadioGroup
-        v-model="status"
-        :options="options"
-        :orientation="orientation"
-        :readonly="readonly"
-      />
-    </div>
-
-    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
-      Selected state:
-      <div class="mt-2 text-base font-semibold text-[var(--gr-fg)]">
-        {{ selectedOption }}
-      </div>
-      <div class="mt-3">
-        Отключённый вариант пропускается и стрелками, и \`Tab\`.
-      </div>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-radio-group-options',  },
   {
     id: 'radio-group-button-tone',
     title: 'Button tone with runtime size control',
     description: 'Группа переключается в button-mode и масштабируется через `size`, что особенно полезно для toolbar и page-view toggles.',
     status: 'ready',
-    previewKey: 'gr-radio-group-button-variant',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrRadioGroup, GrSelect } from '@feugene/granularity'
-
-const view = ref('board')
-const size = ref<'sm' | 'md' | 'lg'>('md')
-
-const sizeOptions = [
-  { value: 'sm', label: 'Small' },
-  { value: 'md', label: 'Medium' },
-  { value: 'lg', label: 'Large' },
-]
-
-const viewOptions = [
-  { value: 'board', label: 'Board' },
-  { value: 'calendar', label: 'Calendar' },
-  { value: 'table', label: 'Table' },
-]
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <div class="md:max-w-[220px]">
-      <GrFormField label="Button size">
-        <GrSelect v-model="size" :options="sizeOptions" />
-      </GrFormField>
-    </div>
-
-    <GrRadioGroup v-model="view" :options="viewOptions" variant="button" :size="size" />
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-radio-group-button-variant',  },
   {
     id: 'radio-group-custom-slots',
     title: 'Custom slot content for per-option annotations',
     description: 'Когда у опций есть secondary badges и статусы, удобнее перейти от `options` к slot-based composition поверх `GrRadioGroup` + `GrRadio`.',
     status: 'ready',
-    previewKey: 'gr-radio-group-custom-slots',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrBadge, GrRadio, GrRadioGroup } from '@feugene/granularity'
-
-const channel = ref('slack')
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-    <GrRadioGroup v-model="channel" name="incident-channel">
-      <GrRadio value="slack">
-        <span class="inline-flex items-center gap-2">
-          Slack
-          <GrBadge tone="success" size="sm">Primary</GrBadge>
-        </span>
-      </GrRadio>
-      <GrRadio value="email">
-        <span class="inline-flex items-center gap-2">
-          Email
-          <GrBadge tone="warning" size="sm">Fallback</GrBadge>
-        </span>
-      </GrRadio>
-      <GrRadio value="pagerduty">
-        <span class="inline-flex items-center gap-2">
-          PagerDuty
-          <GrBadge tone="danger" size="sm">Escalation</GrBadge>
-        </span>
-      </GrRadio>
-    </GrRadioGroup>
-
-    <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
-      Routed through: <span class="font-semibold text-[var(--gr-fg)]">{{ channel }}</span>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-radio-group-custom-slots',  },
 ]

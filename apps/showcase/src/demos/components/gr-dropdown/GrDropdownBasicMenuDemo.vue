@@ -2,10 +2,8 @@
 import { ref } from 'vue'
 
 import { GrBadge, GrButton, GrDropdown } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
-const lastAction = ref(t('components.GrDropdown.basic.noAction'))
+const lastAction = ref('No action yet')
 
 function select(action: string) {
   lastAction.value = action
@@ -17,20 +15,20 @@ function select(action: string) {
     <GrDropdown>
       <template #trigger="{ open, triggerProps }">
         <GrButton variant="outline" v-bind="triggerProps">
-          {{ open ? t('components.GrDropdown.basic.closeMenu') : t('components.GrDropdown.basic.openMenu') }}
+          {{ open ? 'Close menu' : 'Open menu' }}
         </GrButton>
       </template>
 
       <template #content>
         <div class="grid gap-1">
-          <button type="button" role="menuitem" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select(t('components.GrDropdown.basic.preview'))">
-            {{ t('components.GrDropdown.basic.preview') }}
+          <button type="button" role="menuitem" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select('Preview')">
+            Preview
           </button>
-          <button type="button" role="menuitem" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select(t('components.GrDropdown.basic.duplicate'))">
-            {{ t('components.GrDropdown.basic.duplicate') }}
+          <button type="button" role="menuitem" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select('Duplicate')">
+            Duplicate
           </button>
-          <button type="button" role="menuitem" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select(t('components.GrDropdown.basic.archive'))">
-            {{ t('components.GrDropdown.basic.archive') }}
+          <button type="button" role="menuitem" class="rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--gr-accent)]" @click="select('Archive')">
+            Archive
           </button>
         </div>
       </template>

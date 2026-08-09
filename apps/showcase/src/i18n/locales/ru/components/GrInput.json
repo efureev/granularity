@@ -20,36 +20,5 @@
       "title": "Clearable, переключатель пароля, счётчик и readonly",
       "description": "Встроенные удобства поля: кнопка очистки (`clearable`), переключатель видимости пароля (`passwordToggle`), счётчик символов с `maxlength` (`showCount`) и `readonly`-состояние. Метки кнопок локализованы."
     }
-  },
-  "enhancements": {
-    "clearableLabel": "Очищаемое поле",
-    "clearablePlaceholder": "Введите для поиска",
-    "passwordLabel": "Пароль с переключателем видимости",
-    "countLabel": "Счётчик символов (maxlength)",
-    "readonlyLabel": "Только для чтения"
-  },
-  "addons": {
-    "currencyLabel": "Поле суммы",
-    "widthGuardsLabel": "Длинные add-on с ограничением ширины",
-    "intlAccount": "Международный счёт",
-    "primarySettlement": "Основной расчётный счёт"
-  },
-  "sizing": {
-    "textAlignment": "Выравнивание текста",
-    "editablePlaceholder": "Редактируемое содержимое",
-    "xsPlaceholder": "Очень маленький",
-    "smPlaceholder": "Маленький",
-    "mdPlaceholder": "Средний",
-    "lgPlaceholder": "Большой"
-  },
-  "states": {
-    "displayName": "Отображаемое имя",
-    "workEmail": "Рабочий email",
-    "searchInput": "Поле поиска",
-    "invalidError": "Укажите корректный адрес email",
-    "searchPlaceholder": "Поиск компонентов",
-    "validationToggle": "Переключатель валидации",
-    "showInvalid": "Показать невалидное состояние email",
-    "searchQuery": "Поисковый запрос:"
   }
 }

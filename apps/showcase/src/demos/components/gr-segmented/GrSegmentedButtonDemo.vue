@@ -3,9 +3,7 @@ import { ref } from 'vue'
 
 import type { GrSegmentedOption, GrSelectOption } from '@feugene/granularity'
 import { GrFormField, GrSegmented, GrSelect, type GrSegmentedSize } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const view = ref<'board' | 'calendar' | 'table'>('board')
 const size = ref<GrSegmentedSize>('md')
 const indicatorDuration = ref('400')
@@ -36,11 +34,11 @@ const viewOptions: GrSegmentedOption[] = [
          связывает с ним `<label for>`. Нарисованный рядом текст доступным именем
          не становится — селект остаётся безымянным для скринридера. -->
     <div class="grid gap-4 md:grid-cols-2 md:max-w-[520px]">
-      <GrFormField :label="t('components.GrSegmented.button.sizeLabel')">
+      <GrFormField label="Segmented size">
         <GrSelect v-model="size" :options="sizeOptions" />
       </GrFormField>
 
-      <GrFormField :label="t('components.GrSegmented.button.speedLabel')">
+      <GrFormField label="Indicator speed">
         <GrSelect v-model="indicatorDuration" :options="durationOptions" />
       </GrFormField>
     </div>
@@ -51,7 +49,7 @@ const viewOptions: GrSegmentedOption[] = [
       variant="button"
       :size="size"
       :indicator-duration="Number(indicatorDuration)"
-      :aria-label="t('components.GrSegmented.button.viewAria')"
+      aria-label="View"
     />
   </div>
 </template>

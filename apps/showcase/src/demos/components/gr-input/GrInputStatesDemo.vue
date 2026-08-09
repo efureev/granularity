@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrFormField, GrInput, GrSwitch } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const displayName = ref('Ada Lovelace')
 const email = ref('ops@granularity.dev')
 const search = ref('')
@@ -14,11 +12,11 @@ const invalid = ref(false)
 <template>
   <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
     <div class="grid gap-3">
-      <GrFormField :label="t('components.GrInput.states.displayName')">
+      <GrFormField label="Display name">
         <GrInput v-model="displayName" placeholder="Ada Lovelace" />
       </GrFormField>
 
-      <GrFormField :label="t('components.GrInput.states.workEmail')" :error="invalid ? t('components.GrInput.states.invalidError') : undefined">
+      <GrFormField label="Work email" :error="invalid ? 'Use a valid email address' : undefined">
         <GrInput
           v-model="email"
           type="email"
@@ -28,24 +26,24 @@ const invalid = ref(false)
         />
       </GrFormField>
 
-      <GrFormField :label="t('components.GrInput.states.searchInput')">
+      <GrFormField label="Search input">
         <GrInput
           v-model="search"
           type="search"
-          :placeholder="t('components.GrInput.states.searchPlaceholder')"
+          placeholder="Search components"
         />
       </GrFormField>
     </div>
 
     <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        {{ t('components.GrInput.states.validationToggle') }}
+        Validation toggle
       </div>
       <GrSwitch v-model="invalid" size="sm">
-        {{ t('components.GrInput.states.showInvalid') }}
+        Show invalid email state
       </GrSwitch>
       <div class="text-sm text-[var(--gr-muted-fg)]">
-        {{ t('components.GrInput.states.searchQuery') }} {{ search || '—' }}
+        Search query: {{ search || '—' }}
       </div>
     </div>
   </div>

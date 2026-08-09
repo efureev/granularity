@@ -2,14 +2,11 @@
 import { computed, ref } from 'vue'
 
 import { GrBadge, GrButton, GrDropdown } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
 
 const options = computed(() => [
-  { value: 'errors', label: t('components.GrDropdown.persistent.errors') },
-  { value: 'warnings', label: t('components.GrDropdown.persistent.warnings') },
-  { value: 'passed', label: t('components.GrDropdown.persistent.passed') },
+  { value: 'errors', label: 'Errors' },
+  { value: 'warnings', label: 'Warnings' },
+  { value: 'passed', label: 'Passed' },
 ])
 
 const selected = ref<string[]>(['errors'])
@@ -32,12 +29,12 @@ function toggleOption(option: string) {
   <div class="grid gap-3">
     <GrDropdown :close-on-content-click="false" width="16rem">
       <template #trigger="{ triggerProps }">
-        <GrButton variant="outline" v-bind="triggerProps">{{ t('components.GrDropdown.persistent.filters') }}</GrButton>
+        <GrButton variant="outline" v-bind="triggerProps">Filters</GrButton>
       </template>
 
       <template #content="{ close }">
         <div class="grid gap-3 px-3 py-2 text-sm">
-          <div class="font-semibold">{{ t('components.GrDropdown.persistent.visibleStates') }}</div>
+          <div class="font-semibold">Visible states</div>
 
           <label v-for="option in options" :key="option.value" class="flex items-center gap-2">
             <input
@@ -49,7 +46,7 @@ function toggleOption(option: string) {
           </label>
 
           <GrButton size="sm" class="justify-self-start" @click="close">
-            {{ t('components.GrDropdown.persistent.apply') }}
+            Apply filters
           </GrButton>
         </div>
       </template>

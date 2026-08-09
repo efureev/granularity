@@ -1,16 +1,30 @@
 <script setup lang="ts">
+import { ref, watchEffect } from 'vue'
+
 import { GrCard } from '@feugene/granularity'
 
+import { resolveDemoSource } from '../../demos/registry'
 import InlineRichText from '../content/InlineRichText.vue'
 import CodeBlock from './CodeBlock.vue'
 
-defineProps<{
+const props = defineProps<{
   title: string
   description: string
   status?: string
+  /** Готовый сниппет — для примеров, у которых демо-файла нет (доки пакетов, Foundations). */
   code?: string
+  /** Ключ демо: сниппет читается из того же файла, что рисует превью. */
+  previewKey?: string
+  /** Демо печатает свой сниппет само (конструкторы) — второй блок не нужен. */
+  hideCode?: boolean
   note?: string
 }>()
+
+const snippet = ref<string | undefined>(props.code)
+
+watchEffect(async () => {
+  snippet.value = props.hideCode ? undefined : props.code ?? await resolveDemoSource(props.previewKey)
+})
 </script>
 
 <template>
@@ -34,9 +48,9 @@ defineProps<{
     </div>
 
     <CodeBlock
-      v-if="code"
+      v-if="snippet"
       class="mt-5"
-      :code="code"
+      :code="snippet"
       language="vue"
     />
 

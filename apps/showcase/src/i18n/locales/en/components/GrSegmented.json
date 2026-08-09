@@ -16,30 +16,5 @@
       "title": "Disabled items, block layout and language switcher",
       "description": "We assemble real product-like scenarios: language pills, a full-width layout and a disabled item inside the group without losing readability."
     }
-  },
-  "basic": {
-    "revenueTitle": "Revenue snapshot",
-    "revenueSubtitle": "A switcher with a soft pills backing and an animated selected track.",
-    "activeSegment": "Active segment:",
-    "periodAria": "Period"
-  },
-  "button": {
-    "sizeLabel": "Segmented size",
-    "speedLabel": "Indicator speed",
-    "viewAria": "View"
-  },
-  "content": {
-    "iconLabel": "Icon + label",
-    "iconOnly": "Icon-only with scoped slot",
-    "dashboardAria": "Dashboard view",
-    "compactAria": "Compact view switcher"
-  },
-  "states": {
-    "languageSwitcher": "Language switcher",
-    "blockLayout": "Block layout + disabled item",
-    "selectedState": "Selected state:",
-    "disabledNote": "The disabled option stays visible and keeps the structure of the choice set.",
-    "languageAria": "Language",
-    "statusAria": "Publishing status"
   }
 }

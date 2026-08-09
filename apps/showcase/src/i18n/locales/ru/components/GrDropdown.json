@@ -12,31 +12,5 @@
       "title": "Постоянный контент с ручным закрытием",
       "description": "Показываем `closeOnContentClick=false`, когда внутри dropdown есть mini-form/filter pane и компонент не должен закрываться после каждого клика."
     }
-  },
-  "alignment": {
-    "left": "Слева",
-    "leftAligned": "Выравнивание по левому краю",
-    "leftHint": "Привязка к левому краю toolbar или list item.",
-    "center": "По центру",
-    "centerAligned": "Выравнивание по центру",
-    "centerHint": "Хорошо подходит для компактных pickers.",
-    "autoWidth": "Авто-ширина",
-    "autoHint": "Ширина подстраивается под содержимое."
-  },
-  "basic": {
-    "noAction": "Действий пока нет",
-    "closeMenu": "Закрыть меню",
-    "openMenu": "Открыть меню",
-    "preview": "Просмотр",
-    "duplicate": "Дублировать",
-    "archive": "В архив"
-  },
-  "persistent": {
-    "filters": "Фильтры",
-    "visibleStates": "Видимые статусы",
-    "errors": "Ошибки",
-    "warnings": "Предупреждения",
-    "passed": "Успешные",
-    "apply": "Применить фильтры"
   }
 }

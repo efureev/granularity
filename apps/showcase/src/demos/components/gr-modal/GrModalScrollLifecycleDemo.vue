@@ -3,9 +3,6 @@ import { computed, ref } from 'vue'
 
 import type { GrModalScrollBehavior } from '@feugene/granularity'
 import { GrBadge, GrButton, GrModal, GrSegmented } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
 
 const open = ref(false)
 const scrollBehavior = ref<GrModalScrollBehavior>('inside')
@@ -14,6 +11,12 @@ const phase = ref<'idle' | 'opened' | 'closed'>('idle')
 const rows = Array.from({ length: 24 }, (_, index) => index + 1)
 
 const phaseTone = computed(() => (phase.value === 'opened' ? 'success' : 'neutral'))
+
+const phaseLabel = computed(() => ({
+  idle: 'Not opened yet',
+  opened: 'opened — enter animation finished',
+  closed: 'closed — content is safe to unmount',
+}[phase.value]))
 </script>
 
 <template>
@@ -28,10 +31,10 @@ const phaseTone = computed(() => (phase.value === 'opened' ? 'success' : 'neutra
         ]"
       />
       <GrButton class="justify-self-start" @click="open = true">
-        {{ t('components.GrModal.scroll.open') }}
+        Open a long dialog
       </GrButton>
       <GrBadge :tone="phaseTone">
-        {{ t(`components.GrModal.scroll.phase.${phase}`) }}
+        {{ phaseLabel }}
       </GrBadge>
     </div>
 
@@ -45,23 +48,23 @@ const phaseTone = computed(() => (phase.value === 'opened' ? 'success' : 'neutra
       <!-- Слот #title — рекомендуемый путь: он и виден, и даёт окну имя. -->
       <template #title>
         <div class="border-b border-[var(--gr-brd)] px-4 py-3 text-sm font-semibold text-[var(--gr-fg)]">
-          {{ t('components.GrModal.scroll.title') }}
+          Terms of use
         </div>
       </template>
 
       <div class="grid gap-2 p-4">
         <div class="text-sm text-[var(--gr-muted-fg)]">
-          {{ t('components.GrModal.scroll.body') }}
+          With `scrollBehavior="inside"` the panel scrolls itself and the title stays put. With `outside` the whole overlay scrolls.
         </div>
         <div
           v-for="row in rows"
           :key="row"
           class="rounded-xl border border-[var(--gr-brd)] px-3 py-2 text-sm"
         >
-          {{ t('components.GrModal.scroll.row', { index: row }) }}
+          Clause {{ row }}
         </div>
         <GrButton class="justify-self-start" @click="open = false">
-          {{ t('components.GrModal.scroll.close') }}
+          Accept
         </GrButton>
       </div>
     </GrModal>

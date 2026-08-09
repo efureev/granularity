@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { type CSSProperties } from 'vue'
 
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 import { GR_TONES, GrButton, type GrButtonVariant } from '@feugene/granularity'
-
-const { t } = useFintI18n()
 
 const buttonVariants = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border'] as const satisfies readonly GrButtonVariant[]
 const buttonTones = GR_TONES
 const buttonStates = [
-  {key: 'rest', labelKey: 'stateRest'},
-  {key: 'hover', labelKey: 'stateHover'},
-  {key: 'focus', labelKey: 'stateFocus'},
-  {key: 'active', labelKey: 'stateActive'},
+  {key: 'rest', label: 'Rest'},
+  {key: 'hover', label: 'Hover'},
+  {key: 'focus', label: 'Focus'},
+  {key: 'active', label: 'Active'},
 ] as const
 
 type ButtonVariant = (typeof buttonVariants)[number]
@@ -236,7 +233,7 @@ function getButtonPreviewStyle(variant: ButtonVariant, tone: ButtonTone, state: 
 <template>
   <div class="grid gap-4">
     <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-sm text-[var(--gr-muted-fg)]">
-      {{ t('components.GrButton.matrix.description') }}
+      The same matrix that lived in `playground-5`: for each `tone` you can see live buttons and force-rendered `hover`, `focus`, and `active` states across all `variant`s.
     </div>
 
     <div class="grid gap-4">
@@ -250,7 +247,7 @@ function getButtonPreviewStyle(variant: ButtonVariant, tone: ButtonTone, state: 
             tone: {{ tone }}
           </h3>
           <span class="showcase-demo-text text-xs">
-            {{ t('components.GrButton.matrix.liveCount', { count: buttonVariants.length }) }}
+            Live + 4 states × {{ buttonVariants.length }} variants
           </span>
         </div>
 
@@ -258,7 +255,7 @@ function getButtonPreviewStyle(variant: ButtonVariant, tone: ButtonTone, state: 
           <thead>
             <tr>
               <th class="w-28 px-2 py-1 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[var(--gr-muted-fg)]">
-                {{ t('components.GrButton.matrix.stateVsVariant') }}
+                state \ variant
               </th>
               <th
                 v-for="variant in buttonVariants"
@@ -273,7 +270,7 @@ function getButtonPreviewStyle(variant: ButtonVariant, tone: ButtonTone, state: 
           <tbody>
             <tr>
               <th class="px-2 py-1 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[var(--gr-muted-fg)]">
-                {{ t('components.GrButton.matrix.live') }}
+                Live
               </th>
               <td
                 v-for="variant in buttonVariants"
@@ -292,7 +289,7 @@ function getButtonPreviewStyle(variant: ButtonVariant, tone: ButtonTone, state: 
 
             <tr v-for="state in buttonStates" :key="`${tone}-${state.key}`">
               <th class="px-2 py-1 text-left text-xs font-semibold uppercase tracking-[0.12em] text-[var(--gr-muted-fg)]">
-                {{ t(`components.GrButton.matrix.${state.labelKey}`) }}
+                {{ state.label }}
               </th>
               <td
                 v-for="variant in buttonVariants"

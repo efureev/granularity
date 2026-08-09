@@ -125,7 +125,8 @@ describe('component docs metadata', () => {
     expect(doc.examples[0]).toMatchObject({
       id: 'switch-builder',
       previewKey: 'gr-switch-builder',
-      code: '',
+      // Конструктор печатает собственный сниппет — исходник демо под превью не нужен.
+      hideCode: true,
       status: 'ready',
     })
     expect(doc.examples.every(example => example.previewKey?.startsWith('gr-switch'))).toBe(true)
@@ -367,15 +368,19 @@ describe('component docs metadata', () => {
     expect(imageViewerDoc.examples.every(example => example.previewKey?.startsWith('gr-image-viewer'))).toBe(true)
   })
 
-  it('держит live previews ленивыми и не импортирует demo-слой статически в `ComponentDetailPage`', () => {
+  it('держит live previews ленивыми и не импортирует demo-слой статически', () => {
+    const registrySource = readFileSync(new URL('../../demos/registry.ts', import.meta.url), 'utf8')
     const componentDetailPageSource = readFileSync(
       new URL('../../pages/ComponentDetailPage.vue', import.meta.url),
       'utf8',
     )
 
-    expect(componentDetailPageSource).toContain('defineAsyncComponent(() => import(')
-    expect(componentDetailPageSource).not.toMatch(/import\s+Ds[A-Za-z0-9]+Demo\s+from\s+'\.\.\/demos\/components\//)
-    expect(componentDetailPageSource.match(/defineAsyncComponent\(\(\) => import\('\.\.\/demos\/components\//g)?.length ?? 0)
-      .toBeGreaterThan(100)
+    // Оба глоба обязаны остаться ленивыми: `eager` затащил бы все демо и все их
+    // исходники в общий бандл витрины вместо чанка открытой страницы.
+    expect(registrySource).toContain("import.meta.glob('./**/*.vue')")
+    expect(registrySource).toContain("import.meta.glob('./**/*.{vue,ts}', { query: '?raw', import: 'default' })")
+    expect(registrySource).not.toContain('eager: true')
+
+    expect(componentDetailPageSource).not.toMatch(/import\s+\w+Demo\s+from\s+'\.\.\/demos\//)
   })
 })

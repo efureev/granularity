@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrButton, GrTable } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const loading = ref(true)
 
 const rows = [
@@ -18,7 +16,7 @@ const rows = [
   <div class="grid gap-3">
     <div>
       <GrButton size="sm" variant="outline" @click="loading = !loading">
-        {{ loading ? t('components.GrTable.loading.showResolved') : t('components.GrTable.loading.showLoading') }}
+        {{ loading ? 'Show resolved rows' : 'Show loading state' }}
       </GrButton>
     </div>
 
@@ -26,9 +24,9 @@ const rows = [
     <GrTable :loading="loading" :loading-rows="3" :column-count="3">
       <template #head>
         <tr>
-          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.loading.headTask') }}</th>
-          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.loading.headState') }}</th>
-          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.loading.headUpdated') }}</th>
+          <th class="px-4 py-3 text-left font-600">Task</th>
+          <th class="px-4 py-3 text-left font-600">State</th>
+          <th class="px-4 py-3 text-left font-600">Updated</th>
         </tr>
       </template>
 

@@ -20,36 +20,5 @@
       "title": "Clearable, password toggle, counter and readonly",
       "description": "Built-in field affordances: a clear button (`clearable`), password visibility toggle (`passwordToggle`), character counter with `maxlength` (`showCount`) and a `readonly` state. Button labels are localized."
     }
-  },
-  "enhancements": {
-    "clearableLabel": "Clearable",
-    "clearablePlaceholder": "Type to search",
-    "passwordLabel": "Password with visibility toggle",
-    "countLabel": "Character counter (maxlength)",
-    "readonlyLabel": "Read-only"
-  },
-  "addons": {
-    "currencyLabel": "Currency input",
-    "widthGuardsLabel": "Long add-ons with width guards",
-    "intlAccount": "International account",
-    "primarySettlement": "Primary settlement account"
-  },
-  "sizing": {
-    "textAlignment": "Text alignment",
-    "editablePlaceholder": "Editable content",
-    "xsPlaceholder": "Extra small",
-    "smPlaceholder": "Small",
-    "mdPlaceholder": "Medium",
-    "lgPlaceholder": "Large"
-  },
-  "states": {
-    "displayName": "Display name",
-    "workEmail": "Work email",
-    "searchInput": "Search input",
-    "invalidError": "Use a valid email address",
-    "searchPlaceholder": "Search components",
-    "validationToggle": "Validation toggle",
-    "showInvalid": "Show invalid email state",
-    "searchQuery": "Search query:"
   }
 }

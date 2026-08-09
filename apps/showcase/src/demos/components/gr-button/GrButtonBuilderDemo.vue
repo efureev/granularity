@@ -16,9 +16,7 @@ import {
 import IconSparkles from '~icons/lucide/sparkles'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
-import {useFintI18n} from '@feugene/fint-i18n/vue'
 
-const {t } = useFintI18n()
 type GrButtonType = 'button' | 'submit' | 'reset'
 
 const variant = ref<GrButtonVariant>('primary')
@@ -65,7 +63,7 @@ const typeOptions = [
 
 const buttonText = computed(() => {
   if (loading.value && !square.value)
-    return t('components.GrButton.builder.savingText')
+    return 'Saving…'
 
   return label.value.trim() || 'Create workspace'
 })
@@ -76,18 +74,18 @@ const effectiveAriaLabel = computed(() => {
 
 const previewSummary = computed(() => {
   if (square.value)
-    return t('components.GrButton.builder.summarySquare')
+    return 'Square mode makes the button icon-only, so `aria-label` should describe the action for screen readers.'
 
   if (loading.value)
-    return t('components.GrButton.builder.summaryLoading')
+    return 'Loading automatically disables the button and helps prevent repeated submit actions in async scenarios.'
 
   if (disabled.value)
-    return t('components.GrButton.builder.summaryDisabled')
+    return 'Disabled preserves the visual contract of the selected variant/tone while turning off interactivity and pointer events.'
 
   if (variant.value === 'ghost' || variant.value === 'ghost-border')
-    return t('components.GrButton.builder.summaryGhost')
+    return 'Ghost variants work best in toolbars and dense action areas where a filled CTA would feel too heavy.'
 
-  return t('components.GrButton.builder.summaryDefault')
+  return 'Combine `variant`, `tone`, `size`, and `type` to quickly verify the button contract before shipping it to a product scenario.'
 })
 
 function escapeAttribute(value: string) {
@@ -129,7 +127,7 @@ const previewCode = computed(() => {
           class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
         <div class="flex h-full flex-col items-center justify-center gap-4 text-center">
           <div class="showcase-demo-caption text-xs">
-            {{ t('components.GrButton.builder.preview') }}
+            Preview
           </div>
 
           <GrButton
@@ -157,58 +155,58 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" expanded :title="t('components.GrButton.builder.renderedSnippet')"/>
+      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet"/>
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
       <div class="showcase-demo-title text-sm font-semibold">
-        {{ t('components.GrButton.builder.properties') }}
+        Properties
       </div>
 
       <div class="grid gap-4">
-        <GrFormField :label="t('components.GrButton.builder.variant')">
-          <GrSelect v-model="variant" :options="variantOptions" :aria-label="t('components.GrButton.builder.variant')"/>
+        <GrFormField label="Variant">
+          <GrSelect v-model="variant" :options="variantOptions" aria-label="Variant"/>
         </GrFormField>
 
-        <GrFormField :label="t('components.GrButton.builder.tone')">
-          <GrSelect v-model="tone" :options="toneOptions" :aria-label="t('components.GrButton.builder.tone')"/>
+        <GrFormField label="Tone">
+          <GrSelect v-model="tone" :options="toneOptions" aria-label="Tone"/>
         </GrFormField>
 
-        <GrFormField :label="t('components.GrButton.builder.size')">
+        <GrFormField label="Size">
           <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
         </GrFormField>
 
-        <GrFormField :label="t('components.GrButton.builder.type')">
+        <GrFormField label="Type">
           <GrRadioGroup v-model="type" :options="typeOptions" variant="button" size="sm"/>
         </GrFormField>
 
-        <GrFormField :label="t('components.GrButton.builder.buttonLabel')">
+        <GrFormField label="Button label">
           <GrInput
               v-model="label"
               :disabled="square"
-              :placeholder="t('components.GrButton.builder.buttonLabelPlaceholder')"
-              :aria-label="t('components.GrButton.builder.buttonLabel')"
+              placeholder="Create workspace"
+              aria-label="Button label"
           />
         </GrFormField>
 
-        <GrFormField :label="t('components.GrButton.builder.accessibilityLabel')">
+        <GrFormField label="Accessibility label">
           <GrInput
               v-model="ariaLabel"
-              :placeholder="square ? t('components.GrButton.builder.ariaPlaceholderSquare') : t('components.GrButton.builder.ariaPlaceholderDefault')"
-              :aria-label="t('components.GrButton.builder.accessibilityLabel')"
+              :placeholder="square ? 'Required for icon-only state' : 'Optional override for screen readers'"
+              aria-label="Accessibility label"
           />
         </GrFormField>
       </div>
 
       <GrCard class="grid gap-3 p-4">
         <GrSwitch v-model="loading" size="sm">
-          {{ t('components.GrButton.builder.loading') }}
+          Loading
         </GrSwitch>
         <GrSwitch v-model="disabled" size="sm">
-          {{ t('components.GrButton.builder.disabled') }}
+          Disabled
         </GrSwitch>
         <GrSwitch v-model="square" size="sm">
-          {{ t('components.GrButton.builder.squareIconOnly') }}
+          Square / icon-only
         </GrSwitch>
       </GrCard>
     </div>

@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrButton, GrModal, useDialogService } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const dialog = useDialogService()
 
 const open = ref(false)
@@ -17,62 +15,62 @@ function pushLog(message: string): void {
 // confirm -> Promise<boolean>. Открытая модалка остаётся на месте: сервис
 // монтирует свой host в document.body поверх неё.
 async function confirmFromModal(): Promise<void> {
-  const ok = await dialog.confirm(t('components.GrModal.service.confirmMessage'), {
-    title: t('components.GrModal.service.confirmTitle'),
-    confirmText: t('components.GrModal.service.confirmText'),
+  const ok = await dialog.confirm('Delete the selected draft irreversibly?', {
+    title: 'Delete draft?',
+    confirmText: 'Delete',
     confirmTone: 'danger',
-    cancelText: t('components.GrModal.service.cancelText'),
+    cancelText: 'Cancel',
   })
-  pushLog(ok ? t('components.GrModal.service.logConfirmYes') : t('components.GrModal.service.logConfirmNo'))
+  pushLog(ok ? 'confirm -> confirmed (modal not closed)' : 'confirm -> cancelled (modal not closed)')
 }
 
 // alert -> Promise<void>. Одна кнопка, разрешается при закрытии.
 async function alertFromModal(): Promise<void> {
-  await dialog.alert(t('components.GrModal.service.alertMessage'), {
-    title: t('components.GrModal.service.alertTitle'),
-    confirmText: t('components.GrModal.service.alertConfirm'),
+  await dialog.alert('Changes were saved in the background. The settings window stayed open.', {
+    title: 'Done',
+    confirmText: 'Got it',
   })
-  pushLog(t('components.GrModal.service.logAlert'))
+  pushLog('alert -> closed (modal not closed)')
 }
 
 // prompt -> Promise<string | null>. Возвращает введённую строку или null.
 async function promptFromModal(): Promise<void> {
-  const name = await dialog.prompt(t('components.GrModal.service.promptMessage'), {
-    title: t('components.GrModal.service.promptTitle'),
-    label: t('components.GrModal.service.promptLabel'),
-    placeholder: t('components.GrModal.service.promptPlaceholder'),
-    value: t('components.GrModal.service.promptValue'),
-    confirmText: t('components.GrModal.service.promptConfirm'),
-    cancelText: t('components.GrModal.service.promptCancel'),
+  const name = await dialog.prompt('Enter a new preset name', {
+    title: 'Rename preset',
+    label: 'Preset name',
+    placeholder: 'For example: Q3 pricing',
+    value: 'Draft preset',
+    confirmText: 'Save',
+    cancelText: 'Cancel',
     required: true,
   })
-  pushLog(name === null ? t('components.GrModal.service.logPromptCancel') : t('components.GrModal.service.logPrompt', { name }))
+  pushLog(name === null ? 'prompt -> cancelled' : `prompt -> "${name}"`)
 }
 </script>
 
 <template>
   <div class="grid gap-3">
     <p class="text-sm text-[var(--gr-muted-fg)]">
-      {{ t('components.GrModal.service.intro') }}
+      An open `GrModal` invokes the imperative `useDialogService`. The service mounts its own host in `document.body` on top of the modal, so closing confirm/alert/prompt does not close the source window — it stays open, and the user's decision is returned through a `Promise`.
     </p>
 
     <GrButton class="justify-self-start" @click="open = true">
-      {{ t('components.GrModal.service.open') }}
+      Open settings modal
     </GrButton>
 
     <GrModal
       v-model="open"
       :close-on-backdrop="false"
       size="md"
-      :aria-label="t('components.GrModal.service.settingsTitle')"
+      aria-label="Workspace settings"
     >
       <div class="grid gap-4">
         <div class="grid gap-1">
           <div class="text-sm font-semibold text-[var(--gr-fg)]">
-            {{ t('components.GrModal.service.settingsTitle') }}
+            Workspace settings
           </div>
           <div class="text-sm text-[var(--gr-muted-fg)]">
-            {{ t('components.GrModal.service.settingsBody') }}
+            Launch service dialogs straight from the open window — it stays in place after any of them is closed.
           </div>
         </div>
 
@@ -90,7 +88,7 @@ async function promptFromModal(): Promise<void> {
 
         <div class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-muted)]/40 p-3 text-sm">
           <div class="mb-1 font-medium text-[var(--gr-fg)]">
-            {{ t('components.GrModal.service.resultsTitle') }}
+            Results
           </div>
           <ul v-if="log.length" class="grid gap-1 text-[var(--gr-muted-fg)]">
             <li v-for="(entry, index) in log" :key="index">
@@ -98,12 +96,12 @@ async function promptFromModal(): Promise<void> {
             </li>
           </ul>
           <div v-else class="text-[var(--gr-muted-fg)]">
-            {{ t('components.GrModal.service.empty') }}
+            Empty for now — invoke any dialog above.
           </div>
         </div>
 
         <GrButton variant="outline" class="justify-self-start" @click="open = false">
-          {{ t('components.GrModal.service.closeModal') }}
+          Close modal
         </GrButton>
       </div>
     </GrModal>

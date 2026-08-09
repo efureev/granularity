@@ -6,261 +6,32 @@ export const grPaginationExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic paging feedback loop',
     description: 'Минимальный сценарий для `GrPagination`: меняем страницу, а компонент сам показывает диапазон видимых элементов — проп `show-total`.',
     status: 'ready',
-    previewKey: 'gr-pagination-basic-flow',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrBadge, GrPagination } from '@feugene/granularity'
-
-const total = ref(137)
-const page = ref(3)
-const pageSize = ref(10)
-</script>
-
-<template>
-  <div class="grid gap-3">
-    <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" show-total />
-
-    <div class="flex flex-wrap gap-2">
-      <GrBadge>
-        Page {{ page }}
-      </GrBadge>
-      <GrBadge>
-        Page size {{ pageSize }}
-      </GrBadge>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-pagination-basic-flow',  },
   {
     id: 'pagination-page-size-guard',
     title: 'Page-size changes with page clamping',
     description: 'Отдельно показываем защиту от типичного UX-багa: когда после смены `pageSize` текущая страница выходит за пределы нового количества страниц.',
     status: 'ready',
-    previewKey: 'gr-pagination-page-size-guard',
-    code: `<script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import { GrBadge, GrButton, GrPagination } from '@feugene/granularity'
-
-const total = ref(58)
-const page = ref(5)
-const pageSize = ref(12)
-const pageSizes = [6, 12, 24]
-
-const pageCount = computed(() => {
-  return Math.max(1, Math.ceil(total.value / pageSize.value))
-})
-
-function clampPage() {
-  page.value = Math.min(page.value, pageCount.value)
-}
-
-function setTotal(nextTotal: number) {
-  total.value = nextTotal
-  clampPage()
-}
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <div class="flex flex-wrap gap-2">
-      <GrButton size="sm" :variant="total === 58 ? 'primary' : 'outline'" @click="setTotal(58)">
-        58 items
-      </GrButton>
-      <GrButton size="sm" :variant="total === 23 ? 'primary' : 'outline'" @click="setTotal(23)">
-        23 items
-      </GrButton>
-      <GrButton size="sm" :variant="total === 8 ? 'primary' : 'outline'" @click="setTotal(8)">
-        8 items
-      </GrButton>
-    </div>
-
-    <GrPagination
-      v-model:page="page"
-      v-model:page-size="pageSize"
-      :page-sizes="pageSizes"
-      show-page-size
-      :total="total"
-      @update:page-size="clampPage"
-    />
-
-    <div class="flex flex-wrap gap-2">
-      <GrBadge>
-        Total {{ total }}
-      </GrBadge>
-      <GrBadge>
-        Last available page {{ pageCount }}
-      </GrBadge>
-      <GrBadge>
-        Active page {{ page }}
-      </GrBadge>
-    </div>
-  </div>
-</template>`,
-    note: 'Компонент сознательно не «чинит» внешнее состояние сам — страницу лучше нормализовать в owning-контейнере.',
+    previewKey: 'gr-pagination-page-size-guard',    note: 'Компонент сознательно не «чинит» внешнее состояние сам — страницу лучше нормализовать в owning-контейнере.',
   },
   {
     id: 'pagination-data-table-composition',
     title: 'Composition with GrDataTable',
     description: 'Практический сценарий: `GrPagination` остаётся контролом навигации, а slicing данных и действия по строкам живут в page-level orchestration.',
     status: 'ready',
-    previewKey: 'gr-pagination-table-composition',
-    code: `<script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import {
-  GrBadge,
-  GrButton,
-  GrDataTable,
-  GrPagination,
-} from '@feugene/granularity'
-
-const page = ref(1)
-const pageSize = ref(5)
-const pageSizes = [5, 10, 20]
-const lastAction = ref('No row action yet')
-
-const rows = Array.from({ length: 18 }, (_, index) => ({
-  id: index + 1,
-  customer: \`Customer \${index + 1}\`,
-  plan: index % 2 === 0 ? 'Scale' : 'Starter',
-  status: index % 3 === 0 ? 'attention' : 'healthy',
-}))
-
-const columns = [
-  { key: 'customer', label: 'Customer', sortable: true },
-  { key: 'plan', label: 'Plan', sortable: true },
-  { key: 'status', label: 'Status', sortable: true },
-  { key: 'actions', label: 'Actions', align: 'right' as const },
-]
-
-const pagedRows = computed(() => {
-  const start = (page.value - 1) * pageSize.value
-  return rows.slice(start, start + pageSize.value)
-})
-
-const pageCount = computed(() => Math.max(1, Math.ceil(rows.length / pageSize.value)))
-
-function clampPage() {
-  page.value = Math.min(page.value, pageCount.value)
-}
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <GrDataTable :rows="pagedRows" :columns="columns" row-key="id">
-      <template #cell-status="{ row }">
-        <GrBadge :tone="row.status === 'healthy' ? 'success' : 'warning'">
-          {{ row.status }}
-        </GrBadge>
-      </template>
-
-      <template #cell-actions="{ row }">
-        <div class="flex justify-end">
-          <GrButton size="sm" variant="ghost" @click="lastAction = \`Opened \${row.customer}\`">
-            Open
-          </GrButton>
-        </div>
-      </template>
-    </GrDataTable>
-
-    <GrPagination
-      v-model:page="page"
-      v-model:page-size="pageSize"
-      :page-sizes="pageSizes"
-      show-page-size
-      :total="rows.length"
-      @update:page-size="clampPage"
-    />
-
-    <GrBadge>
-      {{ lastAction }}
-    </GrBadge>
-  </div>
-</template>`,
-    note: 'Этот пример полезен как recipe: пагинация не знает о таблице, а таблица не знает о page-size логике — связка собирается наверху.',
+    previewKey: 'gr-pagination-table-composition',    note: 'Этот пример полезен как recipe: пагинация не знает о таблице, а таблица не знает о page-size логике — связка собирается наверху.',
   },
   {
     id: 'pagination-compact-jumper',
     title: 'Compact variant and page jumper',
     description: 'Для узких мест (мобайл, тулбары) `compact` заменяет ряд номеров индикатором «текущая / всего», а `show-jumper` добавляет поле быстрого перехода: ввод номера + Enter (или blur) прыгает на страницу с клампингом к диапазону.',
     status: 'ready',
-    previewKey: 'gr-pagination-compact-jumper',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrBadge, GrPagination } from '@feugene/granularity'
-
-const total = ref(482)
-const page = ref(7)
-const pageSize = ref(20)
-</script>
-
-<template>
-  <div class="grid gap-6">
-    <div class="grid gap-2">
-      <div class="showcase-demo-caption text-xs">
-        Compact — «current / total» indicator
-      </div>
-      <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact />
-    </div>
-
-    <div class="grid gap-2">
-      <div class="showcase-demo-caption text-xs">
-        Jumper — type a page number and press Enter
-      </div>
-      <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" show-jumper />
-    </div>
-
-    <div class="grid gap-2">
-      <div class="showcase-demo-caption text-xs">
-        Compact + jumper together
-      </div>
-      <GrPagination v-model:page="page" v-model:page-size="pageSize" :total="total" compact show-jumper />
-    </div>
-
-    <div class="flex flex-wrap gap-2">
-      <GrBadge>Page {{ page }}</GrBadge>
-      <GrBadge>Page size {{ pageSize }}</GrBadge>
-      <GrBadge>Total {{ total }}</GrBadge>
-    </div>
-  </div>
-</template>`,
-    note: 'Jumper клампит ввод к [1, pageCount] и очищает поле после перехода; компонент остаётся контролируемым — страницу двигает `v-model:page`.',
+    previewKey: 'gr-pagination-compact-jumper',    note: 'Jumper клампит ввод к [1, pageCount] и очищает поле после перехода; компонент остаётся контролируемым — страницу двигает `v-model:page`.',
   },
   {
     id: 'pagination-sizes',
     title: 'Шкала размеров',
     description: 'Размер доезжает до вложенных `GrButton` и `GrSelect`: весь блок пагинации меняет масштаб целиком, а не частями.',
     status: 'ready',
-    previewKey: 'gr-pagination-sizes',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrPagination } from '@feugene/granularity'
-
-const sizes = ['xs', 'sm', 'md', 'lg'] as const
-
-const page = ref(4)
-const pageSize = ref(20)
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <div v-for="size in sizes" :key="size" class="grid gap-2">
-      <div class="text-xs font-semibold text-[var(--gr-muted-fg)]">
-        size="{{ size }}"
-      </div>
-
-      <GrPagination
-        v-model:page="page"
-        v-model:page-size="pageSize"
-        :total="240"
-        :size="size"
-      />
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-pagination-sizes',  },
 ]

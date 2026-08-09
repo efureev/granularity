@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrFormField, GrInput } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const search = ref('Granularity')
 const bio = ref('Design-system engineer')
 const password = ref('s3cr3t-pass')
@@ -13,19 +11,19 @@ const token = ref('sk-live-4f2a90e2f')
 
 <template>
   <div class="grid gap-4 lg:grid-cols-2">
-    <GrFormField :label="t('components.GrInput.enhancements.clearableLabel')">
-      <GrInput v-model="search" clearable :placeholder="t('components.GrInput.enhancements.clearablePlaceholder')" />
+    <GrFormField label="Clearable">
+      <GrInput v-model="search" clearable placeholder="Type to search" />
     </GrFormField>
 
-    <GrFormField :label="t('components.GrInput.enhancements.passwordLabel')">
+    <GrFormField label="Password with visibility toggle">
       <GrInput v-model="password" type="password" password-toggle />
     </GrFormField>
 
-    <GrFormField :label="t('components.GrInput.enhancements.countLabel')">
+    <GrFormField label="Character counter (maxlength)">
       <GrInput v-model="bio" :maxlength="60" show-count clearable />
     </GrFormField>
 
-    <GrFormField :label="t('components.GrInput.enhancements.readonlyLabel')">
+    <GrFormField label="Read-only">
       <GrInput v-model="token" readonly />
     </GrFormField>
   </div>

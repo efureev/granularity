@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrButton, GrTable } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const empty = ref(true)
 
 const rows = [
@@ -17,7 +15,7 @@ const rows = [
   <div class="grid gap-3">
     <div>
       <GrButton size="sm" variant="outline" @click="empty = !empty">
-        {{ empty ? t('components.GrTable.empty.showRows') : t('components.GrTable.empty.showEmpty') }}
+        {{ empty ? 'Show table rows' : 'Show empty state' }}
       </GrButton>
     </div>
 
@@ -25,9 +23,9 @@ const rows = [
     <GrTable :column-count="3" striped hoverable>
       <template #head>
         <tr>
-          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headPreset') }}</th>
-          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headOwner') }}</th>
-          <th class="px-4 py-3 text-left font-600">{{ t('components.GrTable.empty.headValue') }}</th>
+          <th class="px-4 py-3 text-left font-600">Preset</th>
+          <th class="px-4 py-3 text-left font-600">Owner</th>
+          <th class="px-4 py-3 text-left font-600">Value</th>
         </tr>
       </template>
 
@@ -39,9 +37,9 @@ const rows = [
 
       <template #empty>
         <div class="grid justify-items-center gap-2">
-          <span>{{ t('components.GrTable.empty.emptyTitle') }}</span>
+          <span>No preset rows</span>
           <GrButton size="sm" @click="empty = false">
-            {{ t('components.GrTable.empty.loadSample') }}
+            Load sample data
           </GrButton>
         </div>
       </template>

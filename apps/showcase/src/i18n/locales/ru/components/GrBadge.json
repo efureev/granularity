@@ -16,32 +16,5 @@
       "title": "Бейджи внутри action-тулбаров",
       "description": "Компонент часто используется не сам по себе, а как secondary marker внутри toolbar/filter buttons. Этот сценарий показывает composition-паттерн."
     }
-  },
-  "builder": {
-    "preview": "Превью",
-    "renderedSnippet": "Готовый сниппет",
-    "properties": "Свойства badge",
-    "tone": "Тон",
-    "size": "Размер",
-    "radius": "Радиус",
-    "label": "Текст",
-    "labelPlaceholder": "Beta",
-    "badgeToneAria": "Тон бейджа",
-    "badgeLabelAria": "Текст бейджа",
-    "slaStatus": "Статус SLA",
-    "filledMode": "Filled / dark режим",
-    "uppercaseLabel": "Верхний регистр",
-    "summaryDark": "Filled (`dark`) badge лучше работает как яркий статусный индикатор внутри таблиц, toolbar counters и alert summaries.",
-    "summarySquare": "Square badge даёт самый плотный силуэт и хорошо подходит для компактных row-level labels и counters.",
-    "summarySemi": "Semi radius визуально ближе к filter-chip и удобен там, где нужен чуть более строгий контур без полного pill-эффекта.",
-    "summaryNeutral": "Neutral light badge — безопасный дефолт для метаданных, вторичных статусов и вспомогательных подписей.",
-    "summaryDefault": "Соберите нужную комбинацию `tone`, `size`, `radius` и `dark`, чтобы быстро проверить badge перед использованием в интерфейсе."
-  },
-  "toolbar": {
-    "filterPipelines": "Фильтр пайплайнов",
-    "all": "Все",
-    "failed": "С ошибками",
-    "needsReview": "Нужна проверка",
-    "activeFilter": "Активный фильтр:"
   }
 }

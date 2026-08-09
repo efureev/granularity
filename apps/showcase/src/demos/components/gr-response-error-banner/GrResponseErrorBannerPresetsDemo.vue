@@ -10,10 +10,6 @@ import {
   type ResponseErrorInfo,
   useResponseError,
 } from '@feugene/granularity'
-import {useFintI18n} from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
-const NS = 'components.GrResponseErrorBanner'
 
 class FakeHttpError extends Error {
   isAxiosError = true
@@ -65,22 +61,22 @@ type PresetId =
     | 'plain-string'
 
 const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]>(() => [
-  {id: 'network', label: t(`${NS}.preset.network`), build: () => new FakeNetworkError()},
-  {id: 'aborted', label: t(`${NS}.preset.aborted`), build: () => new FakeAbortError()},
+  {id: 'network', label: 'Network (no connection)', build: () => new FakeNetworkError()},
+  {id: 'aborted', label: 'Aborted (cancelled by user)', build: () => new FakeAbortError()},
   {
     id: 'laravel-422',
-    label: t(`${NS}.preset.laravel-422`),
+    label: 'Laravel validation (422 + errors)',
     build: () => new FakeHttpError(422, {
-      message: t(`${NS}.mock.laravel.message`),
+      message: 'Uploading the file field failed.',
       errors: {
-        file: [t(`${NS}.mock.laravel.file.required`), t(`${NS}.mock.laravel.file.size`)],
-        amount: [t(`${NS}.mock.laravel.amount.positive`)],
+        file: ['File is required.', 'File must not exceed 5 MB.'],
+        amount: ['Amount must be positive.'],
       },
     }),
   },
   {
     id: 'jsonapi-422',
-    label: t(`${NS}.preset.jsonapi-422`),
+    label: 'JSON:API validation (422 + errors[])',
     build: () => new FakeHttpError(422, {
       errors: [
         {
@@ -100,7 +96,7 @@ const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]
   },
   {
     id: 'rfc7807-403',
-    label: t(`${NS}.preset.rfc7807-403`),
+    label: 'RFC 7807 problem+json (403)',
     build: () => new FakeHttpError(403,
         {
           type: 'https://example.com/probs/out-of-credit',
@@ -113,23 +109,23 @@ const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]
   },
   {
     id: 'client-404',
-    label: t(`${NS}.preset.client-404`),
+    label: 'Client error (404)',
     build: () => new FakeHttpError(404, {message: 'Resource not found'})
   },
   {
     id: 'server-500',
-    label: t(`${NS}.preset.server-500`),
+    label: 'Server error (500)',
     build: () => new FakeHttpError(500, {message: 'Internal Server Error'})
   },
   {
     id: 'file-validation',
-    label: t(`${NS}.preset.file-validation`),
+    label: 'FileValidationError (local)',
     build: () => new FakeFileValidationError([
-      {file: {name: 'photo.heic'}, message: t(`${NS}.mock.file.heic`)},
-      {file: {name: 'huge.zip'}, message: t(`${NS}.mock.file.tooBig`)},
+      {file: {name: 'photo.heic'}, message: 'Format heic is not supported.'},
+      {file: {name: 'huge.zip'}, message: 'File is larger than 10 MB.'},
     ]),
   },
-  {id: 'plain-string', label: t(`${NS}.preset.plain-string`), build: () => t(`${NS}.mock.plainString`)},
+  {id: 'plain-string', label: 'Plain string', build: () => 'Something went wrong on the backend'},
 ])
 
 const presetOptions = computed(() => presets.value.map(p => ({label: p.label, value: p.id})))
@@ -181,15 +177,15 @@ const currentJson = computed(() => currentError.value ? JSON.stringify(currentEr
       <div class="min-w-[260px] flex-1">
         <!-- Подпись через GrFormField: она даёт селекту доступное имя, а не просто
              рисуется рядом. -->
-        <GrFormField :label="t(`${NS}.presetLabel`)">
+        <GrFormField :label="'Error preset'">
           <GrSelect v-model="selectedPreset" :options="presetOptions" />
         </GrFormField>
       </div>
       <GrButton size="sm" variant="primary" @click="trigger">
-        {{ t(`${NS}.Throw error`) }}
+        Throw error
       </GrButton>
       <GrButton size="sm" variant="outline" @click="dismiss">
-        {{ t(`${NS}.Reset`) }}
+        Reset
       </GrButton>
     </div>
 
@@ -202,14 +198,14 @@ const currentJson = computed(() => currentError.value ? JSON.stringify(currentEr
 
     <details class="text-[12px] text-[var(--gr-muted-fg)]">
       <summary class="cursor-pointer">
-        {{ t(`${NS}.Current ResponseErrorInfo (JSON)`) }}
+        Current ResponseErrorInfo (JSON)
       </summary>
       <pre class="mt-2 overflow-x-auto rounded bg-[var(--gr-muted)] p-3">{{ currentJson }}</pre>
     </details>
 
     <div class="grid gap-1">
       <div class="text-sm font-semibold text-[var(--gr-fg)]">
-        {{ t(`${NS}.Event log`) }}
+        Event log
       </div>
       <pre class="max-h-[160px] overflow-auto rounded bg-[var(--gr-muted)] p-3 text-[12px]">{{
           eventLog.join('\n') || '—'

@@ -2,9 +2,6 @@
 import { ref } from 'vue'
 
 import { GrBadge, GrButton, GrTree } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
 
 type TreeItem = {
   id: number
@@ -46,10 +43,10 @@ const expandedKeys = ref<Array<number | string>>([1, 2])
   <div class="grid gap-4">
     <div class="flex flex-wrap gap-2">
       <GrButton size="sm" variant="outline" @click="expandedKeys = [1, 2, 3]">
-        {{ t('components.GrTree.expanded.expandAll') }}
+        Expand all groups
       </GrButton>
       <GrButton size="sm" variant="ghost" @click="expandedKeys = [2]">
-        {{ t('components.GrTree.expanded.focusBilling') }}
+        Focus billing
       </GrButton>
     </div>
 
@@ -57,7 +54,7 @@ const expandedKeys = ref<Array<number | string>>([1, 2])
 
     <div class="flex flex-wrap gap-2">
       <GrBadge v-for="key in expandedKeys" :key="key">
-        {{ t('components.GrTree.expanded.expandedBadge', { key }) }}
+        Expanded: {{ key }}
       </GrBadge>
     </div>
   </div>

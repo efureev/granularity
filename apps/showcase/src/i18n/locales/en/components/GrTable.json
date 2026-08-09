@@ -12,28 +12,5 @@
       "title": "Empty state inside tbody",
       "description": "Shows how `GrTable` can host a `GrEmptyState` inside `tbody` without losing table semantics and the visual shell."
     }
-  },
-  "basic": {
-    "campaign": "Campaign",
-    "owner": "Owner",
-    "status": "Status",
-    "reach": "Reach"
-  },
-  "empty": {
-    "showRows": "Show table rows",
-    "showEmpty": "Show empty state",
-    "headPreset": "Preset",
-    "headOwner": "Owner",
-    "headValue": "Value",
-    "emptyTitle": "No preset rows",
-    "emptyDescription": "For data-display scenarios `GrTable` can host an empty state right inside the tbody without an extra shell component.",
-    "loadSample": "Load sample data"
-  },
-  "loading": {
-    "showResolved": "Show resolved rows",
-    "showLoading": "Show loading state",
-    "headTask": "Task",
-    "headState": "State",
-    "headUpdated": "Updated"
   }
 }

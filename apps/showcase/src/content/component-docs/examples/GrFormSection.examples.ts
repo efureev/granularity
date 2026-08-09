@@ -6,207 +6,30 @@ export const grFormSectionExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Heading level, actions and slots',
     description: 'Заголовок секции — настоящий `h2`…`h6` (`heading-level`, по умолчанию `h3`): именно по заголовкам незрячий пользователь обходит длинную форму. Слот `#title` собирает заголовок разметкой, `#actions` кладёт кнопки в правую часть шапки. Лендмарком секция становится только по пропу `landmark` — иначе пять секций дали бы пять регионов в обзоре.',
     status: 'ready',
-    previewKey: 'gr-form-section-actions',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrBadge, GrButton, GrCard, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
-
-const members = ref([
-  { id: 1, email: 'ada@example.com' },
-  { id: 2, email: 'grace@example.com' },
-])
-
-function addMember(): void {
-  members.value = [...members.value, { id: Date.now(), email: '' }]
-}
-</script>
-
-<template>
-  <GrCard class="p-4">
-    <!-- Заголовок секции — настоящий \`h4\`, поэтому форма обходится по заголовкам. -->
-    <GrFormSection
-      title="Участники проекта"
-      description="Приглашения уходят на почту сразу после сохранения."
-      :heading-level="4"
-    >
-      <template #title>
-        Участники проекта
-        <GrBadge tone="neutral">
-          {{ members.length }}
-        </GrBadge>
-      </template>
-
-      <template #actions>
-        <GrButton variant="outline" size="sm" @click="addMember">
-          Добавить
-        </GrButton>
-      </template>
-
-      <div class="grid gap-3">
-        <GrFormField v-for="(member, index) in members" :key="member.id" :label="\`Участник \${index + 1}\`">
-          <GrInput v-model="member.email" type="email" placeholder="name@example.com" />
-        </GrFormField>
-      </div>
-    </GrFormSection>
-  </GrCard>
-</template>`,
-  },
+    previewKey: 'gr-form-section-actions',  },
   {
     id: 'form-section-profile-layout',
     title: 'Section heading with profile fields',
     description: 'Показываем базовую роль `GrFormSection`: лёгкий heading-wrapper для связанных полей и описания секции.',
     status: 'ready',
-    previewKey: 'gr-form-section-profile-layout',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrFormSection, GrInput, GrTextarea } from '@feugene/granularity'
-
-const teamName = ref('Platform operations')
-const summary = ref('Coordinates deployments, release notes and service health updates.')
-</script>
-
-<template>
-  <GrFormSection
-    title="Team profile"
-    description="Use \`GrFormSection\` when a group of fields needs shared title and supporting copy."
-  >
-    <div class="grid gap-4 md:grid-cols-2">
-      <GrFormField label="Team name" for-id="team-name">
-        <GrInput id="team-name" v-model="teamName" placeholder="Operations" />
-      </GrFormField>
-
-      <GrFormField label="Summary" for-id="team-summary" class="md:col-span-2">
-        <GrTextarea id="team-summary" v-model="summary" :rows="4" />
-      </GrFormField>
-    </div>
-  </GrFormSection>
-</template>`,
-  },
+    previewKey: 'gr-form-section-profile-layout',  },
   {
     id: 'form-section-nested-groups',
     title: 'Grouped controls inside one section',
     description: 'Отдельный пример фиксирует composition-паттерн, где `GrFormSection` оборачивает и form fields, и более свободные control groups.',
     status: 'ready',
-    previewKey: 'gr-form-section-nested-groups',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrCheckbox, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
-
-const channel = ref('release-updates')
-const includeStakeholders = ref(true)
-const requireApproval = ref(false)
-</script>
-
-<template>
-  <GrFormSection
-    title="Notification routing"
-    description="Section wrappers keep longer forms readable when fields are grouped by intent."
-  >
-    <div class="grid gap-4">
-      <GrFormField label="Slack channel" for-id="notify-channel">
-        <GrInput id="notify-channel" v-model="channel" placeholder="release-updates" />
-      </GrFormField>
-
-      <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-        <GrCheckbox v-model="includeStakeholders">
-          Include business stakeholders in the launch message
-        </GrCheckbox>
-        <GrCheckbox v-model="requireApproval">
-          Require manual approval before notifications are sent
-        </GrCheckbox>
-      </div>
-    </div>
-  </GrFormSection>
-</template>`,
-  },
+    previewKey: 'gr-form-section-nested-groups',  },
   {
     id: 'form-section-stacked-flow',
     title: 'Stacked multi-section flow',
     description: 'Такой сценарий показывает, что несколько `GrFormSection` подряд могут собирать skeleton полноценной settings-страницы без тяжёлой layout-обвязки.',
     status: 'ready',
-    previewKey: 'gr-form-section-stacked-flow',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrBadge, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
-
-const owner = ref('release-manager@company.dev')
-const runbook = ref('docs/runbooks/incident-handoff')
-</script>
-
-<template>
-  <div class="grid gap-6">
-    <GrFormSection title="Ownership">
-      <GrFormField label="Primary owner" for-id="incident-owner">
-        <GrInput id="incident-owner" v-model="owner" placeholder="name@company.dev" />
-      </GrFormField>
-    </GrFormSection>
-
-    <GrFormSection title="Operational assets" description="Multiple sections can be stacked to create a light-weight form page skeleton.">
-      <div class="grid gap-4">
-        <GrFormField label="Runbook path" for-id="runbook-path">
-          <GrInput id="runbook-path" v-model="runbook" placeholder="docs/runbooks/..." />
-        </GrFormField>
-
-        <div class="flex flex-wrap gap-2">
-          <GrBadge tone="success" radius="round">Owner assigned</GrBadge>
-          <GrBadge tone="info" radius="round">Runbook linked</GrBadge>
-        </div>
-      </div>
-    </GrFormSection>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-form-section-stacked-flow',  },
   {
     id: 'form-section-bordered',
     title: 'Bordered & rounded-border sections',
     description: 'У `GrFormSection` один корневой `<section>`, поэтому `class` проходит на него насквозь (fallthrough) и мержится с внутренним `grid gap-4`. Так секцию легко превратить в карточку — прямоугольная рамка (`border`) или скруглённая (`rounded-2xl border`) задаётся обычными utility-классами, без пропсов.',
     status: 'ready',
-    previewKey: 'gr-form-section-bordered',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrFormField, GrFormSection, GrInput, GrTextarea } from '@feugene/granularity'
-
-const projectName = ref('Granularity')
-const apiToken = ref('')
-const notes = ref('Rotate the token every 90 days.')
-</script>
-
-<template>
-  <div class="grid gap-6">
-    <!-- Прямоугольная рамка: класс проходит на корневой <section> секции. -->
-    <GrFormSection
-      title="Bordered section"
-      description="Border via utility classes — GrFormSection forwards \`class\` to its root <section>."
-      class="border border-[var(--gr-brd)] p-5"
-    >
-      <GrFormField label="Project name" for-id="bordered-project">
-        <GrInput id="bordered-project" v-model="projectName" placeholder="Acme" />
-      </GrFormField>
-    </GrFormSection>
-
-    <!-- Скруглённая рамка: те же классы + rounded-2xl и мягкая подложка. -->
-    <GrFormSection
-      title="Rounded-border section"
-      description="Same wrapper with rounded corners and a card surface."
-      class="rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5"
-    >
-      <div class="grid gap-4">
-        <GrFormField label="API token" for-id="rounded-token">
-          <GrInput id="rounded-token" v-model="apiToken" placeholder="sk_live_…" />
-        </GrFormField>
-
-        <GrFormField label="Notes" for-id="rounded-notes">
-          <GrTextarea id="rounded-notes" v-model="notes" :rows="3" />
-        </GrFormField>
-      </div>
-    </GrFormSection>
-  </div>
-</template>`,
-    note: 'Внутренний вертикальный ритм секции (`grid gap-4`) сохраняется — добавляемые классы только расширяют оформление (рамка, паддинги, фон, скругление).',
+    previewKey: 'gr-form-section-bordered',    note: 'Внутренний вертикальный ритм секции (`grid gap-4`) сохраняется — добавляемые классы только расширяют оформление (рамка, паддинги, фон, скругление).',
   },
 ]

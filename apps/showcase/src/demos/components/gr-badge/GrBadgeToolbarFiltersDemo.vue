@@ -2,30 +2,28 @@
 import { ref } from 'vue'
 
 import { GrBadge, GrButton, GrButtonGroup, GrCard } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const activeFilter = ref<'all' | 'failed' | 'review'>('all')
 </script>
 
 <template>
   <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-    <GrButtonGroup :aria-label="t('components.GrBadge.toolbar.filterPipelines')">
+    <GrButtonGroup aria-label="Filter pipelines">
       <GrButton :variant="activeFilter === 'all' ? 'primary' : 'outline'" @click="activeFilter = 'all'">
-        {{ t('components.GrBadge.toolbar.all') }}
+        All
       </GrButton>
       <GrButton :variant="activeFilter === 'failed' ? 'primary' : 'outline'" @click="activeFilter = 'failed'">
-        {{ t('components.GrBadge.toolbar.failed') }}
+        Failed
         <GrBadge class="ml-2" size="sm" radius="semi" dark tone="azure">3</GrBadge>
       </GrButton>
       <GrButton :variant="activeFilter === 'review' ? 'primary' : 'outline'" @click="activeFilter = 'review'">
-        {{ t('components.GrBadge.toolbar.needsReview') }}
+        Needs review
         <GrBadge class="ml-2" size="sm" tone="warning" radius="semi">7</GrBadge>
       </GrButton>
     </GrButtonGroup>
 
     <GrCard class="p-4 text-sm text-[var(--gr-muted-fg)]">
-      {{ t('components.GrBadge.toolbar.activeFilter') }} <span class="font-semibold text-[var(--gr-fg)]">{{ activeFilter }}</span>
+      Active filter: <span class="font-semibold text-[var(--gr-fg)]">{{ activeFilter }}</span>
     </GrCard>
   </div>
 </template>

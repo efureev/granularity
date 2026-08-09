@@ -16,9 +16,6 @@ import {
 } from '@feugene/granularity'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
-import {useFintI18n} from '@feugene/fint-i18n/vue'
-
-const {t} = useFintI18n()
 
 const view = ref<GrSelectView>('default')
 const size = ref<GrSelectSize>('md')
@@ -95,18 +92,18 @@ const effectiveAriaLabel = computed(() => ariaLabel.value.trim() || placeholder.
 
 const previewSummary = computed(() => {
   if (disabled.value)
-    return t('components.GrSelect.Disabled preserves the visual contract of the selected view/size while turning off interactivity and pointer events')
+    return 'Disabled preserves the visual contract of the selected view/size while turning off interactivity and pointer events'
 
   if (allowCustomValue.value)
-    return t('components.GrSelect.Allow custom value enables free-form input alongside the existing options — useful for tag-like pickers')
+    return 'Allow custom value enables free-form input alongside the existing options — useful for tag-like pickers'
 
   if (multiple.value && optionsView.value === 'panel')
-    return t('components.GrSelect.Panel mode with multiple selection acts as a mini-picker — combine with `close-on-select=false` for filter-like UX')
+    return 'Panel mode with multiple selection acts as a mini-picker — combine with `close-on-select=false` for filter-like UX'
 
   if (view.value === 'link')
-    return t('components.GrSelect.Link view aligns the trigger with `GrLink` styling — good for inline switchers and toolbar actions')
+    return 'Link view aligns the trigger with `GrLink` styling — good for inline switchers and toolbar actions'
 
-  return t('components.GrSelect.Combine `view`, `size`, `optionsView`, and state switches to quickly verify the select contract before shipping to a product scenario')
+  return 'Combine `view`, `size`, `optionsView`, and state switches to quickly verify the select contract before shipping to a product scenario'
 })
 
 function escapeAttribute(value: string) {
@@ -219,7 +216,7 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
       <div class="showcase-demo-title text-sm font-semibold">
-        {{ t('Properties') }}
+        Properties
       </div>
 
       <div class="grid gap-4">
@@ -282,8 +279,8 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
           </GrSwitch>
           <p class="showcase-demo-text pl-[2.75rem] text-xs leading-snug opacity-80">
             {{ panelStayOpenAvailable
-              ? t('components.GrSelect.Sets `close-on-select=false` — the panel stays open after each pick (great for multiple selection)')
-              : t('components.GrSelect.Switch `Options view` to `Panel` to keep the dropdown open while picking multiple values') }}
+              ? 'Sets `close-on-select=false` — the panel stays open after each pick (great for multiple selection)'
+              : 'Switch `Options view` to `Panel` to keep the dropdown open while picking multiple values' }}
           </p>
         </div>
         <GrSwitch v-model="clearable" size="sm">

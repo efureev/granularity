@@ -6,201 +6,23 @@ export const grCheckboxExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Sizes aligned with the rest of the form row',
     description: 'Чекбокс живёт на той же размерной шкале, что `GrInput`, `GrRadio` и `GrButton` (`xs`–`lg`), поэтому смешанная форма выравнивается сама — и глобально, через `GrConfigProvider`.',
     status: 'ready',
-    previewKey: 'gr-checkbox-sizes',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrCheckbox, GrFormField, GrInput } from '@feugene/granularity'
-
-const sizes = ['xs', 'sm', 'md', 'lg'] as const
-
-const size = ref<typeof sizes[number]>('md')
-const compact = ref(true)
-const digest = ref(false)
-const project = ref('Granularity')
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <div class="flex flex-wrap items-center gap-4">
-      <GrCheckbox
-        v-for="value in sizes"
-        :key="value"
-        :model-value="size === value"
-        :size="value"
-        @update:model-value="size = value"
-      >
-        {{ value }}
-      </GrCheckbox>
-    </div>
-
-    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-      <!-- Подпись через GrFormField: он выдаёт контролу id и связывает с ним
-           \`<label for>\`. Нарисованный рядом текст доступным именем не становится. -->
-      <GrFormField label="Project name">
-        <GrInput v-model="project" :size="size" />
-      </GrFormField>
-
-      <GrCheckbox v-model="compact" :size="size">
-        Compact rows
-      </GrCheckbox>
-      <GrCheckbox v-model="digest" :size="size" indeterminate>
-        Partial digest selection
-      </GrCheckbox>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-checkbox-sizes',  },
   {
     id: 'checkbox-state-matrix',
     title: 'Checked, unchecked and locked states',
     description: 'Показываем базовую матрицу состояний: управляемые чекбоксы, отдельный disabled-case и компактную сводку по текущему выбору.',
     status: 'ready',
-    previewKey: 'gr-checkbox-state-matrix',
-    code: `<script setup lang="ts">
-import { computed, ref } from 'vue'
-
-import { GrCheckbox, GrSwitch } from '@feugene/granularity'
-
-const weeklyDigest = ref(true)
-const incidentAlerts = ref(false)
-const controlsDisabled = ref(false)
-const terms = ref(false)
-const compactRow = ref(true)
-
-const enabledCount = computed(() => [weeklyDigest.value, incidentAlerts.value].filter(Boolean).length)
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]">
-    <div class="grid gap-3">
-      <GrCheckbox v-model="weeklyDigest" :disabled="controlsDisabled">
-        Weekly product digest
-      </GrCheckbox>
-      <GrCheckbox v-model="incidentAlerts" :disabled="controlsDisabled">
-        Incident alerts
-      </GrCheckbox>
-      <GrCheckbox :model-value="true" disabled>
-        Security bulletins are always enabled
-      </GrCheckbox>
-      <GrCheckbox v-model="terms" :invalid="!terms" required>
-        Accept the notification policy
-      </GrCheckbox>
-      <GrCheckbox v-model="compactRow" label-position="start">
-        Label before the control
-      </GrCheckbox>
-    </div>
-
-    <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
-      <div>
-        <div class="text-sm font-semibold text-[var(--gr-fg)]">
-          Selection summary
-        </div>
-        <div class="text-sm text-[var(--gr-muted-fg)]">
-          {{ enabledCount }} of 2 optional channels are active.
-        </div>
-      </div>
-
-      <GrSwitch v-model="controlsDisabled" size="sm">
-        Lock editable options
-      </GrSwitch>
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-checkbox-state-matrix',  },
   {
     id: 'checkbox-interactive-label',
     title: 'Interactive content inside the label slot',
     description: 'Отдельный сценарий фиксирует важную интеграционную деталь: ссылки и кнопки внутри slot-контента не должны случайно переключать чекбокс.',
     status: 'ready',
-    previewKey: 'gr-checkbox-interactive-label',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrCheckbox } from '@feugene/granularity'
-
-const accepted = ref(false)
-const previewOpens = ref(0)
-</script>
-
-<template>
-  <div class="grid gap-4">
-    <GrCheckbox v-model="accepted">
-      <span class="inline-flex flex-wrap items-center gap-2 text-sm">
-        I accept the rollout policy and reviewed the
-        <a
-          class="font-medium text-[var(--gr-primary)] underline underline-offset-2"
-          href="https://example.com/policy"
-          target="_blank"
-          rel="noreferrer"
-          @click.stop
-        >
-          privacy policy
-        </a>
-        <button
-          type="button"
-          class="rounded-full border border-[var(--gr-brd)] px-2 py-1 text-xs font-medium text-[var(--gr-fg)] transition hover:border-[var(--gr-primary)] hover:text-[var(--gr-primary)]"
-          @click.stop="previewOpens += 1"
-        >
-          Preview changes
-        </button>
-      </span>
-    </GrCheckbox>
-
-    <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]/35 p-4 text-sm text-[var(--gr-muted-fg)]">
-      Checkbox value: <span class="font-semibold text-[var(--gr-fg)]">{{ accepted ? 'accepted' : 'pending' }}</span> ·
-      Preview clicked {{ previewOpens }} times.
-    </div>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-checkbox-interactive-label',  },
   {
     id: 'checkbox-native-form',
     title: 'Native form submission semantics',
     description: 'Показываем, какие `name`/`value` пары реально уходят в `FormData`, чтобы поведение чекбокса было предсказуемо в обычных формах и без обвязки form-library.',
     status: 'ready',
-    previewKey: 'gr-checkbox-native-form',
-    code: `<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrButton, GrCheckbox } from '@feugene/granularity'
-
-const marketing = ref(true)
-const productUpdates = ref(false)
-const submission = ref('Submit the form to inspect native checkbox values.')
-
-function onSubmit(event: SubmitEvent): void {
-  event.preventDefault()
-
-  const formData = new FormData(event.currentTarget as HTMLFormElement)
-
-  submission.value = JSON.stringify(Object.fromEntries(formData.entries()), null, 2)
-}
-</script>
-
-<template>
-  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-    <form class="grid gap-3" @submit="onSubmit">
-      <GrCheckbox v-model="marketing" name="marketing" value="enabled">
-        Marketing updates
-      </GrCheckbox>
-      <GrCheckbox v-model="productUpdates" name="productUpdates" value="beta">
-        Beta feature updates
-      </GrCheckbox>
-
-      <div class="flex items-center gap-3 pt-2">
-        <GrButton type="submit" size="sm">Read form data</GrButton>
-      </div>
-    </form>
-
-    <!-- tabindex: скроллящийся блок обязан быть достижим с клавиатуры,
-         иначе его содержимое недоступно без мыши (axe: scrollable-region-focusable). -->
-    <pre
-      tabindex="0"
-      aria-label="Submitted form data"
-      class="overflow-x-auto rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-fg)] p-4 text-xs text-[var(--gr-bg)]"
-    >{{ submission }}</pre>
-  </div>
-</template>`,
-  },
+    previewKey: 'gr-checkbox-native-form',  },
 ]

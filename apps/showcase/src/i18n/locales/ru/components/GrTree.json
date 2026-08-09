@@ -12,18 +12,5 @@
       "title": "Drag-and-drop с кастомным слотом строки",
       "description": "Комбинируем две важные возможности complex-дерева: rearrange drag-and-drop и кастомный рендер строки через default slot."
     }
-  },
-  "expanded": {
-    "expandAll": "Развернуть все группы",
-    "focusBilling": "Фокус на биллинге",
-    "expandedBadge": "Развёрнут: {key}"
-  },
-  "filtering": {
-    "placeholder": "Фильтр узлов по названию или команде",
-    "aria": "Фильтр узлов дерева",
-    "matches": "Совпадений: {count}"
-  },
-  "drag": {
-    "hint": "Перетащите ручку строки, чтобы переупорядочить или вложить узлы"
   }
 }

@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 
 import { GrAlert, GrButton, GrCard } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-const { t } = useFintI18n()
 const visible = ref(true)
 </script>
 
@@ -12,30 +10,30 @@ const visible = ref(true)
   <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
     <GrAlert
       v-if="visible"
-      :title="t('components.GrAlert.closable.title')"
+      title="Maintenance window"
       tone="warning"
       closable
       @close="visible = false"
     >
-      {{ t('components.GrAlert.closable.message') }}
+      Payments will be processed in read-only mode from 02:00 to 02:30 UTC.
     </GrAlert>
 
     <GrCard v-else class="flex min-h-[92px] items-center justify-center p-4 text-sm text-[var(--gr-muted-fg)]">
-      {{ t('components.GrAlert.closable.dismissed') }}
+      Alert dismissed. Bring it back from the side panel.
     </GrCard>
 
     <GrCard class="grid gap-3 p-4">
       <div>
         <div class="text-sm font-semibold text-[var(--gr-fg)]">
-          {{ t('components.GrAlert.closable.eventTitle') }}
+          Close event
         </div>
         <div class="text-sm text-[var(--gr-muted-fg)]">
-          {{ t('components.GrAlert.closable.eventDescription') }}
+          `close` is emitted so the host screen can hide or persist the banner state.
         </div>
       </div>
 
       <GrButton size="sm" variant="outline" :disabled="visible" @click="visible = true">
-        {{ t('components.GrAlert.closable.restore') }}
+        Restore alert
       </GrButton>
     </GrCard>
   </div>

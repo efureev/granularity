@@ -16,30 +16,5 @@
       "title": "Disabled-элементы, block-layout и переключатель языка",
       "description": "Собираем реальные product-like сценарии: language pills, full-width layout и disabled item внутри группы без потери читаемости."
     }
-  },
-  "basic": {
-    "revenueTitle": "Сводка по выручке",
-    "revenueSubtitle": "Переключатель с мягкой pills-подложкой и анимированным selected track.",
-    "activeSegment": "Активный сегмент:",
-    "periodAria": "Период"
-  },
-  "button": {
-    "sizeLabel": "Размер segmented",
-    "speedLabel": "Скорость индикатора",
-    "viewAria": "Вид"
-  },
-  "content": {
-    "iconLabel": "Иконка + подпись",
-    "iconOnly": "Только иконка со scoped-слотом",
-    "dashboardAria": "Вид дашборда",
-    "compactAria": "Компактный переключатель вида"
-  },
-  "states": {
-    "languageSwitcher": "Переключатель языка",
-    "blockLayout": "Block-layout + disabled-элемент",
-    "selectedState": "Выбранное состояние:",
-    "disabledNote": "Disabled option остаётся видимой и сохраняет структуру choice set.",
-    "languageAria": "Язык",
-    "statusAria": "Статус публикации"
   }
 }

@@ -2,9 +2,6 @@
 import { computed, ref, watch } from 'vue'
 
 import { GrBadge, GrInput, GrTree } from '@feugene/granularity'
-import { useFintI18n } from '@feugene/fint-i18n/vue'
-
-const { t } = useFintI18n()
 
 type TreeItem = {
   id: number
@@ -76,7 +73,7 @@ watch(
 
 <template>
   <div class="grid gap-4">
-    <GrInput v-model="query" :placeholder="t('components.GrTree.filtering.placeholder')" :aria-label="t('components.GrTree.filtering.aria')" />
+    <GrInput v-model="query" placeholder="Filter tree nodes by label or team" aria-label="Filter tree nodes" />
 
     <GrTree
       ref="treeRef"
@@ -86,7 +83,7 @@ watch(
     />
 
     <GrBadge>
-      {{ t('components.GrTree.filtering.matches', { count: matchedCount }) }}
+      Matches: {{ matchedCount }}
     </GrBadge>
   </div>
 </template>
