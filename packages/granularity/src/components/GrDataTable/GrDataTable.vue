@@ -684,15 +684,17 @@ defineExpose({
         v-bind="rowProps?.(row, index)"
         @click="onRowClick(row, index, $event)"
       >
-      <!-- `.stop`: служебная колонка выбора — не «строка» для навигационного
-           клика, иначе выбор чекбоксом уводил бы по `rowClick`-переходу. -->
-      <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]" @click.stop>
+      <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]">
+        <!-- `.stop` на самом чекбоксе, а не на ячейке: гасить навигационный
+             клик есть смысл только там, где стоит контрол выбора. Иначе
+             служебная ячейка невыбираемой строки становится мёртвой зоной. -->
         <GrCheckbox
           v-if="isRowSelectable(row)"
           data-gr-datatable-select-row
           :model-value="isRowSelected(row)"
           :size="checkboxSize"
           :aria-label="t('gr.dataTable.selectRow', 'Select row')"
+          @click.stop
           @update:model-value="toggleRow(row)"
         />
       </td>

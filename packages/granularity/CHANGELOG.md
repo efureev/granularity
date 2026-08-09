@@ -489,9 +489,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Hold-and-release on the `GrNumberInput` steppers.** The auto-repeat did not listen for `pointercancel`, so a
   touch scroll that took the pointer away left the interval stepping to the boundary; and releasing after a hold fired
   the trailing `click` as one extra step. Both fixed: `pointercancel` stops the repeat, and a click that tails a
-  repeat gesture is consumed.
-- **A click on the row-selection checkbox of `GrDataTable` no longer also emits `rowClick`.** The selection column is
-  a service column, not part of the row for navigation purposes.
+  repeat gesture is consumed. Only a *pointer* click can be that tail — a keyboard activation (Enter/Space, `detail:
+  0`) always steps, so a hold that ended without a click (released off the button, cancelled by touch) can no longer
+  swallow the next keystroke from a keyboard or AT user.
+- **A click on the row-selection checkbox of `GrDataTable` no longer also emits `rowClick`.** Selecting a row and
+  navigating away in one click is not a thing. The suppression sits on the checkbox itself, not on the service cell:
+  on a row excluded by `selectableRow` that cell holds no checkbox, and it stays as clickable as every other cell of
+  the row instead of becoming a dead zone.
 - **`GrToaster` pause survives a passing cursor.** Hover and focus-within were one flag, so a mouse crossing the stack
   and leaving resumed countdowns under keyboard focus (WCAG 2.2.1). They are now independent flags OR-ed together.
 - **`GrForm` async validation is race-free.** Two overlapping runs of the same field applied results in promise
@@ -502,7 +506,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   cancel in-flight runs: their answer describes the pre-reset state, it no longer lands in the freshly cleared form,
   and the field stops being marked "validating" at once instead of waiting for the server.
 - **`GrSelect`/`GrAutocomplete` polish.** Chip remove buttons hide under form-context `disabled`, not only the local
-  prop; typeahead searches cyclically from the active option (APG) instead of from the top; option hover updates the
+  prop; typeahead searches cyclically from the active option (APG) instead of from the top, and repeating one letter
+  walks to the next option starting with it instead of searching for "aa" — the same rule `GrTree` and `GrDropdown`
+  already followed; option hover updates the
   active index via a precomputed map — O(1) per mousemove instead of O(n) on virtualized thousands. The autocomplete
   clear button is Tab-reachable (the `GrSelect` convention); below `minQueryLength` the panel shows the "type at least
   N characters" hint instead of stale results — including under `allowCustomValue`, where the hint now sits next to the

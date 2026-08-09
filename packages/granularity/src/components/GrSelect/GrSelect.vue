@@ -969,7 +969,11 @@ function openDropdown(): void {
 let typeaheadBuffer = ''
 let typeaheadTimer: ReturnType<typeof setTimeout> | null = null
 function typeahead(char: string): void {
-  typeaheadBuffer += char.toLowerCase()
+  const lower = char.toLowerCase()
+  // Повтор одной буквы — это «следующий на ту же букву», а не поиск «aa».
+  const repeat = typeaheadBuffer.length === 1 && typeaheadBuffer === lower
+  typeaheadBuffer = repeat ? lower : typeaheadBuffer + lower
+
   if (typeaheadTimer) clearTimeout(typeaheadTimer)
   typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, 600)
 

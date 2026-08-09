@@ -454,7 +454,17 @@ function stepBy(dir: 1 | -1): void {
 let repeatFired = false
 
 /** Клик кнопки «±»: шаг, если это не хвост только что завершённого удержания. */
-function onStepClick(dir: 1 | -1): void {
+function onStepClick(dir: 1 | -1, event: MouseEvent): void {
+  // Enter/Space на кнопке дают click без указателя (`detail === 0`) — хвостом
+  // жеста он быть не может. Иначе удержание, кончившееся без клика (отпускание
+  // вне кнопки, `pointercancel` на таче), оставляло бы флаг взведённым, и
+  // спинбаттон молча терял бы нажатие у клавиатуры и вспомогательных технологий.
+  if (event.detail === 0) {
+    repeatFired = false
+    stepBy(dir)
+    return
+  }
+
   if (repeatFired) {
     repeatFired = false
     return
@@ -716,7 +726,7 @@ function clear(): void {
           @pointerup="stopRepeat"
           @pointerleave="stopRepeat"
           @pointercancel="stopRepeat"
-          @click="onStepClick(1)"
+          @click="onStepClick(1, $event)"
         >
           <GrIcon :size="12">
             <IconChevronUp />
@@ -733,7 +743,7 @@ function clear(): void {
           @pointerup="stopRepeat"
           @pointerleave="stopRepeat"
           @pointercancel="stopRepeat"
-          @click="onStepClick(-1)"
+          @click="onStepClick(-1, $event)"
         >
           <GrIcon :size="12">
             <IconChevronDown />
@@ -760,7 +770,7 @@ function clear(): void {
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
         @pointercancel="stopRepeat"
-        @click="onStepClick(-1)"
+        @click="onStepClick(-1, $event)"
       >
         <GrIcon :size="12">
           <IconChevronLeft />
@@ -786,7 +796,7 @@ function clear(): void {
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
         @pointercancel="stopRepeat"
-        @click="onStepClick(1)"
+        @click="onStepClick(1, $event)"
       >
         <GrIcon :size="12">
           <IconChevronRight />

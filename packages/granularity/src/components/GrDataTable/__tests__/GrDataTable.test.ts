@@ -461,8 +461,30 @@ describe('GrDataTable — клик по чекбоксу выбора строк
     await rowCheckbox.trigger('click')
 
     expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([[1]])
-    // Служебная колонка — не «строка»: навигационный клик не должен уходить.
+    // Сам чекбокс — не «строка»: навигационный клик не должен уходить.
     expect(wrapper.emitted('rowClick')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('служебная ячейка невыбираемой строки — обычная ячейка, а не мёртвая зона', async () => {
+    const wrapper = mount(GrDataTable, {
+      props: {
+        rows: [{ id: 1, name: 'Ada' }, { id: 2, name: 'Linus' }],
+        columns: [{ key: 'name', label: 'Имя' }],
+        selectable: true,
+        selectableRow: (row: Record<string, unknown>) => row.id === 1,
+      },
+      attachTo: document.body,
+    })
+
+    const secondRow = wrapper.findAll('[data-gr-datatable-row]')[1]
+    // Чекбокса тут нет — гасить нечего, и строка обязана кликаться целиком.
+    expect(secondRow.find('[data-gr-datatable-select-row]').exists()).toBe(false)
+
+    await secondRow.findAll('td')[0].trigger('click')
+
+    expect((wrapper.emitted('rowClick')?.at(-1)?.[0] as { index: number }).index).toBe(1)
 
     wrapper.unmount()
   })

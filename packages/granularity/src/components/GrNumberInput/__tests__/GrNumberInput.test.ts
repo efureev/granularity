@@ -496,12 +496,43 @@ describe('GrNumberInput — readonly и жест удержания', () => {
     const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
 
     increase.element.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
-    await increase.trigger('click')
+    // Мышиный клик несёт `detail >= 1` — по нему хвост жеста и опознаётся.
+    increase.element.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+    await nextTick()
 
     expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding)
 
     // Обычный короткий клик (без тиков интервала) по-прежнему шагает.
-    await increase.trigger('click')
+    increase.element.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding + 1)
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('клавиатурная активация после брошенного удержания не проглатывается', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '0', controls: true, ariaLabel: 'Qty' },
+      attachTo: document.body,
+    })
+    const increase = wrapper.get('[data-gr-number-input-increase]')
+
+    increase.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(400 + 130)
+    const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
+    expect(stepsWhileHolding).toBeGreaterThan(0)
+
+    // Указатель ушёл с кнопки и отпущен снаружи: повтор остановлен, клика нет —
+    // жест кончился, ничего поглощать не нужно.
+    increase.element.dispatchEvent(new MouseEvent('pointerleave', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(600)
+
+    // Enter/Space на кнопке дают click без указателя (`detail === 0`).
+    increase.element.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }))
+    await nextTick()
+
     expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding + 1)
 
     wrapper.unmount()

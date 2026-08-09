@@ -355,4 +355,36 @@ describe('GrSelect — резолвенные состояния и typeahead', 
 
     wrapper.unmount()
   })
+
+  it('повтор буквы ведёт к следующему совпадению, а не ищет «aa»', async () => {
+    const wrapper = mountPanel({
+      options: [
+        { value: 'apple', label: 'Apple' },
+        { value: 'banana', label: 'Banana' },
+        { value: 'avocado', label: 'Avocado' },
+      ],
+    })
+    const trigger = wrapper.get('[data-gr-select-trigger]')
+    await trigger.trigger('click')
+
+    async function activeLabel(): Promise<string> {
+      await nextTick()
+      const id = trigger.attributes('aria-activedescendant')!
+      return document.getElementById(id)?.textContent?.trim() ?? ''
+    }
+
+    // Поиск идёт от следующей за активной, поэтому с Apple первая «a» — Avocado.
+    await trigger.trigger('keydown', { key: 'a' })
+    expect(await activeLabel()).toContain('Avocado')
+
+    // Буфер не должен превратиться в «aa»: паритет с GrTree/GrDropdown.
+    await trigger.trigger('keydown', { key: 'a' })
+    expect(await activeLabel()).toContain('Apple')
+
+    // Список цикличен — совпадения перебираются по кругу.
+    await trigger.trigger('keydown', { key: 'a' })
+    expect(await activeLabel()).toContain('Avocado')
+
+    wrapper.unmount()
+  })
 })
