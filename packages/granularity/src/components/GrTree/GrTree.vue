@@ -260,6 +260,20 @@ function absoluteIndex(offsetInWindow: number): number {
   return treeProps.virtual ? virtualizer.range.value.start + offsetInWindow : offsetInWindow
 }
 
+/**
+ * Строка с фокусом ушла из виртуального окна и размонтировалась — фокус упал
+ * бы на `body`, и клавиатура дерева умерла бы до клика мышью. Возвращаем его
+ * на корень: делегированный keydown живёт там, первая же стрелка восстановит
+ * видимую строку через `focusRow`.
+ */
+function restoreFocusAfterUnmount(): void {
+  if (typeof document === 'undefined') return
+
+  const active = document.activeElement
+  if ((active === null || active === document.body) && focusedKey.value !== undefined)
+    treeRootEl.value?.focus()
+}
+
 function focusRow(key: GrTreeNode<T>['key']): void {
   focusedKey.value = key
 
@@ -316,6 +330,14 @@ function expandSiblings(node: GrTreeNode<T>): void {
 }
 
 function onTreeKeydown(event: KeyboardEvent): void {
+  // Делегированная клавиатура уважает интерактивные цели: Enter на
+  // toggle-кнопке — её клик, печать в инпуте слота узла — ввод текста, а не
+  // typeahead. Без гарда preventDefault отменял бы и то и другое.
+  const target = event.target as HTMLElement | null
+  const interactive = target?.closest('button, a[href], input, select, textarea, [contenteditable]')
+  if (interactive && interactive !== event.currentTarget)
+    return
+
   const rows = visibleRows.value
   if (rows.length === 0)
     return
@@ -679,6 +701,7 @@ defineExpose<GrTreeInstance<T>>({
       ref="treeRootEl"
       data-gr-tree
       class="gr-tree"
+      tabindex="-1"
       :data-gr-virtual="treeProps.virtual ? '' : undefined"
       role="tree"
       :aria-multiselectable="treeProps.showCheckbox ? 'true' : undefined"
@@ -690,7 +713,10 @@ defineExpose<GrTreeInstance<T>>({
         :key="row.node.key"
         :ref="(el) => {
           interactionContext.registerNodeEl(row.node.key, el as HTMLElement | null)
-          if (treeProps.virtual) virtualizer.measure(absoluteIndex(windowIndex), el as Element | null)
+          if (treeProps.virtual) {
+            virtualizer.measure(absoluteIndex(windowIndex), el as Element | null)
+            if (!el) restoreFocusAfterUnmount()
+          }
         }"
         data-gr-tree-node
         :data-gr-tree-node-key="row.node.key"
@@ -740,6 +766,7 @@ defineExpose<GrTreeInstance<T>>({
         <button
             v-if="treeProps.draggable"
             type="button"
+            tabindex="-1"
             data-gr-tree-drag-handle
             class="gr-tree__drag-handle"
             :class="[
@@ -757,10 +784,13 @@ defineExpose<GrTreeInstance<T>>({
           <span class="gr-tree__drag-icon" :class="treeProps.dragHandleIcon" />
         </button>
 
+        <!-- tabindex="-1": внутри roving-композита интерактив не табируется,
+             клавиатурный эквивалент — ArrowRight/ArrowLeft на строке. -->
         <button
             v-if="!row.isLeaf"
             data-gr-tree-toggle
             type="button"
+            tabindex="-1"
             class="gr-tree__toggle"
             :class="resolveNodeClass(treeProps.toggleClass, row)"
             :aria-label="row.isExpanded ? collapseLabel : expandLabel"

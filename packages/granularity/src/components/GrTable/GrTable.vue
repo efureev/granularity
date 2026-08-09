@@ -159,12 +159,32 @@ const theadClass = computed(() => [
 
 const scrollEl = ref<HTMLElement | null>(null)
 
-/** Прокрутить скролл-контейнер таблицы — тот же контракт, что у `GrDataTable`. */
 function scrollTo(options: ScrollToOptions): void {
   scrollEl.value?.scrollTo(options)
 }
 
-defineExpose({ scrollTo })
+// Только верхний уровень собственного tbody: вложенная таблица в ячейке не
+// должна сдвигать индексацию строк.
+function contentRows(): HTMLElement[] {
+  if (!showRows.value) return []
+  const el = scrollEl.value
+  if (!el) return []
+  return Array.from(el.querySelectorAll<HTMLElement>(':scope > table > tbody > tr'))
+}
+
+function scrollToRow(index: number, options?: ScrollIntoViewOptions): boolean {
+  const row = contentRows()[index]
+  if (!row) return false
+  row.scrollIntoView(options ?? { block: 'nearest' })
+  return true
+}
+
+defineExpose({
+  /** Прокрутить скролл-контейнер таблицы — тот же контракт, что у `GrDataTable`. */
+  scrollTo,
+  /** Прокрутить к строке содержимого по её индексу в разметке. `false` — строки нет в DOM. */
+  scrollToRow,
+})
 </script>
 
 <template>

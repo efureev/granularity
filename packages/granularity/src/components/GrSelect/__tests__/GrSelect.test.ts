@@ -926,3 +926,31 @@ describe('GrSelect — визуальное состояние', () => {
     expect(wrapper.get('select').classes().some(cls => cls.startsWith('border-[var(--gr-danger)'))).toBe(false)
   })
 })
+
+describe('GrSelect — readonly в native-режиме', () => {
+  it('изменение нативного select не эмитит и откатывается к модели', async () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        modelValue: 'vue',
+        readonly: true,
+        ariaLabel: 'Stack',
+        options: [
+          { value: 'vue', label: 'Vue' },
+          { value: 'react', label: 'React' },
+        ],
+      },
+    })
+
+    const select = wrapper.get('select').element as HTMLSelectElement
+    // Нативного `readonly` у <select> нет: браузер уже переключил значение.
+    select.value = 'react'
+    await wrapper.get('select').trigger('change')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(wrapper.emitted('change')).toBeUndefined()
+    // DOM возвращён к модели — форма не отправит непринятое значение.
+    expect(select.value).toBe('vue')
+
+    wrapper.unmount()
+  })
+})

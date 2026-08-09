@@ -960,6 +960,11 @@
             "name": "focus",
             "description": "",
             "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
           }
         ]
       }
@@ -8699,8 +8704,13 @@
         "items": [
           {
             "name": "scrollTo",
-            "description": "",
+            "description": "Прокрутить скролл-контейнер таблицы — тот же контракт, что у `GrDataTable`.",
             "type": "(options: ScrollToOptions) => void"
+          },
+          {
+            "name": "scrollToRow",
+            "description": "Прокрутить к строке содержимого по её индексу в разметке. `false` — строки нет в DOM.",
+            "type": "(index: number, options?: ScrollIntoViewOptions | undefined) => boolean"
           }
         ]
       }

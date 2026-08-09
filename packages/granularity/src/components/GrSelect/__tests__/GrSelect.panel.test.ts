@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import GrForm from '../../GrForm/GrForm.vue'
+import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrSelect from '../GrSelect.vue'
 
 /**
@@ -302,6 +304,55 @@ describe('GrSelect — name (нативная форма)', () => {
       props: { modelValue: 'vue', options: OPTIONS, name: 'stack', ariaLabel: 'Stack' },
     })
     expect(wrapper.get('select').attributes('name')).toBe('stack')
+    wrapper.unmount()
+  })
+})
+
+describe('GrSelect — резолвенные состояния и typeahead', () => {
+  it('крестики чипов скрыты при disabled из контекста формы', async () => {
+    const wrapper = mount({
+      components: { GrForm, GrFormField, GrSelect },
+      template: `
+        <GrForm :model="{}" disabled>
+          <GrFormField label="Stack" name="stack">
+            <GrSelect
+              :model-value="['vue']"
+              :options="[{ value: 'vue', label: 'Vue' }]"
+              multiple
+              tags
+              options-view="panel"
+            />
+          </GrFormField>
+        </GrForm>
+      `,
+    }, { attachTo: document.body })
+    await nextTick()
+
+    expect(document.querySelector('[data-gr-select-tag]')).toBeTruthy()
+    expect(document.querySelector('[data-gr-select-tag-remove]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('typeahead ищет от активной опции, а не с начала списка', async () => {
+    const wrapper = mountPanel({
+      options: [
+        { value: 'apple', label: 'Apple' },
+        { value: 'banana', label: 'Banana' },
+        { value: 'avocado', label: 'Avocado' },
+      ],
+    })
+    const trigger = wrapper.get('[data-gr-select-trigger]')
+    await trigger.trigger('click')
+
+    // Активная — Banana (стрелкой), затем «a»: следующий от неё — Avocado.
+    await trigger.trigger('keydown', { key: 'ArrowDown' })
+    await trigger.trigger('keydown', { key: 'a' })
+    await nextTick()
+
+    const activeId = trigger.attributes('aria-activedescendant')!
+    expect(document.getElementById(activeId)?.textContent).toContain('Avocado')
+
     wrapper.unmount()
   })
 })

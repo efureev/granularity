@@ -441,3 +441,70 @@ describe('GrNumberInput — озвучивание, очистка и событ
     expect(wrapper.get('[data-gr-number-input]').classes()).toContain('text-[var(--gr-disabled-fg)]')
   })
 })
+
+describe('GrNumberInput — readonly и жест удержания', () => {
+  it('readonly: Home/End и стрелки не меняют значение и не гасят каретку', async () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '5', min: 0, max: 10, readonly: true, ariaLabel: 'Qty' },
+    })
+    const input = wrapper.get('input')
+
+    for (const key of ['Home', 'End', 'ArrowUp', 'ArrowDown']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+      input.element.dispatchEvent(event)
+      // Нативное поведение каретки не подавляется.
+      expect(event.defaultPrevented).toBe(false)
+    }
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('pointercancel останавливает автоповтор', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '0', controls: true, ariaLabel: 'Qty' },
+      attachTo: document.body,
+    })
+    const increase = wrapper.get('[data-gr-number-input-increase]')
+
+    increase.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(400 + 130) // задержка + ~2 тика интервала
+    const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
+    expect(stepsWhileHolding).toBeGreaterThan(0)
+
+    // Браузер забрал указатель (скролл на таче): повтор обязан остановиться.
+    increase.element.dispatchEvent(new MouseEvent('pointercancel', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(600)
+
+    expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding)
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('после удержания отпускание не даёт лишний шаг кликом', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: '0', controls: true, ariaLabel: 'Qty' },
+      attachTo: document.body,
+    })
+    const increase = wrapper.get('[data-gr-number-input-increase]')
+
+    increase.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    await vi.advanceTimersByTimeAsync(400 + 130)
+    const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
+
+    increase.element.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
+    await increase.trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding)
+
+    // Обычный короткий клик (без тиков интервала) по-прежнему шагает.
+    await increase.trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding + 1)
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+})

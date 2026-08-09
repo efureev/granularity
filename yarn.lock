@@ -418,10 +418,10 @@
     "@unocss/preset-mini" "^66.7.5"
     "@unocss/rule-utils" "^66.7.5"
 
-"@feugene/unocss-preset-granular@^0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.7.1.tgz#e868d417f88dc611d3e57caa55d7e6262b88deae"
-  integrity sha512-rUHKvWwte6azbc2h+NzjtgPwinIQICJwg1T3f/i8xcQWsszwtnFEQ1p1yXuEadXasMEPtThVuThLrWky+BSUcA==
+"@feugene/unocss-preset-granular@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.8.0.tgz#f3e406a2646938b9227ffb99d1cbfdbe941b9004"
+  integrity sha512-0nNESTmImKTQyJ4SIiSh3AW9ith5CXg1EAoR9/syqa9UATSFm88ANWIOVBWw73N5KhC0IaI+VD2tBtzuYmLXlQ==
   dependencies:
     "@feugene/unocss-mini-extra-rules" "^0.5.0"
 
@@ -453,13 +453,6 @@
     "@floating-ui/dom" "^1.7.6"
     "@floating-ui/utils" "^0.2.11"
     vue-demi ">=0.13.0"
-
-"@headlessui/vue@^1.7.23":
-  version "1.7.23"
-  resolved "https://registry.yarnpkg.com/@headlessui/vue/-/vue-1.7.23.tgz#7fe19dbeca35de9e6270c82c78c4864e6a6f7391"
-  integrity sha512-JzdCNqurrtuu0YW6QaDtR2PIYCKPUWq28csDyMvN4zmGccmE7lz40Is6hc3LA4HFeCI7sekZ/PQMTNmn9I/4Wg==
-  dependencies:
-    "@tanstack/vue-virtual" "^3.0.0-beta.60"
 
 "@humanfs/core@^0.19.2":
   version "0.19.2"
@@ -824,18 +817,6 @@
     espree "^10.4.0"
     estraverse "^5.3.0"
     picomatch "^4.0.3"
-
-"@tanstack/virtual-core@3.17.4":
-  version "3.17.4"
-  resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.17.4.tgz#26d1307f6e544e8428e2c022616cdabda59ef77e"
-  integrity sha512-nGm5KteqxasUdThLc2izl6dHUqLv0LQj7Nuyo5gYalTPf/U8a9ermvsl7reT+6ioBW1l8WfpP/mcU338nLXpqw==
-
-"@tanstack/vue-virtual@^3.0.0-beta.60":
-  version "3.13.32"
-  resolved "https://registry.yarnpkg.com/@tanstack/vue-virtual/-/vue-virtual-3.13.32.tgz#30ab5a6997dc004d27740f0907ad6100a6bd857e"
-  integrity sha512-E8OCutx7QnwZdvpJijz0Q2PHsYDWBWjnGr3TvgWiqxTU35jB1kVhtkd93scRV7tTFuId2tg3x2iFiw+IE4evjQ==
-  dependencies:
-    "@tanstack/virtual-core" "3.17.4"
 
 "@tybys/wasm-util@^0.10.3":
   version "0.10.3"

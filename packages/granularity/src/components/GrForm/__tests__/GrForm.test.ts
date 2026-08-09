@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, nextTick, reactive, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrForm from '../GrForm.vue'
@@ -345,5 +345,62 @@ describe('GrForm — disabled и validating', () => {
     // Проверка кончилась — состояние снимается, поле снова молчит.
     expect(wrapper.get('[data-gr-form-field]').attributes('aria-busy')).toBeUndefined()
     expect(wrapper.find('[data-gr-form-field-validating]').exists()).toBe(false)
+  })
+})
+
+describe('GrForm — гонка асинхронной валидации поля', () => {
+  it('поздний запуск валидации побеждает: ранний медленный ответ не затирает', async () => {
+    let firstResolve!: (value: boolean | string) => void
+    let secondResolve!: (value: boolean | string) => void
+    let call = 0
+
+    const model = reactive({ email: 'bad' })
+    const formRef = ref<InstanceType<typeof GrForm> | null>(null)
+
+    const wrapper = mount({
+      components: { GrForm, GrFormField, GrInput },
+      setup: () => ({
+        model,
+        formRef,
+        rules: {
+          email: [{
+            validator: () => new Promise<boolean | string>((resolve) => {
+              call += 1
+              if (call === 1) firstResolve = resolve
+              else secondResolve = resolve
+            }),
+          }],
+        },
+      }),
+      template: `
+        <GrForm ref="formRef" :model="model" :rules="rules">
+          <GrFormField label="Email" name="email">
+            <GrInput v-model="model.email" />
+          </GrFormField>
+        </GrForm>
+      `,
+    }, { attachTo: document.body })
+    await nextTick()
+
+    const form = formRef.value!
+
+    // Первый прогон (значение невалидно) — ответ задержится.
+    const first = form.validateField('email')
+    // Пользователь исправил и валидация ушла второй раз.
+    model.email = 'good@example.com'
+    const second = form.validateField('email')
+
+    // Второй ответ приходит раньше: поле валидно.
+    secondResolve(true)
+    await second
+
+    // Медленный первый ответ с ошибкой обязан проиграть — он про старое значение.
+    firstResolve('Некорректный e-mail')
+    await first
+    await nextTick()
+
+    expect(document.querySelector('[data-gr-form-field-error]')?.textContent ?? '').toBe('')
+
+    wrapper.unmount()
   })
 })

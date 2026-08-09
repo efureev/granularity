@@ -229,3 +229,55 @@ describe('GrAutocomplete — name (нативная форма)', () => {
     without.unmount()
   })
 })
+
+describe('GrAutocomplete — очистка, minQueryLength и remote options', () => {
+  it('кнопка очистки табируема (единая конвенция с GrSelect)', () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: 'vue', options: OPTIONS, clearable: true, ariaLabel: 'F' },
+    })
+
+    expect(wrapper.get('[data-gr-autocomplete-clear]').attributes('tabindex')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('ниже minQueryLength список пуст и виден hint, а не старые результаты', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, minQueryLength: 3, ariaLabel: 'F' },
+    })
+    const input = getInput(wrapper)
+    await input.trigger('focus')
+    await input.setValue('vu')
+    await nextTick()
+
+    expect(getTeleportedOptions()).toHaveLength(0)
+    expect(document.body.querySelector('[data-gr-autocomplete-hint]')?.textContent).toContain('3')
+
+    wrapper.unmount()
+  })
+
+  it('смена props.options в remote-режиме снова видна до следующего ответа', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: {
+        modelValue: '',
+        options: [{ value: 'start', label: 'Start' }],
+        fetchOptions: async () => [{ value: 'remote', label: 'Remote' }],
+        debounce: 0,
+        ariaLabel: 'F',
+      },
+    })
+    const input = getInput(wrapper)
+
+    await input.trigger('focus')
+    await input.setValue('r')
+    await new Promise(resolve => setTimeout(resolve, 5))
+    await nextTick()
+    expect(getTeleportedOptions().map(el => el.textContent?.trim())).toEqual(['Remote'])
+
+    // Родитель обновил стартовый список — он снова источник до нового ответа.
+    await wrapper.setProps({ options: [{ value: 'fresh', label: 'Fresh' }] })
+    await nextTick()
+    expect(getTeleportedOptions().map(el => el.textContent?.trim())).toEqual(['Fresh'])
+
+    wrapper.unmount()
+  })
+})

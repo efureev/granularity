@@ -142,3 +142,30 @@ describe('GrTree — виртуализация', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTree — фокус при уходе строки из виртуального окна', () => {
+  it('размонтирование сфокусированной строки возвращает фокус на корень дерева', async () => {
+    const data = Array.from({ length: 60 }, (_, i) => ({ id: i + 1, label: `Node ${i + 1}` }))
+    const wrapper = mount(GrTree, {
+      props: { data, nodeKey: 'id', virtual: true, maxHeight: 90 },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const firstRow = wrapper.get('[data-gr-tree-node-key="1"]').element as HTMLElement
+    firstRow.focus()
+    expect(document.activeElement).toBe(firstRow)
+
+    // Уводим окно далеко вниз: строка №1 размонтируется вместе с фокусом.
+    const root = wrapper.get('[data-gr-tree]').element as HTMLElement
+    root.scrollTop = 1200
+    root.dispatchEvent(new Event('scroll'))
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-tree-node-key="1"]').exists()).toBe(false)
+    // Фокус не должен упасть на body: клавиатура дерева живёт на корне.
+    expect(document.activeElement).toBe(root)
+
+    wrapper.unmount()
+  })
+})

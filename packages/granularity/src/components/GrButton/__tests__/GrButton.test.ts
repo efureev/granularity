@@ -414,3 +414,17 @@ describe('GrButton — block, слоты и объявление загрузк�
     expect(wrapper.find('.sr-only').exists()).toBe(false)
   })
 })
+
+describe('GrButton — императивный API', () => {
+  it('экспонирует пару focus/blur, как остальные контролы', () => {
+    const wrapper = mount(GrButton, { slots: { default: 'Ok' }, attachTo: document.body })
+
+    wrapper.vm.focus()
+    expect(document.activeElement).toBe(wrapper.element)
+
+    wrapper.vm.blur()
+    expect(document.activeElement).not.toBe(wrapper.element)
+
+    wrapper.unmount()
+  })
+})

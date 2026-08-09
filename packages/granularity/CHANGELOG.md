@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTable` exposes `scrollToRow(index, options?)`** — scrolls the container to a content row by its markup index
+  and returns `false` when the row is not rendered (loading/empty state or index out of range). Rows are the
+  consumer's own markup with no keys, so the addressing is positional; service skeleton/empty rows are not
+  addressable, and a nested table inside a cell does not shift the indices. Parity with `GrDataTable.scrollToRow`,
+  which addresses rows by key.
 - **One opening contract for panel overlays: `v-model:open`.** The package had three conventions at once: modal
   surfaces used `v-model`, `GrPopover`/`GrTooltip` used `v-model:open`, `GrSelect`/`GrTreeSelect` only *notified* via
   `visibleChange`, and `GrAutocomplete`/`GrDropdown` emitted nothing at all — a combobox could not be opened from the
@@ -468,6 +473,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`readonly` is now airtight.** Two controls declared `aria-readonly` yet still accepted changes: the native
+  `<select>` of `GrSelect` (no native `readonly` exists there — the DOM value is now reverted to the model, the same
+  trick `GrCheckbox` uses for `<label for>`), and `GrNumberInput`, where Home/End jumped to `min`/`max`. A readonly
+  number field now behaves like readonly text: arrows and Home/End go to the native caret.
+- **Delegated tree keyboard respects interactive targets.** `GrTree` intercepted every key at the root: Enter on the
+  expand toggle activated the *focused* row instead of clicking the button, and typing into an input inside a custom
+  node slot was swallowed by typeahead's `preventDefault`. Keys originating inside a button/link/input are now left
+  alone. The toggle and drag-handle buttons also got `tabindex="-1"` — a tree of fifty nodes was fifty-plus Tab stops
+  instead of one (roving tabindex). And when virtualization unmounts the focused row, focus now lands on the tree root
+  (where the delegated keyboard lives) instead of `<body>`, so the first arrow key recovers the row.
+- **Hold-and-release on the `GrNumberInput` steppers.** The auto-repeat did not listen for `pointercancel`, so a
+  touch scroll that took the pointer away left the interval stepping to the boundary; and releasing after a hold fired
+  the trailing `click` as one extra step. Both fixed: `pointercancel` stops the repeat, and a click that tails a
+  repeat gesture is consumed.
+- **A click on the row-selection checkbox of `GrDataTable` no longer also emits `rowClick`.** The selection column is
+  a service column, not part of the row for navigation purposes.
+- **`GrToaster` pause survives a passing cursor.** Hover and focus-within were one flag, so a mouse crossing the stack
+  and leaving resumed countdowns under keyboard focus (WCAG 2.2.1). They are now independent flags OR-ed together.
+- **`GrForm` async validation is race-free.** Two overlapping runs of the same field applied results in promise
+  *resolution* order — a slow answer about a stale value could overwrite a fresh one. A per-field sequence counter
+  (the `searchSeq` pattern from `GrAutocomplete`) now discards stale results.
+- **`GrSelect`/`GrAutocomplete` polish.** Chip remove buttons hide under form-context `disabled`, not only the local
+  prop; typeahead searches cyclically from the active option (APG) instead of from the top; option hover updates the
+  active index via a precomputed map — O(1) per mousemove instead of O(n) on virtualized thousands. The autocomplete
+  clear button is Tab-reachable (the `GrSelect` convention); below `minQueryLength` the panel shows the "type at least
+  N characters" hint instead of stale results; and replacing `options` in remote mode makes the new list the source
+  again until the next fetch answers (keep the reference stable — an inline literal would reset remote results on
+  every re-render).
+- **`GrList` no longer measures skeletons.** In the loading state the virtualizer recorded loading-row heights under
+  the indices of future data rows, skewing the scroll extent right after load.
+- **`GrButton` exposes `blur()`** — the last control returning only half of the `focus`/`blur` pair.
 - **`GrToaster` showed the newest toasts and bumped the oldest visible one off screen.** The docs promised a queue —
   "extras wait, their timers paused" — but the visible window was the newest `maxVisible` entries, so every push
   displaced a toast the user might still be reading, which then came *back* later. The window is now the oldest

@@ -814,3 +814,59 @@ describe('GrTree — drag & drop', () => {
     expect(event.defaultPrevented).toBe(true)
   })
 })
+
+describe('GrTree — интерактив внутри узлов', () => {
+  const DATA = [
+    { id: 1, label: 'Root', children: [{ id: 11, label: 'Child' }] },
+    { id: 2, label: 'Leaf' },
+  ]
+
+  it('toggle и drag-handle не табируемы: композит держит один таб-стоп', () => {
+    const wrapper = mount(GrTree, {
+      props: { data: DATA, nodeKey: 'id', draggable: true },
+      attachTo: document.body,
+    })
+
+    const toggle = wrapper.get('[data-gr-tree-toggle]')
+    const handle = wrapper.get('[data-gr-tree-drag-handle]')
+    expect(toggle.attributes('tabindex')).toBe('-1')
+    expect(handle.attributes('tabindex')).toBe('-1')
+
+    wrapper.unmount()
+  })
+
+  it('Enter на toggle-кнопке не активирует строку с roving-фокусом', async () => {
+    const wrapper = mount(GrTree, {
+      props: { data: DATA, nodeKey: 'id' },
+      attachTo: document.body,
+    })
+
+    const toggle = wrapper.get('[data-gr-tree-toggle]').element as HTMLElement
+    const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+    toggle.dispatchEvent(event)
+    await nextTick()
+
+    // Делегированная клавиатура уважает интерактивную цель: клик кнопки — её.
+    expect(event.defaultPrevented).toBe(false)
+    expect(wrapper.emitted('nodeClick')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('печать в контроле внутри слота узла не перехватывается typeahead', async () => {
+    const wrapper = mount(GrTree, {
+      props: { data: DATA, nodeKey: 'id' },
+      slots: { default: '<input data-inline-edit type="text">' },
+      attachTo: document.body,
+    })
+
+    const input = wrapper.findAll('[data-inline-edit]')[0].element as HTMLInputElement
+    input.focus()
+    const event = new KeyboardEvent('keydown', { key: 'l', bubbles: true, cancelable: true })
+    input.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(false)
+
+    wrapper.unmount()
+  })
+})

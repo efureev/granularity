@@ -144,8 +144,12 @@ const themeAttrs = useGrThemeAttrs()
 const visibleToasts = computed(() => list.value.slice(-Math.max(1, props.maxVisible)))
 const visibleIds = computed(() => new Set(visibleToasts.value.map(toast => toast.id)))
 
-// Пауза под курсором/фокусом (WCAG 2.2.1). Один флаг на весь стек.
-const paused = ref(false)
+// Пауза под курсором/фокусом (WCAG 2.2.1). Флага два и они независимы: один
+// `paused` терялся на «фокус внутри + мышь прошла насквозь» — `mouseleave`
+// возобновлял отсчёт под клавиатурным фокусом.
+const hovered = ref(false)
+const focusWithin = ref(false)
+const paused = computed(() => hovered.value || focusWithin.value)
 
 // Единый источник правды по таймерам: тост тикает, только если он видим И стек не на
 // паузе. Очередь и hover — на паузе. Реагирует на изменения списка/hover.
@@ -210,10 +214,10 @@ defineExpose({ focus })
         class="fixed z-[var(--gr-z-toast)] w-[var(--gr-toaster-width,360px)] max-w-[calc(100vw-2rem)]"
         :class="containerClass"
         :style="containerStyle"
-        @mouseenter="paused = true"
-        @mouseleave="paused = false"
-        @focusin="paused = true"
-        @focusout="paused = false"
+        @mouseenter="hovered = true"
+        @mouseleave="hovered = false"
+        @focusin="focusWithin = true"
+        @focusout="focusWithin = false"
     >
       <TransitionGroup
           tag="div"

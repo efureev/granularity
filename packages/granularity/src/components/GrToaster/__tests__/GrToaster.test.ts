@@ -357,3 +357,38 @@ describe('GrToaster — семантика очереди: видимые дож
     vi.useRealTimers()
   })
 })
+
+describe('GrToaster — пауза: курсор и фокус независимы', () => {
+  it('mouseleave не возобновляет отсчёт, пока фокус внутри стека', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(GrToaster, {
+      attachTo: document.body,
+      global: { plugins: [granularityToastPlugin] },
+    })
+    const toast = wrapper.vm.$.appContext.app.runWithContext(() => useToast())
+    toast.push({ title: 'Undo', timeoutMs: 100 })
+    await nextTick()
+
+    const hosts = document.querySelectorAll<HTMLElement>('[data-gr-toaster]')
+    const region = hosts[hosts.length - 1]
+
+    // Клавиатурный фокус в стеке, мышь прошла насквозь и ушла.
+    region.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    region.dispatchEvent(new MouseEvent('mouseenter'))
+    region.dispatchEvent(new MouseEvent('mouseleave'))
+    await nextTick()
+
+    // Фокус всё ещё внутри — отсчёт обязан стоять (WCAG 2.2.1).
+    await vi.advanceTimersByTimeAsync(300)
+    expect(toast.list.value).toHaveLength(1)
+
+    // Фокус ушёл — отсчёт возобновился.
+    region.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
+    await nextTick()
+    await vi.advanceTimersByTimeAsync(300)
+    expect(toast.list.value).toHaveLength(0)
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+})

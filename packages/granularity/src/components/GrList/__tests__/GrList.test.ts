@@ -1,5 +1,5 @@
 import { mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils'
-import { defineComponent, markRaw } from 'vue'
+import { defineComponent, markRaw, nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
@@ -335,5 +335,36 @@ describe('GrList — поверхность и типографика', () => {
     const wrapper = mount(GrList)
 
     expect(wrapper.get('[data-gr-list-empty]').classes()).toContain(sizeToken)
+  })
+})
+
+describe('GrList — замеры не берутся со скелетонов', () => {
+  it('высоты loading-строк не искажают распорку после загрузки', async () => {
+    const items = Array.from({ length: 50 }, (_, i) => ({ id: i }))
+    const wrapper = mount(GrList, {
+      props: { items, itemKey: 'id', virtual: true, maxHeight: 112, loading: true, loadingRows: 3 },
+      slots: { item: '<div style="min-height: 56px">Row</div>' },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    // Скелетоны выше будущих строк; форсим update, чтобы measureRendered прошёл
+    // по ним с этой высотой.
+    for (const el of wrapper.element.querySelectorAll('[data-gr-list-loading-row]'))
+      Object.defineProperty(el, 'offsetHeight', { configurable: true, get: () => 100 })
+    await wrapper.setProps({ loadingRows: 4 })
+    await nextTick()
+
+    await wrapper.setProps({ loading: false })
+    await nextTick()
+
+    // Распорка обязана считаться от оценки (56), а не от скелетонов (100):
+    // при чистых оценках хвост кратен 56.
+    const style = wrapper.get('[data-gr-list]').attributes('style') ?? ''
+    const after = Number.parseInt(/--gr-virtual-after: (\d+)px/.exec(style)?.[1] ?? '0', 10)
+    expect(after).toBeGreaterThan(0)
+    expect(after % 56).toBe(0)
+
+    wrapper.unmount()
   })
 })

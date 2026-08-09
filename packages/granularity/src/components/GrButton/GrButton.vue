@@ -119,7 +119,13 @@ function focus(): void {
   el?.focus?.()
 }
 
-defineExpose({ focus })
+function blur(): void {
+  const root = rootEl.value
+  const el = root instanceof HTMLElement ? root : root?.$el
+  el?.blur?.()
+}
+
+defineExpose({ focus, blur })
 
 const className = computed(() => {
   return grButtonClass({

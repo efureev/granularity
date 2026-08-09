@@ -73,8 +73,8 @@ packages/<my-package>/
     }
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.11.0 <1.0.0",
-    "@feugene/unocss-preset-granular": "^0.4.0",
+    "@feugene/granularity": ">=0.15.0 <1.0.0",
+    "@feugene/unocss-preset-granular": "^0.8.0",
     "vue": "^3.5.40"
   },
   "scripts": {

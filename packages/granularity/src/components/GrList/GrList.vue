@@ -160,6 +160,9 @@ const listStyle = computed(() => {
  */
 function measureRendered(): void {
   if (!virtualEnabled.value) return
+  // В состояниях loading/empty дети контейнера — скелетоны и заглушки: их
+  // высоты записались бы в замеры под индексами будущих строк данных.
+  if (!showItems.value) return
 
   const container = listEl.value
   if (!container) return

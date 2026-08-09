@@ -133,25 +133,39 @@ function effectiveRules(name: string): GrFormRule[] {
 const resolveMessage = createGrFormMessageResolver(t)
 
 // ————— Валидация.
+// Счётчик поколений на имя поля: перекрывающиеся асинхронные прогоны пишут
+// результат в порядке РАЗРЕШЕНИЯ промисов, и без него медленный ответ про
+// старое значение затирал бы свежий (приём — `searchSeq` в GrAutocomplete).
+const validationSeq = new Map<string, number>()
+
 async function validateField(name: string, trigger?: GrFormTrigger): Promise<boolean> {
   if (trigger === 'blur' && !props.validateOnBlur) return !errors.value[name]
 
   const rules = rulesForTrigger(effectiveRules(name), trigger)
   if (!rules.length) return !errors.value[name]
 
+  const seq = (validationSeq.get(name) ?? 0) + 1
+  validationSeq.set(name, seq)
+
   // Признак «идёт проверка» нужен именно асинхронным правилам: без него поле
   // молчит до ответа сервера, и пользователь не знает, что что-то происходит.
   validatingSet.value = new Set(validatingSet.value).add(name)
   try {
     const message = await runFieldRules(getValue(name), rules, props.model, resolveMessage)
+
+    // Устаревший прогон: его результат — про прежнее значение, не применять.
+    if (validationSeq.get(name) !== seq) return !errors.value[name]
+
     errors.value = { ...errors.value, [name]: message }
     emit('validate', name, !message, message)
     return !message
   }
   finally {
-    const next = new Set(validatingSet.value)
-    next.delete(name)
-    validatingSet.value = next
+    if (validationSeq.get(name) === seq) {
+      const next = new Set(validatingSet.value)
+      next.delete(name)
+      validatingSet.value = next
+    }
   }
 }
 

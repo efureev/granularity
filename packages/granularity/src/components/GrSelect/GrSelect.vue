@@ -904,10 +904,6 @@ const navigableItems = computed<GrSelectNavigableItem<TValue>[]>(() => {
   return items
 })
 
-function navigableIndexOf(value: TValue): number {
-  return navigableItems.value.findIndex(item => item.kind === 'option' && sameValue(item.value, value))
-}
-
 const addOptionDomId = computed(() => `${listboxId}-add`)
 
 /** Прокрутка к активному: у виртуализации окно, затем доводка `scrollIntoView`. */
@@ -940,6 +936,20 @@ const {
 
 const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.value : undefined))
 
+/** Navigable-индекс по позиции в `panelItems`: O(1) на hover вместо O(n). */
+const navigableIndexByPanelIndex = computed(() => {
+  const map = new Map<number, number>()
+  navigableItems.value.forEach((item, navIndex) => {
+    if (item.kind === 'option') map.set(item.index, navIndex)
+  })
+  return map
+})
+
+function onOptionHover(panelIndex: number): void {
+  const next = navigableIndexByPanelIndex.value.get(panelIndex)
+  if (next !== undefined && next !== activeIndex.value) activeIndex.value = next
+}
+
 /**
  * `aria-activedescendant` работает только на элементе, который держит фокус.
  * С полем поиска фокус уходит в него, поэтому связка с активной опцией живёт
@@ -963,12 +973,20 @@ function typeahead(char: string): void {
   if (typeaheadTimer) clearTimeout(typeaheadTimer)
   typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, 600)
 
-  const idx = navigableItems.value.findIndex((item) => {
-    if (item.kind !== 'option') return false
+  // Поиск циклически от следующей за активной (APG) — как в GrTree/GrDropdown:
+  // повторная буква ведёт к следующему совпадению, а не возвращает к первому.
+  const items = navigableItems.value
+  const from = activeIndex.value
+  for (let step = 1; step <= items.length; step += 1) {
+    const idx = (from + step + items.length) % items.length
+    const item = items[idx]
+    if (item.kind !== 'option') continue
     const opt = flatOptions.value.find(o => sameValue(o.value, item.value))
-    return opt?.label.toLowerCase().startsWith(typeaheadBuffer)
-  })
-  if (idx >= 0) setActive(idx)
+    if (opt?.label.toLowerCase().startsWith(typeaheadBuffer)) {
+      setActive(idx)
+      return
+    }
+  }
 }
 
 function onComboKeydown(event: KeyboardEvent): void {
@@ -1114,6 +1132,18 @@ const triggerClassName = computed(() => {
 
 function onChange(e: Event): void {
   const el = e.target as HTMLSelectElement
+
+  // Нативного `readonly` у `<select>` нет: браузер уже переключил значение —
+  // возвращаем DOM к модели, иначе форма отправит непринятое (приём GrCheckbox).
+  if (isReadonly.value) {
+    if (props.multiple) {
+      for (const option of el.options) option.selected = isSelected(fromDomValue(option.value))
+    }
+    else {
+      el.value = modelSingle.value === '' ? '' : keyOf(modelSingle.value)
+    }
+    return
+  }
 
   if (props.multiple) {
     emit('update:modelValue', Array.from(el.selectedOptions, o => fromDomValue(o.value)))
@@ -1309,7 +1339,7 @@ const themeAttrs = useGrThemeAttrs()
       >
         <span class="truncate">{{ opt.label }}</span>
         <button
-          v-if="!disabled && !isReadonly"
+          v-if="!isDisabled && !isReadonly"
           data-gr-select-tag-remove
           type="button"
           :aria-label="tagRemoveLabel(opt)"
@@ -1475,7 +1505,7 @@ const themeAttrs = useGrThemeAttrs()
                     })"
                     @mousedown.prevent
                     @click="toggleValue(child.option.value)"
-                    @mousemove="activeIndex = navigableIndexOf(child.option.value)"
+                    @mousemove="onOptionHover(child.index)"
                   >
                     <slot name="option" :option="child.option" :selected="isSelected(child.option.value)">
                       <span class="flex items-center gap-2 min-w-0">
@@ -1509,7 +1539,7 @@ const themeAttrs = useGrThemeAttrs()
                   })"
                   @mousedown.prevent
                   @click="toggleValue(row.option.value)"
-                  @mousemove="activeIndex = navigableIndexOf(row.option.value)"
+                  @mousemove="onOptionHover(row.index)"
                 >
                   <slot name="option" :option="row.option" :selected="isSelected(row.option.value)">
                     <span class="flex items-center gap-2 min-w-0">

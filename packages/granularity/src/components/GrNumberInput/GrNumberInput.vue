@@ -449,10 +449,26 @@ function stepBy(dir: 1 | -1): void {
   setValue(current + (props.step ?? 1) * dir)
 }
 
+// Интервал уже шагал: финальный `click` при отпускании — не намерение
+// пользователя сделать ещё один шаг, а хвост того же жеста.
+let repeatFired = false
+
+/** Клик кнопки «±»: шаг, если это не хвост только что завершённого удержания. */
+function onStepClick(dir: 1 | -1): void {
+  if (repeatFired) {
+    repeatFired = false
+    return
+  }
+  stepBy(dir)
+}
+
 // Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, Home/End —
 // к границам `min`/`max` (если заданы).
 function onKeydown(e: KeyboardEvent): void {
   if (isDisabled.value) return
+  // Readonly-поле ведёт себя как текст: стрелки и Home/End отдаются нативной
+  // каретке, значение не меняется.
+  if (isReadonly.value) return
 
   switch (e.key) {
     case 'ArrowUp':
@@ -572,12 +588,14 @@ function startRepeat(dir: 1 | -1): void {
   if (isDisabled.value || isReadonly.value) return
 
   stopRepeat()
+  repeatFired = false
   repeatDelay = setTimeout(() => {
     repeatTimer = setInterval(() => {
       if (!canStep(dir)) {
         stopRepeat()
         return
       }
+      repeatFired = true
       stepBy(dir)
     }, REPEAT_INTERVAL_MS)
   }, REPEAT_DELAY_MS)
@@ -697,7 +715,8 @@ function clear(): void {
           @pointerdown="startRepeat(1)"
           @pointerup="stopRepeat"
           @pointerleave="stopRepeat"
-          @click="stepBy(1)"
+          @pointercancel="stopRepeat"
+          @click="onStepClick(1)"
         >
           <GrIcon :size="12">
             <IconChevronUp />
@@ -713,7 +732,8 @@ function clear(): void {
           @pointerdown="startRepeat(-1)"
           @pointerup="stopRepeat"
           @pointerleave="stopRepeat"
-          @click="stepBy(-1)"
+          @pointercancel="stopRepeat"
+          @click="onStepClick(-1)"
         >
           <GrIcon :size="12">
             <IconChevronDown />
@@ -739,7 +759,8 @@ function clear(): void {
         @pointerdown="startRepeat(-1)"
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
-        @click="stepBy(-1)"
+        @pointercancel="stopRepeat"
+        @click="onStepClick(-1)"
       >
         <GrIcon :size="12">
           <IconChevronLeft />
@@ -764,7 +785,8 @@ function clear(): void {
         @pointerdown="startRepeat(1)"
         @pointerup="stopRepeat"
         @pointerleave="stopRepeat"
-        @click="stepBy(1)"
+        @pointercancel="stopRepeat"
+        @click="onStepClick(1)"
       >
         <GrIcon :size="12">
           <IconChevronRight />

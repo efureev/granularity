@@ -445,3 +445,25 @@ describe('GrDataTable — строки, слоты и состояния', () =>
     wrapper.unmount()
   })
 })
+
+describe('GrDataTable — клик по чекбоксу выбора строки', () => {
+  it('переключает выбор, но не эмитит rowClick', async () => {
+    const wrapper = mount(GrDataTable, {
+      props: {
+        rows: [{ id: 1, name: 'Ada' }, { id: 2, name: 'Linus' }],
+        columns: [{ key: 'name', label: 'Имя' }],
+        selectable: true,
+      },
+      attachTo: document.body,
+    })
+
+    const rowCheckbox = wrapper.get('[data-gr-datatable-select-row]')
+    await rowCheckbox.trigger('click')
+
+    expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([[1]])
+    // Служебная колонка — не «строка»: навигационный клик не должен уходить.
+    expect(wrapper.emitted('rowClick')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+})

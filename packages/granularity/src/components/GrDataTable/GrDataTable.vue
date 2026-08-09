@@ -684,7 +684,9 @@ defineExpose({
         v-bind="rowProps?.(row, index)"
         @click="onRowClick(row, index, $event)"
       >
-      <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]">
+      <!-- `.stop`: служебная колонка выбора — не «строка» для навигационного
+           клика, иначе выбор чекбоксом уводил бы по `rowClick`-переходу. -->
+      <td v-if="selectable" class="text-left" :class="[selectColumnClass, cellClass]" @click.stop>
         <GrCheckbox
           v-if="isRowSelectable(row)"
           data-gr-datatable-select-row

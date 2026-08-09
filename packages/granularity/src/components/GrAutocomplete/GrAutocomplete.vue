@@ -211,6 +211,16 @@ const optionsResolved = computed<GrAutocompleteOption<TValue>[]>(() =>
   props.fetchOptions && remoteAnswered.value ? remoteOptions.value : (props.options ?? []),
 )
 
+// Родитель обновил стартовый список — он снова источник до следующего ответа
+// сервера. Ссылку на `options` в remote-режиме держите стабильной:
+// инлайн-литерал пересоздаётся каждым ререндером и сбрасывал бы
+// remote-результаты (та же конвенция идентичности, что у `useVirtualList.source`).
+watch(() => props.options, () => {
+  if (!props.fetchOptions) return
+  remoteAnswered.value = false
+  remoteOptions.value = []
+})
+
 const isLoading = computed(() => props.loading || remoteLoading.value)
 
 /** `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy. */
@@ -313,6 +323,17 @@ const filteredOptions = computed<GrAutocompleteOption<TValue>[]>(() => {
   return optionsResolved.value.filter(o => matcher(o, q))
 })
 
+const belowMinQuery = computed(() => props.minQueryLength > 0 && query.value.trim().length < props.minQueryLength)
+
+/**
+ * Опции к показу и навигации. Ниже `minQueryLength` — пусто: список ещё
+ * относится к прошлому запросу, показывать его под подсказкой «введите ещё N»
+ * значит дезинформировать.
+ */
+const effectiveOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
+  belowMinQuery.value ? [] : filteredOptions.value,
+)
+
 const canAddCustom = computed(() => {
   if (!props.allowCustomValue) return false
   // Кастомное значение набирается текстом — оно строковое по природе;
@@ -325,10 +346,8 @@ const canAddCustom = computed(() => {
   return !optionsResolved.value.some(o => o.value === v || o.label === v)
 })
 
-const belowMinQuery = computed(() => props.minQueryLength > 0 && query.value.trim().length < props.minQueryLength)
-
 const showEmpty = computed(() =>
-  !isLoading.value && filteredOptions.value.length === 0 && !canAddCustom.value,
+  !isLoading.value && effectiveOptions.value.length === 0 && !canAddCustom.value,
 )
 
 // ————— Панель: id/aria-activedescendant.
@@ -356,13 +375,13 @@ const addOptionDomId = computed(() => `${listboxId}-add`)
 const OPTION_SIZE_ESTIMATE = 36
 
 const addOffset = computed(() => (canAddCustom.value ? 1 : 0))
-const virtualCount = computed(() => filteredOptions.value.length + addOffset.value)
+const virtualCount = computed(() => effectiveOptions.value.length + addOffset.value)
 
 const virtualizer = useVirtualList({
   container: listboxEl,
   count: () => (props.virtual ? virtualCount.value : 0),
   // Фильтрация/remote-ответ пересобирают набор — замеры прошлого невалидны.
-  source: () => filteredOptions.value,
+  source: () => effectiveOptions.value,
   itemSize: OPTION_SIZE_ESTIMATE,
   // Панель скрыта `v-show`, пока закрыта, поэтому `clientHeight` контейнера —
   // ноль. Окно считается от объявленной высоты до первого настоящего замера.
@@ -377,7 +396,7 @@ const showAddOption = computed(() => {
 
 /** Опции к отрисовке вместе с их абсолютным индексом в `filteredOptions`. */
 const renderedOptions = computed(() => {
-  const all = filteredOptions.value
+  const all = effectiveOptions.value
   if (!props.virtual) return all.map((option, index) => ({ option, index }))
 
   const { start, end } = virtualizer.range.value
@@ -418,7 +437,7 @@ type NavigableItem =
 
 const navigableItems = computed<NavigableItem[]>(() => {
   const items: NavigableItem[] = canAddCustom.value ? [{ kind: 'add' }] : []
-  filteredOptions.value.forEach((option, index) => {
+  effectiveOptions.value.forEach((option, index) => {
     if (!option.disabled) items.push({ kind: 'option', option, index })
   })
   return items
@@ -827,7 +846,6 @@ const themeAttrs = useGrThemeAttrs()
         data-gr-autocomplete-clear
         class="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
         :aria-label="resolvedClearLabel"
-        tabindex="-1"
         @click="clearSelection"
       >
         <span class="i-lucide-x block h-4 w-4" aria-hidden="true" />
