@@ -10,10 +10,10 @@
  */
 
 export const sizes = {
-  xs: 'h-7 px-2.5 text-[12px]',
-  sm: 'h-8 px-3 text-[13px]',
-  md: 'h-10 px-3 text-[14px]',
-  lg: 'h-11 px-4 text-[16px]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
 } as const
 
 /**
@@ -41,9 +41,16 @@ export const states = {
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
 } as const
 
+/**
+ * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
+ * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
+ * валидации, и тема вправе развести их по цвету.
+ */
+export const invalidClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[var(--gr-invalid-ring)]'
+
 export type GrInputState = keyof typeof states
 
-export const shellBaseClass = 'relative w-full overflow-hidden rounded-md border transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const shellBaseClass = 'relative w-full overflow-hidden rounded-md border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 export const shellEnabledClass = 'bg-[var(--gr-bg)]'
 
@@ -62,7 +69,7 @@ export function grInputShellClass(options: {
 }): string {
   return [
     shellBaseClass,
-    options.invalid ? states.danger : states[options.state],
+    options.invalid ? invalidClass : states[options.state],
     options.disabled ? shellDisabledClass : shellEnabledClass,
   ].join(' ')
 }

@@ -152,7 +152,7 @@ describe('GrToaster', () => {
     const html = wrapper.html()
 
     expect(html.split('text-[length:var(--gr-text-sm)]')).toHaveLength(3)
-    expect(html).not.toContain('text-[13px]')
+    expect(html).not.toContain('text-[length:var(--gr-control-text-sm)]')
   })
 
   it('placement применяет классы угла (bottom-left)', () => {

@@ -592,7 +592,7 @@ describe('GrTreeSelect — чекбоксы при multiple', () => {
     await nextTick()
 
     expect(document.body.innerHTML).toContain('text-[length:var(--gr-text-sm)]')
-    expect(document.body.innerHTML).not.toContain('text-[13px]')
+    expect(document.body.innerHTML).not.toContain('text-[length:var(--gr-control-text-sm)]')
   })
 
   // Скроллер должен быть один: при виртуализации его берёт дерево, и вторая

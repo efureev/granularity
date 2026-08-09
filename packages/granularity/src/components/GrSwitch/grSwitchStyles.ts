@@ -20,7 +20,7 @@ export const rootLabelPositions: Record<GrSwitchLabelPosition, string> = {
 }
 
 export const trackBase =
-    'relative inline-flex shrink-0 items-center rounded-full border border-[var(--gr-switch-track-brd)] transition-colors duration-150'
+    'relative inline-flex shrink-0 items-center rounded-full border border-[var(--gr-switch-track-brd)] transition-colors duration-[var(--gr-duration-fast)]'
 
 export const trackSizes: Record<GrSwitchSize, string> = {
     xs: 'h-4 w-7',
@@ -30,7 +30,7 @@ export const trackSizes: Record<GrSwitchSize, string> = {
 }
 
 export const thumbBase =
-    'inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-transform duration-150'
+    'inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-transform duration-[var(--gr-duration-fast)]'
 
 export const thumbSizes: Record<GrSwitchSize, string> = {
     xs: 'h-3 w-3',

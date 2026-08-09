@@ -32,10 +32,28 @@
   --gr-brd: #1c5470;
   --gr-input: #1c5470;
   --gr-ring: #38bdf8;
+  /* Подложка модальных слоёв: тон фона темы, а не нейтральный чёрный. */
+  --gr-overlay-bg: rgb(4 30 43 / 0.6);
+
+  /*
+   * State roles.
+   *
+   * Недоступный контрол гасится поверхностью, а не прозрачностью: `opacity`
+   * разбавляет выверенные на AA токены текста. Ошибка валидации по умолчанию
+   * совпадает с danger-тоном, но объявлена отдельно — тема вправе развести
+   * вердикт валидации и декоративную подсветку.
+   */
+  --gr-disabled-bg: #0d3446;
+  --gr-disabled-fg: #6d8fa3;
+  --gr-disabled-brd: #17475f;
+  --gr-invalid-brd: var(--gr-danger);
+  --gr-invalid-ring: var(--gr-danger);
+  --gr-invalid-text: var(--gr-danger-text);
 
   /* Action roles */
   --gr-primary: #4fd1e0;
   --gr-primary-fg: #041e2b;
+  --gr-primary-text: #7fdfea;
   --gr-accent: #0d3a52;
   --gr-accent-fg: #a5e4f2;
 

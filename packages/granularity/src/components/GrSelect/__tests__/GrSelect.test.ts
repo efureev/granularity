@@ -33,7 +33,7 @@ describe('GrSelect', () => {
     const select = wrapper.get('select')
     expect(select.attributes('class')).toContain('h-7')
     expect(select.attributes('class')).toContain('px-2.5')
-    expect(select.attributes('class')).toContain('text-[12px]')
+    expect(select.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
   })
 
   it('поддерживает size=xs в view="link" (меняет font-size)', () => {
@@ -51,7 +51,7 @@ describe('GrSelect', () => {
     // метке-обёртке, а не к нативному `<select>` (который сделан прозрачным overlay,
     // чтобы ширина компонента в закрытом состоянии равнялась выбранной опции, а не самой длинной).
     const label = wrapper.get('[data-gr-select-link-label]')
-    expect(label.attributes('class')).toContain('text-[12px]')
+    expect(label.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
   })
 
   it('эмитит update:modelValue при изменении', async () => {
@@ -893,7 +893,7 @@ describe('GrSelect — визуальное состояние', () => {
 
     expect(select.attributes('aria-invalid')).toBe('true')
     // Раньше ошибка была слышна диктору, но не видна глазами.
-    expect(select.classes()).toContain('border-[var(--gr-danger)]')
+    expect(select.classes()).toContain('border-[var(--gr-invalid-brd)]')
   })
 
   it('state задаёт оттенок рамки, invalid его перебивает', () => {
@@ -904,7 +904,7 @@ describe('GrSelect — визуальное состояние', () => {
     expect(warning.get('select').classes()).toContain('border-[var(--gr-warning)]')
 
     const both = mount(GrSelect, { props: { modelValue: 'a', options, state: 'success', invalid: true } })
-    expect(both.get('select').classes()).toContain('border-[var(--gr-danger)]')
+    expect(both.get('select').classes()).toContain('border-[var(--gr-invalid-brd)]')
     expect(both.get('select').classes()).not.toContain('border-[var(--gr-success)]')
   })
 
@@ -914,7 +914,7 @@ describe('GrSelect — визуальное состояние', () => {
       attachTo: document.body,
     })
 
-    expect(wrapper.get('[data-gr-select-trigger]').classes()).toContain('border-[var(--gr-danger)]')
+    expect(wrapper.get('[data-gr-select-trigger]').classes()).toContain('border-[var(--gr-invalid-brd)]')
     wrapper.unmount()
   })
 

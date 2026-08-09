@@ -97,8 +97,8 @@ describe('GrTable', () => {
     expect(defaultSize.find('table').classes()).toContain('text-sm')
 
     const expected: Record<string, string> = {
-      xs: 'text-[12px]',
-      sm: 'text-[13px]',
+      xs: 'text-[length:var(--gr-control-text-xs)]',
+      sm: 'text-[length:var(--gr-control-text-sm)]',
       md: 'text-sm',
       lg: 'text-base',
     }

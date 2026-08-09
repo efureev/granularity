@@ -20,9 +20,9 @@ export const commandPaletteModalSizeBySize: Record<GrCommandPaletteSize, GrOverl
 }
 
 export const commandSearchRowClass = 'flex items-center gap-2 border-b border-[var(--gr-brd)] px-4'
-export const commandSearchInputClass = 'min-w-0 flex-1 bg-transparent py-3.5 text-[15px] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:outline-none'
+export const commandSearchInputClass = 'min-w-0 flex-1 bg-transparent py-3.5 text-[length:var(--gr-command-input-font-size,15px)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:outline-none'
 
-export const commandGroupLabelClass = 'px-3 pb-1 pt-3 text-[11px] font-medium uppercase tracking-wide text-[var(--gr-muted-fg)]'
+export const commandGroupLabelClass = 'px-3 pb-1 pt-3 text-[length:var(--gr-control-text-2xs)] font-medium uppercase tracking-wide text-[var(--gr-muted-fg)]'
 
 /** Описание под меткой команды. Цвет приходит из `commandItemMutedClass`. */
 export const commandItemDescriptionClass = 'block truncate text-[length:var(--gr-text-xs)]'
@@ -41,14 +41,14 @@ export function commandItemMutedClass(disabled: boolean): string {
 }
 
 /** Совпавший с запросом фрагмент. Фон — тот же токен подсветки, что у активной строки. */
-export const commandMatchClass = 'rounded-[3px] bg-[var(--gr-command-match-bg,color-mix(in_srgb,var(--gr-primary)_22%,transparent))] text-[var(--gr-fg)]'
+export const commandMatchClass = 'rounded-[var(--gr-radius-xs)] bg-[var(--gr-command-match-bg,color-mix(in_srgb,var(--gr-primary)_22%,transparent))] text-[var(--gr-fg)]'
 
 /**
  * Цвета текста в базе нет намеренно: два `text-[…]` в одном списке классов
  * разрешаются порядком правил в сгенерированном CSS, а не порядком в атрибуте, —
  * и цвет выключенной команды молча проигрывал бы базовому.
  */
-export const commandItemBaseClass = 'flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-left text-[14px]'
+export const commandItemBaseClass = 'flex w-full items-center gap-3 rounded-[var(--gr-command-item-radius,10px)] px-3 py-2 text-left text-[length:var(--gr-control-text-md)]'
 export const commandItemEnabledClass = 'cursor-pointer text-[var(--gr-fg)]'
 export const commandItemActiveClass = 'bg-[var(--gr-command-active-bg,color-mix(in_srgb,var(--gr-muted)_45%,transparent))]'
 /**
@@ -67,5 +67,5 @@ export function commandItemClass(options: { active: boolean, disabled: boolean }
     .join(' ')
 }
 
-export const commandEmptyClass = 'px-4 py-10 text-center text-[13px] text-[var(--gr-muted-fg)]'
-export const commandFooterClass = 'flex items-center gap-3 border-t border-[var(--gr-brd)] px-4 py-2 text-[11px] text-[var(--gr-muted-fg)]'
+export const commandEmptyClass = 'px-4 py-10 text-center text-[length:var(--gr-control-text-sm)] text-[var(--gr-muted-fg)]'
+export const commandFooterClass = 'flex items-center gap-3 border-t border-[var(--gr-brd)] px-4 py-2 text-[length:var(--gr-control-text-2xs)] text-[var(--gr-muted-fg)]'

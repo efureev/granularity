@@ -6,16 +6,16 @@ export type GrBadgeTone = GrTone
 export type GrBadgeSize = GrComponentSize
 export type GrBadgeRadius = 'square' | 'semi' | 'round'
 export const sizeClassBySize: Record<GrBadgeSize, string> = {
-  xs: 'px-2 py-0.4 text-[11px]',
-  sm: 'px-2.5 py-0.5 text-[12px]',
-  md: 'px-3 py-1 text-[13px]',
-  lg: 'px-3.5 py-1.5 text-[14px]',
+  xs: 'px-2 py-0.4 text-[length:var(--gr-control-text-2xs)]',
+  sm: 'px-2.5 py-0.5 text-[length:var(--gr-control-text-xs)]',
+  md: 'px-3 py-1 text-[length:var(--gr-control-text-sm)]',
+  lg: 'px-3.5 py-1.5 text-[length:var(--gr-control-text-md)]',
 }
 export const semiRadiusClassBySize: Record<GrBadgeSize, string> = {
-  xs: 'rounded-[3px]',
-  sm: 'rounded-[3px]',
-  md: 'rounded-[5px]',
-  lg: 'rounded-[7px]',
+  xs: 'rounded-[var(--gr-badge-semi-radius-xs,3px)]',
+  sm: 'rounded-[var(--gr-badge-semi-radius-sm,3px)]',
+  md: 'rounded-[var(--gr-badge-semi-radius-md,5px)]',
+  lg: 'rounded-[var(--gr-badge-semi-radius-lg,7px)]',
 }
 export const lightToneClassByTone: Record<GrBadgeTone, string> = {
   neutral: 'bg-[var(--gr-muted)] text-[var(--gr-fg)] border-[var(--gr-brd)]',

@@ -190,7 +190,7 @@ function onConfirm(): void {
   >
     <div class="grid gap-4">
       <slot>
-        <div v-if="description" class="text-[14px] text-[var(--gr-muted-fg)]">
+        <div v-if="description" class="text-[length:var(--gr-control-text-md)] text-[var(--gr-muted-fg)]">
           {{ description }}
         </div>
       </slot>

@@ -23,15 +23,15 @@ describe('GrBadge', () => {
 
   it('поддерживает size: sm / md / lg', () => {
     const sm = mount(GrBadge, { props: { size: 'sm' }, slots: { default: 'SM' } })
-    expect(sm.attributes('class')).toContain('text-[12px]')
+    expect(sm.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
     expect(sm.attributes('class')).toContain('px-2')
 
     const md = mount(GrBadge, { props: { size: 'md' }, slots: { default: 'MD' } })
-    expect(md.attributes('class')).toContain('text-[13px]')
+    expect(md.attributes('class')).toContain('text-[length:var(--gr-control-text-sm)]')
     expect(md.attributes('class')).toContain('px-3')
 
     const lg = mount(GrBadge, { props: { size: 'lg' }, slots: { default: 'LG' } })
-    expect(lg.attributes('class')).toContain('text-[14px]')
+    expect(lg.attributes('class')).toContain('text-[length:var(--gr-control-text-md)]')
     expect(lg.attributes('class')).toContain('px-3')
     expect(lg.attributes('class')).toContain('py-1')
   })
@@ -44,7 +44,7 @@ describe('GrBadge', () => {
       props: { radius: 'semi', size: 'lg' },
       slots: { default: 'Semi' },
     })
-    expect(semi.attributes('class')).toContain('rounded-[7px]')
+    expect(semi.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg,7px)]')
 
     const round = mount(GrBadge, { props: { radius: 'round' }, slots: { default: 'Round' } })
     expect(round.attributes('class')).toContain('rounded-full')
@@ -67,7 +67,7 @@ describe('GrBadge', () => {
     // `-fg`, а не захардкоженный `text-white`: тот не знал полярности заливки
     // и давал 2.54:1 в light и 1.92:1 в dark.
     expect(wrapper.attributes('class')).toContain('text-[var(--gr-success-fg)]')
-    expect(wrapper.attributes('class')).toContain('rounded-[7px]')
+    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg,7px)]')
   })
 
   it('поддерживает новые tones slate и azure', () => {

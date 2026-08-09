@@ -15,8 +15,8 @@ export type GrPopoverSize = GrComponentSize
 export type GrPopoverRole = 'dialog' | 'menu' | 'listbox' | 'grid' | 'group' | 'none'
 
 export const panelSizes: Record<GrPopoverSize, string> = {
-  xs: 'p-2 text-[12px]',
-  sm: 'p-2.5 text-[13px]',
+  xs: 'p-2 text-[length:var(--gr-control-text-xs)]',
+  sm: 'p-2.5 text-[length:var(--gr-control-text-sm)]',
   md: 'p-3 text-sm',
   lg: 'p-4 text-base',
 }

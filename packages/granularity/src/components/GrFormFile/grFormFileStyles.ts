@@ -4,16 +4,16 @@ export type GrFormFileSize = GrComponentSize
 
 /** Имя файла, плейсхолдер, список выбранного. */
 export const textSizes: Record<GrFormFileSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
+  xs: 'text-[length:var(--gr-control-text-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)]',
   md: 'text-sm',
   lg: 'text-base',
 }
 
 /** Ссылка «удалить» у элемента списка — на ступень мельче имени файла. */
 export const removeTextSizes: Record<GrFormFileSize, string> = {
-  xs: 'text-[10px]',
-  sm: 'text-[11px]',
+  xs: 'text-[length:var(--gr-control-text-3xs)]',
+  sm: 'text-[length:var(--gr-control-text-2xs)]',
   md: 'text-xs',
   lg: 'text-sm',
 }

@@ -28,6 +28,27 @@ export interface GrThemeToken {
 }
 
 /**
+ * Природа покомпонентного токена — она же отвечает на вопрос, что будет, если
+ * его не задать: `theme`/`css`/`inline` компонент присваивает сам, `hook` не
+ * присваивается нигде и работает дефолтом из `var(--gr-x, дефолт)`.
+ */
+export type GrComponentTokenKind = 'theme' | 'css' | 'inline' | 'hook'
+
+/**
+ * Точка кастомизации отдельного компонента. Источник — `tokens.json` рядом с
+ * его кодом; в CSS отсюда ничего не генерируется.
+ */
+export interface GrComponentToken {
+  /** Компонент-владелец (`GrTree`) либо `composables` для того, что ставит композабл. */
+  owner: string
+  name: string
+  kind: GrComponentTokenKind
+  /** Значение, которое действует, пока токен не переопределён. */
+  default: string
+  description: string
+}
+
+/**
  * Производное состояние: в CSS живёт формулой `color-mix`, а `values` — тот же
  * результат, посчитанный заранее (он же уходит в `@supports not (color-mix)`).
  */

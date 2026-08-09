@@ -327,7 +327,7 @@ describe('GrList — поверхность и типографика', () => {
     for (const wrapper of [plain, interactive]) {
       const html = wrapper.html()
       expect(html.split(sizeToken)).toHaveLength(3)
-      expect(html).not.toContain('text-[13px]')
+      expect(html).not.toContain('text-[length:var(--gr-control-text-sm)]')
     }
   })
 

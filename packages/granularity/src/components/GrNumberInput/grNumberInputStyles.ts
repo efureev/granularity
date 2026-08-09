@@ -11,10 +11,10 @@ export type NumberInputSize = GrNumberInputSize
 export type NumberInputControlsDirection = GrNumberInputControlsDirection
 
 export const sizeClassBySize: Record<GrNumberInputSize, string> = {
-  xs: 'h-7 px-2.5 text-[12px]',
-  sm: 'h-8 px-3 text-[13px]',
-  md: 'h-10 px-3 text-[14px]',
-  lg: 'h-11 px-4 text-[16px]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
 }
 
 export const textAlignClassByAlign: Record<GrNumberInputTextAlign, string> = {
@@ -29,6 +29,13 @@ export const borderClassByState: Record<GrNumberInputState, string> = {
   warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
 }
+
+/**
+ * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
+ * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
+ * валидации, и тема вправе развести их по цвету.
+ */
+export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[var(--gr-invalid-ring)]'
 
 /**
  * Недоступное поле гасится токенами, а не `opacity`: прозрачность разбавляет
@@ -46,10 +53,10 @@ export const stepperWideClass = `h-full w-full ${stepperBaseClass}`
 
 export const clearButtonClass = 'absolute top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-full text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
-export function grNumberInputShellClass(options: { disabled: boolean, state: GrNumberInputState }): string {
+export function grNumberInputShellClass(options: { disabled: boolean, state: GrNumberInputState, invalid: boolean }): string {
   return [
     options.disabled ? disabledShellClass : '',
-    borderClassByState[options.state],
+    options.invalid ? invalidBorderClass : borderClassByState[options.state],
   ]
     .filter(Boolean)
     .join(' ')

@@ -33,8 +33,8 @@ export const placeholderPaddings: Record<GrDataTableSize, string> = {
 
 /** Подпись колонки набирается мельче тела таблицы — она не данные, а навигация. */
 export const headerTextSizes: Record<GrDataTableSize, string> = {
-  xs: 'text-[10px]',
-  sm: 'text-[11px]',
+  xs: 'text-[length:var(--gr-control-text-3xs)]',
+  sm: 'text-[length:var(--gr-control-text-2xs)]',
   md: 'text-xs',
   lg: 'text-sm',
 }

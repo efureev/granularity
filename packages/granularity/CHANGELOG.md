@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Per-component tokens are a declared contract.** Around 170 variables (`--gr-tree-*`, `--gr-button-*`,
+  `--gr-segmented-*` and the rest) were read through `var(--gr-x, fallback)` and were, in practice, public theming
+  API — yet they were declared nowhere: not in `tokens/*.json`, not in `docs/tokens.md`. Renaming one broke no test,
+  and the only way to learn a name was to read the source. Every component that has its own variables now ships a
+  `tokens.json` next to its code (name, `kind`, default, purpose); the generator turns those into a new
+  "Покомпонентные точки кастомизации" section of `docs/tokens.md` and into `grComponentTokens` in
+  `@feugene/granularity/tokens`. `kind` says what happens when the token is left alone: `theme` / `css` / `inline`
+  are assigned by the component itself, `hook` is never assigned and falls back to the default written in `var()`.
+  No CSS is generated from the registry — that would break exactly those fallbacks. Gate:
+  `src/__tests__/componentTokens.test.ts`, which fails both on an unregistered variable and on a registry entry whose
+  variable is gone.
+- **Invalid is its own theme role: `--gr-invalid-brd`, `--gr-invalid-ring`, `--gr-invalid-text`.** A failed validation
+  reused the decorative `danger` tone, so a theme could not paint an error differently from a `state="danger"`
+  highlight, and a developer using that highlight was visually reporting a validation verdict. The roles default to
+  references to the danger tone — same look out of the box, separate knob when a theme needs one. Applied across
+  `GrInput`, `GrSelect`, `GrTextarea`, `GrTreeSelect`, `GrAutocomplete`, `GrInputTag`, `GrNumberInput` and the error
+  text and required mark of `GrFormField`. Gate: a parametrized block in `src/__tests__/formControlContract.test.ts`.
+- **A type scale for components: `--gr-control-text-*`.** Font sizes lived as 105 literals (`text-[13px]`,
+  `text-[11px]`) across 26 components, because the 13px and 11px steps do not exist in the content scale and should
+  not. The new scale (`3xs` 10px … `lg` 16px) is deliberately denser than the four size steps — each component picks
+  its four — and is themed independently of `--gr-text-*`. Values are unchanged, so nothing moved on screen.
+- **`--gr-radius-xs` (3px) and `--gr-radius-chip` (6px).** The former also fixes a dangling reference: `GrSelect`
+  already read `--gr-radius-xs`, which never existed, so its clear button rendered with no rounding at all. The
+  latter covers small interactive chrome inside a control — chips, `×` buttons, the link focus ring, the slider
+  tooltip.
+
 - **`GrTable` exposes `scrollToRow(index, options?)`** — scrolls the container to a content row by its markup index
   and returns `false` when the row is not rendered (loading/empty state or index out of range). Rows are the
   consumer's own markup with no keys, so the addressing is positional; service skeleton/empty rows are not
@@ -280,6 +306,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   code and its `gr.fileValidation.maxSize` key are gone from all three locales.
 
 ### Changed
+
+- **Animations run on `--gr-duration-*` / `--gr-ease-*`.** Both token groups were generated and used exactly zero
+  times: the package's motion looked configurable but was not. All 60 `duration-N` utilities and 30 `ease-in`/
+  `ease-out` ones now read the tokens. Note the curve actually changes: `presetMini`'s `ease-out` is
+  `cubic-bezier(0, 0, 0.2, 1)`, the package token is `cubic-bezier(0.16, 1, 0.3, 1)` — motion is now defined by the
+  design system rather than by the preset. Durations that were off the scale (100/120/130/180ms) snap to `fast`/`base`.
+  Gate: `src/__tests__/styleTokens.test.ts`.
+- **`GrLoading` scrim reacts to the theme.** It was a literal `bg-black/25`; it is now `--gr-overlay-bg`, the same
+  role `GrModal` and `GrDrawer` use.
+- **`GrNumberInput` reads `invalid` from the field context.** The border only reacted to the component's own prop, so
+  a field marked invalid by `GrForm`/`GrFormField` stayed visually valid — the other six controls already did this
+  right.
 
 - **One combobox engine instead of four copies.** The active-option machinery — `activeIndex`, cyclic clamping,
   `aria-activedescendant`, scroll-to-active, init-on-open — existed as four hand-written copies (`GrSelect`,

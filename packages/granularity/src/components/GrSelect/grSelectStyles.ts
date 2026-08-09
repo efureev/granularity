@@ -34,7 +34,7 @@ export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string> =
   | GrSelectOptionGroup<TValue>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
-export const defaultBaseClass = 'w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const defaultBaseClass = 'w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 /**
  * Цвет рамки по состоянию — та же карта, что у `GrInput` и `GrTextarea`: поля
@@ -46,21 +46,28 @@ export const borderClassByState: Record<GrSelectState, string> = {
   warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
 }
-export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[6px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+/**
+ * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
+ * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
+ * валидации, и тема вправе развести их по цвету.
+ */
+export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
+export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[var(--gr-radius-chip)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
-  xs: 'h-7 px-2.5 text-[12px]',
-  sm: 'h-8 px-3 text-[13px]',
-  md: 'h-10 px-3 text-[14px]',
-  lg: 'h-11 px-4 text-[16px]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
 }
 
 export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
-  md: 'text-[14px]',
-  lg: 'text-[16px]',
+  xs: 'text-[length:var(--gr-control-text-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)]',
 }
 
 /**
@@ -124,7 +131,7 @@ export const grSelectLinkNativeOverlayClass = 'peer absolute inset-0 w-full h-fu
  * Классы видимой метки для `view="link"` + `optionsView="native"` (поверх прозрачного `<select>`).
  * Получает все link-стили (size/variant/underline), а также focus-ring через `peer-focus-visible`.
  */
-export const grSelectLinkNativeLabelBaseClass = 'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[6px] transition-colors duration-150'
+export const grSelectLinkNativeLabelBaseClass = 'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[var(--gr-radius-chip)] transition-colors duration-[var(--gr-duration-fast)]'
 export const grSelectLinkNativeLabelDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)] no-underline'
 export const grSelectLinkNativeLabelFocusClass = 'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--gr-ring)]'
 
@@ -167,7 +174,7 @@ export function grSelectClass(options: {
   return [
     selectSizeClassBySize[options.size],
     // `invalid` сильнее `state`: ошибка перекрывает любую другую подсветку.
-    options.invalid ? borderClassByState.danger : borderClassByState[options.state ?? 'default'],
+    options.invalid ? invalidBorderClass : borderClassByState[options.state ?? 'default'],
     // Заблокированный контрол гасится фоном и цветом текста, а не `opacity`:
     // прозрачность разбавляет выверенные на AA токены и роняет контраст.
     'disabled:cursor-not-allowed disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-muted-fg)]',

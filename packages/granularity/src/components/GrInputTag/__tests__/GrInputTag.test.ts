@@ -208,7 +208,7 @@ describe('GrInputTag — состояние из GrFormField', () => {
 
     const wrapper = mount(Harness)
 
-    expect(wrapper.get('[data-gr-input-tag]').classes()).toContain('border-[var(--gr-danger)]')
+    expect(wrapper.get('[data-gr-input-tag]').classes()).toContain('border-[var(--gr-invalid-brd)]')
   })
 
   it('readonly поля доходит до инпута', () => {

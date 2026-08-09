@@ -37,7 +37,7 @@ const MODES: BadgeMode[] = [
 
 /**
  * Цвета берём из карты тонов, а не из собранного `grBadgeClass`: там есть
- * `text-[13px]` из size-мапы, и обобщённый парсер `text-[` схватил бы размер
+ * `text-[length:var(--gr-control-text-sm)]` из size-мапы, и обобщённый парсер `text-[` схватил бы размер
  * вместо цвета.
  */
 function badgeColors(tone: (typeof GR_TONES)[number], dark: boolean) {

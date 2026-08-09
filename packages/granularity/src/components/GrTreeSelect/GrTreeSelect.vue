@@ -543,7 +543,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-required="isRequired ? 'true' : undefined"
         :aria-describedby="describedBy"
         :aria-label="ariaLabel"
-        class="w-full rounded-md border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="w-full rounded-md border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
         @pointerdown="onTriggerPointerDown"
         @click="toggleDropdown"
@@ -570,7 +570,7 @@ const themeAttrs = useGrThemeAttrs()
         class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--gr-muted-fg)] pointer-events-none"
       >
         <span
-          class="i-lucide-chevron-down inline-block h-4 w-4 transition-transform duration-150"
+          class="i-lucide-chevron-down inline-block h-4 w-4 transition-transform duration-[var(--gr-duration-fast)]"
           :class="open ? 'rotate-180' : ''"
         />
       </span>
@@ -591,10 +591,10 @@ const themeAttrs = useGrThemeAttrs()
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
-        enter-active-class="transition ease-out duration-150"
+        enter-active-class="transition ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
         enter-from-class="transform opacity-0 scale-95"
         enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-100"
+        leave-active-class="transition ease-[var(--gr-ease-in)] duration-[var(--gr-duration-fast)]"
         leave-from-class="transform opacity-100 scale-100"
         leave-to-class="transform opacity-0 scale-95"
       >

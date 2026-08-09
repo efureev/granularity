@@ -1,6 +1,6 @@
 // СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
 
-import type { GrDerivedToken, GrFoundationToken, GrThemeToken } from './types'
+import type { GrComponentToken, GrDerivedToken, GrFoundationToken, GrThemeToken } from './types'
 
 export const grThemeNames = [
   "light",
@@ -139,6 +139,42 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "value": "36px",
     "section": "Typography: font sizes",
     "description": "Размер шрифта `4xl` из типографической шкалы foundation tokens."
+  },
+  {
+    "name": "--gr-control-text-3xs",
+    "value": "10px",
+    "section": "Typography: control scale",
+    "description": "Кегль компонента на самой мелкой ступени — подпись колонки таблицы, служебная ссылка в списке файлов."
+  },
+  {
+    "name": "--gr-control-text-2xs",
+    "value": "11px",
+    "section": "Typography: control scale",
+    "description": "Кегль компонента на ступени между `3xs` и `xs`: мелкий бейдж, компактная подсказка, заголовок группы в палитре команд."
+  },
+  {
+    "name": "--gr-control-text-xs",
+    "value": "12px",
+    "section": "Typography: control scale",
+    "description": "Кегль компонента на ступени `xs`."
+  },
+  {
+    "name": "--gr-control-text-sm",
+    "value": "13px",
+    "section": "Typography: control scale",
+    "description": "Кегль компонента на ступени `sm`."
+  },
+  {
+    "name": "--gr-control-text-md",
+    "value": "14px",
+    "section": "Typography: control scale",
+    "description": "Кегль компонента на ступени `md` — значение по умолчанию."
+  },
+  {
+    "name": "--gr-control-text-lg",
+    "value": "16px",
+    "section": "Typography: control scale",
+    "description": "Кегль компонента на ступени `lg`."
   },
   {
     "name": "--gr-leading-tight",
@@ -381,10 +417,22 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Радиус скругления `none` для углов компонентов и поверхностей."
   },
   {
+    "name": "--gr-radius-xs",
+    "value": "3px",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Радиус скругления `xs` — микроэлементы: подсветка совпадения в поиске, кнопка очистки внутри контрола."
+  },
+  {
     "name": "--gr-radius-sm",
     "value": "4px",
     "section": "Shapes: radii and compatibility aliases",
     "description": "Радиус скругления `sm` для углов компонентов и поверхностей."
+  },
+  {
+    "name": "--gr-radius-chip",
+    "value": "6px",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Радиус мелкой интерактивной детали внутри контрола: чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера."
   },
   {
     "name": "--gr-radius-md",
@@ -846,6 +894,33 @@ export const grThemeTokens: GrThemeToken[] = [
     }
   },
   {
+    "name": "--gr-invalid-brd",
+    "section": "State roles",
+    "description": "Цвет рамки контрола, не прошедшего валидацию.",
+    "values": {
+      "light": "var(--gr-danger)",
+      "dark": "var(--gr-danger)"
+    }
+  },
+  {
+    "name": "--gr-invalid-ring",
+    "section": "State roles",
+    "description": "Цвет focus-ring контрола, не прошедшего валидацию.",
+    "values": {
+      "light": "var(--gr-danger)",
+      "dark": "var(--gr-danger)"
+    }
+  },
+  {
+    "name": "--gr-invalid-text",
+    "section": "State roles",
+    "description": "Цвет текста ошибки и метки обязательного поля.",
+    "values": {
+      "light": "var(--gr-danger-text)",
+      "dark": "var(--gr-danger-text)"
+    }
+  },
+  {
     "name": "--gr-primary",
     "section": "Action roles",
     "description": "Главный brand/action цвет темы для primary CTA и ключевых акцентов.",
@@ -1222,5 +1297,1233 @@ export const grThemeTokens: GrThemeToken[] = [
       "light": "#6366f1",
       "dark": "#818cf8"
     }
+  }
+]
+
+export const grComponentTokens: GrComponentToken[] = [
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-bg",
+    "kind": "inline",
+    "default": "подложка тона (`--gr-<tone>-light`)",
+    "description": "Фон полосы уведомления."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-brd",
+    "kind": "inline",
+    "default": "подмес тона к подложке",
+    "description": "Цвет рамки уведомления."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-text-color",
+    "kind": "inline",
+    "default": "`--gr-<tone>-text`",
+    "description": "Цвет основного текста уведомления."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-title-color",
+    "kind": "inline",
+    "default": "`--gr-<tone>-text`",
+    "description": "Цвет заголовка уведомления."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-icon-color",
+    "kind": "inline",
+    "default": "насыщенный тон (`--gr-<tone>`)",
+    "description": "Цвет иконки тона слева от текста."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-close-color",
+    "kind": "inline",
+    "default": "`--gr-<tone>-text`",
+    "description": "Цвет кнопки закрытия в покое."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-close-hover-color",
+    "kind": "inline",
+    "default": "`--gr-<tone>-text`",
+    "description": "Цвет кнопки закрытия под курсором."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-close-hover-bg",
+    "kind": "inline",
+    "default": "подмес тона к подложке",
+    "description": "Фон кнопки закрытия под курсором."
+  },
+  {
+    "owner": "GrAvatar",
+    "name": "--gr-avatar-square-radius",
+    "kind": "hook",
+    "default": "10px",
+    "description": "Скругление аватара в форме `square`. Не ступень общей шкалы: квадратный аватар мягче плитки, но жёстче чипа."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-semi-radius-xs",
+    "kind": "hook",
+    "default": "3px",
+    "description": "Скругление бейджа `radius=\"semi\"` на ступени `xs`."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-semi-radius-sm",
+    "kind": "hook",
+    "default": "3px",
+    "description": "Скругление бейджа `radius=\"semi\"` на ступени `sm`."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-semi-radius-md",
+    "kind": "hook",
+    "default": "5px",
+    "description": "Скругление бейджа `radius=\"semi\"` на ступени `md`."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-semi-radius-lg",
+    "kind": "hook",
+    "default": "7px",
+    "description": "Скругление бейджа `radius=\"semi\"` на ступени `lg`. Лестница 3/3/5/7 своя: бейдж скругляется медленнее, чем растёт."
+  },
+  {
+    "owner": "GrBadgeWrap",
+    "name": "--gr-badge-wrap-offset-x",
+    "kind": "hook",
+    "default": "-0.5rem (для `dot` — -0.25rem)",
+    "description": "Горизонтальный сдвиг метки относительно угла обёртки."
+  },
+  {
+    "owner": "GrBadgeWrap",
+    "name": "--gr-badge-wrap-offset-y",
+    "kind": "hook",
+    "default": "-0.5rem (для `dot` — -0.25rem)",
+    "description": "Вертикальный сдвиг метки относительно угла обёртки."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius",
+    "kind": "hook",
+    "default": "0.375rem",
+    "description": "Скругление кнопки. Его же по умолчанию наследуют внешние углы `GrButtonGroup`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-square-size",
+    "kind": "hook",
+    "default": "высота кнопки текущей ступени",
+    "description": "Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-bg",
+    "kind": "theme",
+    "default": "var(--gr-primary) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `primary`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-primary-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `primary` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-primary-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `primary` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-fg",
+    "kind": "theme",
+    "default": "var(--gr-primary-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `primary`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `primary`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `primary` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `primary` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-bg",
+    "kind": "theme",
+    "default": "var(--gr-success) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `success`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-success-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `success` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-success-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `success` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-fg",
+    "kind": "theme",
+    "default": "var(--gr-success-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `success`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-success) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `success`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-success) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `success` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-success) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `success` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-bg",
+    "kind": "theme",
+    "default": "var(--gr-warning) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `warning`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-warning-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `warning` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-warning-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `warning` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-fg",
+    "kind": "theme",
+    "default": "var(--gr-warning-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `warning`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-warning) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `warning`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-warning) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `warning` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-warning) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `warning` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-bg",
+    "kind": "theme",
+    "default": "var(--gr-danger) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `danger`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-danger-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `danger` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-danger-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `danger` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-fg",
+    "kind": "theme",
+    "default": "var(--gr-danger-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `danger`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-danger) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `danger`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-danger) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `danger` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-danger) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `danger` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-bg",
+    "kind": "theme",
+    "default": "var(--gr-info) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `info`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-info-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `info` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-info-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `info` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-fg",
+    "kind": "theme",
+    "default": "var(--gr-info-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `info`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-info) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `info`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-info) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `info` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-info) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `info` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-bg",
+    "kind": "theme",
+    "default": "var(--gr-slate) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `slate`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-slate-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `slate` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-slate-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `slate` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-fg",
+    "kind": "theme",
+    "default": "var(--gr-slate-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `slate`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-slate) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `slate`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-slate) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `slate` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-slate) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `slate` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-bg",
+    "kind": "theme",
+    "default": "var(--gr-azure) в светлой теме, собственный затемнённый тон в тёмной",
+    "description": "Заливка solid-кнопки тона `azure`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-azure-hover) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `azure` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-azure-active) / собственный тон тёмной темы",
+    "description": "Заливка solid-кнопки тона `azure` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-fg",
+    "kind": "theme",
+    "default": "var(--gr-azure-fg) / собственный контрастный цвет тёмной темы",
+    "description": "Цвет текста на solid-кнопке тона `azure`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-soft-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-azure) 14%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `azure`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-azure) 18%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `azure` под курсором."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-azure) 24%, var(--gr-bg))",
+    "description": "Заливка soft-кнопки тона `azure` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-disabled-bg",
+    "kind": "theme",
+    "default": "var(--gr-disabled-bg)",
+    "description": "Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-disabled-fg",
+    "kind": "theme",
+    "default": "var(--gr-disabled-fg)",
+    "description": "Цвет текста недоступной кнопки."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-disabled-brd",
+    "kind": "theme",
+    "default": "var(--gr-disabled-brd)",
+    "description": "Цвет рамки недоступной кнопки."
+  },
+  {
+    "owner": "GrButtonGroup",
+    "name": "--gr-button-group-radius",
+    "kind": "css",
+    "default": "var(--gr-button-radius, 0.375rem)",
+    "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-active-bg",
+    "kind": "hook",
+    "default": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+    "description": "Фон активного пункта палитры (наведение и клавиатурный курсор)."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-match-bg",
+    "kind": "hook",
+    "default": "color-mix(in srgb, var(--gr-primary) 22%, transparent)",
+    "description": "Подсветка совпавшей подстроки в подписи пункта."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-item-radius",
+    "kind": "hook",
+    "default": "10px",
+    "description": "Скругление пункта палитры."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-input-font-size",
+    "kind": "hook",
+    "default": "15px",
+    "description": "Кегль строки поиска: крупнее пунктов списка, потому что это единственное поле ввода в оверлее."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-list-max-height",
+    "kind": "hook",
+    "default": "значение пропа `maxHeight` в пикселях",
+    "description": "Максимальная высота списка; дальше список скроллится."
+  },
+  {
+    "owner": "GrDivider",
+    "name": "--gr-divider-thickness",
+    "kind": "hook",
+    "default": "1px",
+    "description": "Толщина разделителя — общая для горизонтального и вертикального."
+  },
+  {
+    "owner": "GrIcon",
+    "name": "--gr-icon-size",
+    "kind": "css",
+    "default": "var(--gr-icon-size-md, 18px)",
+    "description": "Итоговый размер иконки. И обёртка, и вложенный SVG считают себя от него, поэтому размер задаётся одной переменной, а не пропами разметки."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-scrim",
+    "kind": "theme",
+    "default": "rgb(0 0 0 / 0.6)",
+    "description": "Затемнение под кадром. Плотнее общего `--gr-overlay-bg`: рядом с фотографией подложка обязана убрать фон целиком, а не приглушить его."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-chrome-bg",
+    "kind": "theme",
+    "default": "rgb(0 0 0 / 0.35)",
+    "description": "Фон панелей управления просмотрщика."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-chrome-bg-hover",
+    "kind": "theme",
+    "default": "rgb(0 0 0 / 0.55)",
+    "description": "Фон кнопки хрома под курсором."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-chrome-bg-soft",
+    "kind": "theme",
+    "default": "rgb(255 255 255 / 0.1)",
+    "description": "Мягкая подложка внутри хрома — счётчик кадров, шкала масштаба."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-chrome-fg",
+    "kind": "theme",
+    "default": "rgb(255 255 255 / 0.95)",
+    "description": "Основной цвет текста и иконок хрома."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-chrome-fg-muted",
+    "kind": "theme",
+    "default": "rgb(255 255 255 / 0.8)",
+    "description": "Приглушённый текст хрома — подписи и вторичные значения."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-chrome-brd",
+    "kind": "theme",
+    "default": "rgb(255 255 255 / 0.2)",
+    "description": "Цвет рамок внутри хрома."
+  },
+  {
+    "owner": "GrImageViewer",
+    "name": "--gr-image-viewer-ring",
+    "kind": "theme",
+    "default": "rgb(255 255 255 / 0.8)",
+    "description": "Focus-ring внутри просмотрщика: общий `--gr-ring` на тёмном хроме не читается."
+  },
+  {
+    "owner": "GrLink",
+    "name": "--gr-link-color",
+    "kind": "inline",
+    "default": "`-text`-роль выбранного тона",
+    "description": "Цвет ссылки в покое."
+  },
+  {
+    "owner": "GrLink",
+    "name": "--gr-link-color-hover",
+    "kind": "inline",
+    "default": "подмес `--gr-fg` 8% к базовому цвету",
+    "description": "Цвет ссылки под курсором."
+  },
+  {
+    "owner": "GrLink",
+    "name": "--gr-link-color-active",
+    "kind": "inline",
+    "default": "подмес `--gr-fg` 16% к базовому цвету",
+    "description": "Цвет ссылки в момент нажатия."
+  },
+  {
+    "owner": "GrNavbar",
+    "name": "--gr-navbar-height",
+    "kind": "hook",
+    "default": "56px",
+    "description": "Высота шапки. Ею же считается отступ содержимого под прилипшей шапкой."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-bg",
+    "kind": "theme",
+    "default": "var(--gr-primary)",
+    "description": "Заливка полосы прогресса по умолчанию."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-neutral-bg",
+    "kind": "theme",
+    "default": "var(--gr-secondary)",
+    "description": "Заливка полосы тона `neutral`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-success-bg",
+    "kind": "theme",
+    "default": "var(--gr-success)",
+    "description": "Заливка полосы тона `success`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-warning-bg",
+    "kind": "theme",
+    "default": "var(--gr-warning)",
+    "description": "Заливка полосы тона `warning`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-danger-bg",
+    "kind": "theme",
+    "default": "var(--gr-danger)",
+    "description": "Заливка полосы тона `danger`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-info-bg",
+    "kind": "theme",
+    "default": "var(--gr-info)",
+    "description": "Заливка полосы тона `info`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-slate-bg",
+    "kind": "theme",
+    "default": "var(--gr-slate)",
+    "description": "Заливка полосы тона `slate`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-azure-bg",
+    "kind": "theme",
+    "default": "var(--gr-azure)",
+    "description": "Заливка полосы тона `azure`."
+  },
+  {
+    "owner": "GrRating",
+    "name": "--gr-rating-color",
+    "kind": "hook",
+    "default": "насыщенный тон (`--gr-<tone>`)",
+    "description": "Цвет заполненного символа. Перекрывает тон точечно, не трогая остальные компоненты."
+  },
+  {
+    "owner": "GrRating",
+    "name": "--gr-rating-void-color",
+    "kind": "hook",
+    "default": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)",
+    "description": "Цвет незаполненного символа: шкала обязана читаться целиком, а не только заполненной частью."
+  },
+  {
+    "owner": "GrRating",
+    "name": "--gr-rating-symbol-size",
+    "kind": "hook",
+    "default": "0.875rem / 1rem / 1.25rem / 1.5rem по ступеням `xs…lg`",
+    "description": "Размер символа шкалы."
+  },
+  {
+    "owner": "GrRating",
+    "name": "--gr-rating-font-size-lg",
+    "kind": "hook",
+    "default": "15px",
+    "description": "Кегль подписи на ступени `lg`: между `md` и `lg` шкалы контролов."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-track-bg",
+    "kind": "inline",
+    "default": "var(--gr-muted); в варианте `solid` — var(--gr-card)",
+    "description": "Фон дорожки переключателя."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-track-brd",
+    "kind": "inline",
+    "default": "var(--gr-brd)",
+    "description": "Цвет рамки дорожки."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-track-shadow",
+    "kind": "inline",
+    "default": "none; в варианте `solid` — var(--gr-shadow-1)",
+    "description": "Тень дорожки."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-indicator-bg",
+    "kind": "inline",
+    "default": "var(--gr-card); в варианте `primary` — var(--gr-primary)",
+    "description": "Заливка бегунка под выбранным пунктом."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-indicator-brd",
+    "kind": "inline",
+    "default": "подмес `--gr-fg` к фону дорожки",
+    "description": "Цвет рамки бегунка."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-indicator-shadow",
+    "kind": "inline",
+    "default": "var(--gr-shadow-1); в варианте `solid` — var(--gr-shadow-2)",
+    "description": "Тень бегунка — она отделяет его от дорожки."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-indicator-highlight-shadow",
+    "kind": "hook",
+    "default": "0 0 0 0 transparent",
+    "description": "Дополнительная подсветка бегунка: по умолчанию выключена, включается темой поверх основной тени."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-item-color",
+    "kind": "inline",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет невыбранного пункта."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-item-hover-color",
+    "kind": "inline",
+    "default": "var(--gr-fg)",
+    "description": "Цвет пункта под курсором."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-item-selected-color",
+    "kind": "inline",
+    "default": "var(--gr-fg); в варианте `primary` — var(--gr-primary-fg)",
+    "description": "Цвет выбранного пункта."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-item-px",
+    "kind": "inline",
+    "default": "10px / 12px / 14px / 16px по ступеням `xs…lg`",
+    "description": "Горизонтальные поля пункта."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-item-py",
+    "kind": "inline",
+    "default": "4px / 6px / 8px / 10px по ступеням `xs…lg`",
+    "description": "Вертикальные поля пункта."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-min-height",
+    "kind": "inline",
+    "default": "24px / 28px / 40px / 46px по ступеням `xs…lg`",
+    "description": "Минимальная высота дорожки: переключатель обязан вставать в строку с контролами той же ступени."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-padding",
+    "kind": "inline",
+    "default": "4px",
+    "description": "Внутренний отступ дорожки вокруг бегунка."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-radius",
+    "kind": "inline",
+    "default": "9999px",
+    "description": "Скругление дорожки и бегунка."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-font-size",
+    "kind": "inline",
+    "default": "0.75rem / 0.875rem / 0.9375rem по ступеням",
+    "description": "Кегль подписи пункта."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-font-weight",
+    "kind": "inline",
+    "default": "600",
+    "description": "Начертание подписи пункта."
+  },
+  {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-line-height",
+    "kind": "inline",
+    "default": "1rem / 1.25rem по ступеням",
+    "description": "Межстрочный интервал подписи пункта."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-fill",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет пройденной части трека."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-rail",
+    "kind": "hook",
+    "default": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+    "description": "Цвет непройденной части трека."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-track-height",
+    "kind": "hook",
+    "default": "0.1875rem / 0.25rem / 0.375rem / 0.5rem по ступеням `xs…lg`",
+    "description": "Толщина трека."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-thumb-size",
+    "kind": "hook",
+    "default": "0.75rem / 0.875rem / 1rem / 1.25rem по ступеням `xs…lg`",
+    "description": "Диаметр ползунка."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-thumb-bg",
+    "kind": "hook",
+    "default": "var(--gr-bg)",
+    "description": "Заливка ползунка."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-thumb-border",
+    "kind": "hook",
+    "default": "var(--gr-slider-fill, var(--gr-primary))",
+    "description": "Цвет рамки ползунка. По умолчанию совпадает с заливкой трека."
+  },
+  {
+    "owner": "GrSlider",
+    "name": "--gr-slider-length",
+    "kind": "hook",
+    "default": "10rem",
+    "description": "Длина вертикального слайдера: горизонтальный тянется по ширине контейнера, вертикальному нужна явная высота."
+  },
+  {
+    "owner": "GrStatistic",
+    "name": "--gr-statistic-title-color",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет подписи над значением."
+  },
+  {
+    "owner": "GrStatistic",
+    "name": "--gr-statistic-value-color",
+    "kind": "hook",
+    "default": "`-text`-роль выбранного тона",
+    "description": "Цвет самого значения."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-bg",
+    "kind": "inline",
+    "default": "var(--gr-primary) во включённом состоянии, var(--gr-muted) в выключенном, var(--gr-disabled-bg) в недоступном",
+    "description": "Заливка дорожки переключателя."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-brd",
+    "kind": "inline",
+    "default": "var(--gr-primary) / var(--gr-brd) / var(--gr-disabled-brd)",
+    "description": "Цвет рамки дорожки переключателя."
+  },
+  {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-width",
+    "kind": "css",
+    "default": "360px",
+    "description": "Ширина стека тостов. Проп `width` задаёт её же, поэтому одно и то же настраивается и разметкой, и темой."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-gap",
+    "kind": "css",
+    "default": "2px",
+    "description": "Просвет между строками дерева."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-children-pl",
+    "kind": "css",
+    "default": "10px",
+    "description": "Отступ вложенного списка от левого края родителя."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-indent-step",
+    "kind": "css",
+    "default": "calc(24px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width))",
+    "description": "Шаг отступа уровня. Складывается из переключателя, отступа вложенного списка и толщины направляющей — линия обязана попадать ровно между ними."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-indent",
+    "kind": "inline",
+    "default": "шаг отступа × глубина узла",
+    "description": "Готовый отступ конкретной строки: шаг уровня, умноженный на её глубину."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-min-height",
+    "kind": "inline",
+    "default": "22px / 24px / 28px / 32px по ступеням `xs…lg`",
+    "description": "Минимальная высота строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-px",
+    "kind": "inline",
+    "default": "4px / 6px / 8px / 10px по ступеням `xs…lg`",
+    "description": "Горизонтальные поля строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-py",
+    "kind": "inline",
+    "default": "3px / 5px / 8px / 10px по ступеням `xs…lg`",
+    "description": "Вертикальные поля строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-pr",
+    "kind": "css",
+    "default": "var(--gr-tree-row-px)",
+    "description": "Правое поле строки — отдельно от левого: справа часто стоят действия узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-radius",
+    "kind": "css",
+    "default": "8px",
+    "description": "Скругление подсветки строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-color",
+    "kind": "css",
+    "default": "var(--gr-fg)",
+    "description": "Цвет текста строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-hover-bg",
+    "kind": "css",
+    "default": "color-mix(in srgb, var(--gr-primary) 10%, transparent)",
+    "description": "Фон строки под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-current-bg",
+    "kind": "css",
+    "default": "color-mix(in srgb, var(--gr-primary) 5%, transparent)",
+    "description": "Фон текущей (выбранной) строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-current-hover-bg",
+    "kind": "css",
+    "default": "color-mix(in srgb, var(--gr-primary) 16%, transparent)",
+    "description": "Фон текущей строки под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-font-size",
+    "kind": "inline",
+    "default": "12px / 13px / inherit / 15px по ступеням `xs…lg`",
+    "description": "Кегль подписи узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-content-gap",
+    "kind": "inline",
+    "default": "4px / 6px / 8px / 10px по ступеням `xs…lg`",
+    "description": "Просвет между иконкой и подписью узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-icon-size",
+    "kind": "inline",
+    "default": "12px / 14px / 16px / 20px по ступеням `xs…lg`",
+    "description": "Размер иконки узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-toggle-size",
+    "kind": "inline",
+    "default": "18px / 20px / 24px / 28px по ступеням `xs…lg`",
+    "description": "Размер кнопки разворота ветки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-toggle-mr",
+    "kind": "css",
+    "default": "0",
+    "description": "Отступ кнопки разворота от содержимого узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-toggle-radius",
+    "kind": "css",
+    "default": "6px",
+    "description": "Скругление кнопки разворота."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-toggle-color",
+    "kind": "css",
+    "default": "inherit",
+    "description": "Цвет стрелки разворота."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-toggle-hover-bg",
+    "kind": "css",
+    "default": "color-mix(in srgb, var(--gr-muted) 25%, transparent)",
+    "description": "Фон кнопки разворота под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-toggle-hover-color",
+    "kind": "css",
+    "default": "var(--gr-tree-toggle-color)",
+    "description": "Цвет стрелки разворота под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-size",
+    "kind": "inline",
+    "default": "18px / 20px / 24px / 28px по ступеням `xs…lg`",
+    "description": "Размер ручки перетаскивания."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-mr",
+    "kind": "css",
+    "default": "0",
+    "description": "Отступ ручки перетаскивания от содержимого узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-radius",
+    "kind": "css",
+    "default": "6px",
+    "description": "Скругление ручки перетаскивания."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-color",
+    "kind": "css",
+    "default": "inherit",
+    "description": "Цвет ручки перетаскивания."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-opacity",
+    "kind": "css",
+    "default": "0.55",
+    "description": "Прозрачность ручки в покое: ручка не должна спорить с подписью узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-hover-bg",
+    "kind": "css",
+    "default": "color-mix(in srgb, var(--gr-muted) 22%, transparent)",
+    "description": "Фон ручки перетаскивания под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-hover-color",
+    "kind": "css",
+    "default": "var(--gr-tree-drag-handle-color)",
+    "description": "Цвет ручки перетаскивания под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-hover-opacity",
+    "kind": "css",
+    "default": "0.9",
+    "description": "Прозрачность ручки под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-drag-handle-disabled-opacity",
+    "kind": "css",
+    "default": "0.25",
+    "description": "Прозрачность ручки у узла, который перетаскивать нельзя."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-size",
+    "kind": "css",
+    "default": "16px",
+    "description": "Сторона коробки чекбокса узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-radius",
+    "kind": "css",
+    "default": "4px",
+    "description": "Скругление коробки чекбокса."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-mr",
+    "kind": "css",
+    "default": "4px",
+    "description": "Отступ чекбокса от содержимого узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-bg",
+    "kind": "css",
+    "default": "transparent",
+    "description": "Фон невыбранного чекбокса."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-brd",
+    "kind": "css",
+    "default": "var(--gr-brd)",
+    "description": "Цвет рамки чекбокса."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-checked-bg",
+    "kind": "css",
+    "default": "var(--gr-primary)",
+    "description": "Фон отмеченного чекбокса."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-checkbox-checked-fg",
+    "kind": "css",
+    "default": "var(--gr-primary-fg)",
+    "description": "Цвет галочки в отмеченном чекбоксе."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-branch-line-width",
+    "kind": "css",
+    "default": "2px",
+    "description": "Толщина направляющей линии уровня."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-branch-line-offset",
+    "kind": "css",
+    "default": "24px",
+    "description": "Сдвиг направляющей от левого края строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-branch-line-default-color",
+    "kind": "css",
+    "default": "var(--gr-tree-row-current-bg)",
+    "description": "Цвет направляющей по умолчанию."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-branch-line-color",
+    "kind": "inline",
+    "default": "var(--gr-tree-branch-line-default-color)",
+    "description": "Цвет направляющей конкретной ветки — им подсвечивается путь до текущего узла."
+  },
+  {
+    "owner": "composables",
+    "name": "--gr-virtual-before",
+    "kind": "inline",
+    "default": "0px",
+    "description": "Высота спейсера перед первым отрисованным элементом виртуального списка. Ставится `useVirtualList` и читается через `[data-gr-virtual]::before` — потребители (`GrList`, `GrSelect`, `GrTree`, `GrAutocomplete`, `GrCommandPalette`) свою копию не заводят."
+  },
+  {
+    "owner": "composables",
+    "name": "--gr-virtual-after",
+    "kind": "inline",
+    "default": "0px",
+    "description": "Высота спейсера после последнего отрисованного элемента виртуального списка."
   }
 ]

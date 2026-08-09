@@ -28,7 +28,7 @@ export interface GrLoadingProps {
   spinnerTone?: GrIconTone
   /** Вращение спиннера. По умолчанию включено. */
   animated?: boolean
-  /** Свой `background-color`. Задан — дефолтное затемнение `bg-black/25` снимается. */
+  /** Свой `background-color`. Задан — дефолтный скрим `--gr-overlay-bg` снимается. */
   background?: string
   /** Накрыть весь экран (`position: fixed`) вместо ближайшего позиционированного предка. */
   fullscreen?: boolean

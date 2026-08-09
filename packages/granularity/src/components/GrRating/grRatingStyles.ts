@@ -29,10 +29,10 @@ export const ratingGapBySize: Record<GrRatingSize, string> = {
 }
 
 export const ratingTextSizeBySize: Record<GrRatingSize, string> = {
-  xs: 'text-[11px]',
-  sm: 'text-[12px]',
-  md: 'text-[13px]',
-  lg: 'text-[15px]',
+  xs: 'text-[length:var(--gr-control-text-2xs)]',
+  sm: 'text-[length:var(--gr-control-text-xs)]',
+  md: 'text-[length:var(--gr-control-text-sm)]',
+  lg: 'text-[length:var(--gr-rating-font-size-lg,15px)]',
 }
 
 // Цвет заливки по тону. `--gr-rating-color` перекрывает тон точечно.

@@ -33,6 +33,15 @@
   --gr-disabled-bg: #273548;
   --gr-disabled-fg: #64748b;
   --gr-disabled-brd: #334155;
+  /*
+   * Ошибка валидации и декоративный тон `state="danger"` — разные вещи, хотя
+   * выглядят одинаково по умолчанию. Ссылка, а не копия hex: тема, поменявшая
+   * только `--gr-danger`, не обязана помнить про второй набор, а тема, которой
+   * нужен отдельный цвет ошибки, перекрашивает три роли и не трогает danger-тон.
+   */
+  --gr-invalid-brd: var(--gr-danger);
+  --gr-invalid-ring: var(--gr-danger);
+  --gr-invalid-text: var(--gr-danger-text);
 
   /* Action roles */
   /*

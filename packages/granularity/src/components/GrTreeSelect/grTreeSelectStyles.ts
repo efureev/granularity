@@ -5,10 +5,10 @@ import type { GrInputSize } from '../GrInput'
 export type GrTreeSelectState = GrControlState
 
 export const sizeClassBySize: Record<GrInputSize, string> = {
-  xs: 'h-7 px-2.5 text-[12px]',
-  sm: 'h-8 px-3 text-[13px]',
-  md: 'h-10 px-3 text-[14px]',
-  lg: 'h-11 px-4 text-[16px]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
 }
 
 export const borderClassByState: Record<GrTreeSelectState, string> = {
@@ -17,6 +17,13 @@ export const borderClassByState: Record<GrTreeSelectState, string> = {
   warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
 }
+
+/**
+ * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
+ * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
+ * валидации, и тема вправе развести их по цвету.
+ */
+export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
 
 /**
  * Disabled красится фоном и цветом текста, а не прозрачностью: `opacity`
@@ -35,7 +42,7 @@ export function grTreeSelectClass(options: {
     sizeClassBySize[options.size],
     'pr-9',
     options.disabled ? shellDisabledClass : shellEnabledClass,
-    options.invalid ? borderClassByState.danger : borderClassByState[options.state],
+    options.invalid ? invalidBorderClass : borderClassByState[options.state],
   ].join(' ')
 }
 

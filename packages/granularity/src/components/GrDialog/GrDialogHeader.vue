@@ -70,7 +70,7 @@ const { titleId } = useGrModalTitle(() => showVisibleTitle.value)
       v-else-if="showVisibleTitle"
       :id="titleId"
       data-gr-dialog-title
-      class="flex-1 min-w-0 text-[14px] font-700"
+      class="flex-1 min-w-0 text-[length:var(--gr-control-text-md)] font-700"
     >
       {{ resolvedTitle }}
     </div>

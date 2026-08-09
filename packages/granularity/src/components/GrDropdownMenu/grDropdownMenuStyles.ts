@@ -22,7 +22,7 @@ export const colsClass: Record<GrDropdownMenuColumnsCount, string> = {
   4: 'grid-cols-4',
 }
 
-export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 flex items-center gap-2 text-[length:var(--gr-text-sm)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 flex items-center gap-2 text-[length:var(--gr-text-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Насыщенный тон как цвет текста запрещён — для текста есть `-text`-роль.
 export const itemVariantClass: Record<GrDropdownMenuItemVariant, string> = {

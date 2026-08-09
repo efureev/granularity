@@ -43,7 +43,7 @@ describe('GrAvatar', () => {
     expect(image.attributes('src')).toBe('/avatar.png')
     expect(image.attributes('alt')).toBe('Avatar')
     expect(image.attributes('class')).toContain('object-cover')
-    expect(wrapper.attributes('class')).toContain('rounded-[10px]')
+    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
     expect(wrapper.text()).not.toContain('AB')
   })
 
@@ -132,7 +132,7 @@ describe('GrAvatar — имя, статус и конфиг', () => {
       `,
     })
 
-    expect(mount(Harness).get('[data-gr-avatar]').classes()).toContain('rounded-[10px]')
+    expect(mount(Harness).get('[data-gr-avatar]').classes()).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
   })
 
   it('initialsFrom — чистая функция', () => {
@@ -188,6 +188,6 @@ describe('GrAvatarGroup', () => {
     const first = wrapper.findAll('[data-gr-avatar]')[0]
 
     expect(first.attributes('style')).toContain('width: 24px')
-    expect(first.classes()).toContain('rounded-[10px]')
+    expect(first.classes()).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
   })
 })

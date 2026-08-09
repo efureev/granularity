@@ -29,7 +29,7 @@ export const sectionDividerTopClass = 'border-t border-[var(--gr-brd)]'
 export const sectionDividerBottomClass = 'border-b border-[var(--gr-brd)]'
 
 /** Интерактивная карточка целиком: ссылка или кнопка во всю поверхность. */
-export const interactiveClass = 'block w-full text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const interactiveClass = 'block w-full text-left transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const hoverClass = 'cursor-pointer hover:bg-[var(--gr-muted)]'
 

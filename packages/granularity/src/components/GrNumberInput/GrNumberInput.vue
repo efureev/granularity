@@ -309,7 +309,8 @@ const horizontalRightControlsStyle = computed(() => addonStyle('right', suffixLe
 const shellClassName = computed(() => {
   return grNumberInputShellClass({
     disabled: isDisabled.value,
-    state: props.invalid ? 'danger' : props.state,
+    state: props.state,
+    invalid: isInvalid.value,
   })
 })
 
@@ -632,7 +633,7 @@ function clear(): void {
 <template>
   <div
     data-gr-number-input
-    class="relative w-full overflow-hidden rounded-md border bg-[var(--gr-bg)] transition-colors duration-150 focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
+    class="relative w-full overflow-hidden rounded-md border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
     :class="shellClassName"
   >
     <div
@@ -663,7 +664,7 @@ function clear(): void {
       :aria-valuemin="min"
       :aria-valuemax="max"
       :aria-valuetext="ariaValueText"
-      :aria-invalid="invalid || isInvalid ? 'true' : undefined"
+      :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-describedby="describedBy"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"

@@ -81,7 +81,7 @@ export function sliderFillClass(disabled: boolean): string {
 
 // Окантовка бегунка: цветной border (по умолчанию = fill) + тонкая контрастная
 // обводка (`ring`), чтобы бегунок не сливался ни с фоном страницы, ни с заливкой.
-export const sliderThumbBaseClass = 'absolute rounded-full border-2 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] ring-1 ring-[color-mix(in_srgb,var(--gr-fg)_22%,transparent)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
+export const sliderThumbBaseClass = 'absolute rounded-full border-2 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] ring-1 ring-[color-mix(in_srgb,var(--gr-fg)_22%,transparent)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
 
 /** Бегунок центрируется поперёк дорожки, а вдоль неё его ведёт inline-стиль. */
 export const sliderThumbOrientationClass: Record<GrSliderOrientation, string> = {
@@ -105,7 +105,7 @@ export function sliderThumbClass(options: {
   ].join(' ')
 }
 
-export const sliderTooltipBaseClass = 'pointer-events-none absolute whitespace-nowrap rounded-[6px] bg-[var(--gr-fg)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] font-medium leading-tight text-[var(--gr-bg)] shadow-[var(--gr-shadow-2)]'
+export const sliderTooltipBaseClass = 'pointer-events-none absolute whitespace-nowrap rounded-[var(--gr-radius-chip)] bg-[var(--gr-fg)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] font-medium leading-tight text-[var(--gr-bg)] shadow-[var(--gr-shadow-2)]'
 
 /** В вертикали подсказка уходит вбок: над бегунком она легла бы на дорожку. */
 export const sliderTooltipOrientationClass: Record<GrSliderOrientation, string> = {

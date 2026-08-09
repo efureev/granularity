@@ -31,6 +31,28 @@
   --gr-text-3xl: 30px;
   --gr-text-4xl: 36px;
 
+  /*
+   * Typography: control scale
+   *
+   * Шкала кеглей компонентов, живущих на `GrComponentSize` — контролов и всего,
+   * что стоит с ними в один ряд. Отдельная от контентной типографики по двум
+   * причинам. Первая: ступеней 13px и 11px там нет и быть не должно — это
+   * компромиссы плотности контрола, а не ступени текста. Вторая: шкала намеренно
+   * плотнее четырёх ступеней размера — каждый компонент выбирает из неё свои
+   * четыре. Основная лестница `xs…lg` (12/13/14/16) — у `GrInput`, `GrSelect`,
+   * `GrTextarea`, `GrTreeSelect`, `GrAutocomplete`, `GrNumberInput`, `GrInputTag`,
+   * `GrTable`, `GrLink`, `GrPopover`; на ступень мельче (`3xs…md`, 10/11/12/14)
+   * работают `GrTooltip`, `GrDataTable`, `GrBadge`, `GrRating`, `GrFormFile`.
+   * Совпадение значений с `--gr-text-*` не делает шкалы одной: плотность контролов
+   * меняется отдельно от кегля контентного текста.
+   */
+  --gr-control-text-3xs: 10px;
+  --gr-control-text-2xs: 11px;
+  --gr-control-text-xs: 12px;
+  --gr-control-text-sm: 13px;
+  --gr-control-text-md: 14px;
+  --gr-control-text-lg: 16px;
+
   /* Typography: line heights */
   --gr-leading-tight: 1.25;
   --gr-leading-normal: 1.5;
@@ -92,7 +114,9 @@
   /* Shapes: radii and compatibility aliases */
   --radius: 0.5rem;
   --gr-radius-none: 0px;
+  --gr-radius-xs: 3px;
   --gr-radius-sm: 4px;
+  --gr-radius-chip: 6px;
   --gr-radius-md: 8px;
   --gr-radius-lg: 12px;
   --gr-radius-xl: 16px;

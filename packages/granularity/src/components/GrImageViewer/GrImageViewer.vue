@@ -334,7 +334,7 @@ function onPointerUp(event: PointerEvent): void {
 const imageTransitionClass = computed(() =>
   isWheelZooming.value || isDragging.value || isPinching.value
     ? ''
-    : 'transition-transform duration-150 ease-out',
+    : 'transition-transform duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
 )
 
 // Курсор «рука» (grab/grabbing), только если включён drag.
@@ -644,9 +644,9 @@ onBeforeUnmount(() => {
       <div class="fixed inset-0 overflow-hidden">
         <Transition
           appear
-          enter-active-class="duration-150 ease-out"
+          enter-active-class="duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]"
           enter-from-class="opacity-0"
-          leave-active-class="duration-120 ease-in"
+          leave-active-class="duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)]"
           leave-to-class="opacity-0"
         >
           <div
@@ -661,9 +661,9 @@ onBeforeUnmount(() => {
 
         <Transition
           appear
-          enter-active-class="duration-180 ease-out"
+          enter-active-class="duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
           enter-from-class="opacity-0 scale-98"
-          leave-active-class="duration-130 ease-in"
+          leave-active-class="duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)]"
           leave-to-class="opacity-0 scale-98"
           @after-leave="releasePresence"
         >

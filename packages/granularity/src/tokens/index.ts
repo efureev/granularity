@@ -9,8 +9,10 @@
  * доков и инструментов, приложениям в рантайме они не нужны, и тащить их в
  * основной бандл было бы прямым нарушением идеологии гранулярности.
  */
-export { grDerivedTokens, grFoundationTokens, grThemeNames, grThemeTokens } from './generated'
+export { grComponentTokens, grDerivedTokens, grFoundationTokens, grThemeNames, grThemeTokens } from './generated'
 export type {
+  GrComponentToken,
+  GrComponentTokenKind,
   GrDerivedToken,
   GrFoundationToken,
   GrThemeName,

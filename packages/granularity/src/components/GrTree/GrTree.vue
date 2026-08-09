@@ -1073,7 +1073,7 @@ defineExpose<GrTreeInstance<T>>({
 .gr-tree__toggle-icon {
     width: var(--gr-tree-icon-size);
     height: var(--gr-tree-icon-size);
-    transition: transform 120ms ease;
+    transition: transform var(--gr-duration-fast) var(--gr-ease-out);
 }
 
 .gr-tree__toggle-icon--expanded {

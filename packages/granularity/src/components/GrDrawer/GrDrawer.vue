@@ -332,9 +332,9 @@ defineExpose({
     >
       <Transition
         appear
-        enter-active-class="duration-200 ease-out"
+        enter-active-class="duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
         enter-from-class="opacity-0"
-        leave-active-class="duration-150 ease-in"
+        leave-active-class="duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)]"
         leave-to-class="opacity-0"
       >
         <div
@@ -349,9 +349,9 @@ defineExpose({
 
       <Transition
         appear
-        enter-active-class="duration-200 ease-out"
+        enter-active-class="duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
         :enter-from-class="panelEnterFrom"
-        leave-active-class="duration-150 ease-in"
+        leave-active-class="duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)]"
         :leave-to-class="panelEnterFrom"
         @after-enter="emit('opened')"
         @after-leave="onPanelAfterLeave"

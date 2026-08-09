@@ -5373,7 +5373,7 @@
           },
           {
             "name": "background",
-            "description": "Свой `background-color`. Задан — дефолтное затемнение `bg-black/25` снимается.",
+            "description": "Свой `background-color`. Задан — дефолтный скрим `--gr-overlay-bg` снимается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

@@ -847,7 +847,7 @@ defineExpose({
           <div
             v-if="showProgress"
             data-gr-file-upload-progress
-            class="mt-3 transition-opacity duration-150"
+            class="mt-3 transition-opacity duration-[var(--gr-duration-fast)]"
             :class="progressVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'"
             :aria-hidden="!progressVisible"
           >

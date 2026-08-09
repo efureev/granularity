@@ -24,7 +24,7 @@ export const rootEnabledClass = 'cursor-pointer'
 // без него растянутая строка (внутри `grid`/`w-full`) прижалась бы к правому краю.
 export const rootLabelStartClass = 'flex-row-reverse justify-end'
 
-export const controlBase = 'rounded border flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
+export const controlBase = 'rounded border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)] focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
 
 export const controlSizes: Record<GrCheckboxSize, string> = {
   xs: 'h-3 w-3',
@@ -57,7 +57,7 @@ export const iconSizes: Record<GrCheckboxSize, string> = {
 }
 
 // Галочка «проявляется» анимацией, поэтому у неё есть состояние, а у тире — нет.
-export const iconCheckTransitionClass = 'transition-transform transition-opacity duration-150'
+export const iconCheckTransitionClass = 'transition-transform transition-opacity duration-[var(--gr-duration-fast)]'
 export const iconCheckVisibleClass = 'opacity-100 scale-100 text-[var(--gr-primary-fg)]'
 export const iconCheckHiddenClass = 'opacity-0 scale-75 text-transparent'
 

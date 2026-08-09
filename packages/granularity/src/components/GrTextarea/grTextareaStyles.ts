@@ -11,16 +11,23 @@ export const borderClassByState: Record<GrTextareaState, string> = {
 }
 
 /**
+ * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
+ * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
+ * валидации, и тема вправе развести их по цвету.
+ */
+export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
+
+/**
  * Кегль совпадает с `GrInput` на каждой ступени: поле ввода и текстовая область
  * в одной форме обязаны читаться одинаково. Вертикальный паддинг меньше, чем у
  * `GrInput`: там он центрирует одну строку в фиксированной высоте, здесь высоту
  * задаёт `rows`.
  */
 export const sizes: Record<GrTextareaSize, string> = {
-  xs: 'px-2.5 py-1 text-[12px]',
-  sm: 'px-3 py-1.5 text-[13px]',
-  md: 'px-3 py-2 text-[14px]',
-  lg: 'px-4 py-2.5 text-[16px]',
+  xs: 'px-2.5 py-1 text-[length:var(--gr-control-text-xs)]',
+  sm: 'px-3 py-1.5 text-[length:var(--gr-control-text-sm)]',
+  md: 'px-3 py-2 text-[length:var(--gr-control-text-md)]',
+  lg: 'px-4 py-2.5 text-[length:var(--gr-control-text-lg)]',
 }
 
 export type GrTextareaResize = 'none' | 'vertical' | 'both'
@@ -43,5 +50,5 @@ export const disabledSurfaceClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-f
 export const countClass = 'mt-1 text-right text-xs text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
 
 export function grTextareaClass(options: { state: GrTextareaState, invalid: boolean }): string {
-  return options.invalid ? borderClassByState.danger : borderClassByState[options.state]
+  return options.invalid ? invalidBorderClass : borderClassByState[options.state]
 }

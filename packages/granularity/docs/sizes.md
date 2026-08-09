@@ -23,6 +23,35 @@
 size="xs">` физически не мог примениться к половине пакета, а `size="xl"`
 компилировался у одного компонента и падал у соседнего.
 
+## Кегль на ступени
+
+Размер — это не только высота и паддинги, но и кегль. Он живёт отдельной шкалой
+токенов `--gr-control-text-*` (`3xs` 10px, `2xs` 11px, `xs` 12px, `sm` 13px,
+`md` 14px, `lg` 16px), а не литералами в компоненте: строка формы, таблица и
+бейдж рядом обязаны совпадать, а плотность контролов настраивается темой
+отдельно от контентной типографики `--gr-text-*`.
+
+Шкала намеренно плотнее четырёх ступеней размера — компонент выбирает из неё
+свои четыре. Основную лестницу (`xs…lg`, 12/13/14/16) берут `GrInput`,
+`GrSelect`, `GrTextarea`, `GrTreeSelect`, `GrAutocomplete`, `GrNumberInput`,
+`GrInputTag`, `GrTable`, `GrLink`, `GrPopover`; на ступень мельче (`3xs…md`,
+10/11/12/14) работают `GrTooltip`, `GrDataTable`, `GrBadge`, `GrRating`,
+`GrFormFile`.
+
+```ts
+// grInputStyles.ts
+export const sizes = {
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
+} as const
+```
+
+Ступень, которой в шкале нет, — повод завести **покомпонентный** токен с точным
+дефолтом (`--gr-rating-font-size-lg`), а не подгонять кегль под соседнюю ступень.
+Гейт на литералы — `src/__tests__/styleTokens.test.ts`.
+
 ## Как разрешается значение
 
 Приоритет, сверху вниз:

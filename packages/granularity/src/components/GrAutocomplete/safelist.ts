@@ -11,6 +11,7 @@ import {
   autocompleteShellEnabledClass,
   autocompleteSizeClassBySize,
   autocompleteStateClass,
+  invalidShellClass,
 } from './grAutocompleteStyles'
 
 // Всё, что живёт в `grAutocompleteStyles.ts`: и вычисляемые мапы, и строковые
@@ -28,5 +29,6 @@ export const grAutocompleteSafelist = [...new Set([
   ...splitClassTokens(autocompleteOptionActiveClass),
   ...splitClassTokens(autocompleteOptionDisabledClass),
   ...splitClassTokens(autocompleteStateClass),
-  ...splitClassTokens('border-[var(--gr-brd)] border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]'),
+  ...splitClassTokens(invalidShellClass),
+  ...splitClassTokens('border-[var(--gr-brd)]'),
 ])]

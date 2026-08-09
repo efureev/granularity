@@ -10,7 +10,7 @@ import type { GrComponentSize } from '../shared/sizes'
 export const keyBaseClass = 'inline-flex items-center justify-center rounded-md border border-[var(--gr-brd)] bg-[var(--gr-muted)] font-medium leading-none text-[var(--gr-muted-fg)] shadow-[var(--gr-shadow-1)] [font-variant-numeric:tabular-nums]'
 
 export const keySizes: Record<GrComponentSize, string> = {
-  xs: 'min-w-[1.25rem] h-5 px-1 text-[10px]',
+  xs: 'min-w-[1.25rem] h-5 px-1 text-[length:var(--gr-control-text-3xs)]',
   sm: 'min-w-[1.5rem] h-6 px-1.5 text-xs',
   md: 'min-w-[1.75rem] h-7 px-2 text-sm',
   lg: 'min-w-[2rem] h-8 px-2.5 text-base',

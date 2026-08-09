@@ -15,8 +15,8 @@ export type GrTableSize = GrComponentSize
  * системная задача.
  */
 export const tableSizes: Record<GrTableSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
+  xs: 'text-[length:var(--gr-control-text-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)]',
   md: 'text-sm',
   lg: 'text-base',
 }

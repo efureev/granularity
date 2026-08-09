@@ -23,14 +23,14 @@ export type GrLinkSize = GrComponentSize
 
 // Базовые классы корневого элемента (`<a>`/`<span>`). Вынесены сюда,
 // чтобы быть единственным источником истины как для шаблона, так и для safelist.
-export const baseRootClass = 'inline-flex items-center gap-1 rounded-[6px] transition-colors duration-150'
+export const baseRootClass = 'inline-flex items-center gap-1 rounded-[var(--gr-radius-chip)] transition-colors duration-[var(--gr-duration-fast)]'
 export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const sizeClassBySize: Record<GrLinkSize, string> = {
-  xs: 'text-[12px]',
-  sm: 'text-[13px]',
-  md: 'text-[14px]',
-  lg: 'text-[16px]',
+  xs: 'text-[length:var(--gr-control-text-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)]',
 }
 
 // Цвет управляется CSS-переменными (как трек в GrSwitch): один набор классов

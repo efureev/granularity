@@ -1,6 +1,6 @@
 import type { GrComponentSize } from '../shared/sizes'
 
-export const collapseHeaderBase = 'w-full flex items-center gap-4 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const collapseHeaderBase = 'w-full flex items-center gap-4 text-left transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Disabled гасится фоном, а не `opacity`: прозрачность разбавляет выверенные на AA
 // токены текста, а заголовок секции — самый заметный текст аккордеона.
@@ -32,7 +32,7 @@ export const collapseBodyPaddings: Record<GrComponentSize, string> = {
 
 export const collapseBodyBase = 'text-[var(--gr-muted-fg)]'
 
-export const collapseChevronBase = 'shrink-0 transition-transform duration-150 text-[var(--gr-muted-fg)]'
+export const collapseChevronBase = 'shrink-0 transition-transform duration-[var(--gr-duration-fast)] text-[var(--gr-muted-fg)]'
 export const collapseChevronExpandedClass = 'rotate-180'
 
 /** Размер шеврона отстаёт от размера секции на ступень — иначе он перевешивает заголовок. */

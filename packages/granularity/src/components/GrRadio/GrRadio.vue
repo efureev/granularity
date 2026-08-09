@@ -270,7 +270,7 @@ onUnmounted(() => unregister?.())
     :aria-describedby="hasDescription ? descriptionId : undefined"
     :data-value="domValue"
     :tabindex="rovingTabindex"
-    class="inline-flex items-start gap-2 select-none focus-visible:outline-none focus-visible:rounded-[8px] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
+    class="inline-flex items-start gap-2 select-none focus-visible:outline-none focus-visible:rounded-[var(--gr-radius-md)] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     :class="rootClassName"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
@@ -293,7 +293,7 @@ onUnmounted(() => unregister?.())
     <span
       data-gr-radio-control
       aria-hidden="true"
-      class="mt-0.5 h-4 w-4 shrink-0 rounded-full border flex items-center justify-center transition-colors duration-150"
+      class="mt-0.5 h-4 w-4 shrink-0 rounded-full border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)]"
       :class="controlClassName"
     >
       <span

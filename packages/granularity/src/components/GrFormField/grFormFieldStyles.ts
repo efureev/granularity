@@ -38,5 +38,5 @@ export const controlColumnClass = 'flex flex-col min-w-0 flex-1'
 
 export const labelBaseClass = 'text-[var(--gr-muted-fg)]'
 export const hintBaseClass = 'text-[var(--gr-muted-fg)]'
-export const errorBaseClass = 'text-[var(--gr-danger-text)]'
-export const requiredMarkClass = 'text-[var(--gr-danger-text)]'
+export const errorBaseClass = 'text-[var(--gr-invalid-text)]'
+export const requiredMarkClass = 'text-[var(--gr-invalid-text)]'

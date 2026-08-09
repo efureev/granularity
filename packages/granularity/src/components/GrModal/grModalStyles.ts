@@ -41,19 +41,19 @@ export const layoutByScroll: Record<GrModalScrollBehavior, string> = {
 // Классы для `<TransitionChild :enter="..." :enter-from="..." ...>`.
 // Разбиты по фазам транзишна, чтобы не склеивать их в «мешок токенов».
 export const overlayTransition = {
-  enter: 'duration-200 ease-out',
+  enter: 'duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]',
   enterFrom: 'opacity-0',
   enterTo: 'opacity-100',
-  leave: 'duration-150 ease-in',
+  leave: 'duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)]',
   leaveFrom: 'opacity-100',
   leaveTo: 'opacity-0',
 } as const
 
 export const panelTransition = {
-  enter: 'duration-200 ease-out',
+  enter: 'duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]',
   enterFrom: 'opacity-0 translate-y-2 sm:translate-y-0 sm:scale-95',
   enterTo: 'opacity-100 translate-y-0 sm:scale-100',
-  leave: 'duration-150 ease-in',
+  leave: 'duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)]',
   leaveFrom: 'opacity-100 translate-y-0 sm:scale-100',
   leaveTo: 'opacity-0 translate-y-2 sm:translate-y-0 sm:scale-95',
 } as const

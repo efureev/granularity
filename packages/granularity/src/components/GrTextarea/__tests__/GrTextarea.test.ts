@@ -28,8 +28,8 @@ describe('GrTextarea', () => {
     const textarea = wrapper.get('textarea')
 
     expect(textarea.attributes('aria-invalid')).toBe('true')
-    expect(textarea.attributes('class')).toContain('border-[var(--gr-danger)]')
-    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-danger)]')
+    expect(textarea.attributes('class')).toContain('border-[var(--gr-invalid-brd)]')
+    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-invalid-ring)]')
   })
 
   it('уважает rows и state для валидного значения', () => {
@@ -83,7 +83,7 @@ describe('GrTextarea — паритет с GrInput', () => {
     const wrapper = mount(GrTextarea, { props: { modelValue: 'x', readonly: true, size: 'lg' } })
 
     expect((wrapper.element as HTMLTextAreaElement).readOnly).toBe(true)
-    expect(wrapper.classes()).toContain('text-[16px]')
+    expect(wrapper.classes()).toContain('text-[length:var(--gr-control-text-lg)]')
   })
 })
 

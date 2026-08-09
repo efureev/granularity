@@ -232,10 +232,10 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
-        enter-active-class="transition-opacity duration-150"
+        enter-active-class="transition-opacity duration-[var(--gr-duration-fast)]"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition-opacity duration-100"
+        leave-active-class="transition-opacity duration-[var(--gr-duration-fast)]"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >

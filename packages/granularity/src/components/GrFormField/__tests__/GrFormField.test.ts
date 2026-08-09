@@ -33,7 +33,7 @@ describe('granularity/GrFormField (unit)', () => {
     const errorEl = wrapper.get('[data-gr-form-field-error]')
 
     expect(errorEl.text()).toBe('Email обязателен.')
-    expect(errorEl.attributes('class')).toContain('text-[var(--gr-danger-text)]')
+    expect(errorEl.attributes('class')).toContain('text-[var(--gr-invalid-text)]')
     expect(wrapper.get('input').attributes('id')).toBe('email')
   })
 
@@ -59,8 +59,8 @@ describe('GrFormField — токены', () => {
       slots: { default: '<input>' },
     })
 
-    expect(wrapper.get('[data-gr-form-field-required]').classes()).toContain('text-[var(--gr-danger-text)]')
-    expect(wrapper.get('[data-gr-form-field-error]').classes()).toContain('text-[var(--gr-danger-text)]')
+    expect(wrapper.get('[data-gr-form-field-required]').classes()).toContain('text-[var(--gr-invalid-text)]')
+    expect(wrapper.get('[data-gr-form-field-error]').classes()).toContain('text-[var(--gr-invalid-text)]')
   })
 })
 

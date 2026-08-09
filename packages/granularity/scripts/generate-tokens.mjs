@@ -1,4 +1,5 @@
-import { readFile, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
+import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -9,6 +10,13 @@ import { fileURLToPath } from 'node:url'
  *   tokens/foundation.json   — примитивы (палитра, типографика, spacing, радиусы, тени, motion, z-index);
  *   tokens/derived.json      — производные формулы hover/active (декларативно: base + amount + mixWith);
  *   tokens/themes/*.json     — семантические роли темы.
+ *
+ * Плюс покомпонентный контракт — `src/components/GrX/tokens.json` рядом с кодом
+ * компонента (и `src/composables/tokens.json` для того, что ставит композабл).
+ * CSS из него не генерируется: `hook`-токены обязаны остаться неприсвоенными,
+ * иначе `var(--gr-x, дефолт)` перестанет падать на дефолт, а `inline` и `css`
+ * присваивает сам компонент. Реестр нужен для доки и для гейта
+ * `src/__tests__/componentTokens.test.ts`.
  *
  * Отсюда генерируются:
  *   src/styles/tokens.css            — примитивы + `color-mix`-формулы;
@@ -76,15 +84,40 @@ async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'))
 }
 
+/**
+ * Реестры покомпонентных токенов. Владелец берётся из файловой системы, как и
+ * состав компонентов в `generate-registry.mjs`: новый компонент приносит свой
+ * `tokens.json` сам, править общий список не нужно.
+ */
+async function readComponentRegistries() {
+  const componentsDir = resolve(pkgDir, 'src/components')
+  const entries = await readdir(componentsDir, { withFileTypes: true })
+
+  const paths = entries
+    .filter(entry => entry.isDirectory() && entry.name.startsWith('Gr'))
+    .map(entry => resolve(componentsDir, entry.name, 'tokens.json'))
+    .concat([resolve(pkgDir, 'src/composables/tokens.json')])
+    .filter(path => existsSync(path))
+
+  const registries = await Promise.all(paths.map(readJson))
+
+  // Компоненты по алфавиту, владельцы вне `src/components` — после них.
+  const rank = owner => (owner.startsWith('Gr') ? 0 : 1)
+
+  return registries.sort((left, right) =>
+    rank(left.owner) - rank(right.owner) || left.owner.localeCompare(right.owner))
+}
+
 async function readTokenData() {
-  const [foundation, derived, light, dark] = await Promise.all([
+  const [foundation, derived, light, dark, components] = await Promise.all([
     readJson(resolve(tokensDir, 'foundation.json')),
     readJson(resolve(tokensDir, 'derived.json')),
     readJson(resolve(tokensDir, 'themes/light.json')),
     readJson(resolve(tokensDir, 'themes/dark.json')),
+    readComponentRegistries(),
   ])
 
-  return { foundation, derived, themes: [light, dark] }
+  return { foundation, derived, themes: [light, dark], components }
 }
 
 function flattenTokens(groups) {
@@ -193,7 +226,7 @@ function renderThemeCss(theme, derived) {
 
 // --- TS --------------------------------------------------------------------
 
-function renderTs({ foundation, derived, themes }) {
+function renderTs({ foundation, derived, themes, components }) {
   const foundationTokens = flattenTokens(foundation.groups).map(token => ({
     name: token.name,
     value: token.value,
@@ -229,10 +262,18 @@ function renderTs({ foundation, derived, themes }) {
 
   const literal = value => JSON.stringify(value, null, 2)
 
+  const componentTokens = components.flatMap(registry => registry.tokens.map(token => ({
+    owner: registry.owner,
+    name: token.name,
+    kind: token.kind,
+    default: token.default,
+    description: token.description,
+  })))
+
   return [
     GENERATED_BANNER_TS,
     '',
-    "import type { GrDerivedToken, GrFoundationToken, GrThemeToken } from './types'",
+    "import type { GrComponentToken, GrDerivedToken, GrFoundationToken, GrThemeToken } from './types'",
     '',
     `export const grThemeNames = ${literal(themes.map(theme => theme.name))} as const`,
     '',
@@ -242,12 +283,56 @@ function renderTs({ foundation, derived, themes }) {
     '',
     `export const grThemeTokens: GrThemeToken[] = ${literal(themeTokens)}`,
     '',
+    `export const grComponentTokens: GrComponentToken[] = ${literal(componentTokens)}`,
+    '',
   ].join('\n')
 }
 
 // --- docs ------------------------------------------------------------------
 
-function renderDocs({ foundation, derived, themes }) {
+const COMPONENT_KIND_LABEL = {
+  theme: 'тема компонента',
+  css: 'CSS компонента',
+  inline: 'инлайн-стиль',
+  hook: 'только хук',
+}
+
+function renderComponentDocs(components) {
+  const lines = [
+    '## Покомпонентные точки кастомизации',
+    '',
+    'Переменные, которыми перекрашивается и перемеряется отдельный компонент.',
+    'Источник — `tokens.json` рядом с кодом компонента; гейт полноты —',
+    '`src/__tests__/componentTokens.test.ts`. Это публичный контракт: имена',
+    'меняются так же, как имена пропов, — с записью в `CHANGELOG.md`.',
+    '',
+    'Колонка «откуда» отвечает на вопрос, что произойдёт, если токен не задать:',
+    '',
+    '| Значение | Что это значит |',
+    '| --- | --- |',
+    '| тема компонента | объявлен в `components/<Gr…>/themes/*.css`, переключается вместе с темой |',
+    '| CSS компонента | объявлен в собственном `<style>` компонента |',
+    '| инлайн-стиль | компонент присваивает его сам, обычно от ступени `size` |',
+    '| только хук | нигде не присваивается: работает дефолт из `var(--gr-x, дефолт)` |',
+    '',
+  ]
+
+  for (const registry of components) {
+    lines.push(`### ${registry.owner}`, '')
+    lines.push('| Токен | Откуда | По умолчанию | Назначение |', '| --- | --- | --- | --- |')
+
+    for (const token of registry.tokens) {
+      const kind = COMPONENT_KIND_LABEL[token.kind] ?? token.kind
+      lines.push(`| \`${token.name}\` | ${kind} | ${token.default} | ${token.description} |`)
+    }
+
+    lines.push('')
+  }
+
+  return lines
+}
+
+function renderDocs({ foundation, derived, themes, components }) {
   const lines = [
     '<!-- СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются. -->',
     '',
@@ -336,7 +421,7 @@ function renderDocs({ foundation, derived, themes }) {
     }
   }
 
-  lines.push('')
+  lines.push('', ...renderComponentDocs(components))
 
   return lines.join('\n')
 }

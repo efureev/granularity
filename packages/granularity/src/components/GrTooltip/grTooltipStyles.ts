@@ -4,10 +4,10 @@ export type GrTooltipSize = GrComponentSize
 
 /** Панель подсказки: кегль и внутренние поля. */
 export const panelSizes: Record<GrTooltipSize, string> = {
-  xs: 'px-1.5 py-0.5 text-[10px]',
-  sm: 'px-2 py-1 text-[11px]',
-  md: 'px-2 py-1 text-[12px]',
-  lg: 'px-3 py-1.5 text-[14px]',
+  xs: 'px-1.5 py-0.5 text-[length:var(--gr-control-text-3xs)]',
+  sm: 'px-2 py-1 text-[length:var(--gr-control-text-2xs)]',
+  md: 'px-2 py-1 text-[length:var(--gr-control-text-xs)]',
+  lg: 'px-3 py-1.5 text-[length:var(--gr-control-text-md)]',
 }
 
 /** Ширина панели растёт вместе с кеглем — иначе на `lg` строка рвётся втрое. */

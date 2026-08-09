@@ -222,13 +222,13 @@ defineExpose({ focus })
       <TransitionGroup
           tag="div"
           class="grid gap-3"
-          enter-active-class="transition duration-200 ease-out"
+          enter-active-class="transition duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
           enter-from-class="opacity-0 translate-y-2"
           enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-150 ease-in absolute"
+          leave-active-class="transition duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)] absolute"
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 translate-y-2"
-          move-class="transition-transform duration-200 ease-out"
+          move-class="transition-transform duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
       >
         <div
             v-for="toast in visibleToasts"

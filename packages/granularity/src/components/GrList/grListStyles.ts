@@ -16,7 +16,7 @@ export const densityPadding: Record<GrListItemDensity, string> = {
 export const itemLayoutClass = 'flex items-start justify-between gap-4'
 
 /** Интерактивная строка занимает всю ширину пункта — кликабельна вся, а не текст. */
-export const itemInteractiveClass = 'w-full text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-inset'
+export const itemInteractiveClass = 'w-full text-left transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-inset'
 
 export const itemHoverClass = 'cursor-pointer hover:bg-[var(--gr-muted)]'
 

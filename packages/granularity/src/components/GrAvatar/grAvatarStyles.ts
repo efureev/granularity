@@ -6,7 +6,7 @@ export type GrAvatarStatus = typeof GR_AVATAR_STATUSES[number]
 
 export const shapes: Record<GrAvatarShape, string> = {
     circle: 'rounded-full',
-    square: 'rounded-[10px]',
+    square: 'rounded-[var(--gr-avatar-square-radius,10px)]',
 }
 
 export const rootBaseClass = 'relative inline-flex shrink-0 items-center justify-center overflow-hidden border border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] font-700'

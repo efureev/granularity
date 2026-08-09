@@ -6,7 +6,7 @@ export type GrSidebarPosition = typeof GR_SIDEBAR_POSITIONS[number]
 export const GR_SIDEBAR_LANDMARKS = ['complementary', 'navigation'] as const
 export type GrSidebarLandmark = typeof GR_SIDEBAR_LANDMARKS[number]
 
-export const rootBase = 'flex flex-col bg-[var(--gr-sidebar)] text-[var(--gr-sidebar-fg)] transition-[width] duration-200 ease-out'
+export const rootBase = 'flex flex-col bg-[var(--gr-sidebar)] text-[var(--gr-sidebar-fg)] transition-[width] duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
 
 /** Граница отделяет панель от контента, поэтому уезжает на внутреннюю сторону. */
 export const rootPositions: Record<GrSidebarPosition, string> = {
@@ -26,7 +26,7 @@ export const subtitleClass = 'truncate text-[length:var(--gr-text-sm)] text-[var
  */
 export const contentBase = 'flex-1 overflow-y-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--gr-ring)]'
 
-export const itemBase = 'relative flex w-full items-center rounded-lg text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const itemBase = 'relative flex w-full items-center rounded-lg text-sm transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const itemCollapsedClass = 'justify-center px-0 py-2'
 export const itemExpandedClass = 'gap-3 px-3 py-2'

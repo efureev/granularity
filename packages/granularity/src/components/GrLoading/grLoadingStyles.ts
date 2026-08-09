@@ -11,7 +11,7 @@ export const rootModeClass = {
     fullscreen: 'fixed inset-0 z-[var(--gr-z-loading)]',
     inline: 'absolute inset-0 z-10',
 } as const
-export const rootBackgroundClass = 'bg-black/25'
+export const rootBackgroundClass = 'bg-[var(--gr-overlay-bg)]'
 export const rootBackdropBlurClass = 'backdrop-blur-sm'
 
 export function grLoadingRootClass(options: {

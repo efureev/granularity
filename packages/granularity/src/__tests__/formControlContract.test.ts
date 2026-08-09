@@ -186,3 +186,37 @@ describe('контракт форм-контрола', () => {
     })
   }
 })
+
+/**
+ * Ошибка валидации и декоративный тон — разные каналы.
+ *
+ * До этого гейта `invalid` переиспользовал класс-строку тона `danger`: тема,
+ * желающая покрасить ошибку иначе, чем «просто красный акцент», не могла этого
+ * сделать в принципе, а разработчик, поставивший `state="danger"` как подсветку,
+ * визуально сообщал о непройденной валидации.
+ */
+describe('invalid не равен тону danger', () => {
+  const stateful = new Set(['GrInput', 'GrTextarea', 'GrNumberInput', 'GrSelect', 'GrTreeSelect', 'GrInputTag'])
+  const colored = controls.filter(({ meta }) => stateful.has(meta.name) || meta.name === 'GrAutocomplete')
+
+  for (const { component, meta } of colored) {
+    it(`${meta.name}: invalid красится ролью --gr-invalid-*`, async () => {
+      const wrapper = mount(component as never, { props: { ...meta.props, invalid: true } as never })
+      await nextTick()
+
+      expect(wrapper.html()).toContain('--gr-invalid-brd')
+    })
+
+    if (!stateful.has(meta.name))
+      continue
+
+    it(`${meta.name}: state="danger" остаётся тоном danger`, async () => {
+      const wrapper = mount(component as never, { props: { ...meta.props, state: 'danger' } as never })
+      await nextTick()
+
+      const html = wrapper.html()
+      expect(html).toContain('--gr-danger')
+      expect(html, 'декоративный тон не должен выглядеть вердиктом валидации').not.toContain('--gr-invalid-brd')
+    })
+  }
+})

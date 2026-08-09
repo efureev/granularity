@@ -227,7 +227,7 @@ function onKeydown(event: KeyboardEvent): void {
       role="region"
       :aria-labelledby="headerId"
       :inert="expanded ? undefined : true"
-      class="grid transition-[grid-template-rows] duration-200"
+      class="grid transition-[grid-template-rows] duration-[var(--gr-duration-base)]"
       :class="expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
     >
       <div class="overflow-hidden">

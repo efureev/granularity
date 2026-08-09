@@ -7,6 +7,7 @@ import {
   grSelectLinkNativeLabelFocusClass,
   grSelectLinkNativeOverlayClass,
   grSelectPanelClasses,
+  invalidBorderClass,
   linkBaseClass,
   selectOptionActiveClass,
   selectOptionBaseClass,
@@ -25,6 +26,7 @@ import {
 // `dist/chunks/`, вне области скана компонента — гейт `src/__tests__/safelist.test.ts`.
 export const grSelectSafelist = [...new Set([
   ...Object.values(borderClassByState).flatMap(splitClassTokens),
+  ...splitClassTokens(invalidBorderClass),
   ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
   ...splitClassTokens(defaultBaseClass),
   ...splitClassTokens(linkBaseClass),

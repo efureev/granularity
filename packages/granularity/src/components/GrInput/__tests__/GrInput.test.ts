@@ -16,7 +16,7 @@ describe('GrInput', () => {
     const input = wrapper.get('input')
     expect(input.attributes('class')).toContain('h-7')
     expect(input.attributes('class')).toContain('px-2.5')
-    expect(input.attributes('class')).toContain('text-[12px]')
+    expect(input.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
   })
 
   it('поддерживает size=lg', () => {
@@ -30,7 +30,7 @@ describe('GrInput', () => {
     const input = wrapper.get('input')
     expect(input.attributes('class')).toContain('h-11')
     expect(input.attributes('class')).toContain('px-4')
-    expect(input.attributes('class')).toContain('text-[16px]')
+    expect(input.attributes('class')).toContain('text-[length:var(--gr-control-text-lg)]')
   })
 
   it('по умолчанию использует size=md', () => {

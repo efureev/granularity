@@ -214,13 +214,13 @@ function onDismiss(): void {
       <div class="flex flex-wrap items-center gap-2">
         <span
           v-if="props.showStatus && typeof props.error.status === 'number'"
-          class="inline-flex items-center rounded-[var(--gr-radius-sm)] bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-1.5 py-0.5 text-[11px] font-700 leading-none"
+          class="inline-flex items-center rounded-[var(--gr-radius-sm)] bg-[color-mix(in_srgb,currentColor_12%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-control-text-2xs)] font-700 leading-none"
           :data-testid="`${props.testIdPrefix}-status`"
         >
           {{ statusLabel }}
         </span>
         <span
-          class="text-[13px]"
+          class="text-[length:var(--gr-control-text-sm)]"
           :data-testid="`${props.testIdPrefix}-message`"
         >
           {{ message }}
@@ -229,7 +229,7 @@ function onDismiss(): void {
 
       <ul
         v-if="detailEntries.length"
-        class="m-0 list-disc pl-5 text-[12px]"
+        class="m-0 list-disc pl-5 text-[length:var(--gr-control-text-xs)]"
         :data-testid="`${props.testIdPrefix}-details`"
       >
         <li
