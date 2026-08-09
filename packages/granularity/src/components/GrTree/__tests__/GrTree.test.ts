@@ -853,6 +853,26 @@ describe('GrTree — интерактив внутри узлов', () => {
     wrapper.unmount()
   })
 
+  it('клик по toggle не отнимает у дерева навигацию стрелками', async () => {
+    const wrapper = mount(GrTree, {
+      props: { data: DATA, nodeKey: 'id' },
+      attachTo: document.body,
+    })
+
+    const toggle = wrapper.get('[data-gr-tree-toggle]').element as HTMLButtonElement
+    // Браузер фокусирует кликнутую кнопку, `tabindex="-1"` этому не мешает.
+    toggle.focus()
+    await wrapper.get('[data-gr-tree-toggle]').trigger('click')
+
+    toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement?.getAttribute('data-gr-tree-node-key')).toBe('11')
+
+    wrapper.unmount()
+  })
+
   it('печать в контроле внутри слота узла не перехватывается typeahead', async () => {
     const wrapper = mount(GrTree, {
       props: { data: DATA, nodeKey: 'id' },

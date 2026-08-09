@@ -211,12 +211,21 @@ const optionsResolved = computed<GrAutocompleteOption<TValue>[]>(() =>
   props.fetchOptions && remoteAnswered.value ? remoteOptions.value : (props.options ?? []),
 )
 
-// Родитель обновил стартовый список — он снова источник до следующего ответа
-// сервера. Ссылку на `options` в remote-режиме держите стабильной:
-// инлайн-литерал пересоздаётся каждым ререндером и сбрасывал бы
-// remote-результаты (та же конвенция идентичности, что у `useVirtualList.source`).
-watch(() => props.options, () => {
+/**
+ * Подпись состава стартового списка. Сравнивать идентичность массива нельзя:
+ * инлайн-литерал `:options="[...]"` пересоздаётся каждым ререндером родителя —
+ * в том числе тем, который вызвал сам компонент своим `update:modelValue`, —
+ * и remote-результаты исчезали бы прямо посреди выбора.
+ */
+function optionsSignature(options: GrAutocompleteOption<TValue>[] | undefined): string {
+  return (options ?? []).map(o => `${String(o.value)}\u0000${o.label}`).join('\u0001')
+}
+
+// Родитель сменил стартовый список — он снова источник до следующего ответа
+// сервера, а летящий запрос относится к прежнему набору данных и отменяется.
+watch(() => optionsSignature(props.options), () => {
   if (!props.fetchOptions) return
+  cancelSearch()
   remoteAnswered.value = false
   remoteOptions.value = []
 })
@@ -541,10 +550,21 @@ function scheduleSearch(value: string): void {
   }, props.debounce)
 }
 
-onBeforeUnmount(() => {
+/**
+ * Снять запланированный и летящий запрос. Инкремент `searchSeq` обязателен
+ * вместе со снятием `remoteLoading`: после него `finally` в `runFetch` считает
+ * себя устаревшим и флаг не тронет — спиннер остался бы навсегда.
+ */
+function cancelSearch(): void {
   if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = null
   inflight?.abort()
-})
+  inflight = null
+  searchSeq += 1
+  remoteLoading.value = false
+}
+
+onBeforeUnmount(cancelSearch)
 
 // ————— Ввод.
 function onInput(event: Event): void {
@@ -965,7 +985,7 @@ const themeAttrs = useGrThemeAttrs()
               на все три — и вне listbox, чтобы не ломать его состав.
             -->
             <div
-              v-if="isLoading || showEmpty"
+              v-if="isLoading || belowMinQuery || showEmpty"
               data-gr-autocomplete-status
               role="status"
               aria-live="polite"

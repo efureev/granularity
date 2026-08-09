@@ -479,10 +479,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   number field now behaves like readonly text: arrows and Home/End go to the native caret.
 - **Delegated tree keyboard respects interactive targets.** `GrTree` intercepted every key at the root: Enter on the
   expand toggle activated the *focused* row instead of clicking the button, and typing into an input inside a custom
-  node slot was swallowed by typeahead's `preventDefault`. Keys originating inside a button/link/input are now left
-  alone. The toggle and drag-handle buttons also got `tabindex="-1"` — a tree of fifty nodes was fifty-plus Tab stops
-  instead of one (roving tabindex). And when virtualization unmounts the focused row, focus now lands on the tree root
-  (where the delegated keyboard lives) instead of `<body>`, so the first arrow key recovers the row.
+  node slot was swallowed by typeahead's `preventDefault`. A **tabbable** target inside a node — a link, a slot button,
+  an input — now owns the keyboard outright. The row's own toggle and drag-handle are not tabbable (`tabindex="-1"`; a
+  tree of fifty nodes was fifty-plus Tab stops instead of one), and they are reachable by mouse only, so they keep just
+  the activation keys: arrows, `Home`/`End` and typeahead stay with the tree, and clicking the toggle no longer kills
+  navigation until the next click on a row. And when virtualization unmounts the row **that holds focus**, focus lands
+  on the tree root (where the delegated keyboard lives) instead of `<body>`, so the first arrow key recovers the row —
+  scrolling a tree nobody focused leaves the page's focus alone.
 - **Hold-and-release on the `GrNumberInput` steppers.** The auto-repeat did not listen for `pointercancel`, so a
   touch scroll that took the pointer away left the interval stepping to the boundary; and releasing after a hold fired
   the trailing `click` as one extra step. Both fixed: `pointercancel` stops the repeat, and a click that tails a
@@ -493,14 +496,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and leaving resumed countdowns under keyboard focus (WCAG 2.2.1). They are now independent flags OR-ed together.
 - **`GrForm` async validation is race-free.** Two overlapping runs of the same field applied results in promise
   *resolution* order — a slow answer about a stale value could overwrite a fresh one. A per-field sequence counter
-  (the `searchSeq` pattern from `GrAutocomplete`) now discards stale results.
+  (the `searchSeq` pattern from `GrAutocomplete`) now discards stale results, and a superseded run returns the verdict
+  of the run that superseded it instead of reading a not-yet-written error map — otherwise `validate()` could aggregate
+  "valid" for a value nobody had checked yet and `submit` would fire on it. `clearValidate()` and `resetFields()`
+  cancel in-flight runs: their answer describes the pre-reset state, it no longer lands in the freshly cleared form,
+  and the field stops being marked "validating" at once instead of waiting for the server.
 - **`GrSelect`/`GrAutocomplete` polish.** Chip remove buttons hide under form-context `disabled`, not only the local
   prop; typeahead searches cyclically from the active option (APG) instead of from the top; option hover updates the
   active index via a precomputed map — O(1) per mousemove instead of O(n) on virtualized thousands. The autocomplete
   clear button is Tab-reachable (the `GrSelect` convention); below `minQueryLength` the panel shows the "type at least
-  N characters" hint instead of stale results; and replacing `options` in remote mode makes the new list the source
-  again until the next fetch answers (keep the reference stable — an inline literal would reset remote results on
-  every re-render).
+  N characters" hint instead of stale results — including under `allowCustomValue`, where the hint now sits next to the
+  "Add …" row; and replacing `options` in remote mode makes the new list the source again until the next fetch answers,
+  aborting the in-flight request for the previous data set. That reset keys on the list's *contents*, not on array
+  identity, so an inline `:options="[...]"` literal is safe: a re-render that rebuilds the same options — including one
+  the component itself triggered with `update:modelValue` — no longer wipes fetched results mid-interaction.
 - **`GrList` no longer measures skeletons.** In the loading state the virtualizer recorded loading-row heights under
   the indices of future data rows, skewing the scroll extent right after load.
 - **`GrButton` exposes `blur()`** — the last control returning only half of the `focus`/`blur` pair.

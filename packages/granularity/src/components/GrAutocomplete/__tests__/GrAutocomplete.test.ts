@@ -280,4 +280,49 @@ describe('GrAutocomplete — очистка, minQueryLength и remote options', 
 
     wrapper.unmount()
   })
+
+  it('пересборка того же по составу `options` remote-результаты не трогает', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: {
+        modelValue: '',
+        options: [{ value: 'start', label: 'Start' }],
+        fetchOptions: async () => [{ value: 'remote', label: 'Remote' }],
+        debounce: 0,
+        ariaLabel: 'F',
+      },
+    })
+    const input = getInput(wrapper)
+
+    await input.trigger('focus')
+    await input.setValue('r')
+    await new Promise(resolve => setTimeout(resolve, 5))
+    await nextTick()
+    expect(getTeleportedOptions().map(el => el.textContent?.trim())).toEqual(['Remote'])
+
+    // Инлайн-литерал `:options="[...]"` пересоздаётся на каждом ререндере
+    // родителя — в том числе на том, который вызвал сам компонент своим
+    // `update:modelValue`. Состав тот же, значит трогать нечего.
+    await wrapper.setProps({ options: [{ value: 'start', label: 'Start' }] })
+    await nextTick()
+    expect(getTeleportedOptions().map(el => el.textContent?.trim())).toEqual(['Remote'])
+
+    wrapper.unmount()
+  })
+
+  it('подсказка minQueryLength видна и при allowCustomValue', async () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: '', options: OPTIONS, minQueryLength: 3, allowCustomValue: true, ariaLabel: 'F' },
+    })
+    const input = getInput(wrapper)
+    await input.trigger('focus')
+    await input.setValue('vu')
+    await nextTick()
+
+    // Строка «Add …» объясняет, что делать с набранным, но не то, куда делись
+    // опции: подсказка нужна рядом с ней, а не вместо неё.
+    expect(document.body.querySelector('[data-gr-autocomplete-add-option]')).toBeTruthy()
+    expect(document.body.querySelector('[data-gr-autocomplete-hint]')?.textContent).toContain('3')
+
+    wrapper.unmount()
+  })
 })

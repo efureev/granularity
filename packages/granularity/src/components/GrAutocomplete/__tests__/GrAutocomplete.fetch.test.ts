@@ -141,6 +141,43 @@ describe('GrAutocomplete — fetchOptions', () => {
     wrapper.unmount()
   })
 
+  it('смена стартового списка отменяет летящий запрос, а не ждёт его', async () => {
+    vi.useFakeTimers()
+    const pending = deferred()
+
+    const wrapper = mount(GrAutocomplete, {
+      props: {
+        modelValue: '',
+        options: [{ value: 'start', label: 'Start' }],
+        debounce: 10,
+        ariaLabel: 'People',
+        fetchOptions: () => pending.promise,
+      },
+      attachTo: document.body,
+    })
+
+    const input = wrapper.get('input')
+    await input.setValue('an')
+    vi.advanceTimersByTime(10)
+    await nextTick()
+    expect(document.querySelector('[data-gr-autocomplete-loading]')).toBeTruthy()
+
+    await wrapper.setProps({ options: [{ value: 'fresh', label: 'Fresh' }] })
+    await nextTick()
+
+    // Ответ на прежний контекст данных больше не ждут: ни спиннера, ни права
+    // перезаписать новый стартовый список.
+    expect(document.querySelector('[data-gr-autocomplete-loading]')).toBeNull()
+
+    pending.resolve([{ value: 'stale', label: 'Stale' }])
+    await nextTick()
+    await nextTick()
+
+    expect(renderedOptions()).toEqual(['Fresh'])
+
+    wrapper.unmount()
+  })
+
   it('отмена при размонтировании не роняет обработчик', async () => {
     vi.useFakeTimers()
     const pending = deferred()

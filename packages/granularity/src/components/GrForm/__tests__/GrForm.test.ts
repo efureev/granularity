@@ -403,4 +403,102 @@ describe('GrForm — гонка асинхронной валидации пол
 
     wrapper.unmount()
   })
+
+  /**
+   * Стенд с ручным резолвом правила: каждый прогон получает свой `resolve`,
+   * поэтому порядок ответов задаёт тест, а не движок промисов.
+   */
+  function mountDeferred(formProps = '') {
+    const resolvers: Array<(value: boolean | string) => void> = []
+    const model = reactive({ email: 'bad' })
+    const formRef = ref<InstanceType<typeof GrForm> | null>(null)
+
+    const wrapper = mount({
+      components: { GrForm, GrFormField, GrInput },
+      setup: () => ({
+        model,
+        formRef,
+        rules: {
+          email: [{
+            validator: () => new Promise<boolean | string>((resolve) => { resolvers.push(resolve) }),
+          }],
+        },
+      }),
+      template: `
+        <GrForm ref="formRef" :model="model" :rules="rules" ${formProps}>
+          <GrFormField label="Email" name="email">
+            <GrInput v-model="model.email" />
+          </GrFormField>
+        </GrForm>
+      `,
+    }, { attachTo: document.body })
+
+    return { wrapper, model, resolvers, form: () => formRef.value! }
+  }
+
+  it('вытесненный прогон отдаёт вердикт вытеснившего, а не «ошибок пока нет»', async () => {
+    const { wrapper, form, resolvers } = mountDeferred()
+    await nextTick()
+
+    const first = form().validateField('email')
+    const second = form().validateField('email')
+
+    // Ранний прогон отвечает первым — он про уже неактуальное значение.
+    resolvers[0]('Некорректный e-mail')
+    await flushValidation()
+
+    // Вытеснивший ещё летит и в карту ошибок ничего не записал.
+    resolvers[1]('Всё ещё некорректный e-mail')
+
+    expect(await first).toBe(false)
+    expect(await second).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('submit ждёт вытеснивший прогон, а не отправляет непроверенное значение', async () => {
+    const { wrapper, model, form, resolvers } = mountDeferred('validate-on-change')
+    await nextTick()
+
+    // Submit запустил проверку, пользователь тут же поправил значение —
+    // watcher завёл второй прогон поверх первого.
+    const validating = form().validate()
+    model.email = 'typed@example.com'
+    await nextTick()
+    expect(resolvers).toHaveLength(2)
+
+    // Первый отвечает «валидно» — про прежнее значение.
+    resolvers[0](true)
+    await flushValidation()
+    resolvers[1]('Некорректный e-mail')
+
+    expect(await validating).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('сброс формы отменяет летящую проверку: ни ошибки, ни зависшего «проверяем»', async () => {
+    const { wrapper, form, resolvers } = mountDeferred()
+    await nextTick()
+
+    const pending = form().validateField('email')
+    await flushValidation()
+    expect(wrapper.find('[data-gr-form-field-validating]').exists()).toBe(true)
+
+    form().resetFields()
+    await flushValidation()
+
+    // Сброс не может ждать сервер: поле обязано перестать «проверяться» сразу.
+    expect(wrapper.find('[data-gr-form-field-validating]').exists()).toBe(false)
+
+    resolvers[0]('Некорректный e-mail')
+    await pending
+    await flushValidation()
+
+    // Ответ про досбросовое значение не имеет права вернуть ошибку.
+    expect(errorTexts(wrapper)).toEqual([])
+    expect(wrapper.findComponent(GrForm).emitted('validate')).toBeUndefined()
+
+    wrapper.unmount()
+  })
 })

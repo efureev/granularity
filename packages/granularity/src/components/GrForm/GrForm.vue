@@ -137,6 +137,10 @@ const resolveMessage = createGrFormMessageResolver(t)
 // результат в порядке РАЗРЕШЕНИЯ промисов, и без него медленный ответ про
 // старое значение затирал бы свежий (приём — `searchSeq` в GrAutocomplete).
 const validationSeq = new Map<string, number>()
+// Последний стартовавший прогон поля: вытесненному нечего сказать о текущем
+// значении, и он отдаёт вердикт того, кто его вытеснил, — иначе `validate()`
+// собрал бы «валидно» из карты ошибок, куда новый прогон ещё не записал.
+const validationRuns = new Map<string, { seq: number, promise: Promise<boolean> }>()
 
 async function validateField(name: string, trigger?: GrFormTrigger): Promise<boolean> {
   if (trigger === 'blur' && !props.validateOnBlur) return !errors.value[name]
@@ -147,6 +151,12 @@ async function validateField(name: string, trigger?: GrFormTrigger): Promise<boo
   const seq = (validationSeq.get(name) ?? 0) + 1
   validationSeq.set(name, seq)
 
+  const run = runValidation(name, seq, rules)
+  validationRuns.set(name, { seq, promise: run })
+  return run
+}
+
+async function runValidation(name: string, seq: number, rules: GrFormRule[]): Promise<boolean> {
   // Признак «идёт проверка» нужен именно асинхронным правилам: без него поле
   // молчит до ответа сервера, и пользователь не знает, что что-то происходит.
   validatingSet.value = new Set(validatingSet.value).add(name)
@@ -154,7 +164,13 @@ async function validateField(name: string, trigger?: GrFormTrigger): Promise<boo
     const message = await runFieldRules(getValue(name), rules, props.model, resolveMessage)
 
     // Устаревший прогон: его результат — про прежнее значение, не применять.
-    if (validationSeq.get(name) !== seq) return !errors.value[name]
+    if (validationSeq.get(name) !== seq) {
+      const current = validationRuns.get(name)
+      // Цепочка конечна: каждый следующий прогон новее предыдущего. Своего
+      // прогона в реестре нет только после `clearValidate` — там проверять
+      // нечего, форма уже чиста.
+      return current && current.seq !== seq ? current.promise : !errors.value[name]
+    }
 
     errors.value = { ...errors.value, [name]: message }
     emit('validate', name, !message, message)
@@ -176,12 +192,33 @@ async function validate(): Promise<boolean> {
   return valid
 }
 
+/**
+ * Отменить летящие проверки: их ответ относится к состоянию до сброса, и
+ * записать его в очищенную форму значило бы вернуть пользователю ошибку,
+ * которую он только что убрал. Заодно снимаем «проверяем» — ждать сервер,
+ * чтобы погасить индикатор на сброшенном поле, не за чем.
+ */
+function invalidateValidation(names?: string[]): void {
+  const list = names ?? [...validationSeq.keys()]
+  if (!list.length) return
+
+  const nextValidating = new Set(validatingSet.value)
+  for (const name of list) {
+    validationSeq.set(name, (validationSeq.get(name) ?? 0) + 1)
+    validationRuns.delete(name)
+    nextValidating.delete(name)
+  }
+  validatingSet.value = nextValidating
+}
+
 function clearValidate(names?: string | string[]): void {
   if (!names) {
+    invalidateValidation()
     errors.value = {}
     return
   }
   const list = Array.isArray(names) ? names : [names]
+  invalidateValidation(list)
   const next = { ...errors.value }
   for (const name of list) delete next[name]
   errors.value = next
@@ -315,6 +352,10 @@ provide(GR_FORM_KEY, {
 
     return () => {
       fieldRegistry.delete(name)
+      // Иначе счётчики поколений копятся на динамических именах
+      // (`items.417.email`) до размонтирования формы.
+      validationSeq.delete(name)
+      validationRuns.delete(name)
       stopRequired?.()
       const next = new Set(selfRequiredFields.value)
       next.delete(name)

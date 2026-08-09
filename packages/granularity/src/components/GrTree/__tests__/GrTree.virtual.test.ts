@@ -144,28 +144,69 @@ describe('GrTree — виртуализация', () => {
 })
 
 describe('GrTree — фокус при уходе строки из виртуального окна', () => {
-  it('размонтирование сфокусированной строки возвращает фокус на корень дерева', async () => {
+  function mountFocusTree() {
     const data = Array.from({ length: 60 }, (_, i) => ({ id: i + 1, label: `Node ${i + 1}` }))
-    const wrapper = mount(GrTree, {
+    return mount(GrTree, {
       props: { data, nodeKey: 'id', virtual: true, maxHeight: 90 },
       attachTo: document.body,
     })
+  }
+
+  async function scrollTo(wrapper: ReturnType<typeof mountFocusTree>, top: number) {
+    const root = wrapper.get('[data-gr-tree]').element as HTMLElement
+    root.scrollTop = top
+    root.dispatchEvent(new Event('scroll'))
+    await nextTick()
+    return root
+  }
+
+  it('размонтирование сфокусированной строки возвращает фокус на корень дерева', async () => {
+    const wrapper = mountFocusTree()
     await nextTick()
 
     const firstRow = wrapper.get('[data-gr-tree-node-key="1"]').element as HTMLElement
     firstRow.focus()
     expect(document.activeElement).toBe(firstRow)
 
-    // Уводим окно далеко вниз: строка №1 размонтируется вместе с фокусом.
-    const root = wrapper.get('[data-gr-tree]').element as HTMLElement
-    root.scrollTop = 1200
-    root.dispatchEvent(new Event('scroll'))
-    await nextTick()
+    // Ровно одна строка уходит из окна — та, на которой фокус. Vue обнуляет
+    // function ref до удаления узла, поэтому «фокус уже упал на body» тут ещё
+    // не наступило и по нему судить нельзя.
+    const root = await scrollTo(wrapper, 150)
 
     expect(wrapper.find('[data-gr-tree-node-key="1"]').exists()).toBe(false)
     // Фокус не должен упасть на body: клавиатура дерева живёт на корне.
     expect(document.activeElement).toBe(root)
 
     wrapper.unmount()
+  })
+
+  it('размонтирование строк без фокуса не уводит фокус страницы в дерево', async () => {
+    const wrapper = mountFocusTree()
+    await nextTick()
+
+    // Пользователь дерева не касался: фокус страницы на `body`.
+    expect(document.activeElement).toBe(document.body)
+
+    await scrollTo(wrapper, 1200)
+
+    expect(document.activeElement).toBe(document.body)
+
+    wrapper.unmount()
+  })
+
+  it('прокрутка не отнимает фокус у соседнего контрола на странице', async () => {
+    const outside = document.createElement('button')
+    document.body.appendChild(outside)
+
+    const wrapper = mountFocusTree()
+    await nextTick()
+
+    outside.focus()
+    await scrollTo(wrapper, 1200)
+
+    expect(document.activeElement).toBe(outside)
+
+    wrapper.unmount()
+    outside.remove()
   })
 })

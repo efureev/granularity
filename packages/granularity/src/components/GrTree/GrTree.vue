@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onUnmounted, ref, watch } from 'vue'
 import type {
   GrTreeAllowDropType,
   GrTreeInstance,
@@ -261,17 +261,26 @@ function absoluteIndex(offsetInWindow: number): number {
 }
 
 /**
- * Строка с фокусом ушла из виртуального окна и размонтировалась — фокус упал
- * бы на `body`, и клавиатура дерева умерла бы до клика мышью. Возвращаем его
- * на корень: делегированный keydown живёт там, первая же стрелка восстановит
- * видимую строку через `focusRow`.
+ * Строка размонтируется: снимаем регистрацию и, если фокус был на ней, уводим
+ * его на корень — делегированный keydown живёт там, первая же стрелка вернёт
+ * видимую строку через `focusRow`. Иначе фокус упал бы на `body` и клавиатура
+ * дерева умерла бы до клика мышью.
+ *
+ * Спрашиваем сам элемент, а не `document.activeElement === body`: Vue обнуляет
+ * function ref ДО удаления узла, поэтому в момент вызова фокус ещё на строке —
+ * а «фокус на body» означает лишь то, что страницу никто не трогал.
  */
-function restoreFocusAfterUnmount(): void {
-  if (typeof document === 'undefined') return
+let isUnmounting = false
 
-  const active = document.activeElement
-  if ((active === null || active === document.body) && focusedKey.value !== undefined)
-    treeRootEl.value?.focus()
+function releaseNodeEl(key: GrTreeKey): void {
+  const el = interactionContext.nodeEls.get(key)
+  const active = typeof document === 'undefined' ? null : document.activeElement
+  const heldFocus = Boolean(el && active && (el === active || el.contains(active)))
+
+  interactionContext.registerNodeEl(key, null)
+
+  if (heldFocus && !isUnmounting)
+    treeRootEl.value?.focus({ preventScroll: true })
 }
 
 function focusRow(key: GrTreeNode<T>['key']): void {
@@ -330,13 +339,21 @@ function expandSiblings(node: GrTreeNode<T>): void {
 }
 
 function onTreeKeydown(event: KeyboardEvent): void {
-  // Делегированная клавиатура уважает интерактивные цели: Enter на
-  // toggle-кнопке — её клик, печать в инпуте слота узла — ввод текста, а не
-  // typeahead. Без гарда preventDefault отменял бы и то и другое.
+  // Делегированная клавиатура уважает интерактивные цели: печать в инпуте слота
+  // узла — ввод текста, а не typeahead. Без гарда preventDefault отменял бы это.
   const target = event.target as HTMLElement | null
-  const interactive = target?.closest('button, a[href], input, select, textarea, [contenteditable]')
-  if (interactive && interactive !== event.currentTarget)
-    return
+  const interactive = target?.closest<HTMLElement>('button, a[href], input, select, textarea, [contenteditable]')
+  if (interactive && interactive !== event.currentTarget) {
+    // Табируемая цель — самостоятельный таб-стоп: клавиатура целиком её.
+    if (interactive.tabIndex >= 0)
+      return
+
+    // Кнопки строки (toggle, drag-handle) не табируемы: фокус попадает на них
+    // только мышью. За ними остаётся активация — Enter на toggle это его клик, —
+    // а навигация принадлежит дереву, иначе клик мышью убивал бы стрелки.
+    if (event.key === 'Enter' || event.key === ' ')
+      return
+  }
 
   const rows = visibleRows.value
   if (rows.length === 0)
@@ -668,6 +685,9 @@ function focus(key?: GrTreeKey): boolean {
 }
 
 onUnmounted(() => clearTimeout(typeaheadTimer))
+// Дерево уничтожают целиком — строки размонтируются вместе с ним, и возвращать
+// фокус на умирающий корень нельзя: он уедет из документа вместе с деревом.
+onBeforeUnmount(() => { isUnmounting = true })
 
 defineExpose<GrTreeInstance<T>>({
   appendNode: treeStore.appendNode,
@@ -712,11 +732,9 @@ defineExpose<GrTreeInstance<T>>({
         v-for="(row, windowIndex) in renderedRows"
         :key="row.node.key"
         :ref="(el) => {
-          interactionContext.registerNodeEl(row.node.key, el as HTMLElement | null)
-          if (treeProps.virtual) {
-            virtualizer.measure(absoluteIndex(windowIndex), el as Element | null)
-            if (!el) restoreFocusAfterUnmount()
-          }
+          if (el) interactionContext.registerNodeEl(row.node.key, el as HTMLElement)
+          else releaseNodeEl(row.node.key)
+          if (treeProps.virtual) virtualizer.measure(absoluteIndex(windowIndex), el as Element | null)
         }"
         data-gr-tree-node
         :data-gr-tree-node-key="row.node.key"
