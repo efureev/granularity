@@ -360,6 +360,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **The `info` tone is blue now, not a second indigo.** `--gr-info` (`#5850ec`) sat ΔE 4.3 away from `--gr-primary`
+  (`#4f46e5`) — the just-noticeable threshold is about 2.3 — and the two tones' text roles were the same value down to
+  the digit, so a link with `tone="info"` and one with `tone="primary"` rendered identically. Nothing caught it:
+  contrast passed for both, and no test ever compared two tones against each other. The tone now occupies its own part
+  of the palette (blue-600 in light, blue-400 in dark, with `-light`, `-text` and the solid family moved along with
+  it), which puts it ΔE 21/29 from `primary` and 48/22 from `azure`. The intent was always this — the dark theme
+  already refused to move `primary` toward indigo-400 precisely because "solid badges of primary and info would become
+  indistinguishable"; only the tone itself had never been moved. Every contrast guarantee is unchanged and verified:
+  5.17 for white on the light fill, 8.34 for `-text` on the page, 7.02 for dark text on the dark fill, 6.41 for the
+  solid button. New gate: `src/__tests__/tonePalette.test.ts` measures perceptual distance between every pair of tones
+  in every role and separately forbids two tones sharing a value outright. Anything painted `info` — alerts, badges,
+  buttons, toasts, progress bars, the statistic trend — changes colour.
+
 - **`GrLink` tones `primary` and `neutral` now take their colour from `-text`, like the other six.** Seven of the
   eight tones already read `var(--gr-{tone}-text)` — the role meant for text on the page background — while `primary`
   used the saturated `var(--gr-primary)` and `neutral` reached for the same on hover. Contrast happened to pass, which

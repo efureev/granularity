@@ -50,8 +50,9 @@
    * оставался светло-тёмным индиго #6366f1 с белым текстом и проваливал сразу
    * все три роли — текст на фоне 4.00, текст на карточке 3.27, белый на
    * заливке 4.47. Светлый индиго с тёмным `-fg` даёт 6.38 / 5.23 / 6.38.
-   * Не indigo-400 (#818cf8): это ровно `--gr-info` тёмной темы, и solid-бейджи
-   * Primary и Info стали бы неотличимы.
+   * Не indigo-400 (#818cf8): в ту сторону лежит `--gr-info`, и увести primary
+   * туда значило бы вернуть слияние двух тонов, ради разведения которого info
+   * и перекрашен в синий.
    * Кнопок не касается: GrButton задаёт свой `--gr-button-primary-bg`.
    */
   --gr-primary: #9d8bfa;
@@ -73,10 +74,10 @@
   --gr-danger-light: #7f1d1d;
   --gr-danger-fg: #0f172a;
   --gr-danger-text: #fca5a5;
-  --gr-info: #818cf8;
-  --gr-info-light: #312e81;
+  --gr-info: #60a5fa;
+  --gr-info-light: #1e3a8a;
   --gr-info-fg: #0f172a;
-  --gr-info-text: #c7d2fe;
+  --gr-info-text: #bfdbfe;
   --gr-slate: #94a3b8;
   --gr-slate-light: #334155;
   --gr-slate-fg: #0f172a;
@@ -114,9 +115,9 @@
   --gr-danger-solid-hover: #a91919;
   --gr-danger-solid-active: #931515;
   --gr-danger-solid-fg: var(--gr-slate-50);
-  --gr-info-solid: #4338ca;
-  --gr-info-solid-hover: #3d33bb;
-  --gr-info-solid-active: #362da8;
+  --gr-info-solid: #1d4ed8;
+  --gr-info-solid-hover: #1e40af;
+  --gr-info-solid-active: #1e3a8a;
   --gr-info-solid-fg: var(--gr-slate-50);
   --gr-slate-solid: var(--gr-slate-600);
   --gr-slate-solid-hover: var(--gr-slate-700);
@@ -163,8 +164,8 @@
     --gr-warning-active: #fba35b;
     --gr-danger-hover: #f87c7c;
     --gr-danger-active: #f88787;
-    --gr-info-hover: #8b95f8;
-    --gr-info-active: #949ef9;
+    --gr-info-hover: #6cacfa;
+    --gr-info-active: #78b3fa;
     --gr-slate-hover: #9caabd;
     --gr-slate-active: #a4b1c3;
     --gr-azure-hover: #47c2f8;

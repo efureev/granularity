@@ -69,10 +69,19 @@
   --gr-danger-light: #fee2e2;
   --gr-danger-fg: #ffffff;
   --gr-danger-text: #991b1b;
-  --gr-info: #5850ec;
-  --gr-info-light: #e0e7ff;
+  /*
+   * Синий, а не индиго. Прежний `#5850ec` отличался от `--gr-primary` на ΔE 4.3
+   * при пороге заметности около 2.3, а текстовые роли обоих тонов совпадали
+   * значением полностью — ссылка `tone="info"` и ссылка `tone="primary"`
+   * красились одинаково. Тон занял собственный участок палитры: он отличим и от
+   * `primary` (ΔE 21 в светлой теме, 29 в тёмной), и от `azure` (48 и 22).
+   * Замысел был такой и раньше — тёмная тема уже отказывалась брать indigo-400
+   * именно потому, что solid-бейджи primary и info стали бы неотличимы.
+   */
+  --gr-info: #2563eb;
+  --gr-info-light: #dbeafe;
   --gr-info-fg: #ffffff;
-  --gr-info-text: #3730a3;
+  --gr-info-text: #1e40af;
   --gr-slate: #475569;
   --gr-slate-light: #e2e8f0;
   --gr-slate-fg: #ffffff;
@@ -175,8 +184,8 @@
     --gr-warning-active: #d46419;
     --gr-danger-hover: #cc2526;
     --gr-danger-active: #bb2427;
-    --gr-info-hover: #524bdc;
-    --gr-info-active: #4c47cd;
+    --gr-info-hover: #235ddc;
+    --gr-info-active: #2157cc;
     --gr-slate-hover: #435064;
     --gr-slate-active: #3e4b5f;
     --gr-azure-hover: #016fab;

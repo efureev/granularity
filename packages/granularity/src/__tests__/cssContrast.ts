@@ -174,6 +174,36 @@ export function getContrastRatio(foreground: RgbColor, background: RgbColor): nu
   return (lighter + 0.05) / (darker + 0.05)
 }
 
+function toLab(color: RgbColor): [number, number, number] {
+  const [red, green, blue] = [color.r, color.g, color.b].map((channel) => {
+    const normalized = channel / 255
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
+  })
+
+  // sRGB → XYZ (D65) → Lab, точки белого из CIE.
+  const x = (red * 0.4124 + green * 0.3576 + blue * 0.1805) / 0.95047
+  const y = red * 0.2126 + green * 0.7152 + blue * 0.0722
+  const z = (red * 0.0193 + green * 0.1192 + blue * 0.9505) / 1.08883
+
+  const f = (value: number): number => (value > 0.008856 ? value ** (1 / 3) : 7.787 * value + 16 / 116)
+  const [fx, fy, fz] = [f(x), f(y), f(z)]
+
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)]
+}
+
+/**
+ * Воспринимаемое расстояние между цветами (ΔE, CIE76).
+ *
+ * Контраст отвечает на вопрос «читается ли текст», а этот — на вопрос
+ * «различит ли человек два тона рядом». Порог заметности около 2.3; всё, что
+ * ниже, для глаза один цвет, каким бы разным ни выглядел hex.
+ */
+export function getColorDistance(first: RgbColor, second: RgbColor): number {
+  const [firstLab, secondLab] = [toLab(first), toLab(second)]
+
+  return Math.hypot(...firstLab.map((value, index) => value - secondLab[index]))
+}
+
 /**
  * Достаёт выражение цвета из utility-класса вида `text-[…]` / `hover:bg-[…]`.
  * `<prefix>transparent` (без скобок) распознаётся отдельно.

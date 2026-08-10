@@ -713,8 +713,8 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "description": "Hover-состояние info-ролей: подмес `--gr-fg` 8% в `--gr-info`.",
     "formula": "color-mix(in srgb, var(--gr-info) 92%, var(--gr-fg))",
     "values": {
-      "light": "#524bdc",
-      "dark": "#8b95f8"
+      "light": "#235ddc",
+      "dark": "#6cacfa"
     }
   },
   {
@@ -723,8 +723,8 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "description": "Active-состояние info-ролей: подмес `--gr-fg` 16% в `--gr-info`.",
     "formula": "color-mix(in srgb, var(--gr-info) 84%, var(--gr-fg))",
     "values": {
-      "light": "#4c47cd",
-      "dark": "#949ef9"
+      "light": "#2157cc",
+      "dark": "#78b3fa"
     }
   },
   {
@@ -1108,8 +1108,8 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Status roles",
     "description": "Semantic info-цвет для нейтральных уведомлений и информационных акцентов.",
     "values": {
-      "light": "#5850ec",
-      "dark": "#818cf8"
+      "light": "#2563eb",
+      "dark": "#60a5fa"
     }
   },
   {
@@ -1117,8 +1117,8 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Status roles",
     "description": "Облегчённая info-подложка для спокойных информационных блоков.",
     "values": {
-      "light": "#e0e7ff",
-      "dark": "#312e81"
+      "light": "#dbeafe",
+      "dark": "#1e3a8a"
     }
   },
   {
@@ -1135,8 +1135,8 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Status roles",
     "description": "Текстовый оттенок для спокойных info-сообщений и подсказок.",
     "values": {
-      "light": "#3730a3",
-      "dark": "#c7d2fe"
+      "light": "#1e40af",
+      "dark": "#bfdbfe"
     }
   },
   {
@@ -1361,7 +1361,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Сплошная заливка кнопочного веса тона `info`.",
     "values": {
       "light": "var(--gr-info)",
-      "dark": "#4338ca"
+      "dark": "#1d4ed8"
     }
   },
   {
@@ -1370,7 +1370,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Заливка `--gr-info-solid` под курсором.",
     "values": {
       "light": "var(--gr-info-hover)",
-      "dark": "#3d33bb"
+      "dark": "#1e40af"
     }
   },
   {
@@ -1379,7 +1379,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Заливка `--gr-info-solid` в момент нажатия.",
     "values": {
       "light": "var(--gr-info-active)",
-      "dark": "#362da8"
+      "dark": "#1e3a8a"
     }
   },
   {
