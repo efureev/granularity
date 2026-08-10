@@ -3,7 +3,7 @@ import {GrAvatar, GrCard} from "@feugene/granularity";
 
 const avatarSvg = encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none">
-    <rect width="96" height="96" rx="24" fill="#dbeafe" />
+    <rect width="96" height="96" fill="#dbeafe" />
     <circle cx="48" cy="36" r="16" fill="#2563eb" opacity="0.18" />
     <path d="M18 80c6-15 18-23 30-23s24 8 30 23" fill="#2563eb" opacity="0.26" />
     <circle cx="48" cy="36" r="13" fill="#2563eb" />

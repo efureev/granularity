@@ -163,6 +163,22 @@ describe('GrAvatar — раскладка содержимого', () => {
     expect(classes).toContain('justify-center')
   })
 
+  it('обёртка режет по форме только со статусом — иначе это делает корень', () => {
+    const plain = mount(GrAvatar, { props: { name: 'Ada', shape: 'square' } })
+    const media = plain.get('[data-gr-avatar-initials]').element.parentElement!
+
+    expect(plain.classes()).toContain('overflow-hidden')
+    expect(media.className).not.toContain('overflow-hidden')
+    expect(media.className).not.toContain('rounded-')
+
+    const withStatus = mount(GrAvatar, { props: { name: 'Ada', shape: 'square', status: 'online' } })
+    const clipped = withStatus.get('[data-gr-avatar-initials]').element.parentElement!
+
+    expect(withStatus.classes()).toContain('overflow-visible')
+    expect(clipped.className).toContain('overflow-hidden')
+    expect(clipped.className).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
+  })
+
   it('кегль считается от диаметра, а не наследуется от страницы', () => {
     const small = mount(GrAvatar, { props: { name: 'Ada Lovelace', size: 24 } })
     const big = mount(GrAvatar, { props: { name: 'Ada Lovelace', size: 56 } })

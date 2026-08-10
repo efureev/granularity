@@ -4,6 +4,7 @@ import {
   groupItemClass,
   groupOverflowClass,
   mediaClass,
+  mediaClipClass,
   rootBaseClass,
   rootStatusClass,
   shapes,
@@ -14,7 +15,7 @@ import {
 export const grAvatarClassTokens = {
   shapes: Object.values(shapes).flatMap(splitClassTokens),
   root: [...splitClassTokens(rootBaseClass), ...splitClassTokens(rootStatusClass)],
-  media: splitClassTokens(mediaClass),
+  media: [...splitClassTokens(mediaClass), ...splitClassTokens(mediaClipClass)],
   status: [
     ...splitClassTokens(statusDotClass),
     ...Object.values(statusToneClass).flatMap(splitClassTokens),

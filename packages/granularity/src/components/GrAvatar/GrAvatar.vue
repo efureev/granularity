@@ -12,6 +12,7 @@ import {
   grAvatarClass,
   initialsFrom,
   mediaClass,
+  mediaClipClass,
   rootBaseClass,
   rootStatusClass,
   statusDotClass,
@@ -167,7 +168,7 @@ function onLoad(kind: 'primary' | 'fallback'): void {
     :role="rootIsImage ? 'img' : undefined"
     :aria-label="rootIsImage ? accessibleName : undefined"
   >
-    <span :class="[mediaClass, grAvatarClass(resolvedShape)]">
+    <span :class="[mediaClass, status ? [mediaClipClass, grAvatarClass(resolvedShape)] : '']">
       <GrSkeleton
         v-if="showSkeleton"
         data-gr-avatar-skeleton

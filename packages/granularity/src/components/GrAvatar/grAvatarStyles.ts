@@ -32,7 +32,13 @@ export const rootStatusClass = 'overflow-visible'
  * Обёртка растянута на весь аватар, поэтому корневой `justify-center`
  * центрирует её саму, а не содержимое: центрирование обязано быть здесь.
  */
-export const mediaClass = 'flex h-full w-full items-center justify-center overflow-hidden'
+export const mediaClass = 'flex h-full w-full items-center justify-center'
+
+/**
+ * Со статусом корень уходит в `overflow-visible`, чтобы не срезать точку, и
+ * резать по форме становится некому — тогда это берёт на себя обёртка.
+ */
+export const mediaClipClass = 'overflow-hidden'
 
 /**
  * Размер бывает произвольным числом пикселей, поэтому кегль считается, а не
