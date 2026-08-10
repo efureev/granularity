@@ -3,8 +3,8 @@ import { ref } from 'vue'
 
 import { GrFormField, GrNumberInput } from '@feugene/granularity'
 
-const amountComma = ref('1,25')
-const percentage = ref('42,5')
+const amountComma = ref<number | null>(1.25)
+const percentage = ref<number | null>(42.5)
 </script>
 
 <template>

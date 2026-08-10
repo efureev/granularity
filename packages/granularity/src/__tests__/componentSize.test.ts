@@ -132,7 +132,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrInputTag', render: () => h(GrInputTag, { modelValue: ['a'] }) },
   { name: 'GrKbd', render: () => h(GrKbd, null, { default: () => 'K' }) },
   { name: 'GrLink', render: () => h(GrLink, { href: '#' }, { default: () => 'L' }) },
-  { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: '' }) },
+  { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: null }) },
   { name: 'GrPagination', render: () => h(GrPagination, { page: 1, pageSize: 10, total: 100 }) },
   {
     name: 'GrPopover',

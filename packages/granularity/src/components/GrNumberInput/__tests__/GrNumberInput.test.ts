@@ -5,37 +5,46 @@ import { describe, expect, it, vi } from 'vitest'
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrNumberInput from '../GrNumberInput.vue'
 
+/**
+ * Набор без коммита: `wrapper.setValue()` шлёт следом ещё и `change`
+ * («for `v-model.lazy`»), то есть завершает ввод. Черновик так не проверить.
+ */
+async function type(input: ReturnType<ReturnType<typeof mount>['get']>, text: string): Promise<void> {
+  ;(input.element as HTMLInputElement).value = text
+  await input.trigger('input')
+}
+
 describe('GrNumberInput', () => {
   it('санитизирует ввод: оставляет только цифры и один дробный разделитель', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '',
+        modelValue: null,
         decimalSeparator: ',',
       },
     })
 
     await wrapper.get('input').setValue('12a3,4.5')
 
-    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('123,45')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe(123.45)
   })
 
   it('при вводе точки или запятой подставляет заданный decimalSeparator', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '',
+        modelValue: null,
         decimalSeparator: '.',
       },
     })
 
     await wrapper.get('input').setValue('12,34')
 
-    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('12.34')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe(12.34)
   })
 
   it('по умолчанию использует size=md и поддерживает textAlign', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '123',
+        modelValue: 123,
         textAlign: 'center',
       },
     })
@@ -49,7 +58,7 @@ describe('GrNumberInput', () => {
   it('экспортирует focus() через expose', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '',
+        modelValue: null,
       },
     })
 
@@ -64,7 +73,7 @@ describe('GrNumberInput', () => {
   it('скрывает плейсхолдер на focus', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '',
+        modelValue: null,
         placeholder: '0.00',
       },
     })
@@ -75,7 +84,7 @@ describe('GrNumberInput', () => {
   it('horizontal controls клиппит hover-состояние внутри общего бордера', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1',
+        modelValue: 1,
         controls: true,
         controlsDirection: 'horizontal',
       },
@@ -88,7 +97,7 @@ describe('GrNumberInput', () => {
   it('учитывает suffix + controls: добавляет padding-right под оба аддона', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1',
+        modelValue: 1,
         size: 'md',
         controls: true,
       },
@@ -105,7 +114,7 @@ describe('GrNumberInput', () => {
   it('horizontal controls размещает кнопки слева/справа от input, а prefix/suffix остаются внешними', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1',
+        modelValue: 1,
         size: 'md',
         controls: true,
         controlsDirection: 'horizontal',
@@ -127,7 +136,7 @@ describe('GrNumberInput', () => {
   it('controls: stepBy увеличивает значение с учётом decimalSeparator', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1,5',
+        modelValue: 1.5,
         decimalSeparator: ',',
         controls: true,
       },
@@ -135,14 +144,14 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('button[aria-label="Increase"]').trigger('click')
 
-    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('2,5')
-    expect(wrapper.emitted('change')?.[0]?.[0]).toBe('2,5')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe(2.5)
+    expect(wrapper.emitted('change')?.[0]?.[0]).toBe(2.5)
   })
 
   it('controls: на границе кнопка недоступна, а не молча бездействует', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '10',
+        modelValue: 10,
         controls: true,
         min: 10,
         max: 10,
@@ -159,7 +168,7 @@ describe('GrNumberInput', () => {
   it('controls: precision округляет значение при инкременте/декременте', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1,234',
+        modelValue: 1.234,
         decimalSeparator: ',',
         step: 0.1,
         precision: 2,
@@ -169,13 +178,13 @@ describe('GrNumberInput', () => {
 
     await wrapper.get('button[aria-label="Increase"]').trigger('click')
 
-    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('1,33')
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe(1.33)
   })
 
   it('позволяет ограничить ширину prefix/suffix через min/max props', () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1',
+        modelValue: 1,
         size: 'md',
         prefixMinWidth: '10px',
         prefixMaxWidth: '30px',
@@ -200,7 +209,7 @@ describe('GrNumberInput', () => {
   it('если реальная ширина suffix больше minWidth — увеличивает paddingRight и right-offset controls', async () => {
     const wrapper = mount(GrNumberInput, {
       props: {
-        modelValue: '1',
+        modelValue: 1,
         size: 'md',
         controls: true,
       },
@@ -222,7 +231,7 @@ describe('GrNumberInput', () => {
       toJSON: () => ({}),
     })
 
-    await wrapper.setProps({ modelValue: '2' })
+    await wrapper.setProps({ modelValue: 2 })
     await nextTick()
 
     const inputEl = wrapper.get('input').element as HTMLInputElement
@@ -232,30 +241,83 @@ describe('GrNumberInput', () => {
 })
 describe('GrNumberInput — ввод, клампинг, клавиатура и ARIA (item 22)', () => {
   it('разрешает ввести ведущий минус (отрицательные значения)', async () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '' } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: null } })
     const input = wrapper.get('input')
 
     await input.setValue('-5')
 
     const emitted = wrapper.emitted('update:modelValue')
-    expect(emitted?.at(-1)).toEqual(['-5'])
+    expect(emitted?.at(-1)).toEqual([-5])
+  })
+
+  it('незавершённый ввод остаётся в поле, а в модель уходит null', async () => {
+    const wrapper = mount(GrNumberInput, { props: { modelValue: null, decimalSeparator: ',' } })
+    const input = wrapper.get('input')
+
+    // Ни «-», ни «1,» числом не являются — и ровно этим строковая модель
+    // оправдывалась. Теперь незавершённый набор живёт в черновике поля.
+    await type(input, '-')
+    expect(input.element.value).toBe('-')
+    // Модель и была `null` — сообщать нечего, черновик живёт в поле.
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    await type(input, '1,')
+    expect(input.element.value).toBe('1,')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1])
+  })
+
+  it('коммит на change снимает черновик, и показ считается от модели', async () => {
+    const Harness = defineComponent({
+      components: { GrNumberInput },
+      setup: () => ({ value: ref<number | null>(null) }),
+      template: '<GrNumberInput v-model="value" :precision="2" />',
+    })
+    const wrapper = mount(Harness)
+    const input = wrapper.get('input')
+
+    await type(input, '7')
+    expect(input.element.value).toBe('7')
+
+    await input.trigger('change')
+    await nextTick()
+
+    // Точность применяется на коммите, а не на каждом нажатии: иначе «7» стало
+    // бы «7.00» прямо под курсором.
+    expect(input.element.value).toBe('7.00')
+  })
+
+  it('модель, изменённая снаружи, перерисовывает поле', async () => {
+    const Harness = defineComponent({
+      components: { GrNumberInput },
+      setup: () => ({ value: ref<number | null>(1) }),
+      template: '<GrNumberInput v-model="value" />',
+    })
+    const wrapper = mount(Harness)
+    const input = wrapper.get('input')
+
+    expect(input.element.value).toBe('1')
+
+    ;(wrapper.vm as unknown as { value: number | null }).value = 42
+    await nextTick()
+
+    expect(input.element.value).toBe('42')
   })
 
   it('клампит по min/max на change (ручной ввод, а не только кнопки)', async () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '999', max: 10 } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 999, max: 10 } })
     const input = wrapper.get('input')
 
     await input.trigger('change')
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['10'])
-    expect(wrapper.emitted('change')?.at(-1)).toEqual(['10'])
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([10])
+    expect(wrapper.emitted('change')?.at(-1)).toEqual([10])
   })
 
   it('шагает по ArrowUp/ArrowDown и прыгает к границам по Home/End', async () => {
     const Harness = defineComponent({
       components: { GrNumberInput },
       setup() {
-        const value = ref('5')
+        const value = ref<number | null>(5)
         return { value }
       },
       template: '<GrNumberInput v-model="value" :step="1" :min="0" :max="100" />',
@@ -276,8 +338,59 @@ describe('GrNumberInput — ввод, клампинг, клавиатура и 
     expect(input.element.value).toBe('0')
   })
 
+  it('дробный шаг без precision не копит двоичную погрешность', async () => {
+    const Harness = defineComponent({
+      components: { GrNumberInput },
+      setup: () => ({ value: ref<number | null>(0) }),
+      template: '<GrNumberInput v-model="value" :step="0.1" />',
+    })
+    const wrapper = mount(Harness)
+    const input = wrapper.get('input')
+
+    // Третье нажатие и показывало `0.30000000000000004`: округление включалось
+    // только вместе с `precision`, а его тут нет.
+    await input.trigger('keydown', { key: 'ArrowUp' })
+    await input.trigger('keydown', { key: 'ArrowUp' })
+    await input.trigger('keydown', { key: 'ArrowUp' })
+
+    expect(input.element.value).toBe('0.3')
+  })
+
+  it('PageUp/PageDown шагают крупно и упираются в границы', async () => {
+    const Harness = defineComponent({
+      components: { GrNumberInput },
+      setup: () => ({ value: ref<number | null>(50) }),
+      template: '<GrNumberInput v-model="value" :step="1" :min="0" :max="100" />',
+    })
+    const wrapper = mount(Harness)
+    const input = wrapper.get('input')
+
+    // Границы заданы: крупный шаг — десятая часть диапазона (10), а не 10 шагов.
+    await input.trigger('keydown', { key: 'PageUp' })
+    expect(input.element.value).toBe('60')
+
+    await input.trigger('keydown', { key: 'PageDown' })
+    expect(input.element.value).toBe('50')
+
+    for (let i = 0; i < 6; i++) await input.trigger('keydown', { key: 'PageUp' })
+    expect(input.element.value).toBe('100')
+  })
+
+  it('PageUp без границ — десять шагов', async () => {
+    const Harness = defineComponent({
+      components: { GrNumberInput },
+      setup: () => ({ value: ref<number | null>(1) }),
+      template: '<GrNumberInput v-model="value" :step="0.5" />',
+    })
+    const wrapper = mount(Harness)
+    const input = wrapper.get('input')
+
+    await input.trigger('keydown', { key: 'PageUp' })
+    expect(input.element.value).toBe('6')
+  })
+
   it('экспонирует семантику spinbutton (role + aria-value*)', () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '7', min: 0, max: 100 } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 7, min: 0, max: 100 } })
     const input = wrapper.get('input')
 
     expect(input.attributes('role')).toBe('spinbutton')
@@ -289,7 +402,7 @@ describe('GrNumberInput — ввод, клампинг, клавиатура и 
 
 describe('GrNumberInput — locale grouping (feature)', () => {
   it('groups thousands via Intl when not focused, shows raw on focus', async () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '1234567', useGrouping: true, locale: 'en-US' } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 1234567, useGrouping: true, locale: 'en-US' } })
     const input = wrapper.get('input')
 
     // Не в фокусе — сгруппировано.
@@ -306,13 +419,13 @@ describe('GrNumberInput — locale grouping (feature)', () => {
   })
 
   it('does not group by default (useGrouping=false)', () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '1234567' } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 1234567 } })
     expect(wrapper.get('input').element.value).toBe('1234567')
   })
 
   it('уважает локале-разделители: de-DE (группа ".", десятичный ",")', () => {
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '1234567,89', useGrouping: true, locale: 'de-DE', decimalSeparator: ',', precision: 2 },
+      props: { modelValue: 1234567.89, useGrouping: true, locale: 'de-DE', decimalSeparator: ',', precision: 2 },
     })
 
     // Группа '.', десятичный ',' — оба на своих местах (без затирания первого '.').
@@ -323,7 +436,7 @@ describe('GrNumberInput — locale grouping (feature)', () => {
 describe('GrNumberInput — фокус и границы', () => {
   it('кнопка ± не забирает фокус себе', async () => {
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '1', controls: true },
+      props: { modelValue: 1, controls: true },
       attachTo: document.body,
     })
 
@@ -334,20 +447,20 @@ describe('GrNumberInput — фокус и границы', () => {
     // Раньше `stepBy` заканчивался `focus()` поля, и повторный Enter по кнопке
     // становился невозможен: фокус уезжал после первого же шага.
     expect(document.activeElement).toBe(increase.element)
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['2'])
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([2])
 
     wrapper.unmount()
   })
 
   it('кнопки гаснут только на своей границе', async () => {
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '5', controls: true, min: 0, max: 5 },
+      props: { modelValue: 5, controls: true, min: 0, max: 5 },
     })
 
     expect(wrapper.get('button[aria-label="Increase"]').attributes('disabled')).toBeDefined()
     expect(wrapper.get('button[aria-label="Decrease"]').attributes('disabled')).toBeUndefined()
 
-    await wrapper.setProps({ modelValue: '0' })
+    await wrapper.setProps({ modelValue: 0 })
 
     expect(wrapper.get('button[aria-label="Increase"]').attributes('disabled')).toBeUndefined()
     expect(wrapper.get('button[aria-label="Decrease"]').attributes('disabled')).toBeDefined()
@@ -355,7 +468,7 @@ describe('GrNumberInput — фокус и границы', () => {
 
   it('удержание кнопки шагает повторно и замирает на границе', async () => {
     vi.useFakeTimers()
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '1', controls: true, max: 3 } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 1, controls: true, max: 3 } })
     const increase = wrapper.get('button[aria-label="Increase"]')
 
     await increase.trigger('pointerdown')
@@ -376,10 +489,10 @@ describe('GrNumberInput — фокус и границы', () => {
 
 describe('GrNumberInput — озвучивание, очистка и события', () => {
   it('aria-valuetext появляется только при группировке', () => {
-    const plain = mount(GrNumberInput, { props: { modelValue: '1234567' } })
+    const plain = mount(GrNumberInput, { props: { modelValue: 1234567 } })
     expect(plain.get('input').attributes('aria-valuetext')).toBeUndefined()
 
-    const grouped = mount(GrNumberInput, { props: { modelValue: '1234567', useGrouping: true, locale: 'en-US' } })
+    const grouped = mount(GrNumberInput, { props: { modelValue: 1234567, useGrouping: true, locale: 'en-US' } })
     expect(grouped.get('input').attributes('aria-valuetext')).toBe('1,234,567')
   })
 
@@ -388,13 +501,13 @@ describe('GrNumberInput — озвучивание, очистка и событ
     const provide = { [GRANULARITY_I18N_KEY as symbol]: i18n }
 
     const fromAdapter = mount(GrNumberInput, {
-      props: { modelValue: '1234567', useGrouping: true },
+      props: { modelValue: 1234567, useGrouping: true },
       global: { provide },
     })
     expect(fromAdapter.get('input').attributes('aria-valuetext')).toBe('1.234.567')
 
     const fromProp = mount(GrNumberInput, {
-      props: { modelValue: '1234567', useGrouping: true, locale: 'en-US' },
+      props: { modelValue: 1234567, useGrouping: true, locale: 'en-US' },
       global: { provide },
     })
     expect(fromProp.get('input').attributes('aria-valuetext')).toBe('1,234,567')
@@ -402,13 +515,14 @@ describe('GrNumberInput — озвучивание, очистка и событ
 
   it('clearable очищает значение и возвращает фокус в поле', async () => {
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '42', clearable: true },
+      props: { modelValue: 42, clearable: true },
       attachTo: document.body,
     })
 
     await wrapper.get('[data-gr-number-input-clear]').trigger('click')
 
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
+    // Пусто — это `null`, а не `0` и не пустая строка.
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null])
     expect(wrapper.emitted('clear')).toHaveLength(1)
     expect(document.activeElement).toBe(wrapper.get('input').element)
 
@@ -416,15 +530,15 @@ describe('GrNumberInput — озвучивание, очистка и событ
   })
 
   it('кнопка очистки не появляется в readonly и при пустом значении', () => {
-    const empty = mount(GrNumberInput, { props: { modelValue: '', clearable: true } })
+    const empty = mount(GrNumberInput, { props: { modelValue: null, clearable: true } })
     expect(empty.find('[data-gr-number-input-clear]').exists()).toBe(false)
 
-    const readonly = mount(GrNumberInput, { props: { modelValue: '42', clearable: true, readonly: true } })
+    const readonly = mount(GrNumberInput, { props: { modelValue: 42, clearable: true, readonly: true } })
     expect(readonly.find('[data-gr-number-input-clear]').exists()).toBe(false)
   })
 
   it('focus и blur переизлучаются', async () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '1' } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 1 } })
     const input = wrapper.get('input')
 
     await input.trigger('focus')
@@ -435,7 +549,7 @@ describe('GrNumberInput — озвучивание, очистка и событ
   })
 
   it('disabled гасится токенами, а не прозрачностью', () => {
-    const wrapper = mount(GrNumberInput, { props: { modelValue: '1', disabled: true, controls: true } })
+    const wrapper = mount(GrNumberInput, { props: { modelValue: 1, disabled: true, controls: true } })
 
     expect(wrapper.html()).not.toMatch(/opacity-\d/)
     expect(wrapper.get('[data-gr-number-input]').classes()).toContain('text-[var(--gr-disabled-fg)]')
@@ -445,7 +559,7 @@ describe('GrNumberInput — озвучивание, очистка и событ
 describe('GrNumberInput — readonly и жест удержания', () => {
   it('readonly: Home/End и стрелки не меняют значение и не гасят каретку', async () => {
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '5', min: 0, max: 10, readonly: true, ariaLabel: 'Qty' },
+      props: { modelValue: 5, min: 0, max: 10, readonly: true, ariaLabel: 'Qty' },
     })
     const input = wrapper.get('input')
 
@@ -460,10 +574,46 @@ describe('GrNumberInput — readonly и жест удержания', () => {
     wrapper.unmount()
   })
 
+  it('readonly: PageUp/PageDown тоже отдаются каретке', async () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: 5, min: 0, max: 10, readonly: true, ariaLabel: 'Qty' },
+    })
+    const input = wrapper.get('input')
+
+    for (const key of ['PageUp', 'PageDown']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+      input.element.dispatchEvent(event)
+      expect(event.defaultPrevented).toBe(false)
+    }
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('readonly гасит кнопки ±, а не оставляет их живыми на вид', async () => {
+    const wrapper = mount(GrNumberInput, {
+      props: { modelValue: 5, controls: true, readonly: true, ariaLabel: 'Qty' },
+      attachTo: document.body,
+    })
+
+    const increase = wrapper.get('[data-gr-number-input-increase]')
+    const decrease = wrapper.get('[data-gr-number-input-decrease]')
+
+    // Кнопка, которая заведомо получит отказ, — не защита, а шум: `stepBy` и так
+    // выходил молча, но выглядела она рабочей.
+    expect(increase.attributes('disabled')).toBeDefined()
+    expect(decrease.attributes('disabled')).toBeDefined()
+
+    await increase.trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
   it('pointercancel останавливает автоповтор', async () => {
     vi.useFakeTimers()
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '0', controls: true, ariaLabel: 'Qty' },
+      props: { modelValue: 0, controls: true, ariaLabel: 'Qty' },
       attachTo: document.body,
     })
     const increase = wrapper.get('[data-gr-number-input-increase]')
@@ -486,7 +636,7 @@ describe('GrNumberInput — readonly и жест удержания', () => {
   it('после удержания отпускание не даёт лишний шаг кликом', async () => {
     vi.useFakeTimers()
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '0', controls: true, ariaLabel: 'Qty' },
+      props: { modelValue: 0, controls: true, ariaLabel: 'Qty' },
       attachTo: document.body,
     })
     const increase = wrapper.get('[data-gr-number-input-increase]')
@@ -514,7 +664,7 @@ describe('GrNumberInput — readonly и жест удержания', () => {
   it('клавиатурная активация после брошенного удержания не проглатывается', async () => {
     vi.useFakeTimers()
     const wrapper = mount(GrNumberInput, {
-      props: { modelValue: '0', controls: true, ariaLabel: 'Qty' },
+      props: { modelValue: 0, controls: true, ariaLabel: 'Qty' },
       attachTo: document.body,
     })
     const increase = wrapper.get('[data-gr-number-input-increase]')

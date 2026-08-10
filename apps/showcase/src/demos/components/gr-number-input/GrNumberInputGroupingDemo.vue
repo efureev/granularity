@@ -3,8 +3,8 @@ import { ref } from 'vue'
 
 import { GrFormField, GrNumberInput } from '@feugene/granularity'
 
-const usAmount = ref('1234567')
-const euAmount = ref('1234567,89')
+const usAmount = ref<number | null>(1234567)
+const euAmount = ref<number | null>(1234567.89)
 </script>
 
 <template>

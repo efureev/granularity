@@ -9,7 +9,7 @@ const alignmentOptions = [
   { label: 'Center', value: 'center' },
   { label: 'Right', value: 'right' },
 ]
-const budget = ref('240000')
+const budget = ref<number | null>(240000)
 </script>
 
 <template>

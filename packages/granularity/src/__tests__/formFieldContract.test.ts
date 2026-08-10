@@ -41,7 +41,7 @@ const ARIA_LABELLED = new Set(['GrCheckbox', 'GrCheckboxGroup', 'GrRadioGroup'])
 const controls: { name: string, render: () => unknown }[] = [
   { name: 'GrInput', render: () => h(GrInput, { modelValue: '' }) },
   { name: 'GrTextarea', render: () => h(GrTextarea, { modelValue: '' }) },
-  { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: '' }) },
+  { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: null }) },
   { name: 'GrSelect', render: () => h(GrSelect, { modelValue: '', options: [] }) },
   { name: 'GrAutocomplete', render: () => h(GrAutocomplete, { modelValue: '', options: [] }) },
   { name: 'GrInputTag', render: () => h(GrInputTag, { modelValue: [] }) },

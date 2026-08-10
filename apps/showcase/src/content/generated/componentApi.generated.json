@@ -6098,8 +6098,8 @@
           },
           {
             "name": "modelValue",
-            "description": "Значение (строка — контролируем форматирование внутри).",
-            "type": "string",
+            "description": "Значение поля. `null` — пусто. Незавершённый ввод («-», «1,») числом не является и в модель не попадает: пока он набирается, поле держит его во внутреннем черновике, а модель честно говорит «числа пока нет».",
+            "type": "number | null",
             "required": true
           }
         ]
@@ -6129,14 +6129,14 @@
           {
             "name": "update:modelValue",
             "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"update:modelValue\", value: string): void"
+            "type": "[value: number | null]",
+            "signature": "(event: \"update:modelValue\", value: number | null): void"
           },
           {
             "name": "change",
             "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"change\", value: string): void"
+            "type": "[value: number | null]",
+            "signature": "(event: \"change\", value: number | null): void"
           },
           {
             "name": "clear",

@@ -2,7 +2,7 @@
 import type { InputHTMLAttributes } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 
 import {
   clearButtonClass,
@@ -15,6 +15,7 @@ import {
   type GrNumberInputState,
   type GrNumberInputTextAlign,
 } from './grNumberInputStyles'
+import { addStep, bigStep } from './numberInputMath'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -50,8 +51,14 @@ function px(n: number): string {
 }
 
 export interface GrNumberInputProps {
-  /** Значение (строка — контролируем форматирование внутри). */
-  modelValue: string
+  /**
+   * Значение поля. `null` — пусто.
+   *
+   * Незавершённый ввод («-», «1,») числом не является и в модель не попадает:
+   * пока он набирается, поле держит его во внутреннем черновике, а модель
+   * честно говорит «числа пока нет».
+   */
+  modelValue: number | null
   placeholder?: string
   autocomplete?: string
   inputmode?: InputHTMLAttributes['inputmode']
@@ -115,8 +122,8 @@ export interface GrNumberInputProps {
 }
 
 export interface GrNumberInputEmits {
-  (e: 'update:modelValue', value: string): void
-  (e: 'change', value: string): void
+  (e: 'update:modelValue', value: number | null): void
+  (e: 'change', value: number | null): void
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
   /** Значение стёрто кнопкой очистки. */
@@ -191,6 +198,16 @@ const inputEl = ref<HTMLInputElement | null>(null)
 
 // В фокусе поле показывает «сырое» значение: группировка мешала бы правке.
 const isFocused = ref(false)
+
+/**
+ * Черновик ввода: строка ровно в том виде, в каком её набирают.
+ *
+ * Существует, пока набор не завершён. Модель к этому моменту уже может быть
+ * `null` («-», «1,» — не числа), и без черновика поле стирало бы под пальцами
+ * то, что пользователь печатает. Коммит (`change`/`blur`) черновик снимает, и
+ * показ снова считается от модели.
+ */
+const draft = ref<string | null>(null)
 
 function focus(): void {
   inputEl.value?.focus()
@@ -359,38 +376,40 @@ function onInput(e: Event): void {
     el.setSelectionRange(keptBefore, keptBefore)
   }
 
-  emit('update:modelValue', next)
+  draft.value = next
 
-  // Поле уже переписано напрямую (ради каретки). Если родитель модель не
-  // применит, DOM и vnode разъедутся — выравниваем поле по модели.
-  void nextTick(() => {
-    if (!isFocused.value) return
-    const current = inputEl.value
-    if (current && current.value !== props.modelValue && props.modelValue !== next)
-      current.value = props.modelValue
-  })
+  const num = toNumber(next)
+  if (num !== props.modelValue) emit('update:modelValue', num)
 }
 
-function commit(el: HTMLInputElement): void {
-  const num = toNumber(sanitize(el.value))
-  // Пустое значение (или незавершённый ввод `-`) оставляем как есть.
-  const next = num === null ? sanitize(el.value) : format(clamp(normalize(num)))
+/**
+ * Коммит набранного: границы и точность применяются здесь, а не на каждом
+ * нажатии, — иначе `min=10` не дал бы набрать «1» как начало «15».
+ */
+function commit(): void {
+  // Без черновика коммитится сама модель: значение вне границ обязано
+  // выправиться и тогда, когда его выставили снаружи, а не набрали руками.
+  const num = draft.value !== null ? toNumber(draft.value) : props.modelValue
+  const next = num === null ? null : clamp(normalize(num))
 
-  if (el.value !== next) el.value = next
+  draft.value = null
+
   if (next !== props.modelValue) emit('update:modelValue', next)
   emit('change', next)
 }
 
-function onChange(e: Event): void {
+function onChange(): void {
   // Клампинг границ (`min`/`max`) и нормализация — на `change`/`blur`, а не только
   // в кнопках: иначе ручной ввод «999» при `max=10` останется невалидным.
-  commit(e.target as HTMLInputElement)
+  commit()
 }
 
 function setValue(n: number): void {
-  const nextStr = format(clamp(normalize(n)))
-  emit('update:modelValue', nextStr)
-  emit('change', nextStr)
+  const next = clamp(normalize(n))
+  // Шаг завершает набор: черновик снимается, показ считается от модели.
+  draft.value = null
+  emit('update:modelValue', next)
+  emit('change', next)
 }
 
 /**
@@ -398,11 +417,11 @@ function setValue(n: number): void {
  * иначе клавиатурный пользователь после первого Enter теряет её и повторно
  * нажать не может. Поле фокусирует тот, кто шагает от него самого.
  */
-function stepBy(dir: 1 | -1): void {
+function stepBy(dir: 1 | -1, step: number = props.step ?? 1): void {
   if (isDisabled.value || isReadonly.value) return
 
-  const current = toNumber(props.modelValue) ?? 0
-  setValue(current + (props.step ?? 1) * dir)
+  const current = props.modelValue ?? 0
+  setValue(addStep(current, step * dir))
 }
 
 // Интервал уже шагал: финальный `click` при отпускании — не намерение
@@ -428,8 +447,8 @@ function onStepClick(dir: 1 | -1, event: MouseEvent): void {
   stepBy(dir)
 }
 
-// Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, Home/End —
-// к границам `min`/`max` (если заданы).
+// Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, PageUp/PageDown —
+// крупным шагом, Home/End — к границам `min`/`max` (если заданы).
 function onKeydown(e: KeyboardEvent): void {
   if (isDisabled.value) return
   // Readonly-поле ведёт себя как текст: стрелки и Home/End отдаются нативной
@@ -444,6 +463,14 @@ function onKeydown(e: KeyboardEvent): void {
     case 'ArrowDown':
       e.preventDefault()
       stepBy(-1)
+      break
+    case 'PageUp':
+      e.preventDefault()
+      stepBy(1, bigStep(props.step ?? 1, props.min, props.max))
+      break
+    case 'PageDown':
+      e.preventDefault()
+      stepBy(-1, bigStep(props.step ?? 1, props.min, props.max))
       break
     case 'Home':
       if (props.min !== undefined) {
@@ -461,11 +488,11 @@ function onKeydown(e: KeyboardEvent): void {
 }
 
 // `aria-valuenow` — числовое значение для скринридеров; отсутствует, если поле пусто.
-const ariaValueNow = computed(() => toNumber(props.modelValue) ?? undefined)
+const ariaValueNow = computed(() => props.modelValue ?? undefined)
 
 // На пределе кнопка ± гаснет: активная кнопка, у которой `clamp` съедает
 // результат, читается как сломанная.
-const numericValue = computed(() => toNumber(props.modelValue))
+const numericValue = computed(() => props.modelValue)
 
 const canIncrease = computed(() => {
   if (props.max === undefined) return true
@@ -481,9 +508,7 @@ const canDecrease = computed(() => {
 
 // Локале-зависимое отображение: при фокусе показываем «сырое» значение для
 // редактирования, иначе — сгруппированное через `Intl.NumberFormat`.
-function formatGrouped(value: string): string {
-  const num = toNumber(value)
-  if (num === null) return value
+function formatGrouped(num: number): string {
   const sep = props.decimalSeparator || '.'
   // formatToParts позволяет оставить локале-зависимый групповой разделитель,
   // но принудительно подставить наш десятичный разделитель (`decimalSeparator`),
@@ -504,13 +529,18 @@ function formatGrouped(value: string): string {
  */
 const ariaValueText = computed(() => {
   if (!props.useGrouping) return undefined
-  const num = toNumber(props.modelValue)
-  return num === null ? undefined : formatGrouped(props.modelValue)
+  return props.modelValue === null ? undefined : formatGrouped(props.modelValue)
 })
 
+/**
+ * Что показывает поле: набираемый черновик, пока он есть, иначе — модель.
+ * Группировка только вне фокуса: при правке разделители разрядов мешают.
+ */
 const displayValue = computed(() => {
-  if (!props.useGrouping || isFocused.value) return props.modelValue
-  return formatGrouped(props.modelValue)
+  if (draft.value !== null) return draft.value
+  if (props.modelValue === null) return ''
+  if (props.useGrouping && !isFocused.value) return formatGrouped(props.modelValue)
+  return format(props.modelValue)
 })
 
 function onFocus(event: FocusEvent): void {
@@ -520,6 +550,9 @@ function onFocus(event: FocusEvent): void {
 
 function onBlur(event: FocusEvent): void {
   isFocused.value = false
+  // `change` до `blur` доходит не всегда (значение могло вернуться к исходному),
+  // а черновик обязан сняться в любом случае — иначе поле застынет на нём.
+  draft.value = null
   emit('blur', event)
   stopRepeat()
 }
@@ -574,12 +607,13 @@ const resolvedClearable = useGrComponentProp('GrNumberInput', 'clearable', () =>
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
 
 const clearVisible = computed(() =>
-  resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== '',
+  resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== null,
 )
 
 function clear(): void {
-  emit('update:modelValue', '')
-  emit('change', '')
+  draft.value = null
+  emit('update:modelValue', null)
+  emit('change', null)
   emit('clear')
   focus()
 }
@@ -675,7 +709,7 @@ function clear(): void {
           type="button"
           data-gr-number-input-increase
           :class="stepperCompactClass"
-          :disabled="isDisabled || !canIncrease"
+          :disabled="isDisabled || isReadonly || !canIncrease"
           :aria-label="resolvedIncreaseLabel"
           @mousedown.prevent
           @pointerdown="startRepeat(1)"
@@ -692,7 +726,7 @@ function clear(): void {
           type="button"
           data-gr-number-input-decrease
           :class="stepperCompactClass"
-          :disabled="isDisabled || !canDecrease"
+          :disabled="isDisabled || isReadonly || !canDecrease"
           :aria-label="resolvedDecreaseLabel"
           @mousedown.prevent
           @pointerdown="startRepeat(-1)"
@@ -719,7 +753,7 @@ function clear(): void {
         type="button"
         data-gr-number-input-decrease
         :class="stepperWideClass"
-        :disabled="isDisabled || !canDecrease"
+        :disabled="isDisabled || isReadonly || !canDecrease"
         :aria-label="resolvedDecreaseLabel"
         @mousedown.prevent
         @pointerdown="startRepeat(-1)"
@@ -745,7 +779,7 @@ function clear(): void {
         type="button"
         data-gr-number-input-increase
         :class="stepperWideClass"
-        :disabled="isDisabled || !canIncrease"
+        :disabled="isDisabled || isReadonly || !canIncrease"
         :aria-label="resolvedIncreaseLabel"
         @mousedown.prevent
         @pointerdown="startRepeat(1)"

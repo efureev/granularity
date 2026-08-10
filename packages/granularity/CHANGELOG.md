@@ -7,7 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed — BREAKING
+
+- **`GrNumberInput` models a number.** `v-model` was a `string`, which made the numeric control the only one in the
+  package handing the parsing back to its consumer — `GrSlider` has worked with numbers all along. It is now
+  `number | null`, with `null` for empty; `update:modelValue` and `change` carry the same type, and `clear` empties
+  the field to `null` rather than to `''`.
+
+  ```vue
+  <!-- было -->
+  <GrNumberInput v-model="qty" />        <!-- const qty = ref('3') -->
+  <!-- стало -->
+  <GrNumberInput v-model="qty" />        <!-- const qty = ref<number | null>(3) -->
+  ```
+
+  The objection that kept the string was real: a half-typed `-` or `1,` is not a number, and coercing it every
+  keystroke would produce `NaN`. It is answered by separating the two roles rather than by widening the model. What
+  is being typed lives in the field as a **draft** — the exact string, shown as-is — while the model reports `null`
+  until that draft parses. A commit (`change`, blur, or any step from a button or a key) drops the draft and applies
+  `min`/`max` and `precision`, which is why `precision="2"` no longer rewrites `7` into `7.00` under the cursor.
+
+  One consequence worth reading twice: `decimalSeparator` stops being part of the value and goes back to being what
+  it always was — how the fraction is shown and typed. With `decimal-separator=","` the value `1,25` on screen is
+  `1.25` in the model.
+
+### Fixed
+
+- **A fractional `step` no longer drifts.** Rounding only ever happened when `precision` was set, so a field
+  stepping by `0.1` showed `0.30000000000000004` on the third press of `↑`, and `2.2 + 1.1` came out as
+  `3.3000000000000003`. The step now rounds to the decimal count of the larger operand, which leaves `precision`
+  free to mean what it means — how the committed value is shown — instead of doubling as the only guard against
+  binary drift. The suite missed this because its one fractional-step test set `precision`, taking the branch where
+  rounding already existed.
+
+- **`GrNumberInput` steppers are disabled in `readonly`.** `stepBy` refused to act, so nothing changed on click —
+  but the buttons looked alive, while the clear button in the same component already hides itself in that state.
+
 ### Added
+
+- **`PageUp`/`PageDown` in `GrNumberInput`** — the last unclaimed key of the spinbutton pattern. The large step
+  follows the rule `GrSlider` already uses: ten steps or a tenth of the range, whichever is larger. A number field
+  need not have bounds, and without them there is no range to take a tenth of, so ten steps it is.
 
 - **`GrFormFile` shows image thumbnails.** Previews were the one capability separating the form field from
   `GrFileUpload`, and the gap was the reason consumers rewrote the file list on top of the slot. `preview` turns them
