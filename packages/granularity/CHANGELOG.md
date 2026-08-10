@@ -45,6 +45,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrProgressBar` says "unknown" instead of "zero".** Half of all progress is indeterminate — the request is out and
+  the server never said how big the answer is — and the component had no way to show it. `indeterminate` runs a stripe
+  along the track and stops publishing a value: `aria-valuenow` and `aria-valuetext` are dropped, which is what the
+  role uses to mean "unknown", so no extra `aria-busy` is needed. `GrFileUpload` switches to it on its own now,
+  wherever XHR reports no `lengthComputable` — until this it drew an empty bar sitting at 0% for the whole upload.
+
+  The stripe is one of the two animations in the package that carry state, so it does not rely on the global
+  reduced-motion clamp. Frozen in its first frame it would sit 40% wide at the left edge and read as "40% done"; under
+  `reduce` it becomes a neutral full-width fill instead, which claims neither zero nor completion. The reasoning now
+  lives in `docs/motion.md` next to the toast timer, and the second signal is written down: a resting frame that shows
+  the wrong state earns a component-level block just as `fill-mode: forwards` does.
+
+  Two more things the bar used to leave to its callers. `showValue` prints the percentage itself — right of the track,
+  fixed width, tabular figures, so `9%` → `10%` does not nudge the bar — and `formatValue` drives both that label and
+  `aria-valuetext` ("184 of 512 MB" instead of a bare "36"); without a format of its own the attribute stays off,
+  since a screen reader already reads the value against `aria-valuemax`. `buffer` adds the layer behind the fill for
+  played-versus-buffered and uploaded-versus-confirmed; it is clamped like `value` and deliberately does not follow
+  `tone` — `-light` roles exist for six of the eight tones, and a neutral layer between track and fill reads correctly
+  under all of them.
+
+  Full contract: `docs/components/GrProgressBar.md`, the component's first page of its own. The suite went from three
+  render-level assertions to 21 covering both modes, the label, the buffer and the value bounds.
+
 - **`PageUp`/`PageDown` in `GrNumberInput`** — the last unclaimed key of the spinbutton pattern. The large step
   follows the rule `GrSlider` already uses: ten steps or a tenth of the range, whichever is larger. A number field
   need not have bounds, and without them there is no range to take a tenth of, so ten steps it is.

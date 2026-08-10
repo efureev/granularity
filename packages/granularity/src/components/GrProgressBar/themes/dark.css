@@ -8,4 +8,6 @@
   --gr-progress-info-bg: var(--gr-info);
   --gr-progress-slate-bg: var(--gr-slate);
   --gr-progress-azure-bg: var(--gr-azure);
+  --gr-progress-buffer-bg: var(--gr-brd);
+  --gr-progress-indeterminate-bg: var(--gr-muted-fg);
 }

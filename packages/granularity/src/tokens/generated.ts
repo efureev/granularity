@@ -2263,6 +2263,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Заливка полосы тона `azure`."
   },
   {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-buffer-bg",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Слой буфера позади заливки. Тон не наследует: нейтральный слой между треком и заливкой читается у всех восьми тонов."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-indeterminate-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Заливка неопределённого режима под `prefers-reduced-motion: reduce`, когда бегущая полоса остановлена."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-indeterminate-duration",
+    "kind": "hook",
+    "default": "1.4s",
+    "description": "Период пробега полосы в неопределённом режиме."
+  },
+  {
     "owner": "GrRating",
     "name": "--gr-rating-color",
     "kind": "hook",

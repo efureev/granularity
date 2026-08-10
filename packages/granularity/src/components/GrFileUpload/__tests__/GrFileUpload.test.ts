@@ -350,6 +350,37 @@ describe('GrFileUpload', () => {
     expect(wrapper.emitted('stateChange')).toBeTruthy()
   })
 
+  it('прогресс без известного размера показывает полосу без значения', async () => {
+    let release: (value: unknown) => void = () => {}
+    const request = vi.fn((_files: File[], ctx: any) => {
+      ctx.onProgress?.({ percent: 0, loaded: 0, total: 0, indeterminate: true })
+      return new Promise((resolve) => {
+        release = resolve
+      })
+    })
+
+    const wrapper = mount(GrFileUpload, {
+      props: { request, hideProgressOnSuccess: 0 },
+    })
+
+    const file = new File(['x'], 'x.txt', { type: 'text/plain' })
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [file] },
+    })
+    await flushPromises()
+
+    const track = wrapper.get('[data-gr-progress-bar-track]')
+    expect(track.attributes('data-gr-progress-bar-indeterminate')).toBe('')
+    expect(track.attributes('aria-valuenow')).toBeUndefined()
+
+    release({ ok: true })
+    await flushPromises()
+
+    const settled = wrapper.get('[data-gr-progress-bar-track]')
+    expect(settled.attributes('data-gr-progress-bar-indeterminate')).toBeUndefined()
+    expect(settled.attributes('aria-valuenow')).toBe('100')
+  })
+
   it('scoped-слот progress получает state и текущий процент', async () => {
     const request = vi.fn(async (_files: File[], ctx: any) => {
       ctx.onProgress?.({ percent: 42, loaded: 42, total: 100, indeterminate: false })

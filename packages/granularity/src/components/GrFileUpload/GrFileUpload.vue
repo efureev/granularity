@@ -627,9 +627,10 @@ const liveMessage = computed(() => {
 })
 
 const progressVisible = computed(() => state.phase !== 'idle')
-const progressPercent = computed(() => (state.phase === 'uploading' && state.indeterminate ? 0 : state.percent))
+const progressIndeterminate = computed(() => state.phase === 'uploading' && state.indeterminate)
+const progressPercent = computed(() => (progressIndeterminate.value ? 0 : state.percent))
 const progressText = computed(() => {
-  if (state.phase === 'uploading' && state.indeterminate) return ''
+  if (progressIndeterminate.value) return ''
   return `${Math.round(progressPercent.value)}%`
 })
 
@@ -894,6 +895,7 @@ defineExpose({
             <div class="flex items-center gap-2">
               <GrProgressBar
                 :value="progressPercent"
+                :indeterminate="progressIndeterminate"
                 :tone="effectiveProgressTone"
                 :size="progressBarSize"
                 :aria-label="resolvedProgressLabel"

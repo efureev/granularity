@@ -100,7 +100,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrNumberInput`](./components/GrNumberInput.md)
 - [`GrPagination`](./components/GrPagination.md)
 - `GrPopover`
-- `GrProgressBar`
+- [`GrProgressBar`](./components/GrProgressBar.md)
 - [`GrPromptDialog`](./components/GrPromptDialog.md)
 - [`GrRadio`](./components/GrRadio.md)
 - [`GrRadioGroup`](./components/GrRadioGroup.md)
