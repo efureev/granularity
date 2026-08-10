@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrBreadcrumbs` can collapse by the space it actually has.** `maxItems` counts items, and on a narrow screen a
+  count predicts badly: three short levels fit where two long ones do not. `autoCollapse` measures instead — the path
+  becomes a single line and hides as much of its middle as it must, no more. Two boundaries are deliberate: the head
+  is never squeezed (`itemsBeforeCollapse` is usually the root, and it is cheap), and the tail never drops below one
+  item, because the last one answers "where am I" and a path reading "Home / …" is useless. The props compose:
+  `maxItems` stays a hard ceiling, width squeezes further. Off by default — wrapping onto a second line and collapsing
+  are different answers, and the second cannot be imposed on anyone already living with the first. The arithmetic is a
+  pure exported function (`resolveBreadcrumbsFit`), so the decision can be made outside the component, and it is
+  tested by table rather than by mounting.
+- **A gate that runs in a real browser.** `apps/showcase/e2e/interaction.spec.ts` plus the `Interaction gate` step
+  in CI. The package's unit tests live in jsdom, which has neither `Tab` nor `Enter`-activates-a-button, so
+  `trigger('click')` was proving the handler and nothing about the path to it — half of the contract written down in
+  `docs/keyboard.md` had never been verified at all. `GrBreadcrumbs` is covered first: Tab reaches the "…" button,
+  `Enter` expands the path, focus moves to the first revealed item, and the next Tab continues forward instead of
+  jumping back to the start — plus the width-driven collapsing above, which jsdom cannot exercise either: it has no
+  `ResizeObserver` and no layout. The file is the place where the remaining interactive components go.
+
 - **`GrBottomNav` joins the size scale and opens up its items.** The panel was the one navigation component that never
   read `GrConfigProvider` at all: `<GrConfigProvider size="sm">` resized everything around it and left the bottom bar
   alone. It scales now — but the interesting part is what it deliberately does *not* scale. A step moves the bar

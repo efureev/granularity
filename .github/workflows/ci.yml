@@ -243,6 +243,11 @@ jobs:
       - name: Overlay gate
         run: yarn workspace @feugene/granularity-showcase test:overlay
 
+      # То, чего в jsdom нет вовсе: `Tab`, активация кнопки по `Enter` и layout
+      # (`ResizeObserver`). Юнит-тесты проверяют обработчик, но не путь до него.
+      - name: Interaction gate
+        run: yarn workspace @feugene/granularity-showcase test:interaction
+
       - name: Upload report
         if: failure()
         uses: actions/upload-artifact@v7

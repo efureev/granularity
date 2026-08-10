@@ -40,6 +40,7 @@ export const demoPathByPreviewKey = {
   'gr-bottom-nav-basic-flow':               'components/gr-bottom-nav/GrBottomNavBasicFlowDemo.vue',
   'gr-bottom-nav-external-state':           'components/gr-bottom-nav/GrBottomNavExternalStateDemo.vue',
   'gr-bottom-nav-mobile-shell':             'components/gr-bottom-nav/GrBottomNavMobileShellDemo.vue',
+  'gr-breadcrumbs-auto-collapse':           'components/gr-breadcrumbs/GrBreadcrumbsAutoCollapseDemo.vue',
   'gr-breadcrumbs-basic':                   'components/gr-breadcrumbs/GrBreadcrumbsBasicDemo.vue',
   'gr-breadcrumbs-collapsed':               'components/gr-breadcrumbs/GrBreadcrumbsCollapsedDemo.vue',
   'gr-breadcrumbs-icons':                   'components/gr-breadcrumbs/GrBreadcrumbsIconsDemo.vue',

@@ -3,7 +3,7 @@ export { default as GrBreadcrumbs } from './GrBreadcrumbs.vue'
 export { grBreadcrumbsConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrBreadcrumbsConfigurableProps } from './defaults'
-export { resolveBreadcrumbsLayout } from './grBreadcrumbsStyles'
+export { resolveBreadcrumbsFit, resolveBreadcrumbsLayout } from './grBreadcrumbsStyles'
 export type {
   GrBreadcrumbItem,
   GrBreadcrumbsLayoutEntry,

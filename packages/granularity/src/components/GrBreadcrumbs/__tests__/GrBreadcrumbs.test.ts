@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import GrBreadcrumbs from '../GrBreadcrumbs.vue'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
-import { resolveBreadcrumbsLayout } from '../grBreadcrumbsStyles'
+import { resolveBreadcrumbsFit, resolveBreadcrumbsLayout } from '../grBreadcrumbsStyles'
 
 const PATH = [
   { label: 'Главная', href: '/' },
@@ -135,6 +135,47 @@ describe('GrBreadcrumbs — схлопывание', () => {
     expect(entries.every(e => e.kind === 'item')).toBe(true)
   })
 
+  describe('раскладка по доступной ширине', () => {
+    // Пять пунктов по 100px, разделитель 10px, кнопка «…» 20px.
+    const WIDTHS = [100, 100, 100, 100, 100]
+    const fit = (available: number) => resolveBreadcrumbsFit({
+      itemWidths: WIDTHS,
+      separatorWidth: 10,
+      ellipsisWidth: 20,
+      available,
+      itemsBeforeCollapse: 1,
+    })
+
+    it('влезло всё — не схлопываем', () => {
+      // 5×100 + 4×10 = 540
+      expect(fit(540)).toBe(5)
+      expect(fit(1000)).toBe(5)
+    })
+
+    it('не влезло — ужимается хвост, а не голова', () => {
+      // голова 100 + «…» 20 + хвост 3×100 + 4 разделителя = 460
+      expect(fit(539)).toBe(3)
+      expect(fit(460)).toBe(3)
+      // 100 + 20 + 2×100 + 3×10 = 350
+      expect(fit(459)).toBe(2)
+    })
+
+    it('хвост не ужимается ниже одного пункта: он отвечает «где я сейчас»', () => {
+      expect(fit(0)).toBe(1)
+      expect(fit(10)).toBe(1)
+    })
+
+    it('пустой путь схлопывать нечего', () => {
+      expect(resolveBreadcrumbsFit({
+        itemWidths: [],
+        separatorWidth: 10,
+        ellipsisWidth: 20,
+        available: 100,
+        itemsBeforeCollapse: 1,
+      })).toBe(0)
+    })
+  })
+
   it('кнопка «…» раскрывает путь и уводит фокус на первый раскрытый пункт', async () => {
     const wrapper = mount(GrBreadcrumbs, {
       props: { items: LONG, maxItems: 3, itemsBeforeCollapse: 1, itemsAfterCollapse: 1 },
@@ -245,5 +286,108 @@ describe('GrBreadcrumbs — интеграция', () => {
     expect(wrapper.findAll('b')).toHaveLength(4)
     expect(wrapper.findAll('[data-custom-separator]')).toHaveLength(3)
     expect(wrapper.findAll('b').at(-1)!.attributes('data-current')).toBe('true')
+  })
+})
+
+/**
+ * Схлопывание по ширине в jsdom: layout там не считается, поэтому размеры
+ * подменяются. Приём тот же, что в тесте аддонов `GrInput`, — свои
+ * `scrollWidth`/`clientWidth` вместо нулей jsdom.
+ */
+describe('GrBreadcrumbs — схлопывание по ширине', () => {
+  const LONG = Array.from({ length: 5 }, (_, i) => ({ label: `Уровень ${i + 1}`, href: `/l${i + 1}` }))
+
+  const ITEM_WIDTH = 100
+  const SEPARATOR_WIDTH = 10
+  const ELLIPSIS_WIDTH = 20
+
+  let available = 1000
+  const original = {
+    scrollWidth: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollWidth'),
+    clientWidth: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth'),
+  }
+
+  function stubLayout(width: number): void {
+    available = width
+
+    Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
+      configurable: true,
+      get(this: HTMLElement) {
+        if (this.matches('[data-gr-breadcrumbs-item-wrap]')) return ITEM_WIDTH
+        if (this.matches('[data-gr-breadcrumbs-separator]')) return SEPARATOR_WIDTH
+        if (this.matches('[data-gr-breadcrumbs-ellipsis-item]')) return ELLIPSIS_WIDTH
+        return 0
+      },
+    })
+
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.matches('[data-gr-breadcrumbs-list]') ? available : 0
+      },
+    })
+  }
+
+  afterEach(() => {
+    for (const [name, descriptor] of Object.entries(original)) {
+      if (descriptor) Object.defineProperty(HTMLElement.prototype, name, descriptor)
+      else delete (HTMLElement.prototype as unknown as Record<string, unknown>)[name]
+    }
+  })
+
+  async function mountAuto(width: number) {
+    stubLayout(width)
+    const wrapper = mount(GrBreadcrumbs, {
+      props: { items: LONG, autoCollapse: true },
+      attachTo: document.body,
+    })
+
+    // Кадр на замер, кадр на схлопывание, кадр на уточнение ширины кнопки «…».
+    await nextTick()
+    await nextTick()
+    await nextTick()
+    await nextTick()
+
+    return wrapper
+  }
+
+  it('широкий контейнер оставляет путь целиком', async () => {
+    // 5×100 + 4×10 = 540
+    const wrapper = await mountAuto(600)
+
+    expect(wrapper.findAll('[data-gr-breadcrumbs-item]')).toHaveLength(5)
+    expect(wrapper.find('[data-testid="gr-breadcrumbs-ellipsis"]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('узкий контейнер прячет середину', async () => {
+    const wrapper = await mountAuto(300)
+
+    expect(wrapper.find('[data-testid="gr-breadcrumbs-ellipsis"]').exists()).toBe(true)
+    expect(wrapper.findAll('[data-gr-breadcrumbs-item]').length).toBeLessThan(5)
+
+    wrapper.unmount()
+  })
+
+  it('в самом узком контейнере остаётся текущая страница', async () => {
+    const wrapper = await mountAuto(10)
+    const items = wrapper.findAll('[data-gr-breadcrumbs-item]')
+
+    // Голова, «…» и текущая страница: путь не схлопывается в ничто.
+    expect(items).toHaveLength(2)
+    expect(items[items.length - 1].text()).toContain('Уровень 5')
+
+    wrapper.unmount()
+  })
+
+  it('однострочный режим включается только вместе с пропом', async () => {
+    const auto = await mountAuto(600)
+    expect(auto.get('[data-gr-breadcrumbs-list]').classes()).toContain('flex-nowrap')
+    auto.unmount()
+
+    const plain = mount(GrBreadcrumbs, { props: { items: LONG }, attachTo: document.body })
+    expect(plain.get('[data-gr-breadcrumbs-list]').classes()).toContain('flex-wrap')
+    plain.unmount()
   })
 })

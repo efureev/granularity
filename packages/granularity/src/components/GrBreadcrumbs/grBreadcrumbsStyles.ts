@@ -18,7 +18,15 @@ export type GrBreadcrumbItem = {
 }
 
 export const breadcrumbsRootClass = 'w-full min-w-0'
-export const breadcrumbsListClass = 'flex flex-wrap items-center gap-1 m-0 p-0 [list-style:none]'
+export const breadcrumbsListClass = 'flex items-center gap-1 m-0 p-0 [list-style:none]'
+
+/**
+ * Перенос — умолчание: длинный путь уезжает на вторую строку и остаётся читаемым.
+ * В режиме `autoCollapse` строка одна, иначе переполнения не случится никогда и
+ * мерить будет нечего: список просто перенесётся.
+ */
+export const breadcrumbsListWrapClass = 'flex-wrap'
+export const breadcrumbsListNowrapClass = 'flex-nowrap overflow-hidden'
 
 /** Кегль строки пути. Шкала общая с `GrLink`: путь — это ряд ссылок. */
 export const breadcrumbsSizeClassBySize: Record<GrBreadcrumbsSize, string> = {
@@ -54,6 +62,52 @@ export type GrBreadcrumbsLinkComponent = string | Component
 export type GrBreadcrumbsLayoutEntry =
   | { kind: 'item', item: GrBreadcrumbItem, index: number }
   | { kind: 'ellipsis', hiddenCount: number }
+
+/**
+ * Сколько пунктов хвоста влезает в доступную ширину.
+ *
+ * Порог по числу пунктов (`maxItems`) на узком экране предсказывает плохо: три
+ * коротких пункта влезают, два длинных — нет. Здесь решение принимается по
+ * измеренным ширинам.
+ *
+ * Голова не ужимается: `itemsBeforeCollapse` — обычно один корневой пункт, и он
+ * дёшев. Хвост ужимается до упора, но **не меньше одного**: последний пункт
+ * отвечает на вопрос «где я сейчас», и прятать его бессмысленно — путь
+ * превратился бы в «Главная / …».
+ *
+ * Возврат — число пунктов хвоста; `items.length` означает «влезло всё».
+ */
+export function resolveBreadcrumbsFit(options: {
+  itemWidths: number[]
+  separatorWidth: number
+  ellipsisWidth: number
+  available: number
+  itemsBeforeCollapse: number
+}): number {
+  const { itemWidths, separatorWidth, ellipsisWidth, available, itemsBeforeCollapse } = options
+  const total = itemWidths.length
+
+  if (total === 0) return 0
+
+  const sum = (from: number, to: number): number =>
+    itemWidths.slice(from, to).reduce((acc, width) => acc + width, 0)
+
+  // Ширина строки из `parts` видимых блоков: сами блоки плюс разделители между.
+  const rowWidth = (content: number, parts: number): number =>
+    content + Math.max(0, parts - 1) * separatorWidth
+
+  if (rowWidth(sum(0, total), total) <= available) return total
+
+  const before = Math.max(0, Math.min(itemsBeforeCollapse, total))
+
+  for (let after = total - before - 1; after > 1; after--) {
+    const content = sum(0, before) + ellipsisWidth + sum(total - after, total)
+
+    if (rowWidth(content, before + 1 + after) <= available) return after
+  }
+
+  return 1
+}
 
 export function resolveBreadcrumbsLayout(options: {
   items: GrBreadcrumbItem[]

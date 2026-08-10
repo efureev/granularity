@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import GrLink from '../GrLink/GrLink.vue'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
@@ -11,12 +11,15 @@ import {
   breadcrumbsItemIconClass,
   breadcrumbsLabelClass,
   breadcrumbsListClass,
+  breadcrumbsListNowrapClass,
+  breadcrumbsListWrapClass,
   breadcrumbsRootClass,
   breadcrumbsSeparatorClass,
   breadcrumbsSizeClassBySize,
   type GrBreadcrumbItem,
   type GrBreadcrumbsLinkComponent,
   type GrBreadcrumbsSize,
+  resolveBreadcrumbsFit,
   resolveBreadcrumbsLayout,
 } from './grBreadcrumbsStyles'
 
@@ -52,6 +55,15 @@ export interface GrBreadcrumbsProps {
   linkCurrent?: boolean
   /** i18n-метка кнопки раскрытия схлопнутого пути. */
   expandLabel?: string
+  /**
+   * Схлопывать по доступной ширине, а не по числу пунктов. Путь становится
+   * однострочным, середина уходит под «…» ровно настолько, насколько не влезает.
+   *
+   * Без пропа поведение прежнее: список переносится на вторую строку, а порог
+   * задаёт `maxItems`. Вместе пропы совместимы — `maxItems` остаётся жёстким
+   * потолком, ширина ужимает дальше.
+   */
+  autoCollapse?: boolean
 }
 
 const props = withDefaults(defineProps<GrBreadcrumbsProps>(), {
@@ -64,6 +76,7 @@ const props = withDefaults(defineProps<GrBreadcrumbsProps>(), {
   ariaLabel: undefined,
   linkCurrent: false,
   expandLabel: undefined,
+  autoCollapse: false,
 })
 
 defineSlots<{
@@ -84,21 +97,64 @@ const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.breadcrumbs.la
 const resolvedExpandLabel = computed(() => props.expandLabel ?? t('gr.breadcrumbs.expand', 'Show hidden path'))
 
 const rootEl = ref<HTMLElement | null>(null)
+const listEl = ref<HTMLElement | null>(null)
 const expanded = ref(false)
 
+/**
+ * Схлопывание по ширине: сколько пунктов хвоста влезает.
+ *
+ * `undefined` — ещё не мерили, показываем путь целиком. Первый кадр в режиме
+ * `autoCollapse` намеренно полный: ширины снимаются с него, а посчитать их до
+ * рендера неоткуда.
+ */
+const fitAfter = ref<number | undefined>(undefined)
+
+/** Ширины не зависят от контейнера, поэтому живут до смены самого пути. */
+let measured: { items: number[], separator: number } | null = null
+/**
+ * Ширина кнопки «…» узнаётся только когда она отрисована, то есть уже после
+ * первого схлопывания. До этого считаем её нулевой: поправка может лишь
+ * ужать хвост ещё на пункт, а не вернуть спрятанное, поэтому качелей не будет.
+ */
+let ellipsisWidth = 0
+
 // Новый путь — новая страница: раскрытая середина прошлого пути к ней отношения
-// не имеет.
+// не имеет, а измеренные ширины относятся к прошлым подписям.
 watch(() => props.items, () => {
   expanded.value = false
+  measured = null
+  fitAfter.value = undefined
+  void nextTick(measure)
 })
 
 const lastIndex = computed(() => props.items.length - 1)
 
+/**
+ * Схлопывание по ширине выражается через тот же `maxItems`: раскладку считает
+ * одна функция, а режимы отличаются только тем, откуда взялось число.
+ */
+const autoMaxItems = computed(() => {
+  if (!props.autoCollapse || fitAfter.value === undefined) return undefined
+  if (fitAfter.value >= props.items.length) return undefined
+
+  return props.items.length - 1
+})
+
+const effectiveMaxItems = computed(() => {
+  const limits = [props.maxItems, autoMaxItems.value].filter((value): value is number => typeof value === 'number' && value > 0)
+
+  return limits.length > 0 ? Math.min(...limits) : undefined
+})
+
+const effectiveAfter = computed(() => (
+  props.autoCollapse && fitAfter.value !== undefined ? fitAfter.value : props.itemsAfterCollapse
+))
+
 const entries = computed(() => resolveBreadcrumbsLayout({
   items: props.items,
-  maxItems: props.maxItems,
+  maxItems: effectiveMaxItems.value,
   itemsBeforeCollapse: props.itemsBeforeCollapse,
-  itemsAfterCollapse: props.itemsAfterCollapse,
+  itemsAfterCollapse: effectiveAfter.value,
   expanded: expanded.value,
 }))
 
@@ -112,6 +168,85 @@ function isLink(item: GrBreadcrumbItem, index: number): boolean {
   if (isCurrent(index) && !props.linkCurrent) return false
   return item.href !== undefined || item.to !== undefined || props.as !== undefined
 }
+
+function widthOf(el: Element | null | undefined): number {
+  // `scrollWidth`, а не прямоугольник: у подписи стоит `truncate`, и в узком
+  // контейнере прямоугольник вернул бы уже ужатую ширину, а не собственную.
+  return el ? (el as HTMLElement).scrollWidth : 0
+}
+
+/**
+ * Снять ширины с полного пути и пересчитать, сколько пунктов хвоста влезает.
+ *
+ * Замер делается один раз на путь: подписи от ширины контейнера не зависят,
+ * поэтому `resize` пересчитывает только арифметику.
+ */
+function measure(): void {
+  if (!props.autoCollapse) return
+
+  const list = listEl.value
+  if (!list) return
+
+  const ellipsis = list.querySelector('[data-gr-breadcrumbs-ellipsis-item]')
+  if (ellipsis) ellipsisWidth = widthOf(ellipsis)
+
+  if (!measured) {
+    // Ширины снимаем только с полного пути: спрятанных пунктов в DOM нет.
+    if (fitAfter.value !== undefined) return
+
+    const wraps = [...list.querySelectorAll('[data-gr-breadcrumbs-item-wrap]')]
+    if (wraps.length !== props.items.length) return
+
+    measured = {
+      items: wraps.map(widthOf),
+      separator: widthOf(list.querySelector('[data-gr-breadcrumbs-separator]')),
+    }
+  }
+
+  const available = list.clientWidth
+  // jsdom и скрытый контейнер отдают 0 — решать по такой ширине нечего.
+  if (available <= 0) return
+
+  fitAfter.value = resolveBreadcrumbsFit({
+    itemWidths: measured.items,
+    separatorWidth: measured.separator,
+    ellipsisWidth,
+    available,
+    itemsBeforeCollapse: props.itemsBeforeCollapse,
+  })
+}
+
+/**
+ * Ширина кнопки «…» известна только после того, как она отрисована, то есть
+ * после первого схлопывания. Поэтому решение пересчитывается ещё раз: поправка
+ * либо ничего не меняет, либо ужимает хвост на пункт. Цикла нет — второй проход
+ * оставляет `fitAfter` прежним, и наблюдатель больше не срабатывает.
+ */
+watch(fitAfter, () => void nextTick(measure))
+
+let observer: ResizeObserver | null = null
+
+watch(() => props.autoCollapse, (enabled) => {
+  if (enabled) {
+    void nextTick(measure)
+    return
+  }
+
+  measured = null
+  fitAfter.value = undefined
+})
+
+onMounted(() => {
+  void nextTick(measure)
+
+  // На сервере и в jsdom `ResizeObserver` отсутствует — измерять там нечего.
+  if (typeof ResizeObserver === 'undefined') return
+
+  observer = new ResizeObserver(() => measure())
+  if (listEl.value) observer.observe(listEl.value)
+})
+
+onBeforeUnmount(() => observer?.disconnect())
 
 async function expand(): Promise<void> {
   expanded.value = true
@@ -133,7 +268,11 @@ async function expand(): Promise<void> {
     :class="[breadcrumbsRootClass, breadcrumbsSizeClassBySize[resolvedSize]]"
     :aria-label="resolvedAriaLabel"
   >
-    <ol data-gr-breadcrumbs-list :class="breadcrumbsListClass">
+    <ol
+      ref="listEl"
+      data-gr-breadcrumbs-list
+      :class="[breadcrumbsListClass, autoCollapse ? breadcrumbsListNowrapClass : breadcrumbsListWrapClass]"
+    >
       <template v-for="(entry, position) in entries" :key="entry.kind === 'item' ? `item-${entry.index}` : 'ellipsis'">
         <!--
           Разделитель — отдельный элемент списка и помечен `aria-hidden`:
