@@ -90,6 +90,18 @@ async function mountHarnessWithHeader() {
   return wrapper
 }
 
+/**
+ * Ждёт конца анимации слоя: `<Transition>` объявляет её законченной через
+ * `nextFrame`, то есть парой кадров позже смены пропа. Без этого `opened`/
+ * `closed` ещё не эмитнуты, а фокус не переставлен.
+ */
+async function settle(): Promise<void> {
+  for (let i = 0; i < 3; i++) {
+    await new Promise(resolve => requestAnimationFrame(() => resolve(null)))
+    await nextTick()
+  }
+}
+
 describe('granularity/GrDrawer (unit)', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -217,6 +229,24 @@ describe('granularity/GrDrawer (unit)', () => {
 
     // Панель без единого выхода — ловушка, поэтому кнопка закрытия работает.
     await wrapper.find('button[aria-label="Close"]').trigger('click')
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('closeOnEsc=false гасит только Esc, бэкдроп и кнопка закрытия работают', async () => {
+    const wrapper = await mountHarness({ closeOnBackdrop: true, title: 'Filters', closeOnEsc: false })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(true)
+
+    // Отличие от `persistent`: тот запрещает оба мягких выхода, а этот — один.
+    await wrapper.find('[data-gr-drawer-overlay]').trigger('mousedown')
+    await wrapper.find('[data-gr-drawer-overlay]').trigger('click')
     await nextTick()
 
     expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
@@ -383,6 +413,182 @@ describe('GrDrawer — своя шапка', () => {
     expect(wrapper.find('[data-gr-drawer-panel]').exists()).toBe(false)
 
     wrapper.unmount()
+  })
+})
+
+describe('GrDrawer — заголовок разметкой', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('слот #title работает без пропа title и остаётся именем слоя', async () => {
+    const Harness = defineComponent({
+      components: { GrDrawer },
+      setup: () => ({ open: ref(true) }),
+      template: `
+        <GrDrawer v-model="open">
+          <template #title>
+            <span data-testid="rich-title">Filters <b>3</b></span>
+          </template>
+          <div data-testid="drawer-body">Body</div>
+        </GrDrawer>
+      `,
+    })
+
+    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    await nextTick()
+
+    const title = wrapper.find('[data-gr-drawer-title]')
+    expect(title.find('[data-testid="rich-title"]').exists()).toBe(true)
+    expect(title.classes()).not.toContain('sr-only')
+
+    // Заголовок разметкой — тоже заголовок: имя слоя берётся с него, а не
+    // сваливается на обобщённое «Drawer» из локали.
+    expect(wrapper.find('[data-gr-drawer]').attributes('aria-labelledby')).toBe(title.attributes('id'))
+    expect(wrapper.find('[data-gr-drawer]').attributes('aria-label')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('со скрытой шапкой слот #title уезжает в sr-only, а не пропадает', async () => {
+    const Harness = defineComponent({
+      components: { GrDrawer },
+      setup: () => ({ open: ref(true) }),
+      template: `
+        <GrDrawer v-model="open" :show-header="false">
+          <template #title>
+            <span data-testid="rich-title">Filters</span>
+          </template>
+          <div data-testid="drawer-body">Body</div>
+        </GrDrawer>
+      `,
+    })
+
+    const wrapper = mount(Harness, { global: { stubs: { teleport: true } } })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-drawer-header]').exists()).toBe(false)
+
+    const title = wrapper.find('[data-gr-drawer-title]')
+    expect(title.classes()).toContain('sr-only')
+    expect(title.find('[data-testid="rich-title"]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-drawer]').attributes('aria-labelledby')).toBe(title.attributes('id'))
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrDrawer — жизненный цикл, фокус и expose', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
+  })
+
+  it('эмитит opened/closed по концу анимации, а не по смене пропа', async () => {
+    const wrapper = mount(GrDrawer, {
+      attachTo: document.body,
+      props: { modelValue: false, title: 'Filters' },
+      slots: { default: '<div data-testid="drawer-body">Body</div>' },
+      global: { stubs: { transition: false } },
+    })
+
+    await wrapper.setProps({ modelValue: true })
+    expect(wrapper.emitted('opened')).toBeUndefined()
+
+    await settle()
+    expect(wrapper.emitted('opened')).toHaveLength(1)
+    expect(wrapper.emitted('closed')).toBeUndefined()
+
+    await wrapper.setProps({ modelValue: false })
+    await settle()
+    expect(wrapper.emitted('closed')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('initialFocus перебивает панель по умолчанию', async () => {
+    const wrapper = mount(defineComponent({
+      components: { GrDrawer },
+      setup() {
+        const open = ref(true)
+        const target = ref<HTMLElement | null>(null)
+        return { open, target }
+      },
+      template: `
+        <GrDrawer v-model="open" title="Filters" :initial-focus="target">
+          <input data-testid="first">
+          <input ref="target" data-testid="second">
+        </GrDrawer>
+      `,
+    }), { attachTo: document.body, global: { stubs: { transition: false } } })
+
+    // Ссылка на элемент внутри панели появляется только после её рендера,
+    // поэтому фокус проверяем, когда слой устоялся.
+    await settle()
+
+    expect(document.activeElement).toBe(document.querySelector('[data-testid="second"]'))
+
+    wrapper.unmount()
+  })
+
+  it('без initialFocus фокус уходит на саму панель', async () => {
+    const wrapper = mount(GrDrawer, {
+      attachTo: document.body,
+      props: { modelValue: true, title: 'Filters' },
+      slots: { default: '<input data-testid="first">' },
+      global: { stubs: { transition: false } },
+    })
+
+    await settle()
+
+    expect(document.activeElement).toBe(document.querySelector('[data-gr-drawer-panel]'))
+
+    wrapper.unmount()
+  })
+
+  it('expose close() закрывает и persistent-панель', async () => {
+    const wrapper = mount(GrDrawer, {
+      attachTo: document.body,
+      props: { modelValue: true, title: 'Filters', persistent: true },
+      slots: { default: '<div data-testid="drawer-body">Body</div>' },
+      global: { stubs: { transition: false } },
+    })
+
+    await settle()
+
+    wrapper.vm.close()
+    await nextTick()
+
+    // `v-model` остаётся у потребителя: expose эмитит обновление, а не правит
+    // проп мимо него.
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([false])
+
+    wrapper.unmount()
+  })
+
+  it('expose focus() возвращает фокус на панель, уведённый наружу', async () => {
+    const outside = document.createElement('button')
+    document.body.appendChild(outside)
+
+    // Немодальный режим: ловушка фокуса выключена, и вернуть его на панель
+    // после работы со страницей под ней больше нечем.
+    const wrapper = mount(GrDrawer, {
+      attachTo: document.body,
+      props: { modelValue: true, title: 'Filters', modal: false },
+      slots: { default: '<div data-testid="drawer-body">Body</div>' },
+      global: { stubs: { transition: false } },
+    })
+
+    await settle()
+
+    outside.focus()
+    expect(document.activeElement).toBe(outside)
+
+    wrapper.vm.focus()
+    expect(document.activeElement).toBe(document.querySelector('[data-gr-drawer-panel]'))
+
+    wrapper.unmount()
+    outside.remove()
   })
 })
 
