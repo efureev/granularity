@@ -14,7 +14,7 @@ export interface GrSkeletonProps {
 withDefaults(defineProps<GrSkeletonProps>(), {
   height: '12px',
   width: '100%',
-  rounded: '9999px',
+  rounded: 'var(--gr-radius-full)',
 })
 </script>
 

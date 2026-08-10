@@ -279,7 +279,7 @@ describe('granularity/GrModal (unit)', () => {
 
     expect(panelClass).toContain('max-w-none')
     expect(panelClass).toContain('h-full')
-    expect(panelClass).toContain('rounded-none')
+    expect(panelClass).toContain('rounded-[var(--gr-radius-none)]')
 
     // Паддинг оболочки при `full` снимается: вместе с `h-full` он дал бы панель
     // выше вьюпорта и лишний скролл.

@@ -8143,7 +8143,7 @@
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"9999px\""
+            "default": "\"var(--gr-radius-full)\""
           }
         ]
       },

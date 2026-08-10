@@ -588,7 +588,7 @@ function clear(): void {
 <template>
   <div
     data-gr-number-input
-    class="relative w-full overflow-hidden rounded-md border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
+    class="relative w-full overflow-hidden rounded-[var(--gr-radius-control)] border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
     :class="shellClassName"
   >
     <div

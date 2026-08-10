@@ -147,7 +147,7 @@ function clear(): void {
   focus()
 }
 
-const baseClass = 'w-full rounded-md border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+const baseClass = 'w-full rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
 
 const className = computed(() => [
   sizes[resolvedSize.value],
@@ -216,7 +216,7 @@ function onBlur(e: FocusEvent): void {
       type="button"
       data-gr-textarea-clear
       :aria-label="resolvedClearLabel"
-      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
       @click="clear"
     >
       <IconX class="h-4 w-4" aria-hidden="true" />
@@ -245,7 +245,7 @@ function onBlur(e: FocusEvent): void {
       type="button"
       data-gr-textarea-clear
       :aria-label="resolvedClearLabel"
-      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
       @click="clear"
     >
       <IconX class="h-4 w-4" aria-hidden="true" />

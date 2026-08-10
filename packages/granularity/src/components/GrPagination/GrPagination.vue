@@ -285,7 +285,7 @@ const totalText = computed(() =>
             :disabled="disabled"
             :aria-current="item === currentPage ? 'page' : undefined"
             :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
-            class="rounded-md font-600 transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
+            class="rounded-[var(--gr-radius-control)] font-600 transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
             :class="[
               pageClass,
               item === currentPage ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]',
@@ -323,7 +323,7 @@ const totalText = computed(() =>
         data-gr-pagination-jumper
         :disabled="disabled"
         :aria-label="resolvedJumperLabel"
-        class="rounded-md border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] [font-variant-numeric:tabular-nums] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
+        class="rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] [font-variant-numeric:tabular-nums] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
         :class="jumperClass"
         @keydown.enter="submitJumper"
         @blur="submitJumper"

@@ -38,11 +38,11 @@ export const grRadioDotUncheckedClass = 'bg-transparent opacity-0 scale-75'
 export const grRadioDotDisabledClass = 'bg-[var(--gr-muted-fg)] opacity-100 scale-100'
 // Базовые классы «точки» внутри radiobox — нестандартные (`h-[6px]`, `w-[6px]`, произвольный transition).
 // Вынесены сюда, чтобы `safelist` мог гарантировать их присутствие в сборке даже при tree-shaking шаблона.
-export const grRadioDotBaseClass = 'h-[6px] w-[6px] rounded-full transition-[transform,opacity,background-color] duration-[var(--gr-duration-fast)]'
+export const grRadioDotBaseClass = 'h-[6px] w-[6px] rounded-[var(--gr-radius-full)] transition-[transform,opacity,background-color] duration-[var(--gr-duration-fast)]'
 
 /** Выбранный вариант выделяется текстом, а не только точкой. */
-export const grRadioLabelCheckedClass = 'text-sm text-[var(--gr-fg)] font-500'
-export const grRadioLabelClass = 'text-sm text-[var(--gr-muted-fg)]'
+export const grRadioLabelCheckedClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-fg)] font-500'
+export const grRadioLabelClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'
 export const grRadioDescriptionClass = 'text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]'
 
 export function grRadioButtonClass(options: {

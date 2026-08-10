@@ -726,7 +726,7 @@ onBeforeUnmount(() => {
                       type="button"
                       data-gr-image-viewer-zoom-out
                       :aria-label="resolvedZoomOutLabel"
-                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      class="h-11 min-w-11 px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600"
                       :class="toolbarButtonClass"
                       @click="zoomOut"
                     >
@@ -739,7 +739,7 @@ onBeforeUnmount(() => {
                       type="button"
                       data-gr-image-viewer-zoom-reset
                       :aria-label="resolvedResetZoomLabel"
-                      class="h-11 min-w-11 px-3 text-xs font-700"
+                      class="h-11 min-w-11 px-3 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] font-700"
                       :class="toolbarButtonClass"
                       @click="resetTransform"
                     >
@@ -750,7 +750,7 @@ onBeforeUnmount(() => {
                       type="button"
                       data-gr-image-viewer-zoom-in
                       :aria-label="resolvedZoomInLabel"
-                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      class="h-11 min-w-11 px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600"
                       :class="toolbarButtonClass"
                       @click="zoomIn"
                     >
@@ -764,7 +764,7 @@ onBeforeUnmount(() => {
                       type="button"
                       data-gr-image-viewer-download
                       :aria-label="resolvedDownloadLabel"
-                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      class="h-11 min-w-11 px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600"
                       :class="toolbarButtonClass"
                       @click="download"
                     >
@@ -790,7 +790,7 @@ onBeforeUnmount(() => {
                       type="button"
                       data-gr-image-viewer-rotate-left
                       :aria-label="resolvedRotateLeftLabel"
-                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      class="h-11 min-w-11 px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600"
                       :class="toolbarButtonClass"
                       @click="rotateLeft"
                     >
@@ -803,7 +803,7 @@ onBeforeUnmount(() => {
                       type="button"
                       data-gr-image-viewer-rotate-right
                       :aria-label="resolvedRotateRightLabel"
-                      class="h-11 min-w-11 px-2 text-sm font-600"
+                      class="h-11 min-w-11 px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600"
                       :class="toolbarButtonClass"
                       @click="rotateRight"
                     >

@@ -52,7 +52,7 @@ export const ratingVoidClass = 'text-[var(--gr-rating-void-color,color-mix(in_sr
 
 export const ratingDisabledClass = 'cursor-not-allowed text-[var(--gr-disabled-fg)]'
 
-export const ratingRootBaseClass = 'inline-flex items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]'
+export const ratingRootBaseClass = 'inline-flex items-center rounded-[var(--gr-radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)]'
 
 export function ratingRootClass(options: { size: GrRatingSize, disabled: boolean, interactive: boolean }): string {
   return [

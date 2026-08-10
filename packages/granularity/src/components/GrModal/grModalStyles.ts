@@ -88,7 +88,7 @@ export const panelRadiusBySize: Record<GrModalSize, string> = {
   md: 'rounded-[var(--gr-radius-xl)]',
   lg: 'rounded-[var(--gr-radius-xl)]',
   xl: 'rounded-[var(--gr-radius-xl)]',
-  full: 'rounded-none',
+  full: 'rounded-[var(--gr-radius-none)]',
 }
 
 // Для большинства размеров высота не задаётся — `Partial` + фильтрация пустых

@@ -24,7 +24,7 @@ export const rootEnabledClass = 'cursor-pointer'
 // без него растянутая строка (внутри `grid`/`w-full`) прижалась бы к правому краю.
 export const rootLabelStartClass = 'flex-row-reverse justify-end'
 
-export const controlBase = 'rounded border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)] focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
+export const controlBase = 'rounded-[var(--gr-radius-sm)] border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)] focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
 
 export const controlSizes: Record<GrCheckboxSize, string> = {
   xs: 'h-3 w-3',
@@ -64,10 +64,10 @@ export const iconCheckHiddenClass = 'opacity-0 scale-75 text-transparent'
 export const labelBase = 'text-[var(--gr-muted-fg)]'
 
 export const labelSizes: Record<GrCheckboxSize, string> = {
-  xs: 'text-xs',
-  sm: 'text-sm',
-  md: 'text-sm',
-  lg: 'text-base',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 export function grCheckboxRootClass(options: {

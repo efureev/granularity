@@ -27,9 +27,9 @@ export const dotPlacementClass: Record<GrBadgeWrapPlacement, string> = {
   'bottom-left': 'bottom-[var(--gr-badge-wrap-offset-y,-0.25rem)] left-[var(--gr-badge-wrap-offset-x,-0.25rem)]',
 }
 
-export const dotBaseClass = 'absolute h-2 w-2 rounded-full'
+export const dotBaseClass = 'absolute h-2 w-2 rounded-[var(--gr-radius-full)]'
 
-export const countBaseClass = 'absolute min-w-5 h-5 px-1 rounded-full text-[length:var(--gr-text-2xs)] font-700 inline-flex items-center justify-center'
+export const countBaseClass = 'absolute min-w-5 h-5 px-1 rounded-[var(--gr-radius-full)] text-[length:var(--gr-text-2xs)] font-700 inline-flex items-center justify-center'
 
 /**
  * Заливка тоном: та же полярность, что у тёмного варианта `GrBadge` — текст

@@ -5,14 +5,14 @@ export const GR_AVATAR_STATUSES = ['online', 'offline', 'busy', 'away'] as const
 export type GrAvatarStatus = typeof GR_AVATAR_STATUSES[number]
 
 export const shapes: Record<GrAvatarShape, string> = {
-    circle: 'rounded-full',
+    circle: 'rounded-[var(--gr-radius-full)]',
     square: 'rounded-[var(--gr-avatar-square-radius,10px)]',
 }
 
 export const rootBaseClass = 'relative inline-flex shrink-0 items-center justify-center overflow-hidden border border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] font-700'
 
 /** Индикатор статуса: кольцо цветом фона отделяет точку от самого аватара. */
-export const statusDotClass = 'absolute bottom-0 right-0 block h-1/4 w-1/4 min-h-2 min-w-2 rounded-full ring-2 ring-[var(--gr-bg)]'
+export const statusDotClass = 'absolute bottom-0 right-0 block h-1/4 w-1/4 min-h-2 min-w-2 rounded-[var(--gr-radius-full)] ring-2 ring-[var(--gr-bg)]'
 
 export const statusToneClass: Record<GrAvatarStatus, string> = {
     online: 'bg-[var(--gr-success)]',

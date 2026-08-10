@@ -572,7 +572,7 @@ const themeAttrs = useGrThemeAttrs()
         v-if="hasPrefix"
         ref="prefixEl"
         data-gr-tree-select-prefix
-        class="absolute inset-y-px left-px flex items-center justify-center rounded-l-md border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+        class="absolute inset-y-px left-px flex items-center justify-center rounded-l-[var(--gr-radius-control)] border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
         :style="prefixStyle"
         aria-hidden="true"
       >
@@ -598,7 +598,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-required="isRequired ? 'true' : undefined"
         :aria-describedby="describedBy"
         :aria-label="ariaLabel"
-        class="w-full rounded-md border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="w-full rounded-[var(--gr-radius-control)] border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
         :style="triggerStyle"
         @pointerdown="onTriggerPointerDown"
@@ -612,7 +612,7 @@ const themeAttrs = useGrThemeAttrs()
         data-testid="gr-tree-select-clear"
         data-gr-tree-select-clear
         type="button"
-        class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)]"
+        class="absolute top-1/2 -translate-y-1/2 right-3 h-6 w-6 inline-flex items-center justify-center rounded-[var(--gr-radius-control)] text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-muted)_25%,transparent)]"
         :aria-label="t('gr.common.clear', 'Clear')"
         @click.stop="clear"
       >

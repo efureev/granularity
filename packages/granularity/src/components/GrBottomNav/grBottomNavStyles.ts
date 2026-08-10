@@ -45,7 +45,7 @@ export const itemLabelClass = 'max-w-full truncate leading-none'
  * Бейдж висит поверх правого верхнего угла пункта. Своя разметка, а не
  * `GrBadgeWrap`: зависимость притащила бы потребителю чужой CSS ради кружка.
  */
-export const itemBadgeClass = 'absolute top-0.5 right-1 min-w-4 h-4 px-1 rounded-full bg-[var(--gr-danger)] text-[var(--gr-danger-fg)] text-[length:var(--gr-text-2xs)] font-700 inline-flex items-center justify-center'
+export const itemBadgeClass = 'absolute top-0.5 right-1 min-w-4 h-4 px-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-danger)] text-[var(--gr-danger-fg)] text-[length:var(--gr-text-2xs)] font-700 inline-flex items-center justify-center'
 
 export function grBottomNavRootClass(options: {
   position: GrBottomNavPosition

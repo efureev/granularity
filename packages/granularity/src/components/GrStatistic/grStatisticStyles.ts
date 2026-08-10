@@ -22,9 +22,9 @@ export const statisticTitleSizeBySize: Record<GrStatisticSize, string> = {
 }
 
 export const statisticValueSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[length:var(--gr-text-base)] leading-6',
-  sm: 'text-[length:var(--gr-text-xl)] leading-7',
-  md: 'text-[length:var(--gr-text-3xl)] leading-9',
+  xs: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
+  sm: 'text-[length:var(--gr-text-xl)] leading-[var(--gr-leading-xl)]',
+  md: 'text-[length:var(--gr-text-3xl)] leading-[var(--gr-leading-3xl)]',
   lg: 'text-[length:var(--gr-text-4xl)] leading-tight',
 }
 

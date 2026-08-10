@@ -35,8 +35,8 @@ export const placeholderPaddings: Record<GrDataTableSize, string> = {
 export const headerTextSizes: Record<GrDataTableSize, string> = {
   xs: 'text-[length:var(--gr-control-text-3xs)]',
   sm: 'text-[length:var(--gr-control-text-2xs)]',
-  md: 'text-xs',
-  lg: 'text-sm',
+  md: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
 }
 
 /**

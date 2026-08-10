@@ -861,7 +861,7 @@ const themeAttrs = useGrThemeAttrs()
             v-if="!locked"
             type="button"
             data-gr-autocomplete-chip-remove
-            class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+            class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             :aria-label="t('gr.autocomplete.removeValue', 'Remove {label}', { label: option.label })"
             tabindex="-1"
             @click="removeValue(option.value)"
@@ -925,7 +925,7 @@ const themeAttrs = useGrThemeAttrs()
         type="button"
         data-testid="gr-autocomplete-clear"
         data-gr-autocomplete-clear
-        class="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-md text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+        class="shrink-0 inline-flex h-5 w-5 items-center justify-center rounded-[var(--gr-radius-control)] text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
         :aria-label="resolvedClearLabel"
         @click="clearSelection"
       >

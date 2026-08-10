@@ -23,7 +23,7 @@ export type GrLinkSize = GrComponentSize
 
 // Базовые классы корневого элемента (`<a>`/`<span>`). Вынесены сюда,
 // чтобы быть единственным источником истины как для шаблона, так и для safelist.
-export const baseRootClass = 'inline-flex items-center gap-1 rounded-[var(--gr-radius-chip)] transition-colors duration-[var(--gr-duration-fast)]'
+export const baseRootClass = 'inline-flex items-center gap-1 rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)]'
 export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const sizeClassBySize: Record<GrLinkSize, string> = {

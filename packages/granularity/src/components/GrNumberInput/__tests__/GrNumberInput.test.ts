@@ -82,7 +82,7 @@ describe('GrNumberInput', () => {
     })
 
     expect(wrapper.attributes('class')).toContain('overflow-hidden')
-    expect(wrapper.attributes('class')).toContain('rounded-md')
+    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-radius-control)]')
   })
 
   it('учитывает suffix + controls: добавляет padding-right под оба аддона', () => {

@@ -9,7 +9,7 @@ describe('GrSkeleton', () => {
 
     expect(wrapper.attributes('style')).toContain('height: 12px;')
     expect(wrapper.attributes('style')).toContain('width: 100%;')
-    expect(wrapper.attributes('style')).toContain('border-radius: 9999px;')
+    expect(wrapper.attributes('style')).toContain('border-radius: var(--gr-radius-full);')
   })
 
   it('позволяет переопределить размеры и border radius', () => {

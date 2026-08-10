@@ -69,8 +69,8 @@ describe('GrSwitch', () => {
     expect(thumb.attributes('class')).toContain('w-6')
     expect(thumb.attributes('class')).toContain('translate-x-[28px]')
 
-    const label = wrapper.get('span.text-base')
-    expect(label.attributes('class')).toContain('text-base')
+    const label = wrapper.get('[data-gr-switch-label]')
+    expect(label.attributes('class')).toContain('text-[length:var(--gr-text-base)]')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 })

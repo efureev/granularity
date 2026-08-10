@@ -94,13 +94,13 @@ describe('GrTable', () => {
 
   it('меняет размер текста по size', () => {
     const defaultSize = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
-    expect(defaultSize.find('table').classes()).toContain('text-sm')
+    expect(defaultSize.find('table').classes()).toContain('text-[length:var(--gr-control-text-md)]')
 
     const expected: Record<string, string> = {
       xs: 'text-[length:var(--gr-control-text-xs)]',
       sm: 'text-[length:var(--gr-control-text-sm)]',
-      md: 'text-sm',
-      lg: 'text-base',
+      md: 'text-[length:var(--gr-control-text-md)]',
+      lg: 'text-[length:var(--gr-control-text-lg)]',
     }
 
     for (const [size, className] of Object.entries(expected)) {

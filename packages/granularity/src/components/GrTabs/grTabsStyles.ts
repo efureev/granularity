@@ -77,7 +77,7 @@ export const tabBase = 'shrink-0 font-600 transition-colors focus:outline-none f
 // по порядку правил в сгенерированном CSS, а не по порядку классов в атрибуте.
 export const tabVariantBase: Record<GrTabsVariant, string> = {
   pills: 'rounded-[var(--gr-radius-md)]',
-  line: 'rounded-[var(--gr-radius-md)] rounded-b-none border-b-2 -mb-px',
+  line: 'rounded-[var(--gr-radius-md)] rounded-b-[var(--gr-radius-none)] border-b-2 -mb-px',
 }
 
 export const tabStateClasses: Record<GrTabsVariant, { active: string, idle: string, disabled: string }> = {
@@ -97,7 +97,7 @@ export const tabIconClass = 'h-4 w-4 shrink-0'
 
 export const tabContentClass = 'inline-flex items-center gap-2'
 
-export const tabBadgeBase = 'rounded-full bg-[var(--gr-secondary)] text-[var(--gr-secondary-fg)]'
+export const tabBadgeBase = 'rounded-[var(--gr-radius-full)] bg-[var(--gr-secondary)] text-[var(--gr-secondary-fg)]'
 
 export function grTabsListClass(options: {
   variant: GrTabsVariant

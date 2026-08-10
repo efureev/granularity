@@ -26,7 +26,7 @@ export const subtitleClass = 'truncate text-[length:var(--gr-text-sm)] text-[var
  */
 export const contentBase = 'flex-1 overflow-y-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--gr-ring)]'
 
-export const itemBase = 'relative flex w-full items-center rounded-lg text-sm transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const itemBase = 'relative flex w-full items-center rounded-[var(--gr-radius-md)] text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const itemCollapsedClass = 'justify-center px-0 py-2'
 export const itemExpandedClass = 'gap-3 px-3 py-2'
@@ -40,7 +40,7 @@ export const itemActiveClass = 'bg-[var(--gr-muted)] font-600 text-[var(--gr-fg)
 export const itemIdleClass = 'text-[var(--gr-sidebar-fg)] hover:bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_8%,transparent)]'
 
 export const itemLetterClass = 'text-[length:var(--gr-text-xs)] font-700 leading-none'
-export const itemBadgeClass = 'shrink-0 rounded-full bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_12%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] font-600'
+export const itemBadgeClass = 'shrink-0 rounded-[var(--gr-radius-full)] bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_12%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] font-600'
 
 export const groupLabelClass = 'px-3 pb-1 pt-3 text-[length:var(--gr-text-2xs)] font-700 [text-transform:uppercase] tracking-wide text-[var(--gr-muted-fg)]'
 

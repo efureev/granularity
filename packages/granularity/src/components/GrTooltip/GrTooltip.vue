@@ -247,7 +247,7 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
           v-bind="themeAttrs"
           data-gr-tooltip-panel
           data-gr-overlay-root
-          class="pointer-events-none rounded-md border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
+          class="pointer-events-none rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
           :class="panelClass"
           :style="floatingStyle"
         >

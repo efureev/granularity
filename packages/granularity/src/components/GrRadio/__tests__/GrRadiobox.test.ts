@@ -10,7 +10,7 @@ describe('GrRadio (radiobox)', () => {
   it('держит в safelist базовые классы точки, чтобы dot не пропадал в собранных стилях', () => {
     expect(grRadioSafelist).toContain('h-[6px]')
     expect(grRadioSafelist).toContain('w-[6px]')
-    expect(grRadioSafelist).toContain('rounded-full')
+    expect(grRadioSafelist).toContain('rounded-[var(--gr-radius-full)]')
     expect(grRadioSafelist).toContain('transition-[transform,opacity,background-color]')
   })
 

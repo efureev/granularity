@@ -59,10 +59,10 @@ export const disabledClassByVariant: Record<GrButtonVariant, string> = {
 export const grButtonBaseClass = base
 
 export const sizes: Record<GrButtonSize, string> = {
-  xs: 'h-7 text-xs px-2.5',
-  sm: 'h-8 text-sm px-3',
-  md: 'h-10 text-sm px-4',
-  lg: 'h-11 text-base px-5',
+  xs: 'h-7 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] px-2.5',
+  sm: 'h-8 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] px-3',
+  md: 'h-10 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] px-4',
+  lg: 'h-11 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)] px-5',
 }
 
 /**

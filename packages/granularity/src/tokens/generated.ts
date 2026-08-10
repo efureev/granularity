@@ -177,6 +177,36 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Кегль компонента на ступени `lg`."
   },
   {
+    "name": "--gr-leading-xs",
+    "value": "1rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `xs` — идёт в паре с `--gr-text-xs`."
+  },
+  {
+    "name": "--gr-leading-sm",
+    "value": "1.25rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `sm` — идёт в паре с `--gr-text-sm`."
+  },
+  {
+    "name": "--gr-leading-base",
+    "value": "1.5rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `base` — идёт в паре с `--gr-text-base`."
+  },
+  {
+    "name": "--gr-leading-xl",
+    "value": "1.75rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `xl` — идёт в паре с `--gr-text-xl`."
+  },
+  {
+    "name": "--gr-leading-3xl",
+    "value": "2.25rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `3xl` — идёт в паре с `--gr-text-3xl`."
+  },
+  {
     "name": "--gr-leading-tight",
     "value": "1.25",
     "section": "Typography: line heights",
@@ -429,10 +459,10 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Радиус скругления `sm` для углов компонентов и поверхностей."
   },
   {
-    "name": "--gr-radius-chip",
+    "name": "--gr-radius-control",
     "value": "6px",
     "section": "Shapes: radii and compatibility aliases",
-    "description": "Радиус мелкой интерактивной детали внутри контрола: чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера."
+    "description": "Радиус контрола и мелкой интерактивной детали внутри него: оболочка поля, чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера."
   },
   {
     "name": "--gr-radius-md",

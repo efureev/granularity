@@ -17,10 +17,10 @@ export const collapseHeaderPaddings: Record<GrComponentSize, string> = {
 export const collapseTitleBase = 'flex-1 min-w-0'
 
 export const collapseTitleTexts: Record<GrComponentSize, string> = {
-  xs: 'text-xs',
-  sm: 'text-sm',
-  md: 'text-sm',
-  lg: 'text-base',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 export const collapseBodyPaddings: Record<GrComponentSize, string> = {

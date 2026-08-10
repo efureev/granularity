@@ -602,7 +602,7 @@ defineExpose({
               v-if="col.sortable"
               type="button"
               data-gr-datatable-sort
-              class="inline-flex items-center text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
+              class="inline-flex items-center text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
               :class="headerGapClass"
               @click="toggleSort(col)"
             >

@@ -17,8 +17,8 @@ export type GrTableSize = GrComponentSize
 export const tableSizes: Record<GrTableSize, string> = {
   xs: 'text-[length:var(--gr-control-text-xs)]',
   sm: 'text-[length:var(--gr-control-text-sm)]',
-  md: 'text-sm',
-  lg: 'text-base',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }
 
 /** Чередование строк и подсветка под курсором — на `<tbody>`, а не на ячейках. */

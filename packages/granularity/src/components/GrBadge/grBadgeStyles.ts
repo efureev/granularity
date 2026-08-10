@@ -47,7 +47,7 @@ export const darkToneClassByTone: Record<GrBadgeTone, string> = {
 function radiusClass(radius: GrBadgeRadius, size: GrBadgeSize): string {
   if (radius === 'square') return 'rounded-[var(--gr-radius-none)]'
   if (radius === 'semi') return semiRadiusClassBySize[size]
-  return 'rounded-full'
+  return 'rounded-[var(--gr-radius-full)]'
 }
 function toneClass(tone: GrBadgeTone, dark: boolean): string {
   return dark ? darkToneClassByTone[tone] : lightToneClassByTone[tone]

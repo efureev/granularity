@@ -187,16 +187,20 @@ export function getColorClassExpression(className: string, prefix: string): stri
 
   if (className.includes(transparentToken)) return 'transparent'
 
-  const start = className.indexOf(prefix)
+  // `text-[` — префикс не только цвета: кегль из токена приезжает как
+  // `text-[length:var(--gr-text-sm)]` и в шкале классов стоит раньше цвета.
+  for (let start = className.indexOf(prefix); start !== -1; start = className.indexOf(prefix, start + 1)) {
+    const valueStart = start + prefix.length
+    const valueEnd = className.indexOf(']', valueStart)
 
-  if (start === -1) return undefined
+    if (valueEnd === -1) return undefined
 
-  const valueStart = start + prefix.length
-  const valueEnd = className.indexOf(']', valueStart)
+    const value = className.slice(valueStart, valueEnd).replace(/_/g, ' ')
 
-  if (valueEnd === -1) return undefined
+    if (!value.startsWith('length:')) return value
+  }
 
-  return className.slice(valueStart, valueEnd).replace(/_/g, ' ')
+  return undefined
 }
 
 function readSrc(relativePath: string): string {

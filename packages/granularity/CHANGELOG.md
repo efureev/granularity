@@ -315,6 +315,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed — BREAKING
 
+- **`--gr-radius-chip` is renamed to `--gr-radius-control`.** The 6px step is the corner radius of every field shell in
+  the package — `GrInput`, `GrSelect`, `GrTextarea`, `GrTreeSelect`, `GrNumberInput`, `GrAutocomplete`, `GrInputTag`,
+  plus `GrTooltip` and `GrKbd` — and a name saying "chip" described one of its smallest consumers. Chips and `×`
+  buttons keep using it. Migration is a rename: `var(--gr-radius-chip)` → `var(--gr-radius-control)`, same 6px.
+
 - **Slots renamed to fit the vocabulary: `errors` → `error`, `foot` → `footer`, `head` → `header`.** One role was
   going by two names — `errors` in `GrFormFile` against `error` in `GrFormField` and the dialogs, `foot`/`head` in
   `GrTable` and `GrDataTable` against `footer`/`header` in seven other components — so a consumer moving between them
@@ -341,6 +346,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   code and its `gr.fileValidation.maxSize` key are gone from all three locales.
 
 ### Changed
+
+- **Font sizes and radii now come from tokens everywhere, including the ones that looked fine.** Around a hundred
+  places still styled themselves with UnoCSS scale utilities — `text-sm`, `rounded-md`, `leading-6`. Their values
+  matched the tokens, which is exactly what made them dangerous: nothing looked wrong, yet overriding `--gr-text-sm`
+  in a theme moved nothing, because `text-sm` had baked `.875rem` into the stylesheet. Every one of them is now
+  `text-[length:var(--gr-*)]` / `rounded-[var(--gr-radius-*)]`, so the type and shape scales are finally themeable end
+  to end. Two details were easy to get wrong and are worth knowing if you have the same utilities in your own code.
+  First, `text-*` in UnoCSS sets font-size *and* line-height, so each converted site also carries a paired
+  `leading-[var(--gr-leading-*)]` — a new set of absolute steps (`xs`, `sm`, `base`, `xl`, `3xl`) alongside the
+  existing ratio tokens, which stay for prose. Second, the radius steps are offset by one name: `rounded-md` is 6px,
+  not 8px, so the shells of every field map to `--gr-radius-control`, and `rounded-lg` (8px) is what `--gr-radius-md`
+  means. Nothing moved on screen — the visual baselines were not re-shot. The gate `styleTokens.test.ts` now refuses
+  scale utilities the same way it already refused pixel literals, and reads all of `src` rather than components only.
+  One consequence worth knowing if you restyle a component from outside: a class like `label-class="text-xs"` used to
+  set the font size and the line height in one go, and now sets only the size — the component's own
+  `leading-[var(--gr-leading-*)]` keeps the interval. Override the pair, not half of it.
 
 - **One modal shell instead of three hand-wired copies.** `GrModal`, `GrDrawer` and `GrImageViewer` each assembled
   modality by hand out of six primitives — overlay stack, focus trap, `inert`, scroll lock, portal and DOM presence —

@@ -9,7 +9,7 @@ const approvals = ref(false)
 <template>
   <GrFormField
     label="Release checklist"
-    label-class="font-semibold uppercase tracking-[0.12em] text-xs text-[var(--gr-fg)]"
+    label-class="font-semibold uppercase tracking-[0.12em] text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-fg)]"
   >
     <div class="grid gap-3 rounded-2xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">
       <GrCheckbox v-model="approvals">

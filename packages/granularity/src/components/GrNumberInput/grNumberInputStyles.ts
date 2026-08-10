@@ -46,12 +46,12 @@ export const disabledShellClass = 'bg-[var(--gr-disabled-bg)] text-[var(--gr-dis
 const stepperBaseClass = 'inline-flex items-center justify-center text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] active:bg-[var(--gr-muted)] disabled:cursor-not-allowed disabled:text-[var(--gr-disabled-fg)] disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 /** Компактная кнопка вертикального стека ± . */
-export const stepperCompactClass = `h-4 w-7 rounded ${stepperBaseClass}`
+export const stepperCompactClass = `h-4 w-7 rounded-[var(--gr-radius-sm)] ${stepperBaseClass}`
 
 /** Кнопка бокового стека ± — занимает всю высоту поля. */
 export const stepperWideClass = `h-full w-full ${stepperBaseClass}`
 
-export const clearButtonClass = 'absolute top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-full text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const clearButtonClass = 'absolute top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-[var(--gr-radius-full)] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export function grNumberInputShellClass(options: { disabled: boolean, state: GrNumberInputState, invalid: boolean }): string {
   return [

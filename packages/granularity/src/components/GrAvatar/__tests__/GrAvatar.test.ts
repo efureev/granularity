@@ -21,7 +21,7 @@ describe('GrAvatar', () => {
     expect(wrapper.find('img').exists()).toBe(false)
     expect(root.attributes('class')).toContain('inline-flex')
     expect(root.attributes('class')).toContain('overflow-hidden')
-    expect(root.attributes('class')).toContain('rounded-full')
+    expect(root.attributes('class')).toContain('rounded-[var(--gr-radius-full)]')
     expect(root.attributes('style')).toContain('width: 40px;')
     expect(root.attributes('style')).toContain('height: 40px;')
   })

@@ -50,7 +50,7 @@ export const invalidClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[v
 
 export type GrInputState = keyof typeof states
 
-export const shellBaseClass = 'relative w-full overflow-hidden rounded-md border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const shellBaseClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-control)] border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 export const shellEnabledClass = 'bg-[var(--gr-bg)]'
 

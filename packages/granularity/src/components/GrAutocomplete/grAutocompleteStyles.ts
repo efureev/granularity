@@ -20,7 +20,7 @@ export type GrAutocompleteModelValue<TValue extends GrAutocompleteValue = string
  * т.к. фокус живёт на вложенном `<input role="combobox">`. Flex-контейнер с
  * `flex-wrap` — чтобы chips в multiple-режиме переносились и коробка росла в высоту.
  */
-export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-md border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 export const autocompleteShellEnabledClass = 'bg-[var(--gr-bg)]'
 
@@ -48,7 +48,7 @@ export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
 }
 
 // Chip (multiple): удаляемый тег выбранного значения перед инпутом.
-export const autocompleteChipClass = 'inline-flex max-w-full items-center gap-1 rounded-[var(--gr-radius-chip)] bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-control-text-xs)] leading-tight text-[var(--gr-fg)]'
+export const autocompleteChipClass = 'inline-flex max-w-full items-center gap-1 rounded-[var(--gr-radius-control)] bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-control-text-xs)] leading-tight text-[var(--gr-fg)]'
 
 export function autocompleteShellClass(options: {
   size: GrAutocompleteSize

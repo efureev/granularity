@@ -247,10 +247,10 @@ describe('GrCheckbox', () => {
 
   it('масштабирует контрол, иконку и подпись пропом size', () => {
     const sizes = {
-      xs: { control: 'h-3', icon: 'h-2.5', label: 'text-xs' },
-      sm: { control: 'h-3.5', icon: 'h-3', label: 'text-sm' },
-      md: { control: 'h-4', icon: 'h-3.5', label: 'text-sm' },
-      lg: { control: 'h-5', icon: 'h-4', label: 'text-base' },
+      xs: { control: 'h-3', icon: 'h-2.5', label: 'text-[length:var(--gr-text-xs)]' },
+      sm: { control: 'h-3.5', icon: 'h-3', label: 'text-[length:var(--gr-text-sm)]' },
+      md: { control: 'h-4', icon: 'h-3.5', label: 'text-[length:var(--gr-text-sm)]' },
+      lg: { control: 'h-5', icon: 'h-4', label: 'text-[length:var(--gr-text-base)]' },
     } as const
 
     for (const [size, expected] of Object.entries(sizes)) {

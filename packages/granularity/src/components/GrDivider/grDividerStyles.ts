@@ -39,7 +39,7 @@ export const verticalSpacingClass: Record<GrDividerSpacing, string> = {
   lg: 'mx-4',
 }
 
-export const labelRootClass = 'flex w-full items-center gap-3 text-xs text-[var(--gr-muted-fg)]'
+export const labelRootClass = 'flex w-full items-center gap-3 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]'
 
 /** Отрезок линии рядом с подписью: тянется по остатку ширины. */
 export const labelLineClass = 'flex-1'

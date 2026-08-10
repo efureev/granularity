@@ -20,7 +20,7 @@ export const rootLabelPositions: Record<GrSwitchLabelPosition, string> = {
 }
 
 export const trackBase =
-    'relative inline-flex shrink-0 items-center rounded-full border border-[var(--gr-switch-track-brd)] transition-colors duration-[var(--gr-duration-fast)]'
+    'relative inline-flex shrink-0 items-center rounded-[var(--gr-radius-full)] border border-[var(--gr-switch-track-brd)] transition-colors duration-[var(--gr-duration-fast)]'
 
 export const trackSizes: Record<GrSwitchSize, string> = {
     xs: 'h-4 w-7',
@@ -30,7 +30,7 @@ export const trackSizes: Record<GrSwitchSize, string> = {
 }
 
 export const thumbBase =
-    'inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-transform duration-[var(--gr-duration-fast)]'
+    'inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-transform duration-[var(--gr-duration-fast)]'
 
 export const thumbSizes: Record<GrSwitchSize, string> = {
     xs: 'h-3 w-3',
@@ -77,10 +77,10 @@ export const labelBase = 'text-[var(--gr-muted-fg)]'
 export const labelDisabledClass = 'text-[var(--gr-disabled-fg)]'
 
 export const labelSizes: Record<GrSwitchSize, string> = {
-    xs: 'text-xs',
-    sm: 'text-sm',
-    md: 'text-sm',
-    lg: 'text-base',
+    xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+    sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+    md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+    lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 export function grSwitchRootClass(labelPosition: GrSwitchLabelPosition): string {

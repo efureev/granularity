@@ -6,16 +6,16 @@ export type GrFormFileSize = GrComponentSize
 export const textSizes: Record<GrFormFileSize, string> = {
   xs: 'text-[length:var(--gr-control-text-xs)]',
   sm: 'text-[length:var(--gr-control-text-sm)]',
-  md: 'text-sm',
-  lg: 'text-base',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }
 
 /** Ссылка «удалить» у элемента списка — на ступень мельче имени файла. */
 export const removeTextSizes: Record<GrFormFileSize, string> = {
   xs: 'text-[length:var(--gr-control-text-3xs)]',
   sm: 'text-[length:var(--gr-control-text-2xs)]',
-  md: 'text-xs',
-  lg: 'text-sm',
+  md: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
 }
 
 export const rowGaps: Record<GrFormFileSize, string> = {

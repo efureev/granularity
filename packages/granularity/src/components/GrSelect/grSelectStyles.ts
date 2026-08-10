@@ -34,7 +34,7 @@ export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string> =
   | GrSelectOptionGroup<TValue>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
-export const defaultBaseClass = 'w-full rounded-md border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const defaultBaseClass = 'w-full rounded-[var(--gr-radius-control)] border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 /**
  * Цвет рамки по состоянию — та же карта, что у `GrInput` и `GrTextarea`: поля
@@ -53,7 +53,7 @@ export const borderClassByState: Record<GrSelectState, string> = {
  * валидации, и тема вправе развести их по цвету.
  */
 export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
-export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[var(--gr-radius-chip)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
@@ -131,7 +131,7 @@ export const grSelectLinkNativeOverlayClass = 'peer absolute inset-0 w-full h-fu
  * Классы видимой метки для `view="link"` + `optionsView="native"` (поверх прозрачного `<select>`).
  * Получает все link-стили (size/variant/underline), а также focus-ring через `peer-focus-visible`.
  */
-export const grSelectLinkNativeLabelBaseClass = 'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[var(--gr-radius-chip)] transition-colors duration-[var(--gr-duration-fast)]'
+export const grSelectLinkNativeLabelBaseClass = 'pointer-events-none inline-block whitespace-nowrap align-baseline rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)]'
 export const grSelectLinkNativeLabelDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)] no-underline'
 export const grSelectLinkNativeLabelFocusClass = 'peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--gr-ring)]'
 

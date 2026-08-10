@@ -816,7 +816,7 @@ defineExpose({
               data-gr-file-upload-preview
               :src="previewUrl(file)"
               alt=""
-              class="h-8 w-8 shrink-0 rounded object-cover border border-[var(--gr-brd)]"
+              class="h-8 w-8 shrink-0 rounded-[var(--gr-radius-sm)] object-cover border border-[var(--gr-brd)]"
             >
             <span class="font-600">{{ file.name }}</span>
             <span class="text-[var(--gr-muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
@@ -834,7 +834,7 @@ defineExpose({
                 v-if="entryFor(file)!.status === 'uploading'"
                 data-gr-file-upload-abort-file
                 type="button"
-                class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
+                class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
                 :aria-label="t('gr.fileUpload.abortFile', 'Cancel upload of {fileName}', { fileName: file.name })"
                 @click.stop="abortFile(file)"
               >
@@ -847,7 +847,7 @@ defineExpose({
                 v-else-if="entryFor(file)!.status === 'error' && !isDisabled && !isReadonly"
                 data-gr-file-upload-retry-file
                 type="button"
-                class="ml-auto text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded underline"
+                class="ml-auto text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)] underline"
                 :aria-label="t('gr.fileUpload.retryFile', 'Retry {fileName}', { fileName: file.name })"
                 @click.stop="retryFile(file)"
               >
@@ -859,7 +859,7 @@ defineExpose({
               v-if="!isDisabled && !isReadonly"
               data-gr-file-upload-remove
               type="button"
-              class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded"
+              class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
               :aria-label="t('gr.fileUpload.remove', 'Remove {fileName}', { fileName: file.name })"
               @click.stop="removeFile(file)"
             >

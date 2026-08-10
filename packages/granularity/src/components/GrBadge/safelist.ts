@@ -10,7 +10,7 @@ export const grBadgeSafelist = [...new Set([
   ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
   ...Object.values(semiRadiusClassBySize).flatMap(splitClassTokens),
   'rounded-[var(--gr-radius-none)]',
-  'rounded-full',
+  'rounded-[var(--gr-radius-full)]',
   ...Object.values(lightToneClassByTone).flatMap(splitClassTokens),
   ...Object.values(darkToneClassByTone).flatMap(splitClassTokens),
 ])]

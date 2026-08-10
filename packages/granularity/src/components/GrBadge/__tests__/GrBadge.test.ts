@@ -47,7 +47,7 @@ describe('GrBadge', () => {
     expect(semi.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg,7px)]')
 
     const round = mount(GrBadge, { props: { radius: 'round' }, slots: { default: 'Round' } })
-    expect(round.attributes('class')).toContain('rounded-full')
+    expect(round.attributes('class')).toContain('rounded-[var(--gr-radius-full)]')
   })
 
   it('рендерит dark filled tone при dark=true', () => {

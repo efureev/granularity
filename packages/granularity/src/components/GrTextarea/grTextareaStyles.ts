@@ -47,7 +47,7 @@ export const enabledSurfaceClass = 'bg-[var(--gr-bg)]'
  */
 export const disabledSurfaceClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
 
-export const countClass = 'mt-1 text-right text-xs text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
+export const countClass = 'mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
 
 export function grTextareaClass(options: { state: GrTextareaState, invalid: boolean }): string {
   return options.invalid ? invalidBorderClass : borderClassByState[options.state]

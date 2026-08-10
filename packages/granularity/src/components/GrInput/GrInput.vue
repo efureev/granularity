@@ -339,7 +339,7 @@ function togglePassword(): void {
             type="button"
             data-gr-input-clear
             :aria-label="resolvedClearLabel"
-            class="flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+            class="flex h-6 w-6 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
             @click="clear"
         >
           <IconX class="h-4 w-4" aria-hidden="true" />
@@ -351,7 +351,7 @@ function togglePassword(): void {
             data-gr-input-password-toggle
             :aria-label="passwordVisible ? resolvedPasswordHideLabel : resolvedPasswordShowLabel"
             :aria-pressed="passwordVisible ? 'true' : 'false'"
-            class="flex h-6 w-6 items-center justify-center rounded text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+            class="flex h-6 w-6 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
             @click="togglePassword"
         >
           <IconEyeOff v-if="passwordVisible" class="h-4 w-4" aria-hidden="true" />
@@ -376,7 +376,7 @@ function togglePassword(): void {
         v-if="showCount"
         :id="countId"
         data-gr-input-count
-        class="mt-1 text-right text-xs text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
+        class="mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
     >
       {{ countText }}
     </div>

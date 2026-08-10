@@ -11,18 +11,18 @@ export const fieldGaps: Record<GrFormFieldSize, string> = {
 }
 
 export const labelTexts: Record<GrFormFieldSize, string> = {
-  xs: 'text-xs',
-  sm: 'text-sm',
-  md: 'text-sm',
-  lg: 'text-base',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 /** Подсказка набирается на ступень мельче подписи — она вторична. */
 export const hintTexts: Record<GrFormFieldSize, string> = {
-  xs: 'text-xs',
-  sm: 'text-xs',
-  md: 'text-xs',
-  lg: 'text-sm',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
 }
 
 export const errorTexts: Record<GrFormFieldSize, string> = labelTexts

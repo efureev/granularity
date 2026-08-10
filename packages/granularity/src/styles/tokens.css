@@ -53,7 +53,22 @@
   --gr-control-text-md: 14px;
   --gr-control-text-lg: 16px;
 
-  /* Typography: line heights */
+  /*
+   * Typography: line heights
+   *
+   * Две разные вещи под одним префиксом, и различает их суффикс.
+   * Ступени (`xs`/`sm`/`base`) — абсолютные значения, парные одноимённым ступеням
+   * `--gr-text-*`: утилита `text-sm` в uno задавала кегль и межстрочный разом, и
+   * кегль, переведённый на токен в одиночку, отдал бы интервал на откуп `body`
+   * приложения. Коэффициенты (`tight`/`normal`/`relaxed`) — безразмерные, для
+   * текстовых блоков, где интервал задаётся отношением к кеглю, а не числом.
+   * Ступени заводятся по мере употребления: шкала без употребления — мёртвый груз.
+   */
+  --gr-leading-xs: 1rem;
+  --gr-leading-sm: 1.25rem;
+  --gr-leading-base: 1.5rem;
+  --gr-leading-xl: 1.75rem;
+  --gr-leading-3xl: 2.25rem;
   --gr-leading-tight: 1.25;
   --gr-leading-normal: 1.5;
   --gr-leading-relaxed: 1.625;
@@ -116,7 +131,7 @@
   --gr-radius-none: 0px;
   --gr-radius-xs: 3px;
   --gr-radius-sm: 4px;
-  --gr-radius-chip: 6px;
+  --gr-radius-control: 6px;
   --gr-radius-md: 8px;
   --gr-radius-lg: 12px;
   --gr-radius-xl: 16px;

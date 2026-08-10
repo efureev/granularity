@@ -361,10 +361,12 @@ const lightThemeCssExcerpt = renderThemeExcerpt('light', ':root', themeExcerptTo
 
 const darkThemeCssExcerpt = renderThemeExcerpt('dark', "[data-theme='dark']", themeExcerptTokenNames)
 
+// Срез обязан дотягиваться дальше палитры — до типографики, интервалов и
+// радиусов: иначе страница Foundations показывает один список цветов.
 const tokensCssExcerpt = [
   ':root {',
   ...showcaseFoundationTokens
-    .slice(0, 42)
+    .slice(0, 48)
     .map(token => `  ${token.name}: ${token.value};`),
   '}',
 ].join('\n')
