@@ -686,6 +686,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **A `GrDropdown` panel that holds content rather than a menu is usable from the keyboard again.** With
+  `closeOnContentClick={false}` the panel is a place for fields and checkboxes — the package's own "persistent
+  content" example is a filter panel — and none of it could be reached without a mouse. `Tab` closes the panel by
+  design, arrow navigation only ever looked for `[role=menuitem]`, links and buttons, and every printable key was
+  swallowed by the menu typeahead, so a focused checkbox could not even be toggled with `Space`. Three things
+  changed. The focus ring is now collected by the package's shared focusable rules, so anything focusable in the
+  panel — inputs, textareas, selects, `contenteditable` — is reachable with arrows, and elements hidden by a
+  `position: fixed` ancestor are no longer dropped by the old `offsetParent` heuristic. Keys a focused control owns
+  stay with it: printable characters and `Home`/`End` no longer reach the typeahead while focus is in a field.
+  `Space` on an empty typeahead buffer activates the focused item instead of starting a search, which is both the
+  native behaviour of the buttons menu items are made of and the WAI-ARIA APG rule; it still joins the buffer once a
+  search is under way. Arrows are the deliberate exception and remain the panel's — since `Tab` closes the panel,
+  they are the only way out of a field inside it.
 - **`readonly` is now airtight.** Two controls declared `aria-readonly` yet still accepted changes: the native
   `<select>` of `GrSelect` (no native `readonly` exists there — the DOM value is now reverted to the model, the same
   trick `GrCheckbox` uses for `<label for>`), and `GrNumberInput`, where Home/End jumped to `min`/`max`. A readonly

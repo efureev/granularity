@@ -18,6 +18,20 @@ export function isComposingEvent(event: KeyboardEvent): boolean {
   return event.isComposing || event.keyCode === 229
 }
 
+/**
+ * Фокус на контроле, который сам распоряжается печатными клавишами.
+ *
+ * Нужен всем, кто вешает клавиатурные команды на контейнер: горячая клавиша и
+ * typeahead меню обязаны молчать, пока пользователь печатает в поле внутри них.
+ */
+export function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  if (target.isContentEditable) return true
+
+  const tag = target.tagName
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+}
+
 /** Физический код клавиши для латинской буквы или цифры; иначе `null`. */
 export function codeForChar(ch: string): string | null {
   if (/^[a-z]$/i.test(ch)) return `Key${ch.toUpperCase()}`

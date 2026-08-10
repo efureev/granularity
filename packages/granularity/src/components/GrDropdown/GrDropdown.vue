@@ -7,6 +7,8 @@ import { vClickOutside } from '../../directives'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
+import { getFocusableElements } from '../../composables/internal/focusables'
+import { isEditableTarget } from '../../internal/keyboard'
 import {
   grDropdownContentClass,
   grDropdownOriginClass,
@@ -81,13 +83,14 @@ const clickOutsideExclude = [() => panelEl.value]
 
 const panelId = useId()
 
-// Фокусируемые пункты панели для клавиатурной навигации (roving-фокус).
+/**
+ * Кольцо roving-фокуса.
+ *
+ * `tabbableOnly: false` — не оплошность: пункты меню намеренно `tabindex="-1"`
+ * (см. `GrDropdownMenuItem`), и список участников таб-порядка был бы пуст.
+ */
 function panelItems(): HTMLElement[] {
-  const root = panelEl.value
-  if (!root)
-    return []
-  const selector = '[role="menuitem"], a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  return Array.from(root.querySelectorAll<HTMLElement>(selector)).filter(el => el.offsetParent !== null || el === document.activeElement)
+  return getFocusableElements(panelEl.value, { tabbableOnly: false })
 }
 
 function focusItemAt(index: number): void {
@@ -184,7 +187,14 @@ function onPanelKeydown(event: KeyboardEvent): void {
   const items = panelItems()
   const currentIndex = items.indexOf(document.activeElement as HTMLElement)
 
+  // Панель бывает не только меню из кнопок: с `closeOnContentClick={false}` в
+  // ней живут поля и чекбоксы. Клавиши, которые сфокусированный контрол умеет
+  // сам, остаются ему — иначе в поле не напечатать, а чекбокс не переключить.
+  const editable = isEditableTarget(event.target)
+
   switch (event.key) {
+    // Стрелки — исключение: они за меню даже в поле. `Tab` панель закрывает, и
+    // без них из поля внутри панели не было бы выхода вовсе.
     case 'ArrowDown':
       event.preventDefault()
       focusItemAt(currentIndex + 1)
@@ -194,10 +204,14 @@ function onPanelKeydown(event: KeyboardEvent): void {
       focusItemAt(currentIndex - 1)
       return
     case 'Home':
+      if (editable)
+        return
       event.preventDefault()
       focusItemAt(0)
       return
     case 'End':
+      if (editable)
+        return
       event.preventDefault()
       focusItemAt(-1)
       return
@@ -205,6 +219,15 @@ function onPanelKeydown(event: KeyboardEvent): void {
       close()
       return
   }
+
+  if (editable)
+    return
+
+  // Пробел при пустом буфере — активация сфокусированного пункта, а не поиск:
+  // пункты меню это кнопки, и пробел для них родная клавиша. В буфер он входит,
+  // только когда поиск уже идёт (правило typeahead из WAI-ARIA APG).
+  if (event.key === ' ' && typeaheadBuffer === '')
+    return
 
   // Печатный символ без модификаторов — поиск по пунктам, а не команда.
   if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {

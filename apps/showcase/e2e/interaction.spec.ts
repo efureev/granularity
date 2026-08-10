@@ -136,3 +136,35 @@ test.describe('GrBreadcrumbs: схлопывание по ширине', () => {
     await expect(items).toHaveCount(6)
   })
 })
+
+test.describe('GrDropdown: панель с содержимым, а не с меню', () => {
+  /**
+   * Демо `closeOnContentClick={false}` с нативными чекбоксами: до них не дойти
+   * табом (`Tab` панель закрывает), и весь путь к ним — стрелки, а переключение
+   * — пробел. jsdom не даёт ни того, ни другого: там чекбокс не активируется.
+   */
+  test('до чекбокса в панели доходят стрелки, а переключает его пробел', async ({ page }) => {
+    await page.goto(componentPath('GrDropdown'))
+    await page.locator('#live-examples').waitFor()
+
+    await page.getByRole('button', { name: 'Filters' }).focus()
+    await page.keyboard.press('Enter')
+
+    const panel = page.locator('[data-gr-dropdown-panel]').filter({ hasText: 'Visible states' })
+    await expect(panel).toBeVisible()
+
+    const checkboxes = panel.locator('input[type="checkbox"]')
+    await expect(checkboxes.first()).toBeFocused()
+    await expect(checkboxes.first()).toBeChecked()
+
+    await page.keyboard.press('ArrowDown')
+    await expect(checkboxes.nth(1)).toBeFocused()
+    await expect(checkboxes.nth(1)).not.toBeChecked()
+
+    await page.keyboard.press(' ')
+    await expect(checkboxes.nth(1)).toBeChecked()
+
+    // Итог виден снаружи панели: демо печатает выбранное в бейдже под меню.
+    await expect(page.getByText('Errors, Warnings')).toBeVisible()
+  })
+})

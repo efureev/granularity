@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent, nextTick } from 'vue'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrDropdown from '../GrDropdown.vue'
 
@@ -189,22 +189,7 @@ describe('GrDropdown a11y (item 18)', () => {
 })
 
 describe('GrDropdown — триггер, размещение и ширина', () => {
-  // В jsdom `offsetParent` всегда `null`, а компонент по нему отсеивает скрытые
-  // пункты — без подмены список пунктов пуст и клавиатуре некуда вести фокус.
-  let offsetParentSpy: PropertyDescriptor | undefined
-
-  beforeEach(() => {
-    offsetParentSpy = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetParent')
-    Object.defineProperty(HTMLElement.prototype, 'offsetParent', {
-      configurable: true,
-      get() { return this.parentElement },
-    })
-  })
-
   afterEach(() => {
-    if (offsetParentSpy)
-      Object.defineProperty(HTMLElement.prototype, 'offsetParent', offsetParentSpy)
-
     // Панели телепортируются в `body` и переживают unmount обёртки: без уборки
     // следующий тест нашёл бы чужую панель и проверил бы не то.
     document.body.innerHTML = ''
@@ -426,6 +411,202 @@ describe('GrDropdown — триггер, размещение и ширина', 
   })
 })
 
+describe('GrDropdown — кольцо фокуса внутри панели', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    vi.restoreAllMocks()
+  })
+
+  /** Открывает панель с клавиатуры: фокус сразу на первом пункте кольца. */
+  async function mountPanel(content: string) {
+    const Harness = defineComponent({
+      components: { GrDropdown },
+      template: `
+        <GrDropdown teleport-to="body">
+          <template #trigger="{ triggerProps }">
+            <button type="button" data-testid="trigger" v-bind="triggerProps">Меню</button>
+          </template>
+          <template #content>${content}</template>
+        </GrDropdown>
+      `,
+    })
+
+    const wrapper = mount(Harness, { attachTo: document.body })
+    await wrapper.get('[data-testid="trigger"]').trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+
+    return wrapper
+  }
+
+  const MENU = `
+    <button type="button" data-testid="item-apple" role="menuitem" tabindex="-1">Apple</button>
+    <button type="button" data-testid="item-banana" role="menuitem" tabindex="-1">Banana</button>
+    <button type="button" data-testid="item-cherry" role="menuitem" tabindex="-1">Cherry</button>
+  `
+
+  /** Клавиша с конкретной цели: перехват решается по `event.target`. */
+  function press(target: Element, key: string): KeyboardEvent {
+    const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+    target.dispatchEvent(event)
+    return event
+  }
+
+  function focused(): string | null | undefined {
+    return document.activeElement?.getAttribute('data-testid')
+  }
+
+  function panelOf(): HTMLElement {
+    return document.body.querySelector<HTMLElement>('[data-gr-dropdown-panel]')!
+  }
+
+  it('↓/↑ ходят по кругу, Home/End бросают к краям', async () => {
+    const wrapper = await mountPanel(MENU)
+    const panel = panelOf()
+
+    expect(focused()).toBe('item-apple')
+
+    press(panel, 'ArrowDown')
+    expect(focused()).toBe('item-banana')
+
+    press(panel, 'ArrowUp')
+    expect(focused()).toBe('item-apple')
+
+    // Кольцо, а не отрезок: с первого вверх — на последний.
+    press(panel, 'ArrowUp')
+    expect(focused()).toBe('item-cherry')
+
+    press(panel, 'ArrowDown')
+    expect(focused()).toBe('item-apple')
+
+    press(panel, 'End')
+    expect(focused()).toBe('item-cherry')
+
+    press(panel, 'Home')
+    expect(focused()).toBe('item-apple')
+
+    wrapper.unmount()
+  })
+
+  it('Tab закрывает панель, а не уводит фокус по таб-порядку', async () => {
+    const wrapper = await mountPanel(MENU)
+
+    press(panelOf(), 'Tab')
+    await nextTick()
+
+    expect(panelOf().style.display).toBe('none')
+
+    wrapper.unmount()
+  })
+
+  it('пункт с aria-disabled остаётся в кольце, нативно disabled — выпадает', async () => {
+    const wrapper = await mountPanel(`
+      <button type="button" data-testid="item-apple" role="menuitem" tabindex="-1">Apple</button>
+      <button type="button" data-testid="item-off" role="menuitem" tabindex="-1" aria-disabled="true">Off</button>
+      <button type="button" data-testid="item-native-off" role="menuitem" tabindex="-1" disabled>Native</button>
+      <button type="button" data-testid="item-cherry" role="menuitem" tabindex="-1">Cherry</button>
+    `)
+    const panel = panelOf()
+
+    // `aria-disabled` оставляет пункт фокусируемым намеренно: пользователь
+    // узнаёт, что действие есть, но сейчас недоступно (WAI-ARIA APG).
+    press(panel, 'ArrowDown')
+    expect(focused()).toBe('item-off')
+
+    // Нативный `disabled` браузер не фокусирует — в кольце ему делать нечего.
+    press(panel, 'ArrowDown')
+    expect(focused()).toBe('item-cherry')
+
+    wrapper.unmount()
+  })
+
+  it('скрытый пункт выпадает из кольца', async () => {
+    // Скрыт сам элемент, а не предок: в jsdom нет раскладки, и общий сборщик
+    // фокусируемых честно смотрит только на собственные стили элемента.
+    const wrapper = await mountPanel(`
+      <button type="button" data-testid="item-apple" role="menuitem" tabindex="-1">Apple</button>
+      <button type="button" data-testid="item-hidden" role="menuitem" tabindex="-1" hidden>Hidden</button>
+      <button type="button" data-testid="item-none" role="menuitem" tabindex="-1" style="display: none">None</button>
+      <button type="button" data-testid="item-cherry" role="menuitem" tabindex="-1">Cherry</button>
+    `)
+
+    press(panelOf(), 'ArrowDown')
+    expect(focused()).toBe('item-cherry')
+
+    wrapper.unmount()
+  })
+
+  it('поле внутри панели попадает в кольцо, и печатать в нём можно', async () => {
+    const wrapper = await mountPanel(`
+      <input data-testid="query">
+      <button type="button" data-testid="item-banana" role="menuitem" tabindex="-1">Banana</button>
+    `)
+    const panel = panelOf()
+
+    // Раньше `input` в кольцо не входил: до поля внутри панели было не добраться
+    // ни стрелками, ни табом — тот панель закрывает.
+    expect(focused()).toBe('query')
+
+    const input = document.body.querySelector<HTMLInputElement>('[data-testid="query"]')!
+    const typed = press(input, 'b')
+
+    expect(typed.defaultPrevented).toBe(false)
+    expect(focused()).toBe('query')
+
+    // Стрелки — исключение: они остаются за меню, иначе из поля нет выхода.
+    press(input, 'ArrowDown')
+    expect(focused()).toBe('item-banana')
+
+    // Та же буква с пункта — уже typeahead, а не ввод.
+    const search = press(panel, 'b')
+    expect(search.defaultPrevented).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('Home/End в поле двигают каретку, а не фокус', async () => {
+    const wrapper = await mountPanel(`
+      <input data-testid="query">
+      <button type="button" data-testid="item-banana" role="menuitem" tabindex="-1">Banana</button>
+    `)
+
+    const input = document.body.querySelector<HTMLInputElement>('[data-testid="query"]')!
+
+    const home = press(input, 'End')
+    expect(home.defaultPrevented).toBe(false)
+    expect(focused()).toBe('query')
+
+    wrapper.unmount()
+  })
+
+  it('пробел достаётся чекбоксу и кнопке-пункту, но входит в непустой буфер', async () => {
+    const wrapper = await mountPanel(`
+      <input type="checkbox" data-testid="flag">
+      <button type="button" data-testid="item-banana" role="menuitem" tabindex="-1">Banana</button>
+      <button type="button" data-testid="item-b-c" role="menuitem" tabindex="-1">B C</button>
+    `)
+    const panel = panelOf()
+
+    const checkbox = document.body.querySelector<HTMLInputElement>('[data-testid="flag"]')!
+    const toggle = press(checkbox, ' ')
+
+    // Перехваченный пробел не давал переключить чекбокс внутри панели вовсе.
+    expect(toggle.defaultPrevented).toBe(false)
+
+    // На кнопке-пункте пробел — нативная активация, пока поиск не начат.
+    const item = document.body.querySelector<HTMLElement>('[data-testid="item-banana"]')!
+    item.focus()
+    expect(press(item, ' ').defaultPrevented).toBe(false)
+
+    // А в начатом поиске пробел — часть запроса: «b c» находит «B C».
+    press(panel, 'b')
+    const inSearch = press(panel, ' ')
+    expect(inSearch.defaultPrevented).toBe(true)
+    press(panel, 'c')
+    expect(focused()).toBe('item-b-c')
+
+    wrapper.unmount()
+  })
+})
 
 describe('GrDropdown — императивный API', () => {
   it('open/close/toggle правят собственное состояние: модели у меню нет', async () => {

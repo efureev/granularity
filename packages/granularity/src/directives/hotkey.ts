@@ -1,6 +1,6 @@
 import type { Directive } from 'vue'
 
-import { eventMatchesKey, isComposingEvent, shiftSatisfied } from '../internal/keyboard'
+import { eventMatchesKey, isComposingEvent, isEditableTarget, shiftSatisfied } from '../internal/keyboard'
 
 export type HotkeyHandler = (event: KeyboardEvent) => void
 
@@ -53,14 +53,6 @@ type InternalState = {
 }
 
 const states = new WeakMap<HTMLElement, InternalState>()
-
-function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false
-  if (target.isContentEditable) return true
-
-  const tag = target.tagName
-  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
-}
 
 function normalizeBinding(value: HotkeyBindingValue | undefined) {
   if (!value) return { enabled: false, handlers: {} as HotkeyMap, scope: 'global' as HotkeyScope }
