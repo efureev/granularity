@@ -65,7 +65,6 @@ function escapeAttribute(value: string) {
 
 function pushToast() {
   activateHost()
-  clear()
   push({
     tone: tone.value,
     title: effectiveTitle.value,

@@ -117,12 +117,15 @@ let measured: { items: number[], separator: number } | null = null
  * ужать хвост ещё на пункт, а не вернуть спрятанное, поэтому качелей не будет.
  */
 let ellipsisWidth = 0
+/** Ширина, на которой считали в прошлый раз: по её смене раскрытый путь сворачивается. */
+let lastAvailable = 0
 
 // Новый путь — новая страница: раскрытая середина прошлого пути к ней отношения
 // не имеет, а измеренные ширины относятся к прошлым подписям.
 watch(() => props.items, () => {
   expanded.value = false
   measured = null
+  ellipsisWidth = 0
   fitAfter.value = undefined
   void nextTick(measure)
 })
@@ -207,13 +210,23 @@ function measure(): void {
   // jsdom и скрытый контейнер отдают 0 — решать по такой ширине нечего.
   if (available <= 0) return
 
+  lastAvailable = available
+
   fitAfter.value = resolveBreadcrumbsFit({
     itemWidths: measured.items,
     separatorWidth: measured.separator,
     ellipsisWidth,
     available,
     itemsBeforeCollapse: props.itemsBeforeCollapse,
+    gapWidth: listGap(list),
   })
+}
+
+/** Зазор списка в пикселях: он задан классом, а не пропом, поэтому спрашиваем стиль. */
+function listGap(list: HTMLElement): number {
+  if (typeof getComputedStyle !== 'function') return 0
+
+  return Number.parseFloat(getComputedStyle(list).columnGap) || 0
 }
 
 /**
@@ -233,6 +246,7 @@ watch(() => props.autoCollapse, (enabled) => {
   }
 
   measured = null
+  ellipsisWidth = 0
   fitAfter.value = undefined
 })
 
@@ -242,7 +256,16 @@ onMounted(() => {
   // На сервере и в jsdom `ResizeObserver` отсутствует — измерять там нечего.
   if (typeof ResizeObserver === 'undefined') return
 
-  observer = new ResizeObserver(() => measure())
+  observer = new ResizeObserver(() => {
+    // Смена ширины — новая раскладка, и раскрытая руками середина относилась к
+    // прежней. Свернуть её иначе нечем: в раскрытом пути кнопки «…» нет, то есть
+    // поворот телефона оставлял бы путь развёрнутым навсегда. Высота меняется от
+    // самого раскрытия (путь переносится на вторую строку) — на неё не реагируем.
+    if (expanded.value && listEl.value && listEl.value.clientWidth !== lastAvailable)
+      expanded.value = false
+
+    measure()
+  })
   if (listEl.value) observer.observe(listEl.value)
 })
 
@@ -271,7 +294,7 @@ async function expand(): Promise<void> {
     <ol
       ref="listEl"
       data-gr-breadcrumbs-list
-      :class="[breadcrumbsListClass, autoCollapse ? breadcrumbsListNowrapClass : breadcrumbsListWrapClass]"
+      :class="[breadcrumbsListClass, autoCollapse && !expanded ? breadcrumbsListNowrapClass : breadcrumbsListWrapClass]"
     >
       <template v-for="(entry, position) in entries" :key="entry.kind === 'item' ? `item-${entry.index}` : 'ellipsis'">
         <!--

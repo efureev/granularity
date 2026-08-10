@@ -8,41 +8,50 @@ const expanded = ref<Array<string | number>>(['filters'])
 
 <template>
   <!-- Аккордеон уже внутри карточки: borderless снимает вторую рамку и вторую тень. -->
-  <GrCard class="p-4">
-    <h2 class="m-0 mb-3 text-base font-600 text-[var(--gr-fg)]">
-      Report settings
-    </h2>
+  <GrCard padding="md" body-class="grid gap-3">
+    <template #header>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="m-0 text-base font-600 text-[var(--gr-fg)]">
+          Report settings
+        </h3>
+        <GrButton size="xs" variant="ghost">
+          Reset all
+        </GrButton>
+      </div>
+    </template>
 
     <GrCollapse
       v-model="expanded"
       borderless
       size="sm"
-      :heading-level="3"
+      :heading-level="4"
       expand-icon-position="start"
       :divided="false"
     >
-      <GrCollapseItem name="filters" title="Filters">
-        <template #extra>
-          <GrBadge size="sm" tone="primary">
-            3
-          </GrBadge>
+      <GrCollapseItem name="filters">
+        <template #title>
+          <span class="flex items-center gap-2 font-600">
+            Filters
+            <GrBadge size="xs" tone="primary">3</GrBadge>
+          </span>
         </template>
-
-        Keep the accordion flush with the surrounding card: no border, no shadow, no double padding.
+        Статус секции живёт в самом заголовке: подсветка строки накрывает его целиком, и правый край
+        держат отступы карточки, а не отдельная колонка.
       </GrCollapseItem>
 
-      <GrCollapseItem name="columns" title="Columns">
-        <template #extra>
-          <GrButton size="xs" variant="ghost">
-            Reset
-          </GrButton>
+      <GrCollapseItem name="columns">
+        <template #title>
+          <span class="flex items-center gap-2 font-600">
+            Columns
+            <GrBadge size="xs" tone="neutral">12 of 18</GrBadge>
+          </span>
         </template>
-
-        The `#extra` slot renders next to the trigger, so an action inside it stays a separate control.
+        Без рамки и разделителей строку структурирует только hover — поэтому он обязан доходить до
+        правого края, а не обрываться на середине.
       </GrCollapseItem>
 
       <GrCollapseItem name="schedule" title="Delivery schedule">
-        Chevron on the left reads as a tree-like sidebar; on the right — as a classic accordion.
+        Шеврон слева читается как дерево в сайдбаре, справа — как классический аккордеон.
       </GrCollapseItem>
     </GrCollapse>
   </GrCard>

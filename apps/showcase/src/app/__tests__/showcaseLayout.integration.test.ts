@@ -231,34 +231,35 @@ describe('showcase layout integration', () => {
     expect(russian.itemLabels).toEqual(english.itemLabels)
   })
 
-  it('открывает quick search как CSS-sized панель с внутренним скроллом результатов', async () => {
+  it('общий поиск — одна палитра на страницу, кнопок-триггеров два', async () => {
     const { wrapper } = await mountShowcaseAt('/components/gr-button')
-    const searchButton = findButtonByAriaLabel(wrapper, 'Open search')
 
-    expect(searchButton).toBeTruthy()
+    // Триггеры: в шапке и в мобильном drawer'е. Палитра при этом обязана быть
+    // одна — она держит глобальный `mod+k`, и второй слушатель гасил бы открытие.
+    const searchButtons = wrapper.findAll('button')
+      .filter(button => button.attributes('aria-label') === 'Open search')
 
-    await searchButton?.trigger('click')
+    expect(searchButtons.length).toBeGreaterThan(0)
+    expect(wrapper.findAllComponents({ name: 'GrCommandPalette' })).toHaveLength(1)
+
+    await searchButtons[0].trigger('click')
     await flushPromises()
 
-    const searchPanel = wrapper.findAll('.showcase-overlay').find(node => node.text().includes('Quick search'))
+    const input = document.body.querySelector('[data-testid="gr-command-palette-input"]')
+    expect(input).toBeTruthy()
 
-    expect(searchPanel).toBeTruthy()
-    expect(searchPanel?.classes()).toContain('absolute')
-    expect(searchPanel?.classes()).toContain('flex')
-    expect(searchPanel?.classes()).toContain('flex-col')
-    expect(searchPanel?.classes()).toContain('top-[calc(100%+0.75rem)]')
-    expect(searchPanel?.classes()).toContain('w-[min(92vw,30rem)]')
-    expect(searchPanel?.classes()).toContain('max-h-[calc(100dvh-8rem)]')
-    expect(searchPanel?.attributes('style')).toBeUndefined()
+    // Пустой запрос показывает подсказанные записи витрины, а не «ничего не найдено».
+    const items = document.body.querySelectorAll('[data-gr-command-palette-item]')
+    expect(items.length).toBeGreaterThan(0)
 
-    const scrollableResults = searchPanel?.find('.overflow-y-auto')
+    // Группа — вид записи, локализованный: в индексе он техническим словом.
+    const groups = [...document.body.querySelectorAll('[data-gr-command-palette-group]')]
+      .map(group => group.textContent?.trim())
+    expect(groups).toContain('Pages')
 
-    expect(scrollableResults?.exists()).toBe(true)
-    expect(scrollableResults?.classes()).toContain('min-h-0')
-
-    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await searchButtons[0].trigger('click')
     await flushPromises()
 
-    expect(wrapper.findAll('.showcase-overlay').some(node => node.text().includes('Quick search'))).toBe(false)
+    expect(document.body.querySelector('[data-testid="gr-command-palette-input"]')).toBeNull()
   })
 })

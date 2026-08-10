@@ -1,17 +1,36 @@
 import type { GrComponentSize } from '../shared/sizes'
 
-export const collapseHeaderBase = 'w-full flex items-center gap-4 text-left transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+/**
+ * Фон строки красит строка, а не кнопка-триггер.
+ *
+ * Слот `#extra` лежит рядом с триггером, а не внутри него (иначе
+ * `nested-interactive`), поэтому подсветка, нарисованная кнопкой, обрывалась перед
+ * ним: при `divided: false` она — единственная структура строк, и обрыв заметен.
+ * Disabled гасится тем же фоном, а не `opacity`: прозрачность разбавляет
+ * выверенные на AA токены текста.
+ */
+export const collapseRowBase = 'flex items-center transition-colors duration-[var(--gr-duration-fast)]'
+export const collapseRowEnabledClass = 'hover:bg-[var(--gr-muted)]'
+export const collapseRowDisabledClass = 'bg-[var(--gr-muted)]'
 
-// Disabled гасится фоном, а не `opacity`: прозрачность разбавляет выверенные на AA
-// токены текста, а заголовок секции — самый заметный текст аккордеона.
-export const collapseHeaderEnabledClass = 'cursor-pointer hover:bg-[var(--gr-muted)]'
-export const collapseHeaderDisabledClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
+export const collapseHeaderBase = 'w-full flex items-center gap-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+export const collapseHeaderEnabledClass = 'cursor-pointer'
+export const collapseHeaderDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 
 export const collapseHeaderPaddings: Record<GrComponentSize, string> = {
   xs: 'px-3 py-2',
   sm: 'px-3 py-2.5',
   md: 'px-4 py-3',
   lg: 'px-5 py-4',
+}
+
+/** Правый инсет `#extra`: тот же горизонтальный отступ, что у заголовка строки. */
+export const collapseExtraPaddings: Record<GrComponentSize, string> = {
+  xs: 'pr-3',
+  sm: 'pr-3',
+  md: 'pr-4',
+  lg: 'pr-5',
 }
 
 export const collapseTitleBase = 'flex-1 min-w-0'
@@ -48,6 +67,13 @@ export const collapseChevronSizes: Record<GrComponentSize, GrComponentSize> = {
   sm: 'sm',
   md: 'sm',
   lg: 'md',
+}
+
+export function grCollapseRowClass(disabled: boolean): string {
+  return [
+    collapseRowBase,
+    disabled ? collapseRowDisabledClass : collapseRowEnabledClass,
+  ].join(' ')
 }
 
 export function grCollapseHeaderClass(options: { size: GrComponentSize, disabled: boolean }): string {

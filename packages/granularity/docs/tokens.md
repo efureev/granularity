@@ -425,6 +425,22 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-badge-semi-radius-sm` | только хук | 3px | Скругление бейджа `radius="semi"` на ступени `sm`. |
 | `--gr-badge-semi-radius-md` | только хук | 5px | Скругление бейджа `radius="semi"` на ступени `md`. |
 | `--gr-badge-semi-radius-lg` | только хук | 7px | Скругление бейджа `radius="semi"` на ступени `lg`. Лестница 3/3/5/7 своя: бейдж скругляется медленнее, чем растёт. |
+| `--gr-badge-neutral-bg` | тема компонента | var(--gr-fg) | Заливка filled-бейджа нейтрального веса — инверсия страницы. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-neutral-fg` | тема компонента | var(--gr-bg) | Текст filled-бейджа нейтрального веса — инверсия страницы: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-primary-bg` | тема компонента | var(--gr-primary-solid) | Заливка filled-бейджа тона `primary`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-primary-fg` | тема компонента | var(--gr-primary-solid-fg) | Текст filled-бейджа тона `primary`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-success-bg` | тема компонента | var(--gr-success-solid) | Заливка filled-бейджа тона `success`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-success-fg` | тема компонента | var(--gr-success-solid-fg) | Текст filled-бейджа тона `success`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-warning-bg` | тема компонента | var(--gr-warning-solid) | Заливка filled-бейджа тона `warning`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-warning-fg` | тема компонента | var(--gr-warning-solid-fg) | Текст filled-бейджа тона `warning`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-danger-bg` | тема компонента | var(--gr-danger-solid) | Заливка filled-бейджа тона `danger`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-danger-fg` | тема компонента | var(--gr-danger-solid-fg) | Текст filled-бейджа тона `danger`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-info-bg` | тема компонента | var(--gr-info-solid) | Заливка filled-бейджа тона `info`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-info-fg` | тема компонента | var(--gr-info-solid-fg) | Текст filled-бейджа тона `info`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-slate-bg` | тема компонента | var(--gr-slate-solid) | Заливка filled-бейджа тона `slate`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-slate-fg` | тема компонента | var(--gr-slate-solid-fg) | Текст filled-бейджа тона `slate`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-azure-bg` | тема компонента | var(--gr-azure-solid) | Заливка filled-бейджа тона `azure`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
+| `--gr-badge-azure-fg` | тема компонента | var(--gr-azure-solid-fg) | Текст filled-бейджа тона `azure`: полярность задаётся темой, а не заливкой. |
 
 ### GrBadgeWrap
 

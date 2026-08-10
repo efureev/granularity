@@ -33,6 +33,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **A toast whose timer is restarted while it waits no longer burns out unseen.** `toast.promise` and `update` re-arm the
+  timer of an existing toast without touching the list or the pause flag — and the toaster's effect, which is the one
+  place that knows about both, did not depend on `timeoutMs` and never woke up. Two consequences, both silent: a promise
+  settling under the cursor started counting down under the cursor, defeating the pause that WCAG 2.2.1 asks for; and a
+  promise settling while its toast still queued behind `maxVisible` counted down and closed **without ever being shown**.
+  The effect now reads `timeoutMs`, so the decision "tick or not" stays where the visibility and pause live.
+
+- **`GrResponseErrorBanner` retry button takes the banner's tone.** It was always `primary`, so a blue outline button sat
+  on the red of a server error and the orange of a validation one. Banner and button share the same `GrTone` scale, so
+  this is a pass-through, not a mapping — and it applies to the `tone` prop, `toneByKind` and the kind default alike.
+
+- **Expanding a collapsed `GrBreadcrumbs` no longer breaks the path.** In `autoCollapse` the list is a single
+  `overflow: hidden` row — that is what makes collapsing necessary — and expanding it kept the row: the tail was cut off,
+  taking the current page with it, and focusing a revealed crumb scrolled the head out of view with no way back. Expanding
+  now returns wrapping, so the whole path stays readable, and a width change collapses it again (the "…" button is gone
+  once expanded, so a phone rotation used to leave the path expanded for good). Two neighbours of the same bug: the fit
+  arithmetic ignored the list's `gap`, which made it optimistic by ~40px on a six-crumb path, and the measured ellipsis
+  width outlived a change of `items`.
+
+- **`GrCollapse` row highlight reaches the `#extra` slot.** The slot lives next to the trigger rather than inside it (a
+  `<button>` in a `<button>` is `nested-interactive`), and the hover background painted by the button stopped 12px short
+  of it — with `divided: false` that highlight is the only thing structuring the rows. Hover and the disabled background
+  moved to the row itself, and the right inset of `#extra` now comes from the size scale instead of a hardcoded `pr-4`.
+
+- **`GrPagination` page hover is visible in the light theme.** `--gr-muted` on white is 1.10:1, while the neighbouring
+  "previous/next" ghost buttons tint their hover — the row read as two different controls. Page buttons now use the same
+  tonal roles as a `GrDropdownMenu` item (`--gr-accent` / `--gr-accent-fg`).
+
 - **A fractional `step` no longer drifts.** Rounding only ever happened when `precision` was set, so a field
   stepping by `0.1` showed `0.30000000000000004` on the third press of `↑`, and `2.2 + 1.1` came out as
   `3.3000000000000003`. The step now rounds to the decimal count of the larger operand, which leaves `precision`
@@ -44,6 +72,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   but the buttons looked alive, while the clear button in the same component already hides itself in that state.
 
 ### Added
+
+- **A filled `GrBadge` stops being a black plaque in the light theme.** The badge got its own theme layer,
+  `--gr-badge-{tone}-bg` / `-fg`, because the weight a filled badge needs differs between themes. In the light theme
+  `--gr-{tone}` is a bright fill meant for **dark** ink — `-fg` there has to be dark, white on `--gr-success` is 2.54:1 —
+  so the badge read as a heavy near-black plaque; the layer moves it to `-solid`/`-solid-fg`, the button-weight fill under
+  light text (5.48:1 on success, 5.18:1 on warning), which also puts filled badges and solid buttons in one family. The
+  dark theme keeps the roles it had, where a pastel fill with dark ink is the convention. Only `success`, `warning` and
+  `azure` actually change: for the other tones `-solid` is a reference to the tone itself.
+
+  The AA gate now resolves component theme layers too — it used to measure the class fallback, which is not what the user
+  sees. `GrBadgeWrap` deliberately stays on the plain tone: a dot over an avatar is judged against the page (3:1), not
+  against a paragraph on top of it. The weights are written down in `docs/theming.md` so the next component does not pick
+  a role by eye.
+
+- **`GrProgressBar` can drop the track border** — `borderless`, also configurable through `GrConfigProvider`. The border
+  earns its place on a bare background, where the `--gr-muted` track barely differs from the page; inside a card it is a
+  second border next to the card's own.
 
 - **`GrProgressBar` says "unknown" instead of "zero".** Half of all progress is indeterminate — the request is out and
   the server never said how big the answer is — and the component had no way to show it. `indeterminate` runs a stripe

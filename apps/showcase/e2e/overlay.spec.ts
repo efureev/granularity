@@ -30,6 +30,61 @@ async function openFirstModal(page: import('@playwright/test').Page): Promise<vo
   })
 }
 
+/**
+ * Обход слоя по Tab: сверяет **посещённые** элементы с табируемыми внутри слоя.
+ *
+ * Проверки «фокус не ушёл за пределы слоя» для этого мало: ловушка, которая
+ * пришпилила фокус к одной кнопке (или к самой панели с `tabindex="-1"`), её
+ * проходит — фокус и правда не ушёл. Такой дефект видно только сравнением
+ * `activeElement` до и после нажатия, поэтому сверяем множества.
+ */
+async function expectTabCycle(
+  page: import('@playwright/test').Page,
+  layerSelector: string,
+  presses = 10,
+): Promise<void> {
+  const describe = (selector: string) => {
+    const layers = document.querySelectorAll(selector)
+    const layer = layers[layers.length - 1] as HTMLElement | undefined
+    const active = document.activeElement as HTMLElement | null
+    const name = (element: HTMLElement) =>
+      `${element.tagName}:${element.getAttribute('data-testid') ?? (element.textContent ?? '').trim().slice(0, 20)}`
+
+    if (!layer)
+      return { tabbables: [] as string[], active: null as string | null }
+
+    const tabbables = [...layer.querySelectorAll<HTMLElement>(
+      'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]',
+    )]
+      .filter(element => Number.parseInt(element.getAttribute('tabindex') ?? '0', 10) >= 0)
+      .filter(element => element.closest('[inert]') === null)
+      .filter(element => element.getClientRects().length > 0)
+      .map(name)
+
+    return {
+      tabbables,
+      active: active && layer.contains(active) ? name(active) : null,
+    }
+  }
+
+  const { tabbables } = await page.evaluate(describe, layerSelector)
+  expect(tabbables.length, 'в слое нет ни одного табируемого элемента').toBeGreaterThan(0)
+
+  const visited: string[] = []
+
+  for (let i = 0; i < presses; i++) {
+    await page.keyboard.press('Tab')
+    const { active } = await page.evaluate(describe, layerSelector)
+    expect(active, `Tab №${i + 1} увёл фокус за пределы слоя`).not.toBeNull()
+    visited.push(active!)
+  }
+
+  expect(
+    [...new Set(visited)].sort(),
+    `Tab не обошёл слой: посетил ${JSON.stringify(visited)}, табируемые — ${JSON.stringify(tabbables)}`,
+  ).toEqual([...new Set(tabbables)].sort())
+}
+
 test.describe('модальное окно', () => {
   test('открытое окно проходит axe', async ({ page }) => {
     await page.goto(componentPath('GrModal'))
@@ -73,16 +128,8 @@ test.describe('модальное окно', () => {
     // Приложение под окном помечено `inert` — иначе таб уходил бы в невидимое.
     await expect(page.locator('#app')).toHaveAttribute('inert', /.*/)
 
-    // Десяти нажатий хватает, чтобы обойти любую панель по кругу; если ловушка
-    // не держит, фокус успеет уйти в хром браузера или на страницу.
-    for (let i = 0; i < 10; i++) {
-      await page.keyboard.press('Tab')
-      const insideLayer = await page.evaluate(() => {
-        const layer = document.querySelector('[data-gr-overlay-root]')
-        return Boolean(layer && document.activeElement && layer.contains(document.activeElement))
-      })
-      expect(insideLayer, `Tab №${i + 1} увёл фокус за пределы окна`).toBe(true)
-    }
+    // Десяти нажатий хватает, чтобы обойти любую панель по кругу.
+    await expectTabCycle(page, '[data-gr-overlay-root]')
   })
 
   test('Esc закрывает окно и возвращает фокус на триггер', async ({ page }) => {
@@ -147,14 +194,7 @@ test.describe('модальный поповер', () => {
   test('Tab не выходит за панель, Esc возвращает фокус на триггер', async ({ page }) => {
     const trigger = await openModalPopover(page)
 
-    for (let i = 0; i < 10; i++) {
-      await page.keyboard.press('Tab')
-      const insidePanel = await page.evaluate(() => {
-        const panel = document.querySelector('[data-gr-popover-panel][aria-modal="true"]')
-        return Boolean(panel && document.activeElement && panel.contains(document.activeElement))
-      })
-      expect(insidePanel, `Tab №${i + 1} увёл фокус за пределы поповера`).toBe(true)
-    }
+    await expectTabCycle(page, '[data-gr-popover-panel][aria-modal="true"]')
 
     await page.keyboard.press('Escape')
     await expect(page.locator('[data-gr-popover-panel][aria-modal="true"]')).toBeHidden()
@@ -361,14 +401,7 @@ test.describe('сервис диалогов', () => {
     // Хост сервиса лежит в портале рядом с `#app`, поэтому страница гасится целиком.
     await expect(page.locator('#app')).toHaveAttribute('inert', /.*/)
 
-    for (let i = 0; i < 10; i++) {
-      await page.keyboard.press('Tab')
-      const insideLayer = await page.evaluate(() => {
-        const layer = document.querySelector('[data-gr-overlay-root][aria-modal]')
-        return Boolean(layer && document.activeElement && layer.contains(document.activeElement))
-      })
-      expect(insideLayer, `Tab №${i + 1} увёл фокус за пределы окна`).toBe(true)
-    }
+    await expectTabCycle(page, '[data-gr-overlay-root][aria-modal]')
   })
 
   test('Esc закрывает окно и возвращает фокус на триггер', async ({ page }) => {
@@ -395,14 +428,6 @@ test.describe('сервис диалогов', () => {
 
     // Главное, чего не проверяет jsdom: `inert` реально запрещает фокус, поэтому
     // обход по Tab не может свалиться в нижнее окно.
-    for (let i = 0; i < 10; i++) {
-      await page.keyboard.press('Tab')
-      const inTopLayer = await page.evaluate(() => {
-        const all = document.querySelectorAll('[data-gr-overlay-root][aria-modal]')
-        const top = all[all.length - 1]
-        return Boolean(top && document.activeElement && top.contains(document.activeElement))
-      })
-      expect(inTopLayer, `Tab №${i + 1} ушёл из верхнего окна`).toBe(true)
-    }
+    await expectTabCycle(page, '[data-gr-overlay-root][aria-modal]')
   })
 })

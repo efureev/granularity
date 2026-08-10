@@ -28,6 +28,7 @@ import { companionPackages } from '../content/companion/companionPackages'
 import ThemeSwitcher from '../components/ThemeSwitcher.vue'
 import ShowcaseHeader from '../components/layout/ShowcaseHeader.vue'
 import ShowcaseLocaleSwitcher from '../components/layout/ShowcaseLocaleSwitcher.vue'
+import ShowcaseCommandPalette from '../components/layout/ShowcaseCommandPalette.vue'
 import ShowcaseQuickSearch from '../components/layout/ShowcaseQuickSearch.vue'
 import ShowcaseSidebarNavigation from '../components/layout/ShowcaseSidebarNavigation.vue'
 import IconX from '~icons/lucide/x'
@@ -355,5 +356,8 @@ function getSidebarItemClass(item: SidebarNavigationItem) {
         </div>
       </aside>
     </div>
+
+    <!-- Общий поиск: одна палитра на страницу, триггеров два (шапка и drawer). -->
+    <ShowcaseCommandPalette />
   </div>
 </template>

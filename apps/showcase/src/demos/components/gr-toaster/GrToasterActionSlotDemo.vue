@@ -5,14 +5,13 @@ import { GrButton, GrToaster, useToast } from '@feugene/granularity'
 
 import { useShowcaseToasterHost } from './showcaseToasterHost'
 
-const { push, clear } = useToast()
+const { push } = useToast()
 const { isActiveHost, activateHost } = useShowcaseToasterHost('action-slot')
 
 const status = ref('—')
 
 function notify() {
   activateHost()
-  clear()
   status.value = 'Awaiting review'
 
   push({

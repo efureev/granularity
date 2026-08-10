@@ -3,11 +3,19 @@ import { ref } from 'vue'
 
 import { GrButton, GrImageViewer } from '@feugene/granularity'
 
-// Картинка гарантированного размера: picsum возвращает ровно указанные width/height.
-const IMAGE_WIDTH = 1000
-const IMAGE_HEIGHT = 1500
+/**
+ * Настоящая фотография из сети, а не SVG-заглушка: смысл демо — увидеть, что на
+ * «100%» пикселей ещё не видно, а на реальном масштабе уже видно зерно. Вектор
+ * этого не покажет никогда.
+ *
+ * Размер запрошен ровно по оригиналу этого кадра (`id/1027` — 2848×4272), поэтому
+ * сервис отдаёт его без пересэмплинга: апскейл размылил бы как раз то, ради чего
+ * демо и существует.
+ */
+const IMAGE_WIDTH = 2848
+const IMAGE_HEIGHT = 4272
 
-const slides = [`https://picsum.photos/id/1015/${IMAGE_WIDTH}/${IMAGE_HEIGHT}`]
+const slides = [`https://picsum.photos/id/1027/${IMAGE_WIDTH}/${IMAGE_HEIGHT}`]
 
 const open = ref(false)
 </script>
@@ -15,9 +23,10 @@ const open = ref(false)
 <template>
   <div class="grid gap-3">
     <div class="text-sm text-[var(--gr-muted-fg)]">
-      Картинка гарантированного размера {{ IMAGE_WIDTH }}×{{ IMAGE_HEIGHT }}. Номинальный `scale` считается относительно
-      вписанного в окно изображения (`object-contain`), поэтому «100%» — это не натуральный размер. Компонент сам отдаёт
-      в slot natural-размер, фактический rendered-размер и реальный масштаб — без ручного чтения DOM.
+      Фотография {{ IMAGE_WIDTH }}×{{ IMAGE_HEIGHT }} — оригинальный кадр, без масштабирования на стороне сервиса.
+      Номинальный `scale` считается относительно вписанного в окно изображения (`object-contain`), поэтому «100%» — это
+      не натуральный размер: зерно появляется только когда реальный масштаб дойдёт до 100%. Компонент сам отдаёт в slot
+      natural-размер, фактический rendered-размер и реальный масштаб — без ручного чтения DOM.
     </div>
 
     <div>

@@ -356,6 +356,95 @@ describe('GrToaster — семантика очереди: видимые дож
     wrapper.unmount()
     vi.useRealTimers()
   })
+
+  it('видимые тосты доживают до своих таймаутов независимо друг от друга', async () => {
+    vi.useFakeTimers()
+    const { wrapper, toast } = mountScoped(3)
+
+    toast.push({ title: 'Быстрый', timeoutMs: 100 })
+    toast.push({ title: 'Средний', timeoutMs: 300 })
+    toast.push({ title: 'Вечный', timeoutMs: 0 })
+    await nextTick()
+
+    await vi.advanceTimersByTimeAsync(150)
+    expect(toast.list.value.map(item => item.title)).toEqual(['Вечный', 'Средний'])
+
+    await vi.advanceTimersByTimeAsync(200)
+    expect(toast.list.value.map(item => item.title)).toEqual(['Вечный'])
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('повторный push не сбрасывает и не гасит уже показанный тост', async () => {
+    vi.useFakeTimers()
+    const { wrapper, toast } = mountScoped(3)
+
+    toast.push({ title: 'Первый', timeoutMs: 200 })
+    await nextTick()
+    await vi.advanceTimersByTimeAsync(150)
+
+    toast.push({ title: 'Второй', timeoutMs: 200 })
+    await nextTick()
+
+    // Первому осталось 50 мс — новый тост его отсчёт не продлевает и не обнуляет.
+    await vi.advanceTimersByTimeAsync(60)
+    expect(toast.list.value.map(item => item.title)).toEqual(['Второй'])
+
+    await vi.advanceTimersByTimeAsync(150)
+    expect(toast.list.value).toHaveLength(0)
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('перезапуск таймера у ждущего тоста не сжигает его в очереди', async () => {
+    vi.useFakeTimers()
+    const { wrapper, toast } = mountScoped(1)
+
+    toast.push({ title: 'Держит экран', timeoutMs: 0 })
+    const queued = toast.push({ title: 'Ждёт', timeoutMs: 0 })
+    await nextTick()
+
+    // Так ведёт себя `toast.promise`: стадия успеха ставит таймаут тосту, который
+    // в этот момент ещё стоит в очереди. Список и пауза при этом не меняются.
+    toast.update(queued, { title: 'Готово', timeoutMs: 100 })
+    await nextTick()
+
+    await vi.advanceTimersByTimeAsync(300)
+    expect(toast.list.value.map(item => item.title)).toEqual(['Готово', 'Держит экран'])
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('перезапуск таймера под курсором не стартует отсчёт', async () => {
+    vi.useFakeTimers()
+    const { wrapper, toast } = mountScoped(3)
+
+    const id = toast.push({ title: 'Загружаем', timeoutMs: 0 })
+    await nextTick()
+
+    const hosts = document.querySelectorAll('[data-gr-toaster]')
+    const region = hosts[hosts.length - 1] as HTMLElement
+    region.dispatchEvent(new MouseEvent('mouseenter'))
+    await nextTick()
+
+    toast.update(id, { title: 'Готово', timeoutMs: 100 })
+    await nextTick()
+
+    await vi.advanceTimersByTimeAsync(300)
+    expect(toast.list.value.map(item => item.title)).toEqual(['Готово'])
+
+    // Курсор ушёл — остаток отсчитывается с нуля потраченного времени.
+    region.dispatchEvent(new MouseEvent('mouseleave'))
+    await nextTick()
+    await vi.advanceTimersByTimeAsync(150)
+    expect(toast.list.value).toHaveLength(0)
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
 })
 
 describe('GrToaster — пауза: курсор и фокус независимы', () => {

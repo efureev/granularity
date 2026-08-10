@@ -312,11 +312,38 @@ describe('GrCollapse', () => {
   it('disabled гасится токеном фона, а не opacity', () => {
     const wrapper = mount(CollapseHarness, { props: { secondDisabled: true } })
 
-    const [enabled, disabled] = wrapper.findAll('[data-gr-collapse-trigger]')
+    // Фон живёт на строке, а не на кнопке: слот `#extra` — сосед триггера, и фон
+    // кнопки обрывался перед ним.
+    const [enabled, disabled] = wrapper.findAll('[data-gr-collapse-item] > div:first-child')
 
     expect(disabled.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(disabled.classes().some(cls => cls.includes('opacity'))).toBe(false)
-    expect(enabled.classes().some(cls => cls.includes('opacity'))).toBe(false)
+    expect(enabled.classes()).toContain('hover:bg-[var(--gr-muted)]')
+    expect(disabled.classes()).not.toContain('hover:bg-[var(--gr-muted)]')
+    expect(wrapper.html()).not.toMatch(/opacity-\d/)
+  })
+
+  it('подсветка строки покрывает и слот #extra, а его инсет идёт от размера', () => {
+    const wrapper = mount(defineComponent({
+      components: { GrCollapse, GrCollapseItem },
+      template: `
+        <GrCollapse size="lg">
+          <GrCollapseItem name="one" title="One">
+            <template #extra><span data-extra-badge>3</span></template>
+            Body
+          </GrCollapseItem>
+        </GrCollapse>
+      `,
+    }))
+
+    const row = wrapper.get('[data-gr-collapse-item] > div:first-child')
+    const trigger = wrapper.get('[data-gr-collapse-trigger]')
+
+    expect(row.find('[data-gr-collapse-extra]').exists()).toBe(true)
+    expect(row.classes()).toContain('hover:bg-[var(--gr-muted)]')
+    // Кнопка своего фона больше не рисует — иначе подсветка снова оборвалась бы.
+    expect(trigger.classes().some(cls => cls.startsWith('hover:bg-'))).toBe(false)
+    // `lg` даёт заголовку `px-5`, значит и правый инсет `#extra` — `pr-5`.
+    expect(wrapper.get('[data-gr-collapse-extra]').classes()).toContain('pr-5')
   })
 
   it('размер приходит из GrConfigProvider, локальный проп сильнее', () => {

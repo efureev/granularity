@@ -63,10 +63,12 @@ describe('GrBadge', () => {
       },
     })
 
-    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-success)]')
-    // `-fg`, а не захардкоженный `text-white`: тот не знал полярности заливки
-    // и давал 2.54:1 в light и 1.92:1 в dark.
-    expect(wrapper.attributes('class')).toContain('text-[var(--gr-success-fg)]')
+    // Заливка filled идёт через покомпонентный слой: вес у тем разный (в светлой
+    // это `-solid` под светлый текст, в тёмной — роль тона под тёмный).
+    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-badge-success-bg,var(--gr-success-solid))]')
+    // Полярность текста задаёт тема, а не захардкоженный `text-white`: тот давал
+    // 2.54:1 в light и 1.92:1 в dark.
+    expect(wrapper.attributes('class')).toContain('text-[var(--gr-badge-success-fg,var(--gr-success-solid-fg))]')
     expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg,7px)]')
   })
 
@@ -83,7 +85,7 @@ describe('GrBadge', () => {
 
     expect(slate.attributes('class')).toContain('bg-[var(--gr-slate-light)]')
     expect(slate.attributes('class')).toContain('text-[var(--gr-slate-text)]')
-    expect(azure.attributes('class')).toContain('bg-[var(--gr-azure)]')
-    expect(azure.attributes('class')).toContain('text-[var(--gr-azure-fg)]')
+    expect(azure.attributes('class')).toContain('bg-[var(--gr-badge-azure-bg,var(--gr-azure-solid))]')
+    expect(azure.attributes('class')).toContain('text-[var(--gr-badge-azure-fg,var(--gr-azure-solid-fg))]')
   })
 })

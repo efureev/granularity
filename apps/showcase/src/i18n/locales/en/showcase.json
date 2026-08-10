@@ -475,7 +475,15 @@
     "placeholder": "For example: GrButton, file validation, useTheme",
     "noResults": "Nothing found. Try an entity name, export name, type (`component`, `utility`), or section title.",
     "openComponents": "Open components",
-    "openUtilities": "Open utilities"
+    "openUtilities": "Open utilities",
+    "kinds": {
+      "page": "Pages",
+      "section": "Sections",
+      "component": "Components",
+      "directive": "Directives",
+      "composable": "Composables",
+      "utility": "Utilities"
+    }
   },
   "theme": {
     "toggle": "Toggle theme"

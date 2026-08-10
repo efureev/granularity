@@ -3,12 +3,11 @@ import { GrButton, GrToaster, useToast } from '@feugene/granularity'
 
 import { useShowcaseToasterHost } from './showcaseToasterHost'
 
-const { push, clear } = useToast()
+const { push } = useToast()
 const { isActiveHost, activateHost } = useShowcaseToasterHost('queue')
 
 function queueWorkflowToasts() {
   activateHost()
-  clear()
   push({ title: 'Sync started', message: 'Preparing records for upload.', tone: 'info' })
   push({ title: '2 warnings', message: 'Some fields will be normalized before import.', tone: 'warning', timeoutMs: 0 })
   push({ title: 'Sync finished', message: 'Records were uploaded successfully.', tone: 'success' })

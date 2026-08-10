@@ -5,7 +5,7 @@ import GrFormErrorBanner from '../GrFormErrorBanner.vue'
 import GrResponseErrorBanner from '../GrResponseErrorBanner.vue'
 import GrUploadErrorBanner from '../GrUploadErrorBanner.vue'
 import { DEFAULT_RESPONSE_ERROR_TEXTS } from '../responseError.defaults'
-import type { ResponseErrorInfo } from '../responseError.types'
+import type { ResponseErrorInfo, ResponseErrorKind } from '../responseError.types'
 
 function info(partial: Partial<ResponseErrorInfo> = {}): ResponseErrorInfo {
   return {
@@ -161,6 +161,32 @@ describe('GrResponseErrorBanner — видимость, тон и события
   it('кнопки повтора нет, пока её не разрешили', () => {
     expect(mount(GrResponseErrorBanner, { props: { error: info() } })
       .find('[data-testid="response-error-retry"]').exists()).toBe(false)
+  })
+
+  it('кнопка повтора берёт тон баннера, а не собственный primary', () => {
+    const cases: Array<[ResponseErrorKind, string]> = [
+      ['server', 'danger'],
+      ['network', 'danger'],
+      ['validation', 'warning'],
+      ['aborted', 'info'],
+    ]
+
+    for (const [kind, expected] of cases) {
+      const wrapper = mount(GrResponseErrorBanner, { props: { error: info({ kind }), canRetry: true } })
+      const retry = wrapper.findAllComponents({ name: 'GrButton' })
+        .find(button => button.attributes('data-testid') === 'response-error-retry')
+
+      expect(retry?.props('tone'), `kind=${kind}`).toBe(expected)
+    }
+
+    // Свой тон баннера уезжает в кнопку так же, как и выведенный из `kind`.
+    const custom = mount(GrResponseErrorBanner, {
+      props: { error: info({ kind: 'server' }), canRetry: true, tone: 'slate' },
+    })
+    const retry = custom.findAllComponents({ name: 'GrButton' })
+      .find(button => button.attributes('data-testid') === 'response-error-retry')
+
+    expect(retry?.props('tone')).toBe('slate')
   })
 })
 

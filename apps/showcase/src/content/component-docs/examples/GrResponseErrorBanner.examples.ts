@@ -2,11 +2,19 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grResponseErrorBannerExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'response-error-banner-minimal',
+    title: 'Минимум обвязки',
+    description: 'Поймали ошибку запроса — отдали её баннеру. Разбирать ответ, выбирать тон и писать текст не нужно: HTTP 409 сам станет предупреждением с сообщением сервера и кнопкой повтора того же тона.',
+    status: 'ready',
+    previewKey: 'gr-response-error-banner-minimal',
+  },
+  {
     id: 'response-error-banner-presets',
     title: 'Универсальный баннер — пресеты ошибок',
-    description: 'Базовый сценарий: классификация и отображение разных типов ошибок (network, abort, Laravel/JSON:API validation, RFC 7807, client/server, file validation, plain string) через `useResponseError()`.',
+    description: 'Классификация и отображение разных типов ошибок (network, abort, Laravel/JSON:API validation, RFC 7807, client/server, file validation, plain string) через `useResponseError()`. Фейковые классы ошибок в демо — стенд, а не часть обвязки: сниппет скрыт, минимальный вариант выше.',
     status: 'ready',
     previewKey: 'gr-response-error-banner-presets',
+    hideCode: true,
   },
   {
     id: 'response-error-banner-kind-filter',
@@ -14,6 +22,7 @@ export const grResponseErrorBannerExamples: ShowcaseComponentExampleDoc[] = [
     description: 'Whitelist через `autoHideKinds`: разрешаем `network` и `validation` (включая Laravel 422 с `errors`). Остальные ошибки (`client`, `server`, `aborted`) тихо проглатываются — `setRaw()` возвращает `null` и баннер не рендерится. Чекбоксы в демо позволяют менять whitelist на лету.',
     status: 'ready',
     previewKey: 'gr-response-error-banner-kind-filter',
+    hideCode: true,
   },
   {
     id: 'response-error-banner-upload',

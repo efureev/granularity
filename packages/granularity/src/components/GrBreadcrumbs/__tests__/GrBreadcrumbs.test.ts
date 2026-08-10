@@ -390,4 +390,57 @@ describe('GrBreadcrumbs — схлопывание по ширине', () => {
     expect(plain.get('[data-gr-breadcrumbs-list]').classes()).toContain('flex-wrap')
     plain.unmount()
   })
+
+  it('раскрытие возвращает перенос: путь не обрезается вместе с текущей страницей', async () => {
+    const wrapper = await mountAuto(300)
+    const list = wrapper.get('[data-gr-breadcrumbs-list]')
+
+    expect(list.classes()).toContain('flex-nowrap')
+
+    await wrapper.get('[data-testid="gr-breadcrumbs-ellipsis"]').trigger('click')
+    await nextTick()
+
+    // Одна строка раскрытый путь не вмещает — её нехватка и вызвала схлопывание,
+    // а `overflow: hidden` срезал бы хвост.
+    expect(list.classes()).toContain('flex-wrap')
+    expect(list.classes()).not.toContain('overflow-hidden')
+
+    const items = wrapper.findAll('[data-gr-breadcrumbs-item]')
+    expect(items).toHaveLength(5)
+    expect(items[items.length - 1].text()).toContain('Уровень 5')
+
+    wrapper.unmount()
+  })
+
+  it('новый путь снова схлопывается и возвращает однострочный режим', async () => {
+    const wrapper = await mountAuto(300)
+    await wrapper.get('[data-testid="gr-breadcrumbs-ellipsis"]').trigger('click')
+    await nextTick()
+
+    await wrapper.setProps({ items: LONG.map(item => ({ ...item, label: `${item.label} v2` })) })
+    await nextTick()
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-breadcrumbs-list]').classes()).toContain('flex-nowrap')
+    expect(wrapper.find('[data-testid="gr-breadcrumbs-ellipsis"]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('зазор списка входит в расчёт: с ним влезает меньше пунктов', () => {
+    const widths = Array.from({ length: 5 }).fill(ITEM_WIDTH) as number[]
+    const common = {
+      itemWidths: widths,
+      separatorWidth: SEPARATOR_WIDTH,
+      ellipsisWidth: ELLIPSIS_WIDTH,
+      available: 560,
+      itemsBeforeCollapse: 1,
+    }
+
+    // 5×100 + 4×10 = 540 ≤ 560 — без зазоров путь «влезает».
+    expect(resolveBreadcrumbsFit(common)).toBe(5)
+    // С gap 4px добавляется 8 зазоров = 32px: 572 > 560, и путь обязан схлопнуться.
+    expect(resolveBreadcrumbsFit({ ...common, gapWidth: 4 })).toBeLessThan(5)
+  })
 })

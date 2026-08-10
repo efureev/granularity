@@ -246,9 +246,15 @@ function onDismiss(): void {
         v-if="props.canRetry"
         class="mt-1 flex flex-wrap items-center gap-2"
       >
+        <!--
+          Тон кнопки — тон баннера: `primary` по умолчанию давал синюю кнопку на
+          красной и оранжевой подложке. Шкала тонов у кнопки и у баннера одна,
+          поэтому это проброс, а не маппинг.
+        -->
         <GrButton
           size="sm"
           variant="outline"
+          :tone="tone"
           :data-testid="`${props.testIdPrefix}-retry`"
           @click="onRetry"
         >

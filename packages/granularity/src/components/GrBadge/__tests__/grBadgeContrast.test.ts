@@ -5,6 +5,7 @@ import {
   derivedThemeVars,
   getColorClassExpression,
   getContrastRatio,
+  readComponentThemeVars,
   resolveColorExpression,
   themeVarsByName,
   type ThemeName,
@@ -61,7 +62,10 @@ describe('GrBadge · контраст', () => {
       for (const mode of MODES) {
         for (const tone of GR_TONES) {
           const { text, background } = badgeColors(tone, mode.dark)
-          const vars = themeVarsByName[theme]
+          // Покомпонентный слой поверх глобальной темы: filled-бейдж красится
+          // `--gr-badge-*`, и без этих значений гейт мерил бы фолбэк, то есть не
+          // то, что увидит пользователь.
+          const vars = { ...themeVarsByName[theme], ...readComponentThemeVars('GrBadge', theme) }
           const ratio = getContrastRatio(
             resolveColorExpression(text, vars, derivedThemeVars),
             resolveColorExpression(background, vars, derivedThemeVars),

@@ -11,7 +11,6 @@ const lastId = ref('')
 
 function openStickyToast() {
   activateHost()
-  clear()
   lastId.value = push({
     title: 'Manual follow-up required',
     message: 'Use timeoutMs = 0 when the toast must stay until a user action.',

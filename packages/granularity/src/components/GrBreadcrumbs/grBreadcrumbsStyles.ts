@@ -24,6 +24,11 @@ export const breadcrumbsListClass = 'flex items-center gap-1 m-0 p-0 [list-style
  * Перенос — умолчание: длинный путь уезжает на вторую строку и остаётся читаемым.
  * В режиме `autoCollapse` строка одна, иначе переполнения не случится никогда и
  * мерить будет нечего: список просто перенесётся.
+ *
+ * Исключение — раскрытый вручную путь: в одну строку он бы не влез (её нехватка и
+ * вызвала схлопывание), `overflow: hidden` срезал бы хвост вместе с текущей
+ * страницей, а фокус на раскрытом пункте молча уводил бы скролл контейнера.
+ * Поэтому раскрытие возвращает перенос.
  */
 export const breadcrumbsListWrapClass = 'flex-wrap'
 export const breadcrumbsListNowrapClass = 'flex-nowrap overflow-hidden'
@@ -83,8 +88,10 @@ export function resolveBreadcrumbsFit(options: {
   ellipsisWidth: number
   available: number
   itemsBeforeCollapse: number
+  /** Зазор списка (`gap`). Стоит между каждой парой соседей, включая разделители. */
+  gapWidth?: number
 }): number {
-  const { itemWidths, separatorWidth, ellipsisWidth, available, itemsBeforeCollapse } = options
+  const { itemWidths, separatorWidth, ellipsisWidth, available, itemsBeforeCollapse, gapWidth = 0 } = options
   const total = itemWidths.length
 
   if (total === 0) return 0
@@ -92,9 +99,16 @@ export function resolveBreadcrumbsFit(options: {
   const sum = (from: number, to: number): number =>
     itemWidths.slice(from, to).reduce((acc, width) => acc + width, 0)
 
-  // Ширина строки из `parts` видимых блоков: сами блоки плюс разделители между.
+  /**
+   * Ширина строки из `parts` видимых блоков: сами блоки, разделители между ними
+   * и зазоры. Элементов в списке `2 * parts - 1` (блоки и разделители вперемешку),
+   * значит зазоров на один меньше — без них расчёт систематически оптимистичен и
+   * путь подрезается уже после схлопывания.
+   */
   const rowWidth = (content: number, parts: number): number =>
-    content + Math.max(0, parts - 1) * separatorWidth
+    content
+    + Math.max(0, parts - 1) * separatorWidth
+    + Math.max(0, 2 * parts - 2) * gapWidth
 
   if (rowWidth(sum(0, total), total) <= available) return total
 

@@ -6532,6 +6532,13 @@
             "default": "false"
           },
           {
+            "name": "borderless",
+            "description": "Убрать рамку трека: внутри карточки вторая рамка только шумит.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "buffer",
             "description": "Загружено с запасом: слой позади заливки, `0..100`. Не задан — слоя нет.",
             "type": "number | undefined",

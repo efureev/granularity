@@ -7,9 +7,11 @@ import GrIcon from '../GrIcon'
 import { GR_COLLAPSE_CONTEXT, type GrCollapseValue } from './grCollapseContext'
 import {
   collapseChevronSizes,
+  collapseExtraPaddings,
   grCollapseBodyClass,
   grCollapseChevronClass,
   grCollapseHeaderClass,
+  grCollapseRowClass,
   grCollapseTitleClass,
 } from './grCollapseStyles'
 
@@ -59,10 +61,12 @@ const expanded = computed(() => collapseContext.isActive(resolvedName.value))
 const headingTag = computed(() => `h${collapseContext.headingLevel.value}`)
 const iconAtStart = computed(() => collapseContext.expandIconPosition.value === 'start')
 
+const rowClassName = computed(() => grCollapseRowClass(resolvedDisabled.value))
 const headerClassName = computed(() => grCollapseHeaderClass({
   size: collapseContext.size.value,
   disabled: resolvedDisabled.value,
 }))
+const extraClassName = computed(() => collapseExtraPaddings[collapseContext.size.value])
 const titleClassName = computed(() => grCollapseTitleClass(collapseContext.size.value))
 const bodyClassName = computed(() => grCollapseBodyClass(collapseContext.size.value))
 const chevronClassName = computed(() => grCollapseChevronClass(expanded.value))
@@ -162,7 +166,7 @@ function onKeydown(event: KeyboardEvent): void {
     data-gr-collapse-item
     class="text-[var(--gr-fg)]"
   >
-    <div class="flex items-center">
+    <div :class="rowClassName">
       <component
         :is="headingTag"
         class="m-0 min-w-0 flex-1"
@@ -216,7 +220,8 @@ function onKeydown(event: KeyboardEvent): void {
       <div
         v-if="$slots.extra"
         data-gr-collapse-extra
-        class="shrink-0 pr-4"
+        class="shrink-0"
+        :class="extraClassName"
       >
         <slot name="extra" />
       </div>

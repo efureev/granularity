@@ -57,7 +57,9 @@ const hotkeys = {
       — try <GrKbd size="sm">⌘</GrKbd> <GrKbd size="sm">J</GrKbd> without opening the palette.
     </p>
 
-    <GrCommandPalette v-model="open" :items="commands" @select="onSelect">
+    <!-- `mod+k` на странице занят общим поиском витрины: два слушателя открывали бы
+         сразу две палитры. Демо открывается кнопкой и своим ⌘J. -->
+    <GrCommandPalette v-model="open" :items="commands" :hotkey="null" @select="onSelect">
       <template #footer>
         <span class="flex items-center gap-1"><GrKbd size="sm">↑</GrKbd><GrKbd size="sm">↓</GrKbd> to navigate</span>
         <span class="flex items-center gap-1"><GrKbd size="sm">↵</GrKbd> to run</span>

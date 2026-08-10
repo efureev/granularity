@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import {
   bufferClass,
   grProgressBarFillClass,
@@ -35,6 +35,8 @@ export interface GrProgressBarProps {
   tone?: GrProgressBarTone
   /** Толщина трека. */
   size?: GrProgressBarSize
+  /** Убрать рамку трека: внутри карточки вторая рамка только шумит. */
+  borderless?: boolean
 }
 
 const props = withDefaults(defineProps<GrProgressBarProps>(), {
@@ -45,9 +47,12 @@ const props = withDefaults(defineProps<GrProgressBarProps>(), {
   ariaLabel: undefined,
   tone: 'primary',
   size: undefined,
+  // `undefined`, а не `false`: иначе значение из `componentDefaults` не дошло бы.
+  borderless: undefined,
 })
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrProgressBar' })
+const resolvedBorderless = useGrComponentProp('GrProgressBar', 'borderless', () => props.borderless, false)
 const trackClassName = computed(() => trackSizes[resolvedSize.value])
 const rowGapClassName = computed(() => rowGaps[resolvedSize.value])
 const valueClassName = computed(() => valueTextSizes[resolvedSize.value])
@@ -86,8 +91,8 @@ const valueLabel = computed(() => valueText.value ?? `${Math.round(safe.value)}%
       :aria-valuetext="indeterminate ? undefined : valueText"
       aria-valuemin="0"
       aria-valuemax="100"
-      class="relative min-w-0 flex-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-muted)] border border-[var(--gr-brd)] overflow-hidden"
-      :class="trackClassName"
+      class="relative min-w-0 flex-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-muted)] overflow-hidden"
+      :class="[trackClassName, resolvedBorderless ? '' : 'border border-[var(--gr-brd)]']"
     >
       <div
         v-if="safeBuffer !== undefined && !indeterminate"

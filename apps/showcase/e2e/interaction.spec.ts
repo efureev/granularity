@@ -135,6 +135,38 @@ test.describe('GrBreadcrumbs: схлопывание по ширине', () => {
     await expect(ellipsis).toHaveCount(0)
     await expect(items).toHaveCount(6)
   })
+
+  test('раскрытие «…» не срезает путь и сворачивается обратно при смене ширины', async ({ page }) => {
+    await page.goto(componentPath('GrBreadcrumbs'))
+    await page.locator('#live-examples').waitFor()
+
+    // Ищем по переключателю ширины: класс списка после раскрытия меняется, и
+    // фильтр по `.flex-nowrap` перестал бы находить именно то демо, которое проверяем.
+    const demo = page.locator('[data-example-preview]').filter({ has: page.getByRole('radio', { name: 'Narrow' }) })
+    const breadcrumbs = demo.locator('[data-gr-breadcrumbs]')
+    const list = breadcrumbs.locator('[data-gr-breadcrumbs-list]')
+    const items = breadcrumbs.locator('[data-gr-breadcrumbs-item]')
+
+    await page.getByRole('radio', { name: 'Narrow' }).click()
+    await expect(breadcrumbs.locator('[data-testid="gr-breadcrumbs-ellipsis"]')).toHaveCount(1)
+
+    await breadcrumbs.locator('[data-testid="gr-breadcrumbs-ellipsis"]').click()
+
+    // Раскрытый путь переносится, а не режется: в одну строку он не влезал — её
+    // нехватка и вызвала схлопывание.
+    await expect(items).toHaveCount(6)
+    await expect(items.last()).toContainText('CHANGELOG.md')
+    await expect(list).toHaveClass(/flex-wrap/)
+
+    // Фокус на раскрытом пункте не увёл контейнер в скролл: голова пути на месте.
+    expect(await list.evaluate(node => node.scrollLeft)).toBe(0)
+    await expect(items.first()).toContainText('Storage')
+
+    // Смена ширины сворачивает обратно — в раскрытом пути кнопки «…» нет, и иначе
+    // он остался бы развёрнутым до перезагрузки.
+    await page.getByRole('radio', { name: 'Wide' }).click()
+    await expect(list).toHaveClass(/flex-nowrap/)
+  })
 })
 
 test.describe('GrDropdown: панель с содержимым, а не с меню', () => {
@@ -166,5 +198,52 @@ test.describe('GrDropdown: панель с содержимым, а не с ме
 
     // Итог виден снаружи панели: демо печатает выбранное в бейдже под меню.
     await expect(page.getByText('Errors, Warnings')).toBeVisible()
+  })
+})
+
+/**
+ * Общий поиск витрины на `GrCommandPalette`.
+ *
+ * Проверяется в браузере, а не юнитом, по двум причинам: хоткей вешается на
+ * `window` и должен быть на странице ровно один (демо палитры свои гасят), а
+ * навигация стрелками и Enter в jsdom не воспроизводится.
+ */
+test.describe('быстрый поиск витрины', () => {
+  const modKey = process.platform === 'darwin' ? 'Meta' : 'Control'
+
+  test('⌘K открывает единственную палитру и уводит на выбранную страницу', async ({ page }) => {
+    await page.goto('/components')
+    await page.locator('#live-examples, main').first().waitFor()
+
+    await page.keyboard.press(`${modKey}+KeyK`)
+
+    const palette = page.locator('[data-gr-command-palette-list]')
+    await expect(palette).toHaveCount(1)
+    await expect(page.locator('[data-testid="gr-command-palette-input"]')).toBeFocused()
+
+    await page.keyboard.type('slider')
+
+    const items = page.locator('[data-gr-command-palette-item]')
+    await expect(items.first()).toContainText('GrSlider')
+
+    await page.keyboard.press('Enter')
+
+    await expect(page).toHaveURL(/\/components\/gr-slider$/)
+    await expect(palette).toHaveCount(0)
+  })
+
+  test('на странице палитры ⌘K не открывает демо-палитры', async ({ page }) => {
+    await page.goto(componentPath('GrCommandPalette'))
+    await page.locator('#live-examples').waitFor()
+
+    // Демо на странице четыре, и у каждого свой `GrCommandPalette`; хоткей
+    // принадлежит поиску витрины, иначе одно нажатие открывало бы сразу несколько.
+    await page.keyboard.press(`${modKey}+KeyK`)
+
+    await expect(page.locator('[data-gr-command-palette-list]')).toHaveCount(1)
+
+    // Открылся именно общий поиск: он ищет по витрине, а не по командам демо.
+    await page.keyboard.type('foundations')
+    await expect(page.locator('[data-gr-command-palette-item]').first()).toContainText(/Foundations|Основы/)
   })
 })

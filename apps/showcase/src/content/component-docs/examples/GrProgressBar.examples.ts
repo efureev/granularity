@@ -9,6 +9,13 @@ export const grProgressBarExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-progress-bar-basic-flow',
   },
   {
+    id: 'progress-bar-borderless',
+    title: 'Без рамки',
+    description: 'Внутри карточки рамка трека превращается во вторую рамку рядом с её собственной. `borderless` снимает её — и настраивается глобально через `GrConfigProvider`.',
+    status: 'ready',
+    previewKey: 'gr-progress-bar-borderless',
+  },
+  {
     id: 'progress-bar-clamped-values',
     title: 'Out-of-range inputs are clamped',
     description: 'Документируем важный edge-case: отрицательные и слишком большие значения безопасно ограничиваются диапазоном 0–100.',

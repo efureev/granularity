@@ -153,9 +153,17 @@ const paused = computed(() => hovered.value || focusWithin.value)
 
 // Единый источник правды по таймерам: тост тикает, только если он видим И стек не на
 // паузе. Очередь и hover — на паузе. Реагирует на изменения списка/hover.
+//
+// `timeoutMs` читается ради зависимости, а не ради значения: `toast.promise` и
+// `update` перезапускают таймер уже существующего тоста, не трогая ни список, ни
+// паузу. Без этой зависимости эффект не просыпался бы, и заново заведённый
+// таймер тикал бы под курсором или у тоста, который ещё ждёт в очереди, — тот
+// сгорал бы, ни разу не показавшись.
 watchEffect(() => {
   for (const toast of list.value) {
-    if (visibleIds.value.has(toast.id) && !paused.value)
+    const shouldTick = toast.timeoutMs > 0 && visibleIds.value.has(toast.id) && !paused.value
+
+    if (shouldTick)
       resume(toast.id)
     else
       pause(toast.id)

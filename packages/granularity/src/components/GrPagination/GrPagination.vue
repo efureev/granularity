@@ -288,7 +288,13 @@ const totalText = computed(() =>
             class="rounded-[var(--gr-radius-control)] font-600 transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
             :class="[
               pageClass,
-              item === currentPage ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]' : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]',
+              item === currentPage
+                ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]'
+                // Подложка тональная, а не `--gr-muted`: серый на белом фоне даёт
+                // 1.10:1 и на светлой теме hover был практически не виден, хотя у
+                // соседних «назад/вперёд» (ghost-кнопки) он тонирован. Ряд обязан
+                // читаться одним контролом.
+                : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-accent)] hover:text-[var(--gr-accent-fg)]',
             ]"
             @click="goTo(item)"
           >

@@ -5,14 +5,13 @@ import { GrBadge, GrButton, GrToaster, useToast } from '@feugene/granularity'
 
 import { useShowcaseToasterHost } from './showcaseToasterHost'
 
-const { push, clear } = useToast()
+const { push } = useToast()
 const { isActiveHost, activateHost } = useShowcaseToasterHost('focus-hotkey')
 
 const lastAction = ref('—')
 
 function notify() {
   activateHost()
-  clear()
   lastAction.value = '—'
 
   push({

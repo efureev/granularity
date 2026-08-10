@@ -1,0 +1,18 @@
+:root {
+  --gr-badge-neutral-bg: var(--gr-fg);
+  --gr-badge-neutral-fg: var(--gr-bg);
+  --gr-badge-primary-bg: var(--gr-primary-solid);
+  --gr-badge-primary-fg: var(--gr-primary-solid-fg);
+  --gr-badge-success-bg: var(--gr-success-solid);
+  --gr-badge-success-fg: var(--gr-success-solid-fg);
+  --gr-badge-warning-bg: var(--gr-warning-solid);
+  --gr-badge-warning-fg: var(--gr-warning-solid-fg);
+  --gr-badge-danger-bg: var(--gr-danger-solid);
+  --gr-badge-danger-fg: var(--gr-danger-solid-fg);
+  --gr-badge-info-bg: var(--gr-info-solid);
+  --gr-badge-info-fg: var(--gr-info-solid-fg);
+  --gr-badge-slate-bg: var(--gr-slate-solid);
+  --gr-badge-slate-fg: var(--gr-slate-solid-fg);
+  --gr-badge-azure-bg: var(--gr-azure-solid);
+  --gr-badge-azure-fg: var(--gr-azure-solid-fg);
+}

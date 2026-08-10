@@ -205,6 +205,26 @@ describe('GrProgressBar — оформление и размеры', () => {
     expect(wrapper.get(VALUE).classes()).toContain('text-[length:var(--gr-text-2xs)]')
   })
 
+  it('borderless снимает рамку трека и настраивается из GrConfigProvider', () => {
+    const bordered = mount(GrProgressBar, { props: { value: 50 } })
+    expect(bordered.get(TRACK).classes()).toContain('border')
+
+    const borderless = mount(GrProgressBar, { props: { value: 50, borderless: true } })
+    expect(borderless.get(TRACK).classes()).not.toContain('border')
+    expect(borderless.get(TRACK).classes()).not.toContain('border-[var(--gr-brd)]')
+
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrProgressBar },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrProgressBar: { borderless: true } }">
+          <GrProgressBar :value="50" />
+        </GrConfigProvider>
+      `,
+    })
+
+    expect(mount(Harness).get(TRACK).classes()).not.toContain('border')
+  })
+
   it('оформление держится на токенах, а не на прозрачности', () => {
     const wrapper = mount(GrProgressBar, {
       props: { value: 50, buffer: 70, showValue: true },

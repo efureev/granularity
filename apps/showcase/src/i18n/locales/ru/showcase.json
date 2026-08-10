@@ -475,7 +475,15 @@
     "placeholder": "Например: GrButton, file validation, useTheme",
     "noResults": "Ничего не найдено. Попробуйте имя сущности, export name, тип (`component`, `utility`) или section-title.",
     "openComponents": "Открыть components",
-    "openUtilities": "Открыть utilities"
+    "openUtilities": "Открыть utilities",
+    "kinds": {
+      "page": "Страницы",
+      "section": "Разделы",
+      "component": "Компоненты",
+      "directive": "Директивы",
+      "composable": "Композаблы",
+      "utility": "Утилиты"
+    }
   },
   "theme": {
     "toggle": "Переключить тему"

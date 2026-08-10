@@ -6,15 +6,25 @@ import {
   collapseChevronBase,
   collapseChevronExpandedClass,
   collapseEmptyBase,
+  collapseExtraPaddings,
   collapseHeaderBase,
   collapseHeaderDisabledClass,
   collapseHeaderEnabledClass,
   collapseHeaderPaddings,
+  collapseRowBase,
+  collapseRowDisabledClass,
+  collapseRowEnabledClass,
   collapseTitleBase,
   collapseTitleTexts,
 } from './grCollapseStyles'
 
 export const grCollapseClassTokens = {
+  rowBase: splitClassTokens(collapseRowBase),
+  rowState: [
+    ...splitClassTokens(collapseRowEnabledClass),
+    ...splitClassTokens(collapseRowDisabledClass),
+  ],
+  extraPaddings: Object.values(collapseExtraPaddings).flatMap(splitClassTokens),
   headerBase: splitClassTokens(collapseHeaderBase),
   headerPaddings: Object.values(collapseHeaderPaddings).flatMap(splitClassTokens),
   headerState: [

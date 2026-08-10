@@ -61,6 +61,17 @@ function pressTab(shiftKey = false): void {
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey, bubbles: true }))
 }
 
+/**
+ * Отдельно от `pressTab`, потому что здесь важен не итоговый фокус, а сам факт
+ * `preventDefault`: в jsdom Tab фокус не двигает вовсе, поэтому «ловушка не
+ * мешает браузеру» проверяется только по гашению события.
+ */
+function pressTabAndTellIfPrevented(shiftKey = false): boolean {
+  const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey, bubbles: true, cancelable: true })
+  document.dispatchEvent(event)
+  return event.defaultPrevented
+}
+
 describe('useFocusTrap', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -114,6 +125,29 @@ describe('useFocusTrap', () => {
 
     pressTab(true)
     expect(document.activeElement).toBe(byId('last'))
+
+    wrapper.unmount()
+  })
+
+  it('в середине списка Tab не перехватывается — обход ведёт браузер', async () => {
+    const wrapper = mountTrap()
+    await nextTick()
+
+    byId('first').focus()
+    expect(pressTabAndTellIfPrevented(), 'Tab с первого элемента вперёд гасить нечего').toBe(false)
+
+    byId('second').focus()
+    expect(pressTabAndTellIfPrevented()).toBe(false)
+    expect(pressTabAndTellIfPrevented(true), 'Shift+Tab из середины — тоже браузеру').toBe(false)
+
+    byId('last').focus()
+    expect(pressTabAndTellIfPrevented(true)).toBe(false)
+
+    // Границы, наоборот, обязаны гаситься: иначе фокус ушёл бы за пределы слоя.
+    byId('last').focus()
+    expect(pressTabAndTellIfPrevented()).toBe(true)
+    byId('first').focus()
+    expect(pressTabAndTellIfPrevented(true)).toBe(true)
 
     wrapper.unmount()
   })

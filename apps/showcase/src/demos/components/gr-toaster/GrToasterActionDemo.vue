@@ -14,7 +14,6 @@ const archived = ref(false)
 
 function notifyWithUndo() {
   activateHost()
-  clear()
   archived.value = true
   lastAction.value = 'Message archived'
 
@@ -49,7 +48,6 @@ function notifyWithUndo() {
 
 function notifyWithRetry() {
   activateHost()
-  clear()
   lastAction.value = 'Upload failed'
 
   push({
@@ -76,7 +74,6 @@ function notifyWithRetry() {
 // результат, а не закрывается ради нового.
 function notifyWithPromise(shouldFail: boolean) {
   activateHost()
-  clear()
   lastAction.value = 'Syncing…'
 
   const request = new Promise<{ files: number }>((resolve, reject) => {

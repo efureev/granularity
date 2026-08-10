@@ -31,18 +31,27 @@ export const lightToneClassByTone: Record<GrBadgeTone, string> = {
   slate: 'bg-[var(--gr-slate-light)] text-[var(--gr-slate-text)] border-[color-mix(in_srgb,var(--gr-slate)_30%,var(--gr-slate-light))]',
   azure: 'bg-[var(--gr-azure-light)] text-[var(--gr-azure-text)] border-[color-mix(in_srgb,var(--gr-azure)_30%,var(--gr-azure-light))]',
 }
+/**
+ * Заливка filled-бейджа идёт через покомпонентный слой `--gr-badge-{tone}-*`, а
+ * не напрямую из роли тона, потому что нужный вес у тем разный.
+ *
+ * В светлой теме `--gr-{tone}` — это яркая заливка под **тёмный** текст (`-fg`
+ * там обязан быть тёмным: белый на `--gr-success` даёт 2.54:1), и filled-бейдж
+ * читался как тяжёлая почти чёрная плашка. Слой уводит его на `-solid`/`-solid-fg`
+ * — заливку кнопочного веса под светлый текст, ту же, что у solid-кнопок.
+ * В тёмной теме пастельная заливка с тёмным текстом — штатная конвенция, и слой
+ * оставляет прежние роли. Значения — `themes/{light,dark}.css`.
+ */
 export const darkToneClassByTone: Record<GrBadgeTone, string> = {
-  neutral: 'bg-[var(--gr-fg)] text-[var(--gr-bg)] border-[color-mix(in_srgb,var(--gr-fg)_35%,var(--gr-brd))]',
-  primary: 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)] border-[var(--gr-primary)]',
-  // `text-white` был захардкожен и потому не переживал ни смену темы, ни то,
-  // что заливка светлая: белый на `--gr-success` — 2.54:1 в light и 1.75:1 в
-  // dark. Токен `-fg` для того и существует, чтобы знать нужную полярность.
-  success: 'bg-[var(--gr-success)] text-[var(--gr-success-fg)] border-[var(--gr-success)]',
-  warning: 'bg-[var(--gr-warning)] text-[var(--gr-warning-fg)] border-[var(--gr-warning)]',
-  danger: 'bg-[var(--gr-danger)] text-[var(--gr-danger-fg)] border-[var(--gr-danger)]',
-  info: 'bg-[var(--gr-info)] text-[var(--gr-info-fg)] border-[var(--gr-info)]',
-  slate: 'bg-[var(--gr-slate)] text-[var(--gr-slate-fg)] border-[var(--gr-slate)]',
-  azure: 'bg-[var(--gr-azure)] text-[var(--gr-azure-fg)] border-[var(--gr-azure)]',
+  // Нейтральный вес — инверсия страницы, а не тон: `-solid`-роли у него нет.
+  neutral: 'bg-[var(--gr-badge-neutral-bg,var(--gr-fg))] text-[var(--gr-badge-neutral-fg,var(--gr-bg))] border-[color-mix(in_srgb,var(--gr-fg)_35%,var(--gr-brd))]',
+  primary: 'bg-[var(--gr-badge-primary-bg,var(--gr-primary-solid))] text-[var(--gr-badge-primary-fg,var(--gr-primary-solid-fg))] border-[var(--gr-badge-primary-bg,var(--gr-primary-solid))]',
+  success: 'bg-[var(--gr-badge-success-bg,var(--gr-success-solid))] text-[var(--gr-badge-success-fg,var(--gr-success-solid-fg))] border-[var(--gr-badge-success-bg,var(--gr-success-solid))]',
+  warning: 'bg-[var(--gr-badge-warning-bg,var(--gr-warning-solid))] text-[var(--gr-badge-warning-fg,var(--gr-warning-solid-fg))] border-[var(--gr-badge-warning-bg,var(--gr-warning-solid))]',
+  danger: 'bg-[var(--gr-badge-danger-bg,var(--gr-danger-solid))] text-[var(--gr-badge-danger-fg,var(--gr-danger-solid-fg))] border-[var(--gr-badge-danger-bg,var(--gr-danger-solid))]',
+  info: 'bg-[var(--gr-badge-info-bg,var(--gr-info-solid))] text-[var(--gr-badge-info-fg,var(--gr-info-solid-fg))] border-[var(--gr-badge-info-bg,var(--gr-info-solid))]',
+  slate: 'bg-[var(--gr-badge-slate-bg,var(--gr-slate-solid))] text-[var(--gr-badge-slate-fg,var(--gr-slate-solid-fg))] border-[var(--gr-badge-slate-bg,var(--gr-slate-solid))]',
+  azure: 'bg-[var(--gr-badge-azure-bg,var(--gr-azure-solid))] text-[var(--gr-badge-azure-fg,var(--gr-azure-solid-fg))] border-[var(--gr-badge-azure-bg,var(--gr-azure-solid))]',
 }
 function radiusClass(radius: GrBadgeRadius, size: GrBadgeSize): string {
   if (radius === 'square') return 'rounded-[var(--gr-radius-none)]'

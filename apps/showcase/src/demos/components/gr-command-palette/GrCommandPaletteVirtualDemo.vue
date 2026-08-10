@@ -31,9 +31,11 @@ function onSelect(item: GrCommandItem): void {
       Last command: <code>{{ lastCommand ?? '—' }}</code>
     </p>
 
+    <!-- Хоткей выключен: `mod+k` принадлежит общему поиску витрины. -->
     <GrCommandPalette
       v-model="open"
       :items="commands"
+      :hotkey="null"
       virtual
       :max-height="360"
       @select="onSelect"
