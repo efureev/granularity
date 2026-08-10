@@ -6,6 +6,7 @@ import IconArrowRight from '~icons/lucide/arrow-right'
 import { GrCard } from '@feugene/granularity'
 
 import ShowcasePageHero from '../showcase/ShowcasePageHero.vue'
+import { compareEntityGroups } from '../../app/showcaseEntityGroups'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
 import type { ShowcaseEntityKind, ShowcaseEntityRegistryItem } from '../../content/model'
 import type { ShowcasePage } from '../../app/showcase'
@@ -47,11 +48,11 @@ const groupedEntities = computed(() => {
   }
 
   return [...buckets.entries()]
-    .sort(([left], [right]) => getEntityGroupLabel(props.page.name, left).localeCompare(getEntityGroupLabel(props.page.name, right)))
+    .sort(([left], [right]) => compareEntityGroups(props.page.name, left, right))
     .map(([group, entities]) => ({
       group,
       label: getEntityGroupLabel(props.page.name, group),
-      entities: [...entities].sort((left, right) => left.title.localeCompare(right.title)),
+      entities,
     }))
 })
 </script>

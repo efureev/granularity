@@ -6,6 +6,7 @@ import {GrCard} from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {showcaseComponentEntities} from '../app/showcase'
+import {compareEntityGroups} from '../app/showcaseEntityGroups'
 import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
 import {GrBadge} from "@feugene/granularity";
 
@@ -50,11 +51,11 @@ const groupedComponents = computed(() => {
   }
 
   return [...buckets.entries()]
-      .sort(([left], [right]) => getEntityGroupLabel('components', left).localeCompare(getEntityGroupLabel('components', right)))
+      .sort(([left], [right]) => compareEntityGroups('components', left, right))
       .map(([group, entities]) => ({
         group,
         label: getEntityGroupLabel('components', group),
-        entities: [...entities].sort((left, right) => left.title.localeCompare(right.title)),
+        entities,
       }))
 })
 

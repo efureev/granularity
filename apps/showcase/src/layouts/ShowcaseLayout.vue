@@ -20,6 +20,7 @@ import {
   showcasePageRecord,
   showcaseUtilityEntities,
 } from '../app/showcase'
+import { compareEntityGroups } from '../app/showcaseEntityGroups'
 import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 import type { ShowcaseNavigationItem, ShowcasePageName } from '../app/showcase'
 import type { ShowcaseEntityRegistryItem } from '../content/model'
@@ -188,19 +189,15 @@ const contextNavigationGroups = computed<SidebarNavigationGroup[]>(() => {
   }
 
   return [...groups.entries()]
-    .sort(([left], [right]) => {
-      return getEntityGroupLabel(pageName, left).localeCompare(getEntityGroupLabel(pageName, right))
-    })
+    .sort(([left], [right]) => compareEntityGroups(pageName, left, right))
     .map(([group, entities]) => ({
       id: `${pageName}-${group}`,
       title: getEntityGroupLabel(pageName, group),
-      items: [...entities]
-        .sort((left, right) => left.title.localeCompare(right.title))
-        .map(entity => ({
-          id: entity.id,
-          label: entity.title,
-          to: entity.path,
-        })),
+      items: entities.map(entity => ({
+        id: entity.id,
+        label: entity.title,
+        to: entity.path,
+      })),
     }))
 })
 

@@ -13,6 +13,8 @@ const componentGroups = {
   utilities: ['GrConfigProvider'],
 } as const satisfies Record<string, readonly string[]>
 
+export const componentGroupOrder: readonly string[] = [...Object.keys(componentGroups), 'misc']
+
 // Fallback-сводки компонентов (базовая локаль en). Переводы — в блоке `showcase`
 // (`showcase.entitySummaries.component.<name>`), накладываются при рендере через
 // `useShowcasePageI18n().localizeEntity` / `localizeEntitySummary`.

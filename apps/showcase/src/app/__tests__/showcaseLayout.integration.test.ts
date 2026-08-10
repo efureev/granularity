@@ -73,6 +73,15 @@ function findButtonByAriaLabel(wrapper: Awaited<ReturnType<typeof mountShowcaseA
   return wrapper.findAll('button').find(button => button.attributes('aria-label') === label)
 }
 
+async function readSidebar(path: string) {
+  const { wrapper } = await mountShowcaseAt(path)
+
+  return {
+    groupTitles: wrapper.findAll('aside p').map(title => title.text()),
+    itemLabels: wrapper.findAll('aside a').map(link => link.text()),
+  }
+}
+
 describe('showcase layout integration', () => {
   afterEach(() => {
     while (mountedWrappers.length > 0) {
@@ -192,6 +201,34 @@ describe('showcase layout integration', () => {
 
     expect(wrapper.find('[aria-label="Close navigation"]').exists()).toBe(false)
     expect(wrapper.text()).toContain('Utilities catalog')
+  })
+
+  it('сохраняет порядок групп и пунктов сайдбара при смене языка', async () => {
+    const english = await readSidebar('/components')
+
+    window.localStorage.setItem('showcase-locale', 'ru')
+
+    const russian = await readSidebar('/components')
+
+    expect(english.groupTitles).toEqual([
+      'Actions',
+      'Feedback',
+      'Navigation',
+      'Overlays',
+      'Forms',
+      'Data display',
+      'Utilities',
+    ])
+    expect(russian.groupTitles).toEqual([
+      'Действия',
+      'Обратная связь',
+      'Навигация',
+      'Оверлеи',
+      'Формы',
+      'Отображение данных',
+      'Утилиты',
+    ])
+    expect(russian.itemLabels).toEqual(english.itemLabels)
   })
 
   it('открывает quick search как CSS-sized панель с внутренним скроллом результатов', async () => {
