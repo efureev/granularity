@@ -1,6 +1,8 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
   iconOffsets,
+  previewBaseClass,
+  previewSizes,
   removeTextSizes,
   rowGaps,
   stackGaps,
@@ -13,4 +15,6 @@ export const grFormFileSafelist = [...new Set([
   ...Object.values(rowGaps).flatMap(splitClassTokens),
   ...Object.values(stackGaps).flatMap(splitClassTokens),
   ...Object.values(iconOffsets).flatMap(splitClassTokens),
+  ...Object.values(previewSizes).flatMap(splitClassTokens),
+  ...splitClassTokens(previewBaseClass),
 ])]

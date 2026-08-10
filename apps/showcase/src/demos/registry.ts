@@ -135,6 +135,7 @@ export const demoPathByPreviewKey = {
   'gr-form-file-basic-selection':           'components/gr-form-file/GrFormFileBasicSelectionDemo.vue',
   'gr-form-file-custom-validation':         'components/gr-form-file/GrFormFileValidationDemo.vue',
   'gr-form-file-multiple-queue':            'components/gr-form-file/GrFormFileMultipleQueueDemo.vue',
+  'gr-form-file-preview':                   'components/gr-form-file/GrFormFilePreviewDemo.vue',
   'gr-form-file-server-errors':             'components/gr-form-file/GrFormFileServerErrorsDemo.vue',
   'gr-form-file-sizes':                     'components/gr-form-file/GrFormFileSizesDemo.vue',
   'gr-form-mixed-controls':                 'components/gr-form/GrFormMixedControlsDemo.vue',

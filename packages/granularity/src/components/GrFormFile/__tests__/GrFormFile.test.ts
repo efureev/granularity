@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrFormFile from '../GrFormFile.vue'
 import type { GrFormFileError } from '../GrFormFile.vue'
@@ -313,6 +313,161 @@ describe('GrFormFile — список файлов', () => {
     const wrapper = mountMultiple([new File([new ArrayBuffer(2048)], 'big.pdf', { type: 'application/pdf' })])
 
     expect(wrapper.get('[data-gr-form-file-item]').text()).toContain('2 KB')
+  })
+})
+
+describe('GrFormFile — readonly', () => {
+  const pdf = () => new File(['a'], 'contract.pdf', { type: 'application/pdf' })
+
+  // Негативный контракт: проверяем не то, что компонент делает, а то, чего он
+  // делать не должен. Проп объявлялся и объявлял `aria-readonly`, а соблюдал
+  // его один `openDialog()` — набор менялся и перетаскиванием, и кнопками.
+  it('набор виден и объявлен, но ни одна кнопка его не трогает', () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: [pdf()], multiple: true, readonly: true },
+    })
+
+    expect(wrapper.text()).toContain('contract.pdf')
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('aria-readonly')).toBe('true')
+
+    // Кнопка, которая заведомо ничего не сделает, — не защита, а шум.
+    expect(wrapper.find('[data-gr-form-file-clear-all-btn]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-form-file-item-remove]').exists()).toBe(false)
+
+    // Кнопка выбора остаётся: readonly не выкидывает поле из таб-порядка.
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('disabled')).toBeUndefined()
+  })
+
+  it('одиночный режим: кнопки «Удалить» нет', () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: pdf(), readonly: true },
+    })
+
+    expect(wrapper.text()).toContain('contract.pdf')
+    expect(wrapper.find('[data-gr-form-file-clear-btn]').exists()).toBe(false)
+  })
+
+  it('перетаскивание не меняет значение', async () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: null, readonly: true },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-form-file]').trigger('drop', {
+      dataTransfer: { files: [pdf()], dropEffect: 'copy' },
+    })
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
+  it('выбор через диалог не проходит даже в обход кнопки', async () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: null, readonly: true },
+      attachTo: document.body,
+    })
+
+    const input = wrapper.get('[data-gr-form-file-input]')
+    setInputFiles(input.element as HTMLInputElement, [pdf()])
+    await input.trigger('change')
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrFormFile — превью', () => {
+  const png = () => new File(['img'], 'photo.png', { type: 'image/png' })
+  const pdf = () => new File(['doc'], 'contract.pdf', { type: 'application/pdf' })
+
+  function stubObjectUrl() {
+    const createObjectURL = vi.fn(() => 'blob:preview')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { ...URL, createObjectURL, revokeObjectURL })
+    return { createObjectURL, revokeObjectURL }
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('миниатюра только у картинки, файл другого типа остаётся строкой', () => {
+    const { createObjectURL } = stubObjectUrl()
+
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: [png(), pdf()], multiple: true, preview: true },
+    })
+
+    expect(wrapper.findAll('[data-gr-form-file-preview]')).toHaveLength(1)
+    expect(createObjectURL).toHaveBeenCalledTimes(1)
+    expect(wrapper.text()).toContain('contract.pdf')
+
+    wrapper.unmount()
+  })
+
+  it('без пропа миниатюр нет и object URL не создаётся', () => {
+    const { createObjectURL } = stubObjectUrl()
+
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: [png()], multiple: true },
+    })
+
+    expect(wrapper.find('[data-gr-form-file-preview]').exists()).toBe(false)
+    expect(createObjectURL).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('одиночный режим показывает миниатюру рядом с именем', () => {
+    stubObjectUrl()
+
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: png(), preview: true },
+    })
+
+    expect(wrapper.get('[data-gr-form-file-preview]').attributes('src')).toBe('blob:preview')
+    // Имя стоит вплотную, и озвучивать его дважды незачем.
+    expect(wrapper.get('[data-gr-form-file-preview]').attributes('alt')).toBe('')
+
+    wrapper.unmount()
+  })
+
+  it('URL отзывается, когда файл уходит из набора', async () => {
+    const { revokeObjectURL } = stubObjectUrl()
+
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: [png(), pdf()], multiple: true, preview: true },
+    })
+
+    expect(wrapper.findAll('[data-gr-form-file-preview]')).toHaveLength(1)
+
+    await wrapper.setProps({ modelValue: [pdf()] })
+    await nextTick()
+
+    // Blob без отзыва висит в памяти вкладки до перезагрузки.
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:preview')
+
+    wrapper.unmount()
+  })
+
+  it('URL отзывается при размонтировании', () => {
+    const { revokeObjectURL } = stubObjectUrl()
+
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: [png()], multiple: true, preview: true },
+    })
+
+    expect(revokeObjectURL).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:preview')
   })
 })
 

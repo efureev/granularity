@@ -40,6 +40,23 @@ export const iconOffsets: Record<GrFormFileSize, string> = {
   lg: 'ml-2',
 }
 
+/**
+ * Миниатюра картинки в строке набора.
+ *
+ * Квадрат с кадрированием: файлы приходят любых пропорций, а строки списка
+ * обязаны остаться одной высоты. Кадрирование — arbitrary-значением:
+ * `object-cover` не знает ни `presetMini`, ни extra-rules, и класс молча не
+ * превратился бы в CSS.
+ */
+export const previewSizes: Record<GrFormFileSize, string> = {
+  xs: 'h-6 w-6',
+  sm: 'h-7 w-7',
+  md: 'h-8 w-8',
+  lg: 'h-10 w-10',
+}
+
+export const previewBaseClass = 'shrink-0 rounded-[var(--gr-radius-sm)] [object-fit:cover] border border-[var(--gr-brd)]'
+
 /** Кнопки берут размер из шкалы `GrButton` — на ступень ниже самого поля. */
 export const buttonSizes: Record<GrFormFileSize, GrComponentSize> = {
   xs: 'xs',

@@ -4006,6 +4006,13 @@
             "default": "undefined"
           },
           {
+            "name": "preview",
+            "description": "Миниатюры для картинок в наборе. Файлы других типов остаются строкой.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "validate",
             "description": "Дополнительная (кастомная) валидация на стороне потребителя.",
             "type": "((files: File[]) => FileValidationIssue[] | Promise<FileValidationIssue[]>) | undefined",

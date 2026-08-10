@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrFormFile` shows image thumbnails.** Previews were the one capability separating the form field from
+  `GrFileUpload`, and the gap was the reason consumers rewrote the file list on top of the slot. `preview` turns them
+  on in both modes: a thumbnail sits next to the name for a single file and in front of each row of a multiple set.
+  Only `image/*` gets one — anything else stays a plain row rather than an empty frame. The machinery is the
+  uploader's, not a second copy: `useFilePreviews` moved to the package's shared internals, so the two file
+  components agree on what counts as an image and on when a blob is released. Object URLs are tied to the set itself
+  rather than to the places that edit it — a file leaving the set frees its URL whether it was removed by a row
+  button, by "clear all", by a new selection or by an external `v-model` reset, and unmounting frees the rest.
+
 - **`GrCollapse` has an empty state, and its own locale namespace to fill it.** An accordion with no sections drew an
   empty bordered card — a state that reads as breakage rather than "nothing here yet" — and there was no text to put
   in it: the component had no i18n namespace, so a consumer had to detect emptiness and supply the copy themselves.
@@ -685,6 +694,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the title and the description now share a size, and the hierarchy is carried by weight and colour.
 
 ### Fixed
+
+- **`GrFormFile` now honours `readonly` instead of merely announcing it.** The prop was declared, `aria-readonly`
+  reached the button and the value reached the form — but exactly one of the four ways to change the set checked it.
+  A read-only field still accepted a dropped file (`v-dropzone` was gated on `disabled` alone), still rendered a
+  working "Remove"/"Clear all", and still removed individual rows. It now routes every mutating path through the
+  `locked` state of `useGrFormControl` — the same one `GrFileUpload` has used all along — and the buttons that could
+  only ever be refused are no longer rendered. The select button stays focusable and keeps `aria-readonly`: a field
+  has to be reachable from the keyboard to explain why it will not budge. `disabled` is unchanged.
 
 - **A `GrDropdown` panel that holds content rather than a menu is usable from the keyboard again.** With
   `closeOnContentClick={false}` the panel is a place for fields and checkboxes — the package's own "persistent

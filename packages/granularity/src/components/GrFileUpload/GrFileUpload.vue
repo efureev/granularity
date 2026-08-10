@@ -12,7 +12,7 @@ import type { GrUploadProgressInfo } from './uploadViaXhr'
 import type { GrUploadState } from './uploadState'
 import { summarizeFileEntries, type GrFileUploadEntry } from './fileEntry'
 import { useDropZone } from './useDropZone'
-import { useFilePreviews } from './useFilePreviews'
+import { useFilePreviews } from '../../composables/internal/useFilePreviews'
 import { usePerFileUpload } from './usePerFileUpload'
 import { useUploadState } from './useUploadState'
 
@@ -816,7 +816,7 @@ defineExpose({
               data-gr-file-upload-preview
               :src="previewUrl(file)"
               alt=""
-              class="h-8 w-8 shrink-0 rounded-[var(--gr-radius-sm)] object-cover border border-[var(--gr-brd)]"
+              class="h-8 w-8 shrink-0 rounded-[var(--gr-radius-sm)] [object-fit:cover] border border-[var(--gr-brd)]"
             >
             <span class="font-600">{{ file.name }}</span>
             <span class="text-[var(--gr-muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>

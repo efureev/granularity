@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import IconUpload from '~icons/lucide/upload'
 import IconX from '~icons/lucide/x'
@@ -12,6 +12,8 @@ import {
   buttonSizes,
   iconOffsets,
   iconSizes,
+  previewBaseClass,
+  previewSizes,
   removeTextSizes,
   rowGaps,
   stackGaps,
@@ -20,6 +22,7 @@ import {
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
+import { useFilePreviews } from '../../composables/internal/useFilePreviews'
 import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, maxCountValidator, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
@@ -57,6 +60,8 @@ export interface GrFormFileProps {
   placeholder?: string
   /** Размер кнопок, иконок и подписей. */
   size?: GrFormFileSize
+  /** Миниатюры для картинок в наборе. Файлы других типов остаются строкой. */
+  preview?: boolean
   /** Дополнительная (кастомная) валидация на стороне потребителя. */
   validate?: (files: File[]) => GrFormFileError[] | Promise<GrFormFileError[]>
   /**
@@ -81,6 +86,7 @@ const props = withDefaults(
   defineProps<GrFormFileProps>(),
   {
     multiple: false,
+    preview: false,
     disabled: false,
     readonly: false,
     invalid: false,
@@ -109,6 +115,7 @@ const removeTextClass = computed(() => removeTextSizes[resolvedSize.value])
 const iconOffsetClass = computed(() => iconOffsets[resolvedSize.value])
 const buttonSize = computed(() => buttonSizes[resolvedSize.value])
 const iconSize = computed(() => iconSizes[resolvedSize.value])
+const previewClass = computed(() => [previewSizes[resolvedSize.value], previewBaseClass])
 
 const emit = defineEmits<GrFormFileEmits>()
 defineSlots<{
@@ -126,7 +133,14 @@ const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+  // `locked` — «ввод не принимается»: `disabled` или `readonly`. Набор в
+  // `readonly` виден и уходит в форму, но поменять его нельзя ни диалогом, ни
+  // перетаскиванием, ни удалением.
+  locked: isLocked,
+} = useGrFormControl(() => props)
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
 const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
@@ -182,6 +196,24 @@ const files = computed<File[]>(() => {
 
 const hasFiles = computed(() => files.value.length > 0)
 
+const { fileKey, previewUrl, revokePreview, revokeAllPreviews } = useFilePreviews({
+  enabled: () => props.preview,
+})
+
+/**
+ * Отзыв `object URL` привязан к самому набору, а не к местам, где его меняют.
+ * Файл уходит из набора десятком путей — кнопка строки, «очистить всё», новый
+ * выбор, внешний сброс `v-model`, — и точечные вызовы разъехались бы с первой
+ * же новой веткой; blob при этом висел бы в памяти вкладки до перезагрузки.
+ */
+watch(files, (next, prev) => {
+  for (const file of prev ?? []) {
+    if (!next.includes(file)) revokePreview(file)
+  }
+})
+
+onBeforeUnmount(revokeAllPreviews)
+
 /**
  * Один набор валидаторов на оба пути ввода. Собери его отдельно в `applyFiles`
  * и в `dropzone` — копии разъедутся при первой же правке, и выбор через диалог
@@ -216,7 +248,7 @@ function clearErrors() {
 }
 
 function openDialog() {
-  if (isDisabled.value || isReadonly.value) return
+  if (isLocked.value) return
   inputRef.value?.click()
 }
 
@@ -255,7 +287,7 @@ async function applyFiles(nextFiles: File[]) {
 }
 
 async function onInputChange(event: Event) {
-  if (isDisabled.value) return
+  if (isLocked.value) return
 
   const target = event.target as HTMLInputElement | null
   const nextFiles = target?.files ? Array.prototype.slice.call(target.files) as File[] : []
@@ -268,7 +300,7 @@ async function onInputChange(event: Event) {
 }
 
 function clearAll() {
-  if (isDisabled.value) return
+  if (isLocked.value) return
   clearErrors()
   clearInputValue()
   emit('clear')
@@ -278,7 +310,7 @@ function clearAll() {
 }
 
 function removeAt(index: number) {
-  if (isDisabled.value) return
+  if (isLocked.value) return
   if (!props.multiple) {
     clearAll()
     return
@@ -311,7 +343,7 @@ function issueMessage(issue: GrFormFileError): string {
 
 const dropzone = computed(() => {
   return {
-    enabled: !isDisabled.value,
+    enabled: !isLocked.value,
     multiple: props.multiple,
     validators: effectiveValidators.value,
     onFiles: async (dropped: File[]) => {
@@ -356,7 +388,7 @@ watch(
     v-dropzone="dropzone"
     data-gr-form-file
     class="rounded-[var(--gr-radius-md)]"
-    :class="disabled ? 'cursor-not-allowed' : ''"
+    :class="isDisabled ? 'cursor-not-allowed' : ''"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
@@ -396,7 +428,7 @@ watch(
         </GrButton>
 
         <GrButton
-          v-if="hasFiles && !multiple"
+          v-if="hasFiles && !multiple && !isReadonly"
           variant="secondary"
           :size="buttonSize"
           data-gr-form-file-clear-btn
@@ -410,7 +442,7 @@ watch(
         </GrButton>
 
         <GrButton
-          v-if="multiple && hasFiles"
+          v-if="multiple && hasFiles && !isReadonly"
           variant="secondary"
           :size="buttonSize"
           data-gr-form-file-clear-all-btn
@@ -422,6 +454,14 @@ watch(
           </GrIcon>
           <span :class="iconOffsetClass">{{ resolvedClearAllText }}</span>
         </GrButton>
+
+        <img
+          v-if="!multiple && hasFiles && previewUrl(files[0]!)"
+          data-gr-form-file-preview
+          :src="previewUrl(files[0]!)"
+          alt=""
+          :class="previewClass"
+        >
 
         <span
           v-if="!multiple && hasFiles"
@@ -446,10 +486,18 @@ watch(
       <div v-if="multiple && hasFiles" class="flex flex-col" :class="stackClass">
         <div
           v-for="(file, index) in files"
-          :key="`${file.name}-${file.size}-${index}`"
+          :key="fileKey(file)"
           class="flex items-center gap-2"
           data-gr-form-file-item
         >
+          <img
+            v-if="previewUrl(file)"
+            data-gr-form-file-preview
+            :src="previewUrl(file)"
+            alt=""
+            :class="previewClass"
+          >
+
           <span
             class="text-[var(--gr-muted-fg)] truncate max-w-[240px]"
             :class="textClass"
@@ -466,6 +514,7 @@ watch(
           >{{ formatFileSize(file) }}</span>
 
           <button
+            v-if="!isReadonly"
             type="button"
             class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             :class="removeTextClass"

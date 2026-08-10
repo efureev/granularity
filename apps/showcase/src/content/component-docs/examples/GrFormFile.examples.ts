@@ -23,6 +23,13 @@ export const grFormFileExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-form-file-multiple-queue',
   },
   {
+    id: 'form-file-preview',
+    title: 'Image thumbnails and a read-only set',
+    description: 'Превью показываются только у картинок — файл другого типа остаётся строкой. Переключатель рядом делает поле read-only: набор виден и уходит в форму, но менять его нечем.',
+    status: 'ready',
+    previewKey: 'gr-form-file-preview',
+  },
+  {
     id: 'form-file-sizes',
     title: 'Шкала размеров',
     description: 'Размер доезжает до вложенных кнопок и иконок, поэтому поле выбора файла встаёт в один ряд с остальными контролами формы.',
