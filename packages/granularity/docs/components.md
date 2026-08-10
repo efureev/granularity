@@ -58,7 +58,7 @@ GrSelect>` для них не работает, такой компонент к
 означает, что у компонента есть своя страница в [`components/`](./components/) —
 там его особенности, оговорки и примеры.
 
-- `GrAlert`
+- [`GrAlert`](./components/GrAlert.md)
 - [`GrAutocomplete`](./components/GrAutocomplete.md)
 - [`GrAvatar`](./components/GrAvatar.md)
 - `GrBadge`

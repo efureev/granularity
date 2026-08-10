@@ -41,7 +41,21 @@
             "description": "",
             "type": "GrAlertLive | undefined",
             "required": false,
-            "default": "\"auto\""
+            "default": "undefined"
+          },
+          {
+            "name": "icon",
+            "description": "Показывать ли иконку тона. Своя иконка — слотом `#icon`; проп нужен для случая «иконка мешает»: узкая колонка, плотный список, сообщение в форме.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "visible",
+            "description": "Видимость сообщения — **только контролируемая**: без пропа алерт виден всегда, и закрытие остаётся заботой потребителя (`@close`). С `v-model:visible` компонент прячет себя сам. Собственного состояния у пропа нет намеренно. Оно превратило бы кнопку закрытия в необратимое действие у всех, кто уже живёт на `@close` и, например, спрашивает по нему подтверждение.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "backgroundColor",
@@ -73,8 +87,18 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Текст сообщения.",
+            "type": "any"
+          },
+          {
+            "name": "icon",
+            "description": "Иконка вместо глифа по тону. Декоративна: остаётся `aria-hidden`.",
+            "type": "any"
+          },
+          {
+            "name": "actions",
+            "description": "Действия по сообщению: «Повторить», «Подробнее». Ложатся под текст.",
+            "type": "any"
           }
         ]
       },
@@ -88,6 +112,12 @@
             "description": "",
             "type": "[]",
             "signature": "(event: \"close\"): void"
+          },
+          {
+            "name": "update:visible",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:visible\", value: boolean): void"
           }
         ]
       },
@@ -7117,6 +7147,13 @@
             "default": "\"warning\""
           },
           {
+            "name": "icon",
+            "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -7185,13 +7222,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "icon",
-            "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "allowHalf",
@@ -8376,6 +8406,13 @@
             "default": "undefined"
           },
           {
+            "name": "icon",
+            "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
@@ -8392,13 +8429,6 @@
           {
             "name": "locale",
             "description": "BCP-47 локаль форматирования. Не задана — берётся из i18n-адаптера; нет и адаптера — работают ручные разделители.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "icon",
-            "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrAlert` opens up: a custom icon, a place for actions, and self-dismissal.** Everything the component could do was
+  fixed at build time — the icon came from a private tone → glyph map with no way to replace or remove it, action
+  buttons had to go into the message text, and the announcement mode (`live`) was the one prop of four that
+  `GrConfigProvider` could not set globally, so an app that wanted calm alerts had to spell `live="polite"` on every
+  one. Now: slot `#icon` replaces the glyph and `:icon="false"` drops it (useful in a dense form, where a column of
+  icons shouts); slot `#actions` gives "Retry"/"Open logs" their own row under the text instead of breaking the
+  sentence; `live` joins `tone`, `variant` and `closable` in `componentDefaults`. Added `v-model:visible` as well —
+  and deliberately **without** internal state: with no prop the alert still does not disappear on click, it only
+  emits `close` as before, because turning that button into an irreversible action would break every consumer who
+  asks for confirmation on `close` first. Nothing about the existing markup or `@close` changed. Full contract:
+  `docs/components/GrAlert.md`, the component's first page of its own.
+
 - **A solid-fill role per tone: `--gr-{tone}-solid`, `-solid-hover`, `-solid-active`, `-solid-fg`.** A tone had one
   fill role, and it was doing two incompatible jobs. A badge or an indicator needs 3:1 against the page and carries
   dark text on a light fill; a solid button needs light text, which only holds on a darker fill — white on

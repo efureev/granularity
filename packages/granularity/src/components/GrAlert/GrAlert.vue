@@ -47,6 +47,21 @@ export interface GrAlertProps {
   title?: string
   closable?: boolean
   live?: GrAlertLive
+  /**
+   * Показывать ли иконку тона. Своя иконка — слотом `#icon`; проп нужен для
+   * случая «иконка мешает»: узкая колонка, плотный список, сообщение в форме.
+   */
+  icon?: boolean
+  /**
+   * Видимость сообщения — **только контролируемая**: без пропа алерт виден
+   * всегда, и закрытие остаётся заботой потребителя (`@close`). С
+   * `v-model:visible` компонент прячет себя сам.
+   *
+   * Собственного состояния у пропа нет намеренно. Оно превратило бы кнопку
+   * закрытия в необратимое действие у всех, кто уже живёт на `@close` и,
+   * например, спрашивает по нему подтверждение.
+   */
+  visible?: boolean
   backgroundColor?: string
   textColor?: string
   borderColor?: string
@@ -54,11 +69,22 @@ export interface GrAlertProps {
 
 export interface GrAlertEmits {
   (e: 'close'): void
+  /** Пользователь закрыл сообщение (`v-model:visible`). */
+  (e: 'update:visible', value: boolean): void
 }
 
 const emit = defineEmits<GrAlertEmits>()
 
-// Дефолты tone/variant/closable намеренно `undefined`: «настоящий» дефолт
+defineSlots<{
+  /** Текст сообщения. */
+  default?: () => any
+  /** Иконка вместо глифа по тону. Декоративна: остаётся `aria-hidden`. */
+  icon?: () => any
+  /** Действия по сообщению: «Повторить», «Подробнее». Ложатся под текст. */
+  actions?: () => any
+}>()
+
+// Дефолты tone/variant/closable/live намеренно `undefined`: «настоящий» дефолт
 // переехал в `useGrComponentProp`, иначе `GrConfigProvider` не смог бы отличить
 // заданный пользователем проп от подставленного Vue.
 const props = withDefaults(defineProps<GrAlertProps>(), {
@@ -66,7 +92,9 @@ const props = withDefaults(defineProps<GrAlertProps>(), {
   variant: undefined,
   title: undefined,
   closable: undefined,
-  live: 'auto',
+  live: undefined,
+  icon: undefined,
+  visible: undefined,
   backgroundColor: undefined,
   textColor: undefined,
   borderColor: undefined,
@@ -77,6 +105,7 @@ const { t } = useGranularityTranslations()
 const tone = useGrComponentProp('GrAlert', 'tone', () => props.tone, 'info')
 const variantInput = useGrComponentProp('GrAlert', 'variant', () => props.variant, 'soft')
 const closable = useGrComponentProp('GrAlert', 'closable', () => props.closable, false)
+const live = useGrComponentProp('GrAlert', 'live', () => props.live, 'auto')
 
 const variant = variantInput
 
@@ -87,7 +116,15 @@ const ICONS: Record<GrAlertIconKey, Component> = {
   danger: IconError,
 }
 
-const icon = computed<Component>(() => ICONS[grAlertIconKey(tone.value)])
+const toneIcon = computed<Component>(() => ICONS[grAlertIconKey(tone.value)])
+
+const showIcon = computed(() => props.icon !== false)
+const isVisible = computed(() => props.visible !== false)
+
+function close(): void {
+  emit('update:visible', false)
+  emit('close')
+}
 
 const colors = computed(() => applyGrAlertOverrides(
   resolveGrAlertColors(tone.value, variant.value),
@@ -106,9 +143,9 @@ const rootStyle = computed(() => ({
  * поэтому по умолчанию его получают только `warning` и `danger`.
  */
 const role = computed(() => {
-  const mode = props.live === 'auto'
+  const mode = live.value === 'auto'
     ? (tone.value === 'danger' || tone.value === 'warning' ? 'assertive' : 'polite')
-    : props.live
+    : live.value
 
   if (mode === 'off') return undefined
   return mode === 'assertive' ? 'alert' : 'status'
@@ -117,17 +154,23 @@ const role = computed(() => {
 
 <template>
   <div
+    v-if="isVisible"
     :role="role"
     data-gr-alert
     class="rounded-[var(--gr-radius-lg)] border px-4 py-3"
     :style="rootStyle"
   >
     <div class="flex items-start gap-3">
-      <component
-        :is="icon"
+      <span
+        v-if="showIcon"
+        data-gr-alert-icon
         class="mt-0.5 h-5 w-5 shrink-0 text-[var(--gr-alert-icon-color)]"
         aria-hidden="true"
-      />
+      >
+        <slot name="icon">
+          <component :is="toneIcon" class="h-5 w-5" />
+        </slot>
+      </span>
 
       <div class="min-w-0 flex-1">
         <div
@@ -142,6 +185,16 @@ const role = computed(() => {
         >
           <slot />
         </div>
+
+        <!-- Действия идут под текстом, а не рядом с ним: на узкой колонке
+             кнопки в одной строке с сообщением отжимают его до одного слова. -->
+        <div
+          v-if="$slots.actions"
+          data-gr-alert-actions
+          class="mt-2 flex flex-wrap gap-2"
+        >
+          <slot name="actions" />
+        </div>
       </div>
 
       <button
@@ -149,7 +202,7 @@ const role = computed(() => {
         type="button"
         class="-mr-1.5 -mt-1.5 shrink-0 rounded-[var(--gr-radius-md)] p-1.5 text-[var(--gr-alert-close-color)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] hover:bg-[var(--gr-alert-close-hover-bg)] hover:text-[var(--gr-alert-close-hover-color)]"
         :aria-label="t('gr.common.close', 'Close')"
-        @click="emit('close')"
+        @click="close"
       >
         <IconClose class="h-4 w-4" aria-hidden="true" />
       </button>

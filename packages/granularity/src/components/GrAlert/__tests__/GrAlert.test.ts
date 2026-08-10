@@ -185,4 +185,115 @@ describe('GrAlert', () => {
 
     expect((wrapper.element as HTMLDivElement).style.getPropertyValue('--gr-alert-bg')).toBe('var(--gr-success-light)')
   })
+
+  describe('иконка', () => {
+    it('по умолчанию рендерит глиф тона', () => {
+      const wrapper = mount(GrAlert, { props: { tone: 'success' }, slots: { default: 'Body' } })
+
+      expect(wrapper.find('[data-gr-alert-icon]').exists()).toBe(true)
+      expect(wrapper.find('[data-icon="check-circle"]').exists()).toBe(true)
+    })
+
+    it('`icon: false` убирает иконку целиком', () => {
+      const wrapper = mount(GrAlert, { props: { tone: 'success', icon: false }, slots: { default: 'Body' } })
+
+      expect(wrapper.find('[data-gr-alert-icon]').exists()).toBe(false)
+      expect(wrapper.find('[data-icon="check-circle"]').exists()).toBe(false)
+    })
+
+    it('слот подменяет глиф, оставляя иконку декоративной', () => {
+      const wrapper = mount(GrAlert, {
+        props: { tone: 'success' },
+        slots: { default: 'Body', icon: '<span data-custom-icon />' },
+      })
+
+      const icon = wrapper.get('[data-gr-alert-icon]')
+
+      expect(icon.attributes('aria-hidden')).toBe('true')
+      expect(icon.find('[data-custom-icon]').exists()).toBe(true)
+      expect(wrapper.find('[data-icon="check-circle"]').exists()).toBe(false)
+    })
+  })
+
+  describe('действия', () => {
+    it('блок действий появляется только со слотом', () => {
+      const without = mount(GrAlert, { slots: { default: 'Body' } })
+      expect(without.find('[data-gr-alert-actions]').exists()).toBe(false)
+
+      const withActions = mount(GrAlert, {
+        slots: { default: 'Body', actions: '<button>Retry</button>' },
+      })
+
+      expect(withActions.get('[data-gr-alert-actions]').text()).toBe('Retry')
+    })
+  })
+
+  describe('видимость', () => {
+    /**
+     * Защита от случайного перехода на uncontrolled-семантику: без пропа
+     * `visible` кнопка закрытия обязана только сообщать о намерении. Иначе
+     * потребитель, спрашивающий по `close` подтверждение, потеряет сообщение
+     * до ответа.
+     */
+    it('без пропа `visible` алерт остаётся в DOM после закрытия', async () => {
+      const wrapper = mount(GrAlert, { props: { closable: true }, slots: { default: 'Body' } })
+
+      await wrapper.get('button[aria-label="Close"]').trigger('click')
+
+      expect(wrapper.find('[data-gr-alert]').exists()).toBe(true)
+    })
+
+    it('`visible: false` не рендерит сообщение', () => {
+      const wrapper = mount(GrAlert, { props: { visible: false }, slots: { default: 'Body' } })
+
+      expect(wrapper.find('[data-gr-alert]').exists()).toBe(false)
+    })
+
+    it('кнопка закрытия шлёт и `update:visible`, и `close`', async () => {
+      const wrapper = mount(GrAlert, {
+        props: { closable: true, visible: true },
+        slots: { default: 'Body' },
+      })
+
+      await wrapper.get('button[aria-label="Close"]').trigger('click')
+
+      expect(wrapper.emitted('update:visible')).toEqual([[false]])
+      expect(wrapper.emitted('close')?.length).toBe(1)
+    })
+  })
+
+  it('`live` читается из GrConfigProvider', () => {
+    const wrapper = mount(GrAlert, {
+      props: { tone: 'danger' },
+      slots: { default: 'Body' },
+      global: {
+        provide: {
+          [GR_CONFIG_KEY as symbol]: {
+            size: computed(() => undefined),
+            componentDefaults: computed(() => ({ GrAlert: { live: 'polite' } })),
+          },
+        },
+      },
+    })
+
+    // `danger` сам по себе дал бы `alert`; провайдер успокаивает весь пакет.
+    expect(wrapper.attributes('role')).toBe('status')
+  })
+
+  it('локальный `live` сильнее дефолта провайдера', () => {
+    const wrapper = mount(GrAlert, {
+      props: { tone: 'info', live: 'assertive' },
+      slots: { default: 'Body' },
+      global: {
+        provide: {
+          [GR_CONFIG_KEY as symbol]: {
+            size: computed(() => undefined),
+            componentDefaults: computed(() => ({ GrAlert: { live: 'polite' } })),
+          },
+        },
+      },
+    })
+
+    expect(wrapper.attributes('role')).toBe('alert')
+  })
 })

@@ -17,6 +17,7 @@ export const demoPathByPreviewKey = {
   'extra-datepicker-localized':             'extra/granularity-datepicker/GrDateTimePickerLocalizedDemo.vue',
   'extra-datepicker-modes':                 'extra/granularity-datepicker/GrDateTimePickerModesDemo.vue',
   'extra-time-basic':                       'extra/granularity-datepicker/GrTimePickerBasicDemo.vue',
+  'gr-alert-actions':                       'components/gr-alert/GrAlertActionsDemo.vue',
   'gr-alert-closable-flow':                 'components/gr-alert/GrAlertClosableDemo.vue',
   'gr-alert-custom-colors':                 'components/gr-alert/GrAlertCustomColorsDemo.vue',
   'gr-alert-variant-matrix':                'components/gr-alert/GrAlertVariantsDemo.vue',
