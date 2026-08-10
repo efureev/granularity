@@ -2,7 +2,7 @@
   "examples": {
     "table-basic-rows": {
       "title": "Базовый рендер строк",
-      "description": "Для базовой страницы показываем canonical table markup: `#head` slot, body rows и composition с badges."
+      "description": "Для базовой страницы показываем canonical table markup: `#header` slot, body rows и composition с badges."
     },
     "table-loading-state": {
       "title": "Загрузка строк со скелетонами",

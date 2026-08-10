@@ -2,7 +2,7 @@
   "examples": {
     "table-basic-rows": {
       "title": "Basic row rendering",
-      "description": "For the base page we show canonical table markup: the `#head` slot, body rows and composition with badges."
+      "description": "For the base page we show canonical table markup: the `#header` slot, body rows and composition with badges."
     },
     "table-loading-state": {
       "title": "Loading rows with skeletons",

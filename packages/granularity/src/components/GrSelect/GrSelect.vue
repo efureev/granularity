@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TValue extends GrSelectValue = string">
-import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
@@ -15,6 +15,7 @@ import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
+import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
 import { matchesOptionQuery, normalizeOptionQuery, resolveSelectedOptions } from '../shared/optionFilter'
@@ -162,6 +163,17 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
    * panel-режиме значения сериализуются hidden-инпутами (ключ — `keyOf`).
    */
   name?: string
+  /**
+   * Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета
+   * (`docs/form-controls.md`). Аддоны живут в панельном триггере: внутрь
+   * нативного `<select>` разметку положить нельзя.
+   */
+  prefixMinWidth?: string
+  prefixMaxWidth?: string
+  suffixMinWidth?: string
+  suffixMaxWidth?: string
+  prefixFixed?: boolean
+  suffixFixed?: boolean
 }
 
 export interface GrSelectEmits<TValue extends GrSelectValue = string> {
@@ -222,6 +234,12 @@ const props = withDefaults(
     underline: undefined,
     open: undefined,
     name: undefined,
+    prefixMinWidth: undefined,
+    prefixMaxWidth: undefined,
+    suffixMinWidth: undefined,
+    suffixMaxWidth: undefined,
+    prefixFixed: false,
+    suffixFixed: false,
   },
 )
 
@@ -251,6 +269,29 @@ const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : def
 const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full')
 
 const emit = defineEmits<GrSelectEmits<TValue>>()
+defineSlots<{
+  /** Собственные `<option>` для нативного режима. */
+  default?: () => any
+  /** Аддон слева в панельном триггере (в нативном режиме недоступен). */
+  prefix?: () => any
+  /** Аддон справа в панельном триггере, перед крестиком и шевроном. */
+  suffix?: () => any
+  /** Отображение значения в триггере вместо текста по умолчанию. */
+  value?: (props: {
+    selectedOptions: GrSelectOption<TValue>[]
+    selectedValues: TValue[]
+    displayLabel: string
+    placeholder?: string
+    hasSelection: boolean
+  }) => any
+  /** Строка списка вместо подписи опции. */
+  option?: (props: { option: GrSelectOption<TValue>, selected: boolean }) => any
+  /** Содержимое панели, пока едут опции. */
+  loading?: () => any
+  /** Содержимое панели, когда подходящих опций нет. */
+  empty?: () => any
+}>()
+
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required)
 // для связки с лейблом и сообщением об ошибке.
@@ -373,7 +414,7 @@ const hasModelInOptions = computed(() => {
   return flatOptions.value.some(o => sameValue(o.value, modelSingle.value))
 })
 
-const displayLabel = computed(() => {
+const displayLabel = computed<string>(() => {
   if (props.multiple) {
     if (!selectedValues.value.length) return ''
     return selectedValues.value
@@ -381,12 +422,36 @@ const displayLabel = computed(() => {
       .join(', ')
   }
 
-  return flatOptions.value.find(o => sameValue(o.value, modelSingle.value))?.label ?? modelSingle.value
+  return flatOptions.value.find(o => sameValue(o.value, modelSingle.value))?.label ?? String(modelSingle.value)
 })
 
 const displayText = computed(() => {
   if (hasSelection.value) return displayLabel.value
   return props.placeholder ?? ''
+})
+
+const ADDON_MIN_WIDTH_BY_SIZE: Record<GrSelectSize, string> = {
+  xs: '2rem',
+  sm: '2.25rem',
+  md: '2.5rem',
+  lg: '3rem',
+}
+
+/**
+ * Триггер панельного режима — флекс-строка, поэтому аддоны встают её соседями,
+ * а не поверх поля: резервировать место паддингом не нужно.
+ */
+const {
+  hasPrefix,
+  hasSuffix,
+  prefixEl,
+  suffixEl,
+  prefixLen,
+  prefixStyle,
+  suffixStyle,
+} = useControlAddons(() => props, {
+  defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
+  paddingX: () => '0px',
 })
 
 // Нативный `<select multiple>` — это многострочный listbox, а не поповер. В режиме
@@ -857,6 +922,21 @@ const listboxStyle = computed(() => {
 })
 
 if (import.meta.env?.DEV) {
+  const slots = useSlots()
+
+  watch(
+    () => [Boolean(slots.prefix || slots.suffix), effectiveOptionsView.value] as const,
+    ([hasAddon, view]) => {
+      if (hasAddon && view !== 'panel') {
+        console.warn(
+          '[granularity] GrSelect: слоты `prefix`/`suffix` работают только с '
+          + '`optionsView="panel"` — внутрь нативного `<select>` разметку положить нельзя.',
+        )
+      }
+    },
+    { immediate: true },
+  )
+
   watch(
     () => [props.virtual, effectiveOptionsView.value, props.view] as const,
     ([virtual, view, appearance]) => {
@@ -1285,6 +1365,17 @@ const themeAttrs = useGrThemeAttrs()
       @click="toggleDropdown"
       @keydown="onComboKeydown"
     >
+      <span
+        v-if="hasPrefix"
+        ref="prefixEl"
+        data-gr-select-prefix
+        class="shrink-0 inline-flex items-center justify-center text-[var(--gr-muted-fg)] select-none truncate"
+        :style="prefixStyle"
+        aria-hidden="true"
+      >
+        <slot name="prefix" />
+      </span>
+
       <span class="min-w-0 flex-1">
         <slot
           name="value"
@@ -1301,6 +1392,17 @@ const themeAttrs = useGrThemeAttrs()
             {{ showTags && hasSelection ? '' : displayText }}
           </span>
         </slot>
+      </span>
+
+      <span
+        v-if="hasSuffix"
+        ref="suffixEl"
+        data-gr-select-suffix
+        class="shrink-0 inline-flex items-center justify-center text-[var(--gr-muted-fg)] select-none truncate"
+        :style="suffixStyle"
+        aria-hidden="true"
+      >
+        <slot name="suffix" />
       </span>
 
       <!-- Место под кнопку очистки: она лежит абсолютом поверх триггера. -->
@@ -1329,6 +1431,7 @@ const themeAttrs = useGrThemeAttrs()
       v-if="showTags && hasSelection"
       data-gr-select-tags
       class="pointer-events-none absolute inset-y-0 left-0 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1 px-3 py-1.5"
+      :style="{ left: hasPrefix ? prefixLen : undefined }"
     >
       <span
         v-for="opt in visibleTagOptions"

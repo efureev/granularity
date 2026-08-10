@@ -111,6 +111,11 @@ const buttonSize = computed(() => buttonSizes[resolvedSize.value])
 const iconSize = computed(() => iconSizes[resolvedSize.value])
 
 const emit = defineEmits<GrFormFileEmits>()
+defineSlots<{
+  /** Собственный вывод ошибок вместо списка по умолчанию. */
+  error?: (props: { errors: GrFormFileError[] }) => any
+}>()
+
 
 const { t } = useGranularityTranslations()
 
@@ -474,7 +479,7 @@ watch(
         </div>
       </div>
 
-      <slot name="errors" :errors="displayedErrors">
+      <slot name="error" :errors="displayedErrors">
         <div
           v-if="hasLocalErrors"
           :id="errorsId"

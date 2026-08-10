@@ -17,7 +17,7 @@ const rows = [
       </div>
 
       <GrTable :size="size" aria-label="Plans">
-        <template #head>
+        <template #header>
           <tr>
             <th class="px-4 py-2 text-left">
               Plan

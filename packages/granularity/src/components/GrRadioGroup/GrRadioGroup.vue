@@ -86,6 +86,11 @@ const {
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
 const emit = defineEmits<GrRadioGroupEmits>()
+defineSlots<{
+  /** Собственная разметка переключателей вместо генерации из `options`. */
+  default?: () => any
+}>()
+
 
 function setValue(next: GrRadioValue): void {
   if (isDisabled.value || isReadonly.value)

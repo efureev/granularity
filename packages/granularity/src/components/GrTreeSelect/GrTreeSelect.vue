@@ -1,11 +1,12 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId, useSlots, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
+import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -18,8 +19,9 @@ import GrTree, {
   type GrTreeKey,
   type GrTreeNode,
 } from '../GrTree'
+import type { GrInputSize } from '../GrInput/GrInput.vue'
 import type { GrTreeSelectModelValue, GrTreeSelectProps } from './grTreeSelectTypes'
-import { grTreeSelectClass, grTreeSelectPanelClass } from './grTreeSelectStyles'
+import { grTreeSelectClass, grTreeSelectPanelClass, paddingX, trailingZoneWidth } from './grTreeSelectStyles'
 
 export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'update:modelValue', value: GrTreeSelectModelValue): void
@@ -69,6 +71,12 @@ const props = withDefaults(
     closeOnSelect: undefined,
     dropdownMaxHeight: 320,
     virtual: false,
+    prefixMinWidth: undefined,
+    prefixMaxWidth: undefined,
+    suffixMinWidth: undefined,
+    suffixMaxWidth: undefined,
+    prefixFixed: false,
+    suffixFixed: false,
   },
 )
 
@@ -85,6 +93,10 @@ defineSlots<{
   empty?: () => any
   /** Содержимое панели, пока данные едут. */
   loading?: () => any
+  /** Аддон слева от значения: иконка, код валюты, метка. */
+  prefix?: () => any
+  /** Аддон справа от значения, перед крестиком и шевроном. */
+  suffix?: () => any
 }>()
 
 const rootEl = ref<HTMLElement | null>(null)
@@ -283,6 +295,38 @@ const className = computed(() => {
 const panelClasses = computed(() => {
   return grTreeSelectPanelClass
 })
+
+const ADDON_MIN_WIDTH_BY_SIZE: Record<GrInputSize, string> = {
+  xs: '2rem',
+  sm: '2.25rem',
+  md: '2.5rem',
+  lg: '3rem',
+}
+
+const slots = useSlots()
+
+const {
+  hasPrefix,
+  hasSuffix,
+  prefixEl,
+  suffixEl,
+  prefixStyle,
+  suffixStyle,
+  fieldPadding: triggerStyle,
+} = useControlAddons(() => props, {
+  defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
+  paddingX: () => paddingX[resolvedSize.value],
+  // Место под крестик и шеврон уже отдано классом `pr-9`, но инлайн-паддинг
+  // перекрывает класс целиком — с суффиксом эту зону приходится вернуть числом.
+  trailingReserve: () => (slots.suffix ? trailingZoneWidth : '0px'),
+})
+
+// Слот `value` рисуется поверх поля и обязан жить в тех же границах, что и
+// текст под ним. Без аддонов границы задаёт класс — стиль остаётся пустым.
+const valueOverlayStyle = computed(() => ({
+  left: hasPrefix.value ? triggerStyle.value.paddingLeft : undefined,
+  right: hasSuffix.value ? triggerStyle.value.paddingRight : undefined,
+}))
 
 function setOpen(next: boolean) {
   if (isDisabled.value || isReadonly.value)
@@ -524,6 +568,17 @@ const themeAttrs = useGrThemeAttrs()
       >
     </template>
     <div class="relative">
+      <div
+        v-if="hasPrefix"
+        ref="prefixEl"
+        data-gr-tree-select-prefix
+        class="absolute inset-y-px left-px flex items-center justify-center rounded-l-md border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+        :style="prefixStyle"
+        aria-hidden="true"
+      >
+        <slot name="prefix" />
+      </div>
+
       <input
         :id="fieldId"
         ref="triggerEl"
@@ -545,6 +600,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-label="ariaLabel"
         class="w-full rounded-md border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
+        :style="triggerStyle"
         @pointerdown="onTriggerPointerDown"
         @click="toggleDropdown"
         @focus="onTriggerFocus"
@@ -576,8 +632,21 @@ const themeAttrs = useGrThemeAttrs()
       </span>
 
       <div
+        v-if="hasSuffix"
+        ref="suffixEl"
+        data-gr-tree-select-suffix
+        class="absolute inset-y-px right-9 flex items-center justify-center border-l border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+        :class="suffixFixed ? '[direction:rtl]' : ''"
+        :style="suffixStyle"
+        aria-hidden="true"
+      >
+        <slot name="suffix" />
+      </div>
+
+      <div
         v-if="$slots.value"
         class="absolute inset-y-0 left-3 right-9 flex items-center pointer-events-none"
+        :style="valueOverlayStyle"
       >
         <slot
           name="value"

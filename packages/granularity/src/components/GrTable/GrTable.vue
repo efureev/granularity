@@ -82,8 +82,8 @@ export interface GrTableProps {
 /**
  * `GrTable` — «тонкий» GR-контейнер для табличных данных.
  *
- * Рендерит `<table>` внутри скролл-обёртки и даёт слоты `#caption`, `#head`,
- * default (tbody) и `#foot`. Стили ячеек (`<th>`/`<td>` паддинги, выравнивание)
+ * Рендерит `<table>` внутри скролл-обёртки и даёт слоты `#caption`, `#header`,
+ * default (tbody) и `#footer`. Стили ячеек (`<th>`/`<td>` паддинги, выравнивание)
  * оставлены на консьюмере.
  *
  * ВАЖНО: `min-w-full` сам по себе не даст горизонтального скролла. Для него
@@ -211,7 +211,7 @@ defineExpose({
 </slot>
       </caption>
       <thead :class="theadClass">
-        <slot name="head" />
+        <slot name="header" />
       </thead>
       <tbody :class="tbodyClass">
         <template v-if="loading">
@@ -234,8 +234,8 @@ defineExpose({
 
         <slot v-else />
       </tbody>
-      <tfoot v-if="slots.foot" class="text-[var(--gr-fg)]">
-        <slot name="foot" />
+      <tfoot v-if="slots.footer" class="text-[var(--gr-fg)]">
+        <slot name="footer" />
       </tfoot>
     </table>
   </div>

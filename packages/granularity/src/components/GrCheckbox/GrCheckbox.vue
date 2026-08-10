@@ -104,6 +104,11 @@ const props = withDefaults(defineProps<GrCheckboxProps>(), {
 })
 
 const emit = defineEmits<GrCheckboxEmits>()
+defineSlots<{
+  /** Подпись флажка. Может содержать ссылки: роль остаётся на самом контроле. */
+  default?: () => any
+}>()
+
 
 const slots = useSlots()
 

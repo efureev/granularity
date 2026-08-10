@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'tree-select-addons',
+    title: 'Addons in the trigger',
+    description: 'Иконка и валюта в триггере: `prefixFixed` держит ширину аддона, поэтому колонка полей не плывёт.',
+    status: 'ready',
+    previewKey: 'gr-tree-select-addons',
+  },
+  {
     id: 'tree-select-path-display',
     title: 'Single select with path display',
     description: 'Базовый сценарий для `GrTreeSelect`: single-value режим с `valueDisplay="path"`, когда пользователю нужен контекст полной ветки.',

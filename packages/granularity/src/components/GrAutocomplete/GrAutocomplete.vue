@@ -17,6 +17,7 @@ import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
 import { filterOptions, resolveSelectedOptions } from '../shared/optionFilter'
+import { useControlAddons } from '../../composables/internal/useControlAddons'
 
 import {
   autocompleteChipClass,
@@ -119,6 +120,16 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   open?: boolean
   /** Имя для нативной формы: hidden input по значению модели (не по тексту запроса). */
   name?: string
+  /**
+   * Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета
+   * (`docs/form-controls.md`).
+   */
+  prefixMinWidth?: string
+  prefixMaxWidth?: string
+  suffixMinWidth?: string
+  suffixMaxWidth?: string
+  prefixFixed?: boolean
+  suffixFixed?: boolean
 }
 
 export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string> {
@@ -165,14 +176,51 @@ const props = withDefaults(
     clearLabel: undefined,
     open: undefined,
     name: undefined,
+    prefixMinWidth: undefined,
+    prefixMaxWidth: undefined,
+    suffixMinWidth: undefined,
+    suffixMaxWidth: undefined,
+    prefixFixed: false,
+    suffixFixed: false,
   },
 )
+
+/** Ширина аддона по умолчанию — та же лестница, что у `GrInput`. */
+const ADDON_MIN_WIDTH_BY_SIZE: Record<GrAutocompleteSize, string> = {
+  xs: '2rem',
+  sm: '2.25rem',
+  md: '2.5rem',
+  lg: '3rem',
+}
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrAutocomplete' })
 const resolvedClearable = useGrComponentProp('GrAutocomplete', 'clearable', () => props.clearable, false)
 
+/**
+ * Аддоны живут флекс-соседями поля, а не поверх него: оболочка автокомплита —
+ * флекс-строка с чипами, поэтому резервировать место паддингом не нужно.
+ * Контракт ширин остаётся общим (`useControlAddons`).
+ */
+const { hasPrefix, hasSuffix, prefixEl, suffixEl, prefixStyle, suffixStyle } = useControlAddons(() => props, {
+  defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
+  paddingX: () => '0px',
+})
+
 const emit = defineEmits<GrAutocompleteEmits<TValue>>()
+defineSlots<{
+  /** Аддон слева от поля ввода. */
+  prefix?: () => any
+  /** Аддон справа, перед спиннером и крестиком. */
+  suffix?: () => any
+  /** Строка списка вместо подписи опции. */
+  option?: (props: { option: GrAutocompleteOption<TValue>, selected: boolean }) => any
+  /** Содержимое панели, пока едут опции. */
+  loading?: () => any
+  /** Содержимое панели, когда подходящих опций нет. */
+  empty?: () => any
+}>()
+
 
 const { t } = useGranularityTranslations()
 
@@ -790,6 +838,16 @@ const themeAttrs = useGrThemeAttrs()
       :class="autocompleteShellClass({ size: resolvedSize, disabled: isDisabled, invalid: isInvalid })"
       @mousedown.self.prevent="focusInput"
     >
+      <span
+        v-if="hasPrefix"
+        ref="prefixEl"
+        data-gr-autocomplete-prefix
+        class="inline-flex shrink-0 items-center justify-center text-[var(--gr-muted-fg)]"
+        :style="prefixStyle"
+      >
+        <slot name="prefix" />
+      </span>
+
       <!-- Chips выбранных значений (multiple). -->
       <template v-if="multiple">
         <span
@@ -842,6 +900,16 @@ const themeAttrs = useGrThemeAttrs()
         @focus="onFocus"
         @keydown="onKeydown"
       >
+
+      <span
+        v-if="hasSuffix"
+        ref="suffixEl"
+        data-gr-autocomplete-suffix
+        class="inline-flex shrink-0 items-center justify-center text-[var(--gr-muted-fg)]"
+        :style="suffixStyle"
+      >
+        <slot name="suffix" />
+      </span>
 
       <!-- Trailing: спиннер / очистка / шеврон. -->
       <span

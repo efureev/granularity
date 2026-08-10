@@ -170,10 +170,10 @@ test.describe('панель автокомплита', () => {
     await page.locator('#live-examples').waitFor()
 
     // Демо приезжают асинхронно, и появление каждого следующего сдвигает
-    // страницу: клик, попавший в этот момент, уходит мимо поля. Ждём все три и
+    // страницу: клик, попавший в этот момент, уходит мимо поля. Ждём их все и
     // при промахе повторяем.
     const inputs = page.locator('[data-testid="gr-autocomplete-input"]')
-    await expect(inputs).toHaveCount(4)
+    await expect(inputs).toHaveCount(5)
 
     const input = inputs.first()
     await expect.poll(async () => {

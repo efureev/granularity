@@ -4,7 +4,7 @@ export const grTableExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'table-basic-rows',
     title: 'Basic row rendering',
-    description: 'Для базовой страницы показываем canonical table markup: `#head` slot, body rows и composition с badges.',
+    description: 'Для базовой страницы показываем canonical table markup: `#header` slot, body rows и composition с badges.',
     status: 'ready',
     previewKey: 'gr-table-basic-rows',
   },

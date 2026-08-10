@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grInputTagExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'input-tag-addons',
+    title: 'Addons around the chips',
+    description: 'Слоты `prefix` и `suffix` в оболочке: иконка слева, счётчик набора справа — чипы остаются на своём месте.',
+    status: 'ready',
+    previewKey: 'gr-input-tag-addons',
+  },
+  {
     id: 'input-tag-validation',
     title: 'Проверка тега перед добавлением',
     description: 'Асинхронный `beforeAdd` со спиннером, событие `reject` для объяснения отказа и `clearable` для сброса набора.',

@@ -135,7 +135,7 @@ export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<
 /**
  * `GrDataTable` — data-таблица поверх `GrTable` с сортировкой по клику
  * на заголовок и scoped-слотами ячеек (`#cell-<key>`), `#header-<key>`,
- * `#caption`, `#foot`, `#empty`, `#loading`.
+ * `#caption`, `#footer`, `#empty`, `#loading`.
  *
  * Сортировка, включая крайние случаи с пустыми и смешанными значениями, живёт
  * в `grDataTableSort.ts` — см. `docs/components/GrDataTable.md`.
@@ -570,7 +570,7 @@ defineExpose({
       >{{ liveMessage }}</span>
     </template>
 
-    <template #head>
+    <template #header>
       <tr data-gr-datatable-header :aria-rowindex="virtual ? 1 : undefined">
         <th
           v-if="selectable"
@@ -719,8 +719,8 @@ defineExpose({
       </tr>
     </template>
 
-    <template v-if="$slots.foot" #foot>
-      <slot name="foot" />
+    <template v-if="$slots.footer" #footer>
+      <slot name="footer" />
     </template>
   </GrTable>
 </template>

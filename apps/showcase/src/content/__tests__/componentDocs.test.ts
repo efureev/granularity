@@ -34,7 +34,7 @@ describe('component docs metadata', () => {
     const selectDoc = getShowcaseComponentDoc(selectEntity!)
     const fileUploadDoc = getShowcaseComponentDoc(fileUploadEntity!)
 
-    expect(selectDoc.examples).toHaveLength(8)
+    expect(selectDoc.examples).toHaveLength(9)
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
@@ -109,7 +109,7 @@ describe('component docs metadata', () => {
     expect(treeDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeDoc.examples.every(example => example.previewKey?.startsWith('gr-tree'))).toBe(true)
 
-    expect(treeSelectDoc.examples).toHaveLength(4)
+    expect(treeSelectDoc.examples).toHaveLength(5)
     expect(treeSelectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeSelectDoc.examples.every(example => example.previewKey?.startsWith('gr-tree-select'))).toBe(true)
   })
@@ -304,7 +304,7 @@ describe('component docs metadata', () => {
     expect(formSectionDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(formSectionDoc.examples.every(example => example.previewKey?.startsWith('gr-form-section'))).toBe(true)
 
-    expect(inputTagDoc.examples).toHaveLength(4)
+    expect(inputTagDoc.examples).toHaveLength(5)
     expect(inputTagDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(inputTagDoc.examples.every(example => example.previewKey?.startsWith('gr-input-tag'))).toBe(true)
   })

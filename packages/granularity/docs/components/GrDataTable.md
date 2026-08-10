@@ -71,7 +71,7 @@
 - `@row-click` отдаёт `{ row, index, event }`;
 - `rowClass` — строка или функция от строки;
 - `rowProps` — произвольные атрибуты (`data-*`, `title`);
-- слоты `#cell-<key>`, `#header-<key>`, `#empty`, `#loading`, `#caption`, `#foot`;
+- слоты `#cell-<key>`, `#header-<key>`, `#empty`, `#loading`, `#caption`, `#footer`;
 - `emptyText`/`loadingText` — если хватает текста без слота;
 - `width` у колонки — число (пиксели) или строка (`'30%'`, `'12rem'`); уезжает
   в заголовочную ячейку и работает в любом режиме.

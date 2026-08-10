@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'select-addons',
+    title: 'Addons in the panel trigger',
+    description: 'Аддоны доступны в режиме `optionsView="panel"`: внутрь нативного `<select>` разметку положить нельзя.',
+    status: 'ready',
+    previewKey: 'gr-select-addons',
+  },
+  {
     id: 'select-remote-search',
     title: 'Удалённый поиск, теги и события',
     description: '`v-model:search` + `@search` для подгрузки с сервера, `maxTagCount` для длинного выбора и события `change`/`clear`/`visible-change`.',

@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grAutocompleteExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'autocomplete-addons',
+    title: 'Addons in the field',
+    description: 'Слоты `prefix` и `suffix` кладут иконку и код стандарта прямо в поле — подпись рядом с контролом больше не нужна.',
+    status: 'ready',
+    previewKey: 'gr-autocomplete-addons',
+  },
+  {
     id: 'autocomplete-basic',
     title: 'Filterable single select',
     description: 'Базовый сценарий: текстовый `<input role="combobox">` фильтрует опции по мере ввода (локальная фильтрация), `clearable` очищает выбор. Стрелки/Enter/Home/End работают с клавиатуры, активная опция подсвечивается через `aria-activedescendant`.',

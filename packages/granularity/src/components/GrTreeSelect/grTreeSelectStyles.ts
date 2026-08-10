@@ -11,6 +11,21 @@ export const sizeClassBySize: Record<GrInputSize, string> = {
   lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
 }
 
+/**
+ * Горизонтальный отступ из `sizeClassBySize`, но числом: аддоны задают паддинг
+ * инлайн-стилем, а он перекрывает класс — значение нужно обеим формам, и
+ * расходиться им нельзя.
+ */
+export const paddingX: Record<GrInputSize, string> = {
+  xs: '10px',
+  sm: '12px',
+  md: '12px',
+  lg: '16px',
+}
+
+/** Ширина зоны шеврона/крестика справа (`pr-9` в классе триггера). */
+export const trailingZoneWidth = '2.25rem'
+
 export const borderClassByState: Record<GrTreeSelectState, string> = {
   default: 'border-[var(--gr-brd)]',
   success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',

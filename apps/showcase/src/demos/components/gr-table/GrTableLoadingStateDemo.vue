@@ -22,7 +22,7 @@ const rows = [
 
     <!-- Скелетоны рисует сама таблица, контейнер при этом помечен `aria-busy`. -->
     <GrTable :loading="loading" :loading-rows="3" :column-count="3">
-      <template #head>
+      <template #header>
         <tr>
           <th class="px-4 py-3 text-left font-600">Task</th>
           <th class="px-4 py-3 text-left font-600">State</th>

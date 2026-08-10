@@ -1,7 +1,7 @@
 # GrTable
 
 «Тонкий» контейнер таблицы: скролл-обёртка, `caption`, sticky-заголовок и слоты
-`#head` / default / `#foot`. Ячейки оформляет потребитель.
+`#header` / default / `#footer`. Ячейки оформляет потребитель.
 
 Насыщенная таблица с сортировкой и выбором — `GrDataTable`.
 
@@ -18,7 +18,7 @@
 
 ```vue
 <GrTable :loading="pending" :column-count="4">
-  <template #head>…</template>
+  <template #header>…</template>
   <tr v-for="row in rows" :key="row.id">…</tr>
   <template #empty>Ничего не найдено</template>
 </GrTable>

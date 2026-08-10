@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { GrComponentSize } from '../shared/sizes'
-import { computed, ref, useId, useSlots } from 'vue'
+import { computed, ref, useId } from 'vue'
 
-import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
+import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -130,6 +130,13 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<GrInputEmits>()
+defineSlots<{
+  /** Аддон слева от поля: иконка, код валюты, метка. */
+  prefix?: () => any
+  /** Аддон справа от поля: единица измерения, подсказка. */
+  suffix?: () => any
+}>()
+
 
 // Контекст `GrFormField` (если инпут внутри него): даёт id/aria-describedby/
 // invalid/required как fallback, чтобы не прокидывать `forId` вручную.
@@ -177,30 +184,12 @@ defineExpose({
   select,
 })
 
-const slots = useSlots()
-
-const hasPrefix = computed(() => Boolean(slots.prefix))
-const hasSuffix = computed(() => Boolean(slots.suffix))
-
-const defaultAddonMinWidth = computed(() => {
-  const map: Record<NonNullable<typeof props.size>, string> = {
-    xs: '2rem', // w-8
-    sm: '2.25rem', // w-9
-    md: '2.5rem', // w-10
-    lg: '3rem', // w-12
-  }
-
-  return map[resolvedSize.value]
-})
-
-const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
-const suffixMinWidth = computed(() => props.suffixMinWidth ?? defaultAddonMinWidth.value)
-
-// Жёсткая ширина для fixed-режима: max → min → дефолт.
-const prefixFixedWidth = computed(() => props.prefixMaxWidth ?? props.prefixMinWidth ?? defaultAddonMinWidth.value)
-const suffixFixedWidth = computed(() => props.suffixMaxWidth ?? props.suffixMinWidth ?? defaultAddonMinWidth.value)
-
-const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
+const ADDON_MIN_WIDTH_BY_SIZE: Record<GrInputSize, string> = {
+  xs: '2rem', // w-8
+  sm: '2.25rem', // w-9
+  md: '2.5rem', // w-10
+  lg: '3rem', // w-12
+}
 
 const passwordVisible = ref(false)
 // Тип поля с учётом переключателя пароля.
@@ -212,57 +201,16 @@ const showClear = computed(() => resolvedClearable.value && props.modelValue.len
 const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0) + (props.loading ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
 
-const basePaddingXLen = computed(() => paddingX[resolvedSize.value])
-
-const inputStyle = computed(() => {
-  const leftReserved = hasPrefix.value
-    ? (props.prefixFixed ? prefixFixedWidth.value : measuredPrefixWidth.value ?? prefixMinWidth.value)
-    : '0px'
-  const rightReserved = hasSuffix.value
-    ? (props.suffixFixed ? suffixFixedWidth.value : measuredSuffixWidth.value ?? suffixMinWidth.value)
-    : '0px'
-
-  // Keep the same visual text padding as without addons (px-*), but add it on top of reserved space.
-  const left = hasPrefix.value ? addLen(leftReserved, basePaddingXLen.value) : undefined
-  const rightSpace = addLen(rightReserved, trailingReserve.value)
-  const right = (hasSuffix.value || trailingCount.value > 0)
-    ? addLen(rightSpace, basePaddingXLen.value)
-    : undefined
-
-  return {
-    paddingLeft: left,
-    paddingRight: right,
-  } as Record<string, string | undefined>
-})
-
-const prefixStyle = computed(() => {
-  if (props.prefixFixed) {
-    return {
-      width: prefixFixedWidth.value,
-      minWidth: prefixFixedWidth.value,
-      maxWidth: prefixFixedWidth.value,
-    } as Record<string, string | undefined>
-  }
-
-  return {
-    minWidth: prefixMinWidth.value,
-    maxWidth: props.prefixMaxWidth,
-  } as Record<string, string | undefined>
-})
-
-const suffixStyle = computed(() => {
-  if (props.suffixFixed) {
-    return {
-      width: suffixFixedWidth.value,
-      minWidth: suffixFixedWidth.value,
-      maxWidth: suffixFixedWidth.value,
-    } as Record<string, string | undefined>
-  }
-
-  return {
-    minWidth: suffixMinWidth.value,
-    maxWidth: props.suffixMaxWidth,
-  } as Record<string, string | undefined>
+const {
+  prefixEl,
+  suffixEl,
+  prefixStyle,
+  suffixStyle,
+  fieldPadding: inputStyle,
+} = useControlAddons(() => props, {
+  defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
+  paddingX: () => paddingX[resolvedSize.value],
+  trailingReserve: () => trailingReserve.value,
 })
 
 // Border/ring/disabled — на оболочке (`focus-within`), размеры/выравнивание — на инпуте.

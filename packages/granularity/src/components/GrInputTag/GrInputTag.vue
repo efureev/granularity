@@ -7,6 +7,7 @@ import GrIcon from '../GrIcon/GrIcon.vue'
 import IconClose from '~icons/lucide/x'
 import IconLoader from '~icons/lucide/loader-2'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -75,6 +76,16 @@ export interface GrInputTagProps {
   ariaLabel?: string
   /** Имя для нативной формы: hidden input на каждый тег. */
   name?: string
+  /**
+   * Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета
+   * (`docs/form-controls.md`).
+   */
+  prefixMinWidth?: string
+  prefixMaxWidth?: string
+  suffixMinWidth?: string
+  suffixMaxWidth?: string
+  prefixFixed?: boolean
+  suffixFixed?: boolean
 }
 
 export interface GrInputTagEmits {
@@ -124,6 +135,15 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<GrInputTagEmits>()
+defineSlots<{
+  /** Аддон слева от чипов: иконка, метка. */
+  prefix?: () => any
+  /** Аддон справа, перед кнопкой очистки. */
+  suffix?: () => any
+  /** Свой чип: `remove` снимает значение. */
+  tag?: (props: { tag: string, index: number, remove: () => void }) => any
+}>()
+
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required) —
 // как у GrInput и GrSelect: контрол не знает про форму, знает только про поле.
@@ -138,7 +158,24 @@ const {
 } = useGrFormControl(() => props)
 
 // Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
+/** Ширина аддона по умолчанию — та же лестница, что у `GrInput`. */
+const ADDON_MIN_WIDTH_BY_SIZE: Record<GrInputTagSize, string> = {
+  xs: '2rem',
+  sm: '2.25rem',
+  md: '2.5rem',
+  lg: '3rem',
+}
+
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrInputTag' })
+
+/**
+ * Аддоны — флекс-соседи поля: оболочка тегового поля и так флекс-строка с
+ * бейджами, поэтому места паддингом резервировать не нужно.
+ */
+const { hasPrefix, hasSuffix, prefixEl, suffixEl, prefixStyle, suffixStyle } = useControlAddons(() => props, {
+  defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
+  paddingX: () => '0px',
+})
 const resolvedClearable = useGrComponentProp('GrInputTag', 'clearable', () => props.clearable, false)
 
 const { t } = useGranularityTranslations()
@@ -497,6 +534,16 @@ defineExpose({ focus, blur, clear: clearAll })
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
+    <span
+      v-if="hasPrefix"
+      ref="prefixEl"
+      data-gr-input-tag-prefix
+      class="inline-flex shrink-0 items-center justify-center text-[var(--gr-muted-fg)]"
+      :style="prefixStyle"
+    >
+      <slot name="prefix" />
+    </span>
+
     <!-- Нативная форма: hidden на каждый тег — стандартная сериализация набора. -->
     <template v-if="name">
       <input
@@ -574,6 +621,16 @@ defineExpose({ focus, blur, clear: clearAll })
       @blur="onBlur"
       @paste="onPaste"
     >
+
+    <span
+      v-if="hasSuffix"
+      ref="suffixEl"
+      data-gr-input-tag-suffix
+      class="inline-flex shrink-0 items-center justify-center text-[var(--gr-muted-fg)]"
+      :style="suffixStyle"
+    >
+      <slot name="suffix" />
+    </span>
 
     <span
       v-if="isBusy"

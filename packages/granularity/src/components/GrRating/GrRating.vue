@@ -116,6 +116,13 @@ const resolvedSize = useGrComponentSize(() => props.size, {
 })
 
 const emit = defineEmits<GrRatingEmits>()
+defineSlots<{
+  /** Свой символ вместо звезды. `filled` — закрашенная половина символа. */
+  symbol?: (props: { index: number, filled: boolean }) => any
+  /** Подпись рядом с оценкой. */
+  text?: (props: { value: number }) => any
+}>()
+
 
 const { t } = useGranularityTranslations()
 

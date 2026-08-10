@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **One slot vocabulary across the controls.** A slot is a role, and the same role now carries the same name
+  everywhere in the package. `prefix`/`suffix` — until now an `GrInput`-only contract — are available on every control
+  with a text shell: `GrAutocomplete`, `GrTreeSelect`, `GrInputTag` and `GrSelect` in `optionsView="panel"` (a native
+  `<select>` takes no markup inside it, and using the slots there warns in dev). Each of them gained the same six
+  width props — `prefixMinWidth`/`prefixMaxWidth`/`prefixFixed` and the suffix trio — so an addon behaves identically
+  no matter which control it sits in, and `*Fixed` keeps a column of fields from drifting when their addons differ in
+  width. The geometry behind it was written twice, in `GrInput` and `GrNumberInput`; it now lives once in
+  `useControlAddons` and reserves space rather than replacing padding, so a field with an addon is inset from the
+  edge exactly like a field without one. Vocabulary and ownership of the domain slots (`option`, `tag`, `symbol`,
+  `value`, …) are held by `src/__tests__/slotContract.test.ts`: a common name cannot mean two things, and a domain
+  name cannot spread to a component that is not its owner. Documented in `docs/form-controls.md`.
+- **Typed slots on every form control.** `defineSlots` was declared by one control out of sixteen, so slot names
+  reached neither the `.d.ts` nor the IDE, and the only way to learn one was to read the component source. All
+  sixteen now declare their slots, scoped ones together with the types of their props; the gate fails a control that
+  renders a slot without declaring it. Two mismatches surfaced while typing them and are fixed: `GrSelect`'s
+  `displayLabel` promised a string and could hand out a raw non-string value, and `GrFileUpload` passed its default
+  slot a different set of props depending on where it was rendered from.
 - **`GrPopover` gains a modal mode.** A popover with a form inside had no way to isolate the page under it: the only
   option was to swap the anchored panel for `GrModal`, changing the shape of the UI just to get isolation. `modal`
   turns on the full modal contract — background goes `inert`, Tab cycles inside the panel, page scroll is locked, and
@@ -297,6 +314,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **i18n:** `gr.breadcrumbs.label` and `gr.breadcrumbs.expand` in all three locales.
 
 ### Changed — BREAKING
+
+- **Slots renamed to fit the vocabulary: `errors` → `error`, `foot` → `footer`, `head` → `header`.** One role was
+  going by two names — `errors` in `GrFormFile` against `error` in `GrFormField` and the dialogs, `foot`/`head` in
+  `GrTable` and `GrDataTable` against `footer`/`header` in seven other components — so a consumer moving between them
+  rewrote the template for no reason other than the spelling. Migration is mechanical: `<template #errors>` →
+  `#error`, `<template #foot>` → `#footer`, `<template #head>` → `#header`. Scoped props are unchanged.
 
 - **`setTheme`/`toggleTheme` throw during SSR unless `granularityThemePlugin` is installed.** Reading the theme on the
   server keeps working without it — `theme` and `isDark` return `light`, which is what a template that merely branches

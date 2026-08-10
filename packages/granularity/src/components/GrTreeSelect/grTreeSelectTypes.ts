@@ -73,4 +73,15 @@ export interface GrTreeSelectProps<T extends object = any> {
    * два вложенных скроллера дали бы две полосы прокрутки на одном списке.
    */
   virtual?: boolean
+
+  /**
+   * Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета
+   * (`docs/form-controls.md`).
+   */
+  prefixMinWidth?: string
+  prefixMaxWidth?: string
+  suffixMinWidth?: string
+  suffixMaxWidth?: string
+  prefixFixed?: boolean
+  suffixFixed?: boolean
 }

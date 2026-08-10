@@ -29,7 +29,7 @@ const visibleRows = () => (onlyOverdue.value ? rows.filter(row => row.status ===
     </div>
 
     <GrTable>
-      <template #head>
+      <template #header>
         <tr>
           <th class="px-4 py-2 text-left">Invoice</th>
           <th class="px-4 py-2 text-left">Client</th>

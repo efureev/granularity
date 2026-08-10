@@ -68,6 +68,11 @@ const props = withDefaults(defineProps<GrCheckboxGroupProps>(), {
 })
 
 const emit = defineEmits<GrCheckboxGroupEmits>()
+defineSlots<{
+  /** Собственная разметка флажков вместо генерации из `options`. */
+  default?: () => any
+}>()
+
 
 // Эффективный размер группы: локальный проп → `GrConfigProvider` → `md`.
 // Дочерние чекбоксы получают уже разрешённое значение через контекст.

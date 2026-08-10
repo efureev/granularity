@@ -2,7 +2,7 @@
 import type { InputHTMLAttributes } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { computed, nextTick, onBeforeUnmount, ref, useSlots } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 
 import {
   clearButtonClass,
@@ -24,7 +24,8 @@ import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
 import IconChevronUp from '~icons/lucide/chevron-up'
 import IconX from '~icons/lucide/x'
-import { addLen, useAddonMeasurement } from '../../composables/internal/useAddonMeasurement'
+import { addLen } from '../../composables/internal/useAddonMeasurement'
+import { useControlAddons } from '../../composables/internal/useControlAddons'
 
 defineOptions({
   inheritAttrs: false,
@@ -178,6 +179,13 @@ const {
 } = useGrFormControl(() => props)
 
 const emit = defineEmits<GrNumberInputEmits>()
+defineSlots<{
+  /** Аддон слева от поля: знак валюты, иконка. */
+  prefix?: () => any
+  /** Аддон справа от поля: единица измерения. */
+  suffix?: () => any
+}>()
+
 
 const inputEl = ref<HTMLInputElement | null>(null)
 
@@ -194,8 +202,6 @@ function blur(): void {
 
 defineExpose({ focus, blur })
 
-const slots = useSlots()
-
 const { t, locale } = useGranularityTranslations()
 
 /**
@@ -206,9 +212,6 @@ const resolvedLocale = computed(() => props.locale ?? locale.value)
 const resolvedIncreaseLabel = computed(() => props.increaseLabel ?? t('gr.numberInput.increase', 'Increase'))
 const resolvedDecreaseLabel = computed(() => props.decreaseLabel ?? t('gr.numberInput.decrease', 'Decrease'))
 
-const hasPrefix = computed(() => Boolean(slots.prefix))
-const hasSuffix = computed(() => Boolean(slots.suffix))
-
 const hasHorizontalControls = computed(() => props.controls && props.controlsDirection === 'horizontal')
 const hasVerticalControls = computed(() => props.controls && props.controlsDirection === 'vertical')
 
@@ -216,23 +219,25 @@ const addonPx = computed(() => ADDON_PX_BY_SIZE[resolvedSize.value])
 const addonLen = computed(() => px(addonPx.value))
 const basePaddingXLen = computed(() => BASE_PADDING_X_LEN_BY_SIZE[resolvedSize.value])
 
-const defaultAddonMinWidth = computed(() => addonLen.value)
-const prefixMinWidth = computed(() => props.prefixMinWidth ?? defaultAddonMinWidth.value)
-const suffixMinWidth = computed(() => props.suffixMinWidth ?? defaultAddonMinWidth.value)
+/** Кнопки ± справа: вертикальный стек — одна колонка, горизонтальный — вторая. */
+const rightControlsCount = computed(() =>
+  (hasHorizontalControls.value ? 1 : 0) + (hasVerticalControls.value ? 1 : 0))
 
-// Жёсткая ширина для fixed-режима: max → min → дефолт.
-const prefixFixedWidth = computed(() => props.prefixMaxWidth ?? props.prefixMinWidth ?? defaultAddonMinWidth.value)
-const suffixFixedWidth = computed(() => props.suffixMaxWidth ?? props.suffixMinWidth ?? defaultAddonMinWidth.value)
-
-const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
-
-const prefixLen = computed(() => {
-  if (!hasPrefix.value) return '0px'
-  return props.prefixFixed ? prefixFixedWidth.value : measuredPrefixWidth.value ?? prefixMinWidth.value
-})
-const suffixLen = computed(() => {
-  if (!hasSuffix.value) return '0px'
-  return props.suffixFixed ? suffixFixedWidth.value : measuredSuffixWidth.value ?? suffixMinWidth.value
+const {
+  prefixEl,
+  suffixEl,
+  prefixLen,
+  suffixLen,
+  prefixStyle,
+  suffixStyle,
+  fieldPadding: inputStyle,
+} = useControlAddons(() => props, {
+  defaultMinWidth: () => addonLen.value,
+  paddingX: () => basePaddingXLen.value,
+  leadingReserve: () => (hasHorizontalControls.value ? addonLen.value : '0px'),
+  trailingReserve: () => (rightControlsCount.value > 0 ? px(addonPx.value * rightControlsCount.value) : '0px'),
+  // Суффикс позиционируется абсолютно: без якоря он уехал бы от правого края.
+  anchorSuffixRight: true,
 })
 
 function addonStyle(side: 'left' | 'right', offset: string): Record<string, string> {
@@ -242,55 +247,6 @@ function addonStyle(side: 'left' | 'right', offset: string): Record<string, stri
   }
 }
 
-const inputStyle = computed(() => {
-  const leftControls = hasHorizontalControls.value ? addonLen.value : '0px'
-  const rightControlsCount = (hasHorizontalControls.value ? 1 : 0) + (hasVerticalControls.value ? 1 : 0)
-  const rightControls = rightControlsCount > 0 ? px(addonPx.value * rightControlsCount) : '0px'
-
-  const leftReserved = addLen(prefixLen.value, leftControls)
-  const rightReserved = addLen(suffixLen.value, rightControls)
-
-  const left = hasPrefix.value || hasHorizontalControls.value ? addLen(leftReserved, basePaddingXLen.value) : undefined
-  const right = hasSuffix.value || rightControlsCount > 0 ? addLen(rightReserved, basePaddingXLen.value) : undefined
-
-  return {
-    paddingLeft: left,
-    paddingRight: right,
-  } as Record<string, string | undefined>
-})
-
-const suffixStyle = computed(() => {
-  if (props.suffixFixed) {
-    return {
-      right: '0px',
-      width: suffixFixedWidth.value,
-      minWidth: suffixFixedWidth.value,
-      maxWidth: suffixFixedWidth.value,
-    }
-  }
-
-  return {
-    right: '0px',
-    minWidth: suffixMinWidth.value,
-    maxWidth: props.suffixMaxWidth,
-  }
-})
-
-const prefixStyle = computed(() => {
-  if (props.prefixFixed) {
-    return {
-      width: prefixFixedWidth.value,
-      minWidth: prefixFixedWidth.value,
-      maxWidth: prefixFixedWidth.value,
-    }
-  }
-
-  return {
-    minWidth: prefixMinWidth.value,
-    maxWidth: props.prefixMaxWidth,
-  }
-})
-
 const verticalControlsStyle = computed(() => addonStyle('right', suffixLen.value))
 
 /**
@@ -298,8 +254,7 @@ const verticalControlsStyle = computed(() => addonStyle('right', suffixLen.value
  * на них. Ширины там же, где их считает поле, поэтому переиспользуем расчёт.
  */
 const clearButtonStyle = computed(() => {
-  const controlsCount = (hasHorizontalControls.value ? 1 : 0) + (hasVerticalControls.value ? 1 : 0)
-  const controls = controlsCount > 0 ? px(addonPx.value * controlsCount) : '0px'
+  const controls = rightControlsCount.value > 0 ? px(addonPx.value * rightControlsCount.value) : '0px'
 
   return { right: addLen(addLen(suffixLen.value, controls), '6px') }
 })

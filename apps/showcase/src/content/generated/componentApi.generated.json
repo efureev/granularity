@@ -288,6 +288,48 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета (`docs/form-controls.md`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -297,19 +339,29 @@
         "origin": "generated",
         "items": [
           {
+            "name": "prefix",
+            "description": "Аддон слева от поля ввода.",
+            "type": "any"
+          },
+          {
+            "name": "suffix",
+            "description": "Аддон справа, перед спиннером и крестиком.",
+            "type": "any"
+          },
+          {
             "name": "option",
-            "description": "",
+            "description": "Строка списка вместо подписи опции.",
             "type": "{ option: GrAutocompleteOption<TValue>; selected: boolean; }"
           },
           {
             "name": "loading",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое панели, пока едут опции.",
+            "type": "any"
           },
           {
             "name": "empty",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое панели, когда подходящих опций нет.",
+            "type": "any"
           }
         ]
       },
@@ -873,13 +925,6 @@
             "default": "undefined"
           },
           {
-            "name": "target",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "square",
             "description": "",
             "type": "boolean | undefined",
@@ -903,6 +948,13 @@
           {
             "name": "href",
             "description": "Рендерит кнопку как `<a href>` (если не задан `as`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "target",
+            "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1261,8 +1313,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись флажка. Может содержать ссылки: роль остаётся на самом контроле.",
+            "type": "any"
           }
         ]
       },
@@ -1403,8 +1455,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Собственная разметка флажков вместо генерации из `options`.",
+            "type": "any"
           }
         ]
       },
@@ -1774,13 +1826,6 @@
             "default": "undefined"
           },
           {
-            "name": "portalTarget",
-            "description": "Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в `body`. Своё значение нужно там, где приложение живёт в контейнере: микрофронтенд, shadow DOM, CSS-скоупинг под конкретным корнем.",
-            "type": "string | HTMLElement | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "componentDefaults",
             "description": "Дефолтные пропсы по компонентам: `{ GrButton: { variant: 'secondary' } }`.",
             "type": "GrComponentDefaults | undefined",
@@ -1805,6 +1850,13 @@
             "name": "theme",
             "description": "Тема поддерева: значение уезжает в `data-theme`. Тема **документа** — работа `useTheme`/`initThemeEarly`, здесь именно остров.",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "portalTarget",
+            "description": "Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в `body`. Своё значение нужно там, где приложение живёт в контейнере: микрофронтенд, shadow DOM, CSS-скоупинг под конкретным корнем.",
+            "type": "string | HTMLElement | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2281,7 +2333,7 @@
             "type": "{}"
           },
           {
-            "name": "foot",
+            "name": "footer",
             "description": "",
             "type": "{}"
           }
@@ -3416,23 +3468,23 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; fileEntries: GrFileUploadEntry[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
+            "description": "Полностью своя зона загрузки: контрол отдаёт наружу всё своё состояние.",
+            "type": "{ openDialog: () => void; abort: () => void; disabled: boolean; files: File[]; isOver: boolean; state: GrUploadState; retry: () => Promise<void>; removeFile: (file: File) => void; fileEntries: GrFileUploadEntry[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
           },
           {
             "name": "label",
-            "description": "",
-            "type": "{}"
+            "description": "Заголовок зоны вместо `placeholder`.",
+            "type": "any"
           },
           {
             "name": "tip",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись под заголовком: ограничения по типу и размеру.",
+            "type": "any"
           },
           {
             "name": "progress",
-            "description": "",
-            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"uploading\" | \"idle\"; files: { readonly lastModified: number; readonly name: string; readonly webkitRelativePath: string; readonly size: number; readonly type: string; arrayBuffer: () => Promise<ArrayBuffer>; bytes: () => Promise<Uint8Array<ArrayBuffer>>; slice: (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob; stream: () => ReadableStream<Uint8Array<ArrayBuffer>>; text: () => Promise<string>; }[]; abort: () => void; retry: () => Promise<void>; fileEntries: GrFileUploadEntry[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
+            "description": "Свой индикатор прогресса вместо встроенного.",
+            "type": "{ state: GrUploadState; percent: number; indeterminate: boolean; phase: \"success\" | \"error\" | \"idle\" | \"uploading\"; files: File[]; abort: () => void; retry: () => Promise<void>; fileEntries: GrFileUploadEntry[]; retryFile: (file: File) => Promise<void>; abortFile: (file: File) => void; }"
           }
         ]
       },
@@ -3721,13 +3773,6 @@
             "default": "undefined"
           },
           {
-            "name": "labelClass",
-            "description": "",
-            "type": "LabelClass | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "forId",
             "description": "Явный id контрола. Если не задан — генерируется автоматически.",
             "type": "string | undefined",
@@ -3752,6 +3797,13 @@
             "name": "labelWidth",
             "description": "Ширина колонки подписи при `labelPosition=\"start\"`. Число — пиксели.",
             "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "labelClass",
+            "description": "",
+            "type": "LabelClass | undefined",
             "required": false,
             "default": "undefined"
           }
@@ -3940,8 +3992,8 @@
         "origin": "generated",
         "items": [
           {
-            "name": "errors",
-            "description": "",
+            "name": "error",
+            "description": "Собственный вывод ошибок вместо списка по умолчанию.",
             "type": "{ errors: FileValidationIssue[]; }"
           }
         ]
@@ -4539,6 +4591,48 @@
             "default": "undefined"
           },
           {
+            "name": "prefixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixFixed",
+            "description": "Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются» под контент (в пределах min/max), а излишек клипается оболочкой.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "id",
             "description": "",
             "type": "string | undefined",
@@ -4609,48 +4703,6 @@
             "default": "undefined"
           },
           {
-            "name": "prefixMinWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "prefixMaxWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "suffixMinWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "suffixMaxWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "prefixFixed",
-            "description": "Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются» под контент (в пределах min/max), а излишек клипается оболочкой.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "suffixFixed",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "modelValue",
             "description": "",
             "type": "string",
@@ -4665,13 +4717,13 @@
         "items": [
           {
             "name": "prefix",
-            "description": "",
-            "type": "{}"
+            "description": "Аддон слева от поля: иконка, код валюты, метка.",
+            "type": "any"
           },
           {
             "name": "suffix",
-            "description": "",
-            "type": "{}"
+            "description": "Аддон справа от поля: единица измерения, подсказка.",
+            "type": "any"
           }
         ]
       },
@@ -4816,18 +4868,18 @@
             "default": "undefined"
           },
           {
-            "name": "trim",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
             "name": "max",
             "description": "",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "trim",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           },
           {
             "name": "state",
@@ -4925,6 +4977,42 @@
             "description": "",
             "type": "string[]",
             "required": true
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета (`docs/form-controls.md`).",
+            "type": "string | undefined",
+            "required": false
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false
+          },
+          {
+            "name": "prefixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false
           }
         ]
       },
@@ -4934,8 +5022,18 @@
         "origin": "generated",
         "items": [
           {
+            "name": "prefix",
+            "description": "Аддон слева от чипов: иконка, метка.",
+            "type": "any"
+          },
+          {
+            "name": "suffix",
+            "description": "Аддон справа, перед кнопкой очистки.",
+            "type": "any"
+          },
+          {
             "name": "tag",
-            "description": "",
+            "description": "Свой чип: `remove` снимает значение.",
             "type": "{ tag: string; index: number; remove: () => void; }"
           }
         ]
@@ -5129,13 +5227,6 @@
             "default": "undefined"
           },
           {
-            "name": "target",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "as",
             "description": "Кастомный корневой тег/компонент. Если передан и компонент не `disabled` — рендерится через `<component :is=\"as\">`. Игнорируется при `disabled`.",
             "type": "string | Component | undefined",
@@ -5144,6 +5235,13 @@
           },
           {
             "name": "href",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "target",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -5769,6 +5867,48 @@
             "default": "undefined"
           },
           {
+            "name": "prefixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixFixed",
+            "description": "Фиксированная ширина у prefix/suffix: жёсткая ширина (из `*MaxWidth` → `*MinWidth` → дефолт) + обрезка контента по краю (prefix — справа, suffix — слева). По умолчанию аддоны растягиваются под контент.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "max",
             "description": "",
             "type": "number | undefined",
@@ -5816,48 +5956,6 @@
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "\"decimal\""
-          },
-          {
-            "name": "prefixMinWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "prefixMaxWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "suffixMinWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "suffixMaxWidth",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "prefixFixed",
-            "description": "Фиксированная ширина у prefix/suffix: жёсткая ширина (из `*MaxWidth` → `*MinWidth` → дефолт) + обрезка контента по краю (prefix — справа, suffix — слева). По умолчанию аддоны растягиваются под контент.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "suffixFixed",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "decimalSeparator",
@@ -5937,13 +6035,13 @@
         "items": [
           {
             "name": "prefix",
-            "description": "",
-            "type": "{}"
+            "description": "Аддон слева от поля: знак валюты, иконка.",
+            "type": "any"
           },
           {
             "name": "suffix",
-            "description": "",
-            "type": "{}"
+            "description": "Аддон справа от поля: единица измерения.",
+            "type": "any"
           }
         ]
       },
@@ -6947,8 +7045,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Собственная разметка переключателей вместо генерации из `options`.",
+            "type": "any"
           }
         ]
       },
@@ -7138,12 +7236,12 @@
         "items": [
           {
             "name": "symbol",
-            "description": "",
+            "description": "Свой символ вместо звезды. `filled` — закрашенная половина символа.",
             "type": "{ index: number; filled: boolean; }"
           },
           {
             "name": "text",
-            "description": "",
+            "description": "Подпись рядом с оценкой.",
             "type": "{ value: number; }"
           }
         ]
@@ -7444,7 +7542,7 @@
         "items": [
           {
             "name": "default",
-            "description": "",
+            "description": "Содержимое сегмента вместо подписи из `options`.",
             "type": "{ option: GrSegmentedOption; selected: boolean; disabled: boolean; loading: boolean; }"
           }
         ]
@@ -7737,6 +7835,48 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета (`docs/form-controls.md`). Аддоны живут в панельном триггере: внутрь нативного `<select>` разметку положить нельзя.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -7747,28 +7887,38 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Собственные `<option>` для нативного режима.",
+            "type": "any"
+          },
+          {
+            "name": "prefix",
+            "description": "Аддон слева в панельном триггере (в нативном режиме недоступен).",
+            "type": "any"
+          },
+          {
+            "name": "suffix",
+            "description": "Аддон справа в панельном триггере, перед крестиком и шевроном.",
+            "type": "any"
           },
           {
             "name": "value",
-            "description": "",
-            "type": "{ selectedOptions: GrSelectOption<TValue>[]; selectedValues: TValue[]; displayLabel: string | TValue; placeholder: string | undefined; hasSelection: boolean; }"
-          },
-          {
-            "name": "loading",
-            "description": "",
-            "type": "{}"
+            "description": "Отображение значения в триггере вместо текста по умолчанию.",
+            "type": "{ selectedOptions: GrSelectOption<TValue>[]; selectedValues: TValue[]; displayLabel: string; placeholder?: string | undefined; hasSelection: boolean; }"
           },
           {
             "name": "option",
-            "description": "",
+            "description": "Строка списка вместо подписи опции.",
             "type": "{ option: GrSelectOption<TValue>; selected: boolean; }"
           },
           {
+            "name": "loading",
+            "description": "Содержимое панели, пока едут опции.",
+            "type": "any"
+          },
+          {
             "name": "empty",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое панели, когда подходящих опций нет.",
+            "type": "any"
           }
         ]
       },
@@ -8483,8 +8633,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись переключателя.",
+            "type": "any"
           }
         ]
       },
@@ -8672,7 +8822,7 @@
             "type": "{}"
           },
           {
-            "name": "head",
+            "name": "header",
             "description": "",
             "type": "{}"
           },
@@ -8692,7 +8842,7 @@
             "type": "{}"
           },
           {
-            "name": "foot",
+            "name": "footer",
             "description": "",
             "type": "{}"
           }
@@ -9810,6 +9960,48 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "prefixMinWidth",
+            "description": "Ширины аддонов `prefix`/`suffix` — общий контракт контролов пакета (`docs/form-controls.md`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMinWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffixMaxWidth",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "suffixFixed",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -9836,6 +10028,16 @@
           {
             "name": "loading",
             "description": "Содержимое панели, пока данные едут.",
+            "type": "any"
+          },
+          {
+            "name": "prefix",
+            "description": "Аддон слева от значения: иконка, код валюты, метка.",
+            "type": "any"
+          },
+          {
+            "name": "suffix",
+            "description": "Аддон справа от значения, перед крестиком и шевроном.",
             "type": "any"
           }
         ]

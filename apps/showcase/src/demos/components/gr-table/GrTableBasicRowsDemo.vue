@@ -18,7 +18,7 @@ const rows: TableRow[] = [
 
 <template>
   <GrTable>
-    <template #head>
+    <template #header>
       <tr>
         <th class="px-4 py-3 text-left font-600">Campaign</th>
         <th class="px-4 py-3 text-left font-600">Owner</th>

@@ -201,6 +201,40 @@ const progressTextClass = computed(() => progressTextSizes[resolvedSize.value])
 const progressBarSize = computed(() => progressBarSizes[resolvedSize.value])
 
 const emit = defineEmits<GrFileUploadEmits<TResponse>>()
+defineSlots<{
+  /** Полностью своя зона загрузки: контрол отдаёт наружу всё своё состояние. */
+  default?: (props: {
+    openDialog: () => void
+    abort: () => void
+    disabled: boolean
+    files: File[]
+    isOver: boolean
+    state: GrUploadState
+    retry: () => Promise<void>
+    removeFile: (file: File) => void
+    fileEntries: GrFileUploadEntry[]
+    retryFile: (file: File) => Promise<void>
+    abortFile: (file: File) => void
+  }) => any
+  /** Заголовок зоны вместо `placeholder`. */
+  label?: () => any
+  /** Подпись под заголовком: ограничения по типу и размеру. */
+  tip?: () => any
+  /** Свой индикатор прогресса вместо встроенного. */
+  progress?: (props: {
+    state: GrUploadState
+    percent: number
+    indeterminate: boolean
+    phase: GrUploadState['phase']
+    files: File[]
+    abort: () => void
+    retry: () => Promise<void>
+    fileEntries: GrFileUploadEntry[]
+    retryFile: (file: File) => Promise<void>
+    abortFile: (file: File) => void
+  }) => any
+}>()
+
 
 const slots = useSlots()
 
@@ -331,6 +365,25 @@ const dropZone = useDropZone({
   onDrop: files => void handleFiles(files, 'drop'),
 })
 const isOver = dropZone.isOver
+
+/**
+ * Дефолтный слот вызывается из двух мест — как своя зона целиком и как подпись
+ * внутри стандартной. Набор пропов у него один: две копии разъехались бы.
+ */
+const defaultSlotProps = computed(() => ({
+  openDialog,
+  abort,
+  disabled: isDisabled.value,
+  files: lastFiles.value,
+  isOver: isOver.value,
+  state,
+  retry,
+  removeFile,
+  fileEntries: fileEntries.value,
+  retryFile,
+  abortFile,
+}))
+
 
 const zoneClass = computed(() => grFileUploadZoneClass({
   size: resolvedSize.value,
@@ -722,20 +775,7 @@ defineExpose({
       aria-live="polite"
     >{{ liveMessage }}</span>
 
-    <slot
-      v-if="hasCustomUi"
-      :open-dialog="openDialog"
-      :abort="abort"
-      :disabled="isDisabled"
-      :files="lastFiles"
-      :is-over="isOver"
-      :state="state"
-      :retry="retry"
-      :remove-file="removeFile"
-      :file-entries="fileEntries"
-      :retry-file="retryFile"
-      :abort-file="abortFile"
-    />
+    <slot v-if="hasCustomUi" v-bind="defaultSlotProps" />
 
     <div v-else class="flex items-start" :class="zoneGapClass">
       <div
@@ -752,7 +792,7 @@ defineExpose({
       <div class="min-w-0">
         <div data-gr-file-upload-label class="font-700" :class="labelClass">
           <slot name="label">
-            <slot>
+            <slot v-bind="defaultSlotProps">
               {{ resolvedPlaceholder }}
             </slot>
           </slot>

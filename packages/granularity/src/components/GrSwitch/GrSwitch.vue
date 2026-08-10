@@ -118,6 +118,11 @@ const resolvedSize = useGrComponentSize(() => props.size, {
 })
 
 const emit = defineEmits<GrSwitchEmits>()
+defineSlots<{
+  /** Подпись переключателя. */
+  default?: () => any
+}>()
+
 
 const rootClass = computed(() => grSwitchRootClass(props.labelPosition))
 

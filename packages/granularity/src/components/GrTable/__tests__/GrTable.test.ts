@@ -5,10 +5,10 @@ import GrTable from '../GrTable.vue'
 type ScrollApi = { scrollToRow: (index: number, options?: ScrollIntoViewOptions) => boolean }
 
 describe('GrTable', () => {
-  it('рендерит head и body slots внутри таблицы', () => {
+  it('рендерит header и body slots внутри таблицы', () => {
     const wrapper = mount(GrTable, {
       slots: {
-        head: '<tr><th>Title</th></tr>',
+        header: '<tr><th>Title</th></tr>',
         default: '<tr><td>Value</td></tr>',
       },
     })
@@ -17,14 +17,14 @@ describe('GrTable', () => {
     expect(wrapper.find('tbody').text()).toContain('Value')
   })
 
-  it('рендерит tfoot только при наличии слота #foot', () => {
+  it('рендерит tfoot только при наличии слота #footer', () => {
     const without = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
     expect(without.find('tfoot').exists()).toBe(false)
 
     const withFoot = mount(GrTable, {
       slots: {
         default: '<tr><td>x</td></tr>',
-        foot: '<tr><td>total</td></tr>',
+        footer: '<tr><td>total</td></tr>',
       },
     })
     expect(withFoot.find('tfoot').exists()).toBe(true)

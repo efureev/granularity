@@ -82,6 +82,16 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmen
 const resolvedVariant = useGrComponentProp('GrSegmented', 'variant', () => props.variant, 'pills')
 
 const emit = defineEmits<GrSegmentedEmits>()
+defineSlots<{
+  /** Содержимое сегмента вместо подписи из `options`. */
+  default?: (props: {
+    option: GrSegmentedOption
+    selected: boolean
+    disabled: boolean
+    loading: boolean
+  }) => any
+}>()
+
 
 // `useId()` стабилен между сервером и клиентом, в отличие от `instance.uid`.
 const fallbackName = `gr-segmented-${useId()}`
