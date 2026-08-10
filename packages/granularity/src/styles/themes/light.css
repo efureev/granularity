@@ -91,6 +91,55 @@
   --gr-azure-fg: #ffffff;
   --gr-azure-text: #075985;
 
+  /*
+   * Solid fill roles
+   *
+   * Сплошная заливка кнопочного веса и её текст.
+   *
+   * От роли без суффикса отличается порогом. `--gr-{tone}` рассчитан на 3:1 к
+   * фону страницы — это индикатор, граница, бейдж, — и текст на нём берётся из
+   * `-fg`, у светлых заливок тёмный. `-solid` рассчитан на 4.5:1 под СВЕТЛЫЙ
+   * текст: solid-кнопки всех тонов обязаны выглядеть одной семьёй, а бледно-
+   * зелёная кнопка рядом с тёмно-красной читается как ошибка вёрстки.
+   *
+   * Там, где глобальный тон уже достаточно тёмен, `-solid` — ссылка на него.
+   * Собственные значения нужны трём тонам: белый текст даёт 5.48 / 6.45 / 7.71
+   * на затемнённом success и 5.18 на затемнённом warning, тогда как глобальный
+   * `-fg` там тёмный и на той же заливке дал бы 3.26 и 3.45. Azure не чинится
+   * сменой `-fg` вовсе (см. примечание к `--gr-azure`).
+   *
+   * hover и active заданы значениями, а не общей формулой подмеса: они выбраны
+   * ступенями палитры, и формула сдвинула бы azure-active на 32 единицы канала.
+   */
+  --gr-primary-solid: var(--gr-primary);
+  --gr-primary-solid-hover: var(--gr-primary-hover);
+  --gr-primary-solid-active: var(--gr-primary-active);
+  --gr-primary-solid-fg: var(--gr-primary-fg);
+  --gr-success-solid: #047857;
+  --gr-success-solid-hover: #036c4d;
+  --gr-success-solid-active: #025f44;
+  --gr-success-solid-fg: var(--gr-slate-0);
+  --gr-warning-solid: #c2410c;
+  --gr-warning-solid-hover: #b53b0a;
+  --gr-warning-solid-active: #9f3307;
+  --gr-warning-solid-fg: var(--gr-slate-0);
+  --gr-danger-solid: var(--gr-danger);
+  --gr-danger-solid-hover: var(--gr-danger-hover);
+  --gr-danger-solid-active: var(--gr-danger-active);
+  --gr-danger-solid-fg: var(--gr-danger-fg);
+  --gr-info-solid: var(--gr-info);
+  --gr-info-solid-hover: var(--gr-info-hover);
+  --gr-info-solid-active: var(--gr-info-active);
+  --gr-info-solid-fg: var(--gr-info-fg);
+  --gr-slate-solid: var(--gr-slate);
+  --gr-slate-solid-hover: var(--gr-slate-hover);
+  --gr-slate-solid-active: var(--gr-slate-active);
+  --gr-slate-solid-fg: var(--gr-slate-fg);
+  --gr-azure-solid: #0369a1;
+  --gr-azure-solid-hover: #075985;
+  --gr-azure-solid-active: #0c4a6e;
+  --gr-azure-solid-fg: var(--gr-slate-0);
+
   /* Data visualization roles */
   --gr-chart-1: #4f46e5;
   --gr-chart-2: #10b981;

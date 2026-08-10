@@ -1212,6 +1212,258 @@ export const grThemeTokens: GrThemeToken[] = [
     }
   },
   {
+    "name": "--gr-primary-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `primary`.",
+    "values": {
+      "light": "var(--gr-primary)",
+      "dark": "#595ce6"
+    }
+  },
+  {
+    "name": "--gr-primary-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-primary-solid` под курсором.",
+    "values": {
+      "light": "var(--gr-primary-hover)",
+      "dark": "#5053dd"
+    }
+  },
+  {
+    "name": "--gr-primary-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-primary-solid` в момент нажатия.",
+    "values": {
+      "light": "var(--gr-primary-active)",
+      "dark": "#474acf"
+    }
+  },
+  {
+    "name": "--gr-primary-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-primary-solid`.",
+    "values": {
+      "light": "var(--gr-primary-fg)",
+      "dark": "var(--gr-slate-0)"
+    }
+  },
+  {
+    "name": "--gr-success-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `success`.",
+    "values": {
+      "light": "#047857",
+      "dark": "#047857"
+    }
+  },
+  {
+    "name": "--gr-success-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-success-solid` под курсором.",
+    "values": {
+      "light": "#036c4d",
+      "dark": "#036c4d"
+    }
+  },
+  {
+    "name": "--gr-success-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-success-solid` в момент нажатия.",
+    "values": {
+      "light": "#025f44",
+      "dark": "#025f44"
+    }
+  },
+  {
+    "name": "--gr-success-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-success-solid`.",
+    "values": {
+      "light": "var(--gr-slate-0)",
+      "dark": "var(--gr-slate-50)"
+    }
+  },
+  {
+    "name": "--gr-warning-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `warning`.",
+    "values": {
+      "light": "#c2410c",
+      "dark": "#c2410c"
+    }
+  },
+  {
+    "name": "--gr-warning-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-warning-solid` под курсором.",
+    "values": {
+      "light": "#b53b0a",
+      "dark": "#b53b0a"
+    }
+  },
+  {
+    "name": "--gr-warning-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-warning-solid` в момент нажатия.",
+    "values": {
+      "light": "#9f3307",
+      "dark": "#9f3307"
+    }
+  },
+  {
+    "name": "--gr-warning-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-warning-solid`.",
+    "values": {
+      "light": "var(--gr-slate-0)",
+      "dark": "var(--gr-slate-50)"
+    }
+  },
+  {
+    "name": "--gr-danger-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `danger`.",
+    "values": {
+      "light": "var(--gr-danger)",
+      "dark": "#b91c1c"
+    }
+  },
+  {
+    "name": "--gr-danger-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-danger-solid` под курсором.",
+    "values": {
+      "light": "var(--gr-danger-hover)",
+      "dark": "#a91919"
+    }
+  },
+  {
+    "name": "--gr-danger-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-danger-solid` в момент нажатия.",
+    "values": {
+      "light": "var(--gr-danger-active)",
+      "dark": "#931515"
+    }
+  },
+  {
+    "name": "--gr-danger-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-danger-solid`.",
+    "values": {
+      "light": "var(--gr-danger-fg)",
+      "dark": "var(--gr-slate-50)"
+    }
+  },
+  {
+    "name": "--gr-info-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `info`.",
+    "values": {
+      "light": "var(--gr-info)",
+      "dark": "#4338ca"
+    }
+  },
+  {
+    "name": "--gr-info-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-info-solid` под курсором.",
+    "values": {
+      "light": "var(--gr-info-hover)",
+      "dark": "#3d33bb"
+    }
+  },
+  {
+    "name": "--gr-info-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-info-solid` в момент нажатия.",
+    "values": {
+      "light": "var(--gr-info-active)",
+      "dark": "#362da8"
+    }
+  },
+  {
+    "name": "--gr-info-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-info-solid`.",
+    "values": {
+      "light": "var(--gr-info-fg)",
+      "dark": "var(--gr-slate-50)"
+    }
+  },
+  {
+    "name": "--gr-slate-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `slate`.",
+    "values": {
+      "light": "var(--gr-slate)",
+      "dark": "var(--gr-slate-600)"
+    }
+  },
+  {
+    "name": "--gr-slate-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-slate-solid` под курсором.",
+    "values": {
+      "light": "var(--gr-slate-hover)",
+      "dark": "var(--gr-slate-700)"
+    }
+  },
+  {
+    "name": "--gr-slate-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-slate-solid` в момент нажатия.",
+    "values": {
+      "light": "var(--gr-slate-active)",
+      "dark": "var(--gr-slate-800)"
+    }
+  },
+  {
+    "name": "--gr-slate-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-slate-solid`.",
+    "values": {
+      "light": "var(--gr-slate-fg)",
+      "dark": "var(--gr-slate-50)"
+    }
+  },
+  {
+    "name": "--gr-azure-solid",
+    "section": "Solid fill roles",
+    "description": "Сплошная заливка кнопочного веса тона `azure`.",
+    "values": {
+      "light": "#0369a1",
+      "dark": "#0369a1"
+    }
+  },
+  {
+    "name": "--gr-azure-solid-hover",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-azure-solid` под курсором.",
+    "values": {
+      "light": "#075985",
+      "dark": "#075985"
+    }
+  },
+  {
+    "name": "--gr-azure-solid-active",
+    "section": "Solid fill roles",
+    "description": "Заливка `--gr-azure-solid` в момент нажатия.",
+    "values": {
+      "light": "#0c4a6e",
+      "dark": "#0c4a6e"
+    }
+  },
+  {
+    "name": "--gr-azure-solid-fg",
+    "section": "Solid fill roles",
+    "description": "Текст и иконки на заливке `--gr-azure-solid`.",
+    "values": {
+      "light": "var(--gr-slate-0)",
+      "dark": "var(--gr-slate-50)"
+    }
+  },
+  {
     "name": "--gr-chart-1",
     "section": "Data visualization roles",
     "description": "Первый цвет серии для графиков и data-visualization элементов.",
@@ -1454,29 +1706,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-primary-bg",
     "kind": "theme",
-    "default": "var(--gr-primary) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-primary-solid)",
     "description": "Заливка solid-кнопки тона `primary`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-primary-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-primary-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-primary-solid-hover)",
     "description": "Заливка solid-кнопки тона `primary` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-primary-bg-active",
     "kind": "theme",
-    "default": "var(--gr-primary-active) / собственный тон тёмной темы",
+    "default": "var(--gr-primary-solid-active)",
     "description": "Заливка solid-кнопки тона `primary` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-primary-fg",
     "kind": "theme",
-    "default": "var(--gr-primary-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `primary`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-primary-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `primary`. Приходит из `--gr-primary-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1503,29 +1755,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-success-bg",
     "kind": "theme",
-    "default": "var(--gr-success) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-success-solid)",
     "description": "Заливка solid-кнопки тона `success`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-success-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-success-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-success-solid-hover)",
     "description": "Заливка solid-кнопки тона `success` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-success-bg-active",
     "kind": "theme",
-    "default": "var(--gr-success-active) / собственный тон тёмной темы",
+    "default": "var(--gr-success-solid-active)",
     "description": "Заливка solid-кнопки тона `success` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-success-fg",
     "kind": "theme",
-    "default": "var(--gr-success-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `success`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-success-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `success`. Приходит из `--gr-success-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1552,29 +1804,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-warning-bg",
     "kind": "theme",
-    "default": "var(--gr-warning) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-warning-solid)",
     "description": "Заливка solid-кнопки тона `warning`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-warning-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-warning-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-warning-solid-hover)",
     "description": "Заливка solid-кнопки тона `warning` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-warning-bg-active",
     "kind": "theme",
-    "default": "var(--gr-warning-active) / собственный тон тёмной темы",
+    "default": "var(--gr-warning-solid-active)",
     "description": "Заливка solid-кнопки тона `warning` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-warning-fg",
     "kind": "theme",
-    "default": "var(--gr-warning-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `warning`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-warning-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `warning`. Приходит из `--gr-warning-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1601,29 +1853,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-danger-bg",
     "kind": "theme",
-    "default": "var(--gr-danger) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-danger-solid)",
     "description": "Заливка solid-кнопки тона `danger`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-danger-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-danger-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-danger-solid-hover)",
     "description": "Заливка solid-кнопки тона `danger` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-danger-bg-active",
     "kind": "theme",
-    "default": "var(--gr-danger-active) / собственный тон тёмной темы",
+    "default": "var(--gr-danger-solid-active)",
     "description": "Заливка solid-кнопки тона `danger` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-danger-fg",
     "kind": "theme",
-    "default": "var(--gr-danger-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `danger`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-danger-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `danger`. Приходит из `--gr-danger-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1650,29 +1902,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-info-bg",
     "kind": "theme",
-    "default": "var(--gr-info) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-info-solid)",
     "description": "Заливка solid-кнопки тона `info`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-info-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-info-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-info-solid-hover)",
     "description": "Заливка solid-кнопки тона `info` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-info-bg-active",
     "kind": "theme",
-    "default": "var(--gr-info-active) / собственный тон тёмной темы",
+    "default": "var(--gr-info-solid-active)",
     "description": "Заливка solid-кнопки тона `info` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-info-fg",
     "kind": "theme",
-    "default": "var(--gr-info-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `info`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-info-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `info`. Приходит из `--gr-info-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1699,29 +1951,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-slate-bg",
     "kind": "theme",
-    "default": "var(--gr-slate) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-slate-solid)",
     "description": "Заливка solid-кнопки тона `slate`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-slate-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-slate-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-slate-solid-hover)",
     "description": "Заливка solid-кнопки тона `slate` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-slate-bg-active",
     "kind": "theme",
-    "default": "var(--gr-slate-active) / собственный тон тёмной темы",
+    "default": "var(--gr-slate-solid-active)",
     "description": "Заливка solid-кнопки тона `slate` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-slate-fg",
     "kind": "theme",
-    "default": "var(--gr-slate-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `slate`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-slate-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `slate`. Приходит из `--gr-slate-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1748,29 +2000,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-azure-bg",
     "kind": "theme",
-    "default": "var(--gr-azure) в светлой теме, собственный затемнённый тон в тёмной",
+    "default": "var(--gr-azure-solid)",
     "description": "Заливка solid-кнопки тона `azure`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-azure-bg-hover",
     "kind": "theme",
-    "default": "var(--gr-azure-hover) / собственный тон тёмной темы",
+    "default": "var(--gr-azure-solid-hover)",
     "description": "Заливка solid-кнопки тона `azure` под курсором."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-azure-bg-active",
     "kind": "theme",
-    "default": "var(--gr-azure-active) / собственный тон тёмной темы",
+    "default": "var(--gr-azure-solid-active)",
     "description": "Заливка solid-кнопки тона `azure` в момент нажатия."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-azure-fg",
     "kind": "theme",
-    "default": "var(--gr-azure-fg) / собственный контрастный цвет тёмной темы",
-    "description": "Цвет текста на solid-кнопке тона `azure`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой."
+    "default": "var(--gr-azure-solid-fg)",
+    "description": "Цвет текста на solid-кнопке тона `azure`. Приходит из `--gr-azure-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит."
   },
   {
     "owner": "GrButton",
@@ -1797,14 +2049,14 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-disabled-bg",
     "kind": "theme",
-    "default": "var(--gr-disabled-bg)",
+    "default": "var(--gr-disabled-solid)",
     "description": "Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-disabled-fg",
     "kind": "theme",
-    "default": "var(--gr-disabled-fg)",
+    "default": "var(--gr-disabled-solid-fg)",
     "description": "Цвет текста недоступной кнопки."
   },
   {

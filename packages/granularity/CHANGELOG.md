@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **A solid-fill role per tone: `--gr-{tone}-solid`, `-solid-hover`, `-solid-active`, `-solid-fg`.** A tone had one
+  fill role, and it was doing two incompatible jobs. A badge or an indicator needs 3:1 against the page and carries
+  dark text on a light fill; a solid button needs light text, which only holds on a darker fill — white on
+  `--gr-success` is 2.54:1. `GrButton` had solved this privately, with forty hex literals in its own theme layer, so
+  a theme repainting `--gr-success` moved every component except the button. The values now live where values belong:
+  in the global themes, generated from `tokens/themes/*.json` with the AA arithmetic in a `note`, and
+  `GrButton/themes/*.css` is nothing but references — the same shape `GrProgressBar` already had. Two things worth
+  knowing: `-solid` also exists where a tone is already dark enough (`primary`, `danger`, `info`, `slate` in light
+  simply alias it), because solid buttons of different tones have to read as one family; and `-solid-hover`/`-active`
+  are declared values rather than the usual mix formula, because they were picked as palette steps — deriving them
+  would have shifted azure's pressed state by 32 units per channel and, in dark, lightened buttons on hover instead
+  of darkening them. Nothing moved on screen.
+
 - **One slot vocabulary across the controls.** A slot is a role, and the same role now carries the same name
   everywhere in the package. `prefix`/`suffix` — until now an `GrInput`-only contract — are available on every control
   with a text shell: `GrAutocomplete`, `GrTreeSelect`, `GrInputTag` and `GrSelect` in `optionsView="panel"` (a native
@@ -346,6 +359,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   code and its `gr.fileValidation.maxSize` key are gone from all three locales.
 
 ### Changed
+
+- **`GrLink` tones `primary` and `neutral` now take their colour from `-text`, like the other six.** Seven of the
+  eight tones already read `var(--gr-{tone}-text)` — the role meant for text on the page background — while `primary`
+  used the saturated `var(--gr-primary)` and `neutral` reached for the same on hover. Contrast happened to pass, which
+  is exactly why it survived: the exception was invisible to every test. Links of tone `primary` are now noticeably
+  darker in the light theme (6.01 → 9.49) and paler in the dark one (6.38 → 11.97), in line with the other tones
+  (7.2–9.9). If you relied on the old hue, `--gr-primary-text` is the role to repaint. The rule is now held by
+  `GrLink.contrast.test.ts`, which checks every tone against `--gr-bg` and `--gr-card` in both themes and refuses a
+  tone that reads its colour from a fill role. Icons are deliberately out of its reach: `text-[var(--gr-primary)]` on
+  an `aria-hidden` checkmark is a graphical object at a 3:1 threshold, not text.
 
 - **Font sizes and radii now come from tokens everywhere, including the ones that looked fine.** Around a hundred
   places still styled themselves with UnoCSS scale utilities — `text-sm`, `rounded-md`, `leading-6`. Their values

@@ -274,6 +274,152 @@
       ]
     },
     {
+      "title": "Solid fill roles",
+      "note": "Сплошная заливка кнопочного веса и её текст.\n\nОт роли без суффикса отличается порогом. `--gr-{tone}` рассчитан на 3:1 к\nфону страницы — это индикатор, граница, бейдж, — и текст на нём берётся из\n`-fg`, у светлых заливок тёмный. `-solid` рассчитан на 4.5:1 под СВЕТЛЫЙ\nтекст: solid-кнопки всех тонов обязаны выглядеть одной семьёй, а бледно-\nзелёная кнопка рядом с тёмно-красной читается как ошибка вёрстки.\n\nТам, где глобальный тон уже достаточно тёмен, `-solid` — ссылка на него.\nСобственные значения нужны трём тонам: белый текст даёт 5.48 / 6.45 / 7.71\nна затемнённом success и 5.18 на затемнённом warning, тогда как глобальный\n`-fg` там тёмный и на той же заливке дал бы 3.26 и 3.45. Azure не чинится\nсменой `-fg` вовсе (см. примечание к `--gr-azure`).\n\nhover и active заданы значениями, а не общей формулой подмеса: они выбраны\nступенями палитры, и формула сдвинула бы azure-active на 32 единицы канала.",
+      "tokens": [
+        {
+          "name": "--gr-primary-solid",
+          "value": "var(--gr-primary)",
+          "description": "Сплошная заливка кнопочного веса тона `primary`."
+        },
+        {
+          "name": "--gr-primary-solid-hover",
+          "value": "var(--gr-primary-hover)",
+          "description": "Заливка `--gr-primary-solid` под курсором."
+        },
+        {
+          "name": "--gr-primary-solid-active",
+          "value": "var(--gr-primary-active)",
+          "description": "Заливка `--gr-primary-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-primary-solid-fg",
+          "value": "var(--gr-primary-fg)",
+          "description": "Текст и иконки на заливке `--gr-primary-solid`."
+        },
+        {
+          "name": "--gr-success-solid",
+          "value": "#047857",
+          "description": "Сплошная заливка кнопочного веса тона `success`."
+        },
+        {
+          "name": "--gr-success-solid-hover",
+          "value": "#036c4d",
+          "description": "Заливка `--gr-success-solid` под курсором."
+        },
+        {
+          "name": "--gr-success-solid-active",
+          "value": "#025f44",
+          "description": "Заливка `--gr-success-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-success-solid-fg",
+          "value": "var(--gr-slate-0)",
+          "description": "Текст и иконки на заливке `--gr-success-solid`."
+        },
+        {
+          "name": "--gr-warning-solid",
+          "value": "#c2410c",
+          "description": "Сплошная заливка кнопочного веса тона `warning`."
+        },
+        {
+          "name": "--gr-warning-solid-hover",
+          "value": "#b53b0a",
+          "description": "Заливка `--gr-warning-solid` под курсором."
+        },
+        {
+          "name": "--gr-warning-solid-active",
+          "value": "#9f3307",
+          "description": "Заливка `--gr-warning-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-warning-solid-fg",
+          "value": "var(--gr-slate-0)",
+          "description": "Текст и иконки на заливке `--gr-warning-solid`."
+        },
+        {
+          "name": "--gr-danger-solid",
+          "value": "var(--gr-danger)",
+          "description": "Сплошная заливка кнопочного веса тона `danger`."
+        },
+        {
+          "name": "--gr-danger-solid-hover",
+          "value": "var(--gr-danger-hover)",
+          "description": "Заливка `--gr-danger-solid` под курсором."
+        },
+        {
+          "name": "--gr-danger-solid-active",
+          "value": "var(--gr-danger-active)",
+          "description": "Заливка `--gr-danger-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-danger-solid-fg",
+          "value": "var(--gr-danger-fg)",
+          "description": "Текст и иконки на заливке `--gr-danger-solid`."
+        },
+        {
+          "name": "--gr-info-solid",
+          "value": "var(--gr-info)",
+          "description": "Сплошная заливка кнопочного веса тона `info`."
+        },
+        {
+          "name": "--gr-info-solid-hover",
+          "value": "var(--gr-info-hover)",
+          "description": "Заливка `--gr-info-solid` под курсором."
+        },
+        {
+          "name": "--gr-info-solid-active",
+          "value": "var(--gr-info-active)",
+          "description": "Заливка `--gr-info-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-info-solid-fg",
+          "value": "var(--gr-info-fg)",
+          "description": "Текст и иконки на заливке `--gr-info-solid`."
+        },
+        {
+          "name": "--gr-slate-solid",
+          "value": "var(--gr-slate)",
+          "description": "Сплошная заливка кнопочного веса тона `slate`."
+        },
+        {
+          "name": "--gr-slate-solid-hover",
+          "value": "var(--gr-slate-hover)",
+          "description": "Заливка `--gr-slate-solid` под курсором."
+        },
+        {
+          "name": "--gr-slate-solid-active",
+          "value": "var(--gr-slate-active)",
+          "description": "Заливка `--gr-slate-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-slate-solid-fg",
+          "value": "var(--gr-slate-fg)",
+          "description": "Текст и иконки на заливке `--gr-slate-solid`."
+        },
+        {
+          "name": "--gr-azure-solid",
+          "value": "#0369a1",
+          "description": "Сплошная заливка кнопочного веса тона `azure`."
+        },
+        {
+          "name": "--gr-azure-solid-hover",
+          "value": "#075985",
+          "description": "Заливка `--gr-azure-solid` под курсором."
+        },
+        {
+          "name": "--gr-azure-solid-active",
+          "value": "#0c4a6e",
+          "description": "Заливка `--gr-azure-solid` в момент нажатия."
+        },
+        {
+          "name": "--gr-azure-solid-fg",
+          "value": "var(--gr-slate-0)",
+          "description": "Текст и иконки на заливке `--gr-azure-solid`."
+        }
+      ]
+    },
+    {
       "title": "Data visualization roles",
       "tokens": [
         {

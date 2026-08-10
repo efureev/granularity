@@ -298,6 +298,39 @@ floating-компоненты не выходят по построению (v-c
 
 > **`--gr-azure` (light).** Azure — единственный тон, который не чинится сменой `-fg`. Тёмный текст проходит на базе (6.44), но hover/active уводят заливку вниз и ломают его (4.36 / 3.01); белый же не проходит на базе (2.77). Выход один — сама заливка: sky-500 `#0ea5e9` слишком светлая для белого текста. `#0077b6` — самое светлое значение, дающее запас по всем трём состояниям (4.87 / 5.44 / 6.02) и заодно поднимающее azure-иконку на `-light` подложке с 2.42 до 4.24. Оттенок остаётся отличимым от `--gr-info`.
 
+### Solid fill roles
+
+| Токен | light | dark | Назначение |
+| --- | --- | --- | --- |
+| `--gr-primary-solid` | `var(--gr-primary)` | `#595ce6` | Сплошная заливка кнопочного веса тона `primary`. |
+| `--gr-primary-solid-hover` | `var(--gr-primary-hover)` | `#5053dd` | Заливка `--gr-primary-solid` под курсором. |
+| `--gr-primary-solid-active` | `var(--gr-primary-active)` | `#474acf` | Заливка `--gr-primary-solid` в момент нажатия. |
+| `--gr-primary-solid-fg` | `var(--gr-primary-fg)` | `var(--gr-slate-0)` | Текст и иконки на заливке `--gr-primary-solid`. |
+| `--gr-success-solid` | `#047857` | `#047857` | Сплошная заливка кнопочного веса тона `success`. |
+| `--gr-success-solid-hover` | `#036c4d` | `#036c4d` | Заливка `--gr-success-solid` под курсором. |
+| `--gr-success-solid-active` | `#025f44` | `#025f44` | Заливка `--gr-success-solid` в момент нажатия. |
+| `--gr-success-solid-fg` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-success-solid`. |
+| `--gr-warning-solid` | `#c2410c` | `#c2410c` | Сплошная заливка кнопочного веса тона `warning`. |
+| `--gr-warning-solid-hover` | `#b53b0a` | `#b53b0a` | Заливка `--gr-warning-solid` под курсором. |
+| `--gr-warning-solid-active` | `#9f3307` | `#9f3307` | Заливка `--gr-warning-solid` в момент нажатия. |
+| `--gr-warning-solid-fg` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-warning-solid`. |
+| `--gr-danger-solid` | `var(--gr-danger)` | `#b91c1c` | Сплошная заливка кнопочного веса тона `danger`. |
+| `--gr-danger-solid-hover` | `var(--gr-danger-hover)` | `#a91919` | Заливка `--gr-danger-solid` под курсором. |
+| `--gr-danger-solid-active` | `var(--gr-danger-active)` | `#931515` | Заливка `--gr-danger-solid` в момент нажатия. |
+| `--gr-danger-solid-fg` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-danger-solid`. |
+| `--gr-info-solid` | `var(--gr-info)` | `#4338ca` | Сплошная заливка кнопочного веса тона `info`. |
+| `--gr-info-solid-hover` | `var(--gr-info-hover)` | `#3d33bb` | Заливка `--gr-info-solid` под курсором. |
+| `--gr-info-solid-active` | `var(--gr-info-active)` | `#362da8` | Заливка `--gr-info-solid` в момент нажатия. |
+| `--gr-info-solid-fg` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-info-solid`. |
+| `--gr-slate-solid` | `var(--gr-slate)` | `var(--gr-slate-600)` | Сплошная заливка кнопочного веса тона `slate`. |
+| `--gr-slate-solid-hover` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | Заливка `--gr-slate-solid` под курсором. |
+| `--gr-slate-solid-active` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | Заливка `--gr-slate-solid` в момент нажатия. |
+| `--gr-slate-solid-fg` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-slate-solid`. |
+| `--gr-azure-solid` | `#0369a1` | `#0369a1` | Сплошная заливка кнопочного веса тона `azure`. |
+| `--gr-azure-solid-hover` | `#075985` | `#075985` | Заливка `--gr-azure-solid` под курсором. |
+| `--gr-azure-solid-active` | `#0c4a6e` | `#0c4a6e` | Заливка `--gr-azure-solid` в момент нажатия. |
+| `--gr-azure-solid-fg` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-azure-solid`. |
+
 ### Data visualization roles
 
 | Токен | light | dark | Назначение |
@@ -404,57 +437,57 @@ floating-компоненты не выходят по построению (v-c
 | --- | --- | --- | --- |
 | `--gr-button-radius` | только хук | 0.375rem | Скругление кнопки. Его же по умолчанию наследуют внешние углы `GrButtonGroup`. |
 | `--gr-button-square-size` | только хук | высота кнопки текущей ступени | Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени. |
-| `--gr-button-primary-bg` | тема компонента | var(--gr-primary) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `primary`. |
-| `--gr-button-primary-bg-hover` | тема компонента | var(--gr-primary-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `primary` под курсором. |
-| `--gr-button-primary-bg-active` | тема компонента | var(--gr-primary-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `primary` в момент нажатия. |
-| `--gr-button-primary-fg` | тема компонента | var(--gr-primary-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `primary`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-primary-bg` | тема компонента | var(--gr-primary-solid) | Заливка solid-кнопки тона `primary`. |
+| `--gr-button-primary-bg-hover` | тема компонента | var(--gr-primary-solid-hover) | Заливка solid-кнопки тона `primary` под курсором. |
+| `--gr-button-primary-bg-active` | тема компонента | var(--gr-primary-solid-active) | Заливка solid-кнопки тона `primary` в момент нажатия. |
+| `--gr-button-primary-fg` | тема компонента | var(--gr-primary-solid-fg) | Цвет текста на solid-кнопке тона `primary`. Приходит из `--gr-primary-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-primary-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-primary) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `primary`. |
 | `--gr-button-primary-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-primary) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `primary` под курсором. |
 | `--gr-button-primary-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-primary) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `primary` в момент нажатия. |
-| `--gr-button-success-bg` | тема компонента | var(--gr-success) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `success`. |
-| `--gr-button-success-bg-hover` | тема компонента | var(--gr-success-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `success` под курсором. |
-| `--gr-button-success-bg-active` | тема компонента | var(--gr-success-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `success` в момент нажатия. |
-| `--gr-button-success-fg` | тема компонента | var(--gr-success-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `success`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-success-bg` | тема компонента | var(--gr-success-solid) | Заливка solid-кнопки тона `success`. |
+| `--gr-button-success-bg-hover` | тема компонента | var(--gr-success-solid-hover) | Заливка solid-кнопки тона `success` под курсором. |
+| `--gr-button-success-bg-active` | тема компонента | var(--gr-success-solid-active) | Заливка solid-кнопки тона `success` в момент нажатия. |
+| `--gr-button-success-fg` | тема компонента | var(--gr-success-solid-fg) | Цвет текста на solid-кнопке тона `success`. Приходит из `--gr-success-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-success-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-success) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `success`. |
 | `--gr-button-success-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-success) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `success` под курсором. |
 | `--gr-button-success-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-success) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `success` в момент нажатия. |
-| `--gr-button-warning-bg` | тема компонента | var(--gr-warning) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `warning`. |
-| `--gr-button-warning-bg-hover` | тема компонента | var(--gr-warning-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `warning` под курсором. |
-| `--gr-button-warning-bg-active` | тема компонента | var(--gr-warning-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `warning` в момент нажатия. |
-| `--gr-button-warning-fg` | тема компонента | var(--gr-warning-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `warning`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-warning-bg` | тема компонента | var(--gr-warning-solid) | Заливка solid-кнопки тона `warning`. |
+| `--gr-button-warning-bg-hover` | тема компонента | var(--gr-warning-solid-hover) | Заливка solid-кнопки тона `warning` под курсором. |
+| `--gr-button-warning-bg-active` | тема компонента | var(--gr-warning-solid-active) | Заливка solid-кнопки тона `warning` в момент нажатия. |
+| `--gr-button-warning-fg` | тема компонента | var(--gr-warning-solid-fg) | Цвет текста на solid-кнопке тона `warning`. Приходит из `--gr-warning-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-warning-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-warning) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `warning`. |
 | `--gr-button-warning-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-warning) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `warning` под курсором. |
 | `--gr-button-warning-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-warning) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `warning` в момент нажатия. |
-| `--gr-button-danger-bg` | тема компонента | var(--gr-danger) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `danger`. |
-| `--gr-button-danger-bg-hover` | тема компонента | var(--gr-danger-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `danger` под курсором. |
-| `--gr-button-danger-bg-active` | тема компонента | var(--gr-danger-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `danger` в момент нажатия. |
-| `--gr-button-danger-fg` | тема компонента | var(--gr-danger-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `danger`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-danger-bg` | тема компонента | var(--gr-danger-solid) | Заливка solid-кнопки тона `danger`. |
+| `--gr-button-danger-bg-hover` | тема компонента | var(--gr-danger-solid-hover) | Заливка solid-кнопки тона `danger` под курсором. |
+| `--gr-button-danger-bg-active` | тема компонента | var(--gr-danger-solid-active) | Заливка solid-кнопки тона `danger` в момент нажатия. |
+| `--gr-button-danger-fg` | тема компонента | var(--gr-danger-solid-fg) | Цвет текста на solid-кнопке тона `danger`. Приходит из `--gr-danger-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-danger-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-danger) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `danger`. |
 | `--gr-button-danger-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-danger) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `danger` под курсором. |
 | `--gr-button-danger-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-danger) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `danger` в момент нажатия. |
-| `--gr-button-info-bg` | тема компонента | var(--gr-info) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `info`. |
-| `--gr-button-info-bg-hover` | тема компонента | var(--gr-info-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `info` под курсором. |
-| `--gr-button-info-bg-active` | тема компонента | var(--gr-info-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `info` в момент нажатия. |
-| `--gr-button-info-fg` | тема компонента | var(--gr-info-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `info`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-info-bg` | тема компонента | var(--gr-info-solid) | Заливка solid-кнопки тона `info`. |
+| `--gr-button-info-bg-hover` | тема компонента | var(--gr-info-solid-hover) | Заливка solid-кнопки тона `info` под курсором. |
+| `--gr-button-info-bg-active` | тема компонента | var(--gr-info-solid-active) | Заливка solid-кнопки тона `info` в момент нажатия. |
+| `--gr-button-info-fg` | тема компонента | var(--gr-info-solid-fg) | Цвет текста на solid-кнопке тона `info`. Приходит из `--gr-info-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-info-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-info) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `info`. |
 | `--gr-button-info-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-info) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `info` под курсором. |
 | `--gr-button-info-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-info) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `info` в момент нажатия. |
-| `--gr-button-slate-bg` | тема компонента | var(--gr-slate) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `slate`. |
-| `--gr-button-slate-bg-hover` | тема компонента | var(--gr-slate-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `slate` под курсором. |
-| `--gr-button-slate-bg-active` | тема компонента | var(--gr-slate-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `slate` в момент нажатия. |
-| `--gr-button-slate-fg` | тема компонента | var(--gr-slate-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `slate`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-slate-bg` | тема компонента | var(--gr-slate-solid) | Заливка solid-кнопки тона `slate`. |
+| `--gr-button-slate-bg-hover` | тема компонента | var(--gr-slate-solid-hover) | Заливка solid-кнопки тона `slate` под курсором. |
+| `--gr-button-slate-bg-active` | тема компонента | var(--gr-slate-solid-active) | Заливка solid-кнопки тона `slate` в момент нажатия. |
+| `--gr-button-slate-fg` | тема компонента | var(--gr-slate-solid-fg) | Цвет текста на solid-кнопке тона `slate`. Приходит из `--gr-slate-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-slate-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-slate) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `slate`. |
 | `--gr-button-slate-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-slate) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `slate` под курсором. |
 | `--gr-button-slate-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-slate) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `slate` в момент нажатия. |
-| `--gr-button-azure-bg` | тема компонента | var(--gr-azure) в светлой теме, собственный затемнённый тон в тёмной | Заливка solid-кнопки тона `azure`. |
-| `--gr-button-azure-bg-hover` | тема компонента | var(--gr-azure-hover) / собственный тон тёмной темы | Заливка solid-кнопки тона `azure` под курсором. |
-| `--gr-button-azure-bg-active` | тема компонента | var(--gr-azure-active) / собственный тон тёмной темы | Заливка solid-кнопки тона `azure` в момент нажатия. |
-| `--gr-button-azure-fg` | тема компонента | var(--gr-azure-fg) / собственный контрастный цвет тёмной темы | Цвет текста на solid-кнопке тона `azure`. Отдельно от глобальной роли: заливка кнопки темнее общей, и текст на ней свой. |
+| `--gr-button-azure-bg` | тема компонента | var(--gr-azure-solid) | Заливка solid-кнопки тона `azure`. |
+| `--gr-button-azure-bg-hover` | тема компонента | var(--gr-azure-solid-hover) | Заливка solid-кнопки тона `azure` под курсором. |
+| `--gr-button-azure-bg-active` | тема компонента | var(--gr-azure-solid-active) | Заливка solid-кнопки тона `azure` в момент нажатия. |
+| `--gr-button-azure-fg` | тема компонента | var(--gr-azure-solid-fg) | Цвет текста на solid-кнопке тона `azure`. Приходит из `--gr-azure-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-azure-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-azure) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `azure`. |
 | `--gr-button-azure-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-azure) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `azure` под курсором. |
 | `--gr-button-azure-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-azure) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `azure` в момент нажатия. |
-| `--gr-button-disabled-bg` | тема компонента | var(--gr-disabled-bg) | Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. |
-| `--gr-button-disabled-fg` | тема компонента | var(--gr-disabled-fg) | Цвет текста недоступной кнопки. |
+| `--gr-button-disabled-bg` | тема компонента | var(--gr-disabled-solid) | Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. |
+| `--gr-button-disabled-fg` | тема компонента | var(--gr-disabled-solid-fg) | Цвет текста недоступной кнопки. |
 | `--gr-button-disabled-brd` | тема компонента | var(--gr-disabled-brd) | Цвет рамки недоступной кнопки. |
 
 ### GrButtonGroup

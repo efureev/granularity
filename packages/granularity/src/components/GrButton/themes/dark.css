@@ -1,40 +1,47 @@
-
+/*
+ * Тёмная тема кнопки — только ссылки на роли `--gr-{tone}-solid`.
+ *
+ * Переопределены все семь тонов, потому что глобальные `--gr-{tone}` в тёмной
+ * теме — пастельные заливки под тёмный текст, а кнопка остаётся насыщенной со
+ * светлой подписью. Soft-заливки сюда не попадают намеренно: они объявлены в
+ * `:root` формулой от тона и фона и пересчитываются в тёмной теме сами.
+ */
 .dark,
 [data-theme='dark'] {
-  --gr-button-primary-bg: #595ce6;
-  --gr-button-primary-bg-hover: #5053dd;
-  --gr-button-primary-bg-active: #474acf;
-  --gr-button-primary-fg: #ffffff;
+  --gr-button-primary-bg: var(--gr-primary-solid);
+  --gr-button-primary-bg-hover: var(--gr-primary-solid-hover);
+  --gr-button-primary-bg-active: var(--gr-primary-solid-active);
+  --gr-button-primary-fg: var(--gr-primary-solid-fg);
 
-  --gr-button-success-bg: #047857;
-  --gr-button-success-bg-hover: #036c4d;
-  --gr-button-success-bg-active: #025f44;
-  --gr-button-success-fg: #f8fafc;
+  --gr-button-success-bg: var(--gr-success-solid);
+  --gr-button-success-bg-hover: var(--gr-success-solid-hover);
+  --gr-button-success-bg-active: var(--gr-success-solid-active);
+  --gr-button-success-fg: var(--gr-success-solid-fg);
 
-  --gr-button-warning-bg: #c2410c;
-  --gr-button-warning-bg-hover: #b53b0a;
-  --gr-button-warning-bg-active: #9f3307;
-  --gr-button-warning-fg: #f8fafc;
+  --gr-button-warning-bg: var(--gr-warning-solid);
+  --gr-button-warning-bg-hover: var(--gr-warning-solid-hover);
+  --gr-button-warning-bg-active: var(--gr-warning-solid-active);
+  --gr-button-warning-fg: var(--gr-warning-solid-fg);
 
-  --gr-button-danger-bg: #b91c1c;
-  --gr-button-danger-bg-hover: #a91919;
-  --gr-button-danger-bg-active: #931515;
-  --gr-button-danger-fg: #f8fafc;
+  --gr-button-danger-bg: var(--gr-danger-solid);
+  --gr-button-danger-bg-hover: var(--gr-danger-solid-hover);
+  --gr-button-danger-bg-active: var(--gr-danger-solid-active);
+  --gr-button-danger-fg: var(--gr-danger-solid-fg);
 
-  --gr-button-info-bg: #4338ca;
-  --gr-button-info-bg-hover: #3d33bb;
-  --gr-button-info-bg-active: #362da8;
-  --gr-button-info-fg: #f8fafc;
+  --gr-button-info-bg: var(--gr-info-solid);
+  --gr-button-info-bg-hover: var(--gr-info-solid-hover);
+  --gr-button-info-bg-active: var(--gr-info-solid-active);
+  --gr-button-info-fg: var(--gr-info-solid-fg);
 
-  --gr-button-slate-bg: #475569;
-  --gr-button-slate-bg-hover: #334155;
-  --gr-button-slate-bg-active: #1e293b;
-  --gr-button-slate-fg: #f8fafc;
+  --gr-button-slate-bg: var(--gr-slate-solid);
+  --gr-button-slate-bg-hover: var(--gr-slate-solid-hover);
+  --gr-button-slate-bg-active: var(--gr-slate-solid-active);
+  --gr-button-slate-fg: var(--gr-slate-solid-fg);
 
-  --gr-button-azure-bg: #0369a1;
-  --gr-button-azure-bg-hover: #075985;
-  --gr-button-azure-bg-active: #0c4a6e;
-  --gr-button-azure-fg: #f8fafc;
+  --gr-button-azure-bg: var(--gr-azure-solid);
+  --gr-button-azure-bg-hover: var(--gr-azure-solid-hover);
+  --gr-button-azure-bg-active: var(--gr-azure-solid-active);
+  --gr-button-azure-fg: var(--gr-azure-solid-fg);
 
   /*
    * Отключённая кнопка. Гасится собственной парой токенов, а не `opacity` —

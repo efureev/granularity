@@ -86,6 +86,47 @@
   --gr-azure-fg: #0f172a;
   --gr-azure-text: #bae6fd;
 
+  /*
+   * Solid fill roles
+   *
+   * Сплошная заливка кнопочного веса и её текст.
+   *
+   * В тёмной теме собственные значения нужны всем семи тонам: глобальные
+   * `--gr-{tone}` здесь — пастельные заливки под ТЁМНЫЙ текст, а кнопка обязана
+   * остаться насыщенной со светлой подписью.
+   *
+   * hover и active уводят заливку темнее, а не светлее: общая формула подмеса к
+   * `--gr-fg` в тёмной теме осветляла бы кнопку под курсором.
+   */
+  --gr-primary-solid: #595ce6;
+  --gr-primary-solid-hover: #5053dd;
+  --gr-primary-solid-active: #474acf;
+  --gr-primary-solid-fg: var(--gr-slate-0);
+  --gr-success-solid: #047857;
+  --gr-success-solid-hover: #036c4d;
+  --gr-success-solid-active: #025f44;
+  --gr-success-solid-fg: var(--gr-slate-50);
+  --gr-warning-solid: #c2410c;
+  --gr-warning-solid-hover: #b53b0a;
+  --gr-warning-solid-active: #9f3307;
+  --gr-warning-solid-fg: var(--gr-slate-50);
+  --gr-danger-solid: #b91c1c;
+  --gr-danger-solid-hover: #a91919;
+  --gr-danger-solid-active: #931515;
+  --gr-danger-solid-fg: var(--gr-slate-50);
+  --gr-info-solid: #4338ca;
+  --gr-info-solid-hover: #3d33bb;
+  --gr-info-solid-active: #362da8;
+  --gr-info-solid-fg: var(--gr-slate-50);
+  --gr-slate-solid: var(--gr-slate-600);
+  --gr-slate-solid-hover: var(--gr-slate-700);
+  --gr-slate-solid-active: var(--gr-slate-800);
+  --gr-slate-solid-fg: var(--gr-slate-50);
+  --gr-azure-solid: #0369a1;
+  --gr-azure-solid-hover: #075985;
+  --gr-azure-solid-active: #0c4a6e;
+  --gr-azure-solid-fg: var(--gr-slate-50);
+
   /* Data visualization roles */
   --gr-chart-1: #6366f1;
   --gr-chart-2: #34d399;

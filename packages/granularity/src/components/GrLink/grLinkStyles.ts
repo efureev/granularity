@@ -59,10 +59,13 @@ function toneTextColors(tone: string): GrLinkToneColors {
   }
 }
 
+const primaryTextColors = toneTextColors('primary')
+
 const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
-  primary: { base: 'var(--gr-primary)', hover: 'var(--gr-primary-hover)', active: 'var(--gr-primary-active)' },
-  // Нейтральная ссылка: читаемый `--gr-fg` в покое, акцент `--gr-primary` при наведении.
-  neutral: { base: 'var(--gr-fg)', hover: 'var(--gr-primary)', active: 'var(--gr-primary-active)' },
+  primary: primaryTextColors,
+  // Нейтральная ссылка: читаемый `--gr-fg` в покое, акцент при наведении — тот
+  // же, что у тона `primary`, и по тому же правилу «текст берётся из `-text`».
+  neutral: { base: 'var(--gr-fg)', hover: primaryTextColors.base, active: primaryTextColors.active },
   success: toneTextColors('success'),
   warning: toneTextColors('warning'),
   danger: toneTextColors('danger'),
