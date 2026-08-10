@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrBottomNav` joins the size scale and opens up its items.** The panel was the one navigation component that never
+  read `GrConfigProvider` at all: `<GrConfigProvider size="sm">` resized everything around it and left the bottom bar
+  alone. It scales now — but the interesting part is what it deliberately does *not* scale. A step moves the bar
+  height (48/56/56/64px), the glyph (16/20/20/24px) and the label type, while the item itself keeps
+  `min-width`/`min-height` of 44px on every step: a touch target below 44×44 fails WCAG 2.5.5, and "make the bar more
+  compact" is not a reason to fall through that floor. `md` reproduces the previous look exactly, so nothing changes
+  without the prop. Alongside it, the new scoped slot `item` replaces the icon/label/badge markup — the case that
+  prompted it is an avatar instead of an icon on a profile section. The slot takes the content, not the behaviour:
+  tag choice (`button` / `a` / the component from `as`), `aria-current`, `aria-disabled` and click handling stay with
+  the component, so a custom item cannot accidentally stop being navigation. The badge's screen-reader string comes
+  in as a slot prop, so a custom item does not lose the announcement together with the default markup.
+
 - **`GrAlert` opens up: a custom icon, a place for actions, and self-dismissal.** Everything the component could do was
   fixed at build time — the icon came from a private tone → glyph map with no way to replace or remove it, action
   buttons had to go into the message text, and the announcement mode (`live`) was the one prop of four that

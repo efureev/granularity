@@ -45,7 +45,7 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   ellipsis: ['GrBreadcrumbs'],
   extra: ['GrCollapse'],
   hint: ['GrFormField'],
-  item: ['GrBreadcrumbs', 'GrCommandPalette', 'GrList'],
+  item: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrList'],
   left: ['GrNavbar'],
   node: ['GrTreeSelect'],
   option: ['GrSelect', 'GrAutocomplete'],

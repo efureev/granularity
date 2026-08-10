@@ -36,6 +36,7 @@ export const demoPathByPreviewKey = {
   'gr-badge-wrap-counter':                  'components/gr-badge-wrap/GrBadgeWrapCounterDemo.vue',
   'gr-badge-wrap-dot-status':               'components/gr-badge-wrap/GrBadgeWrapDotStatusDemo.vue',
   'gr-badge-wrap-tab-notification':         'components/gr-badge-wrap/GrBadgeWrapTabNotificationDemo.vue',
+  'gr-bottom-nav-custom-item':              'components/gr-bottom-nav/GrBottomNavCustomItemDemo.vue',
   'gr-bottom-nav-basic-flow':               'components/gr-bottom-nav/GrBottomNavBasicFlowDemo.vue',
   'gr-bottom-nav-external-state':           'components/gr-bottom-nav/GrBottomNavExternalStateDemo.vue',
   'gr-bottom-nav-mobile-shell':             'components/gr-bottom-nav/GrBottomNavMobileShellDemo.vue',

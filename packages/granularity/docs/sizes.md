@@ -115,7 +115,7 @@ export const sizes = {
 
 Читают провайдер и различают все четыре ступени:
 
-`GrAutocomplete`, `GrAvatar`, `GrButton`, `GrCheckbox`, `GrCheckboxGroup`,
+`GrAutocomplete`, `GrAvatar`, `GrBottomNav`, `GrButton`, `GrCheckbox`, `GrCheckboxGroup`,
 `GrCollapse`, `GrDataTable`, `GrFileUpload`, `GrFormFile`, `GrIcon`, `GrInput`, `GrLink`, `GrNumberInput`,
 `GrPagination`, `GrProgressBar`, `GrRating`, `GrSegmented`, `GrSelect`,
 `GrSlider`, `GrStatistic`, `GrSwitch`, `GrTable`, `GrTabs`, `GrTextarea`,

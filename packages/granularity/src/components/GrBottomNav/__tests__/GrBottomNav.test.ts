@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { computed, defineComponent, h } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import { GR_CONFIG_KEY } from '../../GrConfigProvider/context'
 import GrBottomNav from '../GrBottomNav.vue'
 
 const items = [
@@ -176,5 +177,94 @@ describe('GrBottomNav — видимость и слой', () => {
     expect(root.classes()).not.toContain('fixed')
     expect(root.classes()).not.toContain('z-[var(--gr-z-bottom-nav)]')
     expect(root.classes()).toContain('relative')
+  })
+
+  describe('размер', () => {
+    const SIZES = ['xs', 'sm', 'md', 'lg'] as const
+
+    it('ступень тянет высоту полосы, глиф и кегль подписи', () => {
+      const rendered = SIZES.map((size) => {
+        const wrapper = mountNav({ size, items: [{ value: 'home', label: 'Home', icon: 'i-lucide-home' }] })
+        return {
+          list: wrapper.get('nav > div').classes().find(name => name.startsWith('h-')),
+          icon: wrapper.get('[aria-hidden="true"]').classes().filter(name => name.startsWith('h-') || name.startsWith('w-')).sort().join(' '),
+          text: wrapper.get('button').classes().find(name => name.startsWith('text-[length')),
+        }
+      })
+
+      expect(rendered.map(item => item.list)).toEqual(['h-12', 'h-14', 'h-14', 'h-16'])
+      expect(rendered.map(item => item.icon)).toEqual(['h-4 w-4', 'h-5 w-5', 'h-5 w-5', 'h-6 w-6'])
+      expect(new Set(rendered.map(item => item.text)).size).toBe(3)
+    })
+
+    /**
+     * Пол шкалы: тач-таргет не сжимается вместе с полосой. Меньше 44×44 — это
+     * WCAG 2.5.5, и ступень `xs` не повод его нарушить.
+     */
+    it('тач-таргет пункта остаётся 44×44 на каждой ступени', () => {
+      for (const size of SIZES) {
+        const classes = mountNav({ size }).get('button').classes()
+
+        expect(classes, `ступень ${size}`).toContain('min-h-[44px]')
+        expect(classes, `ступень ${size}`).toContain('min-w-[44px]')
+      }
+    })
+
+    it('размер приезжает из GrConfigProvider, локальный проп сильнее', () => {
+      const provide = {
+        [GR_CONFIG_KEY as symbol]: {
+          size: computed(() => 'lg'),
+          componentDefaults: computed(() => ({})),
+        },
+      }
+
+      const fromProvider = mount(GrBottomNav, {
+        props: { modelValue: 'home', items },
+        global: { provide },
+      })
+
+      expect(fromProvider.get('nav > div').classes()).toContain('h-16')
+
+      const local = mount(GrBottomNav, {
+        props: { modelValue: 'home', items, size: 'xs' },
+        global: { provide },
+      })
+
+      expect(local.get('nav > div').classes()).toContain('h-12')
+    })
+  })
+
+  describe('слот пункта', () => {
+    it('подменяет содержимое, оставляя поведение пункта компоненту', async () => {
+      const wrapper = mount(GrBottomNav, {
+        props: { modelValue: 'home', items },
+        slots: {
+          item: '<span data-custom>{{ params.item.label }}:{{ params.active }}</span>',
+        },
+      })
+
+      const first = wrapper.get('button')
+
+      expect(first.find('[data-custom]').text()).toBe('Home:true')
+      // Разметку забрал слот, поведение осталось за компонентом.
+      expect(first.attributes('aria-current')).toBe('page')
+
+      await wrapper.findAll('button')[1].trigger('click')
+      expect(wrapper.emitted('update:modelValue')).toEqual([['profile']])
+    })
+
+    it('отдаёт озвучку счётчика слоту — кастомный пункт не теряет её вместе с разметкой', () => {
+      const wrapper = mount(GrBottomNav, {
+        props: {
+          modelValue: 'home',
+          items: [{ value: 'home', label: 'Home', badge: 3 }, { value: 'profile', label: 'Profile' }],
+        },
+        slots: { item: '<span data-label>{{ params.badgeLabel ?? "—" }}</span>' },
+      })
+
+      const labels = wrapper.findAll('[data-label]').map(node => node.text())
+
+      expect(labels).toEqual(['3 new', '—'])
+    })
   })
 })

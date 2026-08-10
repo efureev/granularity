@@ -1,3 +1,5 @@
+import type { GrComponentSize } from '../shared/sizes'
+
 /**
  * Брейкпоинт, начиная с которого панель скрывается. `none` — видна всегда:
  * киоск и PWA нижнюю навигацию не прячут.
@@ -23,9 +25,41 @@ export const rootHideAboveClass: Record<GrBottomNavHideAbove, string> = {
   none: '',
 }
 
-export const listClass = 'h-14 flex items-center justify-around'
+export const listClass = 'flex items-center justify-around'
 
-export const itemBase = 'relative min-w-[44px] min-h-[44px] px-3 py-1 rounded-[var(--gr-radius-md)] flex flex-col items-center justify-center gap-0.5 text-[length:var(--gr-text-xs)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+/**
+ * Размерная шкала панели: высота полосы, глиф и кегль подписи.
+ *
+ * Что тянуть у панели фиксированной высоты — вопрос неочевидный, и ответ здесь
+ * ограничен снизу доступностью: **тач-таргет пункта не может стать меньше
+ * 44×44** (WCAG 2.5.5). Поэтому ступень ужимает полосу и содержимое, а сам
+ * пункт остаётся тем же прямоугольником под палец — `min-w-[44px]
+ * min-h-[44px]` в `itemBase` вне шкалы намеренно.
+ *
+ * `md` совпадает с историческим видом панели: без пропа не меняется ничего.
+ */
+export const listSizes: Record<GrComponentSize, string> = {
+  xs: 'h-12',
+  sm: 'h-14',
+  md: 'h-14',
+  lg: 'h-16',
+}
+
+export const itemTextSizes: Record<GrComponentSize, string> = {
+  xs: 'text-[length:var(--gr-text-2xs)]',
+  sm: 'text-[length:var(--gr-text-2xs)]',
+  md: 'text-[length:var(--gr-text-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)]',
+}
+
+export const itemIconSizes: Record<GrComponentSize, string> = {
+  xs: 'h-4 w-4',
+  sm: 'h-5 w-5',
+  md: 'h-5 w-5',
+  lg: 'h-6 w-6',
+}
+
+export const itemBase = 'relative min-w-[44px] min-h-[44px] px-3 py-1 rounded-[var(--gr-radius-md)] flex flex-col items-center justify-center gap-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 /**
  * Активный пункт несёт три отличия сразу — подложку, вес и цвет. Одного цвета
@@ -38,7 +72,7 @@ export const itemIdleClass = 'font-500 text-[var(--gr-muted-fg)] hover:text-[var
 /** Недоступный пункт гасится токеном: `opacity` разбавляет выверенные на AA цвета. */
 export const itemDisabledClass = 'cursor-not-allowed font-500 text-[var(--gr-disabled-fg)]'
 
-export const itemIconClass = 'block h-5 w-5 shrink-0'
+export const itemIconClass = 'block shrink-0'
 export const itemLabelClass = 'max-w-full truncate leading-none'
 
 /**
@@ -56,13 +90,22 @@ export function grBottomNavRootClass(options: {
     .join(' ')
 }
 
+export function grBottomNavListClass(size: GrComponentSize): string {
+  return [listClass, listSizes[size]].join(' ')
+}
+
+export function grBottomNavIconClass(size: GrComponentSize): string {
+  return [itemIconClass, itemIconSizes[size]].join(' ')
+}
+
 export function grBottomNavItemClass(options: {
   active: boolean
   disabled: boolean
+  size: GrComponentSize
 }): string {
   const state = options.disabled
     ? itemDisabledClass
     : options.active ? itemActiveClass : itemIdleClass
 
-  return [itemBase, state].join(' ')
+  return [itemBase, itemTextSizes[options.size], state].join(' ')
 }

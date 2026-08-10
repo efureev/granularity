@@ -1,18 +1,23 @@
 <script setup lang="ts">
 import { computed, markRaw, type Component } from 'vue'
 
+import type { GrComponentSize } from '../shared/sizes'
+
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
+  grBottomNavIconClass,
   grBottomNavItemClass,
+  grBottomNavListClass,
   grBottomNavRootClass,
   itemBadgeClass,
-  itemIconClass,
   itemLabelClass,
-  listClass,
   type GrBottomNavHideAbove,
   type GrBottomNavPosition,
 } from './grBottomNavStyles'
+
+import './defaults'
 
 export type { GrBottomNavHideAbove, GrBottomNavPosition } from './grBottomNavStyles'
 
@@ -52,6 +57,11 @@ export interface GrBottomNavProps {
   position?: GrBottomNavPosition
   /** Имя лендмарка. Не задано — берётся из локали. */
   ariaLabel?: string
+  /**
+   * Ступень размера: высота полосы, глиф и кегль подписи. Тач-таргет пункта
+   * остаётся 44×44 на любой ступени.
+   */
+  size?: GrComponentSize
 }
 
 export interface GrBottomNavEmits {
@@ -63,13 +73,31 @@ const props = withDefaults(defineProps<GrBottomNavProps>(), {
   hideAbove: 'sm',
   position: 'fixed',
   ariaLabel: undefined,
+  // `undefined`: «настоящий» дефолт живёт в `useGrComponentSize`, иначе
+  // `GrConfigProvider` не отличит заданное значение от подставленного Vue.
+  size: undefined,
 })
 
 const emit = defineEmits<GrBottomNavEmits>()
 
+defineSlots<{
+  /**
+   * Содержимое пункта вместо иконки, подписи и счётчика. Корень пункта —
+   * тег, `aria-current`, `aria-disabled` и клик — остаётся за компонентом.
+   */
+  item?: (props: {
+    item: GrBottomNavItem
+    active: boolean
+    disabled: boolean
+    badgeLabel: string | undefined
+  }) => any
+}>()
+
 const { t } = useGranularityTranslations()
 
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.bottomNav.label', 'Bottom navigation'))
+
+const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrBottomNav' })
 
 const rootClass = computed(() => grBottomNavRootClass({
   position: props.position,
@@ -88,7 +116,8 @@ function itemTag(item: GrBottomNavItem): string | Component {
  * Счётчик рисуется декоративно, а рядом идёт скрытая подпись: голое «3» без
  * единицы измерения диктору ничего не сообщает.
  */
-function badgeLabel(item: GrBottomNavItem): string {
+function badgeLabel(item: GrBottomNavItem): string | undefined {
+  if (item.badge == null || item.badge === '') return undefined
   if (item.badgeLabel) return item.badgeLabel
   if (typeof item.badge === 'number') {
     return t('gr.bottomNav.badge', '{count} new', { count: item.badge, n: item.badge })
@@ -104,7 +133,7 @@ function select(item: GrBottomNavItem): void {
 
 <template>
   <nav :class="rootClass" :aria-label="resolvedAriaLabel">
-    <div :class="listClass">
+    <div :class="grBottomNavListClass(resolvedSize)">
       <component
         :is="itemTag(item)"
         v-for="item in items"
@@ -116,18 +145,26 @@ function select(item: GrBottomNavItem): void {
         :aria-current="item.value === modelValue ? 'page' : undefined"
         :aria-disabled="item.disabled ? 'true' : undefined"
         :aria-label="item.ariaLabel"
-        :class="grBottomNavItemClass({ active: item.value === modelValue, disabled: item.disabled ?? false })"
+        :class="grBottomNavItemClass({ active: item.value === modelValue, disabled: item.disabled ?? false, size: resolvedSize })"
         @click="select(item)"
       >
-        <component :is="item.icon" v-if="item.icon && typeof item.icon !== 'string'" :class="itemIconClass" aria-hidden="true" />
-        <span v-else-if="item.icon" :class="[item.icon, itemIconClass]" aria-hidden="true" />
+        <slot
+          name="item"
+          :item="item"
+          :active="item.value === modelValue"
+          :disabled="item.disabled ?? false"
+          :badge-label="badgeLabel(item)"
+        >
+          <component :is="item.icon" v-if="item.icon && typeof item.icon !== 'string'" :class="grBottomNavIconClass(resolvedSize)" aria-hidden="true" />
+          <span v-else-if="item.icon" :class="[item.icon, grBottomNavIconClass(resolvedSize)]" aria-hidden="true" />
 
-        <span :class="itemLabelClass">{{ item.label }}</span>
+          <span :class="itemLabelClass">{{ item.label }}</span>
 
-        <template v-if="item.badge != null && item.badge !== ''">
-          <span data-gr-bottom-nav-badge :class="itemBadgeClass" aria-hidden="true">{{ item.badge }}</span>
-          <span data-gr-bottom-nav-badge-label class="sr-only">{{ badgeLabel(item) }}</span>
-        </template>
+          <template v-if="item.badge != null && item.badge !== ''">
+            <span data-gr-bottom-nav-badge :class="itemBadgeClass" aria-hidden="true">{{ item.badge }}</span>
+            <span data-gr-bottom-nav-badge-label class="sr-only">{{ badgeLabel(item) }}</span>
+          </template>
+        </slot>
       </component>
     </div>
   </nav>

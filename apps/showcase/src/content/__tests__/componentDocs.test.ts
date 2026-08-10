@@ -190,7 +190,7 @@ describe('component docs metadata', () => {
     const navbarDoc = getShowcaseComponentDoc(navbarEntity!)
     const sidebarDoc = getShowcaseComponentDoc(sidebarEntity!)
 
-    expect(bottomNavDoc.examples).toHaveLength(3)
+    expect(bottomNavDoc.examples).toHaveLength(4)
     expect(bottomNavDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(bottomNavDoc.examples.every(example => example.previewKey?.startsWith('gr-bottom-nav'))).toBe(true)
 

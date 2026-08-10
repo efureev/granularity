@@ -1,6 +1,7 @@
 export { default } from './GrBottomNav.vue'
 export { default as GrBottomNav } from './GrBottomNav.vue'
 export type { GrBottomNavItem, GrBottomNavProps } from './GrBottomNav.vue'
+export type { GrBottomNavConfigurableProps } from './defaults'
 export { grBottomNavConfig } from './config'
 export { GR_BOTTOM_NAV_HIDE_ABOVE, GR_BOTTOM_NAV_POSITIONS } from './grBottomNavStyles'
 export type { GrBottomNavHideAbove, GrBottomNavPosition } from './grBottomNavStyles'

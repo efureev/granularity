@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest'
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrAvatar from '../components/GrAvatar/GrAvatar.vue'
 import GrBadge from '../components/GrBadge/GrBadge.vue'
+import GrBottomNav from '../components/GrBottomNav/GrBottomNav.vue'
 import GrBreadcrumbs from '../components/GrBreadcrumbs/GrBreadcrumbs.vue'
 import GrButton from '../components/GrButton/GrButton.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
@@ -89,6 +90,10 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrAutocomplete', render: () => h(GrAutocomplete, { modelValue: '', options: [] }) },
   { name: 'GrAvatar', render: () => h(GrAvatar, { alt: 'A' }) },
   { name: 'GrBadge', render: () => h(GrBadge, null, { default: () => 'B' }) },
+  {
+    name: 'GrBottomNav',
+    render: () => h(GrBottomNav, { modelValue: 'a', items: [{ label: 'A', value: 'a', icon: 'i-lucide-home' }] }),
+  },
   {
     name: 'GrBreadcrumbs',
     render: () => h(GrBreadcrumbs, { items: [{ label: 'A', href: '/' }, { label: 'B' }] }),

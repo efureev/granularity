@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grBottomNavExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'bottom-nav-custom-item',
+    title: 'Custom item markup and the size scale',
+    description: 'Слот `item` пускает в пункт что угодно — здесь аватар вместо иконки, — а `size` тянет высоту полосы, глиф и кегль подписи, не трогая тач-таргет.',
+    status: 'ready',
+    previewKey: 'gr-bottom-nav-custom-item',
+  },
+  {
     id: 'bottom-nav-basic-flow',
     title: 'Basic section switcher',
     description: 'Базовый сценарий: иконки, счётчик на разделе и активный пункт, который отличается не только цветом.',

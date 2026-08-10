@@ -705,6 +705,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "size",
+            "description": "Ступень размера: высота полосы, глиф и кегль подписи. Тач-таргет пункта остаётся 44×44 на любой ступени.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "ariaLabel",
             "description": "Имя лендмарка. Не задано — берётся из локали.",
             "type": "string | undefined",
@@ -750,7 +757,13 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "item",
+            "description": "Содержимое пункта вместо иконки, подписи и счётчика. Корень пункта — тег, `aria-current`, `aria-disabled` и клик — остаётся за компонентом.",
+            "type": "{ item: GrBottomNavItem; active: boolean; disabled: boolean; badgeLabel: string | undefined; }"
+          }
+        ]
       },
       {
         "key": "events",
