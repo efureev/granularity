@@ -260,6 +260,9 @@
   "link": {
     "opensInNewTab": "se abre en una pestaña nueva"
   },
+  "collapse": {
+    "empty": "Todavía no hay nada"
+  },
   "list": {
     "empty": "Todavía no hay nada"
   },

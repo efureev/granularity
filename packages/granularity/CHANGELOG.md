@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrCollapse` has an empty state, and its own locale namespace to fill it.** An accordion with no sections drew an
+  empty bordered card — a state that reads as breakage rather than "nothing here yet" — and there was no text to put
+  in it: the component had no i18n namespace, so a consumer had to detect emptiness and supply the copy themselves.
+  It now behaves like `GrList` and `GrTable`: the text comes from `gr.collapse.empty` (all three locales), `emptyText`
+  overrides it, the `empty` slot overrides both, and `:empty="false"` suppresses the automatic detection for the case
+  where sections arrive asynchronously and a flash of placeholder would be wrong. Emptiness is decided by the slot's
+  content rather than by your data, through the shared `hasMeaningfulSlotContent` helper, which is why it survives the
+  usual traps: a `v-for` over an empty array leaves a fragment, a `v-if` leaves a comment node, and the template
+  leaves whitespace — none of that is content. Markup for a non-empty accordion is byte-for-byte what it was.
+
 - **`GrBreadcrumbs` can collapse by the space it actually has.** `maxItems` counts items, and on a narrow screen a
   count predicts badly: three short levels fit where two long ones do not. `autoCollapse` measures instead — the path
   becomes a single line and hides as much of its middle as it must, no more. Two boundaries are deliberate: the head

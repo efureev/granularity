@@ -266,7 +266,7 @@ describe('component docs metadata', () => {
     const progressBarDoc = getShowcaseComponentDoc(progressBarEntity!)
     const skeletonDoc = getShowcaseComponentDoc(skeletonEntity!)
 
-    expect(collapseDoc.examples).toHaveLength(5)
+    expect(collapseDoc.examples).toHaveLength(6)
     expect(collapseDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(collapseDoc.examples.every(example => example.previewKey?.startsWith('gr-collapse'))).toBe(true)
 

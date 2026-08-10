@@ -5,6 +5,7 @@ import {
   collapseBodyPaddings,
   collapseChevronBase,
   collapseChevronExpandedClass,
+  collapseEmptyBase,
   collapseHeaderBase,
   collapseHeaderDisabledClass,
   collapseHeaderEnabledClass,
@@ -24,6 +25,7 @@ export const grCollapseClassTokens = {
   titleTexts: Object.values(collapseTitleTexts).flatMap(splitClassTokens),
   bodyBase: splitClassTokens(collapseBodyBase),
   bodyPaddings: Object.values(collapseBodyPaddings).flatMap(splitClassTokens),
+  empty: splitClassTokens(collapseEmptyBase),
   chevron: [
     ...splitClassTokens(collapseChevronBase),
     ...splitClassTokens(collapseChevronExpandedClass),

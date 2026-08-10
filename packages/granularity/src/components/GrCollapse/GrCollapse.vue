@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed, provide } from 'vue'
+import { computed, provide, useSlots } from 'vue'
 
 import GrCard from '../GrCard'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { hasMeaningfulSlotContent } from '../shared/slotNodes'
+import { grCollapseEmptyClass } from './grCollapseStyles'
 
 import {
   GR_COLLAPSE_CONTEXT,
@@ -42,6 +45,14 @@ export interface GrCollapseProps {
   beforeChange?: GrCollapseBeforeChange
   /** Размер секций. Не задан — берётся из `GrConfigProvider`, иначе `md`. */
   size?: GrComponentSize
+  /**
+   * Пусто ли. Не задан — считается по содержимому: аккордеон без секций
+   * показывает заглушку вместо пустой рамки. `false` подавляет автоопределение —
+   * например, когда секции приезжают асинхронно и мигать текстом не надо.
+   */
+  empty?: boolean
+  /** Текст пустого состояния. Слот `#empty` сильнее. */
+  emptyText?: string
 }
 
 export interface GrCollapseEmits {
@@ -62,15 +73,40 @@ const props = withDefaults(defineProps<GrCollapseProps>(), {
   expandIconPosition: undefined,
   beforeChange: undefined,
   size: undefined,
+  empty: undefined,
+  emptyText: undefined,
 })
 
 const emit = defineEmits<GrCollapseEmits>()
+
+defineSlots<{
+  /** Секции аккордеона (`GrCollapseItem`). */
+  default?: () => any
+  /** Содержимое пустого состояния вместо текста по умолчанию. */
+  empty?: () => any
+}>()
+
+const slots = useSlots()
+const { t } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCollapse' })
 const divided = useGrComponentProp('GrCollapse', 'divided', () => props.divided, true)
 const borderless = useGrComponentProp('GrCollapse', 'borderless', () => props.borderless, false)
 const headingLevel = useGrComponentProp('GrCollapse', 'headingLevel', () => props.headingLevel, 3)
 const expandIconPosition = useGrComponentProp('GrCollapse', 'expandIconPosition', () => props.expandIconPosition, 'end')
+
+const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.collapse.empty', 'Nothing here yet'))
+
+/**
+ * Пустоту считает общий разборщик слота: `v-for` приходит фрагментом, `v-if`
+ * оставляет после себя комментарий, а шаблон — переносы строк, и всё это не
+ * содержимое.
+ */
+const isEmpty = computed(() => {
+  if (props.empty !== undefined) return props.empty
+
+  return !hasMeaningfulSlotContent(slots.default?.() ?? [])
+})
 
 const activeSet = computed(() => {
   const value = props.modelValue
@@ -161,15 +197,38 @@ provide(GR_COLLAPSE_CONTEXT, context)
 
 <template>
   <GrCard v-if="!borderless" data-gr-collapse>
-    <div :class="divided ? 'divide-y divide-[var(--gr-brd)]' : ''">
+    <div
+      v-if="isEmpty"
+      data-gr-collapse-empty
+      :class="grCollapseEmptyClass(resolvedSize)"
+    >
+      <slot name="empty">
+        {{ resolvedEmptyText }}
+      </slot>
+    </div>
+
+    <div v-else :class="divided ? 'divide-y divide-[var(--gr-brd)]' : ''">
       <slot />
     </div>
   </GrCard>
+
+  <!-- Разделители остаются на корне: без обёртки в карточку он и есть список
+       секций, и лишний уровень вложенности сдвинул бы вёрстку потребителя. -->
   <div
     v-else
     data-gr-collapse
     :class="divided ? 'divide-y divide-[var(--gr-brd)]' : ''"
   >
-    <slot />
+    <div
+      v-if="isEmpty"
+      data-gr-collapse-empty
+      :class="grCollapseEmptyClass(resolvedSize)"
+    >
+      <slot name="empty">
+        {{ resolvedEmptyText }}
+      </slot>
+    </div>
+
+    <slot v-else />
   </div>
 </template>

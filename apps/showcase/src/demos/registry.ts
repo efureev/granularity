@@ -64,6 +64,7 @@ export const demoPathByPreviewKey = {
   'gr-checkbox-state-matrix':               'components/gr-checkbox/GrCheckboxStatesDemo.vue',
   'gr-collapse-accordion-flow':             'components/gr-collapse/GrCollapseAccordionDemo.vue',
   'gr-collapse-borderless':                 'components/gr-collapse/GrCollapseBorderlessDemo.vue',
+  'gr-collapse-empty':                      'components/gr-collapse/GrCollapseEmptyDemo.vue',
   'gr-collapse-disabled-state':             'components/gr-collapse/GrCollapseDisabledStateDemo.vue',
   'gr-collapse-guard':                      'components/gr-collapse/GrCollapseGuardDemo.vue',
   'gr-collapse-multi-section':              'components/gr-collapse/GrCollapseMultiSectionDemo.vue',

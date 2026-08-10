@@ -259,6 +259,9 @@
   "link": {
     "opensInNewTab": "opens in a new tab"
   },
+  "collapse": {
+    "empty": "Nothing here yet"
+  },
   "list": {
     "empty": "Nothing here yet"
   },

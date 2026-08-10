@@ -394,3 +394,71 @@ describe('GrCollapse', () => {
     }
   })
 })
+
+describe('GrCollapse — пустое состояние', () => {
+  it('аккордеон без секций показывает текст из локали, а не пустую рамку', () => {
+    const wrapper = mount(GrCollapse)
+
+    expect(wrapper.get('[data-gr-collapse-empty]').text()).toBe('Nothing here yet')
+  })
+
+  it('`emptyText` сильнее локали, слот `#empty` сильнее обоих', () => {
+    const withProp = mount(GrCollapse, { props: { emptyText: 'Нет разделов' } })
+    expect(withProp.get('[data-gr-collapse-empty]').text()).toBe('Нет разделов')
+
+    const withSlot = mount(GrCollapse, {
+      props: { emptyText: 'Нет разделов' },
+      slots: { empty: '<span data-custom>Настройте фильтр</span>' },
+    })
+
+    expect(withSlot.get('[data-custom]').text()).toBe('Настройте фильтр')
+    expect(withSlot.get('[data-gr-collapse-empty]').text()).not.toContain('Нет разделов')
+  })
+
+  it('с секциями заглушки нет', () => {
+    const wrapper = mount(CollapseHarness)
+
+    expect(wrapper.find('[data-gr-collapse-empty]').exists()).toBe(false)
+    expect(wrapper.findAll('[data-gr-collapse-item]')).toHaveLength(2)
+  })
+
+  it('`:empty="false"` подавляет автоопределение — секции приедут позже', () => {
+    const wrapper = mount(GrCollapse, { props: { empty: false } })
+
+    expect(wrapper.find('[data-gr-collapse-empty]').exists()).toBe(false)
+  })
+
+  /**
+   * Ровно та ловушка, ради которой пустоту считает общий разборщик слота:
+   * `v-if` оставляет после себя комментарий, `v-for` приходит фрагментом, а
+   * шаблон — переносами строк. Наивная проверка «слот не пуст» считала бы всё
+   * это содержимым и заглушку не показала бы никогда.
+   */
+  it('комментарии от `v-if` и пробелы содержимым не считаются', () => {
+    const Harness = defineComponent({
+      components: { GrCollapse, GrCollapseItem },
+      props: { show: { type: Boolean, default: false } },
+      template: `
+        <GrCollapse>
+          <GrCollapseItem v-if="show" name="a" title="A">body</GrCollapseItem>
+          <GrCollapseItem v-for="name in []" :key="name" :name="name" title="X" />
+        </GrCollapse>
+      `,
+    })
+
+    const empty = mount(Harness)
+    expect(empty.find('[data-gr-collapse-empty]').exists()).toBe(true)
+
+    const filled = mount(Harness, { props: { show: true } })
+    expect(filled.find('[data-gr-collapse-empty]').exists()).toBe(false)
+  })
+
+  it('заглушка живёт и в `borderless`, не ломая разделители секций', () => {
+    const empty = mount(GrCollapse, { props: { borderless: true } })
+    expect(empty.findComponent(GrCard).exists()).toBe(false)
+    expect(empty.find('[data-gr-collapse-empty]').exists()).toBe(true)
+
+    const filled = mount(CollapseHarness, { props: { borderless: true } })
+    expect(filled.get('[data-gr-collapse]').classes()).toContain('divide-y')
+  })
+})

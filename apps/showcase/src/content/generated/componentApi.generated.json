@@ -1631,6 +1631,20 @@
             "type": "GrCollapseBeforeChange | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "empty",
+            "description": "Пусто ли. Не задан — считается по содержимому: аккордеон без секций показывает заглушку вместо пустой рамки. `false` подавляет автоопределение — например, когда секции приезжают асинхронно и мигать текстом не надо.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -1641,8 +1655,13 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Секции аккордеона (`GrCollapseItem`).",
+            "type": "any"
+          },
+          {
+            "name": "empty",
+            "description": "Содержимое пустого состояния вместо текста по умолчанию.",
+            "type": "any"
           }
         ]
       },
@@ -1746,6 +1765,13 @@
             "default": "undefined"
           },
           {
+            "name": "emptyText",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "recentIds",
             "description": "Недавние команды: пока запрос пуст, они поднимаются отдельной группой наверх в этом порядке и не дублируются ниже.",
             "type": "string[] | undefined",
@@ -1772,13 +1798,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "emptyText",
-            "description": "",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "modelValue",
@@ -8776,9 +8795,9 @@
             "default": "false"
           },
           {
-            "name": "maxHeight",
-            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
-            "type": "string | number | undefined",
+            "name": "empty",
+            "description": "Таблица пуста. По умолчанию определяется по содержимому слота.",
+            "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -8786,6 +8805,13 @@
             "name": "emptyText",
             "description": "Текст пустого состояния. Слот `#empty` сильнее.",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
+            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -8830,13 +8856,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "3"
-          },
-          {
-            "name": "empty",
-            "description": "Таблица пуста. По умолчанию определяется по содержимому слота.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "striped",

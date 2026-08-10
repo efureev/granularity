@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grCollapseExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'collapse-empty',
+    title: 'Empty accordion speaks for itself',
+    description: 'Аккордеон без секций показывает текст из локали вместо пустой рамки: пустота считается по содержимому слота, а перебить её можно пропом `emptyText` или слотом `empty`.',
+    status: 'ready',
+    previewKey: 'gr-collapse-empty',
+  },
+  {
     id: 'collapse-accordion-flow',
     title: 'Accordion with controlled active item',
     description: 'Базовый controlled-сценарий: в `accordion` режиме одновременно открыт только один раздел, а текущий state можно вывести рядом.',

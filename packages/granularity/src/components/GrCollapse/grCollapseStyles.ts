@@ -32,6 +32,13 @@ export const collapseBodyPaddings: Record<GrComponentSize, string> = {
 
 export const collapseBodyBase = 'text-[var(--gr-muted-fg)]'
 
+/**
+ * Заглушка пустого аккордеона. Кегль и отступы берутся из тех же карт, что у
+ * секций: пустое состояние — часть той же поверхности, и выпадать из её ритма
+ * ему незачем.
+ */
+export const collapseEmptyBase = 'text-center text-[var(--gr-muted-fg)]'
+
 export const collapseChevronBase = 'shrink-0 transition-transform duration-[var(--gr-duration-fast)] text-[var(--gr-muted-fg)]'
 export const collapseChevronExpandedClass = 'rotate-180'
 
@@ -57,6 +64,10 @@ export function grCollapseTitleClass(size: GrComponentSize): string {
 
 export function grCollapseBodyClass(size: GrComponentSize): string {
   return [collapseBodyBase, collapseBodyPaddings[size], collapseTitleTexts[size]].join(' ')
+}
+
+export function grCollapseEmptyClass(size: GrComponentSize): string {
+  return [collapseEmptyBase, collapseHeaderPaddings[size], collapseTitleTexts[size]].join(' ')
 }
 
 export function grCollapseChevronClass(expanded: boolean): string {
