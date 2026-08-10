@@ -488,9 +488,9 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-button-azure-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-azure) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `azure`. |
 | `--gr-button-azure-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-azure) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `azure` под курсором. |
 | `--gr-button-azure-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-azure) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `azure` в момент нажатия. |
-| `--gr-button-disabled-bg` | тема компонента | var(--gr-disabled-solid) | Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. |
-| `--gr-button-disabled-fg` | тема компонента | var(--gr-disabled-solid-fg) | Цвет текста недоступной кнопки. |
-| `--gr-button-disabled-brd` | тема компонента | var(--gr-disabled-brd) | Цвет рамки недоступной кнопки. |
+| `--gr-button-disabled-bg` | тема компонента | var(--gr-disabled-bg) | Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. Ссылка на общую роль — недоступное во всём пакете перекрашивается одним местом. |
+| `--gr-button-disabled-fg` | тема компонента | var(--gr-disabled-fg) | Цвет текста недоступной кнопки. Ссылка на общую роль недоступного состояния. |
+| `--gr-button-disabled-brd` | тема компонента | var(--gr-disabled-brd) | Цвет рамки недоступной кнопки. Ссылка на общую роль недоступного состояния. |
 
 ### GrButtonGroup
 

@@ -401,6 +401,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **A disabled `GrButton` now dims the way everything else in the package dims.** Its `--gr-button-disabled-*` trio
+  pointed at `--gr-muted`/`--gr-muted-fg`/`--gr-brd` — the roles of ordinary secondary text — while ten components
+  (`GrTabs`, `GrSegmented`, `GrSlider`, `GrSidebar`, `GrBottomNav`, `GrRating`, `GrSwitch`, `GrNumberInput`,
+  `GrCommandPalette`) use the dedicated `--gr-disabled-*` roles. A disabled button standing next to a disabled tab
+  read as the active one. The trio survives as a customization point, but it is now a plain alias, declared once in
+  `:root` rather than repeated per theme. **This is a visible change**: the label of a disabled button goes from a
+  contrast of 5.65 to 2.34 in the light theme (5.04 → 2.61 in dark). That was a deliberate trade — WCAG 1.4.3 exempts
+  disabled controls, and looking unavailable is what the state is for — and it retires the one test in the package
+  that required a disabled control to stay at AA. In its place is a gate asserting the button's tokens resolve to the
+  same colours as the shared roles, because that is the thing that can drift silently: the classes in the markup do
+  not change, only what `var()` expands to. Fixed along the way: the token registry described these three as
+  `var(--gr-disabled-solid)`, a role that never existed.
+
 - **The `info` tone is blue now, not a second indigo.** `--gr-info` (`#5850ec`) sat ΔE 4.3 away from `--gr-primary`
   (`#4f46e5`) — the just-noticeable threshold is about 2.3 — and the two tones' text roles were the same value down to
   the digit, so a link with `tone="info"` and one with `tone="primary"` rendered identically. Nothing caught it:

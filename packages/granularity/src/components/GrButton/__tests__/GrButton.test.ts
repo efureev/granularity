@@ -296,6 +296,36 @@ describe('GrButton — отключённое состояние', () => {
     expect(classes.some(cls => cls.includes('opacity-'))).toBe(false)
   })
 
+  /**
+   * Токены кнопки — ссылки на общие роли недоступного состояния, те же, что у
+   * вкладки, сегмента и бегунка. Разъехаться это может молча: классы в разметке
+   * не меняются, меняется только то, во что разворачивается `var()`.
+   *
+   * Раньше здесь стоял порог контраста 4.5 — единственное место в пакете, где
+   * недоступное состояние обязано было оставаться читаемым. Требование снято
+   * осознанно: WCAG 1.4.3 недоступные контролы исключает, а кнопка, гаснущая
+   * не так, как всё вокруг, читалась как активная.
+   */
+  it('гаснет теми же ролями, что и остальной пакет', () => {
+    const roles = [['bg', '--gr-disabled-bg'], ['fg', '--gr-disabled-fg'], ['brd', '--gr-disabled-brd']] as const
+
+    for (const theme of ['light', 'dark'] as const) {
+      // Тёмная тема переопределяет не всё: базой идёт `:root` из светлого файла.
+      const buttonVars = {
+        ...themeVarsByName[theme],
+        ...grButtonLightThemeVars,
+        ...(theme === 'dark' ? grButtonDarkThemeVars : {}),
+      }
+
+      for (const [part, role] of roles) {
+        const own = resolveColorExpression(`var(--gr-button-disabled-${part})`, buttonVars, derivedThemeVars)
+        const shared = resolveColorExpression(`var(${role})`, themeVarsByName[theme], derivedThemeVars)
+
+        expect(own, `${theme}: --gr-button-disabled-${part} разошёлся с ${role}`).toEqual(shared)
+      }
+    }
+  })
+
   // Вариантные классы не остаются под disabled: два `bg-*` одной специфичности
   // разрулил бы порядок в сгенерированном CSS, а не порядок в списке классов.
   it('вариантные цвета не остаются под disabled', () => {
@@ -337,19 +367,6 @@ describe('GrButton — отключённое состояние', () => {
     expect(wrapper.get('[data-gr-button]').classes()).not.toContain('bg-[var(--gr-button-disabled-bg)]')
   })
 
-  it('пара токенов disabled сохраняет контраст в обеих темах', () => {
-    for (const [themeName, themeVars] of Object.entries({
-      light: { ...lightThemeVars, ...grButtonLightThemeVars },
-      dark: { ...darkThemeVars, ...grButtonLightThemeVars, ...grButtonDarkThemeVars },
-    })) {
-      const contrast = getContrastRatio(
-        resolveColorExpression('var(--gr-button-disabled-fg)', themeVars, derivedThemeVars),
-        resolveColorExpression('var(--gr-button-disabled-bg)', themeVars, derivedThemeVars),
-      )
-
-      expect(contrast, `${themeName}: ${contrast.toFixed(2)}`).toBeGreaterThanOrEqual(4.5)
-    }
-  })
 })
 
 describe('GrButton — квадратный режим', () => {

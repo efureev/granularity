@@ -2049,22 +2049,22 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-disabled-bg",
     "kind": "theme",
-    "default": "var(--gr-disabled-solid)",
-    "description": "Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью."
+    "default": "var(--gr-disabled-bg)",
+    "description": "Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. Ссылка на общую роль — недоступное во всём пакете перекрашивается одним местом."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-disabled-fg",
     "kind": "theme",
-    "default": "var(--gr-disabled-solid-fg)",
-    "description": "Цвет текста недоступной кнопки."
+    "default": "var(--gr-disabled-fg)",
+    "description": "Цвет текста недоступной кнопки. Ссылка на общую роль недоступного состояния."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-disabled-brd",
     "kind": "theme",
     "default": "var(--gr-disabled-brd)",
-    "description": "Цвет рамки недоступной кнопки."
+    "description": "Цвет рамки недоступной кнопки. Ссылка на общую роль недоступного состояния."
   },
   {
     "owner": "GrButtonGroup",
