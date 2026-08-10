@@ -28,7 +28,20 @@ export const statusToneClass: Record<GrAvatarStatus, string> = {
  */
 export const rootStatusClass = 'overflow-visible'
 
-export const mediaClass = 'h-full w-full overflow-hidden'
+/**
+ * Обёртка растянута на весь аватар, поэтому корневой `justify-center`
+ * центрирует её саму, а не содержимое: центрирование обязано быть здесь.
+ */
+export const mediaClass = 'flex h-full w-full items-center justify-center overflow-hidden'
+
+/**
+ * Размер бывает произвольным числом пикселей, поэтому кегль считается, а не
+ * берётся картой по ступеням. Пол в 10px: у аватара 24px пропорциональные 8px
+ * не читаются.
+ */
+export function avatarFontSizePx(sizePx: number): number {
+    return Math.max(10, Math.round(sizePx / 3))
+}
 
 export const groupBaseClass = 'inline-flex items-center'
 

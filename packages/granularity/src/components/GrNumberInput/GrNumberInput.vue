@@ -200,12 +200,9 @@ const inputEl = ref<HTMLInputElement | null>(null)
 const isFocused = ref(false)
 
 /**
- * Черновик ввода: строка ровно в том виде, в каком её набирают.
- *
- * Существует, пока набор не завершён. Модель к этому моменту уже может быть
- * `null` («-», «1,» — не числа), и без черновика поле стирало бы под пальцами
- * то, что пользователь печатает. Коммит (`change`/`blur`) черновик снимает, и
- * показ снова считается от модели.
+ * Строка ровно в том виде, в каком её набирают. Модель к этому моменту может
+ * быть `null` («-», «1,» — не числа), и без черновика поле стирало бы под
+ * пальцами то, что печатают. Коммит (`change`/`blur`) черновик снимает.
  */
 const draft = ref<string | null>(null)
 
@@ -447,8 +444,6 @@ function onStepClick(dir: 1 | -1, event: MouseEvent): void {
   stepBy(dir)
 }
 
-// Клавиатура спинбаттона (WAI-ARIA spinbutton): стрелки шагают, PageUp/PageDown —
-// крупным шагом, Home/End — к границам `min`/`max` (если заданы).
 function onKeydown(e: KeyboardEvent): void {
   if (isDisabled.value) return
   // Readonly-поле ведёт себя как текст: стрелки и Home/End отдаются нативной

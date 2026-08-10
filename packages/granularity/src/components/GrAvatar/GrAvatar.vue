@@ -8,6 +8,7 @@ import type { GrSizeWithPx } from '../shared/sizes'
 
 import { GR_AVATAR_GROUP_KEY } from './avatarContext'
 import {
+  avatarFontSizePx,
   grAvatarClass,
   initialsFrom,
   mediaClass,
@@ -89,7 +90,8 @@ const sizePx = computed(() => (
 
 const style = computed(() => {
   const px = `${sizePx.value}px`
-  return { width: px, height: px }
+  // Кегль на корне, а не на span инициалов: так он достаётся и слотовому тексту.
+  return { width: px, height: px, fontSize: `${avatarFontSizePx(sizePx.value)}px` }
 })
 
 /**

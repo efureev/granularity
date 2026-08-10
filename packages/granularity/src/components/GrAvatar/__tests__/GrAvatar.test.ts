@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrAvatar from '../GrAvatar.vue'
 import GrAvatarGroup from '../GrAvatarGroup.vue'
-import { initialsFrom } from '../grAvatarStyles'
+import { avatarFontSizePx, initialsFrom } from '../grAvatarStyles'
 
 describe('GrAvatar', () => {
   it('по умолчанию рендерит слот и круглую форму', () => {
@@ -141,6 +141,42 @@ describe('GrAvatar — имя, статус и конфиг', () => {
     expect(initialsFrom('Прометей')).toBe('П')
     expect(initialsFrom('')).toBe('')
   })
+
+  it('avatarFontSizePx — чистая функция с полом', () => {
+    expect(avatarFontSizePx(40)).toBe(13)
+    expect(avatarFontSizePx(56)).toBe(19)
+    expect(avatarFontSizePx(96)).toBe(32)
+    expect(avatarFontSizePx(24)).toBe(10)
+    expect(avatarFontSizePx(12)).toBe(10)
+  })
+})
+
+describe('GrAvatar — раскладка содержимого', () => {
+  it('обёртка содержимого центрирует, а не кладёт текст в левый верхний угол', () => {
+    const wrapper = mount(GrAvatar, { props: { name: 'Ada Lovelace', size: 56 } })
+
+    const media = wrapper.get('[data-gr-avatar-initials]').element.parentElement!
+    const classes = media.className.split(/\s+/)
+
+    expect(classes).toContain('flex')
+    expect(classes).toContain('items-center')
+    expect(classes).toContain('justify-center')
+  })
+
+  it('кегль считается от диаметра, а не наследуется от страницы', () => {
+    const small = mount(GrAvatar, { props: { name: 'Ada Lovelace', size: 24 } })
+    const big = mount(GrAvatar, { props: { name: 'Ada Lovelace', size: 56 } })
+
+    expect(small.attributes('style')).toContain('font-size: 10px')
+    expect(big.attributes('style')).toContain('font-size: 19px')
+  })
+
+  it('кегль ставится на корень, поэтому достаётся и слотовому тексту', () => {
+    const wrapper = mount(GrAvatar, { props: { size: 72 }, slots: { default: 'AD' } })
+
+    expect(wrapper.attributes('style')).toContain('font-size: 24px')
+    expect(wrapper.text()).toBe('AD')
+  })
 })
 
 describe('GrAvatarGroup', () => {
@@ -189,5 +225,18 @@ describe('GrAvatarGroup', () => {
 
     expect(first.attributes('style')).toContain('width: 24px')
     expect(first.classes()).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
+  })
+
+  // Разные кегли в одном ряду читались бы как сбой: формула обязана быть общей.
+  it('«+N» и инициалы соседа одного размера набраны одним кеглем', () => {
+    const wrapper = mountGroup({ max: 2, size: 'lg' })
+
+    const avatar = wrapper.findAll('[data-gr-avatar]')[0]
+    const badge = wrapper.get('[data-gr-avatar-group-overflow]')
+
+    const fontOf = (style: string | undefined) => style?.match(/font-size:\s*([\d.]+px)/)?.[1]
+
+    expect(fontOf(avatar.attributes('style'))).toBe('19px')
+    expect(fontOf(badge.attributes('style'))).toBe(fontOf(avatar.attributes('style')))
   })
 })

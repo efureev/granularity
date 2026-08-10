@@ -13,6 +13,7 @@ import type { GrSizeWithPx } from '../shared/sizes'
 
 import { GR_AVATAR_GROUP_KEY } from './avatarContext'
 import {
+  avatarFontSizePx,
   grAvatarClass,
   groupBaseClass,
   groupItemClass,
@@ -86,7 +87,7 @@ const overflowSizePx = computed(() => (
 
 const overflowStyle = computed(() => {
   const px = `${overflowSizePx.value}px`
-  return { width: px, height: px, fontSize: `${Math.max(10, Math.round(overflowSizePx.value / 3))}px` }
+  return { width: px, height: px, fontSize: `${avatarFontSizePx(overflowSizePx.value)}px` }
 })
 
 const groupLabel = computed(() => props.ariaLabel ?? t('gr.avatar.group', 'People'))
