@@ -695,6 +695,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Images crop instead of stretching — `object-*` classes finally emit CSS.** `@unocss/preset-mini` ships no
+  `object-fit` rule at all (both families live in `presetWind*`), so `object-cover` on the `GrAvatar` image, on
+  `GrFileUpload` thumbnails and `object-contain` in `GrImageViewer` sat in the markup with nothing behind them: the
+  build succeeded, the tests stayed green, and a non-square photo was squashed to fill its box. The rules now arrive
+  through `@feugene/unocss-mini-extra-rules` 0.7.0, which is why the peer range on
+  `@feugene/unocss-preset-granular` moved to **`^0.8.1`** — on an older preset those classes are still dead.
+  Two gates were widened so this cannot come back quietly: `object-` joined the families scanned out of component
+  sources (until now only the safelist was checked, and these literals live in templates), and `object-cover` /
+  `object-contain` joined the list of utilities asserted to survive the consumer's preset pair.
+
 - **`GrFormFile` now honours `readonly` instead of merely announcing it.** The prop was declared, `aria-readonly`
   reached the button and the value reached the form — but exactly one of the four ways to change the set checked it.
   A read-only field still accepted a dropped file (`v-dropzone` was gated on `disabled` alone), still rendered a

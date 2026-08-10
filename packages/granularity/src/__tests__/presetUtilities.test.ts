@@ -34,6 +34,11 @@ const UTILITIES_BEYOND_MINI = [
   'space-y-1',
   // Оверлеи: GrModal, GrDrawer.
   'backdrop-blur-sm',
+  // Кадрирование картинок: GrAvatar, GrImageViewer, GrFileUpload, GrFormFile.
+  // Приехали в extra-rules 0.7.0; до неё классы лежали в разметке мёртвыми, и
+  // непропорциональный снимок растягивался вместо кадрирования.
+  'object-cover',
+  'object-contain',
 ] as const
 
 describe('утилиты сверх presetMini', () => {

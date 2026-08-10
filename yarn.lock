@@ -410,20 +410,20 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.6.0.tgz#beb5e5d89befec8f2b6e006ce4959255cbb00c04"
   integrity sha512-vvPqoiM6kzJtYRW/EYc1xDS/lnG3/PtbwNftBRkn8hoK0hvoHiiTGBACBSllwhcfaBY9OdbZX1Ew8SbKTMPmpQ==
 
-"@feugene/unocss-mini-extra-rules@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.5.0.tgz#bb71537540f953a636711f1ea3434d2ab517db96"
-  integrity sha512-KTVVANqt51zffXZ9KLEgt8zSaTNnYgWaAxHM+bTJebhduxSJpn8fFFImj7k3cjUAnYvdEqSXYQ2C2XjdBGi5wA==
+"@feugene/unocss-mini-extra-rules@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.7.0.tgz#426889df4a565991c0c4c115e3630233943e57f7"
+  integrity sha512-cMAYQ2gzh6p7qRI5wJU/23S+df/pAJQNpxNEHl7cH6qgzE8HKdB8b4a58GSezlxn6f4xhKPGRK2N5T0jlDiT3A==
   dependencies:
     "@unocss/preset-mini" "^66.7.5"
     "@unocss/rule-utils" "^66.7.5"
 
-"@feugene/unocss-preset-granular@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.8.0.tgz#f3e406a2646938b9227ffb99d1cbfdbe941b9004"
-  integrity sha512-0nNESTmImKTQyJ4SIiSh3AW9ith5CXg1EAoR9/syqa9UATSFm88ANWIOVBWw73N5KhC0IaI+VD2tBtzuYmLXlQ==
+"@feugene/unocss-preset-granular@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.8.1.tgz#95faaed8d88e3608c7ce4cf4667bc7a9b2814880"
+  integrity sha512-b9+XXteTRYpQ3fVqAMVdgCnAF2dIMaraXK365J2T4ANKZnjR+6asC26BIIFuBbMWSjS8cLMmgEyWj0Xdi/HEcA==
   dependencies:
-    "@feugene/unocss-mini-extra-rules" "^0.5.0"
+    "@feugene/unocss-mini-extra-rules" "^0.7.0"
 
 "@floating-ui/core@^1.8.0":
   version "1.8.0"

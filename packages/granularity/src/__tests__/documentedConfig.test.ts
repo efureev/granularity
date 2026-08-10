@@ -30,7 +30,7 @@ const componentsDir = resolve(process.cwd(), 'src/components')
  * Литералы этих семейств живут в шаблонах, а не в safelist, поэтому их
  * приходится вычитывать из исходников — иначе гейт их не увидит.
  */
-const FRAGILE_PREFIXES = ['animate-', 'space-x-', 'space-y-', 'divide-', 'backdrop-']
+const FRAGILE_PREFIXES = ['animate-', 'space-x-', 'space-y-', 'divide-', 'backdrop-', 'object-']
 
 /**
  * Иконки — осознанное исключение: `i-*` требуют `presetIcons`, а он в
