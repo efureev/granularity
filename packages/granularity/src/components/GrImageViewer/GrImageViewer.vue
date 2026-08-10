@@ -2,14 +2,9 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useAnnouncer } from '../../composables/useAnnouncer'
-import { usePortalTarget } from '../../composables/usePortalTarget'
-import { useFocusTrap } from '../../composables/useFocusTrap'
-import { useInertOthers } from '../../composables/internal/useInertOthers'
-import { useOverlayLayer } from '../../composables/useOverlayLayer'
-import { useOverlayPresence } from '../../composables/internal/useOverlayPresence'
+import { useModalOverlay } from '../../composables/internal/useModalOverlay'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useScrollLock } from '../../composables/internal/useScrollLock'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
 import IconDownload from '~icons/lucide/download'
@@ -54,7 +49,6 @@ import { useViewerKeyboard } from './composables/useViewerKeyboard'
 export type GrImageViewerItem = { src: string, alt?: string }
 export type GrImageViewerSource = string | GrImageViewerItem
 
-import { useGrThemeAttrs } from '../GrConfigProvider/context'
 
 export interface GrImageViewerProps {
   modelValue: boolean
@@ -200,18 +194,6 @@ type GrImageViewerSlotProps = {
 }
 
 const open = computed(() => props.modelValue)
-
-// SSR-guard для teleport + общий reference-counted scroll-lock (как в GrModal/GrDrawer).
-// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
-// рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
-
-// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
-// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
-// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
-// сама.
-const themeAttrs = useGrThemeAttrs()
-const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
 
 const items = computed<GrImageViewerItem[]>(() =>
   props.urlList.map(item => (typeof item === 'string' ? { src: item } : item)),
@@ -445,24 +427,6 @@ const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
   actions: toolbarActions,
 }))
 
-// Клик по подложке считается только тем, что на ней и начался: иначе
-// перетаскивание изображения, отпущенное за его границей, закрывало бы
-// просмотрщик.
-let pointerDownOnBackdrop = false
-
-function onBackdropPointerDown(event: MouseEvent): void {
-  pointerDownOnBackdrop = event.target === event.currentTarget
-}
-
-function onBackdropClick(event: MouseEvent): void {
-  const startedHere = pointerDownOnBackdrop
-  pointerDownOnBackdrop = false
-
-  if (!startedHere || event.target !== event.currentTarget) return
-  if (!props.hideOnClickModal) return
-  closeViewer()
-}
-
 /**
  * Скачивание текущего кадра.
  *
@@ -493,47 +457,30 @@ const { onKeydown } = useViewerKeyboard({
   actions: { close: closeViewer, prev, next, zoomIn, zoomOut, reset: resetTransform },
 })
 
-// Esc — через общий стек слоёв: просмотрщик поверх модалки обязан закрывать себя.
-// Просмотрщик — модальный класс: бэкдроп, scroll-lock, ловушка фокуса. Значит
-// он и участвует в вычислении `inert` наравне с модалками и drawer'ом.
-const isTopmost = ref(true)
-const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? true : undefined))
-
-const rootEl = ref<HTMLElement | null>(null)
+// Просмотрщик — модальный класс: бэкдроп, scroll-lock, ловушка фокуса, место в
+// общем стеке. Открытый поверх модалки, он закрывает по Esc себя, а не её.
 const panelEl = ref<HTMLElement | null>(null)
 
 const {
-  mounted: isMounted,
-  visible: isVisible,
+  rootEl,
+  isMounted,
+  isVisible,
+  inertAttr,
+  portalTarget,
+  teleportEnabled,
+  themeAttrs,
   onPanelAfterLeave: releasePresence,
-} = useOverlayPresence(open)
-
-const layer = useOverlayLayer(
-  open,
-  closeViewer,
-  {
-    modal: true,
-    closeOnEscape: () => props.closeOnPressEscape,
-    onTopmostChange: (value) => { isTopmost.value = value },
-    root: rootEl,
-  },
-)
-
-useFocusTrap(panelEl, {
-  active: () => props.modelValue && isTopmost.value,
-  fallbackFocus: () => panelEl.value,
-  containers: layer.rootsAbove,
-  // Возврат фокуса — за стеком слоёв, у него правило строже.
-  restoreFocus: false,
+  backdrop,
+} = useModalOverlay(open, closeViewer, {
+  panel: panelEl,
+  closeOnEscape: () => props.closeOnPressEscape,
+  closeOnBackdrop: () => props.hideOnClickModal,
 })
-
-useInertOthers(rootEl, () => props.modelValue && isTopmost.value)
 
 watch(
   () => props.modelValue,
   async (isOpen) => {
     if (!isOpen) {
-      unlockBodyScroll()
       stopObservingImage()
       endWheelZoom()
       resetGestures()
@@ -541,7 +488,6 @@ watch(
       return
     }
 
-    lockBodyScroll()
     syncIndexFromInitial()
     await nextTick()
     startObservingImage()
@@ -618,7 +564,6 @@ function preloadNeighbours(index: number): void {
 watch([currentIndex, open], ([index]) => preloadNeighbours(index), { immediate: true })
 
 onBeforeUnmount(() => {
-  unlockBodyScroll()
   stopObservingImage()
   endWheelZoom()
   cancelPreload()
@@ -654,8 +599,7 @@ onBeforeUnmount(() => {
             data-gr-image-viewer-overlay
             :class="scrimClass"
             aria-hidden="true"
-            @mousedown="onBackdropPointerDown"
-            @click="onBackdropClick"
+            v-on="backdrop"
           />
         </Transition>
 

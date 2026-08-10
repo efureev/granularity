@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
-
-import { usePortalTarget } from '../../composables/usePortalTarget'
+import { computed, ref, useId, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
-import { useGrComponentProp, useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-// Единый стек слоёв: Esc верхнему, `inert` нижним модалкам. Модальный drawer
-// регистрируется как `modal`, немодальный — как обычный dismissible-слой.
-import { useFocusTrap } from '../../composables/useFocusTrap'
-import { useInertOthers } from '../../composables/internal/useInertOthers'
-import { useOverlayLayer } from '../../composables/useOverlayLayer'
-import { useOverlayPresence } from '../../composables/internal/useOverlayPresence'
-import { useScrollLock } from '../../composables/internal/useScrollLock'
+// Модальный слой целиком: стек (Esc верхнему, `inert` нижним модалкам), ловушка
+// фокуса, скролл-лок, портал. Немодальная панель регистрируется в стеке как
+// обычный dismissible-слой и страницу под собой не трогает.
+import { useModalOverlay } from '../../composables/internal/useModalOverlay'
 import {
   DEFAULT_GR_DRAWER_BODY_CONFIG,
   DEFAULT_GR_DRAWER_FOOTER_CONFIG,
@@ -155,17 +150,6 @@ const showSrOnlyTitle = computed(() => hasTitle.value && !showVisibleTitle.value
 const labelledBy = computed(() => (hasTitle.value ? titleId : undefined))
 const ariaLabel = computed(() => (labelledBy.value ? undefined : t('gr.drawer.title', 'Drawer')))
 
-// Телепорт включается только ПОСЛЕ монтирования: на сервере `document.body`
-// недоступен, а первый клиентский рендер обязан совпасть с серверным — иначе
-// ломается гидрация (см. композабл).
-const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
-
-// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
-// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
-// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
-// сама.
-const themeAttrs = useGrThemeAttrs()
-
 const panelEl = ref<HTMLElement | null>(null)
 
 /** Произвольный размер — только по оси панели: у боковой ширина, у нижней высота. */
@@ -228,85 +212,33 @@ function closeSoftly(): void {
   close()
 }
 
-// Клик по подложке считается только тем, что на ней и начался: иначе выделение
-// текста в панели, отпущенное за её границей, закрывало бы drawer.
-let pointerDownOnOverlay = false
-
-function onOverlayPointerDown(event: MouseEvent): void {
-  pointerDownOnOverlay = event.target === event.currentTarget
-}
-
-function onOverlayClick(event: MouseEvent): void {
-  const startedHere = pointerDownOnOverlay
-  pointerDownOnOverlay = false
-
-  if (!startedHere || event.target !== event.currentTarget) return
-  if (!props.closeOnBackdrop) return
-  closeSoftly()
-}
-
-// ————— Слой, фокус, скролл.
-const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
-
-const isTopmost = ref(true)
-// Нижние модальные слои уходят в `inert`, освобождая фокус верхнему.
-const inertAttr = computed(() => (props.modelValue && props.modal && !isTopmost.value ? true : undefined))
-
-const rootEl = ref<HTMLElement | null>(null)
-
 const rootClasses = computed(() => [rootClass, props.modal ? '' : rootPassThroughClass].filter(Boolean))
 
+// Немодальная панель остаётся в очереди Esc, но модалки под собой в `inert` не
+// отправляет и скролл не блокирует: она существует ровно ради работы со
+// страницей под ней, и Tab обязан уводить фокус туда.
 const {
-  mounted: isMounted,
-  visible: isVisible,
+  rootEl,
+  isMounted,
+  isVisible,
+  inertAttr,
+  portalTarget,
+  teleportEnabled,
+  themeAttrs,
   onPanelAfterLeave: releasePresence,
-} = useOverlayPresence(computed(() => props.modelValue))
+  backdrop,
+} = useModalOverlay(computed(() => props.modelValue), closeSoftly, {
+  panel: panelEl,
+  modal: () => props.modal,
+  closeOnEscape: () => props.closeOnEsc && !props.persistent,
+  closeOnBackdrop: () => props.closeOnBackdrop,
+  initialFocus: () => props.initialFocus ?? panelEl.value,
+})
 
 function onPanelAfterLeave(): void {
   releasePresence()
   emit('closed')
 }
-
-const layer = useOverlayLayer(
-  computed(() => props.modelValue),
-  closeSoftly,
-  {
-    // Немодальная панель остаётся в очереди Esc, но модалки под собой в `inert`
-    // не отправляет: иначе окно ушло бы туда вместе со своей же панелью.
-    modal: () => props.modal,
-    closeOnEscape: () => props.closeOnEsc && !props.persistent,
-    onTopmostChange: (value) => { isTopmost.value = value },
-    root: rootEl,
-  },
-)
-
-// Ловушка молчит, пока панель не верхний слой; панели, открытые изнутри
-// (селект, дропдаун), телепортированы в `body` — их корни ловушка считает
-// своими. В немодальном режиме ловушки нет вовсе: Tab обязан уводить фокус на
-// страницу, ради работы с которой панель и открыта.
-useFocusTrap(panelEl, {
-  active: () => props.modelValue && props.modal && isTopmost.value,
-  initialFocus: () => props.initialFocus ?? panelEl.value,
-  fallbackFocus: () => panelEl.value,
-  containers: layer.rootsAbove,
-  // Возврат фокуса — за стеком слоёв, у него правило строже.
-  restoreFocus: false,
-})
-
-useInertOthers(rootEl, () => props.modelValue && props.modal && isTopmost.value)
-
-watch(
-  () => props.modelValue && props.modal,
-  (locked) => {
-    if (locked) lockBodyScroll()
-    else unlockBodyScroll()
-  },
-  { immediate: true },
-)
-
-onBeforeUnmount(() => {
-  unlockBodyScroll()
-})
 
 defineExpose({
   /** Закрыть панель (эквивалент `v-model = false`), минуя `persistent`. */
@@ -342,8 +274,7 @@ defineExpose({
           data-gr-drawer-overlay
           :class="overlayClass"
           aria-hidden="true"
-          @mousedown="onOverlayPointerDown"
-          @click="onOverlayClick"
+          v-on="backdrop"
         />
       </Transition>
 

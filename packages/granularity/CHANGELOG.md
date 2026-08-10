@@ -307,6 +307,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **One modal shell instead of three hand-wired copies.** `GrModal`, `GrDrawer` and `GrImageViewer` each assembled
+  modality by hand out of six primitives — overlay stack, focus trap, `inert`, scroll lock, portal and DOM presence —
+  and the assembly was repeated verbatim, comments about the pitfalls included. The danger was never the line count:
+  the wiring carries invariants that fail silently when one is missed. `restoreFocus: false` on the trap (focus
+  restoration belongs to the layer stack, whose rule is stricter), `containers: rootsAbove` (a select panel opened
+  *inside* a window is teleported to `body` and the trap would otherwise steal its focus), trap and `inert` active
+  only while the layer is topmost. All of it now lives in `useModalOverlay`, so a modal component is assembled in one
+  call and cannot be assembled partially. Behaviour is unchanged — the three components' suites pass untouched — and
+  markup deliberately stayed with the components: their roots differ in substance (scroll wrappers, pass-through
+  clicks, viewer chrome), and a shared component may not own a single class literal under the preset's safelist
+  contract.
 - **One option matcher instead of three copies.** The same case-insensitive substring predicate was written three
   times — `GrSelect`, `GrAutocomplete` and `GrCommandPalette` — and each copy normalized the query differently: one
   lowercased it at the call site, another inside the matcher, the third trimmed and lowercased its own way. That kind

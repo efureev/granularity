@@ -19,27 +19,14 @@
  * пропа `ariaLabel`, иначе — из i18n, чтобы безымянного окна не получилось ни
  * при каком употреблении (axe: `aria-dialog-name`).
  *
- * Механика слоя собрана из примитивов пакета:
- * - `useOverlayLayer` — место в общем стеке: Esc верхнему слою, `inert` нижним
- *   окнам, возврат фокуса на триггер. Стек видит слои из разных деревьев
- *   рендера (диалоги `useDialogService` монтируются отдельным `render()`);
- * - `useFocusTrap` — Tab по кругу внутри окна. Панель селекта, открытого
- *   изнутри, телепортирована в `body`, поэтому ловушке отдаются корни слоёв
- *   выше (`rootsAbove`) — иначе она отбирала бы у такой панели фокус;
- * - `useInertOthers` — остальная страница уходит из таб-порядка и из дерева
- *   доступности;
- * - `useOverlayPresence` — поддерево живёт до конца leave-анимации.
+ * Механика слоя — `useModalOverlay`: стек (Esc верхнему, `inert` нижним окнам,
+ * возврат фокуса), ловушка фокуса, блокировка скролла, портал и присутствие в
+ * DOM до конца leave-анимации. Инварианты этой сборки описаны там же.
  */
-import { useGrComponentProp, useGrThemeAttrs } from '../GrConfigProvider/context'
-import { computed, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue'
+import { useGrComponentProp } from '../GrConfigProvider/context'
+import { computed, ref, useId, useSlots, watch } from 'vue'
 
-import { usePortalTarget } from '../../composables/usePortalTarget'
-
-import { useFocusTrap } from '../../composables/useFocusTrap'
-import { useInertOthers } from '../../composables/internal/useInertOthers'
-import { useOverlayLayer } from '../../composables/useOverlayLayer'
-import { useOverlayPresence } from '../../composables/internal/useOverlayPresence'
-import { useScrollLock } from '../../composables/internal/useScrollLock'
+import { useModalOverlay } from '../../composables/internal/useModalOverlay'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { provideGrModalContext } from './context'
 
@@ -129,29 +116,9 @@ const layoutClass = computed(() => layoutByScroll[props.scrollBehavior])
 // клавиатуры (axe: `scrollable-region-focusable`).
 const isBodyScrollable = computed(() => props.scrollBehavior === 'inside')
 
-const rootEl = ref<HTMLElement | null>(null)
 // Панель фокусируема программно (`tabindex="-1"`) — это и приёмник фокуса по
 // умолчанию, и запасной, когда фокусировать внутри нечего.
 const panelRef = ref<HTMLElement | null>(null)
-
-// Является ли это окно верхним (последним открытым) в общем стеке модалок.
-// Когда поверх открыт другой `GrModal`/диалог сервиса, окно перестаёт быть
-// верхним и помечается `inert`, чтобы не «воровать» фокус у верхнего окна.
-const isTopmost = ref(true)
-
-const inertAttr = computed(() => (props.modelValue && !isTopmost.value ? true : undefined))
-
-// SSR-guard: на сервере `document.body` недоступен — отключаем teleport,
-// а в клиенте включаем после маунта.
-// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
-// рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
-
-// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
-// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
-// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
-// сама.
-const themeAttrs = useGrThemeAttrs()
 
 const { t } = useGranularityTranslations()
 
@@ -271,88 +238,41 @@ function toggle(): void {
   emit('update:modelValue', !props.modelValue)
 }
 
-// ————— Клик по подложке.
-// Считается только клик, НАЧАВШИЙСЯ на подложке: иначе выделение текста в
-// панели, отпущенное за её границей, закрывало бы окно вместе с выделением.
-let pointerDownOnOverlay = false
-
-function onOverlayPointerDown(event: MouseEvent): void {
-  pointerDownOnOverlay = event.target === event.currentTarget
-}
-
-function onOverlayClick(event: MouseEvent): void {
-  const startedHere = pointerDownOnOverlay
-  pointerDownOnOverlay = false
-
-  if (!startedHere || event.target !== event.currentTarget) return
-  if (!props.closeOnBackdrop) return
-  close()
-}
-
-// ————— Присутствие в DOM отдельно от видимости: поддерево живёт до конца
-// leave-анимации панели.
+// ————— Модальный слой целиком: стек, ловушка фокуса, `inert`, скролл-лок,
+// портал, присутствие в DOM и guard подложки.
 const {
-  mounted: isMounted,
-  visible: isVisible,
+  rootEl,
+  isMounted,
+  isVisible,
+  inertAttr,
+  portalTarget,
+  teleportEnabled,
+  themeAttrs,
   onPanelAfterLeave: releasePresence,
-} = useOverlayPresence(computed(() => props.modelValue))
+  backdrop,
+} = useModalOverlay(computed(() => props.modelValue), close, {
+  panel: panelRef,
+  closeOnEscape: () => props.closeOnEsc,
+  closeOnBackdrop: () => props.closeOnBackdrop,
+  // Окно фокусирует саму панель, когда внутри фокусировать нечего и когда
+  // потребитель не указал цель явно.
+  initialFocus: () => props.initialFocus ?? panelRef.value,
+})
 
 function onPanelAfterLeave(): void {
   releasePresence()
   emit('closed')
 }
 
-// ————— Слой: Esc верхнему, `inert` нижним окнам, возврат фокуса на триггер.
-const layer = useOverlayLayer(
-  computed(() => props.modelValue),
-  close,
-  {
-    modal: true,
-    closeOnEscape: () => props.closeOnEsc,
-    onTopmostChange: (value) => { isTopmost.value = value },
-    root: rootEl,
-  },
-)
-
-// Ловушка молчит, пока окно не верхнее: фокусом распоряжается то, что открыто
-// поверх. Корни слоёв выше считаются своими — панель селекта, открытого внутри
-// окна, лежит в `body` отдельным поддеревом.
-useFocusTrap(panelRef, {
-  active: () => props.modelValue && isTopmost.value,
-  initialFocus: () => props.initialFocus ?? panelRef.value,
-  fallbackFocus: () => panelRef.value,
-  containers: layer.rootsAbove,
-  // Возврат фокуса — за стеком слоёв: у него правило строже (только если на
-  // момент закрытия фокус ещё внутри слоя).
-  restoreFocus: false,
-})
-
-useInertOthers(rootEl, () => props.modelValue && isTopmost.value)
-
-// ————— Scroll lock на `<body>` на время открытия.
-// Общий reference-counted lock корректно работает при нескольких открытых
-// оверлеях (LIFO-независимо) и компенсирует ширину скроллбара, чтобы контент не
-// дёргался.
-const { lock: lockBodyScroll, unlock: unlockBodyScroll } = useScrollLock()
-
 watch(
   () => props.modelValue,
   (value) => {
-    if (value) {
-      warnMissingAccessibleName()
-      warnDuplicateTitle()
-      lockBodyScroll()
-    }
-    else {
-      unlockBodyScroll()
-    }
+    if (!value) return
+    warnMissingAccessibleName()
+    warnDuplicateTitle()
   },
   { immediate: true },
 )
-
-onBeforeUnmount(() => {
-  unlockBodyScroll()
-})
 
 defineExpose({ open, close, toggle })
 </script>
@@ -388,8 +308,7 @@ defineExpose({ open, close, toggle })
               data-gr-modal-overlay
               :class="overlayClass"
               aria-hidden="true"
-              @mousedown="onOverlayPointerDown"
-              @click="onOverlayClick"
+              v-on="backdrop"
             />
           </Transition>
 

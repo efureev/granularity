@@ -17,6 +17,9 @@ const PORT = Number(process.env.E2E_PORT ?? 4319)
 export default defineConfig({
   testDir: './e2e',
   outputDir: './test-results',
+  // Прогрев dev-сервера: пребандл зависимостей vite шлёт полную перезагрузку
+  // страницы, и до этого шага она попадала на первые тесты — см. `global-setup.ts`.
+  globalSetup: './e2e/global-setup.ts',
   // Визуальные снапшоты храним рядом с тестами (детеминированно, попадают в git).
   snapshotDir: './e2e/__screenshots__',
   fullyParallel: true,
