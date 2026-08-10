@@ -20,5 +20,6 @@ export const grRatingExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Custom symbol, tone and size',
     description: 'Символ меняется пропом `icon` (любая UnoCSS-иконка) или слотом `#symbol`, цвет — тоном либо переменной `--gr-rating-color`, размер — `size` или `--gr-rating-symbol-size`.',
     status: 'ready',
-    previewKey: 'gr-rating-custom',  },
+    previewKey: 'gr-rating-custom',
+  },
 ]

@@ -194,6 +194,7 @@ export const demoPathByPreviewKey = {
   'gr-pagination-table-composition':        'components/gr-pagination/GrPaginationTableCompositionDemo.vue',
   'gr-popover-confirm':                     'components/gr-popover/GrPopoverConfirmDemo.vue',
   'gr-popover-form':                        'components/gr-popover/GrPopoverFormDemo.vue',
+  'gr-popover-modal':                       'components/gr-popover/GrPopoverModalDemo.vue',
   'gr-popover-placement':                   'components/gr-popover/GrPopoverPlacementDemo.vue',
   'gr-progress-bar-basic-flow':             'components/gr-progress-bar/GrProgressBarBasicDemo.vue',
   'gr-progress-bar-clamped-values':         'components/gr-progress-bar/GrProgressBarClampDemo.vue',

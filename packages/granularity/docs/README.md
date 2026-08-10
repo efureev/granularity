@@ -39,7 +39,8 @@
 - [`virtual-list.md`](./virtual-list.md) — `useVirtualList`: виртуализация длинного списка, оценка против замера, фокус вне окна.
 - [`sizes.md`](./sizes.md) — шкала размеров: кто на ней, порядок разрешения `size`, отклонения.
 - [`motion.md`](./motion.md) — контракт движения и `prefers-reduced-motion`: что гасится, почему не `motion-safe:`.
-- [`z-index.md`](./z-index.md) — шкала слоёв и стек оверлеев (Esc, фокус, `inert`).
+- [`overlays.md`](./overlays.md) — контракт оверлеев: портал, стек слоёв, Esc, `inert`, фокус, модальный режим.
+- [`z-index.md`](./z-index.md) — шкала слоёв: кто на каком и как завести новый.
 - [`ssr.md`](./ssr.md) — какие компоненты безопасны при серверном рендере и где нужны оговорки.
 - [`unocss.md`](./unocss.md) — интеграция с `UnoCSS` через `presetGranularNode` из `@feugene/unocss-preset-granular/node`
   и granular-провайдер `@feugene/granularity/granular-provider/node`.

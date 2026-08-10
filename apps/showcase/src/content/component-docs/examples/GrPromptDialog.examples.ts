@@ -6,19 +6,22 @@ export const grPromptDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Rename flow with required value',
     description: 'Базовый сценарий для `GrPromptDialog`: controlled value, required validation и сохранение подтверждённого текста.',
     status: 'ready',
-    previewKey: 'gr-prompt-dialog-rename-flow',  },
+    previewKey: 'gr-prompt-dialog-rename-flow',
+  },
   {
     id: 'prompt-dialog-optional-value',
     title: 'Optional input mode',
     description: 'Показываем `required=false`, placeholder и compact footer для необязательных handoff notes.',
     status: 'ready',
-    previewKey: 'gr-prompt-dialog-optional-value',  },
+    previewKey: 'gr-prompt-dialog-optional-value',
+  },
   {
     id: 'prompt-dialog-reset-flow',
     title: 'External source-of-truth reset',
     description: 'Изолируем кейс, когда значение приходит из внешнего store и должно сбрасываться на момент повторного открытия.',
     status: 'ready',
-    previewKey: 'gr-prompt-dialog-reset-flow',  },
+    previewKey: 'gr-prompt-dialog-reset-flow',
+  },
   {
     id: 'prompt-dialog-imperative-service-link',
     title: 'Imperative service (useDialogService)',
@@ -31,5 +34,6 @@ export const grPromptDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Multiline input with shared validation rules',
     description: '`multiline` даёт `GrTextarea` вместо однострочного поля, а `rules` — те же правила, что у `GrForm`: движок валидации в пакете один, а не отдельный у каждого компонента.',
     status: 'ready',
-    previewKey: 'gr-prompt-dialog-multiline-rules',  },
+    previewKey: 'gr-prompt-dialog-multiline-rules',
+  },
 ]

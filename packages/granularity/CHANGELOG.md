@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrPopover` gains a modal mode.** A popover with a form inside had no way to isolate the page under it: the only
+  option was to swap the anchored panel for `GrModal`, changing the shape of the UI just to get isolation. `modal`
+  turns on the full modal contract — background goes `inert`, Tab cycles inside the panel, page scroll is locked, and
+  the layer registers as modal so windows below it step down. The default is unchanged and deliberately non-modal: a
+  focus trap on a layer that has not blocked the page locks the user inside a panel they are entitled to Tab out of.
+  One nuance worth knowing: in modal mode focus moves into the panel regardless of `autoFocus`, because the background
+  is unreachable and a layer with focus left outside would be a keyboard trap. Built on the same `useModalOverlay`
+  assembly as the window, the drawer and the viewer — no second implementation of modality exists in the package.
+- **`docs/overlays.md`.** The overlay contract — portal, layer stack, Esc ordering, `inert`, focus restoration, the
+  focus trap, modal versus non-modal, and how to build your own overlay — used to live inside the document about the
+  z-index scale, where nobody looking for Esc semantics would think to open it. It now has its own page;
+  `docs/z-index.md` keeps the scale.
 - **Per-component tokens are a declared contract.** Around 170 variables (`--gr-tree-*`, `--gr-button-*`,
   `--gr-segmented-*` and the rest) were read through `var(--gr-x, fallback)` and were, in practice, public theming
   API — yet they were declared nowhere: not in `tokens/*.json`, not in `docs/tokens.md`. Renaming one broke no test,

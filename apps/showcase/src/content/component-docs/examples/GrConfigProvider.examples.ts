@@ -13,7 +13,8 @@ export const grConfigProviderExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Nested providers merge',
     description: 'Провайдеры можно вкладывать: дочерний мержится поверх родительского. Здесь внешний задаёт `size="lg"`, а внутренний переопределяет его на `sm` только для своего поддерева — остальные значения (`componentDefaults`, i18n) наследуются.',
     status: 'ready',
-    previewKey: 'gr-config-provider-nested',  },
+    previewKey: 'gr-config-provider-nested',
+  },
   {
     id: 'config-provider-defaults',
     title: 'Default props per component',
@@ -40,5 +41,6 @@ export const grConfigProviderExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Theme island (including teleported panels)',
     description: 'Проп `theme` кладёт `data-theme` на обёртку провайдера — тёмный остров внутри светлой страницы работает без дополнительных стилей, потому что темы объявлены атрибутным селектором. Панели селекта и дропдауна телепортируются в `body`, вне обёртки, и всё равно остаются тёмными: в дереве компонентов они внутри, поэтому тему берут из контекста и ставят себе сами.',
     status: 'ready',
-    previewKey: 'gr-config-provider-theme-island',  },
+    previewKey: 'gr-config-provider-theme-island',
+  },
 ]

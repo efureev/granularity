@@ -6,13 +6,15 @@ export const grDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic dialog shell',
     description: 'Показываем базовый слой над `GrModal`: готовый header/footer shell для review, approval и confirm-like сценариев.',
     status: 'ready',
-    previewKey: 'gr-dialog-basic-flow',  },
+    previewKey: 'gr-dialog-basic-flow',
+  },
   {
     id: 'dialog-section-config',
     title: 'Section config and internal state',
     description: 'Демонстрируем `headerConfig` / `footerConfig` и локальное состояние формы внутри dialog-shell.',
     status: 'ready',
-    previewKey: 'gr-dialog-section-config',  },
+    previewKey: 'gr-dialog-section-config',
+  },
   {
     id: 'dialog-guarded-backdrop',
     title: 'Guarded backdrop for critical flows',
@@ -25,5 +27,6 @@ export const grDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Long form with a pinned header and footer',
     description: '`scrollBehavior: "inside"` оставляет шапку и подвал на месте и скроллит только тело — форма на двадцать полей не уносит кнопки за экран. Переключатель показывает разницу с дефолтным `outside`.',
     status: 'ready',
-    previewKey: 'gr-dialog-scrollable-body',  },
+    previewKey: 'gr-dialog-scrollable-body',
+  },
 ]

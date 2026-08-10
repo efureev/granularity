@@ -27,5 +27,6 @@ export const grFormExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Editing form: snapshot, dirty state and async rule',
     description: 'Данные приходят после монтирования, поэтому форма пересниает снимок через `setSnapshot()` — иначе «Сбросить» вернул бы пустоту, какой модель была до ответа сервера. `isDirty` блокирует кнопки, `disabled` выключает всю форму на время отправки, а асинхронное правило показывает состояние проверки вместо молчания. Поле «Имя» обязательно пропом `required`, без записи в `rules`, — и submit это проверяет.',
     status: 'ready',
-    previewKey: 'gr-form-editing',  },
+    previewKey: 'gr-form-editing',
+  },
 ]

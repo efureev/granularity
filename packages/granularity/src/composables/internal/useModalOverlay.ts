@@ -52,6 +52,17 @@ export interface UseModalOverlayOptions {
   /** Панель слоя: контейнер ловушки фокуса и её запасной приёмник. */
   panel: Ref<HTMLElement | null>
   /**
+   * Свой корень слоя. У якорного оверлея (`GrPopover`) корень и панель — один
+   * элемент: в портал уезжает сама панель, отдельной обёртки нет. Не задан —
+   * композабл заводит корень сам, как у центрированных окон.
+   */
+  root?: Ref<HTMLElement | null>
+  /**
+   * Точечное переопределение точки монтирования (проп `teleportTo`). По
+   * умолчанию — общий портал оверлеев.
+   */
+  teleportTo?: () => string | HTMLElement | undefined
+  /**
    * Кому отдать фокус при открытии. Не задан — первому фокусируемому внутри
    * панели (правило `useFocusTrap`): просмотрщику нужна именно кнопка тулбара,
    * а окну — сама панель, и оно передаёт её явно.
@@ -99,14 +110,14 @@ export function useModalOverlay(
   const isModal = (): boolean =>
     typeof options.modal === 'function' ? options.modal() : options.modal ?? true
 
-  const rootEl = ref<HTMLElement | null>(null)
+  const rootEl = options.root ?? ref<HTMLElement | null>(null)
   const isTopmost = ref(true)
 
   const inertAttr = computed(() => (open.value && isModal() && !isTopmost.value ? true : undefined))
 
   // Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
   // рендер не совпадёт с серверным и сломается гидрация.
-  const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
+  const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget(options.teleportTo)
 
   // Панель уезжает в `body`, то есть вне обёртки провайдера, и `data-theme` с
   // неё не наследуется. В дереве компонентов слой остаётся внутри — `inject`

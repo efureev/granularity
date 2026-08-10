@@ -6,7 +6,8 @@ export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Single select with path display',
     description: 'Базовый сценарий для `GrTreeSelect`: single-value режим с `valueDisplay="path"`, когда пользователю нужен контекст полной ветки.',
     status: 'ready',
-    previewKey: 'gr-tree-select-path-display',  },
+    previewKey: 'gr-tree-select-path-display',
+  },
   {
     id: 'tree-select-multiple-filter',
     title: 'Multiple selection with filtering',
@@ -26,5 +27,6 @@ export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Клавиатура и загрузка справочника',
     description: 'Стрелка с поля открывает панель и уводит в дерево, `Esc` возвращает фокус обратно, а `loading` не даёт спутать «ещё едет» с «ничего нет».',
     status: 'ready',
-    previewKey: 'gr-tree-select-keyboard',  },
+    previewKey: 'gr-tree-select-keyboard',
+  },
 ]

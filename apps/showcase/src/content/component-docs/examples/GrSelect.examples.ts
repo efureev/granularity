@@ -6,7 +6,8 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Удалённый поиск, теги и события',
     description: '`v-model:search` + `@search` для подгрузки с сервера, `maxTagCount` для длинного выбора и события `change`/`clear`/`visible-change`.',
     status: 'ready',
-    previewKey: 'gr-select-remote-search',  },
+    previewKey: 'gr-select-remote-search',
+  },
   {
     id: 'select-builder',
     title: 'Interactive select constructor',
@@ -21,7 +22,8 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Native single and clearable',
     description: 'Базовый сценарий для `GrSelect`: обычный single-select и clearable режим в native-rendering без дополнительной composition-логики.',
     status: 'ready',
-    previewKey: 'gr-select-native-modes',  },
+    previewKey: 'gr-select-native-modes',
+  },
   {
     id: 'select-panel-multiple',
     title: 'Panel mode for multiple selection',

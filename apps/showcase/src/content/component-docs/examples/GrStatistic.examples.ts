@@ -6,7 +6,8 @@ export const grStatisticExamples: ShowcaseComponentExampleDoc[] = [
     title: 'KPI row',
     description: 'Показатель с подписью, иконкой, приписками и форматированием: `precision` фиксирует знаки, разряды разделяются автоматически.',
     status: 'ready',
-    previewKey: 'gr-statistic-basic',  },
+    previewKey: 'gr-statistic-basic',
+  },
   {
     id: 'statistic-trend',
     title: 'Trend and loading',
@@ -19,5 +20,6 @@ export const grStatisticExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Slots and non-numeric values',
     description: 'Слоты `#icon`, `#trend`, `#prefix`/`#suffix` подставляют любой контент, а нечисловое значение («2 h 15 min») выводится как есть.',
     status: 'ready',
-    previewKey: 'gr-statistic-slots',  },
+    previewKey: 'gr-statistic-slots',
+  },
 ]

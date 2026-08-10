@@ -120,6 +120,49 @@ test.describe('модальное окно', () => {
  * в закрытом виде она `display: none`, а её содержимое правило `listbox`
  * проверяет только на живых узлах.
  */
+/**
+ * Модальный поповер — тот же модальный класс, что окно и drawer, но якорный:
+ * панель остаётся у триггера, а страница под ней выключается. Проверяем именно
+ * это, потому что по умолчанию поповер немодален и обязан таким остаться.
+ */
+test.describe('модальный поповер', () => {
+  async function openModalPopover(page: import('@playwright/test').Page) {
+    await page.goto(componentPath('GrPopover'))
+    await page.locator('#live-examples').waitFor()
+
+    // Подпись демо — литерал, а не строка локали: демо не пользуются i18n.
+    const trigger = page.getByRole('button', { name: 'Request a refund' })
+    await trigger.click()
+    await expect(page.locator('[data-gr-popover-panel][aria-modal="true"]')).toBeVisible()
+
+    return trigger
+  }
+
+  test('объявляет себя модальным и выключает фон', async ({ page }) => {
+    await openModalPopover(page)
+
+    await expect(page.locator('#app')).toHaveAttribute('inert', /.*/)
+  })
+
+  test('Tab не выходит за панель, Esc возвращает фокус на триггер', async ({ page }) => {
+    const trigger = await openModalPopover(page)
+
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press('Tab')
+      const insidePanel = await page.evaluate(() => {
+        const panel = document.querySelector('[data-gr-popover-panel][aria-modal="true"]')
+        return Boolean(panel && document.activeElement && panel.contains(document.activeElement))
+      })
+      expect(insidePanel, `Tab №${i + 1} увёл фокус за пределы поповера`).toBe(true)
+    }
+
+    await page.keyboard.press('Escape')
+    await expect(page.locator('[data-gr-popover-panel][aria-modal="true"]')).toBeHidden()
+    await expect(trigger).toBeFocused()
+    await expect(page.locator('#app')).not.toHaveAttribute('inert', /.*/)
+  })
+})
+
 test.describe('панель автокомплита', () => {
   /** Открывает панель первого демо и отдаёт его инпут вместе с его же панелью. */
   async function openPanel(page: import('@playwright/test').Page) {

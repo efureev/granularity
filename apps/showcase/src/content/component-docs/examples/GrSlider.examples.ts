@@ -20,7 +20,8 @@ export const grSliderExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Marks, steps, sizes and disabled',
     description: 'Метки делений (`marks`), фиксированный `step`, размеры (`sm`/`md`/`lg`) и `disabled`-состояние.',
     status: 'ready',
-    previewKey: 'gr-slider-marks',  },
+    previewKey: 'gr-slider-marks',
+  },
   {
     id: 'slider-custom',
     title: 'Custom colors & size (CSS variables)',

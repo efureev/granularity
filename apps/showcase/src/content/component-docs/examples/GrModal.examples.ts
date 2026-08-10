@@ -6,7 +6,8 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Bare modal flow',
     description: 'Базовый сценарий для `GrModal`: минимальный контейнер, открытие по кнопке и явное закрытие из пользовательского контента.',
     status: 'ready',
-    previewKey: 'gr-modal-basic-flow',  },
+    previewKey: 'gr-modal-basic-flow',
+  },
   {
     id: 'modal-backdrop-guard',
     title: 'Backdrop guard for critical flows',
@@ -19,7 +20,8 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Size variants for different payloads',
     description: 'Изолируем влияние `size` на layout: один и тот же entry point может открывать compact review или широкую review-панель.',
     status: 'ready',
-    previewKey: 'gr-modal-size-switcher',  },
+    previewKey: 'gr-modal-size-switcher',
+  },
   {
     id: 'modal-dialog-service',
     title: 'Imperative dialogs from an open modal',
@@ -32,5 +34,6 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Scrolling long content and lifecycle events',
     description: '`scrollBehavior` решает, кто скроллится — панель или весь оверлей; `opened`/`closed` приходят после анимации, и только по `closed` безопасно размонтировать содержимое.',
     status: 'ready',
-    previewKey: 'gr-modal-scroll-lifecycle',  },
+    previewKey: 'gr-modal-scroll-lifecycle',
+  },
 ]

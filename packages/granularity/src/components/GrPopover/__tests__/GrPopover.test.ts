@@ -272,3 +272,82 @@ describe('GrPopover', () => {
     expect(isPanelVisible()).toBe(false)
   })
 })
+
+/**
+ * Модальный режим — второй класс поведения того же компонента: поповер с формой
+ * внутри обязан изолировать фон, иначе Tab уводит пользователя на страницу, к
+ * которой поповер и относится. Собран той же сборкой, что окно и drawer
+ * (`useModalOverlay`), поэтому проверяем не механику примитивов, а то, что
+ * режим включается пропом и по умолчанию выключен.
+ */
+describe('GrPopover — модальный режим', () => {
+  it('по умолчанию слой немодальный: ни aria-modal, ни блокировки скролла', async () => {
+    const wrapper = mountPopover()
+
+    wrapper.vm.open()
+    await nextTick()
+
+    expect(panelEl()?.getAttribute('aria-modal')).toBeNull()
+    expect(document.body.style.overflow).toBe('')
+  })
+
+  it('`modal` объявляет панель модальной и блокирует скролл страницы', async () => {
+    const wrapper = mountPopover({ modal: true })
+
+    wrapper.vm.open()
+    await nextTick()
+
+    expect(panelEl()?.getAttribute('aria-modal')).toBe('true')
+    expect(document.body.style.overflow).toBe('hidden')
+
+    wrapper.vm.close()
+    await nextTick()
+
+    expect(document.body.style.overflow, 'скролл отпускается при закрытии').toBe('')
+  })
+
+  it('`modal` уводит фон из дерева доступности, а при закрытии возвращает', async () => {
+    const background = document.createElement('div')
+    document.body.append(background)
+
+    const wrapper = mountPopover({ modal: true })
+
+    wrapper.vm.open()
+    await nextTick()
+
+    expect(background.hasAttribute('inert')).toBe(true)
+
+    wrapper.vm.close()
+    await nextTick()
+
+    expect(background.hasAttribute('inert')).toBe(false)
+    background.remove()
+  })
+
+  it('немодальный поповер фон не трогает: под ним продолжают работать', async () => {
+    const background = document.createElement('div')
+    document.body.append(background)
+
+    const wrapper = mountPopover()
+
+    wrapper.vm.open()
+    await nextTick()
+
+    expect(background.hasAttribute('inert')).toBe(false)
+    background.remove()
+  })
+
+  /**
+   * В модальном режиме перенос фокуса не опционален: фон в `inert`, и фокус,
+   * оставленный снаружи, попал бы в недоступное поддерево.
+   */
+  it('`modal` переносит фокус в панель даже при autoFocus=false', async () => {
+    const wrapper = mountPopover({ modal: true, autoFocus: false })
+
+    wrapper.vm.open()
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement).toBe(panelEl())
+  })
+})

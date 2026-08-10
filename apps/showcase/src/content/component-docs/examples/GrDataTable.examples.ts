@@ -13,7 +13,8 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Sortable rows with initial state',
     description: 'Базовый сценарий для `GrDataTable`: передаём `rows`, `columns`, стартовую сортировку и сразу проверяем built-in sorting.',
     status: 'ready',
-    previewKey: 'gr-data-table-sortable-columns',  },
+    previewKey: 'gr-data-table-sortable-columns',
+  },
   {
     id: 'data-table-custom-cells',
     title: 'Custom status and actions cells',
@@ -26,7 +27,8 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Filtered datasets outside the component',
     description: 'Показываем границу ответственности: фильтрация остаётся снаружи, а `GrDataTable` честно рендерит уже подготовленный набор строк.',
     status: 'ready',
-    previewKey: 'gr-data-table-filtered-view',  },
+    previewKey: 'gr-data-table-filtered-view',
+  },
   {
     id: 'data-table-selection-sticky',
     title: 'Row selection, sticky header and loading',
@@ -39,13 +41,15 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Шкала размеров',
     description: 'В отличие от `GrTable`, здесь размер ведёт ещё и паддинги ячеек, стрелки сортировки и чекбоксы — таблицу видно плотнее целиком.',
     status: 'ready',
-    previewKey: 'gr-data-table-sizes',  },
+    previewKey: 'gr-data-table-sizes',
+  },
   {
     id: 'data-table-row-guards',
     title: 'Row guards, tri-state sorting and row click',
     description: 'Строка может быть невыбираемой (`selectableRow`), подсвеченной (`rowClass`) и кликабельной (`@row-click`), а третий клик по заголовку снимает сортировку — `sortCycle="asc-desc-none"`.',
     status: 'ready',
-    previewKey: 'gr-data-table-row-guards',  },
+    previewKey: 'gr-data-table-row-guards',
+  },
   {
     id: 'data-table-virtual',
     title: 'Справочник на 10 000 строк',

@@ -13,7 +13,8 @@ export const grFileUploadExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Custom trigger UI',
     description: 'Показываем режим без стандартной dropzone-разметки: `GrFileUpload` остаётся orchestrator-слоем, а UI можно собрать из других компонентов пакета.',
     status: 'ready',
-    previewKey: 'gr-file-upload-custom-ui',  },
+    previewKey: 'gr-file-upload-custom-ui',
+  },
   {
     id: 'file-upload-disabled-and-limit',
     title: 'Disabled and guarded states',
@@ -47,17 +48,20 @@ export const grFileUploadExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Шкала размеров',
     description: 'Меняются поля дроп-зоны, плитка иконки и кегль подписей; вложенный `GrProgressBar` получает толщину из того же размера.',
     status: 'ready',
-    previewKey: 'gr-file-upload-sizes',  },
+    previewKey: 'gr-file-upload-sizes',
+  },
   {
     id: 'file-upload-retry',
     title: 'Accept, remove and retry',
     description: '`accept` фильтрует и диалог, и перетаскивание; набор файлов после ошибки остаётся, лишний убирается из списка, а `retry()` повторяет загрузку без повторного выбора.',
     status: 'ready',
-    previewKey: 'gr-file-upload-retry',  },
+    previewKey: 'gr-file-upload-retry',
+  },
   {
     id: 'file-upload-per-file',
     title: 'Per-file upload with previews',
     description: '`uploadMode="per-file"` отправляет каждый файл своим запросом (`request` при этом зовётся с массивом из одного файла — контракт не меняется), `concurrency` ограничивает число одновременных соединений, а у строки появляются статус, процент, отмена и повтор именно её. `preview` рисует миниатюры для `image/*` и честно отзывает object URL при удалении и размонтировании.',
     status: 'ready',
-    previewKey: 'gr-file-upload-per-file',  },
+    previewKey: 'gr-file-upload-per-file',
+  },
 ]

@@ -17,17 +17,17 @@
  * - панель — `role="dialog"` по умолчанию и обязательное доступное имя
  *   (`ariaLabel` либо `aria-labelledby` через `labelledBy`);
  * - Esc закрывает верхний слой стека, клик вне — закрывает по точке попадания;
- * - **фокус-ловушки нет намеренно**: Tab обязан уводить фокус наружу, иначе
- *   немодальный слой запирает пользователя на странице, которая не заблокирована.
+ * - **по умолчанию фокус-ловушки нет намеренно**: Tab обязан уводить фокус
+ *   наружу, иначе немодальный слой запирает пользователя на странице, которая
+ *   не заблокирована. Проп `modal` включает второй режим — см. ниже.
  */
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
-import { usePortalTarget } from '../../composables/usePortalTarget'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
+import { useModalOverlay } from '../../composables/internal/useModalOverlay'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
-import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { vClickOutside } from '../../directives'
-import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../GrConfigProvider/context'
 import {
   type GrPopoverRole,
   type GrPopoverSize,
@@ -46,6 +46,16 @@ export interface GrPopoverProps {
   size?: GrPopoverSize
   /** Роль панели. Меняется теми, кто строит поверх примитива своё меню/список. */
   role?: GrPopoverRole
+  /**
+   * Модальный режим: фон уходит в `inert`, Tab ходит по кругу внутри панели,
+   * скролл страницы блокируется, а слой встаёт в стек модальным — как окно.
+   * Нужен поповеру с формой или подтверждением внутри: без изоляции фона
+   * пользователь уводит фокус на страницу, к которой поповер и относится.
+   *
+   * В этом режиме фокус переносится в панель независимо от `autoFocus`: фон
+   * недоступен, и слой без фокуса внутри стал бы клавиатурной ловушкой.
+   */
+  modal?: boolean
   /** Доступное имя панели. Обязательно для `role="dialog"` без видимого заголовка. */
   ariaLabel?: string
   /** `id` видимого заголовка внутри панели — альтернатива `ariaLabel`. */
@@ -84,6 +94,7 @@ const props = withDefaults(defineProps<GrPopoverProps>(), {
   offsetPx: 8,
   size: undefined,
   role: 'dialog',
+  modal: false,
   ariaLabel: undefined,
   labelledBy: undefined,
   trigger: 'click',
@@ -146,16 +157,28 @@ watch(() => props.placement, () => {
  * Слой стека оверлеев: очередь Esc общая с модалками, поэтому поповер, открытый
  * внутри модалки, по Esc закрывает себя, а не её. Возврат фокуса на триггер
  * тоже отсюда — по правилу «только если на момент закрытия фокус ещё внутри».
+ *
+ * Модальность включается пропом и приходит той же сборкой, что у окна и drawer'а
+ * (`useModalOverlay`): ловушка фокуса, `inert` фона, блокировка скролла. При
+ * `modal: false` не включается ничего из этого — дефолтный поповер немодален.
+ *
+ * Корень слоя и панель здесь один элемент: якорный оверлей уезжает в портал сам,
+ * без обёртки.
  */
-useOverlayLayer(isOpen, close, {
-  modal: false,
+const { inertAttr, portalTarget, teleportEnabled, themeAttrs } = useModalOverlay(isOpen, close, {
+  modal: () => props.modal,
   closeOnEscape: () => props.closeOnEsc,
+  panel: panelEl,
   root: panelEl,
+  teleportTo: () => props.teleportTo,
+  initialFocus: () => panelEl.value,
 })
 
 // Фокус переносим после отрисовки панели: до `nextTick` её ещё нет в DOM.
+// В модальном режиме перенос обязателен: фон в `inert`, и фокус, оставленный
+// снаружи, попал бы в недоступное поддерево.
 watch(isOpen, async (next) => {
-  if (!next || !props.autoFocus) return
+  if (!next || !(props.autoFocus || props.modal)) return
 
   await nextTick()
   panelEl.value?.focus()
@@ -184,16 +207,6 @@ function onContentClick(): void {
 const panelClasses = computed(() =>
   grPopoverPanelClass(resolvedSize.value, resolvedPlacement.value, props.contentClass),
 )
-
-// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский рендер
-// не совпадёт с серверным и сломается гидрация (см. композабл).
-const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget(() => props.teleportTo)
-
-// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
-// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
-// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
-// сама.
-const themeAttrs = useGrThemeAttrs()
 
 defineExpose({ open, close, toggle })
 </script>
@@ -233,6 +246,8 @@ defineExpose({ open, close, toggle })
           data-gr-popover-panel
           data-gr-overlay-root
           :role="role === 'none' ? undefined : role"
+          :aria-modal="modal ? 'true' : undefined"
+          :inert="inertAttr"
           :aria-label="labelledBy ? undefined : ariaLabel"
           :aria-labelledby="labelledBy"
           tabindex="-1"

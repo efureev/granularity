@@ -6,7 +6,8 @@ export const grButtonExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Слоты, block и состояния',
     description: '`#prefix`/`#suffix` вместо одного слота, `block` на всю ширину, объявление загрузки и одинаковое приглушение у отключённых кнопки и ссылки.',
     status: 'ready',
-    previewKey: 'gr-button-slots-and-states',  },
+    previewKey: 'gr-button-slots-and-states',
+  },
   {
     id: 'button-builder',
     title: 'Interactive button constructor',

@@ -15,13 +15,15 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Sticky toast and manual clear',
     description: 'Демонстрация `timeoutMs = 0` и ручного очищения shared store для уведомлений, которые не должны исчезать автоматически.',
     status: 'ready',
-    previewKey: 'gr-toaster-sticky-host',  },
+    previewKey: 'gr-toaster-sticky-host',
+  },
   {
     id: 'toaster-queue-flow',
     title: 'Queued workflow feedback',
     description: 'Отдельный workflow-сценарий: пушим несколько toast подряд, чтобы проверить stacking и ручные sticky warnings.',
     status: 'ready',
-    previewKey: 'gr-toaster-queue-flow',  },
+    previewKey: 'gr-toaster-queue-flow',
+  },
   {
     id: 'toaster-action',
     title: 'Action buttons: size, variant, multiple',
@@ -41,5 +43,6 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     title: 'F6 — фокус в стек уведомлений',
     description: 'Тосты телепортированы в конец `body`: без хоткея кнопка действия недостижима с клавиатуры. Заодно — ширина стека пропом.',
     status: 'ready',
-    previewKey: 'gr-toaster-focus-hotkey',  },
+    previewKey: 'gr-toaster-focus-hotkey',
+  },
 ]

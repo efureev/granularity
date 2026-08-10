@@ -6,7 +6,8 @@ export const grPaginationExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic paging feedback loop',
     description: 'Минимальный сценарий для `GrPagination`: меняем страницу, а компонент сам показывает диапазон видимых элементов — проп `show-total`.',
     status: 'ready',
-    previewKey: 'gr-pagination-basic-flow',  },
+    previewKey: 'gr-pagination-basic-flow',
+  },
   {
     id: 'pagination-page-size-guard',
     title: 'Page-size changes with page clamping',
@@ -33,5 +34,6 @@ export const grPaginationExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Шкала размеров',
     description: 'Размер доезжает до вложенных `GrButton` и `GrSelect`: весь блок пагинации меняет масштаб целиком, а не частями.',
     status: 'ready',
-    previewKey: 'gr-pagination-sizes',  },
+    previewKey: 'gr-pagination-sizes',
+  },
 ]

@@ -80,7 +80,8 @@ If you need a more precise CSS setup, use `@feugene/granularity/foundation.css` 
 - [`docs/tokens.md`](./docs/tokens.md) — design token reference (generated from `tokens/*.json`)
 - [`docs/theming.md`](./docs/theming.md) — building a custom theme (roles, contrast rules, wiring)
 - [`docs/keyboard.md`](./docs/keyboard.md) — keyboard contract per component
-- [`docs/z-index.md`](./docs/z-index.md) — layering scale and the overlay stack
+- [`docs/overlays.md`](./docs/overlays.md) — overlay contract: portal, layer stack, Esc, `inert`, focus
+- [`docs/z-index.md`](./docs/z-index.md) — layering scale
 - [`docs/ssr.md`](./docs/ssr.md) — server-side rendering contract
 - [`docs/unocss.md`](./docs/unocss.md) — `UnoCSS` integration
 - [`docs/localization.md`](./docs/localization.md) — how the package plugs into application localization

@@ -13,19 +13,22 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Basic label and `forId` wiring',
     description: 'Минимальный сценарий показывает, как `GrFormField` связывает label и control, не навязывая конкретный input-тип.',
     status: 'ready',
-    previewKey: 'gr-form-field-basic-label',  },
+    previewKey: 'gr-form-field-basic-label',
+  },
   {
     id: 'form-field-error-state',
     title: 'Inline validation message',
     description: 'Отдельно документируем ответственность `GrFormField` за error copy, когда сам control лишь сигнализирует invalid-state.',
     status: 'ready',
-    previewKey: 'gr-form-field-error-state',  },
+    previewKey: 'gr-form-field-error-state',
+  },
   {
     id: 'form-field-custom-label',
     title: 'Section-style labels via `labelClass`',
     description: 'Компонент можно использовать и как мини-секцию формы: label становится heading-строкой, а внутри slot живёт уже более сложная композиция.',
     status: 'ready',
-    previewKey: 'gr-form-field-custom-label',  },
+    previewKey: 'gr-form-field-custom-label',
+  },
   {
     id: 'form-field-custom-control',
     title: 'Custom control + custom rule (no GrForm)',
@@ -38,5 +41,6 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Dense form: inline label, several errors, size',
     description: '`labelPosition="start"` с `labelWidth` собирает плотную форму, `error` принимает массив претензий, а `showMessage: false` помечает поле невалидным без текста.',
     status: 'ready',
-    previewKey: 'gr-form-field-inline-label',  },
+    previewKey: 'gr-form-field-inline-label',
+  },
 ]

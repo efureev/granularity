@@ -13,13 +13,15 @@ export const grCommandPaletteExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Remote search',
     description: '`:filterable="false"` отдаёт фильтрацию наружу: палитра эмитит `search`, владелец подставляет результаты и `loading`. `:hotkey="null"` отключает глобальное сочетание.',
     status: 'ready',
-    previewKey: 'gr-command-palette-async',  },
+    previewKey: 'gr-command-palette-async',
+  },
   {
     id: 'command-palette-recent',
     title: 'Recent commands and match highlighting',
     description: '`recentIds` поднимает команды отдельной группой наверх — в порядке самого массива и без дублей ниже, — пока запрос пуст. С первой же буквой секция уступает место релевантности, а совпавшие фрагменты метки и описания подсвечиваются `<mark>` (цвет — переменная `--gr-command-match-bg`).',
     status: 'ready',
-    previewKey: 'gr-command-palette-recent',  },
+    previewKey: 'gr-command-palette-recent',
+  },
   {
     id: 'command-palette-virtual',
     title: 'Палитра на 5 000 команд',
