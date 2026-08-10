@@ -159,6 +159,25 @@ export function useZoomPan(options: UseZoomPanOptions) {
     options.onRotate(rotation.value)
   }
 
+  /**
+   * Масштаб «один к одному»: пиксель картинки на пиксель экрана.
+   *
+   * Считается от вписанного размера, потому что `scale` номинальный — единица
+   * означает «вписано в окно», а не «натуральный размер». У крупного кадра
+   * реальные 100% приходятся на номинальные 6–8×, и вручную такую кнопку
+   * потребителю пришлось бы собирать из `naturalWidth`/`renderedWidth`.
+   *
+   * Потолок `maxScale` действует и здесь: он ограничивает зум сознательно, и
+   * «один к одному» — не повод его обойти. Если кадру нужно больше, поднимите
+   * `maxScale`.
+   */
+  function zoomToNatural(): void {
+    if (!naturalWidth.value || !fittedWidth.value)
+      return
+
+    setScale(naturalWidth.value / fittedWidth.value)
+  }
+
   function resetTransform(): void {
     scale.value = 1
     rotation.value = 0
@@ -279,6 +298,7 @@ export function useZoomPan(options: UseZoomPanOptions) {
     setScaleAt,
     zoomIn,
     zoomOut,
+    zoomToNatural,
     rotateLeft,
     rotateRight,
     resetTransform,

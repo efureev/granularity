@@ -200,6 +200,7 @@
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
     "resetZoom": "Restablecer zoom",
+    "zoomToNatural": "Tamaño real (1:1)",
     "rotateLeft": "Girar a la izquierda",
     "rotateRight": "Girar a la derecha",
     "download": "Descargar imagen",

@@ -199,6 +199,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
+    "zoomToNatural": "Actual size (1:1)",
     "rotateLeft": "Rotate left",
     "rotateRight": "Rotate right",
     "download": "Download image",

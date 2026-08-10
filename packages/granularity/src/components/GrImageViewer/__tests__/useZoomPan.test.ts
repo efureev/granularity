@@ -196,6 +196,40 @@ describe('useZoomPan: метрики', () => {
     expect(zoomPan.renderedHeight.value).toBe(600)
   })
 
+  it('zoomToNatural доводит реальный масштаб ровно до 100%', () => {
+    const { zoomPan, imageEl } = setup({ maxScale: 10 })
+
+    imageEl.value = { offsetWidth: 400, offsetHeight: 300 } as HTMLImageElement
+    zoomPan.onImageLoad({ target: { naturalWidth: 2848, naturalHeight: 2136 } } as unknown as Event)
+
+    // Номинальная единица — это «вписано в окно», то есть 14% натурального размера.
+    expect(zoomPan.realScalePercent.value).toBe('14')
+
+    zoomPan.zoomToNatural()
+
+    expect(zoomPan.realScale.value).toBe(1)
+    expect(zoomPan.renderedWidth.value).toBe(2848)
+    // Номинальный масштаб при этом семикратный — вручную такую кнопку потребитель
+    // собирал бы из `naturalWidth`/`renderedWidth`.
+    expect(zoomPan.scale.value).toBeCloseTo(7.12, 2)
+  })
+
+  it('zoomToNatural уважает maxScale и молчит без загруженной картинки', () => {
+    const capped = setup({ maxScale: 3 })
+    capped.imageEl.value = { offsetWidth: 400, offsetHeight: 300 } as HTMLImageElement
+    capped.zoomPan.onImageLoad({ target: { naturalWidth: 2848, naturalHeight: 2136 } } as unknown as Event)
+
+    capped.zoomPan.zoomToNatural()
+
+    // Потолок ограничивает зум сознательно: «один к одному» — не повод его обойти.
+    expect(capped.zoomPan.scale.value).toBe(3)
+    expect(Number.parseFloat(capped.zoomPan.realScalePercent.value)).toBeLessThan(100)
+
+    const empty = setup()
+    empty.zoomPan.zoomToNatural()
+    expect(empty.zoomPan.scale.value).toBe(1)
+  })
+
   it('без загруженной картинки реальный масштаб равен нулю, а не NaN', () => {
     const { zoomPan } = setup()
 

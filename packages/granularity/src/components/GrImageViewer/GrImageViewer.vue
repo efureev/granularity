@@ -87,6 +87,8 @@ export interface GrImageViewerProps {
   zoomOutLabel?: string
   /** i18n: aria-label кнопки «сбросить масштаб». */
   resetZoomLabel?: string
+  /** i18n: aria-label кнопки «до натурального размера». */
+  zoomToNaturalLabel?: string
   /** i18n: aria-label кнопки «повернуть влево». */
   rotateLeftLabel?: string
   /** i18n: aria-label кнопки «повернуть вправо». */
@@ -134,6 +136,7 @@ const props = withDefaults(
     zoomInLabel: undefined,
     zoomOutLabel: undefined,
     resetZoomLabel: undefined,
+    zoomToNaturalLabel: undefined,
     rotateLeftLabel: undefined,
     rotateRightLabel: undefined,
     showDownload: false,
@@ -150,6 +153,7 @@ const resolvedNextLabel = computed(() => props.nextLabel ?? t('gr.imageViewer.ne
 const resolvedZoomInLabel = computed(() => props.zoomInLabel ?? t('gr.imageViewer.zoomIn', 'Zoom in'))
 const resolvedZoomOutLabel = computed(() => props.zoomOutLabel ?? t('gr.imageViewer.zoomOut', 'Zoom out'))
 const resolvedResetZoomLabel = computed(() => props.resetZoomLabel ?? t('gr.imageViewer.resetZoom', 'Reset zoom'))
+const resolvedZoomToNaturalLabel = computed(() => props.zoomToNaturalLabel ?? t('gr.imageViewer.zoomToNatural', 'Actual size (1:1)'))
 const resolvedRotateLeftLabel = computed(() => props.rotateLeftLabel ?? t('gr.imageViewer.rotateLeft', 'Rotate left'))
 const resolvedRotateRightLabel = computed(() => props.rotateRightLabel ?? t('gr.imageViewer.rotateRight', 'Rotate right'))
 const resolvedDownloadLabel = computed(() => props.downloadLabel ?? t('gr.imageViewer.download', 'Download image'))
@@ -164,6 +168,8 @@ type GrImageViewerToolbarActions = {
   next: () => void
   zoomIn: () => void
   zoomOut: () => void
+  /** Масштаб «один к одному»: реальные 100%, а не номинальные. */
+  zoomToNatural: () => void
   reset: () => void
   rotateLeft: () => void
   rotateRight: () => void
@@ -222,6 +228,7 @@ const {
   zoomValueText,
   zoomIn,
   zoomOut,
+  zoomToNatural,
   rotateLeft,
   rotateRight,
   resetTransform,
@@ -399,6 +406,7 @@ const toolbarActions: GrImageViewerToolbarActions = {
   next,
   zoomIn,
   zoomOut,
+  zoomToNatural,
   reset: resetTransform,
   rotateLeft,
   rotateRight,
@@ -744,6 +752,24 @@ onBeforeUnmount(() => {
                       @click="resetTransform"
                     >
                       100%
+                    </button>
+
+                    <!--
+                      «1:1» рядом с «100%» не дубль: сброс возвращает вписанный в
+                      окно кадр (номинальные 100%), а это — пиксель в пиксель, то
+                      есть реальные 100%. У крупной фотографии между ними разница
+                      в разы, и собирать эту кнопку из `naturalWidth`/`renderedWidth`
+                      каждому потребителю незачем.
+                    -->
+                    <button
+                      type="button"
+                      data-gr-image-viewer-zoom-natural
+                      :aria-label="resolvedZoomToNaturalLabel"
+                      class="h-11 min-w-11 px-3 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] font-700"
+                      :class="toolbarButtonClass"
+                      @click="zoomToNatural"
+                    >
+                      1:1
                     </button>
 
                     <button

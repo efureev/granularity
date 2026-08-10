@@ -73,6 +73,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrImageViewer` can zoom to the actual pixel size.** `scale` is nominal — 1 means "fitted into the window" — so on a
+  4752 px photo the toolbar's "100%" is really 21% and no grain is visible at all. The new "1:1" button
+  (`actions.zoomToNatural`, also on the imperative API) goes to **real** 100%, pixel for pixel; the data to compute it was
+  already in the toolbar slot, but every consumer had to do the arithmetic itself. It works in both directions: a frame
+  smaller than its place on screen zooms out to 1:1. `maxScale` still applies — it caps zooming on purpose, and the actual
+  size is not a reason to ignore it, which is why a large photo needs a higher cap than the default 5. Nominal versus real
+  scale is now written down in `docs/components/GrImageViewer.md`.
+
 - **A filled `GrBadge` stops being a black plaque in the light theme.** The badge got its own theme layer,
   `--gr-badge-{tone}-bg` / `-fg`, because the weight a filled badge needs differs between themes. In the light theme
   `--gr-{tone}` is a bright fill meant for **dark** ink — `-fg` there has to be dark, white on `--gr-success` is 2.54:1 —

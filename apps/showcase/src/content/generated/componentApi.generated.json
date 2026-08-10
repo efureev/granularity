@@ -4424,6 +4424,13 @@
             "default": "undefined"
           },
           {
+            "name": "zoomToNaturalLabel",
+            "description": "i18n: aria-label кнопки «до натурального размера».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "rotateLeftLabel",
             "description": "i18n: aria-label кнопки «повернуть влево».",
             "type": "string | undefined",
@@ -4547,6 +4554,11 @@
           {
             "name": "zoomOut",
             "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "zoomToNatural",
+            "description": "Масштаб «один к одному»: реальные 100%, а не номинальные.",
             "type": "() => void"
           },
           {
