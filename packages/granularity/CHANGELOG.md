@@ -137,6 +137,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSegmented` goes vertical.** Sidebar filters are the reason the orientation exists, and the component was one
+  prop short of them. `orientation="vertical"` turns the row into a column and declares `aria-orientation`.
+
+  Nothing had to be invented for the indicator: it is measured in two dimensions (`translate3d` plus `width`/
+  `height`), so it slides down the column exactly as it slides across the row — only the grid tracks change, and a
+  watcher recomputes the geometry when the orientation flips, so the indicator does not stay in the coordinates of
+  the previous layout. Keyboard is untouched too, and deliberately so: both axes of arrow keys already work in either
+  orientation, which is what APG asks of a `radiogroup` — a vertical row does not disable the horizontal arrows.
+
+  In the vertical layout there is a single column, so segments share a width by construction and `block` only decides
+  whether the group fills its container. One thing did need adjusting: the track radius. `9999px` is tuned for a short
+  row and turns a tall column into an ellipse, so vertically it is computed from the segment height instead — the
+  column gets the rounding of a single row, and the segments inside stay pills because they derive their radius from
+  the same value.
+
 - **`GrSkeleton` knows its shape, and can repeat itself.** One default radius served every case: a pill is right for
   a line of text and wrong for a block, so every rectangular placeholder passed `rounded` by hand — the showcase demo
   did it three times on one screen. `variant` now names the shape — `text` (pill), `rect` (`--gr-radius-md`),

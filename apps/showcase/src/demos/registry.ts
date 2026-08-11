@@ -237,6 +237,7 @@ export const demoPathByPreviewKey = {
   'gr-segmented-button-variant':            'components/gr-segmented/GrSegmentedButtonDemo.vue',
   'gr-segmented-content':                   'components/gr-segmented/GrSegmentedContentDemo.vue',
   'gr-segmented-states':                    'components/gr-segmented/GrSegmentedStatesDemo.vue',
+  'gr-segmented-vertical':                  'components/gr-segmented/GrSegmentedVerticalDemo.vue',
   'gr-select-addons':                       'components/gr-select/GrSelectAddonsDemo.vue',
   'gr-select-builder':                      'components/gr-select/GrSelectBuilderDemo.vue',
   'gr-select-custom-value':                 'components/gr-select/GrSelectCustomValueDemo.vue',

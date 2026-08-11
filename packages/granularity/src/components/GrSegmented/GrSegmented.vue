@@ -18,6 +18,7 @@ import {
   grSegmentedRootClass,
   grSegmentedRootStyle,
   type GrSegmentedOption,
+  type GrSegmentedOrientation,
   type GrSegmentedSize,
   type GrSegmentedValue,
   type GrSegmentedVariant,
@@ -38,6 +39,11 @@ export interface GrSegmentedProps {
   options: GrSegmentedOption[]
   variant?: GrSegmentedVariant
   size?: GrSegmentedSize
+  /**
+   * Направление ряда. Вертикаль — боковые фильтры; индикатор к ней готов по
+   * построению, он двумерный.
+   */
+  orientation?: GrSegmentedOrientation
   /** Длительность анимации индикатора в мс. */
   indicatorDuration?: number
   /** Растягивать сегмент на всю ширину контейнера. */
@@ -66,6 +72,7 @@ const props = withDefaults(
   {
     variant: undefined,
     size: undefined,
+    orientation: 'horizontal',
     indicatorDuration: 300,
     block: false,
     disabled: false,
@@ -136,20 +143,37 @@ const selectedIndex = computed(() => props.options.findIndex(option => option.va
 const selectedOption = computed(() => props.options[selectedIndex.value] ?? null)
 const enabledOptions = computed(() => props.options.filter(option => !resolveOptionDisabled(option)))
 const indicatorDuration = computed(() => Math.max(0, Math.round(props.indicatorDuration)))
+const isVertical = computed(() => props.orientation === 'vertical')
 const rootClassName = computed(() => grSegmentedRootClass({
   variant: resolvedVariant.value,
+  orientation: props.orientation,
   block: props.block,
   disabled: isDisabled.value,
 }))
-const rootStyle = computed<Record<string, string>>(() => ({
-  ...grSegmentedRootStyle({
-    variant: resolvedVariant.value,
-    size: resolvedSize.value,
-  }),
-  gridTemplateColumns: props.options.length > 0
-    ? props.options.map(() => props.block ? 'minmax(0,1fr)' : 'minmax(0,max-content)').join(' ')
-    : 'none',
-}))
+
+/**
+ * Раскладка задаётся треками, а не классами: число сегментов известно только в
+ * рантайме. По вертикали колонка одна — сегменты одинаковой ширины по
+ * построению, и `block` решает лишь, занимать ли ширину контейнера.
+ */
+const rootStyle = computed<Record<string, string>>(() => {
+  const empty = props.options.length === 0
+  const track = () => props.block && !isVertical.value ? 'minmax(0,1fr)' : 'minmax(0,max-content)'
+
+  return {
+    ...grSegmentedRootStyle({
+      variant: resolvedVariant.value,
+      size: resolvedSize.value,
+      orientation: props.orientation,
+    }),
+    gridTemplateColumns: isVertical.value
+      ? 'minmax(0,1fr)'
+      : empty ? 'none' : props.options.map(track).join(' '),
+    ...(isVertical.value
+      ? { gridTemplateRows: empty ? 'none' : props.options.map(track).join(' ') }
+      : {}),
+  }
+})
 const indicatorClassName = computed(() => grSegmentedIndicatorClass(resolvedVariant.value))
 const resolvedName = computed(() => props.name ?? fallbackName)
 const hasIndicator = computed(() => selectedIndex.value !== -1 && indicatorGeometry.value !== null)
@@ -444,6 +468,9 @@ watch(() => props.options, () => scheduleMeasure(), { deep: true })
 watch(resolvedVariant, () => scheduleMeasure())
 watch(resolvedSize, () => scheduleMeasure())
 watch(() => props.block, () => scheduleMeasure())
+// Смена ориентации переставляет сегменты: без пересчёта индикатор остался бы в
+// координатах прежней раскладки.
+watch(() => props.orientation, () => scheduleMeasure())
 
 onMounted(() => scheduleMeasure())
 onBeforeUnmount(() => {
@@ -460,6 +487,7 @@ onBeforeUnmount(() => {
     data-gr-segmented
     :data-variant="resolvedVariant"
     role="radiogroup"
+    :aria-orientation="orientation"
     :aria-label="ariaLabel"
     :aria-labelledby="labelledBy"
     :aria-describedby="describedBy"

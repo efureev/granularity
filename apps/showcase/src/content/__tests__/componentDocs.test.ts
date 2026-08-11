@@ -139,7 +139,7 @@ describe('component docs metadata', () => {
 
     const doc = getShowcaseComponentDoc(segmentedEntity!)
 
-    expect(doc.examples).toHaveLength(4)
+    expect(doc.examples).toHaveLength(5)
     expect(doc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(doc.examples.every(example => example.previewKey?.startsWith('gr-segmented'))).toBe(true)
   })

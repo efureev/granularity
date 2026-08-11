@@ -7,11 +7,13 @@ export { grSegmentedConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrSegmentedConfigurableProps } from './defaults'
 
-export type {
-  GrSegmentedOption,
-  GrSegmentedSize,
-  GrSegmentedValue,
-  GrSegmentedVariant,
+export {
+  GR_SEGMENTED_ORIENTATIONS,
+  type GrSegmentedOption,
+  type GrSegmentedOrientation,
+  type GrSegmentedSize,
+  type GrSegmentedValue,
+  type GrSegmentedVariant,
 } from './grSegmentedStyles'
 export type { GrSegmentedProps } from './GrSegmented.vue'
 export { grSegmentedSafelist } from './safelist'

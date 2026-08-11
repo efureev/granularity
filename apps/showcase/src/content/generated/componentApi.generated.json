@@ -7673,6 +7673,13 @@
             "default": "false"
           },
           {
+            "name": "orientation",
+            "description": "Направление ряда. Вертикаль — боковые фильтры; индикатор к ней готов по построению, он двумерный.",
+            "type": "\"horizontal\" | \"vertical\" | undefined",
+            "required": false,
+            "default": "\"horizontal\""
+          },
+          {
             "name": "indicatorDuration",
             "description": "Длительность анимации индикатора в мс.",
             "type": "number | undefined",

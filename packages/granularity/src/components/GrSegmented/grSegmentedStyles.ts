@@ -3,6 +3,10 @@ import type { GrComponentSize } from '../shared/sizes'
 import type { Component } from 'vue'
 export type GrSegmentedVariant = 'pills' | 'button'
 export type GrSegmentedSize = GrComponentSize
+
+/** Направление ряда сегментов. Вертикаль — боковые фильтры. */
+export const GR_SEGMENTED_ORIENTATIONS = ['horizontal', 'vertical'] as const
+export type GrSegmentedOrientation = typeof GR_SEGMENTED_ORIENTATIONS[number]
 export type GrSegmentedValue = string | number
 export type GrSegmentedOption = {
   value: GrSegmentedValue
@@ -22,7 +26,13 @@ export type GrSegmentedOption = {
   ariaLabel?: string
 }
 export const rootBaseClass =
-  'relative inline-grid min-w-0 grid-flow-col items-stretch rounded-[var(--gr-segmented-radius)] p-[var(--gr-segmented-padding)] transition-colors duration-[var(--gr-duration-fast)]'
+  'relative inline-grid min-w-0 items-stretch rounded-[var(--gr-segmented-radius)] p-[var(--gr-segmented-padding)] transition-colors duration-[var(--gr-duration-fast)]'
+
+/** Направление потока: остальную раскладку задают `gridTemplate*` в стиле корня. */
+export const rootOrientationClassMap: Record<GrSegmentedOrientation, string> = {
+  horizontal: 'grid-flow-col',
+  vertical: 'grid-flow-row',
+}
 export const rootVariantClassMap: Record<GrSegmentedVariant, string> = {
   pills: 'border border-[var(--gr-segmented-track-brd)] bg-[var(--gr-segmented-track-bg)] text-[var(--gr-segmented-item-color)]',
   button: 'border border-[var(--gr-segmented-track-brd)] bg-[var(--gr-segmented-track-bg)] text-[var(--gr-segmented-item-color)] shadow-[var(--gr-segmented-track-shadow)]',
@@ -118,18 +128,40 @@ const rootVariantStyles: Record<GrSegmentedVariant, Record<string, string>> = {
     '--gr-segmented-item-hover-color': 'var(--gr-fg)',
   },
 }
-export function grSegmentedRootClass(options: { variant: GrSegmentedVariant, block: boolean, disabled: boolean }): string {
+export function grSegmentedRootClass(options: {
+  variant: GrSegmentedVariant
+  orientation: GrSegmentedOrientation
+  block: boolean
+  disabled: boolean
+}): string {
   return [
     rootBaseClass,
+    rootOrientationClassMap[options.orientation],
     rootVariantClassMap[options.variant],
     options.block ? rootBlockClass : '',
     options.disabled ? rootDisabledClass : '',
   ].filter(Boolean).join(' ')
 }
-export function grSegmentedRootStyle(options: { variant: GrSegmentedVariant, size: GrSegmentedSize }): Record<string, string> {
+/**
+ * Радиус дорожки в вертикали — пилюля **одной строки**, а не всей колонки.
+ * `9999px` выверен под короткий горизонтальный ряд; на высокой колонке он
+ * превращает дорожку в эллипс. Формула повторяет высоту сегмента, поэтому
+ * скругление у колонки ровно такое же, как у ряда, и сегменты внутри остаются
+ * пилюлями: они считают свой радиус от этого же значения.
+ */
+const verticalRadiusStyle = {
+  '--gr-segmented-radius': 'calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))',
+}
+
+export function grSegmentedRootStyle(options: {
+  variant: GrSegmentedVariant
+  size: GrSegmentedSize
+  orientation: GrSegmentedOrientation
+}): Record<string, string> {
   return {
     ...rootSizeStyles[options.size],
     ...rootVariantStyles[options.variant],
+    ...(options.orientation === 'vertical' ? verticalRadiusStyle : {}),
   }
 }
 export function grSegmentedIndicatorClass(variant: GrSegmentedVariant): string {

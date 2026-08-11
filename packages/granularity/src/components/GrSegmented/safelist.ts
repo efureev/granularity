@@ -14,11 +14,13 @@ import {
   rootBaseClass,
   rootBlockClass,
   rootDisabledClass,
+  rootOrientationClassMap,
   rootVariantClassMap,
 } from './grSegmentedStyles'
 
 export const grSegmentedClassTokens = {
   rootBaseClass: splitClassTokens(rootBaseClass),
+  rootOrientationClassMap: Object.values(rootOrientationClassMap).flatMap(splitClassTokens),
   rootVariantClassMap: Object.values(rootVariantClassMap).flatMap(splitClassTokens),
   rootBlockClass: splitClassTokens(rootBlockClass),
   rootDisabledClass: splitClassTokens(rootDisabledClass),
@@ -37,6 +39,7 @@ export const grSegmentedClassTokens = {
 
 export const grSegmentedSafelist = [...new Set([
   ...grSegmentedClassTokens.rootBaseClass,
+  ...grSegmentedClassTokens.rootOrientationClassMap,
   ...grSegmentedClassTokens.rootVariantClassMap,
   ...grSegmentedClassTokens.rootBlockClass,
   ...grSegmentedClassTokens.rootDisabledClass,

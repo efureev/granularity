@@ -419,3 +419,104 @@ describe('GrSegmented — загружающийся сегмент', () => {
       .toEqual(['List:false', 'Board:true', 'Calendar:false'])
   })
 })
+
+describe('GrSegmented — ориентация', () => {
+  it('по умолчанию ряд горизонтальный: поток по колонкам, строки не задаются', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
+    const root = wrapper.get('[data-gr-segmented]')
+
+    expect(root.attributes('aria-orientation')).toBe('horizontal')
+    expect(root.classes()).toContain('grid-flow-col')
+    expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,max-content) minmax(0,max-content) minmax(0,max-content)')
+    expect(root.attributes('style')).not.toContain('grid-template-rows')
+  })
+
+  it('vertical разворачивает ряд в колонку и объявляет ориентацию', () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], orientation: 'vertical' },
+    })
+    const root = wrapper.get('[data-gr-segmented]')
+
+    expect(root.attributes('aria-orientation')).toBe('vertical')
+    expect(root.classes()).toContain('grid-flow-row')
+    expect(root.classes()).not.toContain('grid-flow-col')
+
+    // Колонка одна: сегменты одинаковой ширины по построению, а не по `block`.
+    expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,1fr)')
+    expect(root.attributes('style')).toContain('grid-template-rows: minmax(0,max-content) minmax(0,max-content) minmax(0,max-content)')
+  })
+
+  it('block в вертикали занимает ширину контейнера, но колонку не множит', () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], orientation: 'vertical', block: true },
+    })
+    const root = wrapper.get('[data-gr-segmented]')
+
+    expect(root.classes()).toContain('w-full')
+    expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,1fr)')
+  })
+
+  it('пустой список опций не оставляет треков ни в одной ориентации', () => {
+    const horizontal = mount(GrSegmented, { props: { modelValue: '', options: [] } })
+    expect(horizontal.get('[data-gr-segmented]').attributes('style')).toContain('grid-template-columns: none')
+
+    const vertical = mount(GrSegmented, { props: { modelValue: '', options: [], orientation: 'vertical' } })
+    expect(vertical.get('[data-gr-segmented]').attributes('style')).toContain('grid-template-rows: none')
+  })
+
+  it('в вертикали работают обе оси стрелок — так требует APG для radiogroup', async () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], orientation: 'vertical' },
+      attachTo: document.body,
+    })
+
+    const radios = wrapper.findAll('[role="radio"]')
+
+    // Модель подтягивается вручную: без неё `emitValue` отбросил бы шаг назад к
+    // уже «выбранному» значению, и тест проверял бы не то.
+    const press = async (index: number, key: string, expected: string) => {
+      await radios[index].trigger('keydown', { key })
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([expected])
+      await wrapper.setProps({ modelValue: expected })
+    }
+
+    await press(0, 'ArrowDown', 'board')
+    // Горизонтальные стрелки в вертикальном ряду не отключаются: у `radiogroup`
+    // ими ходят так же, как вертикальными.
+    await press(1, 'ArrowRight', 'calendar')
+    await press(2, 'ArrowUp', 'board')
+    await press(1, 'ArrowLeft', 'list')
+
+    wrapper.unmount()
+  })
+
+  it('смена ориентации пересчитывает геометрию индикатора', async () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'board', options: [...options] } })
+    await nextTick()
+
+    const measured = ResizeObserverMock.instances.length
+    await wrapper.setProps({ orientation: 'vertical' })
+    await nextTick()
+    await nextTick()
+
+    // Индикатор, оставшийся в координатах прежней раскладки, съехал бы мимо сегмента.
+    expect(ResizeObserverMock.instances.length).toBeGreaterThanOrEqual(measured)
+    expect(wrapper.get('[data-gr-segmented]').attributes('aria-orientation')).toBe('vertical')
+  })
+})
+
+describe('GrSegmented — радиус дорожки', () => {
+  it('горизонталь остаётся пилюлей, вертикаль считает радиус от высоты сегмента', () => {
+    const horizontal = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
+    expect(horizontal.get('[data-gr-segmented]').attributes('style')).toContain('--gr-segmented-radius: 9999px')
+
+    // `9999px` выверен под короткий ряд: на высокой колонке он превращает
+    // дорожку в эллипс.
+    const vertical = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], orientation: 'vertical' },
+    })
+    const style = vertical.get('[data-gr-segmented]').attributes('style')
+    expect(style).toContain('--gr-segmented-radius: calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
+    expect(style).not.toContain('--gr-segmented-radius: 9999px')
+  })
+})
