@@ -9126,6 +9126,13 @@
             "default": "undefined"
           },
           {
+            "name": "closable",
+            "description": "Крестик на вкладках и закрытие по `Delete`/`Backspace`. Точечно снимается `closable: false` у самой вкладки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
@@ -9138,6 +9145,13 @@
             "type": "GrTabsOrientation | undefined",
             "required": false,
             "default": "\"horizontal\""
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст, когда список вкладок пуст. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "idBase",
@@ -9174,8 +9188,13 @@
         "items": [
           {
             "name": "tab",
-            "description": "Содержимое вкладки целиком — вместо подписи, иконки и счётчика.",
+            "description": "Содержимое вкладки целиком — вместо подписи, иконки и счётчика. Крестик остаётся.",
             "type": "{ tab: GrTab; active: boolean; disabled: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "Пустой ряд — вместо текста из локали.",
+            "type": "any"
           }
         ]
       },
@@ -9184,6 +9203,12 @@
         "title": "Events",
         "origin": "generated",
         "items": [
+          {
+            "name": "close",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"close\", value: string): void"
+          },
           {
             "name": "update:modelValue",
             "description": "",

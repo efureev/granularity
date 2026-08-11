@@ -281,6 +281,10 @@
   "table": {
     "empty": "Todavía no hay nada"
   },
+  "tabs": {
+    "empty": "Todavía no hay nada",
+    "close": "Cerrar pestaña"
+  },
   "bottomNav": {
     "label": "Navegación inferior",
     "badge": "{count} nuevos"

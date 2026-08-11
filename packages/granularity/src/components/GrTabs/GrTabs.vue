@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 
+import IconX from '~icons/lucide/x'
+
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import {
   grTabsBadgeClass,
+  grTabsCloseClass,
+  grTabsEmptyClass,
   grTabsListClass,
   grTabsTabClass,
+  tabCloseIconSizes,
   tabContentClass,
   tabIconClass,
   type GrTabsOrientation,
@@ -20,6 +26,8 @@ export interface GrTab {
   /** UnoCSS-класс иконки слева от подписи (например `i-lucide-user`). */
   icon?: string
   disabled?: boolean
+  /** Перекрывает `closable` ряда в обе стороны: закрепить вкладку или закрыть одну её. */
+  closable?: boolean
 }
 
 export interface GrTabsProps {
@@ -43,10 +51,22 @@ export interface GrTabsProps {
   activationMode?: GrTabsActivationMode
   /** Горизонтальный (по умолчанию) или вертикальный список вкладок. */
   orientation?: GrTabsOrientation
+  /**
+   * Крестик на вкладках и закрытие по `Delete`/`Backspace`. Точечно снимается
+   * `closable: false` у самой вкладки.
+   */
+  closable?: boolean
+  /** Текст, когда список вкладок пуст. Слот `#empty` сильнее. */
+  emptyText?: string
 }
 
 export interface GrTabsEmits {
   (e: 'update:modelValue', value: string): void
+  /**
+   * Просьба закрыть вкладку. Компонент список не трогает: `tabs` — проп, и
+   * закрытие может не состояться («сохранить изменения?»).
+   */
+  (e: 'close', value: string): void
 }
 
 export type GrTabsActivationMode = 'automatic' | 'manual'
@@ -72,14 +92,20 @@ const props = withDefaults(defineProps<GrTabsProps>(), {
   variant: undefined,
   activationMode: 'automatic',
   orientation: 'horizontal',
+  closable: false,
+  emptyText: undefined,
 })
 
 defineSlots<{
-  /** Содержимое вкладки целиком — вместо подписи, иконки и счётчика. */
+  /** Содержимое вкладки целиком — вместо подписи, иконки и счётчика. Крестик остаётся. */
   tab?: (props: { tab: GrTab, active: boolean, disabled: boolean }) => unknown
+  /** Пустой ряд — вместо текста из локали. */
+  empty?: () => unknown
 }>()
 
 const emit = defineEmits<GrTabsEmits>()
+
+const { t } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTabs' })
 const resolvedVariant = useGrComponentProp('GrTabs', 'variant', () => props.variant, 'pills')
@@ -100,6 +126,18 @@ function tabClass(tab: GrTab): string {
 }
 
 const badgeClass = computed(() => grTabsBadgeClass(resolvedSize.value))
+const closeClass = computed(() => grTabsCloseClass(resolvedSize.value))
+const closeIconClass = computed(() => tabCloseIconSizes[resolvedSize.value])
+const emptyClass = computed(() => grTabsEmptyClass(resolvedSize.value))
+
+const isEmpty = computed(() => props.tabs.length === 0)
+const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.tabs.empty', 'Nothing here yet'))
+const closeTitle = computed(() => t('gr.tabs.close', 'Close tab'))
+
+/** Отключённая вкладка не принимает взаимодействия, а закрытие — тоже взаимодействие. */
+function isClosable(tab: GrTab): boolean {
+  return !tab.disabled && (tab.closable ?? props.closable)
+}
 
 const buttonRefs = ref<HTMLButtonElement[]>([])
 
@@ -230,6 +268,16 @@ function onKeydown(event: KeyboardEvent): void {
         void selectByIndex(focusedIndex.value, true)
       }
       return
+    case 'Delete':
+    case 'Backspace': {
+      // Единственный клавиатурный путь к закрытию: крестик в таб-порядке не стоит.
+      const tab = props.tabs[currentIndex]
+      if (tab && isClosable(tab)) {
+        event.preventDefault()
+        requestClose(currentIndex)
+      }
+      return
+    }
     default:
       return
   }
@@ -247,9 +295,54 @@ function onKeydown(event: KeyboardEvent): void {
   void selectByIndex(nextIndex, true)
 }
 
-function onClick(tab: GrTab, index: number): void {
+/**
+ * Закрытая вкладка, которая держала фокус. Компонент список не укорачивает —
+ * это делает потребитель, — поэтому фокус возвращается только после того, как
+ * `tabs` действительно стал короче.
+ */
+let pendingClose: { index: number, value: string } | null = null
+
+function requestClose(index: number): void {
+  const tab = props.tabs[index]
+  if (!tab || !isClosable(tab))
+    return
+
+  const held = buttonRefs.value[index] === document.activeElement
+  pendingClose = held ? { index, value: tab.value } : null
+
+  emit('close', tab.value)
+}
+
+// Без этого клавиатурное закрытие роняет фокус в `<body>`: кнопка, на которой
+// он стоял, исчезает из DOM вместе со вкладкой.
+watch(() => props.tabs.length, async (next, prev) => {
+  const pending = pendingClose
+  pendingClose = null
+
+  if (!pending || next >= prev)
+    return
+  // Ушла не та вкладка — потребитель поменял список по своей причине.
+  if (props.tabs.some(tab => tab.value === pending.value))
+    return
+
+  await nextTick()
+
+  const target = Math.min(pending.index, next - 1)
+  if (target >= 0)
+    void focusIndex(target)
+  else
+    focusedIndex.value = -1
+})
+
+function onClick(event: MouseEvent, tab: GrTab, index: number): void {
   if (!isEnabled(tab))
     return
+
+  // Крестик — не кнопка, поэтому его клик приходит сюда же и разбирается по цели.
+  if (event.target instanceof Element && event.target.closest('[data-gr-tab-close]')) {
+    requestClose(index)
+    return
+  }
 
   focusedIndex.value = index
 
@@ -259,7 +352,18 @@ function onClick(tab: GrTab, index: number): void {
 </script>
 
 <template>
+  <!--
+    Пустой ряд — не пустой `tablist`: роль обязана владеть потомками `tab`,
+    и текст внутри неё был бы нарушением, а не пустым состоянием.
+  -->
+  <div v-if="isEmpty" data-gr-tabs-empty :class="emptyClass">
+    <slot name="empty">
+      {{ resolvedEmptyText }}
+    </slot>
+  </div>
+
   <div
+    v-else
     role="tablist"
     data-gr-tabs
     :aria-orientation="orientation"
@@ -277,9 +381,10 @@ function onClick(tab: GrTab, index: number): void {
       :aria-controls="idBase ? `${idBase}-panel-${tab.value}` : undefined"
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
+      :aria-keyshortcuts="isClosable(tab) ? 'Delete' : undefined"
       :tabindex="index === rovingFocusIndex ? 0 : -1"
       :class="tabClass(tab)"
-      @click="onClick(tab, index)"
+      @click="onClick($event, tab, index)"
     >
       <span :class="tabContentClass">
         <slot
@@ -294,6 +399,17 @@ function onClick(tab: GrTab, index: number): void {
             {{ tab.badge }}
           </span>
         </slot>
+
+        <!-- Снаружи слота: своя разметка вкладки не должна отнимать закрытие. -->
+        <span
+          v-if="isClosable(tab)"
+          data-gr-tab-close
+          :class="closeClass"
+          :title="closeTitle"
+          aria-hidden="true"
+        >
+          <IconX :class="closeIconClass" />
+        </span>
       </span>
     </button>
   </div>

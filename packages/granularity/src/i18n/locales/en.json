@@ -279,6 +279,10 @@
   "table": {
     "empty": "Nothing here yet"
   },
+  "tabs": {
+    "empty": "Nothing here yet",
+    "close": "Close tab"
+  },
   "bottomNav": {
     "label": "Bottom navigation",
     "badge": "{count} new"

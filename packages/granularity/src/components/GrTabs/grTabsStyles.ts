@@ -97,6 +97,34 @@ export const tabIconClass = 'h-4 w-4 shrink-0'
 
 export const tabContentClass = 'inline-flex items-center gap-2'
 
+/**
+ * Крестик закрытия. Кнопкой он быть не может: `role="tab"` объявляет потомков
+ * презентационными, и вложенный интерактив теряется у скринридера (axe:
+ * `nested-interactive`). Поэтому это `<span>`, а клик по нему разбирает
+ * обработчик самой вкладки.
+ *
+ * Своего фокус-кольца у него нет по той же причине — в таб-порядке он не стоит,
+ * с клавиатуры закрытие идёт по `Delete`/`Backspace`.
+ */
+export const tabCloseBase = 'inline-flex items-center justify-center shrink-0 rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)]'
+
+export const tabCloseSizes: Record<GrTabsSize, string> = {
+  xs: 'h-4 w-4',
+  sm: 'h-4 w-4',
+  md: 'h-5 w-5',
+  lg: 'h-5 w-5',
+}
+
+export const tabCloseIconSizes: Record<GrTabsSize, string> = {
+  xs: 'h-3 w-3',
+  sm: 'h-3 w-3',
+  md: 'h-4 w-4',
+  lg: 'h-4 w-4',
+}
+
+/** Пустой ряд держит высоту вкладки: иначе соседние блоки прыгают при закрытии последней. */
+export const tabsEmptyBase = 'inline-flex items-center text-[var(--gr-muted-fg)]'
+
 export const tabBadgeBase = 'rounded-[var(--gr-radius-full)] bg-[var(--gr-secondary)] text-[var(--gr-secondary-fg)]'
 
 export function grTabsListClass(options: {
@@ -133,4 +161,12 @@ export function grTabsTabClass(options: {
 
 export function grTabsBadgeClass(size: GrTabsSize): string {
   return [tabBadgeBase, tabBadgeSizes[size]].join(' ')
+}
+
+export function grTabsCloseClass(size: GrTabsSize): string {
+  return [tabCloseBase, tabCloseSizes[size]].join(' ')
+}
+
+export function grTabsEmptyClass(size: GrTabsSize): string {
+  return [tabsEmptyBase, tabSizes[size]].join(' ')
 }

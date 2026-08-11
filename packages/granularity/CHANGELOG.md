@@ -111,6 +111,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTabs` closes tabs, and knows what to say when there are none.** Two gaps that were really one: the row had no
+  dictionary of its own, so an empty tab list rendered nothing at all — not even a place for the consumer to put a
+  message — and there was no way to close a tab. `closable` now puts a ✕ on the tabs and binds `Delete`/`Backspace`;
+  `closable: false` on a single tab pins it, `closable: true` opts one in when the row-level prop is absent.
+
+  The ✕ is deliberately **not** a button. `role="tab"` makes its descendants presentational, so a nested `<button>`
+  disappears for a screen reader (axe: `nested-interactive`). It is an `aria-hidden` `<span>`, the tab's own click
+  handler tells the two hit areas apart, and closable tabs carry `aria-keyshortcuts="Delete"` — otherwise only a
+  sighted mouse user would ever learn the shortcut. A disabled tab closes by neither route: `aria-disabled` covers
+  all interaction, and closing is interaction.
+
+  The component emits `close(value)` and touches neither `tabs` nor `modelValue`: the list belongs to the consumer,
+  and closing may not go through ("save changes?") — switching the tab in advance would be a lie. What it does take
+  care of is focus: once the list has actually shrunk, focus returns to the tab that took the closed one's place,
+  instead of falling into `<body>` with the button that vanished.
+
+  An empty row no longer renders an empty `role="tablist"` — a role that must own `tab` children, with a text node
+  inside it, is an `aria-required-children` violation rather than an empty state. In its place is a block carrying
+  the new `gr.tabs.empty` (en/ru/es), overridable by `emptyText` and by the `#empty` slot, and it keeps the tab's
+  height so neighbours don't jump when the last tab closes.
+
 - **`GrForm` validates files with a rule.** File constraints lived only on the field (`accept`, `limit`,
   `validators` on `GrFormFile`), so the form knew nothing about them: `validate()` called the field valid, `invalid`
   never mentioned it, scroll-to-error skipped it, and "the contract is required and must be a PDF under 5 MB" could

@@ -3,6 +3,9 @@ import {
   tabBadgeBase,
   tabBadgeSizes,
   tabBase,
+  tabCloseBase,
+  tabCloseIconSizes,
+  tabCloseSizes,
   tabContentClass,
   tabIconClass,
   tablistBase,
@@ -12,6 +15,7 @@ import {
   tablistSizes,
   tablistVariants,
   tablistVerticalVariants,
+  tabsEmptyBase,
   tabSizes,
   tabStateClasses,
   tabVariantBase,
@@ -20,6 +24,8 @@ import {
 export const grTabsSafelist = [...new Set([
   ...Object.values(tabSizes).flatMap(splitClassTokens),
   ...Object.values(tabBadgeSizes).flatMap(splitClassTokens),
+  ...Object.values(tabCloseSizes).flatMap(splitClassTokens),
+  ...Object.values(tabCloseIconSizes).flatMap(splitClassTokens),
   ...Object.values(tablistSizes).flatMap(splitClassTokens),
   ...Object.values(tablistLineSizes).flatMap(splitClassTokens),
   ...Object.values(tablistVariants).flatMap(splitClassTokens),
@@ -37,4 +43,6 @@ export const grTabsSafelist = [...new Set([
   ...splitClassTokens(tabBadgeBase),
   ...splitClassTokens(tabContentClass),
   ...splitClassTokens(tabIconClass),
+  ...splitClassTokens(tabCloseBase),
+  ...splitClassTokens(tabsEmptyBase),
 ])]

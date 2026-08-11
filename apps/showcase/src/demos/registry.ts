@@ -272,6 +272,7 @@ export const demoPathByPreviewKey = {
   'gr-tabs-activation':                     'components/gr-tabs/GrTabsActivationDemo.vue',
   'gr-tabs-badge-navigation':               'components/gr-tabs/GrTabsBadgeDemo.vue',
   'gr-tabs-basic-switch':                   'components/gr-tabs/GrTabsBasicSwitchDemo.vue',
+  'gr-tabs-closable':                       'components/gr-tabs/GrTabsClosableDemo.vue',
   'gr-tabs-panel-layout':                   'components/gr-tabs/GrTabsPanelLayoutDemo.vue',
   'gr-tabs-sizes':                          'components/gr-tabs/GrTabsSizesDemo.vue',
   'gr-textarea-autosize':                   'components/gr-textarea/GrTextareaAutosizeDemo.vue',
