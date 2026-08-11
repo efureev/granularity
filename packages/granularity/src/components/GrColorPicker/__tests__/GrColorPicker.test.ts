@@ -25,6 +25,15 @@ function panel(): HTMLElement | null {
   return layer?.style.display === 'none' ? null : node
 }
 
+/** Текст, который диктор прочитает как описание триггера. */
+function describedText(wrapper: ReturnType<typeof mountPicker>, ids?: string): string {
+  return (ids ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(id => wrapper.find(`[id="${id}"]`).text())
+    .join(' ')
+}
+
 function sliderOf(channel: string): HTMLElement | null {
   return document.querySelector(`[data-gr-color-picker-channel="${channel}"] [role="slider"]`)
 }
@@ -209,7 +218,22 @@ describe('GrColorPicker', () => {
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
-    expect(wrapper.get('[data-gr-color-picker-trigger]').attributes('aria-readonly')).toBe('true')
+
+    // `aria-readonly` роль `button` не поддерживает (axe: `aria-allowed-attr`),
+    // поэтому состояние объявлено описанием триггера.
+    const trigger = wrapper.get('[data-gr-color-picker-trigger]')
+    expect(trigger.attributes('aria-readonly')).toBeUndefined()
+    expect(describedText(wrapper, trigger.attributes('aria-describedby'))).toContain('Read only')
+
+    wrapper.unmount()
+  })
+
+  it('обязательность объявлена описанием, а не запрещённым атрибутом', () => {
+    const wrapper = mountPicker({ required: true })
+    const trigger = wrapper.get('[data-gr-color-picker-trigger]')
+
+    expect(trigger.attributes('aria-required')).toBeUndefined()
+    expect(describedText(wrapper, trigger.attributes('aria-describedby'))).toContain('required')
 
     wrapper.unmount()
   })

@@ -168,8 +168,24 @@ const errorsId = useId()
 const displayedErrors = computed(() => props.errors ?? localErrors.value)
 const hasLocalErrors = computed(() => displayedErrors.value.length > 0)
 
+/**
+ * `aria-required` и `aria-readonly` роль `button` не поддерживает — axe роняет
+ * это как critical `aria-allowed-attr`. Состояния уходят в описание кнопки:
+ * иначе они пропали бы для диктора совсем (маркер `*` у `GrFormField`
+ * декоративен и скрыт).
+ */
+const stateHintId = useId()
+const stateHint = computed(() => [
+  isRequired.value ? t('gr.form.required', 'This field is required') : undefined,
+  isReadonly.value ? t('gr.form.readonly', 'Read only') : undefined,
+].filter(Boolean).join('. ') || undefined)
+
 const describedByIds = computed(() => {
-  return [field?.describedById.value, hasLocalErrors.value ? errorsId : undefined]
+  return [
+    field?.describedById.value,
+    hasLocalErrors.value ? errorsId : undefined,
+    stateHint.value ? stateHintId : undefined,
+  ]
     .filter(Boolean)
     .join(' ') || undefined
 })
@@ -392,6 +408,8 @@ watch(
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
+    <span v-if="stateHint" :id="stateHintId" class="sr-only">{{ stateHint }}</span>
+
     <input
       ref="inputRef"
       data-gr-form-file-input
@@ -415,8 +433,6 @@ watch(
           data-gr-form-file-upload-btn
           :aria-describedby="describedByIds"
           :aria-invalid="showsInvalid ? 'true' : undefined"
-          :aria-required="isRequired ? 'true' : undefined"
-          :aria-readonly="isReadonly ? 'true' : undefined"
           :aria-label="ariaLabel"
           :disabled="isDisabled"
           @click.prevent="openDialog"

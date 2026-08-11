@@ -11,7 +11,7 @@
  * не берётся намеренно: это свой виджет со своей клавиатурой по двум осям, и
  * доступность там пришлось бы собирать с нуля.
  */
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -95,7 +95,6 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrColorP
 
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
 const {
   disabled: isDisabled,
   invalid: isInvalid,
@@ -104,6 +103,23 @@ const {
   // «Ввод не принимается» — `disabled` или `readonly`: значение видно, но не меняется.
   locked: isLocked,
 } = useGrFormControl(() => props)
+
+/**
+ * `aria-required` и `aria-readonly` роль `button` не поддерживает — axe роняет
+ * это как critical `aria-allowed-attr`. Состояния уходят в описание триггера:
+ * иначе они пропали бы для диктора совсем (маркер `*` у `GrFormField`
+ * декоративен и скрыт).
+ */
+const stateHintId = useId()
+const stateHint = computed(() => [
+  isRequired.value ? t('gr.form.required', 'This field is required') : undefined,
+  isReadonly.value ? t('gr.form.readonly', 'Read only') : undefined,
+].filter(Boolean).join('. ') || undefined)
+
+const describedBy = computed(() => [
+  field?.describedById.value,
+  stateHint.value ? stateHintId : undefined,
+].filter(Boolean).join(' ') || undefined)
 
 const triggerEl = ref<HTMLElement | null>(null)
 
@@ -250,6 +266,8 @@ const trackVars = computed<Record<string, string>>(() => {
          контрола внутри виджета быть не должно. -->
     <input v-if="name" type="hidden" :name="name" :value="hexValue">
 
+    <span v-if="stateHint" :id="stateHintId" class="sr-only">{{ stateHint }}</span>
+
     <GrPopover
       v-model:open="panelOpen"
       :size="resolvedSize"
@@ -269,8 +287,6 @@ const trackVars = computed<Record<string, string>>(() => {
           :aria-label="ariaLabel"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid ? 'true' : undefined"
-          :aria-required="isRequired ? 'true' : undefined"
-          :aria-readonly="isReadonly ? 'true' : undefined"
           @focus="emit('focus', $event)"
           @blur="emit('blur', $event)"
         >

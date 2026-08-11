@@ -28,6 +28,17 @@ import { componentPath } from './components'
  */
 test.use({ reducedMotion: 'reduce' })
 
+/**
+ * Липкая шапка витрины перекрывает верх `#live-examples`, поэтому попадает в
+ * снимок элемента — вместе с номером версии пакета. Без маски любой бамп
+ * версии расходится с эталонами на всех страницах сразу (144 файла), хотя ни
+ * один компонент не менялся. Маскируем: предмет гейта — компоненты, а не хром
+ * витрины.
+ */
+async function chrome(page: import('@playwright/test').Page) {
+  return [page.locator('.showcase-header')]
+}
+
 const VISUAL_COMPONENTS = [
   // Форм-контролы: на них завязана бо́льшая часть цветовых токенов.
   'GrButton',
@@ -91,7 +102,9 @@ for (const theme of ['light', 'dark'] as const) {
         // Даём шрифтам/иконкам дорисоваться.
         await page.waitForLoadState('networkidle')
 
-        await expect(examples).toHaveScreenshot(`${componentPath(name).replace('/', '-')}-${theme}.png`)
+        await expect(examples).toHaveScreenshot(`${componentPath(name).replace('/', '-')}-${theme}.png`, {
+          mask: await chrome(page),
+        })
       })
     }
   })

@@ -75,6 +75,7 @@
     "url": "Introduce una URL válida",
     "file": "Archivo no válido",
     "invalid": "Valor no válido",
+    "readonly": "Solo lectura",
     "validating": "Comprobando…"
   },
   "dialog": {

@@ -42,6 +42,21 @@ function hasAttr(root: Element, selector: string): boolean {
   return root.matches?.(selector) || root.querySelector?.(selector) !== null
 }
 
+/**
+ * Текст, на который ссылается `aria-describedby` виджета. Пусто — состояние
+ * никем не объявлено.
+ */
+function describedText(root: Element, widget: string): string {
+  const node = root.matches?.(widget) ? root : root.querySelector(widget)
+  const ids = node?.getAttribute('aria-describedby')?.split(/\s+/) ?? []
+
+  // Селектор по атрибуту, а не `#id`: `CSS.escape` в jsdom нет, а авто-id
+  // приходят из `useId()` и экранирования всё равно требовать не должны.
+  return ids
+    .map(id => root.querySelector(`[id="${id}"]`)?.textContent ?? '')
+    .join(' ')
+}
+
 type Control = {
   name: string
   props: Record<string, unknown>
@@ -49,6 +64,18 @@ type Control = {
   widget: string
   /** Контрол не редактируется в принципе — `readonly` к нему неприменим. */
   noReadonly?: boolean
+  /**
+   * Виджет — `<button>`, а роль `button` не поддерживает ни `aria-required`,
+   * ни `aria-readonly`: axe роняет их как critical `aria-allowed-attr`.
+   * Такие контролы объявляют состояние текстом в описании (`aria-describedby`).
+   */
+  stateInDescription?: boolean
+  /**
+   * Элемент, чьё описание проверяется при `stateInDescription`. Не задан —
+   * сам `widget`; у `GrFormFile` виджет-корень, а подпись и описание живут на
+   * кнопке выбора файла.
+   */
+  describedWidget?: string
 }
 
 const controls: { component: unknown, meta: Control }[] = [
@@ -66,8 +93,8 @@ const controls: { component: unknown, meta: Control }[] = [
   { component: GrSlider, meta: { name: 'GrSlider', props: { modelValue: 0 }, widget: '[role="slider"]' } },
   { component: GrRating, meta: { name: 'GrRating', props: { modelValue: 0 }, widget: '[data-gr-rating]' } },
   { component: GrSegmented, meta: { name: 'GrSegmented', props: { modelValue: 'a', options: [{ value: 'a', label: 'A' }] }, widget: '[role="radiogroup"]' } },
-  { component: GrColorPicker, meta: { name: 'GrColorPicker', props: { modelValue: '#3b82f6' }, widget: '[data-gr-color-picker-trigger]' } },
-  { component: GrFormFile, meta: { name: 'GrFormFile', props: { modelValue: null }, widget: '[data-gr-form-file]' } },
+  { component: GrColorPicker, meta: { name: 'GrColorPicker', props: { modelValue: '#3b82f6' }, widget: '[data-gr-color-picker-trigger]', stateInDescription: true } },
+  { component: GrFormFile, meta: { name: 'GrFormFile', props: { modelValue: null }, widget: '[data-gr-form-file]', stateInDescription: true, describedWidget: '[data-gr-form-file-upload-btn]' } },
   { component: GrFileUpload, meta: { name: 'GrFileUpload', props: {}, widget: '[data-gr-file-upload]' } },
 ]
 
@@ -142,11 +169,24 @@ describe('контракт форм-контрола', () => {
         ).toBe(true)
       })
 
-      it('принимает required и объявляет его через aria-required', async () => {
+      it('принимает required и объявляет его', async () => {
         const wrapper = mount(component as never, {
           props: { ...meta.props, required: true } as never,
         })
         await nextTick()
+
+        if (meta.stateInDescription) {
+          // На кнопке `aria-required` запрещён — состояние уходит в описание.
+          expect(
+            hasAttr(wrapper.element as Element, '[aria-required="true"]'),
+            'на кнопке `aria-required` недопустим — axe роняет его как critical',
+          ).toBe(false)
+          expect(
+            describedText(wrapper.element as Element, meta.describedWidget ?? meta.widget),
+            'обязательность не объявлена ни атрибутом, ни описанием',
+          ).toContain('required')
+          return
+        }
 
         expect(
           hasAttr(wrapper.element as Element, '[aria-required="true"]'),
@@ -171,6 +211,14 @@ describe('контракт форм-контрола', () => {
           }),
         }))
         await nextTick()
+
+        if (meta.stateInDescription) {
+          expect(
+            describedText(wrapper.element as Element, meta.describedWidget ?? meta.widget),
+            'контрол не прочитал readonly из контекста поля',
+          ).toContain('Read only')
+          return
+        }
 
         expect(
           /aria-readonly="true"|readonly=""|readonly="readonly"/.test(wrapper.html()),

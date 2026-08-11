@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrColorPicker` and `GrFormFile` no longer put `aria-required`/`aria-readonly` on a button.** Neither attribute is
+  supported by role `button`, and axe reports them as a critical `aria-allowed-attr` violation — the colour picker hit
+  it as soon as a form rule made its field required. The states are not dropped, though: both controls now announce
+  them in the accessible description of their widget, since `GrFormField`'s `*` marker is decorative and hidden. The
+  contract gate learned the distinction rather than the exception — a control whose widget is a button is checked for
+  the description, and for the *absence* of the forbidden attribute.
+
+- New i18n key `gr.form.readonly` in all three locales: without it the read-only state of those two controls had
+  nothing to be announced with.
+
 ## [v0.16.0] 2026-08-11
 
 ### Changed — BREAKING

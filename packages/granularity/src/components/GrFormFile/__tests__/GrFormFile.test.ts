@@ -328,7 +328,13 @@ describe('GrFormFile — readonly', () => {
     })
 
     expect(wrapper.text()).toContain('contract.pdf')
-    expect(wrapper.get('[data-gr-form-file-upload-btn]').attributes('aria-readonly')).toBe('true')
+    // `aria-readonly` на кнопке запрещён (axe: `aria-allowed-attr`) — состояние
+    // объявлено её описанием.
+    const button = wrapper.get('[data-gr-form-file-upload-btn]')
+    expect(button.attributes('aria-readonly')).toBeUndefined()
+    const describedBy = button.attributes('aria-describedby') ?? ''
+    expect(describedBy.split(/\s+/).filter(Boolean).map(id => wrapper.find(`[id="${id}"]`).text()).join(' '))
+      .toContain('Read only')
 
     // Кнопка, которая заведомо ничего не сделает, — не защита, а шум.
     expect(wrapper.find('[data-gr-form-file-clear-all-btn]').exists()).toBe(false)

@@ -74,6 +74,7 @@
     "url": "Enter a valid URL",
     "file": "Invalid file",
     "invalid": "Invalid value",
+    "readonly": "Read only",
     "validating": "Checking…"
   },
   "dialog": {
