@@ -266,7 +266,17 @@
     "shift": "Shift",
     "control": "Control",
     "enter": "Enter",
-    "escape": "Escape"
+    "escape": "Escape",
+    "tab": "Tab",
+    "backspace": "Backspace",
+    "delete": "Delete",
+    "pageUp": "Page Up",
+    "pageDown": "Page Down",
+    "arrowUp": "Arrow Up",
+    "arrowDown": "Arrow Down",
+    "arrowLeft": "Arrow Left",
+    "arrowRight": "Arrow Right",
+    "then": "then"
   },
   "link": {
     "opensInNewTab": "opens in a new tab"

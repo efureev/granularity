@@ -22,4 +22,11 @@ export const grKbdExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-kbd-navbar-search',
   },
+  {
+    id: 'kbd-variants',
+    title: 'Одна плашка, отдельные клавиши, аккорд',
+    description: 'По умолчанию сочетание рисуется одной плашкой — так его пишут сами системы: `⌘K` на macOS и `Ctrl+K` на прочих (разделитель ставится сам: символы склеиваются, слова — нет). `split` возвращает плашку на клавишу, `sequence` — аккорд «G затем I». Клавиши без букв приходят токенами (`up`, `tab`, `backspace`), и диктор получает имя вместо глифа.',
+    status: 'ready',
+    previewKey: 'gr-kbd-variants',
+  },
 ]

@@ -43,7 +43,7 @@ const { toggle } = useShowcaseSearch()
       собственным `inline-flex`, и кто победит, решал бы порядок правил в CSS.
     -->
     <span class="ml-auto hidden md:inline-flex">
-      <GrKbd keys="mod+K" size="sm" separator="" aria-hidden="true" />
+      <GrKbd keys="mod+K" size="sm" aria-hidden="true" />
     </span>
   </button>
 </template>

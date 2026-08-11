@@ -32,6 +32,16 @@ export function isEditableTarget(target: EventTarget | null): boolean {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
 }
 
+/**
+ * macOS определяем по платформе: от неё зависит, чем является токен `mod` —
+ * Cmd или Ctrl. Живёт здесь, а не рядом с одним потребителем: то же нужно
+ * `GrKbd` (что показать), палитре (что слушать) и директиве `v-hotkey`.
+ */
+export function isAppleDevice(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
+}
+
 /** Физический код клавиши для латинской буквы или цифры; иначе `null`. */
 export function codeForChar(ch: string): string | null {
   if (/^[a-z]$/i.test(ch)) return `Key${ch.toUpperCase()}`

@@ -1,6 +1,6 @@
 import type { Directive } from 'vue'
 
-import { eventMatchesKey, isComposingEvent, isEditableTarget, shiftSatisfied } from '../internal/keyboard'
+import { eventMatchesKey, isAppleDevice, isComposingEvent, isEditableTarget, shiftSatisfied } from '../internal/keyboard'
 
 export type HotkeyHandler = (event: KeyboardEvent) => void
 
@@ -39,6 +39,8 @@ type ParsedHotkey = {
   key: string
   ctrl: boolean
   meta: boolean
+  /** `mod` — Cmd на macOS, Ctrl на прочих: подсказка и привязка пишутся одинаково. */
+  mod: boolean
   alt: boolean
   shift: boolean
   entry: HotkeyEntry
@@ -85,6 +87,7 @@ function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
 
     let ctrl = false
     let meta = false
+    let mod = false
     let alt = false
     let shift = false
 
@@ -92,29 +95,36 @@ function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
     if (!keyToken) continue
     for (const p of parts.slice(0, -1)) {
       const t = p.toLowerCase()
-      if (t === 'ctrl' || t === 'control') ctrl = true
+      if (t === 'mod') mod = true
+      else if (t === 'ctrl' || t === 'control') ctrl = true
       else if (t === 'meta' || t === 'cmd' || t === 'command' || t === '⌘') meta = true
       else if (t === 'alt' || t === 'option') alt = true
       else if (t === 'shift') shift = true
     }
 
     const key = normalizeKeyToken(keyToken)
-    parsed.push({ original: combo, key, ctrl, meta, alt, shift, entry })
+    parsed.push({ original: combo, key, ctrl, meta, mod, alt, shift, entry })
   }
 
   return parsed
 }
 
 function matchesHotkey(event: KeyboardEvent, hk: ParsedHotkey): boolean {
-  if (hk.ctrl !== event.ctrlKey) return false
-  if (hk.meta !== event.metaKey) return false
+  // Платформа читается в момент события: `navigator` в теле модуля на сервере
+  // либо отсутствует, либо отвечает не за ту машину.
+  const apple = hk.mod ? isAppleDevice() : false
+  const expectMeta = hk.meta || (hk.mod && apple)
+  const expectCtrl = hk.ctrl || (hk.mod && !apple)
+
+  if (expectCtrl !== event.ctrlKey) return false
+  if (expectMeta !== event.metaKey) return false
   if (hk.alt !== event.altKey) return false
   if (!shiftSatisfied(event, hk.key, hk.shift)) return false
 
   // По физическому коду матчатся только комбинации с модификаторами: там
   // клавиша — позиция на клавиатуре, и `Ctrl+K` обязан работать на любой
   // раскладке. Одиночная клавиша — печатная, её раскладка и определяет.
-  return eventMatchesKey(event, hk.key, { codeFallback: hk.ctrl || hk.meta || hk.alt })
+  return eventMatchesKey(event, hk.key, { codeFallback: expectCtrl || expectMeta || hk.alt })
 }
 
 function resolveEntry(entry: HotkeyEntry) {
@@ -174,12 +184,12 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
           const entry = resolveEntry(hk.entry)
 
           // По умолчанию не перехватываем "простые" клавиши во время ввода.
-          const hasModifier = hk.ctrl || hk.meta || hk.alt || hk.shift
+          const hasModifier = hk.ctrl || hk.meta || hk.mod || hk.alt || hk.shift
           if (editable && !entry.allowInEditable && !hasModifier && hk.key !== 'Escape') {
             continue
           }
 
-          const preventDefault = entry.preventDefault ?? (hk.ctrl || hk.meta || hk.alt)
+          const preventDefault = entry.preventDefault ?? (hk.ctrl || hk.meta || hk.mod || hk.alt)
           if (preventDefault) event.preventDefault()
           if (entry.stopPropagation) event.stopPropagation()
 

@@ -173,6 +173,7 @@ export const demoPathByPreviewKey = {
   'gr-kbd-basic':                           'components/gr-kbd/GrKbdBasicDemo.vue',
   'gr-kbd-hotkey-hints':                    'components/gr-kbd/GrKbdHotkeyHintsDemo.vue',
   'gr-kbd-navbar-search':                   'components/gr-kbd/GrKbdNavbarSearchDemo.vue',
+  'gr-kbd-variants':                        'components/gr-kbd/GrKbdVariantsDemo.vue',
   'gr-link-builder':                        'components/gr-link/GrLinkBuilderDemo.vue',
   'gr-link-disabled-states':                'components/gr-link/GrLinkDisabledStatesDemo.vue',
   'gr-link-external':                       'components/gr-link/GrLinkExternalDemo.vue',

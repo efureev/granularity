@@ -495,7 +495,7 @@ defineExpose({ open, close, toggle })
           <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" />
         </span>
         <span v-else-if="hotkeyHint.length" class="shrink-0" aria-hidden="true">
-          <GrKbd :keys="hotkeyHint" separator="" size="sm" />
+          <GrKbd :keys="hotkeyHint" size="sm" />
         </span>
       </div>
 
@@ -575,7 +575,7 @@ defineExpose({ open, close, toggle })
                   </span>
                 </span>
                 <span v-if="entry.item.shortcut?.length" class="shrink-0">
-                  <GrKbd :keys="entry.item.shortcut" separator="" size="sm" />
+                  <GrKbd :keys="entry.item.shortcut" size="sm" />
                 </span>
               </slot>
             </div>

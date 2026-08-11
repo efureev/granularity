@@ -138,3 +138,107 @@ describe('GrKbd — сочетания', () => {
     expect(wrapper.text()).toBe('Esc')
   })
 })
+
+describe('GrKbd — варианты сочетания', () => {
+  /**
+   * Что видно на экране: `text()` включает и `sr-only`-имена символов, а они
+   * произносятся вместо глифа, но не рисуются.
+   */
+  function visibleText(wrapper: { element: Element }): string {
+    const clone = wrapper.element.cloneNode(true) as HTMLElement
+    for (const hidden of clone.querySelectorAll('.sr-only')) hidden.remove()
+
+    return (clone.textContent ?? '').replace(/\s+/g, '')
+  }
+
+  /** Рамку носит либо общая плашка, либо каждая клавиша — но не обе сразу. */
+  function hasChrome(className: string): boolean {
+    return className.includes('var(--gr-brd)') && className.includes('var(--gr-muted)')
+  }
+
+  it('по умолчанию сочетание — одна плашка', () => {
+    const wrapper = mount(GrKbd, { props: { keys: 'mod+K', platform: 'apple' } })
+
+    expect(wrapper.get('[data-gr-kbd-combo]').attributes('data-variant')).toBe('merged')
+    expect(hasChrome(wrapper.attributes('class') ?? '')).toBe(true)
+    for (const key of wrapper.findAll('[data-gr-kbd-key]'))
+      expect(hasChrome(key.attributes('class') ?? '')).toBe(false)
+
+    // Разметка остаётся вложенными `<kbd>`: имена символов живут на них.
+    expect(wrapper.get('[data-gr-kbd-combo]').findAll('kbd')).toHaveLength(2)
+    expect(wrapper.text()).toContain('⌘')
+  })
+
+  it('`split` возвращает плашку на каждую клавишу', () => {
+    const wrapper = mount(GrKbd, { props: { keys: 'mod+K', variant: 'split', platform: 'apple' } })
+
+    expect(hasChrome(wrapper.attributes('class') ?? '')).toBe(false)
+    for (const key of wrapper.findAll('[data-gr-kbd-key]'))
+      expect(hasChrome(key.attributes('class') ?? '')).toBe(true)
+  })
+
+  // Так сочетания пишут сами системы: `⌘K` и `Ctrl+K`.
+  it('авто-разделитель склеивает символы и разделяет слова', () => {
+    const apple = mount(GrKbd, { props: { keys: 'mod+shift+K', platform: 'apple' } })
+    const other = mount(GrKbd, { props: { keys: 'mod+shift+K', platform: 'other' } })
+
+    expect(visibleText(apple)).toBe('⌘⇧K')
+    expect(visibleText(other)).toBe('Ctrl+Shift+K')
+  })
+
+  it('явный separator сильнее авто', () => {
+    const glued = mount(GrKbd, { props: { keys: 'ctrl+K', separator: '', platform: 'other' } })
+    const plus = mount(GrKbd, { props: { keys: 'mod+K', separator: '+', platform: 'apple' } })
+
+    expect(visibleText(glued)).toBe('CtrlK')
+    expect(visibleText(plus)).toBe('⌘+K')
+  })
+
+  it('`sequence` ставит между клавишами слово из локали', () => {
+    const wrapper = mount(GrKbd, { props: { keys: ['G', 'I'], variant: 'sequence', platform: 'other' } })
+
+    expect(wrapper.text()).toContain('then')
+    expect(wrapper.findAll('[data-gr-kbd-key]').map(k => k.text())).toEqual(['G', 'I'])
+  })
+
+  it('одиночная клавиша слотом не изменилась', () => {
+    const wrapper = mount(GrKbd, { slots: { default: 'Esc' } })
+
+    expect(wrapper.find('[data-gr-kbd-combo]').exists()).toBe(false)
+    expect(hasChrome(wrapper.attributes('class') ?? '')).toBe(true)
+  })
+})
+
+describe('GrKbd — словарь клавиш', () => {
+  it.each([
+    ['up', '↑', 'Arrow Up'],
+    ['down', '↓', 'Arrow Down'],
+    ['left', '←', 'Arrow Left'],
+    ['right', '→', 'Arrow Right'],
+    ['tab', '⇥', 'Tab'],
+    ['backspace', '⌫', 'Backspace'],
+    ['delete', '⌦', 'Delete'],
+    ['pageup', '⇞', 'Page Up'],
+    ['pagedown', '⇟', 'Page Down'],
+  ])('%s — глиф и читаемое имя', (token, glyph, name) => {
+    const wrapper = mount(GrKbd, { props: { keys: [token], platform: 'apple' } })
+    const key = wrapper.get('[data-gr-kbd-key]')
+
+    expect(key.text()).toContain(glyph)
+    // Глиф от диктора скрыт, имя произносится вместо него.
+    expect(key.get('.sr-only').text()).toBe(name)
+  })
+
+  it('вне macOS у части клавиш слова, а стрелки остаются стрелками', () => {
+    const wrapper = mount(GrKbd, { props: { keys: ['tab', 'up'], variant: 'split', platform: 'other' } })
+
+    expect(wrapper.findAll('[data-gr-kbd-key]').map(k => k.text())).toEqual(['Tab', '↑Arrow Up'])
+  })
+
+  it('алиасы и регистр не важны', () => {
+    const short = mount(GrKbd, { props: { keys: ['pgup', 'del'], platform: 'other' } })
+    const long = mount(GrKbd, { props: { keys: ['PageUp', 'Delete'], platform: 'other' } })
+
+    expect(short.text()).toBe(long.text())
+  })
+})

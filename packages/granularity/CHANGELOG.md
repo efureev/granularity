@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **A key combination is one chip now.** `<GrKbd keys="mod+K" />` used to render `[⌘] [K]` — two bordered keys —
+  which is honest markup but not how the systems themselves write a shortcut. The default is `variant="merged"`:
+  `⌘K` on macOS, `Ctrl+K` elsewhere. `variant="split"` brings the old look back, and a single key in the slot
+  (`<GrKbd>Esc</GrKbd>`) is untouched. The markup stays nested `<kbd>` in every variant — only the border moves
+  from the inner keys to the outer chip, so the readable names of symbol keys survive.
+
+  The `separator` default changes with it: it is no longer `+` but **auto**. In a merged chip a separator is
+  inserted only after a word, which yields `⌘⇧K` and `Ctrl+Shift+K` — within one platform the set is homogeneous
+  (macOS gives symbols, the rest give words), so "glue after a symbol" is exactly "write it the way the OS does".
+  An explicit `separator` still wins.
+
+### Added
+
+- **`GrKbd` knows the rest of the keyboard**: `tab`, `backspace`, `delete`, `pageup`/`pagedown`, `home`, `end` and
+  the four arrows, each with a readable name behind the glyph. Until now those keys were written as bare glyphs in
+  markup, and a screen reader announced `↑` as a symbol rather than as a key.
+
+- **`variant="sequence"`** for chords typed one key after another (`G` then `I`), with the connecting word coming
+  from the locale.
+
+- **`v-hotkey` understands the `mod` token** — the same one `GrKbd` and `GrCommandPalette` already spoke. A binding
+  and its hint are now written identically (`v-hotkey="{ 'mod+K': open }"` next to `<GrKbd keys="mod+K" />`);
+  before, the directive needed `Meta+K` and `Ctrl+K` spelled out separately, and the two drifted apart silently.
+
+- New i18n keys `gr.kbd.*` for the added keys and for the sequence connector, in all three locales.
+
 ### Fixed
 
 - **`GrColorPicker` and `GrFormFile` no longer put `aria-required`/`aria-readonly` on a button.** Neither attribute is

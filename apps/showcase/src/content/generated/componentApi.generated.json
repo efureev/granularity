@@ -5406,6 +5406,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "variant",
+            "description": "`merged` (по умолчанию) — сочетание одной плашкой, как его пишут сами системы: `⌘K` на macOS, `Ctrl+K` на прочих. `split` — по плашке на клавишу. `sequence` — аккорд «G затем I»: клавиши нажимают одну за другой.",
+            "type": "\"split\" | \"merged\" | \"sequence\" | undefined",
+            "required": false,
+            "default": "\"merged\""
+          },
+          {
             "name": "keys",
             "description": "Сочетание: строкой (`\"mod+shift+K\"`) или набором токенов (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.",
             "type": "string | string[] | undefined",
@@ -5421,10 +5428,10 @@
           },
           {
             "name": "separator",
-            "description": "Разделитель между клавишами сочетания. Пустая строка — только зазор.",
+            "description": "Разделитель между клавишами. Не задан — авто: в общей плашке символы склеиваются (`⌘K`), а слова разделяются плюсом (`Ctrl+K`); у `split` это плюс, у `sequence` — слово из локали. Пустая строка — только зазор.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"+\""
+            "default": "undefined"
           },
           {
             "name": "platform",

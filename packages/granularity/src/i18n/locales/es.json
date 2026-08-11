@@ -268,7 +268,17 @@
     "shift": "Mayús",
     "control": "Control",
     "enter": "Intro",
-    "escape": "Escape"
+    "escape": "Escape",
+    "tab": "Tab",
+    "backspace": "Retroceso",
+    "delete": "Suprimir",
+    "pageUp": "Página arriba",
+    "pageDown": "Página abajo",
+    "arrowUp": "flecha arriba",
+    "arrowDown": "flecha abajo",
+    "arrowLeft": "flecha izquierda",
+    "arrowRight": "flecha derecha",
+    "then": "luego"
   },
   "link": {
     "opensInNewTab": "se abre en una pestaña nueva"

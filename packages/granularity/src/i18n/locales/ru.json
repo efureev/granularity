@@ -270,7 +270,17 @@
     "shift": "Shift",
     "control": "Control",
     "enter": "Enter",
-    "escape": "Escape"
+    "escape": "Escape",
+    "tab": "Tab",
+    "backspace": "Backspace",
+    "delete": "Delete",
+    "pageUp": "Page Up",
+    "pageDown": "Page Down",
+    "arrowUp": "стрелка вверх",
+    "arrowDown": "стрелка вниз",
+    "arrowLeft": "стрелка влево",
+    "arrowRight": "стрелка вправо",
+    "then": "затем"
   },
   "link": {
     "opensInNewTab": "откроется в новой вкладке"

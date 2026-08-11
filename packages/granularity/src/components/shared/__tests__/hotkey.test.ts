@@ -72,13 +72,13 @@ describe('formatCommandHotkey', () => {
 
 describe('formatHotkeyToken', () => {
   it('mod зависит от платформы', () => {
-    expect(formatHotkeyToken('mod', true)).toEqual({ label: '⌘', name: 'command' })
+    expect(formatHotkeyToken('mod', true)).toEqual({ label: '⌘', name: 'command', symbol: true })
     expect(formatHotkeyToken('mod', false)).toEqual({ label: 'Ctrl' })
   })
 
   // Имя нужно символу: `⌘` диктор читает как знак, а `Ctrl` — как слово.
   it('читаемое имя добавляется только символам', () => {
-    expect(formatHotkeyToken('shift', true)).toEqual({ label: '⇧', name: 'shift' })
+    expect(formatHotkeyToken('shift', true)).toEqual({ label: '⇧', name: 'shift', symbol: true })
     expect(formatHotkeyToken('shift', false)).toEqual({ label: 'Shift' })
     expect(formatHotkeyToken('ctrl', false).name).toBeUndefined()
   })

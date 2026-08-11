@@ -15,16 +15,12 @@ import SearchIcon from '~icons/lucide/search'
 const isSearchOpen = ref(false)
 const lastPicked = ref<string | null>(null)
 
-/**
- * Директива разбирает конкретные модификаторы, а не токен `mod`, — платформы
- * перечисляются обе. Токен `mod` живёт уровнем выше: его понимают `GrKbd`
- * (что показать) и `GrCommandPalette` (что слушать).
- */
-const openSearch = { handler: () => (isSearchOpen.value = true), stopPropagation: true }
-
+/** Токен `mod` один и тот же в привязке и в подсказке: Cmd на macOS, Ctrl на прочих. */
 const searchHotkey = {
   scope: 'element' as const,
-  handlers: { 'Meta+K': openSearch, 'Ctrl+K': openSearch },
+  handlers: {
+    'mod+K': { handler: () => (isSearchOpen.value = true), stopPropagation: true },
+  },
 }
 
 const items: GrCommandItem[] = [
@@ -66,7 +62,7 @@ function onSelect(item: GrCommandItem): void {
           <SearchIcon class="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>Поиск</span>
           <span class="ml-2 inline-flex" aria-hidden="true">
-            <GrKbd keys="mod+K" separator="" size="sm" />
+            <GrKbd keys="mod+K" size="sm" />
           </span>
         </button>
       </template>
@@ -75,7 +71,7 @@ function onSelect(item: GrCommandItem): void {
     </GrNavbar>
 
     <p class="text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]">
-      Нажмите <GrKbd keys="mod+K" separator="" size="sm" />, когда фокус внутри демо, — или кликните по кнопке.
+      Нажмите <GrKbd keys="mod+K" size="sm" />, когда фокус внутри демо, — или кликните по кнопке.
       <template v-if="lastPicked">
         Выбрано: <strong class="text-[var(--gr-fg)]">{{ lastPicked }}</strong>.
       </template>
