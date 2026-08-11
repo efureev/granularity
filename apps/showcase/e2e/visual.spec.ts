@@ -63,6 +63,7 @@ const VISUAL_COMPONENTS = [
   'GrPagination',
   'GrList',
   'GrProgressBar',
+  'GrProgressCircle',
   'GrSkeleton',
   'GrStatistic',
   'GrTimeline',

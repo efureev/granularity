@@ -102,6 +102,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrPagination`](./components/GrPagination.md)
 - [`GrPopover`](./components/GrPopover.md)
 - [`GrProgressBar`](./components/GrProgressBar.md)
+- [`GrProgressCircle`](./components/GrProgressCircle.md)
 - [`GrPromptDialog`](./components/GrPromptDialog.md)
 - [`GrRadio`](./components/GrRadio.md)
 - [`GrRadioGroup`](./components/GrRadioGroup.md)

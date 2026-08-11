@@ -2445,6 +2445,34 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Период пробега полосы в неопределённом режиме."
   },
   {
+    "owner": "GrProgressCircle",
+    "name": "--gr-progress-circle-size",
+    "kind": "hook",
+    "default": "2rem / 3rem / 4rem / 6rem по ступеням `xs…lg`",
+    "description": "Диаметр кольца. Геометрия дуги считается в единицах `viewBox`, поэтому масштаб можно менять свободно."
+  },
+  {
+    "owner": "GrProgressCircle",
+    "name": "--gr-progress-circle-track",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Цвет дорожки — непройденной части кольца."
+  },
+  {
+    "owner": "GrProgressCircle",
+    "name": "--gr-progress-circle-cap",
+    "kind": "hook",
+    "default": "round",
+    "description": "Торец дуги значения: `round` или `butt` для строгой шкалы."
+  },
+  {
+    "owner": "GrProgressCircle",
+    "name": "--gr-progress-circle-value-size",
+    "kind": "hook",
+    "default": "кегль по ступени `size`",
+    "description": "Кегль содержимого в центре кольца: свой формат значения может не влезть в дефолтный."
+  },
+  {
     "owner": "GrRating",
     "name": "--gr-rating-color",
     "kind": "hook",

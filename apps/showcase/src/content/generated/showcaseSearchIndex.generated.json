@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 64 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 65 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -845,6 +845,17 @@
     "context": "feedback / component",
     "searchableTitle": "grprogressbar",
     "searchableContent": "grprogressbar grprogressbar shows the progress of a task or a loading process. feedback component /components/gr-progress-bar packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grprogressbar generated public-api components components gr-progress-bar gr progress bar"
+  },
+  {
+    "id": "entity:component:GrProgressCircle",
+    "title": "GrProgressCircle",
+    "description": "Shows progress as a ring or a gauge, with the value in the middle.",
+    "href": "/components/gr-progress-circle",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "feedback / component",
+    "searchableTitle": "grprogresscircle",
+    "searchableContent": "grprogresscircle grprogresscircle shows progress as a ring or a gauge, with the value in the middle. feedback component /components/gr-progress-circle packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grprogresscircle generated public-api components components gr-progress-circle gr progress circle"
   },
   {
     "id": "entity:component:GrPromptDialog",
@@ -3188,6 +3199,50 @@
     "context": "GrProgressBar",
     "searchableTitle": "grprogressbar integration notes",
     "searchableContent": "grprogressbar shows the progress of a task or a loading process. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrProgressCircle:section:overview",
+    "title": "GrProgressCircle / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-progress-circle#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrProgressCircle",
+    "searchableTitle": "grprogresscircle component overview",
+    "searchableContent": "grprogresscircle shows progress as a ring or a gauge, with the value in the middle. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrProgressCircle:section:live-examples",
+    "title": "GrProgressCircle / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-progress-circle#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrProgressCircle",
+    "searchableTitle": "grprogresscircle live examples",
+    "searchableContent": "grprogresscircle shows progress as a ring or a gauge, with the value in the middle. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrProgressCircle:section:api",
+    "title": "GrProgressCircle / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-progress-circle#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrProgressCircle",
+    "searchableTitle": "grprogresscircle generated api",
+    "searchableContent": "grprogresscircle shows progress as a ring or a gauge, with the value in the middle. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrProgressCircle:section:integration-notes",
+    "title": "GrProgressCircle / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-progress-circle#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrProgressCircle",
+    "searchableTitle": "grprogresscircle integration notes",
+    "searchableContent": "grprogresscircle shows progress as a ring or a gauge, with the value in the middle. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrPromptDialog:section:overview",

@@ -6790,6 +6790,120 @@
       }
     ]
   },
+  "GrProgressCircle": {
+    "name": "GrProgressCircle",
+    "sourcePath": "packages/granularity/src/components/GrProgressCircle/GrProgressCircle.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "Цветовая тональность дуги.",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "Диаметр кольца по шкале пакета.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Метка для скринридера (обязательна, если рядом нет видимого заголовка).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "shape",
+            "description": "Замкнутое кольцо или дуга с вырезом снизу.",
+            "type": "\"circle\" | \"dashboard\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Текущее значение `0..100`; выходящие за границы клампятся, `NaN` → `0`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "indeterminate",
+            "description": "Прогресс неизвестен: дуга бежит по кругу, значение наружу не объявляется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "thickness",
+            "description": "Толщина обводки в процентах диаметра. Не задана — по ступени `size`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showValue",
+            "description": "Показать значение в центре кольца. Слот по умолчанию сильнее.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "formatValue",
+            "description": "Свой формат значения. Управляет и подписью, и `aria-valuetext`.",
+            "type": "((value: number) => string) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "statusIcon",
+            "description": "На завершении — галочка, при `tone=\"danger\"` — крест вместо значения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "trackless",
+            "description": "Убрать дорожку: поверх картинки пустая часть кольца только шумит.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Содержимое центра вместо значения: иконка, две строки, кнопка отмены.",
+            "type": "{ value: number; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrPromptDialog": {
     "name": "GrPromptDialog",
     "sourcePath": "packages/granularity/src/components/GrPromptDialog/GrPromptDialog.vue",

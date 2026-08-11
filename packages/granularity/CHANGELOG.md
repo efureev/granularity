@@ -137,6 +137,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrProgressCircle`** — progress as a ring or a gauge, for the places a full-width bar does not fit: a
+  dashboard tile, an avatar upload, a metric card. `shape="dashboard"` cuts a quarter out of the bottom so a caption
+  fits under the value, and the reading stays the same in both shapes — the share of work done; only the length of
+  the track changes.
+
+  The markup is deliberately two-layered: `role="progressbar"` carries the SVG alone, and the centre sits next to it
+  as an absolutely positioned sibling. That is not cosmetic. A widget role makes its descendants presentational, so a
+  Cancel button inside the ring — the first thing an upload needs — would become `nested-interactive` and cost the
+  screen reader both the button and the indicator. The centre layer itself is inert to the pointer; interactive
+  content inside it turns events back on.
+
+  What shows in the middle follows a fixed precedence — slot, then status icon, then value. `showValue` prints the
+  percentage and `formatValue` replaces it with your own text (and drives `aria-valuetext` with it); `statusIcon`
+  swaps the number for a check at `value >= 100` and for a cross on `tone="danger"`, that is, only in terminal
+  states. An empty slot does not claim the centre: what counts is the content, not the fact that a slot was passed.
+
+  Tones come from the same theme layer as `GrProgressBar` (`--gr-progress-bg` and its siblings), each read with a
+  fallback to the theme role, so a granular import of the circle alone still gets its colour. `indeterminate` runs
+  the arc around the ring and announces no value at all; under `prefers-reduced-motion` it shows a closed neutral
+  ring rather than a frozen quarter arc, which would read as "25 % done".
+
 - **New `GrTimeline`** — an event feed with an axis, markers and day headings: order history, audit log, delivery
   status. Until now that shape was assembled by hand out of `GrList` plus home-made `::before` lines, and every
   application drew it differently.

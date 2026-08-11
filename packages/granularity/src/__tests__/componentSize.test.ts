@@ -37,6 +37,7 @@ import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrPagination from '../components/GrPagination/GrPagination.vue'
 import GrPopover from '../components/GrPopover/GrPopover.vue'
 import GrProgressBar from '../components/GrProgressBar/GrProgressBar.vue'
+import GrProgressCircle from '../components/GrProgressCircle/GrProgressCircle.vue'
 import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrRadioGroup from '../components/GrRadioGroup/GrRadioGroup.vue'
 import GrRating from '../components/GrRating/GrRating.vue'
@@ -138,6 +139,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
     render: () => h(GrPopover, { open: true, ariaLabel: 'P' }, { content: () => 'C' }),
   },
   { name: 'GrProgressBar', render: () => h(GrProgressBar, { value: 50 }) },
+  { name: 'GrProgressCircle', render: () => h(GrProgressCircle, { value: 50, ariaLabel: 'P' }) },
   { name: 'GrRadio', render: () => h(GrRadio, { modelValue: 'a', value: 'a' }) },
   {
     name: 'GrRadioGroup',

@@ -232,6 +232,10 @@
       "types": "./dist/types/src/components/GrProgressBar/index.d.ts",
       "import": "./dist/components/GrProgressBar/index.js"
     },
+    "./components/GrProgressCircle": {
+      "types": "./dist/types/src/components/GrProgressCircle/index.d.ts",
+      "import": "./dist/components/GrProgressCircle/index.js"
+    },
     "./components/GrPromptDialog": {
       "types": "./dist/types/src/components/GrPromptDialog/index.d.ts",
       "import": "./dist/components/GrPromptDialog/index.js"

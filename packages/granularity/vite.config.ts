@@ -204,6 +204,9 @@ export default defineConfig({
         'components/GrProgressBar/index': fileURLToPath(
           new URL('./src/components/GrProgressBar/index.ts', import.meta.url),
         ),
+        'components/GrProgressCircle/index': fileURLToPath(
+          new URL('./src/components/GrProgressCircle/index.ts', import.meta.url),
+        ),
         'components/GrPromptDialog/index': fileURLToPath(
           new URL('./src/components/GrPromptDialog/index.ts', import.meta.url),
         ),

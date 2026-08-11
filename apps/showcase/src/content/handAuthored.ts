@@ -5,7 +5,7 @@ import type {
 
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
-  feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
+  feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrProgressCircle', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
@@ -63,6 +63,7 @@ const componentSummaryOverrides = {
   GrPagination: 'Splits a long list into pages and manages navigation between them.',
   GrPopover: 'An anchored panel for a short form, settings or a confirmation right next to the trigger.',
   GrProgressBar: 'Shows the progress of a task or a loading process.',
+  GrProgressCircle: 'Shows progress as a ring or a gauge, with the value in the middle.',
   GrPromptDialog: 'Requests a short text input from the user in a dialog.',
   GrRadio: 'A single choice within a group of mutually exclusive options.',
   GrRadioGroup: 'Combines radio options into a single-choice selection flow.',
