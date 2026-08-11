@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrForm from '../GrForm.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
+import GrFormFile from '../../GrFormFile/GrFormFile.vue'
 import GrInput from '../../GrInput/GrInput.vue'
 import type { GrFormRules } from '../validation'
 
@@ -261,6 +262,43 @@ describe('GrForm — снимок, сброс и состояние', () => {
     expect('extra' in wrapper.vm.model).toBe(false)
   })
 
+  it('файл переживает снимок и сброс, а не превращается в пустой объект', async () => {
+    const wrapper = mount(editHarness())
+    const form = wrapper.vm.formRef!
+    const original = new File(['pdf'], 'contract.pdf', { type: 'application/pdf' })
+
+    wrapper.vm.model.doc = original
+    form.setSnapshot()
+
+    wrapper.vm.model.doc = new File(['other'], 'draft.pdf', { type: 'application/pdf' })
+    form.resetFields()
+    await flushValidation()
+
+    // JSON-клон терял `File` (у него нет ни перечислимых свойств, ни `toJSON`),
+    // и «сброс» клал в модель `{}` — мусор, который ушёл бы на сервер.
+    expect(wrapper.vm.model.doc).toBe(original)
+  })
+
+  it('isDirty видит подмену файла', async () => {
+    const wrapper = mount(editHarness())
+    const form = wrapper.vm.formRef!
+
+    wrapper.vm.model.doc = new File(['pdf'], 'contract.pdf', { type: 'application/pdf' })
+    form.setSnapshot()
+    await flushValidation()
+    expect(form.isDirty).toBe(false)
+
+    // Оба файла сериализовались в `{}`, поэтому «поменял документ» было
+    // неотличимо от «не трогал».
+    wrapper.vm.model.doc = new File(['other'], 'draft.pdf', { type: 'application/pdf' })
+    await flushValidation()
+    expect(form.isDirty).toBe(true)
+
+    form.resetFields()
+    await flushValidation()
+    expect(form.isDirty).toBe(false)
+  })
+
   it('isDirty гаснет после сброса, isValid отражает известные ошибки', async () => {
     const wrapper = mount(editHarness())
     const form = wrapper.vm.formRef!
@@ -275,6 +313,111 @@ describe('GrForm — снимок, сброс и состояние', () => {
     await flushValidation()
     expect(form.isDirty).toBe(false)
     expect(form.isValid).toBe(true)
+  })
+})
+
+describe('GrForm — файлы правилом формы', () => {
+  const rules: GrFormRules = {
+    doc: [{ required: true, file: { accept: '.pdf', maxSizeMb: 1 } }],
+  }
+
+  function fileHarness() {
+    return defineComponent({
+      components: { GrForm, GrFormField, GrFormFile },
+      setup() {
+        const model = reactive<Record<string, unknown>>({ doc: null })
+        const formRef = ref<InstanceType<typeof GrForm>>()
+        const submitted = ref(0)
+        return { model, rules, formRef, submitted, onSubmit: () => { submitted.value++ } }
+      },
+      template: `
+        <GrForm ref="formRef" :model="model" :rules="rules" @submit="onSubmit">
+          <GrFormField name="doc" label="Contract">
+            <GrFormFile v-model="model.doc" accept=".pdf" />
+          </GrFormField>
+          <button type="submit">Submit</button>
+        </GrForm>
+      `,
+    })
+  }
+
+  it('пустое обязательное файловое поле не пускает submit', async () => {
+    const wrapper = mount(fileHarness())
+
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    expect(wrapper.vm.submitted).toBe(0)
+    expect(errorTexts(wrapper)).toEqual(['This field is required'])
+  })
+
+  it('ограничение из rules отбивает файл и называет его', async () => {
+    const wrapper = mount(fileHarness())
+
+    wrapper.vm.model.doc = new File(['x'], 'photo.png', { type: 'image/png' })
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    expect(wrapper.vm.submitted).toBe(0)
+    // Текст приходит от того же валидатора, что работает внутри поля.
+    expect(errorTexts(wrapper)[0]).toContain('photo.png')
+  })
+
+  it('размер проверяется тем же правилом', async () => {
+    const wrapper = mount(fileHarness())
+
+    wrapper.vm.model.doc = new File([new Uint8Array(2 * 1024 * 1024)], 'big.pdf', { type: 'application/pdf' })
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    expect(wrapper.vm.submitted).toBe(0)
+    expect(errorTexts(wrapper)[0]).toContain('big.pdf')
+  })
+
+  it('корректный файл пропускает submit, а исправление снимает ошибку', async () => {
+    const wrapper = mount(fileHarness())
+
+    wrapper.vm.model.doc = new File(['x'], 'photo.png', { type: 'image/png' })
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+    expect(errorTexts(wrapper)).toHaveLength(1)
+
+    wrapper.vm.model.doc = new File(['x'], 'contract.pdf', { type: 'application/pdf' })
+    await flushValidation()
+    // Ре-валидация по change убирает ошибку, не дожидаясь второго submit.
+    expect(errorTexts(wrapper)).toEqual([])
+
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+    expect(wrapper.vm.submitted).toBe(1)
+  })
+
+  it('invalid несёт сообщение файлового правила', async () => {
+    const Harness = defineComponent({
+      components: { GrForm, GrFormField, GrFormFile },
+      setup() {
+        const model = reactive<Record<string, unknown>>({
+          doc: new File(['x'], 'photo.png', { type: 'image/png' }),
+        })
+        const payloads = ref<Record<string, string>[]>([])
+        return { model, rules, payloads, onInvalid: (e: Record<string, string>) => { payloads.value.push(e) } }
+      },
+      template: `
+        <GrForm :model="model" :rules="rules" @invalid="onInvalid">
+          <GrFormField name="doc" label="Contract">
+            <GrFormFile v-model="model.doc" />
+          </GrFormField>
+          <button type="submit">Submit</button>
+        </GrForm>
+      `,
+    })
+
+    const wrapper = mount(Harness)
+    await wrapper.get('button[type="submit"]').trigger('submit')
+    await flushValidation()
+
+    expect(wrapper.vm.payloads).toHaveLength(1)
+    expect(wrapper.vm.payloads[0].doc).toContain('photo.png')
   })
 })
 

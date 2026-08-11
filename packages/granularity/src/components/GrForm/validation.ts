@@ -7,6 +7,11 @@
  * дефолтные тексты остаются в компоненте, а движок ничего о них не знает.
  */
 
+import { resolveFileValidationMessage, type FileValidationIssue } from '../../fileValidation'
+import { runFileRule, type GrFormFileRule } from './fileRule'
+
+export type { GrFormFileRule } from './fileRule'
+
 export type GrFormTrigger = 'blur' | 'change' | 'submit'
 
 /** Результат кастомного валидатора: `true`/void — ок; `false` — ошибка (дефолт-текст); строка — текст ошибки. */
@@ -27,6 +32,8 @@ export interface GrFormRule {
   pattern?: RegExp
   /** Встроенный тип-валидатор. */
   type?: 'email' | 'url'
+  /** Ограничения для значения `File | File[]`: тип, размер, количество. */
+  file?: GrFormFileRule
   /** Кастомный (в т.ч. async) валидатор. Второй аргумент — весь `model`. */
   validator?: (value: unknown, model: Record<string, unknown>) => GrFormValidatorResult | Promise<GrFormValidatorResult>
   /** Когда правило срабатывает. По умолчанию — на любом триггере (blur/change/submit). */
@@ -36,7 +43,7 @@ export interface GrFormRule {
 export type GrFormRules = Record<string, GrFormRule | GrFormRule[]>
 
 /** Вид сработавшей проверки — ключ для дефолтного i18n-сообщения. */
-export type GrFormRuleFailure = 'required' | 'min' | 'max' | 'len' | 'pattern' | 'email' | 'url' | 'invalid'
+export type GrFormRuleFailure = 'required' | 'min' | 'max' | 'len' | 'pattern' | 'email' | 'url' | 'file' | 'invalid'
 
 export type GrFormMessageResolver = (
   kind: GrFormRuleFailure,
@@ -59,6 +66,7 @@ const DEFAULT_MESSAGES: Record<GrFormRuleFailure, string> = {
   pattern: 'Invalid format',
   email: 'Enter a valid email',
   url: 'Enter a valid URL',
+  file: 'Invalid file',
   invalid: 'Invalid value',
 }
 
@@ -71,7 +79,18 @@ const DEFAULT_MESSAGES: Record<GrFormRuleFailure, string> = {
  * прогнать те же правила вне формы, обязан был написать свой.
  */
 export function createGrFormMessageResolver(t: GrFormMessageTranslate): GrFormMessageResolver {
-  return (kind, rule, params) => rule.message ?? t(`gr.form.${kind}`, DEFAULT_MESSAGES[kind], params)
+  return (kind, rule, params) => {
+    if (rule.message) return rule.message
+
+    // Текст файловой ошибки приходит от самого валидатора и локализуется его же
+    // ключом (`gr.fileValidation.*`): иначе одно и то же «файл не того типа»
+    // звучало бы по-разному в поле и в форме. `gr.form.file` — фолбэк на случай
+    // вида `file` без issue: сюда движок не приходит, но резолвер публичный.
+    const issue = params.issue as FileValidationIssue | undefined
+    if (kind === 'file' && issue) return resolveFileValidationMessage(issue, t)
+
+    return t(`gr.form.${kind}`, DEFAULT_MESSAGES[kind], params)
+  }
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -165,6 +184,11 @@ export async function runFieldRules(
     if (rule.max != null && measure(value) > rule.max) return resolveMessage('max', rule, { max: rule.max })
 
     if (rule.pattern && !rule.pattern.test(String(value))) return resolveMessage('pattern', rule, {})
+
+    if (rule.file) {
+      const issue = await runFileRule(value, rule.file)
+      if (issue) return resolveMessage('file', rule, { issue })
+    }
 
     if (rule.validator) {
       const result = await rule.validator(value, model)

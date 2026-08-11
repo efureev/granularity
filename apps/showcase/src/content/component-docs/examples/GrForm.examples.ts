@@ -23,6 +23,14 @@ export const grFormExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-form-custom-control',    note: 'Тот же приём работает и для async-валидатора (например, проверка на сервере): `validator` может вернуть `Promise`. Любой контрол, который читает `useGrFormFieldContext()`, автоматически получает id/aria и попадает в валидацию.',
   },
   {
+    id: 'form-file-rules',
+    title: 'File constraints as form rules',
+    description: 'Правило `file` описывает тип, размер и количество файлов там же, где остальные правила формы: `rules: { contract: [{ required: true, file: { accept, maxSizeMb } }] }`. Проверку ведут те же валидаторы, что работают внутри `GrFormFile`, поэтому текст ошибки один и тот же — меняется только то, кто и когда о ней сообщает. У поля остаётся `accept` как фильтр диалога: это подсказка ОС, а не проверка.',
+    status: 'ready',
+    previewKey: 'gr-form-file-rules',
+    note: 'Ключи правила: `accept`, `extensions`, `mimeTypes`, `maxSizeMb` / `maxSizeBytes`, `maxCount`, `maxTotalSizeMb`, плюс люк `validators` для своих `FileValidator` (в том числе async). Если проблемных файлов несколько, поле показывает первую — подробный разбор по каждому остаётся за `GrFormFile`.',
+  },
+  {
     id: 'form-editing',
     title: 'Editing form: snapshot, dirty state and async rule',
     description: 'Данные приходят после монтирования, поэтому форма пересниает снимок через `setSnapshot()` — иначе «Сбросить» вернул бы пустоту, какой модель была до ответа сервера. `isDirty` блокирует кнопки, `disabled` выключает всю форму на время отправки, а асинхронное правило показывает состояние проверки вместо молчания. Поле «Имя» обязательно пропом `required`, без записи в `rules`, — и submit это проверяет.',

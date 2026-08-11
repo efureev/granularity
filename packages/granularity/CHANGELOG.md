@@ -33,6 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **A file survives `GrForm`'s snapshot.** The snapshot cloned the model through `JSON.parse(JSON.stringify(...))`,
+  and a `File` does not survive that: it has no enumerable own properties and no `toJSON`, so it collapsed into `{}`.
+  Two consequences, both silent. `resetFields()` put that `{}` into the field — the control looked reset, but the
+  model now held junk that would be posted to the server; `setSnapshot()` recorded the same `{}`. And `isDirty` could
+  not see files at all: every file serialized identically, so "picked a document" and "did not touch anything" were
+  the same string. The snapshot now keeps `File`/`Blob` by reference (identity is the point — reset must return *that*
+  file), and the dirty comparison fingerprints them by name, size and modification time. Everything else keeps its
+  JSON semantics, `Date` included.
+
 - **`GrSwitch` thumb sits evenly on every step.** The offsets were measured against the track's outer size, but the thumb
   moves inside its content box — 2px narrower because of the 1px border. The vertical gap is fixed by geometry at 1px, so
   the horizontal one had to match; instead it was 2px at rest on three steps out of four and 1–2px at the far end, which
@@ -101,6 +110,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   but the buttons looked alive, while the clear button in the same component already hides itself in that state.
 
 ### Added
+
+- **`GrForm` validates files with a rule.** File constraints lived only on the field (`accept`, `limit`,
+  `validators` on `GrFormFile`), so the form knew nothing about them: `validate()` called the field valid, `invalid`
+  never mentioned it, scroll-to-error skipped it, and "the contract is required and must be a PDF under 5 MB" could
+  not be written down in one place. The new `file` rule says it in `rules`, next to everything else:
+
+  ```ts
+  const rules: GrFormRules = {
+    contract: [{ required: true, file: { accept: '.pdf', maxSizeMb: 1 } }],
+  }
+  ```
+
+  Keys: `accept`, `extensions`, `mimeTypes`, `maxSizeMb` / `maxSizeBytes`, `maxCount`, `maxTotalSizeMb`, plus a
+  `validators` hatch for your own (including async) `FileValidator`. The rule contains no checks of its own — it
+  assembles the very validators from `@feugene/granularity/fileValidation` that `GrFormFile` and `v-dropzone` already
+  run, so a constraint moved from field props into the rule changes neither the behaviour nor the wording: the message
+  comes from the validator and is localized by its own `gr.fileValidation.*` key. `GrFormFile` is untouched — field
+  props stay the fast feedback that keeps a bad file out of the model, the rule is the guarantee at submit. Several
+  bad files report the first one; a form field has one error line, and files are no exception.
+
+- **`FileValidatorSource` gained `'form'`.** A validator can now tell "the user is picking a file" from "the form is
+  checking before submit" — the distinction an expensive validator needs to run on submit and stay quiet on every
+  pick. Widening the union is a typing break only for a consumer with an exhaustive `switch` over `source`.
 
 - **`GrBadgeWrap` can mark an arriving count.** A message that lands while the page is open looked exactly like a number
   that had been sitting there all along. The new `animate` prop pops the counter when it **appears** or **grows** — the

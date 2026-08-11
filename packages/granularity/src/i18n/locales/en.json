@@ -72,6 +72,7 @@
     "pattern": "Invalid format",
     "email": "Enter a valid email",
     "url": "Enter a valid URL",
+    "file": "Invalid file",
     "invalid": "Invalid value",
     "validating": "Checking…"
   },

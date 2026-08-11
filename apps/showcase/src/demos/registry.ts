@@ -138,6 +138,7 @@ export const demoPathByPreviewKey = {
   'gr-form-file-multiple-queue':            'components/gr-form-file/GrFormFileMultipleQueueDemo.vue',
   'gr-form-file-preview':                   'components/gr-form-file/GrFormFilePreviewDemo.vue',
   'gr-form-file-server-errors':             'components/gr-form-file/GrFormFileServerErrorsDemo.vue',
+  'gr-form-file-rules':                     'components/gr-form/GrFormFileRulesDemo.vue',
   'gr-form-file-sizes':                     'components/gr-form-file/GrFormFileSizesDemo.vue',
   'gr-form-mixed-controls':                 'components/gr-form/GrFormMixedControlsDemo.vue',
   'gr-form-section-actions':                'components/gr-form-section/GrFormSectionActionsDemo.vue',

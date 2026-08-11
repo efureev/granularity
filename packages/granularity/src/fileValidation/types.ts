@@ -25,7 +25,13 @@ export type FileValidationIssue = {
   i18nParams?: Record<string, unknown>
 }
 
-export type FileValidatorSource = 'input' | 'drop'
+/**
+ * Откуда пришёл набор: выбор в диалоге, перетаскивание или проверка формы перед
+ * отправкой (правило `file` у `GrForm`). Последний случай отличают не ради
+ * симметрии: дорогой валидатор вправе работать на submit и молчать на каждом
+ * выборе файла.
+ */
+export type FileValidatorSource = 'input' | 'drop' | 'form'
 
 export type FileValidatorContext = {
   source: FileValidatorSource

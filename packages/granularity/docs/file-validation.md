@@ -32,7 +32,9 @@ Entrypoint:
 
 Контекст валидации содержит:
 
-- `source`: `'input' | 'drop'`
+- `source`: `'input' | 'drop' | 'form'` — выбор в диалоге, перетаскивание или
+  проверка формы перед отправкой. Различать их стоит дорогому валидатору: он
+  вправе работать на submit и молчать на каждом выборе файла
 - `multiple`: `boolean`
 - `accept?`: `string`
 
@@ -83,9 +85,13 @@ if (result.issues.length > 0) {
 - `maxTotalSizeBytesValidator` — если нужно ограничение на суммарный размер набора файлов.
 - `maxCountValidator` — если нужно ограничение на количество файлов в наборе (`limit` у `GrFormFile` — сахар к нему).
 
-## Связь с `GrFileUpload` и `vDropzone`
+## Связь с `GrFileUpload`, `vDropzone` и `GrForm`
 
 - `GrFileUpload` переиспользует этот API для своей логики.
 - `vDropzone` принимает `validators` в binding value и запускает их до вызова `onFiles`.
+- `GrForm` собирает те же валидаторы из декларативного правила
+  `file: { accept, maxSizeMb, … }` (см. [`components/GrForm.md`](./components/GrForm.md)),
+  поэтому ограничение, переехавшее из пропов поля в правило формы, не меняет ни
+  поведения, ни текста ошибки.
 
 Иными словами, `fileValidation` — это package-level слой, который можно использовать независимо от конкретного UI.

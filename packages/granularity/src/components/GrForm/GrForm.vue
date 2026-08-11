@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { GR_FORM_KEY } from './context'
+import { cloneModelValue, modelFingerprint } from './modelSnapshot'
 import {
   getByPath,
   createGrFormMessageResolver,
@@ -17,6 +18,7 @@ import {
 } from './validation'
 
 export type {
+  GrFormFileRule,
   GrFormRule,
   GrFormRules,
   GrFormTrigger,
@@ -224,14 +226,7 @@ function clearValidate(names?: string | string[]): void {
   errors.value = next
 }
 
-// Снимок начальных значений для `resetFields`. JSON-клон читает «сквозь» reactive-
-// прокси и даёт простой снимок (модель формы — JSON-данные); `structuredClone` на
-// прокси падает с DataCloneError.
-function cloneData<T>(value: T): T {
-  return value === undefined ? value : (JSON.parse(JSON.stringify(value)) as T)
-}
-
-const initialSnapshot = ref<Record<string, unknown>>(cloneData(props.model))
+const initialSnapshot = ref<Record<string, unknown>>(cloneModelValue(props.model))
 
 /**
  * Переснять «исходное» состояние. Нужен формам редактирования: модель там
@@ -239,7 +234,7 @@ const initialSnapshot = ref<Record<string, unknown>>(cloneData(props.model))
  * объект — и `resetFields()` возвращал не «как было при загрузке», а пустоту.
  */
 function setSnapshot(model?: Record<string, unknown>): void {
-  initialSnapshot.value = cloneData(model ?? props.model)
+  initialSnapshot.value = cloneModelValue(model ?? props.model)
 }
 
 /**
@@ -261,15 +256,15 @@ function resetFields(names?: string | string[]): void {
   const keys = list ?? [...new Set([...Object.keys(props.model), ...Object.keys(snapshot)])]
 
   for (const key of keys) {
-    if (key in snapshot) setByPath(props.model, key, cloneData(snapshot[key]))
+    if (key in snapshot) setByPath(props.model, key, cloneModelValue(snapshot[key]))
     else removeKey(props.model, key)
   }
 
   clearValidate(list)
 }
 
-/** Модель отличается от снимка. Сравнение JSON-ом — тем же, что и снимок. */
-const isDirty = computed(() => JSON.stringify(cloneData(props.model)) !== JSON.stringify(initialSnapshot.value))
+/** Модель отличается от снимка. Файлы сравниваются отпечатком, а не ссылкой. */
+const isDirty = computed(() => modelFingerprint(props.model) !== modelFingerprint(initialSnapshot.value))
 
 /**
  * Известных ошибок нет. Это не «валидация прошла»: до первого `validate()`

@@ -6,6 +6,7 @@ export { default as GrForm } from './GrForm.vue'
 export { grFormConfig } from './config'
 export { GR_FORM_KEY, type GrFormContext, useGrFormContext } from './context'
 export type {
+  GrFormFileRule,
   GrFormProps,
   GrFormRule,
   GrFormRules,

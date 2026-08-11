@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createGrFormMessageResolver,
   getByPath,
   isEmpty,
   rulesForTrigger,
@@ -109,5 +110,127 @@ describe('GrForm validation engine', () => {
     expect(obj.nested.city).toBe('Y')
     setByPath(obj, 'deep.new.key', 42)
     expect((obj as Record<string, any>).deep.new.key).toBe(42)
+  })
+})
+
+/** Файл заданного размера: содержимое неважно, важны имя, тип и `size`. */
+function makeFile(name: string, sizeBytes: number, type = ''): File {
+  return new File([new Uint8Array(sizeBytes)], name, { type })
+}
+
+const MB = 1024 * 1024
+
+describe('GrForm validation engine — файловое правило', () => {
+  it('accept отбивает чужой тип и пропускает свой', async () => {
+    const rule: GrFormRule = { file: { accept: 'image/*,.pdf' } }
+
+    expect(await run(makeFile('a.exe', 10, 'application/x-msdownload'), [rule])).toContain('"code":"accept"')
+    expect(await run(makeFile('a.pdf', 10, 'application/pdf'), [rule])).toBeUndefined()
+    expect(await run(makeFile('a.png', 10, 'image/png'), [rule])).toBeUndefined()
+  })
+
+  it('extensions и mimeTypes — белые списки', async () => {
+    expect(await run(makeFile('a.doc', 10), [{ file: { extensions: ['pdf'] } }])).toContain('"code":"extension"')
+    expect(await run(makeFile('a.pdf', 10), [{ file: { extensions: ['.pdf'] } }])).toBeUndefined()
+
+    const mime: GrFormRule = { file: { mimeTypes: ['application/pdf'] } }
+    expect(await run(makeFile('a.png', 10, 'image/png'), [mime])).toContain('"code":"mimeType"')
+    expect(await run(makeFile('a.pdf', 10, 'application/pdf'), [mime])).toBeUndefined()
+  })
+
+  it('maxSizeMb и maxSizeBytes ограничивают один файл', async () => {
+    expect(await run(makeFile('big.pdf', 2 * MB), [{ file: { maxSizeMb: 1 } }])).toContain('"code":"maxFileSize"')
+    expect(await run(makeFile('ok.pdf', 512), [{ file: { maxSizeMb: 1 } }])).toBeUndefined()
+
+    // Заданы оба предела — применяется меньший, а не последний объявленный.
+    expect(await run(makeFile('mid.pdf', 4096), [{ file: { maxSizeMb: 1, maxSizeBytes: 1024 } }]))
+      .toContain('"code":"maxFileSize"')
+  })
+
+  it('maxCount и maxTotalSizeMb считают набор целиком', async () => {
+    const three = [makeFile('a.pdf', 10), makeFile('b.pdf', 10), makeFile('c.pdf', 10)]
+
+    expect(await run(three, [{ file: { maxCount: 2 } }])).toContain('"code":"maxCount"')
+    expect(await run(three, [{ file: { maxCount: 3 } }])).toBeUndefined()
+
+    const heavy = [makeFile('a.pdf', MB), makeFile('b.pdf', MB)]
+    expect(await run(heavy, [{ file: { maxTotalSizeMb: 1 } }])).toContain('"code":"maxTotalSize"')
+    expect(await run(heavy, [{ file: { maxTotalSizeMb: 3 } }])).toBeUndefined()
+  })
+
+  it('валидаторы потребителя работают после встроенных, в том числе async', async () => {
+    const scan = async ({ files }: { files: File[] }) => {
+      return files.some(f => f.name.startsWith('virus'))
+        ? [{ code: 'scan', message: 'infected', fileName: files[0]?.name }]
+        : []
+    }
+
+    expect(await run(makeFile('virus.pdf', 10, 'application/pdf'), [{
+      file: { accept: 'application/pdf', validators: [scan] },
+    }])).toContain('"code":"scan"')
+
+    // Встроенная проверка отработала раньше и уже отбила файл — до своей очередь
+    // дошла бы, но сообщение отдаёт первая проблема.
+    const message = await run(makeFile('virus.exe', 10), [{
+      file: { accept: 'application/pdf', validators: [scan] },
+    }])
+    expect(message).toContain('"code":"accept"')
+  })
+
+  it('при нескольких проблемных файлах в сообщение идёт первая', async () => {
+    const message = await run(
+      [makeFile('a.exe', 10), makeFile('b.exe', 10)],
+      [{ file: { accept: '.pdf' } }],
+    )
+
+    expect(message).toContain('a.exe')
+    expect(message).not.toContain('b.exe')
+  })
+
+  it('одиночный File и File[] проверяются одинаково', async () => {
+    const rule: GrFormRule = { file: { accept: '.pdf' } }
+    const single = await run(makeFile('a.exe', 10), [rule])
+    const list = await run([makeFile('a.exe', 10)], [rule])
+
+    expect(single).toBe(list)
+  })
+
+  it('не-файловое значение правило пропускает', async () => {
+    // Правило описывает файлы; строку ему проверять нечем, и придумывать вердикт
+    // за неё оно не должно.
+    expect(await run('строка', [{ file: { accept: '.pdf' } }])).toBeUndefined()
+    expect(await run([{ url: 'x' }], [{ file: { accept: '.pdf' } }])).toBeUndefined()
+  })
+
+  it('пустое значение разбирает required, а не файловое правило', async () => {
+    expect(await run(null, [{ file: { accept: '.pdf' } }])).toBeUndefined()
+    expect(await run([], [{ file: { accept: '.pdf' } }])).toBeUndefined()
+    expect(await run(null, [{ required: true, file: { accept: '.pdf' } }])).toBe('required:{}')
+  })
+
+  it('rule.message перекрывает текст валидатора', async () => {
+    expect(await run(makeFile('a.exe', 10), [{ file: { accept: '.pdf' }, message: 'Нужен PDF' }]))
+      .toBe('Нужен PDF')
+  })
+})
+
+describe('createGrFormMessageResolver — файловые сообщения', () => {
+  const t = (key: string, fallback: string) => `${key}|${fallback}`
+  const resolveMessage = createGrFormMessageResolver(t)
+
+  it('текст берётся из ключа валидатора, а не из gr.form.file', () => {
+    const issue = { code: 'accept', message: 'File "a.exe" does not match', fileName: 'a.exe' }
+
+    // Одна и та же проблема обязана звучать одинаково в поле и в форме.
+    expect(resolveMessage('file', {}, { issue })).toBe('gr.fileValidation.accept|File "a.exe" does not match')
+  })
+
+  it('вид file без issue падает на собственный ключ формы', () => {
+    expect(resolveMessage('file', {}, {})).toBe('gr.form.file|Invalid file')
+  })
+
+  it('rule.message сильнее любого источника', () => {
+    const issue = { code: 'accept', message: 'File "a.exe" does not match' }
+    expect(resolveMessage('file', { message: 'Нужен PDF' }, { issue })).toBe('Нужен PDF')
   })
 })
