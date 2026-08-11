@@ -280,6 +280,54 @@
         }
       }
     },
+    "architecture": {
+      "title": "Architecture",
+      "shortTitle": "Architecture",
+      "eyebrow": "Showcase / Architecture",
+      "description": "The dependency graph between components: what depends on nothing, what the library rests on, and how many components arrive alongside the one you select under granular selection.",
+      "sections": {
+        "base": {
+          "title": "Base components",
+          "description": "Components that render no neighbour inside themselves: any of them can be adopted on its own.",
+          "bullets": [
+            "The source of truth is each component's `config.dependencies` — the same one the package gates read.",
+            "Under granular selection a base component brings exactly its own CSS and safelist."
+          ]
+        },
+        "load-bearing": {
+          "title": "What the library rests on",
+          "description": "Ranked by how many components render this one inside themselves.",
+          "bullets": [
+            "Editing a load-bearing component reaches everyone that renders it.",
+            "The dependent count is both a regression-risk estimate and a hint about where a visual gate pays off."
+          ]
+        },
+        "levels": {
+          "title": "Levels",
+          "description": "Graph depth: how many steps separate a component from a base one.",
+          "bullets": [
+            "The graph is acyclic and flat — a consequence of the rule «declare only what you render».",
+            "Transitive edges are expanded by the preset itself; repeating them in `dependencies` is pointless."
+          ]
+        },
+        "focus": {
+          "title": "Component neighbourhood",
+          "description": "What a component pulls downwards and who renders it in turn.",
+          "bullets": [
+            "The price of granular selection: `components: [X]` brings the whole path down with it.",
+            "A canvas holding every component at once is unreadable, so one neighbourhood is shown instead."
+          ]
+        },
+        "soft-links": {
+          "title": "Links that are not edges",
+          "description": "Context and composables bind components tighter than the render graph does, yet they pull no foreign markup.",
+          "bullets": [
+            "`GrConfigProvider` supplies size defaults, `GrFormField` the field context, `shared/` the scales and tones.",
+            "Declaring them as dependencies would hand every consumer the donor's full CSS and safelist."
+          ]
+        }
+      }
+    },
     "extras": {
       "title": "Extras",
       "shortTitle": "Extras",
@@ -314,7 +362,8 @@
     "catalogDescription": "Components with examples:",
     "searchLabel": "Search components",
     "searchPlaceholder": "For example: button, form, overlay",
-    "emptyState": "No components matched the current query. Try a component name (`GrButton`) or a group (`forms`, `overlays`)."
+    "emptyState": "No components matched the current query. Try a component name (`GrButton`) or a group (`forms`, `overlays`).",
+    "architectureLink": "Dependency graph"
   },
   "packageCatalog": {
     "titleSuffix": "catalog",
@@ -324,6 +373,25 @@
     "itemsCount": "items",
     "openDetailPage": "Open detail page",
     "emptyState": "Nothing matched the current query. Try searching by export name or group."
+  },
+  "architecturePage": {
+    "nodeTitle": "{name} — renders {dependencies}, rendered by {dependents}",
+    "levels": {
+      "label": "Level {level}",
+      "hint": {
+        "base": "Renders no neighbour.",
+        "derived": "Longest path down to a base component."
+      }
+    },
+    "focus": {
+      "selectLabel": "Component to focus on",
+      "summary": "Level {level} · pulls in {transitive} components · rendered by {dependents}",
+      "diagramLabel": "Dependency neighbourhood of {name}; the same content follows as a list",
+      "scrollLabel": "Diagram, scrolls horizontally",
+      "columnDependents": "Renders this one",
+      "columnFocus": "Selected",
+      "columnDepth": "Depth {depth}"
+    }
   },
   "foundationsPage": {
     "heroTitle": "Foundations brings installation, themes, and core setup together in one clear section.",
@@ -374,6 +442,14 @@
     "implementationNotes": {
       "title": "Implementation notes",
       "description": "Additional notes on accessibility, dependencies, and related materials."
+    },
+    "dependencies": {
+      "dependsOn": "Renders",
+      "dependsOnEmpty": "Nothing — a base component.",
+      "usedBy": "Rendered by",
+      "usedByEmpty": "Nothing else in the package.",
+      "transitive": "Pulls in {count} components in total",
+      "openGraph": "Graph"
     },
     "packageOverview": {
       "title": "Package overview"

@@ -67,7 +67,16 @@ const groupedComponents = computed(() => {
         :eyebrow="page.eyebrow"
         :title="$t('showcase.componentsPage.heroTitle')"
         :description="$t('showcase.componentsPage.heroDescription')"
-    />
+    >
+      <template #actions>
+        <RouterLink
+            to="/architecture"
+            class="showcase-link-chip showcase-interactive-accent inline-flex rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
+        >
+          {{ $t('showcase.componentsPage.architectureLink') }}
+        </RouterLink>
+      </template>
+    </ShowcasePageHero>
 
     <section id="catalog" class="scroll-mt-28 space-y-5">
       <GrCard class="showcase-panel rounded-3xl border p-6">

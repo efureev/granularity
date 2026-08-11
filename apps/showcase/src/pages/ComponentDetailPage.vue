@@ -11,6 +11,7 @@ import {
 } from '../app/showcase'
 import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
 import {useEntityI18nBlock} from '../app/useEntityI18nBlock'
+import ComponentDependencyCard from '../components/doc/ComponentDependencyCard.vue'
 import EventsTable from '../components/doc/EventsTable.vue'
 import ExampleCard from '../components/doc/ExampleCard.vue'
 import InfoSectionCard from '../components/doc/InfoSectionCard.vue'
@@ -20,7 +21,6 @@ import PropsTable from '../components/doc/PropsTable.vue'
 import SlotsTable from '../components/doc/SlotsTable.vue'
 import {
   createAccessibilityItems,
-  createDependencyItems,
   createRelatedLinks,
 } from '../components/doc/entityPageHelpers'
 import {getShowcaseComponentDoc} from '../content/componentDocs'
@@ -93,7 +93,6 @@ const componentOverview = computed(() => {
 })
 
 const accessibilityItems = computed(() => createAccessibilityItems(componentEntity.value, t))
-const dependencyItems = computed(() => createDependencyItems(componentEntity.value, t))
 const relatedLinks = computed(() => createRelatedLinks(componentEntity.value, t))
 const componentsPage = computed(() => localizePageByName('components'))
 const componentSummary = computed(() =>
@@ -235,8 +234,7 @@ useEntityI18nBlock(computed(() =>
       <div class="grid gap-4 lg:grid-cols-3">
         <InfoSectionCard :title="t('showcase.detailPage.info.accessibilityTitle')" :items="accessibilityItems"
                          variant="list"/>
-        <InfoSectionCard :title="t('showcase.detailPage.info.dependenciesTitle')" :items="dependencyItems"
-                         variant="chips"/>
+        <ComponentDependencyCard :component-name="componentEntity.name"/>
         <InfoSectionCard :title="t('showcase.detailPage.info.relatedLinksTitle')" :links="relatedLinks"
                          variant="links"/>
       </div>

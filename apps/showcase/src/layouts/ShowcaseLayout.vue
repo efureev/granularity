@@ -16,8 +16,8 @@ import {
   showcaseComposableEntities,
   showcaseComponentEntities,
   showcaseDirectiveEntities,
-  showcaseNavigationItems,
   showcasePageRecord,
+  showcaseTopNavigationItems,
   showcaseUtilityEntities,
 } from '../app/showcase'
 import { compareEntityGroups } from '../app/showcaseEntityGroups'
@@ -107,8 +107,7 @@ const currentSections = computed(() => {
   return localizeSections(currentPage.value.name, sections)
 })
 const currentTitle = computed(() => currentEntity.value?.title ?? localizedCurrentPage.value.title)
-const topNavigationItems = computed(() => showcaseNavigationItems
-  .filter(item => item.name !== 'overview')
+const topNavigationItems = computed(() => showcaseTopNavigationItems
   .map(item => {
     const localizedPage = localizePageByName(item.name)
 
@@ -151,7 +150,8 @@ function getEntityCollection(pageName: ShowcasePageName): ShowcaseEntityRegistry
 const contextNavigationGroups = computed<SidebarNavigationGroup[]>(() => {
   const pageName = currentPage.value.name
 
-  if (pageName === 'overview' || pageName === 'foundations') {
+  // Страницы без собственного каталога сущностей: в сайдбаре — якоря секций.
+  if (pageName === 'overview' || pageName === 'foundations' || pageName === 'architecture') {
     return [
       {
         id: `${pageName}-sections`,

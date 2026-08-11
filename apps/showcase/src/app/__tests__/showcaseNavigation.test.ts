@@ -7,6 +7,7 @@ import {
   getShowcasePageByPath,
   showcaseNavigationItems,
   showcasePageRecord,
+  showcaseTopNavigationItems,
 } from '../showcase'
 import { showcaseChildRoutes, showcaseLazyPageLoaders } from '../routeDefinitions'
 
@@ -16,12 +17,30 @@ describe('showcase navigation model', () => {
       'overview',
       'foundations',
       'components',
+      'architecture',
       'extras',
       'directives',
       'composables',
       'utilities',
     ])
     expect(showcasePageRecord.overview.path).toBe('/')
+  })
+
+  /**
+   * Шапка липкая и попадает в снимок `#live-examples`, поэтому её высота —
+   * часть визуальных эталонов: лишний пункт двигает все 74 разом. Страница с
+   * `topNavigation: false` остаётся в поиске и в крошках, но из шапки уходит.
+   */
+  it('держит в шапке только разделы с topNavigation', () => {
+    expect(showcaseTopNavigationItems.map(item => item.name)).toEqual([
+      'foundations',
+      'components',
+      'extras',
+      'directives',
+      'composables',
+      'utilities',
+    ])
+    expect(showcaseNavigationItems.map(item => item.name)).toContain('architecture')
   })
 
   it('нормализует path и корректно находит страницы с хвостовым slash', () => {
@@ -72,8 +91,8 @@ describe('showcase navigation model', () => {
   })
 
   it('подключает ленивые route loaders для всех разделов shell-навигации', () => {
-    expect(Object.keys(showcaseLazyPageLoaders)).toHaveLength(10)
-    expect(showcaseChildRoutes).toHaveLength(12)
+    expect(Object.keys(showcaseLazyPageLoaders)).toHaveLength(11)
+    expect(showcaseChildRoutes).toHaveLength(13)
     expect(showcaseChildRoutes.every(route => typeof route.component === 'function')).toBe(true)
   })
 })

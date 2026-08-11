@@ -50,6 +50,8 @@
   [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md).
 - [`companion-packages.md`](./companion-packages.md) — как собрать пакет-спутник (companion) с нуля:
   упаковка, granular-provider и авто-импорт через `createGranularResolver`.
+- [`packaging.md`](./packaging.md) — почему пакет один и не делится на подпакеты, что вместо этого
+  даёт гранулярность и при каком условии решение пересматривается.
 - [`localization.md`](./localization.md) — как `granularity` работает с локализацией приложения и fallback-текстами.
 - [`directives.md`](./directives.md) — все опубликованные директивы и их назначение.
 - [`file-validation.md`](./file-validation.md) — `fileValidation` API и повторное использование логики валидации файлов.

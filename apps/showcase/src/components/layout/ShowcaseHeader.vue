@@ -7,7 +7,7 @@ import {
 
 import { GrButton } from '@feugene/granularity'
 
-import { showcaseNavigationItems } from '../../app/showcase'
+import { showcaseTopNavigationItems } from '../../app/showcase'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
 import type { ShowcaseNavigationItem } from '../../app/showcase'
 import ThemeSwitcher from '../ThemeSwitcher.vue'
@@ -25,8 +25,7 @@ const { localizePageByName } = useShowcasePageI18n()
 
 const packageVersion = __GRANULARITY_VERSION__
 
-const topNavigationItems = computed(() => showcaseNavigationItems
-  .filter(item => item.name !== 'overview')
+const topNavigationItems = computed(() => showcaseTopNavigationItems
   .map(item => {
     const localizedPage = localizePageByName(item.name)
 

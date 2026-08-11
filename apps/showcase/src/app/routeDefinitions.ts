@@ -5,6 +5,7 @@ export const showcaseLazyPageLoaders = {
   foundations: () => import('../pages/FoundationsPage.vue'),
   components: () => import('../pages/ComponentsPage.vue'),
   componentDetail: () => import('../pages/ComponentDetailPage.vue'),
+  architecture: () => import('../pages/ArchitecturePage.vue'),
   extras: () => import('../pages/ExtrasPage.vue'),
   extraComponentDetail: () => import('../pages/ExtraComponentDetailPage.vue'),
   packageEntityDetail: () => import('../pages/PackageEntityDetailPage.vue'),
@@ -33,6 +34,11 @@ export const showcaseChildRoutes = [
     path: 'components/:componentSlug',
     name: 'component-detail',
     component: showcaseLazyPageLoaders.componentDetail,
+  },
+  {
+    path: 'architecture',
+    name: 'architecture',
+    component: showcaseLazyPageLoaders.architecture,
   },
   {
     path: 'extras',

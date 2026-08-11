@@ -60,6 +60,14 @@ export const showcaseNavigationItems: ShowcaseNavigationItem[] = showcasePages.m
   description,
 }))
 
+/**
+ * Разделы шапки. Уже́ полного списка: `overview` живёт в логотипе, а страницы
+ * с `topNavigation: false` попадают только в поиск и в ссылки по месту.
+ */
+export const showcaseTopNavigationItems: ShowcaseNavigationItem[] = showcaseNavigationItems
+  .filter(item => item.name !== 'overview')
+  .filter(item => showcasePages.find(page => page.name === item.name)?.topNavigation !== false)
+
 function normalizeShowcasePath(path: string): string {
   const [pathname = '/'] = path.split(/[?#]/)
   const normalizedPath = pathname.replace(/\/+$/, '')
