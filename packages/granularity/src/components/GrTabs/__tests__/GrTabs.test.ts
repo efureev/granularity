@@ -446,7 +446,7 @@ describe('GrTabs — закрываемые вкладки', () => {
       slots: { tab: '<template #tab="{ tab }"><span class="custom">{{ tab.label }}</span></template>' },
     })
 
-    expect(wrapper.get('.custom').exists()).toBe(true)
+    expect(wrapper.get('.custom').text()).toBe('A')
     expect(wrapper.find('[data-gr-tab-close]').exists()).toBe(true)
   })
 

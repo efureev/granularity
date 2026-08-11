@@ -8583,6 +8583,34 @@
             "default": "false"
           },
           {
+            "name": "animate",
+            "description": "Перебирать числа при появлении и при смене значения. Нечисловое значение ставится сразу, под `prefers-reduced-motion: reduce` — тоже.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "as",
+            "description": "Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`.",
+            "type": "string | Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "href",
+            "description": "Показатель-ссылка: переход к деталям.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clickable",
+            "description": "Показатель-кнопка: интерактивна вся плитка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "locale",
             "description": "BCP-47 локаль форматирования. Не задана — берётся из i18n-адаптера; нет и адаптера — работают ручные разделители.",
             "type": "string | undefined",
@@ -8639,6 +8667,13 @@
             "default": "undefined"
           },
           {
+            "name": "animateDuration",
+            "description": "Длительность перебора в миллисекундах. Не токеном: шкала `--gr-duration-*` заканчивается на 300 мс и описывает смену состояния, а перебор чисел — другой жанр, и его число живёт там же, где твин.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "600"
+          },
+          {
             "name": "value",
             "description": "Значение показателя. Нечисловая строка выводится как есть.",
             "type": "string | number",
@@ -8687,7 +8722,14 @@
         "key": "events",
         "title": "Events",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "click",
+            "description": "",
+            "type": "[event: MouseEvent]",
+            "signature": "(event: \"click\", event: MouseEvent): void"
+          }
+        ]
       },
       {
         "key": "methods",

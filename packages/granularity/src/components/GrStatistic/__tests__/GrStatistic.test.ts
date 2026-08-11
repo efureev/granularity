@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { ref } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { nextTick, ref } from 'vue'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrStatistic from '../GrStatistic.vue'
@@ -141,5 +141,196 @@ describe('GrStatistic — размеры и локаль', () => {
     const wrapper = mount(GrStatistic, { props: { value: 1234567.5, precision: 2 } })
 
     expect(wrapper.get('[data-testid="gr-statistic-value"]').text()).toBe('1 234 567.50')
+  })
+})
+
+describe('GrStatistic — пара «термин — значение»', () => {
+  it('с подписью это dl/dt/dd, без неё — прежние блоки', () => {
+    const titled = mount(GrStatistic, { props: { title: 'Заказы', value: 1284 } })
+
+    // Диктор получает пару, а не два соседних блока подряд.
+    expect(titled.get('[data-gr-statistic-title]').element.tagName).toBe('DT')
+    expect(titled.get('[data-testid="gr-statistic-value"]').element.tagName).toBe('DD')
+    expect(titled.find('dl').exists()).toBe(true)
+
+    const untitled = mount(GrStatistic, { props: { value: 1284 } })
+    // Список определений без термина — та же бессвязность, только с претензией.
+    expect(untitled.find('dl').exists()).toBe(false)
+    expect(untitled.get('[data-testid="gr-statistic-value"]').element.tagName).toBe('DIV')
+  })
+
+  it('поля dl и dd обнулены: preflight пакета сбрасывает их только у body', () => {
+    const wrapper = mount(GrStatistic, { props: { title: 'Заказы', value: 1284 } })
+
+    expect(wrapper.get('dl').classes()).toContain('m-0')
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').classes()).toContain('m-0')
+  })
+
+  it('строка динамики остаётся снаружи dl', () => {
+    const wrapper = mount(GrStatistic, {
+      props: { title: 'Заказы', value: 1284, trend: 'up', trendText: '+12%' },
+    })
+
+    // Внутри `dl` разрешены только группы dt/dd — посторонний блок невалиден.
+    expect(wrapper.get('dl').find('[data-testid="gr-statistic-trend"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="gr-statistic-trend"]').exists()).toBe(true)
+  })
+
+  it('плейсхолдер загрузки занимает место значения, а не соседствует с ним', () => {
+    const wrapper = mount(GrStatistic, { props: { title: 'Заказы', value: 1284, loading: true } })
+
+    expect(wrapper.get('[data-testid="gr-statistic-placeholder"]').element.tagName).toBe('DD')
+    expect(wrapper.find('[data-testid="gr-statistic-value"]').exists()).toBe(false)
+  })
+})
+
+describe('GrStatistic — переход к деталям', () => {
+  it('по умолчанию корень остаётся div и не интерактивен', () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1284 } })
+    const root = wrapper.get('[data-gr-statistic]')
+
+    expect(root.element.tagName).toBe('DIV')
+    expect(root.classes().join(' ')).not.toContain('focus-visible:ring-2')
+  })
+
+  it('href даёт ссылку, clickable — кнопку, as — свой тег', () => {
+    const link = mount(GrStatistic, { props: { value: 1284, href: '/orders' } })
+    expect(link.get('[data-gr-statistic]').element.tagName).toBe('A')
+    expect(link.get('[data-gr-statistic]').attributes('href')).toBe('/orders')
+
+    const button = mount(GrStatistic, { props: { value: 1284, clickable: true } })
+    expect(button.get('[data-gr-statistic]').element.tagName).toBe('BUTTON')
+    // Без явного типа кнопка внутри формы отправляла бы её.
+    expect(button.get('[data-gr-statistic]').attributes('type')).toBe('button')
+
+    const custom = mount(GrStatistic, { props: { value: 1284, as: 'article', href: '/orders' } })
+    expect(custom.get('[data-gr-statistic]').element.tagName).toBe('ARTICLE')
+    // `href` уезжает только на настоящую ссылку.
+    expect(custom.get('[data-gr-statistic]').attributes('href')).toBeUndefined()
+  })
+
+  it('интерактивный корень получает фокус-кольцо и эмитит click', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1284, clickable: true } })
+
+    expect(wrapper.get('[data-gr-statistic]').classes()).toContain('focus-visible:ring-2')
+
+    await wrapper.get('[data-gr-statistic]').trigger('click')
+    expect(wrapper.emitted('click')).toHaveLength(1)
+  })
+})
+
+describe('GrStatistic — перебор чисел', () => {
+  /** Число из строки: разделитель разрядов — неразрывный пробел, а не обычный. */
+  function digits(wrapper: ReturnType<typeof mount>): number {
+    return Number(wrapper.get('[data-gr-statistic-number]').text().replace(/\s/g, ''))
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance'] })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it('без animate значение стоит на месте с первого кадра', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1284 } })
+    await nextTick()
+
+    expect(digits(wrapper)).toBe(1284)
+    expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
+  })
+
+  it('с animate число добегает от нуля до конечного', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true } })
+    await nextTick()
+    expect(digits(wrapper)).toBe(0)
+
+    vi.advanceTimersByTime(300)
+    await nextTick()
+    const middle = digits(wrapper)
+    expect(middle).toBeGreaterThan(0)
+    expect(middle).toBeLessThan(1000)
+
+    vi.advanceTimersByTime(400)
+    await nextTick()
+    expect(digits(wrapper)).toBe(1000)
+  })
+
+  it('смена значения перебирает от прежнего числа, а не от нуля', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true } })
+    vi.advanceTimersByTime(700)
+    await nextTick()
+
+    await wrapper.setProps({ value: 2000 })
+    await nextTick()
+
+    // Перебор «с нуля» на каждом обновлении дашборда читался бы как сброс данных.
+    expect(digits(wrapper)).toBe(1000)
+
+    vi.advanceTimersByTime(700)
+    await nextTick()
+    expect(digits(wrapper)).toBe(2000)
+  })
+
+  it('animateDuration задаёт длительность', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true, animateDuration: 200 } })
+    await nextTick()
+
+    vi.advanceTimersByTime(250)
+    await nextTick()
+    expect(digits(wrapper)).toBe(1000)
+  })
+
+  it('нечисловое значение ставится сразу: перебирать «2 ч 15 мин» нечем', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: '2 ч 15 мин', animate: true } })
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-statistic-number]').text()).toBe('2 ч 15 мин')
+    expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
+  })
+
+  it('под prefers-reduced-motion перебора нет вовсе', async () => {
+    // Глобальный кламп в `base.css` гасит CSS, но не JS-твин — его гасит сам компонент.
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query.includes('prefers-reduced-motion'),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }))
+
+    const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true } })
+    await nextTick()
+
+    expect(digits(wrapper)).toBe(1000)
+    expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
+  })
+
+  it('пока идёт перебор, диктор получает конечное значение', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true } })
+    vi.advanceTimersByTime(300)
+    await nextTick()
+
+    // «1 000» глазами и «743» в ушах — не шум, а неверные данные.
+    const visible = wrapper.get('[data-gr-statistic-number]')
+    expect(visible.attributes('aria-hidden')).toBe('true')
+    expect(wrapper.get('[data-gr-statistic-final]').text().replace(/\s/g, '')).toBe('1000')
+
+    vi.advanceTimersByTime(400)
+    await nextTick()
+    expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-statistic-number]').attributes('aria-hidden')).toBeUndefined()
+  })
+
+  it('загрузка перебор не запускает: перебирать нечего', async () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true, loading: true } })
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="gr-statistic-placeholder"]').exists()).toBe(true)
+
+    await wrapper.setProps({ loading: false })
+    await nextTick()
+    expect(digits(wrapper)).toBe(1000)
   })
 })

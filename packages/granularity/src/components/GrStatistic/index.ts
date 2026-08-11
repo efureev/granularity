@@ -3,6 +3,7 @@ export { default as GrStatistic } from './GrStatistic.vue'
 export { grStatisticConfig } from './config'
 export { formatStatisticValue } from './formatStatisticValue'
 export type {
+  GrStatisticEmits,
   GrStatisticFormatOptions,
   GrStatisticProps,
   GrStatisticSize,

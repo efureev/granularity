@@ -83,9 +83,28 @@ export const statisticTrendIconByTrend: Record<GrStatisticTrend, string> = {
 
 export const statisticTitleClass = 'font-medium tracking-wide text-[var(--gr-statistic-title-color,var(--gr-muted-fg))]'
 
+export const statisticRootBase = 'flex items-start gap-3 text-left'
+
+/**
+ * Показатель-ссылка или показатель-кнопка. Своей заливки не получает: плитка
+ * дашборда обычно уже лежит в `GrCard`, и вторая поверхность спорила бы с ней.
+ * Видимость интерактивности держат курсор, фокус-кольцо и подсветка подписи.
+ */
+export const statisticRootInteractiveClass = 'w-full cursor-pointer rounded-[var(--gr-radius-md)] transition-colors hover:bg-[var(--gr-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+export function statisticRootClass(options: { interactive: boolean }): string {
+  return [
+    statisticRootBase,
+    options.interactive ? statisticRootInteractiveClass : '',
+  ].filter(Boolean).join(' ')
+}
+
+/** `tabular-nums` держит ширину строки при переборе чисел и при смене значения. */
+export const statisticValueTypographyClass = 'font-semibold [font-variant-numeric:tabular-nums]'
+
 export function statisticValueClass(options: { size: GrStatisticSize, tone: GrStatisticTone }): string {
   return [
-    'font-semibold [font-variant-numeric:tabular-nums]',
+    statisticValueTypographyClass,
     statisticValueSizeBySize[options.size],
     statisticValueClassByTone[options.tone],
   ].join(' ')

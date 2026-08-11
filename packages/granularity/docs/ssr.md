@@ -68,9 +68,9 @@
 `GrConfirmDialog`, `GrDialog` и `GrPromptDialog` попали сюда потому, что вся DOM-механика у них — в `GrModal`, на
 котором они построены.
 
-## DOM только в обработчиках и хуках (4)
+## DOM только в обработчиках и хуках (5)
 
-`GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`.
+`GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`.
 
 Серверный рендер безопасен: обращения живут в `onMounted`/`onBeforeUnmount` и в слушателях событий, которые на сервере
 не выполняются. Конкретно:
@@ -81,7 +81,10 @@
 - `GrCommandPalette` — глобальный хоткей `mod+k`, вешается с проверкой
   `typeof window === 'undefined'`;
 - `GrDialogService` — императивный API, целиком выходит из строя без DOM и поэтому проверяет `typeof window`/
-  `typeof document` на входе.
+  `typeof document` на входе;
+- `GrStatistic` — при `animate` перебирает числа через `requestAnimationFrame` и читает
+  `matchMedia('(prefers-reduced-motion: reduce)')`. Оба обращения — в `onMounted` и в watcher'е значения; первый
+  клиентский рендер повторяет серверный (значение уже конечное), твин стартует после монтирования.
 
 ## Композаблы и директивы
 

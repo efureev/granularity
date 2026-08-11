@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { useGrComponentSize } from '../GrConfigProvider/context'
-import { computed } from 'vue'
+import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
+import { countUpFrame } from './countUp'
 import { formatStatisticValue } from './formatStatisticValue'
 
 import {
   statisticAffixSizeBySize,
   statisticPlaceholderHeightBySize,
+  statisticRootClass,
   statisticTitleClass,
   statisticTitleSizeBySize,
   statisticTrendClassByTrend,
@@ -66,6 +68,27 @@ export interface GrStatisticProps {
   trendText?: string
   /** Состояние загрузки: вместо значения — плейсхолдер. */
   loading?: boolean
+  /**
+   * Перебирать числа при появлении и при смене значения. Нечисловое значение
+   * ставится сразу, под `prefers-reduced-motion: reduce` — тоже.
+   */
+  animate?: boolean
+  /**
+   * Длительность перебора в миллисекундах. Не токеном: шкала `--gr-duration-*`
+   * заканчивается на 300 мс и описывает смену состояния, а перебор чисел —
+   * другой жанр, и его число живёт там же, где твин.
+   */
+  animateDuration?: number
+  /** Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`. */
+  as?: string | Component
+  /** Показатель-ссылка: переход к деталям. */
+  href?: string
+  /** Показатель-кнопка: интерактивна вся плитка. */
+  clickable?: boolean
+}
+
+export interface GrStatisticEmits {
+  (e: 'click', event: MouseEvent): void
 }
 
 const props = withDefaults(
@@ -86,19 +109,140 @@ const props = withDefaults(
     trend: undefined,
     trendText: undefined,
     loading: false,
+    animate: false,
+    animateDuration: 600,
+    as: undefined,
+    href: undefined,
+    clickable: false,
   },
 )
+
+const emit = defineEmits<GrStatisticEmits>()
+
+const slots = useSlots()
 
 const { t, locale } = useGranularityTranslations()
 
 const resolvedLocale = computed(() => props.locale ?? locale.value)
 
-const formatted = computed(() => formatStatisticValue(props.value, {
+/**
+ * Число текущего кадра перебора. `null` — перебора нет, показываем сам проп:
+ * так значение остаётся конечным и на сервере, и до первого твина.
+ */
+const frameValue = ref<number | null>(null)
+
+const formatted = computed(() => formatStatisticValue(frameValue.value ?? props.value, {
   precision: props.precision,
   groupSeparator: props.groupSeparator,
   decimalSeparator: props.decimalSeparator,
   locale: resolvedLocale.value,
 }))
+
+/** Конечное значение — то, что читает диктор, пока на экране идёт перебор. */
+const finalFormatted = computed(() => formatStatisticValue(props.value, {
+  precision: props.precision,
+  groupSeparator: props.groupSeparator,
+  decimalSeparator: props.decimalSeparator,
+  locale: resolvedLocale.value,
+}))
+
+const isCounting = computed(() => frameValue.value !== null)
+
+const hasTitle = computed(() => Boolean(props.title || slots.title))
+
+const isInteractive = computed(() => Boolean(props.as || props.href || props.clickable))
+
+const rootTag = computed<string | Component>(() => {
+  if (props.as)
+    return typeof props.as === 'string' ? props.as : markRaw(props.as)
+
+  if (props.href)
+    return 'a'
+
+  return props.clickable ? 'button' : 'div'
+})
+
+const rootClass = computed(() => statisticRootClass({ interactive: isInteractive.value }))
+
+function toNumber(value: number | string): number | null {
+  const numeric = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numeric) ? numeric : null
+}
+
+let frameHandle: number | null = null
+
+function stopCounting(): void {
+  if (frameHandle !== null) cancelAnimationFrame(frameHandle)
+  frameHandle = null
+}
+
+/**
+ * Перебор чисел ведёт JS, а глобальный кламп в `base.css` гасит только CSS —
+ * значит уважать «уменьшить движение» обязан сам компонент (`docs/motion.md`).
+ * Читается в момент старта, а не в теле `setup`: `matchMedia` на сервере нет, и
+ * первый клиентский рендер разошёлся бы с серверным.
+ */
+function prefersReducedMotion(): boolean {
+  return typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true
+}
+
+function runCountUp(from: number, to: number): void {
+  stopCounting()
+
+  const duration = props.animateDuration
+  if (!(duration > 0) || from === to || prefersReducedMotion()) {
+    frameValue.value = null
+    return
+  }
+
+  const started = performance.now()
+  frameValue.value = from
+
+  const step = (now: number): void => {
+    const elapsed = now - started
+    const value = countUpFrame(from, to, elapsed, duration, props.precision)
+
+    if (elapsed >= duration) {
+      // Конец перебора снимает и подмену значения, и подмену для диктора.
+      frameValue.value = null
+      frameHandle = null
+      return
+    }
+
+    frameValue.value = value
+    frameHandle = requestAnimationFrame(step)
+  }
+
+  frameHandle = requestAnimationFrame(step)
+}
+
+/** Перебирать можно только числа: «2 ч 15 мин» и «—» ставятся сразу. */
+function startIfNumeric(from: number | string, to: number | string): void {
+  if (!props.animate || props.loading) {
+    stopCounting()
+    frameValue.value = null
+    return
+  }
+
+  const target = toNumber(to)
+  const source = toNumber(from)
+
+  if (target === null || source === null) {
+    stopCounting()
+    frameValue.value = null
+    return
+  }
+
+  runCountUp(source, target)
+}
+
+// Появление плитки считается переходом от нуля: ради этого эффекта проп и нужен.
+onMounted(() => startIfNumeric(0, props.value))
+
+watch(() => props.value, (next, prev) => startIfNumeric(prev, next))
+
+onBeforeUnmount(stopCounting)
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatistic' })
 
@@ -118,7 +262,14 @@ const trendLabel = computed(() => {
 </script>
 
 <template>
-  <div data-gr-statistic class="flex items-start gap-3">
+  <component
+    :is="rootTag"
+    data-gr-statistic
+    :type="rootTag === 'button' ? 'button' : undefined"
+    :href="rootTag === 'a' ? href : undefined"
+    :class="rootClass"
+    @click="emit('click', $event)"
+  >
     <span
       v-if="icon || $slots.icon"
       data-gr-statistic-icon
@@ -130,61 +281,81 @@ const trendLabel = computed(() => {
     </span>
 
     <div class="min-w-0">
-      <div
-        v-if="title || $slots.title"
-        data-gr-statistic-title
-        :class="[statisticTitleClass, statisticTitleSizeBySize[resolvedSize]]"
-      >
-        <slot name="title">
-          {{ title }}
-        </slot>
-      </div>
-
-      <!-- Плейсхолдер загрузки повторяет высоту строки значения, чтобы блок не прыгал. -->
-      <div
-        v-if="loading"
-        data-gr-statistic-placeholder
-        data-testid="gr-statistic-placeholder"
-        class="mt-1"
-        role="status"
-        aria-busy="true"
-      >
-        <GrSkeleton
-          width="6rem"
-          :height="statisticPlaceholderHeightBySize[resolvedSize]"
-          rounded="var(--gr-radius-md)"
-        />
-        <span class="sr-only">{{ t('gr.loading.defaultText', 'Loading...') }}</span>
-      </div>
-
-      <div
-        v-else
-        data-gr-statistic-value
-        data-testid="gr-statistic-value"
-        class="mt-0.5 flex items-baseline gap-1"
-      >
-        <span
-          v-if="prefix || $slots.prefix"
-          data-gr-statistic-prefix
-          class="text-[var(--gr-muted-fg)]"
-          :class="statisticAffixSizeBySize[resolvedSize]"
+      <!--
+        Подпись и значение — пара «термин — значение», а не два соседних блока.
+        `<dl>` появляется только вместе с подписью: список определений без `<dt>`
+        — та же бессвязность, только с претензией на семантику. Поля обнуляются
+        руками: preflight пакета сбрасывает их лишь у `body`.
+      -->
+      <component :is="hasTitle ? 'dl' : 'div'" class="m-0">
+        <dt
+          v-if="hasTitle"
+          data-gr-statistic-title
+          :class="[statisticTitleClass, statisticTitleSizeBySize[resolvedSize]]"
         >
-          <slot name="prefix">{{ prefix }}</slot>
-        </span>
+          <slot name="title">
+            {{ title }}
+          </slot>
+        </dt>
 
-        <span :class="statisticValueClass({ size: resolvedSize, tone })">
-          <slot>{{ formatted }}</slot>
-        </span>
-
-        <span
-          v-if="suffix || $slots.suffix"
-          data-gr-statistic-suffix
-          class="text-[var(--gr-muted-fg)]"
-          :class="statisticAffixSizeBySize[resolvedSize]"
+        <!-- Плейсхолдер загрузки повторяет высоту строки значения, чтобы блок не прыгал. -->
+        <component
+          :is="hasTitle ? 'dd' : 'div'"
+          v-if="loading"
+          data-gr-statistic-placeholder
+          data-testid="gr-statistic-placeholder"
+          class="m-0 mt-1"
+          role="status"
+          aria-busy="true"
         >
-          <slot name="suffix">{{ suffix }}</slot>
-        </span>
-      </div>
+          <GrSkeleton
+            width="6rem"
+            :height="statisticPlaceholderHeightBySize[resolvedSize]"
+            rounded="var(--gr-radius-md)"
+          />
+          <span class="sr-only">{{ t('gr.loading.defaultText', 'Loading...') }}</span>
+        </component>
+
+        <component
+          :is="hasTitle ? 'dd' : 'div'"
+          v-else
+          data-gr-statistic-value
+          data-testid="gr-statistic-value"
+          class="m-0 mt-0.5 flex items-baseline gap-1"
+        >
+          <span
+            v-if="prefix || $slots.prefix"
+            data-gr-statistic-prefix
+            class="text-[var(--gr-muted-fg)]"
+            :class="statisticAffixSizeBySize[resolvedSize]"
+          >
+            <slot name="prefix">{{ prefix }}</slot>
+          </span>
+
+          <span
+            data-gr-statistic-number
+            :class="statisticValueClass({ size: resolvedSize, tone })"
+            :aria-hidden="isCounting ? 'true' : undefined"
+          >
+            <slot>{{ formatted }}</slot>
+          </span>
+
+          <!--
+            Пока идёт перебор, на экране промежуточное число. Диктору отдаётся
+            конечное: «1 284» глазами и «743» в ушах — не шум, а неверные данные.
+          -->
+          <span v-if="isCounting" data-gr-statistic-final class="sr-only">{{ finalFormatted }}</span>
+
+          <span
+            v-if="suffix || $slots.suffix"
+            data-gr-statistic-suffix
+            class="text-[var(--gr-muted-fg)]"
+            :class="statisticAffixSizeBySize[resolvedSize]"
+          >
+            <slot name="suffix">{{ suffix }}</slot>
+          </span>
+        </component>
+      </component>
 
       <div
         v-if="trend || trendText || $slots.trend"
@@ -206,5 +377,5 @@ const trendLabel = computed(() => {
         </slot>
       </div>
     </div>
-  </div>
+  </component>
 </template>

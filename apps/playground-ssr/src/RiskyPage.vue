@@ -13,6 +13,7 @@ import {
   GrKbd,
   GrSegmented,
   GrSlider,
+  GrStatistic,
   GrToaster,
   GrTree,
   GrTreeSelect,
@@ -114,6 +115,12 @@ const images = [
     <GrInputTag v-model="tags" aria-label="Теги" />
 
     <GrSlider v-model="volume" :min="0" :max="100" aria-label="Громкость" />
+
+    <!--
+      `animate` читает `matchMedia` и крутит `requestAnimationFrame`: на сервере
+      нет ни того, ни другого, и серверная разметка обязана нести конечное число.
+    -->
+    <GrStatistic title="Выручка" :value="1284500" prefix="₽" animate />
 
     <!--
       `virtual` считает окно от `maxHeight` и оценки строки: контейнера на

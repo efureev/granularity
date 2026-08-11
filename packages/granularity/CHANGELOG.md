@@ -109,7 +109,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **`GrNumberInput` steppers are disabled in `readonly`.** `stepBy` refused to act, so nothing changed on click —
   but the buttons looked alive, while the clear button in the same component already hides itself in that state.
 
+### Changed
+
+- **`GrStatistic` renders the label and the value as a pair.** They were two adjacent `div`s — a screen reader read
+  them in order and the meaning survived, but "term — value" was nowhere in the markup. It is now `<dl>` → `<dt>` →
+  `<dd>`, and only when there is a label: a definition list without a `<dt>` would be the same disconnection with a
+  claim to semantics. The trend line stays **outside** the `<dl>` (only `dt`/`dd` groups are allowed inside), its
+  place in the DOM unchanged. Every `data-` attribute is kept, so consumer styles written against them keep working;
+  `<dl>`/`<dd>` margins are zeroed explicitly, since the package preflight only resets `body`.
+
 ### Added
+
+- **`GrStatistic` counts, and can lead somewhere.** The one thing a dashboard expects from a "statistic" was the one
+  thing it could not do. `animate` now tweens the number when the tile appears and on every change — **from the
+  previous number**, not from zero: counting from zero on each refresh reads as a data reset. `animateDuration` sets
+  the length in milliseconds; deliberately not a token, because the `--gr-duration-*` scale tops out at 300 ms and
+  describes state changes, while walking a number is a different genre and its number belongs where the tween is.
+
+  This is the package's first JS-driven motion, so it carries the obligation the global clamp in `base.css` cannot:
+  the component reads `prefers-reduced-motion` itself, at tween start rather than in `setup` (there is no `matchMedia`
+  on the server, and the first client render would diverge). Under `reduce` the value is simply there, with no
+  intermediate frame. And while the tween runs, the visible number is `aria-hidden` and a visually hidden node carries
+  the final value — "1,284,500" on screen and "743,210" in the ears is not noise, it is wrong data.
+
+  Getting to the details is the same pattern `GrCard` and `GrListItem` already speak: `href` renders a link,
+  `clickable` a button, `as` your own tag or router component, plus a `click` emit.
 
 - **`GrTabs` closes tabs, and knows what to say when there are none.** Two gaps that were really one: the row had no
   dictionary of its own, so an empty tab list rendered nothing at all — not even a place for the consumer to put a
