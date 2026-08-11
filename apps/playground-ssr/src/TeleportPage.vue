@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrDropdown, GrSelect, GrTooltip, GrButton, GrFormField } from '@feugene/granularity'
+import { GrColorPicker, GrDropdown, GrSelect, GrTooltip, GrButton, GrFormField } from '@feugene/granularity'
 
 /**
  * Страница только из телепортирующих компонентов — сжатый набор для тестов.
@@ -16,6 +16,8 @@ const frameworks = [
   { label: 'Vue', value: 'vue' },
   { label: 'Nuxt', value: 'nuxt' },
 ]
+
+const brand = ref('#3b82f6')
 </script>
 
 <template>
@@ -34,6 +36,11 @@ const frameworks = [
         <div>Пункт меню</div>
       </template>
     </GrDropdown>
+
+    <!-- Панель едет в портал, а id триггера — из авто-id: обе точки расхождения сразу. -->
+    <GrFormField label="Цвет бренда">
+      <GrColorPicker v-model="brand" />
+    </GrFormField>
 
     <GrTooltip text="Подсказка">
       <GrButton size="sm">

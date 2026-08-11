@@ -271,6 +271,16 @@
   "link": {
     "opensInNewTab": "откроется в новой вкладке"
   },
+  "colorPicker": {
+    "panelLabel": "Выбор цвета",
+    "hue": "Оттенок",
+    "saturation": "Насыщенность",
+    "lightness": "Светлота",
+    "opacity": "Непрозрачность",
+    "hexLabel": "Значение hex",
+    "presetsLabel": "Палитра",
+    "swatchLabel": "Цвет {color}"
+  },
   "collapse": {
     "empty": "Пока пусто"
   },

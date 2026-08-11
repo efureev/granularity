@@ -69,6 +69,8 @@ export const demoPathByPreviewKey = {
   'gr-collapse-disabled-state':             'components/gr-collapse/GrCollapseDisabledStateDemo.vue',
   'gr-collapse-guard':                      'components/gr-collapse/GrCollapseGuardDemo.vue',
   'gr-collapse-multi-section':              'components/gr-collapse/GrCollapseMultiSectionDemo.vue',
+  'gr-color-picker-basic':                  'components/gr-color-picker/GrColorPickerBasicDemo.vue',
+  'gr-color-picker-form':                   'components/gr-color-picker/GrColorPickerFormDemo.vue',
   'gr-command-palette-async':               'components/gr-command-palette/GrCommandPaletteAsyncDemo.vue',
   'gr-command-palette-basic':               'components/gr-command-palette/GrCommandPaletteBasicDemo.vue',
   'gr-command-palette-recent':              'components/gr-command-palette/GrCommandPaletteRecentDemo.vue',

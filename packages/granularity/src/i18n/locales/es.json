@@ -269,6 +269,16 @@
   "link": {
     "opensInNewTab": "se abre en una pestaña nueva"
   },
+  "colorPicker": {
+    "panelLabel": "Selector de color",
+    "hue": "Tono",
+    "saturation": "Saturación",
+    "lightness": "Luminosidad",
+    "opacity": "Opacidad",
+    "hexLabel": "Valor hex",
+    "presetsLabel": "Paleta de colores",
+    "swatchLabel": "Color {color}"
+  },
   "collapse": {
     "empty": "Todavía no hay nada"
   },

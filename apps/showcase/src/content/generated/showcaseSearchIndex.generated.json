@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 62 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 63 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -515,6 +515,17 @@
     "context": "overlays / component",
     "searchableTitle": "grcollapse",
     "searchableContent": "grcollapse grcollapse collapses and expands additional content on demand. overlays component /components/gr-collapse packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcollapse generated public-api components components gr-collapse gr collapse"
+  },
+  {
+    "id": "entity:component:GrColorPicker",
+    "title": "GrColorPicker",
+    "description": "Picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette.",
+    "href": "/components/gr-color-picker",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "forms / component",
+    "searchableTitle": "grcolorpicker",
+    "searchableContent": "grcolorpicker grcolorpicker picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette. forms component /components/gr-color-picker packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcolorpicker generated public-api new components components gr-color-picker gr color picker"
   },
   {
     "id": "entity:component:GrCommandPalette",
@@ -1846,6 +1857,50 @@
     "context": "GrCollapse",
     "searchableTitle": "grcollapse integration notes",
     "searchableContent": "grcollapse collapses and expands additional content on demand. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrColorPicker:section:overview",
+    "title": "GrColorPicker / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-color-picker#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrColorPicker",
+    "searchableTitle": "grcolorpicker component overview",
+    "searchableContent": "grcolorpicker picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrColorPicker:section:live-examples",
+    "title": "GrColorPicker / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-color-picker#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrColorPicker",
+    "searchableTitle": "grcolorpicker live examples",
+    "searchableContent": "grcolorpicker picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrColorPicker:section:api",
+    "title": "GrColorPicker / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-color-picker#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrColorPicker",
+    "searchableTitle": "grcolorpicker generated api",
+    "searchableContent": "grcolorpicker picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrColorPicker:section:integration-notes",
+    "title": "GrColorPicker / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-color-picker#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrColorPicker",
+    "searchableTitle": "grcolorpicker integration notes",
+    "searchableContent": "grcolorpicker picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrCommandPalette:section:overview",

@@ -71,6 +71,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrCheckbox`](./components/GrCheckbox.md)
 - [`GrCheckboxGroup`](./components/GrCheckboxGroup.md)
 - [`GrCollapse`](./components/GrCollapse.md)
+- [`GrColorPicker`](./components/GrColorPicker.md)
 - [`GrCommandPalette`](./components/GrCommandPalette.md)
 - [`GrConfigProvider`](./components/GrConfigProvider.md)
 - [`GrConfirmDialog`](./components/GrConfirmDialog.md)

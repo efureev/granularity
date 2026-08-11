@@ -13,7 +13,7 @@ import { componentPath } from './components'
  * абсолютный `maxDiffPixels`): цель слоя — ловить именно цветовые регрессии
  * токенов, а они при дефолтных допусках не видны в принципе.
  *
- * Список — не все 60 компонентов, а выборка по визуальному «языку»: форм-контролы,
+ * Список — не все 64 компонента, а выборка по визуальному «языку»: форм-контролы,
  * поверхности, данные, состояния. Компонент попадает сюда, если его вид завязан на
  * токены и стабилен без взаимодействия; оверлеи, открывающиеся по клику, и всё с
  * асинхронным содержимым — нет, они дают мигающие эталоны.
@@ -45,6 +45,7 @@ const VISUAL_COMPONENTS = [
   'GrSegmented',
   'GrInputTag',
   'GrFormField',
+  'GrColorPicker',
   // Поверхности и типографика.
   'GrCard',
   'GrAlert',
@@ -90,5 +91,37 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(examples).toHaveScreenshot(`${componentPath(name).replace('/', '-')}-${theme}.png`)
       })
     }
+  })
+}
+
+/**
+ * Единственное исключение из правила «без взаимодействия»: закрытый
+ * `GrColorPicker` — это кнопка с образцом, и всё, ради чего гейт существует
+ * (радуга оттенка, переходы насыщенности и светлоты, шахматка под альфой),
+ * живёт в панели. Снимок берётся с самой панели, а не со страницы, поэтому
+ * плавающее позиционирование в эталон не попадает.
+ */
+for (const theme of ['light', 'dark'] as const) {
+  test(`visual (${theme}) GrColorPicker panel`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: theme })
+    await page.addInitScript((t) => {
+      try {
+        localStorage.setItem('gr-theme', t)
+      }
+      catch {
+        // ignore storage errors
+      }
+    }, theme)
+
+    await page.goto(componentPath('GrColorPicker'))
+    await page.locator('#live-examples').waitFor()
+    await page.waitForLoadState('networkidle')
+
+    // Второй триггер — демо формы: у него включена альфа, то есть все четыре канала.
+    await page.locator('[data-gr-color-picker-trigger]').nth(1).click()
+    const panel = page.locator('[data-gr-color-picker-panel]:visible')
+    await expect(panel).toBeVisible()
+
+    await expect(panel).toHaveScreenshot(`gr-color-picker-panel-${theme}.png`)
   })
 }

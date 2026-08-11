@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
 import GrCheckboxGroup from '../components/GrCheckboxGroup/GrCheckboxGroup.vue'
+import GrColorPicker from '../components/GrColorPicker/GrColorPicker.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
 import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
@@ -65,6 +66,7 @@ const controls: { component: unknown, meta: Control }[] = [
   { component: GrSlider, meta: { name: 'GrSlider', props: { modelValue: 0 }, widget: '[role="slider"]' } },
   { component: GrRating, meta: { name: 'GrRating', props: { modelValue: 0 }, widget: '[data-gr-rating]' } },
   { component: GrSegmented, meta: { name: 'GrSegmented', props: { modelValue: 'a', options: [{ value: 'a', label: 'A' }] }, widget: '[role="radiogroup"]' } },
+  { component: GrColorPicker, meta: { name: 'GrColorPicker', props: { modelValue: '#3b82f6' }, widget: '[data-gr-color-picker-trigger]' } },
   { component: GrFormFile, meta: { name: 'GrFormFile', props: { modelValue: null }, widget: '[data-gr-form-file]' } },
   { component: GrFileUpload, meta: { name: 'GrFileUpload', props: {}, widget: '[data-gr-file-upload]' } },
 ]

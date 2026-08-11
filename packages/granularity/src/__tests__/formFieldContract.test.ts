@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
 import GrCheckboxGroup from '../components/GrCheckboxGroup/GrCheckboxGroup.vue'
+import GrColorPicker from '../components/GrColorPicker/GrColorPicker.vue'
 import GrFileUpload from '../components/GrFileUpload/GrFileUpload.vue'
 import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
@@ -63,6 +64,7 @@ const controls: { name: string, render: () => unknown }[] = [
       options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }],
     }),
   },
+  { name: 'GrColorPicker', render: () => h(GrColorPicker, { modelValue: '#3b82f6' }) },
   { name: 'GrFormFile', render: () => h(GrFormFile, { modelValue: null }) },
   { name: 'GrFileUpload', render: () => h(GrFileUpload) },
 ]

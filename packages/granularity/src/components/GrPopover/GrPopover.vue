@@ -184,13 +184,21 @@ watch(isOpen, async (next) => {
   panelEl.value?.focus()
 })
 
+/** Роли, которые `aria-haspopup` действительно понимает. */
+const HASPOPUP_ROLES = ['dialog', 'menu', 'listbox', 'grid'] as const
+
 /**
  * Пропсы для реального фокусируемого триггера: `<button v-bind="triggerProps">`.
  * Клик вешается на обёртку, а ARIA — сюда, потому что `aria-expanded` обязан
  * жить на самом интерактивном элементе, а не на `div` вокруг него.
  */
 const triggerProps = computed(() => ({
-  'aria-haspopup': props.role === 'none' ? undefined : props.role,
+  // `aria-haspopup` принимает не любую роль: `group` в его списке нет, и
+  // объявленный им триггер отдавал бы невалидный атрибут, который AT просто
+  // отбрасывает. Роли вне списка сообщают о панели только через `aria-expanded`.
+  'aria-haspopup': HASPOPUP_ROLES.includes(props.role as (typeof HASPOPUP_ROLES)[number])
+    ? (props.role as (typeof HASPOPUP_ROLES)[number])
+    : undefined,
   'aria-expanded': isOpen.value,
   'aria-controls': isOpen.value ? panelId : undefined,
   'disabled': props.disabled || undefined,

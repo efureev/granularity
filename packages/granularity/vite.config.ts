@@ -111,6 +111,9 @@ export default defineConfig({
         'components/GrCollapse/index': fileURLToPath(
           new URL('./src/components/GrCollapse/index.ts', import.meta.url),
         ),
+        'components/GrColorPicker/index': fileURLToPath(
+          new URL('./src/components/GrColorPicker/index.ts', import.meta.url),
+        ),
         'components/GrCommandPalette/index': fileURLToPath(
           new URL('./src/components/GrCommandPalette/index.ts', import.meta.url),
         ),

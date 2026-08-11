@@ -137,6 +137,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrColorPicker`** — a colour field for theming and branding screens, where the colour used to be typed into a
+  plain `GrInput` and validated by eye. The trigger is a button carrying a swatch and the current value; the panel
+  holds the H/S/L channels, an optional opacity channel, a hex field and a grid of presets.
+
+  The model is a hex string — `#RRGGBB`, or `#RRGGBBAA` with `alpha` — which is the form a colour already has in
+  theme tokens, in an API payload and in CSS, so nothing needs converting on either side. An unparseable value neither
+  crashes the component nor gets rewritten: the panel falls back to `#000000` and the model is left alone until the
+  user picks something. Internally the colour is kept as HSLA, separately from the model, because hex is a lossy
+  projection — grey has no hue, and a picker that re-derived its state from the model would snap the hue slider back
+  to 0° the moment saturation reached zero.
+
+  Channels are ordinary `GrSlider`s rather than the usual 2D saturation/value square: that square is a widget of its
+  own, with its own gestures and two axes of keyboard, and its accessibility would have to be built from scratch.
+  What ships instead is a real `role="slider"` per channel, each with its own name and `aria-valuetext`. The panel is
+  a `GrPopover` dialog and stays non-modal, so `Tab` leaves it for the rest of the page while `Esc` closes it and
+  returns focus to the trigger through the shared layer stack. `Enter`/`Space` on the trigger opens the panel.
+
+  The full form-control contract is implemented — `disabled`, `readonly`, `invalid`, `required`, `ariaLabel`,
+  `update:modelValue`/`change`/`focus`/`blur`, exposed `focus()`/`blur()` — plus `v-model:open`, `placement`, `size`
+  from `GrConfigProvider`, `presets` (invalid entries are dropped, the selected one carries `aria-pressed`) and
+  `name`, which posts the value to a native form through a hidden input. There is deliberately no `clearable`: a
+  colour has no empty state.
+
+- New i18n keys `gr.colorPicker.*` (`panelLabel`, `hue`, `saturation`, `lightness`, `opacity`, `hexLabel`,
+  `presetsLabel`, `swatchLabel`) in all three locales.
+
 - **`GrSegmented` goes vertical.** Sidebar filters are the reason the orientation exists, and the component was one
   prop short of them. `orientation="vertical"` turns the row into a column and declares `aria-orientation`.
 

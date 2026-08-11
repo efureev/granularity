@@ -8,7 +8,7 @@ const componentGroups = {
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
-  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTree'],
   utilities: ['GrConfigProvider'],
 } as const satisfies Record<string, readonly string[]>
@@ -29,6 +29,7 @@ const componentSummaryOverrides = {
   GrButton: 'Triggers the primary action in a form, dialog or panel.',
   GrButtonGroup: 'Groups related buttons into a compact action cluster.',
   GrCard: 'A container for a meaningful block of content and actions.',
+  GrColorPicker: 'Picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette.',
   GrConfigProvider: 'Provides global defaults (control size, per-component props, i18n) to nested components — imperative dialogs included.',
   GrDivider: 'Separates content with a line, optionally with a centered label.',
   GrKbd: 'Displays a keyboard key or shortcut in a `<kbd>` element.',
@@ -132,6 +133,10 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
   'component:GrSlider': {
     group: 'forms',
     tags: ['featured'],
+  },
+  'component:GrColorPicker': {
+    group: 'forms',
+    tags: ['new'],
   },
   'component:GrRating': {
     group: 'forms',

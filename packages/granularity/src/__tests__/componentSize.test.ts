@@ -17,6 +17,7 @@ import GrCollapse from '../components/GrCollapse/GrCollapse.vue'
 import GrCollapseItem from '../components/GrCollapse/GrCollapseItem.vue'
 import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
+import GrColorPicker from '../components/GrColorPicker/GrColorPicker.vue'
 import GrCommandPalette from '../components/GrCommandPalette/GrCommandPalette.vue'
 import GrConfirmDialog from '../components/GrConfirmDialog/GrConfirmDialog.vue'
 import GrDialog from '../components/GrDialog/GrDialog.vue'
@@ -145,6 +146,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
       options: [{ value: 'a', label: 'A' }],
     }),
   },
+  { name: 'GrColorPicker', render: () => h(GrColorPicker, { modelValue: '#3b82f6' }) },
   { name: 'GrRating', render: () => h(GrRating, { modelValue: 0 }) },
   {
     name: 'GrSegmented',

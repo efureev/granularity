@@ -1727,6 +1727,162 @@
       }
     ]
   },
+  "GrColorPicker": {
+    "name": "GrColorPicker",
+    "sourcePath": "packages/granularity/src/components/GrColorPicker/GrColorPicker.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Только для чтения: цвет видно, панель открывается, но значение не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы: значение уходит скрытым полем.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placement",
+            "description": "Сторона, с которой раскрывается панель.",
+            "type": "\"bottom-start\" | \"bottom-end\" | \"top-start\" | \"top-end\" | undefined",
+            "required": false,
+            "default": "\"bottom-start\""
+          },
+          {
+            "name": "alpha",
+            "description": "Четвёртый слайдер и восьмизначная форма hex.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "presets",
+            "description": "Палитра быстрого выбора. Пусто — блок не рендерится.",
+            "type": "string[] | undefined",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "modelValue",
+            "description": "Цвет в hex: `#RRGGBB`, а при `alpha` — `#RRGGBBAA`. Мусор не роняет компонент.",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          },
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrCommandPalette": {
     "name": "GrCommandPalette",
     "sourcePath": "packages/granularity/src/components/GrCommandPalette/GrCommandPalette.vue",
@@ -6500,7 +6656,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"listbox\" | \"grid\" | \"dialog\" | \"group\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"listbox\" | \"grid\" | \"dialog\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
           },
           {
             "name": "content",

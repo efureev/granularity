@@ -108,6 +108,10 @@
       "types": "./dist/types/src/components/GrCollapse/index.d.ts",
       "import": "./dist/components/GrCollapse/index.js"
     },
+    "./components/GrColorPicker": {
+      "types": "./dist/types/src/components/GrColorPicker/index.d.ts",
+      "import": "./dist/components/GrColorPicker/index.js"
+    },
     "./components/GrCommandPalette": {
       "types": "./dist/types/src/components/GrCommandPalette/index.d.ts",
       "import": "./dist/components/GrCommandPalette/index.js"

@@ -2186,6 +2186,55 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
   },
   {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-checker-size",
+    "kind": "hook",
+    "default": "6px",
+    "description": "Сторона клетки шахматной подложки под прозрачным цветом."
+  },
+  {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-checker-light",
+    "kind": "hook",
+    "default": "var(--gr-bg)",
+    "description": "Светлая клетка шахматной подложки."
+  },
+  {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-checker-dark",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Тёмная клетка шахматной подложки."
+  },
+  {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-track-hue",
+    "kind": "inline",
+    "default": "радуга по кругу оттенков",
+    "description": "Градиент дорожки оттенка. Задаётся компонентом: через `--gr-slider-rail` градиент не подать — хук уходит в `background-color`."
+  },
+  {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-track-saturation",
+    "kind": "inline",
+    "default": "от серого к насыщенному при текущих оттенке и светлоте",
+    "description": "Градиент дорожки насыщенности."
+  },
+  {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-track-lightness",
+    "kind": "inline",
+    "default": "от чёрного через текущий цвет к белому",
+    "description": "Градиент дорожки светлоты."
+  },
+  {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-track-alpha",
+    "kind": "inline",
+    "default": "от прозрачного к текущему цвету",
+    "description": "Градиент дорожки прозрачности."
+  },
+  {
     "owner": "GrCommandPalette",
     "name": "--gr-command-active-bg",
     "kind": "hook",
