@@ -471,7 +471,7 @@
   },
   "search": {
     "open": "Открыть поиск",
-    "summary": "Ищите страницы, сущности и section anchors по названию, alias и контексту использования.",
+    "label": "Поиск",
     "placeholder": "Например: GrButton, file validation, useTheme",
     "noResults": "Ничего не найдено. Попробуйте имя сущности, export name, тип (`component`, `utility`) или section-title.",
     "openComponents": "Открыть components",
@@ -483,6 +483,11 @@
       "directive": "Директивы",
       "composable": "Композаблы",
       "utility": "Утилиты"
+    },
+    "hints": {
+      "navigate": "навигация",
+      "select": "выбрать",
+      "close": "закрыть"
     }
   },
   "theme": {

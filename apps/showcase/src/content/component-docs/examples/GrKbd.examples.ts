@@ -15,4 +15,11 @@ export const grKbdExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-kbd-hotkey-hints',
   },
+  {
+    id: 'kbd-navbar-search',
+    title: 'Поиск в шапке приложения',
+    description: 'Сочетание рядом с кнопкой — единственный способ узнать про ⌘K, не нажимая его. Кнопка открывает `GrCommandPalette`, а само сочетание вешает директива `v-hotkey`; диктору его сообщает `aria-keyshortcuts`, поэтому клавиши в разметке декоративны.',
+    status: 'ready',
+    previewKey: 'gr-kbd-navbar-search',
+  },
 ]

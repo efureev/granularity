@@ -3,7 +3,7 @@ import { computed, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrCommandPalette, type GrCommandItem } from '@feugene/granularity'
+import { GrCommandPalette, GrKbd, type GrCommandItem } from '@feugene/granularity'
 
 import { useShowcaseSearch } from '../../app/useShowcaseSearch'
 
@@ -66,10 +66,29 @@ function onSelect(item: GrCommandItem): void {
       </div>
     </template>
 
+    <!--
+      Подсказки, а не описание поиска: что искать, уже сказано плейсхолдером в
+      поле, а вот клавиши узнать больше неоткуда — палитра модальна, и мышью в
+      ней делают ровно один клик.
+    -->
     <template #footer>
-      <span class="showcase-text-muted text-xs">
-        {{ $t('showcase.search.summary') }}
-      </span>
+      <p class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span class="inline-flex items-center gap-1.5">
+          <GrKbd size="sm">↑</GrKbd>
+          <GrKbd size="sm">↓</GrKbd>
+          {{ $t('showcase.search.hints.navigate') }}
+        </span>
+
+        <span class="inline-flex items-center gap-1.5">
+          <GrKbd size="sm">↵</GrKbd>
+          {{ $t('showcase.search.hints.select') }}
+        </span>
+
+        <span class="inline-flex items-center gap-1.5">
+          <GrKbd size="sm">Esc</GrKbd>
+          {{ $t('showcase.search.hints.close') }}
+        </span>
+      </p>
     </template>
   </GrCommandPalette>
 </template>

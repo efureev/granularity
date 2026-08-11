@@ -471,7 +471,7 @@
   },
   "search": {
     "open": "Open search",
-    "summary": "Search pages, entities, and section anchors by title, alias, and usage context.",
+    "label": "Search",
     "placeholder": "For example: GrButton, file validation, useTheme",
     "noResults": "Nothing found. Try an entity name, export name, type (`component`, `utility`), or section title.",
     "openComponents": "Open components",
@@ -483,6 +483,11 @@
       "directive": "Directives",
       "composable": "Composables",
       "utility": "Utilities"
+    },
+    "hints": {
+      "navigate": "to navigate",
+      "select": "to select",
+      "close": "to close"
     }
   },
   "theme": {
