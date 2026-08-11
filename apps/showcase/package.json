@@ -43,7 +43,6 @@
     "test:overlay": "yarn build && playwright test e2e/overlay.spec.ts",
     "test:interaction": "yarn build && playwright test e2e/interaction.spec.ts",
     "test:visual": "yarn build && playwright test e2e/visual.spec.ts",
-    "test:visual:update": "yarn build && playwright test e2e/visual.spec.ts --update-snapshots",
-    "test:visual:update:linux": "bash ./scripts/update-visual-linux.sh"
+    "test:visual:update": "yarn build && playwright test e2e/visual.spec.ts --update-snapshots"
   }
 }

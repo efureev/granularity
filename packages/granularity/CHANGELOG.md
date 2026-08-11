@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - New i18n key `gr.form.readonly` in all three locales: without it the read-only state of those two controls had
   nothing to be announced with.
 
+- **Visual baselines no longer capture the showcase header.** It is `position: sticky`, so it painted over the top of
+  the snapshot region — version badge included — and a version bump alone invalidated every baseline without a single
+  component having changed. The header is masked now, and the gate is about components again.
+
 ## [v0.16.0] 2026-08-11
 
 ### Changed — BREAKING
