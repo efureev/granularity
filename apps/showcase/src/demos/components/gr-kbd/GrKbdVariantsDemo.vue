@@ -50,20 +50,5 @@ const combos = ['mod+K', 'mod+shift+P', 'ctrl+alt+delete']
         <GrKbd :keys="['G', 'P']" variant="sequence" :platform="platform" />
       </div>
     </div>
-
-    <div class="grid gap-2">
-      <p class="text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]">
-        Клавиши без букв: символ рисуется, а диктору достаётся имя
-      </p>
-      <div class="flex flex-wrap items-center gap-5">
-        <GrKbd :keys="['up']" :platform="platform" />
-        <GrKbd :keys="['down']" :platform="platform" />
-        <GrKbd keys="tab" :platform="platform" />
-        <GrKbd keys="backspace" :platform="platform" />
-        <GrKbd keys="mod+delete" :platform="platform" />
-        <GrKbd keys="pageup" :platform="platform" />
-        <GrKbd keys="enter" :platform="platform" />
-      </div>
-    </div>
   </div>
 </template>

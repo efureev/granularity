@@ -13,7 +13,11 @@
 
 import { eventMatchesKey, isAppleDevice, isComposingEvent, shiftSatisfied } from '../../internal/keyboard'
 
+import { findKbdToken, type HotkeyKeyView } from './hotkeyTokens'
+
 export { isAppleDevice } from '../../internal/keyboard'
+export { findKbdToken, GR_KBD_TOKENS } from './hotkeyTokens'
+export type { GrKbdKeyName, GrKbdTokenGroup, GrKbdTokenSpec, HotkeyKeyView } from './hotkeyTokens'
 
 export type ParsedCommandHotkey = {
   key: string
@@ -86,109 +90,17 @@ export function formatCommandHotkey(hotkey: ParsedCommandHotkey, apple = isApple
 }
 
 /**
- * Символьная клавиша: глиф плюс ключ читаемого имени. Без имени диктор
- * произносит `⌘` как «знак места интереса», а `↑` — как «стрелка вверх»,
- * то есть как значок, а не как клавишу.
- */
-function symbolKey(label: string, name: GrKbdKeyName): HotkeyKeyView {
-  return { label, name, symbol: true }
-}
-
-const ARROWS: Record<string, { label: string, name: GrKbdKeyName }> = {
-  up: { label: '↑', name: 'arrowUp' },
-  arrowup: { label: '↑', name: 'arrowUp' },
-  down: { label: '↓', name: 'arrowDown' },
-  arrowdown: { label: '↓', name: 'arrowDown' },
-  left: { label: '←', name: 'arrowLeft' },
-  arrowleft: { label: '←', name: 'arrowLeft' },
-  right: { label: '→', name: 'arrowRight' },
-  arrowright: { label: '→', name: 'arrowRight' },
-}
-
-const ARROW_GLYPHS: Record<string, { label: string, name: GrKbdKeyName }> = {
-  '↑': ARROWS.up,
-  '↓': ARROWS.down,
-  '←': ARROWS.left,
-  '→': ARROWS.right,
-}
-
-/** Одна клавиша в человекочитаемом виде. */
-export interface HotkeyKeyView {
-  /** Что видно на экране: символ (`⌘`) или слово (`Ctrl`). */
-  label: string
-  /**
-   * Ключ читаемого имени (`gr.kbd.<name>`) для символьных клавиш. У `K` или
-   * `Ctrl` его нет — они и так читаются вслух.
-   */
-  name?: GrKbdKeyName
-  /** Символ (`⌘`, `↑`) или слово (`Ctrl`, `Esc`): от этого зависит склейка в одной плашке. */
-  symbol?: boolean
-}
-
-/** Ключи читаемых имён — `gr.kbd.<name>`. */
-export type GrKbdKeyName =
-  | 'command' | 'option' | 'shift' | 'control' | 'enter' | 'escape' | 'tab'
-  | 'backspace' | 'delete' | 'pageUp' | 'pageDown'
-  | 'arrowUp' | 'arrowDown' | 'arrowLeft' | 'arrowRight'
-
-/**
- * Токен → то, что видит пользователь. `mod` зависит от платформы: на macOS это
- * Cmd, на остальных — Ctrl. Символы отдаются вместе с ключом читаемого имени:
- * `⌘` без имени диктор произносит как «знак места интереса».
+ * Токен → то, что видит пользователь. Каталог общий с витриной и докой
+ * (`hotkeyTokens.ts`): цепочка `if` расходилась бы со списком, который читает
+ * потребитель.
  */
 export function formatHotkeyToken(token: string, apple: boolean): HotkeyKeyView {
+  const spec = findKbdToken(token)
+  if (spec) return apple ? spec.apple : spec.other
+
+  // Не из каталога — печатная клавиша: одиночный символ заглавным, потому что
+  // `k` и `K` на клавише выглядят одинаково.
   const t = token.trim()
-  const lower = t.toLowerCase()
-
-  // Читаемое имя добавляется только к символу: у слова `Ctrl` оно дало бы
-  // диктору «Ctrl Control».
-  if (lower === 'mod')
-    return apple ? symbolKey('⌘', 'command') : { label: 'Ctrl' }
-
-  if (lower === 'meta' || lower === 'cmd' || lower === 'command' || t === '⌘')
-    return apple ? symbolKey('⌘', 'command') : { label: 'Meta' }
-
-  if (lower === 'ctrl' || lower === 'control' || t === '⌃')
-    return apple ? symbolKey('⌃', 'control') : { label: 'Ctrl' }
-
-  if (lower === 'alt' || lower === 'option' || t === '⌥')
-    return apple ? symbolKey('⌥', 'option') : { label: 'Alt' }
-
-  if (lower === 'shift' || t === '⇧')
-    return apple ? symbolKey('⇧', 'shift') : { label: 'Shift' }
-
-  if (lower === 'enter' || lower === 'return' || t === '↵' || t === '↩')
-    return apple ? symbolKey('↩', 'enter') : { label: 'Enter' }
-
-  if (lower === 'esc' || lower === 'escape')
-    return { label: 'Esc', name: 'escape' }
-
-  if (lower === 'space')
-    return { label: 'Space' }
-
-  if (lower === 'tab' || t === '⇥')
-    return apple ? symbolKey('⇥', 'tab') : { label: 'Tab' }
-
-  if (lower === 'backspace' || t === '⌫')
-    return apple ? symbolKey('⌫', 'backspace') : { label: 'Backspace' }
-
-  if (lower === 'delete' || lower === 'del' || t === '⌦')
-    return apple ? symbolKey('⌦', 'delete') : { label: 'Del' }
-
-  if (lower === 'pageup' || lower === 'pgup' || t === '⇞')
-    return apple ? symbolKey('⇞', 'pageUp') : { label: 'PgUp' }
-
-  if (lower === 'pagedown' || lower === 'pgdn' || lower === 'pgdown' || t === '⇟')
-    return apple ? symbolKey('⇟', 'pageDown') : { label: 'PgDn' }
-
-  // Стрелки одинаковы на всех платформах: словом их пишут только в прозе.
-  const arrow = ARROWS[lower] ?? ARROW_GLYPHS[t]
-  if (arrow) return symbolKey(arrow.label, arrow.name)
-
-  if (lower === 'home') return { label: 'Home' }
-  if (lower === 'end') return { label: 'End' }
-
-  // Одиночный символ — заглавным: `k` и `K` на клавише выглядят одинаково.
   return { label: t.length === 1 ? t.toUpperCase() : t }
 }
 

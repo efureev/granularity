@@ -106,8 +106,8 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
         </nav>
 
         <div class="ml-auto flex items-center gap-1 sm:gap-2">
-          <ShowcaseLocaleSwitcher class="hidden sm:inline-grid" />
           <ShowcaseQuickSearch />
+          <ShowcaseLocaleSwitcher class="hidden sm:inline-grid" />
           <ThemeSwitcher />
         </div>
       </div>

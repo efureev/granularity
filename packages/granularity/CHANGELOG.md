@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the four arrows, each with a readable name behind the glyph. Until now those keys were written as bare glyphs in
   markup, and a screen reader announced `↑` as a symbol rather than as a key.
 
+- **The key catalogue is public**: `GR_KBD_TOKENS` (with `findKbdToken`) lists every token `keys` accepts — the
+  canonical name, its aliases and how it looks on each platform. The formatter reads the same table, so the list in
+  the docs and in the showcase cannot drift from the behaviour.
+
 - **`variant="sequence"`** for chords typed one key after another (`G` then `I`), with the connecting word coming
   from the locale.
 

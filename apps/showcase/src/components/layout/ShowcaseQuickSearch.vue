@@ -25,7 +25,7 @@ const { toggle } = useShowcaseSearch()
   <button
     type="button"
     data-showcase-search-trigger
-    class="showcase-pill inline-flex h-8 items-center gap-2 rounded-[var(--gr-radius-md)] border px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-tight)] transition-colors md:px-3"
+    class="showcase-pill inline-flex h-8 items-center gap-2 rounded-[var(--gr-radius-md)] border px-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-tight)] transition-colors md:pl-2 md:!pr-1"
     :aria-label="$t('showcase.search.open')"
     aria-haspopup="dialog"
     aria-keyshortcuts="Control+K Meta+K"

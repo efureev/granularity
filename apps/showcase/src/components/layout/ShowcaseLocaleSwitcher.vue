@@ -27,7 +27,7 @@ const selectedLocale = computed<'ru' | 'en'>({
   <GrSegmented
     v-model="selectedLocale"
     class="font-semibold showcase-pill"
-    size="sm"
+    size="xs"
     :options="localeOptions"
     :aria-label="$t('showcase.header.languageLabel')"
   />

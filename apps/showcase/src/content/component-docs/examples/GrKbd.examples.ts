@@ -29,4 +29,11 @@ export const grKbdExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-kbd-variants',
   },
+  {
+    id: 'kbd-tokens',
+    title: 'Все клавиши, которые понимает `keys`',
+    description: 'Список приходит из самого пакета (`GR_KBD_TOKENS`), а не переписан в витрине: своя копия разошлась бы с форматтером на первой же новой клавише. Для каждой клавиши видно, что писать в `keys`, какие синонимы принимаются и какое имя получит диктор вместо глифа.',
+    status: 'ready',
+    previewKey: 'gr-kbd-tokens',
+  },
 ]
