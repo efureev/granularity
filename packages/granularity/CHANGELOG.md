@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.16.0] 2026-08-11
+
 ### Changed — BREAKING
 
 - **`GrNumberInput` models a number.** `v-model` was a `string`, which made the numeric control the only one in the

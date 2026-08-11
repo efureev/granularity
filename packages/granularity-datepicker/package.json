@@ -94,7 +94,7 @@
     "date-fns": "^4.1.0"
   },
   "devDependencies": {
-    "@feugene/granularity": "^0.15.0",
+    "@feugene/granularity": "^0.16.0",
     "@feugene/unocss-preset-granular": "^0.8.1",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",
