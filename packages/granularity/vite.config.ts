@@ -252,6 +252,9 @@ export default defineConfig({
         'components/GrTextarea/index': fileURLToPath(
           new URL('./src/components/GrTextarea/index.ts', import.meta.url),
         ),
+        'components/GrTimeline/index': fileURLToPath(
+          new URL('./src/components/GrTimeline/index.ts', import.meta.url),
+        ),
         'components/GrToaster/index': fileURLToPath(
           new URL('./src/components/GrToaster/index.ts', import.meta.url),
         ),

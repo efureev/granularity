@@ -118,6 +118,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrTabPanels`](./components/GrTabPanels.md)
 - [`GrTabs`](./components/GrTabs.md)
 - [`GrTextarea`](./components/GrTextarea.md)
+- [`GrTimeline`](./components/GrTimeline.md)
 - [`GrToaster`](./components/GrToaster.md)
 - [`GrTooltip`](./components/GrTooltip.md)
 - [`GrTree`](./components/GrTree.md)

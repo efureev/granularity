@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 63 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 64 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -1021,6 +1021,17 @@
     "context": "forms / component",
     "searchableTitle": "grtextarea",
     "searchableContent": "grtextarea grtextarea a multi-line field for long text and comments. forms component /components/gr-textarea packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grtextarea generated public-api components components gr-textarea gr textarea"
+  },
+  {
+    "id": "entity:component:GrTimeline",
+    "title": "GrTimeline",
+    "description": "Shows a chronological feed of events with an axis, markers and day headings.",
+    "href": "/components/gr-timeline",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grtimeline",
+    "searchableContent": "grtimeline grtimeline shows a chronological feed of events with an axis, markers and day headings. data component /components/gr-timeline packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grtimeline generated public-api new components components gr-timeline gr timeline"
   },
   {
     "id": "entity:component:GrToaster",
@@ -3881,6 +3892,50 @@
     "context": "GrTextarea",
     "searchableTitle": "grtextarea integration notes",
     "searchableContent": "grtextarea a multi-line field for long text and comments. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrTimeline:section:overview",
+    "title": "GrTimeline / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-timeline#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTimeline",
+    "searchableTitle": "grtimeline component overview",
+    "searchableContent": "grtimeline shows a chronological feed of events with an axis, markers and day headings. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrTimeline:section:live-examples",
+    "title": "GrTimeline / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-timeline#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTimeline",
+    "searchableTitle": "grtimeline live examples",
+    "searchableContent": "grtimeline shows a chronological feed of events with an axis, markers and day headings. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrTimeline:section:api",
+    "title": "GrTimeline / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-timeline#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTimeline",
+    "searchableTitle": "grtimeline generated api",
+    "searchableContent": "grtimeline shows a chronological feed of events with an axis, markers and day headings. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrTimeline:section:integration-notes",
+    "title": "GrTimeline / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-timeline#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrTimeline",
+    "searchableTitle": "grtimeline integration notes",
+    "searchableContent": "grtimeline shows a chronological feed of events with an axis, markers and day headings. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrToaster:section:overview",

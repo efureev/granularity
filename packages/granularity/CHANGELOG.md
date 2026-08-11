@@ -137,6 +137,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrTimeline`** — an event feed with an axis, markers and day headings: order history, audit log, delivery
+  status. Until now that shape was assembled by hand out of `GrList` plus home-made `::before` lines, and every
+  application drew it differently.
+
+  Items come in either of the two ways `GrList` already established. A heterogeneous feed is written as
+  `GrTimelineItem` children; a uniform set is passed as `items` and rendered through `#item` — and only then does
+  the timeline know the shape of the data, which is what makes `groupBy` possible. Grouping only *cuts* the set: the
+  order of events and of groups stays exactly as it arrived, and no date is parsed anywhere. What counts as a day is
+  the application's call — a field name or a function — because the alternative is a component that owns time zones
+  and locale formats the library does not have.
+
+  A flat feed is an `<ol>`; a grouped one is a sequence of `<section>`s, each with its own heading (`<h3>` by
+  default, `groupHeadingLevel` to fit the page) and its own list. The day heading is deliberately not a list item —
+  a `<li>` holding a date would be announced as one of the events. The axis and the markers are `aria-hidden`: the
+  text carries the meaning and the tone only reinforces it. A time label is a `<time>`, machine-readable when
+  `datetime` is given.
+
+  Beyond the default single axis, `layout` offers a left-hand time column and an alternating two-sided feed, and
+  `orientation="horizontal"` turns the axis sideways — the feed becomes a scroller and takes `tabindex="0"`, since a
+  scrollable region has to be reachable from the keyboard. Vertical layouts do not apply there and say so in DEV. The
+  alternating layout folds back to one side on a narrow screen. Markers take a `tone`, an `outlined` variant or a
+  `#marker` slot of their own, and `pending` marks an event that has not happened yet: hollow dot, and the stretch of
+  axis *leading to it* dashed — leading, not following, because the unfinished event is normally the last one and its
+  own segment is not visible at all.
+
+  There is no keyboard of its own, no clickable row and no virtualisation: the feed displays, and anything
+  interactive is placed inside it by the consumer.
+
+- New i18n key `gr.timeline.empty` in all three locales.
+
 - **New `GrColorPicker`** — a colour field for theming and branding screens, where the colour used to be typed into a
   plain `GrInput` and validated by eye. The trigger is a button carrying a swatch and the current value; the panel
   holds the H/S/L channels, an optional opacity channel, a hex field and a grid of presets.

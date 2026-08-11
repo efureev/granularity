@@ -2676,6 +2676,83 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет рамки дорожки переключателя."
   },
   {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-axis-width",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина оси ленты."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-axis-color",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Цвет оси и пунктира у незавершённых событий."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-marker-size",
+    "kind": "hook",
+    "default": "10px",
+    "description": "Диаметр точки события."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-marker-ring",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина обводки полой точки (`variant=\"outlined\"`, `pending`)."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-marker-top",
+    "kind": "hook",
+    "default": "0.35rem",
+    "description": "Отступ точки сверху: выравнивает её по первой строке текста события."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-gap",
+    "kind": "hook",
+    "default": "0.75rem",
+    "description": "Расстояние между колонками ленты — осью, меткой времени и содержимым."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-line-min",
+    "kind": "hook",
+    "default": "0.75rem",
+    "description": "Минимальная длина отрезка оси: без неё однострочное событие обрывало бы линию."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-time-width",
+    "kind": "hook",
+    "default": "5.5rem",
+    "description": "Ширина колонки времени в `layout=\"time\"`."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-dash",
+    "kind": "hook",
+    "default": "4px",
+    "description": "Шаг пунктира на отрезке оси после незавершённого события."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-item-min-width",
+    "kind": "hook",
+    "default": "12rem",
+    "description": "Ширина колонки события в горизонтальной ленте."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-columns",
+    "kind": "css",
+    "default": "`auto 1fr`, а по раскладкам — с колонкой времени либо симметричная",
+    "description": "Сетка колонок ленты. Задаётся собственным CSS компонента по `layout`; строка события и заголовок группы делят её, чтобы ось у них совпадала."
+  },
+  {
     "owner": "GrToaster",
     "name": "--gr-toaster-width",
     "kind": "css",

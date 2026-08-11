@@ -65,6 +65,7 @@ const VISUAL_COMPONENTS = [
   'GrProgressBar',
   'GrSkeleton',
   'GrStatistic',
+  'GrTimeline',
 ]
 
 for (const theme of ['light', 'dark'] as const) {

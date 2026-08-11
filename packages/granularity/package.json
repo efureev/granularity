@@ -296,6 +296,10 @@
       "types": "./dist/types/src/components/GrTextarea/index.d.ts",
       "import": "./dist/components/GrTextarea/index.js"
     },
+    "./components/GrTimeline": {
+      "types": "./dist/types/src/components/GrTimeline/index.d.ts",
+      "import": "./dist/components/GrTimeline/index.js"
+    },
     "./components/GrToaster": {
       "types": "./dist/types/src/components/GrToaster/index.d.ts",
       "import": "./dist/components/GrToaster/index.js"

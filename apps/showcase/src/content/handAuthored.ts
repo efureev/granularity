@@ -9,7 +9,7 @@ const componentGroups = {
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTree'],
+  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree'],
   utilities: ['GrConfigProvider'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -55,6 +55,7 @@ const componentSummaryOverrides = {
   GrInputTag: 'Lets you enter and edit a list of tags or values.',
   GrLink: 'A navigation link for moving between pages and resources.',
   GrList: 'Displays a vertical list of uniform items or actions.',
+  GrTimeline: 'Shows a chronological feed of events with an axis, markers and day headings.',
   GrLoading: 'Indicates that a section or action is currently loading.',
   GrModal: 'A modal window for an important scenario that temporarily blocks the background.',
   GrNavbar: 'Top navigation for the main sections and global actions.',
@@ -147,6 +148,10 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
   },
   'component:GrStatistic': {
     group: 'data',
+  },
+  'component:GrTimeline': {
+    group: 'data',
+    tags: ['new'],
   },
   'component:GrCommandPalette': {
     group: 'navigation',

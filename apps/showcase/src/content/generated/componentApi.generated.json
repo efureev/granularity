@@ -9661,6 +9661,140 @@
       }
     ]
   },
+  "GrTimeline": {
+    "name": "GrTimeline",
+    "sourcePath": "packages/granularity/src/components/GrTimeline/GrTimeline.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "items",
+            "description": "Данные ленты. С ними пункты рисует слот `#item` — и только так лента знает состав набора, то есть может его группировать.",
+            "type": "T[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "itemKey",
+            "description": "Ключ пункта для `v-for`: имя поля или функция. Без него — индекс.",
+            "type": "string | ((item: T, index: number) => string | number) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "groupBy",
+            "description": "Группировка: имя поля или функция от пункта. Заголовок группы — слот `#group`.",
+            "type": "GrTimelineGroupBy<T> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "groupHeadingLevel",
+            "description": "Уровень заголовка группы: лента обязана вписаться в структуру заголовков страницы.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "layout",
+            "description": "Раскладка: одна ось, колонка времени слева или чередование сторон.",
+            "type": "\"alternate\" | \"stacked\" | \"time\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "orientation",
+            "description": "Направление оси. Горизонтальная лента — скроллер.",
+            "type": "\"horizontal\" | \"vertical\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "density",
+            "description": "Плотность вертикальных отступов пункта.",
+            "type": "\"compact\" | \"regular\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "Идёт загрузка: вместо пунктов — заглушки, контейнер помечен `aria-busy`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loadingRows",
+            "description": "Сколько строк-заглушек показать при `loading`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "empty",
+            "description": "Лента пуста. По умолчанию определяется сама — по данным или по слоту; проп нужен там, где потребитель знает лучше.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Пункты ленты (`GrTimelineItem`), когда данные не переданы пропом.",
+            "type": "any"
+          },
+          {
+            "name": "item",
+            "description": "Пункт в data-режиме.",
+            "type": "{ item: T; index: number; }"
+          },
+          {
+            "name": "group",
+            "description": "Заголовок группы. По умолчанию — сам ключ.",
+            "type": "{ group: string; items: T[]; }"
+          },
+          {
+            "name": "empty",
+            "description": "Содержимое пустого состояния вместо текста по умолчанию.",
+            "type": "any"
+          },
+          {
+            "name": "loading",
+            "description": "Заглушки загрузки вместо строк по умолчанию.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrToaster": {
     "name": "GrToaster",
     "sourcePath": "packages/granularity/src/components/GrToaster/GrToaster.vue",

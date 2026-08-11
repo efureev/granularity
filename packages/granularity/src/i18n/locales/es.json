@@ -291,6 +291,9 @@
   "table": {
     "empty": "Todavía no hay nada"
   },
+  "timeline": {
+    "empty": "Todavía no hay nada"
+  },
   "tabs": {
     "empty": "Todavía no hay nada",
     "close": "Cerrar pestaña"
