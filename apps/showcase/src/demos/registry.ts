@@ -221,6 +221,7 @@ export const demoPathByPreviewKey = {
   'gr-prompt-dialog-service-link':          'components/gr-confirm-dialog/GrDialogServiceLinkDemo.vue',
   'gr-progress-circle-basic':               'components/gr-progress-circle/GrProgressCircleBasicDemo.vue',
   'gr-progress-circle-dashboard':           'components/gr-progress-circle/GrProgressCircleDashboardDemo.vue',
+  'gr-progress-circle-ticking':             'components/gr-progress-circle/GrProgressCircleTickingDemo.vue',
   'gr-progress-circle-upload':              'components/gr-progress-circle/GrProgressCircleUploadDemo.vue',
   'gr-radio-button-variant':                'components/gr-radio/GrRadioButtonVariantDemo.vue',
   'gr-radio-descriptions':                  'components/gr-radio/GrRadioDescriptionsDemo.vue',

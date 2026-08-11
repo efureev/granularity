@@ -16,6 +16,13 @@ export const grProgressCircleExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-progress-circle-dashboard',
   },
   {
+    id: 'progress-circle-ticking',
+    title: 'Живое значение',
+    description: 'Два кольца на одной шкале 0…100: левое прибавляет пять процентов раз в секунду, правое — раз в пять секунд. Дуга догоняет новое значение переходом, поэтому частый шаг читается как непрерывное движение, а редкий — как отдельные приращения.',
+    status: 'ready',
+    previewKey: 'gr-progress-circle-ticking',
+  },
+  {
     id: 'progress-circle-upload',
     title: 'Аплоад: от «соединяемся» до галочки',
     description: 'Пока доли прогресса нет — `indeterminate`; дальше значение, а на завершении `statusIcon` меняет число на галочку. Кнопка отмены живёт в центре кольца и остаётся кликабельной: центр лежит рядом с `role="progressbar"`, а не внутри него.',
