@@ -11,16 +11,18 @@ import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
-import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
-import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
-import { matchesOptionQuery, normalizeOptionQuery, resolveSelectedOptions } from '../shared/optionFilter'
+import { useSelectPanelItems } from './composables/useSelectPanelItems'
+import { useSelectNavigation } from './composables/useSelectNavigation'
+import { useSelectVirtualization } from './composables/useSelectVirtualization'
+import type { GrSelectPanelOptionRow, GrSelectPanelRow } from './composables/useSelectPanelItems'
+import { useSelectValues } from './composables/useSelectValues'
+import { isEmptySelectValue } from './selectValue'
 
 import {
   defaultBaseClass,
@@ -330,118 +332,26 @@ function blur(): void {
 defineExpose({ focus, blur })
 const describedBy = computed(() => field?.describedById.value)
 
-const optionsResolved = computed<GrSelectOptionOrGroup<TValue>[]>(() => props.options ?? [])
-
-function isOptionGroup(item: GrSelectOptionOrGroup<TValue>): item is GrSelectOptionGroup<TValue> {
-  return Array.isArray((item as GrSelectOptionGroup).options)
-}
-
-/** Плоский список всех опций (группы «развёрнуты»). Используется для всех вычислений по значениям. */
-const flatOptions = computed<GrSelectOption<TValue>[]>(() => {
-  const result: GrSelectOption<TValue>[] = []
-  for (const item of optionsResolved.value) {
-    if (isOptionGroup(item)) result.push(...item.options)
-    else result.push(item)
-  }
-  return result
-})
-
-/**
- * Ключ значения: для объектов — поле `valueKey`, иначе само значение строкой.
- * Через него идут все сравнения — `===` для объектов означал бы сравнение
- * ссылок, а модель обычно приходит снаружи отдельной копией.
- */
-function keyOf(value: unknown): string {
-  if (value !== null && typeof value === 'object') {
-    const key = props.valueKey
-    const own = key ? (value as Record<string, unknown>)[key] : undefined
-
-    if (own === undefined && import.meta.env?.DEV) {
-      console.warn(
-        '[granularity] GrSelect: объектные значения требуют `valueKey` с именем поля-идентификатора; '
-        + 'без него опции неотличимы друг от друга.',
-      )
-    }
-
-    return String(own ?? JSON.stringify(value))
-  }
-
-  return String(value)
-}
-
-function sameValue(a: unknown, b: unknown): boolean {
-  return keyOf(a) === keyOf(b)
-}
-
-/**
- * `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy:
- * прежняя проверка `if (!value)` теряла ноль вместе с пустой строкой.
- */
-function isEmptyValue(value: unknown): boolean {
-  return value === undefined || value === null || value === ''
-}
-
-function modelToArray(value: GrSelectModelValue<TValue>): TValue[] {
-  if (Array.isArray(value)) return value
-  if (isEmptyValue(value)) return []
-  return [value]
-}
-
-const modelSingle = computed<TValue | ''>(() => {
-  const raw = Array.isArray(props.modelValue) ? props.modelValue[0] : props.modelValue
-  return isEmptyValue(raw) ? '' : (raw as TValue)
-})
-
-const modelMultiple = computed(() => modelToArray(props.modelValue))
-
-const selectedValues = computed(() => {
-  return props.multiple ? modelMultiple.value : (isEmptyValue(modelSingle.value) ? [] : [modelSingle.value as TValue])
-})
-
-const hasSelection = computed(() => selectedValues.value.length > 0)
-
-/**
- * Нативный `<select>` хранит в `option.value` строку, поэтому значение,
- * вернувшееся из DOM, нужно восстановить в исходный тип. Карта строится по
- * опциям: `String(value)` — ключ, само значение — результат.
- */
-const valueByDomKey = computed<Map<string, TValue>>(() => {
-  const map = new Map<string, TValue>()
-  for (const option of flatOptions.value) map.set(keyOf(option.value), option.value)
-  return map
-})
-
-/** Восстанавливает типизированное значение из строки, пришедшей из DOM. */
-function fromDomValue(raw: string): TValue {
-  const known = valueByDomKey.value.get(raw)
-  if (known !== undefined) return known
-  // Значения нет среди опций — это `allowCustomValue`, а он по природе строковый.
-  return raw as TValue
-}
-
-const selectedOptions = computed<GrSelectOption<TValue>[]>(() =>
-  resolveSelectedOptions(selectedValues.value, flatOptions.value, keyOf),
-)
-
-const hasModelInOptions = computed(() => {
-  if (props.multiple) return false
-  return flatOptions.value.some(o => sameValue(o.value, modelSingle.value))
-})
-
-const displayLabel = computed<string>(() => {
-  if (props.multiple) {
-    if (!selectedValues.value.length) return ''
-    return selectedValues.value
-      .map(v => flatOptions.value.find(o => sameValue(o.value, v))?.label ?? keyOf(v))
-      .join(', ')
-  }
-
-  return flatOptions.value.find(o => sameValue(o.value, modelSingle.value))?.label ?? String(modelSingle.value)
-})
-
-const displayText = computed(() => {
-  if (hasSelection.value) return displayLabel.value
-  return props.placeholder ?? ''
+const {
+  optionsResolved,
+  flatOptions,
+  isOptionGroup,
+  keyOf,
+  sameValue,
+  modelSingle,
+  selectedValues,
+  hasSelection,
+  fromDomValue,
+  selectedOptions,
+  hasModelInOptions,
+  displayLabel,
+  displayText,
+} = useSelectValues<TValue>({
+  modelValue: () => props.modelValue,
+  options: () => props.options,
+  multiple: () => props.multiple,
+  valueKey: () => props.valueKey,
+  placeholder: () => props.placeholder,
 })
 
 const ADDON_MIN_WIDTH_BY_SIZE: Record<GrSelectSize, string> = {
@@ -569,119 +479,19 @@ const panelClasses = computed(() => {
   return grSelectPanelClasses
 })
 
-/**
- * Элемент рендера панели: либо заголовок группы, либо опция.
- * Группировка сохраняется, фильтрация по `customValue` скрывает пустые группы.
- */
-type GrSelectPanelItem<TItemValue extends GrSelectValue> =
-  | { kind: 'group', label: string, key: string }
-  /** `groupKey` связывает опцию с заголовком её группы для скринридера. */
-  | { kind: 'option', option: GrSelectOption<TItemValue>, key: string, groupKey?: string }
-
-const panelItems = computed<GrSelectPanelItem<TValue>[]>(() => {
-  const q = (props.allowCustomValue || props.filterable) ? normalizeOptionQuery(customValue.value) : ''
-  const items: GrSelectPanelItem<TValue>[] = []
-
-  // Опция для кастомного значения, которого нет в options (single).
-  if (props.allowCustomValue && !props.multiple && modelSingle.value !== '' && !hasModelInOptions.value) {
-    const custom: GrSelectOption<TValue> = { value: modelSingle.value as TValue, label: String(modelSingle.value) }
-    if (matchesOptionQuery(custom, q)) {
-      items.push({ kind: 'option', option: custom, key: `__custom__${custom.value}` })
-    }
-  }
-
-  optionsResolved.value.forEach((item, index) => {
-    if (isOptionGroup(item)) {
-      const matched = item.options.filter(o => matchesOptionQuery(o, q))
-      if (!matched.length) return
-      const groupKey = `__group__${index}`
-      items.push({ kind: 'group', label: item.label, key: groupKey })
-      for (const option of matched) {
-        // Ключ с индексом группы — одинаковое `value` в разных группах больше не даёт дубликат.
-        items.push({ kind: 'option', option, key: `${index}:${option.value}`, groupKey })
-      }
-      return
-    }
-
-    if (matchesOptionQuery(item, q)) {
-      items.push({ kind: 'option', option: item, key: `${index}:${item.value}` })
-    }
-  })
-
-  return items
-})
-
-/**
- * Строки панели для рендера: заголовок группы больше не сосед опций, а их
- * контейнер. Прямыми потомками `role="listbox"` обязаны быть только опции, а
- * заголовок даёт имя группе через `aria-labelledby`.
- *
- * `index` — позиция опции в `panelItems`: из неё строится `id`, поэтому он не
- * зависит от значения (значение с пробелом дало бы невалидный `id`).
- */
-type GrSelectPanelOptionRow<TItemValue extends GrSelectValue> = {
-  option: GrSelectOption<TItemValue>
-  key: string
-  index: number
-}
-
-type GrSelectPanelRow<TItemValue extends GrSelectValue> =
-  | {
-    kind: 'group'
-    label: string
-    key: string
-    options: GrSelectPanelOptionRow<TItemValue>[]
-    /**
-     * Есть ли в этой отрисовке видимый заголовок. При виртуализации окно может
-     * начаться серединой группы: обёртка нужна всё равно, а заголовка нет —
-     * имя тогда идёт в `aria-label`.
-     */
-    labelVisible?: boolean
-    /** Позиция заголовка в `panelItems` — по ней его замеряет виртуализатор. */
-    labelIndex?: number
-  }
-  | ({ kind: 'option' } & GrSelectPanelOptionRow<TItemValue>)
-
-const panelRows = computed<GrSelectPanelRow<TValue>[]>(() => {
-  const rows: GrSelectPanelRow<TValue>[] = []
-  let currentGroup: Extract<GrSelectPanelRow<TValue>, { kind: 'group' }> | undefined
-
-  panelItems.value.forEach((item, index) => {
-    if (item.kind === 'group') {
-      currentGroup = { kind: 'group', label: item.label, key: item.key, options: [] }
-      rows.push(currentGroup)
-      return
-    }
-
-    const row: GrSelectPanelOptionRow<TValue> = { option: item.option, key: item.key, index }
-
-    if (item.groupKey && currentGroup && currentGroup.key === item.groupKey) {
-      currentGroup.options.push(row)
-      return
-    }
-
-    currentGroup = undefined
-    rows.push({ kind: 'option', ...row })
-  })
-
-  return rows
-})
-
-const canAddCustom = computed(() => {
-  if (!props.allowCustomValue) return false
-  if (effectiveOptionsView.value !== 'panel') return false
-  // Кастомное значение набирается текстом, поэтому оно строковое —
-  // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
-  const v = customValue.value.trim() as TValue
-  if (!v) return false
-
-  if (props.multiple) {
-    if (selectedValues.value.some(selected => sameValue(selected, v))) return false
-    return !flatOptions.value.some(o => sameValue(o.value, v))
-  }
-
-  if (sameValue(v, modelSingle.value)) return false
-  return !flatOptions.value.some(o => sameValue(o.value, v))
+const { panelItems, panelRows, canAddCustom } = useSelectPanelItems<TValue>({
+  optionsResolved,
+  flatOptions,
+  isOptionGroup,
+  modelSingle,
+  selectedValues,
+  hasModelInOptions,
+  sameValue,
+  query: () => customValue.value,
+  allowCustomValue: () => props.allowCustomValue,
+  filterable: () => props.filterable,
+  multiple: () => props.multiple,
+  isPanelView: () => effectiveOptionsView.value === 'panel',
 })
 
 function emitValue(value: GrSelectModelValue<TValue>): void {
@@ -774,165 +584,23 @@ function groupLabelId(groupKey: string): string {
   return `${listboxId}-${groupKey}`
 }
 
-/**
- * Виртуализация панели.
- *
- * Набор — `[«Add …»?] + panelItems`, то есть заголовки групп идут в нём наравне
- * с опциями: на экране они занимают такую же строку. Вложенную структуру групп
- * рендер пересобирает уже из окна.
- */
-
-/** Оценки высоты строк: опция крупнее заголовка группы. Уточняются замером. */
-const OPTION_SIZE_ESTIMATE = 36
-const GROUP_LABEL_SIZE_ESTIMATE = 28
-
-const virtualEnabled = computed(() => props.virtual && effectiveOptionsView.value === 'panel')
-const addOffset = computed(() => (canAddCustom.value ? 1 : 0))
-const virtualCount = computed(() => panelItems.value.length + addOffset.value)
-
-const virtualizer = useVirtualList({
-  container: listboxEl,
-  count: () => (virtualEnabled.value ? virtualCount.value : 0),
-  // Фильтрация пересобирает набор строк — замеры прошлого набора невалидны.
-  source: () => panelItems.value,
-  itemSize: (index) => {
-    const item = panelItems.value[index - addOffset.value]
-    return item?.kind === 'group' ? GROUP_LABEL_SIZE_ESTIMATE : OPTION_SIZE_ESTIMATE
-  },
-  // Панель закрыта — контейнера в раскладке нет, `clientHeight` нулевой.
-  viewportSize: () => props.dropdownMaxHeight,
-})
-
-/**
- * Позиция и размер набора для каждой опции.
- *
- * Набор — не весь список: опция внутри `role="group"` принадлежит набору своей
- * группы, и `aria-posinset` отсчитывается от неё. Опции вне групп вместе с
- * кнопкой «Add …» образуют набор уровня listbox'а.
- */
-const optionSets = computed(() => {
-  const sizes = new Map<string, number>()
-  const positions = new Map<number, { setKey: string, posInSet: number }>()
-  const ROOT = '__root__'
-
-  let rootCount = canAddCustom.value ? 1 : 0
-
-  panelItems.value.forEach((item, index) => {
-    if (item.kind === 'group') return
-
-    const setKey = item.groupKey ?? ROOT
-    const next = (sizes.get(setKey) ?? (setKey === ROOT ? rootCount : 0)) + 1
-    sizes.set(setKey, next)
-    positions.set(index, { setKey, posInSet: next })
-    if (setKey === ROOT) rootCount = next
-  })
-
-  if (canAddCustom.value && !sizes.has(ROOT)) sizes.set(ROOT, rootCount)
-
-  return { sizes, positions, ROOT }
-})
-
-/** ARIA набора: объявляем только при виртуализации — иначе набор виден по DOM. */
-function optionSetProps(index: number): Record<string, number> | undefined {
-  if (!virtualEnabled.value) return undefined
-
-  const position = optionSets.value.positions.get(index)
-  if (!position) return undefined
-
-  return {
-    'aria-setsize': optionSets.value.sizes.get(position.setKey) ?? 1,
-    'aria-posinset': position.posInSet,
-  }
-}
-
-/** ARIA для кнопки «Add …»: она первая в наборе уровня listbox'а. */
-const addOptionSetProps = computed<Record<string, number> | undefined>(() => {
-  if (!virtualEnabled.value) return undefined
-  return {
-    'aria-setsize': optionSets.value.sizes.get(optionSets.value.ROOT) ?? 1,
-    'aria-posinset': 1,
-  }
-})
-
-/** Метка группы по её ключу: окно может начаться ниже заголовка. */
-const groupLabels = computed(() => {
-  const labels = new Map<string, string>()
-  for (const item of panelItems.value) {
-    if (item.kind === 'group') labels.set(item.key, item.label)
-  }
-  return labels
-})
-
-/** Виден ли «Add …»: вне окна его рисовать нельзя — он элемент набора. */
-const showAddOption = computed(() => {
-  if (!canAddCustom.value) return false
-  return !virtualEnabled.value || virtualizer.range.value.start === 0
-})
-
-/**
- * Строки к отрисовке. При виртуализации группы пересобираются из среза
- * `panelItems`: группа, начатая выше окна, всё равно открывается — иначе её
- * опции оказались бы прямыми детьми listbox'а и потеряли имя набора.
- */
-const renderedPanelRows = computed<GrSelectPanelRow<TValue>[]>(() => {
-  if (!virtualEnabled.value) return panelRows.value
-
-  const items = panelItems.value
-  const { start, end } = virtualizer.range.value
-  const from = Math.max(0, start - addOffset.value)
-  const to = Math.min(items.length, Math.max(0, end - addOffset.value))
-
-  const rows: GrSelectPanelRow<TValue>[] = []
-  let currentGroup: Extract<GrSelectPanelRow<TValue>, { kind: 'group' }> | undefined
-
-  for (let index = from; index < to; index++) {
-    const item = items[index]!
-
-    if (item.kind === 'group') {
-      currentGroup = {
-        kind: 'group',
-        label: item.label,
-        key: item.key,
-        options: [],
-        labelVisible: true,
-        labelIndex: index,
-      }
-      rows.push(currentGroup)
-      continue
-    }
-
-    const row: GrSelectPanelOptionRow<TValue> = { option: item.option, key: item.key, index }
-
-    if (item.groupKey) {
-      if (!currentGroup || currentGroup.key !== item.groupKey) {
-        currentGroup = {
-          kind: 'group',
-          label: groupLabels.value.get(item.groupKey) ?? '',
-          key: item.groupKey,
-          options: [],
-          labelVisible: false,
-        }
-        rows.push(currentGroup)
-      }
-      currentGroup.options.push(row)
-      continue
-    }
-
-    currentGroup = undefined
-    rows.push({ kind: 'option', ...row })
-  }
-
-  return rows
-})
-
-const listboxStyle = computed(() => {
-  const base: Record<string, string> = { maxHeight: `${props.dropdownMaxHeight}px` }
-  if (!virtualEnabled.value) return base
-
-  return {
-    ...base,
-    ...virtualizer.spacerStyle.value,
-  }
+const {
+  virtualEnabled,
+  addOffset,
+  scrollToIndex: scrollVirtualToIndex,
+  measure: measureVirtualRow,
+  optionSetProps,
+  addOptionSetProps,
+  showAddOption,
+  renderedPanelRows,
+  listboxStyle,
+} = useSelectVirtualization<TValue>({
+  panelItems,
+  panelRows,
+  canAddCustom,
+  listboxEl,
+  enabled: () => props.virtual && effectiveOptionsView.value === 'panel',
+  maxHeight: () => props.dropdownMaxHeight,
 })
 
 if (import.meta.env?.DEV) {
@@ -973,80 +641,6 @@ if (import.meta.env?.DEV) {
   )
 }
 
-/**
- * Клавиатура ходит и по опциям, и по строке «Add …» (как в `GrAutocomplete`):
- * иначе при непустом списке Enter не мог бы выбрать подсвеченную опцию, а при
- * активной опции — закоммитить произвольное значение.
- */
-type GrSelectNavigableItem<TItemValue extends GrSelectValue> =
-  | { kind: 'add' }
-  | { kind: 'option', value: TItemValue, index: number }
-
-const navigableItems = computed<GrSelectNavigableItem<TValue>[]>(() => {
-  const items: GrSelectNavigableItem<TValue>[] = canAddCustom.value ? [{ kind: 'add' }] : []
-
-  panelItems.value.forEach((item, index) => {
-    if (item.kind === 'option' && !item.option.disabled)
-      items.push({ kind: 'option', value: item.option.value, index })
-  })
-
-  return items
-})
-
-const addOptionDomId = computed(() => `${listboxId}-add`)
-
-/** Прокрутка к активному: у виртуализации окно, затем доводка `scrollIntoView`. */
-async function scrollActiveIntoView(item: GrSelectNavigableItem<TValue>): Promise<void> {
-  // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
-  // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
-  if (virtualEnabled.value)
-    virtualizer.scrollToIndex(item.kind === 'add' ? 0 : item.index + addOffset.value)
-
-  await nextTick()
-  const id = item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
-  document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
-}
-
-const {
-  activeIndex,
-  activeItem,
-  activeDescendantId,
-  setActive,
-  init: initActiveIndex,
-  reset: resetActive,
-  handleNavigationKeys,
-} = useComboboxNavigation<GrSelectNavigableItem<TValue>>({
-  items: () => navigableItems.value,
-  open: () => open.value,
-  idOf: item => (item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)),
-  initialIndex: () => navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.value)),
-  scrollTo: item => scrollActiveIntoView(item),
-})
-
-const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.value : undefined))
-
-/** Navigable-индекс по позиции в `panelItems`: O(1) на hover вместо O(n). */
-const navigableIndexByPanelIndex = computed(() => {
-  const map = new Map<number, number>()
-  navigableItems.value.forEach((item, navIndex) => {
-    if (item.kind === 'option') map.set(item.index, navIndex)
-  })
-  return map
-})
-
-function onOptionHover(panelIndex: number): void {
-  const next = navigableIndexByPanelIndex.value.get(panelIndex)
-  if (next !== undefined && next !== activeIndex.value) activeIndex.value = next
-}
-
-/**
- * `aria-activedescendant` работает только на элементе, который держит фокус.
- * С полем поиска фокус уходит в него, поэтому связка с активной опцией живёт
- * там же; на триггере она осталась бы немой.
- */
-const triggerActiveDescendant = computed(() => (showSearchInput.value ? undefined : activeDescendantId.value))
-const searchActiveDescendant = computed(() => (showSearchInput.value ? activeDescendantId.value : undefined))
-
 /** При `loading` списка в DOM нет — ссылаться на него нельзя. */
 const listboxIdIfRendered = computed(() => (open.value && !props.loading ? listboxId : undefined))
 
@@ -1055,76 +649,38 @@ function openDropdown(): void {
   setOpen(true)
 }
 
-let typeaheadBuffer = ''
-let typeaheadTimer: ReturnType<typeof setTimeout> | null = null
-function typeahead(char: string): void {
-  const lower = char.toLowerCase()
-  // Повтор одной буквы — это «следующий на ту же букву», а не поиск «aa».
-  const repeat = typeaheadBuffer.length === 1 && typeaheadBuffer === lower
-  typeaheadBuffer = repeat ? lower : typeaheadBuffer + lower
-
-  if (typeaheadTimer) clearTimeout(typeaheadTimer)
-  typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, 600)
-
-  // Поиск циклически от следующей за активной (APG) — как в GrTree/GrDropdown:
-  // повторная буква ведёт к следующему совпадению, а не возвращает к первому.
-  const items = navigableItems.value
-  const from = activeIndex.value
-  for (let step = 1; step <= items.length; step += 1) {
-    const idx = (from + step + items.length) % items.length
-    const item = items[idx]
-    if (item.kind !== 'option') continue
-    const opt = flatOptions.value.find(o => sameValue(o.value, item.value))
-    if (opt?.label.toLowerCase().startsWith(typeaheadBuffer)) {
-      setActive(idx)
-      return
-    }
-  }
-}
-
-function onComboKeydown(event: KeyboardEvent): void {
-  // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
-  // Esc отменяет, стрелки ходят по кандидатам.
-  if (isComposingEvent(event)) return
-  if (locked.value) return
-
-  if (!open.value) {
-    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
-      event.preventDefault()
-      openDropdown()
-    }
-    return
-  }
-
-  if (handleNavigationKeys(event)) return
-
-  switch (event.key) {
-    case 'Enter': {
-      event.preventDefault()
-      // Активный элемент сильнее `canAddCustom`: пользователь подсветил опцию
-      // стрелками — Enter обязан выбрать её, а не добавить набранный запрос.
-      const item = activeItem.value
-      if (item?.kind === 'add') addCustom()
-      else if (item?.kind === 'option') toggleValue(item.value)
-      else if (canAddCustom.value) addCustom()
-      break
-    }
-    case 'Tab':
-      closeDropdown()
-      break
-    default:
-      // typeahead — только когда нет поля ввода (иначе мешает вводу в search/custom-инпут).
-      if (!showSearchInput.value && event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey)
-        typeahead(event.key)
-  }
-}
+const {
+  activeIndex,
+  activeItem,
+  activeValue,
+  addOptionDomId,
+  triggerActiveDescendant,
+  searchActiveDescendant,
+  onOptionHover,
+  onComboKeydown,
+  initActiveIndex,
+  resetActive,
+} = useSelectNavigation<TValue>({
+  panelItems,
+  flatOptions,
+  canAddCustom,
+  sameValue,
+  isSelected,
+  open,
+  locked,
+  showSearchInput,
+  virtualEnabled,
+  addOffset,
+  listboxId,
+  optionDomId,
+  scrollVirtualToIndex,
+  openDropdown,
+  closeDropdown,
+  addCustom,
+  toggleValue,
+})
 
 watch(open, isOpen => emit('visibleChange', isOpen))
-
-onBeforeUnmount(() => {
-  // Висячий таймер после размонтирования: буфер typeahead живёт 600 мс.
-  if (typeaheadTimer) clearTimeout(typeaheadTimer)
-})
 
 watch(
   open,
@@ -1168,7 +724,7 @@ const nativeClearOptionVisible = computed(() => {
   if (effectiveOptionsView.value !== 'native') return false
   if (props.multiple) return false
   if (!props.options) return true
-  return !flatOptions.value.some(o => isEmptyValue(o.value))
+  return !flatOptions.value.some(o => isEmptySelectValue(o.value))
 })
 
 const panelClearVisible = computed(() => {
@@ -1603,7 +1159,7 @@ const themeAttrs = useGrThemeAttrs()
                   <div
                     v-if="row.labelVisible !== false"
                     :id="groupLabelId(row.key)"
-                    :ref="(el) => virtualEnabled && row.labelIndex !== undefined && virtualizer.measure(row.labelIndex + addOffset, el as Element | null)"
+                    :ref="(el) => virtualEnabled && row.labelIndex !== undefined && measureVirtualRow(row.labelIndex + addOffset, el as Element | null)"
                     data-gr-select-group-label
                     role="presentation"
                     class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
@@ -1617,7 +1173,7 @@ const themeAttrs = useGrThemeAttrs()
                     v-for="child in row.options"
                     :id="optionDomId(child.index)"
                     :key="child.key"
-                    :ref="(el) => virtualEnabled && virtualizer.measure(child.index + addOffset, el as Element | null)"
+                    :ref="(el) => virtualEnabled && measureVirtualRow(child.index + addOffset, el as Element | null)"
                     data-gr-select-option
                     type="button"
                     role="option"
@@ -1651,7 +1207,7 @@ const themeAttrs = useGrThemeAttrs()
                 <button
                   v-else
                   :id="optionDomId(row.index)"
-                  :ref="(el) => virtualEnabled && virtualizer.measure(row.index + addOffset, el as Element | null)"
+                  :ref="(el) => virtualEnabled && measureVirtualRow(row.index + addOffset, el as Element | null)"
                   data-gr-select-option
                   type="button"
                   role="option"

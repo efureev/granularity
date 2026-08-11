@@ -111,6 +111,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrSelect` is no longer one 1700-line file.** The largest SFC in the package kept everything in one script:
+  values, panel composition, virtualization and keyboard, all sharing one scope of ~90 top-level bindings, where the
+  only way to learn what a computed depended on was to read the whole thing. Its logic now lives where the package
+  already puts it — `GrSelect/composables/` (`useSelectValues`, `useSelectPanelItems`, `useSelectVirtualization`,
+  `useSelectNavigation`), the same shape `GrImageViewer` uses, plus a Vue-free `selectValue.ts` for value comparison
+  with tests of its own. Each takes getters and callbacks and returns computeds, so the dependencies of a block are
+  its signature rather than a guess.
+
+  **Behaviour is untouched, and that is the point:** all 86 existing tests, the overlay and a11y e2e suites, and the
+  visual baselines passed without a single edit. Public types, props, emits and the generated component API are
+  identical.
+
+  One gate had to follow the code: `virtualSpacer.test.ts` looked for `useVirtualList(` in `.vue` files, and after the
+  move `GrSelect.vue` no longer contains that call. It now treats the **component** as the consumer — scanning the
+  whole directory for the call while still demanding the spacer contract from the markup — so a component whose
+  virtualization lives in a composable cannot quietly drop out of the gate.
+
 - **`GrStatistic` renders the label and the value as a pair.** They were two adjacent `div`s — a screen reader read
   them in order and the meaning survived, but "term — value" was nowhere in the markup. It is now `<dl>` → `<dt>` →
   `<dd>`, and only when there is a label: a definition list without a `<dt>` would be the same disconnection with a

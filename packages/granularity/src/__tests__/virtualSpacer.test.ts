@@ -54,24 +54,52 @@ const CANONICAL_CSS = `[data-gr-virtual]::before,
 /** Имена, разведённые по компонентам до выноса: вернуться они не должны. */
 const LEGACY_NAMES = /data-gr-[a-z-]+-virtual|--gr-(?:tree|select|autocomplete|command)-virtual-/
 
-function componentFiles(): { name: string, path: string, source: string }[] {
-  const files: { name: string, path: string, source: string }[] = []
+/**
+ * Потребитель — компонент, а не файл: вызов примитива у крупных компонентов
+ * уезжает в собственный композабл (`GrSelect/composables/useSelectVirtualization.ts`),
+ * а разметка и распорки остаются в его `.vue`. Гейт поэтому смотрит на всю
+ * директорию, но контракт спрашивает с разметки.
+ */
+type VirtualConsumer = {
+  name: string
+  /** Только SFC: там живут распорки и канонический блок стилей. */
+  markup: string
+  /** Вся директория: вызов примитива и `spacerStyle` могут быть в композабле. */
+  sources: string
+}
 
-  for (const dir of readdirSync(componentsDir)) {
-    if (!dir.startsWith('Gr')) continue
+function readComponentSources(dir: string): { markup: string, sources: string } {
+  let markup = ''
+  let sources = ''
+  const stack = [resolve(componentsDir, dir)]
 
-    for (const file of readdirSync(resolve(componentsDir, dir))) {
-      if (!file.endsWith('.vue')) continue
+  while (stack.length) {
+    const current = stack.pop()!
 
-      const path = resolve(componentsDir, dir, file)
-      files.push({ name: `${dir}/${file}`, path, source: readFileSync(path, 'utf-8') })
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      if (entry.name === '__tests__') continue
+
+      const path = resolve(current, entry.name)
+      if (entry.isDirectory()) {
+        stack.push(path)
+        continue
+      }
+
+      if (!/\.(?:vue|ts)$/.test(entry.name)) continue
+
+      const source = readFileSync(path, 'utf-8')
+      sources += source
+      if (entry.name.endsWith('.vue')) markup += source
     }
   }
 
-  return files
+  return { markup, sources }
 }
 
-const consumers = componentFiles().filter(file => file.source.includes('useVirtualList('))
+const consumers: VirtualConsumer[] = readdirSync(componentsDir)
+  .filter(dir => dir.startsWith('Gr'))
+  .map(dir => ({ name: dir, ...readComponentSources(dir) }))
+  .filter(consumer => consumer.sources.includes('useVirtualList('))
 
 /**
  * Разметка строк-распорок целиком.
@@ -101,49 +129,49 @@ function spacerContract(source: string): 'pseudo' | 'rows' | 'none' {
   return 'none'
 }
 
-const pseudoConsumers = consumers.filter(file => spacerContract(file.source) === 'pseudo')
-const rowConsumers = consumers.filter(file => spacerContract(file.source) === 'rows')
+const pseudoConsumers = consumers.filter(consumer => spacerContract(consumer.markup) === 'pseudo')
+const rowConsumers = consumers.filter(consumer => spacerContract(consumer.markup) === 'rows')
 
 describe('контракт распорок виртуального списка', () => {
   it('потребители примитива вообще есть — иначе гейт молчал бы впустую', () => {
-    expect(consumers.map(file => file.name).sort()).toEqual([
-      'GrAutocomplete/GrAutocomplete.vue',
-      'GrCommandPalette/GrCommandPalette.vue',
-      'GrDataTable/GrDataTable.vue',
-      'GrList/GrList.vue',
-      'GrSelect/GrSelect.vue',
-      'GrTree/GrTree.vue',
+    expect(consumers.map(consumer => consumer.name).sort()).toEqual([
+      'GrAutocomplete',
+      'GrCommandPalette',
+      'GrDataTable',
+      'GrList',
+      'GrSelect',
+      'GrTree',
     ])
   })
 
-  it.each(consumers.map(file => [file.name, file] as const))(
+  it.each(consumers.map(consumer => [consumer.name, consumer] as const))(
     '%s объявляет один из двух контрактов распорок',
-    (_name, file) => {
-      expect(spacerContract(file.source)).not.toBe('none')
+    (_name, consumer) => {
+      expect(spacerContract(consumer.markup)).not.toBe('none')
     },
   )
 
-  it.each(pseudoConsumers.map(file => [file.name, file] as const))(
+  it.each(pseudoConsumers.map(consumer => [consumer.name, consumer] as const))(
     '%s (псевдоэлементы) несёт канонический блок',
-    (_name, file) => {
-      expect(file.source).toContain(CANONICAL_CSS)
+    (_name, consumer) => {
+      expect(consumer.markup).toContain(CANONICAL_CSS)
     },
   )
 
-  it.each(pseudoConsumers.map(file => [file.name, file] as const))(
+  it.each(pseudoConsumers.map(consumer => [consumer.name, consumer] as const))(
     '%s (псевдоэлементы) не пишет имена переменных руками: их отдаёт `spacerStyle`',
-    (_name, file) => {
-      expect(file.source).toContain('spacerStyle')
-      expect(file.source).not.toMatch(/'--gr-virtual-(?:before|after)'/)
+    (_name, consumer) => {
+      expect(consumer.sources).toContain('spacerStyle')
+      expect(consumer.sources).not.toMatch(/'--gr-virtual-(?:before|after)'/)
     },
   )
 
-  it.each(rowConsumers.map(file => [file.name, file] as const))(
+  it.each(rowConsumers.map(consumer => [consumer.name, consumer] as const))(
     '%s (строки-распорки) скрывает их от AT и растягивает на все колонки',
-    (_name, file) => {
+    (_name, consumer) => {
       // Распорка — не строка данных: посчитанная диктором, она сместила бы
       // нумерацию, а `colspan` меньше числа колонок сломал бы раскладку.
-      const spacers = spacerRows(file.source)
+      const spacers = spacerRows(consumer.markup)
       expect(spacers).toHaveLength(2)
 
       for (const spacer of spacers) {
@@ -153,19 +181,19 @@ describe('контракт распорок виртуального списк�
     },
   )
 
-  it.each(rowConsumers.map(file => [file.name, file] as const))(
+  it.each(rowConsumers.map(consumer => [consumer.name, consumer] as const))(
     '%s (строки-распорки) фиксирует раскладку таблицы',
-    (_name, file) => {
+    (_name, consumer) => {
       // Без этого ширины колонок считались бы по отрисованному окну и прыгали
       // бы на каждой прокрутке.
-      expect(file.source).toContain('fixedLayout')
+      expect(consumer.markup).toContain('fixedLayout')
     },
   )
 
-  it.each(consumers.map(file => [file.name, file] as const))(
+  it.each(consumers.map(consumer => [consumer.name, consumer] as const))(
     '%s не тащит разведённые по компонентам имена',
-    (_name, file) => {
-      const legacy = file.source.match(LEGACY_NAMES)
+    (_name, consumer) => {
+      const legacy = consumer.sources.match(LEGACY_NAMES)
       expect(legacy?.[0] ?? null).toBeNull()
     },
   )
