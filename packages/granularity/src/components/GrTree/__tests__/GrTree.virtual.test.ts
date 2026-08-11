@@ -21,6 +21,22 @@ function flatTree(count: number) {
   }))
 }
 
+/**
+ * Вложенное дерево: 20 ветвей × 20 листьев. Виртуализация работает по раскрытым
+ * строкам, а не по корням, и до этого теста ни один кейс её на вложенных данных
+ * не проверял — все данные были плоские.
+ */
+function nestedTree(branches: number, leaves: number) {
+  return Array.from({ length: branches }, (_, branch) => ({
+    id: `b${branch + 1}`,
+    label: `Branch ${branch + 1}`,
+    children: Array.from({ length: leaves }, (_, leaf) => ({
+      id: `b${branch + 1}-l${leaf + 1}`,
+      label: `Leaf ${branch + 1}.${leaf + 1}`,
+    })),
+  }))
+}
+
 function mountVirtual(count = 1000, maxHeight = 300) {
   return mount(GrTree, {
     props: { data: flatTree(count), nodeKey: 'id', virtual: true, maxHeight },
@@ -38,6 +54,42 @@ describe('GrTree — виртуализация', () => {
 
     expect(nodes(wrapper)).toHaveLength(200)
     expect(wrapper.get('[data-gr-tree]').attributes('data-gr-virtual')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('окно содержит строки разных уровней, а раскрытие ветки его не ломает', async () => {
+    const wrapper = mount(GrTree, {
+      props: {
+        data: nestedTree(20, 20),
+        nodeKey: 'id',
+        virtual: true,
+        maxHeight: 300,
+        branchLine: true,
+        defaultExpandedKeys: ['b1'],
+      },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const rendered = nodes(wrapper)
+    // Окно короче полного набора (20 ветвей + 20 раскрытых листьев).
+    expect(rendered.length).toBeLessThan(40)
+
+    const levels = new Set(
+      wrapper.findAll('.gr-tree__row').map(row => row.attributes('style')?.match(/\* (\d+)\)/)?.[1]),
+    )
+    // В окне видны и ветвь (множитель 0), и её листья (множитель 1).
+    expect(levels).toContain('0')
+    expect(levels).toContain('1')
+
+    // Направляющая уровня рисуется и в виртуальном окне.
+    expect(wrapper.find('[data-gr-tree-branch-guide]').exists()).toBe(true)
+
+    // ARIA считает полный набор уровня, а не окно: у ветвей `setsize` = 20.
+    const firstBranch = wrapper.findAll('[data-gr-tree-node]')[0]
+    expect(firstBranch.attributes('aria-level')).toBe('1')
+    expect(firstBranch.attributes('aria-setsize')).toBe('20')
+
     wrapper.unmount()
   })
 

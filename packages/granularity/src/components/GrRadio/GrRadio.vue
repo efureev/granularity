@@ -8,10 +8,11 @@ import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import {
   grRadioButtonClass,
   grRadioControlClass,
-  grRadioDescriptionClass,
+  grRadioDescriptionSizes,
   grRadioDotBaseClass,
   grRadioDotClass,
-  grRadioLabelTextClass,
+  grRadioDotSizes,
+  grRadioLabelClassFor,
   grRadioRootClass,
   type GrRadioVariant,
 } from './grRadioStyles'
@@ -145,6 +146,7 @@ const rootClassName = computed(() => grRadioRootClass({
   readonly: resolvedReadonly.value,
 }))
 const controlClassName = computed(() => grRadioControlClass({
+  size: resolvedSize.value,
   checked: checked.value,
   disabled: resolvedDisabled.value,
   invalid: resolvedInvalid.value,
@@ -153,7 +155,9 @@ const dotClassName = computed(() => grRadioDotClass({
   checked: checked.value,
   disabled: resolvedDisabled.value,
 }))
-const labelClassName = computed(() => grRadioLabelTextClass(checked.value))
+const labelClassName = computed(() => grRadioLabelClassFor(resolvedSize.value, checked.value))
+const dotSizeClassName = computed(() => grRadioDotSizes[resolvedSize.value])
+const descriptionClassName = computed(() => grRadioDescriptionSizes[resolvedSize.value])
 
 function setValue(next: GrRadioValue): void {
   if (resolvedDisabled.value)
@@ -293,12 +297,12 @@ onUnmounted(() => unregister?.())
     <span
       data-gr-radio-control
       aria-hidden="true"
-      class="mt-0.5 h-4 w-4 shrink-0 rounded-[var(--gr-radius-full)] border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)]"
+      class="mt-0.5 shrink-0 rounded-[var(--gr-radius-full)] border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)]"
       :class="controlClassName"
     >
       <span
         data-gr-radio-dot
-        :class="[grRadioDotBaseClass, dotClassName]"
+        :class="[grRadioDotBaseClass, dotSizeClassName, dotClassName]"
       />
     </span>
 
@@ -311,7 +315,7 @@ onUnmounted(() => unregister?.())
         v-if="hasDescription"
         :id="descriptionId"
         data-gr-radio-description
-        :class="grRadioDescriptionClass"
+        :class="descriptionClassName"
       >
         <slot name="description" />
       </span>

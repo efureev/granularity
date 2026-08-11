@@ -36,6 +36,48 @@
 
 Директива для обработки клика вне элемента. Подходит для dropdown, popover, contextual menu и похожих сценариев.
 
+Значением может быть сам обработчик или объект:
+
+| Поле | По умолчанию | Что делает |
+| --- | --- | --- |
+| `handler` | — | вызывается на клик вне элемента |
+| `enabled` | `true` | выключает директиву, не снимая её с элемента |
+| `capture` | `true` | слушатель висит в capture-фазе документа: `stopPropagation()` внутри панели не должен ломать закрытие |
+| `events` | `['click']` | какие события считать кликом (`mousedown`, `pointerdown`, `touchstart`) |
+| `exclude` | `[]` | зоны, клик по которым считается «внутренним» |
+
+`exclude` принимает элементы, CSS-селекторы и геттеры — `HTMLElement | string | () => HTMLElement | null`.
+Геттеры разрешаются **на каждый клик**, поэтому триггер, появившийся позже, тоже
+учитывается. Всё, что вернулось не элементом (например сам Vue-ref или инстанс
+компонента), директива отбрасывает молча — в шаблоне ref разворачивается сам, а в
+`<script>` возвращайте `el.value`, для компонента — `instance.$el`.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { vClickOutside } from '@feugene/granularity/directives'
+
+const open = ref(false)
+const triggerEl = ref<HTMLElement | null>(null)
+</script>
+
+<template>
+  <button ref="triggerEl" @click="open = true">
+    Открыть
+  </button>
+
+  <div
+    v-if="open"
+    v-click-outside="{ handler: () => (open = false), exclude: [() => triggerEl] }"
+  >
+    Панель
+  </div>
+</template>
+```
+
+Клик неосновной кнопкой мыши игнорируется, а если элемент уже вынут из документа,
+обработчик не зовётся вовсе: закрывать нечего.
+
 ### `vDropzone`
 
 Директива для drag-and-drop загрузки файлов.
@@ -49,12 +91,6 @@
 - `onError` для обработки ошибок валидации;
 - `onStateChange` для реакции на `drag-over` состояние;
 - `overClass` для CSS-класса активной dropzone.
-
-Минимальный пример:
-
-```ts
-
-```
 
 ### `vHotkey`
 

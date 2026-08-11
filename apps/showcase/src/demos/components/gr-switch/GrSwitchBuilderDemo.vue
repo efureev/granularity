@@ -20,6 +20,7 @@ const activeBackgroundColor = ref('')
 const inactiveBackgroundColor = ref('')
 
 const sizeOptions = [
+  {value: 'xs', label: 'XS'},
   {value: 'sm', label: 'SM'},
   {value: 'md', label: 'MD'},
   {value: 'lg', label: 'LG'},

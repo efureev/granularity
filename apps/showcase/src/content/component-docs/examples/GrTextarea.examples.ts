@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grTextareaExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'textarea-line-count',
+    title: 'Счётчик строк',
+    description: 'Строки считаются логическими — переводами строки, а не визуальными переносами, поэтому при `autosize` число не зависит от ширины поля. `maxLines` задаёт ориентир и намеренно не режет набранное.',
+    status: 'ready',
+    previewKey: 'gr-textarea-line-count',
+  },
+  {
     id: 'textarea-autosize',
     title: 'Автовысота и счётчик символов',
     description: '`autosize` поверх директивы `v-autosize`, `maxlength` + `showCount` со связкой через `aria-describedby`.',

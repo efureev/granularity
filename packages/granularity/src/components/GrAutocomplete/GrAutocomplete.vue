@@ -19,8 +19,10 @@ import { useComboboxNavigation } from '../../composables/internal/useComboboxNav
 import { filterOptions, resolveSelectedOptions } from '../shared/optionFilter'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 
+import GrBadge from '../GrBadge/GrBadge.vue'
+import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
+
 import {
-  autocompleteChipClass,
   autocompleteOptionClass,
   autocompletePanelClasses,
   autocompleteShellClass,
@@ -57,6 +59,15 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
    */
   options?: GrAutocompleteOption<TValue>[]
   multiple?: boolean
+  /**
+   * Вид чипов выбранных значений в режиме `multiple`. Чип — это `GrBadge`, а не
+   * своя плашка: на светлой теме собственная заливка чипа (примесь `--gr-muted`
+   * без рамки) давала 1.02:1 к фону поля, то есть была невидима.
+   */
+  tagTone?: GrBadgeTone
+  tagDark?: boolean
+  tagSize?: GrBadgeSize
+  tagRadius?: GrBadgeRadius
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
@@ -153,6 +164,11 @@ const props = withDefaults(
   {
     options: undefined,
     multiple: false,
+    tagTone: 'neutral',
+    tagDark: false,
+    // `sm`, а не `md` как у `GrInputTag`: чип живёт внутри контрола, а не в тексте.
+    tagSize: 'sm',
+    tagRadius: 'round',
     disabled: false,
     readonly: false,
     invalid: false,
@@ -850,26 +866,31 @@ const themeAttrs = useGrThemeAttrs()
 
       <!-- Chips выбранных значений (multiple). -->
       <template v-if="multiple">
-        <span
+        <GrBadge
           v-for="(option, chipIndex) in selectedOptions"
           :key="option.value"
           data-gr-autocomplete-chip
-          :class="autocompleteChipClass"
+          :tone="tagTone"
+          :dark="tagDark"
+          :size="tagSize"
+          :radius="tagRadius"
         >
-          <span class="truncate">{{ option.label }}</span>
-          <button
-            v-if="!locked"
-            type="button"
-            data-gr-autocomplete-chip-remove
-            class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
-            :aria-label="t('gr.autocomplete.removeValue', 'Remove {label}', { label: option.label })"
-            tabindex="-1"
-            @click="removeValue(option.value)"
-            @keydown="onChipKeydown($event, chipIndex, option.value)"
-          >
-            <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
-          </button>
-        </span>
+          <span class="inline-flex max-w-full items-center gap-1 align-middle">
+            <span class="truncate">{{ option.label }}</span>
+            <button
+              v-if="!locked"
+              type="button"
+              data-gr-autocomplete-chip-remove
+              class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+              :aria-label="t('gr.autocomplete.removeValue', 'Remove {label}', { label: option.label })"
+              tabindex="-1"
+              @click="removeValue(option.value)"
+              @keydown="onChipKeydown($event, chipIndex, option.value)"
+            >
+              <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
+            </button>
+          </span>
+        </GrBadge>
       </template>
 
       <input
@@ -971,7 +992,12 @@ const themeAttrs = useGrThemeAttrs()
           :style="floatingStyle"
         >
           <div :class="autocompletePanelClasses">
+            <!--
+              Пустой listbox не рендерим: его `p-1` давал полосу пустоты над
+              строкой состояния, и «ничего не найдено» выглядело прижатым к низу.
+            -->
             <div
+              v-if="showAddOption || renderedOptions.length"
               :id="listboxId"
               ref="listboxEl"
               data-gr-autocomplete-listbox

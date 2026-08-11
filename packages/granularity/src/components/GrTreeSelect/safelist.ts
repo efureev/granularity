@@ -2,6 +2,7 @@ import { splitClassTokens } from '../shared/classTokens'
 import {
   borderClassByState,
   grTreeSelectPanelClass,
+  grTreeSelectStateClass,
   invalidBorderClass,
   shellDisabledClass,
   shellEnabledClass,
@@ -16,4 +17,5 @@ export const grTreeSelectSafelist = [...new Set([
   ...splitClassTokens(shellEnabledClass),
   ...splitClassTokens(shellDisabledClass),
   ...splitClassTokens(grTreeSelectPanelClass),
+  ...splitClassTokens(grTreeSelectStateClass),
 ])]

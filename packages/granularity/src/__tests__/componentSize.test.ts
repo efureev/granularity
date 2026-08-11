@@ -77,14 +77,12 @@ const PROBE_SIZES = ['xs', 'lg'] as const
  * - `GrBadge` читает только `componentDefaults`, глобальный `size` провайдера
  *   до него не доходит (`useGrComponentProp` вместо `useGrComponentSize`);
  * - `GrKbd` типизирован на `xs…lg`, а реализует две ступени: `sm` и «все
- *   остальные»;
- * - `GrRadio` и `GrRadioGroup` масштабируются только в `variant="button"` —
- *   у radiobox по умолчанию коробка и точка заданы фиксированными пикселями.
+ *   остальные».
  *
  * Список закрытый и проверяется на протухание: как только компонент начинает
  * различать края шкалы, тест требует убрать его отсюда.
  */
-const KNOWN_FLAT_SIZE = new Set(['GrBadge', 'GrRadio', 'GrRadioGroup'])
+const KNOWN_FLAT_SIZE = new Set(['GrBadge'])
 
 const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrAutocomplete', render: () => h(GrAutocomplete, { modelValue: '', options: [] }) },

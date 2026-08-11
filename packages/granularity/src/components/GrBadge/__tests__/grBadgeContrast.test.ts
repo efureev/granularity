@@ -4,6 +4,7 @@ import { GR_TONES } from '../../shared/tones'
 import {
   derivedThemeVars,
   getColorClassExpression,
+  getColorDistance,
   getContrastRatio,
   readComponentThemeVars,
   resolveColorExpression,
@@ -74,6 +75,46 @@ describe('GrBadge · контраст', () => {
           if (ratio < AA_NORMAL_TEXT) {
             failures.push(`${theme}:${mode.name}:${tone}:${ratio.toFixed(2)}`)
           }
+        }
+      }
+    }
+
+    expect(failures).toEqual([])
+  })
+
+  /**
+   * Второй вопрос, отдельный от «читается ли текст»: **видно ли саму плашку** на
+   * фоне под ней. Гейт появился после реального дефекта: чип `GrAutocomplete`
+   * красился примесью `--gr-muted` без рамки, и на светлой теме это давало 1.02:1
+   * к фону поля — три единицы из 255. Контрастом такое не измерить (порог 3:1 из
+   * WCAG 1.4.11 не проходит и наша штатная пара `--gr-muted`/`--gr-brd`), поэтому
+   * мерим воспринимаемое расстояние: порог заметности ΔE ≈ 2.3.
+   */
+  it('граница плашки различима на фоне страницы в обеих темах', () => {
+    const JND = 2.3
+    const failures: string[] = []
+
+    for (const theme of THEMES) {
+      const vars = { ...themeVarsByName[theme], ...readComponentThemeVars('GrBadge', theme) }
+      const pageBackground = resolveColorExpression('var(--gr-bg)', vars, derivedThemeVars)
+
+      for (const tone of GR_TONES) {
+        // soft: границу держит рамка — сама подложка от фона почти не отличается.
+        const softBorder = getColorClassExpression(lightToneClassByTone[tone], 'border-[')
+        // filled: границу держит заливка.
+        const solidFill = getColorClassExpression(darkToneClassByTone[tone], 'bg-[')
+
+        if (!softBorder || !solidFill)
+          throw new Error(`GrBadge: не удалось извлечь границы для ${tone}`)
+
+        for (const [mode, expression] of [['soft', softBorder], ['solid', solidFill]] as const) {
+          const distance = getColorDistance(
+            resolveColorExpression(expression, vars, derivedThemeVars),
+            pageBackground,
+          )
+
+          if (distance < JND)
+            failures.push(`${theme}:${mode}:${tone}:ΔE ${distance.toFixed(2)}`)
         }
       }
     }

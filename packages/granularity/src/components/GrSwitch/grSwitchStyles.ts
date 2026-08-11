@@ -49,22 +49,46 @@ export const thumbSpinnerSizes: Record<GrSwitchSize, string> = {
 
 export const thumbSpinnerBase = 'animate-spin text-[var(--gr-muted-fg)]'
 
+/**
+ * Сдвиг бегунка по горизонтали.
+ *
+ * Бегунок — обычный флекс-ребёнок дорожки, поэтому сдвиг отсчитывается от её
+ * **content-box**, а он на 2px уже внешнего размера: рамка по 1px с каждой
+ * стороны. Отсюда и весь расчёт.
+ *
+ * Зазор по вертикали задан геометрией и равен 1px на всех ступенях
+ * (`(content-height − thumb) / 2`, дорожка центрирует бегунок сама). Значит и по
+ * горизонтали он обязан быть 1px: иначе бегунок в покое выглядит вдавленным
+ * внутрь, а в крайнем положении прижатым к краю — именно так и было, зазоры
+ * расходились на 1–2px у `xs`, `sm` и `lg`.
+ *
+ * | ступень | дорожка | content | бегунок | покой | крайнее |
+ * | --- | --- | --- | --- | --- | --- |
+ * | `xs` | 28 | 26 | 12 | 1 | 13 |
+ * | `sm` | 36 | 34 | 16 | 1 | 17 |
+ * | `md` | 44 | 42 | 20 | 1 | 21 |
+ * | `lg` | 56 | 54 | 24 | 1 | 29 |
+ *
+ * Крайнее положение — `content − thumb − зазор`. Гейт на эту арифметику живёт в
+ * `__tests__/GrSwitch.test.ts`: он считает её заново из `trackSizes`/`thumbSizes`,
+ * поэтому смена любой ступени размера сразу покажет разъехавшийся зазор.
+ */
 export const thumbTranslations: Record<GrSwitchSize, { checked: string, unchecked: string }> = {
     xs: {
         checked: 'translate-x-[13px]',
-        unchecked: 'translate-x-[2px]',
+        unchecked: 'translate-x-[1px]',
     },
     sm: {
         checked: 'translate-x-[17px]',
-        unchecked: 'translate-x-[2px]',
+        unchecked: 'translate-x-[1px]',
     },
     md: {
-        checked: 'translate-x-5',
-        unchecked: 'translate-x-[2px]',
+        checked: 'translate-x-[21px]',
+        unchecked: 'translate-x-[1px]',
     },
     lg: {
-        checked: 'translate-x-[28px]',
-        unchecked: 'translate-x-[3px]',
+        checked: 'translate-x-[29px]',
+        unchecked: 'translate-x-[1px]',
     },
 }
 

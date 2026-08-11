@@ -802,6 +802,20 @@ describe('GrSelect — теги', () => {
     expect(wrapper.get('[data-gr-select-trigger]').find('[data-gr-select-tag-remove]').exists()).toBe(false)
   })
 
+  it('тег и пилюля «+N» — бейджи выбранного тона', () => {
+    const wrapper = mount(GrSelect, { props: tagProps })
+
+    const tag = wrapper.get('[data-gr-select-tag]')
+
+    // Своя плашка красилась `--gr-muted` без рамки: на светлой теме это 1.05:1
+    // к фону поля, то есть тег было не видно.
+    expect(tag.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(tag.classes()).toContain('border-[var(--gr-brd)]')
+
+    const toned = mount(GrSelect, { props: { ...tagProps, tagTone: 'info' } })
+    expect(toned.get('[data-gr-select-tag]').classes()).toContain('bg-[var(--gr-info-light)]')
+  })
+
   it('крестик снимает значение', async () => {
     const wrapper = mount(GrSelect, { props: tagProps })
 

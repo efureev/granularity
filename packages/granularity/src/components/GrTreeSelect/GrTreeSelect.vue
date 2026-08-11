@@ -21,7 +21,7 @@ import GrTree, {
 } from '../GrTree'
 import type { GrInputSize } from '../GrInput/GrInput.vue'
 import type { GrTreeSelectModelValue, GrTreeSelectProps } from './grTreeSelectTypes'
-import { grTreeSelectClass, grTreeSelectPanelClass, paddingX, trailingZoneWidth } from './grTreeSelectStyles'
+import { grTreeSelectClass, grTreeSelectPanelClass, grTreeSelectStateClass, paddingX, trailingZoneWidth } from './grTreeSelectStyles'
 
 export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'update:modelValue', value: GrTreeSelectModelValue): void
@@ -706,7 +706,7 @@ const themeAttrs = useGrThemeAttrs()
               v-if="loading"
               data-gr-tree-select-loading
               role="status"
-              class="flex items-center gap-2 px-3 py-2 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
+              :class="grTreeSelectStateClass"
             >
               <slot name="loading">
                 <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
@@ -714,7 +714,7 @@ const themeAttrs = useGrThemeAttrs()
               </slot>
             </div>
 
-            <div v-else-if="(data?.length ?? 0) === 0" class="px-3 py-2 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]">
+            <div v-else-if="(data?.length ?? 0) === 0" :class="grTreeSelectStateClass">
               <slot name="empty">
                 {{ t('gr.treeSelect.empty', 'No data') }}
               </slot>

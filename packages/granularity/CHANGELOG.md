@@ -33,6 +33,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrSwitch` thumb sits evenly on every step.** The offsets were measured against the track's outer size, but the thumb
+  moves inside its content box — 2px narrower because of the 1px border. The vertical gap is fixed by geometry at 1px, so
+  the horizontal one had to match; instead it was 2px at rest on three steps out of four and 1–2px at the far end, which
+  read as a thumb pressed against one edge. All four steps now keep 1px on every free side, and the arithmetic is a gate:
+  the test recomputes both gaps from `trackSizes`/`thumbSizes`, so changing any step shows the drift immediately.
+
+- **Chips of `GrAutocomplete` and `GrSelect` are visible in the light theme.** They painted their own plate — for the
+  autocomplete a 35% mix of `--gr-muted` with no border, which is **1.02:1** against the field behind it: three units out
+  of 255. Both now render `GrBadge`, the way `GrInputTag` always did, so a chip is a soft badge with a border, and its
+  look is a prop rather than a hardcoded class: `tagTone`, `tagDark`, `tagSize`, `tagRadius` (`sm` by default — a chip
+  lives inside a control, not in running text). The `+N` pill of `GrSelect` joins the same family.
+
+  The reason this shipped at all is that no gate asked whether a plate is **visible**: the contrast gate only checks text
+  on its own background, and 3:1 from WCAG 1.4.11 fails even for our own `--gr-muted`/`--gr-brd` pair. `GrBadge` now has a
+  second gate measuring perceptual distance (ΔE against the page, threshold 2.3 — the just-noticeable difference already
+  used by the tone-palette gate), which is exactly what the old chip would have failed.
+
+- **Panel state rows line up with the panel.** In `GrAutocomplete` and `GrTreeSelect` "Loading…", "Nothing found" and
+  "type at least N" sat 4px left of the options (the row is a sibling of the listbox and missed its padding), and an empty
+  listbox still rendered its own padding above them, so the text looked pinned to the bottom. They are centred with double
+  vertical padding now — the language `GrSelect` and the command palette already spoke — and an empty listbox is not
+  rendered at all.
+
+- **`GrTree` row highlight no longer eats the parent's branch line.** Hover and the current-row background started at the
+  left edge of the tree on every level and painted over the guides of the ancestors — the line disappeared exactly where it
+  carries meaning. The surface moved to a layer inset by the row's own indent, so each level's highlight starts after its
+  parent's line; the focus ring moved with it, otherwise the row read as two different rectangles. This restores what the
+  nested markup did before it became a flat row list.
+
 - **A toast whose timer is restarted while it waits no longer burns out unseen.** `toast.promise` and `update` re-arm the
   timer of an existing toast without touching the list or the pause flag — and the toaster's effect, which is the one
   place that knows about both, did not depend on `timeoutMs` and never woke up. Two consequences, both silent: a promise
@@ -72,6 +101,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   but the buttons looked alive, while the clear button in the same component already hides itself in that state.
 
 ### Added
+
+- **`GrRadio` scales in the `radiobox` variant too.** The box was `h-4 w-4` in the template and the label was pinned to
+  `--gr-text-sm`, so `size` did nothing outside `variant="button"` — the component was on the size scale in name only.
+  Box, dot, label and description now come from maps aligned with the button ladder, and `GrRadio`/`GrRadioGroup` left the
+  `KNOWN_FLAT_SIZE` list of the size gate — that list checks itself for staleness, so it demanded the change as soon as the
+  scale became real.
+
+- **`GrTextarea` counts lines.** `showLineCount` prints a second caption in the same row: lines on the left, characters on
+  the right. Lines are **logical** — separated by newlines, not by visual wrapping — so with `autosize` the number does not
+  depend on the field's width. The caption is localized and declines properly (`gr.textarea.lines`), and `maxLines` turns it
+  into `3 / 10`. It deliberately does not limit input: showing `12 / 10` is the honest answer, trimming what the user typed
+  is not the component's call.
 
 - **`GrImageViewer` can zoom to the actual pixel size.** `scale` is nominal — 1 means "fitted into the window" — so on a
   4752 px photo the toolbar's "100%" is really 21% and no grain is visible at all. The new "1:1" button

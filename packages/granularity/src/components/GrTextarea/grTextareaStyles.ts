@@ -47,6 +47,15 @@ export const enabledSurfaceClass = 'bg-[var(--gr-bg)]'
  */
 export const disabledSurfaceClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
 
+/**
+ * Ряд счётчиков под полем: слева строки, справа символы. Обе подписи — один
+ * визуальный уровень, поэтому кегль и цвет у них общие (`countClass`).
+ */
+export const countRowClass = 'mt-1 flex items-baseline justify-between gap-3'
+
+/** Счётчик строк. Слева, потому что читается раньше: сначала «сколько строк», потом лимит символов. */
+export const lineCountClass = 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
+
 export const countClass = 'mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
 
 export function grTextareaClass(options: { state: GrTextareaState, invalid: boolean }): string {

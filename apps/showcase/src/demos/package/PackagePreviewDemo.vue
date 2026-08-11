@@ -43,6 +43,24 @@ const autosizeValue = ref('Первый абзац\nВторая строка д
 const dropzoneState = ref('Перетащите файл в зону ниже')
 const isDropOver = ref(false)
 const hotkeyLog = ref('Нажмите `Ctrl+K`, `Shift+/` или `Escape`.')
+
+// Демо `vClickOutside`: своя панель, а не `GrDropdown` — у того собственный
+// click-outside, и на нём не видно, что делает `exclude`.
+const outsidePanelOpen = ref(false)
+const outsideExcludeEl = ref<{ $el?: HTMLElement } | HTMLElement | null>(null)
+const outsideLog = ref('—')
+
+// Директива ждёт элемент: ref на компонент отдаёт инстанс, поэтому берём его корень.
+function resolveOutsideExclude(): HTMLElement | null {
+  const target = outsideExcludeEl.value
+  if (!target) return null
+  return '$el' in target ? (target.$el as HTMLElement) : target
+}
+
+function closeOutsidePanel(): void {
+  outsidePanelOpen.value = false
+  outsideLog.value = 'клик вне панели — закрылась'
+}
 const cardLoading = ref(false)
 const imperativeStatus = ref('Overlay ещё не запускался')
 
@@ -352,22 +370,37 @@ async function runNetworkDemo() {
     </template>
 
     <template v-else-if="previewKey === 'v-click-outside-dropdown'">
-      <div class="flex items-start gap-3">
-        <GrDropdown align="left" width="80" :close-on-content-click="false">
-          <template #trigger="{ open }">
-            <GrButton class="justify-self-start">
-              {{ open ? 'Close' : 'Open' }} dropdown
-            </GrButton>
-          </template>
-          <template #content>
-            <p class="text-sm leading-6 text-[var(--gr-muted-fg)]">
-              Клик вне панели закроет dropdown, но клики по exclude-зоне будут считаться внутренними.
-            </p>
-          </template>
-        </GrDropdown>
-        <GrButton variant="outline">
-          Exclude zone
-        </GrButton>
+      <div class="grid gap-3">
+        <div class="flex flex-wrap items-start gap-3">
+          <GrButton @click="outsidePanelOpen = true">
+            Открыть панель
+          </GrButton>
+
+          <!-- Исключённая зона: клик по ней директива считает «внутренним». -->
+          <GrButton
+            ref="outsideExcludeEl"
+            variant="outline"
+            @click="outsideLog = 'клик по exclude-зоне — панель осталась открытой'"
+          >
+            Exclude zone
+          </GrButton>
+        </div>
+
+        <div
+          v-if="outsidePanelOpen"
+          v-click-outside="{
+            handler: closeOutsidePanel,
+            exclude: [resolveOutsideExclude],
+          }"
+          class="showcase-panel max-w-sm rounded-2xl border p-4 text-sm leading-6"
+        >
+          Панель закрывается кликом мимо неё. Кнопка «Exclude zone» перечислена в
+          <code>exclude</code>, поэтому клик по ней панель не закрывает.
+        </div>
+
+        <p class="text-sm text-[var(--gr-muted-fg)]">
+          Последнее событие: <code>{{ outsideLog }}</code>
+        </p>
       </div>
     </template>
 

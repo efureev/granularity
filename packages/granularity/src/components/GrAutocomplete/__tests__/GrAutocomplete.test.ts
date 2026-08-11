@@ -105,6 +105,26 @@ describe('GrAutocomplete', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
   })
 
+  it('чип — это бейдж выбранного тона: своя плашка была невидима на светлой теме', () => {
+    const wrapper = mount(GrAutocomplete, {
+      props: { modelValue: ['vue'], multiple: true, options: OPTIONS, ariaLabel: 'Stack' },
+    })
+
+    const chip = wrapper.get('[data-gr-autocomplete-chip]')
+
+    // Soft-бейдж несёт сплошную подложку И рамку — именно рамка делает чип
+    // различимым на фоне поля (`--gr-muted` против `--gr-bg` — 7 единиц из 255).
+    expect(chip.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(chip.classes()).toContain('border-[var(--gr-brd)]')
+
+    const toned = mount(GrAutocomplete, {
+      props: { modelValue: ['vue'], multiple: true, options: OPTIONS, ariaLabel: 'Stack', tagTone: 'success' },
+    })
+
+    expect(toned.get('[data-gr-autocomplete-chip]').classes())
+      .toContain('bg-[var(--gr-success-light)]')
+  })
+
   it('allowCustomValue: Enter коммитит произвольное значение', async () => {
     const wrapper = mount(GrAutocomplete, {
       props: { modelValue: '', options: OPTIONS, allowCustomValue: true, ariaLabel: 'Framework' },

@@ -11,8 +11,19 @@ const log = ref<string[]>([])
 
 const field = ref<GrInputInstance>()
 
+// Поколение проверки: очистка журнала обязана обесценить уже запущенный запрос.
+// Без этого «Очистить» гасил журнал, а через 900 мс проверка дописывала в него
+// свой результат — со стороны это выглядело как «журнал не очищается».
+let checkRun = 0
+
 function note(entry: string): void {
   log.value = [entry, ...log.value].slice(0, 4)
+}
+
+function clearLog(): void {
+  checkRun += 1
+  checking.value = false
+  log.value = []
 }
 
 // `change` приходит по blur/Enter — момент, когда значение можно проверять.
@@ -21,8 +32,13 @@ async function onChange(value: string): Promise<void> {
 
   if (!value) return
 
+  const run = ++checkRun
   checking.value = true
   await new Promise(resolve => setTimeout(resolve, 900))
+
+  // Журнал успели очистить (или начали новую проверку) — результат устарел.
+  if (run !== checkRun) return
+
   checking.value = false
   note(`проверен: ${value}`)
 }
@@ -56,7 +72,7 @@ function prefill(): void {
       <GrButton size="sm" variant="outline" @click="prefill">
         Подставить и выделить
       </GrButton>
-      <GrButton size="sm" variant="ghost" :disabled="!log.length" @click="log = []">
+      <GrButton size="sm" variant="ghost" :disabled="!log.length" @click="clearLog">
         Очистить журнал
       </GrButton>
     </div>
@@ -65,7 +81,8 @@ function prefill(): void {
       <div v-if="!log.length">
         Журнал событий пуст — поставьте фокус в поле.
       </div>
-      <div v-for="entry in log" :key="entry">
+      <!-- Ключ по индексу: одинаковые записи (`focus`, `focus`) дают дубль ключа. -->
+      <div v-for="(entry, index) in log" :key="index">
         {{ entry }}
       </div>
     </div>

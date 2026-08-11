@@ -59,6 +59,44 @@ describe('GrTextarea — паритет с GrInput', () => {
     expect(wrapper.get('textarea').attributes('maxlength')).toBe('10')
   })
 
+  it('счётчик строк считает переводы строки и связан с полем', () => {
+    const wrapper = mount(GrTextarea, {
+      props: { modelValue: 'первая\nвторая\nтретья', showLineCount: true },
+    })
+
+    const lines = wrapper.get('[data-gr-textarea-line-count]')
+    // Без адаптера i18n подпись приходит из английского фолбэка с формой числа.
+    expect(lines.text()).toContain('3')
+
+    expect(wrapper.get('textarea').attributes('aria-describedby')).toContain(lines.attributes('id'))
+  })
+
+  it('maxLines только форматирует счётчик и не режет ввод', async () => {
+    const wrapper = mount(GrTextarea, {
+      props: { modelValue: 'одна\nдва', showLineCount: true, maxLines: 4 },
+    })
+
+    expect(wrapper.get('[data-gr-textarea-line-count]').text()).toBe('2 / 4')
+
+    // Пять строк при `maxLines: 4` — счётчик показывает перебор, значение цело.
+    await wrapper.setProps({ modelValue: 'a\nb\nc\nd\ne' })
+    expect(wrapper.get('[data-gr-textarea-line-count]').text()).toBe('5 / 4')
+    expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toBe('a\nb\nc\nd\ne')
+  })
+
+  it('счётчики включаются независимо, обёртку даёт любой из них', () => {
+    const both = mount(GrTextarea, {
+      props: { modelValue: 'a\nb', showCount: true, showLineCount: true, maxlength: 10 },
+    })
+
+    expect(both.find('[data-gr-textarea-line-count]').exists()).toBe(true)
+    expect(both.get('[data-gr-textarea-count]').text()).toBe('3 / 10')
+
+    const onlyLines = mount(GrTextarea, { props: { modelValue: 'a', showLineCount: true } })
+    expect(onlyLines.find('[data-gr-textarea-count]').exists()).toBe(false)
+    expect(onlyLines.find('[data-gr-textarea-wrap]').exists()).toBe(true)
+  })
+
   it('без showCount поле остаётся корневым элементом', () => {
     const wrapper = mount(GrTextarea, { props: { modelValue: '' } })
 

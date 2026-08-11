@@ -47,9 +47,6 @@ export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
   lg: 'min-h-11 px-4 py-2 text-[length:var(--gr-control-text-lg)]',
 }
 
-// Chip (multiple): удаляемый тег выбранного значения перед инпутом.
-export const autocompleteChipClass = 'inline-flex max-w-full items-center gap-1 rounded-[var(--gr-radius-control)] bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-control-text-xs)] leading-tight text-[var(--gr-fg)]'
-
 export function autocompleteShellClass(options: {
   size: GrAutocompleteSize
   disabled: boolean
@@ -84,8 +81,14 @@ export function autocompleteOptionClass(options: { disabled: boolean, active: bo
     .join(' ')
 }
 
-/** Строка состояния панели: загрузка, «введите ещё N», «ничего не найдено». */
-export const autocompleteStateClass = 'flex items-center gap-2 px-3 py-2 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
+/**
+ * Строка состояния панели: загрузка, «введите ещё N», «ничего не найдено».
+ *
+ * По центру и с двойным вертикальным воздухом — как у `GrSelect` и палитры команд.
+ * Слева, как у опций, она стоять не может: опции лежат внутри listbox с его `p-1`,
+ * а состояние — сиблинг, и текст расходился с опциями на 4px.
+ */
+export const autocompleteStateClass = 'flex items-center justify-center gap-2 px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
 
 /**
  * Панель списка опций — тот же «язык» поверхностей, что у `GrSelect`

@@ -168,7 +168,7 @@ describe('component docs metadata', () => {
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 
-    expect(textareaDoc.examples).toHaveLength(5)
+    expect(textareaDoc.examples).toHaveLength(6)
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 

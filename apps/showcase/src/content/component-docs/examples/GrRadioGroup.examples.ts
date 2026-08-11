@@ -9,11 +9,11 @@ export const grRadioGroupExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-radio-group-options',
   },
   {
-    id: 'radio-group-button-tone',
-    title: 'Button tone with runtime size control',
-    description: 'Группа переключается в button-mode и масштабируется через `size`, что особенно полезно для toolbar и page-view toggles.',
+    id: 'radio-group-size-scale',
+    title: 'Полная линейка размеров',
+    description: 'Все четыре ступени рядом, в обоих вариантах. У кнопочного карта размеров общая с `GrButton` — кнопка той же ступени стоит рядом для сверки; у radiobox по ступеням масштабируются коробка, точка и подпись.',
     status: 'ready',
-    previewKey: 'gr-radio-group-button-variant',
+    previewKey: 'gr-radio-group-size-scale',
   },
   {
     id: 'radio-group-custom-slots',

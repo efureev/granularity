@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrSwitch from '../GrSwitch.vue'
+import { GR_COMPONENT_SIZES } from '../../shared/sizes'
+import { thumbSizes, thumbTranslations, trackSizes } from '../grSwitchStyles'
 
 describe('GrSwitch', () => {
   it('рендерит checked-state, label и вычисляет custom active color', () => {
@@ -29,7 +31,7 @@ describe('GrSwitch', () => {
     expect(track.attributes('style')).toContain('--gr-switch-track-brd: #10b981')
 
     const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
-    expect(thumb.attributes('class')).toContain('translate-x-5')
+    expect(thumb.attributes('class')).toContain('translate-x-[21px]')
     expect(wrapper.text()).toContain('Enabled')
   })
 
@@ -67,7 +69,7 @@ describe('GrSwitch', () => {
     const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
     expect(thumb.attributes('class')).toContain('h-6')
     expect(thumb.attributes('class')).toContain('w-6')
-    expect(thumb.attributes('class')).toContain('translate-x-[28px]')
+    expect(thumb.attributes('class')).toContain('translate-x-[29px]')
 
     const label = wrapper.get('[data-gr-switch-label]')
     expect(label.attributes('class')).toContain('text-[length:var(--gr-text-base)]')
@@ -204,5 +206,62 @@ describe('GrSwitch — состояния и события', () => {
     expect(button.element.tagName).toBe('BUTTON')
     expect(button.attributes('type')).toBe('button')
     expect(button.attributes('tabindex')).toBeUndefined()
+  })
+})
+
+/**
+ * Арифметика зазоров бегунка — таблицей, а не глазами.
+ *
+ * Зазоры расходились: у `xs`/`sm` справа оставался 1px против 2px слева, у `lg` —
+ * 2 против 3, верно было только у `md`. Считаем заново из тех же карт, что и
+ * рендер: смена любой ступени размера обязана сразу показать разъезд.
+ */
+describe('GrSwitch — геометрия бегунка', () => {
+  /** `h-6` → 24, `w-11` → 44, `translate-x-[21px]` → 21. */
+  function pixels(className: string, prefix: 'h-' | 'w-' | 'translate-x-'): number {
+    const token = className.split(' ').find(part => part.startsWith(prefix))
+    if (!token) throw new Error(`нет класса ${prefix}* в «${className}»`)
+
+    const value = token.slice(prefix.length)
+    const arbitrary = value.match(/^\[(\d+(?:\.\d+)?)px\]$/)
+    if (arbitrary) return Number.parseFloat(arbitrary[1])
+
+    // Шкала Uno: 1 = 0.25rem = 4px.
+    return Number.parseFloat(value) * 4
+  }
+
+  it('зазор одинаков слева, справа и по вертикали на каждой ступени', () => {
+    const rows = GR_COMPONENT_SIZES.map((size) => {
+      // Дорожка — `border-box` с рамкой 1px, бегунок двигается внутри content-box.
+      const trackWidth = pixels(trackSizes[size], 'w-') - 2
+      const trackHeight = pixels(trackSizes[size], 'h-') - 2
+      const thumb = pixels(thumbSizes[size], 'w-')
+
+      const rest = pixels(thumbTranslations[size].unchecked, 'translate-x-')
+      const end = pixels(thumbTranslations[size].checked, 'translate-x-')
+
+      return {
+        size,
+        left: rest,
+        right: trackWidth - thumb - end,
+        vertical: (trackHeight - pixels(thumbSizes[size], 'h-')) / 2,
+      }
+    })
+
+    for (const row of rows) {
+      expect(row.right, `${row.size}: зазор справа против зазора слева`).toBe(row.left)
+      expect(row.vertical, `${row.size}: зазор по вертикали против горизонтального`).toBe(row.left)
+    }
+  })
+
+  it('бегунок не вылезает за дорожку ни в покое, ни в крайнем положении', () => {
+    for (const size of GR_COMPONENT_SIZES) {
+      const trackWidth = pixels(trackSizes[size], 'w-') - 2
+      const thumb = pixels(thumbSizes[size], 'w-')
+      const end = pixels(thumbTranslations[size].checked, 'translate-x-')
+
+      expect(pixels(thumbTranslations[size].unchecked, 'translate-x-'), size).toBeGreaterThan(0)
+      expect(end + thumb, size).toBeLessThanOrEqual(trackWidth)
+    }
   })
 })

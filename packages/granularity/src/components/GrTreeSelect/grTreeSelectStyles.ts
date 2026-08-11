@@ -62,3 +62,10 @@ export function grTreeSelectClass(options: {
 }
 
 export const grTreeSelectPanelClass = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+
+/**
+ * Строка состояния панели: загрузка и «нет данных». По центру и с двойным
+ * воздухом — тот же язык, что у `GrSelect`, `GrAutocomplete` и палитры команд.
+ * Слева она расходилась с содержимым дерева на паддинг скроллера.
+ */
+export const grTreeSelectStateClass = 'flex items-center justify-center gap-2 px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'

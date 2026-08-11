@@ -9,6 +9,8 @@
 import { computed, ref, useId } from 'vue'
 import {
   countClass,
+  countRowClass,
+  lineCountClass,
   disabledSurfaceClass,
   enabledSurfaceClass,
   grTextareaClass,
@@ -46,6 +48,16 @@ export interface GrTextareaProps {
   maxlength?: number
   /** Показывать счётчик символов (`len` или `len/maxlength`). */
   showCount?: boolean
+  /**
+   * Показывать счётчик строк. Считаются **логические** строки (переводы строки), а
+   * не визуальные переносы: при `autosize` число не меняется от ширины поля.
+   */
+  showLineCount?: boolean
+  /**
+   * Ориентир по числу строк для счётчика (`3 / 10`). Ввод не ограничивает: обрезать
+   * набранный текст за пользователя компонент не вправе.
+   */
+  maxLines?: number
   /** Подгонять высоту под содержимое (директива `v-autosize`). */
   autosize?: boolean
   /** Кнопка очистки значения. Настраивается через `GrConfigProvider`. */
@@ -102,11 +114,21 @@ const resolvedId = computed(() => props.id ?? field?.id.value)
 // Счётчик обязан быть частью описания поля: иначе «12 / 60» видно глазами, но
 // не слышно — при том что ограничение длины и есть его смысл.
 const countId = useId()
+const lineCountId = useId()
 const describedBy = computed(() =>
-  [field?.describedById.value, props.showCount ? countId : undefined]
+  [
+    field?.describedById.value,
+    props.showCount ? countId : undefined,
+    props.showLineCount ? lineCountId : undefined,
+  ]
     .filter(Boolean)
     .join(' ') || undefined,
 )
+
+/** Обёртка нужна любому из счётчиков — и кнопке очистки. */
+const hasCounters = computed(() => props.showCount || props.showLineCount)
+
+const lineCount = computed(() => props.modelValue.split('\n').length)
 
 const countText = computed(() =>
   props.maxlength !== undefined ? `${props.modelValue.length} / ${props.maxlength}` : String(props.modelValue.length),
@@ -135,6 +157,13 @@ const resolvedClearable = useGrComponentProp('GrTextarea', 'clearable', () => pr
 
 const { t } = useGranularityTranslations()
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
+
+/** С `maxLines` — «3 / 10», без него — локализованная подпись с формой числа. */
+const lineCountText = computed(() => (
+  props.maxLines !== undefined
+    ? `${lineCount.value} / ${props.maxLines}`
+    : t('gr.textarea.lines', '{n} lines', { n: lineCount.value })
+))
 
 const showClear = computed(() =>
   resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== '',
@@ -200,7 +229,7 @@ function onBlur(e: FocusEvent): void {
 </script>
 
 <template>
-  <div v-if="showCount" data-gr-textarea-wrap class="relative w-full">
+  <div v-if="hasCounters" data-gr-textarea-wrap class="relative w-full">
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
@@ -222,8 +251,27 @@ function onBlur(e: FocusEvent): void {
       <IconX class="h-4 w-4" aria-hidden="true" />
     </button>
 
-    <div :id="countId" data-gr-textarea-count :class="countClass">
-      {{ countText }}
+    <div :class="countRowClass">
+      <div
+        v-if="showLineCount"
+        :id="lineCountId"
+        data-gr-textarea-line-count
+        :class="lineCountClass"
+      >
+        {{ lineCountText }}
+      </div>
+
+      <!-- Символьный счётчик всегда прижат вправо: без счётчика строк он остаётся
+           единственным в ряду, и `justify-between` его туда и отправляет. -->
+      <div
+        v-if="showCount"
+        :id="countId"
+        data-gr-textarea-count
+        class="ml-auto"
+        :class="countClass"
+      >
+        {{ countText }}
+      </div>
     </div>
   </div>
 

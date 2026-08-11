@@ -5,6 +5,8 @@ import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 
+import GrBadge from '../GrBadge/GrBadge.vue'
+import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
@@ -89,6 +91,14 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   placeholder?: string
   /** Multiple selection. */
   multiple?: boolean
+  /**
+   * Вид чипов выбранных значений в режиме `multiple`. Чип — это `GrBadge`: своя
+   * плашка на светлой теме почти не отличалась от фона поля.
+   */
+  tagTone?: GrBadgeTone
+  tagDark?: boolean
+  tagSize?: GrBadgeSize
+  tagRadius?: GrBadgeRadius
   /** Как отображать список опций: нативный `<select>` или кастомная панель. */
   optionsView?: GrSelectOptionsView
   /** Разрешает ввод/выбор значения, которого нет в `options`. */
@@ -213,6 +223,10 @@ const props = withDefaults(
 
     placeholder: undefined,
     multiple: false,
+    tagTone: 'neutral',
+    tagDark: false,
+    tagSize: 'sm',
+    tagRadius: 'round',
 
     optionsView: 'native',
     allowCustomValue: false,
@@ -1433,30 +1447,42 @@ const themeAttrs = useGrThemeAttrs()
       class="pointer-events-none absolute inset-y-0 left-0 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1 px-3 py-1.5"
       :style="{ left: hasPrefix ? prefixLen : undefined }"
     >
-      <span
+      <GrBadge
         v-for="opt in visibleTagOptions"
         :key="keyOf(opt.value)"
         data-gr-select-tag
-        class="pointer-events-auto inline-flex max-w-full items-center gap-1 rounded-[var(--gr-radius-sm)] bg-[var(--gr-muted)] py-0.5 pl-2 pr-1 text-[length:var(--gr-text-xs)] text-[var(--gr-fg)]"
+        class="pointer-events-auto"
+        :tone="tagTone"
+        :dark="tagDark"
+        :size="tagSize"
+        :radius="tagRadius"
       >
-        <span class="truncate">{{ opt.label }}</span>
-        <button
-          v-if="!isDisabled && !isReadonly"
-          data-gr-select-tag-remove
-          type="button"
-          :aria-label="tagRemoveLabel(opt)"
-          class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--gr-radius-xs)] text-[var(--gr-muted-fg)] hover:bg-[color-mix(in_srgb,var(--gr-fg)_12%,transparent)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-          @click.stop="removeValue(opt.value)"
-        >
-          <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
-        </button>
-      </span>
+        <span class="inline-flex max-w-full items-center gap-1 align-middle">
+          <span class="truncate">{{ opt.label }}</span>
+          <button
+            v-if="!isDisabled && !isReadonly"
+            data-gr-select-tag-remove
+            type="button"
+            :aria-label="tagRemoveLabel(opt)"
+            class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--gr-radius-xs)] text-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+            @click.stop="removeValue(opt.value)"
+          >
+            <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
+          </button>
+        </span>
+      </GrBadge>
 
-      <span
+      <GrBadge
         v-if="hiddenTagCount > 0"
         data-gr-select-tag-rest
-        class="pointer-events-auto inline-flex items-center rounded-[var(--gr-radius-sm)] bg-[var(--gr-muted)] px-2 py-0.5 text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]"
-      >+{{ hiddenTagCount }}</span>
+        class="pointer-events-auto"
+        :tone="tagTone"
+        :dark="tagDark"
+        :size="tagSize"
+        :radius="tagRadius"
+      >
+        +{{ hiddenTagCount }}
+      </GrBadge>
     </div>
 
     <button

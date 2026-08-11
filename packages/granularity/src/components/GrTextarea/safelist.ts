@@ -2,6 +2,8 @@ import { splitClassTokens } from '../shared/classTokens'
 import {
   borderClassByState,
   countClass,
+  countRowClass,
+  lineCountClass,
   disabledSurfaceClass,
   enabledSurfaceClass,
   invalidBorderClass,
@@ -17,4 +19,6 @@ export const grTextareaSafelist = [...new Set([
   ...splitClassTokens(enabledSurfaceClass),
   ...splitClassTokens(disabledSurfaceClass),
   ...splitClassTokens(countClass),
+  ...splitClassTokens(countRowClass),
+  ...splitClassTokens(lineCountClass),
 ])]

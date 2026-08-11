@@ -228,6 +228,12 @@
     "hidePassword": "Hide password",
     "limitReached": "Character limit reached"
   },
+  "textarea": {
+    "lines": {
+      "one": "{n} line",
+      "other": "{n} lines"
+    }
+  },
   "rating": {
     "label": "Rating",
     "valueText": "{value} of {max}",

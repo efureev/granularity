@@ -159,6 +159,34 @@
             "default": "false"
           },
           {
+            "name": "tagTone",
+            "description": "Вид чипов выбранных значений в режиме `multiple`. Чип — это `GrBadge`, а не своя плашка: на светлой теме собственная заливка чипа (примесь `--gr-muted` без рамки) давала 1.02:1 к фону поля, то есть была невидима.",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "tagDark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "tagSize",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "\"sm\""
+          },
+          {
+            "name": "tagRadius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "\"round\""
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -4886,6 +4914,34 @@
         "origin": "generated",
         "items": [
           {
+            "name": "tagTone",
+            "description": "",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "tagDark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "tagSize",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "\"md\""
+          },
+          {
+            "name": "tagRadius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "\"round\""
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -5010,34 +5066,6 @@
             "type": "((tag: string) => boolean | Promise<boolean>) | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "tagTone",
-            "description": "",
-            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
-            "required": false,
-            "default": "\"neutral\""
-          },
-          {
-            "name": "tagDark",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "tagSize",
-            "description": "",
-            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
-            "required": false,
-            "default": "\"md\""
-          },
-          {
-            "name": "tagRadius",
-            "description": "",
-            "type": "GrBadgeRadius | undefined",
-            "required": false,
-            "default": "\"round\""
           },
           {
             "name": "tagClosable",
@@ -7820,6 +7848,34 @@
             "default": "false"
           },
           {
+            "name": "tagTone",
+            "description": "Вид чипов выбранных значений в режиме `multiple`. Чип — это `GrBadge`: своя плашка на светлой теме почти не отличалась от фона поля.",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "\"neutral\""
+          },
+          {
+            "name": "tagDark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "tagSize",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "\"sm\""
+          },
+          {
+            "name": "tagRadius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "\"round\""
+          },
+          {
             "name": "optionsView",
             "description": "Как отображать список опций: нативный `<select>` или кастомная панель.",
             "type": "GrSelectOptionsView | undefined",
@@ -9277,6 +9333,18 @@
             "description": "",
             "type": "string",
             "required": true
+          },
+          {
+            "name": "maxLines",
+            "description": "Ориентир по числу строк для счётчика (`3 / 10`). Ввод не ограничивает: обрезать набранный текст за пользователя компонент не вправе.",
+            "type": "number | undefined",
+            "required": false
+          },
+          {
+            "name": "showLineCount",
+            "description": "Показывать счётчик строк. Считаются **логические** строки (переводы строки), а не визуальные переносы: при `autosize` число не меняется от ширины поля.",
+            "type": "boolean | undefined",
+            "required": false
           }
         ]
       },

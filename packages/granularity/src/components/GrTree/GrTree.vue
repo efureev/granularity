@@ -940,7 +940,6 @@ defineExpose<GrTreeInstance<T>>({
     display: flex;
     align-items: center;
     min-height: var(--gr-tree-row-min-height);
-    border-radius: var(--gr-tree-row-radius);
     padding: var(--gr-tree-row-py) var(--gr-tree-row-pr) var(--gr-tree-row-py)
         calc(var(--gr-tree-row-px) + var(--gr-tree-row-indent, 0px));
     font-size: var(--gr-tree-font-size);
@@ -950,7 +949,20 @@ defineExpose<GrTreeInstance<T>>({
     color: var(--gr-tree-row-color);
 }
 
-.gr-tree__row:hover {
+/* Поверхность строки — отдельный слой, вставленный слева на отступ уровня.
+   Фон на самой коробке шёл от левого края дерева и накрывал направляющие
+   предков: линия ветки исчезала под подсветкой ровно там, где она и нужна.
+   Слой лежит ниже направляющих (они — следующие элементы строки), поэтому
+   линия остаётся видна при любом наложении. */
+.gr-tree__row::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 0 var(--gr-tree-row-indent, 0px);
+    border-radius: var(--gr-tree-row-radius);
+    pointer-events: none;
+}
+
+.gr-tree__row:hover::before {
     background: var(--gr-tree-row-hover-bg);
 }
 
@@ -996,16 +1008,18 @@ defineExpose<GrTreeInstance<T>>({
     outline: none;
 }
 
-[data-gr-tree-node]:focus-visible > .gr-tree__row {
-    outline: 2px solid var(--gr-primary);
-    outline-offset: -2px;
+/* Кольцо фокуса — на той же поверхности, что подсветка: иначе строка читалась бы
+   двумя разными прямоугольниками. `outline` для этого не годится — он рисуется по
+   границе коробки, а не по инсету. */
+[data-gr-tree-node]:focus-visible > .gr-tree__row::before {
+    box-shadow: inset 0 0 0 2px var(--gr-primary);
 }
 
-.gr-tree__row--current {
+.gr-tree__row--current::before {
     background: var(--gr-tree-row-current-bg);
 }
 
-.gr-tree__row--current:hover {
+.gr-tree__row--current:hover::before {
     background: var(--gr-tree-row-current-hover-bg);
 }
 

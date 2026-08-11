@@ -230,6 +230,14 @@
     "hidePassword": "Скрыть пароль",
     "limitReached": "Достигнут предел символов"
   },
+  "textarea": {
+    "lines": {
+      "one": "{n} строка",
+      "few": "{n} строки",
+      "many": "{n} строк",
+      "other": "{n} строки"
+    }
+  },
   "rating": {
     "label": "Оценка",
     "valueText": "{value} из {max}",
