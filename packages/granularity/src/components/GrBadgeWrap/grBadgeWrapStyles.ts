@@ -63,3 +63,24 @@ export function formatBadgeValue(value: string | number, max?: number): string {
   if (max === undefined || typeof value !== 'number') return String(value)
   return value > max ? `${max}+` : String(value)
 }
+
+/**
+ * Стоит ли отмечать анимацией переход счётчика из `prev` в `next`.
+ * `undefined` означает «счётчика на экране нет».
+ *
+ * Отмечается только прибавление: появление счётчика и рост числа — события,
+ * о которых пользователь ещё не знает. Убыль — наоборот, след его собственного
+ * действия («прочитал»), и подсвечивать её значит мигать бейджем на каждом
+ * прочитанном письме.
+ *
+ * У строкового значения порядка нет, поэтому любая его смена считается событием.
+ */
+export function isBadgeWrapPulse(
+  prev: string | number | undefined,
+  next: string | number | undefined,
+): boolean {
+  if (next === undefined) return false
+  if (prev === undefined) return true
+  if (typeof prev === 'number' && typeof next === 'number') return next > prev
+  return prev !== next
+}

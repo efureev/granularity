@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
@@ -8,6 +8,7 @@ import {
   dotBaseClass,
   dotPlacementClass,
   formatBadgeValue,
+  isBadgeWrapPulse,
   placementClass,
   rootClass,
   toneClass,
@@ -35,6 +36,8 @@ export interface GrBadgeWrapProps {
   placement?: GrBadgeWrapPlacement
   /** Подпись счётчика для скринридера. Не задана — берётся из локали. */
   ariaLabel?: string
+  /** Отмечать ли появление и рост **счётчика** анимацией. Точке анимировать нечего. */
+  animate?: boolean
 }
 
 const props = withDefaults(defineProps<GrBadgeWrapProps>(), {
@@ -45,6 +48,7 @@ const props = withDefaults(defineProps<GrBadgeWrapProps>(), {
   tone: 'danger',
   placement: 'top-right',
   ariaLabel: undefined,
+  animate: false,
 })
 
 const { t } = useGranularityTranslations()
@@ -63,6 +67,32 @@ const displayValue = computed(() => formatBadgeValue(props.value ?? '', props.ma
  */
 const countLabel = computed(() => props.ariaLabel
   ?? t('gr.badgeWrap.count', '{count} new', { count: props.value, n: props.value }))
+
+const pulsing = ref(false)
+
+/** Значение на экране: скрытый счётчик — то же самое, что его отсутствие. */
+const visibleValue = computed(() => showCount.value ? props.value : undefined)
+
+/**
+ * Пока анимация играет, новое изменение её не перезапускает: счётчик меняется
+ * пачкой (пять писем за секунду), и «поп» на каждое превратился бы в мельтешение.
+ * Серия за время анимации даёт ровно один «поп».
+ *
+ * Флаг отпускает `animationend`, а не таймер: длительность живёт в CSS-токене,
+ * и число в скрипте было бы вторым источником правды. Под
+ * `prefers-reduced-motion` событие тоже приходит — глобальный кламп сжимает
+ * анимацию до `0.01ms`, а не выключает её (`docs/motion.md`).
+ */
+watch(visibleValue, (next, prev) => {
+  if (!props.animate || pulsing.value) return
+  if (isBadgeWrapPulse(prev, next)) pulsing.value = true
+})
+
+// Ушедший с экрана счётчик `animationend` уже не пришлёт, и без сброса
+// следующее его появление осталось бы без анимации навсегда.
+watch(showCount, (visible) => {
+  if (!visible) pulsing.value = false
+})
 </script>
 
 <template>
@@ -83,10 +113,36 @@ const countLabel = computed(() => props.ariaLabel
     <template v-else-if="showCount">
       <span
         data-gr-badge-wrap-count
+        :data-gr-badge-wrap-pop="pulsing || undefined"
         :class="[countBaseClass, placementClass[placement], toneClass[tone]]"
         aria-hidden="true"
+        @animationend="pulsing = false"
       >{{ displayValue }}</span>
       <span data-gr-badge-wrap-label class="sr-only">{{ countLabel }}</span>
     </template>
   </span>
 </template>
+
+<style>
+@keyframes gr-badge-wrap-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/*
+ * `animation-fill-mode` не задан намеренно: под `prefers-reduced-motion` анимация
+ * доигрывает за `0.01ms` и возвращает элемент в исходный кадр — бейдж на месте
+ * и в нужном размере. Именно поэтому компоненту хватает глобального клампа и не
+ * нужен собственный reduce-блок (`docs/motion.md`).
+ */
+[data-gr-badge-wrap-count][data-gr-badge-wrap-pop] {
+  animation: gr-badge-wrap-pop var(--gr-duration-base) var(--gr-ease-out);
+}
+</style>

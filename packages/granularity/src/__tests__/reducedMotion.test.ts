@@ -35,13 +35,14 @@ const REQUIRED_DECLARATIONS = [
  * Критерий ровно один: у анимации нет `animation-fill-mode: forwards`, поэтому,
  * отработав за `0.01ms`, элемент возвращается в исходное состояние. Для вращения
  * это `0deg` — статичная иконка в правильной ориентации, а не замерший под
- * случайным углом кадр.
+ * случайным углом кадр; для «попа» счётчика `GrBadgeWrap` — `transform: none`,
+ * то есть бейдж на своём месте и в своём размере.
  *
  * `GrToaster` в списке нет намеренно: у его полосы прогресса `fill-mode: forwards`,
  * из-за чего кламп фиксировал бы её на `scaleX(0)` — таймер выглядел бы истёкшим
  * при живом тосте. Он обязан иметь собственный блок.
  */
-const CLAMP_SAFE_KEYFRAMES = new Set<string>([])
+const CLAMP_SAFE_KEYFRAMES = new Set<string>(['GrBadgeWrap'])
 
 function readStyle(name: string): string {
   return readFileSync(resolve(stylesDir, name), 'utf8')

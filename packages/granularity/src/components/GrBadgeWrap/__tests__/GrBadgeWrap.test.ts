@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import GrBadgeWrap from '../GrBadgeWrap.vue'
-import { formatBadgeValue } from '../grBadgeWrapStyles'
+import { formatBadgeValue, isBadgeWrapPulse } from '../grBadgeWrapStyles'
 
 describe('GrBadgeWrap', () => {
   it('рендерит слот без бейджа по умолчанию', () => {
@@ -127,5 +127,85 @@ describe('GrBadgeWrap — тон и положение', () => {
     expect(formatBadgeValue(99, 99)).toBe('99')
     // Строковое значение обрезать нечем — отдаём как есть.
     expect(formatBadgeValue('NEW', 99)).toBe('NEW')
+  })
+})
+
+describe('GrBadgeWrap — анимация счётчика', () => {
+  it('isBadgeWrapPulse отмечает прибавление и молчит на убыли', () => {
+    expect(isBadgeWrapPulse(undefined, 3)).toBe(true)
+    expect(isBadgeWrapPulse(3, 7)).toBe(true)
+
+    expect(isBadgeWrapPulse(7, 2)).toBe(false)
+    expect(isBadgeWrapPulse(2, undefined)).toBe(false)
+    expect(isBadgeWrapPulse(undefined, undefined)).toBe(false)
+    expect(isBadgeWrapPulse(3, 3)).toBe(false)
+
+    // Порядка у строк нет, поэтому событием считается любая смена.
+    expect(isBadgeWrapPulse('NEW', 'HOT')).toBe(true)
+    expect(isBadgeWrapPulse('NEW', 'NEW')).toBe(false)
+  })
+
+  it('без animate значение меняется молча', async () => {
+    const wrapper = mount(GrBadgeWrap, { props: { value: 1 } })
+
+    await wrapper.setProps({ value: 5 })
+
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBeUndefined()
+  })
+
+  it('с animate рост помечает счётчик, animationend снимает пометку', async () => {
+    const wrapper = mount(GrBadgeWrap, { props: { value: 1, animate: true } })
+
+    await wrapper.setProps({ value: 2 })
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBe('true')
+
+    await wrapper.get('[data-gr-badge-wrap-count]').trigger('animationend')
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBeUndefined()
+  })
+
+  it('появление счётчика анимируется, первый рендер — нет', async () => {
+    const wrapper = mount(GrBadgeWrap, { props: { value: 3, animate: true } })
+
+    // Страница, на которой при загрузке пульсируют все бейджи разом, — тот же шум.
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBeUndefined()
+
+    await wrapper.setProps({ value: 0 })
+    await wrapper.setProps({ value: 1 })
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBe('true')
+  })
+
+  it('пачка изменений даёт один «поп», а не мельтешение', async () => {
+    const wrapper = mount(GrBadgeWrap, { props: { value: 1, animate: true } })
+
+    await wrapper.setProps({ value: 2 })
+    await wrapper.setProps({ value: 3 })
+    await wrapper.setProps({ value: 4 })
+
+    const badge = wrapper.get('[data-gr-badge-wrap-count]')
+    expect(badge.text()).toBe('4')
+
+    // Перезапуска не было: единственный animationend оставляет счётчик чистым.
+    await badge.trigger('animationend')
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBeUndefined()
+  })
+
+  it('убыль значения счётчик не помечает', async () => {
+    const wrapper = mount(GrBadgeWrap, { props: { value: 9, animate: true } })
+
+    await wrapper.setProps({ value: 4 })
+
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBeUndefined()
+  })
+
+  it('счётчик, исчезнувший во время анимации, снова анимируется при появлении', async () => {
+    const wrapper = mount(GrBadgeWrap, { props: { value: 1, animate: true } })
+
+    await wrapper.setProps({ value: 2 })
+    // `animationend` от удалённого элемента не придёт — флаг обязан сняться сам.
+    await wrapper.setProps({ value: 0 })
+    expect(wrapper.find('[data-gr-badge-wrap-count]').exists()).toBe(false)
+
+    await wrapper.setProps({ value: 1 })
+    expect(wrapper.get('[data-gr-badge-wrap-count]').attributes('data-gr-badge-wrap-pop')).toBe('true')
   })
 })

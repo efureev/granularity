@@ -102,6 +102,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrBadgeWrap` can mark an arriving count.** A message that lands while the page is open looked exactly like a number
+  that had been sitting there all along. The new `animate` prop pops the counter when it **appears** or **grows** — the
+  events the user does not know about yet. Counting down stays silent: that is the trace of their own action ("read"),
+  and highlighting it would blink the badge on every read message. The prop is off by default, because whether the
+  pulse fits is the application's call, not the library's.
+
+  The obvious failure mode is answered by design: a burst of changes produces **one** pop, not five. While the
+  animation plays a new value does not restart it, and the flag is released by `animationend` rather than by a
+  duration duplicated in script — under `prefers-reduced-motion` the package's global clamp compresses the animation
+  to `0.01ms` instead of removing it, so that event still arrives and the badge stays in its normal frame. Timing
+  comes from `--gr-duration-base` / `--gr-ease-out`, so a theme retunes it along with the rest of the motion.
+
 - **`GrRadio` scales in the `radiobox` variant too.** The box was `h-4 w-4` in the template and the label was pinned to
   `--gr-text-sm`, so `size` did nothing outside `variant="button"` — the component was on the size scale in name only.
   Box, dot, label and description now come from maps aligned with the button ladder, and `GrRadio`/`GrRadioGroup` left the

@@ -694,6 +694,13 @@
             "type": "\"top-right\" | \"top-left\" | \"bottom-right\" | \"bottom-left\" | undefined",
             "required": false,
             "default": "\"top-right\""
+          },
+          {
+            "name": "animate",
+            "description": "Отмечать ли появление и рост **счётчика** анимацией. Точке анимировать нечего.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
