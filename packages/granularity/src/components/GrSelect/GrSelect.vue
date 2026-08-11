@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TValue extends GrSelectValue = string">
-import { computed, nextTick, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue'
+import { computed, nextTick, ref, useId, useSlots, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
@@ -20,7 +20,6 @@ import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useSelectPanelItems } from './composables/useSelectPanelItems'
 import { useSelectNavigation } from './composables/useSelectNavigation'
 import { useSelectVirtualization } from './composables/useSelectVirtualization'
-import type { GrSelectPanelOptionRow, GrSelectPanelRow } from './composables/useSelectPanelItems'
 import { useSelectValues } from './composables/useSelectValues'
 import { isEmptySelectValue } from './selectValue'
 
@@ -37,7 +36,6 @@ import {
   type GrSelectModelValue,
   type GrSelectValue,
   type GrSelectOption,
-  type GrSelectOptionGroup,
   type GrSelectOptionOrGroup,
   type GrSelectOptionsView,
   type GrSelectSize,

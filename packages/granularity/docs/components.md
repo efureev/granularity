@@ -61,7 +61,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrAlert`](./components/GrAlert.md)
 - [`GrAutocomplete`](./components/GrAutocomplete.md)
 - [`GrAvatar`](./components/GrAvatar.md)
-- `GrBadge`
+- [`GrBadge`](./components/GrBadge.md)
 - [`GrBadgeWrap`](./components/GrBadgeWrap.md)
 - [`GrBottomNav`](./components/GrBottomNav.md)
 - [`GrBreadcrumbs`](./components/GrBreadcrumbs.md)
@@ -99,7 +99,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrNavbar`](./components/GrNavbar.md)
 - [`GrNumberInput`](./components/GrNumberInput.md)
 - [`GrPagination`](./components/GrPagination.md)
-- `GrPopover`
+- [`GrPopover`](./components/GrPopover.md)
 - [`GrProgressBar`](./components/GrProgressBar.md)
 - [`GrPromptDialog`](./components/GrPromptDialog.md)
 - [`GrRadio`](./components/GrRadio.md)
