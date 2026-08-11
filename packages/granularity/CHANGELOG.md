@@ -137,6 +137,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrSplitter`** — two panels with a divider between them: a tree on the left and content on the right, an
+  editor above a console. `GrSidebar` has exactly two widths, both fixed by a prop, so an application that wanted a
+  draggable boundary wrote the drag by hand every time — window listeners, clamping, keyboard and ARIA from scratch.
+
+  The size is a **share**, not a pixel width: `modelValue` is the percentage taken by the first panel. Percentages
+  survive a change of window width, and — the part that matters more — they are known before the render, so the
+  server markup matches the client and hydration stays clean. The component measures the DOM in exactly one place:
+  turning a pointer coordinate into a percentage. Keyboard, `Home`/`End` and collapsing need no measurement at all.
+  `v-model` is optional — without it the splitter remembers the size itself — and `change` fires at the end of a
+  gesture and on every keyboard step, which is where an application hangs its layout persistence.
+
+  It holds exactly two panels; a three-pane layout is composition, the way code editors do it — a vertical splitter
+  inside the `#end` slot of a horizontal one. `min` and `max` bound the first panel and `minEnd` bounds the second,
+  so neither can be squeezed to nothing; when `min` and `minEnd` conflict, `min` wins, because the alternative is a
+  panel the user cannot get back.
+
+  The divider is a real `role="separator"` in the tab order: arrows step, `Shift`+arrow steps by ten, `Home`/`End`
+  go to the bounds, and with `collapsible` `Enter` collapses the first panel and restores it to the size it had —
+  collapsing is a state of its own, not `modelValue: 0`. Double-click resets the boundary to `defaultSize`, and
+  dragging tight against the edge collapses the panel with the mouse. One detail worth stating: `aria-orientation`
+  describes the divider, not the layout, so a horizontal layout — panels side by side — carries
+  `aria-orientation="vertical"`.
+
+- New i18n key `gr.splitter.label` in all three locales.
+
 - **New `GrProgressCircle`** — progress as a ring or a gauge, for the places a full-width bar does not fit: a
   dashboard tile, an avatar upload, a metric card. `shape="dashboard"` cuts a quarter out of the bottom so a caption
   fits under the value, and the reading stays the same in both shapes — the share of work done; only the length of

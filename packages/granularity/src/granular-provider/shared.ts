@@ -69,6 +69,7 @@ import { grSelectConfig } from '../components/GrSelect/config'
 import { grSidebarConfig } from '../components/GrSidebar/config'
 import { grSkeletonConfig } from '../components/GrSkeleton/config'
 import { grSliderConfig } from '../components/GrSlider/config'
+import { grSplitterConfig } from '../components/GrSplitter/config'
 import { grStatisticConfig } from '../components/GrStatistic/config'
 import { grSwitchConfig } from '../components/GrSwitch/config'
 import { grTableConfig } from '../components/GrTable/config'
@@ -167,6 +168,7 @@ export const granularityComponentConfigs = {
   GrSidebar: grSidebarConfig,
   GrSkeleton: grSkeletonConfig,
   GrSlider: grSliderConfig,
+  GrSplitter: grSplitterConfig,
   GrStatistic: grStatisticConfig,
   GrSwitch: grSwitchConfig,
   GrTable: grTableConfig,

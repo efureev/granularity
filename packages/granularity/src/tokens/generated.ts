@@ -2676,6 +2676,48 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Длина вертикального слайдера: горизонтальный тянется по ширине контейнера, вертикальному нужна явная высота."
   },
   {
+    "owner": "GrSplitter",
+    "name": "--gr-splitter-size",
+    "kind": "hook",
+    "default": "6px",
+    "description": "Толщина полосы разделителя — ширина её грид-трека."
+  },
+  {
+    "owner": "GrSplitter",
+    "name": "--gr-splitter-hit",
+    "kind": "hook",
+    "default": "4px",
+    "description": "Запас зоны захвата с каждой стороны полосы: мишень в шесть пикселей мышью не берётся."
+  },
+  {
+    "owner": "GrSplitter",
+    "name": "--gr-splitter-color",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Цвет разделителя в покое."
+  },
+  {
+    "owner": "GrSplitter",
+    "name": "--gr-splitter-hover-color",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет разделителя под курсором."
+  },
+  {
+    "owner": "GrSplitter",
+    "name": "--gr-splitter-active-color",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет разделителя во время перетаскивания."
+  },
+  {
+    "owner": "GrSplitter",
+    "name": "--gr-splitter-grip",
+    "kind": "hook",
+    "default": "24px",
+    "description": "Длина насечки посередине разделителя. `0` убирает её."
+  },
+  {
     "owner": "GrStatistic",
     "name": "--gr-statistic-title-color",
     "kind": "hook",

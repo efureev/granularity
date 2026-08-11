@@ -13,6 +13,7 @@ import {
   GrKbd,
   GrSegmented,
   GrSlider,
+  GrSplitter,
   GrStatistic,
   GrToaster,
   GrTree,
@@ -42,6 +43,7 @@ import {
 const collapseOpen = ref<string[]>(['first'])
 const view = ref('list')
 const volume = ref(40)
+const splitterSize = ref(35)
 // Палитра открыта намеренно: подсказка хоткея живёт внутри неё, и у закрытой
 // палитры дефект гидрации не проявляется вовсе.
 const paletteOpen = ref(true)
@@ -115,6 +117,18 @@ const images = [
     <GrInputTag v-model="tags" aria-label="Теги" />
 
     <GrSlider v-model="volume" :min="0" :max="100" aria-label="Громкость" />
+
+    <!-- `aria-controls` разделителя строится из авто-id: на сервере и на клиенте он обязан совпасть. -->
+    <div style="height: 120px">
+      <GrSplitter v-model="splitterSize" aria-label="Ширина панели">
+        <template #start>
+          Панель
+        </template>
+        <template #end>
+          Содержимое
+        </template>
+      </GrSplitter>
+    </div>
 
     <!--
       `animate` читает `matchMedia` и крутит `requestAnimationFrame`: на сервере

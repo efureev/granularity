@@ -98,6 +98,9 @@
     "expand": "Expand sidebar",
     "collapse": "Collapse sidebar"
   },
+  "splitter": {
+    "label": "Resize panels"
+  },
   "statistic": {
     "trendUp": "Increase",
     "trendDown": "Decrease",

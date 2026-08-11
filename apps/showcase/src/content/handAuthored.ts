@@ -10,7 +10,7 @@ const componentGroups = {
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree'],
-  utilities: ['GrConfigProvider'],
+  utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
 export const componentGroupOrder: readonly string[] = [...Object.keys(componentGroups), 'misc']
@@ -73,6 +73,7 @@ const componentSummaryOverrides = {
   GrSidebar: 'Side navigation for sections, filters and supporting actions.',
   GrSkeleton: 'A temporary interface skeleton while the content is still loading.',
   GrSlider: 'Pick a number or a range by dragging a thumb, with steps, marks and keyboard support.',
+  GrSplitter: 'Splits a layout into two resizable panels with a draggable divider.',
   GrRating: 'Collect and display a star rating, with half steps and a read-only mode.',
   GrStatistic: 'Highlights a key metric with a caption, formatting and a trend line.',
   GrCommandPalette: 'Opens a ⌘K search over app commands with groups and shortcuts.',

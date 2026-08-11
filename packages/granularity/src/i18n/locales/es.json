@@ -99,6 +99,9 @@
     "expand": "Expandir panel",
     "collapse": "Contraer panel"
   },
+  "splitter": {
+    "label": "Cambiar el tamaño de los paneles"
+  },
   "statistic": {
     "trendUp": "Aumento",
     "trendDown": "Descenso",

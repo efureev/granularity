@@ -41,6 +41,7 @@ const VISUAL_COMPONENTS = [
   'GrRadioGroup',
   'GrSwitch',
   'GrSlider',
+  'GrSplitter',
   'GrRating',
   'GrSegmented',
   'GrInputTag',

@@ -8829,6 +8829,151 @@
       }
     ]
   },
+  "GrSplitter": {
+    "name": "GrSplitter",
+    "sourcePath": "packages/granularity/src/components/GrSplitter/GrSplitter.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "Доля первой панели в процентах. Поддерживает `v-model`; без него компонент помнит размер сам.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "Разделитель не тянется, не фокусируется и не отвечает на клавиши.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя разделителя для скринридера. Не задано — из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "max",
+            "description": "Максимум первой панели в процентах.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "90"
+          },
+          {
+            "name": "orientation",
+            "description": "`horizontal` — панели рядом, `vertical` — одна над другой.",
+            "type": "\"horizontal\" | \"vertical\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "step",
+            "description": "Шаг стрелок.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
+            "name": "min",
+            "description": "Минимум первой панели в процентах.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "10"
+          },
+          {
+            "name": "collapsed",
+            "description": "Первая панель свёрнута. Поддерживает `v-model:collapsed`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "defaultSize",
+            "description": "Стартовая доля и точка возврата по двойному клику.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "50"
+          },
+          {
+            "name": "minEnd",
+            "description": "Минимум второй панели: без него её можно задавить в ноль.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "10"
+          },
+          {
+            "name": "bigStep",
+            "description": "Шаг стрелок с `Shift`.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "10"
+          },
+          {
+            "name": "collapsible",
+            "description": "Разрешить сворачивание первой панели.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "start",
+            "description": "Первая панель — та, чей размер задаёт модель.",
+            "type": "any"
+          },
+          {
+            "name": "end",
+            "description": "Вторая панель: занимает остаток.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: number]",
+            "signature": "(event: \"update:modelValue\", value: number): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: number]",
+            "signature": "(event: \"change\", value: number): void"
+          },
+          {
+            "name": "update:collapsed",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:collapsed\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrStatistic": {
     "name": "GrStatistic",
     "sourcePath": "packages/granularity/src/components/GrStatistic/GrStatistic.vue",

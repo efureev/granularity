@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 65 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 66 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -966,6 +966,17 @@
     "context": "forms / component",
     "searchableTitle": "grslider",
     "searchableContent": "grslider grslider pick a number or a range by dragging a thumb, with steps, marks and keyboard support. forms component /components/gr-slider packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grslider generated public-api featured components components gr-slider gr slider"
+  },
+  {
+    "id": "entity:component:GrSplitter",
+    "title": "GrSplitter",
+    "description": "Splits a layout into two resizable panels with a draggable divider.",
+    "href": "/components/gr-splitter",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "utilities / component",
+    "searchableTitle": "grsplitter",
+    "searchableContent": "grsplitter grsplitter splits a layout into two resizable panels with a draggable divider. utilities component /components/gr-splitter packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grsplitter generated public-api components components gr-splitter gr splitter"
   },
   {
     "id": "entity:component:GrStatistic",
@@ -3683,6 +3694,50 @@
     "context": "GrSlider",
     "searchableTitle": "grslider integration notes",
     "searchableContent": "grslider pick a number or a range by dragging a thumb, with steps, marks and keyboard support. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrSplitter:section:overview",
+    "title": "GrSplitter / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-splitter#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSplitter",
+    "searchableTitle": "grsplitter component overview",
+    "searchableContent": "grsplitter splits a layout into two resizable panels with a draggable divider. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrSplitter:section:live-examples",
+    "title": "GrSplitter / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-splitter#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSplitter",
+    "searchableTitle": "grsplitter live examples",
+    "searchableContent": "grsplitter splits a layout into two resizable panels with a draggable divider. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrSplitter:section:api",
+    "title": "GrSplitter / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-splitter#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSplitter",
+    "searchableTitle": "grsplitter generated api",
+    "searchableContent": "grsplitter splits a layout into two resizable panels with a draggable divider. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrSplitter:section:integration-notes",
+    "title": "GrSplitter / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-splitter#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSplitter",
+    "searchableTitle": "grsplitter integration notes",
+    "searchableContent": "grsplitter splits a layout into two resizable panels with a draggable divider. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrStatistic:section:overview",

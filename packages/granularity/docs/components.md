@@ -113,6 +113,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrSidebar`](./components/GrSidebar.md)
 - [`GrSkeleton`](./components/GrSkeleton.md)
 - [`GrSlider`](./components/GrSlider.md)
+- [`GrSplitter`](./components/GrSplitter.md)
 - [`GrStatistic`](./components/GrStatistic.md)
 - [`GrSwitch`](./components/GrSwitch.md)
 - [`GrTable`](./components/GrTable.md)

@@ -237,6 +237,9 @@ export default defineConfig({
         'components/GrSlider/index': fileURLToPath(
           new URL('./src/components/GrSlider/index.ts', import.meta.url),
         ),
+        'components/GrSplitter/index': fileURLToPath(
+          new URL('./src/components/GrSplitter/index.ts', import.meta.url),
+        ),
         'components/GrStatistic/index': fileURLToPath(
           new URL('./src/components/GrStatistic/index.ts', import.meta.url),
         ),
