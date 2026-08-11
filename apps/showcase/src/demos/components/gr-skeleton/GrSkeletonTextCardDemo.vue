@@ -4,11 +4,9 @@ import { GrCard, GrSkeleton } from '@feugene/granularity'
 
 <template>
   <GrCard class="grid gap-4 p-4">
-    <GrSkeleton width="38%" height="20px" rounded="12px" />
-    <div class="grid gap-2">
-      <GrSkeleton />
-      <GrSkeleton width="92%" />
-      <GrSkeleton width="76%" />
-    </div>
+    <GrSkeleton variant="rect" width="38%" height="20px" />
+
+    <!-- Три строки одним пропом: последняя короче, поэтому блок читается абзацем. -->
+    <GrSkeleton :count="3" />
   </GrCard>
 </template>

@@ -109,7 +109,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrSegmented`](./components/GrSegmented.md)
 - [`GrSelect`](./components/GrSelect.md)
 - [`GrSidebar`](./components/GrSidebar.md)
-- `GrSkeleton`
+- [`GrSkeleton`](./components/GrSkeleton.md)
 - [`GrSlider`](./components/GrSlider.md)
 - [`GrStatistic`](./components/GrStatistic.md)
 - [`GrSwitch`](./components/GrSwitch.md)

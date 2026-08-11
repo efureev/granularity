@@ -56,11 +56,11 @@ const UNO_TEXT_SCALE = /(?<![\w-])text-(?:xs|sm|base|lg|xl|[2-9]xl)(?![\w-])/g
  * Утилиты радиуса из шкалы `presetMini`, включая направленные (`rounded-l-md`).
  *
  * Lookbehind и lookahead отсекают то, что утилитой не является: проп
- * `rounded?: string` и его биндинг `:rounded="…"` у `GrSkeleton`, значение
- * `borderRadius: rounded` в объекте стиля, а также уже переведённую форму
- * `rounded-[var(--gr-radius-*)]`.
+ * `rounded?: string` и его биндинг `:rounded="…"` у `GrSkeleton`, чтение того
+ * же пропа `props.rounded`, значение `borderRadius: rounded` в объекте стиля,
+ * а также уже переведённую форму `rounded-[var(--gr-radius-*)]`.
  */
-const UNO_RADIUS_SCALE = /(?<![\w:-])(?<!:\s)rounded(?:-(?:[tblrse]|tl|tr|bl|br|ss|se|es|ee))?(?:-(?:none|sm|md|lg|xl|[2-9]xl|full))?(?![\w:?=[-])/g
+const UNO_RADIUS_SCALE = /(?<![\w:.-])(?<!:\s)rounded(?:-(?:[tblrse]|tl|tr|bl|br|ss|se|es|ee))?(?:-(?:none|sm|md|lg|xl|[2-9]xl|full))?(?![\w:?=[-])/g
 
 /**
  * Гейт против «шкала есть, а в компонентах литералы».
@@ -132,6 +132,7 @@ describe('стили берут значения из токенов', () => {
       source: stripComments([
         '// If the target has rounded corners, we must clip its content',
         'export interface GrSkeletonProps { rounded?: string }',
+        'const resolved = computed(() => props.rounded ?? roundedByVariant[props.variant])',
         ':style="{ height, width, borderRadius: rounded }"',
         ':rounded="resolvedShape === \'circle\' ? \'var(--gr-radius-full)\' : \'10px\'"',
         'class="rounded-[var(--gr-radius-control)] rounded-l-[var(--gr-radius-md)]"',

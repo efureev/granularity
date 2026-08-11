@@ -278,7 +278,7 @@ describe('component docs metadata', () => {
     expect(progressBarDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(progressBarDoc.examples.every(example => example.previewKey?.startsWith('gr-progress-bar'))).toBe(true)
 
-    expect(skeletonDoc.examples).toHaveLength(3)
+    expect(skeletonDoc.examples).toHaveLength(4)
     expect(skeletonDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(skeletonDoc.examples.every(example => example.previewKey?.startsWith('gr-skeleton'))).toBe(true)
   })

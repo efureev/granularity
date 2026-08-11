@@ -120,6 +120,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSkeleton` knows its shape, and can repeat itself.** One default radius served every case: a pill is right for
+  a line of text and wrong for a block, so every rectangular placeholder passed `rounded` by hand — the showcase demo
+  did it three times on one screen. `variant` now names the shape — `text` (pill), `rect` (`--gr-radius-md`),
+  `circle` (round, height following width so a single given side cannot turn it into an oval) — while `width` and
+  `height` stay with the consumer, because the height of a placeholder is dictated by the content it stands in for,
+  not by a scale inside the component.
+
+  `count` draws a block of N placeholders in one prop instead of a hand-rolled `v-for`; for `text` the last line is
+  shorter, so the block reads as a paragraph rather than a list of identical bars. A single placeholder still renders
+  without a wrapper, and a bare `<GrSkeleton />` is unchanged to the pixel — which is what `GrTable` and `GrList`
+  render in their loading rows.
+
 - **`GrStatistic` counts, and can lead somewhere.** The one thing a dashboard expects from a "statistic" was the one
   thing it could not do. `animate` now tweens the number when the tile appears and on every change — **from the
   previous number**, not from zero: counting from zero on each refresh reads as a data reset. `animateDuration` sets

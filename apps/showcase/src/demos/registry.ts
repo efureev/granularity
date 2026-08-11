@@ -252,6 +252,7 @@ export const demoPathByPreviewKey = {
   'gr-skeleton-dashboard-layout':           'components/gr-skeleton/GrSkeletonDashboardDemo.vue',
   'gr-skeleton-list-placeholder':           'components/gr-skeleton/GrSkeletonListDemo.vue',
   'gr-skeleton-text-card':                  'components/gr-skeleton/GrSkeletonTextCardDemo.vue',
+  'gr-skeleton-variants':                   'components/gr-skeleton/GrSkeletonVariantsDemo.vue',
   'gr-slider-basic':                        'components/gr-slider/GrSliderBasicDemo.vue',
   'gr-slider-custom':                       'components/gr-slider/GrSliderCustomDemo.vue',
   'gr-slider-marks':                        'components/gr-slider/GrSliderMarksDemo.vue',

@@ -8311,25 +8311,39 @@
         "origin": "generated",
         "items": [
           {
+            "name": "variant",
+            "description": "Форма, а не размеры: `width`/`height` остаются на потребителе, потому что высота заглушки диктуется соседним контентом, а не шкалой компонента.",
+            "type": "\"circle\" | \"text\" | \"rect\" | undefined",
+            "required": false,
+            "default": "\"text\""
+          },
+          {
             "name": "width",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"100%\""
+            "default": "undefined"
           },
           {
             "name": "height",
             "description": "",
             "type": "string | undefined",
             "required": false,
-            "default": "\"12px\""
+            "default": "undefined"
           },
           {
             "name": "rounded",
-            "description": "",
+            "description": "Радиус точечно. Не задан — берётся из `variant`.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"var(--gr-radius-full)\""
+            "default": "undefined"
+          },
+          {
+            "name": "count",
+            "description": "Сколько заглушек подряд. Больше одной — они уезжают в общую обёртку.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
           }
         ]
       },
