@@ -10305,6 +10305,13 @@
             "type": "string | false | undefined",
             "required": false,
             "default": "\"F6\""
+          },
+          {
+            "name": "swipeDismiss",
+            "description": "Смахивание тоста к своему краю экрана. Клавиатурный эквивалент — `Delete` и `Backspace` на сфокусированном тосте — остаётся и при выключенном жесте.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           }
         ]
       },

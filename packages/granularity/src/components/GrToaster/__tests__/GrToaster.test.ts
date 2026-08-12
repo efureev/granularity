@@ -34,12 +34,16 @@ vi.mock('~icons/lucide/x', () => ({
   }),
 }))
 
+import { resetPortalRoot } from '../../../composables/internal/portalRoot'
 import { granularityToastPlugin, useToast } from '../../../composables/useToast'
 import GrToaster from '../GrToaster.vue'
 
 afterEach(() => {
   useToast().clear()
   document.body.innerHTML = ''
+  // Корень портала кэшируется модулем, а очистка `body` его открепляет: без
+  // сброса следующий монтаж телепортировал бы тосты в узел вне документа.
+  resetPortalRoot()
 })
 
 describe('GrToaster', () => {
@@ -479,5 +483,210 @@ describe('GrToaster — пауза: курсор и фокус независи�
 
     wrapper.unmount()
     vi.useRealTimers()
+  })
+})
+
+describe('GrToaster — смахивание', () => {
+  /**
+   * jsdom не знает `PointerEvent`, а движение и отпускание примитив слушает на
+   * `window` — приём тот же, что в спеках `useDragSort` и `useZoomPan`.
+   */
+  function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
+    return new MouseEvent(type, { bubbles: true, ...init })
+  }
+
+  /**
+   * Отпущенный тост закрывается через два кадра: первый снимает запрет на
+   * переход, второй задаёт точку отлёта (см. `releaseSwiped`).
+   */
+  async function flushRelease(): Promise<void> {
+    await nextTick()
+    await nextTick()
+    await nextTick()
+  }
+
+  /**
+   * Ищем внутри последнего хоста: уходящий тост остаётся в DOM до конца
+   * перехода, и по всему документу можно поймать узел прошлого теста.
+   */
+  function currentHost(): HTMLElement {
+    const hosts = document.querySelectorAll<HTMLElement>('[data-gr-toaster]')
+
+    return hosts[hosts.length - 1]
+  }
+
+  /** Тост шириной 360px: порог — четверть, то есть 90px. */
+  function toastNode(): HTMLElement {
+    const nodes = currentHost().querySelectorAll<HTMLElement>('[data-gr-toast]')
+    const node = nodes[nodes.length - 1]
+
+    node.getBoundingClientRect = () => ({
+      top: 0, bottom: 80, left: 0, right: 360, width: 360, height: 80, x: 0, y: 0, toJSON: () => ({}),
+    })
+
+    return node
+  }
+
+  async function mountWithToast(props: Record<string, unknown> = {}) {
+    const wrapper = mount(GrToaster, {
+      attachTo: document.body,
+      props,
+      global: { plugins: [granularityToastPlugin] },
+    })
+    const toast = wrapper.vm.$.appContext.app.runWithContext(() => useToast())
+    toast.push({ title: 'Saved', timeoutMs: 0 })
+    await nextTick()
+
+    return { wrapper, toast }
+  }
+
+  it('смахивание за порог к своему краю закрывает тост', async () => {
+    const { wrapper, toast } = await mountWithToast()
+    const node = toastNode()
+
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 140 }))
+    window.dispatchEvent(pointer('pointerup'))
+    await flushRelease()
+
+    expect(toast.list.value).toHaveLength(0)
+
+    wrapper.unmount()
+  })
+
+  it('короткое движение возвращает тост, а не закрывает', async () => {
+    const { wrapper, toast } = await mountWithToast()
+    const node = toastNode()
+
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 50 }))
+    await nextTick()
+    expect(toastNode().style.transform).toBe('translateX(40px)')
+
+    window.dispatchEvent(pointer('pointerup'))
+    await nextTick()
+
+    expect(toast.list.value).toHaveLength(1)
+    expect(toastNode().style.transform).toBe('')
+
+    wrapper.unmount()
+  })
+
+  it('обрыв жеста возвращает тост на место, а не дожимает смахивание', async () => {
+    const { wrapper, toast } = await mountWithToast()
+    const node = toastNode()
+
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 200 }))
+    window.dispatchEvent(pointer('pointercancel'))
+    await nextTick()
+
+    expect(toast.list.value).toHaveLength(1)
+    expect(toastNode().style.transform).toBe('')
+
+    wrapper.unmount()
+  })
+
+  it('движение от своего края тост не закрывает', async () => {
+    const { wrapper, toast } = await mountWithToast()
+    const node = toastNode()
+
+    // Стек справа, тянем влево: сопротивление вчетверо, порог не берётся.
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 300 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 0 }))
+    window.dispatchEvent(pointer('pointerup'))
+    await nextTick()
+
+    expect(toast.list.value).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('стек у левого края смахивается влево', async () => {
+    const { wrapper, toast } = await mountWithToast({ placement: 'bottom-left' })
+    const node = toastNode()
+
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 200 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 60 }))
+    window.dispatchEvent(pointer('pointerup'))
+    await flushRelease()
+
+    expect(toast.list.value).toHaveLength(0)
+
+    wrapper.unmount()
+  })
+
+  it('`swipeDismiss: false` выключает жест', async () => {
+    const { wrapper, toast } = await mountWithToast({ swipeDismiss: false })
+    const node = toastNode()
+
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 300 }))
+    window.dispatchEvent(pointer('pointerup'))
+    await nextTick()
+
+    expect(toast.list.value).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('пока тост тянут, таймер стоит', async () => {
+    const wrapper = mount(GrToaster, {
+      attachTo: document.body,
+      global: { plugins: [granularityToastPlugin] },
+    })
+    const toast = wrapper.vm.$.appContext.app.runWithContext(() => useToast())
+    toast.push({ title: 'Undo', timeoutMs: 5000 })
+    await nextTick()
+
+    const node = toastNode()
+    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 60 }))
+    await nextTick()
+
+    const progress = currentHost().querySelector<HTMLElement>('[data-gr-toast-progress]')
+    expect(progress?.style.animationPlayState).toBe('paused')
+
+    window.dispatchEvent(pointer('pointerup'))
+    wrapper.unmount()
+  })
+
+  it('нажатие на кнопке действия протяжкой не становится', async () => {
+    const wrapper = mount(GrToaster, {
+      attachTo: document.body,
+      global: { plugins: [granularityToastPlugin] },
+    })
+    const toast = wrapper.vm.$.appContext.app.runWithContext(() => useToast())
+    toast.push({ title: 'Deleted', timeoutMs: 0, action: { label: 'Undo', onClick: () => {} } })
+    await nextTick()
+
+    const actions = currentHost().querySelectorAll<HTMLElement>('[data-gr-toast-action]')
+    const action = actions[actions.length - 1]
+
+    action.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
+    window.dispatchEvent(pointer('pointermove', { clientX: 300 }))
+    await nextTick()
+
+    // Тост стоит на месте: жест на кнопке не начался, и клик по «Отменить»
+    // остаётся кликом. Сама обработка клика проверена в тестах действий выше.
+    expect(toastNode().style.transform).toBe('')
+    expect(toast.list.value).toHaveLength(1)
+
+    window.dispatchEvent(pointer('pointerup'))
+    wrapper.unmount()
+  })
+
+  it('`Delete` и `Backspace` закрывают сфокусированный тост', async () => {
+    const first = await mountWithToast()
+    toastNode().dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+    await nextTick()
+    expect(first.toast.list.value).toHaveLength(0)
+    first.wrapper.unmount()
+
+    const second = await mountWithToast()
+    toastNode().dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }))
+    await nextTick()
+    expect(second.toast.list.value).toHaveLength(0)
+    second.wrapper.unmount()
   })
 })

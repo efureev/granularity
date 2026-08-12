@@ -45,4 +45,12 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-toaster-focus-hotkey',
   },
+  {
+    id: 'toaster-swipe',
+    title: 'Смахивание и клавиатурный эквивалент',
+    description: 'Тост смахивается к своему краю экрана — сторона идёт за `placement`. Порог — четверть ширины, короткое движение возвращает тост, обрыв жеста тоже. `swipe-dismiss="false"` выключает жест, не трогая клавиатуру.',
+    status: 'ready',
+    previewKey: 'gr-toaster-swipe',
+    note: 'Клавиатурный эквивалент — `Delete` и `Backspace` на сфокусированном тосте; пока тост тянут, его таймер стоит.',
+  },
 ]

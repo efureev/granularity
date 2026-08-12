@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrToaster` toasts can be swiped away.** A notification now leaves the way it does on a phone:
+  drag it toward its own edge of the screen — right for a right-hand stack, left for a left-hand one
+  — and past a quarter of its width it goes. Short drags spring back, and so does an **interrupted**
+  gesture: if the browser takes the pointer (a system gesture, a call, a lost window) the user never
+  finished the swipe, and finishing it for them would dismiss a message they were still reading.
+  Dragging the other way meets resistance rather than a second, hidden way to the same action, and
+  while a toast is held its timer stops — otherwise it could burn down under the finger.
+
+  The keyboard equivalent is `Delete` / `Backspace` on a focused toast (reach one with `F6`), with
+  focus moving to its neighbour. `Escape` is deliberately left alone: the toaster is not a modal
+  layer, and claiming it would dismiss a notification instead of the dialog underneath.
+  `swipe-dismiss="false"` turns the gesture off and leaves the keyboard path intact.
+
+  A released toast flies out past its edge and only then closes. The fly-out is the component's own
+  transition rather than a new animation, so `prefers-reduced-motion` needs nothing extra: the
+  global clamp collapses it, and dragging itself is direct manipulation rather than motion.
+
 ### Fixed
 
 - **An interrupted gesture no longer flips the frame in `GrImageViewer`.** `pointercancel` — the

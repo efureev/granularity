@@ -22,18 +22,28 @@
  *   визуализируется прогресс-баром до закрытия;
  * - `placement` настраивает угол экрана; слой — `--gr-z-toast`.
  */
-import { computed, ref, useSlots, watchEffect } from 'vue'
+import { computed, nextTick, ref, useSlots, watchEffect } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 import type { Component } from 'vue'
 
+import { useDragGesture } from '../../composables/useDragGesture'
 import { useToast } from '../../composables/useToast'
 import { vHotkey } from '../../directives'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { GrToastTone, Toast, ToastAction } from '../../composables/useToast'
 import GrButton from '../GrButton'
 import GrIcon from '../GrIcon'
-import { PLACEMENT_CLASS, type GrToasterPlacement } from './grToasterStyles'
+import {
+  PLACEMENT_CLASS,
+  SWIPE_DIRECTION,
+  SWIPE_FLY_OUT_PX,
+  SWIPE_RESISTANCE,
+  SWIPE_THRESHOLD_MIN_PX,
+  SWIPE_THRESHOLD_RATIO,
+  swipeOpacity,
+  type GrToasterPlacement,
+} from './grToasterStyles'
 
 import IconCheck from '~icons/lucide/check-circle'
 import IconWarning from '~icons/lucide/alert-triangle'
@@ -81,6 +91,11 @@ export interface GrToasterProps {
    * `F6` — рекомендация APG для перехода между «регионами» страницы.
    */
   focusHotkey?: string | false
+  /**
+   * Смахивание тоста к своему краю экрана. Клавиатурный эквивалент — `Delete`
+   * и `Backspace` на сфокусированном тосте — остаётся и при выключенном жесте.
+   */
+  swipeDismiss?: boolean
 }
 
 import { useGrThemeAttrs } from '../GrConfigProvider/context'
@@ -92,6 +107,7 @@ const props = withDefaults(defineProps<GrToasterProps>(), {
   regionLabel: undefined,
   width: undefined,
   focusHotkey: 'F6',
+  swipeDismiss: true,
 })
 
 /**
@@ -149,7 +165,134 @@ const visibleIds = computed(() => new Set(visibleToasts.value.map(toast => toast
 // возобновлял отсчёт под клавиатурным фокусом.
 const hovered = ref(false)
 const focusWithin = ref(false)
-const paused = computed(() => hovered.value || focusWithin.value)
+
+// Контейнер стека: по нему ищутся тосты — и для фокуса, и для жеста.
+const containerEl = ref<HTMLElement | null>(null)
+
+// ————— Смахивание.
+
+const swipingId = ref<string | null>(null)
+const swipeOffset = ref(0)
+let swipeStartX = 0
+let swipeThreshold = SWIPE_THRESHOLD_MIN_PX
+
+// Тост, который тянут, тоже держит таймеры: иначе уведомление сгорало бы прямо
+// под пальцем, посреди жеста.
+const paused = computed(() => hovered.value || focusWithin.value || swipingId.value !== null)
+
+function toastElement(id: string): HTMLElement | null {
+  return containerEl.value?.querySelector<HTMLElement>(`[data-gr-toast][data-toast-id="${id}"]`) ?? null
+}
+
+/** Жест отпущен и тост закрывается: переход снова разрешён (см. `releaseSwiped`). */
+const swipeReleased = ref(false)
+
+function resetSwipe(): void {
+  swipingId.value = null
+  swipeOffset.value = 0
+  swipeReleased.value = false
+}
+
+/**
+ * Отпущенный тост уезжает за свой край и только потом закрывается.
+ *
+ * Два кадра здесь обязательны, и оба по одной причине: уходящий элемент Vue
+ * больше не перерисовывает — он уезжает с тем стилем, что был на последнем
+ * рендере. Первый кадр снимает инлайновый `transition: none` (во время жеста он
+ * нужен, иначе переходы группы борются с пальцем), второй задаёт конечную
+ * точку — с этого момента анимация уже идёт, и `leave` подхватывает её на ходу.
+ *
+ * Без первого кадра переход остаётся запрещённым, `transitionend` не приходит,
+ * и тост замирает полупрозрачным. В jsdom этого не видно: там переходов нет
+ * вовсе — поймать такое можно только в браузере.
+ */
+async function releaseSwiped(id: string): Promise<void> {
+  swipeReleased.value = true
+  await nextTick()
+
+  swipeOffset.value = SWIPE_DIRECTION[props.placement] * SWIPE_FLY_OUT_PX
+  await nextTick()
+
+  dismiss(id)
+  resetSwipe()
+}
+
+/**
+ * Движение к своему краю идёт один к одному, в обратную сторону — с
+ * сопротивлением: тост едет за пальцем, но закрыть его «наоборот» нельзя.
+ */
+function resistOffset(delta: number): number {
+  const toEdge = SWIPE_DIRECTION[props.placement]
+
+  return Math.sign(delta) === toEdge ? delta : delta / SWIPE_RESISTANCE
+}
+
+const swipe = useDragGesture({
+  disabled: () => !props.swipeDismiss,
+  onStart: (event) => {
+    const target = event.target as HTMLElement | null
+    // Нажатие на кнопке — это нажатие на кнопке: закрытие и действия тоста не
+    // должны превращаться в протяжку.
+    if (target?.closest('button, a[href]')) return false
+
+    const host = target?.closest<HTMLElement>('[data-gr-toast]')
+    const id = host?.dataset.toastId
+    if (!host || !id) return false
+
+    swipingId.value = id
+    swipeOffset.value = 0
+    swipeStartX = event.clientX
+    swipeThreshold = Math.max(SWIPE_THRESHOLD_MIN_PX, host.getBoundingClientRect().width * SWIPE_THRESHOLD_RATIO)
+  },
+  onMove: (event) => {
+    // Против выделения текста тоста во время протяжки.
+    event.preventDefault()
+    swipeOffset.value = resistOffset(event.clientX - swipeStartX)
+  },
+  onEnd: () => {
+    const id = swipingId.value
+    const passed = id !== null
+      && Math.sign(swipeOffset.value) === SWIPE_DIRECTION[props.placement]
+      && Math.abs(swipeOffset.value) >= swipeThreshold
+
+    if (passed) void releaseSwiped(id)
+    else resetSwipe()
+  },
+  // Обрыв возвращает тост на место, а не дожимает смахивание: указатель забрал
+  // браузер, а не пользователь довёл жест.
+  onCancel: resetSwipe,
+})
+
+function swipeStyle(toast: Toast): Record<string, string> | undefined {
+  if (swipingId.value !== toast.id) return undefined
+
+  return {
+    transform: `translateX(${swipeOffset.value}px)`,
+    opacity: String(swipeOpacity(swipeOffset.value, swipeThreshold)),
+    // Переходы группы во время жеста борются с пальцем: тост едет с задержкой
+    // и «догоняет» курсор после отпускания. После отпускания запрет снимается —
+    // уходящему тосту переход нужен, иначе он не уедет вовсе.
+    ...(swipeReleased.value ? {} : { transition: 'none' }),
+  }
+}
+
+/**
+ * Клавиатурный эквивалент смахивания. `Escape` намеренно не берём: тостер не
+ * модальный слой, и перехват закрывал бы уведомление вместо диалога под ним.
+ */
+function onToastKeydown(event: KeyboardEvent, toast: Toast): void {
+  if (event.key !== 'Delete' && event.key !== 'Backspace') return
+
+  event.preventDefault()
+
+  const index = visibleToasts.value.findIndex(item => item.id === toast.id)
+  const next = visibleToasts.value[index + 1] ?? visibleToasts.value[index - 1]
+
+  dismiss(toast.id)
+
+  // Фокус не должен упасть на `body`: дальше по стеку есть что читать.
+  if (next) void nextTick(() => toastElement(next.id)?.focus())
+}
 
 // Единый источник правды по таймерам: тост тикает, только если он видим И стек не на
 // паузе. Очередь и hover — на паузе. Реагирует на изменения списка/hover.
@@ -182,7 +325,6 @@ const containerStyle = computed(() => {
   return { '--gr-toaster-width': typeof props.width === 'number' ? `${props.width}px` : props.width }
 })
 
-const containerEl = ref<HTMLElement | null>(null)
 
 /**
  * Переводит фокус на верхний тост. Тост фокусируем только программно
@@ -243,10 +385,15 @@ defineExpose({ focus })
             :key="toast.id"
             data-gr-toast
             :data-tone="toast.tone"
+            :data-toast-id="toast.id"
             :role="metaFor(toast.tone).role"
             aria-atomic="true"
             tabindex="-1"
             class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)] focus-visible:outline-none focus-visible:shadow-[var(--gr-shadow-2),0_0_0_2px_var(--gr-ring)]"
+            :class="swipeDismiss ? '[touch-action:pan-y]' : ''"
+            :style="swipeStyle(toast)"
+            @pointerdown="swipe.start"
+            @keydown="onToastKeydown($event, toast)"
         >
           <div class="flex items-start gap-3">
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }">

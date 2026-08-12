@@ -241,7 +241,7 @@ describe('component docs metadata', () => {
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-prompt-dialog'))).toBe(true)
 
-    expect(toasterDoc.examples).toHaveLength(6)
+    expect(toasterDoc.examples).toHaveLength(7)
     expect(toasterDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('gr-toaster'))).toBe(true)
 
