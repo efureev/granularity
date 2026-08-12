@@ -32,6 +32,12 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **Wired into the showcase** next to the package it replaces: its own companion section,
+  four demos and hand-written API tables. Both packages ship a `GrDatePicker`, so the
+  showcase demos import this one explicitly — the auto-import resolver matches by name and
+  would silently hand over the other component, and the snippet under a preview is exactly
+  the code a reader copies.
+
 - **Package gates for tokens and accessibility**: no pixel literals or uno-scale utilities
   where the design system has a token, every own CSS variable declared in the component's
   `tokens.json`, and axe over the *open* panel — the showcase gate only ever captures the

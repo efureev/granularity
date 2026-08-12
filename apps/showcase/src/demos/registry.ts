@@ -12,6 +12,10 @@ import { defineAsyncComponent } from 'vue'
  * Порядок — алфавитный по ключу, его держит гейт `examplePreviews.test.ts`.
  */
 export const demoPathByPreviewKey = {
+  'extra-chrono-calendar-basic':             'extra/granularity-chrono/GrCalendarBasicDemo.vue',
+  'extra-chrono-calendar-day-slot':          'extra/granularity-chrono/GrCalendarDaySlotDemo.vue',
+  'extra-chrono-date-picker-basic':          'extra/granularity-chrono/GrDatePickerBasicDemo.vue',
+  'extra-chrono-date-picker-form':           'extra/granularity-chrono/GrDatePickerFormDemo.vue',
   'extra-date-basic':                       'extra/granularity-datepicker/GrDatePickerBasicDemo.vue',
   'extra-date-range':                       'extra/granularity-datepicker/GrDateRangePickerDemo.vue',
   'extra-datepicker-localized':             'extra/granularity-datepicker/GrDateTimePickerLocalizedDemo.vue',

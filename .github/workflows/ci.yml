@@ -155,12 +155,15 @@ jobs:
 
   test-showcase:
     # Витрина использует авто-импорт `unplugin-vue-components` через резолверы из
-    # @feugene/unplugin-granularity и @feugene/granularity-datepicker/resolver —
-    # их dist нужен уже при загрузке vite/vitest-конфига, поэтому скачиваем все три.
+    # @feugene/unplugin-granularity, @feugene/granularity-datepicker/resolver и
+    # @feugene/granularity-chrono/resolver, а `uno.config.ts` читает провайдеры
+    # тех же пакетов — их dist нужен уже при загрузке vite/vitest-конфига,
+    # поэтому скачиваем все четыре.
     needs:
       - build-granularity
       - build-unplugin-granularity
       - build-granularity-datepicker
+      - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -189,6 +192,12 @@ jobs:
         with:
           name: granularity-datepicker-dist
           path: packages/granularity-datepicker/dist
+
+      - name: Download granularity-chrono dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
 
       - name: Test showcase
         run: yarn test:showcase
@@ -201,6 +210,7 @@ jobs:
       - build-granularity
       - build-unplugin-granularity
       - build-granularity-datepicker
+      - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -229,6 +239,12 @@ jobs:
         with:
           name: granularity-datepicker-dist
           path: packages/granularity-datepicker/dist
+
+      - name: Download granularity-chrono dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
 
       - name: Install Playwright browsers
         working-directory: apps/showcase
@@ -259,6 +275,7 @@ jobs:
   build-showcase:
     needs:
       - test-showcase
+      - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -287,6 +304,12 @@ jobs:
         with:
           name: granularity-datepicker-dist
           path: packages/granularity-datepicker/dist
+
+      - name: Download granularity-chrono dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
 
       - name: Build showcase
         run: yarn build:showcase

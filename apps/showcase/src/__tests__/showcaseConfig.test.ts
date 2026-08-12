@@ -107,6 +107,7 @@ describe('showcase bootstrap config', () => {
     expect(showcaseGranularOptions.providers.map(provider => provider.id)).toEqual([
       '@feugene/granularity',
       '@feugene/granularity-datepicker',
+      '@feugene/granularity-chrono',
     ])
     expect(showcaseGranularOptions.components).toBe('all')
     expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
@@ -114,6 +115,7 @@ describe('showcase bootstrap config', () => {
     expect(showcaseUnoConfig).toContain("presetGranularNode")
     expect(showcaseUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("import datepickerProvider from '@feugene/granularity-datepicker/granular-provider/node'")
+    expect(showcaseUnoConfig).toContain("import chronoProvider from '@feugene/granularity-chrono/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("names: ['light', 'dark']")
   })
 })
