@@ -50,6 +50,15 @@ function fittedImage(width: number, height: number): HTMLImageElement {
 }
 
 /** Указатель без реального DOM: нужны только координаты и capture-методы. */
+/**
+ * Движение и отпускание приходят с `window`: панораму ведёт `useDragGesture`,
+ * а он слушает документ, а не элемент. jsdom не знает `PointerEvent`, поэтому
+ * события собираются из `MouseEvent`.
+ */
+function windowPointer(type: string, x?: number, y?: number): void {
+  window.dispatchEvent(new MouseEvent(type, { bubbles: true, clientX: x, clientY: y }))
+}
+
 function pointerEvent(type: string, x: number, y: number, button = 0): PointerEvent {
   const target = {
     setPointerCapture: vi.fn(),
@@ -131,7 +140,7 @@ describe('useZoomPan: поворот', () => {
     zoomPan.zoomIn()
     zoomPan.rotateLeft()
     zoomPan.onPointerDown(pointerEvent('pointerdown', 0, 0))
-    zoomPan.onPointerMove(pointerEvent('pointermove', 40, 25))
+    windowPointer('pointermove', 40, 25)
 
     zoomPan.resetTransform()
 
@@ -156,16 +165,66 @@ describe('useZoomPan: панорамирование', () => {
     zoomPan.onPointerDown(pointerEvent('pointerdown', 100, 100))
     expect(zoomPan.isDragging.value).toBe(true)
 
-    zoomPan.onPointerMove(pointerEvent('pointermove', 130, 80))
+    windowPointer('pointermove', 130, 80)
     expect(zoomPan.offsetX.value).toBe(30)
     expect(zoomPan.offsetY.value).toBe(-20)
 
-    zoomPan.onPointerUp(pointerEvent('pointerup', 130, 80))
+    windowPointer('pointerup')
     expect(zoomPan.isDragging.value).toBe(false)
 
     // После отпускания движение указателя картинку больше не двигает.
-    zoomPan.onPointerMove(pointerEvent('pointermove', 200, 200))
+    windowPointer('pointermove', 200, 200)
     expect(zoomPan.offsetX.value).toBe(30)
+  })
+
+  it('обрыв жеста заканчивает перетаскивание, но оставляет кадр там, куда его довели', () => {
+    const { zoomPan, imageEl } = setup({ draggable: true })
+
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+    zoomPan.setScale(2)
+
+    zoomPan.onPointerDown(pointerEvent('pointerdown', 100, 100))
+    windowPointer('pointermove', 140, 100)
+    expect(zoomPan.offsetX.value).toBe(40)
+
+    windowPointer('pointercancel')
+
+    // Откат к точке до нажатия читался бы как рывок: пользователь кадр уже сдвинул.
+    expect(zoomPan.isDragging.value).toBe(false)
+    expect(zoomPan.offsetX.value).toBe(40)
+
+    windowPointer('pointermove', 200, 100)
+    expect(zoomPan.offsetX.value).toBe(40)
+  })
+
+  it('тач-указатель ветку мыши не запускает: им правят сенсорные жесты', () => {
+    const { zoomPan, imageEl } = setup({ draggable: true })
+
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+    zoomPan.setScale(2)
+
+    zoomPan.onPointerDown({ ...pointerEvent('pointerdown', 100, 100), pointerType: 'touch' })
+
+    expect(zoomPan.isDragging.value).toBe(false)
+  })
+
+  it('`cancelPan` заканчивает жест снаружи — закрытием или сменой кадра', () => {
+    const { zoomPan, imageEl } = setup({ draggable: true })
+
+    imageEl.value = fittedImage(400, 300)
+    zoomPan.measureFitted()
+    zoomPan.setScale(2)
+
+    zoomPan.onPointerDown(pointerEvent('pointerdown', 100, 100))
+    zoomPan.cancelPan()
+
+    expect(zoomPan.isDragging.value).toBe(false)
+
+    // Слушатели сняты: движение указателя кадр больше не двигает.
+    windowPointer('pointermove', 300, 100)
+    expect(zoomPan.offsetX.value).toBe(0)
   })
 
   it('не тянет при draggable=false и не тянет неосновной кнопкой', () => {

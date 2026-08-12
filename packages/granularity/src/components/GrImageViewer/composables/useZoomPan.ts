@@ -1,5 +1,7 @@
 import { computed, ref, type Ref } from 'vue'
 
+import { useDragGesture } from '../../../composables/useDragGesture'
+
 const TRAILING_ZERO_DECIMAL_RE = /\.0$/
 
 export function formatPercent(value: number): string {
@@ -254,27 +256,34 @@ export function useZoomPan(options: UseZoomPanOptions) {
     isDragging.value = false
   }
 
-  function onPointerDown(event: PointerEvent): void {
-    // Тянем только основной кнопкой и только если тянуть вообще есть куда.
-    if (!isPannable.value || event.button !== 0)
-      return
+  /**
+   * Перетаскивание мышью и пером — на общем примитиве жеста.
+   *
+   * Слушатели живут на `window`, а не на захвате указателя: захват привязан к
+   * `<img>`, и смена кадра посреди жеста подменяла элемент — отпускание не
+   * приходило никуда, а `isDragging` оставался поднятым.
+   */
+  const drag = useDragGesture({
+    disabled: () => !isPannable.value,
+    onStart: (event) => {
+      // Тач ведёт `usePointerGestures`: у него свои pinch и свайп, и второй
+      // владелец жеста тянул бы кадр дважды.
+      if (event.pointerType === 'touch') return false
 
-    event.preventDefault()
-    startPan(event.clientX, event.clientY)
+      event.preventDefault()
+      startPan(event.clientX, event.clientY)
+    },
+    onMove: event => movePan(event.clientX, event.clientY),
+    onEnd: endPan,
+    // Обрыв не откатывает панораму: кадр уже сдвинут пользователем, и возврат
+    // к исходной точке читался бы как рывок, а не как отмена.
+    onCancel: endPan,
+  })
 
-    // Захватываем указатель, чтобы движение/отпускание ловились за пределами картинки.
-    ;(event.currentTarget as Element).setPointerCapture?.(event.pointerId)
-  }
-
-  function onPointerMove(event: PointerEvent): void {
-    movePan(event.clientX, event.clientY)
-  }
-
-  function onPointerUp(event: PointerEvent): void {
-    if (!isDragging.value)
-      return
+  /** Принудительно закончить перетаскивание — закрытие и смена кадра. */
+  function cancelPan(): void {
+    drag.stop()
     endPan()
-    ;(event.currentTarget as Element).releasePointerCapture?.(event.pointerId)
   }
 
   return {
@@ -311,8 +320,7 @@ export function useZoomPan(options: UseZoomPanOptions) {
     startPan,
     movePan,
     endPan,
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
+    cancelPan,
+    onPointerDown: drag.start,
   }
 }

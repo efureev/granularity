@@ -27,6 +27,35 @@ function touch(id: number, x: number, y: number, type = 'touch'): PointerEvent {
   return { pointerId: id, pointerType: type, clientX: x, clientY: y } as PointerEvent
 }
 
+describe('usePointerGestures: обрыв жеста', () => {
+  it('не листает кадр: система забрала указатель, а не пользователь смахнул', () => {
+    const { gestures, onSwipeLeft, onSwipeRight, pan } = setup()
+
+    gestures.onPointerDown(touch(1, 300, 200))
+    gestures.onPointerMove(touch(1, 180, 205))
+    gestures.onPointerCancel(touch(1, 180, 205))
+
+    expect(onSwipeLeft).not.toHaveBeenCalled()
+    expect(onSwipeRight).not.toHaveBeenCalled()
+    expect(pan.end).toHaveBeenCalled()
+  })
+
+  it('гасит pinch и не оставляет указатель в наборе', () => {
+    const { gestures } = setup({ scale: 2 })
+
+    gestures.onPointerDown(touch(1, 100, 100))
+    gestures.onPointerDown(touch(2, 200, 100))
+    expect(gestures.isPinching.value).toBe(true)
+
+    gestures.onPointerCancel(touch(1, 100, 100))
+    expect(gestures.isPinching.value).toBe(false)
+
+    // Указателя в наборе нет: повторный обрыв уже ничего не делает.
+    gestures.onPointerCancel(touch(1, 100, 100))
+    expect(gestures.isPinching.value).toBe(false)
+  })
+})
+
 describe('usePointerGestures: свайп', () => {
   it('горизонтальный свайп влево листает вперёд, вправо — назад', () => {
     const { gestures, onSwipeLeft, onSwipeRight } = setup()

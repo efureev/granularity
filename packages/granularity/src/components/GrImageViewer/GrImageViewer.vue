@@ -241,9 +241,8 @@ const {
   startPan,
   movePan,
   endPan,
+  cancelPan,
   onPointerDown: onPanPointerDown,
-  onPointerMove: onPanPointerMove,
-  onPointerUp: onPanPointerUp,
 } = useZoomPan({
   minScale: () => props.minScale,
   maxScale: () => props.maxScale,
@@ -293,6 +292,7 @@ const {
   onPointerDown: onGesturePointerDown,
   onPointerMove: onGesturePointerMove,
   onPointerUp: onGesturePointerUp,
+  onPointerCancel: onGesturePointerCancel,
   reset: resetGestures,
 } = usePointerGestures({
   enabled: () => hasImages.value,
@@ -309,14 +309,18 @@ function onPointerDown(event: PointerEvent): void {
   onPanPointerDown(event)
 }
 
+// Движение и отпускание — только сенсорная ветка: панораму мышью и пером ведёт
+// `useDragGesture` со своими слушателями на `window`.
 function onPointerMove(event: PointerEvent): void {
   onGesturePointerMove(event)
-  onPanPointerMove(event)
 }
 
 function onPointerUp(event: PointerEvent): void {
   onGesturePointerUp(event)
-  onPanPointerUp(event)
+}
+
+function onPointerCancel(event: PointerEvent): void {
+  onGesturePointerCancel(event)
 }
 
 // Плавный CSS-переход только для дискретных зумов; при wheel-зуме/перетаскивании отключаем.
@@ -492,7 +496,7 @@ watch(
       stopObservingImage()
       endWheelZoom()
       resetGestures()
-      isDragging.value = false
+      cancelPan()
       return
     }
 
@@ -576,6 +580,7 @@ onBeforeUnmount(() => {
   endWheelZoom()
   cancelPreload()
   resetGestures()
+  cancelPan()
 })
 </script>
 
@@ -711,7 +716,7 @@ onBeforeUnmount(() => {
                   @pointerdown="onPointerDown"
                   @pointermove="onPointerMove"
                   @pointerup="onPointerUp"
-                  @pointercancel="onPointerUp"
+                  @pointercancel="onPointerCancel"
                 >
 
                 <div

@@ -36,6 +36,24 @@ async function mountViewer(extra: Record<string, unknown> = {}) {
 }
 
 describe('GrImageViewer (decomposed)', () => {
+  it('отпускание за пределами картинки заканчивает перетаскивание', async () => {
+    const wrapper = await mountViewer({ draggable: true })
+    const image = () => wrapper.find('[data-gr-image-viewer-image]')
+
+    image().element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 10, clientY: 10 }))
+    await nextTick()
+    expect(image().classes()).toContain('cursor-grabbing')
+
+    // Отпускание приходит мимо картинки — на документ. Слушатели жеста живут
+    // на `window`, поэтому конец жеста ловится и здесь.
+    window.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
+    await nextTick()
+
+    expect(image().classes()).toContain('cursor-grab')
+    expect(image().classes()).not.toContain('cursor-grabbing')
+
+    wrapper.unmount()
+  })
 
   it('помечает корень inert, когда поверх открыт другой модальный слой', async () => {
     const wrapper = await mountViewer()

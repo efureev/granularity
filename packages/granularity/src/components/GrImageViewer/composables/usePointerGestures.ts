@@ -152,6 +152,21 @@ export function usePointerGestures(options: UsePointerGesturesOptions) {
     options.pan.end()
   }
 
+  /**
+   * Обрыв — не отпускание: браузер забрал указатель (системный жест, звонок,
+   * потеря окна). Пройденное расстояние при этом не считается свайпом, иначе
+   * прерванный жест листает кадр, которого пользователь не листал.
+   */
+  function onPointerCancel(event: PointerEvent): void {
+    if (!pointers.has(event.pointerId))
+      return
+
+    pointers.delete(event.pointerId)
+    isSwipeCandidate = false
+    isPinching.value = false
+    options.pan.end()
+  }
+
   /** Сброс при закрытии, смене кадра и размонтировании. */
   function reset(): void {
     pointers.clear()
@@ -159,5 +174,5 @@ export function usePointerGestures(options: UsePointerGesturesOptions) {
     isSwipeCandidate = false
   }
 
-  return { isPinching, onPointerDown, onPointerMove, onPointerUp, reset }
+  return { isPinching, onPointerDown, onPointerMove, onPointerUp, onPointerCancel, reset }
 }

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **An interrupted gesture no longer flips the frame in `GrImageViewer`.** `pointercancel` — the
+  browser taking the pointer back on a system gesture, a call, a lost window — went into the same
+  handler as `pointerup`, which saw a swipe candidate and paged the viewer. A cancelled gesture is
+  now its own path: it ends the pan, clears the pinch state and counts as nothing.
+
+- **Releasing outside the image ends the drag.** Panning was held by `setPointerCapture` bound to
+  the `<img>`; when the frame changed mid-gesture the element was replaced, no `pointerup` arrived
+  anywhere and `isDragging` stayed up — the cursor stuck at `grabbing` and CSS transitions stayed
+  off. The pan now runs on `useDragGesture` with listeners on `window`, so the end of a gesture is
+  caught wherever it happens.
+
 ### Added
 
 - **`GrDataTable` columns resize and pin.** `resizable-columns` puts a grip on the right edge of
