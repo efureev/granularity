@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
+import GrDateTimePicker from '../components/GrDateTimePicker/GrDateTimePicker.vue'
 import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
 
 /**
@@ -30,6 +31,7 @@ interface Control {
 
 const controls: Control[] = [
   { name: 'GrDatePicker', render: () => h(GrDatePicker as never, { modelValue: null }) },
+  { name: 'GrDateTimePicker', render: () => h(GrDateTimePicker as never, { modelValue: null }) },
   { name: 'GrTimePicker', render: () => h(GrTimePicker as never, { modelValue: null }) },
 ]
 

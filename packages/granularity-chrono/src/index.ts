@@ -1,6 +1,7 @@
 // <granularity:components> — блок генерируется `yarn generate:registry`
 export * from './components/GrCalendar'
 export * from './components/GrDatePicker'
+export * from './components/GrDateTimePicker'
 export * from './components/GrTimePicker'
 // </granularity:components>
 

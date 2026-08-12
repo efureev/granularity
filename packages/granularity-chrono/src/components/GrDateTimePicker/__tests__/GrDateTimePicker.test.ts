@@ -1,0 +1,316 @@
+import { DOMWrapper, mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import { describe, expect, it } from 'vitest'
+
+import GrDateTimePicker from '../GrDateTimePicker.vue'
+
+const TODAY = new Date(2026, 7, 12)
+
+function at(day: number, hour = 0, minute = 0): Date {
+  return new Date(2026, 7, day, hour, minute)
+}
+
+function mountPicker(props: Record<string, unknown> = {}) {
+  return mount(GrDateTimePicker, {
+    props: { locale: 'en-US', today: TODAY, use12Hours: false, ...props },
+    attachTo: document.body,
+  })
+}
+
+type Picker = ReturnType<typeof mountPicker>
+
+function field(wrapper: Picker) {
+  return wrapper.get('[data-gr-date-time-picker-field]')
+}
+
+/** Панель уезжает в портал, то есть из поддерева обёртки. */
+function query(selector: string): DOMWrapper<HTMLElement> {
+  const element = document.querySelector<HTMLElement>(selector)
+  if (!element) throw new Error(`нет элемента ${selector}`)
+
+  return new DOMWrapper(element)
+}
+
+function exists(selector: string): boolean {
+  return document.querySelector(selector) !== null
+}
+
+function day(key: string) {
+  return query(`[data-gr-calendar-day][data-key="${key}"]`)
+}
+
+function timeOption(key: string) {
+  return query(`[data-gr-time-picker-option][data-key="${key}"]`)
+}
+
+async function openPicker(wrapper: Picker) {
+  await field(wrapper).trigger('click')
+  for (let i = 0; i < 4; i += 1) await nextTick()
+}
+
+function lastModel(wrapper: Picker): unknown {
+  return wrapper.emitted('update:modelValue')?.at(-1)?.[0]
+}
+
+describe('GrDateTimePicker — панель', () => {
+  it('в одной панели и сетка, и колонки времени', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    expect(exists('[data-gr-calendar-grid]')).toBe(true)
+    expect(exists('[data-gr-time-columns]')).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('до первого открытия панели в DOM нет', () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 30) })
+
+    expect(exists('[data-gr-date-time-picker-panel]')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('поле показывает и дату, и время', () => {
+    const wrapper = mountPicker({ modelValue: at(12, 15, 30) })
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026, 15:30')
+    wrapper.unmount()
+  })
+
+  it('секунды в показе появляются вместе с колонкой', () => {
+    const wrapper = mountPicker({ modelValue: new Date(2026, 7, 12, 15, 30, 45), enableSeconds: true })
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026, 15:30:45')
+    wrapper.unmount()
+  })
+
+  it('после открытия фокус уходит в сетку', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0) })
+    await openPicker(wrapper)
+
+    expect(document.activeElement?.getAttribute('data-key')).toBe('2026-08-12')
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateTimePicker — выбор при autoApply', () => {
+  it('смена дня сохраняет время', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+
+    expect(lastModel(wrapper)).toEqual(at(20, 9, 30))
+    wrapper.unmount()
+  })
+
+  it('смена времени сохраняет день', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    await timeOption('hour-21').trigger('click')
+
+    expect(lastModel(wrapper)).toEqual(at(12, 21, 30))
+    wrapper.unmount()
+  })
+
+  it('без значения день даёт полночь, а время — дату today', async () => {
+    const wrapper = mountPicker({ modelValue: null })
+    await openPicker(wrapper)
+
+    await day('2026-08-05').trigger('click')
+    expect(lastModel(wrapper)).toEqual(at(5, 0, 0))
+    wrapper.unmount()
+
+    const empty = mountPicker({ modelValue: null })
+    await openPicker(empty)
+    await timeOption('hour-7').trigger('click')
+    expect(lastModel(empty)).toEqual(at(12, 7, 0))
+    empty.unmount()
+  })
+
+  it('панель по выбору не закрывается: дата и время выбираются по очереди', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0) })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateTimePicker — autoApply=false', () => {
+  it('правки уходят в черновик, а не в модель', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), autoApply: false })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+    await timeOption('hour-21').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    // Поле показывает старое значение, панель — новое.
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026, 09:00')
+    expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('class')).toContain('--gr-calendar-selected-bg')
+    wrapper.unmount()
+  })
+
+  it('кнопка подтверждения отдаёт черновик и закрывает панель', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), autoApply: false })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+    await query('[data-gr-date-time-picker-apply]').trigger('click')
+
+    expect(lastModel(wrapper)).toEqual(at(20, 9, 0))
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+    wrapper.unmount()
+  })
+
+  it('отмена закрывает панель, ничего не отдав', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), autoApply: false })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+    await query('[data-gr-date-time-picker-cancel]').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+    wrapper.unmount()
+  })
+
+  it('после отмены повторное открытие показывает модель, а не брошенный черновик', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), autoApply: false })
+    await openPicker(wrapper)
+    await day('2026-08-20').trigger('click')
+    await query('[data-gr-date-time-picker-cancel]').trigger('click')
+
+    await openPicker(wrapper)
+
+    expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('class'))
+      .toContain('--gr-calendar-selected-bg')
+    wrapper.unmount()
+  })
+
+  it('отмена откатывает панель, даже если она осталась открытой', async () => {
+    // Панель контролируется снаружи и на `update:open` не закрывается —
+    // тогда откат черновика виден сразу, а не при следующем открытии.
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), autoApply: false, open: true })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    await day('2026-08-20').trigger('click')
+    await query('[data-gr-date-time-picker-cancel]').trigger('click')
+    await nextTick()
+
+    expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('class'))
+      .toContain('--gr-calendar-selected-bg')
+    expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('class'))
+      .not.toContain('--gr-calendar-selected-bg')
+    wrapper.unmount()
+  })
+
+  it('при autoApply кнопок подтверждения нет', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0) })
+    await openPicker(wrapper)
+
+    expect(exists('[data-gr-date-time-picker-footer]')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('слот подвала получает подтверждение и отмену', async () => {
+    const wrapper = mount(GrDateTimePicker, {
+      props: { locale: 'en-US', today: TODAY, use12Hours: false, modelValue: at(12, 9, 0), autoApply: false },
+      slots: { footer: '<button data-custom-apply @click="params.apply()">ok</button>' },
+      attachTo: document.body,
+    })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+    await query('[data-custom-apply]').trigger('click')
+
+    expect(exists('[data-gr-date-time-picker-apply]'), 'свой подвал заменяет кнопки целиком').toBe(false)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at(20, 9, 0))
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateTimePicker — границы', () => {
+  it('время ограничено только в граничный день', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 12, 0), min: at(12, 9, 0) })
+    await openPicker(wrapper)
+
+    // 12 августа — день границы: до 09:00 выбирать нечего.
+    expect(timeOption('hour-8').attributes('aria-disabled')).toBe('true')
+
+    // Следующий день границей не задет: там доступны все часы.
+    await day('2026-08-20').trigger('click')
+    await wrapper.setProps({ modelValue: at(20, 12, 0) })
+    await nextTick()
+
+    expect(timeOption('hour-8').attributes('aria-disabled')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('дни вне min не выбираются', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), min: at(10, 0, 0) })
+    await openPicker(wrapper)
+
+    await day('2026-08-05').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateTimePicker — негативные сценарии и форма', () => {
+  it('disabled не открывает панель', async () => {
+    const wrapper = mountPicker({ disabled: true })
+    await openPicker(wrapper)
+
+    expect(exists('[data-gr-date-time-picker-panel]')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('readonly открывает панель, но ни день, ни время не меняются', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), readonly: true })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+    await timeOption('hour-21').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    wrapper.unmount()
+  })
+
+  it('форме уходит сериализованное значение, а не видимый текст', () => {
+    const wrapper = mountPicker({
+      modelValue: '2026-08-12T15:30:00',
+      valueAdapter: 'isoDateTime',
+      name: 'meeting',
+    })
+    const hidden = wrapper.get('input[type="hidden"]')
+
+    expect((hidden.element as HTMLInputElement).value).toBe('2026-08-12T15:30:00')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026, 15:30')
+    wrapper.unmount()
+  })
+
+  it('адаптер isoDateTime отдаёт строку', async () => {
+    const wrapper = mountPicker({ modelValue: '2026-08-12T15:30:00', valueAdapter: 'isoDateTime' })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+
+    expect(lastModel(wrapper)).toBe('2026-08-20T15:30:00')
+    wrapper.unmount()
+  })
+
+  it('очистка отдаёт null и своё событие', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 0), clearable: true })
+
+    await wrapper.get('[data-gr-date-time-picker-clear]').trigger('click')
+
+    expect(lastModel(wrapper)).toBeNull()
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+    wrapper.unmount()
+  })
+})

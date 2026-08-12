@@ -8,6 +8,11 @@
     "panelLabel": "Выбор даты",
     "gridLabel": "Календарь"
   },
+  "dateTimePicker": {
+    "panelLabel": "Выбор даты и времени",
+    "apply": "Применить",
+    "cancel": "Отмена"
+  },
   "timePicker": {
     "panelLabel": "Выбор времени",
     "hours": "Часы",

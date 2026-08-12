@@ -32,6 +32,13 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **`GrDateTimePicker`** — the month grid and the time columns in one panel, with `autoApply`.
+  The prop lands here rather than on `GrDatePicker` because only here does confirmation stop
+  being a tautology: picking a date is atomic, picking a date *and* a time is not. With
+  `autoApply` every step goes out immediately; without it the panel edits a draft that is
+  taken on open and only leaves through the confirm button. Time bounds apply inside the
+  boundary day only — `min = 2026-08-12T09:00` says nothing about the 13th.
+
 - **`GrTimePicker`** — a field with a panel of column listboxes: hours, minutes, optionally
   seconds, and a period column in 12-hour locales. Arrow keys, `Home`/`End` and
   `aria-activedescendant` come from the core's `useComboboxNavigation`, so the keyboard

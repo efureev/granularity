@@ -25,7 +25,7 @@ import type { GrPickerSize } from './pickerFieldStyles'
  */
 
 /** Компоненты пакета, у которых есть оболочка. Расширяется вместе с семейством. */
-export type GrPickerComponent = 'GrDatePicker' | 'GrTimePicker'
+export type GrPickerComponent = 'GrDatePicker' | 'GrTimePicker' | 'GrDateTimePicker'
 
 export interface PickerShellProps<TValue> {
   modelValue?: TValue

@@ -8,6 +8,11 @@
     "panelLabel": "Elegir fecha",
     "gridLabel": "Calendario"
   },
+  "dateTimePicker": {
+    "panelLabel": "Elegir fecha y hora",
+    "apply": "Aplicar",
+    "cancel": "Cancelar"
+  },
   "timePicker": {
     "panelLabel": "Elegir hora",
     "hours": "Horas",

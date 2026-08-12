@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrCalendar from '../components/GrCalendar/GrCalendar.vue'
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
+import GrDateTimePicker from '../components/GrDateTimePicker/GrDateTimePicker.vue'
 import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
 
 /**
@@ -104,6 +105,29 @@ describe('a11y', () => {
     for (let i = 0; i < 4; i += 1) await nextTick()
 
     expect(document.querySelector('[data-gr-time-picker-panel]')).not.toBeNull()
+    expect(await violations(document.body)).toEqual([])
+
+    wrapper.unmount()
+  })
+
+  it('GrDateTimePicker — сетка, колонки и подвал без нарушений', async () => {
+    const wrapper = mount(GrDateTimePicker, {
+      props: {
+        modelValue: new Date(2026, 7, 12, 15, 30),
+        today: new Date(2026, 7, 12),
+        locale: 'en-US',
+        use12Hours: true,
+        autoApply: false,
+        clearable: true,
+        ariaLabel: 'Meeting start',
+      },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-date-time-picker-field]').trigger('click')
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.querySelector('[data-gr-date-time-picker-footer]')).not.toBeNull()
     expect(await violations(document.body)).toEqual([])
 
     wrapper.unmount()
