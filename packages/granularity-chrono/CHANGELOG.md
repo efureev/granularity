@@ -5,7 +5,9 @@ All notable changes to the [`@feugene/granularity-chrono`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - 2026-08-12
+## [Unreleased]
+
+## [0.2.0] - 2026-08-12
 
 ### Fixed
 
@@ -23,6 +25,8 @@ to [Semantic Versioning](https://semver.org/).
   component, and vice versa") and an integration test on a **real** `fint-i18n` instance with a real
   component — the only thing that checks the seam between block name, loader shape, JSON structure
   and the keys components ask for. A mock adapter answers any key and would never have caught it.
+
+## [0.1.0] - 2026-08-12
 
 ### Added
 
