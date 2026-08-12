@@ -8,7 +8,10 @@
   },
   "datePicker": {
     "panelLabel": "Elegir fecha",
-    "gridLabel": "Calendario"
+    "gridLabel": "Calendario",
+    "patternDay": "D",
+    "patternMonth": "M",
+    "patternYear": "A"
   },
   "dateRangePicker": {
     "panelLabel": "Elegir periodo"

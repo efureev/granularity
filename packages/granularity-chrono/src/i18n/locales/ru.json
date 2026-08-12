@@ -8,7 +8,10 @@
   },
   "datePicker": {
     "panelLabel": "Выбор даты",
-    "gridLabel": "Календарь"
+    "gridLabel": "Календарь",
+    "patternDay": "Д",
+    "patternMonth": "М",
+    "patternYear": "Г"
   },
   "dateRangePicker": {
     "panelLabel": "Выбор периода"

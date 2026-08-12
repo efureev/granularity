@@ -8,7 +8,10 @@
   },
   "datePicker": {
     "panelLabel": "Choose date",
-    "gridLabel": "Calendar"
+    "gridLabel": "Calendar",
+    "patternDay": "D",
+    "patternMonth": "M",
+    "patternYear": "Y"
   },
   "dateRangePicker": {
     "panelLabel": "Choose date range"

@@ -86,6 +86,17 @@ export {
   weekdayNames,
 } from './chrono/chronoFormat'
 
+// Разбор набранного руками: порядок частей и разделитель — из локали.
+export type { DateUnit, LocaleDateOrder } from './chrono/chronoParse'
+export {
+  localeDateOrder,
+  localeDatePattern,
+  maskLocaleDate,
+  parseLocaleDate,
+  parseLocaleTime,
+  resetChronoParseCache,
+} from './chrono/chronoParse'
+
 // Граница с `Date`: разбор, сборка и адаптеры сериализации.
 export type {
   GrChronoAdapter,

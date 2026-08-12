@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import { formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
+import { parseLocaleTime } from '../../chrono/chronoParse'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
 import type { PlainTime } from '../../chrono/plainTime'
@@ -16,6 +17,7 @@ import {
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
+import { useEditableField } from '../../internal/useEditableField'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 
 import type { GrTimePickerSize } from './grTimePickerStyles'
@@ -59,6 +61,13 @@ export interface GrTimePickerProps<T = Date | null> {
   /** Вид значения в поле — опциями `Intl`, а не строкой-паттерном. */
   format?: Intl.DateTimeFormatOptions
   placeholder?: string
+  /**
+   * Время можно набрать руками: `9:30`, `09:30:45`, `3:30 PM`. Маски здесь нет
+   * намеренно — разделитель у времени один, и дорисовывать нечего.
+   */
+  editable?: boolean
+  /** Разобранный текст уходит наружу на уходе фокуса, а не только по `Enter`. */
+  applyOnBlur?: boolean
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -107,6 +116,8 @@ const props = withDefaults(defineProps<GrTimePickerProps<TValue>>(), {
   today: undefined,
   format: undefined,
   placeholder: undefined,
+  editable: false,
+  applyOnBlur: true,
   // Дефолты живут в резолвере: Vue подставил бы свои раньше, чем компонент
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
@@ -134,6 +145,7 @@ defineSlots<{
 }>()
 
 const columnsRef = ref<InstanceType<typeof TimeColumns> | null>(null)
+
 
 const shell = usePickerShell<TValue>({
   props: () => props,
@@ -197,6 +209,25 @@ function anchorDate(): Date {
   return selectedDate.value ?? props.today ?? new Date()
 }
 
+const field = useEditableField({
+  editable: () => props.editable,
+  applyOnBlur: () => props.applyOnBlur,
+  locked: () => shell.isLocked.value,
+  display: () => displayValue.value,
+  parse: (text) => {
+    const parsed = parseLocaleTime(resolvedLocale.value, text)
+
+    return parsed ? fromPlainParts(toPlainDate(anchorDate()), parsed) : null
+  },
+  commit: date => shell.commit(date),
+})
+
+function onFieldKeydown(event: KeyboardEvent): void {
+  if (field.handleKeydown(event)) return
+
+  shell.onFieldKeydown(event)
+}
+
 function onTimeChange(time: PlainTime): void {
   shell.commit(fromPlainParts(toPlainDate(anchorDate()), time))
 }
@@ -242,9 +273,10 @@ const fieldClass = computed(() => pickerFieldClass({
             data-gr-time-picker-field
             type="text"
             role="combobox"
-            readonly
-            aria-readonly="true"
-            :value="displayValue"
+            :readonly="!editable"
+            :aria-readonly="editable ? undefined : 'true'"
+            :aria-autocomplete="editable ? 'none' : undefined"
+            :value="field.text.value"
             :placeholder="placeholder"
             :class="fieldClass"
             :disabled="isDisabled"
@@ -253,10 +285,11 @@ const fieldClass = computed(() => pickerFieldClass({
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="shell.togglePanel"
-            @keydown="shell.onFieldKeydown"
+            @click="editable ? shell.openPanel() : shell.togglePanel()"
+            @keydown="onFieldKeydown"
+            @input="field.onInput"
             @focus="emit('focus', $event)"
-            @blur="emit('blur', $event)"
+            @blur="field.onBlur(); emit('blur', $event)"
           >
 
           <span :class="trailingZoneClass">

@@ -422,3 +422,161 @@ describe('GrDatePicker — inline', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrDatePicker — ручной ввод', () => {
+  async function type(wrapper: Picker, value: string) {
+    const input = field(wrapper).element as HTMLInputElement
+    input.value = value
+    await field(wrapper).trigger('input')
+  }
+
+  it('без editable поле остаётся нередактируемым', () => {
+    const wrapper = mountPicker()
+
+    expect(field(wrapper).attributes('readonly')).toBeDefined()
+    expect(field(wrapper).attributes('aria-readonly')).toBe('true')
+    wrapper.unmount()
+  })
+
+  it('с editable поле принимает ввод и объявляет это ролью', () => {
+    const wrapper = mountPicker({ editable: true })
+
+    expect(field(wrapper).attributes('readonly')).toBeUndefined()
+    expect(field(wrapper).attributes('aria-readonly')).toBeUndefined()
+    expect(field(wrapper).attributes('aria-autocomplete')).toBe('none')
+    wrapper.unmount()
+  })
+
+  it('плейсхолдер по умолчанию — подсказка формата локали', () => {
+    const wrapper = mountPicker({ editable: true })
+    expect(field(wrapper).attributes('placeholder')).toBe('MM/DD/YYYY')
+
+    // Порядок и разделитель — из локали, буквы — из строк пакета. В тестах
+    // адаптера i18n нет, поэтому буквы английские, а порядок всё равно русский.
+    const russian = mountPicker({ editable: true, locale: 'ru-RU' })
+    expect(russian.get('[data-gr-date-picker-field]').attributes('placeholder')).toBe('DD.MM.YYYY')
+
+    const own = mountPicker({ editable: true, placeholder: 'Когда?' })
+    expect(own.get('[data-gr-date-picker-field]').attributes('placeholder')).toBe('Когда?')
+
+    wrapper.unmount()
+    russian.unmount()
+    own.unmount()
+  })
+
+  it('пока печатают, модель не трогается', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at('2026-08-12') })
+
+    await type(wrapper, '08/2')
+
+    expect(wrapper.emitted('update:modelValue'), 'промежуточный текст — ещё не значение').toBeFalsy()
+    wrapper.unmount()
+  })
+
+  it('Enter отдаёт разобранное значение и не отправляет форму', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: null })
+    await type(wrapper, '08/20/2026')
+
+    const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+    field(wrapper).element.dispatchEvent(event)
+    await nextTick()
+
+    expect(event.defaultPrevented).toBe(true)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at('2026-08-20'))
+    wrapper.unmount()
+  })
+
+  it('уход фокуса отдаёт значение, когда applyOnBlur включён', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: null })
+    await type(wrapper, '08/20/2026')
+    await field(wrapper).trigger('blur')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at('2026-08-20'))
+    wrapper.unmount()
+  })
+
+  it('с applyOnBlur=false уход фокуса откатывает набранное', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at('2026-08-12'), applyOnBlur: false })
+    await type(wrapper, '08/20/2026')
+    await field(wrapper).trigger('blur')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    wrapper.unmount()
+  })
+
+  it('неразобранный текст откатывается к значению модели', async () => {
+    // Держать в поле мусор после коммита — значит показывать значение, которого нет.
+    const wrapper = mountPicker({ editable: true, modelValue: at('2026-08-12') })
+    await type(wrapper, '02/31/2026')
+    await field(wrapper).trigger('blur')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    wrapper.unmount()
+  })
+
+  it('Escape возвращает поле к модели, не трогая её', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at('2026-08-12') })
+    await type(wrapper, '08/20')
+
+    await field(wrapper).trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    wrapper.unmount()
+  })
+
+  it('маска достраивает разделители по мере набора', async () => {
+    const wrapper = mountPicker({ editable: true })
+
+    await type(wrapper, '08')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/')
+
+    await type(wrapper, '0820')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/20/')
+    wrapper.unmount()
+  })
+
+  it('выбор в панели перебивает черновик', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at('2026-08-12') })
+    await type(wrapper, '08/2')
+
+    await openPicker(wrapper)
+    await day(wrapper, '2026-08-20').trigger('click')
+    await wrapper.setProps({ modelValue: at('2026-08-20') })
+    await nextTick()
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 20, 2026')
+    wrapper.unmount()
+  })
+
+  it('пробел в редактируемом поле — символ, а не открытие панели', async () => {
+    const wrapper = mountPicker({ editable: true })
+
+    await field(wrapper).trigger('keydown', { key: ' ' })
+
+    expect(calendar(wrapper).exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('в режимах периода ввод не включается', () => {
+    // Набирать «август 2026» текстом — это разбор названий месяцев, другая задача.
+    const wrapper = mountPicker({ editable: true, mode: 'month' })
+
+    expect(field(wrapper).attributes('readonly')).toBeDefined()
+    wrapper.unmount()
+  })
+
+  it('readonly не даёт править текст даже при editable', async () => {
+    const wrapper = mountPicker({ editable: true, readonly: true, modelValue: at('2026-08-12') })
+    await type(wrapper, '08/20/2026')
+    await field(wrapper).trigger('blur')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    wrapper.unmount()
+  })
+})

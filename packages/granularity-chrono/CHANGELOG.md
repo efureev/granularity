@@ -32,6 +32,15 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **Typing a date or a time by hand** (`editable` on `GrDatePicker` and `GrTimePicker`). The
+  part order, the separator and the format hint come from `Intl`, not from a pattern string:
+  `08/12/2026` in `en-US`, `12.08.2026` in `ru`. Parsing does not care which separator was
+  typed — only the digits matter. While the user types, the model is left alone: the field
+  holds a draft and commits on `Enter` or on blur (`applyOnBlur`), and text that does not parse
+  falls back to the model's value rather than sitting in the field as a value that does not
+  exist. Not offered where a single string would describe two values — the datetime and range
+  pickers — nor in the month and year modes.
+
 - **The provider now reports the right `packageBaseUrl`.** It was computed in the shared module
   from `import.meta.url`, and the bundler is free to either split that module into a chunk or
   inline it into the entry — one level apart. Inlined, the base pointed at the package root, so

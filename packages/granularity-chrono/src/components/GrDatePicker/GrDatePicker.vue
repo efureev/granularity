@@ -5,6 +5,7 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { formatPlainDate } from '../../chrono/chronoFormat'
+import { localeDatePattern, maskLocaleDate, parseLocaleDate } from '../../chrono/chronoParse'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
@@ -17,6 +18,7 @@ import {
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
+import { useEditableField } from '../../internal/useEditableField'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
@@ -65,6 +67,17 @@ export interface GrDatePickerProps<T = Date | null> {
    */
   format?: Intl.DateTimeFormatOptions
   placeholder?: string
+  /**
+   * Дату можно набрать руками. Порядок частей и разделитель берутся из локали,
+   * поэтому свой паттерн задавать не нужно — и нельзя: формат показа задаёт
+   * `format`, а разбор идёт по локали.
+   *
+   * В режимах `month` и `year` ввод не включается: набирать «август 2026»
+   * текстом — это разбор названий месяцев, то есть другая задача.
+   */
+  editable?: boolean
+  /** Разобранный текст уходит наружу на уходе фокуса, а не только по `Enter`. */
+  applyOnBlur?: boolean
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -113,6 +126,8 @@ const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   locale: undefined,
   format: undefined,
   placeholder: undefined,
+  editable: false,
+  applyOnBlur: true,
   // Дефолты живут в резолвере: Vue подставил бы свои раньше, чем компонент
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
@@ -212,6 +227,43 @@ const displayValue = computed(() => (
   selected.value ? formatPlainDate(resolvedLocale.value, selected.value, displayFormat.value) : ''
 ))
 
+/** Ввод руками — только в дневном режиме: у периодов текстом набирать нечего. */
+const isEditable = computed(() => props.editable && props.mode === 'day')
+
+const field = useEditableField({
+  editable: () => isEditable.value,
+  applyOnBlur: () => props.applyOnBlur,
+  locked: () => shell.isLocked.value,
+  display: () => displayValue.value,
+  mask: raw => maskLocaleDate(resolvedLocale.value, raw),
+  parse: (text) => {
+    const parsed = parseLocaleDate(resolvedLocale.value, text)
+
+    return parsed ? fromPlainParts(parsed) : null
+  },
+  commit: date => shell.commit(date),
+})
+
+/**
+ * Плейсхолдер редактируемого поля по умолчанию — подсказка формата: без неё
+ * пользователь не знает, что от него ждут, а порядок частей у локалей разный.
+ */
+const fieldPlaceholder = computed(() => {
+  if (props.placeholder || !isEditable.value) return props.placeholder
+
+  return localeDatePattern(resolvedLocale.value, {
+    day: t('gr.datePicker.patternDay', 'D'),
+    month: t('gr.datePicker.patternMonth', 'M'),
+    year: t('gr.datePicker.patternYear', 'Y'),
+  })
+})
+
+function onFieldKeydown(event: KeyboardEvent): void {
+  if (field.handleKeydown(event)) return
+
+  shell.onFieldKeydown(event)
+}
+
 function onSelect(date: PlainDate): void {
   // Гард здесь, а не только в `commit`: закрытая по клику панель выглядела бы
   // так, будто выбор состоялся.
@@ -271,10 +323,11 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             data-gr-date-picker-field
             type="text"
             role="combobox"
-            readonly
-            aria-readonly="true"
-            :value="displayValue"
-            :placeholder="placeholder"
+            :readonly="!isEditable"
+            :aria-readonly="isEditable ? undefined : 'true'"
+            :aria-autocomplete="isEditable ? 'none' : undefined"
+            :value="field.text.value"
+            :placeholder="fieldPlaceholder"
             :class="fieldClass"
             :disabled="isDisabled"
             :aria-label="ariaLabel"
@@ -282,10 +335,11 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="shell.togglePanel"
-            @keydown="shell.onFieldKeydown"
+            @click="isEditable ? shell.openPanel() : shell.togglePanel()"
+            @keydown="onFieldKeydown"
+            @input="field.onInput"
             @focus="emit('focus', $event)"
-            @blur="emit('blur', $event)"
+            @blur="field.onBlur(); emit('blur', $event)"
           >
 
           <span :class="trailingZoneClass">

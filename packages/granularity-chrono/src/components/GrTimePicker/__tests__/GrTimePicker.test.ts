@@ -471,3 +471,60 @@ describe('GrTimePicker — inline', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTimePicker — ручной ввод', () => {
+  async function type(wrapper: Picker, value: string) {
+    const input = field(wrapper).element as HTMLInputElement
+    input.value = value
+    await field(wrapper).trigger('input')
+  }
+
+  it('без editable поле остаётся нередактируемым', () => {
+    const wrapper = mountPicker()
+
+    expect(field(wrapper).attributes('readonly')).toBeDefined()
+    wrapper.unmount()
+  })
+
+  it('набранное время уходит наружу по Enter, дата значения сохраняется', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(9, 30) })
+    await type(wrapper, '18:45')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at(18, 45))
+    wrapper.unmount()
+  })
+
+  it('12-часовой ввод понимается по подписи периода', async () => {
+    const wrapper = mountPicker({ editable: true, use12Hours: true, modelValue: at(9, 0) })
+    await type(wrapper, '3:30 PM')
+    await field(wrapper).trigger('blur')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at(15, 30))
+    wrapper.unmount()
+  })
+
+  it('неразобранное время откатывается к модели', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(9, 30) })
+    await type(wrapper, '25:99')
+    await field(wrapper).trigger('blur')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('09:30')
+    wrapper.unmount()
+  })
+
+  it('выбор в колонке перебивает черновик', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(9, 30) })
+    await type(wrapper, '18:4')
+
+    await openPicker(wrapper)
+    await option('hour-21').trigger('click')
+    await wrapper.setProps({ modelValue: at(21, 30) })
+    await nextTick()
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('21:30')
+    wrapper.unmount()
+  })
+})

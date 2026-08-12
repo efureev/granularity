@@ -20,6 +20,7 @@ export const demoPathByPreviewKey = {
   'extra-chrono-date-picker-dialog':      'extra/granularity-chrono/GrDatePickerInDialogDemo.vue',
   'extra-chrono-date-picker-inline':      'extra/granularity-chrono/GrDatePickerInlineDemo.vue',
   'extra-chrono-date-picker-modes':       'extra/granularity-chrono/GrDatePickerModesDemo.vue',
+  'extra-chrono-date-picker-typed':       'extra/granularity-chrono/GrDatePickerTypedDemo.vue',
   'extra-chrono-date-time-basic':         'extra/granularity-chrono/GrDateTimePickerBasicDemo.vue',
   'extra-chrono-date-time-confirm':       'extra/granularity-chrono/GrDateTimePickerConfirmDemo.vue',
   'extra-chrono-range-basic':             'extra/granularity-chrono/GrDateRangePickerBasicDemo.vue',
