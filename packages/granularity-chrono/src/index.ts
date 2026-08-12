@@ -105,6 +105,7 @@ export type {
   GrChronoValue,
 } from './chrono/chronoModel'
 export {
+  clockDate,
   dateAdapter,
   fromPlainParts,
   isoDateAdapter,

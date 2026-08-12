@@ -12,6 +12,17 @@ integer maths; everything locale-dependent — the first day of the week, month
 and weekday names, the 12/24-hour default — comes from `Intl`. Installing this
 package pulls in no date library and no third-party widget.
 
+## Documentation
+
+- [`docs/model.md`](./docs/model.md) — the value: why `Date` lives only at the
+  boundary, how to pick a `valueAdapter`, what the public arithmetic offers
+- [`docs/keyboard.md`](./docs/keyboard.md) — keyboard contract per component:
+  the grid, the time columns, the field, the range
+- [`docs/theming.md`](./docs/theming.md) — own `--gr-*` tokens, what may and may
+  not be overridden, how the CSS is assembled
+- [`docs/ssr.md`](./docs/ssr.md) — server rendering: the single source of
+  mismatch and how to remove it
+
 ## Why not wrap an existing picker
 
 The predecessor (`@feugene/granularity-datepicker`) wrapped

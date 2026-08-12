@@ -7,6 +7,7 @@ import { useRovingFocus } from '@feugene/granularity/composables/useRovingFocus'
 import { useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
+import { clockDate } from '../../chrono/chronoModel'
 import { buildCalendarGrid, createDisabledPredicate } from '../../chrono/calendarGrid'
 import { formatMonthTitle, formatYearTitle, localeFirstDayOfWeek, monthNames, weekdayNames } from '../../chrono/chronoFormat'
 import type { PeriodCell, PeriodMode } from '../../chrono/periodGrid'
@@ -154,16 +155,34 @@ const isLocked = computed(() => props.disabled || props.readonly)
  */
 const internalView = ref<PlainDate | undefined>()
 
+/**
+ * Часы читаются один раз на экземпляр, а не при каждом обращении к `viewDate`:
+ * иначе календарь, открытый в 23:59:59, менял бы показываемый месяц прямо во
+ * время перерисовки.
+ */
+const clockToday = clockDate()
+
+/**
+ * Показ выведен из часов — значит серверный рендер и клиентский могут разойтись
+ * (сервер обычно в UTC, браузер — в своей зоне; около полуночи это разные
+ * месяцы). Отвечает за это `data-allow-mismatch` на корне: расхождение здесь
+ * ожидаемое, и глушится оно точечно, а не на всём поддереве приложения.
+ *
+ * Убирается это не флагом, а данными: передайте `today` или `viewDate` — и
+ * рендер станет детерминированным, а атрибут исчезнет сам.
+ */
+const viewFromClock = computed(() => (
+  props.viewDate === undefined
+  && internalView.value === undefined
+  && !props.modelValue
+  && props.today === undefined
+))
+
 const viewDate = computed<PlainDate>(() => {
-  const source = props.viewDate ?? internalView.value ?? props.modelValue ?? props.today ?? todayFallback()
+  const source = props.viewDate ?? internalView.value ?? props.modelValue ?? props.today ?? clockToday
   // Показывать месяц, целиком выпавший за границы, незачем.
   return clampPlainDate(source, props.min, props.max)
 })
-
-function todayFallback(): PlainDate {
-  const now = new Date()
-  return { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() }
-}
 
 const isDisabledDate = computed(() => createDisabledPredicate(props.disabledDates))
 
@@ -459,6 +478,7 @@ defineExpose({
     data-gr-calendar
     :class="calendarRootClass"
     :aria-disabled="disabled ? 'true' : undefined"
+    :data-allow-mismatch="viewFromClock ? 'children' : undefined"
   >
     <slot name="header" :title="periodTitle" :go-to-period="goToPeriod">
       <div :class="calendarHeaderClass" data-gr-calendar-header>

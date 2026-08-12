@@ -6,6 +6,7 @@ on:
     tags:
       - 'v*'
       - 'unplugin-granularity-v*'
+      - 'granularity-chrono-v*'
   pull_request:
     branches: [ main ]
 
@@ -129,9 +130,12 @@ jobs:
   # SSR-стенд: серверный рендер + гидрация настоящего серверного HTML.
   # Ловит то, что юнит-тесты в jsdom увидеть не могут: браузерный API в setup,
   # окружение в первом рендере, нестабильные id. Работает по собранному `dist`.
+  # Стенд рендерит и ядро, и companion-пакет: у обоих в setup есть браузерный
+  # API, телепорты и живые регионы, а расхождения видны только на гидрации.
   test-playground-ssr:
     needs:
       - build-granularity
+      - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -148,6 +152,12 @@ jobs:
         with:
           name: granularity-dist
           path: packages/granularity/dist
+
+      - name: Download granularity-chrono dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
 
       - name: Test SSR playground
         run: yarn test:playground-ssr
@@ -601,6 +611,87 @@ jobs:
         with:
           name: granularity-chrono-dist
           path: packages/granularity-chrono/dist/
+
+  # Публикация @feugene/granularity-chrono в npm по тегу вида
+  # `granularity-chrono-v<semver>`. Отдельный тег позволяет релизить компаньон
+  # независимо от ядра: у него свой цикл и своя версия.
+  publish-npm-granularity-chrono:
+    needs:
+      - build-granularity-chrono
+    if: startsWith(github.ref, 'refs/tags/granularity-chrono-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/granularity-chrono
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#granularity-chrono-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/granularity-chrono
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория
+  # (`@efureev/granularity-chrono`). Аналогично publish-gpr для granularity.
+  publish-gpr-granularity-chrono:
+    needs:
+      - publish-npm-granularity-chrono
+    if: startsWith(github.ref, 'refs/tags/granularity-chrono-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/granularity-chrono
+        run: |
+          npm pkg set name='@efureev/granularity-chrono'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity-chrono
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   check-extra-granularity:
     needs:

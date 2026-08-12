@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
+import ChronoPage from '../src/ChronoPage.vue'
 import OverlayStackPage from '../src/OverlayStackPage.vue'
 import RiskyPage from '../src/RiskyPage.vue'
 import TeleportPage from '../src/TeleportPage.vue'
@@ -25,14 +26,16 @@ export default async function setup(): Promise<void> {
   // `app` — демо-страница целиком, `teleport` — сжатый набор только из
   // телепортирующих компонентов (регрессионный гейт к ANALYSIS §60),
   // `risky` — компоненты с браузерным API, `navigator` и авто-id в setup,
-  // `overlayStack` — два открытых оверлея и чтение темы.
-  const [app, teleport, risky, overlayStack] = await Promise.all([
+  // `overlayStack` — два открытых оверлея и чтение темы,
+  // `chrono` — companion-пакет: часы в отрисовке, ленивые панели, `useAnnouncer`.
+  const [app, teleport, risky, overlayStack, chrono] = await Promise.all([
     render(),
     render(TeleportPage),
     render(RiskyPage),
     render(OverlayStackPage),
+    render(ChronoPage),
   ])
 
   await mkdir(dirname(SSR_SNAPSHOT_PATH), { recursive: true })
-  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack }), 'utf8')
+  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack, chrono }), 'utf8')
 }

@@ -6,7 +6,8 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 import { formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
 import { parseLocaleTime } from '../../chrono/chronoParse'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
-import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import { clockDate, fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import type { PlainDate } from '../../chrono/plainDate'
 import type { PlainTime } from '../../chrono/plainTime'
 import {
   clearButtonClass,
@@ -205,8 +206,8 @@ const displayValue = computed(() => {
 })
 
 /** Дата, к которой привязано время: своя у значения, иначе «сегодня». */
-function anchorDate(): Date {
-  return selectedDate.value ?? props.today ?? new Date()
+function anchorDate(): PlainDate {
+  return selectedDate.value ? toPlainDate(selectedDate.value) : props.today ? toPlainDate(props.today) : clockDate()
 }
 
 const field = useEditableField({
@@ -217,7 +218,7 @@ const field = useEditableField({
   parse: (text) => {
     const parsed = parseLocaleTime(resolvedLocale.value, text)
 
-    return parsed ? fromPlainParts(toPlainDate(anchorDate()), parsed) : null
+    return parsed ? fromPlainParts(anchorDate(), parsed) : null
   },
   commit: date => shell.commit(date),
 })
@@ -229,7 +230,7 @@ function onFieldKeydown(event: KeyboardEvent): void {
 }
 
 function onTimeChange(time: PlainTime): void {
-  shell.commit(fromPlainParts(toPlainDate(anchorDate()), time))
+  shell.commit(fromPlainParts(anchorDate(), time))
 }
 
 defineExpose({

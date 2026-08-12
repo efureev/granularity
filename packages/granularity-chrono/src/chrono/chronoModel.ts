@@ -24,6 +24,17 @@ export function toPlainDate(date: Date): PlainDate {
   return { y: date.getFullYear(), m: date.getMonth(), d: date.getDate() }
 }
 
+/**
+ * Сегодняшняя дата по часам среды — единственное место, где пакет их читает.
+ *
+ * Отдельной функцией, чтобы место было ровно одно: часы в пути отрисовки дают
+ * расхождение серверного рендера с клиентским, и компонент обязан звать это
+ * осознанно, один раз на экземпляр.
+ */
+export function clockDate(): PlainDate {
+  return toPlainDate(new Date())
+}
+
 export function toPlainTime(date: Date): PlainTime {
   return { h: date.getHours(), min: date.getMinutes(), s: date.getSeconds() }
 }

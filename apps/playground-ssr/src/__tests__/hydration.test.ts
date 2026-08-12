@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
+import ChronoPage from '../ChronoPage.vue'
 import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
 import TeleportPage from '../TeleportPage.vue'
@@ -31,7 +32,13 @@ interface SsrSnapshot {
 // В jsdom `import.meta.url` не file-scheme, поэтому путь — от cwd приложения.
 const snapshots = JSON.parse(
   readFileSync(resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json'), 'utf8'),
-) as { app: SsrSnapshot, teleport: SsrSnapshot, risky: SsrSnapshot, overlayStack: SsrSnapshot }
+) as {
+  app: SsrSnapshot
+  teleport: SsrSnapshot
+  risky: SsrSnapshot
+  overlayStack: SsrSnapshot
+  chrono: SsrSnapshot
+}
 
 function captureConsole(): string[] {
   const messages: string[] = []
@@ -219,5 +226,77 @@ describe('гидрация страницы с двумя открытыми о�
     // Стек на клиенте продолжает работать: верхний слой гасит нижний.
     const inert = [...overlays].filter(element => element.hasAttribute('inert'))
     expect(inert).toHaveLength(1)
+  })
+})
+
+/**
+ * Companion-пакет `@feugene/granularity-chrono`.
+ *
+ * Календарь читает часы, когда не задан ни `today`, ни `viewDate`, — и это
+ * единственное место пакета, где серверный рендер вправе разойтись с
+ * клиентским. Помечено оно точечно, `data-allow-mismatch` на своём корне,
+ * поэтому гейт обязан оставаться чистым: всё остальное — сетка, поля, ленивые
+ * панели в портале и живой регион `useAnnouncer` — совпадать обязано.
+ */
+describe('гидрация companion-пакета chrono', () => {
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.chrono, { root: ChronoPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('серверный HTML содержит сетку и поля, а не пустые обёртки', () => {
+    expect(snapshots.chrono.html).toMatch(/data-gr-calendar-grid/)
+    expect(snapshots.chrono.html).toMatch(/data-gr-date-picker-field/)
+    expect(snapshots.chrono.html).toMatch(/data-gr-time-picker-field/)
+  })
+
+  it('панели закрытых пикеров на сервере не рендерятся', () => {
+    // Ленивое монтирование: до первого открытия панели нет ни в разметке, ни в
+    // портале — иначе каждая форма отдавала бы сетку на 42 ячейки на пикер.
+    // Единственная панель в разметке — у `inline`-пикера, она и есть его вид.
+    const panels = snapshots.chrono.html.match(/data-gr-date-picker-panel/g) ?? []
+
+    expect(panels).toHaveLength(1)
+    expect(snapshots.chrono.html).not.toMatch(/data-gr-time-picker-panel/)
+    expect(Object.values(snapshots.chrono.teleports).join('')).not.toMatch(/data-gr-popover-panel/)
+  })
+
+  /**
+   * Метка проверяется не наличием в разметке, а действием: сервер и клиент
+   * здесь стоят в одной зоне и в одну секунду, поэтому настоящего расхождения
+   * часов не случается. Подменяем заголовок в серверном HTML — это ровно то,
+   * что увидел бы браузер в другой зоне, — и смотрим, молчит ли гидрация.
+   */
+  function distortTitle(html: string, index: number): string {
+    let seen = -1
+
+    return html.replace(/(data-gr-calendar-title[^>]*>)([^<]*)/g, (match, open: string, text: string) => {
+      seen += 1
+      return seen === index ? `${open}Совсем другой месяц` : match
+    })
+  }
+
+  it('расхождение часов не роняет гидрацию там, где оно помечено', async () => {
+    const distorted = { ...snapshots.chrono, html: distortTitle(snapshots.chrono.html, 1) }
+    const problems = hydrationProblems(await hydrate(distorted, { root: ChronoPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('а без метки — роняет: гейт умеет видеть расхождения', async () => {
+    // Обратная половина: без неё предыдущий тест зеленел бы и на сломанном
+    // измерении — например если бы гидрация вообще не доходила до заголовка.
+    const distorted = { ...snapshots.chrono, html: distortTitle(snapshots.chrono.html, 0) }
+    const problems = hydrationProblems(await hydrate(distorted, { root: ChronoPage }))
+
+    expect(problems.length).toBeGreaterThan(0)
+  })
+
+  it('часы помечены как ожидаемое расхождение только там, где они читаются', () => {
+    const markers = snapshots.chrono.html.match(/data-allow-mismatch/g) ?? []
+
+    // Ровно один календарь на странице оставлен без `today` — он и помечен.
+    expect(markers).toHaveLength(1)
   })
 })

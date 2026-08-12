@@ -32,6 +32,19 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **The package is ready to publish.** It ships a `LICENSE` (the `license` field pointed at a
+  file that did not exist), four documentation pages under `docs/` — the value and its adapters,
+  the keyboard contract, the tokens, and SSR — and the release now runs from CI on a
+  `granularity-chrono-v*` tag, npm and GitHub Packages alike.
+
+- **Server rendering is covered by a gate.** The clock is read once per instance through a
+  single `clockDate()`, never during a re-render; the one place where the markup depends on it —
+  the shown month, when neither `today` nor `viewDate` nor a value is given — marks itself with
+  `data-allow-mismatch="children"`, so hydration stays quiet and the fix is data rather than a
+  flag: pass `today` and the attribute disappears. The stand renders all five components on a
+  server and hydrates them, and the marker is verified by effect: distort the server HTML and
+  the mismatch must stay silent where it is marked and must be reported where it is not.
+
 - **Typing a date or a time by hand** (`editable` on `GrDatePicker` and `GrTimePicker`). The
   part order, the separator and the format hint come from `Intl`, not from a pattern string:
   `08/12/2026` in `en-US`, `12.08.2026` in `ru`. Parsing does not care which separator was

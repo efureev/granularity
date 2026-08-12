@@ -7,7 +7,7 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { formatPlainDate, formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
-import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import { clockDate, fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
 import type { PlainTime } from '../../chrono/plainTime'
 import { plainTime } from '../../chrono/plainTime'
@@ -281,7 +281,7 @@ function onDateChange(date: PlainDate): void {
 }
 
 function onTimeChange(time: PlainTime): void {
-  const date = shownDate.value ?? toPlainDate(props.today ?? new Date())
+  const date = shownDate.value ?? (props.today ? toPlainDate(props.today) : clockDate())
   put(fromPlainParts(date, time))
 }
 
