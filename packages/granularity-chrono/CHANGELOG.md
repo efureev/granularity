@@ -7,6 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [0.1.0] - 2026-08-12
 
+### Fixed
+
+- **The package's own strings could not be plugged into an app at all.** They shipped as a raw
+  `grChronoMessages` object — no loader collection, no `./i18n` subpath — so there was nothing for
+  `fint-i18n` to register, and every label, `aria-label` and panel title fell back to the English
+  literal compiled into the component. In *every* language, not just the missing ones. The export
+  existed, was used by nobody, and looked like localization. The package now mirrors the core: a
+  block of its own (`grChrono` — squatting on the core's `gr` would collide silently on the first
+  matching top-level key), one loader export per locale so bundlers can drop unused languages, an
+  aggregate for demos, and the two subpaths (`./i18n`, `./i18n/all`) an app actually imports.
+
+  It survived this long because nothing measured it. The package now carries the two gates the core
+  has had all along: locale completeness (including "every key in the dictionary is asked for by a
+  component, and vice versa") and an integration test on a **real** `fint-i18n` instance with a real
+  component — the only thing that checks the seam between block name, loader shape, JSON structure
+  and the keys components ask for. A mock adapter answers any key and would never have caught it.
+
 ### Added
 
 - **`GrRelativeTime` and `useChronoNow`.** The package could pick a moment but not show one:

@@ -3,11 +3,14 @@ import { ref } from 'vue'
 
 // `GrCalendar` и `GrSegmented` подставляются авто-импортом.
 import type { PlainDate } from '@feugene/granularity-chrono'
-import { formatPlainDate } from '@feugene/granularity-chrono'
+import { plainDateKey } from '@feugene/granularity-chrono'
 
 type CalendarMode = 'day' | 'month' | 'year'
 
 const mode = ref<CalendarMode>('day')
+// В режимах периода значением становится первое число: месяц — это 1 августа,
+// год — 1 января. Показываем его ISO-ключом: он не зависит от языка витрины,
+// а сетка рядом и так показывает язык.
 const value = ref<PlainDate | null>({ y: 2026, m: 7, d: 12 })
 
 const modeOptions = [
@@ -15,14 +18,6 @@ const modeOptions = [
   { value: 'month', label: 'Month' },
   { value: 'year', label: 'Year' },
 ] satisfies Array<{ value: CalendarMode, label: string }>
-
-// В режимах периода значением становится первое число: месяц — это 1 августа,
-// год — 1 января.
-const formatByMode: Record<CalendarMode, Intl.DateTimeFormatOptions> = {
-  day: { dateStyle: 'medium' },
-  month: { month: 'long', year: 'numeric' },
-  year: { year: 'numeric' },
-}
 </script>
 
 <template>
@@ -32,13 +27,12 @@ const formatByMode: Record<CalendarMode, Intl.DateTimeFormatOptions> = {
     <GrCalendar
       v-model="value"
       :mode="mode"
-      locale="en-US"
       aria-label="Reporting period"
     />
 
     <p class="showcase-demo-text text-sm">
       <span class="opacity-70">value=</span>
-      <code>{{ value ? formatPlainDate('en-US', value, formatByMode[mode]) : '—' }}</code>
+      <code>{{ value ? plainDateKey(value) : '—' }}</code>
     </p>
   </div>
 </template>

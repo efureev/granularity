@@ -29,6 +29,25 @@ import { companionComponentNames, companionPath, componentPath } from './compone
 test.use({ reducedMotion: 'reduce' })
 
 /**
+ * Тема и язык фиксируются до загрузки приложения.
+ *
+ * Язык — не формальность: демо `chrono` следуют языку витрины, а он переживает
+ * перезагрузку в `localStorage`. Без явной отметки эталон зависел бы от того,
+ * что осталось в профиле браузера от прошлого прогона.
+ */
+async function pinAppearance(page: import('@playwright/test').Page, theme: 'light' | 'dark'): Promise<void> {
+  await page.addInitScript((value) => {
+    try {
+      localStorage.setItem('gr-theme', value)
+      localStorage.setItem('showcase-locale', 'en')
+    }
+    catch {
+      // ignore storage errors
+    }
+  }, theme)
+}
+
+/**
  * Липкая шапка витрины перекрывает верх `#live-examples`, поэтому попадает в
  * снимок элемента — вместе с номером версии пакета. Любой бамп версии иначе
  * расходится с эталонами на всех страницах сразу, хотя ни один компонент не
@@ -113,14 +132,7 @@ for (const theme of ['light', 'dark'] as const) {
       test(`${name} live examples`, async ({ page }) => {
         // Форсим тему до загрузки приложения, чтобы снапшот был стабильным.
         await page.emulateMedia({ colorScheme: theme })
-        await page.addInitScript((t) => {
-          try {
-            localStorage.setItem('gr-theme', t)
-          }
-          catch {
-            // ignore storage errors
-          }
-        }, theme)
+        await pinAppearance(page, theme)
 
         await page.goto(componentPath(name))
         const examples = page.locator('#live-examples')
@@ -141,14 +153,7 @@ for (const theme of ['light', 'dark'] as const) {
     for (const name of VISUAL_COMPANIONS) {
       test(`${name} live examples`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: theme })
-        await page.addInitScript((t) => {
-          try {
-            localStorage.setItem('gr-theme', t)
-          }
-          catch {
-            // ignore storage errors
-          }
-        }, theme)
+        await pinAppearance(page, theme)
 
         await page.goto(companionPath(name))
         const examples = page.locator('#live-examples')
@@ -175,14 +180,7 @@ for (const theme of ['light', 'dark'] as const) {
 for (const theme of ['light', 'dark'] as const) {
   test(`visual (${theme}) GrColorPicker panel`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: theme })
-    await page.addInitScript((t) => {
-      try {
-        localStorage.setItem('gr-theme', t)
-      }
-      catch {
-        // ignore storage errors
-      }
-    }, theme)
+    await pinAppearance(page, theme)
 
     await page.goto(componentPath('GrColorPicker'))
     await page.locator('#live-examples').waitFor()

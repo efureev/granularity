@@ -16,7 +16,6 @@ const from = new Date(2026, 7, 1)
       :min="from"
       :min-range="3"
       :max-range="7"
-      locale="en-US"
       clearable
       placeholder="From 3 to 7 days"
       aria-label="Vacation"

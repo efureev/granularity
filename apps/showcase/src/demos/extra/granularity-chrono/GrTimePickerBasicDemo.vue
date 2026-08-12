@@ -17,7 +17,6 @@ const to = new Date(2026, 7, 12, 18, 0)
       :max="to"
       :minute-step="15"
       :use12-hours="false"
-      locale="en-US"
       clearable
       placeholder="Pick a time"
       aria-label="Meeting time"

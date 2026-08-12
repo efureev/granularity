@@ -24,7 +24,7 @@ function add(): void {
 
     <ul class="grid gap-1 text-sm">
       <li v-for="event in events" :key="event.toISOString()">
-        <GrRelativeTime :value="event" locale="en-US" />
+        <GrRelativeTime :value="event" />
       </li>
     </ul>
   </div>

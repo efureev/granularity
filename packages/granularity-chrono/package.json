@@ -79,6 +79,14 @@
       "types": "./dist/types/composables/useChronoNow.d.ts",
       "import": "./dist/composables/useChronoNow.js"
     },
+    "./i18n": {
+      "types": "./dist/types/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js"
+    },
+    "./i18n/all": {
+      "types": "./dist/types/i18n/all.d.ts",
+      "import": "./dist/i18n/all.js"
+    },
     "./granular-provider": {
       "types": "./dist/types/granular-provider/index.d.ts",
       "import": "./dist/granular-provider.js",
@@ -101,7 +109,8 @@
     "@feugene/unocss-preset-granular": "^0.9.1",
     "vue": "^3.5.0",
     "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
-    "unplugin-vue-components": ">=0.26.0"
+    "unplugin-vue-components": ">=0.26.0",
+    "@feugene/fint-i18n": "^0.6.0"
   },
   "peerDependenciesMeta": {
     "@feugene/unplugin-granularity": {
@@ -109,10 +118,14 @@
     },
     "unplugin-vue-components": {
       "optional": true
+    },
+    "@feugene/fint-i18n": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
+    "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.17.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.0",

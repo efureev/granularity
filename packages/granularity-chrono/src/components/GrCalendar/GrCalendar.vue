@@ -538,7 +538,7 @@ defineExpose({
           data-gr-calendar-prev
           :class="[calendarNavButtonClass, calendarNavSizes[resolvedSize]]"
           :disabled="!canGoBack"
-          :aria-label="isDayMode ? t('gr.calendar.previousMonth', 'Previous month') : t('gr.calendar.previousPeriod', 'Previous')"
+          :aria-label="isDayMode ? t('grChrono.calendar.previousMonth', 'Previous month') : t('grChrono.calendar.previousPeriod', 'Previous')"
           @click="goToPeriod(-1)"
         >
           <span aria-hidden="true">‹</span>
@@ -553,7 +553,7 @@ defineExpose({
           data-gr-calendar-next
           :class="[calendarNavButtonClass, calendarNavSizes[resolvedSize]]"
           :disabled="!canGoForward"
-          :aria-label="isDayMode ? t('gr.calendar.nextMonth', 'Next month') : t('gr.calendar.nextPeriod', 'Next')"
+          :aria-label="isDayMode ? t('grChrono.calendar.nextMonth', 'Next month') : t('grChrono.calendar.nextPeriod', 'Next')"
           @click="goToPeriod(1)"
         >
           <span aria-hidden="true">›</span>
@@ -614,7 +614,7 @@ defineExpose({
       <thead>
         <tr>
           <th v-if="resolvedShowWeekNumbers" scope="col" :class="calendarWeekNumberClass">
-            <span class="sr-only">{{ t('gr.calendar.weekNumber', 'Week') }}</span>
+            <span class="sr-only">{{ t('grChrono.calendar.weekNumber', 'Week') }}</span>
           </th>
           <th
             v-for="column in weekdayColumns"

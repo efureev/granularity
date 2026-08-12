@@ -46,6 +46,12 @@ export default defineConfig({
         'composables/useChronoNow': fileURLToPath(
           new URL('./src/composables/useChronoNow.ts', import.meta.url),
         ),
+        'i18n/index': fileURLToPath(
+          new URL('./src/i18n/index.ts', import.meta.url),
+        ),
+        'i18n/all': fileURLToPath(
+          new URL('./src/i18n/all.ts', import.meta.url),
+        ),
         // <granularity:components> — блок генерируется `yarn generate:registry`
         'components/GrCalendar/index': fileURLToPath(
           new URL('./src/components/GrCalendar/index.ts', import.meta.url),
@@ -76,6 +82,9 @@ export default defineConfig({
         'vue',
         /^@feugene\/granularity(\/.*)?$/,
         /^@feugene\/unocss-preset-granular(\/.*)?$/,
+        // Тип `LocaleLoaderCollection` стирается на сборке, но правило общее:
+        // i18n-слой принадлежит приложению, а не пакету.
+        /^@feugene\/fint-i18n(\/.*)?$/,
         // Build-time helper deps of the optional `./resolver` entry.
         '@feugene/unplugin-granularity',
         'unplugin-vue-components',

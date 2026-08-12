@@ -50,6 +50,36 @@ yarn add @feugene/granularity-chrono
 #   @feugene/granularity  @feugene/unocss-preset-granular  vue
 ```
 
+## Localization
+
+The package ships UI strings only — labels, `aria-label`s, panel titles. Month and weekday names,
+the first day of the week, the 12/24-hour default and the parsing order all come from `Intl`, so the
+components speak every language the engine knows, not the ones we listed.
+
+Strings live in their own block (`grChrono`) and plug into the same `fint-i18n` instance as the
+core's — one i18n layer for the whole app:
+
+```ts
+import { createFintI18n } from '@feugene/fint-i18n/core'
+import { installI18n } from '@feugene/fint-i18n/vue'
+import { GRANULARITY_I18N_BLOCK, en as coreEn, ru as coreRu } from '@feugene/granularity/i18n'
+import { GR_CHRONO_I18N_BLOCK, en, ru } from '@feugene/granularity-chrono/i18n'
+
+const i18n = createFintI18n({
+  locale: 'ru',
+  fallbackLocale: 'en',
+  loaders: [coreEn, coreRu, en, ru],
+})
+
+i18n.registerBlocks([GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK])
+await i18n.loadUsedBlocks('ru')
+installI18n(app, i18n)
+```
+
+Need every language at once (demos, e2e) — import the aggregate instead:
+`@feugene/granularity-chrono/i18n/all`. Skip the wiring entirely and the components still work: every
+key has an English fallback compiled into the component.
+
 ## UnoCSS granular-provider
 
 Register the provider alongside granularity so the package's utility classes are

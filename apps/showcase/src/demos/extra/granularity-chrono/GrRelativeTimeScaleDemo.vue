@@ -29,9 +29,9 @@ const scale = [
     <div v-for="row in scale" :key="row.label" class="flex items-baseline gap-3 text-sm">
       <span class="showcase-demo-text w-24 shrink-0 opacity-70">{{ row.label }}</span>
 
-      <GrRelativeTime :value="row.value" :base="now" locale="en-US" />
+      <GrRelativeTime :value="row.value" :base="now" />
 
-      <GrRelativeTime :value="row.value" :base="now" locale="en-US" width="short" class="opacity-70" />
+      <GrRelativeTime :value="row.value" :base="now" width="short" class="opacity-70" />
     </div>
   </div>
 </template>

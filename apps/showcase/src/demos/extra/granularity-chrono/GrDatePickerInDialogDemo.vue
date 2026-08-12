@@ -20,7 +20,6 @@ const value = ref<string | null>('2026-08-12')
         <GrDatePicker
           v-model="value"
           value-adapter="isoDate"
-          locale="en-US"
           clearable
           placeholder="Pick a date"
         />

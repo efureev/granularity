@@ -14,7 +14,6 @@ const value = ref<string | null>('2026-08-12')
       inline
       name="due"
       value-adapter="isoDate"
-      locale="en-US"
       aria-label="Due date"
     />
 

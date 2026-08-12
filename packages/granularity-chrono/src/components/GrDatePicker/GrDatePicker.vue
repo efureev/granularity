@@ -254,9 +254,9 @@ const fieldPlaceholder = computed(() => {
   if (props.placeholder || !isEditable.value) return props.placeholder
 
   return localeDatePattern(resolvedLocale.value, {
-    day: t('gr.datePicker.patternDay', 'D'),
-    month: t('gr.datePicker.patternMonth', 'M'),
-    year: t('gr.datePicker.patternYear', 'Y'),
+    day: t('grChrono.datePicker.patternDay', 'D'),
+    month: t('grChrono.datePicker.patternMonth', 'M'),
+    year: t('grChrono.datePicker.patternYear', 'Y'),
   })
 })
 
@@ -313,7 +313,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :panel-label="t('gr.datePicker.panelLabel', 'Choose date')"
+      :panel-label="t('grChrono.datePicker.panelLabel', 'Choose date')"
       @update:open="panelOpen = $event"
     >
       <template v-if="!inline" #trigger="{ triggerProps }">
@@ -388,7 +388,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :locale="locale"
             :size="resolvedSize"
             :readonly="isReadonly"
-            :aria-label="ariaLabel ?? t('gr.datePicker.gridLabel', 'Calendar')"
+            :aria-label="ariaLabel ?? t('grChrono.datePicker.gridLabel', 'Calendar')"
             @update:model-value="onSelect"
           >
             <template v-if="$slots.day" #day="slotProps">

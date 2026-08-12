@@ -31,7 +31,6 @@ function submit(event: Event): void {
         name="departure"
         value-adapter="isoDate"
         :min="today"
-        locale="en-US"
         clearable
         placeholder="Pick a date"
       />

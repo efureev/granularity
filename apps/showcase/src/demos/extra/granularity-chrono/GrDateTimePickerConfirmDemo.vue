@@ -15,7 +15,6 @@ const changes = ref(0)
       :auto-apply="false"
       value-adapter="isoDateTime"
       :minute-step="30"
-      locale="en-US"
       aria-label="Appointment"
       @change="changes += 1"
     />

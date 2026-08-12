@@ -89,7 +89,12 @@ describe('showcase bootstrap config', () => {
     expect(showcaseI18nEntry).toContain("import { GRANULARITY_I18N_BLOCK } from '@feugene/granularity/i18n'")
     expect(showcaseI18nEntry).toContain('SHOWCASE_I18N_BLOCK')
     expect(showcaseI18nEntry).toContain('showcaseLocaleLoaders')
-    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK])')
+    // Словарь companion-пакета — отдельной строкой: без него календарь и
+    // пикеры показывают английский fallback на любом языке витрины, и заметить
+    // это можно было только глазами.
+    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-chrono/i18n/all'")
+    expect(showcaseI18nEntry).toContain('...grChronoLocales')
+    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK])')
     expect(showcaseI18nMessagesEntry).toContain("export const SHOWCASE_I18N_BLOCK = 'showcase'")
     expect(showcaseI18nMessagesEntry).toContain("'./locales/en/showcase.json'")
     expect(showcaseI18nMessagesEntry).toContain("'./locales/ru/showcase.json'")

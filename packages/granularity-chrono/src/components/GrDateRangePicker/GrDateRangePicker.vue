@@ -252,7 +252,7 @@ function onDaySelect(date: PlainDate): void {
 
     // Первый клик ничего видимого не выбирает — только открывает период, и без
     // объявления незрячий пользователь не понимает, что ждут второго дня.
-    announce(t('gr.dateRangePicker.startSelected', 'Start date selected: {date}. Choose the end date', {
+    announce(t('grChrono.dateRangePicker.startSelected', 'Start date selected: {date}. Choose the end date', {
       date: formatPlainDate(resolvedLocale.value, date, LONG_DATE),
     }))
     return
@@ -265,12 +265,12 @@ function onDaySelect(date: PlainDate): void {
   // Слишком короткий или слишком длинный период не выбирается, но и не
   // сбрасывает начало: пользователь просто промахнулся мимо допустимой длины.
   if (!isLengthAllowed(from, to)) {
-    announce(t('gr.dateRangePicker.lengthRejected', 'This range length is not allowed'))
+    announce(t('grChrono.dateRangePicker.lengthRejected', 'This range length is not allowed'))
     return
   }
 
   shell.commit([fromPlainParts(from), fromPlainParts(to)])
-  announce(t('gr.dateRangePicker.rangeSelected', 'Range selected: {from} — {to}', {
+  announce(t('grChrono.dateRangePicker.rangeSelected', 'Range selected: {from} — {to}', {
     from: formatPlainDate(resolvedLocale.value, from, LONG_DATE),
     to: formatPlainDate(resolvedLocale.value, to, LONG_DATE),
   }))
@@ -322,7 +322,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :panel-label="t('gr.dateRangePicker.panelLabel', 'Choose date range')"
+      :panel-label="t('grChrono.dateRangePicker.panelLabel', 'Choose date range')"
       @update:open="panelOpen = $event"
     >
       <template v-if="!inline" #trigger="{ triggerProps }">
@@ -398,7 +398,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :locale="locale"
             :size="resolvedSize"
             :readonly="isReadonly"
-            :aria-label="ariaLabel ?? t('gr.datePicker.gridLabel', 'Calendar')"
+            :aria-label="ariaLabel ?? t('grChrono.datePicker.gridLabel', 'Calendar')"
             @update:model-value="onDaySelect"
             @day-hover="onDayHover"
           >

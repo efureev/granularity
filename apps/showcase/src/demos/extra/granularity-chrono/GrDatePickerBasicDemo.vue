@@ -10,7 +10,6 @@ const iso = ref<string | null>('2026-08-20')
   <div class="grid max-w-[320px] gap-4">
     <GrDatePicker
       v-model="value"
-      locale="en-US"
       clearable
       placeholder="Pick a date"
       aria-label="Pick a date"
@@ -21,7 +20,6 @@ const iso = ref<string | null>('2026-08-20')
     <GrDatePicker
       v-model="iso"
       value-adapter="isoDate"
-      locale="en-US"
       :format="{ dateStyle: 'full' }"
       clearable
       placeholder="ISO model"

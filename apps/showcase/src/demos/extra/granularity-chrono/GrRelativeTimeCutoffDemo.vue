@@ -21,7 +21,7 @@ const format: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', yea
     </p>
 
     <div v-for="post in posts" :key="post.toISOString()" class="text-sm">
-      <GrRelativeTime :value="post" :base="now" :cutoff="30" :format="format" locale="en-US" />
+      <GrRelativeTime :value="post" :base="now" :cutoff="30" :format="format" />
     </div>
   </div>
 </template>

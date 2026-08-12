@@ -262,7 +262,7 @@ const fieldClass = computed(() => pickerFieldClass({
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :panel-label="t('gr.timePicker.panelLabel', 'Choose time')"
+      :panel-label="t('grChrono.timePicker.panelLabel', 'Choose time')"
       @update:open="panelOpen = $event"
     >
       <template v-if="!inline" #trigger="{ triggerProps }">

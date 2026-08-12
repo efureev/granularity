@@ -12,7 +12,6 @@ const value = ref<readonly [string, string] | null>(['2026-08-10', '2026-08-14']
     <GrDateRangePicker
       v-model="value"
       value-adapter="isoDate"
-      locale="en-US"
       clearable
       placeholder="Pick a period"
       aria-label="Stay"

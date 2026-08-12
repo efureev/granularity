@@ -332,7 +332,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :panel-label="t('gr.dateTimePicker.panelLabel', 'Choose date and time')"
+      :panel-label="t('grChrono.dateTimePicker.panelLabel', 'Choose date and time')"
       @update:open="panelOpen = $event"
     >
       <template v-if="!inline" #trigger="{ triggerProps }">
@@ -406,7 +406,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               :locale="locale"
               :size="resolvedSize"
               :readonly="isReadonly"
-              :aria-label="ariaLabel ?? t('gr.datePicker.gridLabel', 'Calendar')"
+              :aria-label="ariaLabel ?? t('grChrono.datePicker.gridLabel', 'Calendar')"
               @update:model-value="onDateChange"
             >
               <template v-if="$slots.day" #day="slotProps">
@@ -446,7 +446,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
                 :size="resolvedSize"
                 @click="cancel"
               >
-                {{ t('gr.dateTimePicker.cancel', 'Cancel') }}
+                {{ t('grChrono.dateTimePicker.cancel', 'Cancel') }}
               </GrButton>
 
               <GrButton
@@ -455,7 +455,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
                 :disabled="isLocked"
                 @click="apply"
               >
-                {{ t('gr.dateTimePicker.apply', 'Apply') }}
+                {{ t('grChrono.dateTimePicker.apply', 'Apply') }}
               </GrButton>
             </div>
           </slot>

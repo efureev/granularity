@@ -11,9 +11,9 @@ const year = ref<string | null>('2026-01-01')
   <div class="grid max-w-[320px] gap-4">
     <!-- Режим меняет и панель, и вид значения в поле: подставлять свой
          `format` для этого не нужно. -->
-    <GrDatePicker v-model="day" value-adapter="isoDate" locale="en-US" aria-label="Day" />
-    <GrDatePicker v-model="month" mode="month" value-adapter="isoDate" locale="en-US" aria-label="Month" />
-    <GrDatePicker v-model="year" mode="year" value-adapter="isoDate" locale="en-US" aria-label="Year" />
+    <GrDatePicker v-model="day" value-adapter="isoDate" aria-label="Day" />
+    <GrDatePicker v-model="month" mode="month" value-adapter="isoDate" aria-label="Month" />
+    <GrDatePicker v-model="year" mode="year" value-adapter="isoDate" aria-label="Year" />
 
     <p class="showcase-demo-text text-sm">
       <span class="opacity-70">day=</span><code>{{ day ?? '—' }}</code>

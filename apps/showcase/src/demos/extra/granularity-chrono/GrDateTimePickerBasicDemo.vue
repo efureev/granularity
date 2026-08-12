@@ -13,7 +13,6 @@ const value = ref<string | null>('2026-08-12T14:30:00')
       v-model="value"
       value-adapter="isoDateTime"
       :minute-step="15"
-      locale="en-US"
       clearable
       placeholder="Pick date and time"
       aria-label="Meeting start"

@@ -25,7 +25,6 @@ function eventsOn(date: PlainDate): number {
     <GrCalendar
       v-model="value"
       :view-date="{ y: 2026, m: 7, d: 1 }"
-      locale="en-US"
       aria-label="Schedule"
     >
       <!-- Слот отдаёт саму ячейку: число рисуем сами и дописываем метки. -->

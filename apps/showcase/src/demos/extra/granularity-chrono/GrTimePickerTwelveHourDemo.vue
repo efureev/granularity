@@ -15,7 +15,6 @@ const value = ref<string | null>('2026-08-12T15:30:45')
       use12-hours
       enable-seconds
       :second-step="15"
-      locale="en-US"
       clearable
       aria-label="Start time"
     />

@@ -179,10 +179,10 @@ function onColumnKeydown(unit: TimeUnit, event: KeyboardEvent): void {
 }
 
 const columnLabels: Record<TimeUnit, [string, string]> = {
-  hour: ['gr.timePicker.hours', 'Hours'],
-  minute: ['gr.timePicker.minutes', 'Minutes'],
-  second: ['gr.timePicker.seconds', 'Seconds'],
-  period: ['gr.timePicker.period', 'AM/PM'],
+  hour: ['grChrono.timePicker.hours', 'Hours'],
+  minute: ['grChrono.timePicker.minutes', 'Minutes'],
+  second: ['grChrono.timePicker.seconds', 'Seconds'],
+  period: ['grChrono.timePicker.period', 'AM/PM'],
 }
 
 function columnLabel(unit: TimeUnit): string {
