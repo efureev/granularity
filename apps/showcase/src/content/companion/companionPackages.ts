@@ -33,7 +33,7 @@ export type CompanionComponent = {
 }
 
 export type CompanionPackage = {
-  /** Идентификатор пакета для группировки/route, напр. `granularity-datepicker`. */
+  /** Идентификатор пакета для группировки/route, напр. `granularity-chrono`. */
   id: string
   /** Имя npm-пакета. */
   npmName: string
@@ -44,67 +44,6 @@ export type CompanionPackage = {
   /** Внешние (собственные) зависимости пакета — показываем, за что «платит» consumer. */
   dependencies: string[]
   components: CompanionComponent[]
-}
-
-function commonPickerProps(): ShowcaseApiSectionMeta {
-  return {
-    key: 'props',
-    title: 'Props',
-    origin: 'manual',
-    items: [
-      { name: 'modelValue', type: 'GrDateTimeModel', default: 'null', description: '`v-model`. Форма зависит от `mode`/`range`/`modelType`.' },
-      { name: 'mode', type: `'date' | 'datetime' | 'time' | 'month' | 'year'`, default: `'date'`, description: 'Что выбирает пользователь.' },
-      { name: 'range', type: 'boolean', default: 'false', description: 'Выбор диапазона (модель становится массивом границ).' },
-      { name: 'locale', type: `'en' | 'ru'`, description: 'Локаль-шорткат (маппится на локаль `date-fns`). Произвольная локаль — через `datepickerProps.locale`.' },
-      { name: 'placeholder', type: 'string', description: 'Плейсхолдер поля.' },
-      { name: 'disabled', type: 'boolean', default: 'false', description: 'Блокирует ввод.' },
-      { name: 'clearable', type: 'boolean', default: 'true', description: 'Показывать кнопку очистки.' },
-      { name: 'autoApply', type: 'boolean', default: 'true', description: 'Применять выбор сразу, без кнопки подтверждения.' },
-      { name: 'enableSeconds', type: 'boolean', default: 'false', description: 'Секунды в режимах со временем.' },
-      { name: 'minDate', type: 'GrDateValue', description: 'Нижняя граница допустимых дат.' },
-      { name: 'maxDate', type: 'GrDateValue', description: 'Верхняя граница допустимых дат.' },
-      { name: 'format', type: 'string', description: 'Формат отображения (паттерн `@vuepic/vue-datepicker`).' },
-      { name: 'modelType', type: 'string', description: 'Как значение сериализуется в модель (`timestamp`, `yyyy-MM-dd`, …).' },
-      { name: 'teleport', type: 'boolean | string', default: 'true', description: 'Куда телепортировать меню; `false` — без телепорта.' },
-      { name: 'ui', type: 'Record<string, unknown>', description: 'Escape-hatch: классы, домешиваемые в `ui` подлежащего пикера.' },
-      { name: 'datepickerProps', type: 'Record<string, unknown>', description: 'Escape-hatch: любые пропсы `@vuepic/vue-datepicker` (last-wins).' },
-    ],
-  }
-}
-
-function pickerEventsAndSlots(): ShowcaseApiSectionMeta[] {
-  return [
-    {
-      key: 'events',
-      title: 'Events',
-      origin: 'manual',
-      items: [
-        { name: 'update:modelValue', type: '(value: GrDateTimeModel) => void', description: 'Изменение значения (`v-model`).' },
-        { name: 'change', type: '(value: GrDateTimeModel) => void', description: 'Синоним изменения значения для не-`v-model` сценариев.' },
-        { name: 'cleared', type: '() => void', description: 'Значение очищено (кнопка clear или пустой выбор).' },
-      ],
-    },
-    {
-      key: 'slots',
-      title: 'Slots',
-      origin: 'manual',
-      items: [
-        { name: '*', type: 'passthrough', description: 'Все слоты `@feugene`-обёртки прозрачно пробрасываются в `@vuepic/vue-datepicker` (кастомный `trigger`, `action-row`, `day` и т.д.).' },
-      ],
-    },
-  ]
-}
-
-function presetProps(fixed: string): ShowcaseApiSectionMeta {
-  return {
-    key: 'props',
-    title: 'Props',
-    origin: 'manual',
-    items: [
-      { name: 'modelValue', type: 'GrDateTimeModel', default: 'null', description: '`v-model` значения.' },
-      { name: '…GrDateTimePicker', type: 'see GrDateTimePicker', description: `Пресет фиксирует ${fixed} и прозрачно пробрасывает остальные пропсы/слоты/события в \`GrDateTimePicker\`.` },
-    ],
-  }
 }
 
 /** Пропы сетки: то, что относится к показу месяца и выбору дня. */
@@ -234,84 +173,6 @@ function datePickerApiSections(): ShowcaseApiSectionMeta[] {
 
 export const companionPackages: CompanionPackage[] = [
   {
-    id: 'granularity-datepicker',
-    npmName: '@feugene/granularity-datepicker',
-    label: 'Datepicker',
-    description: 'Date / time / range picker для дизайн-системы: тонкая GR-owned обёртка над `@vuepic/vue-datepicker`. Ставится опционально — ядро `@feugene/granularity` остаётся lean.',
-    // Литералом, потому что пакет не отдаёт свой `package.json` через `exports`;
-    // добавлять туда субпуть ради пакета, который уходит, незачем.
-    version: '0.1.1',
-    dependencies: ['@vuepic/vue-datepicker', 'date-fns'],
-    components: [
-      {
-        name: 'GrDateTimePicker',
-        slug: 'gr-date-time-picker',
-        title: 'GrDateTimePicker',
-        summary: 'Базовый гибкий пикер: `mode` (`date` · `datetime` · `time` · `month` · `year`) и `range`. Публичный контракт принадлежит GR, реализация (vuepic) скрыта.',
-        importPath: '@feugene/granularity-datepicker',
-        examples: [
-          {
-            id: 'datetime-modes',
-            title: 'Modes playground',
-            description: 'Один компонент покрывает date / datetime / time / month / year — режим переключается пропом `mode`.',
-            previewKey: 'extra-datepicker-modes',            note: 'Значение (де)сериализуется по `modelType`; по умолчанию — `Date`.',
-          },
-          {
-            id: 'datetime-localized',
-            title: 'Localized datetime with seconds',
-            description: 'Русская локаль, выбор времени с секундами и подтверждением выбора (`auto-apply=false`).',
-            previewKey: 'extra-datepicker-localized',          },
-        ],
-        apiSections: [commonPickerProps(), ...pickerEventsAndSlots()],
-      },
-      {
-        name: 'GrDatePicker',
-        slug: 'gr-date-picker',
-        title: 'GrDatePicker',
-        summary: 'Пресет `GrDateTimePicker` с зафиксированным `mode="date"` — календарь без времени.',
-        importPath: '@feugene/granularity-datepicker',
-        examples: [
-          {
-            id: 'date-basic',
-            title: 'Basic date',
-            description: 'Одиночный выбор даты с кнопкой очистки.',
-            previewKey: 'extra-date-basic',          },
-        ],
-        apiSections: [presetProps('`mode="date"`'), ...pickerEventsAndSlots()],
-      },
-      {
-        name: 'GrTimePicker',
-        slug: 'gr-time-picker',
-        title: 'GrTimePicker',
-        summary: 'Пресет `GrDateTimePicker` с зафиксированным `mode="time"` — только выбор времени.',
-        importPath: '@feugene/granularity-datepicker',
-        examples: [
-          {
-            id: 'time-basic',
-            title: 'Basic time',
-            description: 'Выбор времени с секундами.',
-            previewKey: 'extra-time-basic',          },
-        ],
-        apiSections: [presetProps('`mode="time"`'), ...pickerEventsAndSlots()],
-      },
-      {
-        name: 'GrDateRangePicker',
-        slug: 'gr-date-range-picker',
-        title: 'GrDateRangePicker',
-        summary: 'Пресет `GrDateTimePicker` с `mode="date"` и `range` — выбор диапазона дат (модель — массив из двух границ).',
-        importPath: '@feugene/granularity-datepicker',
-        examples: [
-          {
-            id: 'date-range',
-            title: 'Date range',
-            description: 'Выбор диапазона дат; модель — `GrDateRangeValue` (массив границ).',
-            previewKey: 'extra-date-range',          },
-        ],
-        apiSections: [presetProps('`mode="date"` + `range`'), ...pickerEventsAndSlots()],
-      },
-    ],
-  },
-  {
     id: 'granularity-chrono',
     npmName: '@feugene/granularity-chrono',
     label: 'Chrono',
@@ -323,7 +184,7 @@ export const companionPackages: CompanionPackage[] = [
     components: [
       {
         name: 'GrCalendar',
-        slug: 'chrono-calendar',
+        slug: 'gr-calendar',
         title: 'GrCalendar',
         summary: 'Сетка месяца по паттерну `grid`: полная клавиатура, объявление смены месяца, слот на ячейку дня. Самостоятельный компонент и одновременно начинка пикеров.',
         importPath: '@feugene/granularity-chrono/components/GrCalendar',
@@ -346,7 +207,7 @@ export const companionPackages: CompanionPackage[] = [
       },
       {
         name: 'GrDatePicker',
-        slug: 'chrono-date-picker',
+        slug: 'gr-date-picker',
         title: 'GrDatePicker',
         summary: 'Поле с календарём — настоящий форм-контрол: свои `id`/`name`, связка с `GrFormField`, `aria-invalid`, размеры из `GrConfigProvider`. Панель монтируется при первом открытии.',
         importPath: '@feugene/granularity-chrono/components/GrDatePicker',

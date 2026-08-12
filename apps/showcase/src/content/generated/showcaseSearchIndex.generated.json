@@ -327,7 +327,7 @@
     "kindLabel": "Section",
     "context": "Extras",
     "searchableTitle": "extras companion packages",
-    "searchableContent": "extras компоненты из сопутствующих (companion) пакетов экосистемы granularity: опциональные пакеты со своеи зависимостью и релизным циклом, сгруппированные по пакету. catalog companion packages каталог компонентов из опциональных пакетов, сгруппированных по пакету-источнику. ядро `@feugene/granularity` остае тся lean тяже лые зависимости живут в companion-пакетах. первыи companion-пакет `@feugene/granularity-datepicker` (date/time/range picker поверх `@vuepic/vue-datepicker`). каждыи companion-компонент получает отдельную страницу с live-примерами и api."
+    "searchableContent": "extras компоненты из сопутствующих (companion) пакетов экосистемы granularity: опциональные пакеты со своеи зависимостью и релизным циклом, сгруппированные по пакету. catalog companion packages каталог компонентов из опциональных пакетов, сгруппированных по пакету-источнику. ядро `@feugene/granularity` остае тся lean тяже лые зависимости живут в companion-пакетах. первыи companion-пакет `@feugene/granularity-chrono` (календарь и пикеры даты и времени без сторонних виджетов). каждыи companion-компонент получает отдельную страницу с live-примерами и api."
   },
   {
     "id": "page:extras:section:live-examples",

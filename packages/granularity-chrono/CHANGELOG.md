@@ -32,6 +32,12 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **Replaces `@feugene/granularity-datepicker`,** which is removed from the repository in the
+  same change. The predecessor was a wrapper over `@vuepic/vue-datepicker`: its failures were
+  structural — the theme never applied because the widget redefined the same variables one
+  level deeper, and `id`/`name`/`aria-*` could not be set at all because the `<input>` was not
+  ours. Nothing here wraps anything.
+
 - **Month and year grids** (`mode="month"` / `mode="year"` on `GrCalendar` and `GrDatePicker`)
   reuse the same roving-focus primitive — only the column count differs, seven days against
   three periods. A period is selectable when at least one of its days is within bounds, so a

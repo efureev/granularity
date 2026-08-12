@@ -339,7 +339,7 @@
           "description": "A catalog of components from optional packages, grouped by their source package.",
           "bullets": [
             "The core @feugene/granularity stays lean — heavy dependencies live in companion packages.",
-            "The first companion package is @feugene/granularity-datepicker (date/time/range picker over @vuepic/vue-datepicker).",
+            "The first companion package is @feugene/granularity-chrono (calendar and date/time pickers with no third-party widget).",
             "Every companion component gets its own page with live examples and API."
           ]
         },

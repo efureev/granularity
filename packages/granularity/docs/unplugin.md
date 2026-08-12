@@ -86,18 +86,18 @@ GranularityResolver({
 ## Companion-пакеты и общая фабрика `createGranularResolver`
 
 Тот же авто-импорт можно включить для **пакетов-спутников** экосистемы (например
-[`@feugene/granularity-datepicker`](../../granularity-datepicker/README.md)). Их компоненты тоже
+[`@feugene/granularity-chrono`](../../granularity-chrono/README.md)). Их компоненты тоже
 начинаются на `Gr*`, поэтому жадный core-резолвер по префиксу перехватил бы их и попытался
 импортировать из несуществующего пути в `@feugene/granularity`. Решение — **whitelist-резолвер**,
 построенный на общей фабрике `createGranularResolver`, и правильный порядок регистрации:
 
 ```ts
 import { GranularityResolver } from '@feugene/unplugin-granularity'
-import { GranularityDatepickerResolver } from '@feugene/granularity-datepicker/resolver'
+import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
 
 Components({
   resolvers: [
-    GranularityDatepickerResolver(), // whitelist — раньше…
+    GranularityChronoResolver(), // whitelist — раньше…
     GranularityResolver(),           // …жадного Gr*-резолвера ядра
   ],
 })

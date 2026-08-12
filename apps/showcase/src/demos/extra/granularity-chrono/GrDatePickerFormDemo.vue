@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-// Импорт явный, а не авто: `GrDatePicker` есть и в старом companion-пакете,
-// и резолвер отдал бы по этому имени именно его. `GrFormField` и `GrButton` —
-// авто-импорт из ядра.
-import GrDatePicker from '@feugene/granularity-chrono/components/GrDatePicker'
-
+// `GrDatePicker`, `GrFormField` и `GrButton` подставляются авто-импортом.
 // Модель — строка `2026-08-20`: её задаёт адаптер, а не проп формата.
 const departure = ref<string | null>(null)
 const attempted = ref(false)

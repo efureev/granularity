@@ -396,7 +396,7 @@ export const showcasePages: ShowcasePage[] = [
         description: 'Каталог компонентов из опциональных пакетов, сгруппированных по пакету-источнику.',
         bullets: [
           'Ядро `@feugene/granularity` остаётся lean — тяжёлые зависимости живут в companion-пакетах.',
-          'Первый companion-пакет — `@feugene/granularity-datepicker` (date/time/range picker поверх `@vuepic/vue-datepicker`).',
+          'Первый companion-пакет — `@feugene/granularity-chrono` (календарь и пикеры даты и времени без сторонних виджетов).',
           'Каждый companion-компонент получает отдельную страницу с live-примерами и API.',
         ],
       },

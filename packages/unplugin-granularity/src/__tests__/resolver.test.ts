@@ -26,26 +26,26 @@ describe('createGranularResolver', () => {
 
   it('omits the styles side-effect when importStyle is false (inlined CSS)', () => {
     const resolver = createGranularResolver({
-      packageName: '@feugene/granularity-datepicker',
+      packageName: '@feugene/granularity-chrono',
       components: ['GrDatePicker'],
       importStyle: false,
     })
 
     expect(resolveWith(resolver, 'GrDatePicker')).toEqual({
       name: 'GrDatePicker',
-      from: '@feugene/granularity-datepicker/components/GrDatePicker',
+      from: '@feugene/granularity-chrono/components/GrDatePicker',
     })
   })
 
   it('whitelist matches only listed names — avoids the greedy Gr* collision', () => {
     const resolver = createGranularResolver({
-      packageName: '@feugene/granularity-datepicker',
+      packageName: '@feugene/granularity-chrono',
       components: ['GrDateTimePicker', 'GrDatePicker', 'GrTimePicker', 'GrDateRangePicker'],
     })
 
     expect(resolveWith(resolver, 'GrDateRangePicker')).toEqual({
       name: 'GrDateRangePicker',
-      from: '@feugene/granularity-datepicker/components/GrDateRangePicker',
+      from: '@feugene/granularity-chrono/components/GrDateRangePicker',
     })
     // A core component (not in the whitelist) is left for the core resolver.
     expect(resolveWith(resolver, 'GrButton')).toBeUndefined()

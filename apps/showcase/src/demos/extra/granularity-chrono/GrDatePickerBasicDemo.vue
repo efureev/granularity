@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-// Импорт явный, а не авто: `GrDatePicker` есть и в старом companion-пакете,
-// и резолвер отдал бы по этому имени именно его.
-import GrDatePicker from '@feugene/granularity-chrono/components/GrDatePicker'
-
+// `GrDatePicker` подставляется авто-импортом (`unplugin-vue-components`).
 const value = ref<Date | null>(new Date(2026, 7, 12))
 const iso = ref<string | null>('2026-08-20')
 </script>

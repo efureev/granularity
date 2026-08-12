@@ -11,7 +11,7 @@ import {
  *
  * Фабрика умеет строить component-resolver для **любого** гранулярного пакета
  * экосистемы (ядро `@feugene/granularity`, companion-пакеты вроде
- * `@feugene/granularity-datepicker`), у которого компоненты опубликованы как
+ * `@feugene/granularity-chrono`), у которого компоненты опубликованы как
  * subpath-экспорты `<packageName>/components/<Name>` с именованным экспортом.
  */
 export interface GranularResolverOptions {
@@ -27,8 +27,8 @@ export interface GranularResolverOptions {
 
   /**
    * Явный whitelist имён компонентов. Используйте его для companion-пакетов,
-   * чьи имена пересекаются с жадным `Gr*`-резолвером ядра (например четыре
-   * компонента `@feugene/granularity-datepicker`), чтобы избежать коллизий.
+   * чьи имена пересекаются с жадным `Gr*`-резолвером ядра (например пять
+   * компонентов `@feugene/granularity-chrono`), чтобы избежать коллизий.
    */
   components?: readonly string[]
 
@@ -59,8 +59,8 @@ export interface GranularResolverOptions {
  * ```ts
  * // Companion-пакет с whitelist (без CSS side-effect — CSS инлайнится):
  * createGranularResolver({
- *   packageName: '@feugene/granularity-datepicker',
- *   components: ['GrDateTimePicker', 'GrDatePicker', 'GrTimePicker', 'GrDateRangePicker'],
+ *   packageName: '@feugene/granularity-chrono',
+ *   components: ['GrCalendar', 'GrDatePicker', 'GrDateTimePicker', 'GrTimePicker', 'GrDateRangePicker'],
  *   importStyle: false,
  * })
  * ```
@@ -187,7 +187,7 @@ function buildDirectiveResolver({ exclude }: ResolvedOptions): ComponentResolver
  * tree-shaking в приложении потребителя работает максимально плотно: в бандл
  * попадает ровно то, что встретилось в шаблонах.
  *
- * Для companion-пакетов (например `@feugene/granularity-datepicker`) используйте
+ * Для companion-пакетов (например `@feugene/granularity-chrono`) используйте
  * их собственный резолвер, построенный на {@link createGranularResolver}, и
  * ставьте его **перед** этим (жадным по `Gr*`) резолвером — иначе core-резолвер
  * перехватит одноимённые компоненты companion-пакета.

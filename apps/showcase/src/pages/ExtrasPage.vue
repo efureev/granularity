@@ -86,7 +86,12 @@ const totalComponents = computed(() =>
               <p class="showcase-text-muted max-w-3xl text-sm leading-6">
                 {{ pkg.description }}
               </p>
-              <div class="showcase-text-subtle flex flex-wrap items-center gap-2 text-xs">
+              <!-- Пакет без внешних зависимостей — не повод показывать пустую
+                   подпись: у `granularity-chrono` их нет вовсе. -->
+              <div
+                v-if="pkg.dependencies.length"
+                class="showcase-text-subtle flex flex-wrap items-center gap-2 text-xs"
+              >
                 <span class="opacity-70">{{ $t('showcase.extrasPage.depsLabel') }}</span>
                 <code
                   v-for="dep in pkg.dependencies"

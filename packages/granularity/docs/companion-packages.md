@@ -5,12 +5,14 @@
 него авто-импорт через [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md).
 
 Companion-пакет уместен, когда компонент **не должен жить в ядре**: он тянет тяжёлую зависимость
-(как [`@feugene/granularity-datepicker`](../../granularity-datepicker/README.md) — обёртка над
-`@vuepic/vue-datepicker`), либо это композит бизнес-уровня
+(так был устроен снятый `@feugene/granularity-datepicker` — обёртка над `@vuepic/vue-datepicker`),
+либо просто не относится к ядру: календарь и пикеры даты и времени вынесены в
+[`@feugene/granularity-chrono`](../../granularity-chrono/README.md) без единой внешней зависимости.
+Ещё вариант — композит бизнес-уровня
 ([`@feugene/extra-granularity`](../../extra-granularity/README.md)). Ядро остаётся lean, а спутник
 имеет собственный релизный цикл и `peerDependency` на `@feugene/granularity`.
 
-> **Референс.** Рабочий пример, на который ссылается этот гайд, — `packages/granularity-datepicker`.
+> **Референс.** Рабочий пример, на который ссылается этот гайд, — `packages/granularity-chrono`.
 > Пер-компонентные детали (`config.ts`, `styles.css`, safelist) описаны в
 > [`ADDING_COMPONENTS.md`](./ADDING_COMPONENTS.md); здесь — упаковка целого пакета.
 
@@ -86,13 +88,14 @@ packages/<my-package>/
 
 - `@feugene/granularity`, `@feugene/unocss-preset-granular`, `vue` — **peer**-зависимости (одна версия
   рантайма на всё приложение).
-- Собственные тяжёлые зависимости пакета (у датапикера — `@vuepic/vue-datepicker`, `date-fns`) идут в
-  `dependencies` — их и оплачивает только тот, кто установит companion-пакет.
+- Собственные зависимости пакета идут в `dependencies` — их и оплачивает только тот, кто установит
+  companion-пакет. У `granularity-chrono` их нет вовсе: своя арифметика дат и `Intl` вместо
+  date-библиотеки.
 
 ## 2. tsconfig
 
 `tsconfig.json` — для typecheck (`noEmit`), `tsconfig.build.json` — только `.d.ts` (эмит компонент
-делает `vite`, а декларации — `vue-tsc`). Проще всего скопировать из `packages/granularity-datepicker`.
+делает `vite`, а декларации — `vue-tsc`). Проще всего скопировать из `packages/granularity-chrono`.
 Главное — `"jsxImportSource": "vue"`, `"types": ["vite/client", "node"]` (для `*.css`-импортов), и в
 `tsconfig.build.json` — `emitDeclarationOnly: true` + `declarationDir: "./dist/types"`.
 
@@ -476,7 +479,7 @@ npx --yes publint@latest --pack npm   # проверка соответстви�
 ```
 
 `publint` должен сказать `All good!` — тогда `exports` и реальные файлы `dist` согласованы. Для релиза
-используйте отдельный тег вида `my-package-v<semver>` (по образцу `granularity-datepicker-v*` в
+используйте отдельный тег вида `my-package-v<semver>` (по образцу `unplugin-granularity-v*` в
 `.github/workflows/ci.yml`), чтобы публиковать спутник независимо от ядра.
 
 ## Чеклист

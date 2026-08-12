@@ -6,7 +6,6 @@ on:
     tags:
       - 'v*'
       - 'unplugin-granularity-v*'
-      - 'granularity-datepicker-v*'
   pull_request:
     branches: [ main ]
 
@@ -154,15 +153,13 @@ jobs:
         run: yarn test:playground-ssr
 
   test-showcase:
-    # Витрина использует авто-импорт `unplugin-vue-components` через резолверы из
-    # @feugene/unplugin-granularity, @feugene/granularity-datepicker/resolver и
-    # @feugene/granularity-chrono/resolver, а `uno.config.ts` читает провайдеры
-    # тех же пакетов — их dist нужен уже при загрузке vite/vitest-конфига,
-    # поэтому скачиваем все четыре.
+    # Витрина использует авто-импорт `unplugin-vue-components` через резолверы
+    # из @feugene/unplugin-granularity и @feugene/granularity-chrono, а
+    # `uno.config.ts` читает провайдеры тех же пакетов — их dist нужен уже при
+    # загрузке vite/vitest-конфига, поэтому скачиваем все три.
     needs:
       - build-granularity
       - build-unplugin-granularity
-      - build-granularity-datepicker
       - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
@@ -186,12 +183,6 @@ jobs:
         with:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-datepicker dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datepicker-dist
-          path: packages/granularity-datepicker/dist
 
       - name: Download granularity-chrono dist
         uses: actions/download-artifact@v8
@@ -209,7 +200,6 @@ jobs:
     needs:
       - build-granularity
       - build-unplugin-granularity
-      - build-granularity-datepicker
       - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
@@ -233,12 +223,6 @@ jobs:
         with:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-datepicker dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datepicker-dist
-          path: packages/granularity-datepicker/dist
 
       - name: Download granularity-chrono dist
         uses: actions/download-artifact@v8
@@ -298,12 +282,6 @@ jobs:
         with:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-datepicker dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datepicker-dist
-          path: packages/granularity-datepicker/dist
 
       - name: Download granularity-chrono dist
         uses: actions/download-artifact@v8
@@ -557,56 +535,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Сборка опционального companion-пакета @feugene/granularity-datepicker
-  # (date/time/range picker поверх @vuepic/vue-datepicker). Peer-зависит от
-  # @feugene/granularity (для vue-tsc нужны его собранные типы) и от
-  # @feugene/unplugin-granularity — на его фабрике `createGranularResolver`
-  # построен entry `./resolver`. Поэтому скачиваем оба dist-артефакта.
-  build-granularity-datepicker:
-    needs:
-      - quality-granularity
-      - build-granularity
-      - build-unplugin-granularity
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Download granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dist
-          path: packages/granularity/dist
-
-      - name: Download unplugin-granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: unplugin-granularity-dist
-          path: packages/unplugin-granularity/dist
-
-      - name: Build package
-        run: yarn workspace @feugene/granularity-datepicker build
-
-      - name: Granular doctor
-        working-directory: packages/granularity-datepicker
-        run: yarn doctor
-
-      - name: Validate package metadata (publint)
-        working-directory: packages/granularity-datepicker
-        run: npx --yes publint@latest --pack npm
-
-      - name: Upload dist
-        uses: actions/upload-artifact@v7
-        with:
-          name: granularity-datepicker-dist
-          path: packages/granularity-datepicker/dist/
-
+  # Сборка опционального companion-пакета @feugene/granularity-chrono
+  # (календарь и пикеры даты и времени). Peer-зависит от @feugene/granularity
+  # (для vue-tsc нужны его собранные типы) и от @feugene/unplugin-granularity —
+  # на его фабрике `createGranularResolver` построен резолвер пакета.
   build-granularity-chrono:
     needs:
       - quality-granularity
@@ -670,92 +602,6 @@ jobs:
           name: granularity-chrono-dist
           path: packages/granularity-chrono/dist/
 
-  # Публикация @feugene/granularity-datepicker в npm по тегу вида
-  # `granularity-datepicker-v<semver>`. Отдельный тег позволяет релизить
-  # companion-пакет независимо от ядра @feugene/granularity.
-  publish-npm-granularity-datepicker:
-    needs:
-      - build-granularity-datepicker
-    if: startsWith(github.ref, 'refs/tags/granularity-datepicker-v')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Verify tag matches package version
-        working-directory: packages/granularity-datepicker
-        run: |
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          TAG_VERSION="${GITHUB_REF_NAME#granularity-datepicker-v}"
-          echo "package.json version: $PKG_VERSION"
-          echo "git tag version:      $TAG_VERSION"
-          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
-            exit 1
-          fi
-
-      - name: Download dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datepicker-dist
-          path: packages/granularity-datepicker/dist
-
-      - name: Publish to npm
-        run: npm publish --access public --provenance
-        working-directory: packages/granularity-datepicker
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  # Зеркало в GitHub Packages под scope владельца репозитория
-  # (`@efureev/granularity-datepicker`). Аналогично publish-gpr для granularity.
-  publish-gpr-granularity-datepicker:
-    needs:
-      - publish-npm-granularity-datepicker
-    if: startsWith(github.ref, 'refs/tags/granularity-datepicker-v')
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@efureev'
-
-      - name: Download dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datepicker-dist
-          path: packages/granularity-datepicker/dist
-
-      - name: Prepare package for GitHub Packages
-        working-directory: packages/granularity-datepicker
-        run: |
-          npm pkg set name='@efureev/granularity-datepicker'
-          npm pkg delete publishConfig.provenance
-          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
-          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
-
-      - name: Publish to GitHub Packages
-        working-directory: packages/granularity-datepicker
-        run: npm publish --ignore-scripts --no-provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-  # `extra-granularity` — композитный провайдер над примитивами granularity,
-  # заявленный как интеграционная проверка связки «библиотека + пресет».
-  # До сих пор в CI его не было вовсе; собирается ради `granular doctor`,
-  # которому нужен `dist`: именно межпакетные рёбра тут и проверяются.
   check-extra-granularity:
     needs:
       - build-granularity
