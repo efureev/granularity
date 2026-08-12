@@ -142,6 +142,23 @@ export function addYears(date: PlainDate, years: number): PlainDate {
   return addMonths(date, years * 12)
 }
 
+/**
+ * Полных месяцев между датами: `to - from`, со знаком.
+ *
+ * Именно **полных**: с 31 января по 28 февраля прошёл ноль месяцев, хотя
+ * индексы месяцев различаются на единицу. Считать разность делением дней на 30
+ * нельзя — февраль и июль тогда одинаковы, и «месяц назад» уезжает на неделю.
+ */
+export function differenceInMonths(from: PlainDate, to: PlainDate): number {
+  const months = (to.y - from.y) * 12 + (to.m - from.m)
+
+  // День месяца не дотянул до исходного — последний месяц не закрылся.
+  if (months > 0 && to.d < from.d) return months - 1
+  if (months < 0 && to.d > from.d) return months + 1
+
+  return months
+}
+
 export function startOfMonth(date: PlainDate): PlainDate {
   return { y: date.y, m: date.m, d: 1 }
 }

@@ -110,6 +110,36 @@ function calendarApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
+/** Метка относительного времени: показ, а не выбор — и поверхность здесь другая. */
+function relativeTimeApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'value', type: 'Date | T | null', description: 'Момент, о котором речь. Пустое значение рисует пустую метку.' },
+        { name: 'valueAdapter', type: `'date' | 'isoDate' | 'isoDateTime' | 'timestamp' | GrChronoAdapter<T>`, default: `'date'`, description: 'Как значение приходит от потребителя. Тот же контракт, что у пикеров.' },
+        { name: 'base', type: 'Date', description: 'С чем сравнивать вместо «сейчас». Задан — часы не читаются вовсе: ни таймера, ни расхождения серверного рендера с клиентским.' },
+        { name: 'live', type: 'boolean', default: 'true', description: 'Обновляться живьём. Такт компонент выбирает сам по текущей единице: секунды пересчитываются часто, месяцы редко.' },
+        { name: 'cutoff', type: 'number', default: '0', description: 'Начиная со скольких дней показывать обычную дату вместо относительной. `0` — никогда.' },
+        { name: 'format', type: 'Intl.DateTimeFormatOptions', default: `{ dateStyle: 'long' }`, description: 'Вид абсолютной даты — её же показывает подсказка `title`.' },
+        { name: 'width', type: `'long' | 'short' | 'narrow'`, default: `'long'`, description: '«3 месяца назад» против «3 мес. назад».' },
+        { name: 'numeric', type: `'auto' | 'always'`, default: `'auto'`, description: '`auto` даёт «вчера», `always` — «1 день назад».' },
+        { name: 'locale', type: 'string', description: 'Локаль показа. Не задана — из адаптера i18n приложения.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'default', type: '{ text: string, absolute: string, datetime: string }', description: 'Своя разметка вместо текста: значения те же, что компонент рисует сам.' },
+      ],
+    },
+  ]
+}
+
 /** Пропы пикера: сетка плюс всё, что относится к полю. */
 function datePickerApiSections(): ShowcaseApiSectionMeta[] {
   return [
@@ -504,6 +534,36 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: dateRangePickerApiSections(),
+      },
+      {
+        name: 'GrRelativeTime',
+        slug: 'gr-relative-time',
+        title: 'GrRelativeTime',
+        summary: '«3 минуты назад» и «через 2 дня» — `<time>` с машинным моментом и живым текстом. Строку строит `Intl`, такт компонент выбирает сам, а таймер в приложении один на всех.',
+        importPath: '@feugene/granularity-chrono/components/GrRelativeTime',
+        examples: [
+          {
+            id: 'chrono-relative-scale',
+            title: 'From seconds to years',
+            description: 'Единица выбирается по разрыву: до суток — по прошедшему времени, дальше — по календарю. Поэтому месяц остаётся месяцем и в феврале, и в июле.',
+            previewKey: 'extra-chrono-relative-scale',
+            note: 'Момент отсчёта задан `base` — иначе пример показывал бы разное в разные дни.',
+          },
+          {
+            id: 'chrono-relative-live',
+            title: 'Live updates',
+            description: 'Без `base` текст обновляется сам. Такт зависит от единицы: секунды пересчитываются раз в пять секунд, месяцы — раз в час, а на скрытой вкладке не тикает ничего.',
+            previewKey: 'extra-chrono-relative-live',
+            note: 'Таймер общий: сто меток с одним тактом — это один `setInterval`, а не сто.',
+          },
+          {
+            id: 'chrono-relative-cutoff',
+            title: 'Cutoff to a date',
+            description: '`cutoff` переводит старое значение в обычную дату: «347 дней назад» не помогает никому.',
+            previewKey: 'extra-chrono-relative-cutoff',
+          },
+        ],
+        apiSections: relativeTimeApiSections(),
       },
     ],
   },

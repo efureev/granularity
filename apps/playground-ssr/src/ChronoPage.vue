@@ -7,6 +7,7 @@ import {
   GrDatePicker,
   GrDateRangePicker,
   GrDateTimePicker,
+  GrRelativeTime,
   GrTimePicker,
 } from '@feugene/granularity-chrono'
 
@@ -32,6 +33,10 @@ const moment = ref<Date | null>(new Date(2026, 7, 12, 9, 30))
 const period = ref<readonly [Date, Date] | null>([new Date(2026, 7, 10), new Date(2026, 7, 14)])
 
 const today = { y: 2026, m: 7, d: 12 }
+
+/** Метка с `base` считается от заданного момента — на сервере и в браузере одинаково. */
+const anchored = new Date(2026, 7, 12, 12, 0)
+const posted = new Date(2026, 7, 11, 12, 0)
 </script>
 
 <template>
@@ -56,6 +61,12 @@ const today = { y: 2026, m: 7, d: 12 }
     <GrFormField label="Период">
       <GrDateRangePicker v-model="period" :today="new Date(2026, 7, 12)" locale="en-US" />
     </GrFormField>
+
+    <!-- С `base` часы не читаются: разметка детерминирована и обязана совпасть. -->
+    <GrRelativeTime :value="posted" :base="anchored" locale="en-US" />
+
+    <!-- Без `base` отсчёт идёт от часов: сервер и клиент вправе разойтись. -->
+    <GrRelativeTime :value="posted" locale="en-US" />
 
     <!-- Панель на месте: путь `inline` не телепортирует и обязан совпасть с сервером. -->
     <GrDatePicker :model-value="day" inline :today="new Date(2026, 7, 12)" locale="en-US" />

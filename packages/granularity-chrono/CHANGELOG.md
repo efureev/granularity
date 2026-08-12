@@ -9,6 +9,28 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrRelativeTime` and `useChronoNow`.** The package could pick a moment but not show one:
+  "3 minutes ago" was left to the consumer, along with a `setInterval` per instance. The unit is
+  chosen in two modes, and that is the whole design: below a day by elapsed time — a second is a
+  second and the calendar has no say — and from a day up by plain tuples. So a month stays a month
+  in February and in July, while a day that lasted 23 hours because of a clock change is called
+  hours, because that much time really did pass. The string comes from `Intl.RelativeTimeFormat`,
+  so the component speaks every language the engine knows and adds not one string to the package
+  locales. `cutoff` switches to a plain date once the relative form stops helping: "347 days ago"
+  helps nobody.
+
+  Live text needs a shared "now". `useChronoNow(interval)` keeps **one timer per tick**, not per
+  component — a hundred rows of a feed cost one `setInterval` — drops the timer on a hidden tab and
+  refreshes the value the moment the tab comes back, rather than an interval later. The tick is not
+  a prop: the component derives it from the current unit (seconds every five seconds, months every
+  hour), so an aging value slows itself down and the subscription moves between tickers on its own.
+  A `0` tick means "do not tick", which is what `base` and `live=false` use to avoid starting a
+  timer at all.
+
+- **`differenceInMonths`** in the public arithmetic: **full** months between two dates, day of the
+  month accounted for. It was the gap that made the rest of the date maths look complete and
+  wasn't.
+
 - **The `weekday` slot on the calendar header.** The grid advertised three slots — `day`,
   `header`, `weekday` — but only shipped the first two, so a consumer who wanted single-letter
   columns or their own header markup had nothing to override. The slot hands over the short

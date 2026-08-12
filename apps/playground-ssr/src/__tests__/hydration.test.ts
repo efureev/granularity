@@ -296,7 +296,32 @@ describe('гидрация companion-пакета chrono', () => {
   it('часы помечены как ожидаемое расхождение только там, где они читаются', () => {
     const markers = snapshots.chrono.html.match(/data-allow-mismatch/g) ?? []
 
-    // Ровно один календарь на странице оставлен без `today` — он и помечен.
-    expect(markers).toHaveLength(1)
+    // Двое на странице читают часы: календарь без `today` и метка без `base`.
+    // Остальные получают момент пропом и обязаны совпасть посимвольно.
+    expect(markers).toHaveLength(2)
+  })
+
+  /** Тот же приём для относительного времени: портим текст метки в серверном HTML. */
+  function distortRelative(html: string, index: number): string {
+    let seen = -1
+
+    return html.replace(/(data-gr-relative-time[^>]*>)([^<]*)/g, (match, open: string) => {
+      seen += 1
+      return seen === index ? `${open}когда-то давно` : match
+    })
+  }
+
+  it('относительное время без base расхождение переживает', async () => {
+    const distorted = { ...snapshots.chrono, html: distortRelative(snapshots.chrono.html, 1) }
+    const problems = hydrationProblems(await hydrate(distorted, { root: ChronoPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('а с base — нет: там рендер детерминирован и обязан совпасть', async () => {
+    const distorted = { ...snapshots.chrono, html: distortRelative(snapshots.chrono.html, 0) }
+    const problems = hydrationProblems(await hydrate(distorted, { root: ChronoPage }))
+
+    expect(problems.length).toBeGreaterThan(0)
   })
 })

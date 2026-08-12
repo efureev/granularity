@@ -43,6 +43,9 @@ export default defineConfig({
         resolver: fileURLToPath(
           new URL('./src/resolver.ts', import.meta.url),
         ),
+        'composables/useChronoNow': fileURLToPath(
+          new URL('./src/composables/useChronoNow.ts', import.meta.url),
+        ),
         // <granularity:components> — блок генерируется `yarn generate:registry`
         'components/GrCalendar/index': fileURLToPath(
           new URL('./src/components/GrCalendar/index.ts', import.meta.url),
@@ -55,6 +58,9 @@ export default defineConfig({
         ),
         'components/GrDateTimePicker/index': fileURLToPath(
           new URL('./src/components/GrDateTimePicker/index.ts', import.meta.url),
+        ),
+        'components/GrRelativeTime/index': fileURLToPath(
+          new URL('./src/components/GrRelativeTime/index.ts', import.meta.url),
         ),
         'components/GrTimePicker/index': fileURLToPath(
           new URL('./src/components/GrTimePicker/index.ts', import.meta.url),

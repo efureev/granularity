@@ -67,9 +67,17 @@
       "types": "./dist/types/components/GrDateTimePicker/index.d.ts",
       "import": "./dist/components/GrDateTimePicker/index.js"
     },
+    "./components/GrRelativeTime": {
+      "types": "./dist/types/components/GrRelativeTime/index.d.ts",
+      "import": "./dist/components/GrRelativeTime/index.js"
+    },
     "./components/GrTimePicker": {
       "types": "./dist/types/components/GrTimePicker/index.d.ts",
       "import": "./dist/components/GrTimePicker/index.js"
+    },
+    "./composables/useChronoNow": {
+      "types": "./dist/types/composables/useChronoNow.d.ts",
+      "import": "./dist/composables/useChronoNow.js"
     },
     "./granular-provider": {
       "types": "./dist/types/granular-provider/index.d.ts",

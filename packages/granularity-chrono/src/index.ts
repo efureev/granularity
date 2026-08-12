@@ -3,6 +3,7 @@ export * from './components/GrCalendar'
 export * from './components/GrDatePicker'
 export * from './components/GrDateRangePicker'
 export * from './components/GrDateTimePicker'
+export * from './components/GrRelativeTime'
 export * from './components/GrTimePicker'
 // </granularity:components>
 
@@ -18,6 +19,7 @@ export {
   comparePlainDates,
   daysInMonth,
   differenceInDays,
+  differenceInMonths,
   endOfMonth,
   fromEpochDay,
   isLeapYear,
@@ -85,6 +87,18 @@ export {
   resetChronoFormatCache,
   weekdayNames,
 } from './chrono/chronoFormat'
+
+// Относительное время: «3 минуты назад». Единица выбирается здесь, строку
+// строит `Intl.RelativeTimeFormat`.
+export type { FormatRelativeTimeOptions, RelativeAmount, RelativeUnit } from './chrono/relativeTime'
+export {
+  formatRelativeTime,
+  resetRelativeTimeCache,
+  selectRelativeAmount,
+} from './chrono/relativeTime'
+
+// Общее «сейчас»: один таймер на такт, а не на компонент.
+export { chronoTickerIntervals, GR_CHRONO_TICK_MS, resetChronoNow, useChronoNow } from './composables/useChronoNow'
 
 // Разбор набранного руками: порядок частей и разделитель — из локали.
 export type { DateUnit, LocaleDateOrder } from './chrono/chronoParse'

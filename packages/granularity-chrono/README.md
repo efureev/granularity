@@ -15,7 +15,8 @@ package pulls in no date library and no third-party widget.
 ## Documentation
 
 - [`docs/model.md`](./docs/model.md) — the value: why `Date` lives only at the
-  boundary, how to pick a `valueAdapter`, what the public arithmetic offers
+  boundary, how to pick a `valueAdapter`, what the public arithmetic offers, how
+  relative time picks its unit and its tick
 - [`docs/keyboard.md`](./docs/keyboard.md) — keyboard contract per component:
   the grid, the time columns, the field, the range
 - [`docs/theming.md`](./docs/theming.md) — own `--gr-*` tokens, what may and may
@@ -37,9 +38,9 @@ full reasoning.
 
 ## Status
 
-**Scaffold.** The package builds and is wired into the workspace, but ships no
-components yet. Components arrive with the calendar grid — see the roadmap in
-`SPEC-GrChrono.md` (P1).
+Six components — `GrCalendar`, `GrDatePicker`, `GrTimePicker`, `GrDateTimePicker`,
+`GrDateRangePicker` and `GrRelativeTime` — plus the public arithmetic and the
+shared clock (`useChronoNow`). The remaining roadmap lives in `SPEC-GrChrono.md`.
 
 ## Install
 

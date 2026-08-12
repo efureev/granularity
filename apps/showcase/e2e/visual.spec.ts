@@ -39,6 +39,18 @@ async function chrome(page: import('@playwright/test').Page) {
   return [page.locator('.showcase-header')]
 }
 
+/**
+ * Всё, что выведено из часов, из кадра исключается: «5 секунд назад» меняется
+ * между съёмкой и прогоном, и эталон протухал бы через минуту после создания.
+ *
+ * Селектор не перечисляет демо, а спрашивает у разметки: `data-allow-mismatch`
+ * компонент ставит ровно там, где читает часы. Новое живое демо попадёт под
+ * маску само.
+ */
+function clockDriven(page: import('@playwright/test').Page) {
+  return page.locator('[data-gr-relative-time][data-allow-mismatch]')
+}
+
 const VISUAL_COMPONENTS = [
   // Форм-контролы: на них завязана бо́льшая часть цветовых токенов.
   'GrButton',
@@ -137,7 +149,7 @@ for (const theme of ['light', 'dark'] as const) {
         await page.waitForLoadState('networkidle')
 
         await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`, {
-          mask: await chrome(page),
+          mask: [...await chrome(page), clockDriven(page)],
         })
       })
     }

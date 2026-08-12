@@ -12,6 +12,7 @@ import { grCalendarConfig } from '../components/GrCalendar/config'
 import { grDatePickerConfig } from '../components/GrDatePicker/config'
 import { grDateRangePickerConfig } from '../components/GrDateRangePicker/config'
 import { grDateTimePickerConfig } from '../components/GrDateTimePicker/config'
+import { grRelativeTimeConfig } from '../components/GrRelativeTime/config'
 import { grTimePickerConfig } from '../components/GrTimePicker/config'
 // </granularity:components:imports>
 
@@ -31,6 +32,7 @@ export const granularityChronoComponentConfigs = {
   GrDatePicker: grDatePickerConfig,
   GrDateRangePicker: grDateRangePickerConfig,
   GrDateTimePicker: grDateTimePickerConfig,
+  GrRelativeTime: grRelativeTimeConfig,
   GrTimePicker: grTimePickerConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>

@@ -15,6 +15,7 @@ export const GRANULARITY_CHRONO_COMPONENTS = [
   'GrDatePicker',
   'GrDateRangePicker',
   'GrDateTimePicker',
+  'GrRelativeTime',
   'GrTimePicker',
   // </granularity:components>
 ] as const
