@@ -4,6 +4,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import IconX from '~icons/lucide/x'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import {
   grTabsBadgeClass,
@@ -158,31 +159,55 @@ function setButtonRef(el: unknown, index: number): void {
 
 const activeIndex = computed(() => props.tabs.findIndex(t => t.value === props.modelValue))
 
-// Roving tabindex обязан всегда держать ровно один элемент с `0`. Если
-// `modelValue` не совпал ни с одной вкладкой (пустое начальное значение,
-// асинхронный список, удалённая активная вкладка), в таб-порядке остаётся
-// первая доступная — иначе tablist выпадает из него целиком и молча.
-const rovingIndex = computed(() => {
-  if (activeIndex.value >= 0) return activeIndex.value
-
-  const firstEnabled = props.tabs.findIndex(tab => !tab.disabled)
-  return firstEnabled >= 0 ? firstEnabled : 0
-})
-
 function isEnabled(tab: GrTab): boolean {
   return !tab.disabled
 }
 
-const focusedIndex = ref(-1)
+const tabIndexes = computed(() => props.tabs.map((_, index) => index))
 
-/** Роверная вкладка: при `manual` фокус может уехать вперёд выбора. */
-const rovingFocusIndex = computed(() => (focusedIndex.value >= 0 ? focusedIndex.value : rovingIndex.value))
+/**
+ * Кольцо roving-фокуса. При `activationMode: 'manual'` фокус уезжает вперёд
+ * выбора — это и есть разница между `activeKey` примитива и `initialKey`:
+ * первый ведёт фокус, второй подставляет выбранную вкладку, пока фокус не
+ * трогали.
+ *
+ * Выбор стрелка **не** переносит: этим заведует `onKeydown` по
+ * `activationMode`. Через `onMove` это выразить нельзя — клик тоже зовёт
+ * `focusKey`, и выбор эмитился бы дважды.
+ */
+const roving = useRovingFocus<number>({
+  items: () => tabIndexes.value,
+  elementFor: index => buttonRefs.value[index],
+  isDisabled: index => Boolean(props.tabs[index]?.disabled),
+  orientation: () => (props.orientation === 'vertical' ? 'vertical' : 'horizontal'),
+  skipDisabled: () => true,
+  /**
+   * Пока фокус не трогали, остановку `Tab` держит выбранная вкладка. Если
+   * `modelValue` не совпал ни с одной (пустое начальное значение, асинхронный
+   * список, удалённая активная вкладка), примитив ставит её на первую
+   * доступную — иначе tablist выпал бы из обхода целиком и молча.
+   *
+   * Выключенность здесь не проверяется намеренно: на кнопке `aria-disabled`, а
+   * не нативный `disabled`, поэтому выключенная вкладка фокусируется и держать
+   * остановку вправе.
+   */
+  initialKey: () => (activeIndex.value >= 0 ? activeIndex.value : undefined),
+  /**
+   * Прокрутка до фокуса, а не после: иначе браузер доскроллит сам по-своему, и
+   * ряд дёрнется дважды. Синхронно — фокус обязан остаться в том же такте, что
+   * и раньше: тик, где он нужен, добавляет `focusIndex`.
+   */
+  beforeFocus: index => scrollIntoView(index),
+})
 
+/**
+ * Фокус после перерисовки — для путей, где список только что изменился
+ * (закрытие вкладки). Клавиатура идёт через примитив напрямую: там ряд уже
+ * отрисован, и лишний тик только отложил бы фокус.
+ */
 async function focusIndex(index: number): Promise<void> {
-  focusedIndex.value = index
   await nextTick()
-  buttonRefs.value[index]?.focus()
-  scrollIntoView(index)
+  await roving.focusKey(index)
 }
 
 /**
@@ -210,62 +235,19 @@ async function selectByIndex(index: number, focus = false): Promise<void> {
     await focusIndex(index)
 }
 
-function findNextEnabled(from: number, direction: 1 | -1): number {
-  const length = props.tabs.length
-  if (length === 0)
-    return -1
-  let index = from
-  for (let i = 0; i < length; i++) {
-    index = (index + direction + length) % length
-    const tab = props.tabs[index]
-    if (tab && isEnabled(tab))
-      return index
-  }
-  return -1
-}
-
-function firstEnabled(): number {
-  return props.tabs.findIndex(isEnabled)
-}
-
-function lastEnabled(): number {
-  for (let i = props.tabs.length - 1; i >= 0; i--) {
-    const tab = props.tabs[i]
-    if (tab && isEnabled(tab))
-      return i
-  }
-  return -1
-}
-
 function onKeydown(event: KeyboardEvent): void {
   if (props.tabs.length === 0)
     return
 
-  const currentIndex = focusedIndex.value >= 0 ? focusedIndex.value : (activeIndex.value < 0 ? 0 : activeIndex.value)
-  let nextIndex = -1
-
-  const forward = props.orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight'
-  const backward = props.orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft'
+  const currentIndex = roving.rovingKey.value ?? 0
 
   switch (event.key) {
-    case forward:
-      nextIndex = findNextEnabled(currentIndex, 1)
-      break
-    case backward:
-      nextIndex = findNextEnabled(currentIndex, -1)
-      break
-    case 'Home':
-      nextIndex = firstEnabled()
-      break
-    case 'End':
-      nextIndex = lastEnabled()
-      break
     case 'Enter':
     case ' ':
-      // В ручном режиме выбор подтверждается явно.
-      if (props.activationMode === 'manual' && focusedIndex.value >= 0) {
+      // В ручном режиме выбор подтверждается явно — на той вкладке, где фокус.
+      if (props.activationMode === 'manual') {
         event.preventDefault()
-        void selectByIndex(focusedIndex.value, true)
+        void selectByIndex(currentIndex, false)
       }
       return
     case 'Delete':
@@ -278,21 +260,15 @@ function onKeydown(event: KeyboardEvent): void {
       }
       return
     }
-    default:
-      return
   }
 
-  if (nextIndex < 0)
+  // Стрелки, `Home`, `End` — фокус ведёт примитив по объявленной ориентации.
+  if (!roving.handleNavigationKeys(event))
     return
 
-  event.preventDefault()
-
-  if (props.activationMode === 'manual') {
-    void focusIndex(nextIndex)
-    return
-  }
-
-  void selectByIndex(nextIndex, true)
+  // `automatic`: выбор едет за фокусом. `manual`: ждёт `Enter`/`Space`.
+  if (props.activationMode !== 'manual')
+    void selectByIndex(roving.rovingKey.value ?? currentIndex, false)
 }
 
 /**
@@ -331,7 +307,7 @@ watch(() => props.tabs.length, async (next, prev) => {
   if (target >= 0)
     void focusIndex(target)
   else
-    focusedIndex.value = -1
+    roving.reset()
 })
 
 function onClick(event: MouseEvent, tab: GrTab, index: number): void {
@@ -344,7 +320,7 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
     return
   }
 
-  focusedIndex.value = index
+  roving.setActive(index)
 
   if (tab.value !== props.modelValue)
     emit('update:modelValue', tab.value)
@@ -382,7 +358,7 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
       :aria-selected="tab.value === modelValue ? 'true' : 'false'"
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :aria-keyshortcuts="isClosable(tab) ? 'Delete' : undefined"
-      :tabindex="index === rovingFocusIndex ? 0 : -1"
+      :tabindex="roving.tabindexFor(index)"
       :class="tabClass(tab)"
       @click="onClick($event, tab, index)"
     >

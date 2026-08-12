@@ -111,7 +111,7 @@ const valueLabel = computed(() => valueText.value ?? `${Math.round(safe.value)}%
     <span
       v-if="showValue && !indeterminate"
       data-gr-progress-bar-value
-      class="text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums] min-w-[4ch] text-right"
+      class="text-[var(--gr-muted-fg)] tabular-nums min-w-[4ch] text-right"
       :class="valueClassName"
     >{{ valueLabel }}</span>
   </div>

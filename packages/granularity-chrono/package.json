@@ -1,0 +1,121 @@
+{
+  "name": "@feugene/granularity-chrono",
+  "description": "Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.",
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-chrono"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "calendar",
+    "datepicker",
+    "timepicker",
+    "date-range",
+    "granularity",
+    "design-system",
+    "tree-shakeable",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./components/GrCalendar": {
+      "types": "./dist/types/components/GrCalendar/index.d.ts",
+      "import": "./dist/components/GrCalendar/index.js"
+    },
+    "./granular-provider": {
+      "types": "./dist/types/granular-provider/index.d.ts",
+      "import": "./dist/granular-provider.js",
+      "default": "./dist/granular-provider.js"
+    },
+    "./granular-provider/node": {
+      "types": "./dist/types/granular-provider/node.d.ts",
+      "import": "./dist/granular-provider-node.js",
+      "default": "./dist/granular-provider-node.js"
+    },
+    "./resolver": {
+      "types": "./dist/types/resolver.d.ts",
+      "import": "./dist/resolver.js",
+      "default": "./dist/resolver.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.16.0 <1.0.0",
+    "@feugene/unocss-preset-granular": "^0.9.1",
+    "vue": "^3.5.0",
+    "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
+    "unplugin-vue-components": ">=0.26.0"
+  },
+  "peerDependenciesMeta": {
+    "@feugene/unplugin-granularity": {
+      "optional": true
+    },
+    "unplugin-vue-components": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@feugene/granularity": "^0.16.0",
+    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/unplugin-granularity": "^0.4.0",
+    "@types/node": "^26.1.1",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.7.0",
+    "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.2",
+    "unplugin-vue-components": "^32.0.0",
+    "vite": "^8.1.5",
+    "vite-plugin-lib-inject-css": "^2.2.2",
+    "vitest": "^4.1.10",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "doctor": "granular doctor ./granular.options.mjs --strict",
+    "generate:registry": "node scripts/generate-registry.mjs",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+  }
+}

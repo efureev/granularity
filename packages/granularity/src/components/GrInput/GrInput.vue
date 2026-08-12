@@ -376,7 +376,7 @@ function togglePassword(): void {
         v-if="showCount"
         :id="countId"
         data-gr-input-count
-        class="mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
+        class="mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] tabular-nums"
     >
       {{ countText }}
     </div>

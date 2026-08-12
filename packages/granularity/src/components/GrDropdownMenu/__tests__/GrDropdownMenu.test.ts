@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrDropdownMenu from '../GrDropdownMenu.vue'
 import GrDropdownMenuColumn from '../GrDropdownMenuColumn.vue'
@@ -402,5 +402,233 @@ describe('GrDropdownMenu — v-model:open (прокидка в GrDropdown)', () 
     await uncontrolled.get('[data-testid="trigger"]').trigger('click')
     expect(uncontrolled.emitted('update:open')?.at(-1)).toEqual([true])
     uncontrolled.unmount()
+  })
+})
+
+/**
+ * Клавиатура меню.
+ *
+ * Реализация живёт в `GrDropdown` (кольцо roving-фокуса и typeahead на панели),
+ * но контракт принадлежит меню: `GrDropdownMenu` — единственный потребитель,
+ * ради которого панель ведёт себя как `menu`, а не как произвольный поповер.
+ * Поэтому спек тут, а не у примитива.
+ *
+ * Тесты шлют настоящие события и проверяют `document.activeElement`: проверка по
+ * атрибутам показала бы `tabindex="-1"` у всех пунктов и была бы зелёной при
+ * полностью сломанной навигации — фокусом в этом паттерне распоряжаются стрелки,
+ * а не таб-порядок.
+ */
+describe('GrDropdownMenu — клавиатура паттерна menu', () => {
+  const items: GrDropdownMenuEntry[] = [
+    { key: 'open', label: 'Открыть' },
+    { key: 'save', label: 'Сохранить' },
+    { key: 'send', label: 'Скопировать' },
+    { key: 'locked', label: 'Печать', disabled: true },
+    { key: 'delete', label: 'Удалить' },
+  ]
+
+  function mountOpen() {
+    const wrapper = mount(GrDropdownMenu, {
+      attachTo: document.body,
+      props: { open: true, items },
+      slots: { trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Меню</button>' },
+    })
+    return wrapper
+  }
+
+  function panel(): HTMLElement {
+    const el = document.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
+    if (!el)
+      throw new Error('панель не найдена')
+    return el
+  }
+
+  function menuItems(): HTMLElement[] {
+    return [...panel().querySelectorAll<HTMLElement>('[data-gr-dropdown-menu-item]')]
+  }
+
+  /** Событие уходит с сфокусированного пункта и всплывает до панели — как в браузере. */
+  function press(key: string, init: KeyboardEventInit = {}): void {
+    const target = (document.activeElement as HTMLElement | null) ?? panel()
+    target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init }))
+  }
+
+  function focusedLabel(): string | undefined {
+    return (document.activeElement as HTMLElement | null)?.textContent?.trim()
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('ArrowDown с триггера открывает меню и ведёт на первый пункт', async () => {
+    const wrapper = mount(GrDropdownMenu, {
+      attachTo: document.body,
+      props: { items },
+      slots: { trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Меню</button>' },
+    })
+
+    await wrapper.get('[data-testid="trigger"]').trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
+    expect(focusedLabel()).toBe('Открыть')
+    wrapper.unmount()
+  })
+
+  it('ArrowUp с триггера открывает меню и ведёт на последний пункт', async () => {
+    const wrapper = mount(GrDropdownMenu, {
+      attachTo: document.body,
+      props: { items },
+      slots: { trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Меню</button>' },
+    })
+
+    await wrapper.get('[data-testid="trigger"]').trigger('keydown', { key: 'ArrowUp' })
+    await nextTick()
+
+    expect(focusedLabel()).toBe('Удалить')
+    wrapper.unmount()
+  })
+
+  it('стрелки двигают фокус по пунктам в обе стороны', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[0].focus()
+
+    press('ArrowDown')
+    expect(focusedLabel()).toBe('Сохранить')
+
+    press('ArrowDown')
+    expect(focusedLabel()).toBe('Скопировать')
+
+    press('ArrowUp')
+    expect(focusedLabel()).toBe('Сохранить')
+
+    wrapper.unmount()
+  })
+
+  it('кольцо замкнуто в обе стороны', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    const all = menuItems()
+
+    all.at(-1)!.focus()
+    press('ArrowDown')
+    expect(focusedLabel()).toBe('Открыть')
+
+    press('ArrowUp')
+    expect(focusedLabel()).toBe('Удалить')
+
+    wrapper.unmount()
+  })
+
+  it('Home и End уводят на края', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[2].focus()
+
+    press('Home')
+    expect(focusedLabel()).toBe('Открыть')
+
+    press('End')
+    expect(focusedLabel()).toBe('Удалить')
+
+    wrapper.unmount()
+  })
+
+  it('выключенный пункт остаётся в кольце', async () => {
+    // Осознанное решение паттерна: `aria-disabled` вместо нативного `disabled`
+    // оставляет пункт фокусируемым, чтобы скринридер прочёл, что он есть и
+    // недоступен. Прыжок через него молча поменял бы семантику стрелок.
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[2].focus()
+
+    press('ArrowDown')
+    expect(focusedLabel()).toBe('Печать')
+    expect(document.activeElement?.getAttribute('aria-disabled')).toBe('true')
+
+    wrapper.unmount()
+  })
+
+  it('Tab закрывает меню, а не уводит фокус внутри него', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[0].focus()
+
+    press('Tab')
+    await nextTick()
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+    wrapper.unmount()
+  })
+
+  it('печатный символ ведёт на пункт с этой буквы', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[0].focus()
+
+    press('у')
+    expect(focusedLabel()).toBe('Удалить')
+
+    wrapper.unmount()
+  })
+
+  it('повтор буквы перебирает пункты на неё, а не ищет удвоение', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[0].focus()
+
+    press('с')
+    expect(focusedLabel()).toBe('Сохранить')
+
+    press('с')
+    expect(focusedLabel()).toBe('Скопировать')
+
+    wrapper.unmount()
+  })
+
+  it('поиск идёт от следующего за текущим, а не с начала списка', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[1].focus() // «Сохранить»
+
+    press('с')
+    expect(focusedLabel()).toBe('Скопировать')
+
+    wrapper.unmount()
+  })
+
+  it('пробел при пустом буфере остаётся пункту, а не уходит в поиск', async () => {
+    // Пункты меню — кнопки, пробел для них родная клавиша активации.
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[0].focus()
+
+    press(' ')
+    expect(focusedLabel()).toBe('Открыть')
+
+    wrapper.unmount()
+  })
+
+  it('символ с модификатором — команда, а не поиск', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+    menuItems()[0].focus()
+
+    press('у', { metaKey: true })
+    expect(focusedLabel()).toBe('Открыть')
+
+    wrapper.unmount()
+  })
+
+  it('Escape с триггера закрывает открытое меню', async () => {
+    const wrapper = mountOpen()
+    await nextTick()
+
+    await wrapper.get('[data-testid="trigger"]').trigger('keydown', { key: 'Escape' })
+
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+    wrapper.unmount()
   })
 })

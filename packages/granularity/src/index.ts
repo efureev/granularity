@@ -80,6 +80,21 @@ export { usePortalTarget } from './composables/usePortalTarget'
 export type { PortalTarget } from './composables/usePortalTarget'
 export { useOverlayLayer } from './composables/useOverlayLayer'
 export type { OverlayLayerHandle, UseOverlayLayerOptions } from './composables/useOverlayLayer'
+export { useRovingFocus } from './composables/useRovingFocus'
+export type {
+  GrRovingEdge,
+  GrRovingOrientation,
+  UseRovingFocusOptions,
+  UseRovingFocusReturn,
+} from './composables/useRovingFocus'
+export * from './composables/useGrComponentConfig'
+export { useComboboxNavigation } from './composables/useComboboxNavigation'
+export type {
+  UseComboboxNavigationOptions,
+  UseComboboxNavigationReturn,
+} from './composables/useComboboxNavigation'
+export { useGranularityTranslations } from './composables/useGranularityTranslations'
+export type { GranularityI18nLike } from './composables/useGranularityTranslations'
 export { useFloating } from './composables/useFloating'
 export type { UseFloatingOptions, UseFloatingPlacement, UseFloatingReturn } from './composables/useFloating'
 // Общий живой регион: объявить событие скринридеру из любого места приложения.

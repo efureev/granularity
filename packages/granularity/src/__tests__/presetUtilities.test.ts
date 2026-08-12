@@ -39,6 +39,12 @@ const UTILITIES_BEYOND_MINI = [
   // непропорциональный снимок растягивался вместо кадрирования.
   'object-cover',
   'object-contain',
+  // Табличные цифры: счётчики GrInput/GrTextarea, проценты GrProgressBar и
+  // GrProgressCircle, номера страниц GrPagination, значения GrStatistic,
+  // GrColorPicker, GrKbd, GrRating, GrTimeline, GrFileUpload. Приехали в
+  // extra-rules 0.8.0; до неё пакет писал ту же запись arbitrary-значением —
+  // `[font-variant-numeric:…]` — в семнадцати местах.
+  'tabular-nums',
 ] as const
 
 describe('утилиты сверх presetMini', () => {

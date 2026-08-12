@@ -5,7 +5,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { isComposingEvent } from '../../internal/keyboard'
-import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
+import { useComboboxNavigation } from '../../composables/useComboboxNavigation'
 import GrKbd from '../GrKbd/GrKbd.vue'
 import GrModal from '../GrModal/GrModal.vue'
 

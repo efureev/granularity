@@ -21,5 +21,5 @@ export const grRatingSafelist = [...new Set([
   ...splitClassTokens(ratingRootBaseClass),
   ...splitClassTokens(ratingDisabledClass),
   ...splitClassTokens('cursor-pointer'),
-  ...splitClassTokens('relative block shrink-0 [font-variant-numeric:tabular-nums]'),
+  ...splitClassTokens('relative block shrink-0 tabular-nums'),
 ])]

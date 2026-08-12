@@ -13,6 +13,12 @@ export type GrRadioValue = string | number | boolean
 export type GrRadioEntry = {
   value: () => GrRadioValue
   disabled: () => boolean
+  /**
+   * Корневой узел переключателя. Геттер, а не значение: регистрация идёт в
+   * `setup`, когда элемента ещё нет. Благодаря ему группа переносит фокус, не
+   * обходя DOM селекторами.
+   */
+  el: () => HTMLElement | null
 }
 
 export type GrRadioGroupContext = {
@@ -41,10 +47,12 @@ export type GrRadioGroupContext = {
    * выбрано ничего, остановкой становится первый доступный переключатель.
    */
   rovingValue: ComputedRef<GrRadioValue | undefined>
-  /** Переводит выбор на соседний доступный переключатель (стрелки). */
-  moveSelection: (from: GrRadioValue, direction: 1 | -1) => GrRadioValue | undefined
-  /** Переводит выбор на первый или последний доступный (`Home`/`End`). */
-  selectEdge: (edge: 'first' | 'last') => GrRadioValue | undefined
+  /**
+   * Стрелки, `Home`, `End`: переносят выбор и фокус на соседний доступный
+   * переключатель. Вернул `true` — клавиша обработана (с `preventDefault`).
+   * Кольцо ведёт группа, а не переключатель: только она знает состав.
+   */
+  handleNavigationKeys: (event: KeyboardEvent) => boolean
 }
 
 export const GR_RADIO_GROUP_CONTEXT: InjectionKey<GrRadioGroupContext> = Symbol('GR_RADIO_GROUP_CONTEXT')

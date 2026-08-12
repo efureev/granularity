@@ -481,3 +481,83 @@ describe('GrTabs — закрываемые вкладки', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Кольцо roving-фокуса собрано на общем `useRovingFocus`. У ряда вкладок две
+ * позиции — выбранная и сфокусированная, — и в `manual` они расходятся: это
+ * ровно разница между «производной» остановкой примитива и явно наведённой.
+ */
+describe('GrTabs — остановка Tab', () => {
+  const three = [
+    { value: 'a', label: 'A' },
+    { value: 'b', label: 'B' },
+    { value: 'c', label: 'C' },
+  ]
+
+  function tabindexes(wrapper: ReturnType<typeof mount>) {
+    return wrapper.findAll('[role="tab"]').map(tab => tab.attributes('tabindex'))
+  }
+
+  it('остановка стоит на выбранной вкладке', () => {
+    const wrapper = mount(GrTabs, { props: { modelValue: 'b', tabs: three } })
+
+    expect(tabindexes(wrapper)).toEqual(['-1', '0', '-1'])
+  })
+
+  it('значение вне списка не оставляет ряд без остановки', () => {
+    // Асинхронный список или удалённая активная вкладка: остановка обязана
+    // достаться первой доступной, иначе tablist выпадает из обхода молча.
+    const wrapper = mount(GrTabs, { props: { modelValue: 'нет такой', tabs: three } })
+
+    expect(tabindexes(wrapper)).toEqual(['0', '-1', '-1'])
+  })
+
+  it('весь ряд выключен — остановка всё равно есть', () => {
+    const wrapper = mount(GrTabs, {
+      props: {
+        modelValue: 'нет такой',
+        tabs: three.map(tab => ({ ...tab, disabled: true })),
+      },
+    })
+
+    expect(tabindexes(wrapper)).toEqual(['0', '-1', '-1'])
+  })
+
+  it('выбранная выключенная вкладка остановку сохраняет', () => {
+    // На кнопке `aria-disabled`, а не нативный `disabled`: она фокусируется, и
+    // отдавать остановку соседу незачем.
+    const wrapper = mount(GrTabs, {
+      props: { modelValue: 'b', tabs: [three[0], { ...three[1], disabled: true }, three[2]] },
+    })
+
+    expect(tabindexes(wrapper)).toEqual(['-1', '0', '-1'])
+  })
+
+  it('manual: Enter подтверждает остановку Tab, даже если стрелку не нажимали', async () => {
+    // Изменение поведения при переезде на примитив. Раньше выбор требовал,
+    // чтобы фокус до этого сдвинули стрелкой: `Enter` сразу после захода в ряд
+    // по `Tab` не делал ничего. Здесь `modelValue` не совпадает ни с одной
+    // вкладкой, остановка стоит на первой — и `Enter` обязан её выбрать.
+    const wrapper = mount(GrTabs, {
+      props: { modelValue: 'нет такой', tabs: three, activationMode: 'manual' },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'Enter' })
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['a'])
+    wrapper.unmount()
+  })
+
+  it('manual: Enter на уже выбранной вкладке молчит', async () => {
+    const wrapper = mount(GrTabs, {
+      props: { modelValue: 'a', tabs: three, activationMode: 'manual' },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'Enter' })
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})

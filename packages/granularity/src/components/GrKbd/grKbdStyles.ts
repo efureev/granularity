@@ -15,7 +15,7 @@ export const GR_KBD_VARIANTS = ['merged', 'split', 'sequence'] as const
  */
 export type GrKbdVariant = typeof GR_KBD_VARIANTS[number]
 
-export const keyBaseClass = 'inline-flex items-center justify-center rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] font-medium leading-none text-[var(--gr-muted-fg)] shadow-[var(--gr-shadow-1)] [font-variant-numeric:tabular-nums]'
+export const keyBaseClass = 'inline-flex items-center justify-center rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] font-medium leading-none text-[var(--gr-muted-fg)] shadow-[var(--gr-shadow-1)] tabular-nums'
 
 export const keySizes: Record<GrComponentSize, string> = {
   xs: 'min-w-[1.25rem] h-5 px-1 text-[length:var(--gr-control-text-3xs)]',

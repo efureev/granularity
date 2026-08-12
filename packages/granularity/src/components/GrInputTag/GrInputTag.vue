@@ -10,6 +10,7 @@ import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/cont
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
+import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -224,13 +225,27 @@ const { announce } = useAnnouncer()
 /**
  * Roving tabindex по крестикам: двадцать тегов давали двадцать одну остановку
  * `Tab`. В таб-порядке ровно один крестик, между ними ходят стрелками.
+ *
+ * Адресация индексом, а не значением тега: теги допускают повторы, и по
+ * значению два одинаковых чипа было бы не различить.
  */
-const focusedTagIndex = ref(0)
-const rovingIndex = computed(() => {
-  const last = props.modelValue.length - 1
-  if (last < 0)
-    return -1
-  return Math.min(Math.max(focusedTagIndex.value, 0), last)
+const tagIndexes = computed(() => props.modelValue.map((_, index) => index))
+
+const roving = useRovingFocus<number>({
+  items: () => tagIndexes.value,
+  elementFor: index => removeEls.value[index],
+  orientation: () => 'horizontal',
+  // Ряд чипов — не кольцо: у него есть край, и за краем стоит поле ввода.
+  wrap: () => false,
+  onOverflow: (edge) => {
+    // За последним чипом — поле ввода: продолжение того же ряда. Слева от
+    // первого — начало строки, фокус остаётся на месте.
+    if (edge === 'end') focus()
+    return true
+  },
+  // Удаление чипа перерисовывает ряд: без ожидания фокус уехал бы на узел,
+  // которого уже нет.
+  beforeFocus: () => nextTick(),
 })
 
 async function focusTag(index: number): Promise<void> {
@@ -240,10 +255,7 @@ async function focusTag(index: number): Promise<void> {
     return
   }
 
-  const target = Math.min(Math.max(index, 0), last)
-  focusedTagIndex.value = target
-  await nextTick()
-  removeEls.value[target]?.focus()
+  await roving.focusKey(Math.min(Math.max(index, 0), last))
 }
 
 function escapeRegexChar(ch: string): string {
@@ -441,31 +453,7 @@ function onKeydown(e: KeyboardEvent): void {
 }
 
 function onTagKeydown(e: KeyboardEvent, index: number): void {
-  if (e.key === 'ArrowLeft') {
-    e.preventDefault()
-    void focusTag(index - 1)
-    return
-  }
-
-  if (e.key === 'ArrowRight') {
-    e.preventDefault()
-    // За последним чипом — поле ввода: продолжение того же ряда.
-    if (index === props.modelValue.length - 1)
-      focus()
-    else
-      void focusTag(index + 1)
-    return
-  }
-
-  if (e.key === 'Home') {
-    e.preventDefault()
-    void focusTag(0)
-    return
-  }
-
-  if (e.key === 'End') {
-    e.preventDefault()
-    void focusTag(props.modelValue.length - 1)
+  if (roving.handleNavigationKeys(e)) {
     return
   }
 
@@ -582,12 +570,12 @@ defineExpose({ focus, blur, clear: clearAll })
             type="button"
             :class="removeButtonClass"
             :aria-label="removeTagLabelFor(tag)"
-            :tabindex="rovingIndex === i ? 0 : -1"
+            :tabindex="roving.tabindexFor(i)"
             data-gr-input-tag-remove
             data-testid="gr-input-tag-remove"
             :data-index="i"
             @mousedown.prevent.stop
-            @focus="focusedTagIndex = i"
+            @focus="roving.setActive(i)"
             @keydown="onTagKeydown($event, i)"
             @click.stop="removeAt(i)"
           >

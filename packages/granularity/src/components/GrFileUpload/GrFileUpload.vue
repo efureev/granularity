@@ -902,7 +902,7 @@ defineExpose({
               />
               <span
                 data-gr-file-upload-progress-text
-                class="text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums] min-w-[3ch] text-right"
+                class="text-[var(--gr-muted-fg)] tabular-nums min-w-[3ch] text-right"
                 :class="progressTextClass"
               >{{ progressText }}</span>
             </div>

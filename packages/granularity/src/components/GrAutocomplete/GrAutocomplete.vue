@@ -15,7 +15,7 @@ import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
-import { useComboboxNavigation } from '../../composables/internal/useComboboxNavigation'
+import { useComboboxNavigation } from '../../composables/useComboboxNavigation'
 import { filterOptions, resolveSelectedOptions } from '../shared/optionFilter'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 

@@ -69,7 +69,7 @@ export const svgClass = 'block h-full w-full'
  */
 export const centerClass = 'pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5 text-center'
 
-export const valueClass = 'font-600 text-[var(--gr-fg)] [font-variant-numeric:tabular-nums]'
+export const valueClass = 'font-600 text-[var(--gr-fg)] tabular-nums'
 
 export function grProgressCircleArcColor(tone: GrProgressCircleTone): string {
   return arcColorByTone[tone]

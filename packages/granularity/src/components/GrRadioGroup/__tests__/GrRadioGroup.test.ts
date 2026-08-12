@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('~icons/lucide/loader-circle', () => {
@@ -146,5 +146,89 @@ describe('GrRadioGroup — состояния', () => {
 
     expect(wrapper.get('[data-gr-radio-group] > div').classes()).toContain('flex')
     expect(wrapper.findAll('[data-gr-radio]')[1].attributes('aria-disabled')).toBe('true')
+  })
+})
+
+/**
+ * Кольцо roving-фокуса собрано на общем `useRovingFocus` и живёт в группе:
+ * состав переключателей знает только она. Инвариант паттерна `radiogroup` —
+ * ровно одна остановка `Tab` на группу; ноль означает, что до переключателей
+ * не добраться с клавиатуры вовсе, и увидеть это можно только счётом.
+ */
+describe('GrRadioGroup — остановка Tab и клавиатура', () => {
+  const options = [
+    { value: 'a', label: 'A' },
+    { value: 'b', label: 'B', disabled: true },
+    { value: 'c', label: 'C' },
+  ]
+
+  function stops(wrapper: ReturnType<typeof mount>) {
+    return wrapper.findAll('[role="radio"]')
+      .map(radio => radio.attributes('tabindex'))
+  }
+
+  it('остановка стоит на выбранном переключателе', async () => {
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'c', options } })
+    await nextTick()
+
+    expect(stops(wrapper)).toEqual(['-1', '-1', '0'])
+  })
+
+  it('выбранный выключенный переключатель не забирает группу из таб-порядка', async () => {
+    // На выключенном `GrRadio` ставит `tabindex="-1"` сам, поэтому остановка,
+    // назначенная ему, отрисовалась бы как её отсутствие: ни один элемент не
+    // получил бы `0`, и группа выпала бы из обхода целиком.
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'b', options } })
+    await nextTick()
+    await nextTick()
+
+    expect(stops(wrapper)).toEqual(['0', '-1', '-1'])
+  })
+
+  it('стрелка переносит и выбор, и остановку, перешагивая выключенный', async () => {
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'a', options } })
+    await nextTick()
+
+    await wrapper.findAll('[role="radio"]')[0].trigger('keydown', { key: 'ArrowRight' })
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['c'])
+  })
+
+  it('кольцо замкнуто: с последнего вперёд — на первый', async () => {
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'c', options } })
+    await nextTick()
+
+    await wrapper.findAll('[role="radio"]')[2].trigger('keydown', { key: 'ArrowDown' })
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['a'])
+  })
+
+  it('обе оси стрелок работают — требование паттерна radiogroup', async () => {
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'a', options } })
+    await nextTick()
+
+    await wrapper.findAll('[role="radio"]')[0].trigger('keydown', { key: 'ArrowUp' })
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['c'])
+  })
+
+  it('Home и End ведут на края доступного набора', async () => {
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'a', options } })
+    await nextTick()
+
+    await wrapper.findAll('[role="radio"]')[0].trigger('keydown', { key: 'End' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['c'])
+
+    await wrapper.findAll('[role="radio"]')[0].trigger('keydown', { key: 'Home' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['a'])
+  })
+
+  it('readonly не даёт стрелке поменять выбор', async () => {
+    const wrapper = mount(GrRadioGroup, { props: { modelValue: 'a', options, readonly: true } })
+    await nextTick()
+
+    await wrapper.findAll('[role="radio"]')[0].trigger('keydown', { key: 'ArrowRight' })
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
   })
 })

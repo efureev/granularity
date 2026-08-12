@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, provide, ref } from 'vue'
+import { computed, nextTick, provide, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import type { GrButtonSize } from '../GrButton'
@@ -112,14 +113,6 @@ const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
   leave: event => emit('blur', event),
 })
 
-function focus(): void {
-  rootEl.value?.querySelector<HTMLElement>('[role="radio"][tabindex="0"]')?.focus()
-}
-
-function blur(): void {
-  rootEl.value?.querySelector<HTMLElement>('[role="radio"][tabindex="0"]')?.blur()
-}
-
 defineExpose({ focus, blur })
 
 const entries = ref<GrRadioEntry[]>([])
@@ -132,34 +125,47 @@ function register(entry: GrRadioEntry): () => void {
   }
 }
 
-const enabledValues = computed(() =>
-  entries.value.filter(entry => !entry.disabled()).map(entry => entry.value()),
-)
-
-const rovingValue = computed(() => {
-  if (enabledValues.value.includes(props.modelValue)) return props.modelValue
-  return enabledValues.value[0]
-})
-
-function moveSelection(from: GrRadioValue, direction: 1 | -1): GrRadioValue | undefined {
-  const values = enabledValues.value
-  if (values.length === 0) return undefined
-
-  const current = values.indexOf(from)
-  // Стрелки зациклены — это требование паттерна radiogroup.
-  const next = values[(current + direction + values.length) % values.length]
-
-  if (next !== undefined) setValue(next)
-  return next
+function entryOf(value: GrRadioValue): GrRadioEntry | undefined {
+  return entries.value.find(entry => entry.value() === value)
 }
 
-/** `Home`/`End` — на края набора; как в `GrSegmented`, где паттерн реализован целиком. */
-function selectEdge(edge: 'first' | 'last'): GrRadioValue | undefined {
-  const values = enabledValues.value
-  const next = edge === 'first' ? values[0] : values.at(-1)
+/**
+ * Кольцо roving-фокуса. Живёт в группе, а не в переключателе: состав знает
+ * только она. Обе оси работают всегда — требование паттерна `radiogroup`,
+ * стрелки зациклены, выключенные перешагиваются.
+ */
+const roving = useRovingFocus<GrRadioValue>({
+  items: () => entries.value.map(entry => entry.value()),
+  elementFor: value => entryOf(value)?.el() ?? null,
+  isDisabled: value => entryOf(value)?.disabled() ?? true,
+  orientation: () => 'both',
+  skipDisabled: () => true,
+  // Выбранное значение держит остановку `Tab` — но только пока переключатель
+  // доступен: на выключенном `GrRadio` ставит `tabindex="-1"` сам, и остановка
+  // на нём означала бы, что `Tab` не приводит никуда.
+  initialKey: () => {
+    const entry = entryOf(props.modelValue)
+    return entry && !entry.disabled() ? props.modelValue : undefined
+  },
+  // В `radiogroup` стрелка переносит выбор, а не только фокус.
+  onMove: value => setValue(value),
+  // Выбор меняет разметку: фокус ставим по перерисовке, иначе следующая
+  // стрелка отсчитывалась бы от прежнего элемента.
+  beforeFocus: () => nextTick(),
+})
 
-  if (next !== undefined) setValue(next)
-  return next
+/** Императивный фокус ведёт на текущую остановку `Tab`, а не на первый элемент. */
+function rovingElement(): HTMLElement | null {
+  const value = roving.rovingKey.value
+  return value === undefined ? null : entryOf(value)?.el() ?? null
+}
+
+function focus(): void {
+  rovingElement()?.focus()
+}
+
+function blur(): void {
+  rovingElement()?.blur()
 }
 
 provide(GR_RADIO_GROUP_CONTEXT, {
@@ -171,9 +177,8 @@ provide(GR_RADIO_GROUP_CONTEXT, {
   size: resolvedSize,
   setValue,
   register,
-  rovingValue,
-  moveSelection,
-  selectEdge,
+  rovingValue: roving.rovingKey,
+  handleNavigationKeys: roving.handleNavigationKeys,
 })
 </script>
 

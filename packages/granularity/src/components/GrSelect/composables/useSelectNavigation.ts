@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 import { computed, nextTick, onBeforeUnmount } from 'vue'
 
-import { useComboboxNavigation } from '../../../composables/internal/useComboboxNavigation'
+import { useComboboxNavigation } from '../../../composables/useComboboxNavigation'
 import { isComposingEvent } from '../../../internal/keyboard'
 import type { GrSelectOption, GrSelectValue } from '../grSelectStyles'
 import type { GrSelectPanelItem } from './useSelectPanelItems'

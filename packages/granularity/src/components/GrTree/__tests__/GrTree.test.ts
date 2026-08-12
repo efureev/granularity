@@ -890,3 +890,81 @@ describe('GrTree — интерактив внутри узлов', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Кольцо roving-фокуса собрано на общем `useRovingFocus`. Раньше инвариант
+ * «ровно один `treeitem` с `tabindex=0`» держала ручная нормализация с
+ * `watch(..., { flush: 'sync' })`; теперь он следует из того, что роверный узел
+ * вычисляется, а не хранится.
+ */
+describe('GrTree — остановка Tab', () => {
+  function mountTree(props: Record<string, unknown> = {}) {
+    return mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        ...props,
+      },
+      attachTo: document.body,
+    })
+  }
+
+  function stops(wrapper: ReturnType<typeof mountTree>) {
+    return wrapper.findAll('[role="treeitem"]')
+      .filter(item => item.attributes('tabindex') === '0')
+      .map(item => item.text())
+  }
+
+  it('свёрнутый родитель не забирает у дерева остановку Tab', async () => {
+    // Узел, державший остановку, исчезает из видимых строк — остановка обязана
+    // переехать на видимый. Это и делала ручная нормализация.
+    const wrapper = mountTree()
+    const tree = wrapper.get('[role="tree"]')
+
+    // Клавиатура делегирована корню: позиция берётся из кольца, а не из цели
+    // события. Стартовая остановка — корневой узел.
+    await tree.trigger('keydown', { key: 'ArrowDown' })
+    await tree.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    expect(stops(wrapper)).toEqual(['Child B'])
+
+    // Сворачиваем родителя мышью — остановка при этом остаётся на ребёнке,
+    // который вот-вот исчезнет из разметки. Клавиатурой так не получится:
+    // `ArrowLeft` с листа сперва уводит к родителю.
+    await wrapper.get('[data-gr-tree-toggle]').trigger('click')
+    await nextTick()
+
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(1)
+    expect(stops(wrapper)).toEqual(['Parent'])
+
+    wrapper.unmount()
+  })
+
+  it('стрелка вниз на последней строке гасится, но никуда не ведёт', async () => {
+    // Без гашения страница под деревом прокрутилась бы: у дерева нет
+    // зацикливания, но клавиша всё равно наша.
+    const wrapper = mountTree()
+    const tree = wrapper.get('[role="tree"]')
+
+    await tree.trigger('keydown', { key: 'End' })
+    await nextTick()
+    expect(stops(wrapper)).toEqual(['Child B'])
+
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
+    wrapper.get('[role="tree"]').element.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+    expect(stops(wrapper)).toEqual(['Child B'])
+
+    wrapper.unmount()
+  })
+
+  it('пустое дерево остановок не создаёт', () => {
+    const wrapper = mountTree({ data: [] })
+
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(0)
+
+    wrapper.unmount()
+  })
+})

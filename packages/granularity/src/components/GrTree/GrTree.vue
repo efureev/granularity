@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, onBeforeUnmount, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onUnmounted, ref } from 'vue'
 import type {
   GrTreeAllowDropType,
   GrTreeInstance,
@@ -13,6 +13,7 @@ import type { GrTreeCheckState } from './grTreeChecking'
 import { createGrTreeStore } from './grTreeStore'
 import { treeSizeVars } from './grTreeStyles'
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type {
@@ -109,7 +110,6 @@ const expandLabel = computed(() => treeProps.expandLabel ?? t('gr.tree.expand', 
 const collapseLabel = computed(() => treeProps.collapseLabel ?? t('gr.tree.collapse', 'Collapse'))
 const currentKey = treeStore.currentKey
 const hoveredKey = interactionContext.hoveredKey
-const focusedKey = interactionContext.focusedKey
 const dropTarget = interactionContext.dropTarget
 
 // Корневой элемент дерева — область для делегированной клавиатуры (WAI-ARIA tree).
@@ -156,9 +156,31 @@ const visibleRows = computed<GrTreeVisibleRow<T>[]>(() => {
   return rows
 })
 
+/**
+ * Кольцо roving-фокуса: ровно один `treeitem` на всё дерево держит `tabindex=0`.
+ *
+ * Ориентация вертикальная намеренно: влево-вправо в дереве заняты раскрытием
+ * ветки и переходом к родителю, и примитив их не трогает — это доменная логика,
+ * она осталась в `onTreeKeydown`.
+ */
+const roving = useRovingFocus<GrTreeNode<T>['key']>({
+  items: () => visibleRows.value.map(row => row.node.key),
+  elementFor: key => interactionContext.nodeEls.get(key),
+  orientation: () => 'vertical',
+  // У дерева есть верх и низ: с последней строки вниз идти некуда.
+  wrap: () => false,
+  // Но клавишу на краю всё равно гасим: иначе `ArrowDown` на последнем узле
+  // прокрутит страницу под деревом.
+  onOverflow: () => true,
+  // Пока фокус не трогали, остановку держит текущий (выбранный) узел, а если
+  // его не видно — первая видимая строка.
+  initialKey: () => currentKey.value ?? undefined,
+  beforeFocus: key => scrollRowIntoView(key),
+})
+
 function onRowClick(node: GrTreeNode<T>) {
   treeStore.setCurrentKey(node.key)
-  focusedKey.value = node.key
+  roving.setActive(node.key)
   interactionContext.emitNodeClick(node.data, node)
 }
 
@@ -177,10 +199,8 @@ function onRowContextMenu(evt: MouseEvent, node: GrTreeNode<T>) {
 
 // ————— Клавиатурная навигация по WAI-ARIA tree pattern (только корневой инстанс).
 
-// Один узел на всё дерево держит tabindex=0 (roving). `focusedKey` — общий для
-// всех вложенных инстансов, поэтому проверка одинаковая на любом уровне.
 function isRovingItem(key: GrTreeNode<T>['key']): boolean {
-  return focusedKey.value === key
+  return roving.rovingKey.value === key
 }
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTree' })
@@ -283,18 +303,22 @@ function releaseNodeEl(key: GrTreeKey): void {
     treeRootEl.value?.focus({ preventScroll: true })
 }
 
-function focusRow(key: GrTreeNode<T>['key']): void {
-  focusedKey.value = key
-
-  // При виртуализации узла вне окна в DOM нет: `nodeEls.get` вернул бы
-  // `undefined`, а фокус уехал бы на `body` вместе с размонтированной строкой.
-  // Поэтому сперва прокрутка, и только следующим тиком — фокус.
+/**
+ * При виртуализации узла вне окна в DOM нет: `nodeEls.get` вернул бы
+ * `undefined`, а фокус уехал бы на `body` вместе с размонтированной строкой.
+ * Поэтому сперва прокрутка, и только следующим тиком — фокус.
+ */
+function scrollRowIntoView(key: GrTreeNode<T>['key']): Promise<void> {
   if (treeProps.virtual) {
     const index = visibleRows.value.findIndex(row => row.node.key === key)
     if (index >= 0) virtualizer.scrollToIndex(index)
   }
 
-  void nextTick(() => interactionContext.nodeEls.get(key)?.focus())
+  return nextTick()
+}
+
+function focusRow(key: GrTreeNode<T>['key']): void {
+  void roving.focusKey(key)
 }
 
 /**
@@ -359,7 +383,7 @@ function onTreeKeydown(event: KeyboardEvent): void {
   if (rows.length === 0)
     return
 
-  const idx = Math.max(0, rows.findIndex(r => r.node.key === focusedKey.value))
+  const idx = Math.max(0, rows.findIndex(r => r.node.key === roving.rovingKey.value))
   const cur = rows[idx]
 
   if (event.key === '*') {
@@ -375,17 +399,12 @@ function onTreeKeydown(event: KeyboardEvent): void {
     return
   }
 
+  // Вертикаль, `Home` и `End` ведёт примитив. Влево-вправо он не трогает: в
+  // дереве это раскрытие ветки и переход к родителю, а не движение по списку.
+  if (roving.handleNavigationKeys(event))
+    return
+
   switch (event.key) {
-    case 'ArrowDown':
-      event.preventDefault()
-      if (idx < rows.length - 1)
-        focusRow(rows[idx + 1].node.key)
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      if (idx > 0)
-        focusRow(rows[idx - 1].node.key)
-      break
     case 'ArrowRight':
       event.preventDefault()
       if (!cur.isLeaf) {
@@ -402,14 +421,6 @@ function onTreeKeydown(event: KeyboardEvent): void {
       else if (cur.node.parent && rows.some(r => r.node.key === cur.node.parent!.key))
         focusRow(cur.node.parent.key)
       break
-    case 'Home':
-      event.preventDefault()
-      focusRow(rows[0].node.key)
-      break
-    case 'End':
-      event.preventDefault()
-      focusRow(rows[rows.length - 1].node.key)
-      break
     case 'Enter':
       event.preventDefault()
       onRowClick(cur.node)
@@ -425,28 +436,6 @@ function onTreeKeydown(event: KeyboardEvent): void {
       break
   }
 }
-
-// Нормализация roving-фокуса: держим `focusedKey` на видимом узле, чтобы ровно
-// один treeitem всегда имел tabindex=0 (даже после сворачивания родителя). Только корень.
-function normalizeFocusedKey(): void {
-  const rows = visibleRows.value
-  if (rows.length === 0) {
-    focusedKey.value = undefined
-    return
-  }
-
-  const stillVisible = focusedKey.value !== undefined && rows.some(r => r.node.key === focusedKey.value)
-  if (stillVisible)
-    return
-
-  focusedKey.value = (currentKey.value != null && rows.some(r => r.node.key === currentKey.value))
-    ? currentKey.value
-    : rows[0].node.key
-}
-
-// Синхронно до первого рендера — чтобы roving tabindex был проставлен сразу.
-normalizeFocusedKey()
-watch(visibleRows, normalizeFocusedKey, { flush: 'sync' })
 
 function onRowMouseEnter(node: GrTreeNode<T>) {
   hoveredKey.value = node.key
@@ -678,7 +667,7 @@ function focus(key?: GrTreeKey): boolean {
 
   const target = key != null && rows.some(row => row.node.key === key)
     ? key
-    : focusedKey.value ?? rows[0].node.key
+    : roving.rovingKey.value ?? rows[0].node.key
 
   focusRow(target)
   return true

@@ -4,6 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 
 import type { ComponentPublicInstance } from 'vue'
@@ -121,14 +122,6 @@ const { onFocusIn, onFocusOut } = useFocusWithin(rootRef, {
   leave: event => emit('blur', event),
 })
 
-function focus(): void {
-  rootRef.value?.querySelector<HTMLElement>('[data-gr-segmented-item][tabindex="0"]')?.focus()
-}
-
-function blur(): void {
-  rootRef.value?.querySelector<HTMLElement>('[data-gr-segmented-item][tabindex="0"]')?.blur()
-}
-
 defineExpose({ focus, blur })
 const itemRefs = ref(new Map<string, HTMLElement>())
 const indicatorGeometry = ref<IndicatorGeometry | null>(null)
@@ -141,7 +134,6 @@ let scheduled = false
 
 const selectedIndex = computed(() => props.options.findIndex(option => option.value === props.modelValue))
 const selectedOption = computed(() => props.options[selectedIndex.value] ?? null)
-const enabledOptions = computed(() => props.options.filter(option => !resolveOptionDisabled(option)))
 const indicatorDuration = computed(() => Math.max(0, Math.round(props.indicatorDuration)))
 const isVertical = computed(() => props.orientation === 'vertical')
 const rootClassName = computed(() => grSegmentedRootClass({
@@ -226,22 +218,6 @@ function isOptionSelected(option: GrSegmentedOption): boolean {
 
 function isIconOnlyOption(option: GrSegmentedOption): boolean {
   return Boolean(option.icon) && !option.label
-}
-
-function isFocusableOption(option: GrSegmentedOption, index: number): boolean {
-  if (resolveOptionDisabled(option)) {
-    return false
-  }
-
-  if (isOptionSelected(option)) {
-    return true
-  }
-
-  if (selectedIndex.value !== -1) {
-    return false
-  }
-
-  return enabledOptions.value[0]?.value === props.options[index]?.value
 }
 
 function setItemRef(value: GrSegmentedValue, element: Element | ComponentPublicInstance | null): void {
@@ -369,30 +345,59 @@ function emitValue(option: GrSegmentedOption): void {
   emit('change', option.value, option)
 }
 
-function getNextEnabledIndex(startIndex: number, direction: 1 | -1): number {
-  if (props.options.length === 0) {
-    return -1
-  }
-
-  let cursor = startIndex
-  for (let step = 0; step < props.options.length; step += 1) {
-    cursor = (cursor + direction + props.options.length) % props.options.length
-    const option = props.options[cursor]
-    if (option && !isOptionBlocked(option)) {
-      return cursor
-    }
-  }
-
-  return -1
+function optionOf(value: GrSegmentedValue): GrSegmentedOption | undefined {
+  return props.options.find(option => option.value === value)
 }
 
-function focusIndex(index: number): void {
-  const option = props.options[index]
-  if (!option) {
-    return
-  }
+/**
+ * Кольцо roving-фокуса. Обе оси работают всегда: `orientation` у сегмента
+ * описывает раскладку и уходит в `aria-orientation`, а не сужает клавиатуру —
+ * вертикальный набор листается и стрелками влево/вправо.
+ */
+const roving = useRovingFocus<GrSegmentedValue>({
+  items: () => props.options.map(option => option.value),
+  elementFor: value => itemRefs.value.get(getOptionKey(value)),
+  isDisabled: (value) => {
+    const option = optionOf(value)
+    return option ? isOptionBlocked(option) : true
+  },
+  orientation: () => 'both',
+  skipDisabled: () => true,
+  /**
+   * Выбранный сегмент держит остановку `Tab` — кроме выключенного: на нём
+   * стоит нативный `disabled`, и фокус на него не встанет вовсе. Загружающийся
+   * остановку сохраняет: он не «недоступен», а занят.
+   */
+  initialKey: () => {
+    const selected = selectedOption.value
+    return selected && !resolveOptionDisabled(selected) ? selected.value : undefined
+  },
+  // Стрелка в `radiogroup` переносит и выбор, а не только фокус.
+  onMove: (value) => {
+    const option = optionOf(value)
+    if (option) emitValue(option)
+  },
+})
 
-  itemRefs.value.get(getOptionKey(option.value))?.focus()
+function onItemClick(option: GrSegmentedOption): void {
+  emitValue(option)
+  // Клик тоже переносит остановку `Tab`: иначе она осталась бы там, куда её
+  // увела последняя стрелка.
+  if (!isOptionBlocked(option)) roving.setActive(option.value)
+}
+
+/** Императивный фокус ведёт на текущую остановку `Tab`, а не на первый сегмент. */
+function rovingElement(): HTMLElement | undefined {
+  const key = roving.rovingKey.value
+  return key === undefined ? undefined : itemRefs.value.get(getOptionKey(key))
+}
+
+function focus(): void {
+  rovingElement()?.focus()
+}
+
+function blur(): void {
+  rovingElement()?.blur()
 }
 
 function onKeydown(event: KeyboardEvent, index: number): void {
@@ -400,57 +405,7 @@ function onKeydown(event: KeyboardEvent, index: number): void {
     return
   }
 
-  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-    event.preventDefault()
-    const nextIndex = getNextEnabledIndex(index, 1)
-    if (nextIndex === -1) {
-      return
-    }
-
-    const option = props.options[nextIndex]
-    if (option) {
-      emitValue(option)
-      focusIndex(nextIndex)
-    }
-    return
-  }
-
-  if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-    event.preventDefault()
-    const nextIndex = getNextEnabledIndex(index, -1)
-    if (nextIndex === -1) {
-      return
-    }
-
-    const option = props.options[nextIndex]
-    if (option) {
-      emitValue(option)
-      focusIndex(nextIndex)
-    }
-    return
-  }
-
-  if (event.key === 'Home') {
-    event.preventDefault()
-    const firstOption = enabledOptions.value[0]
-    if (!firstOption) {
-      return
-    }
-
-    emitValue(firstOption)
-    focusIndex(props.options.findIndex(option => option.value === firstOption.value))
-    return
-  }
-
-  if (event.key === 'End') {
-    event.preventDefault()
-    const lastOption = enabledOptions.value.at(-1)
-    if (!lastOption) {
-      return
-    }
-
-    emitValue(lastOption)
-    focusIndex(props.options.findIndex(option => option.value === lastOption.value))
+  if (roving.handleNavigationKeys(event)) {
     return
   }
 
@@ -533,14 +488,14 @@ onBeforeUnmount(() => {
       :aria-disabled="resolveOptionDisabled(option) ? 'true' : undefined"
       :aria-busy="isOptionBusy(option) ? 'true' : undefined"
       :disabled="resolveOptionDisabled(option)"
-      :tabindex="isFocusableOption(option, index) ? 0 : -1"
+      :tabindex="roving.tabindexFor(option.value)"
       :class="grSegmentedItemClass({
         variant: resolvedVariant,
         selected: isOptionSelected(option),
         disabled: resolveOptionDisabled(option),
         iconOnly: isIconOnlyOption(option),
       })"
-      @click="emitValue(option)"
+      @click="onItemClick(option)"
       @keydown="onKeydown($event, index)"
     >
       <slot

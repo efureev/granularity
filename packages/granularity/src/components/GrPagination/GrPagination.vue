@@ -232,7 +232,7 @@ const totalText = computed(() =>
     <div
       v-if="showTotal"
       data-gr-pagination-total
-      class="text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
+      class="text-[var(--gr-muted-fg)] tabular-nums"
       :class="labelClass"
     >
       <slot name="total" :from="rangeFrom" :to="rangeTo" :total="total">
@@ -262,7 +262,7 @@ const totalText = computed(() =>
     <div
       v-if="compact"
       data-gr-pagination-compact
-      class="px-2 text-[var(--gr-fg)] [font-variant-numeric:tabular-nums]"
+      class="px-2 text-[var(--gr-fg)] tabular-nums"
       :class="labelClass"
       role="status"
     >
@@ -329,7 +329,7 @@ const totalText = computed(() =>
         data-gr-pagination-jumper
         :disabled="disabled"
         :aria-label="resolvedJumperLabel"
-        class="rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] [font-variant-numeric:tabular-nums] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
+        class="rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] tabular-nums transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
         :class="jumperClass"
         @keydown.enter="submitJumper"
         @blur="submitJumper"

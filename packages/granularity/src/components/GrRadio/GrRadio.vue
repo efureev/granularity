@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onUnmounted, ref, useId, useSlots } from 'vue'
+import { computed, inject, onUnmounted, ref, useId, useSlots } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -185,39 +185,17 @@ const rovingTabindex = computed(() => {
 
 const rootEl = ref<HTMLElement | null>(null)
 
-/**
- * Фокус переезжает вслед за выбором — иначе следующая стрелка отсчитывалась бы
- * от прежнего элемента.
- */
-function focusValue(next: GrRadioValue | undefined): void {
-  if (next === undefined) return
-
-  void nextTick(() => {
-    const group = rootEl.value?.closest('[data-gr-radio-group]')
-    const target = [...(group?.querySelectorAll<HTMLElement>('[data-gr-radio]') ?? [])]
-      .find(el => el.dataset.value === String(next))
-
-    target?.focus()
-  })
-}
-
-function onArrow(direction: 1 | -1, event: KeyboardEvent): void {
+/** Кольцо ведёт группа: только она знает состав и порядок. */
+function onKeydown(event: KeyboardEvent): void {
   if (!group || resolvedDisabled.value) return
 
-  event.preventDefault()
-  focusValue(group.moveSelection(props.value, direction))
-}
-
-function onEdge(edge: 'first' | 'last', event: KeyboardEvent): void {
-  if (!group || resolvedDisabled.value) return
-
-  event.preventDefault()
-  focusValue(group.selectEdge(edge))
+  group.handleNavigationKeys(event)
 }
 
 const unregister = group?.register({
   value: () => props.value,
   disabled: () => resolvedDisabled.value,
+  el: () => rootEl.value,
 })
 
 onUnmounted(() => unregister?.())
@@ -242,12 +220,7 @@ onUnmounted(() => unregister?.())
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"
-    @keydown.down="onArrow(1, $event)"
-    @keydown.right="onArrow(1, $event)"
-    @keydown.up="onArrow(-1, $event)"
-    @keydown.left="onArrow(-1, $event)"
-    @keydown.home="onEdge('first', $event)"
-    @keydown.end="onEdge('last', $event)"
+    @keydown="onKeydown"
   >
     <input
       v-if="submitsValue"
@@ -279,12 +252,7 @@ onUnmounted(() => unregister?.())
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"
-    @keydown.down="onArrow(1, $event)"
-    @keydown.right="onArrow(1, $event)"
-    @keydown.up="onArrow(-1, $event)"
-    @keydown.left="onArrow(-1, $event)"
-    @keydown.home="onEdge('first', $event)"
-    @keydown.end="onEdge('last', $event)"
+    @keydown="onKeydown"
   >
     <input
       v-if="submitsValue"

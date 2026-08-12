@@ -58,7 +58,7 @@ export const markerOutlinedToneClass: Record<GrTimelineTone, string> = {
 
 export const markerBaseClass = 'block shrink-0 rounded-[var(--gr-radius-full)]'
 
-export const timeClass = 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-normal)] text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
+export const timeClass = 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-normal)] text-[var(--gr-muted-fg)] tabular-nums'
 
 export const titleClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-normal)] font-600 text-[var(--gr-fg)]'
 

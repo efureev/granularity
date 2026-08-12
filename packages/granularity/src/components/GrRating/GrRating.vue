@@ -355,7 +355,7 @@ function onKeydown(event: KeyboardEvent): void {
     <span
       v-if="showText || $slots.text"
       data-gr-rating-text
-      class="text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]"
+      class="text-[var(--gr-muted-fg)] tabular-nums"
       :class="ratingTextSizeBySize[resolvedSize]"
     >
       <slot name="text" :value="displayValue">{{ text }}</slot>

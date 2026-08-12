@@ -584,6 +584,69 @@ jobs:
           name: granularity-datepicker-dist
           path: packages/granularity-datepicker/dist/
 
+  build-granularity-chrono:
+    needs:
+      - quality-granularity
+      - build-granularity
+      - build-unplugin-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Lint
+        working-directory: packages/granularity-chrono
+        run: yarn lint
+
+      - name: Typecheck
+        working-directory: packages/granularity-chrono
+        run: yarn typecheck
+
+      # Реестры сверяются с файловой системой до сборки: рассинхрон ломает не
+      # сборку, а tree-shaking, subpath-импорт и скан классов — молча.
+      - name: Registry drift
+        working-directory: packages/granularity-chrono
+        run: yarn generate:registry --check
+
+      - name: Test
+        working-directory: packages/granularity-chrono
+        run: yarn test:run
+
+      - name: Build package
+        run: yarn workspace @feugene/granularity-chrono build
+
+      - name: Granular doctor
+        working-directory: packages/granularity-chrono
+        run: yarn doctor
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/granularity-chrono
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist/
+
   # Публикация @feugene/granularity-datepicker в npm по тегу вида
   # `granularity-datepicker-v<semver>`. Отдельный тег позволяет релизить
   # companion-пакет независимо от ядра @feugene/granularity.

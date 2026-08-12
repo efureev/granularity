@@ -273,6 +273,43 @@ describe('GrInputTag — клавиатура по чипам', () => {
     wrapper.unmount()
   })
 
+  it('остановка Tab переезжает вслед за стрелками, оставаясь единственной', async () => {
+    const wrapper = mount(GrInputTag, { props, attachTo: document.body })
+    const tabindexes = () => wrapper.findAll('[data-gr-input-tag-remove]')
+      .map(btn => btn.attributes('tabindex'))
+
+    expect(tabindexes()).toEqual(['0', '-1', '-1'])
+
+    await wrapper.findAll('[data-gr-input-tag-remove]')[0].trigger('keydown', { key: 'End' })
+    await nextTick()
+    expect(tabindexes()).toEqual(['-1', '-1', '0'])
+
+    wrapper.unmount()
+  })
+
+  it('слева от первого чипа — край ряда, фокус остаётся на месте', async () => {
+    const wrapper = mount(GrInputTag, { props, attachTo: document.body })
+    const buttons = wrapper.findAll('[data-gr-input-tag-remove]')
+
+    ;(buttons[0].element as HTMLElement).focus()
+    await buttons[0].trigger('keydown', { key: 'ArrowLeft' })
+    await nextTick()
+
+    expect(document.activeElement).toBe(buttons[0].element)
+    wrapper.unmount()
+  })
+
+  it('Home возвращает на первый чип', async () => {
+    const wrapper = mount(GrInputTag, { props, attachTo: document.body })
+    const buttons = wrapper.findAll('[data-gr-input-tag-remove]')
+
+    await buttons[2].trigger('keydown', { key: 'Home' })
+    await nextTick()
+
+    expect(document.activeElement).toBe(buttons[0].element)
+    wrapper.unmount()
+  })
+
   it('стрелка влево из пустого поля уводит на последний чип', async () => {
     const wrapper = mount(GrInputTag, { props, attachTo: document.body })
 

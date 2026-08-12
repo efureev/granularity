@@ -405,6 +405,14 @@ describe('GrSegmented — загружающийся сегмент', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['calendar'])
   })
 
+  it('выбранный занятый сегмент остаётся остановкой Tab', () => {
+    // Занят — не недоступен: нативного `disabled` на нём нет, фокус встаёт.
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'board', options: busyOptions } })
+    const items = wrapper.findAll('[data-gr-segmented-item]')
+
+    expect(items.map(item => item.attributes('tabindex'))).toEqual(['-1', '0', '-1'])
+  })
+
   it('слот получает состояние загрузки', () => {
     const wrapper = mount(GrSegmented, {
       props: { modelValue: 'list', options: busyOptions },
@@ -518,5 +526,69 @@ describe('GrSegmented — радиус дорожки', () => {
     const style = vertical.get('[data-gr-segmented]').attributes('style')
     expect(style).toContain('--gr-segmented-radius: calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
     expect(style).not.toContain('--gr-segmented-radius: 9999px')
+  })
+})
+
+/**
+ * Кольцо roving-фокуса собрано на общем `useRovingFocus`. Инвариант паттерна —
+ * ровно одна остановка `Tab` на группу: ноль означает, что до сегментов не
+ * добраться с клавиатуры вовсе, и увидеть это можно только счётом.
+ */
+describe('GrSegmented — остановка Tab', () => {
+  const withDisabled = [
+    { value: 'list', label: 'List' },
+    { value: 'board', label: 'Board', disabled: true },
+    { value: 'calendar', label: 'Calendar' },
+  ]
+
+  function tabindexes(wrapper: ReturnType<typeof mount>) {
+    return wrapper.findAll('[data-gr-segmented-item]').map(item => item.attributes('tabindex'))
+  }
+
+  it('остановка стоит на выбранном сегменте', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'calendar', options: [...options] } })
+
+    expect(tabindexes(wrapper)).toEqual(['-1', '-1', '0'])
+  })
+
+  it('без выбора остановка — первый доступный сегмент', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'none', options: withDisabled } })
+
+    expect(tabindexes(wrapper)).toEqual(['0', '-1', '-1'])
+  })
+
+  it('выбранный выключенный сегмент не забирает группу из таб-порядка', () => {
+    // На выключенном стоит нативный `disabled` — остановка на нём означала бы,
+    // что `Tab` не приводит никуда. Раньше в этом случае остановки не было ни
+    // на одном сегменте, и группа выпадала из обхода целиком.
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'board', options: withDisabled } })
+
+    expect(tabindexes(wrapper)).toEqual(['0', '-1', '-1'])
+  })
+
+  it('пустой список остановок не создаёт', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'none', options: [] } })
+
+    expect(tabindexes(wrapper)).toEqual([])
+  })
+
+  it('клик переносит остановку туда же, куда и выбор', async () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
+
+    await wrapper.findAll('[data-gr-segmented-item]')[0].trigger('keydown', { key: 'ArrowRight' })
+    await wrapper.setProps({ modelValue: 'board' })
+    expect(tabindexes(wrapper)).toEqual(['-1', '0', '-1'])
+
+    await wrapper.findAll('[data-gr-segmented-item]')[2].trigger('click')
+    await wrapper.setProps({ modelValue: 'calendar' })
+    expect(tabindexes(wrapper)).toEqual(['-1', '-1', '0'])
+  })
+
+  it('исчезнувший из набора сегмент не оставляет группу без остановки', async () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'calendar', options: [...options] } })
+    expect(tabindexes(wrapper)).toEqual(['-1', '-1', '0'])
+
+    await wrapper.setProps({ options: options.slice(0, 2) })
+    expect(tabindexes(wrapper)).toEqual(['0', '-1'])
   })
 })

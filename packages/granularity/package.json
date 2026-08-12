@@ -348,6 +348,22 @@
       "types": "./dist/types/src/composables/useOverlayLayer.d.ts",
       "import": "./dist/composables/useOverlayLayer.js"
     },
+    "./composables/useRovingFocus": {
+      "types": "./dist/types/src/composables/useRovingFocus.d.ts",
+      "import": "./dist/composables/useRovingFocus.js"
+    },
+    "./composables/useGrComponentConfig": {
+      "types": "./dist/types/src/composables/useGrComponentConfig.d.ts",
+      "import": "./dist/composables/useGrComponentConfig.js"
+    },
+    "./composables/useComboboxNavigation": {
+      "types": "./dist/types/src/composables/useComboboxNavigation.d.ts",
+      "import": "./dist/composables/useComboboxNavigation.js"
+    },
+    "./composables/useGranularityTranslations": {
+      "types": "./dist/types/src/composables/useGranularityTranslations.d.ts",
+      "import": "./dist/composables/useGranularityTranslations.js"
+    },
     "./composables/useTheme": {
       "types": "./dist/types/src/composables/useTheme.d.ts",
       "import": "./dist/composables/useTheme.js"
@@ -423,7 +439,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/unocss-preset-granular": "^0.8.1",
+    "@feugene/unocss-preset-granular": "^0.9.1",
     "@floating-ui/dom": "^1.8.0",
     "vue": "^3.5.40"
   },
@@ -438,7 +454,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/unocss-preset-granular": "^0.8.1",
+    "@feugene/unocss-preset-granular": "^0.9.1",
     "@floating-ui/dom": "^1.8.0",
     "@iconify-json/lucide": "^1.2.117",
     "@types/node": "^25.9.5",

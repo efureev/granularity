@@ -298,6 +298,18 @@ export default defineConfig({
         'composables/useOverlayLayer': fileURLToPath(
           new URL('./src/composables/useOverlayLayer.ts', import.meta.url),
         ),
+        'composables/useRovingFocus': fileURLToPath(
+          new URL('./src/composables/useRovingFocus.ts', import.meta.url),
+        ),
+        'composables/useGrComponentConfig': fileURLToPath(
+          new URL('./src/composables/useGrComponentConfig.ts', import.meta.url),
+        ),
+        'composables/useComboboxNavigation': fileURLToPath(
+          new URL('./src/composables/useComboboxNavigation.ts', import.meta.url),
+        ),
+        'composables/useGranularityTranslations': fileURLToPath(
+          new URL('./src/composables/useGranularityTranslations.ts', import.meta.url),
+        ),
         'composables/useTheme': fileURLToPath(
           new URL('./src/composables/useTheme.ts', import.meta.url),
         ),

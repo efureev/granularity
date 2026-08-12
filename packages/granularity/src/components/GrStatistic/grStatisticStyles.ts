@@ -100,7 +100,7 @@ export function statisticRootClass(options: { interactive: boolean }): string {
 }
 
 /** `tabular-nums` держит ширину строки при переборе чисел и при смене значения. */
-export const statisticValueTypographyClass = 'font-semibold [font-variant-numeric:tabular-nums]'
+export const statisticValueTypographyClass = 'font-semibold tabular-nums'
 
 export function statisticValueClass(options: { size: GrStatisticSize, tone: GrStatisticTone }): string {
   return [

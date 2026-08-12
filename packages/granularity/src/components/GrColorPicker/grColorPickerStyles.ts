@@ -35,7 +35,7 @@ export const triggerDisabledClass = 'cursor-not-allowed border-[var(--gr-brd)] b
 export const triggerEnabledClass = 'cursor-pointer hover:border-[var(--gr-primary)]'
 export const triggerInvalidClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
 
-export const triggerValueClass = 'min-w-0 flex-1 truncate text-left [font-variant-numeric:tabular-nums]'
+export const triggerValueClass = 'min-w-0 flex-1 truncate text-left tabular-nums'
 
 /**
  * Шахматка под прозрачным цветом. Живёт классом-маркером, а сами клетки рисует
@@ -54,7 +54,7 @@ export const previewClass = 'relative h-10 w-full overflow-hidden rounded-[var(-
 
 export const rowClass = 'grid grid-cols-[1.25rem_minmax(0,1fr)_2.75rem] items-center gap-2'
 export const rowLabelClass = 'text-[var(--gr-muted-fg)]'
-export const rowValueClass = 'text-right text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
+export const rowValueClass = 'text-right text-[var(--gr-muted-fg)] tabular-nums'
 
 export const presetsGridClass = 'flex flex-wrap gap-1.5'
 export const presetBaseClass = 'relative h-5 w-5 shrink-0 overflow-hidden rounded-[var(--gr-radius-sm)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)] transition-shadow duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'

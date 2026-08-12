@@ -49,12 +49,14 @@ describe('GrKbd', () => {
     expect(wrapper.classes().some(c => c.startsWith('min-w-'))).toBe(true)
   })
 
-  // `tabular-nums` — утилита `presetWind`; на `presetMini`, где живёт пакет, она
-  // молча не генерируется. Тот же эффект даёт arbitrary-значение.
+  // `tabular-nums` в `presetMini`, где живёт пакет, отсутствует — её добирает
+  // `@feugene/unocss-mini-extra-rules` (с 0.8.0). Что связка потребителя её
+  // действительно генерирует, стережёт `src/__tests__/presetUtilities.test.ts`:
+  // здесь проверяется только наличие класса в разметке.
   it('цифры не пляшут по ширине', () => {
     const wrapper = mount(GrKbd, { slots: { default: '1' } })
 
-    expect(wrapper.classes()).toContain('[font-variant-numeric:tabular-nums]')
+    expect(wrapper.classes()).toContain('tabular-nums')
   })
 
   it('оформление берётся из токенов, а не из хардкода', () => {
