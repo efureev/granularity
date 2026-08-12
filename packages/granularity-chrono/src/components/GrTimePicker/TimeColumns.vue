@@ -134,7 +134,12 @@ watch(() => props.open, (open) => {
 }, { immediate: true })
 
 function initNavigation(): void {
-  for (const nav of Object.values(navigation)) nav.init()
+  for (const nav of Object.values(navigation)) {
+    nav.init()
+    // `init` только ставит курсор, прокрутку он не трогает — а колонка на 24
+    // значения открывается на нуле, и выбранные 09:30 остаются за кадром.
+    nav.setActive(nav.activeIndex.value)
+  }
 }
 
 function select(unit: TimeUnit, option: TimeOption): void {

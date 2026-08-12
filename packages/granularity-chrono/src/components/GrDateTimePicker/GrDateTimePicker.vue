@@ -26,9 +26,9 @@ import TimeColumns from '../GrTimePicker/TimeColumns.vue'
 
 import type { GrDateTimePickerSize } from './grDateTimePickerStyles'
 import {
-  dateTimeDividerClass,
   dateTimeFooterClass,
   dateTimePanelClass,
+  dateTimeTimeClass,
 } from './grDateTimePickerStyles'
 
 /**
@@ -415,9 +415,8 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               </template>
             </GrCalendar>
 
-            <div :class="dateTimeDividerClass" aria-hidden="true" />
-
-            <TimeColumns
+            <div :class="dateTimeTimeClass">
+              <TimeColumns
               :model-value="shownTime"
               :min="timeBounds.min"
               :max="timeBounds.max"
@@ -427,10 +426,11 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               :twelve-hour="twelveHour"
               :locale="resolvedLocale"
               :size="resolvedSize"
-              :locked="isLocked"
-              :open="panelVisible"
-              @update:model-value="onTimeChange"
-            />
+                :locked="isLocked"
+                :open="panelVisible"
+                @update:model-value="onTimeChange"
+              />
+            </div>
           </div>
 
           <slot name="footer" :apply="apply" :cancel="cancel">

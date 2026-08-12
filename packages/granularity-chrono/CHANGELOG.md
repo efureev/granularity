@@ -32,6 +32,10 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- Time columns scroll to the selected value when the panel opens. The navigation primitive
+  puts the cursor there but never scrolls, so a 24-value column opened at midnight while 09:30
+  sat off-screen.
+
 - **Replaces `@feugene/granularity-datepicker`,** which is removed from the repository in the
   same change. The predecessor was a wrapper over `@vuepic/vue-datepicker`: its failures were
   structural — the theme never applied because the widget redefined the same variables one

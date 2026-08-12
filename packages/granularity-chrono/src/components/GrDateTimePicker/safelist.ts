@@ -2,9 +2,9 @@ import { splitClassTokens } from '../../internal/classTokens'
 import { pickerFieldClassTokens } from '../../internal/pickerFieldStyles'
 
 import {
-  dateTimeDividerClass,
   dateTimeFooterClass,
   dateTimePanelClass,
+  dateTimeTimeClass,
 } from './grDateTimePickerStyles'
 
 /**
@@ -16,6 +16,6 @@ import {
 export const grDateTimePickerSafelist: string[] = [
   ...pickerFieldClassTokens.flatMap(splitClassTokens),
   ...splitClassTokens(dateTimePanelClass),
-  ...splitClassTokens(dateTimeDividerClass),
+  ...splitClassTokens(dateTimeTimeClass),
   ...splitClassTokens(dateTimeFooterClass),
 ]

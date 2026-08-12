@@ -1,6 +1,6 @@
 import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
@@ -234,6 +234,26 @@ describe('GrTimePicker — клавиатура', () => {
     await openPicker(wrapper)
 
     expect(document.activeElement?.getAttribute('data-unit')).toBe('hour')
+    wrapper.unmount()
+  })
+
+  it('колонка прокручивается к выбранному значению', async () => {
+    // Иначе панель на 24 значения открывается на нуле, и выбранные 09:30
+    // остаются за кадром — курсор на них есть, а видно их нет.
+    // jsdom метода не знает вовсе — заводим заглушку и следим за вызовами.
+    // Убирается она удалением, а не возвратом прежнего значения: прежнего нет.
+    Element.prototype.scrollIntoView = () => {}
+    const spy = vi.spyOn(Element.prototype, 'scrollIntoView')
+
+    const wrapper = mountPicker({ modelValue: at(9, 30) })
+    await openPicker(wrapper)
+
+    const scrolled = spy.mock.instances.map(element => (element as Element).getAttribute('data-key'))
+    expect(scrolled).toContain('hour-9')
+    expect(scrolled).toContain('minute-30')
+
+    spy.mockRestore()
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
     wrapper.unmount()
   })
 
