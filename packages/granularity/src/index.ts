@@ -103,6 +103,9 @@ export type { GrAnnounceOptions, GrAnnouncer, GrAnnouncerPoliteness } from './co
 // Виртуализация длинного списка: геометрия окна без своей разметки.
 export { useVirtualList } from './composables/useVirtualList'
 export type { GrVirtualAlign, UseVirtualListOptions, UseVirtualListReturn } from './composables/useVirtualList'
+// Скелет указательного жеста: слушатели на `window`, отпускание против обрыва.
+export { useDragGesture } from './composables/useDragGesture'
+export type { UseDragGestureOptions, UseDragGestureReturn } from './composables/useDragGesture'
 // Контракт форм-контрола: сведение собственных пропов с контекстом `GrFormField`.
 // Публичен ради сторонних контролов — без него контракт пакета не выполнить.
 export { useGrFormControl } from './composables/useGrFormControl'

@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [v0.17.0] 2026-08-12
+### Added
+
+- **`useDragGesture`** — the pointer-drag skeleton every draggable control was writing for itself.
+  It owns the plumbing and nothing else: subscribe on `pointerdown`, ignore anything but the primary
+  button, listen on `window` (a pointer leaves the element constantly, and capture would tie the
+  gesture to a DOM node that may re-render mid-drag), and unsubscribe on both endings and on scope
+  disposal.
+
+  The reason it exists is that a drag has **two** endings, not one. `pointerup` finishes the gesture
+  and commits; `pointercancel` — the browser taking the pointer back, which is routine on touch when
+  a vertical swipe turns into a page scroll — aborts it and restores the state from before the press.
+  That rule lived in two copies (`GrSlider`, `GrSplitter`) and would have drifted on the first edit.
+  Both components now run on the primitive with no change in behaviour, proven by their existing
+  suites: 24 and 32 tests, untouched.
+
+  Deliberately absent: `preventDefault` (a slider suppresses text selection, an image pan must not),
+  coordinate math, a drag threshold, and multi-pointer tracking. See `docs/drag-gesture.md`.
 
 ### Fixed
 

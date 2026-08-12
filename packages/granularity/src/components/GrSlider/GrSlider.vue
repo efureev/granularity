@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useDragGesture } from '../../composables/useDragGesture'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -283,30 +284,6 @@ function nearestThumb(value: number): number {
   return Math.abs(value - lo) < Math.abs(value - hi) ? 0 : 1
 }
 
-function onTrackPointerDown(event: PointerEvent): void {
-  if (isDisabled.value || isReadonly.value) return
-  // Только основная кнопка: правый и средний клик перетаскиванием не считаются.
-  if (event.button !== 0) return
-
-  const value = valueFromPointer(event)
-  const index = nearestThumb(value)
-  activeThumb.value = index
-  // Фокусируем активный бегунок сразу — чтобы клавиатура работала после клика по
-  // дорожке (div не получает фокус по клику автоматически, только через `.focus()`).
-  thumbEls.value[index]?.focus()
-  setThumb(index, value, false)
-
-  window.addEventListener('pointermove', onPointerMove)
-  window.addEventListener('pointerup', onPointerUp)
-  window.addEventListener('pointercancel', onPointerCancel)
-}
-
-function onPointerMove(event: PointerEvent): void {
-  if (activeThumb.value === null) return
-  event.preventDefault()
-  setThumb(activeThumb.value, valueFromPointer(event), false)
-}
-
 function endDrag(commit: boolean): void {
   if (activeThumb.value !== null && commit) {
     // Финальный commit значения: у `lazy` он же и единственный `update:modelValue`.
@@ -318,23 +295,26 @@ function endDrag(commit: boolean): void {
   // коммитит — черновик просто отбрасывается, бегунок возвращается к модели.
   draftValues.value = null
   activeThumb.value = null
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('pointercancel', onPointerCancel)
 }
 
-function onPointerUp(): void {
-  endDrag(true)
-}
-
-function onPointerCancel(): void {
-  endDrag(false)
-}
-
-onBeforeUnmount(() => {
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('pointercancel', onPointerCancel)
+const drag = useDragGesture({
+  disabled: () => isDisabled.value || isReadonly.value,
+  onStart: (event) => {
+    const value = valueFromPointer(event)
+    const index = nearestThumb(value)
+    activeThumb.value = index
+    // Фокусируем активный бегунок сразу — чтобы клавиатура работала после клика по
+    // дорожке (div не получает фокус по клику автоматически, только через `.focus()`).
+    thumbEls.value[index]?.focus()
+    setThumb(index, value, false)
+  },
+  onMove: (event) => {
+    if (activeThumb.value === null) return
+    event.preventDefault()
+    setThumb(activeThumb.value, valueFromPointer(event), false)
+  },
+  onEnd: () => endDrag(true),
+  onCancel: () => endDrag(false),
 })
 
 // ————— Клавиатура.
@@ -423,7 +403,7 @@ function thumbValueText(value: number): string | undefined {
       data-gr-slider-track
       class="relative"
       :class="trackClass"
-      @pointerdown="onTrackPointerDown"
+      @pointerdown="drag.start"
     >
       <div :class="sliderRailClass" />
       <div

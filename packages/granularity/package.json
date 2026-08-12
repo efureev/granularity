@@ -368,6 +368,10 @@
       "types": "./dist/types/src/composables/useTheme.d.ts",
       "import": "./dist/composables/useTheme.js"
     },
+    "./composables/useDragGesture": {
+      "types": "./dist/types/src/composables/useDragGesture.d.ts",
+      "import": "./dist/composables/useDragGesture.js"
+    },
     "./composables/useVirtualList": {
       "types": "./dist/types/src/composables/useVirtualList.d.ts",
       "import": "./dist/composables/useVirtualList.js"

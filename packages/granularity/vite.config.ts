@@ -283,6 +283,9 @@ export default defineConfig({
         'composables/useGrFormControl': fileURLToPath(
           new URL('./src/composables/useGrFormControl.ts', import.meta.url),
         ),
+        'composables/useDragGesture': fileURLToPath(
+          new URL('./src/composables/useDragGesture.ts', import.meta.url),
+        ),
         'composables/useVirtualList': fileURLToPath(
           new URL('./src/composables/useVirtualList.ts', import.meta.url),
         ),

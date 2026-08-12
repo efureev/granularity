@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useDragGesture } from '../../composables/useDragGesture'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import { paneClass, rootClass, separatorClass } from './grSplitterStyles'
@@ -115,8 +116,6 @@ const restoreSize = ref(sizeState.value)
 let sizeBeforeDrag = sizeState.value
 let collapsedBeforeDrag = false
 
-const isDragging = ref(false)
-
 const isCollapsed = computed(() => collapsible.value && collapsedState.value)
 
 /** Что видно на экране: свёрнутая панель — это ноль в треке, но не ноль в модели. */
@@ -210,52 +209,21 @@ function onPointerMove(event: PointerEvent): void {
   setSize(raw, false)
 }
 
-function stopListening(): void {
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('pointercancel', onPointerCancel)
-}
-
-function endDrag(commit: boolean): void {
-  if (!isDragging.value) return
-
-  isDragging.value = false
-  stopListening()
-
-  if (commit) {
-    emit('change', renderedSize.value)
-    return
-  }
-
+const { isDragging, start: onPointerDown } = useDragGesture({
+  disabled: () => props.disabled,
+  onStart: () => {
+    sizeBeforeDrag = sizeState.value
+    collapsedBeforeDrag = collapsedState.value
+  },
+  onMove: onPointerMove,
+  onEnd: () => emit('change', renderedSize.value),
   // Оборванный жест (браузер забрал указатель) не коммитит ничего: раскладка
   // возвращается к той, что была до нажатия.
-  setCollapsed(collapsedBeforeDrag)
-  setSize(sizeBeforeDrag, false)
-}
-
-function onPointerUp(): void {
-  endDrag(true)
-}
-
-function onPointerCancel(): void {
-  endDrag(false)
-}
-
-function onPointerDown(event: PointerEvent): void {
-  if (props.disabled) return
-  // Только основная кнопка: правый и средний клик перетаскиванием не считаются.
-  if (event.button !== 0) return
-
-  sizeBeforeDrag = sizeState.value
-  collapsedBeforeDrag = collapsedState.value
-  isDragging.value = true
-
-  window.addEventListener('pointermove', onPointerMove)
-  window.addEventListener('pointerup', onPointerUp)
-  window.addEventListener('pointercancel', onPointerCancel)
-}
-
-onBeforeUnmount(stopListening)
+  onCancel: () => {
+    setCollapsed(collapsedBeforeDrag)
+    setSize(sizeBeforeDrag, false)
+  },
+})
 
 // ————— Клавиатура.
 const decreaseKey = computed(() => (orientation.value === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'))
