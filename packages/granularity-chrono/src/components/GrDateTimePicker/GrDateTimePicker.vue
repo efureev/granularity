@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue'
 
 import GrButton from '@feugene/granularity/components/GrButton'
-import GrPopover from '@feugene/granularity/components/GrPopover'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
@@ -20,6 +19,7 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
+import PickerSurface from '../../internal/PickerSurface.vue'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 import TimeColumns from '../GrTimePicker/TimeColumns.vue'
@@ -75,6 +75,12 @@ export interface GrDateTimePickerProps<T = Date | null> {
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
+  /**
+   * Панель рисуется на месте: ни поля, ни поповера. Модель, адаптер и `name`
+   * остаются пикеровскими — этим `inline` и отличается от голого `GrCalendar`,
+   * который говорит кортежами.
+   */
+  inline?: boolean
   placement?: UseFloatingPlacement
   teleportTo?: string | HTMLElement
   size?: GrDateTimePickerSize
@@ -122,6 +128,7 @@ const props = withDefaults(defineProps<GrDateTimePickerProps<TValue>>(), {
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
   open: undefined,
+  inline: false,
   placement: undefined,
   teleportTo: undefined,
   size: undefined,
@@ -142,7 +149,7 @@ defineSlots<{
   /** Своя ячейка дня вместо числа. */
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
   /** Своя шапка сетки вместо заголовка и стрелок. */
-  header?: (props: { title: string, goToMonth: (delta: number) => void }) => unknown
+  header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
   /** Подвал панели вместо кнопок подтверждения. */
   footer?: (props: { apply: () => void, cancel: () => void }) => unknown
 }>()
@@ -179,6 +186,7 @@ const {
   selected: selectedDate,
   formValues,
   panelOpen,
+  panelVisible,
   hasBeenOpen,
   fieldEl,
   showClear,
@@ -197,9 +205,11 @@ const draft = ref<Date | null>(null)
 
 const shown = computed(() => (props.autoApply ? selectedDate.value : draft.value))
 
-watch(panelOpen, (next) => {
+// `panelVisible`, а не `panelOpen`: в `inline` панель на экране с монтирования,
+// и черновику неоткуда взяться, если ждать открытия.
+watch(panelVisible, (next) => {
   if (next && !props.autoApply) draft.value = selectedDate.value
-})
+}, { immediate: true })
 
 const shownDate = computed<PlainDate | null>(() => (shown.value ? toPlainDate(shown.value) : null))
 const shownTime = computed<PlainTime | null>(() => (shown.value ? toPlainTime(shown.value) : null))
@@ -313,18 +323,17 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       <input v-for="(value, index) in formValues" :key="index" type="hidden" :name="name" :value="value">
     </template>
 
-    <GrPopover
-      v-model:open="panelOpen"
+    <PickerSurface
+      :inline="inline"
+      :open="panelOpen"
       :size="resolvedSize"
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :aria-label="t('gr.dateTimePicker.panelLabel', 'Choose date and time')"
-      :close-on-content-click="false"
-      trigger="manual"
-      :auto-focus="false"
+      :panel-label="t('gr.dateTimePicker.panelLabel', 'Choose date and time')"
+      @update:open="panelOpen = $event"
     >
-      <template #trigger="{ triggerProps }">
+      <template v-if="!inline" #trigger="{ triggerProps }">
         <div class="relative">
           <input
             :id="inputId"
@@ -381,8 +390,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
         </div>
       </template>
 
-      <template #content>
-        <div v-if="hasBeenOpen" data-gr-date-time-picker-panel :style="calendarVars">
+      <div v-if="hasBeenOpen" data-gr-date-time-picker-panel :style="calendarVars">
           <div :class="dateTimePanelClass">
             <GrCalendar
               ref="calendarRef"
@@ -420,7 +428,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               :locale="resolvedLocale"
               :size="resolvedSize"
               :locked="isLocked"
-              :open="panelOpen"
+              :open="panelVisible"
               @update:model-value="onTimeChange"
             />
           </div>
@@ -447,7 +455,6 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             </div>
           </slot>
         </div>
-      </template>
-    </GrPopover>
+    </PickerSurface>
   </div>
 </template>

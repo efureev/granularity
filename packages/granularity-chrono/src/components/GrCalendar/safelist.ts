@@ -2,6 +2,9 @@ import { splitClassTokens } from '../../internal/classTokens'
 
 import {
   calendarCellSizes,
+  calendarPeriodClass,
+  calendarPeriodGridClass,
+  calendarPeriodSizes,
   calendarRangeCellClass,
   calendarDayClass,
   calendarGridClass,
@@ -38,7 +41,17 @@ const rangeVariants = [
   calendarRangeCellClass({ inRange: true, start: false, end: true }),
 ]
 
+const periodVariants = (['xs', 'sm', 'md', 'lg'] as const).flatMap(size => [
+  calendarPeriodClass({ size, selected: false, current: false, disabled: false }),
+  calendarPeriodClass({ size, selected: true, current: false, disabled: false }),
+  calendarPeriodClass({ size, selected: false, current: true, disabled: false }),
+  calendarPeriodClass({ size, selected: false, current: false, disabled: true }),
+])
+
 export const grCalendarSafelist: string[] = [
+  ...splitClassTokens(calendarPeriodGridClass),
+  ...Object.values(calendarPeriodSizes).flatMap(splitClassTokens),
+  ...periodVariants.flatMap(splitClassTokens),
   ...rangeVariants.flatMap(splitClassTokens),
   ...splitClassTokens(calendarRootClass),
   ...splitClassTokens(calendarHeaderClass),

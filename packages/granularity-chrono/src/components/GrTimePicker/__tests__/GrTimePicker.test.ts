@@ -425,3 +425,29 @@ describe('GrTimePicker — форма', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTimePicker — inline', () => {
+  it('колонки на месте, поля нет, фокус не забирается', async () => {
+    const before = document.activeElement
+    const wrapper = mountPicker({ inline: true, modelValue: at(9, 30) })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.querySelector('[data-gr-time-picker-field]')).toBeNull()
+    expect(document.querySelector('[data-gr-picker-inline]')).not.toBeNull()
+    expect(options('hour')).toHaveLength(24)
+    expect(document.activeElement).toBe(before)
+    wrapper.unmount()
+  })
+
+  it('курсор колонки объявлен и без открытия панели', async () => {
+    // В `inline` панель не «открывают» — `aria-activedescendant` обязан быть
+    // всё равно, иначе клавиатура молчит для скринридера.
+    const wrapper = mountPicker({ inline: true, modelValue: at(9, 30) })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    await press('hour', 'ArrowDown')
+
+    expect(activeKey('hour')).toBe('hour-10')
+    wrapper.unmount()
+  })
+})

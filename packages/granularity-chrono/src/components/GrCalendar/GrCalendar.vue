@@ -8,10 +8,13 @@ import { useGrComponentSize } from '@feugene/granularity/composables/useGrCompon
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { buildCalendarGrid, createDisabledPredicate } from '../../chrono/calendarGrid'
-import { formatMonthTitle, localeFirstDayOfWeek, weekdayNames } from '../../chrono/chronoFormat'
+import { formatMonthTitle, formatYearTitle, localeFirstDayOfWeek, monthNames, weekdayNames } from '../../chrono/chronoFormat'
+import type { PeriodCell, PeriodMode } from '../../chrono/periodGrid'
+import { buildPeriodGrid, decadeLabel, decadeStart } from '../../chrono/periodGrid'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
 import {
   addMonths,
+  addYears,
   clampPlainDate,
   comparePlainDates,
   isPlainDateWithin,
@@ -22,6 +25,8 @@ import type { GrCalendarSize } from './grCalendarStyles'
 import {
   calendarDayClass,
   calendarGridClass,
+  calendarPeriodClass,
+  calendarPeriodGridClass,
   calendarRangeCellClass,
   calendarHeaderClass,
   calendarNavButtonClass,
@@ -44,6 +49,11 @@ import {
  * в другое адаптером.
  */
 export interface GrCalendarProps {
+  /**
+   * Что выбирается: день, месяц или год. В режимах периода сетка показывает
+   * двенадцать ячеек в три колонки, а выбор отдаёт первое число периода.
+   */
+  mode?: 'day' | PeriodMode
   /** Выбранная дата. `null` — ничего не выбрано. */
   modelValue?: PlainDate | null
   /** Показываемый месяц. Без него календарь ведёт его сам, отталкиваясь от выбора. */
@@ -85,13 +95,14 @@ export interface GrCalendarEmits {
   (e: 'update:modelValue', value: PlainDate): void
   (e: 'update:viewDate', value: PlainDate): void
   (e: 'change', value: PlainDate): void
-  /** Показываемый месяц сменился — листанием, клавиатурой или выбором. */
-  (e: 'monthChange', value: PlainDate): void
+  /** Показываемый период сменился — листанием, клавиатурой или выбором. */
+  (e: 'periodChange', value: PlainDate): void
   /** День под курсором сменился. `null` — курсор ушёл из сетки. */
   (e: 'dayHover', value: PlainDate | null): void
 }
 
 const props = withDefaults(defineProps<GrCalendarProps>(), {
+  mode: 'day',
   modelValue: null,
   viewDate: undefined,
   min: undefined,
@@ -118,7 +129,7 @@ defineSlots<{
   /** Своя ячейка дня вместо числа. */
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
   /** Своя шапка вместо заголовка и стрелок. */
-  header?: (props: { title: string, goToMonth: (delta: number) => void }) => unknown
+  header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
   /** Подвал панели: кнопки «сегодня», «очистить». */
   footer?: () => unknown
 }>()
@@ -171,7 +182,38 @@ const grid = computed(() => buildCalendarGrid({
   isDisabled: isDisabledDate.value,
 }))
 
-const monthTitle = computed(() => formatMonthTitle(resolvedLocale.value, viewDate.value.y, viewDate.value.m))
+const isDayMode = computed(() => props.mode === 'day')
+
+/**
+ * Сетка периодов строится только в своём режиме: в дневном она осталась бы
+ * висеть в памяти вместе с двенадцатью объектами, которые никто не смотрит.
+ */
+const periodCells = computed<PeriodCell[]>(() => (
+  isDayMode.value
+    ? []
+    : buildPeriodGrid({
+        mode: props.mode as PeriodMode,
+        year: viewDate.value.y,
+        min: props.min,
+        max: props.max,
+        today: props.today,
+      })
+))
+
+const periodLabels = computed(() => (props.mode === 'month' ? monthNames(resolvedLocale.value, 'short') : []))
+
+function periodLabel(cell: PeriodCell): string {
+  return props.mode === 'month' ? periodLabels.value[cell.value] ?? String(cell.value) : String(cell.value)
+}
+
+/** Заголовок: месяц с годом, год или десятилетие — смотря что показываем. */
+const periodTitle = computed(() => {
+  if (props.mode === 'month') return formatYearTitle(resolvedLocale.value, viewDate.value.y)
+  if (props.mode === 'year') return decadeLabel(viewDate.value.y)
+
+  return formatMonthTitle(resolvedLocale.value, viewDate.value.y, viewDate.value.m)
+})
+
 const weekdays = computed(() => weekdayNames(resolvedLocale.value, resolvedWeekStart.value))
 
 /** Полные названия дней — в `abbr`, чтобы скринридер не читал «пн» по буквам. */
@@ -229,6 +271,22 @@ function setDayEl(key: string, element: unknown): void {
 }
 
 const cellByKey = computed(() => new Map(grid.value.cells.map(cell => [cell.key, cell])))
+const periodByKey = computed(() => new Map(periodCells.value.map(cell => [cell.key, cell])))
+
+/** Ключи ячеек текущего режима — по ним ходит roving-фокус. */
+const cellKeys = computed(() => (
+  isDayMode.value ? grid.value.cells.map(cell => cell.key) : periodCells.value.map(cell => cell.key)
+))
+
+/** Ячейка периода, попавшая в выбор: месяц выбранной даты либо её год. */
+const selectedPeriodKey = computed(() => {
+  const selected = props.modelValue
+  if (!selected || isDayMode.value) return undefined
+
+  return periodCells.value.find(cell => (
+    props.mode === 'month' ? cell.date.y === selected.y && cell.value === selected.m : cell.value === selected.y
+  ))?.key
+})
 
 /**
  * Кольцо roving-фокуса в режиме сетки: ровно одна ячейка держит `tabindex=0`,
@@ -238,10 +296,12 @@ const cellByKey = computed(() => new Map(grid.value.cells.map(cell => [cell.key,
  * нативный `disabled`, и прыжок через них молча поменял бы семантику стрелок.
  */
 const roving = useRovingFocus<string>({
-  items: () => grid.value.cells.map(cell => cell.key),
+  items: () => cellKeys.value,
   elementFor: key => dayEls.value.get(key),
   orientation: () => 'grid',
-  columns: () => 7,
+  // Семь дней в неделе против трёх периодов в ряду: примитив у сеток один,
+  // разная у них только ширина.
+  columns: () => (isDayMode.value ? 7 : 3),
   // Края сетки — не кольцо: за ними следующий и предыдущий месяцы.
   wrap: () => false,
   onOverflow: (edge) => {
@@ -249,12 +309,14 @@ const roving = useRovingFocus<string>({
     // Стрелка вниз из последней недели листает месяц вперёд, вверх из
     // первой — назад. Клавишу гасим в любом случае: иначе прокрутится
     // страница под календарём.
-    goToMonth(edge === 'end' ? 1 : -1)
+    goToPeriod(edge === 'end' ? 1 : -1)
     return true
   },
   // Пока фокус не трогали, остановку держит выбранный день; если его в этом
   // месяце нет — первый день месяца, а не добор соседнего.
   initialKey: () => {
+    if (!isDayMode.value) return selectedPeriodKey.value ?? cellKeys.value[0]
+
     const selected = props.modelValue
     if (selected && cellByKey.value.has(plainDateKey(selected))) return plainDateKey(selected)
 
@@ -262,25 +324,42 @@ const roving = useRovingFocus<string>({
   },
 })
 
-function goToMonth(delta: number): void {
+/** Шаг листания: месяц, год или десятилетие — смотря что показываем. */
+function shiftView(from: PlainDate, delta: number): PlainDate {
+  if (props.mode === 'month') return addYears(from, delta)
+  if (props.mode === 'year') return addYears(from, delta * 10)
+
+  return addMonths(from, delta)
+}
+
+function goToPeriod(delta: number): void {
   if (isLocked.value) return
 
-  const next = addMonths(viewDate.value, delta)
-  if (!isMonthReachable(next)) return
+  const next = shiftView(viewDate.value, delta)
+  if (!isPeriodReachable(next)) return
 
   internalView.value = next
   emit('update:viewDate', next)
-  emit('monthChange', next)
+  emit('periodChange', next)
 
-  // Смена месяца стрелками для незрячего пользователя иначе беззвучна:
+  // Смена периода стрелками для незрячего пользователя иначе беззвучна:
   // фокус переехал, а что именно изменилось — неизвестно.
-  announce(formatMonthTitle(resolvedLocale.value, next.y, next.m))
+  announce(
+    props.mode === 'month'
+      ? formatYearTitle(resolvedLocale.value, next.y)
+      : props.mode === 'year'
+        ? decadeLabel(next.y)
+        : formatMonthTitle(resolvedLocale.value, next.y, next.m),
+  )
 }
 
-/** Месяц достижим, если хотя бы один его день попадает в границы. */
-function isMonthReachable(month: PlainDate): boolean {
-  const first: PlainDate = { y: month.y, m: month.m, d: 1 }
-  const last: PlainDate = { y: month.y, m: month.m, d: 31 }
+/** Период достижим, если хотя бы один его день попадает в границы. */
+function isPeriodReachable(view: PlainDate): boolean {
+  const [first, last] = props.mode === 'day'
+    ? [{ y: view.y, m: view.m, d: 1 }, { y: view.y, m: view.m, d: 31 }]
+    : props.mode === 'month'
+      ? [{ y: view.y, m: 0, d: 1 }, { y: view.y, m: 11, d: 31 }]
+      : [{ y: decadeStart(view.y), m: 0, d: 1 }, { y: decadeStart(view.y) + 9, m: 11, d: 31 }]
 
   if (props.max && comparePlainDates(first, props.max) > 0) return false
   if (props.min && comparePlainDates(last, props.min) < 0) return false
@@ -288,8 +367,22 @@ function isMonthReachable(month: PlainDate): boolean {
   return true
 }
 
-const canGoBack = computed(() => !isLocked.value && isMonthReachable(addMonths(viewDate.value, -1)))
-const canGoForward = computed(() => !isLocked.value && isMonthReachable(addMonths(viewDate.value, 1)))
+const canGoBack = computed(() => !isLocked.value && isPeriodReachable(shiftView(viewDate.value, -1)))
+const canGoForward = computed(() => !isLocked.value && isPeriodReachable(shiftView(viewDate.value, 1)))
+
+
+function selectPeriod(cell: PeriodCell): void {
+  if (isLocked.value || cell.disabled) return
+
+  emit('update:modelValue', cell.date)
+  emit('change', cell.date)
+
+  // Год из добора соседнего десятилетия переводит показ туда — как день из
+  // добора соседнего месяца в дневной сетке.
+  if (props.mode === 'year' && decadeStart(cell.date.y) !== decadeStart(viewDate.value.y)) {
+    goToPeriod(cell.date.y > viewDate.value.y ? 1 : -1)
+  }
+}
 
 function selectCell(cell: CalendarCell): void {
   if (isLocked.value || cell.disabled) return
@@ -299,11 +392,16 @@ function selectCell(cell: CalendarCell): void {
 
   // Клик по добору соседнего месяца переводит показ туда: иначе выбранный
   // день исчез бы из сетки сразу после выбора.
-  if (!cell.inMonth) goToMonth(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
+  if (!cell.inMonth) goToPeriod(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
 }
 
 function onDayClick(cell: CalendarCell): void {
   selectCell(cell)
+  roving.setActive(cell.key)
+}
+
+function onPeriodClick(cell: PeriodCell): void {
+  selectPeriod(cell)
   roving.setActive(cell.key)
 }
 
@@ -315,7 +413,9 @@ function onGridKeydown(event: KeyboardEvent): void {
   if (event.key === 'PageUp' || event.key === 'PageDown') {
     event.preventDefault()
     const direction = event.key === 'PageDown' ? 1 : -1
-    goToMonth(event.shiftKey ? direction * 12 : direction)
+    // `Shift` уводит на порядок крупнее: год в дневной сетке, десятилетие в
+    // сетке месяцев, век в сетке лет.
+    goToPeriod(event.shiftKey ? direction * (isDayMode.value ? 12 : 10) : direction)
     return
   }
 
@@ -324,8 +424,16 @@ function onGridKeydown(event: KeyboardEvent): void {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault()
     const key = roving.rovingKey.value
-    const cell = key ? cellByKey.value.get(key) : undefined
-    if (cell) selectCell(cell)
+    if (!key) return
+
+    if (isDayMode.value) {
+      const cell = cellByKey.value.get(key)
+      if (cell) selectCell(cell)
+      return
+    }
+
+    const period = periodByKey.value.get(key)
+    if (period) selectPeriod(period)
   }
 }
 
@@ -336,7 +444,7 @@ function focus(): void {
 
 defineExpose({
   focus,
-  goToMonth,
+  goToPeriod,
   /** Перевести показ на месяц с этой датой и поставить на неё фокус. */
   focusDate: (date: PlainDate) => {
     if (!isPlainDateWithin(date, props.min, props.max)) return
@@ -352,21 +460,21 @@ defineExpose({
     :class="calendarRootClass"
     :aria-disabled="disabled ? 'true' : undefined"
   >
-    <slot name="header" :title="monthTitle" :go-to-month="goToMonth">
+    <slot name="header" :title="periodTitle" :go-to-period="goToPeriod">
       <div :class="calendarHeaderClass" data-gr-calendar-header>
         <button
           type="button"
           data-gr-calendar-prev
           :class="[calendarNavButtonClass, calendarNavSizes[resolvedSize]]"
           :disabled="!canGoBack"
-          :aria-label="t('gr.calendar.previousMonth', 'Previous month')"
-          @click="goToMonth(-1)"
+          :aria-label="isDayMode ? t('gr.calendar.previousMonth', 'Previous month') : t('gr.calendar.previousPeriod', 'Previous')"
+          @click="goToPeriod(-1)"
         >
           <span aria-hidden="true">‹</span>
         </button>
 
         <span :id="titleId" :class="calendarTitleClass" data-gr-calendar-title aria-live="off">
-          {{ monthTitle }}
+          {{ periodTitle }}
         </span>
 
         <button
@@ -374,15 +482,53 @@ defineExpose({
           data-gr-calendar-next
           :class="[calendarNavButtonClass, calendarNavSizes[resolvedSize]]"
           :disabled="!canGoForward"
-          :aria-label="t('gr.calendar.nextMonth', 'Next month')"
-          @click="goToMonth(1)"
+          :aria-label="isDayMode ? t('gr.calendar.nextMonth', 'Next month') : t('gr.calendar.nextPeriod', 'Next')"
+          @click="goToPeriod(1)"
         >
           <span aria-hidden="true">›</span>
         </button>
       </div>
     </slot>
 
+    <!-- Сетка периодов: те же роли `grid`/`row`/`gridcell`, только рядов три
+         по три ячейки, а не недели по семь дней. -->
+    <div
+      v-if="!isDayMode"
+      :id="gridId"
+      data-gr-calendar-periods
+      role="grid"
+      :class="calendarPeriodGridClass"
+      :aria-label="ariaLabel"
+      :aria-labelledby="ariaLabel ? undefined : titleId"
+      :aria-readonly="readonly ? 'true' : undefined"
+      :aria-disabled="disabled ? 'true' : undefined"
+      @keydown="onGridKeydown"
+    >
+      <span
+        v-for="cell in periodCells"
+        :ref="element => setDayEl(cell.key, element)"
+        :key="cell.key"
+        role="gridcell"
+        data-gr-calendar-period
+        :data-key="cell.key"
+        :tabindex="roving.tabindexFor(cell.key)"
+        :aria-selected="cell.key === selectedPeriodKey ? 'true' : 'false'"
+        :aria-disabled="cell.disabled ? 'true' : undefined"
+        :aria-current="cell.current ? 'date' : undefined"
+        :class="calendarPeriodClass({
+          size: resolvedSize,
+          selected: cell.key === selectedPeriodKey,
+          current: cell.current,
+          disabled: cell.disabled,
+        })"
+        @click="onPeriodClick(cell)"
+      >
+        {{ periodLabel(cell) }}
+      </span>
+    </div>
+
     <table
+      v-else
       :id="gridId"
       data-gr-calendar-grid
       role="grid"

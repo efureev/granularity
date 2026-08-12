@@ -356,3 +356,69 @@ describe('GrDatePicker — очистка', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrDatePicker — inline', () => {
+  it('панель на месте, поля и поповера нет', () => {
+    const wrapper = mountPicker({ inline: true, modelValue: at('2026-08-12') })
+
+    expect(wrapper.find('[data-gr-date-picker-field]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-picker-inline]').exists()).toBe(true)
+    expect(calendar(wrapper).exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('фокус на монтировании не забирается', async () => {
+    const before = document.activeElement
+    const wrapper = mountPicker({ inline: true })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.activeElement).toBe(before)
+    wrapper.unmount()
+  })
+
+  it('фокус не забирается даже при open=true', async () => {
+    // Панель и так на экране: `open` у inline-пикера ничего не открывает, но
+    // и права уводить фокус со страницы не даёт.
+    const before = document.activeElement
+    const wrapper = mountPicker({ inline: true, open: true, modelValue: at('2026-08-12') })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.activeElement).toBe(before)
+    wrapper.unmount()
+  })
+
+  it('выбор работает и отдаёт то же, что в панели', async () => {
+    const wrapper = mountPicker({ inline: true, name: 'day', valueAdapter: 'isoDate', modelValue: '2026-08-12' })
+
+    await day(wrapper, '2026-08-20').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('2026-08-20')
+    // Модель и форма остаются пикеровскими — этим `inline` и отличается от
+    // голого `GrCalendar`, который говорит кортежами.
+    expect((wrapper.get('input[type="hidden"]').element as HTMLInputElement).value).toBe('2026-08-12')
+    wrapper.unmount()
+  })
+
+  it('режим месяцев показывает месяц с годом', () => {
+    const wrapper = mountPicker({ mode: 'month', modelValue: at('2026-08-12') })
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('August 2026')
+    wrapper.unmount()
+  })
+
+  it('режим лет показывает год', () => {
+    const wrapper = mountPicker({ mode: 'year', modelValue: at('2026-08-12') })
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('2026')
+    wrapper.unmount()
+  })
+
+  it('в режиме месяцев панель показывает сетку периодов', async () => {
+    const wrapper = mountPicker({ mode: 'month', modelValue: at('2026-08-12') })
+    await openPicker(wrapper)
+
+    expect(calendar(wrapper).findAll('[data-gr-calendar-period]')).toHaveLength(12)
+    expect(calendar(wrapper).find('[data-gr-calendar-grid]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

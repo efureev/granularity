@@ -164,6 +164,11 @@ export function dayPeriodNames(locale: string): [string, string] {
   return [partAt(9, 'AM'), partAt(21, 'PM')]
 }
 
+/** Заголовок сетки месяцев: «2026» или «2026 г.» — как принято в локали. */
+export function formatYearTitle(locale: string, year: number): string {
+  return formatter(locale, { year: 'numeric', timeZone: 'UTC' }).format(utcAt(year, 0, 1))
+}
+
 /** Заголовок панели: «август 2026». */
 export function formatMonthTitle(locale: string, year: number, month: number): string {
   return formatter(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(utcAt(year, month, 1))

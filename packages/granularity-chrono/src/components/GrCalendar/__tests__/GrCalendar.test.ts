@@ -167,11 +167,11 @@ describe('GrCalendar — клавиатура паттерна grid', () => {
     const wrapper = mountCalendar()
 
     await press(wrapper, 'PageDown')
-    expect(wrapper.emitted('monthChange')?.at(-1)?.[0]).toEqual(iso('2026-09-01'))
+    expect(wrapper.emitted('periodChange')?.at(-1)?.[0]).toEqual(iso('2026-09-01'))
 
     await press(wrapper, 'PageUp')
     await press(wrapper, 'PageUp')
-    expect(wrapper.emitted('monthChange')?.at(-1)?.[0]).toEqual(iso('2026-07-01'))
+    expect(wrapper.emitted('periodChange')?.at(-1)?.[0]).toEqual(iso('2026-07-01'))
     wrapper.unmount()
   })
 
@@ -179,7 +179,7 @@ describe('GrCalendar — клавиатура паттерна grid', () => {
     const wrapper = mountCalendar()
 
     await press(wrapper, 'PageDown', { shiftKey: true })
-    expect(wrapper.emitted('monthChange')?.at(-1)?.[0]).toEqual(iso('2027-08-01'))
+    expect(wrapper.emitted('periodChange')?.at(-1)?.[0]).toEqual(iso('2027-08-01'))
     wrapper.unmount()
   })
 
@@ -192,7 +192,7 @@ describe('GrCalendar — клавиатура паттерна grid', () => {
     wrapper.get('[data-gr-calendar-grid]').element.dispatchEvent(event)
 
     expect(event.defaultPrevented).toBe(true)
-    expect(wrapper.emitted('monthChange')).toBeTruthy()
+    expect(wrapper.emitted('periodChange')).toBeTruthy()
     wrapper.unmount()
   })
 
@@ -246,7 +246,7 @@ describe('GrCalendar — запреты и границы', () => {
     await press(wrapper, 'ArrowRight')
 
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
-    expect(wrapper.emitted('monthChange')).toBeFalsy()
+    expect(wrapper.emitted('periodChange')).toBeFalsy()
     wrapper.unmount()
   })
 
@@ -257,7 +257,7 @@ describe('GrCalendar — запреты и границы', () => {
     await press(wrapper, 'PageDown')
 
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
-    expect(wrapper.emitted('monthChange')).toBeFalsy()
+    expect(wrapper.emitted('periodChange')).toBeFalsy()
     wrapper.unmount()
   })
 })
@@ -280,7 +280,7 @@ describe('GrCalendar — выбор мышью', () => {
     await wrapper.get('[data-key="2026-09-01"]').trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(iso('2026-09-01'))
-    expect(wrapper.emitted('monthChange')?.at(-1)?.[0]).toEqual(iso('2026-09-01'))
+    expect(wrapper.emitted('periodChange')?.at(-1)?.[0]).toEqual(iso('2026-09-01'))
     wrapper.unmount()
   })
 
@@ -359,6 +359,118 @@ describe('GrCalendar — объявления для скринридера', ()
     const wrapper = mountCalendar()
 
     expect(wrapper.get('[data-gr-calendar-title]').attributes('aria-live')).toBe('off')
+    wrapper.unmount()
+  })
+})
+
+describe('GrCalendar — режимы месяца и года', () => {
+  function mountMonths(props: Record<string, unknown> = {}) {
+    return mount(GrCalendar, {
+      // `viewDate` не задаётся намеренно: с ним показ управляется снаружи, и
+      // листание внутри календаря ничего не меняет.
+      props: { mode: 'month', today: iso('2026-08-12'), locale: 'en-US', ...props },
+      attachTo: document.body,
+    })
+  }
+
+  function periods(wrapper: ReturnType<typeof mountMonths>) {
+    return wrapper.findAll('[data-gr-calendar-period]')
+  }
+
+  it('сетка месяцев — двенадцать ячеек с ролями grid и gridcell', () => {
+    const wrapper = mountMonths()
+
+    expect(wrapper.get('[data-gr-calendar-periods]').attributes('role')).toBe('grid')
+    expect(periods(wrapper)).toHaveLength(12)
+    expect(periods(wrapper)[0]!.attributes('role')).toBe('gridcell')
+    expect(periods(wrapper)[0]!.text()).toBe('Jan')
+    expect(wrapper.find('[data-gr-calendar-grid]').exists(), 'дневная сетка в этом режиме не рендерится').toBe(false)
+    wrapper.unmount()
+  })
+
+  it('заголовок показывает год, а листание ходит годами', async () => {
+    const wrapper = mountMonths()
+    expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2026')
+
+    await wrapper.get('[data-gr-calendar-next]').trigger('click')
+
+    expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2027')
+    // Показ — это якорь, а не выбор: в режиме месяцев от него важен только год.
+    expect(wrapper.emitted('periodChange')?.at(-1)?.[0]).toEqual(iso('2027-08-12'))
+    wrapper.unmount()
+  })
+
+  it('выбор месяца отдаёт его первое число', async () => {
+    const wrapper = mountMonths()
+
+    await wrapper.get('[data-key="2026-03"]').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(iso('2026-03-01'))
+    wrapper.unmount()
+  })
+
+  it('стрелки ходят по трём колонкам', async () => {
+    const wrapper = mountMonths({ modelValue: iso('2026-01-15') })
+    const grid = wrapper.get('[data-gr-calendar-periods]')
+
+    await grid.trigger('keydown', { key: 'ArrowRight' })
+    await nextTick()
+    expect(wrapper.findAll('[data-gr-calendar-period]').filter(cell => cell.attributes('tabindex') === '0')[0]!.attributes('data-key'))
+      .toBe('2026-02')
+
+    await grid.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    expect(wrapper.findAll('[data-gr-calendar-period]').filter(cell => cell.attributes('tabindex') === '0')[0]!.attributes('data-key'))
+      .toBe('2026-05')
+    wrapper.unmount()
+  })
+
+  it('сетка лет показывает десятилетие с добором и подписью по краям', async () => {
+    const wrapper = mountMonths({ mode: 'year' })
+
+    expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2020 — 2029')
+    expect(periods(wrapper)[0]!.text()).toBe('2019')
+    expect(periods(wrapper).at(-1)!.text()).toBe('2030')
+
+    await wrapper.get('[data-key="2024"]').trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(iso('2024-01-01'))
+    wrapper.unmount()
+  })
+
+  it('листание в режиме лет ходит десятилетиями', async () => {
+    const wrapper = mountMonths({ mode: 'year' })
+
+    await wrapper.get('[data-gr-calendar-next]').trigger('click')
+
+    expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2030 — 2039')
+    wrapper.unmount()
+  })
+
+  it('выбор года из добора переводит показ в его десятилетие', async () => {
+    const wrapper = mountMonths({ mode: 'year' })
+
+    await wrapper.get('[data-key="2030"]').trigger('click')
+
+    expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2030 — 2039')
+    wrapper.unmount()
+  })
+
+  it('периоды вне границ не выбираются', async () => {
+    const wrapper = mountMonths({ min: iso('2026-06-01') })
+
+    expect(wrapper.get('[data-key="2026-03"]').attributes('aria-disabled')).toBe('true')
+    await wrapper.get('[data-key="2026-03"]').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    wrapper.unmount()
+  })
+
+  it('смена периода объявляется вслух', async () => {
+    const wrapper = mountMonths()
+
+    await wrapper.get('[data-gr-calendar-next]').trigger('click')
+
+    expect(await announced()).toBe('2027')
     wrapper.unmount()
   })
 })

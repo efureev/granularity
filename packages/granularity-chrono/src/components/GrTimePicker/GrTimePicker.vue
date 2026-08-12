@@ -1,7 +1,6 @@
 <script setup lang="ts" generic="TValue = Date | null">
 import { computed, ref } from 'vue'
 
-import GrPopover from '@feugene/granularity/components/GrPopover'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import { formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
@@ -16,6 +15,7 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
+import PickerSurface from '../../internal/PickerSurface.vue'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 
 import type { GrTimePickerSize } from './grTimePickerStyles'
@@ -62,6 +62,12 @@ export interface GrTimePickerProps<T = Date | null> {
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
+  /**
+   * Панель рисуется на месте: ни поля, ни поповера. Модель, адаптер и `name`
+   * остаются пикеровскими — этим `inline` и отличается от голого `GrCalendar`,
+   * который говорит кортежами.
+   */
+  inline?: boolean
   placement?: UseFloatingPlacement
   teleportTo?: string | HTMLElement
   size?: GrTimePickerSize
@@ -105,6 +111,7 @@ const props = withDefaults(defineProps<GrTimePickerProps<TValue>>(), {
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
   open: undefined,
+  inline: false,
   placement: undefined,
   teleportTo: undefined,
   size: undefined,
@@ -157,6 +164,7 @@ const {
   selected: selectedDate,
   formValues,
   panelOpen,
+  panelVisible,
   hasBeenOpen,
   fieldEl,
   showClear,
@@ -215,18 +223,17 @@ const fieldClass = computed(() => pickerFieldClass({
       <input v-for="(value, index) in formValues" :key="index" type="hidden" :name="name" :value="value">
     </template>
 
-    <GrPopover
-      v-model:open="panelOpen"
+    <PickerSurface
+      :inline="inline"
+      :open="panelOpen"
       :size="resolvedSize"
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :aria-label="t('gr.timePicker.panelLabel', 'Choose time')"
-      :close-on-content-click="false"
-      trigger="manual"
-      :auto-focus="false"
+      :panel-label="t('gr.timePicker.panelLabel', 'Choose time')"
+      @update:open="panelOpen = $event"
     >
-      <template #trigger="{ triggerProps }">
+      <template v-if="!inline" #trigger="{ triggerProps }">
         <div class="relative">
           <input
             :id="inputId"
@@ -282,8 +289,7 @@ const fieldClass = computed(() => pickerFieldClass({
         </div>
       </template>
 
-      <template #content>
-        <div v-if="hasBeenOpen" data-gr-time-picker-panel>
+      <div v-if="hasBeenOpen" data-gr-time-picker-panel>
           <TimeColumns
             ref="columnsRef"
             :model-value="selectedTime"
@@ -296,13 +302,12 @@ const fieldClass = computed(() => pickerFieldClass({
             :locale="resolvedLocale"
             :size="resolvedSize"
             :locked="isLocked"
-            :open="panelOpen"
+            :open="panelVisible"
             @update:model-value="onTimeChange"
           />
 
           <slot name="footer" />
         </div>
-      </template>
-    </GrPopover>
+    </PickerSurface>
   </div>
 </template>

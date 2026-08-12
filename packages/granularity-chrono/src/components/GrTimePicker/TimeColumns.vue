@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
 
 import { useComboboxNavigation } from '@feugene/granularity/composables/useComboboxNavigation'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
@@ -122,6 +122,21 @@ const navigation = {
   period: createNavigation('period'),
 } as const
 
+/**
+ * Курсор ставится на выбранные значения, как только колонки на экране.
+ *
+ * Не в `focus()`: в `inline` панель никто не открывает и фокус в неё не уводит,
+ * а `aria-activedescendant` обязан существовать всё равно — иначе клавиатура
+ * для скринридера молчит.
+ */
+watch(() => props.open, (open) => {
+  if (open) initNavigation()
+}, { immediate: true })
+
+function initNavigation(): void {
+  for (const nav of Object.values(navigation)) nav.init()
+}
+
 function select(unit: TimeUnit, option: TimeOption): void {
   if (props.locked || option.disabled) return
 
@@ -159,7 +174,7 @@ function columnLabel(unit: TimeUnit): string {
 
 /** Поставить курсор на выбранные значения и увести фокус в первую колонку. */
 function focus(): void {
-  for (const nav of Object.values(navigation)) nav.init()
+  initNavigation()
   columnEls.value.get('hour')?.focus()
 }
 

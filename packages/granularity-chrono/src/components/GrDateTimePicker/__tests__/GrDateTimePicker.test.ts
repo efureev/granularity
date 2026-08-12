@@ -314,3 +314,29 @@ describe('GrDateTimePicker — негативные сценарии и форм
     wrapper.unmount()
   })
 })
+
+describe('GrDateTimePicker — inline', () => {
+  it('сетка и колонки на месте, поля нет', async () => {
+    const wrapper = mountPicker({ inline: true, modelValue: at(12, 9, 30) })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.querySelector('[data-gr-date-time-picker-field]')).toBeNull()
+    expect(exists('[data-gr-calendar-grid]')).toBe(true)
+    expect(exists('[data-gr-time-columns]')).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('черновик заводится и без открытия панели', async () => {
+    // Иначе при `autoApply: false` подтверждать было бы нечего: черновик
+    // заводится на открытии, которого в `inline` не случается.
+    const wrapper = mountPicker({ inline: true, autoApply: false, modelValue: at(12, 9, 0) })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    await day('2026-08-20').trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+
+    await query('[data-gr-date-time-picker-apply]').trigger('click')
+    expect(lastModel(wrapper)).toEqual(at(20, 9, 0))
+    wrapper.unmount()
+  })
+})

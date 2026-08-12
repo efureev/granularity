@@ -334,3 +334,20 @@ describe('GrDateRangePicker — негативные сценарии и фор�
     wrapper.unmount()
   })
 })
+
+describe('GrDateRangePicker — inline', () => {
+  it('сетка на месте, поля нет, период набирается', async () => {
+    const wrapper = mountPicker({ inline: true })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.querySelector('[data-gr-date-range-picker-field]')).toBeNull()
+
+    await day('2026-08-10').trigger('click')
+    await day('2026-08-13').trigger('mouseenter')
+    expect(inRange('2026-08-12')).toBe(true)
+
+    await day('2026-08-14').trigger('click')
+    expect(lastModel(wrapper)).toEqual([at(10), at(14)])
+    wrapper.unmount()
+  })
+})

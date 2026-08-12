@@ -2,7 +2,9 @@
   "calendar": {
     "previousMonth": "Mes anterior",
     "nextMonth": "Mes siguiente",
-    "weekNumber": "Semana"
+    "weekNumber": "Semana",
+    "previousPeriod": "Anterior",
+    "nextPeriod": "Siguiente"
   },
   "datePicker": {
     "panelLabel": "Elegir fecha",

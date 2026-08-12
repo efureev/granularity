@@ -32,6 +32,21 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **Month and year grids** (`mode="month"` / `mode="year"` on `GrCalendar` and `GrDatePicker`)
+  reuse the same roving-focus primitive — only the column count differs, seven days against
+  three periods. A period is selectable when at least one of its days is within bounds, so a
+  month with `min` in the middle stays available; February of a leap year is not cut off at
+  the 28th. The decade grid pads with one neighbouring year on each side, the way the day grid
+  pads with neighbouring months.
+
+- **`inline` on every picker** — the panel is drawn in place, without a field or a popover,
+  while the model, the value adapter and the `name` stay the picker's own. That is what
+  separates it from a bare `GrCalendar`, which speaks tuples. The panel markup is still
+  written once: what `inline` changes is only what wraps it.
+
+- `GrCalendar` renames what stopped being about months: `goToMonth` → `goToPeriod`,
+  `monthChange` → `periodChange`.
+
 - **`GrDateRangePicker`** — a period picked with two clicks, previewed on hover, with
   `minRange`/`maxRange` limits counted inclusively. The highlight is computed at render from
   tuple comparisons: the grid builder still knows nothing about selection, which is what keeps

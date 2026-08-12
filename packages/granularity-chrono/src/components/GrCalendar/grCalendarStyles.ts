@@ -113,3 +113,43 @@ export function calendarDayClass(options: CalendarDayClassOptions): string {
 
   return parts.join(' ')
 }
+
+/** Сетка месяцев и лет: три колонки вместо семи, ячейка шире и ниже. */
+export const calendarPeriodGridClass = 'grid grid-cols-3 gap-1'
+
+export const calendarPeriodSizes: Record<GrCalendarSize, string> = {
+  xs: 'h-7 text-[length:var(--gr-control-text-xs)]',
+  sm: 'h-8 text-[length:var(--gr-control-text-sm)]',
+  md: 'h-9 text-[length:var(--gr-control-text-md)]',
+  lg: 'h-10 text-[length:var(--gr-control-text-lg)]',
+}
+
+export interface CalendarPeriodClassOptions {
+  size: GrCalendarSize
+  selected: boolean
+  /** Период, в который попадает «сегодня». */
+  current: boolean
+  disabled: boolean
+}
+
+/** Состояния те же, что у дня, и читаются так же: заливка — выбор, обводка — «сейчас». */
+export function calendarPeriodClass(options: CalendarPeriodClassOptions): string {
+  const parts = [
+    'inline-flex w-full items-center justify-center rounded-[var(--gr-radius-control)] px-2',
+    'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
+    calendarPeriodSizes[options.size],
+  ]
+
+  if (options.disabled)
+    parts.push('cursor-not-allowed text-[var(--gr-disabled-fg)]')
+  else if (options.selected)
+    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-primary))] text-[var(--gr-calendar-selected-fg,var(--gr-primary-fg))]')
+  else
+    parts.push('cursor-pointer text-[var(--gr-fg)] hover:bg-[var(--gr-calendar-hover-bg,var(--gr-muted))]')
+
+  if (options.current && !options.selected)
+    parts.push('ring-1 ring-[var(--gr-calendar-today-ring,var(--gr-primary))] ring-inset')
+
+  return parts.join(' ')
+}

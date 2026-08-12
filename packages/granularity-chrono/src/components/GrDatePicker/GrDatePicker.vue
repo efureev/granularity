@@ -1,7 +1,6 @@
 <script setup lang="ts" generic="TValue = Date | null">
 import { computed, ref } from 'vue'
 
-import GrPopover from '@feugene/granularity/components/GrPopover'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
@@ -17,6 +16,7 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
+import PickerSurface from '../../internal/PickerSurface.vue'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
@@ -33,6 +33,11 @@ import type { GrDatePickerSize } from './grDatePickerStyles'
  * `readonly`: значение меняется только через панель.
  */
 export interface GrDatePickerProps<T = Date | null> {
+  /**
+   * Что выбирается: день, месяц или год. В режимах периода панель показывает
+   * двенадцать ячеек, а значением становится первое число периода.
+   */
+  mode?: 'day' | 'month' | 'year'
   modelValue?: T
   /**
    * Как значение уходит наружу и приходит обратно: имя готового адаптера
@@ -63,6 +68,12 @@ export interface GrDatePickerProps<T = Date | null> {
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
+  /**
+   * Панель рисуется на месте: ни поля, ни поповера. Модель, адаптер и `name`
+   * остаются пикеровскими — этим `inline` и отличается от голого `GrCalendar`,
+   * который говорит кортежами.
+   */
+  inline?: boolean
   placement?: UseFloatingPlacement
   /** Точечное переопределение точки монтирования панели. */
   teleportTo?: string | HTMLElement
@@ -90,6 +101,7 @@ export interface GrDatePickerEmits<T = Date | null> {
 }
 
 const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
+  mode: 'day',
   modelValue: undefined,
   valueAdapter: undefined,
   min: undefined,
@@ -105,6 +117,7 @@ const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
   open: undefined,
+  inline: false,
   placement: undefined,
   teleportTo: undefined,
   size: undefined,
@@ -124,7 +137,7 @@ defineSlots<{
   /** Своя ячейка дня вместо числа. */
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
   /** Своя шапка панели вместо заголовка и стрелок. */
-  header?: (props: { title: string, goToMonth: (delta: number) => void }) => unknown
+  header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
   /** Подвал панели. */
   footer?: () => unknown
 }>()
@@ -186,8 +199,17 @@ const disabledDates = computed<DisabledDatesInput>(() => {
   return source.map(toPlainDate)
 })
 
+/** Показ по умолчанию соответствует режиму: день, месяц с годом или год. */
+const displayFormat = computed<Intl.DateTimeFormatOptions | undefined>(() => {
+  if (props.format) return props.format
+  if (props.mode === 'month') return { month: 'long', year: 'numeric' }
+  if (props.mode === 'year') return { year: 'numeric' }
+
+  return undefined
+})
+
 const displayValue = computed(() => (
-  selected.value ? formatPlainDate(resolvedLocale.value, selected.value, props.format) : ''
+  selected.value ? formatPlainDate(resolvedLocale.value, selected.value, displayFormat.value) : ''
 ))
 
 function onSelect(date: PlainDate): void {
@@ -230,18 +252,17 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       <input v-for="(value, index) in formValues" :key="index" type="hidden" :name="name" :value="value">
     </template>
 
-    <GrPopover
-      v-model:open="panelOpen"
+    <PickerSurface
+      :inline="inline"
+      :open="panelOpen"
       :size="resolvedSize"
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :aria-label="t('gr.datePicker.panelLabel', 'Choose date')"
-      :close-on-content-click="false"
-      trigger="manual"
-      :auto-focus="false"
+      :panel-label="t('gr.datePicker.panelLabel', 'Choose date')"
+      @update:open="panelOpen = $event"
     >
-      <template #trigger="{ triggerProps }">
+      <template v-if="!inline" #trigger="{ triggerProps }">
         <div class="relative">
           <input
             :id="inputId"
@@ -297,10 +318,10 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
         </div>
       </template>
 
-      <template #content>
-        <div v-if="hasBeenOpen" data-gr-date-picker-panel :style="calendarVars">
+      <div v-if="hasBeenOpen" data-gr-date-picker-panel :style="calendarVars">
           <GrCalendar
             ref="calendarRef"
+            :mode="mode"
             :model-value="selected"
             :min="minPlain"
             :max="maxPlain"
@@ -325,7 +346,6 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             </template>
           </GrCalendar>
         </div>
-      </template>
-    </GrPopover>
+    </PickerSurface>
   </div>
 </template>

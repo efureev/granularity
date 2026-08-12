@@ -80,6 +80,8 @@ export function rangeCodec<TItem>(
 
 export interface PickerShellProps<TValue> {
   modelValue?: TValue
+  /** Панель рисуется на месте: ни поля, ни поповера. */
+  inline?: boolean
   clearable?: boolean
   open?: boolean
   placement?: UseFloatingPlacement
@@ -136,6 +138,11 @@ export interface UsePickerShellReturn<TParsed = Date> {
   /** Сериализованные значения для скрытых полей формы. */
   formValues: ComputedRef<string[]>
   panelOpen: Ref<boolean>
+  /**
+   * Панель на экране: открыта либо нарисована на месте. Именно это, а не
+   * `panelOpen`, отвечает на вопрос «видит ли пользователь содержимое».
+   */
+  panelVisible: ComputedRef<boolean>
   /** Панель уже открывали — значит она смонтирована. */
   hasBeenOpen: Ref<boolean>
   fieldEl: Ref<HTMLInputElement | null>
@@ -204,7 +211,9 @@ export function usePickerShell<TValue, TParsed = Date>(
    * Размонтировать на закрытие нельзя: содержимое исчезло бы рывком посреди
    * анимации ухода.
    */
-  const hasBeenOpen = ref(false)
+  const hasBeenOpen = ref(Boolean(props().inline))
+
+  const panelVisible = computed(() => Boolean(props().inline) || panelOpen.value)
 
   const fieldEl = ref<HTMLInputElement | null>(null)
 
@@ -218,6 +227,10 @@ export function usePickerShell<TValue, TParsed = Date>(
 
     hasBeenOpen.value = true
 
+    // В `inline` панель и так на экране: уводить в неё фокус без действия
+    // пользователя значит забирать его у страницы на монтировании.
+    if (props().inline) return
+
     // Два тика: первый монтирует панель, второй отдаёт ей отрисованное содержимое.
     await nextTick()
     await nextTick()
@@ -225,7 +238,7 @@ export function usePickerShell<TValue, TParsed = Date>(
   }, { immediate: true })
 
   function openPanel(): void {
-    if (isDisabled.value || panelOpen.value) return
+    if (isDisabled.value || panelOpen.value || props().inline) return
 
     panelOpen.value = true
   }
@@ -290,6 +303,7 @@ export function usePickerShell<TValue, TParsed = Date>(
     selected,
     formValues,
     panelOpen,
+    panelVisible,
     hasBeenOpen,
     fieldEl,
     showClear,
