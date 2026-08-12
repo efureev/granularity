@@ -5,6 +5,7 @@ import {
   grAutocompleteExamples,
   grSelectExamples,
   grSliderExamples,
+  grSortableListExamples,
   grSplitterExamples,
   grFileUploadExamples,
   grModalExamples,
@@ -300,12 +301,26 @@ const grPopoverOverview = {
   ],
 }
 
+const grSortableListOverview = {
+  paragraphs: [
+    'Список, порядок которого задаёт пользователь: приоритеты задач, поля отчёта, шаги маршрута, колонки таблицы.',
+    'Переносится мышью, пальцем и с клавиатуры — последнее и есть причина держать компонент в дизайн-системе: самописная сортировка почти всегда остаётся без клавиатуры, то есть недоступной.',
+  ],
+  features: [
+    'Ручка тянет строку, а сама строка остаётся кликабельной — внутри можно держать ссылки и кнопки.',
+    'Клавиатура: Space берёт, стрелки двигают, Space кладёт, Esc отменяет; каждый шаг объявляется скринридеру.',
+    '`v-model` отдаёт новый массив и не мутирует входной; рядом — событие `move` с парой индексов.',
+    '`max-height` включает автопрокрутку у краёв, `orientation="horizontal"` разворачивает список и ось клавиатуры.',
+  ],
+}
+
 export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocMeta>> = {
   GrConfigProvider: createComponentDocMeta(grConfigProviderExamples, grConfigProviderOverview),
   GrForm: createComponentDocMeta(grFormExamples, grFormOverview),
   GrButton: createComponentDocMeta(grButtonExamples),
   GrAutocomplete: createComponentDocMeta(grAutocompleteExamples, grAutocompleteOverview),
   GrSlider: createComponentDocMeta(grSliderExamples, grSliderOverview),
+  GrSortableList: createComponentDocMeta(grSortableListExamples, grSortableListOverview),
   GrSplitter: createComponentDocMeta(grSplitterExamples),
   GrRating: createComponentDocMeta(grRatingExamples, grRatingOverview),
   GrStatistic: createComponentDocMeta(grStatisticExamples, grStatisticOverview),

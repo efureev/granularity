@@ -8,11 +8,14 @@ import type {
   GrTreeNodeDropType,
 } from './grTreeTypes'
 import { createGrTreeDataAdapter } from './grTreeDataAdapter'
+import type { GrTreeDropTarget } from './grTreeInteractionContext'
 import { createGrTreeInteractionContext } from './grTreeInteractionContext'
 import type { GrTreeCheckState } from './grTreeChecking'
 import { createGrTreeStore } from './grTreeStore'
 import { treeSizeVars } from './grTreeStyles'
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useAnnouncer } from '../../composables/useAnnouncer'
+import { useDragSort } from '../../composables/useDragSort'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -34,6 +37,9 @@ export interface GrTreeEmits<T extends Record<string, any> = any> {
 }
 
 const DEFAULT_BRANCH_LINE_COLOR = 'var(--gr-tree-branch-line-default-color, var(--gr-brd))'
+
+/** Стрелки, которые вместе с `Shift` двигают узел, а не фокус. */
+const MOVE_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'])
 
 const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   props: () => ({
@@ -105,6 +111,7 @@ const interactionContext = createGrTreeInteractionContext(props, {
 const treeProps = props as Readonly<GrTreeProps<T>>
 
 const { t } = useGranularityTranslations()
+const { announce } = useAnnouncer()
 const dragLabel = computed(() => treeProps.dragLabel ?? t('gr.tree.drag', 'Drag'))
 const expandLabel = computed(() => treeProps.expandLabel ?? t('gr.tree.expand', 'Expand'))
 const collapseLabel = computed(() => treeProps.collapseLabel ?? t('gr.tree.collapse', 'Collapse'))
@@ -399,6 +406,16 @@ function onTreeKeydown(event: KeyboardEvent): void {
     return
   }
 
+  // `Shift` со стрелкой двигает сам узел — раскладка аутлайнера. Проверяется
+  // раньше навигации: иначе примитив увёл бы фокус вместо переноса.
+  if (event.shiftKey && MOVE_KEYS.has(event.key)) {
+    if (!treeProps.draggable) return
+
+    event.preventDefault()
+    void onNodeMoveKey(cur.node, event.key)
+    return
+  }
+
   // Вертикаль, `Home` и `End` ведёт примитив. Влево-вправо он не трогает: в
   // дереве это раскрытие ветки и переход к родителю, а не движение по списку.
   if (roving.handleNavigationKeys(event))
@@ -539,14 +556,14 @@ function shouldShowDragHandle(node: GrTreeNode<T>): boolean {
   return canDrag(node) && hoveredKey.value === node.key
 }
 
-function resolveDropType(evt: DragEvent, el: HTMLElement): GrTreeNodeDropType {
-  const rect = el.getBoundingClientRect()
-  const y = evt.clientY - rect.top
-  const third = rect.height / 3
-  if (y < third)
-    return 'prev'
-  if (y > third * 2)
-    return 'next'
+/**
+ * Треть строки сверху — «до», треть снизу — «после», середина — «внутрь».
+ * Зоны нарезает компонент: примитив отдаёт только долю вдоль строки.
+ */
+function dropTypeFromFraction(fraction: number): GrTreeNodeDropType {
+  if (fraction < 1 / 3) return 'prev'
+  if (fraction > 2 / 3) return 'next'
+
   return 'inner'
 }
 
@@ -554,62 +571,98 @@ function canDrop(drag: GrTreeNode<T>, target: GrTreeNode<T>, type: GrTreeAllowDr
   return interactionContext.canDrop(drag, target, type)
 }
 
-function onDragStart(evt: DragEvent, node: GrTreeNode<T>) {
-  if (!canDrag(node)) {
-    evt.preventDefault()
-    return
-  }
+/** Перенос состоялся: одна дорога и для указателя, и для клавиатуры. */
+function applyMove(source: GrTreeNode<T>, targetKey: GrTreeKey, type: GrTreeNodeDropType): boolean {
+  const reference = treeStore.getNode(targetKey)
+  if (!reference) return false
 
-  interactionContext.draggingNode.value = node
-  interactionContext.dropTarget.value = null
-  try {
-    evt.dataTransfer?.setData('text/plain', String(node.key))
-  }
-  catch {
-    // ignore
-  }
-  if (evt.dataTransfer)
-    evt.dataTransfer.effectAllowed = 'move'
+  const movedNode = treeStore.moveNode(source, reference, type)
+  if (!movedNode) return false
+
+  const dropNode = treeStore.getNode(reference.key) ?? reference
+  interactionContext.emitNodeDrop(movedNode, dropNode, type)
+
+  return true
 }
 
-function onDragEnd() {
-  interactionContext.resetDragState()
+const dragSort = useDragSort<GrTreeKey, GrTreeDropTarget>({
+  items: () => visibleRows.value.map(row => row.node.key),
+  elementFor: key => interactionContext.nodeEls.get(key) ?? null,
+  scroller: () => treeRootEl.value,
+  disabled: () => !treeProps.draggable,
+  canDrag: (key) => {
+    const node = treeStore.getNode(key)
+
+    return node ? canDrag(node) : false
+  },
+  resolveTarget: (hit, sourceKey, previous) => {
+    const source = treeStore.getNode(sourceKey)
+    const node = treeStore.getNode(hit.key)
+    if (!source || !node) return null
+
+    const type = dropTypeFromFraction(hit.fraction)
+    const allowed = treeStore.canMoveNode(source, node, type) && canDrop(source, node, type)
+
+    // Та же ссылка, пока смысл не изменился: иначе подсветка перерисовывалась бы
+    // на каждом движении указателя.
+    if (previous && previous.key === node.key && previous.type === type && previous.allowed === allowed)
+      return previous
+
+    return { key: node.key, type, allowed }
+  },
+  onDrop: (sourceKey, target) => {
+    const source = treeStore.getNode(sourceKey)
+    if (!source || !target.allowed) return
+
+    applyMove(source, target.key, target.type)
+  },
+  onUpdate: (sourceKey, target) => {
+    interactionContext.draggingNode.value = sourceKey === null ? null : treeStore.getNode(sourceKey) ?? null
+    interactionContext.dropTarget.value = target
+  },
+})
+
+function onHandlePointerDown(event: PointerEvent, node: GrTreeNode<T>): void {
+  if (!treeProps.draggable) return
+
+  dragSort.startFrom(node.key)(event)
 }
 
-function onDragOver(evt: DragEvent, node: GrTreeNode<T>, rowEl: HTMLElement) {
-  const drag = interactionContext.draggingNode.value
-  if (!treeProps.draggable || !drag)
-    return
+/**
+ * Клавиатурный перенос — раскладка аутлайнера: `Shift` со стрелкой сразу
+ * двигает узел, без режима «взято». Режим здесь был бы лишним: `Space` в дереве
+ * уже отмечает чекбокс, а стрелки водят фокус по веткам.
+ */
+function moveByKeyboard(node: GrTreeNode<T>, key: string): boolean {
+  const siblings = node.parent ? node.parent.childNodes : treeStore.treeModel.value.roots
+  const index = siblings.findIndex(sibling => sibling.key === node.key)
 
-  // required for `drop` to fire
-  evt.preventDefault()
+  if (key === 'ArrowUp' && index > 0)
+    return applyMove(node, siblings[index - 1].key, 'prev')
 
-  const type = resolveDropType(evt, rowEl)
-  const allowed = treeStore.canMoveNode(drag, node, type) && canDrop(drag, node, type)
-  interactionContext.dropTarget.value = { key: node.key, type, allowed }
-  if (evt.dataTransfer)
-    evt.dataTransfer.dropEffect = allowed ? 'move' : 'none'
+  if (key === 'ArrowDown' && index >= 0 && index < siblings.length - 1)
+    return applyMove(node, siblings[index + 1].key, 'next')
+
+  // Вправо — в предыдущего соседа: у первого в уровне такого соседа нет.
+  if (key === 'ArrowRight' && index > 0)
+    return applyMove(node, siblings[index - 1].key, 'inner')
+
+  if (key === 'ArrowLeft' && node.parent)
+    return applyMove(node, node.parent.key, 'next')
+
+  return false
 }
 
-function onDrop(evt: DragEvent, node: GrTreeNode<T>) {
-  // Первым делом и безусловно: если drop до нас дошёл, дефолт браузера — это
-  // навигация по брошенной ссылке или открытие брошенного файла поверх страницы.
-  evt.preventDefault()
+async function onNodeMoveKey(node: GrTreeNode<T>, key: string): Promise<void> {
+  if (!treeProps.draggable || !canDrag(node)) return
+  if (!moveByKeyboard(node, key)) return
 
-  const drag = interactionContext.draggingNode.value
-  const target = interactionContext.dropTarget.value
-  if (!treeProps.draggable || !drag || !target)
-    return
+  announce(t('gr.tree.moved', 'Moved {label}', { label: node.label }))
 
-  if (target.key === node.key && target.allowed) {
-    const movedNode = treeStore.moveNode(drag, node, target.type)
-    if (movedNode) {
-      const dropNode = treeStore.getNode(node.key) ?? node
-      interactionContext.emitNodeDrop(movedNode, dropNode, target.type)
-    }
-  }
-
-  interactionContext.resetDragState()
+  // Перестановка перерисовывает уровень: без возврата фокуса следующий Shift
+  // уже некуда было бы адресовать.
+  await nextTick()
+  focusRow(node.key)
 }
 
 function filter(value: string) {
@@ -751,8 +804,7 @@ defineExpose<GrTreeInstance<T>>({
           :style="rowStyle(row)"
           @click="onRowActivate(row)"
           @contextmenu="onRowContextMenu($event, row.node)"
-          @drop="onDrop($event, row.node)"
-          @dragover="onDragOver($event, row.node, $event.currentTarget as HTMLElement)"
+          @drop.prevent
           @mouseenter="onRowMouseEnter(row.node)"
           @mouseleave="onRowMouseLeave(row.node)"
       >
@@ -782,11 +834,9 @@ defineExpose<GrTreeInstance<T>>({
             resolveNodeClass(treeProps.dragHandleClass, row),
           ]"
             :aria-label="dragLabel"
-            :draggable="canDrag(row.node)"
+            :aria-disabled="canDrag(row.node) ? undefined : 'true'"
             @click.stop
-            @mousedown.stop
-            @dragstart="onDragStart($event, row.node)"
-            @dragend="onDragEnd"
+            @pointerdown="onHandlePointerDown($event, row.node)"
         >
           <span class="gr-tree__drag-icon" :class="treeProps.dragHandleIcon" />
         </button>
@@ -1026,6 +1076,9 @@ defineExpose<GrTreeInstance<T>>({
     border-radius: var(--gr-tree-drag-handle-radius);
     color: var(--gr-tree-drag-handle-color);
     cursor: grab;
+    /* Без этого вертикальный свайп по ручке уходит в прокрутку страницы,
+       браузер отзывает указатель, и пальцем узел неперетаскиваем. */
+    touch-action: none;
     visibility: hidden;
     pointer-events: none;
     opacity: 0;

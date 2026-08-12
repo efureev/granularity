@@ -8836,6 +8836,141 @@
       }
     ]
   },
+  "GrSortableList": {
+    "name": "GrSortableList",
+    "sourcePath": "packages/granularity/src/components/GrSortableList/GrSortableList.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "Набор в текущем порядке. `v-model`: наружу уходит новый массив, вход не мутируется.",
+            "type": "T[]",
+            "required": true
+          },
+          {
+            "name": "itemKey",
+            "description": "Ключ элемента: имя поля или функция. Без него — индекс.",
+            "type": "string | ((item: T, index: number) => string | number) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "Список только для чтения: ни указателем, ни с клавиатуры.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "orientation",
+            "description": "Ось переноса. `horizontal` — ряд с переносом по ширине.",
+            "type": "GrSortableOrientation | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
+            "name": "variant",
+            "description": "Поверхность под списком — вариант карточки.",
+            "type": "GrCardVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "divided",
+            "description": "Разделители между строками.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "handleOnly",
+            "description": "Тянуть можно только за ручку. Выключено — тянется вся строка.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Высота видимой части: список становится скроллером с автопрокруткой при переносе.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст пустого состояния. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя списка для скринридера. Не задано — берётся из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "item",
+            "description": "",
+            "type": "{ item: T; index: number; dragging: boolean; grabbed: boolean; }"
+          },
+          {
+            "name": "handle",
+            "description": "",
+            "type": "{ item: T; index: number; disabled: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[T[]]",
+            "signature": "(e: \"update:modelValue\", value: T[]): void"
+          },
+          {
+            "name": "move",
+            "description": "",
+            "type": "[number, number]",
+            "signature": "(e: \"move\", from: number, to: number): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[T[]]",
+            "signature": "(e: \"change\", value: T[]): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrSplitter": {
     "name": "GrSplitter",
     "sourcePath": "packages/granularity/src/components/GrSplitter/GrSplitter.vue",

@@ -23,6 +23,47 @@ function tree() {
   ] satisfies Item[]
 }
 
+/**
+ * jsdom не знает `PointerEvent`, а `trigger()` из test-utils падает на
+ * присвоении `clientY` незнакомому типу события — поэтому указатель
+ * отправляется в элемент напрямую.
+ */
+function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
+  return new MouseEvent(type, { bubbles: true, ...init })
+}
+
+/** Строки по 30px подряд: в jsdom `getBoundingClientRect` всегда нулевой. */
+function layoutRows(wrapper: ReturnType<typeof mount>): void {
+  wrapper.findAll('[data-gr-tree-node]').forEach((row, index) => {
+    ;(row.element as HTMLElement).getBoundingClientRect = () => ({
+      top: index * 30,
+      bottom: index * 30 + 30,
+      left: 0,
+      right: 100,
+      width: 100,
+      height: 30,
+      x: 0,
+      y: index * 30,
+      toJSON: () => ({}),
+    })
+  })
+}
+
+function nodeOf(wrapper: ReturnType<typeof mount>, index: number) {
+  return wrapper.findAll('[data-gr-tree-node]')[index]
+}
+
+function handleOf(wrapper: ReturnType<typeof mount>, index: number): Element {
+  return nodeOf(wrapper, index).get('.gr-tree__drag-handle').element
+}
+
+/** Полный жест: нажали на ручке строки, довели указатель до цели, отпустили. */
+function drag(wrapper: ReturnType<typeof mount>, from: number, fromY: number, toY: number): void {
+  handleOf(wrapper, from).dispatchEvent(pointer('pointerdown', { clientY: fromY, button: 0 }))
+  window.dispatchEvent(pointer('pointermove', { clientY: toY }))
+  window.dispatchEvent(pointer('pointerup'))
+}
+
 function treeWithNestedFolder() {
   return [
     {
@@ -381,7 +422,7 @@ describe('GrTree', () => {
     expect(childHandle.classes()).toContain('gr-tree__drag-handle--visible')
   })
 
-  it('эмитит `nodeDrop` при DnD (prev/inner/next)', async () => {
+  it('эмитит `nodeDrop` при переносе указателем', async () => {
     const wrapper = mount(GrTree<Item>, {
       props: {
         data: tree(),
@@ -390,44 +431,24 @@ describe('GrTree', () => {
         defaultExpandedKeys: [1],
         draggable: true,
       },
+      attachTo: document.body,
     })
 
-    const rows = wrapper.findAll('.gr-tree__row')
-    const dragRow = rows[1]
-    const dropRow = rows[2]
-
-    const dragHandle = dragRow.get('.gr-tree__drag-handle')
-
-    const stubTransfer = {
-      effectAllowed: 'move',
-      dropEffect: 'move',
-      setData() {},
-    }
-
-    ;(dropRow.element as any).getBoundingClientRect = () => ({
-      top: 0,
-      bottom: 30,
-      left: 0,
-      right: 100,
-      width: 100,
-      height: 30,
-      x: 0,
-      y: 0,
-      toJSON() {},
-    })
-
-    await dragHandle.trigger('dragstart', { dataTransfer: stubTransfer })
-    await dropRow.trigger('dragover', { dataTransfer: stubTransfer, clientY: 1 })
-    await dropRow.trigger('drop', { dataTransfer: stubTransfer })
+    layoutRows(wrapper)
+    // Верхняя треть третьей строки — «до неё».
+    drag(wrapper, 1, 35, 62)
+    await nextTick()
 
     const e = wrapper.emitted('nodeDrop')
     expect(e).toBeTruthy()
     expect(e![0][0]).toMatchObject({ key: 2 })
     expect(e![0][1]).toMatchObject({ key: 3 })
     expect(e![0][2]).toBe('prev')
+
+    wrapper.unmount()
   })
 
-  it('перемещает ноду в данных и DOM при DnD', async () => {
+  it('перемещает ноду в данных и DOM при переносе указателем', async () => {
     const data = tree()
     const wrapper = mount(GrTree<Item>, {
       props: {
@@ -437,35 +458,11 @@ describe('GrTree', () => {
         defaultExpandedKeys: [1],
         draggable: true,
       },
+      attachTo: document.body,
     })
 
-    const rows = wrapper.findAll('.gr-tree__row')
-    const dragRow = rows[2]
-    const dropRow = rows[1]
-
-    const dragHandle = dragRow.get('.gr-tree__drag-handle')
-
-    const stubTransfer = {
-      effectAllowed: 'move',
-      dropEffect: 'move',
-      setData() {},
-    }
-
-    ;(dropRow.element as any).getBoundingClientRect = () => ({
-      top: 0,
-      bottom: 30,
-      left: 0,
-      right: 100,
-      width: 100,
-      height: 30,
-      x: 0,
-      y: 0,
-      toJSON() {},
-    })
-
-    await dragHandle.trigger('dragstart', { dataTransfer: stubTransfer })
-    await dropRow.trigger('dragover', { dataTransfer: stubTransfer, clientY: 1 })
-    await dropRow.trigger('drop', { dataTransfer: stubTransfer })
+    layoutRows(wrapper)
+    drag(wrapper, 2, 65, 32)
     await nextTick()
 
     expect(data[0].children?.map(item => item.id)).toEqual([3, 2])
@@ -474,6 +471,134 @@ describe('GrTree', () => {
       'Child B',
       'Child A',
     ])
+
+    wrapper.unmount()
+  })
+
+  it('нажатие без движения переносом не считается', async () => {
+    const data = tree()
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data,
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        draggable: true,
+      },
+      attachTo: document.body,
+    })
+
+    layoutRows(wrapper)
+    handleOf(wrapper, 1).dispatchEvent(pointer('pointerdown', { clientY: 35, button: 0 }))
+    window.dispatchEvent(pointer('pointerup'))
+    await nextTick()
+
+    expect(wrapper.emitted('nodeDrop')).toBeFalsy()
+    expect(data[0].children?.map(item => item.id)).toEqual([2, 3])
+
+    wrapper.unmount()
+  })
+
+  it('`Esc` отменяет начатый перенос', async () => {
+    const data = tree()
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data,
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        draggable: true,
+      },
+      attachTo: document.body,
+    })
+
+    layoutRows(wrapper)
+    handleOf(wrapper, 1).dispatchEvent(pointer('pointerdown', { clientY: 35, button: 0 }))
+    window.dispatchEvent(pointer('pointermove', { clientY: 62 }))
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    window.dispatchEvent(pointer('pointerup'))
+    await nextTick()
+
+    expect(wrapper.emitted('nodeDrop')).toBeFalsy()
+    expect(data[0].children?.map(item => item.id)).toEqual([2, 3])
+
+    wrapper.unmount()
+  })
+
+  it('`Shift` со стрелкой двигает узел с клавиатуры', async () => {
+    const data = tree()
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data,
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        draggable: true,
+      },
+      attachTo: document.body,
+    })
+
+    const root = wrapper.get('[role="tree"]')
+    // Клик по строке ставит роверный фокус: без него `Shift` адресовался бы
+    // первой видимой строке, а не той, что двигаем.
+    await nodeOf(wrapper, 1).get('.gr-tree__row').trigger('click')
+    await root.trigger('keydown', { key: 'ArrowDown', shiftKey: true })
+    await nextTick()
+
+    expect(data[0].children?.map(item => item.id)).toEqual([3, 2])
+    expect(wrapper.emitted('nodeDrop')?.[0][2]).toBe('next')
+
+    wrapper.unmount()
+  })
+
+  it('`Shift` + стрелка влево выносит узел на уровень родителя', async () => {
+    const data = tree()
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data,
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        draggable: true,
+      },
+      attachTo: document.body,
+    })
+
+    const root = wrapper.get('[role="tree"]')
+    // Клик по строке ставит роверный фокус: без него `Shift` адресовался бы
+    // первой видимой строке, а не той, что двигаем.
+    await nodeOf(wrapper, 1).get('.gr-tree__row').trigger('click')
+    await root.trigger('keydown', { key: 'ArrowLeft', shiftKey: true })
+    await nextTick()
+
+    expect(data.map(item => item.id)).toEqual([1, 2])
+    expect(data[0].children?.map(item => item.id)).toEqual([3])
+
+    wrapper.unmount()
+  })
+
+  it('без `draggable` `Shift` со стрелкой ничего не двигает', async () => {
+    const data = tree()
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data,
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+      },
+      attachTo: document.body,
+    })
+
+    const root = wrapper.get('[role="tree"]')
+    // Клик по строке ставит роверный фокус: без него `Shift` адресовался бы
+    // первой видимой строке, а не той, что двигаем.
+    await nodeOf(wrapper, 1).get('.gr-tree__row').trigger('click')
+    await root.trigger('keydown', { key: 'ArrowDown', shiftKey: true })
+    await nextTick()
+
+    expect(data[0].children?.map(item => item.id)).toEqual([2, 3])
+
+    wrapper.unmount()
   })
 
   it('не позволяет перенести ноду в собственное поддерево', async () => {
@@ -486,40 +611,19 @@ describe('GrTree', () => {
         defaultExpandedKeys: [1, 2],
         draggable: true,
       },
+      attachTo: document.body,
     })
 
-    const rows = wrapper.findAll('.gr-tree__row')
-    const dragRow = rows[1]
-    const dropRow = rows[2]
-
-    const dragHandle = dragRow.get('.gr-tree__drag-handle')
-
-    const stubTransfer = {
-      effectAllowed: 'move',
-      dropEffect: 'move',
-      setData() {},
-    }
-
-    ;(dropRow.element as any).getBoundingClientRect = () => ({
-      top: 0,
-      bottom: 30,
-      left: 0,
-      right: 100,
-      width: 100,
-      height: 30,
-      x: 0,
-      y: 0,
-      toJSON() {},
-    })
-
-    await dragHandle.trigger('dragstart', { dataTransfer: stubTransfer })
-    await dropRow.trigger('dragover', { dataTransfer: stubTransfer, clientY: 15 })
-    await dropRow.trigger('drop', { dataTransfer: stubTransfer })
+    layoutRows(wrapper)
+    // Середина третьей строки — «внутрь», и это собственный потомок.
+    drag(wrapper, 1, 35, 75)
     await nextTick()
 
     expect(data[0].children?.map(item => item.id)).toEqual([2, 3])
     expect(data[0].children?.[0].children?.map(item => item.id)).toEqual([4])
     expect(wrapper.emitted('nodeDrop')).toBeFalsy()
+
+    wrapper.unmount()
   })
 })
 

@@ -54,6 +54,7 @@ export * from './components/GrSelect'
 export * from './components/GrSidebar'
 export * from './components/GrSkeleton'
 export * from './components/GrSlider'
+export * from './components/GrSortableList'
 export * from './components/GrSplitter'
 export * from './components/GrStatistic'
 export * from './components/GrSwitch'
@@ -106,6 +107,15 @@ export type { GrVirtualAlign, UseVirtualListOptions, UseVirtualListReturn } from
 // Скелет указательного жеста: слушатели на `window`, отпускание против обрыва.
 export { useDragGesture } from './composables/useDragGesture'
 export type { UseDragGestureOptions, UseDragGestureReturn } from './composables/useDragGesture'
+// Модель перестановки: порог, попадание, автопрокрутка, клавиатурный перенос.
+export { useDragSort } from './composables/useDragSort'
+export type {
+  DragSortHit,
+  DragSortMode,
+  DragSortOrientation,
+  UseDragSortOptions,
+  UseDragSortReturn,
+} from './composables/useDragSort'
 // Контракт форм-контрола: сведение собственных пропов с контекстом `GrFormField`.
 // Публичен ради сторонних контролов — без него контракт пакета не выполнить.
 export { useGrFormControl } from './composables/useGrFormControl'

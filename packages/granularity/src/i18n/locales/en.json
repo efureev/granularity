@@ -30,7 +30,8 @@
   "tree": {
     "drag": "Drag",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "moved": "Moved {label}"
   },
   "select": {
     "customValuePlaceholder": "Add value…",
@@ -316,5 +317,14 @@
   },
   "emptyState": {
     "title": "Nothing here yet"
+  },
+  "sortable": {
+    "label": "Sortable list",
+    "handle": "Reorder",
+    "empty": "Nothing to sort yet",
+    "grabbed": "Grabbed. Position {position} of {count}",
+    "moved": "Position {position} of {count}",
+    "dropped": "Dropped at position {position} of {count}",
+    "cancelled": "Move cancelled"
   }
 }

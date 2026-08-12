@@ -237,6 +237,9 @@ export default defineConfig({
         'components/GrSlider/index': fileURLToPath(
           new URL('./src/components/GrSlider/index.ts', import.meta.url),
         ),
+        'components/GrSortableList/index': fileURLToPath(
+          new URL('./src/components/GrSortableList/index.ts', import.meta.url),
+        ),
         'components/GrSplitter/index': fileURLToPath(
           new URL('./src/components/GrSplitter/index.ts', import.meta.url),
         ),
@@ -285,6 +288,9 @@ export default defineConfig({
         ),
         'composables/useDragGesture': fileURLToPath(
           new URL('./src/composables/useDragGesture.ts', import.meta.url),
+        ),
+        'composables/useDragSort': fileURLToPath(
+          new URL('./src/composables/useDragSort.ts', import.meta.url),
         ),
         'composables/useVirtualList': fileURLToPath(
           new URL('./src/composables/useVirtualList.ts', import.meta.url),

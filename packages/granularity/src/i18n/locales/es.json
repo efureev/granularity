@@ -30,7 +30,8 @@
   "tree": {
     "drag": "Arrastrar",
     "expand": "Expandir",
-    "collapse": "Contraer"
+    "collapse": "Contraer",
+    "moved": "{label} movido"
   },
   "select": {
     "customValuePlaceholder": "Añadir valor…",
@@ -318,5 +319,14 @@
   },
   "emptyState": {
     "title": "Todavía no hay nada"
+  },
+  "sortable": {
+    "label": "Lista ordenable",
+    "handle": "Reordenar",
+    "empty": "Nada que ordenar todavía",
+    "grabbed": "Agarrado. Posición {position} de {count}",
+    "moved": "Posición {position} de {count}",
+    "dropped": "Soltado en la posición {position} de {count}",
+    "cancelled": "Movimiento cancelado"
   }
 }

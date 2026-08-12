@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrSortableList`** — a list whose order the user changes: task priorities, report fields,
+  route steps. It drags with a mouse, with a finger, and — the reason it belongs in a design system
+  rather than in every application — **from the keyboard**: `Space` picks a row up, arrows move it,
+  `Space` drops it, `Esc` cancels, and every one of those is announced through the shared live
+  region. One `Tab` stop for the whole list (roving tabindex), the handle is a button outside the
+  tab order, `v-model` returns a **new** array instead of mutating the input, and `move(from, to)`
+  is emitted alongside for callers that persist a single operation rather than the whole list.
+  `orientation="horizontal"` switches both the layout and the arrow axis; `maxHeight` turns the
+  list into a scroller with edge auto-scrolling. No virtualization by design — a drop target has to
+  be rendered. Adds `gr.sortable.*` to all three locales.
+
+- **`useDragSort`** — the reorder model behind it, built on `useDragGesture`. It owns the mechanics
+  (drag threshold, hit-testing, edge auto-scroll, `Esc` cancellation, pointer/keyboard session
+  state) and deliberately not the meaning: what counts as a target, which keys move it and what to
+  announce stay with the component. That split is what lets a list treat a target as an insertion
+  index while a tree treats it as a node plus a `prev`/`inner`/`next` zone. See `docs/drag-sort.md`.
+
 - **`useDragGesture`** — the pointer-drag skeleton every draggable control was writing for itself.
   It owns the plumbing and nothing else: subscribe on `pointerdown`, ignore anything but the primary
   button, listen on `window` (a pointer leaves the element constantly, and capture would tie the
@@ -24,6 +41,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   Deliberately absent: `preventDefault` (a slider suppresses text selection, an image pan must not),
   coordinate math, a drag threshold, and multi-pointer tracking. See `docs/drag-gesture.md`.
+
+### Changed
+
+- **`GrTree` drag and drop runs on pointer events.** It used to be built on the HTML5 drag and drop
+  API, which sends no events on touch and has no keyboard equivalent — so reordering a tree worked
+  with a mouse, on a desktop, and nowhere else. It now shares `useDragSort` with `GrSortableList`:
+  the same drag threshold, the same edge auto-scrolling, the same `Esc` to abort, plus an outliner
+  keymap — `Shift`+`↑`/`↓` reorders among siblings, `Shift`+`→` makes the node a child of the
+  previous sibling, `Shift`+`←` lifts it to the parent level, each move announced in the live
+  region. The public API is unchanged: `draggable`, `allowDrag`, `allowDrop`, `nodeDrop` and the
+  three drop zones behave exactly as before. Adds `gr.tree.moved` to all three locales.
+
+## [v0.17.0] 2026-08-12
 
 ### Fixed
 

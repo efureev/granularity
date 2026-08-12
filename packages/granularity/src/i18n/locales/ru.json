@@ -30,7 +30,8 @@
   "tree": {
     "drag": "Перетащить",
     "expand": "Развернуть",
-    "collapse": "Свернуть"
+    "collapse": "Свернуть",
+    "moved": "{label} перемещён"
   },
   "select": {
     "customValuePlaceholder": "Добавить значение…",
@@ -320,5 +321,14 @@
   },
   "emptyState": {
     "title": "Пока пусто"
+  },
+  "sortable": {
+    "label": "Сортируемый список",
+    "handle": "Переставить",
+    "empty": "Пока нечего сортировать",
+    "grabbed": "Взято. Позиция {position} из {count}",
+    "moved": "Позиция {position} из {count}",
+    "dropped": "Отпущено на позиции {position} из {count}",
+    "cancelled": "Перенос отменён"
   }
 }

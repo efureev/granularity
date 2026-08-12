@@ -2676,6 +2676,41 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Длина вертикального слайдера: горизонтальный тянется по ширине контейнера, вертикальному нужна явная высота."
   },
   {
+    "owner": "GrSortableList",
+    "name": "--gr-sortable-handle-size",
+    "kind": "hook",
+    "default": "1.5rem",
+    "description": "Размер ручки переноса."
+  },
+  {
+    "owner": "GrSortableList",
+    "name": "--gr-sortable-handle-color",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет ручки переноса."
+  },
+  {
+    "owner": "GrSortableList",
+    "name": "--gr-sortable-row-bg-active",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Фон строки, которую переносят указателем или держат с клавиатуры."
+  },
+  {
+    "owner": "GrSortableList",
+    "name": "--gr-sortable-indicator",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет линии, показывающей место вставки."
+  },
+  {
+    "owner": "GrSortableList",
+    "name": "--gr-sortable-indicator-width",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина линии места вставки."
+  },
+  {
     "owner": "GrSplitter",
     "name": "--gr-splitter-size",
     "kind": "hook",

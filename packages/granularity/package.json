@@ -276,6 +276,10 @@
       "types": "./dist/types/src/components/GrSlider/index.d.ts",
       "import": "./dist/components/GrSlider/index.js"
     },
+    "./components/GrSortableList": {
+      "types": "./dist/types/src/components/GrSortableList/index.d.ts",
+      "import": "./dist/components/GrSortableList/index.js"
+    },
     "./components/GrSplitter": {
       "types": "./dist/types/src/components/GrSplitter/index.d.ts",
       "import": "./dist/components/GrSplitter/index.js"
@@ -371,6 +375,10 @@
     "./composables/useDragGesture": {
       "types": "./dist/types/src/composables/useDragGesture.d.ts",
       "import": "./dist/composables/useDragGesture.js"
+    },
+    "./composables/useDragSort": {
+      "types": "./dist/types/src/composables/useDragSort.d.ts",
+      "import": "./dist/composables/useDragSort.js"
     },
     "./composables/useVirtualList": {
       "types": "./dist/types/src/composables/useVirtualList.d.ts",
