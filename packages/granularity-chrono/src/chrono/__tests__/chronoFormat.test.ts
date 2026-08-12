@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
+  dayPeriodNames,
   formatMonthTitle,
   formatPlainDate,
   formatPlainTime,
@@ -107,6 +108,26 @@ describe('показ значения', () => {
   it('заголовок панели — месяц и год', () => {
     expect(formatMonthTitle('en-US', 2026, 7)).toBe('August 2026')
     expect(formatMonthTitle('ru-RU', 2026, 7)).toBe('август 2026 г.')
+  })
+})
+
+describe('половины суток', () => {
+  it('английская локаль отдаёт AM и PM', () => {
+    expect(dayPeriodNames('en-US')).toEqual(['AM', 'PM'])
+  })
+
+  it('локаль решает сама, как их писать', () => {
+    // Срезом строки это не получить: часть стоит и до числа, и после, и
+    // пишется по-своему.
+    const [am, pm] = dayPeriodNames('ru-RU')
+
+    expect(am).toBeTruthy()
+    expect(pm).toBeTruthy()
+    expect(am).not.toBe(pm)
+  })
+
+  it('некорректный тег локали не роняет показ', () => {
+    expect(dayPeriodNames('не-локаль')).toEqual(['AM', 'PM'])
   })
 })
 

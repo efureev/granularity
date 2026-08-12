@@ -50,6 +50,9 @@ export default defineConfig({
         'components/GrDatePicker/index': fileURLToPath(
           new URL('./src/components/GrDatePicker/index.ts', import.meta.url),
         ),
+        'components/GrTimePicker/index': fileURLToPath(
+          new URL('./src/components/GrTimePicker/index.ts', import.meta.url),
+        ),
         // </granularity:components>
       },
       formats: ['es'],

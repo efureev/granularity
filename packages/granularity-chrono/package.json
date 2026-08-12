@@ -58,6 +58,10 @@
       "types": "./dist/types/components/GrDatePicker/index.d.ts",
       "import": "./dist/components/GrDatePicker/index.js"
     },
+    "./components/GrTimePicker": {
+      "types": "./dist/types/components/GrTimePicker/index.d.ts",
+      "import": "./dist/components/GrTimePicker/index.js"
+    },
     "./granular-provider": {
       "types": "./dist/types/granular-provider/index.d.ts",
       "import": "./dist/granular-provider.js",

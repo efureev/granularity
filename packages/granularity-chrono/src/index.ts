@@ -1,6 +1,7 @@
 // <granularity:components> — блок генерируется `yarn generate:registry`
 export * from './components/GrCalendar'
 export * from './components/GrDatePicker'
+export * from './components/GrTimePicker'
 // </granularity:components>
 
 // Арифметика дат и времени. Публична намеренно: потребитель, которому нужно
@@ -59,9 +60,20 @@ export type {
 } from './chrono/calendarGrid'
 export { buildCalendarGrid, createDisabledPredicate } from './chrono/calendarGrid'
 
+// Колонки времени — та же чистая функция, что и сетка месяца, и та же причина
+// её иметь: запреты на границах проверяются тестом, а не глазами.
+export type {
+  BuildTimeColumnsOptions,
+  TimeColumn,
+  TimeOption,
+  TimeUnit,
+} from './chrono/timeColumns'
+export { applyTimeUnit, buildTimeColumns } from './chrono/timeColumns'
+
 // Всё локале-зависимое — из `Intl`, а не из словарей пакета.
 export type { NameWidth } from './chrono/chronoFormat'
 export {
+  dayPeriodNames,
   formatMonthTitle,
   formatPlainDate,
   formatPlainTime,

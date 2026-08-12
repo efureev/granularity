@@ -11,6 +11,7 @@ import {
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grCalendarConfig } from '../components/GrCalendar/config'
 import { grDatePickerConfig } from '../components/GrDatePicker/config'
+import { grTimePickerConfig } from '../components/GrTimePicker/config'
 // </granularity:components:imports>
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
@@ -31,6 +32,7 @@ export const granularityChronoComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrCalendar: grCalendarConfig,
   GrDatePicker: grDatePickerConfig,
+  GrTimePicker: grTimePickerConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>
 

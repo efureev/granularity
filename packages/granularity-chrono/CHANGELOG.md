@@ -32,6 +32,18 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **`GrTimePicker`** — a field with a panel of column listboxes: hours, minutes, optionally
+  seconds, and a period column in 12-hour locales. Arrow keys, `Home`/`End` and
+  `aria-activedescendant` come from the core's `useComboboxNavigation`, so the keyboard
+  contract is the one `GrSelect` already implements. The panel does **not** close on a pick:
+  a time takes several of them, and closing after the first would mean reopening for every
+  unit. Which values are out of bounds is decided per unit — with `min = 09:30` the 9 o'clock
+  hour stays selectable while the minutes before 30 do not.
+
+- The picker shell — form-control contract, `v-model:open`, lazy panel mounting, field
+  keyboard, clearing, serialization for the native form — now lives in one composable shared
+  by the pickers. `GrDatePicker` moved onto it with its tests untouched.
+
 - **Wired into the showcase** next to the package it replaces: its own companion section,
   four demos and hand-written API tables. Both packages ship a `GrDatePicker`, so the
   showcase demos import this one explicitly — the auto-import resolver matches by name and

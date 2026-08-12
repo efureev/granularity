@@ -7,5 +7,12 @@
   "datePicker": {
     "panelLabel": "Choose date",
     "gridLabel": "Calendar"
+  },
+  "timePicker": {
+    "panelLabel": "Choose time",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "period": "AM/PM"
   }
 }

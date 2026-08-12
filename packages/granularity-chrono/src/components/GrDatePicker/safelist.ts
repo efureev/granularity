@@ -1,33 +1,9 @@
 import { splitClassTokens } from '../../internal/classTokens'
-
-import {
-  clearButtonClass,
-  fieldBaseClass,
-  fieldDisabledClass,
-  fieldEnabledClass,
-  fieldInvalidClass,
-  fieldSizes,
-  iconClass,
-  indicatorClass,
-  spinnerClass,
-  trailingZoneClass,
-} from './grDatePickerStyles'
+import { pickerFieldClassTokens } from '../../internal/pickerFieldStyles'
 
 /**
- * Классы из `.ts`-хелпера обязаны быть в safelist: хелпер уезжает в общий
- * `dist/chunks/`, а пресет сканирует только `dist/components/<Name>/**`.
- *
- * Ссылки на сами константы, а не копии строками: копия расходится молча.
+ * Классы поля приходят из общего модуля, а он уезжает в `dist/chunks/` —
+ * пресет сканирует только `dist/components/<Name>/**`. Своих классов у пикера
+ * нет: панель рисует `GrCalendar`, её safelist объявлен там.
  */
-export const grDatePickerSafelist: string[] = [
-  ...splitClassTokens(fieldBaseClass),
-  ...splitClassTokens(fieldEnabledClass),
-  ...splitClassTokens(fieldDisabledClass),
-  ...splitClassTokens(fieldInvalidClass),
-  ...Object.values(fieldSizes).flatMap(splitClassTokens),
-  ...splitClassTokens(trailingZoneClass),
-  ...splitClassTokens(indicatorClass),
-  ...splitClassTokens(clearButtonClass),
-  ...splitClassTokens(iconClass),
-  ...splitClassTokens(spinnerClass),
-]
+export const grDatePickerSafelist: string[] = pickerFieldClassTokens.flatMap(splitClassTokens)

@@ -7,5 +7,12 @@
   "datePicker": {
     "panelLabel": "Выбор даты",
     "gridLabel": "Календарь"
+  },
+  "timePicker": {
+    "panelLabel": "Выбор времени",
+    "hours": "Часы",
+    "minutes": "Минуты",
+    "seconds": "Секунды",
+    "period": "До и после полудня"
   }
 }

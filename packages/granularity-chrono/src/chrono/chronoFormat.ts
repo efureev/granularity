@@ -146,6 +146,24 @@ export function formatPlainTime(
   return formatter(locale, { ...options, timeZone: 'UTC' }).format(date)
 }
 
+/**
+ * Подписи половин суток (`AM`/`PM`) в порядке `[до полудня, после]`.
+ *
+ * Через `formatToParts`, а не срезом строки: в разных локалях часть стоит и до
+ * числа, и после, и пишется по-своему («дп»/«пп», «a. m.»). Локаль без
+ * 12-часового вида части не отдаёт — тогда берётся английский запас, но
+ * колонка периода в такой локали и не показывается.
+ */
+export function dayPeriodNames(locale: string): [string, string] {
+  const format = formatter(locale, { hour: 'numeric', hour12: true, timeZone: 'UTC' })
+
+  const partAt = (hour: number, fallback: string): string =>
+    format.formatToParts(new Date(Date.UTC(2021, 0, 1, hour)))
+      .find(part => part.type === 'dayPeriod')?.value ?? fallback
+
+  return [partAt(9, 'AM'), partAt(21, 'PM')]
+}
+
 /** Заголовок панели: «август 2026». */
 export function formatMonthTitle(locale: string, year: number, month: number): string {
   return formatter(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(utcAt(year, month, 1))

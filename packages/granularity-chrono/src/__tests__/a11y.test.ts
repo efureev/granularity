@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrCalendar from '../components/GrCalendar/GrCalendar.vue'
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
+import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
 
 /**
  * Гейт axe на самой панели.
@@ -79,6 +80,30 @@ describe('a11y', () => {
     // Панель уезжает в портал — проверяем документ целиком, иначе она выпадет
     // из области сканирования вместе со всей своей разметкой.
     expect(wrapper.find('[data-gr-date-picker-panel]').exists() || document.querySelector('[data-gr-date-picker-panel]') !== null).toBe(true)
+    expect(await violations(document.body)).toEqual([])
+
+    wrapper.unmount()
+  })
+
+  it('GrTimePicker — поле и раскрытые колонки без нарушений', async () => {
+    const wrapper = mount(GrTimePicker, {
+      props: {
+        modelValue: new Date(2026, 7, 12, 15, 30),
+        today: new Date(2026, 7, 12),
+        locale: 'en-US',
+        use12Hours: true,
+        enableSeconds: true,
+        clearable: true,
+        required: true,
+        ariaLabel: 'Departure time',
+      },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-time-picker-field]').trigger('click')
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.querySelector('[data-gr-time-picker-panel]')).not.toBeNull()
     expect(await violations(document.body)).toEqual([])
 
     wrapper.unmount()

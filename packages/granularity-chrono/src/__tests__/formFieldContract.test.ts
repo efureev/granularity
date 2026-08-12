@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
+import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
 
 /**
  * Гейт контракта `GrFormField` — копия того, что живёт в ядре
@@ -29,6 +30,7 @@ interface Control {
 
 const controls: Control[] = [
   { name: 'GrDatePicker', render: () => h(GrDatePicker as never, { modelValue: null }) },
+  { name: 'GrTimePicker', render: () => h(GrTimePicker as never, { modelValue: null }) },
 ]
 
 function mountInField(render: () => unknown) {

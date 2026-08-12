@@ -1,28 +1,26 @@
 <script setup lang="ts" generic="TValue = Date | null">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import GrPopover from '@feugene/granularity/components/GrPopover'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
-import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
-import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
-import { useGrFormControl } from '@feugene/granularity/composables/useGrFormControl'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { formatPlainDate } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
-import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
+import { fromPlainParts, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
+import {
+  clearButtonClass,
+  iconClass,
+  indicatorClass,
+  pickerFieldClass,
+  spinnerClass,
+  trailingZoneClass,
+} from '../../internal/pickerFieldStyles'
+import { usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
 import type { GrDatePickerSize } from './grDatePickerStyles'
-import {
-  clearButtonClass,
-  grDatePickerFieldClass,
-  iconClass,
-  indicatorClass,
-  spinnerClass,
-  trailingZoneClass,
-} from './grDatePickerStyles'
 
 /**
  * GrDatePicker — поле с датой и панелью-календарём.
@@ -131,32 +129,40 @@ defineSlots<{
   footer?: () => unknown
 }>()
 
-const { t, locale: i18nLocale } = useGranularityTranslations()
+const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
 
-const resolvedSize = useGrComponentSize<GrDatePickerSize>(() => props.size, { component: 'GrDatePicker' })
-const resolvedClearable = useGrComponentProp('GrDatePicker', 'clearable', () => props.clearable, false)
-const resolvedPlacement = useGrComponentProp('GrDatePicker', 'placement', () => props.placement, 'bottom-start')
-const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
+const shell = usePickerShell<TValue>({
+  props: () => props,
+  component: 'GrDatePicker',
+  emit: {
+    open: value => emit('update:open', value),
+    model: (value) => {
+      emit('update:modelValue', value)
+      emit('change', value)
+    },
+    clear: () => emit('clear'),
+  },
+  focusPanel: () => calendarRef.value?.focus(),
+})
 
 const {
-  disabled: isDisabled,
-  invalid: isInvalid,
-  required: isRequired,
-  readonly: isReadonly,
-  locked: isLocked,
-  id: fieldId,
+  t,
+  resolvedSize,
+  resolvedPlacement,
+  resolvedLocale,
+  isDisabled,
+  isInvalid,
+  isRequired,
+  isReadonly,
+  inputId,
   describedBy,
-} = useGrFormControl(() => props)
-
-const inputId = computed(() => props.id ?? fieldId.value)
-
-/** Значение в кортежах: наружу `Date`, внутрь `PlainDate`. */
-const adapter = computed(() => resolveChronoAdapter<TValue>(props.valueAdapter))
-
-const selectedDate = computed<Date | null>(() => {
-  if (props.modelValue === undefined || props.modelValue === null) return null
-  return adapter.value.parse(props.modelValue)
-})
+  selectedDate,
+  formValue,
+  panelOpen,
+  hasBeenOpen,
+  fieldEl,
+  showClear,
+} = shell
 
 const selected = computed<PlainDate | null>(() => (
   selectedDate.value ? toPlainDate(selectedDate.value) : null
@@ -183,115 +189,29 @@ const displayValue = computed(() => (
   selected.value ? formatPlainDate(resolvedLocale.value, selected.value, props.format) : ''
 ))
 
-/** Сериализованное значение для нативной формы: текст поля туда отдавать нельзя. */
-const formValue = computed(() => {
-  if (!selectedDate.value) return ''
-  const serialized = adapter.value.serialize(selectedDate.value)
-
-  return serialized instanceof Date ? serialized.toISOString() : String(serialized)
-})
-
-const internalOpen = ref(false)
-
-const panelOpen = computed({
-  get: () => props.open ?? internalOpen.value,
-  set: (value) => {
-    internalOpen.value = value
-    emit('update:open', value)
-  },
-})
-
-/**
- * Панель монтируется при первом открытии и остаётся.
- *
- * `GrPopover` держит содержимое в `v-show`, то есть без этого флага сетка на
- * 42 ячейки создавалась бы на загрузке страницы у каждого пикера в форме.
- * Размонтировать на закрытие нельзя: содержимое исчезло бы рывком посреди
- * анимации ухода.
- */
-const hasBeenOpen = ref(false)
-
-const fieldEl = ref<HTMLInputElement | null>(null)
-const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
-
-/**
- * Монтирование и перенос фокуса висят на самом состоянии, а не на обработчике
- * открытия: панель открывают и снаружи, через `v-model:open`, и такой вызов
- * обязан привести к тому же, что и клик по полю.
- */
-watch(panelOpen, async (next) => {
-  if (!next) return
-
-  hasBeenOpen.value = true
-
-  // Два тика: первый монтирует панель, второй отдаёт ей отрисованную сетку.
-  await nextTick()
-  await nextTick()
-  calendarRef.value?.focus()
-}, { immediate: true })
-
-function openPanel(): void {
-  if (isDisabled.value || panelOpen.value) return
-
-  panelOpen.value = true
-}
-
-function closePanel(): void {
-  panelOpen.value = false
-}
-
-/**
- * Поповер открывается вручную (`trigger="manual"`): переключение висит здесь,
- * потому что открытие обязано ещё и увести фокус в сетку.
- */
-function togglePanel(): void {
-  panelOpen.value ? closePanel() : openPanel()
-}
-
-function onFieldKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
-    // Иначе `Space` прокрутит страницу, а `Enter` отправит форму.
-    event.preventDefault()
-    openPanel()
-  }
-}
-
 function onSelect(date: PlainDate): void {
-  if (isLocked.value) return
+  // Гард здесь, а не только в `commit`: закрытая по клику панель выглядела бы
+  // так, будто выбор состоялся.
+  if (shell.isLocked.value) return
 
-  const value = adapter.value.serialize(fromPlainParts(date))
-  emit('update:modelValue', value)
-  emit('change', value)
+  shell.commit(fromPlainParts(date))
 
   // Фокус на поле вернёт стек слоёв: на момент закрытия он ещё внутри панели.
-  closePanel()
+  shell.closePanel()
 }
 
-function clear(): void {
-  if (isLocked.value) return
+defineExpose({
+  focus: shell.focus,
+  blur: shell.blur,
+  open: shell.openPanel,
+  close: shell.closePanel,
+})
 
-  emit('update:modelValue', null)
-  emit('change', null)
-  emit('clear')
-}
-
-function focus(): void {
-  fieldEl.value?.focus()
-}
-
-function blur(): void {
-  fieldEl.value?.blur()
-}
-
-defineExpose({ focus, blur, open: openPanel, close: closePanel })
-
-const fieldClass = computed(() => grDatePickerFieldClass({
+const fieldClass = computed(() => pickerFieldClass({
   size: resolvedSize.value,
   disabled: isDisabled.value,
   invalid: isInvalid.value,
 }))
-
-const showClear = computed(() => resolvedClearable.value && !isLocked.value && selected.value !== null)
 
 /**
  * Панель отдаёт свои фон и отступ, а календарь внутри неё — нет: две подложки
@@ -338,8 +258,8 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="togglePanel"
-            @keydown="onFieldKeydown"
+            @click="shell.togglePanel"
+            @keydown="shell.onFieldKeydown"
             @focus="emit('focus', $event)"
             @blur="emit('blur', $event)"
           >
@@ -357,7 +277,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               type="button"
               :class="clearButtonClass"
               :aria-label="t('gr.common.clear', 'Clear')"
-              @click.stop="clear"
+              @click.stop="shell.clear"
             >
               <svg :class="iconClass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round" />
