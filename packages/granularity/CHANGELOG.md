@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.18.0] 2026-08-12
+
 ### Added
 
 - **`GrToaster` toasts can be swiped away.** A notification now leaves the way it does on a phone:
