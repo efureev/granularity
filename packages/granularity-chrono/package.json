@@ -97,7 +97,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.16.0 <1.0.0",
+    "@feugene/granularity": ">=0.17.0 <1.0.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "vue": "^3.5.0",
     "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
@@ -113,7 +113,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
-    "@feugene/granularity": "^0.16.0",
+    "@feugene/granularity": "^0.17.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.0",
     "@types/node": "^26.1.1",

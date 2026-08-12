@@ -1,5 +1,19 @@
+import { fileURLToPath } from 'node:url'
+
 import antfu from '@antfu/eslint-config'
 import globals from 'globals'
+
+/**
+ * Путь до `tsconfig.json` — абсолютный, а не относительный.
+ *
+ * Типизированные правила резолвят его от **cwd**, а не от этого файла. Из
+ * директории пакета всё сходится, но редактор запускает ESLint из корня
+ * монорепо — и там `tsconfig.json` другой (точнее, его нет вовсе): каждый файл
+ * пакета падал с `Parsing error: Could not read Project Service default
+ * project`. Гейт при этом оставался зелёным, потому что `yarn lint` идёт из
+ * пакета, — расходились ровно IDE и CI.
+ */
+const tsconfigPath = fileURLToPath(new URL('./tsconfig.json', import.meta.url))
 
 export default antfu(
   {
@@ -15,7 +29,7 @@ export default antfu(
       vueVersion: 3,
     },
     typescript: {
-      tsconfigPath: 'tsconfig.json',
+      tsconfigPath,
     },
     jsonc: false,
     yaml: false,

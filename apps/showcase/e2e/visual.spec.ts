@@ -30,13 +30,20 @@ test.use({ reducedMotion: 'reduce' })
 
 /**
  * Липкая шапка витрины перекрывает верх `#live-examples`, поэтому попадает в
- * снимок элемента — вместе с номером версии пакета. Без маски любой бамп
- * версии расходится с эталонами на всех страницах сразу (144 файла), хотя ни
- * один компонент не менялся. Маскируем: предмет гейта — компоненты, а не хром
- * витрины.
+ * снимок элемента — вместе с номером версии пакета. Любой бамп версии иначе
+ * расходится с эталонами на всех страницах сразу, хотя ни один компонент не
+ * менялся: предмет гейта — компоненты, а не хром витрины.
+ *
+ * Шапка **скрывается**, а не маскируется. Маска закрашивает box элемента, но
+ * не то, что он рисует за его пределами: у активной вкладки навигации есть
+ * свечение, и оно спускается ниже шапки на полтора десятка пикселей. Строка
+ * версии меняет ширину плашки, плашка сдвигает навигацию, навигация уводит
+ * свечение — и эталон расходился под маской, а не под ней. `visibility` снимает
+ * всю отрисовку разом и не трогает раскладку: шапка липкая и места в потоке
+ * `#live-examples` не занимает.
  */
-async function chrome(page: import('@playwright/test').Page) {
-  return [page.locator('.showcase-header')]
+async function hideChrome(page: import('@playwright/test').Page): Promise<void> {
+  await page.addStyleTag({ content: '.showcase-header { visibility: hidden !important; }' })
 }
 
 /**
@@ -121,9 +128,9 @@ for (const theme of ['light', 'dark'] as const) {
         // Даём шрифтам/иконкам дорисоваться.
         await page.waitForLoadState('networkidle')
 
-        await expect(examples).toHaveScreenshot(`${componentPath(name).replace('/', '-')}-${theme}.png`, {
-          mask: await chrome(page),
-        })
+        await hideChrome(page)
+
+        await expect(examples).toHaveScreenshot(`${componentPath(name).replace('/', '-')}-${theme}.png`)
       })
     }
   })
@@ -148,8 +155,10 @@ for (const theme of ['light', 'dark'] as const) {
         await examples.waitFor()
         await page.waitForLoadState('networkidle')
 
+        await hideChrome(page)
+
         await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`, {
-          mask: [...await chrome(page), clockDriven(page)],
+          mask: [clockDriven(page)],
         })
       })
     }

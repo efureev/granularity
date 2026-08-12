@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.17.0] 2026-08-12
+
+### Fixed
+
+- **A version bump no longer invalidates every visual baseline.** v0.16.0 masked the sticky showcase
+  header for exactly this reason, and it was not enough: a mask paints over an element's box, not
+  over what the element draws outside it. The active navigation pill has a glow that reaches some
+  fifteen pixels below the header, and the version chip is what moves it — a wider string widens the
+  chip, the chip shifts the navigation, the navigation carries the glow. So the difference landed
+  just *below* the mask, and bumping to 0.17.0 broke 81 of 86 baselines with nothing but antialiasing
+  under a magenta rectangle. The header is now hidden rather than masked: `visibility` drops the whole
+  paint at once and leaves the layout alone, since a sticky header takes no space in the flow. Proven
+  by running the gate against three different version strings, one of them longer.
+
 ### Changed
 
 - **A key combination is one chip now.** `<GrKbd keys="mod+K" />` used to render `[⌘] [K]` — two bordered keys —
