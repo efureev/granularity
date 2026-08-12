@@ -5,6 +5,25 @@ All notable changes to the [`@feugene/unplugin-granularity`](.) package are docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+## [v0.4.1] 2026-08-12
+
+### Fixed
+
+- **The documented default for `prefix` was wrong.** The README said `default 'Ds'`; the resolver has
+  defaulted to `'Gr'` since the package was renamed, so anyone who trusted the README set a prefix
+  they did not need.
+
+### Changed
+
+- **Examples point at `@feugene/granularity-chrono`.** The companion package they referenced
+  (`@feugene/granularity-datepicker`) has been removed from the repository, so every snippet, comment
+  and test fixture named a package that no longer exists.
+
+- **The peer range on the core is `>=0.12.0`.** It claimed `>=0.11.0`, while the resolver has needed
+  the subpath layout introduced in 0.12.0 all along.
+
 ## [v0.4.0] 2026-07-19
 
 ### Added

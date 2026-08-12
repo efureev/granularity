@@ -69,8 +69,8 @@ describe('GranularityResolver (core preset)', () => {
   it('returns a component resolver + a directive resolver by default', () => {
     const [component, directive] = GranularityResolver() as ComponentResolverObject[]
 
-    expect(component.type).toBe('component')
-    expect(resolveWith(component, 'GrInput')).toEqual({
+    expect(component?.type).toBe('component')
+    expect(resolveWith(component!, 'GrInput')).toEqual({
       name: 'GrInput',
       from: '@feugene/granularity/components/GrInput',
       sideEffects: '@feugene/granularity/components/GrInput/styles.css',
