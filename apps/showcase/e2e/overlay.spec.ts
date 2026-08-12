@@ -491,3 +491,64 @@ test.describe('пикер поверх окна', () => {
     expect(focusedKey).toBeTruthy()
   })
 })
+
+/**
+ * Порядок отрисовки: панель, открытая изнутри окна, обязана быть **над** ним.
+ *
+ * Проверяется не числом в стиле, а попаданием: `elementFromPoint` в центре
+ * панели возвращает то, что пользователь там видит. Числа проверяет юнит-тест
+ * `useFloating`; здесь важен результат в настоящем браузере, потому что панель
+ * телепортирована в общий портал и лежит рядом с корнем окна.
+ *
+ * Регрессия, ради которой гейт заведён: панель уходила под окно, а все
+ * существовавшие проверки (Esc, фокус, `inert`) этого не видели.
+ */
+test.describe('панель поверх окна', () => {
+  /** Что реально нарисовано в центре элемента. */
+  async function topmostAt(locator: import('@playwright/test').Locator): Promise<string> {
+    const box = await locator.boundingBox()
+    expect(box, 'панель не отрисована').not.toBeNull()
+
+    return locator.page().evaluate(({ x, y }) => {
+      const element = document.elementFromPoint(x, y)
+      if (!element) return 'ничего'
+
+      const panel = element.closest('[data-gr-select-panel], [data-gr-popover-panel], [data-gr-date-picker-panel]')
+      return panel ? 'панель' : (element.closest('[data-gr-modal-panel]') ? 'окно' : 'страница')
+    }, { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 })
+  }
+
+  test('панель селекта внутри GrModal рисуется поверх окна', async ({ page }) => {
+    await page.goto(componentPath('GrModal'))
+    await page.locator('#live-examples').waitFor()
+
+    await page.getByRole('button', { name: 'Open form with poppers', exact: true }).click()
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('[data-gr-modal-panel]')
+      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
+    })
+
+    await page.locator('[data-gr-modal-panel] [data-gr-select-trigger], [data-gr-modal-panel] [data-testid="gr-select-trigger"]').first().click()
+
+    const panel = page.locator('[data-gr-select-panel]').first()
+    await expect(panel).toBeVisible()
+    expect(await topmostAt(panel)).toBe('панель')
+  })
+
+  test('панель пикера внутри GrDialog рисуется поверх окна', async ({ page }) => {
+    await page.goto('extras/gr-date-picker')
+    await page.locator('#live-examples').waitFor()
+
+    await page.getByRole('button', { name: 'Schedule delivery', exact: true }).click()
+    await page.waitForFunction(() => {
+      const panel = document.querySelector('[data-gr-modal-panel]')
+      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
+    })
+
+    await page.locator('[data-gr-modal-panel] [data-gr-date-picker-field]').click()
+
+    const panel = page.locator('[data-gr-date-picker-panel]').last()
+    await expect(panel).toBeVisible()
+    expect(await topmostAt(panel)).toBe('панель')
+  })
+})

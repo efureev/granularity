@@ -41,6 +41,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **A popover opened inside a modal no longer hides behind it.** The panel is teleported into the
+  shared portal, so it ends up next to the modal's root rather than inside it — the modal's own
+  stacking context never covered it, and a static `--gr-z-dropdown` (1000) lost to
+  `--gr-z-modal` (1100). It affected every floating component in the package — `GrSelect`,
+  `GrAutocomplete`, `GrDropdown`, `GrTreeSelect`, `GrTooltip`, `GrPopover` — and everything built
+  on them. `useFloating` now takes the height from the overlay stack: with `N` modal layers open
+  a panel gets `calc(var(--gr-z-modal) + N)`, which keeps nested dialogs working and leaves the
+  fullscreen loading overlay and toasts on top. A popover opened *outside* a modal is unaffected:
+  while a modal is open the page behind it is `inert`, so a non-zero count means "opened from
+  inside the modal". The showcase gained a demo with a select, an autocomplete, a dropdown, a
+  tooltip and a date picker inside one modal — the case that had no coverage at all, which is
+  why the regression lived unnoticed.
+
 - **`componentDefaults` typing now survives in companion packages.** The `GrComponentDefaultsRegistry` interface was
   declared in `GrConfigProvider/context` and only re-exported from the public subpaths, so an outside package had no
   way to name the module that declares it. Augmenting a re-export works — but only while it is the sole augmentation

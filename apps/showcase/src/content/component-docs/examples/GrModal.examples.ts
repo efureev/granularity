@@ -30,6 +30,14 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-modal-dialog-service',    note: 'Закрытие confirm/alert/prompt не закрывает исходную модалку — это удобно для подтверждений и быстрых вводов внутри сложных форм.',
   },
   {
+    id: 'modal-nested-poppers',
+    title: 'Poppers inside a modal',
+    description: 'Селект, автокомплит, дата и меню внутри окна: их панели телепортируются в общий портал и лежат рядом с корнем окна, а высоту получают из стека слоёв.',
+    status: 'ready',
+    previewKey: 'gr-modal-nested-poppers',
+    note: 'Esc закрывает сначала панель, потом окно. Пока панель открыта, ловушка фокуса окна считает её своей.',
+  },
+  {
     id: 'modal-scroll-lifecycle',
     title: 'Scrolling long content and lifecycle events',
     description: '`scrollBehavior` решает, кто скроллится — панель или весь оверлей; `opened`/`closed` приходят после анимации, и только по `closed` безопасно размонтировать содержимое.',
