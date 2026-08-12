@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 
+import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { useComboboxNavigation } from '@feugene/granularity/composables/useComboboxNavigation'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
-import { dayPeriodNames } from '../../chrono/chronoFormat'
+import { dayPeriodNames, formatPlainTime } from '../../chrono/chronoFormat'
 import type { PlainTime } from '../../chrono/plainTime'
 import { plainTime } from '../../chrono/plainTime'
 import type { TimeColumn, TimeOption, TimeUnit } from '../../chrono/timeColumns'
@@ -59,6 +60,7 @@ const props = withDefaults(defineProps<TimeColumnsProps>(), {
 const emit = defineEmits<{ (e: 'update:modelValue', value: PlainTime): void }>()
 
 const { t } = useGranularityTranslations()
+const { announce } = useAnnouncer()
 
 const columns = computed(() => buildTimeColumns({
   value: props.modelValue,
@@ -146,7 +148,18 @@ function select(unit: TimeUnit, option: TimeOption): void {
   if (props.locked || option.disabled) return
 
   const base = props.modelValue ?? plainTime(0, 0, 0)
-  emit('update:modelValue', applyTimeUnit(base, unit, option.value, props.twelveHour))
+  const next = applyTimeUnit(base, unit, option.value, props.twelveHour)
+  emit('update:modelValue', next)
+
+  // Колонок несколько, и слышно из них только опцию под курсором. Собранное
+  // время не звучит нигде: для диктора оно не элемент, а состояние в четырёх
+  // разных списках.
+  announce(formatPlainTime(props.locale, next, {
+    hour: props.twelveHour ? 'numeric' : '2-digit',
+    minute: '2-digit',
+    ...(props.enableSeconds ? { second: '2-digit' } : {}),
+    hour12: props.twelveHour,
+  }))
 }
 
 function onOptionClick(unit: TimeUnit, option: TimeOption, index: number): void {

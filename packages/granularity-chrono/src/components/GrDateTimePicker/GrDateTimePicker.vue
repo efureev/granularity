@@ -150,6 +150,8 @@ defineSlots<{
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
   /** Своя шапка сетки вместо заголовка и стрелок. */
   header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
+  /** Своя ячейка шапки недели вместо сокращённого названия дня. */
+  weekday?: (props: { label: string, full: string, isoWeekday: IsoWeekday }) => unknown
   /** Подвал панели вместо кнопок подтверждения. */
   footer?: (props: { apply: () => void, cancel: () => void }) => unknown
 }>()
@@ -412,6 +414,9 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               </template>
               <template v-if="$slots.header" #header="slotProps">
                 <slot name="header" v-bind="slotProps" />
+              </template>
+              <template v-if="$slots.weekday" #weekday="slotProps">
+                <slot name="weekday" v-bind="slotProps" />
               </template>
             </GrCalendar>
 

@@ -81,6 +81,42 @@ describe('GrCalendar — разметка и роли', () => {
     wrapper.unmount()
   })
 
+  it('слот weekday получает подпись, полное название и ISO-номер дня', () => {
+    const wrapper = mount(GrCalendar, {
+      props: { viewDate: iso('2026-08-01'), today: iso('2026-08-12'), locale: 'en-US', weekStart: 1 },
+      slots: {
+        weekday: `<template #weekday="{ label, full, isoWeekday }">
+          <i :data-iso="isoWeekday" :title="full">{{ label[0] }}</i>
+        </template>`,
+      },
+      attachTo: document.body,
+    })
+
+    const cells = wrapper.findAll('[data-gr-calendar-weekday] i')
+
+    expect(cells).toHaveLength(7)
+    expect(cells.map(cell => cell.text())).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+    expect(cells[0]!.attributes('title')).toBe('Monday')
+    // Номер дня — по ISO, а не по колонке: иначе выходные пришлось бы вычислять
+    // из того, с какого дня локаль начинает неделю.
+    expect(cells.map(cell => cell.attributes('data-iso'))).toEqual(['1', '2', '3', '4', '5', '6', '7'])
+    expect(wrapper.find('[data-gr-calendar-weekday] abbr').exists(), 'подпись по умолчанию заменена').toBe(false)
+    wrapper.unmount()
+  })
+
+  it('слот weekday нумерует дни от первого дня недели, а не от понедельника', () => {
+    // Воскресная неделя: первая колонка — 7, последняя — 6.
+    const wrapper = mount(GrCalendar, {
+      props: { viewDate: iso('2026-08-01'), locale: 'en-US', weekStart: 7 },
+      slots: { weekday: `<template #weekday="{ isoWeekday }"><i :data-iso="isoWeekday" /></template>` },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.findAll('[data-gr-calendar-weekday] i').map(cell => cell.attributes('data-iso')))
+      .toEqual(['7', '1', '2', '3', '4', '5', '6'])
+    wrapper.unmount()
+  })
+
   it('«сегодня» помечен aria-current, выбранный — aria-selected', () => {
     const wrapper = mountCalendar({ modelValue: iso('2026-08-20') })
 
@@ -355,6 +391,59 @@ describe('GrCalendar — объявления для скринридера', ()
     wrapper.unmount()
   })
 
+  it('выбранный день объявляется полной датой', async () => {
+    // `aria-selected` меняется на ячейке, где фокус уже стоит: диктор об этом
+    // молчит, и клик неотличим от ничего.
+    const wrapper = mountCalendar()
+
+    await days(wrapper).find(day => day.attributes('data-key') === '2026-08-20')!.trigger('click')
+
+    expect(await announced()).toBe('August 20, 2026')
+    wrapper.unmount()
+  })
+
+  it('выбор с клавиатуры объявляется так же, как клик', async () => {
+    const wrapper = mountCalendar({ modelValue: iso('2026-08-20') })
+
+    await press(wrapper, 'Enter')
+
+    expect(await announced()).toBe('August 20, 2026')
+    wrapper.unmount()
+  })
+
+  it('день из добора соседнего месяца объявляет себя, а не месяц, куда переехал показ', async () => {
+    // Выбор переводит показ на сентябрь, и смена периода объявляет себя сама —
+    // объявленный раньше день она бы затёрла.
+    const wrapper = mountCalendar()
+
+    await days(wrapper).find(day => day.attributes('data-key') === '2026-09-01')!.trigger('click')
+
+    expect(await announced()).toBe('September 1, 2026')
+    wrapper.unmount()
+  })
+
+  it('запрещённый день не объявляется: выбора не было', async () => {
+    const wrapper = mountCalendar({ disabledDates: [iso('2026-08-20')] })
+
+    await days(wrapper).find(day => day.attributes('data-key') === '2026-08-20')!.trigger('click')
+
+    expect(await announced()).toBe('')
+    wrapper.unmount()
+  })
+
+  it('announceSelection выключает объявление выбора, но не смены периода', async () => {
+    // Оболочка диапазона объявляет состояние периода сама: два объявления на
+    // один клик перебили бы друг друга.
+    const wrapper = mountCalendar({ announceSelection: false })
+
+    await days(wrapper).find(day => day.attributes('data-key') === '2026-08-20')!.trigger('click')
+    expect(await announced()).toBe('')
+
+    await wrapper.get('[data-gr-calendar-next]').trigger('click')
+    expect(await announced()).toBe('September 2026')
+    wrapper.unmount()
+  })
+
   it('заголовок сам живым регионом не является — иначе объявление задвоится', () => {
     const wrapper = mountCalendar()
 
@@ -452,6 +541,34 @@ describe('GrCalendar — режимы месяца и года', () => {
     await wrapper.get('[data-key="2030"]').trigger('click')
 
     expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2030 — 2039')
+    wrapper.unmount()
+  })
+
+  it('выбранный месяц объявляется вместе с годом', async () => {
+    // Без года «March» на слух не отличить от марта любого другого года.
+    const wrapper = mountMonths()
+
+    await wrapper.get('[data-key="2026-03"]').trigger('click')
+
+    expect(await announced()).toBe('March 2026')
+    wrapper.unmount()
+  })
+
+  it('выбранный год объявляется числом', async () => {
+    const wrapper = mountMonths({ mode: 'year' })
+
+    await wrapper.get('[data-key="2024"]').trigger('click')
+
+    expect(await announced()).toBe('2024')
+    wrapper.unmount()
+  })
+
+  it('год из добора объявляет себя, а не десятилетие, куда переехал показ', async () => {
+    const wrapper = mountMonths({ mode: 'year' })
+
+    await wrapper.get('[data-key="2030"]').trigger('click')
+
+    expect(await announced()).toBe('2030')
     wrapper.unmount()
   })
 

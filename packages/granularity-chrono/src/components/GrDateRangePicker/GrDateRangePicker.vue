@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="TItem = Date">
 import { computed, ref, watch } from 'vue'
 
+import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
@@ -135,11 +136,18 @@ defineSlots<{
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
   /** Своя шапка сетки вместо заголовка и стрелок. */
   header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
+  /** Своя ячейка шапки недели вместо сокращённого названия дня. */
+  weekday?: (props: { label: string, full: string, isoWeekday: IsoWeekday }) => unknown
   /** Подвал панели. */
   footer?: () => unknown
 }>()
 
 const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
+
+const { announce } = useAnnouncer()
+
+/** Границы в объявлениях — полной датой: «12.08» на слух неотличимо от «12.03». */
+const LONG_DATE: Intl.DateTimeFormatOptions = { dateStyle: 'long' }
 
 const shell = usePickerShell<readonly [TItem, TItem] | null, [Date, Date]>({
   props: () => props,
@@ -241,6 +249,12 @@ function onDaySelect(date: PlainDate): void {
   if (!anchor.value) {
     anchor.value = date
     hovered.value = date
+
+    // Первый клик ничего видимого не выбирает — только открывает период, и без
+    // объявления незрячий пользователь не понимает, что ждут второго дня.
+    announce(t('gr.dateRangePicker.startSelected', 'Start date selected: {date}. Choose the end date', {
+      date: formatPlainDate(resolvedLocale.value, date, LONG_DATE),
+    }))
     return
   }
 
@@ -250,9 +264,16 @@ function onDaySelect(date: PlainDate): void {
 
   // Слишком короткий или слишком длинный период не выбирается, но и не
   // сбрасывает начало: пользователь просто промахнулся мимо допустимой длины.
-  if (!isLengthAllowed(from, to)) return
+  if (!isLengthAllowed(from, to)) {
+    announce(t('gr.dateRangePicker.lengthRejected', 'This range length is not allowed'))
+    return
+  }
 
   shell.commit([fromPlainParts(from), fromPlainParts(to)])
+  announce(t('gr.dateRangePicker.rangeSelected', 'Range selected: {from} — {to}', {
+    from: formatPlainDate(resolvedLocale.value, from, LONG_DATE),
+    to: formatPlainDate(resolvedLocale.value, to, LONG_DATE),
+  }))
   anchor.value = null
   hovered.value = null
 
@@ -364,6 +385,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
           <GrCalendar
             ref="calendarRef"
             :model-value="null"
+            :announce-selection="false"
             :range-start="rangeStart"
             :range-end="rangeEnd"
             :range-preview="hovered"
@@ -385,6 +407,9 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             </template>
             <template v-if="$slots.header" #header="slotProps">
               <slot name="header" v-bind="slotProps" />
+            </template>
+            <template v-if="$slots.weekday" #weekday="slotProps">
+              <slot name="weekday" v-bind="slotProps" />
             </template>
             <template v-if="$slots.footer" #footer>
               <slot name="footer" />

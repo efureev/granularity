@@ -67,6 +67,7 @@ function calendarApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'rangeStart', type: 'PlainDate | null', description: 'Начало показываемого диапазона. Сетка про диапазон ничего не решает — только рисует его.' },
         { name: 'rangeEnd', type: 'PlainDate | null', description: 'Конец диапазона.' },
         { name: 'rangePreview', type: 'PlainDate | null', description: 'Второй край предпросмотра, пока диапазон не закрыт.' },
+        { name: 'announceSelection', type: 'boolean', default: 'true', description: 'Объявлять выбор в живом регионе. Выключается, когда объявляет оболочка: у диапазона осмысленно состояние периода, а не отдельный день.' },
         { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Размер ячейки. Не задан — из `GrConfigProvider`.' },
         { name: 'disabled', type: 'boolean', default: 'false', description: 'Ни выбора, ни листания.' },
         { name: 'readonly', type: 'boolean', default: 'false', description: 'Значение видно, выбор не меняется.' },
@@ -92,6 +93,7 @@ function calendarApiSections(): ShowcaseApiSectionMeta[] {
       items: [
         { name: 'day', type: '{ cell: CalendarCell, selected: boolean }', description: 'Содержимое ячейки дня. Число рисует потребитель.' },
         { name: 'header', type: '{ title: string, goToPeriod: (delta: number) => void }', description: 'Своя шапка вместо заголовка и стрелок.' },
+        { name: 'weekday', type: '{ label: string, full: string, isoWeekday: IsoWeekday }', description: 'Ячейка шапки недели. `isoWeekday` — номер дня по ISO, по нему отличают выходные, не гадая, с какого дня начата неделя в локали.' },
         { name: 'footer', type: '—', description: 'Подвал панели: кнопки «сегодня», «очистить».' },
       ],
     },
@@ -163,6 +165,7 @@ function datePickerApiSections(): ShowcaseApiSectionMeta[] {
       items: [
         { name: 'day', type: '{ cell: CalendarCell, selected: boolean }', description: 'Пробрасывается в `GrCalendar`.' },
         { name: 'header', type: '{ title: string, goToPeriod: (delta: number) => void }', description: 'Пробрасывается в `GrCalendar`.' },
+        { name: 'weekday', type: '{ label: string, full: string, isoWeekday: IsoWeekday }', description: 'Пробрасывается в `GrCalendar`.' },
         { name: 'footer', type: '—', description: 'Пробрасывается в `GrCalendar`.' },
       ],
     },
@@ -300,6 +303,7 @@ function dateTimePickerApiSections(): ShowcaseApiSectionMeta[] {
       items: [
         { name: 'day', type: '{ cell: CalendarCell, selected: boolean }', description: 'Пробрасывается в `GrCalendar`.' },
         { name: 'header', type: '{ title: string, goToPeriod: (delta: number) => void }', description: 'Пробрасывается в `GrCalendar`.' },
+        { name: 'weekday', type: '{ label: string, full: string, isoWeekday: IsoWeekday }', description: 'Пробрасывается в `GrCalendar`.' },
         { name: 'footer', type: '{ apply: () => void, cancel: () => void }', description: 'Свой подвал вместо кнопок подтверждения.' },
       ],
     },
@@ -337,6 +341,7 @@ function dateRangePickerApiSections(): ShowcaseApiSectionMeta[] {
       items: [
         { name: 'day', type: '{ cell: CalendarCell, selected: boolean }', description: 'Пробрасывается в `GrCalendar`.' },
         { name: 'header', type: '{ title: string, goToPeriod: (delta: number) => void }', description: 'Пробрасывается в `GrCalendar`.' },
+        { name: 'weekday', type: '{ label: string, full: string, isoWeekday: IsoWeekday }', description: 'Пробрасывается в `GrCalendar`.' },
         { name: 'footer', type: '—', description: 'Пробрасывается в `GrCalendar`.' },
       ],
     },

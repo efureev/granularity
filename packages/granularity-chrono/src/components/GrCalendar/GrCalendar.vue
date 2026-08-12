@@ -9,7 +9,15 @@ import { useGrComponentSize } from '@feugene/granularity/composables/useGrCompon
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { clockDate } from '../../chrono/chronoModel'
 import { buildCalendarGrid, createDisabledPredicate } from '../../chrono/calendarGrid'
-import { formatMonthTitle, formatYearTitle, localeFirstDayOfWeek, monthNames, weekdayNames } from '../../chrono/chronoFormat'
+import {
+  formatMonthTitle,
+  formatPlainDate,
+  formatYearTitle,
+  localeFirstDayOfWeek,
+  monthNames,
+  weekdayNames,
+  weekdayOrder,
+} from '../../chrono/chronoFormat'
 import type { PeriodCell, PeriodMode } from '../../chrono/periodGrid'
 import { buildPeriodGrid, decadeLabel, decadeStart } from '../../chrono/periodGrid'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
@@ -90,6 +98,12 @@ export interface GrCalendarProps {
    * под клавиатурной остановкой.
    */
   rangePreview?: PlainDate | null
+  /**
+   * Объявлять выбор в живом регионе. Выключается, когда объявляет оболочка:
+   * у диапазона осмысленно состояние периода («начало выбрано»), а не
+   * отдельный день, и два объявления на один клик перебили бы друг друга.
+   */
+  announceSelection?: boolean
 }
 
 export interface GrCalendarEmits {
@@ -122,6 +136,7 @@ const props = withDefaults(defineProps<GrCalendarProps>(), {
   rangeStart: null,
   rangeEnd: null,
   rangePreview: null,
+  announceSelection: true,
 })
 
 const emit = defineEmits<GrCalendarEmits>()
@@ -131,6 +146,8 @@ defineSlots<{
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
   /** Своя шапка вместо заголовка и стрелок. */
   header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
+  /** Своя ячейка шапки недели вместо сокращённого названия дня. */
+  weekday?: (props: { label: string, full: string, isoWeekday: IsoWeekday }) => unknown
   /** Подвал панели: кнопки «сегодня», «очистить». */
   footer?: () => unknown
 }>()
@@ -237,6 +254,13 @@ const weekdays = computed(() => weekdayNames(resolvedLocale.value, resolvedWeekS
 
 /** Полные названия дней — в `abbr`, чтобы скринридер не читал «пн» по буквам. */
 const weekdaysFull = computed(() => weekdayNames(resolvedLocale.value, resolvedWeekStart.value, 'long'))
+
+/** Колонка шапки одним объектом: подпись, полное название и ISO-номер дня. */
+const weekdayColumns = computed(() => weekdayOrder(resolvedWeekStart.value).map((isoWeekday, index) => ({
+  isoWeekday,
+  label: weekdays.value[index] ?? '',
+  full: weekdaysFull.value[index] ?? '',
+})))
 
 function isSelected(cell: CalendarCell): boolean {
   return props.modelValue ? isSamePlainDate(cell.date, props.modelValue) : false
@@ -390,6 +414,29 @@ const canGoBack = computed(() => !isLocked.value && isPeriodReachable(shiftView(
 const canGoForward = computed(() => !isLocked.value && isPeriodReachable(shiftView(viewDate.value, 1)))
 
 
+/**
+ * Выбор — событие, а не состояние: `aria-selected` меняется на ячейке, где
+ * фокус уже стоит, и диктор об этом молчит. Без объявления клик и `Enter` для
+ * незрячего пользователя неотличимы от ничего.
+ */
+/**
+ * Выбор — событие, а не состояние: `aria-selected` меняется на ячейке, где
+ * фокус уже стоит, и диктор об этом молчит. Без объявления клик и `Enter` для
+ * незрячего пользователя неотличимы от ничего.
+ *
+ * Зовётся **после** возможного перевода показа: смена периода объявляет себя
+ * сама, и объявленное раньше она бы затёрла.
+ */
+function announceSelected(date: PlainDate): void {
+  if (!props.announceSelection) return
+
+  announce(props.mode === 'year'
+    ? formatYearTitle(resolvedLocale.value, date.y)
+    : formatPlainDate(resolvedLocale.value, date, props.mode === 'month'
+      ? { month: 'long', year: 'numeric' }
+      : { dateStyle: 'long' }))
+}
+
 function selectPeriod(cell: PeriodCell): void {
   if (isLocked.value || cell.disabled) return
 
@@ -401,6 +448,8 @@ function selectPeriod(cell: PeriodCell): void {
   if (props.mode === 'year' && decadeStart(cell.date.y) !== decadeStart(viewDate.value.y)) {
     goToPeriod(cell.date.y > viewDate.value.y ? 1 : -1)
   }
+
+  announceSelected(cell.date)
 }
 
 function selectCell(cell: CalendarCell): void {
@@ -412,6 +461,8 @@ function selectCell(cell: CalendarCell): void {
   // Клик по добору соседнего месяца переводит показ туда: иначе выбранный
   // день исчез бы из сетки сразу после выбора.
   if (!cell.inMonth) goToPeriod(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
+
+  announceSelected(cell.date)
 }
 
 function onDayClick(cell: CalendarCell): void {
@@ -566,14 +617,16 @@ defineExpose({
             <span class="sr-only">{{ t('gr.calendar.weekNumber', 'Week') }}</span>
           </th>
           <th
-            v-for="(weekday, index) in weekdays"
-            :key="weekday"
+            v-for="column in weekdayColumns"
+            :key="column.isoWeekday"
             scope="col"
             :class="calendarWeekdayClass"
             data-gr-calendar-weekday
           >
-            <!-- Полное название — скринридеру: «пн» он прочёл бы по буквам. -->
-            <abbr :title="weekdaysFull[index]">{{ weekday }}</abbr>
+            <slot name="weekday" v-bind="column">
+              <!-- Полное название — скринридеру: «пн» он прочёл бы по буквам. -->
+              <abbr :title="column.full">{{ column.label }}</abbr>
+            </slot>
           </th>
         </tr>
       </thead>

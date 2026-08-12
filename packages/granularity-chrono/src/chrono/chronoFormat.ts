@@ -109,6 +109,17 @@ export function monthNames(locale: string, width: NameWidth = 'long'): string[] 
 }
 
 /**
+ * ISO-номера дней **в порядке показа**, начиная с `firstDayOfWeek`.
+ *
+ * Колонка сетки знает только свой индекс, а потребителю слота шапки нужен
+ * именно номер дня: по нему он отличит выходной от буднего, не гадая, с какого
+ * дня начата неделя в этой локали.
+ */
+export function weekdayOrder(firstDayOfWeek: IsoWeekday = 1): IsoWeekday[] {
+  return Array.from({ length: 7 }, (_, index) => (((firstDayOfWeek - 1 + index) % 7) + 1) as IsoWeekday)
+}
+
+/**
  * Названия дней недели **в порядке показа**, начиная с `firstDayOfWeek`.
  *
  * Порядок — часть ответа: шапка сетки обязана совпасть с её колонками, и
@@ -123,10 +134,7 @@ export function weekdayNames(
   const format = formatter(locale, { weekday: width, timeZone: 'UTC' })
 
   // 2021-02-01 — понедельник, отсюда и отсчёт ISO-дней.
-  return Array.from({ length: 7 }, (_, index) => {
-    const isoDay = ((firstDayOfWeek - 1 + index) % 7) + 1
-    return format.format(utcAt(2021, 1, isoDay))
-  })
+  return weekdayOrder(firstDayOfWeek).map(isoDay => format.format(utcAt(2021, 1, isoDay)))
 }
 
 export function formatPlainDate(

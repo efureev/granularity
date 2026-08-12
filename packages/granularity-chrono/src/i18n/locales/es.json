@@ -14,7 +14,10 @@
     "patternYear": "A"
   },
   "dateRangePicker": {
-    "panelLabel": "Elegir periodo"
+    "panelLabel": "Elegir periodo",
+    "startSelected": "Fecha de inicio seleccionada: {date}. Elige la fecha final",
+    "rangeSelected": "Periodo seleccionado: del {from} al {to}",
+    "lengthRejected": "Esta duración del periodo no está permitida"
   },
   "dateTimePicker": {
     "panelLabel": "Elegir fecha y hora",

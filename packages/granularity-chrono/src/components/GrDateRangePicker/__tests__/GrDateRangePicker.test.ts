@@ -1,6 +1,8 @@
 import { DOMWrapper, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import { resetAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 
 import * as calendarGrid from '../../../chrono/calendarGrid'
 import * as calendarStyles from '../../GrCalendar/grCalendarStyles'
@@ -57,6 +59,16 @@ async function openPicker(wrapper: Picker) {
 function lastModel(wrapper: Picker): unknown {
   return wrapper.emitted('update:modelValue')?.at(-1)?.[0]
 }
+
+/** Текст уходит в общий живой регион отложенным макротаском. */
+async function announced(): Promise<string> {
+  await new Promise(resolve => setTimeout(resolve, 2))
+  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
+}
+
+afterEach(() => {
+  resetAnnouncer()
+})
 
 describe('GrDateRangePicker — выбор периода', () => {
   it('первый клик открывает период, второй закрывает и отдаёт пару', async () => {
@@ -259,6 +271,66 @@ describe('GrDateRangePicker — ограничения длины', () => {
   })
 })
 
+describe('GrDateRangePicker — объявления для скринридера', () => {
+  it('первый клик объявляет, что выбрано начало и ждут конца', async () => {
+    // Видимого выбора первый клик не делает: без объявления незрячий
+    // пользователь не понимает, что от него ждут второй даты.
+    const wrapper = mountPicker()
+    await openPicker(wrapper)
+
+    await day('2026-08-10').trigger('click')
+
+    expect(await announced()).toBe('Start date selected: August 10, 2026. Choose the end date')
+    wrapper.unmount()
+  })
+
+  it('второй клик объявляет обе границы периода', async () => {
+    const wrapper = mountPicker()
+    await openPicker(wrapper)
+
+    await day('2026-08-10').trigger('click')
+    await day('2026-08-14').trigger('click')
+
+    expect(await announced()).toBe('Range selected: August 10, 2026 — August 14, 2026')
+    wrapper.unmount()
+  })
+
+  it('границы, набранные назад, объявляются по порядку', async () => {
+    const wrapper = mountPicker()
+    await openPicker(wrapper)
+
+    await day('2026-08-14').trigger('click')
+    await day('2026-08-10').trigger('click')
+
+    expect(await announced()).toBe('Range selected: August 10, 2026 — August 14, 2026')
+    wrapper.unmount()
+  })
+
+  it('промах мимо допустимой длины объявляется отказом, а не тишиной', async () => {
+    // Иначе клик выглядит потерянным: ничего не выбралось и ничего не сказано.
+    const wrapper = mountPicker({ minRange: 3 })
+    await openPicker(wrapper)
+
+    await day('2026-08-10').trigger('click')
+    await day('2026-08-11').trigger('click')
+
+    expect(await announced()).toBe('This range length is not allowed')
+    wrapper.unmount()
+  })
+
+  it('календарь внутри диапазона свой день не объявляет — объявляет оболочка', async () => {
+    const wrapper = mountPicker()
+    await openPicker(wrapper)
+
+    expect(query('[data-gr-calendar]').exists()).toBe(true)
+    await day('2026-08-10').trigger('click')
+
+    // Одно объявление на клик: два перебили бы друг друга в общем регионе.
+    expect(await announced()).not.toBe('August 10, 2026')
+    wrapper.unmount()
+  })
+})
+
 describe('GrDateRangePicker — негативные сценарии и форма', () => {
   it('disabled не открывает панель', async () => {
     const wrapper = mountPicker({ disabled: true })
@@ -348,6 +420,25 @@ describe('GrDateRangePicker — inline', () => {
 
     await day('2026-08-14').trigger('click')
     expect(lastModel(wrapper)).toEqual([at(10), at(14)])
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateRangePicker — проброс слота шапки недели', () => {
+  it('слот weekday доходит до сетки вместе с ISO-номером дня', async () => {
+    // Слот объявлен на пикере, а рендерит его вложенный `GrCalendar`: без
+    // проброса потребитель переопределял бы шапку только у голой сетки.
+    const wrapper = mount(GrDateRangePicker, {
+      props: { locale: 'en-US', today: TODAY, weekStart: 1 },
+      slots: { weekday: `<template #weekday="{ label, isoWeekday }"><i :data-iso="isoWeekday">{{ label[0] }}</i></template>` },
+      attachTo: document.body,
+    })
+    await openPicker(wrapper)
+
+    const cells = [...document.querySelectorAll('[data-gr-calendar-weekday] i')]
+
+    expect(cells.map(cell => cell.textContent)).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+    expect(cells[0]!.getAttribute('data-iso')).toBe('1')
     wrapper.unmount()
   })
 })

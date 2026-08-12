@@ -9,6 +9,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **The `weekday` slot on the calendar header.** The grid advertised three slots — `day`,
+  `header`, `weekday` — but only shipped the first two, so a consumer who wanted single-letter
+  columns or their own header markup had nothing to override. The slot hands over the short
+  label, the full name and `isoWeekday`: the ISO number is what tells a weekend column from a
+  weekday one without guessing which day the locale starts the week on. It is forwarded by
+  `GrDatePicker`, `GrDateTimePicker` and `GrDateRangePicker` — a slot the pickers declare but
+  do not pass down is a slot that only works on the bare grid.
+
+- **Selection is announced to screen readers.** Moving through the grid or a time column reads
+  itself: the reader speaks the focused cell and the active option. Selection does not —
+  `aria-selected` flips on the cell the focus is already on, so a click or `Enter` was
+  indistinguishable from nothing at all. A chosen day is now announced as a full date, a chosen
+  month or year as the whole period, and a chosen time as the assembled value: the columns are
+  four, and "30" on its own says nothing. The range picker announces state rather than a date —
+  "start selected, choose the end", both bounds when the period closes, and a refusal when the
+  click missed `minRange`/`maxRange`, which used to be silent. The announcement comes after any
+  view shift, because a period change announces itself and would overwrite it; and it is one
+  message per action — inside the range the grid stays quiet (`announce-selection="false"`) and
+  the shell does the talking, since two messages in one live region cut each other off.
+
 - **Date and time arithmetic on plain tuples** (`{y, m, d}` / `{h, min, s}`): month and year
   shifts, month length, leap years, comparison, ranges, ISO weekday and week number, the
   month grid builder, cached `Intl` wrappers and the `Date` boundary with `date`/`isoDate`/

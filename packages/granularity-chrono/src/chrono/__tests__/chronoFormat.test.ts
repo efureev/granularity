@@ -10,6 +10,7 @@ import {
   monthNames,
   resetChronoFormatCache,
   weekdayNames,
+  weekdayOrder,
 } from '../chronoFormat'
 
 beforeEach(() => {
@@ -83,6 +84,23 @@ describe('названия дней недели', () => {
 
   it('локализованы', () => {
     expect(weekdayNames('ru-RU', 1)[0]).toBe('пн')
+  })
+
+  it('номера дней идут тем же порядком, что и названия', () => {
+    // Из них потребитель слота шапки узнаёт, какая колонка выходная, не гадая,
+    // с какого дня локаль начинает неделю.
+    expect(weekdayOrder(1)).toEqual([1, 2, 3, 4, 5, 6, 7])
+    expect(weekdayOrder(7)).toEqual([7, 1, 2, 3, 4, 5, 6])
+    expect(weekdayOrder(6)).toEqual([6, 7, 1, 2, 3, 4, 5])
+  })
+
+  it('порядок номеров и порядок названий — один и тот же обход', () => {
+    // Иначе шапка и её номера разъехались бы на локали с воскресной неделей.
+    const names = weekdayNames('en-US', 7, 'long')
+    const iso = weekdayOrder(7)
+
+    expect(names[iso.indexOf(1)]).toBe('Monday')
+    expect(names[iso.indexOf(7)]).toBe('Sunday')
   })
 })
 

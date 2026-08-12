@@ -14,7 +14,10 @@
     "patternYear": "Y"
   },
   "dateRangePicker": {
-    "panelLabel": "Choose date range"
+    "panelLabel": "Choose date range",
+    "startSelected": "Start date selected: {date}. Choose the end date",
+    "rangeSelected": "Range selected: {from} — {to}",
+    "lengthRejected": "This range length is not allowed"
   },
   "dateTimePicker": {
     "panelLabel": "Choose date and time",

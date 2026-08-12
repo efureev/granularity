@@ -580,3 +580,22 @@ describe('GrDatePicker — ручной ввод', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrDatePicker — проброс слота шапки недели', () => {
+  it('слот weekday доходит до сетки вместе с ISO-номером дня', async () => {
+    // Слот объявлен на пикере, а рендерит его вложенный `GrCalendar`: без
+    // проброса потребитель переопределял бы шапку только у голой сетки.
+    const wrapper = mount(GrDatePicker, {
+      props: { locale: 'en-US', today: at('2026-08-12'), weekStart: 1 },
+      slots: { weekday: `<template #weekday="{ label, isoWeekday }"><i :data-iso="isoWeekday">{{ label[0] }}</i></template>` },
+      attachTo: document.body,
+    })
+    await openPicker(wrapper)
+
+    const cells = [...document.querySelectorAll('[data-gr-calendar-weekday] i')]
+
+    expect(cells.map(cell => cell.textContent)).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+    expect(cells[0]!.getAttribute('data-iso')).toBe('1')
+    wrapper.unmount()
+  })
+})

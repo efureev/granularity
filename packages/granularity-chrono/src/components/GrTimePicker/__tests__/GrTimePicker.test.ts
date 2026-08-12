@@ -1,7 +1,8 @@
 import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { resetAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
 import GrTimePicker from '../GrTimePicker.vue'
@@ -76,6 +77,61 @@ function activeKey(unit: string): string | undefined {
 
   return document.querySelector(`[id="${id}"]`)?.getAttribute('data-key') ?? undefined
 }
+
+/** Текст уходит в общий живой регион отложенным макротаском. */
+async function announced(): Promise<string> {
+  await new Promise(resolve => setTimeout(resolve, 2))
+  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
+}
+
+afterEach(() => {
+  resetAnnouncer()
+})
+
+describe('GrTimePicker — объявления для скринридера', () => {
+  it('выбор в колонке объявляет собранное время целиком', async () => {
+    // Слышно только опцию под курсором — «30» само по себе не говорит ничего:
+    // время собрано из четырёх колонок, и ни в одной из них его нет.
+    const wrapper = mountPicker({ modelValue: at(9, 0) })
+    await openPicker(wrapper)
+
+    await option('minute-30').trigger('click')
+
+    expect(await announced()).toBe('09:30')
+    wrapper.unmount()
+  })
+
+  it('выбор с клавиатуры объявляется так же, как клик', async () => {
+    const wrapper = mountPicker({ modelValue: at(9, 0) })
+    await openPicker(wrapper)
+
+    await press('hour', 'ArrowDown')
+    await press('hour', 'Enter')
+
+    expect(await announced()).toBe('10:00')
+    wrapper.unmount()
+  })
+
+  it('секунды звучат, только когда они есть в панели', async () => {
+    const wrapper = mountPicker({ modelValue: at(9, 0, 0), enableSeconds: true })
+    await openPicker(wrapper)
+
+    await option('second-15').trigger('click')
+
+    expect(await announced()).toBe('09:00:15')
+    wrapper.unmount()
+  })
+
+  it('запрещённая опция не объявляется: выбора не было', async () => {
+    const wrapper = mountPicker({ modelValue: at(9, 0), min: at(9, 0) })
+    await openPicker(wrapper)
+
+    await option('hour-8').trigger('click')
+
+    expect(await announced()).toBe('')
+    wrapper.unmount()
+  })
+})
 
 describe('GrTimePicker — поле и роли', () => {
   it('поле объявлено combobox и не редактируется вручную', () => {

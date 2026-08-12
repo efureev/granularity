@@ -14,7 +14,10 @@
     "patternYear": "Г"
   },
   "dateRangePicker": {
-    "panelLabel": "Выбор периода"
+    "panelLabel": "Выбор периода",
+    "startSelected": "Начало выбрано: {date}. Выберите конец периода",
+    "rangeSelected": "Период выбран: с {from} по {to}",
+    "lengthRejected": "Такая длина периода недопустима"
   },
   "dateTimePicker": {
     "panelLabel": "Выбор даты и времени",
