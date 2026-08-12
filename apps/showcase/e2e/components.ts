@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { granularityComponentConfigs } from '@feugene/granularity/granular-provider'
+import { granularityChronoComponentConfigs } from '@feugene/granularity-chrono/granular-provider'
 
 /**
  * Что сканируют e2e и откуда берётся список.
@@ -36,12 +37,25 @@ export function toKebabCase(value: string): string {
 /** Все публичные компоненты пакета — из реестра `granular-provider`. */
 export const registryComponentNames: string[] = Object.keys(granularityComponentConfigs).sort()
 
+/**
+ * Компоненты companion-пакетов — из их собственных реестров, по тому же
+ * правилу, что и ядро. Списком руками они бы отставали от пакета молча: до
+ * 2.6 e2e не видел companion-страниц вовсе, и ни axe, ни визуальный слой их
+ * не проверяли.
+ */
+export const companionComponentNames: string[] = Object.keys(granularityChronoComponentConfigs).sort()
+
 /** Компоненты со своей страницей витрины (`GrButton`, `GrSlider`, …). */
 export const componentNames: string[] = Object.keys(componentApi).sort()
 
 /** URL-путь страницы компонента относительно baseURL (`components/gr-slider`). */
 export function componentPath(name: string): string {
   return `components/${toKebabCase(name)}`
+}
+
+/** URL-путь страницы компаньона (`extras/gr-calendar`). */
+export function companionPath(name: string): string {
+  return `extras/${toKebabCase(name)}`
 }
 
 /** Цель постраничного axe-скана: где живёт компонент и по чему ждать готовности. */
@@ -64,6 +78,7 @@ export const SERVICE_ENTITIES: Record<string, Omit<ScanTarget, 'name'>> = {
 /** Всё, что обходит постраничный axe: страницы компонентов плюс сервисные сущности. */
 export const scanTargets: ScanTarget[] = [
   ...componentNames.map(name => ({ name, path: componentPath(name), ready: '#live-examples' })),
+  ...companionComponentNames.map(name => ({ name, path: companionPath(name), ready: '#live-examples' })),
   ...Object.entries(SERVICE_ENTITIES).map(([name, target]) => ({ name, ...target })),
 ].sort((left, right) => left.name.localeCompare(right.name))
 

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { componentPath } from './components'
+import { companionComponentNames, companionPath, componentPath } from './components'
 
 /**
  * Визуальная регрессия: снимок области «Live examples» для набора компонентов.
@@ -81,6 +81,13 @@ const VISUAL_COMPONENTS = [
   'GrTimeline',
 ]
 
+/**
+ * Страницы компаньонов снимаются целиком, а не выборкой: пакет там один, и его
+ * вид завязан на те же токены. Панели пикеров в кадр попадают через демо с
+ * `inline` — открывающиеся по клику в снимок не идут по общему правилу.
+ */
+const VISUAL_COMPANIONS = companionComponentNames
+
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual (${theme})`, () => {
     for (const name of VISUAL_COMPONENTS) {
@@ -103,6 +110,33 @@ for (const theme of ['light', 'dark'] as const) {
         await page.waitForLoadState('networkidle')
 
         await expect(examples).toHaveScreenshot(`${componentPath(name).replace('/', '-')}-${theme}.png`, {
+          mask: await chrome(page),
+        })
+      })
+    }
+  })
+}
+
+for (const theme of ['light', 'dark'] as const) {
+  test.describe(`visual companion (${theme})`, () => {
+    for (const name of VISUAL_COMPANIONS) {
+      test(`${name} live examples`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: theme })
+        await page.addInitScript((t) => {
+          try {
+            localStorage.setItem('gr-theme', t)
+          }
+          catch {
+            // ignore storage errors
+          }
+        }, theme)
+
+        await page.goto(companionPath(name))
+        const examples = page.locator('#live-examples')
+        await examples.waitFor()
+        await page.waitForLoadState('networkidle')
+
+        await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`, {
           mask: await chrome(page),
         })
       })

@@ -409,6 +409,12 @@ export const companionPackages: CompanionPackage[] = [
             previewKey: 'extra-chrono-date-picker-modes',
           },
           {
+            id: 'chrono-date-picker-dialog',
+            title: 'Inside a dialog',
+            description: 'Панель встаёт в общий стек слоёв поверх окна: Esc закрывает сначала её, и только следующий — само окно.',
+            previewKey: 'extra-chrono-date-picker-dialog',
+          },
+          {
             id: 'chrono-date-picker-inline',
             title: 'Inline panel',
             description: 'Панель на месте, без поля и поповера. Модель, адаптер и `name` остаются пикеровскими — этим `inline` и отличается от голого `GrCalendar`.',

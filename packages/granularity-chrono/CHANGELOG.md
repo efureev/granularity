@@ -32,6 +32,14 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **The provider now reports the right `packageBaseUrl`.** It was computed in the shared module
+  from `import.meta.url`, and the bundler is free to either split that module into a chunk or
+  inline it into the entry — one level apart. Inlined, the base pointed at the package root, so
+  the preset looked for `components/<Name>/` where there are none and **silently skipped the
+  scan**: only the safelist kept the CSS alive. The entry computes it now, and its location is
+  fixed by the build config. The component registry is also re-exported from the browser entry,
+  the way the core does it.
+
 - Time columns scroll to the selected value when the panel opens. The navigation primitive
   puts the cursor there but never scrolls, so a 24-value column opened at midnight while 09:30
   sat off-screen.

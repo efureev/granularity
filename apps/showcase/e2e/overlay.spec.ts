@@ -431,3 +431,63 @@ test.describe('сервис диалогов', () => {
     await expectTabCycle(page, '[data-gr-overlay-root][aria-modal]')
   })
 })
+
+/**
+ * Панель пикера в стеке слоёв.
+ *
+ * Пикер немодален и живёт в том же стеке, что и окно: Esc обязан закрыть
+ * верхний слой — панель, — а не окно под ней. Проверить это можно только
+ * по-настоящему открыв оба: jsdom не знает ни `inert`, ни порядка слоёв, а
+ * витринный axe-скан снимает страницу с закрытыми оверлеями.
+ */
+test.describe('пикер поверх окна', () => {
+  const page = 'extras/gr-date-picker'
+
+  async function openDialogWithPicker(browserPage: import('@playwright/test').Page) {
+    await browserPage.goto(page)
+    await browserPage.locator('#live-examples').waitFor()
+
+    // Подпись — литерал самого демо, а не строка локали витрины: она стабильна
+    // и однозначно указывает на нужный пример.
+    await browserPage.getByRole('button', { name: 'Schedule delivery', exact: true }).click()
+
+    await browserPage.waitForFunction(() => {
+      const panel = document.querySelector('[data-gr-modal-panel]')
+      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
+    })
+  }
+
+  test('Esc закрывает панель пикера, а окно остаётся', async ({ page: browserPage }) => {
+    await openDialogWithPicker(browserPage)
+
+    // Поле — то, что внутри окна: на странице есть и другие демо. Состояние
+    // панели читаем по нему же: сама панель уезжает в портал, и там их столько,
+    // сколько пикеров на странице.
+    const field = browserPage.locator('[data-gr-modal-panel] [data-gr-date-picker-field]')
+    await field.click()
+    await expect(field).toHaveAttribute('aria-expanded', 'true')
+
+    await browserPage.keyboard.press('Escape')
+
+    await expect(field).toHaveAttribute('aria-expanded', 'false')
+    await expect(browserPage.locator('[data-gr-modal-panel]')).toHaveCount(1)
+
+    // Второй Esc — уже окну: очередь стека, а не два слоя за одно нажатие.
+    await browserPage.keyboard.press('Escape')
+    await expect(browserPage.locator('[data-gr-modal-panel]')).toHaveCount(0)
+  })
+
+  test('панель пикера не заперта ловушкой фокуса окна', async ({ page: browserPage }) => {
+    await openDialogWithPicker(browserPage)
+
+    const field = browserPage.locator('[data-gr-modal-panel] [data-gr-date-picker-field]')
+    await field.click()
+    await expect(field).toHaveAttribute('aria-expanded', 'true')
+
+    // Панель уезжает в портал, то есть вне панели окна: ловушка фокуса обязана
+    // считать её своей, иначе фокус на дне календаря был бы «снаружи» окна и
+    // ловушка утащила бы его обратно.
+    const focusedKey = await browserPage.evaluate(() => document.activeElement?.getAttribute('data-key') ?? null)
+    expect(focusedKey).toBeTruthy()
+  })
+})

@@ -17,6 +17,7 @@ export const demoPathByPreviewKey = {
   'extra-chrono-calendar-modes':          'extra/granularity-chrono/GrCalendarModesDemo.vue',
   'extra-chrono-date-picker-basic':       'extra/granularity-chrono/GrDatePickerBasicDemo.vue',
   'extra-chrono-date-picker-form':        'extra/granularity-chrono/GrDatePickerFormDemo.vue',
+  'extra-chrono-date-picker-dialog':      'extra/granularity-chrono/GrDatePickerInDialogDemo.vue',
   'extra-chrono-date-picker-inline':      'extra/granularity-chrono/GrDatePickerInlineDemo.vue',
   'extra-chrono-date-picker-modes':       'extra/granularity-chrono/GrDatePickerModesDemo.vue',
   'extra-chrono-date-time-basic':         'extra/granularity-chrono/GrDateTimePickerBasicDemo.vue',

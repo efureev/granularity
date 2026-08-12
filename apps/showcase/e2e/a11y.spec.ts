@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { knownIssuesFor } from './a11y-baseline'
-import { registryComponentNames, scanTargets } from './components'
+import { companionComponentNames, registryComponentNames, scanTargets } from './components'
 
 /**
  * Доступностный слой: axe-core по страницам компонентов витрины.
@@ -67,10 +67,13 @@ for (const target of scanTargets) {
  * реестр пакета: компонент, до которого витрина не доросла, обязан ронять гейт,
  * а не тихо выпадать из него. Так `GrDialogService` и потерялся — он есть в
  * реестре, но не в `componentApi.generated.json`, откуда брался список.
+ *
+ * Реестров теперь два: ядро и companion. Страницы компаньонов до 2.6 не
+ * сканировались вовсе — ни этим гейтом, ни визуальным слоем.
  */
 test('каждый компонент реестра покрыт e2e', () => {
   const covered = new Set(scanTargets.map(target => target.name))
-  const uncovered = registryComponentNames.filter(name => !covered.has(name))
+  const uncovered = [...registryComponentNames, ...companionComponentNames].filter(name => !covered.has(name))
 
   expect(
     uncovered,

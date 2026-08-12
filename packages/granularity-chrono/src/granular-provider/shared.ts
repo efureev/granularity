@@ -6,7 +6,6 @@ import {
   defineGranularProvider,
   type GranularComponentDescriptor,
   type GranularProvider,
-  resolvePackageBaseUrl,
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grCalendarConfig } from '../components/GrCalendar/config'
@@ -18,10 +17,6 @@ import { grTimePickerConfig } from '../components/GrTimePicker/config'
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_CHRONO_PROVIDER_ID = '@feugene/granularity-chrono'
-
-// Не заменять на `new URL('..', import.meta.url)`: Vite и rolldown распознают
-// этот литерал и подставляют `data:`-URL, после чего scan-директории пустеют.
-const packageBaseUrl = resolvePackageBaseUrl(import.meta.url)
 
 /**
  * Реестр компонентов пакета — именованной мапой, а не инлайн-массивом.
@@ -48,9 +43,18 @@ export type GranularityChronoComponentName = keyof typeof granularityChronoCompo
  * Принимает `granularityProvider` снаружи — в зависимости от entry это будет
  * browser- или node-вариант провайдера `@feugene/granularity`. Это важно,
  * чтобы у пресета был ровно один инстанс с данным `id`.
+ *
+ * `packageBaseUrl` тоже приходит снаружи, из самого entry, и это не церемония:
+ * он считается от `import.meta.url`, а этот модуль бандлер волен и вынести в
+ * общий чанк, и заинлайнить в entry — то есть положить на разную глубину.
+ * Промах на уровень даёт `dist/components/<Name>/`, которых нет, пресет молча
+ * пропускает скан, и в CSS остаётся только то, что перечислено в safelist.
+ * У entry-файлов место фиксировано конфигом сборки, поэтому считать базу
+ * обязаны они.
  */
 export function createGranularityChronoProvider(
   granularityProvider: GranularProvider,
+  packageBaseUrl: string,
 ): GranularProvider {
   return defineGranularProvider({
     id: GRANULARITY_CHRONO_PROVIDER_ID,
