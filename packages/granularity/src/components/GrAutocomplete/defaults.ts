@@ -10,7 +10,7 @@ export interface GrAutocompleteConfigurableProps {
   clearable: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrAutocomplete: GrAutocompleteConfigurableProps
   }

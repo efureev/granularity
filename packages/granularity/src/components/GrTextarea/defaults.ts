@@ -13,7 +13,7 @@ export interface GrTextareaConfigurableProps {
   clearable: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrTextarea: GrTextareaConfigurableProps
   }

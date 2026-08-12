@@ -41,6 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`componentDefaults` typing now survives in companion packages.** The `GrComponentDefaultsRegistry` interface was
+  declared in `GrConfigProvider/context` and only re-exported from the public subpaths, so an outside package had no
+  way to name the module that declares it. Augmenting a re-export works — but only while it is the sole augmentation
+  in the program: as soon as a `defaults.d.ts` of this package joined the same type graph, the outside augmentation
+  was dropped silently, leaving `componentDefaults` unaware of that component and `useGrComponentProp` untyped. No
+  error, just types drifting from runtime. The declaration moved to the public `composables/useGrComponentConfig`,
+  where both this package's components and companions augment it directly. A gate
+  (`src/__tests__/componentDefaults.test.ts`) now pins the address for every `defaults.ts`.
+
 - **`GrColorPicker` and `GrFormFile` no longer put `aria-required`/`aria-readonly` on a button.** Neither attribute is
   supported by role `button`, and axe reports them as a critical `aria-allowed-attr` violation — the colour picker hit
   it as soon as a form rule made its field required. The states are not dropped, though: both controls now announce

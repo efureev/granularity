@@ -14,7 +14,7 @@ export interface GrTimelineConfigurableProps {
   groupHeadingLevel: GrTimelineHeadingLevel
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrTimeline: GrTimelineConfigurableProps
   }

@@ -3,5 +3,9 @@
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
     "weekNumber": "Week"
+  },
+  "datePicker": {
+    "panelLabel": "Choose date",
+    "gridLabel": "Calendar"
   }
 }

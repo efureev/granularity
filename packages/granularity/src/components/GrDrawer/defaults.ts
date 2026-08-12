@@ -14,7 +14,7 @@ export interface GrDrawerConfigurableProps {
   side: GrDrawerSide
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrDrawer: GrDrawerConfigurableProps
   }

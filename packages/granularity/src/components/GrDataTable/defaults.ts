@@ -5,7 +5,7 @@ export interface GrDataTableConfigurableProps {
   size: GrComponentSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrDataTable: GrDataTableConfigurableProps
   }

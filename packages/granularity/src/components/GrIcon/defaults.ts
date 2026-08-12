@@ -9,7 +9,7 @@ export interface GrIconConfigurableProps {
   size: GrComponentSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrIcon: GrIconConfigurableProps
   }

@@ -8,7 +8,7 @@ export interface GrTabsConfigurableProps {
   variant: GrTabsVariant
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrTabs: GrTabsConfigurableProps
   }

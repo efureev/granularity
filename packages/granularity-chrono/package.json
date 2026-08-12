@@ -54,6 +54,10 @@
       "types": "./dist/types/components/GrCalendar/index.d.ts",
       "import": "./dist/components/GrCalendar/index.js"
     },
+    "./components/GrDatePicker": {
+      "types": "./dist/types/components/GrDatePicker/index.d.ts",
+      "import": "./dist/components/GrDatePicker/index.js"
+    },
     "./granular-provider": {
       "types": "./dist/types/granular-provider/index.d.ts",
       "import": "./dist/granular-provider.js",
@@ -95,6 +99,7 @@
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^4.1.10",
     "@vue/test-utils": "^2.4.11",
+    "axe-core": "~4.12.1",
     "eslint": "^10.7.0",
     "globals": "^16.5.0",
     "jsdom": "^29.1.1",

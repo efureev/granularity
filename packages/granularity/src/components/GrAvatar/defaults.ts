@@ -12,7 +12,7 @@ export interface GrAvatarConfigurableProps {
   shape: GrAvatarShape
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrAvatar: GrAvatarConfigurableProps
   }

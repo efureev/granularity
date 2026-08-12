@@ -9,7 +9,7 @@ export interface GrSwitchConfigurableProps {
   size: GrSwitchSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrSwitch: GrSwitchConfigurableProps
   }

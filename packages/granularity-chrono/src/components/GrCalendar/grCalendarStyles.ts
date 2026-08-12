@@ -18,7 +18,7 @@ export const calendarRootClass
 export const calendarHeaderClass = 'flex items-center justify-between gap-2'
 
 export const calendarTitleClass
-  = 'font-600 text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-md)]'
+  = 'font-600 text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]'
 
 export const calendarNavButtonClass
   = 'inline-flex items-center justify-center rounded-[var(--gr-radius-control)] '

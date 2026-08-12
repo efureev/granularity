@@ -10,7 +10,7 @@ export interface GrBreadcrumbsConfigurableProps {
   separator: string
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrBreadcrumbs: GrBreadcrumbsConfigurableProps
   }

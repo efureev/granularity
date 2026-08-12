@@ -9,7 +9,7 @@ export interface GrModalConfigurableProps {
   size: GrModalSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrModal: GrModalConfigurableProps
   }

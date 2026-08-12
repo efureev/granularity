@@ -9,7 +9,7 @@ export interface GrStatisticConfigurableProps {
   size: GrStatisticSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrStatistic: GrStatisticConfigurableProps
   }

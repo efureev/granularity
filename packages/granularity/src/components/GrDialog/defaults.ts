@@ -9,7 +9,7 @@ export interface GrDialogConfigurableProps {
   size: GrDialogSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrDialog: GrDialogConfigurableProps
   }

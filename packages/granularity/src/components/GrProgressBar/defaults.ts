@@ -6,7 +6,7 @@ export interface GrProgressBarConfigurableProps {
   borderless: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrProgressBar: GrProgressBarConfigurableProps
   }

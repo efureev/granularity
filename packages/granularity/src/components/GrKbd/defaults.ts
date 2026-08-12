@@ -9,7 +9,7 @@ export interface GrKbdConfigurableProps {
   size: GrKbdSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrKbd: GrKbdConfigurableProps
   }

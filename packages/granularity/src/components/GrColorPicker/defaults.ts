@@ -10,7 +10,7 @@ export interface GrColorPickerConfigurableProps {
   size: GrColorPickerSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrColorPicker: GrColorPickerConfigurableProps
   }

@@ -9,6 +9,36 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Date and time arithmetic on plain tuples** (`{y, m, d}` / `{h, min, s}`): month and year
+  shifts, month length, leap years, comparison, ranges, ISO weekday and week number, the
+  month grid builder, cached `Intl` wrappers and the `Date` boundary with `date`/`isoDate`/
+  `isoDateTime`/`timestamp` adapters. `Date` arithmetic is a source of DST bugs — on a
+  transition day the tuple is immune by construction. No date library is involved, and
+  everything locale-dependent comes from `Intl`, so the package speaks every language the
+  engine knows rather than the ones we listed.
+
+- **`GrCalendar`** — the month grid as the WAI-ARIA `grid` pattern: roving tabindex with
+  exactly one tab stop, arrows across days and weeks, `Home`/`End` as week bounds,
+  `PageUp`/`PageDown` for the month, `Shift` with them for the year. The grid edge pages the
+  month instead of wrapping, and the month change is announced — otherwise arrow navigation
+  is silent for a screen-reader user. Disabled days keep `aria-disabled` and stay in the
+  traversal.
+
+- **`GrDatePicker`** — a field with a calendar panel. The field is the package's boundary:
+  it speaks `Date` (or whatever `valueAdapter` says) outward and tuples inward. It is a real
+  form control — own `id`/`name`, `GrFormField` wiring, `aria-invalid`/`aria-required`,
+  sizes from `GrConfigProvider`, `v-model:open` — all of which the predecessor could not do
+  at all, because its `<input>` belonged to a third-party widget. The panel mounts on first
+  open, not on page load: a form with several pickers would otherwise build a 42-cell grid
+  per picker before anyone clicked anything.
+
+- **Package gates for tokens and accessibility**: no pixel literals or uno-scale utilities
+  where the design system has a token, every own CSS variable declared in the component's
+  `tokens.json`, and axe over the *open* panel — the showcase gate only ever captures the
+  closed state, so the grid roles would go unchecked. The token gate paid for itself on its
+  first run: the month title referenced `--gr-leading-md`, a step that does not exist in the
+  scale, so its line-height had been silently falling back to `normal`.
+
 - Package scaffold: build config with a per-component entry map, `granular-provider`
   (browser and node entries), `unplugin-vue-components` resolver, `granular doctor`
   options and the registry generator. No components yet.

@@ -10,7 +10,7 @@ export interface GrNumberInputConfigurableProps {
   clearable: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrNumberInput: GrNumberInputConfigurableProps
   }

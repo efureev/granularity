@@ -5,7 +5,7 @@ export interface GrTreeConfigurableProps {
   size: GrComponentSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrTree: GrTreeConfigurableProps
   }

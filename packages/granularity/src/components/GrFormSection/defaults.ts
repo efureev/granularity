@@ -9,7 +9,7 @@ export interface GrFormSectionConfigurableProps {
   headingLevel: GrFormSectionHeadingLevel
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrFormSection: GrFormSectionConfigurableProps
   }

@@ -11,7 +11,7 @@ export interface GrSplitterConfigurableProps {
   collapsible: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrSplitter: GrSplitterConfigurableProps
   }

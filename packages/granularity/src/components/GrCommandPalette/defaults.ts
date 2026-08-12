@@ -9,7 +9,7 @@ export interface GrCommandPaletteConfigurableProps {
   size: GrCommandPaletteSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrCommandPalette: GrCommandPaletteConfigurableProps
   }

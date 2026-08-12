@@ -10,7 +10,7 @@ export interface GrCardConfigurableProps {
   variant: GrCardVariant
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrCard: GrCardConfigurableProps
   }

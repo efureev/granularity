@@ -13,7 +13,7 @@ export interface GrProgressCircleConfigurableProps {
   trackless: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrProgressCircle: GrProgressCircleConfigurableProps
   }

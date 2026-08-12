@@ -10,7 +10,7 @@ export interface GrPopoverConfigurableProps {
   size: GrComponentSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrPopover: GrPopoverConfigurableProps
   }

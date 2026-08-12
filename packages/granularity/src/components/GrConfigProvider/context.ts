@@ -1,5 +1,7 @@
 import { computed, getCurrentInstance, inject, type ComputedRef, type InjectionKey } from 'vue'
 
+import type { GrComponentDefaultsRegistry } from '../../composables/useGrComponentConfig'
+
 /**
  * Контекст `GrConfigProvider` — глобальные дефолты для вложенных GR-компонентов:
  * размер контролов и per-component дефолтные пропсы.
@@ -19,28 +21,13 @@ export const GR_COMPONENT_SIZES = ['xs', 'sm', 'md', 'lg'] as const
 export type GrComponentSize = typeof GR_COMPONENT_SIZES[number]
 
 /**
- * Открытый реестр компонентов, у которых есть настраиваемые через конфиг пропы.
+ * Реестр компонентов с настраиваемыми через конфиг пропами.
  *
- * Пустой по умолчанию: каждый компонент дополняет его **из своей папки** через
- * declaration merging (`GrButton/defaults.ts` и т. п.). Так провайдер не знает
- * ни имён, ни типов конкретных компонентов — контракт объявляет тот, кто им
- * владеет, а не общий модуль.
- *
- * Практическое следствие: реестр состоит ровно из тех компонентов, которые
- * попали в граф типов потребителя. Импортировали только `GrButton` — в
- * `componentDefaults` типизирована только кнопка, типы `GrBadge` в проект не
- * приезжают.
- *
- * ```ts
- * // GrButton/defaults.ts
- * declare module '../GrConfigProvider/context' {
- *   interface GrComponentDefaultsRegistry {
- *     GrButton: GrButtonConfigurableProps
- *   }
- * }
- * ```
+ * Объявлен в `composables/useGrComponentConfig` — там же, куда его дополняют
+ * и компоненты пакета, и companion-пакеты. Здесь только реэкспорт для тех, кто
+ * работает с контекстом провайдера напрямую.
  */
-export interface GrComponentDefaultsRegistry {}
+export type { GrComponentDefaultsRegistry }
 
 /** Имя компонента, у которого есть настраиваемые через конфиг пропы. */
 export type GrConfigurableComponent = keyof GrComponentDefaultsRegistry

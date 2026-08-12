@@ -10,7 +10,7 @@ export interface GrFormFieldConfigurableProps {
   labelPosition: GrFormFieldLabelPosition
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrFormField: GrFormFieldConfigurableProps
   }

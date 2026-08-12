@@ -10,7 +10,7 @@ export interface GrSegmentedConfigurableProps {
   variant: GrSegmentedVariant
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrSegmented: GrSegmentedConfigurableProps
   }

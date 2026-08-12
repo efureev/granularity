@@ -10,7 +10,7 @@ export interface GrBadgeConfigurableProps {
   radius: GrBadgeRadius
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrBadge: GrBadgeConfigurableProps
   }

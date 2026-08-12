@@ -10,7 +10,7 @@ export interface GrDividerConfigurableProps {
   spacing: GrDividerSpacing
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrDivider: GrDividerConfigurableProps
   }

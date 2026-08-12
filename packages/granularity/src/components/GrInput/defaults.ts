@@ -13,7 +13,7 @@ export interface GrInputConfigurableProps {
   clearable: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrInput: GrInputConfigurableProps
   }

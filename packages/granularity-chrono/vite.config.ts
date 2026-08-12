@@ -47,6 +47,9 @@ export default defineConfig({
         'components/GrCalendar/index': fileURLToPath(
           new URL('./src/components/GrCalendar/index.ts', import.meta.url),
         ),
+        'components/GrDatePicker/index': fileURLToPath(
+          new URL('./src/components/GrDatePicker/index.ts', import.meta.url),
+        ),
         // </granularity:components>
       },
       formats: ['es'],

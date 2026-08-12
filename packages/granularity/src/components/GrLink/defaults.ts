@@ -9,7 +9,7 @@ export interface GrLinkConfigurableProps {
   size: GrLinkSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrLink: GrLinkConfigurableProps
   }

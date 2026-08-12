@@ -9,7 +9,7 @@ export interface GrRatingConfigurableProps {
   size: GrRatingSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrRating: GrRatingConfigurableProps
   }

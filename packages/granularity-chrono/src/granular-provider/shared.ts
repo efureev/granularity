@@ -10,6 +10,7 @@ import {
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grCalendarConfig } from '../components/GrCalendar/config'
+import { grDatePickerConfig } from '../components/GrDatePicker/config'
 // </granularity:components:imports>
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
@@ -29,6 +30,7 @@ const packageBaseUrl = resolvePackageBaseUrl(import.meta.url)
 export const granularityChronoComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrCalendar: grCalendarConfig,
+  GrDatePicker: grDatePickerConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>
 

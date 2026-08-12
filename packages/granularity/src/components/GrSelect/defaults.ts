@@ -12,7 +12,7 @@ export interface GrSelectConfigurableProps {
   clearable: boolean
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrSelect: GrSelectConfigurableProps
   }

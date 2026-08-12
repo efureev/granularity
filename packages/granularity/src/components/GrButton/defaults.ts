@@ -20,7 +20,7 @@ export interface GrButtonConfigurableProps {
  * `GrConfigProvider`, чтобы провайдер не знал про конкретные компоненты: тип
  * приезжает к потребителю ровно тогда, когда он импортирует сам `GrButton`.
  */
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrButton: GrButtonConfigurableProps
   }

@@ -14,7 +14,7 @@ export interface GrCollapseConfigurableProps {
   headingLevel: GrCollapseHeadingLevel
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrCollapse: GrCollapseConfigurableProps
   }

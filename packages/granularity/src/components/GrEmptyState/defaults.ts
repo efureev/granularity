@@ -11,7 +11,7 @@ export interface GrEmptyStateConfigurableProps {
   headingLevel: GrEmptyStateHeadingLevel
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrEmptyState: GrEmptyStateConfigurableProps
   }

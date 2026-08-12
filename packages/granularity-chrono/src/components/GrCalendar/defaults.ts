@@ -10,7 +10,7 @@ export interface GrCalendarConfigurableProps {
   showWeekNumbers: boolean
 }
 
-declare module '@feugene/granularity/components/GrConfigProvider' {
+declare module '@feugene/granularity/composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrCalendar: GrCalendarConfigurableProps
   }

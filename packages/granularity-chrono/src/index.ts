@@ -1,5 +1,6 @@
 // <granularity:components> — блок генерируется `yarn generate:registry`
 export * from './components/GrCalendar'
+export * from './components/GrDatePicker'
 // </granularity:components>
 
 // Арифметика дат и времени. Публична намеренно: потребитель, которому нужно

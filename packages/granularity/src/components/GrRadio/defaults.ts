@@ -9,7 +9,7 @@ export interface GrRadioConfigurableProps {
   size: GrButtonSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrRadio: GrRadioConfigurableProps
   }

@@ -5,7 +5,7 @@ export interface GrTooltipConfigurableProps {
   size: GrComponentSize
 }
 
-declare module '../GrConfigProvider/context' {
+declare module '../../composables/useGrComponentConfig' {
   interface GrComponentDefaultsRegistry {
     GrTooltip: GrTooltipConfigurableProps
   }
