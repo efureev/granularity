@@ -1,5 +1,5 @@
-<script setup lang="ts" generic="TValue = Date | null">
-import { computed, ref } from 'vue'
+<script setup lang="ts" generic="TItem = Date">
+import { computed, ref, watch } from 'vue'
 
 import GrPopover from '@feugene/granularity/components/GrPopover'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
@@ -9,6 +9,7 @@ import { formatPlainDate } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
+import { comparePlainDates, differenceInDays } from '../../chrono/plainDate'
 import {
   clearButtonClass,
   iconClass,
@@ -17,59 +18,58 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
-import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
+import { rangeCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
-import type { GrDatePickerSize } from './grDatePickerStyles'
+import type { GrDateRangePickerSize } from './grDateRangePickerStyles'
 
 /**
- * GrDatePicker — поле с датой и панелью-календарём.
+ * GrDateRangePicker — выбор периода одной сеткой.
  *
- * Границей между мирами служит именно этот компонент: наружу он говорит на
- * `Date` (или на том, что задаёт `valueAdapter`), внутрь — кортежами
- * `PlainDate`, на которых считает весь пакет.
+ * Диапазон набирается двумя кликами: первый ставит начало, второй закрывает
+ * период и отдаёт его наружу. Пока период открыт, сетка показывает
+ * предпросмотр до дня под курсором — и считается он **на отрисовке**,
+ * сравнением кортежей: ячейки про выбор ничего не знают, иначе движение мыши
+ * пересобирало бы всю сетку на каждый кадр.
  *
- * Ручного ввода текстом в этой версии нет, поэтому поле честно помечено
- * `readonly`: значение меняется только через панель.
+ * Границы можно вести и назад — порядок нормализуется при закрытии периода.
  */
-export interface GrDatePickerProps<T = Date | null> {
-  modelValue?: T
+export interface GrDateRangePickerProps<T = Date> {
+  /** Обе границы или ничего: полупустой диапазон значением не считается. */
+  modelValue?: readonly [T, T] | null
   /**
-   * Как значение уходит наружу и приходит обратно: имя готового адаптера
-   * (`date`, `isoDate`, `isoDateTime`, `timestamp`) либо свой.
-   *
-   * Отдельным пропом, а не подменой типа модели: у предшественника фактический
-   * тип задавала строка, и вывести его из типов было невозможно.
+   * Как границы уходят наружу и приходят обратно. Адаптер применяется к каждой
+   * отдельно, поэтому модель — пара `[T, T]`.
    */
   valueAdapter?: GrChronoAdapterName | GrChronoAdapter<T>
   min?: Date
   max?: Date
   /** Запрещённые даты: список или предикат. */
   disabledDates?: readonly Date[] | ((date: Date) => boolean)
-  /** Первый день недели по ISO (1 — понедельник). Не задан — из локали. */
+  /** Наименьшая длина периода в днях, считая обе границы. */
+  minRange?: number
+  /** Наибольшая длина периода в днях, считая обе границы. */
+  maxRange?: number
   weekStart?: IsoWeekday
   showWeekNumbers?: boolean
-  /** Что считать сегодняшним днём. Задаётся ради воспроизводимых тестов и снимков. */
+  /** Что считать сегодняшним днём. Задаётся ради воспроизводимых тестов. */
   today?: Date
-  /** Локаль показа. Не задана — из адаптера i18n приложения. */
-  locale?: string
-  /**
-   * Вид значения в поле — опциями `Intl`, а не строкой-паттерном: паттерн
-   * пришлось бы разбирать самим и он всё равно не знает порядка частей в чужой
-   * локали.
-   */
+  /** Вид границ в поле — опциями `Intl`, а не строкой-паттерном. */
   format?: Intl.DateTimeFormatOptions
+  /** Разделитель границ в поле. */
+  separator?: string
   placeholder?: string
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
   placement?: UseFloatingPlacement
-  /** Точечное переопределение точки монтирования панели. */
   teleportTo?: string | HTMLElement
-  size?: GrDatePickerSize
+  size?: GrDateRangePickerSize
+  /** Локаль показа. Не задана — из адаптера i18n приложения. */
+  locale?: string
   /** Собственный `id` поля. Не задан — берётся из `GrFormField`. */
   id?: string
-  /** Имя для нативной формы: сериализованное значение уходит скрытым полем. */
+  /** Имя для нативной формы: границы уходят двумя скрытыми полями. */
   name?: string
   disabled?: boolean
   /** Значение видно, панель открывается, но выбор не меняется. */
@@ -80,26 +80,28 @@ export interface GrDatePickerProps<T = Date | null> {
   ariaLabel?: string
 }
 
-export interface GrDatePickerEmits<T = Date | null> {
-  (e: 'update:modelValue', value: T | null): void
-  (e: 'change', value: T | null): void
+export interface GrDateRangePickerEmits<T = Date> {
+  (e: 'update:modelValue', value: readonly [T, T] | null): void
+  (e: 'change', value: readonly [T, T] | null): void
   (e: 'update:open', value: boolean): void
   (e: 'clear'): void
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
 }
 
-const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
+const props = withDefaults(defineProps<GrDateRangePickerProps<TItem>>(), {
   modelValue: undefined,
   valueAdapter: undefined,
   min: undefined,
   max: undefined,
   disabledDates: undefined,
+  minRange: undefined,
+  maxRange: undefined,
   weekStart: undefined,
   showWeekNumbers: false,
   today: undefined,
-  locale: undefined,
   format: undefined,
+  separator: ' — ',
   placeholder: undefined,
   // Дефолты живут в резолвере: Vue подставил бы свои раньше, чем компонент
   // заглянет в `GrConfigProvider`.
@@ -108,6 +110,7 @@ const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   placement: undefined,
   teleportTo: undefined,
   size: undefined,
+  locale: undefined,
   id: undefined,
   name: undefined,
   disabled: false,
@@ -118,12 +121,12 @@ const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   ariaLabel: undefined,
 })
 
-const emit = defineEmits<GrDatePickerEmits<TValue>>()
+const emit = defineEmits<GrDateRangePickerEmits<TItem>>()
 
 defineSlots<{
   /** Своя ячейка дня вместо числа. */
   day?: (props: { cell: CalendarCell, selected: boolean }) => unknown
-  /** Своя шапка панели вместо заголовка и стрелок. */
+  /** Своя шапка сетки вместо заголовка и стрелок. */
   header?: (props: { title: string, goToMonth: (delta: number) => void }) => unknown
   /** Подвал панели. */
   footer?: () => unknown
@@ -131,10 +134,10 @@ defineSlots<{
 
 const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
 
-const shell = usePickerShell<TValue>({
+const shell = usePickerShell<readonly [TItem, TItem] | null, [Date, Date]>({
   props: () => props,
-  codec: () => dateCodec(resolveChronoAdapter<TValue>(props.valueAdapter)),
-  component: 'GrDatePicker',
+  component: 'GrDateRangePicker',
+  codec: () => rangeCodec(resolveChronoAdapter<TItem>(props.valueAdapter)),
   emit: {
     open: value => emit('update:open', value),
     model: (value) => {
@@ -155,9 +158,10 @@ const {
   isInvalid,
   isRequired,
   isReadonly,
+  isLocked,
   inputId,
   describedBy,
-  selected: selectedDate,
+  selected,
   formValues,
   panelOpen,
   hasBeenOpen,
@@ -165,19 +169,30 @@ const {
   showClear,
 } = shell
 
-const selected = computed<PlainDate | null>(() => (
-  selectedDate.value ? toPlainDate(selectedDate.value) : null
+/** Начало незакрытого периода: есть, пока ждём второй клик. */
+const anchor = ref<PlainDate | null>(null)
+const hovered = ref<PlainDate | null>(null)
+
+// Панель закрылась с незакрытым периодом — начало сбрасывается: показывать
+// половину выбора при следующем открытии значит врать о состоянии.
+watch(panelOpen, (next) => {
+  if (!next) {
+    anchor.value = null
+    hovered.value = null
+  }
+})
+
+const selectedRange = computed<[PlainDate, PlainDate] | null>(() => (
+  selected.value ? [toPlainDate(selected.value[0]), toPlainDate(selected.value[1])] : null
 ))
+
+const rangeStart = computed(() => anchor.value ?? selectedRange.value?.[0] ?? null)
+const rangeEnd = computed(() => (anchor.value ? null : selectedRange.value?.[1] ?? null))
 
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
 const maxPlain = computed(() => (props.max ? toPlainDate(props.max) : undefined))
 const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : undefined))
 
-/**
- * Запреты приходят в `Date`, а сетка спрашивает кортежами. Предикат
- * оборачивается, а не переписывается: обратный перевод стоит одного объекта на
- * ячейку при смене месяца — 42 за раз, и только когда предикат вообще задан.
- */
 const disabledDates = computed<DisabledDatesInput>(() => {
   const source = props.disabledDates
   if (!source) return undefined
@@ -186,19 +201,62 @@ const disabledDates = computed<DisabledDatesInput>(() => {
   return source.map(toPlainDate)
 })
 
-const displayValue = computed(() => (
-  selected.value ? formatPlainDate(resolvedLocale.value, selected.value, props.format) : ''
-))
+const displayValue = computed(() => {
+  const range = selectedRange.value
+  if (!range) return ''
 
-function onSelect(date: PlainDate): void {
-  // Гард здесь, а не только в `commit`: закрытая по клику панель выглядела бы
-  // так, будто выбор состоялся.
-  if (shell.isLocked.value) return
+  const [from, to] = range
+  return [
+    formatPlainDate(resolvedLocale.value, from, props.format),
+    formatPlainDate(resolvedLocale.value, to, props.format),
+  ].join(props.separator)
+})
 
-  shell.commit(fromPlainParts(date))
+/** Длина периода в днях, считая обе границы: 12–12 августа — это один день. */
+function lengthOf(from: PlainDate, to: PlainDate): number {
+  return Math.abs(differenceInDays(to, from)) + 1
+}
+
+function isLengthAllowed(from: PlainDate, to: PlainDate): boolean {
+  const length = lengthOf(from, to)
+
+  if (props.minRange !== undefined && length < props.minRange) return false
+  if (props.maxRange !== undefined && length > props.maxRange) return false
+
+  return true
+}
+
+function onDaySelect(date: PlainDate): void {
+  if (isLocked.value) return
+
+  // Первый клик открывает период, второй закрывает. Клик по началу открытого
+  // периода — тоже второй: период в один день допустим, если длина позволяет.
+  if (!anchor.value) {
+    anchor.value = date
+    hovered.value = date
+    return
+  }
+
+  const [from, to] = comparePlainDates(anchor.value, date) <= 0
+    ? [anchor.value, date]
+    : [date, anchor.value]
+
+  // Слишком короткий или слишком длинный период не выбирается, но и не
+  // сбрасывает начало: пользователь просто промахнулся мимо допустимой длины.
+  if (!isLengthAllowed(from, to)) return
+
+  shell.commit([fromPlainParts(from), fromPlainParts(to)])
+  anchor.value = null
+  hovered.value = null
 
   // Фокус на поле вернёт стек слоёв: на момент закрытия он ещё внутри панели.
   shell.closePanel()
+}
+
+function onDayHover(date: PlainDate | null): void {
+  if (!anchor.value) return
+
+  hovered.value = date
 }
 
 defineExpose({
@@ -216,16 +274,15 @@ const fieldClass = computed(() => pickerFieldClass({
 
 /**
  * Панель отдаёт свои фон и отступ, а календарь внутри неё — нет: две подложки
- * с двойным паддингом выглядели бы как рамка внутри рамки. Гасится хуками
- * самого календаря, ради которых они и заведены.
+ * с двойным паддингом выглядели бы как рамка внутри рамки.
  */
 const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding': '0' }
 </script>
 
 <template>
-  <div data-gr-date-picker>
-    <!-- Форме уходит сериализованное значение, а не видимый текст: показ
-         локале-зависим и на сервере не разбирается. -->
+  <div data-gr-date-range-picker>
+    <!-- Границы уходят двумя полями с одним именем: так их читает
+         `FormData.getAll`, и так же ведут себя нативные множественные поля. -->
     <template v-if="name">
       <input v-for="(value, index) in formValues" :key="index" type="hidden" :name="name" :value="value">
     </template>
@@ -236,7 +293,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       :placement="resolvedPlacement"
       :disabled="isDisabled"
       :teleport-to="teleportTo"
-      :aria-label="t('gr.datePicker.panelLabel', 'Choose date')"
+      :aria-label="t('gr.dateRangePicker.panelLabel', 'Choose date range')"
       :close-on-content-click="false"
       trigger="manual"
       :auto-focus="false"
@@ -247,7 +304,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :id="inputId"
             ref="fieldEl"
             v-bind="triggerProps"
-            data-gr-date-picker-field
+            data-gr-date-range-picker-field
             type="text"
             role="combobox"
             readonly
@@ -268,7 +325,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
           >
 
           <span :class="trailingZoneClass">
-            <span v-if="loading" data-gr-date-picker-spinner aria-hidden="true">
+            <span v-if="loading" data-gr-date-range-picker-spinner aria-hidden="true">
               <svg :class="spinnerClass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 12a9 9 0 1 1-6.2-8.6" stroke-linecap="round" />
               </svg>
@@ -276,7 +333,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
 
             <button
               v-else-if="showClear"
-              data-gr-date-picker-clear
+              data-gr-date-range-picker-clear
               type="button"
               :class="clearButtonClass"
               :aria-label="t('gr.common.clear', 'Clear')"
@@ -287,10 +344,10 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               </svg>
             </button>
 
-            <span v-else data-gr-date-picker-indicator :class="indicatorClass" aria-hidden="true">
+            <span v-else data-gr-date-range-picker-indicator :class="indicatorClass" aria-hidden="true">
               <svg :class="iconClass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="5" width="18" height="16" rx="2" />
-                <path d="M8 3v4M16 3v4M3 11h18" stroke-linecap="round" />
+                <path d="M8 3v4M16 3v4M3 11h18M7 15h4" stroke-linecap="round" />
               </svg>
             </span>
           </span>
@@ -298,10 +355,13 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
       </template>
 
       <template #content>
-        <div v-if="hasBeenOpen" data-gr-date-picker-panel :style="calendarVars">
+        <div v-if="hasBeenOpen" data-gr-date-range-picker-panel :style="calendarVars">
           <GrCalendar
             ref="calendarRef"
-            :model-value="selected"
+            :model-value="null"
+            :range-start="rangeStart"
+            :range-end="rangeEnd"
+            :range-preview="hovered"
             :min="minPlain"
             :max="maxPlain"
             :disabled-dates="disabledDates"
@@ -312,7 +372,8 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :size="resolvedSize"
             :readonly="isReadonly"
             :aria-label="ariaLabel ?? t('gr.datePicker.gridLabel', 'Calendar')"
-            @update:model-value="onSelect"
+            @update:model-value="onDaySelect"
+            @day-hover="onDayHover"
           >
             <template v-if="$slots.day" #day="slotProps">
               <slot name="day" v-bind="slotProps" />

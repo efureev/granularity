@@ -6,7 +6,7 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 
 import { formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
-import { fromPlainParts, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
 import type { PlainTime } from '../../chrono/plainTime'
 import {
   clearButtonClass,
@@ -16,7 +16,7 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
-import { usePickerShell } from '../../internal/usePickerShell'
+import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 
 import type { GrTimePickerSize } from './grTimePickerStyles'
 import TimeColumns from './TimeColumns.vue'
@@ -130,6 +130,7 @@ const columnsRef = ref<InstanceType<typeof TimeColumns> | null>(null)
 
 const shell = usePickerShell<TValue>({
   props: () => props,
+  codec: () => dateCodec(resolveChronoAdapter<TValue>(props.valueAdapter)),
   component: 'GrTimePicker',
   emit: {
     open: value => emit('update:open', value),
@@ -153,8 +154,8 @@ const {
   isLocked,
   inputId,
   describedBy,
-  selectedDate,
-  formValue,
+  selected: selectedDate,
+  formValues,
   panelOpen,
   hasBeenOpen,
   fieldEl,
@@ -210,7 +211,9 @@ const fieldClass = computed(() => pickerFieldClass({
   <div data-gr-time-picker>
     <!-- Форме уходит сериализованное значение, а не видимый текст: показ
          локале-зависим и на сервере не разбирается. -->
-    <input v-if="name" type="hidden" :name="name" :value="formValue">
+    <template v-if="name">
+      <input v-for="(value, index) in formValues" :key="index" type="hidden" :name="name" :value="value">
+    </template>
 
     <GrPopover
       v-model:open="panelOpen"

@@ -50,6 +50,9 @@ export default defineConfig({
         'components/GrDatePicker/index': fileURLToPath(
           new URL('./src/components/GrDatePicker/index.ts', import.meta.url),
         ),
+        'components/GrDateRangePicker/index': fileURLToPath(
+          new URL('./src/components/GrDateRangePicker/index.ts', import.meta.url),
+        ),
         'components/GrDateTimePicker/index': fileURLToPath(
           new URL('./src/components/GrDateTimePicker/index.ts', import.meta.url),
         ),

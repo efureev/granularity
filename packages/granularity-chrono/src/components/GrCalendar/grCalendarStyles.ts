@@ -52,6 +52,28 @@ export const calendarNavSizes: Record<GrCalendarSize, string> = {
   lg: 'h-9 w-9',
 }
 
+/**
+ * Полоса диапазона рисуется на ячейке таблицы, а не на самом дне: у дня свой
+ * радиус, и цепочка скруглённых квадратов полосой не выглядит. Ячейка отдаёт
+ * сплошную заливку, а скругление остаётся только на краях.
+ */
+export interface CalendarRangeCellOptions {
+  inRange: boolean
+  start: boolean
+  end: boolean
+}
+
+export function calendarRangeCellClass(options: CalendarRangeCellOptions): string {
+  if (!options.inRange && !options.start && !options.end) return ''
+
+  const parts = ['bg-[var(--gr-calendar-range-bg,var(--gr-muted))]']
+
+  if (options.start) parts.push('rounded-l-[var(--gr-radius-control)]')
+  if (options.end) parts.push('rounded-r-[var(--gr-radius-control)]')
+
+  return parts.join(' ')
+}
+
 export interface CalendarDayClassOptions {
   size: GrCalendarSize
   inMonth: boolean

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrCalendar from '../components/GrCalendar/GrCalendar.vue'
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
+import GrDateRangePicker from '../components/GrDateRangePicker/GrDateRangePicker.vue'
 import GrDateTimePicker from '../components/GrDateTimePicker/GrDateTimePicker.vue'
 import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
 
@@ -128,6 +129,28 @@ describe('a11y', () => {
     for (let i = 0; i < 4; i += 1) await nextTick()
 
     expect(document.querySelector('[data-gr-date-time-picker-footer]')).not.toBeNull()
+    expect(await violations(document.body)).toEqual([])
+
+    wrapper.unmount()
+  })
+
+  it('GrDateRangePicker — сетка с выбранным периодом без нарушений', async () => {
+    const wrapper = mount(GrDateRangePicker, {
+      props: {
+        modelValue: [new Date(2026, 7, 10), new Date(2026, 7, 14)],
+        today: new Date(2026, 7, 12),
+        locale: 'en-US',
+        showWeekNumbers: true,
+        clearable: true,
+        ariaLabel: 'Stay',
+      },
+      attachTo: document.body,
+    })
+
+    await wrapper.get('[data-gr-date-range-picker-field]').trigger('click')
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(document.querySelector('[data-gr-date-range-picker-panel]')).not.toBeNull()
     expect(await violations(document.body)).toEqual([])
 
     wrapper.unmount()

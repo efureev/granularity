@@ -8,6 +8,9 @@
     "panelLabel": "Выбор даты",
     "gridLabel": "Календарь"
   },
+  "dateRangePicker": {
+    "panelLabel": "Выбор периода"
+  },
   "dateTimePicker": {
     "panelLabel": "Выбор даты и времени",
     "apply": "Применить",

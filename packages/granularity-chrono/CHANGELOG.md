@@ -32,6 +32,13 @@ to [Semantic Versioning](https://semver.org/).
   open, not on page load: a form with several pickers would otherwise build a 42-cell grid
   per picker before anyone clicked anything.
 
+- **`GrDateRangePicker`** — a period picked with two clicks, previewed on hover, with
+  `minRange`/`maxRange` limits counted inclusively. The highlight is computed at render from
+  tuple comparisons: the grid builder still knows nothing about selection, which is what keeps
+  mouse movement from rebuilding 42 cells per frame — now pinned by a test, not just a comment.
+  Both bounds go to a native form as two hidden inputs sharing one name, the way
+  `FormData.getAll` reads them.
+
 - **`GrDateTimePicker`** — the month grid and the time columns in one panel, with `autoApply`.
   The prop lands here rather than on `GrDatePicker` because only here does confirmation stop
   being a tautology: picking a date is atomic, picking a date *and* a time is not. With

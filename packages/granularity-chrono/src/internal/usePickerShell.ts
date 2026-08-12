@@ -6,8 +6,7 @@ import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/com
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { useGrFormControl } from '@feugene/granularity/composables/useGrFormControl'
 
-import type { GrChronoAdapter, GrChronoAdapterName } from '../chrono/chronoModel'
-import { resolveChronoAdapter } from '../chrono/chronoModel'
+import type { GrChronoAdapter } from '../chrono/chronoModel'
 import type { GrPickerSize } from './pickerFieldStyles'
 
 /**
@@ -25,11 +24,62 @@ import type { GrPickerSize } from './pickerFieldStyles'
  */
 
 /** Компоненты пакета, у которых есть оболочка. Расширяется вместе с семейством. */
-export type GrPickerComponent = 'GrDatePicker' | 'GrTimePicker' | 'GrDateTimePicker'
+export type GrPickerComponent = 'GrDatePicker' | 'GrTimePicker' | 'GrDateTimePicker' | 'GrDateRangePicker'
+
+/**
+ * Перевод между моделью потребителя и тем, чем оперирует панель.
+ *
+ * Понадобился на диапазоне: у него модель — пара границ, а не одно значение,
+ * и адаптер применяется к каждой отдельно. Оболочке при этом всё равно, что
+ * внутри, — ей нужно лишь знать, пусто ли значение и что отдать нативной форме.
+ */
+export interface PickerCodec<TValue, TParsed> {
+  /** Из модели в рабочее значение. Невалидное — `null`, а не исключение. */
+  parse: (raw: TValue) => TParsed | null
+  serialize: (parsed: TParsed) => TValue
+  /**
+   * Значения для скрытых полей формы. Массив, потому что диапазон уходит двумя
+   * полями с одним именем — так его читает `FormData.getAll`.
+   */
+  toFormValues: (parsed: TParsed) => string[]
+}
+
+function serializedToString(value: unknown): string {
+  return value instanceof Date ? value.toISOString() : String(value)
+}
+
+/** Кодек одиночного значения: ровно то, что делает адаптер. */
+export function dateCodec<TValue>(adapter: GrChronoAdapter<TValue>): PickerCodec<TValue, Date> {
+  return {
+    parse: raw => adapter.parse(raw),
+    serialize: date => adapter.serialize(date),
+    toFormValues: date => [serializedToString(adapter.serialize(date))],
+  }
+}
+
+/** Кодек диапазона: адаптер применяется к каждой границе, обе обязательны. */
+export function rangeCodec<TItem>(
+  adapter: GrChronoAdapter<TItem>,
+): PickerCodec<readonly [TItem, TItem] | null, [Date, Date]> {
+  return {
+    parse: (raw) => {
+      if (!Array.isArray(raw) || raw.length !== 2) return null
+
+      const from = adapter.parse(raw[0])
+      const to = adapter.parse(raw[1])
+
+      return from && to ? [from, to] : null
+    },
+    serialize: ([from, to]) => [adapter.serialize(from), adapter.serialize(to)] as const,
+    toFormValues: ([from, to]) => [
+      serializedToString(adapter.serialize(from)),
+      serializedToString(adapter.serialize(to)),
+    ],
+  }
+}
 
 export interface PickerShellProps<TValue> {
   modelValue?: TValue
-  valueAdapter?: GrChronoAdapterName | GrChronoAdapter<TValue>
   clearable?: boolean
   open?: boolean
   placement?: UseFloatingPlacement
@@ -46,10 +96,16 @@ export interface PickerShellProps<TValue> {
   ariaLabel?: string
 }
 
-export interface UsePickerShellOptions<TValue> {
+export interface UsePickerShellOptions<TValue, TParsed = Date> {
   /** Геттер пропов пикера — геттер, чтобы не терять реактивность на `props`. */
   props: () => PickerShellProps<TValue>
   component: GrPickerComponent
+  /**
+   * Перевод модели в рабочее значение. Геттер, потому что зависит от пропа
+   * `valueAdapter`, а собирает его пикер: только он знает, применяется адаптер
+   * к одному значению или к каждой границе пары.
+   */
+  codec: () => PickerCodec<TValue, TParsed>
   emit: {
     open: (value: boolean) => void
     model: (value: TValue | null) => void
@@ -62,7 +118,7 @@ export interface UsePickerShellOptions<TValue> {
   focusPanel: () => void
 }
 
-export interface UsePickerShellReturn<TValue> {
+export interface UsePickerShellReturn<TParsed = Date> {
   t: ReturnType<typeof useGranularityTranslations>['t']
   resolvedSize: ComputedRef<GrPickerSize>
   resolvedPlacement: ComputedRef<UseFloatingPlacement>
@@ -75,11 +131,10 @@ export interface UsePickerShellReturn<TValue> {
   isLocked: ComputedRef<boolean>
   inputId: ComputedRef<string | undefined>
   describedBy: ComputedRef<string | undefined>
-  adapter: ComputedRef<GrChronoAdapter<TValue>>
-  /** Значение модели, разобранное адаптером. Невалидное — `null`. */
-  selectedDate: ComputedRef<Date | null>
-  /** Сериализованное значение для нативной формы. */
-  formValue: ComputedRef<string>
+  /** Значение модели, разобранное кодеком. Невалидное — `null`. */
+  selected: ComputedRef<TParsed | null>
+  /** Сериализованные значения для скрытых полей формы. */
+  formValues: ComputedRef<string[]>
   panelOpen: Ref<boolean>
   /** Панель уже открывали — значит она смонтирована. */
   hasBeenOpen: Ref<boolean>
@@ -90,15 +145,15 @@ export interface UsePickerShellReturn<TValue> {
   togglePanel: () => void
   onFieldKeydown: (event: KeyboardEvent) => void
   /** Отдать значение наружу (`update:modelValue` + `change`). */
-  commit: (date: Date) => void
+  commit: (value: TParsed) => void
   clear: () => void
   focus: () => void
   blur: () => void
 }
 
-export function usePickerShell<TValue>(
-  options: UsePickerShellOptions<TValue>,
-): UsePickerShellReturn<TValue> {
+export function usePickerShell<TValue, TParsed = Date>(
+  options: UsePickerShellOptions<TValue, TParsed>,
+): UsePickerShellReturn<TParsed> {
   const props = options.props
   const { t, locale: i18nLocale } = useGranularityTranslations()
 
@@ -119,22 +174,17 @@ export function usePickerShell<TValue>(
 
   const inputId = computed(() => props().id ?? fieldId.value)
 
-  const adapter = computed(() => resolveChronoAdapter<TValue>(props().valueAdapter))
+  const codec = computed<PickerCodec<TValue, TParsed>>(() => options.codec())
 
-  const selectedDate = computed<Date | null>(() => {
+  const selected = computed<TParsed | null>(() => {
     const value = props().modelValue
     if (value === undefined || value === null) return null
 
-    return adapter.value.parse(value)
+    return codec.value.parse(value)
   })
 
   /** Форме уходит сериализованное значение: показ локале-зависим и на сервере не разбирается. */
-  const formValue = computed(() => {
-    if (!selectedDate.value) return ''
-    const serialized = adapter.value.serialize(selectedDate.value)
-
-    return serialized instanceof Date ? serialized.toISOString() : String(serialized)
-  })
+  const formValues = computed(() => (selected.value ? codec.value.toFormValues(selected.value) : []))
 
   const internalOpen = ref(false)
 
@@ -200,10 +250,10 @@ export function usePickerShell<TValue>(
     }
   }
 
-  function commit(date: Date): void {
+  function commit(value: TParsed): void {
     if (isLocked.value) return
 
-    options.emit.model(adapter.value.serialize(date))
+    options.emit.model(codec.value.serialize(value))
   }
 
   function clear(): void {
@@ -222,7 +272,7 @@ export function usePickerShell<TValue>(
   }
 
   const showClear = computed(() => (
-    resolvedClearable.value && !isLocked.value && selectedDate.value !== null
+    resolvedClearable.value && !isLocked.value && selected.value !== null
   ))
 
   return {
@@ -237,9 +287,8 @@ export function usePickerShell<TValue>(
     isLocked,
     inputId,
     describedBy,
-    adapter,
-    selectedDate,
-    formValue,
+    selected,
+    formValues,
     panelOpen,
     hasBeenOpen,
     fieldEl,

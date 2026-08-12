@@ -8,7 +8,7 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { formatPlainDate, formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
-import { fromPlainParts, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
 import type { PlainTime } from '../../chrono/plainTime'
 import { plainTime } from '../../chrono/plainTime'
@@ -20,7 +20,7 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
-import { usePickerShell } from '../../internal/usePickerShell'
+import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 import TimeColumns from '../GrTimePicker/TimeColumns.vue'
 
@@ -151,6 +151,7 @@ const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
 
 const shell = usePickerShell<TValue>({
   props: () => props,
+  codec: () => dateCodec(resolveChronoAdapter<TValue>(props.valueAdapter)),
   component: 'GrDateTimePicker',
   emit: {
     open: value => emit('update:open', value),
@@ -175,8 +176,8 @@ const {
   isLocked,
   inputId,
   describedBy,
-  selectedDate,
-  formValue,
+  selected: selectedDate,
+  formValues,
   panelOpen,
   hasBeenOpen,
   fieldEl,
@@ -308,7 +309,9 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
   <div data-gr-date-time-picker>
     <!-- Форме уходит сериализованное значение, а не видимый текст: показ
          локале-зависим и на сервере не разбирается. -->
-    <input v-if="name" type="hidden" :name="name" :value="formValue">
+    <template v-if="name">
+      <input v-for="(value, index) in formValues" :key="index" type="hidden" :name="name" :value="value">
+    </template>
 
     <GrPopover
       v-model:open="panelOpen"

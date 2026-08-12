@@ -8,6 +8,9 @@
     "panelLabel": "Choose date",
     "gridLabel": "Calendar"
   },
+  "dateRangePicker": {
+    "panelLabel": "Choose date range"
+  },
   "dateTimePicker": {
     "panelLabel": "Choose date and time",
     "apply": "Apply",

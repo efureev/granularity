@@ -13,6 +13,7 @@ export const GRANULARITY_CHRONO_COMPONENTS = [
   // <granularity:components> — блок генерируется `yarn generate:registry`
   'GrCalendar',
   'GrDatePicker',
+  'GrDateRangePicker',
   'GrDateTimePicker',
   'GrTimePicker',
   // </granularity:components>

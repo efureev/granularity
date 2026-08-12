@@ -22,6 +22,7 @@ import type { GrCalendarSize } from './grCalendarStyles'
 import {
   calendarDayClass,
   calendarGridClass,
+  calendarRangeCellClass,
   calendarHeaderClass,
   calendarNavButtonClass,
   calendarNavSizes,
@@ -66,6 +67,18 @@ export interface GrCalendarProps {
   readonly?: boolean
   /** Доступное имя сетки, когда рядом нет подписи. */
   ariaLabel?: string
+  /**
+   * Начало выбранного диапазона. Сетка про диапазон ничего не решает — только
+   * рисует его: считать границы, порядок и ограничения длины — дело пикера.
+   */
+  rangeStart?: PlainDate | null
+  /** Конец выбранного диапазона. */
+  rangeEnd?: PlainDate | null
+  /**
+   * Второй край предпросмотра, пока диапазон не закрыт: день под курсором или
+   * под клавиатурной остановкой.
+   */
+  rangePreview?: PlainDate | null
 }
 
 export interface GrCalendarEmits {
@@ -74,6 +87,8 @@ export interface GrCalendarEmits {
   (e: 'change', value: PlainDate): void
   /** Показываемый месяц сменился — листанием, клавиатурой или выбором. */
   (e: 'monthChange', value: PlainDate): void
+  /** День под курсором сменился. `null` — курсор ушёл из сетки. */
+  (e: 'dayHover', value: PlainDate | null): void
 }
 
 const props = withDefaults(defineProps<GrCalendarProps>(), {
@@ -92,6 +107,9 @@ const props = withDefaults(defineProps<GrCalendarProps>(), {
   disabled: false,
   readonly: false,
   ariaLabel: undefined,
+  rangeStart: null,
+  rangeEnd: null,
+  rangePreview: null,
 })
 
 const emit = defineEmits<GrCalendarEmits>()
@@ -161,6 +179,46 @@ const weekdaysFull = computed(() => weekdayNames(resolvedLocale.value, resolvedW
 
 function isSelected(cell: CalendarCell): boolean {
   return props.modelValue ? isSamePlainDate(cell.date, props.modelValue) : false
+}
+
+/**
+ * Отрезок, который сейчас показывается: закрытый диапазон либо предпросмотр от
+ * начала до дня под курсором. Границы упорядочиваются здесь, потому что вести
+ * курсор можно и назад.
+ */
+const shownRange = computed<[PlainDate, PlainDate] | null>(() => {
+  const start = props.rangeStart
+  if (!start) return null
+
+  const end = props.rangeEnd ?? props.rangePreview
+  if (!end) return [start, start]
+
+  return comparePlainDates(start, end) <= 0 ? [start, end] : [end, start]
+})
+
+/**
+ * Принадлежность отрезку считается **на отрисовке**, сравнением кортежей, а не
+ * хранится в ячейке. Иначе движение мыши по диапазону пересобирало бы 42
+ * объекта на каждый кадр — ради этого сетка и не знает про выбор.
+ */
+function rangeStateOf(cell: CalendarCell): { inRange: boolean, start: boolean, end: boolean } {
+  const range = shownRange.value
+  if (!range) return { inRange: false, start: false, end: false }
+
+  const [from, to] = range
+  const inside = comparePlainDates(cell.date, from) >= 0 && comparePlainDates(cell.date, to) <= 0
+
+  return {
+    inRange: inside,
+    start: inside && isSamePlainDate(cell.date, from),
+    end: inside && isSamePlainDate(cell.date, to),
+  }
+}
+
+/** Край диапазона выглядит выбранным: заливка та же, что у одиночного выбора. */
+function isEdge(cell: CalendarCell): boolean {
+  const state = rangeStateOf(cell)
+  return state.start || state.end
 }
 
 const dayEls = ref(new Map<string, HTMLElement>())
@@ -334,6 +392,7 @@ defineExpose({
       :aria-readonly="readonly ? 'true' : undefined"
       :aria-disabled="disabled ? 'true' : undefined"
       @keydown="onGridKeydown"
+      @mouseleave="emit('dayHover', null)"
     >
       <thead>
         <tr>
@@ -369,7 +428,8 @@ defineExpose({
             :key="cell.key"
             role="gridcell"
             data-gr-calendar-cell
-            :aria-selected="isSelected(cell) ? 'true' : 'false'"
+            :class="calendarRangeCellClass(rangeStateOf(cell))"
+            :aria-selected="isSelected(cell) || rangeStateOf(cell).inRange ? 'true' : 'false'"
           >
             <span
               :ref="element => setDayEl(cell.key, element)"
@@ -382,10 +442,11 @@ defineExpose({
                 size: resolvedSize,
                 inMonth: cell.inMonth,
                 today: cell.today,
-                selected: isSelected(cell),
+                selected: isSelected(cell) || isEdge(cell),
                 disabled: cell.disabled,
               })"
               @click="onDayClick(cell)"
+              @mouseenter="emit('dayHover', cell.date)"
             >
               <slot name="day" :cell="cell" :selected="isSelected(cell)">
                 {{ cell.date.d }}

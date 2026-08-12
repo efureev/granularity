@@ -11,6 +11,7 @@ import {
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grCalendarConfig } from '../components/GrCalendar/config'
 import { grDatePickerConfig } from '../components/GrDatePicker/config'
+import { grDateRangePickerConfig } from '../components/GrDateRangePicker/config'
 import { grDateTimePickerConfig } from '../components/GrDateTimePicker/config'
 import { grTimePickerConfig } from '../components/GrTimePicker/config'
 // </granularity:components:imports>
@@ -33,6 +34,7 @@ export const granularityChronoComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrCalendar: grCalendarConfig,
   GrDatePicker: grDatePickerConfig,
+  GrDateRangePicker: grDateRangePickerConfig,
   GrDateTimePicker: grDateTimePickerConfig,
   GrTimePicker: grTimePickerConfig,
   // </granularity:components:registry>
