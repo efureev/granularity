@@ -73,6 +73,16 @@ export interface GrTableProps {
    */
   fixedLayout?: boolean
   /**
+   * Минимальная ширина самой таблицы (число — пиксели).
+   *
+   * Нужна при `fixedLayout`: с фиксированной раскладкой и шириной `auto`
+   * браузер вписывает таблицу в контейнер и делит место между колонками
+   * пропорционально — то есть заданные ширины молча ужимаются, а
+   * горизонтальной прокрутки, на которой держатся закреплённые колонки, не
+   * возникает вовсе.
+   */
+  tableMinWidth?: string | number
+  /**
    * Максимальная высота скролл-контейнера (включает вертикальный скролл).
    * Число трактуется как пиксели. Нужен для работы `stickyHeader`.
    */
@@ -106,6 +116,7 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   maxHeight: undefined,
   rowCount: undefined,
   fixedLayout: false,
+  tableMinWidth: undefined,
 })
 
 const slots = useSlots()
@@ -157,6 +168,14 @@ const theadClass = computed(() => [
   props.stickyHeader ? 'sticky top-0 z-[1]' : '',
 ].filter(Boolean).join(' '))
 
+const tableStyle = computed(() => {
+  if (props.tableMinWidth === undefined) return undefined
+
+  const value = typeof props.tableMinWidth === 'number' ? `${props.tableMinWidth}px` : props.tableMinWidth
+
+  return { minWidth: value }
+})
+
 const scrollEl = ref<HTMLElement | null>(null)
 
 function scrollTo(options: ScrollToOptions): void {
@@ -201,6 +220,7 @@ defineExpose({
     <table
       data-gr-table
       class="min-w-full" :class="[tableTextClass, fixedLayout ? '[table-layout:fixed]' : '']"
+      :style="tableStyle"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"
       :aria-rowcount="rowCount"

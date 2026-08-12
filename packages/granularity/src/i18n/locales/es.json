@@ -49,7 +49,11 @@
     "selectRow": "Seleccionar fila",
     "sortAsc": "Active para ordenar de forma ascendente",
     "sortDesc": "Active para ordenar de forma descendente",
-    "sortNone": "Active para quitar la ordenación"
+    "sortNone": "Active para quitar la ordenación",
+    "moveColumn": "Mover la columna {label}",
+    "columnMoved": "Columna {label} movida a la posición {position} de {count}",
+    "resizeColumn": "Ancho de la columna {label}",
+    "columnResized": "La columna {label} mide {width} píxeles"
   },
   "breadcrumbs": {
     "label": "Ruta de navegación",

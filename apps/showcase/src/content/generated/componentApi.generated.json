@@ -2569,6 +2569,34 @@
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "reorderableColumns",
+            "description": "Пользовательский порядок колонок: в шапке появляется ручка переноса. Колонка тянется указателем и двигается `Shift`+`←`/`→` с клавиатуры.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "columnOrder",
+            "description": "Контролируемый порядок колонок — ключи в нужном порядке (`v-model:columnOrder`). Не задан — порядок компонент помнит сам, начиная с порядка `columns`.",
+            "type": "string[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "resizableColumns",
+            "description": "Пользовательская ширина колонок: у правого края заголовка появляется ручка. Тянется указателем, с клавиатуры — стрелками (паттерн window splitter). Включает фиксированную раскладку таблицы: без неё браузер пересчитывает ширины по содержимому и заданная пользователем пропадает.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "columnWidths",
+            "description": "Контролируемые ширины в пикселях по ключу колонки (`v-model:columnWidths`). Не заданы — ширины компонент помнит сам.",
+            "type": "Record<string, number> | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -2633,6 +2661,30 @@
             "description": "",
             "type": "[{ row: TRow; index: number; event: MouseEvent; }]",
             "signature": "(e: \"rowClick\", payload: { row: TRow; index: number; event: MouseEvent; }): void"
+          },
+          {
+            "name": "update:columnOrder",
+            "description": "",
+            "type": "[string[]]",
+            "signature": "(e: \"update:columnOrder\", value: string[]): void"
+          },
+          {
+            "name": "columnReorder",
+            "description": "",
+            "type": "[{ key: string; from: number; to: number; }]",
+            "signature": "(e: \"columnReorder\", payload: { key: string; from: number; to: number; }): void"
+          },
+          {
+            "name": "update:columnWidths",
+            "description": "",
+            "type": "[Record<string, number>]",
+            "signature": "(e: \"update:columnWidths\", value: Record<string, number>): void"
+          },
+          {
+            "name": "columnResize",
+            "description": "",
+            "type": "[{ key: string; width: number; }]",
+            "signature": "(e: \"columnResize\", payload: { key: string; width: number; }): void"
           }
         ]
       },
@@ -6663,7 +6715,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"listbox\" | \"grid\" | \"dialog\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"grid\" | \"menu\" | \"listbox\" | \"dialog\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
           },
           {
             "name": "content",
@@ -9614,6 +9666,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "tableMinWidth",
+            "description": "Минимальная ширина самой таблицы (число — пиксели). Нужна при `fixedLayout`: с фиксированной раскладкой и шириной `auto` браузер вписывает таблицу в контейнер и делит место между колонками пропорционально — то есть заданные ширины молча ужимаются, а горизонтальной прокрутки, на которой держатся закреплённые колонки, не возникает вовсе.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },

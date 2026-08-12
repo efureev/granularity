@@ -57,4 +57,20 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-data-table-virtual',    note: 'Виртуализация включает фиксированную раскладку: ширина колонки считается по содержимому всех строк, а в DOM их только окно — без фиксации колонки прыгали бы на каждой прокрутке. Полное число строк уходит в `aria-rowcount`, номер строки — в `aria-rowindex`.',
   },
+  {
+    id: 'data-table-column-order',
+    title: 'Пользовательский порядок колонок',
+    description: '`reorderable-columns` добавляет в шапку ручку переноса, `v-model:column-order` хранит порядок ключей. Клик по заголовку остаётся сортировкой: перетаскивание живёт на своей кнопке и её не перехватывает.',
+    status: 'ready',
+    previewKey: 'gr-data-table-column-order',
+    note: 'С клавиатуры порядок меняется `Shift` со стрелкой на ручке; ручки держат одну остановку `Tab` на всю шапку, а каждая перестановка объявляется скринридеру.',
+  },
+  {
+    id: 'data-table-column-layout',
+    title: 'Ширина и закрепление колонок',
+    description: '`resizable-columns` даёт ручку у правого края заголовка и `v-model:column-widths`; `pinned: \'left\' | \'right\'` у колонки прижимает её к краю при горизонтальной прокрутке. Закреплённые колонки всегда стоят своей группой — перенос через границу групп запрещён.',
+    status: 'ready',
+    previewKey: 'gr-data-table-column-layout',
+    note: 'Ручка ширины — `role="separator"` с паттерном window splitter: стрелки меняют ширину, `Shift` — крупным шагом, `Enter` и двойной клик возвращают колонку к авторазметке.',
+  },
 ]

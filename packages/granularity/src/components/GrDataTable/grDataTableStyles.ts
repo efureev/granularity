@@ -31,6 +31,59 @@ export const placeholderPaddings: Record<GrDataTableSize, string> = {
   lg: 'px-5 py-8',
 }
 
+/**
+ * Ручка перестановки колонки. Появляется по наведению на заголовок и по
+ * фокусу: постоянная сетка ручек в шапке из десяти колонок читается как рябь,
+ * а не как управление.
+ */
+export const columnHandleClass = 'inline-flex shrink-0 cursor-grab items-center text-[var(--gr-datatable-drag-handle,var(--gr-muted-fg))] opacity-0 [touch-action:none] transition-opacity duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)] group-hover:opacity-100'
+
+export const columnHandleActiveClass = 'opacity-100'
+
+export const columnHandleIconClass = 'i-lucide-grip-vertical block'
+
+/** Переносимая колонка гасится, чтобы было видно, что она «поднята». */
+export const columnDraggingClass = 'bg-[var(--gr-muted)]'
+
+/**
+ * Место вставки — полоса по краю ячейки заголовка. Псевдоэлемент, а не свой
+ * узел: `<th>` не терпит посторонних детей в раскладке таблицы.
+ */
+export const columnDropBeforeClass = 'before:absolute before:inset-y-0 before:left-0 before:w-[var(--gr-datatable-drag-indicator-width,2px)] before:bg-[var(--gr-datatable-drag-indicator,var(--gr-primary))] before:content-empty'
+
+export const columnDropAfterClass = 'after:absolute after:inset-y-0 after:right-0 after:w-[var(--gr-datatable-drag-indicator-width,2px)] after:bg-[var(--gr-datatable-drag-indicator,var(--gr-primary))] after:content-empty'
+
+/**
+ * Подсветка выбранной строки. Живёт здесь, потому что закреплённой ячейке её
+ * приходится повторять: у ячейки свой непрозрачный фон, и подсветка строки
+ * сквозь него не видна.
+ */
+export const rowSelectedClass = 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]'
+
+/**
+ * Ручка ширины — полоса у правого края заголовка. Видима она узкой линией, а
+ * ловится широкой зоной: попасть в двухпиксельную границу мышью тяжело.
+ */
+export const columnResizerClass = 'absolute inset-y-0 right-0 z-[1] flex w-3 translate-x-1/2 cursor-col-resize items-stretch justify-center [touch-action:none] focus:outline-none'
+
+export const columnResizerLineClass = 'w-[var(--gr-datatable-resizer-width,2px)] bg-transparent transition-colors duration-[var(--gr-duration-fast)]'
+
+/** Полоса подсвечивается только когда её ведут или на неё встал фокус. */
+export const columnResizerLineActiveClass = 'bg-[var(--gr-datatable-resizer,var(--gr-primary))]'
+
+export const columnResizerHoverClass = 'hover:bg-[var(--gr-datatable-resizer,var(--gr-primary))] focus-visible:bg-[var(--gr-datatable-resizer,var(--gr-primary))]'
+
+/**
+ * Закреплённая колонка липнет к краю прокрутки. Фон обязателен: без него
+ * уезжающие под неё ячейки просвечивают насквозь.
+ */
+export const columnPinnedClass = 'sticky z-[2] bg-[var(--gr-card)]'
+
+/** Граница группы закреплённых колонок — тень, а не рамка: рамка сдвигает сетку. */
+export const columnPinnedLeftEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow,4px_0_6px_-4px_rgba(0,0,0,0.25))]'
+
+export const columnPinnedRightEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow-end,-4px_0_6px_-4px_rgba(0,0,0,0.25))]'
+
 /** Подпись колонки набирается мельче тела таблицы — она не данные, а навигация. */
 export const headerTextSizes: Record<GrDataTableSize, string> = {
   xs: 'text-[length:var(--gr-control-text-3xs)]',

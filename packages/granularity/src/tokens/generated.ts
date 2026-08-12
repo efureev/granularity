@@ -2270,6 +2270,55 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Максимальная высота списка; дальше список скроллится."
   },
   {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-drag-handle",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет ручки перестановки колонки."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-drag-indicator",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет полосы, показывающей место вставки колонки."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-drag-indicator-width",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина полосы места вставки колонки."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-resizer",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет полосы изменения ширины колонки."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-resizer-width",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина полосы изменения ширины колонки."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-pinned-shadow",
+    "kind": "hook",
+    "default": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+    "description": "Тень на границе группы колонок, закреплённых слева."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-pinned-shadow-end",
+    "kind": "hook",
+    "default": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+    "description": "Тень на границе группы колонок, закреплённых справа."
+  },
+  {
     "owner": "GrDivider",
     "name": "--gr-divider-thickness",
     "kind": "hook",

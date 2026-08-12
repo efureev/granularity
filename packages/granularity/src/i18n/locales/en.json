@@ -49,7 +49,11 @@
     "selectRow": "Select row",
     "sortAsc": "Activate to sort ascending",
     "sortDesc": "Activate to sort descending",
-    "sortNone": "Activate to remove sorting"
+    "sortNone": "Activate to remove sorting",
+    "moveColumn": "Move column {label}",
+    "columnMoved": "Column {label} moved to position {position} of {count}",
+    "resizeColumn": "Width of column {label}",
+    "columnResized": "Column {label} is {width} pixels wide"
   },
   "breadcrumbs": {
     "label": "Breadcrumb",

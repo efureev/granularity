@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDataTable` columns resize and pin.** `resizable-columns` puts a grip on the right edge of
+  every header cell: the width follows a pointer, and from the keyboard the grip behaves as a window
+  splitter (`role="separator"`) — arrows step by 16px, `Shift` by 48px, `Enter` (or a double click)
+  returns the column to auto layout. Widths live in `v-model:column-widths` keyed by column, with a
+  `columnResize` event alongside; 48px is the floor, and an aborted gesture restores the width from
+  before the press. The mode switches the table to a fixed layout on purpose — on auto layout the
+  browser recomputes columns from content and a user's width disappears on the next data update.
+
+  `pinned: 'left' | 'right'` on a column sticks it to the edge during horizontal scrolling. Offsets
+  inside a pinned group are measured from neighbours rather than declared, so a pinned column does
+  not need a `width`; they are recomputed on data changes and through a `ResizeObserver`. Pinned
+  columns always sit as a group at their edge — reordering across a group boundary is refused,
+  otherwise "pinned left" would stop meaning "left" — and the selection column pins together with
+  the left group so a checkbox never scrolls away from its row. Adds `gr.dataTable.resizeColumn` and
+  `gr.dataTable.columnResized` to all three locales, plus `--gr-datatable-resizer*` and
+  `--gr-datatable-pinned-shadow*` tokens.
+
+- **`GrDataTable` lets people reorder columns.** `reorderable-columns` puts a drag handle in every
+  header cell; the column follows a pointer — mouse or finger — and moves from the keyboard with
+  `Shift`+`←`/`→`, each move announced in the live region. The handle is its own button rather than
+  the header itself, so clicking a header still sorts and dragging never steals that click; in the
+  tab order all handles share **one** stop for the whole header row (roving tabindex), with plain
+  arrows walking between them.
+
+  `v-model:column-order` holds the order as an array of keys — without it the table remembers the
+  order itself, exactly as it already does for sorting. `columnReorder` (`{ key, from, to }`) is
+  emitted alongside for callers that persist a single operation. The set of columns still belongs to
+  `columns`: an unknown key in the order is ignored and a column missing from it lands at the end,
+  so editing `columns` can never drop a column silently. Adds `gr.dataTable.moveColumn` and
+  `gr.dataTable.columnMoved` to all three locales, and `--gr-datatable-drag-*` tokens for the handle
+  and the insertion line.
+
 - **New `GrSortableList`** — a list whose order the user changes: task priorities, report fields,
   route steps. It drags with a mouse, with a finger, and — the reason it belongs in a design system
   rather than in every application — **from the keyboard**: `Space` picks a row up, arrows move it,
