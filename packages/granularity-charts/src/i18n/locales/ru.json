@@ -13,8 +13,26 @@
     "axisX": "Ось X",
     "axisY": "Ось Y"
   },
+  "area": {
+    "label": "График с областями",
+    "labelStacked": "Стопка областей"
+  },
   "line": {
     "label": "Линейный график"
+  },
+  "pie": {
+    "label": "Круговая диаграмма",
+    "roleDescription": "круговая диаграмма",
+    "roleDescriptionDonut": "кольцевая диаграмма",
+    "summary": "Круговая диаграмма, долей: {count}, итого {total}",
+    "keyboardHint": "Стрелки — переход по долям",
+    "slice": "{label}: {value}, {share}",
+    "sliceValue": "{label}: {value}",
+    "total": "Итого",
+    "tableCaption": "Данные диаграммы",
+    "columnLabel": "Категория",
+    "columnValue": "Значение",
+    "columnShare": "Доля"
   },
   "legend": {
     "toggle": "Показать или скрыть {label}",

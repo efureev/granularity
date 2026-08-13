@@ -52,9 +52,17 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./components/GrChartArea": {
+      "types": "./dist/types/components/GrChartArea/index.d.ts",
+      "import": "./dist/components/GrChartArea/index.js"
+    },
     "./components/GrChartLine": {
       "types": "./dist/types/components/GrChartLine/index.d.ts",
       "import": "./dist/components/GrChartLine/index.js"
+    },
+    "./components/GrChartPie": {
+      "types": "./dist/types/components/GrChartPie/index.d.ts",
+      "import": "./dist/components/GrChartPie/index.js"
     },
     "./components/GrSparkline": {
       "types": "./dist/types/components/GrSparkline/index.d.ts",

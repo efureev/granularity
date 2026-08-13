@@ -40,6 +40,22 @@ export interface UseChartTooltipOptions {
   surface: Ref<HTMLElement | null>
   enabled?: () => boolean
   closeDelayMs?: number
+  /**
+   * Своё правило попадания: координаты внутри поверхности → индекс позиции,
+   * `-1` — мимо.
+   *
+   * По умолчанию берётся ближайшая по абсциссе точка — это верно для всего,
+   * что раскладывается по оси. У круга попадание **угловое**, и декартово
+   * правило ответило бы неверно всегда, кроме случайных совпадений.
+   */
+  hitTest?: (point: { x: number, y: number }, plot: Rect) => number
+  /**
+   * Своё место якоря тултипа. `null` — якорь спрятан.
+   *
+   * Дефолт садится на верхнее значение столбика точек; у круга такого столбика
+   * нет вовсе, и якорь уехал бы в случайную точку холста.
+   */
+  anchor?: (index: number, plot: Rect) => { x: number, y: number } | null
 }
 
 export interface UseChartTooltipReturn {
@@ -106,6 +122,22 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
     if (!point)
       return hidden
 
+    if (options.anchor) {
+      const custom = options.anchor(point.index, plot)
+
+      if (!custom)
+        return hidden
+
+      return {
+        position: 'absolute',
+        left: `${custom.x}px`,
+        top: `${custom.y}px`,
+        width: '0px',
+        height: '0px',
+        pointerEvents: 'none',
+      }
+    }
+
     const values = point.series.map(series => series.value).filter((value): value is number => value !== null)
     // Якорь садится на верхнее значение столбика точек: тултип всплывает над
     // тем, что человек и так рассматривает. Значений нет — середина области.
@@ -141,7 +173,10 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
       return
 
     const rect = element.getBoundingClientRect()
-    const index = nearestIndex(options.data().positions, options.xScale(), event.clientX - rect.left)
+    const point = { x: event.clientX - rect.left, y: event.clientY - rect.top }
+    const index = options.hitTest
+      ? options.hitTest(point, options.plot())
+      : nearestIndex(options.data().positions, options.xScale(), point.x)
 
     setActive(index === -1 ? null : index)
   }

@@ -48,6 +48,62 @@ export type CompanionPackage = {
 }
 
 /** Публичная поверхность линейного графика. */
+/** Публичная поверхность площади: линия плюс заливка и стек. */
+function chartAreaApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда `x` становится порядковым номером.' },
+        { name: 'stacked', type: 'boolean', default: 'false', description: 'Складывать серии: каждая полоса ложится на сумму предыдущих. Ось при этом считается по вершинам полос и всегда отсчитывается от нуля.' },
+        { name: 'fill', type: `'auto' | 'gradient' | 'solid'`, default: `'auto'`, description: '`auto` — градиент у наложения (ряды обязаны просвечивать) и плотная заливка у стека (полосы стоят встык, и градиент размыл бы границу между ними).' },
+        { name: 'xScale', type: `'linear' | 'time' | 'band'`, description: 'Тип оси X. Не задан — выводится из данных.' },
+        { name: 'curve', type: `'linear' | 'smooth' | 'step'`, default: `'linear'`, description: '`smooth` — монотонная кубика: она не выбрасывает кривую за диапазон соседних значений.' },
+        { name: 'height', type: 'number', default: '256', description: 'Высота холста в пикселях. Раскладка обязана быть детерминированной до первого замера.' },
+        { name: 'width', type: 'number', default: '640', description: 'Объявленная ширина: от неё идёт серверный рендер, клиентская уточняется замером.' },
+        { name: 'yDomain / includeZero', type: '[number | null, number | null] · boolean', description: 'Границы оси значений. У стека ноль включается сам.' },
+        { name: 'showPoints', type: `'auto' | 'always' | 'never'`, default: `'auto'`, description: '`auto` — марки при ряде до 60 точек. В стеке марка садится на верх полосы.' },
+        { name: 'showGrid', type: `'both' | 'x' | 'y' | 'none'`, default: `'y'`, description: 'Какие линии сетки рисовать.' },
+        { name: 'showLegend / legendPosition', type: `boolean | 'auto' · 'top' | 'bottom'`, default: `'auto' · 'bottom'`, description: '`auto` — легенда появляется от второй серии.' },
+        { name: 'tooltip', type: 'boolean', default: 'true', description: 'Тултип от координаты указателя. В стеке показывает своё значение серии, а не сумму под ней.' },
+        { name: 'hiddenSeries', type: 'readonly string[]', description: '`v-model:hiddenSeries` — скрытые серии по id. Скрытая серия из стека выпадает, соседи опускаются.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — курсор. Синхронизирует пару графиков.' },
+        { name: 'loading / empty / emptyText', type: 'boolean · boolean · string', description: 'Состояния.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Полные данные таблицей. `hidden` — только для скринридера, но в дереве доступности.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку: `role="img"` с именем, без фокуса, тултипа и клавиатуры.' },
+        { name: 'valueFormat / xTickFormat / yTickFormat', type: 'GrChartNumberFormat · (value) => string', description: 'Форматирование значений и подписей делений.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей и размер марок. Не задан — из `GrConfigProvider`.' },
+        { name: 'canvasThreshold', type: 'number', default: '2000', description: 'Порог, выше которого марки не рисуются даже при `auto`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:hiddenSeries', type: '(value: string[]) => void', description: 'Легенда переключила серию.' },
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Курсор сменился — указателем или клавиатурой.' },
+        { name: 'pointClick', type: '(value: GrChartActivePoint) => void', description: 'Клик или `Enter` на активной точке.' },
+        { name: 'pointHover', type: '(value: GrChartActivePoint | null) => void', description: 'Активная точка сменилась. `null` — курсор ушёл.' },
+        { name: 'legendToggle', type: '(value: { seriesId: string, hidden: boolean }) => void', description: 'Намерение скрыть или показать серию. Применяет его потребитель — состояние его.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active: GrChartActivePoint, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'legend', type: '{ series, toggle }', description: 'Своя легенда.' },
+        { name: 'empty', type: '—', description: 'Своё пустое состояние вместо `GrEmptyState`.' },
+        { name: 'header', type: '—', description: 'Строка над графиком: заголовок, действия.' },
+      ],
+    },
+  ]
+}
+
 function chartLineApiSections(): ShowcaseApiSectionMeta[] {
   return [
     {
@@ -100,6 +156,60 @@ function chartLineApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'legend', type: '{ series, toggle }', description: 'Своя легенда.' },
         { name: 'empty', type: '—', description: 'Своё пустое состояние вместо `GrEmptyState`.' },
         { name: 'header', type: '—', description: 'Строка над графиком: заголовок, действия.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность круга: у него полярные координаты, поэтому и события про доли. */
+function chartPieApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'data', type: 'GrChartPieSlice[] | (number | null)[]', description: 'Доли `{ label, value, color? }` либо голый ряд чисел — тогда подписью становится порядковый номер. Пропуски, нули и отрицательные значения доли не дают: «минус три» части круга не бывает.' },
+        { name: 'variant', type: `'pie' | 'donut'`, default: `'pie'`, description: 'Сектор или кольцо. У кольца середина свободна — туда садится итог.' },
+        { name: 'donutRatio', type: 'number', default: '0.62', description: 'Радиус дырки долей внешнего радиуса.' },
+        { name: 'startAngle', type: 'number', default: '0', description: 'Угол первой доли в градусах от двенадцати часов, по часовой.' },
+        { name: 'labels', type: `'none' | 'share' | 'value'`, default: `'none'`, description: 'Подписи на выносках **снаружи** кольца. Внутри доли текст не проходит AA ни на одной из пяти ролей палитры — ни белым, ни тёмным.' },
+        { name: 'labelMinShare', type: 'number', default: '0.05', description: 'Наименьшая доля, которую подписывают: ниже порога подпись перекрыла бы соседнюю.' },
+        { name: 'height', type: 'number', default: '256', description: 'Высота холста в пикселях. Раскладка обязана быть детерминированной до первого замера.' },
+        { name: 'width', type: 'number', default: '640', description: 'Объявленная ширина: от неё идёт серверный рендер, клиентская уточняется замером.' },
+        { name: 'showLegend', type: 'boolean', default: 'true', description: 'Легенда с подписью, значением и долей. У круга это ключ к рисунку, а не украшение, поэтому она включена по умолчанию.' },
+        { name: 'legendPosition', type: `'top' | 'bottom'`, default: `'bottom'`, description: 'Где стоит легенда.' },
+        { name: 'tooltip', type: 'boolean', default: 'true', description: 'Тултип от координаты указателя. Попадание считается по углу, а не по абсциссе.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — выделенная доля. Остальные при этом приглушаются: вертикали, которой линейный график показывает «вот эта точка», у круга нет.' },
+        { name: 'totalLabel', type: 'string', description: 'Подпись под итогом в середине кольца. Сам итог — сумма нарисованных долей.' },
+        { name: 'loading', type: 'boolean', default: 'false', description: 'Скелет и `aria-busy` на корне.' },
+        { name: 'empty', type: 'boolean', description: 'Принудительное пустое состояние. Не задано — выводится из данных: круг из одних нулей это тот же пустой холст.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Таблица долей: подпись, значение, доля. `hidden` — только для скринридера, но в дереве доступности.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает круг в картинку: `role="img"` с именем, без фокуса, тултипа и клавиатуры.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Точность и разделители значений. Локаль берётся из адаптера i18n.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Выделенная доля сменилась — указателем или клавиатурой.' },
+        { name: 'sliceClick', type: '(value: GrChartPieActiveSlice) => void', description: 'Клик или `Enter` на доле. В нагрузке подпись, значение, доля и цвет.' },
+        { name: 'sliceHover', type: '(value: GrChartPieActiveSlice | null) => void', description: 'Доля под курсором сменилась. `null` — курсор ушёл с круга.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'center', type: '{ total, formattedTotal }', description: 'Середина кольца. Содержимое рисуется внутри холста, поэтому это SVG, а не HTML.' },
+        { name: 'tooltip', type: '{ active, slice, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'legend', type: '{ slices, formatValue }', description: 'Своя легенда.' },
+        { name: 'empty', type: '—', description: 'Своё пустое состояние вместо `GrEmptyState`.' },
+        { name: 'header', type: '—', description: 'Строка над диаграммой: заголовок, действия.' },
       ],
     },
   ]
@@ -467,6 +577,36 @@ export const companionPackages: CompanionPackage[] = [
     dependencies: [],
     components: [
       {
+        name: 'GrChartArea',
+        slug: 'gr-chart-area',
+        title: 'GrChartArea',
+        summary: 'Тот же ряд, что у линии, но с заливкой до базовой линии — и складываемый в стек. Целое и вклад каждой части в него одним рисунком.',
+        importPath: '@feugene/granularity-charts/components/GrChartArea',
+        examples: [
+          {
+            id: 'charts-area-basic',
+            title: 'Volume, not just level',
+            description: 'Площадь берут там, где важен не только уровень, но и объём: «сколько всего набежало». Заливка гаснет к базовой линии — сплошная плашка утяжелила бы низ графика, где смотреть не на что.',
+            previewKey: 'extra-charts-area-basic',
+            note: 'Клавиатура и скрытая таблица те же, что у линии: у графика одна остановка `Tab`, дальше стрелки по точкам.',
+          },
+          {
+            id: 'charts-area-stacked',
+            title: 'Stack or overlay',
+            description: 'Два режима отвечают на разные вопросы. Стек показывает целое и вклад каждого канала: верхний край полос — выручка компании. Наложение показывает каналы сами по себе — на стеке их не сравнить, второй ряд едет по горбам первого.',
+            previewKey: 'extra-charts-area-stacked',
+            note: 'Тултип и таблица в обоих режимах говорят «партнёры — 190», а не «партнёры — 650, потому что снизу лежит розница».',
+          },
+          {
+            id: 'charts-area-zero',
+            title: 'Above and below zero',
+            description: 'Базовая линия — ноль, а не низ холста. Заливай мы всегда до нижнего края, убыток в минус сто нарисовался бы той же высотой, что и прибыль в плюс сто, только чуть ниже.',
+            previewKey: 'extra-charts-area-zero',
+          },
+        ],
+        apiSections: chartAreaApiSections(),
+      },
+      {
         name: 'GrChartLine',
         slug: 'gr-chart-line',
         title: 'GrChartLine',
@@ -496,6 +636,37 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: chartLineApiSections(),
+      },
+      {
+        name: 'GrChartPie',
+        slug: 'gr-chart-pie',
+        title: 'GrChartPie',
+        summary: 'Доли одного целого — кругом или кольцом. Попадание курсора угловое, легенда несёт значения и проценты, а скринридер получает таблицу долей вместо ряда по оси.',
+        importPath: '@feugene/granularity-charts/components/GrChartPie',
+        examples: [
+          {
+            id: 'charts-pie-basic',
+            title: 'Whole and its parts',
+            description: 'Кольцо отвечает на два вопроса сразу: сколько всего — числом в середине, и из чего сложилось — долями вокруг. Один проп переключает его в сплошной круг.',
+            previewKey: 'extra-charts-pie-basic',
+            note: 'Стрелки ходят по долям, выделенная доля гасит соседние: вертикали, которой линейный график показывает точку, у круга нет.',
+          },
+          {
+            id: 'charts-pie-labels',
+            title: 'Callout labels',
+            description: 'Проценты стоят снаружи на выносках. Внутри доли текст не проходит AA ни на одной из пяти ролей палитры — ни белым, ни тёмным, — а снаружи контраст держит обычная роль фона.',
+            previewKey: 'extra-charts-pie-labels',
+            note: 'Мелкие доли остаются без подписи по порогу `labelMinShare`: две подписи на трёх процентах наезжают друг на друга.',
+          },
+          {
+            id: 'charts-pie-textures',
+            title: 'Beyond five colours',
+            description: 'Ролей в палитре пять, а долей бывает больше. Со второго круга палитры к цвету добавляется штриховка — на круге соседние доли стоят вплотную, и один только повтор цвета читается как «это одно и то же».',
+            previewKey: 'extra-charts-pie-textures',
+            note: 'Свой `color` у доли текстуру отменяет: выбор потребителя сильнее автоматики.',
+          },
+        ],
+        apiSections: chartPieApiSections(),
       },
       {
         name: 'GrSparkline',

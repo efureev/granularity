@@ -10,7 +10,9 @@
  */
 export const GRANULARITY_CHARTS_COMPONENTS = [
   // <granularity:components> — блок генерируется `yarn generate:registry`
+  'GrChartArea',
   'GrChartLine',
+  'GrChartPie',
   'GrSparkline',
   // </granularity:components>
 ] as const

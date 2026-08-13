@@ -13,8 +13,26 @@
     "axisX": "X axis",
     "axisY": "Y axis"
   },
+  "area": {
+    "label": "Area chart",
+    "labelStacked": "Stacked area chart"
+  },
   "line": {
     "label": "Line chart"
+  },
+  "pie": {
+    "label": "Pie chart",
+    "roleDescription": "pie chart",
+    "roleDescriptionDonut": "donut chart",
+    "summary": "Pie chart, {count} slices, total {total}",
+    "keyboardHint": "Use arrow keys to browse slices",
+    "slice": "{label}: {value}, {share}",
+    "sliceValue": "{label}: {value}",
+    "total": "Total",
+    "tableCaption": "Chart data",
+    "columnLabel": "Category",
+    "columnValue": "Value",
+    "columnShare": "Share"
   },
   "legend": {
     "toggle": "Toggle {label}",

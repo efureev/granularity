@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { areaPath, dashArrayFor, GR_CHART_SHAPES, linePath, segmentsOf, symbolPath } from '../chartPath'
+import { areaPath, bandPath, dashArrayFor, GR_CHART_SHAPES, linePath, segmentsOf, symbolPath } from '../chartPath'
 
 describe('segmentsOf', () => {
   it('пропуск в середине рвёт ряд на два куска', () => {
@@ -132,5 +132,52 @@ describe('dashArrayFor', () => {
 
   it('нулевая толщина не даёт вырожденного узора', () => {
     expect(dashArrayFor('dot', 0)).toBe('0.5 1')
+  })
+})
+
+describe('bandPath', () => {
+  const top = [{ x: 0, y: 10 }, { x: 10, y: 20 }, { x: 20, y: 15 }]
+  const base = [{ x: 0, y: 40 }, { x: 10, y: 40 }, { x: 20, y: 40 }]
+
+  it('замыкает полосу одной фигурой, а не двумя лентами', () => {
+    const d = bandPath(top, base)
+
+    // Один `M` на полосу: низ дописывается через `L`, иначе получилось бы два
+    // подпути и заливка разъехалась бы.
+    expect(d.match(/M /g)).toHaveLength(1)
+    expect(d.endsWith('Z')).toBe(true)
+  })
+
+  it('низ обходится в обратном порядке', () => {
+    const d = bandPath(top, base)
+    const closing = d.slice(d.indexOf('L 20 40'))
+
+    expect(closing).toContain('L 20 40')
+    expect(d.indexOf('L 20 40')).toBeLessThan(d.indexOf('L 0 40'))
+  })
+
+  it('разрыв по любой из границ рвёт полосу', () => {
+    const gapTop = bandPath(
+      [{ x: 0, y: 10 }, { x: 10, y: null }, { x: 20, y: 15 }, { x: 30, y: 12 }],
+      [{ x: 0, y: 40 }, { x: 10, y: 40 }, { x: 20, y: 40 }, { x: 30, y: 40 }],
+    )
+    const gapBase = bandPath(
+      [{ x: 0, y: 10 }, { x: 10, y: 12 }, { x: 20, y: 15 }, { x: 30, y: 12 }],
+      [{ x: 0, y: 40 }, { x: 10, y: null }, { x: 20, y: 40 }, { x: 30, y: 40 }],
+    )
+
+    // Слева от разрыва осталась одна точка — полосы из неё не выйдет.
+    expect(gapTop.match(/M /g)).toHaveLength(1)
+    expect(gapBase.match(/M /g)).toHaveLength(1)
+  })
+
+  it('полоса из одной точки не рисуется', () => {
+    expect(bandPath([{ x: 0, y: 10 }], [{ x: 0, y: 40 }])).toBe('')
+  })
+
+  it('гладкая полоса гладкая по обеим границам', () => {
+    const d = bandPath(top, base, 'smooth')
+
+    expect(d.match(/C /g)!.length).toBeGreaterThanOrEqual(4)
   })
 })

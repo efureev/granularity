@@ -26,6 +26,7 @@ const DEFAULT_GROUP_SEPARATOR = ' '
 const DEFAULT_DECIMAL_SEPARATOR = '.'
 
 const numberFormatters = new Map<string, Intl.NumberFormat>()
+const percentFormatters = new Map<string, Intl.NumberFormat>()
 const dateFormatters = new Map<string, Intl.DateTimeFormat>()
 
 /**
@@ -68,6 +69,7 @@ function dateFormatter(locale: string, options: Intl.DateTimeFormatOptions): Int
 export function resetChartFormatCache(): void {
   numberFormatters.clear()
   dateFormatters.clear()
+  percentFormatters.clear()
 }
 
 export function formatNumber(value: number, options: GrChartNumberFormat = {}): string {
@@ -133,6 +135,35 @@ export function formatValue(
   noValueText = '—',
 ): string {
   return value === null || !Number.isFinite(value) ? noValueText : formatNumber(value, options)
+}
+
+/**
+ * Доля процентами.
+ *
+ * Знаков после запятой ровно столько, сколько нужно, чтобы доля не выглядела
+ * враньём: до десятой процента у мелких долей (где «0 %» читается как «ничего»)
+ * и целые у остальных. Знак процента ставит `Intl` — в русской типографике он
+ * отбивается пробелом, в английской нет, и склеивать строку руками значило бы
+ * выбрать одну из двух и ошибиться в другой.
+ */
+export function formatShare(share: number, locale: string): string {
+  if (!Number.isFinite(share))
+    return '—'
+
+  const digits = share > 0 && share < 0.01 ? 1 : 0
+  const key = `${locale}|${digits}`
+  let formatter = percentFormatters.get(key)
+
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, {
+      style: 'percent',
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    })
+    percentFormatters.set(key, formatter)
+  }
+
+  return formatter.format(share)
 }
 
 const TICK_FORMATS: Record<GrTimeTickUnit, Intl.DateTimeFormatOptions> = {

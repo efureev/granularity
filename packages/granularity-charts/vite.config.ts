@@ -62,8 +62,14 @@ export default defineConfig({
           new URL('./src/i18n/all.ts', import.meta.url),
         ),
         // <granularity:components> — блок генерируется `yarn generate:registry`
+        'components/GrChartArea/index': fileURLToPath(
+          new URL('./src/components/GrChartArea/index.ts', import.meta.url),
+        ),
         'components/GrChartLine/index': fileURLToPath(
           new URL('./src/components/GrChartLine/index.ts', import.meta.url),
+        ),
+        'components/GrChartPie/index': fileURLToPath(
+          new URL('./src/components/GrChartPie/index.ts', import.meta.url),
         ),
         'components/GrSparkline/index': fileURLToPath(
           new URL('./src/components/GrSparkline/index.ts', import.meta.url),

@@ -49,6 +49,16 @@ export interface NormalizedPoint {
   sourceIndex: number
   raw: GrChartXValue
   label?: string
+  /**
+   * Границы полосы стека: низ — сумма предыдущих серий, верх — плюс своё
+   * значение. Заданы только при `stacked`.
+   *
+   * Собственное `y` при этом **не трогается**. Тултип, скрытая таблица и живой
+   * регион обязаны говорить «продажи — сорок», а не «продажи — сто двадцать,
+   * потому что снизу лежат ещё две серии».
+   */
+  stackBase?: number
+  stackTop?: number
 }
 
 export interface NormalizedSeries {
@@ -78,6 +88,8 @@ export interface NormalizeOptions {
   includeZero?: boolean
   /** Границы оси значений; `null` в любой позиции — считать эту сторону. */
   yDomain?: readonly [number | null, number | null]
+  /** Складывать серии по позиции: каждая полоса ложится на сумму предыдущих. */
+  stacked?: boolean
 }
 
 export interface PadDomainOptions {
@@ -187,7 +199,15 @@ export function normalizeChartData(
   // держать ось растянутой под значение, которого на экране нет.
   const visible = normalized.filter(item => !item.hidden)
   const positions = collectPositions(visible)
-  const yExtent = extentOf(visible.flatMap(item => item.points.map(point => point.y)))
+
+  if (options.stacked)
+    applyStack(visible)
+
+  // Ось стека считается по вершинам полос, а не по значениям: иначе верхняя
+  // серия уходила бы за верхний край на сумму нижних.
+  const yExtent = options.stacked
+    ? extentOf(visible.flatMap(item => item.points.map(point => point.stackTop ?? null)))
+    : extentOf(visible.flatMap(item => item.points.map(point => point.y)))
 
   return {
     kind,
@@ -196,6 +216,33 @@ export function normalizeChartData(
     xDomain: resolveXDomain(kind, categories, positions),
     yDomain: resolveYDomain(yExtent, options),
     positions,
+  }
+}
+
+/**
+ * Раскладка серий по стеку: первая серия внизу.
+ *
+ * Пропуск в серии **не двигает соседей вверх**: он просто ничего не добавляет к
+ * сумме, а собственная полоса серии в этом месте рвётся. Альтернативы хуже:
+ * протянуть последнее известное значение — это нарисовать данные, которых не
+ * было. Отсюда практическое следствие, о котором стоит знать: у ряда с дырами
+ * сумма в этом месте занижена, и стек честнее строить по полным рядам.
+ */
+function applyStack(series: readonly NormalizedSeries[]): void {
+  const totals = new Map<number, number>()
+
+  for (const item of series) {
+    for (const point of item.points) {
+      if (point.y === null)
+        continue
+
+      const base = totals.get(point.x) ?? 0
+      const top = base + point.y
+
+      point.stackBase = base
+      point.stackTop = top
+      totals.set(point.x, top)
+    }
   }
 }
 
@@ -357,7 +404,8 @@ function resolveYDomain(
     ]
   }
 
-  const padded = padDomain(extent, { includeZero: options.includeZero })
+  // Стек всегда отсчитывается от нуля: полоса, висящая над осью, врёт о своей высоте.
+  const padded = padDomain(extent, { includeZero: options.includeZero || options.stacked })
 
   return [minOverride ?? padded[0], maxOverride ?? padded[1]]
 }

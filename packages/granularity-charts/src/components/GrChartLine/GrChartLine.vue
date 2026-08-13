@@ -4,21 +4,21 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import { computed, ref } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
-import type { GrChartScale, GrChartScaleKind  } from '../../chart/chartScale'
+import type { GrChartScaleKind } from '../../chart/chartScale'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
-import { type GrChartCurve, linePath, type PathPoint, symbolPath } from '../../chart/chartPath'
+import { activeSymbolMarks, symbolMarks, toPixelPoints } from '../../chart/chartMarks'
+import { type GrChartCurve, linePath } from '../../chart/chartPath'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { GrChartActivePoint } from '../../composables/useChartTooltip'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
-import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
 import {
-  ACTIVE_POINT_SCALE,
-  AUTO_POINTS_LIMIT,
-  lineStrokeWidth,
-  pointHaloStroke,
-  pointSizes,
-} from './grChartLineStyles'
+  ACTIVE_MARKER_SCALE,
+  AUTO_MARKERS_LIMIT,
+  type GrChartSize,
+  markerSizes,
+} from '../GrChartFrame/chartFrameStyles'
+import { lineStrokeWidth, pointHaloStroke } from './grChartLineStyles'
 
 /**
  * Линейный график: ряд во времени, по числовой оси или по категориям.
@@ -167,70 +167,14 @@ const showMarkers = computed(() => {
   if (total > props.canvasThreshold)
     return false
 
-  return props.showPoints === 'always' || total <= AUTO_POINTS_LIMIT
+  return props.showPoints === 'always' || total <= AUTO_MARKERS_LIMIT
 })
 
-const markerSize = computed(() => pointSizes[resolvedSize.value])
+const markerSize = computed(() => markerSizes[resolvedSize.value])
 
-function toPixels(series: NormalizedSeries, xScale: GrChartScale, yScale: GrChartScale): PathPoint[] {
-  return series.points.map(point => ({
-    x: xScale.scale(point.x),
-    y: point.y === null ? null : yScale.scale(point.y),
-  }))
-}
-
-interface Marker {
-  key: string
-  d: string
-  color: string
-}
-
-/** Маркеры всех видимых серий одним плоским списком — так шаблон остаётся плоским. */
-function markers(
-  series: readonly NormalizedSeries[],
-  xScale: GrChartScale,
-  yScale: GrChartScale,
-): Marker[] {
-  const size = markerSize.value
-
-  return series.flatMap(item => item.points
-    .filter(point => point.y !== null)
-    .map(point => ({
-      key: `${item.id}-${point.sourceIndex}`,
-      d: symbolPath(item.style.shape, xScale.scale(point.x), yScale.scale(point.y!), size),
-      color: item.style.color,
-    })))
-}
-
-/** Активная точка крупнее соседних: вертикаль показывает «где», размер — «что именно». */
-function activeMarkers(
-  series: readonly NormalizedSeries[],
-  xScale: GrChartScale,
-  yScale: GrChartScale,
-  cursor: number | null,
-): Marker[] {
-  if (cursor === null)
-    return []
-
-  const x = data.value.positions[cursor]
-
-  if (x === undefined)
-    return []
-
-  const size = markerSize.value * ACTIVE_POINT_SCALE
-
-  return series.flatMap((item) => {
-    const point = item.points.find(candidate => candidate.x === x && candidate.y !== null)
-
-    if (!point)
-      return []
-
-    return [{
-      key: `active-${item.id}`,
-      d: symbolPath(item.style.shape, xScale.scale(point.x), yScale.scale(point.y!), size),
-      color: item.style.color,
-    }]
-  })
+/** Позиция курсора — в абсциссу ряда: марки ищутся по ней, а не по индексу. */
+function activeX(cursor: number | null): number | undefined {
+  return cursor === null ? undefined : data.value.positions[cursor]
 }
 
 function onLegendToggle(payload: { seriesId: string, hidden: boolean }): void {
@@ -296,7 +240,7 @@ defineExpose({
           v-for="item in visibleSeries"
           :key="item.id"
           :data-gr-chart-series="item.id"
-          :d="linePath(toPixels(item, sx, sy), resolvedCurve)"
+          :d="linePath(toPixelPoints(item, sx, sy), resolvedCurve)"
           fill="none"
           :stroke="item.style.color"
           :stroke-width="lineStrokeWidth"
@@ -306,7 +250,7 @@ defineExpose({
         />
 
         <path
-          v-for="marker in (showMarkers ? markers(visibleSeries, sx, sy) : [])"
+          v-for="marker in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize) : [])"
           :key="marker.key"
           :d="marker.d"
           :fill="marker.color"
@@ -315,7 +259,7 @@ defineExpose({
         />
 
         <path
-          v-for="marker in activeMarkers(visibleSeries, sx, sy, cursor)"
+          v-for="marker in activeSymbolMarks(visibleSeries, sx, sy, activeX(cursor), markerSize * ACTIVE_MARKER_SCALE)"
           :key="marker.key"
           data-gr-chart-active-point
           :d="marker.d"

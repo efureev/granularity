@@ -220,3 +220,58 @@ describe('normalizeChartData', () => {
     expect(data.xDomain).toEqual([0, 1])
   })
 })
+
+describe('normalizeChartData: стек', () => {
+  const series = [
+    { id: 'a', y: [10, 20] },
+    { id: 'b', y: [5, 5] },
+    { id: 'c', y: [1, 1] },
+  ]
+
+  it('без флага границ полос нет', () => {
+    const data = normalizeChartData(series)
+
+    expect(data.series[0]!.points[0]!.stackTop).toBeUndefined()
+  })
+
+  it('первая серия внизу, каждая следующая ложится на сумму предыдущих', () => {
+    const data = normalizeChartData(series, { stacked: true })
+    const tops = data.series.map(item => item.points[0]!.stackTop)
+
+    expect(tops).toEqual([10, 15, 16])
+    expect(data.series[2]!.points[0]!.stackBase).toBe(15)
+  })
+
+  it('собственное значение точки стек не трогает', () => {
+    // Тултип обязан говорить «пять», а не «пятнадцать, потому что снизу десять».
+    const data = normalizeChartData(series, { stacked: true })
+
+    expect(data.series[1]!.points[0]!.y).toBe(5)
+  })
+
+  it('ось считается по вершинам полос, а не по значениям', () => {
+    const data = normalizeChartData(series, { stacked: true })
+
+    expect(data.yDomain[1]).toBeGreaterThanOrEqual(26)
+    expect(data.yDomain[0]).toBe(0)
+  })
+
+  it('скрытая серия из стека выпадает — соседи опускаются', () => {
+    const withHidden = normalizeChartData(
+      [{ id: 'a', y: [10] }, { id: 'b', y: [5], hidden: true }, { id: 'c', y: [1] }],
+      { stacked: true },
+    )
+
+    expect(withHidden.series[2]!.points[0]!.stackBase).toBe(10)
+  })
+
+  it('пропуск ничего не добавляет к сумме и рвёт собственную полосу', () => {
+    const data = normalizeChartData(
+      [{ id: 'a', y: [10, null] }, { id: 'b', y: [5, 5] }],
+      { stacked: true },
+    )
+
+    expect(data.series[0]!.points[1]!.stackTop).toBeUndefined()
+    expect(data.series[1]!.points[1]!.stackBase).toBe(0)
+  })
+})

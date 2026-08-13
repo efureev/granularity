@@ -27,6 +27,7 @@ export { bandTicks, linearTicks, niceNumber, timeTicks } from './chartTicks'
 export type { GrChartCurve, GrChartDashPattern, GrChartPointShape, PathPoint } from './chartPath'
 export {
   areaPath,
+  bandPath,
   dashArrayFor,
   GR_CHART_DASHES,
   GR_CHART_SHAPES,
@@ -35,17 +36,24 @@ export {
   symbolPath,
 } from './chartPath'
 
+export type { ChartMark } from './chartMarks'
+export { activeSymbolMarks, symbolMarks, toPixelPoints, toStackBand } from './chartMarks'
+
 export type { GrChartSeriesStyle } from './chartSeriesStyle'
 export { GR_CHART_SERIES_COLORS, seriesStyle } from './chartSeriesStyle'
 
 export type { GrChartNumberFormat } from './chartFormat'
 export {
   formatNumber,
+  formatShare,
   formatTimeTick,
   formatTimeValue,
   formatValue,
   resetChartFormatCache,
 } from './chartFormat'
+
+export type { PieSlice, Point } from './chartArc'
+export { angleOfPoint, arcCentroid, arcPath, pieSlices, polarPoint, sliceAtPoint } from './chartArc'
 
 export type { ChartLayout, ChartLayoutInput, Rect } from './chartLayout'
 export { chartLayout, estimateTextWidth } from './chartLayout'

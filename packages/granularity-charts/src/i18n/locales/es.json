@@ -13,8 +13,26 @@
     "axisX": "Eje X",
     "axisY": "Eje Y"
   },
+  "area": {
+    "label": "Gráfico de áreas",
+    "labelStacked": "Gráfico de áreas apiladas"
+  },
   "line": {
     "label": "Gráfico de líneas"
+  },
+  "pie": {
+    "label": "Gráfico circular",
+    "roleDescription": "gráfico circular",
+    "roleDescriptionDonut": "gráfico de anillo",
+    "summary": "Gráfico circular, {count} porciones, total {total}",
+    "keyboardHint": "Usa las flechas para recorrer las porciones",
+    "slice": "{label}: {value}, {share}",
+    "sliceValue": "{label}: {value}",
+    "total": "Total",
+    "tableCaption": "Datos del gráfico",
+    "columnLabel": "Categoría",
+    "columnValue": "Valor",
+    "columnShare": "Proporción"
   },
   "legend": {
     "toggle": "Mostrar u ocultar {label}",

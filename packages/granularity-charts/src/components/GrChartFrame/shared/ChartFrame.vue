@@ -13,7 +13,7 @@ import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
 import { createScale, type GrChartScale, linearScale } from '../../../chart/chartScale'
 import { linearTicks } from '../../../chart/chartTicks'
-import { chartTableModel } from '../../../chart/chartTable'
+import { type ChartTableModel, chartTableModel } from '../../../chart/chartTable'
 import { useChartScale } from '../../../composables/useChartScale'
 import { type ChartTick, type ChartTickFormat, useChartTicks } from '../../../composables/useChartTicks'
 import { type GrChartActivePoint, useChartTooltip } from '../../../composables/useChartTooltip'
@@ -87,6 +87,17 @@ export interface ChartFrameProps {
   xTickFormat?: ChartTickFormat
   yTickFormat?: (value: number) => string
   valueFormat?: GrChartNumberFormat
+  /** Вертикаль под активной точкой. У круга её нет: там активна доля, а не абсцисса. */
+  crosshair?: boolean
+  /**
+   * Точки, зависящие от системы координат. Дефолты декартовы; круг подменяет
+   * их, потому что у него попадание угловое, якорь тултипа — центроид доли,
+   * строка таблицы — доля, а описание точки включает процент (§10).
+   */
+  hitTest?: (point: { x: number, y: number }, plot: Rect) => number
+  anchorPoint?: (index: number, plot: Rect) => { x: number, y: number } | null
+  tableModel?: ChartTableModel
+  describePoint?: (index: number, seriesIndex: number) => string
 }
 
 export interface ChartFrameEmits {
@@ -120,6 +131,11 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   xTickFormat: undefined,
   yTickFormat: undefined,
   valueFormat: undefined,
+  crosshair: true,
+  hitTest: undefined,
+  anchorPoint: undefined,
+  tableModel: undefined,
+  describePoint: undefined,
 })
 
 const emit = defineEmits<ChartFrameEmits>()
@@ -275,6 +291,8 @@ const tooltipApi = useChartTooltip({
   plot: () => plot.value,
   surface: surfaceEl,
   enabled: () => props.tooltip && props.interactive && !isEmpty.value,
+  hitTest: props.hitTest,
+  anchor: props.anchorPoint,
 })
 
 const { floatingStyle } = useFloating(anchorEl, tooltipEl, tooltipApi.open, {
@@ -357,7 +375,7 @@ const a11y = useChartA11y({
   activeSeriesIndex,
   setActive: index => tooltipApi.setActive(index),
   announce: message => announce(message),
-  describe: describePoint,
+  describe: (index, seriesIndex) => (props.describePoint ?? describePoint)(index, seriesIndex),
   onActivate: () => {
     if (tooltipApi.active.value)
       emit('pointClick', tooltipApi.active.value)
@@ -376,7 +394,7 @@ const surfaceLabel = computed(() => {
   return `${label}. ${t('grCharts.chart.keyboardHint', 'Use arrow keys to browse points')}`
 })
 
-const tableModel = computed(() => chartTableModel(props.data, {
+const tableModel = computed(() => props.tableModel ?? chartTableModel(props.data, {
   xLabel: t('grCharts.chart.columnX', 'X'),
   caption: t('grCharts.chart.tableCaption', 'Chart data'),
   formatX,
@@ -528,7 +546,7 @@ watch(tooltipApi.activeIndex, (value) => {
         </template>
 
         <line
-          v-if="tooltipApi.activeIndex.value !== null && !isEmpty"
+          v-if="crosshair && tooltipApi.activeIndex.value !== null && !isEmpty"
           data-gr-chart-crosshair
           :x1="xScale.scale(data.positions[tooltipApi.activeIndex.value] ?? 0)"
           :x2="xScale.scale(data.positions[tooltipApi.activeIndex.value] ?? 0)"

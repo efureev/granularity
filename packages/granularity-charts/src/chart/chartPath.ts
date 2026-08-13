@@ -91,6 +91,60 @@ export function areaPath(
     .join(' ')
 }
 
+/**
+ * Полоса между двумя кривыми — тело стека.
+ *
+ * От `areaPath` отличается тем, что низ полосы не прямая, а такая же кривая:
+ * в стеке каждая серия лежит на сумме предыдущих. Разрыв берётся по **обеим**
+ * границам сразу: полоса, у которой известен только верх, — это не полоса.
+ *
+ * Нижняя граница обходится в обратном порядке, а её `M` подменяется на `L`:
+ * иначе получился бы второй подпуть, и заливка вышла бы двумя лентами вместо
+ * одной замкнутой фигуры.
+ */
+export function bandPath(
+  top: readonly PathPoint[],
+  base: readonly PathPoint[],
+  curve: GrChartCurve = 'linear',
+): string {
+  const runs: number[][] = []
+  let current: number[] = []
+
+  for (let i = 0; i < top.length; i++) {
+    const upper = top[i]
+    const lower = base[i]
+    const solid = upper !== undefined && lower !== undefined
+      && upper.y !== null && lower.y !== null
+      && Number.isFinite(upper.y) && Number.isFinite(lower.y)
+
+    if (solid) {
+      current.push(i)
+      continue
+    }
+
+    if (current.length > 0) {
+      runs.push(current)
+      current = []
+    }
+  }
+
+  if (current.length > 0)
+    runs.push(current)
+
+  return runs
+    .map((run) => {
+      if (run.length < 2)
+        return ''
+
+      const upper = segmentPath(run.map(i => ({ x: top[i]!.x, y: top[i]!.y as number })), curve)
+      const lower = segmentPath(run.map(i => ({ x: base[i]!.x, y: base[i]!.y as number })).reverse(), curve)
+
+      return upper && lower ? `${upper} L${lower.slice(1)} Z` : ''
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
 function segmentPath(segment: readonly SolidPoint[], curve: GrChartCurve): string {
   if (segment.length === 0)
     return ''
