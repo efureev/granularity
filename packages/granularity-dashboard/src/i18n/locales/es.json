@@ -1,0 +1,28 @@
+{
+  "dashboard": {
+    "label": "Panel",
+    "empty": "Aún no hay widgets"
+  },
+  "item": {
+    "dragHandle": "Mover {title}",
+    "resizeHandle": "Redimensionar {title}, {w} por {h}",
+    "grabbed": "{title} tomado. Columna {col}, fila {row}",
+    "moved": "Columna {col}, fila {row}",
+    "dropped": "{title} movido. Columna {col}, fila {row}",
+    "cancelled": "Movimiento cancelado",
+    "resized": "{title}, {w} por {h}",
+    "added": "{title} añadido",
+    "untitled": "Widget"
+  },
+  "palette": {
+    "label": "Catálogo de widgets",
+    "add": "Añadir {title}",
+    "empty": "No hay widgets disponibles"
+  },
+  "toolbar": {
+    "label": "Controles del panel",
+    "edit": "Editar disposición",
+    "done": "Listo",
+    "reset": "Restablecer disposición"
+  }
+}

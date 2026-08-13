@@ -96,7 +96,9 @@ describe('showcase bootstrap config', () => {
     expect(showcaseI18nEntry).toContain('...grChronoLocales')
     expect(showcaseI18nEntry).toContain("from '@feugene/granularity-charts/i18n/all'")
     expect(showcaseI18nEntry).toContain('...grChartsLocales')
-    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK])')
+    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-dashboard/i18n/all'")
+    expect(showcaseI18nEntry).toContain('...grDashboardLocales')
+    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK])')
     expect(showcaseI18nMessagesEntry).toContain("export const SHOWCASE_I18N_BLOCK = 'showcase'")
     expect(showcaseI18nMessagesEntry).toContain("'./locales/en/showcase.json'")
     expect(showcaseI18nMessagesEntry).toContain("'./locales/ru/showcase.json'")
@@ -115,6 +117,7 @@ describe('showcase bootstrap config', () => {
       '@feugene/granularity',
       '@feugene/granularity-chrono',
       '@feugene/granularity-charts',
+      '@feugene/granularity-dashboard',
     ])
     expect(showcaseGranularOptions.components).toBe('all')
     expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
@@ -123,6 +126,7 @@ describe('showcase bootstrap config', () => {
     expect(showcaseUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("import chronoProvider from '@feugene/granularity-chrono/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("import chartsProvider from '@feugene/granularity-charts/granular-provider/node'")
+    expect(showcaseUnoConfig).toContain("import dashboardProvider from '@feugene/granularity-dashboard/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("names: ['light', 'dark']")
   })
 })

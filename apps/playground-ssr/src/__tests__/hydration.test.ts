@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
 import ChartsPage from '../ChartsPage.vue'
+import DashboardPage from '../DashboardPage.vue'
 import ChronoPage from '../ChronoPage.vue'
 import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
@@ -40,6 +41,7 @@ const snapshots = JSON.parse(
   overlayStack: SsrSnapshot
   chrono: SsrSnapshot
   charts: SsrSnapshot
+  dashboard: SsrSnapshot
 }
 
 function captureConsole(): string[] {
@@ -410,6 +412,84 @@ describe('гидрация companion-пакета charts', () => {
       html: snapshots.charts.html.replace(/(data-gr-chart-axis="y"[^>]*>)/, '$1<text>сбито</text>'),
     }
     const problems = hydrationProblems(await hydrate(distorted, { root: ChartsPage }))
+
+    expect(problems.length).toBeGreaterThan(0)
+  })
+})
+
+/**
+ * Companion-пакет `@feugene/granularity-dashboard`.
+ *
+ * Часов пакет не читает, хранилище до `onMounted` не трогает — поэтому
+ * помеченных расхождений здесь нет ни одного и гейт обязан быть чист целиком.
+ * Проверяются два класса дефектов, ради которых стенд и существует: наблюдатели
+ * (`ResizeObserver` выбирает раскладку, `IntersectionObserver` монтирует
+ * содержимое), которых на сервере нет, и `useId()` в связке заголовка с именем
+ * группы.
+ */
+describe('гидрация companion-пакета dashboard', () => {
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.dashboard, { root: DashboardPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('серверный HTML содержит разложенные виджеты, а не пустые обёртки', () => {
+    expect(snapshots.dashboard.html).toMatch(/data-gr-dashboard[ >]/)
+    expect(snapshots.dashboard.html.match(/data-gr-dashboard-item/g) ?? []).toHaveLength(3)
+  })
+
+  it('раскладка уходит с сервера от объявленного брейкпоинта, а не от нулевой ширины', () => {
+    // `ResizeObserver` на сервере нет, и гард обязан работать режимом, а не
+    // отказом: без брейкпоинта по умолчанию сетка схлопнулась бы в две колонки,
+    // и каждая ячейка приехала бы расхождением.
+    expect(snapshots.dashboard.html).toMatch(/data-breakpoint="lg"/)
+    expect(snapshots.dashboard.html).toMatch(/grid-column:\s*1\s*\/\s*span 8/)
+  })
+
+  it('при `lazy` сервер отдаёт слот-заглушку, а не содержимое', () => {
+    // Ленивость и серверный рендер содержимого несовместимы по построению:
+    // стартовое состояние обязано совпасть у сервера и первого клиентского
+    // рендера, иначе гидрация разойдётся. Компромисс назван в `docs/ssr.md`
+    // пакета: `lazy` выключает серверный рендер содержимого, и включать его
+    // стоит там, где содержимое в SEO не нужно.
+    expect(snapshots.dashboard.html).toContain('Загружается…')
+    expect(snapshots.dashboard.html).not.toContain('Содержимое приходит с сервера целиком')
+  })
+
+  it('ничего не помечено ожидаемым расхождением: часов пакет не читает', () => {
+    expect(snapshots.dashboard.html).not.toMatch(/data-allow-mismatch/)
+  })
+
+  it('каждая ссылка `aria-labelledby` находит свой заголовок', () => {
+    // Имена из `useId()` — единственное в разметке, что не выводится из данных.
+    // Разойдись счётчик сервера и клиента, имя группы указало бы в пустоту, а
+    // гидрация промолчала бы: `id` для неё такой же атрибут, как любой другой.
+    const ids = new Set([...snapshots.dashboard.html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]!))
+    const refs = [...snapshots.dashboard.html.matchAll(/aria-labelledby="([^"]+)"/g)].map(match => match[1]!)
+
+    expect(refs.length).toBeGreaterThan(0)
+    expect(refs.filter(ref => !ids.has(ref))).toEqual([])
+  })
+
+  it('живой регион на сервере не рендерится, а после гидрации появляется', async () => {
+    expect(snapshots.dashboard.html).not.toMatch(/aria-live/)
+
+    await hydrate(snapshots.dashboard, { root: DashboardPage })
+
+    expect(document.querySelector('[aria-live]')).not.toBeNull()
+  })
+
+  /**
+   * Обратная половина измерения: без неё «расхождений нет» зеленело бы и на
+   * гидрации, которая до сетки вообще не доходит.
+   */
+  it('а гейт умеет видеть расхождение: порченый виджет его роняет', async () => {
+    const distorted = {
+      ...snapshots.dashboard,
+      html: snapshots.dashboard.html.replace(/(data-gr-dashboard-item[^>]*>)/, '$1<span>сбито</span>'),
+    }
+    const problems = hydrationProblems(await hydrate(distorted, { root: DashboardPage }))
 
     expect(problems.length).toBeGreaterThan(0)
   })

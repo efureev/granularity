@@ -1,0 +1,28 @@
+{
+  "dashboard": {
+    "label": "Dashboard",
+    "empty": "No widgets yet"
+  },
+  "item": {
+    "dragHandle": "Move {title}",
+    "resizeHandle": "Resize {title}, {w} by {h}",
+    "grabbed": "{title} grabbed. Column {col}, row {row}",
+    "moved": "Column {col}, row {row}",
+    "dropped": "{title} moved. Column {col}, row {row}",
+    "cancelled": "Move cancelled",
+    "resized": "{title}, {w} by {h}",
+    "added": "{title} added",
+    "untitled": "Widget"
+  },
+  "palette": {
+    "label": "Widget catalog",
+    "add": "Add {title}",
+    "empty": "No widgets available"
+  },
+  "toolbar": {
+    "label": "Dashboard controls",
+    "edit": "Edit layout",
+    "done": "Done",
+    "reset": "Reset layout"
+  }
+}

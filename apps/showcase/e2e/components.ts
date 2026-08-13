@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { granularityComponentConfigs } from '@feugene/granularity/granular-provider'
 import { granularityChartsComponentConfigs } from '@feugene/granularity-charts/granular-provider'
 import { granularityChronoComponentConfigs } from '@feugene/granularity-chrono/granular-provider'
+import { granularityDashboardComponentConfigs } from '@feugene/granularity-dashboard/granular-provider'
 
 /**
  * Что сканируют e2e и откуда берётся список.
@@ -47,6 +48,7 @@ export const registryComponentNames: string[] = Object.keys(granularityComponent
 export const companionComponentNames: string[] = [
   ...Object.keys(granularityChronoComponentConfigs),
   ...Object.keys(granularityChartsComponentConfigs),
+  ...Object.keys(granularityDashboardComponentConfigs),
 ].sort()
 
 /**
@@ -61,11 +63,20 @@ export const companionComponentNames: string[] = [
  * — axe (он для этих страниц **остаётся**), сама геометрия — инварианты чистых
  * модулей, которых у пакета две сотни.
  *
+ * `granularity-dashboard` исключён по той же причине с другой стороны: его
+ * страница показывает сетку, положение виджетов в которой зависит от ширины
+ * контейнера — то есть от размера окна раннера. Эталон, снятый на одной
+ * ширине, на другой расходится целиком, а раскладку как таковую держат
+ * инварианты чистых модулей `./layout`. Доступность — так же за axe.
+ *
  * Плата за включение была бы прямой: визуальный слой локальный, эталоны
  * снимаются вручную на машине владельца, и любая правка демо или ряда данных
  * требовала бы пересъёмки.
  */
-const VISUAL_EXCLUDED_PACKAGES = Object.keys(granularityChartsComponentConfigs)
+const VISUAL_EXCLUDED_PACKAGES = [
+  ...Object.keys(granularityChartsComponentConfigs),
+  ...Object.keys(granularityDashboardComponentConfigs),
+]
 
 /** Компаньоны для визуального слоя — см. `VISUAL_EXCLUDED_PACKAGES`. */
 export const visualCompanionComponentNames: string[] = companionComponentNames

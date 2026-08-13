@@ -3,6 +3,7 @@ import type { Component } from 'vue'
 import App from './App.vue'
 import ChartsPage from './ChartsPage.vue'
 import ChronoPage from './ChronoPage.vue'
+import DashboardPage from './DashboardPage.vue'
 import OverlayStackPage from './OverlayStackPage.vue'
 import RiskyPage from './RiskyPage.vue'
 import TeleportPage from './TeleportPage.vue'
@@ -34,6 +35,7 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   { path: '/overlay-stack', title: 'Overlay stack', about: 'два открытых оверлея и чтение темы', component: OverlayStackPage },
   { path: '/chrono', title: 'Chrono', about: 'часы в отрисовке, ленивые панели, useAnnouncer', component: ChronoPage },
   { path: '/charts', title: 'Charts', about: 'ResizeObserver и useId() в разметке SVG', component: ChartsPage },
+  { path: '/dashboard', title: 'Dashboard', about: 'ResizeObserver и IntersectionObserver в выборе раскладки', component: DashboardPage },
 ]
 
 /** Неизвестный путь отдаёт корневую страницу: 404 у стенда без роутера смысла не имеет. */

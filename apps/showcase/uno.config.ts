@@ -12,9 +12,10 @@ import {presetGranularNode} from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
 import chronoProvider from '@feugene/granularity-chrono/granular-provider/node'
 import chartsProvider from '@feugene/granularity-charts/granular-provider/node'
+import dashboardProvider from '@feugene/granularity-dashboard/granular-provider/node'
 
 export const showcaseGranularOptions: PresetGranularNodeOptions = {
-    providers: [granularityProvider, chronoProvider, chartsProvider],
+    providers: [granularityProvider, chronoProvider, chartsProvider, dashboardProvider],
     components: 'all',
     themes: {names: ['light', 'dark']},
     layer: 'granular' as const,

@@ -1,4 +1,5 @@
 import chartsPkg from '@feugene/granularity-charts/package.json'
+import dashboardPkg from '@feugene/granularity-dashboard/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
 import type { ShowcaseApiSectionMeta } from '../model.ts'
@@ -679,6 +680,133 @@ function dateRangePickerApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
+
+/** Публичная поверхность сетки виджетов. */
+function dashboardApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'layout', type: 'GrDashboardResponsiveLayout', description: '`v-model:layout` — раскладка на каждый брейкпоинт. Недостающий выводится из ближайшего более широкого.' },
+        { name: 'cols', type: 'Record<string, number> | number', default: '{ lg: 12, md: 10, sm: 6, xs: 2 }', description: 'Число колонок по брейкпоинтам либо одно на всё.' },
+        { name: 'breakpoints', type: 'Record<string, number>', default: '{ lg: 1200, md: 996, sm: 768, xs: 480 }', description: 'Пороги ширины контейнера. Нулевая ширина брейкпоинт не переключает: скрытая вкладка — это «не отрисовано», а не «узкий экран».' },
+        { name: 'initialBreakpoint', type: 'string', default: `'lg'`, description: 'Брейкпоинт первого рендера. Ширины контейнера на сервере нет, и от него идёт серверная раскладка.' },
+        { name: 'rowHeight / gap', type: 'number · number', default: '64 · 12', description: 'Высота строки и зазор в пикселях. Настраиваются через `GrConfigProvider`.' },
+        { name: 'mode', type: `'view' | 'edit'`, default: `'view'`, description: 'В режиме просмотра ручек нет вовсе — не скрыты, а не отрисованы.' },
+        { name: 'draggable / resizable', type: 'boolean · boolean', default: 'true · true', description: 'Что разрешено в режиме редактирования.' },
+        { name: 'compact', type: `'vertical' | 'none'`, default: `'vertical'`, description: '`vertical` — виджеты падают вверх, дыр не остаётся; сдвинуть виджет вниз в пустоту при этом нельзя, он всплывёт обратно.' },
+        { name: 'preventCollision', type: 'boolean', default: 'false', description: 'Столкновение отменяет перемещение целиком вместо того, чтобы толкать соседей.' },
+        { name: 'lazy', type: 'boolean', default: 'false', description: 'Содержимое виджета монтируется по попаданию в окно. Выключает серверный рендер содержимого — см. `docs/ssr.md` пакета.' },
+        { name: 'ariaLabel', type: 'string', description: 'Имя сетки для скринридера. Не задано — берётся из локали.' },
+      ],
+    },
+    {
+      key: 'emits',
+      title: 'Emits',
+      origin: 'manual',
+      items: [
+        { name: 'update:layout', type: '(value: GrDashboardResponsiveLayout) => void', description: 'Раскладка изменилась: перенос, растягивание или отмена.' },
+        { name: 'layoutChange', type: '(value: GrDashboardLayout, breakpoint: string) => void', description: 'То же, но раскладкой текущего брейкпоинта.' },
+        { name: 'itemMove / itemResize', type: '(id, from, to) => void', description: 'Что именно и куда переехало — до и после.' },
+        { name: 'breakpointChange', type: '(breakpoint: string, cols: number) => void', description: 'Сетка перешла на другой брейкпоинт.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'default', type: '—', description: 'Виджеты — `GrDashboardItem`.' },
+        { name: 'empty', type: '—', description: 'Пустая сетка. По умолчанию объясняет себя строкой из локали.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность виджета. */
+function dashboardItemApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'itemId', type: 'string', description: 'Связывает разметку с записью раскладки. Обязателен.' },
+        { name: 'title', type: 'string', description: 'Заголовок виджета. Он же — имя в ручках и в объявлениях.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, default: `'md'`, description: 'Плотность шапки и кегль заголовка — **не** размер в сетке: тот задаётся `w` и `h`.' },
+        { name: 'minW / minH / maxW / maxH', type: 'number', description: 'Границы размера. Раскладка их может не содержать — знает их виджет.' },
+        { name: 'static', type: 'boolean', default: 'false', description: 'Не двигается сам и не двигается соседями; перемещение, упёршееся в него, отменяется.' },
+        { name: 'ariaLabel', type: 'string', description: 'Имя виджета, если заголовка нет.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'default', type: '—', description: 'Содержимое виджета.' },
+        { name: 'header', type: '—', description: 'Замена заголовка целиком.' },
+        { name: 'actions', type: '—', description: 'Кнопки в правой части шапки.' },
+        { name: 'footer', type: '—', description: 'Подвал карточки.' },
+        { name: 'skeleton', type: '—', description: 'Что показать до монтирования содержимого при `lazy`.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность каталога виджетов. */
+function dashboardPaletteApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'items', type: 'GrDashboardPaletteItem[]', description: 'Каталог: `id`, `title`, `description`, `defaultSize`, границы размера, `disabled`.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, default: `'md'`, description: 'Кегль строк каталога.' },
+        { name: 'disabled', type: 'boolean', default: 'false', description: 'Гасит весь каталог.' },
+        { name: 'ariaLabel', type: 'string', description: 'Имя списка. Не задано — берётся из локали.' },
+      ],
+    },
+    {
+      key: 'emits',
+      title: 'Emits',
+      origin: 'manual',
+      items: [
+        { name: 'add', type: '(item: GrDashboardPaletteItem) => void', description: 'Виджет выбран. Куда его класть, решает приложение — например функцией `addItem` из `./layout`.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность панели управления. */
+function dashboardToolbarApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'mode', type: `'view' | 'edit'`, description: '`v-model:mode`. Не задан — берётся у сетки, если тулбар внутри неё.' },
+        { name: 'resettable', type: 'boolean', default: 'false', description: 'Показать кнопку сброса раскладки.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, default: `'md'`, description: 'Размер кнопок.' },
+        { name: 'disabled', type: 'boolean', default: 'false', description: 'Гасит обе кнопки.' },
+      ],
+    },
+    {
+      key: 'emits',
+      title: 'Emits',
+      origin: 'manual',
+      items: [
+        { name: 'update:mode', type: `(value: 'view' | 'edit') => void`, description: 'Режим переключён.' },
+        { name: 'reset', type: '() => void', description: 'Нажат сброс. Что считать исходной раскладкой, решает приложение.' },
+      ],
+    },
+  ]
+}
+
 export const companionPackages: CompanionPackage[] = [
   {
     id: 'granularity-charts',
@@ -1057,6 +1185,86 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: relativeTimeApiSections(),
+      },
+    ],
+  },
+  {
+    id: 'granularity-dashboard',
+    npmName: '@feugene/granularity-dashboard',
+    label: 'Dashboard',
+    version: dashboardPkg.version,
+    description: 'Сетка виджетов, которую пользователь раскладывает под себя, и раскладка, которая переживает перезагрузку. Перенос и растягивание — мышью и с клавиатуры, отдельная раскладка на каждый брейкпоинт, ноль зависимостей.',
+    dependencies: [],
+    components: [
+      {
+        name: 'GrDashboard',
+        slug: 'gr-dashboard',
+        title: 'GrDashboard',
+        summary: 'Сетка, в которой виджеты переносят и растягивают. Режим просмотра и режим редактирования разведены, раскладка хранится на каждый брейкпоинт.',
+        importPath: '@feugene/granularity-dashboard/components/GrDashboard',
+        examples: [
+          {
+            id: 'dashboard-basic',
+            title: 'Разложить под себя',
+            description: 'Переключите режим и перетащите виджет за ручку в шапке — соседи расступятся, а раскладка подтянется вверх. То же делается с клавиатуры: `Space` берёт виджет, стрелки двигают, `Esc` отменяет.',
+            previewKey: 'extra-dashboard-basic',
+          },
+          {
+            id: 'dashboard-static',
+            title: 'Закреплённый виджет и свободная сетка',
+            description: 'Баннер вверху закреплён: он не двигается ни сам, ни соседями, и перемещение, упёршееся в него, отменяется целиком. Ниже — `compact="none"`: виджет остаётся ровно там, куда его положили, вместе с дырой под ним.',
+            previewKey: 'extra-dashboard-static',
+          },
+        ],
+        apiSections: dashboardApiSections(),
+      },
+      {
+        name: 'GrDashboardItem',
+        slug: 'gr-dashboard-item',
+        title: 'GrDashboardItem',
+        summary: 'Виджет на сетке поверх карточки ядра: заголовок, действия, подвал — и собственные границы размера.',
+        importPath: '@feugene/granularity-dashboard/components/GrDashboardItem',
+        examples: [
+          {
+            id: 'dashboard-item-persistence',
+            title: 'Раскладка переживает перезагрузку',
+            description: 'Разложите виджеты и обновите страницу — вернётся то, что вы оставили. Хранилище задаётся адаптером, поэтому раскладка так же легко уезжает на сервер, как и в `localStorage`.',
+            previewKey: 'extra-dashboard-persistence',
+          },
+        ],
+        apiSections: dashboardItemApiSections(),
+      },
+      {
+        name: 'GrDashboardPalette',
+        slug: 'gr-dashboard-palette',
+        title: 'GrDashboardPalette',
+        summary: 'Каталог виджетов, которые можно добавить. Добавление — обычная кнопка, поэтому клавиатурный сценарий существует по построению.',
+        importPath: '@feugene/granularity-dashboard/components/GrDashboardPalette',
+        examples: [
+          {
+            id: 'dashboard-palette',
+            title: 'Добавить виджет',
+            description: 'Каталог не владеет раскладкой: он сообщает, что выбрали, а куда положить — решает приложение. В демо это одна строка с `addItem` из подпути `./layout`.',
+            previewKey: 'extra-dashboard-palette',
+          },
+        ],
+        apiSections: dashboardPaletteApiSections(),
+      },
+      {
+        name: 'GrDashboardToolbar',
+        slug: 'gr-dashboard-toolbar',
+        title: 'GrDashboardToolbar',
+        summary: 'Переключатель режима и сброс раскладки. Работает и внутри сетки, и отдельно от неё — например в шапке страницы.',
+        importPath: '@feugene/granularity-dashboard/components/GrDashboardToolbar',
+        examples: [
+          {
+            id: 'dashboard-toolbar',
+            title: 'Режим и сброс',
+            description: 'Две кнопки над сеткой: одна разводит режимы просмотра и редактирования, вторая возвращает исходную раскладку. Своего состояния тулбар не держит — режим приходит `v-model:mode`, а что считать исходной раскладкой, решает приложение.',
+            previewKey: 'extra-dashboard-basic',
+          },
+        ],
+        apiSections: dashboardToolbarApiSections(),
       },
     ],
   },

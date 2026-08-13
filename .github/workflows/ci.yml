@@ -8,6 +8,7 @@ on:
       - 'unplugin-granularity-v*'
       - 'granularity-chrono-v*'
       - 'granularity-charts-v*'
+      - 'granularity-dashboard-v*'
   pull_request:
     branches: [ main ]
 
@@ -141,6 +142,7 @@ jobs:
       - build-granularity
       - build-granularity-chrono
       - build-granularity-charts
+      - build-granularity-dashboard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -169,6 +171,12 @@ jobs:
         with:
           name: granularity-charts-dist
           path: packages/granularity-charts/dist
+
+      - name: Download granularity-dashboard dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
 
       - name: Test SSR playground
         run: yarn test:playground-ssr
@@ -184,6 +192,7 @@ jobs:
       - build-unplugin-granularity
       - build-granularity-chrono
       - build-granularity-charts
+      - build-granularity-dashboard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -218,6 +227,12 @@ jobs:
         with:
           name: granularity-charts-dist
           path: packages/granularity-charts/dist
+
+      - name: Download granularity-dashboard dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
 
       - name: Test showcase
         run: yarn test:showcase
@@ -231,6 +246,7 @@ jobs:
       - build-unplugin-granularity
       - build-granularity-chrono
       - build-granularity-charts
+      - build-granularity-dashboard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -265,6 +281,12 @@ jobs:
         with:
           name: granularity-charts-dist
           path: packages/granularity-charts/dist
+
+      - name: Download granularity-dashboard dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
 
       - name: Install Playwright browsers
         working-directory: apps/showcase
@@ -297,6 +319,7 @@ jobs:
       - test-showcase
       - build-granularity-chrono
       - build-granularity-charts
+      - build-granularity-dashboard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -331,6 +354,12 @@ jobs:
         with:
           name: granularity-charts-dist
           path: packages/granularity-charts/dist
+
+      - name: Download granularity-dashboard dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
 
       - name: Build showcase
         run: yarn build:showcase
@@ -872,6 +901,156 @@ jobs:
 
       - name: Publish to GitHub Packages
         working-directory: packages/granularity-charts
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-granularity-dashboard:
+    needs:
+      - quality-granularity
+      - build-granularity
+      - build-unplugin-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Lint
+        working-directory: packages/granularity-dashboard
+        run: yarn lint
+
+      - name: Typecheck
+        working-directory: packages/granularity-dashboard
+        run: yarn typecheck
+
+      # Реестры сверяются с файловой системой до сборки: рассинхрон ломает не
+      # сборку, а tree-shaking, subpath-импорт и скан классов — молча.
+      - name: Registry drift
+        working-directory: packages/granularity-dashboard
+        run: yarn generate:registry --check
+
+      # Три локали обязаны совпадать по ключам: пропущенный перевод ничем не
+      # проявляется — компонент молча показывает английский fallback.
+      - name: Locale completeness
+        working-directory: packages/granularity-dashboard
+        run: yarn check:messages
+
+      - name: Test
+        working-directory: packages/granularity-dashboard
+        run: yarn test:run
+
+      - name: Build package
+        run: yarn workspace @feugene/granularity-dashboard build
+
+      - name: Granular doctor
+        working-directory: packages/granularity-dashboard
+        run: yarn doctor
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/granularity-dashboard
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist/
+
+  # Публикация @feugene/granularity-dashboard в npm по тегу вида
+  # `granularity-dashboard-v<semver>`. Отдельный тег позволяет релизить компаньон
+  # независимо от ядра: у него свой цикл и своя версия.
+  publish-npm-granularity-dashboard:
+    needs:
+      - build-granularity-dashboard
+    if: startsWith(github.ref, 'refs/tags/granularity-dashboard-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/granularity-dashboard
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#granularity-dashboard-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/granularity-dashboard
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория
+  # (`@efureev/granularity-dashboard`). Аналогично publish-gpr для granularity.
+  publish-gpr-granularity-dashboard:
+    needs:
+      - publish-npm-granularity-dashboard
+    if: startsWith(github.ref, 'refs/tags/granularity-dashboard-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/granularity-dashboard
+        run: |
+          npm pkg set name='@efureev/granularity-dashboard'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity-dashboard
         run: npm publish --ignore-scripts --no-provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
