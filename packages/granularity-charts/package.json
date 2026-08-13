@@ -56,6 +56,10 @@
       "types": "./dist/types/components/GrChartArea/index.d.ts",
       "import": "./dist/components/GrChartArea/index.js"
     },
+    "./components/GrChartBar": {
+      "types": "./dist/types/components/GrChartBar/index.d.ts",
+      "import": "./dist/components/GrChartBar/index.js"
+    },
     "./components/GrChartLine": {
       "types": "./dist/types/components/GrChartLine/index.d.ts",
       "import": "./dist/components/GrChartLine/index.js"

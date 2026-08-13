@@ -1,0 +1,372 @@
+<script setup lang="ts">
+import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
+import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
+import { computed, ref } from 'vue'
+
+import { barPath, barRect, groupSlots } from '../../chart/chartBars'
+import type { GrChartNumberFormat } from '../../chart/chartFormat'
+import { formatShare } from '../../chart/chartFormat'
+import type { Rect } from '../../chart/chartLayout'
+import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
+import { normalizeChartData } from '../../chart/chartModel'
+import type { GrChartScale, GrChartScaleKind } from '../../chart/chartScale'
+import type { ChartTickFormat } from '../../composables/useChartTicks'
+import type { GrChartActivePoint } from '../../composables/useChartTooltip'
+import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
+import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
+import {
+  barGapStroke,
+  barGapWidth,
+  barHoverFill,
+  DEFAULT_BAR_RADIUS,
+} from './grChartBarStyles'
+
+/**
+ * Столбцы: величины по категориям — рядом, стопкой или долями до ста процентов.
+ *
+ * Ось значений у столбцов **всегда** начинается от нуля: высота полосы это и
+ * есть величина, и обрезанная снизу ось врёт о ней в разы. У линии обрезать
+ * можно — она показывает изменение, а не величину.
+ */
+
+export interface GrChartBarProps {
+  /** Серии либо голый ряд чисел — тогда категорией становится порядковый номер. */
+  series: readonly GrChartSeries[] | readonly number[]
+  /** Тип оси X. Не задан — выводится из данных; для столбцов это обычно категории. */
+  xScale?: GrChartScaleKind
+  /** `true` — стопка, `'100%'` — стопка с нормировкой столбца к единице. */
+  stacked?: boolean | '100%'
+  /** Доля ширины слота, уходящая в зазор между сериями внутри категории. */
+  groupPadding?: number
+  /** Скругление дальнего от базовой линии конца полосы, пиксели. */
+  barRadius?: number
+  height?: number
+  /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
+  width?: number
+  yDomain?: readonly [number | null, number | null]
+  xTickCount?: number
+  yTickCount?: number
+  xTickFormat?: ChartTickFormat
+  yTickFormat?: (value: number) => string
+  valueFormat?: GrChartNumberFormat
+  showGrid?: 'both' | 'x' | 'y' | 'none'
+  showLegend?: boolean | 'auto'
+  legendPosition?: 'top' | 'bottom'
+  tooltip?: boolean
+  /** Скрытые серии по id — `v-model:hiddenSeries`. Скрытая серия из стопки выпадает. */
+  hiddenSeries?: readonly string[]
+  /** Курсор — `v-model:activeIndex`. Синхронизирует пару графиков. */
+  activeIndex?: number | null
+  loading?: boolean
+  empty?: boolean
+  emptyText?: string
+  dataTable?: 'hidden' | 'visible' | 'off'
+  /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
+  interactive?: boolean
+  size?: GrChartSize
+  locale?: string
+  ariaLabel?: string
+  ariaDescription?: string
+}
+
+export interface GrChartBarEmits {
+  (e: 'update:hiddenSeries', value: string[]): void
+  (e: 'update:activeIndex', value: number | null): void
+  (e: 'pointClick', value: GrChartActivePoint): void
+  (e: 'pointHover', value: GrChartActivePoint | null): void
+  (e: 'legendToggle', value: { seriesId: string, hidden: boolean }): void
+}
+
+const props = withDefaults(defineProps<GrChartBarProps>(), {
+  xScale: undefined,
+  stacked: false,
+  // Дефолты живут в резолверах: Vue подставил бы свой раньше, чем компонент
+  // заглянет в `GrConfigProvider`.
+  groupPadding: undefined,
+  barRadius: undefined,
+  height: undefined,
+  width: 640,
+  yDomain: undefined,
+  xTickCount: 6,
+  yTickCount: 5,
+  xTickFormat: undefined,
+  yTickFormat: undefined,
+  valueFormat: undefined,
+  showGrid: undefined,
+  showLegend: undefined,
+  legendPosition: undefined,
+  tooltip: undefined,
+  hiddenSeries: undefined,
+  activeIndex: undefined,
+  loading: false,
+  empty: undefined,
+  emptyText: undefined,
+  dataTable: undefined,
+  interactive: true,
+  size: undefined,
+  locale: undefined,
+  ariaLabel: undefined,
+  ariaDescription: undefined,
+})
+
+const emit = defineEmits<GrChartBarEmits>()
+
+defineSlots<{
+  tooltip?: (props: { active: GrChartActivePoint, formatValue: (value: number | null) => string }) => unknown
+  legend?: (props: { series: readonly NormalizedSeries[], toggle: (id: string) => void }) => unknown
+  empty?: () => unknown
+  header?: () => unknown
+}>()
+
+const { t, locale: i18nLocale } = useGranularityTranslations()
+
+const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { component: 'GrChartBar' })
+const resolvedHeight = useGrComponentProp('GrChartBar', 'height', () => props.height, 256)
+const resolvedRadius = useGrComponentProp('GrChartBar', 'barRadius', () => props.barRadius, DEFAULT_BAR_RADIUS)
+const resolvedGroupPadding = useGrComponentProp('GrChartBar', 'groupPadding', () => props.groupPadding, 0.1)
+const resolvedGrid = useGrComponentProp('GrChartBar', 'showGrid', () => props.showGrid, 'y' as const)
+const resolvedLegendMode = useGrComponentProp('GrChartBar', 'showLegend', () => props.showLegend, 'auto' as const)
+const resolvedLegendPosition = useGrComponentProp('GrChartBar', 'legendPosition', () => props.legendPosition, 'bottom' as const)
+const resolvedTooltip = useGrComponentProp('GrChartBar', 'tooltip', () => props.tooltip, true)
+const resolvedDataTable = useGrComponentProp('GrChartBar', 'dataTable', () => props.dataTable, 'hidden' as const)
+
+const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
+
+/** Скрытые серии приходят пропом, а флаг живёт на самой серии — сводим здесь. */
+const seriesInput = computed<readonly GrChartSeries[] | readonly number[]>(() => {
+  if (props.series.length > 0 && typeof props.series[0] === 'number')
+    return props.series as readonly number[]
+
+  const hidden = new Set(props.hiddenSeries ?? [])
+
+  return (props.series as readonly GrChartSeries[]).map(series => ({
+    ...series,
+    hidden: series.hidden === true || hidden.has(series.id),
+  }))
+})
+
+const data = computed(() => normalizeChartData(seriesInput.value, {
+  kind: props.xScale,
+  // Ноль включается всегда и не спрашивая: столбец, не начинающийся от нуля,
+  // врёт о своей величине — и врёт тем сильнее, чем уже диапазон.
+  includeZero: true,
+  yDomain: props.yDomain,
+  stacked: props.stacked,
+}))
+
+const isNormalized = computed(() => props.stacked === '100%')
+
+/** В режиме ста процентов ось показывает доли — иначе на ней стояли бы 0,2 и 0,4. */
+const yTickFormat = computed(() => (
+  props.yTickFormat ?? (isNormalized.value ? (value: number) => formatShare(value, resolvedLocale.value) : undefined)
+))
+
+const showLegend = computed(() => (
+  resolvedLegendMode.value === 'auto' ? data.value.series.length > 1 : resolvedLegendMode.value === true
+))
+
+/**
+ * Ширина категории.
+ *
+ * У непрерывной шкалы её нет вовсе (`bandwidth === 0`), а столбцы по датам —
+ * обычное дело: тогда ширина считается от числа позиций. Без этого график по
+ * оси времени рисовался бы полосами нулевой ширины, то есть ничем.
+ */
+function bandOf(xScale: GrChartScale, plot: Rect, count: number): number {
+  return xScale.bandwidth > 0 ? xScale.bandwidth : (plot.width / Math.max(1, count)) * 0.8
+}
+
+interface BarMark {
+  key: string
+  d: string
+  color: string
+  seriesId: string
+}
+
+/**
+ * Полосы всех видимых серий одним плоским списком.
+ *
+ * Скругляется только дальний от базовой линии конец, и в стопке — только у
+ * верхнего сегмента столбца: скругли каждый, и стопка распадётся на отдельные
+ * пилюли вместо одного целого.
+ */
+function barMarks(
+  series: readonly NormalizedSeries[],
+  xScale: GrChartScale,
+  yScale: GrChartScale,
+  plot: Rect,
+): BarMark[] {
+  const stacked = props.stacked !== false
+  const bandwidth = bandOf(xScale, plot, data.value.positions.length)
+  const slots = groupSlots(stacked ? 1 : series.length, bandwidth, { groupPadding: resolvedGroupPadding.value })
+  const baseline = Math.min(Math.max(yScale.scale(0), plot.y), plot.y + plot.height)
+  const top = topmostAt(series)
+  const marks: BarMark[] = []
+
+  series.forEach((item, seriesIndex) => {
+    const slot = slots[stacked ? 0 : seriesIndex]
+
+    if (!slot)
+      return
+
+    for (const point of item.points) {
+      if (point.y === null)
+        continue
+      if (stacked && point.stackTop === undefined)
+        continue
+
+      const from = stacked ? yScale.scale(point.stackBase!) : baseline
+      const to = stacked ? yScale.scale(point.stackTop!) : yScale.scale(point.y)
+      // Имя не `rounded`: гейт `styleTokens` ищет утилиту с тем же написанием.
+      const withRadius = !stacked || top.get(point.x) === item.id
+
+      marks.push({
+        key: `${item.id}-${point.sourceIndex}`,
+        d: barPath(barRect(xScale.scale(point.x), slot, from, to), withRadius ? resolvedRadius.value : 0, to <= from),
+        color: item.style.color,
+        seriesId: item.id,
+      })
+    }
+  })
+
+  return marks
+}
+
+/** Кто в каждой категории лежит сверху: только его сегмент получает скругление. */
+function topmostAt(series: readonly NormalizedSeries[]): Map<number, string> {
+  const top = new Map<number, string>()
+
+  for (const item of series) {
+    for (const point of item.points) {
+      if (point.y !== null)
+        top.set(point.x, item.id)
+    }
+  }
+
+  return top
+}
+
+interface BandHighlight {
+  x: number
+  width: number
+}
+
+/**
+ * Подсветка активной категории вместо вертикали.
+ *
+ * Вертикаль под точкой проходит сквозь полосу и читается как её граница —
+ * ровно то, чего у столбца быть не должно.
+ */
+function bandHighlight(
+  xScale: GrChartScale,
+  plot: Rect,
+  cursor: number | null,
+): BandHighlight[] {
+  const x = cursor === null ? undefined : data.value.positions[cursor]
+
+  if (x === undefined)
+    return []
+
+  const width = xScale.step > 0 ? xScale.step : bandOf(xScale, plot, data.value.positions.length)
+
+  return [{ x: xScale.scale(x) - width / 2, width }]
+}
+
+function onLegendToggle(payload: { seriesId: string, hidden: boolean }): void {
+  emit('legendToggle', payload)
+
+  const next = new Set(props.hiddenSeries ?? [])
+
+  if (payload.hidden)
+    next.add(payload.seriesId)
+  else
+    next.delete(payload.seriesId)
+
+  emit('update:hiddenSeries', [...next])
+}
+
+const frameEl = ref<InstanceType<typeof ChartFrame> | null>(null)
+
+defineExpose({
+  /** Корневой элемент — для замеров и скролла в потребителе. */
+  element: computed(() => (frameEl.value?.$el ?? null) as HTMLElement | null),
+})
+</script>
+
+<template>
+  <ChartFrame
+    ref="frameEl"
+    :data="data"
+    :height="resolvedHeight"
+    :width="width"
+    :size="resolvedSize"
+    :show-grid="resolvedGrid"
+    :show-legend="showLegend"
+    :legend-position="resolvedLegendPosition"
+    :tooltip="resolvedTooltip"
+    :crosshair="false"
+    :loading="loading"
+    :empty="empty"
+    :empty-text="emptyText"
+    :data-table="resolvedDataTable"
+    :interactive="interactive"
+    :active-index="activeIndex"
+    :locale="locale"
+    :aria-label="ariaLabel"
+    :aria-description="ariaDescription"
+    :role-description="stacked === '100%'
+      ? t('grCharts.bar.labelNormalized', 'Stacked bar chart, 100%')
+      : stacked
+        ? t('grCharts.bar.labelStacked', 'Stacked bar chart')
+        : t('grCharts.bar.label', 'Bar chart')"
+    :x-tick-count="xTickCount"
+    :y-tick-count="yTickCount"
+    :x-tick-format="xTickFormat"
+    :y-tick-format="yTickFormat"
+    :value-format="valueFormat"
+    data-gr-chart-bar
+    @update:active-index="value => emit('update:activeIndex', value)"
+    @point-click="value => emit('pointClick', value)"
+    @point-hover="value => emit('pointHover', value)"
+    @legend-toggle="onLegendToggle"
+  >
+    <template #header>
+<slot name="header" />
+</template>
+
+    <template #plot="{ plot, xScale: sx, yScale: sy, visibleSeries, activeIndex: cursor, clipPathId }">
+      <g :clip-path="`url(#${clipPathId})`" data-gr-chart-bar-body>
+        <rect
+          v-for="(band, index) in bandHighlight(sx, plot, cursor)"
+          :key="index"
+          data-gr-chart-bar-band
+          :x="band.x"
+          :y="plot.y"
+          :width="band.width"
+          :height="plot.height"
+          :fill="barHoverFill"
+        />
+
+        <path
+          v-for="mark in barMarks(visibleSeries, sx, sy, plot)"
+          :key="mark.key"
+          :data-gr-chart-bar-mark="mark.seriesId"
+          :d="mark.d"
+          :fill="mark.color"
+          :stroke="stacked !== false ? barGapStroke : 'none'"
+          :stroke-width="stacked !== false ? barGapWidth : undefined"
+        />
+      </g>
+    </template>
+
+    <template v-if="$slots.tooltip" #tooltip="scope">
+<slot name="tooltip" v-bind="scope" />
+</template>
+    <template v-if="$slots.legend" #legend="scope">
+<slot name="legend" v-bind="scope" />
+</template>
+    <template v-if="$slots.empty" #empty>
+<slot name="empty" />
+</template>
+  </ChartFrame>
+</template>

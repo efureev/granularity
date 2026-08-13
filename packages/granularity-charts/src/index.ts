@@ -1,5 +1,6 @@
 // <granularity:components> — блок генерируется `yarn generate:registry`
 export * from './components/GrChartArea'
+export * from './components/GrChartBar'
 export * from './components/GrChartLine'
 export * from './components/GrChartPie'
 export * from './components/GrSparkline'

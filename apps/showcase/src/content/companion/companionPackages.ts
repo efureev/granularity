@@ -104,6 +104,60 @@ function chartAreaApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
+/** Публичная поверхность столбцов: группировка, стопка и режим ста процентов. */
+function chartBarApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда категорией становится порядковый номер.' },
+        { name: 'stacked', type: `boolean | '100%'`, default: 'false', description: '`false` — серии стоят рядом внутри категории, `true` — стопкой, `\'100%\'` — стопкой с нормировкой столбца к единице: остаётся только структура, абсолютные числа уходят с оси.' },
+        { name: 'groupPadding', type: 'number', default: '0.1', description: 'Доля ширины слота, уходящая в зазор между сериями внутри категории. Центры полос при этом не двигаются.' },
+        { name: 'barRadius', type: 'number', default: '4', description: 'Скругление дальнего от базовой линии конца полосы в пикселях. Числом, а не токеном: радиус идёт в геометрию пути, а прочитать CSS-переменную из JS нечем.' },
+        { name: 'xScale', type: `'linear' | 'time' | 'band'`, description: 'Тип оси X. Не задан — выводится из данных. У непрерывной оси ширина полосы считается от числа позиций, иначе столбцы по датам вышли бы нулевой ширины.' },
+        { name: 'height', type: 'number', default: '256', description: 'Высота холста в пикселях. Раскладка обязана быть детерминированной до первого замера.' },
+        { name: 'width', type: 'number', default: '640', description: 'Объявленная ширина: от неё идёт серверный рендер, клиентская уточняется замером.' },
+        { name: 'yDomain', type: '[number | null, number | null]', description: 'Границы оси значений. Ноль включается всегда и без спроса: столбец от обрезанной оси врёт о величине.' },
+        { name: 'showGrid', type: `'both' | 'x' | 'y' | 'none'`, default: `'y'`, description: 'Какие линии сетки рисовать.' },
+        { name: 'showLegend / legendPosition', type: `boolean | 'auto' · 'top' | 'bottom'`, default: `'auto' · 'bottom'`, description: '`auto` — легенда появляется от второй серии.' },
+        { name: 'tooltip', type: 'boolean', default: 'true', description: 'Тултип от координаты указателя. Вместо вертикали подсвечивается вся категория: вертикаль прошла бы сквозь полосу и читалась бы как её граница.' },
+        { name: 'hiddenSeries', type: 'readonly string[]', description: '`v-model:hiddenSeries` — скрытые серии по id. Скрытая серия освобождает место оставшимся и выпадает из стопки.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — активная категория. Синхронизирует пару графиков.' },
+        { name: 'loading / empty / emptyText', type: 'boolean · boolean · string', description: 'Состояния.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Полные данные таблицей. Во всех режимах показывает исходное значение серии, а не долю и не сумму под сегментом.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку: `role="img"` с именем, без фокуса, тултипа и клавиатуры.' },
+        { name: 'valueFormat / xTickFormat / yTickFormat', type: 'GrChartNumberFormat · (value) => string', description: 'Форматирование значений и подписей делений. В режиме ста процентов ось сама подписывается долями.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:hiddenSeries', type: '(value: string[]) => void', description: 'Легенда переключила серию.' },
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Активная категория сменилась — указателем или клавиатурой.' },
+        { name: 'pointClick', type: '(value: GrChartActivePoint) => void', description: 'Клик или `Enter` на активной категории.' },
+        { name: 'pointHover', type: '(value: GrChartActivePoint | null) => void', description: 'Активная категория сменилась. `null` — курсор ушёл.' },
+        { name: 'legendToggle', type: '(value: { seriesId: string, hidden: boolean }) => void', description: 'Намерение скрыть или показать серию. Применяет его потребитель — состояние его.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active: GrChartActivePoint, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'legend', type: '{ series, toggle }', description: 'Своя легенда.' },
+        { name: 'empty', type: '—', description: 'Своё пустое состояние вместо `GrEmptyState`.' },
+        { name: 'header', type: '—', description: 'Строка над графиком: заголовок, действия.' },
+      ],
+    },
+  ]
+}
+
 function chartLineApiSections(): ShowcaseApiSectionMeta[] {
   return [
     {
@@ -605,6 +659,36 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: chartAreaApiSections(),
+      },
+      {
+        name: 'GrChartBar',
+        slug: 'gr-chart-bar',
+        title: 'GrChartBar',
+        summary: 'Величины по категориям — рядом, стопкой или долями до ста процентов. Ось всегда от нуля: высота полосы это и есть величина.',
+        importPath: '@feugene/granularity-charts/components/GrChartBar',
+        examples: [
+          {
+            id: 'charts-bar-basic',
+            title: 'How much, not where to',
+            description: 'Столбцы отвечают на вопрос «сколько», а не «куда движется»: величину читают высотой полосы. Поэтому ось у них всегда от нуля — обрежь её, и разница в три процента нарисуется разницей в три раза.',
+            previewKey: 'extra-charts-bar-basic',
+            note: 'Вместо вертикали под точкой подсвечивается вся категория: вертикаль прошла бы сквозь полосу и читалась бы как её граница.',
+          },
+          {
+            id: 'charts-bar-stacked',
+            title: 'Side by side, stacked, 100%',
+            description: 'Три режима одного набора — три разных вопроса. Рядом сравнивают сегменты между собой, стопка показывает целое и вклад, сто процентов — только структуру, когда абсолютные числа растут у всех сразу и потому ничего не объясняют.',
+            previewKey: 'extra-charts-bar-stacked',
+            note: 'Скругляется только верхний сегмент столбца: скругли каждый, и стопка распадётся на отдельные пилюли вместо одного целого.',
+          },
+          {
+            id: 'charts-bar-zero',
+            title: 'Below the axis',
+            description: 'Полоса вниз от нуля — это минус, а не «столбец пониже». Скругление переезжает на другой конец, и столбец остаётся приклеенным к оси, а не висит над ней.',
+            previewKey: 'extra-charts-bar-zero',
+          },
+        ],
+        apiSections: chartBarApiSections(),
       },
       {
         name: 'GrChartLine',

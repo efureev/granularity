@@ -13,6 +13,11 @@
     "axisX": "X axis",
     "axisY": "Y axis"
   },
+  "bar": {
+    "label": "Bar chart",
+    "labelStacked": "Stacked bar chart",
+    "labelNormalized": "Stacked bar chart, 100%"
+  },
   "area": {
     "label": "Area chart",
     "labelStacked": "Stacked area chart"

@@ -36,6 +36,9 @@ export {
   symbolPath,
 } from './chartPath'
 
+export type { BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
+export { barPath, barRect, groupSlots } from './chartBars'
+
 export type { ChartMark } from './chartMarks'
 export { activeSymbolMarks, symbolMarks, toPixelPoints, toStackBand } from './chartMarks'
 

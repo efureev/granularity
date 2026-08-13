@@ -15,6 +15,7 @@ declare module 'vue' {
     GrButton: typeof import('@feugene/granularity/components/GrButton')['GrButton']
     GrCalendar: typeof import('@feugene/granularity-chrono/components/GrCalendar')['GrCalendar']
     GrChartArea: typeof import('@feugene/granularity-charts/components/GrChartArea')['GrChartArea']
+    GrChartBar: typeof import('@feugene/granularity-charts/components/GrChartBar')['GrChartBar']
     GrChartLine: typeof import('@feugene/granularity-charts/components/GrChartLine')['GrChartLine']
     GrChartPie: typeof import('@feugene/granularity-charts/components/GrChartPie')['GrChartPie']
     GrDatePicker: typeof import('@feugene/granularity-chrono/components/GrDatePicker')['GrDatePicker']

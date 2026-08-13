@@ -9,6 +9,7 @@ import {
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grChartAreaConfig } from '../components/GrChartArea/config'
+import { grChartBarConfig } from '../components/GrChartBar/config'
 import { grChartLineConfig } from '../components/GrChartLine/config'
 import { grChartPieConfig } from '../components/GrChartPie/config'
 import { grSparklineConfig } from '../components/GrSparkline/config'
@@ -29,6 +30,7 @@ export const GRANULARITY_CHARTS_PROVIDER_ID = '@feugene/granularity-charts'
 export const granularityChartsComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrChartArea: grChartAreaConfig,
+  GrChartBar: grChartBarConfig,
   GrChartLine: grChartLineConfig,
   GrChartPie: grChartPieConfig,
   GrSparkline: grSparklineConfig,

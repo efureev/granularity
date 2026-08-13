@@ -13,6 +13,11 @@
     "axisX": "Eje X",
     "axisY": "Eje Y"
   },
+  "bar": {
+    "label": "Gráfico de barras",
+    "labelStacked": "Gráfico de barras apiladas",
+    "labelNormalized": "Gráfico de barras apiladas, 100%"
+  },
   "area": {
     "label": "Gráfico de áreas",
     "labelStacked": "Gráfico de áreas apiladas"

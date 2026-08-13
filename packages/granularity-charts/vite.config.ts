@@ -65,6 +65,9 @@ export default defineConfig({
         'components/GrChartArea/index': fileURLToPath(
           new URL('./src/components/GrChartArea/index.ts', import.meta.url),
         ),
+        'components/GrChartBar/index': fileURLToPath(
+          new URL('./src/components/GrChartBar/index.ts', import.meta.url),
+        ),
         'components/GrChartLine/index': fileURLToPath(
           new URL('./src/components/GrChartLine/index.ts', import.meta.url),
         ),

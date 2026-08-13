@@ -90,8 +90,12 @@ export interface NormalizeOptions {
   includeZero?: boolean
   /** Границы оси значений; `null` в любой позиции — считать эту сторону. */
   yDomain?: readonly [number | null, number | null]
-  /** Складывать серии по позиции: каждая полоса ложится на сумму предыдущих. */
-  stacked?: boolean
+  /**
+   * Складывать серии по позиции: каждая полоса ложится на сумму предыдущих.
+   * `'100%'` вдобавок нормирует столбец к единице — тогда ось показывает доли,
+   * а не величины.
+   */
+  stacked?: boolean | '100%'
 }
 
 export interface PadDomainOptions {
@@ -203,7 +207,7 @@ export function normalizeChartData(
   const positions = collectPositions(visible)
 
   if (options.stacked)
-    applyStack(visible)
+    applyStack(visible, options.stacked === '100%')
 
   // Ось стека считается по вершинам полос, а не по значениям: иначе верхняя
   // серия уходила бы за верхний край на сумму нижних.
@@ -230,7 +234,7 @@ export function normalizeChartData(
  * было. Отсюда практическое следствие, о котором стоит знать: у ряда с дырами
  * сумма в этом месте занижена, и стек честнее строить по полным рядам.
  */
-function applyStack(series: readonly NormalizedSeries[]): void {
+function applyStack(series: readonly NormalizedSeries[], normalize: boolean): void {
   const totals = new Map<number, number>()
 
   for (const item of series) {
@@ -244,6 +248,25 @@ function applyStack(series: readonly NormalizedSeries[]): void {
       point.stackBase = base
       point.stackTop = top
       totals.set(point.x, top)
+    }
+  }
+
+  if (!normalize)
+    return
+
+  // Второй проход, а не деление на лету: доля считается от **итога** столбца, а
+  // он известен только после того, как сложены все серии.
+  for (const item of series) {
+    for (const point of item.points) {
+      if (point.stackTop === undefined)
+        continue
+
+      const total = totals.get(point.x) ?? 0
+
+      // Пустой столбец нормировать не на что: рисовать в нём нечего, и деление
+      // на ноль дало бы `NaN` на всём графике.
+      point.stackBase = total > 0 ? point.stackBase! / total : 0
+      point.stackTop = total > 0 ? point.stackTop / total : 0
     }
   }
 }
@@ -407,7 +430,7 @@ function resolveYDomain(
   }
 
   // Стек всегда отсчитывается от нуля: полоса, висящая над осью, врёт о своей высоте.
-  const padded = padDomain(extent, { includeZero: options.includeZero || options.stacked })
+  const padded = padDomain(extent, { includeZero: options.includeZero || options.stacked !== undefined && options.stacked !== false })
 
   return [minOverride ?? padded[0], maxOverride ?? padded[1]]
 }

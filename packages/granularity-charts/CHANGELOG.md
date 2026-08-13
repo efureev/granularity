@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial package: charts drawn with design-system tokens, own SVG, zero runtime dependencies.
 - `GrChartLine` — line chart with axes, grid, legend, tooltip, empty and loading states, keyboard
   navigation over points and a screen-reader data table.
+- `GrChartBar` — bar chart: series side by side, stacked, or normalised to 100%; the value axis always starts at
+  zero, only the far end of a bar is rounded (and in a stack only its topmost segment), and the whole category is
+  highlighted on hover instead of a crosshair.
 - `GrChartArea` — area chart: fill down to the zero baseline (not the canvas bottom), per-series gradients
   anchored to the shape they fill, and `stacked` mode where each band sits on the sum of the ones below while
   the tooltip and data table keep reporting the series' own value.
@@ -20,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   screen-reader table of shares.
 - `GrSparkline` — frameless inline chart for table cells and stat tiles.
 - Chart arithmetic as pure modules (`@feugene/granularity-charts/chart`): data normalisation, linear/time/band
-  scales, nice-number ticks, path geometry, arc geometry, band geometry for stacks, mark placement, plot-area
-  layout, series discriminators.
+  scales, nice-number ticks, path geometry, arc geometry, band geometry for stacks, bar layout and rounded bar
+  paths, mark placement, plot-area layout, series discriminators.
 - Composables `useChartScale`, `useChartTicks`, `useChartTooltip`.
 - Three locales (`en`, `ru`, `es`) under the `grCharts` i18n block.
