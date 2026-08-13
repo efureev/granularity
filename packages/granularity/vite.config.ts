@@ -374,6 +374,14 @@ export default defineConfig({
         'testing': fileURLToPath(
           new URL('./src/testing/index.ts', import.meta.url),
         ),
+        // Композиция тем: сборочная часть тянет справочник токенов, рантайм —
+        // нет. Отсюда две entry, а не одна.
+        'theme': fileURLToPath(
+          new URL('./src/theme/index.ts', import.meta.url),
+        ),
+        'theme-apply': fileURLToPath(
+          new URL('./src/theme/apply.ts', import.meta.url),
+        ),
       },
       formats: ['es'],
       fileName: (_format, entryName) => `${entryName}.js`,

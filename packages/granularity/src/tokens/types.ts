@@ -57,5 +57,13 @@ export interface GrDerivedToken {
   section: string
   description: string
   formula: string
+  /**
+   * Слагаемые формулы отдельно от её текста: по ним пересчитывается фолбэк
+   * `@supports not (color-mix)` для темы, которой на момент сборки пакета не
+   * существовало (`extendTheme`).
+   */
+  base: string
+  amount: number
+  mixWith: string
   values: GrTokenValues
 }

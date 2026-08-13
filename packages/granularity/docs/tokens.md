@@ -349,12 +349,14 @@ floating-компоненты не выходят по построению (v-c
 | --- | --- | --- | --- |
 | `--gr-sidebar` | `#ffffff` | `#1e293b` | Фон sidebar/navigation rail области текущей темы. |
 | `--gr-sidebar-fg` | `#0f172a` | `#f8fafc` | Основной текст и иконки внутри sidebar. |
-| `--gr-sidebar-primary` | `#4f46e5` | `#6366f1` | Акцентный цвет активных/ключевых элементов внутри sidebar. |
+| `--gr-sidebar-primary` | `#4f46e5` | `#6365f0` | Акцентный цвет активных/ключевых элементов внутри sidebar. |
 | `--gr-sidebar-primary-fg` | `#ffffff` | `#ffffff` | Контрастный текст поверх sidebar primary-акцентов. |
 | `--gr-sidebar-accent` | `#f1f5f9` | `#334155` | Мягкий accent-фон для hover/selected состояний в sidebar. |
 | `--gr-sidebar-accent-fg` | `#1e293b` | `#f1f5f9` | Цвет текста поверх sidebar accent-подложек. |
 | `--gr-sidebar-brd` | `#e2e8f0` | `#334155` | Бордеры и разделители sidebar-области. |
 | `--gr-sidebar-ring` | `#6366f1` | `#818cf8` | Focus-ring для интерактивных элементов внутри sidebar. |
+
+> **`--gr-sidebar-primary` (dark).** Белый текст на #6366f1 даёт 4.47:1 — тот же недолёт AA, из-за которого перекрашен `--gr-primary` (заметка выше). Здесь взят минимальный шаг, снимающий недолёт без смены вида: 4.52:1 при ΔE 0.42 к прежнему цвету.
 
 ## Производные состояния
 

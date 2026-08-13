@@ -1,0 +1,122 @@
+import { extendTheme, tone } from '@feugene/granularity/theme'
+
+/**
+ * Поверхности темы — от них считается всё остальное. `tone` берёт отсюда фон,
+ * текст и карточку: больше ему ничего не нужно.
+ */
+const surfaces = {
+  '--gr-bg': '#041e2b',
+  '--gr-fg': '#e8f4fa',
+  '--gr-card': '#0a2f42',
+}
+
+/**
+ * Тема `ocean` — пример из `packages/granularity/docs/theming.md`.
+ *
+ * Объявляет ТОЛЬКО то, что отличается от тёмной темы пакета. Всё остальное —
+ * включая роли, которых на момент написания этой темы ещё не существовало, —
+ * приезжает из базы при сборке. Это и есть разница с прежним подходом: раньше
+ * здесь лежал CSS-файл на 90 ролей, и стоило пакету завести новую роль, как
+ * тема тихо отставала (ровно так она и отстала на 28 ролях `-solid*`).
+ *
+ * Тема тёмная, поэтому действует конвенция тёмной темы пакета: заливка тоном
+ * СВЕТЛЕЕ фона, а текст на ней (`-fg`) — тёмный.
+ *
+ * Контраст и различимость тонов проверяет сам `extendTheme` — сборка падает,
+ * если тема не читается.
+ */
+export const ocean = extendTheme({
+  name: 'ocean',
+  base: 'dark',
+  tokens: {
+    // Поверхности.
+    ...surfaces,
+    '--gr-card-fg': '#e8f4fa',
+    '--gr-popover': '#0a2f42',
+    '--gr-popover-fg': '#e8f4fa',
+    '--gr-muted': '#123f56',
+    // Вторичный текст живёт на `--gr-muted`/`--gr-secondary`, а не на фоне
+    // страницы, и выверен по самому светлому из них (ловушка №1).
+    '--gr-muted-fg': '#a8c4d4',
+    '--gr-secondary': '#123f56',
+    '--gr-secondary-fg': '#e8f4fa',
+    '--gr-brd': '#1c5470',
+    '--gr-input': '#1c5470',
+    '--gr-ring': '#38bdf8',
+    // Подложка модальных слоёв: тон фона темы, а не нейтральный чёрный.
+    '--gr-overlay-bg': 'rgb(4 30 43 / 0.6)',
+
+    // Состояния. Недоступный контрол гасится поверхностью, а не прозрачностью.
+    '--gr-disabled-bg': '#0d3446',
+    '--gr-disabled-fg': '#6d8fa3',
+    '--gr-disabled-brd': '#17475f',
+    '--gr-invalid-brd': 'var(--gr-danger)',
+    '--gr-invalid-ring': 'var(--gr-danger)',
+    '--gr-invalid-text': 'var(--gr-danger-text)',
+
+    // Тона.
+    '--gr-primary': '#4fd1e0',
+    '--gr-primary-fg': '#041e2b',
+    '--gr-primary-text': '#7fdfea',
+    '--gr-accent': '#0d3a52',
+    '--gr-accent-fg': '#a5e4f2',
+    '--gr-success': '#45d6a3',
+    '--gr-success-light': '#06463a',
+    '--gr-success-fg': '#041e2b',
+    '--gr-success-text': '#7ee7c0',
+    '--gr-warning': '#fbbf24',
+    '--gr-warning-light': '#5a3608',
+    '--gr-warning-fg': '#041e2b',
+    '--gr-warning-text': '#fcd34d',
+    '--gr-danger': '#fb8a8a',
+    '--gr-danger-light': '#5f1a1a',
+    '--gr-danger-fg': '#041e2b',
+    '--gr-danger-text': '#fcb0b0',
+    '--gr-info': '#7dd3fc',
+    '--gr-info-light': '#0b3f5c',
+    '--gr-info-fg': '#041e2b',
+    '--gr-info-text': '#bae6fd',
+    '--gr-slate': '#9db4c4',
+    '--gr-slate-light': '#17364a',
+    '--gr-slate-fg': '#041e2b',
+    '--gr-slate-text': '#cbdae4',
+    // Azure показывает второй путь: семья ролей выводится из одного цвета и
+    // проверяется на контраст, вместо того чтобы подбирать четыре значения
+    // руками. Роли `-solid*` при этом появляются сами — а раньше их тут не было
+    // вовсе, и они молча приезжали от светлой темы.
+    ...tone('azure', '#38bdf8', { base: surfaces }),
+
+    // Графики.
+    '--gr-chart-1': '#4fd1e0',
+    '--gr-chart-2': '#45d6a3',
+    '--gr-chart-3': '#fbbf24',
+    '--gr-chart-4': '#7dd3fc',
+    '--gr-chart-5': '#c4b5fd',
+
+    // Сайдбар.
+    '--gr-sidebar': '#072634',
+    '--gr-sidebar-fg': '#e8f4fa',
+    '--gr-sidebar-primary': '#4fd1e0',
+    '--gr-sidebar-primary-fg': '#041e2b',
+    '--gr-sidebar-accent': '#123f56',
+    '--gr-sidebar-accent-fg': '#e8f4fa',
+    '--gr-sidebar-brd': '#1c5470',
+    '--gr-sidebar-ring': '#38bdf8',
+  },
+
+  // Кнопки красятся своим слоем: между темами он не наследуется.
+  componentTokens: {
+    '--gr-button-primary-bg': 'var(--gr-primary)',
+    '--gr-button-primary-bg-hover': 'var(--gr-primary-hover)',
+    '--gr-button-primary-bg-active': 'var(--gr-primary-active)',
+    '--gr-button-primary-fg': 'var(--gr-primary-fg)',
+    '--gr-button-success-bg': 'var(--gr-success)',
+    '--gr-button-success-bg-hover': 'var(--gr-success-hover)',
+    '--gr-button-success-bg-active': 'var(--gr-success-active)',
+    '--gr-button-success-fg': 'var(--gr-success-fg)',
+    '--gr-button-warning-bg': 'var(--gr-warning)',
+    '--gr-button-warning-bg-hover': 'var(--gr-warning-hover)',
+    '--gr-button-warning-bg-active': 'var(--gr-warning-active)',
+    '--gr-button-warning-fg': 'var(--gr-warning-fg)',
+  },
+})

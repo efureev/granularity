@@ -3,6 +3,8 @@ import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { mixSrgb } from '../src/theme/color.ts'
+
 /**
  * Генерация токенов из данных.
  *
@@ -47,36 +49,8 @@ const GENERATED_BANNER_TS
 
 // --- цвет ------------------------------------------------------------------
 
-function parseHex(value) {
-  const match = value.trim().match(/^#([\da-f]{3}|[\da-f]{6})$/i)
-  if (!match)
-    return null
-
-  const hex = match[1].length === 3
-    ? match[1].split('').map(char => char + char).join('')
-    : match[1]
-
-  return [0, 2, 4].map(offset => Number.parseInt(hex.slice(offset, offset + 2), 16))
-}
-
-function toHex(channels) {
-  return `#${channels.map(channel => Math.round(channel).toString(16).padStart(2, '0')).join('')}`
-}
-
-/**
- * `color-mix(in srgb, base <amount>%, other)` для непрозрачных цветов — это
- * линейная интерполяция в gamma-кодированном sRGB, то есть ровно то же, что
- * делает браузер. Поэтому вычисленный фолбэк совпадает с живым `color-mix`.
- */
-function mixSrgb(baseHex, otherHex, amount) {
-  const base = parseHex(baseHex)
-  const other = parseHex(otherHex)
-  if (!base || !other)
-    throw new Error(`фолбэк считается только из hex-значений, получено: ${baseHex} / ${otherHex}`)
-
-  const ratio = amount / 100
-  return toHex(base.map((channel, index) => channel * ratio + other[index] * (1 - ratio)))
-}
+// Математика общая с `extendTheme` и гейтами контраста — расходиться ей нельзя.
+// Отсюда и запуск скрипта: `node --experimental-strip-types` (см. package.json).
 
 // --- чтение данных ---------------------------------------------------------
 
@@ -239,6 +213,9 @@ function renderTs({ foundation, derived, themes, components }) {
     section: group.title,
     description: token.description,
     formula: `color-mix(in srgb, var(${token.base}) ${token.amount}%, var(${token.mixWith}))`,
+    base: token.base,
+    amount: token.amount,
+    mixWith: token.mixWith,
     values: Object.fromEntries(themes.map(theme => [
       theme.name,
       mixSrgb(themeValueOf(theme, token.base), themeValueOf(theme, token.mixWith), token.amount),

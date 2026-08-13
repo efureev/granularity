@@ -592,6 +592,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: action roles",
     "description": "Hover-состояние primary action: подмес `--gr-fg` 8% в `--gr-primary`.",
     "formula": "color-mix(in srgb, var(--gr-primary) 92%, var(--gr-fg))",
+    "base": "--gr-primary",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#4a42d6",
       "dark": "#a494fa"
@@ -602,6 +605,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: action roles",
     "description": "Active-состояние primary action: подмес `--gr-fg` 16% в `--gr-primary`.",
     "formula": "color-mix(in srgb, var(--gr-primary) 84%, var(--gr-fg))",
+    "base": "--gr-primary",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#453ec7",
       "dark": "#ac9dfa"
@@ -612,6 +618,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: action roles",
     "description": "Hover-состояние secondary action: подмес `--gr-fg` 8% в `--gr-secondary`.",
     "formula": "color-mix(in srgb, var(--gr-secondary) 92%, var(--gr-fg))",
+    "base": "--gr-secondary",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#d1d7e0",
       "dark": "#435062"
@@ -622,6 +631,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: action roles",
     "description": "Active-состояние secondary action: подмес `--gr-fg` 16% в `--gr-secondary`.",
     "formula": "color-mix(in srgb, var(--gr-secondary) 84%, var(--gr-fg))",
+    "base": "--gr-secondary",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#c0c7d0",
       "dark": "#535f70"
@@ -632,6 +644,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: action roles",
     "description": "Hover-состояние бордеров и outline-элементов: подмес `--gr-fg` 30% в `--gr-brd`.",
     "formula": "color-mix(in srgb, var(--gr-brd) 70%, var(--gr-fg))",
+    "base": "--gr-brd",
+    "amount": 70,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#a3a9b5",
       "dark": "#6e7987"
@@ -642,6 +657,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: action roles",
     "description": "Active-состояние бордеров и outline-элементов: подмес `--gr-fg` 45% в `--gr-brd`.",
     "formula": "color-mix(in srgb, var(--gr-brd) 55%, var(--gr-fg))",
+    "base": "--gr-brd",
+    "amount": 55,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#838a97",
       "dark": "#8c94a0"
@@ -652,6 +670,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`.",
     "formula": "color-mix(in srgb, var(--gr-success) 92%, var(--gr-fg))",
+    "base": "--gr-success",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#10ac7a",
       "dark": "#44d6a1"
@@ -662,6 +683,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Active-состояние success-ролей: подмес `--gr-fg` 16% в `--gr-success`.",
     "formula": "color-mix(in srgb, var(--gr-success) 84%, var(--gr-fg))",
+    "base": "--gr-success",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#109f73",
       "dark": "#53d9a9"
@@ -672,6 +696,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние warning-ролей: подмес `--gr-fg` 8% в `--gr-warning`.",
     "formula": "color-mix(in srgb, var(--gr-warning) 92%, var(--gr-fg))",
+    "base": "--gr-warning",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#e66c18",
       "dark": "#fb9a4b"
@@ -682,6 +709,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Active-состояние warning-ролей: подмес `--gr-fg` 16% в `--gr-warning`.",
     "formula": "color-mix(in srgb, var(--gr-warning) 84%, var(--gr-fg))",
+    "base": "--gr-warning",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#d46419",
       "dark": "#fba35b"
@@ -692,6 +722,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние danger-ролей: подмес `--gr-fg` 8% в `--gr-danger`.",
     "formula": "color-mix(in srgb, var(--gr-danger) 92%, var(--gr-fg))",
+    "base": "--gr-danger",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#cc2526",
       "dark": "#f87c7c"
@@ -702,6 +735,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Active-состояние danger-ролей: подмес `--gr-fg` 16% в `--gr-danger`.",
     "formula": "color-mix(in srgb, var(--gr-danger) 84%, var(--gr-fg))",
+    "base": "--gr-danger",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#bb2427",
       "dark": "#f88787"
@@ -712,6 +748,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние info-ролей: подмес `--gr-fg` 8% в `--gr-info`.",
     "formula": "color-mix(in srgb, var(--gr-info) 92%, var(--gr-fg))",
+    "base": "--gr-info",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#235ddc",
       "dark": "#6cacfa"
@@ -722,6 +761,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Active-состояние info-ролей: подмес `--gr-fg` 16% в `--gr-info`.",
     "formula": "color-mix(in srgb, var(--gr-info) 84%, var(--gr-fg))",
+    "base": "--gr-info",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#2157cc",
       "dark": "#78b3fa"
@@ -732,6 +774,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние slate-ролей: подмес `--gr-fg` 8% в `--gr-slate`.",
     "formula": "color-mix(in srgb, var(--gr-slate) 92%, var(--gr-fg))",
+    "base": "--gr-slate",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#435064",
       "dark": "#9caabd"
@@ -742,6 +787,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Active-состояние slate-ролей: подмес `--gr-fg` 16% в `--gr-slate`.",
     "formula": "color-mix(in srgb, var(--gr-slate) 84%, var(--gr-fg))",
+    "base": "--gr-slate",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#3e4b5f",
       "dark": "#a4b1c3"
@@ -752,6 +800,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Hover-состояние azure-ролей: подмес `--gr-fg` 8% в `--gr-azure`.",
     "formula": "color-mix(in srgb, var(--gr-azure) 92%, var(--gr-fg))",
+    "base": "--gr-azure",
+    "amount": 92,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#016fab",
       "dark": "#47c2f8"
@@ -762,6 +813,9 @@ export const grDerivedTokens: GrDerivedToken[] = [
     "section": "Derived interaction formulas: status roles",
     "description": "Active-состояние azure-ролей: подмес `--gr-fg` 16% в `--gr-azure`.",
     "formula": "color-mix(in srgb, var(--gr-azure) 84%, var(--gr-fg))",
+    "base": "--gr-azure",
+    "amount": 84,
+    "mixWith": "--gr-fg",
     "values": {
       "light": "#0268a0",
       "dark": "#57c7f9"
@@ -1532,7 +1586,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Акцентный цвет активных/ключевых элементов внутри sidebar.",
     "values": {
       "light": "#4f46e5",
-      "dark": "#6366f1"
+      "dark": "#6365f0"
     }
   },
   {

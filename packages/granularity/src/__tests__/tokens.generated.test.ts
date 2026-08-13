@@ -25,7 +25,9 @@ function readCss(relativePath: string): string {
 describe('токены как данные', () => {
   it('сгенерированные файлы совпадают с `tokens/*.json`', () => {
     expect(() => {
-      execFileSync('node', ['scripts/generate-tokens.mjs', '--check'], {
+      // Флаг, а не голый `node`: генератор берёт цветовую математику из
+      // `src/theme/color.ts`, а Node 22 из матрицы CI стрипает типы только по нему.
+      execFileSync('node', ['--experimental-strip-types', 'scripts/generate-tokens.mjs', '--check'], {
         cwd: pkgDir,
         stdio: 'pipe',
       })

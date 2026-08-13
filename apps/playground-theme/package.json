@@ -18,6 +18,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "generate:theme": "node scripts/generate-theme.mjs",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
     "test:run": "vitest run --config vitest.config.ts"

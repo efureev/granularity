@@ -7,5 +7,6 @@ junit-report.xml
 .eslintcache
 .DS_Store
 
-# Локальные разрешения Claude Code — машинозависимые, не коммитятся
-.claude/settings.local.json
+/.claude/
+/CLAUDE.md
+/docs/

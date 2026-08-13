@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { contrast, deltaE, luminance, parseHex, type Rgb } from '../theme/color'
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов.
@@ -78,20 +79,15 @@ function splitTopLevel(input: string): string[] {
   return parts
 }
 
+/**
+ * Цвет здесь — тройка каналов, а математика общая с темами (`src/theme/color.ts`):
+ * контраст, ΔE и подмес обязаны считаться одинаково у гейтов, у генератора
+ * токенов и у `extendTheme`, иначе «проверено» и «сгенерировано» разъедутся.
+ */
 function hexToRgb(hex: string): RgbColor {
-  let value = hex.trim().slice(1)
+  const [r, g, b] = parseHex(hex)
 
-  if (value.length === 3) {
-    value = value.split('').map(char => char + char).join('')
-  }
-
-  const numeric = Number.parseInt(value, 16)
-
-  return {
-    r: (numeric >> 16) & 255,
-    g: (numeric >> 8) & 255,
-    b: numeric & 255,
-  }
+  return { r, g, b }
 }
 
 function mixColors(left: RgbColor, right: RgbColor, leftAmount: number): RgbColor {
@@ -100,6 +96,20 @@ function mixColors(left: RgbColor, right: RgbColor, leftAmount: number): RgbColo
     g: left.g * leftAmount + right.g * (1 - leftAmount),
     b: left.b * leftAmount + right.b * (1 - leftAmount),
   }
+}
+
+const channelsOf = (color: RgbColor): Rgb => [color.r, color.g, color.b]
+
+export function getLuminance(color: RgbColor): number {
+  return luminance(channelsOf(color))
+}
+
+export function getContrastRatio(foreground: RgbColor, background: RgbColor): number {
+  return contrast(channelsOf(foreground), channelsOf(background))
+}
+
+export function getColorDistance(first: RgbColor, second: RgbColor): number {
+  return deltaE(channelsOf(first), channelsOf(second))
 }
 
 /**
@@ -155,53 +165,6 @@ export function resolveColorExpression(
   }
 
   throw new Error(`Unsupported color expression: ${value}`)
-}
-
-export function getLuminance(color: RgbColor): number {
-  const [red, green, blue] = [color.r, color.g, color.b].map((channel) => {
-    const normalized = channel / 255
-    return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
-  })
-
-  return 0.2126 * red + 0.7152 * green + 0.0722 * blue
-}
-
-export function getContrastRatio(foreground: RgbColor, background: RgbColor): number {
-  const first = getLuminance(foreground)
-  const second = getLuminance(background)
-  const [lighter, darker] = first > second ? [first, second] : [second, first]
-
-  return (lighter + 0.05) / (darker + 0.05)
-}
-
-function toLab(color: RgbColor): [number, number, number] {
-  const [red, green, blue] = [color.r, color.g, color.b].map((channel) => {
-    const normalized = channel / 255
-    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
-  })
-
-  // sRGB → XYZ (D65) → Lab, точки белого из CIE.
-  const x = (red * 0.4124 + green * 0.3576 + blue * 0.1805) / 0.95047
-  const y = red * 0.2126 + green * 0.7152 + blue * 0.0722
-  const z = (red * 0.0193 + green * 0.1192 + blue * 0.9505) / 1.08883
-
-  const f = (value: number): number => (value > 0.008856 ? value ** (1 / 3) : 7.787 * value + 16 / 116)
-  const [fx, fy, fz] = [f(x), f(y), f(z)]
-
-  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)]
-}
-
-/**
- * Воспринимаемое расстояние между цветами (ΔE, CIE76).
- *
- * Контраст отвечает на вопрос «читается ли текст», а этот — на вопрос
- * «различит ли человек два тона рядом». Порог заметности около 2.3; всё, что
- * ниже, для глаза один цвет, каким бы разным ни выглядел hex.
- */
-export function getColorDistance(first: RgbColor, second: RgbColor): number {
-  const [firstLab, secondLab] = [toLab(first), toLab(second)]
-
-  return Math.hypot(...firstLab.map((value, index) => value - secondLab[index]))
 }
 
 /**

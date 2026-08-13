@@ -452,6 +452,16 @@
       "import": "./dist/testing.js",
       "default": "./dist/testing.js"
     },
+    "./theme": {
+      "types": "./dist/types/src/theme/index.d.ts",
+      "import": "./dist/theme.js",
+      "default": "./dist/theme.js"
+    },
+    "./theme/apply": {
+      "types": "./dist/types/src/theme/apply.d.ts",
+      "import": "./dist/theme-apply.js",
+      "default": "./dist/theme-apply.js"
+    },
     "./tokens/*.json": "./tokens/*.json"
   },
   "peerDependencies": {
@@ -497,7 +507,7 @@
     "dev": "vite build --watch",
     "doctor": "granular doctor ./granular.options.mjs --strict",
     "generate:registry": "node scripts/generate-registry.mjs",
-    "generate:tokens": "node scripts/generate-tokens.mjs",
+    "generate:tokens": "node --experimental-strip-types scripts/generate-tokens.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
     "test": "vitest --config vitest.config.ts",

@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Theme composition: `@feugene/granularity/theme`.** A custom theme used to mean writing out all
+  90 semantic roles by hand, because a role you leave out does not fall back to *your* base — it
+  inherits from `:root`, which is the light theme. A dark theme with one forgotten role gets a bright
+  patch, and nothing catches it until a user does. Worse, themes rot: the package adds a role, your
+  theme silently stays behind (our own sample theme was 28 roles behind before this change).
+
+  `extendTheme({ name, base, tokens })` builds the full set from the package's own token data: you
+  declare only what differs, everything else comes from `light`, `dark` or another custom theme, and
+  roles added later arrive on the next build. It also emits the `@supports not (color-mix)` fallback
+  computed from **your** colours — a hand-written theme has none, so such browsers used to fall back
+  to the light theme's hover/active values.
+
+  `tone('success', '#3ddc97', { base })` derives a whole tone family (`-fg`, `-solid`, `-solid-fg`,
+  `-light`, `-text`) by the rules in `docs/theming.md`, checking every contrast threshold on the way
+  and throwing — with the role name and the ratio it reached — rather than handing back something
+  unreadable. `validateTheme` checks WCAG contrast and tone distinguishability (ΔE); `extendTheme`
+  runs it and fails the build, unless `validate: false`.
+
+  Runtime application lives at `@feugene/granularity/theme/apply` (`applyTheme(css)`), a separate
+  subpath that pulls in no token data — themes that only exist in the browser (a theme editor, user
+  settings) should not cost the app a token reference. Docs: `docs/theming.md`.
+
 - **Test utilities: `@feugene/granularity/testing`.** Testing a UI kit means fighting the same jsdom
   gaps in every file — and the package's own suite had seven verbatim copies of one pointer helper,
   eleven hand-written `getBoundingClientRect` mocks and nine copies of a live-region reader. The new

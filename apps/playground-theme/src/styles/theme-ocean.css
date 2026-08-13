@@ -1,19 +1,5 @@
-/*
- * Тема `ocean` — пример из `packages/granularity/docs/theming.md`.
- *
- * Объявляет ТОЛЬКО семантические роли. Примитивы (`--gr-space-*`, `--gr-radius-*`,
- * `--gr-text-*`, `--gr-z-*`) от темы не зависят, а производные состояния
- * (`--gr-primary-hover` и т. п.) выведены формулой `color-mix` от ролей ниже и
- * подстроятся сами.
- *
- * Полнота набора и контраст проверяются тестом `src/__tests__/theme.test.ts` —
- * он же служит образцом такой проверки для приложения.
- *
- * Тема тёмная, поэтому действует конвенция тёмной темы пакета: заливка тоном
- * СВЕТЛЕЕ фона, а текст на ней (`-fg`) — тёмный.
- */
+/* Тема "ocean" собрана `extendTheme` из @feugene/granularity/theme. */
 [data-theme='ocean'] {
-  /* Surface roles */
   --gr-bg: #041e2b;
   --gr-fg: #e8f4fa;
   --gr-card: #0a2f42;
@@ -21,46 +7,27 @@
   --gr-popover: #0a2f42;
   --gr-popover-fg: #e8f4fa;
   --gr-muted: #123f56;
-  /*
-   * Вторичный текст живёт не на `--gr-bg`, а на `--gr-muted`/`--gr-secondary` —
-   * в чипах, таблицах и панелях. Значение выверено по самому светлому из этих
-   * фонов, а не по фону страницы (ловушка №1 из docs/theming.md).
-   */
   --gr-muted-fg: #a8c4d4;
   --gr-secondary: #123f56;
   --gr-secondary-fg: #e8f4fa;
+  --gr-overlay-bg: rgb(4 30 43 / 0.6);
   --gr-brd: #1c5470;
   --gr-input: #1c5470;
   --gr-ring: #38bdf8;
-  /* Подложка модальных слоёв: тон фона темы, а не нейтральный чёрный. */
-  --gr-overlay-bg: rgb(4 30 43 / 0.6);
-
-  /*
-   * State roles.
-   *
-   * Недоступный контрол гасится поверхностью, а не прозрачностью: `opacity`
-   * разбавляет выверенные на AA токены текста. Ошибка валидации по умолчанию
-   * совпадает с danger-тоном, но объявлена отдельно — тема вправе развести
-   * вердикт валидации и декоративную подсветку.
-   */
   --gr-disabled-bg: #0d3446;
   --gr-disabled-fg: #6d8fa3;
   --gr-disabled-brd: #17475f;
   --gr-invalid-brd: var(--gr-danger);
   --gr-invalid-ring: var(--gr-danger);
   --gr-invalid-text: var(--gr-danger-text);
-
-  /* Action roles */
   --gr-primary: #4fd1e0;
   --gr-primary-fg: #041e2b;
-  --gr-primary-text: #7fdfea;
   --gr-accent: #0d3a52;
   --gr-accent-fg: #a5e4f2;
-
-  /* Status roles */
   --gr-success: #45d6a3;
   --gr-success-light: #06463a;
   --gr-success-fg: #041e2b;
+  --gr-primary-text: #7fdfea;
   --gr-success-text: #7ee7c0;
   --gr-warning: #fbbf24;
   --gr-warning-light: #5a3608;
@@ -79,18 +46,42 @@
   --gr-slate-fg: #041e2b;
   --gr-slate-text: #cbdae4;
   --gr-azure: #38bdf8;
-  --gr-azure-light: #0b3f5c;
+  --gr-azure-light: #144e6a;
   --gr-azure-fg: #041e2b;
-  --gr-azure-text: #bae6fd;
-
-  /* Data visualization roles */
+  --gr-azure-text: #4dc4f8;
+  --gr-primary-solid: #595ce6;
+  --gr-primary-solid-hover: #5053dd;
+  --gr-primary-solid-active: #474acf;
+  --gr-primary-solid-fg: var(--gr-slate-0);
+  --gr-success-solid: #047857;
+  --gr-success-solid-hover: #036c4d;
+  --gr-success-solid-active: #025f44;
+  --gr-success-solid-fg: var(--gr-slate-50);
+  --gr-warning-solid: #c2410c;
+  --gr-warning-solid-hover: #b53b0a;
+  --gr-warning-solid-active: #9f3307;
+  --gr-warning-solid-fg: var(--gr-slate-50);
+  --gr-danger-solid: #b91c1c;
+  --gr-danger-solid-hover: #a91919;
+  --gr-danger-solid-active: #931515;
+  --gr-danger-solid-fg: var(--gr-slate-50);
+  --gr-info-solid: #1d4ed8;
+  --gr-info-solid-hover: #1e40af;
+  --gr-info-solid-active: #1e3a8a;
+  --gr-info-solid-fg: var(--gr-slate-50);
+  --gr-slate-solid: var(--gr-slate-600);
+  --gr-slate-solid-hover: var(--gr-slate-700);
+  --gr-slate-solid-active: var(--gr-slate-800);
+  --gr-slate-solid-fg: var(--gr-slate-50);
+  --gr-azure-solid: #38bdf8;
+  --gr-azure-solid-hover: #075985;
+  --gr-azure-solid-active: #0c4a6e;
+  --gr-azure-solid-fg: #041e2b;
   --gr-chart-1: #4fd1e0;
   --gr-chart-2: #45d6a3;
   --gr-chart-3: #fbbf24;
   --gr-chart-4: #7dd3fc;
   --gr-chart-5: #c4b5fd;
-
-  /* Navigation roles */
   --gr-sidebar: #072634;
   --gr-sidebar-fg: #e8f4fa;
   --gr-sidebar-primary: #4fd1e0;
@@ -100,12 +91,7 @@
   --gr-sidebar-brd: #1c5470;
   --gr-sidebar-ring: #38bdf8;
 
-  /*
-   * Покомпонентные токены: `GrButton` заливается СОБСТВЕННЫМ тоном, а не
-   * глобальным `--gr-success`, поэтому смена палитры до кнопок сама не доедет
-   * (см. docs/theming.md → «Что тема может не покрыть»). Переопределяем то, что
-   * иначе осталось бы в цветах пакета.
-   */
+  /* Покомпонентные токены темы. */
   --gr-button-primary-bg: var(--gr-primary);
   --gr-button-primary-bg-hover: var(--gr-primary-hover);
   --gr-button-primary-bg-active: var(--gr-primary-active);
@@ -118,4 +104,27 @@
   --gr-button-warning-bg-hover: var(--gr-warning-hover);
   --gr-button-warning-bg-active: var(--gr-warning-active);
   --gr-button-warning-fg: var(--gr-warning-fg);
+}
+
+@supports not (color: color-mix(in srgb, #000 50%, #fff)) {
+  [data-theme='ocean'] {
+    --gr-primary-hover: #5bd4e2;
+    --gr-primary-active: #67d7e4;
+    --gr-secondary-hover: #234d63;
+    --gr-secondary-active: #345c70;
+    --gr-brd-hover: #598499;
+    --gr-brd-active: #789cae;
+    --gr-success-hover: #52d8aa;
+    --gr-success-active: #5fdbb1;
+    --gr-warning-hover: #f9c335;
+    --gr-warning-active: #f8c746;
+    --gr-danger-hover: #f99293;
+    --gr-danger-active: #f89b9c;
+    --gr-info-hover: #86d6fc;
+    --gr-info-active: #8ed8fc;
+    --gr-slate-hover: #a3b9c8;
+    --gr-slate-active: #a9becd;
+    --gr-azure-hover: #46c1f8;
+    --gr-azure-active: #54c6f8;
+  }
 }

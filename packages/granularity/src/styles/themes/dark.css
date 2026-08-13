@@ -138,7 +138,12 @@
   /* Navigation roles */
   --gr-sidebar: #1e293b;
   --gr-sidebar-fg: #f8fafc;
-  --gr-sidebar-primary: #6366f1;
+  /*
+   * Белый текст на #6366f1 даёт 4.47:1 — тот же недолёт AA, из-за которого
+   * перекрашен `--gr-primary` (заметка выше). Здесь взят минимальный шаг, снимающий
+   * недолёт без смены вида: 4.52:1 при ΔE 0.42 к прежнему цвету.
+   */
+  --gr-sidebar-primary: #6365f0;
   --gr-sidebar-primary-fg: #ffffff;
   --gr-sidebar-accent: #334155;
   --gr-sidebar-accent-fg: #f1f5f9;

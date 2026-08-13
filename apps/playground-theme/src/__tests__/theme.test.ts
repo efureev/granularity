@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
@@ -7,11 +8,16 @@ import { grThemeTokens } from '@feugene/granularity/tokens'
 
 /**
  * Проверка кастомной темы — ровно та, что описана в
- * `packages/granularity/docs/theming.md`, раздел «Проверка перед выкладкой».
+ * `packages/granularity/docs/theming.md`.
  *
- * Смысл приложения: показать, что тема проверяема автоматически. Полнота
- * набора берётся из данных пакета, контраст считается по WCAG — обе проверки
- * не зависят от того, сколько ролей появится в пакете завтра.
+ * Тема собрана `extendTheme` (`theme.config.mjs`), поэтому полнота набора здесь
+ * больше не проверяется: она обеспечена построением, а не бдительностью. Взамен
+ * проверяется, что собранный файл не отстал от конфига — единственный способ
+ * отстать, который у темы остался.
+ *
+ * Контрастные проверки остаются: они читают итоговый CSS, то есть проверяют
+ * ровно то, что увидит браузер, — и служат образцом такой проверки для
+ * приложения.
  */
 
 const themeCss = readFileSync(
@@ -87,23 +93,31 @@ const AA_TEXT = 4.5
 const AA_LARGE = 3
 
 describe('тема ocean', () => {
-  it('объявляет все роли, которые ожидает пакет', () => {
+  it('собранный файл не отстал от `theme.config.mjs`', () => {
+    // Тот же приём, что у генератора токенов пакета: сравниваем, а не верим.
+    expect(() => {
+      execFileSync('node', ['scripts/generate-theme.mjs', '--check'], {
+        cwd: fileURLToPath(new URL('../..', import.meta.url)),
+        stdio: 'pipe',
+      })
+    }).not.toThrow()
+  })
+
+  it('полнота набора обеспечена композицией, а не перечислением', () => {
+    // 90 ролей в файле при десятке в конфиге — это и есть наследование от базы.
     const missing = grThemeTokens
       .map(token => token.name)
       .filter(name => !declarations.has(name))
 
-    expect(missing, 'пропущенная роль унаследуется из :root, то есть из светлой темы').toEqual([])
+    expect(missing, 'роль, которой нет в теме, унаследовалась бы из :root — то есть из светлой').toEqual([])
   })
 
-  it('не объявляет лишнего: ни примитивов, ни производных состояний', () => {
-    // Покомпонентные токены (`--gr-button-*`) — легитимное исключение: пакет
-    // держит для них собственный theme-слой.
-    const known = new Set(grThemeTokens.map(token => token.name))
+  it('производные состояния посчитаны от цветов ЭТОЙ темы', () => {
+    // Без своего блока `@supports` тема получила бы фолбэки светлой темы.
+    const fallback = themeCss.slice(themeCss.indexOf('@supports'))
 
-    const extra = [...declarations.keys()]
-      .filter(name => !known.has(name) && !name.startsWith('--gr-button-'))
-
-    expect(extra, 'примитивы и hover/active темой не переопределяются').toEqual([])
+    expect(fallback).toContain("[data-theme='ocean']")
+    expect(fallback).toMatch(/--gr-primary-hover:\s*#[\da-f]{6}/i)
   })
 
   it('основной текст проходит AA на всех поверхностях', () => {
