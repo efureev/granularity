@@ -11,7 +11,7 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'select-remote-search',
     title: 'Удалённый поиск, теги и события',
-    description: '`v-model:search` + `@search` для подгрузки с сервера, `maxTagCount` для длинного выбора и события `change`/`clear`/`visible-change`.',
+    description: '`v-model:search` + `@search` для подгрузки с сервера, `maxTagCount` для длинного выбора и события `change`/`clear`/`update:open`.',
     status: 'ready',
     previewKey: 'gr-select-remote-search',
   },

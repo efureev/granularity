@@ -33,11 +33,6 @@ export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'change', value: GrTreeSelectModelValue): void
   /** Панель открылась/закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
-  /**
-   * Панель открылась/закрылась.
-   * @deprecated Используйте `update:open` (`v-model:open`); алиас будет снят после 1.0.
-   */
-  (e: 'visibleChange', visible: boolean): void
   (e: 'clear'): void
   (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
   (e: 'focus', event: FocusEvent): void
@@ -144,10 +139,7 @@ let hadPointerDownOnTrigger = false
 // Имя `open` сохранено: читатели работают с computed-Ref.
 const { open, setOpen: setOpenState } = useControlledOpen(
   () => props.open,
-  (next) => {
-    emit('update:open', next)
-    emit('visibleChange', next)
-  },
+  next => emit('update:open', next),
 )
 const filterValue = ref('')
 

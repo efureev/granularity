@@ -638,7 +638,7 @@ describe('GrTreeSelect — v-model:open', () => {
     wrapper.unmount()
   })
 
-  it('uncontrolled: открытие кликом эмитит `update:open` (и deprecated `visibleChange`)', async () => {
+  it('uncontrolled: открытие кликом эмитит `update:open`', async () => {
     const wrapper = mount(GrTreeSelect, {
       props: { modelValue: null, data: DATA, nodeKey: 'id' },
       attachTo: document.body,
@@ -648,7 +648,6 @@ describe('GrTreeSelect — v-model:open', () => {
 
     expect(isPanelVisible()).toBe(true)
     expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
-    expect(wrapper.emitted('visibleChange')?.at(-1)).toEqual([true])
     wrapper.unmount()
   })
 

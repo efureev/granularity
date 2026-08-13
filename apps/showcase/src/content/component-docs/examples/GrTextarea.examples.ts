@@ -16,6 +16,13 @@ export const grTextareaExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-textarea-autosize',
   },
   {
+    id: 'textarea-clearable',
+    title: 'Кнопка очистки',
+    description: '`clearable` добавляет крестик, когда в поле есть текст. Кнопка стоит в таб-порядке сразу за полем, срабатывает на `Enter` и `Space` и возвращает фокус в поле — очистка с клавиатуры не выкидывает пользователя из формы.',
+    status: 'ready',
+    previewKey: 'gr-textarea-clearable',
+  },
+  {
     id: 'textarea-rows-layout',
     title: 'Default and expanded rows',
     description: 'Базовый сценарий для short-form и long-form контента: одна и та же textarea может быть компактной или сразу подготовленной под большой объём текста.',

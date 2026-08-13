@@ -7,5 +7,4 @@ export type { GrCollapseConfigurableProps } from './defaults'
 export { grCollapseSafelist } from './safelist'
 
 export type * from './grCollapseContext'
-export * from './grCollapseContext'
 export type { GrCollapseEmits } from './GrCollapse.vue'

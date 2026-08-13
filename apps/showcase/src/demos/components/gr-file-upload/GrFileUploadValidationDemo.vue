@@ -2,11 +2,8 @@
 import { ref } from 'vue'
 
 import type { GrFileUploadExtraData, GrFileUploadRequestCtx } from '@feugene/granularity'
-import {
-  GrFileUpload,
-  acceptValidator,
-  maxFileSize,
-} from '@feugene/granularity'
+import { GrFileUpload } from '@feugene/granularity'
+import { acceptValidator, maxFileSize } from '@feugene/granularity/fileValidation'
 
 const lastResult = ref('No uploads yet')
 

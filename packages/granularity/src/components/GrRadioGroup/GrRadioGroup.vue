@@ -10,7 +10,7 @@ import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import type { GrButtonSize } from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
 import GrRadio from '../GrRadio/GrRadio.vue'
-import { GR_RADIO_GROUP_CONTEXT } from '../GrRadio'
+import { GR_RADIO_GROUP_CONTEXT } from '../GrRadio/grRadioGroupContext'
 import type { GrRadioEntry, GrRadioValue } from '../GrRadio/grRadioGroupContext'
 
 export type GrRadioGroupVariant = 'radiobox' | 'button'

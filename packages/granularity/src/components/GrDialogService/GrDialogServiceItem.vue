@@ -16,7 +16,7 @@ import {
   coreResponseErrorParsers,
   createResponseErrorClassifier,
   responseErrorParserPresets,
-} from '../GrResponseErrorBanner'
+} from '../GrResponseErrorBanner/parsers'
 import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 
 import { GR_CONFIG_KEY, type GrComponentDefaults, type GrConfigContext } from '../GrConfigProvider/context'

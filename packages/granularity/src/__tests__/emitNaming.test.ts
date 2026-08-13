@@ -6,9 +6,9 @@ import { describe, expect, it } from 'vitest'
 /**
  * Гейт нейминга эмитов.
  *
- * В пакете сосуществовали два регистра: 7 эмитов camelCase (`visibleChange`,
- * `nodeClick`, `stateChange`, …) и один kebab-case (`sort-change`). В шаблоне
- * это разные события для читателя, а IDE не подсказывает.
+ * В пакете сосуществовали два регистра: 7 эмитов camelCase (`nodeClick`,
+ * `stateChange`, …) и один kebab-case (`sort-change`). В шаблоне это разные
+ * события для читателя, а IDE не подсказывает.
  *
  * Канон — camelCase, и не только по большинству. Проверено поведением Vue:
  * шаблонный `@sort-change` компилируется в проп `onSortChange`, который

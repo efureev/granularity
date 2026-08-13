@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { componentPath } from './components'
+import { focusedDescription as describeFocus, tabUntil } from './keyboard'
 
 /**
  * Поведение, которого в jsdom нет вовсе.
@@ -18,16 +19,7 @@ import { componentPath } from './components'
 
 /** Что сейчас в фокусе — в виде, пригодном для сообщения об ошибке. */
 async function focusedDescription(page: import('@playwright/test').Page): Promise<string> {
-  return page.evaluate(() => {
-    const active = document.activeElement
-    if (!active) return 'null'
-
-    const attrs = ['data-testid', 'data-gr-breadcrumbs-item', 'data-gr-breadcrumbs-ellipsis']
-      .filter(name => active.hasAttribute(name))
-      .join(',')
-
-    return `${active.tagName.toLowerCase()}[${attrs}] «${active.textContent?.trim().slice(0, 24) ?? ''}»`
-  })
+  return describeFocus(page, ['data-gr-breadcrumbs-item', 'data-gr-breadcrumbs-ellipsis'])
 }
 
 /**
@@ -245,5 +237,226 @@ test.describe('быстрый поиск витрины', () => {
     // Открылся именно общий поиск: он ищет по витрине, а не по командам демо.
     await page.keyboard.type('foundations')
     await expect(page.locator('[data-gr-command-palette-item]').first()).toContainText(/Foundations|Основы/)
+  })
+})
+
+/**
+ * Семь компонентов из системного пункта аудита «клавиатура протестирована у 34
+ * из 68». Все они попали в непокрытые не потому, что клавиатуры не имеют, а
+ * потому, что их клавиатура целиком за пределами jsdom: таб-порядок,
+ * возврат фокуса после действия, прокрутка области стрелками и то, что
+ * `aria-disabled`-пункт остаётся достижим табом, но не срабатывает.
+ */
+
+/**
+ * Индекс поля с крестиком берётся один раз и дальше используется позиционно.
+ *
+ * Фильтр «то поле, у которого есть кнопка очистки» пересчитывается на каждом
+ * обращении и перестаёт находить поле ровно тогда, когда кнопка исчезает, —
+ * то есть сразу после очистки, а проверять надо именно состояние после неё.
+ */
+async function fieldWith(page: import('@playwright/test').Page, root: string, child: string) {
+  const index = await page.locator(root).evaluateAll(
+    (nodes, selector) => nodes.findIndex(node => node.querySelector(selector)),
+    child,
+  )
+
+  expect(index, `на странице нет «${root}» с «${child}»`).toBeGreaterThanOrEqual(0)
+
+  return page.locator(root).nth(index)
+}
+
+test.describe('GrInput: trailing-кнопки', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrInput'))
+    await page.locator('#live-examples').waitFor()
+    await page.locator('[data-gr-input-clear]').first().waitFor()
+  })
+
+  test('очистка достижима табом, срабатывает Enter и возвращает фокус в поле', async ({ page }) => {
+    const field = await fieldWith(page, '[data-gr-input]', '[data-gr-input-clear]')
+    const input = field.locator('input')
+    const clear = field.locator('[data-gr-input-clear]')
+
+    await input.click()
+    const before = await input.inputValue()
+    expect(before, 'демо должно приехать с текстом — иначе очищать нечего').not.toBe('')
+
+    // Ровно один Tab: кнопка обязана стоять сразу за полем **этого** поля, а не
+    // просто где-то дальше по странице.
+    await page.keyboard.press('Tab')
+    await expect(clear, `после поля фокус ушёл на ${await focusedDescription(page)}`).toBeFocused()
+
+    await page.keyboard.press('Enter')
+
+    await expect(input).toHaveValue('')
+    // Возврат фокуса — половина контракта из `docs/keyboard.md`: без него
+    // очистка выкидывает пользователя из формы, и он ищет поле заново.
+    await expect(input, `после очистки фокус ушёл на ${await focusedDescription(page)}`).toBeFocused()
+  })
+
+  test('переключатель пароля меняет тип поля по Space и держит фокус', async ({ page }) => {
+    const field = page.locator('[data-gr-input]')
+      .filter({ has: page.locator('[data-gr-input-password-toggle]') })
+      .first()
+    const input = field.locator('input')
+    const toggle = field.locator('[data-gr-input-password-toggle]')
+
+    await input.click()
+    await expect(input).toHaveAttribute('type', 'password')
+
+    await tabUntil(page, 'data-gr-input-password-toggle')
+    await expect(toggle).toBeFocused()
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+    await page.keyboard.press('Space')
+
+    await expect(input).toHaveAttribute('type', 'text')
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    await expect(input).toBeFocused()
+  })
+})
+
+test.describe('GrTextarea: кнопка очистки', () => {
+  test('Enter на крестике очищает поле и возвращает в него фокус', async ({ page }) => {
+    await page.goto(componentPath('GrTextarea'))
+    await page.locator('#live-examples').waitFor()
+
+    const demo = await fieldWith(page, '[data-example-preview]', '[data-gr-textarea-clear]')
+    const textarea = demo.locator('textarea').first()
+    const clear = demo.locator('[data-gr-textarea-clear]').first()
+
+    await textarea.click()
+    expect(await textarea.inputValue()).not.toBe('')
+
+    await page.keyboard.press('Tab')
+    await expect(clear, `после поля фокус ушёл на ${await focusedDescription(page)}`).toBeFocused()
+
+    await page.keyboard.press('Enter')
+
+    await expect(textarea).toHaveValue('')
+    await expect(textarea).toBeFocused()
+  })
+})
+
+test.describe('GrFileUpload: кнопки строки файла', () => {
+  test('поле выбора файла в таб-порядке, а зона сброса — нет', async ({ page }) => {
+    await page.goto(componentPath('GrFileUpload'))
+    await page.locator('#live-examples').waitFor()
+
+    const uploader = page.locator('[data-gr-file-upload]').first()
+    await expect(uploader).not.toHaveAttribute('tabindex', '0')
+
+    // Доступный контрол — сам `<input type="file">`: он визуально скрыт, но
+    // остаётся в таб-порядке, а фокус показывает обёртка через `focus-within`.
+    const input = uploader.locator('[data-gr-file-upload-input]')
+    await expect(input).toHaveAttribute('tabindex', '0')
+
+    await input.focus()
+    await expect(input).toBeFocused()
+  })
+})
+
+test.describe('GrTable: прокручиваемая область', () => {
+  test('область достижима табом, имеет имя и листается стрелками', async ({ page }) => {
+    await page.goto(componentPath('GrTable'))
+    await page.locator('#live-examples').waitFor()
+
+    // Именно демо с `regionLabel`: у остальных таблиц на странице скроллер тоже
+    // есть, но роли и имени у него нет — и не должно быть.
+    const scroller = page.locator('[data-gr-table-scroll][role="region"]').first()
+    await scroller.waitFor()
+
+    // Имя обязательно: безымянный `role="region"` скринридер объявляет как
+    // «регион», и пользователь не знает, куда попал.
+    await expect(scroller).toHaveAttribute('tabindex', '0')
+    await expect(scroller).not.toHaveAttribute('aria-label', '')
+
+    await scroller.focus()
+    await expect(scroller).toBeFocused()
+
+    const before = await scroller.evaluate(node => node.scrollTop)
+    await page.keyboard.press('PageDown')
+    await expect
+      .poll(async () => scroller.evaluate(node => node.scrollTop), { message: 'область не прокрутилась с клавиатуры' })
+      .toBeGreaterThan(before)
+  })
+})
+
+test.describe('GrSidebar: сворачивание', () => {
+  test('Enter на кнопке сворачивания переключает состояние', async ({ page }) => {
+    await page.goto(componentPath('GrSidebar'))
+    await page.locator('#live-examples').waitFor()
+
+    const toggle = page.locator('[data-gr-sidebar-toggle]').first()
+    await toggle.waitFor()
+
+    const expandedBefore = await toggle.getAttribute('aria-expanded')
+    await toggle.focus()
+    await page.keyboard.press('Enter')
+
+    await expect(toggle).not.toHaveAttribute('aria-expanded', expandedBefore!)
+    // Кнопка не теряет фокус: следующее нажатие возвращает панель обратно.
+    await expect(toggle).toBeFocused()
+
+    await page.keyboard.press('Enter')
+    await expect(toggle).toHaveAttribute('aria-expanded', expandedBefore!)
+  })
+
+  test('содержимое сайдбара — таб-стоп: прокрутка достижима с клавиатуры', async ({ page }) => {
+    await page.goto(componentPath('GrSidebar'))
+    await page.locator('#live-examples').waitFor()
+
+    await expect(page.locator('[data-gr-sidebar-content][tabindex="0"]').first()).toBeAttached()
+  })
+})
+
+test.describe('GrBottomNav: выбор раздела', () => {
+  test('Enter меняет раздел, а выключенный пункт не активируется', async ({ page }) => {
+    await page.goto(componentPath('GrBottomNav'))
+    await page.locator('#live-examples').waitFor()
+
+    const demo = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-gr-bottom-nav-item][aria-disabled="true"]') })
+      .first()
+
+    const target = demo.locator('[data-gr-bottom-nav-item]:not([aria-disabled="true"])').last()
+    await target.focus()
+    await expect(target).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(target).toHaveAttribute('aria-current', 'page')
+
+    // Выключенный пункт рендерится `<span>`: он остаётся видимым и объявленным
+    // через `aria-disabled`, но из таб-порядка выпадает — то есть до него нельзя
+    // ни дойти клавиатурой, ни активировать. Проверяем ровно это, а не обход.
+    const disabled = demo.locator('[data-gr-bottom-nav-item][aria-disabled="true"]').first()
+    await expect(disabled).toHaveJSProperty('tagName', 'SPAN')
+    await expect(disabled).not.toHaveAttribute('tabindex', '0')
+
+    await disabled.click({ force: true })
+
+    await expect(disabled).not.toHaveAttribute('aria-current', 'page')
+    await expect(target, 'клик по выключенному пункту сменил раздел').toHaveAttribute('aria-current', 'page')
+  })
+})
+
+test.describe('GrList: кликабельная строка', () => {
+  test('Enter и Space на строке вызывают действие', async ({ page }) => {
+    await page.goto(componentPath('GrList'))
+    await page.locator('#live-examples').waitFor()
+
+    const demo = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-gr-list-item-action]') })
+      .first()
+    const action = demo.locator('[data-gr-list-item-action]').first()
+
+    await action.focus()
+    await expect(action).toBeFocused()
+
+    const label = (await action.textContent())?.trim() ?? ''
+    await page.keyboard.press('Enter')
+
+    // У демо есть внешний вывод «последнее действие» — по нему и видно, что
+    // строка сработала, а не просто получила фокус.
+    await expect(demo).toContainText(label.slice(0, 12))
   })
 })

@@ -168,7 +168,7 @@ describe('component docs metadata', () => {
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 
-    expect(textareaDoc.examples).toHaveLength(6)
+    expect(textareaDoc.examples).toHaveLength(7)
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 
@@ -351,7 +351,7 @@ describe('component docs metadata', () => {
     expect(listDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(listDoc.examples.every(example => example.previewKey?.startsWith('gr-list'))).toBe(true)
 
-    expect(tableDoc.examples).toHaveLength(4)
+    expect(tableDoc.examples).toHaveLength(5)
     expect(tableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tableDoc.examples.every(example => example.previewKey?.startsWith('gr-table'))).toBe(true)
   })

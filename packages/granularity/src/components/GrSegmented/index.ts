@@ -8,7 +8,6 @@ export { grSegmentedConfig } from './config'
 export type { GrSegmentedConfigurableProps } from './defaults'
 
 export {
-  GR_SEGMENTED_ORIENTATIONS,
   type GrSegmentedOption,
   type GrSegmentedOrientation,
   type GrSegmentedSize,

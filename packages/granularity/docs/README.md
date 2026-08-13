@@ -32,7 +32,8 @@
 ## Карта документации
 
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
-- [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы и порядок импортов.
+- [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы, порядок импортов и почему
+  RTL не поддерживается.
 - [`tokens.md`](./tokens.md) — справочник токенов (генерируется из `tokens/*.json`, руками не править).
 - [`theming.md`](./theming.md) — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, композиция
   поверх готовой (`extendTheme`) и с нуля (`createTheme`), подключение, проверка контраста.

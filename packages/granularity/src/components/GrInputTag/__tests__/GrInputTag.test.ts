@@ -25,6 +25,7 @@ import GrFormField from '../../GrFormField/GrFormField.vue'
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
 import GrInputTag from '../GrInputTag.vue'
 import { announced } from '../../../testing'
+import { composingKeydown } from '../../../testing/keyboard'
 
 afterEach(() => {
   resetAnnouncer()
@@ -435,9 +436,7 @@ describe('GrInputTag — IME-композиция', () => {
     const input = wrapper.get('input')
     await input.setValue('vue')
 
-    input.element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
-    )
+    composingKeydown(input.element, 'Enter')
     await new Promise(resolve => setTimeout(resolve, 0))
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()

@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { SERVICE_ENTITIES, componentPath } from './components'
+import { expectTabCycle } from './keyboard'
 
 /**
  * Модальный слой в открытом состоянии.
@@ -28,61 +29,6 @@ async function openFirstModal(page: import('@playwright/test').Page): Promise<vo
     const panel = document.querySelector('[data-gr-modal-panel]')
     return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
   })
-}
-
-/**
- * Обход слоя по Tab: сверяет **посещённые** элементы с табируемыми внутри слоя.
- *
- * Проверки «фокус не ушёл за пределы слоя» для этого мало: ловушка, которая
- * пришпилила фокус к одной кнопке (или к самой панели с `tabindex="-1"`), её
- * проходит — фокус и правда не ушёл. Такой дефект видно только сравнением
- * `activeElement` до и после нажатия, поэтому сверяем множества.
- */
-async function expectTabCycle(
-  page: import('@playwright/test').Page,
-  layerSelector: string,
-  presses = 10,
-): Promise<void> {
-  const describe = (selector: string) => {
-    const layers = document.querySelectorAll(selector)
-    const layer = layers[layers.length - 1] as HTMLElement | undefined
-    const active = document.activeElement as HTMLElement | null
-    const name = (element: HTMLElement) =>
-      `${element.tagName}:${element.getAttribute('data-testid') ?? (element.textContent ?? '').trim().slice(0, 20)}`
-
-    if (!layer)
-      return { tabbables: [] as string[], active: null as string | null }
-
-    const tabbables = [...layer.querySelectorAll<HTMLElement>(
-      'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]',
-    )]
-      .filter(element => Number.parseInt(element.getAttribute('tabindex') ?? '0', 10) >= 0)
-      .filter(element => element.closest('[inert]') === null)
-      .filter(element => element.getClientRects().length > 0)
-      .map(name)
-
-    return {
-      tabbables,
-      active: active && layer.contains(active) ? name(active) : null,
-    }
-  }
-
-  const { tabbables } = await page.evaluate(describe, layerSelector)
-  expect(tabbables.length, 'в слое нет ни одного табируемого элемента').toBeGreaterThan(0)
-
-  const visited: string[] = []
-
-  for (let i = 0; i < presses; i++) {
-    await page.keyboard.press('Tab')
-    const { active } = await page.evaluate(describe, layerSelector)
-    expect(active, `Tab №${i + 1} увёл фокус за пределы слоя`).not.toBeNull()
-    visited.push(active!)
-  }
-
-  expect(
-    [...new Set(visited)].sort(),
-    `Tab не обошёл слой: посетил ${JSON.stringify(visited)}, табируемые — ${JSON.stringify(tabbables)}`,
-  ).toEqual([...new Set(tabbables)].sort())
 }
 
 test.describe('модальное окно', () => {

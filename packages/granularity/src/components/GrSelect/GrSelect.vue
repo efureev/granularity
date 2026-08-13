@@ -199,11 +199,6 @@ export interface GrSelectEmits<TValue extends GrSelectValue = string> {
   (e: 'clear'): void
   /** Панель открылась/закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
-  /**
-   * Панель открылась/закрылась.
-   * @deprecated Используйте `update:open` (`v-model:open`); алиас будет снят после 1.0.
-   */
-  (e: 'visibleChange', visible: boolean): void
   /** Текст поиска как контролируемое значение (`v-model:search`). */
   (e: 'update:search', value: string): void
   (e: 'focus', event: FocusEvent): void
@@ -682,8 +677,6 @@ const {
   addCustom,
   toggleValue,
 })
-
-watch(open, isOpen => emit('visibleChange', isOpen))
 
 watch(
   open,

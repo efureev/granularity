@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 // проверяем как список команд, а не как модалку (её контракт покрыт GrModal).
 import GrCommandPalette from '../GrCommandPalette.vue'
 import type { GrCommandItem } from '../filtering'
+import { composingKeydown } from '../../../testing/keyboard'
 
 const items: GrCommandItem[] = [
   { id: 'new', label: 'Новый документ', group: 'Файл', shortcut: ['⌘', 'N'] },
@@ -349,9 +350,7 @@ describe('GrCommandPalette — IME-композиция', () => {
   it('Enter во время композиции не запускает команду', async () => {
     const wrapper = await mountPalette()
 
-    wrapper.get('[data-testid="gr-command-palette-input"]').element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
-    )
+    composingKeydown(wrapper.get('[data-testid="gr-command-palette-input"]').element, 'Enter')
     await nextTick()
 
     expect(wrapper.emitted('select')).toBeUndefined()

@@ -3,6 +3,7 @@ import { nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrAutocomplete from '../GrAutocomplete.vue'
+import { composingKeydown } from '../../../testing/keyboard'
 
 const OPTIONS = [
   { value: 'vue', label: 'Vue' },
@@ -173,9 +174,7 @@ describe('GrAutocomplete — IME-композиция', () => {
     const input = getInput(wrapper)
     await input.trigger('focus')
 
-    input.element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
-    )
+    composingKeydown(input.element, 'Enter')
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()

@@ -12,16 +12,7 @@ import {
   GrInput,
   GrTextarea,
   GrToaster,
-  FileValidationError,
-  acceptValidator,
-  allowedExtensionsValidator,
-  allowedMimeTypesValidator,
   createLoading,
-  matchAccept,
-  maxFileSize,
-  maxTotalSizeBytesValidator,
-  normalizeFiles,
-  runFileValidators,
   useAnnouncer,
   useDialogService,
   useTheme,
@@ -33,6 +24,19 @@ import {
   vHotkey,
   vLoading,
 } from '@feugene/granularity'
+// Валидация файлов — свой подпуть: у неё нет ни компонента, ни CSS, и тянуть
+// её через корневую бочку значило бы тащить за собой весь граф компонентов.
+import {
+  FileValidationError,
+  acceptValidator,
+  allowedExtensionsValidator,
+  allowedMimeTypesValidator,
+  matchAccept,
+  maxFileSize,
+  maxTotalSizeBytesValidator,
+  normalizeFiles,
+  runFileValidators,
+} from '@feugene/granularity/fileValidation'
 
 const props = defineProps<{
   previewKey: string

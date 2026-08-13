@@ -837,7 +837,7 @@ describe('GrSelect — события и состояния', () => {
     document.body.innerHTML = ''
   })
 
-  it('эмитит change, clear и visibleChange', async () => {
+  it('эмитит change, clear и update:open', async () => {
     const wrapper = mount(GrSelect, {
       props: {
         modelValue: 'a',
@@ -849,7 +849,7 @@ describe('GrSelect — события и состояния', () => {
     })
 
     await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
-    expect(wrapper.emitted('visibleChange')?.at(-1)).toEqual([true])
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([true])
 
     const options = getTeleportedOptions()
     options[1].click()

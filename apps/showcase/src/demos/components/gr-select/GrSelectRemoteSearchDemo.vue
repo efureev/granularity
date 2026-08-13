@@ -51,7 +51,7 @@ async function fetchOptions(search: string): Promise<void> {
       @search="fetchOptions"
       @change="lastEvent = 'change'"
       @clear="lastEvent = 'clear'"
-      @visible-change="lastEvent = $event ? 'opened' : 'closed'"
+      @update:open="lastEvent = $event ? 'opened' : 'closed'"
     />
 
     <div class="rounded-2xl border border-dashed border-[var(--gr-brd)] p-3 text-sm text-[var(--gr-muted-fg)]">

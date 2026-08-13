@@ -7,6 +7,7 @@
  */
 
 export { cancelPointer, drag, move, pointer, press, release } from './pointer'
+export { composingKeydown, keyboardEvent, type KeyboardEventOptions, keydown } from './keyboard'
 export { mockRect, type MockRect, stackRects, type StackRectsOptions } from './geometry'
 export { resetGranularityDom, stubMatchMedia, type StubMatchMediaOptions } from './env'
 export { granularityGlobal, type GranularityGlobalOptions, i18nAdapter, type I18nAdapterOptions } from './context'

@@ -43,6 +43,14 @@ strategies.
     - `@feugene/granularity/uno` — browser-safe preset;
     - `@feugene/granularity/uno-node` — node-oriented preset with CSS/preflight helpers.
 
+## Limitations
+
+**RTL is not supported.** Components lay themselves out with physical directions (`pl-`/`pr-`,
+`ml-`/`mr-`, `left-`/`right-`), and `dir="rtl"` is not read anywhere: a right-to-left document will
+render mirrored padding, offsets and floating panels. This is a deliberate decision for the `1.x`
+line — moving to logical properties changes how every component looks, which is a visual breaking
+change and belongs in a major release, not a patch. See [`docs/styling.md`](./docs/styling.md).
+
 ## Quick start
 
 ```bash

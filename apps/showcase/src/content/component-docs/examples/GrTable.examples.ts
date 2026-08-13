@@ -23,6 +23,13 @@ export const grTableExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-table-empty-state',
   },
   {
+    id: 'table-scroll-region',
+    title: 'Прокручиваемая область с клавиатуры',
+    description: '`maxHeight` со `stickyHeader` превращает таблицу в прокручиваемую область, а `regionLabel` даёт ей `role="region"` и имя. Без имени такая область — безымянная ловушка для скринридера; с ним она достижима `Tab` и листается стрелками.',
+    status: 'ready',
+    previewKey: 'gr-table-scroll-region',
+  },
+  {
     id: 'table-sizes',
     title: 'Шкала размеров',
     description: '`GrTable` — тонкий контейнер, поэтому `size` задаёт базовый кегль таблицы; паддинги ячеек остаются за потребителем.',

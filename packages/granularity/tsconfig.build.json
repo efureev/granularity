@@ -4,12 +4,15 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "rootDir": ".",
+    "rootDir": "src",
     "declarationDir": "./dist/types",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    // Перечислено заново, а не унаследовано: `types` из `extends` не мержится.
+    // Третий пакет заменяет `vite-env.d.ts`, который под `rootDir: "src"` в
+    // компиляцию не входит, — без него не резолвится `~icons/lucide/*`.
+    "types": ["vite/client", "node", "unplugin-icons/types/vue"]
   },
   "include": [
-    "vite-env.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

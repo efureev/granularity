@@ -9,7 +9,6 @@ export { grCheckboxConfig } from './config'
 export type { GrCheckboxConfigurableProps } from './defaults'
 export type { GrCheckboxLabelPosition, GrCheckboxSize } from './grCheckboxStyles'
 export type { GrCheckboxGroupContext } from './grCheckboxGroupContext'
-export { GR_CHECKBOX_GROUP_CONTEXT } from './grCheckboxGroupContext'
 export { grCheckboxSafelist } from './safelist'
 export type { GrCheckboxEmits } from './GrCheckbox.vue'
 export type GrCheckboxInstance = ComponentExposed<typeof GrCheckboxComponent>

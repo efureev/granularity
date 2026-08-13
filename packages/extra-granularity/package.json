@@ -34,7 +34,8 @@
     "provenance": true
   },
   "type": "module",
-  "types": "./dist/types/src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist"
   ],
@@ -43,24 +44,25 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/types/src/index.d.ts",
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./components/XgQuickForm": {
-      "types": "./dist/types/src/components/XgQuickForm/index.d.ts",
+      "types": "./dist/types/components/XgQuickForm/index.d.ts",
       "import": "./dist/components/XgQuickForm/index.js"
     },
     "./granular-provider": {
-      "types": "./dist/types/src/granular-provider/index.d.ts",
+      "types": "./dist/types/granular-provider/index.d.ts",
       "import": "./dist/granular-provider.js",
       "default": "./dist/granular-provider.js"
     },
     "./granular-provider/node": {
-      "types": "./dist/types/src/granular-provider/node.d.ts",
+      "types": "./dist/types/granular-provider/node.d.ts",
       "import": "./dist/granular-provider-node.js",
       "default": "./dist/granular-provider-node.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.16.0 <1.0.0",

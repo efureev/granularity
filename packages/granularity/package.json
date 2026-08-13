@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -36,7 +36,8 @@
     "provenance": true
   },
   "type": "module",
-  "types": "./dist/types/src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "web-types": "./dist/web-types.json",
   "files": [
     "dist",
@@ -47,428 +48,429 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/types/src/index.d.ts",
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./styles/*": "./dist/styles/*",
     "./composables/useAnnouncer": {
-      "types": "./dist/types/src/composables/useAnnouncer.d.ts",
+      "types": "./dist/types/composables/useAnnouncer.d.ts",
       "import": "./dist/composables/useAnnouncer.js"
     },
     "./components/GrAlert": {
-      "types": "./dist/types/src/components/GrAlert/index.d.ts",
+      "types": "./dist/types/components/GrAlert/index.d.ts",
       "import": "./dist/components/GrAlert/index.js"
     },
     "./components/GrAutocomplete": {
-      "types": "./dist/types/src/components/GrAutocomplete/index.d.ts",
+      "types": "./dist/types/components/GrAutocomplete/index.d.ts",
       "import": "./dist/components/GrAutocomplete/index.js"
     },
     "./components/GrAvatar": {
-      "types": "./dist/types/src/components/GrAvatar/index.d.ts",
+      "types": "./dist/types/components/GrAvatar/index.d.ts",
       "import": "./dist/components/GrAvatar/index.js"
     },
     "./components/GrBadge": {
-      "types": "./dist/types/src/components/GrBadge/index.d.ts",
+      "types": "./dist/types/components/GrBadge/index.d.ts",
       "import": "./dist/components/GrBadge/index.js"
     },
     "./components/GrBadgeWrap": {
-      "types": "./dist/types/src/components/GrBadgeWrap/index.d.ts",
+      "types": "./dist/types/components/GrBadgeWrap/index.d.ts",
       "import": "./dist/components/GrBadgeWrap/index.js"
     },
     "./components/GrBottomNav": {
-      "types": "./dist/types/src/components/GrBottomNav/index.d.ts",
+      "types": "./dist/types/components/GrBottomNav/index.d.ts",
       "import": "./dist/components/GrBottomNav/index.js"
     },
     "./components/GrBreadcrumbs": {
-      "types": "./dist/types/src/components/GrBreadcrumbs/index.d.ts",
+      "types": "./dist/types/components/GrBreadcrumbs/index.d.ts",
       "import": "./dist/components/GrBreadcrumbs/index.js"
     },
     "./components/GrButton": {
-      "types": "./dist/types/src/components/GrButton/index.d.ts",
+      "types": "./dist/types/components/GrButton/index.d.ts",
       "import": "./dist/components/GrButton/index.js"
     },
     "./components/GrButtonGroup": {
-      "types": "./dist/types/src/components/GrButtonGroup/index.d.ts",
+      "types": "./dist/types/components/GrButtonGroup/index.d.ts",
       "import": "./dist/components/GrButtonGroup/index.js"
     },
     "./components/GrCard": {
-      "types": "./dist/types/src/components/GrCard/index.d.ts",
+      "types": "./dist/types/components/GrCard/index.d.ts",
       "import": "./dist/components/GrCard/index.js"
     },
     "./components/GrCheckbox": {
-      "types": "./dist/types/src/components/GrCheckbox/index.d.ts",
+      "types": "./dist/types/components/GrCheckbox/index.d.ts",
       "import": "./dist/components/GrCheckbox/index.js"
     },
     "./components/GrCheckboxGroup": {
-      "types": "./dist/types/src/components/GrCheckboxGroup/index.d.ts",
+      "types": "./dist/types/components/GrCheckboxGroup/index.d.ts",
       "import": "./dist/components/GrCheckboxGroup/index.js"
     },
     "./components/GrCollapse": {
-      "types": "./dist/types/src/components/GrCollapse/index.d.ts",
+      "types": "./dist/types/components/GrCollapse/index.d.ts",
       "import": "./dist/components/GrCollapse/index.js"
     },
     "./components/GrColorPicker": {
-      "types": "./dist/types/src/components/GrColorPicker/index.d.ts",
+      "types": "./dist/types/components/GrColorPicker/index.d.ts",
       "import": "./dist/components/GrColorPicker/index.js"
     },
     "./components/GrCommandPalette": {
-      "types": "./dist/types/src/components/GrCommandPalette/index.d.ts",
+      "types": "./dist/types/components/GrCommandPalette/index.d.ts",
       "import": "./dist/components/GrCommandPalette/index.js"
     },
     "./components/GrConfigProvider": {
-      "types": "./dist/types/src/components/GrConfigProvider/index.d.ts",
+      "types": "./dist/types/components/GrConfigProvider/index.d.ts",
       "import": "./dist/components/GrConfigProvider/index.js"
     },
     "./components/GrConfirmDialog": {
-      "types": "./dist/types/src/components/GrConfirmDialog/index.d.ts",
+      "types": "./dist/types/components/GrConfirmDialog/index.d.ts",
       "import": "./dist/components/GrConfirmDialog/index.js"
     },
     "./components/GrDataTable": {
-      "types": "./dist/types/src/components/GrDataTable/index.d.ts",
+      "types": "./dist/types/components/GrDataTable/index.d.ts",
       "import": "./dist/components/GrDataTable/index.js"
     },
     "./components/GrDialog": {
-      "types": "./dist/types/src/components/GrDialog/index.d.ts",
+      "types": "./dist/types/components/GrDialog/index.d.ts",
       "import": "./dist/components/GrDialog/index.js"
     },
     "./components/GrDialogService": {
-      "types": "./dist/types/src/components/GrDialogService/index.d.ts",
+      "types": "./dist/types/components/GrDialogService/index.d.ts",
       "import": "./dist/components/GrDialogService/index.js"
     },
     "./components/GrDivider": {
-      "types": "./dist/types/src/components/GrDivider/index.d.ts",
+      "types": "./dist/types/components/GrDivider/index.d.ts",
       "import": "./dist/components/GrDivider/index.js"
     },
     "./components/GrDrawer": {
-      "types": "./dist/types/src/components/GrDrawer/index.d.ts",
+      "types": "./dist/types/components/GrDrawer/index.d.ts",
       "import": "./dist/components/GrDrawer/index.js"
     },
     "./components/GrDropdown": {
-      "types": "./dist/types/src/components/GrDropdown/index.d.ts",
+      "types": "./dist/types/components/GrDropdown/index.d.ts",
       "import": "./dist/components/GrDropdown/index.js"
     },
     "./components/GrDropdownMenu": {
-      "types": "./dist/types/src/components/GrDropdownMenu/index.d.ts",
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
       "import": "./dist/components/GrDropdownMenu/index.js"
     },
     "./components/GrEmptyState": {
-      "types": "./dist/types/src/components/GrEmptyState/index.d.ts",
+      "types": "./dist/types/components/GrEmptyState/index.d.ts",
       "import": "./dist/components/GrEmptyState/index.js"
     },
     "./components/GrFileUpload": {
-      "types": "./dist/types/src/components/GrFileUpload/index.d.ts",
+      "types": "./dist/types/components/GrFileUpload/index.d.ts",
       "import": "./dist/components/GrFileUpload/index.js"
     },
     "./components/GrForm": {
-      "types": "./dist/types/src/components/GrForm/index.d.ts",
+      "types": "./dist/types/components/GrForm/index.d.ts",
       "import": "./dist/components/GrForm/index.js"
     },
     "./components/GrFormField": {
-      "types": "./dist/types/src/components/GrFormField/index.d.ts",
+      "types": "./dist/types/components/GrFormField/index.d.ts",
       "import": "./dist/components/GrFormField/index.js"
     },
     "./components/GrFormFile": {
-      "types": "./dist/types/src/components/GrFormFile/index.d.ts",
+      "types": "./dist/types/components/GrFormFile/index.d.ts",
       "import": "./dist/components/GrFormFile/index.js"
     },
     "./components/GrFormSection": {
-      "types": "./dist/types/src/components/GrFormSection/index.d.ts",
+      "types": "./dist/types/components/GrFormSection/index.d.ts",
       "import": "./dist/components/GrFormSection/index.js"
     },
     "./components/GrIcon": {
-      "types": "./dist/types/src/components/GrIcon/index.d.ts",
+      "types": "./dist/types/components/GrIcon/index.d.ts",
       "import": "./dist/components/GrIcon/index.js"
     },
     "./components/GrImageViewer": {
-      "types": "./dist/types/src/components/GrImageViewer/index.d.ts",
+      "types": "./dist/types/components/GrImageViewer/index.d.ts",
       "import": "./dist/components/GrImageViewer/index.js"
     },
     "./components/GrInput": {
-      "types": "./dist/types/src/components/GrInput/index.d.ts",
+      "types": "./dist/types/components/GrInput/index.d.ts",
       "import": "./dist/components/GrInput/index.js"
     },
     "./components/GrInputTag": {
-      "types": "./dist/types/src/components/GrInputTag/index.d.ts",
+      "types": "./dist/types/components/GrInputTag/index.d.ts",
       "import": "./dist/components/GrInputTag/index.js"
     },
     "./components/GrKbd": {
-      "types": "./dist/types/src/components/GrKbd/index.d.ts",
+      "types": "./dist/types/components/GrKbd/index.d.ts",
       "import": "./dist/components/GrKbd/index.js"
     },
     "./components/GrLink": {
-      "types": "./dist/types/src/components/GrLink/index.d.ts",
+      "types": "./dist/types/components/GrLink/index.d.ts",
       "import": "./dist/components/GrLink/index.js"
     },
     "./components/GrList": {
-      "types": "./dist/types/src/components/GrList/index.d.ts",
+      "types": "./dist/types/components/GrList/index.d.ts",
       "import": "./dist/components/GrList/index.js"
     },
     "./components/GrLoading": {
-      "types": "./dist/types/src/components/GrLoading/index.d.ts",
+      "types": "./dist/types/components/GrLoading/index.d.ts",
       "import": "./dist/components/GrLoading/index.js"
     },
     "./components/GrModal": {
-      "types": "./dist/types/src/components/GrModal/index.d.ts",
+      "types": "./dist/types/components/GrModal/index.d.ts",
       "import": "./dist/components/GrModal/index.js"
     },
     "./components/GrNavbar": {
-      "types": "./dist/types/src/components/GrNavbar/index.d.ts",
+      "types": "./dist/types/components/GrNavbar/index.d.ts",
       "import": "./dist/components/GrNavbar/index.js"
     },
     "./components/GrNumberInput": {
-      "types": "./dist/types/src/components/GrNumberInput/index.d.ts",
+      "types": "./dist/types/components/GrNumberInput/index.d.ts",
       "import": "./dist/components/GrNumberInput/index.js"
     },
     "./components/GrPagination": {
-      "types": "./dist/types/src/components/GrPagination/index.d.ts",
+      "types": "./dist/types/components/GrPagination/index.d.ts",
       "import": "./dist/components/GrPagination/index.js"
     },
     "./components/GrPopover": {
-      "types": "./dist/types/src/components/GrPopover/index.d.ts",
+      "types": "./dist/types/components/GrPopover/index.d.ts",
       "import": "./dist/components/GrPopover/index.js"
     },
     "./components/GrProgressBar": {
-      "types": "./dist/types/src/components/GrProgressBar/index.d.ts",
+      "types": "./dist/types/components/GrProgressBar/index.d.ts",
       "import": "./dist/components/GrProgressBar/index.js"
     },
     "./components/GrProgressCircle": {
-      "types": "./dist/types/src/components/GrProgressCircle/index.d.ts",
+      "types": "./dist/types/components/GrProgressCircle/index.d.ts",
       "import": "./dist/components/GrProgressCircle/index.js"
     },
     "./components/GrPromptDialog": {
-      "types": "./dist/types/src/components/GrPromptDialog/index.d.ts",
+      "types": "./dist/types/components/GrPromptDialog/index.d.ts",
       "import": "./dist/components/GrPromptDialog/index.js"
     },
     "./components/GrRadio": {
-      "types": "./dist/types/src/components/GrRadio/index.d.ts",
+      "types": "./dist/types/components/GrRadio/index.d.ts",
       "import": "./dist/components/GrRadio/index.js"
     },
     "./components/GrRadioGroup": {
-      "types": "./dist/types/src/components/GrRadioGroup/index.d.ts",
+      "types": "./dist/types/components/GrRadioGroup/index.d.ts",
       "import": "./dist/components/GrRadioGroup/index.js"
     },
     "./components/GrRating": {
-      "types": "./dist/types/src/components/GrRating/index.d.ts",
+      "types": "./dist/types/components/GrRating/index.d.ts",
       "import": "./dist/components/GrRating/index.js"
     },
     "./components/GrResponseErrorBanner": {
-      "types": "./dist/types/src/components/GrResponseErrorBanner/index.d.ts",
+      "types": "./dist/types/components/GrResponseErrorBanner/index.d.ts",
       "import": "./dist/components/GrResponseErrorBanner/index.js"
     },
     "./components/GrSegmented": {
-      "types": "./dist/types/src/components/GrSegmented/index.d.ts",
+      "types": "./dist/types/components/GrSegmented/index.d.ts",
       "import": "./dist/components/GrSegmented/index.js"
     },
     "./components/GrSelect": {
-      "types": "./dist/types/src/components/GrSelect/index.d.ts",
+      "types": "./dist/types/components/GrSelect/index.d.ts",
       "import": "./dist/components/GrSelect/index.js"
     },
     "./components/GrSidebar": {
-      "types": "./dist/types/src/components/GrSidebar/index.d.ts",
+      "types": "./dist/types/components/GrSidebar/index.d.ts",
       "import": "./dist/components/GrSidebar/index.js"
     },
     "./components/GrSkeleton": {
-      "types": "./dist/types/src/components/GrSkeleton/index.d.ts",
+      "types": "./dist/types/components/GrSkeleton/index.d.ts",
       "import": "./dist/components/GrSkeleton/index.js"
     },
     "./components/GrSlider": {
-      "types": "./dist/types/src/components/GrSlider/index.d.ts",
+      "types": "./dist/types/components/GrSlider/index.d.ts",
       "import": "./dist/components/GrSlider/index.js"
     },
     "./components/GrSortableList": {
-      "types": "./dist/types/src/components/GrSortableList/index.d.ts",
+      "types": "./dist/types/components/GrSortableList/index.d.ts",
       "import": "./dist/components/GrSortableList/index.js"
     },
     "./components/GrSplitter": {
-      "types": "./dist/types/src/components/GrSplitter/index.d.ts",
+      "types": "./dist/types/components/GrSplitter/index.d.ts",
       "import": "./dist/components/GrSplitter/index.js"
     },
     "./components/GrStatistic": {
-      "types": "./dist/types/src/components/GrStatistic/index.d.ts",
+      "types": "./dist/types/components/GrStatistic/index.d.ts",
       "import": "./dist/components/GrStatistic/index.js"
     },
     "./components/GrSwitch": {
-      "types": "./dist/types/src/components/GrSwitch/index.d.ts",
+      "types": "./dist/types/components/GrSwitch/index.d.ts",
       "import": "./dist/components/GrSwitch/index.js"
     },
     "./components/GrTable": {
-      "types": "./dist/types/src/components/GrTable/index.d.ts",
+      "types": "./dist/types/components/GrTable/index.d.ts",
       "import": "./dist/components/GrTable/index.js"
     },
     "./components/GrTabPanels": {
-      "types": "./dist/types/src/components/GrTabPanels/index.d.ts",
+      "types": "./dist/types/components/GrTabPanels/index.d.ts",
       "import": "./dist/components/GrTabPanels/index.js"
     },
     "./components/GrTabs": {
-      "types": "./dist/types/src/components/GrTabs/index.d.ts",
+      "types": "./dist/types/components/GrTabs/index.d.ts",
       "import": "./dist/components/GrTabs/index.js"
     },
     "./components/GrTextarea": {
-      "types": "./dist/types/src/components/GrTextarea/index.d.ts",
+      "types": "./dist/types/components/GrTextarea/index.d.ts",
       "import": "./dist/components/GrTextarea/index.js"
     },
     "./components/GrTimeline": {
-      "types": "./dist/types/src/components/GrTimeline/index.d.ts",
+      "types": "./dist/types/components/GrTimeline/index.d.ts",
       "import": "./dist/components/GrTimeline/index.js"
     },
     "./components/GrToaster": {
-      "types": "./dist/types/src/components/GrToaster/index.d.ts",
+      "types": "./dist/types/components/GrToaster/index.d.ts",
       "import": "./dist/components/GrToaster/index.js"
     },
     "./components/GrTooltip": {
-      "types": "./dist/types/src/components/GrTooltip/index.d.ts",
+      "types": "./dist/types/components/GrTooltip/index.d.ts",
       "import": "./dist/components/GrTooltip/index.js"
     },
     "./components/GrTree": {
-      "types": "./dist/types/src/components/GrTree/index.d.ts",
+      "types": "./dist/types/components/GrTree/index.d.ts",
       "import": "./dist/components/GrTree/index.js"
     },
     "./components/GrTreeSelect": {
-      "types": "./dist/types/src/components/GrTreeSelect/index.d.ts",
+      "types": "./dist/types/components/GrTreeSelect/index.d.ts",
       "import": "./dist/components/GrTreeSelect/index.js"
     },
     "./composables/useDismissible": {
-      "types": "./dist/types/src/composables/useDismissible.d.ts",
+      "types": "./dist/types/composables/useDismissible.d.ts",
       "import": "./dist/composables/useDismissible.js"
     },
     "./composables/useFloating": {
-      "types": "./dist/types/src/composables/useFloating.d.ts",
+      "types": "./dist/types/composables/useFloating.d.ts",
       "import": "./dist/composables/useFloating.js"
     },
     "./composables/useFocusTrap": {
-      "types": "./dist/types/src/composables/useFocusTrap.d.ts",
+      "types": "./dist/types/composables/useFocusTrap.d.ts",
       "import": "./dist/composables/useFocusTrap.js"
     },
     "./composables/useGrFormControl": {
-      "types": "./dist/types/src/composables/useGrFormControl.d.ts",
+      "types": "./dist/types/composables/useGrFormControl.d.ts",
       "import": "./dist/composables/useGrFormControl.js"
     },
     "./composables/usePortalTarget": {
-      "types": "./dist/types/src/composables/usePortalTarget.d.ts",
+      "types": "./dist/types/composables/usePortalTarget.d.ts",
       "import": "./dist/composables/usePortalTarget.js"
     },
     "./composables/useOverlayLayer": {
-      "types": "./dist/types/src/composables/useOverlayLayer.d.ts",
+      "types": "./dist/types/composables/useOverlayLayer.d.ts",
       "import": "./dist/composables/useOverlayLayer.js"
     },
     "./composables/useRovingFocus": {
-      "types": "./dist/types/src/composables/useRovingFocus.d.ts",
+      "types": "./dist/types/composables/useRovingFocus.d.ts",
       "import": "./dist/composables/useRovingFocus.js"
     },
     "./composables/useGrComponentConfig": {
-      "types": "./dist/types/src/composables/useGrComponentConfig.d.ts",
+      "types": "./dist/types/composables/useGrComponentConfig.d.ts",
       "import": "./dist/composables/useGrComponentConfig.js"
     },
     "./composables/useComboboxNavigation": {
-      "types": "./dist/types/src/composables/useComboboxNavigation.d.ts",
+      "types": "./dist/types/composables/useComboboxNavigation.d.ts",
       "import": "./dist/composables/useComboboxNavigation.js"
     },
     "./composables/useGranularityTranslations": {
-      "types": "./dist/types/src/composables/useGranularityTranslations.d.ts",
+      "types": "./dist/types/composables/useGranularityTranslations.d.ts",
       "import": "./dist/composables/useGranularityTranslations.js"
     },
     "./composables/useTheme": {
-      "types": "./dist/types/src/composables/useTheme.d.ts",
+      "types": "./dist/types/composables/useTheme.d.ts",
       "import": "./dist/composables/useTheme.js"
     },
     "./composables/useDragGesture": {
-      "types": "./dist/types/src/composables/useDragGesture.d.ts",
+      "types": "./dist/types/composables/useDragGesture.d.ts",
       "import": "./dist/composables/useDragGesture.js"
     },
     "./composables/useDragSort": {
-      "types": "./dist/types/src/composables/useDragSort.d.ts",
+      "types": "./dist/types/composables/useDragSort.d.ts",
       "import": "./dist/composables/useDragSort.js"
     },
     "./composables/useVirtualList": {
-      "types": "./dist/types/src/composables/useVirtualList.d.ts",
+      "types": "./dist/types/composables/useVirtualList.d.ts",
       "import": "./dist/composables/useVirtualList.js"
     },
     "./composables/useToast": {
-      "types": "./dist/types/src/composables/useToast.d.ts",
+      "types": "./dist/types/composables/useToast.d.ts",
       "import": "./dist/composables/useToast.js"
     },
     "./directives": {
-      "types": "./dist/types/src/directives/index.d.ts",
+      "types": "./dist/types/directives/index.d.ts",
       "import": "./dist/directives/index.js"
     },
     "./directives/autofocus": {
-      "types": "./dist/types/src/directives/autofocus.d.ts",
+      "types": "./dist/types/directives/autofocus.d.ts",
       "import": "./dist/directives/autofocus.js"
     },
     "./directives/autosize": {
-      "types": "./dist/types/src/directives/autosize.d.ts",
+      "types": "./dist/types/directives/autosize.d.ts",
       "import": "./dist/directives/autosize.js"
     },
     "./directives/clickOutside": {
-      "types": "./dist/types/src/directives/clickOutside.d.ts",
+      "types": "./dist/types/directives/clickOutside.d.ts",
       "import": "./dist/directives/clickOutside.js"
     },
     "./directives/dropzone": {
-      "types": "./dist/types/src/directives/dropzone.d.ts",
+      "types": "./dist/types/directives/dropzone.d.ts",
       "import": "./dist/directives/dropzone.js"
     },
     "./directives/hotkey": {
-      "types": "./dist/types/src/directives/hotkey.d.ts",
+      "types": "./dist/types/directives/hotkey.d.ts",
       "import": "./dist/directives/hotkey.js"
     },
     "./directives/loading": {
-      "types": "./dist/types/src/directives/loading.d.ts",
+      "types": "./dist/types/directives/loading.d.ts",
       "import": "./dist/directives/loading.js"
     },
     "./fileValidation": {
-      "types": "./dist/types/src/fileValidation/index.d.ts",
+      "types": "./dist/types/fileValidation/index.d.ts",
       "import": "./dist/fileValidation/index.js"
     },
     "./i18n": {
-      "types": "./dist/types/src/i18n/index.d.ts",
+      "types": "./dist/types/i18n/index.d.ts",
       "import": "./dist/i18n/index.js"
     },
     "./i18n/all": {
-      "types": "./dist/types/src/i18n/all.d.ts",
+      "types": "./dist/types/i18n/all.d.ts",
       "import": "./dist/i18n/all.js"
     },
     "./vue": {
-      "types": "./dist/types/src/vue/index.d.ts",
+      "types": "./dist/types/vue/index.d.ts",
       "import": "./dist/vue/index.js"
     },
     "./granular-provider": {
-      "types": "./dist/types/src/granular-provider/index.d.ts",
+      "types": "./dist/types/granular-provider/index.d.ts",
       "import": "./dist/granular-provider.js",
       "default": "./dist/granular-provider.js"
     },
     "./granular-provider/node": {
-      "types": "./dist/types/src/granular-provider/node.d.ts",
+      "types": "./dist/types/granular-provider/node.d.ts",
       "import": "./dist/granular-provider-node.js",
       "default": "./dist/granular-provider-node.js"
     },
     "./tokens": {
-      "types": "./dist/types/src/tokens/index.d.ts",
+      "types": "./dist/types/tokens/index.d.ts",
       "import": "./dist/tokens.js",
       "default": "./dist/tokens.js"
     },
     "./testing": {
-      "types": "./dist/types/src/testing/index.d.ts",
+      "types": "./dist/types/testing/index.d.ts",
       "import": "./dist/testing.js",
       "default": "./dist/testing.js"
     },
     "./theme": {
-      "types": "./dist/types/src/theme/index.d.ts",
+      "types": "./dist/types/theme/index.d.ts",
       "import": "./dist/theme.js",
       "default": "./dist/theme.js"
     },
     "./theme/apply": {
-      "types": "./dist/types/src/theme/apply.d.ts",
+      "types": "./dist/types/theme/apply.d.ts",
       "import": "./dist/theme-apply.js",
       "default": "./dist/theme-apply.js"
     },
-    "./tokens/*.json": "./tokens/*.json"
+    "./tokens/*.json": "./tokens/*.json",
+    "./package.json": "./package.json"
   },
   "peerDependencies": {
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@floating-ui/dom": "^1.8.0",
-    "vue": "^3.5.40"
+    "vue": "^3.5.0"
   },
   "peerDependenciesMeta": {
     "@feugene/fint-i18n": {
@@ -511,6 +513,7 @@
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
     "test": "vitest --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "test:run": "vitest run --config vitest.config.ts",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   }

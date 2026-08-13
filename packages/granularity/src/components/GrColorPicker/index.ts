@@ -8,6 +8,6 @@ export { grColorPickerConfig } from './config'
 export type { GrColorPickerConfigurableProps } from './defaults'
 export type { GrColorPickerEmits, GrColorPickerProps } from './GrColorPicker.vue'
 export type { GrColorPickerSize } from './grColorPickerStyles'
-export { formatHexColor, type GrHsla, parseHexColor } from './color'
+export { type GrHsla } from './color'
 export { grColorPickerSafelist } from './safelist'
 export type GrColorPickerInstance = ComponentExposed<typeof GrColorPickerComponent>

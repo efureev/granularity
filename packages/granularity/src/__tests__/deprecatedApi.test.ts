@@ -6,9 +6,9 @@ import { describe, expect, it } from 'vitest'
 /**
  * Гейт на снятые deprecated-приёмы.
  *
- * Все четыре — одного класса: алиас или не-канонический префикс, который после
+ * Все — одного класса: алиас или не-канонический префикс, который после
  * 1.0 остался бы навсегда. CLAUDE.md §5 запрещает алиасы CSS-токенов, но три из
- * четырёх жили в коде именно так.
+ * них жили в коде именно так.
  */
 
 const srcDir = resolve(process.cwd(), 'src')
@@ -64,5 +64,15 @@ describe('снятые deprecated-приёмы', () => {
     // Вместе с алиасом ушла и нормализация: без него она была тождеством.
     expect('normalizeGrAlertVariant' in styles, 'нормализация алиаса больше не нужна').toBe(false)
     expect(grep(/GrAlertVariantInput/), 'тип-алиас снят').toEqual([])
+  })
+
+  it('нет эмита visibleChange: панель отдаёт только update:open', () => {
+    // Алиас `update:open` у `GrSelect` и `GrTreeSelect`. Возврат опаснее
+    // остальных пунктов: Vue не различает «эмит не объявлен» и «эмит не
+    // выстрелил», поэтому `@visible-change` у потребителя молчит в обе
+    // стороны — ни предупреждения о снятом событии, ни ошибки о новом.
+    const offenders = grep(/visibleChange/)
+
+    expect(offenders, offenders.join('\n')).toEqual([])
   })
 })

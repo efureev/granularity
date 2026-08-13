@@ -52,32 +52,34 @@ packages/<my-package>/
   "name": "@feugene/my-package",
   "version": "0.1.0",
   "type": "module",
-  "types": "./dist/types/src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": ["dist"],
   "sideEffects": ["**/*.css"],
   "publishConfig": { "access": "public", "provenance": true },
   "exports": {
     ".": {
-      "types": "./dist/types/src/index.d.ts",
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js"
     },
     "./components/GrMyThing": {
-      "types": "./dist/types/src/components/GrMyThing/index.d.ts",
+      "types": "./dist/types/components/GrMyThing/index.d.ts",
       "import": "./dist/components/GrMyThing/index.js"
     },
     "./granular-provider": {
-      "types": "./dist/types/src/granular-provider/index.d.ts",
+      "types": "./dist/types/granular-provider/index.d.ts",
       "import": "./dist/granular-provider.js"
     },
     "./granular-provider/node": {
-      "types": "./dist/types/src/granular-provider/node.d.ts",
+      "types": "./dist/types/granular-provider/node.d.ts",
       "import": "./dist/granular-provider-node.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.19.0 <1.0.0",
+    "@feugene/granularity": ">=0.20.0 <1.0.0",
     "@feugene/unocss-preset-granular": "^0.8.2",
-    "vue": "^3.5.40"
+    "vue": "^3.5.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
@@ -97,7 +99,16 @@ packages/<my-package>/
 `tsconfig.json` — для typecheck (`noEmit`), `tsconfig.build.json` — только `.d.ts` (эмит компонент
 делает `vite`, а декларации — `vue-tsc`). Проще всего скопировать из `packages/granularity-chrono`.
 Главное — `"jsxImportSource": "vue"`, `"types": ["vite/client", "node"]` (для `*.css`-импортов), и в
-`tsconfig.build.json` — `emitDeclarationOnly: true` + `declarationDir: "./dist/types"`.
+`tsconfig.build.json` — `emitDeclarationOnly: true` + `declarationDir: "./dist/types"` + **`rootDir:
+"src"`**.
+
+`rootDir` тут не косметика: без него TS берёт за корень общий префикс входных файлов, и любой файл
+вне `src` (типичный случай — `vite-env.d.ts` в корне пакета) добавляет в путь деклараций лишний
+сегмент `src`. Тогда `types` придётся писать как `./dist/types/src/index.d.ts` — путь, который ломает
+внешние инструменты. Если пакет использует `~icons/*`, декларации оттуда приходят как раз из
+`vite-env.d.ts`: под `rootDir: "src"` он в компиляцию не входит, поэтому в `tsconfig.build.json`
+добавьте `"unplugin-icons/types/vue"` в `types` — список из `extends` не мержится и перечисляется
+заново целиком.
 
 ## 3. `vite.config.ts`
 
@@ -308,8 +319,8 @@ i18n-entries в сборку. `sideEffects` не должен блокирова
 ```jsonc
 // package.json
 "exports": {
-  "./i18n":     { "types": "./dist/types/src/i18n/index.d.ts", "import": "./dist/i18n/index.js" },
-  "./i18n/all": { "types": "./dist/types/src/i18n/all.d.ts",   "import": "./dist/i18n/all.js" }
+  "./i18n":     { "types": "./dist/types/i18n/index.d.ts", "import": "./dist/i18n/index.js" },
+  "./i18n/all": { "types": "./dist/types/i18n/all.d.ts",   "import": "./dist/i18n/all.js" }
 },
 "peerDependencies": { "@feugene/fint-i18n": "^0.3.0" },
 "peerDependenciesMeta": { "@feugene/fint-i18n": { "optional": true } }
@@ -442,7 +453,7 @@ export function MyPackageResolver(): ComponentResolver {
 ```jsonc
 // package.json
 "exports": {
-  "./resolver": { "types": "./dist/types/src/resolver.d.ts", "import": "./dist/resolver.js" }
+  "./resolver": { "types": "./dist/types/resolver.d.ts", "import": "./dist/resolver.js" }
 },
 "peerDependencies": {
   "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",

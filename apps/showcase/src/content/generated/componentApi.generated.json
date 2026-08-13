@@ -8474,12 +8474,6 @@
             "signature": "(e: \"update:open\", value: boolean): void"
           },
           {
-            "name": "visibleChange",
-            "description": "Панель открылась/закрылась.",
-            "type": "[boolean]",
-            "signature": "(e: \"visibleChange\", visible: boolean): void"
-          },
-          {
             "name": "update:search",
             "description": "Текст поиска как контролируемое значение (`v-model:search`).",
             "type": "[string]",
@@ -11107,12 +11101,6 @@
             "description": "Панель открылась/закрылась (`v-model:open`).",
             "type": "[boolean]",
             "signature": "(e: \"update:open\", value: boolean): void"
-          },
-          {
-            "name": "visibleChange",
-            "description": "Панель открылась/закрылась.",
-            "type": "[boolean]",
-            "signature": "(e: \"visibleChange\", visible: boolean): void"
           },
           {
             "name": "clear",

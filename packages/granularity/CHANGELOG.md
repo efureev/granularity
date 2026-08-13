@@ -7,6 +7,115 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.20.0] 2026-08-13
+
+The release that freezes the public contract before `1.0`. Every breaking change
+below costs one edit today and a major version with a migration guide after the
+`1.0` tag — which is the only reason they are grouped into a single release.
+
+### Removed
+
+- **The deprecated `visibleChange` emit is gone** (`GrSelect`, `GrTreeSelect`).
+  Use `@update:open` / `v-model:open`, which have carried the same signal since
+  0.14.0.
+
+  ⚠️ **This one breaks silently.** Vue does not distinguish "the emit is not
+  declared" from "the emit did not fire": a template that still says
+  `@visible-change="…"` produces no error, no warning, and no console output —
+  the handler simply stops running. Grep your templates for both spellings
+  (`@visible-change` and `@visibleChange`) rather than waiting for a test to
+  catch it. A gate in `deprecatedApi.test.ts` now keeps the name out of the
+  package for good.
+
+- **The public export surface is narrower: 832 names → 767.** Component barrels
+  were leaking their own internals — splitter geometry, hex parsing, cell
+  comparison, injection keys, runtime variant tuples — and `1.0` would have
+  frozen all of it as API. What went: 65 value exports with no consumer anywhere
+  in this repository or its docs, plus the two transitive `export *` re-exports
+  (`GrCollapse` → its context module, `GrFileUpload` → the whole
+  `fileValidation` barrel).
+
+  Untouched: every component, `GrXProps` / `GrXEmits` / `GrXInstance`,
+  `grXConfig`, `grXSafelist`, the documented variant types (`GrButtonVariant`,
+  `GrTabsOrientation`, `GrBadgeTone` and the rest), every `use*` composable, and
+  the error classes you catch (`GrUploadAbortError`, `GrUploadHttpError`,
+  `FileValidationError`).
+
+  **The one migration you may actually need:** file-validation values
+  (`acceptValidator`, `maxFileSize`, `normalizeFiles`, `runFileValidators`,
+  `matchAccept`, …) reached the root barrel only through `GrFileUpload`'s
+  `export *`. They now live where the docs always pointed —
+  `@feugene/granularity/fileValidation`. Types are unaffected: the root barrel
+  re-exports them as before.
+
+  A new gate (`publicSurface.test.ts`) keeps the surface from growing back: a
+  value leaving a component barrel must be the component, its config, its
+  safelist, a composable, or an entry in a closed allow-list with a stated
+  consumer.
+
+### Changed
+
+- **`types` now resolves to `dist/types/index.d.ts`, and `main` is present.**
+  The old path carried a `src` segment (`dist/types/src/index.d.ts`) — an
+  artefact of `vue-tsc` compiling with the package root as `rootDir`, which
+  broke tools that resolve declarations by convention. If you hard-coded the old
+  path anywhere, drop the `src`. The same fix landed in `@feugene/extra-granularity`
+  and `@feugene/unplugin-granularity`.
+
+- **`exports` gained `"./package.json"`.** Bundler analyzers, resolver plugins
+  and metadata checks read it directly, and Node refuses paths that are not
+  exported.
+
+- **`peerDependencies.vue` lowered from `^3.5.40` to `^3.5.0`.** This widens
+  compatibility rather than breaking it: the real floor is `useId`, available
+  since 3.5.0, and nothing in the package uses an API from 3.5.1–3.5.40. The
+  narrow range was excluding consumers for no reason.
+
+- **RTL is explicitly unsupported.** Components lay out with physical directions
+  (112 occurrences across 27 components) and never read `dir`; a right-to-left
+  document renders mirrored. Moving to logical properties changes how every
+  component looks, so it belongs in a major release, not a patch. Recorded in
+  `README.md` and `docs/styling.md` so the answer is findable instead of
+  inferred.
+
+### Added
+
+- **Coverage is a gate, not a suggestion.** The `coverage-granularity` CI job is
+  enabled with per-metric thresholds (lines 89, statements 87, functions 89,
+  branches 81 — measured values minus ~3 pp of headroom, because v8 counts SFC
+  coverage slightly differently between vitest patches and a zero-margin gate is
+  just a flake generator). The job could never have run before: the root
+  `coverage:granularity` script called `test:coverage`, which the package did not
+  define. Data files (generated registries, safelists, defaults, locales) are
+  excluded — with them in the denominator the number measures how much of `src`
+  is data, not how well it is tested.
+
+- **Negative form-control contract tests** (`formControlNegative.test.ts`). The
+  suite had 3200 tests proving components *do* things and almost none proving
+  what they must *refuse* to do — which is exactly why the readonly bypasses and
+  IME commits found in the 2026-08-08 audit walked past all of them. Two classes,
+  both asserted in **both** directions, because "no event was emitted" is free
+  for a component that ignores the keyboard entirely: every key that changes a
+  value must stop changing it under `readonly`, and `Enter` during IME
+  composition must not commit what plain `Enter` does. The control registry moved
+  to `src/__tests__/formControls.ts` so contract and negative gates read one list.
+
+- **`keydown` and `composingKeydown` in `@feugene/granularity/testing`.**
+  `isComposing` is read-only on `KeyboardEvent` and silently lost by
+  `wrapper.trigger('keydown', …)`, so the obvious way to write an IME test
+  actually tests a plain `Enter` — it stays green on broken code. The helper sets
+  both `isComposing` and `keyCode: 229`, matching the predicate the package reads.
+
+- **Keyboard e2e for seven components** — `GrInput`, `GrTextarea`,
+  `GrFileUpload`, `GrTable`, `GrSidebar`, `GrBottomNav`, `GrList` — in
+  `interaction.spec.ts` (8 scenarios → 17). All seven were unverified for the
+  same reason: their contract is tab order, focus return after an action, arrow
+  scrolling and `aria-disabled` semantics — none of which exist in jsdom.
+
+- **Two showcase demos that were missing outright:** `clearable` on `GrTextarea`
+  and a labelled scroll region on `GrTable` (`maxHeight` + `stickyHeader` +
+  `regionLabel`). Both features shipped long ago with nowhere to see them.
+
 ## [v0.19.0] 2026-08-13
 
 ### Added

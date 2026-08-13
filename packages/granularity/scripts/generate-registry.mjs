@@ -39,7 +39,15 @@ const check = process.argv.includes('--check')
 const targets = [
   codegenTargets.barrel(),
   codegenTargets.viteEntries(),
-  codegenTargets.packageExports(),
+  // Своя форма subpath-экспорта: декларации лежат в `dist/types/` без сегмента
+  // `src` — `rootDir` в `tsconfig.build.json` указывает на `src`. Дефолт
+  // генератора описывает раскладку, которой в репозитории больше нет.
+  codegenTargets.packageExports({
+    entryFor: component => ({
+      types: `./dist/types/components/${component}/index.d.ts`,
+      import: `./dist/components/${component}/index.js`,
+    }),
+  }),
   ...codegenTargets.providerRegistry(),
 ]
 

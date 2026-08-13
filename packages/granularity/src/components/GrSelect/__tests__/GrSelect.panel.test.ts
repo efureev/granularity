@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import GrForm from '../../GrForm/GrForm.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrSelect from '../GrSelect.vue'
+import { composingKeydown } from '../../../testing/keyboard'
 
 /**
  * Контракт панели-combobox: фокус живёт на триггере (или в поле поиска), список
@@ -273,9 +274,7 @@ describe('GrSelect — IME-композиция', () => {
     const wrapper = mountPanel()
     await wrapper.get('[data-gr-select-trigger]').trigger('click')
 
-    wrapper.get('[data-gr-select-trigger]').element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true, cancelable: true }),
-    )
+    composingKeydown(wrapper.get('[data-gr-select-trigger]').element, 'Enter')
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
