@@ -271,6 +271,62 @@ function chartPieApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
+/** Публичная поверхность паутины: две шкалы осей и своя геометрия. */
+function chartRadarApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии по общему набору осей. Своего `xScale` у радара нет — ось всегда категориальная. Серия, не знающая какой-то оси, получает на ней пропуск: спицы не исчезают при скрытии ряда.' },
+        { name: 'axisScale', type: `'shared' | 'per-axis'`, default: `'shared'`, description: '`shared` — одна шкала на все оси: площадь фигуры сравнима, форма честна. `per-axis` — каждая ось нормирована своим максимумом; единственный способ показать разнородные метрики, но площади при этом сравнивать нельзя.' },
+        { name: 'axisMax', type: 'Record&lt;string, number&gt;', description: 'Верхние границы осей при `per-axis`, ключ — имя оси. Без них максимум берётся из данных, и лучший результат садится на внешнее кольцо — что читается как «предел достигнут».' },
+        { name: 'rings', type: 'number', default: '4', description: 'Желаемое число колец. Фактическое следует лестнице «красивых» чисел: кольцо обязано стоять на круглом значении. При `per-axis` круглых значений нет, и колец ровно столько, сколько запрошено.' },
+        { name: 'shape', type: `'polygon' | 'circle'`, default: `'polygon'`, description: 'Форма колец сетки.' },
+        { name: 'startAngle', type: 'number', default: '0', description: 'Угол первой оси в градусах от двенадцати часов, по часовой.' },
+        { name: 'fill', type: 'boolean', default: 'true', description: 'Полупрозрачная заливка контура. На трёх и более сериях её выключают: заливки наслаиваются и прячут друг друга.' },
+        { name: 'showPoints', type: `'auto' | 'always' | 'never'`, default: `'auto'`, description: 'Марки вершин. Форма марки — второй различитель серии помимо цвета.' },
+        { name: 'yDomain', type: '[number | null, number | null]', description: 'Границы оси значений при `shared`. Ноль в домене остаётся всегда: длина луча и есть величина.' },
+        { name: 'height', type: 'number', default: '280', description: 'Высота холста в пикселях.' },
+        { name: 'width', type: 'number', default: '640', description: 'Объявленная ширина: от неё идёт серверный рендер, клиентская уточняется замером.' },
+        { name: 'showLegend / legendPosition', type: `boolean | 'auto' · 'top' | 'bottom'`, default: `'auto' · 'bottom'`, description: '`auto` — легенда появляется от второй серии.' },
+        { name: 'tooltip', type: 'boolean', default: 'true', description: 'Тултип от координаты указателя. Попадание угловое — ближайшая спица.' },
+        { name: 'hiddenSeries', type: 'readonly string[]', description: '`v-model:hiddenSeries` — скрытые серии по id. Оси при этом остаются на месте.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — индекс активной оси.' },
+        { name: 'loading / empty / emptyText', type: 'boolean · boolean · string', description: 'Состояния. Ряд из нулей — не пустое состояние, а законная картинка.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Полные данные таблицей. При `per-axis` в неё добавляется столбец с максимумом оси — без него форма фигуры из таблицы не восстанавливается.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку: `role="img"` с именем, без фокуса, тултипа и клавиатуры.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Точность и разделители значений.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей и размер марок. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:hiddenSeries', type: '(value: string[]) => void', description: 'Легенда переключила серию.' },
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Активная ось сменилась — указателем или клавиатурой.' },
+        { name: 'pointClick', type: '(value: GrChartActivePoint) => void', description: 'Клик или `Enter` на активной оси.' },
+        { name: 'pointHover', type: '(value: GrChartActivePoint | null) => void', description: 'Активная ось сменилась. `null` — курсор ушёл с паутины.' },
+        { name: 'legendToggle', type: '(value: { seriesId: string, hidden: boolean }) => void', description: 'Намерение скрыть или показать серию. Применяет его потребитель — состояние его.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active: GrChartActivePoint, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'legend', type: '{ series, toggle }', description: 'Своя легенда.' },
+        { name: 'empty', type: '—', description: 'Своё пустое состояние вместо `GrEmptyState`.' },
+        { name: 'header', type: '—', description: 'Строка над графиком: заголовок, действия.' },
+      ],
+    },
+  ]
+}
+
 /** Публичная поверхность спарклайна: он неинтерактивен, поэтому эмитов нет. */
 function sparklineApiSections(): ShowcaseApiSectionMeta[] {
   return [
@@ -753,6 +809,43 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: chartPieApiSections(),
+      },
+      {
+        name: 'GrChartRadar',
+        slug: 'gr-chart-radar',
+        title: 'GrChartRadar',
+        summary: 'Профиль по нескольким осям и сравнение профилей. Отвечает на вопрос, которого не закрывают ни столбцы, ни круг: не «сколько» и не «из чего», а какой формы.',
+        importPath: '@feugene/granularity-charts/components/GrChartRadar',
+        examples: [
+          {
+            id: 'charts-radar-basic',
+            title: 'Two profiles at a glance',
+            description: 'Столбцы дают те же числа, но не дают формы; круг говорит о долях одного целого, а не о профиле. Два продукта по пяти критериям сравниваются одним взглядом — там, где две таблицы пришлось бы читать.',
+            previewKey: 'extra-charts-radar-basic',
+            note: 'Стрелки ходят по осям от двенадцати часов по часовой, `↑`/`↓` меняют читаемый ряд. У графика одна остановка `Tab`.',
+          },
+          {
+            id: 'charts-radar-per-axis',
+            title: 'Metrics that share nothing',
+            description: 'Выручка в миллионах, NPS в баллах и отклик в миллисекундах общей шкалы не имеют. `axis-scale="per-axis"` нормирует каждую спицу своим максимумом — единственный способ показать такой набор. Переключатель показывает, во что превращается та же картинка на общей шкале.',
+            previewKey: 'extra-charts-radar-per-axis',
+            note: 'Подписи колец при нормировке исчезают намеренно: единственного верного числа для кольца там нет, и максимум уезжает в имя оси. Тултип и таблица по-прежнему показывают исходное значение, а не долю.',
+          },
+          {
+            id: 'charts-radar-gaps',
+            title: 'A month without data',
+            description: 'Пропуск на радаре — не ноль и не «соединить по прямой». Замкнуть контур через него значит нарисовать ребро, которого нет; залить рваный контур — площадь, которой нет.',
+            previewKey: 'extra-charts-radar-gaps',
+            note: 'Стрелки проходят по осям с пропуском: значение отсутствует, ось существует.',
+          },
+          {
+            id: 'charts-radar-shape',
+            title: 'Twelve axes, three series',
+            description: 'Плотный случай: форма сетки, число колец и заливка. На трёх сериях поверх двенадцати осей заливки наслаиваются и прячут друг друга — тогда её выключают, и различителями остаются цвет, форма марки и штриховка контура.',
+            previewKey: 'extra-charts-radar-shape',
+          },
+        ],
+        apiSections: chartRadarApiSections(),
       },
       {
         name: 'GrSparkline',

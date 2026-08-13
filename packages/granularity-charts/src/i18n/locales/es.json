@@ -39,6 +39,15 @@
     "columnValue": "Valor",
     "columnShare": "Proporción"
   },
+  "radar": {
+    "roleDescription": "gráfico radial",
+    "summary": "Gráfico radial, {axes} ejes, {series} series",
+    "keyboardHint": "Usa las flechas para recorrer los ejes",
+    "axisWithMax": "{axis} · {max}",
+    "point": "{axis}. {series}: {value} de {max}",
+    "columnAxis": "Eje",
+    "columnMax": "Máximo del eje"
+  },
   "legend": {
     "toggle": "Mostrar u ocultar {label}",
     "hidden": "{label} oculta, {shown} de {total} series visibles",

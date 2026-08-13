@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
 import GrChartLine from '../components/GrChartLine/GrChartLine.vue'
+import GrChartRadar from '../components/GrChartRadar/GrChartRadar.vue'
 import GrSparkline from '../components/GrSparkline/GrSparkline.vue'
 
 /**
@@ -76,6 +77,39 @@ describe('a11y', () => {
   it('GrChartLine — неинтерактивный режим без нарушений', async () => {
     const wrapper = mount(GrChartLine, {
       props: { series, interactive: false, ariaLabel: 'Weekly revenue' },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    expect(await violations(wrapper.element as Element)).toEqual([])
+    wrapper.unmount()
+  })
+
+  it('GrChartRadar — паутина с легендой и таблицей, без нарушений', async () => {
+    const wrapper = mount(GrChartRadar, {
+      props: {
+        series: [
+          { id: 'a', label: 'A', x: ['Speed', 'Price', 'Support'], y: [8, 6, 9] },
+          { id: 'b', label: 'B', x: ['Speed', 'Price', 'Support'], y: [6, 9, 5] },
+        ],
+        showLegend: true,
+        dataTable: 'visible',
+      },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    expect(await violations(wrapper.element as Element)).toEqual([])
+    wrapper.unmount()
+  })
+
+  it('GrChartRadar с нормировкой на ось — таблица с максимумами, без нарушений', async () => {
+    const wrapper = mount(GrChartRadar, {
+      props: {
+        series: [{ id: 'a', label: 'A', x: ['Revenue', 'NPS'], y: [4.2, 62] }],
+        axisScale: 'per-axis',
+        dataTable: 'visible',
+      },
       attachTo: document.body,
     })
     await nextTick()

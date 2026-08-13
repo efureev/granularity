@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `GrChartRadar` — radar chart: a profile across several axes and the comparison of profiles. Two axis scales —
+  `shared` (one scale for every spoke, so the shape and the area are both comparable) and `per-axis` (each spoke
+  normalised by its own maximum, the only way to put unrelated metrics on one web). Under `per-axis` the ring labels
+  give way to the axis maxima, which move into the axis names, the announcement gains "of {max}", and the hidden
+  table gains an axis-maximum column — without it the shape cannot be reconstructed from the table.
 - `GrChartLine` gained `gaps: 'hidden' | 'shadow' | 'dashed'` — what to draw across a break in the series. The bridge
   is always straight, even when the line is smoothed, and never reaches the tooltip or the data table: those keep
   reporting "no value".

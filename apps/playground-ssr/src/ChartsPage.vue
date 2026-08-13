@@ -4,6 +4,7 @@ import {
   GrChartBar,
   GrChartLine,
   GrChartPie,
+  GrChartRadar,
   GrSparkline,
 } from '@feugene/granularity-charts'
 
@@ -55,6 +56,11 @@ const slices = [
 ]
 
 const spark = [12, 15, 14, 19, 22, 20, 26, 31]
+
+const radar = [
+  { id: 'ours', label: 'Ours', x: ['Speed', 'Price', 'Support', 'Docs'], y: [8, 6, 9, 7] },
+  { id: 'rival', label: 'Rival', x: ['Speed', 'Price', 'Support', 'Docs'], y: [6, 9, 5, 4] },
+]
 </script>
 
 <template>
@@ -87,6 +93,11 @@ const spark = [12, 15, 14, 19, 22, 20, 26, 31]
 
     <!-- Текстура шестой доли — `<pattern>`, третий вид id в разметке. -->
     <GrChartPie :data="slices" variant="donut" :width="640" :height="240" locale="en-US" aria-label="Traffic sources" />
+
+    <!-- Паутина строится тригонометрией от замеренной ширины: если гард
+         `ResizeObserver` откажет, спицы схлопнутся в точку. Своих `useId()` у
+         радара нет — заливка плоская, `<defs>` ему не нужны. -->
+    <GrChartRadar :series="radar" :width="640" :height="280" locale="en-US" aria-label="Product comparison" />
 
     <!-- Рамы не использует вовсе: ни замера, ни живого региона — чистый SVG. -->
     <GrSparkline :data="spark" locale="en-US" />

@@ -40,6 +40,19 @@ export {
 export type { BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
 export { barPath, barRect, groupSlots } from './chartBars'
 
+export type { RadarHitBounds, RadarSegments } from './chartRadar'
+export {
+  alignSeriesToAxes,
+  nearestAxis,
+  perAxisMaxima,
+  radarAreaPath,
+  radarAxisAngles,
+  radarLabelAnchor,
+  radarLinePath,
+  radarRingPath,
+  radarSegments,
+} from './chartRadar'
+
 export type { ChartMark } from './chartMarks'
 export { activeSymbolMarks, symbolMarks, toPixelPoints, toStackBand } from './chartMarks'
 

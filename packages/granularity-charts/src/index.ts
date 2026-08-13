@@ -3,6 +3,7 @@ export * from './components/GrChartArea'
 export * from './components/GrChartBar'
 export * from './components/GrChartLine'
 export * from './components/GrChartPie'
+export * from './components/GrChartRadar'
 export * from './components/GrSparkline'
 // </granularity:components>
 

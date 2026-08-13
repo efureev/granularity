@@ -68,6 +68,10 @@
       "types": "./dist/types/components/GrChartPie/index.d.ts",
       "import": "./dist/components/GrChartPie/index.js"
     },
+    "./components/GrChartRadar": {
+      "types": "./dist/types/components/GrChartRadar/index.d.ts",
+      "import": "./dist/components/GrChartRadar/index.js"
+    },
     "./components/GrSparkline": {
       "types": "./dist/types/components/GrSparkline/index.d.ts",
       "import": "./dist/components/GrSparkline/index.js"

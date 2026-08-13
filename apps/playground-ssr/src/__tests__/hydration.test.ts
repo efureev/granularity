@@ -349,6 +349,7 @@ describe('гидрация companion-пакета charts', () => {
     expect(snapshots.charts.html).toMatch(/data-gr-chart-area-fill/)
     expect(snapshots.charts.html).toMatch(/data-gr-chart-bar-mark/)
     expect(snapshots.charts.html).toMatch(/data-gr-chart-pie-slice/)
+    expect(snapshots.charts.html).toMatch(/data-gr-chart-radar-outline/)
     expect(snapshots.charts.html).toMatch(/data-gr-sparkline/)
   })
 

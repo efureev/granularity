@@ -14,6 +14,7 @@ export const GRANULARITY_CHARTS_COMPONENTS = [
   'GrChartBar',
   'GrChartLine',
   'GrChartPie',
+  'GrChartRadar',
   'GrSparkline',
   // </granularity:components>
 ] as const

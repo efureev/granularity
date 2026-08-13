@@ -12,6 +12,7 @@ import { grChartAreaConfig } from '../components/GrChartArea/config'
 import { grChartBarConfig } from '../components/GrChartBar/config'
 import { grChartLineConfig } from '../components/GrChartLine/config'
 import { grChartPieConfig } from '../components/GrChartPie/config'
+import { grChartRadarConfig } from '../components/GrChartRadar/config'
 import { grSparklineConfig } from '../components/GrSparkline/config'
 // </granularity:components:imports>
 
@@ -33,6 +34,7 @@ export const granularityChartsComponentConfigs = {
   GrChartBar: grChartBarConfig,
   GrChartLine: grChartLineConfig,
   GrChartPie: grChartPieConfig,
+  GrChartRadar: grChartRadarConfig,
   GrSparkline: grSparklineConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>

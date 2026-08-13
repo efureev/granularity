@@ -39,6 +39,15 @@
     "columnValue": "Значение",
     "columnShare": "Доля"
   },
+  "radar": {
+    "roleDescription": "лепестковая диаграмма",
+    "summary": "Лепестковая диаграмма, осей: {axes}, рядов: {series}",
+    "keyboardHint": "Стрелки — переход по осям",
+    "axisWithMax": "{axis} · {max}",
+    "point": "{axis}. {series}: {value} из {max}",
+    "columnAxis": "Ось",
+    "columnMax": "Максимум оси"
+  },
   "legend": {
     "toggle": "Показать или скрыть {label}",
     "hidden": "{label} скрыта, показано {shown} из {total}",

@@ -74,6 +74,9 @@ export default defineConfig({
         'components/GrChartPie/index': fileURLToPath(
           new URL('./src/components/GrChartPie/index.ts', import.meta.url),
         ),
+        'components/GrChartRadar/index': fileURLToPath(
+          new URL('./src/components/GrChartRadar/index.ts', import.meta.url),
+        ),
         'components/GrSparkline/index': fileURLToPath(
           new URL('./src/components/GrSparkline/index.ts', import.meta.url),
         ),
