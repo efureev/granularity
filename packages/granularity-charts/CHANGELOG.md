@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v0.2.0] 2026-08-13
+### Fixed
+
+- Switching locale no longer shifts the plot area. `Intl` uses a non-breaking space (`U+00A0` in `ru`/`fi`) or a
+  narrow one (`U+202F` in `fr`) as the thousands separator, and the label-width estimator scored those as
+  medium-width characters — so `1 000` reserved more axis gutter than `1,000`, and the drawing moved with it. Any
+  whitespace now counts as narrow.
 
 First published release. `0.1.0` was cut in the working tree but never tagged or published, so everything the
 package contains ships here.

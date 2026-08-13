@@ -47,8 +47,20 @@ const DEFAULT_MAX_AXIS_WIDTH = 96
 const LINE_HEIGHT_RATIO = 1.35
 const DEFAULT_PADDING = { top: 8, right: 8, bottom: 4, left: 4 } as const
 
-const NARROW = new Set([...'.,:;\'`|!ift1 '])
+const NARROW = new Set([...'.,:;\'`|!ift1'])
 const WIDE = new Set([...'ABCDEFGHKLMNOPQRSTUVXYZmw@%'])
+
+/**
+ * Пробел любого вида — узкий, и проверяется он классом, а не перечислением.
+ *
+ * Разделитель разрядов у `Intl` — пробел далеко не всегда обычный: русский и
+ * финский ставят неразрывный `U+00A0`, французский — узкий неразрывный
+ * `U+202F`. По коду с `' '` они не совпадают, и в перечислении их не было —
+ * значит, «1 000» оценивалось шире, чем «1,000», хотя рисуется той же
+ * шириной. Отступ оси от этого гулял на смене локали, и вместе с ним
+ * переезжала вся область построения.
+ */
+const SPACE = /\s/u
 
 /**
  * Ширина строки без DOM.
@@ -61,7 +73,7 @@ export function estimateTextWidth(text: string, fontSizePx: number): number {
   let units = 0
 
   for (const char of text) {
-    if (NARROW.has(char))
+    if (NARROW.has(char) || SPACE.test(char))
       units += 0.32
     else if (WIDE.has(char))
       units += 0.68

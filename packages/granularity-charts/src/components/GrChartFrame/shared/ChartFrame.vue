@@ -92,7 +92,7 @@ export interface ChartFrameProps {
   /**
    * Точки, зависящие от системы координат. Дефолты декартовы; круг подменяет
    * их, потому что у него попадание угловое, якорь тултипа — центроид доли,
-   * строка таблицы — доля, а описание точки включает процент (§10).
+   * строка таблицы — доля, а описание точки включает процент.
    */
   hitTest?: (point: { x: number, y: number }, context: ChartHitContext) => number
   anchorPoint?: (index: number, context: ChartHitContext) => { x: number, y: number } | null

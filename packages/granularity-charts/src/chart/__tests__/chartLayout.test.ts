@@ -80,3 +80,20 @@ describe('chartLayout', () => {
     expect(layout.gutters.right).toBeGreaterThan(8)
   })
 })
+
+describe('estimateTextWidth: разделители разрядов', () => {
+  it('одно и то же число оценивается одинаково в любой локали', () => {
+    // `Intl` ставит в группировке неразрывный пробел (ru, fi) или узкий
+    // неразрывный (fr). Считай мы их знаками средней ширины — отступ оси гулял
+    // бы на смене локали, а вместе с ним переезжала бы область построения.
+    const en = estimateTextWidth(new Intl.NumberFormat('en').format(1000), 12)
+
+    for (const locale of ['ru', 'fr', 'fi', 'de-CH'])
+      expect(estimateTextWidth(new Intl.NumberFormat(locale).format(1000), 12)).toBe(en)
+  })
+
+  it('пробел любого вида — узкий', () => {
+    for (const space of [' ', '\u00A0', '\u202F', '\u2009'])
+      expect(estimateTextWidth(space, 10)).toBe(estimateTextWidth(' ', 10))
+  })
+})

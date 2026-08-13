@@ -282,7 +282,7 @@ function labelTextOf(entry: PieEntry): string {
  * Место, которое подписи забирают у радиуса, считается по самой длинной из них.
  *
  * Замерить текст нечем — `getBBox` нет в jsdom и он форсирует reflow в браузере
- * (§3 ТЗ), — поэтому ширина оценивается по числу знаков.
+ * (докблок `chart/chartLayout.ts`), — поэтому ширина оценивается по числу знаков.
  */
 const labelGutter = computed(() => {
   if (!showLabels.value)
