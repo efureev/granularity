@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
+import ChartsPage from '../src/ChartsPage.vue'
 import ChronoPage from '../src/ChronoPage.vue'
 import OverlayStackPage from '../src/OverlayStackPage.vue'
 import RiskyPage from '../src/RiskyPage.vue'
@@ -27,15 +28,17 @@ export default async function setup(): Promise<void> {
   // телепортирующих компонентов (регрессионный гейт к ANALYSIS §60),
   // `risky` — компоненты с браузерным API, `navigator` и авто-id в setup,
   // `overlayStack` — два открытых оверлея и чтение темы,
-  // `chrono` — companion-пакет: часы в отрисовке, ленивые панели, `useAnnouncer`.
-  const [app, teleport, risky, overlayStack, chrono] = await Promise.all([
+  // `chrono` — companion-пакет: часы в отрисовке, ленивые панели, `useAnnouncer`,
+  // `charts` — companion-пакет: `ResizeObserver`, `useId()` в разметке SVG.
+  const [app, teleport, risky, overlayStack, chrono, charts] = await Promise.all([
     render(),
     render(TeleportPage),
     render(RiskyPage),
     render(OverlayStackPage),
     render(ChronoPage),
+    render(ChartsPage),
   ])
 
   await mkdir(dirname(SSR_SNAPSHOT_PATH), { recursive: true })
-  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack, chrono }), 'utf8')
+  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack, chrono, charts }), 'utf8')
 }

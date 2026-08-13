@@ -136,9 +136,11 @@ jobs:
   # Стенд рендерит и ядро, и companion-пакет: у обоих в setup есть браузерный
   # API, телепорты и живые регионы, а расхождения видны только на гидрации.
   test-playground-ssr:
+    # Стенд рендерит страницы обоих компаньонов, поэтому ему нужен и их dist.
     needs:
       - build-granularity
       - build-granularity-chrono
+      - build-granularity-charts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -161,6 +163,12 @@ jobs:
         with:
           name: granularity-chrono-dist
           path: packages/granularity-chrono/dist
+
+      - name: Download granularity-charts dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-charts-dist
+          path: packages/granularity-charts/dist
 
       - name: Test SSR playground
         run: yarn test:playground-ssr

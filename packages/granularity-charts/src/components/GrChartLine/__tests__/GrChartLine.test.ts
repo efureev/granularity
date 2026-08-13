@@ -84,6 +84,79 @@ describe('GrChartLine', () => {
     expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([null])
   })
 
+  it('первое нажатие заходит с того края, куда ведёт клавиша', async () => {
+    // Иначе первое движение с клавиатуры не даёт ничего, и пользователь решает,
+    // что график клавиатуру не понимает (`docs/keyboard.md`).
+    const right = factory()
+
+    keydown(right.find('[data-gr-chart-surface]').element, 'ArrowRight')
+    await nextTick()
+    expect(right.emitted('update:activeIndex')?.at(-1)).toEqual([0])
+
+    const left = factory()
+
+    keydown(left.find('[data-gr-chart-surface]').element, 'ArrowLeft')
+    await nextTick()
+    expect(left.emitted('update:activeIndex')?.at(-1)).toEqual([3])
+  })
+
+  it('движение по ряду не кольцуется: на краю курсор остаётся на месте', async () => {
+    const wrapper = factory()
+    const surface = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(surface, 'End')
+    keydown(surface, 'ArrowRight')
+    await nextTick()
+
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([3])
+  })
+
+  it('PageDown шагает десятой частью ряда, но не меньше точки', async () => {
+    const dense = { id: 'a', y: Array.from({ length: 50 }, (_, index) => index) }
+    const wrapper = factory({ series: [dense] })
+
+    keydown(wrapper.find('[data-gr-chart-surface]').element, 'PageDown')
+    await nextTick()
+
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([5])
+  })
+
+  /**
+   * Клавиша, которой нечего делать, не съедается. Иначе `Esc` не закрыл бы
+   * модалку, в которой стоит график, а `Space` перестал бы прокручивать
+   * страницу — обе потери тихие.
+   */
+  it.each([
+    ['Escape'],
+    [' '],
+    ['ArrowUp'],
+  ])('%s без работы не перехватывается', (key) => {
+    const wrapper = factory({ series: [{ id: 'a', y: [1, 2, 3] }] })
+    const event = new KeyboardEvent('keydown', { key, cancelable: true, bubbles: true })
+
+    wrapper.find('[data-gr-chart-surface]').element.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(false)
+  })
+
+  it('стрелки вверх и вниз меняют читаемую серию и кольцуются', async () => {
+    const wrapper = factory({}, { i18n: i18nAdapter({}) })
+    const surface = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(surface, 'ArrowRight')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Продажи')
+
+    keydown(surface, 'ArrowDown')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Возвраты')
+
+    // Серий две — второй шаг возвращает к первой.
+    keydown(surface, 'ArrowDown')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Продажи')
+  })
+
   it('Tab не перехватывается — фокус обязан уходить дальше', () => {
     const wrapper = factory()
     const event = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true, bubbles: true })

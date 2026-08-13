@@ -60,7 +60,8 @@ import { en, GR_CHARTS_I18N_BLOCK, ru } from '@feugene/granularity-charts/i18n'
 ## Доки
 
 - [`docs/model.md`](./docs/model.md) — форма данных, шкалы, деления, что считается пропуском;
-- [`docs/a11y.md`](./docs/a11y.md) — клавиатура, объявления, скрытая таблица;
+- [`docs/a11y.md`](./docs/a11y.md) — роли, объявления, скрытая таблица;
+- [`docs/keyboard.md`](./docs/keyboard.md) — карта клавиш, края ряда, различия типов графиков;
 - [`docs/theming.md`](./docs/theming.md) — токены пакета, палитра серий, различители помимо цвета;
 - [`docs/ssr.md`](./docs/ssr.md) — первый рендер от объявленной ширины.
 

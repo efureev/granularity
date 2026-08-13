@@ -199,6 +199,27 @@ describe('GrChartPie', () => {
     expect(message).toContain('%')
   })
 
+  it('стрелки заходят и на доли, которых нет на рисунке', async () => {
+    // Пропуск, ноль и отрицательное значение доли не дают, но из данных не
+    // исчезают: клавиатура их проходит, а объявление читает значение и ставит
+    // прочерк вместо процента (`docs/keyboard.md`). Промолчать было бы хуже.
+    const wrapper = factory(
+      { data: [{ label: 'Есть', value: 10 }, { label: 'Нет', value: 0 }] },
+      { i18n: i18nAdapter({}) },
+    )
+    const surface = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(surface, 'End')
+    await nextTick()
+
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([1])
+
+    const message = await announced()
+
+    expect(message).toContain('Нет')
+    expect(message).not.toContain('%')
+  })
+
   it('у круга ровно одна остановка Tab', () => {
     expect(factory().findAll('[tabindex="0"]')).toHaveLength(1)
   })

@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
+import ChartsPage from '../ChartsPage.vue'
 import ChronoPage from '../ChronoPage.vue'
 import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
@@ -38,6 +39,7 @@ const snapshots = JSON.parse(
   risky: SsrSnapshot
   overlayStack: SsrSnapshot
   chrono: SsrSnapshot
+  charts: SsrSnapshot
 }
 
 function captureConsole(): string[] {
@@ -321,6 +323,92 @@ describe('гидрация companion-пакета chrono', () => {
   it('а с base — нет: там рендер детерминирован и обязан совпасть', async () => {
     const distorted = { ...snapshots.chrono, html: distortRelative(snapshots.chrono.html, 0) }
     const problems = hydrationProblems(await hydrate(distorted, { root: ChronoPage }))
+
+    expect(problems.length).toBeGreaterThan(0)
+  })
+})
+
+/**
+ * Companion-пакет `@feugene/granularity-charts`.
+ *
+ * Часов пакет не читает вовсе — ось времени строится от значений в данных, —
+ * поэтому помеченных расхождений здесь нет ни одного и гейт обязан быть чист
+ * целиком. Проверяются два класса дефектов, ради которых стенд и существует:
+ * `ResizeObserver`, которого на сервере нет, и `useId()`, чьи имена в разметке
+ * SVG обязаны совпасть посимвольно.
+ */
+describe('гидрация companion-пакета charts', () => {
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.charts, { root: ChartsPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('серверный HTML содержит нарисованные графики, а не пустые обёртки', () => {
+    expect(snapshots.charts.html).toMatch(/data-gr-chart-line-body/)
+    expect(snapshots.charts.html).toMatch(/data-gr-chart-area-fill/)
+    expect(snapshots.charts.html).toMatch(/data-gr-chart-bar-mark/)
+    expect(snapshots.charts.html).toMatch(/data-gr-chart-pie-slice/)
+    expect(snapshots.charts.html).toMatch(/data-gr-sparkline/)
+  })
+
+  it('раскладка уходит с сервера от объявленной ширины, а не от нуля', () => {
+    // `ResizeObserver` на сервере нет, и гард обязан работать режимом, а не
+    // отказом: без объявленной ширины холст схлопнулся бы в точку, а ось не
+    // получила бы ни одного деления.
+    expect(snapshots.charts.html).toMatch(/viewBox="0 0 640 220"/)
+    expect(snapshots.charts.html.match(/data-gr-chart-axis="y"/g) ?? []).not.toHaveLength(0)
+  })
+
+  it('ничего не помечено ожидаемым расхождением: часов пакет не читает', () => {
+    expect(snapshots.charts.html).not.toMatch(/data-allow-mismatch/)
+  })
+
+  /**
+   * Имена из `useId()` — единственное в разметке, что не выводится из данных.
+   * Разойдись счётчик сервера и клиента, браузер обрежет график чужой маской
+   * либо не найдёт заливку вовсе, а гидрация об этом промолчит: `id` для неё
+   * такой же атрибут, как любой другой.
+   */
+  it('id масок, градиентов и текстур уникальны в пределах документа', () => {
+    const ids = [...snapshots.charts.html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]!)
+
+    expect(ids.length).toBeGreaterThan(0)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('каждая ссылка `url(#…)` находит своё определение', () => {
+    const ids = new Set([...snapshots.charts.html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]!))
+    const refs = [...snapshots.charts.html.matchAll(/url\(#([^)]+)\)/g)].map(match => match[1]!)
+
+    expect(refs.length).toBeGreaterThan(0)
+    expect(refs.filter(ref => !ids.has(ref))).toEqual([])
+  })
+
+  it('живой регион рамы на сервере не рендерится, а после гидрации появляется', async () => {
+    // `useAnnouncer` ставит регион в документ — на сервере документа нет.
+    expect(snapshots.charts.html).not.toMatch(/aria-live/)
+
+    await hydrate(snapshots.charts, { root: ChartsPage })
+
+    expect(document.querySelector('[aria-live]')).not.toBeNull()
+  })
+
+  it('неинтерактивный график отдаётся картинкой, интерактивный — приложением', () => {
+    expect(snapshots.charts.html).toMatch(/role="application"/)
+    expect(snapshots.charts.html).toMatch(/role="img"/)
+  })
+
+  /**
+   * Обратная половина измерения: без неё «расхождений нет» зеленело бы и на
+   * гидрации, которая до графиков вообще не доходит.
+   */
+  it('а гейт умеет видеть расхождение: порченая ось его роняет', async () => {
+    const distorted = {
+      ...snapshots.charts,
+      html: snapshots.charts.html.replace(/(data-gr-chart-axis="y"[^>]*>)/, '$1<text>сбито</text>'),
+    }
+    const problems = hydrationProblems(await hydrate(distorted, { root: ChartsPage }))
 
     expect(problems.length).toBeGreaterThan(0)
   })
