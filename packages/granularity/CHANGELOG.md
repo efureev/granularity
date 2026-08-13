@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.19.0] 2026-08-13
+
 ### Added
 
 - **`createTheme`: a theme with no base.** `extendTheme` inherits from `light`, `dark` or another
