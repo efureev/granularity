@@ -601,6 +601,9 @@ const RESIZE_BIG_STEP = 48
 const internalColumnWidths = ref<Record<string, number>>({})
 const columnWidths = computed(() => props.columnWidths ?? internalColumnWidths.value)
 
+/** Фактические ширины шапки: заполняются замером, см. `measureLayout`. */
+const measuredColumnWidths = ref<Record<string, number>>({})
+
 /** Ширина колонки: заданная пользователем сильнее объявленной в `columns`. */
 function widthOf(col: GrDataColumn<TRow>): string | number | undefined {
   return columnWidths.value[String(col.key)] ?? col.width
@@ -722,8 +725,18 @@ function resizerLabel(col: GrDataColumn<TRow>): string {
   return t('gr.dataTable.resizeColumn', 'Width of column {label}', { label: col.label })
 }
 
-function resizerValue(col: GrDataColumn<TRow>): number | undefined {
-  return columnWidths.value[String(col.key)]
+/**
+ * Ручка ресайза — фокусируемый `separator`, а значит обязана называть текущее
+ * значение с первого рендера, до всякого перетаскивания. Заданной ширины у
+ * колонки может не быть вовсе (авторазметка), поэтому за значением идём к
+ * измеренной; до замера остаётся объявленная в `columns`, а её тоже может не
+ * быть — тогда минимум.
+ */
+function resizerValue(col: GrDataColumn<TRow>): number {
+  const key = String(col.key)
+  const declared = typeof col.width === 'number' ? col.width : undefined
+
+  return columnWidths.value[key] ?? measuredColumnWidths.value[key] ?? declared ?? MIN_COLUMN_WIDTH
 }
 
 // ————— Закреплённые колонки.
@@ -766,6 +779,26 @@ function measurePinnedOffsets(): void {
   pinnedOffsets.value = next
 }
 
+function measureColumnWidths(): void {
+  if (!props.resizableColumns) return
+
+  const next: Record<string, number> = {}
+
+  for (const col of orderedColumns.value) {
+    const key = String(col.key)
+    const width = headerCellEls.get(key)?.getBoundingClientRect().width
+
+    if (width) next[key] = Math.round(width)
+  }
+
+  measuredColumnWidths.value = next
+}
+
+function measureLayout(): void {
+  measurePinnedOffsets()
+  measureColumnWidths()
+}
+
 function pinnedStyleOf(col: GrDataColumn<TRow>): Record<string, string> | undefined {
   if (!col.pinned) return undefined
 
@@ -793,26 +826,26 @@ function pinnedCellClass(col: GrDataColumn<TRow>, index: number): string[] {
  * ячейки двигают её сами. `ResizeObserver` — единственный способ узнать об этом;
  * в jsdom и на сервере его нет, там хватает пересчёта по изменению данных.
  */
-let offsetsObserver: ResizeObserver | null = null
+let layoutObserver: ResizeObserver | null = null
 
 onMounted(() => {
-  measurePinnedOffsets()
+  measureLayout()
 
   if (typeof ResizeObserver === 'undefined') return
 
-  offsetsObserver = new ResizeObserver(() => measurePinnedOffsets())
+  layoutObserver = new ResizeObserver(() => measureLayout())
   const el = headerCellEls.get(SELECT_COLUMN_KEY) ?? headerCellEls.get(columnKeys.value[0])
-  if (el?.parentElement) offsetsObserver.observe(el.parentElement)
+  if (el?.parentElement) layoutObserver.observe(el.parentElement)
 })
 
 onUnmounted(() => {
-  offsetsObserver?.disconnect()
-  offsetsObserver = null
+  layoutObserver?.disconnect()
+  layoutObserver = null
 })
 
 watch(
   () => [orderedColumns.value, columnWidths.value, props.loading, props.rows.length] as const,
-  () => void nextTick(measurePinnedOffsets),
+  () => void nextTick(measureLayout),
 )
 
 /**
@@ -1136,7 +1169,7 @@ defineExpose({
             :aria-label="resizerLabel(col)"
             :aria-valuenow="resizerValue(col)"
             :aria-valuemin="MIN_COLUMN_WIDTH"
-            :aria-valuetext="resizerValue(col) === undefined ? undefined : `${resizerValue(col)}px`"
+            :aria-valuetext="`${resizerValue(col)}px`"
             @pointerdown="onResizerPointerDown($event, String(col.key))"
             @keydown="onResizerKeydown($event, String(col.key))"
             @dblclick="resetColumnWidth(String(col.key))"

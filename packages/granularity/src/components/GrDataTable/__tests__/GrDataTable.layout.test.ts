@@ -171,6 +171,21 @@ describe('ширина колонок', () => {
     wrapper.unmount()
   })
 
+  // Фокусируемый `separator` без `aria-valuenow` — критическое нарушение axe,
+  // а до первой протяжки заданной ширины у колонки нет вовсе.
+  it('называет ширину с первого рендера, до всякой протяжки', () => {
+    const wrapper = mountTable({
+      resizableColumns: true,
+      columns: [{ key: 'name', label: 'Name' }, { key: 'score', label: 'Score', width: 120 }],
+    })
+
+    expect(resizers(wrapper)[0].attributes('aria-valuenow')).toBe('48')
+    expect(resizers(wrapper)[1].attributes('aria-valuenow')).toBe('120')
+    expect(resizers(wrapper)[1].attributes('aria-valuetext')).toBe('120px')
+
+    wrapper.unmount()
+  })
+
   it('контролируемые `columnWidths` задают ширину', () => {
     const wrapper = mountTable({ resizableColumns: true, columnWidths: { score: 220 } })
 
