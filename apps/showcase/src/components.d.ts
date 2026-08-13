@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    GrBadge: typeof import('@feugene/granularity/components/GrBadge')['GrBadge']
     GrButton: typeof import('@feugene/granularity/components/GrButton')['GrButton']
     GrCalendar: typeof import('@feugene/granularity-chrono/components/GrCalendar')['GrCalendar']
     GrCard: typeof import('@feugene/granularity/components/GrCard')['GrCard']
