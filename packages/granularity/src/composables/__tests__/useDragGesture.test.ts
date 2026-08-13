@@ -3,14 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { UseDragGestureOptions } from '../useDragGesture'
 import { useDragGesture } from '../useDragGesture'
-
-/**
- * jsdom не знает `PointerEvent`, а `button` у события только на чтение —
- * поэтому нажатие собирается через `MouseEvent` с нужной кнопкой.
- */
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  return new MouseEvent(type, { bubbles: true, ...init })
-}
+import { cancelPointer, move as movePointer, pointer, release } from '../../testing'
 
 function setup(overrides: Partial<UseDragGestureOptions> = {}) {
   const onStart = vi.fn()
@@ -34,9 +27,9 @@ function setup(overrides: Partial<UseDragGestureOptions> = {}) {
     onEnd,
     onCancel,
     down: (button = 0) => gesture.start(pointer('pointerdown', { button }) as PointerEvent),
-    move: (clientX = 10) => window.dispatchEvent(pointer('pointermove', { clientX })),
-    up: () => window.dispatchEvent(pointer('pointerup')),
-    cancel: () => window.dispatchEvent(pointer('pointercancel')),
+    move: (clientX = 10) => movePointer({ clientX }),
+    up: () => release(),
+    cancel: () => cancelPointer(),
     dispose: () => scope.stop(),
   }
 }

@@ -2,7 +2,7 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { resetAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
+import { announced, resetGranularityDom } from '@feugene/granularity/testing'
 
 import * as calendarGrid from '../../../chrono/calendarGrid'
 import * as calendarStyles from '../../GrCalendar/grCalendarStyles'
@@ -60,15 +60,7 @@ function lastModel(wrapper: Picker): unknown {
   return wrapper.emitted('update:modelValue')?.at(-1)?.[0]
 }
 
-/** Текст уходит в общий живой регион отложенным макротаском. */
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
-}
-
-afterEach(() => {
-  resetAnnouncer()
-})
+afterEach(resetGranularityDom)
 
 describe('GrDateRangePicker — выбор периода', () => {
   it('первый клик открывает период, второй закрывает и отдаёт пару', async () => {

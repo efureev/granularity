@@ -41,6 +41,8 @@
 - [`virtual-list.md`](./virtual-list.md) — `useVirtualList`: виртуализация длинного списка, оценка против замера, фокус вне окна.
 - [`drag-gesture.md`](./drag-gesture.md) — `useDragGesture`: указательный жест, отпускание против обрыва, почему слушатели на `window`.
 - [`drag-sort.md`](./drag-sort.md) — `useDragSort`: перестановка указателем и с клавиатуры, порог, автопрокрутка, границы.
+- [`testing.md`](./testing.md) — `@feugene/granularity/testing`: указательные жесты, геометрия в jsdom,
+  окружение для монтирования, живой регион, уборка между тестами.
 - [`sizes.md`](./sizes.md) — шкала размеров: кто на ней, порядок разрешения `size`, отклонения.
 - [`motion.md`](./motion.md) — контракт движения и `prefers-reduced-motion`: что гасится, почему не `motion-safe:`.
 - [`overlays.md`](./overlays.md) — контракт оверлеев: портал, стек слоёв, Esc, `inert`, фокус, модальный режим.

@@ -2,9 +2,10 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrTreeSelect from '../GrTreeSelect.vue'
 import type { GrTreeSelectProps } from '../grTreeSelectTypes'
+import type { GranularityI18nAdapter } from '../../../i18n/adapter'
+import { granularityGlobal } from '../../../testing'
 
 type Row = { id: number; label: string; children?: Row[] }
 
@@ -83,13 +84,7 @@ async function mountHarness(
 
   return mount(Harness, {
     attachTo: document.body,
-    global: i18n
-      ? {
-          provide: {
-            [GRANULARITY_I18N_KEY as symbol]: i18n,
-          },
-        }
-      : undefined,
+    global: i18n ? granularityGlobal({ i18n }) : undefined,
     attrs: {
       passthrough: props ?? {},
     },

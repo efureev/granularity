@@ -3,7 +3,7 @@ import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
-import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
+import { granularityGlobal, mockRect, move, press, type MockRect } from '../../../testing'
 import GrSlider from '../GrSlider.vue'
 import type { GrSliderModelValue } from '../GrSlider.vue'
 
@@ -118,16 +118,12 @@ describe('GrSlider', () => {
  */
 function pointerDown(wrapper: ReturnType<typeof mount>, init: MouseEventInit): void {
   const track = wrapper.get('[data-gr-slider-track]').element
-  track.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, ...init }))
+  press(track, init)
 }
 
 /** Дорожке в jsdom нужна геометрия: без неё любое значение схлопнется в `min`. */
-function stubTrackRect(wrapper: ReturnType<typeof mount>, rect: Partial<DOMRect>): void {
-  const track = wrapper.get('[data-gr-slider-track]').element
-  track.getBoundingClientRect = (): DOMRect => ({
-    left: 0, top: 0, width: 200, height: 200, right: 200, bottom: 200, x: 0, y: 0,
-    toJSON: () => ({}), ...rect,
-  })
+function stubTrackRect(wrapper: ReturnType<typeof mount>, rect: MockRect): void {
+  mockRect(wrapper.get('[data-gr-slider-track]').element, { width: 200, height: 200, ...rect })
 }
 
 describe('GrSlider — доступное имя и valuetext', () => {
@@ -138,7 +134,7 @@ describe('GrSlider — доступное имя и valuetext', () => {
 
     const wrapper = mount(GrSlider, {
       props: { modelValue: [20, 80] as GrSliderModelValue, range: true, ariaLabel: 'Громкость' },
-      global: { provide: { [GRANULARITY_I18N_KEY as symbol]: i18n } },
+      global: granularityGlobal({ i18n }),
     })
 
     const labels = wrapper.findAll('[role="slider"]').map(thumb => thumb.attributes('aria-label'))
@@ -239,7 +235,7 @@ describe('GrSlider — жест на таче', () => {
     expect(wrapper.get('[data-gr-slider-thumb]').attributes('style')).toContain('left: 10%')
 
     // Оборванный жест не продолжается движением указателя.
-    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 90 }))
+    move({ clientX: 90 })
     await nextTick()
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
 

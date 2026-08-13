@@ -24,16 +24,7 @@ import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
 import GrInputTag from '../GrInputTag.vue'
-
-/**
- * События набора уходят в общий живой регион (`useAnnouncer`), а не в узел
- * компонента: текст там появляется отложенным макротаском — иначе повтор того
- * же сообщения не давал бы мутации и не читался.
- */
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
-}
+import { announced } from '../../../testing'
 
 afterEach(() => {
   resetAnnouncer()

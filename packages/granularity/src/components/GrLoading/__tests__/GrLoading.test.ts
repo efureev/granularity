@@ -2,8 +2,8 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, markRaw, nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import GrLoading from '../GrLoading.vue'
+import { granularityGlobal } from '../../../testing'
 
 describe('granularity/GrLoading (unit)', () => {
   it('рендерит дефолтный текст, дефолтный overlay-класс и анимированный спиннер', () => {
@@ -26,14 +26,7 @@ describe('granularity/GrLoading (unit)', () => {
 
   it('берёт дефолтный текст из локали', () => {
     const wrapper = mount(GrLoading, {
-      global: {
-        provide: {
-          [GRANULARITY_I18N_KEY as symbol]: {
-            t: (key: string) => (key === 'gr.loading.defaultText' ? 'Загрузка...' : key),
-            te: (key: string) => key === 'gr.loading.defaultText',
-          },
-        },
-      },
+      global: granularityGlobal({ i18n: { 'gr.loading.defaultText': 'Загрузка...' } }),
     })
 
     expect(wrapper.text()).toContain('Загрузка...')

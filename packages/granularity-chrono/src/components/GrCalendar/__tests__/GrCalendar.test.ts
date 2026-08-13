@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { resetAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
+import { announced, resetGranularityDom } from '@feugene/granularity/testing'
 
 import type { PlainDate } from '../../../chrono/plainDate'
 import GrCalendar from '../GrCalendar.vue'
@@ -37,19 +37,7 @@ async function press(wrapper: ReturnType<typeof mountCalendar>, key: string, ini
   await nextTick()
 }
 
-/**
- * Объявления уходят в общий живой регион, а не в узел компонента: текст там
- * появляется отложенным макротаском — иначе повтор того же сообщения не дал бы
- * мутации и не прочитался.
- */
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
-}
-
-afterEach(() => {
-  resetAnnouncer()
-})
+afterEach(resetGranularityDom)
 
 describe('GrCalendar — разметка и роли', () => {
   it('сетка объявлена как grid и связана с заголовком', () => {

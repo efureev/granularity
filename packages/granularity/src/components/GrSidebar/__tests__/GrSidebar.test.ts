@@ -2,9 +2,9 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
-import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import GrSidebar, { GrSidebarGroup, GrSidebarItem } from '..'
 import { grSidebarCollapseDirection } from '../grSidebarStyles'
+import { granularityGlobal } from '../../../testing'
 
 describe('GrSidebar', () => {
   it('рендерит title, subtitle и содержимое слота', () => {
@@ -138,7 +138,7 @@ describe('GrSidebar — лейбл тогла и типографика', () => 
 
     const wrapper = mount(GrSidebar, {
       props: { showToggleButton: true },
-      global: { provide: { [GRANULARITY_I18N_KEY as symbol]: i18n } },
+      global: granularityGlobal({ i18n }),
     })
 
     const toggle = wrapper.get('[data-gr-sidebar-toggle]')

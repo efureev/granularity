@@ -4,35 +4,15 @@ import { describe, expect, it, vi } from 'vitest'
 import { insertionIndex } from '../internal/dragSortGeometry'
 import type { UseDragSortOptions } from '../useDragSort'
 import { useDragSort } from '../useDragSort'
+import { cancelPointer, move as movePointer, pointer, release, stackRects } from '../../testing'
 
-/** jsdom не знает `PointerEvent`; координаты и кнопка приходят через `MouseEvent`. */
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  return new MouseEvent(type, { bubbles: true, ...init })
-}
-
-/**
- * Три строки по 20px подряд. `getBoundingClientRect` в jsdom всегда нулевой,
- * поэтому геометрия задаётся руками — иначе попадание проверять не на чем.
- */
+/** Три строки по 20px подряд: в jsdom раскладки нет, попадание считать не на чем. */
 function setup(overrides: Partial<UseDragSortOptions<string, number>> = {}) {
   const keys = ['a', 'b', 'c']
   const nodes = new Map<string, HTMLElement>()
 
-  keys.forEach((key, index) => {
-    const el = document.createElement('div')
-    el.getBoundingClientRect = () => ({
-      top: index * 20,
-      bottom: index * 20 + 20,
-      left: 0,
-      right: 100,
-      height: 20,
-      width: 100,
-      x: 0,
-      y: index * 20,
-      toJSON: () => ({}),
-    })
-    nodes.set(key, el)
-  })
+  for (const key of keys) nodes.set(key, document.createElement('div'))
+  stackRects(nodes.values(), { size: 20 })
 
   const onDrop = vi.fn()
   const onUpdate = vi.fn()
@@ -53,9 +33,9 @@ function setup(overrides: Partial<UseDragSortOptions<string, number>> = {}) {
     onDrop,
     onUpdate,
     down: (key: string, clientY = 10) => sort.startFrom(key)(pointer('pointerdown', { clientY }) as PointerEvent),
-    move: (clientY: number) => window.dispatchEvent(pointer('pointermove', { clientY })),
-    up: () => window.dispatchEvent(pointer('pointerup')),
-    cancelGesture: () => window.dispatchEvent(pointer('pointercancel')),
+    move: (clientY: number) => movePointer({ clientY }),
+    up: () => release(),
+    cancelGesture: () => cancelPointer(),
     escape: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })),
     dispose: () => scope.stop(),
   }

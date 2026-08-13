@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 
 import GrTree from '../GrTree.vue'
+import { drag as dragPointer, move, press, release, stackRects } from '../../../testing'
 
 type Item = {
   id: number
@@ -23,30 +24,9 @@ function tree() {
   ] satisfies Item[]
 }
 
-/**
- * jsdom не знает `PointerEvent`, а `trigger()` из test-utils падает на
- * присвоении `clientY` незнакомому типу события — поэтому указатель
- * отправляется в элемент напрямую.
- */
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  return new MouseEvent(type, { bubbles: true, ...init })
-}
-
-/** Строки по 30px подряд: в jsdom `getBoundingClientRect` всегда нулевой. */
+/** Строки по 30px подряд: в jsdom раскладки нет. */
 function layoutRows(wrapper: ReturnType<typeof mount>): void {
-  wrapper.findAll('[data-gr-tree-node]').forEach((row, index) => {
-    ;(row.element as HTMLElement).getBoundingClientRect = () => ({
-      top: index * 30,
-      bottom: index * 30 + 30,
-      left: 0,
-      right: 100,
-      width: 100,
-      height: 30,
-      x: 0,
-      y: index * 30,
-      toJSON: () => ({}),
-    })
-  })
+  stackRects(wrapper.findAll('[data-gr-tree-node]').map(row => row.element), { size: 30 })
 }
 
 function nodeOf(wrapper: ReturnType<typeof mount>, index: number) {
@@ -59,9 +39,7 @@ function handleOf(wrapper: ReturnType<typeof mount>, index: number): Element {
 
 /** Полный жест: нажали на ручке строки, довели указатель до цели, отпустили. */
 function drag(wrapper: ReturnType<typeof mount>, from: number, fromY: number, toY: number): void {
-  handleOf(wrapper, from).dispatchEvent(pointer('pointerdown', { clientY: fromY, button: 0 }))
-  window.dispatchEvent(pointer('pointermove', { clientY: toY }))
-  window.dispatchEvent(pointer('pointerup'))
+  dragPointer(handleOf(wrapper, from), { clientY: fromY }, { clientY: toY })
 }
 
 function treeWithNestedFolder() {
@@ -489,8 +467,8 @@ describe('GrTree', () => {
     })
 
     layoutRows(wrapper)
-    handleOf(wrapper, 1).dispatchEvent(pointer('pointerdown', { clientY: 35, button: 0 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(handleOf(wrapper, 1), { clientY: 35 })
+    release()
     await nextTick()
 
     expect(wrapper.emitted('nodeDrop')).toBeFalsy()
@@ -513,10 +491,10 @@ describe('GrTree', () => {
     })
 
     layoutRows(wrapper)
-    handleOf(wrapper, 1).dispatchEvent(pointer('pointerdown', { clientY: 35, button: 0 }))
-    window.dispatchEvent(pointer('pointermove', { clientY: 62 }))
+    press(handleOf(wrapper, 1), { clientY: 35 })
+    move({ clientY: 62 })
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
-    window.dispatchEvent(pointer('pointerup'))
+    release()
     await nextTick()
 
     expect(wrapper.emitted('nodeDrop')).toBeFalsy()

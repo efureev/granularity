@@ -7,6 +7,7 @@ import { resetScrollLock } from '../../../composables/internal/useScrollLock'
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
 
 import GrImageViewer from '../GrImageViewer.vue'
+import { press, release } from '../../../testing'
 
 afterEach(() => {
   resetAnnouncer()
@@ -40,13 +41,13 @@ describe('GrImageViewer (decomposed)', () => {
     const wrapper = await mountViewer({ draggable: true })
     const image = () => wrapper.find('[data-gr-image-viewer-image]')
 
-    image().element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 10, clientY: 10 }))
+    press(image().element, { clientX: 10, clientY: 10 })
     await nextTick()
     expect(image().classes()).toContain('cursor-grabbing')
 
     // Отпускание приходит мимо картинки — на документ. Слушатели жеста живут
     // на `window`, поэтому конец жеста ловится и здесь.
-    window.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
+    release()
     await nextTick()
 
     expect(image().classes()).toContain('cursor-grab')

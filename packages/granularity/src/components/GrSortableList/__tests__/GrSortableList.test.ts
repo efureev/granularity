@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
+import { announced, move, press, release, stackRects } from '../../../testing'
 import GrSortableList from '../GrSortableList.vue'
 
 type Row = { id: string, title: string }
@@ -30,39 +31,9 @@ function items(wrapper: ReturnType<typeof mountList>) {
   return wrapper.findAll('[data-gr-sortable-item]')
 }
 
-/** Живой регион общий на документ, текст в нём появляется отложенным макротаском. */
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
-}
-
-/**
- * jsdom не знает `PointerEvent`, а `trigger()` из test-utils собирает для
- * незнакомого типа обычный `Event` и падает на присвоении `clientY` — поэтому
- * указательные события отправляются в элемент напрямую (приём из `GrSplitter`).
- */
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  return new MouseEvent(type, { bubbles: true, ...init })
-}
-
-function press(el: Element, clientY: number): void {
-  el.dispatchEvent(pointer('pointerdown', { clientY, button: 0 }))
-}
-
+/** Строки по 20px подряд: в jsdom раскладки нет. */
 function layout(wrapper: ReturnType<typeof mountList>): void {
-  items(wrapper).forEach((row, index) => {
-    ;(row.element as HTMLElement).getBoundingClientRect = () => ({
-      top: index * 20,
-      bottom: index * 20 + 20,
-      left: 0,
-      right: 100,
-      height: 20,
-      width: 100,
-      x: 0,
-      y: index * 20,
-      toJSON: () => ({}),
-    })
-  })
+  stackRects(items(wrapper).map(row => row.element), { size: 20 })
 }
 
 afterEach(() => {
@@ -117,9 +88,9 @@ describe('перенос указателем', () => {
     const wrapper = mountList({ modelValue: source })
     layout(wrapper)
 
-    press(items(wrapper)[0].get('[data-gr-sortable-handle]').element, 10)
-    window.dispatchEvent(pointer('pointermove', { clientY: 55 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(items(wrapper)[0].get('[data-gr-sortable-handle]').element, { clientY: 10 })
+    move({ clientY: 55 })
+    release()
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('move')?.[0]).toEqual([0, 2])
@@ -134,8 +105,8 @@ describe('перенос указателем', () => {
     const wrapper = mountList()
     layout(wrapper)
 
-    press(items(wrapper)[0].get('[data-gr-sortable-handle]').element, 10)
-    window.dispatchEvent(pointer('pointerup'))
+    press(items(wrapper)[0].get('[data-gr-sortable-handle]').element, { clientY: 10 })
+    release()
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('move')).toBeUndefined()
@@ -147,9 +118,9 @@ describe('перенос указателем', () => {
     const wrapper = mountList({ disabled: true })
     layout(wrapper)
 
-    press(items(wrapper)[0].get('[data-gr-sortable-handle]').element, 10)
-    window.dispatchEvent(pointer('pointermove', { clientY: 55 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(items(wrapper)[0].get('[data-gr-sortable-handle]').element, { clientY: 10 })
+    move({ clientY: 55 })
+    release()
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('move')).toBeUndefined()
@@ -161,9 +132,9 @@ describe('перенос указателем', () => {
     const wrapper = mountList({ handleOnly: false })
     layout(wrapper)
 
-    press(items(wrapper)[0].element, 10)
-    window.dispatchEvent(pointer('pointermove', { clientY: 55 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(items(wrapper)[0].element, { clientY: 10 })
+    move({ clientY: 55 })
+    release()
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('move')?.[0]).toEqual([0, 2])

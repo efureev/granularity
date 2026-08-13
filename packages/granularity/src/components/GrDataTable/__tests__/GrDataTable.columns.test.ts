@@ -11,6 +11,7 @@ vi.mock('~icons/lucide/arrow-down', () => ({
 
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
 import GrDataTable from '../GrDataTable.vue'
+import { announced, move, press, release, stackRects } from '../../../testing'
 
 type Row = { id: number, name: string, score: number, note: string }
 
@@ -41,37 +42,15 @@ function handles(wrapper: ReturnType<typeof mountTable>) {
   return wrapper.findAll('[data-gr-datatable-column-handle]')
 }
 
-/** jsdom не знает `PointerEvent`; ширины колонок задаём руками. */
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  return new MouseEvent(type, { bubbles: true, ...init })
-}
-
-/** Колонки по 100px подряд. */
+/** Колонки по 100px в ряд: в jsdom раскладки нет. */
 function layout(wrapper: ReturnType<typeof mountTable>): void {
-  wrapper.findAll('thead th').forEach((th, index) => {
-    ;(th.element as HTMLElement).getBoundingClientRect = () => ({
-      top: 0,
-      bottom: 40,
-      left: index * 100,
-      right: index * 100 + 100,
-      width: 100,
-      height: 40,
-      x: index * 100,
-      y: 0,
-      toJSON: () => ({}),
-    })
-  })
+  stackRects(wrapper.findAll('thead th').map(th => th.element), { size: 100, axis: 'horizontal', cross: 40 })
 }
 
 function dragColumn(wrapper: ReturnType<typeof mountTable>, from: number, toX: number): void {
-  handles(wrapper)[from].element.dispatchEvent(pointer('pointerdown', { clientX: from * 100 + 10, button: 0 }))
-  window.dispatchEvent(pointer('pointermove', { clientX: toX }))
-  window.dispatchEvent(pointer('pointerup'))
-}
-
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
+  press(handles(wrapper)[from].element, { clientX: from * 100 + 10 })
+  move({ clientX: toX })
+  release()
 }
 
 afterEach(() => {
@@ -139,8 +118,8 @@ describe('перенос указателем', () => {
     const wrapper = mountTable()
     layout(wrapper)
 
-    handles(wrapper)[0].element.dispatchEvent(pointer('pointerdown', { clientX: 10, button: 0 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(handles(wrapper)[0].element, { clientX: 10 })
+    release()
     await nextTick()
 
     expect(wrapper.emitted('columnReorder')).toBeUndefined()

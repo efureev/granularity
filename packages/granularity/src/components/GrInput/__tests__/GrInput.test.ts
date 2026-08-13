@@ -3,6 +3,7 @@ import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrInput from '../GrInput.vue'
+import { mockRect } from '../../../testing'
 
 describe('GrInput', () => {
   it('поддерживает size=xs', () => {
@@ -143,17 +144,7 @@ describe('GrInput', () => {
     })
 
     const prefix = wrapper.get('[data-testid="gr-input-prefix"]').element as HTMLElement
-    prefix.getBoundingClientRect = () => ({
-      width: 120,
-      height: 0,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      x: 0,
-      y: 0,
-      toJSON: () => ({}),
-    })
+    mockRect(prefix, { width: 120 })
 
     await wrapper.setProps({ modelValue: '124' })
     await nextTick()

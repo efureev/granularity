@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrStatistic from '../GrStatistic.vue'
+import { granularityGlobal, stubMatchMedia } from '../../../testing'
 
 describe('GrStatistic', () => {
   it('показывает отформатированное значение, подпись и приписки', () => {
@@ -115,11 +115,7 @@ describe('GrStatistic — размеры и локаль', () => {
   })
 
   it('локаль берётся из i18n-адаптера, а проп locale её перебивает', () => {
-    const i18n: GranularityI18nAdapter = {
-      t: key => key,
-      locale: ref('de-DE'),
-    }
-    const provide = { [GRANULARITY_I18N_KEY as symbol]: i18n }
+    const { provide } = granularityGlobal({ i18n: { locale: 'de-DE' } })
 
     const fromAdapter = mount(GrStatistic, { props: { value: 1234567.5, precision: 2 }, global: { provide } })
     expect(fromAdapter.get('[data-testid="gr-statistic-value"]').text()).toBe('1.234.567,50')
@@ -293,18 +289,15 @@ describe('GrStatistic — перебор чисел', () => {
 
   it('под prefers-reduced-motion перебора нет вовсе', async () => {
     // Глобальный кламп в `base.css` гасит CSS, но не JS-твин — его гасит сам компонент.
-    vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: query.includes('prefers-reduced-motion'),
-      media: query,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    }))
+    const restoreMatchMedia = stubMatchMedia({ reducedMotion: true })
 
     const wrapper = mount(GrStatistic, { props: { value: 1000, animate: true } })
     await nextTick()
 
     expect(digits(wrapper)).toBe(1000)
     expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
+
+    restoreMatchMedia()
   })
 
   it('пока идёт перебор, диктор получает конечное значение', async () => {

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrSplitter from '../GrSplitter.vue'
+import { cancelPointer, mockRect, move, press as pressPointer, release } from '../../../testing'
 
 function mountSplitter(props: Record<string, unknown> = {}) {
   return mount(GrSplitter, {
@@ -26,20 +27,14 @@ async function press(wrapper: ReturnType<typeof mountSplitter>, key: string, opt
   await separator(wrapper).trigger('keydown', { key, ...options })
 }
 
-/**
- * jsdom не знает `PointerEvent`, а `button` у события только на чтение —
- * `trigger()` его не подделает. Шлём `MouseEvent` с нужным именем, как в тестах
- * `GrSlider`.
- */
 async function pointerDown(wrapper: ReturnType<typeof mountSplitter>, button = 0) {
-  separator(wrapper).element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button }))
+  pressPointer(separator(wrapper).element, { button })
   await wrapper.vm.$nextTick()
 }
 
 /** Контейнер в jsdom нулевого размера: без прямоугольника считать не от чего. */
 function stubRect(wrapper: ReturnType<typeof mountSplitter>) {
-  const root = wrapper.get('[data-gr-splitter]').element as HTMLElement
-  root.getBoundingClientRect = () => ({ left: 0, top: 0, width: 400, height: 200 }) as DOMRect
+  mockRect(wrapper.get('[data-gr-splitter]').element, { width: 400, height: 200 })
 }
 
 describe('GrSplitter', () => {
@@ -216,13 +211,13 @@ describe('GrSplitter', () => {
     await pointerDown(wrapper)
     expect(wrapper.get('[data-gr-splitter]').attributes('data-dragging')).toBe('')
 
-    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 0 }))
+    move({ clientX: 100, clientY: 0 })
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([25])
     // Пока тянут — только модель: `change` это точка сохранения раскладки.
     expect(wrapper.emitted('change')).toBeUndefined()
 
-    window.dispatchEvent(new MouseEvent('pointerup'))
+    release()
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('change')?.at(-1)).toEqual([25])
     expect(wrapper.get('[data-gr-splitter]').attributes('data-dragging')).toBeUndefined()
@@ -235,10 +230,10 @@ describe('GrSplitter', () => {
     stubRect(wrapper)
 
     await pointerDown(wrapper)
-    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 0 }))
+    move({ clientX: 100, clientY: 0 })
     await wrapper.vm.$nextTick()
 
-    window.dispatchEvent(new MouseEvent('pointercancel'))
+    cancelPointer()
     await wrapper.vm.$nextTick()
 
     expect(track(wrapper)).toContain('50%')
@@ -252,7 +247,7 @@ describe('GrSplitter', () => {
     stubRect(wrapper)
 
     await pointerDown(wrapper)
-    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 20, clientY: 0 }))
+    move({ clientX: 20, clientY: 0 })
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('update:collapsed')?.at(-1)).toEqual([true])

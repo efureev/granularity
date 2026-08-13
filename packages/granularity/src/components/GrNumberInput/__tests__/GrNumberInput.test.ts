@@ -2,8 +2,8 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
-import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrNumberInput from '../GrNumberInput.vue'
+import { granularityGlobal, mockRect, pointer, press } from '../../../testing'
 
 /**
  * Набор без коммита: `wrapper.setValue()` шлёт следом ещё и `change`
@@ -219,17 +219,7 @@ describe('GrNumberInput', () => {
     })
 
     const suffix = wrapper.get('[data-testid="number-input-suffix"]').element as HTMLElement
-    suffix.getBoundingClientRect = () => ({
-      width: 70,
-      height: 0,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      x: 0,
-      y: 0,
-      toJSON: () => ({}),
-    })
+    mockRect(suffix, { width: 70 })
 
     await wrapper.setProps({ modelValue: 2 })
     await nextTick()
@@ -497,8 +487,7 @@ describe('GrNumberInput — озвучивание, очистка и событ
   })
 
   it('локаль берётся из адаптера, проп её перебивает', () => {
-    const i18n: GranularityI18nAdapter = { t: key => key, locale: ref('de-DE') }
-    const provide = { [GRANULARITY_I18N_KEY as symbol]: i18n }
+    const provide = granularityGlobal({ i18n: { locale: 'de-DE' } }).provide
 
     const fromAdapter = mount(GrNumberInput, {
       props: { modelValue: 1234567, useGrouping: true },
@@ -618,13 +607,13 @@ describe('GrNumberInput — readonly и жест удержания', () => {
     })
     const increase = wrapper.get('[data-gr-number-input-increase]')
 
-    increase.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    press(increase.element)
     await vi.advanceTimersByTimeAsync(400 + 130) // задержка + ~2 тика интервала
     const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
     expect(stepsWhileHolding).toBeGreaterThan(0)
 
     // Браузер забрал указатель (скролл на таче): повтор обязан остановиться.
-    increase.element.dispatchEvent(new MouseEvent('pointercancel', { bubbles: true }))
+    increase.element.dispatchEvent(pointer('pointercancel'))
     await vi.advanceTimersByTimeAsync(600)
 
     expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(stepsWhileHolding)
@@ -641,11 +630,11 @@ describe('GrNumberInput — readonly и жест удержания', () => {
     })
     const increase = wrapper.get('[data-gr-number-input-increase]')
 
-    increase.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    press(increase.element)
     await vi.advanceTimersByTimeAsync(400 + 130)
     const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
 
-    increase.element.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
+    increase.element.dispatchEvent(pointer('pointerup'))
     // Мышиный клик несёт `detail >= 1` — по нему хвост жеста и опознаётся.
     increase.element.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
     await nextTick()
@@ -669,14 +658,14 @@ describe('GrNumberInput — readonly и жест удержания', () => {
     })
     const increase = wrapper.get('[data-gr-number-input-increase]')
 
-    increase.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    press(increase.element)
     await vi.advanceTimersByTimeAsync(400 + 130)
     const stepsWhileHolding = wrapper.emitted('update:modelValue')?.length ?? 0
     expect(stepsWhileHolding).toBeGreaterThan(0)
 
     // Указатель ушёл с кнопки и отпущен снаружи: повтор остановлен, клика нет —
     // жест кончился, ничего поглощать не нужно.
-    increase.element.dispatchEvent(new MouseEvent('pointerleave', { bubbles: true }))
+    increase.element.dispatchEvent(pointer('pointerleave'))
     await vi.advanceTimersByTimeAsync(600)
 
     // Enter/Space на кнопке дают click без указателя (`detail === 0`).

@@ -51,7 +51,8 @@
 | `components/shared/` (шкалы, тона, `optionFilter`) | 60 из 67                       |
 | контекст `GrFormField`                             | 16 контролов                   |
 
-Плюс общие `composables/`, `directives/`, `i18n/locales/` и `tokens/`.
+Плюс общие `composables/`, `directives/`, `i18n/locales/` и `tokens/`. Особняком — `./testing`: своя entry, из
+root-barrel не реэкспортируется, в бандл приложения не попадает (`docs/testing.md`).
 
 Раскрой даёт `core` + N тонких пакетов, каждый с peer-зависимостью на `core`. Цена: N чейнджлогов, N версий, N шагов
 релиза и матрица version skew у потребителя, который поставил `forms@0.17` рядом с `core@0.16`. Отдельно —

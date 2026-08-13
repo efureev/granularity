@@ -2,7 +2,7 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { resetAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
+import { announced, resetGranularityDom } from '@feugene/granularity/testing'
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
 import GrTimePicker from '../GrTimePicker.vue'
@@ -78,15 +78,7 @@ function activeKey(unit: string): string | undefined {
   return document.querySelector(`[id="${id}"]`)?.getAttribute('data-key') ?? undefined
 }
 
-/** Текст уходит в общий живой регион отложенным макротаском. */
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
-}
-
-afterEach(() => {
-  resetAnnouncer()
-})
+afterEach(resetGranularityDom)
 
 describe('GrTimePicker — объявления для скринридера', () => {
   it('выбор в колонке объявляет собранное время целиком', async () => {

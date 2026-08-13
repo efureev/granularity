@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Test utilities: `@feugene/granularity/testing`.** Testing a UI kit means fighting the same jsdom
+  gaps in every file — and the package's own suite had seven verbatim copies of one pointer helper,
+  eleven hand-written `getBoundingClientRect` mocks and nine copies of a live-region reader. The new
+  entry ships them: `press`/`move`/`release`/`cancelPointer`/`drag` for pointer gestures, `mockRect`
+  and `stackRects` for geometry, `granularityGlobal` and `i18nAdapter` for mounting inside the
+  package's config and translation context without rendering `GrConfigProvider`, `announced` for the
+  live region, `resetGranularityDom` for cleanup, `stubMatchMedia` for reduced-motion checks.
+
+  Each helper carries knowledge a local copy loses: `pointermove`/`pointerup` are listened for on
+  **`window`** (that is how `useDragGesture` works, so a test dispatching them at the element
+  silently asserts nothing), and clearing `body` without resetting the portal root leaves the next
+  mount teleporting into a detached node. Depends on neither `vitest` nor `@vue/test-utils` — it
+  hands you data and DOM actions, you keep your runner. Docs: `docs/testing.md`.
+
 ### Fixed
 
 - **The package no longer needs an icon preset in your config.** Its own icons — the select chevron,

@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { resetAnnouncer, useAnnouncer } from '../useAnnouncer'
+import { useAnnouncer } from '../useAnnouncer'
 import { inertableOutside, markInert } from '../internal/inert'
-import { ensurePortalRoot, resetPortalRoot } from '../internal/portalRoot'
+import { ensurePortalRoot } from '../internal/portalRoot'
+import { resetGranularityDom } from '../../testing'
 
 /** Запись текста отложена макротаском — ждём его, а не `nextTick`. */
 function flush(ms = 0): Promise<void> {
@@ -17,11 +18,7 @@ function assertive(): HTMLElement | null {
   return document.querySelector('[data-gr-announcer-region="assertive"]')
 }
 
-afterEach(() => {
-  resetAnnouncer()
-  resetPortalRoot()
-  document.body.innerHTML = ''
-})
+afterEach(resetGranularityDom)
 
 describe('useAnnouncer', () => {
   it('ставит оба региона одним хостом и переиспользует его между вызовами', () => {

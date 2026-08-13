@@ -34,17 +34,12 @@ vi.mock('~icons/lucide/x', () => ({
   }),
 }))
 
-import { resetPortalRoot } from '../../../composables/internal/portalRoot'
 import { granularityToastPlugin, useToast } from '../../../composables/useToast'
+import { cancelPointer, mockRect, move, press, release } from '../../../testing'
+import { resetGranularityDom } from '../../../testing/env'
 import GrToaster from '../GrToaster.vue'
 
-afterEach(() => {
-  useToast().clear()
-  document.body.innerHTML = ''
-  // Корень портала кэшируется модулем, а очистка `body` его открепляет: без
-  // сброса следующий монтаж телепортировал бы тосты в узел вне документа.
-  resetPortalRoot()
-})
+afterEach(resetGranularityDom)
 
 describe('GrToaster', () => {
   it('рендерит toast из useToast с tone-иконкой и цветом', () => {
@@ -488,14 +483,6 @@ describe('GrToaster — пауза: курсор и фокус независи�
 
 describe('GrToaster — смахивание', () => {
   /**
-   * jsdom не знает `PointerEvent`, а движение и отпускание примитив слушает на
-   * `window` — приём тот же, что в спеках `useDragSort` и `useZoomPan`.
-   */
-  function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-    return new MouseEvent(type, { bubbles: true, ...init })
-  }
-
-  /**
    * Отпущенный тост закрывается через два кадра: первый снимает запрет на
    * переход, второй задаёт точку отлёта (см. `releaseSwiped`).
    */
@@ -520,9 +507,7 @@ describe('GrToaster — смахивание', () => {
     const nodes = currentHost().querySelectorAll<HTMLElement>('[data-gr-toast]')
     const node = nodes[nodes.length - 1]
 
-    node.getBoundingClientRect = () => ({
-      top: 0, bottom: 80, left: 0, right: 360, width: 360, height: 80, x: 0, y: 0, toJSON: () => ({}),
-    })
+    mockRect(node, { width: 360, height: 80 })
 
     return node
   }
@@ -544,9 +529,9 @@ describe('GrToaster — смахивание', () => {
     const { wrapper, toast } = await mountWithToast()
     const node = toastNode()
 
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 140 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(node, { button: 0, clientX: 10 })
+    move({ clientX: 140 })
+    release()
     await flushRelease()
 
     expect(toast.list.value).toHaveLength(0)
@@ -558,12 +543,12 @@ describe('GrToaster — смахивание', () => {
     const { wrapper, toast } = await mountWithToast()
     const node = toastNode()
 
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 50 }))
+    press(node, { button: 0, clientX: 10 })
+    move({ clientX: 50 })
     await nextTick()
     expect(toastNode().style.transform).toBe('translateX(40px)')
 
-    window.dispatchEvent(pointer('pointerup'))
+    release()
     await nextTick()
 
     expect(toast.list.value).toHaveLength(1)
@@ -576,9 +561,9 @@ describe('GrToaster — смахивание', () => {
     const { wrapper, toast } = await mountWithToast()
     const node = toastNode()
 
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 200 }))
-    window.dispatchEvent(pointer('pointercancel'))
+    press(node, { button: 0, clientX: 10 })
+    move({ clientX: 200 })
+    cancelPointer()
     await nextTick()
 
     expect(toast.list.value).toHaveLength(1)
@@ -592,9 +577,9 @@ describe('GrToaster — смахивание', () => {
     const node = toastNode()
 
     // Стек справа, тянем влево: сопротивление вчетверо, порог не берётся.
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 300 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 0 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(node, { button: 0, clientX: 300 })
+    move({ clientX: 0 })
+    release()
     await nextTick()
 
     expect(toast.list.value).toHaveLength(1)
@@ -606,9 +591,9 @@ describe('GrToaster — смахивание', () => {
     const { wrapper, toast } = await mountWithToast({ placement: 'bottom-left' })
     const node = toastNode()
 
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 200 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 60 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(node, { button: 0, clientX: 200 })
+    move({ clientX: 60 })
+    release()
     await flushRelease()
 
     expect(toast.list.value).toHaveLength(0)
@@ -620,9 +605,9 @@ describe('GrToaster — смахивание', () => {
     const { wrapper, toast } = await mountWithToast({ swipeDismiss: false })
     const node = toastNode()
 
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 300 }))
-    window.dispatchEvent(pointer('pointerup'))
+    press(node, { button: 0, clientX: 10 })
+    move({ clientX: 300 })
+    release()
     await nextTick()
 
     expect(toast.list.value).toHaveLength(1)
@@ -640,14 +625,14 @@ describe('GrToaster — смахивание', () => {
     await nextTick()
 
     const node = toastNode()
-    node.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 60 }))
+    press(node, { button: 0, clientX: 10 })
+    move({ clientX: 60 })
     await nextTick()
 
     const progress = currentHost().querySelector<HTMLElement>('[data-gr-toast-progress]')
     expect(progress?.style.animationPlayState).toBe('paused')
 
-    window.dispatchEvent(pointer('pointerup'))
+    release()
     wrapper.unmount()
   })
 
@@ -663,8 +648,8 @@ describe('GrToaster — смахивание', () => {
     const actions = currentHost().querySelectorAll<HTMLElement>('[data-gr-toast-action]')
     const action = actions[actions.length - 1]
 
-    action.dispatchEvent(pointer('pointerdown', { button: 0, clientX: 10 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 300 }))
+    press(action, { button: 0, clientX: 10 })
+    move({ clientX: 300 })
     await nextTick()
 
     // Тост стоит на месте: жест на кнопке не начался, и клик по «Отменить»
@@ -672,7 +657,7 @@ describe('GrToaster — смахивание', () => {
     expect(toastNode().style.transform).toBe('')
     expect(toast.list.value).toHaveLength(1)
 
-    window.dispatchEvent(pointer('pointerup'))
+    release()
     wrapper.unmount()
   })
 

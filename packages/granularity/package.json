@@ -447,6 +447,11 @@
       "import": "./dist/tokens.js",
       "default": "./dist/tokens.js"
     },
+    "./testing": {
+      "types": "./dist/types/src/testing/index.d.ts",
+      "import": "./dist/testing.js",
+      "default": "./dist/testing.js"
+    },
     "./tokens/*.json": "./tokens/*.json"
   },
   "peerDependencies": {

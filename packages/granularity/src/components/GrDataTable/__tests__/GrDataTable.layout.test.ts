@@ -11,6 +11,7 @@ vi.mock('~icons/lucide/arrow-down', () => ({
 
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
 import GrDataTable from '../GrDataTable.vue'
+import { announced, cancelPointer, drag, move, press, stackRects } from '../../../testing'
 
 type Row = { id: number, name: string, score: number, note: string }
 
@@ -44,36 +45,13 @@ function handles(wrapper: ReturnType<typeof mountTable>) {
   return wrapper.findAll('[data-gr-datatable-column-handle]')
 }
 
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  return new MouseEvent(type, { bubbles: true, ...init })
-}
-
-/** Колонки по 100px: в jsdom `getBoundingClientRect` всегда нулевой. */
+/** Колонки по 100px в ряд: в jsdom раскладки нет. */
 function layout(wrapper: ReturnType<typeof mountTable>, width = 100): void {
-  wrapper.findAll('thead th').forEach((th, index) => {
-    ;(th.element as HTMLElement).getBoundingClientRect = () => ({
-      top: 0,
-      bottom: 40,
-      left: index * width,
-      right: index * width + width,
-      width,
-      height: 40,
-      x: index * width,
-      y: 0,
-      toJSON: () => ({}),
-    })
-  })
+  stackRects(wrapper.findAll('thead th').map(th => th.element), { size: width, axis: 'horizontal', cross: 40 })
 }
 
 function dragResizer(wrapper: ReturnType<typeof mountTable>, index: number, from: number, to: number): void {
-  resizers(wrapper)[index].element.dispatchEvent(pointer('pointerdown', { clientX: from, button: 0 }))
-  window.dispatchEvent(pointer('pointermove', { clientX: to }))
-  window.dispatchEvent(pointer('pointerup'))
-}
-
-async function announced(): Promise<string> {
-  await new Promise(resolve => setTimeout(resolve, 2))
-  return document.querySelector('[data-gr-announcer-region="polite"]')?.textContent ?? ''
+  drag(resizers(wrapper)[index].element, { clientX: from }, { clientX: to })
 }
 
 afterEach(() => {
@@ -119,9 +97,9 @@ describe('ширина колонок', () => {
     const wrapper = mountTable({ resizableColumns: true })
     layout(wrapper)
 
-    resizers(wrapper)[0].element.dispatchEvent(pointer('pointerdown', { clientX: 100, button: 0 }))
-    window.dispatchEvent(pointer('pointermove', { clientX: 200 }))
-    window.dispatchEvent(pointer('pointercancel'))
+    press(resizers(wrapper)[0].element, { clientX: 100 })
+    move({ clientX: 200 })
+    cancelPointer()
     await nextTick()
 
     expect(wrapper.emitted('update:columnWidths')?.at(-1)?.[0]).toEqual({})

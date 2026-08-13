@@ -369,6 +369,11 @@ export default defineConfig({
         'tokens': fileURLToPath(
           new URL('./src/tokens/index.ts', import.meta.url),
         ),
+        // Тестовые утилиты — своей entry по той же причине: в бандл приложения
+        // они попадать не должны, из root-barrel не реэкспортируются.
+        'testing': fileURLToPath(
+          new URL('./src/testing/index.ts', import.meta.url),
+        ),
       },
       formats: ['es'],
       fileName: (_format, entryName) => `${entryName}.js`,

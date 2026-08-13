@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
-import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 
 vi.mock('~icons/lucide/menu', () => ({
   default: defineComponent({
@@ -12,6 +11,8 @@ vi.mock('~icons/lucide/menu', () => ({
 }))
 
 import GrNavbar from '../GrNavbar.vue'
+import type { GranularityI18nAdapter } from '../../../i18n/adapter'
+import { granularityGlobal } from '../../../testing'
 
 function createI18n(locale: 'en' | 'ru'): GranularityI18nAdapter {
   const messages = {
@@ -50,11 +51,7 @@ describe('GrNavbar', () => {
   it('локализует aria-label кнопки меню через i18n-адаптер', () => {
     const wrapper = mount(GrNavbar, {
       props: { title: 'Dashboard', showMenuButton: true },
-      global: {
-        provide: {
-          [GRANULARITY_I18N_KEY as symbol]: createI18n('ru'),
-        },
-      },
+      global: granularityGlobal({ i18n: createI18n('ru') }),
     })
     expect(wrapper.find('[data-gr-navbar-menu]').attributes('aria-label')).toBe('Открыть меню')
   })

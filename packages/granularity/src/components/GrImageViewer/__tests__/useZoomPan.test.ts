@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import { formatPercent, useZoomPan } from '../composables/useZoomPan'
+import { mockRect } from '../../../testing'
 
 /**
  * Область кадра задаётся фиктивным элементом: якорный зум и границы пана
@@ -11,9 +12,7 @@ function stage(width = 400, height = 300) {
   const el = document.createElement('div')
   Object.defineProperty(el, 'clientWidth', { value: width })
   Object.defineProperty(el, 'clientHeight', { value: height })
-  el.getBoundingClientRect = () => ({
-    left: 0, top: 0, width, height, right: width, bottom: height, x: 0, y: 0, toJSON: () => ({}),
-  })
+  mockRect(el, { width, height })
   return el
 }
 

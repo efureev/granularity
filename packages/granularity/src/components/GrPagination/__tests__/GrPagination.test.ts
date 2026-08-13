@@ -1,8 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
 import GrPagination, { type GrPaginationProps } from '../GrPagination.vue'
+import type { GranularityI18nAdapter } from '../../../i18n/adapter'
+import { granularityGlobal } from '../../../testing'
 
 type PaginationMountOptions = {
   locale?: 'en' | 'ru'
@@ -45,13 +46,7 @@ function mountPagination(options: PaginationMountOptions = {}) {
       ...(options.props ?? {}),
     },
     slots: options.slots,
-    global: i18n
-      ? {
-          provide: {
-            [GRANULARITY_I18N_KEY as symbol]: i18n,
-          },
-        }
-      : undefined,
+    global: i18n ? granularityGlobal({ i18n }) : undefined,
   })
 }
 
