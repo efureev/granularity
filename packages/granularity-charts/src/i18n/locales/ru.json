@@ -1,0 +1,31 @@
+{
+  "chart": {
+    "roleDescription": "график",
+    "label": "График, серий: {series}, точек: {points}",
+    "keyboardHint": "Стрелки — переход по точкам",
+    "empty": "Нет данных",
+    "loading": "Загрузка графика",
+    "tableCaption": "Данные графика",
+    "columnX": "X",
+    "noValue": "нет значения",
+    "point": "{x}. {values}",
+    "seriesValue": "{series}: {value}",
+    "axisX": "Ось X",
+    "axisY": "Ось Y"
+  },
+  "line": {
+    "label": "Линейный график"
+  },
+  "legend": {
+    "toggle": "Показать или скрыть {label}",
+    "hidden": "{label} скрыта, показано {shown} из {total}",
+    "shown": "{label} показана, показано {shown} из {total}"
+  },
+  "sparkline": {
+    "label": "Спарклайн",
+    "summary": "{trend}, от {first} до {last}, минимум {min}, максимум {max}",
+    "trendUp": "рост",
+    "trendDown": "падение",
+    "trendFlat": "без изменений"
+  }
+}

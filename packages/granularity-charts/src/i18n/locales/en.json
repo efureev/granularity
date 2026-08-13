@@ -1,0 +1,31 @@
+{
+  "chart": {
+    "roleDescription": "chart",
+    "label": "Chart, {series} series, {points} points",
+    "keyboardHint": "Use arrow keys to browse points",
+    "empty": "No data",
+    "loading": "Loading chart",
+    "tableCaption": "Chart data",
+    "columnX": "X",
+    "noValue": "no value",
+    "point": "{x}. {values}",
+    "seriesValue": "{series}: {value}",
+    "axisX": "X axis",
+    "axisY": "Y axis"
+  },
+  "line": {
+    "label": "Line chart"
+  },
+  "legend": {
+    "toggle": "Toggle {label}",
+    "hidden": "{label} hidden, {shown} of {total} series shown",
+    "shown": "{label} shown, {shown} of {total} series shown"
+  },
+  "sparkline": {
+    "label": "Sparkline",
+    "summary": "{trend}, from {first} to {last}, minimum {min}, maximum {max}",
+    "trendUp": "rising",
+    "trendDown": "falling",
+    "trendFlat": "flat"
+  }
+}

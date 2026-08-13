@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { granularityComponentConfigs } from '@feugene/granularity/granular-provider'
+import { granularityChartsComponentConfigs } from '@feugene/granularity-charts/granular-provider'
 import { granularityChronoComponentConfigs } from '@feugene/granularity-chrono/granular-provider'
 
 /**
@@ -43,7 +44,10 @@ export const registryComponentNames: string[] = Object.keys(granularityComponent
  * 2.6 e2e не видел companion-страниц вовсе, и ни axe, ни визуальный слой их
  * не проверяли.
  */
-export const companionComponentNames: string[] = Object.keys(granularityChronoComponentConfigs).sort()
+export const companionComponentNames: string[] = [
+  ...Object.keys(granularityChronoComponentConfigs),
+  ...Object.keys(granularityChartsComponentConfigs),
+].sort()
 
 /** Компоненты со своей страницей витрины (`GrButton`, `GrSlider`, …). */
 export const componentNames: string[] = Object.keys(componentApi).sort()

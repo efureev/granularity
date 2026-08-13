@@ -1,0 +1,91 @@
+import { granularityGlobal } from '@feugene/granularity/testing'
+import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
+
+import GrSparkline from '../GrSparkline.vue'
+
+function factory(props: Record<string, unknown> = {}, options: Record<string, unknown> = {}) {
+  return mount(GrSparkline, { props: { data: [1, 5, 3, 9], ...props }, global: granularityGlobal(options) })
+}
+
+describe('GrSparkline', () => {
+  it('это картинка с осмысленным именем, а не приложение', () => {
+    const wrapper = factory()
+    const label = wrapper.attributes('aria-label')!
+
+    expect(wrapper.attributes('role')).toBe('img')
+    expect(label).toContain('rising')
+    expect(label).toContain('9')
+  })
+
+  it('падение и ровный ряд читаются по-разному', () => {
+    expect(factory({ data: [9, 5, 1] }).attributes('aria-label')).toContain('falling')
+    expect(factory({ data: [4, 4, 4] }).attributes('aria-label')).toContain('flat')
+  })
+
+  it('своё имя сильнее сводки', () => {
+    expect(factory({ ariaLabel: 'Выручка' }).attributes('aria-label')).toBe('Выручка')
+  })
+
+  it('сводку можно выключить', () => {
+    expect(factory({ summary: false }).attributes('aria-label')).toBe('Sparkline')
+  })
+
+  it('рамы нет: ни осей, ни легенды, ни поверхности взаимодействия', () => {
+    const wrapper = factory()
+
+    expect(wrapper.find('[data-gr-chart-surface]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-chart-legend]').exists()).toBe(false)
+    expect(wrapper.findAll('[tabindex]')).toHaveLength(0)
+  })
+
+  it('линия защищена от растяжения холста', () => {
+    const line = factory().find('[data-gr-sparkline-line]')
+
+    expect(line.attributes('vector-effect')).toBe('non-scaling-stroke')
+  })
+
+  it('маркер последнего значения — нулевой отрезок с круглым торцом', () => {
+    const point = factory().find('[data-gr-sparkline-point]')
+
+    expect(point.attributes('stroke-linecap')).toBe('round')
+    expect(point.attributes('vector-effect')).toBe('non-scaling-stroke')
+    expect(point.attributes('d')).toMatch(/^M ([\d.]+) ([\d.]+) L \1 \2$/)
+  })
+
+  it('маркер отключается пропом', () => {
+    expect(factory({ showLastPoint: false }).find('[data-gr-sparkline-point]').exists()).toBe(false)
+  })
+
+  it('area добавляет заливку тише линии', () => {
+    const wrapper = factory({ variant: 'area' })
+    const fill = wrapper.findAll('path')[0]!
+
+    expect(fill.attributes('fill-opacity')).toContain('--gr-sparkline-fill-opacity')
+    expect(fill.attributes('d')).toContain('Z')
+  })
+
+  it('пропуск рвёт линию, а не соединяет её через ноль', () => {
+    const d = factory({ data: [1, 2, null, 3, 4] }).find('[data-gr-sparkline-line]').attributes('d')!
+
+    expect(d.match(/M /g)).toHaveLength(2)
+  })
+
+  it('ряд, начинающийся с пропуска, остаётся рядом чисел', () => {
+    const wrapper = factory({ data: [null, null, 5, 7] })
+
+    expect(wrapper.attributes('aria-label')).toContain('rising')
+  })
+
+  it('вырожденные данные не роняют компонент', () => {
+    expect(() => factory({ data: [] })).not.toThrow()
+    expect(() => factory({ data: [null, null] })).not.toThrow()
+    expect(factory({ data: [] }).attributes('aria-label')).toBe('Sparkline')
+  })
+
+  it('маркер последней точки пропускает хвостовой пропуск', () => {
+    const wrapper = factory({ data: [1, 5, null] })
+
+    expect(wrapper.find('[data-gr-sparkline-point]').exists()).toBe(true)
+  })
+})

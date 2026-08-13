@@ -1,0 +1,31 @@
+{
+  "chart": {
+    "roleDescription": "gráfico",
+    "label": "Gráfico, {series} series, {points} puntos",
+    "keyboardHint": "Usa las flechas para recorrer los puntos",
+    "empty": "Sin datos",
+    "loading": "Cargando gráfico",
+    "tableCaption": "Datos del gráfico",
+    "columnX": "X",
+    "noValue": "sin valor",
+    "point": "{x}. {values}",
+    "seriesValue": "{series}: {value}",
+    "axisX": "Eje X",
+    "axisY": "Eje Y"
+  },
+  "line": {
+    "label": "Gráfico de líneas"
+  },
+  "legend": {
+    "toggle": "Mostrar u ocultar {label}",
+    "hidden": "{label} oculta, {shown} de {total} series visibles",
+    "shown": "{label} visible, {shown} de {total} series visibles"
+  },
+  "sparkline": {
+    "label": "Minigráfico",
+    "summary": "{trend}, de {first} a {last}, mínimo {min}, máximo {max}",
+    "trendUp": "en alza",
+    "trendDown": "a la baja",
+    "trendFlat": "sin cambios"
+  }
+}

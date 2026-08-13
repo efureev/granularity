@@ -13,6 +13,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     GrButton: typeof import('@feugene/granularity/components/GrButton')['GrButton']
     GrCalendar: typeof import('@feugene/granularity-chrono/components/GrCalendar')['GrCalendar']
+    GrCard: typeof import('@feugene/granularity/components/GrCard')['GrCard']
+    GrChartLine: typeof import('@feugene/granularity-charts/components/GrChartLine')['GrChartLine']
     GrDatePicker: typeof import('@feugene/granularity-chrono/components/GrDatePicker')['GrDatePicker']
     GrDateRangePicker: typeof import('@feugene/granularity-chrono/components/GrDateRangePicker')['GrDateRangePicker']
     GrDateTimePicker: typeof import('@feugene/granularity-chrono/components/GrDateTimePicker')['GrDateTimePicker']
@@ -20,6 +22,8 @@ declare module 'vue' {
     GrFormField: typeof import('@feugene/granularity/components/GrFormField')['GrFormField']
     GrRelativeTime: typeof import('@feugene/granularity-chrono/components/GrRelativeTime')['GrRelativeTime']
     GrSegmented: typeof import('@feugene/granularity/components/GrSegmented')['GrSegmented']
+    GrSparkline: typeof import('@feugene/granularity-charts/components/GrSparkline')['GrSparkline']
+    GrTable: typeof import('@feugene/granularity/components/GrTable')['GrTable']
     GrTimePicker: typeof import('@feugene/granularity-chrono/components/GrTimePicker')['GrTimePicker']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

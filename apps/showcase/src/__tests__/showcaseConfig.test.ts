@@ -94,7 +94,9 @@ describe('showcase bootstrap config', () => {
     // это можно было только глазами.
     expect(showcaseI18nEntry).toContain("from '@feugene/granularity-chrono/i18n/all'")
     expect(showcaseI18nEntry).toContain('...grChronoLocales')
-    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK])')
+    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-charts/i18n/all'")
+    expect(showcaseI18nEntry).toContain('...grChartsLocales')
+    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK])')
     expect(showcaseI18nMessagesEntry).toContain("export const SHOWCASE_I18N_BLOCK = 'showcase'")
     expect(showcaseI18nMessagesEntry).toContain("'./locales/en/showcase.json'")
     expect(showcaseI18nMessagesEntry).toContain("'./locales/ru/showcase.json'")
@@ -112,6 +114,7 @@ describe('showcase bootstrap config', () => {
     expect(showcaseGranularOptions.providers.map(provider => provider.id)).toEqual([
       '@feugene/granularity',
       '@feugene/granularity-chrono',
+      '@feugene/granularity-charts',
     ])
     expect(showcaseGranularOptions.components).toBe('all')
     expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
@@ -119,6 +122,7 @@ describe('showcase bootstrap config', () => {
     expect(showcaseUnoConfig).toContain("presetGranularNode")
     expect(showcaseUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("import chronoProvider from '@feugene/granularity-chrono/granular-provider/node'")
+    expect(showcaseUnoConfig).toContain("import chartsProvider from '@feugene/granularity-charts/granular-provider/node'")
     expect(showcaseUnoConfig).toContain("names: ['light', 'dark']")
   })
 })

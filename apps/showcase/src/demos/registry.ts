@@ -12,6 +12,11 @@ import { defineAsyncComponent } from 'vue'
  * Порядок — алфавитный по ключу, его держит гейт `examplePreviews.test.ts`.
  */
 export const demoPathByPreviewKey = {
+  'extra-charts-line-basic':              'extra/granularity-charts/GrChartLineBasicDemo.vue',
+  'extra-charts-line-series':             'extra/granularity-charts/GrChartLineSeriesDemo.vue',
+  'extra-charts-line-states':             'extra/granularity-charts/GrChartLineStatesDemo.vue',
+  'extra-charts-sparkline-basic':         'extra/granularity-charts/GrSparklineBasicDemo.vue',
+  'extra-charts-sparkline-table':         'extra/granularity-charts/GrSparklineTableDemo.vue',
   'extra-chrono-calendar-basic':          'extra/granularity-chrono/GrCalendarBasicDemo.vue',
   'extra-chrono-calendar-day-slot':       'extra/granularity-chrono/GrCalendarDaySlotDemo.vue',
   'extra-chrono-calendar-modes':          'extra/granularity-chrono/GrCalendarModesDemo.vue',

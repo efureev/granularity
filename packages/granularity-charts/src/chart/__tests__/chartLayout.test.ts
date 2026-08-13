@@ -1,0 +1,82 @@
+import { describe, expect, it } from 'vitest'
+
+import { chartLayout, estimateTextWidth } from '../chartLayout'
+
+const base = {
+  width: 600,
+  height: 300,
+  yTickLabels: ['0', '50', '100'],
+  xTickLabels: ['янв', 'фев', 'мар'],
+  fontSizePx: 12,
+  showYAxis: true,
+  showXAxis: true,
+}
+
+describe('estimateTextWidth', () => {
+  it('растёт с длиной строки и кеглем', () => {
+    expect(estimateTextWidth('1234', 12)).toBeGreaterThan(estimateTextWidth('12', 12))
+    expect(estimateTextWidth('1234', 24)).toBeGreaterThan(estimateTextWidth('1234', 12))
+  })
+
+  it('пустая строка не занимает места', () => {
+    expect(estimateTextWidth('', 12)).toBe(0)
+  })
+})
+
+describe('chartLayout', () => {
+  it('оставляет место под обе оси', () => {
+    const layout = chartLayout(base)
+
+    expect(layout.gutters.left).toBeGreaterThan(10)
+    expect(layout.gutters.bottom).toBeGreaterThan(10)
+    expect(layout.plot.width).toBeLessThan(base.width)
+    expect(layout.plot.height).toBeLessThan(base.height)
+  })
+
+  it('без осей отступы равны заданным', () => {
+    const layout = chartLayout({ ...base, showXAxis: false, showYAxis: false, padding: { top: 2, right: 2, bottom: 2, left: 2 } })
+
+    expect(layout.gutters).toEqual({ top: 2, right: 2, bottom: 2, left: 2 })
+    expect(layout.plot).toEqual({ x: 2, y: 2, width: 596, height: 296 })
+  })
+
+  it('длинная подпись расширяет отступ до потолка и помечается усечённой', () => {
+    const long = chartLayout({ ...base, yTickLabels: ['1 234 567 890 123'], maxAxisWidth: 40 })
+
+    expect(long.truncated).toBe(true)
+    expect(long.gutters.left).toBeLessThanOrEqual(4 + 40 + 6)
+  })
+
+  it('короткие подписи усечения не дают', () => {
+    expect(chartLayout(base).truncated).toBe(false)
+  })
+
+  it('нулевой холст не даёт отрицательной области построения', () => {
+    const layout = chartLayout({ ...base, width: 0, height: 0 })
+
+    expect(layout.plot.width).toBe(0)
+    expect(layout.plot.height).toBe(0)
+  })
+
+  it('легенда сверху отнимает высоту, но не ширину', () => {
+    const withLegend = chartLayout({ ...base, legend: { position: 'top', height: 20 } })
+    const without = chartLayout(base)
+
+    expect(withLegend.plot.height).toBeLessThan(without.plot.height)
+    expect(withLegend.plot.width).toBe(without.plot.width)
+    expect(withLegend.legend?.y).toBe(without.gutters.top)
+  })
+
+  it('легенда снизу сдвигает нижний отступ, а не верхний', () => {
+    const withLegend = chartLayout({ ...base, legend: { position: 'bottom', height: 20 } })
+
+    expect(withLegend.plot.y).toBe(chartLayout(base).plot.y)
+    expect(withLegend.gutters.bottom).toBeGreaterThan(chartLayout(base).gutters.bottom)
+  })
+
+  it('крайняя подпись оси X резервирует половину своей ширины', () => {
+    const layout = chartLayout({ ...base, xTickLabels: ['01.01.2026', '01.02.2026', '01.12.2026'] })
+
+    expect(layout.gutters.right).toBeGreaterThan(8)
+  })
+})

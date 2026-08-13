@@ -1,3 +1,4 @@
+import chartsPkg from '@feugene/granularity-charts/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
 import type { ShowcaseApiSectionMeta } from '../model.ts'
@@ -44,6 +45,84 @@ export type CompanionPackage = {
   /** Внешние (собственные) зависимости пакета — показываем, за что «платит» consumer. */
   dependencies: string[]
   components: CompanionComponent[]
+}
+
+/** Публичная поверхность линейного графика. */
+function chartLineApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда `x` становится порядковым номером. Внутри серии два вида входа: объектный `data` и колоночная пара `x`/`y`.' },
+        { name: 'xScale', type: `'linear' | 'time' | 'band'`, description: 'Тип оси X. Не задан — выводится из данных: `Date` даёт время, строка даёт категории.' },
+        { name: 'height', type: 'number', default: '256', description: 'Высота холста в пикселях. Раскладка обязана быть детерминированной до первого замера — отсюда число, а не CSS-строка.' },
+        { name: 'width', type: 'number', default: '640', description: 'Объявленная ширина: от неё идёт серверный рендер, клиентская уточняется замером.' },
+        { name: 'yDomain', type: '[number | null, number | null]', description: 'Границы оси значений. `null` в позиции — считать эту сторону по данным.' },
+        { name: 'includeZero', type: 'boolean', default: 'false', description: 'Притянуть ось значений к нулю.' },
+        { name: 'curve', type: `'linear' | 'smooth' | 'step'`, default: `'linear'`, description: '`smooth` — монотонная кубика: она не выбрасывает кривую за диапазон соседних значений, то есть не рисует максимум, которого в данных нет.' },
+        { name: 'showPoints', type: `'auto' | 'always' | 'never'`, default: `'auto'`, description: '`auto` — маркеры при ряде до 60 точек; выше они сливаются в полосу и только мешают.' },
+        { name: 'showGrid', type: `'both' | 'x' | 'y' | 'none'`, default: `'y'`, description: 'Какие линии сетки рисовать.' },
+        { name: 'showLegend', type: `boolean | 'auto'`, default: `'auto'`, description: '`auto` — легенда появляется от второй серии.' },
+        { name: 'legendPosition', type: `'top' | 'bottom'`, default: `'bottom'`, description: 'Где стоит легенда.' },
+        { name: 'tooltip', type: 'boolean', default: 'true', description: 'Тултип от координаты указателя, а не от попадания в марку: по линии в два пикселя мышью не попасть.' },
+        { name: 'hiddenSeries', type: 'readonly string[]', description: '`v-model:hiddenSeries` — скрытые серии по id. Скрытая серия не растягивает ось.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — курсор. Синхронизирует пару графиков.' },
+        { name: 'loading', type: 'boolean', default: 'false', description: 'Скелет и `aria-busy` на корне.' },
+        { name: 'empty', type: 'boolean', description: 'Принудительное пустое состояние. Не задано — выводится из данных.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Полные данные таблицей. `hidden` — только для скринридера, но в дереве доступности; `off` убирает её совсем.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку: `role="img"` с именем, без фокуса, тултипа и клавиатуры.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Точность и разделители значений. Локаль берётся из адаптера i18n.' },
+        { name: 'xTickFormat / yTickFormat', type: '(value: number, kind?) => string', description: 'Свой формат подписей делений.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей и размер маркеров. Не задан — из `GrConfigProvider`.' },
+        { name: 'canvasThreshold', type: 'number', default: '2000', description: 'Порог, выше которого маркеры не рисуются даже при `auto`. Работает уже сейчас, хотя canvas-путь придёт второй фазой.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:hiddenSeries', type: '(value: string[]) => void', description: 'Легенда переключила серию.' },
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Курсор сменился — указателем или клавиатурой.' },
+        { name: 'pointClick', type: '(value: GrChartActivePoint) => void', description: 'Клик или `Enter` на активной точке.' },
+        { name: 'pointHover', type: '(value: GrChartActivePoint | null) => void', description: 'Активная точка сменилась. `null` — курсор ушёл.' },
+        { name: 'legendToggle', type: '(value: { seriesId: string, hidden: boolean }) => void', description: 'Намерение скрыть или показать серию. Применяет его потребитель — состояние его.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active: GrChartActivePoint, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'legend', type: '{ series, toggle }', description: 'Своя легенда.' },
+        { name: 'empty', type: '—', description: 'Своё пустое состояние вместо `GrEmptyState`.' },
+        { name: 'header', type: '—', description: 'Строка над графиком: заголовок, действия.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность спарклайна: он неинтерактивен, поэтому эмитов нет. */
+function sparklineApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'data', type: '(number | null)[] | GrChartPoint[]', description: 'Ряд значений. `null` — пропуск: линия рвётся.' },
+        { name: 'variant', type: `'line' | 'area'`, default: `'line'`, description: 'С заливкой под линией или без.' },
+        { name: 'color', type: 'string', description: 'Цвет линии. Не задан — токен `--gr-sparkline-color`, то есть первая роль палитры серий.' },
+        { name: 'showLastPoint', type: 'boolean', default: 'true', description: 'Маркер последнего значения — того, ради которого спарклайн обычно и ставят.' },
+        { name: 'summary', type: 'boolean', default: 'true', description: 'Автоматическая текстовая сводка: направление, края, размах. Она и становится именем картинки.' },
+        { name: 'ariaLabel', type: 'string', description: 'Своё имя вместо сводки.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Формат чисел в сводке.' },
+      ],
+    },
+  ]
 }
 
 /** Пропы сетки: то, что относится к показу месяца и выбору дня. */
@@ -380,6 +459,68 @@ function dateRangePickerApiSections(): ShowcaseApiSectionMeta[] {
 }
 
 export const companionPackages: CompanionPackage[] = [
+  {
+    id: 'granularity-charts',
+    npmName: '@feugene/granularity-charts',
+    label: 'Charts',
+    version: chartsPkg.version,
+    description: 'Графики без чужой библиотеки: свой SVG, ноль зависимостей, рисунок собирается токенами темы. Переключение light/dark ничего не пересоздаёт — цвет серии это роль `--gr-chart-*`, а не палитра вендора.',
+    dependencies: [],
+    components: [
+      {
+        name: 'GrChartLine',
+        slug: 'gr-chart-line',
+        title: 'GrChartLine',
+        summary: 'Ряд во времени, по числовой оси или по категориям: оси, сетка, легенда-переключатель, тултип от координаты курсора, клавиатура по точкам и скрытая таблица данных для скринридера.',
+        importPath: '@feugene/granularity-charts/components/GrChartLine',
+        examples: [
+          {
+            id: 'charts-line-basic',
+            title: 'Time series',
+            description: 'Тип оси выводится из данных: первый `x` — `Date`, значит шкала времени, а деления шагаются календарём, а не числом миллисекунд.',
+            previewKey: 'extra-charts-line-basic',
+            note: 'У графика одна остановка `Tab`. Дальше — стрелки по точкам, `Home`/`End` по краям, `Esc` снимает выбор.',
+          },
+          {
+            id: 'charts-line-series',
+            title: 'Six series on five colours',
+            description: 'Палитра ядра — пять ролей, поэтому шестая серия повторяет цвет первой и отличается формой точки. Цвет никогда не единственный различитель.',
+            previewKey: 'extra-charts-line-series',
+            note: 'Клик по пункту легенды скрывает серию и объявляет результат в живом регионе.',
+          },
+          {
+            id: 'charts-line-states',
+            title: 'Gaps, loading, empty',
+            description: 'Пропуск в ряду рвёт линию, а не соединяет её через ноль: значения там не было. В таблице данных на его месте прочерк.',
+            previewKey: 'extra-charts-line-states',
+          },
+        ],
+        apiSections: chartLineApiSections(),
+      },
+      {
+        name: 'GrSparkline',
+        slug: 'gr-sparkline',
+        title: 'GrSparkline',
+        summary: 'Линия без рамы — в ячейку таблицы и в карточку показателя. Ничего не замеряет и не держит слушателей, поэтому сотня штук на странице ничего не стоит.',
+        importPath: '@feugene/granularity-charts/components/GrSparkline',
+        examples: [
+          {
+            id: 'charts-sparkline-basic',
+            title: 'Next to a number',
+            description: 'Имя картинки собирается само: направление, края и размах. «График» в качестве альтернативного текста не сообщает ничего.',
+            previewKey: 'extra-charts-sparkline-basic',
+          },
+          {
+            id: 'charts-sparkline-table',
+            title: 'In table cells',
+            description: 'Сценарий, ради которого спарклайн и существует. Холст растягивается по ячейке, а штрих от растяжения защищён `vector-effect`.',
+            previewKey: 'extra-charts-sparkline-table',
+          },
+        ],
+        apiSections: sparklineApiSections(),
+      },
+    ],
+  },
   {
     id: 'granularity-chrono',
     npmName: '@feugene/granularity-chrono',
