@@ -16,7 +16,7 @@ import { linearTicks } from '../../../chart/chartTicks'
 import { type ChartTableModel, chartTableModel } from '../../../chart/chartTable'
 import { useChartScale } from '../../../composables/useChartScale'
 import { type ChartTick, type ChartTickFormat, useChartTicks } from '../../../composables/useChartTicks'
-import { type GrChartActivePoint, useChartTooltip } from '../../../composables/useChartTooltip'
+import { type ChartHitContext, type GrChartActivePoint, useChartTooltip } from '../../../composables/useChartTooltip'
 import { useChartA11y } from '../../../composables/internal/useChartA11y'
 import { useElementSize } from '../../../composables/internal/useElementSize'
 import ChartAxis from './ChartAxis.vue'
@@ -94,8 +94,8 @@ export interface ChartFrameProps {
    * их, потому что у него попадание угловое, якорь тултипа — центроид доли,
    * строка таблицы — доля, а описание точки включает процент (§10).
    */
-  hitTest?: (point: { x: number, y: number }, plot: Rect) => number
-  anchorPoint?: (index: number, plot: Rect) => { x: number, y: number } | null
+  hitTest?: (point: { x: number, y: number }, context: ChartHitContext) => number
+  anchorPoint?: (index: number, context: ChartHitContext) => { x: number, y: number } | null
   tableModel?: ChartTableModel
   describePoint?: (index: number, seriesIndex: number) => string
 }
@@ -143,7 +143,14 @@ const emit = defineEmits<ChartFrameEmits>()
 defineSlots<{
   /** Марки графика: линия, площадь, столбцы. */
   plot?: (props: ChartPlotScope) => unknown
-  /** Своя панель тултипа. */
+  /**
+   * Своя панель тултипа.
+   *
+   * Указателя она не перехватывает: панель висит над областью построения, и
+   * любой её хит закрывал бы тултип, из-за которого она и появилась.
+   * Интерактивному содержимому здесь места нет — ему место в `header` или в
+   * обработчике `pointClick`.
+   */
   tooltip?: (props: { active: GrChartActivePoint, formatValue: (value: number | null) => string }) => unknown
   /** Своя легенда. */
   legend?: (props: { series: readonly NormalizedSeries[], toggle: (id: string) => void }) => unknown
@@ -649,9 +656,23 @@ watch(tooltipApi.activeIndex, (value) => {
       />
     </slot>
 
-    <!-- Панель тултипа обязана быть в DOM до открытия: позиционирование не
-         измеряет то, чего нет в дереве. Отсюда `v-show`, а не `v-if`. -->
-    <div v-show="tooltipApi.open.value && tooltipApi.active.value" ref="tooltipEl" :style="floatingStyle">
+    <!--
+      Панель тултипа обязана быть в DOM до открытия: позиционирование не
+      измеряет то, чего нет в дереве. Отсюда `v-show`, а не `v-if`.
+
+      `pointer-events-none` — на **обёртке**, а не только на самой панели.
+      Обёртка позиционируется `fixed` и ложится поверх области построения; без
+      этого указатель, дошедший до панели, покидает поверхность, та получает
+      `pointerleave` и закрывает тултип — а курсор снова оказывается над
+      графиком и открывает его заново. Получается мигание тем чаще, чем ближе
+      панель к курсору: у столбцов она садится прямо на верх полосы.
+    -->
+    <div
+      v-show="tooltipApi.open.value && tooltipApi.active.value"
+      ref="tooltipEl"
+      class="pointer-events-none"
+      :style="floatingStyle"
+    >
       <template v-if="tooltipApi.active.value">
         <slot name="tooltip" :active="tooltipApi.active.value" :format-value="formatPointValue">
           <ChartTooltip

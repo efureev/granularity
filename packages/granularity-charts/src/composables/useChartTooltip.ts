@@ -31,6 +31,20 @@ export interface GrChartActivePoint {
   series: GrChartActiveSeriesValue[]
 }
 
+/**
+ * Что известно правилу попадания о системе координат.
+ *
+ * Одной области построения мало: круг считает угол от её центра, а столбцы —
+ * попадание в полосу категории, ширина которой живёт в шкале и зависит от её
+ * отступов. Собирать шкалу заново в компоненте значило бы повторить настройки
+ * рамы и однажды разойтись с ними.
+ */
+export interface ChartHitContext {
+  plot: Rect
+  xScale: GrChartScale
+  yScale: GrChartScale
+}
+
 export interface UseChartTooltipOptions {
   data: () => ChartData
   xScale: () => GrChartScale
@@ -48,14 +62,14 @@ export interface UseChartTooltipOptions {
    * что раскладывается по оси. У круга попадание **угловое**, и декартово
    * правило ответило бы неверно всегда, кроме случайных совпадений.
    */
-  hitTest?: (point: { x: number, y: number }, plot: Rect) => number
+  hitTest?: (point: { x: number, y: number }, context: ChartHitContext) => number
   /**
    * Своё место якоря тултипа. `null` — якорь спрятан.
    *
    * Дефолт садится на верхнее значение столбика точек; у круга такого столбика
    * нет вовсе, и якорь уехал бы в случайную точку холста.
    */
-  anchor?: (index: number, plot: Rect) => { x: number, y: number } | null
+  anchor?: (index: number, context: ChartHitContext) => { x: number, y: number } | null
 }
 
 export interface UseChartTooltipReturn {
@@ -74,6 +88,10 @@ const DEFAULT_CLOSE_DELAY = 80
 
 export function useChartTooltip(options: UseChartTooltipOptions): UseChartTooltipReturn {
   const activeIndex = ref<number | null>(null)
+
+  function hitContext(): ChartHitContext {
+    return { plot: options.plot(), xScale: options.xScale(), yScale: options.yScale() }
+  }
   const open = ref(false)
   let closeTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -123,7 +141,7 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
       return hidden
 
     if (options.anchor) {
-      const custom = options.anchor(point.index, plot)
+      const custom = options.anchor(point.index, hitContext())
 
       if (!custom)
         return hidden
@@ -138,11 +156,16 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
       }
     }
 
-    const values = point.series.map(series => series.value).filter((value): value is number => value !== null)
-    // Якорь садится на верхнее значение столбика точек: тултип всплывает над
-    // тем, что человек и так рассматривает. Значений нет — середина области.
-    const top = values.length > 0
-      ? options.yScale().scale(Math.max(...values))
+    // Якорь садится на **верх нарисованного** в этой позиции: тултип всплывает
+    // над тем, что человек и так рассматривает. У стопки верх — это вершина
+    // полосы (`stackTop`), а не наибольшее из значений: по значению панель
+    // уехала бы внутрь столбца и накрыла бы ровно то, что показывает.
+    const tops = point.series
+      .map(series => series.point?.stackTop ?? series.value)
+      .filter((value): value is number => value !== null)
+
+    const top = tops.length > 0
+      ? options.yScale().scale(Math.max(...tops))
       : plot.y + plot.height / 2
 
     const style: Record<string, string> = {
@@ -175,7 +198,7 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
     const rect = element.getBoundingClientRect()
     const point = { x: event.clientX - rect.left, y: event.clientY - rect.top }
     const index = options.hitTest
-      ? options.hitTest(point, options.plot())
+      ? options.hitTest(point, hitContext())
       : nearestIndex(options.data().positions, options.xScale(), point.x)
 
     setActive(index === -1 ? null : index)

@@ -11,7 +11,7 @@ import type { GrChartPoint } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
 import { seriesStyle } from '../../chart/chartSeriesStyle'
 import type { ChartTableModel } from '../../chart/chartTable'
-import type { GrChartActivePoint } from '../../composables/useChartTooltip'
+import type { ChartHitContext, GrChartActivePoint } from '../../composables/useChartTooltip'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
 import {
   frameTooltipClass,
@@ -324,8 +324,8 @@ function geometryOf(plot: Rect): PieGeometry {
  * случайно. Возвращается **индекс входа**, а не порядок в раскладке — по нему
  * ходят курсор, клавиатура и таблица.
  */
-function hitTest(point: { x: number, y: number }, plot: Rect): number {
-  const geometry = geometryOf(plot)
+function hitTest(point: { x: number, y: number }, context: ChartHitContext): number {
+  const geometry = geometryOf(context.plot)
   // Радиус попадания — выросший, и для всех долей сразу: см. `ACTIVE_GROW`.
   const found = sliceAtPoint(
     slices.value,
@@ -340,13 +340,13 @@ function hitTest(point: { x: number, y: number }, plot: Rect): number {
   return found === -1 ? -1 : slices.value[found]!.sourceIndex
 }
 
-function anchorPoint(index: number, plot: Rect): { x: number, y: number } | null {
+function anchorPoint(index: number, context: ChartHitContext): { x: number, y: number } | null {
   const entry = entries.value[index]
 
   if (!entry?.slice)
     return null
 
-  const geometry = geometryOf(plot)
+  const geometry = geometryOf(context.plot)
 
   return arcCentroid(
     geometry.cx,

@@ -1,6 +1,7 @@
-import { granularityGlobal, mockRect } from '@feugene/granularity/testing'
+import { granularityGlobal, mockRect, pointer } from '@feugene/granularity/testing'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
+import { nextTick } from 'vue'
 
 import GrChartBar from '../GrChartBar.vue'
 
@@ -133,15 +134,67 @@ describe('GrChartBar', () => {
     expect(boxOf(up!).left).toBeLessThan(boxOf(down!).left)
   })
 
-  it('вертикали у столбцов нет — вместо неё подсвечивается категория', async () => {
+  it('вертикали у столбцов нет — гаснут полосы остальных категорий', async () => {
+    // Ни вертикаль, ни плашка за столбцами не годятся: первая читается как
+    // граница полосы, вторая закрывает сетку и сам рисунок.
     const wrapper = factory()
 
     expect(wrapper.find('[data-gr-chart-crosshair]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-chart-bar-band]').exists()).toBe(false)
+    expect(bars(wrapper).every(node => node.attributes('fill-opacity') === undefined)).toBe(true)
 
     await wrapper.setProps({ activeIndex: 1 })
 
-    expect(wrapper.find('[data-gr-chart-bar-band]').exists()).toBe(true)
+    const dimmed = bars(wrapper).filter(node => node.attributes('fill-opacity')?.includes('--gr-chart-bar-dim'))
+
+    // Погасли все, кроме двух полос второй категории.
+    expect(dimmed).toHaveLength(bars(wrapper).length - 2)
+  })
+
+  it('приглушение соседей отключается пропом', async () => {
+    const wrapper = factory({ dimInactive: false, activeIndex: 1 })
+
+    await nextTick()
+
+    expect(bars(wrapper).every(node => node.attributes('fill-opacity') === undefined)).toBe(true)
+    // Тултип при этом остаётся: о выделенной категории говорит он.
+    expect(wrapper.find('[data-gr-chart-table]').exists()).toBe(true)
+  })
+
+  it('за пределами колонки категории попадания нет', async () => {
+    const wrapper = factory()
+    const surface = wrapper.find('[data-gr-chart-surface]')
+    const boxes = bars(wrapper).map(node => boxOf(node.attributes('d')!))
+
+    // Категорий четыре, серий две: полосы категории `k` стоят на местах `k` и `k + 4`.
+    const centerOf = (category: number) => {
+      const left = boxes[category]!
+      const right = boxes[category + 4]!
+
+      return (left.left + right.left + right.width) / 2
+    }
+
+    const hover = async (x: number, y: number) => {
+      surface.element.dispatchEvent(pointer('pointermove', { clientX: x, clientY: y }))
+      await nextTick()
+    }
+
+    await hover(centerOf(0), 120)
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([0])
+
+    // Ровно посередине между центрами категорий: это зазор, столбцов здесь нет.
+    await hover((centerOf(0) + centerOf(1)) / 2, 120)
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([null])
+  })
+
+  it('под осью и над областью построения попадания нет', async () => {
+    const wrapper = factory()
+    const surface = wrapper.find('[data-gr-chart-surface]')
+    const first = boxOf(bars(wrapper)[0]!.attributes('d')!)
+
+    surface.element.dispatchEvent(pointer('pointermove', { clientX: first.left + 2, clientY: 250 }))
+    await nextTick()
+
+    expect(wrapper.emitted('update:activeIndex')?.at(-1) ?? [null]).toEqual([null])
   })
 
   it('столбцы по непрерывной оси не схлопываются в нулевую ширину', () => {
@@ -174,6 +227,23 @@ describe('GrChartBar', () => {
     expect(one.width).toBeGreaterThan(both.width)
   })
 
+  it('в стопке тултип всплывает над вершиной столбца, а не внутри него', async () => {
+    // По наибольшему из значений якорь уехал бы в середину столбца, и панель
+    // накрыла бы ровно то, что показывает.
+    const wrapper = factory({ stacked: true, activeIndex: 0 })
+
+    await nextTick()
+
+    const anchor = wrapper.findAll('div').find(node => node.attributes('style')?.includes('width: 0px'))
+    const anchorTop = Number(/top:\s*([\d.]+)px/.exec(anchor!.attributes('style')!)![1])
+    const columnTop = Math.min(...bars(wrapper)
+      .slice(0, 1)
+      .concat(bars(wrapper).slice(4, 5))
+      .map(node => boxOf(node.attributes('d')!).top))
+
+    expect(anchorTop).toBeCloseTo(columnTop, 0)
+  })
+
   it('таблица показывает своё значение серии, а не сумму стопки', () => {
     const rows = factory({ stacked: true }).find('[data-gr-chart-table]').findAll('tbody tr')
 
@@ -196,9 +266,15 @@ describe('GrChartBar', () => {
     expect(wrapper.find('svg').attributes('aria-label')).toBe('План и факт по кварталам')
   })
 
-  it('оформление приезжает из GrConfigProvider', () => {
-    const wrapper = factory({}, { componentDefaults: { GrChartBar: { barRadius: 0 } } })
+  it('оформление приезжает из GrConfigProvider', async () => {
+    const radius = factory({}, { componentDefaults: { GrChartBar: { barRadius: 0 } } })
 
-    expect(bars(wrapper)[0]!.attributes('d')).not.toContain('A ')
+    expect(bars(radius)[0]!.attributes('d')).not.toContain('A ')
+
+    const dim = factory({ activeIndex: 1 }, { componentDefaults: { GrChartBar: { dimInactive: false } } })
+
+    await nextTick()
+
+    expect(bars(dim).every(node => node.attributes('fill-opacity') === undefined)).toBe(true)
   })
 })

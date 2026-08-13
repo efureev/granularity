@@ -12,6 +12,8 @@ export interface GrChartBarConfigurableProps {
   /** Скругление дальнего конца полосы в пикселях: радиус идёт в геометрию пути, а не в CSS. */
   barRadius: number
   groupPadding: number
+  /** Гасить полосы неактивных категорий при наведении. */
+  dimInactive: boolean
   showGrid: 'both' | 'x' | 'y' | 'none'
   showLegend: boolean | 'auto'
   legendPosition: 'top' | 'bottom'

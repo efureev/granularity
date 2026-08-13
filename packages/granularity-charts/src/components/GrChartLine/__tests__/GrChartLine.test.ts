@@ -153,6 +153,19 @@ describe('GrChartLine', () => {
     expect(table.findAll('thead th')).toHaveLength(3)
   })
 
+  it('панель тултипа не перехватывает указатель — иначе она моргает под курсором', () => {
+    // Обёртка панели позиционируется `fixed` и ложится поверх области
+    // построения. Перехвати она указатель — поверхность получила бы
+    // `pointerleave`, тултип закрылся бы, курсор снова оказался бы над графиком
+    // и открыл его заново. Инвариант рамы, а не линии: у столбцов панель садится
+    // прямо на верх полосы, и там это заметнее всего.
+    const wrapper = factory()
+    const panel = wrapper.findAll('div').find(node => node.attributes('style')?.includes('position: fixed'))
+
+    expect(panel).toBeDefined()
+    expect(panel!.classes()).toContain('pointer-events-none')
+  })
+
   it('dataTable=off убирает таблицу целиком', () => {
     expect(factory({ dataTable: 'off' }).find('[data-gr-chart-table]').exists()).toBe(false)
   })

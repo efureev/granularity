@@ -9,15 +9,15 @@ import { formatShare } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
-import type { GrChartScale, GrChartScaleKind } from '../../chart/chartScale'
+import { type GrChartScale, type GrChartScaleKind, nearestIndex } from '../../chart/chartScale'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
-import type { GrChartActivePoint } from '../../composables/useChartTooltip'
+import type { ChartHitContext, GrChartActivePoint } from '../../composables/useChartTooltip'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
 import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
 import {
+  barDimOpacity,
   barGapStroke,
   barGapWidth,
-  barHoverFill,
   DEFAULT_BAR_RADIUS,
 } from './grChartBarStyles'
 
@@ -40,6 +40,14 @@ export interface GrChartBarProps {
   groupPadding?: number
   /** Скругление дальнего от базовой линии конца полосы, пиксели. */
   barRadius?: number
+  /**
+   * Гасить полосы неактивных категорий при наведении.
+   *
+   * `false` — активная категория ничем не выделяется, о ней говорит только
+   * тултип. Это осмысленно там, где график стоит рядом с легендой или таблицей
+   * и лишнее движение цвета мешает читать соседей.
+   */
+  dimInactive?: boolean
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
@@ -84,6 +92,7 @@ const props = withDefaults(defineProps<GrChartBarProps>(), {
   // заглянет в `GrConfigProvider`.
   groupPadding: undefined,
   barRadius: undefined,
+  dimInactive: undefined,
   height: undefined,
   width: 640,
   yDomain: undefined,
@@ -124,6 +133,7 @@ const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { compone
 const resolvedHeight = useGrComponentProp('GrChartBar', 'height', () => props.height, 256)
 const resolvedRadius = useGrComponentProp('GrChartBar', 'barRadius', () => props.barRadius, DEFAULT_BAR_RADIUS)
 const resolvedGroupPadding = useGrComponentProp('GrChartBar', 'groupPadding', () => props.groupPadding, 0.1)
+const resolvedDimInactive = useGrComponentProp('GrChartBar', 'dimInactive', () => props.dimInactive, true)
 const resolvedGrid = useGrComponentProp('GrChartBar', 'showGrid', () => props.showGrid, 'y' as const)
 const resolvedLegendMode = useGrComponentProp('GrChartBar', 'showLegend', () => props.showLegend, 'auto' as const)
 const resolvedLegendPosition = useGrComponentProp('GrChartBar', 'legendPosition', () => props.legendPosition, 'bottom' as const)
@@ -181,6 +191,7 @@ interface BarMark {
   d: string
   color: string
   seriesId: string
+  dimmed: boolean
 }
 
 /**
@@ -195,7 +206,9 @@ function barMarks(
   xScale: GrChartScale,
   yScale: GrChartScale,
   plot: Rect,
+  cursor: number | null,
 ): BarMark[] {
+  const activeX = cursor === null ? undefined : data.value.positions[cursor]
   const stacked = props.stacked !== false
   const bandwidth = bandOf(xScale, plot, data.value.positions.length)
   const slots = groupSlots(stacked ? 1 : series.length, bandwidth, { groupPadding: resolvedGroupPadding.value })
@@ -225,6 +238,7 @@ function barMarks(
         d: barPath(barRect(xScale.scale(point.x), slot, from, to), withRadius ? resolvedRadius.value : 0, to <= from),
         color: item.style.color,
         seriesId: item.id,
+        dimmed: resolvedDimInactive.value && activeX !== undefined && point.x !== activeX,
       })
     }
   })
@@ -246,30 +260,36 @@ function topmostAt(series: readonly NormalizedSeries[]): Map<number, string> {
   return top
 }
 
-interface BandHighlight {
-  x: number
-  width: number
-}
-
 /**
- * Подсветка активной категории вместо вертикали.
+ * Попадание — в колонку категории, а не «в ближайшую вообще».
  *
- * Вертикаль под точкой проходит сквозь полосу и читается как её граница —
- * ровно то, чего у столбца быть не должно.
+ * Дефолт рамы берёт ближайшую позицию по абсциссе, где бы курсор ни стоял: над
+ * зазором между категориями, на полях холста, под осью. Для линии это верно —
+ * ряд непрерывен, и «ближайшая точка» есть у любой абсциссы. У столбцов между
+ * категориями пусто, и тултип там сообщает о том, на что человек не наводился.
+ *
+ * По вертикали граница — область построения: подписи оси и отступ сверху к
+ * данным не относятся. По горизонтали — ширина полосы категории, то есть
+ * footprint самих столбцов. Требовать попадания в **конкретный** столбец было
+ * бы хуже: тултип показывает всю категорию сразу, а низкую полосу в один
+ * процент нельзя было бы навести вовсе — и это ровно то значение, которое чаще
+ * всего и хотят прочитать.
  */
-function bandHighlight(
-  xScale: GrChartScale,
-  plot: Rect,
-  cursor: number | null,
-): BandHighlight[] {
-  const x = cursor === null ? undefined : data.value.positions[cursor]
+function hitTest(point: { x: number, y: number }, context: ChartHitContext): number {
+  const { plot, xScale } = context
 
-  if (x === undefined)
-    return []
+  if (point.y < plot.y || point.y > plot.y + plot.height)
+    return -1
 
-  const width = xScale.step > 0 ? xScale.step : bandOf(xScale, plot, data.value.positions.length)
+  const positions = data.value.positions
+  const index = nearestIndex(positions, xScale, point.x)
 
-  return [{ x: xScale.scale(x) - width / 2, width }]
+  if (index === -1)
+    return -1
+
+  const half = bandOf(xScale, plot, positions.length) / 2
+
+  return Math.abs(point.x - xScale.scale(positions[index]!)) <= half ? index : -1
 }
 
 function onLegendToggle(payload: { seriesId: string, hidden: boolean }): void {
@@ -305,6 +325,7 @@ defineExpose({
     :legend-position="resolvedLegendPosition"
     :tooltip="resolvedTooltip"
     :crosshair="false"
+    :hit-test="hitTest"
     :loading="loading"
     :empty="empty"
     :empty-text="emptyText"
@@ -336,23 +357,13 @@ defineExpose({
 
     <template #plot="{ plot, xScale: sx, yScale: sy, visibleSeries, activeIndex: cursor, clipPathId }">
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-bar-body>
-        <rect
-          v-for="(band, index) in bandHighlight(sx, plot, cursor)"
-          :key="index"
-          data-gr-chart-bar-band
-          :x="band.x"
-          :y="plot.y"
-          :width="band.width"
-          :height="plot.height"
-          :fill="barHoverFill"
-        />
-
         <path
-          v-for="mark in barMarks(visibleSeries, sx, sy, plot)"
+          v-for="mark in barMarks(visibleSeries, sx, sy, plot, cursor)"
           :key="mark.key"
           :data-gr-chart-bar-mark="mark.seriesId"
           :d="mark.d"
           :fill="mark.color"
+          :fill-opacity="mark.dimmed ? barDimOpacity : undefined"
           :stroke="stacked !== false ? barGapStroke : 'none'"
           :stroke-width="stacked !== false ? barGapWidth : undefined"
         />

@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial package: charts drawn with design-system tokens, own SVG, zero runtime dependencies.
 - `GrChartLine` — line chart with axes, grid, legend, tooltip, empty and loading states, keyboard
   navigation over points and a screen-reader data table.
-- `GrChartBar` — bar chart: series side by side, stacked, or normalised to 100%; the value axis always starts at
+- `GrChartBar` — bar chart: series side by side, stacked, or normalised to 100%; `dimInactive` turns the hover
+  emphasis off; the value axis always starts at
   zero, only the far end of a bar is rounded (and in a stack only its topmost segment), and the whole category is
   highlighted on hover instead of a crosshair.
 - `GrChartArea` — area chart: fill down to the zero baseline (not the canvas bottom), per-series gradients
@@ -27,3 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   paths, mark placement, plot-area layout, series discriminators.
 - Composables `useChartScale`, `useChartTicks`, `useChartTooltip`.
 - Three locales (`en`, `ru`, `es`) under the `grCharts` i18n block.
+
+### Fixed
+
+- Bar chart hover no longer paints a slab behind the column: the active category now stays at full saturation while
+  the other bars fade, so the grid and the drawing underneath stay visible.
+- Bar chart no longer opens a tooltip over empty canvas. Hit testing is bounded by the category column and by the
+  plot area, instead of snapping to the nearest category from anywhere.
+- Stacked charts anchor the tooltip at the top of the column instead of at the largest single value, which used to
+  put the panel inside the stack and cover what it was describing.
+- Tooltip no longer flickers when the pointer reaches the panel: `pointer-events: none` now sits on the panel's
+  wrapper, not only on the panel itself. The wrapper is `fixed`-positioned over the plot area, so hitting it made the
+  surface fire `pointerleave`, which closed the tooltip and immediately reopened it.
