@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/granularity": "^0.19.0",
+    "@feugene/granularity": "^0.20.0",
     "@feugene/granularity-chrono": "^0.2.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@floating-ui/dom": "^1.8.0",
