@@ -7,15 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-13
+
+First published release. `0.1.0` was cut in the working tree but never tagged or published, so everything the
+package contains ships here.
+
 ### Added
 
 - Initial package: charts drawn with design-system tokens, own SVG, zero runtime dependencies.
 - `GrChartLine` — line chart with axes, grid, legend, tooltip, empty and loading states, keyboard
   navigation over points and a screen-reader data table.
-- `GrChartBar` — bar chart: series side by side, stacked, or normalised to 100%; `dimInactive` turns the hover
-  emphasis off; the value axis always starts at
-  zero, only the far end of a bar is rounded (and in a stack only its topmost segment), and the whole category is
-  highlighted on hover instead of a crosshair.
+- `GrChartBar` — bar chart: series side by side, stacked, or normalised to 100%. The value axis always starts at
+  zero, only the far end of a bar is rounded (and in a stack only its topmost segment), and hovering a category
+  keeps it saturated while the other bars fade — switched off with `dimInactive`.
 - `GrChartArea` — area chart: fill down to the zero baseline (not the canvas bottom), per-series gradients
   anchored to the shape they fill, and `stacked` mode where each band sits on the sum of the ones below while
   the tooltip and data table keep reporting the series' own value.
