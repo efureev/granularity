@@ -49,6 +49,28 @@ export const companionComponentNames: string[] = [
   ...Object.keys(granularityChartsComponentConfigs),
 ].sort()
 
+/**
+ * Компаньоны, которые **не** снимаются визуальным слоем.
+ *
+ * `granularity-charts` рисует не вёрстку, а геометрию: кривую, посчитанную
+ * арифметикой из данных. Пиксельный дифф по ней меряет в основном
+ * антиалиасинг длинных диагональных штрихов, а не то, ради чего гейт
+ * заведён, — раскладку. Регрессии, которые у графика реальны, держат другие
+ * гейты, и держат точнее: цвета и токены — `componentTokens`, `styleTokens` и
+ * `svgPaint` пакета, различимость серий — `seriesDiscriminators`, доступность
+ * — axe (он для этих страниц **остаётся**), сама геометрия — инварианты чистых
+ * модулей, которых у пакета две сотни.
+ *
+ * Плата за включение была бы прямой: визуальный слой локальный, эталоны
+ * снимаются вручную на машине владельца, и любая правка демо или ряда данных
+ * требовала бы пересъёмки.
+ */
+const VISUAL_EXCLUDED_PACKAGES = Object.keys(granularityChartsComponentConfigs)
+
+/** Компаньоны для визуального слоя — см. `VISUAL_EXCLUDED_PACKAGES`. */
+export const visualCompanionComponentNames: string[] = companionComponentNames
+  .filter(name => !VISUAL_EXCLUDED_PACKAGES.includes(name))
+
 /** Компоненты со своей страницей витрины (`GrButton`, `GrSlider`, …). */
 export const componentNames: string[] = Object.keys(componentApi).sort()
 

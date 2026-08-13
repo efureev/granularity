@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { companionComponentNames, companionPath, componentPath } from './components'
+import { companionPath, componentPath, visualCompanionComponentNames } from './components'
 
 /**
  * Визуальная регрессия: снимок области «Live examples» для набора компонентов.
@@ -120,11 +120,16 @@ const VISUAL_COMPONENTS = [
 ]
 
 /**
- * Страницы компаньонов снимаются целиком, а не выборкой: пакет там один, и его
- * вид завязан на те же токены. Панели пикеров в кадр попадают через демо с
- * `inline` — открывающиеся по клику в снимок не идут по общему правилу.
+ * Страницы компаньонов снимаются целиком, а не выборкой: их вид завязан на те
+ * же токены. Панели пикеров в кадр попадают через демо с `inline` —
+ * открывающиеся по клику в снимок не идут по общему правилу.
+ *
+ * Исключение — `granularity-charts`: он рисует геометрию, а не вёрстку, и
+ * пиксельный дифф по кривой меряет антиалиасинг. Обоснование и список —
+ * `components.ts`, `VISUAL_EXCLUDED_PACKAGES`. Из axe-гейта эти страницы **не**
+ * исключены.
  */
-const VISUAL_COMPANIONS = companionComponentNames
+const VISUAL_COMPANIONS = visualCompanionComponentNames
 
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual (${theme})`, () => {
