@@ -235,7 +235,7 @@ function areaMarks(
   return series.map((item) => {
     const paint = resolvedFill.value === 'gradient'
       ? `url(#${gradientBase}-${item.colorIndex})`
-      : item.style.color
+      : item.style.fill
 
     if (props.stacked) {
       const band = toStackBand(item, xScale, yScale)
@@ -282,7 +282,7 @@ function gradientStops(
 
     return {
       id: `${gradientBase}-${item.colorIndex}`,
-      color: item.style.color,
+      color: item.style.fill,
       // Градиент натянут на всю закрашиваемую фигуру, включая её часть под
       // базовой линией: у ряда, уходящего в минус, иначе весь минус оказывался
       // бы за концом градиента и красился последним стопом, то есть никак.

@@ -31,6 +31,8 @@ export interface GrChartSeries {
   x?: readonly GrChartXValue[]
   y?: readonly (number | null)[]
   color?: string
+  /** Цвет заливки, если он должен отличаться от линии. Читает его только площадь. */
+  fillColor?: string
   shape?: GrChartPointShape
   dash?: GrChartDashPattern
   hidden?: boolean
@@ -189,7 +191,7 @@ export function normalizeChartData(
       id: item.id,
       label: item.label ?? item.id,
       colorIndex: index,
-      style: seriesStyle(index, { color: item.color, shape: item.shape, dash: item.dash }),
+      style: seriesStyle(index, { color: item.color, fill: item.fillColor, shape: item.shape, dash: item.dash }),
       hidden: item.hidden === true,
       points,
     }

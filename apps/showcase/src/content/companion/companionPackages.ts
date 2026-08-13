@@ -56,7 +56,7 @@ function chartAreaApiSections(): ShowcaseApiSectionMeta[] {
       title: 'Props',
       origin: 'manual',
       items: [
-        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда `x` становится порядковым номером.' },
+        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда `x` становится порядковым номером. У серии свои `color` и `fillColor`: линия обязана читаться на фоне, а заливка под ней — не спорить с сеткой, и это разные роли.' },
         { name: 'stacked', type: 'boolean', default: 'false', description: 'Складывать серии: каждая полоса ложится на сумму предыдущих. Ось при этом считается по вершинам полос и всегда отсчитывается от нуля.' },
         { name: 'fill', type: `'auto' | 'gradient' | 'solid'`, default: `'auto'`, description: '`auto` — градиент у наложения (ряды обязаны просвечивать) и плотная заливка у стека (полосы стоят встык, и градиент размыл бы границу между ними).' },
         { name: 'xScale', type: `'linear' | 'time' | 'band'`, description: 'Тип оси X. Не задан — выводится из данных.' },
@@ -588,7 +588,7 @@ export const companionPackages: CompanionPackage[] = [
             title: 'Volume, not just level',
             description: 'Площадь берут там, где важен не только уровень, но и объём: «сколько всего набежало». Заливка гаснет к базовой линии — сплошная плашка утяжелила бы низ графика, где смотреть не на что.',
             previewKey: 'extra-charts-area-basic',
-            note: 'Клавиатура и скрытая таблица те же, что у линии: у графика одна остановка `Tab`, дальше стрелки по точкам.',
+            note: 'Линия и заливка красятся ролями темы независимо: `color` и `fillColor` у серии. Роль, а не hex, — потому что при переключении light/dark значение меняет себя само, без пересоздания графика.',
           },
           {
             id: 'charts-area-stacked',

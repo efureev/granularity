@@ -34,3 +34,18 @@ describe('seriesStyle', () => {
     expect(seriesStyle(1.7).color).toBe(GR_CHART_SERIES_COLORS[1])
   })
 })
+
+describe('заливка отдельно от линии', () => {
+  it('без переопределения совпадает с цветом линии', () => {
+    const style = seriesStyle(0)
+
+    expect(style.fill).toBe(style.color)
+  })
+
+  it('переопределяется независимо: у площади линия и заливка — разные роли', () => {
+    const style = seriesStyle(0, { color: 'var(--gr-danger)', fill: 'var(--gr-warning)' })
+
+    expect(style.color).toBe('var(--gr-danger)')
+    expect(style.fill).toBe('var(--gr-warning)')
+  })
+})

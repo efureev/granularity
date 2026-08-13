@@ -23,6 +23,14 @@ export const GR_CHART_SERIES_COLORS = [
 
 export interface GrChartSeriesStyle {
   color: string
+  /**
+   * Цвет заливки. По умолчанию совпадает с цветом линии.
+   *
+   * Отдельным полем, потому что у площади это две разные роли: линия обязана
+   * читаться на фоне, а заливка под ней — не спорить с сеткой и соседями.
+   * Совпадение цветов — частый случай, но не закон.
+   */
+  fill: string
   shape: GrChartPointShape
   dash: GrChartDashPattern
   dashArray: string | undefined
@@ -47,5 +55,5 @@ export function seriesStyle(index: number, overrides: Partial<GrChartSeriesStyle
   const shape = overrides.shape ?? GR_CHART_SHAPES[Math.floor(i / COLOR_COUNT) % SHAPE_COUNT]!
   const dash = overrides.dash ?? GR_CHART_DASHES[Math.floor(i / (COLOR_COUNT * SHAPE_COUNT)) % DASH_COUNT]!
 
-  return { color, shape, dash, dashArray: dashArrayFor(dash, 2) }
+  return { color, fill: overrides.fill ?? color, shape, dash, dashArray: dashArrayFor(dash, 2) }
 }

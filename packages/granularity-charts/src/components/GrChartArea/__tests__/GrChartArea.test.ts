@@ -136,6 +136,24 @@ describe('GrChartArea', () => {
     expect(wrapper.emitted('update:hiddenSeries')?.at(-1)).toEqual([['search']])
   })
 
+  it('заливка красится своим цветом, линия — своим', () => {
+    const wrapper = factory({
+      series: [{ id: 'a', y: [1, 2, 3], color: 'var(--gr-danger)', fillColor: 'var(--gr-warning)' }],
+      fill: 'solid',
+    })
+
+    expect(wrapper.find('[data-gr-chart-series="a"]').attributes('stroke')).toBe('var(--gr-danger)')
+    expect(fills(wrapper)[0]!.attributes('fill')).toBe('var(--gr-warning)')
+  })
+
+  it('свой цвет заливки доезжает и до градиента', () => {
+    const wrapper = factory({
+      series: [{ id: 'a', y: [1, 2, 3], color: 'var(--gr-danger)', fillColor: 'var(--gr-warning)' }],
+    })
+
+    expect(wrapper.find('stop').attributes('stop-color')).toBe('var(--gr-warning)')
+  })
+
   it('на стеке auto означает «без марок»: марка на стыке полос читается дыркой', () => {
     const auto = factory({ stacked: true })
     const forced = factory({ stacked: true, showPoints: 'always' })
