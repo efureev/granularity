@@ -111,7 +111,7 @@ function chartLineApiSections(): ShowcaseApiSectionMeta[] {
       title: 'Props',
       origin: 'manual',
       items: [
-        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда `x` становится порядковым номером. Внутри серии два вида входа: объектный `data` и колоночная пара `x`/`y`.' },
+        { name: 'series', type: 'GrChartSeries[] | (number | null)[]', description: 'Серии либо голый ряд чисел — тогда `x` становится порядковым номером. Внутри серии два вида входа: объектный `data` и колоночная пара `x`/`y`. Свой цвет задаётся полем `color` — ролью темы, а не hex.' },
         { name: 'xScale', type: `'linear' | 'time' | 'band'`, description: 'Тип оси X. Не задан — выводится из данных: `Date` даёт время, строка даёт категории.' },
         { name: 'height', type: 'number', default: '256', description: 'Высота холста в пикселях. Раскладка обязана быть детерминированной до первого замера — отсюда число, а не CSS-строка.' },
         { name: 'width', type: 'number', default: '640', description: 'Объявленная ширина: от неё идёт серверный рендер, клиентская уточняется замером.' },
@@ -618,7 +618,7 @@ export const companionPackages: CompanionPackage[] = [
             title: 'Time series',
             description: 'Тип оси выводится из данных: первый `x` — `Date`, значит шкала времени, а деления шагаются календарём, а не числом миллисекунд.',
             previewKey: 'extra-charts-line-basic',
-            note: 'У графика одна остановка `Tab`. Дальше — стрелки по точкам, `Home`/`End` по краям, `Esc` снимает выбор.',
+            note: 'Цвет серии — роль темы (`color: \'var(--gr-success)\'`), а не hex: при переключении light/dark значение меняет себя само. У графика одна остановка `Tab`, дальше стрелки по точкам, `Home`/`End` по краям, `Esc` снимает выбор.',
           },
           {
             id: 'charts-line-series',
