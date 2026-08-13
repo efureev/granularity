@@ -184,17 +184,38 @@ const yLabels = useChartTicks({
   format: () => (props.yTickFormat ? value => props.yTickFormat!(value) : undefined),
 })
 
+/**
+ * Пока данных нет, место под оси резервируется по образцовым подписям.
+ *
+ * Дважды зачем. Скелет тогда ложится **на область построения**, а не на весь
+ * холст, и читается как «здесь будет график», а не как «здесь серый
+ * прямоугольник». И, что важнее, область построения не переезжает в момент
+ * прихода данных: без этого график прыгал бы на ширину оси у каждого
+ * потребителя, который показывает загрузку.
+ */
+const LOADING_Y_LABEL = '0000'
+const LOADING_X_LABEL = '00:00'
+
+const reserveAxes = computed(() => props.axes && (props.loading || !isEmpty.value))
+
 const layout = computed(() => chartLayout({
   width: width.value,
   height: props.height,
-  yTickLabels: showAxes.value ? yLabels.value.map(tick => tick.label) : [],
-  xTickLabels: showAxes.value ? xLabels.value.map(tick => tick.label) : [],
+  yTickLabels: props.loading ? [LOADING_Y_LABEL] : showAxes.value ? yLabels.value.map(tick => tick.label) : [],
+  xTickLabels: props.loading ? [LOADING_X_LABEL] : showAxes.value ? xLabels.value.map(tick => tick.label) : [],
   fontSizePx: fontSizePx.value,
-  showYAxis: showAxes.value,
-  showXAxis: showAxes.value,
+  showYAxis: reserveAxes.value,
+  showXAxis: reserveAxes.value,
 }))
 
 const plot = computed(() => layout.value.plot)
+
+const plotStyle = computed(() => ({
+  left: `${plot.value.x}px`,
+  top: `${plot.value.y}px`,
+  width: `${plot.value.width}px`,
+  height: `${plot.value.height}px`,
+}))
 
 const { xScale, yScale } = useChartScale({
   data: () => props.data,
@@ -505,8 +526,10 @@ watch(tooltipApi.activeIndex, (value) => {
         @blur="tooltipApi.close"
       />
 
-      <div v-if="loading" :class="frameStateClass" role="status">
-        <GrSkeleton variant="rect" width="100%" height="100%" />
+      <!-- Скелет ложится на область построения, а не на весь холст: гуттеры под
+           оси уже зарезервированы, и данные придут ровно сюда же. -->
+      <div v-if="loading" class="absolute" :style="plotStyle" role="status">
+        <GrSkeleton variant="rect" width="100%" height="100%" rounded="var(--gr-radius-sm)" />
         <span class="sr-only">{{ t('grCharts.chart.loading', 'Loading chart') }}</span>
       </div>
 
