@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { areaPath, bandPath, dashArrayFor, GR_CHART_SHAPES, linePath, segmentsOf, symbolPath } from '../chartPath'
+import { areaPath, bandPath, bridgePath, dashArrayFor, GR_CHART_SHAPES, linePath, segmentsOf, symbolPath } from '../chartPath'
 
 describe('segmentsOf', () => {
   it('пропуск в середине рвёт ряд на два куска', () => {
@@ -179,5 +179,56 @@ describe('bandPath', () => {
     const d = bandPath(top, base, 'smooth')
 
     expect(d.match(/C /g)!.length).toBeGreaterThanOrEqual(4)
+  })
+})
+
+describe('bridgePath', () => {
+  it('соединяет конец куска с началом следующего', () => {
+    const d = bridgePath([
+      { x: 0, y: 10 },
+      { x: 10, y: 20 },
+      { x: 20, y: null },
+      { x: 30, y: 40 },
+    ])
+
+    expect(d).toBe('M 10 20 L 30 40')
+  })
+
+  it('перемычка на каждый разрыв', () => {
+    const d = bridgePath([
+      { x: 0, y: 1 },
+      { x: 10, y: null },
+      { x: 20, y: 3 },
+      { x: 30, y: null },
+      { x: 40, y: 5 },
+    ])
+
+    expect(d.match(/M /g)).toHaveLength(2)
+  })
+
+  it('ряд без разрывов перемычек не даёт', () => {
+    expect(bridgePath([{ x: 0, y: 1 }, { x: 10, y: 2 }])).toBe('')
+    expect(bridgePath([])).toBe('')
+  })
+
+  it('одинокая точка между разрывами перемычки получает: линии у неё нет вовсе', () => {
+    const d = bridgePath([
+      { x: 0, y: 1 },
+      { x: 10, y: null },
+      { x: 20, y: 3 },
+      { x: 30, y: null },
+      { x: 40, y: 5 },
+    ])
+
+    expect(d).toContain('L 20 3')
+    expect(d).toContain('M 20 3')
+  })
+
+  it('перемычка всегда прямая — даже там, где линия сглажена', () => {
+    // Кривая перемычка нарисовала бы ход значения там, где его не измеряли.
+    const gapped = [{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 20, y: null }, { x: 30, y: 30 }, { x: 40, y: 40 }]
+
+    expect(bridgePath(gapped)).not.toContain('C ')
+    expect(linePath(gapped, 'smooth')).toContain('C ')
   })
 })

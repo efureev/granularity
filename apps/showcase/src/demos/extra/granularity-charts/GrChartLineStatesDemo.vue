@@ -27,6 +27,21 @@ type State = 'data' | 'loading' | 'empty'
 const state = ref<State>('data')
 const showTable = ref(false)
 
+/**
+ * Чем закрыть два часа без замеров.
+ *
+ * `hidden` честнее всего: данных нет — линии нет. Но разорванная линия читается
+ * как поломка графика, поэтому есть и перемычка — заметно отличная от линии,
+ * чтобы не выдавать себя за измеренное.
+ */
+const gaps = ref<'hidden' | 'shadow' | 'dashed'>('shadow')
+
+const gapOptions: GrSegmentedOption[] = [
+  { value: 'hidden', label: 'Разрыв' },
+  { value: 'shadow', label: 'Тень' },
+  { value: 'dashed', label: 'Штрих' },
+]
+
 const stateOptions: GrSegmentedOption[] = [
   { value: 'data', label: 'Данные' },
   { value: 'loading', label: 'Загрузка' },
@@ -45,13 +60,17 @@ function formatTemperature(value: number): string {
     <!-- Панель управления графиком — то, что в продукте стоит над ним всегда. -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <GrSegmented v-model="state" :options="stateOptions" size="sm" aria-label="Состояние графика" />
-      <GrSwitch v-model="showTable" size="sm">Таблица данных</GrSwitch>
+      <div class="flex flex-wrap items-center gap-3">
+        <GrSegmented v-model="gaps" :options="gapOptions" size="sm" aria-label="Как показать пропуск" />
+        <GrSwitch v-model="showTable" size="sm">Таблица данных</GrSwitch>
+      </div>
     </div>
 
     <GrChartLine
       :series="state === 'empty' ? [] : series"
       :loading="state === 'loading'"
       :height="220"
+      :gaps="gaps"
       :y-tick-format="formatTemperature"
       :data-table="showTable ? 'visible' : 'hidden'"
       empty-text="За выбранные сутки замеров нет"
@@ -59,9 +78,13 @@ function formatTemperature(value: number): string {
     />
 
     <p class="showcase-demo-text text-sm text-[var(--gr-muted-fg)]">
-      В ряду {{ gapHours }} часа без значений — датчик был отключён на обслуживание. Линия там
-      <strong>разорвана</strong>, а не сведена к нулю и не соединена по прямой: и то и другое нарисовало бы температуру,
-      которой не измеряли. В таблице данных на этом месте стоит «нет значения».
+      В ряду {{ gapHours }} часа без значений — датчик был отключён на обслуживание. К нулю ряд там не сводится и
+      сплошной линией не соединяется: и то и другое нарисовало бы температуру, которой не измеряли. В таблице данных
+      на этом месте стоит «нет значения» — в любом режиме.
+      <br>
+      Переключатель решает, чем закрыть провал <em>визуально</em>. «Разрыв» честнее всего, но читается как поломка
+      графика; «тень» и «штрих» показывают, куда ряд ушёл за это время, оставаясь заметно непохожими на настоящую
+      линию. Перемычка всегда прямая, даже когда линия сглажена: кривая придумала бы ход значения.
       <br>
       Скелет загрузки помечает корень <code>aria-busy</code>, а пустое состояние — это <code>GrEmptyState</code> ядра
       со своим текстом: «нет данных» и «данные ещё едут» звучат для пользователя по-разному.

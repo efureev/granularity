@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `GrChartLine` gained `gaps: 'hidden' | 'shadow' | 'dashed'` — what to draw across a break in the series. The bridge
+  is always straight, even when the line is smoothed, and never reaches the tooltip or the data table: those keep
+  reporting "no value".
+
 ### Changed
 
 - `dataTable: 'visible'` no longer repeats the full date on every row of a time series. The date now appears on the

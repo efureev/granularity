@@ -92,6 +92,30 @@ export function areaPath(
 }
 
 /**
+ * Перемычки через разрывы: отрезки от конца одного куска ряда к началу следующего.
+ *
+ * Отдельным путём, а не частью линии, и **всегда прямые**, даже когда сама
+ * линия сглажена. Иначе перемычка получила бы форму — то есть нарисовала бы
+ * ход значения там, где значения не измеряли. Прямой отрезок говорит ровно то,
+ * что известно: слева было столько, справа стало столько, а между ними данных
+ * нет. Отличать её от настоящей линии — забота компонента (штрих или тень).
+ */
+export function bridgePath(points: readonly PathPoint[]): string {
+  const segments = segmentsOf(points)
+  const parts: string[] = []
+
+  for (let index = 1; index < segments.length; index++) {
+    const previous = segments[index - 1]!
+    const from = previous[previous.length - 1]!
+    const to = segments[index]![0]!
+
+    parts.push(`M ${n(from.x)} ${n(from.y)} L ${n(to.x)} ${n(to.y)}`)
+  }
+
+  return parts.join(' ')
+}
+
+/**
  * Полоса между двумя кривыми — тело стека.
  *
  * От `areaPath` отличается тем, что низ полосы не прямая, а такая же кривая:

@@ -8,7 +8,7 @@ import type { GrChartScaleKind } from '../../chart/chartScale'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
 import { activeSymbolMarks, symbolMarks, toPixelPoints } from '../../chart/chartMarks'
-import { type GrChartCurve, linePath } from '../../chart/chartPath'
+import { bridgePath, dashArrayFor, type GrChartCurve, linePath } from '../../chart/chartPath'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { GrChartActivePoint } from '../../composables/useChartTooltip'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
@@ -18,7 +18,7 @@ import {
   type GrChartSize,
   markerSizes,
 } from '../GrChartFrame/chartFrameStyles'
-import { lineStrokeWidth, pointHaloStroke } from './grChartLineStyles'
+import { GAP_DASH, gapStrokeOpacity, lineStrokeWidth, pointHaloStroke } from './grChartLineStyles'
 
 /**
  * Линейный график: ряд во времени, по числовой оси или по категориям.
@@ -43,6 +43,14 @@ export interface GrChartLineProps {
   yTickFormat?: (value: number) => string
   valueFormat?: GrChartNumberFormat
   curve?: GrChartCurve
+  /**
+   * Чем закрыть разрыв ряда.
+   *
+   * `hidden` — ничем: линия рвётся, и это честнее всего. `shadow` и `dashed`
+   * рисуют перемычку, заметно отличную от линии, — она показывает, куда ряд
+   * ушёл за время без замеров, но собой данными не притворяется.
+   */
+  gaps?: 'hidden' | 'shadow' | 'dashed'
   showPoints?: 'auto' | 'always' | 'never'
   showGrid?: 'both' | 'x' | 'y' | 'none'
   showLegend?: boolean | 'auto'
@@ -90,6 +98,7 @@ const props = withDefaults(defineProps<GrChartLineProps>(), {
   yTickFormat: undefined,
   valueFormat: undefined,
   curve: undefined,
+  gaps: undefined,
   showPoints: 'auto',
   showGrid: undefined,
   showLegend: undefined,
@@ -124,6 +133,11 @@ const { t } = useGranularityTranslations()
 const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { component: 'GrChartLine' })
 const resolvedHeight = useGrComponentProp('GrChartLine', 'height', () => props.height, 256)
 const resolvedCurve = useGrComponentProp('GrChartLine', 'curve', () => props.curve, 'linear' as GrChartCurve)
+const resolvedGaps = useGrComponentProp('GrChartLine', 'gaps', () => props.gaps, 'hidden' as const)
+
+/** Узор перемычки: штрих — рисунком, тень — яркостью. */
+const gapDashArray = computed(() => (resolvedGaps.value === 'dashed' ? dashArrayFor(GAP_DASH, 2) : undefined))
+const gapOpacity = computed(() => (resolvedGaps.value === 'shadow' ? gapStrokeOpacity : undefined))
 const resolvedGrid = useGrComponentProp('GrChartLine', 'showGrid', () => props.showGrid, 'y' as const)
 const resolvedLegendMode = useGrComponentProp('GrChartLine', 'showLegend', () => props.showLegend, 'auto' as const)
 const resolvedLegendPosition = useGrComponentProp('GrChartLine', 'legendPosition', () => props.legendPosition, 'bottom' as const)
@@ -236,6 +250,23 @@ defineExpose({
 
     <template #plot="{ xScale: sx, yScale: sy, visibleSeries, activeIndex: cursor, clipPathId }">
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-line-body>
+        <!--
+          Перемычки идут ПОД линией и под марками: разрыв не должен спорить с
+          тем, что действительно измерено.
+        -->
+        <path
+          v-for="item in (resolvedGaps === 'hidden' ? [] : visibleSeries)"
+          :key="`gap-${item.id}`"
+          :data-gr-chart-gap="item.id"
+          :d="bridgePath(toPixelPoints(item, sx, sy))"
+          fill="none"
+          :stroke="item.style.color"
+          :stroke-width="lineStrokeWidth"
+          :stroke-opacity="gapOpacity"
+          :stroke-dasharray="gapDashArray"
+          stroke-linecap="butt"
+        />
+
         <path
           v-for="item in visibleSeries"
           :key="item.id"

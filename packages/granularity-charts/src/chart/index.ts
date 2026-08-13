@@ -28,6 +28,7 @@ export type { GrChartCurve, GrChartDashPattern, GrChartPointShape, PathPoint } f
 export {
   areaPath,
   bandPath,
+  bridgePath,
   dashArrayFor,
   GR_CHART_DASHES,
   GR_CHART_SHAPES,

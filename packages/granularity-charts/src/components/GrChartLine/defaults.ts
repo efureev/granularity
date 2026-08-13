@@ -11,6 +11,8 @@ export interface GrChartLineConfigurableProps {
   size: GrChartSize
   height: number
   curve: GrChartCurve
+  /** Чем закрыть разрыв ряда: ничем, тенью или штрихом. */
+  gaps: 'hidden' | 'shadow' | 'dashed'
   showGrid: 'both' | 'x' | 'y' | 'none'
   showLegend: boolean | 'auto'
   legendPosition: 'top' | 'bottom'

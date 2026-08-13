@@ -42,6 +42,60 @@ describe('GrChartLine', () => {
     expect(d.match(/M /g)).toHaveLength(2)
   })
 
+  describe('перемычки через разрыв', () => {
+    const gapped = [{ id: 'a', x: [0, 1, 2, 3, 4], y: [1, 2, null, 4, 5] }]
+
+    it('по умолчанию линия рвётся и ничем не закрывается', () => {
+      expect(factory({ series: gapped }).findAll('[data-gr-chart-gap]')).toHaveLength(0)
+    })
+
+    it('тень — приглушением, штрих — узором, и это разные вещи', () => {
+      const shadow = factory({ series: gapped, gaps: 'shadow' }).find('[data-gr-chart-gap]')
+      const dashed = factory({ series: gapped, gaps: 'dashed' }).find('[data-gr-chart-gap]')
+
+      expect(shadow.attributes('stroke-opacity')).toContain('--gr-chart-line-gap-opacity')
+      expect(shadow.attributes('stroke-dasharray')).toBeUndefined()
+
+      expect(dashed.attributes('stroke-dasharray')).toBeTruthy()
+      expect(dashed.attributes('stroke-opacity')).toBeUndefined()
+    })
+
+    it('перемычка соединяет края разрыва и рисуется под линией', () => {
+      const wrapper = factory({ series: gapped, gaps: 'dashed' })
+      const body = wrapper.find('[data-gr-chart-line-body]')
+      const paths = body.findAll('path')
+
+      expect(paths[0]!.attributes('data-gr-chart-gap')).toBe('a')
+      expect(paths[1]!.attributes('data-gr-chart-series')).toBe('a')
+      expect(paths[0]!.attributes('d')).toMatch(/^M [\d.]+ [\d.]+ L [\d.]+ [\d.]+$/)
+    })
+
+    it('ряд без разрывов перемычек не даёт', () => {
+      const wrapper = factory({ series: [{ id: 'a', y: [1, 2, 3] }], gaps: 'dashed' })
+
+      expect(wrapper.find('[data-gr-chart-gap]').attributes('d')).toBe('')
+    })
+
+    it('перемычка не меняет данные: в таблице по-прежнему «нет значения»', () => {
+      // Она дорисовывает картинку, а не ряд. Появись пропуск в таблице
+      // значением — график начал бы врать тому, кто читает его без зрения.
+      const rows = factory({ series: gapped, gaps: 'shadow' })
+        .find('[data-gr-chart-table]')
+        .findAll('tbody tr')
+
+      expect(rows[2]!.text()).toContain('no value')
+    })
+
+    it('режим приезжает из GrConfigProvider', () => {
+      const wrapper = factory(
+        { series: gapped },
+        { componentDefaults: { GrChartLine: { gaps: 'dashed' } } },
+      )
+
+      expect(wrapper.find('[data-gr-chart-gap]').attributes('stroke-dasharray')).toBeTruthy()
+    })
+  })
+
   it('ряд, начинающийся с пропуска, остаётся рядом чисел, а не списком серий', () => {
     expect(() => factory({ series: [{ id: 'a', y: [null, null, 5, 7] }] })).not.toThrow()
   })
