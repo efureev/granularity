@@ -4,6 +4,8 @@ import {
   actionsClass,
   bodyClass,
   bodySizes,
+  cardBodyClass,
+  cardClass,
   draggingClass,
   headerClass,
   headerSizes,
@@ -20,5 +22,7 @@ export const grDashboardItemSafelist = [...new Set([
   ...splitClassTokens(headerClass),
   ...splitClassTokens(titleClass),
   ...splitClassTokens(bodyClass),
+  ...splitClassTokens(cardClass),
+  ...splitClassTokens(cardBodyClass),
   ...splitClassTokens(actionsClass),
 ])]

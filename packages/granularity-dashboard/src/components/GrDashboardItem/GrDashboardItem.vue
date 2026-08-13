@@ -12,6 +12,8 @@ import {
   actionsClass,
   bodyClass,
   bodySizes,
+  cardBodyClass,
+  cardClass,
   draggingClass,
   headerClass,
   headerSizes,
@@ -56,6 +58,7 @@ const size = useGrComponentSize(() => props.size, { component: 'GrDashboardItem'
 
 const titleId = useId()
 const rootEl = ref<HTMLElement | null>(null)
+const bodyEl = ref<HTMLElement | null>(null)
 const handleEl = ref<InstanceType<typeof DragHandle> | null>(null)
 
 const item = computed(() => dashboard?.itemFor(props.itemId))
@@ -103,6 +106,24 @@ const style = computed(() => {
   }
 })
 
+/**
+ * Тело прокручивается, когда содержимое не влезло в ячейку, — и ровно тогда
+ * обязано встать в таб-порядок: до прокручиваемой области, которую нельзя
+ * сфокусировать, с клавиатуры не добраться (axe: `scrollable-region-focusable`).
+ *
+ * Проверяется по факту переполнения, а не «на всякий случай»: постоянный
+ * `tabindex` добавил бы остановку `Tab` каждому виджету, и на дашборде из
+ * тридцати их стало бы тридцать лишних.
+ */
+const scrollable = ref(false)
+
+function syncScrollable(): void {
+  const el = bodyEl.value
+  if (!el) return
+
+  scrollable.value = el.scrollHeight - el.clientHeight > 1
+}
+
 // ————— Ленивый монтаж содержимого.
 
 const visible = ref(!dashboard?.lazy.value)
@@ -110,6 +131,12 @@ let observer: IntersectionObserver | null = null
 
 onMounted(() => {
   dashboard?.setItemElement(props.itemId, rootEl.value)
+
+  if (bodyEl.value) {
+    syncScrollable()
+    dashboard?.observeBody(bodyEl.value, syncScrollable)
+  }
+
   dashboard?.setHandleElement(props.itemId, (handleEl.value?.$el ?? null) as HTMLElement | null)
 
   if (visible.value || typeof IntersectionObserver === 'undefined') {
@@ -133,6 +160,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   observer?.disconnect()
   observer = null
+  if (bodyEl.value) dashboard?.unobserveBody(bodyEl.value)
+
   dashboard?.unregisterItem(props.itemId)
 })
 
@@ -168,7 +197,7 @@ const showHeader = computed(() => Boolean(props.title) || canDrag.value)
     :class="classes"
     :style="style"
   >
-    <GrCard class="h-full" variant="elevated">
+    <GrCard :class="cardClass" :body-class="cardBodyClass" variant="elevated">
       <template v-if="showHeader" #header>
         <div :class="[headerClass, headerSizes[size]]">
           <DragHandle
@@ -190,7 +219,11 @@ const showHeader = computed(() => Boolean(props.title) || canDrag.value)
         </div>
       </template>
 
-      <div :class="[bodyClass, bodySizes[size]]">
+      <div
+        ref="bodyEl"
+        :class="[bodyClass, bodySizes[size]]"
+        :tabindex="scrollable ? 0 : undefined"
+      >
         <slot v-if="visible" />
         <slot v-else name="skeleton" />
       </div>

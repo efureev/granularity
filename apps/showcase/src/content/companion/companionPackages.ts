@@ -3,6 +3,7 @@ import dashboardPkg from '@feugene/granularity-dashboard/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
 import type { ShowcaseApiSectionMeta } from '../model.ts'
+import type { ShowcaseComponentOverviewDoc } from '../component-docs/types'
 
 /**
  * Реестр компонентов из **сопутствующих (companion) пакетов** — опциональных
@@ -30,6 +31,23 @@ export type CompanionComponent = {
   summary: string
   /** Публичный import path. */
   importPath: string
+  /**
+   * Что это за компонент и где проходит его зона ответственности.
+   *
+   * `summary` отвечает на «что это» одной фразой — её читают в каталоге. Здесь
+   * место второму вопросу: за что компонент отвечает, а что оставляет соседям.
+   * У пакета из нескольких компонентов без этого не разобрать, кто чем занят.
+   */
+  overview?: ShowcaseComponentOverviewDoc
+  /**
+   * Публичные типы, которые нужны, чтобы работать с компонентом на своей
+   * стороне: модель `v-model`, объединения пропов, форма элемента коллекции.
+   *
+   * Здесь **не** место всему, что пакет экспортирует: внутренние структуры и
+   * типы соседних компонентов только зашумят страницу. Мерило простое —
+   * попадёт ли этот тип в сигнатуру кода потребителя.
+   */
+  typeDeclarations?: string
   examples: CompanionExample[]
   apiSections: ShowcaseApiSectionMeta[]
 }
@@ -781,12 +799,18 @@ function dashboardPaletteApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
-/** Публичная поверхность панели управления. */
+/**
+ * Публичная поверхность панели управления.
+ *
+ * Живёт на странице сетки, а не на своей: предмет тулбара — две кнопки над
+ * сеткой, и в отрыве от неё показывать нечего. Отдельная страница дала бы
+ * четвёртое демо, неотличимое от первых трёх.
+ */
 function dashboardToolbarApiSections(): ShowcaseApiSectionMeta[] {
   return [
     {
-      key: 'props',
-      title: 'Props',
+      key: 'toolbar-props',
+      title: 'GrDashboardToolbar · Props',
       origin: 'manual',
       items: [
         { name: 'mode', type: `'view' | 'edit'`, description: '`v-model:mode`. Не задан — берётся у сетки, если тулбар внутри неё.' },
@@ -796,12 +820,22 @@ function dashboardToolbarApiSections(): ShowcaseApiSectionMeta[] {
       ],
     },
     {
-      key: 'emits',
-      title: 'Emits',
+      key: 'toolbar-emits',
+      title: 'GrDashboardToolbar · Emits',
       origin: 'manual',
       items: [
         { name: 'update:mode', type: `(value: 'view' | 'edit') => void`, description: 'Режим переключён.' },
         { name: 'reset', type: '() => void', description: 'Нажат сброс. Что считать исходной раскладкой, решает приложение.' },
+      ],
+    },
+    {
+      key: 'toolbar-slots',
+      title: 'GrDashboardToolbar · Slots',
+      origin: 'manual',
+      items: [
+        { name: 'start', type: '—', description: 'Левая часть панели: заголовок дашборда, период, фильтр.' },
+        { name: 'default', type: '—', description: 'Середина, растягивается по ширине.' },
+        { name: 'end', type: '—', description: 'Правая часть, после кнопок режима и сброса.' },
       ],
     },
   ]
@@ -1202,21 +1236,104 @@ export const companionPackages: CompanionPackage[] = [
         title: 'GrDashboard',
         summary: 'Сетка, в которой виджеты переносят и растягивают. Режим просмотра и режим редактирования разведены, раскладка хранится на каждый брейкпоинт.',
         importPath: '@feugene/granularity-dashboard/components/GrDashboard',
+        typeDeclarations: `import type {
+  GrDashboardBreakpoint,
+  GrDashboardBreakpoints,
+  GrDashboardCols,
+  GrDashboardCompaction,
+  GrDashboardItemLayout,
+  GrDashboardLayout,
+  GrDashboardResponsiveLayout,
+} from '@feugene/granularity-dashboard/layout'
+import type { GrDashboardMode } from '@feugene/granularity-dashboard/components/GrDashboard'
+
+/** Место одного виджета в сетке. Все величины — целые ячейки, не пиксели. */
+interface GrDashboardItemLayout {
+  /** Совпадает с \`itemId\` у GrDashboardItem. */
+  id: string
+  /** Колонка и строка левого верхнего угла, от нуля. */
+  x: number
+  y: number
+  /** Размер в ячейках. */
+  w: number
+  h: number
+  minW?: number
+  minH?: number
+  maxW?: number
+  maxH?: number
+  /** Не двигается сам и не двигается соседями. */
+  static?: boolean
+}
+
+/** Порядок массива смысла не несёт — его несёт пара (y, x). */
+type GrDashboardLayout = GrDashboardItemLayout[]
+
+/** Ключ брейкпоинта. Набор открыт: имена задаёт приложение. */
+type GrDashboardBreakpoint = string
+
+/** Модель \`v-model:layout\`: своя раскладка на каждый брейкпоинт. */
+type GrDashboardResponsiveLayout = Record<GrDashboardBreakpoint, GrDashboardLayout>
+
+/** Пороги ширины контейнера и число колонок на них. */
+type GrDashboardBreakpoints = Record<GrDashboardBreakpoint, number>
+type GrDashboardCols = Record<GrDashboardBreakpoint, number>
+
+type GrDashboardMode = 'view' | 'edit'
+
+/** Падают ли виджеты вверх после переноса. */
+type GrDashboardCompaction = 'vertical' | 'none'`,
+        overview: {
+          paragraphs: [
+            'Сетка — единственный в пакете владелец раскладки. Она знает, сколько колонок на текущей ширине, где стоит каждый виджет и что происходит при переносе: кого толкать, куда подтягивать, когда движение отменить. Всё это она отдаёт наружу одним `v-model:layout` и ничего не хранит у себя.',
+            'Чего сетка не знает — так это что внутри виджетов. Она не рисует содержимое, не ходит за данными и не имеет мнения о том, график там или таблица. Граница проведена ровно здесь: расстановка — её дело, содержимое — дело приложения.',
+          ],
+          features: [
+            'Раскладка на каждый брейкпоинт: недостающая выводится из ближайшей более широкой, а не собирается заново.',
+            'Перенос и растягивание — указателем и с клавиатуры; отменённый жест возвращает раскладку в исходное состояние.',
+            'Режим просмотра и режим редактирования — одна и та же разметка, а не два набора.',
+            'Компактизация вверх либо свободная сетка — пропом `compact`, без переписывания раскладки.',
+          ],
+          lists: [
+            {
+              title: 'За что отвечает не она',
+              items: [
+                '`GrDashboardItem` — оформление виджета и его собственные границы размера.',
+                '`GrDashboardPalette` — каталог того, что можно добавить.',
+                '`useDashboardLayout` — где раскладка хранится между сессиями.',
+                'Приложение — что положено внутрь виджета и откуда взяты данные.',
+              ],
+            },
+          ],
+        },
         examples: [
+          {
+            id: 'dashboard-panel',
+            title: 'Панель, а не сетка',
+            description: 'Так это выглядит в работе: график, показатель со спарклайном, статистика, карточка дежурного и таблица кампаний. Виджет — место под содержимое, и пакет о нём ничего не знает: что положат внутрь, решает приложение.',
+            previewKey: 'extra-dashboard-panel',
+            note: 'Переключите режим — и та же панель станет редактируемой, без второго набора разметки.',
+          },
           {
             id: 'dashboard-basic',
             title: 'Разложить под себя',
-            description: 'Переключите режим и перетащите виджет за ручку в шапке — соседи расступятся, а раскладка подтянется вверх. То же делается с клавиатуры: `Space` берёт виджет, стрелки двигают, `Esc` отменяет.',
+            description: 'Перетащите виджет за ручку в шапке — соседи расступятся, а раскладка подтянется вверх. То же делается с клавиатуры: `Space` берёт виджет, стрелки двигают, `Esc` отменяет.',
             previewKey: 'extra-dashboard-basic',
           },
           {
             id: 'dashboard-static',
             title: 'Закреплённый виджет и свободная сетка',
-            description: 'Баннер вверху закреплён: он не двигается ни сам, ни соседями, и перемещение, упёршееся в него, отменяется целиком. Ниже — `compact="none"`: виджет остаётся ровно там, куда его положили, вместе с дырой под ним.',
+            description: 'Баннер вверху закреплён: он не двигается ни сам, ни соседями, и перемещение, упёршееся в него, отменяется целиком. Вся сетка здесь — `compact="none"`: виджет остаётся ровно там, куда его положили, вместе с дырой под ним.',
             previewKey: 'extra-dashboard-static',
           },
+          {
+            id: 'dashboard-persistence',
+            title: 'Раскладка переживает перезагрузку',
+            description: 'Разложите виджеты и обновите страницу — вернётся то, что вы оставили. Хранилище задаётся адаптером, поэтому раскладка так же легко уезжает на сервер, как и в `localStorage`.',
+            previewKey: 'extra-dashboard-persistence',
+            note: 'Композабл читает хранилище только после монтирования: на сервере и в первом клиентском рендере видна раскладка по умолчанию, поэтому гидрация не расходится.',
+          },
         ],
-        apiSections: dashboardApiSections(),
+        apiSections: [...dashboardApiSections(), ...dashboardToolbarApiSections()],
       },
       {
         name: 'GrDashboardItem',
@@ -1224,12 +1341,74 @@ export const companionPackages: CompanionPackage[] = [
         title: 'GrDashboardItem',
         summary: 'Виджет на сетке поверх карточки ядра: заголовок, действия, подвал — и собственные границы размера.',
         importPath: '@feugene/granularity-dashboard/components/GrDashboardItem',
+        typeDeclarations: `import type {
+  GrDashboardItemProps,
+  GrDashboardItemSize,
+} from '@feugene/granularity-dashboard/components/GrDashboardItem'
+import type {
+  GrDashboardItemBounds,
+} from '@feugene/granularity-dashboard/components/GrDashboard'
+
+/** Плотность шапки и кегль заголовка — НЕ размер в сетке: тот задают w и h. */
+type GrDashboardItemSize = 'xs' | 'sm' | 'md' | 'lg'
+
+/**
+ * Границы, которые виджет объявляет сам. Сетка накладывает их на запись
+ * раскладки: «ниже двух строк я нечитаем» знает виджет, а не модель.
+ */
+interface GrDashboardItemBounds {
+  minW?: number
+  minH?: number
+  maxW?: number
+  maxH?: number
+  static?: boolean
+  /** Имя виджета для ручек и объявлений в живой регион. */
+  title?: string
+}
+
+interface GrDashboardItemProps {
+  /** Связывает разметку с записью раскладки по полю \`id\`. */
+  itemId: string
+  title?: string
+  size?: GrDashboardItemSize
+  static?: boolean
+  minW?: number
+  minH?: number
+  maxW?: number
+  maxH?: number
+  ariaLabel?: string
+}`,
+        overview: {
+          paragraphs: [
+            'Виджет — это место под содержимое и всё, что вокруг него: заголовок, действия рядом с заголовком, подвал. Построен на `GrCard` ядра, поэтому выглядит и ведёт себя как остальные карточки приложения, а не как «что-то из дашборда».',
+            'Его вторая обязанность — знать пределы собственной читаемости. Раскладка знает координаты, но «ниже двух строк этот график превращается в кашу» знает только сам виджет, поэтому `minW`, `minH`, `maxW` и `maxH` объявляются здесь, а не в модели раскладки. Сетка их учитывает и не даст сжать виджет дальше.',
+            'Виджет не решает, где он стоит: его место — запись раскладки, которой владеет сетка. Он лишь сообщает, кем является (`itemId`) и в каких границах остаётся читаемым.',
+          ],
+          features: [
+            'Слоты `#header`, `#actions`, `#footer` и `#skeleton` вокруг содержимого по умолчанию.',
+            'Собственные границы размера — их уважают и мышь, и клавиатура.',
+            '`static` — закреплённый виджет: не двигается ни сам, ни соседями.',
+            'Тело растягивается на остаток высоты, поэтому график или таблица получают всю доступную площадь.',
+            '`size` меняет плотность шапки и кегль заголовка — но не размер в сетке: тот задают `w` и `h`.',
+          ],
+          lists: [
+            {
+              title: 'Зона ответственности',
+              items: [
+                'Отвечает: оформление карточки, границы размера, признак `static`, имя виджета для ручек и объявлений.',
+                'Не отвечает: координаты в сетке, компактизация, брейкпоинты — это `GrDashboard`.',
+                'Не отвечает: содержимое и данные — их даёт приложение слотом.',
+              ],
+            },
+          ],
+        },
         examples: [
           {
-            id: 'dashboard-item-persistence',
-            title: 'Раскладка переживает перезагрузку',
-            description: 'Разложите виджеты и обновите страницу — вернётся то, что вы оставили. Хранилище задаётся адаптером, поэтому раскладка так же легко уезжает на сервер, как и в `localStorage`.',
-            previewKey: 'extra-dashboard-persistence',
+            id: 'dashboard-item-slots',
+            title: 'Заголовок, действия, подвал — и свои границы',
+            description: 'Четыре слота вокруг содержимого и границы размера, которые виджет объявляет сам: «ниже двух строк я нечитаем» знает он, а не раскладка. Попробуйте сжать средний виджет уголком — дальше `min-w` он не пойдёт.',
+            previewKey: 'extra-dashboard-item-slots',
+            note: 'Границы применяются к обеим осям: `min-h` держит высоту так же, как `min-w` — ширину. У закреплённого виджета ручек нет вовсе — не скрыты, а не отрисованы.',
           },
         ],
         apiSections: dashboardItemApiSections(),
@@ -1240,6 +1419,66 @@ export const companionPackages: CompanionPackage[] = [
         title: 'GrDashboardPalette',
         summary: 'Каталог виджетов, которые можно добавить. Добавление — обычная кнопка, поэтому клавиатурный сценарий существует по построению.',
         importPath: '@feugene/granularity-dashboard/components/GrDashboardPalette',
+        typeDeclarations: `import type {
+  GrDashboardPaletteItem,
+  GrDashboardPaletteSize,
+} from '@feugene/granularity-dashboard/components/GrDashboardPalette'
+import { addItem } from '@feugene/granularity-dashboard/layout'
+import type {
+  GrDashboardItemLayout,
+  GrDashboardLayout,
+} from '@feugene/granularity-dashboard/layout'
+
+/** Строка каталога: что предлагают добавить и с каким размером. */
+interface GrDashboardPaletteItem {
+  id: string
+  title: string
+  description?: string
+  /** Размер, с которым виджет встаёт в сетку. */
+  defaultSize?: { w: number, h: number }
+  minW?: number
+  minH?: number
+  maxW?: number
+  maxH?: number
+  disabled?: boolean
+}
+
+type GrDashboardPaletteSize = 'xs' | 'sm' | 'md' | 'lg'
+
+/**
+ * Каталог сообщает о выборе и на этом заканчивает: класть виджет в раскладку —
+ * дело приложения. Ячейка не задана — виджет встаёт под низ сетки.
+ */
+function addItem(
+  layout: GrDashboardLayout,
+  item: GrDashboardItemLayout,
+  options: { cols: number, compact?: 'vertical' | 'none', preventCollision?: boolean },
+  cell?: { x: number, y: number },
+): GrDashboardLayout`,
+        overview: {
+          paragraphs: [
+            'Каталог отвечает на один вопрос: что ещё можно поставить на дашборд. Он показывает список доступных виджетов с названием, описанием и предполагаемым размером — и сообщает наружу, что из него выбрали.',
+            'Класть выбранное в сетку — не его дело. Каталог не владеет раскладкой и даже не обязан стоять внутри `GrDashboard`: он эмитит `add`, а приложение решает, куда встанет виджет и встанет ли вообще (например, если такой уже есть). Функция `addItem` из подпути `./layout` делает это одной строкой.',
+            'Добавление здесь — обычная кнопка, а не перетаскивание. Это не упрощение: сделай контрактом перетаскивание — и каталогом нельзя пользоваться с клавиатуры, а «доступность потом» в таких местах не наступает. Перетаскивание может появиться поверх работающего пути, но не вместо него.',
+          ],
+          features: [
+            'Список виджетов с описанием и размером по умолчанию.',
+            'Добавление кнопкой — работает мышью и с клавиатуры одинаково.',
+            'Каждое добавление объявляется в живой регион.',
+            'Слот `#item` — если строка каталога должна выглядеть иначе.',
+            'Работает и вне сетки: это обычный список с эмитом.',
+          ],
+          lists: [
+            {
+              title: 'Зона ответственности',
+              items: [
+                'Отвечает: показать, что доступно, и сообщить о выборе.',
+                'Не отвечает: расстановка, коллизии, размер на сетке — это `GrDashboard` и подпуть `./layout`.',
+                'Не отвечает: откуда взялся список виджетов — его даёт приложение пропом `items`.',
+              ],
+            },
+          ],
+        },
         examples: [
           {
             id: 'dashboard-palette',
@@ -1249,22 +1488,6 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: dashboardPaletteApiSections(),
-      },
-      {
-        name: 'GrDashboardToolbar',
-        slug: 'gr-dashboard-toolbar',
-        title: 'GrDashboardToolbar',
-        summary: 'Переключатель режима и сброс раскладки. Работает и внутри сетки, и отдельно от неё — например в шапке страницы.',
-        importPath: '@feugene/granularity-dashboard/components/GrDashboardToolbar',
-        examples: [
-          {
-            id: 'dashboard-toolbar',
-            title: 'Режим и сброс',
-            description: 'Две кнопки над сеткой: одна разводит режимы просмотра и редактирования, вторая возвращает исходную раскладку. Своего состояния тулбар не держит — режим приходит `v-model:mode`, а что считать исходной раскладкой, решает приложение.',
-            previewKey: 'extra-dashboard-basic',
-          },
-        ],
-        apiSections: dashboardToolbarApiSections(),
       },
     ],
   },

@@ -44,6 +44,15 @@ export interface GrDashboardContext {
   unregisterItem: (id: string) => void
   setHandleElement: (id: string, el: HTMLElement | null) => void
   setItemElement: (id: string, el: HTMLElement | null) => void
+  /**
+   * Подписать тело виджета на общий наблюдатель размера.
+   *
+   * Наблюдатель один на всю сетку и здесь: `ResizeObserver` умеет следить за
+   * многими элементами, а N инстансов на N виджетов — это N очередей коллбэков
+   * там, где хватает одной.
+   */
+  observeBody: (el: HTMLElement, onResize: () => void) => void
+  unobserveBody: (el: HTMLElement) => void
 
   startMove: (id: string, event: PointerEvent) => void
   startResize: (id: string, event: PointerEvent) => void

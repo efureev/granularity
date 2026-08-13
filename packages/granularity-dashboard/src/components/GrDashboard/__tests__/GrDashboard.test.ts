@@ -223,6 +223,48 @@ describe('gRDashboard: растягивание с клавиатуры', () => 
   })
 })
 
+describe('gRDashboard: прокручиваемое тело виджета', () => {
+  /** Переполнение задаётся до монтирования: замер идёт в `onMounted`. */
+  function stubOverflow(scrollHeight: number, clientHeight: number): () => void {
+    const scroll = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollHeight')
+    const client = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientHeight')
+
+    Object.defineProperty(HTMLElement.prototype, 'scrollHeight', { configurable: true, value: scrollHeight })
+    Object.defineProperty(HTMLElement.prototype, 'clientHeight', { configurable: true, value: clientHeight })
+
+    return () => {
+      if (scroll) Object.defineProperty(HTMLElement.prototype, 'scrollHeight', scroll)
+      if (client) Object.defineProperty(HTMLElement.prototype, 'clientHeight', client)
+    }
+  }
+
+  function bodyOf(root: HTMLElement): HTMLElement {
+    return query(root, '[data-item-id="sales"] [data-gr-card-body] > div')
+  }
+
+  it('переполненное тело встаёт в таб-порядок', async () => {
+    // Прокручиваемая область, которую нельзя сфокусировать, недостижима с
+    // клавиатуры — axe ловит это правилом `scrollable-region-focusable`.
+    const restore = stubOverflow(400, 200)
+    const { root } = stand()
+    restore()
+    await nextTick()
+
+    expect(bodyOf(root).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('умещающееся тело лишней остановки Tab не создаёт', async () => {
+    // Постоянный `tabindex` дал бы тридцать лишних остановок на дашборде из
+    // тридцати виджетов — поэтому он ставится по факту переполнения.
+    const restore = stubOverflow(200, 200)
+    const { root } = stand()
+    restore()
+    await nextTick()
+
+    expect(bodyOf(root).getAttribute('tabindex')).toBeNull()
+  })
+})
+
 describe('gRDashboard: что уходит наружу', () => {
   it('в раскладку не подмешивается ничего из разметки виджета', async () => {
     // `title` и границы объявлены пропами `GrDashboardItem`. Попади они в

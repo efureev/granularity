@@ -5,14 +5,12 @@ import { RouterLink, useRoute } from 'vue-router'
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 import { GrBadge } from '@feugene/granularity'
 
+import ApiTable from '../components/doc/ApiTable.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
 import ExampleCard from '../components/doc/ExampleCard.vue'
-import EventsTable from '../components/doc/EventsTable.vue'
-import PropsTable from '../components/doc/PropsTable.vue'
-import SlotsTable from '../components/doc/SlotsTable.vue'
+import InlineRichText from '../components/content/InlineRichText.vue'
 import { getCompanionComponentBySlug } from '../content/companion/companionPackages'
 import { resolveDemoComponent } from '../demos/registry'
-import type { ShowcaseApiItemMeta } from '../content/model'
 import IconArrowLeft from '~icons/lucide/arrow-left'
 
 const route = useRoute()
@@ -25,9 +23,12 @@ const importCode = computed(() =>
   component.value ? `import { ${component.value.name} } from '${component.value.importPath}'` : '',
 )
 
-function sectionItems(key: string): ShowcaseApiItemMeta[] {
-  return component.value?.apiSections.find(section => section.key === key)?.items ?? []
-}
+/**
+ * Таблицы API рисуются по **всем** объявленным секциям, а не по трём известным
+ * ключам: пакет вправе описать и то, чего у ядра нет — например компонент,
+ * живущий на чужой странице. Раньше такие секции молча не отображались.
+ */
+const apiSections = computed(() => component.value?.apiSections ?? [])
 
 </script>
 
@@ -56,6 +57,58 @@ function sectionItems(key: string): ShowcaseApiItemMeta[] {
       />
     </div>
 
+    <section v-if="component.overview" id="about" class="scroll-mt-28 space-y-4">
+      <h2 class="text-2xl font-semibold">
+        {{ t('showcase.detailPage.about.title') }}
+      </h2>
+
+      <div class="max-w-3xl space-y-3">
+        <p
+          v-for="(paragraph, index) in component.overview.paragraphs"
+          :key="index"
+          class="showcase-text-muted text-base leading-7"
+        >
+          <InlineRichText :text="paragraph" />
+        </p>
+      </div>
+
+      <div v-if="component.overview.features?.length" class="space-y-2">
+        <h3 class="text-lg font-semibold">
+          {{ t('showcase.detailPage.about.featuresTitle') }}
+        </h3>
+        <ul class="grid max-w-3xl gap-2">
+          <li
+            v-for="(feature, index) in component.overview.features"
+            :key="index"
+            class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
+          >
+            <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true" />
+            <span><InlineRichText :text="feature" /></span>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        v-for="(list, listIndex) in component.overview.lists ?? []"
+        :key="`list-${listIndex}`"
+        class="space-y-2"
+      >
+        <h3 class="text-lg font-semibold">
+          {{ list.title }}
+        </h3>
+        <ul class="grid max-w-3xl gap-2">
+          <li
+            v-for="(item, index) in list.items"
+            :key="index"
+            class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
+          >
+            <span class="i-lucide-dot mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true" />
+            <span><InlineRichText :text="item" /></span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
     <section id="live-examples" class="scroll-mt-28 space-y-4">
       <h2 class="text-2xl font-semibold">
         {{ t('showcase.detailPage.liveExamples.title') }}
@@ -82,10 +135,27 @@ function sectionItems(key: string): ShowcaseApiItemMeta[] {
         {{ t('showcase.detailPage.api.title') }}
       </h2>
       <div class="grid gap-4">
-        <PropsTable :items="sectionItems('props')" />
-        <EventsTable :items="sectionItems('events')" />
-        <SlotsTable :items="sectionItems('slots')" />
+        <ApiTable
+          v-for="section in apiSections"
+          :key="section.key"
+          :title="section.title"
+          :items="section.items"
+          :empty-label="t('showcase.docComponents.emptyLabel.generic')"
+        />
       </div>
+    </section>
+
+    <section v-if="component.typeDeclarations" id="types" class="scroll-mt-28 space-y-4">
+      <div>
+        <h2 class="text-2xl font-semibold">
+          {{ t('showcase.detailPage.types.title') }}
+        </h2>
+        <p class="showcase-text-muted mt-2 max-w-3xl text-sm leading-6">
+          {{ t('showcase.detailPage.types.description') }}
+        </p>
+      </div>
+
+      <CodeBlock :code="component.typeDeclarations" language="ts" expanded />
     </section>
 
     <RouterLink to="/extras" class="showcase-card-link inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm">

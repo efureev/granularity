@@ -439,6 +439,10 @@
       "title": "API",
       "descriptionPackage": "Everything about parameters and the usage contract gathered in one place."
     },
+    "types": {
+      "title": "Type Declarations",
+      "description": "Public types the component works with — import them to type your own model and props."
+    },
     "implementationNotes": {
       "title": "Implementation notes",
       "description": "Additional notes on accessibility, dependencies, and related materials."

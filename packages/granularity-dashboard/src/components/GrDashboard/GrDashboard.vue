@@ -213,6 +213,24 @@ function commit(next: GrDashboardLayout): void {
 let observer: ResizeObserver | null = null
 
 /**
+ * Наблюдатель тел виджетов — один на сетку. Тело виджета прокручивается, когда
+ * содержимое не влезло, и в этот момент обязано встать в таб-порядок: иначе до
+ * него не добраться с клавиатуры (axe: `scrollable-region-focusable`).
+ */
+const bodyCallbacks = new Map<HTMLElement, () => void>()
+let bodyObserver: ResizeObserver | null = null
+
+function ensureBodyObserver(): ResizeObserver | null {
+  if (bodyObserver || typeof ResizeObserver === 'undefined') return bodyObserver
+
+  bodyObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) bodyCallbacks.get(entry.target as HTMLElement)?.()
+  })
+
+  return bodyObserver
+}
+
+/**
  * Нулевая ширина — это не «самый узкий экран», а «контейнер не отрисован»:
  * скрытая вкладка, свёрнутая панель, `display: none`. Принять её за брейкпоинт
  * значит перевести дашборд на две колонки и записать эту раскладку в модель —
@@ -237,6 +255,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   observer?.disconnect()
   observer = null
+  bodyObserver?.disconnect()
+  bodyObserver = null
+  bodyCallbacks.clear()
 })
 
 watch([breakpoint, cols], ([nextBreakpoint, nextCols], previous) => {
@@ -599,6 +620,14 @@ const context: GrDashboardContext = {
   setItemElement: (id, el) => {
     if (el) itemEls.set(id, el)
     else itemEls.delete(id)
+  },
+  observeBody: (el, onResize) => {
+    bodyCallbacks.set(el, onResize)
+    ensureBodyObserver()?.observe(el)
+  },
+  unobserveBody: (el) => {
+    bodyCallbacks.delete(el)
+    bodyObserver?.unobserve(el)
   },
   startMove: (id, event) => beginGesture(id, 'move', event),
   startResize: (id, event) => beginGesture(id, 'resize', event),

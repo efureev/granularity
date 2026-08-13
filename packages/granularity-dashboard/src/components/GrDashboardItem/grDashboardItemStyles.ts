@@ -38,6 +38,15 @@ export const headerClass = 'flex items-center gap-2 min-w-0'
 
 export const titleClass = 'flex-1 min-w-0 truncate font-medium text-[var(--gr-fg)]'
 
+/**
+ * Карточка тянется на всю высоту виджета, а тело забирает остаток: иначе
+ * содержимое короче ячейки оставляет карточке висящий низ, а содержимое длиннее
+ * растит её за пределы ячейки вместо того, чтобы прокручиваться внутри.
+ */
+export const cardClass = 'h-full flex flex-col'
+
+export const cardBodyClass = 'flex-1 min-h-0'
+
 export const bodyClass = 'h-full min-h-0 overflow-auto'
 
 export const actionsClass = 'flex items-center gap-1 shrink-0'

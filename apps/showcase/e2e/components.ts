@@ -110,12 +110,26 @@ export interface ScanTarget {
 export const SERVICE_ENTITIES: Record<string, Omit<ScanTarget, 'name'>> = {
   // Сервис живёт страницей композабла: у него нет пропсов, есть `useDialogService`.
   GrDialogService: { path: 'composables/use-dialog-service', ready: '#examples' },
+  // Тулбар — две кнопки над сеткой, и в отрыве от неё показывать нечего: своя
+  // страница дала бы демо, неотличимое от демо сетки. Показан и проверяется там
+  // же, где работает; его пропы — секциями на той же странице.
+  GrDashboardToolbar: { path: 'extras/gr-dashboard', ready: '#live-examples' },
 }
 
-/** Всё, что обходит постраничный axe: страницы компонентов плюс сервисные сущности. */
+/**
+ * Всё, что обходит постраничный axe: страницы компонентов плюс сервисные сущности.
+ *
+ * Companion-имена берутся из реестра пакета, поэтому среди них есть и те, у кого
+ * своей страницы нет: их адрес объявлен в `SERVICE_ENTITIES`, и брать его надо
+ * оттуда. Без фильтра получались бы две цели с одним именем — playwright падает
+ * на дублирующемся заголовке теста, и это лучше, чем скан несуществующей
+ * страницы.
+ */
 export const scanTargets: ScanTarget[] = [
   ...componentNames.map(name => ({ name, path: componentPath(name), ready: '#live-examples' })),
-  ...companionComponentNames.map(name => ({ name, path: companionPath(name), ready: '#live-examples' })),
+  ...companionComponentNames
+    .filter(name => !(name in SERVICE_ENTITIES))
+    .map(name => ({ name, path: companionPath(name), ready: '#live-examples' })),
   ...Object.entries(SERVICE_ENTITIES).map(([name, target]) => ({ name, ...target })),
 ].sort((left, right) => left.name.localeCompare(right.name))
 
