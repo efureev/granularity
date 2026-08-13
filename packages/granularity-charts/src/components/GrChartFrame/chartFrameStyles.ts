@@ -68,6 +68,9 @@ export const frameLabelClass = 'leading-[var(--gr-leading-normal)]'
 
 export const frameStateClass = 'absolute inset-0 flex items-center justify-center'
 
+/** Призрак графика поверх мерцающего скелета: он лежит ровно на его площади. */
+export const frameGhostClass = 'absolute inset-0 h-full w-full'
+
 export const frameTooltipClass
   = 'pointer-events-none z-[var(--gr-z-tooltip)] flex flex-col gap-1 rounded-[var(--gr-radius-md)] '
     + 'border border-[var(--gr-chart-frame-tooltip-brd,var(--gr-brd))] '
@@ -106,3 +109,9 @@ export const gridStrokeWidth = 'var(--gr-chart-frame-grid-width,1px)'
 export const axisStroke = 'var(--gr-chart-frame-axis,var(--gr-brd))'
 export const labelFill = 'var(--gr-chart-frame-label,var(--gr-muted-fg))'
 export const crosshairStroke = 'var(--gr-chart-frame-crosshair,var(--gr-brd))'
+
+/**
+ * Призрак загрузки красится приглушённой ролью, а не цветом серии: это не
+ * данные, и выглядеть данными он не должен.
+ */
+export const ghostStroke = 'var(--gr-muted-fg)'

@@ -1,6 +1,7 @@
 import { splitClassTokens } from '../../internal/classTokens'
 
 import {
+  frameGhostClass,
   frameLabelClass,
   labelSizeClass,
   frameLegendClass,
@@ -39,6 +40,7 @@ export const chartFrameSafelist: string[] = [...new Set([
   ...splitClassTokens(frameSurfaceClass),
   ...splitClassTokens(frameLabelClass),
   ...splitClassTokens(frameStateClass),
+  ...splitClassTokens(frameGhostClass),
   ...splitClassTokens(frameTooltipClass),
   ...splitClassTokens(frameTooltipTitleClass),
   ...splitClassTokens(frameTooltipRowClass),

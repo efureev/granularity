@@ -114,11 +114,25 @@ describe('GrChartLine', () => {
     expect(wrapper.findAll('[data-gr-chart-series]')).toHaveLength(1)
   })
 
-  it('загрузка помечает корень aria-busy и показывает скелет', () => {
+  it('загрузка помечает корень aria-busy и показывает скелет с призраком графика', () => {
     const wrapper = factory({ loading: true })
 
     expect(wrapper.find('[data-gr-chart-frame]').attributes('aria-busy')).toBe('true')
     expect(wrapper.find('[role="status"]').exists()).toBe(true)
+    // Призрак — не данные: он скрыт от скринридера, за него говорит `role="status"`.
+    expect(wrapper.find('[data-gr-chart-ghost]').attributes('aria-hidden')).toBe('true')
+  })
+
+  it('на время загрузки место под оси зарезервировано — данные придут без перекладки', () => {
+    // Иначе область построения переезжает на ширину оси в момент прихода данных.
+    const plotOf = (wrapper: ReturnType<typeof factory>) =>
+      wrapper.find('[role="status"]').attributes('style')
+
+    const loading = plotOf(factory({ loading: true }))
+
+    expect(loading).toContain('left:')
+    // Гуттер под ось значений заметно больше нуля.
+    expect(Number(/left:\s*([\d.]+)px/.exec(loading!)![1])).toBeGreaterThan(20)
   })
 
   it('пустые данные дают пустое состояние и не дают поверхности', () => {

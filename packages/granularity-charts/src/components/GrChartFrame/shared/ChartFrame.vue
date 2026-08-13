@@ -9,6 +9,7 @@ import { computed, ref, useId, watch } from 'vue'
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
 import { formatNumber, formatTimeValue, formatValue } from '../../../chart/chartFormat'
 import { chartLayout, type Rect } from '../../../chart/chartLayout'
+import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
 import { createScale, type GrChartScale, linearScale } from '../../../chart/chartScale'
 import { linearTicks } from '../../../chart/chartTicks'
@@ -25,6 +26,10 @@ import ChartLegend from './ChartLegend.vue'
 import ChartTooltip from './ChartTooltip.vue'
 import {
   crosshairStroke,
+  frameGhostClass,
+  ghostStroke,
+  gridStroke,
+  gridStrokeWidth,
   type GrChartSize,
   frameRootClass,
   frameStateClass,
@@ -195,6 +200,39 @@ const yLabels = useChartTicks({
  */
 const LOADING_Y_LABEL = '0000'
 const LOADING_X_LABEL = '00:00'
+
+/**
+ * Призрак графика на время загрузки.
+ *
+ * Форма фиксированная и намеренно **не похожа на данные**: рисуется приглушённым
+ * `--gr-muted-fg`, а не цветом серии, — иначе читатель начнёт считывать с неё
+ * тренд, которого ещё нет. Задача призрака одна: сказать «здесь будет линия», а
+ * не «вот линия».
+ *
+ * Считается один раз на модуль: геометрия не зависит ни от данных, ни от
+ * размера — холст растягивается сам.
+ */
+const GHOST_VIEW = { width: 100, height: 40 } as const
+
+/**
+ * Приглушение призрака — не декоративная мелочь.
+ *
+ * `--gr-muted-fg` в светлой теме достаточно тёмный, чтобы линия читалась как
+ * настоящий ряд; на полупрозрачности она остаётся видимой, но очевидно
+ * незавершённой — и одинаково ведёт себя в обеих темах, потому что роль
+ * подстраивается сама.
+ */
+const GHOST_OPACITY = 0.45
+const GHOST_FRACTIONS = [0.62, 0.5, 0.68, 0.34, 0.42, 0.26, 0.3, 0.14]
+const GHOST_GRID = [0.25, 0.5, 0.75]
+
+const GHOST_PATH = linePath(
+  GHOST_FRACTIONS.map((fraction, index) => ({
+    x: (index / (GHOST_FRACTIONS.length - 1)) * GHOST_VIEW.width,
+    y: fraction * GHOST_VIEW.height,
+  })),
+  'smooth',
+)
 
 const reserveAxes = computed(() => props.axes && (props.loading || !isEmpty.value))
 
@@ -526,10 +564,49 @@ watch(tooltipApi.activeIndex, (value) => {
         @blur="tooltipApi.close"
       />
 
-      <!-- Скелет ложится на область построения, а не на весь холст: гуттеры под
-           оси уже зарезервированы, и данные придут ровно сюда же. -->
+      <!--
+        Скелет ложится на область построения, а не на весь холст: гуттеры под оси
+        уже зарезервированы, и данные придут ровно сюда же — без перекладки.
+
+        Мерцание берётся у `GrSkeleton` ядра (оно уже выверено под
+        `prefers-reduced-motion`), а поверх идёт призрак графика: сетка и линия.
+        Так место занято не «серым прямоугольником», а обещанием конкретной
+        картинки.
+      -->
       <div v-if="loading" class="absolute" :style="plotStyle" role="status">
         <GrSkeleton variant="rect" width="100%" height="100%" rounded="var(--gr-radius-sm)" />
+
+        <svg
+          :class="frameGhostClass"
+          :viewBox="`0 0 ${GHOST_VIEW.width} ${GHOST_VIEW.height}`"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+          data-gr-chart-ghost
+        >
+          <line
+            v-for="fraction in GHOST_GRID"
+            :key="fraction"
+            x1="0"
+            :x2="GHOST_VIEW.width"
+            :y1="fraction * GHOST_VIEW.height"
+            :y2="fraction * GHOST_VIEW.height"
+            :stroke="gridStroke"
+            :stroke-width="gridStrokeWidth"
+            vector-effect="non-scaling-stroke"
+          />
+          <path
+            :d="GHOST_PATH"
+            fill="none"
+            :stroke="ghostStroke"
+            :stroke-opacity="GHOST_OPACITY"
+            stroke-width="2"
+            stroke-linecap="butt"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+          />
+        </svg>
+
         <span class="sr-only">{{ t('grCharts.chart.loading', 'Loading chart') }}</span>
       </div>
 
