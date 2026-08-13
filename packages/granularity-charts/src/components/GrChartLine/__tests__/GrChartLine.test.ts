@@ -239,6 +239,37 @@ describe('GrChartLine', () => {
     expect(panel!.classes()).toContain('pointer-events-none')
   })
 
+  it('видимая таблица не повторяет дату в каждой строке, а скрытая повторяет', () => {
+    // Скринридер читает строку вне соседей — там дата обязана быть. Глазами тот
+    // же повтор двадцать четыре раза мешает сравнивать значения
+    // (`docs/model.md`, «Подписи времени в таблице»).
+    const hourly = [{
+      id: 'temp',
+      data: Array.from({ length: 6 }, (_, hour) => ({ x: new Date(2026, 6, 12, hour), y: 20 + hour })),
+    }]
+
+    const rowsOf = (dataTable: string) => factory({ series: hourly, dataTable, locale: 'en-US' })
+      .find('[data-gr-chart-table]')
+      .findAll('tbody th')
+      .map(node => node.text())
+
+    const visible = rowsOf('visible')
+    const hidden = rowsOf('hidden')
+
+    expect(visible[0]).toMatch(/Jul/)
+    expect(visible.slice(1).some(row => row.includes('Jul'))).toBe(false)
+    expect(hidden.every(row => row.includes('Jul'))).toBe(true)
+  })
+
+  it('категориальной оси сокращать нечего: подписи остаются как есть', () => {
+    const rows = factory({
+      series: [{ id: 'a', x: ['Q1', 'Q2', 'Q3'], y: [1, 2, 3] }],
+      dataTable: 'visible',
+    }).find('[data-gr-chart-table]').findAll('tbody th').map(node => node.text())
+
+    expect(rows).toEqual(['Q1', 'Q2', 'Q3'])
+  })
+
   it('dataTable=off убирает таблицу целиком', () => {
     expect(factory({ dataTable: 'off' }).find('[data-gr-chart-table]').exists()).toBe(false)
   })

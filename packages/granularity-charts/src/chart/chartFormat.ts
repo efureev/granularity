@@ -188,6 +188,100 @@ export function formatTimeTick(value: number, unit: GrTimeTickUnit, locale: stri
   return dateFormatter(locale, TICK_FORMATS[unit]).format(new Date(value))
 }
 
+/**
+ * Две формы подписи на каждую единицу лестницы и признак, по которому решается,
+ * что контекст пора повторить.
+ *
+ * `group` — не про длину строки, а про то, где короткая форма перестаёт быть
+ * однозначной: «03:00» одинаково для всех суток, «12 июл.» — для всех лет.
+ */
+const SEQUENCE_FORMATS: Record<GrTimeTickUnit, {
+  short: Intl.DateTimeFormatOptions
+  full: Intl.DateTimeFormatOptions
+  group: 'day' | 'year' | 'none'
+}> = {
+  second: {
+    short: { minute: '2-digit', second: '2-digit' },
+    full: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' },
+    group: 'day',
+  },
+  minute: {
+    short: { hour: '2-digit', minute: '2-digit' },
+    full: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' },
+    group: 'day',
+  },
+  hour: {
+    short: { hour: '2-digit', minute: '2-digit' },
+    full: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' },
+    group: 'day',
+  },
+  day: {
+    short: { day: 'numeric', month: 'short' },
+    full: { day: 'numeric', month: 'short', year: 'numeric' },
+    group: 'year',
+  },
+  week: {
+    short: { day: 'numeric', month: 'short' },
+    full: { day: 'numeric', month: 'short', year: 'numeric' },
+    group: 'year',
+  },
+  month: {
+    short: { month: 'short' },
+    full: { month: 'short', year: 'numeric' },
+    group: 'year',
+  },
+  year: {
+    short: { year: 'numeric' },
+    full: { year: 'numeric' },
+    group: 'none',
+  },
+}
+
+function groupKey(value: number, group: 'day' | 'year' | 'none'): string {
+  if (group === 'none')
+    return ''
+
+  const date = new Date(value)
+
+  return group === 'year'
+    ? String(date.getFullYear())
+    : `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+}
+
+/**
+ * Ряд подписей времени: контекст на первой и при его смене, дальше коротко.
+ *
+ * Почасовой ряд за сутки печатал бы «12 июл. 2026 г., 03:00» двадцать четыре
+ * раза — дату читатель узнаёт из первой строки, а дальше она мешает сравнивать
+ * значения. Но и уронить её везде нельзя: на переходе через полночь «00:00»
+ * без даты становится неотличимо от вчерашнего.
+ *
+ * Правило поэтому не «коротко всегда», а «коротко, пока однозначно»: полная
+ * форма возвращается на первой строке и на каждой смене суток (или года — для
+ * дневной и месячной лестницы).
+ *
+ * Только для **видимой** таблицы. Скрытая обязана оставаться самодостаточной
+ * построчно: скринридер читает строку вне соседей, и «03:00» в ней не значит
+ * ничего.
+ */
+export function formatTimeSequence(
+  values: readonly number[],
+  unit: GrTimeTickUnit,
+  locale: string,
+): string[] {
+  const format = SEQUENCE_FORMATS[unit]
+  let previous: string | null = null
+
+  return values.map((value) => {
+    const key = groupKey(value, format.group)
+    const withContext = previous === null || key !== previous
+
+    previous = key
+
+    return dateFormatter(locale, withContext ? format.full : format.short).format(new Date(value))
+  })
+}
+
 /** Полная подпись момента — для тултипа и скрытой таблицы, где контекст нужен весь. */
 export function formatTimeValue(value: number, locale: string): string {
   return dateFormatter(locale, {

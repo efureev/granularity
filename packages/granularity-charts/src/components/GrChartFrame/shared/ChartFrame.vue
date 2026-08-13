@@ -7,12 +7,12 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import { computed, ref, useId, watch } from 'vue'
 
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
-import { formatNumber, formatTimeValue, formatValue } from '../../../chart/chartFormat'
+import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '../../../chart/chartFormat'
 import { chartLayout, type Rect } from '../../../chart/chartLayout'
 import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
 import { createScale, type GrChartScale, linearScale } from '../../../chart/chartScale'
-import { linearTicks } from '../../../chart/chartTicks'
+import { linearTicks, timeTicks } from '../../../chart/chartTicks'
 import { type ChartTableModel, chartTableModel } from '../../../chart/chartTable'
 import { useChartScale } from '../../../composables/useChartScale'
 import { type ChartTick, type ChartTickFormat, useChartTicks } from '../../../composables/useChartTicks'
@@ -401,10 +401,39 @@ const surfaceLabel = computed(() => {
   return `${label}. ${t('grCharts.chart.keyboardHint', 'Use arrow keys to browse points')}`
 })
 
+/**
+ * Подписи строк видимой таблицы для оси времени.
+ *
+ * Скрытая таблица печатает полную дату в каждой строке и обязана: скринридер
+ * читает строку вне соседей. Видимую то же самое превращает в двадцать четыре
+ * повтора «12 июл. 2026 г.» подряд — контекст, который мешает сравнивать
+ * значения. Здесь он остаётся на первой строке и на каждой смене суток.
+ *
+ * Единица берётся у той же лестницы, что размечает ось, но по числу строк, а
+ * не делений: подписывается ряд данных, а не ось.
+ */
+const visibleTimeLabels = computed<Map<number, string> | null>(() => {
+  if (props.dataTable !== 'visible' || props.data.kind !== 'time')
+    return null
+
+  const positions = props.data.positions
+
+  if (positions.length === 0)
+    return null
+
+  const { unit } = timeTicks([positions[0]!, positions[positions.length - 1]!], positions.length)
+
+  return new Map(formatTimeSequence(positions, unit, resolvedLocale.value).map((label, index) => [positions[index]!, label]))
+})
+
+function formatTableX(point: NormalizedPoint): string {
+  return visibleTimeLabels.value?.get(point.x) ?? formatX(point)
+}
+
 const tableModel = computed(() => props.tableModel ?? chartTableModel(props.data, {
   xLabel: t('grCharts.chart.columnX', 'X'),
   caption: t('grCharts.chart.tableCaption', 'Chart data'),
-  formatX,
+  formatX: formatTableX,
   formatY: formatPointValue,
 }))
 

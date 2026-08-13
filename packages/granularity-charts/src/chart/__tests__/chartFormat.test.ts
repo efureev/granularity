@@ -1,7 +1,7 @@
 import { formatStatisticValue } from '@feugene/granularity/components/GrStatistic'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { formatNumber, formatTimeTick, formatValue, resetChartFormatCache } from '../chartFormat'
+import { formatNumber, formatTimeSequence, formatTimeTick, formatValue, resetChartFormatCache } from '../chartFormat'
 
 beforeEach(() => {
   resetChartFormatCache()
@@ -67,5 +67,50 @@ describe('formatTimeTick', () => {
     resetChartFormatCache()
 
     expect(formatTimeTick(value, 'day', 'ru-RU')).toBe(first)
+  })
+})
+
+describe('formatTimeSequence', () => {
+  const hour = (h: number, day = 12) => new Date(2026, 6, day, h, 0).getTime()
+
+  it('контекст на первой строке, дальше только время', () => {
+    const labels = formatTimeSequence([hour(1), hour(2), hour(3)], 'hour', 'en-US')
+
+    expect(labels[0]).toMatch(/Jul/)
+    expect(labels[1]).not.toMatch(/Jul/)
+    expect(labels[2]).not.toMatch(/Jul/)
+  })
+
+  it('на смене суток контекст возвращается', () => {
+    // Иначе «00:00» следующего дня неотличимо от вчерашнего.
+    const labels = formatTimeSequence([hour(23, 12), hour(0, 13), hour(1, 13)], 'hour', 'en-US')
+
+    expect(labels[0]).toMatch(/Jul/)
+    expect(labels[1]).toMatch(/Jul/)
+    expect(labels[2]).not.toMatch(/Jul/)
+  })
+
+  it('у дневной лестницы контекст — год, а не сутки', () => {
+    const days = [
+      new Date(2026, 11, 30).getTime(),
+      new Date(2026, 11, 31).getTime(),
+      new Date(2027, 0, 1).getTime(),
+    ]
+    const labels = formatTimeSequence(days, 'day', 'en-US')
+
+    expect(labels[0]).toMatch(/2026/)
+    expect(labels[1]).not.toMatch(/2026/)
+    expect(labels[2]).toMatch(/2027/)
+  })
+
+  it('годовая лестница коротка всегда: повторять там нечего', () => {
+    const years = [2024, 2025, 2026].map(year => new Date(year, 0, 1).getTime())
+
+    expect(formatTimeSequence(years, 'year', 'en-US')).toEqual(['2024', '2025', '2026'])
+  })
+
+  it('на каждое значение приходится ровно одна подпись', () => {
+    expect(formatTimeSequence([hour(1), hour(2)], 'hour', 'ru')).toHaveLength(2)
+    expect(formatTimeSequence([], 'hour', 'ru')).toEqual([])
   })
 })

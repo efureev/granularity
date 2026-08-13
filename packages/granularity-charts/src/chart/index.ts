@@ -49,6 +49,7 @@ export type { GrChartNumberFormat } from './chartFormat'
 export {
   formatNumber,
   formatShare,
+  formatTimeSequence,
   formatTimeTick,
   formatTimeValue,
   formatValue,

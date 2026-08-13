@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `dataTable: 'visible'` no longer repeats the full date on every row of a time series. The date now appears on the
+  first row and returns whenever the day (or year, for daily and monthly ladders) changes — dropping it everywhere
+  would make midnight indistinguishable from the previous day. The hidden, screen-reader table keeps the full date
+  per row: it is read out of context.
+
 ### Fixed
 
 - Switching locale no longer shifts the plot area. `Intl` uses a non-breaking space (`U+00A0` in `ru`/`fi`) or a
