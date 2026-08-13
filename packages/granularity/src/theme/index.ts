@@ -12,10 +12,10 @@
  * Документация: `docs/theming.md`.
  */
 
-export { extendTheme, GrThemeError, renderThemeCss } from './extendTheme'
+export { createTheme, extendTheme, GrThemeError, renderThemeCss } from './extendTheme'
 export type { ExtendThemeOptions, GrTheme } from './extendTheme'
 export { GrToneError, tone } from './tone'
-export type { ToneOptions } from './tone'
+export type { ToneOptions, ToneRole } from './tone'
 export { validateTheme } from './validate'
 export type { GrThemeIssue } from './validate'
 export { resolveRole, themeRoleNames } from './roles'

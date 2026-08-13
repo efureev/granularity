@@ -3,16 +3,35 @@ import type { GrThemeName } from '../tokens/types'
 import { contrast, mixSrgb, parseHex } from './color'
 import { resolveRole, type GrThemeTokens } from './roles'
 
+export type ToneRole = 'fill' | 'solid' | 'light' | 'text'
+
 export interface ToneOptions {
   /** Тема, в которой тон будет жить: от неё зависят фон, текст и направление сдвигов. */
   base: GrThemeName | { tokens: GrThemeTokens } | GrThemeTokens
-  /** Ролей `-light`/`-text` у тона может не быть — тогда их не выводим. */
-  roles?: ('fill' | 'solid' | 'light' | 'text')[]
+  /**
+   * Что выводить. По умолчанию — ровно те роли, которые у этого тона есть **в
+   * реестре пакета**: у `--gr-accent` это только `-fg`, у `--gr-primary` нет
+   * `-light`. Для имени, которого в реестре нет, выводится полная семья.
+   */
+  roles?: ToneRole[]
 }
 
 const AA_TEXT = 4.5
 /** Шаг подбора: 100 шагов по 1% дают точность, которой глаз не различает. */
 const STEP = 1
+/**
+ * Насколько темнеет solid в hover и active.
+ *
+ * Обычные состояния пакет считает подмесом `--gr-fg` (`tokens/derived.json`), но
+ * solid — кнопочная заливка: в светлой теме `--gr-fg` тёмный, в тёмной светлый,
+ * и вторая уводила бы кнопку в сторону текста, то есть высветляла. Кнопка при
+ * нажатии темнеет в обеих темах, поэтому здесь подмес чёрного.
+ *
+ * Значения встроенных тем взяты из шкал палитры и лежат в диапазоне 81–99%:
+ * `tone` даёт согласованную семью, а не копию пакетных цветов.
+ */
+const SOLID_HOVER = 92
+const SOLID_ACTIVE = 84
 
 export class GrToneError extends Error {
   constructor(role: string, actual: number, expected: number) {
@@ -23,6 +42,26 @@ export class GrToneError extends Error {
 
     this.name = 'GrToneError'
   }
+}
+
+/**
+ * Роли, которые у этого тона есть в реестре. Лишняя роль — не «запас», а ошибка
+ * сборки («роли, которых у пакета нет»), поэтому набор берётся из данных.
+ */
+function rolesOf(name: string): ToneRole[] {
+  const known = new Set(grThemeTokens.map(token => token.name))
+  const prefix = `--gr-${name}`
+
+  if (!known.has(prefix)) return ['fill', 'solid', 'light', 'text']
+
+  return ([
+    ['fill', prefix],
+    ['solid', `${prefix}-solid`],
+    ['light', `${prefix}-light`],
+    ['text', `${prefix}-text`],
+  ] as const)
+    .filter(([, role]) => known.has(role))
+    .map(([kind]) => kind)
 }
 
 function baseTokensOf(base: ToneOptions['base']): GrThemeTokens {
@@ -80,7 +119,7 @@ function isDark(tokens: GrThemeTokens): boolean {
  */
 export function tone(name: string, seed: string, options: ToneOptions): GrThemeTokens {
   const tokens = baseTokensOf(options.base)
-  const roles = options.roles ?? ['fill', 'solid', 'light', 'text']
+  const roles = options.roles ?? rolesOf(name)
 
   const bg = requireColor(tokens, '--gr-bg')
   const fg = requireColor(tokens, '--gr-fg')
@@ -110,13 +149,28 @@ export function tone(name: string, seed: string, options: ToneOptions): GrThemeT
   }
 
   if (roles.includes('solid')) {
-    // Solid — кнопочный вес: заливка обязана держать текст противоположного
-    // полюса. В светлой теме это белый на тёмной заливке, в тёмной — наоборот.
-    const solidFg = dark ? bg : '#ffffff'
-    const towards = dark ? fg : '#000000'
+    // Solid — кнопочный вес, и он одинаков в обеих темах: тёмная заливка со
+    // светлым текстом. Это не симметрия ради симметрии — кнопки всех тонов
+    // обязаны выглядеть одной семьёй (docs/theming.md, «Зачем -solid»), а
+    // светлая кнопка в тёмной теме читалась бы как другой компонент.
+    // Отсюда же направление состояний: заливка темнеет при наведении и нажатии.
+    const solidFg = dark ? fg : '#ffffff'
 
-    result[`${prefix}-solid`] = shiftUntil(seed, towards, solidFg, AA_TEXT, `${prefix}-solid`)
+    const solid = shiftUntil(seed, '#000000', solidFg, AA_TEXT, `${prefix}-solid`)
+
+    result[`${prefix}-solid`] = solid
     result[`${prefix}-solid-fg`] = solidFg
+
+    // Состояния solid — темовые роли, а не производные: `color-mix` их не
+    // считает, и без них тема с нуля не соберётся вовсе.
+    for (const [suffix, amount] of [['-solid-hover', SOLID_HOVER], ['-solid-active', SOLID_ACTIVE]] as const) {
+      const state = mixSrgb(solid, '#000000', amount)
+      const ratio = contrast(solidFg, state)
+
+      if (ratio < AA_TEXT) throw new GrToneError(`${prefix}${suffix}`, ratio, AA_TEXT)
+
+      result[`${prefix}${suffix}`] = state
+    }
   }
 
   if (roles.includes('light')) {

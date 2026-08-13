@@ -108,7 +108,7 @@ function renderFallback(tokens: GrThemeTokens, selector: string): string[] {
 
 export function renderThemeCss(theme: Pick<GrTheme, 'name' | 'selector' | 'tokens'> & Partial<Pick<GrTheme, 'componentTokens'>>): string {
   return [
-    `/* Тема "${theme.name}" собрана \`extendTheme\` из @feugene/granularity/theme. */`,
+    `/* Тема "${theme.name}" собрана из @feugene/granularity/theme — правки здесь потеряются. */`,
     `${theme.selector} {`,
     ...renderDeclarations(theme.tokens, '  '),
     ...renderComponentDeclarations(theme.componentTokens ?? {}, '  '),
@@ -116,6 +116,55 @@ export function renderThemeCss(theme: Pick<GrTheme, 'name' | 'selector' | 'token
     ...renderFallback(theme.tokens, theme.selector),
     '',
   ].join('\n')
+}
+
+interface BuildOptions {
+  name: string
+  tokens: GrThemeTokens
+  componentTokens: GrThemeTokens
+  selector: string
+  validate: boolean
+  /** Что сказать, если ролей не хватает: у темы с базой и без базы причины разные. */
+  explainMissing: (missing: string[]) => string
+}
+
+function buildTheme(options: BuildOptions): GrTheme {
+  const { name, tokens, componentTokens, selector, validate, explainMissing } = options
+
+  const known = new Set(themeRoleNames())
+  const unknown = Object.keys(tokens).filter(role => !known.has(role))
+
+  if (unknown.length > 0) {
+    throw new Error(
+      `тема "${name}" объявляет роли, которых у пакета нет: ${unknown.join(', ')}.\n`
+      + 'Примитивы (`--gr-space-*`, `--gr-radius-*`) и производные (`-hover`/`-active`) темой не задаются: '
+      + 'первые от темы не зависят, вторые выводятся формулой.',
+    )
+  }
+
+  const knownComponent = new Set(grComponentTokens.map(token => token.name))
+  const unknownComponent = Object.keys(componentTokens).filter(token => !knownComponent.has(token))
+
+  if (unknownComponent.length > 0)
+    throw new Error(`тема "${name}" объявляет покомпонентные токены, которых у пакета нет: ${unknownComponent.join(', ')}`)
+
+  const missing = themeRoleNames().filter(role => tokens[role] === undefined)
+  if (missing.length > 0) throw new Error(explainMissing(missing))
+
+  const theme: GrTheme = {
+    name,
+    selector,
+    tokens,
+    componentTokens,
+    css: renderThemeCss({ name, selector, tokens, componentTokens }),
+  }
+
+  if (validate) {
+    const issues = validateTheme(theme)
+    if (issues.length > 0) throw new GrThemeError(name, issues)
+  }
+
+  return theme
 }
 
 /**
@@ -136,41 +185,49 @@ export function extendTheme(options: ExtendThemeOptions): GrTheme {
     validate = true,
   } = options
 
-  const known = new Set(themeRoleNames())
-  const unknown = Object.keys(tokens).filter(role => !known.has(role))
-
-  if (unknown.length > 0) {
-    throw new Error(
-      `тема "${name}" объявляет роли, которых у пакета нет: ${unknown.join(', ')}.\n`
-      + 'Примитивы (`--gr-space-*`, `--gr-radius-*`) и производные (`-hover`/`-active`) темой не задаются: '
-      + 'первые от темы не зависят, вторые выводятся формулой.',
-    )
-  }
-
-  const knownComponent = new Set(grComponentTokens.map(token => token.name))
-  const unknownComponent = Object.keys(componentTokens).filter(token => !knownComponent.has(token))
-
-  if (unknownComponent.length > 0)
-    throw new Error(`тема "${name}" объявляет покомпонентные токены, которых у пакета нет: ${unknownComponent.join(', ')}`)
-
-  const resolved: GrThemeTokens = { ...baseTokens(base), ...tokens }
-  const missing = themeRoleNames().filter(role => resolved[role] === undefined)
-
-  if (missing.length > 0)
-    throw new Error(`база не даёт ролей: ${missing.join(', ')}`)
-
-  const theme: GrTheme = {
+  return buildTheme({
     name,
-    selector,
-    tokens: resolved,
+    tokens: { ...baseTokens(base), ...tokens },
     componentTokens,
-    css: renderThemeCss({ name, selector, tokens: resolved, componentTokens }),
-  }
+    selector,
+    validate,
+    explainMissing: missing => `база темы "${name}" не даёт ролей: ${missing.join(', ')}`,
+  })
+}
 
-  if (validate) {
-    const issues = validateTheme(theme)
-    if (issues.length > 0) throw new GrThemeError(name, issues)
-  }
+/**
+ * Тема с нуля: без базы, все роли свои.
+ *
+ * «Без базы» — это не «ни от чего не наследуется»: в CSS так нельзя. Роль,
+ * которую тема не объявила, придёт из `:root`, а `:root` — это **светлая тема
+ * пакета**. Независимой тема становится ровно тогда, когда объявляет все роли
+ * сама, и здесь это проверяется: не хватает — сборка падает со списком, а не
+ * молча подмешивает чужую палитру.
+ *
+ * Цена честная и её видно: `extendTheme` получает новую роль пакета
+ * автоматически, а тема с нуля — упадёт на следующей сборке и потребует решения.
+ * Это и есть смысл выбора: полный контроль в обмен на сопровождение.
+ */
+export function createTheme(options: Omit<ExtendThemeOptions, 'base'>): GrTheme {
+  const {
+    name,
+    tokens = {},
+    componentTokens = {},
+    selector = `[data-theme='${name}']`,
+    validate = true,
+  } = options
 
-  return theme
+  return buildTheme({
+    name,
+    tokens,
+    componentTokens,
+    selector,
+    validate,
+    explainMissing: missing => [
+      `тема "${name}" объявлена без базы, но не задаёт ${missing.length} ролей:`,
+      `  ${missing.join(', ')}`,
+      'Незаявленная роль придёт не «ниоткуда», а из `:root` — то есть из светлой темы пакета.',
+      'Задайте их, либо соберите тему поверх готовой: `extendTheme({ base: \'light\' | \'dark\', tokens })`.',
+    ].join('\n'),
+  })
 }

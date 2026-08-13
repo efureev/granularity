@@ -173,3 +173,65 @@ describe('тема ocean', () => {
     expect(distance).toBeGreaterThan(40)
   })
 })
+
+/**
+ * Тема с нуля проверяется тем же способом — контраст читается из итогового CSS.
+ * Разница в договоре: у `contrast` нет базы, поэтому полнота набора здесь не
+ * следствие наследования, а условие сборки (`createTheme` падает без неё).
+ */
+describe('тема contrast', () => {
+  const css = readFileSync(
+    fileURLToPath(new URL('../styles/theme-contrast.css', import.meta.url)),
+    'utf8',
+  )
+  const decls = parseDeclarations(css)
+  const read = (token: string): string => {
+    const declared = decls.get(token)
+    if (!declared) throw new Error(`тема не объявляет ${token}`)
+
+    return declared
+  }
+
+  const AAA_TEXT = 7
+
+  it('объявляет все роли сама: ни одна не придёт из `:root`', () => {
+    const missing = grThemeTokens.map(token => token.name).filter(name => !decls.has(name))
+
+    expect(missing, 'у темы без базы незаявленная роль приедет из светлой темы пакета').toEqual([])
+  })
+
+  it('не заимствует ни одной поверхности у светлой темы пакета', () => {
+    // Смысл высококонтрастной темы теряется от любого приглушённого значения,
+    // просочившегося из `light`.
+    const light = new Map(grThemeTokens.map(token => [token.name, token.values.light]))
+
+    for (const surface of ['--gr-bg', '--gr-muted', '--gr-secondary', '--gr-brd', '--gr-sidebar'])
+      expect(read(surface), surface).not.toBe(light.get(surface))
+  })
+
+  it('основной текст держит AAA, а не только AA', () => {
+    // Ради этого тема и написана: AA здесь недостаточный порог.
+    for (const surface of ['--gr-bg', '--gr-card', '--gr-popover'])
+      expect(contrast(read('--gr-fg'), read(surface)), surface).toBeGreaterThanOrEqual(AAA_TEXT)
+
+    expect(contrast(read('--gr-sidebar-fg'), read('--gr-sidebar'))).toBeGreaterThanOrEqual(AAA_TEXT)
+  })
+
+  it('текст на solid читается во всех трёх состояниях', () => {
+    // Состояния solid — свои роли темы, а не производные формулой: у темы с
+    // нуля их некому вывести, и проверить их больше нечем.
+    for (const tone of TONES) {
+      const fg = read(`--gr-${tone}-solid-fg`)
+
+      for (const state of ['', '-hover', '-active'])
+        expect(contrast(fg, read(`--gr-${tone}-solid${state}`)), `${tone}${state}`).toBeGreaterThanOrEqual(AA_TEXT)
+    }
+  })
+
+  it('производные состояния посчитаны от её собственных цветов', () => {
+    const fallback = css.slice(css.indexOf('@supports'))
+
+    expect(fallback).toContain("[data-theme='contrast']")
+    expect(fallback).toMatch(/--gr-primary-hover:\s*#[\da-f]{6}/i)
+  })
+})

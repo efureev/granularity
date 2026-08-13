@@ -34,7 +34,8 @@
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
 - [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы и порядок импортов.
 - [`tokens.md`](./tokens.md) — справочник токенов (генерируется из `tokens/*.json`, руками не править).
-- [`theming.md`](./theming.md) — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, подключение, проверка контраста.
+- [`theming.md`](./theming.md) — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, композиция
+  поверх готовой (`extendTheme`) и с нуля (`createTheme`), подключение, проверка контраста.
 - [`keyboard.md`](./keyboard.md) — клавиатурный контракт: общие правила и таблица по компонентам.
 - [`form-controls.md`](./form-controls.md) — контракт форм-контрола: пропы, методы `focus()`/`blur()`, события и граница фокуса у составных.
 - [`announcer.md`](./announcer.md) — `useAnnouncer`: как объявить событие скринридеру и когда это лучше своего `role="status"`.

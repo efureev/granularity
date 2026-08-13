@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`createTheme`: a theme with no base.** `extendTheme` inherits from `light`, `dark` or another
+  theme, which is the wrong deal for a theme that shares nothing with the package palette — a
+  high-contrast theme, a brand theme, a print theme. Worth being precise about what "from scratch"
+  can mean: in CSS a theme cannot inherit from nothing. A role the theme does not declare comes from
+  `:root`, and `:root` is the package's light theme, so a hand-written file that declares 74 of the
+  90 roles is not independent — it is 16 roles of light theme in disguise. `createTheme` makes
+  independence a build-time guarantee: leave a role out and the build fails, naming the roles and
+  where they would otherwise have come from.
+
+  `tone` now derives `-solid-hover` / `-solid-active` too — those are theme roles, not `color-mix`
+  derivatives, so a from-scratch theme could not be completed without them — and picks its suffixes
+  from the role registry (`--gr-accent` only has `-fg`, `--gr-primary` has no `-light`), so its
+  output drops into either builder unedited. `validateTheme` gained a matching rule: solid text must
+  stay readable on all three solid states.
+
 - **Theme composition: `@feugene/granularity/theme`.** A custom theme used to mean writing out all
   90 semantic roles by hand, because a role you leave out does not fall back to *your* base — it
   inherits from `:root`, which is the light theme. A dark theme with one forgotten role gets a bright

@@ -16,7 +16,9 @@ describe('семья ролей из одного цвета', () => {
       '--gr-success-fg',
       '--gr-success-light',
       '--gr-success-solid',
+      '--gr-success-solid-active',
       '--gr-success-solid-fg',
+      '--gr-success-solid-hover',
       '--gr-success-text',
     ])
   })
@@ -63,6 +65,39 @@ describe('семья ролей из одного цвета', () => {
     const family = tone('brand', '#3ddc97', { base: 'dark', roles: ['fill'] })
 
     expect(Object.keys(family)).toEqual(['--gr-brand', '--gr-brand-fg'])
+  })
+
+  /**
+   * Набор суффиксов у ролей разный, и лишняя роль — не запас, а ошибка сборки
+   * («роли, которых у пакета нет»). Поэтому он берётся из реестра.
+   */
+  it('по умолчанию выводит ровно те роли, что есть у тона в реестре', () => {
+    // У accent в пакете только пара `-fg`.
+    expect(Object.keys(tone('accent', '#3ddc97', { base: 'dark' })).sort())
+      .toEqual(['--gr-accent', '--gr-accent-fg'])
+
+    // У primary нет `-light`, но есть solid и `-text`.
+    expect(Object.keys(tone('primary', '#8b7ff5', { base: 'dark' })).sort())
+      .toEqual([
+        '--gr-primary',
+        '--gr-primary-fg',
+        '--gr-primary-solid',
+        '--gr-primary-solid-active',
+        '--gr-primary-solid-fg',
+        '--gr-primary-solid-hover',
+        '--gr-primary-text',
+      ])
+
+    // Имени нет в реестре — выводим полную семью: решать за потребителя нечем.
+    expect(Object.keys(tone('brand', '#3ddc97', { base: 'dark' })).length).toBe(8)
+  })
+
+  it('текст читается и на состояниях solid — они не выводятся формулой', () => {
+    const family = tone('success', '#3ddc97', { base: 'dark' })
+    const fg = family['--gr-success-solid-fg']
+
+    for (const state of ['--gr-success-solid', '--gr-success-solid-hover', '--gr-success-solid-active'])
+      expect(contrast(fg, family[state]), state).toBeGreaterThanOrEqual(AA)
   })
 
   /** Смысл упражнения: перекрашенный тон не должен ронять проверку темы. */

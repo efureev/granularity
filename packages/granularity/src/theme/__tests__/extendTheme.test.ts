@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { grThemeTokens } from '../../tokens/generated'
 import { mixSrgb } from '../color'
-import { extendTheme, GrThemeError, renderThemeCss } from '../extendTheme'
+import { createTheme, extendTheme, GrThemeError, renderThemeCss } from '../extendTheme'
 import { validateTheme } from '../validate'
 
 const OCEAN = {
@@ -167,5 +167,56 @@ describe('renderThemeCss', () => {
     const theme = extendTheme({ name: 'ocean', base: 'dark', tokens: OCEAN, validate: false })
 
     expect(renderThemeCss({ name: 'ocean', selector: '.x', tokens: theme.tokens })).toContain('.x {')
+  })
+})
+
+/**
+ * Тема без базы. «Без базы» — это не «ни от чего не наследуется»: в CSS так
+ * нельзя, и незаявленная роль пришла бы из `:root`, то есть из светлой темы.
+ * Независимость обеспечивается ровно тем, что здесь проверяется, — полнотой.
+ */
+describe('тема с нуля', () => {
+  const full = Object.fromEntries(grThemeTokens.map(token => [token.name, token.values.dark]))
+
+  it('с полным набором собирается и даёт те же роли, что `extendTheme`', () => {
+    const scratch = createTheme({ name: 'scratch', tokens: full, validate: false })
+    const extended = extendTheme({ name: 'scratch', base: 'dark', validate: false })
+
+    expect(scratch.tokens).toEqual(extended.tokens)
+    expect(scratch.css).toBe(extended.css)
+  })
+
+  it('без части ролей падает со списком и объяснением про `:root`', () => {
+    const partial = { ...full }
+    delete partial['--gr-success-solid']
+    delete partial['--gr-info-light']
+
+    expect(() => createTheme({ name: 'scratch', tokens: partial, validate: false })).toThrow()
+
+    try {
+      createTheme({ name: 'scratch', tokens: partial, validate: false })
+    }
+    catch (error) {
+      const message = (error as Error).message
+
+      // Ошибка обязана называть настоящую причину: не «ниоткуда», а из светлой темы.
+      expect(message).toContain(':root')
+      expect(message).toContain('extendTheme')
+      expect(message).toContain('не задаёт 2 ролей')
+      expect(message).toContain('--gr-success-solid')
+      expect(message).toContain('--gr-info-light')
+    }
+  })
+
+  it('фолбэк производных считается и здесь — базы у него нет, значения свои', () => {
+    const scratch = createTheme({ name: 'scratch', tokens: full, validate: false })
+    const expected = mixSrgb(full['--gr-primary'], full['--gr-fg'], 92)
+
+    expect(scratch.css).toContain(`--gr-primary-hover: ${expected};`)
+  })
+
+  it('проверка контраста работает так же, как у темы с базой', () => {
+    expect(() => createTheme({ name: 'scratch', tokens: { ...full, '--gr-fg': full['--gr-bg'] } }))
+      .toThrow(GrThemeError)
   })
 })

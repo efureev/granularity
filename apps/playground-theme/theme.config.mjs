@@ -1,10 +1,10 @@
-import { extendTheme, tone } from '@feugene/granularity/theme'
+import { createTheme, extendTheme, tone } from '@feugene/granularity/theme'
 
 /**
- * Поверхности темы — от них считается всё остальное. `tone` берёт отсюда фон,
- * текст и карточку: больше ему ничего не нужно.
+ * Поверхности темы `ocean` — от них считается всё остальное. `tone` берёт отсюда
+ * фон, текст и карточку: больше ему ничего не нужно.
  */
-const surfaces = {
+const oceanSurfaces = {
   '--gr-bg': '#041e2b',
   '--gr-fg': '#e8f4fa',
   '--gr-card': '#0a2f42',
@@ -30,7 +30,7 @@ export const ocean = extendTheme({
   base: 'dark',
   tokens: {
     // Поверхности.
-    ...surfaces,
+    ...oceanSurfaces,
     '--gr-card-fg': '#e8f4fa',
     '--gr-popover': '#0a2f42',
     '--gr-popover-fg': '#e8f4fa',
@@ -84,7 +84,7 @@ export const ocean = extendTheme({
     // проверяется на контраст, вместо того чтобы подбирать четыре значения
     // руками. Роли `-solid*` при этом появляются сами — а раньше их тут не было
     // вовсе, и они молча приезжали от светлой темы.
-    ...tone('azure', '#38bdf8', { base: surfaces }),
+    ...tone('azure', '#38bdf8', { base: oceanSurfaces }),
 
     // Графики.
     '--gr-chart-1': '#4fd1e0',
@@ -118,5 +118,89 @@ export const ocean = extendTheme({
     '--gr-button-warning-bg-hover': 'var(--gr-warning-hover)',
     '--gr-button-warning-bg-active': 'var(--gr-warning-active)',
     '--gr-button-warning-fg': 'var(--gr-warning-fg)',
+  },
+})
+
+/**
+ * Поверхности темы `contrast`: чистые полюса без полутонов. Из них же считается
+ * весь остальной набор.
+ */
+const contrastSurfaces = {
+  '--gr-bg': '#ffffff',
+  '--gr-fg': '#000000',
+  '--gr-card': '#ffffff',
+}
+
+/**
+ * Тема `contrast` — высококонтрастная светлая, собранная **с нуля**.
+ *
+ * Разница с `ocean` не в цветах, а в договоре с пакетом. `ocean` берёт тёмную
+ * тему за базу: не объявленная в ней роль приезжает из `dark`, и новая роль
+ * пакета приедет туда же сама. `contrast` базы не имеет и обязана объявить все
+ * роли сама — `createTheme` проверяет это на сборке и падает со списком, если
+ * чего-то нет.
+ *
+ * Почему именно эта тема написана с нуля: у высококонтрастной темы нет ничего
+ * общего с палитрой пакета. Любое унаследованное значение — приглушённый серый
+ * из `light` — сломало бы её смысл, а увидел бы это не разработчик, а тот, кому
+ * тема и нужна. Здесь честный размен: полный контроль ценой сопровождения.
+ *
+ * Тона подобраны под AAA (7:1) к белому: в этой теме AA — недостаточный порог.
+ */
+export const contrast = createTheme({
+  name: 'contrast',
+  tokens: {
+    ...contrastSurfaces,
+    '--gr-card-fg': '#000000',
+    '--gr-popover': '#ffffff',
+    '--gr-popover-fg': '#000000',
+    // Приглушённых поверхностей в этой теме нет: «слегка серое» — первое, что
+    // теряется при слабом зрении. Роль остаётся, но берёт различимый тон.
+    '--gr-muted': '#f0f0f0',
+    '--gr-muted-fg': '#2b2b2b',
+    '--gr-secondary': '#e8e8e8',
+    '--gr-secondary-fg': '#000000',
+    '--gr-accent': '#e0eaff',
+    '--gr-accent-fg': '#00227a',
+    // Границы и фокус-кольцо: тонкая светлая линия здесь бесполезна.
+    '--gr-brd': '#000000',
+    '--gr-input': '#000000',
+    '--gr-ring': '#0b3fd4',
+    '--gr-overlay-bg': 'rgb(0 0 0 / 0.7)',
+
+    // Состояния. Недоступный контрол гасится поверхностью и границей, а не
+    // прозрачностью: `opacity` разбавляет выверенный контраст.
+    '--gr-disabled-bg': '#ebebeb',
+    '--gr-disabled-fg': '#595959',
+    '--gr-disabled-brd': '#8f8f8f',
+    '--gr-invalid-brd': 'var(--gr-danger)',
+    '--gr-invalid-ring': 'var(--gr-danger)',
+    '--gr-invalid-text': 'var(--gr-danger-text)',
+
+    // Тона: семь вызовов дают 55 ролей из 90, каждая проверена на контраст.
+    ...tone('primary', '#0b3fd4', { base: contrastSurfaces }),
+    ...tone('success', '#00622e', { base: contrastSurfaces }),
+    ...tone('warning', '#7a4200', { base: contrastSurfaces }),
+    ...tone('danger', '#b3001b', { base: contrastSurfaces }),
+    ...tone('info', '#0050b3', { base: contrastSurfaces }),
+    ...tone('slate', '#3d4753', { base: contrastSurfaces }),
+    ...tone('azure', '#005b8f', { base: contrastSurfaces }),
+
+    // Графики: те же тона, чтобы легенда совпадала с остальным интерфейсом.
+    '--gr-chart-1': '#0b3fd4',
+    '--gr-chart-2': '#00622e',
+    '--gr-chart-3': '#7a4200',
+    '--gr-chart-4': '#b3001b',
+    '--gr-chart-5': '#005b8f',
+
+    // Сайдбар: инверсия — так его край виден без тени и полутонов.
+    '--gr-sidebar': '#000000',
+    '--gr-sidebar-fg': '#ffffff',
+    '--gr-sidebar-primary': '#8ab4ff',
+    '--gr-sidebar-primary-fg': '#000000',
+    '--gr-sidebar-accent': '#2b2b2b',
+    '--gr-sidebar-accent-fg': '#ffffff',
+    '--gr-sidebar-brd': '#ffffff',
+    '--gr-sidebar-ring': '#8ab4ff',
   },
 })

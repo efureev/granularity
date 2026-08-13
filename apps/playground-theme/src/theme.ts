@@ -10,7 +10,7 @@ import { onMounted, ref } from 'vue'
  * атрибут `[data-theme]` на `<html>`, — а не сам композабл.
  */
 
-export const APP_THEMES = ['light', 'dark', 'ocean'] as const
+export const APP_THEMES = ['light', 'dark', 'ocean', 'contrast'] as const
 
 export type AppTheme = (typeof APP_THEMES)[number]
 

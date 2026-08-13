@@ -1,4 +1,4 @@
-/* Тема "ocean" собрана `extendTheme` из @feugene/granularity/theme. */
+/* Тема "ocean" собрана из @feugene/granularity/theme — правки здесь потеряются. */
 [data-theme='ocean'] {
   --gr-bg: #041e2b;
   --gr-fg: #e8f4fa;
@@ -73,10 +73,10 @@
   --gr-slate-solid-hover: var(--gr-slate-700);
   --gr-slate-solid-active: var(--gr-slate-800);
   --gr-slate-solid-fg: var(--gr-slate-50);
-  --gr-azure-solid: #38bdf8;
-  --gr-azure-solid-hover: #075985;
-  --gr-azure-solid-active: #0c4a6e;
-  --gr-azure-solid-fg: #041e2b;
+  --gr-azure-solid: #23759a;
+  --gr-azure-solid-hover: #206c8e;
+  --gr-azure-solid-active: #1d6281;
+  --gr-azure-solid-fg: #e8f4fa;
   --gr-chart-1: #4fd1e0;
   --gr-chart-2: #45d6a3;
   --gr-chart-3: #fbbf24;

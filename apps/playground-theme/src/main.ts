@@ -9,6 +9,7 @@ import App from './App.vue'
 await import('./reset')
 await import('./granularity')
 await import('./styles/theme-ocean.css')
+await import('./styles/theme-contrast.css')
 await import('./app-styles')
 
 createApp(App).mount('#app')

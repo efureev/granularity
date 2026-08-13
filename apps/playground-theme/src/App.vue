@@ -70,13 +70,16 @@ function onThemeChange(next: string | number): void {
             playground-theme
           </p>
           <h1 class="text-2xl font-semibold">
-            Кастомная тема поверх пакета
+            Кастомные темы: поверх пакета и с нуля
           </h1>
           <p class="mt-2 max-w-2xl text-sm text-[var(--gr-muted-fg)]">
-            Тема <code>ocean</code> объявлена в <code>src/styles/theme-ocean.css</code> и
-            подключена обычным импортом CSS в <code>src/main.ts</code> — третью тему
-            через пресет добавить нельзя. Ни один компонент про неё не знает: они
-            читают семантические роли.
+            Обе темы описаны данными в <code>theme.config.mjs</code> и собраны в CSS
+            шагом сборки. <code>ocean</code> берёт за базу тёмную тему пакета
+            (<code>extendTheme</code>) — незаявленная роль приходит из неё.
+            <code>contrast</code> собрана с нуля (<code>createTheme</code>) и обязана
+            объявить все роли сама: не хватит одной — сборка упадёт, а не подмешает
+            палитру светлой темы. Ни один компонент про них не знает: они читают
+            семантические роли.
           </p>
         </div>
 

@@ -95,10 +95,17 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
     }
   }
 
-  // Основной и вторичный текст на всех своих подложках. Вторичный живёт не на
-  // фоне страницы, а в чипах, таблицах и панелях — ловушка №1 из docs/theming.md.
-  for (const surface of ['--gr-bg', '--gr-card', '--gr-popover', '--gr-sidebar'])
+  // Основной текст — только на поверхностях БЕЗ собственной пары `-fg`.
+  // У карточки, поповера и сайдбара она есть, и проверяется ниже вместе с
+  // тонами: сайдбар вправе быть инвертированным (тёмная панель в светлой теме),
+  // и требовать на нём общий `--gr-fg` значило бы запретить это.
+  const withOwnFg = new Set(toneNames().map(tone => `--gr-${tone}`))
+
+  for (const surface of ['--gr-bg', '--gr-card', '--gr-popover', '--gr-sidebar']) {
+    if (withOwnFg.has(surface)) continue
+
     requireContrast('--gr-fg', surface, AA_TEXT, 'основной текст')
+  }
 
   for (const surface of ['--gr-bg', '--gr-card', '--gr-muted', '--gr-secondary'])
     requireContrast('--gr-muted-fg', surface, AA_TEXT, 'вторичный текст')
@@ -107,6 +114,14 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
     const fill = `--gr-${tone}`
 
     requireContrastWithStates(`${fill}-fg`, fill, `текст на заливке ${tone}`)
+
+    // Состояния solid — свои роли темы, а не производные формулой, поэтому
+    // текст на них проверяется отдельно: у темы с нуля это единственная защита.
+    for (const state of ['-hover', '-active']) {
+      if (tokens[`${fill}${state}`] === undefined) continue
+
+      requireContrast(`${fill}-fg`, `${fill}${state}`, AA_TEXT, `текст на состоянии ${tone}${state}`)
+    }
 
     if (tokens[`${fill}-text`] !== undefined) {
       requireContrast(`${fill}-text`, `${fill}-light`, AA_TEXT, `текст тона ${tone}`)
