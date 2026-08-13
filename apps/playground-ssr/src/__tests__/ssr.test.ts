@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { useTheme } from '@feugene/granularity'
 
+import ChartsPage from '../ChartsPage.vue'
 import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
 import TeleportPage from '../TeleportPage.vue'
-import { render } from '../entry-server'
+import { render, renderPath } from '../entry-server'
+import { PLAYGROUND_PAGES, resolvePage } from '../pages'
 
 /**
  * SSR-стенд: проверяет утверждения `packages/granularity/docs/ssr.md` не
@@ -231,5 +233,36 @@ describe('серверный рендер: стек слоёв и тема', () 
     const second = await render(OverlayStackPage)
     expect(second.html).toContain('Тема тёмная: нет')
     expect(second.html).toBe(first.html)
+  })
+})
+
+/**
+ * Резолвер страниц — общий для сервера и клиента (`entry-server.renderPath` и
+ * `entry-client`). Разойдись стороны, и стенд, который существует ради поиска
+ * расхождений гидрации, начал бы их производить сам.
+ */
+describe('навигация стенда', () => {
+  it('каждый объявленный адрес ведёт на свою страницу', () => {
+    for (const page of PLAYGROUND_PAGES)
+      expect(resolvePage(page.path)).toBe(page.component)
+  })
+
+  it('адреса не повторяются', () => {
+    const paths = PLAYGROUND_PAGES.map(page => page.path)
+
+    expect(new Set(paths).size).toBe(paths.length)
+  })
+
+  it('неизвестный адрес отдаёт корневую страницу, а не пустоту', () => {
+    expect(resolvePage('/нет-такой')).toBe(PLAYGROUND_PAGES[0]!.component)
+  })
+
+  it('рендер по адресу отдаёт ту же разметку, что и рендер компонентом', async () => {
+    const [byPath, byComponent] = await Promise.all([
+      renderPath('/charts'),
+      render(ChartsPage),
+    ])
+
+    expect(byPath.html).toBe(byComponent.html)
   })
 })

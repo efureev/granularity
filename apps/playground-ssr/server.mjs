@@ -30,6 +30,25 @@ function renderTeleports(teleports) {
     .join('\n')
 }
 
+/**
+ * Шапка навигации собирается на сервере и живёт **вне** `#app`.
+ *
+ * Обычная разметка, а не компонент: внутри приложения она попала бы в гидрацию
+ * и в снимки страниц, то есть каждая фикстура обросла бы чужим DOM. Список
+ * страниц при этом один — из `pages.ts`.
+ */
+function renderNav(pages, pathname) {
+  const links = pages
+    .map(({ path, title, about }) => {
+      const current = path === pathname ? ' aria-current="page"' : ''
+
+      return `<a href="${path}"${current} title="${about}">${title}</a>`
+    })
+    .join('\n')
+
+  return `<nav class="playground-nav">${links}</nav>`
+}
+
 const server = createHttpServer((request, response) => {
   vite.middlewares(request, response, async () => {
     try {
@@ -38,10 +57,13 @@ const server = createHttpServer((request, response) => {
         await readFile(new URL('./index.html', import.meta.url), 'utf8'),
       )
 
-      const { render } = await vite.ssrLoadModule('/src/entry-server.ts')
-      const { html, teleports } = await render()
+      const { renderPath } = await vite.ssrLoadModule('/src/entry-server.ts')
+      const { PLAYGROUND_PAGES } = await vite.ssrLoadModule('/src/pages.ts')
+      const pathname = new URL(request.url ?? '/', 'http://localhost').pathname
+      const { html, teleports } = await renderPath(pathname)
 
       const page = template
+        .replace('<!--app-nav-->', renderNav(PLAYGROUND_PAGES, pathname))
         .replace('<!--app-html-->', html)
         .replace('<!--app-teleports-->', renderTeleports(teleports))
 

@@ -4,8 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>granularity — SSR</title>
+    <style>
+      .playground-nav { display: flex; flex-wrap: wrap; gap: .75rem; padding: .75rem 1rem; border-bottom: 1px solid #d4d4d8; font: 14px/1.4 system-ui, sans-serif }
+      .playground-nav a { color: #3f3f46; text-decoration: none }
+      .playground-nav a[aria-current] { color: #4f46e5; font-weight: 600 }
+    </style>
   </head>
   <body>
+    <!-- Шапка вне `#app`: она не должна попадать ни в гидрацию, ни в снимки страниц. -->
+    <!--app-nav-->
     <div id="app"><!--app-html--></div>
     <!--app-teleports-->
     <script type="module" src="/src/entry-client.ts"></script>
