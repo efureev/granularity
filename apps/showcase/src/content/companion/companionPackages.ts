@@ -116,7 +116,6 @@ function sparklineApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'data', type: '(number | null)[] | GrChartPoint[]', description: 'Ряд значений. `null` — пропуск: линия рвётся.' },
         { name: 'variant', type: `'line' | 'area'`, default: `'line'`, description: 'С заливкой под линией или без.' },
         { name: 'color', type: 'string', description: 'Цвет линии. Не задан — токен `--gr-sparkline-color`, то есть первая роль палитры серий.' },
-        { name: 'showLastPoint', type: 'boolean', default: 'true', description: 'Маркер последнего значения — того, ради которого спарклайн обычно и ставят.' },
         { name: 'summary', type: 'boolean', default: 'true', description: 'Автоматическая текстовая сводка: направление, края, размах. Она и становится именем картинки.' },
         { name: 'ariaLabel', type: 'string', description: 'Своё имя вместо сводки.' },
         { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Формат чисел в сводке.' },
@@ -507,7 +506,7 @@ export const companionPackages: CompanionPackage[] = [
           {
             id: 'charts-sparkline-basic',
             title: 'Next to a number',
-            description: 'Спарклайн отвечает на один вопрос — куда оно движется. Точное значение даёт число рядом, форму ряда — линия; читается слева направо, правый край это «сейчас», и там же маркер текущего значения.',
+            description: 'Спарклайн отвечает на один вопрос — куда оно движется. Точное значение даёт число рядом, форму ряда — линия; читается слева направо, правый край это «сейчас».',
             previewKey: 'extra-charts-sparkline-basic',
             note: 'Осей и подписей нет намеренно: с ними линия перестанет читаться боковым зрением за долю секунды, ради которой её и ставят. Концы периода подписывает карточка.',
           },

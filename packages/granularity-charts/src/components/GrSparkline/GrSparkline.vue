@@ -9,8 +9,8 @@ import { linearScale } from '../../chart/chartScale'
 import { type GrChartPoint, normalizeChartData } from '../../chart/chartModel'
 import { areaPath, linePath, type PathPoint } from '../../chart/chartPath'
 import {
+  sparklineCanvasClass,
   sparklineFillOpacity,
-  sparklinePointStroke,
   sparklineRootClass,
   sparklineStroke,
   sparklineStrokeWidth,
@@ -36,7 +36,6 @@ export interface GrSparklineProps {
   variant?: 'line' | 'area'
   /** Цвет линии. Не задан — токен `--gr-sparkline-color`. */
   color?: string
-  showLastPoint?: boolean
   /** Автоматическая текстовая сводка для скринридера. */
   summary?: boolean
   valueFormat?: GrChartNumberFormat
@@ -50,7 +49,6 @@ const props = withDefaults(defineProps<GrSparklineProps>(), {
   // заглянет в `GrConfigProvider`.
   variant: undefined,
   color: undefined,
-  showLastPoint: undefined,
   summary: undefined,
   valueFormat: undefined,
   locale: undefined,
@@ -60,7 +58,6 @@ const props = withDefaults(defineProps<GrSparklineProps>(), {
 const { t, locale: i18nLocale } = useGranularityTranslations()
 
 const resolvedVariant = useGrComponentProp('GrSparkline', 'variant', () => props.variant, 'line' as const)
-const resolvedShowLastPoint = useGrComponentProp('GrSparkline', 'showLastPoint', () => props.showLastPoint, true)
 const resolvedSummary = useGrComponentProp('GrSparkline', 'summary', () => props.summary, true)
 const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
 
@@ -88,27 +85,29 @@ const scales = computed(() => ({
   y: linearScale(data.value.yDomain, [VIEW_HEIGHT, 0]),
 }))
 
-const points = computed<PathPoint[]>(() => (series.value?.points ?? []).map(point => ({
-  x: scales.value.x.scale(point.x),
-  y: point.y === null ? null : scales.value.y.scale(point.y),
-})))
+const points = computed<PathPoint[]>(() => {
+  const mapped: PathPoint[] = (series.value?.points ?? []).map(point => ({
+    x: scales.value.x.scale(point.x),
+    y: point.y === null ? null : scales.value.y.scale(point.y),
+  }))
+
+  const solid = mapped.filter(point => point.y !== null)
+
+  /**
+   * Единственное значение растягивается в горизонтальную линию во всю ширину.
+   *
+   * Отрезок нулевой длины не рисует ни один рендерер, и холст остался бы
+   * пустым — а пустой холст читается как «нет данных». Одна точка означает
+   * другое: «изменений пока нет», и плоская линия говорит это ровно.
+   */
+  if (solid.length === 1)
+    return [{ x: 0, y: solid[0]!.y }, { x: VIEW_WIDTH, y: solid[0]!.y }]
+
+  return mapped
+})
 
 const linePathD = computed(() => linePath(points.value))
 const areaPathD = computed(() => (resolvedVariant.value === 'area' ? areaPath(points.value, VIEW_HEIGHT) : ''))
-
-const lastPoint = computed(() => {
-  if (!resolvedShowLastPoint.value)
-    return null
-
-  for (let i = points.value.length - 1; i >= 0; i--) {
-    const point = points.value[i]!
-
-    if (point.y !== null)
-      return point as { x: number, y: number }
-  }
-
-  return null
-})
 
 const numberFormat = computed<GrChartNumberFormat>(() => ({
   locale: resolvedLocale.value,
@@ -151,46 +150,38 @@ const label = computed(() => {
 </script>
 
 <template>
-  <svg
-    :class="sparklineRootClass"
-    :viewBox="`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`"
-    preserveAspectRatio="none"
-    role="img"
-    :aria-label="label"
-    data-gr-sparkline
-  >
-    <path
-      v-if="areaPathD"
-      :d="areaPathD"
-      :fill="color ?? sparklineStroke"
-      :fill-opacity="sparklineFillOpacity"
-      stroke="none"
-    />
-    <path
-      v-if="linePathD"
-      :d="linePathD"
-      fill="none"
-      :stroke="color ?? sparklineStroke"
-      :stroke-width="sparklineStrokeWidth"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      vector-effect="non-scaling-stroke"
-      data-gr-sparkline-line
-    />
-    <!--
-      Маркер — нулевой отрезок с круглым торцом, а не `<circle>`: холст
-      растянут по контейнеру, и круг превратился бы в эллипс. Штрих от
-      растяжения защищён `vector-effect`, а вместе с ним и торец.
-    -->
-    <path
-      v-if="lastPoint"
-      :d="`M ${lastPoint.x} ${lastPoint.y} L ${lastPoint.x} ${lastPoint.y}`"
-      fill="none"
-      :stroke="color ?? sparklinePointStroke"
-      stroke-width="4"
-      stroke-linecap="round"
-      vector-effect="non-scaling-stroke"
-      data-gr-sparkline-point
-    />
-  </svg>
+  <span :class="sparklineRootClass" role="img" :aria-label="label" data-gr-sparkline>
+    <!-- Смысл несёт имя обёртки: рисунок для скринридера — декорация. -->
+    <svg
+      :class="sparklineCanvasClass"
+      :viewBox="`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        v-if="areaPathD"
+        :d="areaPathD"
+        :fill="color ?? sparklineStroke"
+        :fill-opacity="sparklineFillOpacity"
+        stroke="none"
+      />
+      <!--
+        Торцы — `butt`, а не `round`: холст растянут неравномерно, и круглый
+        торец приезжает сплющенной линзой. Концы ряда — граница данных, им
+        скругление и не нужно; стыки внутри линии остаются круглыми.
+      -->
+      <path
+        v-if="linePathD"
+        :d="linePathD"
+        fill="none"
+        :stroke="color ?? sparklineStroke"
+        :stroke-width="sparklineStrokeWidth"
+        stroke-linecap="butt"
+        stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
+        data-gr-sparkline-line
+      />
+    </svg>
+  </span>
 </template>

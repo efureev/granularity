@@ -45,16 +45,11 @@ describe('GrSparkline', () => {
     expect(line.attributes('vector-effect')).toBe('non-scaling-stroke')
   })
 
-  it('маркер последнего значения — нулевой отрезок с круглым торцом', () => {
-    const point = factory().find('[data-gr-sparkline-point]')
+  it('торцы линии чистые: круглый торец в растянутом холсте даёт линзу', () => {
+    const line = factory().find('[data-gr-sparkline-line]')
 
-    expect(point.attributes('stroke-linecap')).toBe('round')
-    expect(point.attributes('vector-effect')).toBe('non-scaling-stroke')
-    expect(point.attributes('d')).toMatch(/^M ([\d.]+) ([\d.]+) L \1 \2$/)
-  })
-
-  it('маркер отключается пропом', () => {
-    expect(factory({ showLastPoint: false }).find('[data-gr-sparkline-point]').exists()).toBe(false)
+    expect(line.attributes('stroke-linecap')).toBe('butt')
+    expect(line.attributes('stroke-linejoin')).toBe('round')
   })
 
   it('area добавляет заливку тише линии', () => {
@@ -77,15 +72,18 @@ describe('GrSparkline', () => {
     expect(wrapper.attributes('aria-label')).toContain('rising')
   })
 
+  it('единственное значение рисуется плоской линией, а не пустым холстом', () => {
+    // Пустой холст читался бы как «нет данных»; одна точка означает другое —
+    // «изменений пока нет».
+    const d = factory({ data: [42] }).find('[data-gr-sparkline-line]').attributes('d')!
+
+    expect(d).toMatch(/^M 0 [\d.]+ L 100 [\d.]+$/)
+  })
+
   it('вырожденные данные не роняют компонент', () => {
     expect(() => factory({ data: [] })).not.toThrow()
     expect(() => factory({ data: [null, null] })).not.toThrow()
     expect(factory({ data: [] }).attributes('aria-label')).toBe('Sparkline')
   })
 
-  it('маркер последней точки пропускает хвостовой пропуск', () => {
-    const wrapper = factory({ data: [1, 5, null] })
-
-    expect(wrapper.find('[data-gr-sparkline-point]').exists()).toBe(true)
-  })
 })

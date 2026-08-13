@@ -7,7 +7,6 @@
  */
 export interface GrSparklineConfigurableProps {
   variant: 'line' | 'area'
-  showLastPoint: boolean
   summary: boolean
 }
 

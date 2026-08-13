@@ -1,6 +1,6 @@
 import { splitClassTokens } from '../../internal/classTokens'
 
-import { sparklineRootClass } from './grSparklineStyles'
+import { sparklineCanvasClass, sparklineRootClass } from './grSparklineStyles'
 
 /**
  * Класс корня живёт в `.ts`-хелпере, а значит уезжает в общий `dist/chunks/`,
@@ -9,4 +9,7 @@ import { sparklineRootClass } from './grSparklineStyles'
  *
  * Рамы у спарклайна нет, поэтому `chartFrameSafelist` сюда не подмешивается.
  */
-export const grSparklineSafelist: string[] = [...splitClassTokens(sparklineRootClass)]
+export const grSparklineSafelist: string[] = [...new Set([
+  ...splitClassTokens(sparklineRootClass),
+  ...splitClassTokens(sparklineCanvasClass),
+])]
