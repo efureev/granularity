@@ -8,9 +8,17 @@
 
 export const gridClass = 'relative grid w-full'
 
+/**
+ * Подложка — место, куда встанет переносимый виджет.
+ *
+ * Отступает внутрь своей ячейки: без отступа её пунктир ложится ровно на
+ * границу соседа, и там, где стороны совпадают, рамка выглядывает из-под
+ * чужой карточки — читается как дефект вёрстки, а не как показанное место.
+ */
 export const placeholderClass = [
   'pointer-events-none',
-  'rounded-[var(--gr-dashboard-frame-placeholder-radius,var(--gr-radius-md))]',
+  'm-[var(--gr-dashboard-frame-placeholder-inset,4px)]',
+  'rounded-[var(--gr-dashboard-frame-placeholder-radius,var(--gr-radius-lg))]',
   'bg-[var(--gr-dashboard-frame-placeholder-bg,var(--gr-muted))]',
   'border-2 border-dashed',
   'border-[var(--gr-dashboard-frame-placeholder-brd,var(--gr-primary))]',
@@ -36,12 +44,19 @@ export const dragHandleClass = `${handleBaseClass} cursor-grab`
 
 export const dragHandleGrabbedClass = 'cursor-grabbing text-[var(--gr-primary)]'
 
+/**
+ * Уголок растягивания в правом нижнем углу виджета.
+ *
+ * Скруглён по тому же радиусу, что и сам виджет: прямой угол на скруглённой
+ * карточке торчит за её край и выглядит приклеенным снаружи, а не частью её.
+ */
 export const resizeHandleClass = [
   'absolute bottom-0 right-0 z-1',
   'w-[var(--gr-dashboard-frame-resize-size,14px)] h-[var(--gr-dashboard-frame-resize-size,14px)]',
   'bg-transparent p-0',
   'border-0 border-b-2 border-r-2 border-solid',
   'border-[var(--gr-dashboard-frame-handle-color,var(--gr-muted-fg))]',
+  'rounded-br-[var(--gr-dashboard-frame-resize-radius,var(--gr-radius-lg))]',
   'cursor-nwse-resize [touch-action:none]',
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
   'hover:border-[var(--gr-primary)]',

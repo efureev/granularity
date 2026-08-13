@@ -25,7 +25,7 @@ export const bodySizes: Record<GrDashboardItemSize, string> = {
 export const rootClass = [
   'relative min-w-0 min-h-0',
   'overflow-hidden',
-  'rounded-[var(--gr-dashboard-item-radius,var(--gr-radius-md))]',
+  'rounded-[var(--gr-dashboard-item-radius,var(--gr-radius-lg))]',
 ].join(' ')
 
 /** Виджет, который сейчас несут: он один поднят над сеткой. */
