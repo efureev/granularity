@@ -444,3 +444,13 @@ describe('GrBreadcrumbs — схлопывание по ширине', () => {
     expect(resolveBreadcrumbsFit({ ...common, gapWidth: 4 })).toBeLessThan(5)
   })
 })
+
+describe('GrBreadcrumbs — иконка пункта', () => {
+const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+
+  it('принимает компонент наравне с классом', () => {
+    const wrapper = mountPath({ items: [{ label: 'Главная', href: '/', icon: CustomIcon }, { label: 'Тут' }] })
+
+    expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
+  })
+})

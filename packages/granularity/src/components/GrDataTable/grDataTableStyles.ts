@@ -40,7 +40,6 @@ export const columnHandleClass = 'inline-flex shrink-0 cursor-grab items-center 
 
 export const columnHandleActiveClass = 'opacity-100'
 
-export const columnHandleIconClass = 'i-lucide-grip-vertical block'
 
 /** Переносимая колонка гасится, чтобы было видно, что она «поднята». */
 export const columnDraggingClass = 'bg-[var(--gr-muted)]'

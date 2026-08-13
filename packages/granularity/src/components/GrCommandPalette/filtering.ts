@@ -1,3 +1,5 @@
+import type { Component } from 'vue'
+
 import { matchesQueryParts, normalizeOptionQuery } from '../shared/optionFilter'
 
 /** Команда палитры. `id` обязателен — он же ключ рендера и цель `aria-activedescendant`. */
@@ -6,8 +8,11 @@ export type GrCommandItem = {
   label: string
   /** Пояснение под меткой. */
   description?: string
-  /** UnoCSS-класс иконки (например `i-lucide-file-plus`). */
-  icon?: string
+  /**
+   * Иконка команды: Vue-компонент либо класс иконки вашей UnoCSS-сборки
+   * (`'i-lucide-file-plus'` — тогда нужен ваш `presetIcons`).
+   */
+  icon?: string | Component
   /** Подсказка сочетания клавиш — массив клавиш, каждая рисуется отдельным `GrKbd`. */
   shortcut?: string[]
   /** Заголовок группы, под которой команда показывается в списке. */

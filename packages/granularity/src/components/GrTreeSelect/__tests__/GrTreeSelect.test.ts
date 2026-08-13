@@ -123,7 +123,7 @@ describe('GrTreeSelect (unit)', () => {
     await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const chevronIcon = wrapper.find('[data-testid="gr-tree-select-chevron"] > span')
+    const chevronIcon = wrapper.find('[data-testid="gr-tree-select-chevron"] > svg')
     expect(chevronIcon.exists()).toBe(true)
     expect(chevronIcon.classes()).toContain('rotate-180')
 

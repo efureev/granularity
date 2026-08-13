@@ -7605,8 +7605,8 @@
           },
           {
             "name": "icon",
-            "description": "UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`).",
-            "type": "string | undefined",
+            "description": "Символ вместо встроенной звезды: Vue-компонент либо класс иконки вашей UnoCSS-сборки (`'i-lucide-heart'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).",
+            "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -9193,8 +9193,8 @@
           },
           {
             "name": "icon",
-            "description": "UnoCSS-класс иконки слева от блока (например `i-lucide-users`).",
-            "type": "string | undefined",
+            "description": "Иконка слева от блока: Vue-компонент либо класс иконки вашей UnoCSS-сборки (`'i-lucide-users'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).",
+            "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -10559,17 +10559,17 @@
           },
           {
             "name": "expandIcon",
-            "description": "",
-            "type": "string | undefined",
+            "description": "Иконка свёрнутого узла: Vue-компонент либо класс иконки вашей UnoCSS-сборки (`'i-lucide-plus'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`). Не задана — встроенная стрелка.",
+            "type": "string | Component | undefined",
             "required": false,
-            "default": "\"i-lucide-chevron-right\""
+            "default": "undefined"
           },
           {
             "name": "collapseIcon",
-            "description": "",
-            "type": "string | undefined",
+            "description": "Иконка раскрытого узла. Не задана — та же встроенная стрелка, повёрнутая.",
+            "type": "string | Component | undefined",
             "required": false,
-            "default": "\"i-lucide-chevron-right\""
+            "default": "undefined"
           },
           {
             "name": "toggleIconRotate",
@@ -10713,10 +10713,10 @@
           },
           {
             "name": "dragHandleIcon",
-            "description": "",
-            "type": "string | undefined",
+            "description": "Иконка ручки переноса: компонент, класс иконки или ничего — тогда встроенная.",
+            "type": "string | Component | undefined",
             "required": false,
-            "default": "\"i-lucide-grip-vertical\""
+            "default": "undefined"
           },
           {
             "name": "allowDrop",

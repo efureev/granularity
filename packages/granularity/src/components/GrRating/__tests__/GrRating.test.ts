@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { defineComponent, h } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
@@ -245,5 +245,17 @@ describe('GrRating — name (нативная форма)', () => {
     const wrapper = mount(GrRating, { props: { modelValue: 3, ariaLabel: 'Score' } })
     expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
     wrapper.unmount()
+  })
+})
+
+describe('GrRating — символ иконкой', () => {
+const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+
+  it('класс от потребителя уезжает на `span`, компонент рисуется как есть', () => {
+    const byClass = mount(GrRating, { props: { modelValue: 3, icon: 'i-lucide-heart' } })
+    expect(byClass.find('span.i-lucide-heart').exists()).toBe(true)
+
+    const byComponent = mount(GrRating, { props: { modelValue: 3, icon: CustomIcon } })
+    expect(byComponent.find('[data-custom-icon]').exists()).toBe(true)
   })
 })

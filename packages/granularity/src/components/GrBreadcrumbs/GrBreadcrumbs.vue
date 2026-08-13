@@ -4,6 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import GrLink from '../GrLink/GrLink.vue'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { iconClass, iconTag } from '../shared/icon'
 
 import {
   breadcrumbsCurrentClass,
@@ -341,7 +342,12 @@ async function expand(): Promise<void> {
             :aria-current="isCurrent(entry.index) ? 'page' : undefined"
           >
             <slot name="item" :item="entry.item" :index="entry.index" :is-current="isCurrent(entry.index)">
-              <span v-if="entry.item.icon" :class="[breadcrumbsItemIconClass, entry.item.icon]" aria-hidden="true" />
+              <component
+                :is="iconTag(entry.item.icon)"
+                v-if="entry.item.icon"
+                :class="[breadcrumbsItemIconClass, iconClass(entry.item.icon)]"
+                aria-hidden="true"
+              />
               <span :class="breadcrumbsLabelClass">{{ entry.item.label }}</span>
             </slot>
           </GrLink>
@@ -360,7 +366,12 @@ async function expand(): Promise<void> {
             tabindex="-1"
           >
             <slot name="item" :item="entry.item" :index="entry.index" :is-current="isCurrent(entry.index)">
-              <span v-if="entry.item.icon" :class="[breadcrumbsItemIconClass, entry.item.icon]" aria-hidden="true" />
+              <component
+                :is="iconTag(entry.item.icon)"
+                v-if="entry.item.icon"
+                :class="[breadcrumbsItemIconClass, iconClass(entry.item.icon)]"
+                aria-hidden="true"
+              />
               <span :class="breadcrumbsLabelClass">{{ entry.item.label }}</span>
             </slot>
           </span>

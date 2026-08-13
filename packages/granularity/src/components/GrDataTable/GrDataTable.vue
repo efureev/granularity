@@ -22,7 +22,6 @@ import {
   columnDropBeforeClass,
   columnHandleActiveClass,
   columnHandleClass,
-  columnHandleIconClass,
   columnPinnedClass,
   columnPinnedLeftEdgeClass,
   columnPinnedRightEdgeClass,
@@ -42,6 +41,8 @@ import {
 } from './grDataTableStyles'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
+import IconGripVertical from '~icons/lucide/grip-vertical'
+import IconLoaderCircle from '~icons/lucide/loader-circle'
 import IconArrowDown from '~icons/lucide/arrow-down'
 
 /**
@@ -1127,7 +1128,7 @@ defineExpose({
               @focus="columnRoving.setActive(String(col.key))"
               @click.stop
             >
-              <span :class="columnHandleIconClass" aria-hidden="true" />
+              <IconGripVertical class="block" aria-hidden="true" />
             </button>
             <button
               v-if="col.sortable"
@@ -1193,7 +1194,7 @@ defineExpose({
         <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
           <slot name="loading">
             <span class="inline-flex items-center gap-2">
-              <span class="i-lucide-loader-circle block animate-spin" :class="spinnerClass" aria-hidden="true" />
+              <IconLoaderCircle class="block animate-spin" :class="spinnerClass" aria-hidden="true" />
               <span>{{ resolvedLoadingText }}</span>
             </span>
           </slot>

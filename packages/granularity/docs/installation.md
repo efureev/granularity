@@ -99,6 +99,56 @@ export default defineConfig({
 Дальнейшие секции показывают, как **наращивать** этот базовый пример
 опциями по мере необходимости. Все эти опции — необязательные.
 
+## Иконки
+
+**Свои иконки пакет привозит с собой.** Стрелка селекта, крестик очистки,
+галочка выбранной опции, спиннер, ручка переноса — всё это компилируется в
+`dist` при сборке пакета. Ставить `unplugin-icons` или коллекцию иконок ради
+них не нужно, и от вашего `uno.config.ts` они не зависят.
+
+**Своя иконка приходит двумя способами.** Пропы `icon` (`GrTabs`,
+`GrBreadcrumbs`, `GrStatistic`, `GrSidebarItem`, `GrBottomNav`,
+`GrCommandPalette`, `GrRating`, `GrTree`) принимают либо Vue-компонент, либо
+класс иконки:
+
+```vue
+<script setup>
+import IconUser from '~icons/lucide/user'
+</script>
+
+<template>
+  <!-- Компонент: работает всегда, ничего настраивать не нужно. -->
+  <GrTabs :tabs="[{ value: 'a', label: 'Профиль', icon: IconUser }]" />
+
+  <!-- Класс: CSS для него генерирует ВАШ конфиг, см. ниже. -->
+  <GrTabs :tabs="[{ value: 'a', label: 'Профиль', icon: 'i-lucide-user' }]" />
+</template>
+```
+
+Класс `i-lucide-*` — это утилита UnoCSS, и делает её не пакет, а ваша сборка.
+Хотите передавать иконки классами — добавьте пресет иконок и коллекцию себе:
+
+```bash
+yarn add -D @unocss/preset-icons @iconify-json/lucide
+```
+
+```ts
+import { presetIcons } from 'unocss'
+
+export default defineConfig({
+  presets: [
+    presetMini(),
+    presetGranularNode({ providers: [granularityProvider] }),
+    presetIcons({ extraProperties: { display: 'inline-block' } }),
+  ],
+})
+```
+
+Без пресета класс останется классом: место под иконку будет, картинки не будет,
+и сборка при этом пройдёт молча. Со стороны пакета границу держит гейт
+`src/__tests__/iconContract.test.ts` — он не даёт собственным иконкам пакета
+снова уехать в классы.
+
 ### Сужаем список компонентов
 
 Чтобы не тянуть в бандл CSS всех компонентов — явно выбираем нужные:

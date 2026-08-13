@@ -44,6 +44,11 @@ import {
   type GrSelectView,
 } from './grSelectStyles'
 
+import IconCheck from '~icons/lucide/check'
+import IconChevronDown from '~icons/lucide/chevron-down'
+import IconLoaderCircle from '~icons/lucide/loader-circle'
+import IconX from '~icons/lucide/x'
+
 export type {
   GrSelectModelValue,
   GrSelectOption,
@@ -890,7 +895,7 @@ const themeAttrs = useGrThemeAttrs()
       data-testid="gr-select-chevron"
       class="absolute top-1/2 -translate-y-1/2 right-3 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
     >
-      <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
+      <IconChevronDown class="block h-4 w-4" aria-hidden="true" />
     </span>
   </div>
 
@@ -986,7 +991,7 @@ const themeAttrs = useGrThemeAttrs()
         data-testid="gr-select-chevron"
         class="shrink-0 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
       >
-        <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
+        <IconChevronDown class="block h-4 w-4" aria-hidden="true" />
       </span>
     </button>
 
@@ -1021,7 +1026,7 @@ const themeAttrs = useGrThemeAttrs()
             class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--gr-radius-xs)] text-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
             @click.stop="removeValue(opt.value)"
           >
-            <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
+            <IconX class="block h-3 w-3" aria-hidden="true" />
           </button>
         </span>
       </GrBadge>
@@ -1049,7 +1054,7 @@ const themeAttrs = useGrThemeAttrs()
       :aria-label="resolvedClearLabel"
       @click.stop="clearSelection"
     >
-      <span class="i-lucide-x inline-block h-4 w-4" aria-hidden="true" />
+      <IconX class="inline-block h-4 w-4" aria-hidden="true" />
     </button>
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
@@ -1099,7 +1104,7 @@ const themeAttrs = useGrThemeAttrs()
               aria-live="polite"
             >
               <slot name="loading">
-                <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+                <IconLoaderCircle class="block h-4 w-4 animate-spin" aria-hidden="true" />
                 <span>{{ resolvedLoadingText }}</span>
               </slot>
             </div>
@@ -1191,11 +1196,12 @@ const themeAttrs = useGrThemeAttrs()
                   >
                     <slot name="option" :option="child.option" :selected="isSelected(child.option.value)">
                       <span class="flex items-center gap-2 min-w-0">
-                        <span
-                          class="inline-block h-4 w-4 shrink-0"
-                          :class="isSelected(child.option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
-                          aria-hidden="true"
-                        />
+                        <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
+                          <IconCheck
+                            v-if="isSelected(child.option.value)"
+                            class="block h-4 w-4 text-[var(--gr-primary)]"
+                          />
+                        </span>
                         <span class="truncate">{{ child.option.label }}</span>
                       </span>
                     </slot>
@@ -1225,11 +1231,12 @@ const themeAttrs = useGrThemeAttrs()
                 >
                   <slot name="option" :option="row.option" :selected="isSelected(row.option.value)">
                     <span class="flex items-center gap-2 min-w-0">
-                      <span
-                        class="inline-block h-4 w-4 shrink-0"
-                        :class="isSelected(row.option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
-                        aria-hidden="true"
-                      />
+                      <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
+                        <IconCheck
+                          v-if="isSelected(row.option.value)"
+                          class="block h-4 w-4 text-[var(--gr-primary)]"
+                        />
+                      </span>
                       <span class="truncate">{{ row.option.label }}</span>
                     </span>
                   </slot>

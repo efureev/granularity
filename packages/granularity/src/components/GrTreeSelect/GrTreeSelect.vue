@@ -23,6 +23,11 @@ import type { GrInputSize } from '../GrInput/GrInput.vue'
 import type { GrTreeSelectModelValue, GrTreeSelectProps } from './grTreeSelectTypes'
 import { grTreeSelectClass, grTreeSelectPanelClass, grTreeSelectStateClass, paddingX, trailingZoneWidth } from './grTreeSelectStyles'
 
+import IconCheck from '~icons/lucide/check'
+import IconChevronDown from '~icons/lucide/chevron-down'
+import IconLoaderCircle from '~icons/lucide/loader-circle'
+import IconX from '~icons/lucide/x'
+
 export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'update:modelValue', value: GrTreeSelectModelValue): void
   (e: 'change', value: GrTreeSelectModelValue): void
@@ -616,7 +621,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-label="t('gr.common.clear', 'Clear')"
         @click.stop="clear"
       >
-        <span class="i-lucide-x inline-block h-4 w-4" />
+        <IconX class="inline-block h-4 w-4" aria-hidden="true" />
       </button>
 
       <span
@@ -625,9 +630,10 @@ const themeAttrs = useGrThemeAttrs()
         data-gr-tree-select-chevron
         class="absolute top-1/2 -translate-y-1/2 right-3 text-[var(--gr-muted-fg)] pointer-events-none"
       >
-        <span
-          class="i-lucide-chevron-down inline-block h-4 w-4 transition-transform duration-[var(--gr-duration-fast)]"
+        <IconChevronDown
+          class="inline-block h-4 w-4 transition-transform duration-[var(--gr-duration-fast)]"
           :class="open ? 'rotate-180' : ''"
+          aria-hidden="true"
         />
       </span>
 
@@ -709,7 +715,7 @@ const themeAttrs = useGrThemeAttrs()
               :class="grTreeSelectStateClass"
             >
               <slot name="loading">
-                <span class="i-lucide-loader-circle block h-4 w-4 animate-spin" aria-hidden="true" />
+                <IconLoaderCircle class="block h-4 w-4 animate-spin" aria-hidden="true" />
                 <span>{{ t('gr.treeSelect.loading', 'Loading…') }}</span>
               </slot>
             </div>
@@ -753,9 +759,10 @@ const themeAttrs = useGrThemeAttrs()
                       v-if="!checkboxMode"
                       data-gr-tree-select-check
                       class="inline-block h-4 w-4 shrink-0"
-                      :class="selectedKeySet.has(node.key) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
                       aria-hidden="true"
-                    />
+                    >
+                      <IconCheck v-if="selectedKeySet.has(node.key)" class="block h-4 w-4 text-[var(--gr-primary)]" />
+                    </span>
                     <span class="truncate">{{ node.label }}</span>
                   </div>
                 </slot>

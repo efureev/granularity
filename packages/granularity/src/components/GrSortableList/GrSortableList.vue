@@ -15,7 +15,6 @@ import {
   emptyClass,
   handleClass,
   handleDisabledClass,
-  handleIconClass,
   indicatorAfterClass,
   indicatorBeforeClass,
   listClass,
@@ -25,6 +24,8 @@ import {
   rowGrabbedClass,
   rowLayoutClass,
 } from './grSortableListStyles'
+
+import IconGripVertical from '~icons/lucide/grip-vertical'
 
 export interface GrSortableListProps<TItem = unknown> {
   /** Набор в текущем порядке. `v-model`: наружу уходит новый массив, вход не мутируется. */
@@ -334,7 +335,7 @@ defineExpose({
             :index="index"
             :disabled="disabled"
           >
-            <span :class="handleIconClass" aria-hidden="true" />
+            <IconGripVertical class="block" aria-hidden="true" />
           </slot>
         </button>
 

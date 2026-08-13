@@ -6,7 +6,6 @@ import {
   statisticTitleClass,
   statisticTitleSizeBySize,
   statisticTrendClassByTrend,
-  statisticTrendIconByTrend,
   statisticTrendSizeBySize,
   statisticValueClassByTone,
   statisticValueSizeBySize,
@@ -22,7 +21,6 @@ export const grStatisticSafelist = [...new Set([
   ...Object.values(statisticValueClassByTone).flatMap(splitClassTokens),
   ...Object.values(statisticTrendClassByTrend).flatMap(splitClassTokens),
   // Иконки динамики приходят из мапы — как классы-маски их тоже надо сгенерировать.
-  ...Object.values(statisticTrendIconByTrend).flatMap(splitClassTokens),
   // Литералы из grStatisticStyles.ts (корень, подпись, типографика значения).
   ...splitClassTokens(statisticRootBase),
   ...splitClassTokens(statisticRootInteractiveClass),

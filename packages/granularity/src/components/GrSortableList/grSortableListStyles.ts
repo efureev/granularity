@@ -43,7 +43,6 @@ export const handleClass = 'flex shrink-0 items-center justify-center rounded-[v
 
 export const handleDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 
-export const handleIconClass = 'i-lucide-grip-vertical'
 
 export const contentClass = 'min-w-0 flex-1 text-[length:var(--gr-text-sm)]'
 

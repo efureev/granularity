@@ -33,6 +33,11 @@ import {
   type GrAutocompleteSize,
 } from './grAutocompleteStyles'
 
+import IconCheck from '~icons/lucide/check'
+import IconChevronDown from '~icons/lucide/chevron-down'
+import IconLoaderCircle from '~icons/lucide/loader-circle'
+import IconX from '~icons/lucide/x'
+
 export type {
   GrAutocompleteModelValue,
   GrAutocompleteOption,
@@ -887,7 +892,7 @@ const themeAttrs = useGrThemeAttrs()
               @click="removeValue(option.value)"
               @keydown="onChipKeydown($event, chipIndex, option.value)"
             >
-              <span class="i-lucide-x block h-3 w-3" aria-hidden="true" />
+              <IconX class="block h-3 w-3" aria-hidden="true" />
             </button>
           </span>
         </GrBadge>
@@ -938,7 +943,7 @@ const themeAttrs = useGrThemeAttrs()
         data-gr-autocomplete-spinner
         class="shrink-0 flex items-center text-[var(--gr-muted-fg)]"
       >
-        <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" aria-hidden="true" />
+        <IconLoaderCircle class="block h-4 w-4 animate-spin" aria-hidden="true" />
       </span>
 
       <button
@@ -950,7 +955,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-label="resolvedClearLabel"
         @click="clearSelection"
       >
-        <span class="i-lucide-x block h-4 w-4" aria-hidden="true" />
+        <IconX class="block h-4 w-4" aria-hidden="true" />
       </button>
 
       <span
@@ -958,7 +963,7 @@ const themeAttrs = useGrThemeAttrs()
         data-testid="gr-autocomplete-chevron"
         class="shrink-0 flex items-center text-[var(--gr-muted-fg)] pointer-events-none"
       >
-        <span class="i-lucide-chevron-down block h-4 w-4" aria-hidden="true" />
+        <IconChevronDown class="block h-4 w-4" aria-hidden="true" />
       </span>
     </div>
 
@@ -1055,11 +1060,9 @@ const themeAttrs = useGrThemeAttrs()
               >
                 <slot name="option" :option="option" :selected="isSelected(option.value)">
                   <span class="flex items-center gap-2 min-w-0">
-                    <span
-                      class="inline-block h-4 w-4 shrink-0"
-                      :class="isSelected(option.value) ? 'i-lucide-check text-[var(--gr-primary)]' : ''"
-                      aria-hidden="true"
-                    />
+                    <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
+                      <IconCheck v-if="isSelected(option.value)" class="block h-4 w-4 text-[var(--gr-primary)]" />
+                    </span>
                     <span class="truncate">{{ option.label }}</span>
                   </span>
                 </slot>
@@ -1081,7 +1084,7 @@ const themeAttrs = useGrThemeAttrs()
               <template v-if="isLoading">
                 <span data-gr-autocomplete-loading class="flex items-center gap-2">
                   <slot name="loading">
-                    <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" aria-hidden="true" />
+                    <IconLoaderCircle class="block h-4 w-4 animate-spin" aria-hidden="true" />
                     <span>{{ resolvedLoadingText }}</span>
                   </slot>
                 </span>

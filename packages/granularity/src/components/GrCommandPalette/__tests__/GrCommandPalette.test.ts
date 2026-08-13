@@ -1,4 +1,4 @@
-import { nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -200,7 +200,7 @@ describe('GrCommandPalette — структура listbox и состояния'
     expect(region.text()).toBe('Loading…')
 
     // Иконка спиннера декоративна: текст состояния читает регион.
-    expect(loading.find('.i-lucide-loader-2').attributes('aria-label')).toBeUndefined()
+    expect(loading.get('.animate-spin').attributes('aria-label')).toBeUndefined()
 
     const empty = await mountPalette()
     await empty.get('[data-testid="gr-command-palette-input"]').setValue('ничего такого нет')
@@ -356,5 +356,17 @@ describe('GrCommandPalette — IME-композиция', () => {
 
     expect(wrapper.emitted('select')).toBeUndefined()
     wrapper.unmount()
+  })
+})
+
+describe('GrCommandPalette — иконка команды', () => {
+const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+
+  it('принимает компонент наравне с классом', async () => {
+    const wrapper = await mountPalette({
+      items: [{ id: 'new', label: 'Новый документ', icon: CustomIcon }],
+    })
+
+    expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
   })
 })

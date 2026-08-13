@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../../i18n/adapter'
@@ -20,7 +20,7 @@ describe('GrStatistic', () => {
   it('строка динамики окрашивается по направлению', () => {
     const up = mount(GrStatistic, { props: { value: 10, trend: 'up', trendText: '+12%' } })
     expect(up.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-success-text)')
-    expect(up.get('[data-testid="gr-statistic-trend"]').html()).toContain('i-lucide-trending-up')
+    expect(up.get('[data-testid="gr-statistic-trend"]').find('svg').exists()).toBe(true)
 
     const down = mount(GrStatistic, { props: { value: 10, trend: 'down', trendText: '-3%' } })
     expect(down.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-danger-text)')
@@ -70,7 +70,7 @@ describe('GrStatistic — доступность динамики и загру�
       expect(hidden.text()).toBe(label)
       expect(hidden.classes()).toContain('sr-only')
       // Иконка направления остаётся декоративной: иначе диктор прочитает его дважды.
-      expect(wrapper.get('[data-testid="gr-statistic-trend"] .i-lucide-trending-up, [data-testid="gr-statistic-trend"] .i-lucide-trending-down, [data-testid="gr-statistic-trend"] .i-lucide-minus').attributes('aria-hidden')).toBe('true')
+      expect(wrapper.get('[data-testid="gr-statistic-trend"] svg').attributes('aria-hidden')).toBe('true')
     }
   })
 
@@ -332,5 +332,17 @@ describe('GrStatistic — перебор чисел', () => {
     await wrapper.setProps({ loading: false })
     await nextTick()
     expect(digits(wrapper)).toBe(1000)
+  })
+})
+
+describe('GrStatistic — иконка блока', () => {
+const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+
+  it('принимает и класс, и компонент', () => {
+    const byClass = mount(GrStatistic, { props: { value: 10, icon: 'i-lucide-users' } })
+    expect(byClass.find('span.i-lucide-users').exists()).toBe(true)
+
+    const byComponent = mount(GrStatistic, { props: { value: 10, icon: CustomIcon } })
+    expect(byComponent.find('[data-custom-icon]').exists()).toBe(true)
   })
 })

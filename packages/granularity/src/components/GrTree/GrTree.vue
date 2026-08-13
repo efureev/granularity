@@ -19,6 +19,13 @@ import { useDragSort } from '../../composables/useDragSort'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { iconClass, iconTag } from '../shared/icon'
+
+import IconCheck from '~icons/lucide/check'
+import IconChevronRight from '~icons/lucide/chevron-right'
+import IconGripVertical from '~icons/lucide/grip-vertical'
+import IconLoaderCircle from '~icons/lucide/loader-circle'
+import IconMinus from '~icons/lucide/minus'
 import type {
   GrTreeBranchLineColor,
   GrTreeNodeClass,
@@ -62,14 +69,14 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   checkStrictly: false,
   lazy: false,
   load: undefined,
-  expandIcon: 'i-lucide-chevron-right',
-  collapseIcon: 'i-lucide-chevron-right',
+  expandIcon: undefined,
+  collapseIcon: undefined,
   toggleIconRotate: true,
   branchLine: false,
   branchLineColor: undefined,
   branchLineActiveColor: undefined,
   draggable: false,
-  dragHandleIcon: 'i-lucide-grip-vertical',
+  dragHandleIcon: undefined,
   dragLabel: undefined,
   expandLabel: undefined,
   collapseLabel: undefined,
@@ -838,7 +845,11 @@ defineExpose<GrTreeInstance<T>>({
             @click.stop
             @pointerdown="onHandlePointerDown($event, row.node)"
         >
-          <span class="gr-tree__drag-icon" :class="treeProps.dragHandleIcon" />
+          <component
+              :is="iconTag(treeProps.dragHandleIcon, IconGripVertical)"
+              class="gr-tree__drag-icon"
+              :class="iconClass(treeProps.dragHandleIcon)"
+          />
         </button>
 
         <!-- tabindex="-1": внутри roving-композита интерактив не табируется,
@@ -853,16 +864,17 @@ defineExpose<GrTreeInstance<T>>({
             :aria-label="row.isExpanded ? collapseLabel : expandLabel"
             @click.stop="toggleExpand(row.node)"
         >
-          <span
+          <IconLoaderCircle
               v-if="row.isLoading"
               data-gr-tree-loading
-              class="gr-tree__toggle-icon animate-spin i-lucide-loader-circle"
+              class="gr-tree__toggle-icon animate-spin"
           />
-          <span
+          <component
+              :is="iconTag(row.isExpanded ? treeProps.collapseIcon : treeProps.expandIcon, IconChevronRight)"
               v-else
               class="gr-tree__toggle-icon"
               :class="[
-              row.isExpanded ? treeProps.collapseIcon : treeProps.expandIcon,
+              iconClass(row.isExpanded ? treeProps.collapseIcon : treeProps.expandIcon),
               row.isExpanded && treeProps.toggleIconRotate ? 'gr-tree__toggle-icon--expanded' : '',
               resolveNodeClass(treeProps.toggleIconClass, row),
             ]"
@@ -890,10 +902,10 @@ defineExpose<GrTreeInstance<T>>({
             aria-hidden="true"
             @click.stop="toggleChecked(row.node)"
         >
-          <span
+          <component
+              :is="checkStateOf(row.node.key) === 'half' ? IconMinus : IconCheck"
               v-if="checkStateOf(row.node.key) !== 'unchecked'"
               class="gr-tree__checkbox-mark"
-              :class="checkStateOf(row.node.key) === 'half' ? 'i-lucide-minus' : 'i-lucide-check'"
           />
         </span>
 

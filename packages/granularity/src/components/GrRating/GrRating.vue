@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, type Component } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { iconClass, iconTag } from '../shared/icon'
 
 import {
   ratingFillClassByTone,
@@ -32,7 +33,7 @@ export type {
  *
  * Символ по умолчанию рисуется инлайновым SVG (звезда с `fill="currentColor"`) —
  * иконочные шрифты-маски `i-lucide-star` дают только контур. Свой символ
- * задаётся пропом `icon` (UnoCSS-класс иконки) или слотом `#symbol`.
+ * задаётся пропом `icon` (Vue-компонент или класс иконки) либо слотом `#symbol`.
  */
 export interface GrRatingProps {
   /** Текущая оценка. Дробная (`3.5`) поддерживается при `allowHalf`. */
@@ -53,8 +54,12 @@ export interface GrRatingProps {
   required?: boolean
   /** Повторный клик по текущей оценке сбрасывает её в `0`. */
   clearable?: boolean
-  /** UnoCSS-класс иконки вместо встроенной звезды (например `i-lucide-heart`). */
-  icon?: string
+  /**
+   * Символ вместо встроенной звезды: Vue-компонент либо класс иконки вашей
+   * UnoCSS-сборки (`'i-lucide-heart'` — тогда нужен ваш `presetIcons`,
+   * см. `docs/installation.md`).
+   */
+  icon?: string | Component
   /** Показывать числовую подпись справа от шкалы. */
   showText?: boolean
   /** Формат подписи. По умолчанию — само значение. Сильнее `texts`. */
@@ -326,7 +331,7 @@ function onKeydown(event: KeyboardEvent): void {
         <!-- Нижний слой — «пустой» символ, поверх него обрезанный по ширине «залитый». -->
         <span class="block h-full w-full" :class="ratingVoidClass" aria-hidden="true">
           <slot name="symbol" :index="index" :filled="false">
-            <span v-if="icon" class="block h-full w-full" :class="icon" />
+            <component :is="iconTag(icon)" v-if="icon" class="block h-full w-full" :class="iconClass(icon)" />
             <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full">
               <path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.7 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.5l6.6-.9z" />
             </svg>
@@ -342,7 +347,7 @@ function onKeydown(event: KeyboardEvent): void {
         >
           <span :class="ratingSymbolClass(resolvedSize)">
             <slot name="symbol" :index="index" :filled="true">
-              <span v-if="icon" class="block h-full w-full" :class="icon" />
+              <component :is="iconTag(icon)" v-if="icon" class="block h-full w-full" :class="iconClass(icon)" />
               <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full">
                 <path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.7 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.5l6.6-.9z" />
               </svg>

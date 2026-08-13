@@ -6,6 +6,7 @@ import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { isComposingEvent } from '../../internal/keyboard'
 import { useComboboxNavigation } from '../../composables/useComboboxNavigation'
+import { iconClass, iconTag } from '../shared/icon'
 import GrKbd from '../GrKbd/GrKbd.vue'
 import GrModal from '../GrModal/GrModal.vue'
 
@@ -38,6 +39,9 @@ import {
   commandSearchRowClass,
   type GrCommandPaletteSize,
 } from './grCommandPaletteStyles'
+
+import IconLoaderCircle from '~icons/lucide/loader-circle'
+import IconSearch from '~icons/lucide/search'
 
 export type { GrCommandFilter, GrCommandGroup, GrCommandItem } from './filtering'
 export type { GrCommandPaletteSize } from './grCommandPaletteStyles'
@@ -468,7 +472,7 @@ defineExpose({ open, close, toggle })
   >
     <div data-gr-command-palette :aria-label="resolvedAriaLabel">
       <div data-gr-command-palette-search :class="commandSearchRowClass">
-        <span class="i-lucide-search block h-4 w-4 shrink-0 text-[var(--gr-muted-fg)]" aria-hidden="true" />
+        <IconSearch class="block h-4 w-4 shrink-0 text-[var(--gr-muted-fg)]" aria-hidden="true" />
 
         <input
           ref="inputEl"
@@ -492,7 +496,7 @@ defineExpose({ open, close, toggle })
         >
 
         <span v-if="loading" class="shrink-0 text-[var(--gr-muted-fg)]" aria-hidden="true">
-          <span class="i-lucide-loader-2 block h-4 w-4 animate-spin" />
+          <IconLoaderCircle class="block h-4 w-4 animate-spin" />
         </span>
         <span v-else-if="hotkeyHint.length" class="shrink-0" aria-hidden="true">
           <GrKbd :keys="hotkeyHint" size="sm" />
@@ -551,10 +555,11 @@ defineExpose({ open, close, toggle })
               @mousemove="onItemHover(entry.item)"
             >
               <slot name="item" :item="entry.item" :active="isActive(entry.item)">
-                <span
+                <component
+                  :is="iconTag(entry.item.icon)"
                   v-if="entry.item.icon"
                   class="block h-4 w-4 shrink-0"
-                  :class="[entry.item.icon, commandItemMutedClass(Boolean(entry.item.disabled))]"
+                  :class="[iconClass(entry.item.icon), commandItemMutedClass(Boolean(entry.item.disabled))]"
                   aria-hidden="true"
                 />
                 <span class="min-w-0 flex-1">

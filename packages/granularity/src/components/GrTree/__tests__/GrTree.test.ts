@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 
 import GrTree from '../GrTree.vue'
 
@@ -1070,5 +1070,38 @@ describe('GrTree — остановка Tab', () => {
     expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(0)
 
     wrapper.unmount()
+  })
+})
+
+/**
+ * Иконки дерева: встроенная рисуется компонентом и не зависит от конфига
+ * потребителя, а его собственная приходит классом или компонентом.
+ */
+describe('GrTree — иконки', () => {
+const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+
+  it('без пропа рисует встроенную стрелку и встроенную ручку переноса', () => {
+    const wrapper = mount(GrTree, { props: { data: tree(), nodeKey: 'id', draggable: true } })
+
+    expect(wrapper.get('.gr-tree__toggle-icon').element.tagName.toLowerCase()).toBe('svg')
+    expect(wrapper.get('.gr-tree__drag-icon').element.tagName.toLowerCase()).toBe('svg')
+  })
+
+  it('класс от потребителя уезжает на пустой `span`', () => {
+    const wrapper = mount(GrTree, {
+      props: { data: tree(), nodeKey: 'id', expandIcon: 'i-lucide-plus' },
+    })
+
+    const icon = wrapper.get('.gr-tree__toggle-icon')
+    expect(icon.element.tagName.toLowerCase()).toBe('span')
+    expect(icon.classes()).toContain('i-lucide-plus')
+  })
+
+  it('компонент от потребителя рисуется как есть', () => {
+    const wrapper = mount(GrTree, {
+      props: { data: tree(), nodeKey: 'id', expandIcon: CustomIcon },
+    })
+
+    expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
   })
 })

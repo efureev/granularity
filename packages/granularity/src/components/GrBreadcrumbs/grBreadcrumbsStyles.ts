@@ -10,8 +10,11 @@ export type GrBreadcrumbItem = {
   href?: string
   /** Цель роутерной ссылки: уезжает в `GrLink` через `attrs` вместе с `as`. */
   to?: unknown
-  /** Класс иконки перед подписью (`i-lucide-*`) — иконка декоративна. */
-  icon?: string
+  /**
+   * Иконка перед подписью — декоративна. Vue-компонент либо класс иконки вашей
+   * UnoCSS-сборки (`i-lucide-*` требует вашего `presetIcons`).
+   */
+  icon?: string | Component
   disabled?: boolean
   /** Доступное имя пункта, когда подписи недостаточно («Настройки» → «Настройки проекта»). */
   ariaLabel?: string

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
@@ -559,5 +559,21 @@ describe('GrTabs — остановка Tab', () => {
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     wrapper.unmount()
+  })
+})
+
+describe('GrTabs — иконка вкладки', () => {
+const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+
+  it('принимает и класс, и компонент', () => {
+    const byClass = mount(GrTabs, {
+      props: { modelValue: 'a', tabs: [{ value: 'a', label: 'A', icon: 'i-lucide-user' }] },
+    })
+    expect(byClass.find('span.i-lucide-user').exists()).toBe(true)
+
+    const byComponent = mount(GrTabs, {
+      props: { modelValue: 'a', tabs: [{ value: 'a', label: 'A', icon: CustomIcon }] },
+    })
+    expect(byComponent.find('[data-custom-icon]').exists()).toBe(true)
   })
 })

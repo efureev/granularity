@@ -33,5 +33,5 @@ export const grCommandPaletteSafelist = [...new Set([
   ...splitClassTokens(commandEmptyClass),
   ...splitClassTokens(commandFooterClass),
   // Иконки поля поиска и индикатора загрузки.
-  ...splitClassTokens('i-lucide-search i-lucide-loader-2 animate-spin'),
+  ...splitClassTokens('animate-spin'),
 ])]

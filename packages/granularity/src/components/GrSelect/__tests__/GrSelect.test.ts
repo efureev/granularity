@@ -197,7 +197,7 @@ describe('GrSelect', () => {
     const chevron = wrapper.get('[data-testid="gr-select-chevron"]')
 
     expect(chevron.attributes('class')).toContain('shrink-0')
-    expect(chevron.find('.i-lucide-chevron-down').exists()).toBe(true)
+    expect(chevron.find('svg').exists()).toBe(true)
   })
 
   it('в panel-режиме эмитит update:modelValue при выборе опции кликом', async () => {

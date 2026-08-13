@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'vue'
+import type { Component, HTMLAttributes } from 'vue'
 
 import type { GrTreeSize } from './grTreeStyles'
 import type {
@@ -88,8 +88,14 @@ export type GrTreeViewProps<T extends object> = {
   /** Максимальная высота дерева со своим скроллером. Число — пиксели. */
   maxHeight?: number | string
   highlightCurrent?: boolean
-  expandIcon?: string
-  collapseIcon?: string
+  /**
+   * Иконка свёрнутого узла: Vue-компонент либо класс иконки вашей UnoCSS-сборки
+   * (`'i-lucide-plus'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).
+   * Не задана — встроенная стрелка.
+   */
+  expandIcon?: string | Component
+  /** Иконка раскрытого узла. Не задана — та же встроенная стрелка, повёрнутая. */
+  collapseIcon?: string | Component
   toggleIconRotate?: boolean
   branchLine?: boolean
   branchLineColor?: GrTreeBranchLineColor<T>
@@ -114,7 +120,8 @@ export type GrTreeInteractionProps<T extends object> = {
   /** На каждом уровне раскрыт максимум один узел. */
   accordion?: boolean
   draggable?: boolean
-  dragHandleIcon?: string
+  /** Иконка ручки переноса: компонент, класс иконки или ничего — тогда встроенная. */
+  dragHandleIcon?: string | Component
   allowDrop?: (draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, type: GrTreeAllowDropType) => boolean
   allowDrag?: (draggingNode: GrTreeNode<T>) => boolean
 }

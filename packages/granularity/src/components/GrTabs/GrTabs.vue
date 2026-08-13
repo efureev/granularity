@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch, type Component } from 'vue'
 
 import IconX from '~icons/lucide/x'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useRovingFocus } from '../../composables/useRovingFocus'
+import { iconClass, iconTag } from '../shared/icon'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import {
   grTabsBadgeClass,
@@ -24,8 +25,11 @@ export interface GrTab {
   value: string
   label: string
   badge?: string
-  /** UnoCSS-класс иконки слева от подписи (например `i-lucide-user`). */
-  icon?: string
+  /**
+   * Иконка слева от подписи: Vue-компонент либо класс иконки вашей UnoCSS-сборки
+   * (`'i-lucide-user'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).
+   */
+  icon?: string | Component
   disabled?: boolean
   /** Перекрывает `closable` ряда в обе стороны: закрепить вкладку или закрыть одну её. */
   closable?: boolean
@@ -369,7 +373,12 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
           :active="tab.value === modelValue"
           :disabled="Boolean(tab.disabled)"
         >
-          <span v-if="tab.icon" :class="[tabIconClass, tab.icon]" aria-hidden="true" />
+          <component
+            :is="iconTag(tab.icon)"
+            v-if="tab.icon"
+            :class="[tabIconClass, iconClass(tab.icon)]"
+            aria-hidden="true"
+          />
           <span>{{ tab.label }}</span>
           <span v-if="tab.badge" :class="badgeClass">
             {{ tab.badge }}

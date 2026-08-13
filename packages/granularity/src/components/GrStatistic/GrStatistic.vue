@@ -3,7 +3,12 @@ import { useGrComponentSize } from '../GrConfigProvider/context'
 import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { iconClass, iconTag } from '../shared/icon'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
+
+import IconMinus from '~icons/lucide/minus'
+import IconTrendingDown from '~icons/lucide/trending-down'
+import IconTrendingUp from '~icons/lucide/trending-up'
 
 import { countUpFrame } from './countUp'
 import { formatStatisticValue } from './formatStatisticValue'
@@ -15,7 +20,6 @@ import {
   statisticTitleClass,
   statisticTitleSizeBySize,
   statisticTrendClassByTrend,
-  statisticTrendIconByTrend,
   statisticTrendSizeBySize,
   statisticValueClass,
   type GrStatisticSize,
@@ -57,8 +61,11 @@ export interface GrStatisticProps {
   prefix?: string
   /** Приписка после значения (единица измерения, `%`). */
   suffix?: string
-  /** UnoCSS-класс иконки слева от блока (например `i-lucide-users`). */
-  icon?: string
+  /**
+   * Иконка слева от блока: Vue-компонент либо класс иконки вашей UnoCSS-сборки
+   * (`'i-lucide-users'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).
+   */
+  icon?: string | Component
   size?: GrStatisticSize
   /** Тон значения; точечно перекрывается `--gr-statistic-value-color`. */
   tone?: GrStatisticTone
@@ -246,6 +253,12 @@ onBeforeUnmount(stopCounting)
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatistic' })
 
+const trendIconByTrend: Record<GrStatisticTrend, Component> = {
+  up: IconTrendingUp,
+  down: IconTrendingDown,
+  flat: IconMinus,
+}
+
 // Иконка направления `aria-hidden`, а «+12,5 %» само по себе рост от падения не
 // отличает: направление доносит скрытая подпись.
 const trendLabel = computed(() => {
@@ -276,7 +289,7 @@ const trendLabel = computed(() => {
       class="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--gr-radius-lg)] bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]"
     >
       <slot name="icon">
-        <span class="block h-4 w-4" :class="icon" aria-hidden="true" />
+        <component :is="iconTag(icon)" class="block h-4 w-4" :class="iconClass(icon)" aria-hidden="true" />
       </slot>
     </span>
 
@@ -367,10 +380,10 @@ const trendLabel = computed(() => {
         <span v-if="trendLabel" data-gr-statistic-trend-label class="sr-only">{{ trendLabel }}</span>
 
         <slot name="trend">
-          <span
+          <component
+            :is="trendIconByTrend[trend]"
             v-if="trend"
             class="block h-3.5 w-3.5"
-            :class="statisticTrendIconByTrend[trend]"
             aria-hidden="true"
           />
           <span>{{ trendText }}</span>

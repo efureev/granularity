@@ -75,12 +75,6 @@ export const statisticTrendClassByTrend: Record<GrStatisticTrend, string> = {
   flat: 'text-[var(--gr-muted-fg)]',
 }
 
-export const statisticTrendIconByTrend: Record<GrStatisticTrend, string> = {
-  up: 'i-lucide-trending-up',
-  down: 'i-lucide-trending-down',
-  flat: 'i-lucide-minus',
-}
-
 export const statisticTitleClass = 'font-medium tracking-wide text-[var(--gr-statistic-title-color,var(--gr-muted-fg))]'
 
 export const statisticRootBase = 'flex items-start gap-3 text-left'
