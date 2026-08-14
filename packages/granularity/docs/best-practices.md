@@ -318,15 +318,15 @@ forwards`/`both` и то, что показывает исходный кадр.
 монтирования ваши: точка входа не зависит ни от `vitest`, ни от
 `@vue/test-utils` ([`testing.md`](./testing.md)).
 
-| Помощник | Зачем |
-| --- | --- |
-| `granularityGlobal({ size, componentDefaults, i18n })` | то же, что кладёт в `provide` `GrConfigProvider` |
-| `press` / `move` / `release` / `drag` / `cancelPointer` | указательные жесты |
-| `keydown` / `composingKeydown` | клавиатура и IME |
-| `mockRect` / `stackRects` | геометрия в jsdom |
-| `announced()` | текст живого региона |
-| `resetGranularityDom` | уборка между тестами |
-| `stubMatchMedia({ reducedMotion })` | задать ответ `matchMedia` |
+| Помощник                                                | Зачем                                            |
+|---------------------------------------------------------|--------------------------------------------------|
+| `granularityGlobal({ size, componentDefaults, i18n })`  | то же, что кладёт в `provide` `GrConfigProvider` |
+| `press` / `move` / `release` / `drag` / `cancelPointer` | указательные жесты                               |
+| `keydown` / `composingKeydown`                          | клавиатура и IME                                 |
+| `mockRect` / `stackRects`                               | геометрия в jsdom                                |
+| `announced()`                                           | текст живого региона                             |
+| `resetGranularityDom`                                   | уборка между тестами                             |
+| `stubMatchMedia({ reducedMotion })`                     | задать ответ `matchMedia`                        |
 
 **`afterEach(resetGranularityDom)` — не гигиена, а условие работы.** Одного
 `document.body.innerHTML = ''` мало: корень портала и хост живого региона
@@ -353,13 +353,13 @@ forwards`/`both` и то, что показывает исходный кадр.
 
 Чтобы не искать в нём то, чего там нет:
 
-| Не делает | Что вместо |
-| --- | --- |
-| Плюрализацию, форматы чисел, дат и валют | `Intl` через ваш i18n-слой |
-| RTL | не поддерживается осознанно ([`styling.md`](./styling.md)) |
-| Управление состоянием и роутинг | ваш стор и роутер |
-| Автопрокрутку при перетаскивании в виртуальном списке | пока нет |
-| Потоковый SSR (`renderToWebStream`) | не покрыт стендом |
+| Не делает                                             | Что вместо                                                 |
+|-------------------------------------------------------|------------------------------------------------------------|
+| Плюрализацию, форматы чисел, дат и валют              | `Intl` через ваш i18n-слой                                 |
+| RTL                                                   | не поддерживается осознанно ([`styling.md`](./styling.md)) |
+| Управление состоянием и роутинг                       | ваш стор и роутер                                          |
+| Автопрокрутку при перетаскивании в виртуальном списке | пока нет                                                   |
+| Потоковый SSR (`renderToWebStream`)                   | не покрыт стендом                                          |
 
 ---
 

@@ -753,12 +753,12 @@ export async function setupI18n() {
 
 ### Что есть в семействе
 
-| Пакет | Версия | Компоненты | Блок i18n | Резолвер |
-| --- | --- | --- | --- | --- |
-| `@feugene/granularity` | 0.20.0 | ядро, 68 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` |
-| `@feugene/granularity-chrono` | 0.2.1 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrTimePicker`, `GrRelativeTime` | `grChrono` | `GranularityChronoResolver` |
-| `@feugene/granularity-charts` | 0.3.0 | `GrChartArea`, `GrChartBar`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
-| `@feugene/granularity-dashboard` | 0.1.0 | `GrDashboard`, `GrDashboardItem`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
+| Пакет                            | Версия | Компоненты                                                                                              | Блок i18n     | Резолвер                       |
+|----------------------------------|--------|---------------------------------------------------------------------------------------------------------|---------------|--------------------------------|
+| `@feugene/granularity`           | 0.20.0 | ядро, 68 subpath-экспортов `./components/Gr*`                                                           | `gr`          | `GranularityResolver`          |
+| `@feugene/granularity-chrono`    | 0.2.1  | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrTimePicker`, `GrRelativeTime` | `grChrono`    | `GranularityChronoResolver`    |
+| `@feugene/granularity-charts`    | 0.3.0  | `GrChartArea`, `GrChartBar`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrSparkline`                 | `grCharts`    | `GranularityChartsResolver`    |
+| `@feugene/granularity-dashboard` | 0.1.0  | `GrDashboard`, `GrDashboardItem`, `GrDashboardPalette`, `GrDashboardToolbar`                            | `grDashboard` | `GranularityDashboardResolver` |
 
 Резолвер каждый спутник экспортирует сам — из subpath `./resolver`. Кроме
 компонентов спутники публикуют прикладное API: `./chart` и `useChartScale` у
@@ -825,15 +825,15 @@ export default defineConfig({
 
 ## Приложение не поднялось — что смотреть
 
-| Симптом | Причина |
-| --- | --- |
-| Компоненты бесцветные, разметка «голая» | `granularContent(...)` не развёрнут в top-level `content` — `@unocss/vite` не читает `content` из пресета |
-| Компоненты бесцветные внутри монорепо | Пакет не пересобран: `yarn build:granularity` |
-| Спиннер не крутится, `sr-only`-текст виден | Выключен `includeExtraRules` — утилит `animate-spin`, `sr-only`, `divide-*` нет в `presetMini`, их добирает пресет |
+| Симптом                                                          | Причина                                                                                                                         |
+|------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Компоненты бесцветные, разметка «голая»                          | `granularContent(...)` не развёрнут в top-level `content` — `@unocss/vite` не читает `content` из пресета                       |
+| Компоненты бесцветные внутри монорепо                            | Пакет не пересобран: `yarn build:granularity`                                                                                   |
+| Спиннер не крутится, `sr-only`-текст виден                       | Выключен `includeExtraRules` — утилит `animate-spin`, `sr-only`, `divide-*` нет в `presetMini`, их добирает пресет              |
 | Иконка, переданная классом (`icon="i-lucide-user"`), не рисуется | Нет `presetIcons` и коллекции: этот класс генерирует конфиг приложения, а не пакет. Собственные иконки пакета работают без него |
-| Интерфейс английский при заданной локали | Блок не зарегистрирован, лоадеры не добавлены или забыт `installI18n` |
-| Hydration mismatch на первой же странице | Сервер и клиент выбрали разные компоненты, либо в `setup` читается среда — см. [`ssr.md`](./ssr.md) |
-| Оверлей не работает после гидрации, хотя разметка пришла | В шаблон не вставлен `ssrContext.teleports` — клиенту не по чему найти целевой контейнер |
+| Интерфейс английский при заданной локали                         | Блок не зарегистрирован, лоадеры не добавлены или забыт `installI18n`                                                           |
+| Hydration mismatch на первой же странице                         | Сервер и клиент выбрали разные компоненты, либо в `setup` читается среда — см. [`ssr.md`](./ssr.md)                             |
+| Оверлей не работает после гидрации, хотя разметка пришла         | В шаблон не вставлен `ssrContext.teleports` — клиенту не по чему найти целевой контейнер                                        |
 
 Что именно попало в CSS и почему, показывает dev-сервер:
 
