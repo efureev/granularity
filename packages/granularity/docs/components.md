@@ -4,16 +4,42 @@
 
 ## Рекомендуемый импорт
 
-Для точечного использования компонентов предпочтителен формат:
+Для точечного использования компонентов предпочтителен subpath-импорт:
 
-```ts
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
 
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrInput } from '@feugene/granularity/components/GrInput'
+
+const query = ref('')
+</script>
+
+<template>
+  <GrInput v-model="query" placeholder="Поиск" />
+  <GrButton>Найти</GrButton>
+</template>
 ```
+
+Каждый компонент — отдельная entry сборки, поэтому в бандл приезжает ровно то,
+что импортировано, вместе со своим CSS ([`packaging.md`](./packaging.md)).
 
 Для быстрого старта допустим root import:
 
-```ts
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
 
+import { GrButton, GrInput } from '@feugene/granularity'
+
+const query = ref('')
+</script>
+
+<template>
+  <GrInput v-model="query" placeholder="Поиск" />
+  <GrButton>Найти</GrButton>
+</template>
 ```
 
 ## Типы компонента
@@ -27,7 +53,10 @@
 | `GrXEmits` | интерфейс эмитов | обёртка, переизлучающая события пакета один в один |
 | `GrXInstance` | то, что компонент отдал через `defineExpose` | `ref` на компонент и вызов его методов |
 
-```ts
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
 import { GrInput, GrSelect } from '@feugene/granularity'
 import type { GrInputEmits, GrInputProps, GrSelectInstance } from '@feugene/granularity'
 
@@ -35,11 +64,24 @@ interface FieldProps extends GrInputProps {
   hint?: string
 }
 
-defineProps<FieldProps>()
-defineEmits<GrInputEmits>()
+const props = defineProps<FieldProps>()
+const emit = defineEmits<GrInputEmits>()
 
 const select = ref<GrSelectInstance | null>(null)
-select.value?.focus()
+const category = ref('')
+
+function focusSelect(): void {
+  select.value?.focus()
+}
+</script>
+
+<template>
+  <GrInput
+    :model-value="props.modelValue"
+    @update:model-value="emit('update:modelValue', $event)"
+  />
+  <GrSelect ref="select" v-model="category" @change="focusSelect" />
+</template>
 ```
 
 `GrXInstance` выводится из самого компонента, а не пишется руками, поэтому

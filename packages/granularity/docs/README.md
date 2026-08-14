@@ -12,6 +12,7 @@
 
 - Если нужен быстрый старт: откройте [`installation.md`](./installation.md).
 - Если нужен каркас приложения целиком — SPA или SSR: откройте [`getting-started.md`](./getting-started.md).
+- Если приложение уже пишется и хочется не переделывать: откройте [`best-practices.md`](./best-practices.md).
 - Если важно понять устройство слоёв стилей: откройте [`styling.md`](./styling.md).
 - Если приложение уже использует `UnoCSS`: откройте [`unocss.md`](./unocss.md) и [`installation.md`](./installation.md).
 - Если нужен единый bootstrap-вход в Vue-приложение: откройте [`vue-plugin.md`](./vue-plugin.md).
@@ -35,6 +36,8 @@
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
 - [`getting-started.md`](./getting-started.md) — приложение с нуля: полные каркасы SPA и SSR, подключение
   локализации и остальных пакетов семейства.
+- [`best-practices.md`](./best-practices.md) — практики прикладной разработки: импорт и конфиг, формы и обёртки,
+  свои оверлеи, доступность, темы, тесты приложения и чего пакет намеренно не делает.
 - [`styling.md`](./styling.md) — `foundation.css`, `styles.css`, `tokens`, `base`, темы, порядок импортов и почему
   RTL не поддерживается.
 - [`tokens.md`](./tokens.md) — справочник токенов (генерируется из `tokens/*.json`, руками не править).
