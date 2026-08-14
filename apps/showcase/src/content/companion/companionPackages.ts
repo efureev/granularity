@@ -1523,7 +1523,13 @@ function addItem(
 
 /** Плоский список companion-компонентов со ссылкой на их пакет. */
 export const companionComponents = companionPackages.flatMap(pkg =>
-  pkg.components.map(component => ({ ...component, packageId: pkg.id, packageLabel: pkg.label, npmName: pkg.npmName })),
+  pkg.components.map(component => ({
+    ...component,
+    packageId: pkg.id,
+    packageLabel: pkg.label,
+    npmName: pkg.npmName,
+    version: pkg.version,
+  })),
 )
 
 export type CompanionComponentWithPackage = (typeof companionComponents)[number]

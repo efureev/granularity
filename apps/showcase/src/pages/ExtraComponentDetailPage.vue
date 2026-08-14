@@ -43,6 +43,7 @@ const apiSections = computed(() => component.value?.apiSections ?? [])
       </h1>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <code class="showcase-link-chip rounded-full border px-3 py-1 text-xs">{{ component.npmName }}</code>
+        <GrBadge tone="neutral" :title="t('showcase.header.versionLabel')">v{{ component.version }}</GrBadge>
         <GrBadge tone="azure">{{ t('showcase.extraDetailPage.companionBadge') }}</GrBadge>
       </div>
       <p class="showcase-text-muted mt-4 max-w-3xl text-base leading-7">
