@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrTimeline`: the axis jogged sideways and broke apart at every group
+  heading.** Three defects, one root cause — the rail geometry assumed a rail
+  always contains a marker, and a group heading's rail contains only the line.
+
+  1. The heading row and an event row are *separate grid containers*, so each
+     resolved the `auto` rail column against its own content: 10px (the dot) in
+     an event, 2px (the bare line) in a heading. The axis shifted 4px sideways at
+     every heading. The rail now takes its floor from
+     `--gr-timeline-marker-size`, so both agree by construction.
+  2. `[data-gr-timeline-rail] > :first-child { flex: none }` was written for the
+     dot, but in a heading the *line* is the first child — it stopped growing,
+     stalled at its `min-height` and left an 11.6px hole below the heading. The
+     rule now targets everything except the line.
+  3. The air above a heading sat on the heading row, and the rail spans that row
+     — so the padding punched a 2.4px hole above the date. It now sits on the
+     heading text instead.
+
+  Only the first heading hid all three: its line is `visibility: hidden`, so the
+  damage showed from the second group onward. Geometry is not observable in
+  jsdom, so the regression gate lives in the browser —
+  `apps/showcase/e2e/interaction.spec.ts` asserts that the axis neither drifts
+  sideways nor breaks anywhere except the one deliberate gap under each dot.
+
 ## [v0.20.0] 2026-08-13
 
 The release that freezes the public contract before `1.0`. Every breaking change

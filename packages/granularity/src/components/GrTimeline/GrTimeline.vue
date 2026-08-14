@@ -322,9 +322,10 @@ if (import.meta.env?.DEV) {
   align-items: center;
   align-self: stretch;
   padding-top: var(--gr-timeline-marker-top, 0.35rem);
+  min-width: var(--gr-timeline-marker-size, 10px);
 }
 
-[data-gr-timeline-rail] > :first-child {
+[data-gr-timeline-rail] > :not([data-gr-timeline-line]) {
   flex: none;
 }
 
@@ -377,8 +378,7 @@ if (import.meta.env?.DEV) {
   padding-top: 0;
 }
 
-/* Воздух перед заголовком — отступом строки, а не полем: поле разорвало бы ось. */
-[data-gr-timeline-group] + [data-gr-timeline-group] [data-gr-timeline-group-header] {
+[data-gr-timeline-group] + [data-gr-timeline-group] [data-gr-timeline-group-title] {
   padding-top: 0.5rem;
 }
 

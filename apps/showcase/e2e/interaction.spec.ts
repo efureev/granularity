@@ -460,3 +460,54 @@ test.describe('GrList: кликабельная строка', () => {
     await expect(demo).toContainText(label.slice(0, 12))
   })
 })
+
+test.describe('GrTimeline: ось сквозь заголовок группы', () => {
+  test('ось не смещается вбок и не рвётся на границе групп', async ({ page }) => {
+    await page.goto(componentPath('GrTimeline'))
+    await page.locator('#live-examples').waitFor()
+
+    const grouped = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-gr-timeline-group-header]') })
+      .first()
+    await grouped.waitFor()
+
+    const axis = await grouped.evaluate((root) => {
+      const rails = [...root.querySelectorAll('[data-gr-timeline-rail]')]
+
+      const centers = rails.map((rail) => {
+        const box = rail.querySelector('[data-gr-timeline-line]')!.getBoundingClientRect()
+
+        return box.x + box.width / 2
+      })
+
+      // Нарисованные куски оси по порядку сверху вниз: точки и видимые отрезки.
+      const ink: { dot: boolean, top: number, bottom: number }[] = []
+      rails.forEach((rail) => {
+        rail.querySelectorAll('[data-gr-timeline-marker], [data-gr-timeline-line]').forEach((node) => {
+          if (getComputedStyle(node).visibility === 'hidden') return
+          const box = node.getBoundingClientRect()
+          if (!box.height) return
+          ink.push({ dot: node.hasAttribute('data-gr-timeline-marker'), top: box.top, bottom: box.bottom })
+        })
+      })
+      ink.sort((a, b) => a.top - b.top)
+
+      // Единственный задуманный просвет — сразу под точкой. Любой другой разрыв
+      // означает дыру в оси.
+      let unwantedGap = 0
+      for (let i = 1; i < ink.length; i++) {
+        if (ink[i - 1].dot) continue
+        unwantedGap = Math.max(unwantedGap, ink[i].top - ink[i - 1].bottom)
+      }
+
+      return { lateralSpread: Math.max(...centers) - Math.min(...centers), unwantedGap }
+    })
+
+    // Заголовок группы и событие — разные грид-контейнеры, и колонку оси каждый
+    // считает по своему содержимому. Разойдись ширина рельсы — ось поедет вбок
+    // ровно на половину разницы, и увидит это только тот, кто откроет страницу.
+    expect(axis.lateralSpread, 'ось смещается на заголовке группы').toBeLessThanOrEqual(0.5)
+
+    expect(axis.unwantedGap, 'ось рвётся на границе групп').toBeLessThanOrEqual(0.5)
+  })
+})
