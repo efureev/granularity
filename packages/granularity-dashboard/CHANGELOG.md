@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-14
+
 ### Added
 
 - **First release.** A widget grid for the `@feugene/granularity` design system: users arrange
@@ -63,3 +65,4 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   rather than to values.
 
 [Unreleased]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.1.0...HEAD
+[0.1.0]: https://github.com/efureev/granularity/releases/tag/granularity-dashboard-v0.1.0

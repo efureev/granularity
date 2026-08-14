@@ -7,15 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- **The hidden data table no longer inflates the scroll height of whatever wraps the chart.**
-  `sr-only` sat on the `<table>` itself, and table boxes treat `width`/`height` as a minimum rather
-  than a size — so `height: 1px` was ignored, `clip` hid the table visually while its full geometry
-  stayed, and any container with a bounded height grew a scrollbar with nothing to scroll. The class
-  moved to a wrapping `<div>`, which collapses as intended; the table stays in the accessibility
-  tree exactly as before.
-
+## [v0.3.0] 2026-08-14
 
 ### Added
 
@@ -41,6 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   narrow one (`U+202F` in `fr`) as the thousands separator, and the label-width estimator scored those as
   medium-width characters — so `1 000` reserved more axis gutter than `1,000`, and the drawing moved with it. Any
   whitespace now counts as narrow.
+- **The hidden data table no longer inflates the scroll height of whatever wraps the chart.**
+  `sr-only` sat on the `<table>` itself, and table boxes treat `width`/`height` as a minimum rather
+  than a size — so `height: 1px` was ignored, `clip` hid the table visually while its full geometry
+  stayed, and any container with a bounded height grew a scrollbar with nothing to scroll. The class
+  moved to a wrapping `<div>`, which collapses as intended; the table stays in the accessibility
+  tree exactly as before.
+
+## [v0.2.0] 2026-08-13
 
 First published release. `0.1.0` was cut in the working tree but never tagged or published, so everything the
 package contains ships here.
