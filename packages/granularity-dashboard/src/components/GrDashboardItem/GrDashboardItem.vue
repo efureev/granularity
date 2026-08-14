@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
 
 import GrCard from '@feugene/granularity/components/GrCard'
-import { useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
+import {
+  useGrComponentDefaults,
+  useGrComponentProp,
+  useGrComponentSize,
+} from '@feugene/granularity/composables/useGrComponentConfig'
 
 import DragHandle from '../GrDashboardFrame/shared/DragHandle.vue'
 import ResizeHandle from '../GrDashboardFrame/shared/ResizeHandle.vue'
 import { useGrDashboardContext } from '../GrDashboard/context'
-import type { GrDashboardItemSize } from './grDashboardItemStyles'
+import type {
+  GrDashboardItemOverflow,
+  GrDashboardItemPadding,
+  GrDashboardItemSize,
+} from './grDashboardItemStyles'
 import {
   actionsClass,
   bodyClass,
@@ -17,6 +25,12 @@ import {
   draggingClass,
   headerClass,
   headerSizes,
+  overflowClass,
+  overlayHeaderClass,
+  overlayHeaderHiddenClass,
+  overlayHeaderVisibleClass,
+  overlaySpacerClass,
+  paddingSizes,
   rootClass,
   titleClass,
 } from './grDashboardItemStyles'
@@ -29,6 +43,13 @@ export interface GrDashboardItemProps {
   /** Имя виджета: заголовок, имя ручек, имя в объявлениях. */
   title?: string
   size?: GrDashboardItemSize
+  /**
+   * Отступы содержимого. Не задан — ступень от `size`; `none` отдаёт виджет
+   * содержимому целиком, край в край.
+   */
+  padding?: GrDashboardItemPadding
+  /** `hidden` снимает и полосу прокрутки, и остановку `Tab` у тела. */
+  overflow?: GrDashboardItemOverflow
   /** Не двигается сам и не двигается соседями. */
   static?: boolean
   /** Границы размера. Раскладка их может не содержать — знает их виджет. */
@@ -40,8 +61,10 @@ export interface GrDashboardItemProps {
 }
 
 const props = withDefaults(defineProps<GrDashboardItemProps>(), {
-  // `undefined`, а не готовое значение: иначе `componentDefaults` до него не дошли бы.
+  // `undefined`, а не готовые значения: иначе `componentDefaults` до них не дошли бы.
   size: undefined,
+  padding: undefined,
+  overflow: undefined,
   static: undefined,
 })
 
@@ -49,12 +72,27 @@ defineSlots<{
   default?: () => unknown
   header?: () => unknown
   actions?: () => unknown
+  /** Действия режима редактирования: удалить виджет, открыть настройки. */
+  editActions?: () => unknown
   footer?: () => unknown
   skeleton?: () => unknown
 }>()
 
 const dashboard = useGrDashboardContext()
 const size = useGrComponentSize(() => props.size, { component: 'GrDashboardItem' })
+const overflow = useGrComponentProp('GrDashboardItem', 'overflow', () => props.overflow, 'auto')
+
+/**
+ * Отступы: проп → конфиг → ступень от `size`.
+ *
+ * Через `useGrComponentProp` это не выражается — у него дефолт константа, а
+ * здесь дефолт производный, и «`md` по умолчанию» вместо «по размеру» тихо
+ * сломало бы плотные виджеты.
+ */
+const itemDefaults = useGrComponentDefaults('GrDashboardItem')
+const padding = computed<GrDashboardItemPadding>(
+  () => props.padding ?? itemDefaults.value.padding ?? size.value,
+)
 
 const titleId = useId()
 const rootEl = ref<HTMLElement | null>(null)
@@ -119,20 +157,49 @@ const scrollable = ref(false)
 
 function syncScrollable(): void {
   const el = bodyEl.value
-  if (!el) return
+  if (!el || overflow.value === 'hidden') return
 
   scrollable.value = el.scrollHeight - el.clientHeight > 1
 }
+
+// ————— Панель режима редактирования у виджета без шапки.
+
+const hovered = ref(false)
+const focusWithin = ref(false)
+
+/**
+ * Указатель без наведения — палец. Читается в `onMounted`, а не в `setup`:
+ * `matchMedia` на сервере нет, и первый клиентский рендер обязан повторить
+ * серверный (`docs/ssr.md`, правило 6).
+ */
+const coarsePointer = ref(false)
+
+const overlayVisible = computed(() => (
+  coarsePointer.value || hovered.value || focusWithin.value || grabbed.value
+))
 
 // ————— Ленивый монтаж содержимого.
 
 const visible = ref(!dashboard?.lazy.value)
 let observer: IntersectionObserver | null = null
 
+let hoverQuery: MediaQueryList | null = null
+
+function syncCoarsePointer(): void {
+  coarsePointer.value = hoverQuery?.matches ?? false
+}
+
 onMounted(() => {
   dashboard?.setItemElement(props.itemId, rootEl.value)
 
-  if (bodyEl.value) {
+  if (typeof matchMedia !== 'undefined') {
+    hoverQuery = matchMedia('(hover: none)')
+    syncCoarsePointer()
+    hoverQuery.addEventListener('change', syncCoarsePointer)
+  }
+
+  // Непрокручиваемое тело наблюдать незачем: остановки `Tab` у него не будет.
+  if (bodyEl.value && overflow.value === 'auto') {
     syncScrollable()
     dashboard?.observeBody(bodyEl.value, syncScrollable)
   }
@@ -160,6 +227,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   observer?.disconnect()
   observer = null
+  hoverQuery?.removeEventListener('change', syncCoarsePointer)
+  hoverQuery = null
   if (bodyEl.value) dashboard?.unobserveBody(bodyEl.value)
 
   dashboard?.unregisterItem(props.itemId)
@@ -181,7 +250,33 @@ watch(
 const classes = computed(() => [rootClass, active.value ? draggingClass : ''])
 const dragLabel = computed(() => dashboard?.dragLabelFor(props.itemId) ?? '')
 const resizeLabel = computed(() => dashboard?.resizeLabelFor(props.itemId) ?? '')
-const showHeader = computed(() => Boolean(props.title) || canDrag.value)
+
+const slots = useSlots()
+
+/**
+ * Шапка есть, только если ей есть что показать.
+ *
+ * Раньше сюда входил и `canDrag`: в режиме редактирования шапка появлялась ради
+ * одной ручки, и содержимое сжималось на её высоту при каждом переключении
+ * режима. Теперь ручка безголового виджета живёт в панели поверх содержимого.
+ */
+const showHeader = computed(() => Boolean(props.title) || Boolean(slots.header) || Boolean(slots.actions))
+
+/** Панель нужна там, где шапки нет, а показать в режиме редактирования есть что. */
+const showOverlayHeader = computed(() => (
+  !showHeader.value && editing.value && (canDrag.value || Boolean(slots.editActions))
+))
+
+const overlayClasses = computed(() => [
+  overlayHeaderClass,
+  overlayVisible.value ? overlayHeaderVisibleClass : overlayHeaderHiddenClass,
+])
+
+/**
+ * Роль без имени скринридеру бесполезна: «группа» и больше ничего. Безымянный
+ * виджет остаётся обычным блоком.
+ */
+const named = computed(() => Boolean(props.ariaLabel) || Boolean(props.title))
 </script>
 
 <template>
@@ -191,11 +286,15 @@ const showHeader = computed(() => Boolean(props.title) || canDrag.value)
     data-gr-dashboard-item
     :data-item-id="itemId"
     :data-dragging="active ? '' : undefined"
-    role="group"
+    :role="named ? 'group' : undefined"
     :aria-label="ariaLabel"
     :aria-labelledby="ariaLabel ? undefined : (title ? titleId : undefined)"
     :class="classes"
     :style="style"
+    @pointerenter="hovered = true"
+    @pointerleave="hovered = false"
+    @focusin="focusWithin = true"
+    @focusout="focusWithin = false"
   >
     <GrCard :class="cardClass" :body-class="cardBodyClass" variant="elevated">
       <template v-if="showHeader" #header>
@@ -213,6 +312,9 @@ const showHeader = computed(() => Boolean(props.title) || canDrag.value)
           <slot name="header">
             <span :id="titleId" :class="titleClass">{{ title }}</span>
           </slot>
+          <span v-if="$slots.editActions && editing" :class="actionsClass">
+            <slot name="editActions" />
+          </span>
           <span v-if="$slots.actions" :class="actionsClass">
             <slot name="actions" />
           </span>
@@ -221,7 +323,7 @@ const showHeader = computed(() => Boolean(props.title) || canDrag.value)
 
       <div
         ref="bodyEl"
-        :class="[bodyClass, bodySizes[size]]"
+        :class="[bodyClass, overflowClass[overflow], paddingSizes[padding]]"
         :tabindex="scrollable ? 0 : undefined"
       >
         <slot v-if="visible" />
@@ -234,6 +336,25 @@ const showHeader = computed(() => Boolean(props.title) || canDrag.value)
         </div>
       </template>
     </GrCard>
+
+    <div v-if="showOverlayHeader" data-gr-dashboard-overlay-header :class="overlayClasses">
+      <DragHandle
+        v-if="canDrag"
+        ref="handleEl"
+        :label="dragLabel"
+        :grabbed="grabbed"
+        :tabindex="dashboard?.tabindexFor(itemId) ?? 0"
+        @pointerdown="dashboard?.startMove(itemId, $event)"
+        @keydown="dashboard?.onHandleKeydown(itemId, $event)"
+        @focus="dashboard?.onHandleFocus(itemId)"
+      />
+
+      <span :class="overlaySpacerClass" />
+
+      <span v-if="$slots.editActions" :class="actionsClass">
+        <slot name="editActions" />
+      </span>
+    </div>
 
     <ResizeHandle
       v-if="canResize && item"

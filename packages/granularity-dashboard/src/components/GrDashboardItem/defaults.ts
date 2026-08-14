@@ -1,4 +1,8 @@
-import type { GrDashboardItemSize } from './grDashboardItemStyles'
+import type {
+  GrDashboardItemOverflow,
+  GrDashboardItemPadding,
+  GrDashboardItemSize,
+} from './grDashboardItemStyles'
 
 /**
  * Пропы `GrDashboardItem`, настраиваемые глобально.
@@ -8,6 +12,9 @@ import type { GrDashboardItemSize } from './grDashboardItemStyles'
  */
 export interface GrDashboardItemConfigurableProps {
   size: GrDashboardItemSize
+  /** Не задан — отступы берутся от `size`. */
+  padding: GrDashboardItemPadding
+  overflow: GrDashboardItemOverflow
 }
 
 declare module '@feugene/granularity/composables/useGrComponentConfig' {

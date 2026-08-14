@@ -19,7 +19,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `layoutChange`, `itemMove`, `itemResize`, `breakpointChange`.
 - **`GrDashboardItem`** — a widget on the grid, built on the core `GrCard`. Declares its own size
   bounds (`minW`, `minH`, `maxW`, `maxH`, `static`), takes slots `default`, `header`, `actions`,
-  `footer` and `skeleton`.
+  `editActions`, `footer` and `skeleton`.
+  - **A widget may have no header at all.** The header appears only when there is something to put
+    in it — a `title`, a `header` slot or `actions`. A widget holding a map or a single big number
+    needs none, and entering the edit mode no longer grows one just to host the drag handle: the
+    handle lives in a panel laid over the top of the content, so switching modes shifts nothing.
+    The panel follows hover and focus-within, and stays visible where hovering does not exist
+    (`hover: none`); hidden, it remains in the DOM and in the tab order.
+  - **`padding`** (`none | xs | sm | md | lg`) — content insets; defaults to the `size` step.
+    `none` gives the widget over to its content edge to edge, which is what a table wants. The
+    footer keeps its own insets: it is a utility strip, not content.
+  - **`overflow`** (`auto | hidden`) — `hidden` drops both the scrollbar and the body's `Tab` stop
+    (the body joins the tab order only when it actually overflows).
+  - **`editActions`** — actions that belong to the edit mode (remove the widget, open its settings).
+    They show up only in `mode="edit"`, in the header when there is one and in the overlay panel
+    when there is not, while `actions` stays for product buttons that are visible at all times.
+  - A widget with neither `title` nor `ariaLabel` no longer claims `role="group"`: a group without
+    a name is announced as plain "group" and tells a screen reader nothing.
 - **`GrDashboardToolbar`** — mode switch and layout reset. Works both inside the grid and outside
   it, through `v-model:mode`.
 - **`GrDashboardPalette`** — a catalogue of widgets that can be added. Adding is a plain button, so

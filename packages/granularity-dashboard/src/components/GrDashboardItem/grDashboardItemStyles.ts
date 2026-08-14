@@ -22,6 +22,26 @@ export const bodySizes: Record<GrDashboardItemSize, string> = {
   lg: 'p-5',
 }
 
+/** Отступы содержимого, когда виджет задаёт их сам. */
+export type GrDashboardItemPadding = 'none' | GrDashboardItemSize
+
+export const paddingSizes: Record<GrDashboardItemPadding, string> = {
+  none: '',
+  ...bodySizes,
+}
+
+export type GrDashboardItemOverflow = 'auto' | 'hidden'
+
+/**
+ * `hidden` снимает не только полосу прокрутки, но и остановку `Tab`: тело
+ * встаёт в таб-порядок по факту переполнения, а непрокручиваемому телу это
+ * ни к чему.
+ */
+export const overflowClass: Record<GrDashboardItemOverflow, string> = {
+  auto: 'overflow-auto',
+  hidden: 'overflow-hidden',
+}
+
 export const rootClass = [
   'relative min-w-0 min-h-0',
   'overflow-hidden',
@@ -47,6 +67,33 @@ export const cardClass = 'h-full flex flex-col'
 
 export const cardBodyClass = 'flex-1 min-h-0'
 
-export const bodyClass = 'h-full min-h-0 overflow-auto'
+export const bodyClass = 'h-full min-h-0'
 
 export const actionsClass = 'flex items-center gap-1 shrink-0'
+
+/**
+ * Панель режима редактирования у виджета без шапки.
+ *
+ * Лежит поверх верха содержимого (`absolute`), поэтому вход в режим
+ * редактирования ничего не сдвигает: шапка, занимающая место в потоке, сжимала
+ * бы содержимое ровно на свою высоту при каждом переключении.
+ *
+ * Скрытая панель остаётся в DOM и в таб-порядке — иначе ручка переноса
+ * исчезала бы из обхода клавиатурой; видимой её делает фокус внутри виджета.
+ */
+export const overlayHeaderClass = [
+  'absolute inset-x-0 top-0 z-2',
+  'flex items-center gap-2',
+  'px-2 py-1',
+  'bg-[var(--gr-dashboard-item-overlay-bg,var(--gr-card))]',
+  'border-0 border-b border-solid border-[var(--gr-brd)]',
+  'rounded-t-[var(--gr-dashboard-item-radius,var(--gr-radius-lg))]',
+  'transition-opacity duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
+].join(' ')
+
+export const overlayHeaderHiddenClass = 'opacity-0 pointer-events-none'
+
+export const overlayHeaderVisibleClass = 'opacity-100'
+
+/** Разделитель между ручкой и действиями: действия жмутся к правому краю. */
+export const overlaySpacerClass = 'flex-1 min-w-0'
