@@ -274,7 +274,11 @@ describe('GrChartLine', () => {
     const table = wrapper.find('[data-gr-chart-table]')
     const rows = table.findAll('tbody tr')
 
-    expect(table.classes()).toContain('sr-only')
+    // `sr-only` висит на обёртке, а не на самой таблице: у табличных боксов
+    // `height: 1px` работает как минимум, и скрытая таблица сохраняла бы полную
+    // высоту, раздувая прокрутку контейнера вокруг графика.
+    expect(table.classes()).not.toContain('sr-only')
+    expect(table.element.parentElement?.className).toContain('sr-only')
     expect(rows).toHaveLength(4)
     expect(rows[1]!.text()).toContain('40')
     expect(table.findAll('thead th')).toHaveLength(3)

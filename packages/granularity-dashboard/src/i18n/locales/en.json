@@ -17,6 +17,8 @@
   "palette": {
     "label": "Widget catalog",
     "add": "Add {title}",
+    "addShort": "Add",
+    "added": "Added",
     "empty": "No widgets available"
   },
   "toolbar": {

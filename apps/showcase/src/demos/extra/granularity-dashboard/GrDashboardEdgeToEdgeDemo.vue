@@ -17,8 +17,8 @@ const cols = { lg: 12, md: 8, sm: 4, xs: 2 }
 
 const layout = ref<GrDashboardResponsiveLayout>({
   lg: [
-    { id: 'rows', x: 0, y: 0, w: 7, h: 3 },
-    { id: 'score', x: 7, y: 0, w: 5, h: 3 },
+    { id: 'rows', x: 0, y: 0, w: 7, h: 4 },
+    { id: 'score', x: 7, y: 0, w: 5, h: 4 },
   ],
 })
 
@@ -29,12 +29,20 @@ interface Row {
   share: string
 }
 
-const rows: Row[] = [
-  { region: 'Москва', status: 'Норма', tone: 'success', share: '38%' },
-  { region: 'Санкт-Петербург', status: 'Норма', tone: 'success', share: '21%' },
-  { region: 'Новосибирск', status: 'Задержки', tone: 'warning', share: '12%' },
-  { region: 'Екатеринбург', status: 'Норма', tone: 'success', share: '9%' },
+const regions = [
+  'Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург', 'Казань',
+  'Нижний Новгород', 'Челябинск', 'Самара', 'Омск', 'Ростов-на-Дону',
+  'Уфа', 'Красноярск', 'Воронеж', 'Пермь', 'Волгоград',
+  'Краснодар', 'Саратов', 'Тюмень', 'Тольятти', 'Ижевск',
 ]
+
+/** Двадцать строк: столько уже не влезает в виджет — и шапка обязана остаться на месте. */
+const rows: Row[] = regions.map((region, index) => ({
+  region,
+  status: index % 7 === 3 ? 'Задержки' : 'Норма',
+  tone: index % 7 === 3 ? 'warning' : 'success',
+  share: `${Math.max(1, 38 - index * 2)}%`,
+}))
 </script>
 
 <template>
@@ -49,8 +57,13 @@ const rows: Row[] = [
       :row-height="72"
     >
       <!-- Таблица от края до края: `padding="none"` отдаёт виджет содержимому. -->
-      <GrDashboardItem item-id="rows" aria-label="Регионы" padding="none">
-        <GrTable size="sm" aria-label="Доли по регионам">
+      <!--
+        Скроллит сама таблица, а не тело виджета: `sticky` у шапки прилипает к
+        ближайшему скролл-контейнеру, и со скроллом на теле она уехала бы вместе
+        со строками. Отсюда `overflow="hidden"` у виджета — иначе скроллеров два.
+      -->
+      <GrDashboardItem item-id="rows" aria-label="Регионы" padding="none" overflow="hidden">
+        <GrTable size="sm" sticky-header max-height="100%" aria-label="Доли по регионам">
           <template #header>
             <tr>
               <th class="px-3 py-2 text-left font-600">Регион</th>

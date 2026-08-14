@@ -223,6 +223,29 @@ describe('gRDashboard: растягивание с клавиатуры', () => 
   })
 })
 
+describe('gRDashboard: пустое состояние', () => {
+  it('содержимое слота занимает всю ширину сетки, а не одну колонку', async () => {
+    // Слот — обычный ребёнок CSS Grid: без обёртки со `col-span-full` текст
+    // приложения встал бы в колонку из двенадцати и порвался по буквам.
+    const layout = ref<GrDashboardResponsiveLayout>({ lg: [] })
+
+    const Stand = defineComponent({
+      setup: () => () => h(
+        GrDashboard,
+        { layout: layout.value },
+        { empty: () => h('p', 'Дашборд пуст') },
+      ),
+    })
+
+    const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
+    await nextTick()
+
+    const slotHost = (wrapper.element as HTMLElement).querySelector('p')?.parentElement
+
+    expect(slotHost?.className).toContain('col-span-full')
+  })
+})
+
 describe('gRDashboard: прокручиваемое тело виджета', () => {
   /** Переполнение задаётся до монтирования: замер идёт в `onMounted`. */
   function stubOverflow(scrollHeight: number, clientHeight: number): () => void {

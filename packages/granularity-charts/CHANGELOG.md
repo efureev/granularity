@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The hidden data table no longer inflates the scroll height of whatever wraps the chart.**
+  `sr-only` sat on the `<table>` itself, and table boxes treat `width`/`height` as a minimum rather
+  than a size — so `height: 1px` was ignored, `clip` hid the table visually while its full geometry
+  stayed, and any container with a bounded height grew a scrollbar with nothing to scroll. The class
+  moved to a wrapping `<div>`, which collapses as intended; the table stays in the accessibility
+  tree exactly as before.
+
+
 ### Added
 
 - `GrChartRadar` — radar chart: a profile across several axes and the comparison of profiles. Two axis scales —

@@ -69,6 +69,16 @@ export const resizeHandleClass = [
  */
 export const animatedClass = 'transition-all duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
 
-export const emptyClass = 'col-span-full text-[var(--gr-muted-fg)]'
+/**
+ * Пустое состояние занимает всю ширину сетки.
+ *
+ * Обёртка обязательна: слот `#empty` — обычный ребёнок CSS Grid, и без
+ * `col-span-full` любое содержимое приложения встало бы в одну колонку из
+ * двенадцати, где текст рвётся по буквам. Знать про устройство сетки слот не
+ * должен.
+ */
+export const emptyWrapClass = 'col-span-full'
+
+export const emptyTextClass = 'text-[var(--gr-muted-fg)]'
 
 export const srOnlyClass = 'sr-only'

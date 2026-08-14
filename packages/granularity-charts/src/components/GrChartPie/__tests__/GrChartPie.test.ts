@@ -228,7 +228,7 @@ describe('GrChartPie', () => {
     const wrapper = factory()
     const table = wrapper.find('[data-gr-chart-table]')
 
-    expect(table.classes()).toContain('sr-only')
+    expect(table.element.parentElement?.className).toContain('sr-only')
     expect(table.findAll('thead th')).toHaveLength(3)
 
     const rows = table.findAll('tbody tr')

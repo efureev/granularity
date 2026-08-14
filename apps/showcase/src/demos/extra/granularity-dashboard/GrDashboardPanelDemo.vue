@@ -63,12 +63,27 @@ interface Campaign {
   reach: string
 }
 
-const campaigns: Campaign[] = [
-  { name: 'Онбординг', owner: 'Ольга', status: 'Идёт', tone: 'success', reach: '18,2k' },
-  { name: 'Миграция карт', owner: 'Максим', status: 'Ревью', tone: 'info', reach: '9,7k' },
-  { name: 'Напоминание о выплате', owner: 'Анна', status: 'Пауза', tone: 'warning', reach: '6,3k' },
-  { name: 'Возврат ушедших', owner: 'Пётр', status: 'Черновик', tone: 'neutral', reach: '2,1k' },
+const names = [
+  'Онбординг', 'Миграция карт', 'Напоминание о выплате', 'Возврат ушедших', 'Летняя рассрочка',
+  'Кэшбэк на топливо', 'Приведи друга', 'Апгрейд тарифа', 'Первый платёж', 'Реактивация спящих',
+  'Push о доставке', 'Опрос удовлетворённости', 'Скидка на подписку', 'Бонус за отзыв', 'Возврат корзины',
+  'Годовая подписка', 'Партнёрская программа', 'Ранний доступ', 'Пробный период', 'Прощальное письмо',
 ]
+const owners = ['Ольга', 'Максим', 'Анна', 'Пётр', 'Ирина']
+const statuses: { status: string, tone: GrBadgeTone }[] = [
+  { status: 'Идёт', tone: 'success' },
+  { status: 'Ревью', tone: 'info' },
+  { status: 'Пауза', tone: 'warning' },
+  { status: 'Черновик', tone: 'neutral' },
+]
+
+/** Двадцать строк: столько уже не влезает в виджет, и шапка обязана остаться на месте. */
+const campaigns: Campaign[] = names.map((name, index) => ({
+  name,
+  owner: owners[index % owners.length]!,
+  ...statuses[index % statuses.length]!,
+  reach: `${(18.2 - index * 0.8).toFixed(1).replace('.', ',')}k`,
+}))
 </script>
 
 <template>
@@ -90,7 +105,7 @@ const campaigns: Campaign[] = [
       aria-label="Панель продукта"
     >
       <!-- Площадь: важен не только уровень, но и объём — «сколько всего набежало». -->
-      <GrDashboardItem item-id="traffic" title="Трафик" :min-w="4">
+      <GrDashboardItem item-id="traffic" title="Трафик" :min-w="4" overflow="hidden">
         <template #actions>
           <GrBadge tone="neutral" size="sm">2 недели</GrBadge>
         </template>
@@ -108,7 +123,7 @@ const campaigns: Campaign[] = [
         Карточка показателя целиком: число отвечает «сколько», спарклайн — «как
         менялось», бейдж — «на сколько за период». Осей у линии нет намеренно.
       -->
-      <GrDashboardItem item-id="signups" title="Регистрации" :min-w="3">
+      <GrDashboardItem item-id="signups" title="Регистрации" :min-w="3" overflow="hidden">
         <template #actions>
           <GrBadge tone="success" size="sm">+{{ signupsDelta }}%</GrBadge>
         </template>
@@ -120,14 +135,9 @@ const campaigns: Campaign[] = [
         <div class="mt-2">
           <GrSparkline :data="signups" />
         </div>
-
-        <div class="mt-1 flex justify-between text-[length:var(--gr-control-text-2xs)] text-[var(--gr-muted-fg)]">
-          <span>12 недель назад</span>
-          <span>сейчас</span>
-        </div>
       </GrDashboardItem>
 
-      <GrDashboardItem item-id="revenue" title="Выручка" :min-w="3">
+      <GrDashboardItem item-id="revenue" title="Выручка" :min-w="3" overflow="hidden">
         <GrStatistic
           :value="12.48"
           :precision="2"
@@ -139,7 +149,7 @@ const campaigns: Campaign[] = [
       </GrDashboardItem>
 
       <!-- Кто сейчас на связи: лицо, имя, роль — и его показатели за смену. -->
-      <GrDashboardItem item-id="duty" title="Дежурный" :min-w="3">
+      <GrDashboardItem item-id="duty" title="Дежурный" :min-w="3" overflow="hidden">
         <div class="flex flex-col items-center gap-3 text-center">
           <GrAvatar :size="64" :src="avatarSrc" alt="Алексей Дорохов" status="online" />
 
@@ -167,12 +177,17 @@ const campaigns: Campaign[] = [
         </div>
       </GrDashboardItem>
 
-      <GrDashboardItem item-id="campaigns" title="Кампании" :min-w="4">
+      <!--
+        Скроллит сама таблица, а не тело виджета: `sticky` у шапки прилипает к
+        ближайшему скролл-контейнеру, и со скроллом на теле она уехала бы вместе
+        со строками. Шапка самого виджета при этом остаётся на месте.
+      -->
+      <GrDashboardItem item-id="campaigns" title="Кампании" :min-w="4" padding="none" overflow="hidden">
         <template #actions>
           <GrBadge tone="neutral" size="sm">{{ campaigns.length }}</GrBadge>
         </template>
 
-        <GrTable size="sm" aria-label="Активные кампании">
+        <GrTable size="sm" sticky-header max-height="100%" aria-label="Активные кампании">
           <template #header>
             <tr>
               <th class="px-3 py-2 text-left font-600">Название</th>

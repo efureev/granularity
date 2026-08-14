@@ -2,7 +2,8 @@ import { splitClassTokens } from '../../internal/classTokens'
 import {
   animatedClass,
   dragHandleClass,
-  emptyClass,
+  emptyTextClass,
+  emptyWrapClass,
   dragHandleGrabbedClass,
   gridClass,
   placeholderClass,
@@ -21,6 +22,7 @@ export const dashboardFrameSafelist = [...new Set([
   ...splitClassTokens(dragHandleGrabbedClass),
   ...splitClassTokens(resizeHandleClass),
   ...splitClassTokens(animatedClass),
-  ...splitClassTokens(emptyClass),
+  ...splitClassTokens(emptyWrapClass),
+  ...splitClassTokens(emptyTextClass),
   ...splitClassTokens(srOnlyClass),
 ])]

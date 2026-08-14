@@ -8,11 +8,15 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 
 import type { GrDashboardPaletteItem, GrDashboardPaletteSize } from './grDashboardPaletteStyles'
 import {
+  actionClass,
   descriptionClass,
   emptyClass,
+  headingClass,
   listClass,
+  measureClass,
   paletteSizes,
   rowClass,
+  rowDisabledClass,
   textClass,
   titleClass,
 } from './grDashboardPaletteStyles'
@@ -63,6 +67,11 @@ function add(item: GrDashboardPaletteItem): void {
   emit('add', item)
   announce(t('grDashboard.item.added', '{title} added', { title: item.title }))
 }
+
+/** Размер в ячейках — `6×2`. Знак умножения, а не буква `x`. */
+function measure(item: GrDashboardPaletteItem): string | undefined {
+  return item.defaultSize ? `${item.defaultSize.w}×${item.defaultSize.h}` : undefined
+}
 </script>
 
 <template>
@@ -70,19 +79,26 @@ function add(item: GrDashboardPaletteItem): void {
     <ul v-if="items.length > 0" :class="listClass" :aria-label="label">
       <li v-for="item in items" :key="item.id" data-gr-dashboard-palette-item>
         <slot name="item" :item="item">
-          <span :class="rowClass">
+          <span :class="[rowClass, item.disabled ? rowDisabledClass : '']">
             <span :class="textClass">
-              <span :class="titleClass">{{ item.title }}</span>
+              <span :class="headingClass">
+                <span :class="titleClass">{{ item.title }}</span>
+                <span v-if="measure(item)" :class="measureClass">{{ measure(item) }}</span>
+              </span>
               <span v-if="item.description" :class="descriptionClass">{{ item.description }}</span>
             </span>
+
             <GrButton
               :size="size"
               variant="outline"
+              :class="actionClass"
               :disabled="disabled || item.disabled"
               :aria-label="t('grDashboard.palette.add', 'Add {title}', { title: item.title })"
               @click="add(item)"
             >
-              +
+              {{ item.disabled
+                ? t('grDashboard.palette.added', 'Added')
+                : t('grDashboard.palette.addShort', 'Add') }}
             </GrButton>
           </span>
         </slot>

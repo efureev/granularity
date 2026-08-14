@@ -14,6 +14,13 @@ import { frameTableCellClass, frameTableClass } from '../chartFrameStyles'
  *
  * `visible: false` не прячет таблицу от скринридера: `sr-only` оставляет её в
  * дереве доступности, в отличие от `display: none`.
+ *
+ * Скрывается при этом **обёртка**, а не сама `<table>`. Причина в CSS: у
+ * табличных боксов `width`/`height` работают как минимум, а не как размер, и
+ * `height: 1px` из `sr-only` таблица игнорирует — визуально её убирает `clip`,
+ * но геометрия остаётся в полный рост. У графика внутри контейнера с
+ * ограниченной высотой это давало лишние сотни пикселей прокрутки: полоса
+ * появлялась там, где прокручивать нечего. `<div>` схлопывается как положено.
  */
 defineProps<{
   model: ChartTableModel
@@ -22,23 +29,39 @@ defineProps<{
 </script>
 
 <template>
-  <table :class="visible ? frameTableClass : 'sr-only'" data-gr-chart-table>
-    <caption :class="visible ? undefined : 'sr-only'">
-{{ model.caption }}
-</caption>
+  <!-- Скрытый режим: `sr-only` на обёртке, а не на таблице — см. докблок выше. -->
+  <div v-if="!visible" class="sr-only">
+    <table data-gr-chart-table>
+      <caption>{{ model.caption }}</caption>
+      <thead>
+        <tr>
+          <th v-for="column in model.columns" :key="column.key" scope="col">
+            {{ column.label }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in model.rows" :key="row.header">
+          <th scope="row">{{ row.header }}</th>
+          <td v-for="(cell, index) in row.cells" :key="index">{{ cell }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <table v-else :class="frameTableClass" data-gr-chart-table>
+    <caption>{{ model.caption }}</caption>
     <thead>
       <tr>
-        <th v-for="column in model.columns" :key="column.key" scope="col" :class="visible ? frameTableCellClass : undefined">
+        <th v-for="column in model.columns" :key="column.key" scope="col" :class="frameTableCellClass">
           {{ column.label }}
         </th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="row in model.rows" :key="row.header">
-        <th scope="row" :class="visible ? frameTableCellClass : undefined">
-{{ row.header }}
-</th>
-        <td v-for="(cell, index) in row.cells" :key="index" :class="visible ? frameTableCellClass : undefined">
+        <th scope="row" :class="frameTableCellClass">{{ row.header }}</th>
+        <td v-for="(cell, index) in row.cells" :key="index" :class="frameTableCellClass">
           {{ cell }}
         </td>
       </tr>

@@ -57,6 +57,22 @@ describe('grDashboardPalette', () => {
     expect(wrapper.emitted('add')).toBeUndefined()
   })
 
+  it('плитка несёт размер виджета в ячейках', () => {
+    // Выбирают не только «что», но и «сколько места это займёт»: без размера
+    // человек узнаёт его, только уже поставив виджет на дашборд.
+    expect(palette().text()).toContain('4×2')
+  })
+
+  it('уже добавленный виджет читается как добавленный, а не как сломанный', () => {
+    // Адаптера перевода в тесте нет — значит видны английские fallback-строки,
+    // и это вторая половина проверки: без i18n кнопка обязана нести текст, а не ключ.
+    const buttons = palette().findAll('button')
+
+    expect(buttons[0]?.text()).toBe('Add')
+    expect(buttons[1]?.text()).toBe('Added')
+    expect(buttons[1]?.attributes('disabled')).toBeDefined()
+  })
+
   it('пустой каталог показывает объяснение, а не пустоту', () => {
     const wrapper = mount(GrDashboardPalette, { props: { items: [] }, global: granularityGlobal() })
 

@@ -33,7 +33,7 @@ import {
   withBreakpointLayout,
 } from '../../layout'
 import DashboardPlaceholder from '../GrDashboardFrame/shared/DashboardPlaceholder.vue'
-import { animatedClass, emptyClass, gridClass } from '../GrDashboardFrame/frameStyles'
+import { animatedClass, emptyTextClass, emptyWrapClass, gridClass } from '../GrDashboardFrame/frameStyles'
 import type { GrDashboardActiveGeometry, GrDashboardContext, GrDashboardItemBounds } from './context'
 import { GR_DASHBOARD_KEY } from './context'
 import type { GrDashboardMode } from './grDashboardStyles'
@@ -677,10 +677,12 @@ const label = computed(() => props.ariaLabel ?? t('grDashboard.dashboard.label',
   >
     <DashboardPlaceholder :cell="placeholderCell" />
     <slot />
-    <slot v-if="order.length === 0" name="empty">
-      <p :class="emptyClass">
-        {{ t('grDashboard.dashboard.empty', 'No widgets yet') }}
-      </p>
-    </slot>
+    <div v-if="order.length === 0" :class="emptyWrapClass">
+      <slot name="empty">
+        <p :class="emptyTextClass">
+          {{ t('grDashboard.dashboard.empty', 'No widgets yet') }}
+        </p>
+      </slot>
+    </div>
   </div>
 </template>
