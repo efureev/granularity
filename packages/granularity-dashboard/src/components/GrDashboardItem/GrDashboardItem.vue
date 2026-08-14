@@ -50,6 +50,13 @@ export interface GrDashboardItemProps {
   padding?: GrDashboardItemPadding
   /** `hidden` снимает и полосу прокрутки, и остановку `Tab` у тела. */
   overflow?: GrDashboardItemOverflow
+  /**
+   * Можно ли этот виджет тащить и растягивать. Не задан — действует правило
+   * сетки; `static` сильнее обоих, потому что он про раскладку, а не про
+   * интерфейс.
+   */
+  draggable?: boolean
+  resizable?: boolean
   /** Не двигается сам и не двигается соседями. */
   static?: boolean
   /** Границы размера. Раскладка их может не содержать — знает их виджет. */
@@ -65,6 +72,8 @@ const props = withDefaults(defineProps<GrDashboardItemProps>(), {
   size: undefined,
   padding: undefined,
   overflow: undefined,
+  draggable: undefined,
+  resizable: undefined,
   static: undefined,
 })
 
@@ -102,8 +111,16 @@ const handleEl = ref<InstanceType<typeof DragHandle> | null>(null)
 const item = computed(() => dashboard?.itemFor(props.itemId))
 const editing = computed(() => dashboard?.mode.value === 'edit')
 const isStatic = computed(() => props.static ?? item.value?.static ?? false)
-const canDrag = computed(() => editing.value && (dashboard?.draggable.value ?? false) && !isStatic.value)
-const canResize = computed(() => editing.value && (dashboard?.resizable.value ?? false) && !isStatic.value)
+const canDrag = computed(() => (
+  editing.value
+  && (props.draggable ?? dashboard?.draggable.value ?? false)
+  && !isStatic.value
+))
+const canResize = computed(() => (
+  editing.value
+  && (props.resizable ?? dashboard?.resizable.value ?? false)
+  && !isStatic.value
+))
 const grabbed = computed(() => dashboard?.grabbedId.value === props.itemId)
 
 const active = computed(() => {
@@ -240,6 +257,8 @@ watch(
     minH: props.minH,
     maxW: props.maxW,
     maxH: props.maxH,
+    draggable: props.draggable,
+    resizable: props.resizable,
     static: props.static,
     title: props.title,
   }),

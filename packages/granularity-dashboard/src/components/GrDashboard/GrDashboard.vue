@@ -189,6 +189,21 @@ function itemFor(id: string): GrDashboardItemLayout | undefined {
 }
 
 /**
+ * Что виджету разрешено. Правило сетки — общее, виджет вправе его сузить.
+ *
+ * Ответ живёт здесь, а не только в разметке: спрятать ручку мало — жест и
+ * клавиатура идут через контекст, и запрет, который держится на «кнопку не
+ * отрисовали», снимается первым же программным вызовом.
+ */
+function canMove(id: string): boolean {
+  return (bounds.get(id)?.draggable ?? draggable.value) && !itemFor(id)?.static
+}
+
+function canResizeItem(id: string): boolean {
+  return (bounds.get(id)?.resizable ?? resizable.value) && !itemFor(id)?.static
+}
+
+/**
  * Наружу уходит раскладка приложения с новыми координатами — и ничего сверх.
  *
  * Границы, объявленные пропами виджета, в модель не подмешиваются: они живут в
@@ -394,8 +409,8 @@ const gesture = useDragGesture({
 function beginGesture(id: string, kind: 'move' | 'resize', event: PointerEvent): void {
   const origin = itemFor(id)
   if (!origin || origin.static) return
-  if (kind === 'move' && !draggable.value) return
-  if (kind === 'resize' && !resizable.value) return
+  if (kind === 'move' && !canMove(id)) return
+  if (kind === 'resize' && !canResizeItem(id)) return
 
   // Метрика снимается один раз: замер на каждое движение — это принудительный
   // reflow сорок раз в секунду.
@@ -472,7 +487,7 @@ function announcePosition(key: string, fallback: string, item: GrDashboardItemLa
 
 function grab(id: string): void {
   const item = itemFor(id)
-  if (!item || item.static || !draggable.value) return
+  if (!item || item.static || !canMove(id)) return
 
   grabbedId.value = id
   keyboardOrigin.value = item
@@ -555,7 +570,7 @@ function onHandleKeydown(id: string, event: KeyboardEvent): void {
 }
 
 function onResizeKeydown(id: string, event: KeyboardEvent): void {
-  if (mode.value !== 'edit' || !resizable.value) return
+  if (mode.value !== 'edit' || !canResizeItem(id)) return
 
   const item = itemFor(id)
   if (!item) return

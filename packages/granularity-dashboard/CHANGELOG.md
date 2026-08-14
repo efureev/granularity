@@ -29,6 +29,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - **`padding`** (`none | xs | sm | md | lg`) — content insets; defaults to the `size` step.
     `none` gives the widget over to its content edge to edge, which is what a table wants. The
     footer keeps its own insets: it is a utility strip, not content.
+  - **`draggable` and `resizable`** — per-widget overrides of the grid-wide rules. `:resizable="false"`
+    drops the resize corner while the widget can still be moved, `:draggable="false"` does the
+    opposite; `static` stays stronger than both because it is about the layout, not the interface.
+    The grid enforces them itself rather than merely hiding a handle: the gesture and the keyboard
+    both go through its context.
   - **`overflow`** (`auto | hidden`) — `hidden` drops both the scrollbar and the body's `Tab` stop
     (the body joins the tab order only when it actually overflows).
   - **`editActions`** — actions that belong to the edit mode (remove the widget, open its settings).

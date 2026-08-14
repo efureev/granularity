@@ -757,7 +757,8 @@ function dashboardItemApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'padding', type: `'none' | 'xs' | 'sm' | 'md' | 'lg'`, default: 'от `size`', description: 'Отступы содержимого. `none` отдаёт виджет содержимому целиком, край в край, — то, что нужно таблице. Подвал этому не подчиняется: он служебная полоса.' },
         { name: 'overflow', type: `'auto' | 'hidden'`, default: `'auto'`, description: '`hidden` снимает и полосу прокрутки, и остановку `Tab` у тела: в таб-порядок оно встаёт по факту переполнения, а непрокручиваемому телу это ни к чему.' },
         { name: 'minW / minH / maxW / maxH', type: 'number', description: 'Границы размера. Раскладка их может не содержать — знает их виджет.' },
-        { name: 'static', type: 'boolean', default: 'false', description: 'Не двигается сам и не двигается соседями; перемещение, упёршееся в него, отменяется.' },
+        { name: 'draggable / resizable', type: 'boolean · boolean', default: 'правило сетки', description: 'Сужают общее правило для одного виджета: `:resizable="false"` убирает уголок растягивания, оставляя перенос, `:draggable="false"` — наоборот. Запрет проверяет сама сетка, а не только прячет ручку.' },
+        { name: 'static', type: 'boolean', default: 'false', description: 'Не двигается сам и не двигается соседями; перемещение, упёршееся в него, отменяется. Сильнее `draggable` и `resizable`: те про интерфейс, а `static` про раскладку.' },
         { name: 'ariaLabel', type: 'string', description: 'Имя виджета, если заголовка нет.' },
       ],
     },
@@ -1384,6 +1385,9 @@ interface GrDashboardItemProps {
   size?: GrDashboardItemSize
   padding?: GrDashboardItemPadding
   overflow?: GrDashboardItemOverflow
+  /** Не заданы — действует правило сетки. */
+  draggable?: boolean
+  resizable?: boolean
   static?: boolean
   minW?: number
   minH?: number
@@ -1404,6 +1408,7 @@ interface GrDashboardItemProps {
             '`padding="none"` отдаёт виджет содержимому край в край; `overflow="hidden"` снимает прокрутку вместе с лишней остановкой `Tab`.',
             'Собственные границы размера — их уважают и мышь, и клавиатура.',
             '`static` — закреплённый виджет: не двигается ни сам, ни соседями.',
+            '`draggable` и `resizable` сужают правило сетки для одного виджета: можно запретить растягивание, оставив перенос.',
             'Тело растягивается на остаток высоты, поэтому график или таблица получают всю доступную площадь.',
             '`size` меняет плотность шапки и кегль заголовка — но не размер в сетке: тот задают `w` и `h`.',
           ],
@@ -1424,7 +1429,7 @@ interface GrDashboardItemProps {
             title: 'Заголовок, действия, подвал — и свои границы',
             description: 'Четыре слота вокруг содержимого и границы размера, которые виджет объявляет сам: «ниже двух строк я нечитаем» знает он, а не раскладка. Попробуйте сжать средний виджет уголком — дальше `min-w` он не пойдёт.',
             previewKey: 'extra-dashboard-item-slots',
-            note: 'Границы применяются к обеим осям: `min-h` держит высоту так же, как `min-w` — ширину. У закреплённого виджета ручек нет вовсе — не скрыты, а не отрисованы.',
+            note: 'Границы применяются к обеим осям: `min-h` держит высоту так же, как `min-w` — ширину. У виджета с `:resizable="false"` уголка нет вовсе, а перетащить его можно; у закреплённого нет ни того, ни другого.',
           },
           {
             id: 'dashboard-item-edge-to-edge',

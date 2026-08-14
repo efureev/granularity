@@ -16,7 +16,8 @@ const layout = ref<GrDashboardResponsiveLayout>({
   lg: [
     { id: 'report', x: 0, y: 0, w: 7, h: 3 },
     { id: 'narrow', x: 7, y: 0, w: 5, h: 3 },
-    { id: 'pinned', x: 0, y: 3, w: 12, h: 2 },
+    { id: 'fixed', x: 0, y: 3, w: 6, h: 2 },
+    { id: 'pinned', x: 0, y: 5, w: 12, h: 2 },
   ],
 })
 </script>
@@ -48,12 +49,20 @@ const layout = ref<GrDashboardResponsiveLayout>({
 
     <!--
       Границы объявляет сам виджет: раскладка знает координаты, а «ниже двух
-      строк я нечитаем» знает только он. Попробуйте сжать его уголком.
+      строк я нечитаем» знает только он.
     -->
     <GrDashboardItem item-id="narrow" title="Не сжимается" :min-w="4" :min-h="2">
       <p class="text-[var(--gr-muted-fg)]">
         <code>min-w="4"</code> и <code>min-h="2"</code>: уголок растягивания дальше этих границ не пустит —
         ни мышью, ни с клавиатуры.
+      </p>
+    </GrDashboardItem>
+
+    <!-- Размер задан вёрсткой содержимого: менять его нечем и незачем. -->
+    <GrDashboardItem item-id="fixed" title="Размер фиксирован" :resizable="false">
+      <p class="text-[var(--gr-muted-fg)]">
+        <code>:resizable="false"</code>: уголка нет вовсе — ни мышью, ни с клавиатуры. Перетащить виджет
+        при этом можно.
       </p>
     </GrDashboardItem>
 

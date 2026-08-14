@@ -5,6 +5,8 @@ import { mount } from '@vue/test-utils'
 import { granularityGlobal, keydown, resetGranularityDom } from '@feugene/granularity/testing'
 
 import type { GrDashboardResponsiveLayout } from '../../../layout'
+import type { GrDashboardContext } from '../../GrDashboard/context'
+import { useGrDashboardContext } from '../../GrDashboard/context'
 import GrDashboard from '../../GrDashboard/GrDashboard.vue'
 import GrDashboardItem from '../GrDashboardItem.vue'
 
@@ -99,6 +101,90 @@ describe('grDashboardItem: виджет без шапки', () => {
     await nextTick()
 
     expect(layout.value.lg?.[0]?.x).toBe(1)
+  })
+})
+
+describe('grDashboardItem: запрет переноса и растягивания', () => {
+  const dragHandle = (root: HTMLElement) => query(root, '[data-gr-dashboard-drag-handle]')
+  const resizeHandle = (root: HTMLElement) => query(root, '[data-gr-dashboard-resize-handle]')
+
+  it('resizable=false убирает уголок, но тащить виджет по-прежнему можно', async () => {
+    const { root, layout } = stand({ props: { resizable: false } })
+
+    expect(resizeHandle(root)).toBeNull()
+    expect(dragHandle(root)).not.toBeNull()
+
+    keydown(dragHandle(root)!, ' ')
+    keydown(dragHandle(root)!, 'ArrowRight')
+    await nextTick()
+
+    expect(layout.value.lg?.[0]?.x).toBe(1)
+  })
+
+  it('запрет живёт в сетке, а не в разметке: обработчик отказывает и без ручки', async () => {
+    // Спрятать кнопку мало. Жест и клавиатура идут через контекст, и запрет,
+    // который держится на «кнопку не отрисовали», снимается первым же прямым
+    // вызовом — поэтому спрашиваем сам контекст.
+    let context: GrDashboardContext | null = null
+    const layout = ref<GrDashboardResponsiveLayout>({ lg: [{ id: 'solo', x: 0, y: 0, w: 6, h: 3 }] })
+
+    const Spy = defineComponent({
+      setup: () => {
+        context = useGrDashboardContext()
+
+        return () => null
+      },
+    })
+
+    const Stand = defineComponent({
+      setup: () => () => h(
+        GrDashboard,
+        {
+          'layout': layout.value,
+          'mode': 'edit',
+          'onUpdate:layout': (value: GrDashboardResponsiveLayout) => { layout.value = value },
+        },
+        () => [
+          h(GrDashboardItem, { itemId: 'solo', resizable: false }),
+          h(Spy),
+        ],
+      ),
+    })
+
+    const restore = stubWidth(1200)
+    mount(Stand, { attachTo: document.body, global: granularityGlobal() })
+    restore()
+    await nextTick()
+
+    context!.onResizeKeydown('solo', new KeyboardEvent('keydown', { key: 'ArrowRight' }))
+    await nextTick()
+
+    expect(layout.value.lg?.[0]?.w).toBe(6)
+  })
+
+  it('draggable=false убирает ручку, но растягивать можно', async () => {
+    const { root, layout } = stand({ props: { draggable: false } })
+
+    expect(dragHandle(root)).toBeNull()
+    expect(resizeHandle(root)).not.toBeNull()
+
+    keydown(resizeHandle(root)!, 'ArrowRight')
+    await nextTick()
+
+    expect(layout.value.lg?.[0]?.w).toBe(7)
+  })
+
+  it('static сильнее обоих: ни ручки, ни уголка', () => {
+    const { root } = stand({ props: { static: true, draggable: true, resizable: true } })
+
+    expect(dragHandle(root)).toBeNull()
+    expect(resizeHandle(root)).toBeNull()
+  })
+
+  it('без своих пропов виджет слушается сетки', () => {
+    const both = stand()
+    expect(dragHandle(both.root)).not.toBeNull()
+    expect(resizeHandle(both.root)).not.toBeNull()
   })
 })
 
