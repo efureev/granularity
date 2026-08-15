@@ -482,7 +482,67 @@ Components({
 
 Подробнее про сам резолвер и его опции — [`unplugin.md`](./unplugin.md).
 
-## 9. Сборка и публикация
+## 9. Гейты пакета — фабриками, а не копиями
+
+Четыре обещания пакет держит теми же проверками, что ядро: покомпонентные токены объявлены, стилевые
+значения берутся из шкалы, все точки регистрации сходятся с файловой системой, а `defaults.ts`
+дополняет реестр по месту объявления. Раньше это были копии четырёх файлов ядра (~450 строк на пакет),
+и расходились они молча. Теперь — вызовы фабрик из
+[`@feugene/granularity-test-kit`](../../granularity-test-kit/README.md):
+
+```ts
+// src/__tests__/styleTokens.test.ts
+import { defineStyleTokensGate } from '@feugene/granularity-test-kit/gates'
+
+defineStyleTokensGate()
+```
+
+```ts
+// src/__tests__/componentTokens.test.ts
+import { grComponentTokens, grDerivedTokens, grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
+import { defineComponentTokensGate } from '@feugene/granularity-test-kit/gates'
+
+// Всё, что объявило ядро, легально как употребление — но не как объявление.
+defineComponentTokensGate({
+  globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grThemeTokens, ...grComponentTokens],
+})
+```
+
+```ts
+// src/__tests__/registry.generated.test.ts
+import { defineRegistryGate } from '@feugene/granularity-test-kit/gates'
+import { MY_PACKAGE_COMPONENTS } from '../componentNames'
+import { myPackageComponentConfigs } from '../granular-provider/shared'
+
+defineRegistryGate({ componentConfigs: myPackageComponentConfigs, componentNames: MY_PACKAGE_COMPONENTS })
+```
+
+```ts
+// src/__tests__/componentDefaults.test.ts
+import { defineComponentDefaultsGate } from '@feugene/granularity-test-kit/gates'
+
+defineComponentDefaultsGate({ registryModule: '@feugene/granularity/composables/useGrComponentConfig' })
+```
+
+```ts
+// src/__tests__/gateCoverage.test.ts
+import { defineGateCoverage } from '@feugene/granularity-test-kit/gates'
+
+defineGateCoverage()
+```
+
+Тест-кит идёт в `devDependencies` и **не зависит от ядра**: реестры токенов и конфигов приходят
+аргументом. Поэтому его же фабрики зовёт само ядро, а направление зависимостей остаётся
+односторонним.
+
+Гейты читают собранный `dist` тест-кита — как витрина читает собранный `dist` ядра. Корневые
+`test:*` и `typecheck:*` собирают его сами; при прямом `yarn workspace <pkg> test:run` он должен быть
+собран (`yarn build:test-kit`).
+
+Всё остальное — `a11y`, `emitNaming`, полнота локалей, интеграция с `fint-i18n`, гейты своего домена —
+пишется пакетом самостоятельно: они у каждого разные по существу.
+
+## 10. Сборка и публикация
 
 ```bash
 yarn workspace @feugene/my-package build
@@ -501,4 +561,5 @@ npx --yes publint@latest --pack npm   # проверка соответстви�
 - [ ] (Опц., если есть встроенные строки) `src/i18n`: уникальный блок (не `gr`), per-locale loaders, `all.ts` вне barrel; экспорты `./i18n` + `./i18n/all`, `fint-i18n` — optional peer; компоненты читают перевод через резолвер с fallback.
 - [ ] Granular-provider: `shared.ts` + browser/node entry, зарегистрирован в приложении рядом с ядром.
 - [ ] (Опц.) `./resolver` на `createGranularResolver` (whitelist + `importStyle: false`), optional peers, регистрируется раньше core-резолвера.
+- [ ] Гейты: четыре фабрики из `@feugene/granularity-test-kit/gates` + `defineGateCoverage`; свои гейты домена — рядом.
 - [ ] `build` зелёный, `publint` — `All good!`.
