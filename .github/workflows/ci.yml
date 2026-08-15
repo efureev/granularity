@@ -6,6 +6,7 @@ on:
     tags:
       - 'v*'
       - 'unplugin-granularity-v*'
+      - 'granularity-test-kit-v*'
       - 'granularity-chrono-v*'
       - 'granularity-charts-v*'
       - 'granularity-dashboard-v*'
@@ -20,6 +21,124 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Гейты токенов, реестров и дефолтов живут фабриками в
+  # @feugene/granularity-test-kit — ядро и все спутники зовут их из собранного
+  # `dist`, поэтому пакет проверяется первым и ни от чего не зависит сам.
+  build-granularity-test-kit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint package
+        run: yarn lint:test-kit
+
+      - name: Typecheck package
+        if: always()
+        run: yarn typecheck:test-kit
+
+      - name: Test package
+        run: yarn test:test-kit
+
+      - name: Build package
+        run: yarn build:test-kit
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/granularity-test-kit
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-test-kit-dist
+          path: packages/granularity-test-kit/dist/
+
+  # Публикация @feugene/granularity-test-kit в npm по тегу вида
+  # `granularity-test-kit-v<semver>`. Отдельный тег нужен по той же причине, что
+  # у остальных спутников: гейты правятся чаще ядра и не ждут его релиза.
+  publish-npm-granularity-test-kit:
+    needs:
+      - build-granularity-test-kit
+    if: startsWith(github.ref, 'refs/tags/granularity-test-kit-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/granularity-test-kit
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#granularity-test-kit-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-test-kit-dist
+          path: packages/granularity-test-kit/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/granularity-test-kit
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория.
+  publish-gpr-granularity-test-kit:
+    needs:
+      - publish-npm-granularity-test-kit
+    if: startsWith(github.ref, 'refs/tags/granularity-test-kit-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-test-kit-dist
+          path: packages/granularity-test-kit/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/granularity-test-kit
+        run: |
+          npm pkg set name='@efureev/granularity-test-kit'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity-test-kit
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   quality-granularity:
     runs-on: ubuntu-latest
     steps:
@@ -639,6 +758,12 @@ jobs:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
 
+      # Гейты пакета зовут фабрики из собранного `dist` тест-кита — как витрина
+      # работает с собранным `dist` ядра. Джоба гоняет скрипты пакета напрямую,
+      # поэтому сборка нужна здесь, а не приезжает из корневого скрипта.
+      - name: Build test kit
+        run: yarn build:test-kit
+
       - name: Lint
         working-directory: packages/granularity-chrono
         run: yarn lint
@@ -782,6 +907,9 @@ jobs:
         with:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
+
+      - name: Build test kit
+        run: yarn build:test-kit
 
       - name: Lint
         working-directory: packages/granularity-charts
@@ -932,6 +1060,9 @@ jobs:
         with:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
+
+      - name: Build test kit
+        run: yarn build:test-kit
 
       - name: Lint
         working-directory: packages/granularity-dashboard
