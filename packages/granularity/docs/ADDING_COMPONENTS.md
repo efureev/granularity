@@ -230,6 +230,24 @@ yarn workspace @feugene/granularity generate:registry
 зависимости между компонентами, `granularityComponents` и общий safelist,
 `granularityStyleAssets` и extra CSS assets в `vite.config.ts`.
 
+### Страница компонента — той же правкой, не потом
+
+Компонент без страницы не выбрать: чтобы понять, он тут нужен или сосед, придётся
+читать его исходник. Поэтому страница заводится вместе с компонентом, а не
+«когда устоится API».
+
+1. `docs/components/<ComponentName>.md` — назначение одной фразой, обязательные
+   секции `## Когда брать` и `## Когда взять другое`, дальше неочевидные решения
+   и их причины. Перечня пропов там быть не должно: он генерируется.
+   Жанр и границы — раздел «Страница компонента» в [`components.md`](./components.md),
+   процедура написания — `.claude/rules/component-docs.md`.
+2. Имя компонента в [`components.md`](./components.md) §«Опубликованные
+   компоненты» становится **ссылкой** на эту страницу.
+3. Компонент встаёт хотя бы в одну развилку `docs/COMPONENT-MAP.md` в корне
+   репозитория — то есть автор проговаривает, чем он отличается от соседей.
+   Развилку назвать не получается — вероятно, компонент дублирует существующий,
+   и вопрос стоит задать до реализации, а не после.
+
 ### 4. `package` CSS-exports
 
 Foundation-only слой публикуется как `@feugene/granularity/foundation.css`, а полный пакетный bundle — как `@feugene/granularity/styles.css`.
@@ -302,6 +320,9 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.
 6. Обновлён `src/__tests__/presetGranularity.test.ts` и связанные component tests, если они нужны.
 7. Для компонента добавлены все ожидаемые публичные entrypoint'ы и связанные style asset'ы.
+8. Заведена `docs/components/<ComponentName>.md` с обеими обязательными секциями,
+   имя в `components.md` стало ссылкой, компонент стоит в развилке
+   `docs/COMPONENT-MAP.md`. Проверяет гейт `src/__tests__/componentDocs.test.ts`.
 
 ## Как добавлять директивы
 
@@ -330,4 +351,5 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 5. Подключить компонент в `src/registry/components.ts`.
 6. Прогнать `yarn generate:registry` — он обновит `src/index.ts`, `package.json#exports`, `vite.config.ts` и реестр провайдера.
 7. Обновить `src/__tests__/presetGranularity.test.ts` и сопутствующие тесты.
-8. Проверить, что новый компонент или директива корректно подключены в публичный API пакета.
+8. Написать `docs/components/<ComponentName>.md`, сделать имя в `components.md` ссылкой, поставить компонент в развилку `docs/COMPONENT-MAP.md`.
+9. Проверить, что новый компонент или директива корректно подключены в публичный API пакета.

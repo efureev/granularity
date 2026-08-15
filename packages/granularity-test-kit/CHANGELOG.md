@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `defineComponentDocsGate` — a fifth contract: every registry component has a page under
+  `docs/components/`, no orphan pages, `H1` matches the component, both `## Когда брать` and
+  `## Когда взять другое` are present and non-empty, redirect links resolve to real files, the
+  name is linked from the index, and no hand-written API table sneaks back in. A component
+  without a page, an orphan page and an index out of sync all used to pass CI in silence.
+- `redirectExempt` option for components with no neighbour in the ecosystem: each exemption
+  carries a written reason, so a silent skip cannot accumulate.
+
+### Changed
+
+- `REQUIRED_GATES` now includes `defineComponentDocsGate`, so `defineGateCoverage` fails a
+  package that ships components without pages.
+
 ## [v0.1.0] 2026-08-15
 
 ### Added

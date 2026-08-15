@@ -39,7 +39,9 @@ yarn install
 
 - The version is bumped in `packages/granularity/package.json`, and a `vX.Y.Z` tag is created on `main`.
 - Pushing the tag triggers the `publish` job in GitHub Actions: publishing to npm (with `--provenance`) and GitHub Packages.
-- Update [`CHANGELOG.md`](./CHANGELOG.md) as part of the release PR.
+- Update the changelog of the package being released — for the core that is
+  [`packages/granularity/CHANGELOG.md`](./packages/granularity/CHANGELOG.md) — as part of the
+  release PR. There is no changelog at the repository root: every package keeps its own.
 
 ## License
 

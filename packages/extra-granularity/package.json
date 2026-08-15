@@ -71,12 +71,14 @@
   },
   "devDependencies": {
     "@feugene/granularity": "^0.20.0",
+    "@feugene/granularity-test-kit": "^0.1.0",
     "@feugene/unocss-preset-granular": "^0.8.2",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.1.5",
     "vite-plugin-lib-inject-css": "^2.2.2",
+    "vitest": "^4.1.10",
     "vue": "^3.5.40",
     "vue-tsc": "^3.3.7"
   },
@@ -84,6 +86,8 @@
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "doctor": "granular doctor ./granular.options.mjs --strict",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   }
 }

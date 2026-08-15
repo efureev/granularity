@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Per-component documentation under `docs/components/` — one page per component, plus a
+  `docs/components.md` index. Until now the only per-component description lived in the
+  showcase app (`companionPackages.ts`), so it never reached the published tarball.
+- `docs/a11y.md` — roles, what the live region announces and why, the `grid` pattern and the
+  non-modal panel. The package was the only companion without it.
+- `defineComponentDocsGate` from `@feugene/granularity-test-kit` wired in: a component
+  without a page can no longer ship.
+
 ## [0.2.0] - 2026-08-12
 
 ### Fixed

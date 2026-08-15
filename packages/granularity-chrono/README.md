@@ -33,14 +33,16 @@ same CSS variables one level deeper; `id`, `name` and the accessible name could
 not be set because the `<input>` belonged to the library; and the prop contract
 drifted on every major of the dependency without anything failing the build.
 
-See `AUDIT-DATEPICKER.md` and `SPEC-GrChrono.md` in the repository root for the
-full reasoning.
+Each of the three is structural: none could be fixed without owning the widget,
+which is what this package does.
 
 ## Status
 
 Six components — `GrCalendar`, `GrDatePicker`, `GrTimePicker`, `GrDateTimePicker`,
 `GrDateRangePicker` and `GrRelativeTime` — plus the public arithmetic and the
-shared clock (`useChronoNow`). The remaining roadmap lives in `SPEC-GrChrono.md`.
+shared clock (`useChronoNow`). What each one is for, and where the line to its
+neighbour runs, is in [`docs/components.md`](./docs/components.md); what has
+shipped so far is in [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Install
 

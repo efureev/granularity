@@ -7,8 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Every component page now answers "when do I reach for this one?"** Two required
+  sections — `## Когда брать` (3–5 user situations, not a feature list) and
+  `## Когда взять другое` (a table of redirects, each row ending in a live link to a
+  neighbour) — across all 68 pages. Picking between `GrSelect` and `GrAutocomplete`, or
+  between `GrDialog`, `GrModal` and `GrDrawer`, no longer means reading both sources.
+- `defineComponentDocsGate` from `@feugene/granularity-test-kit` wired in. It holds the
+  **shape**: a page per registry component, no orphans, `H1` matching the component, both
+  sections present and non-empty, redirect links resolving to real components, the name
+  linked from the index, and no hand-written API table — the listing is generated, and a
+  manual copy drifts silently.
+
+### Changed
+
+- `docs/components.md` §"Страница компонента" now specifies the four places a page has and
+  the question each one answers, so redirects to a neighbour and genuinely missing
+  capabilities stop bleeding into each other.
+- `ADDING_COMPONENTS.md` gained the documentation step it never had: the page, the index
+  link and the fork entry in the cross-package map, all in the same change as the component.
+
 ### Fixed
 
+- **Prop docs that contradicted their own implementation.** `GrSegmented.name`
+  promised "hidden radio-inputs" while the component emits exactly one hidden
+  field — deliberately, since `role="radio"` declares its children
+  presentational and a nested interactive control breaks the widget for screen
+  readers. `GrTimelineItem.pending` claimed the dashed run starts *after* the
+  marker, while the CSS dashes the segment *leading to* it and its own. Both
+  strings had already travelled into `componentApi.generated.json`,
+  `web-types.json` and IDE tooltips, so the fix is in the source, not the page.
+- **Behaviour that existed only in code.** `GrTimeline` auto-detects emptiness
+  (and why `v-for` over an empty array does not count as content) and renders
+  skeleton rows while loading; `GrFileUpload` keeps the progress bar for
+  `hideProgressOnSuccess` ms after success, because a bar vanishing on the same
+  frame it fills reads as a failure; `GrDataTable` separates
+  `initialSortKey`/`initialSortDir` from the controlled `sortKey`/`sortDir`.
+  None of it was on the pages.
 - **`GrTimeline`: the axis jogged sideways and broke apart at every group
   heading.** Three defects, one root cause — the rail geometry assumed a rail
   always contains a marker, and a group heading's rail contains only the line.

@@ -56,7 +56,7 @@ export interface GrSegmentedProps {
   invalid?: boolean
   /** Обязательное поле (`aria-required`). */
   required?: boolean
-  /** Имя скрытых radio-inputs для интеграции с нативной формой. */
+  /** Имя скрытого поля, которым выбранное значение уходит в нативную форму. */
   name?: string
   ariaLabel?: string
 }

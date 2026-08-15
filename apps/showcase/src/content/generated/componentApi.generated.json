@@ -7989,7 +7989,7 @@
           },
           {
             "name": "name",
-            "description": "Имя скрытых radio-inputs для интеграции с нативной формой.",
+            "description": "Имя скрытого поля, которым выбранное значение уходит в нативную форму.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

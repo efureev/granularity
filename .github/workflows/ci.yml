@@ -159,6 +159,37 @@ jobs:
         if: always()
         run: yarn typecheck:granularity
 
+      # Карта выбора компонента: генерируемый блок совпадает со страницами,
+      # каждый компонент стоит хотя бы в одной развилке, ссылки резолвятся.
+      - name: Check component map
+        if: always()
+        run: yarn docs:check
+
+  docs-granularity:
+    needs:
+      - build-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Проверка читает `dist/web-types.json`, поэтому идёт после сборки, а не
+      # в vitest: примеры на страницах сверяются с публичной поверхностью.
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Check doc examples against API
+        run: yarn docs:audit:check
+
   test-granularity:
     runs-on: ubuntu-latest
     strategy:
@@ -1206,8 +1237,14 @@ jobs:
           name: granularity-dist
           path: packages/granularity/dist
 
+      - name: Build test kit
+        run: yarn build:test-kit
+
       - name: Build package
         run: yarn workspace @feugene/extra-granularity build
+
+      - name: Run tests
+        run: yarn workspace @feugene/extra-granularity test:run
 
       - name: Granular doctor
         working-directory: packages/extra-granularity

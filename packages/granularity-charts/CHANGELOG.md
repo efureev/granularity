@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Per-component documentation under `docs/components/` — one page per chart, plus a
+  `docs/components.md` index. Until now the only per-component description lived in the
+  showcase app (`companionPackages.ts`), so it never reached the published tarball.
+- `defineComponentDocsGate` from `@feugene/granularity-test-kit` wired in: a component
+  without a page can no longer ship.
+
 ## [v0.3.0] 2026-08-14
 
 ### Added
