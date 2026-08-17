@@ -135,8 +135,17 @@ for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual (${theme})`, () => {
     for (const name of VISUAL_COMPONENTS) {
       test(`${name} live examples`, async ({ page }) => {
-        // Форсим тему до загрузки приложения, чтобы снапшот был стабильным.
-        await page.emulateMedia({ colorScheme: theme })
+        /*
+         * Тема форсится до загрузки приложения, чтобы снапшот был стабильным.
+         *
+         * `reducedMotion` — по той же причине, а не ради доступности: снимок
+         * анимации ловит случайный кадр и протухает сразу после съёмки. Демо
+         * пакета под этим режимом останавливаются сами (таймеры «живого
+         * значения» у `GrProgressCircle` не запускаются вовсе, пульс
+         * `GrSkeleton` гасится медиазапросом), поэтому маска не нужна —
+         * достаточно попросить страницу не двигаться.
+         */
+        await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
         await pinAppearance(page, theme)
 
         await page.goto(componentPath(name))
@@ -157,7 +166,7 @@ for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual companion (${theme})`, () => {
     for (const name of VISUAL_COMPANIONS) {
       test(`${name} live examples`, async ({ page }) => {
-        await page.emulateMedia({ colorScheme: theme })
+        await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
         await pinAppearance(page, theme)
 
         await page.goto(companionPath(name))
@@ -184,7 +193,7 @@ for (const theme of ['light', 'dark'] as const) {
  */
 for (const theme of ['light', 'dark'] as const) {
   test(`visual (${theme}) GrColorPicker panel`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme: theme })
+    await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
     await pinAppearance(page, theme)
 
     await page.goto(componentPath('GrColorPicker'))
