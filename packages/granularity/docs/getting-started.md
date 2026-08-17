@@ -132,7 +132,7 @@ my-app/
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@feugene/granularity": "^0.20.0",
+    "@feugene/granularity": "^0.21.0",
     "@floating-ui/dom": "^1.8.0",
     "@unocss/reset": "^66.7.5",
     "vue": "^3.5.40"
