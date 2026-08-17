@@ -19,6 +19,7 @@
 | Строки вложены друг в друга | [`GrTree`](./GrTree.md) |
 | Порядок строк меняет пользователь | [`GrSortableList`](./GrSortableList.md) |
 | Строки — события во времени | [`GrTimeline`](./GrTimeline.md) |
+| Строка — пара «характеристика → значение» | [`GrDescriptionList`](./GrDescriptionList.md) |
 | Строк нет, и надо объяснить почему | [`GrEmptyState`](./GrEmptyState.md) |
 
 ## Поверхность

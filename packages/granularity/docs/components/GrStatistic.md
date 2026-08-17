@@ -20,6 +20,7 @@
 | Важен ход во времени | [`GrChartLine`](../../../granularity-charts/docs/components/GrChartLine.md) / [`GrSparkline`](../../../granularity-charts/docs/components/GrSparkline.md) |
 | Показана доля от целого | [`GrProgressCircle`](./GrProgressCircle.md) |
 | Значение — статус, а не число | [`GrBadge`](./GrBadge.md) |
+| Величина стоит внутри строки текста, а не плиткой | [`GrDelta`](./GrDelta.md) |
 
 Компонент презентационный: данные не грузит и дельту не считает — только
 форматирует и подаёт. Тренд приходит готовым, потому что «к чему сравнивать»

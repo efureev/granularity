@@ -35,6 +35,15 @@ export type ToastInput = {
   action?: ToastAction
   /** Несколько action-кнопок в теле тоста. Рендерятся после `action`. */
   actions?: ToastAction[]
+  /**
+   * Схлопывать повтор: `push` с уже занятым ключом обновляет **живой** тост
+   * и перезапускает его автозакрытие вместо того, чтобы завести второй.
+   *
+   * Ключ действует только пока тост на экране. Это не то же самое, что помнить
+   * последнее показанное: повтор действия с тем же текстом обязан показаться
+   * снова, иначе второе «Сохранено» пропадёт молча.
+   */
+  dedupeKey?: string
 }
 
 /**
@@ -58,6 +67,8 @@ export type Toast = {
   action?: ToastAction
   /** Несколько action-кнопок в теле тоста. */
   actions?: ToastAction[]
+  /** Ключ схлопывания повторов, если тост создан с ним. */
+  dedupeKey?: string
 }
 
 const DEFAULT_TIMEOUT_MS = 3500
@@ -203,8 +214,22 @@ export function useToast() {
   }
 
   function push(input: ToastInput): string {
-    const id = makeId()
     const timeout = input.timeoutMs ?? DEFAULT_TIMEOUT_MS
+
+    // Схлопывание ищет тост только среди живых. Помнить последний показанный
+    // ключ нельзя: тогда повтор того же действия («Сохранено» второй раз)
+    // не показался бы вообще — тост уже ушёл, а ключ ещё занят.
+    if (input.dedupeKey !== undefined) {
+      const existing = state.toasts.find(item => item.dedupeKey === input.dedupeKey)
+      if (existing) {
+        // Замена целиком, а не патч: повторный `push` — это законченное
+        // высказывание, и `message` от прошлого раза донашивать он не должен.
+        applyStage(existing.id, { ...input, tone: input.tone ?? 'info', timeoutMs: timeout })
+        return existing.id
+      }
+    }
+
+    const id = makeId()
     const toast: Toast = {
       id,
       title: input.title,
@@ -213,6 +238,7 @@ export function useToast() {
       timeoutMs: timeout > 0 ? timeout : 0,
       action: input.action,
       actions: input.actions,
+      dedupeKey: input.dedupeKey,
     }
 
     state.toasts.unshift(toast)

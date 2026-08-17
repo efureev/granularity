@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import { GrButton, GrForm, GrFormField, GrInput, type GrFormRules } from '@feugene/granularity'
+import { GrButton, GrForm, GrFormField, GrInput, type GrFormInstance, type GrFormRules } from '@feugene/granularity'
 
 import CustomColorInput from './CustomColorInput.vue'
 
@@ -17,7 +17,7 @@ const rules: GrFormRules = {
   brandColor: [{ required: true }, { validator: isHexColor }],
 }
 
-const formRef = ref<InstanceType<typeof GrForm>>()
+const formRef = ref<GrFormInstance>()
 const saved = ref('')
 
 function onSubmit() {

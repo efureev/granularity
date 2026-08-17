@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import { GrButton, GrForm, GrFormField, GrInput, type GrFormRules } from '@feugene/granularity'
+import { GrButton, GrForm, GrFormField, GrInput, type GrFormInstance, type GrFormRules } from '@feugene/granularity'
 
 const model = reactive({ name: '', email: '', password: '' })
 
@@ -11,7 +11,7 @@ const rules: GrFormRules = {
   password: [{ required: true, min: 8 }],
 }
 
-const formRef = ref<InstanceType<typeof GrForm>>()
+const formRef = ref<GrFormInstance>()
 const submitted = ref(false)
 
 function onSubmit() {

@@ -38,6 +38,7 @@ import {
   selectColumnWidths,
   sortIconSizes,
   spinnerSizes,
+  summaryRowClass,
 } from './grDataTableStyles'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
@@ -57,6 +58,14 @@ export type GrDataColumnKey<TRow extends Record<string, unknown> = Record<string
 export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, unknown>> = {
   key: GrDataColumnKey<TRow>
   label: string
+  /**
+   * Заголовок колонки сортирует.
+   *
+   * Сортируется **переданный массив `rows`**, и только он. Над серверной
+   * пагинацией это врёт: «максимальное списание» покажет максимум по текущей
+   * странице, а прочитается как максимум по журналу. Данные приходят
+   * постранично — включайте `externalSort` и сортируйте запросом.
+   */
   sortable?: boolean
   align?: 'left' | 'center' | 'right'
   /**
@@ -75,6 +84,16 @@ export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, u
    */
   pinned?: 'left' | 'right'
 }
+
+/**
+ * Значения итоговой строки по ключам колонок.
+ *
+ * Не строка набора: у итога нет ключа, он не сортируется и не выбирается.
+ * Колонка, для которой значения нет, остаётся пустой ячейкой — заполнять все
+ * колонки итог не обязан.
+ */
+export type GrDataTableSummary<TRow extends Record<string, unknown> = Record<string, unknown>> =
+  Partial<Record<GrDataColumnKey<TRow>, unknown>>
 
 export type GrDataTableRowKey<TRow extends Record<string, unknown> = Record<string, unknown>> =
   | string
@@ -126,6 +145,21 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
   rowClass?: string | ((row: TRow, index: number) => string | undefined)
   /** Произвольные атрибуты строки (`data-*`, `title`, …). */
   rowProps?: (row: TRow, index: number) => Record<string, unknown> | undefined
+  /**
+   * Итоговая строка в `<tfoot>`: значения по ключам колонок.
+   *
+   * Встаёт по той же колоночной сетке, что и тело, — с теми же паддингами,
+   * выравниванием, ширинами и закреплением. Собранная руками в `#footer`, она
+   * этих классов не получает (`GrTable` их принципиально не даёт) и разъезжается
+   * с телом на первой же смене `size`.
+   *
+   * Итог не суммируется компонентом: что считать итогом — знает приложение.
+   * Оформление ячейки — слот `#summary-<key>`.
+   *
+   * `null` равнозначен отсутствию: `totals ?? null` — обычная запись там, где
+   * итог считается не всегда.
+   */
+  summaryRow?: GrDataTableSummary<TRow> | null
   /**
    * Размер таблицы: кегль, паддинги ячеек, стрелки сортировки и чекбоксы.
    * Прокидывается в `GrTable`.
@@ -192,6 +226,14 @@ export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<
  * на заголовок и scoped-слотами ячеек (`#cell-<key>`), `#header-<key>`,
  * `#caption`, `#footer`, `#empty`, `#loading`.
  *
+ * Итоговая строка объявляется пропом `summaryRow` и оформляется слотами
+ * `#summary-<key>`: она встаёт по той же колоночной сетке, что и тело.
+ *
+ * `#footer` — для свободной разметки под итогом: несколько строк, примечание,
+ * `colspan`. Рендерится внутрь того же `<tfoot>`, то есть его содержимое тоже
+ * строки таблицы (`<tr><td>`), а скоуп отдаёт `columns` (в текущем порядке) и
+ * `totalColumns` (с колонкой выбора).
+ *
  * Сортировка, включая крайние случаи с пустыми и смешанными значениями, живёт
  * в `grDataTableSort.ts` — см. `docs/components/GrDataTable.md`.
  */
@@ -211,6 +253,7 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   emptyText: undefined,
   rowClass: undefined,
   rowProps: undefined,
+  summaryRow: undefined,
   size: undefined,
   caption: undefined,
   ariaLabel: undefined,
@@ -386,13 +429,38 @@ const checkboxSize = computed(() => selectCheckboxSizes[resolvedSize.value])
  * диктор считает строки по разметке, а там всего окно. Заголовок — строка
  * первая, поэтому строки набора начинаются со второй.
  */
-const ariaRowCount = computed(() => (props.virtual ? sortedRows.value.length + 1 : undefined))
+/**
+ * Итог показывается, только когда набор на экране: «Итого 1 234» над спиннером —
+ * утверждение о том, чего ещё не показали. Пустой набор при этом итог не гасит:
+ * «Итого 0» под «нет данных» осмысленно, и считает его потребитель.
+ *
+ * Предикат один на всех: шаблон, `aria-rowcount` и номер строки обязаны сходиться,
+ * иначе диктор объявит строку, которой в разметке нет.
+ */
+const hasSummary = computed(() => props.summaryRow != null && !props.loading)
+
+const ariaRowCount = computed(() => (
+  props.virtual ? sortedRows.value.length + 1 + (hasSummary.value ? 1 : 0) : undefined
+))
 
 function ariaRowIndex(index: number): number | undefined {
   return props.virtual ? index + 2 : undefined
 }
 
+/** Итог идёт следующим номером за последней строкой набора. */
+const summaryAriaRowIndex = computed(() => (
+  props.virtual ? sortedRows.value.length + 2 : undefined
+))
+
 const isEmpty = computed(() => sortedRows.value.length === 0)
+
+/**
+ * Значение итога по ключу колонки. Как и `cellValue`, отдаёт сырое: отсутствие
+ * ключа даёт пустую ячейку, а ноль — это значение, а не пустота.
+ */
+function summaryValue(key: string): unknown {
+  return (props.summaryRow as Record<string, unknown> | undefined)?.[key]
+}
 
 // Общее число колонок с учётом ведущей чекбокс-колонки — для `colspan`
 // строк loading/empty.
@@ -1293,8 +1361,42 @@ defineExpose({
       </tr>
     </template>
 
-    <template v-if="$slots.footer" #footer>
-      <slot name="footer" />
+    <template v-if="$slots.footer || hasSummary" #footer>
+      <!--
+        Итог зеркалит ячейку тела теми же функциями, а не своими классами: у
+        `GrTable` ячейки `<tfoot>` не оформлены принципиально, и собранная руками
+        строка разъезжается с телом на первой же смене `size`. Индекс колонки
+        обязателен — по нему `pinnedEdgeClass` находит край группы.
+      -->
+      <tr
+        v-if="hasSummary"
+        data-gr-datatable-summary
+        :class="summaryRowClass"
+        :aria-rowindex="summaryAriaRowIndex"
+      >
+        <td
+          v-if="selectable"
+          :class="[
+            selectColumnClass,
+            cellClass,
+            hasPinnedLeft ? columnPinnedClass : '',
+          ]"
+          :style="hasPinnedLeft ? { left: '0px' } : undefined"
+        />
+        <td
+          v-for="(col, colIndex) in orderedColumns"
+          :key="col.key"
+          :data-column-key="col.key"
+          :class="[cellClass, cellAlign(col), ...pinnedCellClass(col, colIndex)]"
+          :style="{ ...columnWidthStyle(widthOf(col)), ...pinnedStyleOf(col) }"
+        >
+          <slot :name="`summary-${col.key}`" :value="summaryValue(col.key)" :column="col">
+            <span>{{ summaryValue(col.key) }}</span>
+          </slot>
+        </td>
+      </tr>
+
+      <slot name="footer" :columns="orderedColumns" :total-columns="totalColumns" />
     </template>
   </GrTable>
 </template>

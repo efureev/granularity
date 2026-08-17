@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TModel extends object = Record<string, unknown>">
 import { computed, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -34,9 +34,17 @@ export type {
  * template ref (`validate` / `validateField` / `clearValidate` / `resetFields` /
  * `scrollToField`).
  */
-export interface GrFormProps {
-  /** Реактивный объект данных формы. Поля адресуются по `name` (`GrFormField`), в т.ч. dot-path. */
-  model: Record<string, unknown>
+export interface GrFormProps<TModel extends object = Record<string, unknown>> {
+  /**
+   * Реактивный объект данных формы. Поля адресуются по `name` (`GrFormField`),
+   * в т.ч. dot-path.
+   *
+   * Тип дженерик, а не `Record<string, unknown>`: моделью бывает объект чужой
+   * библиотеки (`useForm` Inertia, стор), у которого рядом с полями лежат
+   * собственные методы. Под словарь он не подходит, и потребителю пришлось бы
+   * приводить его через `as unknown as` в каждой форме.
+   */
+  model: TModel
   /** Правила валидации по имени поля: `{ email: [{ required: true, type: 'email' }] }`. */
   rules?: GrFormRules
   /** Валидировать поле при потере фокуса. */
@@ -53,9 +61,9 @@ export interface GrFormProps {
   disabled?: boolean
 }
 
-export interface GrFormEmits {
+export interface GrFormEmits<TModel extends object = Record<string, unknown>> {
   /** Форма прошла валидацию по submit. Отдаёт `model`. */
-  (e: 'submit', model: Record<string, unknown>): void
+  (e: 'submit', model: TModel): void
   /** Результат валидации одного поля. */
   (e: 'validate', name: string, valid: boolean, message: string | undefined): void
   /**
@@ -66,7 +74,7 @@ export interface GrFormEmits {
 }
 
 const props = withDefaults(
-  defineProps<GrFormProps>(),
+  defineProps<GrFormProps<TModel>>(),
   {
     rules: undefined,
     validateOnBlur: true,
@@ -77,9 +85,16 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<GrFormEmits>()
+const emit = defineEmits<GrFormEmits<TModel>>()
 
 const { t } = useGranularityTranslations()
+
+/**
+ * Модель наружу дженерик, а адресация полей внутри работает по строковому пути.
+ * Приведение безопасно: форма читает и пишет только по именам, объявленным
+ * полями (`GrFormField name`), а не по всему объекту.
+ */
+const modelRecord = computed(() => props.model as Record<string, unknown>)
 
 // ————— Ошибки и реестр полей.
 const errors = ref<Record<string, string | undefined>>({})
@@ -101,7 +116,7 @@ function getRules(name: string): GrFormRule[] {
 }
 
 function getValue(name: string): unknown {
-  return getByPath(props.model, name)
+  return getByPath(modelRecord.value, name)
 }
 
 const requiredFields = computed(() => {
@@ -163,7 +178,7 @@ async function runValidation(name: string, seq: number, rules: GrFormRule[]): Pr
   // молчит до ответа сервера, и пользователь не знает, что что-то происходит.
   validatingSet.value = new Set(validatingSet.value).add(name)
   try {
-    const message = await runFieldRules(getValue(name), rules, props.model, resolveMessage)
+    const message = await runFieldRules(getValue(name), rules, modelRecord.value, resolveMessage)
 
     // Устаревший прогон: его результат — про прежнее значение, не применять.
     if (validationSeq.get(name) !== seq) {
@@ -226,7 +241,7 @@ function clearValidate(names?: string | string[]): void {
   errors.value = next
 }
 
-const initialSnapshot = ref<Record<string, unknown>>(cloneModelValue(props.model))
+const initialSnapshot = ref<Record<string, unknown>>(cloneModelValue(modelRecord.value))
 
 /**
  * Переснять «исходное» состояние. Нужен формам редактирования: модель там
@@ -234,7 +249,7 @@ const initialSnapshot = ref<Record<string, unknown>>(cloneModelValue(props.model
  * объект — и `resetFields()` возвращал не «как было при загрузке», а пустоту.
  */
 function setSnapshot(model?: Record<string, unknown>): void {
-  initialSnapshot.value = cloneModelValue(model ?? props.model)
+  initialSnapshot.value = cloneModelValue((model ?? props.model) as Record<string, unknown>)
 }
 
 /**
@@ -249,22 +264,26 @@ function removeKey(model: Record<string, unknown>, key: string): void {
 
 function resetFields(names?: string | string[]): void {
   const snapshot = initialSnapshot.value
+  const model = modelRecord.value
   const list = names ? (Array.isArray(names) ? names : [names]) : undefined
 
   // Ключи объединяем: поле, появившееся после снимка, надо **удалить**, а не
   // выставить в `undefined` — иначе «сброс» оставляет за собой мусор.
-  const keys = list ?? [...new Set([...Object.keys(props.model), ...Object.keys(snapshot)])]
+  const keys = list ?? [...new Set([...Object.keys(model), ...Object.keys(snapshot)])]
 
+  // Метод не удаляем, даже если его нет в снимке. Снимок строится клоном, а клон
+  // отбрасывает функции — то есть для внешней модели (`useForm` Inertia, стор)
+  // «нет в снимке» означает «это её метод», и сброс снёс бы саму модель.
   for (const key of keys) {
-    if (key in snapshot) setByPath(props.model, key, cloneModelValue(snapshot[key]))
-    else removeKey(props.model, key)
+    if (key in snapshot) setByPath(model, key, cloneModelValue(snapshot[key]))
+    else if (typeof model[key] !== 'function') removeKey(model, key)
   }
 
   clearValidate(list)
 }
 
 /** Модель отличается от снимка. Файлы сравниваются отпечатком, а не ссылкой. */
-const isDirty = computed(() => modelFingerprint(props.model) !== modelFingerprint(initialSnapshot.value))
+const isDirty = computed(() => modelFingerprint(modelRecord.value) !== modelFingerprint(initialSnapshot.value))
 
 /**
  * Известных ошибок нет. Это не «валидация прошла»: до первого `validate()`

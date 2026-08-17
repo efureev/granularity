@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { computed, markRaw, useSlots, type Component } from 'vue'
+import { computed, markRaw, useId, useSlots, type Component } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
 
 import {
+  cardDescriptionClass,
+  cardTitleClass,
   grCardRootClass,
   paddingClass,
   sectionDividerBottomClass,
   sectionDividerTopClass,
+  type GrCardHeadingLevel,
   type GrCardPadding,
   type GrCardVariant,
 } from './grCardStyles'
 
-export type { GrCardPadding, GrCardVariant } from './grCardStyles'
+export type { GrCardHeadingLevel, GrCardPadding, GrCardVariant } from './grCardStyles'
 
 export interface GrCardProps {
   /**
@@ -32,6 +35,16 @@ export interface GrCardProps {
   hoverable?: boolean
   /** Классы обёртки тела — она появляется вместе с секциями. */
   bodyClass?: string
+  /**
+   * Заголовок карточки — настоящий `h2`…`h6`, а не жирная строка: отчёт из
+   * шести карточек иначе не обойти по структуре, после `h1` страницы в нём
+   * нет ни одного заголовка.
+   */
+  title?: string
+  /** Пояснение под заголовком. */
+  description?: string
+  /** Уровень заголовка под структуру страницы. Не задан — из `GrConfigProvider`, иначе `3`. */
+  headingLevel?: GrCardHeadingLevel
 }
 
 export interface GrCardEmits {
@@ -47,6 +60,9 @@ const props = withDefaults(defineProps<GrCardProps>(), {
   clickable: false,
   hoverable: false,
   bodyClass: undefined,
+  title: undefined,
+  description: undefined,
+  headingLevel: undefined,
 })
 
 const emit = defineEmits<GrCardEmits>()
@@ -69,11 +85,63 @@ const rootTag = computed<string | Component>(() => {
 })
 
 /**
+ * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без
+ * `href` он ведёт в никуда. Строковый тег, кроме `a`, атрибут не понимает —
+ * там он и гасится.
+ */
+const rootHref = computed(() => (
+  typeof rootTag.value === 'string' && rootTag.value !== 'a' ? undefined : props.href
+))
+
+const headingLevel = useGrComponentProp('GrCard', 'headingLevel', () => props.headingLevel, 3)
+
+/**
+ * Заголовок внутри `<button>` невалиден: контент-модель кнопки — phrasing
+ * content. Кликабельная карточка печатает подпись `<span>`, а структура
+ * страницы в этом случае собирается ссылкой в заголовке рядом с `hoverable`.
+ */
+let headingInButtonWarned = false
+
+const headingTag = computed(() => {
+  if (rootTag.value !== 'button') return `h${headingLevel.value}`
+
+  if (!headingInButtonWarned && process.env.NODE_ENV !== 'production') {
+    headingInButtonWarned = true
+    console.warn(
+      '[GrCard] `title` внутри `clickable` печатается `<span>`: заголовок в '
+      + '`<button>` невалиден по HTML. Нужен заголовок в структуре страницы — '
+      + 'замените `clickable` на `hoverable` и поставьте ссылку в сам заголовок.',
+    )
+  }
+
+  return 'span'
+})
+
+const titleId = useId()
+const descriptionId = useId()
+
+// `#header` сильнее пропов: нестандартная шапка не обязана объяснять, почему
+// она не `title`.
+const hasOwnHeader = computed(() => Boolean(slots.header))
+const hasTitle = computed(() => !hasOwnHeader.value && Boolean(props.title))
+const hasDescription = computed(() => !hasOwnHeader.value && Boolean(props.description))
+const hasHeadingBlock = computed(() => hasTitle.value || hasDescription.value)
+
+/**
  * Обёртки появляются, только когда их попросили: карточка без секций остаётся
  * одним `<div>` со слотом внутри — ровно тем, что рендерили `GrCollapse` и
  * `GrList` до появления пропов.
  */
-const hasSections = computed(() => Boolean(slots.header || slots.footer || props.bodyClass))
+const hasSections = computed(() => Boolean(
+  slots.header || slots.footer || props.bodyClass || hasHeadingBlock.value,
+))
+
+/**
+ * Имя карточки-ссылки. Без него доступным именем становится всё содержимое
+ * подряд — заголовок, описание и тело одной строкой.
+ */
+const rootLabelledBy = computed(() => (isInteractive.value && hasTitle.value ? titleId : undefined))
+const rootDescribedBy = computed(() => (isInteractive.value && hasDescription.value ? descriptionId : undefined))
 
 const rootClass = computed(() => grCardRootClass({
   variant: resolvedVariant.value,
@@ -99,13 +167,34 @@ function onClick(event: MouseEvent): void {
     :is="rootTag"
     data-gr-card
     :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootTag === 'a' ? href : undefined"
+    :href="rootHref"
     :class="rootClass"
+    :aria-labelledby="rootLabelledBy"
+    :aria-describedby="rootDescribedBy"
     @click="onClick"
   >
     <template v-if="hasSections">
-      <div v-if="$slots.header" data-gr-card-header :class="headerClass">
-        <slot name="header" />
+      <div v-if="hasOwnHeader || hasHeadingBlock" data-gr-card-header :class="headerClass">
+        <slot name="header">
+          <component
+            :is="headingTag"
+            v-if="hasTitle"
+            :id="titleId"
+            data-gr-card-title
+            :class="cardTitleClass"
+          >
+            {{ title }}
+          </component>
+
+          <p
+            v-if="hasDescription"
+            :id="descriptionId"
+            data-gr-card-description
+            :class="cardDescriptionClass"
+          >
+            {{ description }}
+          </p>
+        </slot>
       </div>
 
       <div data-gr-card-body :class="bodySectionClass">

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
+import { defineComponent, h, markRaw, nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrStatistic from '../GrStatistic.vue'
@@ -203,6 +203,21 @@ describe('GrStatistic — переход к деталям', () => {
     expect(custom.get('[data-gr-statistic]').element.tagName).toBe('ARTICLE')
     // `href` уезжает только на настоящую ссылку.
     expect(custom.get('[data-gr-statistic]').attributes('href')).toBeUndefined()
+  })
+
+  // Обратная сторона предыдущего правила: компонент-ссылка сам рендерит `<a>`,
+  // и `href` ему нужен — а `rootTag === 'a'` для него ложно.
+  it('as-компонент получает href', () => {
+    const StubLink = markRaw(defineComponent({
+      name: 'StubLink',
+      props: { href: { type: String, default: undefined } },
+      template: '<a :href="href"><slot /></a>',
+    }))
+
+    const wrapper = mount(GrStatistic, { props: { value: 1284, as: StubLink, href: '/orders' } })
+
+    expect(wrapper.getComponent(StubLink).props('href')).toBe('/orders')
+    expect(wrapper.get('a').attributes('href')).toBe('/orders')
   })
 
   it('интерактивный корень получает фокус-кольцо и эмитит click', async () => {

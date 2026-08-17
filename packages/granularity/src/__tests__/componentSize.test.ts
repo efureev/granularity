@@ -17,6 +17,8 @@ import GrCollapse from '../components/GrCollapse/GrCollapse.vue'
 import GrCollapseItem from '../components/GrCollapse/GrCollapseItem.vue'
 import GrConfigProvider from '../components/GrConfigProvider/GrConfigProvider.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
+import GrDelta from '../components/GrDelta/GrDelta.vue'
+import GrDescriptionList from '../components/GrDescriptionList/GrDescriptionList.vue'
 import GrColorPicker from '../components/GrColorPicker/GrColorPicker.vue'
 import GrCommandPalette from '../components/GrCommandPalette/GrCommandPalette.vue'
 import GrConfirmDialog from '../components/GrConfirmDialog/GrConfirmDialog.vue'
@@ -120,6 +122,8 @@ const harnesses: { name: string, render: () => unknown }[] = [
       columns: [{ key: 'name', label: 'Name' }],
     }),
   },
+  { name: 'GrDelta', render: () => h(GrDelta, { value: 42 }) },
+  { name: 'GrDescriptionList', render: () => h(GrDescriptionList, { items: [{ label: 'L', value: 'V' }] }) },
   { name: 'GrEmptyState', render: () => h(GrEmptyState, { title: 'E' }) },
   { name: 'GrFileUpload', render: () => h(GrFileUpload) },
   {

@@ -16,6 +16,14 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-data-table-sortable-columns',
   },
   {
+    id: 'data-table-summary-row',
+    title: 'Summary row in the table grid',
+    description: '`summaryRow` — значения по ключам колонок; строка встаёт в `<tfoot>` по той же колоночной сетке, что и тело. Оформление ячейки — слот `#summary-<key>`, он получает `value` и `column`.',
+    status: 'ready',
+    previewKey: 'gr-data-table-summary-row',
+    note: 'Переключите размер: паддинги итога едут вместе с телом. Собранная руками в `#footer` строка этого не умеет — `GrTable` ячейки `<tfoot>` не оформляет, и однажды прописанный `px-3 py-2` разъезжается с телом на первой же смене `size`.',
+  },
+  {
     id: 'data-table-custom-cells',
     title: 'Custom status and actions cells',
     description: 'Ключевой composition-scenario: стандартный data pipeline остаётся у `GrDataTable`, а конкретные ячейки переопределяются слотами.',

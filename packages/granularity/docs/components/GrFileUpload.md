@@ -48,7 +48,7 @@ input объявлены пропами явно.
 заново не нужно.
 
 ```ts
-const uploader = ref<InstanceType<typeof GrFileUpload>>()
+const uploader = ref<GrFileUploadInstance>()
 
 uploader.value?.retry()
 uploader.value?.removeFile(file)   // удаление обрывает идущую загрузку: она была про прежний набор

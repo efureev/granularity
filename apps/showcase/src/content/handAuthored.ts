@@ -9,7 +9,7 @@ const componentGroups = {
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree'],
+  data: ['GrAvatar', 'GrCard', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree'],
   utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -77,6 +77,8 @@ const componentSummaryOverrides = {
   GrSplitter: 'Splits a layout into two resizable panels with a draggable divider.',
   GrRating: 'Collect and display a star rating, with half steps and a read-only mode.',
   GrStatistic: 'Highlights a key metric with a caption, formatting and a trend line.',
+  GrDelta: 'Shows a signed value with its sign, tone and arrow inline in a sentence.',
+  GrDescriptionList: 'Lists label-value pairs as a real description list, values aligned in a column.',
   GrCommandPalette: 'Opens a ⌘K search over app commands with groups and shortcuts.',
   GrSwitch: 'Quickly turns a binary setting on and off.',
   GrTable: 'A simple table for compact display of structured data.',
@@ -155,6 +157,14 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
   },
   'component:GrStatistic': {
     group: 'data',
+  },
+  'component:GrDelta': {
+    group: 'data',
+    tags: ['new'],
+  },
+  'component:GrDescriptionList': {
+    group: 'data',
+    tags: ['new'],
   },
   'component:GrTimeline': {
     group: 'data',

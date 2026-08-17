@@ -7,6 +7,7 @@ import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrFormFile from '../../GrFormFile/GrFormFile.vue'
 import GrInput from '../../GrInput/GrInput.vue'
 import type { GrFormRules } from '../validation'
+import type { GrFormInstance } from '..'
 
 // jsdom не реализует layout; глушим scrollIntoView, чтобы scroll-to-error не падал.
 beforeEach(() => {
@@ -21,7 +22,7 @@ function makeHarness(rules: GrFormRules, initial: Record<string, string> = { ema
     components: { GrForm, GrFormField, GrInput },
     setup() {
       const model = reactive({ ...initial })
-      const formRef = ref<InstanceType<typeof GrForm>>()
+      const formRef = ref<GrFormInstance>()
       const submitted = ref(0)
       return { model, rules, formRef, submitted, onSubmit: () => { submitted.value++ } }
     },
@@ -225,7 +226,7 @@ describe('GrForm — снимок, сброс и состояние', () => {
       components: { GrForm, GrFormField, GrInput },
       setup() {
         const model = reactive<Record<string, unknown>>({ name: '' })
-        const formRef = ref<InstanceType<typeof GrForm>>()
+        const formRef = ref<GrFormInstance>()
         return { model, formRef }
       },
       template: `
@@ -299,6 +300,39 @@ describe('GrForm — снимок, сброс и состояние', () => {
     expect(form.isDirty).toBe(false)
   })
 
+  // Снимок строится клоном, а клон отбрасывает функции — значит для внешней
+  // модели (`useForm` Inertia, стор) «нет в снимке» означает «это её метод».
+  // Без защиты `resetFields()` сносил бы с объекта `post`, `reset`, `errors`,
+  // и форма переставала работать молча.
+  it('resetFields не удаляет методы внешней модели', async () => {
+    const submitSpy = vi.fn()
+    const external = reactive({ name: 'Иван', submit: submitSpy, reset: () => {} })
+
+    const wrapper = mount(defineComponent({
+      components: { GrForm, GrFormField, GrInput },
+      setup() {
+        const formRef = ref<GrFormInstance>()
+        return { model: external, formRef }
+      },
+      template: `
+        <GrForm ref="formRef" :model="model">
+          <GrFormField name="name" label="Имя"><GrInput v-model="model.name" /></GrFormField>
+        </GrForm>
+      `,
+    }))
+
+    wrapper.vm.model.name = 'Пётр'
+    wrapper.vm.formRef!.resetFields()
+    await flushValidation()
+
+    expect(wrapper.vm.model.name).toBe('Иван')
+    expect(typeof wrapper.vm.model.submit).toBe('function')
+    expect(typeof wrapper.vm.model.reset).toBe('function')
+    expect(wrapper.vm.model.submit).toBe(submitSpy)
+
+    wrapper.unmount()
+  })
+
   it('isDirty гаснет после сброса, isValid отражает известные ошибки', async () => {
     const wrapper = mount(editHarness())
     const form = wrapper.vm.formRef!
@@ -326,7 +360,7 @@ describe('GrForm — файлы правилом формы', () => {
       components: { GrForm, GrFormField, GrFormFile },
       setup() {
         const model = reactive<Record<string, unknown>>({ doc: null })
-        const formRef = ref<InstanceType<typeof GrForm>>()
+        const formRef = ref<GrFormInstance>()
         const submitted = ref(0)
         return { model, rules, formRef, submitted, onSubmit: () => { submitted.value++ } }
       },
@@ -461,7 +495,7 @@ describe('GrForm — disabled и validating', () => {
       components: { GrForm, GrFormField, GrInput },
       setup() {
         const model = reactive({ login: 'gr' })
-        const formRef = ref<InstanceType<typeof GrForm>>()
+        const formRef = ref<GrFormInstance>()
         return { model, rules, formRef }
       },
       template: `
@@ -498,7 +532,7 @@ describe('GrForm — гонка асинхронной валидации пол
     let call = 0
 
     const model = reactive({ email: 'bad' })
-    const formRef = ref<InstanceType<typeof GrForm> | null>(null)
+    const formRef = ref<GrFormInstance | null>(null)
 
     const wrapper = mount({
       components: { GrForm, GrFormField, GrInput },
@@ -554,13 +588,17 @@ describe('GrForm — гонка асинхронной валидации пол
   function mountDeferred(formProps = '') {
     const resolvers: Array<(value: boolean | string) => void> = []
     const model = reactive({ email: 'bad' })
-    const formRef = ref<InstanceType<typeof GrForm> | null>(null)
+    const formRef = ref<GrFormInstance | null>(null)
+    // Слушаем событие на месте: `findComponent(GrForm).emitted()` у
+    // дженерик-компонента не типизируется — VTU разрешает перегрузку в DOM-обёртку.
+    const onValidate = vi.fn()
 
     const wrapper = mount({
       components: { GrForm, GrFormField, GrInput },
       setup: () => ({
         model,
         formRef,
+        onValidate,
         rules: {
           email: [{
             validator: () => new Promise<boolean | string>((resolve) => { resolvers.push(resolve) }),
@@ -568,7 +606,7 @@ describe('GrForm — гонка асинхронной валидации пол
         },
       }),
       template: `
-        <GrForm ref="formRef" :model="model" :rules="rules" ${formProps}>
+        <GrForm ref="formRef" :model="model" :rules="rules" @validate="onValidate" ${formProps}>
           <GrFormField label="Email" name="email">
             <GrInput v-model="model.email" />
           </GrFormField>
@@ -576,7 +614,7 @@ describe('GrForm — гонка асинхронной валидации пол
       `,
     }, { attachTo: document.body })
 
-    return { wrapper, model, resolvers, form: () => formRef.value! }
+    return { wrapper, model, resolvers, onValidate, form: () => formRef.value! }
   }
 
   it('вытесненный прогон отдаёт вердикт вытеснившего, а не «ошибок пока нет»', async () => {
@@ -621,7 +659,7 @@ describe('GrForm — гонка асинхронной валидации пол
   })
 
   it('сброс формы отменяет летящую проверку: ни ошибки, ни зависшего «проверяем»', async () => {
-    const { wrapper, form, resolvers } = mountDeferred()
+    const { wrapper, form, resolvers, onValidate } = mountDeferred()
     await nextTick()
 
     const pending = form().validateField('email')
@@ -640,7 +678,7 @@ describe('GrForm — гонка асинхронной валидации пол
 
     // Ответ про досбросовое значение не имеет права вернуть ошибку.
     expect(errorTexts(wrapper)).toEqual([])
-    expect(wrapper.findComponent(GrForm).emitted('validate')).toBeUndefined()
+    expect(onValidate).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })

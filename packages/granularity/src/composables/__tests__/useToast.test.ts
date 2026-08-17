@@ -234,3 +234,83 @@ describe('useToast — потолок очереди', () => {
     vi.useRealTimers()
   })
 })
+
+describe('useToast — схлопывание повторов', () => {
+  it('push с занятым ключом обновляет живой тост, а не заводит второй', () => {
+    const { list, push, clear } = useToast()
+    clear()
+
+    const first = push({ title: 'Сохранено', dedupeKey: 'save' })
+    const second = push({ title: 'Сохранено ещё раз', dedupeKey: 'save' })
+
+    expect(second).toBe(first)
+    expect(list.value).toHaveLength(1)
+    expect(list.value[0]?.title).toBe('Сохранено ещё раз')
+
+    clear()
+  })
+
+  // Повтор — законченное высказывание, а не патч: `message` от прошлого раза
+  // остался бы в тосте навсегда.
+  it('повтор заменяет тост целиком, а не дописывает поля', () => {
+    const { list, push, clear } = useToast()
+    clear()
+
+    push({ title: 'Загрузка', message: 'осталось 3 файла', tone: 'info', dedupeKey: 'upload' })
+    push({ title: 'Готово', tone: 'success', dedupeKey: 'upload' })
+
+    expect(list.value[0]?.message).toBeUndefined()
+    expect(list.value[0]?.tone).toBe('success')
+
+    clear()
+  })
+
+  // Тот самый дефект, ради которого ключ и заводится: приложение помнило
+  // последний показанный текст, и повтор того же действия не показывался вовсе.
+  it('ключ действует только пока тост жив — после закрытия повтор показывается снова', () => {
+    const { list, push, dismiss, clear } = useToast()
+    clear()
+
+    const first = push({ title: 'Сохранено', dedupeKey: 'save' })
+    dismiss(first)
+    expect(list.value).toHaveLength(0)
+
+    const second = push({ title: 'Сохранено', dedupeKey: 'save' })
+
+    expect(second).not.toBe(first)
+    expect(list.value).toHaveLength(1)
+
+    clear()
+  })
+
+  it('повтор перезапускает автозакрытие', async () => {
+    vi.useFakeTimers()
+    const { list, push, clear } = useToast()
+    clear()
+
+    push({ title: 'Сохранено', timeoutMs: 1000, dedupeKey: 'save' })
+    await vi.advanceTimersByTimeAsync(800)
+    push({ title: 'Сохранено', timeoutMs: 1000, dedupeKey: 'save' })
+
+    // Прошло 1600 мс от первого пуша — без перезапуска тост бы уже закрылся.
+    await vi.advanceTimersByTimeAsync(800)
+    expect(list.value).toHaveLength(1)
+
+    await vi.advanceTimersByTimeAsync(400)
+    expect(list.value).toHaveLength(0)
+
+    vi.useRealTimers()
+  })
+
+  it('без ключа повторы копятся, как и раньше', () => {
+    const { list, push, clear } = useToast()
+    clear()
+
+    push({ title: 'Сохранено' })
+    push({ title: 'Сохранено' })
+
+    expect(list.value).toHaveLength(2)
+
+    clear()
+  })
+})

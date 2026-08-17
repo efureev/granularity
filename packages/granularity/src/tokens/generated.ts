@@ -2373,6 +2373,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Тень на границе группы колонок, закреплённых справа."
   },
   {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-label-color",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет подписи (`<dt>`). Тон задаётся только значению, поэтому подпись перекрашивается отдельно."
+  },
+  {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-row-gap",
+    "kind": "hook",
+    "default": "0.375rem (`density=\"compact\"` — 0.125rem)",
+    "description": "Зазор между парами. Не ступень общей шкалы: плотность списка характеристик настраивается отдельно от отступов раскладки."
+  },
+  {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-divider",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Цвет линии между парами при `divided`."
+  },
+  {
     "owner": "GrDivider",
     "name": "--gr-divider-thickness",
     "kind": "hook",

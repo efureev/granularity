@@ -9,6 +9,7 @@ export type {
   GrDataTableProps,
   GrDataTableRowKey,
   GrDataTableSortCycle,
+  GrDataTableSummary,
 } from './GrDataTable.vue'
 export type { GrDataTableSortDir } from './grDataTableSort'
 export { grDataTableConfig } from './config'

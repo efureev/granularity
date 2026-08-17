@@ -19,6 +19,7 @@ import {
   rowSelectedClass,
   selectColumnWidths,
   spinnerSizes,
+  summaryRowClass,
 } from './grDataTableStyles'
 
 export const grDataTableSafelist = [...new Set([
@@ -41,4 +42,5 @@ export const grDataTableSafelist = [...new Set([
   ...splitClassTokens(columnPinnedLeftEdgeClass),
   ...splitClassTokens(columnPinnedRightEdgeClass),
   ...splitClassTokens(rowSelectedClass),
+  ...splitClassTokens(summaryRowClass),
 ])]

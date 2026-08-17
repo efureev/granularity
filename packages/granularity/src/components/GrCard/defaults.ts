@@ -1,4 +1,4 @@
-import type { GrCardPadding, GrCardVariant } from './grCardStyles'
+import type { GrCardHeadingLevel, GrCardPadding, GrCardVariant } from './grCardStyles'
 
 /**
  * Пропы `GrCard`, настраиваемые глобально через
@@ -8,6 +8,7 @@ import type { GrCardPadding, GrCardVariant } from './grCardStyles'
 export interface GrCardConfigurableProps {
   padding: GrCardPadding
   variant: GrCardVariant
+  headingLevel: GrCardHeadingLevel
 }
 
 declare module '../../composables/useGrComponentConfig' {

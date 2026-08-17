@@ -1203,6 +1203,13 @@
             "default": "undefined"
           },
           {
+            "name": "title",
+            "description": "Заголовок карточки — настоящий `h2`…`h6`, а не жирная строка: отчёт из шести карточек иначе не обойти по структуре, после `h1` страницы в нём нет ни одного заголовка.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "as",
             "description": "Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`.",
             "type": "string | Component | undefined",
@@ -1241,6 +1248,20 @@
             "name": "bodyClass",
             "description": "Классы обёртки тела — она появляется вместе с секциями.",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "description",
+            "description": "Пояснение под заголовком.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "headingLevel",
+            "description": "Уровень заголовка под структуру страницы. Не задан — из `GrConfigProvider`, иначе `3`.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
             "required": false,
             "default": "undefined"
           }
@@ -1626,6 +1647,13 @@
             "default": "undefined"
           },
           {
+            "name": "headingLevel",
+            "description": "Уровень заголовков секций (`h2`…`h6`) — под структуру страницы.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "accordion",
             "description": "",
             "type": "boolean | undefined",
@@ -1643,13 +1671,6 @@
             "name": "borderless",
             "description": "",
             "type": "boolean | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "headingLevel",
-            "description": "Уровень заголовков секций (`h2`…`h6`) — под структуру страницы.",
-            "type": "2 | 3 | 4 | 5 | 6 | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -2515,6 +2536,13 @@
             "default": "undefined"
           },
           {
+            "name": "summaryRow",
+            "description": "Итоговая строка в `<tfoot>`: значения по ключам колонок. Встаёт по той же колоночной сетке, что и тело, — с теми же паддингами, выравниванием, ширинами и закреплением. Собранная руками в `#footer`, она этих классов не получает (`GrTable` их принципиально не даёт) и разъезжается с телом на первой же смене `size`. Итог не суммируется компонентом: что считать итогом — знает приложение. Оформление ячейки — слот `#summary-<key>`. `null` равнозначен отсутствию: `totals ?? null` — обычная запись там, где итог считается не всегда.",
+            "type": "Partial<Record<GrDataColumnKey<TRow>, unknown>> | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "Размер таблицы: кегль, паддинги ячеек, стрелки сортировки и чекбоксы. Прокидывается в `GrTable`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
@@ -2623,7 +2651,7 @@
           {
             "name": "footer",
             "description": "",
-            "type": "{}"
+            "type": "{ columns: GrDataColumn<TRow>[]; totalColumns: number; }"
           }
         ]
       },
@@ -2687,6 +2715,205 @@
             "signature": "(e: \"columnResize\", payload: { key: string; width: number; }): void"
           }
         ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDelta": {
+    "name": "GrDelta",
+    "sourcePath": "packages/granularity/src/components/GrDelta/GrDelta.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Чем печатать отсутствующую величину.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "locale",
+            "description": "Локаль форматирования. Не задана — локаль i18n-адаптера.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "precision",
+            "description": "Знаков после запятой. Не задано — как отдаст локаль.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prefix",
+            "description": "Приписка перед числом: валюта, единица.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "suffix",
+            "description": "Приписка после числа: `%`, `мс`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "polarity",
+            "description": "Что считать хорошим. Для выручки рост — успех, для себестоимости и времени отклика — наоборот; без этого компонент врал бы в половине случаев.",
+            "type": "GrDeltaPolarity | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showSign",
+            "description": "Ставить `+` у положительных. Минус подставляет `Intl` сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "showArrow",
+            "description": "Стрелка направления. Декоративна: направление уже в знаке.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Величина. `null` — её нет; это не ноль.",
+            "type": "number | null",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrDescriptionList": {
+    "name": "GrDescriptionList",
+    "sourcePath": "packages/granularity/src/components/GrDescriptionList/GrDescriptionList.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "divided",
+            "description": "Отбивать пары линиями.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Чем печатать пустое значение.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "columns",
+            "description": "",
+            "type": "GrDescriptionColumns | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "layout",
+            "description": "`inline` — подпись слева колонкой; `stacked` — над значением.",
+            "type": "GrDescriptionLayout | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "labelWidth",
+            "description": "Ширина колонки подписей при `inline`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "stackBelow",
+            "description": "Ниже какой ширины контейнера (px) `inline` переключается на `stacked`. В узкой колонке фиксированная подпись выжимает значение в букву на строку.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "density",
+            "description": "",
+            "type": "GrDescriptionDensity | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "items",
+            "description": "",
+            "type": "readonly GrDescriptionItem[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "empty",
+            "description": "",
+            "type": "{ item: GrDescriptionItem; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
       },
       {
         "key": "methods",
@@ -3503,16 +3730,16 @@
             "default": "undefined"
           },
           {
-            "name": "headingLevel",
+            "name": "description",
             "description": "",
-            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "description",
+            "name": "headingLevel",
             "description": "",
-            "type": "string | undefined",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
             "required": false,
             "default": "undefined"
           }
@@ -3879,18 +4106,10 @@
         "origin": "generated",
         "items": [
           {
-            "name": "disabled",
-            "description": "Выключить форму целиком — типично на время отправки. Доезжает до контролов через контекст поля, поэтому обходить их по одному не нужно.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "scrollBehavior",
-            "description": "",
-            "type": "ScrollBehavior | undefined",
-            "required": false,
-            "default": "\"smooth\""
+            "name": "model",
+            "description": "Реактивный объект данных формы. Поля адресуются по `name` (`GrFormField`), в т.ч. dot-path. Тип дженерик, а не `Record<string, unknown>`: моделью бывает объект чужой библиотеки (`useForm` Inertia, стор), у которого рядом с полями лежат собственные методы. Под словарь он не подходит, и потребителю пришлось бы приводить его через `as unknown as` в каждой форме.",
+            "type": "TModel",
+            "required": true
           },
           {
             "name": "rules",
@@ -3921,10 +4140,18 @@
             "default": "true"
           },
           {
-            "name": "model",
-            "description": "Реактивный объект данных формы. Поля адресуются по `name` (`GrFormField`), в т.ч. dot-path.",
-            "type": "Record<string, unknown>",
-            "required": true
+            "name": "scrollBehavior",
+            "description": "",
+            "type": "ScrollBehavior | undefined",
+            "required": false,
+            "default": "\"smooth\""
+          },
+          {
+            "name": "disabled",
+            "description": "Выключить форму целиком — типично на время отправки. Доезжает до контролов через контекст поля, поэтому обходить их по одному не нужно.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -3946,22 +4173,22 @@
         "origin": "generated",
         "items": [
           {
-            "name": "invalid",
-            "description": "",
-            "type": "[errors: Record<string, string>]",
-            "signature": "(event: \"invalid\", errors: Record<string, string>): void"
-          },
-          {
             "name": "submit",
-            "description": "",
-            "type": "[model: Record<string, unknown>]",
-            "signature": "(event: \"submit\", model: Record<string, unknown>): void"
+            "description": "Форма прошла валидацию по submit. Отдаёт `model`.",
+            "type": "[TModel]",
+            "signature": "(e: \"submit\", model: TModel): void"
           },
           {
             "name": "validate",
-            "description": "",
-            "type": "[name: string, valid: boolean, message: string | undefined]",
-            "signature": "(event: \"validate\", name: string, valid: boolean, message: string | undefined): void"
+            "description": "Результат валидации одного поля.",
+            "type": "[string, boolean, string | undefined]",
+            "signature": "(e: \"validate\", name: string, valid: boolean, message: string | undefined): void"
+          },
+          {
+            "name": "invalid",
+            "description": "Submit не прошёл валидацию. Без этого события «форма невалидна» и «ничего не произошло» выглядят для потребителя одинаково.",
+            "type": "[Record<string, string>]",
+            "signature": "(e: \"invalid\", errors: Record<string, string>): void"
           }
         ]
       },
@@ -3969,53 +4196,7 @@
         "key": "methods",
         "title": "Methods / Expose",
         "origin": "generated",
-        "items": [
-          {
-            "name": "validate",
-            "description": "",
-            "type": "() => Promise<boolean>"
-          },
-          {
-            "name": "validateField",
-            "description": "",
-            "type": "(name: string, trigger?: GrFormTrigger | undefined) => Promise<boolean>"
-          },
-          {
-            "name": "clearValidate",
-            "description": "",
-            "type": "(names?: string | string[] | undefined) => void"
-          },
-          {
-            "name": "resetFields",
-            "description": "",
-            "type": "(names?: string | string[] | undefined) => void"
-          },
-          {
-            "name": "scrollToField",
-            "description": "",
-            "type": "(name: string) => void"
-          },
-          {
-            "name": "setSnapshot",
-            "description": "",
-            "type": "(model?: Record<string, unknown> | undefined) => void"
-          },
-          {
-            "name": "isDirty",
-            "description": "",
-            "type": "boolean"
-          },
-          {
-            "name": "isValid",
-            "description": "",
-            "type": "boolean"
-          },
-          {
-            "name": "validatingFields",
-            "description": "",
-            "type": "Set<string> & Omit<Set<string>, keyof Set<any>>"
-          }
-        ]
+        "items": []
       }
     ]
   },
@@ -4078,6 +4259,20 @@
             "default": "undefined"
           },
           {
+            "name": "labelWidth",
+            "description": "Ширина колонки подписи при `labelPosition=\"start\"`. Число — пиксели.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "labelClass",
+            "description": "",
+            "type": "LabelClass | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "label",
             "description": "",
             "type": "string | undefined",
@@ -4104,20 +4299,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "labelWidth",
-            "description": "Ширина колонки подписи при `labelPosition=\"start\"`. Число — пиксели.",
-            "type": "string | number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "labelClass",
-            "description": "",
-            "type": "LabelClass | undefined",
-            "required": false,
-            "default": "undefined"
           }
         ]
       },
@@ -4396,16 +4577,16 @@
             "default": "undefined"
           },
           {
-            "name": "headingLevel",
-            "description": "Уровень заголовка под структуру страницы. Не задан — берётся из `GrConfigProvider`, иначе `3`.",
-            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "name": "description",
+            "description": "",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "description",
-            "description": "",
-            "type": "string | undefined",
+            "name": "headingLevel",
+            "description": "Уровень заголовка под структуру страницы. Не задан — берётся из `GrConfigProvider`, иначе `3`.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -6268,6 +6449,13 @@
             "default": "undefined"
           },
           {
+            "name": "precision",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "textAlign",
             "description": "",
             "type": "GrNumberInputTextAlign | undefined",
@@ -6311,13 +6499,6 @@
           },
           {
             "name": "min",
-            "description": "",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "precision",
             "description": "",
             "type": "number | undefined",
             "required": false,
@@ -9242,23 +9423,9 @@
             "default": "undefined"
           },
           {
-            "name": "decimalSeparator",
-            "description": "Десятичный разделитель. Сильнее локали; без него и без локали — точка.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "precision",
             "description": "Число знаков после запятой.",
             "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "groupSeparator",
-            "description": "Разделитель разрядов. Сильнее локали; без него и без локали — узкий пробел.",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -9272,6 +9439,20 @@
           {
             "name": "suffix",
             "description": "Приписка после значения (единица измерения, `%`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "decimalSeparator",
+            "description": "Десятичный разделитель. Сильнее локали; без него и без локали — точка.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "groupSeparator",
+            "description": "Разделитель разрядов. Сильнее локали; без него и без локали — узкий пробел.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10155,7 +10336,7 @@
           {
             "name": "layout",
             "description": "Раскладка: одна ось, колонка времени слева или чередование сторон.",
-            "type": "\"alternate\" | \"stacked\" | \"time\" | undefined",
+            "type": "\"stacked\" | \"alternate\" | \"time\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -10169,7 +10350,7 @@
           {
             "name": "density",
             "description": "Плотность вертикальных отступов пункта.",
-            "type": "\"compact\" | \"regular\" | undefined",
+            "type": "\"regular\" | \"compact\" | undefined",
             "required": false,
             "default": "undefined"
           },

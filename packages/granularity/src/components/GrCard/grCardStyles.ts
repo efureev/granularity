@@ -28,6 +28,20 @@ export const paddingClass: Record<GrCardPadding, string> = {
 export const sectionDividerTopClass = 'border-t border-[var(--gr-brd)]'
 export const sectionDividerBottomClass = 'border-b border-[var(--gr-brd)]'
 
+/**
+ * Уровень заголовка карточки. `h1` намеренно нет: его задаёт страница, а
+ * карточка — блок внутри уже существующей структуры.
+ */
+export const GR_CARD_HEADING_LEVELS = [2, 3, 4, 5, 6] as const
+
+export type GrCardHeadingLevel = typeof GR_CARD_HEADING_LEVELS[number]
+
+// `m-0` — у нативного заголовка есть браузерные отступы, и без сброса шапка
+// разъезжается по вертикали.
+export const cardTitleClass = 'm-0 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600'
+
+export const cardDescriptionClass = 'mt-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]'
+
 /** Интерактивная карточка целиком: ссылка или кнопка во всю поверхность. */
 export const interactiveClass = 'block w-full text-left transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 

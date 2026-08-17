@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrFileUpload } from '@feugene/granularity'
-
-type GrFileUploadInstance = InstanceType<typeof GrFileUpload>
+import { GrButton, GrFileUpload, type GrFileUploadInstance } from '@feugene/granularity'
 
 const uploader = ref<GrFileUploadInstance | null>(null)
 const files = ref<string[]>([])

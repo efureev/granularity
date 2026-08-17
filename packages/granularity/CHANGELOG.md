@@ -9,6 +9,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrDelta` — a signed value with sign and tone inside a line of text.**
+  «Margin −$12.50» is a fragment of a sentence, not a tile: `GrStatistic` owns the
+  block-level metric, this one owns the inline one. Zero is neutral under every
+  polarity, and `null` prints a dash with no tone, no arrow and no affixes —
+  "no data" and "zero" are different claims, and `$—` reads as zero dollars.
+  `polarity` inverts the tone without touching the sign, so a 15% drop in response
+  time is green and still negative. The sign comes from `Intl`'s `signDisplay`
+  rather than string concatenation, which is what used to turn `1234.5` into the
+  un-groupable string `'+1234.5'`. Tone selection lives in a pure module tested
+  without mounting — that `switch` is exactly what consumers were copying by hand,
+  and the copies had already drifted into painting zero green.
+- **New `GrDescriptionList` — label-value pairs as a real `<dl>`.** Renders
+  `dl > div > dt + dd`, which is valid HTML5 and gives the layout something to
+  hang on; hand-written markup kept producing a `<dl>` full of bare `<div>`s that
+  looked like a list but carried neither term nor definition for a parser or a
+  screen reader. An empty value prints a dash instead of dropping the row, since a
+  missing row breaks both the alignment and the reading. `inline` keeps labels in a
+  fixed column so values stop drifting with label length, and `stackBelow` measures
+  the **container** — pairs live inside narrow cards on wide screens. `columns: 2`
+  lays pairs out on a grid rather than `column-count`, so a pair can never be split
+  across columns. Tone applies to the value only: a red label reads as "this field
+  is broken" when the problem is the number.
+- **`GrCard` gained `title`, `description` and `headingLevel`.** The heading is a
+  real `h2`…`h6` (default `h3`), not a bold `<span>`: a report built from six cards
+  had nothing but the page `h1` to navigate by. `#header` still wins over the props
+  when the header is non-standard, and a card-link takes its accessible name from
+  the heading instead of its entire contents. A `clickable` card degrades the
+  heading to a `<span>` and warns in dev — `<button>` only admits phrasing content,
+  so a heading inside it is invalid; use `hoverable` plus a link in the heading.
+- **`useToast().push()` accepts `dedupeKey`.** A repeat push under a live key
+  replaces that toast and restarts its dismissal timer instead of stacking a
+  duplicate — the usual source being navigation that replays the same page props.
+  The key is only held **while the toast is on screen**: remembering the last text
+  shown instead never releases, and the second "Saved" would never appear.
+- **`GrDataTable` takes a typed summary row.** `summaryRow` maps column keys to
+  values and renders them in `<tfoot>` on the same column grid as the body —
+  same paddings, alignment, widths and pinning, because it reuses the very
+  functions the body cells use. Hand-built footer rows cannot: `GrTable` leaves
+  `<tfoot>` cells unstyled on purpose, so a hardcoded `px-3 py-2` silently drifts
+  four pixels off the body the moment the table changes `size`. A column absent
+  from the object stays an empty cell, and `0` still prints — "the total is zero"
+  and "there is no total" are different claims. Styling is the `#summary-<key>`
+  slot (scoped with `value` and `column`); the row carries no tone of its own,
+  since "refunds" and "profit" are different messages and the component cannot
+  pick between them. Under `virtual`, the row joins `aria-rowcount` and gets its
+  own `aria-rowindex`.
+- **`GrDataTable`'s `#footer` slot is scoped** with `columns` (in current order)
+  and `totalColumns` (including the selection column), and now renders after the
+  summary row — it is the escape hatch for what a single typed row cannot carry:
+  several totals, a note, a `colspan`.
+
 - **Every component page now answers "when do I reach for this one?"** Two required
   sections — `## Когда брать` (3–5 user situations, not a feature list) and
   `## Когда взять другое` (a table of redirects, each row ending in a live link to a
@@ -22,6 +73,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrForm.model` is now generic** (`GrForm<TModel extends object>`), and `submit`
+  emits that same type. An external form object — Inertia's `useForm`, a store —
+  no longer needs `as unknown as` in every form; `Record<string, unknown>` stays the
+  default type argument, so existing usage is unchanged. Type a `ref` to the form as
+  `GrFormInstance`: a generic component compiles to a function, and
+  `InstanceType<typeof GrForm>` does not resolve for it.
+- **`GrCard.title` is a prop now, not a passthrough attribute.** `<GrCard title="…">`
+  used to land on the root element as a native tooltip; it renders a heading
+  instead. For a tooltip, use `GrTooltip` around the card.
 - `docs/components.md` §"Страница компонента" now specifies the four places a page has and
   the question each one answers, so redirects to a neighbour and genuinely missing
   capabilities stop bleeding into each other.
@@ -30,6 +90,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`href` was dropped whenever `as` named a component** — `GrCard`,
+  `GrSidebarItem` and `GrStatistic` all gated it on `rootTag === 'a'`, which is
+  false for a component. Inertia's `Link` and `RouterLink` render an `<a>` of their
+  own and need the prop, so `<GrCard :as="Link" href="…">` produced a link to
+  nowhere and consumers wrapped the card from the outside instead. The attribute is
+  now suppressed only for string tags other than `a`, where it would be invalid
+  HTML — `as="article"` still gets nothing.
+- **`GrForm.resetFields()` deleted the methods of an external model.** The snapshot
+  is built by cloning, the clone drops functions, and any key missing from the
+  snapshot was removed — so resetting a form built on Inertia's `useForm` stripped
+  `post`, `reset` and `errors` off the object and the form silently stopped working.
+  Function-valued keys are now left alone.
 - **Prop docs that contradicted their own implementation.** `GrSegmented.name`
   promised "hidden radio-inputs" while the component emits exactly one hidden
   field — deliberately, since `role="radio"` declares its children

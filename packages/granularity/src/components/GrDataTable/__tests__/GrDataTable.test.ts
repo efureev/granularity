@@ -334,6 +334,186 @@ describe('GrDataTable — выбор строк', () => {
   })
 })
 
+describe('GrDataTable — итоговая строка', () => {
+  const columns = [
+    { key: 'name', label: 'Name' },
+    { key: 'score', label: 'Score' },
+  ]
+  const rows = [{ id: 1, name: 'Alice', score: 10 }]
+
+  // Без скоупа потребитель повторял бы порядок, закрепление и колонку выбора
+  // руками — и расходился с шапкой при первом же переносе колонки.
+  it('#footer рендерится в tfoot и получает колонки со счётчиком', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, selectable: true },
+      slots: {
+        footer: `
+          <template #default="{ columns: cols, totalColumns }">
+            <tr data-summary>
+              <td :colspan="totalColumns - 1">Итого ({{ cols.map(c => c.key).join(',') }})</td>
+              <td>10</td>
+            </tr>
+          </template>
+        `,
+      },
+    })
+
+    const summary = wrapper.get('tfoot tr[data-summary]')
+    // Колонка выбора учтена: 2 объявленных + 1 служебная.
+    expect(summary.findAll('td')[0].attributes('colspan')).toBe('2')
+    expect(summary.text()).toContain('name,score')
+  })
+
+  it('без summaryRow и без #footer tfoot не рендерится вовсе', () => {
+    const wrapper = mount(GrDataTable, { props: { columns, rows } })
+
+    expect(wrapper.find('tfoot').exists()).toBe(false)
+  })
+
+  it('summaryRow ставит значения под своими колонками, остальные оставляет пустыми', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, summaryRow: { score: 10 } },
+    })
+
+    const cells = wrapper.get('[data-gr-datatable-summary]').findAll('td')
+    expect(cells).toHaveLength(2)
+    expect(cells[0].text()).toBe('')
+    expect(cells[1].text()).toBe('10')
+    expect(cells[1].attributes('data-column-key')).toBe('score')
+  })
+
+  // Ради этого проп и заведён: собранная руками строка получает свои паддинги и
+  // разъезжается с телом на первой же смене `size`.
+  it('ячейка итога совпадает с ячейкой тела по сетке: паддинг, выравнивание, ширина', () => {
+    const gridColumns = [
+      { key: 'name', label: 'Name' },
+      { key: 'score', label: 'Score', align: 'right' as const, width: 120 },
+    ]
+
+    const wrapper = mount(GrDataTable, {
+      props: { columns: gridColumns, rows, size: 'lg', summaryRow: { name: 'Итого', score: 10 } },
+    })
+
+    const bodyCells = wrapper.get('[data-gr-datatable-row]').findAll('td')
+    const summaryCells = wrapper.get('[data-gr-datatable-summary]').findAll('td')
+
+    for (const index of [0, 1]) {
+      expect(summaryCells[index].classes()).toEqual(bodyCells[index].classes())
+      expect(summaryCells[index].attributes('style')).toBe(bodyCells[index].attributes('style'))
+    }
+
+    // Ступень `lg`, а не захардкоженная `sm`.
+    expect(summaryCells[0].classes()).toContain('px-5')
+    expect(summaryCells[1].classes()).toContain('text-right')
+  })
+
+  it('при selectable служебная ячейка есть и у итога — иначе колонки съедут', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, selectable: true, summaryRow: { name: 'Итого' } },
+    })
+
+    const summaryCells = wrapper.get('[data-gr-datatable-summary]').findAll('td')
+    expect(summaryCells).toHaveLength(3)
+    // Служебная ячейка пуста: выбирать итог нечем.
+    expect(summaryCells[0].text()).toBe('')
+    expect(summaryCells[1].text()).toBe('Итого')
+  })
+
+  it('закреплённая колонка липнет и в итоге, с тем же классом края', () => {
+    const pinned = [
+      { key: 'name', label: 'Name', pinned: 'left' as const },
+      { key: 'score', label: 'Score' },
+    ]
+
+    const wrapper = mount(GrDataTable, {
+      props: { columns: pinned, rows, summaryRow: { name: 'Итого' } },
+    })
+
+    const summaryCell = wrapper.get('[data-gr-datatable-summary]').findAll('td')[0]
+    const bodyCell = wrapper.get('[data-gr-datatable-row]').findAll('td')[0]
+
+    expect(summaryCell.classes()).toContain('sticky')
+    expect(summaryCell.classes()).toEqual(bodyCell.classes())
+  })
+
+  it('columnOrder переставляет ячейки итога вместе с телом', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, columnOrder: ['score', 'name'], summaryRow: { name: 'Итого', score: 10 } },
+    })
+
+    const keys = wrapper.get('[data-gr-datatable-summary]')
+      .findAll('td')
+      .map(cell => cell.attributes('data-column-key'))
+
+    expect(keys).toEqual(['score', 'name'])
+  })
+
+  it('слот #summary-<key> перебивает значение и получает его в скоупе', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, summaryRow: { score: 10 } },
+      slots: {
+        'summary-score': `
+          <template #default="{ value, column }">
+            <b data-slot>{{ column.label }}: {{ value }}</b>
+          </template>
+        `,
+      },
+    })
+
+    expect(wrapper.get('[data-gr-datatable-summary] [data-slot]').text()).toBe('Score: 10')
+  })
+
+  // `0` — это значение, а не пустота: отличить «итог ноль» от «итога нет» иначе
+  // было бы нечем.
+  it('ноль печатается, отсутствующий ключ — нет', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, summaryRow: { name: 0 } },
+    })
+
+    const cells = wrapper.get('[data-gr-datatable-summary]').findAll('td')
+    expect(cells[0].text()).toBe('0')
+    expect(cells[1].text()).toBe('')
+  })
+
+  // `:summary-row="totals ?? null"` — обычная запись у потребителя. Предикат
+  // обязан быть один: разойдись шаблон с `aria-rowcount`, диктор объявил бы
+  // строку, которой в разметке нет.
+  it('null — это «итога нет», как и отсутствие пропа', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, summaryRow: null },
+    })
+
+    expect(wrapper.find('[data-gr-datatable-summary]').exists()).toBe(false)
+    expect(wrapper.find('tfoot').exists()).toBe(false)
+  })
+
+  // «Итого 1 234» над спиннером — утверждение о том, чего ещё не показали.
+  it('во время загрузки итог скрыт, на пустом наборе — показан', () => {
+    const loading = mount(GrDataTable, {
+      props: { columns, rows, loading: true, summaryRow: { name: 'Итого' } },
+    })
+    expect(loading.find('[data-gr-datatable-summary]').exists()).toBe(false)
+
+    const empty = mount(GrDataTable, {
+      props: { columns, rows: [], summaryRow: { name: 'Итого' } },
+    })
+    // «Итого 0» под «нет данных» осмысленно: считает его потребитель.
+    expect(empty.get('[data-gr-datatable-summary]').text()).toContain('Итого')
+  })
+
+  it('summaryRow и #footer сосуществуют: сначала итог, потом свободная разметка', () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, summaryRow: { name: 'Итого' } },
+      slots: { footer: '<tr data-note><td>примечание</td></tr>' },
+    })
+
+    const footRows = wrapper.get('tfoot').findAll('tr')
+    expect(footRows).toHaveLength(2)
+    expect(footRows[0].attributes('data-gr-datatable-summary')).toBeDefined()
+    expect(footRows[1].attributes('data-note')).toBeDefined()
+  })
+})
+
 describe('GrDataTable — строки, слоты и состояния', () => {
   const columns = [{ key: 'name', label: 'Name' }]
   const rows = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]

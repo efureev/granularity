@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, markRaw, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrSidebar, { GrSidebarGroup, GrSidebarItem } from '..'
@@ -165,6 +165,40 @@ describe('GrSidebar — лейбл тогла и типографика', () => 
     expect(wrapper.get('[data-gr-sidebar-subtitle]').classes()).toContain('text-[length:var(--gr-text-sm)]')
     expect(wrapper.html()).toContain('text-[length:var(--gr-text-2xs)]')
     expect(wrapper.html()).not.toMatch(/text-\[\d+px\]/)
+  })
+})
+
+describe('GrSidebarItem — корневой тег и href', () => {
+  /** Заглушка компонента-ссылки: так устроены `Link` от Inertia и `RouterLink`. */
+  const StubLink = markRaw(defineComponent({
+    name: 'StubLink',
+    props: { href: { type: String, default: undefined } },
+    template: '<a :href="href"><slot /></a>',
+  }))
+
+  // Компонент-ссылка рендерит `<a>` сам, но `rootTag === 'a'` для него ложно —
+  // проп до него не доезжал, и пункт вёл в никуда.
+  it('as-компонент получает href', () => {
+    const wrapper = mount(GrSidebarItem, { props: { label: 'Отчёты', as: StubLink, href: '/reports' } })
+
+    expect(wrapper.getComponent(StubLink).props('href')).toBe('/reports')
+    expect(wrapper.get('a').attributes('href')).toBe('/reports')
+  })
+
+  it('строковый as, кроме a, href не получает', () => {
+    const wrapper = mount(GrSidebarItem, { props: { label: 'Отчёты', as: 'div', href: '/reports' } })
+
+    expect(wrapper.attributes('href')).toBeUndefined()
+  })
+
+  // Недоступный пункт — `span`: ссылка, по которой нельзя пройти, хуже её отсутствия.
+  it('disabled гасит href даже у компонента-ссылки', () => {
+    const wrapper = mount(GrSidebarItem, {
+      props: { label: 'Отчёты', as: StubLink, href: '/reports', disabled: true },
+    })
+
+    expect(wrapper.element.tagName).toBe('SPAN')
+    expect(wrapper.attributes('href')).toBeUndefined()
   })
 })
 

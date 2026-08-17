@@ -32,6 +32,8 @@ import { grCommandPaletteConfig } from '../components/GrCommandPalette/config'
 import { grConfigProviderConfig } from '../components/GrConfigProvider/config'
 import { grConfirmDialogConfig } from '../components/GrConfirmDialog/config'
 import { grDataTableConfig } from '../components/GrDataTable/config'
+import { grDeltaConfig } from '../components/GrDelta/config'
+import { grDescriptionListConfig } from '../components/GrDescriptionList/config'
 import { grDialogConfig } from '../components/GrDialog/config'
 import { grDialogServiceConfig } from '../components/GrDialogService/config'
 import { grDividerConfig } from '../components/GrDivider/config'
@@ -132,6 +134,8 @@ export const granularityComponentConfigs = {
   GrConfigProvider: grConfigProviderConfig,
   GrConfirmDialog: grConfirmDialogConfig,
   GrDataTable: grDataTableConfig,
+  GrDelta: grDeltaConfig,
+  GrDescriptionList: grDescriptionListConfig,
   GrDialog: grDialogConfig,
   GrDialogService: grDialogServiceConfig,
   GrDivider: grDividerConfig,

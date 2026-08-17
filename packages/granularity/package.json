@@ -129,6 +129,14 @@
       "types": "./dist/types/components/GrDataTable/index.d.ts",
       "import": "./dist/components/GrDataTable/index.js"
     },
+    "./components/GrDelta": {
+      "types": "./dist/types/components/GrDelta/index.d.ts",
+      "import": "./dist/components/GrDelta/index.js"
+    },
+    "./components/GrDescriptionList": {
+      "types": "./dist/types/components/GrDescriptionList/index.d.ts",
+      "import": "./dist/components/GrDescriptionList/index.js"
+    },
     "./components/GrDialog": {
       "types": "./dist/types/components/GrDialog/index.d.ts",
       "import": "./dist/components/GrDialog/index.js"

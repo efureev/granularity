@@ -25,6 +25,8 @@ import {
   grSkeletonExamples,
   grDropdownExamples,
   grDataTableExamples,
+  grDeltaExamples,
+  grDescriptionListExamples,
   grPaginationExamples,
   grTabsExamples,
   grKbdExamples,
@@ -260,6 +262,36 @@ const grStatisticOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grDeltaOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Изменение прямо в строке текста: «Маржа −$12.50», «Конверсия +8.4 %». Знак, цвет и стрелка отвечают «лучше или хуже» до того, как читатель разберёт саму цифру.',
+    'Компонент знает, что рост бывает плохим: для оттока и времени отклика цвет инвертируется, а знак остаётся при величине. Ноль остаётся нейтральным, а «нет данных» не притворяется нулём.',
+  ],
+  features: [
+    'Знак и разряды ставит `Intl` — по локали приложения или по заданной.',
+    'Полярность: рост — успех, рост — проблема или знак без оценки.',
+    'Ноль нейтрален при любой полярности.',
+    'Отсутствующая величина печатается прочерком, без тона и приписок.',
+    'Необязательная стрелка направления, скрытая от скринридера.',
+    'Префикс и суффикс — валюта, проценты, единицы.',
+  ],
+}
+
+const grDescriptionListOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Карточка объекта, в которой значения стоят ровной колонкой: реквизиты заказа, параметры документа, сводка профиля. Подписи не «плавают» по длине, а длинный идентификатор переносится, а не рвёт вёрстку.',
+    'Под капотом — настоящий список определений, поэтому пары читаются скринридером как пары, а не как поток текста. Любое значение можно заменить бейджем, ссылкой или относительным временем, не переписывая разметку.',
+  ],
+  features: [
+    'Раскладка «подпись слева» или «подпись сверху», с переключением по ширине контейнера.',
+    'Две колонки для длинных списков — пара между ними не разрывается.',
+    'Слоты на конкретную пару: бейдж статуса, ссылка, относительное время.',
+    'Пустое значение печатается прочерком и строку не теряет.',
+    'Тон значения под смысл: просроченный срок, отрицательный баланс.',
+    'Плотность, разделители и ширина колонки подписей — пропами.',
+  ],
+}
+
 const grCommandPaletteOverview: ShowcaseComponentOverviewDoc = {
   paragraphs: [
     'Один ⌘K — и всё приложение под рукой: команды, разделы, документы. Пользователю не нужно помнить, где спрятан пункт меню, достаточно начать печатать.',
@@ -342,6 +374,8 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrSkeleton: createComponentDocMeta(grSkeletonExamples),
   GrDropdown: createComponentDocMeta(grDropdownExamples),
   GrDataTable: createComponentDocMeta(grDataTableExamples),
+  GrDelta: createComponentDocMeta(grDeltaExamples, grDeltaOverview),
+  GrDescriptionList: createComponentDocMeta(grDescriptionListExamples, grDescriptionListOverview),
   GrPagination: createComponentDocMeta(grPaginationExamples),
   GrTabs: createComponentDocMeta(grTabsExamples),
   GrTabPanels: createComponentDocMeta(grTabPanelsExamples),

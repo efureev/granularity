@@ -8,6 +8,7 @@ import {
   GrFormField,
   GrInput,
   GrSelect,
+  type GrFormInstance,
   type GrFormRules,
 } from '@feugene/granularity'
 
@@ -36,7 +37,7 @@ const rules: GrFormRules = {
   ],
 }
 
-const formRef = ref<InstanceType<typeof GrForm>>()
+const formRef = ref<GrFormInstance>()
 const result = ref('')
 
 async function checkValidity() {

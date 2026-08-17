@@ -1,9 +1,16 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { defineComponent, markRaw } from 'vue'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrCard from '../GrCard.vue'
+
+/** Заглушка компонента-ссылки: так устроены `Link` от Inertia и `RouterLink`. */
+const StubLink = markRaw(defineComponent({
+  name: 'StubLink',
+  props: { href: { type: String, default: undefined } },
+  template: '<a :href="href"><slot /></a>',
+}))
 
 describe('GrCard', () => {
   it('рендерит слот и базовые card-классы', () => {
@@ -117,6 +124,95 @@ describe('GrCard — секции', () => {
   })
 })
 
+describe('GrCard — заголовок секции', () => {
+  it('title даёт настоящий заголовок, description — подпись под ним', () => {
+    const wrapper = mount(GrCard, {
+      props: { title: 'Выручка за месяц', description: 'Без учёта возвратов', padding: 'md' },
+      slots: { default: 'тело' },
+    })
+
+    const heading = wrapper.get('[data-gr-card-title]')
+    // Дефолт — h3, как у GrFormSection и GrTimeline.
+    expect(heading.element.tagName).toBe('H3')
+    expect(heading.text()).toBe('Выручка за месяц')
+    expect(wrapper.get('[data-gr-card-description]').text()).toBe('Без учёта возвратов')
+  })
+
+  it.each([2, 4, 6] as const)('headingLevel=%s задаёт уровень', (level) => {
+    const wrapper = mount(GrCard, { props: { title: 'Секция', headingLevel: level } })
+
+    expect(wrapper.get('[data-gr-card-title]').element.tagName).toBe(`H${level}`)
+  })
+
+  it('headingLevel читается из GrConfigProvider', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrCard },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrCard: { headingLevel: 2 } }">
+          <GrCard title="Секция" />
+        </GrConfigProvider>
+      `,
+    })
+
+    expect(mount(Harness).get('[data-gr-card-title]').element.tagName).toBe('H2')
+  })
+
+  // Нестандартная шапка не обязана объяснять, почему она не `title`.
+  it('слот #header сильнее пропов', () => {
+    const wrapper = mount(GrCard, {
+      props: { title: 'Из пропа', description: 'И описание' },
+      slots: { header: '<b>Своя шапка</b>' },
+    })
+
+    expect(wrapper.get('[data-gr-card-header]').text()).toBe('Своя шапка')
+    expect(wrapper.find('[data-gr-card-title]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-card-description]').exists()).toBe(false)
+  })
+
+  // Иначе отступ остался бы на поверхности и сложился бы с отступом секций.
+  it('title включает секции, и отступ переезжает на них', () => {
+    const wrapper = mount(GrCard, { props: { title: 'Секция', padding: 'md' }, slots: { default: 'тело' } })
+
+    expect(wrapper.classes()).not.toContain('p-4')
+    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-4')
+    expect(wrapper.get('[data-gr-card-body]').classes()).toContain('p-4')
+  })
+
+  it('без title карточка остаётся ровно тем, чем была', () => {
+    const wrapper = mount(GrCard, { props: { padding: 'md' }, slots: { default: 'тело' } })
+
+    expect(wrapper.element.tagName).toBe('DIV')
+    expect(wrapper.classes()).toContain('p-4')
+    expect(wrapper.find('[data-gr-card-header]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-card-body]').exists()).toBe(false)
+  })
+
+  it('карточка-ссылка получает имя из заголовка, а не из всего содержимого', () => {
+    const wrapper = mount(GrCard, {
+      props: { title: 'Отчёт', description: 'за август', href: '/reports/8' },
+      slots: { default: 'много текста внутри' },
+    })
+
+    const titleId = wrapper.get('[data-gr-card-title]').attributes('id')
+    expect(wrapper.attributes('aria-labelledby')).toBe(titleId)
+    expect(wrapper.attributes('aria-describedby')).toBe(wrapper.get('[data-gr-card-description]').attributes('id'))
+  })
+
+  // Тест на срабатывание: снимут правило — заголовок уедет внутрь `<button>`,
+  // где он невалиден по контент-модели.
+  it('в кликабельной карточке заголовок деградирует в span и предупреждает', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrCard, { props: { title: 'Секция', clickable: true } })
+
+    expect(wrapper.element.tagName).toBe('BUTTON')
+    expect(wrapper.get('[data-gr-card-title]').element.tagName).toBe('SPAN')
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('[GrCard]'))
+
+    warn.mockRestore()
+  })
+})
+
 describe('GrCard — интерактивность', () => {
   it('href делает карточку ссылкой', () => {
     const wrapper = mount(GrCard, { props: { href: '/report' }, slots: { default: 'x' } })
@@ -140,6 +236,28 @@ describe('GrCard — интерактивность', () => {
     const wrapper = mount(GrCard, { props: { as: 'section' }, slots: { default: 'x' } })
 
     expect(wrapper.element.tagName).toBe('SECTION')
+  })
+
+  // Компонент-ссылка рендерит `<a>` сам, но `rootTag === 'a'` для него ложно —
+  // карточка-ссылка собиралась обёрткой снаружи, потому что проп не доезжал.
+  it('as-компонент получает href', () => {
+    const wrapper = mount(GrCard, {
+      props: { as: StubLink, href: '/reports/42' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.getComponent(StubLink).props('href')).toBe('/reports/42')
+    expect(wrapper.get('a').attributes('href')).toBe('/reports/42')
+  })
+
+  // Обратная сторона того же правила: `href` на `<article>` — невалидный атрибут.
+  it('строковый as, кроме a, href не получает', () => {
+    const wrapper = mount(GrCard, {
+      props: { as: 'article', href: '/reports/42' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.attributes('href')).toBeUndefined()
   })
 
   it('hoverable подсвечивает карточку, не делая её кнопкой', () => {

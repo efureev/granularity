@@ -169,6 +169,15 @@ const rootTag = computed<string | Component>(() => {
   return props.clickable ? 'button' : 'div'
 })
 
+/**
+ * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без
+ * `href` он ведёт в никуда. Строковый тег, кроме `a`, атрибут не понимает —
+ * там он и гасится.
+ */
+const rootHref = computed(() => (
+  typeof rootTag.value === 'string' && rootTag.value !== 'a' ? undefined : props.href
+))
+
 const rootClass = computed(() => statisticRootClass({ interactive: isInteractive.value }))
 
 function toNumber(value: number | string): number | null {
@@ -279,7 +288,7 @@ const trendLabel = computed(() => {
     :is="rootTag"
     data-gr-statistic
     :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootTag === 'a' ? href : undefined"
+    :href="rootHref"
     :class="rootClass"
     @click="emit('click', $event)"
   >

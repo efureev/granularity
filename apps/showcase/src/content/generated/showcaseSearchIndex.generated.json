@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 67 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 69 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -636,6 +636,28 @@
     "context": "data / component",
     "searchableTitle": "grdatatable",
     "searchableContent": "grdatatable grdatatable a table for large data sets with sorting and filtering. data component /components/gr-data-table packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grdatatable generated public-api components components gr-data-table gr data table"
+  },
+  {
+    "id": "entity:component:GrDelta",
+    "title": "GrDelta",
+    "description": "Shows a signed value with its sign, tone and arrow inline in a sentence.",
+    "href": "/components/gr-delta",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grdelta",
+    "searchableContent": "grdelta grdelta shows a signed value with its sign, tone and arrow inline in a sentence. data component /components/gr-delta packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grdelta generated public-api new components components gr-delta gr delta"
+  },
+  {
+    "id": "entity:component:GrDescriptionList",
+    "title": "GrDescriptionList",
+    "description": "Lists label-value pairs as a real description list, values aligned in a column.",
+    "href": "/components/gr-description-list",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grdescriptionlist",
+    "searchableContent": "grdescriptionlist grdescriptionlist lists label-value pairs as a real description list, values aligned in a column. data component /components/gr-description-list packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grdescriptionlist generated public-api new components components gr-description-list gr description list"
   },
   {
     "id": "entity:component:GrDialog",
@@ -2187,6 +2209,94 @@
     "context": "GrDataTable",
     "searchableTitle": "grdatatable integration notes",
     "searchableContent": "grdatatable a table for large data sets with sorting and filtering. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrDelta:section:overview",
+    "title": "GrDelta / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-delta#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDelta",
+    "searchableTitle": "grdelta component overview",
+    "searchableContent": "grdelta shows a signed value with its sign, tone and arrow inline in a sentence. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrDelta:section:live-examples",
+    "title": "GrDelta / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-delta#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDelta",
+    "searchableTitle": "grdelta live examples",
+    "searchableContent": "grdelta shows a signed value with its sign, tone and arrow inline in a sentence. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrDelta:section:api",
+    "title": "GrDelta / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-delta#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDelta",
+    "searchableTitle": "grdelta generated api",
+    "searchableContent": "grdelta shows a signed value with its sign, tone and arrow inline in a sentence. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrDelta:section:integration-notes",
+    "title": "GrDelta / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-delta#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDelta",
+    "searchableTitle": "grdelta integration notes",
+    "searchableContent": "grdelta shows a signed value with its sign, tone and arrow inline in a sentence. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrDescriptionList:section:overview",
+    "title": "GrDescriptionList / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-description-list#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDescriptionList",
+    "searchableTitle": "grdescriptionlist component overview",
+    "searchableContent": "grdescriptionlist lists label-value pairs as a real description list, values aligned in a column. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrDescriptionList:section:live-examples",
+    "title": "GrDescriptionList / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-description-list#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDescriptionList",
+    "searchableTitle": "grdescriptionlist live examples",
+    "searchableContent": "grdescriptionlist lists label-value pairs as a real description list, values aligned in a column. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrDescriptionList:section:api",
+    "title": "GrDescriptionList / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-description-list#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDescriptionList",
+    "searchableTitle": "grdescriptionlist generated api",
+    "searchableContent": "grdescriptionlist lists label-value pairs as a real description list, values aligned in a column. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrDescriptionList:section:integration-notes",
+    "title": "GrDescriptionList / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-description-list#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrDescriptionList",
+    "searchableTitle": "grdescriptionlist integration notes",
+    "searchableContent": "grdescriptionlist lists label-value pairs as a real description list, values aligned in a column. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrDialog:section:overview",

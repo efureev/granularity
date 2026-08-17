@@ -105,6 +105,25 @@ describe('GrDataTable — виртуализация', () => {
     wrapper.unmount()
   })
 
+  // Итог — тоже строка таблицы, и `aria-rowcount` объявлен как «полное число
+  // строк набора». Не учтя его, диктор считал бы на одну меньше, чем есть.
+  it('итоговая строка входит в число строк и получает свой номер', async () => {
+    const wrapper = mountTable({ virtual: true, maxHeight: 400, summaryRow: { score: 0 } })
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-table]').attributes('aria-rowcount')).toBe(String(TOTAL + 2))
+    expect(wrapper.get('[data-gr-datatable-summary]').attributes('aria-rowindex')).toBe(String(TOTAL + 2))
+    wrapper.unmount()
+  })
+
+  it('без виртуализации номеров у итога нет — их считает диктор по разметке', () => {
+    const wrapper = mountTable({ rows: manyRows(3), summaryRow: { score: 0 } })
+
+    expect(wrapper.get('[data-gr-table]').attributes('aria-rowcount')).toBeUndefined()
+    expect(wrapper.get('[data-gr-datatable-summary]').attributes('aria-rowindex')).toBeUndefined()
+    wrapper.unmount()
+  })
+
   it('прокрутка сдвигает окно, и номера строк едут вместе с ним', async () => {
     const wrapper = mountTable({ virtual: true, maxHeight: 400 })
     const box = wrapper.get('[data-gr-table-scroll]').element as HTMLElement

@@ -126,6 +126,12 @@ export default defineConfig({
         'components/GrDataTable/index': fileURLToPath(
           new URL('./src/components/GrDataTable/index.ts', import.meta.url),
         ),
+        'components/GrDelta/index': fileURLToPath(
+          new URL('./src/components/GrDelta/index.ts', import.meta.url),
+        ),
+        'components/GrDescriptionList/index': fileURLToPath(
+          new URL('./src/components/GrDescriptionList/index.ts', import.meta.url),
+        ),
         'components/GrDialog/index': fileURLToPath(
           new URL('./src/components/GrDialog/index.ts', import.meta.url),
         ),

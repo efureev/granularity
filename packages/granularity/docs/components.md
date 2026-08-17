@@ -118,6 +118,8 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrConfigProvider`](./components/GrConfigProvider.md)
 - [`GrConfirmDialog`](./components/GrConfirmDialog.md)
 - [`GrDataTable`](./components/GrDataTable.md)
+- [`GrDelta`](./components/GrDelta.md)
+- [`GrDescriptionList`](./components/GrDescriptionList.md)
 - [`GrDialog`](./components/GrDialog.md)
 - [`GrDialogService`](./components/GrDialogService.md)
 - [`GrDivider`](./components/GrDivider.md)

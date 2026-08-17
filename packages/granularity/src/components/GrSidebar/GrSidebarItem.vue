@@ -48,6 +48,15 @@ const rootTag = computed<string | Component>(() => {
   return props.href ? 'a' : 'button'
 })
 
+/**
+ * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без
+ * `href` он ведёт в никуда. Строковый тег, кроме `a`, атрибут не понимает —
+ * там он и гасится.
+ */
+const rootHref = computed(() => (
+  typeof rootTag.value === 'string' && rootTag.value !== 'a' ? undefined : props.href
+))
+
 const rootClass = computed(() => grSidebarItemClass({
   collapsed: collapsed.value,
   disabled: props.disabled,
@@ -60,7 +69,7 @@ const rootClass = computed(() => grSidebarItemClass({
     :is="rootTag"
     data-gr-sidebar-item
     :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootTag === 'a' ? href : undefined"
+    :href="rootHref"
     :aria-current="active ? 'page' : undefined"
     :aria-disabled="disabled ? 'true' : undefined"
     :title="collapsed ? label : undefined"

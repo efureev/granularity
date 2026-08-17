@@ -104,6 +104,7 @@
 | Что происходит | Компонент |
 | --- | --- |
 | строки однородные, разметку даёт компонент | [`GrList`](../packages/granularity/docs/components/GrList.md) |
+| строки — пары «характеристика → значение» | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
 | таблица, ячейки оформляет потребитель | [`GrTable`](../packages/granularity/docs/components/GrTable.md) |
 | таблица с сортировкой, выбором строк, слотами ячеек | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
 | строки вложены друг в друга | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
@@ -171,6 +172,11 @@
 | иконку из любого набора | [`GrIcon`](../packages/granularity/docs/components/GrIcon.md) |
 | клавишу или сочетание | [`GrKbd`](../packages/granularity/docs/components/GrKbd.md) |
 | крупный числовой показатель с динамикой | [`GrStatistic`](../packages/granularity/docs/components/GrStatistic.md) |
+| величину со знаком и тоном внутри строки текста | [`GrDelta`](../packages/granularity/docs/components/GrDelta.md) |
+
+Различитель у последних двух — **место в вёрстке**, а не тип величины:
+`GrStatistic` это блочная плитка со своей подписью, `GrDelta` — фрагмент
+предложения, у которого ни подписи, ни поверхности нет.
 
 ### Раскладка и поверхности
 
@@ -266,10 +272,12 @@
 | [`GrDashboardItem`](../packages/granularity-dashboard/docs/components/GrDashboardItem.md) | dashboard | любой виджет внутри `GrDashboard` |
 | [`GrDashboardPalette`](../packages/granularity-dashboard/docs/components/GrDashboardPalette.md) | dashboard | набор виджетов выбирает пользователь |
 | [`GrDashboardToolbar`](../packages/granularity-dashboard/docs/components/GrDashboardToolbar.md) | dashboard | дашборд редактируемый |
-| [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) | ядро | данные приходят массивом |
+| [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) | ядро | строки сортируют |
 | [`GrDatePicker`](../packages/granularity-chrono/docs/components/GrDatePicker.md) | chrono | дата — значение поля формы |
 | [`GrDateRangePicker`](../packages/granularity-chrono/docs/components/GrDateRangePicker.md) | chrono | отчёт за период |
 | [`GrDateTimePicker`](../packages/granularity-chrono/docs/components/GrDateTimePicker.md) | chrono | момент, а не день |
+| [`GrDelta`](../packages/granularity/docs/components/GrDelta.md) | ядро | число со знаком стоит в предложении |
+| [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) | ядро | карточка объекта |
 | [`GrDialog`](../packages/granularity/docs/components/GrDialog.md) | ядро | окно с шапкой, телом и подвалом |
 | [`GrDialogService`](../packages/granularity/docs/components/GrDialogService.md) | ядро | окно вызывается из кода |
 | [`GrDivider`](../packages/granularity/docs/components/GrDivider.md) | ядро | блоки надо разделить |

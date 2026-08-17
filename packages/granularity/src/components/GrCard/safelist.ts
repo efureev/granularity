@@ -1,5 +1,7 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  cardDescriptionClass,
+  cardTitleClass,
   hoverClass,
   interactiveClass,
   paddingClass,
@@ -17,4 +19,6 @@ export const grCardSafelist = [...new Set([
   ...splitClassTokens(sectionDividerBottomClass),
   ...splitClassTokens(interactiveClass),
   ...splitClassTokens(hoverClass),
+  ...splitClassTokens(cardTitleClass),
+  ...splitClassTokens(cardDescriptionClass),
 ])]
