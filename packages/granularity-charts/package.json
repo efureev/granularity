@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-charts",
   "description": "Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -60,6 +60,18 @@
       "types": "./dist/types/components/GrChartBar/index.d.ts",
       "import": "./dist/components/GrChartBar/index.js"
     },
+    "./components/GrChartBullet": {
+      "types": "./dist/types/components/GrChartBullet/index.d.ts",
+      "import": "./dist/components/GrChartBullet/index.js"
+    },
+    "./components/GrChartFunnel": {
+      "types": "./dist/types/components/GrChartFunnel/index.d.ts",
+      "import": "./dist/components/GrChartFunnel/index.js"
+    },
+    "./components/GrChartHeatmap": {
+      "types": "./dist/types/components/GrChartHeatmap/index.d.ts",
+      "import": "./dist/components/GrChartHeatmap/index.js"
+    },
     "./components/GrChartLine": {
       "types": "./dist/types/components/GrChartLine/index.d.ts",
       "import": "./dist/components/GrChartLine/index.js"
@@ -71,6 +83,10 @@
     "./components/GrChartRadar": {
       "types": "./dist/types/components/GrChartRadar/index.d.ts",
       "import": "./dist/components/GrChartRadar/index.js"
+    },
+    "./components/GrChartWaterfall": {
+      "types": "./dist/types/components/GrChartWaterfall/index.d.ts",
+      "import": "./dist/components/GrChartWaterfall/index.js"
     },
     "./components/GrSparkline": {
       "types": "./dist/types/components/GrSparkline/index.d.ts",

@@ -11,16 +11,52 @@
     "point": "{x}. {values}",
     "seriesValue": "{series}: {value}",
     "axisX": "Eje X",
-    "axisY": "Eje Y"
+    "axisY": "Eje Y",
+    "axisLeft": "eje izquierdo",
+    "axisRight": "eje derecho"
+  },
+  "funnel": {
+    "roleDescription": "gráfico de embudo",
+    "summary": "Gráfico de embudo, {stages} pasos",
+    "keyboardHint": "Usa las flechas para recorrer los pasos",
+    "stage": "{label}: {value}, {shareFirst} del primer paso, {sharePrev} del anterior",
+    "rising": "Pasos mayores que el anterior: {steps}",
+    "tableCaption": "Datos del gráfico",
+    "columnStage": "Paso",
+    "columnValue": "Valor",
+    "columnShareFirst": "Proporción del primero",
+    "columnSharePrev": "Proporción del anterior"
   },
   "bar": {
     "label": "Gráfico de barras",
     "labelStacked": "Gráfico de barras apiladas",
     "labelNormalized": "Gráfico de barras apiladas, 100%"
   },
+  "bullet": {
+    "roleDescription": "gráfico de viñeta",
+    "label": "Valor",
+    "valueText": "{value} de {max}",
+    "valueTextWithTarget": "{value} de {max}, objetivo {target}",
+    "range": "de {from} a {to}",
+    "ranges": "Rangos: {ranges}",
+    "overflow": "El valor está fuera de la escala",
+    "tableCaption": "Datos del gráfico",
+    "columnMetric": "Métrica",
+    "columnValue": "Valor",
+    "columnTarget": "Objetivo"
+  },
+  "heatmap": {
+    "roleDescription": "mapa de calor",
+    "summary": "Mapa de calor, {rows} filas, {columns} columnas",
+    "keyboardHint": "Usa las flechas para recorrer las celdas",
+    "cell": "{row}, {column}: {value}",
+    "tableCaption": "Datos del gráfico",
+    "columnRow": "Fila"
+  },
   "area": {
     "label": "Gráfico de áreas",
-    "labelStacked": "Gráfico de áreas apiladas"
+    "labelStacked": "Gráfico de áreas apiladas",
+    "labelNormalized": "Gráfico de áreas apiladas, 100%"
   },
   "line": {
     "label": "Gráfico de líneas"
@@ -53,11 +89,28 @@
     "hidden": "{label} oculta, {shown} de {total} series visibles",
     "shown": "{label} visible, {shown} de {total} series visibles"
   },
+  "reference": {
+    "labeled": "{label}: {value}",
+    "plain": "Referencia: {value}",
+    "band": "de {from} a {to}"
+  },
   "sparkline": {
     "label": "Minigráfico",
     "summary": "{trend}, de {first} a {last}, mínimo {min}, máximo {max}",
     "trendUp": "en alza",
     "trendDown": "a la baja",
     "trendFlat": "sin cambios"
+  },
+  "waterfall": {
+    "roleDescription": "gráfico de cascada",
+    "summary": "Gráfico de cascada, {steps} pasos, total {total}",
+    "keyboardHint": "Usa las flechas para recorrer los pasos",
+    "point": "{label}: {value}, acumulado {after}",
+    "total": "Total",
+    "tableCaption": "Datos del gráfico",
+    "columnStep": "Paso",
+    "columnValue": "Cambio",
+    "columnBefore": "Acumulado antes",
+    "columnAfter": "Acumulado después"
   }
 }

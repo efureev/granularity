@@ -3,7 +3,7 @@ import { computed, type ComputedRef, onBeforeUnmount, ref, type Ref, watch } fro
 import type { Rect } from '../chart/chartLayout'
 import type { ChartData, GrChartXValue, NormalizedPoint } from '../chart/chartModel'
 import type { GrChartSeriesStyle } from '../chart/chartSeriesStyle'
-import { type GrChartScale, nearestIndex } from '../chart/chartScale'
+import { type GrChartScale, nearestIndex, scaleForAxis } from '../chart/chartScale'
 
 /**
  * Активная точка и её положение на холсте.
@@ -21,6 +21,8 @@ export interface GrChartActiveSeriesValue {
   value: number | null
   point: NormalizedPoint | null
   style: GrChartSeriesStyle
+  /** Ось серии: у графика с двумя осями значения приходят из разных шкал. */
+  axis: 'left' | 'right'
 }
 
 export interface GrChartActivePoint {
@@ -49,6 +51,8 @@ export interface UseChartTooltipOptions {
   data: () => ChartData
   xScale: () => GrChartScale
   yScale: () => GrChartScale
+  /** Шкала правой оси; `null` — ось одна. */
+  yScaleRight?: () => GrChartScale | null
   plot: () => Rect
   /** Элемент, по которому считается координата указателя. */
   surface: Ref<HTMLElement | null>
@@ -126,7 +130,14 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
         .map((series) => {
           const point = series.points.find(item => item.x === x) ?? null
 
-          return { id: series.id, label: series.label, value: point?.y ?? null, point, style: series.style }
+          return {
+            id: series.id,
+            label: series.label,
+            value: point?.y ?? null,
+            point,
+            style: series.style,
+            axis: series.axis,
+          }
         }),
     }
   })
@@ -160,13 +171,19 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
     // над тем, что человек и так рассматривает. У стопки верх — это вершина
     // полосы (`stackTop`), а не наибольшее из значений: по значению панель
     // уехала бы внутрь столбца и накрыла бы ровно то, что показывает.
+    // Пиксель считается на **своей** шкале серии, и только потом берётся
+    // верхний. Сравнивать значения с разных осей нельзя: сорок тысяч рублей и
+    // двенадцать штук — не «сорок тысяч выше», а разные единицы.
+    const right = options.yScaleRight?.() ?? null
     const tops = point.series
-      .map(series => series.point?.stackTop ?? series.value)
+      .map((series) => {
+        const value = series.point?.stackTop ?? series.value
+
+        return value === null ? null : scaleForAxis(series.axis, options.yScale(), right).scale(value)
+      })
       .filter((value): value is number => value !== null)
 
-    const top = tops.length > 0
-      ? options.yScale().scale(Math.max(...tops))
-      : plot.y + plot.height / 2
+    const top = tops.length > 0 ? Math.min(...tops) : plot.y + plot.height / 2
 
     const style: Record<string, string> = {
       position: 'absolute',

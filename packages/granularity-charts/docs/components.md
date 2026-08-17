@@ -1,6 +1,6 @@
 # Каталог компонентов
 
-`@feugene/granularity-charts` публикует шесть компонентов, каждый — отдельным
+`@feugene/granularity-charts` публикует десять компонентов, каждый — отдельным
 subpath-экспортом:
 
 ```ts
@@ -12,9 +12,13 @@ import { GrChartLine } from '@feugene/granularity-charts/components/GrChartLine'
 
 - [`GrChartArea`](./components/GrChartArea.md) — как менялось целое и вклад частей в него
 - [`GrChartBar`](./components/GrChartBar.md) — сколько у каждой категории
+- [`GrChartBullet`](./components/GrChartBullet.md) — насколько величина близка к цели и к порогу
+- [`GrChartFunnel`](./components/GrChartFunnel.md) — где теряются пользователи между ступенями
+- [`GrChartHeatmap`](./components/GrChartHeatmap.md) — где горячо в матрице двух измерений
 - [`GrChartLine`](./components/GrChartLine.md) — как величина менялась
 - [`GrChartPie`](./components/GrChartPie.md) — из чего состоит одно целое
 - [`GrChartRadar`](./components/GrChartRadar.md) — какой формы профиль по нескольким осям
+- [`GrChartWaterfall`](./components/GrChartWaterfall.md) — как из начала периода получился конец
 - [`GrSparkline`](./components/GrSparkline.md) — тренд в ячейке таблицы или в карточке
 
 Выбор между пакетами — карта `docs/COMPONENT-MAP.md` в корне репозитория.

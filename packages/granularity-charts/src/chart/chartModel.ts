@@ -36,6 +36,14 @@ export interface GrChartSeries {
   shape?: GrChartPointShape
   dash?: GrChartDashPattern
   hidden?: boolean
+  /**
+   * К какой оси значений привязана серия. Дефолт — левая.
+   *
+   * Без `dualAxis` поле **игнорируется**, и это осознанно: две оси позволяют
+   * подогнать любые два ряда под видимую корреляцию, поэтому вторая ось должна
+   * быть решением автора графика, а не побочным эффектом поля в данных.
+   */
+  axis?: 'left' | 'right'
 }
 
 export interface NormalizedPoint {
@@ -69,6 +77,8 @@ export interface NormalizedSeries {
   colorIndex: number
   style: GrChartSeriesStyle
   hidden: boolean
+  /** Задана всегда: без `dualAxis` нормализация ставит всем сериям левую. */
+  axis: 'left' | 'right'
   points: readonly NormalizedPoint[]
 }
 
@@ -79,6 +89,12 @@ export interface ChartData {
   categories: readonly string[]
   xDomain: readonly [number, number]
   yDomain: readonly [number, number]
+  /**
+   * Домен правой оси. `undefined` — ось одна, и всё, что её касается, спит:
+   * раскладка не резервирует место справа, `yScaleRight` равен `null`, у колонок
+   * таблицы нет пометки об оси.
+   */
+  yDomainRight?: readonly [number, number]
   /** Объединённые x видимых серий по возрастанию — по ним ходят курсор и клавиатура. */
   positions: readonly number[]
 }
@@ -96,6 +112,29 @@ export interface NormalizeOptions {
    * а не величины.
    */
   stacked?: boolean | '100%'
+  /**
+   * Значения, которые домен обязан вместить помимо данных: порог опоры,
+   * основание и вершина шага моста.
+   *
+   * Складываются с размахом данных **до** `padDomain`, поэтому `includeZero` и
+   * отступы применяются к объединению, а не к данным отдельно. Модель при этом
+   * не знает ни про опоры, ни про мост: закрепить значение на оси — это её
+   * работа, а что оно означает — уже нет.
+   *
+   * У категориальной оси закреплять нечего: её домен это `[0, n−1]`, и
+   * `includeXValues` там игнорируется.
+   */
+  includeXValues?: readonly number[]
+  includeYValues?: readonly number[]
+  /**
+   * Разнести серии по двум осям значений.
+   *
+   * Без него `axis` у серии игнорируется: включение обязано быть осознанным.
+   */
+  dualAxis?: boolean
+  /** Границы правой оси; `null` в любой позиции — считать эту сторону. */
+  yDomainRight?: readonly [number | null, number | null]
+  includeYValuesRight?: readonly number[]
 }
 
 export interface PadDomainOptions {
@@ -127,6 +166,20 @@ export function inferScaleKind(series: readonly GrChartSeries[]): GrChartScaleKi
   }
 
   return 'linear'
+}
+
+/**
+ * Тип шкалы для входа любого вида: явный проп сильнее вывода.
+ *
+ * Нужен снаружи потому, что опорная линия расширяет домен, а разобрать её
+ * значение (`Date`, ISO-строка, имя категории) можно только зная тип оси — то
+ * есть **до** нормализации, внутри которой домен и считается.
+ */
+export function resolveScaleKind(
+  input: readonly GrChartSeries[] | readonly (number | null)[],
+  explicit?: GrChartScaleKind,
+): GrChartScaleKind {
+  return explicit ?? inferScaleKind(asSeriesList(input))
 }
 
 /** Размах конечных значений; `null` — считать нечего. */
@@ -197,6 +250,9 @@ export function normalizeChartData(
       colorIndex: index,
       style: seriesStyle(index, { color: item.color, fill: item.fillColor, shape: item.shape, dash: item.dash }),
       hidden: item.hidden === true,
+      // Без `dualAxis` ось у всех серий левая: поле в данных само по себе
+      // вторую ось не включает.
+      axis: options.dualAxis ? item.axis ?? 'left' : 'left',
       points,
     }
   })
@@ -206,23 +262,46 @@ export function normalizeChartData(
   const visible = normalized.filter(item => !item.hidden)
   const positions = collectPositions(visible)
 
-  if (options.stacked)
-    applyStack(visible, options.stacked === '100%')
+  const left = visible.filter(item => item.axis === 'left')
+  const right = options.dualAxis ? visible.filter(item => item.axis === 'right') : []
 
-  // Ось стека считается по вершинам полос, а не по значениям: иначе верхняя
-  // серия уходила бы за верхний край на сумму нижних.
-  const yExtent = options.stacked
-    ? extentOf(visible.flatMap(item => item.points.map(point => point.stackTop ?? null)))
-    : extentOf(visible.flatMap(item => item.points.map(point => point.y)))
+  if (options.stacked) {
+    // Стек считается по группе на ось, каждая со своими итогами: полоса из
+    // долларов, положенная на полосу из штук, не значит ничего.
+    applyStack(left, options.stacked === '100%')
+    applyStack(right, options.stacked === '100%')
+  }
 
   return {
     kind,
     series: normalized,
     categories,
-    xDomain: resolveXDomain(kind, categories, positions),
-    yDomain: resolveYDomain(yExtent, options),
+    xDomain: resolveXDomain(kind, categories, positions, options.includeXValues),
+    yDomain: resolveYDomain(axisExtent(left, options.stacked), options),
+    yDomainRight: right.length === 0
+      ? undefined
+      : resolveYDomain(axisExtent(right, options.stacked), {
+          ...options,
+          yDomain: options.yDomainRight,
+          includeYValues: options.includeYValuesRight,
+        }),
     positions,
   }
+}
+
+/**
+ * Размах группы серий.
+ *
+ * У стека — по вершинам полос, а не по значениям: иначе верхняя серия уходила
+ * бы за верхний край на сумму нижних.
+ */
+function axisExtent(
+  series: readonly NormalizedSeries[],
+  stacked: NormalizeOptions['stacked'],
+): [number, number] | null {
+  return stacked
+    ? extentOf(series.flatMap(item => item.points.map(point => point.stackTop ?? null)))
+    : extentOf(series.flatMap(item => item.points.map(point => point.y)))
 }
 
 /**
@@ -397,19 +476,39 @@ function collectPositions(series: readonly NormalizedSeries[]): number[] {
   return [...unique].sort((a, b) => a - b)
 }
 
+/** Размах данных плюс закреплённые значения; `null` — вместить нечего. */
+function mergeExtent(
+  extent: [number, number] | null,
+  values: readonly number[] | undefined,
+): [number, number] | null {
+  const extra = values === undefined || values.length === 0 ? null : extentOf(values)
+
+  if (!extent)
+    return extra
+  if (!extra)
+    return extent
+
+  return [Math.min(extent[0], extra[0]), Math.max(extent[1], extra[1])]
+}
+
 function resolveXDomain(
   kind: GrChartScaleKind,
   categories: readonly string[],
   positions: readonly number[],
+  includeXValues: readonly number[] | undefined,
 ): readonly [number, number] {
   if (kind === 'band')
     return [0, Math.max(0, categories.length - 1)]
 
-  if (positions.length === 0)
+  const merged = mergeExtent(
+    positions.length === 0 ? null : [positions[0]!, positions[positions.length - 1]!],
+    includeXValues,
+  )
+
+  if (!merged)
     return EMPTY_DOMAIN
 
-  const first = positions[0]!
-  const last = positions[positions.length - 1]!
+  const [first, last] = merged
 
   // Единственная точка: линии нет, но маркер обязан встать в середину холста,
   // а не в его левый край.
@@ -421,8 +520,9 @@ function resolveYDomain(
   options: NormalizeOptions,
 ): readonly [number, number] {
   const [minOverride, maxOverride] = options.yDomain ?? [null, null]
+  const merged = mergeExtent(extent, options.includeYValues)
 
-  if (!extent) {
+  if (!merged) {
     return [
       minOverride ?? 0,
       maxOverride ?? 1,
@@ -430,7 +530,7 @@ function resolveYDomain(
   }
 
   // Стек всегда отсчитывается от нуля: полоса, висящая над осью, врёт о своей высоте.
-  const padded = padDomain(extent, { includeZero: options.includeZero || options.stacked !== undefined && options.stacked !== false })
+  const padded = padDomain(merged, { includeZero: options.includeZero || options.stacked !== undefined && options.stacked !== false })
 
   return [minOverride ?? padded[0], maxOverride ?? padded[1]]
 }

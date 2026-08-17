@@ -75,27 +75,37 @@ function n(value: number): number {
   return Math.round(value * 100) / 100
 }
 
+/** Куда растёт полоса от своей базовой линии — тот конец и скругляется. */
+export type BarDirection = 'up' | 'down' | 'left' | 'right'
+
 /**
  * Путь полосы со скруглением дальнего от базовой линии конца.
  *
- * Радиус зажимается по половине ширины и по высоте: на низком столбце
+ * Радиус зажимается по половине поперечника и по длине: на низком столбце
  * незажатый радиус вывернул бы дугу наизнанку, а на узком — сомкнул бы её саму
  * с собой.
+ *
+ * Направлений четыре, потому что полоса бывает и горизонтальной: у моста
+ * (`GrChartWaterfall`) при `orientation: 'horizontal'` шаги идут вправо и
+ * влево, и скруглять там надо правый или левый конец. Рисовать такую полосу
+ * `<rect rx>` нельзя по той же причине, что и вертикальную: `rx` скругляет все
+ * четыре угла, и полоса отрывается от своей базовой линии.
  */
-export function barPath(rect: BarRect, radius: number, up = true): string {
+export function barPath(rect: BarRect, radius: number, toward: BarDirection = 'up'): string {
   const { x, y, width, height } = rect
 
   if (!(width > 0) || !(height > 0))
     return ''
 
-  const r = Math.max(0, Math.min(radius, width / 2, height))
+  const vertical = toward === 'up' || toward === 'down'
+  const r = Math.max(0, Math.min(radius, vertical ? width / 2 : height / 2, vertical ? height : width))
 
   // Команды всюду абсолютные, включая эту ветку: смесь `h`/`v` с `H`/`V` в
   // одном модуле читается хуже и разбирается тестом иначе, чем скруглённый путь.
   if (r === 0)
     return `M ${n(x)} ${n(y)} H ${n(x + width)} V ${n(y + height)} H ${n(x)} Z`
 
-  if (up) {
+  if (toward === 'up') {
     return [
       `M ${n(x)} ${n(y + height)}`,
       `V ${n(y + r)}`,
@@ -107,13 +117,37 @@ export function barPath(rect: BarRect, radius: number, up = true): string {
     ].join(' ')
   }
 
+  if (toward === 'down') {
+    return [
+      `M ${n(x)} ${n(y)}`,
+      `V ${n(y + height - r)}`,
+      `A ${n(r)} ${n(r)} 0 0 0 ${n(x + r)} ${n(y + height)}`,
+      `H ${n(x + width - r)}`,
+      `A ${n(r)} ${n(r)} 0 0 0 ${n(x + width)} ${n(y + height - r)}`,
+      `V ${n(y)}`,
+      'Z',
+    ].join(' ')
+  }
+
+  if (toward === 'right') {
+    return [
+      `M ${n(x)} ${n(y)}`,
+      `H ${n(x + width - r)}`,
+      `A ${n(r)} ${n(r)} 0 0 1 ${n(x + width)} ${n(y + r)}`,
+      `V ${n(y + height - r)}`,
+      `A ${n(r)} ${n(r)} 0 0 1 ${n(x + width - r)} ${n(y + height)}`,
+      `H ${n(x)}`,
+      'Z',
+    ].join(' ')
+  }
+
   return [
-    `M ${n(x)} ${n(y)}`,
+    `M ${n(x + width)} ${n(y)}`,
+    `H ${n(x + r)}`,
+    `A ${n(r)} ${n(r)} 0 0 0 ${n(x)} ${n(y + r)}`,
     `V ${n(y + height - r)}`,
     `A ${n(r)} ${n(r)} 0 0 0 ${n(x + r)} ${n(y + height)}`,
-    `H ${n(x + width - r)}`,
-    `A ${n(r)} ${n(r)} 0 0 0 ${n(x + width)} ${n(y + height - r)}`,
-    `V ${n(y)}`,
+    `H ${n(x + width)}`,
     'Z',
   ].join(' ')
 }

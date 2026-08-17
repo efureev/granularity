@@ -68,6 +68,15 @@ export default defineConfig({
         'components/GrChartBar/index': fileURLToPath(
           new URL('./src/components/GrChartBar/index.ts', import.meta.url),
         ),
+        'components/GrChartBullet/index': fileURLToPath(
+          new URL('./src/components/GrChartBullet/index.ts', import.meta.url),
+        ),
+        'components/GrChartFunnel/index': fileURLToPath(
+          new URL('./src/components/GrChartFunnel/index.ts', import.meta.url),
+        ),
+        'components/GrChartHeatmap/index': fileURLToPath(
+          new URL('./src/components/GrChartHeatmap/index.ts', import.meta.url),
+        ),
         'components/GrChartLine/index': fileURLToPath(
           new URL('./src/components/GrChartLine/index.ts', import.meta.url),
         ),
@@ -76,6 +85,9 @@ export default defineConfig({
         ),
         'components/GrChartRadar/index': fileURLToPath(
           new URL('./src/components/GrChartRadar/index.ts', import.meta.url),
+        ),
+        'components/GrChartWaterfall/index': fileURLToPath(
+          new URL('./src/components/GrChartWaterfall/index.ts', import.meta.url),
         ),
         'components/GrSparkline/index': fileURLToPath(
           new URL('./src/components/GrSparkline/index.ts', import.meta.url),

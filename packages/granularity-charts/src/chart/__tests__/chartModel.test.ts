@@ -275,3 +275,130 @@ describe('normalizeChartData: стек', () => {
     expect(data.series[1]!.points[1]!.stackBase).toBe(0)
   })
 })
+
+describe('normalizeChartData: закреплённые значения домена', () => {
+  const series = [{ id: 'a', y: [0.02, 0.03, 0.031] }]
+
+  it('без закрепления порог за пределами данных домен не растягивает', () => {
+    expect(normalizeChartData(series).yDomain[1]).toBeCloseTo(0.031)
+  })
+
+  it('закреплённое значение входит в домен вместе с данными', () => {
+    const data = normalizeChartData(series, { includeYValues: [1] })
+
+    expect(data.yDomain[1]).toBe(1)
+    expect(data.yDomain[0]).toBeCloseTo(0.02)
+  })
+
+  it('закрепление складывается с `includeZero`, а не отменяет его', () => {
+    const data = normalizeChartData(series, { includeZero: true, includeYValues: [1] })
+
+    expect(data.yDomain).toEqual([0, 1])
+  })
+
+  it('`yDomain` сильнее закрепления: явная граница остаётся явной', () => {
+    const data = normalizeChartData(series, { includeYValues: [1], yDomain: [null, 0.05] })
+
+    expect(data.yDomain[1]).toBe(0.05)
+  })
+
+  it('закрепление по X расширяет линейную ось', () => {
+    const data = normalizeChartData([{ id: 'a', x: [0, 1, 2], y: [1, 2, 3] }], { includeXValues: [10] })
+
+    expect(data.xDomain).toEqual([0, 10])
+  })
+
+  it('у категориальной оси закреплять нечего — домен остаётся по категориям', () => {
+    // Домен `band` это `[0, n−1]`: расширить его значило бы дорисовать
+    // категорию, которой в данных нет.
+    const data = normalizeChartData([{ id: 'a', data: [{ x: 'янв', y: 1 }, { x: 'фев', y: 2 }] }], {
+      includeXValues: [10],
+    })
+
+    expect(data.xDomain).toEqual([0, 1])
+  })
+
+  it('пустой массив закреплений ничего не меняет', () => {
+    expect(normalizeChartData(series, { includeYValues: [] }).yDomain)
+      .toEqual(normalizeChartData(series).yDomain)
+  })
+
+  it('закрепление держит домен, когда данных нет вовсе', () => {
+    const data = normalizeChartData([], { includeYValues: [4, 8] })
+
+    expect(data.yDomain).toEqual([4, 8])
+  })
+})
+
+describe('normalizeChartData: вторая ось значений', () => {
+  const series = [
+    { id: 'mrr', label: 'MRR', y: [40000, 42000], axis: 'right' as const },
+    { id: 'active', label: 'Активные', y: [120, 130] },
+  ]
+
+  it('`dualAxis: false` кладёт все серии на левую ось и второго домена не заводит', () => {
+    // Поле в данных само по себе вторую ось не включает: две оси позволяют
+    // подогнать любые два ряда под видимую корреляцию.
+    const data = normalizeChartData(series)
+
+    expect(data.series.map(item => item.axis)).toEqual(['left', 'left'])
+    expect(data.yDomainRight).toBeUndefined()
+  })
+
+  it('`dualAxis: false` даёт домен, неотличимый от того, что был до второй оси', () => {
+    const data = normalizeChartData(series)
+
+    expect(data.yDomain).toEqual([120, 42000])
+  })
+
+  it('домены считаются раздельно, каждый по своим сериям', () => {
+    const data = normalizeChartData(series, { dualAxis: true })
+
+    expect(data.yDomain).toEqual([120, 130])
+    expect(data.yDomainRight).toEqual([40000, 42000])
+  })
+
+  it('скрытие серии трогает только свою ось', () => {
+    const data = normalizeChartData(
+      [...series, { id: 'new', label: 'Новые', y: [500, 600] }],
+      { dualAxis: true },
+    )
+    const hidden = normalizeChartData(
+      [...series, { id: 'new', label: 'Новые', y: [500, 600], hidden: true }],
+      { dualAxis: true },
+    )
+
+    expect(hidden.yDomain).not.toEqual(data.yDomain)
+    expect(hidden.yDomainRight).toEqual(data.yDomainRight)
+  })
+
+  it('второго домена нет, пока нет ни одной серии на правой оси', () => {
+    expect(normalizeChartData([{ id: 'a', y: [1, 2] }], { dualAxis: true }).yDomainRight).toBeUndefined()
+  })
+
+  it('стек не пересекает ось: у каждой свои итоги', () => {
+    const data = normalizeChartData([
+      { id: 'a', y: [10] },
+      { id: 'b', y: [5] },
+      { id: 'c', y: [1000], axis: 'right' as const },
+    ], { dualAxis: true, stacked: true })
+
+    expect(data.series[1]!.points[0]!.stackBase).toBe(10)
+    // Правая серия начинает свою стопку с нуля, а не с суммы левых.
+    expect(data.series[2]!.points[0]!.stackBase).toBe(0)
+  })
+
+  it('`yDomainRight` перекрывает границу правой оси, не трогая левую', () => {
+    const data = normalizeChartData(series, { dualAxis: true, yDomainRight: [0, null] })
+
+    expect(data.yDomainRight?.[0]).toBe(0)
+    expect(data.yDomain[0]).toBe(120)
+  })
+
+  it('`includeZero` применяется к обеим осям', () => {
+    const data = normalizeChartData(series, { dualAxis: true, includeZero: true })
+
+    expect(data.yDomain[0]).toBe(0)
+    expect(data.yDomainRight?.[0]).toBe(0)
+  })
+})

@@ -11,16 +11,52 @@
     "point": "{x}. {values}",
     "seriesValue": "{series}: {value}",
     "axisX": "Ось X",
-    "axisY": "Ось Y"
+    "axisY": "Ось Y",
+    "axisLeft": "левая ось",
+    "axisRight": "правая ось"
+  },
+  "funnel": {
+    "roleDescription": "воронка",
+    "summary": "Воронка, ступеней {stages}",
+    "keyboardHint": "Стрелки — переход по ступеням",
+    "stage": "{label}: {value}, {shareFirst} от первой ступени, {sharePrev} от предыдущей",
+    "rising": "Ступени больше предыдущей: {steps}",
+    "tableCaption": "Данные графика",
+    "columnStage": "Ступень",
+    "columnValue": "Значение",
+    "columnShareFirst": "Доля от первой",
+    "columnSharePrev": "Доля от предыдущей"
   },
   "bar": {
     "label": "Столбчатая диаграмма",
     "labelStacked": "Столбцы стопкой",
     "labelNormalized": "Столбцы стопкой, 100%"
   },
+  "bullet": {
+    "roleDescription": "полоса с целью",
+    "label": "Значение",
+    "valueText": "{value} из {max}",
+    "valueTextWithTarget": "{value} из {max}, цель {target}",
+    "range": "от {from} до {to}",
+    "ranges": "Диапазоны: {ranges}",
+    "overflow": "Значение вне шкалы",
+    "tableCaption": "Данные графика",
+    "columnMetric": "Показатель",
+    "columnValue": "Значение",
+    "columnTarget": "Цель"
+  },
+  "heatmap": {
+    "roleDescription": "теплокарта",
+    "summary": "Теплокарта, строк {rows}, колонок {columns}",
+    "keyboardHint": "Стрелки — переход по ячейкам",
+    "cell": "{row}, {column}: {value}",
+    "tableCaption": "Данные графика",
+    "columnRow": "Строка"
+  },
   "area": {
     "label": "График с областями",
-    "labelStacked": "Стопка областей"
+    "labelStacked": "Стопка областей",
+    "labelNormalized": "Стопка областей, 100%"
   },
   "line": {
     "label": "Линейный график"
@@ -53,11 +89,28 @@
     "hidden": "{label} скрыта, показано {shown} из {total}",
     "shown": "{label} показана, показано {shown} из {total}"
   },
+  "reference": {
+    "labeled": "{label}: {value}",
+    "plain": "Опора: {value}",
+    "band": "от {from} до {to}"
+  },
   "sparkline": {
     "label": "Спарклайн",
     "summary": "{trend}, от {first} до {last}, минимум {min}, максимум {max}",
     "trendUp": "рост",
     "trendDown": "падение",
     "trendFlat": "без изменений"
+  },
+  "waterfall": {
+    "roleDescription": "мост",
+    "summary": "Мост, шагов {steps}, итог {total}",
+    "keyboardHint": "Стрелки — переход по шагам",
+    "point": "{label}: {value}, накоплено {after}",
+    "total": "Итого",
+    "tableCaption": "Данные графика",
+    "columnStep": "Шаг",
+    "columnValue": "Изменение",
+    "columnBefore": "Накоплено до",
+    "columnAfter": "Накоплено после"
   }
 }

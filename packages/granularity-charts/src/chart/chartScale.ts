@@ -159,6 +159,21 @@ export function createScale(
  * Возвращает `-1` на пустом наборе: «нет активной точки» — валидное состояние,
  * а не ошибка.
  */
+/**
+ * Шкала значений для серии.
+ *
+ * Отдельной функцией, чтобы `?? left` не размножился по трём компонентам: с
+ * ним однажды разошлись бы расчёт марки и расчёт её базовой линии, и столбец
+ * правой оси встал бы на чужой ноль.
+ */
+export function scaleForAxis(
+  axis: 'left' | 'right',
+  left: GrChartScale,
+  right: GrChartScale | null,
+): GrChartScale {
+  return axis === 'right' && right !== null ? right : left
+}
+
 export function nearestIndex(
   positions: readonly number[],
   scale: GrChartScale,

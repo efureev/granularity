@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { bandTicks, linearTicks, niceNumber, timeTicks } from '../chartTicks'
+import { alignedTicks, bandTicks, linearTicks, niceNumber, timeTicks } from '../chartTicks'
 
 /** Шаг обязан быть 1, 2 или 5 на своём порядке — это и есть Heckbert. */
 function mantissa(step: number): number {
@@ -139,5 +139,41 @@ describe('bandTicks', () => {
 
   it('пустой набор — пустой список', () => {
     expect(bandTicks(0, 6)).toEqual([])
+  })
+})
+
+describe('alignedTicks', () => {
+  it('число делений задаётся снаружи и соблюдается', () => {
+    // Иначе сетка двух осей двоилась бы: у каждой лестницы свой счёт.
+    for (const count of [3, 5, 8])
+      expect(alignedTicks([0, 97], count).values).toHaveLength(count)
+  })
+
+  it('данные остаются внутри расширенного домена', () => {
+    const ticks = alignedTicks([12, 97], 5)
+
+    expect(ticks.niceDomain[0]).toBeLessThanOrEqual(12)
+    expect(ticks.niceDomain[1]).toBeGreaterThanOrEqual(97)
+  })
+
+  it('шаг берётся с той же лестницы 1/2/5/10, что и у обычных делений', () => {
+    expect(alignedTicks([0, 100], 5).step).toBe(50)
+  })
+
+  it('верхнее деление совпадает с верхом домена', () => {
+    const ticks = alignedTicks([0, 97], 5)
+
+    expect(ticks.values.at(-1)).toBe(ticks.niceDomain[1])
+  })
+
+  it('вырожденный домен даёт одно деление, а не деление на ноль', () => {
+    expect(alignedTicks([7, 7], 5).values).toEqual([7])
+  })
+
+  it('отрицательный домен не ломает знаки', () => {
+    const ticks = alignedTicks([-80, -10], 5)
+
+    expect(ticks.niceDomain[0]).toBeLessThanOrEqual(-80)
+    expect(ticks.values.every(value => value <= 0)).toBe(true)
   })
 })

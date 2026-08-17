@@ -365,6 +365,187 @@ function sparklineApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
+/** Публичная поверхность моста: шаги, накопление и итог. */
+function chartWaterfallApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'steps', type: 'GrChartWaterfallStep[]', description: 'Шаги моста: `{ label, value, kind?, color?, meta? }`. `kind: \'total\'` — абсолютное значение: столбец от нуля, накопление сбрасывается на него.' },
+        { name: 'baseline', type: 'number', default: '0', description: 'Начальное накопление. Первый шаг-дельта отсчитывается от него.' },
+        { name: 'showTotal', type: 'boolean | string', default: 'false', description: 'Дорисовать итоговый столбец справа. Строка задаёт его подпись. Накопления он не меняет — только показывает.' },
+        { name: 'showConnectors', type: 'boolean', default: 'true', description: 'Линии от вершины предыдущего столбца к основанию следующего. К шагу `total` соединитель не ведёт: он объявляет накопление, а не продолжает его.' },
+        { name: 'barRadius', type: 'number', default: '2', description: 'Скругление дальнего конца столбца в пикселях. Числом, а не токеном: радиус идёт в геометрию пути.' },
+        { name: 'orientation', type: `'vertical' | 'horizontal'`, default: `'vertical'`, description: 'Горизонталь берут, когда подписи шагов длиннее ширины категории. Оси в этом режиме рисует сам компонент.' },
+        { name: 'height / width', type: 'number', default: '256 · 640', description: 'Высота холста и объявленная ширина для серверного рендера.' },
+        { name: 'yDomain', type: '[number | null, number | null]', description: 'Границы оси значений. Ноль включается всегда: мост, оторванный от нуля, врёт о величинах.' },
+        { name: 'showGrid', type: `'both' | 'x' | 'y' | 'none'`, default: `'y'`, description: 'Оси названы по данным: при горизонтали стороны меняются местами сами.' },
+        { name: 'tooltip', type: 'boolean', default: 'true', description: 'Тултип от координаты указателя: шаг, его значение и накопление после.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — активный шаг.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Три колонки значений: изменение, накопление до и после. По одной дельте мост не восстановить.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку: `role="img"` с именем, без фокуса и клавиатуры.' },
+        { name: 'valueFormat / yTickFormat', type: 'GrChartNumberFormat · (value) => string', description: 'Форматирование значений и подписей оси.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Активный шаг сменился — указателем или клавиатурой.' },
+        { name: 'stepClick', type: '(value: GrChartWaterfallActiveStep) => void', description: 'Клик или `Enter` на шаге. В полезной нагрузке накопление до и после.' },
+        { name: 'stepHover', type: '(value: GrChartWaterfallActiveStep | null) => void', description: 'Шаг под курсором. `null` — курсор ушёл.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active, step, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'header / empty', type: '—', description: 'Строка над графиком и своё пустое состояние.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность bullet: величина, цель и качественные диапазоны. */
+function chartBulletApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'value', type: 'number | null', description: 'Измеряемая величина. `null` — величины нет: полосы нет, цель остаётся, в таблице прочерк. Это не ноль.' },
+        { name: 'target', type: 'number', description: 'Целевое значение — засечка поперёк дорожки. Цель за пределами шкалы засечки не даёт.' },
+        { name: 'ranges', type: 'readonly number[]', description: 'Границы качественных диапазонов: `[0.9, 1]` при `max: 1.2` даёт три полосы. Порядок не важен, граница за краем шкалы зажимается, а не выбрасывается.' },
+        { name: 'min / max', type: 'number', default: '0 · по данным', description: 'Границы шкалы. Верх не задан — максимум из величины, цели и границ с запасом.' },
+        { name: 'rangeColors', type: 'readonly string[]', description: 'Цвета полос от «хорошо» к «плохо». Длина на единицу больше `ranges`.' },
+        { name: 'color', type: 'string', description: 'Тон полосы значения. Не задан — первая роль палитры серий.' },
+        { name: 'orientation', type: `'horizontal' | 'vertical'`, default: `'horizontal'`, description: 'Направление дорожки.' },
+        { name: 'label', type: 'string', description: 'Имя метрики: заголовок строки в таблице и в тултипе.' },
+        { name: 'height / width', type: 'number', default: '48 · 640', description: 'Высота дорожки и объявленная ширина.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Метрика, значение и цель таблицей; диапазоны уходят примечанием в `tfoot`.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Формат значений в тултипе, таблице и `aria-valuetext`.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'valueClick', type: '(value: number | null) => void', description: 'Клик или `Enter` на дорожке. Приходит настоящая величина, а не зажатая по шкале.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active, formatValue }', description: 'Своя панель тултипа.' },
+        { name: 'header / empty', type: '—', description: 'Строка над графиком и своё пустое состояние.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность теплокарты: матрица, шкала цвета и двумерный курсор. */
+function chartHeatmapApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'values', type: '(number | null)[][]', description: 'Значения построчно: `values[y][x]`. `null` — ячейки нет, а не «ноль»: она не заливается, в таблице прочерк, в домен не входит. Короткие строки дополняются `null` справа.' },
+        { name: 'xLabels / yLabels', type: 'readonly string[]', description: 'Подписи колонок и строк. Их число и задаёт размер матрицы.' },
+        { name: 'domain', type: '[number, number]', description: 'Границы шкалы. Не заданы — считаются по данным без учёта отсутствующих ячеек.' },
+        { name: 'scale / midpoint', type: `'sequential' | 'diverging' · number`, default: `'sequential' · 0`, description: 'Расходящаяся шкала красит недобор и перебор разными ролями и нормируется на больший из отступов от середины — так она симметрична по построению.' },
+        { name: 'lowColor / highColor / midColor', type: 'string', description: 'Полюса шкалы ролями темы. Цвет ячейки — `color-mix` по роли, а не палитра из пяти литералов.' },
+        { name: 'steps', type: 'number', default: '5', description: 'Число ступеней шкалы; `0` — непрерывный градиент. Края в обоих режимах совпадают, различаются середины.' },
+        { name: 'cellGap', type: 'number', default: '2', description: 'Зазор между ячейками в пикселях. Съедается изнутри ячейки: сетка остаётся упёртой в края области.' },
+        { name: 'showValues', type: `boolean | 'auto'`, default: `'auto'`, description: '`auto` рисует значения только там, где они помещаются. Контраст подписи считается от доли примеси: измерить итоговый цвет без DOM нечем.' },
+        { name: 'showLegend', type: 'boolean', default: 'true', description: 'Легенда — шкала с подписями границ, а не список категорий: у матрицы нет оси значений.' },
+        { name: 'activeCell', type: '{ x: number, y: number } | null', description: '`v-model:activeCell` — активная ячейка обеими координатами.' },
+        { name: 'height / width', type: 'number', default: '256 · 640', description: 'Высота холста и объявленная ширина.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Настоящая таблица с заголовками строк и колонок. Без неё теплокарта нечитаема вовсе, а не менее удобна.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Формат значений в ячейках, тултипе и таблице.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:activeCell', type: '(value: { x, y } | null) => void', description: 'Курсор сменил ячейку — указателем или стрелками.' },
+        { name: 'cellClick', type: '(value: GrChartHeatmapCell) => void', description: 'Клик или `Enter` на ячейке: индексы, подписи и значение.' },
+        { name: 'cellHover', type: '(value: GrChartHeatmapCell | null) => void', description: 'Ячейка под курсором. `null` — курсор ушёл.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'legend', type: '{ thresholds, colorAt }', description: 'Своя легенда шкалы.' },
+        { name: 'tooltip', type: '{ active, cell }', description: 'Своя панель тултипа.' },
+        { name: 'header / empty', type: '—', description: 'Строка над графиком и своё пустое состояние.' },
+      ],
+    },
+  ]
+}
+
+/** Публичная поверхность воронки: ступени и обе доли. */
+function chartFunnelApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'stages', type: 'GrChartFunnelStage[]', description: 'Ступени: `{ label, value, color?, meta? }`. Ширина пропорциональна значению, а не порядку: убывание рисуется потому, что оно есть в данных.' },
+        { name: 'labels', type: `'value' | 'share-first' | 'share-prev' | 'none'`, default: `'value'`, description: 'Что писать на самой ступени. Обе доли остаются доступными рядом — в тултипе, таблице и объявлении.' },
+        { name: 'orientation', type: `'vertical' | 'horizontal'`, default: `'vertical'`, description: 'Направление воронки.' },
+        { name: 'shape', type: `'trapezoid' | 'bar'`, default: `'trapezoid'`, description: 'Сужающаяся лента или прямоугольники. Значения и таблица при этом совпадают до знака: форма здесь вопрос вкуса.' },
+        { name: 'gap', type: 'number', default: '4', description: 'Зазор между ступенями в пикселях.' },
+        { name: 'height / width', type: 'number', default: '256 · 640', description: 'Высота холста и объявленная ширина.' },
+        { name: 'activeIndex', type: 'number | null', description: '`v-model:activeIndex` — активная ступень.' },
+        { name: 'dataTable', type: `'hidden' | 'visible' | 'off'`, default: `'hidden'`, description: 'Ступень, значение и обе доли отдельными колонками.' },
+        { name: 'interactive', type: 'boolean', default: 'true', description: '`false` превращает график в картинку.' },
+        { name: 'valueFormat', type: 'GrChartNumberFormat', description: 'Формат значений.' },
+        { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей. Не задан — из `GrConfigProvider`.' },
+      ],
+    },
+    {
+      key: 'events',
+      title: 'Events',
+      origin: 'manual',
+      items: [
+        { name: 'update:activeIndex', type: '(value: number | null) => void', description: 'Активная ступень сменилась.' },
+        { name: 'stageClick', type: '(value: GrChartFunnelActiveStage) => void', description: 'Клик или `Enter` на ступени. В полезной нагрузке обе доли.' },
+        { name: 'stageHover', type: '(value: GrChartFunnelActiveStage | null) => void', description: 'Ступень под курсором. `null` — курсор ушёл.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'tooltip', type: '{ active, stage }', description: 'Своя панель тултипа.' },
+        { name: 'header / empty', type: '—', description: 'Строка над графиком и своё пустое состояние.' },
+      ],
+    },
+  ]
+}
+
 /** Пропы сетки: то, что относится к показу месяца и выбору дня. */
 function calendarApiSections(): ShowcaseApiSectionMeta[] {
   return [
@@ -876,6 +1057,13 @@ export const companionPackages: CompanionPackage[] = [
             note: 'Тултип и таблица в обоих режимах говорят «партнёры — 190», а не «партнёры — 650, потому что снизу лежит розница».',
           },
           {
+            id: 'charts-area-share',
+            title: 'Share over time',
+            description: 'Доля во времени — типичная задача именно для площадей: лента показывает, как менялось распределение, когда абсолютные числа растут у всех сразу и потому ничего не объясняют.',
+            previewKey: 'extra-charts-area-share',
+            note: 'Нормируется рисунок, а не данные: тултип и таблица под графиком по-прежнему называют абсолютные величины. Заливка при ста процентах плотная — ленты стоят встык, и градиент внутри каждой размыл бы границу между ними.',
+          },
+          {
             id: 'charts-area-zero',
             title: 'Above and below zero',
             description: 'Базовая линия — ноль, а не низ холста. Заливай мы всегда до нижнего края, убыток в минус сто нарисовался бы той же высотой, что и прибыль в плюс сто, только чуть ниже.',
@@ -942,8 +1130,118 @@ export const companionPackages: CompanionPackage[] = [
             previewKey: 'extra-charts-line-states',
             note: 'Переключатель `gaps` решает, чем закрыть провал визуально; на данные он не влияет — в таблице у пропущенных часов по-прежнему «нет значения», а не ноль.',
           },
+          {
+            id: 'charts-line-references',
+            title: 'Thresholds are not a series',
+            description: 'Порог, нарисованный серией из константы, врёт трижды: попадает в легенду равноправным рядом, растягивает домен оси и уезжает в скрытую таблицу как данные. Опора не делает ничего из этого.',
+            previewKey: 'extra-charts-line-references',
+            note: 'Домен по умолчанию опора не растягивает: критический порог `1.0` при данных около `0.03` схлопнул бы сами данные в линию у нуля. Опора за краем домена не рисуется, но остаётся в описании графика — «порог не виден» и «порога нет» это разные утверждения.',
+          },
+          {
+            id: 'charts-line-dual-axis',
+            title: 'Money and counts on one chart',
+            description: 'Деньги и штуки одна ось не выдерживает: ряд меньшего порядка схлопывается в линию у нуля, и вопрос «как связаны выручка и движение» приходится рассматривать по двум картинкам.',
+            previewKey: 'extra-charts-line-dual-axis',
+            note: 'Вторая ось включается пропом `dualAxis`, а не полем в данных: две оси позволяют подогнать любые два ряда под видимую корреляцию, и это должно быть решением автора графика. Делений у осей поровну, чтобы сетка не двоилась, и рисуется она только по левой.',
+          },
         ],
         apiSections: chartLineApiSections(),
+      },
+      {
+        name: 'GrChartWaterfall',
+        slug: 'gr-chart-waterfall',
+        title: 'GrChartWaterfall',
+        summary: 'Мост от начала периода к его концу: каждый столбец стоит там, где кончился предыдущий. Отвечает не «сколько пришло и ушло», а «как одно превратилось в другое».',
+        importPath: '@feugene/granularity-charts/components/GrChartWaterfall',
+        examples: [
+          {
+            id: 'charts-waterfall-basic',
+            title: 'How the month added up',
+            description: 'Расходящиеся столбцы отвечают «сколько пришло и сколько ушло». Мост отвечает «как из начала месяца получился конец» — и показывает, сходится ли сумма движений с заявленным остатком.',
+            previewKey: 'extra-charts-waterfall-basic',
+            note: 'Шаг `kind: \'total\'` объявляет накопление, а не прибавляется к нему: реальные остатки с бэкенда встают в тот же график, и расхождение видно глазом. Соединитель к такому шагу не ведёт — он не продолжает мост.',
+          },
+          {
+            id: 'charts-waterfall-horizontal',
+            title: 'Long labels go sideways',
+            description: 'Горизонталь берут, когда подписи шагов длиннее ширины категории: под вертикальной осью они налезли бы друг на друга. Оси в этом режиме рисует сам компонент — ось значений рамы вертикальна по построению.',
+            previewKey: 'extra-charts-waterfall-horizontal',
+            note: 'Нулевой шаг рисуется чертой на уровне накопления, а не пропадает: «движения не было» это факт, а не отсутствие данных.',
+          },
+        ],
+        apiSections: chartWaterfallApiSections(),
+      },
+      {
+        name: 'GrChartBullet',
+        slug: 'gr-chart-bullet',
+        title: 'GrChartBullet',
+        summary: 'Величина, цель и качественные диапазоны в одну строку. Отвечает не «сколько», а «насколько это хорошо и далеко ли до следующей границы».',
+        importPath: '@feugene/granularity-charts/components/GrChartBullet',
+        examples: [
+          {
+            id: 'charts-bullet-basic',
+            title: 'Metrics you can scan',
+            description: 'Число рядом с бейджем `warning` говорит, что плохо, но не говорит, насколько. Bullet Стивена Фью решает ту же задачу в одну строку — и сравнивается по вертикали, когда таких метрик несколько.',
+            previewKey: 'extra-charts-bullet-basic',
+            note: 'Циферблата в пакете нет намеренно: он тратит много места на мало данных и плохо читается количественно. Роль оверлея здесь `meter`, а `aria-valuetext` читается как «0,031 из 0,05, цель 0,04».',
+          },
+          {
+            id: 'charts-bullet-states',
+            title: 'No value, and off the scale',
+            description: 'Два крайних случая, о которых обычно забывают: величины нет вовсе и величина вышла за шкалу. Ни то, ни другое нельзя показать нулём или обрезанной полосой — оба варианта нарисовали бы число, которого в данных нет.',
+            previewKey: 'extra-charts-bullet-states',
+            note: 'Вместе со значением исчезает и роль `meter`: она требует `aria-valuenow`, и оставленная роль дала бы нарушение уровня serious.',
+          },
+        ],
+        apiSections: chartBulletApiSections(),
+      },
+      {
+        name: 'GrChartHeatmap',
+        slug: 'gr-chart-heatmap',
+        title: 'GrChartHeatmap',
+        summary: 'Матрица, где цвет кодирует величину: удержание по когортам, активность по часам и дням. Показывает форму раньше, чем читатель начнёт сравнивать цифры.',
+        importPath: '@feugene/granularity-charts/components/GrChartHeatmap',
+        examples: [
+          {
+            id: 'charts-heatmap-cohorts',
+            title: 'Retention by cohort',
+            description: 'Строки — когорты, колонки — месяц после регистрации. Разреженность здесь не дефект данных, а их природа: у сентябрьской когорты четвёртого месяца ещё не было.',
+            previewKey: 'extra-charts-heatmap-cohorts',
+            note: '`null` — не ноль и не минимум шкалы: ячейка не заливается, в таблице получает прочерк и в домен не входит. «Месяц ещё не наступил» и «удержание ноль» это разные утверждения. Клавиатура двумерная и не кольцуется ни по одной оси.',
+          },
+          {
+            id: 'charts-heatmap-scale',
+            title: 'Diverging, stepped or smooth',
+            description: 'Расходящуюся шкалу берут, когда важно отклонение в обе стороны: недобор и перебор красятся разными ролями вокруг середины. Ступени против непрерывной — вопрос того, читают карту как зоны или как градиент.',
+            previewKey: 'extra-charts-heatmap-scale',
+            note: 'Шкала нормируется на больший из отступов от середины — так она симметрична по построению, а не по совпадению данных. Контраст подписи в ячейке считается от доли примеси: измерить итоговый цвет без DOM нечем.',
+          },
+        ],
+        apiSections: chartHeatmapApiSections(),
+      },
+      {
+        name: 'GrChartFunnel',
+        slug: 'gr-chart-funnel',
+        title: 'GrChartFunnel',
+        summary: 'Ступени конверсии и потери между ними. Три числа отвечают «сколько дошло», воронка — «где теряем».',
+        importPath: '@feugene/granularity-charts/components/GrChartFunnel',
+        examples: [
+          {
+            id: 'charts-funnel-basic',
+            title: 'Two shares, two denominators',
+            description: 'Доля от первой ступени и доля от предыдущей — разные числа, и обе доступны одновременно. Смешивать их в одной подписи нельзя: «конверсия сорок процентов» без указания знаменателя не значит ничего.',
+            previewKey: 'extra-charts-funnel-basic',
+            note: 'Проп `labels` выбирает только то, что написано на самой ступени; тултип, скрытая таблица и объявление продолжают называть обе доли.',
+          },
+          {
+            id: 'charts-funnel-shape',
+            title: 'A step that grows',
+            description: 'Ступень больше предыдущей воронка не выпрямляет: это либо ошибка данных, либо разные когорты, и решать должен читатель. Ширина пропорциональна значению, а не порядку.',
+            previewKey: 'extra-charts-funnel-shape',
+            note: 'Факт роста попадает в описание графика словами — иначе он существовал бы только для зрячих. Лента и полосы дают одни и те же числа в таблице: форма здесь вопрос вкуса, а не смысла.',
+          },
+        ],
+        apiSections: chartFunnelApiSections(),
       },
       {
         name: 'GrChartPie',

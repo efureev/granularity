@@ -8,8 +8,10 @@ import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
-import { normalizeChartData } from '../../chart/chartModel'
-import { type GrChartScale, type GrChartScaleKind, nearestIndex } from '../../chart/chartScale'
+import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
+import type { GrChartReference } from '../../chart/chartReference'
+import { referenceDomainValues } from '../../chart/chartReference'
+import { type GrChartScale, type GrChartScaleKind, nearestIndex, scaleForAxis } from '../../chart/chartScale'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { ChartHitContext, GrChartActivePoint } from '../../composables/useChartTooltip'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
@@ -52,6 +54,32 @@ export interface GrChartBarProps {
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
   yDomain?: readonly [number | null, number | null]
+  /**
+   * Опорные линии и полосы: порог, план, коридор допустимого.
+   *
+   * Не серия и нигде ею не считается: в легенду не попадает, индекс палитры не
+   * тратит, в стек не входит и в скрытую таблицу уезжает примечанием, а не
+   * строкой данных.
+   */
+  references?: readonly GrChartReference[]
+  /**
+   * Включить опоры в домен оси.
+   *
+   * По умолчанию нет, и это осознанно: порог `1.0` при данных около `0.03`
+   * растянул бы ось так, что сами данные схлопнулись бы в линию.
+   */
+  includeReferencesInDomain?: boolean
+  /**
+   * Показывать вторую ось значений справа.
+   *
+   * Без неё серии с `axis: 'right'` попадают на левую. Включение осознанное:
+   * две оси позволяют подогнать любые два ряда под видимую корреляцию, и это
+   * должно быть решением автора графика, а не побочным эффектом поля в данных.
+   */
+  dualAxis?: boolean
+  yDomainRight?: readonly [number | null, number | null]
+  yTickFormatRight?: (value: number) => string
+  valueFormatRight?: GrChartNumberFormat
   xTickCount?: number
   yTickCount?: number
   xTickFormat?: ChartTickFormat
@@ -96,6 +124,12 @@ const props = withDefaults(defineProps<GrChartBarProps>(), {
   height: undefined,
   width: 640,
   yDomain: undefined,
+  references: undefined,
+  includeReferencesInDomain: false,
+  dualAxis: false,
+  yDomainRight: undefined,
+  yTickFormatRight: undefined,
+  valueFormatRight: undefined,
   xTickCount: 6,
   yTickCount: 5,
   xTickFormat: undefined,
@@ -155,13 +189,30 @@ const seriesInput = computed<readonly GrChartSeries[] | readonly number[]>(() =>
   }))
 })
 
+/**
+ * Тип оси нужен раньше нормализации: значение опоры (`Date`, ISO-строка, имя
+ * категории) без него не разобрать, а разобрать его надо до того, как
+ * посчитается домен.
+ */
+const scaleKind = computed(() => resolveScaleKind(seriesInput.value, props.xScale))
+
+const referenceDomain = computed(() => (
+  props.includeReferencesInDomain
+    ? referenceDomainValues(props.references ?? [], scaleKind.value)
+    : { x: [], y: [] }
+))
+
 const data = computed(() => normalizeChartData(seriesInput.value, {
-  kind: props.xScale,
+  kind: scaleKind.value,
   // Ноль включается всегда и не спрашивая: столбец, не начинающийся от нуля,
   // врёт о своей величине — и врёт тем сильнее, чем уже диапазон.
   includeZero: true,
   yDomain: props.yDomain,
   stacked: props.stacked,
+  includeXValues: referenceDomain.value.x,
+  includeYValues: referenceDomain.value.y,
+  dualAxis: props.dualAxis,
+  yDomainRight: props.yDomainRight,
 }))
 
 const isNormalized = computed(() => props.stacked === '100%')
@@ -207,12 +258,12 @@ function barMarks(
   yScale: GrChartScale,
   plot: Rect,
   cursor: number | null,
+  yScaleRight: GrChartScale | null = null,
 ): BarMark[] {
   const activeX = cursor === null ? undefined : data.value.positions[cursor]
   const stacked = props.stacked !== false
   const bandwidth = bandOf(xScale, plot, data.value.positions.length)
   const slots = groupSlots(stacked ? 1 : series.length, bandwidth, { groupPadding: resolvedGroupPadding.value })
-  const baseline = Math.min(Math.max(yScale.scale(0), plot.y), plot.y + plot.height)
   const top = topmostAt(series)
   const marks: BarMark[] = []
 
@@ -222,20 +273,25 @@ function barMarks(
     if (!slot)
       return
 
+    // Шкала и её ноль берутся у одной оси: иначе столбец правой серии встал бы
+    // на чужую базовую линию и показал бы величину, которой нет.
+    const scale = scaleForAxis(item.axis, yScale, yScaleRight)
+    const baseline = Math.min(Math.max(scale.scale(0), plot.y), plot.y + plot.height)
+
     for (const point of item.points) {
       if (point.y === null)
         continue
       if (stacked && point.stackTop === undefined)
         continue
 
-      const from = stacked ? yScale.scale(point.stackBase!) : baseline
-      const to = stacked ? yScale.scale(point.stackTop!) : yScale.scale(point.y)
+      const from = stacked ? scale.scale(point.stackBase!) : baseline
+      const to = stacked ? scale.scale(point.stackTop!) : scale.scale(point.y)
       // Имя не `rounded`: гейт `styleTokens` ищет утилиту с тем же написанием.
       const withRadius = !stacked || top.get(point.x) === item.id
 
       marks.push({
         key: `${item.id}-${point.sourceIndex}`,
-        d: barPath(barRect(xScale.scale(point.x), slot, from, to), withRadius ? resolvedRadius.value : 0, to <= from),
+        d: barPath(barRect(xScale.scale(point.x), slot, from, to), withRadius ? resolvedRadius.value : 0, to <= from ? 'up' : 'down'),
         color: item.style.color,
         seriesId: item.id,
         dimmed: resolvedDimInactive.value && activeX !== undefined && point.x !== activeX,
@@ -345,6 +401,9 @@ defineExpose({
     :x-tick-format="xTickFormat"
     :y-tick-format="yTickFormat"
     :value-format="valueFormat"
+    :references="references"
+    :y-tick-format-right="yTickFormatRight"
+    :value-format-right="valueFormatRight"
     data-gr-chart-bar
     @update:active-index="value => emit('update:activeIndex', value)"
     @point-click="value => emit('pointClick', value)"
@@ -355,10 +414,10 @@ defineExpose({
 <slot name="header" />
 </template>
 
-    <template #plot="{ plot, xScale: sx, yScale: sy, visibleSeries, activeIndex: cursor, clipPathId }">
+    <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, activeIndex: cursor, clipPathId }">
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-bar-body>
         <path
-          v-for="mark in barMarks(visibleSeries, sx, sy, plot, cursor)"
+          v-for="mark in barMarks(visibleSeries, sx, sy, plot, cursor, syr)"
           :key="mark.key"
           :data-gr-chart-bar-mark="mark.seriesId"
           :d="mark.d"

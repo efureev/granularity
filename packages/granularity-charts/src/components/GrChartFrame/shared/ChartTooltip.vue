@@ -19,7 +19,7 @@ import {
 defineProps<{
   active: GrChartActivePoint
   title: string
-  formatValue: (value: number | null) => string
+  formatValue: (value: number | null, axis?: 'left' | 'right') => string
 }>()
 </script>
 
@@ -31,7 +31,7 @@ defineProps<{
         <path :d="symbolPath(series.style.shape, 6, 6, 10)" :fill="series.style.color" />
       </svg>
       <span>{{ series.label }}</span>
-      <span :class="frameTooltipValueClass">{{ formatValue(series.value) }}</span>
+      <span :class="frameTooltipValueClass">{{ formatValue(series.value, series.axis) }}</span>
     </span>
   </div>
 </template>

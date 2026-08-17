@@ -16,7 +16,22 @@ export type {
   NormalizeOptions,
   PadDomainOptions,
 } from './chartModel'
-export { extentOf, inferScaleKind, normalizeChartData, padDomain } from './chartModel'
+export { extentOf, inferScaleKind, normalizeChartData, padDomain, resolveScaleKind } from './chartModel'
+
+export type {
+  GrChartReference,
+  GrChartReferenceValue,
+  NormalizedReference,
+  ReferenceContext,
+  ReferenceMark,
+  ReferenceMarksOptions,
+} from './chartReference'
+export {
+  normalizeReferences,
+  referenceDomainValues,
+  referenceMarks,
+  referenceValueToNumber,
+} from './chartReference'
 
 export type { BandScaleOptions, GrChartScale, GrChartScaleKind } from './chartScale'
 export { bandScale, createScale, linearScale, nearestIndex, timeScale } from './chartScale'
@@ -37,8 +52,27 @@ export {
   symbolPath,
 } from './chartPath'
 
-export type { BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
+export type { BarDirection, BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
 export { barPath, barRect, groupSlots } from './chartBars'
+
+export type { BulletBand, BulletLayoutOptions, BulletModel } from './chartBullet'
+export { bulletLayout } from './chartBullet'
+
+export type { FunnelOptions, FunnelStage, GrChartFunnelStage } from './chartFunnel'
+export { funnelPath, funnelStages } from './chartFunnel'
+
+export type {
+  HeatmapCell,
+  HeatmapGrid,
+  HeatmapRoles,
+  HeatmapScale,
+  HeatmapScaleKind,
+  HeatmapScaleOptions,
+} from './chartHeatmap'
+export { heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from './chartHeatmap'
+
+export type { GrChartWaterfallStep, WaterfallModel, WaterfallOptions, WaterfallSegment } from './chartWaterfall'
+export { waterfallSegments } from './chartWaterfall'
 
 export type { RadarHitBounds, RadarSegments } from './chartRadar'
 export {
@@ -73,8 +107,8 @@ export {
 export type { PieSlice, Point } from './chartArc'
 export { angleOfPoint, arcCentroid, arcPath, pieSlices, polarPoint, sliceAtPoint } from './chartArc'
 
-export type { ChartLayout, ChartLayoutInput, Rect } from './chartLayout'
-export { chartLayout, estimateTextWidth } from './chartLayout'
+export type { ChartLayout, ChartLayoutInput, LabelGutters, LabelGuttersInput, Rect } from './chartLayout'
+export { chartLayout, estimateTextWidth, labelGutters } from './chartLayout'
 
 export type { ChartTableColumn, ChartTableModel, ChartTableOptions, ChartTableRow } from './chartTable'
 export { chartTableModel } from './chartTable'

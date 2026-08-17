@@ -6,7 +6,7 @@
   "dependencies": {
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.20.0",
-    "@feugene/granularity-charts": "^0.3.0",
+    "@feugene/granularity-charts": "^0.4.0",
     "@feugene/granularity-chrono": "^0.2.1",
     "@feugene/granularity-dashboard": "^0.1.0",
     "@feugene/unocss-preset-granular": "^0.9.1",

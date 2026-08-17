@@ -189,3 +189,64 @@ describe('GrChartArea', () => {
     expect(wrapper.findAll('linearGradient')).toHaveLength(0)
   })
 })
+
+describe('GrChartArea: сто процентов', () => {
+  /** Верх ленты — наименьшая ордината её пути: ось значений перевёрнута. */
+  function topOf(d: string): number {
+    return Math.min(...[...d.matchAll(/[ML] [\d.-]+ ([\d.-]+)/g)].map(match => Number(match[1])))
+  }
+
+  it('ось показывает доли, а не величины', () => {
+    const labels = factory({ stacked: '100%' })
+      .findAll('[data-gr-chart-axis="y"] text').map(node => node.text())
+
+    expect(labels.some(label => label.includes('%'))).toBe(true)
+  })
+
+  it('верхняя лента упирается в потолок в каждой позиции: сумма долей равна единице', () => {
+    const normalized = factory({ stacked: '100%' })
+    const plain = factory({ stacked: true })
+
+    // У обычного стека верх ленты гуляет вместе с суммой, у нормированного — нет.
+    expect(topOf(fills(normalized)[1]!.attributes('d')!))
+      .toBeLessThan(topOf(fills(plain)[1]!.attributes('d')!))
+  })
+
+  it('в скрытой таблице остаются абсолютные значения, а не доли', () => {
+    // Доля — свойство рисунка, значение — свойство данных. Таблица про данные.
+    const cells = factory({ stacked: '100%' })
+      .findAll('[data-gr-chart-table] tbody tr')[0]!
+      .findAll('td').map(node => node.text())
+
+    expect(cells).toEqual(['10', '5'])
+  })
+
+  it('скрытие серии пересчитывает доли остальных', () => {
+    const both = factory({ stacked: '100%' })
+    const alone = factory({ stacked: '100%', hiddenSeries: ['search'] })
+
+    expect(fills(alone)).toHaveLength(1)
+    expect(topOf(fills(alone)[0]!.attributes('d')!))
+      .toBeLessThan(topOf(fills(both)[0]!.attributes('d')!))
+  })
+
+  it('нулевая сумма в позиции не даёт `NaN`', () => {
+    const wrapper = factory({
+      stacked: '100%',
+      series: [{ id: 'a', y: [0, 5] }, { id: 'b', y: [0, 5] }],
+    })
+
+    for (const fill of fills(wrapper))
+      expect(fill.attributes('d')).not.toContain('NaN')
+  })
+
+  it('заливка при ста процентах плотная, а не градиентная', () => {
+    // Ленты стоят встык, и градиент внутри каждой размыл бы границу между ними.
+    expect(factory({ stacked: '100%' }).find('linearGradient').exists()).toBe(false)
+  })
+
+  it('график называет себя нормированным', () => {
+    expect(factory({ stacked: '100%' }).find('[data-gr-chart-surface]').attributes('aria-roledescription'))
+      .toContain('100%')
+  })
+})

@@ -10,9 +10,13 @@ import {
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grChartAreaConfig } from '../components/GrChartArea/config'
 import { grChartBarConfig } from '../components/GrChartBar/config'
+import { grChartBulletConfig } from '../components/GrChartBullet/config'
+import { grChartFunnelConfig } from '../components/GrChartFunnel/config'
+import { grChartHeatmapConfig } from '../components/GrChartHeatmap/config'
 import { grChartLineConfig } from '../components/GrChartLine/config'
 import { grChartPieConfig } from '../components/GrChartPie/config'
 import { grChartRadarConfig } from '../components/GrChartRadar/config'
+import { grChartWaterfallConfig } from '../components/GrChartWaterfall/config'
 import { grSparklineConfig } from '../components/GrSparkline/config'
 // </granularity:components:imports>
 
@@ -32,9 +36,13 @@ export const granularityChartsComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrChartArea: grChartAreaConfig,
   GrChartBar: grChartBarConfig,
+  GrChartBullet: grChartBulletConfig,
+  GrChartFunnel: grChartFunnelConfig,
+  GrChartHeatmap: grChartHeatmapConfig,
   GrChartLine: grChartLineConfig,
   GrChartPie: grChartPieConfig,
   GrChartRadar: grChartRadarConfig,
+  GrChartWaterfall: grChartWaterfallConfig,
   GrSparkline: grSparklineConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>

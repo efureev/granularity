@@ -11,6 +11,35 @@ import type { ChartData } from '../../chart/chartModel'
  * вредительство. Фокус живёт на прозрачном оверлее, а «где я» несёт
  * объявление в живой регион.
  */
+/**
+ * Настройки карты клавиш под систему координат.
+ *
+ * Дефолты воспроизводят декартово поведение буквально: ни один существующий
+ * график их не передаёт, и передавать не должен.
+ */
+export interface ChartKeyboardOptions {
+  /**
+   * По чему ходят стрелки.
+   *
+   * `'both'` — `←→` по позициям, `↑↓` по сериям (дефолт).
+   * `'positions'` — обе пары по позициям: у воронки ступени идут сверху вниз,
+   * и `↑↓` там значит ровно то же, что `←→`.
+   */
+  axes?: 'both' | 'positions'
+  /**
+   * Кольцевать переход по сериям. Дефолт — да.
+   *
+   * У матрицы `false`: перескок с последней строки на первую дезориентирует —
+   * читатель теряет, в какой он строке, а сказать ему об этом нечем.
+   */
+  wrapSeries?: boolean
+  /**
+   * `PageUp`/`PageDown`: десятая часть ряда (дефолт) или край **по сериям** —
+   * то есть край колонки у матрицы.
+   */
+  pageMode?: 'positions' | 'series'
+}
+
 export interface UseChartA11yOptions {
   data: () => ChartData
   activeIndex: Ref<number | null>
@@ -20,6 +49,7 @@ export interface UseChartA11yOptions {
   announce: (message: string) => void
   describe: (index: number, seriesIndex: number) => string
   onActivate?: (index: number) => void
+  keyboard?: () => ChartKeyboardOptions | undefined
 }
 
 export interface UseChartA11yReturn {
@@ -59,6 +89,31 @@ export function useChartA11y(options: UseChartA11yOptions): UseChartA11yReturn {
     return true
   }
 
+  /** Переход по сериям: у матрицы это строка, и кольцевать его нельзя. */
+  function moveSeries(delta: number, edge: boolean): boolean {
+    const series = visibleSeries()
+
+    if (series.length < 2)
+      return false
+
+    const current = options.activeSeriesIndex.value
+    const last = series.length - 1
+
+    if (edge)
+      options.activeSeriesIndex.value = delta > 0 ? last : 0
+    else if (options.keyboard?.()?.wrapSeries === false)
+      options.activeSeriesIndex.value = Math.min(last, Math.max(0, current + delta))
+    else
+      options.activeSeriesIndex.value = (current + delta + series.length) % series.length
+
+    if (options.activeIndex.value === null)
+      return moveTo(0)
+
+    announceActive()
+
+    return true
+  }
+
   function onKeydown(event: KeyboardEvent): boolean {
     const total = options.data().positions.length
 
@@ -66,7 +121,9 @@ export function useChartA11y(options: UseChartA11yOptions): UseChartA11yReturn {
       return false
 
     const current = options.activeIndex.value
-    const series = visibleSeries()
+    const keyboard = options.keyboard?.()
+    const alongPositions = keyboard?.axes === 'positions'
+    const pageBySeries = keyboard?.pageMode === 'series'
 
     switch (event.key) {
       case 'ArrowRight':
@@ -80,24 +137,13 @@ export function useChartA11y(options: UseChartA11yOptions): UseChartA11yReturn {
       case 'End':
         return moveTo(total - 1)
       case 'PageDown':
-        return moveTo((current ?? 0) + pageStep(total))
+        return pageBySeries ? moveSeries(1, true) : moveTo((current ?? 0) + pageStep(total))
       case 'PageUp':
-        return moveTo((current ?? 0) - pageStep(total))
+        return pageBySeries ? moveSeries(-1, true) : moveTo((current ?? 0) - pageStep(total))
       case 'ArrowDown':
-      case 'ArrowUp': {
-        if (series.length < 2)
-          return false
-
-        const delta = event.key === 'ArrowDown' ? 1 : -1
-
-        options.activeSeriesIndex.value = (options.activeSeriesIndex.value + delta + series.length) % series.length
-        if (current === null)
-          return moveTo(0)
-
-        announceActive()
-
-        return true
-      }
+        return alongPositions ? moveTo(current === null ? 0 : current + 1) : moveSeries(1, false)
+      case 'ArrowUp':
+        return alongPositions ? moveTo(current === null ? total - 1 : current - 1) : moveSeries(-1, false)
       case 'Enter':
       case ' ':
         if (current === null)

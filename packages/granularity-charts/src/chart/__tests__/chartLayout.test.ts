@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { chartLayout, estimateTextWidth } from '../chartLayout'
+import { chartLayout, estimateTextWidth, labelGutters } from '../chartLayout'
 
 const base = {
   width: 600,
@@ -95,5 +95,66 @@ describe('estimateTextWidth: разделители разрядов', () => {
   it('пробел любого вида — узкий', () => {
     for (const space of [' ', '\u00A0', '\u202F', '\u2009'])
       expect(estimateTextWidth(space, 10)).toBe(estimateTextWidth(' ', 10))
+  })
+})
+
+describe('labelGutters', () => {
+  it('слева резервируется самая широкая подпись плюс зазор', () => {
+    const narrow = labelGutters({ leftLabels: ['I'], fontSizePx: 12 })
+    const wide = labelGutters({ leftLabels: ['I', 'Ноябрь 2026'], fontSizePx: 12 })
+
+    expect(wide.left).toBeGreaterThan(narrow.left)
+  })
+
+  it('без подписей гуттера нет — это не то же самое, что подпись нулевой ширины', () => {
+    expect(labelGutters({ fontSizePx: 12 })).toEqual({ left: 0, bottom: 0, truncated: false })
+  })
+
+  it('снизу резервируется строка текста, а её содержимое ширину не меняет', () => {
+    const short = labelGutters({ bottomLabels: ['I'], fontSizePx: 12 })
+    const long = labelGutters({ bottomLabels: ['Ноябрь 2026', 'Декабрь 2026'], fontSizePx: 12 })
+
+    expect(short.bottom).toBe(long.bottom)
+    expect(short.bottom).toBeGreaterThan(0)
+  })
+
+  it('подпись выше потолка усекается и помечается', () => {
+    const gutters = labelGutters({ leftLabels: ['A'.repeat(200)], fontSizePx: 12, maxLabelWidth: 40 })
+
+    expect(gutters.left).toBe(46)
+    expect(gutters.truncated).toBe(true)
+  })
+})
+
+describe('chartLayout: правая ось', () => {
+  it('без второй оси правый отступ остаётся прежним', () => {
+    const withFlag = chartLayout({ ...base, showYAxisRight: false, yTickLabelsRight: ['40 000'] })
+
+    expect(withFlag.gutters.right).toBe(chartLayout(base).gutters.right)
+  })
+
+  it('вторая ось резервирует место справа', () => {
+    const dual = chartLayout({ ...base, showYAxisRight: true, yTickLabelsRight: ['40 000', '42 000'] })
+
+    expect(dual.gutters.right).toBeGreaterThan(chartLayout(base).gutters.right)
+    expect(dual.plot.width).toBeLessThan(chartLayout(base).plot.width)
+  })
+
+  it('пустой список подписей места не занимает: флага мало, нужны сами подписи', () => {
+    const empty = chartLayout({ ...base, showYAxisRight: true, yTickLabelsRight: [] })
+
+    expect(empty.gutters.right).toBe(chartLayout(base).gutters.right)
+  })
+
+  it('подпись правой оси выше потолка помечает усечение', () => {
+    const long = chartLayout({ ...base, showYAxisRight: true, yTickLabelsRight: ['A'.repeat(200)] })
+
+    expect(long.truncated).toBe(true)
+  })
+
+  it('левый отступ вторая ось не трогает', () => {
+    const dual = chartLayout({ ...base, showYAxisRight: true, yTickLabelsRight: ['40 000'] })
+
+    expect(dual.gutters.left).toBe(chartLayout(base).gutters.left)
   })
 })

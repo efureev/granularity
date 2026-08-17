@@ -382,3 +382,162 @@ describe('GrChartLine', () => {
     expect(wrapper.find('svg').attributes('height')).toBe('120')
   })
 })
+
+describe('GrChartLine: опоры', () => {
+  const threshold = [{ axis: 'y' as const, value: 30, label: 'Порог' }]
+
+  it('опора рисуется линией с подписью', () => {
+    const wrapper = factory({ references: threshold })
+
+    expect(wrapper.findAll('[data-gr-chart-reference]')).toHaveLength(1)
+    expect(wrapper.find('[data-gr-chart-reference-label]').text()).toBe('Порог')
+  })
+
+  it('пара значений даёт полосу, одно — только линию', () => {
+    const band = factory({ references: [{ axis: 'y', value: [20, 40] }] })
+    const line = factory({ references: threshold })
+
+    expect(band.findAll('[data-gr-chart-reference-band]')).toHaveLength(1)
+    expect(line.findAll('[data-gr-chart-reference-band]')).toHaveLength(0)
+  })
+
+  it('опора не тратит индекс палитры и не попадает в легенду', () => {
+    // Серия-константа делала ровно это: читатель искал в легенде порог, а
+    // нашёл бы ряд, которого в данных нет.
+    const withReference = factory({ references: threshold, showLegend: true })
+    const without = factory({ showLegend: true })
+
+    expect(withReference.findAll('[data-gr-chart-legend] li'))
+      .toHaveLength(without.findAll('[data-gr-chart-legend] li').length)
+    expect(withReference.find('[data-gr-chart-series="sales"]').attributes('stroke'))
+      .toBe(without.find('[data-gr-chart-series="sales"]').attributes('stroke'))
+  })
+
+  /** Подписи делений форматированы (разделитель разрядов) — сравнивать надо числа. */
+  function topTick(wrapper: ReturnType<typeof factory>): number {
+    const values = wrapper.findAll('[data-gr-chart-axis="y"] text')
+      .map(node => Number(node.text().replace(/[^\d.-]/gu, '')))
+
+    return Math.max(...values)
+  }
+
+  it('домен по умолчанию опора не растягивает', () => {
+    // Порог 1000 при данных до 50 схлопнул бы сами данные в линию у оси.
+    expect(topTick(factory({ references: [{ axis: 'y', value: 1000 }] }))).toBeLessThan(100)
+  })
+
+  it('`includeReferencesInDomain` растягивает домен осознанно', () => {
+    const wrapper = factory({ references: [{ axis: 'y', value: 1000 }], includeReferencesInDomain: true })
+
+    expect(topTick(wrapper)).toBe(1000)
+  })
+
+  it('опора за пределами домена не рисуется, но остаётся в описании', () => {
+    // «Порог не виден» и «порога нет» — разные утверждения.
+    const wrapper = factory({ references: [{ axis: 'y', value: 1000, label: 'Критический' }] })
+
+    expect(wrapper.findAll('[data-gr-chart-reference]')).toHaveLength(0)
+    expect(wrapper.find('[data-gr-chart-surface]').attributes('aria-description')).toContain('Критический')
+  })
+
+  it('опора уходит в скрытую таблицу примечанием, а не строкой данных', () => {
+    const wrapper = factory({ references: threshold })
+    const table = wrapper.find('[data-gr-chart-table]')
+
+    expect(table.find('tfoot th').text()).toBe('Порог: 30')
+    expect(table.findAll('tbody tr')).toHaveLength(4)
+  })
+
+  it('описание графика не затирает собственное `ariaDescription`', () => {
+    const wrapper = factory({ references: threshold, ariaDescription: 'Выручка по неделям' })
+
+    expect(wrapper.find('[data-gr-chart-surface]').attributes('aria-description'))
+      .toBe('Выручка по неделям. Порог: 30')
+  })
+
+  it('без опор описание остаётся прежним', () => {
+    expect(factory({ ariaDescription: 'Выручка' }).find('[data-gr-chart-surface]').attributes('aria-description'))
+      .toBe('Выручка')
+    expect(factory().find('[data-gr-chart-surface]').attributes('aria-description')).toBeUndefined()
+  })
+})
+
+describe('GrChartLine: вторая ось значений', () => {
+  const mixed = [
+    { id: 'mrr', label: 'MRR', x: [0, 1, 2], y: [40000, 41000, 42000], axis: 'right' as const },
+    { id: 'active', label: 'Активные', x: [0, 1, 2], y: [120, 125, 130] },
+  ]
+
+  it('без `dualAxis` вторая ось не рисуется, а серия падает на левую', () => {
+    const wrapper = factory({ series: mixed })
+
+    expect(wrapper.findAll('[data-gr-chart-axis="y"]')).toHaveLength(1)
+  })
+
+  it('`dualAxis` добавляет вторую ось справа', () => {
+    const wrapper = factory({ series: mixed, dualAxis: true })
+    const axes = wrapper.findAll('[data-gr-chart-axis="y"]')
+
+    expect(axes).toHaveLength(2)
+    // Правая ось стоит на дальнем краю области построения.
+    const [left, right] = axes.map(node => Number(node.find('line').attributes('x1')))
+    expect(right).toBeGreaterThan(left!)
+  })
+
+  it('число делений у осей совпадает: иначе сетка двоится', () => {
+    const wrapper = factory({ series: mixed, dualAxis: true })
+    const counts = wrapper.findAll('[data-gr-chart-axis="y"]').map(node => node.findAll('text').length)
+
+    expect(counts[0]).toBe(counts[1])
+  })
+
+  it('оси меряют своё: подписи правой уходят к десяткам тысяч', () => {
+    const wrapper = factory({ series: mixed, dualAxis: true })
+    const numbers = wrapper.findAll('[data-gr-chart-axis="y"] text')
+      .map(node => Number(node.text().replace(/[^\d.-]/gu, '')))
+
+    expect(Math.max(...numbers)).toBeGreaterThan(40000)
+    expect(numbers.some(value => value > 0 && value < 200)).toBe(true)
+  })
+
+  it('линия правой серии не уезжает за край области', () => {
+    // На левой шкале сорок тысяч ушли бы далеко выше потолка холста.
+    const wrapper = factory({ series: mixed, dualAxis: true })
+    const d = wrapper.find('[data-gr-chart-series="mrr"]').attributes('d')!
+    const ys = [...d.matchAll(/[ML] [\d.-]+ ([\d.-]+)/g)].map(match => Number(match[1]))
+
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(0)
+    expect(Math.max(...ys)).toBeLessThanOrEqual(256)
+  })
+
+  it('колонка таблицы называет свою ось только при двух осях', () => {
+    const dual = factory({ series: mixed, dualAxis: true, dataTable: 'visible' })
+    const single = factory({ series: mixed, dataTable: 'visible' })
+
+    expect(dual.findAll('[data-gr-chart-table] thead th').map(node => node.text()))
+      .toEqual(['X', 'MRR (right axis)', 'Активные (left axis)'])
+    expect(single.findAll('[data-gr-chart-table] thead th').map(node => node.text()))
+      .toEqual(['X', 'MRR', 'Активные'])
+  })
+
+  it('`valueFormatRight` форматирует только правую серию', () => {
+    const wrapper = factory({
+      series: mixed,
+      dualAxis: true,
+      dataTable: 'visible',
+      valueFormatRight: { precision: 1 },
+    })
+    const cells = wrapper.findAll('[data-gr-chart-table] tbody tr')[0]!.findAll('td').map(node => node.text())
+
+    expect(cells[0]).toContain('.0')
+    expect(cells[1]).toBe('120')
+  })
+
+  it('раскладка резервирует место справа только при двух осях', () => {
+    const gutter = (props: Record<string, unknown>) => Number(
+      factory(props).find('[data-gr-chart-axis="x"] line').attributes('x2'),
+    )
+
+    expect(gutter({ series: mixed, dualAxis: true })).toBeLessThan(gutter({ series: mixed }))
+  })
+})

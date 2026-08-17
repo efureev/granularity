@@ -42,10 +42,26 @@ defineProps<{
       </thead>
       <tbody>
         <tr v-for="row in model.rows" :key="row.header">
-          <th scope="row">{{ row.header }}</th>
-          <td v-for="(cell, index) in row.cells" :key="index">{{ cell }}</td>
+          <th scope="row">
+{{ row.header }}
+</th>
+          <td v-for="(cell, index) in row.cells" :key="index">
+{{ cell }}
+</td>
         </tr>
       </tbody>
+      <!--
+        Пояснение — `th`, а не `td`: ячейка без заголовка в таблице от трёх
+        колонок поднимает `td-has-header` у axe, а заголовком строки пояснение
+        и является.
+      -->
+      <tfoot v-if="model.notes?.length">
+        <tr v-for="(note, index) in model.notes" :key="index">
+          <th scope="row" :colspan="model.columns.length">
+{{ note }}
+</th>
+        </tr>
+      </tfoot>
     </table>
   </div>
 
@@ -60,11 +76,20 @@ defineProps<{
     </thead>
     <tbody>
       <tr v-for="row in model.rows" :key="row.header">
-        <th scope="row" :class="frameTableCellClass">{{ row.header }}</th>
+        <th scope="row" :class="frameTableCellClass">
+{{ row.header }}
+</th>
         <td v-for="(cell, index) in row.cells" :key="index" :class="frameTableCellClass">
           {{ cell }}
         </td>
       </tr>
     </tbody>
+    <tfoot v-if="model.notes?.length">
+      <tr v-for="(note, index) in model.notes" :key="index">
+        <th scope="row" :colspan="model.columns.length" :class="frameTableCellClass">
+{{ note }}
+</th>
+      </tr>
+    </tfoot>
   </table>
 </template>

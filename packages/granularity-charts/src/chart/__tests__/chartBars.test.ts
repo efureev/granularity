@@ -59,11 +59,11 @@ describe('barPath', () => {
 
   it('скругляются только два угла — дальние от базовой линии', () => {
     expect(barPath(rect, 4).match(/A /g)).toHaveLength(2)
-    expect(barPath(rect, 4, false).match(/A /g)).toHaveLength(2)
+    expect(barPath(rect, 4, 'down').match(/A /g)).toHaveLength(2)
   })
 
   it('вверх и вниз — разные пути: скругление переезжает на другой конец', () => {
-    expect(barPath(rect, 4)).not.toBe(barPath(rect, 4, false))
+    expect(barPath(rect, 4)).not.toBe(barPath(rect, 4, 'down'))
   })
 
   it('радиус зажимается по половине ширины и по высоте', () => {
@@ -78,5 +78,33 @@ describe('barPath', () => {
   it('вырожденная полоса не рисуется', () => {
     expect(barPath({ x: 0, y: 0, width: 0, height: 10 }, 4)).toBe('')
     expect(barPath({ x: 0, y: 0, width: 10, height: 0 }, 4)).toBe('')
+  })
+})
+
+describe('barPath: горизонтальные полосы', () => {
+  const rect = { x: 10, y: 20, width: 60, height: 12 }
+
+  it('скругляется дальний конец, а не все четыре угла', () => {
+    // `<rect rx>` скруглил бы и тот конец, которым полоса стоит на базовой
+    // линии, — и полоса оторвалась бы от неё.
+    expect(barPath(rect, 4, 'right').match(/A /g)).toHaveLength(2)
+    expect(barPath(rect, 4, 'left').match(/A /g)).toHaveLength(2)
+  })
+
+  it('вправо и влево — разные пути', () => {
+    expect(barPath(rect, 4, 'right')).not.toBe(barPath(rect, 4, 'left'))
+  })
+
+  it('радиус зажимается по половине высоты и по длине полосы', () => {
+    const thin = barPath({ x: 0, y: 0, width: 60, height: 3 }, 12, 'right')
+    const short = barPath({ x: 0, y: 0, width: 5, height: 30 }, 12, 'right')
+
+    expect(thin).not.toContain('NaN')
+    expect(short).not.toContain('NaN')
+    expect(thin.match(/A /g)).toHaveLength(2)
+  })
+
+  it('нулевая полоса пути не даёт', () => {
+    expect(barPath({ x: 0, y: 0, width: 0, height: 12 }, 4, 'right')).toBe('')
   })
 })

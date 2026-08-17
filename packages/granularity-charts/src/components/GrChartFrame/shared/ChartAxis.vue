@@ -21,12 +21,22 @@ const props = defineProps<{
   truncated: boolean
   /** Имя оси. Не `ariaLabel`: одноимённый проп столкнулся бы с fallthrough-атрибутом. */
   label: string
+  /** Сторона оси значений. Действует только при `orientation: 'y'`. */
+  side?: 'left' | 'right'
 }>()
 
 const TICK_GAP = 6
 
+/** Правая ось стоит на дальнем краю области, подписи растут от неё вправо. */
+const isRight = computed(() => props.orientation === 'y' && props.side === 'right')
+
 const line = computed(() => (props.orientation === 'y'
-  ? { x1: props.plot.x, x2: props.plot.x, y1: props.plot.y, y2: props.plot.y + props.plot.height }
+  ? {
+      x1: isRight.value ? props.plot.x + props.plot.width : props.plot.x,
+      x2: isRight.value ? props.plot.x + props.plot.width : props.plot.x,
+      y1: props.plot.y,
+      y2: props.plot.y + props.plot.height,
+    }
   : {
       x1: props.plot.x,
       x2: props.plot.x + props.plot.width,
@@ -35,7 +45,10 @@ const line = computed(() => (props.orientation === 'y'
     }))
 
 function labelX(tick: ChartTick): number {
-  return props.orientation === 'y' ? props.plot.x - TICK_GAP : tick.position
+  if (props.orientation !== 'y')
+    return tick.position
+
+  return isRight.value ? props.plot.x + props.plot.width + TICK_GAP : props.plot.x - TICK_GAP
 }
 
 function labelY(tick: ChartTick): number {
@@ -55,7 +68,7 @@ function labelY(tick: ChartTick): number {
       :y="labelY(tick)"
       :class="[frameLabelClass, sizeClass]"
       :fill="labelFill"
-      :text-anchor="orientation === 'y' ? 'end' : 'middle'"
+      :text-anchor="orientation === 'y' ? (side === 'right' ? 'start' : 'end') : 'middle'"
       :dominant-baseline="orientation === 'y' ? 'middle' : 'auto'"
     >
       {{ tick.label }}

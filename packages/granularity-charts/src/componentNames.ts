@@ -12,9 +12,13 @@ export const GRANULARITY_CHARTS_COMPONENTS = [
   // <granularity:components> — блок генерируется `yarn generate:registry`
   'GrChartArea',
   'GrChartBar',
+  'GrChartBullet',
+  'GrChartFunnel',
+  'GrChartHeatmap',
   'GrChartLine',
   'GrChartPie',
   'GrChartRadar',
+  'GrChartWaterfall',
   'GrSparkline',
   // </granularity:components>
 ] as const

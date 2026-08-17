@@ -4,12 +4,15 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import { computed, ref, useId } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
+import { formatShare } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
 import { activeSymbolMarks, symbolMarks, toPixelPoints, toStackBand } from '../../chart/chartMarks'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
-import { normalizeChartData } from '../../chart/chartModel'
+import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
+import type { GrChartReference } from '../../chart/chartReference'
+import { referenceDomainValues } from '../../chart/chartReference'
 import { areaPath, bandPath, type GrChartCurve, linePath } from '../../chart/chartPath'
-import type { GrChartScale, GrChartScaleKind } from '../../chart/chartScale'
+import { type GrChartScale, type GrChartScaleKind, scaleForAxis } from '../../chart/chartScale'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { GrChartActivePoint } from '../../composables/useChartTooltip'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
@@ -40,8 +43,15 @@ export interface GrChartAreaProps {
   series: readonly GrChartSeries[] | readonly number[]
   /** Тип оси X. Не задан — выводится из данных. */
   xScale?: GrChartScaleKind
-  /** Складывать серии: каждая полоса ложится на сумму предыдущих. */
-  stacked?: boolean
+  /**
+   * Складывать серии: каждая полоса ложится на сумму предыдущих.
+   *
+   * `'100%'` вдобавок нормирует каждую позицию к единице — тогда лента
+   * показывает, как менялось **распределение**, а не величины. Собственные
+   * значения точек при этом не трогаются: тултип и таблица говорят «сорок», а
+   * не «треть».
+   */
+  stacked?: boolean | '100%'
   /** Заливка. `auto` — градиент у наложения, плотная у стека. */
   fill?: 'auto' | 'gradient' | 'solid'
   height?: number
@@ -49,6 +59,32 @@ export interface GrChartAreaProps {
   width?: number
   yDomain?: readonly [number | null, number | null]
   includeZero?: boolean
+  /**
+   * Опорные линии и полосы: порог, план, коридор допустимого.
+   *
+   * Не серия и нигде ею не считается: в легенду не попадает, индекс палитры не
+   * тратит, в стек не входит и в скрытую таблицу уезжает примечанием, а не
+   * строкой данных.
+   */
+  references?: readonly GrChartReference[]
+  /**
+   * Включить опоры в домен оси.
+   *
+   * По умолчанию нет, и это осознанно: порог `1.0` при данных около `0.03`
+   * растянул бы ось так, что сами данные схлопнулись бы в линию.
+   */
+  includeReferencesInDomain?: boolean
+  /**
+   * Показывать вторую ось значений справа.
+   *
+   * Без неё серии с `axis: 'right'` попадают на левую. Включение осознанное:
+   * две оси позволяют подогнать любые два ряда под видимую корреляцию, и это
+   * должно быть решением автора графика, а не побочным эффектом поля в данных.
+   */
+  dualAxis?: boolean
+  yDomainRight?: readonly [number | null, number | null]
+  yTickFormatRight?: (value: number) => string
+  valueFormatRight?: GrChartNumberFormat
   xTickCount?: number
   yTickCount?: number
   xTickFormat?: ChartTickFormat
@@ -96,6 +132,12 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
   width: 640,
   yDomain: undefined,
   includeZero: false,
+  references: undefined,
+  includeReferencesInDomain: false,
+  dualAxis: false,
+  yDomainRight: undefined,
+  yTickFormatRight: undefined,
+  valueFormatRight: undefined,
   xTickCount: 6,
   yTickCount: 5,
   xTickFormat: undefined,
@@ -130,7 +172,7 @@ defineSlots<{
   header?: () => unknown
 }>()
 
-const { t } = useGranularityTranslations()
+const { t, locale: i18nLocale } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { component: 'GrChartArea' })
 const resolvedHeight = useGrComponentProp('GrChartArea', 'height', () => props.height, 256)
@@ -142,6 +184,15 @@ const resolvedTooltip = useGrComponentProp('GrChartArea', 'tooltip', () => props
 const resolvedDataTable = useGrComponentProp('GrChartArea', 'dataTable', () => props.dataTable, 'hidden' as const)
 
 const fillMode = useGrComponentProp('GrChartArea', 'fill', () => props.fill, 'auto' as const)
+
+const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
+
+const isNormalized = computed(() => props.stacked === '100%')
+
+/** В режиме ста процентов ось показывает доли — иначе на ней стояли бы 0,2 и 0,4. */
+const yTickFormat = computed(() => (
+  props.yTickFormat ?? (isNormalized.value ? (value: number) => formatShare(value, resolvedLocale.value) : undefined)
+))
 
 /**
  * `auto` — это градиент у наложения и плотная заливка у стека.
@@ -173,11 +224,28 @@ const seriesInput = computed<readonly GrChartSeries[] | readonly number[]>(() =>
   }))
 })
 
+/**
+ * Тип оси нужен раньше нормализации: значение опоры (`Date`, ISO-строка, имя
+ * категории) без него не разобрать, а разобрать его надо до того, как
+ * посчитается домен.
+ */
+const scaleKind = computed(() => resolveScaleKind(seriesInput.value, props.xScale))
+
+const referenceDomain = computed(() => (
+  props.includeReferencesInDomain
+    ? referenceDomainValues(props.references ?? [], scaleKind.value)
+    : { x: [], y: [] }
+))
+
 const data = computed(() => normalizeChartData(seriesInput.value, {
-  kind: props.xScale,
+  kind: scaleKind.value,
   includeZero: props.includeZero,
   yDomain: props.yDomain,
   stacked: props.stacked,
+  includeXValues: referenceDomain.value.x,
+  includeYValues: referenceDomain.value.y,
+  dualAxis: props.dualAxis,
+  yDomainRight: props.yDomainRight,
 }))
 
 const showLegend = computed(() => (
@@ -229,23 +297,26 @@ function areaMarks(
   xScale: GrChartScale,
   yScale: GrChartScale,
   plot: Rect,
+  yScaleRight: GrChartScale | null = null,
 ): AreaMark[] {
-  const baseline = baselineOf(yScale, plot)
-
   return series.map((item) => {
+    // Шкала и базовая линия берутся у **одной** оси: разойдись они, площадь
+    // правой серии заливалась бы до чужого нуля.
+    const scale = scaleForAxis(item.axis, yScale, yScaleRight)
+    const baseline = baselineOf(scale, plot)
     const paint = resolvedFill.value === 'gradient'
       ? `url(#${gradientBase}-${item.colorIndex})`
       : item.style.fill
 
     if (props.stacked) {
-      const band = toStackBand(item, xScale, yScale)
+      const band = toStackBand(item, xScale, scale)
 
       return { key: item.id, d: bandPath(band.top, band.base, resolvedCurve.value), fill: paint, color: item.style.color }
     }
 
     return {
       key: item.id,
-      d: areaPath(toPixelPoints(item, xScale, yScale), baseline, resolvedCurve.value),
+      d: areaPath(toPixelPoints(item, xScale, scale), baseline, resolvedCurve.value),
       fill: paint,
       color: item.style.color,
     }
@@ -272,13 +343,14 @@ function gradientStops(
   series: readonly NormalizedSeries[],
   yScale: GrChartScale,
   plot: Rect,
+  yScaleRight: GrChartScale | null = null,
 ): GradientStop[] {
-  const baseline = baselineOf(yScale, plot)
-
   return series.map((item) => {
+    const scale = scaleForAxis(item.axis, yScale, yScaleRight)
+    const baseline = baselineOf(scale, plot)
     const values = item.points.map(point => point.y).filter((value): value is number => value !== null)
-    const top = values.length > 0 ? yScale.scale(Math.max(...values)) : plot.y
-    const bottom = values.length > 0 ? yScale.scale(Math.min(...values)) : plot.y + plot.height
+    const top = values.length > 0 ? scale.scale(Math.max(...values)) : plot.y
+    const bottom = values.length > 0 ? scale.scale(Math.min(...values)) : plot.y + plot.height
 
     return {
       id: `${gradientBase}-${item.colorIndex}`,
@@ -295,10 +367,17 @@ function gradientStops(
 }
 
 /** Верхний край полосы: в стеке это сумма, вне стека — само значение. */
-function edgePoints(series: NormalizedSeries, xScale: GrChartScale, yScale: GrChartScale) {
+function edgePoints(
+  series: NormalizedSeries,
+  xScale: GrChartScale,
+  yScale: GrChartScale,
+  yScaleRight: GrChartScale | null = null,
+) {
+  const scale = scaleForAxis(series.axis, yScale, yScaleRight)
+
   return props.stacked
-    ? toStackBand(series, xScale, yScale).top
-    : toPixelPoints(series, xScale, yScale)
+    ? toStackBand(series, xScale, scale).top
+    : toPixelPoints(series, xScale, scale)
 }
 
 function onLegendToggle(payload: { seriesId: string, hidden: boolean }): void {
@@ -342,14 +421,18 @@ defineExpose({
     :locale="locale"
     :aria-label="ariaLabel"
     :aria-description="ariaDescription"
-    :role-description="stacked
-      ? t('grCharts.area.labelStacked', 'Stacked area chart')
-      : t('grCharts.area.label', 'Area chart')"
+    :role-description="stacked === '100%'
+      ? t('grCharts.area.labelNormalized', 'Stacked area chart, 100%')
+      : stacked ? t('grCharts.area.labelStacked', 'Stacked area chart')
+        : t('grCharts.area.label', 'Area chart')"
     :x-tick-count="xTickCount"
     :y-tick-count="yTickCount"
     :x-tick-format="xTickFormat"
     :y-tick-format="yTickFormat"
     :value-format="valueFormat"
+    :references="references"
+    :y-tick-format-right="yTickFormatRight"
+    :value-format-right="valueFormatRight"
     data-gr-chart-area
     @update:active-index="value => emit('update:activeIndex', value)"
     @point-click="value => emit('pointClick', value)"
@@ -360,10 +443,10 @@ defineExpose({
 <slot name="header" />
 </template>
 
-    <template #plot="{ plot, xScale: sx, yScale: sy, visibleSeries, activeIndex: cursor, clipPathId }">
+    <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, activeIndex: cursor, clipPathId }">
       <defs v-if="resolvedFill === 'gradient'">
         <linearGradient
-          v-for="stop in gradientStops(visibleSeries, sy, plot)"
+          v-for="stop in gradientStops(visibleSeries, sy, plot, syr)"
           :id="stop.id"
           :key="stop.id"
           gradientUnits="userSpaceOnUse"
@@ -379,7 +462,7 @@ defineExpose({
 
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-area-body>
         <path
-          v-for="mark in areaMarks(visibleSeries, sx, sy, plot)"
+          v-for="mark in areaMarks(visibleSeries, sx, sy, plot, syr)"
           :key="mark.key"
           :data-gr-chart-area-fill="mark.key"
           :d="mark.d"
@@ -392,7 +475,7 @@ defineExpose({
           v-for="item in visibleSeries"
           :key="item.id"
           :data-gr-chart-series="item.id"
-          :d="linePath(edgePoints(item, sx, sy), resolvedCurve)"
+          :d="linePath(edgePoints(item, sx, sy, syr), resolvedCurve)"
           fill="none"
           :stroke="item.style.color"
           :stroke-width="areaStrokeWidth"
@@ -402,7 +485,7 @@ defineExpose({
         />
 
         <path
-          v-for="mark in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize, stacked) : [])"
+          v-for="mark in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize, stacked !== false, syr) : [])"
           :key="mark.key"
           :d="mark.d"
           :fill="mark.color"
@@ -411,7 +494,7 @@ defineExpose({
         />
 
         <path
-          v-for="mark in activeSymbolMarks(visibleSeries, sx, sy, activeX(cursor), markerSize * ACTIVE_MARKER_SCALE, stacked)"
+          v-for="mark in activeSymbolMarks(visibleSeries, sx, sy, activeX(cursor), markerSize * ACTIVE_MARKER_SCALE, stacked !== false, syr)"
           :key="mark.key"
           data-gr-chart-active-point
           :d="mark.d"

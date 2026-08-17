@@ -4,9 +4,11 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import { computed, ref } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
-import type { GrChartScaleKind } from '../../chart/chartScale'
+import { type GrChartScaleKind, scaleForAxis } from '../../chart/chartScale'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
-import { normalizeChartData } from '../../chart/chartModel'
+import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
+import type { GrChartReference } from '../../chart/chartReference'
+import { referenceDomainValues } from '../../chart/chartReference'
 import { activeSymbolMarks, symbolMarks, toPixelPoints } from '../../chart/chartMarks'
 import { bridgePath, dashArrayFor, type GrChartCurve, linePath } from '../../chart/chartPath'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
@@ -37,6 +39,32 @@ export interface GrChartLineProps {
   width?: number
   yDomain?: readonly [number | null, number | null]
   includeZero?: boolean
+  /**
+   * Опорные линии и полосы: порог, план, коридор допустимого.
+   *
+   * Не серия и нигде ею не считается: в легенду не попадает, индекс палитры не
+   * тратит, в стек не входит и в скрытую таблицу уезжает примечанием, а не
+   * строкой данных.
+   */
+  references?: readonly GrChartReference[]
+  /**
+   * Включить опоры в домен оси.
+   *
+   * По умолчанию нет, и это осознанно: порог `1.0` при данных около `0.03`
+   * растянул бы ось так, что сами данные схлопнулись бы в линию.
+   */
+  includeReferencesInDomain?: boolean
+  /**
+   * Показывать вторую ось значений справа.
+   *
+   * Без неё серии с `axis: 'right'` попадают на левую. Включение осознанное:
+   * две оси позволяют подогнать любые два ряда под видимую корреляцию, и это
+   * должно быть решением автора графика, а не побочным эффектом поля в данных.
+   */
+  dualAxis?: boolean
+  yDomainRight?: readonly [number | null, number | null]
+  yTickFormatRight?: (value: number) => string
+  valueFormatRight?: GrChartNumberFormat
   xTickCount?: number
   yTickCount?: number
   xTickFormat?: ChartTickFormat
@@ -92,6 +120,12 @@ const props = withDefaults(defineProps<GrChartLineProps>(), {
   width: 640,
   yDomain: undefined,
   includeZero: false,
+  references: undefined,
+  includeReferencesInDomain: false,
+  dualAxis: false,
+  yDomainRight: undefined,
+  yTickFormatRight: undefined,
+  valueFormatRight: undefined,
   xTickCount: 6,
   yTickCount: 5,
   xTickFormat: undefined,
@@ -157,10 +191,27 @@ const seriesInput = computed<readonly GrChartSeries[] | readonly number[]>(() =>
   }))
 })
 
+/**
+ * Тип оси нужен раньше нормализации: значение опоры (`Date`, ISO-строка, имя
+ * категории) без него не разобрать, а разобрать его надо до того, как
+ * посчитается домен.
+ */
+const scaleKind = computed(() => resolveScaleKind(seriesInput.value, props.xScale))
+
+const referenceDomain = computed(() => (
+  props.includeReferencesInDomain
+    ? referenceDomainValues(props.references ?? [], scaleKind.value)
+    : { x: [], y: [] }
+))
+
 const data = computed(() => normalizeChartData(seriesInput.value, {
-  kind: props.xScale,
+  kind: scaleKind.value,
   includeZero: props.includeZero,
   yDomain: props.yDomain,
+  includeXValues: referenceDomain.value.x,
+  includeYValues: referenceDomain.value.y,
+  dualAxis: props.dualAxis,
+  yDomainRight: props.yDomainRight,
 }))
 
 const showLegend = computed(() => (
@@ -238,6 +289,9 @@ defineExpose({
     :x-tick-format="xTickFormat"
     :y-tick-format="yTickFormat"
     :value-format="valueFormat"
+    :references="references"
+    :y-tick-format-right="yTickFormatRight"
+    :value-format-right="valueFormatRight"
     data-gr-chart-line
     @update:active-index="value => emit('update:activeIndex', value)"
     @point-click="value => emit('pointClick', value)"
@@ -248,7 +302,7 @@ defineExpose({
 <slot name="header" />
 </template>
 
-    <template #plot="{ xScale: sx, yScale: sy, visibleSeries, activeIndex: cursor, clipPathId }">
+    <template #plot="{ xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, activeIndex: cursor, clipPathId }">
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-line-body>
         <!--
           Перемычки идут ПОД линией и под марками: разрыв не должен спорить с
@@ -258,7 +312,7 @@ defineExpose({
           v-for="item in (resolvedGaps === 'hidden' ? [] : visibleSeries)"
           :key="`gap-${item.id}`"
           :data-gr-chart-gap="item.id"
-          :d="bridgePath(toPixelPoints(item, sx, sy))"
+          :d="bridgePath(toPixelPoints(item, sx, scaleForAxis(item.axis, sy, syr)))"
           fill="none"
           :stroke="item.style.color"
           :stroke-width="lineStrokeWidth"
@@ -271,7 +325,7 @@ defineExpose({
           v-for="item in visibleSeries"
           :key="item.id"
           :data-gr-chart-series="item.id"
-          :d="linePath(toPixelPoints(item, sx, sy), resolvedCurve)"
+          :d="linePath(toPixelPoints(item, sx, scaleForAxis(item.axis, sy, syr)), resolvedCurve)"
           fill="none"
           :stroke="item.style.color"
           :stroke-width="lineStrokeWidth"
@@ -281,7 +335,7 @@ defineExpose({
         />
 
         <path
-          v-for="marker in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize) : [])"
+          v-for="marker in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize, false, syr) : [])"
           :key="marker.key"
           :d="marker.d"
           :fill="marker.color"
@@ -290,7 +344,7 @@ defineExpose({
         />
 
         <path
-          v-for="marker in activeSymbolMarks(visibleSeries, sx, sy, activeX(cursor), markerSize * ACTIVE_MARKER_SCALE)"
+          v-for="marker in activeSymbolMarks(visibleSeries, sx, sy, activeX(cursor), markerSize * ACTIVE_MARKER_SCALE, false, syr)"
           :key="marker.key"
           data-gr-chart-active-point
           :d="marker.d"

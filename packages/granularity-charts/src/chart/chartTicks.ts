@@ -81,6 +81,42 @@ export function linearTicks(domain: readonly [number, number], count: number): L
   return { ...ticks, step }
 }
 
+/**
+ * Деления с числом, заданным снаружи.
+ *
+ * Нужны второй оси значений: у неё свои данные, но своё число делений она
+ * выбирать не вправе. Две «красивые» лестницы дают разное количество линий,
+ * сетка от этого двоится, и читать её становится нечем — поэтому счёт
+ * приходит от левой оси, а шаг подбирается под него с той же лестницы 1/2/5/10.
+ *
+ * Домен расширяется наружу ровно до `count − 1` интервалов: данные остаются
+ * внутри, а верхнее деление совпадает с верхней линией сетки.
+ */
+export function alignedTicks(domain: readonly [number, number], count: number): LinearTicks {
+  const [min, max] = domain
+  const intervals = Math.max(1, Math.floor(count) - 1)
+
+  if (!Number.isFinite(min) || !Number.isFinite(max))
+    return { values: [], step: 0, niceDomain: [0, 0] }
+
+  if (min === max)
+    return { values: [min], step: 0, niceDomain: [min - 0.5, max + 0.5] }
+
+  const step = niceNumber((max - min) / intervals, false)
+
+  if (!(step > 0))
+    return { values: [min], step: 0, niceDomain: [min, max] }
+
+  const start = Math.floor(min / step) * step
+  const decimals = Math.max(0, -Math.floor(Math.log10(step)))
+  const values = Array.from(
+    { length: intervals + 1 },
+    (_, index) => Number((start + step * index).toFixed(decimals)),
+  )
+
+  return { values, step, niceDomain: [values[0]!, values[values.length - 1]!] }
+}
+
 function buildTicks(min: number, max: number, step: number): Omit<LinearTicks, 'step'> {
   if (!(step > 0))
     return { values: [], niceDomain: [min, max] }

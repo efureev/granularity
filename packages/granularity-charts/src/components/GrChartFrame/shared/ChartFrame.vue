@@ -11,18 +11,22 @@ import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '
 import { chartLayout, type Rect } from '../../../chart/chartLayout'
 import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
+import type { GrChartReference } from '../../../chart/chartReference'
+import { normalizeReferences } from '../../../chart/chartReference'
 import { createScale, type GrChartScale, linearScale } from '../../../chart/chartScale'
-import { linearTicks, timeTicks } from '../../../chart/chartTicks'
+import { alignedTicks, linearTicks, timeTicks } from '../../../chart/chartTicks'
 import { type ChartTableModel, chartTableModel } from '../../../chart/chartTable'
 import { useChartScale } from '../../../composables/useChartScale'
 import { type ChartTick, type ChartTickFormat, useChartTicks } from '../../../composables/useChartTicks'
 import { type ChartHitContext, type GrChartActivePoint, useChartTooltip } from '../../../composables/useChartTooltip'
+import type { ChartKeyboardOptions } from '../../../composables/internal/useChartA11y'
 import { useChartA11y } from '../../../composables/internal/useChartA11y'
 import { useElementSize } from '../../../composables/internal/useElementSize'
 import ChartAxis from './ChartAxis.vue'
 import ChartDataTable from './ChartDataTable.vue'
 import ChartGrid from './ChartGrid.vue'
 import ChartLegend from './ChartLegend.vue'
+import ChartReferences from './ChartReferences.vue'
 import ChartTooltip from './ChartTooltip.vue'
 import {
   crosshairStroke,
@@ -53,9 +57,13 @@ export interface ChartPlotScope {
   plot: Rect
   xScale: GrChartScale
   yScale: GrChartScale
+  /** Шкала правой оси. `null` — второй оси нет, серия `axis: 'right'` падает на левую. */
+  yScaleRight: GrChartScale | null
   data: ChartData
   visibleSeries: readonly NormalizedSeries[]
   activeIndex: number | null
+  /** Активная серия. У матрицы это строка; декартовы графики её игнорируют. */
+  activeSeriesIndex: number
   clipPathId: string
 }
 
@@ -77,33 +85,74 @@ export interface ChartFrameProps {
   dataTable?: 'hidden' | 'visible' | 'off'
   interactive?: boolean
   activeIndex?: number | null
+  /** Курсор по сериям — `v-model:activeSeriesIndex` у матрицы. */
+  activeSeriesIndex?: number
   locale?: string
   ariaLabel?: string
   ariaDescription?: string
   /** Чем себя называет график: «линейный график», «столбцы». */
   roleDescription?: string
+  /**
+   * Роль оверлея. Дефолт — `application`: у графика своя карта клавиш, и роль
+   * обязана её включить.
+   *
+   * `meter` у bullet: там не приложение, а величина на шкале, и
+   * `aria-valuenow` без этой роли не значит ничего. Роль с презентационными
+   * потомками здесь безопасна — оверлей пуст, а скрытая таблица ему сиблинг.
+   */
+  surfaceRole?: string
+  /** Атрибуты оверлея сверх имени: `aria-valuenow` и соседи у `meter`. */
+  surfaceAttrs?: Record<string, string | number | undefined>
   xTickCount?: number
   yTickCount?: number
   xTickFormat?: ChartTickFormat
   yTickFormat?: (value: number) => string
+  /** Формат подписей правой оси: у неё свои единицы, иначе она их и не заслужила. */
+  yTickFormatRight?: (value: number) => string
   valueFormat?: GrChartNumberFormat
+  /** Формат значений правой оси в тултипе, таблице и объявлении. */
+  valueFormatRight?: GrChartNumberFormat
   /** Вертикаль под активной точкой. У круга её нет: там активна доля, а не абсцисса. */
   crosshair?: boolean
+  /**
+   * Опорные линии и полосы: порог, план, коридор допустимого.
+   *
+   * Слой рисует рама, а не компонент, и это не удобство. Опора обязана дойти до
+   * читателя без зрения — через `aria-description` поверхности и `<tfoot>`
+   * скрытой таблицы, — а собирает то и другое рама. Разложи слой по трём
+   * компонентам, и порядок «под марками, над сеткой» пришлось бы соблюдать
+   * трижды, причём его нарушение молчит: порядка элементов не видит ни один
+   * гейт.
+   *
+   * Домен опора не расширяет: это решает компонент пропом
+   * `includeReferencesInDomain`.
+   */
+  references?: readonly GrChartReference[]
   /**
    * Точки, зависящие от системы координат. Дефолты декартовы; круг подменяет
    * их, потому что у него попадание угловое, якорь тултипа — центроид доли,
    * строка таблицы — доля, а описание точки включает процент.
    */
   hitTest?: (point: { x: number, y: number }, context: ChartHitContext) => number
+  /**
+   * Строка под указателем: у матрицы попадание двумерное. `-1` — мимо.
+   *
+   * Отдельным пропом, а не внутри `hitTest`: `useChartTooltip` знает одну ось и
+   * должен таким остаться — вторая координата ему не нужна ни для чего.
+   */
+  hitSeries?: (point: { x: number, y: number }, context: ChartHitContext) => number
   anchorPoint?: (index: number, context: ChartHitContext) => { x: number, y: number } | null
   tableModel?: ChartTableModel
   describePoint?: (index: number, seriesIndex: number) => string
+  /** Карта клавиш под свою систему координат. Не задана — декартова. */
+  keyboard?: ChartKeyboardOptions
 }
 
 export interface ChartFrameEmits {
   (e: 'update:activeIndex', value: number | null): void
   (e: 'pointClick', value: GrChartActivePoint): void
   (e: 'pointHover', value: GrChartActivePoint | null): void
+  (e: 'update:activeSeriesIndex', value: number): void
   (e: 'legendToggle', value: { seriesId: string, hidden: boolean }): void
 }
 
@@ -122,20 +171,28 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   dataTable: 'hidden',
   interactive: true,
   activeIndex: undefined,
+  activeSeriesIndex: undefined,
   locale: undefined,
   ariaLabel: undefined,
   ariaDescription: undefined,
   roleDescription: undefined,
+  surfaceRole: undefined,
+  surfaceAttrs: undefined,
   xTickCount: 6,
   yTickCount: 5,
   xTickFormat: undefined,
   yTickFormat: undefined,
+  yTickFormatRight: undefined,
   valueFormat: undefined,
+  valueFormatRight: undefined,
   crosshair: true,
+  references: undefined,
   hitTest: undefined,
+  hitSeries: undefined,
   anchorPoint: undefined,
   tableModel: undefined,
   describePoint: undefined,
+  keyboard: undefined,
 })
 
 const emit = defineEmits<ChartFrameEmits>()
@@ -184,7 +241,21 @@ const showAxes = computed(() => props.axes && !isEmpty.value && !props.loading)
  * Иначе верхнее деление сетки повисает под верхним краем данных, и график
  * выглядит обрезанным сверху.
  */
-const niceYDomain = computed<[number, number]>(() => linearTicks(props.data.yDomain, props.yTickCount).niceDomain)
+const yTicksLeft = computed(() => linearTicks(props.data.yDomain, props.yTickCount))
+const niceYDomain = computed<[number, number]>(() => yTicksLeft.value.niceDomain)
+
+/**
+ * Правая ось не выбирает своё число делений.
+ *
+ * Две «красивые» лестницы дают разное количество линий, сетка от этого двоится
+ * и становится нечитаемой. Счёт приходит от левой оси; сетка рисуется тоже по
+ * левой, а правая даёт только подписи.
+ */
+const rightTicks = computed(() => (props.data.yDomainRight === undefined
+  ? null
+  : alignedTicks(props.data.yDomainRight, yTicksLeft.value.values.length)))
+
+const hasRightAxis = computed(() => rightTicks.value !== null)
 
 /**
  * Подписи считаются на единичной шкале, координаты — на настоящей.
@@ -211,6 +282,18 @@ const yLabels = useChartTicks({
   locale: () => resolvedLocale.value,
   format: () => (props.yTickFormat ? value => props.yTickFormat!(value) : undefined),
 })
+
+/**
+ * Подписи правой оси строятся по её **готовым** делениям, а не через
+ * `useChartTicks`: тот пересчитал бы лестницу заново от `yTickCount` и вернул
+ * своё число линий — ровно то расхождение, ради которого и заведён
+ * `alignedTicks`.
+ */
+const yLabelsRight = computed<ChartTick[]>(() => (rightTicks.value?.values ?? []).map(value => ({
+  value,
+  position: 0,
+  label: props.yTickFormatRight?.(value) ?? formatNumber(value, { locale: resolvedLocale.value }),
+})))
 
 /**
  * Пока данных нет, место под оси резервируется по образцовым подписям.
@@ -263,6 +346,8 @@ const layout = computed(() => chartLayout({
   width: width.value,
   height: props.height,
   yTickLabels: props.loading ? [LOADING_Y_LABEL] : showAxes.value ? yLabels.value.map(tick => tick.label) : [],
+  yTickLabelsRight: showAxes.value && hasRightAxis.value ? yLabelsRight.value.map(tick => tick.label) : [],
+  showYAxisRight: reserveAxes.value && hasRightAxis.value,
   xTickLabels: props.loading ? [LOADING_X_LABEL] : showAxes.value ? xLabels.value.map(tick => tick.label) : [],
   fontSizePx: fontSizePx.value,
   showYAxis: reserveAxes.value,
@@ -278,10 +363,11 @@ const plotStyle = computed(() => ({
   height: `${plot.value.height}px`,
 }))
 
-const { xScale, yScale } = useChartScale({
+const { xScale, yScale, yScaleRight } = useChartScale({
   data: () => props.data,
   plot: () => plot.value,
   yDomain: () => niceYDomain.value,
+  yDomainRight: () => rightTicks.value?.niceDomain,
 })
 
 function withPosition(ticks: readonly ChartTick[], scale: GrChartScale): ChartTick[] {
@@ -290,11 +376,13 @@ function withPosition(ticks: readonly ChartTick[], scale: GrChartScale): ChartTi
 
 const xTicks = computed(() => withPosition(xLabels.value, xScale.value))
 const yTicks = computed(() => withPosition(yLabels.value, yScale.value))
+const yTicksRight = computed(() => (yScaleRight.value === null ? [] : withPosition(yLabelsRight.value, yScaleRight.value)))
 
 const tooltipApi = useChartTooltip({
   data: () => props.data,
   xScale: () => xScale.value,
   yScale: () => yScale.value,
+  yScaleRight: () => yScaleRight.value,
   plot: () => plot.value,
   surface: surfaceEl,
   enabled: () => props.tooltip && props.interactive && !isEmpty.value,
@@ -324,9 +412,72 @@ const numberFormat = computed<GrChartNumberFormat>(() => ({
   ...props.valueFormat,
 }))
 
-function formatPointValue(value: number | null): string {
-  return formatValue(value, numberFormat.value, t('grCharts.chart.noValue', 'no value'))
+/** Правая ось меряет в своих единицах — и форматируется своим форматом. */
+const numberFormatRight = computed<GrChartNumberFormat>(() => ({
+  locale: resolvedLocale.value,
+  ...(props.valueFormatRight ?? props.valueFormat),
+}))
+
+function formatPointValue(value: number | null, axis: 'left' | 'right' = 'left'): string {
+  const format = axis === 'right' ? numberFormatRight.value : numberFormat.value
+
+  return formatValue(value, format, t('grCharts.chart.noValue', 'no value'))
 }
+
+/**
+ * Опоры считаются по **расширенному** домену оси значений, а не по домену
+ * данных: рисует их та же шкала, что и марки, и «за пределами» обязано значить
+ * то же самое для обеих.
+ */
+const normalizedReferences = computed(() => normalizeReferences(props.references ?? [], {
+  kind: props.data.kind,
+  categories: props.data.categories,
+  xDomain: props.data.xDomain,
+  yDomain: niceYDomain.value,
+}))
+
+function formatReferenceValue(axis: 'x' | 'y', value: number): string {
+  if (axis === 'y')
+    return formatPointValue(value)
+  if (props.data.kind === 'time')
+    return formatTimeValue(value, resolvedLocale.value)
+  if (props.data.kind === 'band')
+    return props.data.categories[value] ?? String(value)
+
+  return formatNumber(value, { locale: resolvedLocale.value })
+}
+
+/**
+ * Опора текстом — для описания графика и для скрытой таблицы.
+ *
+ * Опора, существующая только визуально, — худший вид ложной доступности:
+ * зрячий видит порог и сравнивает с ним, читающий без зрения получает ряд без
+ * системы отсчёта и об этом не догадывается.
+ */
+const referenceDescriptions = computed<string[]>(() => normalizedReferences.value.map((reference) => {
+  const value = reference.band
+    ? t('grCharts.reference.band', '{from} to {to}', {
+        from: formatReferenceValue(reference.axis, reference.from),
+        to: formatReferenceValue(reference.axis, reference.to),
+      })
+    : formatReferenceValue(reference.axis, reference.from)
+
+  return reference.label
+    ? t('grCharts.reference.labeled', '{label}: {value}', { label: reference.label, value })
+    : t('grCharts.reference.plain', 'Reference: {value}', { value })
+}))
+
+/**
+ * Описание графика вместе с опорами.
+ *
+ * Опора за пределами домена в описание всё равно попадает: «порог не виден» и
+ * «порога нет» — разные утверждения, и отличить их читателю больше нечем.
+ */
+const surfaceDescription = computed(() => {
+  const parts = [props.ariaDescription, ...referenceDescriptions.value].filter(Boolean)
+
+  return parts.length > 0 ? parts.join('. ') : undefined
+})
 
 function pointAt(index: number): NormalizedPoint | null {
   const x = props.data.positions[index]
@@ -361,16 +512,19 @@ function describePoint(index: number, seriesIndex: number): string {
   const xText = formatX(point)
 
   if (series.length <= 1) {
-    const only = series[0]?.points.find(item => item.x === x)
+    const only = series[0]
 
-    return t('grCharts.chart.point', '{x}. {values}', { x: xText, values: formatPointValue(only?.y ?? null) })
+    return t('grCharts.chart.point', '{x}. {values}', {
+      x: xText,
+      values: formatPointValue(only?.points.find(item => item.x === x)?.y ?? null, only?.axis ?? 'left'),
+    })
   }
 
   const current = series[Math.min(seriesIndex, series.length - 1)]!
   const value = current.points.find(item => item.x === x)?.y ?? null
   const values = t('grCharts.chart.seriesValue', '{series}: {value}', {
     series: current.label,
-    value: formatPointValue(value),
+    value: formatPointValue(value, current.axis),
   })
 
   return t('grCharts.chart.point', '{x}. {values}', { x: xText, values })
@@ -387,6 +541,7 @@ const a11y = useChartA11y({
     if (tooltipApi.active.value)
       emit('pointClick', tooltipApi.active.value)
   },
+  keyboard: () => props.keyboard,
 })
 
 const surfaceLabel = computed(() => {
@@ -430,12 +585,22 @@ function formatTableX(point: NormalizedPoint): string {
   return visibleTimeLabels.value?.get(point.x) ?? formatX(point)
 }
 
-const tableModel = computed(() => props.tableModel ?? chartTableModel(props.data, {
-  xLabel: t('grCharts.chart.columnX', 'X'),
-  caption: t('grCharts.chart.tableCaption', 'Chart data'),
-  formatX: formatTableX,
-  formatY: formatPointValue,
-}))
+const tableModel = computed<ChartTableModel>(() => {
+  const base = props.tableModel ?? chartTableModel(props.data, {
+    xLabel: t('grCharts.chart.columnX', 'X'),
+    caption: t('grCharts.chart.tableCaption', 'Chart data'),
+    formatX: formatTableX,
+    formatY: formatPointValue,
+    axisLabel: axis => (axis === 'right'
+      ? t('grCharts.chart.axisRight', 'right axis')
+      : t('grCharts.chart.axisLeft', 'left axis')),
+  })
+  const notes = referenceDescriptions.value
+
+  // Опора приписывается к готовой модели, а не строкой данных: позиции по X у
+  // порога нет, и строка утверждала бы её.
+  return notes.length === 0 ? base : { ...base, notes: [...(base.notes ?? []), ...notes] }
+})
 
 const tooltipTitle = computed(() => {
   const point = tooltipApi.active.value
@@ -447,11 +612,35 @@ const plotScope = computed<ChartPlotScope>(() => ({
   plot: plot.value,
   xScale: xScale.value,
   yScale: yScale.value,
+  yScaleRight: yScaleRight.value,
   data: props.data,
   visibleSeries: visibleSeries.value,
   activeIndex: tooltipApi.activeIndex.value,
+  activeSeriesIndex: activeSeriesIndex.value,
   clipPathId,
 }))
+
+/**
+ * Строка под указателем — рядом с колонкой, а не внутри `useChartTooltip`.
+ *
+ * У матрицы попадание двумерное, но тултипу вторая координата не нужна ни для
+ * чего: он живёт на одной оси и должен таким остаться.
+ */
+function onPointerMove(event: PointerEvent): void {
+  tooltipApi.onPointerMove(event)
+
+  if (!props.hitSeries || !surfaceEl.value)
+    return
+
+  const rect = surfaceEl.value.getBoundingClientRect()
+  const row = props.hitSeries(
+    { x: event.clientX - rect.left, y: event.clientY - rect.top },
+    { plot: plot.value, xScale: xScale.value, yScale: yScale.value },
+  )
+
+  if (row !== -1)
+    activeSeriesIndex.value = row
+}
 
 function onKeydown(event: KeyboardEvent): void {
   if (a11y.onKeydown(event))
@@ -498,6 +687,13 @@ watch(
       : t('grCharts.legend.shown', '{label} shown, {shown} of {total} series shown', params))
   },
 )
+
+watch(() => props.activeSeriesIndex, (value) => {
+  if (value !== undefined && value !== activeSeriesIndex.value)
+    activeSeriesIndex.value = value
+}, { immediate: true })
+
+watch(activeSeriesIndex, value => emit('update:activeSeriesIndex', value))
 
 // Управляемый курсор: пара графиков синхронизируется через `v-model:activeIndex`.
 watch(() => props.activeIndex, (value) => {
@@ -571,6 +767,17 @@ watch(tooltipApi.activeIndex, (value) => {
             :label="t('grCharts.chart.axisY', 'Y axis')"
           />
           <ChartAxis
+            v-if="hasRightAxis"
+            :plot="plot"
+            :ticks="yTicksRight"
+            orientation="y"
+            side="right"
+            :font-size-px="fontSizePx"
+            :size-class="labelSizeClass[size]"
+            :truncated="layout.truncated"
+            :label="t('grCharts.chart.axisRight', 'right axis')"
+          />
+          <ChartAxis
             :plot="plot"
             :ticks="xTicks"
             orientation="x"
@@ -580,6 +787,20 @@ watch(tooltipApi.activeIndex, (value) => {
             :label="t('grCharts.chart.axisX', 'X axis')"
           />
         </template>
+
+        <!--
+          Опоры над осями и под вертикалью курсора: полоса допустимого не должна
+          глотать указатель, а марки — теряться под порогом.
+        -->
+        <ChartReferences
+          v-if="normalizedReferences.length > 0 && !isEmpty && !loading"
+          :references="normalizedReferences"
+          :plot="plot"
+          :x-scale="xScale"
+          :y-scale="yScale"
+          :size-class="labelSizeClass[size]"
+          :font-size-px="fontSizePx"
+        />
 
         <line
           v-if="crosshair && tooltipApi.activeIndex.value !== null && !isEmpty"
@@ -606,12 +827,13 @@ watch(tooltipApi.activeIndex, (value) => {
         ref="surfaceEl"
         :class="frameSurfaceClass"
         data-gr-chart-surface
-        role="application"
+        :role="surfaceRole ?? 'application'"
         tabindex="0"
+        v-bind="surfaceAttrs"
         :aria-roledescription="roleDescription ?? t('grCharts.chart.roleDescription', 'chart')"
         :aria-label="surfaceLabel"
-        :aria-description="ariaDescription"
-        @pointermove="tooltipApi.onPointerMove"
+        :aria-description="surfaceDescription"
+        @pointermove="onPointerMove"
         @pointerleave="tooltipApi.onPointerLeave"
         @keydown="onKeydown"
         @click="onClick"

@@ -111,6 +111,22 @@ export const labelFill = 'var(--gr-chart-frame-label,var(--gr-muted-fg))'
 export const crosshairStroke = 'var(--gr-chart-frame-crosshair,var(--gr-brd))'
 
 /**
+ * Опора красится приглушённой ролью, а не цветом серии.
+ *
+ * Порог — это не ряд: возьми он цвет из палитры, читатель начал бы искать его в
+ * легенде. Свой цвет опоры (`color`) отменяет этот дефолт — но решает так автор
+ * графика, а не палитра.
+ */
+export const referenceStroke = 'var(--gr-chart-frame-reference,var(--gr-muted-fg))'
+export const referenceLabelFill = 'var(--gr-chart-frame-reference-label,var(--gr-muted-fg))'
+
+/** Полоса заливается едва заметно: коридор допустимого не должен спорить с данными. */
+export const referenceBandOpacity = 'var(--gr-chart-frame-reference-band-opacity,0.12)'
+
+/** Толщина линии опоры — числом: она же идёт в `dashArrayFor`, а тот считает в JS. */
+export const REFERENCE_STROKE_WIDTH = 1.5
+
+/**
  * Размер марки — число, а не токен: он идёт в геометрию символа
  * (`symbolPath`), которая считается в JS и CSS-переменную прочитать не может.
  *

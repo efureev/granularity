@@ -24,9 +24,12 @@ export interface ChartLayoutInput {
   height: number
   /** Уже отформатированные подписи: по ним и считается место под ось. */
   yTickLabels: readonly string[]
+  /** Подписи правой оси. Место под неё резервируется, только когда она есть. */
+  yTickLabelsRight?: readonly string[]
   xTickLabels: readonly string[]
   fontSizePx: number
   showYAxis: boolean
+  showYAxisRight?: boolean
   showXAxis: boolean
   legend?: { position: 'top' | 'bottom', height: number }
   padding?: Partial<Record<'top' | 'right' | 'bottom' | 'left', number>>
@@ -84,6 +87,45 @@ export function estimateTextWidth(text: string, fontSizePx: number): number {
   return units * fontSizePx
 }
 
+export interface LabelGuttersInput {
+  /** Подписи слева от области: строки матрицы, категории горизонтальной раскладки. */
+  leftLabels?: readonly string[]
+  /** Подписи под областью: колонки матрицы, деления значений при горизонтали. */
+  bottomLabels?: readonly string[]
+  fontSizePx: number
+  maxLabelWidth?: number
+}
+
+export interface LabelGutters {
+  left: number
+  bottom: number
+  /** Подпись не влезла в потолок: рисующий обязан дать ей `<title>`. */
+  truncated: boolean
+}
+
+/**
+ * Место под собственные подписи компонента — для тех, кто идёт с `axes: false`.
+ *
+ * Теплокарта, воронка и горизонтальный мост подписывают не деления числовой
+ * оси, а сами марки, и `chartLayout` про эти подписи ничего не знает: он
+ * считает гуттеры рамы, а рама их осей у таких графиков не рисует. Гуттер
+ * поэтому считается внутри области построения и ужимает марки — тот же приём,
+ * что у круга под выносными подписями.
+ *
+ * Ширина по-прежнему оценивается, а не измеряется: причина в докблоке модуля.
+ */
+export function labelGutters(input: LabelGuttersInput): LabelGutters {
+  const maxLabelWidth = input.maxLabelWidth ?? DEFAULT_MAX_AXIS_WIDTH
+  const widest = Math.max(0, ...(input.leftLabels ?? []).map(label => estimateTextWidth(label, input.fontSizePx)))
+  const capped = Math.min(widest, maxLabelWidth)
+
+  return {
+    left: widest > 0 ? capped + TICK_GAP : 0,
+    bottom: (input.bottomLabels?.length ?? 0) > 0 ? input.fontSizePx * LINE_HEIGHT_RATIO + TICK_GAP : 0,
+    truncated: widest > capped,
+  }
+}
+
 export function chartLayout(input: ChartLayoutInput): ChartLayout {
   const padding = { ...DEFAULT_PADDING, ...input.padding }
   const maxAxisWidth = input.maxAxisWidth ?? DEFAULT_MAX_AXIS_WIDTH
@@ -101,6 +143,14 @@ export function chartLayout(input: ChartLayoutInput): ChartLayout {
 
     truncated = widest > capped
     left += capped + TICK_GAP
+  }
+
+  if (input.showYAxisRight && (input.yTickLabelsRight?.length ?? 0) > 0) {
+    const widest = Math.max(...input.yTickLabelsRight!.map(label => estimateTextWidth(label, input.fontSizePx)))
+    const capped = Math.min(widest, maxAxisWidth)
+
+    truncated ||= widest > capped
+    right += capped + TICK_GAP
   }
 
   if (input.showXAxis && input.xTickLabels.length > 0) {

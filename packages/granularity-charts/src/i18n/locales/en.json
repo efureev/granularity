@@ -11,16 +11,52 @@
     "point": "{x}. {values}",
     "seriesValue": "{series}: {value}",
     "axisX": "X axis",
-    "axisY": "Y axis"
+    "axisY": "Y axis",
+    "axisLeft": "left axis",
+    "axisRight": "right axis"
+  },
+  "funnel": {
+    "roleDescription": "funnel chart",
+    "summary": "Funnel chart, {stages} steps",
+    "keyboardHint": "Use arrow keys to browse steps",
+    "stage": "{label}: {value}, {shareFirst} of the first step, {sharePrev} of the previous",
+    "rising": "Steps larger than the previous one: {steps}",
+    "tableCaption": "Chart data",
+    "columnStage": "Step",
+    "columnValue": "Value",
+    "columnShareFirst": "Share of first",
+    "columnSharePrev": "Share of previous"
   },
   "bar": {
     "label": "Bar chart",
     "labelStacked": "Stacked bar chart",
     "labelNormalized": "Stacked bar chart, 100%"
   },
+  "bullet": {
+    "roleDescription": "bullet chart",
+    "label": "Value",
+    "valueText": "{value} of {max}",
+    "valueTextWithTarget": "{value} of {max}, target {target}",
+    "range": "{from} to {to}",
+    "ranges": "Ranges: {ranges}",
+    "overflow": "Value is outside the scale",
+    "tableCaption": "Chart data",
+    "columnMetric": "Metric",
+    "columnValue": "Value",
+    "columnTarget": "Target"
+  },
+  "heatmap": {
+    "roleDescription": "heatmap",
+    "summary": "Heatmap, {rows} rows, {columns} columns",
+    "keyboardHint": "Use arrow keys to browse cells",
+    "cell": "{row}, {column}: {value}",
+    "tableCaption": "Chart data",
+    "columnRow": "Row"
+  },
   "area": {
     "label": "Area chart",
-    "labelStacked": "Stacked area chart"
+    "labelStacked": "Stacked area chart",
+    "labelNormalized": "Stacked area chart, 100%"
   },
   "line": {
     "label": "Line chart"
@@ -53,11 +89,28 @@
     "hidden": "{label} hidden, {shown} of {total} series shown",
     "shown": "{label} shown, {shown} of {total} series shown"
   },
+  "reference": {
+    "labeled": "{label}: {value}",
+    "plain": "Reference: {value}",
+    "band": "{from} to {to}"
+  },
   "sparkline": {
     "label": "Sparkline",
     "summary": "{trend}, from {first} to {last}, minimum {min}, maximum {max}",
     "trendUp": "rising",
     "trendDown": "falling",
     "trendFlat": "flat"
+  },
+  "waterfall": {
+    "roleDescription": "waterfall chart",
+    "summary": "Waterfall chart, {steps} steps, total {total}",
+    "keyboardHint": "Use arrow keys to browse steps",
+    "point": "{label}: {value}, running total {after}",
+    "total": "Total",
+    "tableCaption": "Chart data",
+    "columnStep": "Step",
+    "columnValue": "Change",
+    "columnBefore": "Running total before",
+    "columnAfter": "Running total after"
   }
 }

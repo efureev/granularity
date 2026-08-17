@@ -199,8 +199,12 @@
 | как менялось целое и вклад частей в него | [`GrChartArea`](../packages/granularity-charts/docs/components/GrChartArea.md) |
 | сколько у каждой категории | [`GrChartBar`](../packages/granularity-charts/docs/components/GrChartBar.md) |
 | из чего состоит одно целое | [`GrChartPie`](../packages/granularity-charts/docs/components/GrChartPie.md) |
+| как из начала периода получился конец | [`GrChartWaterfall`](../packages/granularity-charts/docs/components/GrChartWaterfall.md) |
+| где теряются пользователи между ступенями | [`GrChartFunnel`](../packages/granularity-charts/docs/components/GrChartFunnel.md) |
 | какой формы профиль по нескольким осям | [`GrChartRadar`](../packages/granularity-charts/docs/components/GrChartRadar.md) |
+| где горячо в матрице двух измерений | [`GrChartHeatmap`](../packages/granularity-charts/docs/components/GrChartHeatmap.md) |
 | тренд в ячейке таблицы или в карточке | [`GrSparkline`](../packages/granularity-charts/docs/components/GrSparkline.md) |
+| насколько величина близка к цели и к порогу | [`GrChartBullet`](../packages/granularity-charts/docs/components/GrChartBullet.md) |
 | какая доля одного показателя набрана | [`GrProgressCircle`](../packages/granularity/docs/components/GrProgressCircle.md) |
 | одно число крупно, с динамикой | [`GrStatistic`](../packages/granularity/docs/components/GrStatistic.md) |
 
@@ -244,9 +248,13 @@
 | [`GrCard`](../packages/granularity/docs/components/GrCard.md) | ядро | контенту нужна поверхность |
 | [`GrChartArea`](../packages/granularity-charts/docs/components/GrChartArea.md) | charts | целое и вклад частей в него во времени |
 | [`GrChartBar`](../packages/granularity-charts/docs/components/GrChartBar.md) | charts | сколько у каждой категории |
+| [`GrChartBullet`](../packages/granularity-charts/docs/components/GrChartBullet.md) | charts | метрика с порогами, которые уже есть в данных |
+| [`GrChartFunnel`](../packages/granularity-charts/docs/components/GrChartFunnel.md) | charts | последовательность ступеней, где каждая — подмножество предыдущей |
+| [`GrChartHeatmap`](../packages/granularity-charts/docs/components/GrChartHeatmap.md) | charts | матрица удержания по когортам |
 | [`GrChartLine`](../packages/granularity-charts/docs/components/GrChartLine.md) | charts | как величина менялась |
 | [`GrChartPie`](../packages/granularity-charts/docs/components/GrChartPie.md) | charts | из чего состоит одно целое |
 | [`GrChartRadar`](../packages/granularity-charts/docs/components/GrChartRadar.md) | charts | форма профиля по нескольким метрикам |
+| [`GrChartWaterfall`](../packages/granularity-charts/docs/components/GrChartWaterfall.md) | charts | движение от остатка к остатку |
 | [`GrCheckbox`](../packages/granularity/docs/components/GrCheckbox.md) | ядро | согласие или флаг в форме |
 | [`GrCheckboxGroup`](../packages/granularity/docs/components/GrCheckboxGroup.md) | ядро | значений несколько из короткого набора |
 | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | ядро | содержимого много, а нужно не всё сразу |

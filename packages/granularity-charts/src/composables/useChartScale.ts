@@ -22,6 +22,8 @@ export interface UseChartScaleOptions {
   plot: () => Rect
   /** Домен оси значений, если он уже расширен до «красивых» делений. */
   yDomain?: () => readonly [number, number] | undefined
+  /** Домен правой оси. `undefined` — второй оси нет. */
+  yDomainRight?: () => readonly [number, number] | undefined
   paddingInner?: () => number | undefined
   paddingOuter?: () => number | undefined
 }
@@ -29,6 +31,8 @@ export interface UseChartScaleOptions {
 export interface UseChartScaleReturn {
   xScale: ComputedRef<GrChartScale>
   yScale: ComputedRef<GrChartScale>
+  /** Шкала правой оси; `null` — оси одна, и серии `axis: 'right'` падают на левую. */
+  yScaleRight: ComputedRef<GrChartScale | null>
 }
 
 export function useChartScale(options: UseChartScaleOptions): UseChartScaleReturn {
@@ -51,5 +55,16 @@ export function useChartScale(options: UseChartScaleOptions): UseChartScaleRetur
     return linearScale(domain, [plot.y + plot.height, plot.y])
   })
 
-  return { xScale, yScale }
+  const yScaleRight = computed(() => {
+    const domain = options.yDomainRight?.() ?? options.data().yDomainRight
+
+    if (domain === undefined)
+      return null
+
+    const plot = options.plot()
+
+    return linearScale(domain, [plot.y + plot.height, plot.y])
+  })
+
+  return { xScale, yScale, yScaleRight }
 }
