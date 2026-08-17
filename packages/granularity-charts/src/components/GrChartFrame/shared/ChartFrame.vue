@@ -363,6 +363,23 @@ const plotStyle = computed(() => ({
   height: `${plot.value.height}px`,
 }))
 
+/**
+ * Высота области построения.
+ *
+ * Пустому графику площадь не нужна: рисовать там нечего, и две пустые карточки
+ * рядом съедали бы по `height` каждая ради одной фразы. Ограничение сверху
+ * заданной высотой обязательно — иначе график, которому явно задали 80px, от
+ * пустоты бы вырос.
+ *
+ * Загрузка высоту сохраняет: скелет занимает место будущего графика, иначе
+ * страница прыгнет в момент прихода данных.
+ */
+const frameHeightStyle = computed(() => ({
+  height: isEmpty.value && !props.loading
+    ? `min(${props.height}px, var(--gr-chart-frame-empty-height, 8rem))`
+    : `${props.height}px`,
+}))
+
 const { xScale, yScale, yScaleRight } = useChartScale({
   data: () => props.data,
   plot: () => plot.value,
@@ -716,8 +733,11 @@ watch(tooltipApi.activeIndex, (value) => {
   >
     <slot name="header" />
 
+    <!-- Пустой график легенды не получает: она объясняла бы цвета, которых на
+         экране нет. Гасится в раме, а не в обёртках, — тогда правило действует
+         и на собственные легенды круга и матрицы, идущие в этот же слот. -->
     <slot
-      v-if="showLegend && legendPosition === 'top'"
+      v-if="showLegend && !isEmpty && legendPosition === 'top'"
       name="legend"
       :series="data.series"
       :toggle="toggleSeries"
@@ -730,14 +750,17 @@ watch(tooltipApi.activeIndex, (value) => {
       />
     </slot>
 
-    <div class="relative" :style="{ height: `${height}px` }">
+    <div data-gr-chart-plot class="relative" :style="frameHeightStyle">
       <!--
         В интерактивном режиме рисунок — декорация: смысл несут оверлей с
         клавиатурой и скрытая таблица. `role="img"` на `<svg>` объявил бы его
         потомков презентационными, и точки перестали бы существовать для
         скринридера — тот же капкан, что у `role="progressbar"` в ядре.
       -->
+      <!-- Пустой холст не рисуется вовсе: сетка, оси и марки уже погашены, а
+           полная высота переполнила бы укороченную обёртку. -->
       <svg
+        v-if="!isEmpty || loading"
         :class="frameSvgClass"
         :viewBox="`0 0 ${width} ${height}`"
         :width="width"
@@ -894,7 +917,7 @@ watch(tooltipApi.activeIndex, (value) => {
     </div>
 
     <slot
-      v-if="showLegend && legendPosition === 'bottom'"
+      v-if="showLegend && !isEmpty && legendPosition === 'bottom'"
       name="legend"
       :series="data.series"
       :toggle="toggleSeries"

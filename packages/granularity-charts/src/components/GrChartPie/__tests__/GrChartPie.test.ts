@@ -287,6 +287,17 @@ describe('GrChartPie', () => {
     expect(factory({ data: [0, 0] }).text()).toContain('No data')
   })
 
+  // У круга легенда включена по умолчанию, поэтому пустое состояние показывало
+  // полный список подписей с «0 · —» — ключ к долям, которых на экране нет.
+  it('под пустым кругом легенды нет, хотя она включена по умолчанию', () => {
+    const zeros = factory({ data: [{ label: 'Chrome', value: 0 }, { label: 'Safari', value: 0 }] })
+
+    expect(zeros.text()).toContain('No data')
+    expect(zeros.find('[data-gr-chart-pie-legend]').exists()).toBe(false)
+
+    expect(factory().find('[data-gr-chart-pie-legend]').exists()).toBe(true)
+  })
+
   it('клик по доле отдаёт долю, а не точку графика', async () => {
     const wrapper = factory()
 

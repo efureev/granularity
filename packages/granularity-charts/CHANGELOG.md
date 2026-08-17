@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.0] 2026-08-18
+
+### Fixed
+
+- **An empty chart still drew its legend, explaining colours that were not on
+  screen.** A report with two declared series and no rows for the period showed
+  "No payments in this period" with "Net revenue" and "Fee" listed underneath —
+  a key to a picture that does not exist. The cause is that emptiness is decided
+  by positions (`data.positions.length === 0`) while the legend is drawn from
+  series, and a backend that knows its series but has no rows produces exactly
+  that combination. The legend was the only visible layer of the frame without
+  an `!isEmpty` guard; axes, grid, marks, references, crosshair, surface and
+  tooltip all had one. It is now guarded in the frame rather than in each chart,
+  which is what makes it hold for `GrChartPie` and `GrChartHeatmap` too: their
+  own legends are passed into the very same slot, and a pie of zeros used to
+  show the full list of labels with "0 · —" because its legend defaults to on.
+  A legend beside a partially empty chart is untouched — while anything is still
+  plotted, an empty series must keep its place so its neighbours do not change
+  colour on the next filtering.
+- **An empty chart reserved the full plotting area.** Seven of the nine charts
+  default to 256px, so two empty cards side by side spent 500px of screen on one
+  sentence. The frame no longer reserves that space when there is nothing to
+  plot; the height comes from `--gr-chart-frame-empty-height` (8rem) and is
+  capped by the declared `height`, so a chart explicitly given 80px does not
+  grow from being empty. The loading state keeps the full height on purpose —
+  its skeleton is a promise of the picture about to arrive, and shrinking it
+  would make the page jump at the moment data lands.
+
 ## [v0.4.0] 2026-08-17
 
 ### Added

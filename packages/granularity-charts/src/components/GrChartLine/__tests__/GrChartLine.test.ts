@@ -269,6 +269,42 @@ describe('GrChartLine', () => {
     expect(wrapper.text()).toContain('No data')
   })
 
+  // Серии есть, точек нет: легенда объясняла бы цвета, которых на экране нет.
+  // `series: []` этот случай не ловит — там легенда и так выключена по `auto`.
+  it('под пустым графиком легенды нет, даже когда серии объявлены', () => {
+    const wrapper = factory({
+      series: [
+        { id: 'net', label: 'Чистый доход', x: [], y: [] },
+        { id: 'fee', label: 'Комиссия', x: [], y: [] },
+      ],
+    })
+
+    expect(wrapper.text()).toContain('No data')
+    expect(wrapper.find('[data-gr-chart-legend]').exists()).toBe(false)
+  })
+
+  it('легенда возвращается вместе с данными', () => {
+    const wrapper = factory()
+
+    expect(wrapper.find('[data-gr-chart-legend]').exists()).toBe(true)
+  })
+
+  // Пустому графику незачем держать площадь построения: две пустые карточки
+  // рядом съедали по 256px каждая ради одной фразы.
+  it('пустое состояние не резервирует высоту графика', () => {
+    const empty = factory({ series: [], height: 256 })
+    const filled = factory({ height: 256 })
+
+    // Прямой потомок — сам холст: иконка заглушки тоже `svg`, но лежит глубже.
+    expect(empty.find('[data-gr-chart-plot] > svg').exists()).toBe(false)
+    expect(filled.find('[data-gr-chart-plot] > svg').exists()).toBe(true)
+    // Заданная высота остаётся потолком: график, которому явно дали 80px, от
+    // пустоты вырасти не должен.
+    expect(filled.find('[data-gr-chart-plot]').attributes('style')).toBe('height: 256px;')
+    expect(empty.find('[data-gr-chart-plot]').attributes('style'))
+      .toBe('height: min(256px, var(--gr-chart-frame-empty-height, 8rem));')
+  })
+
   it('скрытая таблица повторяет данные графика', () => {
     const wrapper = factory()
     const table = wrapper.find('[data-gr-chart-table]')
