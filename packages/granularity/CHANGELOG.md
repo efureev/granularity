@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrFilePreview` — a stored file as a tile.** An attachment feed mixes
+  receipts, contracts and exports, and one rule does not show them all: an `<img>`
+  pointed at a PDF renders a broken-image icon, which is the defect this replaces.
+  The kind comes from `mime`, never the extension — extensions lie, the backend
+  does not. Six kinds, one icon each; an empty type, `application/octet-stream`
+  and an unknown type all land on the placeholder rather than a hole, because "no
+  type recorded" is an ordinary row in the database. A failed load degrades into
+  that same placeholder with a different glyph — "the image did not open", not
+  "this is a file" — and a new `src` does not inherit the old error. `alt` is never
+  invented: a `name` becomes the `alt`, and without one the image is decorative,
+  since a description the component made up is read out as fact. The tile is a
+  control only when asked (`clickable`, `href`, `as`); otherwise it is a `<div>`
+  and takes no tab stop. It does not open the viewer itself — it emits `click`,
+  because a grid of tiles and a fullscreen viewer are different page states.
 - **New `GrCodeBlock` — raw JSON or text, shown as it is.** The consumer case is a
   service response pasted into a ticket, and until now that meant `<pre>` copied
   across pages with three different sets of classes, none of them keyboard-reachable

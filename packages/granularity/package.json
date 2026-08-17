@@ -169,6 +169,10 @@
       "types": "./dist/types/components/GrEmptyState/index.d.ts",
       "import": "./dist/components/GrEmptyState/index.js"
     },
+    "./components/GrFilePreview": {
+      "types": "./dist/types/components/GrFilePreview/index.d.ts",
+      "import": "./dist/components/GrFilePreview/index.js"
+    },
     "./components/GrFileUpload": {
       "types": "./dist/types/components/GrFileUpload/index.d.ts",
       "import": "./dist/components/GrFileUpload/index.js"

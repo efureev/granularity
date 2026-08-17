@@ -31,6 +31,21 @@
 Граница `GrFormFile` / `GrFileUpload` — кто отправляет. У первого файл это
 значение `v-model`, отправляет форма; второй грузит сам и показывает прогресс.
 
+### Файл, который уже лежит
+
+Различитель — **что с файлом делают**: отправляют новый (развилка выше) или
+показывают сохранённый.
+
+| Что происходит | Компонент |
+| --- | --- |
+| плитка вложения в ленте: картинка либо иконка по типу | [`GrFilePreview`](../packages/granularity/docs/components/GrFilePreview.md) |
+| картинку рассматривают во весь экран | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) |
+| показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+
+`GrFilePreview` просмотрщик не открывает — он эмитит `click`, а окно показывает
+потребитель. Пары «плитка + просмотрщик» одним компонентом в пакете нет
+намеренно: набор плиток и просмотр набора — разные состояния страницы.
+
 ### Выбор из набора готовых значений
 
 Различитель — **сколько вариантов** и **просматривают их или ищут**.
@@ -301,6 +316,7 @@
 | [`GrDropdown`](../packages/granularity/docs/components/GrDropdown.md) | ядро | меню со своими пунктами |
 | [`GrDropdownMenu`](../packages/granularity/docs/components/GrDropdownMenu.md) | ядро | действия над объектом |
 | [`GrEmptyState`](../packages/granularity/docs/components/GrEmptyState.md) | ядро | список пуст с самого начала |
+| [`GrFilePreview`](../packages/granularity/docs/components/GrFilePreview.md) | ядро | лента вложений |
 | [`GrFileUpload`](../packages/granularity/docs/components/GrFileUpload.md) | ядро | файл уходит на сервер сразу |
 | [`GrForm`](../packages/granularity/docs/components/GrForm.md) | ядро | полей больше одного и они проверяются |
 | [`GrFormField`](../packages/granularity/docs/components/GrFormField.md) | ядро | у поля есть подпись |

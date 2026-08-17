@@ -1,0 +1,224 @@
+import { mount } from '@vue/test-utils'
+import { defineComponent, h, markRaw, nextTick } from 'vue'
+import { describe, expect, it, vi } from 'vitest'
+
+// `vi.mock` поднимается компилятором в начало файла, поэтому пути пишутся
+// литералами: в цикле замыкание до подъёма не доживает.
+vi.mock('~icons/lucide/file', () => ({
+  default: defineComponent({ name: 'IconFile', render: () => h('svg', { 'data-icon': 'file' }) }),
+}))
+vi.mock('~icons/lucide/file-archive', () => ({
+  default: defineComponent({ name: 'IconFileArchive', render: () => h('svg', { 'data-icon': 'file-archive' }) }),
+}))
+vi.mock('~icons/lucide/file-spreadsheet', () => ({
+  default: defineComponent({ name: 'IconFileSpreadsheet', render: () => h('svg', { 'data-icon': 'file-spreadsheet' }) }),
+}))
+vi.mock('~icons/lucide/file-text', () => ({
+  default: defineComponent({ name: 'IconFileText', render: () => h('svg', { 'data-icon': 'file-text' }) }),
+}))
+vi.mock('~icons/lucide/file-type', () => ({
+  default: defineComponent({ name: 'IconFileType', render: () => h('svg', { 'data-icon': 'file-type' }) }),
+}))
+vi.mock('~icons/lucide/image-off', () => ({
+  default: defineComponent({ name: 'IconImageOff', render: () => h('svg', { 'data-icon': 'image-off' }) }),
+}))
+
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
+import GrFilePreview from '../GrFilePreview.vue'
+
+const IMAGE = 'https://cdn.invalid/receipt.png'
+
+/** Заглушка компонента-ссылки: так устроены `Link` от Inertia и `RouterLink`. */
+const StubLink = markRaw(defineComponent({
+  name: 'StubLink',
+  props: { href: { type: String, default: undefined } },
+  template: '<a :href="href"><slot /></a>',
+}))
+
+describe('GrFilePreview — что показывается', () => {
+  it('image/* рисует картинку', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    expect(wrapper.get('[data-gr-file-preview-image]').attributes('src')).toBe(IMAGE)
+    expect(wrapper.find('[data-gr-file-preview-fallback]').exists()).toBe(false)
+  })
+
+  // Тот самый дефект у потребителя: `<img>` на PDF рисует битую иконку.
+  it('application/pdf не рендерит img вовсе', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'application/pdf' } })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.find('svg[data-icon="file-text"]').exists()).toBe(true)
+  })
+
+  it.each([
+    ['application/vnd.ms-excel', 'file-spreadsheet'],
+    ['application/zip', 'file-archive'],
+    ['application/msword', 'file-type'],
+    ['application/octet-stream', 'file'],
+  ])('%s даёт иконку %s', (mime, icon) => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime } })
+
+    expect(wrapper.find(`svg[data-icon="${icon}"]`).exists()).toBe(true)
+  })
+
+  // Контроллер отдаёт варианты файла без типа сплошь и рядом.
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['пустая строка', ''],
+  ])('mime=%s даёт заглушку, а не пустоту', (_name, mime) => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime } })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-file-preview-fallback]').exists()).toBe(true)
+    expect(wrapper.attributes('data-kind')).toBe('unknown')
+  })
+
+  it('без src картинки нет даже у image/*', () => {
+    const wrapper = mount(GrFilePreview, { props: { mime: 'image/png' } })
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-file-preview-fallback]').exists()).toBe(true)
+  })
+
+  // Превью исчезает с диска, и «сломанная картинка» не информативнее иконки.
+  it('сорвавшаяся загрузка деградирует в заглушку', async () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    await wrapper.get('[data-gr-file-preview-image]').trigger('error')
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    // Значок другой: «изображение не открылось», а не «это файл».
+    expect(wrapper.find('svg[data-icon="image-off"]').exists()).toBe(true)
+  })
+
+  it('новая ссылка не наследует ошибку прошлой', async () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+    await wrapper.get('[data-gr-file-preview-image]').trigger('error')
+    expect(wrapper.find('img').exists()).toBe(false)
+
+    await wrapper.setProps({ src: 'https://cdn.invalid/other.png' })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-file-preview-image]').exists()).toBe(true)
+  })
+})
+
+describe('GrFilePreview — доступное имя', () => {
+  it('name становится alt', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', name: 'Чек №42.png' } })
+
+    expect(wrapper.get('[data-gr-file-preview-image]').attributes('alt')).toBe('Чек №42.png')
+  })
+
+  // Придуманный компонентом alt хуже пустого: диктор прочитает выдумку как факт.
+  it('без name картинка декоративна', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    expect(wrapper.get('[data-gr-file-preview-image]').attributes('alt')).toBe('')
+  })
+
+  it('в заглушке name становится подписью, иконка скрыта от диктора', () => {
+    const wrapper = mount(GrFilePreview, { props: { mime: 'application/pdf', name: 'Договор.pdf' } })
+
+    expect(wrapper.get('[data-gr-file-preview-label]').text()).toBe('Договор.pdf')
+    expect(wrapper.find('svg[data-icon="file-text"]').attributes('aria-hidden')).toBe('true')
+  })
+
+  it('ariaLabel именует интерактивную плитку', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { src: IMAGE, mime: 'image/png', clickable: true, ariaLabel: 'Открыть чек' },
+    })
+
+    expect(wrapper.attributes('aria-label')).toBe('Открыть чек')
+  })
+})
+
+describe('GrFilePreview — интерактивность', () => {
+  // Плитка без действия — картинка, а не контрол: пустая остановка `Tab` хуже
+  // её отсутствия.
+  it('по умолчанию это div вне таб-порядка', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    expect(wrapper.element.tagName).toBe('DIV')
+    expect(wrapper.attributes('tabindex')).toBeUndefined()
+    expect(wrapper.classes()).not.toContain('cursor-pointer')
+  })
+
+  it('clickable даёт кнопку и эмитит click', async () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', clickable: true } })
+
+    expect(wrapper.element.tagName).toBe('BUTTON')
+    expect(wrapper.attributes('type')).toBe('button')
+
+    await wrapper.trigger('click')
+    expect(wrapper.emitted('click')).toHaveLength(1)
+  })
+
+  it('href делает плитку ссылкой', () => {
+    const wrapper = mount(GrFilePreview, { props: { mime: 'application/pdf', href: '/files/42.pdf' } })
+
+    expect(wrapper.element.tagName).toBe('A')
+    expect(wrapper.attributes('href')).toBe('/files/42.pdf')
+  })
+
+  // Тот же класс дефекта, что чинили в GrCard, GrSidebarItem и GrStatistic.
+  it('as-компонент получает href', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { mime: 'application/pdf', as: StubLink, href: '/files/42.pdf' },
+    })
+
+    expect(wrapper.getComponent(StubLink).props('href')).toBe('/files/42.pdf')
+  })
+
+  it('строковый as, кроме a, href не получает', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { mime: 'application/pdf', as: 'article', href: '/files/42.pdf' },
+    })
+
+    expect(wrapper.attributes('href')).toBeUndefined()
+  })
+})
+
+describe('GrFilePreview — размер и загрузка', () => {
+  it('ступень задаёт ширину, число — произвольную', () => {
+    const step = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', tileSize: 'lg' } })
+    expect(step.classes()).toContain('w-32')
+
+    const exact = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', tileSize: 96 } })
+    expect(exact.attributes('style')).toContain('width: 96px')
+    expect(exact.classes().some(cls => /^w-\d/.test(cls))).toBe(false)
+  })
+
+  it('соотношение сторон держит место до загрузки', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', ratio: '16:9' } })
+
+    expect(wrapper.classes()).toContain('aspect-[16/9]')
+  })
+
+  // Плиток на странице бывает десяток.
+  it('загрузка ленивая по умолчанию', () => {
+    const lazy = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+    expect(lazy.get('[data-gr-file-preview-image]').attributes('loading')).toBe('lazy')
+
+    const eager = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', loading: 'eager' } })
+    expect(eager.get('[data-gr-file-preview-image]').attributes('loading')).toBe('eager')
+  })
+
+  it('оформление читается из GrConfigProvider', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrFilePreview },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrFilePreview: { tileSize: 'sm', ratio: '4:3', loading: 'eager' } }">
+          <GrFilePreview src="${IMAGE}" mime="image/png" />
+        </GrConfigProvider>
+      `,
+    })
+
+    const tile = mount(Harness).get('[data-gr-file-preview]')
+    expect(tile.classes()).toContain('w-16')
+    expect(tile.classes()).toContain('aspect-[4/3]')
+    expect(tile.get('[data-gr-file-preview-image]').attributes('loading')).toBe('eager')
+  })
+})

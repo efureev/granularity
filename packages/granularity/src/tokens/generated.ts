@@ -2457,6 +2457,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Толщина разделителя — общая для горизонтального и вертикального."
   },
   {
+    "owner": "GrFilePreview",
+    "name": "--gr-file-preview-bg",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Фон плитки. Виден у заглушки целиком, а у картинки — пока она едет и по краям при несовпадении пропорций."
+  },
+  {
+    "owner": "GrFilePreview",
+    "name": "--gr-file-preview-icon",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет иконки вида файла и подписи под ней."
+  },
+  {
+    "owner": "GrFilePreview",
+    "name": "--gr-file-preview-radius",
+    "kind": "hook",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление плитки. Отдельный хук, а не ступень общей шкалы: плитка в ленте документов и плитка в строке списка скругляются по-разному."
+  },
+  {
     "owner": "GrIcon",
     "name": "--gr-icon-size",
     "kind": "css",

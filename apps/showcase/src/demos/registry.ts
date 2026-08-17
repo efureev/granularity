@@ -186,6 +186,8 @@ export const demoPathByPreviewKey = {
   'gr-file-upload-retry':                 'components/gr-file-upload/GrFileUploadRetryDemo.vue',
   'gr-file-upload-sizes':                 'components/gr-file-upload/GrFileUploadSizesDemo.vue',
   'gr-file-upload-validation':            'components/gr-file-upload/GrFileUploadValidationDemo.vue',
+  'gr-file-preview-kinds':                'components/gr-file-preview/GrFilePreviewKindsDemo.vue',
+  'gr-file-preview-viewer':               'components/gr-file-preview/GrFilePreviewViewerDemo.vue',
   'gr-form-custom-control':               'components/gr-form/GrFormCustomControlDemo.vue',
   'gr-form-editing':                      'components/gr-form/GrFormEditingDemo.vue',
   'gr-form-field-basic-label':            'components/gr-form-field/GrFormFieldBasicDemo.vue',

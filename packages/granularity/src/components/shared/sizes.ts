@@ -33,5 +33,9 @@ export const GR_CONTROL_STATES = ['default', 'success', 'warning', 'danger'] as 
 
 export type GrControlState = typeof GR_CONTROL_STATES[number]
 
-/** Размер контрола с escape-hatch в пиксели: только `GrAvatar` и `GrIcon`. */
+/**
+ * Размер с escape-hatch в пиксели. Берут его трое: `GrAvatar` и `GrIcon`
+ * (исторический произвольный диаметр) и `GrFilePreview` (ширина плитки: лента
+ * вложений в четыре ступени не укладывается).
+ */
 export type GrSizeWithPx = GrComponentSize | number

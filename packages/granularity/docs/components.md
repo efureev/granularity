@@ -129,6 +129,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrDropdownMenu`](./components/GrDropdownMenu.md)
 - [`GrEmptyState`](./components/GrEmptyState.md)
 - [`GrFileUpload`](./components/GrFileUpload.md)
+- [`GrFilePreview`](./components/GrFilePreview.md)
 - [`GrForm`](./components/GrForm.md)
 - [`GrFormField`](./components/GrFormField.md)
 - [`GrFormFile`](./components/GrFormFile.md)

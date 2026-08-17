@@ -7,6 +7,7 @@ import {
   grSliderExamples,
   grSortableListExamples,
   grSplitterExamples,
+  grFilePreviewExamples,
   grFileUploadExamples,
   grModalExamples,
   grDialogExamples,
@@ -263,6 +264,21 @@ const grStatisticOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grFilePreviewOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Лента вложений, в которой вперемешку чеки, договоры и выгрузки. Картинка показывается картинкой, всё остальное — иконкой своего вида: PDF, документ, таблица, архив. Одним правилом такой набор не покажешь, а `<img>` на PDF рисует битую иконку.',
+    'Тип берётся из `mime`, а не из расширения: расширение врёт. Пустой тип, незнакомый тип и сорвавшаяся загрузка ведут в одну и ту же аккуратную заглушку — состояние «превью нет» здесь штатное, а не сбой.',
+  ],
+  features: [
+    'Шесть видов файла по MIME, своя иконка на каждый.',
+    'Сорвавшаяся загрузка деградирует в заглушку со своим значком.',
+    '`alt` из имени файла — и пустой `alt`, когда имени нет: выдумка хуже пустоты.',
+    'Плитка становится контролом только по `clickable` или `href`.',
+    'Ленивая загрузка и соотношение сторон, держащее место до картинки.',
+    'Фон, цвет иконки и скругление — точки кастомизации `--gr-file-preview-*`.',
+  ],
+}
+
 const grCodeBlockOverview: ShowcaseComponentOverviewDoc = {
   paragraphs: [
     'Ответ сервиса, тело запроса, payload события — всё, что приходит «как есть» и что потом отправляют в тикет. Моноширинный блок с подсветкой JSON и кнопкой копирования вместо `<pre>`, скопированного по страницам с разными классами.',
@@ -374,6 +390,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrStatistic: createComponentDocMeta(grStatisticExamples, grStatisticOverview),
   GrCommandPalette: createComponentDocMeta(grCommandPaletteExamples, grCommandPaletteOverview),
   GrSelect: createComponentDocMeta(grSelectExamples),
+  GrFilePreview: createComponentDocMeta(grFilePreviewExamples, grFilePreviewOverview),
   GrFileUpload: createComponentDocMeta(grFileUploadExamples),
   GrModal: createComponentDocMeta(grModalExamples),
   GrDialog: createComponentDocMeta(grDialogExamples),

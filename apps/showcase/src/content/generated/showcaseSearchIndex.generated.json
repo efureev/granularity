@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 70 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 71 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -735,6 +735,17 @@
     "context": "feedback / component",
     "searchableTitle": "gremptystate",
     "searchableContent": "gremptystate gremptystate explains an empty state and suggests the user s next step. feedback component /components/gr-empty-state packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/gremptystate generated public-api components components gr-empty-state gr empty state"
+  },
+  {
+    "id": "entity:component:GrFilePreview",
+    "title": "GrFilePreview",
+    "description": "Shows a stored file as a tile: the image itself, or an icon for its type.",
+    "href": "/components/gr-file-preview",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grfilepreview",
+    "searchableContent": "grfilepreview grfilepreview shows a stored file as a tile: the image itself, or an icon for its type. data component /components/gr-file-preview packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grfilepreview generated public-api new components components gr-file-preview gr file preview"
   },
   {
     "id": "entity:component:GrFileUpload",
@@ -2616,6 +2627,50 @@
     "context": "GrEmptyState",
     "searchableTitle": "gremptystate integration notes",
     "searchableContent": "gremptystate explains an empty state and suggests the user s next step. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrFilePreview:section:overview",
+    "title": "GrFilePreview / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-file-preview#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrFilePreview",
+    "searchableTitle": "grfilepreview component overview",
+    "searchableContent": "grfilepreview shows a stored file as a tile: the image itself, or an icon for its type. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrFilePreview:section:live-examples",
+    "title": "GrFilePreview / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-file-preview#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrFilePreview",
+    "searchableTitle": "grfilepreview live examples",
+    "searchableContent": "grfilepreview shows a stored file as a tile: the image itself, or an icon for its type. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrFilePreview:section:api",
+    "title": "GrFilePreview / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-file-preview#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrFilePreview",
+    "searchableTitle": "grfilepreview generated api",
+    "searchableContent": "grfilepreview shows a stored file as a tile: the image itself, or an icon for its type. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrFilePreview:section:integration-notes",
+    "title": "GrFilePreview / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-file-preview#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrFilePreview",
+    "searchableTitle": "grfilepreview integration notes",
+    "searchableContent": "grfilepreview shows a stored file as a tile: the image itself, or an icon for its type. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrFileUpload:section:overview",

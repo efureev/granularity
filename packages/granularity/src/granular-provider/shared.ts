@@ -42,6 +42,7 @@ import { grDrawerConfig } from '../components/GrDrawer/config'
 import { grDropdownConfig } from '../components/GrDropdown/config'
 import { grDropdownMenuConfig } from '../components/GrDropdownMenu/config'
 import { grEmptyStateConfig } from '../components/GrEmptyState/config'
+import { grFilePreviewConfig } from '../components/GrFilePreview/config'
 import { grFileUploadConfig } from '../components/GrFileUpload/config'
 import { grFormConfig } from '../components/GrForm/config'
 import { grFormFieldConfig } from '../components/GrFormField/config'
@@ -145,6 +146,7 @@ export const granularityComponentConfigs = {
   GrDropdown: grDropdownConfig,
   GrDropdownMenu: grDropdownMenuConfig,
   GrEmptyState: grEmptyStateConfig,
+  GrFilePreview: grFilePreviewConfig,
   GrFileUpload: grFileUploadConfig,
   GrForm: grFormConfig,
   GrFormField: grFormFieldConfig,

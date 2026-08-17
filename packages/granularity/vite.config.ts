@@ -156,6 +156,9 @@ export default defineConfig({
         'components/GrEmptyState/index': fileURLToPath(
           new URL('./src/components/GrEmptyState/index.ts', import.meta.url),
         ),
+        'components/GrFilePreview/index': fileURLToPath(
+          new URL('./src/components/GrFilePreview/index.ts', import.meta.url),
+        ),
         'components/GrFileUpload/index': fileURLToPath(
           new URL('./src/components/GrFileUpload/index.ts', import.meta.url),
         ),

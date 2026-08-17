@@ -3879,6 +3879,114 @@
       }
     ]
   },
+  "GrFilePreview": {
+    "name": "GrFilePreview",
+    "sourcePath": "packages/granularity/src/components/GrFilePreview/GrFilePreview.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя интерактивной плитки. Не задано — имя приходит из содержимого: `alt` картинки или подписи заглушки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loading",
+            "description": "",
+            "type": "\"lazy\" | \"eager\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя файла: доступное имя картинки и подпись заглушки.",
+            "type": "string | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "src",
+            "description": "Адрес превью. Пусто — сразу заглушка по типу.",
+            "type": "string | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "as",
+            "description": "Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`.",
+            "type": "string | Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "href",
+            "description": "Ссылка на оригинал — для не-картинок и для перехода мимо просмотрщика.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clickable",
+            "description": "Плитка кликабельна и эмитит `click` — обычно чтобы открыть просмотрщик.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "mime",
+            "description": "MIME-тип. Он решает, картинка это или файл.",
+            "type": "string | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "tileSize",
+            "description": "Ступень канонической шкалы либо произвольная ширина в пикселях. Число — escape-hatch, как диаметр у GrAvatar: плитка 96px в ленте вложений в четыре ступени не укладывается.",
+            "type": "GrSizeWithPx | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ratio",
+            "description": "",
+            "type": "GrFilePreviewRatio | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "click",
+            "description": "",
+            "type": "[event: MouseEvent]",
+            "signature": "(event: \"click\", event: MouseEvent): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrFileUpload": {
     "name": "GrFileUpload",
     "sourcePath": "packages/granularity/src/components/GrFileUpload/GrFileUpload.vue",
@@ -9051,6 +9159,13 @@
             "default": "false"
           },
           {
+            "name": "lazy",
+            "description": "Эмитить `update:modelValue` только по завершении жеста: во время перетаскивания значение ведёт сам слайдер. Клавиатура коммитит сразу — нажатие клавиши дискретно, придерживать его нечего.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "step",
             "description": "",
             "type": "number | undefined",
@@ -9084,13 +9199,6 @@
             "type": "((value: number) => string) | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "lazy",
-            "description": "Эмитить `update:modelValue` только по завершении жеста: во время перетаскивания значение ведёт сам слайдер. Клавиатура коммитит сразу — нажатие клавиши дискретно, придерживать его нечего.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "modelValue",
