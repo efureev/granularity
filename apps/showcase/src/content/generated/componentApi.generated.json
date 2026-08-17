@@ -3706,10 +3706,10 @@
           },
           {
             "name": "contentClass",
-            "description": "Дополнительные классы content-контейнера; по умолчанию `p-0`.",
+            "description": "Дополнительные классы content-контейнера.",
             "type": "string | undefined",
             "required": false,
-            "default": "\"p-0\""
+            "default": "\"\""
           },
           {
             "name": "teleportTo",

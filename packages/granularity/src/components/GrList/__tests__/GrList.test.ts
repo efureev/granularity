@@ -336,6 +336,27 @@ describe('GrList — поверхность и типографика', () => {
 
     expect(wrapper.get('[data-gr-list-empty]').classes()).toContain(sizeToken)
   })
+
+  /**
+   * Своего радиуса у строки нет и не нужно — строки идут вплотную. Но подсветка
+   * первой и последней заливает углы карточки, если список их не обрезает:
+   * поля у `GrCard` по умолчанию нет, и строка лежит вплотную к скруглению.
+   */
+  it('список обрезается по радиусу карточки', () => {
+    const wrapper = mount(GrList, { slots: { default: '<div>row</div>' } })
+
+    const list = wrapper.get('[data-gr-list]')
+    expect(list.classes()).toContain('overflow-hidden')
+    expect(list.classes()).toContain('rounded-[inherit]')
+  })
+
+  it('клип не теряется вместе с разделителями', () => {
+    const divided = mount(GrList, { props: { divided: true }, slots: { default: '<div>row</div>' } })
+
+    expect(divided.get('[data-gr-list]').classes()).toEqual(
+      expect.arrayContaining(['overflow-hidden', 'rounded-[inherit]', 'divide-y']),
+    )
+  })
 })
 
 describe('GrList — замеры не берутся со скелетонов', () => {

@@ -381,6 +381,42 @@ describe('GrDropdownMenu — проброс в GrDropdown', () => {
   })
 })
 
+describe('GrDropdownMenu — геометрия подсветки', () => {
+  // Фон пункта прямоугольный ровно настолько, насколько ему разрешили: без
+  // своего радиуса он заливает угловые сегменты, вырезанные радиусом панели.
+  it('пункт скруглён', () => {
+    const wrapper = mount(GrDropdownMenuItem, { slots: { default: 'Открыть' } })
+
+    expect(wrapper.classes()).toContain('rounded-[var(--gr-radius-md)]')
+  })
+
+  it('выключенный пункт скруглён тоже — его фон виден без наведения', () => {
+    const wrapper = mount(GrDropdownMenuItem, { props: { disabled: true }, slots: { default: 'Открыть' } })
+
+    expect(wrapper.classes()).toContain('rounded-[var(--gr-radius-md)]')
+    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
+  })
+
+  /**
+   * Меню не гасит поле панели своим классом: `p-1` и `p-0` попадают в один
+   * атрибут с равной специфичностью, и победителя выбирает порядок правил в
+   * сгенерированном CSS, а не разметка. Проверяем список классов, а не
+   * `getComputedStyle`: каскад в jsdom не разрешается, и такой тест зеленел бы
+   * на сломанном коде.
+   */
+  it('поле панели остаётся за панелью', () => {
+    const wrapper = mount(GrDropdownMenu, {
+      props: { items: [{ key: 'rename', label: 'Переименовать' }] as GrDropdownMenuEntry[] },
+      global: { stubs: { teleport: true } },
+    })
+
+    const content = wrapper.find('[data-gr-dropdown-content]')
+
+    expect(content.classes()).toContain('p-1')
+    expect(content.classes()).not.toContain('p-0')
+  })
+})
+
 describe('GrDropdownMenu — v-model:open (прокидка в GrDropdown)', () => {
   it('`:open="true"` показывает меню, открытие кликом переэмитит `update:open`', async () => {
     const opened = mount(GrDropdownMenu, {

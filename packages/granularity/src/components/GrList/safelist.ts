@@ -9,11 +9,13 @@ import {
   itemInteractiveClass,
   itemLayoutClass,
   itemTitleClass,
+  listSurfaceClass,
   loadingRowClass,
 } from './grListStyles'
 
 export const grListSafelist = [...new Set([
   ...Object.values(densityPadding).flatMap(splitClassTokens),
+  ...splitClassTokens(listSurfaceClass),
   ...splitClassTokens(itemLayoutClass),
   ...splitClassTokens(itemTitleClass),
   ...splitClassTokens(itemDescriptionClass),

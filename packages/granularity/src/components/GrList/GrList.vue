@@ -8,7 +8,7 @@ import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useVirtualList, type GrVirtualAlign } from '../../composables/useVirtualList'
 
-import { dividedClass, emptyClass, loadingRowClass } from './grListStyles'
+import { dividedClass, emptyClass, listSurfaceClass, loadingRowClass } from './grListStyles'
 
 export interface GrListProps<TItem = unknown> {
   /**
@@ -86,8 +86,11 @@ const isEmpty = computed(() => {
 const showItems = computed(() => !props.loading && !isEmpty.value)
 
 // Разделители нужны только между пунктами: в пустой и загрузочной ветках они
-// оставили бы висящую линию.
-const listClass = computed(() => (props.divided && showItems.value ? dividedClass : undefined))
+// оставили бы висящую линию. Клип по радиусу карточки — безусловный.
+const listClass = computed(() => [
+  listSurfaceClass,
+  props.divided && showItems.value ? dividedClass : '',
+].filter(Boolean).join(' '))
 
 const loadingRowCount = computed(() => Math.max(1, Math.trunc(props.loadingRows)))
 

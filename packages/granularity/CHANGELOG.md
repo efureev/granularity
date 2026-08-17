@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.21.1] 2026-08-17
+
+### Fixed
+
+- **A menu item's highlight spilled past the rounded corners of its panel.**
+  `GrDropdownMenu` painted `hover:bg-*` on a full-width item that had no radius of
+  its own, inside a `GrDropdown` panel that is rounded and does not clip — so the
+  first and last rows flooded the very corner segments the radius had cut away,
+  and a `disabled` row showed it without any hover at all. The item now carries a
+  radius one step below the panel's, the way `GrSelect` and `GrAutocomplete`
+  options already do. The menu also stopped trying to cancel the panel's padding
+  with a `p-0` of its own: both classes land in the same attribute with equal
+  specificity, so which one wins is decided by the order of the generated CSS
+  rules rather than by the markup — a silent coin flip that had been resolving
+  against the intent. Suppressing another component's spacing needs its own
+  channel, never a competing class.
+- **`GrList` rows flooded the corners of the card beneath them** for the same
+  reason: no padding on the card, no radius on the row, no clip anywhere. The list
+  container now clips to the card's radius, inheriting the value rather than
+  repeating it, so the two cannot drift apart.
+
+## [v0.21.0] 2026-08-17
+
 ### Added
 
 - **New `GrFilePreview` — a stored file as a tile.** An attachment feed mixes

@@ -22,7 +22,16 @@ export const colsClass: Record<GrDropdownMenuColumnsCount, string> = {
   4: 'grid-cols-4',
 }
 
-export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 flex items-center gap-2 text-[length:var(--gr-text-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+/**
+ * Радиус здесь не украшение: фон подсветки лежит на самом пункте, а панель
+ * `GrDropdown` скруглена на 16 px и содержимое не обрезает. Прямоугольник во всю
+ * ширину заливал бы угловые сегменты, вырезанные этим радиусом. Восемь
+ * пикселей — та же ступень, что у опций `GrSelect` и `GrAutocomplete`; внутренний
+ * угол панели после рамки и поля ≈ 11 px, так что подсветка до скругления не
+ * достаёт. Радиус в базовом классе, а не отдельной константой: hover, disabled и
+ * кольцо фокуса висят на одном элементе.
+ */
+export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 rounded-[var(--gr-radius-md)] flex items-center gap-2 text-[length:var(--gr-text-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Насыщенный тон как цвет текста запрещён — для текста есть `-text`-роль.
 export const itemVariantClass: Record<GrDropdownMenuItemVariant, string> = {

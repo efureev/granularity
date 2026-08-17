@@ -38,7 +38,7 @@ export interface GrDropdownMenuProps {
   teleportTo?: string | HTMLElement
   /** Закрывать по клику внутри content. */
   closeOnContentClick?: boolean
-  /** Дополнительные классы content-контейнера; по умолчанию `p-0`. */
+  /** Дополнительные классы content-контейнера. */
   contentClass?: string
   /**
    * Декларативное меню: пункты, группы и разделители массивом. Слот по
@@ -79,9 +79,11 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
   disabled: false,
   teleportTo: undefined,
   closeOnContentClick: true,
-  // В `GrDropdown` есть `p-1`, поэтому здесь по умолчанию обнуляем padding,
-  // чтобы пункты меню могли растягиваться до границ.
-  contentClass: 'p-0',
+  // Поле панели принадлежит панели. Гасить его отсюда своим `p-0` нельзя: оба
+  // класса попадают в один атрибут с равной специфичностью, и победителя
+  // выбирает порядок правил в сгенерированном CSS, а не разметка. Пункт вписан
+  // в это поле собственным радиусом — см. `itemBaseClass`.
+  contentClass: '',
   items: undefined,
   dividers: false,
   borderTop: false,
