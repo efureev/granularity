@@ -7,6 +7,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-18
+
+### Fixed
+
+- **`compact: 'none'` was ignored on every breakpoint the app had not laid out
+  by hand.** A layout is derived from a neighbouring breakpoint whenever one is
+  missing, and that derivation hardcoded vertical compaction — so an app that
+  had deliberately switched compaction off got it back the moment the viewport
+  reached a breakpoint without its own layout, silently and only there. The mode
+  now travels with the derivation (`deriveLayout` takes it as an optional fourth
+  argument, `layoutFor` through `options.compact`), defaulting to `'vertical'`
+  so existing callers are unaffected.
+
 ### Added
 
 - Per-component documentation under `docs/components/` — one page per component, plus a

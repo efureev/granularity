@@ -9,6 +9,7 @@ import type {
   GrDashboardBreakpoint,
   GrDashboardBreakpoints,
   GrDashboardCols,
+  GrDashboardCompaction,
   GrDashboardLayout,
   GrDashboardResponsiveLayout,
 } from './layoutModel'
@@ -47,7 +48,17 @@ export function colsFor(breakpoint: GrDashboardBreakpoint, cols: GrDashboardCols
  * расположение виджетов — единственное, что о раскладке известно наверняка, и
  * его стоит сохранить. Множество идентификаторов при этом не меняется.
  */
-export function deriveLayout(source: GrDashboardLayout, fromCols: number, toCols: number): GrDashboardLayout {
+export function deriveLayout(
+  source: GrDashboardLayout,
+  fromCols: number,
+  toCols: number,
+  /**
+   * Режим уплотнения. Принадлежит потребителю: приложение, отключившее
+   * уплотнение, не должно получать его на брейкпоинтах, раскладку для которых
+   * не объявляло, — там оно вывода даже не заметит.
+   */
+  compaction: GrDashboardCompaction = 'vertical',
+): GrDashboardLayout {
   if (fromCols === toCols) return sortLayout(source)
 
   const ratio = toCols / fromCols
@@ -59,12 +70,13 @@ export function deriveLayout(source: GrDashboardLayout, fromCols: number, toCols
     return clampItem({ ...item, x, y: item.y, w }, toCols)
   })
 
-  return compact(scaled, 'vertical')
+  return compact(scaled, compaction)
 }
 
 export interface LayoutForOptions {
   breakpoints: GrDashboardBreakpoints
   cols: GrDashboardCols | number
+  compact?: GrDashboardCompaction
 }
 
 /**
@@ -96,6 +108,7 @@ export function layoutFor(
     responsive[donor] ?? [],
     colsFor(donor, options.cols),
     colsFor(breakpoint, options.cols),
+    options.compact,
   )
 }
 

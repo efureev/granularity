@@ -66,6 +66,27 @@ describe('deriveLayout', () => {
   it('на той же сетке ничего не меняет', () => {
     expect(deriveLayout(source, 12, 12)).toEqual(source)
   })
+
+  // Режим уплотнения принадлежит потребителю. Приложение, отключившее его,
+  // получало вертикальное уплотнение на каждом брейкпоинте без своей раскладки.
+  it('compact=none не уплотняет выведенную раскладку', () => {
+    const gapped: GrDashboardLayout = [
+      { id: 'a', x: 0, y: 0, w: 6, h: 2 },
+      { id: 'b', x: 0, y: 5, w: 6, h: 2 },
+    ]
+
+    expect(deriveLayout(gapped, 12, 12, 'none').find(item => item.id === 'b')?.y).toBe(5)
+    expect(deriveLayout(gapped, 12, 6, 'none').find(item => item.id === 'b')?.y).toBe(5)
+  })
+
+  it('без указания режима уплотняет по вертикали, как и раньше', () => {
+    const gapped: GrDashboardLayout = [
+      { id: 'a', x: 0, y: 0, w: 6, h: 2 },
+      { id: 'b', x: 0, y: 5, w: 6, h: 2 },
+    ]
+
+    expect(deriveLayout(gapped, 12, 6).find(item => item.id === 'b')?.y).toBe(2)
+  })
 })
 
 describe('layoutFor', () => {
@@ -78,6 +99,24 @@ describe('layoutFor', () => {
 
   it('отдаёт объявленную раскладку как есть', () => {
     expect(layoutFor(responsive, 'lg', options)).toEqual(responsive.lg)
+  })
+
+  // Раскладка выводится молча, и режим уплотнения обязан доехать до вывода:
+  // иначе `compact="none"` действует только на том брейкпоинте, который
+  // приложение объявило руками.
+  it('доносит режим уплотнения до выведенной раскладки', () => {
+    const gapped: GrDashboardResponsiveLayout = {
+      lg: [
+        { id: 'a', x: 0, y: 0, w: 6, h: 2 },
+        { id: 'b', x: 0, y: 5, w: 6, h: 2 },
+      ],
+    }
+
+    const kept = layoutFor(gapped, 'sm', { ...options, compact: 'none' })
+    const packed = layoutFor(gapped, 'sm', options)
+
+    expect(kept.find(item => item.id === 'b')?.y).toBe(5)
+    expect(packed.find(item => item.id === 'b')?.y).toBe(2)
   })
 
   it('недостающую выводит из ближайшей более широкой', () => {

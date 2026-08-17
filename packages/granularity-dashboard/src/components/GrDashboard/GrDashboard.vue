@@ -149,6 +149,7 @@ const moveOptions = computed(() => ({
 const declaredLayout = computed<GrDashboardLayout>(() => layoutFor(props.layout, breakpoint.value, {
   breakpoints: props.breakpoints,
   cols: props.cols,
+  compact: compaction.value,
 }))
 
 /**
