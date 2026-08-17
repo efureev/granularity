@@ -16,4 +16,12 @@ export const grDeltaExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-delta-polarity',
   },
+  {
+    id: 'delta-type-scale',
+    title: 'The value takes the type size of its line',
+    description: 'Одна и та же разметка в заголовке, в подзаголовке и в подписи: `size` не задан нигде, кегль приходит от строки. Стрелка и суффикс растут вместе с числом.',
+    status: 'ready',
+    previewKey: 'gr-delta-type-scale',
+    note: 'Явная ступень (`size="sm"`) нужна в обратном случае — когда величина стоит не в предложении, а в ряду с контролами и обязана совпасть с ними, а не с текстом вокруг.',
+  },
 ]

@@ -21,6 +21,16 @@ export const deltaRootClass = 'inline-flex items-baseline tabular-nums'
 /** Суффикс — единица измерения, и от числа он отбивается: «−15 %», «120 мс». */
 export const deltaSuffixClass = 'ml-1'
 
+/**
+ * Стрелка выравнивается по строке, а не по базовой линии: у svg её нет.
+ *
+ * Размер — в `em`, потому что на ступени `md` кегля у величины нет вовсе:
+ * пиксельная лестница оставила бы стрелку 14-пиксельной внутри заголовка.
+ * Чуть меньше единицы: стрелка декоративна, и равный вес спорил бы с самим
+ * числом.
+ */
+export const deltaArrowClass = 'mr-0.5 self-center shrink-0 h-[0.875em] w-[0.875em]'
+
 export const deltaToneClass: Record<GrDeltaTone, string> = {
   success: 'text-[var(--gr-success-text)]',
   danger: 'text-[var(--gr-danger-text)]',
@@ -30,23 +40,16 @@ export const deltaToneClass: Record<GrDeltaTone, string> = {
 /** Прочерк вместо величины: тона у него нет, но и цвет основного текста ему не нужен. */
 export const deltaEmptyClass = 'text-[var(--gr-muted-fg)]'
 
-export const deltaSizeClass: Record<GrComponentSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-2xs)]',
-  sm: 'text-[length:var(--gr-control-text-xs)]',
-  md: 'text-[length:var(--gr-control-text-sm)]',
-  lg: 'text-[length:var(--gr-control-text-md)]',
-}
-
 /**
- * Стрелка меньше кегля величины: она декоративна, и равный вес спорил бы с
- * самим числом.
+ * `md` пуст намеренно: на ступени по умолчанию величина набирается кеглем той
+ * строки, в которой стоит. Фиксированные 13 px разъезжаются и вверх, и вниз —
+ * внутри заголовка величина оставалась бы мелкой, в подписи под графиком
+ * крупной. Ступени по краям остаются явными: они нужны, когда величина стоит
+ * не в предложении, а в ряду с контролами.
  */
-export const deltaArrowSizeClass: Record<GrComponentSize, string> = {
-  xs: 'h-2.5 w-2.5',
-  sm: 'h-3 w-3',
-  md: 'h-3.5 w-3.5',
-  lg: 'h-4 w-4',
+export const deltaSizeClass: Record<GrComponentSize, string> = {
+  xs: 'text-[length:var(--gr-control-text-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)]',
+  md: '',
+  lg: 'text-[length:var(--gr-control-text-lg)]',
 }
-
-/** Стрелка выравнивается по строке, а не по базовой линии: у svg её нет. */
-export const deltaArrowClass = 'mr-0.5 self-center shrink-0'

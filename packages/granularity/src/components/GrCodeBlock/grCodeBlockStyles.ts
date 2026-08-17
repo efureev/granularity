@@ -20,10 +20,26 @@ export const codeBlockHookClass = 'gr-code-block'
 /** Включает колонку номеров. Тоже зацепка, не утилита. */
 export const codeBlockNumberedClass = 'gr-code-block--numbered'
 
-// Позиционирование нужно кнопке копирования: она лежит поверх блока, а не в шапке.
-export const codeBlockRootClass = 'relative'
+/**
+ * Поверхность держит корень, а не `<pre>`: кнопка копирования стоит рядом со
+ * скроллером, и жёлоб под неё обязан быть частью блока, а не полем страницы.
+ */
+export const codeBlockRootClass = 'relative rounded-[var(--gr-radius-md)] bg-[var(--gr-code-block-bg,var(--gr-muted))] text-[var(--gr-code-block-fg,var(--gr-fg))]'
 
-export const codeBlockSurfaceClass = 'm-0 rounded-[var(--gr-radius-md)] bg-[var(--gr-code-block-bg,var(--gr-muted))] text-[var(--gr-code-block-fg,var(--gr-fg))]'
+/**
+ * Полоса под кнопку: 28 px самой кнопки плюс отбивка `right-1`.
+ *
+ * Кнопка не может висеть поверх `<pre>`: полосу прокрутки браузер рисует у
+ * правого края скроллера, в тех же 8–15 px, и накрытую кнопкой её не ухватить
+ * мышью. Отступами это не лечится — их пришлось бы взять больше ширины самой
+ * кнопки, и «угол» перестал бы быть углом. Витринный `doc/CodeBlock.vue` решает
+ * то же самое шапкой; у пакетного блока шапки нет, поэтому место отдаётся
+ * жёлобом.
+ */
+export const codeBlockGutterClass = 'pr-9'
+
+/** Браузерный отступ `<pre>`: фон и радиус живут на корне, полю здесь не место. */
+export const codeBlockSurfaceClass = 'm-0'
 
 /** Скроллер обязан показывать фокус: он стоит в таб-порядке. */
 export const codeBlockScrollClass = 'overflow-auto focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
@@ -31,7 +47,7 @@ export const codeBlockScrollClass = 'overflow-auto focus:outline-none focus-visi
 export const codeBlockWrapClass = 'whitespace-pre-wrap break-words'
 export const codeBlockNowrapClass = 'whitespace-pre'
 
-/** Кнопка копирования: правый верхний угол, поверх содержимого. */
+/** Кнопка копирования: правый верхний угол, внутри жёлоба. */
 export const codeBlockCopyClass = 'absolute right-1 top-1 z-[1]'
 
 export const codeBlockPaddings: Record<GrComponentSize, string> = {

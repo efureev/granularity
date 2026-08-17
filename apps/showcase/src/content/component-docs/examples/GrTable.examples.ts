@@ -23,6 +23,14 @@ export const grTableExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-table-empty-state',
   },
   {
+    id: 'table-footer',
+    title: 'Footer built by hand: totals and a note',
+    description: 'Слот `#footer` рендерится в `<tfoot>`, поэтому его содержимое — строки таблицы, а не свободный блок. Итог, отбивка и `colspan` примечания пишутся руками: `GrTable` ячейки не оформляет принципиально.',
+    status: 'ready',
+    previewKey: 'gr-table-footer',
+    note: 'Нужен итог, который сам встаёт по колоночной сетке тела и едет за `size`, шириной и закреплением, — это `summaryRow` у `GrDataTable`. Здесь же за свободу платят повтором паддингов на каждой ячейке.',
+  },
+  {
     id: 'table-scroll-region',
     title: 'Прокручиваемая область с клавиатуры',
     description: '`maxHeight` со `stickyHeader` превращает таблицу в прокручиваемую область, а `regionLabel` даёт ей `role="region"` и имя. Без имени такая область — безымянная ловушка для скринридера; с ним она достижима `Tab` и листается стрелками.',

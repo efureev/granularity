@@ -64,7 +64,7 @@ describe('component docs metadata', () => {
     expect(dropdownDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown'))).toBe(true)
 
-    expect(dataTableDoc.examples).toHaveLength(11)
+    expect(dataTableDoc.examples).toHaveLength(12)
     expect(dataTableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dataTableDoc.examples.every(example => example.previewKey?.startsWith('gr-data-table'))).toBe(true)
   })
@@ -351,7 +351,7 @@ describe('component docs metadata', () => {
     expect(listDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(listDoc.examples.every(example => example.previewKey?.startsWith('gr-list'))).toBe(true)
 
-    expect(tableDoc.examples).toHaveLength(5)
+    expect(tableDoc.examples).toHaveLength(6)
     expect(tableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tableDoc.examples.every(example => example.previewKey?.startsWith('gr-table'))).toBe(true)
   })

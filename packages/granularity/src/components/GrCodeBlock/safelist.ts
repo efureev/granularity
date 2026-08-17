@@ -2,6 +2,7 @@ import { splitClassTokens } from '../shared/classTokens'
 
 import {
   codeBlockCopyClass,
+  codeBlockGutterClass,
   codeBlockNowrapClass,
   codeBlockPaddings,
   codeBlockRootClass,
@@ -25,6 +26,7 @@ export const grCodeBlockSafelist = [...new Set([
   ...splitClassTokens(codeBlockWrapClass),
   ...splitClassTokens(codeBlockNowrapClass),
   ...splitClassTokens(codeBlockCopyClass),
+  ...splitClassTokens(codeBlockGutterClass),
   ...Object.values(codeBlockPaddings).flatMap(splitClassTokens),
   ...Object.values(codeBlockTextSizes).flatMap(splitClassTokens),
   ...Object.values(codeTokenClass).flatMap(splitClassTokens),

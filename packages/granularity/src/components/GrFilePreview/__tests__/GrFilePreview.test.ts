@@ -105,6 +105,52 @@ describe('GrFilePreview — что показывается', () => {
   })
 })
 
+describe('GrFilePreview — пока картинка едет', () => {
+  it('место держит скелет, а картинка ждёт невидимой', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    expect(wrapper.find('[data-gr-skeleton]').exists()).toBe(true)
+    // Картинка обязана быть в дереве: без неё браузер не начнёт качать, и
+    // `load` не придёт никогда.
+    expect(wrapper.get('[data-gr-file-preview-image]').classes()).toContain('invisible')
+  })
+
+  it('после load скелет уходит, картинка возвращается в поток', async () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    await wrapper.get('[data-gr-file-preview-image]').trigger('load')
+
+    expect(wrapper.find('[data-gr-skeleton]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-file-preview-image]').classes()).not.toContain('invisible')
+  })
+
+  it('сорвавшаяся загрузка скелет снимает', async () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+
+    await wrapper.get('[data-gr-file-preview-image]').trigger('error')
+
+    expect(wrapper.find('[data-gr-skeleton]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-file-preview-fallback]').exists()).toBe(true)
+  })
+
+  it('у не-картинки скелета нет вовсе', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'application/pdf' } })
+
+    expect(wrapper.find('[data-gr-skeleton]').exists()).toBe(false)
+  })
+
+  it('новая ссылка возвращает состояние в загрузку', async () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png' } })
+    await wrapper.get('[data-gr-file-preview-image]').trigger('load')
+    expect(wrapper.find('[data-gr-skeleton]').exists()).toBe(false)
+
+    await wrapper.setProps({ src: 'https://cdn.invalid/other.png' })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-skeleton]').exists()).toBe(true)
+  })
+})
+
 describe('GrFilePreview — доступное имя', () => {
   it('name становится alt', () => {
     const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', name: 'Чек №42.png' } })

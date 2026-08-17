@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   control only when asked (`clickable`, `href`, `as`); otherwise it is a `<div>`
   and takes no tab stop. It does not open the viewer itself — it emits `click`,
   because a grid of tiles and a fullscreen viewer are different page states.
+  While an image is in flight the tile holds its place with a skeleton: a feed of
+  a dozen attachments arrives out of order, and an empty cell reads as "this file
+  has no preview" when the request is merely still on the wire. The image stays in
+  the DOM throughout and simply waits invisible — remove it and the browser never
+  starts the download, so the loading state would never end.
 - **New `GrCodeBlock` — raw JSON or text, shown as it is.** The consumer case is a
   service response pasted into a ticket, and until now that meant `<pre>` copied
   across pages with three different sets of classes, none of them keyboard-reachable
@@ -38,7 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   highlighter dependency for two admin pages would not be proportionate. The block
   joins the tab order when it is a scroller **by props** (`maxHeight` set, or `wrap`
   off), which is how `GrTable` and `GrList` already decide — measuring overflow
-  would make the tab stop flicker on every data change.
+  would make the tab stop flicker on every data change. The copy button sits
+  beside the scroller rather than on top of it: a browser paints the scrollbar at
+  the scroller's right edge, and a button covering it takes away the very pixels
+  you grab it by. The block therefore reserves a gutter on the right, and drops it
+  when there is no button to put there.
 - **New `GrDelta` — a signed value with sign and tone inside a line of text.**
   «Margin −$12.50» is a fragment of a sentence, not a tile: `GrStatistic` owns the
   block-level metric, this one owns the inline one. Zero is neutral under every
@@ -49,7 +58,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   rather than string concatenation, which is what used to turn `1234.5` into the
   un-groupable string `'+1234.5'`. Tone selection lives in a pure module tested
   without mounting — that `switch` is exactly what consumers were copying by hand,
-  and the copies had already drifted into painting zero green.
+  and the copies had already drifted into painting zero green. The default step
+  sets no font size at all, so the value is typeset in the size of the line it
+  stands in — large in a heading, small in a caption under a chart — and the arrow,
+  sized in `em`, grows with it. The outer steps stay explicit for the opposite
+  case: a value standing in a row of controls has to match them, not the prose.
 - **New `GrDescriptionList` — label-value pairs as a real `<dl>`.** Renders
   `dl > div > dt + dd`, which is valid HTML5 and gives the layout something to
   hang on; hand-written markup kept producing a `<dl>` full of bare `<div>`s that

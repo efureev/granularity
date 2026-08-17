@@ -2,7 +2,6 @@ import { splitClassTokens } from '../shared/classTokens'
 
 import {
   deltaArrowClass,
-  deltaArrowSizeClass,
   deltaEmptyClass,
   deltaRootClass,
   deltaSizeClass,
@@ -19,5 +18,4 @@ export const grDeltaSafelist = [...new Set([
   ...splitClassTokens(deltaSuffixClass),
   ...Object.values(deltaToneClass).flatMap(splitClassTokens),
   ...Object.values(deltaSizeClass).flatMap(splitClassTokens),
-  ...Object.values(deltaArrowSizeClass).flatMap(splitClassTokens),
 ])]

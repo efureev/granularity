@@ -114,6 +114,31 @@ describe('GrDelta', () => {
     expect(wrapper.find('[data-gr-delta-arrow]').exists()).toBe(false)
   })
 
+  // Величина стоит в предложении: 13 px внутри заголовка рвут строку.
+  it('ступень по умолчанию кегля не задаёт', () => {
+    const wrapper = mount(GrDelta, { props: { value: 5 } })
+
+    expect(wrapper.classes().some(token => token.startsWith('text-[length:'))).toBe(false)
+  })
+
+  it('явная ступень берёт кегль контрольной шкалы', () => {
+    const large = mount(GrDelta, { props: { value: 5, size: 'lg' } })
+    expect(large.classes()).toContain('text-[length:var(--gr-control-text-lg)]')
+
+    const small = mount(GrDelta, { props: { value: 5, size: 'xs' } })
+    expect(small.classes()).toContain('text-[length:var(--gr-control-text-xs)]')
+  })
+
+  // Стрелка обязана расти вместе с числом и там, где кегль унаследован, —
+  // пиксельная мапа этого не умеет по определению.
+  it('стрелка задана в em и от ступени не зависит', () => {
+    for (const size of [undefined, 'lg'] as const) {
+      const wrapper = mount(GrDelta, { props: { value: 5, showArrow: true, size } })
+
+      expect(wrapper.get('[data-gr-delta-arrow]').classes()).toContain('h-[0.875em]')
+    }
+  })
+
   it('polarity и emptyText читаются из GrConfigProvider', () => {
     const Harness = defineComponent({
       components: { GrConfigProvider, GrDelta },

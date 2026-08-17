@@ -4,5 +4,6 @@ import { grFilePreviewSafelist } from './safelist'
 
 export const grFilePreviewConfig = defineGranularComponent(import.meta.url, {
   name: 'GrFilePreview',
+  dependencies: ['GrSkeleton'],
   safelist: grFilePreviewSafelist,
 })

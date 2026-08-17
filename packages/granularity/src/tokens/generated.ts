@@ -2271,8 +2271,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrCodeBlock",
     "name": "--gr-code-block-number",
     "kind": "hook",
-    "default": "var(--gr-info-text)",
-    "description": "Цвет числа."
+    "default": "var(--gr-azure-text)",
+    "description": "Цвет числа. Взят от `azure`, а не от `info`: `info` — синий в двух шагах от индиго `primary`, и пара «ключ ↔ число» сливалась бы в `{\"count\": 42}`."
   },
   {
     "owner": "GrCodeBlock",
@@ -2461,7 +2461,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-file-preview-bg",
     "kind": "hook",
     "default": "var(--gr-muted)",
-    "description": "Фон плитки. Виден у заглушки целиком, а у картинки — пока она едет и по краям при несовпадении пропорций."
+    "description": "Фон плитки. Виден у заглушки целиком, а у картинки — по краям при несовпадении пропорций; на время загрузки место занимает скелет."
   },
   {
     "owner": "GrFilePreview",

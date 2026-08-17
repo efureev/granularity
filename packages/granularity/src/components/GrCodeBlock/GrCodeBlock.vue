@@ -13,6 +13,7 @@ import { serializeCode } from './serializeCode'
 import { tokenizeJson, type GrCodeToken } from './tokenizeJson'
 import {
   codeBlockCopyClass,
+  codeBlockGutterClass,
   codeBlockHookClass,
   codeBlockNowrapClass,
   codeBlockNumberedClass as numberedClass,
@@ -173,7 +174,7 @@ const copyLabel = computed(() => (
 </script>
 
 <template>
-  <div data-gr-code-block :class="codeBlockRootClass">
+  <div data-gr-code-block :class="[codeBlockRootClass, showCopy ? codeBlockGutterClass : '']">
     <GrButton
       v-if="showCopy"
       data-gr-code-block-copy

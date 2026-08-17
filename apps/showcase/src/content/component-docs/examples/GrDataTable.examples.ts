@@ -24,6 +24,14 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Переключите размер: паддинги итога едут вместе с телом. Собранная руками в `#footer` строка этого не умеет — `GrTable` ячейки `<tfoot>` не оформляет, и однажды прописанный `px-3 py-2` разъезжается с телом на первой же смене `size`.',
   },
   {
+    id: 'data-table-footer',
+    title: 'The whole footer: totals, a comparison row and a note',
+    description: 'Типизированный итог, обе его ячейки со своим оформлением и `#footer` под ним — вторая итоговая строка и примечание на всю ширину. `totalColumns` из скоупа считает `colspan` вместе с колонкой выбора, поэтому подбирать его на глаз не приходится.',
+    status: 'ready',
+    previewKey: 'gr-data-table-footer',
+    note: 'Ручная строка платит за свободу: пустую ведущую ячейку под чекбокс, паддинги и выравнивание она переписывает сама, и они привязаны к `size`. Главный итог поэтому идёт пропом.',
+  },
+  {
     id: 'data-table-custom-cells',
     title: 'Custom status and actions cells',
     description: 'Ключевой composition-scenario: стандартный data pipeline остаётся у `GrDataTable`, а конкретные ячейки переопределяются слотами.',

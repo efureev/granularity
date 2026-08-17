@@ -12,7 +12,6 @@ import IconTrendingUp from '~icons/lucide/trending-up'
 import { deltaDirection, deltaTone, type GrDeltaPolarity, type GrDeltaTone } from './deltaTone'
 import {
   deltaArrowClass,
-  deltaArrowSizeClass,
   deltaEmptyClass,
   deltaRootClass,
   deltaSizeClass,
@@ -111,7 +110,7 @@ const rootClass = computed(() => [
   deltaRootClass,
   deltaSizeClass[resolvedSize.value],
   isEmpty.value ? deltaEmptyClass : deltaToneClass[tone.value],
-].join(' '))
+].filter(Boolean).join(' '))
 </script>
 
 <template>
@@ -120,7 +119,7 @@ const rootClass = computed(() => [
       :is="arrowIcon"
       v-if="resolvedShowArrow && !isEmpty"
       data-gr-delta-arrow
-      :class="[deltaArrowClass, deltaArrowSizeClass[resolvedSize]]"
+      :class="deltaArrowClass"
       aria-hidden="true"
     />
 

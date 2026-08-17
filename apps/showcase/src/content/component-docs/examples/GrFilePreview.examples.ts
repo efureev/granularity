@@ -16,4 +16,12 @@ export const grFilePreviewExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-file-preview-viewer',
   },
+  {
+    id: 'file-preview-grid',
+    title: 'A dozen tiles, each holding its place while it loads',
+    description: 'Лента вложений к заявке: двенадцать плиток мелкой ступени. Пока картинка не доехала, место держит скелет — «ещё грузится» и «у файла нет превью» это разные сообщения, и пустой ячейкой их не различить.',
+    status: 'ready',
+    previewKey: 'gr-file-preview-grid',
+    note: 'Картинка при этом остаётся в разметке и просто ждёт невидимой: убери её на время загрузки — браузер не начнёт качать, и состояние «грузится» не кончится никогда.',
+  },
 ]

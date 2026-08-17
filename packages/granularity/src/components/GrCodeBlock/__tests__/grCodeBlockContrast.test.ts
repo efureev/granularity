@@ -9,7 +9,7 @@ import {
   themeVarsByName,
   type ThemeName,
 } from '../../../__tests__/cssContrast'
-import { codeBlockSurfaceClass, codeTokenClass } from '../grCodeBlockStyles'
+import { codeBlockRootClass, codeTokenClass } from '../grCodeBlockStyles'
 import type { GrCodeTokenKind } from '../tokenizeJson'
 
 /**
@@ -57,7 +57,7 @@ function resolve(expression: string, theme: ThemeName) {
   return resolveColorExpression(expression, themeVarsByName[theme], derivedThemeVars)
 }
 
-const backgroundExpression = getColorClassExpression(codeBlockSurfaceClass, 'bg-[')
+const backgroundExpression = getColorClassExpression(codeBlockRootClass, 'bg-[')
 
 describe('GrCodeBlock — палитра подсветки', () => {
   it('фон блока извлекается из класса поверхности', () => {

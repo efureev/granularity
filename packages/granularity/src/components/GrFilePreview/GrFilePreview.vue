@@ -2,6 +2,7 @@
 import { computed, markRaw, ref, watch, type Component } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
+import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
 import IconFile from '~icons/lucide/file'
 import IconFileArchive from '~icons/lucide/file-archive'
@@ -19,6 +20,7 @@ import {
   filePreviewInteractiveClass,
   filePreviewLabelClass,
   filePreviewMediaClass,
+  filePreviewMediaLoadingClass,
   filePreviewRatioClass,
   filePreviewRootClass,
   filePreviewTileWidths,
@@ -91,17 +93,24 @@ const resolvedLoading = useGrComponentProp('GrFilePreview', 'loading', () => pro
 const kind = computed<GrFileKind>(() => fileKindOf(props.mime))
 
 /**
- * Сорвавшаяся загрузка деградирует в ту же заглушку: превью может исчезнуть с
- * диска, и «сломанная картинка» здесь не информативнее иконки.
+ * Состояний три, а не два. Сорвавшаяся загрузка деградирует в заглушку: превью
+ * может исчезнуть с диска, и «сломанная картинка» здесь не информативнее
+ * иконки. Отдельное `loading` нужно ленте вложений: два десятка плиток
+ * приезжают вразнобой, и без него сетка стоит дырами непонятной природы —
+ * «ещё едет» и «файл без превью» выглядят одинаково.
  */
-const failed = ref(false)
+type ImageState = 'loading' | 'loaded' | 'error'
 
-// Новая ссылка не должна наследовать ошибку прошлой.
-watch(() => props.src, () => { failed.value = false })
+const imageState = ref<ImageState>('loading')
+
+// Новая ссылка не должна наследовать ни ошибку прошлой, ни её готовность.
+watch(() => props.src, () => { imageState.value = 'loading' })
 
 const showImage = computed(() => (
-  isPreviewableKind(kind.value) && Boolean(props.src) && !failed.value
+  isPreviewableKind(kind.value) && Boolean(props.src) && imageState.value !== 'error'
 ))
+
+const showSkeleton = computed(() => showImage.value && imageState.value === 'loading')
 
 /**
  * Иконка вида. Картинка попадает сюда только сорвавшейся загрузкой — тогда и
@@ -169,6 +178,20 @@ function onClick(event: MouseEvent): void {
     :aria-label="ariaLabel"
     @click="onClick"
   >
+    <GrSkeleton
+      v-if="showSkeleton"
+      data-gr-file-preview-skeleton
+      width="100%"
+      height="100%"
+      rounded="var(--gr-file-preview-radius, var(--gr-radius-md))"
+    />
+
+    <!--
+      Условие — `showImage`, а не «картинка готова»: убери её из дерева на
+      время загрузки, и браузер не начнёт качать, а `load` не придёт никогда.
+      Поэтому она ждёт невидимой и вне потока — иначе поделила бы плитку со
+      скелетом как второй flex-элемент.
+    -->
     <img
       v-if="showImage"
       :key="src ?? ''"
@@ -176,8 +199,9 @@ function onClick(event: MouseEvent): void {
       :src="src ?? undefined"
       :alt="alt"
       :loading="resolvedLoading"
-      :class="filePreviewMediaClass"
-      @error="failed = true"
+      :class="[filePreviewMediaClass, showSkeleton ? filePreviewMediaLoadingClass : '']"
+      @load="imageState = 'loaded'"
+      @error="imageState = 'error'"
     >
 
     <span v-else data-gr-file-preview-fallback :class="filePreviewFallbackClass">

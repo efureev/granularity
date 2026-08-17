@@ -131,6 +131,28 @@ describe('GrCodeBlock — копирование', () => {
     expect(hidden.find('[data-gr-code-block-copy]').exists()).toBe(false)
   })
 
+  // Поверх скроллера кнопка отбирает полосу прокрутки: её хватают мышью в тех
+  // же пикселях у правого края, которые накрывает кнопка.
+  it('кнопка стоит в жёлобе корня, а не поверх скроллера', async () => {
+    stubClipboard()
+
+    const wrapper = mount(GrCodeBlock, { props: { code: SAMPLE, maxHeight: '8rem' } })
+    await nextTick()
+
+    const scroller = wrapper.get('[data-gr-code-block-scroll]')
+    expect(scroller.find('[data-gr-code-block-copy]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-code-block]').classes()).toContain('pr-9')
+  })
+
+  it('без кнопки жёлоб не резервируется', async () => {
+    stubClipboard()
+
+    const wrapper = mount(GrCodeBlock, { props: { code: SAMPLE, copyable: false } })
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-code-block]').classes()).not.toContain('pr-9')
+  })
+
   // Главный инвариант: в буфер уходит исходный текст, а не отрисованный. Номера
   // строк — CSS-счётчик, и попасть туда они не могут по построению.
   it('копирует исходный текст, а не разметку с номерами строк', async () => {
