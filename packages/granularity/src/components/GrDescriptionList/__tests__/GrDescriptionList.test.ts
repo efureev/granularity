@@ -130,6 +130,67 @@ describe('GrDescriptionList', () => {
     expect(wrapper.get('dt').attributes('style')).toContain('width')
   })
 
+  it('flow строит строку, а не сетку', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items, layout: 'flow' } })
+
+    expect(wrapper.classes()).toContain('flex')
+    expect(wrapper.classes()).toContain('flex-wrap')
+    expect(wrapper.classes()).not.toContain('grid')
+  })
+
+  // Колонки принадлежат сетке: в строке задавать их нечему.
+  it('columns в flow не подмешивает сетку', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items, layout: 'flow', columns: 4 } })
+
+    expect(wrapper.classes().some(cls => cls.includes('grid-cols'))).toBe(false)
+  })
+
+  it('в flow подпись и значение стоят рядом узким зазором', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items, layout: 'flow' } })
+    const pair = wrapper.get('[data-gr-description-pair]')
+
+    expect(pair.classes()).toContain('items-baseline')
+    expect(pair.classes()).toContain('gap-1')
+    // Фиксированной колонки подписей в строке нет.
+    expect(wrapper.get('dt').attributes('style')).toBeUndefined()
+  })
+
+  // Строка переносится сама — подменять её на `stacked` незачем.
+  it('stackBelow не трогает flow', async () => {
+    const observers: Array<(entries: Array<{ contentRect: { width: number } }>) => void> = []
+
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback: (entries: Array<{ contentRect: { width: number } }>) => void) {
+        observers.push(callback)
+      }
+
+      observe() {}
+      disconnect() {}
+    })
+
+    const wrapper = mount(GrDescriptionList, {
+      props: { items, layout: 'flow', stackBelow: 480 },
+    })
+
+    observers[0]([{ contentRect: { width: 320 } }])
+    await nextTick()
+
+    expect(wrapper.classes()).toContain('flex-wrap')
+    expect(wrapper.classes()).not.toContain('grid')
+  })
+
+  // Лестница брейкпоинтов зашита в ступень: узкий экран всегда в одну колонку.
+  it.each([
+    [3, 'lg:grid-cols-3'],
+    [4, 'lg:grid-cols-4'],
+  ] as const)('columns=%i раскладывается лестницей', (columns, wide) => {
+    const wrapper = mount(GrDescriptionList, { props: { items, columns } })
+
+    expect(wrapper.classes()).toContain('grid-cols-1')
+    expect(wrapper.classes()).toContain('sm:grid-cols-2')
+    expect(wrapper.classes()).toContain(wide)
+  })
+
   // `column-count` раскладывает поток и разорвал бы пару между колонками.
   it('columns=2 не рвёт пару: dt и dd остаются в одном элементе сетки', () => {
     const wrapper = mount(GrDescriptionList, { props: { items, columns: 2 } })

@@ -9,9 +9,12 @@ import {
   descriptionDividedClass,
   descriptionLabelInlineClass,
   descriptionLabelStackedClass,
+  descriptionPairFlowClass,
   descriptionPairInlineClass,
   descriptionPairStackedClass,
   descriptionRootClass,
+  descriptionRootFlowClass,
+  descriptionRootGridClass,
   descriptionSizeClass,
   descriptionValueClass,
   descriptionValueToneClass,
@@ -48,7 +51,10 @@ export interface GrDescriptionItem {
  */
 export interface GrDescriptionListProps {
   items: readonly GrDescriptionItem[]
-  /** `inline` — подпись слева колонкой; `stacked` — над значением. */
+  /**
+   * `inline` — подпись слева колонкой; `stacked` — над значением; `flow` —
+   * пары текут по строке с переносом (метаданные внутри пункта списка).
+   */
   layout?: GrDescriptionLayout
   /** Ширина колонки подписей при `inline`. */
   labelWidth?: string
@@ -58,8 +64,9 @@ export interface GrDescriptionListProps {
    */
   stackBelow?: number
   density?: GrDescriptionDensity
-  /** Отбивать пары линиями. */
+  /** Отбивать пары линиями. В `flow` не применяется. */
   divided?: boolean
+  /** Колонки сетки. В `flow` не применяются: строка колонок не имеет. */
   columns?: GrDescriptionColumns
   /** Чем печатать пустое значение. */
   emptyText?: string
@@ -113,24 +120,36 @@ onBeforeUnmount(() => {
   observer = null
 })
 
-// До монтирования действует заданная раскладка — это же и есть серверный рендер.
+/**
+ * До монтирования действует заданная раскладка — это же и есть серверный рендер.
+ *
+ * Порог спасает только `inline`: колонка подписей в узком контейнере выжимает
+ * значение в букву на строку. `flow` переносится сам, и подменять его нечем.
+ */
 const effectiveLayout = computed<GrDescriptionLayout>(() => (
-  narrow.value ? 'stacked' : resolvedLayout.value
+  narrow.value && resolvedLayout.value === 'inline' ? 'stacked' : resolvedLayout.value
 ))
 
 const isInline = computed(() => effectiveLayout.value === 'inline')
+const isFlow = computed(() => effectiveLayout.value === 'flow')
 
 const rootClass = computed(() => [
   descriptionRootClass,
-  descriptionColumnsClass[resolvedColumns.value],
+  isFlow.value ? descriptionRootFlowClass : descriptionRootGridClass,
+  // Колонки принадлежат сетке: в строчной раскладке их задавать нечему.
+  isFlow.value ? '' : descriptionColumnsClass[resolvedColumns.value],
   descriptionSizeClass[resolvedSize.value],
   descriptionDensityClass[resolvedDensity.value],
 ].filter(Boolean).join(' '))
 
-const pairClass = computed(() => [
-  isInline.value ? descriptionPairInlineClass : descriptionPairStackedClass,
-  resolvedDivided.value ? descriptionDividedClass : '',
-].filter(Boolean).join(' '))
+const pairClass = computed(() => {
+  if (isFlow.value) return descriptionPairFlowClass
+
+  return [
+    isInline.value ? descriptionPairInlineClass : descriptionPairStackedClass,
+    resolvedDivided.value ? descriptionDividedClass : '',
+  ].filter(Boolean).join(' ')
+})
 
 const labelClass = computed(() => (
   isInline.value ? descriptionLabelInlineClass : descriptionLabelStackedClass

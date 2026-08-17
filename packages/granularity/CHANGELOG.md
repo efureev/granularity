@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrDelta` printed the sign after the currency symbol.** With `prefix` and
+  `showSign` together the output was `$+0.0280`, while the component's own page
+  had promised `+$0.0280` since the day it was written — the sign belongs to the
+  quantity as a whole, not to the number standing after the currency mark, and
+  no typographic tradition sets it the other way. The invariant that produced
+  the defect is untouched: the sign is still placed by `Intl` through
+  `signDisplay`, never by string concatenation, which once cost `GrStatistic`
+  its digit grouping. The component now **extracts** the sign from
+  `formatToParts` into its own node ahead of the prefix instead of appending one
+  — the digits are never reassembled. Without a `prefix` there is nowhere to
+  move the sign to and the markup is byte-for-byte what it was. One subtlety
+  worth naming: in RTL locales an invisible direction mark precedes the sign and
+  is what flips it relative to the digits, so it travels with the sign rather
+  than being stranded in the number it no longer governs.
+
+### Added
+
+- **`GrDescriptionList` lays out up to four columns and can run its pairs along
+  a line.** Eight short pairs in two columns stretch a card to twice its needed
+  height and leave half of it empty, so `columns` now accepts `3` and `4`. The
+  breakpoint ladder is baked into the step rather than handed to the caller:
+  four columns of short pairs are unreadable on a phone, so `columns: 4` means
+  "up to four" — one column on a narrow screen, two on a tablet, four when there
+  is room. Separately, a third `layout`, `flow`, sends pairs along a line with
+  wrapping: `inline` and `stacked` both stack pairs vertically, which is wrong
+  for metadata that captions something else — "Messages: 3 · Created: 12.04"
+  inside a list item. It stays a real `<dl>` with `dt`/`dd` pairs, not text with
+  colons. `columns`, `divided` and `labelWidth` do not apply there, because a
+  line has neither columns nor a row to rule off; and `stackBelow` leaves it
+  alone, since a line already wraps by itself.
+- **`GrStatistic` derives its tone from the sign of the value.** A margin tile
+  has to turn red when the margin is negative, and until now the consumer wrote
+  that `computed` by hand next to two class literals. `polarity` reuses exactly
+  the rule `GrDelta` already applies: `positive-good` for revenue,
+  `negative-good` for cost of goods and churn, `none` when the sign says nothing
+  about quality. Zero stays neutral under every polarity — "unchanged" is a
+  third state that two colours cannot express — and a non-numeric value
+  (`"2 h 15 min"`, `"—"`) has no sign to read. An explicit `tone` still wins: a
+  derived tone is a default, not a dictate. The tone follows the prop rather
+  than the count-up frame, so an animating tile does not flash neutral on its
+  way to the answer.
+- **`deltaTone` / `deltaDirection` and `fileKindOf` / `isPreviewableKind` are
+  public.** Both rules were already implemented and tested inside the package
+  and both were being rewritten in consuming apps, which is where they drift:
+  one copy of the tone rule painted a zero green, like income. The tone is
+  needed precisely where the delta's markup does not fit — `tone` on
+  `GrStatistic` and `GrBadge` in report tiles — and the file classifier is
+  needed because `GrFilePreview` deliberately does not open the viewer, so
+  deciding which files to hand to `GrImageViewer` falls to the consumer.
+
 ## [v0.22.0] 2026-08-17
 
 ### Added

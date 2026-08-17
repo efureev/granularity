@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { deltaTone, type GrDeltaPolarity } from '../GrDelta/deltaTone'
 import { iconClass, iconTag } from '../shared/icon'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
@@ -69,6 +70,12 @@ export interface GrStatisticProps {
   size?: GrStatisticSize
   /** Тон значения; точечно перекрывается `--gr-statistic-value-color`. */
   tone?: GrStatisticTone
+  /**
+   * Что считать хорошим: тон выводится из знака самого значения. Для выручки
+   * рост — успех, для себестоимости и оттока — наоборот. Явный `tone` сильнее:
+   * выведенный тон — умолчание, а не диктат.
+   */
+  polarity?: GrDeltaPolarity
   /** Направление динамики — задаёт цвет и иконку строки под значением. */
   trend?: GrStatisticTrend
   /** Текст динамики (например `+12,5% к прошлой неделе`). */
@@ -112,7 +119,11 @@ const props = withDefaults(
     suffix: undefined,
     icon: undefined,
     size: undefined,
-    tone: 'neutral',
+    // Дефолт тона живёт в `resolvedTone`: с ним здесь «пользователь задал
+    // neutral» было бы неотличимо от «сработал дефолт», и явный
+    // `tone="neutral"` не смог бы отменить `polarity`.
+    tone: undefined,
+    polarity: undefined,
     trend: undefined,
     trendText: undefined,
     loading: false,
@@ -261,6 +272,25 @@ watch(() => props.value, (next, prev) => startIfNumeric(prev, next))
 onBeforeUnmount(stopCounting)
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatistic' })
+const resolvedPolarity = useGrComponentProp('GrStatistic', 'polarity', () => props.polarity, 'none')
+
+/**
+ * Тон значения: явный проп → выведенный из знака → нейтральный.
+ *
+ * Отдельной ветки «полярность не задана» нет намеренно: `deltaTone(x, 'none')`
+ * нейтрален при любом значении, то есть `'none'` и есть прежнее поведение.
+ *
+ * Знак берётся у самого пропа, а не у кадра перебора: `frameValue` стартует с
+ * нуля, и цвет плитки мигал бы нейтральным на каждой анимации.
+ */
+const resolvedTone = computed<GrStatisticTone>(() => {
+  if (props.tone !== undefined) return props.tone
+
+  const numeric = toNumber(props.value)
+
+  // «2 ч 15 мин» и «—» знака не имеют — красить нечем.
+  return numeric === null ? 'neutral' : deltaTone(numeric, resolvedPolarity.value)
+})
 
 const trendIconByTrend: Record<GrStatisticTrend, Component> = {
   up: IconTrendingUp,
@@ -356,7 +386,7 @@ const trendLabel = computed(() => {
 
           <span
             data-gr-statistic-number
-            :class="statisticValueClass({ size: resolvedSize, tone })"
+            :class="statisticValueClass({ size: resolvedSize, tone: resolvedTone })"
             :aria-hidden="isCounting ? 'true' : undefined"
           >
             <slot>{{ formatted }}</slot>

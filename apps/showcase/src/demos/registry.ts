@@ -342,6 +342,7 @@ export const demoPathByPreviewKey = {
   'gr-splitter-nested':                   'components/gr-splitter/GrSplitterNestedDemo.vue',
   'gr-statistic-basic':                   'components/gr-statistic/GrStatisticBasicDemo.vue',
   'gr-statistic-dashboard':               'components/gr-statistic/GrStatisticDashboardDemo.vue',
+  'gr-statistic-polarity':                'components/gr-statistic/GrStatisticPolarityDemo.vue',
   'gr-statistic-slots':                   'components/gr-statistic/GrStatisticSlotsDemo.vue',
   'gr-statistic-trend':                   'components/gr-statistic/GrStatisticTrendDemo.vue',
   'gr-switch-builder':                    'components/gr-switch/GrSwitchBuilderDemo.vue',

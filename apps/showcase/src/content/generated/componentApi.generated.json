@@ -2935,7 +2935,7 @@
           },
           {
             "name": "divided",
-            "description": "Отбивать пары линиями.",
+            "description": "Отбивать пары линиями. В `flow` не применяется.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
@@ -2949,14 +2949,14 @@
           },
           {
             "name": "columns",
-            "description": "",
+            "description": "Колонки сетки. В `flow` не применяются: строка колонок не имеет.",
             "type": "GrDescriptionColumns | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "layout",
-            "description": "`inline` — подпись слева колонкой; `stacked` — над значением.",
+            "description": "`inline` — подпись слева колонкой; `stacked` — над значением; `flow` — пары текут по строке с переносом (метаданные внутри пункта списка).",
             "type": "GrDescriptionLayout | undefined",
             "required": false,
             "default": "undefined"
@@ -9694,7 +9694,7 @@
             "description": "Тон значения; точечно перекрывается `--gr-statistic-value-color`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
-            "default": "\"neutral\""
+            "default": "undefined"
           },
           {
             "name": "title",
@@ -9777,6 +9777,13 @@
             "name": "suffix",
             "description": "Приписка после значения (единица измерения, `%`).",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "polarity",
+            "description": "Что считать хорошим: тон выводится из знака самого значения. Для выручки рост — успех, для себестоимости и оттока — наоборот. Явный `tone` сильнее: выведенный тон — умолчание, а не диктат.",
+            "type": "GrDeltaPolarity | undefined",
             "required": false,
             "default": "undefined"
           },

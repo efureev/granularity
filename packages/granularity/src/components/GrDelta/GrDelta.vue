@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { formatNumber } from '../../internal/granularityFormat'
+import { formatNumberToParts, splitLeadingSign } from '../../internal/granularityFormat'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -85,20 +85,38 @@ const tone = computed<GrDeltaTone>(() => (
 
 const direction = computed(() => (isEmpty.value ? 'flat' : deltaDirection(props.value as number)))
 
+const formatOptions = computed<Intl.NumberFormatOptions>(() => ({
+  signDisplay: resolvedShowSign.value ? 'exceptZero' : 'auto',
+  ...(props.precision === undefined
+    ? {}
+    : { minimumFractionDigits: props.precision, maximumFractionDigits: props.precision }),
+}))
+
 /**
+ * Знак и число по отдельности.
+ *
  * Знак — префикс форматирования, а не склейка строки. `'+' + value` уже ломало
  * `GrStatistic`: строка `'+10'` разбирается как число, и разряды теряются.
+ * Поэтому знак не дописывают, а **вынимают** из готовых частей `Intl`.
+ *
+ * Делится величина только вместе с `prefix`: валюта обязана стоять после знака
+ * (`+$0,0280`, а не `$+0,0280`). Без приписки делить нечего — знак остаётся
+ * внутри величины, и разметка не меняется ни на байт.
  */
-const formatted = computed(() => {
-  if (isEmpty.value) return resolvedEmptyText.value
+const valueNodes = computed<{ sign: string, value: string }>(() => {
+  if (isEmpty.value) return { sign: '', value: resolvedEmptyText.value }
 
-  return formatNumber(resolvedLocale.value, props.value as number, {
-    signDisplay: resolvedShowSign.value ? 'exceptZero' : 'auto',
-    ...(props.precision === undefined
-      ? {}
-      : { minimumFractionDigits: props.precision, maximumFractionDigits: props.precision }),
-  })
+  const parts = formatNumberToParts(resolvedLocale.value, props.value as number, formatOptions.value)
+
+  if (!props.prefix) return { sign: '', value: parts.map(part => part.value).join('') }
+
+  const { sign, rest } = splitLeadingSign(parts)
+
+  return { sign, value: rest }
 })
+
+const sign = computed(() => valueNodes.value.sign)
+const formatted = computed(() => valueNodes.value.value)
 
 const arrowIcon = computed(() => {
   if (direction.value === 'up') return IconTrendingUp
@@ -123,6 +141,7 @@ const rootClass = computed(() => [
       aria-hidden="true"
     />
 
+    <span v-if="sign" data-gr-delta-sign>{{ sign }}</span>
     <span v-if="prefix && !isEmpty" data-gr-delta-prefix>{{ prefix }}</span>
     <span data-gr-delta-value>{{ formatted }}</span>
     <span v-if="suffix && !isEmpty" data-gr-delta-suffix :class="deltaSuffixClass">{{ suffix }}</span>

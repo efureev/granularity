@@ -2,7 +2,8 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h, markRaw, nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import GrStatistic from '../GrStatistic.vue'
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
+import GrStatistic, { type GrStatisticProps } from '../GrStatistic.vue'
 import { granularityGlobal, stubMatchMedia } from '../../../testing'
 
 describe('GrStatistic', () => {
@@ -52,6 +53,78 @@ describe('GrStatistic', () => {
   it('тон меняет цвет значения', () => {
     const wrapper = mount(GrStatistic, { props: { value: 1, tone: 'danger' } })
     expect(wrapper.get('[data-testid="gr-statistic-value"]').html()).toContain('var(--gr-danger-text)')
+  })
+})
+
+describe('GrStatistic — тон из знака значения', () => {
+  const paint = (props: GrStatisticProps): string =>
+    mount(GrStatistic, { props }).get('[data-testid="gr-statistic-value"]').html()
+
+  it('polarity выводит тон из знака', () => {
+    expect(paint({ value: 12, polarity: 'positive-good' })).toContain('var(--gr-success-text)')
+    expect(paint({ value: -12, polarity: 'positive-good' })).toContain('var(--gr-danger-text)')
+  })
+
+  it('negative-good инвертирует тон, не трогая само значение', () => {
+    const wrapper = mount(GrStatistic, { props: { value: -12, polarity: 'negative-good' } })
+
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').html()).toContain('var(--gr-success-text)')
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').text()).toContain('-12')
+    expect(paint({ value: 12, polarity: 'negative-good' })).toContain('var(--gr-danger-text)')
+  })
+
+  // «Не изменилось» — третье состояние, двумя цветами оно не выражается.
+  it('ноль нейтрален при любой полярности', () => {
+    expect(paint({ value: 0, polarity: 'positive-good' })).toContain('var(--gr-fg)')
+    expect(paint({ value: 0, polarity: 'negative-good' })).toContain('var(--gr-fg)')
+  })
+
+  it('polarity="none" тона не даёт', () => {
+    expect(paint({ value: -12, polarity: 'none' })).toContain('var(--gr-fg)')
+  })
+
+  // Без этого гейта снятый жёсткий дефолт `tone` молча перекрасил бы каждую
+  // вторую плитку в приложениях.
+  it('без polarity плитка остаётся нейтральной', () => {
+    expect(paint({ value: -12 })).toContain('var(--gr-fg)')
+  })
+
+  it('явный tone сильнее polarity', () => {
+    expect(paint({ value: -12, polarity: 'positive-good', tone: 'primary' })).toContain('var(--gr-primary)')
+  })
+
+  // Ровно тот случай, ради которого дефолт уехал из `withDefaults`.
+  it('явный tone="neutral" гасит polarity', () => {
+    expect(paint({ value: 12, polarity: 'positive-good', tone: 'neutral' })).toContain('var(--gr-fg)')
+  })
+
+  it('нечисловое значение красить нечем', () => {
+    expect(paint({ value: '2 ч 15 мин', polarity: 'positive-good' })).toContain('var(--gr-fg)')
+    expect(paint({ value: '—', polarity: 'positive-good' })).toContain('var(--gr-fg)')
+  })
+
+  // Разбор тот же `toNumber`, что у перебора чисел: строка с числом — число.
+  it('числовая строка красится как число', () => {
+    expect(paint({ value: '-12.5', polarity: 'positive-good' })).toContain('var(--gr-danger-text)')
+  })
+
+  it('polarity читается из GrConfigProvider, локальный проп сильнее', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrStatistic },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrStatistic: { polarity: 'negative-good' } }">
+          <GrStatistic :value="-12" data-case="config" />
+          <GrStatistic :value="-12" polarity="positive-good" data-case="local" />
+          <GrStatistic :value="-12" tone="info" data-case="explicit" />
+        </GrConfigProvider>
+      `,
+    })
+
+    const wrapper = mount(Harness)
+
+    expect(wrapper.get('[data-case="config"]').html()).toContain('var(--gr-success-text)')
+    expect(wrapper.get('[data-case="local"]').html()).toContain('var(--gr-danger-text)')
+    expect(wrapper.get('[data-case="explicit"]').html()).toContain('var(--gr-info-text)')
   })
 })
 

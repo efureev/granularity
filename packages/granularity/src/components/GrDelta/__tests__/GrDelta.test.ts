@@ -21,10 +21,94 @@ describe('GrDelta', () => {
       props: { value: 0.004, precision: 3, prefix: '$', locale: 'en-US' },
     })
 
+    expect(wrapper.get('[data-gr-delta-sign]').text()).toBe('+')
     expect(wrapper.get('[data-gr-delta-prefix]').text()).toBe('$')
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('+0.004')
+    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('0.004')
     expect(wrapper.attributes('data-tone')).toBe('success')
     expect(wrapper.classes()).toContain('text-[var(--gr-success-text)]')
+  })
+
+  // `$+0.004` читается как «доллары, а потом рост»: знак относится к величине
+  // целиком, а не к числу после символа валюты.
+  it('знак встаёт перед префиксом, а не между ним и числом', () => {
+    const wrapper = mount(GrDelta, {
+      props: { value: 0.028, precision: 4, prefix: '$', locale: 'ru' },
+    })
+
+    expect(wrapper.text()).toBe('+$0,0280')
+  })
+
+  it('минус выносится перед префиксом так же, как плюс', () => {
+    const wrapper = mount(GrDelta, {
+      props: { value: -0.028, precision: 4, prefix: '$', locale: 'ru' },
+    })
+
+    expect(wrapper.get('[data-gr-delta-sign]').text()).toBe('-')
+    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('0,0280')
+    expect(wrapper.text()).toBe('-$0,0280')
+  })
+
+  it('ноль знака не выносит: выносить нечего', () => {
+    const wrapper = mount(GrDelta, { props: { value: 0, prefix: '$', locale: 'en-US' } })
+
+    expect(wrapper.find('[data-gr-delta-sign]').exists()).toBe(false)
+    expect(wrapper.text()).toBe('$0')
+  })
+
+  // `showSign` управляет плюсом. Минус приходит от `Intl` при любом его
+  // значении, и `$-10` неверен ровно так же, как `$+10`.
+  it('showSign=false убирает плюс, но минус всё равно впереди префикса', () => {
+    const plus = mount(GrDelta, {
+      props: { value: 10, prefix: '$', showSign: false, locale: 'en-US' },
+    })
+    expect(plus.find('[data-gr-delta-sign]').exists()).toBe(false)
+    expect(plus.text()).toBe('$10')
+
+    const minus = mount(GrDelta, {
+      props: { value: -10, prefix: '$', showSign: false, locale: 'en-US' },
+    })
+    expect(minus.get('[data-gr-delta-sign]').text()).toBe('-')
+    expect(minus.text()).toBe('-$10')
+  })
+
+  // В RTL знаку предшествует невидимая метка направления (`he-IL` — U+200E),
+  // которой он и разворачивается относительно цифр. Оторвать её значит
+  // потерять управление знаком.
+  it('метка направления уезжает вместе со знаком', () => {
+    const wrapper = mount(GrDelta, {
+      props: { value: -1234.5, precision: 1, prefix: '₪', locale: 'he-IL' },
+    })
+
+    const sign = wrapper.get('[data-gr-delta-sign]').text()
+
+    expect(sign.endsWith('-')).toBe(true)
+    expect(sign.length).toBeGreaterThan(1)
+    expect(wrapper.get('[data-gr-delta-value]').text()).not.toContain('-')
+  })
+
+  it('вынос знака не пересобирает разряды', () => {
+    const wrapper = mount(GrDelta, {
+      props: { value: 1234567.5, precision: 1, prefix: '$', locale: 'de-DE' },
+    })
+
+    expect(wrapper.text()).toBe('+$1.234.567,5')
+  })
+
+  // Разметка без префикса не меняется вовсе: выносить знак некуда, и лишний
+  // узел сломал бы стили потребителя, написанные по `[data-gr-delta-value]`.
+  it('без префикса знак остаётся внутри числа', () => {
+    const wrapper = mount(GrDelta, { props: { value: 5, locale: 'en-US' } })
+
+    expect(wrapper.find('[data-gr-delta-sign]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('+5')
+  })
+
+  it('стрелка стоит перед знаком, а не между знаком и префиксом', () => {
+    const wrapper = mount(GrDelta, {
+      props: { value: 5, prefix: '$', showArrow: true, locale: 'en-US' },
+    })
+
+    expect(wrapper.text()).toBe('+$5')
   })
 
   it('падение красится опасностью, минус ставит Intl', () => {
@@ -50,6 +134,7 @@ describe('GrDelta', () => {
     expect(wrapper.get('[data-gr-delta-value]').text()).toBe('—')
     expect(wrapper.attributes('data-tone')).toBeUndefined()
     expect(wrapper.find('[data-gr-delta-arrow]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-delta-sign]').exists()).toBe(false)
     expect(wrapper.find('[data-gr-delta-prefix]').exists()).toBe(false)
     expect(wrapper.find('[data-gr-delta-suffix]').exists()).toBe(false)
     expect(wrapper.classes()).toContain('text-[var(--gr-muted-fg)]')

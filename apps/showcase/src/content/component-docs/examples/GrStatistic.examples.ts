@@ -24,6 +24,14 @@ export const grStatisticExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-statistic-trend',    note: 'Плейсхолдер помечен `role="status"` и `aria-busy`, поэтому обновление данных не остаётся незамеченным.',
   },
   {
+    id: 'statistic-polarity',
+    title: 'Tone from the sign of the value',
+    description: '`polarity` выводит тон из знака самой величины: `positive-good` для выручки, `negative-good` для себестоимости и оттока. Ноль нейтрален при любой полярности — «не изменилось» третье состояние, и двумя цветами оно не выражается. Явный `tone` сильнее: выведенный тон — умолчание, а не диктат.',
+    status: 'ready',
+    previewKey: 'gr-statistic-polarity',
+    note: '`polarity` красит значение, `trend` — строку под ним. Это независимые сигналы: показатель может краснеть без подписи о динамике, а подпись — стоять под нейтральным значением.',
+  },
+  {
     id: 'statistic-slots',
     title: 'Slots and non-numeric values',
     description: 'Слоты `#icon`, `#trend`, `#prefix`/`#suffix` подставляют любой контент, а нечисловое значение («2 h 15 min») выводится как есть.',

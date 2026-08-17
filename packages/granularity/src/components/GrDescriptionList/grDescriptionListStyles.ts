@@ -8,28 +8,46 @@ import type { GrTone } from '../shared/tones'
  * текст файла, и собранное шаблонной строкой имя уехало бы в CSS литералом.
  */
 
-/** `inline` — подпись колонкой слева; `stacked` — над значением. */
-export type GrDescriptionLayout = 'inline' | 'stacked'
+/**
+ * `inline` — подпись колонкой слева; `stacked` — над значением; `flow` — пары
+ * текут по строке с переносом.
+ */
+export type GrDescriptionLayout = 'inline' | 'stacked' | 'flow'
 
 export type GrDescriptionDensity = 'regular' | 'compact'
 
-/** Сколько колонок пар. Длинный список читается в две. */
-export type GrDescriptionColumns = 1 | 2
+/** Сколько колонок пар. Длинный список читается в несколько. */
+export type GrDescriptionColumns = 1 | 2 | 3 | 4
 
 // `m-0` — у нативного `<dl>` есть браузерные отступы, и без сброса список
 // разъезжается по вертикали. Ряды разводит `--gr-description-list-row-gap`,
 // потому что зазор здесь — точка кастомизации, а не ступень шкалы.
-export const descriptionRootClass = 'm-0 grid gap-x-4 [row-gap:var(--gr-description-list-row-gap,0.375rem)]'
+export const descriptionRootClass = 'm-0 gap-x-4 [row-gap:var(--gr-description-list-row-gap,0.375rem)]'
 
+/** Сетка колонок — раскладки `inline` и `stacked`. */
+export const descriptionRootGridClass = 'grid'
+
+// `flow` строит строку, а не сетку: пары текут по ширине и переносятся сами,
+// поэтому колонок у неё нет.
+export const descriptionRootFlowClass = 'flex flex-wrap items-baseline'
+
+// Лестница брейкпоинтов зашита в саму ступень: четыре колонки коротких пар на
+// узком экране нечитаемы, и решать это потребителю незачем.
 export const descriptionColumnsClass: Record<GrDescriptionColumns, string> = {
   1: 'grid-cols-1',
   // Пара — элемент сетки, поэтому между колонками она не рвётся. `column-count`
   // рвал бы: он раскладывает поток, а не блоки.
   2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
 }
 
 export const descriptionPairInlineClass = 'flex min-w-0 items-baseline gap-2'
 export const descriptionPairStackedClass = 'min-w-0'
+
+// Зазор уже: подпись и значение здесь читаются как одна фраза «Сообщений: 3»,
+// а пары друг от друга отбивает `gap-x-4` корня.
+export const descriptionPairFlowClass = 'flex min-w-0 items-baseline gap-1'
 
 export const descriptionDividedClass = 'border-b border-[var(--gr-description-list-divider,var(--gr-brd))] pb-1 last:border-b-0 last:pb-0'
 

@@ -120,6 +120,7 @@
 | --- | --- |
 | строки однородные, разметку даёт компонент | [`GrList`](../packages/granularity/docs/components/GrList.md) |
 | строки — пары «характеристика → значение» | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
+| пары — метаданные строкой, а не столбцом | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) с `layout="flow"` |
 | таблица, ячейки оформляет потребитель | [`GrTable`](../packages/granularity/docs/components/GrTable.md) |
 | таблица с сортировкой, выбором строк, слотами ячеек | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
 | строки вложены друг в друга | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
