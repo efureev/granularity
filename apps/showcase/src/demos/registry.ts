@@ -113,6 +113,8 @@ export const demoPathByPreviewKey = {
   'gr-checkbox-native-form':              'components/gr-checkbox/GrCheckboxNativeFormDemo.vue',
   'gr-checkbox-sizes':                    'components/gr-checkbox/GrCheckboxSizesDemo.vue',
   'gr-checkbox-state-matrix':             'components/gr-checkbox/GrCheckboxStatesDemo.vue',
+  'gr-code-block-basic':                  'components/gr-code-block/GrCodeBlockBasicDemo.vue',
+  'gr-code-block-resilience':             'components/gr-code-block/GrCodeBlockResilienceDemo.vue',
   'gr-collapse-accordion-flow':           'components/gr-collapse/GrCollapseAccordionDemo.vue',
   'gr-collapse-borderless':               'components/gr-collapse/GrCollapseBorderlessDemo.vue',
   'gr-collapse-disabled-state':           'components/gr-collapse/GrCollapseDisabledStateDemo.vue',

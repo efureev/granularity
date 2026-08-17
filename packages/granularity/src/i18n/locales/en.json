@@ -330,5 +330,10 @@
     "moved": "Position {position} of {count}",
     "dropped": "Dropped at position {position} of {count}",
     "cancelled": "Move cancelled"
+  },
+  "codeBlock": {
+    "copy": "Copy code",
+    "copied": "Code copied",
+    "copyFailed": "Could not copy code"
   }
 }

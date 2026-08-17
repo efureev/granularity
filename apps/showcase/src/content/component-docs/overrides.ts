@@ -25,6 +25,7 @@ import {
   grSkeletonExamples,
   grDropdownExamples,
   grDataTableExamples,
+  grCodeBlockExamples,
   grDeltaExamples,
   grDescriptionListExamples,
   grPaginationExamples,
@@ -262,6 +263,21 @@ const grStatisticOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grCodeBlockOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Ответ сервиса, тело запроса, payload события — всё, что приходит «как есть» и что потом отправляют в тикет. Моноширинный блок с подсветкой JSON и кнопкой копирования вместо `<pre>`, скопированного по страницам с разными классами.',
+    'Значение принимается любым: объект сериализуется с отступом, строка проходит нетронутой. Циклическая ссылка, `BigInt` и враждебный `toJSON` не роняют страницу — данные приходят из базы, и блок обязан пережить их все.',
+  ],
+  features: [
+    'Подсветка JSON по четырём ролям — ключ, строка, число, литерал.',
+    'Копирование исходного текста, а не отрисованного: номера строк в буфер не попадают.',
+    'Номера строк CSS-счётчиком — их не выделить мышью и не скопировать по ошибке.',
+    'Перенос длинных строк или горизонтальная прокрутка — на выбор.',
+    'Ограничение высоты со скроллом, достижимым с клавиатуры.',
+    'Цвета подсветки — точки кастомизации `--gr-code-block-*`, обе темы из коробки.',
+  ],
+}
+
 const grDeltaOverview: ShowcaseComponentOverviewDoc = {
   paragraphs: [
     'Изменение прямо в строке текста: «Маржа −$12.50», «Конверсия +8.4 %». Знак, цвет и стрелка отвечают «лучше или хуже» до того, как читатель разберёт саму цифру.',
@@ -374,6 +390,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrSkeleton: createComponentDocMeta(grSkeletonExamples),
   GrDropdown: createComponentDocMeta(grDropdownExamples),
   GrDataTable: createComponentDocMeta(grDataTableExamples),
+  GrCodeBlock: createComponentDocMeta(grCodeBlockExamples, grCodeBlockOverview),
   GrDelta: createComponentDocMeta(grDeltaExamples, grDeltaOverview),
   GrDescriptionList: createComponentDocMeta(grDescriptionListExamples, grDescriptionListOverview),
   GrPagination: createComponentDocMeta(grPaginationExamples),

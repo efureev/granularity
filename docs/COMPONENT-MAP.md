@@ -178,6 +178,21 @@
 `GrStatistic` это блочная плитка со своей подписью, `GrDelta` — фрагмент
 предложения, у которого ни подписи, ни поверхности нет.
 
+### Технические данные как есть
+
+Значение пришло `unknown` из БД или от чужого сервиса, и показать его надо
+целиком, ничего не переписывая. Различитель — **читают или обходят**.
+
+| Что происходит | Компонент |
+| --- | --- |
+| текст или JSON читают целиком и копируют | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+| по данным ходят: раскрывают ветки, выбирают узел | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
+| данные разложены по колонкам и известны заранее | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
+| это пара «характеристика → значение», а не документ | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
+
+`GrCodeBlock` не сворачивает узлы: свёртка с поиском и виртуализацией — задача
+на порядок дороже, и в экосистеме её пока нет.
+
 ### Раскладка и поверхности
 
 | Что нужно | Компонент |
@@ -263,6 +278,7 @@
 | [`GrChartWaterfall`](../packages/granularity-charts/docs/components/GrChartWaterfall.md) | charts | движение от остатка к остатку |
 | [`GrCheckbox`](../packages/granularity/docs/components/GrCheckbox.md) | ядро | согласие или флаг в форме |
 | [`GrCheckboxGroup`](../packages/granularity/docs/components/GrCheckboxGroup.md) | ядро | значений несколько из короткого набора |
+| [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) | ядро | показать ответ сервиса как есть |
 | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | ядро | содержимого много, а нужно не всё сразу |
 | [`GrColorPicker`](../packages/granularity/docs/components/GrColorPicker.md) | ядро | цвет задаёт пользователь |
 | [`GrCommandPalette`](../packages/granularity/docs/components/GrCommandPalette.md) | ядро | команд много и они разбросаны по интерфейсу |

@@ -1616,6 +1616,99 @@
       }
     ]
   },
+  "GrCodeBlock": {
+    "name": "GrCodeBlock",
+    "sourcePath": "packages/granularity/src/components/GrCodeBlock/GrCodeBlock.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя области прокрутки. Безымянную скринридер объявляет просто «регион».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "language",
+            "description": "",
+            "type": "GrCodeBlockLanguage | undefined",
+            "required": false,
+            "default": "\"json\""
+          },
+          {
+            "name": "maxHeight",
+            "description": "Высота, после которой включается вертикальный скролл.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "copyable",
+            "description": "Кнопка копирования. Без защищённого контекста не рисуется вовсе.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "wrap",
+            "description": "Переносить длинные строки вместо горизонтальной прокрутки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "lineNumbers",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "code",
+            "description": "Строка или значение: объект сериализуется с отступом.",
+            "type": "unknown",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "copy",
+            "description": "",
+            "type": "[code: string]",
+            "signature": "(event: \"copy\", code: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrCollapse": {
     "name": "GrCollapse",
     "sourcePath": "packages/granularity/src/components/GrCollapse/GrCollapse.vue",
@@ -1977,6 +2070,13 @@
             "default": "undefined"
           },
           {
+            "name": "maxHeight",
+            "description": "Максимальная высота списка, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "360"
+          },
+          {
             "name": "emptyText",
             "description": "",
             "type": "string | undefined",
@@ -1996,13 +2096,6 @@
             "type": "string | null | undefined",
             "required": false,
             "default": "\"mod+k\""
-          },
-          {
-            "name": "maxHeight",
-            "description": "Максимальная высота списка, px.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "360"
           },
           {
             "name": "showHotkeyHint",
@@ -5968,15 +6061,15 @@
         "origin": "generated",
         "items": [
           {
-            "name": "spinnerClass",
-            "description": "Дополнительные классы обёртки спиннера.",
+            "name": "text",
+            "description": "Подпись под спиннером. Пустая строка убирает её совсем. По умолчанию — из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "text",
-            "description": "Подпись под спиннером. Пустая строка убирает её совсем. По умолчанию — из локали.",
+            "name": "spinnerClass",
+            "description": "Дополнительные классы обёртки спиннера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -9759,6 +9852,13 @@
             "default": "false"
           },
           {
+            "name": "maxHeight",
+            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "empty",
             "description": "Таблица пуста. По умолчанию определяется по содержимому слота.",
             "type": "boolean | undefined",
@@ -9769,13 +9869,6 @@
             "name": "emptyText",
             "description": "Текст пустого состояния. Слот `#empty` сильнее.",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "maxHeight",
-            "description": "Максимальная высота скролл-контейнера (включает вертикальный скролл). Число трактуется как пиксели. Нужен для работы `stickyHeader`.",
-            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -10560,6 +10653,13 @@
             "default": "\"top\""
           },
           {
+            "name": "text",
+            "description": "Текст подсказки. Разметка вместо текста — слот `#content`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "openDelay",
             "description": "Задержка перед показом, мс. Спасает от мигания при проведении курсором по панели кнопок.",
             "type": "number | undefined",
@@ -10572,13 +10672,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "0"
-          },
-          {
-            "name": "text",
-            "description": "Текст подсказки. Разметка вместо текста — слот `#content`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "offsetPx",

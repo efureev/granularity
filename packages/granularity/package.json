@@ -105,6 +105,10 @@
       "types": "./dist/types/components/GrCheckboxGroup/index.d.ts",
       "import": "./dist/components/GrCheckboxGroup/index.js"
     },
+    "./components/GrCodeBlock": {
+      "types": "./dist/types/components/GrCodeBlock/index.d.ts",
+      "import": "./dist/components/GrCodeBlock/index.js"
+    },
     "./components/GrCollapse": {
       "types": "./dist/types/components/GrCollapse/index.d.ts",
       "import": "./dist/components/GrCollapse/index.js"

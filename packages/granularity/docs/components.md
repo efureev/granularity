@@ -112,6 +112,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrCard`](./components/GrCard.md)
 - [`GrCheckbox`](./components/GrCheckbox.md)
 - [`GrCheckboxGroup`](./components/GrCheckboxGroup.md)
+- [`GrCodeBlock`](./components/GrCodeBlock.md)
 - [`GrCollapse`](./components/GrCollapse.md)
 - [`GrColorPicker`](./components/GrColorPicker.md)
 - [`GrCommandPalette`](./components/GrCommandPalette.md)

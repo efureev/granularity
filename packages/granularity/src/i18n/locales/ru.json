@@ -334,5 +334,10 @@
     "moved": "Позиция {position} из {count}",
     "dropped": "Отпущено на позиции {position} из {count}",
     "cancelled": "Перенос отменён"
+  },
+  "codeBlock": {
+    "copy": "Скопировать код",
+    "copied": "Код скопирован",
+    "copyFailed": "Не удалось скопировать код"
   }
 }

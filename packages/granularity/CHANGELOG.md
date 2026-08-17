@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrCodeBlock` — raw JSON or text, shown as it is.** The consumer case is a
+  service response pasted into a ticket, and until now that meant `<pre>` copied
+  across pages with three different sets of classes, none of them keyboard-reachable
+  despite scrolling. `code` takes `unknown` because the data comes out of a database:
+  a circular reference becomes `[Circular]` instead of hanging the tab, `BigInt`
+  prints with an `n` suffix instead of throwing, and a hostile `toJSON` yields
+  `[Unserializable]`. A string passes through untouched — it is already text.
+  The copy button puts the **source** in the clipboard, not the rendered node; line
+  numbers are a CSS counter, so they exist in no selection and no paste. Without a
+  secure context the button is not rendered at all, since one that silently does
+  nothing is worse than none — and because the check runs after mount, server and
+  first client render agree. Highlighting is a four-role tokenizer of our own; a
+  highlighter dependency for two admin pages would not be proportionate. The block
+  joins the tab order when it is a scroller **by props** (`maxHeight` set, or `wrap`
+  off), which is how `GrTable` and `GrList` already decide — measuring overflow
+  would make the tab stop flicker on every data change.
 - **New `GrDelta` — a signed value with sign and tone inside a line of text.**
   «Margin −$12.50» is a fragment of a sentence, not a tile: `GrStatistic` owns the
   block-level metric, this one owns the inline one. Zero is neutral under every
