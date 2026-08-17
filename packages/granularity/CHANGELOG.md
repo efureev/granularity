@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.23.0] 2026-08-17
+
 ### Fixed
 
 - **`GrDelta` printed the sign after the currency symbol.** With `prefix` and
