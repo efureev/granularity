@@ -7,6 +7,17 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.0] 2026-08-18
+
+### Fixed
+
+- **A picker field clipped its value with no way to read the rest.** A range
+  showed as "18 июл. 2026 г. — 17 …" and the end of the period was simply gone:
+  the field is `readonly` and a click opens the panel, so it could not even be
+  scrolled. All four pickers now hand the full value over as a native tooltip on
+  hover, using `titleWhenTruncated` from the core package — and only when the
+  value is actually clipped, so a field that fits stays quiet.
+
 ### Added
 
 - Per-component documentation under `docs/components/` — one page per component, plus a

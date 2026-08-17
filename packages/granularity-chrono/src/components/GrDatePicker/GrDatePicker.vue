@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="TValue = Date | null">
 import { computed, ref } from 'vue'
 
+import { titleWhenTruncated } from '@feugene/granularity'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
@@ -341,6 +342,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             @keydown="onFieldKeydown"
             @input="field.onInput"
             @focus="emit('focus', $event)"
+            @pointerenter="titleWhenTruncated"
             @blur="field.onBlur(); emit('blur', $event)"
           >
 

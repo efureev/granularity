@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 
 import GrButton from '@feugene/granularity/components/GrButton'
+import { titleWhenTruncated } from '@feugene/granularity'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
@@ -358,6 +359,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             @click="shell.togglePanel"
             @keydown="shell.onFieldKeydown"
             @focus="emit('focus', $event)"
+            @pointerenter="titleWhenTruncated"
             @blur="emit('blur', $event)"
           >
 
