@@ -494,6 +494,26 @@
           "description": "Focus-ring для интерактивных элементов внутри sidebar."
         }
       ]
+    },
+    {
+      "title": "Elevation",
+      "tokens": [
+        {
+          "name": "--gr-shadow-1",
+          "value": "0 1px 2px rgba(15, 23, 42, 0.08)",
+          "description": "Уровень elevation `1`. Синеватая полупрозрачная тень читается на светлом фоне мягче чёрной."
+        },
+        {
+          "name": "--gr-shadow-2",
+          "value": "0 8px 24px rgba(15, 23, 42, 0.14)",
+          "description": "Уровень elevation `2` для всплывающих слоёв."
+        },
+        {
+          "name": "--gr-shadow-3",
+          "value": "0 16px 48px rgba(15, 23, 42, 0.20)",
+          "description": "Уровень elevation `3` для модальных слоёв."
+        }
+      ]
     }
   ]
 }

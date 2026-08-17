@@ -31,15 +31,46 @@ export const descriptionRootGridClass = 'grid'
 // поэтому колонок у неё нет.
 export const descriptionRootFlowClass = 'flex flex-wrap items-baseline'
 
-// Лестница брейкпоинтов зашита в саму ступень: четыре колонки коротких пар на
-// узком экране нечитаемы, и решать это потребителю незачем.
-export const descriptionColumnsClass: Record<GrDescriptionColumns, string> = {
-  1: 'grid-cols-1',
-  // Пара — элемент сетки, поэтому между колонками она не рвётся. `column-count`
-  // рвал бы: он раскладывает поток, а не блоки.
-  2: 'grid-cols-1 sm:grid-cols-2',
-  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+/** Одна колонка — обычный класс: считать там нечего. */
+export const descriptionSingleColumnClass = 'grid-cols-1'
+
+/**
+ * Колонки по ширине **контейнера**, а не вьюпорта.
+ *
+ * Медиазапрос меряет экран, а список живёт в карточке: на широком мониторе в
+ * колонке 290px включались две колонки, подпись фиксированной ширины съедала
+ * почти всё место, и значение переносилось посимвольно — «30» печаталось как
+ * «3» и «0» на двух строках. Показанное число становилось неверным.
+ *
+ * `auto-fit` решает это без медиазапросов, без JS и без замеров, то есть
+ * одинаково на сервере и на клиенте. `columns` при этом становится **потолком**:
+ * трек не уже `column-min`, но и не уже доли, на которую делится контейнер при
+ * N колонках, — поэтому шире N штук не встанет никогда.
+ *
+ * `min(100%, …)` спасает совсем узкий контейнер: без него трек шириной с
+ * `column-min` вылезал бы за край.
+ *
+ * Инлайновым стилем, а не классом: выражение зависит от N, и шкалы утилит для
+ * него не существует — тот же довод, что записан у сетки `GrDashboard`.
+ */
+export function descriptionColumnsStyle(
+  columns: GrDescriptionColumns,
+  /**
+   * Ширина колонки подписей при `inline`. В этой раскладке подпись и значение
+   * стоят **рядом**, поэтому минимум колонки складывается из них двоих: колонка
+   * шириной с одну подпись оставляет значению несколько пикселей, и оно
+   * переносится посимвольно — тот же дефект, только в других числах.
+   */
+  labelWidth?: string,
+): Record<string, string> {
+  const base = 'var(--gr-description-list-column-min, 12rem)'
+  const min = labelWidth
+    ? `max(${base}, calc(${labelWidth} + var(--gr-description-list-value-min, 5rem)))`
+    : base
+
+  return {
+    gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, max(${min}, (100% - ${columns - 1} * 1rem) / ${columns})), 1fr))`,
+  }
 }
 
 export const descriptionPairInlineClass = 'flex min-w-0 items-baseline gap-2'

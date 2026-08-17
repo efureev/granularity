@@ -87,6 +87,7 @@ import { grToasterConfig } from '../components/GrToaster/config'
 import { grTooltipConfig } from '../components/GrTooltip/config'
 import { grTreeConfig } from '../components/GrTree/config'
 import { grTreeSelectConfig } from '../components/GrTreeSelect/config'
+import { grValueConfig } from '../components/GrValue/config'
 // </granularity:components:imports>
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
@@ -192,6 +193,7 @@ export const granularityComponentConfigs = {
   GrTooltip: grTooltipConfig,
   GrTree: grTreeConfig,
   GrTreeSelect: grTreeSelectConfig,
+  GrValue: grValueConfig,
   // </granularity:components:registry>
 }
 

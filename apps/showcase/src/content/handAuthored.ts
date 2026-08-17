@@ -9,7 +9,7 @@ const componentGroups = {
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrCodeBlock', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree'],
+  data: ['GrAvatar', 'GrCard', 'GrCodeBlock', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
   utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -91,6 +91,7 @@ const componentSummaryOverrides = {
   GrTooltip: 'Shows a short hint on hover or focus.',
   GrTree: 'Shows a hierarchy of items with node expansion and selection.',
   GrTreeSelect: 'Selection of a value from a tree structure in a single control.',
+  GrValue: 'A quantity with its affixes: prefix, value, suffix — and nothing else.',
 } as const satisfies Record<string, string>
 
 export function resolveHandAuthoredComponentGroup(componentName: string): string {
@@ -174,6 +175,10 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
     tags: ['new'],
   },
   'component:GrDelta': {
+    group: 'data',
+    tags: ['new'],
+  },
+  'component:GrValue': {
     group: 'data',
     tags: ['new'],
   },

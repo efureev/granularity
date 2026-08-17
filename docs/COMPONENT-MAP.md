@@ -189,10 +189,15 @@
 | клавишу или сочетание | [`GrKbd`](../packages/granularity/docs/components/GrKbd.md) |
 | крупный числовой показатель с динамикой | [`GrStatistic`](../packages/granularity/docs/components/GrStatistic.md) |
 | величину со знаком и тоном внутри строки текста | [`GrDelta`](../packages/granularity/docs/components/GrDelta.md) |
+| величину с припиской — валютой, единицей — и ничего сверх | [`GrValue`](../packages/granularity/docs/components/GrValue.md) |
 
-Различитель у последних двух — **место в вёрстке**, а не тип величины:
+Различитель у первых двух — **место в вёрстке**, а не тип величины:
 `GrStatistic` это блочная плитка со своей подписью, `GrDelta` — фрагмент
 предложения, у которого ни подписи, ни поверхности нет.
+
+`GrValue` — примитив под обоими: он показывает запись величины и решает, как
+выглядят её приписки. Берут его напрямую, когда пишут свой компонент с
+величиной и не хотят ни знака с тоном, ни плитки с подписью.
 
 ### Технические данные как есть
 
@@ -368,6 +373,7 @@
 | [`GrTooltip`](../packages/granularity/docs/components/GrTooltip.md) | ядро | подпись к иконочной кнопке |
 | [`GrTree`](../packages/granularity/docs/components/GrTree.md) | ядро | данные вложены |
 | [`GrTreeSelect`](../packages/granularity/docs/components/GrTreeSelect.md) | ядро | варианты вложены |
+| [`GrValue`](../packages/granularity/docs/components/GrValue.md) | ядро | пишете свой компонент с величиной |
 | [`XgQuickForm`](../packages/extra-granularity/docs/components/XgQuickForm.md) | extra | форма из одного поля |
 <!-- component-map:generated:end -->
 

@@ -70,7 +70,7 @@
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granularity": "^0.23.0",
+    "@feugene/granularity": "^0.24.0",
     "@feugene/granularity-test-kit": "^0.1.0",
     "@feugene/unocss-preset-granular": "^0.8.2",
     "@types/node": "^26.1.1",

@@ -1,0 +1,5 @@
+export { default } from './GrValue.vue'
+export { default as GrValue } from './GrValue.vue'
+export { grValueConfig } from './config'
+export type { GrValueProps } from './GrValue.vue'
+export { grValueSafelist } from './safelist'

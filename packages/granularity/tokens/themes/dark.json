@@ -154,7 +154,7 @@
         },
         {
           "name": "--gr-success-light",
-          "value": "#064e3b",
+          "value": "#194536",
           "description": "Облегчённая success-подложка для мягких статусов и подсветок."
         },
         {
@@ -179,7 +179,7 @@
         },
         {
           "name": "--gr-warning-light",
-          "value": "#7c2d12",
+          "value": "#672e1c",
           "description": "Облегчённая warning-подложка для мягких warning-состояний."
         },
         {
@@ -199,7 +199,7 @@
         },
         {
           "name": "--gr-danger-light",
-          "value": "#7f1d1d",
+          "value": "#6a2522",
           "description": "Облегчённая danger-подложка для мягких error-состояний."
         },
         {
@@ -219,7 +219,7 @@
         },
         {
           "name": "--gr-info-light",
-          "value": "#1e3a8a",
+          "value": "#213771",
           "description": "Облегчённая info-подложка для спокойных информационных блоков."
         },
         {
@@ -239,7 +239,7 @@
         },
         {
           "name": "--gr-slate-light",
-          "value": "#334155",
+          "value": "#313b4a",
           "description": "Облегчённая slate-подложка для мягких нейтральных состояний."
         },
         {
@@ -259,7 +259,7 @@
         },
         {
           "name": "--gr-azure-light",
-          "value": "#0c4a6e",
+          "value": "#1b425c",
           "description": "Облегчённая azure-подложка для мягких informational поверхностей."
         },
         {
@@ -493,6 +493,26 @@
           "name": "--gr-sidebar-ring",
           "value": "#818cf8",
           "description": "Focus-ring для интерактивных элементов внутри sidebar."
+        }
+      ]
+    },
+    {
+      "title": "Elevation",
+      "tokens": [
+        {
+          "name": "--gr-shadow-1",
+          "value": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "description": "Уровень elevation `1`. Тень тёмной темы чернее и плотнее светлой: на тёмном фоне полупрозрачный синий не даёт тени вовсе, и поверхность теряет один из двух каналов подъёма."
+        },
+        {
+          "name": "--gr-shadow-2",
+          "value": "0 8px 24px rgba(0, 0, 0, 0.55)",
+          "description": "Уровень elevation `2` для всплывающих слоёв."
+        },
+        {
+          "name": "--gr-shadow-3",
+          "value": "0 16px 48px rgba(0, 0, 0, 0.65)",
+          "description": "Уровень elevation `3` для модальных слоёв."
         }
       ]
     }

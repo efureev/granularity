@@ -34,7 +34,7 @@ describe('GrCard', () => {
 
     expect(wrapper.element.tagName).toBe('DIV')
     expect(wrapper.find('[data-gr-card-body]').exists()).toBe(false)
-    expect(wrapper.classes()).toContain('shadow-sm')
+    expect(wrapper.classes()).toContain('shadow-[var(--gr-shadow-1)]')
     expect(wrapper.classes().some(cls => /^p-\d/.test(cls))).toBe(false)
   })
 })
@@ -55,11 +55,11 @@ describe('GrCard — padding и variant', () => {
   it('outlined снимает тень, ghost — ещё и рамку', () => {
     const outlined = mount(GrCard, { props: { variant: 'outlined' }, slots: { default: 'x' } })
     expect(outlined.classes()).toContain('border')
-    expect(outlined.classes()).not.toContain('shadow-sm')
+    expect(outlined.classes()).not.toContain('shadow-[var(--gr-shadow-1)]')
 
     const ghost = mount(GrCard, { props: { variant: 'ghost' }, slots: { default: 'x' } })
     expect(ghost.classes()).not.toContain('border')
-    expect(ghost.classes()).not.toContain('shadow-sm')
+    expect(ghost.classes()).not.toContain('shadow-[var(--gr-shadow-1)]')
     expect(ghost.classes()).toContain('bg-[var(--gr-card)]')
   })
 
@@ -75,7 +75,7 @@ describe('GrCard — padding и variant', () => {
 
     const card = mount(Harness).get('[data-gr-card]')
     expect(card.classes()).toContain('p-6')
-    expect(card.classes()).not.toContain('shadow-sm')
+    expect(card.classes()).not.toContain('shadow-[var(--gr-shadow-1)]')
   })
 })
 
@@ -174,8 +174,52 @@ describe('GrCard — заголовок секции', () => {
     const wrapper = mount(GrCard, { props: { title: 'Секция', padding: 'md' }, slots: { default: 'тело' } })
 
     expect(wrapper.classes()).not.toContain('p-4')
-    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-4')
     expect(wrapper.get('[data-gr-card-body]').classes()).toContain('p-4')
+  })
+
+  // Заголовок рисует сама карточка, и прижатым к рамке он выглядеть не должен
+  // ни при каком `padding` — тем более при дефолтном `none`.
+  it('шапка из title не остаётся без отступа даже при padding=none', () => {
+    const wrapper = mount(GrCard, { props: { title: 'Документ' }, slots: { default: 'тело' } })
+    const header = wrapper.get('[data-gr-card-header]').classes()
+
+    expect(header).toContain('px-4')
+    expect(header).toContain('py-3')
+    // Тело по-прежнему слушается `padding`: таблица внутри идёт край в край.
+    expect(wrapper.get('[data-gr-card-body]').classes().some(cls => /^p-\d/.test(cls))).toBe(false)
+  })
+
+  // Компонентного подвала не бывает: подвал всегда приходит слотом, то есть
+  // отвечает за него потребитель — как и за `#header`.
+  it('подвал остаётся на общем padding: его рисует не карточка', () => {
+    const wrapper = mount(GrCard, {
+      props: { title: 'Документ' },
+      slots: { default: 'тело', footer: '<button>Действие</button>' },
+    })
+
+    expect(wrapper.get('[data-gr-card-footer]').classes()).not.toContain('px-4')
+  })
+
+  // `#header` наполняет потребитель — он же отвечает за его отступы. Иначе
+  // `GrDashboardItem`, который передаёт свою шапку со своими отступами,
+  // получил бы двойной.
+  it('слот #header своего отступа не получает', () => {
+    const wrapper = mount(GrCard, {
+      slots: { header: '<div class="p-2">своя шапка</div>', default: 'тело' },
+    })
+    const header = wrapper.get('[data-gr-card-header]').classes()
+
+    expect(header).not.toContain('px-4')
+    expect(header).not.toContain('py-3')
+  })
+
+  it('слот #header по-прежнему слушается padding', () => {
+    const wrapper = mount(GrCard, {
+      props: { padding: 'md' },
+      slots: { header: '<h3>H</h3>', default: 'тело' },
+    })
+
+    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-4')
   })
 
   it('без title карточка остаётся ровно тем, чем была', () => {

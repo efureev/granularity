@@ -22,8 +22,8 @@ describe('GrDelta', () => {
     })
 
     expect(wrapper.get('[data-gr-delta-sign]').text()).toBe('+')
-    expect(wrapper.get('[data-gr-delta-prefix]').text()).toBe('$')
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('0.004')
+    expect(wrapper.get('[data-gr-value-prefix]').text()).toBe('$')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('0.004')
     expect(wrapper.attributes('data-tone')).toBe('success')
     expect(wrapper.classes()).toContain('text-[var(--gr-success-text)]')
   })
@@ -44,7 +44,7 @@ describe('GrDelta', () => {
     })
 
     expect(wrapper.get('[data-gr-delta-sign]').text()).toBe('-')
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('0,0280')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('0,0280')
     expect(wrapper.text()).toBe('-$0,0280')
   })
 
@@ -83,7 +83,7 @@ describe('GrDelta', () => {
 
     expect(sign.endsWith('-')).toBe(true)
     expect(sign.length).toBeGreaterThan(1)
-    expect(wrapper.get('[data-gr-delta-value]').text()).not.toContain('-')
+    expect(wrapper.get('[data-gr-value-number]').text()).not.toContain('-')
   })
 
   it('вынос знака не пересобирает разряды', () => {
@@ -95,12 +95,23 @@ describe('GrDelta', () => {
   })
 
   // Разметка без префикса не меняется вовсе: выносить знак некуда, и лишний
-  // узел сломал бы стили потребителя, написанные по `[data-gr-delta-value]`.
+  // узел сломал бы стили потребителя, написанные по `[data-gr-value-number]`.
   it('без префикса знак остаётся внутри числа', () => {
     const wrapper = mount(GrDelta, { props: { value: 5, locale: 'en-US' } })
 
     expect(wrapper.find('[data-gr-delta-sign]').exists()).toBe(false)
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('+5')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('+5')
+  })
+
+  // Величина стоит в строке текста: приписка при ней набирается кеглем и
+  // цветом строки. Дефолт `GrValue` рассчитан на плитку и приглушает суффикс —
+  // здесь он перекрыт, иначе процент оказался бы мельче окружающих слов.
+  it('суффикс в строке текста не приглушается', () => {
+    const wrapper = mount(GrDelta, { props: { value: -15, suffix: '%', locale: 'en-US' } })
+    const style = wrapper.attributes('style') ?? ''
+
+    expect(style).toContain('--gr-value-suffix-color: currentColor')
+    expect(style).toContain('--gr-value-suffix-size: 1em')
   })
 
   it('стрелка стоит перед знаком, а не между знаком и префиксом', () => {
@@ -114,14 +125,14 @@ describe('GrDelta', () => {
   it('падение красится опасностью, минус ставит Intl', () => {
     const wrapper = mount(GrDelta, { props: { value: -12.5, precision: 2, locale: 'en-US' } })
 
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('-12.50')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('-12.50')
     expect(wrapper.attributes('data-tone')).toBe('danger')
   })
 
   it('ноль нейтрален и знака не получает', () => {
     const wrapper = mount(GrDelta, { props: { value: 0, locale: 'en-US' } })
 
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('0')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('0')
     expect(wrapper.attributes('data-tone')).toBe('neutral')
   })
 
@@ -131,19 +142,19 @@ describe('GrDelta', () => {
       props: { value: null, prefix: '$', suffix: '%', showArrow: true },
     })
 
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('—')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('—')
     expect(wrapper.attributes('data-tone')).toBeUndefined()
     expect(wrapper.find('[data-gr-delta-arrow]').exists()).toBe(false)
     expect(wrapper.find('[data-gr-delta-sign]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-delta-prefix]').exists()).toBe(false)
-    expect(wrapper.find('[data-gr-delta-suffix]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-value-prefix]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-value-suffix]').exists()).toBe(false)
     expect(wrapper.classes()).toContain('text-[var(--gr-muted-fg)]')
   })
 
   it('emptyText перекрывает прочерк', () => {
     const wrapper = mount(GrDelta, { props: { value: null, emptyText: 'нет данных' } })
 
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('нет данных')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('нет данных')
   })
 
   // Значение остаётся собой: «−15 %» при падении себестоимости зелёное,
@@ -154,29 +165,29 @@ describe('GrDelta', () => {
     })
 
     expect(wrapper.attributes('data-tone')).toBe('success')
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('-15')
-    expect(wrapper.get('[data-gr-delta-suffix]').text()).toBe('%')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('-15')
+    expect(wrapper.get('[data-gr-value-suffix]').text()).toBe('%')
   })
 
   it('showSign=false убирает плюс, минус оставляет', () => {
     const plus = mount(GrDelta, { props: { value: 10, showSign: false, locale: 'en-US' } })
-    expect(plus.get('[data-gr-delta-value]').text()).toBe('10')
+    expect(plus.get('[data-gr-value-number]').text()).toBe('10')
 
     const minus = mount(GrDelta, { props: { value: -10, showSign: false, locale: 'en-US' } })
-    expect(minus.get('[data-gr-delta-value]').text()).toBe('-10')
+    expect(minus.get('[data-gr-value-number]').text()).toBe('-10')
   })
 
   // Склейка `'+' + value` теряла разряды: строка `'+1,234'` уже не число.
   it('форматирование по локали не теряет разряды', () => {
     const wrapper = mount(GrDelta, { props: { value: 1234567.5, precision: 1, locale: 'en-US' } })
 
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('+1,234,567.5')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('+1,234,567.5')
   })
 
   it('локаль меняет разделители', () => {
     const wrapper = mount(GrDelta, { props: { value: 1234.5, precision: 1, locale: 'de-DE' } })
 
-    expect(wrapper.get('[data-gr-delta-value]').text()).toBe('+1.234,5')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('+1.234,5')
   })
 
   it('стрелка декоративна и следует знаку, а не полярности', () => {

@@ -52,6 +52,12 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   leaf: ['GrJsonViewer'],
   group: ['GrTimeline'],
   handle: ['GrSortableList'],
+  // Места до и после величины, куда потребитель кладёт своё: знак и стрелку
+  // (`GrDelta`), скрытое конечное значение для диктора (`GrStatistic`). Не
+  // `before`/`after`: те читаются как «до/после всего компонента», а эти два
+  // стоят **внутри** записи величины, между её частями.
+  lead: ['GrValue'],
+  trail: ['GrValue'],
   left: ['GrNavbar'],
   marker: ['GrTimeline'],
   node: ['GrTreeSelect'],

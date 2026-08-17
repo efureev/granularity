@@ -1,7 +1,7 @@
 import { splitClassTokens } from '../shared/classTokens'
 
 import {
-  descriptionColumnsClass,
+  descriptionSingleColumnClass,
   descriptionDensityClass,
   descriptionDividedClass,
   descriptionLabelInlineClass,
@@ -30,7 +30,7 @@ export const grDescriptionListSafelist = [...new Set([
   ...splitClassTokens(descriptionLabelInlineClass),
   ...splitClassTokens(descriptionLabelStackedClass),
   ...splitClassTokens(descriptionValueClass),
-  ...Object.values(descriptionColumnsClass).flatMap(splitClassTokens),
+  ...splitClassTokens(descriptionSingleColumnClass),
   ...Object.values(descriptionValueToneClass).flatMap(splitClassTokens),
   ...Object.values(descriptionSizeClass).flatMap(splitClassTokens),
   ...Object.values(descriptionDensityClass).flatMap(splitClassTokens),

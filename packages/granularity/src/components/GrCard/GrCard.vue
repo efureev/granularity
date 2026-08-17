@@ -7,6 +7,7 @@ import {
   cardDescriptionClass,
   cardTitleClass,
   grCardRootClass,
+  ownHeaderPaddingClass,
   paddingClass,
   sectionDividerBottomClass,
   sectionDividerTopClass,
@@ -153,7 +154,16 @@ const rootClass = computed(() => grCardRootClass({
 
 const sectionPaddingClass = computed(() => paddingClass[resolvedPadding.value])
 
-const headerClass = computed(() => [sectionPaddingClass.value, sectionDividerBottomClass].filter(Boolean).join(' '))
+/**
+ * Карточка отбивает то, что рисует сама. Шапка из `title` — её собственная, и
+ * отступ ей полагается независимо от `padding`. Слот `#header` сильнее пропов и
+ * заменяет шапку целиком: там отступы принадлежат тому, кто её наполнил, —
+ * иначе потребитель со своими отступами внутри слота получил бы двойные.
+ */
+const headerClass = computed(() => [
+  hasOwnHeader.value ? sectionPaddingClass.value : ownHeaderPaddingClass,
+  sectionDividerBottomClass,
+].filter(Boolean).join(' '))
 const footerClass = computed(() => [sectionPaddingClass.value, sectionDividerTopClass].filter(Boolean).join(' '))
 const bodySectionClass = computed(() => [sectionPaddingClass.value, props.bodyClass].filter(Boolean).join(' '))
 

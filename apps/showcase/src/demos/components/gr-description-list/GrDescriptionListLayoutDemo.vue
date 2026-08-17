@@ -15,6 +15,12 @@ const items: GrDescriptionItem[] = [
 
 const layout = ref<GrDescriptionLayout>('inline')
 const columns = ref<GrDescriptionColumns>(2)
+
+/**
+ * Ширина контейнера, а не окна: колонки считает CSS от неё. Сузьте — и лишние
+ * колонки схлопнутся сами, не дожидаясь смены брейкпоинта вьюпорта.
+ */
+const width = ref(680)
 </script>
 
 <template>
@@ -46,10 +52,22 @@ const columns = ref<GrDescriptionColumns>(2)
     />
 
     <!--
-      `stackBelow` меряет контейнер, а не вьюпорт: пары живут и в узкой карточке
-      на широком экране. Ниже порога `inline` сам переключается на `stacked` —
-      фиксированная подпись иначе выжимает значение в букву на строку.
+      Ширина контейнера, а не окна. Колонки считает CSS от неё: `columns` задаёт
+      потолок, а сколько их встанет на самом деле — решает место. Сузьте до
+      290px, и две колонки схлопнутся в одну, хотя экран остался широким.
     -->
-    <GrDescriptionList :items="items" :layout="layout" :columns="columns" :stack-below="420" />
+    <label class="flex items-center gap-3 text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]">
+      Ширина контейнера
+      <input v-model.number="width" type="range" min="240" max="680" step="10" class="w-48">
+      <span class="tabular-nums">{{ width }}px</span>
+    </label>
+
+    <!--
+      `stackBelow` меряет контейнер и переключает только раскладку подписей:
+      фиксированная подпись в узкой колонке выжимает значение в букву на строку.
+    -->
+    <div :style="{ width: `${width}px`, maxWidth: '100%' }" class="rounded-[var(--gr-radius-md)] border border-dashed border-[var(--gr-brd)] p-3">
+      <GrDescriptionList :items="items" :layout="layout" :columns="columns" :stack-below="420" />
+    </div>
   </div>
 </template>

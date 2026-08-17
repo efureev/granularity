@@ -35,6 +35,21 @@ export const statisticAffixSizeBySize: Record<GrStatisticSize, string> = {
   lg: 'text-[length:var(--gr-text-xl)]',
 }
 
+/**
+ * Кегль приписки — значением токена, а не классом: он уезжает в
+ * `--gr-value-suffix-size`, которым `GrValue` и набирает суффикс.
+ *
+ * Ступень шкалы, а не доля от величины: у плитки шкала размеров своя, и на
+ * ступени `md` число крупное (`--gr-text-3xl`), а приписка при нём обязана
+ * остаться подписью. Доля дала бы её вровень с числом.
+ */
+export const statisticAffixSizeVarBySize: Record<GrStatisticSize, string> = {
+  xs: 'var(--gr-text-xs)',
+  sm: 'var(--gr-text-xs)',
+  md: 'var(--gr-text-base)',
+  lg: 'var(--gr-text-xl)',
+}
+
 // Высота плейсхолдера загрузки повторяет строку значения — блок не «прыгает».
 // Значение отдаётся в `GrSkeleton` пропом, поэтому это px, а не класс.
 export const statisticPlaceholderHeightBySize: Record<GrStatisticSize, string> = {

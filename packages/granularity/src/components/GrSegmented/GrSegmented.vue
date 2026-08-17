@@ -6,6 +6,7 @@ import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
+import { titleWhenTruncated } from '../shared/truncationTitle'
 
 import type { ComponentPublicInstance } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
@@ -517,7 +518,13 @@ onBeforeUnmount(() => {
           aria-hidden="true"
           :class="grSegmentedItemIconClass"
         />
-        <span v-if="option.label" :class="grSegmentedItemLabelClass">
+        <!-- Подпись сегмента обрезается по ширине трека, и «Включе…» без
+             подсказки прочитать нечем: полный текст отдаётся по наведению. -->
+        <span
+          v-if="option.label"
+          :class="grSegmentedItemLabelClass"
+          @pointerenter="titleWhenTruncated"
+        >
           {{ option.label }}
         </span>
       </slot>

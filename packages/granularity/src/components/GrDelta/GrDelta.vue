@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import { formatNumberToParts, splitLeadingSign } from '../../internal/granularityFormat'
+import GrValue from '../GrValue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -15,7 +16,7 @@ import {
   deltaEmptyClass,
   deltaRootClass,
   deltaSizeClass,
-  deltaSuffixClass,
+  deltaValueStyle,
   deltaToneClass,
 } from './grDeltaStyles'
 
@@ -132,7 +133,7 @@ const rootClass = computed(() => [
 </script>
 
 <template>
-  <span data-gr-delta :data-tone="isEmpty ? undefined : tone" :class="rootClass">
+  <span data-gr-delta :data-tone="isEmpty ? undefined : tone" :class="rootClass" :style="deltaValueStyle">
     <component
       :is="arrowIcon"
       v-if="resolvedShowArrow && !isEmpty"
@@ -141,9 +142,17 @@ const rootClass = computed(() => [
       aria-hidden="true"
     />
 
-    <span v-if="sign" data-gr-delta-sign>{{ sign }}</span>
-    <span v-if="prefix && !isEmpty" data-gr-delta-prefix>{{ prefix }}</span>
-    <span data-gr-delta-value>{{ formatted }}</span>
-    <span v-if="suffix && !isEmpty" data-gr-delta-suffix :class="deltaSuffixClass">{{ suffix }}</span>
+    <!-- Запись величины рисует `GrValue`: приписки оформляются там же, где у
+         остальных величин пакета, и настраиваются теми же токенами. Знак идёт
+         в `#lead` — он обязан встать перед валютой, а не после неё. -->
+    <GrValue
+      :value="formatted"
+      :prefix="isEmpty ? undefined : prefix"
+      :suffix="isEmpty ? undefined : suffix"
+    >
+      <template v-if="sign" #lead>
+        <span data-gr-delta-sign>{{ sign }}</span>
+      </template>
+    </GrValue>
   </span>
 </template>

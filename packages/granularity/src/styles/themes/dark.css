@@ -62,28 +62,28 @@
 
   /* Status roles */
   --gr-success: #34d399;
-  --gr-success-light: #064e3b;
+  --gr-success-light: #194536;
   --gr-success-fg: #0f172a;
   --gr-primary-text: #c7d2fe;
   --gr-success-text: #6ee7b7;
   --gr-warning: #fb923c;
-  --gr-warning-light: #7c2d12;
+  --gr-warning-light: #672e1c;
   --gr-warning-fg: #0f172a;
   --gr-warning-text: #fdba74;
   --gr-danger: #f87171;
-  --gr-danger-light: #7f1d1d;
+  --gr-danger-light: #6a2522;
   --gr-danger-fg: #0f172a;
   --gr-danger-text: #fca5a5;
   --gr-info: #60a5fa;
-  --gr-info-light: #1e3a8a;
+  --gr-info-light: #213771;
   --gr-info-fg: #0f172a;
   --gr-info-text: #bfdbfe;
   --gr-slate: #94a3b8;
-  --gr-slate-light: #334155;
+  --gr-slate-light: #313b4a;
   --gr-slate-fg: #0f172a;
   --gr-slate-text: #cbd5e1;
   --gr-azure: #38bdf8;
-  --gr-azure-light: #0c4a6e;
+  --gr-azure-light: #1b425c;
   --gr-azure-fg: #0f172a;
   --gr-azure-text: #bae6fd;
 
@@ -149,6 +149,11 @@
   --gr-sidebar-accent-fg: #f1f5f9;
   --gr-sidebar-brd: #334155;
   --gr-sidebar-ring: #818cf8;
+
+  /* Elevation */
+  --gr-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --gr-shadow-2: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --gr-shadow-3: 0 16px 48px rgba(0, 0, 0, 0.65);
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {

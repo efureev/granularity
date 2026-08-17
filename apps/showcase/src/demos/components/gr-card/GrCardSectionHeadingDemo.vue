@@ -25,6 +25,15 @@ const items = [
       <GrDescriptionList :items="items" label-width="7rem" />
     </GrCard>
 
+    <!--
+      Типовая карточка отчёта: `padding` оставлен дефолтным, чтобы содержимое
+      шло край в край, — и шапка всё равно с отступом. Она принадлежит самой
+      карточке, а не содержимому, и прижатой к рамке быть не должна.
+    -->
+    <GrCard title="Documents" variant="outlined">
+      <GrDescriptionList :items="items" layout="flow" class="px-4 py-3" />
+    </GrCard>
+
     <!-- `#header` сильнее пропов: нестандартная шапка остаётся за потребителем. -->
     <GrCard variant="outlined" padding="md">
       <template #header>

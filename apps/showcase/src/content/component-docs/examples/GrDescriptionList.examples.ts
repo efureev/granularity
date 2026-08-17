@@ -12,7 +12,7 @@ export const grDescriptionListExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'description-list-layout',
     title: 'Inline, stacked, flow and columns',
-    description: '`inline` держит подписи колонкой, `stacked` ставит их над значением, `flow` пускает пары строкой с переносом. Колонок до четырёх, и лестница брейкпоинтов зашита в ступень. `stackBelow` переключает раскладку по ширине контейнера, а не вьюпорта — сузьте окно и посмотрите на переход.',
+    description: '`inline` держит подписи колонкой, `stacked` ставит их над значением, `flow` пускает пары строкой с переносом. `columns` задаёт **потолок** колонок — сколько встанет на самом деле, решает ширина контейнера, а не вьюпорта: потяните ползунок и посмотрите, как две колонки схлопываются в одну на широком экране. `stackBelow` тем же способом переключает раскладку подписей.',
     status: 'ready',
     previewKey: 'gr-description-list-layout',
   },

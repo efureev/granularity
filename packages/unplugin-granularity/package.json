@@ -54,7 +54,7 @@
     "unplugin-vue-components": ">=0.26.0"
   },
   "devDependencies": {
-    "@feugene/granularity": "^0.23.0",
+    "@feugene/granularity": "^0.24.0",
     "@types/node": "^25.5.2",
     "typescript": "^6.0.2",
     "unplugin-vue-components": "^32.0.0",

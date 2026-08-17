@@ -72,6 +72,7 @@ export * from './components/GrToaster'
 export * from './components/GrTooltip'
 export * from './components/GrTree'
 export * from './components/GrTreeSelect'
+export * from './components/GrValue'
 // </granularity:components>
 
 // Runtime composables, публикуемые пакетом через root-barrel
@@ -141,6 +142,10 @@ export type {
 // (валидация, фильтры, генерация safelist).
 export { GR_TONES } from './components/shared/tones'
 export type { GrTone } from './components/shared/tones'
+
+// Обрезка без подсказки — потеря данных, и правило это одно на всю разметку,
+// а не на компоненты пакета: `truncate` в прикладном коде обрезает точно так же.
+export { titleWhenTruncated } from './components/shared/truncationTitle'
 
 // File validation — реэкспортируем типы, чтобы прикладной код мог писать
 // `import type { FileValidationIssue } from '@feugene/granularity'` без

@@ -12,7 +12,12 @@ export type GrCardVariant = 'elevated' | 'outlined' | 'ghost'
 export const surfaceBaseClass = 'rounded-[var(--gr-radius-lg)] bg-[var(--gr-card)] text-[var(--gr-card-fg)]'
 
 export const variantClass: Record<GrCardVariant, string> = {
-  elevated: 'border border-[var(--gr-brd)] shadow-sm',
+  // Тень — токеном, а не утилитой uno-шкалы: у той зашит свой полупрозрачный
+  // цвет, темой он не настраивается, и на тёмном фоне тени не получалось вовсе
+  // — карточка теряла подъём и держалась на одной рамке. Токен темозависим.
+  // Имя утилиты здесь не пишется намеренно: UnoCSS сканирует текст файла и
+  // сгенерировал бы класс прямо из комментария.
+  elevated: 'border border-[var(--gr-brd)] shadow-[var(--gr-shadow-1)]',
   outlined: 'border border-[var(--gr-brd)]',
   // Карточка внутри карточки: вторая рамка только шумит.
   ghost: '',
@@ -27,6 +32,18 @@ export const paddingClass: Record<GrCardPadding, string> = {
 
 export const sectionDividerTopClass = 'border-t border-[var(--gr-brd)]'
 export const sectionDividerBottomClass = 'border-b border-[var(--gr-brd)]'
+
+/**
+ * Отступ шапки, которую карточка рисует сама из `title`.
+ *
+ * Не берётся из `padding`: тот описывает **содержимое**, и дефолт `none` у него
+ * осмыслен — на `GrCard` стоят `GrCollapse` и `GrList`, а карточка с таблицей
+ * хочет её край в край. Заголовок же принадлежит самой карточке, и прижатым к
+ * рамке вместе с разделителем он выглядеть не должен ни при каком `padding`.
+ *
+ * По вертикали отступ меньше горизонтального: шапка — строка, а не блок.
+ */
+export const ownHeaderPaddingClass = 'px-4 py-3'
 
 /**
  * Уровень заголовка карточки. `h1` намеренно нет: его задаёт страница, а

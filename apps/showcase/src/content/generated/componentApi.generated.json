@@ -11660,5 +11660,80 @@
         "items": []
       }
     ]
+  },
+  "GrValue": {
+    "name": "GrValue",
+    "sourcePath": "packages/granularity/src/components/GrValue/GrValue.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "value",
+            "description": "Готовое к показу значение. Не форматируется: «2 ч 15 мин» и «—» тоже величины.",
+            "type": "string | number | null | undefined",
+            "required": false
+          },
+          {
+            "name": "prefix",
+            "description": "Приписка перед значением: валюта, знак приближения.",
+            "type": "string | undefined",
+            "required": false
+          },
+          {
+            "name": "suffix",
+            "description": "Приписка после значения: единица измерения, валюта справа.",
+            "type": "string | undefined",
+            "required": false
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Значение вместо пропа.",
+            "type": "any"
+          },
+          {
+            "name": "prefix",
+            "description": "Приписка перед значением.",
+            "type": "any"
+          },
+          {
+            "name": "suffix",
+            "description": "Приписка после значения.",
+            "type": "any"
+          },
+          {
+            "name": "lead",
+            "description": "Перед префиксом: знак величины у `GrDelta`, стрелка направления. Слотом, а не пропом, — разметка там принадлежит потребителю.",
+            "type": "any"
+          },
+          {
+            "name": "trail",
+            "description": "После значения: скрытый узел для диктора у `GrStatistic`.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": []
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
   }
 }

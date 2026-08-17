@@ -173,6 +173,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrTooltip`](./components/GrTooltip.md)
 - [`GrTree`](./components/GrTree.md)
 - [`GrTreeSelect`](./components/GrTreeSelect.md)
+- [`GrValue`](./components/GrValue.md)
 
 ## Страница компонента: что туда писать
 

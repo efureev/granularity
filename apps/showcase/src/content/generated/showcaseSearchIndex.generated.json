@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 72 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 73 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -1230,6 +1230,17 @@
     "context": "forms / component",
     "searchableTitle": "grtreeselect",
     "searchableContent": "grtreeselect grtreeselect selection of a value from a tree structure in a single control. forms component /components/gr-tree-select packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grtreeselect generated public-api components components gr-tree-select gr tree select"
+  },
+  {
+    "id": "entity:component:GrValue",
+    "title": "GrValue",
+    "description": "A quantity with its affixes: prefix, value, suffix — and nothing else.",
+    "href": "/components/gr-value",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grvalue",
+    "searchableContent": "grvalue grvalue a quantity with its affixes: prefix, value, suffix and nothing else. data component /components/gr-value packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grvalue generated public-api new components components gr-value gr value"
   },
   {
     "id": "entity:directive:vAutofocus",
@@ -4618,6 +4629,50 @@
     "context": "GrTreeSelect",
     "searchableTitle": "grtreeselect integration notes",
     "searchableContent": "grtreeselect selection of a value from a tree structure in a single control. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrValue:section:overview",
+    "title": "GrValue / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-value#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrValue",
+    "searchableTitle": "grvalue component overview",
+    "searchableContent": "grvalue a quantity with its affixes: prefix, value, suffix and nothing else. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrValue:section:live-examples",
+    "title": "GrValue / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-value#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrValue",
+    "searchableTitle": "grvalue live examples",
+    "searchableContent": "grvalue a quantity with its affixes: prefix, value, suffix and nothing else. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrValue:section:api",
+    "title": "GrValue / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-value#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrValue",
+    "searchableTitle": "grvalue generated api",
+    "searchableContent": "grvalue a quantity with its affixes: prefix, value, suffix and nothing else. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrValue:section:integration-notes",
+    "title": "GrValue / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-value#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrValue",
+    "searchableTitle": "grvalue integration notes",
+    "searchableContent": "grvalue a quantity with its affixes: prefix, value, suffix and nothing else. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:directive:vAutofocus:section:overview",

@@ -396,6 +396,7 @@ export const demoPathByPreviewKey = {
   'gr-tree-select-keyboard':              'components/gr-tree-select/GrTreeSelectKeyboardDemo.vue',
   'gr-tree-select-multiple-filter':       'components/gr-tree-select/GrTreeSelectMultipleFilterDemo.vue',
   'gr-tree-select-path-display':          'components/gr-tree-select/GrTreeSelectPathDisplayDemo.vue',
+  'gr-value-affixes':                     'components/gr-value/GrValueAffixesDemo.vue',
   'gr-tree-sizes':                        'components/gr-tree/GrTreeSizesDemo.vue',
   'gr-tree-virtual':                      'components/gr-tree/GrTreeVirtualDemo.vue',
 } as const

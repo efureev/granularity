@@ -179,29 +179,64 @@ describe('GrDescriptionList', () => {
     expect(wrapper.classes()).not.toContain('grid')
   })
 
-  // Лестница брейкпоинтов зашита в ступень: узкий экран всегда в одну колонку.
-  it.each([
-    [3, 'lg:grid-cols-3'],
-    [4, 'lg:grid-cols-4'],
-  ] as const)('columns=%i раскладывается лестницей', (columns, wide) => {
+  // Колонки считает CSS по ширине контейнера, а не медиазапрос по вьюпорту:
+  // вьюпортная лестница включала две колонки в узкой карточке на широком
+  // экране, и значение переносилось посимвольно — «30» печаталось как «3»/«0».
+  it.each([2, 3, 4] as const)('columns=%i задаёт потолок колонок, а не приказ', (columns) => {
     const wrapper = mount(GrDescriptionList, { props: { items, columns } })
+    const style = wrapper.attributes('style') ?? ''
+
+    expect(style).toContain('repeat(auto-fit')
+    expect(style).toContain(`/ ${columns})`)
+    expect(style).toContain('--gr-description-list-column-min')
+    // Ни одного вьюпортного класса не остаётся.
+    expect(wrapper.classes().some(cls => cls.includes(':grid-cols'))).toBe(false)
+  })
+
+  // В `inline` подпись и значение стоят рядом, поэтому колонка обязана вместить
+  // обоих. Колонка шириной с одну подпись оставляла значению 25px, и «Business»
+  // рвался на три строки — тот же дефект, что и посимвольный перенос числа.
+  it('в inline минимум колонки складывается из подписи и значения', () => {
+    const wrapper = mount(GrDescriptionList, {
+      props: { items, columns: 2, labelWidth: '11rem' },
+    })
+    const style = wrapper.attributes('style') ?? ''
+
+    expect(style).toContain('11rem + var(--gr-description-list-value-min')
+  })
+
+  it('в stacked ширина подписи в расчёт не идёт: значение под ней, а не рядом', () => {
+    const wrapper = mount(GrDescriptionList, {
+      props: { items, columns: 2, layout: 'stacked', labelWidth: '11rem' },
+    })
+
+    expect(wrapper.attributes('style') ?? '').not.toContain('11rem')
+  })
+
+  it('одна колонка остаётся классом: формула там вырождается', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items, columns: 1 } })
 
     expect(wrapper.classes()).toContain('grid-cols-1')
-    expect(wrapper.classes()).toContain('sm:grid-cols-2')
-    expect(wrapper.classes()).toContain(wide)
+    expect(wrapper.attributes('style') ?? '').not.toContain('auto-fit')
   })
 
   // `column-count` раскладывает поток и разорвал бы пару между колонками.
   it('columns=2 не рвёт пару: dt и dd остаются в одном элементе сетки', () => {
     const wrapper = mount(GrDescriptionList, { props: { items, columns: 2 } })
 
-    expect(wrapper.classes()).toContain('sm:grid-cols-2')
     expect(wrapper.classes().some(cls => cls.startsWith('columns-'))).toBe(false)
 
     for (const pair of wrapper.findAll('[data-gr-description-pair]')) {
       expect(pair.findAll('dt')).toHaveLength(1)
       expect(pair.findAll('dd')).toHaveLength(1)
     }
+  })
+
+  it('в flow колонок нет ни классом, ни стилем', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items, layout: 'flow', columns: 4 } })
+
+    expect(wrapper.attributes('style') ?? '').not.toContain('auto-fit')
+    expect(wrapper.classes().some(cls => cls.includes('grid-cols'))).toBe(false)
   })
 
   it('divided отбивает пары линией, кроме последней', () => {
@@ -231,7 +266,7 @@ describe('GrDescriptionList', () => {
     const wrapper = mount(Harness)
     expect(wrapper.get('dd').text()).toBe('н/д')
     expect(wrapper.get('dt').attributes('style')).toBeUndefined()
-    expect(wrapper.get('[data-gr-description-list]').classes()).toContain('sm:grid-cols-2')
+    expect(wrapper.get('[data-gr-description-list]').attributes('style')).toContain('/ 2)')
   })
 })
 

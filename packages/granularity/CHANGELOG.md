@@ -7,6 +7,133 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.24.0] 2026-08-18
+
+### Added
+
+- **New `GrValue` — a quantity with its affixes, and nothing else.** Prefix,
+  value, suffix: the primitive `GrDelta` and `GrStatistic` now both stand on. It
+  formats nothing — "2 h 15 min" and "—" are quantities too, and a component
+  that tried to parse them would ruin both — and it has no size scale of its
+  own: type size and colour are inherited from wherever the quantity sits.
+  **What kind of affix it is, the component does not decide.** That question was
+  answered in code until now — prefix set as the number, suffix set as a unit —
+  and the answer was right for `$14.99` and `42 %` but wrong for the rouble,
+  which is written after the amount and is just as much part of it. The defaults
+  are unchanged, but they are defaults now rather than rules, expressed as six
+  tokens: `--gr-value-{prefix,suffix}-{color,size,gap}`. A right-hand currency is
+  two of them. Which side the symbol goes on stays the consumer's call,
+  deliberately: `Intl` places it **by locale, not by currency** — `ru-RU` puts
+  every currency on the right, dollar included; `en-US` puts every one on the
+  left, rouble included — so the familiar "₽ right, $ and € left" is a product
+  rule that cannot be derived from anywhere.
+
+### Changed
+
+- **BREAKING: affix `data`-attributes moved to `GrValue`.** `GrStatistic` and
+  `GrDelta` render the primitive now, so `data-gr-statistic-prefix`,
+  `data-gr-statistic-suffix`, `data-gr-statistic-number`, `data-gr-delta-prefix`,
+  `data-gr-delta-value` and `data-gr-delta-suffix` are gone; those nodes carry
+  `data-gr-value-prefix`, `data-gr-value-number` and `data-gr-value-suffix`
+  instead. Consumer styles written against the old names stop matching —
+  silently, the way CSS does. `GrStatistic`'s page used to promise those
+  attributes would keep working; the promise is withdrawn here rather than
+  quietly broken. `data-gr-delta-sign`, `data-gr-statistic-final` and everything
+  outside the value record are untouched.
+
+### Fixed
+
+- **Elevation was a single set shared by both themes, and in the dark one it
+  produced no shadow at all.** The levels were painted with a translucent
+  `rgba(15, 23, 42, …)` — the exact colour of the dark theme's own background —
+  so a raised surface lost one of its two lift channels and stood on lightness
+  alone. That is the real cause behind "cards do not separate, the page is one
+  dark sheet": the reported culprit, the `--gr-card`/`--gr-bg` pair, measures
+  **further apart** in dark than in light (ΔL\* 8.4 against 1.8), so it was never
+  the problem. Each theme now declares its own elevation, and the dark one is
+  blacker and denser. `GrCard` and `GrLoading` also stopped taking their shadow
+  from a uno-scale utility: that utility carries its own hardcoded colour, is
+  not themeable, and was the reason the card's shadow could not follow the theme
+  at all. Gate: `src/__tests__/elevationPerTheme.test.ts`.
+- **Soft tone backdrops shouted in the dark theme.** The same `-light` role sat
+  1.5–2.8× further from its card than in light, and up to 4× higher in chroma:
+  `danger` screamed where its light-theme counterpart whispered. All six tones
+  are now damped to about three quarters of that distance. Matching the light
+  theme exactly was measured and rejected — it turns the backdrops grey, because
+  a colour on a dark ground needs more chroma to read as a colour at all. Text
+  contrast improves rather than suffers (worst case 5.28 → 5.82), and the tones
+  stay apart by ΔE ≥ 8.4, well over the gate's threshold of 4.
+
+### Changed
+
+- **`GrStatistic` no longer renders a currency sign as a caption.** The prefix
+  was drawn muted, a step smaller and separated by a gap, which on screen read
+  as "$ 14,99" — a label standing next to a number rather than one amount. The
+  distinction is not about this component: a *currency prefix* is part of the
+  quantity, while a *unit suffix* (`%`, `ms`, `pcs`) is not, and drawing both
+  the same way left every consumer overriding it through the slot. The prefix
+  now takes the number's own size, colour and weight and sits flush against it;
+  the suffix keeps its muted treatment and gains the spacing the shared `gap`
+  used to hand out indiscriminately. Tone travels to the prefix too, so a
+  negative amount turns red as one value instead of half of one. `GrDelta`
+  already worked this way — it is the same rule, now in both places.
+
+### Added
+
+- **`titleWhenTruncated` — the full text of a clipped line, on hover.** A label
+  cut to "Включе…" cannot be read at all, and that is data loss rather than a
+  cosmetic issue: `truncate` is a paint-time rule, so the string stays whole in
+  the DOM and a screen reader still gets all of it — the only reader who loses
+  it is the one looking at the screen. `GrSegmented` now hands its label over on
+  hover, and the handler is exported because the rule belongs to any markup with
+  `truncate`, not to this package's components. The tooltip appears **only when
+  the text is genuinely clipped**: measuring happens on the hover itself, so
+  there are no observers and no subscriptions, and a tooltip that merely repeats
+  a fully visible label — noise nobody asked for — never appears.
+
+### Changed
+
+- **`GrDescriptionList` now sizes its columns by the container, not the
+  viewport.** This changes behaviour released in 0.23.0 without changing the
+  shape of the prop: `columns` was a ladder of media queries
+  (`sm:grid-cols-2 lg:grid-cols-4`), and media queries measure the screen while
+  the list lives in a card. In a 290px column on a wide monitor two columns
+  switched on with nowhere to go, a fixed `labelWidth` took what little space
+  there was, and `break-words` — deliberate, so hashes and request ids wrap
+  instead of blowing up the layout — split the remainder character by character:
+  "30" printed as "3" and "0" on two lines. The card was showing a number that
+  was not the number. `columns` is now a **ceiling**: `columns: 4` means "up to
+  four", and how many actually appear is decided by the width available.
+  Anything narrower than `--gr-description-list-column-min` (12rem, overridable)
+  gets one column. Under `inline` the floor is higher, because there the label
+  sits *beside* the value and the column has to fit both: `labelWidth` plus
+  `--gr-description-list-value-min` (5rem). Without that term a column exactly
+  as wide as one label leaves the value a few pixels and wraps it per character
+  — the same defect in different numbers, and it was still reproducible at
+  460–500px until this was added. It is plain CSS — `repeat(auto-fit, …)` — so
+  there is no measurement, no observer and no difference between the server
+  render and the first client one. `stackBelow` is untouched and keeps doing its
+  own job: it switches the *label* layout, not the number of columns.
+
+### Fixed
+
+- **A card's own heading sat flush against its border.** `<GrCard title="…">`
+  with no explicit `padding` printed the heading, and the `border-b` under it,
+  hard against the frame — on the default value of its own prop, which is how it
+  reached 29 cards in one admin panel. The cause was one computed feeding all
+  three sections: `padding` resolves to `none` by default, `paddingClass.none`
+  is an empty string, and the divider is drawn unconditionally. The `none`
+  default is not the mistake and has not moved — it exists because `GrCollapse`,
+  `GrList` and `GrSortableList` are built on `GrCard`, and because a card
+  wrapping a table wants that table edge to edge. What was wrong is that the
+  argument "the content knows its own padding" was applied to a header that has
+  no content: the card draws it. **A card now pads what it draws itself.** The
+  heading from `title`/`description` gets its own inset at any `padding`; the
+  `#header` and `#footer` slots keep taking theirs from `padding`, because the
+  consumer filled them and a slot with its own insets would otherwise end up
+  with double. That split is the same one already documented for precedence —
+  `#header` overrides the props, and with them the responsibility.
+
 ## [v0.23.0] 2026-08-17
 
 ### Fixed

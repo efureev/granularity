@@ -14,8 +14,8 @@ describe('GrStatistic', () => {
 
     expect(wrapper.get('[data-gr-statistic-title]').text()).toBe('Выручка')
     expect(wrapper.get('[data-testid="gr-statistic-value"]').text()).toContain('1 234 567.50')
-    expect(wrapper.get('[data-gr-statistic-prefix]').text()).toBe('₽')
-    expect(wrapper.get('[data-gr-statistic-suffix]').text()).toBe('в месяц')
+    expect(wrapper.get('[data-gr-value-prefix]').text()).toBe('₽')
+    expect(wrapper.get('[data-gr-value-suffix]').text()).toBe('в месяц')
   })
 
   it('строка динамики окрашивается по направлению', () => {
@@ -177,11 +177,9 @@ describe('GrStatistic — размеры и локаль', () => {
   it('лестницы кеглей идут от токенов --gr-text-*', () => {
     const xs = mount(GrStatistic, { props: { value: 1, title: 'x', size: 'xs', suffix: '%' } })
     expect(xs.get('[data-gr-statistic-title]').classes()).toContain('text-[length:var(--gr-text-2xs)]')
-    expect(xs.get('[data-gr-statistic-suffix]').classes()).toContain('text-[length:var(--gr-text-xs)]')
 
     const lg = mount(GrStatistic, { props: { value: 1, title: 'x', size: 'lg', suffix: '%' } })
     expect(lg.get('[data-gr-statistic-title]').classes()).toContain('text-[length:var(--gr-text-sm)]')
-    expect(lg.get('[data-gr-statistic-suffix]').classes()).toContain('text-[length:var(--gr-text-xl)]')
 
     expect(xs.html()).not.toMatch(/text-\[\d+px\]/)
     expect(lg.html()).not.toMatch(/text-\[\d+px\]/)
@@ -306,7 +304,7 @@ describe('GrStatistic — переход к деталям', () => {
 describe('GrStatistic — перебор чисел', () => {
   /** Число из строки: разделитель разрядов — неразрывный пробел, а не обычный. */
   function digits(wrapper: ReturnType<typeof mount>): number {
-    return Number(wrapper.get('[data-gr-statistic-number]').text().replace(/\s/g, ''))
+    return Number(wrapper.get('[data-gr-value-number]').text().replace(/\s/g, ''))
   }
 
   beforeEach(() => {
@@ -371,7 +369,7 @@ describe('GrStatistic — перебор чисел', () => {
     const wrapper = mount(GrStatistic, { props: { value: '2 ч 15 мин', animate: true } })
     await nextTick()
 
-    expect(wrapper.get('[data-gr-statistic-number]').text()).toBe('2 ч 15 мин')
+    expect(wrapper.get('[data-gr-value-number]').text()).toBe('2 ч 15 мин')
     expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
   })
 
@@ -394,14 +392,14 @@ describe('GrStatistic — перебор чисел', () => {
     await nextTick()
 
     // «1 000» глазами и «743» в ушах — не шум, а неверные данные.
-    const visible = wrapper.get('[data-gr-statistic-number]')
+    const visible = wrapper.get('[data-gr-value-number] [aria-hidden]')
     expect(visible.attributes('aria-hidden')).toBe('true')
     expect(wrapper.get('[data-gr-statistic-final]').text().replace(/\s/g, '')).toBe('1000')
 
     vi.advanceTimersByTime(400)
     await nextTick()
     expect(wrapper.find('[data-gr-statistic-final]').exists()).toBe(false)
-    expect(wrapper.get('[data-gr-statistic-number]').attributes('aria-hidden')).toBeUndefined()
+    expect(wrapper.get('[data-gr-value-number]').attributes('aria-hidden')).toBeUndefined()
   })
 
   it('загрузка перебор не запускает: перебирать нечего', async () => {
@@ -425,5 +423,48 @@ const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', 
 
     const byComponent = mount(GrStatistic, { props: { value: 10, icon: CustomIcon } })
     expect(byComponent.find('[data-custom-icon]').exists()).toBe(true)
+  })
+})
+
+describe('GrStatistic — аффиксы величины', () => {
+  // Знак валюты — часть самой величины, а не подпись к ней. Приглушённый,
+  // мельче и с зазором он читался как «$ 14,99»: две сущности вместо одной.
+  it('префикс набран как число: тот же кегль, цвет и вес', () => {
+    const wrapper = mount(GrStatistic, { props: { value: 14.99, precision: 2, prefix: '$' } })
+    const prefix = wrapper.get('[data-gr-value-prefix]').classes()
+    const number = wrapper.get('[data-gr-value-number]').classes()
+
+    expect(prefix).not.toContain('text-[var(--gr-muted-fg)]')
+    for (const cls of number) expect(prefix).toContain(cls)
+  })
+
+  it('между валютой и числом нет зазора', () => {
+    const wrapper = mount(GrStatistic, { props: { value: 14.99, prefix: '$' } })
+
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').classes()).not.toContain('gap-1')
+    expect(wrapper.get('[data-gr-value-prefix]').classes()).not.toContain('mr-1')
+  })
+
+  // Единица измерения — не часть величины: по умолчанию её приглушают и
+  // отбивают. Дефолт живёт в токене, поэтому приложение вправе его сменить —
+  // валюта справа (`100 ₽`) ровно этим и получается.
+  it('суффикс остаётся единицей: приглушён, мельче и отбит', () => {
+    const wrapper = mount(GrStatistic, { props: { value: 42, suffix: '%', size: 'md' } })
+    const suffix = wrapper.get('[data-gr-value-suffix]').classes()
+
+    expect(suffix).toContain('text-[var(--gr-value-suffix-color,var(--gr-muted-fg))]')
+    expect(suffix).toContain('text-[length:var(--gr-value-suffix-size,0.85em)]')
+    expect(suffix).toContain('ms-[var(--gr-value-suffix-gap,0.25rem)]')
+  })
+
+  // Тон стоит на контейнере величины, а приписки его наследуют: отрицательная
+  // сумма краснеет целиком, а не числом без знака валюты.
+  it('тон значения красит и валюту: это одна величина', () => {
+    const wrapper = mount(GrStatistic, { props: { value: -12, prefix: '$', polarity: 'positive-good' } })
+
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').classes())
+      .toContain('text-[var(--gr-statistic-value-color,var(--gr-danger-text))]')
+    expect(wrapper.get('[data-gr-value-prefix]').classes())
+      .toContain('text-[var(--gr-value-prefix-color,inherit)]')
   })
 })

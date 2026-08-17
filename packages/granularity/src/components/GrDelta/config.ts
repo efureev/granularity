@@ -4,5 +4,6 @@ import { grDeltaSafelist } from './safelist'
 
 export const grDeltaConfig = defineGranularComponent(import.meta.url, {
   name: 'GrDelta',
+  dependencies: ['GrValue'],
   safelist: grDeltaSafelist,
 })

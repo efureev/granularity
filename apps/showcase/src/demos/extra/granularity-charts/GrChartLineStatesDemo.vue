@@ -16,11 +16,30 @@ const readings: (number | null)[] = [
   24.1, 23.7, 23.9, 24.4, 24.9, 25.4, 25.2, 24.7, 23.8, 22.9, 22.2, 21.8,
 ]
 
-const series = [{
-  id: 'rack-a',
-  label: 'Стойка A',
-  data: readings.map((value, hour) => ({ x: new Date(2026, 6, 12, hour), y: value })),
-}]
+const neighbour: (number | null)[] = [
+  20.8, 21.0, 21.1, 21.5, 21.9, 22.0, 22.3, 22.8, 23.1, 23.5, 23.8, 23.4,
+  23.0, 22.7, 22.8, 23.1, 23.5, 23.9, 23.7, 23.2, 22.6, 22.0, 21.5, 21.1,
+]
+
+const series = [
+  {
+    id: 'rack-a',
+    label: 'Стойка A',
+    data: readings.map((value, hour) => ({ x: new Date(2026, 6, 12, hour), y: value })),
+  },
+  {
+    id: 'rack-b',
+    label: 'Стойка B',
+    data: neighbour.map((value, hour) => ({ x: new Date(2026, 6, 12, hour), y: value })),
+  },
+]
+
+/**
+ * Пустой период — это **объявленные серии без точек**, а не отсутствие серий.
+ * Так отвечает бэкенд: набор рядов известен заранее, строк за период нет. Ровно
+ * в этом случае легенда и объясняла цвета, которых на экране нет.
+ */
+const emptySeries = series.map(item => ({ ...item, data: [] }))
 
 type State = 'data' | 'loading' | 'empty'
 
@@ -67,7 +86,7 @@ function formatTemperature(value: number): string {
     </div>
 
     <GrChartLine
-      :series="state === 'empty' ? [] : series"
+      :series="state === 'empty' ? emptySeries : series"
       :loading="state === 'loading'"
       :height="220"
       :gaps="gaps"

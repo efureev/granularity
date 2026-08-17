@@ -291,6 +291,9 @@ export default defineConfig({
         'components/GrTreeSelect/index': fileURLToPath(
           new URL('./src/components/GrTreeSelect/index.ts', import.meta.url),
         ),
+        'components/GrValue/index': fileURLToPath(
+          new URL('./src/components/GrValue/index.ts', import.meta.url),
+        ),
         // </granularity:components>
         'composables/useAnnouncer': fileURLToPath(
           new URL('./src/composables/useAnnouncer.ts', import.meta.url),

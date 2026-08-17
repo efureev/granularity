@@ -592,3 +592,39 @@ describe('GrSegmented — остановка Tab', () => {
     expect(tabindexes(wrapper)).toEqual(['0', '-1'])
   })
 })
+
+describe('GrSegmented — обрезанная подпись', () => {
+  /** jsdom раскладки не считает: ширины задаются вручную. */
+  function measure(node: Element, widths: { scroll: number, client: number }): void {
+    Object.defineProperty(node, 'scrollWidth', { value: widths.scroll, configurable: true })
+    Object.defineProperty(node, 'clientWidth', { value: widths.client, configurable: true })
+  }
+
+  // «Включе…» без подсказки прочитать нечем: текст в DOM остаётся целым, но
+  // видит его только скринридер, а не тот, кто смотрит глазами.
+  it('обрезанная подпись отдаёт полный текст по наведению', async () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'on', options: [{ value: 'on', label: 'Включено в подписку' }] },
+    })
+
+    const label = wrapper.get('[data-gr-segmented-item] span')
+    measure(label.element, { scroll: 240, client: 80 })
+
+    await label.trigger('pointerenter')
+
+    expect(label.attributes('title')).toBe('Включено в подписку')
+  })
+
+  it('поместившаяся подпись подсказки не получает', async () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'on', options: [{ value: 'on', label: 'Да' }] },
+    })
+
+    const label = wrapper.get('[data-gr-segmented-item] span')
+    measure(label.element, { scroll: 40, client: 80 })
+
+    await label.trigger('pointerenter')
+
+    expect(label.attributes('title')).toBeUndefined()
+  })
+})

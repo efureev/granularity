@@ -4,7 +4,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useSlots } from 'vue'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import {
-  descriptionColumnsClass,
+  descriptionColumnsStyle,
   descriptionDensityClass,
   descriptionDividedClass,
   descriptionLabelInlineClass,
@@ -15,6 +15,7 @@ import {
   descriptionRootClass,
   descriptionRootFlowClass,
   descriptionRootGridClass,
+  descriptionSingleColumnClass,
   descriptionSizeClass,
   descriptionValueClass,
   descriptionValueToneClass,
@@ -133,14 +134,23 @@ const effectiveLayout = computed<GrDescriptionLayout>(() => (
 const isInline = computed(() => effectiveLayout.value === 'inline')
 const isFlow = computed(() => effectiveLayout.value === 'flow')
 
+const isSingleColumn = computed(() => isFlow.value || resolvedColumns.value === 1)
+
 const rootClass = computed(() => [
   descriptionRootClass,
   isFlow.value ? descriptionRootFlowClass : descriptionRootGridClass,
   // Колонки принадлежат сетке: в строчной раскладке их задавать нечему.
-  isFlow.value ? '' : descriptionColumnsClass[resolvedColumns.value],
+  !isFlow.value && resolvedColumns.value === 1 ? descriptionSingleColumnClass : '',
   descriptionSizeClass[resolvedSize.value],
   descriptionDensityClass[resolvedDensity.value],
 ].filter(Boolean).join(' '))
+
+/** Сетку колонок считает CSS по ширине контейнера — см. `descriptionColumnsStyle`. */
+const rootStyle = computed(() => (
+  isSingleColumn.value
+    ? undefined
+    : descriptionColumnsStyle(resolvedColumns.value, isInline.value ? resolvedLabelWidth.value : undefined)
+))
 
 const pairClass = computed(() => {
   if (isFlow.value) return descriptionPairFlowClass
@@ -183,7 +193,7 @@ function hasSlot(name: string): boolean {
 </script>
 
 <template>
-  <dl ref="rootEl" data-gr-description-list :class="rootClass">
+  <dl ref="rootEl" data-gr-description-list :class="rootClass" :style="rootStyle">
     <!-- Пара оборачивается в `<div>`: `dl > div > dt + dd` валиден по HTML5 и
          нужен для раскладки. Голые `<div>` вместо `dt`/`dd` — то, ради чего
          компонент и заводится. -->

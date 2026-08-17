@@ -5,7 +5,6 @@ import {
   deltaEmptyClass,
   deltaRootClass,
   deltaSizeClass,
-  deltaSuffixClass,
   deltaToneClass,
 } from './grDeltaStyles'
 
@@ -15,7 +14,6 @@ export const grDeltaSafelist = [...new Set([
   ...splitClassTokens(deltaRootClass),
   ...splitClassTokens(deltaEmptyClass),
   ...splitClassTokens(deltaArrowClass),
-  ...splitClassTokens(deltaSuffixClass),
   ...Object.values(deltaToneClass).flatMap(splitClassTokens),
   ...Object.values(deltaSizeClass).flatMap(splitClassTokens),
 ])]

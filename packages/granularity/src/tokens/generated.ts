@@ -1055,7 +1055,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Облегчённая success-подложка для мягких статусов и подсветок.",
     "values": {
       "light": "#d1fae5",
-      "dark": "#064e3b"
+      "dark": "#194536"
     }
   },
   {
@@ -1100,7 +1100,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Облегчённая warning-подложка для мягких warning-состояний.",
     "values": {
       "light": "#ffedd5",
-      "dark": "#7c2d12"
+      "dark": "#672e1c"
     }
   },
   {
@@ -1136,7 +1136,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Облегчённая danger-подложка для мягких error-состояний.",
     "values": {
       "light": "#fee2e2",
-      "dark": "#7f1d1d"
+      "dark": "#6a2522"
     }
   },
   {
@@ -1172,7 +1172,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Облегчённая info-подложка для спокойных информационных блоков.",
     "values": {
       "light": "#dbeafe",
-      "dark": "#1e3a8a"
+      "dark": "#213771"
     }
   },
   {
@@ -1208,7 +1208,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Облегчённая slate-подложка для мягких нейтральных состояний.",
     "values": {
       "light": "#e2e8f0",
-      "dark": "#334155"
+      "dark": "#313b4a"
     }
   },
   {
@@ -1244,7 +1244,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "description": "Облегчённая azure-подложка для мягких informational поверхностей.",
     "values": {
       "light": "#e0f2fe",
-      "dark": "#0c4a6e"
+      "dark": "#1b425c"
     }
   },
   {
@@ -1632,6 +1632,33 @@ export const grThemeTokens: GrThemeToken[] = [
     "values": {
       "light": "#6366f1",
       "dark": "#818cf8"
+    }
+  },
+  {
+    "name": "--gr-shadow-1",
+    "section": "Elevation",
+    "description": "Уровень elevation `1`. Синеватая полупрозрачная тень читается на светлом фоне мягче чёрной.",
+    "values": {
+      "light": "0 1px 2px rgba(15, 23, 42, 0.08)",
+      "dark": "0 1px 2px rgba(0, 0, 0, 0.45)"
+    }
+  },
+  {
+    "name": "--gr-shadow-2",
+    "section": "Elevation",
+    "description": "Уровень elevation `2` для всплывающих слоёв.",
+    "values": {
+      "light": "0 8px 24px rgba(15, 23, 42, 0.14)",
+      "dark": "0 8px 24px rgba(0, 0, 0, 0.55)"
+    }
+  },
+  {
+    "name": "--gr-shadow-3",
+    "section": "Elevation",
+    "description": "Уровень elevation `3` для модальных слоёв.",
+    "values": {
+      "light": "0 16px 48px rgba(15, 23, 42, 0.20)",
+      "dark": "0 16px 48px rgba(0, 0, 0, 0.65)"
     }
   }
 ]
@@ -2427,6 +2454,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "hook",
     "default": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)",
     "description": "Тень на границе группы колонок, закреплённых справа."
+  },
+  {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-column-min",
+    "kind": "hook",
+    "default": "12rem",
+    "description": "Минимальная ширина колонки. Ниже неё сетка отдаёт колонку целиком, а не делит её: в тесной колонке значение переносится посимвольно, и число «30» читается как «3» и «0». Порог считается от ширины контейнера, а не вьюпорта."
+  },
+  {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-value-min",
+    "kind": "hook",
+    "default": "5rem",
+    "description": "Сколько места остаётся значению рядом с подписью при `inline`. Складывается с `labelWidth` в минимальную ширину колонки: колонка шириной с одну подпись выжимает значение в букву на строку."
   },
   {
     "owner": "GrDescriptionList",
@@ -3407,6 +3448,48 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "inline",
     "default": "var(--gr-tree-branch-line-default-color)",
     "description": "Цвет направляющей конкретной ветки — им подсвечивается путь до текущего узла."
+  },
+  {
+    "owner": "GrValue",
+    "name": "--gr-value-prefix-color",
+    "kind": "hook",
+    "default": "цвет величины (наследуется)",
+    "description": "Цвет приписки перед значением. По умолчанию наследует цвет величины: знак валюты — часть суммы, и краснеть при отрицательном значении обязан вместе с ней."
+  },
+  {
+    "owner": "GrValue",
+    "name": "--gr-value-prefix-size",
+    "kind": "hook",
+    "default": "кегль величины (наследуется)",
+    "description": "Кегль приписки перед значением. По умолчанию равен кеглю самой величины: приглушённый и уменьшенный знак валюты читается подписью рядом с числом, а не его частью."
+  },
+  {
+    "owner": "GrValue",
+    "name": "--gr-value-prefix-gap",
+    "kind": "hook",
+    "default": "0",
+    "description": "Отбивка между припиской и значением. По умолчанию нулевая: «$ 14,99» с зазором читается как опечатка."
+  },
+  {
+    "owner": "GrValue",
+    "name": "--gr-value-suffix-color",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет приписки после значения. По умолчанию приглушён: там обычно единица измерения, а она величине не принадлежит. Валюта справа (`100 ₽`) — случай обратный, и цвет для неё снимают этим токеном."
+  },
+  {
+    "owner": "GrValue",
+    "name": "--gr-value-suffix-size",
+    "kind": "hook",
+    "default": "0.85em",
+    "description": "Кегль приписки после значения. Доля от кегля величины, а не ступень шкалы: примитив своей шкалы размеров не имеет и набирается кеглем места, где стоит."
+  },
+  {
+    "owner": "GrValue",
+    "name": "--gr-value-suffix-gap",
+    "kind": "hook",
+    "default": "0.25rem",
+    "description": "Отбивка между значением и припиской после него. Задаётся логическим отступом, поэтому в RTL встаёт с нужной стороны."
   },
   {
     "owner": "composables",

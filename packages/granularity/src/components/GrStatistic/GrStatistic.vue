@@ -6,6 +6,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { deltaTone, type GrDeltaPolarity } from '../GrDelta/deltaTone'
 import { iconClass, iconTag } from '../shared/icon'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
+import GrValue from '../GrValue'
 
 import IconMinus from '~icons/lucide/minus'
 import IconTrendingDown from '~icons/lucide/trending-down'
@@ -15,7 +16,7 @@ import { countUpFrame } from './countUp'
 import { formatStatisticValue } from './formatStatisticValue'
 
 import {
-  statisticAffixSizeBySize,
+  statisticAffixSizeVarBySize,
   statisticPlaceholderHeightBySize,
   statisticRootClass,
   statisticTitleClass,
@@ -191,6 +192,7 @@ const rootHref = computed(() => (
 
 const rootClass = computed(() => statisticRootClass({ interactive: isInteractive.value }))
 
+
 function toNumber(value: number | string): number | null {
   const numeric = typeof value === 'number' ? value : Number(value)
   return Number.isFinite(numeric) ? numeric : null
@@ -273,6 +275,11 @@ onBeforeUnmount(stopCounting)
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrStatistic' })
 const resolvedPolarity = useGrComponentProp('GrStatistic', 'polarity', () => props.polarity, 'none')
+/**
+ * Кегль приписки идёт ступенью шкалы плитки, а не долей от величины: на `md`
+ * число набрано `--gr-text-3xl`, и доля подняла бы приписку вровень с ним.
+ */
+const affixStyle = computed(() => ({ '--gr-value-suffix-size': statisticAffixSizeVarBySize[resolvedSize.value] }))
 
 /**
  * Тон значения: явный проп → выведенный из знака → нейтральный.
@@ -373,39 +380,36 @@ const trendLabel = computed(() => {
           v-else
           data-gr-statistic-value
           data-testid="gr-statistic-value"
-          class="m-0 mt-0.5 flex items-baseline gap-1"
+          class="m-0 mt-0.5 flex items-baseline"
+          :class="statisticValueClass({ size: resolvedSize, tone: resolvedTone })"
         >
-          <span
-            v-if="prefix || $slots.prefix"
-            data-gr-statistic-prefix
-            class="text-[var(--gr-muted-fg)]"
-            :class="statisticAffixSizeBySize[resolvedSize]"
-          >
-            <slot name="prefix">{{ prefix }}</slot>
-          </span>
-
-          <span
-            data-gr-statistic-number
-            :class="statisticValueClass({ size: resolvedSize, tone: resolvedTone })"
-            :aria-hidden="isCounting ? 'true' : undefined"
-          >
-            <slot>{{ formatted }}</slot>
-          </span>
-
           <!--
-            Пока идёт перебор, на экране промежуточное число. Диктору отдаётся
-            конечное: «1 284» глазами и «743» в ушах — не шум, а неверные данные.
+            Кегль и тон стоят на контейнере, а не на каждом узле: `GrValue`
+            наследует их обоих, и отрицательная сумма краснеет целиком, вместе
+            со знаком валюты. Оформление приписок настраивается токенами
+            `--gr-value-*` — плитка за потребителя этого не решает.
           -->
-          <span v-if="isCounting" data-gr-statistic-final class="sr-only">{{ finalFormatted }}</span>
+          <GrValue :prefix="prefix" :suffix="suffix" :style="affixStyle">
+            <template v-if="$slots.prefix" #prefix>
+              <slot name="prefix" />
+            </template>
 
-          <span
-            v-if="suffix || $slots.suffix"
-            data-gr-statistic-suffix
-            class="text-[var(--gr-muted-fg)]"
-            :class="statisticAffixSizeBySize[resolvedSize]"
-          >
-            <slot name="suffix">{{ suffix }}</slot>
-          </span>
+            <span :aria-hidden="isCounting ? 'true' : undefined">
+              <slot>{{ formatted }}</slot>
+            </span>
+
+            <!--
+              Пока идёт перебор, на экране промежуточное число. Диктору отдаётся
+              конечное: «1 284» глазами и «743» в ушах — не шум, а неверные данные.
+            -->
+            <template v-if="isCounting" #trail>
+              <span data-gr-statistic-final class="sr-only">{{ finalFormatted }}</span>
+            </template>
+
+            <template v-if="$slots.suffix" #suffix>
+              <slot name="suffix" />
+            </template>
+          </GrValue>
         </component>
       </component>
 
