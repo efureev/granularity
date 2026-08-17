@@ -90,6 +90,9 @@
   --gr-sidebar-accent-fg: #ffffff;
   --gr-sidebar-brd: #ffffff;
   --gr-sidebar-ring: #8ab4ff;
+  --gr-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --gr-shadow-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --gr-shadow-3: 0 16px 48px rgba(0, 0, 0, 0.55);
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {

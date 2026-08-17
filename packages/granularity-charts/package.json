@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-charts",
   "description": "Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -155,7 +155,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/granularity": "^0.24.0",
+    "@feugene/granularity": "^0.24.1",
     "@feugene/granularity-test-kit": "^0.1.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.1",

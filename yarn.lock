@@ -405,11 +405,6 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.6.0.tgz#beb5e5d89befec8f2b6e006ce4959255cbb00c04"
   integrity sha512-vvPqoiM6kzJtYRW/EYc1xDS/lnG3/PtbwNftBRkn8hoK0hvoHiiTGBACBSllwhcfaBY9OdbZX1Ew8SbKTMPmpQ==
 
-"@feugene/granularity@^0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@feugene/granularity/-/granularity-0.20.0.tgz#a3c3380eec0ea966827e2a1feadbafd384a59886"
-  integrity sha512-OEGUjrjXZrP5odZhGjtoBIM8T8elSTk0IG9JTsgq9DvEpsEOb2VcwJEn9+BTXENzjz8Z7NQS5wKnKF6+svbXNg==
-
 "@feugene/unocss-mini-extra-rules@^0.8.1":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.8.1.tgz#04cdf74687a05cc897549e405437c09c9eb85462"

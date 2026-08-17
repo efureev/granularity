@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-chrono",
   "description": "Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -126,7 +126,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/granularity": "^0.24.0",
+    "@feugene/granularity": "^0.24.1",
     "@feugene/granularity-test-kit": "^0.1.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.1",

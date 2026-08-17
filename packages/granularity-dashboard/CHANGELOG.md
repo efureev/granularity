@@ -7,6 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.2.1] 2026-08-18
+
+### Changed
+
+- Release-only bump: the workspace playground apps still pinned the core at
+  `^0.20.0`, so yarn resolved a published copy for them instead of linking the
+  workspace, and their uno config scanned that copy's `dist`. The pins are
+  updated to the current range; nothing in this package's runtime changed.
+
+
 ## [v0.2.0] 2026-08-18
 
 ### Fixed
