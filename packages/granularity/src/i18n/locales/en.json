@@ -335,5 +335,14 @@
     "copy": "Copy code",
     "copied": "Code copied",
     "copyFailed": "Could not copy code"
+  },
+  "jsonViewer": {
+    "search": "Search key or value",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "copy": "Copy value",
+    "copied": "Value copied",
+    "copyFailed": "Could not copy value",
+    "moreItems": "more"
   }
 }

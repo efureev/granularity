@@ -5830,6 +5830,142 @@
       }
     ]
   },
+  "GrJsonViewer": {
+    "name": "GrJsonViewer",
+    "sourcePath": "packages/granularity/src/components/GrJsonViewer/GrJsonViewer.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя области для скринридера. Безымянное дерево объявляется просто «дерево».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "virtual",
+            "description": "Оставлять в DOM только окно вокруг вьюпорта. Требует `maxHeight`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Высота области просмотра: число — пиксели, строка — как есть.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "copyable",
+            "description": "Кнопка копирования узла в строке.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rootLabel",
+            "description": "Подпись корня. По умолчанию `$` — так адресуют путь JSONPath и dev-tools.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "defaultExpandDepth",
+            "description": "Сколько уровней раскрыто изначально.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxStringLength",
+            "description": "Длина строкового значения, после которой показ обрезается. Не косметика: запрос к модели с картинкой в base64 — это один лист на сотни тысяч символов, и ни свёртка, ни виртуализация по строкам его не берут. Копирование при этом отдаёт значение целиком.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxArrayItems",
+            "description": "Сколько элементов массива разбирать до заглушки «ещё N».",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "searchable",
+            "description": "Поле поиска над деревом. Выключено — поиск остаётся на `filter()` из `defineExpose`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Показываемое значение. `unknown`, потому что приходит из БД или чужого сервиса.",
+            "type": "unknown",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "leaf",
+            "description": "Значение листа: ссылка, дата, денежная сумма — оформление знает приложение.",
+            "type": "{ node: GrJsonNode; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "copy",
+            "description": "",
+            "type": "[payload: { path: string; value: unknown; }]",
+            "signature": "(event: \"copy\", payload: { path: string; value: unknown; }): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "filter",
+            "description": "",
+            "type": "(value: string) => void"
+          },
+          {
+            "name": "expandAll",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "collapseAll",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrKbd": {
     "name": "GrKbd",
     "sourcePath": "packages/granularity/src/components/GrKbd/GrKbd.vue",

@@ -52,6 +52,7 @@ import { grIconConfig } from '../components/GrIcon/config'
 import { grImageViewerConfig } from '../components/GrImageViewer/config'
 import { grInputConfig } from '../components/GrInput/config'
 import { grInputTagConfig } from '../components/GrInputTag/config'
+import { grJsonViewerConfig } from '../components/GrJsonViewer/config'
 import { grKbdConfig } from '../components/GrKbd/config'
 import { grLinkConfig } from '../components/GrLink/config'
 import { grListConfig } from '../components/GrList/config'
@@ -156,6 +157,7 @@ export const granularityComponentConfigs = {
   GrImageViewer: grImageViewerConfig,
   GrInput: grInputConfig,
   GrInputTag: grInputTagConfig,
+  GrJsonViewer: grJsonViewerConfig,
   GrKbd: grKbdConfig,
   GrLink: grLinkConfig,
   GrList: grListConfig,

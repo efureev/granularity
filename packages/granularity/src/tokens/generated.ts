@@ -2541,6 +2541,55 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Focus-ring внутри просмотрщика: общий `--gr-ring` на тёмном хроме не читается."
   },
   {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-bg",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Фон панели просмотрщика."
+  },
+  {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-key",
+    "kind": "hook",
+    "default": "var(--gr-primary-text)",
+    "description": "Цвет имени ключа. Ключ и значение стоят в одной строке через двоеточие, и цвет — единственное, чем они различимы глазом."
+  },
+  {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-string",
+    "kind": "hook",
+    "default": "var(--gr-success-text)",
+    "description": "Цвет строкового значения."
+  },
+  {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-number",
+    "kind": "hook",
+    "default": "var(--gr-azure-text)",
+    "description": "Цвет числа. Взят от `azure`, а не от `info`: `info` — синий в двух шагах от индиго `primary`, и пара «ключ ↔ число» сливалась бы в одной строке."
+  },
+  {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-literal",
+    "kind": "hook",
+    "default": "var(--gr-warning-text)",
+    "description": "Цвет литералов `true`, `false`, `null`."
+  },
+  {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-punctuation",
+    "kind": "hook",
+    "default": "var(--gr-fg)",
+    "description": "Цвет двоеточия между ключом и значением."
+  },
+  {
+    "owner": "GrJsonViewer",
+    "name": "--gr-json-viewer-muted",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет служебного: счётчика у свёрнутой ветки, заглушки «ещё N элементов», значений, которых в JSON не бывает."
+  },
+  {
     "owner": "GrLink",
     "name": "--gr-link-color",
     "kind": "inline",

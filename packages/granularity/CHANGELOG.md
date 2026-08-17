@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.22.0] 2026-08-17
+
+### Added
+
+- **New `GrJsonViewer` — an unknown value as a tree you can walk.** `GrCodeBlock`
+  answers "read this and paste it into a ticket"; this one answers "find the field",
+  which is the other half of every integration screen — webhook bodies, model
+  responses, audit payloads. It is built on `GrTree`, so the expensive parts — the
+  WAI-ARIA `tree` pattern, the keyboard contract, roving tabindex, virtualisation
+  and node filtering — arrive already written and already tested; what is new is the
+  walk from `unknown` to nodes. Node keys are readable paths (`$.items[3].name`),
+  not ordinals, because the path is what goes into the ticket and what drives
+  expansion; a key containing a dot is escaped so the address stays an address.
+  **Long values are truncated on sight, and that is not cosmetic**: a request
+  carrying a base64 image is a single leaf of several hundred thousand characters,
+  which neither node collapse nor row virtualisation can help with — there is one
+  node and one string. Copying still yields the value whole, because truncation
+  belongs to the display. Cycles are marked only on a genuine ancestor: unlike a
+  `JSON.stringify` replacer, which never sees the ancestor stack and so has to
+  brand every repeated reference, a tree walk has that stack — an object honestly
+  placed in the data twice now renders twice.
+
 ## [v0.21.1] 2026-08-17
 
 ### Fixed

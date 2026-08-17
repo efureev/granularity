@@ -33,6 +33,7 @@ import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
 import GrIcon from '../components/GrIcon/GrIcon.vue'
 import GrInput from '../components/GrInput/GrInput.vue'
+import GrJsonViewer from '../components/GrJsonViewer/GrJsonViewer.vue'
 import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
 import GrKbd from '../components/GrKbd/GrKbd.vue'
 import GrLink from '../components/GrLink/GrLink.vue'
@@ -124,6 +125,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
   },
   { name: 'GrDelta', render: () => h(GrDelta, { value: 42 }) },
   { name: 'GrDescriptionList', render: () => h(GrDescriptionList, { items: [{ label: 'L', value: 'V' }] }) },
+  { name: 'GrJsonViewer', render: () => h(GrJsonViewer, { value: { a: 1 } }) },
   { name: 'GrEmptyState', render: () => h(GrEmptyState, { title: 'E' }) },
   { name: 'GrFileUpload', render: () => h(GrFileUpload) },
   {

@@ -337,5 +337,14 @@
     "copy": "Copiar código",
     "copied": "Código copiado",
     "copyFailed": "No se pudo copiar el código"
+  },
+  "jsonViewer": {
+    "search": "Buscar clave o valor",
+    "expandAll": "Expandir todo",
+    "collapseAll": "Contraer todo",
+    "copy": "Copiar valor",
+    "copied": "Valor copiado",
+    "copyFailed": "No se pudo copiar el valor",
+    "moreItems": "más"
   }
 }

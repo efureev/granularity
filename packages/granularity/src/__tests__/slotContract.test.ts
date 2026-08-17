@@ -47,6 +47,9 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   extra: ['GrCollapse'],
   hint: ['GrFormField'],
   item: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrList', 'GrSortableList', 'GrTimeline'],
+  // Не `value`: у `GrSelect` это выбранное значение в контроле, здесь — лист
+  // дерева. Одно имя на два смысла и есть то, что этот словарь ловит.
+  leaf: ['GrJsonViewer'],
   group: ['GrTimeline'],
   handle: ['GrSortableList'],
   left: ['GrNavbar'],

@@ -138,6 +138,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrImageViewer`](./components/GrImageViewer.md)
 - [`GrInput`](./components/GrInput.md)
 - [`GrInputTag`](./components/GrInputTag.md)
+- [`GrJsonViewer`](./components/GrJsonViewer.md)
 - [`GrKbd`](./components/GrKbd.md)
 - [`GrLink`](./components/GrLink.md)
 - [`GrList`](./components/GrList.md)

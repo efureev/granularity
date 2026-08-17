@@ -201,12 +201,15 @@
 | Что происходит | Компонент |
 | --- | --- |
 | текст или JSON читают целиком и копируют | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
-| по данным ходят: раскрывают ветки, выбирают узел | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
+| по чужому `unknown` ходят: сворачивают узлы, ищут ключ | [`GrJsonViewer`](../packages/granularity/docs/components/GrJsonViewer.md) |
+| дерево своих данных: выбор узла, чекбоксы, перенос | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
 | данные разложены по колонкам и известны заранее | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
 | это пара «характеристика → значение», а не документ | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
 
-`GrCodeBlock` не сворачивает узлы: свёртка с поиском и виртуализацией — задача
-на порядок дороже, и в экосистеме её пока нет.
+Различитель между первыми двумя — **читают или ищут**. Ответ на двести строк
+копируют в тикет целиком (`GrCodeBlock`); в ответе на две тысячи узлов ищут одно
+поле (`GrJsonViewer`). Между `GrJsonViewer` и `GrTree` различитель другой — чьи
+данные: первый разбирает `unknown` сам, второму дерево приносят готовым.
 
 ### Раскладка и поверхности
 
@@ -326,6 +329,7 @@
 | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) | ядро | картинку нужно рассмотреть |
 | [`GrInput`](../packages/granularity/docs/components/GrInput.md) | ядро | вводится строка |
 | [`GrInputTag`](../packages/granularity/docs/components/GrInputTag.md) | ядро | значения придумывает пользователь |
+| [`GrJsonViewer`](../packages/granularity/docs/components/GrJsonViewer.md) | ядро | ответ чужого сервиса разбирают по полям |
 | [`GrKbd`](../packages/granularity/docs/components/GrKbd.md) | ядро | показывается сочетание клавиш |
 | [`GrLink`](../packages/granularity/docs/components/GrLink.md) | ядро | нужен переход |
 | [`GrList`](../packages/granularity/docs/components/GrList.md) | ядро | строки однородные |

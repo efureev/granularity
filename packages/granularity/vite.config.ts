@@ -186,6 +186,9 @@ export default defineConfig({
         'components/GrInputTag/index': fileURLToPath(
           new URL('./src/components/GrInputTag/index.ts', import.meta.url),
         ),
+        'components/GrJsonViewer/index': fileURLToPath(
+          new URL('./src/components/GrJsonViewer/index.ts', import.meta.url),
+        ),
         'components/GrKbd/index': fileURLToPath(
           new URL('./src/components/GrKbd/index.ts', import.meta.url),
         ),

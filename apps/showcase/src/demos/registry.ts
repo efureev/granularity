@@ -234,6 +234,8 @@ export const demoPathByPreviewKey = {
   'gr-input-tag-max-state':               'components/gr-input-tag/GrInputTagMaxStateDemo.vue',
   'gr-input-tag-validation':              'components/gr-input-tag/GrInputTagValidationDemo.vue',
   'gr-input-validation-states':           'components/gr-input/GrInputStatesDemo.vue',
+  'gr-json-viewer-limits':                'components/gr-json-viewer/GrJsonViewerLimitsDemo.vue',
+  'gr-json-viewer-response':              'components/gr-json-viewer/GrJsonViewerResponseDemo.vue',
   'gr-kbd-basic':                         'components/gr-kbd/GrKbdBasicDemo.vue',
   'gr-kbd-hotkey-hints':                  'components/gr-kbd/GrKbdHotkeyHintsDemo.vue',
   'gr-kbd-navbar-search':                 'components/gr-kbd/GrKbdNavbarSearchDemo.vue',

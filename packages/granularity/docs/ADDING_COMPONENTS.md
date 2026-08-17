@@ -105,11 +105,11 @@ src/components/<ComponentName>/
 Пример для компонента без собственных CSS-файлов:
 
 ```ts
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 import { grButtonSafelist } from './safelist'
 
-export const grButtonConfig = defineGranularityComponentConfig(import.meta.url, {
+export const grButtonConfig = defineGranularComponent(import.meta.url, {
   name: 'GrButton',
   safelist: grButtonSafelist,
 })
@@ -118,11 +118,11 @@ export const grButtonConfig = defineGranularityComponentConfig(import.meta.url, 
 Пример для компонента с зависимостями:
 
 ```ts
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 import { grDialogSafelist } from './grDialogStyles'
 
-export const grDialogConfig = defineGranularityComponentConfig(import.meta.url, {
+export const grDialogConfig = defineGranularComponent(import.meta.url, {
   name: 'GrDialog',
   dependencies: ['GrButton', 'GrModal'],
   safelist: grDialogSafelist,
@@ -146,11 +146,11 @@ export const grDialogConfig = defineGranularityComponentConfig(import.meta.url, 
 Пример для компонента с локальными CSS-файлами:
 
 ```ts
-import { defineGranularityComponentConfig } from '../../registry/componentConfig'
+import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
 
 import { grIconSafelist } from './safelist'
 
-export const grIconConfig = defineGranularityComponentConfig(import.meta.url, {
+export const grIconConfig = defineGranularComponent(import.meta.url, {
   name: 'GrIcon',
   safelist: grIconSafelist,
   cssFiles: ['./tokens.css', './styles.css'],
@@ -296,16 +296,16 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 
 ## Как тестировать новый компонент
 
-Минимум нужно обновить `src/__tests__/presetGranularity.test.ts`.
+Отдельного «стенда нового компонента» заводить не нужно: сквозные гейты в
+`src/__tests__/` находят компонент сами, по реестру и по файловой системе.
+Красный гейт после `generate:registry` — это и есть список того, что осталось
+доделать; сообщение каждого называет, чего именно не хватает.
 
-В текущем коде там проверяются:
+Руками дописываются только два, и оба — списки, которые вывести неоткуда:
 
-- запуск `yarn generate:registry` после добавления компонента (реестры не синхронизируются сами);
-- safelist компонента в `granularityComponents` и `getGranularitySafelist(...)`;
-- зависимости `dependencies`, если они есть;
-- `styleAssetFileName`;
-- `cssFiles` и `cssFileAssetNames`, если компонент использует локальные CSS-файлы;
-- итоговый список `granularityStyleAssets`.
+- `componentSize.test.ts` — стенд рендера, если у компонента настраиваемый
+  `size` (гейт сам проверяет, что стенд есть);
+- `slotContract.test.ts` — доменное имя слота, если оно новое.
 
 Если у компонента есть заметная runtime-логика, добавьте и отдельные component tests рядом с компонентом, как это сделано у `GrModal`, `GrPromptDialog` и `GrSelect`.
 
@@ -318,7 +318,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
    компонента молча не попадают в CSS; ловится `granular doctor --strict`.
 4. При необходимости обновлён `packages/granularity/package.json`.
 5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.
-6. Обновлён `src/__tests__/presetGranularity.test.ts` и связанные component tests, если они нужны.
+6. Прогнан `yarn test:granularity` целиком: сквозные гейты сами скажут, чего не хватает.
 7. Для компонента добавлены все ожидаемые публичные entrypoint'ы и связанные style asset'ы.
 8. Заведена `docs/components/<ComponentName>.md` с обеими обязательными секциями,
    имя в `components.md` стало ссылкой, компонент стоит в развилке
@@ -348,8 +348,7 @@ Foundation-only слой публикуется как `@feugene/granularity/fou
 2. Добавить `<ComponentName>.vue`, `config.ts` и `index.ts`.
 3. При необходимости вынести style/helper-логику в локальные `ds*.ts` и/или `safelist.ts`.
 4. При необходимости добавить `styles.css`, `tokens.css` и перечислить нужные файлы в `config.ts`.
-5. Подключить компонент в `src/registry/components.ts`.
-6. Прогнать `yarn generate:registry` — он обновит `src/index.ts`, `package.json#exports`, `vite.config.ts` и реестр провайдера.
-7. Обновить `src/__tests__/presetGranularity.test.ts` и сопутствующие тесты.
-8. Написать `docs/components/<ComponentName>.md`, сделать имя в `components.md` ссылкой, поставить компонент в развилку `docs/COMPONENT-MAP.md`.
-9. Проверить, что новый компонент или директива корректно подключены в публичный API пакета.
+5. Прогнать `yarn generate:registry` — он обновит `src/index.ts`, `package.json#exports`, `vite.config.ts` и реестр провайдера. Руками компонент никуда не вписывают.
+6. Прогнать `yarn test:granularity` и дописать то, что потребуют гейты: стенд в `componentSize.test.ts`, доменное имя слота в `slotContract.test.ts`, тесты самого компонента.
+7. Написать `docs/components/<ComponentName>.md`, сделать имя в `components.md` ссылкой, поставить компонент в развилку `docs/COMPONENT-MAP.md`.
+8. Проверить, что новый компонент или директива корректно подключены в публичный API пакета.
