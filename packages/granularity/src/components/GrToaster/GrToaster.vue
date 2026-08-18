@@ -400,10 +400,10 @@ defineExpose({ focus })
               <component :is="metaFor(toast.tone).icon" />
             </GrIcon>
             <div class="min-w-0 flex-1">
-              <div class="text-[length:var(--gr-text-sm)] font-700">
+              <div class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700">
                 {{ toast.title }}
               </div>
-              <div v-if="toast.message" class="mt-0.5 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]">
+              <div v-if="toast.message" class="mt-0.5 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]">
                 {{ toast.message }}
               </div>
 

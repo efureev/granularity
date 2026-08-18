@@ -24,10 +24,10 @@ export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:
  * задаёт `rows`.
  */
 export const sizes: Record<GrTextareaSize, string> = {
-  xs: 'px-2.5 py-1 text-[length:var(--gr-control-text-xs)]',
-  sm: 'px-3 py-1.5 text-[length:var(--gr-control-text-sm)]',
-  md: 'px-3 py-2 text-[length:var(--gr-control-text-md)]',
-  lg: 'px-4 py-2.5 text-[length:var(--gr-control-text-lg)]',
+  xs: 'px-2.5 py-1 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'px-3 py-1.5 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'px-3 py-2 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'px-4 py-2.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export type GrTextareaResize = 'none' | 'vertical' | 'both'

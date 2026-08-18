@@ -28,6 +28,7 @@ import { useModalOverlay } from '../../composables/internal/useModalOverlay'
 import { createFloatingAnchor, type GrFloatingAnchorRect, useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { vClickOutside } from '../../directives'
 import { useGrComponentSize } from '../GrConfigProvider/context'
+import { panelPopTransition } from '../shared/overlayTransition'
 import {
   type GrPopoverPadding,
   type GrPopoverRole,
@@ -251,6 +252,23 @@ const panelClasses = computed(() =>
 )
 
 defineExpose({ open, close, toggle })
+
+defineSlots<{
+  /**
+   * Триггер панели. `triggerProps` обязаны попасть на сам интерактивный
+   * элемент, а не на обёртку вокруг него: `aria-expanded` и `aria-controls`
+   * читаются с того узла, который получает фокус.
+   */
+  trigger?: (props: {
+    open: boolean
+    toggle: () => void
+    close: () => void
+    triggerProps: Record<string, unknown>
+  }) => any
+  /** Содержимое панели. */
+  content?: (props: { close: () => void }) => any
+}>()
+
 </script>
 
 <template>
@@ -274,12 +292,12 @@ defineExpose({ open, close, toggle })
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
-        enter-active-class="transition ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
-        enter-from-class="transform opacity-0 scale-95"
-        enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-[var(--gr-ease-in)] duration-[var(--gr-duration-fast)]"
-        leave-from-class="transform opacity-100 scale-100"
-        leave-to-class="transform opacity-0 scale-95"
+        :enter-active-class="panelPopTransition.enter"
+        :enter-from-class="panelPopTransition.enterFrom"
+        :enter-to-class="panelPopTransition.enterTo"
+        :leave-active-class="panelPopTransition.leave"
+        :leave-from-class="panelPopTransition.leaveFrom"
+        :leave-to-class="panelPopTransition.leaveTo"
       >
         <div
           v-show="isOpen"

@@ -57,17 +57,17 @@ export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline 
 
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-xs)]',
-  sm: 'text-[length:var(--gr-control-text-sm)]',
-  md: 'text-[length:var(--gr-control-text-md)]',
-  lg: 'text-[length:var(--gr-control-text-lg)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /**
@@ -231,7 +231,7 @@ export const grSelectPanelClasses = 'rounded-[var(--gr-radius-xl)] border border
 /** Общая подсветка наведения и активной опции панели. */
 const selectOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
 
-export const selectOptionBaseClass = 'rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)]'
+export const selectOptionBaseClass = 'rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]'
 export const selectOptionLinkWidthClass = 'block min-w-full w-max whitespace-nowrap'
 export const selectOptionWidthClass = 'w-full'
 export const selectOptionEnabledClass = `hover:${selectOptionHighlight}`

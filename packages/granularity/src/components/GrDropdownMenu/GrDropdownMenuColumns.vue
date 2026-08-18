@@ -8,6 +8,12 @@ export interface GrDropdownMenuColumnsProps {
 withDefaults(defineProps<GrDropdownMenuColumnsProps>(), {
   cols: 2,
 })
+
+defineSlots<{
+  /** Колонки меню (`GrDropdownMenuColumn`). */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

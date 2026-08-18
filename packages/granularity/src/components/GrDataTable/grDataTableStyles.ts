@@ -93,8 +93,8 @@ export const columnPinnedRightEdgeClass = 'shadow-[var(--gr-datatable-pinned-sha
 
 /** Подпись колонки набирается мельче тела таблицы — она не данные, а навигация. */
 export const headerTextSizes: Record<GrDataTableSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-3xs)]',
-  sm: 'text-[length:var(--gr-control-text-2xs)]',
+  xs: 'text-[length:var(--gr-control-text-3xs)] leading-[var(--gr-control-leading-3xs)]',
+  sm: 'text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)]',
   md: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)]',
   lg: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
 }

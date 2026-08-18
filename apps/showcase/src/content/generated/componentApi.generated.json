@@ -160,7 +160,7 @@
           },
           {
             "name": "tagTone",
-            "description": "Вид чипов выбранных значений в режиме `multiple`. Чип — это `GrBadge`, а не своя плашка: на светлой теме собственная заливка чипа (примесь `--gr-muted` без рамки) давала 1.02:1 к фону поля, то есть была невидима.",
+            "description": "Вид чипов выбранных значений в режиме `multiple`. Рисует их `GrChip`, но шкала пропа осталась бейджевой: `tagSize` публичен, и его значения обязаны означать тот же кегль, что и раньше. Перевод ступеней — в `chipSizeForBadgeScale`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
@@ -618,8 +618,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое метки.",
+            "type": "any"
           }
         ]
       },
@@ -711,8 +711,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Элемент, к которому крепится метка.",
+            "type": "any"
           }
         ]
       },
@@ -1066,19 +1066,19 @@
         "origin": "generated",
         "items": [
           {
-            "name": "prefix",
-            "description": "",
-            "type": "{}"
+            "name": "default",
+            "description": "Содержимое кнопки.",
+            "type": "any"
           },
           {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "name": "prefix",
+            "description": "Аддон слева: иконка, счётчик. В состоянии загрузки уступает место спиннеру.",
+            "type": "any"
           },
           {
             "name": "suffix",
-            "description": "",
-            "type": "{}"
+            "description": "Аддон справа: шеврон, счётчик.",
+            "type": "any"
           }
         ]
       },
@@ -1167,8 +1167,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Кнопки группы.",
+            "type": "any"
           }
         ]
       },
@@ -1273,19 +1273,19 @@
         "origin": "generated",
         "items": [
           {
-            "name": "header",
-            "description": "",
-            "type": "{}"
+            "name": "default",
+            "description": "Содержимое карточки.",
+            "type": "any"
           },
           {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "name": "header",
+            "description": "Шапка вместо пропов `title` и `description`.",
+            "type": "any"
           },
           {
             "name": "footer",
-            "description": "",
-            "type": "{}"
+            "description": "Подвал: действия, сводка, пагинация.",
+            "type": "any"
           }
         ]
       },
@@ -1708,6 +1708,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "removeTabindex",
+            "description": "`tabindex` кнопки снятия — для чипа внутри поля ввода. Там таб-стоп принадлежит `<input>`, а ряд чипов ходит стрелками: у `GrInputTag` кольцо оставляет ровно один `0`, у `GrAutocomplete` их нет вовсе. Проп нужен потому, что кольцом управляет родитель — он знает и порядок чипов, и что стоит за краем ряда.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -1761,6 +1768,11 @@
             "name": "blur",
             "description": "",
             "type": "() => void | undefined"
+          },
+          {
+            "name": "removeEl",
+            "description": "Кнопка снятия — цель roving-фокуса у родителя. Отдаётся элементом, а не методом `focusRemove`: кольцу нужен сам узел, оно само решает, когда и куда переносить фокус.",
+            "type": "HTMLButtonElement | null"
           }
         ]
       }
@@ -2439,18 +2451,18 @@
         "items": [
           {
             "name": "item",
-            "description": "",
+            "description": "Строка списка вместо стандартной.",
             "type": "{ item: GrCommandItem; active: boolean; }"
           },
           {
             "name": "empty",
-            "description": "",
+            "description": "Пустое состояние: получает запрос, чтобы предложить действие по нему.",
             "type": "{ query: string; }"
           },
           {
             "name": "footer",
-            "description": "",
-            "type": "{}"
+            "description": "Подвал палитры: подсказки по клавишам, счётчик.",
+            "type": "any"
           }
         ]
       },
@@ -2577,8 +2589,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Поддерево, которому адресованы настройки.",
+            "type": "any"
           }
         ]
       },
@@ -2774,18 +2786,18 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое диалога вместо пропа `message`.",
+            "type": "any"
           },
           {
             "name": "error",
-            "description": "",
+            "description": "Разбор ошибки вместо встроенного баннера.",
             "type": "{ error: ResponseErrorInfo | null; }"
           },
           {
             "name": "footer",
-            "description": "",
-            "type": "{}"
+            "description": "Кнопки диалога вместо пары «отмена и подтверждение».",
+            "type": "any"
           }
         ]
       },
@@ -2945,12 +2957,12 @@
         "items": [
           {
             "name": "default",
-            "description": "",
+            "description": "Область, по которой вызывается меню.",
             "type": "{ open: boolean; }"
           },
           {
             "name": "content",
-            "description": "",
+            "description": "Содержимое меню.",
             "type": "{ close: () => void; }"
           }
         ]
@@ -3235,22 +3247,22 @@
         "items": [
           {
             "name": "caption",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись таблицы — `<caption>`, читается диктором первой.",
+            "type": "any"
           },
           {
             "name": "loading",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое, пока едут данные.",
+            "type": "any"
           },
           {
             "name": "empty",
-            "description": "",
-            "type": "{}"
+            "description": "Пустое состояние вместо текста по умолчанию.",
+            "type": "any"
           },
           {
             "name": "footer",
-            "description": "",
+            "description": "Подвал под таблицей: пагинация, счётчик, итоги во всю ширину.",
             "type": "{ columns: GrDataColumn<TRow>[]; totalColumns: number; }"
           }
         ]
@@ -3504,7 +3516,7 @@
         "items": [
           {
             "name": "empty",
-            "description": "",
+            "description": "Пустое состояние значения — когда у пункта нечего показать.",
             "type": "{ item: GrDescriptionItem; }"
           }
         ]
@@ -3776,8 +3788,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись внутри линии: «или», название раздела.",
+            "type": "any"
           }
         ]
       },
@@ -3882,6 +3894,27 @@
             "default": "false"
           },
           {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
+            "name": "modal",
+            "description": "Модальная панель: подложка, блокировка скролла, `inert` остальной странице и ловушка фокуса. `false` — панель живёт рядом со страницей: с ней работают, не закрывая, а Tab уходит наружу.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "side",
+            "description": "Сторона, с которой выезжает панель.",
+            "type": "GrDrawerSide | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "width",
             "description": "Произвольная ширина боковой панели. Число трактуется как пиксели; сильнее `size`.",
             "type": "string | number | undefined",
@@ -3892,27 +3925,6 @@
             "name": "height",
             "description": "Произвольная высота верхней или нижней панели. Число трактуется как пиксели.",
             "type": "string | number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "modal",
-            "description": "Модальная панель: подложка, блокировка скролла, `inert` остальной странице и ловушка фокуса. `false` — панель живёт рядом со страницей: с ней работают, не закрывая, а Tab уходит наружу.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "initialFocus",
-            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
-            "type": "HTMLElement | null | undefined",
-            "required": false,
-            "default": "null"
-          },
-          {
-            "name": "side",
-            "description": "Сторона, с которой выезжает панель.",
-            "type": "GrDrawerSide | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4054,13 +4066,6 @@
             "default": "\"12rem\""
           },
           {
-            "name": "closeOnContentClick",
-            "description": "Закрывать панель по клику внутри content.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
             "name": "offset",
             "description": "Зазор между триггером и панелью, px.",
             "type": "number | undefined",
@@ -4080,6 +4085,13 @@
             "type": "number | undefined",
             "required": false,
             "default": "160"
+          },
+          {
+            "name": "closeOnContentClick",
+            "description": "Закрывать панель по клику внутри content.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           }
         ]
       },
@@ -4090,12 +4102,12 @@
         "items": [
           {
             "name": "trigger",
-            "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; 'aria-disabled': boolean | undefined; onClick: () => void; onKeydown: (event: KeyboardEvent) => void; }; }"
+            "description": "Триггер панели. `triggerProps` обязаны попасть на сам интерактивный элемент, а не на обёртку вокруг него: `aria-expanded` и `aria-controls` читаются с того узла, который получает фокус.",
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: Record<string, unknown>; }"
           },
           {
             "name": "content",
-            "description": "",
+            "description": "Содержимое меню.",
             "type": "{ close: () => void; }"
           }
         ]
@@ -4212,13 +4224,6 @@
             "default": "\"12rem\""
           },
           {
-            "name": "closeOnContentClick",
-            "description": "Закрывать по клику внутри content.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
             "name": "offset",
             "description": "Зазор между триггером и панелью, px.",
             "type": "number | undefined",
@@ -4240,15 +4245,22 @@
             "default": "160"
           },
           {
-            "name": "borderBottom",
-            "description": "Нижний бордер контейнера списка.",
+            "name": "closeOnContentClick",
+            "description": "Закрывать по клику внутри content.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "borderTop",
+            "description": "Верхний бордер контейнера списка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
-            "name": "borderTop",
-            "description": "Верхний бордер контейнера списка.",
+            "name": "borderBottom",
+            "description": "Нижний бордер контейнера списка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -4261,14 +4273,14 @@
         "origin": "generated",
         "items": [
           {
-            "name": "trigger",
-            "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\"; 'aria-expanded': boolean; 'aria-controls': string | undefined; 'aria-disabled': boolean | undefined; onClick: () => void; onKeydown: (event: KeyboardEvent) => void; }; }"
+            "name": "default",
+            "description": "Пункты меню. Слот-пропы прокидываются от `GrDropdown` как есть.",
+            "type": "{ close: () => void; }"
           },
           {
-            "name": "default",
-            "description": "",
-            "type": "{ close: () => void; }"
+            "name": "trigger",
+            "description": "Триггер панели. `triggerProps` обязаны попасть на сам интерактивный элемент, а не на обёртку вокруг него: `aria-expanded` и `aria-controls` читаются с того узла, который получает фокус.",
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: Record<string, unknown>; }"
           }
         ]
       },
@@ -4870,8 +4882,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{ validate: () => Promise<boolean>; errors: Record<string, string | undefined>; isDirty: boolean; isValid: boolean; validatingFields: Set<string> & Omit<Set<string>, keyof Set<any>>; resetFields: (names?: string | string[] | undefined) => void; setSnapshot: (model?: Record<string, unknown> | undefined) => void; }"
+            "description": "Поля формы. Слот-пропы повторяют публичный API инстанса: форма в шаблоне доступна без `ref`, а значит и без `nextTick` после монтирования.",
+            "type": "{ validate: () => Promise<boolean>; errors: Record<string, string | undefined>; isDirty: boolean; isValid: boolean; validatingFields: Set<string>; resetFields: (names?: string | string[] | undefined) => void; setSnapshot: (model?: Record<string, unknown> | undefined) => void; }"
           }
         ]
       },
@@ -4981,13 +4993,6 @@
             "default": "undefined"
           },
           {
-            "name": "labelClass",
-            "description": "",
-            "type": "LabelClass | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "forId",
             "description": "Явный id контрола. Если не задан — генерируется автоматически.",
             "type": "string | undefined",
@@ -5007,6 +5012,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "labelClass",
+            "description": "",
+            "type": "LabelClass | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -5016,23 +5028,23 @@
         "origin": "generated",
         "items": [
           {
+            "name": "default",
+            "description": "Контрол поля.",
+            "type": "any"
+          },
+          {
             "name": "label",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись вместо пропа `label`.",
+            "type": "any"
           },
           {
             "name": "hint",
-            "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Подсказка под контролом вместо пропа `hint`.",
+            "type": "any"
           },
           {
             "name": "error",
-            "description": "",
+            "description": "Текст ошибки вместо стандартного. Получает уже разрешённый список.",
             "type": "{ errors: string[]; }"
           }
         ]
@@ -5152,13 +5164,6 @@
             "default": "undefined"
           },
           {
-            "name": "errors",
-            "description": "Контролируемый список ошибок: `v-model:errors`. Задан — показывается он, и внутренняя валидация его не перетирает. Сюда же кладутся ошибки, пришедшие с сервера. Не задан — компонент держит свои ошибки сам.",
-            "type": "FileValidationIssue[] | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "uploadText",
             "description": "",
             "type": "string | undefined",
@@ -5183,6 +5188,13 @@
             "name": "clearAllText",
             "description": "",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "errors",
+            "description": "Контролируемый список ошибок: `v-model:errors`. Задан — показывается он, и внутренняя валидация его не перетирает. Сюда же кладутся ошибки, пришедшие с сервера. Не задан — компонент держит свои ошибки сам.",
+            "type": "FileValidationIssue[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5394,8 +5406,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Своя разметка иконки вместо имени из набора.",
+            "type": "any"
           }
         ]
       },
@@ -5611,13 +5623,13 @@
         "items": [
           {
             "name": "toolbar",
-            "description": "",
-            "type": "{ index: number; src?: string | undefined; alt: string; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
+            "description": "Панель инструментов целиком вместо встроенной.",
+            "type": "GrImageViewerSlotProps"
           },
           {
             "name": "toolbar-actions",
-            "description": "",
-            "type": "{ index: number; src?: string | undefined; alt: string; displayIndex: number; total: number; scale: number; rotation: number; naturalWidth: number; naturalHeight: number; renderedWidth: number; renderedHeight: number; realScale: number; realScalePercent: string; actions: GrImageViewerToolbarActions; }"
+            "description": "Свои кнопки рядом со встроенными — поворот, скачивание, печать.",
+            "type": "GrImageViewerSlotProps"
           }
         ]
       },
@@ -5860,13 +5872,6 @@
             "default": "undefined"
           },
           {
-            "name": "textAlign",
-            "description": "",
-            "type": "GrInputTextAlign | undefined",
-            "required": false,
-            "default": "\"left\""
-          },
-          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -5921,6 +5926,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "textAlign",
+            "description": "",
+            "type": "GrInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
           },
           {
             "name": "modelValue",
@@ -6526,8 +6538,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Клавиша или сочетание вместо пропа `keys`.",
+            "type": "any"
           }
         ]
       },
@@ -6654,8 +6666,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Текст ссылки.",
+            "type": "any"
           }
         ]
       },
@@ -6767,24 +6779,24 @@
         "origin": "generated",
         "items": [
           {
-            "name": "loading",
-            "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "empty",
-            "description": "",
-            "type": "{}"
+            "name": "default",
+            "description": "Пункты списка, когда разметка пишется руками вместо `items`.",
+            "type": "any"
           },
           {
             "name": "item",
-            "description": "",
+            "description": "Пункт в data-режиме. `aria` проставляется только в виртуальном режиме — когда набор в DOM неполный и размер списка браузеру взять неоткуда.",
             "type": "{ item: T; index: number; aria: Record<string, number>; }"
           },
           {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "name": "loading",
+            "description": "Содержимое, пока едут данные.",
+            "type": "any"
+          },
+          {
+            "name": "empty",
+            "description": "Пустое состояние вместо текста по умолчанию.",
+            "type": "any"
           }
         ]
       },
@@ -6819,8 +6831,8 @@
             "default": "undefined"
           },
           {
-            "name": "spinnerClass",
-            "description": "Дополнительные классы обёртки спиннера.",
+            "name": "zIndexVar",
+            "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -6833,15 +6845,8 @@
             "default": "undefined"
           },
           {
-            "name": "background",
-            "description": "Свой `background-color`. Задан — дефолтный скрим `--gr-overlay-bg` снимается.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "zIndexVar",
-            "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`.",
+            "name": "spinnerClass",
+            "description": "Дополнительные классы обёртки спиннера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -6866,6 +6871,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "background",
+            "description": "Свой `background-color`. Задан — дефолтный скрим `--gr-overlay-bg` снимается.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "fullscreen",
@@ -7080,13 +7092,6 @@
             "default": "undefined"
           },
           {
-            "name": "sticky",
-            "description": "Панель прилипает к верху при прокрутке. Слой — `--gr-z-navbar`: он ниже якорных панелей, чтобы открытый список не уезжал под шапку.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "showMenuButton",
             "description": "",
             "type": "boolean | undefined",
@@ -7099,6 +7104,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"\""
+          },
+          {
+            "name": "sticky",
+            "description": "Панель прилипает к верху при прокрутке. Слой — `--gr-z-navbar`: он ниже якорных панелей, чтобы открытый список не уезжал под шапку.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -7300,13 +7312,6 @@
             "default": "undefined"
           },
           {
-            "name": "textAlign",
-            "description": "",
-            "type": "GrNumberInputTextAlign | undefined",
-            "required": false,
-            "default": "\"left\""
-          },
-          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -7326,6 +7331,13 @@
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "\"decimal\""
+          },
+          {
+            "name": "textAlign",
+            "description": "",
+            "type": "GrNumberInputTextAlign | undefined",
+            "required": false,
+            "default": "\"left\""
           },
           {
             "name": "decimalSeparator",
@@ -7557,13 +7569,13 @@
             "required": true
           },
           {
-            "name": "total",
+            "name": "pageSize",
             "description": "",
             "type": "number",
             "required": true
           },
           {
-            "name": "pageSize",
+            "name": "total",
             "description": "",
             "type": "number",
             "required": true
@@ -7661,13 +7673,6 @@
             "default": "\"default\""
           },
           {
-            "name": "anchor",
-            "description": "Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`: панель встаёт у точки курсора или у строки списка. Нужен контекстному меню, у которого триггера-элемента нет вовсе. `triggerProps` в этом режиме некому потребить, и своих ARIA-атрибутов поповер никуда не вешает: `aria-haspopup` невалиден вне интерактивного элемента, а `aria-expanded` без хозяина — шум. Связь с содержимым страницы объявляет тот, кто открывает.",
-            "type": "GrFloatingAnchorRect | null | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "closeOnEsc",
             "description": "",
             "type": "boolean | undefined",
@@ -7710,11 +7715,11 @@
             "default": "undefined"
           },
           {
-            "name": "role",
-            "description": "Роль панели. Меняется теми, кто строит поверх примитива своё меню/список.",
-            "type": "GrPopoverRole | undefined",
+            "name": "anchor",
+            "description": "Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`: панель встаёт у точки курсора или у строки списка. Нужен контекстному меню, у которого триггера-элемента нет вовсе. `triggerProps` в этом режиме некому потребить, и своих ARIA-атрибутов поповер никуда не вешает: `aria-haspopup` невалиден вне интерактивного элемента, а `aria-expanded` без хозяина — шум. Связь с содержимым страницы объявляет тот, кто открывает.",
+            "type": "GrFloatingAnchorRect | null | undefined",
             "required": false,
-            "default": "\"dialog\""
+            "default": "undefined"
           },
           {
             "name": "modal",
@@ -7724,18 +7729,25 @@
             "default": "false"
           },
           {
-            "name": "closeOnClickOutside",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
             "name": "closeOnContentClick",
             "description": "Закрывать по клику внутри панели — удобно для меню, вредно для формы.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "role",
+            "description": "Роль панели. Меняется теми, кто строит поверх примитива своё меню/список.",
+            "type": "GrPopoverRole | undefined",
+            "required": false,
+            "default": "\"dialog\""
+          },
+          {
+            "name": "closeOnClickOutside",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           },
           {
             "name": "autoFocus",
@@ -7753,12 +7765,12 @@
         "items": [
           {
             "name": "trigger",
-            "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"dialog\" | \"listbox\" | \"grid\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
+            "description": "Триггер панели. `triggerProps` обязаны попасть на сам интерактивный элемент, а не на обёртку вокруг него: `aria-expanded` и `aria-controls` читаются с того узла, который получает фокус.",
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: Record<string, unknown>; }"
           },
           {
             "name": "content",
-            "description": "",
+            "description": "Содержимое панели.",
             "type": "{ close: () => void; }"
           }
         ]
@@ -8270,18 +8282,18 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое диалога вместо пропа `message`.",
+            "type": "any"
           },
           {
             "name": "error",
-            "description": "",
+            "description": "Разбор ошибки вместо встроенного баннера.",
             "type": "{ error: ResponseErrorInfo | null; }"
           },
           {
             "name": "footer",
-            "description": "",
-            "type": "{}"
+            "description": "Кнопки диалога вместо пары «отмена и подтверждение».",
+            "type": "any"
           }
         ]
       },
@@ -8446,13 +8458,13 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись переключателя вместо пропа `label`.",
+            "type": "any"
           },
           {
             "name": "description",
-            "description": "",
-            "type": "{}"
+            "description": "Пояснение под подписью.",
+            "type": "any"
           }
         ]
       },
@@ -9633,19 +9645,19 @@
         "origin": "generated",
         "items": [
           {
-            "name": "subtitle",
-            "description": "",
-            "type": "{}"
+            "name": "default",
+            "description": "Содержимое панели: навигация, группы, произвольная разметка.",
+            "type": "any"
           },
           {
             "name": "title",
-            "description": "",
-            "type": "{}"
+            "description": "Заголовок шапки вместо пропа `title`.",
+            "type": "any"
           },
           {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "name": "subtitle",
+            "description": "Подзаголовок под заголовком.",
+            "type": "any"
           }
         ]
       },
@@ -9809,13 +9821,6 @@
             "default": "\"horizontal\""
           },
           {
-            "name": "range",
-            "description": "Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "lazy",
             "description": "Эмитить `update:modelValue` только по завершении жеста: во время перетаскивания значение ведёт сам слайдер. Клавиатура коммитит сразу — нажатие клавиши дискретно, придерживать его нечего.",
             "type": "boolean | undefined",
@@ -9835,6 +9840,13 @@
             "type": "number | undefined",
             "required": false,
             "default": "0"
+          },
+          {
+            "name": "range",
+            "description": "Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "marks",
@@ -10357,34 +10369,34 @@
         "origin": "generated",
         "items": [
           {
+            "name": "default",
+            "description": "Значение вместо пропа `value`.",
+            "type": "any"
+          },
+          {
             "name": "icon",
-            "description": "",
-            "type": "{}"
+            "description": "Иконка перед подписью.",
+            "type": "any"
           },
           {
             "name": "title",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись показателя вместо пропа `title`.",
+            "type": "any"
           },
           {
             "name": "prefix",
-            "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Приписка перед значением: знак валюты, стрелка.",
+            "type": "any"
           },
           {
             "name": "suffix",
-            "description": "",
-            "type": "{}"
+            "description": "Приписка после значения: единица измерения, процент.",
+            "type": "any"
           },
           {
             "name": "trend",
-            "description": "",
-            "type": "{}"
+            "description": "Динамика под значением вместо встроенного `GrDelta`.",
+            "type": "any"
           }
         ]
       },
@@ -10810,18 +10822,18 @@
             "default": "false"
           },
           {
-            "name": "columnCount",
-            "description": "Сколько колонок занимает служебная строка (пустое состояние и скелетоны).",
-            "type": "number | undefined",
-            "required": false,
-            "default": "1"
-          },
-          {
             "name": "loadingRows",
             "description": "Сколько строк-заглушек показать при `loading`.",
             "type": "number | undefined",
             "required": false,
             "default": "3"
+          },
+          {
+            "name": "columnCount",
+            "description": "Сколько колонок занимает служебная строка (пустое состояние и скелетоны).",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
           },
           {
             "name": "striped",
@@ -10859,34 +10871,34 @@
         "origin": "generated",
         "items": [
           {
+            "name": "default",
+            "description": "Строки таблицы, когда разметка пишется руками вместо `data`.",
+            "type": "any"
+          },
+          {
             "name": "caption",
-            "description": "",
-            "type": "{}"
+            "description": "Подпись таблицы — `<caption>`, читается диктором первой.",
+            "type": "any"
           },
           {
             "name": "header",
-            "description": "",
-            "type": "{}"
+            "description": "Шапка вместо построенной по `columns`.",
+            "type": "any"
           },
           {
             "name": "loading",
-            "description": "",
-            "type": "{}"
+            "description": "Содержимое, пока едут данные, — вместо строк-заглушек.",
+            "type": "any"
           },
           {
             "name": "empty",
-            "description": "",
-            "type": "{}"
-          },
-          {
-            "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Пустое состояние вместо текста по умолчанию.",
+            "type": "any"
           },
           {
             "name": "footer",
-            "description": "",
-            "type": "{}"
+            "description": "Итоговая строка под таблицей.",
+            "type": "any"
           }
         ]
       },
@@ -10946,8 +10958,8 @@
         "items": [
           {
             "name": "default",
-            "description": "",
-            "type": "{}"
+            "description": "Панели (`GrTabPanel`).",
+            "type": "any"
           }
         ]
       },
@@ -11175,13 +11187,6 @@
             "default": "4"
           },
           {
-            "name": "resize",
-            "description": "Ручное изменение размера пользователем.",
-            "type": "GrTextareaResize | undefined",
-            "required": false,
-            "default": "\"vertical\""
-          },
-          {
             "name": "state",
             "description": "",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
@@ -11217,21 +11222,28 @@
             "default": "false"
           },
           {
+            "name": "resize",
+            "description": "Ручное изменение размера пользователем.",
+            "type": "GrTextareaResize | undefined",
+            "required": false,
+            "default": "\"vertical\""
+          },
+          {
             "name": "modelValue",
             "description": "",
             "type": "string",
             "required": true
           },
           {
-            "name": "maxLines",
-            "description": "Ориентир по числу строк для счётчика (`3 / 10`). Ввод не ограничивает: обрезать набранный текст за пользователя компонент не вправе.",
-            "type": "number | undefined",
-            "required": false
-          },
-          {
             "name": "showLineCount",
             "description": "Показывать счётчик строк. Считаются **логические** строки (переводы строки), а не визуальные переносы: при `autosize` число не меняется от ширины поля.",
             "type": "boolean | undefined",
+            "required": false
+          },
+          {
+            "name": "maxLines",
+            "description": "Ориентир по числу строк для счётчика (`3 / 10`). Ввод не ограничивает: обрезать набранный текст за пользователя компонент не вправе.",
+            "type": "number | undefined",
             "required": false
           }
         ]
@@ -11338,7 +11350,7 @@
           {
             "name": "layout",
             "description": "Раскладка: одна ось, колонка времени слева или чередование сторон.",
-            "type": "\"stacked\" | \"alternate\" | \"time\" | undefined",
+            "type": "\"stacked\" | \"time\" | \"alternate\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -11449,16 +11461,16 @@
             "default": "\"top-right\""
           },
           {
-            "name": "width",
-            "description": "Ширина стека. Число — пиксели, строка — любая CSS-длина. Уезжает в `--gr-toaster-width`, поэтому то же самое можно задать и темой.",
-            "type": "string | number | undefined",
+            "name": "regionLabel",
+            "description": "A11y-лейбл контейнера-региона (i18n).",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "regionLabel",
-            "description": "A11y-лейбл контейнера-региона (i18n).",
-            "type": "string | undefined",
+            "name": "width",
+            "description": "Ширина стека. Число — пиксели, строка — любая CSS-длина. Уезжает в `--gr-toaster-width`, поэтому то же самое можно задать и темой.",
+            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           },

@@ -133,6 +133,12 @@ const NAME_FALLBACKS: Record<string, string> = {
 function readableName(name: string): string {
   return t(`gr.kbd.${name}`, NAME_FALLBACKS[name] ?? name)
 }
+
+defineSlots<{
+  /** Клавиша или сочетание вместо пропа `keys`. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

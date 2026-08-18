@@ -1,6 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
-import { computed, nextTick, onBeforeUnmount } from 'vue'
+import { computed, nextTick } from 'vue'
 
+import { useTypeahead } from '../../../composables/internal/useTypeahead'
 import { useComboboxNavigation } from '../../../composables/useComboboxNavigation'
 import { isComposingEvent } from '../../../internal/keyboard'
 import type { GrSelectOption, GrSelectValue } from '../grSelectStyles'
@@ -14,9 +15,6 @@ import type { GrSelectPanelItem } from './useSelectPanelItems'
 export type GrSelectNavigableItem<TValue extends GrSelectValue> =
   | { kind: 'add' }
   | { kind: 'option', value: TValue, index: number }
-
-/** Буфер typeahead живёт ровно столько: дальше набранное перестаёт быть словом. */
-const TYPEAHEAD_RESET_MS = 600
 
 export interface UseSelectNavigationOptions<TValue extends GrSelectValue> {
   panelItems: ComputedRef<GrSelectPanelItem<TValue>[]>
@@ -131,33 +129,41 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
     options.showSearchInput.value ? activeDescendantId.value : undefined
   ))
 
-  let typeaheadBuffer = ''
-  let typeaheadTimer: ReturnType<typeof setTimeout> | null = null
+  /**
+   * Подпись опции по значению.
+   *
+   * Мапой, а не `find` по списку: typeahead опрашивает подпись на каждом шаге
+   * обхода, и линейный поиск внутри цикла давал квадрат по числу опций — на
+   * длинных списках это чувствовалось прямо во время набора.
+   */
+  const labelByItem = computed(() => {
+    const byValue = new Map<unknown, string>()
+    for (const option of options.flatOptions.value)
+      byValue.set(option.value, option.label)
 
-  function typeahead(char: string): void {
-    const lower = char.toLowerCase()
-    // Повтор одной буквы — это «следующий на ту же букву», а не поиск «aa».
-    const repeat = typeaheadBuffer.length === 1 && typeaheadBuffer === lower
-    typeaheadBuffer = repeat ? lower : typeaheadBuffer + lower
+    return byValue
+  })
 
-    if (typeaheadTimer) clearTimeout(typeaheadTimer)
-    typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, TYPEAHEAD_RESET_MS)
+  function labelOf(item: GrSelectNavigableItem<TValue>): string {
+    if (item.kind !== 'option') return ''
 
-    // Поиск циклически от следующей за активной (APG) — как в GrTree/GrDropdown:
-    // повторная буква ведёт к следующему совпадению, а не возвращает к первому.
-    const items = navigableItems.value
-    const from = activeIndex.value
-    for (let step = 1; step <= items.length; step += 1) {
-      const idx = (from + step + items.length) % items.length
-      const item = items[idx]
-      if (item.kind !== 'option') continue
-      const opt = options.flatOptions.value.find(o => options.sameValue(o.value, item.value))
-      if (opt?.label.toLowerCase().startsWith(typeaheadBuffer)) {
-        setActive(idx)
-        return
-      }
-    }
+    const direct = labelByItem.value.get(item.value)
+    if (direct !== undefined) return direct
+
+    // `sameValue` умеет сравнивать объекты по ключу — на такой список Map по
+    // ссылке не ложится, и остаётся честный перебор.
+    return options.flatOptions.value
+      .find(option => options.sameValue(option.value, item.value))?.label ?? ''
   }
+
+  const typeahead = useTypeahead<GrSelectNavigableItem<TValue>>({
+    items: () => navigableItems.value,
+    textOf: labelOf,
+    // Поиск идёт от активной опции, а не с начала списка (APG): повторная буква
+    // ведёт к следующему совпадению.
+    currentIndex: () => activeIndex.value,
+    onMatch: (_item, index) => setActive(index),
+  })
 
   function onComboKeydown(event: KeyboardEvent): void {
     // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
@@ -193,14 +199,9 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
         // typeahead — только когда нет поля ввода (иначе мешает вводу в search/custom-инпут).
         if (!options.showSearchInput.value && event.key.length === 1
           && !event.metaKey && !event.ctrlKey && !event.altKey)
-          typeahead(event.key)
+          typeahead.type(event.key)
     }
   }
-
-  onBeforeUnmount(() => {
-    // Висячий таймер после размонтирования: буфер typeahead живёт 600 мс.
-    if (typeaheadTimer) clearTimeout(typeaheadTimer)
-  })
 
   return {
     navigableItems,

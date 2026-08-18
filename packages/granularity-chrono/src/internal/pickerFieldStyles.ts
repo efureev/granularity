@@ -20,10 +20,10 @@ export type GrPickerSize = GrComponentSize
  */
 
 export const fieldSizes: Record<GrPickerSize, string> = {
-  xs: 'h-7 pl-2.5 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 pl-3 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-10 pl-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-11 pl-4 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 pl-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 pl-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 pl-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 pl-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const fieldBaseClass

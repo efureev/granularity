@@ -1,3 +1,5 @@
+export { bigStep } from '../shared/numericStep'
+
 /**
  * Экспоненциальная запись разбирается отдельно: `String(1e-7)` — это `"1e-7"`,
  * и поиск точки насчитал бы ноль знаков, после чего округление съело бы всё
@@ -28,19 +30,4 @@ export function addStep(current: number, step: number): number {
 
   // `toFixed` за пределами 100 знаков бросает.
   return decimals > 100 ? sum : Number(sum.toFixed(decimals))
-}
-
-/**
- * Правило `GrSlider` (`bigStep` в `GrSlider.vue`): десять шагов либо десятая
- * часть диапазона — что крупнее. У поля границы необязательны, и без них
- * диапазона не существует.
- */
-export function bigStep(step: number, min?: number, max?: number): number {
-  const base = step * 10
-  if (min === undefined || max === undefined) return base
-
-  const span = max - min
-  const tenth = Math.round((span / 10) / step) * step
-
-  return Math.max(base, tenth || step)
 }

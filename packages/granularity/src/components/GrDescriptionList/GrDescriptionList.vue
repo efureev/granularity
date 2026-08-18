@@ -190,6 +190,19 @@ function pairKey(item: GrDescriptionItem, index: number): string {
 function hasSlot(name: string): boolean {
   return Boolean(slots[name])
 }
+
+defineSlots<{
+  /** Пустое состояние значения — когда у пункта нечего показать. */
+  empty?: (props: { item: GrDescriptionItem }) => any
+  /**
+   * Подпись пункта: `#label-email`. Имя собирается из `name` пункта, поэтому
+   * тип задан шаблоном — перечислить их заранее нельзя.
+   */
+  [label: `label-${string}`]: (props: { item: GrDescriptionItem }) => any
+  /** Значение пункта: `#value-email`. */
+  [value: `value-${string}`]: (props: { item: GrDescriptionItem }) => any
+}>()
+
 </script>
 
 <template>

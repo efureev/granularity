@@ -40,12 +40,19 @@ function stripComments(source: string): string {
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1')
 }
 
-function sourceFiles(dir: string, acc: string[] = []): string[] {
+/**
+ * Исходники компонента: всё дерево его директории, кроме тестов.
+ *
+ * Экспортируется, потому что «что считается исходником компонента» обязано
+ * быть определено один раз: тем же обходом пользуется гейт safelist, и
+ * разойдись они — один гейт видел бы вложенные `composables/*.ts`, а другой нет.
+ */
+export function componentSourceFiles(dir: string, acc: string[] = []): string[] {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = resolve(dir, entry.name)
     if (entry.isDirectory()) {
       if (entry.name !== '__tests__')
-        sourceFiles(path, acc)
+        componentSourceFiles(path, acc)
     }
     else if (/\.(?:vue|ts)$/.test(entry.name) && !entry.name.endsWith('.test.ts')) {
       acc.push(path)
@@ -81,7 +88,7 @@ const DYNAMIC_IMPORT = /import\(\s*['"]\.\.\/(Gr[A-Za-z0-9]+)(?:\/([^'"]+))?['"]
 export function collectRequiredDependencies(component: string): DependencyUsage[] {
   const usages = new Map<string, DependencyUsage>()
 
-  for (const file of sourceFiles(resolve(componentsDir, component))) {
+  for (const file of componentSourceFiles(resolve(componentsDir, component))) {
     const source = file.slice(componentsDir.length + 1)
 
     for (const { dependency, kind } of parseDependencyUsages(readFileSync(file, 'utf8'))) {

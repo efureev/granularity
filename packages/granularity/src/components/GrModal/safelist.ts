@@ -1,4 +1,4 @@
-import { splitClassTokens } from '../shared/classTokens'
+import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
 import {
   layoutByScroll,
   overlay,
@@ -30,10 +30,6 @@ type GrModalClassTokens = {
   panelHeight: readonly string[]
 }
 
-function flattenTransition(stages: Record<string, string>): string[] {
-  return Object.values(stages).flatMap(splitClassTokens)
-}
-
 export const grModalClassTokens: GrModalClassTokens = {
   root: splitClassTokens(root),
   shell: [
@@ -43,14 +39,14 @@ export const grModalClassTokens: GrModalClassTokens = {
   ],
   layout: Object.values(layoutByScroll).flatMap(splitClassTokens),
   overlay: splitClassTokens(overlay),
-  overlayTransition: flattenTransition(overlayTransition),
+  overlayTransition: flattenTransitionTokens(overlayTransition),
   panelBase: [
     ...splitClassTokens(panelBase),
     ...Object.values(panelOverflowByScroll).flatMap(splitClassTokens),
     ...splitClassTokens(panelBodyScrollClass),
     ...splitClassTokens(panelSectionClass),
   ],
-  panelTransition: flattenTransition(panelTransition),
+  panelTransition: flattenTransitionTokens(panelTransition),
   panelWidth: Object.values(panelWidthBySize).flatMap(splitClassTokens),
   panelRadius: Object.values(panelRadiusBySize).flatMap(splitClassTokens),
   panelHeight: Object.values(panelHeightBySize).flatMap(v => splitClassTokens(v ?? '')),

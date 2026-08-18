@@ -48,6 +48,15 @@ export interface GrChipProps {
   ariaLabel?: string
   /** Имя кнопки снятия целиком. Перебивает собранное из `label`. */
   removeLabel?: string
+  /**
+   * `tabindex` кнопки снятия — для чипа внутри поля ввода.
+   *
+   * Там таб-стоп принадлежит `<input>`, а ряд чипов ходит стрелками: у
+   * `GrInputTag` кольцо оставляет ровно один `0`, у `GrAutocomplete` их нет
+   * вовсе. Проп нужен потому, что кольцом управляет родитель — он знает и
+   * порядок чипов, и что стоит за краем ряда.
+   */
+  removeTabindex?: number
 }
 
 export interface GrChipEmits {
@@ -70,6 +79,7 @@ const props = withDefaults(defineProps<GrChipProps>(), {
   disabled: false,
   ariaLabel: undefined,
   removeLabel: undefined,
+  removeTabindex: undefined,
 })
 
 const emit = defineEmits<GrChipEmits>()
@@ -229,9 +239,17 @@ if (group) {
   onBeforeUnmount(unregister)
 }
 
+const removeEl = ref<HTMLButtonElement | null>(null)
+
 defineExpose({
   focus: () => rootEl.value?.focus(),
   blur: () => rootEl.value?.blur(),
+  /**
+   * Кнопка снятия — цель roving-фокуса у родителя. Отдаётся элементом, а не
+   * методом `focusRemove`: кольцу нужен сам узел, оно само решает, когда и
+   * куда переносить фокус.
+   */
+  removeEl,
 })
 </script>
 
@@ -280,10 +298,12 @@ defineExpose({
 
     <button
       v-else-if="isClosable"
+      ref="removeEl"
       data-gr-chip-close
       type="button"
       :class="[chipCloseButtonClass, iconSizeClass]"
       :aria-label="removeTitle"
+      :tabindex="removeTabindex"
       @mousedown.prevent.stop
       @click.stop="requestRemove()"
     >

@@ -28,7 +28,7 @@ export const rowDisabledClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[v
 
 export const dividedClass = 'divide-y divide-[var(--gr-brd)]'
 
-export const emptyClass = 'px-4 py-6 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
+export const emptyClass = 'px-4 py-6 text-center text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'
 
 /**
  * Ручка не табируется: внутри роверного композита свой таб-стоп сломал бы
@@ -44,7 +44,7 @@ export const handleClass = 'flex shrink-0 items-center justify-center rounded-[v
 export const handleDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 
 
-export const contentClass = 'min-w-0 flex-1 text-[length:var(--gr-text-sm)]'
+export const contentClass = 'min-w-0 flex-1 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]'
 
 /**
  * Куда встанет строка — псевдоэлемент самой строки, а не отдельный узел:

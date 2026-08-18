@@ -20,10 +20,10 @@ export type GrChipRadius = GrBadgeRadius
  * должен стоять с бейджем в одном ряду и не расходиться с ним по цвету.
  */
 export const chipSizeClassBySize: Record<GrChipSize, string> = {
-  xs: 'h-6 gap-1 px-2 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-7 gap-1 px-2.5 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-8 gap-1.5 px-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-9 gap-1.5 px-3.5 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-6 gap-1 px-2 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-7 gap-1 px-2.5 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-8 gap-1.5 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-9 gap-1.5 px-3.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /** Крестик и иконка не растут вместе с кеглем один в один — плитка бы разъехалась. */
@@ -34,12 +34,7 @@ export const chipIconSizeClassBySize: Record<GrChipSize, string> = {
   lg: 'h-4 w-4',
 }
 
-/**
- * `leading-none` осознанно: у контрольной шкалы парных ступеней межстрочного
- * нет, и без явного значения плитка поехала бы за `line-height` приложения.
- * Тот же приём у `GrBadge` и `GrKbd`.
- */
-export const chipRootClass = 'inline-flex max-w-full items-center border align-middle leading-none whitespace-nowrap'
+export const chipRootClass = 'inline-flex max-w-full items-center border align-middle whitespace-nowrap'
 
 /** Подпись жмётся, а не ломает ряд: чип с длинным тегом не должен рвать раскладку. */
 export const chipLabelClass = 'min-w-0 truncate'
@@ -95,4 +90,18 @@ export function grChipClass(options: {
     options.interactive && !options.disabled ? chipInteractiveClass : '',
     options.selected ? chipSelectedClass : '',
   ].filter(Boolean).join(' ')
+}
+
+/**
+ * Ступень чипа, равная по кеглю ступени бейджа.
+ *
+ * Нужна там, где чип заменил собой бейдж внутри контрола (`GrInputTag`,
+ * `GrAutocomplete`, `GrSelect`): проп `tagSize` у них публичный, и `md` обязан
+ * означать для потребителя то же, что означал. Шкалы сдвинуты на ступень —
+ * бейдж `md` это 13px, а чип 13px — это `sm`.
+ */
+export function chipSizeForBadgeScale(size: GrChipSize): GrChipSize {
+  const byBadgeStep: Record<GrChipSize, GrChipSize> = { xs: 'xs', sm: 'xs', md: 'sm', lg: 'md' }
+
+  return byBadgeStep[size]
 }

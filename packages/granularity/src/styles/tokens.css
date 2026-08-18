@@ -62,13 +62,24 @@
    * кегль, переведённый на токен в одиночку, отдал бы интервал на откуп `body`
    * приложения. Коэффициенты (`tight`/`normal`/`relaxed`) — безразмерные, для
    * текстовых блоков, где интервал задаётся отношением к кеглю, а не числом.
+   * Контрольные ступени (`--gr-control-leading-*`) — такая же пара, но к шкале
+   * контролов: без них интервал наследовался от `body` приложения абсолютным
+   * значением, и подпись кеглем 10px получала межстрочный 24px, то есть 2.4.
    * Ступени заводятся по мере употребления: шкала без употребления — мёртвый груз.
    */
+  --gr-leading-2xs: 0.875rem;
   --gr-leading-xs: 1rem;
   --gr-leading-sm: 1.25rem;
   --gr-leading-base: 1.5rem;
+  --gr-leading-lg: 1.625rem;
   --gr-leading-xl: 1.75rem;
   --gr-leading-3xl: 2.25rem;
+  --gr-control-leading-3xs: 14px;
+  --gr-control-leading-2xs: 16px;
+  --gr-control-leading-xs: 16px;
+  --gr-control-leading-sm: 18px;
+  --gr-control-leading-md: 20px;
+  --gr-control-leading-lg: 24px;
   --gr-leading-tight: 1.25;
   --gr-leading-normal: 1.5;
   --gr-leading-relaxed: 1.625;

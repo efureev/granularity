@@ -462,6 +462,16 @@ const listStyleWithSpacers = computed(() => {
 })
 
 defineExpose({ open, close, toggle })
+
+defineSlots<{
+  /** Строка списка вместо стандартной. */
+  item?: (props: { item: GrCommandItem, active: boolean }) => any
+  /** Пустое состояние: получает запрос, чтобы предложить действие по нему. */
+  empty?: (props: { query: string }) => any
+  /** Подвал палитры: подсказки по клавишам, счётчик. */
+  footer?: () => any
+}>()
+
 </script>
 
 <template>

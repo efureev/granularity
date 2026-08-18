@@ -24,7 +24,7 @@ export const navbarRightAlignClass = 'justify-end'
 
 export const navbarCenterClass = 'flex min-w-0 flex-1 items-center justify-center gap-3'
 
-export const navbarTitleClass = 'text-[length:var(--gr-text-sm)] font-700'
+export const navbarTitleClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700'
 
 export function grNavbarRootClass(sticky: boolean): string {
   return [navbarBaseClass, sticky ? navbarStickyClass : ''].filter(Boolean).join(' ')

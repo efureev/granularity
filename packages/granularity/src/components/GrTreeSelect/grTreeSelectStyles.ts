@@ -5,10 +5,10 @@ import type { GrInputSize } from '../GrInput'
 export type GrTreeSelectState = GrControlState
 
 export const sizeClassBySize: Record<GrInputSize, string> = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /**
@@ -68,4 +68,4 @@ export const grTreeSelectPanelClass = 'rounded-[var(--gr-radius-xl)] border bord
  * воздухом — тот же язык, что у `GrSelect`, `GrAutocomplete` и палитры команд.
  * Слева она расходилась с содержимым дерева на паддинг скроллера.
  */
-export const grTreeSelectStateClass = 'flex items-center justify-center gap-2 px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
+export const grTreeSelectStateClass = 'flex items-center justify-center gap-2 px-3 py-4 text-center text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'

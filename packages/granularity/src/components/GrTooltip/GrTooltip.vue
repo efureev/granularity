@@ -231,11 +231,17 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
     </span>
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
+      <!--
+        Свой набор, а не общий `panelPopTransition`: подсказка появляется фейдом
+        без масштабирования — она догоняет курсор, и рост от 95% читался бы как
+        второй, лишний жест. В общей карте живут наборы с двумя и более
+        потребителями, у этого он один.
+      -->
       <transition
-        enter-active-class="transition-opacity duration-[var(--gr-duration-fast)]"
+        enter-active-class="transition-opacity ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition-opacity duration-[var(--gr-duration-fast)]"
+        leave-active-class="transition-opacity ease-[var(--gr-ease-in)] duration-[var(--gr-duration-fast)]"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >

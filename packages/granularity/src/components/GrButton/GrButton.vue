@@ -137,6 +137,16 @@ const className = computed(() => {
     block: props.block,
   })
 })
+
+defineSlots<{
+  /** Содержимое кнопки. */
+  default?: () => any
+  /** Аддон слева: иконка, счётчик. В состоянии загрузки уступает место спиннеру. */
+  prefix?: () => any
+  /** Аддон справа: шеврон, счётчик. */
+  suffix?: () => any
+}>()
+
 </script>
 
 <template>

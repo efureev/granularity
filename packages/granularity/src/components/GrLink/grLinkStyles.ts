@@ -27,10 +27,10 @@ export const baseRootClass = 'inline-flex items-center gap-1 rounded-[var(--gr-r
 export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const sizeClassBySize: Record<GrLinkSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-xs)]',
-  sm: 'text-[length:var(--gr-control-text-sm)]',
-  md: 'text-[length:var(--gr-control-text-md)]',
-  lg: 'text-[length:var(--gr-control-text-lg)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 // Цвет управляется CSS-переменными (как трек в GrSwitch): один набор классов

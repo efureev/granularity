@@ -61,6 +61,12 @@ if (__GR_DEV__) {
     )
   })
 }
+
+defineSlots<{
+  /** Содержимое панели. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

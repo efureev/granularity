@@ -26,6 +26,12 @@ const itemsClass = computed(() => [
   listBaseClass,
   props.dividers ? dividersClass : '',
 ].filter(Boolean).join(' '))
+
+defineSlots<{
+  /** Пункты группы. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

@@ -7,6 +7,59 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.27.0] 2026-08-19
+
+### Changed
+
+- **Control-scale font sizes now ship a paired line height.** The scale gained
+  `--gr-control-leading-3xs…lg`, and every place that sets a control font size sets the
+  matching `leading-*` next to it. Before this the line height was inherited from the host
+  application's `body` — and inherited as an absolute value, so a 10px caption rendered with a
+  24px line box whenever the host used the common `line-height: 1.5`. How airy a control looked
+  was decided by someone else's CSS reset. Steps are tighter than the content scale, and `lg`
+  (16 → 24px) matches the most common inherited value, so large controls did not move. The
+  content scale gained the two missing steps (`--gr-leading-2xs`, `--gr-leading-lg`) and is now
+  paired everywhere too. **Visible change:** captions, panel text, list rows and table cells
+  that are not height-locked get a tighter line box.
+- **Chips inside `GrInputTag`, `GrAutocomplete` and `GrSelect` are now `GrChip`, not `GrBadge`.**
+  One chip, one keyboard contract, one set of colours. The `tagSize` prop keeps its badge scale —
+  it is public API, so `md` still means the font size it always meant; the mapping lives in
+  `chipSizeForBadgeScale`. The remove button is now addressed as `[data-gr-chip-close]` in all
+  three; the old per-component selectors (`data-gr-input-tag-remove` and friends) are gone.
+- **`GrChip` gained `removeTabindex` and exposes `removeEl`** — what a chip needs to live inside a
+  text field, where the tab stop belongs to the `<input>` and the row of chips is walked with
+  arrows. `GrInputTag` keeps exactly one tab stop in the row; `GrAutocomplete` keeps none.
+
+### Added
+
+- **Typed slots for every SFC that has them.** All 81 slot-bearing components now declare
+  `defineSlots` with a JSDoc line per member. This is not cosmetic: the slot descriptions in the
+  showcase API tables and in `web-types.json` for IDEs are read from exactly that JSDoc and from
+  nowhere else, so 38 components previously showed an empty description column and a `{}` type.
+
+### Fixed
+
+- **`GrTree` typeahead lost matches when Shift was held.** The buffer stored the raw character and
+  normalised only the query, so `Shift+F` followed by `f` searched for `"Ff"` and found nothing —
+  the focus silently stayed put. Both `GrTree` and `GrSelect` now use the shared `useTypeahead`,
+  which normalises before comparing.
+- **`GrTooltip` took its easing curve from the preset, not from the design system.** Its transition
+  declared a duration but no `ease-*` at all, so `presetMini` supplied the curve.
+
+### Internal
+
+- Transition classes of the five floating panels moved to a single shared preset
+  (`panelPopTransition`); each panel declares its classes in its own safelist, because a module in
+  `components/shared/` has no directory of its own in `dist` and the preset never scans it.
+- The safelist gate now walks component imports into `components/shared/**` and reads nested helper
+  directories, closing a blind spot in which such a module's classes were checked by nothing at
+  all — not the gate, not `doctor`, and not the showcase, where a neighbour masks the defect.
+- The paired-leading rule is enforced by `defineStyleTokensGate({ requirePairedLeading: true })`,
+  with an explicit list of exceptions (`GrKbd`, where `leading-none` centres the glyph).
+- `PageUp`/`PageDown` step size is shared by `GrSlider` and `GrNumberInput`
+  (`components/shared/numericStep.ts`). `GrSplitter` keeps its own: different trigger, different
+  unit, and its `bigStep` is a public prop.
+
 ## [v0.26.0] 2026-08-18
 
 ### Added

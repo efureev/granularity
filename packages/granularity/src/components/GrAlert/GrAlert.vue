@@ -175,7 +175,7 @@ const role = computed(() => {
       <div class="min-w-0 flex-1">
         <div
           v-if="props.title"
-          class="text-[length:var(--gr-text-sm)] font-600 text-[var(--gr-alert-title-color)]"
+          class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600 text-[var(--gr-alert-title-color)]"
         >
           {{ props.title }}
         </div>

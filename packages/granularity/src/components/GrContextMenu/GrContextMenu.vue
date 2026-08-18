@@ -334,6 +334,14 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({ openAt, openAtElement, open, close, toggle })
+
+defineSlots<{
+  /** Область, по которой вызывается меню. */
+  default?: (props: { open: boolean }) => any
+  /** Содержимое меню. */
+  content?: (props: { close: () => void }) => any
+}>()
+
 </script>
 
 <template>

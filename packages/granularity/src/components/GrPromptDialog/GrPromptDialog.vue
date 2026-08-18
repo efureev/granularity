@@ -319,6 +319,16 @@ watch(
   // будет вовсе, и без этого фокус остался бы на панели.
   { immediate: true, flush: 'post' },
 )
+
+defineSlots<{
+  /** Содержимое диалога вместо пропа `message`. */
+  default?: () => any
+  /** Разбор ошибки вместо встроенного баннера. */
+  error?: (props: { error: ResponseErrorInfo | null }) => any
+  /** Кнопки диалога вместо пары «отмена и подтверждение». */
+  footer?: () => any
+}>()
+
 </script>
 
 <template>
@@ -337,7 +347,7 @@ watch(
   >
     <div class="grid gap-4">
       <slot>
-        <div v-if="description" class="text-[length:var(--gr-control-text-md)] text-[var(--gr-muted-fg)]">
+        <div v-if="description" class="text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)] text-[var(--gr-muted-fg)]">
           {{ description }}
         </div>
       </slot>

@@ -199,6 +199,14 @@ const unregister = group?.register({
 })
 
 onUnmounted(() => unregister?.())
+
+defineSlots<{
+  /** Подпись переключателя вместо пропа `label`. */
+  default?: () => any
+  /** Пояснение под подписью. */
+  description?: () => any
+}>()
+
 </script>
 
 <template>

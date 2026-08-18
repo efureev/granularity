@@ -220,7 +220,7 @@ function onDismiss(): void {
           {{ statusLabel }}
         </span>
         <span
-          class="text-[length:var(--gr-control-text-sm)]"
+          class="text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]"
           :data-testid="`${props.testIdPrefix}-message`"
         >
           {{ message }}
@@ -229,7 +229,7 @@ function onDismiss(): void {
 
       <ul
         v-if="detailEntries.length"
-        class="m-0 list-disc pl-5 text-[length:var(--gr-control-text-xs)]"
+        class="m-0 list-disc pl-5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]"
         :data-testid="`${props.testIdPrefix}-details`"
       >
         <li

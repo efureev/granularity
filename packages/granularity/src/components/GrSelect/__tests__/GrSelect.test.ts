@@ -795,11 +795,11 @@ describe('GrSelect — теги', () => {
   it('крестики тегов — настоящие кнопки вне комбобокса', () => {
     const wrapper = mount(GrSelect, { props: tagProps })
 
-    const removes = wrapper.findAll('[data-gr-select-tag-remove]')
+    const removes = wrapper.findAll('[data-gr-chip-close]')
     expect(removes).toHaveLength(3)
     expect(removes[0].element.tagName).toBe('BUTTON')
     expect(removes[0].attributes('tabindex')).toBeUndefined()
-    expect(wrapper.get('[data-gr-select-trigger]').find('[data-gr-select-tag-remove]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-select-trigger]').find('[data-gr-chip-close]').exists()).toBe(false)
   })
 
   it('тег и пилюля «+N» — бейджи выбранного тона', () => {
@@ -819,7 +819,7 @@ describe('GrSelect — теги', () => {
   it('крестик снимает значение', async () => {
     const wrapper = mount(GrSelect, { props: tagProps })
 
-    await wrapper.findAll('[data-gr-select-tag-remove]')[1].trigger('click')
+    await wrapper.findAll('[data-gr-chip-close]')[1].trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a', 'c']])
   })

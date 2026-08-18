@@ -11,5 +11,10 @@ import { defineStyleTokensGate } from '@feugene/granularity-test-kit/gates'
  * генерируются из `tokens/*.json` и обязаны содержать литералы.
  */
 defineStyleTokensGate({
+  requirePairedLeading: true,
+  // Клавиша центрирует глиф в плашке фиксированной высоты: `leading-none` в
+  // `keyBaseClass` — её осознанный межстрочный, и парная ступень встала бы
+  // второй декларацией того же веса.
+  pairedLeadingExceptions: ['GrKbd/grKbdStyles.ts'],
   excludeTopDirs: ['styles', 'tokens'],
 })

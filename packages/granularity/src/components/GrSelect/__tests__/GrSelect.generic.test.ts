@@ -164,7 +164,7 @@ describe('GrSelect — объектные значения', () => {
     })
     await nextTick()
 
-    const removeButtons = wrapper.findAll('[data-gr-select-tag-remove]')
+    const removeButtons = wrapper.findAll('[data-gr-chip-close]')
     expect(removeButtons).toHaveLength(2)
 
     await removeButtons[0].trigger('click')

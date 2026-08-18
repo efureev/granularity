@@ -128,6 +128,34 @@ const VISUAL_COMPONENTS = [
   'GrFilePreview',
   'GrJsonViewer',
   'GrValue',
+  /**
+   * Статичные в покое — раскладка снимается первым кадром.
+   *
+   * Недетерминизм в их демо есть (`Date.now()` в шапке секции, `Math.random()`
+   * у прогресса загрузки, часы в баннере ошибки), но весь он за кликом, и до
+   * первого кадра не доходит. `GrLoading` крутится CSS-анимацией — её гасит
+   * `animations: 'disabled'`.
+   *
+   * Чего здесь нет и почему: оверлеи за кликом (`GrModal`, `GrDrawer`,
+   * `GrDropdown`, `GrTooltip`, `GrPopover` и соседи) дают мигающий эталон;
+   * `GrNavbar`, `GrSidebar`, `GrBottomNav` считают раскладку от ширины окна
+   * раннера; `GrConfigProvider` и `GrForm` своей разметки не рисуют вовсе, и
+   * снимок мерил бы демо; у `GrDialogService` нет страницы — это сервис.
+   */
+  'GrBadgeWrap',
+  'GrCheckboxGroup',
+  'GrCollapse',
+  'GrFileUpload',
+  'GrFormFile',
+  'GrFormSection',
+  'GrIcon',
+  'GrLoading',
+  'GrRadio',
+  'GrResponseErrorBanner',
+  'GrSortableList',
+  'GrTabPanels',
+  'GrTree',
+  'GrTreeSelect',
 ]
 
 /**

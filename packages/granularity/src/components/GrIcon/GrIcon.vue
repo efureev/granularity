@@ -67,6 +67,12 @@ const iconClass = computed(() => [
  * сильнее собственной привязки.
  */
 const ariaHidden = computed(() => (props.label ? undefined : 'true'))
+
+defineSlots<{
+  /** Своя разметка иконки вместо имени из набора. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

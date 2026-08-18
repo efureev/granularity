@@ -37,25 +37,25 @@ export const iconGlyphSizes: Record<GrFileUploadSize, number> = {
  * четырёхступенчатыми.
  */
 export const labelSizes: Record<GrFileUploadSize, string> = {
-  xs: 'text-[length:var(--gr-text-xs)]',
-  sm: 'text-[length:var(--gr-text-xs)]',
-  md: 'text-[length:var(--gr-text-sm)]',
-  lg: 'text-[length:var(--gr-text-base)]',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 /** Подсказка, список файлов и текст прогресса — мельче основной подписи. */
 export const hintSizes: Record<GrFileUploadSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)]',
-  sm: 'text-[length:var(--gr-text-xs)]',
-  md: 'text-[length:var(--gr-text-xs)]',
-  lg: 'text-[length:var(--gr-text-sm)]',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
 }
 
 export const progressTextSizes: Record<GrFileUploadSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)]',
-  sm: 'text-[length:var(--gr-text-2xs)]',
-  md: 'text-[length:var(--gr-text-xs)]',
-  lg: 'text-[length:var(--gr-text-xs)]',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  sm: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
 }
 
 export const zoneGaps: Record<GrFileUploadSize, string> = {

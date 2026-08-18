@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { bigStep } from '../shared/numericStep'
 import { useDragGesture } from '../../composables/useDragGesture'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
@@ -318,9 +319,10 @@ const drag = useDragGesture({
 })
 
 // ————— Клавиатура.
-function bigStep(): number {
-  // PageUp/Down: 10 шагов либо 10% диапазона (что крупнее).
-  return Math.max(props.step * 10, Math.round((span.value / 10) / props.step) * props.step || props.step)
+function keyboardBigStep(): number {
+  // Границы передаются от нормализованного размаха, а не от сырых пропов:
+  // `span` уже подставил единицу вместо вырожденного `max <= min`.
+  return bigStep(props.step, props.min, props.min + span.value)
 }
 
 function onThumbKeydown(event: KeyboardEvent, index: number): void {
@@ -338,10 +340,10 @@ function onThumbKeydown(event: KeyboardEvent, index: number): void {
       next = current - props.step
       break
     case 'PageUp':
-      next = current + bigStep()
+      next = current + keyboardBigStep()
       break
     case 'PageDown':
-      next = current - bigStep()
+      next = current - keyboardBigStep()
       break
     case 'Home':
       next = props.min

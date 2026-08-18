@@ -156,6 +156,12 @@ onBeforeUnmount(() => {
 })
 
 const wrapperStyle = { display: 'contents' } as const
+
+defineSlots<{
+  /** Поддерево, которому адресованы настройки. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

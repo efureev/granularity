@@ -7,10 +7,10 @@ export type GrColorPickerSize = GrComponentSize
  * с `GrInput`, и своя лестница высот выдала бы его из ряда.
  */
 export const triggerSizeClassBySize: Record<GrColorPickerSize, string> = {
-  xs: 'h-7 px-2 gap-1.5 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 px-2.5 gap-2 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-10 px-3 gap-2 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-11 px-4 gap-2.5 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 px-2 gap-1.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 px-2.5 gap-2 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 px-3 gap-2 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 px-4 gap-2.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /** Образец в триггере: квадрат со стороной чуть меньше высоты поля. */
@@ -22,10 +22,10 @@ export const triggerSwatchSizeBySize: Record<GrColorPickerSize, string> = {
 }
 
 export const panelSizeClassBySize: Record<GrColorPickerSize, string> = {
-  xs: 'w-56 gap-2 text-[length:var(--gr-control-text-xs)]',
-  sm: 'w-60 gap-2.5 text-[length:var(--gr-control-text-sm)]',
-  md: 'w-64 gap-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'w-72 gap-3 text-[length:var(--gr-control-text-lg)]',
+  xs: 'w-56 gap-2 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'w-60 gap-2.5 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'w-64 gap-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'w-72 gap-3 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'

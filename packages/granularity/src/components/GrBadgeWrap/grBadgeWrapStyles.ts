@@ -29,7 +29,7 @@ export const dotPlacementClass: Record<GrBadgeWrapPlacement, string> = {
 
 export const dotBaseClass = 'absolute h-2 w-2 rounded-[var(--gr-radius-full)]'
 
-export const countBaseClass = 'absolute min-w-5 h-5 px-1 rounded-[var(--gr-radius-full)] text-[length:var(--gr-text-2xs)] font-700 inline-flex items-center justify-center'
+export const countBaseClass = 'absolute min-w-5 h-5 px-1 rounded-[var(--gr-radius-full)] text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] font-700 inline-flex items-center justify-center'
 
 /**
  * Заливка — насыщенная роль тона, текст из `-fg`, а не из белого литерала: тот не

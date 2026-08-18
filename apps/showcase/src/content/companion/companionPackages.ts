@@ -985,13 +985,7 @@ function dashboardPaletteApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
-/**
- * Публичная поверхность панели управления.
- *
- * Живёт на странице сетки, а не на своей: предмет тулбара — две кнопки над
- * сеткой, и в отрыве от неё показывать нечего. Отдельная страница дала бы
- * четвёртое демо, неотличимое от первых трёх.
- */
+/** Публичная поверхность панели управления. */
 function dashboardToolbarApiSections(): ShowcaseApiSectionMeta[] {
   return [
     {
@@ -1636,7 +1630,7 @@ type GrDashboardCompaction = 'vertical' | 'none'`,
             note: 'Композабл читает хранилище только после монтирования: на сервере и в первом клиентском рендере видна раскладка по умолчанию, поэтому гидрация не расходится.',
           },
         ],
-        apiSections: [...dashboardApiSections(), ...dashboardToolbarApiSections()],
+        apiSections: dashboardApiSections(),
       },
       {
         name: 'GrDashboardItem',
@@ -1815,6 +1809,36 @@ function addItem(
           },
         ],
         apiSections: dashboardPaletteApiSections(),
+      },
+      {
+        name: 'GrDashboardToolbar',
+        slug: 'gr-dashboard-toolbar',
+        title: 'GrDashboardToolbar',
+        summary: 'Панель над дашбордом: переключатель режима, сброс раскладки и три слота под своё — заголовок, период, экспорт.',
+        importPath: '@feugene/granularity-dashboard/components/GrDashboardToolbar',
+        overview: {
+          paragraphs: [
+            'Дашборд в приложении редко живёт голым: над ним стоит строка с названием, периодом и кнопкой экспорта. Тулбар — место для неё, и заодно готовый переключатель «просмотр / правка» с кнопкой сброса.',
+            'Режимом он не владеет: показывает то, что дала сетка или проп, а изменение отдаёт эмитом. Владелец раскладки — приложение, и оно же решает, что считать исходным состоянием при сбросе.',
+            'Контекст сетки не обязателен. Тулбар работает и сам по себе — это обычная панель, которую можно поставить над чем угодно.',
+          ],
+          features: [
+            'Переключатель режима с `v-model:mode`.',
+            'Кнопка сброса по `resettable` — событие `reset` без собственной трактовки.',
+            'Слоты `start`, `default` и `end`: заголовок, период, свои действия.',
+            'Роль `toolbar` и доступное имя из локали пакета.',
+            'Размер кнопок общей шкалой контролов.',
+          ],
+        },
+        examples: [
+          {
+            id: 'dashboard-toolbar',
+            title: 'Панель со своим содержимым',
+            description: 'Тулбар вне сетки: слева заголовок и период, справа экспорт, режим и сброс — встроенные. Второй экземпляр показывает погашенное состояние.',
+            previewKey: 'extra-dashboard-toolbar',
+          },
+        ],
+        apiSections: dashboardToolbarApiSections(),
       },
     ],
   },

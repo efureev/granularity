@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 
-import GrBadge from '../GrBadge/GrBadge.vue'
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
+import GrChip from '../GrChip/GrChip.vue'
+import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconClose from '~icons/lucide/x'
 import IconLoader from '~icons/lucide/loader-2'
@@ -20,7 +21,6 @@ import {
   clearButtonClass,
   grInputTagInputClass,
   grInputTagWrapperClass,
-  removeButtonClass,
   spinnerClass,
   type GrInputTagSize,
   type GrInputTagState,
@@ -198,13 +198,23 @@ const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
   enter: event => emit('focus', event),
   leave: event => emit('blur', event),
 })
-const removeEls = ref<HTMLButtonElement[]>([])
+/**
+ * Инстансы чипов: у кольца цель — кнопка снятия внутри чипа, и достаётся она
+ * через `defineExpose` (`removeEl`), а не селектором по DOM.
+ */
+const chipRefs = ref<Array<{ removeEl: HTMLButtonElement | null } | null>>([])
 
-function setRemoveEl(index: number) {
+function setChipRef(index: number) {
   return (el: unknown): void => {
-    removeEls.value[index] = el as HTMLButtonElement
+    chipRefs.value[index] = el as { removeEl: HTMLButtonElement | null } | null
   }
 }
+
+/**
+ * Проп `tagSize` объявлен по шкале бейджа и остаётся публичным контрактом:
+ * `md` обязан означать для потребителя тот же кегль, что и раньше.
+ */
+const chipSize = computed(() => chipSizeForBadgeScale(props.tagSize))
 
 function focus(): void {
   inputEl.value?.focus()
@@ -233,7 +243,7 @@ const tagIndexes = computed(() => props.modelValue.map((_, index) => index))
 
 const roving = useRovingFocus<number>({
   items: () => tagIndexes.value,
-  elementFor: index => removeEls.value[index],
+  elementFor: index => chipRefs.value[index]?.removeEl,
   orientation: () => 'horizontal',
   // Ряд чипов — не кольцо: у него есть край, и за краем стоит поле ввода.
   wrap: () => false,
@@ -547,44 +557,29 @@ defineExpose({ focus, blur, clear: clearAll })
       обязаны переноситься в одном потоке с полем ввода.
     -->
     <span v-if="modelValue.length" role="list" class="contents">
-      <GrBadge
+      <GrChip
         v-for="(tag, i) in modelValue"
         :key="`${tag}-${i}`"
+        :ref="setChipRef(i)"
         role="listitem"
         :tone="tagTone"
         :dark="tagDark"
-        :size="tagSize"
+        :size="chipSize"
         :radius="tagRadius"
+        :closable="showRemove"
+        :remove-label="removeTagLabelFor(tag)"
+        :remove-tabindex="roving.tabindexFor(i)"
         data-gr-input-tag-item
         data-testid="gr-input-tag-item"
         :data-index="i"
+        @remove="removeAt(i)"
+        @focusin="roving.setActive(i)"
+        @keydown="onTagKeydown($event, i)"
       >
-        <span class="inline-flex items-center gap-1 align-middle">
-          <slot name="tag" :tag="tag" :index="i" :remove="() => removeAt(i)">
-            <span class="truncate max-w-[18rem]">{{ tag }}</span>
-          </slot>
-
-          <button
-            v-if="showRemove"
-            :ref="setRemoveEl(i)"
-            type="button"
-            :class="removeButtonClass"
-            :aria-label="removeTagLabelFor(tag)"
-            :tabindex="roving.tabindexFor(i)"
-            data-gr-input-tag-remove
-            data-testid="gr-input-tag-remove"
-            :data-index="i"
-            @mousedown.prevent.stop
-            @focus="roving.setActive(i)"
-            @keydown="onTagKeydown($event, i)"
-            @click.stop="removeAt(i)"
-          >
-            <GrIcon size="sm">
-              <IconClose />
-            </GrIcon>
-          </button>
-        </span>
-      </GrBadge>
+        <slot name="tag" :tag="tag" :index="i" :remove="() => removeAt(i)">
+          <span class="truncate max-w-[18rem]">{{ tag }}</span>
+        </slot>
+      </GrChip>
     </span>
 
     <input

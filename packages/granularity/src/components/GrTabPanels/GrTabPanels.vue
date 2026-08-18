@@ -35,6 +35,12 @@ provide(GR_TAB_PANELS_KEY, {
   activeValue: computed(() => props.modelValue),
   idBase: resolvedIdBase,
 })
+
+defineSlots<{
+  /** Панели (`GrTabPanel`). */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

@@ -105,6 +105,12 @@ const spacingClass = computed(() =>
 )
 
 const variantClass = computed(() => lineVariantClass[resolvedVariant.value])
+
+defineSlots<{
+  /** Подпись внутри линии: «или», название раздела. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

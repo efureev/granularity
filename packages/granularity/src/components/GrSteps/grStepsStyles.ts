@@ -45,10 +45,10 @@ export const stepsItemConnectedClass: Record<GrStepsOrientation, string> = {
  * него нет: это не кегль и не радиус, а собственная метрика компонента.
  */
 export const stepsSizeClassBySize: Record<GrStepsSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-xs)] [--gr-steps-marker-size:1.25rem]',
-  sm: 'text-[length:var(--gr-control-text-sm)] [--gr-steps-marker-size:1.5rem]',
-  md: 'text-[length:var(--gr-control-text-md)] [--gr-steps-marker-size:1.75rem]',
-  lg: 'text-[length:var(--gr-control-text-lg)] [--gr-steps-marker-size:2rem]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)] [--gr-steps-marker-size:1.25rem]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] [--gr-steps-marker-size:1.5rem]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)] [--gr-steps-marker-size:1.75rem]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)] [--gr-steps-marker-size:2rem]',
 }
 
 export const stepsTriggerClass = 'min-w-0 bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gr-bg)] rounded-[var(--gr-radius-md)]'
@@ -87,7 +87,7 @@ export const stepsLabelClassByStatus: Record<GrStepStatus, string> = {
   error: 'text-[var(--gr-danger-text)]',
 }
 
-export const stepsDescriptionClass = 'block mt-0.5 text-[length:var(--gr-control-text-xs)] text-[var(--gr-muted-fg)]'
+export const stepsDescriptionClass = 'block mt-0.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)] text-[var(--gr-muted-fg)]'
 
 /**
  * Соединитель между шагами.
@@ -108,7 +108,7 @@ export const stepsConnectorPendingClass = 'bg-[var(--gr-steps-connector-pending,
 
 /** Компактный вариант: подпись и полоса вместо ленты. */
 export const stepsCompactRowClass = 'flex items-baseline justify-between gap-3'
-export const stepsCompactCounterClass = 'shrink-0 text-[length:var(--gr-control-text-xs)] text-[var(--gr-muted-fg)]'
+export const stepsCompactCounterClass = 'shrink-0 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)] text-[var(--gr-muted-fg)]'
 export const stepsCompactLabelClass = 'min-w-0 truncate font-600 text-[var(--gr-fg)]'
 export const stepsCompactBarClass = 'mt-2'
 

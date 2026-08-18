@@ -88,7 +88,7 @@ describe('GrInputTag', () => {
       },
     })
 
-    const btn = wrapper.get('[data-testid="gr-input-tag-remove"][data-index="0"]')
+    const btn = wrapper.get('[data-index="0"] [data-gr-chip-close]')
     await btn.trigger('click')
 
     expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual(['b'])
@@ -155,7 +155,7 @@ describe('GrInputTag', () => {
     await input.trigger('keydown', { key: 'Enter' })
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
-    expect(wrapper.find('[data-testid="gr-input-tag-remove"]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-chip-close]').exists()).toBe(false)
   })
 })
 
@@ -233,7 +233,7 @@ describe('GrInputTag — клавиатура по чипам', () => {
 
   it('в таб-порядке ровно один крестик', () => {
     const wrapper = mount(GrInputTag, { props })
-    const tabbable = wrapper.findAll('[data-gr-input-tag-remove]')
+    const tabbable = wrapper.findAll('[data-gr-chip-close]')
       .filter(btn => btn.attributes('tabindex') === '0')
 
     expect(tabbable).toHaveLength(1)
@@ -241,14 +241,14 @@ describe('GrInputTag — клавиатура по чипам', () => {
 
   it('крестик называет свой тег', () => {
     const wrapper = mount(GrInputTag, { props })
-    const labels = wrapper.findAll('[data-gr-input-tag-remove]').map(btn => btn.attributes('aria-label'))
+    const labels = wrapper.findAll('[data-gr-chip-close]').map(btn => btn.attributes('aria-label'))
 
     expect(labels).toEqual(['Remove tag vue', 'Remove tag ts', 'Remove tag uno'])
   })
 
   it('стрелки переносят roving-фокус между чипами', async () => {
     const wrapper = mount(GrInputTag, { props, attachTo: document.body })
-    const buttons = wrapper.findAll('[data-gr-input-tag-remove]')
+    const buttons = wrapper.findAll('[data-gr-chip-close]')
 
     await buttons[0].trigger('keydown', { key: 'ArrowRight' })
     await nextTick()
@@ -267,12 +267,12 @@ describe('GrInputTag — клавиатура по чипам', () => {
 
   it('остановка Tab переезжает вслед за стрелками, оставаясь единственной', async () => {
     const wrapper = mount(GrInputTag, { props, attachTo: document.body })
-    const tabindexes = () => wrapper.findAll('[data-gr-input-tag-remove]')
+    const tabindexes = () => wrapper.findAll('[data-gr-chip-close]')
       .map(btn => btn.attributes('tabindex'))
 
     expect(tabindexes()).toEqual(['0', '-1', '-1'])
 
-    await wrapper.findAll('[data-gr-input-tag-remove]')[0].trigger('keydown', { key: 'End' })
+    await wrapper.findAll('[data-gr-chip-close]')[0].trigger('keydown', { key: 'End' })
     await nextTick()
     expect(tabindexes()).toEqual(['-1', '-1', '0'])
 
@@ -281,7 +281,7 @@ describe('GrInputTag — клавиатура по чипам', () => {
 
   it('слева от первого чипа — край ряда, фокус остаётся на месте', async () => {
     const wrapper = mount(GrInputTag, { props, attachTo: document.body })
-    const buttons = wrapper.findAll('[data-gr-input-tag-remove]')
+    const buttons = wrapper.findAll('[data-gr-chip-close]')
 
     ;(buttons[0].element as HTMLElement).focus()
     await buttons[0].trigger('keydown', { key: 'ArrowLeft' })
@@ -293,7 +293,7 @@ describe('GrInputTag — клавиатура по чипам', () => {
 
   it('Home возвращает на первый чип', async () => {
     const wrapper = mount(GrInputTag, { props, attachTo: document.body })
-    const buttons = wrapper.findAll('[data-gr-input-tag-remove]')
+    const buttons = wrapper.findAll('[data-gr-chip-close]')
 
     await buttons[2].trigger('keydown', { key: 'Home' })
     await nextTick()
@@ -308,14 +308,14 @@ describe('GrInputTag — клавиатура по чипам', () => {
     await wrapper.get('[data-gr-input-tag-input]').trigger('keydown', { key: 'ArrowLeft' })
     await nextTick()
 
-    expect(document.activeElement).toBe(wrapper.findAll('[data-gr-input-tag-remove]')[2].element)
+    expect(document.activeElement).toBe(wrapper.findAll('[data-gr-chip-close]')[2].element)
     wrapper.unmount()
   })
 
   it('Delete удаляет чип и не роняет фокус', async () => {
     const wrapper = mount(GrInputTag, { props: { ...props }, attachTo: document.body })
 
-    await wrapper.findAll('[data-gr-input-tag-remove]')[1].trigger('keydown', { key: 'Delete' })
+    await wrapper.findAll('[data-gr-chip-close]')[1].trigger('keydown', { key: 'Delete' })
 
     expect(wrapper.emitted('remove')?.at(-1)).toEqual(['ts', 1])
     expect(await announced()).toBe('Tag removed: ts')

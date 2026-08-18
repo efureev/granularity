@@ -4,6 +4,6 @@ import { grSelectSafelist } from './safelist'
 
 export const grSelectConfig = defineGranularComponent(import.meta.url, {
   name: 'GrSelect',
-  dependencies: ['GrBadge', 'GrInput'],
+  dependencies: ['GrChip', 'GrInput'],
   safelist: grSelectSafelist,
 })

@@ -159,6 +159,18 @@ function onKeydown(event: KeyboardEvent): void {
     onToggle()
   }
 }
+
+defineSlots<{
+  /** Содержимое секции. */
+  default?: () => any
+  /** Заголовок секции вместо пропа `title`. */
+  title?: () => any
+  /** Иконка-указатель вместо шеврона. */
+  icon?: () => any
+  /** Управление справа в заголовке: счётчик, переключатель, кнопка. */
+  extra?: () => any
+}>()
+
 </script>
 
 <template>

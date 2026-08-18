@@ -31,7 +31,7 @@ export const colsClass: Record<GrDropdownMenuColumnsCount, string> = {
  * достаёт. Радиус в базовом классе, а не отдельной константой: hover, disabled и
  * кольцо фокуса висят на одном элементе.
  */
-export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 rounded-[var(--gr-radius-md)] flex items-center gap-2 text-[length:var(--gr-text-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 rounded-[var(--gr-radius-md)] flex items-center gap-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Насыщенный тон как цвет текста запрещён — для текста есть `-text`-роль.
 export const itemVariantClass: Record<GrDropdownMenuItemVariant, string> = {
@@ -46,9 +46,9 @@ export const itemInteractiveClass = 'cursor-pointer hover:bg-[var(--gr-accent)] 
 export const itemDisabledClass = 'cursor-not-allowed pointer-events-none bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
 
 export const itemIndicatorClass = 'h-3.5 w-3.5 shrink-0'
-export const itemShortcutClass = 'ml-auto pl-4 text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]'
+export const itemShortcutClass = 'ml-auto pl-4 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]'
 
-export const headerClass = 'px-4 py-2 text-[length:var(--gr-text-xs)] tracking-wide text-[var(--gr-muted-fg)]'
+export const headerClass = 'px-4 py-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] tracking-wide text-[var(--gr-muted-fg)]'
 
 export const listBaseClass = 'w-full'
 export const dividersClass = 'divide-y divide-[var(--gr-brd)]'

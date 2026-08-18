@@ -44,6 +44,12 @@ const className = computed(() => {
     radius: resolvedRadius.value,
   })
 })
+
+defineSlots<{
+  /** Содержимое метки. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

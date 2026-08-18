@@ -582,6 +582,14 @@ onBeforeUnmount(() => {
   resetGestures()
   cancelPan()
 })
+
+defineSlots<{
+  /** Панель инструментов целиком вместо встроенной. */
+  toolbar?: (props: GrImageViewerSlotProps) => any
+  /** Свои кнопки рядом со встроенными — поворот, скачивание, печать. */
+  'toolbar-actions'?: (props: GrImageViewerSlotProps) => any
+}>()
+
 </script>
 
 <template>

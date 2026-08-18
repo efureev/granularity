@@ -64,8 +64,8 @@ export const deltaEmptyClass = 'text-[var(--gr-muted-fg)]'
  * не в предложении, а в ряду с контролами.
  */
 export const deltaSizeClass: Record<GrComponentSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-xs)]',
-  sm: 'text-[length:var(--gr-control-text-sm)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
   md: '',
-  lg: 'text-[length:var(--gr-control-text-lg)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }

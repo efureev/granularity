@@ -112,10 +112,6 @@ export interface ScanTarget {
 export const SERVICE_ENTITIES: Record<string, Omit<ScanTarget, 'name'>> = {
   // Сервис живёт страницей композабла: у него нет пропсов, есть `useDialogService`.
   GrDialogService: { path: 'composables/use-dialog-service', ready: '#examples' },
-  // Тулбар — две кнопки над сеткой, и в отрыве от неё показывать нечего: своя
-  // страница дала бы демо, неотличимое от демо сетки. Показан и проверяется там
-  // же, где работает; его пропы — секциями на той же странице.
-  GrDashboardToolbar: { path: 'extras/gr-dashboard', ready: '#live-examples' },
 }
 
 /**

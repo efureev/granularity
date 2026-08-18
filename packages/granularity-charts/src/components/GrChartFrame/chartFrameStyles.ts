@@ -99,7 +99,7 @@ export const frameLegendItemHiddenClass = 'text-[var(--gr-muted-fg)]'
 
 export const frameLegendSwatchClass = 'inline-block h-3 w-3 shrink-0'
 
-export const frameTableClass = 'w-full border-collapse text-left text-[length:var(--gr-control-text-sm)]'
+export const frameTableClass = 'w-full border-collapse text-left text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]'
 
 export const frameTableCellClass = 'border border-[var(--gr-brd)] px-2 py-1'
 

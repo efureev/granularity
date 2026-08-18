@@ -29,9 +29,9 @@ export const ratingGapBySize: Record<GrRatingSize, string> = {
 }
 
 export const ratingTextSizeBySize: Record<GrRatingSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-2xs)]',
-  sm: 'text-[length:var(--gr-control-text-xs)]',
-  md: 'text-[length:var(--gr-control-text-sm)]',
+  xs: 'text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)]',
+  sm: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  md: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
   lg: 'text-[length:var(--gr-rating-font-size-lg,15px)]',
 }
 

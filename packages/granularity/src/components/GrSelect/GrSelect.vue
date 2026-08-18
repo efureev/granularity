@@ -5,14 +5,16 @@ import { usePortalTarget } from '../../composables/usePortalTarget'
 
 import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 
-import GrBadge from '../GrBadge/GrBadge.vue'
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
+import GrChip from '../GrChip/GrChip.vue'
+import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
 import GrInput from '../GrInput/GrInput.vue'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { panelPopTransition } from '../shared/overlayTransition'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
@@ -560,6 +562,12 @@ const visibleTagOptions = computed(() => {
   return selectedOptions.value.slice(0, limit)
 })
 
+/**
+ * Проп `tagSize` объявлен по шкале бейджа и остаётся публичным контрактом:
+ * ступени чипа сдвинуты, и перевод держит кегль тем же.
+ */
+const chipSize = computed(() => chipSizeForBadgeScale(props.tagSize))
+
 const hiddenTagCount = computed(() => selectedOptions.value.length - visibleTagOptions.value.length)
 
 function tagRemoveLabel(option: GrSelectOption<TValue>): string {
@@ -999,42 +1007,33 @@ const themeAttrs = useGrThemeAttrs()
       class="pointer-events-none absolute inset-y-0 left-0 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1 px-3 py-1.5"
       :style="{ left: hasPrefix ? prefixLen : undefined }"
     >
-      <GrBadge
+      <GrChip
         v-for="opt in visibleTagOptions"
         :key="keyOf(opt.value)"
         data-gr-select-tag
         class="pointer-events-auto"
         :tone="tagTone"
         :dark="tagDark"
-        :size="tagSize"
+        :size="chipSize"
         :radius="tagRadius"
+        :closable="!isDisabled && !isReadonly"
+        :remove-label="tagRemoveLabel(opt)"
+        @remove="removeValue(opt.value)"
       >
-        <span class="inline-flex max-w-full items-center gap-1 align-middle">
-          <span class="truncate">{{ opt.label }}</span>
-          <button
-            v-if="!isDisabled && !isReadonly"
-            data-gr-select-tag-remove
-            type="button"
-            :aria-label="tagRemoveLabel(opt)"
-            class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--gr-radius-xs)] text-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-            @click.stop="removeValue(opt.value)"
-          >
-            <IconX class="block h-3 w-3" aria-hidden="true" />
-          </button>
-        </span>
-      </GrBadge>
+        <span class="truncate">{{ opt.label }}</span>
+      </GrChip>
 
-      <GrBadge
+      <GrChip
         v-if="hiddenTagCount > 0"
         data-gr-select-tag-rest
         class="pointer-events-auto"
         :tone="tagTone"
         :dark="tagDark"
-        :size="tagSize"
+        :size="chipSize"
         :radius="tagRadius"
       >
         +{{ hiddenTagCount }}
-      </GrBadge>
+      </GrChip>
     </div>
 
     <button
@@ -1052,12 +1051,12 @@ const themeAttrs = useGrThemeAttrs()
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
-        enter-active-class="transition ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
-        enter-from-class="transform opacity-0 scale-95"
-        enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-[var(--gr-ease-in)] duration-[var(--gr-duration-fast)]"
-        leave-from-class="transform opacity-100 scale-100"
-        leave-to-class="transform opacity-0 scale-95"
+        :enter-active-class="panelPopTransition.enter"
+        :enter-from-class="panelPopTransition.enterFrom"
+        :enter-to-class="panelPopTransition.enterTo"
+        :leave-active-class="panelPopTransition.leave"
+        :leave-from-class="panelPopTransition.leaveFrom"
+        :leave-to-class="panelPopTransition.leaveTo"
       >
         <div
           v-show="open"
@@ -1092,7 +1091,7 @@ const themeAttrs = useGrThemeAttrs()
             <div
               v-if="loading"
               data-gr-select-loading
-              class="flex items-center justify-center gap-2 px-3 py-4 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
+              class="flex items-center justify-center gap-2 px-3 py-4 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]"
               role="status"
               aria-live="polite"
             >
@@ -1158,7 +1157,7 @@ const themeAttrs = useGrThemeAttrs()
                     :ref="(el) => virtualEnabled && row.labelIndex !== undefined && measureVirtualRow(row.labelIndex + addOffset, el as Element | null)"
                     data-gr-select-group-label
                     role="presentation"
-                    class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
+                    class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]" :class="[
                       view === 'link' ? 'block min-w-full w-max whitespace-nowrap' : '',
                     ]"
                   >
@@ -1244,7 +1243,7 @@ const themeAttrs = useGrThemeAttrs()
             <div
               v-if="!loading && !panelItems.length && !canAddCustom"
               data-gr-select-empty
-              class="px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]"
+              class="px-3 py-4 text-center text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]"
               role="status"
               aria-live="polite"
             >

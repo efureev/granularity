@@ -19,6 +19,8 @@ export const PX_LITERAL_SCALE = /(?:text|rounded)-\[\d+(?:\.\d+)?px\]/g
 export const UNO_DURATION_SCALE = /(?<![\w-])duration-\d+(?![\w-])/g
 export const UNO_EASE_SCALE = /(?<![\w-])ease-(?:in-out|in|out|linear)(?![\w-])/g
 export const MS_LITERAL = /(?<![\w.-])\d+ms(?![\w-])/g
+/** Кегль, уже переведённый на токен: у него обязан быть парный межстрочный. */
+export const TOKEN_TEXT_SCALE = /text-\[length:var\(--gr-(?:control-)?text-[\w-]+\)\]/
 
 export interface StyleTokensGateOptions {
   /** Корень исходников; по умолчанию — `<cwd>/src`. */
@@ -30,6 +32,22 @@ export interface StyleTokensGateOptions {
    * Пакету без собственной анимации это правило не подходит.
    */
   requireTokenUsage?: boolean
+  /**
+   * Требовать парный `leading-[…]` рядом с каждым кеглем-токеном.
+   *
+   * Флагом, а не безусловно: пакет переходит на парность целиком, одной
+   * правкой, и до перехода гейт красил бы его в красный за чужой долг.
+   */
+  requirePairedLeading?: boolean
+  /**
+   * Файлы, где межстрочный задан осознанно и парная ступень навредила бы:
+   * `leading-none` у клавиши `GrKbd` центрирует глиф в плашке, а вторая
+   * декларация того же веса подралась бы с ним за порядок в стилях.
+   *
+   * Список, а не эвристика «в файле есть `leading-none`»: исключение обязано
+   * быть видно в ревью, иначе им закроют случайный недосмотр.
+   */
+  pairedLeadingExceptions?: readonly string[]
 }
 
 /**
@@ -93,6 +111,38 @@ export function defineStyleTokensGate(options: StyleTokensGateOptions = {}): voi
       expect(
         offenders(UNO_RADIUS_SCALE, sources),
         'используй `rounded-[var(--gr-radius-*)]`; шаги uno сдвинуты — `rounded-md` это 6px, то есть `--gr-radius-control`',
+      ).toEqual([])
+    })
+
+    /**
+     * Кегль без межстрочного — половина решения: `line-height` тогда
+     * наследуется от `body` приложения, причём абсолютным значением. Подпись
+     * кеглем 10px получала интервал 24px, то есть 2.4, и выглядела разреженной
+     * ровно настолько, насколько это решил чужой сброс стилей.
+     *
+     * Проверка построчная: класс-литерал живёт в одной строке, и соседняя
+     * строка того же объекта — уже другая ступень со своей парой.
+     */
+    it.runIf(options.requirePairedLeading ?? false)('кегль идёт в паре с межстрочным', () => {
+      const unpaired: string[] = []
+      const exceptions = options.pairedLeadingExceptions ?? []
+
+      for (const { path, source } of sources) {
+        if (exceptions.some(allowed => path.endsWith(allowed))) continue
+
+        source.split('\n').forEach((line, index) => {
+          if (!TOKEN_TEXT_SCALE.test(line)) return
+          // `leading-none` — осознанный выбор (клавиша, счётчик шага): две
+          // одинаковые по весу декларации подрались бы за порядок в стилях.
+          if (/leading-/.test(line)) return
+
+          unpaired.push(`${path}:${index + 1}: ${line.trim().slice(0, 80)}`)
+        })
+      }
+
+      expect(
+        unpaired,
+        'добавь `leading-[var(--gr-leading-*)]` или `leading-[var(--gr-control-leading-*)]` рядом с кеглем',
       ).toEqual([])
     })
 

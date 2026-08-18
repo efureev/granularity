@@ -13,10 +13,10 @@ export const wrapperSizeClassBySize: Record<GrInputTagSize, string> = {
 }
 
 export const inputSizeClassBySize: Record<GrInputTagSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-xs)]',
-  sm: 'text-[length:var(--gr-control-text-sm)]',
-  md: 'text-[length:var(--gr-control-text-md)]',
-  lg: 'text-[length:var(--gr-control-text-lg)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const wrapperBorderClassByState: Record<GrInputTagState, string> = {
@@ -43,13 +43,6 @@ export const wrapperEnabledClass = 'bg-[var(--gr-bg)] cursor-text'
  * два `bg-*` одной специфичности разрулил бы порядок в сгенерированном CSS.
  */
 export const wrapperDisabledClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
-
-/**
- * Крестик наследует цвет тона бейджа (`text-current`) в полную силу: гасить его
- * прозрачностью нельзя — контраст глифа тогда зависит от тона чипа, а на тёмном
- * бейдже он проваливается.
- */
-export const removeButtonClass = '-mr-0.5 shrink-0 inline-flex items-center justify-center rounded-[var(--gr-radius-control)] p-0.5 text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const clearButtonClass = 'ml-auto shrink-0 inline-flex items-center justify-center rounded-[var(--gr-radius-control)] p-0.5 text-[var(--gr-muted-fg)] transition-colors hover:text-[var(--gr-fg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 

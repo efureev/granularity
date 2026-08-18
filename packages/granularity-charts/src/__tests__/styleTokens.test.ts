@@ -5,4 +5,4 @@ import { defineStyleTokensGate } from '@feugene/granularity-test-kit/gates'
  * выглядят настраиваемыми. Пиксельный литерал или утилита `duration-150` этого
  * обещания не держат: тема их не видит.
  */
-defineStyleTokensGate()
+defineStyleTokensGate({ requirePairedLeading: true })

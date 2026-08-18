@@ -109,6 +109,16 @@ function onClickCapture(e: MouseEvent): void {
   // остановка всплытия его не отменяет.
   e.stopImmediatePropagation()
 }
+
+defineSlots<{
+  /** Подпись пункта вместо пропа `label`. */
+  default?: () => any
+  /** Иконка перед подписью. */
+  icon?: () => any
+  /** Сочетание клавиш справа — обычно `GrKbd`. */
+  shortcut?: () => any
+}>()
+
 </script>
 
 <template>

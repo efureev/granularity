@@ -250,6 +250,18 @@ function onFocusOut(event: FocusEvent): void {
 
   void form.validateField(props.name, 'blur')
 }
+
+defineSlots<{
+  /** Контрол поля. */
+  default?: () => any
+  /** Подпись вместо пропа `label`. */
+  label?: () => any
+  /** Подсказка под контролом вместо пропа `hint`. */
+  hint?: () => any
+  /** Текст ошибки вместо стандартного. Получает уже разрешённый список. */
+  error?: (props: { errors: string[] }) => any
+}>()
+
 </script>
 
 <template>

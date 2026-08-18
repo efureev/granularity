@@ -10,6 +10,12 @@ export interface GrDropdownMenuColumnProps {
 withDefaults(defineProps<GrDropdownMenuColumnProps>(), {
   align: 'center',
 })
+
+defineSlots<{
+  /** Содержимое колонки меню. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

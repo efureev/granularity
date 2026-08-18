@@ -16,11 +16,14 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useComboboxNavigation } from '../../composables/useComboboxNavigation'
+import { useRovingFocus } from '../../composables/useRovingFocus'
 import { filterOptions, resolveSelectedOptions } from '../shared/optionFilter'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 
-import GrBadge from '../GrBadge/GrBadge.vue'
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
+import GrChip from '../GrChip/GrChip.vue'
+import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
+import { panelPopTransition } from '../shared/overlayTransition'
 
 import {
   autocompleteOptionClass,
@@ -65,9 +68,10 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   options?: GrAutocompleteOption<TValue>[]
   multiple?: boolean
   /**
-   * Вид чипов выбранных значений в режиме `multiple`. Чип — это `GrBadge`, а не
-   * своя плашка: на светлой теме собственная заливка чипа (примесь `--gr-muted`
-   * без рамки) давала 1.02:1 к фону поля, то есть была невидима.
+   * Вид чипов выбранных значений в режиме `multiple`. Рисует их `GrChip`, но
+   * шкала пропа осталась бейджевой: `tagSize` публичен, и его значения обязаны
+   * означать тот же кегль, что и раньше. Перевод ступеней — в
+   * `chipSizeForBadgeScale`.
    */
   tagTone?: GrBadgeTone
   tagDark?: boolean
@@ -709,38 +713,57 @@ const showClear = computed(() =>
 // Крестики намеренно не табируемы: у combobox фокус живёт на `<input>`, и
 // двадцать выбранных значений не должны давать двадцать остановок Tab. Поэтому
 // вход в чипы — ArrowLeft из пустого запроса, а выход — ArrowRight/Esc/печать.
-function chipRemoveButtons(): HTMLButtonElement[] {
-  return [...(rootEl.value?.querySelectorAll<HTMLButtonElement>('[data-gr-autocomplete-chip-remove]') ?? [])]
+//
+// Отсюда же единственное отличие от `GrInputTag`: `tabindexFor` здесь не
+// используется. Кольцо нужно как движок навигации, а таб-стоп у ряда чипов
+// отсутствует вовсе — он принадлежит полю ввода.
+const chipRefs = ref<Array<{ removeEl: HTMLButtonElement | null } | null>>([])
+
+function setChipRef(index: number) {
+  return (el: unknown): void => {
+    chipRefs.value[index] = el as { removeEl: HTMLButtonElement | null } | null
+  }
 }
 
+/**
+ * Проп `tagSize` объявлен по шкале бейджа и остаётся публичным контрактом:
+ * дефолт `sm` обязан означать для потребителя тот же кегль, что и раньше.
+ */
+const chipSize = computed(() => chipSizeForBadgeScale(props.tagSize))
+
+// Адресация индексом, а не значением: значения дженерик-типа, и `TValue`
+// сравнивался бы по ссылке там, где опции пересоздаются.
+const chipIndexes = computed(() => selectedOptions.value.map((_, index) => index))
+
+const chipRoving = useRovingFocus<number>({
+  items: () => chipIndexes.value,
+  elementFor: index => chipRefs.value[index]?.removeEl,
+  orientation: () => 'horizontal',
+  // Ряд чипов — не кольцо: за правым краем стоит поле ввода, за левым ничего.
+  wrap: () => false,
+  onOverflow: (edge) => {
+    if (edge === 'end') focusInput()
+    return true
+  },
+  // Удаление чипа перерисовывает ряд: без ожидания фокус уехал бы на узел,
+  // которого уже нет.
+  beforeFocus: () => nextTick(),
+})
+
 function focusChip(index: number): void {
-  const buttons = chipRemoveButtons()
-  if (!buttons.length) {
+  const last = selectedOptions.value.length - 1
+  if (last < 0) {
     focusInput()
     return
   }
-  buttons[Math.min(Math.max(index, 0), buttons.length - 1)].focus()
+
+  void chipRoving.focusKey(Math.min(Math.max(index, 0), last))
 }
 
 function onChipKeydown(event: KeyboardEvent, index: number, value: TValue): void {
+  if (chipRoving.handleNavigationKeys(event)) return
+
   switch (event.key) {
-    case 'ArrowLeft':
-      event.preventDefault()
-      focusChip(index - 1)
-      break
-    case 'ArrowRight':
-      event.preventDefault()
-      if (index >= chipRemoveButtons().length - 1) focusInput()
-      else focusChip(index + 1)
-      break
-    case 'Home':
-      event.preventDefault()
-      focusChip(0)
-      break
-    case 'End':
-      event.preventDefault()
-      focusChip(chipRemoveButtons().length - 1)
-      break
     case 'Delete':
     case 'Backspace':
       event.preventDefault()
@@ -871,31 +894,23 @@ const themeAttrs = useGrThemeAttrs()
 
       <!-- Chips выбранных значений (multiple). -->
       <template v-if="multiple">
-        <GrBadge
+        <GrChip
           v-for="(option, chipIndex) in selectedOptions"
           :key="option.value"
+          :ref="setChipRef(chipIndex)"
           data-gr-autocomplete-chip
           :tone="tagTone"
           :dark="tagDark"
-          :size="tagSize"
+          :size="chipSize"
           :radius="tagRadius"
+          :closable="!locked"
+          :remove-label="t('gr.autocomplete.removeValue', 'Remove {label}', { label: option.label })"
+          :remove-tabindex="-1"
+          @remove="removeValue(option.value)"
+          @keydown="onChipKeydown($event, chipIndex, option.value)"
         >
-          <span class="inline-flex max-w-full items-center gap-1 align-middle">
-            <span class="truncate">{{ option.label }}</span>
-            <button
-              v-if="!locked"
-              type="button"
-              data-gr-autocomplete-chip-remove
-              class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-              :aria-label="t('gr.autocomplete.removeValue', 'Remove {label}', { label: option.label })"
-              tabindex="-1"
-              @click="removeValue(option.value)"
-              @keydown="onChipKeydown($event, chipIndex, option.value)"
-            >
-              <IconX class="block h-3 w-3" aria-hidden="true" />
-            </button>
-          </span>
-        </GrBadge>
+          <span class="truncate">{{ option.label }}</span>
+        </GrChip>
       </template>
 
       <input
@@ -980,12 +995,12 @@ const themeAttrs = useGrThemeAttrs()
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
-        enter-active-class="transition ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
-        enter-from-class="transform opacity-0 scale-95"
-        enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-[var(--gr-ease-in)] duration-[var(--gr-duration-fast)]"
-        leave-from-class="transform opacity-100 scale-100"
-        leave-to-class="transform opacity-0 scale-95"
+        :enter-active-class="panelPopTransition.enter"
+        :enter-from-class="panelPopTransition.enterFrom"
+        :enter-to-class="panelPopTransition.enterTo"
+        :leave-active-class="panelPopTransition.leave"
+        :leave-from-class="panelPopTransition.leaveFrom"
+        :leave-to-class="panelPopTransition.leaveTo"
       >
         <div
           v-show="open"

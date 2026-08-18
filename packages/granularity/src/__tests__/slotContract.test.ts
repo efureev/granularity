@@ -106,26 +106,6 @@ const ADDON_PROPS = [
   'suffixFixed',
 ]
 
-/** Форм-контролы: список тот же, что у `formControlContract.test.ts`. */
-const FORM_CONTROLS = [
-  'GrInput',
-  'GrTextarea',
-  'GrNumberInput',
-  'GrSelect',
-  'GrAutocomplete',
-  'GrTreeSelect',
-  'GrInputTag',
-  'GrCheckbox',
-  'GrCheckboxGroup',
-  'GrRadioGroup',
-  'GrSwitch',
-  'GrSlider',
-  'GrRating',
-  'GrSegmented',
-  'GrFormFile',
-  'GrFileUpload',
-]
-
 interface ComponentSlots {
   name: string
   source: string
@@ -161,6 +141,22 @@ function slotNamesOf(source: string): string[] {
   }
 
   return [...names].sort()
+}
+
+/** Все SFC пакета по отдельности — гейт типизации считает по файлам. */
+function sfcFiles(): Array<[string, string]> {
+  const files: Array<[string, string]> = []
+
+  for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !entry.name.startsWith('Gr')) continue
+
+    for (const file of readdirSync(resolve(componentsDir, entry.name))) {
+      if (!file.endsWith('.vue')) continue
+      files.push([`${entry.name}/${file}`, readFileSync(resolve(componentsDir, entry.name, file), 'utf8')])
+    }
+  }
+
+  return files
 }
 
 const components = readComponents()
@@ -208,16 +204,22 @@ describe('словарь слотов', () => {
   })
 })
 
-describe('типизация слотов контролов', () => {
-  it.each(FORM_CONTROLS)('%s объявляет defineSlots, если у него есть слоты', (name) => {
-    const component = components.find(entry => entry.name === name)
-    expect(component, `${name} не найден`).toBeDefined()
+describe('типизация слотов', () => {
+  /**
+   * Правило одностороннее: «есть слоты → есть `defineSlots`», но не наоборот.
+   * `GrAvatarGroup` объявляет типы и не рендерит `<slot>` вовсе — он раздаёт
+   * узлы через `useSlots()`, и обратная проверка сделала бы его нарушителем.
+   *
+   * Считаем по файлам, а не по директориям: у компонента их несколько
+   * (`GrCollapse` + `GrCollapseItem`), и склейка источников зеленела бы, пока
+   * `defineSlots` есть хоть в одном — восемь дырок так и проскочили бы.
+   */
+  it.each(sfcFiles())('%s объявляет defineSlots, если у него есть слоты', (_label, source) => {
+    if (slotNamesOf(source).length === 0) return
 
-    if (component!.slots.length === 0) return
-
-    // Без `defineSlots` слоты не попадают в `.d.ts`: IDE молчит, а потребитель
-    // узнаёт имя слота из исходников компонента.
-    expect(component!.source, `${name}: слоты есть, а типов у них нет`).toContain('defineSlots<')
+    // Без `defineSlots` слоты не попадают ни в `.d.ts`, ни в API-таблицы
+    // витрины: описание слота там берётся ровно из JSDoc над его членом.
+    expect(source, 'слоты есть, а типов у них нет').toContain('defineSlots<')
   })
 })
 

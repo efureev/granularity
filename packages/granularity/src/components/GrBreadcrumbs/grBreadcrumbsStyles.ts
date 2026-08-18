@@ -38,10 +38,10 @@ export const breadcrumbsListNowrapClass = 'flex-nowrap overflow-hidden'
 
 /** Кегль строки пути. Шкала общая с `GrLink`: путь — это ряд ссылок. */
 export const breadcrumbsSizeClassBySize: Record<GrBreadcrumbsSize, string> = {
-  xs: 'text-[length:var(--gr-text-xs)]',
-  sm: 'text-[length:var(--gr-text-sm)]',
-  md: 'text-[length:var(--gr-text-sm)]',
-  lg: 'text-[length:var(--gr-text-base)]',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 export const breadcrumbsSeparatorClass = 'select-none text-[var(--gr-muted-fg)]'

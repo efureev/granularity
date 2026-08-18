@@ -170,6 +170,16 @@ const bodySectionClass = computed(() => [sectionPaddingClass.value, props.bodyCl
 function onClick(event: MouseEvent): void {
   emit('click', event)
 }
+
+defineSlots<{
+  /** Содержимое карточки. */
+  default?: () => any
+  /** Шапка вместо пропов `title` и `description`. */
+  header?: () => any
+  /** Подвал: действия, сводка, пагинация. */
+  footer?: () => any
+}>()
+
 </script>
 
 <template>

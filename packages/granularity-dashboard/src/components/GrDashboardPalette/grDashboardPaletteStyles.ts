@@ -54,7 +54,7 @@ export const descriptionClass = 'mt-0.5 block text-[var(--gr-muted-fg)]'
 /** Размер в ячейках: выбирают не только «что», но и «сколько места это займёт». */
 export const measureClass = [
   'shrink-0 whitespace-nowrap',
-  'text-[length:var(--gr-control-text-2xs)]',
+  'text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)]',
   'text-[var(--gr-muted-fg)]',
   '[font-variant-numeric:tabular-nums]',
 ].join(' ')

@@ -105,10 +105,10 @@ export const descriptionValueToneClass: Record<GrTone, string> = {
 }
 
 export const descriptionSizeClass: Record<GrComponentSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-2xs)]',
-  sm: 'text-[length:var(--gr-control-text-xs)]',
-  md: 'text-[length:var(--gr-control-text-sm)]',
-  lg: 'text-[length:var(--gr-control-text-md)]',
+  xs: 'text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)]',
+  sm: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  md: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  lg: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
 }
 
 export const descriptionDensityClass: Record<GrDescriptionDensity, string> = {

@@ -58,10 +58,10 @@ export const codeBlockPaddings: Record<GrComponentSize, string> = {
 }
 
 export const codeBlockTextSizes: Record<GrComponentSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-3xs)]',
-  sm: 'text-[length:var(--gr-control-text-2xs)]',
-  md: 'text-[length:var(--gr-control-text-xs)]',
-  lg: 'text-[length:var(--gr-control-text-sm)]',
+  xs: 'text-[length:var(--gr-control-text-3xs)] leading-[var(--gr-control-leading-3xs)]',
+  sm: 'text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)]',
+  md: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  lg: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
 }
 
 /**

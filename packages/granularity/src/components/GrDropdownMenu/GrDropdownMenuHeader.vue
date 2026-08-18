@@ -24,6 +24,12 @@ const props = withDefaults(defineProps<GrDropdownMenuHeaderProps>(), {
  */
 const slots = useSlots()
 const isVisible = computed(() => Boolean(props.title) || Boolean(slots.default))
+
+defineSlots<{
+  /** Заголовок раздела меню вместо пропа `label`. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

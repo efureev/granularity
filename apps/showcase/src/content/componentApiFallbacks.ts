@@ -26,32 +26,6 @@ export const showcaseComponentApiFallbacks: Record<string, ShowcaseComponentApiF
         },
       ],
     },
-    slots: {
-      key: 'slots',
-      title: 'Slots',
-      origin: 'manual',
-      items: [
-        {
-          name: 'default',
-          description: 'Текст кнопки, иконка или произвольный контент внутри `GrButton`.',
-          type: '() => VNode[]',
-        },
-      ],
-    },
-  },
-  GrCard: {
-    slots: {
-      key: 'slots',
-      title: 'Slots',
-      origin: 'manual',
-      items: [
-        {
-          name: 'default',
-          description: 'Основное содержимое карточки.',
-          type: '() => VNode[]',
-        },
-      ],
-    },
   },
   GrLink: {
     props: {

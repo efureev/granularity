@@ -13,8 +13,8 @@ export const formSectionHeaderClass = 'flex flex-wrap items-start justify-betwee
 
 // `m-0` — у нативного заголовка есть браузерные отступы, и без сброса секция
 // разъезжается по вертикали.
-export const formSectionTitleClass = 'm-0 text-[length:var(--gr-text-sm)] font-700'
+export const formSectionTitleClass = 'm-0 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700'
 
-export const formSectionDescriptionClass = 'mt-1 text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
+export const formSectionDescriptionClass = 'mt-1 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'
 
 export const formSectionActionsClass = 'flex shrink-0 items-center gap-2'

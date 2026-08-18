@@ -362,11 +362,14 @@ const lightThemeCssExcerpt = renderThemeExcerpt('light', ':root', themeExcerptTo
 const darkThemeCssExcerpt = renderThemeExcerpt('dark', "[data-theme='dark']", themeExcerptTokenNames)
 
 // Срез обязан дотягиваться дальше палитры — до типографики, интервалов и
-// радиусов: иначе страница Foundations показывает один список цветов.
+// радиусов: иначе страница Foundations показывает один список цветов. Граница
+// подвижная: каждая новая ступень шкалы сдвигает интервалы вправо, и её надо
+// двигать следом — гейт `foundationsContent` требует, чтобы `--gr-space-4`
+// оставался в срезе.
 const tokensCssExcerpt = [
   ':root {',
   ...showcaseFoundationTokens
-    .slice(0, 48)
+    .slice(0, 60)
     .map(token => `  ${token.name}: ${token.value};`),
   '}',
 ].join('\n')

@@ -86,6 +86,22 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
 
 const emit = defineEmits<GrDropdownMenuEmits>()
 
+defineSlots<{
+  /** Пункты меню. Слот-пропы прокидываются от `GrDropdown` как есть. */
+  default?: (props: { close: () => void }) => any
+  /**
+   * Триггер панели. `triggerProps` обязаны попасть на сам интерактивный
+   * элемент, а не на обёртку вокруг него: `aria-expanded` и `aria-controls`
+   * читаются с того узла, который получает фокус.
+   */
+  trigger?: (props: {
+    open: boolean
+    toggle: () => void
+    close: () => void
+    triggerProps: Record<string, unknown>
+  }) => any
+}>()
+
 </script>
 
 <template>

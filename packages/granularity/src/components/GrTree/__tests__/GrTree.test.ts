@@ -749,6 +749,63 @@ describe('GrTree — клавиатура сверх стрелок', () => {
     wrapper.unmount()
   })
 
+  it('повтор буквы с зажатым `Shift` остаётся повтором, а не ищет «Ff»', async () => {
+    // Прежняя копия хранила в буфере сырой символ и нормализовала только запрос,
+    // поэтому `Shift+F` затем `f` давало буфер «Ff» и ноль совпадений — фокус
+    // молча оставался на месте.
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: [
+          { id: 1, label: 'Alpha' },
+          { id: 2, label: 'Foo' },
+          { id: 3, label: 'Fee' },
+        ] satisfies Item[],
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+      },
+    })
+    const tree$ = wrapper.get('[role="tree"]')
+    const focusedKey = () => wrapper.findAll('[role="treeitem"]')
+      .find(i => i.attributes('tabindex') === '0')
+      ?.attributes('data-gr-tree-node-key')
+
+    await tree$.trigger('keydown', { key: 'F', shiftKey: true })
+    await nextTick()
+    expect(focusedKey()).toBe('2')
+
+    await tree$.trigger('keydown', { key: 'f' })
+    await nextTick()
+    expect(focusedKey()).toBe('3')
+
+    wrapper.unmount()
+  })
+
+  it('без наведённого фокуса поиск начинается с первой строки, а не с последней', async () => {
+    // Точка старта — `Math.max(0, …)`: без неё `findIndex` вернул бы `-1`, обход
+    // пошёл бы с нулевого шага и первая строка выпала бы из поиска.
+    const wrapper = mount(GrTree<Item>, {
+      attachTo: document.body,
+      props: {
+        data: [
+          { id: 1, label: 'Alpha' },
+          { id: 2, label: 'Beta' },
+        ] satisfies Item[],
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+      },
+    })
+    const tree$ = wrapper.get('[role="tree"]')
+
+    await tree$.trigger('keydown', { key: 'b' })
+    await nextTick()
+
+    const focusable = wrapper.findAll('[role="treeitem"]').filter(i => i.attributes('tabindex') === '0')
+    expect(focusable[0].attributes('data-gr-tree-node-key')).toBe('2')
+
+    wrapper.unmount()
+  })
+
   it('`*` раскрывает всех соседей уровня', async () => {
     const wrapper = mount(GrTree<Item>, {
       attachTo: document.body,

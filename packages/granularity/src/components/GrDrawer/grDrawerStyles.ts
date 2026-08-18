@@ -111,7 +111,7 @@ export const panelBaseClass = 'fixed flex flex-col border-[var(--gr-brd)] bg-[va
 
 export const headerBorderClass = 'border-b border-[var(--gr-brd)]'
 export const footerBorderClass = 'border-t border-[var(--gr-brd)]'
-export const titleClass = 'text-[length:var(--gr-text-sm)] font-700 min-w-0 truncate'
+export const titleClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700 min-w-0 truncate'
 
 /** Скрытый заголовок: имя слоя есть даже там, где шапки на экране нет. */
 export const srOnlyTitleClass = 'sr-only'

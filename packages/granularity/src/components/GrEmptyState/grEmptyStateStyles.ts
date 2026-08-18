@@ -52,19 +52,19 @@ export const iconSizeBySize: Record<GrEmptyStateSize, number> = {
 export const titleBaseClass = 'mb-0 font-700'
 
 export const titleBySize: Record<GrEmptyStateSize, string> = {
-  xs: 'mt-2 text-[length:var(--gr-text-xs)]',
-  sm: 'mt-3 text-[length:var(--gr-text-sm)]',
-  md: 'mt-4 text-[length:var(--gr-text-sm)]',
-  lg: 'mt-5 text-[length:var(--gr-text-base)]',
+  xs: 'mt-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'mt-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  md: 'mt-4 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'mt-5 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 export const descriptionBaseClass = 'text-[var(--gr-muted-fg)]'
 
 export const descriptionBySize: Record<GrEmptyStateSize, string> = {
-  xs: 'mt-0.5 text-[length:var(--gr-text-xs)]',
-  sm: 'mt-1 text-[length:var(--gr-text-xs)]',
-  md: 'mt-1 text-[length:var(--gr-text-sm)]',
-  lg: 'mt-2 text-[length:var(--gr-text-sm)]',
+  xs: 'mt-0.5 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'mt-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'mt-1 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'mt-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
 }
 
 export const actionsBaseClass = 'flex justify-center'

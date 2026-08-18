@@ -1,4 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
+import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
+import { panelPopTransition } from '../shared/overlayTransition'
 import {
   borderClassByState,
   defaultBaseClass,
@@ -51,4 +52,8 @@ export const grSelectSafelist = [...new Set([
   ...splitClassTokens('inline-flex items-center gap-1 text-left'),
   ...splitClassTokens('flex items-center justify-between text-left'),
   ...splitClassTokens('block min-w-full w-max whitespace-nowrap'),
+  // Набор перехода панели общий на пять компонентов и живёт безадресным
+  // модулем в `shared/`: в `dist` он лежит в общем чанке, который пресет не
+  // сканирует, поэтому объявить его обязан каждый потребитель.
+  ...flattenTransitionTokens(panelPopTransition),
 ])]

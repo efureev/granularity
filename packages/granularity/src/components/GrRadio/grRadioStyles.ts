@@ -70,10 +70,10 @@ const grRadioLabelTexts: Record<GrButtonSize, string> = {
 }
 
 export const grRadioDescriptionSizes: Record<GrButtonSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)] text-[var(--gr-muted-fg)]',
-  sm: 'text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]',
-  md: 'text-[length:var(--gr-text-xs)] text-[var(--gr-muted-fg)]',
-  lg: 'text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] text-[var(--gr-muted-fg)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]',
+  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]',
 }
 
 /** Выбранный вариант выделяется текстом, а не только точкой. */

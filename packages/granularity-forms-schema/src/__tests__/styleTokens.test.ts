@@ -1,3 +1,3 @@
 import { defineStyleTokensGate } from '@feugene/granularity-test-kit/gates'
 
-defineStyleTokensGate()
+defineStyleTokensGate({ requirePairedLeading: true })

@@ -41,10 +41,10 @@ export const invalidShellClass = 'border-[var(--gr-invalid-brd)] focus-within:ri
 
 // Размеры совпадают с `GrInput`/`GrSelect` (h → min-h, чтобы multiple мог расти).
 export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
-  xs: 'min-h-7 px-2.5 py-1 text-[length:var(--gr-control-text-xs)]',
-  sm: 'min-h-8 px-3 py-1 text-[length:var(--gr-control-text-sm)]',
-  md: 'min-h-10 px-3 py-1.5 text-[length:var(--gr-control-text-md)]',
-  lg: 'min-h-11 px-4 py-2 text-[length:var(--gr-control-text-lg)]',
+  xs: 'min-h-7 px-2.5 py-1 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'min-h-8 px-3 py-1 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'min-h-10 px-3 py-1.5 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'min-h-11 px-4 py-2 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export function autocompleteShellClass(options: {
@@ -65,7 +65,7 @@ export function autocompleteShellClass(options: {
 /** Общая подсветка наведения и активной опции. */
 const autocompleteOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
 
-export const autocompleteOptionBaseClass = 'w-full rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)]'
+export const autocompleteOptionBaseClass = 'w-full rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]'
 export const autocompleteOptionActiveClass = autocompleteOptionHighlight
 export const autocompleteOptionEnabledClass = `hover:${autocompleteOptionHighlight}`
 /** Выключенная опция гасится токеном текста — по той же причине, что и оболочка. */
@@ -88,7 +88,7 @@ export function autocompleteOptionClass(options: { disabled: boolean, active: bo
  * Слева, как у опций, она стоять не может: опции лежат внутри listbox с его `p-1`,
  * а состояние — сиблинг, и текст расходился с опциями на 4px.
  */
-export const autocompleteStateClass = 'flex items-center justify-center gap-2 px-3 py-4 text-center text-[length:var(--gr-text-sm)] text-[var(--gr-muted-fg)]'
+export const autocompleteStateClass = 'flex items-center justify-center gap-2 px-3 py-4 text-center text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'
 
 /**
  * Панель списка опций — тот же «язык» поверхностей, что у `GrSelect`

@@ -17,6 +17,11 @@ export type GrKbdVariant = typeof GR_KBD_VARIANTS[number]
 
 export const keyBaseClass = 'inline-flex items-center justify-center rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] font-medium leading-none text-[var(--gr-muted-fg)] shadow-[var(--gr-shadow-1)] tabular-nums'
 
+/**
+ * Межстрочный здесь не парный: у клавиши он задан осознанно (`leading-none` в
+ * `keyBaseClass`), и вторая декларация того же веса подралась бы с ним за
+ * порядок в стилях. Правило — `docs/sizes.md`.
+ */
 export const keySizes: Record<GrComponentSize, string> = {
   xs: 'min-w-[1.25rem] h-5 px-1 text-[length:var(--gr-control-text-3xs)]',
   sm: 'min-w-[1.5rem] h-6 px-1.5 text-[length:var(--gr-control-text-xs)]',

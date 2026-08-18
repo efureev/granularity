@@ -26,6 +26,12 @@ const className = computed(() => grDropdownMenuListClass({
   borderTop: props.borderTop,
   borderBottom: props.borderBottom,
 }))
+
+defineSlots<{
+  /** Пункты списка меню. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

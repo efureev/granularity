@@ -11,10 +11,10 @@ export type NumberInputSize = GrNumberInputSize
 export type NumberInputControlsDirection = GrNumberInputControlsDirection
 
 export const sizeClassBySize: Record<GrNumberInputSize, string> = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const textAlignClassByAlign: Record<GrNumberInputTextAlign, string> = {

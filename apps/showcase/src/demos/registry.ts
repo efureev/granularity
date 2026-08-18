@@ -68,6 +68,7 @@ export const demoPathByPreviewKey = {
   'extra-dashboard-panel':                'extra/granularity-dashboard/GrDashboardPanelDemo.vue',
   'extra-dashboard-persistence':          'extra/granularity-dashboard/GrDashboardPersistenceDemo.vue',
   'extra-dashboard-static':               'extra/granularity-dashboard/GrDashboardStaticDemo.vue',
+  'extra-dashboard-toolbar':             'extra/granularity-dashboard/GrDashboardToolbarDemo.vue',
   'gr-alert-actions':                     'components/gr-alert/GrAlertActionsDemo.vue',
   'gr-alert-closable-flow':               'components/gr-alert/GrAlertClosableDemo.vue',
   'gr-alert-custom-colors':               'components/gr-alert/GrAlertCustomColorsDemo.vue',

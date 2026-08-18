@@ -20,6 +20,7 @@ import GrTree, {
   type GrTreeNode,
 } from '../GrTree'
 import type { GrInputSize } from '../GrInput/GrInput.vue'
+import { panelPopTransition } from '../shared/overlayTransition'
 import type { GrTreeSelectModelValue, GrTreeSelectProps } from './grTreeSelectTypes'
 import { grTreeSelectClass, grTreeSelectPanelClass, grTreeSelectStateClass, paddingX, trailingZoneWidth } from './grTreeSelectStyles'
 
@@ -658,12 +659,12 @@ const themeAttrs = useGrThemeAttrs()
 
     <teleport :to="portalTarget" :disabled="!teleportEnabled">
       <transition
-        enter-active-class="transition ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
-        enter-from-class="transform opacity-0 scale-95"
-        enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-[var(--gr-ease-in)] duration-[var(--gr-duration-fast)]"
-        leave-from-class="transform opacity-100 scale-100"
-        leave-to-class="transform opacity-0 scale-95"
+        :enter-active-class="panelPopTransition.enter"
+        :enter-from-class="panelPopTransition.enterFrom"
+        :enter-to-class="panelPopTransition.enterTo"
+        :leave-active-class="panelPopTransition.leave"
+        :leave-from-class="panelPopTransition.leaveFrom"
+        :leave-to-class="panelPopTransition.leaveTo"
       >
         <div
           v-show="open"

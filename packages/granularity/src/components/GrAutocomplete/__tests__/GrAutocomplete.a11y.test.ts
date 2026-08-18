@@ -151,7 +151,7 @@ describe('GrAutocomplete — disabled и readonly', () => {
     await nextTick()
 
     expect(wrapper.get('[data-gr-autocomplete-shell]').classes()).toContain('cursor-not-allowed')
-    expect(wrapper.find('[data-gr-autocomplete-chip-remove]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-chip-close]').exists()).toBe(false)
 
     wrapper.unmount()
   })

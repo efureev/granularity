@@ -35,6 +35,12 @@ provideGrButtonGroup({
   variant: computed(() => props.variant),
   tone: computed(() => props.tone),
 })
+
+defineSlots<{
+  /** Кнопки группы. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

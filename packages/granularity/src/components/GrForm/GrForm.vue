@@ -405,6 +405,23 @@ defineExpose({
   isValid,
   validatingFields,
 })
+
+defineSlots<{
+  /**
+   * Поля формы. Слот-пропы повторяют публичный API инстанса: форма в шаблоне
+   * доступна без `ref`, а значит и без `nextTick` после монтирования.
+   */
+  default?: (props: {
+    validate: () => Promise<boolean>
+    errors: Record<string, string | undefined>
+    isDirty: boolean
+    isValid: boolean
+    validatingFields: Set<string>
+    resetFields: (names?: string | string[]) => void
+    setSnapshot: (model?: Record<string, unknown>) => void
+  }) => any
+}>()
+
 </script>
 
 <template>

@@ -3,7 +3,6 @@ import {
   clearButtonClass,
   inputSizeClassBySize,
   invalidWrapperBorderClass,
-  removeButtonClass,
   spinnerClass,
   wrapperBaseClass,
   wrapperBorderClassByState,
@@ -20,7 +19,6 @@ export const grInputTagSafelist = [...new Set([
   ...splitClassTokens(wrapperBaseClass),
   ...splitClassTokens(wrapperEnabledClass),
   ...splitClassTokens(wrapperDisabledClass),
-  ...splitClassTokens(removeButtonClass),
   ...splitClassTokens(clearButtonClass),
   ...splitClassTokens(spinnerClass),
 ])]

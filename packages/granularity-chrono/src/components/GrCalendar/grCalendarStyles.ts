@@ -39,10 +39,10 @@ export const calendarWeekNumberClass
 
 /** Размер ячейки — не меньше 24 CSS-px по WCAG 2.2 «Target Size (Minimum)». */
 export const calendarCellSizes: Record<GrCalendarSize, string> = {
-  xs: 'h-7 w-7 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 w-8 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-9 w-9 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-10 w-10 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 w-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 w-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-9 w-9 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-10 w-10 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const calendarNavSizes: Record<GrCalendarSize, string> = {
@@ -118,10 +118,10 @@ export function calendarDayClass(options: CalendarDayClassOptions): string {
 export const calendarPeriodGridClass = 'grid grid-cols-3 gap-1'
 
 export const calendarPeriodSizes: Record<GrCalendarSize, string> = {
-  xs: 'h-7 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-9 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-10 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-9 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-10 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export interface CalendarPeriodClassOptions {

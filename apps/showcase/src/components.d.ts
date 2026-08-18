@@ -34,6 +34,7 @@ declare module 'vue' {
     GrFormField: typeof import('@feugene/granularity/components/GrFormField')['GrFormField']
     GrRelativeTime: typeof import('@feugene/granularity-chrono/components/GrRelativeTime')['GrRelativeTime']
     GrSegmented: typeof import('@feugene/granularity/components/GrSegmented')['GrSegmented']
+    GrSelect: typeof import('@feugene/granularity/components/GrSelect')['GrSelect']
     GrSparkline: typeof import('@feugene/granularity-charts/components/GrSparkline')['GrSparkline']
     GrSwitch: typeof import('@feugene/granularity/components/GrSwitch')['GrSwitch']
     GrTimePicker: typeof import('@feugene/granularity-chrono/components/GrTimePicker')['GrTimePicker']

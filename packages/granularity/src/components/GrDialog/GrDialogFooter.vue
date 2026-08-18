@@ -22,6 +22,12 @@ const rootClass = computed(() => [
   resolvedConfig.value.paddingY,
   resolvedConfig.value.bordered ? 'border-t border-[var(--gr-brd)]' : '',
 ])
+
+defineSlots<{
+  /** Действия диалога. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

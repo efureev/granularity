@@ -1,9 +1,11 @@
-import { readdirSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readFileSync, readdirSync } from 'node:fs'
+import { basename, relative, resolve } from 'node:path'
 
 import { createGenerator, presetMini } from 'unocss'
 import { presetGranular } from '@feugene/unocss-preset-granular'
 import { describe, expect, it } from 'vitest'
+
+import { componentSourceFiles } from './componentGraph'
 
 /**
  * Гейт safelist-контракта.
@@ -23,16 +25,31 @@ import { describe, expect, it } from 'vitest'
  *
  * Литералы из `.vue` под правило не подпадают: шаблон и `<script setup>`
  * компилируются в чанк самого компонента, то есть всегда лежат в области скана.
+ *
+ * Хелперы из `components/shared/` считаются наравне со своими: адреса у такого
+ * модуля нет вовсе — в `dist` он лежит в общем чанке и не принадлежит ни одной
+ * директории, которую сканирует пресет. Поэтому его классы обязан объявить
+ * **каждый** компонент, который его импортирует. Ни этот гейт до расширения, ни
+ * `doctor` этого не ловили: диагностики доктора закрыты списком и классов не
+ * касаются вовсе, а `undeclared-dependency` — это ребро в директорию другого
+ * компонента, тогда как общий чанк ничьей директорией не является.
  */
 
 const componentsDir = resolve(process.cwd(), 'src/components')
+const sharedDir = resolve(componentsDir, 'shared')
 
 /** Файлы компонента, которые не являются style-хелперами. */
 const NOT_A_HELPER = /^(?:index|config|safelist|defaults)\.ts$/
 
+/** `from '../shared/x'`, `from '../../shared/x'` — импорт безадресного хелпера. */
+const SHARED_IMPORT = /import\s+(type\s+)?([^'"]*?)from\s*['"](?:\.\.\/)+shared\/([\w-]+)(?:\.\w+)?['"]/g
+/** Внутри `shared/` соседи адресуются относительно: `from './classTokens'`. */
+const SIBLING_IMPORT = /import\s+(type\s+)?([^'"]*?)from\s*['"]\.\/([\w-]+)(?:\.\w+)?['"]/g
+
 function stripComments(source: string): string {
   return source
     .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')
 }
 
@@ -61,9 +78,81 @@ function looksLikeClassList(literal: string): boolean {
   return /[-:[\]/]/.test(tokens[0])
 }
 
+/**
+ * Модули `shared/`, на которые ссылается файл.
+ *
+ * Без FS, чтобы правило распознавания ребра можно было проверить прямо, а не
+ * подбирая компонент, который случайно его покрывает. `import type` пропускается:
+ * типовой импорт в бандл не эмитит ничего, а значит и классов не приносит.
+ */
+export function parseSharedImports(fileContent: string): string[] {
+  const code = stripComments(fileContent)
+  const found = new Set<string>()
+
+  for (const [, typeOnly, clause, module] of code.matchAll(SHARED_IMPORT)) {
+    if (typeOnly || !hasValueImport(clause)) continue
+    found.add(module)
+  }
+
+  return [...found]
+}
+
+/** `import { type A }` — тоже пустышка для бандла, как и `import type`. */
+function hasValueImport(clause: string): boolean {
+  const named = clause.match(/\{([^}]*)\}/)
+  if (!named) return true
+
+  return named[1].split(',').some(name => name.trim() && !name.trim().startsWith('type '))
+}
+
+/**
+ * Импорт соседа внутри `shared/` тянет и его классы: в общий чанк уезжает вся
+ * цепочка, а не только тот модуль, который назвал компонент.
+ */
+function expandSharedModules(entry: string[]): string[] {
+  const seen = new Set<string>()
+  const queue = [...entry]
+
+  while (queue.length > 0) {
+    const module = queue.pop()!
+    if (seen.has(module)) continue
+    seen.add(module)
+
+    const path = resolve(sharedDir, `${module}.ts`)
+    let source: string
+    try {
+      source = readFileSync(path, 'utf8')
+    }
+    catch {
+      continue
+    }
+
+    for (const [, typeOnly, clause, sibling] of stripComments(source).matchAll(SIBLING_IMPORT)) {
+      if (typeOnly || !hasValueImport(clause)) continue
+      queue.push(sibling)
+    }
+  }
+
+  return [...seen].map(module => resolve(sharedDir, `${module}.ts`))
+}
+
+/**
+ * Файлы, чьи класс-литералы обязаны быть в safelist компонента: его собственные
+ * `.ts`-хелперы плюс безадресные модули из `shared/`.
+ *
+ * Обход рекурсивный: у `GrSelect` хелперы лежат в `composables/`, у
+ * `GrResponseErrorBanner` — в `parsers/`, и плоский `readdirSync` их не видел.
+ */
 function helperFiles(component: string): string[] {
-  return readdirSync(resolve(componentsDir, component))
-    .filter(file => file.endsWith('.ts') && !NOT_A_HELPER.test(file) && !file.includes('.test.'))
+  const dir = resolve(componentsDir, component)
+  const own = componentSourceFiles(dir)
+    .filter(file => file.endsWith('.ts') && !NOT_A_HELPER.test(basename(file)))
+
+  const shared = expandSharedModules(
+    componentSourceFiles(dir).flatMap(file => parseSharedImports(readFileSync(file, 'utf8'))),
+  )
+
+  return [...own, ...shared]
 }
 
 function componentNames(): string[] {
@@ -104,7 +193,7 @@ describe('safelist-контракт', () => {
       const candidates = new Set<string>()
 
       for (const file of files) {
-        const source = stripComments(readFileSync(resolve(componentsDir, component, file), 'utf8'))
+        const source = stripComments(readFileSync(file, 'utf8'))
 
         for (const literal of stringLiterals(source)) {
           if (!looksLikeClassList(literal)) continue
@@ -126,10 +215,30 @@ describe('safelist-контракт', () => {
         if (isUtility.get(token)) missing.push(token)
       }
 
-      if (missing.length > 0)
-        violations.push(`${component} [${files.join(', ')}]: ${missing.sort().join(' ')}`)
+      if (missing.length > 0) {
+        // Путь от `src/components`, иначе общий хелпер в сообщении неотличим
+        // от файла самого компонента.
+        const where = files.map(file => relative(componentsDir, file)).join(', ')
+        violations.push(`${component} [${where}]: ${missing.sort().join(' ')}`)
+      }
     }
 
     expect(violations).toEqual([])
+  })
+
+  describe('разбор импортов `shared/`', () => {
+    it('находит модуль по относительному пути любой глубины', () => {
+      expect(parseSharedImports(`import { splitClassTokens } from '../shared/classTokens'`)).toEqual(['classTokens'])
+      expect(parseSharedImports(`import { toneClass } from '../../shared/tones'`)).toEqual(['tones'])
+    })
+
+    it('пропускает типовой импорт: он не эмитит ничего, значит и классов не приносит', () => {
+      expect(parseSharedImports(`import type { GrComponentSize } from '../shared/sizes'`)).toEqual([])
+      expect(parseSharedImports(`import { type GrComponentSize } from '../shared/sizes'`)).toEqual([])
+    })
+
+    it('не считает `shared` импорт соседнего компонента', () => {
+      expect(parseSharedImports(`import { grBadgeSafelist } from '../GrBadge/safelist'`)).toEqual([])
+    })
   })
 })

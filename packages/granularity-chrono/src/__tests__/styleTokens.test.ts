@@ -6,4 +6,4 @@ import { defineStyleTokensGate } from '@feugene/granularity-test-kit/gates'
  * обещания не держат: тема их не видит. Отсутствие гейта в предшественнике
  * (`granularity-datepicker`) стоило пакету жизни с `text-[14px]`.
  */
-defineStyleTokensGate()
+defineStyleTokensGate({ requirePairedLeading: true })

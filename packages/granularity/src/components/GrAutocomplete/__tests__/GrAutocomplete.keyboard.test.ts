@@ -19,7 +19,7 @@ afterEach(() => {
 })
 
 function chipRemoveButtons(): HTMLButtonElement[] {
-  return [...document.querySelectorAll<HTMLButtonElement>('[data-gr-autocomplete-chip-remove]')]
+  return [...document.querySelectorAll<HTMLButtonElement>('[data-gr-chip-close]')]
 }
 
 function mountMultiple(modelValue: string[]) {
@@ -52,13 +52,13 @@ describe('GrAutocomplete — чипы с клавиатуры', () => {
     await input.trigger('keydown', { key: 'ArrowLeft' })
 
     const chips = chipRemoveButtons()
-    await wrapper.findAll('[data-gr-autocomplete-chip-remove]')[1].trigger('keydown', { key: 'ArrowLeft' })
+    await wrapper.findAll('[data-gr-chip-close]')[1].trigger('keydown', { key: 'ArrowLeft' })
     expect(document.activeElement).toBe(chips[0])
 
-    await wrapper.findAll('[data-gr-autocomplete-chip-remove]')[0].trigger('keydown', { key: 'End' })
+    await wrapper.findAll('[data-gr-chip-close]')[0].trigger('keydown', { key: 'End' })
     expect(document.activeElement).toBe(chips[1])
 
-    await wrapper.findAll('[data-gr-autocomplete-chip-remove]')[1].trigger('keydown', { key: 'ArrowRight' })
+    await wrapper.findAll('[data-gr-chip-close]')[1].trigger('keydown', { key: 'ArrowRight' })
     expect(document.activeElement).toBe(input.element)
 
     wrapper.unmount()
@@ -78,7 +78,7 @@ describe('GrAutocomplete — чипы с клавиатуры', () => {
     input.element.focus()
     await input.trigger('keydown', { key: 'ArrowLeft' })
 
-    await wrapper.findAll('[data-gr-autocomplete-chip-remove]')[1].trigger('keydown', { key: 'Delete' })
+    await wrapper.findAll('[data-gr-chip-close]')[1].trigger('keydown', { key: 'Delete' })
     await nextTick()
 
     expect(chipRemoveButtons()).toHaveLength(1)
@@ -93,7 +93,7 @@ describe('GrAutocomplete — чипы с клавиатуры', () => {
     input.element.focus()
     await input.trigger('keydown', { key: 'ArrowLeft' })
 
-    await wrapper.get('[data-gr-autocomplete-chip-remove]').trigger('keydown', { key: 'Escape' })
+    await wrapper.get('[data-gr-chip-close]').trigger('keydown', { key: 'Escape' })
     expect(document.activeElement).toBe(input.element)
 
     wrapper.unmount()

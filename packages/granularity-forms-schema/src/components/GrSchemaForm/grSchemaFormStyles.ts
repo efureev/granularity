@@ -67,7 +67,7 @@ export const schemaArrayEmptyClass = 'rounded-[var(--gr-radius-lg)] border borde
 export const schemaArrayListClass = 'grid gap-[var(--gr-schema-form-row-gap,0.75rem)]'
 export const schemaSectionsClass = 'grid gap-6'
 export const schemaFormErrorsClass = 'mb-4'
-export const schemaRowLabelClass = 'text-[length:var(--gr-control-text-sm)] font-600 text-[var(--gr-muted-fg)]'
+export const schemaRowLabelClass = 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] font-600 text-[var(--gr-muted-fg)]'
 
 export const ALL_GRID_CLASSES: readonly string[] = [
   schemaGridClass,

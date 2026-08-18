@@ -177,6 +177,12 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Кегль компонента на ступени `lg`."
   },
   {
+    "name": "--gr-leading-2xs",
+    "value": "0.875rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `2xs` — идёт в паре с `--gr-text-2xs`."
+  },
+  {
     "name": "--gr-leading-xs",
     "value": "1rem",
     "section": "Typography: line heights",
@@ -195,6 +201,12 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Межстрочный интервал ступени `base` — идёт в паре с `--gr-text-base`."
   },
   {
+    "name": "--gr-leading-lg",
+    "value": "1.625rem",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `lg` — идёт в паре с `--gr-text-lg`."
+  },
+  {
     "name": "--gr-leading-xl",
     "value": "1.75rem",
     "section": "Typography: line heights",
@@ -205,6 +217,42 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "value": "2.25rem",
     "section": "Typography: line heights",
     "description": "Межстрочный интервал ступени `3xl` — идёт в паре с `--gr-text-3xl`."
+  },
+  {
+    "name": "--gr-control-leading-3xs",
+    "value": "14px",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `3xs` — идёт в паре с `--gr-control-text-3xs`."
+  },
+  {
+    "name": "--gr-control-leading-2xs",
+    "value": "16px",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `2xs` — идёт в паре с `--gr-control-text-2xs`."
+  },
+  {
+    "name": "--gr-control-leading-xs",
+    "value": "16px",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `xs` — идёт в паре с `--gr-control-text-xs`."
+  },
+  {
+    "name": "--gr-control-leading-sm",
+    "value": "18px",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `sm` — идёт в паре с `--gr-control-text-sm`."
+  },
+  {
+    "name": "--gr-control-leading-md",
+    "value": "20px",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `md` — идёт в паре с `--gr-control-text-md`."
+  },
+  {
+    "name": "--gr-control-leading-lg",
+    "value": "24px",
+    "section": "Typography: line heights",
+    "description": "Межстрочный интервал ступени `lg` — идёт в паре с `--gr-control-text-lg`."
   },
   {
     "name": "--gr-leading-tight",

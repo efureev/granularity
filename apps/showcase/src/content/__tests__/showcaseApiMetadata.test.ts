@@ -18,12 +18,22 @@ describe('showcase generated component API metadata', () => {
     expect(slotsSection?.items.some(item => item.name === 'default')).toBe(true)
   })
 
-  it('подмешивает fallback-описания для слотов там, где auto extraction не даёт достаточного описания', () => {
+  /**
+   * Раньше описания слотов подмешивались вручную из `componentApiFallbacks.ts`,
+   * и заплатка перекрывала секцию целиком: у `GrButton` витрина показывала один
+   * `default` вместо трёх слотов. Теперь источник один — JSDoc над членом
+   * `defineSlots`, и заплатки по слотам сняты. Гейт `slotContract` следит, что
+   * этот источник есть у каждого SFC со слотами.
+   */
+  it('описывает слоты из `defineSlots` компонента, а не из ручного списка', () => {
     const buttonEntity = showcaseComponentEntities.find(entity => entity.name === 'GrButton')
     const slotsSection = buttonEntity?.apiSections.find(section => section.key === 'slots')
 
     expect(slotsSection?.origin).toBe('generated')
-    expect(slotsSection?.items.find(item => item.name === 'default')?.description).toContain('Текст кнопки')
+    expect(slotsSection?.items.map(item => item.name)).toEqual(['default', 'prefix', 'suffix'])
+
+    for (const item of slotsSection?.items ?? [])
+      expect(item.description, `слот ${item.name} без описания`).not.toBe('')
   })
 
   it('раскрывает literal union значения для tone, tone и size у GrButton и GrLink в API showcase', () => {

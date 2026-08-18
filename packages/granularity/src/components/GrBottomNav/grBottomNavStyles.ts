@@ -46,10 +46,10 @@ export const listSizes: Record<GrComponentSize, string> = {
 }
 
 export const itemTextSizes: Record<GrComponentSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)]',
-  sm: 'text-[length:var(--gr-text-2xs)]',
-  md: 'text-[length:var(--gr-text-xs)]',
-  lg: 'text-[length:var(--gr-text-sm)]',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  sm: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
 }
 
 export const itemIconSizes: Record<GrComponentSize, string> = {
@@ -79,7 +79,7 @@ export const itemLabelClass = 'max-w-full truncate leading-none'
  * Бейдж висит поверх правого верхнего угла пункта. Своя разметка, а не
  * `GrBadgeWrap`: зависимость притащила бы потребителю чужой CSS ради кружка.
  */
-export const itemBadgeClass = 'absolute top-0.5 right-1 min-w-4 h-4 px-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-danger)] text-[var(--gr-danger-fg)] text-[length:var(--gr-text-2xs)] font-700 inline-flex items-center justify-center'
+export const itemBadgeClass = 'absolute top-0.5 right-1 min-w-4 h-4 px-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-danger)] text-[var(--gr-danger-fg)] text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] font-700 inline-flex items-center justify-center'
 
 export function grBottomNavRootClass(options: {
   position: GrBottomNavPosition

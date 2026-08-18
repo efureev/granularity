@@ -15,10 +15,10 @@ export type GrStatisticTrend = 'up' | 'down' | 'flat'
  */
 
 export const statisticTitleSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)]',
-  sm: 'text-[length:var(--gr-text-xs)]',
-  md: 'text-[length:var(--gr-text-xs)]',
-  lg: 'text-[length:var(--gr-text-sm)]',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
 }
 
 export const statisticValueSizeBySize: Record<GrStatisticSize, string> = {
@@ -29,10 +29,10 @@ export const statisticValueSizeBySize: Record<GrStatisticSize, string> = {
 }
 
 export const statisticAffixSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[length:var(--gr-text-xs)]',
-  sm: 'text-[length:var(--gr-text-xs)]',
-  md: 'text-[length:var(--gr-text-base)]',
-  lg: 'text-[length:var(--gr-text-xl)]',
+  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
+  lg: 'text-[length:var(--gr-text-xl)] leading-[var(--gr-leading-xl)]',
 }
 
 /**
@@ -60,10 +60,10 @@ export const statisticPlaceholderHeightBySize: Record<GrStatisticSize, string> =
 }
 
 export const statisticTrendSizeBySize: Record<GrStatisticSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)]',
-  sm: 'text-[length:var(--gr-text-xs)]',
-  md: 'text-[length:var(--gr-text-xs)]',
-  lg: 'text-[length:var(--gr-text-sm)]',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)]',
+  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
 }
 
 // Цвет значения по тону. `neutral` наследует основной цвет текста.

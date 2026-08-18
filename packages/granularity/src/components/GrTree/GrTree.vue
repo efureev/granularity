@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, onBeforeUnmount, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import type {
   GrTreeAllowDropType,
   GrTreeInstance,
@@ -16,6 +16,7 @@ import { treeSizeVars } from './grTreeStyles'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useDragSort } from '../../composables/useDragSort'
+import { useTypeahead } from '../../composables/internal/useTypeahead'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -338,30 +339,18 @@ function focusRow(key: GrTreeNode<T>['key']): void {
 /**
  * Typeahead паттерна tree: печатные символы копятся в буфер и переводят фокус
  * на первый подходящий видимый узел, начиная со следующего за текущим.
+ *
+ * Поиск идёт по данным (`visibleRows`), а не по DOM: при виртуализации узла вне
+ * окна в разметке нет, и поиск по тексту элементов находил бы только видимое.
  */
-const TYPEAHEAD_RESET_MS = 600
-let typeaheadBuffer = ''
-let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
-
-function onTypeahead(char: string, rows: GrTreeVisibleRow<T>[], fromIndex: number): void {
-  clearTimeout(typeaheadTimer)
-  typeaheadTimer = setTimeout(() => { typeaheadBuffer = '' }, TYPEAHEAD_RESET_MS)
-
-  // Повтор одной буквы — это «следующий на ту же букву», а не поиск «аа».
-  const repeat = typeaheadBuffer.length === 1 && typeaheadBuffer === char
-  typeaheadBuffer = repeat ? char : typeaheadBuffer + char
-
-  const query = typeaheadBuffer.toLowerCase()
-  const total = rows.length
-
-  for (let step = 1; step <= total; step += 1) {
-    const row = rows[(fromIndex + step) % total]
-    if (row.node.label.toLowerCase().startsWith(query)) {
-      focusRow(row.node.key)
-      return
-    }
-  }
-}
+const typeahead = useTypeahead<GrTreeVisibleRow<T>>({
+  items: () => visibleRows.value,
+  textOf: row => row.node.label,
+  // Без наведённого фокуса ищем с начала списка, а не от конца: `findIndex`
+  // вернул бы `-1`, и первая строка выпала бы из обхода.
+  currentIndex: rows => Math.max(0, rows.findIndex(row => row.node.key === roving.rovingKey.value)),
+  onMatch: row => focusRow(row.node.key),
+})
 
 /** `*` — раскрыть всех соседей узла, на котором фокус (уровень целиком). */
 function expandSiblings(node: GrTreeNode<T>): void {
@@ -409,7 +398,7 @@ function onTreeKeydown(event: KeyboardEvent): void {
   // Печатный символ без модификаторов — typeahead, а не команда.
   if (event.key.length === 1 && event.key !== ' ' && !event.ctrlKey && !event.metaKey && !event.altKey) {
     event.preventDefault()
-    onTypeahead(event.key, rows, idx)
+    typeahead.type(event.key)
     return
   }
 
@@ -733,7 +722,6 @@ function focus(key?: GrTreeKey): boolean {
   return true
 }
 
-onUnmounted(() => clearTimeout(typeaheadTimer))
 // Дерево уничтожают целиком — строки размонтируются вместе с ним, и возвращать
 // фокус на умирающий корень нельзя: он уедет из документа вместе с деревом.
 onBeforeUnmount(() => { isUnmounting = true })

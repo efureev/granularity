@@ -14,18 +14,18 @@ export type GrTabsOrientation = 'horizontal' | 'vertical'
 
 /** Высота вкладки повторяет шкалу `GrButton`: вкладки часто стоят с ним в один ряд. */
 export const tabSizes: Record<GrTabsSize, string> = {
-  xs: 'h-7 px-2 text-[length:var(--gr-text-xs)]',
-  sm: 'h-8 px-2.5 text-[length:var(--gr-text-xs)]',
-  md: 'h-9 px-3 text-[length:var(--gr-text-sm)]',
-  lg: 'h-10 px-4 text-[length:var(--gr-text-base)]',
+  xs: 'h-7 px-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  sm: 'h-8 px-2.5 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
+  md: 'h-9 px-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'h-10 px-4 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 /** Счётчик у вкладки: на ступень мельче подписи. */
 export const tabBadgeSizes: Record<GrTabsSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)] px-1 py-0.5',
-  sm: 'text-[length:var(--gr-text-2xs)] px-1.5 py-0.5',
-  md: 'text-[length:var(--gr-text-2xs)] px-1.5 py-0.5',
-  lg: 'text-[length:var(--gr-text-xs)] px-2 py-0.5',
+  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] px-1 py-0.5',
+  sm: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] px-1.5 py-0.5',
+  md: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] px-1.5 py-0.5',
+  lg: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] px-2 py-0.5',
 }
 
 /** Обойма вокруг вкладок: на мелких ступенях рамка съедала бы высоту. */

@@ -18,8 +18,8 @@ export type GrPopoverRole = 'dialog' | 'menu' | 'listbox' | 'grid' | 'group' | '
 export type GrPopoverPadding = 'default' | 'none'
 
 export const panelSizes: Record<GrPopoverSize, string> = {
-  xs: 'p-2 text-[length:var(--gr-control-text-xs)]',
-  sm: 'p-2.5 text-[length:var(--gr-control-text-sm)]',
+  xs: 'p-2 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'p-2.5 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
   md: 'p-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
   lg: 'p-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }
@@ -62,8 +62,8 @@ export function grPopoverOriginClass(placement: Placement): string {
  * сгенерированном CSS. Меню внутри поповера с `p-3` — визуально не меню.
  */
 export const panelSizesFlush: Record<GrPopoverSize, string> = {
-  xs: 'text-[length:var(--gr-control-text-xs)]',
-  sm: 'text-[length:var(--gr-control-text-sm)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
   md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }

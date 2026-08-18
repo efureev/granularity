@@ -110,6 +110,16 @@ const rootClass = computed(() => grSidebarRootClass(props.position))
 
 const collapseDirection = computed(() => grSidebarCollapseDirection(props.position, collapsedState.value))
 const collapseIcon = computed(() => (collapseDirection.value === 'right' ? IconChevronRight : IconChevronLeft))
+
+defineSlots<{
+  /** Содержимое панели: навигация, группы, произвольная разметка. */
+  default?: () => any
+  /** Заголовок шапки вместо пропа `title`. */
+  title?: () => any
+  /** Подзаголовок под заголовком. */
+  subtitle?: () => any
+}>()
+
 </script>
 
 <template>

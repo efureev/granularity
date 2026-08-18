@@ -172,6 +172,16 @@ function onConfirm(): void {
   if (props.closeOnConfirm)
     emit('update:modelValue', false)
 }
+
+defineSlots<{
+  /** Содержимое диалога вместо пропа `message`. */
+  default?: () => any
+  /** Разбор ошибки вместо встроенного баннера. */
+  error?: (props: { error: ResponseErrorInfo | null }) => any
+  /** Кнопки диалога вместо пары «отмена и подтверждение». */
+  footer?: () => any
+}>()
+
 </script>
 
 <template>
@@ -190,7 +200,7 @@ function onConfirm(): void {
   >
     <div class="grid gap-4">
       <slot>
-        <div v-if="description" class="text-[length:var(--gr-control-text-md)] text-[var(--gr-muted-fg)]">
+        <div v-if="description" class="text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)] text-[var(--gr-muted-fg)]">
           {{ description }}
         </div>
       </slot>

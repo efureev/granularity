@@ -168,6 +168,12 @@ const colorStyle = computed(() => grLinkColorStyle({
   variant: props.variant,
   disabled: props.disabled,
 }))
+
+defineSlots<{
+  /** Текст ссылки. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>

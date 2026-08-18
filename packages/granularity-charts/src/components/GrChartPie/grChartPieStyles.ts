@@ -44,7 +44,7 @@ export const pieTextureStroke = 'var(--gr-chart-pie-texture,var(--gr-bg))'
 export const pieLegendClass = 'flex flex-wrap items-center gap-x-4 gap-y-1'
 
 export const pieLegendItemClass
-  = 'inline-flex items-center gap-2 text-[length:var(--gr-control-text-sm)] '
+  = 'inline-flex items-center gap-2 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] '
     + 'leading-[var(--gr-leading-normal)] text-[var(--gr-fg)]'
 
 export const pieLegendValueClass

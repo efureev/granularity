@@ -93,6 +93,12 @@ watch(visibleValue, (next, prev) => {
 watch(showCount, (visible) => {
   if (!visible) pulsing.value = false
 })
+
+defineSlots<{
+  /** Элемент, к которому крепится метка. */
+  default?: () => any
+}>()
+
 </script>
 
 <template>
