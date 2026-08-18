@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.26.0] 2026-08-18
+
+### Added
+
+- **`isEmpty`, `getByPath` and `setByPath` are now exported from the `GrForm` entry**, next to
+  `runFieldRules` and `createGrFormMessageResolver`. They are what the form itself judges by, and
+  anything that builds rules from the outside — a schema compiler, a generated form — has to read
+  the model and decide "is this empty" exactly the same way. A private copy would drift silently,
+  and the failure mode is the quiet kind: a `min` rule stops firing on a field the form considers
+  filled. `setByPath` creates intermediate objects, never arrays, so a consumer writing into an
+  array path prepares the array itself — that is documented rather than changed, since the form's
+  own reset path depends on the current behaviour.
+
 ## [v0.25.0] 2026-08-18
 
 ### Added

@@ -123,7 +123,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/granularity": "^0.25.0",
+    "@feugene/granularity": "^0.26.0",
     "@feugene/granularity-test-kit": "^0.1.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.1",
