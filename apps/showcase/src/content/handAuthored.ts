@@ -9,7 +9,7 @@ const componentGroups = {
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrCodeBlock', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
+  data: ['GrAvatar', 'GrCard', 'GrChip', 'GrChipGroup', 'GrCodeBlock', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
   utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -77,6 +77,9 @@ const componentSummaryOverrides = {
   GrSplitter: 'Splits a layout into two resizable panels with a draggable divider.',
   GrRating: 'Collect and display a star rating, with half steps and a read-only mode.',
   GrStatistic: 'Highlights a key metric with a caption, formatting and a trend line.',
+  GrChip: 'An interactive tag: removable, selectable, with an icon.'
+    + ' Where GrBadge only shows a status, a chip answers to a click.',
+  GrChipGroup: 'A set of chips sharing one value: list filters, record labels, a quick pick.',
   GrCodeBlock: 'Shows raw JSON or text with highlighting, line numbers and a copy button.',
   GrJsonViewer: 'Walks an unknown value as a tree: collapsible nodes, search by key or value, copy a node with its path.',
   GrFilePreview: 'Shows a stored file as a tile: the image itself, or an icon for its type.',
@@ -163,6 +166,14 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
     group: 'data',
   },
   'component:GrFilePreview': {
+    group: 'data',
+    tags: ['new'],
+  },
+  'component:GrChip': {
+    group: 'data',
+    tags: ['new'],
+  },
+  'component:GrChipGroup': {
     group: 'data',
     tags: ['new'],
   },

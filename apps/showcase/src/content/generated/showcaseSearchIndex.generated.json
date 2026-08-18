@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 73 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 75 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -570,6 +570,28 @@
     "context": "forms / component",
     "searchableTitle": "grcheckboxgroup",
     "searchableContent": "grcheckboxgroup grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. forms component /components/gr-checkbox-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcheckboxgroup generated public-api components components gr-checkbox-group gr checkbox group"
+  },
+  {
+    "id": "entity:component:GrChip",
+    "title": "GrChip",
+    "description": "An interactive tag: removable, selectable, with an icon. Where GrBadge only shows a status, a chip answers to a click.",
+    "href": "/components/gr-chip",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grchip",
+    "searchableContent": "grchip grchip an interactive tag: removable, selectable, with an icon. where grbadge only shows a status, a chip answers to a click. data component /components/gr-chip packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grchip generated public-api new components components gr-chip gr chip"
+  },
+  {
+    "id": "entity:component:GrChipGroup",
+    "title": "GrChipGroup",
+    "description": "A set of chips sharing one value: list filters, record labels, a quick pick.",
+    "href": "/components/gr-chip-group",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grchipgroup",
+    "searchableContent": "grchipgroup grchipgroup a set of chips sharing one value: list filters, record labels, a quick pick. data component /components/gr-chip-group packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grchipgroup generated public-api new components components gr-chip-group gr chip group"
   },
   {
     "id": "entity:component:GrCodeBlock",
@@ -1989,6 +2011,94 @@
     "context": "GrCheckboxGroup",
     "searchableTitle": "grcheckboxgroup integration notes",
     "searchableContent": "grcheckboxgroup collects checkboxes into one multi-select field with a shared model and states. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrChip:section:overview",
+    "title": "GrChip / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-chip#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChip",
+    "searchableTitle": "grchip component overview",
+    "searchableContent": "grchip an interactive tag: removable, selectable, with an icon. where grbadge only shows a status, a chip answers to a click. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrChip:section:live-examples",
+    "title": "GrChip / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-chip#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChip",
+    "searchableTitle": "grchip live examples",
+    "searchableContent": "grchip an interactive tag: removable, selectable, with an icon. where grbadge only shows a status, a chip answers to a click. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrChip:section:api",
+    "title": "GrChip / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-chip#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChip",
+    "searchableTitle": "grchip generated api",
+    "searchableContent": "grchip an interactive tag: removable, selectable, with an icon. where grbadge only shows a status, a chip answers to a click. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrChip:section:integration-notes",
+    "title": "GrChip / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-chip#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChip",
+    "searchableTitle": "grchip integration notes",
+    "searchableContent": "grchip an interactive tag: removable, selectable, with an icon. where grbadge only shows a status, a chip answers to a click. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrChipGroup:section:overview",
+    "title": "GrChipGroup / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-chip-group#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChipGroup",
+    "searchableTitle": "grchipgroup component overview",
+    "searchableContent": "grchipgroup a set of chips sharing one value: list filters, record labels, a quick pick. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrChipGroup:section:live-examples",
+    "title": "GrChipGroup / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-chip-group#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChipGroup",
+    "searchableTitle": "grchipgroup live examples",
+    "searchableContent": "grchipgroup a set of chips sharing one value: list filters, record labels, a quick pick. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrChipGroup:section:api",
+    "title": "GrChipGroup / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-chip-group#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChipGroup",
+    "searchableTitle": "grchipgroup generated api",
+    "searchableContent": "grchipgroup a set of chips sharing one value: list filters, record labels, a quick pick. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrChipGroup:section:integration-notes",
+    "title": "GrChipGroup / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-chip-group#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrChipGroup",
+    "searchableTitle": "grchipgroup integration notes",
+    "searchableContent": "grchipgroup a set of chips sharing one value: list filters, record labels, a quick pick. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrCodeBlock:section:overview",

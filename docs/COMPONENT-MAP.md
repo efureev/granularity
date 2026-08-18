@@ -183,6 +183,8 @@
 | Что показываем | Компонент |
 | --- | --- |
 | статус или ярлык текстом | [`GrBadge`](../packages/granularity/docs/components/GrBadge.md) |
+| снимаемую или выбираемую метку | [`GrChip`](../packages/granularity/docs/components/GrChip.md) |
+| набор таких меток с общим выбором | [`GrChipGroup`](../packages/granularity/docs/components/GrChipGroup.md) |
 | счётчик поверх чужого контрола | [`GrBadgeWrap`](../packages/granularity/docs/components/GrBadgeWrap.md) |
 | человека или сущность картинкой | [`GrAvatar`](../packages/granularity/docs/components/GrAvatar.md) |
 | иконку из любого набора | [`GrIcon`](../packages/granularity/docs/components/GrIcon.md) |
@@ -190,6 +192,10 @@
 | крупный числовой показатель с динамикой | [`GrStatistic`](../packages/granularity/docs/components/GrStatistic.md) |
 | величину со знаком и тоном внутри строки текста | [`GrDelta`](../packages/granularity/docs/components/GrDelta.md) |
 | величину с припиской — валютой, единицей — и ничего сверх | [`GrValue`](../packages/granularity/docs/components/GrValue.md) |
+
+Различитель между бейджем и чипом — **интерактив**, а не вид: по чипу кликают,
+его снимают, он получает фокус. Отсюда у него роль, клавиатура и высота цели
+нажатия, которых у метки нет и быть не должно.
 
 Различитель у первых двух — **место в вёрстке**, а не тип величины:
 `GrStatistic` это блочная плитка со своей подписью, `GrDelta` — фрагмент
@@ -302,6 +308,8 @@
 | [`GrChartWaterfall`](../packages/granularity-charts/docs/components/GrChartWaterfall.md) | charts | движение от остатка к остатку |
 | [`GrCheckbox`](../packages/granularity/docs/components/GrCheckbox.md) | ядро | согласие или флаг в форме |
 | [`GrCheckboxGroup`](../packages/granularity/docs/components/GrCheckboxGroup.md) | ядро | значений несколько из короткого набора |
+| [`GrChip`](../packages/granularity/docs/components/GrChip.md) | ядро | снимаемая метка у сущности |
+| [`GrChipGroup`](../packages/granularity/docs/components/GrChipGroup.md) | ядро | фильтры списка строкой |
 | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) | ядро | показать ответ сервиса как есть |
 | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | ядро | содержимого много, а нужно не всё сразу |
 | [`GrColorPicker`](../packages/granularity/docs/components/GrColorPicker.md) | ядро | цвет задаёт пользователь |
@@ -384,9 +392,7 @@
 
 **Планируется в ядро.** `GrTransfer` — перенос
 между двумя списками; `GrCarousel` — карусель; `GrAffix` — прилипание к краю
-при скролле; `GrMenu` — вертикальное меню навигации; `GrSteps` — шаги мастера;
-`GrTag` — снимаемая метка (сейчас ближайшее — `GrBadge` без интерактива и
-`GrInputTag` как поле ввода).
+при скролле; `GrMenu` — вертикальное меню навигации; `GrSteps` — шаги мастера.
 
 **Планируется отдельными пакетами.** Форма из схемы
 бэкенда, rich-text и markdown, кроп аватара и камера, связка «таблица ↔ фильтры

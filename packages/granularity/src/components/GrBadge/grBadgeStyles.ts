@@ -53,12 +53,17 @@ export const darkToneClassByTone: Record<GrBadgeTone, string> = {
   slate: 'bg-[var(--gr-badge-slate-bg,var(--gr-slate-solid))] text-[var(--gr-badge-slate-fg,var(--gr-slate-solid-fg))] border-[var(--gr-badge-slate-bg,var(--gr-slate-solid))]',
   azure: 'bg-[var(--gr-badge-azure-bg,var(--gr-azure-solid))] text-[var(--gr-badge-azure-fg,var(--gr-azure-solid-fg))] border-[var(--gr-badge-azure-bg,var(--gr-azure-solid))]',
 }
-function radiusClass(radius: GrBadgeRadius, size: GrBadgeSize): string {
+/**
+ * Экспортируются ради `GrChip`: у чипа те же три радиуса и та же палитра тонов,
+ * и копия этих двух ветвлений разошлась бы с оригиналом молча. Свои у чипа
+ * только размеры — он интерактивен, и цель нажатия у него не метки, а контрола.
+ */
+export function radiusClass(radius: GrBadgeRadius, size: GrBadgeSize): string {
   if (radius === 'square') return 'rounded-[var(--gr-radius-none)]'
   if (radius === 'semi') return semiRadiusClassBySize[size]
   return 'rounded-[var(--gr-radius-full)]'
 }
-function toneClass(tone: GrBadgeTone, dark: boolean): string {
+export function toneClass(tone: GrBadgeTone, dark: boolean): string {
   return dark ? darkToneClassByTone[tone] : lightToneClassByTone[tone]
 }
 export function grBadgeClass(options: { tone: GrBadgeTone, dark: boolean, size: GrBadgeSize, radius: GrBadgeRadius }): string {

@@ -118,6 +118,8 @@ const VISUAL_COMPONENTS = [
   'GrStatistic',
   'GrTimeline',
   // Приехали в 0.21–0.24 и до сих пор были вне набора.
+  'GrChip',
+  'GrChipGroup',
   'GrCodeBlock',
   'GrDelta',
   'GrDescriptionList',

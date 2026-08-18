@@ -2267,6 +2267,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
   },
   {
+    "owner": "GrChip",
+    "name": "--gr-chip-disabled-bg",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Заливка выключенного чипа. Гасить прозрачностью нельзя: она разбавляет выверенные на AA токены текста и роняет контраст."
+  },
+  {
+    "owner": "GrChip",
+    "name": "--gr-chip-disabled-fg",
+    "kind": "hook",
+    "default": "var(--gr-disabled-fg)",
+    "description": "Текст выключенного чипа."
+  },
+  {
+    "owner": "GrChip",
+    "name": "--gr-chip-disabled-brd",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Рамка выключенного чипа."
+  },
+  {
     "owner": "GrCodeBlock",
     "name": "--gr-code-block-bg",
     "kind": "hook",

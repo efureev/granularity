@@ -26,6 +26,8 @@ import {
   grSkeletonExamples,
   grDropdownExamples,
   grDataTableExamples,
+  grChipExamples,
+  grChipGroupExamples,
   grCodeBlockExamples,
   grDeltaExamples,
   grDescriptionListExamples,
@@ -282,6 +284,30 @@ const grFilePreviewOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grChipOverview = {
+  paragraphs: [
+    'Метка, с которой можно работать: снять крестиком, отметить нажатием, поставить иконку. Там, где `GrBadge` только показывает статус, чип отвечает на действие.',
+  ],
+  features: [
+    'Крестик со снятием — и мышью, и с клавиатуры',
+    'Режим переключателя для фильтров',
+    'Восемь тонов и четыре размера, общие с бейджем',
+    'Иконка перед подписью',
+  ],
+}
+
+const grChipGroupOverview = {
+  paragraphs: [
+    'Набор чипов с общим значением: фильтры списка, метки записи, быстрый выбор периода. Группа сама ведёт выбор, роли и клавиатуру — весь набор занимает одну остановку Tab.',
+  ],
+  features: [
+    'Одиночный и множественный выбор',
+    'Стрелки водят фокус, Home и End — к краям',
+    'Delete снимает чип под фокусом',
+    'Значение уходит в нативную форму по name',
+  ],
+}
+
 const grCodeBlockOverview: ShowcaseComponentOverviewDoc = {
   paragraphs: [
     'Ответ сервиса, тело запроса, payload события — всё, что приходит «как есть» и что потом отправляют в тикет. Моноширинный блок с подсветкой JSON и кнопкой копирования вместо `<pre>`, скопированного по страницам с разными классами.',
@@ -410,6 +436,8 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrSkeleton: createComponentDocMeta(grSkeletonExamples),
   GrDropdown: createComponentDocMeta(grDropdownExamples),
   GrDataTable: createComponentDocMeta(grDataTableExamples),
+  GrChip: createComponentDocMeta(grChipExamples, grChipOverview),
+  GrChipGroup: createComponentDocMeta(grChipGroupExamples, grChipGroupOverview),
   GrCodeBlock: createComponentDocMeta(grCodeBlockExamples, grCodeBlockOverview),
   GrDelta: createComponentDocMeta(grDeltaExamples, grDeltaOverview),
   GrDescriptionList: createComponentDocMeta(grDescriptionListExamples, grDescriptionListOverview),

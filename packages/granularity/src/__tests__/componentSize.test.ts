@@ -8,6 +8,8 @@ import { describe, expect, it } from 'vitest'
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrAvatar from '../components/GrAvatar/GrAvatar.vue'
 import GrBadge from '../components/GrBadge/GrBadge.vue'
+import GrChip from '../components/GrChip/GrChip.vue'
+import GrChipGroup from '../components/GrChipGroup/GrChipGroup.vue'
 import GrBottomNav from '../components/GrBottomNav/GrBottomNav.vue'
 import GrBreadcrumbs from '../components/GrBreadcrumbs/GrBreadcrumbs.vue'
 import GrButton from '../components/GrButton/GrButton.vue'
@@ -92,6 +94,15 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrAutocomplete', render: () => h(GrAutocomplete, { modelValue: '', options: [] }) },
   { name: 'GrAvatar', render: () => h(GrAvatar, { alt: 'A' }) },
   { name: 'GrBadge', render: () => h(GrBadge, null, { default: () => 'B' }) },
+  { name: 'GrChip', render: () => h(GrChip, { label: 'C' }) },
+  {
+    // Размер группы доезжает до чипа контекстом: стенд обязан ловить именно
+    // это, иначе связка «группа → чип» могла бы разъехаться незамеченной.
+    name: 'GrChipGroup',
+    render: () => h(GrChipGroup, { modelValue: [] }, {
+      default: () => h(GrChip, { value: 'a', label: 'A' }),
+    }),
+  },
   {
     name: 'GrBottomNav',
     render: () => h(GrBottomNav, { modelValue: 'a', items: [{ label: 'A', value: 'a', icon: 'i-lucide-home' }] }),

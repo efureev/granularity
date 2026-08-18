@@ -1616,6 +1616,326 @@
       }
     ]
   },
+  "GrChip": {
+    "name": "GrChip",
+    "sourcePath": "packages/granularity/src/components/GrChip/GrChip.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closable",
+            "description": "Крестик. Внутри виджета он не кнопка — см. блок про роли ниже.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Доступное имя, когда подпись не объясняет назначения.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "radius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "value",
+            "description": "Значение чипа в группе. Вне `GrChipGroup` не используется.",
+            "type": "GrChipValue | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "label",
+            "description": "Подпись. Нужна отдельно от слота: из неё собирается имя кнопки снятия — «Убрать» на двадцати кнопках подряд не даёт выбрать нужную.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "selectable",
+            "description": "Чип становится переключателем: `aria-pressed`, `Enter`/`Space`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "selected",
+            "description": "Состояние переключателя вне группы. Внутри группы значение ведёт группа.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "removeLabel",
+            "description": "Имя кнопки снятия целиком. Перебивает собранное из `label`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Подпись чипа. Внутри выбираемого чипа — только фразовое содержимое.",
+            "type": "any"
+          },
+          {
+            "name": "icon",
+            "description": "Иконка перед подписью.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "remove",
+            "description": "",
+            "type": "[]",
+            "signature": "(event: \"remove\"): void"
+          },
+          {
+            "name": "update:selected",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:selected\", value: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void | undefined"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void | undefined"
+          }
+        ]
+      }
+    ]
+  },
+  "GrChipGroup": {
+    "name": "GrChipGroup",
+    "sourcePath": "packages/granularity/src/components/GrChipGroup/GrChipGroup.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "tone",
+            "description": "",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closable",
+            "description": "Крестик у всех чипов набора. Точечно перебивается пропом самого чипа.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "modelValue",
+            "description": "Одиночный выбор — значение, множественный — массив.",
+            "type": "GrChipValue | GrChipValue[] | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "Выбор видно, но он не меняется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя для нативной формы. Множественный выбор отдаёт по полю на значение.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dark",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "radius",
+            "description": "",
+            "type": "GrBadgeRadius | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "selection",
+            "description": "",
+            "type": "GrChipSelection | undefined",
+            "required": false,
+            "default": "\"multiple\""
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Чипы набора.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: GrChipValue | GrChipValue[] | null]",
+            "signature": "(event: \"update:modelValue\", value: GrChipValue | GrChipValue[] | null): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: GrChipValue | GrChipValue[] | null]",
+            "signature": "(event: \"change\", value: GrChipValue | GrChipValue[] | null): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          },
+          {
+            "name": "remove",
+            "description": "",
+            "type": "[value: GrChipValue]",
+            "signature": "(event: \"remove\", value: GrChipValue): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void | undefined"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void | undefined"
+          }
+        ]
+      }
+    ]
+  },
   "GrCodeBlock": {
     "name": "GrCodeBlock",
     "sourcePath": "packages/granularity/src/components/GrCodeBlock/GrCodeBlock.vue",
@@ -4453,6 +4773,13 @@
             "default": "undefined"
           },
           {
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "error",
             "description": "Явная ошибка (или несколько). Перекрывает ошибку из `GrForm` — ручной режим без формы тоже здесь. Массив нужен там, где источник ошибок один, а претензий несколько: ответ сервера, валидация файла.",
             "type": "string | string[] | undefined",
@@ -4470,13 +4797,6 @@
             "name": "labelClass",
             "description": "",
             "type": "LabelClass | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "label",
-            "description": "",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5793,16 +6113,16 @@
             "signature": "(event: \"add\", value: string): void"
           },
           {
-            "name": "reject",
-            "description": "",
-            "type": "[value: string]",
-            "signature": "(event: \"reject\", value: string): void"
-          },
-          {
             "name": "remove",
             "description": "",
             "type": "[value: string, index: number]",
             "signature": "(event: \"remove\", value: string, index: number): void"
+          },
+          {
+            "name": "reject",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"reject\", value: string): void"
           }
         ]
       },
@@ -7526,6 +7846,13 @@
             "default": "undefined"
           },
           {
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeOnBackdrop",
             "description": "",
             "type": "boolean | undefined",
@@ -7655,13 +7982,6 @@
             "name": "rows",
             "description": "Высота многострочного поля в строках.",
             "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "label",
-            "description": "",
-            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },

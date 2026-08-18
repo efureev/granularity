@@ -7,6 +7,58 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **New `GrChip` — a tag you can act on.** Removable with a cross, selectable as a toggle, with an
+  icon in front of the label. `GrBadge` stays what it is — a label that shows a status — because an
+  interactive tag needs a role, a keyboard and a hit target, and bolting those onto a label would
+  have made every badge in the package pay for them. Tones and radii are `GrBadge`'s own maps
+  reused unchanged, since the two stand side by side and must not drift apart in colour; the size
+  ladder is the chip's own, on the control scale rather than the finer label one, because a chip is
+  something you press.
+
+  **The cross is a button only when the chip itself is not.** A plain removable tag renders a
+  `<span>` root with a real `<button>` cross that has its own name and its own Tab stop. A
+  selectable chip renders a `<button>` root — and there the cross cannot be a button at all: the
+  role declares its descendants presentational (axe: `nested-interactive`), and `<button>` inside
+  `<button>` is invalid by HTML's content model regardless of ARIA. So it becomes an
+  `aria-hidden` `<span>`, removal moves to `Delete`/`Backspace`, and the chip advertises that with
+  `aria-keyshortcuts`. Closable tabs already work this way; the rule is the same one, applied
+  again. Practical consequence worth knowing before you reach for it: **a link cannot go inside a
+  selectable chip**.
+
+  **A selected chip takes the dense variant of its own tone** — the same fill `dark` gives. Not a
+  neighbouring hue: a filter set where the selected item changes colour reads as a rainbow rather
+  than as a state. An outline and a slightly heavier label were tried first and did not carry it —
+  in a row of five filters the selected one was not findable at a glance. A shift in lightness is,
+  and it survives monochrome and colour blindness. The non-colour channel stays regardless:
+  selected chips are `font-weight: 600`, which also covers the case where the whole set is `dark`
+  and the fills coincide.
+
+  Removal is a request, not a fact: `remove` fires and nothing disappears, because the array lives
+  with the consumer. The chip announces nothing to the live region for the same reason — saying
+  "removed" before it happened would be a lie.
+- **New `GrChipGroup` — a set of chips sharing one value.** List filters, record labels, a quick
+  pick of period or status. A composite widget: one Tab stop, arrows on both axes (chips wrap, so
+  "down" means the next chip just as "right" does), `Home`/`End` to the edges, `Delete` to drop the
+  chip under focus. Roles follow the selection mode — `radiogroup`/`radio` for single,
+  `listbox` with `aria-multiselectable` plus `option` for multiple — and the chips take their role
+  from the group rather than choosing it, so a set never announces itself as several different
+  widgets at once.
+
+  **An arrow moves focus and never the value, single mode included.** Chips have a second action
+  bound to `Delete`, and carrying the selection along with focus would mean changing the model just
+  by walking to the chip you wanted. In a form's `radiogroup` the opposite is conventional, but
+  there the elements have one action each.
+
+  Re-picking the selected chip in single mode clears the value: a filter set with nothing selected
+  is meaningful ("any"), and there would be no other way to say it. The value reaches a native form
+  through hidden inputs rendered beside the chips — inside a widget role they would be one more
+  piece of nested interactive content.
+- **i18n:** `gr.chip.remove` and `gr.chip.removeNamed` in `en`, `ru` and `es`. The named form is the
+  default whenever the chip has a `label`: twenty buttons all called "Remove" give a screen-reader
+  user no way to pick the right one.
+
 ### Fixed
 
 - **A dev warning could crash the component instead of being skipped.** Eleven guards read

@@ -1,4 +1,8 @@
 {
+  "chip": {
+    "remove": "Убрать",
+    "removeNamed": "Убрать {label}"
+  },
   "common": {
     "confirm": "Подтвердить",
     "cancel": "Отмена",

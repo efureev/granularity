@@ -105,6 +105,14 @@
       "types": "./dist/types/components/GrCheckboxGroup/index.d.ts",
       "import": "./dist/components/GrCheckboxGroup/index.js"
     },
+    "./components/GrChip": {
+      "types": "./dist/types/components/GrChip/index.d.ts",
+      "import": "./dist/components/GrChip/index.js"
+    },
+    "./components/GrChipGroup": {
+      "types": "./dist/types/components/GrChipGroup/index.d.ts",
+      "import": "./dist/components/GrChipGroup/index.js"
+    },
     "./components/GrCodeBlock": {
       "types": "./dist/types/components/GrCodeBlock/index.d.ts",
       "import": "./dist/components/GrCodeBlock/index.js"
