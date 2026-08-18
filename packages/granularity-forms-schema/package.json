@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-forms-schema",
   "description": "Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -148,8 +148,8 @@
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.27.0",
-    "@feugene/granularity-chrono": "^0.3.1",
-    "@feugene/granularity-test-kit": "^0.1.0",
+    "@feugene/granularity-chrono": "^0.4.0",
+    "@feugene/granularity-test-kit": "^0.2.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.1",
     "@types/node": "^26.1.1",

@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.4.0] 2026-08-19
+
+### Changed
+
+- **Control-scale font sizes now ship a paired line height.** The calendar, the time picker and
+  the shared picker field set the matching `leading-*` next to every control font size, from the
+  core's new `--gr-control-leading-*` steps. Before this the line height came from the host
+  application's `body` as an absolute value, so a 12px picker caption inherited whatever the host
+  had set. Requires core `>=0.27.0`.
+
 ### Added
 
 - **`weekStart` can now be set once for the whole application** through
@@ -38,7 +48,6 @@ to [Semantic Versioning](https://semver.org/).
   `^0.20.0`, so yarn resolved a published copy for them instead of linking the
   workspace, and their uno config scanned that copy's `dist`. The pins are
   updated to the current range; nothing in this package's runtime changed.
-
 
 ## [v0.3.0] 2026-08-18
 

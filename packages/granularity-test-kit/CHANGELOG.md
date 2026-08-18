@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-19
+
 ### Added
+
+- `requirePairedLeading` option for `defineStyleTokensGate`: every `text-[length:var(--gr-*text-*)]`
+  must carry a `leading-*` in the same class literal. Until now the pairing rule lived only in the
+  gate's own error message, and the only real check — "`--gr-leading-*` is used by at least one
+  file" — passed a package with a hundred unpaired sites. Off by default, because a package moves
+  onto pairing in one edit and would otherwise go red for a debt it has not paid yet.
+- `pairedLeadingExceptions` — an explicit list of files where the line height is set on purpose
+  (`leading-none` centring a glyph in a fixed-height key). A list rather than a heuristic like
+  "the file mentions `leading-none`": an exemption has to be visible in review.
 
 - `defineComponentDocsGate` — a fifth contract: every registry component has a page under
   `docs/components/`, no orphan pages, `H1` matches the component, both `## Когда брать` and
