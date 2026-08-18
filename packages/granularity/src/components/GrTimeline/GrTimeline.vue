@@ -139,7 +139,7 @@ function itemsOf(group: { entries: { item: T }[] }): T[] {
 
 provide(GR_TIMELINE_CONTEXT, { layout, orientation, density })
 
-if (import.meta.env?.DEV) {
+if (__GR_DEV__) {
   watch(
     () => [dataMode.value, Boolean(slots.item)] as const,
     ([hasItems, hasSlot]) => {

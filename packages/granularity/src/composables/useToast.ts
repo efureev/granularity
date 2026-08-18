@@ -163,11 +163,11 @@ function resolveToastState(): ToastState {
     )
   }
 
-  // Дедуп и текст — инлайном под dev-гардом: бандлер потребителя сворачивает
-  // условие в `false` и выкидывает сообщение из продакшн-сборки.
+  // Дедуп и текст — прямо под гардом: `__GR_DEV__` разворачивается в условие
+  // на сборке, и у потребителя вся ветка выкидывается вместе с сообщением.
   if (
     appScopedToastProvided && !contextFallbackWarned
-    && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
+    && __GR_DEV__
   ) {
     contextFallbackWarned = true
     console.warn(

@@ -688,7 +688,7 @@ function blur(): void {
 // выборе файла поздно. Выразить требование типом нельзя: `defineProps` в SFC
 // принимает объектный тип или интерфейс, но не discriminated union.
 onMounted(() => {
-  if (process.env.NODE_ENV === 'production') return
+  if (!__GR_DEV__) return
   if (props.action || props.request) return
 
   console.warn('[GrFileUpload] не задан ни `action`, ни `request`: отправлять файлы некуда.')

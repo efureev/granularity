@@ -80,7 +80,9 @@ function toggle(): void {
           class="showcase-code-meta"
           :class="title ? 'mt-0.5' : ''"
         >
-          <b>{{ language }}</b><template v-if="isCollapsible"> · {{ t('showcase.docComponents.codeBlock.lines', { count: lineCount }) }}</template>
+          <b>{{ language }}</b><template v-if="isCollapsible">
+· {{ t('showcase.docComponents.codeBlock.lines', { count: lineCount }) }}
+</template>
         </p>
       </div>
 

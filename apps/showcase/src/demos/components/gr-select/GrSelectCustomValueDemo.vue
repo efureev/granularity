@@ -16,7 +16,7 @@ const region = ref('')
   <div class="grid gap-3">
     <GrSelect
       v-model="region"
-      optionsView="panel"
+      options-view="panel"
       allow-custom-value
       :options="options"
       placeholder="Pick or add region"

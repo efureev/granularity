@@ -42,7 +42,7 @@ const panelCity = ref('Chengdu')
       <span class="text-sm text-[var(--gr-muted-fg)]">Panel (group headers)</span>
       <GrSelect
         v-model="panelCity"
-        optionsView="panel"
+        options-view="panel"
         :options="groupedOptions"
         placeholder="Pick a city"
         aria-label="Pick a city (panel)"

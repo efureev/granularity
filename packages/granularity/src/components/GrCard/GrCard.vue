@@ -106,7 +106,7 @@ let headingInButtonWarned = false
 const headingTag = computed(() => {
   if (rootTag.value !== 'button') return `h${headingLevel.value}`
 
-  if (!headingInButtonWarned && process.env.NODE_ENV !== 'production') {
+  if (!headingInButtonWarned && __GR_DEV__) {
     headingInButtonWarned = true
     console.warn(
       '[GrCard] `title` внутри `clickable` печатается `<span>`: заголовок в '

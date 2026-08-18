@@ -88,4 +88,33 @@ describe('GrBadge', () => {
     expect(azure.attributes('class')).toContain('bg-[var(--gr-badge-azure-bg,var(--gr-azure-solid))]')
     expect(azure.attributes('class')).toContain('text-[var(--gr-badge-azure-fg,var(--gr-azure-solid-fg))]')
   })
+
+  /**
+   * Ролей у бейджа нет намеренно, и это тоже контракт.
+   *
+   * Метка статуса — оформление вокруг текста: роль вроде `status` заставила бы
+   * скринридер объявлять её при каждом появлении, а `img` — требовать
+   * доступного имени, которого у бейджа не бывает. Тест утверждает отсутствие,
+   * потому что лишняя роль приезжает тихо и axe считает её валидной.
+   */
+  it('не навешивает ни роли, ни aria-атрибутов', () => {
+    const wrapper = mount(GrBadge, { props: { tone: 'danger' }, slots: { default: '3' } })
+
+    for (const el of [wrapper.element, ...wrapper.element.querySelectorAll('*')]) {
+      expect(el.getAttribute('role'), el.className).toBeNull()
+      expect(
+        [...el.attributes].map(a => a.name).filter(name => name.startsWith('aria-')),
+        el.className,
+      ).toEqual([])
+    }
+  })
+
+  it('текст лежит в собственном узле и достаётся скринридеру', () => {
+    // `text-box-trim` живёт на `.gr-badge__text`, а не на корне: если содержимое
+    // переедет, обрезка перестанет попадать в текст и вернётся косой базлайн.
+    const wrapper = mount(GrBadge, { slots: { default: 'Черновик' } })
+
+    expect(wrapper.get('.gr-badge__text').text()).toBe('Черновик')
+    expect(wrapper.get('.gr-badge__text').attributes('aria-hidden')).toBeUndefined()
+  })
 })

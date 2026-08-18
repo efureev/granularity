@@ -7,6 +7,29 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`weekStart` can now be set once for the whole application** through
+  `<GrConfigProvider :component-defaults="{ GrCalendar: { weekStart: 7 } }">`. The prop existed on the calendar and on
+  all three pickers, but only per instance — an application whose working week starts on Sunday regardless of interface
+  language had to repeat it at every call site, and miss one to get two different calendars on one screen. The key is
+  `GrCalendar` and there is deliberately no per-picker one: the pickers render that same calendar, so a second key would
+  be two names for one setting. Resolution order is the usual one — a prop on the spot beats the config, the config
+  beats the locale — and with neither set `Intl` still decides, which is what makes the default right in every country
+  without anybody configuring anything.
+
+### Fixed
+
+- **`showWeekNumbers` was typed as configurable and was not.** `GrCalendar` declared it in its defaults registry, so the
+  key type-checked and the IDE suggested it, but the component read `props.showWeekNumbers ?? false` and never looked at
+  the provider. Nothing failed: the setting was simply ignored, silently, which is the worst way for a contract to be
+  broken. The gate did not catch it either — `defineComponentDefaultsGate` checks that a declaration exists, not that
+  the component reads it.
+- **The pickers overrode that setting even once it worked.** `GrDatePicker`, `GrDateRangePicker` and `GrDateTimePicker`
+  defaulted `showWeekNumbers` to `false` rather than `undefined` and passed that value straight down, so an explicit
+  "no" from the picker beat the application's "yes" from the provider. They now pass the prop through untouched and let
+  the calendar resolve it.
+
 ## [v0.3.1] 2026-08-18
 
 ### Changed

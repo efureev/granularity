@@ -19,7 +19,7 @@ const stats = [
     >
       <div class="flex items-center justify-between gap-3">
         <GrIcon size="lg" :class="stat.tone">
-          <IconCircleCheck/>
+          <IconCircleCheck />
         </GrIcon>
 
         <GrBadge size="sm" tone="neutral">

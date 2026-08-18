@@ -170,7 +170,7 @@ const panelStyle = computed(() => {
 })
 
 // Проп не своей оси молча не работал бы — а выглядит это как баг компонента.
-if (process.env.NODE_ENV !== 'production') {
+if (__GR_DEV__) {
   watch(
     [axis, () => props.width, () => props.height],
     ([currentAxis, width, height]) => {

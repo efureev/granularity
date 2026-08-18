@@ -140,7 +140,7 @@ useEntityI18nBlock(computed(() =>
             :key="index"
             class="showcase-text-muted text-base leading-7"
         >
-          <InlineRichText :text="paragraph"/>
+          <InlineRichText :text="paragraph" />
         </p>
       </div>
 
@@ -154,8 +154,8 @@ useEntityI18nBlock(computed(() =>
               :key="index"
               class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
           >
-            <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true"/>
-            <span><InlineRichText :text="feature"/></span>
+            <span class="i-lucide-check mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true" />
+            <span><InlineRichText :text="feature" /></span>
           </li>
         </ul>
       </div>
@@ -174,8 +174,8 @@ useEntityI18nBlock(computed(() =>
               :key="index"
               class="showcase-text-muted flex items-start gap-2 text-sm leading-6"
           >
-            <span class="i-lucide-dot mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true"/>
-            <span><InlineRichText :text="item"/></span>
+            <span class="i-lucide-dot mt-1 h-4 w-4 shrink-0 text-[var(--gr-primary)]" aria-hidden="true" />
+            <span><InlineRichText :text="item" /></span>
           </li>
         </ul>
       </div>
@@ -203,7 +203,7 @@ useEntityI18nBlock(computed(() =>
             :note="example.note"
         >
           <template v-if="resolveDemoComponent(example.previewKey)" #preview>
-            <component :is="resolveDemoComponent(example.previewKey)"/>
+            <component :is="resolveDemoComponent(example.previewKey)" />
           </template>
         </ExampleCard>
       </div>
@@ -214,10 +214,10 @@ useEntityI18nBlock(computed(() =>
         {{ t('showcase.detailPage.api.title') }}
       </h2>
       <div class="grid gap-4">
-        <PropsTable :items="componentEntity.apiSections.find(section => section.key === 'props')?.items ?? []"/>
-        <SlotsTable :items="componentEntity.apiSections.find(section => section.key === 'slots')?.items ?? []"/>
-        <EventsTable :items="componentEntity.apiSections.find(section => section.key === 'events')?.items ?? []"/>
-        <MethodsTable :items="componentEntity.apiSections.find(section => section.key === 'methods')?.items ?? []"/>
+        <PropsTable :items="componentEntity.apiSections.find(section => section.key === 'props')?.items ?? []" />
+        <SlotsTable :items="componentEntity.apiSections.find(section => section.key === 'slots')?.items ?? []" />
+        <EventsTable :items="componentEntity.apiSections.find(section => section.key === 'events')?.items ?? []" />
+        <MethodsTable :items="componentEntity.apiSections.find(section => section.key === 'methods')?.items ?? []" />
       </div>
     </section>
 
@@ -232,11 +232,15 @@ useEntityI18nBlock(computed(() =>
       </div>
 
       <div class="grid gap-4 lg:grid-cols-3">
-        <InfoSectionCard :title="t('showcase.detailPage.info.accessibilityTitle')" :items="accessibilityItems"
-                         variant="list"/>
-        <ComponentDependencyCard :component-name="componentEntity.name"/>
-        <InfoSectionCard :title="t('showcase.detailPage.info.relatedLinksTitle')" :links="relatedLinks"
-                         variant="links"/>
+        <InfoSectionCard
+:title="t('showcase.detailPage.info.accessibilityTitle')" :items="accessibilityItems"
+                         variant="list"
+/>
+        <ComponentDependencyCard :component-name="componentEntity.name" />
+        <InfoSectionCard
+:title="t('showcase.detailPage.info.relatedLinksTitle')" :links="relatedLinks"
+                         variant="links"
+/>
       </div>
     </section>
   </div>

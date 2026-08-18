@@ -35,7 +35,7 @@ export function applyGrZIndexBase(token: symbol, base: number | undefined): (() 
     return null
   }
 
-  if (owner && owner !== token && process.env.NODE_ENV !== 'production') {
+  if (owner && owner !== token && __GR_DEV__) {
     console.warn(
       '[GrConfigProvider] zIndexBase задан больше чем одним провайдером. '
       + 'Шкала слоёв одна на документ (панели телепортируются в body), поэтому применится последняя.',

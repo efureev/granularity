@@ -86,7 +86,7 @@ let ambiguousStateWarned = false
 
 function warnAmbiguousState(): void {
   if (ambiguousStateWarned) return
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return
+  if (!__GR_DEV__) return
 
   ambiguousStateWarned = true
   console.warn(
@@ -141,7 +141,7 @@ function ensureMounted(state: DialogServiceState, appContext?: AppContext | null
 
 function warnIfContextless(state: DialogServiceState, context: CapturedDialogContext | null): void {
   if (state.contextlessWarned || context?.config || context?.i18n) return
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return
+  if (!__GR_DEV__) return
 
   state.contextlessWarned = true
   console.warn(

@@ -168,11 +168,11 @@ function resolveThemeState(options: UseThemeOptions): ThemeState {
   // мутацию — течёт именно она.
   if (IS_SERVER) return createThemeState(options, false)
 
-  // Дедуп и текст — инлайном под dev-гардом: бандлер потребителя сворачивает
-  // условие в `false` и выкидывает сообщение из продакшн-сборки.
+  // Дедуп и текст — прямо под гардом: `__GR_DEV__` разворачивается в условие
+  // на сборке, и у потребителя вся ветка выкидывается вместе с сообщением.
   if (
     appScopedThemeProvided && !contextFallbackWarned
-    && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
+    && __GR_DEV__
   ) {
     contextFallbackWarned = true
     console.warn(

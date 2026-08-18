@@ -83,15 +83,6 @@ async function readSidebar(path: string) {
 }
 
 describe('showcase layout integration', () => {
-  afterEach(() => {
-    while (mountedWrappers.length > 0) {
-      mountedWrappers.pop()?.unmount()
-    }
-
-    document.body.innerHTML = ''
-    vi.unstubAllGlobals()
-  })
-
   beforeEach(() => {
     const storageMock = createStorageMock()
 
@@ -118,6 +109,16 @@ describe('showcase layout integration', () => {
 
     initThemeEarly()
   })
+
+  afterEach(() => {
+    while (mountedWrappers.length > 0) {
+      mountedWrappers.pop()?.unmount()
+    }
+
+    document.body.innerHTML = ''
+    vi.unstubAllGlobals()
+  })
+
 
   it('рендерит breadcrumbs и doc sections для component detail route', async () => {
     const { wrapper } = await mountShowcaseAt('/components/gr-button')

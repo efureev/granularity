@@ -204,7 +204,7 @@ let missingNameWarned = false
 
 function warnMissingAccessibleName(): void {
   if (missingNameWarned) return
-  if (process.env.NODE_ENV === 'production') return
+  if (!__GR_DEV__) return
   if (slots.title || props.ariaLabel) return
 
   missingNameWarned = true
@@ -217,7 +217,7 @@ function warnMissingAccessibleName(): void {
 // Два заголовка на окно — это разъехавшийся `aria-labelledby`: диктор прочитает
 // первый, а автор будет уверен во втором.
 function warnDuplicateTitle(): void {
-  if (process.env.NODE_ENV === 'production') return
+  if (!__GR_DEV__) return
   if (titleClaims <= 1) return
 
   console.warn(

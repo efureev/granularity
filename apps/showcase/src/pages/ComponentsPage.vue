@@ -2,13 +2,12 @@
 import {computed, ref} from 'vue'
 import {RouterLink} from 'vue-router'
 
-import {GrCard} from '@feugene/granularity'
+import {GrCard,GrBadge} from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {showcaseComponentEntities} from '../app/showcase'
 import {compareEntityGroups} from '../app/showcaseEntityGroups'
 import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
-import {GrBadge} from "@feugene/granularity";
 
 const {
   getEntityGroupLabel,
@@ -87,7 +86,9 @@ const groupedComponents = computed(() => {
             </h2>
             <p class="showcase-text-muted max-w-3xl text-sm leading-6">
               {{ $t('showcase.componentsPage.catalogDescription') }}
-              <GrBadge tone="azure">{{ componentsWithExamples.length }}</GrBadge>
+              <GrBadge tone="azure">
+{{ componentsWithExamples.length }}
+</GrBadge>
             </p>
           </div>
 

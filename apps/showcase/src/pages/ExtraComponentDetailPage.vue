@@ -43,8 +43,12 @@ const apiSections = computed(() => component.value?.apiSections ?? [])
       </h1>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <code class="showcase-link-chip rounded-full border px-3 py-1 text-xs">{{ component.npmName }}</code>
-        <GrBadge tone="neutral" :title="t('showcase.header.versionLabel')">v{{ component.version }}</GrBadge>
-        <GrBadge tone="azure">{{ t('showcase.extraDetailPage.companionBadge') }}</GrBadge>
+        <GrBadge tone="neutral" :title="t('showcase.header.versionLabel')">
+v{{ component.version }}
+</GrBadge>
+        <GrBadge tone="azure">
+{{ t('showcase.extraDetailPage.companionBadge') }}
+</GrBadge>
       </div>
       <p class="showcase-text-muted mt-4 max-w-3xl text-base leading-7">
         {{ component.summary }}
@@ -167,6 +171,8 @@ const apiSections = computed(() => component.value?.apiSections ?? [])
 
   <div v-else class="showcase-empty-state rounded-3xl border border-dashed px-5 py-10 text-sm leading-6">
     {{ t('showcase.extraDetailPage.notFound') }}
-    <RouterLink to="/extras" class="underline">{{ t('showcase.extraDetailPage.notFoundLink') }}</RouterLink>
+    <RouterLink to="/extras" class="underline">
+{{ t('showcase.extraDetailPage.notFoundLink') }}
+</RouterLink>
   </div>
 </template>

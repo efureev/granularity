@@ -117,6 +117,13 @@ const VISUAL_COMPONENTS = [
   'GrSkeleton',
   'GrStatistic',
   'GrTimeline',
+  // Приехали в 0.21–0.24 и до сих пор были вне набора.
+  'GrCodeBlock',
+  'GrDelta',
+  'GrDescriptionList',
+  'GrFilePreview',
+  'GrJsonViewer',
+  'GrValue',
 ]
 
 /**

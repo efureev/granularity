@@ -4,7 +4,7 @@ import { computed, ref, useId } from 'vue'
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { useRovingFocus } from '@feugene/granularity/composables/useRovingFocus'
-import { useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
+import { useGrComponentDefaults, useGrComponentProp, useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { clockDate } from '../../chrono/chronoModel'
@@ -157,8 +157,19 @@ const { announce } = useAnnouncer()
 
 const resolvedSize = useGrComponentSize<GrCalendarSize>(() => props.size, { component: 'GrCalendar' })
 const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
-const resolvedWeekStart = computed(() => props.weekStart ?? localeFirstDayOfWeek(resolvedLocale.value))
-const resolvedShowWeekNumbers = computed(() => props.showWeekNumbers ?? false)
+const calendarDefaults = useGrComponentDefaults('GrCalendar')
+
+/**
+ * Цепочка `weekStart` написана руками, а не через `useGrComponentProp`.
+ *
+ * Последнее звено здесь не константа, а вывод из локали, — `useGrComponentProp`
+ * же принимает статический `fallback` и вычислил бы его один раз на setup.
+ * Смена локали на лету перестала бы двигать первый день недели.
+ */
+const resolvedWeekStart = computed(
+  () => props.weekStart ?? calendarDefaults.value.weekStart ?? localeFirstDayOfWeek(resolvedLocale.value),
+)
+const resolvedShowWeekNumbers = useGrComponentProp('GrCalendar', 'showWeekNumbers', () => props.showWeekNumbers, false)
 
 const gridId = useId()
 const titleId = useId()

@@ -15,11 +15,14 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
     "@axe-core/playwright": "^4.12.1",
     "@feugene/unplugin-granularity": "^0.4.0",
     "@playwright/test": "^1.61.1",
     "@unocss/reset": "^66.7.5",
     "@vitejs/plugin-vue": "^6.0.8",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
     "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "^6.0.2",
     "unocss": "^66.7.5",
@@ -32,6 +35,8 @@
   "scripts": {
     "build": "yarn generate:api && yarn generate:search && vite build",
     "build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
     "dev": "yarn prepare:granularity && yarn generate:api && yarn generate:search && vite",
     "generate:api": "node ./scripts/generate-component-api.mjs",
     "generate:search": "node ./scripts/generate-showcase-search-index.mjs",

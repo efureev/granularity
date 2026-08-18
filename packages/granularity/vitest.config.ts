@@ -3,6 +3,12 @@ import Icons from 'unplugin-icons/vite'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  // Тесты — всегда dev-ветка: они и написаны ради того, чтобы проверять
+  // предупреждения. Продовое поведение гарда проверяет гейт по собранному
+  // `dist`, а не подмена этой константы.
+  define: {
+    __GR_DEV__: 'true',
+  },
   plugins: [
     vue(),
     Icons({

@@ -7,6 +7,45 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **A dev warning could crash the component instead of being skipped.** Eleven guards read
+  `process.env.NODE_ENV` bare, without the `typeof process !== 'undefined'` insurance the package's
+  own canon declares. That is not a style question: this package ships unminified and with no
+  `define` for `NODE_ENV` — folding is the consumer's bundler's job — so the bare form travelled
+  into `dist` verbatim, and in any runtime where `process` is not defined (a worker, an edge
+  runtime, a plain ESM import) it is a `ReferenceError` during setup. The component died where it
+  was supposed to print a hint.
+- **Six more warnings were invisible outside Vite.** `GrList`, `GrListItem`, `GrSelect`,
+  `GrTabPanel`, `GrTimeline` and `selectValue` guarded on `import.meta.env?.DEV`, which is
+  `undefined` for anyone not building with Vite — so the warning never appeared, silently, and the
+  defect it was written to catch reached production unannounced. This was drift rather than a
+  decision: the comment above one of them names `GrFormField` as its model, and `GrFormField` was
+  written the other way.
+
+### Changed
+
+- **All 23 dev guards are now one symbol, `__GR_DEV__`, expanded at build time.** Three dialects had
+  accumulated because the guard was written by hand at every site, and hand-written guards have two
+  mirrored shapes — `&&` under a condition, `||` before an early `return`. Getting the shape wrong
+  is worse than forgetting the guard: an early return written with `&&` stops firing exactly where
+  `process` is undefined, which sends the warning to production on the very runtimes the insurance
+  was added for. One symbol removes the choice; `!` does the mirroring.
+
+  **It is a compile-time substitution, not a helper, and that distinction is the whole point.** A
+  runtime `isDev()` would read better and cost the consumer real bytes: bundlers do not inline
+  across module boundaries. Measured with esbuild at `--minify` with `NODE_ENV` defined as
+  production — the inline form collapses to `function warn(n){typeof process<"u"}`, body, dedup
+  `Set` and message text all gone; through a helper the condition folds to `!1` but the call
+  survives, and the `Set` and the message ship with it. The substitution produces byte-for-byte
+  what a hand-written guard would, so nothing is lost.
+
+  Two gates hold it: `src/__tests__/envGuard.test.ts` forbids any environment check in `src` that
+  is not `__GR_DEV__`, and `scripts/check-dist-dev-guard.mjs` — wired into `yarn build` — verifies
+  the name actually expanded in `dist`. The second is not redundant: unit tests run with
+  `__GR_DEV__` defined as `true`, so a broken `define` would leave them green while consumers got
+  `__GR_DEV__ is not defined` on import.
+
 ## [v0.24.1] 2026-08-18
 
 ### Changed

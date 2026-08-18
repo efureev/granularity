@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import GrConfigProvider from '@feugene/granularity/components/GrConfigProvider'
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
 import GrCalendar from '../../GrCalendar/GrCalendar.vue'
@@ -597,5 +598,68 @@ describe('GrDatePicker — проброс слота шапки недели', (
     expect(cells.map(cell => cell.textContent)).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
     expect(cells[0]!.getAttribute('data-iso')).toBe('1')
     wrapper.unmount()
+  })
+})
+
+/**
+ * Настройка панели через `GrConfigProvider`.
+ *
+ * Пикер рисует ту же `GrCalendar`, поэтому настройка живёт под ключом
+ * `GrCalendar` — своего у пикера нет намеренно. Но собственный дефолт пикера
+ * умеет эту настройку перебить: пока он подставлял `false` вместо `undefined`,
+ * конфиг доезжал до панели и молча проигрывал.
+ */
+describe('GrDatePicker и GrConfigProvider', () => {
+  function mountConfigured(defaults: Record<string, unknown>, props: Record<string, unknown> = {}) {
+    const Harness = defineComponent({
+      name: 'HarnessDatePickerConfig',
+      components: { GrConfigProvider, GrDatePicker },
+      props: {
+        componentDefaults: { type: Object, required: true },
+        pickerProps: { type: Object, default: () => ({}) },
+      },
+      template: `
+        <GrConfigProvider :component-defaults="componentDefaults">
+          <GrDatePicker v-bind="pickerProps" inline />
+        </GrConfigProvider>
+      `,
+    })
+
+    return mount(Harness, {
+      props: {
+        componentDefaults: { GrCalendar: defaults },
+        pickerProps: { locale: 'en-US', today: at('2026-08-12'), ...props },
+      },
+      attachTo: document.body,
+    })
+  }
+
+  it('showWeekNumbers из конфига доезжает до панели пикера', () => {
+    const wrapper = mountConfigured({ showWeekNumbers: true })
+
+    expect(wrapper.findAll('[data-gr-calendar-week-number]').length).toBeGreaterThan(0)
+
+    wrapper.unmount()
+  })
+
+  it('явный проп пикера сильнее конфига', () => {
+    const wrapper = mountConfigured({ showWeekNumbers: true }, { showWeekNumbers: false })
+
+    expect(wrapper.findAll('[data-gr-calendar-week-number]')).toHaveLength(0)
+
+    wrapper.unmount()
+  })
+
+  it('weekStart из конфига двигает первый день недели в панели', () => {
+    const monday = mountConfigured({ weekStart: 1 })
+    const sunday = mountConfigured({ weekStart: 7 })
+
+    const first = (wrapper: ReturnType<typeof mountConfigured>) =>
+      wrapper.findAll('[data-gr-calendar-weekday]')[0]!.text()
+
+    expect(first(monday)).not.toBe(first(sunday))
+
+    monday.unmount()
+    sunday.unmount()
   })
 })

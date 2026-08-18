@@ -601,7 +601,7 @@ const {
   maxHeight: () => props.dropdownMaxHeight,
 })
 
-if (import.meta.env?.DEV) {
+if (__GR_DEV__) {
   const slots = useSlots()
 
   watch(

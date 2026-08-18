@@ -40,6 +40,7 @@
     "lint:chrono": "yarn workspace @feugene/granularity-chrono lint",
     "lint:charts": "yarn workspace @feugene/granularity-charts lint",
     "lint:dashboard": "yarn workspace @feugene/granularity-dashboard lint",
+  "lint:showcase": "yarn workspace @feugene/granularity-showcase lint",
     "typecheck:test-kit": "yarn workspace @feugene/granularity-test-kit typecheck",
     "typecheck:granularity": "yarn build:test-kit && yarn workspace @feugene/granularity typecheck",
     "typecheck:chrono": "yarn build:test-kit && yarn workspace @feugene/granularity-chrono typecheck",

@@ -156,7 +156,8 @@ const previewCode = computed(() => {
   <div class="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_320px]">
     <div class="grid gap-4">
       <div
-          class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
+          class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]"
+>
         <div class="flex h-full flex-col items-center justify-center gap-4 text-center">
           <div class="showcase-demo-caption text-xs">
             Preview
@@ -185,7 +186,7 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet" />
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
@@ -195,19 +196,19 @@ const previewCode = computed(() => {
 
       <div class="grid gap-4">
         <GrFormField label="Tone">
-          <GrSelect v-model="tone" :options="toneOptions" aria-label="Link tone"/>
+          <GrSelect v-model="tone" :options="toneOptions" aria-label="Link tone" />
         </GrFormField>
 
         <GrFormField label="Variant">
-          <GrRadioGroup v-model="variant" :options="variantOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="variant" :options="variantOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Size">
-          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Underline">
-          <GrRadioGroup v-model="underline" :options="underlineOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="underline" :options="underlineOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Label">
@@ -235,7 +236,7 @@ const previewCode = computed(() => {
         </GrFormField>
 
         <GrFormField label="Target">
-          <GrRadioGroup v-model="targetMode" :options="targetOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="targetMode" :options="targetOptions" variant="button" size="sm" />
           <GrInput
               v-if="targetMode === 'custom'"
               v-model="customTarget"
@@ -246,7 +247,7 @@ const previewCode = computed(() => {
         </GrFormField>
 
         <GrFormField label="Rel">
-          <GrSelect v-model="relMode" :options="relOptions" aria-label="Link rel"/>
+          <GrSelect v-model="relMode" :options="relOptions" aria-label="Link rel" />
           <GrInput
               v-if="relMode === 'custom'"
               v-model="customRel"

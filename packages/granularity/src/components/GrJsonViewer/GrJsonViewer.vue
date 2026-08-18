@@ -164,7 +164,7 @@ const canCopy = ref(false)
 onMounted(() => {
   canCopy.value = typeof navigator !== 'undefined' && typeof navigator.clipboard?.writeText === 'function'
 
-  if (props.virtual && props.maxHeight === undefined && typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  if (props.virtual && props.maxHeight === undefined && __GR_DEV__) {
     console.warn('[GrJsonViewer] `virtual` без `maxHeight` не включает виртуализацию: окно считается от высоты области.')
   }
 })

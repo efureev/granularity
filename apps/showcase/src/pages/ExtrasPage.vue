@@ -52,7 +52,9 @@ const totalComponents = computed(() =>
             </h2>
             <p class="showcase-text-muted max-w-3xl text-sm leading-6">
               {{ $t('showcase.extrasPage.catalogDescription') }}
-              <GrBadge tone="azure">{{ totalComponents }}</GrBadge>
+              <GrBadge tone="azure">
+{{ totalComponents }}
+</GrBadge>
             </p>
           </div>
 
@@ -81,7 +83,9 @@ const totalComponents = computed(() =>
                   {{ pkg.label }}
                 </h3>
                 <code class="showcase-link-chip rounded-full border px-3 py-1 text-xs">{{ pkg.npmName }}</code>
-                <GrBadge tone="neutral">v{{ pkg.version }}</GrBadge>
+                <GrBadge tone="neutral">
+v{{ pkg.version }}
+</GrBadge>
               </div>
               <p class="showcase-text-muted max-w-3xl text-sm leading-6">
                 {{ pkg.description }}

@@ -18,7 +18,7 @@ const selectedTeams = ref<string[]>(['design', 'platform'])
     <GrSelect
       v-model="selectedTeams"
       multiple
-      optionsView="panel"
+      options-view="panel"
       :close-on-select="false"
       :options="options"
       placeholder="Pick teams"

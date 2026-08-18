@@ -38,8 +38,8 @@ function advance(
 onMounted(() => {
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return
 
-  fastTimer = setInterval(() => advance(fast.value, tweenFast, jumpFast, 1000), 1000)
-  slowTimer = setInterval(() => advance(slow.value, tweenSlow, jumpSlow, 5000), 5000)
+  fastTimer = setInterval(advance, 1000, fast.value, tweenFast, jumpFast, 1000)
+  slowTimer = setInterval(advance, 5000, slow.value, tweenSlow, jumpSlow, 5000)
 })
 
 onBeforeUnmount(() => {

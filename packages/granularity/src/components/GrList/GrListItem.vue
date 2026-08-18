@@ -94,7 +94,7 @@ function isFocusableTag(tag: string): boolean {
   return tag === 'button' || (tag === 'a' && !!props.href)
 }
 
-if (import.meta.env?.DEV) {
+if (__GR_DEV__) {
   watch(
     () => [isInteractive.value, props.as] as const,
     ([interactive, as]) => {

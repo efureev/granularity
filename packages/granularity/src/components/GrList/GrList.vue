@@ -186,7 +186,7 @@ function scrollToIndex(index: number, align?: GrVirtualAlign): void {
 
 defineExpose({ scrollToIndex })
 
-if (import.meta.env?.DEV) {
+if (__GR_DEV__) {
   watch(
     () => [props.virtual, dataMode.value, props.maxHeight] as const,
     ([virtual, hasItems, maxHeight]) => {

@@ -50,7 +50,7 @@ const shouldRender = computed(() => {
  * `aria-labelledby` висеть в пустоту. Проверяем это в dev, как `GrFormField`
  * проверяет забытый контрол.
  */
-if (import.meta.env?.DEV) {
+if (__GR_DEV__) {
   onMounted(() => {
     if (!tabId.value || !isActive.value) return
     if (document.getElementById(tabId.value)) return

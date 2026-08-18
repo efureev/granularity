@@ -1839,5 +1839,5 @@ export function getCompanionComponentBySlug(slug: string): CompanionComponentWit
 
 export function getCompanionComponentByPath(path: string): CompanionComponentWithPackage | undefined {
   const match = /^\/extras\/([^/?#]+)/.exec(path)
-  return match ? getCompanionComponentBySlug(match[1] as string) : undefined
+  return match ? getCompanionComponentBySlug(match[1]) : undefined
 }

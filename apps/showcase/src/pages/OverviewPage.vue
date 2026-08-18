@@ -36,12 +36,12 @@ const overviewFeatureList = computed(() =>
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <RouterLink to="/foundations" custom v-slot="{ navigate, href }">
+          <RouterLink v-slot="{ navigate, href }" to="/foundations" custom>
             <GrButton :href="href" @click="navigate">
               {{ t('showcase.overviewPage.ctaFoundations') }}
             </GrButton>
           </RouterLink>
-          <RouterLink to="/components" custom v-slot="{ navigate, href }">
+          <RouterLink v-slot="{ navigate, href }" to="/components" custom>
             <GrButton variant="ghost-border" :href="href" @click="navigate">
               {{ t('showcase.overviewPage.ctaComponents') }}
             </GrButton>
@@ -52,7 +52,9 @@ const overviewFeatureList = computed(() =>
 
     <section class="space-y-4">
       <div class="space-y-2">
-        <h2 class="text-2xl font-semibold">{{ t('showcase.overviewPage.whyTitle') }}</h2>
+        <h2 class="text-2xl font-semibold">
+{{ t('showcase.overviewPage.whyTitle') }}
+</h2>
       </div>
 
       <GrCard class="showcase-panel overflow-hidden rounded-[32px] border p-6 lg:p-8">
@@ -69,7 +71,8 @@ const overviewFeatureList = computed(() =>
           >
             <h4 class="flex items-center gap-3 text-base font-semibold leading-6">
                 <span
-                    class="inline-flex h-8 w-8 min-w-8 shrink-0 items-center justify-center rounded-full bg-[var(--gr-primary)] text-xs font-semibold text-[var(--gr-primary-fg)]">
+                    class="inline-flex h-8 w-8 min-w-8 shrink-0 items-center justify-center rounded-full bg-[var(--gr-primary)] text-xs font-semibold text-[var(--gr-primary-fg)]"
+>
                   0{{ index + 1 }}
                 </span>
               {{ feature.title }}
@@ -84,7 +87,9 @@ const overviewFeatureList = computed(() =>
 
     <section id="quick-start" class="scroll-mt-28 space-y-4">
       <div class="space-y-2">
-        <h2 class="text-2xl font-semibold">{{ t('showcase.overviewPage.quickStartTitle') }}</h2>
+        <h2 class="text-2xl font-semibold">
+{{ t('showcase.overviewPage.quickStartTitle') }}
+</h2>
         <p class="showcase-text-muted max-w-3xl text-sm leading-6">
           {{ t('showcase.overviewPage.quickStartSubtitle') }}
         </p>
@@ -102,15 +107,17 @@ const overviewFeatureList = computed(() =>
               <h3 class="text-xl font-semibold">
                 {{ card.title }}
               </h3>
-              <RouterLink to="/foundations"
-                          class="showcase-text-primary text-xs font-semibold uppercase tracking-[0.16em] transition-colors">
+              <RouterLink
+to="/foundations"
+                          class="showcase-text-primary text-xs font-semibold uppercase tracking-[0.16em] transition-colors"
+>
                 {{ t('showcase.overviewPage.foundationsLink') }}
               </RouterLink>
             </div>
             <p class="showcase-text-muted text-sm leading-6">
               {{ card.description }}
             </p>
-            <CodeBlock :code="card.code" :language="card.language" :title="card.title"/>
+            <CodeBlock :code="card.code" :language="card.language" :title="card.title" />
             <p class="showcase-text-subtle text-sm leading-6">
               {{ card.note }}
             </p>
@@ -120,11 +127,13 @@ const overviewFeatureList = computed(() =>
 
       <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-3">
-          <h2 class="text-2xl font-semibold">{{ t('showcase.overviewPage.installSummaryTitle') }}</h2>
+          <h2 class="text-2xl font-semibold">
+{{ t('showcase.overviewPage.installSummaryTitle') }}
+</h2>
           <p class="showcase-text-muted max-w-3xl text-sm leading-6">
             {{ t('showcase.overviewPage.installSummaryText') }}
           </p>
-          <CodeBlock :code="showcaseInstallationNarrative" language="md" :title="t('showcase.overviewPage.installGuideExcerptTitle')"/>
+          <CodeBlock :code="showcaseInstallationNarrative" language="md" :title="t('showcase.overviewPage.installGuideExcerptTitle')" />
         </div>
       </GrCard>
     </section>

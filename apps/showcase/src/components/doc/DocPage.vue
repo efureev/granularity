@@ -70,7 +70,9 @@ defineProps<{
 
     <section v-if="examples?.length" class="space-y-4">
       <div class="space-y-2">
-        <h2 class="text-2xl font-semibold">{{ $t('showcase.detailPage.liveExamples.title') }}</h2>
+        <h2 class="text-2xl font-semibold">
+{{ $t('showcase.detailPage.liveExamples.title') }}
+</h2>
         <p class="showcase-text-muted text-sm leading-6">
           {{ $t('showcase.detailPage.liveExamples.descriptionGeneric') }}
         </p>
@@ -89,7 +91,9 @@ defineProps<{
     </section>
 
     <section id="api" class="space-y-4">
-      <h2 class="text-2xl font-semibold">{{ $t('showcase.detailPage.api.title') }}</h2>
+      <h2 class="text-2xl font-semibold">
+{{ $t('showcase.detailPage.api.title') }}
+</h2>
       <div class="grid gap-4">
         <PropsTable :items="apiSections?.find(section => section.key === 'props')?.items ?? []" />
         <SlotsTable :items="apiSections?.find(section => section.key === 'slots')?.items ?? []" />
@@ -100,7 +104,9 @@ defineProps<{
 
     <section class="space-y-4">
       <div class="space-y-2">
-        <h2 class="text-2xl font-semibold">{{ $t('showcase.detailPage.implementationNotes.title') }}</h2>
+        <h2 class="text-2xl font-semibold">
+{{ $t('showcase.detailPage.implementationNotes.title') }}
+</h2>
         <p class="showcase-text-muted max-w-3xl text-sm leading-6">
           {{ $t('showcase.detailPage.implementationNotes.description') }}
         </p>

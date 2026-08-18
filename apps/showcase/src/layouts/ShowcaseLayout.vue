@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   RouterLink,
   RouterView,
@@ -241,7 +241,7 @@ function getSidebarItemClass(item: SidebarNavigationItem) {
     <ShowcaseHeader @open-mobile-navigation="isMobileNavigationOpen = true" />
 
     <div class="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[290px_minmax(0,1fr)] lg:px-8">
-      <ShowcaseSidebarNavigation :groups="contextNavigationGroups"/>
+      <ShowcaseSidebarNavigation :groups="contextNavigationGroups" />
 
       <main class="min-w-0 space-y-6">
         <div class="showcase-panel flex flex-wrap items-center gap-2 rounded-[24px] border px-4 py-3 text-sm">

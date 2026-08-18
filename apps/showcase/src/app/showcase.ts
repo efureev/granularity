@@ -8,18 +8,15 @@ import type {
 } from './showcaseModel.ts'
 
 export {
-  showcaseComposableEntities,
   showcaseComponentEntities,
+  showcaseComposableEntities,
   showcaseDirectiveEntities,
   showcaseEntityRegistry,
   showcaseUtilityEntities,
 } from './showcaseEntities.ts'
 import {
-  showcaseComposableEntities,
   showcaseComponentEntities,
-  showcaseDirectiveEntities,
   showcaseEntityRegistry,
-  showcaseUtilityEntities,
 } from './showcaseEntities.ts'
 export {
   showcaseComponentDetailSections,

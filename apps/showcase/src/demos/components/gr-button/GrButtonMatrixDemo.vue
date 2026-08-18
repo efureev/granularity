@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type CSSProperties } from 'vue'
+import type { CSSProperties } from 'vue'
 
 import { GR_TONES, GrButton, type GrButtonVariant } from '@feugene/granularity'
 

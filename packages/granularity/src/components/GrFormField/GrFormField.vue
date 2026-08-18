@@ -215,7 +215,7 @@ onMounted(async () => {
  * об этом можно только вручную. Дешёвая страховка — предупреждение в dev.
  */
 function warnIfControlMissed(): void {
-  if (process.env.NODE_ENV === 'production') return
+  if (!__GR_DEV__) return
   if (!hasLabel.value) return
 
   const root = fieldRootEl.value

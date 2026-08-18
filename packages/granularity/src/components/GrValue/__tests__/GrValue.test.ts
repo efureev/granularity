@@ -101,4 +101,30 @@ describe('GrValue — слоты', () => {
     expect(wrapper.get('[data-gr-value-number]').text()).toBe('0,028')
     expect(wrapper.find('[data-final]').exists()).toBe(true)
   })
+
+  /**
+   * Приписки читаются вслух — прятать их нельзя.
+   *
+   * `aria-hidden` на префиксе выглядит безобидно (значок же декоративный), но
+   * тогда «$14,99» превращается в «14,99», а «42 %» — в «42». Единица измерения
+   * и валюта — часть величины, а не украшение, и потерять их дороже, чем
+   * услышать лишний символ.
+   */
+  it('префикс и суффикс не спрятаны от скринридера', () => {
+    const wrapper = mount(GrValue, { props: { value: '14,99', prefix: '$', suffix: '%' } })
+
+    expect(wrapper.get('[data-gr-value-prefix]').attributes('aria-hidden')).toBeUndefined()
+    expect(wrapper.get('[data-gr-value-suffix]').attributes('aria-hidden')).toBeUndefined()
+    expect(wrapper.get('[data-gr-value-number]').attributes('aria-hidden')).toBeUndefined()
+  })
+
+  // Примитив показывает величину и не притворяется виджетом.
+  it('не навешивает ни роли, ни aria-атрибутов', () => {
+    const wrapper = mount(GrValue, { props: { value: 42, prefix: '$', suffix: '%' } })
+
+    for (const el of [wrapper.element, ...wrapper.element.querySelectorAll('*')]) {
+      expect(el.getAttribute('role')).toBeNull()
+      expect([...el.attributes].map(a => a.name).filter(name => name.startsWith('aria-'))).toEqual([])
+    }
+  })
 })

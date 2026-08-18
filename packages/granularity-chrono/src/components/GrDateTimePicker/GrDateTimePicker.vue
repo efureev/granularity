@@ -116,7 +116,9 @@ const props = withDefaults(defineProps<GrDateTimePickerProps<TValue>>(), {
   max: undefined,
   disabledDates: undefined,
   weekStart: undefined,
-  showWeekNumbers: false,
+  // `undefined`, а не `false`: явный дефолт пикера перебил бы настройку
+  // `GrCalendar` из `GrConfigProvider` — панель у них общая.
+  showWeekNumbers: undefined,
   minuteStep: 1,
   secondStep: 1,
   enableSeconds: false,

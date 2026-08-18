@@ -158,7 +158,8 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
   <div class="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_320px]">
     <div class="grid gap-4">
       <div
-          class="relative grid min-h-[280px] overflow-hidden rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
+          class="relative grid min-h-[280px] overflow-hidden rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]"
+>
         <div class="flex h-full min-w-0 flex-col items-center justify-center gap-4 text-center">
           <div class="showcase-demo-caption text-xs">
             Preview
@@ -203,7 +204,8 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
           </div>
 
           <div
-              class="pointer-events-none absolute inset-x-6 bottom-6 flex justify-center border-t border-dashed border-[var(--preview-brd)] pt-2">
+              class="pointer-events-none absolute inset-x-6 bottom-6 flex justify-center border-t border-dashed border-[var(--preview-brd)] pt-2"
+>
             <div class="showcase-demo-text max-w-[40ch] text-center text-sm">
               {{ previewSummary }}
             </div>
@@ -211,7 +213,7 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet" />
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
@@ -221,15 +223,15 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
 
       <div class="grid gap-4">
         <GrFormField label="View">
-          <GrRadioGroup v-model="view" :options="viewOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="view" :options="viewOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Size">
-          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Options view">
-          <GrRadioGroup v-model="optionsView" :options="optionsViewOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="optionsView" :options="optionsViewOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Variant (link only)">
@@ -252,11 +254,11 @@ const linkVariantDisabled = computed(() => view.value !== 'link')
         </GrFormField>
 
         <GrFormField label="Placeholder">
-          <GrInput v-model="placeholder" placeholder="Pick workspace" aria-label="Placeholder"/>
+          <GrInput v-model="placeholder" placeholder="Pick workspace" aria-label="Placeholder" />
         </GrFormField>
 
         <GrFormField label="Accessibility label">
-          <GrInput v-model="ariaLabel" placeholder="Optional override for screen readers" aria-label="Accessibility label"/>
+          <GrInput v-model="ariaLabel" placeholder="Optional override for screen readers" aria-label="Accessibility label" />
         </GrFormField>
 
         <GrFormField label="Custom value placeholder">

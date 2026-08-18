@@ -201,13 +201,11 @@ export function useGrComponentSize<TSize extends string = GrComponentSize>(
     if (fromConfig === undefined) return fallback
 
     if (supported && !supported.includes(fromConfig as TSize)) {
-      // Проверку окружения держим инлайном: бандлер потребителя подставляет
-      // `process.env.NODE_ENV`, сворачивает условие в `false` и выкидывает
-      // и текст предупреждения, и дедуп-Set. Через промежуточную константу
-      // это не работает — межмодульную свёртку esbuild/rollup не делают, и
-      // DX-сообщение осталось бы в каждом бандле (проверено замером).
-      // `typeof process` — страховка для сборок, где `process` не определён.
-      if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production')
+      // Текст предупреждения и его дедуп живут прямо под гардом, а не в общей
+      // функции: `__GR_DEV__` разворачивается в условие на сборке, бандлер
+      // потребителя сворачивает его в `false` и выкидывает ветку целиком.
+      // Почему не рантайм-хелпер — в `vite.config.ts`, у самого `define`.
+      if (__GR_DEV__)
         warnUnsupportedSize(fromConfig, supported)
       return fallback
     }

@@ -337,7 +337,7 @@ watch(
 watch(
   itemsResolved,
   (items) => {
-    if (process.env.NODE_ENV === 'production') return
+    if (!__GR_DEV__) return
     const duplicates = findDuplicateCommandIds(items)
     if (!duplicates.length) return
 

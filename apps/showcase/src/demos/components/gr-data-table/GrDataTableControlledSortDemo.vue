@@ -57,7 +57,7 @@ function onSortChange(event: { key: string, dir: 'asc' | 'desc' }) {
       :columns="columns"
       row-key="id"
       external-sort
-      @sortChange="onSortChange"
+      @sort-change="onSortChange"
     />
   </div>
 </template>

@@ -529,7 +529,7 @@
     "vue-tsc": "^3.3.7"
   },
   "scripts": {
-    "build": "vite build && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json",
+    "build": "vite build && node scripts/check-dist-dev-guard.mjs && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json",
     "check:messages": "fint-i18n-check-messages src/i18n/locales",
     "dev": "vite build --watch",
     "doctor": "granular doctor ./granular.options.mjs --strict",

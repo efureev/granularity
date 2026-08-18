@@ -327,7 +327,7 @@ function toCssLength(value: GrDropdownWidth): string | undefined {
   // — и предупреждаем: `width="48"` легко прочесть как токен шкалы `w-48`.
   const bare = value.trim()
   if (/^\d+$/.test(bare)) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (__GR_DEV__) {
       console.warn(
         `[GrDropdown] width="${value}" трактуется как ${bare}px. `
         + 'Шкалы tailwind-токенов (w-48) у пропа больше нет — укажите единицы: '
@@ -359,7 +359,7 @@ function onContentClick(): void {
 // без ARIA. Молчать об этом нельзя: панель просто не открывалась бы, и искать
 // причину пришлось бы в чужом коде.
 onMounted(() => {
-  if (process.env.NODE_ENV === 'production')
+  if (!__GR_DEV__)
     return
   if (rootEl.value?.querySelector('[aria-haspopup]'))
     return

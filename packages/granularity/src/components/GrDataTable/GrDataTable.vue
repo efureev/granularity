@@ -360,7 +360,7 @@ function syntheticRowKey(row: TRow): string {
   const generated = `gr-row-${syntheticKeyCounter}`
   syntheticKeys.set(row, generated)
 
-  if (!missingKeyWarned.value && process.env.NODE_ENV !== 'production') {
+  if (!missingKeyWarned.value && __GR_DEV__) {
     missingKeyWarned.value = true
     console.warn(
       `[GrDataTable] У строки нет значения по ключу "${String(props.rowKey)}". `

@@ -92,7 +92,8 @@ const previewCode = computed(() => {
   <div class="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_320px]">
     <div class="grid gap-4">
       <div
-          class="relative grid min-h-[240px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
+          class="relative grid min-h-[240px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]"
+>
         <div class="flex h-full flex-col items-center justify-center gap-5 text-center">
           <div class="showcase-demo-caption text-xs">
             Preview
@@ -116,7 +117,7 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet" />
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
@@ -126,19 +127,19 @@ const previewCode = computed(() => {
 
       <div class="grid gap-4">
         <GrFormField label="Tone">
-          <GrSelect v-model="tone" :options="toneOptions" aria-label="Badge tone"/>
+          <GrSelect v-model="tone" :options="toneOptions" aria-label="Badge tone" />
         </GrFormField>
 
         <GrFormField label="Size">
-          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Radius">
-          <GrRadioGroup v-model="radius" :options="radiusOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="radius" :options="radiusOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Label">
-          <GrInput v-model="label" placeholder="Beta" aria-label="Badge label"/>
+          <GrInput v-model="label" placeholder="Beta" aria-label="Badge label" />
         </GrFormField>
       </div>
 

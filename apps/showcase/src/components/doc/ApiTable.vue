@@ -31,9 +31,15 @@ defineProps<{
         </colgroup>
         <thead class="showcase-table-head">
           <tr>
-            <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.name') }}</th>
-            <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.type') }}</th>
-            <th class="px-5 py-3 font-semibold">{{ $t('showcase.docComponents.apiTable.head.details') }}</th>
+            <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.docComponents.apiTable.head.name') }}
+</th>
+            <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.docComponents.apiTable.head.type') }}
+</th>
+            <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.docComponents.apiTable.head.details') }}
+</th>
           </tr>
         </thead>
         <tbody>

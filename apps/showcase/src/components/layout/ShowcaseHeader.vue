@@ -17,7 +17,7 @@ import IconLayers from '~icons/lucide/layers'
 import IconMenu from '~icons/lucide/menu'
 
 const emit = defineEmits<{
-  (event: 'open-mobile-navigation'): void
+  (event: 'openMobileNavigation'): void
 }>()
 
 const route = useRoute()
@@ -63,7 +63,7 @@ function getTopNavigationItemClass(item: ShowcaseNavigationItem) {
           size="sm"
           square
           :aria-label="$t('showcase.header.openNavigation')"
-          @click="emit('open-mobile-navigation')"
+          @click="emit('openMobileNavigation')"
         >
           <IconMenu class="h-4 w-4" aria-hidden="true" />
         </GrButton>

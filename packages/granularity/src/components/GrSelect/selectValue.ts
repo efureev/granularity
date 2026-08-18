@@ -15,7 +15,7 @@ export function selectValueKey(value: unknown, valueKey?: string): string {
   if (value !== null && typeof value === 'object') {
     const own = valueKey ? (value as Record<string, unknown>)[valueKey] : undefined
 
-    if (own === undefined && import.meta.env?.DEV) {
+    if (own === undefined && __GR_DEV__) {
       console.warn(
         '[granularity] GrSelect: объектные значения требуют `valueKey` с именем поля-идентификатора; '
         + 'без него опции неотличимы друг от друга.',

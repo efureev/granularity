@@ -428,7 +428,7 @@ export function resolveDemoComponent(previewKey?: string) {
 async function loadSource(path: string): Promise<string | undefined> {
   const loader = demoSources[`./${path}`]
 
-  return loader ? (await loader()) as string : undefined
+  return loader ? (loader()) : undefined
 }
 
 /** Соседние файлы демо: `import X from './X.vue'`, `from './useThing'`. */

@@ -30,7 +30,9 @@ const hasDescription = computed(() => Boolean(slots.description) || false)
 
     <div :class="(eyebrow || hasEyebrow) ? 'mt-5 space-y-4' : 'space-y-4'">
       <h1 v-if="title || hasTitle" class="max-w-4xl text-3xl font-semibold leading-tight lg:text-4xl">
-        <slot name="title">{{ title }}</slot>
+        <slot name="title">
+{{ title }}
+</slot>
       </h1>
       <p v-if="description || hasDescription" class="showcase-text-muted max-w-3xl text-base leading-7">
         <InlineRichText :text="description" />

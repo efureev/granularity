@@ -124,7 +124,8 @@ const previewCode = computed(() => {
   <div class="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_320px]">
     <div class="grid gap-4">
       <div
-          class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]">
+          class="relative grid min-h-[280px] rounded-[24px] border border-dashed border-[var(--preview-brd)] bg-[image:var(--preview-surface)] p-6 pb-[72px]"
+>
         <div class="flex h-full flex-col items-center justify-center gap-4 text-center">
           <div class="showcase-demo-caption text-xs">
             Preview
@@ -140,14 +141,15 @@ const previewCode = computed(() => {
               :square="square"
               :aria-label="effectiveAriaLabel"
           >
-            <IconSparkles v-if="square && !loading" class="h-4 w-4" aria-hidden="true"/>
+            <IconSparkles v-if="square && !loading" class="h-4 w-4" aria-hidden="true" />
             <template v-else>
               {{ buttonText }}
             </template>
           </GrButton>
 
           <div
-              class="pointer-events-none absolute inset-x-6 bottom-6 flex justify-center border-t border-dashed border-[var(--preview-brd)] pt-2">
+              class="pointer-events-none absolute inset-x-6 bottom-6 flex justify-center border-t border-dashed border-[var(--preview-brd)] pt-2"
+>
             <div class="showcase-demo-text max-w-[40ch] text-center text-sm">
               {{ previewSummary }}
             </div>
@@ -155,7 +157,7 @@ const previewCode = computed(() => {
         </div>
       </div>
 
-      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet"/>
+      <CodeBlock :code="previewCode" language="vue" expanded title="Rendered snippet" />
     </div>
 
     <div class="showcase-demo-panel grid gap-4 rounded-[28px] border p-4 lg:p-5">
@@ -165,19 +167,19 @@ const previewCode = computed(() => {
 
       <div class="grid gap-4">
         <GrFormField label="Variant">
-          <GrSelect v-model="variant" :options="variantOptions" aria-label="Variant"/>
+          <GrSelect v-model="variant" :options="variantOptions" aria-label="Variant" />
         </GrFormField>
 
         <GrFormField label="Tone">
-          <GrSelect v-model="tone" :options="toneOptions" aria-label="Tone"/>
+          <GrSelect v-model="tone" :options="toneOptions" aria-label="Tone" />
         </GrFormField>
 
         <GrFormField label="Size">
-          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="size" :options="sizeOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Type">
-          <GrRadioGroup v-model="type" :options="typeOptions" variant="button" size="sm"/>
+          <GrRadioGroup v-model="type" :options="typeOptions" variant="button" size="sm" />
         </GrFormField>
 
         <GrFormField label="Button label">

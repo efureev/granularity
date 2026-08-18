@@ -315,3 +315,177 @@ describe('GrPromptDialog — rules', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Связка поля с текстом ошибки — самая длинная молчаливая цепочка в диалоге.
+ *
+ * Диалог не ставит `aria-*` сам: `GrFormField` генерирует `id` контейнера
+ * ошибки, кладёт его в контекст, `useGrFormControl` достаёт оттуда, и уже
+ * `GrInput` печатает `aria-describedby` с `aria-invalid`. Порвётся любое звено —
+ * ни один существующий тест этого не заметит, а axe со страницы витрины видит
+ * только закрытый диалог.
+ */
+describe('GrPromptDialog: связка поля с ошибкой', () => {
+  function mountPrompt(props: Record<string, unknown> = {}) {
+    const Harness = defineComponent({
+      name: 'HarnessPromptAria',
+      components: { GrPromptDialog },
+      props: { extra: { type: Object, default: () => ({}) } },
+      setup() {
+        const open = ref(true)
+        const value = ref('')
+        return { open, value }
+      },
+      template: '<GrPromptDialog v-model="open" v-model:value="value" title="T" required v-bind="extra" />',
+    })
+
+    // `attachTo` обязателен: связку проверяем через `document.getElementById`,
+    // то есть узел с ошибкой должен реально лежать в документе.
+    return mount(Harness, {
+      props: { extra: props },
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+  }
+
+  const input = (wrapper: ReturnType<typeof mountPrompt>) =>
+    wrapper.get('[data-testid="gr-prompt-input"]')
+
+  it('до первого blur поле не помечено ошибочным', async () => {
+    const wrapper = mountPrompt()
+    await nextTick()
+
+    // Пустое обязательное поле — ещё не ошибка: пользователь его не трогал.
+    // Красная рамка и `aria-invalid` при открытии обвиняют раньше времени.
+    expect(input(wrapper).attributes('aria-invalid')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('после blur пустого поля появляются aria-invalid и ссылка на текст ошибки', async () => {
+    const wrapper = mountPrompt()
+    await nextTick()
+
+    await input(wrapper).trigger('blur')
+    await nextTick()
+
+    const describedBy = input(wrapper).attributes('aria-describedby')
+
+    expect(input(wrapper).attributes('aria-invalid')).toBe('true')
+    expect(describedBy).toBeTruthy()
+
+    // Проверяем не факт атрибута, а адрес: он обязан вести в узел с текстом
+    // ошибки, а не в подсказку и не в пустоту.
+    const errorNode = document.getElementById(describedBy!)
+    expect(errorNode).not.toBeNull()
+    expect(errorNode!.textContent?.trim()).not.toBe('')
+
+    wrapper.unmount()
+  })
+
+  it('внешняя ошибка поля помечает его сразу, не дожидаясь blur', async () => {
+    const wrapper = mountPrompt({ fieldError: 'Такой логин занят' })
+    await nextTick()
+
+    const describedBy = input(wrapper).attributes('aria-describedby')
+
+    expect(input(wrapper).attributes('aria-invalid')).toBe('true')
+    expect(document.getElementById(describedBy!)?.textContent).toContain('Такой логин занят')
+
+    wrapper.unmount()
+  })
+
+  it('multiline держит ту же связку на textarea', async () => {
+    const wrapper = mountPrompt({ multiline: true })
+    await nextTick()
+
+    expect(input(wrapper).element.tagName).toBe('TEXTAREA')
+
+    await input(wrapper).trigger('blur')
+    await nextTick()
+
+    const describedBy = input(wrapper).attributes('aria-describedby')
+
+    expect(input(wrapper).attributes('aria-invalid')).toBe('true')
+    expect(document.getElementById(describedBy!)?.textContent?.trim()).not.toBe('')
+
+    wrapper.unmount()
+  })
+
+  it('повторное открытие снимает ошибку вместе с прикосновением', async () => {
+    const Harness = defineComponent({
+      name: 'HarnessPromptReopen',
+      components: { GrPromptDialog },
+      setup() {
+        const open = ref(true)
+        const value = ref('')
+        return { open, value }
+      },
+      template: '<GrPromptDialog v-model="open" v-model:value="value" title="T" required />',
+    })
+
+    const wrapper = mount(Harness, {
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+    await nextTick()
+
+    await wrapper.get('[data-testid="gr-prompt-input"]').trigger('blur')
+    await nextTick()
+    expect(wrapper.get('[data-testid="gr-prompt-input"]').attributes('aria-invalid')).toBe('true')
+
+    wrapper.vm.open = false
+    await nextTick()
+    wrapper.vm.open = true
+    await nextTick()
+
+    expect(wrapper.get('[data-testid="gr-prompt-input"]').attributes('aria-invalid')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Два диалога на одной странице не делят `id`.
+   *
+   * Ровно ради этого `GrFormField` генерирует `id` сам, а не берёт литерал —
+   * комментарий в шаблоне помнит, как литеральный id ломал пару открытых
+   * диалогов: `aria-describedby` второго указывал в контейнер первого.
+   *
+   * Оба диалога живут в одном приложении намеренно: `useId()` нумерует внутри
+   * приложения, и два отдельных `mount()` дали бы совпадение идентификаторов
+   * там, где у потребителя его не бывает.
+   */
+  it('два диалога не делят идентификаторы', async () => {
+    const Harness = defineComponent({
+      name: 'HarnessTwoPrompts',
+      components: { GrPromptDialog },
+      setup() {
+        return { openA: ref(true), openB: ref(true), a: ref(''), b: ref('') }
+      },
+      template: `
+        <div>
+          <GrPromptDialog v-model="openA" v-model:value="a" title="A" field-error="Первая" />
+          <GrPromptDialog v-model="openB" v-model:value="b" title="B" field-error="Вторая" />
+        </div>
+      `,
+    })
+
+    const wrapper = mount(Harness, {
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+    await nextTick()
+
+    const [firstId, secondId] = wrapper
+      .findAll('[data-testid="gr-prompt-input"]')
+      .map(field => field.attributes('aria-describedby'))
+
+    expect(firstId).toBeTruthy()
+    expect(secondId).toBeTruthy()
+    expect(firstId).not.toBe(secondId)
+    expect(document.getElementById(firstId!)?.textContent).toContain('Первая')
+    expect(document.getElementById(secondId!)?.textContent).toContain('Вторая')
+
+    wrapper.unmount()
+  })
+})

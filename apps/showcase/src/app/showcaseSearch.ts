@@ -26,6 +26,9 @@ export function normalizeSearchValue(value: string): string {
   return value
     .toLowerCase()
     .normalize('NFKD')
+    // Нижняя граница диапазона ASCII, а не управляющий символ: класс оставляет
+    // латиницу, цифры и буквы любых алфавитов, остальное схлопывает в пробел.
+    // eslint-disable-next-line no-control-regex
     .replace(/[^\u0000-\u007E\p{L}\p{N}]+/gu, ' ')
     .replace(/\s+/g, ' ')
     .trim()

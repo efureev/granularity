@@ -7,7 +7,6 @@ import {
   GrButton,
   GrCard,
   GrDialog,
-  GrDropdown,
   GrFileUpload,
   GrInput,
   GrTextarea,
@@ -38,7 +37,7 @@ import {
   runFileValidators,
 } from '@feugene/granularity/fileValidation'
 
-const props = defineProps<{
+defineProps<{
   previewKey: string
 }>()
 
@@ -353,7 +352,7 @@ async function runNetworkDemo() {
       </GrButton>
 
       <GrDialog v-model="dialogOpen" title="Invite teammate" size="sm">
-        <div class="grid gap-3 text-sm text-[var(--gr-muted-fg)]" v-autofocus="{ selector: 'input', preventScroll: true }">
+        <div v-autofocus="{ selector: 'input', preventScroll: true }" class="grid gap-3 text-sm text-[var(--gr-muted-fg)]">
           <p>После открытия dialog фокус попадёт в первое поле ввода.</p>
           <GrInput model-value="" placeholder="name@company.com" />
           <GrInput model-value="" placeholder="Role" />

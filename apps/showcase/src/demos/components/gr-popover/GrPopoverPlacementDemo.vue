@@ -10,7 +10,7 @@ const placements = ['top', 'right', 'bottom', 'left'] as const
       v-for="placement in placements"
       :key="placement"
       :placement="placement"
-      :aria-label="'Opens on the ' + placement"
+      :aria-label="`Opens on the ${ placement}`"
       size="sm"
     >
       <template #trigger="{ triggerProps }">

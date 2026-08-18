@@ -268,6 +268,58 @@ describe('GrDescriptionList', () => {
     expect(wrapper.get('dt').attributes('style')).toBeUndefined()
     expect(wrapper.get('[data-gr-description-list]').attributes('style')).toContain('/ 2)')
   })
+
+  /**
+   * Семантика — то, ради чего компонент существует.
+   *
+   * Список характеристик, собранный из `<div>`, для скринридера просто набор
+   * текста: связи «термин → значение» в нём нет, перемещаться по парам нечем.
+   * Поэтому корень обязан быть `<dl>`, а пара — `dt` + `dd` внутри обёртки
+   * (`dl > div > dt + dd` валиден по HTML5 и нужен раскладке).
+   */
+  it('рендерит настоящий dl с парами dt + dd', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items } })
+
+    expect(wrapper.element.tagName).toBe('DL')
+
+    const pairs = wrapper.findAll('[data-gr-description-pair]')
+    expect(pairs).toHaveLength(items.length)
+
+    for (const pair of pairs) {
+      expect(pair.element.parentElement).toBe(wrapper.element)
+      expect(pair.get('[data-gr-description-label]').element.tagName).toBe('DT')
+      expect(pair.get('[data-gr-description-value]').element.tagName).toBe('DD')
+    }
+
+    expect(wrapper.findAll('dt')).toHaveLength(items.length)
+    expect(wrapper.findAll('dd')).toHaveLength(items.length)
+  })
+
+  /**
+   * Пустое значение печатается, а не выкидывает `<dd>`.
+   *
+   * Пара без `dd` ломает `dl` структурно: следующий `dt` встаёт термином без
+   * значения, и дальше вся связка едет на единицу. Прочерк на месте — дешевле
+   * и честнее.
+   */
+  it.each([undefined, null, ''])('пустое значение (%s) остаётся парой с dd', (value) => {
+    const wrapper = mount(GrDescriptionList, {
+      props: { items: [{ label: 'Комментарий', value }] },
+    })
+
+    expect(wrapper.findAll('dt')).toHaveLength(1)
+    expect(wrapper.findAll('dd')).toHaveLength(1)
+    expect(wrapper.get('dd').text()).toBe('—')
+  })
+
+  // Ролей поверх нативной семантики нет: `dl` уже несёт её сам.
+  it('не подменяет семантику ролями', () => {
+    const wrapper = mount(GrDescriptionList, { props: { items } })
+
+    for (const el of [wrapper.element, ...wrapper.element.querySelectorAll('*')]) {
+      expect(el.getAttribute('role'), el.tagName).toBeNull()
+    }
+  })
 })
 
 afterEach(() => {

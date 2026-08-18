@@ -1,10 +1,12 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { announced, resetGranularityDom } from '@feugene/granularity/testing'
 
 import type { PlainDate } from '../../../chrono/plainDate'
+import GrConfigProvider from '@feugene/granularity/components/GrConfigProvider'
+
 import GrCalendar from '../GrCalendar.vue'
 
 function iso(value: string): PlainDate {
@@ -577,5 +579,92 @@ describe('GrCalendar — режимы месяца и года', () => {
 
     expect(await announced()).toBe('2027')
     wrapper.unmount()
+  })
+})
+
+/**
+ * Настройка через `GrConfigProvider`.
+ *
+ * Реестр дефолтов типизируется аугментацией из `defaults.ts`, но сам факт
+ * записи в реестр ничего не гарантирует: гейт `componentDefaults` проверяет
+ * адрес аугментации, а не то, что компонент действительно читает конфиг. Ровно
+ * так `showWeekNumbers` числился настраиваемым и им не был — IDE подсказывала
+ * ключ, `GrConfigProvider` на него не влиял, и ошибки не было ни одной.
+ */
+describe('GrCalendar и GrConfigProvider', () => {
+  function mountWithConfig(defaults: Record<string, unknown>, props: Record<string, unknown> = {}) {
+    const Harness = defineComponent({
+      name: 'HarnessCalendarConfig',
+      components: { GrCalendar, GrConfigProvider },
+      props: {
+        componentDefaults: { type: Object, required: true },
+        calendarProps: { type: Object, default: () => ({}) },
+      },
+      template: `
+        <GrConfigProvider :component-defaults="componentDefaults">
+          <GrCalendar v-bind="calendarProps" />
+        </GrConfigProvider>
+      `,
+    })
+
+    return mount(Harness, {
+      props: {
+        componentDefaults: { GrCalendar: defaults },
+        calendarProps: { viewDate: iso('2026-08-01'), today: iso('2026-08-12'), locale: 'en-US', ...props },
+      },
+      attachTo: document.body,
+    })
+  }
+
+  const weekdays = (wrapper: ReturnType<typeof mountWithConfig>) =>
+    wrapper.findAll('[data-gr-calendar-weekday]').map(node => node.text())
+
+  it('weekStart берётся из конфига', () => {
+    const monday = mountWithConfig({ weekStart: 1 })
+    const sunday = mountWithConfig({ weekStart: 7 })
+
+    expect(weekdays(monday)[0]).not.toBe(weekdays(sunday)[0])
+    expect(weekdays(sunday)[0]).toBe(weekdays(monday)[6])
+
+    monday.unmount()
+    sunday.unmount()
+  })
+
+  it('локальный проп сильнее конфига', () => {
+    const wrapper = mountWithConfig({ weekStart: 7 }, { weekStart: 1 })
+    const configured = mountWithConfig({ weekStart: 1 })
+
+    expect(weekdays(wrapper)).toEqual(weekdays(configured))
+
+    wrapper.unmount()
+    configured.unmount()
+  })
+
+  /**
+   * Локаль остаётся последним звеном, а не первым.
+   *
+   * Если бы конфиг подставлялся всегда, `Intl` перестал бы решать: приложение,
+   * ничего не настраивавшее, получило бы понедельник и в `en-US`, где неделя
+   * начинается с воскресенья.
+   */
+  it('без конфига и пропа первый день недели даёт локаль', () => {
+    const us = mountWithConfig({}, { locale: 'en-US' })
+    const ru = mountWithConfig({}, { locale: 'ru-RU' })
+
+    expect(weekdays(us)[0]).not.toBe(weekdays(ru)[0])
+
+    us.unmount()
+    ru.unmount()
+  })
+
+  it('showWeekNumbers включается конфигом и выключается пропом', () => {
+    const on = mountWithConfig({ showWeekNumbers: true })
+    expect(on.findAll('[data-gr-calendar-week-number]').length).toBeGreaterThan(0)
+
+    const off = mountWithConfig({ showWeekNumbers: true }, { showWeekNumbers: false })
+    expect(off.findAll('[data-gr-calendar-week-number]')).toHaveLength(0)
+
+    on.unmount()
+    off.unmount()
   })
 })

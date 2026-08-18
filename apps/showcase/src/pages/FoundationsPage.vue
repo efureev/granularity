@@ -164,7 +164,9 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
     <section id="installation" class="space-y-6 scroll-mt-28">
       <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-3">
-          <h2 class="text-2xl font-semibold">{{ $t('showcase.foundationsPage.installationTitle') }}</h2>
+          <h2 class="text-2xl font-semibold">
+{{ $t('showcase.foundationsPage.installationTitle') }}
+</h2>
           <CodeBlock
             code="yarn add @feugene/granularity vue"
             language="bash"
@@ -176,9 +178,11 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
       <GrCard class="showcase-panel rounded-3xl border p-6">
         <div class="space-y-4">
           <div class="space-y-2">
-            <h2 class="text-2xl font-semibold">{{ $t('showcase.foundationsPage.quickStartTitle') }}</h2>
+            <h2 class="text-2xl font-semibold">
+{{ $t('showcase.foundationsPage.quickStartTitle') }}
+</h2>
             <p class="showcase-text-muted text-sm leading-6">
-              <InlineRichText :text="$t('showcase.foundationsPage.quickStartDescription')"/>
+              <InlineRichText :text="$t('showcase.foundationsPage.quickStartDescription')" />
             </p>
           </div>
 
@@ -191,18 +195,18 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
               <div class="space-y-3">
                 <div class="flex flex-wrap items-center gap-3">
                   <h3 class="text-lg font-semibold">
-                    <InlineRichText :text="card.title"/>
+                    <InlineRichText :text="card.title" />
                   </h3>
-                  <GrBadge variant="primary" dark v-if="card.id === preferredQuickStartCardId">
+                  <GrBadge v-if="card.id === preferredQuickStartCardId" variant="primary" dark>
                     {{ $t('showcase.foundationsPage.preferredMethod') }}
                   </GrBadge>
                 </div>
                 <p class="showcase-text-muted text-sm leading-6">
-                  <InlineRichText :text="card.description"/>
+                  <InlineRichText :text="card.description" />
                 </p>
-                <CodeBlock :code="card.code" :language="card.language" :title="card.title"/>
+                <CodeBlock :code="card.code" :language="card.language" :title="card.title" />
                 <p class="showcase-text-subtle text-sm leading-6">
-                  <InlineRichText :text="card.note"/>
+                  <InlineRichText :text="card.note" />
                 </p>
               </div>
             </GrCard>
@@ -227,38 +231,43 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
               <GrLink
                   :href="`#${guide.id}`"
                   variant="muted"
-                  class="px-1 text-xs">
-                <IconHash/>
+                  class="px-1 text-xs"
+>
+                <IconHash />
               </GrLink>
             </div>
             <p class="showcase-text-muted text-base leading-7">
-              <InlineRichText :text="guide.summary"/>
+              <InlineRichText :text="guide.summary" />
             </p>
           </div>
 
           <div class="grid gap-4 md:grid-cols-2">
             <div class="space-y-3">
-              <h3 class="text-lg font-semibold">{{ $t('showcase.foundationsPage.keyPointsTitle') }}</h3>
+              <h3 class="text-lg font-semibold">
+{{ $t('showcase.foundationsPage.keyPointsTitle') }}
+</h3>
               <ul class="grid gap-3">
                 <li
                     v-for="item in guide.keyPoints"
                     :key="item"
                     class="showcase-inline-surface rounded-2xl border px-4 py-3 text-sm leading-6"
                 >
-                  <InlineRichText :text="item"/>
+                  <InlineRichText :text="item" />
                 </li>
               </ul>
             </div>
 
             <div class="space-y-3">
-              <h3 class="text-lg font-semibold">{{ $t('showcase.foundationsPage.recommendationsTitle') }}</h3>
+              <h3 class="text-lg font-semibold">
+{{ $t('showcase.foundationsPage.recommendationsTitle') }}
+</h3>
               <ul class="grid gap-3">
                 <li
                     v-for="item in guide.recommendations"
                     :key="item"
                     class="showcase-panel-emphasis rounded-2xl border px-4 py-3 text-sm leading-6"
                 >
-                  <InlineRichText :text="item"/>
+                  <InlineRichText :text="item" />
                 </li>
               </ul>
             </div>
@@ -274,7 +283,9 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
 
           <div v-if="guide.id === 'tokens'" class="space-y-4">
             <div class="space-y-2">
-              <h3 class="text-lg font-semibold">{{ $t('showcase.foundationsPage.currentTokenRegistryTitle') }}</h3>
+              <h3 class="text-lg font-semibold">
+{{ $t('showcase.foundationsPage.currentTokenRegistryTitle') }}
+</h3>
               <p class="showcase-text-muted text-sm leading-6">
                 {{ $t('showcase.foundationsPage.currentTokenRegistryDescription') }}
               </p>
@@ -289,7 +300,9 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                 >
                   <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div class="space-y-1">
-                      <h4 class="text-base font-semibold">{{ group.section }}</h4>
+                      <h4 class="text-base font-semibold">
+{{ group.section }}
+</h4>
                       <p class="showcase-text-subtle text-xs">
                         {{ group.tokens.length }} {{ $t('showcase.foundationsPage.tokensCount') }}
                       </p>
@@ -313,9 +326,15 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                     <table class="min-w-full border-collapse text-left text-sm">
                       <thead class="showcase-table-head">
                       <tr>
-                        <th class="min-w-[200px] px-5 py-3 font-semibold">{{ $t('showcase.foundationsPage.table.token') }}</th>
-                        <th class="px-5 py-3 font-semibold">{{ $t('showcase.foundationsPage.table.value') }}</th>
-                        <th class="px-5 py-3 font-semibold">{{ $t('showcase.foundationsPage.table.description') }}</th>
+                        <th class="min-w-[200px] px-5 py-3 font-semibold">
+{{ $t('showcase.foundationsPage.table.token') }}
+</th>
+                        <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.foundationsPage.table.value') }}
+</th>
+                        <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.foundationsPage.table.description') }}
+</th>
                       </tr>
                       </thead>
 
@@ -367,7 +386,9 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
           <div v-if="guide.id === 'themes'" class="space-y-4">
             <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <div class="space-y-2">
-                <h3 class="text-lg font-semibold">{{ $t('showcase.foundationsPage.currentThemeRegistryTitle') }}</h3>
+                <h3 class="text-lg font-semibold">
+{{ $t('showcase.foundationsPage.currentThemeRegistryTitle') }}
+</h3>
                 <p class="showcase-text-muted max-w-3xl text-sm leading-6">
                   {{ $t('showcase.foundationsPage.currentThemeRegistryDescription') }}
                 </p>
@@ -375,9 +396,13 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
 
               <GrCard class="showcase-panel-soft min-w-[220px] rounded-3xl border px-4 py-3">
                 <div class="flex items-center justify-between gap-4">
-                  <div class="text-sm font-semibold">{{ $t('showcase.foundationsPage.themeLabel') }}</div>
-                  <div class="text-sm">{{ activeThemeLabel }}</div>
-                  <GrSwitch v-model="isDarkThemePreview" size="sm"/>
+                  <div class="text-sm font-semibold">
+{{ $t('showcase.foundationsPage.themeLabel') }}
+</div>
+                  <div class="text-sm">
+{{ activeThemeLabel }}
+</div>
+                  <GrSwitch v-model="isDarkThemePreview" size="sm" />
                 </div>
               </GrCard>
             </div>
@@ -395,7 +420,9 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                 >
                   <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div class="space-y-1">
-                      <h4 class="text-base font-semibold">{{ group.section }}</h4>
+                      <h4 class="text-base font-semibold">
+{{ group.section }}
+</h4>
                       <p class="showcase-text-subtle text-xs">
                         {{ group.tokens.length }} {{ $t('showcase.foundationsPage.tokensCount') }}
                       </p>
@@ -419,9 +446,15 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                     <table class="min-w-full border-collapse text-left text-sm">
                       <thead class="showcase-table-head">
                       <tr>
-                        <th class="min-w-[200px] px-5 py-3 font-semibold">{{ $t('showcase.foundationsPage.table.token') }}</th>
-                        <th class="px-5 py-3 font-semibold">{{ $t('showcase.foundationsPage.table.value') }}</th>
-                        <th class="px-5 py-3 font-semibold">{{ $t('showcase.foundationsPage.table.description') }}</th>
+                        <th class="min-w-[200px] px-5 py-3 font-semibold">
+{{ $t('showcase.foundationsPage.table.token') }}
+</th>
+                        <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.foundationsPage.table.value') }}
+</th>
+                        <th class="px-5 py-3 font-semibold">
+{{ $t('showcase.foundationsPage.table.description') }}
+</th>
                       </tr>
                       </thead>
 
@@ -499,11 +532,11 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                 {{ section.title }}
               </h2>
               <GrLink :href="`#${section.id}`" variant="muted" class="px-1 text-xs">
-                <IconHash/>
+                <IconHash />
               </GrLink>
             </div>
             <p class="showcase-text-muted text-base leading-7">
-              <InlineRichText :text="section.description"/>
+              <InlineRichText :text="section.description" />
             </p>
           </div>
 
@@ -513,7 +546,7 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                 :key="index"
                 class="showcase-inline-surface rounded-2xl border px-4 py-3 text-sm leading-6"
             >
-              <InlineRichText :text="bullet"/>
+              <InlineRichText :text="bullet" />
             </li>
           </ul>
 

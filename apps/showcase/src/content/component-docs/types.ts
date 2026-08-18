@@ -1,4 +1,4 @@
-import { showcaseComponentDetailSections } from '../../app/showcase'
+import type { showcaseComponentDetailSections } from '../../app/showcase'
 
 import type { ShowcaseExampleStatus } from '../model'
 

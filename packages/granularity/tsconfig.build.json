@@ -13,6 +13,9 @@
     "types": ["vite/client", "node", "unplugin-icons/types/vue"]
   },
   "include": [
+    // Объявление `__GR_DEV__`: файл вне `rootDir`, но `.d.ts` вывода не даёт,
+    // а без него сборка типов не знает про подставляемую константу.
+    "vite-env.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

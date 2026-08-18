@@ -61,11 +61,11 @@ describe('showcase discoverability', () => {
     expect(directiveEntity).toBeDefined()
     expect(componentEntity).toBeDefined()
 
-    expect(createImportSnippet(utilityEntity!)).toBe("import { acceptValidator } from '@feugene/granularity/fileValidation'")
-    expect(createImportSnippet(directiveEntity!)).toBe("import { vLoading } from '@feugene/granularity/directives'")
+    expect(createImportSnippet(utilityEntity)).toBe("import { acceptValidator } from '@feugene/granularity/fileValidation'")
+    expect(createImportSnippet(directiveEntity)).toBe("import { vLoading } from '@feugene/granularity/directives'")
 
-    const utilityLinks = createRelatedLinks(utilityEntity!)
-    const componentLinks = createRelatedLinks(componentEntity!)
+    const utilityLinks = createRelatedLinks(utilityEntity)
+    const componentLinks = createRelatedLinks(componentEntity)
 
     expect(utilityLinks.map(link => link.label)).toEqual(expect.arrayContaining([
       'Package source',

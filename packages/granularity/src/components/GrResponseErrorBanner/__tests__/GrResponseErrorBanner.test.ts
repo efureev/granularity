@@ -221,4 +221,67 @@ describe('пресеты поверх базового баннера', () => {
       files: [{ name: 'a.pdf' }],
     })
   })
+
+  /**
+   * `kind` доезжает до скринридера ролью, а не только цветом.
+   *
+   * Баннер сам ролей не ставит — их выбирает `GrAlert` по тону, а тон приходит
+   * из `kind`. Цепочка длинная и вся молчаливая: перепутанный тон в
+   * `DEFAULT_TONE_BY_KIND` превратит `role="alert"` в `role="status"`, и отказ
+   * сети перестанет перебивать речь. Для axe обе роли валидны, так что кроме
+   * этого теста цепочку не держит ничто.
+   *
+   * Речь перебивают оба «плохих» тона — и `danger`, и `warning`: ошибка ввода
+   * так же требует ответа, как отказ сети. Тихим остаётся только `aborted`:
+   * отмену запросил сам пользователь, и объявлять её поверх его действия не за
+   * что.
+   */
+  it.each([
+    ['network', 'alert'],
+    ['server', 'alert'],
+    ['unknown', 'alert'],
+    ['validation', 'alert'],
+    ['client', 'alert'],
+    ['aborted', 'status'],
+  ] as const)('%s объявляется как %s', (kind, role) => {
+    const wrapper = mount(GrResponseErrorBanner, { props: { error: info({ kind }) } })
+
+    expect(wrapper.get('[data-gr-alert]').attributes('role')).toBe(role)
+  })
+
+  it('кнопка повтора — настоящая кнопка с доступным именем', () => {
+    const wrapper = mount(GrResponseErrorBanner, {
+      props: { error: info(), canRetry: true },
+    })
+
+    const retry = wrapper.get('[data-testid="response-error-retry"]')
+
+    expect(retry.element.tagName).toBe('BUTTON')
+    expect(retry.text()).toBe(DEFAULT_RESPONSE_ERROR_TEXTS.retryLabel)
+  })
+
+  /**
+   * Детали — настоящий список, а не строки в `<div>`.
+   *
+   * Скринридер объявляет число пунктов и даёт по ним перемещаться; из десятка
+   * `<div>` он не соберёт ни того, ни другого — а деталей у ошибки валидации
+   * бывает и десяток.
+   */
+  it('детали объявляются списком', () => {
+    const wrapper = mount(GrResponseErrorBanner, {
+      props: { error: info({ kind: 'validation', details: ['Слишком коротко', 'Нет домена'] }) },
+    })
+
+    const list = wrapper.get('[data-testid="response-error-details"]')
+
+    expect(list.element.tagName).toBe('UL')
+    expect(list.findAll('li')).toHaveLength(2)
+  })
+
+  // Глиф тона — оформление: озвучивать его нечем и незачем.
+  it('иконка тона скрыта от скринридера', () => {
+    const wrapper = mount(GrResponseErrorBanner, { props: { error: info() } })
+
+    expect(wrapper.get('[data-gr-alert-icon]').attributes('aria-hidden')).toBe('true')
+  })
 })
