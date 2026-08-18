@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 75 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 76 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -1142,6 +1142,17 @@
     "context": "data / component",
     "searchableTitle": "grstatistic",
     "searchableContent": "grstatistic grstatistic highlights a key metric with a caption, formatting and a trend line. data component /components/gr-statistic packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grstatistic generated public-api components components gr-statistic gr statistic"
+  },
+  {
+    "id": "entity:component:GrSteps",
+    "title": "GrSteps",
+    "description": "Shows where the user is in a multi-step process and can hold them back until the step checks out.",
+    "href": "/components/gr-steps",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "navigation / component",
+    "searchableTitle": "grsteps",
+    "searchableContent": "grsteps grsteps shows where the user is in a multi-step process and can hold them back until the step checks out. navigation component /components/gr-steps packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grsteps generated public-api new components components gr-steps gr steps"
   },
   {
     "id": "entity:component:GrSwitch",
@@ -4299,6 +4310,50 @@
     "context": "GrStatistic",
     "searchableTitle": "grstatistic integration notes",
     "searchableContent": "grstatistic highlights a key metric with a caption, formatting and a trend line. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrSteps:section:overview",
+    "title": "GrSteps / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-steps#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSteps",
+    "searchableTitle": "grsteps component overview",
+    "searchableContent": "grsteps shows where the user is in a multi-step process and can hold them back until the step checks out. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrSteps:section:live-examples",
+    "title": "GrSteps / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-steps#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSteps",
+    "searchableTitle": "grsteps live examples",
+    "searchableContent": "grsteps shows where the user is in a multi-step process and can hold them back until the step checks out. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrSteps:section:api",
+    "title": "GrSteps / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-steps#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSteps",
+    "searchableTitle": "grsteps generated api",
+    "searchableContent": "grsteps shows where the user is in a multi-step process and can hold them back until the step checks out. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrSteps:section:integration-notes",
+    "title": "GrSteps / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-steps#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrSteps",
+    "searchableTitle": "grsteps integration notes",
+    "searchableContent": "grsteps shows where the user is in a multi-step process and can hold them back until the step checks out. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrSwitch:section:overview",

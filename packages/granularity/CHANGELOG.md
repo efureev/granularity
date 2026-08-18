@@ -58,6 +58,43 @@ to [Semantic Versioning](https://semver.org/).
 - **i18n:** `gr.chip.remove` and `gr.chip.removeNamed` in `en`, `ru` and `es`. The named form is the
   default whenever the chip has a `label`: twenty buttons all called "Remove" give a screen-reader
   user no way to pick the right one.
+- **New `GrSteps` — the indicator for a multi-step wizard.** Checkout, sign-up, an import run:
+  where the user is in the process, what is behind them and where they may return to. `steps` is a
+  plain array of `{ value, label, description?, icon?, status?, disabled? }`; `linear` limits
+  forward movement to the first unfinished step while leaving the way back open, because going
+  back to correct something already filled in is ordinary editing, not a way around the rule.
+  Horizontal for a wizard header, vertical for a side panel, and `variant="compact"` — the current
+  step's label, a counter and a `GrProgressBar` — for a column too narrow for seven markers.
+  `next()`, `back()` and `goTo()` are exposed through the ref, since the wizard's own buttons
+  belong in the page footer next to "Cancel", not inside the indicator.
+
+  **Step validation goes through the `beforeLeave(from, to)` gate, not through knowing about
+  `GrForm`.** Return `false` and the transition does not happen; inside it the consumer calls
+  `validate()` or `validateField()` on whichever fields belong to the step. So `GrSteps` never
+  reads the form's context, and the form's public API did not have to grow a batch-validation
+  method to serve one component. Every transition the component initiates passes the gate —
+  a click on a step, `next()`, `back()`, `goTo()`. Changing `v-model` from the outside does not,
+  because that is already the application's decision and intercepting it would be a lie.
+
+  **The `error` status is set from the outside.** Three statuses follow from position — before the
+  current one is `complete`, the current one is `current`, after it is `upcoming` — but the fourth
+  cannot: an error lives in the form, not in the order of steps. Mark it yourself when a step was
+  passed but did not hold, and the wizard becomes able to say "step 2 still has errors". A step in
+  error is not the edge of what is done: under `linear` nothing past it is reachable.
+
+  **This is navigation, not a tablist.** The root is a `<nav>` with an `<ol>`, and the items carry
+  no roles at all: `role="tab"` without a `tabpanel` is a broken pattern, and a wizard's step
+  content is ordinary markup. A completed step is a `<button>` with its own Tab stop, the current
+  one is a `<span aria-current="step">`, and a future or disabled step stays out of the tab order —
+  the shape `GrBreadcrumbs` and `GrBottomNav` already hold. There is no roving tabindex, and that
+  is deliberate: the one-Tab-stop rule covers widgets that select a value, whereas here the ring of
+  arrows would mostly walk over what is unreachable. "Step 2 of 4" lives in its own
+  `role="status"` region in the markup rather than going through the announcer, because it is
+  state, not an event.
+- **i18n:** `gr.steps.label`, `gr.steps.status`, `gr.steps.completed` and `gr.steps.error` in `en`,
+  `ru` and `es`. The last two are the hidden state captions inside a step: without them a completed
+  step and a step in error sound exactly alike — the marker's colour is not available to a screen
+  reader.
 
 ### Fixed
 

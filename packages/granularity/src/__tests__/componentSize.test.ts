@@ -48,6 +48,7 @@ import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrRadioGroup from '../components/GrRadioGroup/GrRadioGroup.vue'
 import GrRating from '../components/GrRating/GrRating.vue'
 import GrSegmented from '../components/GrSegmented/GrSegmented.vue'
+import GrSteps from '../components/GrSteps/GrSteps.vue'
 import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrSlider from '../components/GrSlider/GrSlider.vue'
 import GrStatistic from '../components/GrStatistic/GrStatistic.vue'
@@ -175,6 +176,13 @@ const harnesses: { name: string, render: () => unknown }[] = [
     }),
   },
   { name: 'GrSelect', render: () => h(GrSelect, { modelValue: '', options: [] }) },
+  {
+    name: 'GrSteps',
+    render: () => h(GrSteps, {
+      modelValue: 'a',
+      steps: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }],
+    }),
+  },
   { name: 'GrSlider', render: () => h(GrSlider, { modelValue: 0 }) },
   { name: 'GrStatistic', render: () => h(GrStatistic, { value: 42 }) },
   { name: 'GrSwitch', render: () => h(GrSwitch, { modelValue: false }) },

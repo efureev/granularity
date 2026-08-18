@@ -13,6 +13,12 @@
   "loading": {
     "defaultText": "Cargando..."
   },
+  "steps": {
+    "label": "Progreso",
+    "status": "Paso {step} de {count}",
+    "completed": "completado",
+    "error": "tiene errores"
+  },
   "treeSelect": {
     "filterPlaceholder": "Buscar…",
     "empty": "Sin datos",

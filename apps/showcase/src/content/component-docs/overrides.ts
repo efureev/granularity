@@ -75,6 +75,7 @@ import {
   grTableExamples,
   grRatingExamples,
   grStatisticExamples,
+  grStepsExamples,
   grCommandPaletteExamples,
 } from './examples'
 import type { ShowcaseComponentDocMeta, ShowcaseComponentExampleDoc, ShowcaseComponentOverviewDoc } from './types'
@@ -253,6 +254,18 @@ const grRatingOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grStepsOverview = {
+  paragraphs: [
+    'Показывает, где пользователь в многошаговом процессе: что пройдено, где он сейчас и куда можно вернуться. Умеет не пустить вперёд, пока текущий шаг не сошёлся.',
+  ],
+  features: [
+    'Горизонтальная лента и вертикальная колонка',
+    'Гейт перехода: валидация шага вашим кодом',
+    'Шаг с ошибкой виден в ленте',
+    'Компактный вид для узкой колонки',
+  ],
+}
+
 const grStatisticOverview: ShowcaseComponentOverviewDoc = {
   paragraphs: [
     'Ключевая цифра, которую видно с другого конца комнаты: выручка, число пользователей, конверсия. Подпись, приписки и форматирование разрядов — уже внутри, считать и склеивать строки не нужно.',
@@ -417,6 +430,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrSplitter: createComponentDocMeta(grSplitterExamples),
   GrRating: createComponentDocMeta(grRatingExamples, grRatingOverview),
   GrStatistic: createComponentDocMeta(grStatisticExamples, grStatisticOverview),
+  GrSteps: createComponentDocMeta(grStepsExamples, grStepsOverview),
   GrCommandPalette: createComponentDocMeta(grCommandPaletteExamples, grCommandPaletteOverview),
   GrSelect: createComponentDocMeta(grSelectExamples),
   GrFilePreview: createComponentDocMeta(grFilePreviewExamples, grFilePreviewOverview),

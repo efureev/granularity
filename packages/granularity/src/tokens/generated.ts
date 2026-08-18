@@ -3079,6 +3079,34 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет самого значения."
   },
   {
+    "owner": "GrSteps",
+    "name": "--gr-steps-marker-size",
+    "kind": "inline",
+    "default": "1.25rem / 1.5rem / 1.75rem / 2rem по ступеням `xs…lg`",
+    "description": "Диаметр маркера шага. Задаётся ступенью размера и служит опорой для соединителя: линия центруется по этому значению."
+  },
+  {
+    "owner": "GrSteps",
+    "name": "--gr-steps-connector-size",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина линии между шагами."
+  },
+  {
+    "owner": "GrSteps",
+    "name": "--gr-steps-connector-done",
+    "kind": "hook",
+    "default": "var(--gr-primary-solid)",
+    "description": "Цвет пройденного участка линии."
+  },
+  {
+    "owner": "GrSteps",
+    "name": "--gr-steps-connector-pending",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Цвет непройденного участка линии."
+  },
+  {
     "owner": "GrSwitch",
     "name": "--gr-switch-track-bg",
     "kind": "inline",

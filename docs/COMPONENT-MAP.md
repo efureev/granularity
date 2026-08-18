@@ -163,8 +163,13 @@
 | нижняя панель разделов на мобильном | [`GrBottomNav`](../packages/granularity/docs/components/GrBottomNav.md) |
 | путь до текущей страницы | [`GrBreadcrumbs`](../packages/granularity/docs/components/GrBreadcrumbs.md) |
 | разделы внутри одной страницы | [`GrTabs`](../packages/granularity/docs/components/GrTabs.md) + [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) |
+| этапы процесса по порядку | [`GrSteps`](../packages/granularity/docs/components/GrSteps.md) |
 | страницы длинного списка | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) |
 | одиночный переход | [`GrLink`](../packages/granularity/docs/components/GrLink.md) |
+
+Различитель между вкладками и шагами — **порядок**: вкладки равноправны и
+переключаются как угодно, шаги идут один за другим, помнят пройденное и умеют не
+пустить вперёд. Отсюда у шагов `aria-current`, а у вкладок `aria-selected`.
 
 ### Действие
 
@@ -370,6 +375,7 @@
 | [`GrSparkline`](../packages/granularity-charts/docs/components/GrSparkline.md) | charts | тренд в ячейке таблицы |
 | [`GrSplitter`](../packages/granularity/docs/components/GrSplitter.md) | ядро | двум областям нужна общая граница |
 | [`GrStatistic`](../packages/granularity/docs/components/GrStatistic.md) | ядро | один показатель — главный |
+| [`GrSteps`](../packages/granularity/docs/components/GrSteps.md) | ядро | оформление заказа или регистрация |
 | [`GrSwitch`](../packages/granularity/docs/components/GrSwitch.md) | ядро | настройка включается сразу |
 | [`GrTable`](../packages/granularity/docs/components/GrTable.md) | ядро | ячейки оформляет потребитель |
 | [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) | ядро | к вкладкам нужны панели |
@@ -392,7 +398,7 @@
 
 **Планируется в ядро.** `GrTransfer` — перенос
 между двумя списками; `GrCarousel` — карусель; `GrAffix` — прилипание к краю
-при скролле; `GrMenu` — вертикальное меню навигации; `GrSteps` — шаги мастера.
+при скролле; `GrMenu` — вертикальное меню навигации.
 
 **Планируется отдельными пакетами.** Форма из схемы
 бэкенда, rich-text и markdown, кроп аватара и камера, связка «таблица ↔ фильтры

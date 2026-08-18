@@ -439,6 +439,41 @@ test.describe('GrBottomNav: выбор раздела', () => {
   })
 })
 
+test.describe('GrSteps: проход мастера', () => {
+  test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
+    await page.goto(componentPath('GrSteps'))
+    await page.locator('#live-examples').waitFor()
+
+    const demo = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-gr-step][data-value="contacts"]') })
+      .first()
+
+    // Будущий шаг рендерится `<span>`: он виден и объявлен, но дойти до него
+    // клавиатурой нельзя. Ровно это jsdom и не показывает — там `tabindex`
+    // проверяется атрибутом, а не реальным порядком обхода.
+    const future = demo.locator('[data-gr-step][data-value="done"] [data-gr-step-trigger]')
+    await expect(future).toHaveJSProperty('tagName', 'SPAN')
+
+    const next = demo.getByRole('button', { name: 'Далее' })
+    const email = demo.locator('input[name="email"]')
+    await email.focus()
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await expect(next).toBeFocused()
+
+    // Поле пустое — гейт обязан удержать мастер на шаге и пометить его ошибкой.
+    await page.keyboard.press('Enter')
+    await expect(demo.locator('[data-gr-step][data-value="contacts"]')).toHaveAttribute('data-status', 'error')
+
+    await email.fill('user@example.com')
+    await next.click()
+
+    await expect(demo.locator('[data-gr-step][data-value="delivery"] [data-gr-step-trigger]'))
+      .toHaveAttribute('aria-current', 'step')
+    await expect(demo.locator('[data-gr-step][data-value="contacts"]')).toHaveAttribute('data-status', 'complete')
+  })
+})
+
 test.describe('GrList: кликабельная строка', () => {
   test('Enter и Space на строке вызывают действие', async ({ page }) => {
     await page.goto(componentPath('GrList'))

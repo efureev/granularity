@@ -165,6 +165,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrSortableList`](./components/GrSortableList.md)
 - [`GrSplitter`](./components/GrSplitter.md)
 - [`GrStatistic`](./components/GrStatistic.md)
+- [`GrSteps`](./components/GrSteps.md)
 - [`GrSwitch`](./components/GrSwitch.md)
 - [`GrTable`](./components/GrTable.md)
 - [`GrTabPanels`](./components/GrTabPanels.md)

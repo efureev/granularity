@@ -10208,6 +10208,143 @@
       }
     ]
   },
+  "GrSteps": {
+    "name": "GrSteps",
+    "sourcePath": "packages/granularity/src/components/GrSteps/GrSteps.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "Компактный вид для узкой колонки: подпись текущего шага и полоса прогресса.",
+            "type": "GrStepsVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "orientation",
+            "description": "",
+            "type": "GrStepsOrientation | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "clickable",
+            "description": "Переход кликом по шагу. Выключен — лента становится только индикатором.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "linear",
+            "description": "Вперёд — не дальше первого непройденного. Назад свободно всегда: вернуться и поправить заполненное — обычный сценарий, а не обход правила.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "beforeLeave",
+            "description": "Гейт перехода. Вернул `false` — перехода нет. Сюда потребитель кладёт валидацию шага: `GrSteps` про `GrForm` ничего не знает и знать не должен, а форма уже отдаёт `validate()`/`validateField()`.",
+            "type": "((from: string, to: string) => boolean | Promise<boolean>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "steps",
+            "description": "",
+            "type": "GrStep[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "step",
+            "description": "Своя разметка пункта. Корневой тег, `aria-current` и клик остаются за компонентом — иначе доступность шага пришлось бы собирать заново.",
+            "type": "{ step: GrStep; index: number; status: GrStepStatus; enterable: boolean; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "next",
+            "description": "",
+            "type": "() => Promise<boolean>"
+          },
+          {
+            "name": "back",
+            "description": "",
+            "type": "() => Promise<boolean>"
+          },
+          {
+            "name": "goTo",
+            "description": "",
+            "type": "(value: string) => Promise<boolean>"
+          },
+          {
+            "name": "isFirst",
+            "description": "",
+            "type": "boolean"
+          },
+          {
+            "name": "isLast",
+            "description": "",
+            "type": "boolean"
+          }
+        ]
+      }
+    ]
+  },
   "GrSwitch": {
     "name": "GrSwitch",
     "sourcePath": "packages/granularity/src/components/GrSwitch/GrSwitch.vue",

@@ -6,7 +6,7 @@ import type {
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrProgressCircle', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
-  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
+  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrChip', 'GrChipGroup', 'GrCodeBlock', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
@@ -77,6 +77,7 @@ const componentSummaryOverrides = {
   GrSplitter: 'Splits a layout into two resizable panels with a draggable divider.',
   GrRating: 'Collect and display a star rating, with half steps and a read-only mode.',
   GrStatistic: 'Highlights a key metric with a caption, formatting and a trend line.',
+  GrSteps: 'Shows where the user is in a multi-step process and can hold them back until the step checks out.',
   GrChip: 'An interactive tag: removable, selectable, with an icon.'
     + ' Where GrBadge only shows a status, a chip answers to a click.',
   GrChipGroup: 'A set of chips sharing one value: list filters, record labels, a quick pick.',
@@ -164,6 +165,10 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
   },
   'component:GrStatistic': {
     group: 'data',
+  },
+  'component:GrSteps': {
+    group: 'navigation',
+    tags: ['new'],
   },
   'component:GrFilePreview': {
     group: 'data',

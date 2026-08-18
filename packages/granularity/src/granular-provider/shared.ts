@@ -79,6 +79,7 @@ import { grSliderConfig } from '../components/GrSlider/config'
 import { grSortableListConfig } from '../components/GrSortableList/config'
 import { grSplitterConfig } from '../components/GrSplitter/config'
 import { grStatisticConfig } from '../components/GrStatistic/config'
+import { grStepsConfig } from '../components/GrSteps/config'
 import { grSwitchConfig } from '../components/GrSwitch/config'
 import { grTableConfig } from '../components/GrTable/config'
 import { grTabPanelsConfig } from '../components/GrTabPanels/config'
@@ -187,6 +188,7 @@ export const granularityComponentConfigs = {
   GrSortableList: grSortableListConfig,
   GrSplitter: grSplitterConfig,
   GrStatistic: grStatisticConfig,
+  GrSteps: grStepsConfig,
   GrSwitch: grSwitchConfig,
   GrTable: grTableConfig,
   GrTabPanels: grTabPanelsConfig,

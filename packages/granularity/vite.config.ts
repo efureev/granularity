@@ -285,6 +285,9 @@ export default defineConfig({
         'components/GrStatistic/index': fileURLToPath(
           new URL('./src/components/GrStatistic/index.ts', import.meta.url),
         ),
+        'components/GrSteps/index': fileURLToPath(
+          new URL('./src/components/GrSteps/index.ts', import.meta.url),
+        ),
         'components/GrSwitch/index': fileURLToPath(
           new URL('./src/components/GrSwitch/index.ts', import.meta.url),
         ),

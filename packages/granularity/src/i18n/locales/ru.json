@@ -13,6 +13,12 @@
   "loading": {
     "defaultText": "Загрузка..."
   },
+  "steps": {
+    "label": "Ход выполнения",
+    "status": "Шаг {step} из {count}",
+    "completed": "выполнен",
+    "error": "есть ошибки"
+  },
   "treeSelect": {
     "filterPlaceholder": "Поиск…",
     "empty": "Нет данных",
