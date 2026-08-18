@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 76 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 77 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -658,6 +658,17 @@
     "context": "overlays / component",
     "searchableTitle": "grconfirmdialog",
     "searchableContent": "grconfirmdialog grconfirmdialog asks to confirm a potentially important or dangerous action. overlays component /components/gr-confirm-dialog packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grconfirmdialog generated public-api components components gr-confirm-dialog gr confirm dialog"
+  },
+  {
+    "id": "entity:component:GrContextMenu",
+    "title": "GrContextMenu",
+    "description": "Brings actions to the pointer: right-click a row, a tree node or a canvas.",
+    "href": "/components/gr-context-menu",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "overlays / component",
+    "searchableTitle": "grcontextmenu",
+    "searchableContent": "grcontextmenu grcontextmenu brings actions to the pointer: right-click a row, a tree node or a canvas. overlays component /components/gr-context-menu packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcontextmenu generated public-api components components gr-context-menu gr context menu"
   },
   {
     "id": "entity:component:GrDataTable",
@@ -2374,6 +2385,50 @@
     "context": "GrConfirmDialog",
     "searchableTitle": "grconfirmdialog integration notes",
     "searchableContent": "grconfirmdialog asks to confirm a potentially important or dangerous action. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrContextMenu:section:overview",
+    "title": "GrContextMenu / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-context-menu#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrContextMenu",
+    "searchableTitle": "grcontextmenu component overview",
+    "searchableContent": "grcontextmenu brings actions to the pointer: right-click a row, a tree node or a canvas. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrContextMenu:section:live-examples",
+    "title": "GrContextMenu / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-context-menu#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrContextMenu",
+    "searchableTitle": "grcontextmenu live examples",
+    "searchableContent": "grcontextmenu brings actions to the pointer: right-click a row, a tree node or a canvas. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrContextMenu:section:api",
+    "title": "GrContextMenu / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-context-menu#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrContextMenu",
+    "searchableTitle": "grcontextmenu generated api",
+    "searchableContent": "grcontextmenu brings actions to the pointer: right-click a row, a tree node or a canvas. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrContextMenu:section:integration-notes",
+    "title": "GrContextMenu / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-context-menu#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrContextMenu",
+    "searchableTitle": "grcontextmenu integration notes",
+    "searchableContent": "grcontextmenu brings actions to the pointer: right-click a row, a tree node or a canvas. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrDataTable:section:overview",

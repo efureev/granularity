@@ -356,5 +356,8 @@
     "copied": "Valor copiado",
     "copyFailed": "No se pudo copiar el valor",
     "moreItems": "más"
+  },
+  "contextMenu": {
+    "label": "Menú contextual"
   }
 }

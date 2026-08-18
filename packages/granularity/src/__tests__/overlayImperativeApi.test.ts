@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import GrCommandPalette from '../components/GrCommandPalette/GrCommandPalette.vue'
+import GrContextMenu from '../components/GrContextMenu/GrContextMenu.vue'
 import GrDialog from '../components/GrDialog/GrDialog.vue'
 import GrDropdown from '../components/GrDropdown/GrDropdown.vue'
 import GrModal from '../components/GrModal/GrModal.vue'
@@ -29,6 +30,7 @@ const overlays = [
   ['GrDialog', GrDialog, { modelValue: false, ariaLabel: 'Dialog' }],
   ['GrDropdown', GrDropdown, {}],
   ['GrCommandPalette', GrCommandPalette, { modelValue: false, items: [] }],
+  ['GrContextMenu', GrContextMenu, { items: [{ key: 'a', label: 'A' }] }],
 ] as const
 
 describe('императивный API слоя оверлеев', () => {

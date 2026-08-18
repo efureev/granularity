@@ -439,6 +439,66 @@ test.describe('GrBottomNav: выбор раздела', () => {
   })
 })
 
+test.describe('GrContextMenu: меню по правому клику', () => {
+  test('открывается указателем и с клавиатуры, закрывается Esc', async ({ page }) => {
+    await page.goto(componentPath('GrContextMenu'))
+    await page.locator('#live-examples').waitFor()
+
+    const demo = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-gr-tree]') })
+      .first()
+    const row = demo.locator('[data-gr-tree-node-key="q1"]').first()
+    // На странице два меню, и обе панели живут в DOM (`v-show`) — различаем по
+    // содержимому, а не по порядку.
+    const panel = page.locator('[data-gr-popover-panel][role="menu"]')
+      .filter({ hasText: 'Переименовать' })
+
+    await row.click({ button: 'right' })
+    await expect(panel).toBeVisible()
+    // Пункты собраны под файл: у папки «Скачать» нет.
+    await expect(panel.locator('[role="menuitem"]', { hasText: 'Скачать' })).toBeVisible()
+    // Фокус сразу в меню — иначе с клавиатуры из него не выйти ничем, кроме Esc.
+    await expect(panel.locator('[role="menuitem"]').first()).toBeFocused()
+
+    await page.keyboard.press('Escape')
+    await expect(panel).toBeHidden()
+
+    /**
+     * Клавиатурный путь — то, чего jsdom не покажет: `contextmenu` по `Shift+F10`
+     * там не порождается, и настоящего таб-порядка нет.
+     */
+    await row.click()
+    await page.keyboard.press('Shift+F10')
+    await expect(panel).toBeVisible()
+
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+    await expect(panel).toBeHidden()
+    await expect(demo.getByText('Переименовать: Q1 revenue.xlsx')).toBeVisible()
+  })
+
+  test('правый клик вне меню закрывает его', async ({ page }) => {
+    await page.goto(componentPath('GrContextMenu'))
+    await page.locator('#live-examples').waitFor()
+
+    const demo = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-gr-tree]') })
+      .first()
+    // На странице два меню, и обе панели живут в DOM (`v-show`) — различаем по
+    // содержимому, а не по порядку.
+    const panel = page.locator('[data-gr-popover-panel][role="menu"]')
+      .filter({ hasText: 'Переименовать' })
+
+    await demo.locator('[data-gr-tree-node-key="q1"]').first().click({ button: 'right' })
+    await expect(panel).toBeVisible()
+
+    // `v-click-outside` отбрасывает всё, что не левая кнопка, а `contextmenu` не
+    // порождает `click` — без своего слушателя меню осталось бы висеть.
+    await page.locator('h1').click({ button: 'right' })
+    await expect(panel).toBeHidden()
+  })
+})
+
 test.describe('GrSteps: проход мастера', () => {
   test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
     await page.goto(componentPath('GrSteps'))

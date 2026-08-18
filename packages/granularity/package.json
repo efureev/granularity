@@ -137,6 +137,10 @@
       "types": "./dist/types/components/GrConfirmDialog/index.d.ts",
       "import": "./dist/components/GrConfirmDialog/index.js"
     },
+    "./components/GrContextMenu": {
+      "types": "./dist/types/components/GrContextMenu/index.d.ts",
+      "import": "./dist/components/GrContextMenu/index.js"
+    },
     "./components/GrDataTable": {
       "types": "./dist/types/components/GrDataTable/index.d.ts",
       "import": "./dist/components/GrDataTable/index.js"

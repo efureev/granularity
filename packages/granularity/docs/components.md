@@ -120,6 +120,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrCommandPalette`](./components/GrCommandPalette.md)
 - [`GrConfigProvider`](./components/GrConfigProvider.md)
 - [`GrConfirmDialog`](./components/GrConfirmDialog.md)
+- [`GrContextMenu`](./components/GrContextMenu.md)
 - [`GrDataTable`](./components/GrDataTable.md)
 - [`GrDelta`](./components/GrDelta.md)
 - [`GrDescriptionList`](./components/GrDescriptionList.md)

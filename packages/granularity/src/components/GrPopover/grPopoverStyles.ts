@@ -14,6 +14,9 @@ export type GrPopoverSize = GrComponentSize
  */
 export type GrPopoverRole = 'dialog' | 'menu' | 'listbox' | 'grid' | 'group' | 'none'
 
+/** Поле панели. `none` — поле рисует содержимое (меню, список опций). */
+export type GrPopoverPadding = 'default' | 'none'
+
 export const panelSizes: Record<GrPopoverSize, string> = {
   xs: 'p-2 text-[length:var(--gr-control-text-xs)]',
   sm: 'p-2.5 text-[length:var(--gr-control-text-sm)]',
@@ -51,12 +54,31 @@ export function grPopoverOriginClass(placement: Placement): string {
  * Поверхность панели. `max-w-[min(...)]` не даёт поповеру вылезти за узкий
  * экран: `useFloating` смещает панель в пределах viewport, но не сужает её.
  */
+/**
+ * Кегль без поля.
+ *
+ * Отдельная мапа, а не `contentClass="p-0"`: поле и кегль приезжают одной
+ * строкой равной специфичности, и кто победит — решал бы порядок правил в
+ * сгенерированном CSS. Меню внутри поповера с `p-3` — визуально не меню.
+ */
+export const panelSizesFlush: Record<GrPopoverSize, string> = {
+  xs: 'text-[length:var(--gr-control-text-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
+}
+
 export const popoverPanelBaseClass = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-2)] max-w-[min(22rem,calc(100vw-1rem))] focus:outline-none'
 
-export function grPopoverPanelClass(size: GrPopoverSize, placement: Placement, extra?: string): string {
+export function grPopoverPanelClass(
+  size: GrPopoverSize,
+  placement: Placement,
+  extra?: string,
+  padding: GrPopoverPadding = 'default',
+): string {
   return [
     popoverPanelBaseClass,
-    panelSizes[size],
+    padding === 'none' ? panelSizesFlush[size] : panelSizes[size],
     grPopoverOriginClass(placement),
     extra ?? '',
   ].filter(Boolean).join(' ')

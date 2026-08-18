@@ -150,6 +150,9 @@ export default defineConfig({
         'components/GrConfirmDialog/index': fileURLToPath(
           new URL('./src/components/GrConfirmDialog/index.ts', import.meta.url),
         ),
+        'components/GrContextMenu/index': fileURLToPath(
+          new URL('./src/components/GrContextMenu/index.ts', import.meta.url),
+        ),
         'components/GrDataTable/index': fileURLToPath(
           new URL('./src/components/GrDataTable/index.ts', import.meta.url),
         ),

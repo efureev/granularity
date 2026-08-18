@@ -95,6 +95,41 @@ to [Semantic Versioning](https://semver.org/).
   `ru` and `es`. The last two are the hidden state captions inside a step: without them a completed
   step and a step in error sound exactly alike — the marker's colour is not available to a screen
   reader.
+- **New `GrContextMenu` — actions at the pointer.** Right-click a table row, a tree node or a
+  canvas instead of travelling to a "⋯" button at the end of the line. Items are the same flat
+  model `GrDropdownMenu` already uses, so groups, dividers, icons, shortcuts, links and the danger
+  variant come along unchanged; the layer is `GrPopover` in its new anchored mode. Nested submenus
+  are deliberately out of scope — they need their own navigation and a safe-triangle for the mouse,
+  which is a separate component rather than a prop.
+
+  **`beforeOpen` fires before the panel opens**, and that is the only moment a menu can be built
+  for whatever was clicked: a folder and a file deserve different actions. Take the target from the
+  DOM rather than from the mouse event and the same handler also serves the keyboard, which has no
+  mouse event at all. No separate way to cancel opening is needed — an empty model simply does not
+  open, and an empty panel would be a focus trap with `Esc` as its only exit.
+
+  **A menu reachable only by right-click does not exist for the keyboard.** The wrapper listens for
+  `Shift+F10` and the `ContextMenu` key, and there the anchor becomes the *rectangle* of the focused
+  element rather than a point: the menu belongs to the row and flips together with it when there is
+  no room below. `trigger="manual"` disables opening by pointer only — the keyboard path always
+  stays, otherwise every consumer would rewrite that handler. Inside a text field the call is not
+  intercepted: the browser's own menu, with spellcheck and clipboard, is more useful there.
+
+  `Shift`+right-click is handed to the browser (`allowNativeMenu`) — in Firefox that is the
+  documented escape hatch to the native menu. `Ctrl` is deliberately not part of it: on macOS
+  Ctrl+click *is* the right click. Scrolling closes the menu, as native menus do, because the
+  anchor is a viewport point with no element behind it.
+- **`GrPopover` gained `anchor` and `padding`.** `anchor` positions the panel by a viewport
+  rectangle instead of the `#trigger` wrapper — the wrapper is not rendered at all when the slot is
+  absent, and no ARIA is emitted in that mode, since `aria-haspopup` is invalid outside an
+  interactive element. `padding="none"` drops the panel's own padding for content that draws its
+  own, which `contentClass` could not do reliably: padding and type size ship in one class string
+  of equal specificity, so the winner depended on rule order in the generated CSS.
+- **`useFloating` accepts a virtual anchor.** The reference may now be a getter returning either an
+  element or a `{ x, y, width?, height? }` rectangle, and the subscription is only rebuilt when the
+  reference itself changes — so moving a context menu to a new point costs one reposition instead
+  of tearing `autoUpdate` down and setting it up again.
+- **i18n:** `gr.contextMenu.label` in `en`, `ru` and `es` — the accessible name of the menu panel.
 
 ### Fixed
 
@@ -114,6 +149,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Menu typeahead now normalises case before comparing.** `GrDropdown` compared the raw character,
+  so a letter typed with `Shift` held did not count as a repeat of the same letter and the search
+  silently missed. The buffer, the 600 ms window and the "repeat a letter to reach the next match"
+  rule are unchanged — they now live in one place shared with `GrContextMenu`, together with the
+  arrow ring, `Home`/`End` and the `Space`-activates-when-the-buffer-is-empty rule, instead of a
+  fourth verbatim copy. Menu items are also focused with `preventScroll`: the panel is already
+  inside the viewport, so scrolling the page to reach an item was never anything but a side effect.
 - **All 23 dev guards are now one symbol, `__GR_DEV__`, expanded at build time.** Three dialects had
   accumulated because the guard was written by hand at every site, and hand-written guards have two
   mirrored shapes — `&&` under a condition, `||` before an early `return`. Getting the shape wrong

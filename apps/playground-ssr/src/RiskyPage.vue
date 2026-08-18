@@ -6,6 +6,7 @@ import {
   GrCollapse,
   GrCollapseItem,
   GrCommandPalette,
+  GrContextMenu,
   GrDataTable,
   GrDrawer,
   GrFileUpload,
@@ -56,6 +57,10 @@ const drawerOpen = ref(false)
 const viewerOpen = ref(false)
 const treeValue = ref<number | null>(null)
 const tags = ref<string[]>(['ssr'])
+const menuItems = [
+  { key: 'open', label: 'Открыть' },
+  { key: 'remove', label: 'Удалить', variant: 'danger' as const },
+]
 
 const views = [
   { label: 'Список', value: 'list' },
@@ -156,6 +161,15 @@ const images = [
     <GrTree :data="treeData" node-key="id" virtual :max-height="200" />
 
     <GrTreeSelect v-model="treeValue" :data="treeData" node-key="id" placeholder="Выберите узел" />
+
+    <!--
+      Якорь контекстного меню — точка вьюпорта, которой на сервере нет вовсе:
+      меню обязано отрендериться закрытым и не тронуть ни `window`, ни портал
+      до гидрации.
+    -->
+    <GrContextMenu :items="menuItems">
+      <div>Правый клик по этому блоку</div>
+    </GrContextMenu>
 
     <GrDataTable :rows="rows" :columns="columns" />
 

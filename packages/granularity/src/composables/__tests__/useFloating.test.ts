@@ -3,8 +3,11 @@ import type { Ref } from 'vue'
 import { defineComponent, nextTick, ref, watchEffect } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { computePosition } from '@floating-ui/dom'
+
 import { pushOverlayLayer, removeOverlayLayer, resetOverlayStack } from '../internal/overlayStack'
-import { useFloating } from '../useFloating'
+import type { GrFloatingAnchorRect } from '../useFloating'
+import { createFloatingAnchor, useFloating } from '../useFloating'
 
 /**
  * `autoUpdate` подписывается на ResizeObserver/IntersectionObserver и scroll —
@@ -211,6 +214,127 @@ describe('useFloating — высота над модальным окном', ()
     await nextTick()
     await openPanel(open)
     expect(style.value.zIndex).toBe('calc(var(--gr-z-modal) + 1)')
+
+    wrapper.unmount()
+  })
+})
+
+/**
+ * Виртуальный якорь: позиционирование по точке курсора, у которой нет элемента
+ * в DOM. Проверяем не пиксели (в jsdom `getBoundingClientRect` нулевой, а
+ * `computePosition` замокан), а то, что именно доехало до движка и когда
+ * пересоздаётся подписка.
+ */
+describe('useFloating — виртуальный якорь', () => {
+  beforeEach(() => {
+    autoUpdateMock.mockClear()
+    autoUpdateCleanup.mockClear()
+    vi.mocked(computePosition).mockClear()
+  })
+
+  function mountAnchored(anchor: Ref<GrFloatingAnchorRect | null>) {
+    const open = ref(false)
+    const anchorEl = createFloatingAnchor(() => anchor.value)
+    let update = (): void => {}
+
+    const wrapper = mount(defineComponent({
+      setup() {
+        const floating = ref<HTMLElement | null>(null)
+        update = useFloating(() => anchorEl, floating, open).update
+        return { floating }
+      },
+      template: '<div><div ref="floating" /></div>',
+    }), { attachTo: document.body })
+
+    return { wrapper, open, anchorEl, update: () => update() }
+  }
+
+  async function settle() {
+    for (let i = 0; i < 4; i += 1) await nextTick()
+  }
+
+  it('прямоугольник считается от координат и согласован по сторонам', () => {
+    const point = createFloatingAnchor(() => ({ x: 10, y: 20 }))
+    // Точка курсора — прямоугольник 0×0: `flip` и `shift` меряют её как обычный
+    // якорь нулевого размера, поэтому стороны обязаны сойтись в одну точку.
+    expect(point.getBoundingClientRect()).toMatchObject({
+      x: 10, y: 20, width: 0, height: 0, top: 20, left: 10, right: 10, bottom: 20,
+    })
+
+    const row = createFloatingAnchor(() => ({ x: 4, y: 8, width: 200, height: 32 }))
+    expect(row.getBoundingClientRect()).toMatchObject({
+      x: 4, y: 8, width: 200, height: 32, top: 8, left: 4, right: 204, bottom: 40,
+    })
+  })
+
+  it('пустой якорь не роняет измерение', () => {
+    // Меню закрыто — координат ещё нет, а `autoUpdate` уже может дёрнуть замер.
+    expect(createFloatingAnchor(() => null).getBoundingClientRect()).toMatchObject({ x: 0, y: 0 })
+  })
+
+  it('виртуальный якорь доезжает до движка вместо элемента', async () => {
+    const anchor = ref<GrFloatingAnchorRect | null>({ x: 10, y: 20 })
+    const { wrapper, open, anchorEl } = mountAnchored(anchor)
+
+    open.value = true
+    await settle()
+
+    expect(vi.mocked(computePosition).mock.calls[0]?.[0]).toBe(anchorEl)
+    expect(autoUpdateMock.mock.calls[0]?.[0]).toBe(anchorEl)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Второй правый клик по другой точке. Объект якоря один на всё время жизни,
+   * поэтому подписка обязана уцелеть: пересоздавать её на каждое движение
+   * курсора значило бы рвать `autoUpdate` ради смены двух чисел.
+   */
+  it('смена координат пересчитывает позицию, но не переподписывает autoUpdate', async () => {
+    const anchor = ref<GrFloatingAnchorRect | null>({ x: 10, y: 20 })
+    const { wrapper, open, anchorEl, update } = mountAnchored(anchor)
+
+    open.value = true
+    await settle()
+    expect(autoUpdateMock).toHaveBeenCalledTimes(1)
+
+    anchor.value = { x: 300, y: 400 }
+    update()
+    await settle()
+
+    expect(autoUpdateMock).toHaveBeenCalledTimes(1)
+    expect(anchorEl.getBoundingClientRect()).toMatchObject({ x: 300, y: 400 })
+    expect(vi.mocked(computePosition).mock.calls.length).toBeGreaterThan(1)
+
+    wrapper.unmount()
+  })
+
+  it('смена самой ссылки снимает старую подписку и заводит новую', async () => {
+    const open = ref(false)
+    const useAnchor = ref(false)
+    const anchorEl = createFloatingAnchor(() => ({ x: 1, y: 2 }))
+
+    const wrapper = mount(defineComponent({
+      setup() {
+        const reference = ref<HTMLElement | null>(null)
+        const floating = ref<HTMLElement | null>(null)
+        useFloating(() => (useAnchor.value ? anchorEl : reference.value), floating, open)
+        return { reference, floating }
+      },
+      template: '<div><button ref="reference" /><div ref="floating" /></div>',
+    }), { attachTo: document.body })
+
+    open.value = true
+    await settle()
+    expect(autoUpdateMock).toHaveBeenCalledTimes(1)
+    expect(autoUpdateCleanup).not.toHaveBeenCalled()
+
+    useAnchor.value = true
+    await settle()
+
+    expect(autoUpdateCleanup).toHaveBeenCalledTimes(1)
+    expect(autoUpdateMock).toHaveBeenCalledTimes(2)
+    expect(autoUpdateMock.mock.calls[1]?.[0]).toBe(anchorEl)
 
     wrapper.unmount()
   })

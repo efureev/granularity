@@ -34,6 +34,7 @@ import { grColorPickerConfig } from '../components/GrColorPicker/config'
 import { grCommandPaletteConfig } from '../components/GrCommandPalette/config'
 import { grConfigProviderConfig } from '../components/GrConfigProvider/config'
 import { grConfirmDialogConfig } from '../components/GrConfirmDialog/config'
+import { grContextMenuConfig } from '../components/GrContextMenu/config'
 import { grDataTableConfig } from '../components/GrDataTable/config'
 import { grDeltaConfig } from '../components/GrDelta/config'
 import { grDescriptionListConfig } from '../components/GrDescriptionList/config'
@@ -143,6 +144,7 @@ export const granularityComponentConfigs = {
   GrCommandPalette: grCommandPaletteConfig,
   GrConfigProvider: grConfigProviderConfig,
   GrConfirmDialog: grConfirmDialogConfig,
+  GrContextMenu: grContextMenuConfig,
   GrDataTable: grDataTableConfig,
   GrDelta: grDeltaConfig,
   GrDescriptionList: grDescriptionListConfig,

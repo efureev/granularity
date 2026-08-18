@@ -1,5 +1,5 @@
 import type { CSSProperties, Ref } from 'vue'
-import type { Middleware, Placement } from '@floating-ui/dom'
+import type { Middleware, Placement, VirtualElement } from '@floating-ui/dom'
 import { autoUpdate, computePosition, flip, offset as offsetMiddleware, shift, size as sizeMiddleware } from '@floating-ui/dom'
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
@@ -49,6 +49,61 @@ function roundByDpr(element: HTMLElement, value: number): number {
   return Math.round(value * dpr) / dpr
 }
 
+/**
+ * Прямоугольник в координатах вьюпорта — якорь, которого нет в DOM.
+ *
+ * Точка курсора описывается прямоугольником `0×0`. Размеры необязательны именно
+ * поэтому: контекстное меню, открытое с клавиатуры, встаёт у **прямоугольника**
+ * сфокусированной строки, а не у её угла, и переворачивается вместе с ней.
+ */
+export interface GrFloatingAnchorRect {
+  x: number
+  y: number
+  /** По умолчанию 0. */
+  width?: number
+  /** По умолчанию 0. */
+  height?: number
+}
+
+/** Ссылка позиционирования: элемент, виртуальный якорь или ничего. */
+export type UseFloatingReference = HTMLElement | VirtualElement | null
+
+/**
+ * Виртуальный якорь: объект создаётся один раз, координаты читает геттер на
+ * каждом измерении.
+ *
+ * Стабильность объекта здесь не стилистика, а условие работы: `useFloating`
+ * пересоздаёт подписку `autoUpdate` при смене самой ссылки, поэтому новый объект
+ * на каждое движение курсора рвал бы и заводил её заново. С одним объектом смена
+ * точки — это просто `update()`.
+ */
+export function createFloatingAnchor(
+  get: () => GrFloatingAnchorRect | null | undefined,
+  options: { contextElement?: () => Element | null | undefined } = {},
+): VirtualElement {
+  return {
+    getBoundingClientRect() {
+      const rect = get() ?? { x: 0, y: 0 }
+      const width = rect.width ?? 0
+      const height = rect.height ?? 0
+
+      return {
+        x: rect.x,
+        y: rect.y,
+        width,
+        height,
+        top: rect.y,
+        left: rect.x,
+        right: rect.x + width,
+        bottom: rect.y + height,
+      }
+    },
+    get contextElement() {
+      return options.contextElement?.() ?? undefined
+    },
+  }
+}
+
 export interface UseFloatingOptions {
   /**
    * Предпочитаемое место панели относительно триггера. По умолчанию `bottom-start`.
@@ -67,6 +122,8 @@ export interface UseFloatingOptions {
    * - `'min'` — панель растёт по контенту (`width: max-content`), но не уже триггера
    *   (`min-width = ширина триггера`) — режим `GrSelect view="link"`;
    * - функция-геттер — как и `placement`, для реактивной зависимости от пропа.
+   *
+   * С виртуальным якорем не работает: ширина точки равна нулю.
    */
   matchWidth?: boolean | 'min' | (() => boolean | 'min')
   /**
@@ -105,11 +162,17 @@ export interface UseFloatingReturn {
  * элемент, которого нет в дереве.
  */
 export function useFloating(
-  referenceEl: Ref<HTMLElement | null>,
+  // Объединение, а не `Ref<HTMLElement | VirtualElement | null>`: аксессорный
+  // `Ref` проверяется контравариантно по записи, и расширение элементного типа
+  // отняло бы у шести нынешних потребителей право передавать свой `Ref` как есть.
+  reference: Ref<HTMLElement | null> | (() => UseFloatingReference),
   floatingEl: Ref<HTMLElement | null>,
   open: Ref<boolean>,
   options: UseFloatingOptions = {},
 ): UseFloatingReturn {
+  const readReference: () => UseFloatingReference
+    = typeof reference === 'function' ? reference : () => reference.value
+
   const floatingStyle = ref<CSSProperties>({
     position: 'fixed',
     top: '0px',
@@ -128,7 +191,7 @@ export function useFloating(
   let stopAutoUpdate: (() => void) | null = null
 
   async function update(): Promise<void> {
-    const reference = referenceEl.value
+    const reference = readReference()
     const floating = floatingEl.value
     if (!reference || !floating)
       return
@@ -183,7 +246,7 @@ export function useFloating(
 
   function start(): void {
     stop()
-    const reference = referenceEl.value
+    const reference = readReference()
     const floating = floatingEl.value
     if (!reference || !floating)
       return
@@ -196,13 +259,22 @@ export function useFloating(
     stopAutoUpdate = autoUpdate(reference, floating, () => void update())
   }
 
+  // На какую ссылку подписан текущий `autoUpdate`. Отличает смену самого якоря
+  // (подписку пересоздать) от смены его координат (достаточно `update()`): у
+  // виртуального якоря объект один на всё время жизни.
+  let subscribedTo: UseFloatingReference = null
+
   watch(
-    open,
-    (isOpen) => {
-      if (!isOpen) {
+    [open, () => readReference()],
+    ([isOpen, nextReference]) => {
+      if (!isOpen || !nextReference) {
         stop()
+        subscribedTo = null
         return
       }
+
+      if (nextReference === subscribedTo && stopAutoUpdate)
+        return
 
       // `floatingEl` монтируется в том же тике, что и `open` переключается
       // (v-show уже в DOM, но teleport/переход могут ещё не отработать) —
@@ -210,7 +282,10 @@ export function useFloating(
       // Перепроверка `open`: панель могли закрыть, пока `start()` ждал в
       // очереди, — `stop()` уже отработал, и снимать подписку было бы некому.
       void nextTick(() => {
-        if (open.value) start()
+        if (!open.value)
+          return
+        subscribedTo = readReference()
+        start()
       })
     },
     { immediate: true },

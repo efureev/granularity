@@ -120,6 +120,7 @@ const VISUAL_COMPONENTS = [
   'GrTimeline',
   // Приехали в 0.21–0.24 и до сих пор были вне набора.
   'GrChip',
+  'GrContextMenu',
   'GrChipGroup',
   'GrCodeBlock',
   'GrDelta',

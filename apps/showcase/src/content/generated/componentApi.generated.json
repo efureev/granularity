@@ -2822,6 +2822,193 @@
       }
     ]
   },
+  "GrContextMenu": {
+    "name": "GrContextMenu",
+    "sourcePath": "packages/granularity/src/components/GrContextMenu/GrContextMenu.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "open",
+            "description": "Открыто ли меню. Без пропа компонент ведёт состояние сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placement",
+            "description": "",
+            "type": "Placement | undefined",
+            "required": false,
+            "default": "\"bottom-start\""
+          },
+          {
+            "name": "items",
+            "description": "Декларативное меню. Слот `#content` сильнее.",
+            "type": "GrDropdownMenuEntry[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "trigger",
+            "description": "",
+            "type": "GrContextMenuTrigger | undefined",
+            "required": false,
+            "default": "\"contextmenu\""
+          },
+          {
+            "name": "offsetPx",
+            "description": "Зазор от якоря. Ноль по умолчанию: меню липнет к курсору.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "minWidth",
+            "description": "Меню из коротких слов не должно быть шириной в слово.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "\"11rem\""
+          },
+          {
+            "name": "labelledBy",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "teleportTo",
+            "description": "",
+            "type": "string | HTMLElement | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "contentClass",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "listClass",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "dividers",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "closeOnScroll",
+            "description": "Закрывать при прокрутке страницы. Якорь — точка вьюпорта, и панель осталась бы висеть на экране, пока контент под ней уезжает. Так же ведут себя нативные меню.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "allowNativeMenu",
+            "description": "Пропускать `Shift`+правый клик к браузеру.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "",
+            "type": "{ open: boolean; }"
+          },
+          {
+            "name": "content",
+            "description": "",
+            "type": "{ close: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          },
+          {
+            "name": "select",
+            "description": "",
+            "type": "[item: GrDropdownMenuAction]",
+            "signature": "(event: \"select\", item: GrDropdownMenuAction): void"
+          },
+          {
+            "name": "beforeOpen",
+            "description": "",
+            "type": "[context: GrContextMenuOpenContext]",
+            "signature": "(event: \"beforeOpen\", context: GrContextMenuOpenContext): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "openAt",
+            "description": "",
+            "type": "(at: MouseEvent | GrFloatingAnchorRect) => void"
+          },
+          {
+            "name": "openAtElement",
+            "description": "",
+            "type": "(element: Element) => void"
+          },
+          {
+            "name": "close",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "toggle",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrDataTable": {
     "name": "GrDataTable",
     "sourcePath": "packages/granularity/src/components/GrDataTable/GrDataTable.vue",
@@ -3695,27 +3882,6 @@
             "default": "false"
           },
           {
-            "name": "initialFocus",
-            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
-            "type": "HTMLElement | null | undefined",
-            "required": false,
-            "default": "null"
-          },
-          {
-            "name": "modal",
-            "description": "Модальная панель: подложка, блокировка скролла, `inert` остальной странице и ловушка фокуса. `false` — панель живёт рядом со страницей: с ней работают, не закрывая, а Tab уходит наружу.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "side",
-            "description": "Сторона, с которой выезжает панель.",
-            "type": "GrDrawerSide | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "width",
             "description": "Произвольная ширина боковой панели. Число трактуется как пиксели; сильнее `size`.",
             "type": "string | number | undefined",
@@ -3726,6 +3892,27 @@
             "name": "height",
             "description": "Произвольная высота верхней или нижней панели. Число трактуется как пиксели.",
             "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modal",
+            "description": "Модальная панель: подложка, блокировка скролла, `inert` остальной странице и ловушка фокуса. `false` — панель живёт рядом со страницей: с ней работают, не закрывая, а Tab уходит наружу.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "initialFocus",
+            "description": "Элемент, получающий фокус при открытии. По умолчанию — сама панель.",
+            "type": "HTMLElement | null | undefined",
+            "required": false,
+            "default": "null"
+          },
+          {
+            "name": "side",
+            "description": "Сторона, с которой выезжает панель.",
+            "type": "GrDrawerSide | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -3839,6 +4026,27 @@
             "default": "\"bottom-end\""
           },
           {
+            "name": "trigger",
+            "description": "Чем открывается панель. В любом режиме работают клик и клавиатура.",
+            "type": "GrDropdownTrigger | undefined",
+            "required": false,
+            "default": "\"click\""
+          },
+          {
+            "name": "teleportTo",
+            "description": "Точечное переопределение точки монтирования. По умолчанию — общий портал оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).",
+            "type": "string | HTMLElement | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "contentClass",
+            "description": "Дополнительные классы контейнера content.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
             "name": "width",
             "description": "Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту.",
             "type": "GrDropdownWidth | undefined",
@@ -3846,18 +4054,18 @@
             "default": "\"12rem\""
           },
           {
+            "name": "closeOnContentClick",
+            "description": "Закрывать панель по клику внутри content.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "offset",
             "description": "Зазор между триггером и панелью, px.",
             "type": "number | undefined",
             "required": false,
             "default": "8"
-          },
-          {
-            "name": "trigger",
-            "description": "Чем открывается панель. В любом режиме работают клик и клавиатура.",
-            "type": "GrDropdownTrigger | undefined",
-            "required": false,
-            "default": "\"click\""
           },
           {
             "name": "openDelay",
@@ -3872,27 +4080,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "160"
-          },
-          {
-            "name": "closeOnContentClick",
-            "description": "Закрывать панель по клику внутри content.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "contentClass",
-            "description": "Дополнительные классы контейнера content.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"\""
-          },
-          {
-            "name": "teleportTo",
-            "description": "Точечное переопределение точки монтирования. По умолчанию — общий портал оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).",
-            "type": "string | HTMLElement | undefined",
-            "required": false,
-            "default": "undefined"
           }
         ]
       },
@@ -3983,6 +4170,41 @@
             "default": "undefined"
           },
           {
+            "name": "trigger",
+            "description": "Чем открывается панель. В любом режиме работают клик и клавиатура.",
+            "type": "GrDropdownTrigger | undefined",
+            "required": false,
+            "default": "\"click\""
+          },
+          {
+            "name": "teleportTo",
+            "description": "Точечное переопределение точки монтирования; по умолчанию — общий портал.",
+            "type": "string | HTMLElement | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "contentClass",
+            "description": "Дополнительные классы content-контейнера.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "listClass",
+            "description": "Дополнительные классы для wrapper'а списка.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "dividers",
+            "description": "Разделители между пунктами.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "width",
             "description": "Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту.",
             "type": "GrDropdownWidth | undefined",
@@ -3990,18 +4212,18 @@
             "default": "\"12rem\""
           },
           {
+            "name": "closeOnContentClick",
+            "description": "Закрывать по клику внутри content.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "offset",
             "description": "Зазор между триггером и панелью, px.",
             "type": "number | undefined",
             "required": false,
             "default": "8"
-          },
-          {
-            "name": "trigger",
-            "description": "Чем открывается панель. В любом режиме работают клик и клавиатура.",
-            "type": "GrDropdownTrigger | undefined",
-            "required": false,
-            "default": "\"click\""
           },
           {
             "name": "openDelay",
@@ -4018,27 +4240,6 @@
             "default": "160"
           },
           {
-            "name": "closeOnContentClick",
-            "description": "Закрывать по клику внутри content.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "true"
-          },
-          {
-            "name": "contentClass",
-            "description": "Дополнительные классы content-контейнера.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"\""
-          },
-          {
-            "name": "teleportTo",
-            "description": "Точечное переопределение точки монтирования; по умолчанию — общий портал.",
-            "type": "string | HTMLElement | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "borderBottom",
             "description": "Нижний бордер контейнера списка.",
             "type": "boolean | undefined",
@@ -4051,20 +4252,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "dividers",
-            "description": "Разделители между пунктами.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "listClass",
-            "description": "Дополнительные классы для wrapper'а списка.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"\""
           }
         ]
       },
@@ -7467,18 +7654,25 @@
             "default": "\"bottom-start\""
           },
           {
+            "name": "padding",
+            "description": "Поле панели. `none` — содержимое рисует своё (меню, список опций).",
+            "type": "GrPopoverPadding | undefined",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "anchor",
+            "description": "Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`: панель встаёт у точки курсора или у строки списка. Нужен контекстному меню, у которого триггера-элемента нет вовсе. `triggerProps` в этом режиме некому потребить, и своих ARIA-атрибутов поповер никуда не вешает: `aria-haspopup` невалиден вне интерактивного элемента, а `aria-expanded` без хозяина — шум. Связь с содержимым страницы объявляет тот, кто открывает.",
+            "type": "GrFloatingAnchorRect | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeOnEsc",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
-          },
-          {
-            "name": "modal",
-            "description": "Модальный режим: фон уходит в `inert`, Tab ходит по кругу внутри панели, скролл страницы блокируется, а слой встаёт в стек модальным — как окно. Нужен поповеру с формой или подтверждением внутри: без изоляции фона пользователь уводит фокус на страницу, к которой поповер и относится. В этом режиме фокус переносится в панель независимо от `autoFocus`: фон недоступен, и слой без фокуса внутри стал бы клавиатурной ловушкой.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "trigger",
@@ -7488,15 +7682,15 @@
             "default": "\"click\""
           },
           {
-            "name": "closeOnContentClick",
-            "description": "Закрывать по клику внутри панели — удобно для меню, вредно для формы.",
-            "type": "boolean | undefined",
+            "name": "offsetPx",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
             "required": false,
-            "default": "false"
+            "default": "8"
           },
           {
-            "name": "contentClass",
-            "description": "",
+            "name": "labelledBy",
+            "description": "`id` видимого заголовка внутри панели — альтернатива `ariaLabel`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7509,11 +7703,11 @@
             "default": "undefined"
           },
           {
-            "name": "offsetPx",
-            "description": "Зазор между триггером и панелью, px.",
-            "type": "number | undefined",
+            "name": "contentClass",
+            "description": "",
+            "type": "string | undefined",
             "required": false,
-            "default": "8"
+            "default": "undefined"
           },
           {
             "name": "role",
@@ -7523,11 +7717,11 @@
             "default": "\"dialog\""
           },
           {
-            "name": "labelledBy",
-            "description": "`id` видимого заголовка внутри панели — альтернатива `ariaLabel`.",
-            "type": "string | undefined",
+            "name": "modal",
+            "description": "Модальный режим: фон уходит в `inert`, Tab ходит по кругу внутри панели, скролл страницы блокируется, а слой встаёт в стек модальным — как окно. Нужен поповеру с формой или подтверждением внутри: без изоляции фона пользователь уводит фокус на страницу, к которой поповер и относится. В этом режиме фокус переносится в панель независимо от `autoFocus`: фон недоступен, и слой без фокуса внутри стал бы клавиатурной ловушкой.",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "false"
           },
           {
             "name": "closeOnClickOutside",
@@ -7535,6 +7729,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "closeOnContentClick",
+            "description": "Закрывать по клику внутри панели — удобно для меню, вредно для формы.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "autoFocus",
@@ -7553,7 +7754,7 @@
           {
             "name": "trigger",
             "description": "",
-            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"grid\" | \"menu\" | \"listbox\" | \"dialog\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
+            "type": "{ open: boolean; toggle: () => void; close: () => void; triggerProps: { 'aria-haspopup': \"menu\" | \"dialog\" | \"listbox\" | \"grid\" | undefined; 'aria-expanded': boolean; 'aria-controls': string | undefined; disabled: true | undefined; }; }"
           },
           {
             "name": "content",
@@ -9371,7 +9572,7 @@
           {
             "name": "position",
             "description": "Сторона экрана: граница и направление шеврона зеркалятся.",
-            "type": "\"left\" | \"right\" | undefined",
+            "type": "\"right\" | \"left\" | undefined",
             "required": false,
             "default": "\"left\""
           },
@@ -11248,16 +11449,16 @@
             "default": "\"top-right\""
           },
           {
-            "name": "regionLabel",
-            "description": "A11y-лейбл контейнера-региона (i18n).",
-            "type": "string | undefined",
+            "name": "width",
+            "description": "Ширина стека. Число — пиксели, строка — любая CSS-длина. Уезжает в `--gr-toaster-width`, поэтому то же самое можно задать и темой.",
+            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "width",
-            "description": "Ширина стека. Число — пиксели, строка — любая CSS-длина. Уезжает в `--gr-toaster-width`, поэтому то же самое можно задать и темой.",
-            "type": "string | number | undefined",
+            "name": "regionLabel",
+            "description": "A11y-лейбл контейнера-региона (i18n).",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -11368,6 +11569,13 @@
             "default": "undefined"
           },
           {
+            "name": "offsetPx",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "openDelay",
             "description": "Задержка перед показом, мс. Спасает от мигания при проведении курсором по панели кнопок.",
             "type": "number | undefined",
@@ -11380,13 +11588,6 @@
             "type": "number | undefined",
             "required": false,
             "default": "0"
-          },
-          {
-            "name": "offsetPx",
-            "description": "Зазор между триггером и панелью, px.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
           },
           {
             "name": "iconColor",

@@ -99,6 +99,7 @@
 | текстовую подсказку к контролу | нет | [`GrTooltip`](../packages/granularity/docs/components/GrTooltip.md) |
 | список действий, пункты готовые | нет | [`GrDropdownMenu`](../packages/granularity/docs/components/GrDropdownMenu.md) |
 | список действий, пункты свои | нет | [`GrDropdown`](../packages/granularity/docs/components/GrDropdown.md) |
+| список действий по правому клику, у курсора | нет | [`GrContextMenu`](../packages/granularity/docs/components/GrContextMenu.md) |
 | произвольное содержимое у якоря | по `modal` | [`GrPopover`](../packages/granularity/docs/components/GrPopover.md) |
 | окно «шапка — тело — подвал» | да | [`GrDialog`](../packages/granularity/docs/components/GrDialog.md) |
 | окно с нестандартной раскладкой | да | [`GrModal`](../packages/granularity/docs/components/GrModal.md) |
@@ -321,6 +322,7 @@
 | [`GrCommandPalette`](../packages/granularity/docs/components/GrCommandPalette.md) | ядро | команд много и они разбросаны по интерфейсу |
 | [`GrConfigProvider`](../packages/granularity/docs/components/GrConfigProvider.md) | ядро | размеры контролов едины на приложение |
 | [`GrConfirmDialog`](../packages/granularity/docs/components/GrConfirmDialog.md) | ядро | действие необратимо |
+| [`GrContextMenu`](../packages/granularity/docs/components/GrContextMenu.md) | ядро | действия над строкой списка или узлом дерева |
 | [`GrDashboard`](../packages/granularity-dashboard/docs/components/GrDashboard.md) | dashboard | раскладку определяет пользователь |
 | [`GrDashboardItem`](../packages/granularity-dashboard/docs/components/GrDashboardItem.md) | dashboard | любой виджет внутри `GrDashboard` |
 | [`GrDashboardPalette`](../packages/granularity-dashboard/docs/components/GrDashboardPalette.md) | dashboard | набор виджетов выбирает пользователь |
@@ -398,7 +400,8 @@
 
 **Планируется в ядро.** `GrTransfer` — перенос
 между двумя списками; `GrCarousel` — карусель; `GrAffix` — прилипание к краю
-при скролле; `GrMenu` — вертикальное меню навигации.
+при скролле; `GrMenu` — вертикальное меню навигации (меню действий по правому
+клику закрывает `GrContextMenu`, вложенных подменю нет ни у кого).
 
 **Планируется отдельными пакетами.** Форма из схемы
 бэкенда, rich-text и markdown, кроп аватара и камера, связка «таблица ↔ фильтры

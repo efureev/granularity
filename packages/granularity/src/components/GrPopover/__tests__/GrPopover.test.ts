@@ -351,3 +351,83 @@ describe('GrPopover — модальный режим', () => {
     expect(document.activeElement).toBe(panelEl())
   })
 })
+
+/**
+ * Якорный режим: панель встаёт у точки вьюпорта, а элемента-триггера нет вовсе.
+ * На этом собирается `GrContextMenu` — меню по правому клику.
+ */
+describe('GrPopover — якорь вместо триггера', () => {
+  function mountAnchored(props: Record<string, unknown> = {}) {
+    mounted = mount(GrPopover, {
+      props: { ariaLabel: 'Меню', anchor: { x: 40, y: 60 }, open: true, trigger: 'manual', ...props },
+      slots: { content: CONTENT },
+      attachTo: document.body,
+    })
+
+    return mounted
+  }
+
+  it('без слота триггера обёртка не рендерится вовсе', async () => {
+    const wrapper = mountAnchored()
+    await nextTick()
+
+    // Пустая обёртка `inline-block` осталась бы строчным боксом в потоке
+    // страницы и в некоторых раскладках дала бы лишнюю строку высоты.
+    expect(wrapper.find('[data-gr-popover-trigger]').exists()).toBe(false)
+    expect(isPanelVisible()).toBe(true)
+  })
+
+  it('панель сохраняет роль и доступное имя без триггера', async () => {
+    mountAnchored({ role: 'menu' })
+    await nextTick()
+
+    expect(panelEl()?.getAttribute('role')).toBe('menu')
+    expect(panelEl()?.getAttribute('aria-label')).toBe('Меню')
+  })
+
+  it('клик вне панели закрывает её и в якорном режиме', async () => {
+    const wrapper = mountAnchored({ open: undefined })
+    ;(wrapper.vm as unknown as { open: () => void }).open()
+    await nextTick()
+    expect(isPanelVisible()).toBe(true)
+
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+
+    expect(isPanelVisible()).toBe(false)
+  })
+
+  it('якорь и слот триггера сосуществуют: обёртка на месте', async () => {
+    mounted = mount(GrPopover, {
+      props: { ariaLabel: 'Панель', anchor: { x: 10, y: 10 }, open: true },
+      slots: { trigger: TRIGGER, content: CONTENT },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    expect(mounted.find('[data-gr-popover-trigger]').exists()).toBe(true)
+    expect(isPanelVisible()).toBe(true)
+  })
+})
+
+describe('GrPopover — поле панели', () => {
+  it('по умолчанию поле есть', async () => {
+    mountPopover({ open: true })
+    await nextTick()
+
+    expect(panelEl()?.className).toContain('p-3')
+  })
+
+  /**
+   * `contentClass="p-0"` здесь не работает: поле и кегль приезжают одной строкой
+   * равной специфичности, и победителя выбрал бы порядок правил в CSS.
+   */
+  it('`padding="none"` снимает поле, но оставляет кегль', async () => {
+    mountPopover({ open: true, padding: 'none' })
+    await nextTick()
+
+    const className = panelEl()?.className ?? ''
+    expect(className).not.toContain('p-3')
+    expect(className).toContain('text-[length:var(--gr-control-text-md)]')
+  })
+})

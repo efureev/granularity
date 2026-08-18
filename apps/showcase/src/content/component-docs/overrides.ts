@@ -13,6 +13,7 @@ import {
   grDialogExamples,
   grDrawerExamples,
   grConfirmDialogExamples,
+  grContextMenuExamples,
   grPromptDialogExamples,
   grToasterExamples,
   grLoadingExamples,
@@ -254,6 +255,18 @@ const grRatingOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grContextMenuOverview = {
+  paragraphs: [
+    'Действия там, где пользователь уже смотрит: правый клик по строке, узлу дерева или свободной области вместо поездки мышью к кнопке «⋯».',
+  ],
+  features: [
+    'Меню собирается под то, по чему кликнули',
+    'Открывается и с клавиатуры: Shift+F10',
+    'Shift + правый клик остаётся браузеру',
+    'Закрывается при прокрутке, как нативное',
+  ],
+}
+
 const grStepsOverview = {
   paragraphs: [
     'Показывает, где пользователь в многошаговом процессе: что пройдено, где он сейчас и куда можно вернуться. Умеет не пустить вперёд, пока текущий шаг не сошёлся.',
@@ -439,6 +452,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrDialog: createComponentDocMeta(grDialogExamples),
   GrDrawer: createComponentDocMeta(grDrawerExamples),
   GrConfirmDialog: createComponentDocMeta(grConfirmDialogExamples),
+  GrContextMenu: createComponentDocMeta(grContextMenuExamples, grContextMenuOverview),
   GrPromptDialog: createComponentDocMeta(grPromptDialogExamples),
   GrToaster: createComponentDocMeta(grToasterExamples),
   GrLoading: createComponentDocMeta(grLoadingExamples),

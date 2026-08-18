@@ -144,6 +144,8 @@ export const demoPathByPreviewKey = {
   'gr-confirm-dialog-custom-body':        'components/gr-confirm-dialog/GrConfirmDialogCustomBodyDemo.vue',
   'gr-confirm-dialog-destructive':        'components/gr-confirm-dialog/GrConfirmDialogDestructiveDemo.vue',
   'gr-confirm-dialog-service-link':       'components/gr-confirm-dialog/GrDialogServiceLinkDemo.vue',
+  'gr-context-menu-area':                 'components/gr-context-menu/GrContextMenuAreaDemo.vue',
+  'gr-context-menu-tree':                 'components/gr-context-menu/GrContextMenuTreeDemo.vue',
   'gr-data-table-column-layout':          'components/gr-data-table/GrDataTableColumnLayoutDemo.vue',
   'gr-data-table-column-order':           'components/gr-data-table/GrDataTableColumnOrderDemo.vue',
   'gr-data-table-controlled-sort':        'components/gr-data-table/GrDataTableControlledSortDemo.vue',

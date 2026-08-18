@@ -21,14 +21,15 @@
  *   наружу, иначе немодальный слой запирает пользователя на странице, которая
  *   не заблокирована. Проп `modal` включает второй режим — см. ниже.
  */
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId, useSlots, watch } from 'vue'
 
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useModalOverlay } from '../../composables/internal/useModalOverlay'
-import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
+import { createFloatingAnchor, type GrFloatingAnchorRect, useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { vClickOutside } from '../../directives'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import {
+  type GrPopoverPadding,
   type GrPopoverRole,
   type GrPopoverSize,
   grPopoverPanelClass,
@@ -82,6 +83,19 @@ export interface GrPopoverProps {
   teleportTo?: string | HTMLElement
   contentClass?: string
   disabled?: boolean
+  /**
+   * Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`:
+   * панель встаёт у точки курсора или у строки списка. Нужен контекстному меню,
+   * у которого триггера-элемента нет вовсе.
+   *
+   * `triggerProps` в этом режиме некому потребить, и своих ARIA-атрибутов
+   * поповер никуда не вешает: `aria-haspopup` невалиден вне интерактивного
+   * элемента, а `aria-expanded` без хозяина — шум. Связь с содержимым страницы
+   * объявляет тот, кто открывает.
+   */
+  anchor?: GrFloatingAnchorRect | null
+  /** Поле панели. `none` — содержимое рисует своё (меню, список опций). */
+  padding?: GrPopoverPadding
 }
 
 export interface GrPopoverEmits {
@@ -105,9 +119,13 @@ const props = withDefaults(defineProps<GrPopoverProps>(), {
   teleportTo: undefined,
   contentClass: undefined,
   disabled: false,
+  anchor: undefined,
+  padding: 'default',
 })
 
 const emit = defineEmits<GrPopoverEmits>()
+
+const slots = useSlots()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPopover' })
 
@@ -135,8 +153,18 @@ function toggle(): void {
   isOpen.value ? close() : open()
 }
 
+/**
+ * Якорь создаётся один раз и читает координаты геттером: `useFloating`
+ * пересоздаёт подписку при смене самой ссылки, а точка меняется на каждый
+ * вызов — новый объект рвал бы `autoUpdate` без нужды.
+ */
+const anchorEl = createFloatingAnchor(() => props.anchor)
+
+/** Обёртка триггера существует только вместе со слотом — см. проп `anchor`. */
+const hasTrigger = computed(() => Boolean(slots.trigger))
+
 const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = useFloating(
-  rootEl,
+  () => (props.anchor ? anchorEl : rootEl.value),
   panelEl,
   isOpen,
   {
@@ -152,6 +180,12 @@ const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = use
 watch(() => props.placement, () => {
   if (isOpen.value) updateFloatingPosition()
 })
+
+// Объект якоря стабилен, поэтому смену координат `useFloating` сам не заметит:
+// повторный вызов у другой точки — это пересчёт позиции, а не переоткрытие.
+watch(() => props.anchor, () => {
+  if (isOpen.value) updateFloatingPosition()
+}, { deep: true })
 
 /**
  * Слой стека оверлеев: очередь Esc общая с модалками, поэтому поповер, открытый
@@ -213,7 +247,7 @@ function onContentClick(): void {
 }
 
 const panelClasses = computed(() =>
-  grPopoverPanelClass(resolvedSize.value, resolvedPlacement.value, props.contentClass),
+  grPopoverPanelClass(resolvedSize.value, resolvedPlacement.value, props.contentClass, props.padding),
 )
 
 defineExpose({ open, close, toggle })
@@ -222,6 +256,7 @@ defineExpose({ open, close, toggle })
 <template>
   <div data-gr-popover>
     <div
+      v-if="hasTrigger"
       ref="rootEl"
       v-click-outside="{ handler: close, enabled: isOpen && closeOnClickOutside, exclude: clickOutsideExclude }"
       data-gr-popover-trigger
@@ -250,6 +285,7 @@ defineExpose({ open, close, toggle })
           v-show="isOpen"
           :id="panelId"
           ref="panelEl"
+          v-click-outside="{ handler: close, enabled: isOpen && closeOnClickOutside && !hasTrigger }"
           v-bind="themeAttrs"
           data-gr-popover-panel
           data-gr-overlay-root
