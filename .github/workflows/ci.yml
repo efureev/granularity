@@ -1252,6 +1252,10 @@ jobs:
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
+      # Пакет линтуется с проверкой типов, а `./renderers/chrono` импортирует
+      # пикеры из `@feugene/granularity-chrono`. Без его `dist` типы приезжают
+      # как `any`, и `ts/no-unsafe-assignment` роняет шаг Lint.
+      - build-granularity-chrono
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1274,6 +1278,12 @@ jobs:
         with:
           name: unplugin-granularity-dist
           path: packages/unplugin-granularity/dist
+
+      - name: Download granularity-chrono dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
 
       - name: Build test kit
         run: yarn build:test-kit
