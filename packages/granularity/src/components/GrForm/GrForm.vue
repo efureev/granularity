@@ -292,10 +292,16 @@ const isDirty = computed(() => modelFingerprint(modelRecord.value) !== modelFing
 const isValid = computed(() => Object.values(errors.value).every(message => !message))
 
 // ————— Scroll-to-error.
+/**
+ * Вызов опциональный: `scrollIntoView` есть в любом браузере, но не в jsdom —
+ * тот не считает layout и метода не реализует вовсе. Без `?.` любой тест
+ * потребителя, где форма не прошла валидацию, падал бы необработанным отказом
+ * промиса, ничего при этом не проверяя про прокрутку.
+ */
 function scrollToField(name: string): void {
   const el = fieldRegistry.get(name)?.()
   if (!el) return
-  el.scrollIntoView({ behavior: props.scrollBehavior, block: 'center' })
+  el.scrollIntoView?.({ behavior: props.scrollBehavior, block: 'center' })
   const focusable = el.querySelector<HTMLElement>('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')
   focusable?.focus?.()
 }
@@ -313,7 +319,7 @@ function scrollToFirstError(): void {
 
   const first = elements[0]
   if (!first) return
-  first.scrollIntoView({ behavior: props.scrollBehavior, block: 'center' })
+  first.scrollIntoView?.({ behavior: props.scrollBehavior, block: 'center' })
   first.querySelector<HTMLElement>('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')?.focus?.()
 }
 

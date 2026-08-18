@@ -10,6 +10,9 @@ import type { GrFormRules } from '../validation'
 import type { GrFormInstance } from '..'
 
 // jsdom не реализует layout; глушим scrollIntoView, чтобы scroll-to-error не падал.
+// Мок стоит здесь ровно поэтому — и он же однажды скрыл дефект от нас самих:
+// у потребителя без такой заглушки форма роняла тест необработанным отказом.
+// Случай без мока проверяется отдельно, в самом конце файла.
 beforeEach(() => {
   Element.prototype.scrollIntoView = vi.fn()
 })
@@ -679,6 +682,31 @@ describe('GrForm — гонка асинхронной валидации пол
     // Ответ про досбросовое значение не имеет права вернуть ошибку.
     expect(errorTexts(wrapper)).toEqual([])
     expect(onValidate).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrForm — среда без `scrollIntoView`', () => {
+  /**
+   * jsdom не реализует `scrollIntoView` вовсе, и до правки форма звала его
+   * безусловно: у любого, кто тестирует свою форму в jsdom и не знает про
+   * заглушку, неуспешная валидация роняла прогон необработанным отказом — при
+   * зелёных тестах и ненулевом коде возврата. Ровно так падал CI пакета
+   * `granularity-forms-schema`.
+   */
+  it('неуспешная валидация не роняет прогон, когда метода нет', async () => {
+    // Снимаем общую заглушку: предмет проверки — именно её отсутствие.
+    delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView
+
+    const Harness = makeHarness({ email: [{ required: true, message: 'Обязательно' }] })
+    const wrapper = mount(Harness, { attachTo: document.body })
+
+    const form = (wrapper.vm as unknown as { formRef: GrFormInstance }).formRef
+    await expect(form.validate()).resolves.toBe(false)
+    await nextTick()
+
+    expect(wrapper.text()).toContain('Обязательно')
 
     wrapper.unmount()
   })

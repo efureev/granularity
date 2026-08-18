@@ -39,6 +39,12 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **A failed validation crashed the test run of anyone testing a form in jsdom.** `GrForm` called
+  `scrollIntoView` unconditionally when scrolling to the first invalid field, and jsdom does not
+  implement that method at all — the call surfaced as an unhandled rejection, so the suite reported
+  every test as passing and still exited non-zero. Both calls are optional now. The core's own
+  tests never saw it: they stub `Element.prototype.scrollIntoView` globally, and that stub hid the
+  defect from us while it reached consumers.
 - **`GrTree` typeahead lost matches when Shift was held.** The buffer stored the raw character and
   normalised only the query, so `Shift+F` followed by `f` searched for `"Ff"` and found nothing —
   the focus silently stayed put. Both `GrTree` and `GrSelect` now use the shared `useTypeahead`,
