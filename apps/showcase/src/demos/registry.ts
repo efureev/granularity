@@ -59,6 +59,8 @@ export const demoPathByPreviewKey = {
   'extra-chrono-relative-scale':          'extra/granularity-chrono/GrRelativeTimeScaleDemo.vue',
   'extra-chrono-time-basic':              'extra/granularity-chrono/GrTimePickerBasicDemo.vue',
   'extra-chrono-time-twelve':             'extra/granularity-chrono/GrTimePickerTwelveHourDemo.vue',
+  'extra-forms-schema-array':            'extra/granularity-forms-schema/GrSchemaFormArrayDemo.vue',
+  'extra-forms-schema-json':             'extra/granularity-forms-schema/GrSchemaFormJsonDemo.vue',
   'extra-dashboard-basic':                'extra/granularity-dashboard/GrDashboardBasicDemo.vue',
   'extra-dashboard-edge-to-edge':         'extra/granularity-dashboard/GrDashboardEdgeToEdgeDemo.vue',
   'extra-dashboard-item-slots':           'extra/granularity-dashboard/GrDashboardItemSlotsDemo.vue',

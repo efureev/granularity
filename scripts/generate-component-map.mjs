@@ -37,6 +37,7 @@ const PACKAGES = [
   { dir: 'packages/granularity-charts', label: 'charts' },
   { dir: 'packages/granularity-chrono', label: 'chrono' },
   { dir: 'packages/granularity-dashboard', label: 'dashboard' },
+  { dir: 'packages/granularity-forms-schema', label: 'forms-schema' },
   { dir: 'packages/extra-granularity', label: 'extra' },
 ]
 

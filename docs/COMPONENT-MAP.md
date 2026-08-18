@@ -86,6 +86,7 @@
 | смысловой блок полей с заголовком | [`GrFormSection`](../packages/granularity/docs/components/GrFormSection.md) |
 | общие дефолты контролов на всё поддерево | [`GrConfigProvider`](../packages/granularity/docs/components/GrConfigProvider.md) |
 | готовая мини-форма из трёх примитивов | [`XgQuickForm`](../packages/extra-granularity/docs/components/XgQuickForm.md) |
+| поля описаны схемой бэкенда — zod, JSON Schema, OpenAPI | [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) |
 
 Контролы про форму не знают: оркестрация подключается через `GrFormField` по
 `name`, поэтому в валидацию попадает любой существующий контрол без правок.
@@ -368,6 +369,7 @@
 | [`GrRating`](../packages/granularity/docs/components/GrRating.md) | ядро | оценка ставится в один клик |
 | [`GrRelativeTime`](../packages/granularity-chrono/docs/components/GrRelativeTime.md) | chrono | свежесть важнее точности |
 | [`GrResponseErrorBanner`](../packages/granularity/docs/components/GrResponseErrorBanner.md) | ядро | запрос упал |
+| [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) | forms-schema | бэкенд уже описывает контракт |
 | [`GrSegmented`](../packages/granularity/docs/components/GrSegmented.md) | ядро | переключение вида одного и того же |
 | [`GrSelect`](../packages/granularity/docs/components/GrSelect.md) | ядро | поле формы со списком значений |
 | [`GrSidebar`](../packages/granularity/docs/components/GrSidebar.md) | ядро | разделов много и они постоянны |

@@ -2,6 +2,7 @@ import { GranularityResolver } from '@feugene/unplugin-granularity'
 import { GranularityChartsResolver } from '@feugene/granularity-charts/resolver'
 import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
 import { GranularityDashboardResolver } from '@feugene/granularity-dashboard/resolver'
+import { GranularityFormsSchemaResolver } from '@feugene/granularity-forms-schema/resolver'
 
 /**
  * Резолверы `unplugin-vue-components` для авто-импорта компонентов дизайн-системы
@@ -12,6 +13,7 @@ import { GranularityDashboardResolver } from '@feugene/granularity-dashboard/res
  *   фабрике `createGranularResolver`;
  * - `@feugene/granularity-charts` (companion) — он же;
  * - `@feugene/granularity-dashboard` (companion) — он же.
+ * - `@feugene/granularity-forms-schema` (companion) — он же.
  *
  * Порядок важен: whitelist-резолверы компаньонов идут **первыми**, иначе жадный
  * core-резолвер перехватил бы `GrCalendar`, `GrChartLine` и остальные и
@@ -26,6 +28,7 @@ export function granularityAutoImportResolvers() {
     GranularityChronoResolver(),
     GranularityChartsResolver(),
     GranularityDashboardResolver(),
+    GranularityFormsSchemaResolver(),
     GranularityResolver({ importStyle: false }),
   ]
 }

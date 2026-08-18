@@ -10,6 +10,7 @@ on:
       - 'granularity-chrono-v*'
       - 'granularity-charts-v*'
       - 'granularity-dashboard-v*'
+      - 'granularity-forms-schema-v*'
   pull_request:
     branches: [ main ]
 
@@ -293,6 +294,7 @@ jobs:
       - build-granularity-chrono
       - build-granularity-charts
       - build-granularity-dashboard
+      - build-granularity-forms-schema
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -327,6 +329,12 @@ jobs:
         with:
           name: granularity-dashboard-dist
           path: packages/granularity-dashboard/dist
+
+      - name: Download granularity-forms-schema dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
 
       - name: Test SSR playground
         run: yarn test:playground-ssr
@@ -343,6 +351,7 @@ jobs:
       - build-granularity-chrono
       - build-granularity-charts
       - build-granularity-dashboard
+      - build-granularity-forms-schema
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -383,6 +392,12 @@ jobs:
         with:
           name: granularity-dashboard-dist
           path: packages/granularity-dashboard/dist
+
+      - name: Download granularity-forms-schema dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
 
       - name: Test showcase
         run: yarn test:showcase
@@ -397,6 +412,7 @@ jobs:
       - build-granularity-chrono
       - build-granularity-charts
       - build-granularity-dashboard
+      - build-granularity-forms-schema
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -437,6 +453,12 @@ jobs:
         with:
           name: granularity-dashboard-dist
           path: packages/granularity-dashboard/dist
+
+      - name: Download granularity-forms-schema dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
 
       - name: Install Playwright browsers
         working-directory: apps/showcase
@@ -470,6 +492,7 @@ jobs:
       - build-granularity-chrono
       - build-granularity-charts
       - build-granularity-dashboard
+      - build-granularity-forms-schema
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -510,6 +533,12 @@ jobs:
         with:
           name: granularity-dashboard-dist
           path: packages/granularity-dashboard/dist
+
+      - name: Download granularity-forms-schema dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
 
       - name: Build showcase
         run: yarn build:showcase
@@ -1142,6 +1171,7 @@ jobs:
   publish-npm-granularity-dashboard:
     needs:
       - build-granularity-dashboard
+      - build-granularity-forms-schema
     if: startsWith(github.ref, 'refs/tags/granularity-dashboard-v')
     runs-on: ubuntu-latest
     permissions:
@@ -1213,6 +1243,159 @@ jobs:
 
       - name: Publish to GitHub Packages
         working-directory: packages/granularity-dashboard
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-granularity-forms-schema:
+    needs:
+      - quality-granularity
+      - build-granularity
+      - build-unplugin-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Build test kit
+        run: yarn build:test-kit
+
+      - name: Lint
+        working-directory: packages/granularity-forms-schema
+        run: yarn lint
+
+      - name: Typecheck
+        working-directory: packages/granularity-forms-schema
+        run: yarn typecheck
+
+      # Реестры сверяются с файловой системой до сборки: рассинхрон ломает не
+      # сборку, а tree-shaking, subpath-импорт и скан классов — молча.
+      - name: Registry drift
+        working-directory: packages/granularity-forms-schema
+        run: yarn generate:registry --check
+
+      # Три локали обязаны совпадать по ключам: пропущенный перевод ничем не
+      # проявляется — компонент молча показывает английский fallback.
+      - name: Locale completeness
+        working-directory: packages/granularity-forms-schema
+        run: yarn check:messages
+
+      - name: Test
+        working-directory: packages/granularity-forms-schema
+        run: yarn test:run
+
+      - name: Build package
+        run: yarn workspace @feugene/granularity-forms-schema build
+
+      - name: Granular doctor
+        working-directory: packages/granularity-forms-schema
+        run: yarn doctor
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/granularity-forms-schema
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist/
+
+  # Публикация @feugene/granularity-forms-schema в npm по тегу вида
+  # `granularity-forms-schema-v<semver>`. Отдельный тег позволяет релизить компаньон
+  # независимо от ядра: у него свой цикл и своя версия.
+  publish-npm-granularity-forms-schema:
+    needs:
+      - build-granularity-forms-schema
+    if: startsWith(github.ref, 'refs/tags/granularity-forms-schema-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/granularity-forms-schema
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#granularity-forms-schema-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/granularity-forms-schema
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория
+  # (`@efureev/granularity-forms-schema`). Аналогично publish-gpr для granularity.
+  publish-gpr-granularity-forms-schema:
+    needs:
+      - publish-npm-granularity-forms-schema
+    if: startsWith(github.ref, 'refs/tags/granularity-forms-schema-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/granularity-forms-schema
+        run: |
+          npm pkg set name='@efureev/granularity-forms-schema'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity-forms-schema
         run: npm publish --ignore-scripts --no-provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

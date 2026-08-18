@@ -11,6 +11,8 @@ import { GR_CHARTS_I18N_BLOCK } from '@feugene/granularity-charts/i18n'
 import grChartsLocales from '@feugene/granularity-charts/i18n/all'
 import { GR_DASHBOARD_I18N_BLOCK } from '@feugene/granularity-dashboard/i18n'
 import grDashboardLocales from '@feugene/granularity-dashboard/i18n/all'
+import { GR_FORMS_SCHEMA_I18N_BLOCK } from '@feugene/granularity-forms-schema/i18n'
+import grFormsSchemaLocales from '@feugene/granularity-forms-schema/i18n/all'
 
 import { SHOWCASE_I18N_BLOCK, showcaseLocaleLoaders } from './messages'
 
@@ -28,7 +30,7 @@ export async function setupShowcaseI18n() {
     // ключи у него `gr.calendar.*`, а реестр лоадеров `fint-i18n` источники
     // одного блока склеивает. Без этой строки календарь и пикеры показывают
     // английский fallback из компонента — на любом языке витрины.
-    loaders: [showcaseLocaleLoaders, ...grLocales, ...grChronoLocales, ...grChartsLocales, ...grDashboardLocales],
+    loaders: [showcaseLocaleLoaders, ...grLocales, ...grChronoLocales, ...grChartsLocales, ...grDashboardLocales, ...grFormsSchemaLocales],
     plugins: [
       new PersistencePlugin({
         key: 'showcase-locale', // Key in localStorage
@@ -37,7 +39,7 @@ export async function setupShowcaseI18n() {
     ]
   })
 
-  i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK])
+  i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK])
   // `PersistencePlugin` уже мог восстановить сохранённый в localStorage (`showcase-locale`)
   // язык в `i18n.locale.value` во время `createFintI18n`. Грузим блоки именно для активного
   // языка, а не для `defaultLocale`, иначе после перезагрузки страница остаётся на английском

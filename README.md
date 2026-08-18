@@ -12,6 +12,7 @@ with components, styles, and a UnoCSS preset that supports granular subpath expo
 - `packages/granularity` — the published [`@feugene/granularity`](./packages/granularity/README.md) package.
 - `packages/granularity-*` — companion packages: [charts](./packages/granularity-charts/README.md),
   [chrono](./packages/granularity-chrono/README.md), [dashboard](./packages/granularity-dashboard/README.md),
+  [forms-schema](./packages/granularity-forms-schema/README.md),
   [test-kit](./packages/granularity-test-kit/README.md).
 - `apps/showcase` — live component showcase, deployed to GitHub Pages.
 - `apps/playground*` — sandboxes for integration scenarios (not published, not covered by CI).
@@ -38,7 +39,8 @@ yarn dev:showcase          # run the showcase locally
 
 - Packages are published to `npm` and GitHub Packages by GitHub Actions. The core releases on
   `v*` tags; every companion has its own tag and its own cycle — `granularity-charts-v*`,
-  `granularity-chrono-v*`, `granularity-dashboard-v*`, `granularity-test-kit-v*`,
+  `granularity-chrono-v*`, `granularity-dashboard-v*`, `granularity-forms-schema-v*`,
+  `granularity-test-kit-v*`,
   `unplugin-granularity-v*`.
 - There is no changelog at the repository root: each package keeps its own, next to its
   `package.json`. Start with [`packages/granularity/CHANGELOG.md`](./packages/granularity/CHANGELOG.md).

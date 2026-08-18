@@ -1,0 +1,41 @@
+{
+  "array": {
+    "add": "Añadir",
+    "added": "Fila {index} añadida, {count} en total",
+    "duplicate": "Duplicar la posición {index}",
+    "empty": "Aún no se ha añadido nada",
+    "itemLabel": "Elemento {index}",
+    "moveDown": "Bajar la posición {index}",
+    "moveUp": "Subir la posición {index}",
+    "moved": "Fila {from} movida a la posición {to}",
+    "removeAt": "Eliminar la posición {index}",
+    "removed": "Fila {index} eliminada, quedan {count}",
+    "rowGroup": "Posición {index} de {count}"
+  },
+  "format": {
+    "color": "Introduce un color como #RRGGBB",
+    "date": "Introduce una fecha como AAAA-MM-DD",
+    "dateTime": "Introduce fecha y hora",
+    "hostname": "Nombre de host no válido",
+    "invalid": "Formato no válido",
+    "ipv4": "Dirección IPv4 no válida",
+    "ipv6": "Dirección IPv6 no válida",
+    "json": "JSON no válido",
+    "slug": "Usa minúsculas, dígitos y guiones",
+    "time": "Introduce una hora como HH:MM",
+    "uuid": "UUID no válido"
+  },
+  "rule": {
+    "const": "El valor debe ser {value}",
+    "exclusiveMax": "El valor debe ser menor que {max}",
+    "exclusiveMin": "El valor debe ser mayor que {min}",
+    "integer": "Introduce un número entero",
+    "max": "El máximo es {max}",
+    "maxDate": "No posterior a {date}",
+    "min": "El mínimo es {min}",
+    "minDate": "No anterior a {date}",
+    "mustBeTrue": "Debes marcar esta casilla",
+    "step": "El valor debe ser múltiplo de {step}",
+    "unique": "Los valores no deben repetirse"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "array": {
+    "add": "Add",
+    "added": "Row {index} added, {count} total",
+    "duplicate": "Duplicate position {index}",
+    "empty": "Nothing added yet",
+    "itemLabel": "Item {index}",
+    "moveDown": "Move position {index} down",
+    "moveUp": "Move position {index} up",
+    "moved": "Row {from} moved to position {to}",
+    "removeAt": "Remove position {index}",
+    "removed": "Row {index} removed, {count} left",
+    "rowGroup": "Position {index} of {count}"
+  },
+  "format": {
+    "color": "Enter a colour as #RRGGBB",
+    "date": "Enter a date as YYYY-MM-DD",
+    "dateTime": "Enter a date and time",
+    "hostname": "Enter a valid host name",
+    "invalid": "Invalid format",
+    "ipv4": "Enter a valid IPv4 address",
+    "ipv6": "Enter a valid IPv6 address",
+    "json": "Enter valid JSON",
+    "slug": "Use lowercase letters, digits and hyphens",
+    "time": "Enter a time as HH:MM",
+    "uuid": "Enter a valid UUID"
+  },
+  "rule": {
+    "const": "Value must be {value}",
+    "exclusiveMax": "Value must be less than {max}",
+    "exclusiveMin": "Value must be greater than {min}",
+    "integer": "Enter a whole number",
+    "max": "Maximum is {max}",
+    "maxDate": "Not later than {date}",
+    "min": "Minimum is {min}",
+    "minDate": "Not earlier than {date}",
+    "mustBeTrue": "This must be checked",
+    "step": "Value must be a multiple of {step}",
+    "unique": "Values must not repeat"
+  }
+}

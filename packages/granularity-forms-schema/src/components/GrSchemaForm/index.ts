@@ -1,0 +1,12 @@
+export { grSchemaFormConfig } from './config'
+// Реэкспорт затягивает `defaults.ts` — и его аугментацию реестра — к потребителю.
+export type { GrSchemaFormConfigurableProps } from './defaults'
+export { type GrSchemaFormContext, useSchemaForm } from './context'
+export { default } from './GrSchemaForm.vue'
+export { default as GrSchemaForm } from './GrSchemaForm.vue'
+export type { GrSchemaFormEmits, GrSchemaFormProps } from './GrSchemaForm.vue'
+export { default as GrSchemaArrayField } from './GrSchemaArrayField.vue'
+export type { GrSchemaArrayFieldEmits, GrSchemaArrayFieldProps } from './GrSchemaArrayField.vue'
+export { default as GrSchemaField } from './GrSchemaField.vue'
+export type { GrSchemaFieldEmits, GrSchemaFieldProps } from './GrSchemaField.vue'
+export { grSchemaFormSafelist } from './safelist'

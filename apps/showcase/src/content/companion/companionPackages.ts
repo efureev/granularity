@@ -1,5 +1,6 @@
 import chartsPkg from '@feugene/granularity-charts/package.json'
 import dashboardPkg from '@feugene/granularity-dashboard/package.json'
+import formsSchemaPkg from '@feugene/granularity-forms-schema/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
 import type { ShowcaseApiSectionMeta } from '../model.ts'
@@ -1814,6 +1815,56 @@ function addItem(
           },
         ],
         apiSections: dashboardPaletteApiSections(),
+      },
+    ],
+  },
+  {
+    id: 'granularity-forms-schema',
+    npmName: '@feugene/granularity-forms-schema',
+    label: 'Forms Schema',
+    version: formsSchemaPkg.version,
+    description: 'Форма из схемы бэкенда: zod или JSON Schema на входе — настоящие поля дизайн-системы на выходе, с валидацией, раскладкой и повторяемыми секциями. Ни одной зависимости: адаптеры подключаются отдельными subpath.',
+    dependencies: [],
+    components: [
+      {
+        name: 'GrSchemaForm',
+        slug: 'gr-schema-form',
+        title: 'GrSchemaForm',
+        summary: 'Раскладывает форму по схеме: поля, правила, разделы и повторяемые секции. Виджет выбирает реестр, вид настраивает uiSchema, а любое поле можно перехватить слотом.',
+        importPath: '@feugene/granularity-forms-schema/components/GrSchemaForm',
+        overview: {
+          paragraphs: [
+            'Бэкенд уже описал контракт — zod, JSON Schema, OpenAPI. Пакет раскладывает по нему форму и переносит ограничения в валидацию, чтобы описание не пришлось повторять руками и потом сверять две расходящиеся версии.',
+          ],
+          features: [
+            'Схема на входе, поля дизайн-системы на выходе',
+            'Валидация из схемы: правила ядра плюс полная проверка',
+            'Повторяемые секции для массивов объектов',
+            'uiSchema: порядок, колонки, условия, подмена виджета',
+            'Серверные ошибки садятся на свои поля',
+          ],
+        },
+        typeDeclarations: `import type {
+  GrSchemaAdapter,
+  GrSchemaModel,
+  GrSchemaNode,
+  GrUiSchema,
+} from '@feugene/granularity-forms-schema'`,
+        examples: [
+          {
+            id: 'forms-schema-json',
+            title: 'Форма по JSON Schema',
+            description: 'Типы и форматы решают, каким контролом рисовать поле, а ограничения становятся правилами. Вид задаётся отдельно — `uiSchema` не трогает контракт данных.',
+            previewKey: 'extra-forms-schema-json',
+          },
+          {
+            id: 'forms-schema-array',
+            title: 'Повторяемая секция',
+            description: 'Массив объектов: добавление, удаление, перенос строк и границы длины. Ошибки не съезжают на соседнюю строку при удалении — валидация хвоста снимается до сдвига.',
+            previewKey: 'extra-forms-schema-array',
+          },
+        ],
+        apiSections: [],
       },
     ],
   },
