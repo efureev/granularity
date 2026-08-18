@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.25.0] 2026-08-18
+
 ### Added
 
 - **New `GrChip` — a tag you can act on.** Removable with a cross, selectable as a toggle, with an
