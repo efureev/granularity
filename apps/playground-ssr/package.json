@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@feugene/granularity": "^0.27.0",
-    "@feugene/granularity-charts": "^0.5.2",
+    "@feugene/granularity-charts": "^0.6.0",
     "@feugene/granularity-chrono": "^0.4.0",
     "@feugene/granularity-dashboard": "^0.2.2",
     "@unocss/reset": "^66.7.5",
