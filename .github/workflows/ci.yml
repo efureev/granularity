@@ -779,6 +779,9 @@ jobs:
           name: granularity-dist
           path: packages/granularity/dist
 
+      - name: Typecheck package
+        run: yarn typecheck:unplugin
+
       - name: Test package
         run: yarn workspace @feugene/unplugin-granularity test:run
 
@@ -927,6 +930,10 @@ jobs:
       - name: Registry drift
         working-directory: packages/granularity-chrono
         run: yarn generate:registry --check
+
+      - name: Locale completeness
+        working-directory: packages/granularity-chrono
+        run: yarn check:messages
 
       - name: Test
         working-directory: packages/granularity-chrono
@@ -1529,6 +1536,14 @@ jobs:
       - name: Run tests
         run: yarn workspace @feugene/extra-granularity test:run
 
+      - name: Typecheck package
+        run: yarn typecheck:extra
+
       - name: Granular doctor
         working-directory: packages/extra-granularity
         run: yarn doctor
+
+      # Единственный собираемый пакет, чьи метаданные не проверялись.
+      - name: Validate package metadata (publint)
+        working-directory: packages/extra-granularity
+        run: npx --yes publint@latest --pack npm
