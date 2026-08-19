@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.2] 2026-08-19
+
 ### Fixed
 
 - **`GrConfigProvider` now actually configures `GrSchemaForm`.** All four declared keys
