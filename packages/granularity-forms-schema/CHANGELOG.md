@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.3] 2026-08-20
+
 ### Fixed
 
 - **`z.email()` and friends kept their format again.** zod 4 moved string formats onto the
