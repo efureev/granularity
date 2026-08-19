@@ -1,4 +1,4 @@
-import { granularityGlobal, mockRect, pointer } from '@feugene/granularity/testing'
+import { announced, granularityGlobal, keydown, mockRect, pointer } from '@feugene/granularity/testing'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
@@ -276,5 +276,133 @@ describe('GrChartBar', () => {
     await nextTick()
 
     expect(bars(dim).every(node => node.attributes('fill-opacity') === undefined)).toBe(true)
+  })
+})
+
+describe('GrChartBar — горизонталь', () => {
+  /**
+   * Левый край полосы — минимальная абсцисса горизонтальных переходов `H`.
+   *
+   * Не первое число пути: `barPath` начинает полосу влево с её правого конца.
+   * И не минимум всех чисел: в путь входит радиус дуги.
+   */
+  function startX(d: string): number {
+    const xs = [...d.matchAll(/H\s+(-?\d+(?:\.\d+)?)/g)].map(match => Number(match[1]))
+
+    return Math.min(...xs)
+  }
+
+  it('оси рисует сам компонент, а не рама', () => {
+    // Рама уходит с `axes: false`: её ось значений вертикальна по построению.
+    const wrapper = factory({ orientation: 'horizontal' })
+    const axes = wrapper.findAll('[data-gr-chart-axis]')
+
+    expect(axes.length).toBe(2)
+    expect(wrapper.text()).toContain('Q1')
+
+    wrapper.unmount()
+  })
+
+  it('все полосы начинаются от общего нуля слева', () => {
+    const wrapper = factory({ orientation: 'horizontal' })
+    const starts = bars(wrapper).map(bar => startX(bar.attributes('d')!))
+
+    expect(new Set(starts.map(value => Math.round(value))).size).toBe(1)
+
+    wrapper.unmount()
+  })
+
+  it('отрицательное значение растёт влево от нуля', () => {
+    const wrapper = factory({
+      orientation: 'horizontal',
+      series: [{ id: 'delta', x: categories, y: [40, -30, 20, 10] }],
+    })
+    const paths = bars(wrapper).map(bar => bar.attributes('d')!)
+    // Полоса убытка начинается левее нулевой отметки, у которой стоят остальные.
+    const zero = startX(paths[0]!)
+
+    expect(startX(paths[1]!)).toBeLessThan(zero)
+
+    wrapper.unmount()
+  })
+
+  it('в группе серии идут одна под другой, а не рядом', () => {
+    const wrapper = factory({ orientation: 'horizontal' })
+    const paths = bars(wrapper).map(bar => bar.attributes('d')!)
+    // Полосы одной категории стоят на разной высоте и начинаются от общего нуля:
+    // при перепутанных осях они наложились бы друг на друга.
+    const tops = paths.map(d => Number(/^M\s+-?\d+(?:\.\d+)?\s+(-?\d+(?:\.\d+)?)/.exec(d)![1]))
+
+    expect(new Set(tops).size).toBe(paths.length)
+    expect(new Set(paths.map(startX)).size).toBe(1)
+
+    wrapper.unmount()
+  })
+
+  it('вертикаль по-прежнему рисуется рамой', () => {
+    const wrapper = factory()
+
+    expect(wrapper.findAll('[data-gr-chart-axis]').length).toBeGreaterThan(0)
+    expect(bars(wrapper).length).toBeGreaterThan(0)
+
+    wrapper.unmount()
+  })
+
+  it('`↑↓` ведут по категориям, `→` меняет читаемую серию', async () => {
+    const wrapper = factory({ orientation: 'horizontal' })
+    const element = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(element, 'ArrowDown')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Q1')
+
+    keydown(element, 'ArrowDown')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Q2')
+
+    keydown(element, 'ArrowRight')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Факт')
+
+    wrapper.unmount()
+  })
+
+  it('попадание считается по строке категории, а не по колонке', async () => {
+    const wrapper = factory({ orientation: 'horizontal' })
+    const surface = wrapper.find('[data-gr-chart-surface]')
+
+    // Категории идут сверху вниз: первая строка — вверху области.
+    surface.element.dispatchEvent(pointer('pointermove', { clientX: 200, clientY: 35 }))
+    await nextTick()
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([0])
+
+    // Ниже по той же колонке — уже другая категория; при декартовом правиле
+    // рамы обе точки дали бы один и тот же индекс.
+    surface.element.dispatchEvent(pointer('pointermove', { clientX: 200, clientY: 200 }))
+    await nextTick()
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).not.toEqual([0])
+
+    wrapper.unmount()
+  })
+
+  it('`orientation` приезжает из GrConfigProvider', () => {
+    const wrapper = factory({}, { componentDefaults: { GrChartBar: { orientation: 'horizontal' } } })
+
+    expect(wrapper.findAll('[data-gr-chart-axis]').length).toBe(2)
+
+    wrapper.unmount()
+  })
+
+  it('опоры рисуются в горизонтальных координатах', () => {
+    const wrapper = factory({
+      orientation: 'horizontal',
+      references: [{ axis: 'y', value: 50, label: 'План' }],
+    })
+
+    expect(wrapper.find('[data-gr-chart-reference]').exists()).toBe(true)
+    // Текст опоры несёт рама — он остаётся в описании и таблице.
+    expect(wrapper.html()).toContain('План')
+
+    wrapper.unmount()
   })
 })

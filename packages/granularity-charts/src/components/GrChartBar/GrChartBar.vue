@@ -3,18 +3,26 @@ import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/com
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { computed, ref } from 'vue'
 
-import { barPath, barRect, groupSlots } from '../../chart/chartBars'
+import { barBandwidth, barHitIndex, barPath, barRect, barToward, groupSlots } from '../../chart/chartBars'
+import type { ChartOrientation } from '../../chart/chartOrientation'
+import { orientedGrid, orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
+import { labelGutters } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
-import type { GrChartReference } from '../../chart/chartReference'
-import { referenceDomainValues } from '../../chart/chartReference'
-import { type GrChartScale, type GrChartScaleKind, nearestIndex, scaleForAxis } from '../../chart/chartScale'
-import type { ChartTickFormat } from '../../composables/useChartTicks'
+import type { GrChartReference, NormalizedReference } from '../../chart/chartReference'
+import { normalizeReferences, referenceDomainValues } from '../../chart/chartReference'
+import { bandScale, createScale, type GrChartScale, type GrChartScaleKind, linearScale, scaleForAxis } from '../../chart/chartScale'
+import type { ChartTick, ChartTickFormat } from '../../composables/useChartTicks'
 import type { ChartHitContext, GrChartActivePoint } from '../../composables/useChartTooltip'
+import { bandTicks, linearTicks } from '../../chart/chartTicks'
+import ChartAxis from '../GrChartFrame/shared/ChartAxis.vue'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
+import ChartGrid from '../GrChartFrame/shared/ChartGrid.vue'
+import ChartReferences from '../GrChartFrame/shared/ChartReferences.vue'
+import { labelFontPx, labelSizeClass } from '../GrChartFrame/chartFrameStyles'
 import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
 import {
   barDimOpacity,
@@ -36,6 +44,18 @@ export interface GrChartBarProps {
   series: readonly GrChartSeries[] | readonly number[]
   /** Тип оси X. Не задан — выводится из данных; для столбцов это обычно категории. */
   xScale?: GrChartScaleKind
+  /**
+   * Раскладка столбцов.
+   *
+   * `'horizontal'` — категории идут сверху вниз, значения вправо. Берут её ради
+   * подписей: длинное название категории в вертикальной раскладке либо наезжает
+   * на соседнее, либо встаёт наискось.
+   *
+   * Оси и после поворота называются **по данным**: `yDomain`, `yTickFormat` и
+   * `showGrid: 'y'` относятся к оси значений, где бы она ни лежала. Алиасов нет
+   * намеренно — два пропа с одним смыслом хуже одного неточного имени.
+   */
+  orientation?: ChartOrientation
   /** `true` — стопка, `'100%'` — стопка с нормировкой столбца к единице. */
   stacked?: boolean | '100%'
   /** Доля ширины слота, уходящая в зазор между сериями внутри категории. */
@@ -115,6 +135,7 @@ export interface GrChartBarEmits {
 
 const props = withDefaults(defineProps<GrChartBarProps>(), {
   xScale: undefined,
+  orientation: undefined,
   stacked: false,
   // Дефолты живут в резолверах: Vue подставил бы свой раньше, чем компонент
   // заглянет в `GrConfigProvider`.
@@ -169,6 +190,8 @@ const resolvedRadius = useGrComponentProp('GrChartBar', 'barRadius', () => props
 const resolvedGroupPadding = useGrComponentProp('GrChartBar', 'groupPadding', () => props.groupPadding, 0.1)
 const resolvedDimInactive = useGrComponentProp('GrChartBar', 'dimInactive', () => props.dimInactive, true)
 const resolvedGrid = useGrComponentProp('GrChartBar', 'showGrid', () => props.showGrid, 'y' as const)
+const resolvedOrientation = useGrComponentProp('GrChartBar', 'orientation', () => props.orientation, 'vertical' as ChartOrientation)
+const isHorizontal = computed(() => resolvedOrientation.value === 'horizontal')
 const resolvedLegendMode = useGrComponentProp('GrChartBar', 'showLegend', () => props.showLegend, 'auto' as const)
 const resolvedLegendPosition = useGrComponentProp('GrChartBar', 'legendPosition', () => props.legendPosition, 'bottom' as const)
 const resolvedTooltip = useGrComponentProp('GrChartBar', 'tooltip', () => props.tooltip, true)
@@ -211,7 +234,10 @@ const data = computed(() => normalizeChartData(seriesInput.value, {
   stacked: props.stacked,
   includeXValues: referenceDomain.value.x,
   includeYValues: referenceDomain.value.y,
-  dualAxis: props.dualAxis,
+  // Вторая ось значений при горизонтали стала бы верхней, а верхнего гуттера
+  // нет ни у `chartLayout`, ни у `labelGutters`. Гасим здесь, а не в шаблоне:
+  // тогда и таблица не припишет «(правая ось)», и тултип возьмёт один формат.
+  dualAxis: props.dualAxis && !isHorizontal.value,
   yDomainRight: props.yDomainRight,
 }))
 
@@ -226,15 +252,83 @@ const showLegend = computed(() => (
   resolvedLegendMode.value === 'auto' ? data.value.series.length > 1 : resolvedLegendMode.value === true
 ))
 
+/** Подписи категорий: у полосной шкалы это имена, у непрерывной — форматированные числа. */
+const categoryLabels = computed(() => data.value.positions.map((position, index) => categoryTickLabel(position, index)))
+
+function categoryTickLabel(position: number, index?: number): string {
+  const categories = data.value.categories
+
+  if (categories.length > 0)
+    return categories[index ?? position] ?? String(position)
+
+  return props.xTickFormat ? String(props.xTickFormat(position, data.value.kind)) : String(position)
+}
+
 /**
- * Ширина категории.
+ * Место под собственные подписи при горизонтали.
  *
- * У непрерывной шкалы её нет вовсе (`bandwidth === 0`), а столбцы по датам —
- * обычное дело: тогда ширина считается от числа позиций. Без этого график по
- * оси времени рисовался бы полосами нулевой ширины, то есть ничем.
+ * Рама идёт с `axes: false`: её ось значений вертикальна по построению, а здесь
+ * она внизу. Содержимое нижних подписей на высоту гуттера не влияет — важно
+ * лишь то, что строка текста под областью есть.
  */
-function bandOf(xScale: GrChartScale, plot: Rect, count: number): number {
-  return xScale.bandwidth > 0 ? xScale.bandwidth : (plot.width / Math.max(1, count)) * 0.8
+const gutters = computed(() => (isHorizontal.value
+  ? labelGutters({
+      leftLabels: categoryLabels.value,
+      bottomLabels: ['0'],
+      fontSizePx: labelFontPx[resolvedSize.value],
+    })
+  : { left: 0, bottom: 0, truncated: false }))
+
+interface BarGeometry {
+  /** Шкала значений: у вертикали это ось рамы, у горизонтали — своя. */
+  value: GrChartScale
+  /** Шкала категорий. */
+  category: GrChartScale
+  /** Область под марки за вычетом собственных гуттеров. */
+  area: Rect
+}
+
+/**
+ * Одна точка, из которой берут систему координат марки, попадание и якорь
+ * тултипа: разъедься они — и тултип встанет не на тот столбец.
+ *
+ * Домен значений при горизонтали берётся у шкалы рамы: он уже расширен до
+ * «красивых» границ, и посчитанный заново разошёлся бы с ней на округлении.
+ */
+function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): BarGeometry {
+  if (!isHorizontal.value)
+    return { value: yScale, category: xScale, area: plot }
+
+  const area = {
+    x: plot.x + gutters.value.left,
+    y: plot.y,
+    width: Math.max(0, plot.width - gutters.value.left),
+    height: Math.max(0, plot.height - gutters.value.bottom),
+  }
+
+  return {
+    value: linearScale(yScale.domain, [area.x, area.x + area.width]),
+    category: data.value.kind === 'band'
+      ? bandScale(data.value.positions.length, [area.y, area.y + area.height])
+      : createScale(data.value.kind, data.value.xDomain, [area.y, area.y + area.height]),
+    area,
+  }
+}
+
+function valueTicks(geometry: BarGeometry): ChartTick[] {
+  return linearTicks(geometry.value.domain, props.yTickCount).values.map(value => ({
+    value,
+    position: geometry.value.scale(value),
+    label: yTickFormat.value ? String(yTickFormat.value(value)) : String(value),
+  }))
+}
+
+function categoryTicks(geometry: BarGeometry): ChartTick[] {
+  return bandTicks(data.value.positions.length, 12).map(index => ({
+    value: index,
+    position: geometry.category.scale(data.value.positions[index] ?? index),
+    label: categoryTickLabel(data.value.positions[index] ?? index, index),
+  }))
 }
 
 interface BarMark {
@@ -262,9 +356,14 @@ function barMarks(
 ): BarMark[] {
   const activeX = cursor === null ? undefined : data.value.positions[cursor]
   const stacked = props.stacked !== false
-  const bandwidth = bandOf(xScale, plot, data.value.positions.length)
+  const orientation = resolvedOrientation.value
+  const geometry = geometryOf(plot, xScale, yScale)
+  const bandwidth = barBandwidth(geometry.category, geometry.area, data.value.positions.length, orientation)
   const slots = groupSlots(stacked ? 1 : series.length, bandwidth, { groupPadding: resolvedGroupPadding.value })
-  const top = topmostAt(series)
+  const outermost = outermostAt(series)
+  const [valueLow, valueHigh] = isHorizontal.value
+    ? [geometry.area.x, geometry.area.x + geometry.area.width]
+    : [geometry.area.y, geometry.area.y + geometry.area.height]
   const marks: BarMark[] = []
 
   series.forEach((item, seriesIndex) => {
@@ -275,8 +374,8 @@ function barMarks(
 
     // Шкала и её ноль берутся у одной оси: иначе столбец правой серии встал бы
     // на чужую базовую линию и показал бы величину, которой нет.
-    const scale = scaleForAxis(item.axis, yScale, yScaleRight)
-    const baseline = Math.min(Math.max(scale.scale(0), plot.y), plot.y + plot.height)
+    const scale = isHorizontal.value ? geometry.value : scaleForAxis(item.axis, yScale, yScaleRight)
+    const baseline = Math.min(Math.max(scale.scale(0), valueLow), valueHigh)
 
     for (const point of item.points) {
       if (point.y === null)
@@ -287,11 +386,15 @@ function barMarks(
       const from = stacked ? scale.scale(point.stackBase!) : baseline
       const to = stacked ? scale.scale(point.stackTop!) : scale.scale(point.y)
       // Имя не `rounded`: гейт `styleTokens` ищет утилиту с тем же написанием.
-      const withRadius = !stacked || top.get(point.x) === item.id
+      const withRadius = !stacked || outermost.get(point.x) === item.id
 
       marks.push({
         key: `${item.id}-${point.sourceIndex}`,
-        d: barPath(barRect(xScale.scale(point.x), slot, from, to), withRadius ? resolvedRadius.value : 0, to <= from ? 'up' : 'down'),
+        d: barPath(
+          barRect(geometry.category.scale(point.x), slot, from, to, orientation),
+          withRadius ? resolvedRadius.value : 0,
+          barToward(from, to, orientation),
+        ),
         color: item.style.color,
         seriesId: item.id,
         dimmed: resolvedDimInactive.value && activeX !== undefined && point.x !== activeX,
@@ -302,8 +405,11 @@ function barMarks(
   return marks
 }
 
-/** Кто в каждой категории лежит сверху: только его сегмент получает скругление. */
-function topmostAt(series: readonly NormalizedSeries[]): Map<number, string> {
+/**
+ * Кто в каждой категории лежит дальше всех от базовой линии: только его сегмент
+ * получает скругление. При горизонтали «дальний» — правый, а не верхний.
+ */
+function outermostAt(series: readonly NormalizedSeries[]): Map<number, string> {
   const top = new Map<number, string>()
 
   for (const item of series) {
@@ -331,21 +437,88 @@ function topmostAt(series: readonly NormalizedSeries[]): Map<number, string> {
  * процент нельзя было бы навести вовсе — и это ровно то значение, которое чаще
  * всего и хотят прочитать.
  */
+/**
+ * Опоры в горизонтальной системе координат.
+ *
+ * Рама рисует их своими шкалами и своим `axis`, где `'y'` — это ось значений,
+ * идущая вниз. При горизонтали значения идут вправо, поэтому опора приезжает
+ * сюда со свопнутой осью: `'y'` становится `'x'`, и `referenceMarks` внутри
+ * `ChartReferences` строит ровно ту вертикальную черту, которая и нужна.
+ *
+ * Текст опоры при этом остаётся за рамой — `aria-description` и строка
+ * `<tfoot>` собираются там же, где и раньше, поэтому читатель без зрения порог
+ * не теряет.
+ */
+function horizontalReferences(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): NormalizedReference[] {
+  if (!isHorizontal.value)
+    return []
+
+  const geometry = geometryOf(plot, xScale, yScale)
+
+  return normalizeReferences(props.references ?? [], {
+    kind: data.value.kind,
+    categories: data.value.categories,
+    xDomain: data.value.xDomain,
+    yDomain: geometry.value.domain,
+  }).map(reference => ({ ...reference, axis: reference.axis === 'y' ? 'x' as const : 'y' as const }))
+}
+
 function hitTest(point: { x: number, y: number }, context: ChartHitContext): number {
-  const { plot, xScale } = context
-
-  if (point.y < plot.y || point.y > plot.y + plot.height)
-    return -1
-
+  const geometry = geometryOf(context.plot, context.xScale, context.yScale)
   const positions = data.value.positions
-  const index = nearestIndex(positions, xScale, point.x)
 
-  if (index === -1)
-    return -1
+  return barHitIndex({
+    point,
+    area: geometry.area,
+    positions,
+    scale: geometry.category,
+    bandwidth: barBandwidth(geometry.category, geometry.area, positions.length, resolvedOrientation.value),
+    orientation: resolvedOrientation.value,
+  })
+}
 
-  const half = bandOf(xScale, plot, positions.length) / 2
+/**
+ * Якорь панели — дальний конец самой длинной полосы категории.
+ *
+ * Функция стабильная и ветвится внутри: рама забирает `anchorPoint` по значению
+ * один раз на setup, и условный проп (`isHorizontal ? fn : undefined`) протух бы
+ * при переключении раскладки на живом компоненте — панель осталась бы у старой
+ * оси.
+ */
+function anchorPoint(index: number, context: ChartHitContext): { x: number, y: number } | null {
+  const position = data.value.positions[index]
 
-  return Math.abs(point.x - xScale.scale(positions[index]!)) <= half ? index : -1
+  if (position === undefined)
+    return null
+
+  const geometry = geometryOf(context.plot, context.xScale, context.yScale)
+  const center = geometry.category.scale(position)
+  const stacked = props.stacked !== false
+  let tip: number | null = null
+
+  for (const item of data.value.series) {
+    if (item.hidden)
+      continue
+
+    const point = item.points.find(candidate => candidate.x === position)
+
+    if (!point || point.y === null)
+      continue
+
+    const scale = isHorizontal.value
+      ? geometry.value
+      : scaleForAxis(item.axis, context.yScale, context.yScaleRight)
+    const value = scale.scale(stacked ? (point.stackTop ?? point.y) : point.y)
+
+    // Дальний конец — самый правый при горизонтали и самый верхний при
+    // вертикали: у перевёрнутой оси значений «больше» это меньший пиксель.
+    tip = tip === null ? value : (isHorizontal.value ? Math.max(tip, value) : Math.min(tip, value))
+  }
+
+  if (tip === null)
+    return null
+
+  return orientedPoint(center, tip, resolvedOrientation.value)
 }
 
 function onLegendToggle(payload: { seriesId: string, hidden: boolean }): void {
@@ -376,12 +549,16 @@ defineExpose({
     :height="resolvedHeight"
     :width="width"
     :size="resolvedSize"
-    :show-grid="resolvedGrid"
+    :axes="!isHorizontal"
+    :keyboard="isHorizontal ? { axes: 'transposed' } : undefined"
+    :show-grid="isHorizontal ? 'none' : resolvedGrid"
+    :reference-layer="!isHorizontal"
     :show-legend="showLegend"
     :legend-position="resolvedLegendPosition"
     :tooltip="resolvedTooltip"
     :crosshair="false"
     :hit-test="hitTest"
+    :anchor-point="anchorPoint"
     :loading="loading"
     :empty="empty"
     :empty-text="emptyText"
@@ -415,6 +592,30 @@ defineExpose({
 </template>
 
     <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, activeIndex: cursor, clipPathId }">
+      <!--
+        При горизонтали рама уступает свои слои: её оси, сетка и опоры считаются
+        в вертикальной системе координат и легли бы поперёк. Порядок обязателен —
+        сетка, опоры, марки: опора под полосой читается как порог, поверх неё —
+        как перечёркивание. Порядка элементов не стережёт ни один гейт.
+      -->
+      <template v-if="isHorizontal">
+        <ChartGrid
+          :plot="geometryOf(plot, sx, sy).area"
+          :x-ticks="valueTicks(geometryOf(plot, sx, sy))"
+          :y-ticks="[]"
+          :show="orientedGrid(resolvedGrid, 'horizontal')"
+        />
+        <ChartReferences
+          v-if="horizontalReferences(plot, sx, sy).length > 0"
+          :references="horizontalReferences(plot, sx, sy)"
+          :plot="geometryOf(plot, sx, sy).area"
+          :x-scale="geometryOf(plot, sx, sy).value"
+          :y-scale="geometryOf(plot, sx, sy).category"
+          :size-class="labelSizeClass[resolvedSize]"
+          :font-size-px="labelFontPx[resolvedSize]"
+        />
+      </template>
+
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-bar-body>
         <path
           v-for="mark in barMarks(visibleSeries, sx, sy, plot, cursor, syr)"
@@ -427,6 +628,27 @@ defineExpose({
           :stroke-width="stacked !== false ? barGapWidth : undefined"
         />
       </g>
+
+      <template v-if="isHorizontal">
+        <ChartAxis
+          :plot="geometryOf(plot, sx, sy).area"
+          :ticks="categoryTicks(geometryOf(plot, sx, sy))"
+          orientation="y"
+          :font-size-px="labelFontPx[resolvedSize]"
+          :size-class="labelSizeClass[resolvedSize]"
+          :truncated="gutters.truncated"
+          :label="t('grCharts.chart.axisY', 'Y axis')"
+        />
+        <ChartAxis
+          :plot="geometryOf(plot, sx, sy).area"
+          :ticks="valueTicks(geometryOf(plot, sx, sy))"
+          orientation="x"
+          :font-size-px="labelFontPx[resolvedSize]"
+          :size-class="labelSizeClass[resolvedSize]"
+          :truncated="false"
+          :label="t('grCharts.chart.axisX', 'X axis')"
+        />
+      </template>
     </template>
 
     <template v-if="$slots.tooltip" #tooltip="scope">

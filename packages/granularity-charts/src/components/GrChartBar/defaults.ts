@@ -1,3 +1,4 @@
+import type { ChartOrientation } from '../../chart/chartOrientation'
 import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
 
 /**
@@ -8,6 +9,11 @@ import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
  */
 export interface GrChartBarConfigurableProps {
   size: GrChartSize
+  /**
+   * Раскладка столбцов. Настраивается глобально, потому что решение сквозное:
+   * приложение с длинными названиями категорий выбирает горизонталь один раз.
+   */
+  orientation: ChartOrientation
   height: number
   /** Скругление дальнего конца полосы в пикселях: радиус идёт в геометрию пути, а не в CSS. */
   barRadius: number
