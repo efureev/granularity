@@ -197,3 +197,35 @@ describe('GrChartHeatmap: клавиатура', () => {
     expect(surface(factory({ values: [], xLabels: [], yLabels: [] })).exists()).toBe(false)
   })
 })
+
+describe('потолок строк таблицы', () => {
+  // Теплокарта строит модель таблицы сама и мимо сужения по `ChartData`
+  // проходит — её страхует общий потолок на уровне готовой модели.
+  const big = {
+    values: Array.from({ length: 800 }, (_, row) => Array.from({ length: 3 }, (_, col) => row + col)),
+    xLabels: ['A', 'B', 'C'],
+    yLabels: Array.from({ length: 800 }, (_, row) => `R${row}`),
+  }
+
+  it('усекает длинную матрицу и говорит об этом', () => {
+    const wrapper = factory({ ...big, dataTable: 'visible' })
+    const rows = wrapper.findAll('[data-gr-chart-table] tbody tr').length
+
+    expect(rows).toBeGreaterThan(0)
+    expect(rows).toBeLessThanOrEqual(500)
+    expect(wrapper.find('[data-gr-chart-table] tfoot th').text()).toContain('800')
+  })
+
+  it('`Infinity` снимает потолок — решает приложение', () => {
+    const wrapper = factory({ ...big, dataTable: 'visible', dataTableMaxRows: Number.POSITIVE_INFINITY })
+
+    expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(800)
+    expect(wrapper.find('[data-gr-chart-table] tfoot').exists()).toBe(false)
+  })
+
+  it('короткая матрица потолком не трогается', () => {
+    const wrapper = factory({ values: [[1, 2], [3, 4]], xLabels: ['A', 'B'], yLabels: ['R0', 'R1'], dataTable: 'visible' })
+
+    expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(2)
+  })
+})

@@ -13,11 +13,14 @@
     "axisX": "Eje X",
     "axisY": "Eje Y",
     "axisLeft": "eje izquierdo",
-    "axisRight": "eje derecho"
+    "axisRight": "eje derecho",
+    "tableTrimmed": "Mostrando {shown} de {total} puntos: los mismos que dibuja el gráfico. Las flechas recorren todos.",
+    "tableSampled": "Mostrando {shown} de {total} filas, espaciadas uniformemente. Las flechas recorren todas."
   },
   "zoom": {
     "window": "Mostrando de {from} a {to}, {points} puntos",
-    "reset": "Intervalo completo"
+    "reset": "Intervalo completo",
+    "keyboardHint": "Más y menos acercan, Shift con flechas desplaza, cero restablece"
   },
   "funnel": {
     "roleDescription": "gráfico de embudo",

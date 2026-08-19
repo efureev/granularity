@@ -4,9 +4,9 @@ import GrSkeleton from '@feugene/granularity/components/GrSkeleton'
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { useFloating } from '@feugene/granularity/composables/useFloating'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
-import { computed, ref, useId, watch } from 'vue'
+import { computed, onScopeDispose, ref, shallowRef, useId, watch } from 'vue'
 
-import { decimateSeriesGroup, decimationBudget } from '../../../chart/chartDecimate'
+import { decimateChartData, decimateSeriesGroup, decimationBudget } from '../../../chart/chartDecimate'
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
 import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '../../../chart/chartFormat'
 import { chartLayout, type Rect } from '../../../chart/chartLayout'
@@ -16,7 +16,7 @@ import type { GrChartReference } from '../../../chart/chartReference'
 import { normalizeReferences } from '../../../chart/chartReference'
 import { createScale, type GrChartScale, linearScale } from '../../../chart/chartScale'
 import { alignedTicks, linearTicks, timeTicks } from '../../../chart/chartTicks'
-import { type ChartTableModel, chartTableModel } from '../../../chart/chartTable'
+import { type ChartTableModel, chartTableModel, trimTableModel } from '../../../chart/chartTable'
 import { useChartScale } from '../../../composables/useChartScale'
 import { type ChartTick, type ChartTickFormat, useChartTicks } from '../../../composables/useChartTicks'
 import { type ChartHitContext, type GrChartActivePoint, useChartTooltip } from '../../../composables/useChartTooltip'
@@ -198,6 +198,11 @@ export interface ChartFrameProps {
   zoom?: GrChartZoom
   /** Текущее окно; `null` — весь ряд. */
   xWindow?: GrChartXWindow | null
+  /**
+   * Потолок строк скрытой таблицы. `'auto'` — столько же, сколько вершин в
+   * рисунке; число — явный потолок; `Infinity` — полный ряд всегда.
+   */
+  dataTableMaxRows?: number | 'auto'
 }
 
 export interface ChartFrameEmits {
@@ -252,6 +257,7 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   keyboard: undefined,
   zoom: false,
   xWindow: null,
+  dataTableMaxRows: 'auto',
 })
 
 const emit = defineEmits<ChartFrameEmits>()
@@ -424,15 +430,17 @@ const plot = computed(() => layout.value.plot)
  * расчёт шёл бы на каждое движение указателя — слот перерисовывается вместе с
  * активной точкой.
  */
+/** Бюджет вершин рисунка; `null` — прореживания нет. Его же берёт таблица при `'auto'`. */
+const drawBudget = computed(() => decimationBudget({
+  mode: props.decimate,
+  kind: props.data.kind,
+  plotWidth: plot.value.width,
+  maxPoints: props.maxPoints,
+  total: visibleSeries.value.reduce((max, series) => Math.max(max, series.points.length), 0),
+}))
+
 const drawSeries = computed<readonly NormalizedSeries[]>(() => {
-  const longest = visibleSeries.value.reduce((max, series) => Math.max(max, series.points.length), 0)
-  const budget = decimationBudget({
-    mode: props.decimate,
-    kind: props.data.kind,
-    plotWidth: plot.value.width,
-    maxPoints: props.maxPoints,
-    total: longest,
-  })
+  const budget = drawBudget.value
 
   if (budget === null)
     return visibleSeries.value
@@ -479,17 +487,6 @@ const xTicks = computed(() => withPosition(xLabels.value, xScale.value))
 const yTicks = computed(() => withPosition(yLabels.value, yScale.value))
 const yTicksRight = computed(() => (yScaleRight.value === null ? [] : withPosition(yLabelsRight.value, yScaleRight.value)))
 
-const zoomApi = useChartZoom({
-  mode: () => (props.interactive && !isEmpty.value ? props.zoom ?? false : false),
-  surface: surfaceEl,
-  plot: () => plot.value,
-  xScale: () => xScale.value,
-  positions: () => props.data.positions,
-  full: () => props.data.fullXDomain,
-  window: () => props.xWindow ?? null,
-  apply: value => emit('update:xWindow', value),
-})
-
 const tooltipApi = useChartTooltip({
   data: () => props.data,
   xScale: () => xScale.value,
@@ -499,10 +496,35 @@ const tooltipApi = useChartTooltip({
   surface: surfaceEl,
   // Во время протяжки тултип молчит: панель под рукой закрывала бы ровно тот
   // участок, который сейчас выделяют.
-  enabled: () => props.tooltip && props.interactive && !isEmpty.value && !zoomApi.brushing.value,
+  enabled: () => props.tooltip && props.interactive && !isEmpty.value && !isBrushing(),
   hitTest: props.hitTest,
   anchor: props.anchorPoint,
 })
+
+const zoomApi = useChartZoom({
+  mode: () => (props.interactive && !isEmpty.value ? props.zoom ?? false : false),
+  surface: surfaceEl,
+  plot: () => plot.value,
+  xScale: () => xScale.value,
+  positions: () => props.data.positions,
+  full: () => props.data.fullXDomain,
+  window: () => props.xWindow ?? null,
+  apply: value => emit('update:xWindow', value),
+  cursor: () => {
+    const index = tooltipApi.activeIndex.value
+
+    return index === null ? null : props.data.positions[index] ?? null
+  },
+})
+
+/**
+ * Тултип и приближение ссылаются друг на друга: одному нужна активная точка,
+ * другому — знание, что идёт протяжка. Поднятая функция разрывает порядок
+ * объявления, не заводя третьего состояния.
+ */
+function isBrushing(): boolean {
+  return zoomApi.brushing.value
+}
 
 const { floatingStyle } = useFloating(anchorEl, tooltipEl, tooltipApi.open, {
   placement: 'top',
@@ -619,7 +641,13 @@ const referenceDescriptions = computed<string[]>(() => normalizedReferences.valu
  * «порога нет» — разные утверждения, и отличить их читателю больше нечем.
  */
 const surfaceDescription = computed(() => {
-  const parts = [props.ariaDescription, ...referenceDescriptions.value].filter(Boolean)
+  // Подсказка про приближение живёт здесь, а не в имени: имя потребитель
+  // перебивает пропом `ariaLabel` (и почти всегда перебивает), а описание
+  // достраивается к его собственному.
+  const zoomHint = props.zoom === false
+    ? undefined
+    : t('grCharts.zoom.keyboardHint', 'Plus and minus zoom, Shift with arrows pans, zero resets')
+  const parts = [props.ariaDescription, ...referenceDescriptions.value, zoomHint].filter(Boolean)
 
   return parts.length > 0 ? parts.join('. ') : undefined
 })
@@ -730,8 +758,103 @@ function formatTableX(point: NormalizedPoint): string {
   return visibleTimeLabels.value?.get(point.x) ?? formatX(point)
 }
 
+/**
+ * Скрытая таблица догоняет **успокоившееся** окно, а не каждый его шаг.
+ *
+ * Строк в ней столько же, сколько точек в ряду, и перестроение десяти тысяч —
+ * это порядок сотни миллисекунд. Приближение колесом и автоповтором клавиши
+ * меняет окно десятки раз в секунду, и синхронная таблица превращала бы жест в
+ * очередь перерисовок, из которой график не выбирается.
+ *
+ * Контракт при этом не меняется: в покое таблица точно совпадает с рисунком.
+ * Расходятся они только пока идёт жест — а посреди жеста таблицу никто не
+ * читает: смену окна диктор узнаёт из живого региона, и объявление синхронно.
+ *
+ * Задержка ставится только на смену **окна**: любые другие данные — новые
+ * серии, скрытая серия, другой домен — приезжают в таблицу сразу.
+ */
+const TABLE_SETTLE_MS = 80
+
+const tableData = shallowRef(props.data)
+let tableWindow = props.xWindow ?? null
+let settleTimer: ReturnType<typeof setTimeout> | null = null
+
+function cancelSettle(): void {
+  if (settleTimer === null)
+    return
+
+  clearTimeout(settleTimer)
+  settleTimer = null
+}
+
+watch(() => props.data, (value) => {
+  cancelSettle()
+
+  if (sameWindow(props.xWindow ?? null, tableWindow)) {
+    tableData.value = value
+
+    return
+  }
+
+  settleTimer = setTimeout(() => {
+    settleTimer = null
+    tableWindow = props.xWindow ?? null
+    // Берём свежее, а не захваченное: за время ожидания данные могли уехать
+    // дальше окна — например, потребитель скрыл серию.
+    tableData.value = props.data
+  }, TABLE_SETTLE_MS)
+})
+
+onScopeDispose(cancelSettle)
+
+/**
+ * Ряд, из которого строится скрытая таблица.
+ *
+ * Строка на точку — контракт, который держится ровно до тех пор, пока строк
+ * можно прочитать. На десяти тысячах он перестаёт кого-либо обслуживать: подряд
+ * такую таблицу не читает никто, а перестроение стоит сотню миллисекунд.
+ *
+ * Выше потолка таблица печатает **те же точки, что нарисованы** — тот же LTTB,
+ * тот же бюджет. Это и есть заявленный контракт доступности в его сильной
+ * форме: незрячий читает буквально то, что видит зрячий. Поточечная полнота при
+ * этом никуда не девается — стрелки обходят весь ряд и проговаривают каждую
+ * точку, о чём и сообщает пометка в подвале таблицы.
+ *
+ * `'auto'` берёт бюджет рисунка: сказал потребитель «рисуй все точки»
+ * (`decimate: 'never'`) — таблица тоже полная. Решение о том, включать ли
+ * усечение, остаётся за приложением: число задаёт свой потолок, `Infinity`
+ * снимает его совсем, `dataTable: 'off'` убирает таблицу целиком.
+ */
+/**
+ * Потолок строк таблицы.
+ *
+ * `'auto'` берёт бюджет рисунка — тогда таблица показывает буквально
+ * нарисованное. Бюджета нет у категориальной оси и при `decimate: 'never'`, и
+ * там `'auto'` опускается до фиксированного потолка: выше пятисот строк таблица
+ * перестаёт быть таблицей — её не прочитать подряд ни глазами, ни диктором.
+ */
+const AUTO_TABLE_ROWS = 500
+
+const tableRowCap = computed(() => (
+  props.dataTableMaxRows === 'auto'
+    ? drawBudget.value ?? AUTO_TABLE_ROWS
+    : props.dataTableMaxRows
+))
+
+const tableSource = computed<ChartData>(() => {
+  const data = tableData.value
+  const cap = tableRowCap.value
+
+  if (!Number.isFinite(cap) || data.positions.length <= cap)
+    return data
+
+  return decimateChartData(data, cap)
+})
+
 const tableModel = computed<ChartTableModel>(() => {
-  const base = props.tableModel ?? chartTableModel(props.data, {
+  const source = tableSource.value
+  const drawn = source !== tableData.value
+  const built = props.tableModel ?? chartTableModel(source, {
     xLabel: t('grCharts.chart.columnX', 'X'),
     caption: t('grCharts.chart.tableCaption', 'Chart data'),
     formatX: formatTableX,
@@ -740,7 +863,25 @@ const tableModel = computed<ChartTableModel>(() => {
       ? t('grCharts.chart.axisRight', 'right axis')
       : t('grCharts.chart.axisLeft', 'left axis')),
   })
-  const notes = referenceDescriptions.value
+  // Страховка на все типы: у категориальной оси бюджета рисунка нет, а шесть
+  // типов строят модель сами и сужение по `ChartData` проходят мимо.
+  const base = trimTableModel(built, tableRowCap.value)
+  const notes = [...referenceDescriptions.value]
+
+  // Усечение обязано быть названо вслух: без пометки таблица выглядит полной, и
+  // читатель решит, что между строками ничего не было.
+  if (drawn) {
+    notes.push(t('grCharts.chart.tableTrimmed', 'Showing {shown} of {total} points — the ones the chart draws. Arrow keys walk all of them.', {
+      shown: source.positions.length,
+      total: tableData.value.positions.length,
+    }))
+  }
+  else if (base !== built) {
+    notes.push(t('grCharts.chart.tableSampled', 'Showing {shown} of {total} rows, evenly spaced. Arrow keys walk all of them.', {
+      shown: base.rows.length,
+      total: built.rows.length,
+    }))
+  }
 
   // Опора приписывается к готовой модели, а не строкой данных: позиции по X у
   // порога нет, и строка утверждала бы её.
@@ -789,7 +930,9 @@ function onPointerMove(event: PointerEvent): void {
 }
 
 function onKeydown(event: KeyboardEvent): void {
-  if (a11y.onKeydown(event))
+  // Приближение спрашивается первым: `Shift`+стрелка иначе увела бы курсор —
+  // модификаторы карта позиций не смотрит.
+  if (zoomApi.onKeydown(event) || a11y.onKeydown(event))
     event.preventDefault()
 }
 

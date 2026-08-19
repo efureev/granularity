@@ -121,6 +121,16 @@ export interface GrChartPieProps {
   totalLabel?: string
   ariaLabel?: string
   ariaDescription?: string
+  /**
+   * Потолок строк скрытой таблицы данных.
+   *
+   * `'auto'` (по умолчанию) — столько строк, сколько можно прочитать; выше
+   * потолка таблица идёт равномерной выборкой и говорит об этом пометкой, а
+   * поточечная полнота остаётся за клавиатурой. Число задаёт свой потолок,
+   * `Infinity` снимает его совсем, `dataTable: 'off'` убирает таблицу целиком —
+   * что из этого нужно, решает приложение.
+   */
+  dataTableMaxRows?: number | 'auto'
 }
 
 export interface GrChartPieEmits {
@@ -154,6 +164,7 @@ const props = withDefaults(defineProps<GrChartPieProps>(), {
   totalLabel: undefined,
   ariaLabel: undefined,
   ariaDescription: undefined,
+  dataTableMaxRows: undefined,
 })
 
 const emit = defineEmits<GrChartPieEmits>()
@@ -182,6 +193,7 @@ const resolvedLegend = useGrComponentProp('GrChartPie', 'showLegend', () => prop
 const resolvedLegendPosition = useGrComponentProp('GrChartPie', 'legendPosition', () => props.legendPosition, 'bottom' as const)
 const resolvedTooltip = useGrComponentProp('GrChartPie', 'tooltip', () => props.tooltip, true)
 const resolvedDataTable = useGrComponentProp('GrChartPie', 'dataTable', () => props.dataTable, 'hidden' as const)
+const resolvedTableMaxRows = useGrComponentProp('GrChartPie', 'dataTableMaxRows', () => props.dataTableMaxRows, 'auto' as number | 'auto')
 
 const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
 
@@ -547,6 +559,7 @@ defineExpose({
     :empty="isEmpty"
     :empty-text="emptyText"
     :data-table="resolvedDataTable"
+    :data-table-max-rows="resolvedTableMaxRows"
     :interactive="interactive"
     :active-index="activeIndex"
     :locale="locale"

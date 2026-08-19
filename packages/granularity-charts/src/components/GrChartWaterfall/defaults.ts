@@ -17,6 +17,14 @@ export interface GrChartWaterfallConfigurableProps {
   showGrid: 'both' | 'x' | 'y' | 'none'
   tooltip: boolean
   dataTable: 'hidden' | 'visible' | 'off'
+  /**
+   * Потолок строк скрытой таблицы данных.
+   *
+   * Политика приложения: держать ли весь ряд в дереве доступности, усечь ли его
+   * до читаемого или убрать таблицу вовсе — решение уровня продукта, а не
+   * отдельного графика.
+   */
+  dataTableMaxRows: number | 'auto'
 }
 
 declare module '@feugene/granularity/composables/useGrComponentConfig' {

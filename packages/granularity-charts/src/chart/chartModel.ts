@@ -519,8 +519,14 @@ function toNumericY(value: number | null | undefined): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
-/** Первая точка на абсциссу — та же, что отдавал `Array.find`. */
-function indexByX(points: readonly NormalizedPoint[]): ReadonlyMap<number, NormalizedPoint> {
+/**
+ * Первая точка на абсциссу — та же, что отдавал `Array.find`.
+ *
+ * Экспортируется ради `chartDecimate`: серия с прорежёнными точками обязана
+ * нести индекс **своих** точек, иначе `byX` и `points` разойдутся.
+ * В баррель `./chart` не выведена — это внутренний контракт пакета.
+ */
+export function indexByX(points: readonly NormalizedPoint[]): ReadonlyMap<number, NormalizedPoint> {
   const index = new Map<number, NormalizedPoint>()
 
   for (const point of points) {

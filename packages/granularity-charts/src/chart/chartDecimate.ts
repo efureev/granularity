@@ -1,4 +1,5 @@
-import type { NormalizedPoint, NormalizedSeries } from './chartModel'
+import type { ChartData, NormalizedPoint, NormalizedSeries } from './chartModel'
+import { indexByX } from './chartModel'
 import type { GrChartScaleKind } from './chartScale'
 
 /**
@@ -234,9 +235,17 @@ export function decimatePoints(
 
 /** Серия для рисунка. Та же ссылка, когда прореживать нечего. */
 export function decimateSeries(series: NormalizedSeries, options: DecimateOptions): NormalizedSeries {
-  const points = decimatePoints(series.points, options)
+  return withPoints(series, decimatePoints(series.points, options))
+}
 
-  return points === series.points ? series : { ...series, points }
+/**
+ * Серия с другим набором точек и **своим** индексом.
+ *
+ * `byX` обязан описывать те точки, что лежат в `points`: разойдись они, и
+ * таблица, построенная по прорежённому ряду, спрашивала бы индекс полного.
+ */
+function withPoints(series: NormalizedSeries, points: readonly NormalizedPoint[]): NormalizedSeries {
+  return points === series.points ? series : { ...series, points, byX: indexByX(points) }
 }
 
 export interface DecimateGroupOptions extends DecimateOptions {
@@ -280,6 +289,35 @@ export function decimateSeriesGroup(
       || index === 0
     ))
 
-    return points.length === item.points.length ? item : { ...item, points }
+    return withPoints(item, points.length === item.points.length ? item.points : points)
   })
+}
+
+/**
+ * Ряд, прорежённый до бюджета целиком — вместе с позициями.
+ *
+ * Нужен скрытой таблице: она строится из `ChartData`, а не из серий, и её
+ * строки идут по `positions`. Набор абсцисс общий на группу — иначе у серий
+ * разошлись бы строки и в таблице появились бы дыры там, где данные есть.
+ */
+export function decimateChartData(data: ChartData, maxPoints: number): ChartData {
+  const visible = data.series.filter(series => !series.hidden)
+  const decimated = decimateSeriesGroup(visible, { maxPoints, sharedX: true })
+
+  if (decimated === visible)
+    return data
+
+  const byId = new Map(decimated.map(series => [series.id, series]))
+  const positions = new Set<number>()
+
+  for (const series of decimated) {
+    for (const point of series.points)
+      positions.add(point.x)
+  }
+
+  return {
+    ...data,
+    series: data.series.map(series => byId.get(series.id) ?? series),
+    positions: [...positions].sort((a, b) => a - b),
+  }
 }

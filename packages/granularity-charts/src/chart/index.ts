@@ -62,6 +62,7 @@ export type {
   DecimationBudgetInput,
 } from './chartDecimate'
 export {
+  decimateChartData,
   decimatePoints,
   decimateSeries,
   decimateSeriesGroup,
@@ -134,4 +135,4 @@ export type { ChartLayout, ChartLayoutInput, LabelGutters, LabelGuttersInput, Re
 export { chartLayout, estimateTextWidth, fitLabel, labelGutters } from './chartLayout'
 
 export type { ChartTableColumn, ChartTableModel, ChartTableOptions, ChartTableRow } from './chartTable'
-export { chartTableModel } from './chartTable'
+export { chartTableModel, trimTableModel } from './chartTable'

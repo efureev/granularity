@@ -147,6 +147,16 @@ export interface GrChartAreaProps {
    * Отсюда же следствие: `activeIndex` адресует текущее окно.
    */
   xWindow?: readonly [GrChartXValue, GrChartXValue] | null
+  /**
+   * Потолок строк скрытой таблицы данных.
+   *
+   * `'auto'` (по умолчанию) — столько же, сколько вершин в рисунке: выше
+   * потолка таблица печатает те же точки, что нарисованы, и говорит об этом
+   * пометкой. Число задаёт свой потолок, `Infinity` снимает его совсем,
+   * `dataTable: 'off'` убирает таблицу целиком — что из этого нужно, решает
+   * приложение.
+   */
+  dataTableMaxRows?: number | 'auto'
 }
 
 export interface GrChartAreaEmits {
@@ -201,6 +211,7 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
   canvasThreshold: 2000,
   zoom: undefined,
   xWindow: undefined,
+  dataTableMaxRows: undefined,
 })
 
 const emit = defineEmits<GrChartAreaEmits>()
@@ -218,6 +229,7 @@ const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { compone
 const resolvedDecimate = useGrComponentProp('GrChartArea', 'decimate', () => props.decimate, 'auto' as const)
 const resolvedMaxPoints = useGrComponentProp('GrChartArea', 'maxPoints', () => props.maxPoints, undefined as unknown as number)
 const resolvedZoom = useGrComponentProp('GrChartArea', 'zoom', () => props.zoom, false as GrChartZoom)
+const resolvedTableMaxRows = useGrComponentProp('GrChartArea', 'dataTableMaxRows', () => props.dataTableMaxRows, 'auto' as number | 'auto')
 const resolvedHeight = useGrComponentProp('GrChartArea', 'height', () => props.height, 256)
 const resolvedCurve = useGrComponentProp('GrChartArea', 'curve', () => props.curve, 'linear' as GrChartCurve)
 const resolvedGrid = useGrComponentProp('GrChartArea', 'showGrid', () => props.showGrid, 'y' as const)
@@ -487,6 +499,7 @@ defineExpose({
     :max-points="resolvedMaxPoints"
     :zoom="resolvedZoom"
     :x-window="xWindow"
+    :data-table-max-rows="resolvedTableMaxRows"
     :aria-label="ariaLabel"
     :aria-description="ariaDescription"
     :role-description="stacked === '100%'

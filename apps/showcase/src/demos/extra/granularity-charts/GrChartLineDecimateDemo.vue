@@ -23,15 +23,42 @@ const series = [{
 
 const decimate = ref<'auto' | 'never'>('auto')
 
+/**
+ * Скрытая таблица данных — отдельным переключателем, потому что это отдельное
+ * решение приложения, а не следствие режима прореживания.
+ */
+type TableMode = 'auto' | 'full' | 'off'
+
+const tableMode = ref<TableMode>('auto')
+
+const tableProps = computed(() => (
+  tableMode.value === 'off'
+    ? { dataTable: 'off' as const }
+    : {
+        dataTable: 'hidden' as const,
+        dataTableMaxRows: tableMode.value === 'full' ? Number.POSITIVE_INFINITY : ('auto' as const),
+      }
+))
+
+const tableHint: Record<TableMode, string> = {
+  auto: 'Столько строк, сколько можно прочитать. При «Прореживать» это бюджет рисунка — таблица печатает ровно нарисованные точки; при «Все точки» бюджета нет, и остаётся фиксированный потолок с равномерной выборкой.',
+  full: 'Весь ряд строками в дереве доступности, независимо от рисунка. Прочитать подряд десять тысяч строк невозможно.',
+  off: 'Таблицы нет. Данные остаются достижимы поточечно: стрелки обходят полный ряд и проговаривают каждую точку.',
+}
+
+const tableRows = ref(0)
+
 const chartEl = useTemplateRef<HTMLElement>('chartEl')
 const vertices = ref(0)
 
 watchEffect(() => {
   // Читаем после того, как режим уже применён к разметке.
   void decimate.value
+  void tableMode.value
   requestAnimationFrame(() => {
     const d = chartEl.value?.querySelector('[data-gr-chart-series="cpu"]')?.getAttribute('d') ?? ''
     vertices.value = (d.match(/[ML]/g) ?? []).length
+    tableRows.value = chartEl.value?.querySelectorAll('[data-gr-chart-table] tbody tr').length ?? 0
   })
 })
 
@@ -62,6 +89,7 @@ const hint = computed(() => (
 
     <div ref="chartEl">
       <GrChartLine
+        v-bind="tableProps"
         :series="series"
         :decimate="decimate"
         :height="260"
@@ -70,11 +98,32 @@ const hint = computed(() => (
       />
     </div>
 
+    <div class="flex flex-wrap items-baseline justify-between gap-3">
+      <span class="text-[length:var(--gr-control-text-sm)] text-[var(--gr-muted-fg)]">
+        Скрытая таблица для скринридера: строк <strong>{{ tableRows.toLocaleString('ru') }}</strong>
+      </span>
+
+      <GrSegmented
+        v-model="tableMode"
+        size="sm"
+        :options="[
+          { value: 'auto', label: 'Авто (по порогу)' },
+          { value: 'full', label: 'Полная' },
+          { value: 'off', label: 'Без таблицы' },
+        ]"
+        aria-label="Скрытая таблица данных"
+      />
+    </div>
+
+    <p class="text-[length:var(--gr-control-text-sm)] text-[var(--gr-muted-fg)]">
+      {{ tableHint[tableMode] }}
+    </p>
+
     <p class="text-[length:var(--gr-control-text-sm)] text-[var(--gr-muted-fg)]">
       {{ hint }} Прореживание сокращает <strong>рисунок</strong>, а не данные:
-      <kbd>End</kbd> ставит курсор на десятитысячную точку в обоих режимах, и
-      скрытая таблица печатает все строки. На шумном участке активная марка
-      может отойти от линии — линия здесь сводка, а марка и тултип правда.
+      <kbd>End</kbd> ставит курсор на десятитысячную точку в обоих режимах.
+      На шумном участке активная марка может отойти от линии — линия здесь
+      сводка, а марка и тултип правда.
     </p>
   </div>
 </template>

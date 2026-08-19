@@ -135,6 +135,16 @@ export interface GrChartLineProps {
    * Отсюда же следствие: `activeIndex` адресует текущее окно.
    */
   xWindow?: readonly [GrChartXValue, GrChartXValue] | null
+  /**
+   * Потолок строк скрытой таблицы данных.
+   *
+   * `'auto'` (по умолчанию) — столько же, сколько вершин в рисунке: выше
+   * потолка таблица печатает те же точки, что нарисованы, и говорит об этом
+   * пометкой. Число задаёт свой потолок, `Infinity` снимает его совсем,
+   * `dataTable: 'off'` убирает таблицу целиком — что из этого нужно, решает
+   * приложение.
+   */
+  dataTableMaxRows?: number | 'auto'
 }
 
 export interface GrChartLineEmits {
@@ -188,6 +198,7 @@ const props = withDefaults(defineProps<GrChartLineProps>(), {
   canvasThreshold: 2000,
   zoom: undefined,
   xWindow: undefined,
+  dataTableMaxRows: undefined,
 })
 
 const emit = defineEmits<GrChartLineEmits>()
@@ -205,6 +216,7 @@ const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { compone
 const resolvedDecimate = useGrComponentProp('GrChartLine', 'decimate', () => props.decimate, 'auto' as const)
 const resolvedMaxPoints = useGrComponentProp('GrChartLine', 'maxPoints', () => props.maxPoints, undefined as unknown as number)
 const resolvedZoom = useGrComponentProp('GrChartLine', 'zoom', () => props.zoom, false as GrChartZoom)
+const resolvedTableMaxRows = useGrComponentProp('GrChartLine', 'dataTableMaxRows', () => props.dataTableMaxRows, 'auto' as number | 'auto')
 const resolvedHeight = useGrComponentProp('GrChartLine', 'height', () => props.height, 256)
 const resolvedCurve = useGrComponentProp('GrChartLine', 'curve', () => props.curve, 'linear' as GrChartCurve)
 const resolvedGaps = useGrComponentProp('GrChartLine', 'gaps', () => props.gaps, 'hidden' as const)
@@ -345,6 +357,7 @@ defineExpose({
     :max-points="resolvedMaxPoints"
     :zoom="resolvedZoom"
     :x-window="xWindow"
+    :data-table-max-rows="resolvedTableMaxRows"
     :aria-label="ariaLabel"
     :aria-description="ariaDescription"
     :role-description="t('grCharts.line.label', 'Line chart')"

@@ -7,6 +7,60 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.8.0] 2026-08-20
+
+### Added
+
+- **The x-axis window is operable from the keyboard**, closing the gap `0.7.0` shipped with. `+`/`-`
+  zoom, `Shift`+arrows pan by a quarter of the window, `0` restores the full series. Zooming anchors
+  on the **active point** rather than the window centre — anchored on the centre, the ends of a
+  series would stay out of reach however long you held the key. The keys are not a mode: the `zoom`
+  union (`'brush' | 'wheel' | 'both'`) names **pointer gestures**, and the keyboard is on whenever
+  zoom is on. Making it switchable would offer a way to build a zoom that cannot be reached from a
+  keyboard — WCAG 2.1 SC 2.1.1 — by simply not writing a line. `Shift`+arrow belongs to the window
+  even at full range, where it does nothing: one chord must mean one thing rather than pan or move
+  the cursor depending on state. `Ctrl`, `Alt` and `Cmd` combinations are left to the browser. The
+  hint naming these keys goes into the surface's **description**, not its name: consumers override
+  the name with `ariaLabel` almost every time, and a hint living there would vanish with it.
+
+### Changed
+
+- **The hidden data table has a row cap: `dataTableMaxRows`, `'auto'` by default.** One row per point
+  is readable while there are few rows; nobody reads ten thousand of them in sequence, and rebuilding
+  that many costs on the order of a hundred milliseconds per zoom step. Above the cap the table
+  prints **the points the chart draws** — same LTTB, same budget — and says so in a `tfoot` note.
+  `'auto'` means "as many rows as anyone can read", not "whatever is drawn": it takes the drawing's
+  budget when there is one — then the table matches the drawing exactly, down to the LTTB-selected
+  points — and falls back to a flat 500-row ceiling with even sampling when there is none, which is
+  the case for category scales and for `decimate: 'never'`. Anything else would let the whole point
+  be lost behind one toggle. The prop exists on all nine types that have a table; where the type
+  builds its own table model (pie, radar, funnel, bullet, waterfall, heatmap) the same ceiling
+  applies as a row sample, so no chart type is left without a way to bound it.
+
+  This reverses the earlier rule that the table always prints every row. That rule assumed trimming
+  would hand a blind reader different data than a sighted one sees; on a long series the assumption
+  is false — a sighted reader does not read ten thousand values either, they read the shape and hover
+  for specifics. A table trimmed to what is drawn gives exactly that shape, and the per-point truth
+  stays with the keyboard, which still walks the **full** series and announces every point. The
+  contract did not weaken, it got sharper: **the table matches the drawing, the keyboard matches the
+  data.** What to enable is the application's call — a number sets its own cap, `Infinity` removes it,
+  `dataTable: 'off'` drops the table entirely. Measured on 10 000 points, a window change went from
+  119 ms with the full table to 14 ms under `'auto'`, against 8 ms with no table at all.
+- **A decimated series now carries its own `byX` index.** `decimateSeries` spread the original series,
+  so the index described the full row set while `points` held the trimmed one — harmless today,
+  because nothing read `byX` off a decimated series, and a trap the moment something did. The table
+  above the cap is that something.
+- **The hidden data table now follows the settled window rather than every step of it.** It holds one
+  row per point, so rebuilding ten thousand of them costs on the order of a hundred milliseconds,
+  while the wheel and key auto-repeat change the window dozens of times a second — a synchronous
+  table turned the gesture into a queue of repaints the chart never caught up with. Measured on a
+  10 000-point series, a window change went from 132 ms to 44 ms, and a continuous gesture now pays
+  for one rebuild instead of one per step. The delay is 80 ms and applies to **window changes only**:
+  new series, a hidden series or a different domain reach the table immediately. The contract is
+  unchanged — at rest the table matches the drawing exactly; they differ only mid-gesture, when
+  nobody is reading it, and the window change itself is announced through the live region
+  synchronously.
+
 ## [v0.7.0] 2026-08-19
 
 ### Added

@@ -25,6 +25,7 @@ export const demoPathByPreviewKey = {
   'extra-charts-funnel-basic':            'extra/granularity-charts/GrChartFunnelBasicDemo.vue',
   'extra-charts-funnel-shape':            'extra/granularity-charts/GrChartFunnelShapeDemo.vue',
   'extra-charts-heatmap-cohorts':         'extra/granularity-charts/GrChartHeatmapCohortsDemo.vue',
+  'extra-charts-heatmap-incidents':       'extra/granularity-charts/GrChartHeatmapIncidentsDemo.vue',
   'extra-charts-heatmap-scale':           'extra/granularity-charts/GrChartHeatmapScaleDemo.vue',
   'extra-charts-line-basic':              'extra/granularity-charts/GrChartLineBasicDemo.vue',
   'extra-charts-line-decimate':           'extra/granularity-charts/GrChartLineDecimateDemo.vue',

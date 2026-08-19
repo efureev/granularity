@@ -13,11 +13,14 @@
     "axisX": "X axis",
     "axisY": "Y axis",
     "axisLeft": "left axis",
-    "axisRight": "right axis"
+    "axisRight": "right axis",
+    "tableTrimmed": "Showing {shown} of {total} points — the ones the chart draws. Arrow keys walk all of them.",
+    "tableSampled": "Showing {shown} of {total} rows, evenly spaced. Arrow keys walk all of them."
   },
   "zoom": {
     "window": "Showing {from} to {to}, {points} points",
-    "reset": "Full range"
+    "reset": "Full range",
+    "keyboardHint": "Plus and minus zoom, Shift with arrows pans, zero resets"
   },
   "funnel": {
     "roleDescription": "funnel chart",

@@ -111,6 +111,16 @@ export interface GrChartRadarProps {
   locale?: string
   ariaLabel?: string
   ariaDescription?: string
+  /**
+   * Потолок строк скрытой таблицы данных.
+   *
+   * `'auto'` (по умолчанию) — столько строк, сколько можно прочитать; выше
+   * потолка таблица идёт равномерной выборкой и говорит об этом пометкой, а
+   * поточечная полнота остаётся за клавиатурой. Число задаёт свой потолок,
+   * `Infinity` снимает его совсем, `dataTable: 'off'` убирает таблицу целиком —
+   * что из этого нужно, решает приложение.
+   */
+  dataTableMaxRows?: number | 'auto'
 }
 
 export interface GrChartRadarEmits {
@@ -149,6 +159,7 @@ const props = withDefaults(defineProps<GrChartRadarProps>(), {
   locale: undefined,
   ariaLabel: undefined,
   ariaDescription: undefined,
+  dataTableMaxRows: undefined,
 })
 
 const emit = defineEmits<GrChartRadarEmits>()
@@ -173,6 +184,7 @@ const resolvedLegendMode = useGrComponentProp('GrChartRadar', 'showLegend', () =
 const resolvedLegendPosition = useGrComponentProp('GrChartRadar', 'legendPosition', () => props.legendPosition, 'bottom' as const)
 const resolvedTooltip = useGrComponentProp('GrChartRadar', 'tooltip', () => props.tooltip, true)
 const resolvedDataTable = useGrComponentProp('GrChartRadar', 'dataTable', () => props.dataTable, 'hidden' as const)
+const resolvedTableMaxRows = useGrComponentProp('GrChartRadar', 'dataTableMaxRows', () => props.dataTableMaxRows, 'auto' as number | 'auto')
 
 const resolvedLocale = computed(() => props.locale ?? i18nLocale.value ?? 'en')
 const perAxis = computed(() => resolvedAxisScale.value === 'per-axis')
@@ -563,6 +575,7 @@ defineExpose({
     :empty="empty"
     :empty-text="emptyText"
     :data-table="resolvedDataTable"
+    :data-table-max-rows="resolvedTableMaxRows"
     :interactive="interactive"
     :active-index="activeIndex"
     :locale="locale"

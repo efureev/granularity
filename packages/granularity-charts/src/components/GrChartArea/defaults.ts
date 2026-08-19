@@ -24,6 +24,14 @@ export interface GrChartAreaConfigurableProps {
    * поведения у одинаковых с виду картинок.
    */
   zoom: GrChartZoom
+  /**
+   * Потолок строк скрытой таблицы данных.
+   *
+   * Политика приложения: держать ли полный ряд в дереве доступности, усечь ли
+   * его до нарисованного или убрать таблицу вовсе — решение уровня продукта, а
+   * не отдельного графика.
+   */
+  dataTableMaxRows: number | 'auto'
 
   size: GrChartSize
   height: number

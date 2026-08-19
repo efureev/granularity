@@ -36,6 +36,12 @@ const PAGE_HEIGHT_PX = 400
 const WHEEL_SENSITIVITY = 0.0015
 const WHEEL_STEP_LIMIT = 2
 
+/** Шаг `+`/`-`. Взаимно обратные множители: приблизил и отдалил — вернулся туда же. */
+const KEY_ZOOM_STEP = 0.8
+
+/** Сдвиг `Shift`+стрелка — четверть окна: шаг заметен, но не теряет контекст. */
+const KEY_PAN_FRACTION = 0.25
+
 export interface UseChartZoomOptions {
   mode: () => GrChartZoom
   /** Элемент, по которому считается координата указателя. */
@@ -48,6 +54,13 @@ export interface UseChartZoomOptions {
   full: () => readonly [number, number]
   window: () => GrChartXWindow | null
   apply: (next: GrChartXWindow | null) => void
+  /**
+   * Абсцисса курсора — якорь приближения с клавиатуры; `null` — курсора нет.
+   *
+   * У колеса якорь под указателем, и клавиатуре нужен свой: без него `+` всегда
+   * тянул бы к середине окна, и добраться до края ряда было бы нечем.
+   */
+  cursor: () => number | null
 }
 
 export interface UseChartZoomReturn {
@@ -57,6 +70,8 @@ export interface UseChartZoomReturn {
   band: Ref<{ x: number, width: number } | null>
   onPointerDown: (event: PointerEvent) => void
   onWheel: (event: WheelEvent) => void
+  /** Обработал ли жест клавишу. Контракт тот же, что у `useChartA11y`. */
+  onKeydown: (event: KeyboardEvent) => boolean
 }
 
 export function useChartZoom(options: UseChartZoomOptions): UseChartZoomReturn {
@@ -135,15 +150,82 @@ export function useChartZoom(options: UseChartZoomOptions): UseChartZoomReturn {
     apply(zoomWindow(current, wheelFactor(event), anchor))
   }
 
-  function apply(next: GrChartXWindow): void {
+  /**
+   * Приближение с клавиатуры.
+   *
+   * Работает всегда, когда работает `zoom`, и отдельным режимом не включается:
+   * union пропа перечисляет **жесты указателя**, а клавиатура — не жест и не
+   * предмет выбора. Дай её отключить — и получится ровно то нарушение
+   * WCAG 2.1 SC 2.1.1, ради которого она заведена.
+   */
+  function onKeydown(event: KeyboardEvent): boolean {
+    if (options.mode() === false)
+      return false
+
+    // `+` набирается через `Shift`, поэтому его тут нет: отсеиваются только те
+    // модификаторы, за которыми стоят команды браузера и системы.
+    if (event.altKey || event.ctrlKey || event.metaKey)
+      return false
+
+    switch (event.key) {
+      case '+':
+      case '=':
+        return zoomBy(KEY_ZOOM_STEP)
+      case '-':
+      case '_':
+        return zoomBy(1 / KEY_ZOOM_STEP)
+      case '0':
+        return options.window() !== null && apply(null)
+      case 'ArrowLeft':
+        return event.shiftKey && pan(-1)
+      case 'ArrowRight':
+        return event.shiftKey && pan(1)
+      default:
+        return false
+    }
+  }
+
+  function zoomBy(factor: number): boolean {
+    const current = options.window() ?? options.full()
+    const anchor = options.cursor() ?? (current[0] + current[1]) / 2
+
+    return apply(zoomWindow([current[0], current[1]], factor, anchor))
+  }
+
+  /**
+   * Сдвиг окна. Клавишу забирает всегда, даже когда двигать нечего.
+   *
+   * Иначе `Shift`+стрелка означала бы разное в зависимости от состояния: на
+   * полном ряде она проваливалась бы в карту позиций и уводила курсор, а в
+   * приближении двигала окно. Одно сочетание — одно значение; на краю оно
+   * просто ничего не делает, как и стрелка на краю ряда.
+   */
+  function pan(direction: number): boolean {
+    const current = options.window()
+
+    if (current !== null) {
+      const shift = (current[1] - current[0]) * KEY_PAN_FRACTION * direction
+
+      apply([current[0] + shift, current[1] + shift])
+    }
+
+    return true
+  }
+
+  /** `false` — окно не изменилось, и клавишу глотать не за что. */
+  function apply(next: GrChartXWindow | null): boolean {
     const full = options.full()
-    const clamped = clampWindow(next, [full[0], full[1]], smallestGap(options.positions()))
+    const clamped = next === null
+      ? null
+      : clampWindow(next, [full[0], full[1]], smallestGap(options.positions()))
     const current = options.window()
 
     if (same(clamped, current))
-      return
+      return false
 
     options.apply(clamped)
+
+    return true
   }
 
   function allows(gesture: 'brush' | 'wheel'): boolean {
@@ -164,7 +246,7 @@ export function useChartZoom(options: UseChartZoomOptions): UseChartZoomReturn {
     detachEscape()
   }
 
-  function onKeydown(event: KeyboardEvent): void {
+  function onEscape(event: KeyboardEvent): void {
     if (event.key !== 'Escape')
       return
 
@@ -182,7 +264,7 @@ export function useChartZoom(options: UseChartZoomOptions): UseChartZoomReturn {
       return
 
     escapeAttached = true
-    window.addEventListener('keydown', onKeydown, true)
+    window.addEventListener('keydown', onEscape, true)
   }
 
   function detachEscape(): void {
@@ -190,14 +272,14 @@ export function useChartZoom(options: UseChartZoomOptions): UseChartZoomReturn {
       return
 
     escapeAttached = false
-    window.removeEventListener('keydown', onKeydown, true)
+    window.removeEventListener('keydown', onEscape, true)
   }
 
   // `useDragGesture` на смерти области снимает свои слушатели, но `onCancel` не
   // зовёт — этот пришлось бы снимать самому.
   onScopeDispose(detachEscape)
 
-  return { brushing: drag.isDragging, band, onPointerDown: drag.start, onWheel }
+  return { brushing: drag.isDragging, band, onPointerDown: drag.start, onWheel, onKeydown }
 }
 
 function clampToPlot(x: number, plot: Rect): number {

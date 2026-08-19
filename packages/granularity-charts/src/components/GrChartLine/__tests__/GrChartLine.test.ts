@@ -1,6 +1,6 @@
 import { announced, granularityGlobal, i18nAdapter, keydown, mockRect, move, press, release } from '@feugene/granularity/testing'
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
 import GrChartLine from '../GrChartLine.vue'
@@ -603,14 +603,58 @@ describe('GrChartLine — прореживание', () => {
     wrapper.unmount()
   })
 
-  it('скрытая таблица остаётся полной: прореживание — это про рисунок', () => {
-    // Прорежённая таблица отдала бы читателю без зрения другой график, чем видит
-    // зрячий сосед. Это данные, а не запасной вариант рисунка.
+  it('таблица печатает те же точки, что нарисованы, и говорит об этом', () => {
+    // Строка на точку держится ровно до тех пор, пока строк можно прочитать:
+    // подряд пять тысяч не читает никто. Выше потолка таблица показывает то же,
+    // что видит зрячий, а поточечная полнота остаётся за клавиатурой — о чём и
+    // сообщает пометка.
     const wrapper = factory({ series: dense, decimate: 'always', maxPoints: 200, dataTable: 'visible' })
+    const rows = wrapper.findAll('tbody tr').length
 
-    expect(wrapper.findAll('tbody tr').length).toBe(5000)
+    expect(rows).toBeGreaterThan(0)
+    expect(rows).toBeLessThan(300)
+    expect(wrapper.find('tfoot th').text()).toContain('5000')
 
     wrapper.unmount()
+  })
+
+  it('потолок таблицы снимается числом, и тогда она полная', () => {
+    // Решение о том, держать ли пять тысяч строк в дереве доступности, остаётся
+    // за приложением.
+    const wrapper = factory({
+      series: dense,
+      decimate: 'always',
+      maxPoints: 200,
+      dataTable: 'visible',
+      dataTableMaxRows: Number.POSITIVE_INFINITY,
+    })
+
+    expect(wrapper.findAll('tbody tr').length).toBe(5000)
+    expect(wrapper.find('tfoot').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('без прореживания рисунка потолок остаётся — просто фиксированный', () => {
+    // `'auto'` — это «столько строк, сколько можно прочитать», а не «как
+    // нарисовано». Бюджет рисунка используется, когда он есть: тогда таблица
+    // совпадает с рисунком точно. Нет бюджета — остаётся читаемый потолок,
+    // иначе весь смысл терялся бы за одним `decimate: 'never'`.
+    const wrapper = factory({ series: dense, decimate: 'never', dataTable: 'visible' })
+    const rows = wrapper.findAll('tbody tr').length
+
+    expect(rows).toBeGreaterThan(0)
+    expect(rows).toBeLessThanOrEqual(500)
+    expect(wrapper.find('tfoot th').text()).toContain('5000')
+
+    wrapper.unmount()
+  })
+
+  it('короткий ряд потолок не трогает', () => {
+    const wrapper = factory({ dataTable: 'visible' })
+
+    expect(wrapper.findAll('tbody tr').length).toBe(4)
+    expect(wrapper.find('tfoot').exists()).toBe(false)
   })
 
   it('клавиатура ходит по полному ряду', async () => {
@@ -781,6 +825,148 @@ describe('приближение по абсциссе', () => {
     expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(4)
   })
 
+  describe('клавиатура', () => {
+    const surfaceOf = (wrapper: ReturnType<typeof factory>) => wrapper.find('[data-gr-chart-surface]').element
+
+    it('`+` приближает, `-` отдаляет обратно до полного ряда', async () => {
+      const wrapper = factory({ series: dense, zoom: 'brush' })
+
+      keydown(surfaceOf(wrapper), '+')
+      await nextTick()
+
+      const near = windowOf(wrapper)!
+
+      expect(near[1] - near[0]).toBeLessThan(9)
+
+      for (let step = 0; step < 10 && windowOf(wrapper) !== null; step++) {
+        keydown(surfaceOf(wrapper), '-')
+        await nextTick()
+      }
+
+      expect(windowOf(wrapper)).toBeNull()
+    })
+
+    it('`=` — тот же `+`: на большинстве раскладок плюс набирается через `Shift`', async () => {
+      const wrapper = factory({ series: dense, zoom: 'brush' })
+
+      keydown(surfaceOf(wrapper), '=')
+      await nextTick()
+
+      expect(windowOf(wrapper)).not.toBeNull()
+    })
+
+    it('приближает к активной точке, а не к середине окна', async () => {
+      // Без якоря на курсоре до края ряда было бы не добраться: каждый шаг
+      // подтягивал бы окно к его середине.
+      const centred = factory({ series: dense, zoom: 'brush' })
+      keydown(surfaceOf(centred), '+')
+      await nextTick()
+
+      const atCursor = factory({ series: dense, zoom: 'brush' })
+      keydown(surfaceOf(atCursor), 'End')
+      await nextTick()
+      keydown(surfaceOf(atCursor), '+')
+      await nextTick()
+
+      expect(windowOf(atCursor)![1]).toBeGreaterThan(windowOf(centred)![1])
+    })
+
+    it('`Shift` со стрелками сдвигает окно, не трогая курсор', async () => {
+      const wrapper = factory({ series: dense, zoom: 'brush', xWindow: [3, 6] })
+
+      keydown(surfaceOf(wrapper), 'ArrowRight', { shiftKey: true })
+      await nextTick()
+
+      const moved = windowOf(wrapper)!
+
+      expect(moved[0]).toBeGreaterThan(3)
+      expect(moved[1] - moved[0]).toBeCloseTo(3)
+      // Курсор — это `activeIndex`, и сдвиг окна его не двигает.
+      expect(wrapper.emitted('update:activeIndex')).toBeUndefined()
+    })
+
+    it('без `Shift` стрелка по-прежнему ведёт курсор', async () => {
+      const wrapper = factory({ series: dense, zoom: 'brush', xWindow: [3, 6] })
+
+      keydown(surfaceOf(wrapper), 'ArrowRight')
+      await nextTick()
+
+      expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([0])
+      expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+    })
+
+    it('`0` сбрасывает окно, а на полном ряде клавишу не глотает', async () => {
+      const zoomed = factory({ series: dense, zoom: 'brush', xWindow: [3, 6] })
+
+      keydown(surfaceOf(zoomed), '0')
+      await nextTick()
+      expect(windowOf(zoomed)).toBeNull()
+
+      const full = factory({ series: dense, zoom: 'brush' })
+      const event = keydown(surfaceOf(full), '0')
+
+      expect(full.emitted('update:xWindow')).toBeUndefined()
+      expect(event.defaultPrevented).toBe(false)
+    })
+
+    it('сдвигать весь ряд некуда, но клавишу приближение всё равно забирает', async () => {
+      // Иначе `Shift`+стрелка означала бы разное по состоянию: на полном ряде
+      // уводила бы курсор, а в приближении двигала окно.
+      const wrapper = factory({ series: dense, zoom: 'brush' })
+      const event = keydown(surfaceOf(wrapper), 'ArrowRight', { shiftKey: true })
+
+      await nextTick()
+
+      expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+      expect(wrapper.emitted('update:activeIndex')).toBeUndefined()
+      expect(event.defaultPrevented).toBe(true)
+    })
+
+    it('работает и при `zoom: \'wheel\'` — клавиатура не предмет выбора', async () => {
+      // Union пропа перечисляет жесты указателя; отключаемая клавиатура была бы
+      // ровно тем нарушением WCAG, ради которого она заведена.
+      const wrapper = factory({ series: dense, zoom: 'wheel' })
+
+      keydown(surfaceOf(wrapper), '+')
+      await nextTick()
+
+      expect(windowOf(wrapper)).not.toBeNull()
+    })
+
+    it('без `zoom` клавиши приближения не перехватываются', () => {
+      const wrapper = factory({ series: dense })
+
+      for (const key of ['+', '-', '0'])
+        expect(keydown(surfaceOf(wrapper), key).defaultPrevented, key).toBe(false)
+
+      expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+    })
+
+    it('сочетания с `Ctrl`, `Alt` и `Cmd` остаются браузеру', () => {
+      const wrapper = factory({ series: dense, zoom: 'brush' })
+
+      for (const modifier of ['ctrlKey', 'metaKey', 'altKey'] as const) {
+        const event = keydown(surfaceOf(wrapper), '+', { [modifier]: true })
+
+        expect(event.defaultPrevented, modifier).toBe(false)
+      }
+
+      expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+    })
+
+    it('подсказка про клавиши приближения есть в описании поверхности', () => {
+      // Именно в описании: имя потребитель почти всегда перебивает `ariaLabel`.
+      const wrapper = factory({ series: dense, zoom: 'both', ariaLabel: 'Загрузка' })
+      const description = wrapper.find('[data-gr-chart-surface]').attributes('aria-description')
+
+      expect(description).toContain('Shift')
+
+      const off = factory({ series: dense, ariaLabel: 'Загрузка' })
+
+      expect(off.find('[data-gr-chart-surface]').attributes('aria-description')).toBeUndefined()
+    })
+  })
+
   it('опора за краем окна не рисуется, но из описания не пропадает', async () => {
     // Существующий флаг `outside` считается по домену, а домен при окне и есть
     // окно, — поэтому отдельного сторожа под приближение не нужно. Проверяется
@@ -796,6 +982,52 @@ describe('приближение по абсциссе', () => {
 
     expect(zoomed.findAll('[data-gr-chart-reference]')).toHaveLength(0)
     expect(zoomed.find('[data-gr-chart-surface]').attributes('aria-description')).toContain('Релиз')
+  })
+
+  it('скрытая таблица догоняет успокоившееся окно, а не каждый его шаг', async () => {
+    // Строк в таблице столько же, сколько точек: перестраивать её на каждый шаг
+    // автоповтора клавиши значит превратить жест в очередь перерисовок.
+    vi.useFakeTimers()
+
+    try {
+      const wrapper = factory({ series: dense, xWindow: [0, 9], dataTable: 'visible' })
+      const rows = () => wrapper.findAll('[data-gr-chart-table] tbody tr').length
+
+      expect(rows()).toBe(10)
+
+      await wrapper.setProps({ xWindow: [0, 4] })
+      await nextTick()
+      // Рисунок уже сузился, а таблица ещё нет — и это ровно то, чего мы хотим.
+      expect(wrapper.find('[data-gr-chart-series="a"]').attributes('d')).toBeTruthy()
+      expect(rows()).toBe(10)
+
+      await wrapper.setProps({ xWindow: [0, 2] })
+      vi.advanceTimersByTime(200)
+      await nextTick()
+
+      // В покое таблица точно совпадает с рисунком, и промежуточное окно она
+      // не показывала ни разу.
+      expect(rows()).toBe(3)
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('смена серий приезжает в таблицу сразу — задержка только у окна', async () => {
+    vi.useFakeTimers()
+
+    try {
+      const wrapper = factory({ series: dense, dataTable: 'visible' })
+
+      await wrapper.setProps({ series: [{ id: 'a', x: [0, 1], y: [1, 2] }] })
+      await nextTick()
+
+      expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(2)
+    }
+    finally {
+      vi.useRealTimers()
+    }
   })
 
   it('смена окна уходит в живой регион', async () => {
