@@ -98,8 +98,6 @@ export interface GrChartLineProps {
   locale?: string
   ariaLabel?: string
   ariaDescription?: string
-  /** Рендерер. Расширится значением `canvas`, когда появится второй путь. */
-  renderer?: 'auto' | 'svg'
   /** Порог, выше которого маркеры не рисуются даже при `showPoints: 'auto'`. */
   /**
    * Когда прореживать ряд для рисунка (LTTB).
@@ -160,7 +158,6 @@ const props = withDefaults(defineProps<GrChartLineProps>(), {
   locale: undefined,
   ariaLabel: undefined,
   ariaDescription: undefined,
-  renderer: 'auto',
   decimate: undefined,
   maxPoints: undefined,
   canvasThreshold: 2000,
