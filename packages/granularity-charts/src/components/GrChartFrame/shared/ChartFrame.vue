@@ -129,6 +129,16 @@ export interface ChartFrameProps {
    */
   references?: readonly GrChartReference[]
   /**
+   * Рисует ли слой опор сама рама.
+   *
+   * `false` ставит компонент, у которого своя система координат: рама считает
+   * опору своими шкалами, и при горизонтальной раскладке порог по значению лёг
+   * бы поперёк области. Текст опоры рама несёт в любом случае —
+   * `aria-description` и строка `<tfoot>` не зависят от того, кто рисует линию,
+   * поэтому читатель без зрения порог не теряет.
+   */
+  referenceLayer?: boolean
+  /**
    * Точки, зависящие от системы координат. Дефолты декартовы; круг подменяет
    * их, потому что у него попадание угловое, якорь тултипа — центроид доли,
    * строка таблицы — доля, а описание точки включает процент.
@@ -186,6 +196,7 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   valueFormat: undefined,
   valueFormatRight: undefined,
   crosshair: true,
+  referenceLayer: true,
   references: undefined,
   hitTest: undefined,
   hitSeries: undefined,
@@ -652,7 +663,7 @@ function onPointerMove(event: PointerEvent): void {
   const rect = surfaceEl.value.getBoundingClientRect()
   const row = props.hitSeries(
     { x: event.clientX - rect.left, y: event.clientY - rect.top },
-    { plot: plot.value, xScale: xScale.value, yScale: yScale.value },
+    { plot: plot.value, xScale: xScale.value, yScale: yScale.value, yScaleRight: yScaleRight.value },
   )
 
   if (row !== -1)
@@ -816,7 +827,7 @@ watch(tooltipApi.activeIndex, (value) => {
           глотать указатель, а марки — теряться под порогом.
         -->
         <ChartReferences
-          v-if="normalizedReferences.length > 0 && !isEmpty && !loading"
+          v-if="referenceLayer && normalizedReferences.length > 0 && !isEmpty && !loading"
           :references="normalizedReferences"
           :plot="plot"
           :x-scale="xScale"

@@ -45,6 +45,14 @@ export interface ChartHitContext {
   plot: Rect
   xScale: GrChartScale
   yScale: GrChartScale
+  /**
+   * Вторая ось значений при `dualAxis`, иначе `null`.
+   *
+   * Компонент, который считает собственный якорь, обязан взять её отсюда, а не
+   * строить заново: «красивый» домен правой оси рама округляет по-своему, и
+   * пересчёт разошёлся бы с рисунком на несколько пикселей.
+   */
+  yScaleRight: GrChartScale | null
 }
 
 export interface UseChartTooltipOptions {
@@ -94,7 +102,12 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
   const activeIndex = ref<number | null>(null)
 
   function hitContext(): ChartHitContext {
-    return { plot: options.plot(), xScale: options.xScale(), yScale: options.yScale() }
+    return {
+      plot: options.plot(),
+      xScale: options.xScale(),
+      yScale: options.yScale(),
+      yScaleRight: options.yScaleRight?.() ?? null,
+    }
   }
   const open = ref(false)
   let closeTimer: ReturnType<typeof setTimeout> | null = null

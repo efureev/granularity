@@ -52,8 +52,17 @@ export {
   symbolPath,
 } from './chartPath'
 
-export type { BarDirection, BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
-export { barPath, barRect, groupSlots } from './chartBars'
+export type { BarDirection, BarHitInput, BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
+export { barBandwidth, barHitIndex, barPath, barRect, barToward, groupSlots } from './chartBars'
+export type { ChartOrientation } from './chartOrientation'
+export {
+  acrossBounds,
+  acrossOf,
+  alongExtent,
+  alongOf,
+  orientedGrid,
+  orientedPoint,
+} from './chartOrientation'
 
 export type { BulletBand, BulletLayoutOptions, BulletModel } from './chartBullet'
 export { bulletLayout } from './chartBullet'

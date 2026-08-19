@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import { type ChartData, normalizeChartData } from '../../chart/chartModel'
 import { useChartA11y } from '../internal/useChartA11y'
 
-function setup(data: ChartData) {
+function setup(data: ChartData, keyboard?: { axes?: 'both' | 'positions' | 'transposed' }) {
   const activeIndex = ref<number | null>(null)
   const activeSeriesIndex = ref(0)
   const announced: string[] = []
@@ -18,6 +18,7 @@ function setup(data: ChartData) {
     announce: message => announced.push(message),
     describe: (index, seriesIndex) => `точка ${index}, серия ${seriesIndex}`,
     onActivate,
+    keyboard: () => keyboard,
   })
 
   return { api, activeIndex, activeSeriesIndex, announced, onActivate }
@@ -121,5 +122,49 @@ describe('useChartA11y', () => {
     const { api } = setup(normalizeChartData([]))
 
     expect(api.onKeydown(key('ArrowRight'))).toBe(false)
+  })
+})
+
+describe('useChartA11y — повёрнутая карта клавиш', () => {
+  /**
+   * У горизонтальной раскладки категории идут сверху вниз, поэтому по ним ведут
+   * `↑↓`. Схема `'positions'` тут не годится: она отдаёт обе пары стрелок
+   * позициям, и переход между сериями — единственный способ прочитать соседнюю
+   * полосу в группе — исчезает целиком.
+   */
+  it('`↑↓` ведут по позициям', () => {
+    const { api, activeIndex } = setup(many, { axes: 'transposed' })
+
+    expect(api.onKeydown(key('ArrowDown'))).toBe(true)
+    expect(activeIndex.value).toBe(0)
+
+    expect(api.onKeydown(key('ArrowDown'))).toBe(true)
+    expect(activeIndex.value).toBe(1)
+  })
+
+  it('`←→` меняют читаемую серию', () => {
+    const { api, activeSeriesIndex } = setup(many, { axes: 'transposed' })
+
+    expect(api.onKeydown(key('ArrowRight'))).toBe(true)
+    expect(activeSeriesIndex.value).toBe(1)
+
+    expect(api.onKeydown(key('ArrowLeft'))).toBe(true)
+    expect(activeSeriesIndex.value).toBe(0)
+  })
+
+  it('при одной серии `←→` не двигают ничего', () => {
+    const { api, activeSeriesIndex, activeIndex } = setup(single, { axes: 'transposed' })
+
+    api.onKeydown(key('ArrowRight'))
+
+    expect(activeSeriesIndex.value).toBe(0)
+    expect(activeIndex.value).toBeNull()
+  })
+
+  it('`Home`/`End` остаются на позициях в обеих схемах', () => {
+    const { api, activeIndex } = setup(many, { axes: 'transposed' })
+
+    expect(api.onKeydown(key('End'))).toBe(true)
+    expect(activeIndex.value).toBe(1)
   })
 })

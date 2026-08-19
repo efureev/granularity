@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { barPath, barRect, groupSlots } from '../chartBars'
+import { barBandwidth, barHitIndex, barPath, barRect, barToward, groupSlots } from '../chartBars'
 
 describe('groupSlots', () => {
   it('одна серия занимает полосу целиком', () => {
@@ -106,5 +106,98 @@ describe('barPath: горизонтальные полосы', () => {
 
   it('нулевая полоса пути не даёт', () => {
     expect(barPath({ x: 0, y: 0, width: 0, height: 12 }, 4, 'right')).toBe('')
+  })
+})
+
+const area = { x: 0, y: 0, width: 400, height: 200 }
+
+/** Полосная шкала-заглушка: категории через равные шаги от нуля. */
+function bandLike(step: number, bandwidth: number) {
+  return {
+    scale: (value: number) => value * step + step / 2,
+    invert: (px: number) => (px - step / 2) / step,
+    bandwidth,
+    step,
+    domain: [0, 1] as [number, number],
+    range: [0, 400] as [number, number],
+    kind: 'band' as const,
+  }
+}
+
+describe('barRect и ориентация', () => {
+  it('вертикаль: слот задаёт ширину, значения — высоту', () => {
+    const rect = barRect(100, { offset: 0, width: 20 }, 180, 40)
+
+    expect(rect).toEqual({ x: 90, y: 40, width: 20, height: 140 })
+  })
+
+  it('горизонталь: слот задаёт высоту, значения — ширину', () => {
+    // Та же полоса, повёрнутая: перепутанные стороны дали бы столбец, растущий
+    // поперёк собственной категории, и заметить это можно было бы только глазами.
+    const rect = barRect(100, { offset: 0, width: 20 }, 40, 180)
+
+    expect(barRect(100, { offset: 0, width: 20 }, 40, 180, 'horizontal'))
+      .toEqual({ x: 40, y: 90, width: 140, height: 20 })
+    expect(rect.width).toBe(20)
+  })
+
+  it('порядок `from`/`to` не важен ни в одной ориентации', () => {
+    expect(barRect(100, { offset: 0, width: 20 }, 180, 40, 'horizontal'))
+      .toEqual(barRect(100, { offset: 0, width: 20 }, 40, 180, 'horizontal'))
+  })
+})
+
+describe('barToward', () => {
+  it('вертикаль: рост вверх по экрану — скругляется верх', () => {
+    expect(barToward(180, 40)).toBe('up')
+    expect(barToward(40, 180)).toBe('down')
+  })
+
+  it('горизонталь: рост вправо — скругляется правый конец', () => {
+    expect(barToward(40, 180, 'horizontal')).toBe('right')
+    expect(barToward(180, 40, 'horizontal')).toBe('left')
+  })
+})
+
+describe('barBandwidth', () => {
+  it('полосная шкала знает ширину сама', () => {
+    expect(barBandwidth(bandLike(40, 32), area, 10)).toBe(32)
+  })
+
+  it('на непрерывной шкале полоса получает долю области с зазором', () => {
+    // Без зазора столбцы сомкнулись бы в сплошную заливку.
+    expect(barBandwidth(bandLike(40, 0), area, 10)).toBeCloseTo(32)
+  })
+
+  it('при горизонтали доля считается от высоты, а не от ширины', () => {
+    expect(barBandwidth(bandLike(40, 0), area, 10, 'horizontal')).toBeCloseTo(16)
+  })
+})
+
+describe('barHitIndex', () => {
+  const scale = bandLike(40, 32)
+  const positions = [0, 1, 2, 3]
+
+  it('находит категорию под указателем', () => {
+    expect(barHitIndex({ point: { x: 60, y: 100 }, area, positions, scale, bandwidth: 32 })).toBe(1)
+  })
+
+  it('промахивается в зазоре между категориями', () => {
+    // Ровно посередине между центрами: 20 от каждого при полуширине 16.
+    expect(barHitIndex({ point: { x: 40, y: 100 }, area, positions, scale, bandwidth: 32 })).toBe(-1)
+  })
+
+  it('промахивается за пределами области поперёк', () => {
+    expect(barHitIndex({ point: { x: 60, y: 260 }, area, positions, scale, bandwidth: 32 })).toBe(-1)
+  })
+
+  it('при горизонтали оси меняются ролями', () => {
+    expect(barHitIndex({ point: { x: 100, y: 60 }, area, positions, scale, bandwidth: 32, orientation: 'horizontal' })).toBe(1)
+    // Тот же указатель без указания ориентации попал бы мимо.
+    expect(barHitIndex({ point: { x: 100, y: 60 }, area, positions, scale, bandwidth: 32 })).toBe(2)
+  })
+
+  it('пустой набор категорий — всегда промах', () => {
+    expect(barHitIndex({ point: { x: 60, y: 100 }, area, positions: [], scale, bandwidth: 32 })).toBe(-1)
   })
 })

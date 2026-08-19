@@ -6,11 +6,19 @@
  * оторванной от неё. Скругляется только дальний от базовой линии конец.
  */
 
+import type { ChartOrientation } from './chartOrientation'
+import { acrossBounds, alongExtent } from './chartOrientation'
+import type { GrChartScale } from './chartScale'
+import type { Rect } from './chartLayout'
+
 export interface BarSlot {
   /** Смещение центра полосы от центра категории. */
   offset: number
   width: number
 }
+
+/** Куда растёт полоса от своей базовой линии — тот конец и скругляется. */
+export type BarDirection = 'up' | 'down' | 'left' | 'right'
 
 export interface BarRect {
   x: number
@@ -57,26 +65,102 @@ export function groupSlots(
 }
 
 /**
- * Прямоугольник полосы между двумя координатами по вертикали.
+ * Прямоугольник полосы между двумя координатами оси значений.
  *
  * Порядок `from`/`to` не важен: столбец вниз от нуля — такой же столбец, и
  * знать, кто из них выше, вызывающему незачем.
+ *
+ * `center` и `slot` живут на оси **категорий**, `from`/`to` — на оси значений;
+ * ориентация решает, какая из них экранная `x`. Аргумент необязателен, поэтому
+ * прежние вызовы вертикали остались как были.
  */
-export function barRect(center: number, slot: BarSlot, from: number, to: number): BarRect {
-  return {
-    x: center + slot.offset - slot.width / 2,
-    y: Math.min(from, to),
-    width: slot.width,
-    height: Math.abs(to - from),
+export function barRect(
+  center: number,
+  slot: BarSlot,
+  from: number,
+  to: number,
+  orientation: ChartOrientation = 'vertical',
+): BarRect {
+  const near = center + slot.offset - slot.width / 2
+  const start = Math.min(from, to)
+  const length = Math.abs(to - from)
+
+  return orientation === 'horizontal'
+    ? { x: start, y: near, width: length, height: slot.width }
+    : { x: near, y: start, width: slot.width, height: length }
+}
+
+/**
+ * Куда растёт полоса от базовой линии — тот конец `barPath` и скруглит.
+ *
+ * Считается из экранных координат, а не из знака значения: у перевёрнутой оси
+ * значений «больше» рисуется выше, и знак сам по себе ничего не сообщает.
+ */
+export function barToward(from: number, to: number, orientation: ChartOrientation = 'vertical'): BarDirection {
+  if (orientation === 'horizontal')
+    return to >= from ? 'right' : 'left'
+
+  return to <= from ? 'up' : 'down'
+}
+
+/**
+ * Ширина полосы одной категории.
+ *
+ * У полосной шкалы её знает сама шкала; у непрерывной ширины нет, и полоса
+ * получает свою долю области с зазором — иначе на непрерывной оси столбцы
+ * сомкнулись бы в сплошную заливку.
+ */
+export function barBandwidth(scale: GrChartScale, area: Rect, count: number, orientation: ChartOrientation = 'vertical'): number {
+  if (scale.bandwidth > 0) return scale.bandwidth
+
+  return (alongExtent(area, orientation) / Math.max(1, count)) * 0.8
+}
+
+export interface BarHitInput {
+  point: { x: number, y: number }
+  area: Rect
+  positions: readonly number[]
+  /** Шкала оси категорий. */
+  scale: GrChartScale
+  bandwidth: number
+  orientation?: ChartOrientation
+}
+
+/**
+ * Индекс категории под указателем или `-1`.
+ *
+ * Одно правило на обе ориентации и на все столбчатые типы: поперёк проверяются
+ * границы области, вдоль — попадание в полуширину полосы. Без второй проверки
+ * тултип «прилипал» бы к ближайшему столбцу через весь зазор между категориями.
+ */
+export function barHitIndex(input: BarHitInput): number {
+  const orientation = input.orientation ?? 'vertical'
+  const [low, high] = acrossBounds(input.area, orientation)
+  const across = orientation === 'horizontal' ? input.point.x : input.point.y
+
+  if (across < low || across > high) return -1
+  if (input.positions.length === 0) return -1
+
+  const along = orientation === 'horizontal' ? input.point.y : input.point.x
+
+  let index = 0
+  let best = Number.POSITIVE_INFINITY
+
+  for (let i = 0; i < input.positions.length; i += 1) {
+    const distance = Math.abs(along - input.scale.scale(input.positions[i]!))
+
+    if (distance < best) {
+      best = distance
+      index = i
+    }
   }
+
+  return best <= input.bandwidth / 2 ? index : -1
 }
 
 function n(value: number): number {
   return Math.round(value * 100) / 100
 }
-
-/** Куда растёт полоса от своей базовой линии — тот конец и скругляется. */
-export type BarDirection = 'up' | 'down' | 'left' | 'right'
 
 /**
  * Путь полосы со скруглением дальнего от базовой линии конца.

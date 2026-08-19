@@ -24,8 +24,12 @@ export interface ChartKeyboardOptions {
    * `'both'` — `←→` по позициям, `↑↓` по сериям (дефолт).
    * `'positions'` — обе пары по позициям: у воронки ступени идут сверху вниз,
    * и `↑↓` там значит ровно то же, что `←→`.
+   * `'transposed'` — карта, повёрнутая на 90°: `↑↓` по позициям, `←→` по
+   * сериям. Для горизонтальной раскладки, где серий несколько: `'positions'`
+   * там убил бы переход между сериями целиком, а он единственный способ
+   * прочитать соседнюю полосу в группе.
    */
-  axes?: 'both' | 'positions'
+  axes?: 'both' | 'positions' | 'transposed'
   /**
    * Кольцевать переход по сериям. Дефолт — да.
    *
@@ -122,16 +126,18 @@ export function useChartA11y(options: UseChartA11yOptions): UseChartA11yReturn {
 
     const current = options.activeIndex.value
     const keyboard = options.keyboard?.()
-    const alongPositions = keyboard?.axes === 'positions'
+    const transposed = keyboard?.axes === 'transposed'
+    // Обе схемы ведут `↑↓` по позициям; различаются они тем, что делает `←→`.
+    const alongPositions = keyboard?.axes === 'positions' || transposed
     const pageBySeries = keyboard?.pageMode === 'series'
 
     switch (event.key) {
       case 'ArrowRight':
         // Первое нажатие ставит курсор в начало ряда, а не «на следующую после
         // никакой»: иначе первое движение с клавиатуры не даёт ничего.
-        return moveTo(current === null ? 0 : current + 1)
+        return transposed ? moveSeries(1, false) : moveTo(current === null ? 0 : current + 1)
       case 'ArrowLeft':
-        return moveTo(current === null ? total - 1 : current - 1)
+        return transposed ? moveSeries(-1, false) : moveTo(current === null ? total - 1 : current - 1)
       case 'Home':
         return moveTo(0)
       case 'End':

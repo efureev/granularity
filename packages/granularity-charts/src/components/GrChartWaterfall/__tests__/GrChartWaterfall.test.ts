@@ -189,3 +189,40 @@ describe('GrChartWaterfall: горизонталь', () => {
     expect(lines[0]!.attributes('y1')).not.toBe(lines[0]!.attributes('y2'))
   })
 })
+
+describe('GrChartWaterfall — клавиатура при горизонтали', () => {
+  /**
+   * При горизонтали шаги идут сверху вниз, а карта клавиш оставалась декартовой:
+   * `←`/`→` вели по шагам, `↑`/`↓` не делали ничего. Воронка это уже чинила
+   * (`axes: 'positions'`), мост — нет.
+   */
+  it('`↑↓` ведут по шагам, потому что шаги идут колонкой', async () => {
+    const wrapper = factory({ orientation: 'horizontal' })
+    const element = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(element, 'ArrowDown')
+    await nextTick()
+    await expect(announced()).resolves.toContain('На начало')
+
+    keydown(element, 'ArrowDown')
+    await nextTick()
+    await expect(announced()).resolves.toContain('Новые')
+
+    keydown(element, 'ArrowUp')
+    await nextTick()
+    await expect(announced()).resolves.toContain('На начало')
+
+    wrapper.unmount()
+  })
+
+  it('вертикаль по-прежнему ходит `←→`', async () => {
+    const wrapper = factory()
+    const element = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(element, 'ArrowRight')
+    await nextTick()
+    await expect(announced()).resolves.toContain('На начало')
+
+    wrapper.unmount()
+  })
+})

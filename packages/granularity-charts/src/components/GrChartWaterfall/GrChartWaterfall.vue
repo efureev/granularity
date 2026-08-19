@@ -3,13 +3,14 @@ import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/com
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { computed, ref } from 'vue'
 
-import { barPath, type BarDirection, barRect, groupSlots } from '../../chart/chartBars'
+import { barHitIndex, barPath, barRect, barToward, groupSlots } from '../../chart/chartBars'
+import { orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatNumber, formatValue } from '../../chart/chartFormat'
 import { labelGutters, type Rect } from '../../chart/chartLayout'
 import type { GrChartPoint } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
-import { bandScale, type GrChartScale, linearScale, nearestIndex } from '../../chart/chartScale'
+import { bandScale, type GrChartScale, linearScale } from '../../chart/chartScale'
 import type { ChartTableModel } from '../../chart/chartTable'
 import { bandTicks, linearTicks } from '../../chart/chartTicks'
 import type { GrChartWaterfallStep, WaterfallSegment } from '../../chart/chartWaterfall'
@@ -314,19 +315,10 @@ function barMarks(geometry: WaterfallGeometry): BarMark[] {
     const from = geometry.value.scale(segment.from)
     const to = geometry.value.scale(segment.to)
 
-    const rect = isHorizontal.value
-      ? {
-          x: Math.min(from, to),
-          y: center - slot.width / 2,
-          width: Math.abs(to - from),
-          height: slot.width,
-        }
-      : barRect(center, slot, from, to)
-
+    const orientation = isHorizontal.value ? 'horizontal' : 'vertical'
+    const rect = barRect(center, slot, from, to, orientation)
     // Скругляется дальний от основания конец: в пикселях он там, куда шаг вырос.
-    const toward: BarDirection = isHorizontal.value
-      ? (to >= from ? 'right' : 'left')
-      : (to <= from ? 'up' : 'down')
+    const toward = barToward(from, to, orientation)
 
     return [{ index: segment.index, d: barPath(rect, resolvedRadius.value, toward), fill: fillOf(segment) }]
   })
@@ -410,21 +402,15 @@ function stepTicks(geometry: WaterfallGeometry): ChartTick[] {
  */
 function hitTest(point: { x: number, y: number }, context: ChartHitContext): number {
   const geometry = geometryOf(context.plot, context.xScale, context.yScale)
-  const along = isHorizontal.value ? point.y : point.x
-  const across = isHorizontal.value ? point.x : point.y
-  const box = geometry.area
-  const min = isHorizontal.value ? box.x : box.y
-  const max = isHorizontal.value ? box.x + box.width : box.y + box.height
 
-  if (across < min || across > max)
-    return -1
-
-  const index = nearestIndex(data.value.positions, geometry.category, along)
-
-  if (index === -1)
-    return -1
-
-  return Math.abs(along - geometry.category.scale(index)) <= geometry.category.bandwidth / 2 ? index : -1
+  return barHitIndex({
+    point,
+    area: geometry.area,
+    positions: data.value.positions,
+    scale: geometry.category,
+    bandwidth: geometry.category.bandwidth,
+    orientation: isHorizontal.value ? 'horizontal' : 'vertical',
+  })
 }
 
 function anchorPoint(index: number, context: ChartHitContext): { x: number, y: number } | null {
@@ -439,7 +425,7 @@ function anchorPoint(index: number, context: ChartHitContext): { x: number, y: n
   // числа, и панель уехала бы внутрь полосы.
   const tip = geometry.value.scale(segment.to >= segment.from ? segment.to : segment.from)
 
-  return isHorizontal.value ? { x: tip, y: center } : { x: center, y: tip }
+  return orientedPoint(center, tip, isHorizontal.value ? 'horizontal' : 'vertical')
 }
 
 function describePoint(index: number): string {
@@ -530,6 +516,7 @@ defineExpose({
     :width="width"
     :size="resolvedSize"
     :axes="!isHorizontal"
+    :keyboard="isHorizontal ? { axes: 'positions' } : undefined"
     :show-grid="isHorizontal ? 'none' : resolvedGrid"
     :crosshair="false"
     :tooltip="resolvedTooltip"
