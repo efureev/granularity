@@ -13,6 +13,8 @@ export const REQUIRED_GATES = [
   'defineStyleTokensGate',
   'defineComponentDefaultsGate',
   'defineComponentDocsGate',
+  'defineEmitNamingGate',
+  'defineLocaleCompletenessGate',
 ] as const
 
 export interface GateCoverageOptions {
