@@ -77,6 +77,21 @@ export function innerOf(schema: ZodLike): ZodLike | undefined {
   return undefined
 }
 
+/**
+ * Формат, объявленный самой схемой: `z.email()`, `z.uuid()`, `z.iso.date()`.
+ *
+ * В zod 4 это рекомендованная форма, и формат в ней лежит **на схеме**
+ * (`def.format`), а не в списке проверок: `z.email()` не заводит ни одного
+ * `check`. Устаревшая `z.string().email()` — наоборот. Читать надо оба места,
+ * иначе современный идиом молча теряет тип поля, и почта приезжает обычной
+ * строкой.
+ */
+export function schemaFormatOf(schema: ZodLike): string | undefined {
+  const format = defOf(schema).format
+
+  return typeof format === 'string' ? format : undefined
+}
+
 export function checksOf(schema: ZodLike): ZodCheck[] {
   const def = defOf(schema)
   const checks = def.checks

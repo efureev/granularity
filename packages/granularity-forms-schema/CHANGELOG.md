@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`z.email()` and friends kept their format again.** zod 4 moved string formats onto the
+  schema itself (`z.email()` sets `def.format` and registers no check), while the deprecated
+  `z.string().email()` still expresses them as a check. The adapter read checks only, so the
+  **recommended** modern idiom silently lost the format: an email field parsed as a plain
+  string and rendered as a plain text input, with no warning anywhere. Both spellings now
+  yield the same node, under `optional()` too.
+
 ## [v0.1.2] 2026-08-19
 
 ### Fixed

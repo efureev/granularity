@@ -165,3 +165,33 @@ describe('supports', () => {
     expect(zodAdapter.supports(null)).toBe(false)
   })
 })
+
+describe('формат, объявленный самой схемой', () => {
+  // В zod 4 `z.email()` — рекомендованная форма, и формат в ней лежит на схеме,
+  // а не в списке проверок. Читай мы только проверки — современный идиом молча
+  // терял бы тип поля, и почта приезжала бы обычной строкой.
+  it('`z.email()` даёт тот же формат, что устаревшая `z.string().email()`', () => {
+    const modern = parseZodSchema(z.object({ mail: z.email() }))
+    const legacy = parseZodSchema(z.object({ mail: z.string().email() }))
+
+    const formatOf = (model: ReturnType<typeof parseZodSchema>) =>
+      model.root.fields?.find(field => field.key === 'mail')?.format
+
+    expect(formatOf(modern)).toBe('email')
+    expect(formatOf(legacy)).toBe('email')
+  })
+
+  it('работает и под обёрткой `optional`', () => {
+    const model = parseZodSchema(z.object({ site: z.url().optional() }))
+    const site = model.root.fields?.find(field => field.key === 'site')
+
+    expect(site?.format).toBe('url')
+    expect(site?.required).toBe(false)
+  })
+
+  it('чужой формат схемы не выдумывает известный', () => {
+    const model = parseZodSchema(z.object({ id: z.string() }))
+
+    expect(model.root.fields?.find(field => field.key === 'id')?.format).toBeUndefined()
+  })
+})

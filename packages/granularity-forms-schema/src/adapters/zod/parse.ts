@@ -22,6 +22,7 @@ import {
   isZodSchema,
   metaOf,
   optionsOf,
+  schemaFormatOf,
   shapeOf,
   typeNameOf,
 } from './introspect'
@@ -239,6 +240,8 @@ function parseNode(
   const kind = kindOf(name)
   const constraints: GrSchemaConstraints = {}
   const { format, message, residual: checkResidual } = applyChecks(checksOf(schema), kind, constraints)
+  // Формат бывает объявлен и самой схемой, и проверкой — см. `schemaFormatOf`.
+  const declaredFormat = STRING_FORMATS[schemaFormatOf(schema) ?? '']
 
   const meta = ctx.annotationPrefix === false ? undefined : metaOf(schema)
   const literal = name === 'literal' ? optionsOf(schema)?.[0] : undefined
@@ -247,7 +250,7 @@ function parseNode(
     path,
     key,
     kind,
-    format: (meta?.format as GrSchemaFormat | undefined) ?? format,
+    format: (meta?.format as GrSchemaFormat | undefined) ?? format ?? declaredFormat,
     title: (meta?.title as string | undefined),
     description: descriptionOf(schema) ?? (meta?.description as string | undefined),
     required: requiredByParent && !optional,

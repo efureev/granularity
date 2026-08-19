@@ -33,7 +33,8 @@
     "vite": "^8.1.5",
     "vitest": "^4.1.10",
     "vue-component-meta": "^3.3.7",
-    "vue-tsc": "^3.3.7"
+    "vue-tsc": "^3.3.7",
+    "zod": "^4.0.0"
   },
   "scripts": {
     "build": "yarn generate:api && yarn generate:search && vite build",
