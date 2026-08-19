@@ -7,6 +7,45 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.6.0] 2026-08-19
+
+### Added
+
+- **`GrChartBar` lays bars sideways.** `orientation="horizontal"` turns categories into rows, so a
+  long department or product name reads as a line of text instead of a slanted, clipped tail — the
+  scenario the docs used to redirect away from. Stacking, grouping, `'100%'`, references, legend,
+  tooltip and the hidden data table behave exactly as they do vertically. Axes keep their data
+  names in both layouts: `yDomain`, `yTickFormat` and `yTickCount` always address the value axis,
+  so `showGrid: 'y'` draws vertical lines when the chart is horizontal. `dualAxis` is not supported
+  sideways — the second value axis would have to sit on top, where the layout reserves no room; the
+  prop is ignored and dev builds warn. Keyboard follows the eye: `ArrowDown`/`ArrowUp` walk the
+  categories, `ArrowLeft`/`ArrowRight` switch the series being read.
+- **Long series are decimated for drawing (LTTB).** `GrChartLine` and `GrChartArea` gained
+  `decimate` (`'auto' | 'always' | 'never'`, default `'auto'`) and `maxPoints`; `GrSparkline` sizes
+  its budget from its fixed canvas and needs no prop at all. Decimation shortens the `d` string and
+  nothing else: the cursor, the keyboard, the tooltip and the hidden data table keep the full
+  series, so `End` still lands on the ten-thousandth point and the table still prints every row.
+  The budget is two vertices per pixel of plot width (at least 64), quantised to 32px so the path
+  does not shimmer while a pane is resized; category scales are never decimated, gaps keep exactly
+  one separator each, and a stack shares one set of abscissas across its group.
+
+### Fixed
+
+- **Axis labels no longer run off the canvas.** SVG has no `text-overflow`, so a category label
+  wider than its gutter used to be cut by the canvas edge with no ellipsis — the reader saw the
+  tail of a word with no sign that the start was missing. Labels are now trimmed to the reserved
+  width with an ellipsis and carry the full text in `<title>`. The horizontal bar chart also
+  reserves room for the outermost value tick, which is centred on its gridline and used to hang
+  half its width past the edge.
+- **`GrChartWaterfall` keyboard follows its horizontal layout.** Sideways, the steps run top to
+  bottom, but the arrows still walked them left to right.
+
+### Removed
+
+- **`renderer` prop on `GrChartLine`.** It was never read by anything, and the documentation
+  promised a canvas path behind it that does not exist in this package. Long series are handled by
+  `decimate` instead.
+
 ## [v0.5.2] 2026-08-19
 
 ### Changed
