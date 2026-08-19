@@ -13,7 +13,7 @@ const placements = [
   { value: 'right', label: 'right' },
   { value: 'bottom', label: 'bottom' },
   { value: 'left', label: 'left' },
-] as const
+]
 
 const actions = ['Merge', 'Revert', 'Rebase'] as const
 </script>

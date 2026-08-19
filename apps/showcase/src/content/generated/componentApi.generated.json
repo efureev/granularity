@@ -5746,6 +5746,13 @@
             "default": "\"text\""
           },
           {
+            "name": "modelValue",
+            "description": "Значение поля. Необязательное: без `v-model` поле рисуется пустым. Дефолт — пустая строка, а не `undefined`: длина значения читается напрямую (`showClear`), и `undefined` уронил бы рендер.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -5933,12 +5940,6 @@
             "type": "GrInputTextAlign | undefined",
             "required": false,
             "default": "\"left\""
-          },
-          {
-            "name": "modelValue",
-            "description": "",
-            "type": "string",
-            "required": true
           }
         ]
       },
@@ -10568,6 +10569,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "modelValue",
+            "description": "Значение переключателя. Необязательное: без `v-model` контрол рисуется выключенным — так же, как `GrCheckbox`. Обязательный проп заставлял бы заводить `ref` даже там, где переключатель presentational.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
@@ -10664,12 +10672,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "modelValue",
-            "description": "",
-            "type": "boolean",
-            "required": true
           }
         ]
       },

@@ -2,6 +2,14 @@ import type { LocaleLoaderCollection } from '@feugene/fint-i18n/core'
 
 export const SHOWCASE_I18N_BLOCK = 'showcase'
 
+/**
+ * `satisfies LocaleLoaderCollection` здесь не проходит, и это ограничение типа,
+ * а не ошибка данных: в JSON витрины есть массивы (`bullets`), а `MessageValue`
+ * описывает только примитивы и вложенные объекты. Рантайм с ними работает —
+ * `useShowcasePageI18n` адресует их по индексу (`…bullets.0`), то есть массив
+ * это законная запись нумерованного набора. Поэтому приведение, а не переделка
+ * локалей под тип.
+ */
 export const showcaseLocaleLoaders = {
   en: {
     [SHOWCASE_I18N_BLOCK]: () => import('./locales/en/showcase.json'),
@@ -35,4 +43,4 @@ export const showcaseLocaleLoaders = {
     'composables.useAnnouncer': () => import('./locales/ru/composables/useAnnouncer.json'),
     'composables.useDialogService': () => import('./locales/ru/composables/useDialogService.json'),
   },
-} satisfies LocaleLoaderCollection
+} as unknown as LocaleLoaderCollection

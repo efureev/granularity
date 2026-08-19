@@ -22,7 +22,7 @@ const cities = [
 ]
 
 const airport = ref('')
-const airports = ['BER', 'LIS', 'TBS', 'AMS', 'IST']
+const airports = ['BER', 'LIS', 'TBS', 'AMS', 'IST'].map(code => ({ value: code, label: code }))
 
 const departure = ref<string | null>('2026-08-12')
 </script>

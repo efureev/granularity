@@ -23,7 +23,12 @@ export type { GrSwitchLabelPosition, GrSwitchSize } from './grSwitchStyles'
  * Пропсы публичного GR-примитива «Switch».
  */
 export interface GrSwitchProps {
-  modelValue: boolean
+  /**
+   * Значение переключателя. Необязательное: без `v-model` контрол рисуется
+   * выключенным — так же, как `GrCheckbox`. Обязательный проп заставлял бы
+   * заводить `ref` даже там, где переключатель presentational.
+   */
+  modelValue?: boolean
   disabled?: boolean
   /** Только для чтения: состояние видно, но не переключается. */
   readonly?: boolean
@@ -68,6 +73,7 @@ defineOptions({ inheritAttrs: false })
 const props = withDefaults(
     defineProps<GrSwitchProps>(),
     {
+      modelValue: false,
       disabled: false,
       readonly: false,
       invalid: false,

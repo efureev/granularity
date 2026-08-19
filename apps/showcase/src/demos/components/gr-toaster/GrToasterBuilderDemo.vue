@@ -6,6 +6,7 @@ import {
   GrCard,
   GrFormField,
   GrInput,
+  GrNumberInput,
   GrRadioGroup,
   GrSelect,
   GrToaster,
@@ -179,9 +180,10 @@ const previewCode = computed(() => {
         </GrFormField>
 
         <GrFormField label="Timeout (ms, 0 = sticky)">
-          <GrInput
-            v-model.number="timeoutMs"
-            type="number"
+          <GrNumberInput
+            v-model="timeoutMs"
+            :min="0"
+            :step="500"
             placeholder="3500"
             aria-label="Toast timeout in milliseconds"
           />

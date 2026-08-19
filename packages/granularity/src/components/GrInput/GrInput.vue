@@ -17,7 +17,12 @@ import IconEye from '~icons/lucide/eye'
 import IconEyeOff from '~icons/lucide/eye-off'
 
 export interface GrInputProps {
-    modelValue: string
+    /**
+     * Значение поля. Необязательное: без `v-model` поле рисуется пустым.
+     * Дефолт — пустая строка, а не `undefined`: длина значения читается
+     * напрямую (`showClear`), и `undefined` уронил бы рендер.
+     */
+    modelValue?: string
     type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
     placeholder?: string
     autocomplete?: string
@@ -94,6 +99,7 @@ export type GrInputTextAlign = 'left' | 'center' | 'right'
 const props = withDefaults(
     defineProps<GrInputProps>(),
     {
+      modelValue: '',
       type: 'text',
       placeholder: undefined,
       autocomplete: undefined,

@@ -64,7 +64,7 @@ function open(name: string): void {
 
     <GrImageViewer
       v-model="viewerOpen"
-      :url-list="images.map(file => file.src)"
+      :url-list="images.map(file => file.src).filter((src): src is string => src !== null)"
       :initial-index="viewerIndex"
     />
   </div>

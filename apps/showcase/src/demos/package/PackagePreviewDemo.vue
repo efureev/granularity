@@ -57,7 +57,11 @@ const outsideLog = ref('—')
 function resolveOutsideExclude(): HTMLElement | null {
   const target = outsideExcludeEl.value
   if (!target) return null
-  return '$el' in target ? (target.$el as HTMLElement) : target
+  // `instanceof`, а не `'$el' in target`: проверка через `in` не сужает union,
+  // и `$el` остаётся неизвестного типа.
+  if (target instanceof HTMLElement) return target
+
+  return target.$el ?? null
 }
 
 function closeOutsidePanel(): void {
@@ -106,7 +110,9 @@ function pushToast(variant: 'info' | 'success' | 'warning' | 'danger', timeoutMs
   const id = toasts.push({
     title: `Toast ${variant}`,
     message: `Queue length before push: ${toasts.list.value.length}`,
-    variant,
+    // Поле называется `tone`, а не `variant`: до этой правки тон молча не
+    // применялся — все тосты демо выходили нейтральными.
+    tone: variant,
     timeoutMs,
   })
 

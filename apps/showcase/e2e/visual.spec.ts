@@ -26,7 +26,10 @@ import { companionPath, componentPath, visualCompanionComponentNames } from './c
  * движение» — тот же канал, которым пользуется сам компонент, поэтому эталон
  * снимается с уже доехавшими значениями.
  */
-test.use({ reducedMotion: 'reduce' })
+// Опция принадлежит контексту, а не самому тесту: в форме `test.use({ reducedMotion })`
+// Playwright её не применял — гашение держалось только на `page.emulateMedia`
+// ниже, а эта строка вводила в заблуждение.
+test.use({ contextOptions: { reducedMotion: 'reduce' } })
 
 /**
  * Тема и язык фиксируются до загрузки приложения.

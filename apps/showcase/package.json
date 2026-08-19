@@ -31,13 +31,15 @@
     "unplugin-vue-components": "^32.0.0",
     "vite": "^8.1.5",
     "vitest": "^4.1.10",
-    "vue-component-meta": "^3.3.7"
+    "vue-component-meta": "^3.3.7",
+    "vue-tsc": "^3.3.7"
   },
   "scripts": {
     "build": "yarn generate:api && yarn generate:search && vite build",
     "build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "dev": "yarn prepare:granularity && yarn generate:api && yarn generate:search && vite",
     "generate:api": "node ./scripts/generate-component-api.mjs",
     "generate:search": "node ./scripts/generate-showcase-search-index.mjs",

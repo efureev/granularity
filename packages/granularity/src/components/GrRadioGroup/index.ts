@@ -8,6 +8,7 @@ export { grRadioGroupConfig } from './config'
 export type { GrRadioGroupConfigurableProps } from './defaults'
 export type {
   GrRadioGroupOption,
+  GrRadioGroupOrientation,
   GrRadioGroupProps,
   GrRadioGroupVariant,
 } from './GrRadioGroup.vue'

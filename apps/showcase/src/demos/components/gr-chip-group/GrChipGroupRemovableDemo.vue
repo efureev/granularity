@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import type { GrChipValue } from '@feugene/granularity'
 import { GrChip, GrChipGroup } from '@feugene/granularity'
 
 // Метки можно и выбирать, и снимать: выбор ведёт группа, состав — приложение.
 const labels = ref(['срочно', 'бэкенд', 'регресс', 'релиз 0.25'])
 const active = ref<string[]>(['срочно'])
 
-function drop(label: string): void {
+function drop(value: GrChipValue): void {
+  const label = String(value)
   labels.value = labels.value.filter(item => item !== label)
   active.value = active.value.filter(item => item !== label)
 }

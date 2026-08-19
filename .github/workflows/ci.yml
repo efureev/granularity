@@ -13,13 +13,12 @@ on:
       - 'granularity-forms-schema-v*'
   pull_request:
     branches: [ main ]
+  # Ручной перезапуск: push тега тем же значением события не создаёт, и упавший
+  # релиз иначе перезапускается только пересозданием тега.
+  workflow_dispatch:
 
 permissions:
   contents: read
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   # Гейты токенов, реестров и дефолтов живут фабриками в
@@ -160,11 +159,94 @@ jobs:
         if: always()
         run: yarn typecheck:granularity
 
+      # Дрейф реестров ломает не сборку, а tree-shaking, subpath-импорт и скан
+      # классов — молча. У компаньонов проверка стояла с самого начала, у ядра
+      # её не было, хотя генератор и гейт у него те же.
+      - name: Registry drift
+        if: always()
+        working-directory: packages/granularity
+        run: yarn generate:registry --check
+
+      # Локали ядра: ключ, добавленный в одну, но не в три, даёт fallback на
+      # английский у части интерфейса.
+      - name: Locale completeness
+        if: always()
+        working-directory: packages/granularity
+        run: yarn check:messages
+
       # Карта выбора компонента: генерируемый блок совпадает со страницами,
       # каждый компонент стоит хотя бы в одной развилке, ссылки резолвятся.
       - name: Check component map
         if: always()
         run: yarn docs:check
+
+  # Витрина — самый большой код репозитория, который до сих пор не проверял
+  # никто: скрипт `lint` у неё был, джобы не было, а `typecheck` не существовало
+  # вовсе (не было ни скрипта, ни `vue-tsc`). Первый прогон нашёл 106 ошибок.
+  #
+  # Зависит от сборок пакетов: витрина типизируется против собранного `dist`,
+  # как и её тесты.
+  quality-showcase:
+    needs:
+      - build-granularity
+      - build-unplugin-granularity
+      - build-granularity-chrono
+      - build-granularity-charts
+      - build-granularity-dashboard
+      - build-granularity-forms-schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      - name: Download granularity-chrono dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-chrono-dist
+          path: packages/granularity-chrono/dist
+
+      - name: Download granularity-charts dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-charts-dist
+          path: packages/granularity-charts/dist
+
+      - name: Download granularity-dashboard dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dashboard-dist
+          path: packages/granularity-dashboard/dist
+
+      - name: Download granularity-forms-schema dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-forms-schema-dist
+          path: packages/granularity-forms-schema/dist
+
+      - name: Lint showcase
+        run: yarn lint:showcase
+
+      - name: Typecheck showcase
+        if: always()
+        run: yarn typecheck:showcase
 
   docs-granularity:
     needs:
@@ -554,6 +636,14 @@ jobs:
       - build-showcase
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Группа принадлежит этой джобе, а не всему workflow: конкурентных вызовов
+    # не терпит только Pages API. Объявленная на уровне workflow, она сажала в
+    # одну очередь все прогоны — веток и всех семи видов тегов, — а в очереди
+    # GitHub держит ровно один ожидающий прогон, и следующий вытесняет его.
+    # Так из шести тегов одного релиза два оказались `cancelled`.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
     permissions:
       contents: read
       pages: write

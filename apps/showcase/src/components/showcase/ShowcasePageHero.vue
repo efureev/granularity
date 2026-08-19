@@ -35,7 +35,7 @@ const hasDescription = computed(() => Boolean(slots.description) || false)
 </slot>
       </h1>
       <p v-if="description || hasDescription" class="showcase-text-muted max-w-3xl text-base leading-7">
-        <InlineRichText :text="description" />
+        <InlineRichText :text="description ?? ''" />
       </p>
     </div>
 
