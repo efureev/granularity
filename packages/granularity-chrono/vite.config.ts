@@ -65,6 +65,9 @@ export default defineConfig({
         'components/GrDateTimePicker/index': fileURLToPath(
           new URL('./src/components/GrDateTimePicker/index.ts', import.meta.url),
         ),
+        'components/GrDuration/index': fileURLToPath(
+          new URL('./src/components/GrDuration/index.ts', import.meta.url),
+        ),
         'components/GrRelativeTime/index': fileURLToPath(
           new URL('./src/components/GrRelativeTime/index.ts', import.meta.url),
         ),

@@ -7,6 +7,7 @@ import GrCalendar from '../components/GrCalendar/GrCalendar.vue'
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
 import GrDateRangePicker from '../components/GrDateRangePicker/GrDateRangePicker.vue'
 import GrDateTimePicker from '../components/GrDateTimePicker/GrDateTimePicker.vue'
+import GrDuration from '../components/GrDuration/GrDuration.vue'
 import GrRelativeTime from '../components/GrRelativeTime/GrRelativeTime.vue'
 import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
 
@@ -83,6 +84,17 @@ describe('a11y', () => {
     // Панель уезжает в портал — проверяем документ целиком, иначе она выпадет
     // из области сканирования вместе со всей своей разметкой.
     expect(wrapper.find('[data-gr-date-picker-panel]').exists() || document.querySelector('[data-gr-date-picker-panel]') !== null).toBe(true)
+    expect(await violations(document.body)).toEqual([])
+
+    wrapper.unmount()
+  })
+
+  it('GrDuration — метка длительности без нарушений', async () => {
+    const wrapper = mount(GrDuration, {
+      props: { value: 9000, locale: 'en-US' },
+      attachTo: document.body,
+    })
+
     expect(await violations(document.body)).toEqual([])
 
     wrapper.unmount()

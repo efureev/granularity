@@ -67,6 +67,10 @@
       "types": "./dist/types/components/GrDateTimePicker/index.d.ts",
       "import": "./dist/components/GrDateTimePicker/index.js"
     },
+    "./components/GrDuration": {
+      "types": "./dist/types/components/GrDuration/index.d.ts",
+      "import": "./dist/components/GrDuration/index.js"
+    },
     "./components/GrRelativeTime": {
       "types": "./dist/types/components/GrRelativeTime/index.d.ts",
       "import": "./dist/components/GrRelativeTime/index.js"

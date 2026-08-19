@@ -1,13 +1,13 @@
 # Каталог компонентов
 
-`@feugene/granularity-chrono` публикует шесть компонентов, каждый — отдельным
+`@feugene/granularity-chrono` публикует семь компонентов, каждый — отдельным
 subpath-экспортом:
 
 ```ts
 import { GrDatePicker } from '@feugene/granularity-chrono/components/GrDatePicker'
 ```
 
-Пять из них выбирают момент, шестой его показывает.
+Пять из них выбирают момент, два других показывают — момент и длину промежутка.
 
 - [`GrCalendar`](./components/GrCalendar.md) — сетка месяца сама по себе, без поля
 - [`GrDatePicker`](./components/GrDatePicker.md) — дата как значение поля формы
@@ -15,6 +15,7 @@ import { GrDatePicker } from '@feugene/granularity-chrono/components/GrDatePicke
 - [`GrDateTimePicker`](./components/GrDateTimePicker.md) — дата вместе со временем
 - [`GrTimePicker`](./components/GrTimePicker.md) — только время
 - [`GrRelativeTime`](./components/GrRelativeTime.md) — момент относительно сейчас
+- [`GrDuration`](./components/GrDuration.md) — сколько длилось, а не когда случилось
 
 Выбор между пакетами — карта `docs/COMPONENT-MAP.md` в корне репозитория.
 

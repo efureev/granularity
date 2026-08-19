@@ -31,11 +31,13 @@
 | Дата вместе со временем | [`GrDateTimePicker`](./GrDateTimePicker.md) |
 | Только дата | [`GrDatePicker`](./GrDatePicker.md) |
 | Период «с — по» по датам | [`GrDateRangePicker`](./GrDateRangePicker.md) |
-| Длительность, а не момент на часах | [`GrNumberInput`](../../../granularity/docs/components/GrNumberInput.md) |
+| Ввести длительность, а не момент на часах | [`GrNumberInput`](../../../granularity/docs/components/GrNumberInput.md) |
+| Показать длительность | [`GrDuration`](./GrDuration.md) |
 | Несколько готовых слотов на выбор | [`GrSelect`](../../../granularity/docs/components/GrSelect.md) |
 
 **Длительность — не время.** «Полтора часа» это число с единицей, а не момент:
 колонки часов и минут для неё врут, потому что 90 минут в них не набираются.
+Вводят её числом, а показывают [`GrDuration`](./GrDuration.md).
 
 ## Панель не закрывается по выбору
 

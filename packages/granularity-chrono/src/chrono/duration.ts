@@ -92,7 +92,18 @@ export function selectDurationParts(totalSeconds: number, options: SelectDuratio
 
   // Пустой промежуток — это «0 с», а не пустая строка: пустота читается как
   // «нет данных», а ноль означает другое.
-  return taken === 0 ? { [smallest]: 0 } : parts
+  if (taken === 0) return { [smallest]: 0 }
+
+  // Хвостовой ноль не несёт информации: ровно два часа — это «2 ч», а не
+  // «2 ч 0 мин». `maxUnits` задаёт потолок, а не квоту, которую надо добрать.
+  // Первая часть по построению ненулевая, поэтому цикл не съест всё.
+  for (const unit of units.filter(item => parts[item] !== undefined).reverse()) {
+    if (parts[unit] !== 0) break
+
+    delete parts[unit]
+  }
+
+  return parts
 }
 
 /**
@@ -191,7 +202,12 @@ export function formatDuration(locale: string, totalSeconds: number, options: Fo
   const style = options.style ?? 'short'
   const parts = selectDurationParts(totalSeconds, options)
 
-  if (!hasDurationFormat()) return formatWithUnits(locale, style, parts)
+  // Вырожденный случай идёт запасным путём всегда: `Intl.DurationFormat`
+  // опускает нулевые поля, и «0 с» превратилось бы в пустую строку — то есть
+  // в «нет данных» вместо «нисколько».
+  const isZero = Object.values(parts).every(value => value === 0)
+
+  if (isZero || !hasDurationFormat()) return formatWithUnits(locale, style, parts)
 
   const duration: Partial<Record<'days' | 'hours' | 'minutes' | 'seconds', number>> = {}
   for (const unit of UNIT_ORDER) {

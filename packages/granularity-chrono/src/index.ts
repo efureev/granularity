@@ -3,6 +3,7 @@ export * from './components/GrCalendar'
 export * from './components/GrDatePicker'
 export * from './components/GrDateRangePicker'
 export * from './components/GrDateTimePicker'
+export * from './components/GrDuration'
 export * from './components/GrRelativeTime'
 export * from './components/GrTimePicker'
 // </granularity:components>

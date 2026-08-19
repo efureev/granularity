@@ -21,6 +21,11 @@ describe('selectDurationParts', () => {
     expect(selectDurationParts(10_770)).toEqual({ hour: 2, minute: 59 })
   })
 
+  it('хвостовой ноль отбрасывается: `maxUnits` — потолок, а не квота', () => {
+    expect(selectDurationParts(7200)).toEqual({ hour: 2 })
+    expect(selectDurationParts(86_400, { maxUnits: 3 })).toEqual({ day: 1 })
+  })
+
   it('число единиц задаётся', () => {
     expect(selectDurationParts(90_061, { maxUnits: 4 })).toEqual({ day: 1, hour: 1, minute: 1, second: 1 })
     expect(selectDurationParts(90_061, { maxUnits: 1 })).toEqual({ day: 1 })
@@ -69,6 +74,12 @@ describe('durationToIso', () => {
 describe('formatDuration', () => {
   it('«2 ч 30 мин» по-русски', () => {
     expect(formatDuration('ru', 9000)).toBe('2 ч 30 мин')
+  })
+
+  it('ноль печатается, а не исчезает', () => {
+    // `Intl.DurationFormat` опускает нулевые поля, и «0 с» стало бы пустой
+    // строкой — то есть «нет данных» вместо «нисколько».
+    expect(formatDuration('ru', 0)).toBe('0 с')
   })
 
   it('длина имён единиц выбирается', () => {

@@ -271,7 +271,7 @@
 
 ### Дата и время
 
-Различитель — **вводят или показывают** и **что именно за момент**.
+Различитель — **вводят или показывают** и **момент это или длина промежутка**.
 
 | Что происходит | Компонент |
 | --- | --- |
@@ -281,6 +281,7 @@
 | вводят только время | [`GrTimePicker`](../packages/granularity-chrono/docs/components/GrTimePicker.md) |
 | сетка месяца нужна сама по себе, без поля | [`GrCalendar`](../packages/granularity-chrono/docs/components/GrCalendar.md) |
 | показывают момент относительно сейчас | [`GrRelativeTime`](../packages/granularity-chrono/docs/components/GrRelativeTime.md) |
+| показывают, сколько длилось | [`GrDuration`](../packages/granularity-chrono/docs/components/GrDuration.md) |
 
 Календарь событий, агенду и Гант этот пакет не закрывает — см. «Чего в
 экосистеме нет».
@@ -340,6 +341,7 @@
 | [`GrDrawer`](../packages/granularity/docs/components/GrDrawer.md) | ядро | панель приходит от края |
 | [`GrDropdown`](../packages/granularity/docs/components/GrDropdown.md) | ядро | меню со своими пунктами |
 | [`GrDropdownMenu`](../packages/granularity/docs/components/GrDropdownMenu.md) | ядро | действия над объектом |
+| [`GrDuration`](../packages/granularity-chrono/docs/components/GrDuration.md) | chrono | сколько заняло |
 | [`GrEmptyState`](../packages/granularity/docs/components/GrEmptyState.md) | ядро | список пуст с самого начала |
 | [`GrFilePreview`](../packages/granularity/docs/components/GrFilePreview.md) | ядро | лента вложений |
 | [`GrFileUpload`](../packages/granularity/docs/components/GrFileUpload.md) | ядро | файл уходит на сервер сразу |
