@@ -101,6 +101,17 @@ export interface GrChartLineProps {
   /** Рендерер. Расширится значением `canvas`, когда появится второй путь. */
   renderer?: 'auto' | 'svg'
   /** Порог, выше которого маркеры не рисуются даже при `showPoints: 'auto'`. */
+  /**
+   * Когда прореживать ряд для рисунка (LTTB).
+   *
+   * `'auto'` включается, только когда точек больше бюджета: выше двух вершин на
+   * пиксель SVG всё равно не покажет того, что выбросил бы алгоритм, а платит за
+   * это длиной строки `d`. Прорежённые точки идут **только** в рисунок — курсор,
+   * клавиатура, тултип и скрытая таблица знают полный ряд.
+   */
+  decimate?: 'auto' | 'always' | 'never'
+  /** Бюджет точек на серию. Не задан — считается от ширины области построения. */
+  maxPoints?: number
   canvasThreshold?: number
 }
 
@@ -150,6 +161,8 @@ const props = withDefaults(defineProps<GrChartLineProps>(), {
   ariaLabel: undefined,
   ariaDescription: undefined,
   renderer: 'auto',
+  decimate: undefined,
+  maxPoints: undefined,
   canvasThreshold: 2000,
 })
 
@@ -165,6 +178,8 @@ defineSlots<{
 const { t } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { component: 'GrChartLine' })
+const resolvedDecimate = useGrComponentProp('GrChartLine', 'decimate', () => props.decimate, 'auto' as const)
+const resolvedMaxPoints = useGrComponentProp('GrChartLine', 'maxPoints', () => props.maxPoints, undefined as unknown as number)
 const resolvedHeight = useGrComponentProp('GrChartLine', 'height', () => props.height, 256)
 const resolvedCurve = useGrComponentProp('GrChartLine', 'curve', () => props.curve, 'linear' as GrChartCurve)
 const resolvedGaps = useGrComponentProp('GrChartLine', 'gaps', () => props.gaps, 'hidden' as const)
@@ -281,6 +296,8 @@ defineExpose({
     :interactive="interactive"
     :active-index="activeIndex"
     :locale="locale"
+    :decimate="resolvedDecimate"
+    :max-points="resolvedMaxPoints"
     :aria-label="ariaLabel"
     :aria-description="ariaDescription"
     :role-description="t('grCharts.line.label', 'Line chart')"
@@ -302,14 +319,19 @@ defineExpose({
 <slot name="header" />
 </template>
 
-    <template #plot="{ xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, activeIndex: cursor, clipPathId }">
+    <!--
+      Рисуй по `drawSeries`, утверждай по `visibleSeries`: активная марка стоит
+      на конкретном значении, и брать его из прорежённой выборки нельзя — она
+      сводка, а не данные.
+    -->
+    <template #plot="{ xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, drawSeries, activeIndex: cursor, clipPathId }">
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-line-body>
         <!--
           Перемычки идут ПОД линией и под марками: разрыв не должен спорить с
           тем, что действительно измерено.
         -->
         <path
-          v-for="item in (resolvedGaps === 'hidden' ? [] : visibleSeries)"
+          v-for="item in (resolvedGaps === 'hidden' ? [] : drawSeries)"
           :key="`gap-${item.id}`"
           :data-gr-chart-gap="item.id"
           :d="bridgePath(toPixelPoints(item, sx, scaleForAxis(item.axis, sy, syr)))"
@@ -322,7 +344,7 @@ defineExpose({
         />
 
         <path
-          v-for="item in visibleSeries"
+          v-for="item in drawSeries"
           :key="item.id"
           :data-gr-chart-series="item.id"
           :d="linePath(toPixelPoints(item, sx, scaleForAxis(item.axis, sy, syr)), resolvedCurve)"
@@ -335,7 +357,7 @@ defineExpose({
         />
 
         <path
-          v-for="marker in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize, false, syr) : [])"
+          v-for="marker in (showMarkers ? symbolMarks(drawSeries, sx, sy, markerSize, false, syr) : [])"
           :key="marker.key"
           :d="marker.d"
           :fill="marker.color"

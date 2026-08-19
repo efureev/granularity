@@ -577,3 +577,68 @@ describe('GrChartLine: вторая ось значений', () => {
     expect(gutter({ series: mixed, dualAxis: true })).toBeLessThan(gutter({ series: mixed }))
   })
 })
+
+describe('GrChartLine — прореживание', () => {
+  const dense = [{ id: 'load', label: 'Нагрузка', y: Array.from({ length: 5000 }, (_, index) => Math.sin(index / 40) * 50 + 50) }]
+
+  function commands(wrapper: ReturnType<typeof factory>): number {
+    const d = wrapper.find('[data-gr-chart-series]').attributes('d') ?? ''
+
+    return (d.match(/L/g) ?? []).length
+  }
+
+  it('`never` оставляет рисунок как был', () => {
+    const wrapper = factory({ series: dense, decimate: 'never' })
+
+    expect(commands(wrapper)).toBe(4999)
+
+    wrapper.unmount()
+  })
+
+  it('`always` укорачивает путь до бюджета', () => {
+    const wrapper = factory({ series: dense, decimate: 'always', maxPoints: 200 })
+
+    expect(commands(wrapper)).toBeLessThan(300)
+
+    wrapper.unmount()
+  })
+
+  it('скрытая таблица остаётся полной: прореживание — это про рисунок', () => {
+    // Прорежённая таблица отдала бы читателю без зрения другой график, чем видит
+    // зрячий сосед. Это данные, а не запасной вариант рисунка.
+    const wrapper = factory({ series: dense, decimate: 'always', maxPoints: 200, dataTable: 'visible' })
+
+    expect(wrapper.findAll('tbody tr').length).toBe(5000)
+
+    wrapper.unmount()
+  })
+
+  it('клавиатура ходит по полному ряду', async () => {
+    const wrapper = factory({ series: dense, decimate: 'always', maxPoints: 200 })
+    const element = wrapper.find('[data-gr-chart-surface]').element
+
+    keydown(element, 'End')
+    await nextTick()
+
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([4999])
+
+    wrapper.unmount()
+  })
+
+  it('короткий ряд не трогается даже при `auto`', () => {
+    const wrapper = factory({ decimate: 'auto' })
+    const before = wrapper.find('[data-gr-chart-series]').attributes('d')
+
+    expect(before).toBe(factory({ decimate: 'never' }).find('[data-gr-chart-series]').attributes('d'))
+
+    wrapper.unmount()
+  })
+
+  it('`decimate` приезжает из GrConfigProvider', () => {
+    const wrapper = factory({ series: dense }, { componentDefaults: { GrChartLine: { decimate: 'always', maxPoints: 100 } } })
+
+    expect(commands(wrapper)).toBeLessThan(200)
+
+    wrapper.unmount()
+  })
+})

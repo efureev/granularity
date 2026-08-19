@@ -87,3 +87,23 @@ describe('GrSparkline', () => {
   })
 
 })
+
+describe('GrSparkline — прореживание', () => {
+  it('длинный ряд не складывает тысячи вершин в холст шириной сто пикселей', () => {
+    const wrapper = factory({ data: Array.from({ length: 5000 }, (_, index) => Math.sin(index / 30) * 10 + 20) })
+    const d = wrapper.find('path').attributes('d') ?? ''
+
+    // Бюджет — константа от ширины `viewBox`: замера у спарклайна нет вовсе.
+    expect((d.match(/L/g) ?? []).length).toBeLessThan(400)
+
+    wrapper.unmount()
+  })
+
+  it('короткий ряд рисуется целиком', () => {
+    const wrapper = factory({ data: [1, 5, 3, 9, 4] })
+
+    expect((wrapper.find('path').attributes('d')?.match(/L/g) ?? []).length).toBe(4)
+
+    wrapper.unmount()
+  })
+})

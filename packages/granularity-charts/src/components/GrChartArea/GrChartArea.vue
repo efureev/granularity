@@ -111,6 +111,17 @@ export interface GrChartAreaProps {
   ariaLabel?: string
   ariaDescription?: string
   /** Порог, выше которого марки не рисуются даже при `showPoints: 'auto'`. */
+  /**
+   * Когда прореживать ряд для рисунка (LTTB).
+   *
+   * `'auto'` включается, только когда точек больше бюджета: выше двух вершин на
+   * пиксель SVG всё равно не покажет того, что выбросил бы алгоритм, а платит за
+   * это длиной строки `d`. Прорежённые точки идут **только** в рисунок — курсор,
+   * клавиатура, тултип и скрытая таблица знают полный ряд.
+   */
+  decimate?: 'auto' | 'always' | 'never'
+  /** Бюджет точек на серию. Не задан — считается от ширины области построения. */
+  maxPoints?: number
   canvasThreshold?: number
 }
 
@@ -160,6 +171,8 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
   locale: undefined,
   ariaLabel: undefined,
   ariaDescription: undefined,
+  decimate: undefined,
+  maxPoints: undefined,
   canvasThreshold: 2000,
 })
 
@@ -175,6 +188,8 @@ defineSlots<{
 const { t, locale: i18nLocale } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { component: 'GrChartArea' })
+const resolvedDecimate = useGrComponentProp('GrChartArea', 'decimate', () => props.decimate, 'auto' as const)
+const resolvedMaxPoints = useGrComponentProp('GrChartArea', 'maxPoints', () => props.maxPoints, undefined as unknown as number)
 const resolvedHeight = useGrComponentProp('GrChartArea', 'height', () => props.height, 256)
 const resolvedCurve = useGrComponentProp('GrChartArea', 'curve', () => props.curve, 'linear' as GrChartCurve)
 const resolvedGrid = useGrComponentProp('GrChartArea', 'showGrid', () => props.showGrid, 'y' as const)
@@ -419,6 +434,9 @@ defineExpose({
     :interactive="interactive"
     :active-index="activeIndex"
     :locale="locale"
+    :decimate="resolvedDecimate"
+    :decimate-shared-x="stacked !== false"
+    :max-points="resolvedMaxPoints"
     :aria-label="ariaLabel"
     :aria-description="ariaDescription"
     :role-description="stacked === '100%'
@@ -443,7 +461,8 @@ defineExpose({
 <slot name="header" />
 </template>
 
-    <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, activeIndex: cursor, clipPathId }">
+    <!-- Рисуй по `drawSeries`, утверждай по `visibleSeries`. -->
+    <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, drawSeries, activeIndex: cursor, clipPathId }">
       <defs v-if="resolvedFill === 'gradient'">
         <linearGradient
           v-for="stop in gradientStops(visibleSeries, sy, plot, syr)"
@@ -462,7 +481,7 @@ defineExpose({
 
       <g :clip-path="`url(#${clipPathId})`" data-gr-chart-area-body>
         <path
-          v-for="mark in areaMarks(visibleSeries, sx, sy, plot, syr)"
+          v-for="mark in areaMarks(drawSeries, sx, sy, plot, syr)"
           :key="mark.key"
           :data-gr-chart-area-fill="mark.key"
           :d="mark.d"
@@ -472,7 +491,7 @@ defineExpose({
         />
 
         <path
-          v-for="item in visibleSeries"
+          v-for="item in drawSeries"
           :key="item.id"
           :data-gr-chart-series="item.id"
           :d="linePath(edgePoints(item, sx, sy, syr), resolvedCurve)"
@@ -485,7 +504,7 @@ defineExpose({
         />
 
         <path
-          v-for="mark in (showMarkers ? symbolMarks(visibleSeries, sx, sy, markerSize, stacked !== false, syr) : [])"
+          v-for="mark in (showMarkers ? symbolMarks(drawSeries, sx, sy, markerSize, stacked !== false, syr) : [])"
           :key="mark.key"
           :d="mark.d"
           :fill="mark.color"

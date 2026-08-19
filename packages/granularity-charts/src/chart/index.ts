@@ -54,6 +54,18 @@ export {
 
 export type { BarDirection, BarHitInput, BarRect, BarSlot, GroupSlotsOptions } from './chartBars'
 export { barBandwidth, barHitIndex, barPath, barRect, barToward, groupSlots } from './chartBars'
+export type {
+  DecimateGroupOptions,
+  DecimateOptions,
+  DecimationBudgetInput,
+} from './chartDecimate'
+export {
+  decimatePoints,
+  decimateSeries,
+  decimateSeriesGroup,
+  decimationBudget,
+  lttbIndices,
+} from './chartDecimate'
 export type { ChartOrientation } from './chartOrientation'
 export {
   acrossBounds,

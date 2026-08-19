@@ -6,6 +6,7 @@ import { useFloating } from '@feugene/granularity/composables/useFloating'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { computed, ref, useId, watch } from 'vue'
 
+import { decimateSeriesGroup, decimationBudget } from '../../../chart/chartDecimate'
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
 import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '../../../chart/chartFormat'
 import { chartLayout, type Rect } from '../../../chart/chartLayout'
@@ -60,7 +61,18 @@ export interface ChartPlotScope {
   /** Шкала правой оси. `null` — второй оси нет, серия `axis: 'right'` падает на левую. */
   yScaleRight: GrChartScale | null
   data: ChartData
+  /**
+   * Полные серии. По ним считается всё, что **утверждает** значение: активная
+   * марка, попадание, тултип.
+   */
   visibleSeries: readonly NormalizedSeries[]
+  /**
+   * Серии для **рисования**: те же объекты, но, возможно, прорежённые.
+   *
+   * Контракт: рисуй по `drawSeries`, утверждай по `visibleSeries`. Без
+   * прореживания это один и тот же массив по ссылке.
+   */
+  drawSeries: readonly NormalizedSeries[]
   activeIndex: number | null
   /** Активная серия. У матрицы это строка; декартовы графики её игнорируют. */
   activeSeriesIndex: number
@@ -129,6 +141,23 @@ export interface ChartFrameProps {
    */
   references?: readonly GrChartReference[]
   /**
+   * Когда прореживать ряд для рисунка.
+   *
+   * `'auto'` — только когда точек больше бюджета; `'always'` — всегда;
+   * `'never'` — никогда. Прорежённые точки идут **только** в рисунок: курсор,
+   * клавиатура, тултип и скрытая таблица продолжают знать полный ряд.
+   */
+  decimate?: 'auto' | 'always' | 'never'
+  /** Бюджет точек на серию. Не задан — считается от ширины области построения. */
+  maxPoints?: number
+  /**
+   * Общий набор абсцисс на всю группу серий.
+   *
+   * Нужен стеку: независимо прорежённые серии выбрали бы разные точки, и полосы
+   * разошлись бы швами.
+   */
+  decimateSharedX?: boolean
+  /**
    * Рисует ли слой опор сама рама.
    *
    * `false` ставит компонент, у которого своя система координат: рама считает
@@ -196,6 +225,9 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   valueFormat: undefined,
   valueFormatRight: undefined,
   crosshair: true,
+  decimate: 'never',
+  maxPoints: undefined,
+  decimateSharedX: false,
   referenceLayer: true,
   references: undefined,
   hitTest: undefined,
@@ -243,6 +275,7 @@ const fontSizePx = computed(() => labelFontPx[props.size])
 const { width } = useElementSize(rootEl, { initialWidth: () => props.width })
 
 const visibleSeries = computed(() => props.data.series.filter(series => !series.hidden))
+
 const isEmpty = computed(() => props.empty ?? props.data.positions.length === 0)
 const showAxes = computed(() => props.axes && !isEmpty.value && !props.loading)
 
@@ -366,6 +399,30 @@ const layout = computed(() => chartLayout({
 }))
 
 const plot = computed(() => layout.value.plot)
+
+/**
+ * Серии для рисунка.
+ *
+ * Считает рама, а не компонент в слоте: у неё лежат и область построения, и
+ * список видимых серий, а `computed` мемоизирует результат. В слоте тот же
+ * расчёт шёл бы на каждое движение указателя — слот перерисовывается вместе с
+ * активной точкой.
+ */
+const drawSeries = computed<readonly NormalizedSeries[]>(() => {
+  const longest = visibleSeries.value.reduce((max, series) => Math.max(max, series.points.length), 0)
+  const budget = decimationBudget({
+    mode: props.decimate,
+    kind: props.data.kind,
+    plotWidth: plot.value.width,
+    maxPoints: props.maxPoints,
+    total: longest,
+  })
+
+  if (budget === null)
+    return visibleSeries.value
+
+  return decimateSeriesGroup(visibleSeries.value, { maxPoints: budget, sharedX: props.decimateSharedX })
+})
 
 const plotStyle = computed(() => ({
   left: `${plot.value.x}px`,
@@ -643,6 +700,7 @@ const plotScope = computed<ChartPlotScope>(() => ({
   yScaleRight: yScaleRight.value,
   data: props.data,
   visibleSeries: visibleSeries.value,
+  drawSeries: drawSeries.value,
   activeIndex: tooltipApi.activeIndex.value,
   activeSeriesIndex: activeSeriesIndex.value,
   clipPathId,

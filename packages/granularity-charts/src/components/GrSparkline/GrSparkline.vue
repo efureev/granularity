@@ -7,6 +7,7 @@ import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatValue } from '../../chart/chartFormat'
 import { linearScale } from '../../chart/chartScale'
 import { type GrChartPoint, normalizeChartData } from '../../chart/chartModel'
+import { decimatePoints, decimationBudget } from '../../chart/chartDecimate'
 import { areaPath, linePath, type PathPoint } from '../../chart/chartPath'
 import {
   sparklineCanvasClass,
@@ -85,8 +86,30 @@ const scales = computed(() => ({
   y: linearScale(data.value.yDomain, [VIEW_HEIGHT, 0]),
 }))
 
+/**
+ * Бюджет точек — константа от ширины холста.
+ *
+ * У спарклайна `viewBox` фиксированный и замера нет вовсе, поэтому ширина
+ * известна заранее. Случай самый выгодный: сотня спарклайнов в таблице
+ * перестаёт складывать сотню тысяч вершин ради рисунка шириной сто пикселей.
+ */
+const SPARKLINE_BUDGET = VIEW_WIDTH * 2
+
+const drawPoints = computed(() => {
+  const raw = series.value?.points ?? []
+  const budget = decimationBudget({
+    mode: 'auto',
+    kind: data.value.kind,
+    plotWidth: VIEW_WIDTH,
+    maxPoints: SPARKLINE_BUDGET,
+    total: raw.length,
+  })
+
+  return budget === null ? raw : decimatePoints(raw, { maxPoints: budget })
+})
+
 const points = computed<PathPoint[]>(() => {
-  const mapped: PathPoint[] = (series.value?.points ?? []).map(point => ({
+  const mapped: PathPoint[] = drawPoints.value.map(point => ({
     x: scales.value.x.scale(point.x),
     y: point.y === null ? null : scales.value.y.scale(point.y),
   }))

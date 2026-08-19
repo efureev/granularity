@@ -8,6 +8,14 @@ import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
  * Только оформление: данные, стек и границы осей задаются на месте.
  */
 export interface GrChartAreaConfigurableProps {
+  /**
+   * Когда прореживать ряд для рисунка. Политика рендера — приложение с плотными
+   * рядами задаёт её один раз на всё поддерево.
+   */
+  decimate: 'auto' | 'always' | 'never'
+  /** Бюджет точек на серию. */
+  maxPoints: number
+
   size: GrChartSize
   height: number
   curve: GrChartCurve
