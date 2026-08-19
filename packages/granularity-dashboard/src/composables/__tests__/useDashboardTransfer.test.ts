@@ -3,6 +3,7 @@ import { defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import { cancelPointer, move, release, resetGranularityDom } from '@feugene/granularity/testing'
+import { nextFrame } from '@feugene/granularity-test-kit/vue'
 
 import type {
   GrDashboardTransfer,
@@ -58,11 +59,6 @@ function makeTarget(rect: Partial<DOMRect> & { left: number, top: number, width:
   return { target, calls, point: () => lastPoint }
 }
 
-/** Кадр `requestAnimationFrame`: в нём живёт вся работа модели. */
-async function frame(): Promise<void> {
-  return new Promise(resolve => requestAnimationFrame(() => resolve()))
-}
-
 /** `PointerEvent` в jsdom нет — жест собирается `MouseEvent`-ом, как и в `testing/pointer`. */
 function pointerdown(x: number, y: number): PointerEvent {
   return new MouseEvent('pointerdown', { button: 0, clientX: x, clientY: y }) as unknown as PointerEvent
@@ -74,7 +70,7 @@ describe('useDashboardTransfer: порог', () => {
 
     api.start(CARGO, pointerdown(100, 100))
     move({ clientX: 100 + GR_DASHBOARD_TRANSFER_THRESHOLD - 1, clientY: 100 })
-    await frame()
+    await nextFrame()
 
     expect(api.transfer.value).toBeNull()
     expect(api.isTransferring.value).toBe(false)
@@ -85,7 +81,7 @@ describe('useDashboardTransfer: порог', () => {
 
     api.start(CARGO, pointerdown(100, 100))
     move({ clientX: 140, clientY: 160 })
-    await frame()
+    await nextFrame()
 
     expect(api.transfer.value).toEqual(CARGO)
     expect(api.point.value).toEqual({ x: 140, y: 160 })
@@ -124,12 +120,12 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
     expect(grid.calls.over).toBe(1)
     expect(grid.point()).toEqual({ x: 100, y: 100 })
 
     move({ clientX: 500, clientY: 500 })
-    await frame()
+    await nextFrame()
     expect(grid.calls.leave).toBe(1)
   })
 
@@ -142,12 +138,12 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 50, clientY: 50 })
-    await frame()
+    await nextFrame()
     expect(left.calls.over).toBe(1)
     expect(right.calls.over).toBe(0)
 
     move({ clientX: 250, clientY: 50 })
-    await frame()
+    await nextFrame()
     expect(left.calls.leave).toBe(1)
     expect(right.calls.over).toBe(1)
   })
@@ -159,7 +155,7 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
 
     expect(off.calls.over).toBe(0)
   })
@@ -171,14 +167,14 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
     release()
     expect(grid.calls.drop).toBe(1)
     expect(api.transfer.value).toBeNull()
 
     begin(api)
     move({ clientX: 900, clientY: 900 })
-    await frame()
+    await nextFrame()
     expect(() => release()).not.toThrow()
     expect(grid.calls.drop).toBe(1)
   })
@@ -190,14 +186,14 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
     expect(grid.calls.drop).toBe(0)
     expect(api.transfer.value).toBeNull()
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
     cancelPointer()
     expect(grid.calls.drop).toBe(0)
     expect(api.transfer.value).toBeNull()
@@ -210,11 +206,11 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
     unregister()
     move({ clientX: 120, clientY: 120 })
 
-    await expect(frame()).resolves.toBeUndefined()
+    await expect(nextFrame()).resolves.toBeUndefined()
     expect(() => release()).not.toThrow()
   })
 
@@ -225,7 +221,7 @@ describe('useDashboardTransfer: приёмники', () => {
 
     begin(api)
     move({ clientX: 100, clientY: 100 })
-    await frame()
+    await nextFrame()
     expect(api.transfer.value).not.toBeNull()
 
     // Примитив при смерти области снимает слушатели, но `onCancel` не зовёт:

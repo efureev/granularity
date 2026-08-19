@@ -1,8 +1,8 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
+import { expectNoA11yRegressions, expectTabCycle, waitForOpaque } from '@feugene/granularity-test-kit/e2e'
+
 import { SERVICE_ENTITIES, componentPath } from './components'
-import { expectTabCycle } from './keyboard'
 
 /**
  * Модальный слой в открытом состоянии.
@@ -25,10 +25,7 @@ async function openFirstModal(page: import('@playwright/test').Page): Promise<vo
 
   // Дожидаемся конца enter-анимации: на полупрозрачной панели axe считает
   // смешанный цвет и находит несуществующий контрастный дефект.
-  await page.waitForFunction(() => {
-    const panel = document.querySelector('[data-gr-modal-panel]')
-    return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
-  })
+  await waitForOpaque(page, '[data-gr-modal-panel]')
 }
 
 test.describe('модальное окно', () => {
@@ -40,13 +37,7 @@ test.describe('модальное окно', () => {
     const dialog = page.locator('[data-gr-overlay-root][role="dialog"]')
     await expect(dialog).toBeVisible()
 
-    const results = await new AxeBuilder({ page })
-      .include('[data-gr-overlay-root]')
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze()
-
-    const blocking = results.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))
-    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
+    await expectNoA11yRegressions(page, { include: '[data-gr-overlay-root]' })
   })
 
   test('объявляет себя модальным и даёт себе имя', async ({ page }) => {
@@ -181,13 +172,7 @@ test.describe('панель автокомплита', () => {
   test('открытая панель проходит axe', async ({ page }) => {
     const { panel } = await openPanel(page)
 
-    const results = await new AxeBuilder({ page })
-      .include('[data-gr-autocomplete-panel]')
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze()
-
-    const blocking = results.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))
-    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
+    await expectNoA11yRegressions(page, { include: '[data-gr-autocomplete-panel]' })
     await expect(panel).toBeVisible()
   })
 
@@ -244,13 +229,7 @@ test.describe('панель селекта', () => {
   test('открытая панель проходит axe', async ({ page }) => {
     const { panel } = await openPanel(page)
 
-    const results = await new AxeBuilder({ page })
-      .include('[data-gr-select-panel]')
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze()
-
-    const blocking = results.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))
-    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
+    await expectNoA11yRegressions(page, { include: '[data-gr-select-panel]' })
     await expect(panel).toBeVisible()
   })
 
@@ -307,10 +286,7 @@ test.describe('сервис диалогов', () => {
 
     // Ждём конца enter-анимации: на полупрозрачной панели axe считает смешанный
     // цвет и находит несуществующий контрастный дефект.
-    await page.waitForFunction(() => {
-      const panel = document.querySelector('[data-gr-modal-panel]')
-      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
-    })
+    await waitForOpaque(page, '[data-gr-modal-panel]')
 
     return trigger
   }
@@ -319,13 +295,7 @@ test.describe('сервис диалогов', () => {
     await openDialog(page, 'use-dialog-service-confirm')
     await expect(dialogLayers(page)).toHaveCount(1)
 
-    const results = await new AxeBuilder({ page })
-      .include('[data-gr-overlay-root][aria-modal]')
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze()
-
-    const blocking = results.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))
-    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
+    await expectNoA11yRegressions(page, { include: '[data-gr-overlay-root][aria-modal]' })
   })
 
   test('объявляет себя модальным и даёт себе имя', async ({ page }) => {
@@ -397,10 +367,7 @@ test.describe('пикер поверх окна', () => {
     // и однозначно указывает на нужный пример.
     await browserPage.getByRole('button', { name: 'Schedule delivery', exact: true }).click()
 
-    await browserPage.waitForFunction(() => {
-      const panel = document.querySelector('[data-gr-modal-panel]')
-      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
-    })
+    await waitForOpaque(browserPage, '[data-gr-modal-panel]')
   }
 
   test('Esc закрывает панель пикера, а окно остаётся', async ({ page: browserPage }) => {
@@ -469,10 +436,7 @@ test.describe('панель поверх окна', () => {
     await page.locator('#live-examples').waitFor()
 
     await page.getByRole('button', { name: 'Open form with poppers', exact: true }).click()
-    await page.waitForFunction(() => {
-      const panel = document.querySelector('[data-gr-modal-panel]')
-      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
-    })
+    await waitForOpaque(page, '[data-gr-modal-panel]')
 
     await page.locator('[data-gr-modal-panel] [data-gr-select-trigger], [data-gr-modal-panel] [data-testid="gr-select-trigger"]').first().click()
 
@@ -486,10 +450,7 @@ test.describe('панель поверх окна', () => {
     await page.locator('#live-examples').waitFor()
 
     await page.getByRole('button', { name: 'Schedule delivery', exact: true }).click()
-    await page.waitForFunction(() => {
-      const panel = document.querySelector('[data-gr-modal-panel]')
-      return Boolean(panel) && getComputedStyle(panel!).opacity === '1'
-    })
+    await waitForOpaque(page, '[data-gr-modal-panel]')
 
     await page.locator('[data-gr-modal-panel] [data-gr-date-picker-field]').click()
 

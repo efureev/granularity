@@ -3,6 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import { granularityGlobal, keydown, resetGranularityDom } from '@feugene/granularity/testing'
+import { stubElementRects } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardResponsiveLayout } from '../../../layout'
 import type { GrDashboardContext } from '../../GrDashboard/context'
@@ -11,20 +12,6 @@ import GrDashboard from '../../GrDashboard/GrDashboard.vue'
 import GrDashboardItem from '../GrDashboardItem.vue'
 
 afterEach(resetGranularityDom)
-
-/** Ширины в jsdom нет, а от неё зависит выбор брейкпоинта. */
-function stubWidth(width: number): () => void {
-  const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'getBoundingClientRect')
-
-  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
-    configurable: true,
-    value: (): DOMRect => new DOMRect(0, 0, width, 0),
-  })
-
-  return () => {
-    if (original) Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', original)
-  }
-}
 
 interface StandOptions {
   mode?: 'view' | 'edit'
@@ -53,7 +40,7 @@ function stand(options: StandOptions = {}) {
     ),
   })
 
-  const restore = stubWidth(1200)
+  const restore = stubElementRects({ width: 1200 })
   const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
   restore()
 
@@ -151,7 +138,7 @@ describe('grDashboardItem: запрет переноса и растягиван
       ),
     })
 
-    const restore = stubWidth(1200)
+    const restore = stubElementRects({ width: 1200 })
     mount(Stand, { attachTo: document.body, global: granularityGlobal() })
     restore()
     await nextTick()

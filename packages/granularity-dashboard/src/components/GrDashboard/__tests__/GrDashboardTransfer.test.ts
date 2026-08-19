@@ -3,6 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import { cancelPointer, granularityGlobal, move, press, release, resetGranularityDom } from '@feugene/granularity/testing'
+import { nextFrame, stubElementRects } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardResponsiveLayout } from '../../../layout'
 import { addItem } from '../../../layout'
@@ -26,16 +27,7 @@ const HALF_2x2 = { x: (2 * 89 + 12) / 2, y: (2 * 64 + 12) / 2 }
 let restoreRect: (() => void) | null = null
 
 beforeEach(() => {
-  const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'getBoundingClientRect')
-
-  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
-    configurable: true,
-    value: (): DOMRect => new DOMRect(0, 0, 1200, 600),
-  })
-
-  restoreRect = () => {
-    if (original) Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', original)
-  }
+  restoreRect = stubElementRects({ width: 1200, height: 600 })
 })
 
 afterEach(() => {
@@ -99,15 +91,11 @@ function tile(root: HTMLElement): HTMLElement {
 
 const placeholder = (root: HTMLElement) => root.querySelector<HTMLElement>('[data-gr-dashboard-placeholder]')
 
-async function frame(): Promise<void> {
-  return new Promise(resolve => requestAnimationFrame(() => resolve()))
-}
-
 /** Довести указатель до центра ячейки `(col, row)` для виджета 2×2. */
 async function carryTo(root: HTMLElement, col: number, row: number): Promise<void> {
   press(tile(root), { clientX: 5, clientY: 5 })
   move({ clientX: col * COL_STEP + HALF_2x2.x, clientY: row * 76 + HALF_2x2.y })
-  await frame()
+  await nextFrame()
   await nextTick()
 }
 
@@ -171,7 +159,7 @@ describe('gRDashboard: приём виджета из каталога', () => {
     expect(placeholder(root)).not.toBeNull()
 
     move({ clientX: 5000, clientY: 5000 })
-    await frame()
+    await nextFrame()
     await nextTick()
     expect(placeholder(root)).toBeNull()
 
@@ -248,7 +236,7 @@ describe('gRDashboard: приём виджета из каталога', () => {
     // Нажатие на ручку посреди чужого переноса не начинает второй жест.
     press(handle, { clientX: 0, clientY: 0 })
     move({ clientX: 400, clientY: 0 })
-    await frame()
+    await nextFrame()
     await nextTick()
 
     release()

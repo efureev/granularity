@@ -3,6 +3,7 @@ import { nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { announced, resetGranularityDom } from '@feugene/granularity/testing'
+import { queryOne } from '@feugene/granularity-test-kit/vue'
 
 import * as calendarGrid from '../../../chrono/calendarGrid'
 import * as calendarStyles from '../../GrCalendar/grCalendarStyles'
@@ -28,12 +29,7 @@ function field(wrapper: Picker) {
 }
 
 /** Панель уезжает в портал, то есть из поддерева обёртки. */
-function query(selector: string): DOMWrapper<HTMLElement> {
-  const element = document.querySelector<HTMLElement>(selector)
-  if (!element) throw new Error(`нет элемента ${selector}`)
-
-  return new DOMWrapper(element)
-}
+const query = (selector: string): DOMWrapper<HTMLElement> => new DOMWrapper(queryOne(selector))
 
 function day(key: string) {
   return query(`[data-gr-calendar-day][data-key="${key}"]`)

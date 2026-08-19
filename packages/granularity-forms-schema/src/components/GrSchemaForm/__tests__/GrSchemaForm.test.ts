@@ -251,8 +251,6 @@ describe('GrSchemaForm и GrConfigProvider', () => {
     const wrapper = mountWithConfig({ columns: 2 })
 
     expect(wrapper.get('[data-gr-schema-form] .grid').classes()).toContain('grid-cols-2')
-
-    wrapper.unmount()
   })
 
   it('локальный проп сильнее провайдера', () => {
@@ -261,8 +259,6 @@ describe('GrSchemaForm и GrConfigProvider', () => {
 
     expect(classes).toContain('grid-cols-1')
     expect(classes).not.toContain('grid-cols-3')
-
-    wrapper.unmount()
   })
 
   it('`headingLevel` из провайдера доезжает до заголовка раздела', () => {
@@ -278,7 +274,5 @@ describe('GrSchemaForm и GrConfigProvider', () => {
     })
 
     expect(wrapper.find('h5').exists()).toBe(true)
-
-    wrapper.unmount()
   })
 })

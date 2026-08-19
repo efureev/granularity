@@ -71,7 +71,7 @@
   },
   "devDependencies": {
     "@feugene/granularity": "^0.27.0",
-    "@feugene/granularity-test-kit": "^0.2.0",
+    "@feugene/granularity-test-kit": "^0.3.0",
     "@feugene/unocss-preset-granular": "^0.8.2",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",

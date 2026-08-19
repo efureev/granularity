@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
-import axe from 'axe-core'
 import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
+
+import { axeViolations } from '@feugene/granularity-test-kit/a11y'
 
 import GrCalendar from '../components/GrCalendar/GrCalendar.vue'
 import GrDatePicker from '../components/GrDatePicker/GrDatePicker.vue'
@@ -20,30 +21,17 @@ import GrTimePicker from '../components/GrTimePicker/GrTimePicker.vue'
  * интересное живёт именно в раскрытой сетке: роли `grid`/`row`/`gridcell`,
  * `aria-selected` на дне, связка панели с полем.
  *
- * `color-contrast` выключен — как и в витрине: правилу нужен настоящий рендер
- * (в jsdom нет ни раскладки, ни canvas), а цвета держат `tonePalette` и
- * `cssContrast` в ядре.
+ * `color-contrast` `axeViolations` гасит по умолчанию: в jsdom нет отрисовки,
+ * и правилу нечего мерить. Цвета держат `tonePalette` и `cssContrast` в ядре, а
+ * в браузере то же правило включено.
  *
  * Проверяются нарушения уровня serious и critical: axe в jsdom честно отдаёт
  * часть проверок как `incomplete` — это не долг, а отсутствие раскладки.
  */
 
-const RULES: axe.RunOptions = {
-  rules: { 'color-contrast': { enabled: false } },
-  resultTypes: ['violations'],
-}
-
 function iso(value: string) {
   const [y, m, d] = value.split('-').map(Number) as [number, number, number]
   return { y, m: m - 1, d }
-}
-
-async function violations(root: Element): Promise<string[]> {
-  const result = await axe.run(root, RULES)
-
-  return result.violations
-    .filter(violation => violation.impact === 'serious' || violation.impact === 'critical')
-    .map(violation => `${violation.id}: ${violation.help} (${violation.nodes.length})`)
 }
 
 describe('a11y', () => {
@@ -61,7 +49,7 @@ describe('a11y', () => {
     })
     await nextTick()
 
-    expect(await violations(wrapper.element as Element)).toEqual([])
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
     wrapper.unmount()
   })
 
@@ -84,7 +72,7 @@ describe('a11y', () => {
     // Панель уезжает в портал — проверяем документ целиком, иначе она выпадет
     // из области сканирования вместе со всей своей разметкой.
     expect(wrapper.find('[data-gr-date-picker-panel]').exists() || document.querySelector('[data-gr-date-picker-panel]') !== null).toBe(true)
-    expect(await violations(document.body)).toEqual([])
+    expect(await axeViolations(document.body)).toEqual([])
 
     wrapper.unmount()
   })
@@ -95,7 +83,7 @@ describe('a11y', () => {
       attachTo: document.body,
     })
 
-    expect(await violations(document.body)).toEqual([])
+    expect(await axeViolations(document.body)).toEqual([])
 
     wrapper.unmount()
   })
@@ -110,7 +98,7 @@ describe('a11y', () => {
       attachTo: document.body,
     })
 
-    expect(await violations(document.body)).toEqual([])
+    expect(await axeViolations(document.body)).toEqual([])
 
     wrapper.unmount()
   })
@@ -134,7 +122,7 @@ describe('a11y', () => {
     for (let i = 0; i < 4; i += 1) await nextTick()
 
     expect(document.querySelector('[data-gr-time-picker-panel]')).not.toBeNull()
-    expect(await violations(document.body)).toEqual([])
+    expect(await axeViolations(document.body)).toEqual([])
 
     wrapper.unmount()
   })
@@ -157,7 +145,7 @@ describe('a11y', () => {
     for (let i = 0; i < 4; i += 1) await nextTick()
 
     expect(document.querySelector('[data-gr-date-time-picker-footer]')).not.toBeNull()
-    expect(await violations(document.body)).toEqual([])
+    expect(await axeViolations(document.body)).toEqual([])
 
     wrapper.unmount()
   })
@@ -179,7 +167,7 @@ describe('a11y', () => {
     for (let i = 0; i < 4; i += 1) await nextTick()
 
     expect(document.querySelector('[data-gr-date-range-picker-panel]')).not.toBeNull()
-    expect(await violations(document.body)).toEqual([])
+    expect(await axeViolations(document.body)).toEqual([])
 
     wrapper.unmount()
   })

@@ -12,15 +12,23 @@
     "forceConsistentCasingInFileNames": true,
     "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "vite.config.ts",
     "vitest.config.ts",
     "src/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

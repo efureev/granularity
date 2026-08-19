@@ -7,8 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.3.0] 2026-08-19
+
 ### Added
 
+- **Three more subpaths, split by peer rather than by topic** — so that the heavy one reaches only the
+  package that asked for it. `./vue` holds what a component test needs and the design system does not
+  know about: a throwing `queryOne`, a prototype-wide `stubElementRects`, `nextFrame`, and a
+  `fintI18nGlobal` shaped to compose with other `provide` blocks. `./a11y` holds `axeViolations` alone —
+  separately, because `axe-core` is a peer the core does not have, and a shared module would have made it
+  mandatory for everyone importing a single function. `./e2e` holds the Playwright layer: the a11y gate
+  model, the accepted-debt mechanics, the Tab walk and the enter-animation wait. Every new peer is
+  optional.
+- `axeViolations` replaces four copies of the same rig — three byte-for-byte, the fourth already drifted
+  into a different shape. `color-contrast` is off by default and now says why: jsdom paints nothing, so
+  the rule has nothing to measure. The old comments blamed the showcase, which had switched the rule back
+  **on** in a real browser a month earlier.
+- `createA11yBaseline` and `expectNoA11yRegressions` carry the model the showcase gate was built from:
+  blocking violations minus accepted debt, subtracted by rule id, with `A11Y_AUDIT=1` zeroing the debt.
+  The data — which components owe what — stays with the application.
 - `defineEmitNamingGate` and `defineLocaleCompletenessGate` — both were copied per
   package rather than shared: the emit-naming files of two packages were byte-for-byte
   identical, the locale ones differed by a single regex prefix, and one package had no

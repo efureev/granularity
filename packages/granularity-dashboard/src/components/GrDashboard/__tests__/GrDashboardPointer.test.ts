@@ -3,6 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import { cancelPointer, granularityGlobal, move, press, release, resetGranularityDom } from '@feugene/granularity/testing'
+import { nextFrame, stubElementRects } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardResponsiveLayout } from '../../../layout'
 import GrDashboard from '../GrDashboard.vue'
@@ -21,16 +22,7 @@ const COL_STEP = 100
 let restoreRect: (() => void) | null = null
 
 beforeEach(() => {
-  const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'getBoundingClientRect')
-
-  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
-    configurable: true,
-    value: (): DOMRect => new DOMRect(0, 0, WIDTH, 0),
-  })
-
-  restoreRect = () => {
-    if (original) Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', original)
-  }
+  restoreRect = stubElementRects({ width: WIDTH })
 })
 
 afterEach(() => {
@@ -75,11 +67,6 @@ function handle(root: HTMLElement, id: string, kind: 'drag' | 'resize' = 'drag')
   return el
 }
 
-/** Кадр `requestAnimationFrame`: в нём живёт вся работа жеста. */
-async function frame(): Promise<void> {
-  await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
-}
-
 function xOf(layout: GrDashboardResponsiveLayout, id: string): number | undefined {
   return layout.lg?.find(item => item.id === id)?.x
 }
@@ -90,7 +77,7 @@ describe('gRDashboard: перенос указателем', () => {
 
     press(handle(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 10 + COL_STEP * 2, clientY: 10 })
-    await frame()
+    await nextFrame()
     release()
     await nextTick()
 
@@ -103,7 +90,7 @@ describe('gRDashboard: перенос указателем', () => {
 
     press(handle(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 10 + COL_STEP * 3, clientY: 10 })
-    await frame()
+    await nextFrame()
     cancelPointer()
     await nextTick()
 
@@ -129,7 +116,7 @@ describe('gRDashboard: перенос указателем', () => {
 
     press(handle(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 10 + COL_STEP * 0.3, clientY: 10 })
-    await frame()
+    await nextFrame()
 
     expect(JSON.stringify(layout.value)).toBe(before)
 
@@ -142,7 +129,7 @@ describe('gRDashboard: перенос указателем', () => {
 
     press(handle(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 10 + COL_STEP, clientY: 10 })
-    await frame()
+    await nextFrame()
     await nextTick()
 
     expect(item?.style.position).toBe('absolute')
@@ -161,7 +148,7 @@ describe('gRDashboard: перенос указателем', () => {
 
     press(handle(root, 'sales', 'resize'), { clientX: 400, clientY: 100 })
     move({ clientX: 400 + COL_STEP, clientY: 100 })
-    await frame()
+    await nextFrame()
     release()
     await nextTick()
 

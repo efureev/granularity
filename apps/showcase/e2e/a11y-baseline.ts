@@ -44,7 +44,3 @@
  * печатает всё, что нашёл — обычный гейт про регрессии и на записанном долге молчит.
  */
 export const a11yKnownIssues: Record<string, string[]> = {}
-
-export function knownIssuesFor(componentName: string): string[] {
-  return a11yKnownIssues[componentName] ?? []
-}

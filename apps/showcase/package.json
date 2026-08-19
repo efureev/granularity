@@ -18,6 +18,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@axe-core/playwright": "^4.12.1",
+    "@feugene/granularity-test-kit": "^0.3.0",
     "@feugene/unplugin-granularity": "^0.4.0",
     "@playwright/test": "^1.61.1",
     "@unocss/reset": "^66.7.5",

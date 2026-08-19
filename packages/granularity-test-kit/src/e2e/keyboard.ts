@@ -4,8 +4,9 @@ import type { Page } from '@playwright/test'
 /**
  * Клавиатурные помощники для e2e.
  *
- * Не `*.spec.ts` намеренно: `testMatch` подхватывает только спеки, и файл с
- * хелперами не должен попасть в прогон отдельным пустым тестом.
+ * Ни одного селектора приложения здесь нет и быть не должно: слой отвечает на
+ * вопрос «доберётся ли до этого клавиатура», а что именно проверяют — знает
+ * потребитель.
  */
 
 /**
@@ -29,8 +30,11 @@ export async function focusedDescription(page: Page, extraAttrs: string[] = []):
   }, extraAttrs)
 }
 
-/** Селектор активного элемента по data-атрибуту — для утверждений «фокус там, где нужно». */
-export async function focusedHasAttribute(page: Page, attribute: string): Promise<boolean> {
+/**
+ * Есть ли у активного элемента атрибут. Наружу не отдаётся: снаружи его не звал
+ * никто, а внутри на нём стоит `tabUntil`.
+ */
+async function focusedHasAttribute(page: Page, attribute: string): Promise<boolean> {
   return page.evaluate(name => document.activeElement?.hasAttribute(name) ?? false, attribute)
 }
 

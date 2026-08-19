@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import { fintI18nGlobal } from '@feugene/granularity-test-kit/vue'
+
 import { createFintI18n } from '@feugene/fint-i18n/core'
 import { GRANULARITY_I18N_BLOCK, ru as coreRu } from '@feugene/granularity/i18n'
 
@@ -32,18 +34,13 @@ async function createI18n(locale: string) {
   return i18n
 }
 
-/** Тот же глобальный символ, что кладёт `installI18n()` из `@feugene/fint-i18n/vue`. */
-function withI18n(i18n: unknown) {
-  return { global: { provide: { [Symbol.for('FintI18n')]: i18n } } }
-}
-
 describe('granularity-chrono + fint-i18n (реальный инстанс)', () => {
   it('строки пакета доезжают до компонента', async () => {
     const i18n = await createI18n('ru')
 
     const wrapper = mount(GrCalendar, {
       props: { today: TODAY, viewDate: TODAY, locale: 'ru' },
-      ...withI18n(i18n),
+      global: fintI18nGlobal(i18n),
     })
 
     expect(wrapper.get('[data-gr-calendar-prev]').attributes('aria-label')).toBe('Предыдущий месяц')
@@ -67,7 +64,7 @@ describe('granularity-chrono + fint-i18n (реальный инстанс)', () 
     const wrapper = mount(GrDatePicker, {
       props: { today: new Date(2026, 7, 12), locale: 'ru', open: true },
       attachTo: document.body,
-      ...withI18n(i18n),
+      global: fintI18nGlobal(i18n),
     })
     for (let i = 0; i < 4; i += 1) await nextTick()
 
@@ -84,7 +81,7 @@ describe('granularity-chrono + fint-i18n (реальный инстанс)', () 
 
     const wrapper = mount(GrCalendar, {
       props: { today: TODAY, viewDate: TODAY, locale: 'en' },
-      ...withI18n(i18n),
+      global: fintI18nGlobal(i18n),
     })
 
     expect(wrapper.get('[data-gr-calendar-prev]').attributes('aria-label')).toBe('Previous month')

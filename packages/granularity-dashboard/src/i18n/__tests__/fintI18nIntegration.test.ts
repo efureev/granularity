@@ -2,6 +2,8 @@ import { createFintI18n } from '@feugene/fint-i18n/core'
 import { GRANULARITY_I18N_BLOCK, ru as coreRu } from '@feugene/granularity/i18n'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
+
+import { fintI18nGlobal } from '@feugene/granularity-test-kit/vue'
 import { defineComponent, h, ref } from 'vue'
 
 import type { GrDashboardResponsiveLayout } from '../../layout'
@@ -29,11 +31,6 @@ async function createI18n(locale: string) {
   return i18n
 }
 
-/** Тот же глобальный символ, что кладёт `installI18n()` из `@feugene/fint-i18n/vue`. */
-function withI18n(i18n: unknown) {
-  return { global: { provide: { [Symbol.for('FintI18n')]: i18n } } }
-}
-
 function stand(mode: 'view' | 'edit') {
   const layout = ref<GrDashboardResponsiveLayout>({ lg: [{ id: 'sales', x: 0, y: 0, w: 4, h: 2 }] })
 
@@ -49,7 +46,7 @@ function stand(mode: 'view' | 'edit') {
 describe('granularity-dashboard + fint-i18n (реальный инстанс)', () => {
   it('строки пакета доезжают до компонента', async () => {
     const i18n = await createI18n('ru')
-    const wrapper = mount(stand('edit'), withI18n(i18n))
+    const wrapper = mount(stand('edit'), { global: fintI18nGlobal(i18n) })
 
     const handle = wrapper.find('[data-gr-dashboard-drag-handle]')
     expect(handle.attributes('aria-label')).toContain('Переместить')
@@ -66,7 +63,7 @@ describe('granularity-dashboard + fint-i18n (реальный инстанс)', 
 
   it('панель управления берёт подписи кнопок из локали', async () => {
     const i18n = await createI18n('ru')
-    const wrapper = mount(GrDashboardToolbar, { props: { mode: 'view', resettable: true }, ...withI18n(i18n) })
+    const wrapper = mount(GrDashboardToolbar, { props: { mode: 'view', resettable: true }, global: fintI18nGlobal(i18n) })
 
     expect(wrapper.text()).toContain('Настроить раскладку')
     expect(wrapper.text()).toContain('Сбросить раскладку')
@@ -77,7 +74,7 @@ describe('granularity-dashboard + fint-i18n (реальный инстанс)', 
     // Обратная половина: без неё гейт зеленел бы и на словаре, из которого
     // выкинули половину ключей.
     const i18n = await createI18n('en')
-    const wrapper = mount(GrDashboardToolbar, { props: { mode: 'view' }, ...withI18n(i18n) })
+    const wrapper = mount(GrDashboardToolbar, { props: { mode: 'view' }, global: fintI18nGlobal(i18n) })
 
     expect(wrapper.text()).toContain('Edit layout')
     wrapper.unmount()

@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test'
 
+import { focusedDescription as describeFocus, tabUntil } from '@feugene/granularity-test-kit/e2e'
+
 import { componentPath } from './components'
-import { focusedDescription as describeFocus, tabUntil } from './keyboard'
 
 /**
  * Поведение, которого в jsdom нет вовсе.

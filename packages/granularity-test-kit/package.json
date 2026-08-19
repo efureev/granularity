@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-test-kit",
   "description": "Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -49,24 +49,65 @@
       "import": "./dist/gates.js",
       "default": "./dist/gates.js"
     },
+    "./a11y": {
+      "types": "./dist/types/a11y/index.d.ts",
+      "import": "./dist/a11y.js",
+      "default": "./dist/a11y.js"
+    },
+    "./vue": {
+      "types": "./dist/types/vue/index.d.ts",
+      "import": "./dist/vue.js",
+      "default": "./dist/vue.js"
+    },
+    "./e2e": {
+      "types": "./dist/types/e2e/index.d.ts",
+      "import": "./dist/e2e.js",
+      "default": "./dist/e2e.js"
+    },
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "vitest": ">=3.0.0"
+    "@axe-core/playwright": ">=4.10",
+    "@playwright/test": ">=1.50",
+    "@vue/test-utils": ">=2.4",
+    "axe-core": ">=4.10",
+    "vitest": ">=3.0.0",
+    "vue": "^3.5.0"
   },
   "peerDependenciesMeta": {
+    "@axe-core/playwright": {
+      "optional": true
+    },
+    "@playwright/test": {
+      "optional": true
+    },
+    "@vue/test-utils": {
+      "optional": true
+    },
+    "axe-core": {
+      "optional": true
+    },
     "vitest": {
+      "optional": true
+    },
+    "vue": {
       "optional": true
     }
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
+    "@vue/test-utils": "^2.4.11",
+    "axe-core": "~4.12.1",
     "eslint": "^10.7.0",
     "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
     "typescript": "^6.0.2",
     "vite": "^8.1.5",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "vue": "^3.5.40"
   },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",

@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
-import axe from 'axe-core'
 import { describe, expect, it } from 'vitest'
+
+import { axeViolations } from '@feugene/granularity-test-kit/a11y'
 import { defineComponent, h, nextTick, ref } from 'vue'
 
 import { granularityGlobal } from '@feugene/granularity/testing'
@@ -19,22 +20,10 @@ import GrDashboardToolbar from '../components/GrDashboardToolbar/GrDashboardTool
  * дотягивается, а интересное у дашборда живёт именно в нём: ручки переноса и
  * растягивания, роли групп, имена виджетов.
  *
- * `color-contrast` выключен, как и в витрине: правилу нужен настоящий рендер,
- * а цвета держат гейты палитры в ядре.
+ * `color-contrast` `axeViolations` гасит по умолчанию: в jsdom нет отрисовки, и
+ * правилу нечего мерить. Цвета держат гейты палитры в ядре, а в браузере то же
+ * правило включено.
  */
-
-const RULES: axe.RunOptions = {
-  rules: { 'color-contrast': { enabled: false } },
-  resultTypes: ['violations'],
-}
-
-async function violations(root: Element): Promise<string[]> {
-  const result = await axe.run(root, RULES)
-
-  return result.violations
-    .filter(violation => violation.impact === 'serious' || violation.impact === 'critical')
-    .map(violation => `${violation.id}: ${violation.help} (${violation.nodes.length})`)
-}
 
 function layout(): GrDashboardResponsiveLayout {
   return {
@@ -66,14 +55,14 @@ describe('a11y', () => {
     const wrapper = mount(dashboard('view'), { attachTo: document.body, global: granularityGlobal() })
     await nextTick()
 
-    expect(await violations(wrapper.element as Element)).toEqual([])
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 
   it('сетка в режиме редактирования — ручки переноса и размера без нарушений', async () => {
     const wrapper = mount(dashboard('edit'), { attachTo: document.body, global: granularityGlobal() })
     await nextTick()
 
-    expect(await violations(wrapper.element as Element)).toEqual([])
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 
   it('открытое окно настроек виджета — без нарушений', async () => {
@@ -83,7 +72,7 @@ describe('a11y', () => {
     })
     await nextTick()
 
-    expect(await violations(wrapper.element as Element)).toEqual([])
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 
   it('каталог виджетов, в том числе перетаскиваемый, — без нарушений', async () => {
@@ -100,7 +89,7 @@ describe('a11y', () => {
     })
     await nextTick()
 
-    expect(await violations(wrapper.element as Element)).toEqual([])
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 
   it('панель управления — без нарушений', async () => {
@@ -111,6 +100,6 @@ describe('a11y', () => {
     })
     await nextTick()
 
-    expect(await violations(wrapper.element as Element)).toEqual([])
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 })

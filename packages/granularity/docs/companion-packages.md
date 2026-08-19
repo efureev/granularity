@@ -550,8 +550,20 @@ import { defineComponentDocsGate } from '@feugene/granularity-test-kit/gates'
 defineComponentDocsGate()
 ```
 
-Всё остальное — `a11y`, `emitNaming`, полнота локалей, интеграция с `fint-i18n`, гейты своего домена —
-пишется пакетом самостоятельно: они у каждого разные по существу.
+Всё остальное — гейты своего домена — пишется пакетом самостоятельно: они у каждого разные по существу.
+
+Оснастку для них тест-кит отдаёт тремя подпутями, разведёнными **по peer**, чтобы тяжёлый достался
+только тому, кто его просил: `./vue` (`queryOne`, `stubElementRects`, `nextFrame`, `fintI18nGlobal`),
+`./a11y` (`axeViolations` — отдельно, потому что `axe-core` есть не у всех) и `./e2e` (модель
+a11y-гейта, зафиксированный долг, обход по `Tab`, ожидание конца анимации). Peer у всех трёх
+опциональные.
+
+```ts
+// src/__tests__/a11y.test.ts
+import { axeViolations } from '@feugene/granularity-test-kit/a11y'
+
+expect(await axeViolations(wrapper.element as Element)).toEqual([])
+```
 
 ## 9.1. Документация пакета
 

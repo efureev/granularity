@@ -3,6 +3,8 @@ import { GRANULARITY_I18N_BLOCK, ru as coreRu } from '@feugene/granularity/i18n'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
+import { fintI18nGlobal } from '@feugene/granularity-test-kit/vue'
+
 import GrChartLine from '../../components/GrChartLine/GrChartLine.vue'
 import GrSparkline from '../../components/GrSparkline/GrSparkline.vue'
 import { en, GR_CHARTS_I18N_BLOCK, ru } from '../messages'
@@ -26,17 +28,12 @@ async function createI18n(locale: string) {
   return i18n
 }
 
-/** Тот же глобальный символ, что кладёт `installI18n()` из `@feugene/fint-i18n/vue`. */
-function withI18n(i18n: unknown) {
-  return { global: { provide: { [Symbol.for('FintI18n')]: i18n } } }
-}
-
 const series = [{ id: 'a', label: 'Продажи', y: [1, 2, 3] }]
 
 describe('granularity-charts + fint-i18n (реальный инстанс)', () => {
   it('строки пакета доезжают до компонента', async () => {
     const i18n = await createI18n('ru')
-    const wrapper = mount(GrChartLine, { props: { series }, ...withI18n(i18n) })
+    const wrapper = mount(GrChartLine, { props: { series }, global: fintI18nGlobal(i18n) })
 
     expect(wrapper.find('[data-gr-chart-surface]').attributes('aria-roledescription')).toBe('Линейный график')
     expect(wrapper.find('[data-gr-chart-table] caption').text()).toBe('Данные графика')
@@ -53,7 +50,7 @@ describe('granularity-charts + fint-i18n (реальный инстанс)', () 
 
   it('сводка спарклайна собирается из локали, а не из английского fallback', async () => {
     const i18n = await createI18n('ru')
-    const wrapper = mount(GrSparkline, { props: { data: [1, 5] }, ...withI18n(i18n) })
+    const wrapper = mount(GrSparkline, { props: { data: [1, 5] }, global: fintI18nGlobal(i18n) })
 
     expect(wrapper.attributes('aria-label')).toContain('рост')
     wrapper.unmount()
@@ -63,7 +60,7 @@ describe('granularity-charts + fint-i18n (реальный инстанс)', () 
     // Обратная половина: без неё гейт зеленел бы и на словаре, из которого
     // выкинули половину ключей.
     const i18n = await createI18n('en')
-    const wrapper = mount(GrChartLine, { props: { series: [] }, ...withI18n(i18n) })
+    const wrapper = mount(GrChartLine, { props: { series: [] }, global: fintI18nGlobal(i18n) })
 
     expect(wrapper.text()).toContain('No data')
     wrapper.unmount()

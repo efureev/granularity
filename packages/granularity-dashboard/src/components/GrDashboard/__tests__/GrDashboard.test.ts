@@ -3,6 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import { announced, granularityGlobal, keydown, resetGranularityDom } from '@feugene/granularity/testing'
+import { queryOne, stubElementRects } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardCompaction, GrDashboardItemLayout, GrDashboardResponsiveLayout } from '../../../layout'
 import type { GrDashboardContext } from '../context'
@@ -18,24 +19,6 @@ function initialLayout(): GrDashboardResponsiveLayout {
       { id: 'sales', x: 0, y: 0, w: 4, h: 2 },
       { id: 'traffic', x: 4, y: 0, w: 4, h: 2 },
     ],
-  }
-}
-
-/**
- * Ширины в jsdom нет, а от неё зависит выбор брейкпоинта. Подменяется именно
- * прототип: замерить контейнер компонент успевает в `onMounted`, то есть до
- * того, как тест доберётся до его элемента.
- */
-function stubWidth(width: number): () => void {
-  const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'getBoundingClientRect')
-
-  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
-    configurable: true,
-    value: (): DOMRect => new DOMRect(0, 0, width, 0),
-  })
-
-  return () => {
-    if (original) Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', original)
   }
 }
 
@@ -66,32 +49,25 @@ function stand(options: {
     ),
   })
 
-  const restore = stubWidth(1200)
+  const restore = stubElementRects({ width: 1200 })
   const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
   restore()
 
   return { root: wrapper.element as HTMLElement, layout }
 }
 
-function query(root: HTMLElement, selector: string): HTMLElement {
-  const el = root.querySelector<HTMLElement>(selector)
-  if (!el) throw new Error(`не найдено: ${selector}`)
-
-  return el
-}
-
 function dragHandle(root: HTMLElement, id: string): HTMLElement {
-  return query(root, `[data-item-id="${id}"] [data-gr-dashboard-drag-handle]`)
+  return queryOne(`[data-item-id="${id}"] [data-gr-dashboard-drag-handle]`, root)
 }
 
 function resizeHandle(root: HTMLElement, id: string): HTMLElement {
-  return query(root, `[data-item-id="${id}"] [data-gr-dashboard-resize-handle]`)
+  return queryOne(`[data-item-id="${id}"] [data-gr-dashboard-resize-handle]`, root)
 }
 
 describe('gRDashboard: раскладка и роли', () => {
   it('каждый виджет встаёт в свою область сетки', () => {
     const { root } = stand()
-    const sales = query(root, '[data-item-id="sales"]')
+    const sales = queryOne('[data-item-id="sales"]', root)
 
     expect(sales.style.gridColumn).toBe('1 / span 4')
     expect(sales.style.gridRow).toBe('1 / span 2')
@@ -102,7 +78,7 @@ describe('gRDashboard: раскладка и роли', () => {
     expect(root.getAttribute('role')).toBe('group')
     expect(root.getAttribute('aria-label')).toBeTruthy()
 
-    const sales = query(root, '[data-item-id="sales"]')
+    const sales = queryOne('[data-item-id="sales"]', root)
     expect(sales.getAttribute('role')).toBe('group')
     expect(sales.getAttribute('aria-labelledby')).toBeTruthy()
   })
@@ -269,7 +245,7 @@ describe('gRDashboard: прокручиваемое тело виджета', ()
   }
 
   function bodyOf(root: HTMLElement): HTMLElement {
-    return query(root, '[data-item-id="sales"] [data-gr-card-body] > div')
+    return queryOne('[data-item-id="sales"] [data-gr-card-body] > div', root)
   }
 
   it('переполненное тело встаёт в таб-порядок', async () => {
@@ -328,7 +304,7 @@ describe('gRDashboard: границы виджета', () => {
       ),
     })
 
-    const restore = stubWidth(1200)
+    const restore = stubElementRects({ width: 1200 })
     const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
     restore()
     const handle = resizeHandle(wrapper.element as HTMLElement, 'sales')
@@ -423,7 +399,7 @@ describe('gRDashboard: программный доступ через конте
       ),
     })
 
-    const restore = stubWidth(1200)
+    const restore = stubElementRects({ width: 1200 })
     const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
     restore()
 

@@ -205,6 +205,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # Спеки `e2e/**` импортируют `@feugene/granularity-test-kit/e2e`, а
+      # `tsconfig.json` витрины их типизирует. Без собранного `dist` тест-кита
+      # обе джобы витрины краснеют ещё до первой настоящей проверки.
+      - name: Build test kit
+        run: yarn build:test-kit
+
       - name: Download granularity dist
         uses: actions/download-artifact@v8
         with:
@@ -505,6 +511,12 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      # Спеки `e2e/**` импортируют `@feugene/granularity-test-kit/e2e`, а
+      # `tsconfig.json` витрины их типизирует. Без собранного `dist` тест-кита
+      # обе джобы витрины краснеют ещё до первой настоящей проверки.
+      - name: Build test kit
+        run: yarn build:test-kit
 
       - name: Download granularity dist
         uses: actions/download-artifact@v8

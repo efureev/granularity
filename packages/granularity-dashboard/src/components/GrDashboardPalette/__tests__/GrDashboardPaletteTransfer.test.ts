@@ -4,6 +4,7 @@ import type { ComponentMountingOptions } from '@vue/test-utils'
 import { mount } from '@vue/test-utils'
 
 import { announced, cancelPointer, granularityGlobal, move, press, release, resetGranularityDom } from '@feugene/granularity/testing'
+import { nextFrame } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardPaletteItem } from '../grDashboardPaletteStyles'
 import GrDashboardPalette from '../GrDashboardPalette.vue'
@@ -43,18 +44,13 @@ function row(root: HTMLElement, id: string): HTMLElement {
 
 const ghost = () => document.body.querySelector<HTMLElement>('[data-gr-dashboard-transfer-ghost]')
 
-/** Кадр `requestAnimationFrame`: в нём живёт вся работа модели переноса. */
-async function frame(): Promise<void> {
-  return new Promise(resolve => requestAnimationFrame(() => resolve()))
-}
-
 describe('grDashboardPalette: начало переноса', () => {
   it('перетаскивание включено по умолчанию', async () => {
     const { root } = stand()
 
     press(row(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
 
     expect(ghost()).not.toBeNull()
   })
@@ -64,7 +60,7 @@ describe('grDashboardPalette: начало переноса', () => {
 
     press(row(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     expect(ghost()).toBeNull()
 
     root.querySelector('button')?.click()
@@ -80,7 +76,7 @@ describe('grDashboardPalette: начало переноса', () => {
 
     press(button, { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     expect(ghost()).toBeNull()
 
     button.click()
@@ -92,14 +88,14 @@ describe('grDashboardPalette: начало переноса', () => {
     const { root } = stand()
     press(row(root, 'traffic'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     expect(ghost()).toBeNull()
 
     cancelPointer()
     const off = stand({ disabled: true })
     press(row(off.root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     expect(ghost()).toBeNull()
   })
 
@@ -108,7 +104,7 @@ describe('grDashboardPalette: начало переноса', () => {
 
     press(row(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     release()
     await nextTick()
     expect(await announced()).toBe('')
@@ -125,11 +121,11 @@ describe('grDashboardPalette: призрак', () => {
 
     press(row(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 12, clientY: 10 })
-    await frame()
+    await nextFrame()
     expect(ghost()).toBeNull()
 
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
 
     const el = ghost()!
     expect(el).not.toBeNull()
@@ -145,7 +141,7 @@ describe('grDashboardPalette: призрак', () => {
 
     press(row(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
 
     expect(ghost()?.querySelector('[data-own-ghost]')).not.toBeNull()
     expect(ghost()?.textContent).not.toContain('6×2')
@@ -156,7 +152,7 @@ describe('grDashboardPalette: призрак', () => {
 
     press(row(root, 'sales'), { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     release()
     await nextTick()
 
@@ -181,7 +177,7 @@ describe('grDashboardPalette: своя плитка', () => {
     const own = root.querySelector<HTMLElement>('[data-own-row]')!
     press(own, { clientX: 10, clientY: 10 })
     move({ clientX: 60, clientY: 40 })
-    await frame()
+    await nextFrame()
     await nextTick()
 
     expect(ghost()).not.toBeNull()

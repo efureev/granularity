@@ -3,6 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { announced, resetGranularityDom } from '@feugene/granularity/testing'
+import { queryOne } from '@feugene/granularity-test-kit/vue'
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
 import GrTimePicker from '../GrTimePicker.vue'
@@ -31,12 +32,7 @@ function field(wrapper: Picker) {
  * видит. Запросы идут по документу; каждый тест размонтирует свой пикер, так
  * что чужих панелей в нём не остаётся.
  */
-function query(selector: string): DOMWrapper<HTMLElement> {
-  const element = document.querySelector<HTMLElement>(selector)
-  if (!element) throw new Error(`нет элемента ${selector}`)
-
-  return new DOMWrapper(element)
-}
+const query = (selector: string): DOMWrapper<HTMLElement> => new DOMWrapper(queryOne(selector))
 
 function panelExists(): boolean {
   return document.querySelector('[data-gr-time-picker-panel]') !== null

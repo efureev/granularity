@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
-import axe from 'axe-core'
 import { nextTick, reactive } from 'vue'
 import { describe, expect, it } from 'vitest'
+
+import { axeViolations } from '@feugene/granularity-test-kit/a11y'
 
 import type { JsonSchemaDocument } from '../adapters/json-schema'
 import { jsonSchemaAdapter } from '../adapters/json-schema'
@@ -14,8 +15,9 @@ import GrSchemaForm from '../components/GrSchemaForm/GrSchemaForm.vue'
  * подпись без поля, поле без имени и кнопка без текста здесь появляются не от
  * невнимательности, а от неверного маппинга — и сразу во всех формах приложения.
  *
- * `color-contrast` выключен: цвета приходят токенами ядра, их контраст проверяет
- * ядро, а в jsdom они всё равно не вычисляются.
+ * `color-contrast` `axeViolations` гасит по умолчанию: в jsdom цвета не
+ * вычисляются вовсе. Их контраст проверяет ядро, а в браузере то же правило
+ * включено.
  */
 const schema: JsonSchemaDocument = {
   type: 'object',
@@ -33,14 +35,6 @@ const schema: JsonSchemaDocument = {
   required: ['email'],
 }
 
-async function run(html: HTMLElement) {
-  const results = await axe.run(html, {
-    rules: { 'color-contrast': { enabled: false } },
-  })
-
-  return results.violations.filter(violation => violation.impact === 'serious' || violation.impact === 'critical')
-}
-
 describe('доступность', () => {
   it('сгенерированная форма проходит axe', async () => {
     const wrapper = mount(GrSchemaForm, {
@@ -50,10 +44,7 @@ describe('доступность', () => {
     await nextTick()
     await nextTick()
 
-    const violations = await run(wrapper.element as HTMLElement)
-    expect(violations.map(violation => `${violation.id}: ${violation.help}`)).toEqual([])
-
-    wrapper.unmount()
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 
   it('повторитель с несколькими строками проходит axe', async () => {
@@ -68,9 +59,6 @@ describe('доступность', () => {
     await nextTick()
     await nextTick()
 
-    const violations = await run(wrapper.element as HTMLElement)
-    expect(violations.map(violation => `${violation.id}: ${violation.help}`)).toEqual([])
-
-    wrapper.unmount()
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
   })
 })

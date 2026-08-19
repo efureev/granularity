@@ -2,6 +2,8 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import { queryOne } from '@feugene/granularity-test-kit/vue'
+
 import GrDateTimePicker from '../GrDateTimePicker.vue'
 
 const TODAY = new Date(2026, 7, 12)
@@ -24,12 +26,7 @@ function field(wrapper: Picker) {
 }
 
 /** Панель уезжает в портал, то есть из поддерева обёртки. */
-function query(selector: string): DOMWrapper<HTMLElement> {
-  const element = document.querySelector<HTMLElement>(selector)
-  if (!element) throw new Error(`нет элемента ${selector}`)
-
-  return new DOMWrapper(element)
-}
+const query = (selector: string): DOMWrapper<HTMLElement> => new DOMWrapper(queryOne(selector))
 
 function exists(selector: string): boolean {
   return document.querySelector(selector) !== null

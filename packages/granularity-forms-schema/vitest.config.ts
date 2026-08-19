@@ -12,6 +12,7 @@ export default defineConfig({
     // Модель схемы, компилятор правил и адаптеры тестируются без монтирования,
     // но компоненты пакета живут в DOM.
     environment: 'jsdom',
+    setupFiles: ['./src/__tests__/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
 })
