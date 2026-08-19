@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
@@ -661,5 +661,81 @@ describe('GrDatePicker и GrConfigProvider', () => {
 
     monday.unmount()
     sunday.unmount()
+  })
+})
+
+describe('GrDatePicker — готовые даты', () => {
+  const tomorrow = { label: 'Завтра', date: at('2026-08-13') }
+
+  /** Панель уезжает в портал, то есть из поддерева обёртки. */
+  function presets(): DOMWrapper<HTMLElement>[] {
+    return [...document.querySelectorAll<HTMLElement>('[data-gr-date-picker-preset]')]
+      .map(el => new DOMWrapper(el))
+  }
+
+  it('одно нажатие ставит дату и закрывает панель', async () => {
+    const wrapper = mountPicker({ presets: [tomorrow] })
+    await openPicker(wrapper)
+
+    await presets()[0]!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at('2026-08-13'))
+    expect(wrapper.emitted('update:open')?.at(-1)?.[0]).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('дата из `disabledDates` выключает шорткат так же, как сетка гасит ячейку', async () => {
+    const wrapper = mountPicker({ presets: [tomorrow], disabledDates: [at('2026-08-13')] })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    await presets()[0]!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('дата за `max` выключает шорткат', async () => {
+    const wrapper = mountPicker({ presets: [tomorrow], max: at('2026-08-12') })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    wrapper.unmount()
+  })
+
+  it('`readonly` не даёт применить шорткат', async () => {
+    const wrapper = mountPicker({ presets: [tomorrow], readonly: true })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    await presets()[0]!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('свой подвал заменяет ряд целиком и получает рабочий `select`', async () => {
+    const wrapper = mountPicker({ presets: [tomorrow] }, {
+      slots: { footer: '<button data-own @click="params.select(new Date(2026, 7, 20))">свой</button>' },
+    })
+    await openPicker(wrapper)
+
+    expect(document.querySelector('[data-gr-date-picker-preset]')).toBeNull()
+
+    await new DOMWrapper(document.querySelector<HTMLElement>('[data-own]')).trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at('2026-08-20'))
+
+    wrapper.unmount()
   })
 })

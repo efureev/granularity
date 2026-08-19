@@ -11,13 +11,15 @@
     "gridLabel": "Календарь",
     "patternDay": "Д",
     "patternMonth": "М",
-    "patternYear": "Г"
+    "patternYear": "Г",
+    "presetsLabel": "Готовые даты"
   },
   "dateRangePicker": {
     "panelLabel": "Выбор периода",
     "startSelected": "Начало выбрано: {date}. Выберите конец периода",
     "rangeSelected": "Период выбран: с {from} по {to}",
-    "lengthRejected": "Такая длина периода недопустима"
+    "lengthRejected": "Такая длина периода недопустима",
+    "presetsLabel": "Готовые периоды"
   },
   "dateTimePicker": {
     "panelLabel": "Выбор даты и времени",

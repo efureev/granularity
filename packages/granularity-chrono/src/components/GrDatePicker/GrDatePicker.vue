@@ -5,11 +5,13 @@ import { titleWhenTruncated } from '@feugene/granularity'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
+import { createDisabledPredicate } from '../../chrono/calendarGrid'
 import { formatPlainDate } from '../../chrono/chronoFormat'
 import { localeDatePattern, maskLocaleDate, parseLocaleDate } from '../../chrono/chronoParse'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
+import { isPlainDateWithin } from '../../chrono/plainDate'
 import {
   clearButtonClass,
   iconClass,
@@ -18,9 +20,11 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
+import { presetRowClass } from '../../internal/presetRowStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
 import { useEditableField } from '../../internal/useEditableField'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
+import GrButton from '@feugene/granularity/components/GrButton'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
 import type { GrDatePickerSize } from './grDatePickerStyles'
@@ -54,6 +58,17 @@ export interface GrDatePickerProps<T = Date | null> {
   max?: Date
   /** Запрещённые даты: список или предикат. */
   disabledDates?: readonly Date[] | ((date: Date) => boolean)
+  /**
+   * Готовые даты в подвале панели: «Сегодня», «Завтра».
+   *
+   * Дату можно задать функцией — «сегодня» считается в момент показа, а не в
+   * момент объявления пропа. Функция обязана быть чистой: её зовут и чтобы
+   * решить, доступен ли шорткат, и чтобы применить его.
+   *
+   * Дата вне `min`/`max` или из `disabledDates` приходит выключенной — как и
+   * её ячейка в сетке.
+   */
+  presets?: readonly GrDatePreset[]
   /** Первый день недели по ISO (1 — понедельник). Не задан — из локали. */
   weekStart?: IsoWeekday
   showWeekNumbers?: boolean
@@ -114,6 +129,13 @@ export interface GrDatePickerEmits<T = Date | null> {
   (e: 'blur', event: FocusEvent): void
 }
 
+/** Готовая дата в подвале панели. */
+export interface GrDatePreset {
+  label: string
+  /** Дата или функция, считающая её в момент показа и нажатия. */
+  date: Date | (() => Date)
+}
+
 const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   mode: 'day',
   modelValue: undefined,
@@ -121,6 +143,7 @@ const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   min: undefined,
   max: undefined,
   disabledDates: undefined,
+  presets: undefined,
   weekStart: undefined,
   // `undefined`, а не `false`: явный дефолт пикера перебил бы настройку
   // `GrCalendar` из `GrConfigProvider` — панель у них общая.
@@ -158,8 +181,18 @@ defineSlots<{
   header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
   /** Своя ячейка шапки недели вместо сокращённого названия дня. */
   weekday?: (props: { label: string, full: string, isoWeekday: IsoWeekday }) => unknown
-  /** Подвал панели. */
-  footer?: () => unknown
+  /**
+   * Подвал панели.
+   *
+   * Выбор отдаётся внутрь: запрет даты складывается из `min`, `max` и
+   * `disabledDates`, а `readonly` запрещает выбор целиком — снаружи этих
+   * правил не видно.
+   */
+  footer?: (props: {
+    select: (date: Date) => boolean
+    canSelect: (date: Date) => boolean
+    close: () => void
+  }) => unknown
 }>()
 
 const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
@@ -278,6 +311,53 @@ function onSelect(date: PlainDate): void {
 
   // Фокус на поле вернёт стек слоёв: на момент закрытия он ещё внутри панели.
   shell.closePanel()
+}
+
+const isDisabledDate = computed(() => createDisabledPredicate(disabledDates.value))
+
+/**
+ * Выбираема ли дата — тем же правилом, каким сетка гасит ячейку.
+ *
+ * Подвал сетку обходит, поэтому спрашивает явно; кнопка с недоступной датой
+ * приходит выключенной, а не молча ничего не делает.
+ */
+function canSelectDate(date: Date): boolean {
+  if (shell.isLocked.value) return false
+
+  const plain = toPlainDate(date)
+
+  return !isDisabledDate.value(plain) && isPlainDateWithin(plain, minPlain.value, maxPlain.value)
+}
+
+/** Выбор из подвала. Возвращает `false`, если дата запрещена. */
+function selectDate(date: Date): boolean {
+  if (!canSelectDate(date)) return false
+
+  shell.commit(fromPlainParts(toPlainDate(date)))
+  shell.closePanel()
+
+  return true
+}
+
+function dateOf(preset: GrDatePreset): Date {
+  return typeof preset.date === 'function' ? preset.date() : preset.date
+}
+
+/**
+ * Шорткаты с уже решённой доступностью.
+ *
+ * Функция-пресет зовётся здесь и ещё раз при нажатии: иначе доступность
+ * считалась бы по одному значению, а применялось бы другое. Панель монтируется
+ * лениво, так что расчёт идёт с её открытия, а не с загрузки страницы.
+ */
+const presetRows = computed(() => (props.presets ?? []).map((preset, index) => ({
+  key: `${index}-${preset.label}`,
+  preset,
+  allowed: canSelectDate(dateOf(preset)),
+})))
+
+function applyPreset(preset: GrDatePreset): void {
+  selectDate(dateOf(preset))
 }
 
 defineExpose({
@@ -404,10 +484,30 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             <template v-if="$slots.weekday" #weekday="slotProps">
               <slot name="weekday" v-bind="slotProps" />
             </template>
-            <template v-if="$slots.footer" #footer>
-              <slot name="footer" />
-            </template>
           </GrCalendar>
+
+          <slot name="footer" :select="selectDate" :can-select="canSelectDate" :close="shell.closePanel">
+            <div
+              v-if="presetRows.length"
+              data-gr-date-picker-presets
+              :class="presetRowClass"
+              role="group"
+              :aria-label="t('grChrono.datePicker.presetsLabel', 'Quick dates')"
+            >
+              <GrButton
+                v-for="row in presetRows"
+                :key="row.key"
+                data-gr-date-picker-preset
+                type="button"
+                variant="ghost"
+                :size="resolvedSize"
+                :disabled="!row.allowed"
+                @click="applyPreset(row.preset)"
+              >
+                {{ row.preset.label }}
+              </GrButton>
+            </div>
+          </slot>
         </div>
     </PickerSurface>
   </div>

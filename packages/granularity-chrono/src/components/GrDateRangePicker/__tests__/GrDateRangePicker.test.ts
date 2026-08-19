@@ -434,3 +434,132 @@ describe('GrDateRangePicker — проброс слота шапки недел�
     wrapper.unmount()
   })
 })
+
+describe('готовые периоды', () => {
+  function presets(): DOMWrapper<HTMLElement>[] {
+    return [...document.querySelectorAll<HTMLElement>('[data-gr-date-range-picker-preset]')]
+      .map(el => new DOMWrapper(el))
+  }
+
+  const thisWeek = { label: 'Эта неделя', range: [at(10), at(16)] as const }
+
+  it('одно нажатие ставит обе границы и закрывает панель', async () => {
+    const wrapper = mountPicker({ presets: [thisWeek] })
+    await openPicker(wrapper)
+
+    await presets()[0]!.trigger('click')
+    await nextTick()
+
+    expect(lastModel(wrapper)).toEqual([at(10), at(16)])
+    // Панель остаётся смонтированной (`v-show` у поповера), закрытие видно по `v-model:open`.
+    expect(wrapper.emitted('update:open')?.at(-1)?.[0]).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('период длиннее `maxRange` приходит выключенным и модель не меняет', async () => {
+    const wrapper = mountPicker({ presets: [thisWeek], maxRange: 3 })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    await presets()[0]!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('граница на запрещённой дате выключает шорткат так же, как сетка гасит день', async () => {
+    const wrapper = mountPicker({ presets: [thisWeek], disabledDates: [at(16)] })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    wrapper.unmount()
+  })
+
+  it('граница за `max` выключает шорткат', async () => {
+    const wrapper = mountPicker({ presets: [thisWeek], max: at(14) })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    wrapper.unmount()
+  })
+
+  it('`readonly` не даёт применить шорткат ни одним способом', async () => {
+    const wrapper = mountPicker({ presets: [thisWeek], readonly: true })
+    await openPicker(wrapper)
+
+    expect(presets()[0]!.attributes('disabled')).toBeDefined()
+
+    await presets()[0]!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('выбор периода объявляется вслух — как и второй клик по сетке', async () => {
+    const wrapper = mountPicker({ presets: [thisWeek] })
+    await openPicker(wrapper)
+
+    await presets()[0]!.trigger('click')
+
+    expect(await announced()).toContain('August 10')
+
+    wrapper.unmount()
+  })
+
+  it('границы-функция пересчитываются, а не замораживаются на момент объявления', async () => {
+    // «Последние 7 дней» отсчитываются от сегодняшнего дня, а не от дня, когда
+    // объявили проп.
+    const range = vi.fn(() => [at(11), at(12)] as const)
+    const wrapper = mountPicker({ presets: [{ label: 'Последние 2 дня', range }] })
+    await openPicker(wrapper)
+
+    const beforeClick = range.mock.calls.length
+    await presets()[0]!.trigger('click')
+
+    expect(beforeClick).toBeGreaterThan(0)
+    expect(range.mock.calls.length).toBeGreaterThan(beforeClick)
+    expect(lastModel(wrapper)).toEqual([at(11), at(12)])
+
+    wrapper.unmount()
+  })
+
+  it('свой подвал заменяет ряд целиком и получает рабочий `setRange`', async () => {
+    const wrapper = mount(GrDateRangePicker, {
+      props: { locale: 'en-US', today: TODAY, presets: [thisWeek] },
+      slots: { footer: '<button data-own @click="params.setRange(new Date(2026, 7, 3), new Date(2026, 7, 5))">свой</button>' },
+      attachTo: document.body,
+    })
+    await openPicker(wrapper)
+
+    expect(document.querySelector('[data-gr-date-range-picker-preset]')).toBeNull()
+
+    await query('[data-own]').trigger('click')
+    await nextTick()
+
+    expect(lastModel(wrapper)).toEqual([at(3), at(5)])
+
+    wrapper.unmount()
+  })
+
+  it('подвал стоит в панели, а не внутри сетки календаря', async () => {
+    // Внутри `[data-gr-calendar]` у подвала не было бы собственного отступа:
+    // панель отдаёт фон и паддинг календарю.
+    const wrapper = mountPicker({ presets: [thisWeek] })
+    await openPicker(wrapper)
+
+    const row = document.querySelector('[data-gr-date-range-picker-presets]')!
+
+    expect(row.closest('[data-gr-date-range-picker-panel]')).not.toBeNull()
+    expect(row.closest('[data-gr-calendar]')).toBeNull()
+
+    wrapper.unmount()
+  })
+})

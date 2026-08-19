@@ -11,13 +11,15 @@
     "gridLabel": "Calendar",
     "patternDay": "D",
     "patternMonth": "M",
-    "patternYear": "Y"
+    "patternYear": "Y",
+    "presetsLabel": "Quick dates"
   },
   "dateRangePicker": {
     "panelLabel": "Choose date range",
     "startSelected": "Start date selected: {date}. Choose the end date",
     "rangeSelected": "Range selected: {from} — {to}",
-    "lengthRejected": "This range length is not allowed"
+    "lengthRejected": "This range length is not allowed",
+    "presetsLabel": "Quick ranges"
   },
   "dateTimePicker": {
     "panelLabel": "Choose date and time",

@@ -15,6 +15,6 @@ export const grDatePickerConfig = defineGranularComponent(import.meta.url, {
   safelist: grDatePickerSafelist,
   dependencies: [
     'GrCalendar',
-    { provider: '@feugene/granularity', components: ['GrPopover'] },
+    { provider: '@feugene/granularity', components: ['GrPopover', 'GrButton'] },
   ],
 })

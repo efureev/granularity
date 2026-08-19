@@ -97,6 +97,16 @@ export {
   selectRelativeAmount,
 } from './chrono/relativeTime'
 
+// Длительность: «2 ч 30 мин». Единицами только сутки и мельче — месяц и год
+// календарные, и из числа секунд их не вывести.
+export type { DurationParts, DurationUnit, FormatDurationOptions, SelectDurationPartsOptions } from './chrono/duration'
+export {
+  durationToIso,
+  formatDuration,
+  resetDurationFormatCache,
+  selectDurationParts,
+} from './chrono/duration'
+
 // Общее «сейчас»: один таймер на такт, а не на компонент.
 export { chronoTickerIntervals, GR_CHRONO_TICK_MS, resetChronoNow, useChronoNow } from './composables/useChronoNow'
 

@@ -11,13 +11,15 @@
     "gridLabel": "Calendario",
     "patternDay": "D",
     "patternMonth": "M",
-    "patternYear": "A"
+    "patternYear": "A",
+    "presetsLabel": "Fechas rápidas"
   },
   "dateRangePicker": {
     "panelLabel": "Elegir periodo",
     "startSelected": "Fecha de inicio seleccionada: {date}. Elige la fecha final",
     "rangeSelected": "Periodo seleccionado: del {from} al {to}",
-    "lengthRejected": "Esta duración del periodo no está permitida"
+    "lengthRejected": "Esta duración del periodo no está permitida",
+    "presetsLabel": "Períodos rápidos"
   },
   "dateTimePicker": {
     "panelLabel": "Elegir fecha y hora",

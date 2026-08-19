@@ -6,11 +6,12 @@ import { titleWhenTruncated } from '@feugene/granularity'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
+import { createDisabledPredicate } from '../../chrono/calendarGrid'
 import { formatPlainDate } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
-import { comparePlainDates, differenceInDays } from '../../chrono/plainDate'
+import { comparePlainDates, differenceInDays, isPlainDateWithin } from '../../chrono/plainDate'
 import {
   clearButtonClass,
   iconClass,
@@ -19,8 +20,10 @@ import {
   spinnerClass,
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
+import { presetRowClass } from '../../internal/presetRowStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
 import { rangeCodec, usePickerShell } from '../../internal/usePickerShell'
+import GrButton from '@feugene/granularity/components/GrButton'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
 import type { GrDateRangePickerSize } from './grDateRangePickerStyles'
@@ -52,6 +55,18 @@ export interface GrDateRangePickerProps<T = Date> {
   minRange?: number
   /** Наибольшая длина периода в днях, считая обе границы. */
   maxRange?: number
+  /**
+   * Готовые периоды в подвале панели: «Сегодня», «Последние 7 дней».
+   *
+   * Границы можно задать функцией — «последние 7 дней» отсчитываются от
+   * сегодняшнего дня, а не от дня, когда объявили проп. Функция обязана быть
+   * чистой: её зовут и чтобы решить, доступен ли шорткат, и чтобы применить его.
+   *
+   * Период вне `min`/`max`, задевающий `disabledDates` или нарушающий
+   * `minRange`/`maxRange`, приходит выключенным: кнопка, которая ничего не
+   * делает, обманывает.
+   */
+  presets?: readonly GrDateRangePreset[]
   weekStart?: IsoWeekday
   showWeekNumbers?: boolean
   /** Что считать сегодняшним днём. Задаётся ради воспроизводимых тестов. */
@@ -97,6 +112,13 @@ export interface GrDateRangePickerEmits<T = Date> {
   (e: 'blur', event: FocusEvent): void
 }
 
+/** Готовый период в подвале панели. */
+export interface GrDateRangePreset {
+  label: string
+  /** Пара границ или функция, считающая их в момент показа и нажатия. */
+  range: readonly [Date, Date] | (() => readonly [Date, Date])
+}
+
 const props = withDefaults(defineProps<GrDateRangePickerProps<TItem>>(), {
   modelValue: undefined,
   valueAdapter: undefined,
@@ -105,6 +127,7 @@ const props = withDefaults(defineProps<GrDateRangePickerProps<TItem>>(), {
   disabledDates: undefined,
   minRange: undefined,
   maxRange: undefined,
+  presets: undefined,
   weekStart: undefined,
   // `undefined`, а не `false`: явный дефолт пикера перебил бы настройку
   // `GrCalendar` из `GrConfigProvider` — панель у них общая.
@@ -141,8 +164,18 @@ defineSlots<{
   header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
   /** Своя ячейка шапки недели вместо сокращённого названия дня. */
   weekday?: (props: { label: string, full: string, isoWeekday: IsoWeekday }) => unknown
-  /** Подвал панели. */
-  footer?: () => unknown
+  /**
+   * Подвал панели.
+   *
+   * Выбор периода отдаётся внутрь: шорткат обязан выставить **обе** границы и
+   * не обойти `minRange`/`maxRange`, `min`/`max` и `disabledDates`, а снаружи
+   * этих правил не видно.
+   */
+  footer?: (props: {
+    setRange: (from: Date, to: Date) => boolean
+    canSetRange: (from: Date, to: Date) => boolean
+    close: () => void
+  }) => unknown
 }>()
 
 const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
@@ -244,6 +277,18 @@ function isLengthAllowed(from: PlainDate, to: PlainDate): boolean {
   return true
 }
 
+/** Границы в хронологическом порядке: кликнуть можно и справа налево. */
+function orderPlain(a: PlainDate, b: PlainDate): [PlainDate, PlainDate] {
+  return comparePlainDates(a, b) <= 0 ? [a, b] : [b, a]
+}
+
+function announceRange(from: PlainDate, to: PlainDate): void {
+  announce(t('grChrono.dateRangePicker.rangeSelected', 'Range selected: {from} — {to}', {
+    from: formatPlainDate(resolvedLocale.value, from, LONG_DATE),
+    to: formatPlainDate(resolvedLocale.value, to, LONG_DATE),
+  }))
+}
+
 function onDaySelect(date: PlainDate): void {
   if (isLocked.value) return
 
@@ -261,9 +306,7 @@ function onDaySelect(date: PlainDate): void {
     return
   }
 
-  const [from, to] = comparePlainDates(anchor.value, date) <= 0
-    ? [anchor.value, date]
-    : [date, anchor.value]
+  const [from, to] = orderPlain(anchor.value, date)
 
   // Слишком короткий или слишком длинный период не выбирается, но и не
   // сбрасывает начало: пользователь просто промахнулся мимо допустимой длины.
@@ -273,15 +316,76 @@ function onDaySelect(date: PlainDate): void {
   }
 
   shell.commit([fromPlainParts(from), fromPlainParts(to)])
-  announce(t('grChrono.dateRangePicker.rangeSelected', 'Range selected: {from} — {to}', {
-    from: formatPlainDate(resolvedLocale.value, from, LONG_DATE),
-    to: formatPlainDate(resolvedLocale.value, to, LONG_DATE),
-  }))
+  announceRange(from, to)
   anchor.value = null
   hovered.value = null
 
   // Фокус на поле вернёт стек слоёв: на момент закрытия он ещё внутри панели.
   shell.closePanel()
+}
+
+const isDisabledDate = computed(() => createDisabledPredicate(disabledDates.value))
+
+/** Выбираема ли граница — тем же правилом, каким сетка гасит ячейку. */
+function isDayAllowed(date: PlainDate): boolean {
+  return !isDisabledDate.value(date) && isPlainDateWithin(date, minPlain.value, maxPlain.value)
+}
+
+/**
+ * Допустим ли период. Спрашивается **до** нажатия: кнопка, которая ничего не
+ * делает, обманывает, поэтому шорткат с недопустимым периодом приходит
+ * выключенным.
+ */
+function canSetRange(from: Date, to: Date): boolean {
+  if (isLocked.value) return false
+
+  const [start, end] = orderPlain(toPlainDate(from), toPlainDate(to))
+
+  return isDayAllowed(start) && isDayAllowed(end) && isLengthAllowed(start, end)
+}
+
+/**
+ * Выбор периода из подвала — минуя сетку, поэтому со своими проверками.
+ *
+ * Возвращает `false`, если период запрещён: вызывающему нужно знать, что
+ * ничего не произошло.
+ */
+function setRange(from: Date, to: Date): boolean {
+  if (!canSetRange(from, to)) return false
+
+  const [start, end] = orderPlain(toPlainDate(from), toPlainDate(to))
+
+  shell.commit([fromPlainParts(start), fromPlainParts(end)])
+  announceRange(start, end)
+  anchor.value = null
+  hovered.value = null
+  shell.closePanel()
+
+  return true
+}
+
+function rangeOf(preset: GrDateRangePreset): readonly [Date, Date] {
+  return typeof preset.range === 'function' ? preset.range() : preset.range
+}
+
+/**
+ * Шорткаты с уже решённой доступностью.
+ *
+ * Функция-пресет зовётся здесь и ещё раз при нажатии — на первый взгляд лишний
+ * вызов, но иначе доступность считалась бы по одному значению, а применялось
+ * бы другое. Панель монтируется лениво, так что расчёт идёт с её открытия, а не
+ * с загрузки страницы.
+ */
+const presetRows = computed(() => (props.presets ?? []).map((preset, index) => {
+  const [from, to] = rangeOf(preset)
+
+  return { key: `${index}-${preset.label}`, preset, allowed: canSetRange(from, to) }
+}))
+
+function applyPreset(preset: GrDateRangePreset): void {
+  const [from, to] = rangeOf(preset)
+
+  setRange(from, to)
 }
 
 function onDayHover(date: PlainDate | null): void {
@@ -415,10 +519,30 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             <template v-if="$slots.weekday" #weekday="slotProps">
               <slot name="weekday" v-bind="slotProps" />
             </template>
-            <template v-if="$slots.footer" #footer>
-              <slot name="footer" />
-            </template>
           </GrCalendar>
+
+          <slot name="footer" :set-range="setRange" :can-set-range="canSetRange" :close="shell.closePanel">
+            <div
+              v-if="presetRows.length"
+              data-gr-date-range-picker-presets
+              :class="presetRowClass"
+              role="group"
+              :aria-label="t('grChrono.dateRangePicker.presetsLabel', 'Quick ranges')"
+            >
+              <GrButton
+                v-for="row in presetRows"
+                :key="row.key"
+                data-gr-date-range-picker-preset
+                type="button"
+                variant="ghost"
+                :size="resolvedSize"
+                :disabled="!row.allowed"
+                @click="applyPreset(row.preset)"
+              >
+                {{ row.preset.label }}
+              </GrButton>
+            </div>
+          </slot>
         </div>
     </PickerSurface>
   </div>

@@ -148,8 +148,17 @@ defineSlots<{
   header?: (props: { title: string, goToPeriod: (delta: number) => void }) => unknown
   /** Своя ячейка шапки недели вместо сокращённого названия дня. */
   weekday?: (props: { label: string, full: string, isoWeekday: IsoWeekday }) => unknown
-  /** Подвал панели: кнопки «сегодня», «очистить». */
-  footer?: () => unknown
+  /**
+   * Подвал панели: кнопки «сегодня», «очистить», готовые периоды.
+   *
+   * Выбор отдаётся внутрь, потому что снаружи его не повторить: запрет даты
+   * складывается из `min`, `max` и `disabledDates`, а `readonly` запрещает
+   * любой выбор целиком.
+   */
+  footer?: (props: {
+    select: (date: PlainDate) => boolean
+    canSelect: (date: PlainDate) => boolean
+  }) => unknown
 }>()
 
 const { t, locale: i18nLocale } = useGranularityTranslations()
@@ -429,11 +438,6 @@ const canGoForward = computed(() => !isLocked.value && isPeriodReachable(shiftVi
  * Выбор — событие, а не состояние: `aria-selected` меняется на ячейке, где
  * фокус уже стоит, и диктор об этом молчит. Без объявления клик и `Enter` для
  * незрячего пользователя неотличимы от ничего.
- */
-/**
- * Выбор — событие, а не состояние: `aria-selected` меняется на ячейке, где
- * фокус уже стоит, и диктор об этом молчит. Без объявления клик и `Enter` для
- * незрячего пользователя неотличимы от ничего.
  *
  * Зовётся **после** возможного перевода показа: смена периода объявляет себя
  * сама, и объявленное раньше она бы затёрла.
@@ -474,6 +478,27 @@ function selectCell(cell: CalendarCell): void {
   if (!cell.inMonth) goToPeriod(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
 
   announceSelected(cell.date)
+}
+
+/**
+ * Можно ли выбрать эту дату — тем же правилом, каким сетка гасит ячейку.
+ *
+ * Подвал сетку обходит, поэтому спрашивает явно: иначе шорткат поставил бы
+ * значение, до которого не дотянуться ни кликом, ни клавишей.
+ */
+function canSelectDate(date: PlainDate): boolean {
+  return !isLocked.value && !isDisabledDate.value(date) && isPlainDateWithin(date, props.min, props.max)
+}
+
+/** Выбор из подвала. Возвращает `false`, если дата запрещена. */
+function selectDate(date: PlainDate): boolean {
+  if (!canSelectDate(date)) return false
+
+  emit('update:modelValue', date)
+  emit('change', date)
+  announceSelected(date)
+
+  return true
 }
 
 function onDayClick(cell: CalendarCell): void {
@@ -687,6 +712,6 @@ defineExpose({
       </tbody>
     </table>
 
-    <slot name="footer" />
+    <slot name="footer" :select="selectDate" :can-select="canSelectDate" />
   </div>
 </template>
