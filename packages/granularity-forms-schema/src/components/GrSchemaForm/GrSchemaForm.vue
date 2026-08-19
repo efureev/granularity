@@ -38,6 +38,8 @@ import type { GrSchemaRuleCompilerOptions } from '../../validation'
 import { compileRules } from '../../validation'
 import { useTranslations } from '../../internal/i18n'
 
+import { useGrComponentProp } from '@feugene/granularity/composables/useGrComponentConfig'
+
 import { provideSchemaForm } from './context'
 import GrSchemaArrayField from './GrSchemaArrayField.vue'
 import GrSchemaField from './GrSchemaField.vue'
@@ -116,7 +118,7 @@ const props = withDefaults(defineProps<GrSchemaFormProps<TModel>>(), {
   columns: undefined,
   labelPosition: undefined,
   labelWidth: undefined,
-  headingLevel: 3,
+  headingLevel: undefined,
   showFormErrors: true,
 })
 
@@ -186,6 +188,31 @@ const registry = computed<GrSchemaRendererRegistry>(() => {
 })
 
 const ui = computed<GrUiSchema>(() => props.uiSchema ?? {})
+
+/**
+ * Раскладка приходит из трёх мест, и порядок здесь ровно тот, что у остальных
+ * настраиваемых пропов пакета: локальный проп сильнее `uiSchema`, `uiSchema`
+ * сильнее приложения, приложение сильнее встроенного дефолта.
+ *
+ * До этой правки все четыре ключа были объявлены в `defaults.ts`, но не читались
+ * ни разу: `<GrConfigProvider :component-defaults="{ GrSchemaForm: … }">` не
+ * влиял ни на что, и узнать об этом было неоткуда — гейт проверял только адрес
+ * аугментации.
+ */
+const resolvedColumns = useGrComponentProp(
+  'GrSchemaForm',
+  'columns',
+  () => props.columns ?? ui.value.layout?.columns,
+  undefined as unknown as GrUiColumns,
+)
+const resolvedLabelPosition = useGrComponentProp('GrSchemaForm', 'labelPosition', () => props.labelPosition, 'top')
+const resolvedLabelWidth = useGrComponentProp(
+  'GrSchemaForm',
+  'labelWidth',
+  () => props.labelWidth,
+  undefined as unknown as string | number,
+)
+const resolvedHeadingLevel = useGrComponentProp('GrSchemaForm', 'headingLevel', () => props.headingLevel, 3)
 
 /** Все поля по текущим данным; скрытые условиями отсеиваются здесь же. */
 const allFields = computed<GrSchemaFieldInstance[]>(() => {
@@ -311,7 +338,7 @@ function onInvalid(errors: Record<string, string>): void {
   emit('invalid', errors)
 }
 
-const gridClass = computed(() => [schemaGridClass, columnsToClass(props.columns ?? ui.value.layout?.columns)])
+const gridClass = computed(() => [schemaGridClass, columnsToClass(resolvedColumns.value)])
 
 defineExpose({
   validate,
@@ -366,8 +393,8 @@ defineExpose({
             :node="{ ...root!, title: section.title, description: section.description, fields: sectionFields(section).map(field => field.node) }"
             path=""
             name=""
-            :columns="section.columns ?? columns"
-            :heading-level="section.headingLevel ?? headingLevel"
+            :columns="section.columns ?? resolvedColumns"
+            :heading-level="section.headingLevel ?? resolvedHeadingLevel"
           />
         </template>
       </div>
@@ -381,7 +408,7 @@ defineExpose({
             :name="field.name"
             :indices="field.indices"
             :ui="ui.fields?.[field.templatePath]?.array"
-            :heading-level="headingLevel"
+            :heading-level="resolvedHeadingLevel"
             :disabled="disabled"
             :readonly="readonly"
             class="col-span-full"
@@ -392,8 +419,8 @@ defineExpose({
             :path="field.templatePath"
             :name="field.name"
             :indices="field.indices"
-            :columns="columns"
-            :heading-level="headingLevel"
+            :columns="resolvedColumns"
+            :heading-level="resolvedHeadingLevel"
             class="col-span-full"
           />
           <GrSchemaField
@@ -402,8 +429,8 @@ defineExpose({
             :path="field.templatePath"
             :name="field.name"
             :indices="field.indices"
-            :label-position="labelPosition"
-            :label-width="labelWidth"
+            :label-position="resolvedLabelPosition"
+            :label-width="resolvedLabelWidth"
             @unresolved="(node, name) => emit('unresolved', node, name)"
           />
         </template>

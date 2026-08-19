@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { nextTick, reactive } from 'vue'
+import { defineComponent, nextTick, reactive } from 'vue'
+import GrConfigProvider from '@feugene/granularity/components/GrConfigProvider'
 import { describe, expect, it } from 'vitest'
 
 import { jsonSchemaAdapter } from '../../../adapters/json-schema'
@@ -209,5 +210,75 @@ describe('слоты', () => {
     })
 
     expect(wrapper.findAll('[data-custom]').length).toBe(5)
+  })
+})
+
+/**
+ * Настройка через `GrConfigProvider`.
+ *
+ * Все четыре ключа были объявлены в `defaults.ts` и не читались ни разу: во всём
+ * пакете не было ни одного вызова `useGrComponentProp`, а `headingLevel` вдобавок
+ * держал дефолт `3` в `withDefaults` — Vue подставлял его раньше, чем компонент
+ * мог заглянуть в провайдер. Гейт молчал: он проверяет адрес аугментации, а не
+ * чтение. Ровно так когда-то `showWeekNumbers` числился настраиваемым и им не был.
+ */
+describe('GrSchemaForm и GrConfigProvider', () => {
+  function mountWithConfig(defaults: Record<string, unknown>, props: Record<string, unknown> = {}) {
+    const Harness = defineComponent({
+      name: 'HarnessSchemaFormConfig',
+      components: { GrSchemaForm, GrConfigProvider },
+      props: {
+        componentDefaults: { type: Object, required: true },
+        formProps: { type: Object, default: () => ({}) },
+      },
+      template: `
+        <GrConfigProvider :component-defaults="componentDefaults">
+          <GrSchemaForm v-bind="formProps" />
+        </GrConfigProvider>
+      `,
+    })
+
+    return mount(Harness, {
+      props: {
+        componentDefaults: { GrSchemaForm: defaults },
+        formProps: { schema: basic, adapters: [jsonSchemaAdapter], ...props },
+      },
+      attachTo: document.body,
+    })
+  }
+
+  it('`columns` из провайдера доезжает до сетки полей', () => {
+    const wrapper = mountWithConfig({ columns: 2 })
+
+    expect(wrapper.get('[data-gr-schema-form] .grid').classes()).toContain('grid-cols-2')
+
+    wrapper.unmount()
+  })
+
+  it('локальный проп сильнее провайдера', () => {
+    const wrapper = mountWithConfig({ columns: 3 }, { columns: 1 })
+    const classes = wrapper.get('[data-gr-schema-form] .grid').classes()
+
+    expect(classes).toContain('grid-cols-1')
+    expect(classes).not.toContain('grid-cols-3')
+
+    wrapper.unmount()
+  })
+
+  it('`headingLevel` из провайдера доезжает до заголовка раздела', () => {
+    // Именно этот ключ не сработал бы и после появления чтения: дефолт `3`
+    // в `withDefaults` не оставляет резолверу шанса увидеть `undefined`.
+    const wrapper = mountWithConfig({ headingLevel: 5 }, {
+      schema: {
+        type: 'object',
+        properties: {
+          user: { type: 'object', title: 'Пользователь', properties: { name: { type: 'string' } } },
+        },
+      } satisfies JsonSchemaDocument,
+    })
+
+    expect(wrapper.find('h5').exists()).toBe(true)
+
+    wrapper.unmount()
   })
 })
