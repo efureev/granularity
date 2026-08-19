@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-dashboard",
   "description": "Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -60,6 +60,10 @@
       "types": "./dist/types/components/GrDashboardItem/index.d.ts",
       "import": "./dist/components/GrDashboardItem/index.js"
     },
+    "./components/GrDashboardItemSettings": {
+      "types": "./dist/types/components/GrDashboardItemSettings/index.d.ts",
+      "import": "./dist/components/GrDashboardItemSettings/index.js"
+    },
     "./components/GrDashboardPalette": {
       "types": "./dist/types/components/GrDashboardPalette/index.d.ts",
       "import": "./dist/components/GrDashboardPalette/index.js"
@@ -71,6 +75,10 @@
     "./composables/useDashboardLayout": {
       "types": "./dist/types/composables/useDashboardLayout.d.ts",
       "import": "./dist/composables/useDashboardLayout.js"
+    },
+    "./composables/useDashboardTransfer": {
+      "types": "./dist/types/composables/useDashboardTransfer.d.ts",
+      "import": "./dist/composables/useDashboardTransfer.js"
     },
     "./layout": {
       "types": "./dist/types/layout/index.d.ts",

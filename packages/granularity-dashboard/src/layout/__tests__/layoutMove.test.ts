@@ -106,3 +106,58 @@ describe('addItem и removeItem', () => {
     expect(result.find(item => item.id === 'c')?.y).toBe(2)
   })
 })
+
+describe('горизонтальные режимы компактизации', () => {
+  const horizontal = { cols: 12, compact: 'horizontal' } as const
+  const both = { cols: 12, compact: 'both' } as const
+
+  it('moveItem: сдвинуть виджет вправо в пустоту нельзя — он уедет обратно к краю', () => {
+    const layout: GrDashboardLayout = [{ id: 'a', x: 0, y: 0, w: 2, h: 1 }]
+    const result = moveItem(layout, 'a', { x: 6, y: 0 }, horizontal)
+
+    expect(result).toEqual(layout)
+  })
+
+  it('resizeItem: толкнутый вниз сосед придвигается влево', () => {
+    const layout: GrDashboardLayout = [
+      { id: 'a', x: 0, y: 0, w: 2, h: 1 },
+      { id: 'b', x: 2, y: 0, w: 2, h: 1 },
+    ]
+    const result = resizeItem(layout, 'a', { w: 4, h: 1 }, horizontal)
+
+    expect(result.find(item => item.id === 'a')).toMatchObject({ x: 0, y: 0, w: 4 })
+    expect(result.find(item => item.id === 'b')).toMatchObject({ x: 0, y: 1 })
+  })
+
+  it('addItem при both всплывает в свободную ячейку, а не остаётся под низом', () => {
+    // Новый виджет кладётся под низ сетки, но рядом с `a` пусто — и уплотнение
+    // по обеим осям поднимает его в первую строку, придвигая `a` следом.
+    const layout: GrDashboardLayout = [{ id: 'a', x: 4, y: 0, w: 2, h: 1 }]
+    const result = addItem(layout, { id: 'd', x: 0, y: 0, w: 2, h: 1 }, both)
+
+    expect(result.find(item => item.id === 'd')).toMatchObject({ x: 0, y: 0 })
+    expect(result.find(item => item.id === 'a')).toMatchObject({ x: 2, y: 0 })
+  })
+
+  it('removeItem при horizontal придвигает соседей, не трогая строки', () => {
+    const layout: GrDashboardLayout = [
+      { id: 'a', x: 0, y: 0, w: 2, h: 1 },
+      { id: 'b', x: 2, y: 0, w: 2, h: 1 },
+      { id: 'c', x: 4, y: 3, w: 2, h: 1 },
+    ]
+    const result = removeItem(layout, 'a', horizontal)
+
+    expect(result.find(item => item.id === 'b')).toMatchObject({ x: 0, y: 0 })
+    expect(result.find(item => item.id === 'c')).toMatchObject({ x: 0, y: 3 })
+  })
+
+  it('preventCollision вместе с horizontal отменяет перемещение целиком', () => {
+    const layout: GrDashboardLayout = [
+      { id: 'a', x: 0, y: 0, w: 2, h: 1 },
+      { id: 'b', x: 4, y: 0, w: 2, h: 1 },
+    ]
+    const result = moveItem(layout, 'b', { x: 1, y: 0 }, { ...horizontal, preventCollision: true })
+
+    expect(result).toEqual(layout)
+  })
+})

@@ -12,6 +12,7 @@
     "cancelled": "Movimiento cancelado",
     "resized": "{title}, {w} por {h}",
     "added": "{title} añadido",
+    "settings": "Ajustes de «{title}»",
     "untitled": "Widget"
   },
   "palette": {
@@ -20,6 +21,14 @@
     "addShort": "Añadir",
     "added": "Añadido",
     "empty": "No hay widgets disponibles"
+  },
+  "settings": {
+    "title": "Ajustes del widget",
+    "width": "Ancho, columnas",
+    "height": "Alto, filas",
+    "apply": "Aplicar",
+    "cancel": "Cancelar",
+    "noRoom": "No hay espacio en la cuadrícula para ese tamaño"
   },
   "toolbar": {
     "label": "Controles del panel",

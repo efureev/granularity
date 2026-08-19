@@ -4,7 +4,7 @@ export { grDashboardConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrDashboardConfigurableProps } from './defaults'
 export type { GrDashboardMode } from './grDashboardStyles'
-export type { GrDashboardContext, GrDashboardItemBounds } from './context'
+export type { GrDashboardContext, GrDashboardDropEvent, GrDashboardItemBounds } from './context'
 export { GR_DASHBOARD_KEY, useGrDashboardContext } from './context'
 export { grDashboardSafelist } from './safelist'
 export type { GrDashboardEmits, GrDashboardProps } from './GrDashboard.vue'

@@ -1,22 +1,24 @@
 # Каталог компонентов
 
-`@feugene/granularity-dashboard` публикует четыре компонента, каждый — отдельным
+`@feugene/granularity-dashboard` публикует пять компонентов, каждый — отдельным
 subpath-экспортом:
 
 ```ts
 import { GrDashboard } from '@feugene/granularity-dashboard/components/GrDashboard'
 ```
 
-Первые два обязательны и работают только в паре, вторые два — готовая обвязка,
+Первые два обязательны и работают только в паре, остальные — готовая обвязка,
 которую иначе пришлось бы писать в каждом приложении заново.
 
 - [`GrDashboard`](./components/GrDashboard.md) — сетка: раскладка, брейкпоинты, режимы
 - [`GrDashboardItem`](./components/GrDashboardItem.md) — виджет на сетке поверх `GrCard`
 - [`GrDashboardToolbar`](./components/GrDashboardToolbar.md) — переключатель режима и сброс раскладки
 - [`GrDashboardPalette`](./components/GrDashboardPalette.md) — каталог виджетов для добавления
+- [`GrDashboardItemSettings`](./components/GrDashboardItemSettings.md) — окно параметров одного виджета
 
-Плюс `useDashboardLayout` (сохранение и восстановление) и подпуть `./layout` —
-чистая арифметика раскладки без Vue и DOM.
+Плюс два композабла — `useDashboardLayout` (сохранение и восстановление) и
+`useDashboardTransfer` (перенос виджета из каталога в сетку) — и подпуть
+`./layout`: чистая арифметика раскладки без Vue и DOM.
 
 Выбор между пакетами — карта `docs/COMPONENT-MAP.md` в корне репозитория.
 

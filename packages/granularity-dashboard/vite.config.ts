@@ -47,6 +47,9 @@ export default defineConfig({
         'composables/useDashboardLayout': fileURLToPath(
           new URL('./src/composables/useDashboardLayout.ts', import.meta.url),
         ),
+        'composables/useDashboardTransfer': fileURLToPath(
+          new URL('./src/composables/useDashboardTransfer.ts', import.meta.url),
+        ),
         'layout/index': fileURLToPath(
           new URL('./src/layout/index.ts', import.meta.url),
         ),
@@ -62,6 +65,9 @@ export default defineConfig({
         ),
         'components/GrDashboardItem/index': fileURLToPath(
           new URL('./src/components/GrDashboardItem/index.ts', import.meta.url),
+        ),
+        'components/GrDashboardItemSettings/index': fileURLToPath(
+          new URL('./src/components/GrDashboardItemSettings/index.ts', import.meta.url),
         ),
         'components/GrDashboardPalette/index': fileURLToPath(
           new URL('./src/components/GrDashboardPalette/index.ts', import.meta.url),

@@ -6,6 +6,7 @@
  * указателя — это принудительный reflow сорок раз в секунду.
  */
 import type { GrDashboardItemLayout } from './layoutModel'
+import type { GrDashboardSpan } from './layoutMove'
 
 export interface GrDashboardMetrics {
   /** Ширина контейнера, px. */
@@ -68,6 +69,41 @@ export function cellFromDelta(
   return {
     x: Math.round((origin.left + dx) / colStep(metrics)),
     y: Math.round((origin.top + dy) / rowStep(metrics)),
+  }
+}
+
+/**
+ * Ячейка, в которую попадает точка внутри сетки. `x`/`y` — пиксели от её левого
+ * верхнего угла.
+ *
+ * `cellFromDelta` считает от прямоугольника виджета, который уже в раскладке; у
+ * пришедшего из каталога прямоугольника ещё нет — есть только курсор и будущий
+ * размер. Поэтому при заданном `span` точка считается **центром** виджета: его
+ * призрак висит под курсором, и место обязано лечь под него, а не правее и ниже.
+ *
+ * Нулевая ширина контейнера — это «не отрисовано», а не «сетка шириной в ноль»:
+ * точка в такой сетке не лежит по определению, и считать по ней ячейку значило
+ * бы отдать наружу выдуманное число.
+ */
+export function cellFromPoint(
+  metrics: GrDashboardMetrics,
+  x: number,
+  y: number,
+  span?: GrDashboardSpan,
+): { x: number, y: number } {
+  const col = colStep(metrics)
+  const row = rowStep(metrics)
+  if (metrics.width <= 0 || col <= 0 || row <= 0) return { x: 0, y: 0 }
+
+  const w = Math.max(1, Math.round(span?.w ?? 1))
+  const h = Math.max(1, Math.round(span?.h ?? 1))
+
+  const left = span ? x - (w * metrics.colWidth + (w - 1) * metrics.gap) / 2 : x
+  const top = span ? y - (h * metrics.rowHeight + (h - 1) * metrics.gap) / 2 : y
+
+  return {
+    x: Math.min(Math.max(0, Math.round(left / col)), Math.max(0, metrics.cols - w)),
+    y: Math.max(0, Math.round(top / row)),
   }
 }
 

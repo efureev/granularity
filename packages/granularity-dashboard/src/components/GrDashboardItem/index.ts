@@ -9,4 +9,4 @@ export type {
   GrDashboardItemSize,
 } from './grDashboardItemStyles'
 export { grDashboardItemSafelist } from './safelist'
-export type { GrDashboardItemProps } from './GrDashboardItem.vue'
+export type { GrDashboardItemEmits, GrDashboardItemProps } from './GrDashboardItem.vue'

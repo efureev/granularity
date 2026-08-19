@@ -243,6 +243,7 @@
 | виджет на такой сетке | [`GrDashboardItem`](../packages/granularity-dashboard/docs/components/GrDashboardItem.md) |
 | переключатель режима и сброс раскладки | [`GrDashboardToolbar`](../packages/granularity-dashboard/docs/components/GrDashboardToolbar.md) |
 | каталог виджетов для добавления | [`GrDashboardPalette`](../packages/granularity-dashboard/docs/components/GrDashboardPalette.md) |
+| окно параметров одного виджета | [`GrDashboardItemSettings`](../packages/granularity-dashboard/docs/components/GrDashboardItemSettings.md) |
 
 `GrSplitter` — про размер двух областей, `GrDashboard` — про положение многих
 виджетов на сетке. Общего у них только жест.
@@ -327,6 +328,7 @@
 | [`GrContextMenu`](../packages/granularity/docs/components/GrContextMenu.md) | ядро | действия над строкой списка или узлом дерева |
 | [`GrDashboard`](../packages/granularity-dashboard/docs/components/GrDashboard.md) | dashboard | раскладку определяет пользователь |
 | [`GrDashboardItem`](../packages/granularity-dashboard/docs/components/GrDashboardItem.md) | dashboard | любой виджет внутри `GrDashboard` |
+| [`GrDashboardItemSettings`](../packages/granularity-dashboard/docs/components/GrDashboardItemSettings.md) | dashboard | у виджета есть что настраивать |
 | [`GrDashboardPalette`](../packages/granularity-dashboard/docs/components/GrDashboardPalette.md) | dashboard | набор виджетов выбирает пользователь |
 | [`GrDashboardToolbar`](../packages/granularity-dashboard/docs/components/GrDashboardToolbar.md) | dashboard | дашборд редактируемый |
 | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) | ядро | строки сортируют |

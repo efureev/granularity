@@ -2,10 +2,13 @@
 import { ref } from 'vue'
 
 import {
+  addItem,
   GrDashboard,
   GrDashboardItem,
+  GrDashboardItemSettings,
   GrDashboardPalette,
   GrDashboardToolbar,
+  type GrDashboardDropEvent,
   type GrDashboardResponsiveLayout,
 } from '@feugene/granularity-dashboard'
 
@@ -27,7 +30,14 @@ import {
  *  3. **`useId()` в разметке.** Заголовок виджета адресуется из
  *     `aria-labelledby`: разойдись счётчик — и имя группы указывает в пустоту;
  *  4. **`useAnnouncer` в setup.** Сетка зовёт его при монтировании, а живой
- *     регион ставится в документ — на сервере документа нет.
+ *     регион ставится в документ — на сервере документа нет;
+ *  5. **Модель переноса на уровне модуля.** Каталог с `draggable` и сетка с
+ *     `itemDrop` держат общее состояние рядом с деревом компонентов. На сервере
+ *     в него не пишется ничего — призрака нет, подложки нет, — и разметка
+ *     обязана совпасть с клиентской;
+ *  6. **Портал призрака и модального окна.** `usePortalTarget` выключен и на
+ *     сервере, и на первом клиентском рендере: включись он раньше — телепорт
+ *     унёс бы поддерево, которого в серверном HTML нет.
  *
  * Часов пакет не читает вовсе, хранилище не трогает до `onMounted` — поэтому
  * `data-allow-mismatch` здесь не нужен нигде, и гейт обязан быть чист целиком.
@@ -46,6 +56,28 @@ const catalogue = [
   { id: 'sessions', title: 'Сессии', description: 'Посещения за неделю', defaultSize: { w: 4, h: 2 } },
   { id: 'errors', title: 'Ошибки', description: 'Пятисотые по часам' },
 ]
+
+const settingsOpen = ref(false)
+const settingsFor = ref<string | null>(null)
+
+function openSettings(id: string): void {
+  settingsFor.value = id
+  settingsOpen.value = true
+}
+
+function drop(event: GrDashboardDropEvent): void {
+  const { transfer, cell, breakpoint, options } = event
+
+  layout.value = {
+    ...layout.value,
+    [breakpoint]: addItem(
+      layout.value[breakpoint] ?? [],
+      { id: transfer.id, x: 0, y: 0, w: transfer.size.w, h: transfer.size.h },
+      options,
+      cell,
+    ),
+  }
+}
 </script>
 
 <template>
@@ -54,8 +86,8 @@ const catalogue = [
 
     <GrDashboardToolbar v-model:mode="mode" resettable />
 
-    <GrDashboard v-model:layout="layout" :mode="mode" lazy>
-      <GrDashboardItem item-id="revenue" title="Выручка">
+    <GrDashboard v-model:layout="layout" :mode="mode" lazy @item-settings="openSettings" @item-drop="drop">
+      <GrDashboardItem item-id="revenue" title="Выручка" show-settings>
         <p>Содержимое монтируется в браузере: при `lazy` с сервера приходит заглушка.</p>
         <template #skeleton>
           <p>Загружается…</p>
@@ -69,9 +101,13 @@ const catalogue = [
       <GrDashboardItem item-id="pinned" title="Закреплённый" static>
         <p>Статика не двигается ни сама, ни соседями.</p>
       </GrDashboardItem>
+
+      <GrDashboardItemSettings v-model="settingsOpen" :item-id="settingsFor">
+        <p>Поля приложения приходят слотом.</p>
+      </GrDashboardItemSettings>
     </GrDashboard>
 
     <h2>Каталог</h2>
-    <GrDashboardPalette :items="catalogue" />
+    <GrDashboardPalette :items="catalogue" draggable />
   </main>
 </template>

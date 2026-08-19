@@ -8,6 +8,7 @@ import { granularityGlobal } from '@feugene/granularity/testing'
 import type { GrDashboardResponsiveLayout } from '../layout'
 import GrDashboard from '../components/GrDashboard/GrDashboard.vue'
 import GrDashboardItem from '../components/GrDashboardItem/GrDashboardItem.vue'
+import GrDashboardItemSettings from '../components/GrDashboardItemSettings/GrDashboardItemSettings.vue'
 import GrDashboardPalette from '../components/GrDashboardPalette/GrDashboardPalette.vue'
 import GrDashboardToolbar from '../components/GrDashboardToolbar/GrDashboardToolbar.vue'
 
@@ -44,7 +45,7 @@ function layout(): GrDashboardResponsiveLayout {
   }
 }
 
-function dashboard(mode: 'view' | 'edit') {
+function dashboard(mode: 'view' | 'edit', settingsOpen = false) {
   const model = ref(layout())
 
   return defineComponent({
@@ -52,8 +53,9 @@ function dashboard(mode: 'view' | 'edit') {
       GrDashboard,
       { 'layout': model.value, mode, 'onUpdate:layout': (v: GrDashboardResponsiveLayout) => { model.value = v } },
       () => [
-        h(GrDashboardItem, { itemId: 'sales', title: 'Продажи' }, { default: () => 'график' }),
+        h(GrDashboardItem, { itemId: 'sales', title: 'Продажи', showSettings: true }, { default: () => 'график' }),
         h(GrDashboardItem, { itemId: 'traffic', title: 'Трафик' }, { default: () => 'график' }),
+        h(GrDashboardItemSettings, { modelValue: settingsOpen, itemId: 'sales' }),
       ],
     ),
   })
@@ -74,9 +76,20 @@ describe('a11y', () => {
     expect(await violations(wrapper.element as Element)).toEqual([])
   })
 
-  it('каталог виджетов — без нарушений', async () => {
+  it('открытое окно настроек виджета — без нарушений', async () => {
+    const wrapper = mount(dashboard('edit', true), {
+      attachTo: document.body,
+      global: { ...granularityGlobal(), stubs: { teleport: true, transition: false } },
+    })
+    await nextTick()
+
+    expect(await violations(wrapper.element as Element)).toEqual([])
+  })
+
+  it('каталог виджетов, в том числе перетаскиваемый, — без нарушений', async () => {
     const wrapper = mount(GrDashboardPalette, {
       props: {
+        draggable: true,
         items: [
           { id: 'sales', title: 'Продажи', description: 'Выручка по дням' },
           { id: 'traffic', title: 'Трафик', disabled: true },

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { GrDashboardLayout, GrDashboardResponsiveLayout } from '../layoutModel'
 import { GR_DASHBOARD_BREAKPOINTS, GR_DASHBOARD_COLS } from '../layoutModel'
 import { colsFor, deriveLayout, layoutFor, resolveBreakpoint } from '../layoutBreakpoints'
-import { collides } from '../layoutCollision'
+import { collides, compact } from '../layoutCollision'
 
 const options = { breakpoints: GR_DASHBOARD_BREAKPOINTS, cols: GR_DASHBOARD_COLS }
 
@@ -134,5 +134,40 @@ describe('layoutFor', () => {
 
   it('пустая модель даёт пустую раскладку, а не исключение', () => {
     expect(layoutFor({}, 'md', options)).toEqual([])
+  })
+})
+
+describe('вывод раскладки в горизонтальных режимах', () => {
+  const source: GrDashboardLayout = [
+    { id: 'a', x: 0, y: 0, w: 6, h: 2 },
+    { id: 'b', x: 6, y: 0, w: 6, h: 2 },
+    { id: 'c', x: 3, y: 2, w: 6, h: 1 },
+  ]
+
+  it('deriveLayout с horizontal не теряет виджеты и не оставляет пересечений', () => {
+    const derived = deriveLayout(source, 12, 2, 'horizontal')
+
+    expect(derived.map(item => item.id).sort()).toEqual(['a', 'b', 'c'])
+    expect(derived.some((item, index) => derived.slice(index + 1).some(other => collides(item, other)))).toBe(false)
+  })
+
+  it('deriveLayout с both отдаёт раскладку, неподвижную под повторным уплотнением', () => {
+    const derived = deriveLayout(source, 12, 6, 'both')
+
+    expect(compact(derived, 'both')).toEqual(derived)
+  })
+
+  it('layoutFor доносит horizontal до выведенной раскладки', () => {
+    const responsive: GrDashboardResponsiveLayout = {
+      lg: [
+        { id: 'a', x: 4, y: 0, w: 2, h: 1 },
+        { id: 'b', x: 8, y: 0, w: 2, h: 1 },
+      ],
+    }
+
+    const derived = layoutFor(responsive, 'sm', { ...options, compact: 'horizontal' })
+
+    expect(derived.map(item => item.x)).toEqual([0, 1])
+    expect(derived.every(item => item.y === 0)).toBe(true)
   })
 })

@@ -1,8 +1,9 @@
 import type { GrDashboardPaletteSize } from './grDashboardPaletteStyles'
 
-/** Пропы `GrDashboardPalette`, настраиваемые глобально. Только оформление. */
+/** Пропы `GrDashboardPalette`, настраиваемые глобально. */
 export interface GrDashboardPaletteConfigurableProps {
   size: GrDashboardPaletteSize
+  draggable: boolean
 }
 
 declare module '@feugene/granularity/composables/useGrComponentConfig' {

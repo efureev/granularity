@@ -7,9 +7,11 @@ import {
   useGrComponentProp,
   useGrComponentSize,
 } from '@feugene/granularity/composables/useGrComponentConfig'
+import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
 import DragHandle from '../GrDashboardFrame/shared/DragHandle.vue'
 import ResizeHandle from '../GrDashboardFrame/shared/ResizeHandle.vue'
+import SettingsButton from '../GrDashboardFrame/shared/SettingsButton.vue'
 import { useGrDashboardContext } from '../GrDashboard/context'
 import type {
   GrDashboardItemOverflow,
@@ -59,6 +61,8 @@ export interface GrDashboardItemProps {
   resizable?: boolean
   /** Не двигается сам и не двигается соседями. */
   static?: boolean
+  /** Кнопка настроек в действиях режима редактирования. Шапку она не включает. */
+  showSettings?: boolean
   /** Границы размера. Раскладка их может не содержать — знает их виджет. */
   minW?: number
   minH?: number
@@ -75,7 +79,15 @@ const props = withDefaults(defineProps<GrDashboardItemProps>(), {
   draggable: undefined,
   resizable: undefined,
   static: undefined,
+  showSettings: false,
 })
+
+export interface GrDashboardItemEmits {
+  /** Нажата кнопка настроек. Сетка пересылает это наружу как `itemSettings`. */
+  (e: 'settings', id: string): void
+}
+
+const emit = defineEmits<GrDashboardItemEmits>()
 
 defineSlots<{
   default?: () => unknown
@@ -283,8 +295,27 @@ const showHeader = computed(() => Boolean(props.title) || Boolean(slots.header) 
 
 /** Панель нужна там, где шапки нет, а показать в режиме редактирования есть что. */
 const showOverlayHeader = computed(() => (
-  !showHeader.value && editing.value && (canDrag.value || Boolean(slots.editActions))
+  !showHeader.value && editing.value && (canDrag.value || Boolean(slots.editActions) || props.showSettings)
 ))
+
+const { t } = useGranularityTranslations()
+
+/**
+ * Настройки — действие режима редактирования, как и `#editActions`.
+ *
+ * Шапку кнопка не включает, в отличие от `#actions`: иначе переключение режима
+ * сдвигало бы содержимое на её высоту.
+ */
+const canSettings = computed(() => editing.value && props.showSettings)
+
+const settingsLabel = computed(() => t('grDashboard.item.settings', 'Settings for {title}', {
+  title: props.title ?? t('grDashboard.item.untitled', 'Widget'),
+}))
+
+function openSettings(): void {
+  emit('settings', props.itemId)
+  dashboard?.requestSettings(props.itemId)
+}
 
 const overlayClasses = computed(() => [
   overlayHeaderClass,
@@ -331,7 +362,8 @@ const named = computed(() => Boolean(props.ariaLabel) || Boolean(props.title))
           <slot name="header">
             <span :id="titleId" :class="titleClass">{{ title }}</span>
           </slot>
-          <span v-if="$slots.editActions && editing" :class="actionsClass">
+          <span v-if="editing && (canSettings || $slots.editActions)" :class="actionsClass">
+            <SettingsButton v-if="canSettings" :label="settingsLabel" @click="openSettings" />
             <slot name="editActions" />
           </span>
           <span v-if="$slots.actions" :class="actionsClass">
@@ -370,7 +402,8 @@ const named = computed(() => Boolean(props.ariaLabel) || Boolean(props.title))
 
       <span :class="overlaySpacerClass" />
 
-      <span v-if="$slots.editActions" :class="actionsClass">
+      <span v-if="canSettings || $slots.editActions" :class="actionsClass">
+        <SettingsButton v-if="canSettings" :label="settingsLabel" @click="openSettings" />
         <slot name="editActions" />
       </span>
     </div>

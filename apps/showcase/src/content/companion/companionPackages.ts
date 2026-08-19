@@ -924,9 +924,10 @@ function dashboardApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'rowHeight / gap', type: 'number · number', default: '64 · 12', description: 'Высота строки и зазор в пикселях. Настраиваются через `GrConfigProvider`.' },
         { name: 'mode', type: `'view' | 'edit'`, default: `'view'`, description: 'В режиме просмотра ручек нет вовсе — не скрыты, а не отрисованы.' },
         { name: 'draggable / resizable', type: 'boolean · boolean', default: 'true · true', description: 'Что разрешено в режиме редактирования.' },
-        { name: 'compact', type: `'vertical' | 'none'`, default: `'vertical'`, description: '`vertical` — виджеты падают вверх, дыр не остаётся; сдвинуть виджет вниз в пустоту при этом нельзя, он всплывёт обратно.' },
+        { name: 'compact', type: `'vertical' | 'horizontal' | 'both' | 'none'`, default: `'vertical'`, description: 'Куда тянет уплотнение: вверх, влево, в обе стороны или никуда. Сдвинуть виджет в пустоту по оси уплотнения нельзя — он уедет обратно.' },
         { name: 'preventCollision', type: 'boolean', default: 'false', description: 'Столкновение отменяет перемещение целиком вместо того, чтобы толкать соседей.' },
         { name: 'lazy', type: 'boolean', default: 'false', description: 'Содержимое виджета монтируется по попаданию в окно. Выключает серверный рендер содержимого — см. `docs/ssr.md` пакета.' },
+        { name: 'droppable', type: 'boolean', default: 'true', description: 'Сетка принимает виджеты, перетаскиваемые из каталога. Работает только в `mode="edit"`; нужен там, где сеток на странице несколько, а принимать должна одна.' },
         { name: 'ariaLabel', type: 'string', description: 'Имя сетки для скринридера. Не задано — берётся из локали.' },
       ],
     },
@@ -939,6 +940,8 @@ function dashboardApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'layoutChange', type: '(value: GrDashboardLayout, breakpoint: string) => void', description: 'То же, но раскладкой текущего брейкпоинта.' },
         { name: 'itemMove / itemResize', type: '(id, from, to) => void', description: 'Что именно и куда переехало — до и после.' },
         { name: 'breakpointChange', type: '(breakpoint: string, cols: number) => void', description: 'Сетка перешла на другой брейкпоинт.' },
+        { name: 'itemDrop', type: '(event: GrDashboardDropEvent) => void', description: 'В сетку бросили виджет из каталога. В событии — что несли, ячейка, брейкпоинт и опции раскладки: с ними `addItem` повторит ровно то место, которое показывала подложка. Кладёт приложение.' },
+        { name: 'itemSettings', type: '(id: string) => void', description: 'Нажата встроенная кнопка настроек у виджета. Подписка одна на сетку, а не по одной на виджет.' },
       ],
     },
     {
@@ -969,7 +972,16 @@ function dashboardItemApiSections(): ShowcaseApiSectionMeta[] {
         { name: 'minW / minH / maxW / maxH', type: 'number', description: 'Границы размера. Раскладка их может не содержать — знает их виджет.' },
         { name: 'draggable / resizable', type: 'boolean · boolean', default: 'правило сетки', description: 'Сужают общее правило для одного виджета: `:resizable="false"` убирает уголок растягивания, оставляя перенос, `:draggable="false"` — наоборот. Запрет проверяет сама сетка, а не только прячет ручку.' },
         { name: 'static', type: 'boolean', default: 'false', description: 'Не двигается сам и не двигается соседями; перемещение, упёршееся в него, отменяется. Сильнее `draggable` и `resizable`: те про интерфейс, а `static` про раскладку.' },
+        { name: 'showSettings', type: 'boolean', default: 'false', description: 'Кнопка-шестерёнка среди действий режима редактирования. Шапку, в отличие от `#actions`, не включает: иначе вход в режим сдвигал бы содержимое на её высоту.' },
         { name: 'ariaLabel', type: 'string', description: 'Имя виджета, если заголовка нет.' },
+      ],
+    },
+    {
+      key: 'emits',
+      title: 'Emits',
+      origin: 'manual',
+      items: [
+        { name: 'settings', type: '(id: string) => void', description: 'Нажата кнопка настроек. Сетка пересылает это наружу как `itemSettings` — подписаться можно один раз на всю сетку.' },
       ],
     },
     {
@@ -988,6 +1000,43 @@ function dashboardItemApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
+/** Публичная поверхность окна настроек виджета. */
+function dashboardItemSettingsApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'modelValue', type: 'boolean', description: '`v-model` — окно открыто.' },
+        { name: 'itemId', type: 'string | null', description: 'Какой виджет настраиваем. `null` — окну нечего читать.' },
+        { name: 'title', type: 'string', description: 'Заголовок окна. Не задан — строка локали.' },
+        { name: 'size', type: `'sm' | 'md' | 'lg' | 'xl' | 'full'`, default: `'md'`, description: 'Ширина окна: прокидывается в `GrDialog`.' },
+        { name: 'hideSize', type: 'boolean', default: 'false', description: 'Убрать встроенный редактор размера: у приложения свои поля и только они.' },
+      ],
+    },
+    {
+      key: 'emits',
+      title: 'Emits',
+      origin: 'manual',
+      items: [
+        { name: 'update:modelValue', type: '(value: boolean) => void', description: 'Окно открылось или закрылось.' },
+        { name: 'apply', type: '(id: string, span: { w: number, h: number }) => void', description: 'Нажали «Применить». Размер к этому моменту уже закоммичен сеткой — приложению остаётся сохранить своё.' },
+        { name: 'cancel', type: '(id: string) => void', description: 'Закрыли без применения: кнопка, `Esc`, клик по подложке.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'default', type: '{ item }', description: 'Поля приложения. Идут над размером: продуктовое важнее служебного. `item` не задан, когда окно стоит вне сетки.' },
+        { name: 'footer', type: '{ apply, cancel }', description: 'Замена подвала целиком, когда «Отмена / Применить» не подходят.' },
+      ],
+    },
+  ]
+}
+
 /** Публичная поверхность каталога виджетов. */
 function dashboardPaletteApiSections(): ShowcaseApiSectionMeta[] {
   return [
@@ -998,6 +1047,7 @@ function dashboardPaletteApiSections(): ShowcaseApiSectionMeta[] {
       items: [
         { name: 'items', type: 'GrDashboardPaletteItem[]', description: 'Каталог: `id`, `title`, `description`, `defaultSize`, границы размера, `disabled`.' },
         { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, default: `'md'`, description: 'Кегль строк каталога.' },
+        { name: 'draggable', type: 'boolean', default: 'true', description: 'Плитку можно перетащить на сетку. Кнопка «Добавить» остаётся при любом значении: она и есть клавиатурный путь. Сетка, не слушающая `itemDrop`, покажет подложку и ничего не сделает.' },
         { name: 'disabled', type: 'boolean', default: 'false', description: 'Гасит весь каталог.' },
         { name: 'ariaLabel', type: 'string', description: 'Имя списка. Не задано — берётся из локали.' },
       ],
@@ -1007,7 +1057,17 @@ function dashboardPaletteApiSections(): ShowcaseApiSectionMeta[] {
       title: 'Emits',
       origin: 'manual',
       items: [
-        { name: 'add', type: '(item: GrDashboardPaletteItem) => void', description: 'Виджет выбран. Куда его класть, решает приложение — например функцией `addItem` из `./layout`.' },
+        { name: 'add', type: '(item: GrDashboardPaletteItem) => void', description: 'Виджет выбран кнопкой. Куда его класть, решает приложение — например функцией `addItem` из `./layout`. Про бросок сообщает сетка, а не каталог.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'item', type: '{ item, dragging, transferProps }', description: 'Своя плитка. `transferProps` навешивается на её корень через `v-bind` — без этого перетащить свою разметку нечем.' },
+        { name: 'ghost', type: '{ item }', description: 'Что рисуется под курсором во время переноса.' },
+        { name: 'empty', type: '—', description: 'Пустой каталог.' },
       ],
     },
   ]
@@ -1644,7 +1704,15 @@ type GrDashboardCols = Record<GrDashboardBreakpoint, number>
 type GrDashboardMode = 'view' | 'edit'
 
 /** Падают ли виджеты вверх после переноса. */
-type GrDashboardCompaction = 'vertical' | 'none'`,
+type GrDashboardCompaction = 'vertical' | 'horizontal' | 'both' | 'none'
+
+interface GrDashboardDropEvent {
+  transfer: GrDashboardTransfer
+  /** Ячейка левого верхнего угла — та же, что показывала подложка. */
+  cell: { x: number, y: number }
+  breakpoint: GrDashboardBreakpoint
+  options: GrDashboardMoveOptions
+}`,
         overview: {
           paragraphs: [
             'Сетка — единственный в пакете владелец раскладки. Она знает, сколько колонок на текущей ширине, где стоит каждый виджет и что происходит при переносе: кого толкать, куда подтягивать, когда движение отменить. Всё это она отдаёт наружу одним `v-model:layout` и ничего не хранит у себя.',
@@ -1654,7 +1722,8 @@ type GrDashboardCompaction = 'vertical' | 'none'`,
             'Раскладка на каждый брейкпоинт: недостающая выводится из ближайшей более широкой, а не собирается заново.',
             'Перенос и растягивание — указателем и с клавиатуры; отменённый жест возвращает раскладку в исходное состояние.',
             'Режим просмотра и режим редактирования — одна и та же разметка, а не два набора.',
-            'Компактизация вверх либо свободная сетка — пропом `compact`, без переписывания раскладки.',
+            'Уплотнение вверх, влево, по обеим осям или свободная сетка — пропом `compact`, без переписывания раскладки.',
+            'Виджет приезжает из каталога перетаскиванием или кнопкой; куда его положить, решает приложение.',
           ],
           lists: [
             {
@@ -1687,6 +1756,13 @@ type GrDashboardCompaction = 'vertical' | 'none'`,
             title: 'Закреплённый виджет и свободная сетка',
             description: 'Баннер вверху закреплён: он не двигается ни сам, ни соседями, и перемещение, упёршееся в него, отменяется целиком. Вся сетка здесь — `compact="none"`: виджет остаётся ровно там, куда его положили, вместе с дырой под ним.',
             previewKey: 'extra-dashboard-static',
+          },
+          {
+            id: 'dashboard-compaction',
+            title: 'Четыре режима уплотнения',
+            description: 'Одна и та же раскладка с дырами по обеим осям. `vertical` тянет виджеты вверх, `horizontal` — влево, `both` — до упора в обе стороны, `none` оставляет всё как есть.',
+            previewKey: 'extra-dashboard-compaction',
+            note: 'Сдвинуть виджет в пустоту по оси уплотнения нельзя — он уедет обратно. Это определение компактизации, а не потеря жеста.',
           },
           {
             id: 'dashboard-persistence',
@@ -1804,7 +1880,7 @@ interface GrDashboardItemProps {
         name: 'GrDashboardPalette',
         slug: 'gr-dashboard-palette',
         title: 'GrDashboardPalette',
-        summary: 'Каталог виджетов, которые можно добавить. Добавление — обычная кнопка, поэтому клавиатурный сценарий существует по построению.',
+        summary: 'Каталог виджетов, которые можно добавить: кнопкой или перетаскиванием на сетку. Кнопка остаётся на месте, поэтому клавиатурный сценарий существует по построению.',
         importPath: '@feugene/granularity-dashboard/components/GrDashboardPalette',
         typeDeclarations: `import type {
   GrDashboardPaletteItem,
@@ -1846,11 +1922,12 @@ function addItem(
           paragraphs: [
             'Каталог отвечает на один вопрос: что ещё можно поставить на дашборд. Он показывает список доступных виджетов с названием, описанием и предполагаемым размером — и сообщает наружу, что из него выбрали.',
             'Класть выбранное в сетку — не его дело. Каталог не владеет раскладкой и даже не обязан стоять внутри `GrDashboard`: он эмитит `add`, а приложение решает, куда встанет виджет и встанет ли вообще (например, если такой уже есть). Функция `addItem` из подпути `./layout` делает это одной строкой.',
-            'Добавление здесь — обычная кнопка, а не перетаскивание. Это не упрощение: сделай контрактом перетаскивание — и каталогом нельзя пользоваться с клавиатуры, а «доступность потом» в таких местах не наступает. Перетаскивание может появиться поверх работающего пути, но не вместо него.',
+            'Плитку можно перетащить прямо на сетку, но кнопка при этом никуда не делась — и это принципиально. Сделай перетаскивание контрактом, и каталогом нельзя пользоваться с клавиатуры, а «доступность потом» в таких местах не наступает. Куда бросили, сообщает сетка эмитом `itemDrop`; кладёт по-прежнему приложение.',
           ],
           features: [
             'Список виджетов с описанием и размером по умолчанию.',
             'Добавление кнопкой — работает мышью и с клавиатуры одинаково.',
+            'Перетаскивание плитки на сетку: подложка показывает место, соседи расступаются заранее.',
             'Каждое добавление объявляется в живой регион.',
             'Слот `#item` — если строка каталога должна выглядеть иначе.',
             'Работает и вне сетки: это обычный список с эмитом.',
@@ -1873,8 +1950,73 @@ function addItem(
             description: 'Каталог не владеет раскладкой: он сообщает, что выбрали, а куда положить — решает приложение. В демо это одна строка с `addItem` из подпути `./layout`.',
             previewKey: 'extra-dashboard-palette',
           },
+          {
+            id: 'dashboard-transfer',
+            title: 'Перетащить на сетку',
+            description: 'Тот же каталог, но виджет можно донести до места. Подложка показывает, куда он встанет, и соседи расступаются заранее — предпросмотр считается ровно теми же функциями, что и сам бросок.',
+            previewKey: 'extra-dashboard-transfer',
+            note: 'Кнопка «Добавить» осталась и работает как раньше: перетаскивание добавлено поверх неё, а не вместо. Пальцем плитка не тащится — каталог на телефоне обязан прокручиваться.',
+          },
         ],
         apiSections: dashboardPaletteApiSections(),
+      },
+      {
+        name: 'GrDashboardItemSettings',
+        slug: 'gr-dashboard-item-settings',
+        title: 'GrDashboardItemSettings',
+        summary: 'Окно параметров одного виджета. Своё содержимое у него ровно одно — размер в ячейках; всё остальное приносит приложение слотом.',
+        importPath: '@feugene/granularity-dashboard/components/GrDashboardItemSettings',
+        typeDeclarations: `import type {
+  GrDashboardItemSettingsProps,
+  GrDashboardItemSettingsSize,
+} from '@feugene/granularity-dashboard/components/GrDashboardItemSettings'
+
+type GrDashboardItemSettingsSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
+
+interface GrDashboardItemSettingsProps {
+  /** Окно открыто. \`v-model\`. */
+  modelValue: boolean
+  /** Какой виджет настраиваем. \`null\` — окну нечего читать. */
+  itemId: string | null
+  title?: string
+  size?: GrDashboardItemSettingsSize
+  /** Убрать встроенный редактор размера. */
+  hideSize?: boolean
+}`,
+        overview: {
+          paragraphs: [
+            'У виджета почти всегда есть что настроить: период, источник, порог тревоги. Окно даёт этим полям место — и заодно закрывает то, что приложение сделало бы неправильно: размер виджета в ячейках.',
+            'Верхняя граница ширины тут не число колонок и не объявленный максимум, а то, что реально осталось до правого края. Изменение коммитится через сетку — с её уплотнением, её `preventCollision` и её проверкой закреплённых виджетов. Не поместилось — окно останется открытым и скажет об этом, а не закроется над несделанным.',
+            'Кнопку-шестерёнку рисует сам виджет пропом `showSettings`, а сетка пересылает нажатие наружу как `itemSettings`: подписка одна на всю сетку, а не по одной на каждый виджет.',
+          ],
+          features: [
+            'Ширина и высота в ячейках с честными границами.',
+            'Слот под поля приложения — над размером: продуктовое важнее служебного.',
+            'Отказ виден: «на сетке нет места» вместо тихого закрытия.',
+            'Готовый подвал «Отмена / Применить», заменяемый слотом.',
+            'Вне сетки работает без блока размера — слот приложения продолжает жить.',
+          ],
+          lists: [
+            {
+              title: 'Чего окно не редактирует',
+              items: [
+                'Заголовок виджета — он не входит в раскладку намеренно: уехав в хранилище, он протух бы при первой смене языка.',
+                'Границы `minW`/`maxW` — их объявляет разметка виджета, и редактор завёл бы вторую правду о том же самом.',
+                'Данные и содержимое виджета — за этим в приложение.',
+              ],
+            },
+          ],
+        },
+        examples: [
+          {
+            id: 'dashboard-item-settings',
+            title: 'Размер и период',
+            description: 'Размер в ячейках даёт пакет, период — приложение. Поля стоят в одном окне, но за первым следит сетка, а за вторым никто, кроме вас.',
+            previewKey: 'extra-dashboard-item-settings',
+            note: 'Попробуйте увеличить «Заказы» до двенадцати колонок: правее восьмой начинается край сетки, и поле честно об этом знает.',
+          },
+        ],
+        apiSections: dashboardItemSettingsApiSections(),
       },
       {
         name: 'GrDashboardToolbar',

@@ -10,6 +10,7 @@ import {
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grDashboardConfig } from '../components/GrDashboard/config'
 import { grDashboardItemConfig } from '../components/GrDashboardItem/config'
+import { grDashboardItemSettingsConfig } from '../components/GrDashboardItemSettings/config'
 import { grDashboardPaletteConfig } from '../components/GrDashboardPalette/config'
 import { grDashboardToolbarConfig } from '../components/GrDashboardToolbar/config'
 // </granularity:components:imports>
@@ -26,6 +27,7 @@ export const granularityDashboardComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
   GrDashboard: grDashboardConfig,
   GrDashboardItem: grDashboardItemConfig,
+  GrDashboardItemSettings: grDashboardItemSettingsConfig,
   GrDashboardPalette: grDashboardPaletteConfig,
   GrDashboardToolbar: grDashboardToolbarConfig,
   // </granularity:components:registry>

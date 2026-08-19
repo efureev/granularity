@@ -324,3 +324,55 @@ describe('grDashboardItem: действия режима редактирова�
     expect(query(root, '[data-remove]')).toBeNull()
   })
 })
+
+describe('grDashboardItem: кнопка настроек', () => {
+  const settingsButton = (root: HTMLElement) => query(root, '[data-gr-dashboard-settings-button]')
+
+  it('появляется только в режиме редактирования', () => {
+    expect(settingsButton(stand({ mode: 'view', props: { showSettings: true } }).root)).toBeNull()
+    expect(settingsButton(stand({ mode: 'edit', props: { showSettings: true } }).root)).not.toBeNull()
+  })
+
+  it('едет в шапку, когда шапка есть, и в панель, когда её нет', () => {
+    const withHeader = stand({ props: { showSettings: true, title: 'Продажи' } }).root
+    expect(withHeader.querySelector('[data-gr-card-header] [data-gr-dashboard-settings-button]')).not.toBeNull()
+
+    const headless = stand({ props: { showSettings: true } }).root
+    expect(headless.querySelector('[data-gr-dashboard-overlay-header] [data-gr-dashboard-settings-button]')).not.toBeNull()
+  })
+
+  it('сама шапку не включает: переключение режима не должно сдвигать содержимое', () => {
+    const { root } = stand({ props: { showSettings: true } })
+
+    expect(query(root, '[data-gr-card-header]')).toBeNull()
+  })
+
+  it('нажатие эмитит settings у виджета и уходит в сетку', async () => {
+    const seen: string[] = []
+    const { root } = stand({ props: { showSettings: true, onSettings: (id: string) => seen.push(id) } })
+
+    settingsButton(root)?.click()
+    await nextTick()
+
+    expect(seen).toEqual(['solo'])
+  })
+
+  it('имя кнопки содержит заголовок виджета, а окно объявлено через aria-haspopup', () => {
+    const { root } = stand({ props: { showSettings: true, title: 'Продажи' } })
+    const button = settingsButton(root)
+
+    expect(button?.getAttribute('aria-label')).toContain('Продажи')
+    expect(button?.getAttribute('aria-haspopup')).toBe('dialog')
+  })
+
+  it('скрытая панель оставляет кнопку в DOM и в таб-порядке', () => {
+    // Панель гаснет прозрачностью, а не `v-if`: убери её из разметки — и фокус
+    // после закрытия окна возвращать будет некуда.
+    const { root } = stand({ props: { showSettings: true } })
+    const button = settingsButton(root)
+
+    expect(button).not.toBeNull()
+    expect(button?.hasAttribute('disabled')).toBe(false)
+    expect(button?.getAttribute('tabindex')).toBeNull()
+  })
+})

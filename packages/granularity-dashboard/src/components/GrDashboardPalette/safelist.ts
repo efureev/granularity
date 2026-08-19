@@ -10,6 +10,8 @@ import {
   paletteSizes,
   rowClass,
   rowDisabledClass,
+  rowDraggableClass,
+  rowTransferringClass,
   textClass,
   titleClass,
 } from './grDashboardPaletteStyles'
@@ -20,6 +22,8 @@ export const grDashboardPaletteSafelist = [...new Set([
   ...splitClassTokens(listClass),
   ...splitClassTokens(rowClass),
   ...splitClassTokens(rowDisabledClass),
+  ...splitClassTokens(rowDraggableClass),
+  ...splitClassTokens(rowTransferringClass),
   ...splitClassTokens(headingClass),
   ...splitClassTokens(measureClass),
   ...splitClassTokens(actionClass),

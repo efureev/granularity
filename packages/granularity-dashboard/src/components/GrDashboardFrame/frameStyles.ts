@@ -44,6 +44,9 @@ export const dragHandleClass = `${handleBaseClass} cursor-grab`
 
 export const dragHandleGrabbedClass = 'cursor-grabbing text-[var(--gr-primary)]'
 
+/** Кнопка настроек виджета. Та же цель, что у ручки переноса, — но нажимается, а не тащится. */
+export const settingsButtonClass = `${handleBaseClass} cursor-pointer`
+
 /**
  * Уголок растягивания в правом нижнем углу виджета.
  *
@@ -61,6 +64,35 @@ export const resizeHandleClass = [
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
   'hover:border-[var(--gr-primary)]',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
+].join(' ')
+
+/**
+ * Призрак — то, что видно между каталогом и сеткой.
+ *
+ * Слой выше окна: перенос начинают и из модалки, а призрак живёт ровно пока
+ * палец на кнопке. `pointer-events: none` тут не украшение — без него призрак
+ * перехватывает хит-тест и приёмник под курсором не находится никогда.
+ */
+export const ghostClass = [
+  'fixed left-0 top-0',
+  'z-[var(--gr-dashboard-frame-ghost-z,var(--gr-z-toast))]',
+  'pointer-events-none select-none',
+  'inline-flex items-center gap-2',
+  'px-3 py-2',
+  'rounded-[var(--gr-dashboard-frame-ghost-radius,var(--gr-radius-lg))]',
+  'bg-[var(--gr-dashboard-frame-ghost-bg,var(--gr-card))]',
+  'border border-solid border-[var(--gr-dashboard-frame-ghost-brd,var(--gr-primary))]',
+  'shadow-[var(--gr-dashboard-frame-ghost-shadow,var(--gr-shadow-3))]',
+  'text-[var(--gr-fg)]',
+  'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+].join(' ')
+
+export const ghostTitleClass = 'truncate max-w-[16rem] font-medium'
+
+export const ghostMeasureClass = [
+  'shrink-0 whitespace-nowrap',
+  'text-[var(--gr-muted-fg)]',
+  '[font-variant-numeric:tabular-nums]',
 ].join(' ')
 
 /**

@@ -4,7 +4,9 @@ import { mount } from '@vue/test-utils'
 
 import { announced, granularityGlobal, keydown, resetGranularityDom } from '@feugene/granularity/testing'
 
-import type { GrDashboardResponsiveLayout } from '../../../layout'
+import type { GrDashboardCompaction, GrDashboardItemLayout, GrDashboardResponsiveLayout } from '../../../layout'
+import type { GrDashboardContext } from '../context'
+import { useGrDashboardContext } from '../context'
 import GrDashboard from '../GrDashboard.vue'
 import GrDashboardItem from '../../GrDashboardItem/GrDashboardItem.vue'
 
@@ -41,7 +43,11 @@ function stubWidth(width: number): () => void {
  * Стенд собран отдельным компонентом, а не `slots` в `mount`: раскладка ходит
  * через `v-model:layout`, и проверять надо именно её обратный путь.
  */
-function stand(options: { mode?: 'view' | 'edit', layout?: GrDashboardResponsiveLayout } = {}) {
+function stand(options: {
+  mode?: 'view' | 'edit'
+  layout?: GrDashboardResponsiveLayout
+  compact?: GrDashboardCompaction
+} = {}) {
   const layout = ref(options.layout ?? initialLayout())
 
   const Stand = defineComponent({
@@ -50,6 +56,7 @@ function stand(options: { mode?: 'view' | 'edit', layout?: GrDashboardResponsive
       {
         'layout': layout.value,
         'mode': options.mode ?? 'view',
+        'compact': options.compact,
         'onUpdate:layout': (value: GrDashboardResponsiveLayout) => { layout.value = value },
       },
       () => [
@@ -331,5 +338,158 @@ describe('gRDashboard: границы виджета', () => {
     await nextTick()
 
     expect(layout.value.lg?.[0]?.w).toBe(3)
+  })
+})
+
+describe('gRDashboard: горизонтальные режимы компактизации', () => {
+  it('при horizontal вправо в пустоту виджет не уезжает — его тянет обратно к краю', async () => {
+    const { root, layout } = stand({ mode: 'edit', compact: 'horizontal' })
+    const handle = dragHandle(root, 'traffic')
+
+    keydown(handle, ' ')
+    keydown(handle, 'ArrowRight')
+    await nextTick()
+
+    expect(layout.value.lg?.find(item => item.id === 'traffic')?.x).toBe(4)
+  })
+
+  it('при both перенос вниз упаковывает раскладку по обеим осям', async () => {
+    const { root, layout } = stand({
+      mode: 'edit',
+      compact: 'both',
+      layout: {
+        lg: [
+          { id: 'sales', x: 4, y: 0, w: 4, h: 2 },
+          { id: 'traffic', x: 8, y: 0, w: 4, h: 2 },
+        ],
+      },
+    })
+
+    keydown(dragHandle(root, 'sales'), ' ')
+    keydown(dragHandle(root, 'sales'), 'ArrowDown')
+    await nextTick()
+
+    expect(layout.value.lg?.find(item => item.id === 'sales')).toMatchObject({ x: 0, y: 0 })
+    expect(layout.value.lg?.find(item => item.id === 'traffic')).toMatchObject({ x: 4, y: 0 })
+  })
+})
+
+describe('gRDashboard: программный доступ через контекст', () => {
+  interface Events {
+    settings: string[]
+    resize: Array<{ id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout }>
+    move: Array<{ id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout }>
+  }
+
+  function contextStand(options: {
+    mode?: 'view' | 'edit'
+    layout?: GrDashboardResponsiveLayout
+    itemProps?: Record<string, unknown>
+    preventCollision?: boolean
+  } = {}) {
+    let context: GrDashboardContext | null = null
+    const layout = ref(options.layout ?? initialLayout())
+    const events: Events = { settings: [], resize: [], move: [] }
+
+    const Spy = defineComponent({
+      setup: () => {
+        context = useGrDashboardContext()
+
+        return () => null
+      },
+    })
+
+    const Stand = defineComponent({
+      setup: () => () => h(
+        GrDashboard,
+        {
+          'layout': layout.value,
+          'mode': options.mode ?? 'edit',
+          'preventCollision': options.preventCollision,
+          'onUpdate:layout': (value: GrDashboardResponsiveLayout) => { layout.value = value },
+          'onItemSettings': (id: string) => events.settings.push(id),
+          'onItemResize': (id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout) => {
+            events.resize.push({ id, from, to })
+          },
+          'onItemMove': (id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout) => {
+            events.move.push({ id, from, to })
+          },
+        },
+        () => [
+          h(GrDashboardItem, { itemId: 'sales', title: 'Продажи', ...options.itemProps }, { default: () => 'график' }),
+          h(GrDashboardItem, { itemId: 'traffic', title: 'Трафик' }, { default: () => 'график' }),
+          h(Spy),
+        ],
+      ),
+    })
+
+    const restore = stubWidth(1200)
+    const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
+    restore()
+
+    return { root: wrapper.element as HTMLElement, layout, events, context: context! }
+  }
+
+  it('requestSettings пересылается наружу как itemSettings', () => {
+    const { context, events } = contextStand()
+
+    context.requestSettings('sales')
+
+    expect(events.settings).toEqual(['sales'])
+  })
+
+  it('resizeItemTo меняет раскладку, эмитит itemResize и объявляет результат', async () => {
+    const { context, layout, events } = contextStand()
+
+    expect(context.resizeItemTo('sales', { w: 2, h: 2 })).toBe(true)
+    await nextTick()
+
+    expect(layout.value.lg?.find(item => item.id === 'sales')?.w).toBe(2)
+    expect(events.resize).toHaveLength(1)
+    expect(events.resize[0]).toMatchObject({ id: 'sales', to: { w: 2, h: 2 } })
+    expect(await announced()).toContain('Продажи')
+  })
+
+  it('resizeItemTo отказывает у статики и в режиме просмотра', () => {
+    const pinned = contextStand({ itemProps: { static: true } })
+    expect(pinned.context.resizeItemTo('sales', { w: 2, h: 2 })).toBe(false)
+    expect(pinned.layout.value.lg?.find(item => item.id === 'sales')?.w).toBe(4)
+
+    const viewing = contextStand({ mode: 'view' })
+    expect(viewing.context.resizeItemTo('sales', { w: 2, h: 2 })).toBe(false)
+  })
+
+  it('resizeItemTo отказывает, когда preventCollision не даёт занять место', () => {
+    const { context, layout } = contextStand({ preventCollision: true })
+
+    expect(context.resizeItemTo('sales', { w: 8, h: 2 })).toBe(false)
+    expect(layout.value.lg?.find(item => item.id === 'sales')?.w).toBe(4)
+  })
+
+  it('canResize повторяет правило сетки, сужённое виджетом', () => {
+    expect(contextStand().context.canResize('sales')).toBe(true)
+    expect(contextStand({ itemProps: { resizable: false } }).context.canResize('sales')).toBe(false)
+    expect(contextStand({ itemProps: { static: true } }).context.canResize('sales')).toBe(false)
+  })
+
+  it('клавиатура эмитит itemMove и itemResize наравне с указателем', async () => {
+    const { root, events } = contextStand()
+    const handle = dragHandle(root, 'sales')
+
+    keydown(handle, ' ')
+    keydown(handle, 'ArrowRight')
+    await nextTick()
+    expect(events.move).toHaveLength(1)
+    expect(events.move[0]).toMatchObject({ id: 'sales', from: { x: 0 }, to: { x: 1 } })
+
+    keydown(handle, 'Escape')
+    await nextTick()
+    expect(events.move).toHaveLength(2)
+    expect(events.move[1]).toMatchObject({ id: 'sales', to: { x: 0 } })
+
+    keydown(resizeHandle(root, 'sales'), 'ArrowRight')
+    await nextTick()
+    expect(events.resize).toHaveLength(1)
+    expect(events.resize[0]).toMatchObject({ id: 'sales', to: { w: 5 } })
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cellFromDelta, metricsOf, rectOfItem, spanFromDelta } from '../layoutGeometry'
+import { cellFromDelta, cellFromPoint, metricsOf, rectOfItem, spanFromDelta } from '../layoutGeometry'
 
 // 1000px, 10 колонок, зазор 10 → колонка 91px, шаг 101px.
 const metrics = metricsOf(1000, 10, 60, 10)
@@ -63,5 +63,38 @@ describe('spanFromDelta', () => {
 
   it('не даёт схлопнуться меньше ячейки', () => {
     expect(spanFromDelta(item, metrics, -10_000, -10_000)).toEqual({ w: 1, h: 1 })
+  })
+})
+
+describe('cellFromPoint', () => {
+  // colWidth = (1200 - 12 * 11) / 12 = 89 ⇒ colStep = 101, rowStep = 76.
+  const metrics = metricsOf(1200, 12, 64, 12)
+
+  it('точка в центре виджета 1×1 даёт его же ячейку', () => {
+    expect(cellFromPoint(metrics, 44.5, 32, { w: 1, h: 1 })).toEqual({ x: 0, y: 0 })
+  })
+
+  it('со `span` точка считается центром, а не левым верхним углом', () => {
+    // Виджет 6×2 шириной 594px: чтобы он встал в третью колонку, курсор должен
+    // быть на 297px правее её левого края.
+    expect(cellFromPoint(metrics, 3 * 101 + 297, 32, { w: 6, h: 2 })).toMatchObject({ x: 3 })
+  })
+
+  it('без `span` точка — это левый верхний угол', () => {
+    expect(cellFromPoint(metrics, 303, 76)).toEqual({ x: 3, y: 1 })
+  })
+
+  it('переезд в соседнюю ячейку на середине пути', () => {
+    expect(cellFromPoint(metrics, 50, 0)).toMatchObject({ x: 0 })
+    expect(cellFromPoint(metrics, 51, 0)).toMatchObject({ x: 1 })
+  })
+
+  it('за край сетки не выпускает: правая граница считается от ширины виджета', () => {
+    expect(cellFromPoint(metrics, 5000, 5000, { w: 4, h: 1 })).toMatchObject({ x: 8 })
+    expect(cellFromPoint(metrics, -500, -500, { w: 4, h: 1 })).toEqual({ x: 0, y: 0 })
+  })
+
+  it('нулевая ширина контейнера даёт нулевую ячейку, а не NaN', () => {
+    expect(cellFromPoint(metricsOf(0, 12, 64, 12), 100, 100, { w: 2, h: 1 })).toEqual({ x: 0, y: 0 })
   })
 })

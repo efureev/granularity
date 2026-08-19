@@ -1,7 +1,16 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
 import { inject } from 'vue'
 
-import type { GrDashboardItemLayout, GrDashboardLayout, GrDashboardRect } from '../../layout'
+import type { GrDashboardTransfer } from '../../composables/useDashboardTransfer'
+import type {
+  GrDashboardBreakpoint,
+  GrDashboardCell,
+  GrDashboardItemLayout,
+  GrDashboardLayout,
+  GrDashboardMoveOptions,
+  GrDashboardRect,
+  GrDashboardSpan,
+} from '../../layout'
 import type { GrDashboardMode } from './grDashboardStyles'
 
 /**
@@ -28,6 +37,21 @@ export interface GrDashboardItemBounds {
   resizable?: boolean
   /** Имя виджета для ручек и объявлений. */
   title?: string
+}
+
+/**
+ * Всё, что нужно, чтобы положить брошенный виджет ровно туда, где стояла подложка.
+ *
+ * `breakpoint` и `options` — не полнота ради полноты: без первого приложение
+ * пишет в `lg`, когда пользователь на `sm`, а со своими опциями считает
+ * раскладку не так, как её посчитала сетка, и получает не то, что было показано.
+ */
+export interface GrDashboardDropEvent {
+  transfer: GrDashboardTransfer
+  /** Ячейка левого верхнего угла — та же, что показывала подложка. */
+  cell: GrDashboardCell
+  breakpoint: GrDashboardBreakpoint
+  options: GrDashboardMoveOptions
 }
 
 /** Геометрия виджета, который сейчас несут: выставляется один раз на старте жеста. */
@@ -68,6 +92,20 @@ export interface GrDashboardContext {
   onHandleKeydown: (id: string, event: KeyboardEvent) => void
   onResizeKeydown: (id: string, event: KeyboardEvent) => void
   onHandleFocus: (id: string) => void
+
+  /** Виджет попросил открыть свои настройки. Сетка только пересылает это наружу. */
+  requestSettings: (id: string) => void
+  /** Разрешено ли растягивать этот виджет: правило сетки, сужённое виджетом, плюс `static`. */
+  canResize: (id: string) => boolean
+  /**
+   * Программное изменение размера — единственный путь мимо жеста и клавиатуры.
+   *
+   * Возвращает, изменилась ли раскладка. Отказ (`static`, `preventCollision`,
+   * соседняя статика) обязан быть виден вызывающему: `resizeItem` в этом случае
+   * молча отдаёт исходную раскладку, и тот, кто показал форму, должен уметь
+   * сказать «не поместилось» вместо того, чтобы закрыться над несделанным.
+   */
+  resizeItemTo: (id: string, span: GrDashboardSpan) => boolean
 
   tabindexFor: (id: string) => 0 | -1
   dragLabelFor: (id: string) => string

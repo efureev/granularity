@@ -12,6 +12,7 @@
     "cancelled": "Move cancelled",
     "resized": "{title}, {w} by {h}",
     "added": "{title} added",
+    "settings": "Settings for {title}",
     "untitled": "Widget"
   },
   "palette": {
@@ -20,6 +21,14 @@
     "addShort": "Add",
     "added": "Added",
     "empty": "No widgets available"
+  },
+  "settings": {
+    "title": "Widget settings",
+    "width": "Width, columns",
+    "height": "Height, rows",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "noRoom": "There is no room for this size on the grid"
   },
   "toolbar": {
     "label": "Dashboard controls",

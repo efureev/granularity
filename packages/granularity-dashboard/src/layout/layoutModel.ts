@@ -42,10 +42,14 @@ export type GrDashboardCols = Record<GrDashboardBreakpoint, number>
 /**
  * Как раскладка ведёт себя после переноса.
  *
- * `vertical` — виджеты падают вверх, дыр не остаётся; `none` — виджет остаётся
+ * `vertical` — виджеты падают вверх; `horizontal` — придвигаются влево, не меняя
+ * строки; `both` — и то, и другое до неподвижной точки; `none` — виджет остаётся
  * ровно там, куда его положили.
+ *
+ * Оси не симметричны: вверх и влево тянут одинаково, а вот разводить пересечения
+ * можно только вниз — вправо мешает `x + w <= cols`.
  */
-export type GrDashboardCompaction = 'vertical' | 'none'
+export type GrDashboardCompaction = 'vertical' | 'horizontal' | 'both' | 'none'
 
 export const GR_DASHBOARD_BREAKPOINTS: GrDashboardBreakpoints = { lg: 1200, md: 996, sm: 768, xs: 480 }
 

@@ -7,18 +7,24 @@ import { useGrComponentProp } from '@feugene/granularity/composables/useGrCompon
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { useRovingFocus } from '@feugene/granularity/composables/useRovingFocus'
 
+import type { GrDashboardTransfer, GrDashboardTransferPoint } from '../../composables/useDashboardTransfer'
+import { useDashboardTransfer } from '../../composables/useDashboardTransfer'
 import type {
   GrDashboardBreakpoint,
   GrDashboardBreakpoints,
+  GrDashboardCell,
   GrDashboardCols,
   GrDashboardCompaction,
   GrDashboardItemLayout,
   GrDashboardLayout,
   GrDashboardMetrics,
   GrDashboardResponsiveLayout,
+  GrDashboardSpan,
 } from '../../layout'
 import {
+  addItem,
   cellFromDelta,
+  cellFromPoint,
   clampItem,
   colsFor,
   GR_DASHBOARD_BREAKPOINTS,
@@ -34,7 +40,12 @@ import {
 } from '../../layout'
 import DashboardPlaceholder from '../GrDashboardFrame/shared/DashboardPlaceholder.vue'
 import { animatedClass, emptyTextClass, emptyWrapClass, gridClass } from '../GrDashboardFrame/frameStyles'
-import type { GrDashboardActiveGeometry, GrDashboardContext, GrDashboardItemBounds } from './context'
+import type {
+  GrDashboardActiveGeometry,
+  GrDashboardContext,
+  GrDashboardDropEvent,
+  GrDashboardItemBounds,
+} from './context'
 import { GR_DASHBOARD_KEY } from './context'
 import type { GrDashboardMode } from './grDashboardStyles'
 import { gridStyle } from './grDashboardStyles'
@@ -67,6 +78,13 @@ export interface GrDashboardProps {
   preventCollision?: boolean
   /** Содержимое виджета монтируется по попаданию в окно. */
   lazy?: boolean
+  /**
+   * Сетка принимает виджеты, перетаскиваемые из каталога.
+   *
+   * Работает только в `mode="edit"`. Проп нужен там, где сеток на странице
+   * несколько, а принимать должна одна.
+   */
+  droppable?: boolean
   ariaLabel?: string
 }
 
@@ -76,6 +94,16 @@ export interface GrDashboardEmits {
   (e: 'itemMove', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
   (e: 'itemResize', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
   (e: 'breakpointChange', breakpoint: GrDashboardBreakpoint, cols: number): void
+  /** Виджет попросил открыть свои настройки: нажата встроенная кнопка-шестерёнка. */
+  (e: 'itemSettings', id: string): void
+  /**
+   * В сетку бросили виджет из каталога.
+   *
+   * Сетка сообщает **что и куда**, а кладёт приложение — тем же `addItem`, что
+   * и по кнопке каталога. Иначе в раскладке появился бы виджет, для которого
+   * приложение не рисовало разметки.
+   */
+  (e: 'itemDrop', event: GrDashboardDropEvent): void
 }
 
 const props = withDefaults(defineProps<GrDashboardProps>(), {
@@ -91,6 +119,7 @@ const props = withDefaults(defineProps<GrDashboardProps>(), {
   compact: undefined,
   preventCollision: undefined,
   lazy: undefined,
+  droppable: undefined,
 })
 
 const emit = defineEmits<GrDashboardEmits>()
@@ -111,6 +140,7 @@ const resizable = useGrComponentProp('GrDashboard', 'resizable', () => props.res
 const compaction = useGrComponentProp('GrDashboard', 'compact', () => props.compact, 'vertical')
 const preventCollision = useGrComponentProp('GrDashboard', 'preventCollision', () => props.preventCollision, false)
 const lazy = useGrComponentProp('GrDashboard', 'lazy', () => props.lazy, false)
+const droppable = useGrComponentProp('GrDashboard', 'droppable', () => props.droppable, true)
 
 const rootId = useId()
 const rootEl = ref<HTMLElement | null>(null)
@@ -181,7 +211,25 @@ const baseLayout = computed<GrDashboardLayout>(() => declaredLayout.value.map((i
  */
 const preview = shallowRef<GrDashboardLayout | null>(null)
 
-const currentLayout = computed(() => preview.value ?? baseLayout.value)
+/**
+ * Фантом переноса из каталога.
+ *
+ * Пока указатель над сеткой, предпросмотр считается **тем же** `addItem`, что
+ * уедет в `itemDrop`: соседи расступаются по-настоящему, и подложка не врёт.
+ * Наружу фантом при этом не выходит нигде — ни в `order` (а значит, и в
+ * стрелочную навигацию по ручкам), ни в контекст, ни тем более в `commit`,
+ * который незнакомые идентификаторы пропускает насквозь и записал бы его в
+ * модель приложения, а оттуда в хранилище.
+ */
+const GR_TRANSFER_ID = '__gr-dashboard-transfer__'
+
+const transferCell = shallowRef<GrDashboardCell | null>(null)
+
+const currentLayout = computed(() => {
+  const layout = preview.value ?? baseLayout.value
+
+  return transferCell.value === null ? layout : layout.filter(item => item.id !== GR_TRANSFER_ID)
+})
 
 const order = computed(() => currentLayout.value.map(item => item.id))
 
@@ -395,6 +443,82 @@ function finishGesture(commitResult: boolean): void {
   commit(next)
 }
 
+// ————— Приём виджета из каталога.
+
+const transfer = useDashboardTransfer()
+
+function phantomOf(payload: GrDashboardTransfer): GrDashboardItemLayout {
+  return {
+    id: GR_TRANSFER_ID,
+    x: 0,
+    y: 0,
+    w: payload.size.w,
+    h: payload.size.h,
+    minW: payload.minW,
+    minH: payload.minH,
+    maxW: payload.maxW,
+    maxH: payload.maxH,
+  }
+}
+
+/**
+ * Метрика читается **раз в кадр**, а не один раз на жест.
+ *
+ * У своего переноса между нажатием и отпусканием проходят доли секунды; здесь
+ * между нажатием в каталоге и броском — секунды, за которые страница успевает
+ * прокрутиться колесом.
+ */
+function transferOver(payload: GrDashboardTransfer, at: GrDashboardTransferPoint): void {
+  const rect = rootEl.value?.getBoundingClientRect()
+  if (!rect) return
+
+  const snapshot = metricsOf(rect.width, cols.value, rowHeight.value, gap.value)
+  const cell = cellFromPoint(snapshot, at.x - rect.left, at.y - rect.top, payload.size)
+  const previous = transferCell.value
+  if (previous && previous.x === cell.x && previous.y === cell.y) return
+
+  transferCell.value = cell
+  preview.value = addItem(baseLayout.value, phantomOf(payload), moveOptions.value, cell)
+}
+
+function transferLeave(): void {
+  if (transferCell.value === null) return
+
+  transferCell.value = null
+  preview.value = null
+}
+
+function transferDrop(payload: GrDashboardTransfer): void {
+  const cell = transferCell.value
+  if (!cell) return
+
+  emit('itemDrop', {
+    transfer: payload,
+    cell,
+    breakpoint: breakpoint.value,
+    options: moveOptions.value,
+  })
+}
+
+// Регистрация — своим блоком, а не в общем `onMounted`: `enabled` спрашивает
+// состояние собственного жеста, объявленное ниже.
+let unregisterTarget: (() => void) | null = null
+
+onMounted(() => {
+  unregisterTarget = transfer.registerTarget({
+    rect: () => rootEl.value?.getBoundingClientRect() ?? null,
+    enabled: () => mode.value === 'edit' && droppable.value && dragState.value === null,
+    over: transferOver,
+    leave: transferLeave,
+    drop: transferDrop,
+  })
+})
+
+onBeforeUnmount(() => {
+  unregisterTarget?.()
+  unregisterTarget = null
+})
+
 const gesture = useDragGesture({
   disabled: () => mode.value !== 'edit',
   onMove: (event) => {
@@ -408,6 +532,10 @@ const gesture = useDragGesture({
 })
 
 function beginGesture(id: string, kind: 'move' | 'resize', event: PointerEvent): void {
+  // Два жеста разом делили бы один `preview`, и раскладка досталась бы тому,
+  // кто отпустил позже.
+  if (transfer.isTransferring.value) return
+
   const origin = itemFor(id)
   if (!origin || origin.static) return
   if (kind === 'move' && !canMove(id)) return
@@ -512,7 +640,17 @@ function cancelKeyboard(): void {
   keyboardOrigin.value = null
   if (!id || !origin) return
 
-  commit(moveItem(baseLayout.value, id, { x: origin.x, y: origin.y }, moveOptions.value))
+  const from = itemFor(id)
+  const next = moveItem(baseLayout.value, id, { x: origin.x, y: origin.y }, moveOptions.value)
+  commit(next)
+
+  // Возврат — такой же перенос, как и стрелки до него: каждая из них уже
+  // сообщила о переезде, и без этого эмита цепочка событий оборвалась бы не
+  // там, где виджет стоит на самом деле.
+  const restored = next.find(entry => entry.id === id)
+  if (from && restored && (restored.x !== from.x || restored.y !== from.y))
+    emit('itemMove', id, from, restored)
+
   announce(t('grDashboard.item.cancelled', 'Move cancelled'))
 }
 
@@ -527,7 +665,13 @@ function moveGrabbedBy(dx: number, dy: number): void {
   commit(next)
 
   const moved = next.find(entry => entry.id === id)
-  if (moved) announcePosition('grDashboard.item.moved', 'Column {col}, row {row}', moved)
+  if (!moved) return
+
+  // Клавиатура эмитит `itemMove` наравне с указателем: приложение, слушающее
+  // событие, иначе видело бы только половину переносов.
+  if (moved.x !== item.x || moved.y !== item.y) emit('itemMove', id, item, moved)
+
+  announcePosition('grDashboard.item.moved', 'Column {col}, row {row}', moved)
 }
 
 const ARROW_DELTA: Record<string, [number, number]> = {
@@ -591,11 +735,31 @@ function onResizeKeydown(id: string, event: KeyboardEvent): void {
   }
 
   event.preventDefault()
-  const next = resizeItem(baseLayout.value, id, { w, h }, moveOptions.value)
-  commit(next)
+  applyResize(id, { w, h })
+}
 
-  const resized = next.find(entry => entry.id === id)
-  if (resized) announcePosition('grDashboard.item.resized', '{title}, {w} by {h}', resized)
+/**
+ * Растягивание в обход жеста: клавиатура и программный вызов из контекста.
+ *
+ * `false` означает «не поместилось». Отличить это от «получилось» можно только
+ * здесь: `resizeItem` при отказе молча отдаёт исходную раскладку, и вызывающий,
+ * показавший форму, принял бы отказ за успех.
+ */
+function applyResize(id: string, span: GrDashboardSpan): boolean {
+  if (mode.value !== 'edit' || !canResizeItem(id)) return false
+
+  const from = itemFor(id)
+  if (!from) return false
+
+  const next = resizeItem(baseLayout.value, id, span, moveOptions.value)
+  const to = next.find(entry => entry.id === id)
+  if (!to || (to.w === from.w && to.h === from.h)) return false
+
+  emit('itemResize', id, from, to)
+  commit(next)
+  announcePosition('grDashboard.item.resized', '{title}, {w} by {h}', to)
+
+  return true
 }
 
 /** Взятое не может остаться взятым навсегда: фокус ушёл — перенос отменён. */
@@ -650,6 +814,9 @@ const context: GrDashboardContext = {
   onHandleKeydown,
   onResizeKeydown,
   onHandleFocus: id => roving.setActive(id),
+  requestSettings: id => emit('itemSettings', id),
+  canResize: canResizeItem,
+  resizeItemTo: applyResize,
   tabindexFor: id => roving.tabindexFor(id),
   dragLabelFor: id => t('grDashboard.item.dragHandle', 'Move {title}', { title: titleOf(id) }),
   resizeLabelFor: (id) => {
@@ -669,8 +836,9 @@ defineExpose({ breakpoint, cols })
 
 const placeholderCell = computed(() => {
   const state = dragState.value
+  if (state) return preview.value?.find(item => item.id === state.id) ?? null
 
-  return state ? (preview.value?.find(item => item.id === state.id) ?? null) : null
+  return transferCell.value === null ? null : (preview.value?.find(item => item.id === GR_TRANSFER_ID) ?? null)
 })
 
 const rootClass = computed(() => [gridClass, dragState.value ? '' : animatedClass])
@@ -693,7 +861,7 @@ const label = computed(() => props.ariaLabel ?? t('grDashboard.dashboard.label',
   >
     <DashboardPlaceholder :cell="placeholderCell" />
     <slot />
-    <div v-if="order.length === 0" :class="emptyWrapClass">
+    <div v-if="order.length === 0 && transferCell === null" :class="emptyWrapClass">
       <slot name="empty">
         <p :class="emptyTextClass">
           {{ t('grDashboard.dashboard.empty', 'No widgets yet') }}

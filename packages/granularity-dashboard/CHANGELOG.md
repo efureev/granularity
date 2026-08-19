@@ -7,6 +7,71 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.3.0] 2026-08-19
+
+### Added
+
+- **Horizontal compaction.** `compact` now takes `'horizontal'` and `'both'` alongside
+  `'vertical'` and `'none'`. `'horizontal'` slides widgets to the left edge and leaves their rows
+  alone; `'both'` runs the two passes until neither moves anything. The iteration is not
+  ceremony: a widget that slides left frees the cell above its neighbour, so a single
+  up-then-left pass is not idempotent, and `compact(compact(l)) === compact(l)` is an invariant
+  of this package. Overlapping input is still separated **downwards** in every mode — rows are
+  unbounded, while `x + w <= cols` means a rightward push is not always resolvable. The mode
+  travels through `moveItem`, `resizeItem`, `addItem`, `removeItem`, `deriveLayout` and
+  `layoutFor` exactly as before: no signature changed.
+
+- **`GrDashboardItemSettings`** — a dialog for one widget's settings, built on the core
+  `GrDialog`. Its own content is the widget size in cells; everything the application owns
+  arrives through the default slot. The size fields are bounded by what the grid will actually
+  accept — `min(maxW, cols - x)`, not `cols`, because a widget grows rightwards and stops at the
+  edge — and the change is committed through the grid, so compaction, `preventCollision` and
+  `static` all still apply. A refusal keeps the dialog open with a message instead of closing
+  over a change that never happened.
+- **`GrDashboardItem` gained `showSettings` and a `settings` emit**; `GrDashboard` re-emits it as
+  `itemSettings(id)`. The gear button lands where `#editActions` lands — the header when there is
+  one, the overlay panel otherwise — and, unlike `#actions`, does not bring a header into
+  existence. It exists only in `mode="edit"`.
+- **Widgets can be dragged from the catalog into the grid.** `GrDashboardPalette` gained
+  `draggable` (on by default), a `#ghost` slot and slot props on `#item`; `GrDashboard` gained
+  `droppable` and an `itemDrop` event. The button stays exactly where it was and remains the
+  keyboard path — dragging is an addition on top of a working route, not a replacement for it,
+  because a catalog you can only drag from is a catalog you cannot use from a keyboard.
+  The drop reports where it landed and the application places the widget, same as with the
+  button: a grid that wrote the layout itself would produce a widget the application never
+  rendered markup for. `breakpoint` and the grid's own `options` ride along in the event so that
+  `addItem` reproduces exactly the cell the placeholder showed.
+  Dragging by touch is deliberately not supported: it would need `touch-action: none` on a tile
+  inside a list that has to scroll on a phone, and the button already does the job there.
+- **`useDashboardTransfer`** — the model behind it, on a new subpath. The catalog sits outside
+  `<GrDashboard>` and cannot sit inside (the grid root is a CSS Grid; any direct child becomes a
+  cell), so the channel is module-level state next to the component tree rather than
+  provide/inject. Nothing is ever written to it on the server: targets register from `onMounted`,
+  a session starts from `pointerdown`.
+- **`cellFromPoint`** in the `./layout` subpath: which cell a point falls into, treating the point
+  as the centre of the incoming widget — the ghost hangs under the cursor, and the place has to
+  land under it.
+- `GrDashboardContext` gained `requestSettings`, `canResize` and `resizeItemTo`. The last is the
+  only programmatic resize path and returns whether the layout actually changed: `resizeItem`
+  refuses silently by handing back the original layout, and a caller that showed a form would
+  otherwise read the refusal as success.
+
+### Changed
+
+- **In `'horizontal'` and `'both'` a widget cannot be parked in empty space to the right** — it
+  slides back to the left edge. This mirrors the existing "you cannot drop a widget into empty
+  space below"; `compact: 'none'` is still the free grid.
+- `docs/model.md` no longer states that horizontal holes are deliberate. That paragraph described
+  the absence of this feature, not a decision about it.
+
+### Fixed
+
+- **Moving and resizing from the keyboard did not emit `itemMove` / `itemResize`.** Both paths
+  committed the layout and announced the result but stayed silent on the dedicated events, so an
+  application listening to them saw pointer gestures only. Cancelling a keyboard move now emits
+  the return trip too: every arrow press before it already reported a move, and without this the
+  event trail ended somewhere the widget no longer is.
+
 ## [v0.2.2] 2026-08-19
 
 ### Changed
@@ -104,5 +169,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Theme tokens** — `--gr-dashboard-*` and `--gr-dashboard-frame-*`, all resolving to core roles
   rather than to values.
 
-[Unreleased]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.1.0...HEAD
+[Unreleased]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.3.0...HEAD
+[v0.3.0]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.2.2...granularity-dashboard-v0.3.0
+[v0.2.2]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.2.1...granularity-dashboard-v0.2.2
+[v0.2.1]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.2.0...granularity-dashboard-v0.2.1
+[v0.2.0]: https://github.com/efureev/granularity/compare/granularity-dashboard-v0.1.0...granularity-dashboard-v0.2.0
 [0.1.0]: https://github.com/efureev/granularity/releases/tag/granularity-dashboard-v0.1.0

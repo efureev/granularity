@@ -43,6 +43,18 @@ export const rowClass = [
  */
 export const rowDisabledClass = 'bg-[var(--gr-muted)] hover:bg-[var(--gr-muted)]'
 
+/**
+ * Плитку можно тащить. Курсор — единственное, что об этом сообщает заранее:
+ * ручки у плитки нет, тащится она целиком.
+ */
+export const rowDraggableClass = 'cursor-grab select-none'
+
+/**
+ * Источник переноса гасится фоном, а не прозрачностью: `opacity` разбавляет
+ * выверенные на AA цвета текста.
+ */
+export const rowTransferringClass = 'bg-[var(--gr-muted)]'
+
 export const textClass = 'flex-1 min-w-0'
 
 export const headingClass = 'flex items-center gap-2 min-w-0'

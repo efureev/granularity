@@ -19,6 +19,7 @@ export interface GrDashboardConfigurableProps {
   compact: GrDashboardCompaction
   preventCollision: boolean
   lazy: boolean
+  droppable: boolean
 }
 
 declare module '@feugene/granularity/composables/useGrComponentConfig' {

@@ -12,6 +12,7 @@ export const GRANULARITY_DASHBOARD_COMPONENTS = [
   // <granularity:components> — блок генерируется `yarn generate:registry`
   'GrDashboard',
   'GrDashboardItem',
+  'GrDashboardItemSettings',
   'GrDashboardPalette',
   'GrDashboardToolbar',
   // </granularity:components>
