@@ -250,21 +250,37 @@ test.describe('быстрый поиск витрины', () => {
  */
 
 /**
- * Индекс поля с крестиком берётся один раз и дальше используется позиционно.
+ * Поле с крестиком помечается атрибутом и дальше адресуется по нему.
  *
- * Фильтр «то поле, у которого есть кнопка очистки» пересчитывается на каждом
- * обращении и перестаёт находить поле ровно тогда, когда кнопка исчезает, —
- * то есть сразу после очистки, а проверять надо именно состояние после неё.
+ * Двух наивных способов тут не хватает, и оба уже кусали. Фильтр «то поле, у
+ * которого есть кнопка очистки» пересчитывается на каждом обращении и перестаёт
+ * находить поле ровно тогда, когда кнопка исчезает, — то есть сразу после
+ * очистки, а проверять надо именно состояние после неё. Индекс, снятый один раз,
+ * от этого спасает, но `nth(i)` **переразрешается** на каждом обращении: демо
+ * витрины домонтируются и после `#live-examples`, и стоит появиться ещё одному
+ * полю выше — тот же индекс указывает уже на соседа. Тест при этом фокусировал
+ * одно поле, а крестик ждал у другого, и падал в параллельном прогоне, где
+ * страница успевает меньше.
+ *
+ * Метка снимает оба: она едет с самим узлом и переживает исчезновение кнопки.
  */
 async function fieldWith(page: import('@playwright/test').Page, root: string, child: string) {
-  const index = await page.locator(root).evaluateAll(
-    (nodes, selector) => nodes.findIndex(node => node.querySelector(selector)),
+  // Демо приезжают лениво; без этого индекс считался бы по недособранной странице.
+  await page.waitForLoadState('networkidle')
+
+  const marked = await page.locator(root).evaluateAll(
+    (nodes, selector) => {
+      const found = nodes.find(node => node.querySelector(selector))
+      found?.setAttribute('data-e2e-field', '')
+
+      return Boolean(found)
+    },
     child,
   )
 
-  expect(index, `на странице нет «${root}» с «${child}»`).toBeGreaterThanOrEqual(0)
+  expect(marked, `на странице нет «${root}» с «${child}»`).toBe(true)
 
-  return page.locator(root).nth(index)
+  return page.locator(`${root}[data-e2e-field]`)
 }
 
 test.describe('GrInput: trailing-кнопки', () => {
@@ -282,6 +298,11 @@ test.describe('GrInput: trailing-кнопки', () => {
     await input.click()
     const before = await input.inputValue()
     expect(before, 'демо должно приехать с текстом — иначе очищать нечего').not.toBe('')
+
+    // Фокус в поле — утверждением, а не предположением: домонтировавшееся демо
+    // перерисовывает поддерево и роняет фокус в `body`, и тогда следующий Tab
+    // уводит куда угодно. Без этой строки провал списался бы на таб-порядок.
+    await expect(input, `клик не поставил фокус в поле, он на ${await focusedDescription(page)}`).toBeFocused()
 
     // Ровно один Tab: кнопка обязана стоять сразу за полем **этого** поля, а не
     // просто где-то дальше по странице.
@@ -328,6 +349,7 @@ test.describe('GrTextarea: кнопка очистки', () => {
 
     await textarea.click()
     expect(await textarea.inputValue()).not.toBe('')
+    await expect(textarea, `клик не поставил фокус в поле, он на ${await focusedDescription(page)}`).toBeFocused()
 
     await page.keyboard.press('Tab')
     await expect(clear, `после поля фокус ушёл на ${await focusedDescription(page)}`).toBeFocused()
@@ -375,10 +397,26 @@ test.describe('GrTable: прокручиваемая область', () => {
     await scroller.focus()
     await expect(scroller).toBeFocused()
 
-    const before = await scroller.evaluate(node => node.scrollTop)
-    await page.keyboard.press('PageDown')
+    // Переполнение — предусловие, а не следствие: `PageDown` по области, которая
+    // ещё не переросла свою высоту, не двигает ничего. Под нагрузкой раскладка
+    // доезжает позже самой таблицы, поэтому ждём именно её.
     await expect
-      .poll(async () => scroller.evaluate(node => node.scrollTop), { message: 'область не прокрутилась с клавиатуры' })
+      .poll(async () => scroller.evaluate(node => node.scrollHeight - node.clientHeight))
+      .toBeGreaterThan(0)
+
+    const before = await scroller.evaluate(node => node.scrollTop)
+
+    // Фокус и нажатие — внутри опроса, а не до него. Домонтировавшееся демо
+    // перерисовывает поддерево и роняет фокус в `body`; единственный `PageDown`
+    // в этот момент прокручивает страницу, а не область, и повторить его
+    // ожиданию уже нечем — оно только перечитывает `scrollTop`.
+    await expect
+      .poll(async () => {
+        await scroller.focus()
+        await page.keyboard.press('PageDown')
+
+        return scroller.evaluate(node => node.scrollTop)
+      }, { message: 'область не прокрутилась с клавиатуры' })
       .toBeGreaterThan(before)
   })
 })
