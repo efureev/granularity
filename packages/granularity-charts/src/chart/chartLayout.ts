@@ -99,8 +99,31 @@ export interface LabelGuttersInput {
 export interface LabelGutters {
   left: number
   bottom: number
+  /** Ширина, отведённая под текст подписи, — без зазора до марок. */
+  labelWidth: number
   /** Подпись не влезла в потолок: рисующий обязан дать ей `<title>`. */
   truncated: boolean
+}
+
+/**
+ * Подпись, укороченная до отведённой ширины.
+ *
+ * SVG не знает `text-overflow`: текст, которому не хватило места, просто уезжает
+ * за холст и обрезается его краем — читатель видит хвост слова без всякого
+ * признака, что начало отрезано. Многоточие этот признак возвращает, а полный
+ * текст рисующий кладёт в `<title>`.
+ */
+export function fitLabel(label: string, fontSizePx: number, maxWidth: number): string {
+  if (maxWidth <= 0 || estimateTextWidth(label, fontSizePx) <= maxWidth)
+    return label
+
+  const ellipsisWidth = estimateTextWidth('…', fontSizePx)
+  let cut = label.length
+
+  while (cut > 0 && estimateTextWidth(label.slice(0, cut), fontSizePx) + ellipsisWidth > maxWidth)
+    cut -= 1
+
+  return cut > 0 ? `${label.slice(0, cut).trimEnd()}…` : '…'
 }
 
 /**
@@ -122,6 +145,7 @@ export function labelGutters(input: LabelGuttersInput): LabelGutters {
   return {
     left: widest > 0 ? capped + TICK_GAP : 0,
     bottom: (input.bottomLabels?.length ?? 0) > 0 ? input.fontSizePx * LINE_HEIGHT_RATIO + TICK_GAP : 0,
+    labelWidth: widest > 0 ? capped : 0,
     truncated: widest > capped,
   }
 }

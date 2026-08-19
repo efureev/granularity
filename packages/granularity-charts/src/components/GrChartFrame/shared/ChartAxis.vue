@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import type { Rect } from '../../../chart/chartLayout'
+import { fitLabel } from '../../../chart/chartLayout'
 import type { ChartTick } from '../../../composables/useChartTicks'
 import { axisStroke, frameLabelClass, labelFill } from '../chartFrameStyles'
 
@@ -19,6 +20,12 @@ const props = defineProps<{
   /** Класс кегля: он парный к `fontSizePx`, иначе раскладка и рисунок разойдутся. */
   sizeClass: string
   truncated: boolean
+  /**
+   * Потолок ширины подписи. Задают те, кто сам зарезервировал под подписи место:
+   * без него длинная подпись уезжает за холст и режется его краем — без
+   * многоточия, то есть без признака, что текст обрезан.
+   */
+  maxLabelWidth?: number
   /** Имя оси. Не `ariaLabel`: одноимённый проп столкнулся бы с fallthrough-атрибутом. */
   label: string
   /** Сторона оси значений. Действует только при `orientation: 'y'`. */
@@ -26,6 +33,10 @@ const props = defineProps<{
 }>()
 
 const TICK_GAP = 6
+
+function displayLabel(label: string): string {
+  return props.maxLabelWidth === undefined ? label : fitLabel(label, props.fontSizePx, props.maxLabelWidth)
+}
 
 /** Правая ось стоит на дальнем краю области, подписи растут от неё вправо. */
 const isRight = computed(() => props.orientation === 'y' && props.side === 'right')
@@ -71,7 +82,7 @@ function labelY(tick: ChartTick): number {
       :text-anchor="orientation === 'y' ? (side === 'right' ? 'start' : 'end') : 'middle'"
       :dominant-baseline="orientation === 'y' ? 'middle' : 'auto'"
     >
-      {{ tick.label }}
+      {{ displayLabel(tick.label) }}
       <title v-if="truncated">
 {{ tick.label }}
 </title>

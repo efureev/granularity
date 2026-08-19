@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
+import { estimateTextWidth } from '../../../chart/chartLayout'
 import GrChartBar from '../GrChartBar.vue'
 
 const categories = ['Q1', 'Q2', 'Q3', 'Q4']
@@ -299,6 +300,43 @@ describe('GrChartBar — горизонталь', () => {
 
     expect(axes.length).toBe(2)
     expect(wrapper.text()).toContain('Q1')
+
+    wrapper.unmount()
+  })
+
+  it('крайняя подпись оси значений влезает в холст целиком', () => {
+    // Подпись центрируется под делением: без резерва последняя вылезла бы
+    // за холст ровно половиной ширины и обрезалась бы его краем.
+    const wrapper = factory({
+      orientation: 'horizontal',
+      yTickFormat: (value: number) => `${value} 000 ₽`,
+    })
+    const svg = wrapper.find('svg').element as SVGSVGElement
+    const width = Number(svg.getAttribute('viewBox')?.split(' ')[2] ?? svg.getAttribute('width'))
+    const last = [...wrapper.findAll('[data-gr-chart-axis="x"] text')].at(-1)!
+    const text = last.element.childNodes[0]!.textContent!.trim()
+    const center = Number(last.attributes('x'))
+
+    expect(center + estimateTextWidth(text, 12) / 2).toBeLessThanOrEqual(width)
+
+    wrapper.unmount()
+  })
+
+  it('длинная подпись категории обрезается многоточием, а полная уходит в title', () => {
+    // SVG не знает `text-overflow`: без обрезки подпись уезжает за холст и
+    // режется его краем — читатель видит хвост слова без признака обрезки.
+    const long = 'Клиентское обслуживание корпоративных клиентов'
+    const wrapper = factory({
+      orientation: 'horizontal',
+      series: [{ id: 'a', label: 'A', x: [long, 'Q2'], y: [10, 20] }],
+    })
+    const label = wrapper.findAll('[data-gr-chart-axis="y"] text').find(node => node.text().includes('Клиентское'))!
+    // Первый узел — сам текст подписи: `text()` склеил бы его с `<title>`.
+    const drawn = label.element.childNodes[0]!.textContent!.trim()
+
+    expect(drawn.endsWith('…')).toBe(true)
+    expect(drawn.length).toBeLessThan(long.length)
+    expect(label.find('title').text()).toBe(long)
 
     wrapper.unmount()
   })

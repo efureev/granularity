@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { chartLayout, estimateTextWidth, labelGutters } from '../chartLayout'
+import { chartLayout, estimateTextWidth, fitLabel, labelGutters } from '../chartLayout'
 
 const base = {
   width: 600,
@@ -98,7 +98,39 @@ describe('estimateTextWidth: разделители разрядов', () => {
   })
 })
 
+describe('fitLabel', () => {
+  it('подпись, влезающая в отведённое место, остаётся целой', () => {
+    expect(fitLabel('Логистика', 12, 200)).toBe('Логистика')
+  })
+
+  it('слишком длинная подпись кончается многоточием и влезает в потолок', () => {
+    const fitted = fitLabel('Клиентское обслуживание', 12, 96)
+
+    expect(fitted.endsWith('…')).toBe(true)
+    expect(estimateTextWidth(fitted, 12)).toBeLessThanOrEqual(96)
+    expect('Клиентское обслуживание'.startsWith(fitted.slice(0, -1))).toBe(true)
+  })
+
+  it('места нет вовсе — остаётся признак обрезки, а не хвост слова', () => {
+    expect(fitLabel('Клиентское обслуживание', 12, 4)).toBe('…')
+  })
+})
+
 describe('labelGutters', () => {
+  it('под текст отводится место без зазора до марок', () => {
+    const gutters = labelGutters({ leftLabels: ['Логистика'], fontSizePx: 12 })
+
+    expect(gutters.labelWidth).toBeGreaterThan(0)
+    expect(gutters.labelWidth).toBeLessThan(gutters.left)
+  })
+
+  it('подпись шире потолка ужимается до него, и это помечено', () => {
+    const gutters = labelGutters({ leftLabels: ['Клиентское обслуживание отделения'], fontSizePx: 12 })
+
+    expect(gutters.truncated).toBe(true)
+    expect(fitLabel('Клиентское обслуживание отделения', 12, gutters.labelWidth).endsWith('…')).toBe(true)
+  })
+
   it('слева резервируется самая широкая подпись плюс зазор', () => {
     const narrow = labelGutters({ leftLabels: ['I'], fontSizePx: 12 })
     const wide = labelGutters({ leftLabels: ['I', 'Ноябрь 2026'], fontSizePx: 12 })
@@ -107,7 +139,7 @@ describe('labelGutters', () => {
   })
 
   it('без подписей гуттера нет — это не то же самое, что подпись нулевой ширины', () => {
-    expect(labelGutters({ fontSizePx: 12 })).toEqual({ left: 0, bottom: 0, truncated: false })
+    expect(labelGutters({ fontSizePx: 12 })).toEqual({ left: 0, bottom: 0, labelWidth: 0, truncated: false })
   })
 
   it('снизу резервируется строка текста, а её содержимое ширину не меняет', () => {

@@ -221,7 +221,7 @@ const gutters = computed(() => (isHorizontal.value
       bottomLabels: ['0'],
       fontSizePx: labelFontPx[resolvedSize.value],
     })
-  : { left: 0, bottom: 0, truncated: false }))
+  : { left: 0, bottom: 0, labelWidth: 0, truncated: false }))
 
 /** `showGrid` называет оси по данным; при горизонтали стороны меняются местами. */
 const horizontalGrid = computed<'both' | 'x' | 'y' | 'none'>(() => {
@@ -563,6 +563,7 @@ defineExpose({
             :font-size-px="labelFontPx[resolvedSize]"
             :size-class="labelSizeClass[resolvedSize]"
             :truncated="gutters.truncated"
+            :max-label-width="gutters.labelWidth"
             :label="t('grCharts.chart.axisY', 'Y axis')"
           />
           <ChartAxis

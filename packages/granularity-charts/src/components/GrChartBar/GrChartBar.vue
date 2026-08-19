@@ -9,7 +9,7 @@ import { orientedGrid, orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
-import { labelGutters } from '../../chart/chartLayout'
+import { estimateTextWidth, labelGutters } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
 import type { GrChartReference, NormalizedReference } from '../../chart/chartReference'
@@ -277,7 +277,7 @@ const gutters = computed(() => (isHorizontal.value
       bottomLabels: ['0'],
       fontSizePx: labelFontPx[resolvedSize.value],
     })
-  : { left: 0, bottom: 0, truncated: false }))
+  : { left: 0, bottom: 0, labelWidth: 0, truncated: false }))
 
 interface BarGeometry {
   /** Шкала значений: у вертикали это ось рамы, у горизонтали — своя. */
@@ -295,6 +295,26 @@ interface BarGeometry {
  * Домен значений при горизонтали берётся у шкалы рамы: он уже расширен до
  * «красивых» границ, и посчитанный заново разошёлся бы с ней на округлении.
  */
+/**
+ * Половина крайней подписи оси значений.
+ *
+ * Подпись центрируется под своим делением, и последняя ровно половиной ширины
+ * вылезла бы за холст. Рама это место резервирует сама, но при горизонтали она
+ * идёт с `axes: false` — считаем здесь. Деления зависят только от домена, так
+ * что круга «область → деления → область» не возникает.
+ */
+function valueLabelOverhang(domain: readonly [number, number]): number {
+  const values = linearTicks(domain, props.yTickCount).values
+  const last = values.at(-1)
+
+  if (last === undefined)
+    return 0
+
+  const label = yTickFormat.value ? String(yTickFormat.value(last)) : String(last)
+
+  return estimateTextWidth(label, labelFontPx[resolvedSize.value]) / 2
+}
+
 function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): BarGeometry {
   if (!isHorizontal.value)
     return { value: yScale, category: xScale, area: plot }
@@ -302,7 +322,7 @@ function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): Bar
   const area = {
     x: plot.x + gutters.value.left,
     y: plot.y,
-    width: Math.max(0, plot.width - gutters.value.left),
+    width: Math.max(0, plot.width - gutters.value.left - valueLabelOverhang(yScale.domain)),
     height: Math.max(0, plot.height - gutters.value.bottom),
   }
 
@@ -637,6 +657,7 @@ defineExpose({
           :font-size-px="labelFontPx[resolvedSize]"
           :size-class="labelSizeClass[resolvedSize]"
           :truncated="gutters.truncated"
+          :max-label-width="gutters.labelWidth"
           :label="t('grCharts.chart.axisY', 'Y axis')"
         />
         <ChartAxis

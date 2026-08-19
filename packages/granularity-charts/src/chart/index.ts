@@ -129,7 +129,7 @@ export type { PieSlice, Point } from './chartArc'
 export { angleOfPoint, arcCentroid, arcPath, pieSlices, polarPoint, sliceAtPoint } from './chartArc'
 
 export type { ChartLayout, ChartLayoutInput, LabelGutters, LabelGuttersInput, Rect } from './chartLayout'
-export { chartLayout, estimateTextWidth, labelGutters } from './chartLayout'
+export { chartLayout, estimateTextWidth, fitLabel, labelGutters } from './chartLayout'
 
 export type { ChartTableColumn, ChartTableModel, ChartTableOptions, ChartTableRow } from './chartTable'
 export { chartTableModel } from './chartTable'
