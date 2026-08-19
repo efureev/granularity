@@ -104,7 +104,7 @@ jobs:
   # Зеркало в GitHub Packages под scope владельца репозитория.
   publish-gpr-granularity-test-kit:
     needs:
-      - publish-npm-granularity-test-kit
+      - build-granularity-test-kit
     if: startsWith(github.ref, 'refs/tags/granularity-test-kit-v')
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -715,9 +715,17 @@ jobs:
   # Отдельный job, чтобы сбой GPR не откатывал/не блокировал публикацию в npm.
   # Имя пакета в GPR отличается (`@efureev/granularity`), поэтому меняем его
   # на копии через `npm pkg set` (без `sed` по исходному package.json).
+  #
+  # Предусловия те же, что у публикации в npm, но самой npm-джобы среди них
+  # нет. У GPR свой реестр и свой токен, так что зеркалу от неё нужен только
+  # порядок «сначала npm» — а платой за него было бы пропущенное зеркало
+  # каждый раз, когда `npm publish` возвращает ненулевой код уже после того,
+  # как пакет с провенансом загрузился в реестр.
   publish-gpr:
     needs:
-      - publish-npm
+      - quality-granularity
+      - test-granularity
+      - build-granularity
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -844,7 +852,7 @@ jobs:
   # (`@efureev/unplugin-granularity`). Аналогично publish-gpr для granularity.
   publish-gpr-unplugin-granularity:
     needs:
-      - publish-npm-unplugin-granularity
+      - build-unplugin-granularity
     if: startsWith(github.ref, 'refs/tags/unplugin-granularity-v')
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -1002,7 +1010,7 @@ jobs:
   # (`@efureev/granularity-chrono`). Аналогично publish-gpr для granularity.
   publish-gpr-granularity-chrono:
     needs:
-      - publish-npm-granularity-chrono
+      - build-granularity-chrono
     if: startsWith(github.ref, 'refs/tags/granularity-chrono-v')
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -1155,7 +1163,7 @@ jobs:
   # (`@efureev/granularity-charts`). Аналогично publish-gpr для granularity.
   publish-gpr-granularity-charts:
     needs:
-      - publish-npm-granularity-charts
+      - build-granularity-charts
     if: startsWith(github.ref, 'refs/tags/granularity-charts-v')
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -1309,7 +1317,8 @@ jobs:
   # (`@efureev/granularity-dashboard`). Аналогично publish-gpr для granularity.
   publish-gpr-granularity-dashboard:
     needs:
-      - publish-npm-granularity-dashboard
+      - build-granularity-dashboard
+      - build-granularity-forms-schema
     if: startsWith(github.ref, 'refs/tags/granularity-dashboard-v')
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -1472,7 +1481,7 @@ jobs:
   # (`@efureev/granularity-forms-schema`). Аналогично publish-gpr для granularity.
   publish-gpr-granularity-forms-schema:
     needs:
-      - publish-npm-granularity-forms-schema
+      - build-granularity-forms-schema
     if: startsWith(github.ref, 'refs/tags/granularity-forms-schema-v')
     runs-on: ubuntu-latest
     continue-on-error: true
