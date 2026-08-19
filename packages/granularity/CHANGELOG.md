@@ -7,6 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`GrSwitch` and `GrInput` no longer require `modelValue`.** Both declared it as a
+  required prop, so neither control could be used without `v-model` — even where the
+  switch is presentational or the field is read-only. `GrCheckbox` already had it
+  optional. The default is `false` and `''` respectively; the input reads the value's
+  length directly, and `undefined` there would break the render.
+
+### Fixed
+
+- **A failed validation no longer crashes a jsdom test run.** `GrForm` called
+  `scrollIntoView` unconditionally when scrolling to the first invalid field, and jsdom
+  does not implement it — the call surfaced as an unhandled rejection, so a consumer's
+  suite reported every test as passing and still exited non-zero.
+- **`GrRadioGroupOrientation` is exported.** The `orientation` prop was public while its
+  type was not, so it could not be named in consumer code.
+
 ## [v0.27.0] 2026-08-19
 
 ### Changed

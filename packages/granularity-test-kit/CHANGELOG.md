@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `defineEmitNamingGate` and `defineLocaleCompletenessGate` — both were copied per
+  package rather than shared: the emit-naming files of two packages were byte-for-byte
+  identical, the locale ones differed by a single regex prefix, and one package had no
+  emit gate at all. `REQUIRED_GATES` grows from five to seven, so a package can no
+  longer ship without them.
+- `defineComponentDefaultsGate` gained a rule that every configurable prop is declared
+  `undefined` in `withDefaults`. Without it the provider is silently ignored: Vue
+  substitutes the declared default before the component reads the config, and from the
+  inside "the user passed a value" is indistinguishable from "the default fired".
+
 ## [v0.2.0] 2026-08-19
 
 ### Added

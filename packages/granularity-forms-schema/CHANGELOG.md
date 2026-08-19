@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrConfigProvider` now actually configures `GrSchemaForm`.** All four declared keys
+  — `columns`, `labelPosition`, `labelWidth`, `headingLevel` — were registered as
+  configurable and never read: the package contained no call to `useGrComponentProp` at
+  all. `headingLevel` would not have worked even then, because it carried a default of
+  `3` in `withDefaults`, which Vue substitutes before the component can consult the
+  provider. Resolution order is now the usual one: prop → `uiSchema` → provider →
+  built-in default.
+
 ## [v0.1.1] 2026-08-19
 
 ### Changed
