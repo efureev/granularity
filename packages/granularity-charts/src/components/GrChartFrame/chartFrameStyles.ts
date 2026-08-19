@@ -109,6 +109,9 @@ export const gridStrokeWidth = 'var(--gr-chart-frame-grid-width,1px)'
 export const axisStroke = 'var(--gr-chart-frame-axis,var(--gr-brd))'
 export const labelFill = 'var(--gr-chart-frame-label,var(--gr-muted-fg))'
 export const crosshairStroke = 'var(--gr-chart-frame-crosshair,var(--gr-brd))'
+export const brushFill = 'var(--gr-chart-frame-brush-fill,var(--gr-primary))'
+export const brushStroke = 'var(--gr-chart-frame-brush-stroke,var(--gr-primary))'
+export const brushFillOpacity = 'var(--gr-chart-frame-brush-fill-opacity,0.12)'
 
 /**
  * Опора красится приглушённой ролью, а не цветом серии.

@@ -15,6 +15,10 @@
     "axisLeft": "левая ось",
     "axisRight": "правая ось"
   },
+  "zoom": {
+    "window": "Показано с {from} по {to}, точек: {points}",
+    "reset": "Весь ряд"
+  },
   "funnel": {
     "roleDescription": "воронка",
     "summary": "Воронка, ступеней {stages}",

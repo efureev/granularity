@@ -16,7 +16,7 @@ export type {
   NormalizeOptions,
   PadDomainOptions,
 } from './chartModel'
-export { extentOf, inferScaleKind, normalizeChartData, padDomain, resolveScaleKind } from './chartModel'
+export { extentOf, inferScaleKind, normalizeChartData, padDomain, resolveScaleKind, resolveXWindow } from './chartModel'
 
 export type {
   GrChartReference,
@@ -34,10 +34,12 @@ export {
 } from './chartReference'
 
 export type { BandScaleOptions, GrChartScale, GrChartScaleKind } from './chartScale'
-export { bandScale, createScale, linearScale, nearestIndex, timeScale } from './chartScale'
+export { bandScale, createScale, linearScale, nearestIndex, scaleForAxis, timeScale } from './chartScale'
 
+export type { GrChartXWindow } from './chartZoom'
+export { clampWindow, smallestGap, windowFromPixels, zoomWindow } from './chartZoom'
 export type { GrTimeTickUnit, LinearTicks, TimeTicks } from './chartTicks'
-export { bandTicks, linearTicks, niceNumber, timeTicks } from './chartTicks'
+export { alignedTicks, bandTicks, linearTicks, niceNumber, timeTicks } from './chartTicks'
 
 export type { GrChartCurve, GrChartDashPattern, GrChartPointShape, PathPoint } from './chartPath'
 export {
@@ -90,7 +92,7 @@ export type {
   HeatmapScaleKind,
   HeatmapScaleOptions,
 } from './chartHeatmap'
-export { heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from './chartHeatmap'
+export { heatmapCell, heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from './chartHeatmap'
 
 export type { GrChartWaterfallStep, WaterfallModel, WaterfallOptions, WaterfallSegment } from './chartWaterfall'
 export { waterfallSegments } from './chartWaterfall'

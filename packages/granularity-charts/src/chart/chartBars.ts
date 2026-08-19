@@ -9,6 +9,7 @@
 import type { ChartOrientation } from './chartOrientation'
 import { acrossBounds, alongExtent } from './chartOrientation'
 import type { GrChartScale } from './chartScale'
+import { nearestIndex } from './chartScale'
 import type { Rect } from './chartLayout'
 
 export interface BarSlot {
@@ -132,6 +133,11 @@ export interface BarHitInput {
  * Одно правило на обе ориентации и на все столбчатые типы: поперёк проверяются
  * границы области, вдоль — попадание в полуширину полосы. Без второй проверки
  * тултип «прилипал» бы к ближайшему столбцу через весь зазор между категориями.
+ *
+ * Ближайшая полоса ищется `nearestIndex`, то есть бинарным поиском: это
+ * единственный расчёт, который у столбцов и моста идёт на **каждое** движение
+ * указателя, а не на смену активной точки. Обход всех категорий стоил здесь
+ * прохода по ряду на каждый `pointermove`.
  */
 export function barHitIndex(input: BarHitInput): number {
   const orientation = input.orientation ?? 'vertical'
@@ -139,23 +145,13 @@ export function barHitIndex(input: BarHitInput): number {
   const across = orientation === 'horizontal' ? input.point.x : input.point.y
 
   if (across < low || across > high) return -1
-  if (input.positions.length === 0) return -1
 
   const along = orientation === 'horizontal' ? input.point.y : input.point.x
+  const index = nearestIndex(input.positions, input.scale, along)
 
-  let index = 0
-  let best = Number.POSITIVE_INFINITY
+  if (index === -1) return -1
 
-  for (let i = 0; i < input.positions.length; i += 1) {
-    const distance = Math.abs(along - input.scale.scale(input.positions[i]!))
-
-    if (distance < best) {
-      best = distance
-      index = i
-    }
-  }
-
-  return best <= input.bandwidth / 2 ? index : -1
+  return Math.abs(along - input.scale.scale(input.positions[index]!)) <= input.bandwidth / 2 ? index : -1
 }
 
 function n(value: number): number {

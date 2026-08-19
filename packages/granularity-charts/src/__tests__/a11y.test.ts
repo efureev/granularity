@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { axeViolations } from '@feugene/granularity-test-kit/a11y'
+import { mockRect, move, press, release } from '@feugene/granularity/testing'
 import { nextTick } from 'vue'
 
 import GrChartBullet from '../components/GrChartBullet/GrChartBullet.vue'
@@ -171,6 +172,29 @@ describe('a11y', () => {
     await nextTick()
 
     expect(await axeViolations(wrapper.element as Element)).toEqual([])
+    wrapper.unmount()
+  })
+
+  it('GrChartLine с открытой полосой приближения — без нарушений', async () => {
+    // Полоса живёт внутри `svg`, который целиком `aria-hidden`, но проверить
+    // это дешевле, чем однажды обнаружить у неё собственную роль.
+    const wrapper = mount(GrChartLine, {
+      props: { series, zoom: 'brush' },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const surface = wrapper.find('[data-gr-chart-surface]')
+
+    mockRect(surface.element, { left: 0, top: 0, width: 640, height: 256 })
+    press(surface.element, { clientX: 100, clientY: 60 })
+    move({ clientX: 400, clientY: 60 })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-chart-brush]').exists()).toBe(true)
+    expect(await axeViolations(wrapper.element as Element)).toEqual([])
+
+    release({ clientX: 400, clientY: 60 })
     wrapper.unmount()
   })
 

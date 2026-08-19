@@ -59,7 +59,7 @@ export interface ChartTableOptions {
  */
 export function chartTableModel(data: ChartData, options: ChartTableOptions): ChartTableModel {
   const visible = data.series.filter(series => !series.hidden)
-  const byPosition = visible.map(series => new Map(series.points.map(point => [point.x, point])))
+  const byPosition = visible.map(series => series.byX)
   const anyPoint = new Map<number, NormalizedPoint>()
 
   for (const series of visible) {

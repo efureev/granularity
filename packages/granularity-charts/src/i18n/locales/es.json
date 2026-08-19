@@ -15,6 +15,10 @@
     "axisLeft": "eje izquierdo",
     "axisRight": "eje derecho"
   },
+  "zoom": {
+    "window": "Mostrando de {from} a {to}, {points} puntos",
+    "reset": "Intervalo completo"
+  },
   "funnel": {
     "roleDescription": "gráfico de embudo",
     "summary": "Gráfico de embudo, {stages} pasos",

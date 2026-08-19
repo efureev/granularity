@@ -97,9 +97,9 @@ export function activeSymbolMarks(
     return []
 
   return series.flatMap((item) => {
-    const point = item.points.find(candidate => candidate.x === x && candidate.y !== null)
+    const point = item.byX.get(x)
 
-    if (!point)
+    if (!point || point.y === null)
       return []
 
     return [{
@@ -107,7 +107,7 @@ export function activeSymbolMarks(
       d: symbolPath(
         item.style.shape,
         xScale.scale(point.x),
-        scaleForAxis(item.axis, yScale, yScaleRight).scale(stacked ? point.stackTop ?? point.y! : point.y!),
+        scaleForAxis(item.axis, yScale, yScaleRight).scale(stacked ? point.stackTop ?? point.y : point.y),
         size,
       ),
       color: item.style.color,

@@ -131,8 +131,8 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
     if (x === undefined)
       return null
 
-    const first = data.series.find(series => !series.hidden && series.points.some(point => point.x === x))
-    const sample = first?.points.find(point => point.x === x)
+    const first = data.series.find(series => !series.hidden && series.byX.has(x))
+    const sample = first?.byX.get(x)
 
     return {
       index,
@@ -141,7 +141,7 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
       series: data.series
         .filter(series => !series.hidden)
         .map((series) => {
-          const point = series.points.find(item => item.x === x) ?? null
+          const point = series.byX.get(x) ?? null
 
           return {
             id: series.id,

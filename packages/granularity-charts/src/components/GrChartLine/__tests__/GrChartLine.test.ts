@@ -1,4 +1,4 @@
-import { announced, granularityGlobal, i18nAdapter, keydown, mockRect } from '@feugene/granularity/testing'
+import { announced, granularityGlobal, i18nAdapter, keydown, mockRect, move, press, release } from '@feugene/granularity/testing'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
@@ -640,5 +640,170 @@ describe('GrChartLine — прореживание', () => {
     expect(commands(wrapper)).toBeLessThan(200)
 
     wrapper.unmount()
+  })
+})
+
+describe('приближение по абсциссе', () => {
+  const dense = [{ id: 'a', x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], y: [0, 4, 1, 6, 2, 8, 3, 9, 5, 7] }]
+
+  function brush(wrapper: ReturnType<typeof factory>, from: number, to: number): void {
+    press(wrapper.find('[data-gr-chart-surface]').element, { clientX: from, clientY: 60 })
+    move({ clientX: to, clientY: 60 })
+    release({ clientX: to, clientY: 60 })
+  }
+
+  // Тик между событиями не для красоты: колесо считает следующий шаг от уже
+  // применённого окна, а оно приезжает обратно пропом. В браузере каждое
+  // `wheel` — своя задача, и перерисовка между ними успевает всегда.
+  async function wheel(wrapper: ReturnType<typeof factory>, deltaY: number): Promise<void> {
+    wrapper.find('[data-gr-chart-surface]').element
+      .dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, clientX: 300, deltaY }))
+    await nextTick()
+  }
+
+  function windowOf(wrapper: ReturnType<typeof factory>): [number, number] | null {
+    const last = wrapper.emitted('update:xWindow')?.at(-1)
+
+    return (last?.[0] ?? null) as [number, number] | null
+  }
+
+  it('протяжка сужает окно до выделенного участка', () => {
+    const wrapper = factory({ series: dense, zoom: 'brush' })
+
+    brush(wrapper, 150, 400)
+
+    const value = windowOf(wrapper)!
+
+    expect(wrapper.emitted('update:xWindow')).toHaveLength(1)
+    expect(value[0]).toBeGreaterThan(0)
+    expect(value[1]).toBeLessThan(9)
+    expect(value[0]).toBeLessThan(value[1])
+  })
+
+  it('ход короче порога — это клик, а не протяжка', () => {
+    // Иначе выбор точки щелчком превращался бы в приближение до одной точки.
+    const wrapper = factory({ series: dense, zoom: 'brush' })
+
+    brush(wrapper, 200, 202)
+
+    expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+  })
+
+  it('`Escape` в середине протяжки отменяет её', async () => {
+    const wrapper = factory({ series: dense, zoom: 'brush' })
+    const surface = wrapper.find('[data-gr-chart-surface]')
+
+    press(surface.element, { clientX: 150, clientY: 60 })
+    move({ clientX: 400, clientY: 60 })
+    await nextTick()
+    expect(wrapper.find('[data-gr-chart-brush]').exists()).toBe(true)
+
+    keydown(document.body, 'Escape')
+    release({ clientX: 400, clientY: 60 })
+    await nextTick()
+
+    expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+    expect(wrapper.find('[data-gr-chart-brush]').exists()).toBe(false)
+  })
+
+  it('полоса выделения живёт ровно во время жеста', async () => {
+    const wrapper = factory({ series: dense, zoom: 'brush' })
+    const surface = wrapper.find('[data-gr-chart-surface]')
+
+    expect(wrapper.find('[data-gr-chart-brush]').exists()).toBe(false)
+
+    press(surface.element, { clientX: 150, clientY: 60 })
+    move({ clientX: 400, clientY: 60 })
+    await nextTick()
+    expect(wrapper.find('[data-gr-chart-brush]').exists()).toBe(true)
+
+    release({ clientX: 400, clientY: 60 })
+    await nextTick()
+    expect(wrapper.find('[data-gr-chart-brush]').exists()).toBe(false)
+  })
+
+  it('режим выбирает жест: `brush` не слушает колесо, `wheel` — протяжку', async () => {
+    const onlyBrush = factory({ series: dense, zoom: 'brush' })
+    await wheel(onlyBrush, -100)
+    expect(onlyBrush.emitted('update:xWindow')).toBeUndefined()
+
+    const onlyWheel = factory({ series: dense, zoom: 'wheel' })
+    brush(onlyWheel, 150, 400)
+    expect(onlyWheel.emitted('update:xWindow')).toBeUndefined()
+  })
+
+  it('колесо приближает к точке под указателем и отдаляет обратно', async () => {
+    const wrapper = factory({ series: dense, zoom: 'wheel' })
+
+    await wheel(wrapper, -240)
+
+    const near = windowOf(wrapper)!
+
+    expect(near[1] - near[0]).toBeLessThan(9)
+
+    // Один «щелчок» ограничен вдвое, поэтому обратный путь — несколько шагов;
+    // дойдя до полного ряда, окно становится `null`, а не парой границ.
+    for (let step = 0; step < 5 && windowOf(wrapper) !== null; step++)
+      await wheel(wrapper, 600)
+
+    expect(windowOf(wrapper)).toBeNull()
+  })
+
+  it('без пропа `zoom` ни один жест не работает', async () => {
+    const wrapper = factory({ series: dense })
+
+    brush(wrapper, 150, 400)
+    await wheel(wrapper, -240)
+
+    expect(wrapper.emitted('update:xWindow')).toBeUndefined()
+  })
+
+  it('окно сужает позиции, скрытую таблицу и курсор', async () => {
+    const wrapper = factory({ series: dense, xWindow: [2, 5], dataTable: 'visible' })
+    await nextTick()
+
+    expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(4)
+
+    // `End` ведёт к концу окна, а не ряда: курсор ходит по тем же позициям.
+    keydown(wrapper.find('[data-gr-chart-surface]').element, 'End')
+    await nextTick()
+    expect(wrapper.emitted('update:activeIndex')?.at(-1)).toEqual([3])
+  })
+
+  it('управляемое окно жестом не перетирается', async () => {
+    const wrapper = factory({ series: dense, zoom: 'brush', xWindow: [2, 5], dataTable: 'visible' })
+
+    brush(wrapper, 150, 400)
+    await nextTick()
+
+    // Жест просит новое окно, но показанное меняет только потребитель.
+    expect(wrapper.emitted('update:xWindow')).toHaveLength(1)
+    expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(4)
+  })
+
+  it('опора за краем окна не рисуется, но из описания не пропадает', async () => {
+    // Существующий флаг `outside` считается по домену, а домен при окне и есть
+    // окно, — поэтому отдельного сторожа под приближение не нужно. Проверяется
+    // здесь, чтобы это осталось правдой: «порог не виден» и «порога нет» —
+    // разные утверждения, и второе было бы ложью.
+    const withReference = { series: dense, references: [{ axis: 'x' as const, value: 8, label: 'Релиз' }] }
+    const full = factory(withReference)
+
+    expect(full.findAll('[data-gr-chart-reference]')).toHaveLength(1)
+
+    const zoomed = factory({ ...withReference, xWindow: [0, 3] })
+    await nextTick()
+
+    expect(zoomed.findAll('[data-gr-chart-reference]')).toHaveLength(0)
+    expect(zoomed.find('[data-gr-chart-surface]').attributes('aria-description')).toContain('Релиз')
+  })
+
+  it('смена окна уходит в живой регион', async () => {
+    const wrapper = factory({ series: dense, xWindow: null })
+
+    await wrapper.setProps({ xWindow: [2, 5] })
+    await nextTick()
+
+    expect(await announced()).toContain('2')
   })
 })

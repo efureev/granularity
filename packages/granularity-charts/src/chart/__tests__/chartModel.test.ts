@@ -402,3 +402,93 @@ describe('normalizeChartData: вторая ось значений', () => {
     expect(data.yDomainRight?.[0]).toBe(0)
   })
 })
+
+describe('индекс точки по абсциссе', () => {
+  it('`byX` отвечает то же, что линейный поиск', () => {
+    const data = normalizeChartData([{ id: 'a', x: [0, 5, 9], y: [1, 2, 3] }])
+    const points = data.series[0]!.points
+
+    for (const point of points)
+      expect(data.series[0]!.byX.get(point.x)).toBe(point)
+
+    expect(data.series[0]!.byX.get(7)).toBeUndefined()
+  })
+
+  it('при повторе абсциссы выигрывает первая точка — как у `Array.find`', () => {
+    const data = normalizeChartData([{ id: 'a', data: [{ x: 1, y: 10 }, { x: 1, y: 20 }] }])
+
+    expect(data.series[0]!.byX.get(1)!.y).toBe(10)
+  })
+})
+
+describe('окно по абсциссе', () => {
+  const wide = [{ id: 'a', x: [0, 1, 2, 3, 4], y: [10, 20, 30, 40, 50] }]
+
+  it('отсекает точки, позиции и строки таблицы', () => {
+    const data = normalizeChartData(wide, { xWindow: [1, 3] })
+
+    expect(data.positions).toEqual([1, 2, 3])
+    expect(data.series[0]!.points.map(point => point.y)).toEqual([20, 30, 40])
+  })
+
+  it('доменом становится само окно, а не размах уцелевших точек', () => {
+    // Иначе выделенный протяжкой участок съезжал бы к ближайшим данным.
+    expect(normalizeChartData(wide, { xWindow: [0.5, 3.5] }).xDomain).toEqual([0.5, 3.5])
+  })
+
+  it('обратный адрес в исходную серию переживает окно', () => {
+    const data = normalizeChartData(wide, { xWindow: [3, 4] })
+
+    expect(data.series[0]!.points.map(point => point.sourceIndex)).toEqual([3, 4])
+  })
+
+  it('ось значений считается по видимому', () => {
+    const full = normalizeChartData(wide).yDomain
+    const windowed = normalizeChartData(wide, { xWindow: [0, 1] }).yDomain
+
+    expect(windowed[1]).toBeLessThan(full[1])
+  })
+
+  it('`includeXValues` окно не растягивает', () => {
+    // Опора за краем окна отменяла бы приближение сама собой.
+    const data = normalizeChartData(wide, { xWindow: [1, 2], includeXValues: [99] })
+
+    expect(data.xDomain).toEqual([1, 2])
+  })
+
+  it('полный размах остаётся известен — иначе из приближения не выйти', () => {
+    const data = normalizeChartData(wide, { xWindow: [1, 2] })
+
+    expect(data.fullXDomain).toEqual([0, 4])
+  })
+
+  it('без окна полный размах совпадает с доменом', () => {
+    const data = normalizeChartData(wide)
+
+    expect(data.fullXDomain).toEqual([...data.xDomain])
+  })
+
+  it('порядок концов окна не важен, вырожденное окно игнорируется', () => {
+    expect(normalizeChartData(wide, { xWindow: [3, 1] }).positions).toEqual([1, 2, 3])
+    expect(normalizeChartData(wide, { xWindow: [2, 2] }).positions).toEqual([0, 1, 2, 3, 4])
+  })
+
+  it('у категориальной оси окна нет', () => {
+    const data = normalizeChartData(
+      [{ id: 'a', x: ['Пн', 'Вт', 'Ср'], y: [1, 2, 3] }],
+      { xWindow: [0, 1] },
+    )
+
+    expect(data.positions).toEqual([0, 1, 2])
+  })
+
+  it('время принимает `Date` и ISO-строку', () => {
+    const stamps = [Date.UTC(2026, 0, 1), Date.UTC(2026, 0, 2), Date.UTC(2026, 0, 3)]
+    const data = normalizeChartData(
+      [{ id: 'a', x: stamps.map(value => new Date(value)), y: [1, 2, 3] }],
+      { xWindow: [new Date(stamps[1]!), new Date(stamps[2]!)] },
+    )
+
+    expect(data.positions).toEqual([stamps[1], stamps[2]])
+  })
+})

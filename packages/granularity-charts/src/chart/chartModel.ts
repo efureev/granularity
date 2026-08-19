@@ -80,6 +80,19 @@ export interface NormalizedSeries {
   /** Задана всегда: без `dualAxis` нормализация ставит всем сериям левую. */
   axis: 'left' | 'right'
   points: readonly NormalizedPoint[]
+  /**
+   * Точка по абсциссе — индекс горячего пути.
+   *
+   * Курсор, тултип, активная марка и скрытая таблица спрашивают «что у этой
+   * серии в этом `x`» на каждую смену активной точки. Линейным поиском это
+   * стоило бы прохода по ряду на каждую серию — на десяти тысячах точек
+   * заметно рукой.
+   *
+   * При повторе `x` внутри серии выигрывает **первая** точка: так отвечал
+   * `Array.find`, которым индекс заменил, и рисунок с таблицей обязаны
+   * рассказывать про одну и ту же точку.
+   */
+  byX: ReadonlyMap<number, NormalizedPoint>
 }
 
 export interface ChartData {
@@ -97,6 +110,13 @@ export interface ChartData {
   yDomainRight?: readonly [number, number]
   /** Объединённые x видимых серий по возрастанию — по ним ходят курсор и клавиатура. */
   positions: readonly number[]
+  /**
+   * Размах абсцисс **без учёта окна**; без окна совпадает с `xDomain`.
+   *
+   * От него считается приближение: меряй жест от текущего окна, из него нельзя
+   * было бы выйти — каждый шаг сужал бы уже суженное.
+   */
+  fullXDomain: readonly [number, number]
 }
 
 export interface NormalizeOptions {
@@ -135,6 +155,22 @@ export interface NormalizeOptions {
   /** Границы правой оси; `null` в любой позиции — считать эту сторону. */
   yDomainRight?: readonly [number | null, number | null]
   includeYValuesRight?: readonly number[]
+  /**
+   * Видимое окно по абсциссе; `null` — весь ряд.
+   *
+   * Окно отсекает точки **до** стека и доменов, поэтому по нему считается всё
+   * остальное: позиции, курсор, клавиатура, скрытая таблица, размах оси
+   * значений. Это осознанно шире, чем «нарисовать кусок»: окно выбирает
+   * пользователь и видит его на экране, а значит доступное представление
+   * обязано за ним следовать. Прореживание — противоположный случай, оно
+   * пользователю невидимо и полный ряд не трогает (`docs/model.md`).
+   *
+   * Домен оси становится ровно окном, а не размахом уцелевших точек: иначе
+   * выделенный протяжкой участок съезжал бы к ближайшим данным.
+   *
+   * У категориальной оси окна нет: у категорий нет непрерывной абсциссы.
+   */
+  xWindow?: readonly [GrChartXValue, GrChartXValue] | null
 }
 
 export interface PadDomainOptions {
@@ -144,6 +180,9 @@ export interface PadDomainOptions {
 }
 
 const EMPTY_DOMAIN: readonly [number, number] = [0, 1]
+
+// Окна у категориальной оси нет, и разбор границ до неё не доходит.
+const EMPTY_CATEGORY_INDEX: ReadonlyMap<string, number> = new Map()
 
 /**
  * Тип шкалы по данным: `Date` → время, строка → категории, число → линейная.
@@ -237,12 +276,19 @@ export function normalizeChartData(
   const categories = kind === 'band' ? collectCategories(series) : []
   const categoryIndex = new Map(categories.map((name, index) => [name, index]))
   const sort = kind === 'band' ? false : options.sort !== false
+  const window = resolveXWindow(kind, options.xWindow)
+
+  const fullExtents: ([number, number] | null)[] = []
 
   const normalized: NormalizedSeries[] = series.map((item, index) => {
-    const points = readPoints(item, kind, categoryIndex)
+    const read = readPoints(item, kind, categoryIndex)
 
     if (sort)
-      points.sort((a, b) => a.x - b.x)
+      read.sort((a, b) => a.x - b.x)
+
+    fullExtents.push(extentOf(read.map(point => point.x)))
+
+    const points = window ? read.filter(point => point.x >= window[0] && point.x <= window[1]) : read
 
     return {
       id: item.id,
@@ -254,6 +300,7 @@ export function normalizeChartData(
       // вторую ось не включает.
       axis: options.dualAxis ? item.axis ?? 'left' : 'left',
       points,
+      byX: indexByX(points),
     }
   })
 
@@ -261,6 +308,10 @@ export function normalizeChartData(
   // держать ось растянутой под значение, которого на экране нет.
   const visible = normalized.filter(item => !item.hidden)
   const positions = collectPositions(visible)
+  const fullExtent = normalized.reduce<[number, number] | null>(
+    (acc, item, index) => item.hidden ? acc : mergeExtent(acc, fullExtents[index] ?? undefined),
+    null,
+  )
 
   const left = visible.filter(item => item.axis === 'left')
   const right = options.dualAxis ? visible.filter(item => item.axis === 'right') : []
@@ -276,7 +327,10 @@ export function normalizeChartData(
     kind,
     series: normalized,
     categories,
-    xDomain: resolveXDomain(kind, categories, positions, options.includeXValues),
+    xDomain: resolveXDomain(kind, categories, positions, options.includeXValues, window),
+    fullXDomain: kind === 'band'
+      ? [0, Math.max(0, categories.length - 1)]
+      : fullExtent ?? EMPTY_DOMAIN,
     yDomain: resolveYDomain(axisExtent(left, options.stacked), options),
     yDomainRight: right.length === 0
       ? undefined
@@ -465,6 +519,41 @@ function toNumericY(value: number | null | undefined): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
+/** Первая точка на абсциссу — та же, что отдавал `Array.find`. */
+function indexByX(points: readonly NormalizedPoint[]): ReadonlyMap<number, NormalizedPoint> {
+  const index = new Map<number, NormalizedPoint>()
+
+  for (const point of points) {
+    if (!index.has(point.x))
+      index.set(point.x, point)
+  }
+
+  return index
+}
+
+/**
+ * Границы окна в числах шкалы. `null` — окна нет или оно вырождено.
+ *
+ * Публичная: окно приходит от потребителя в том же виде, что абсциссы точек
+ * (`Date`, ISO-строка, число), а жест и рама считают уже в числах. Разбирать
+ * его дважды и разными правилами — верный способ разойтись на часовом поясе.
+ */
+export function resolveXWindow(
+  kind: GrChartScaleKind,
+  xWindow: NormalizeOptions['xWindow'],
+): readonly [number, number] | null {
+  if (!xWindow || kind === 'band')
+    return null
+
+  const from = toNumericX(xWindow[0], 0, kind, EMPTY_CATEGORY_INDEX)
+  const to = toNumericX(xWindow[1], 1, kind, EMPTY_CATEGORY_INDEX)
+
+  if (!Number.isFinite(from) || !Number.isFinite(to) || from === to)
+    return null
+
+  return from < to ? [from, to] : [to, from]
+}
+
 function collectPositions(series: readonly NormalizedSeries[]): number[] {
   const unique = new Set<number>()
 
@@ -496,9 +585,15 @@ function resolveXDomain(
   categories: readonly string[],
   positions: readonly number[],
   includeXValues: readonly number[] | undefined,
+  window: readonly [number, number] | null,
 ): readonly [number, number] {
   if (kind === 'band')
     return [0, Math.max(0, categories.length - 1)]
+
+  // Окно сильнее всего остального, включая `includeXValues`: опора за краем
+  // окна растянула бы домен обратно и приближение отменилось бы само.
+  if (window)
+    return window
 
   const merged = mergeExtent(
     positions.length === 0 ? null : [positions[0]!, positions[positions.length - 1]!],

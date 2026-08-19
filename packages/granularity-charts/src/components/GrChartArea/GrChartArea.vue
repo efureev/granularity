@@ -7,14 +7,16 @@ import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
 import { activeSymbolMarks, symbolMarks, toPixelPoints, toStackBand } from '../../chart/chartMarks'
-import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
-import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
+import type { GrChartSeries, GrChartXValue, NormalizedSeries } from '../../chart/chartModel'
+import { normalizeChartData, resolveScaleKind, resolveXWindow } from '../../chart/chartModel'
 import type { GrChartReference } from '../../chart/chartReference'
 import { referenceDomainValues } from '../../chart/chartReference'
 import { areaPath, bandPath, type GrChartCurve, linePath } from '../../chart/chartPath'
 import { type GrChartScale, type GrChartScaleKind, scaleForAxis } from '../../chart/chartScale'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { GrChartActivePoint } from '../../composables/useChartTooltip'
+import type { GrChartZoom } from '../../composables/internal/useChartZoom'
+import type { GrChartXWindow } from '../../chart/chartZoom'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
 import {
   ACTIVE_MARKER_SCALE,
@@ -110,7 +112,6 @@ export interface GrChartAreaProps {
   locale?: string
   ariaLabel?: string
   ariaDescription?: string
-  /** Порог, выше которого марки не рисуются даже при `showPoints: 'auto'`. */
   /**
    * Когда прореживать ряд для рисунка (LTTB).
    *
@@ -122,12 +123,36 @@ export interface GrChartAreaProps {
   decimate?: 'auto' | 'always' | 'never'
   /** Бюджет точек на серию. Не задан — считается от ширины области построения. */
   maxPoints?: number
+  /**
+   * Порог, выше которого марки не рисуются даже при `showPoints: 'always'`.
+   *
+   * На `'auto'` при дефолтах не влияет: тот отсекает марки раньше, на
+   * `AUTO_MARKERS_LIMIT`. Влиять начинает, если задать порог ниже него.
+   */
   canvasThreshold?: number
+  /**
+   * Какими жестами пользователь меняет видимое окно. По умолчанию — никакими.
+   *
+   * Управляется только указателем; клавиатурного пути к окну у графика нет.
+   * Поэтому окно и выведено наружу как `v-model:xWindow` — приложение обязано
+   * дать к нему свой доступный путь: кнопку сброса, поля диапазона.
+   */
+  zoom?: GrChartZoom
+  /**
+   * Видимое окно по абсциссе — `v-model:xWindow`. `null` — весь ряд.
+   *
+   * Окно **выбирает данные**, а не обрезает рисунок: по нему считаются позиции,
+   * курсор, клавиатура, скрытая таблица и размах оси значений. Прореживание —
+   * противоположный случай, оно рисунку невидимо и полный ряд не трогает.
+   * Отсюда же следствие: `activeIndex` адресует текущее окно.
+   */
+  xWindow?: readonly [GrChartXValue, GrChartXValue] | null
 }
 
 export interface GrChartAreaEmits {
   (e: 'update:hiddenSeries', value: string[]): void
   (e: 'update:activeIndex', value: number | null): void
+  (e: 'update:xWindow', value: GrChartXWindow | null): void
   (e: 'pointClick', value: GrChartActivePoint): void
   (e: 'pointHover', value: GrChartActivePoint | null): void
   (e: 'legendToggle', value: { seriesId: string, hidden: boolean }): void
@@ -174,6 +199,8 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
   decimate: undefined,
   maxPoints: undefined,
   canvasThreshold: 2000,
+  zoom: undefined,
+  xWindow: undefined,
 })
 
 const emit = defineEmits<GrChartAreaEmits>()
@@ -190,6 +217,7 @@ const { t, locale: i18nLocale } = useGranularityTranslations()
 const resolvedSize = useGrComponentSize<GrChartSize>(() => props.size, { component: 'GrChartArea' })
 const resolvedDecimate = useGrComponentProp('GrChartArea', 'decimate', () => props.decimate, 'auto' as const)
 const resolvedMaxPoints = useGrComponentProp('GrChartArea', 'maxPoints', () => props.maxPoints, undefined as unknown as number)
+const resolvedZoom = useGrComponentProp('GrChartArea', 'zoom', () => props.zoom, false as GrChartZoom)
 const resolvedHeight = useGrComponentProp('GrChartArea', 'height', () => props.height, 256)
 const resolvedCurve = useGrComponentProp('GrChartArea', 'curve', () => props.curve, 'linear' as GrChartCurve)
 const resolvedGrid = useGrComponentProp('GrChartArea', 'showGrid', () => props.showGrid, 'y' as const)
@@ -252,6 +280,25 @@ const referenceDomain = computed(() => (
     : { x: [], y: [] }
 ))
 
+/**
+ * Окно живёт здесь, а не в раме: оно уходит в нормализацию данных, а рама
+ * получает уже готовую модель. Пропом окно только синхронизируется — без
+ * привязки график приближается сам по себе.
+ */
+const ownWindow = ref<GrChartXWindow | null>(null)
+
+// `undefined` и `null` тут разное: первое — «окном никто не управляет», второе —
+// «управляет и просит весь ряд». Слей их `??`, и сброс снаружи возвращал бы
+// последнее приближение, сделанное жестом.
+const xWindow = computed<GrChartXWindow | null>(() => (
+  props.xWindow === undefined ? ownWindow.value : resolveXWindow(scaleKind.value, props.xWindow)
+))
+
+function applyWindow(value: GrChartXWindow | null): void {
+  ownWindow.value = value
+  emit('update:xWindow', value)
+}
+
 const data = computed(() => normalizeChartData(seriesInput.value, {
   kind: scaleKind.value,
   includeZero: props.includeZero,
@@ -261,6 +308,7 @@ const data = computed(() => normalizeChartData(seriesInput.value, {
   includeYValues: referenceDomain.value.y,
   dualAxis: props.dualAxis,
   yDomainRight: props.yDomainRight,
+  xWindow: xWindow.value,
 }))
 
 const showLegend = computed(() => (
@@ -437,6 +485,8 @@ defineExpose({
     :decimate="resolvedDecimate"
     :decimate-shared-x="stacked !== false"
     :max-points="resolvedMaxPoints"
+    :zoom="resolvedZoom"
+    :x-window="xWindow"
     :aria-label="ariaLabel"
     :aria-description="ariaDescription"
     :role-description="stacked === '100%'
@@ -453,6 +503,7 @@ defineExpose({
     :value-format-right="valueFormatRight"
     data-gr-chart-area
     @update:active-index="value => emit('update:activeIndex', value)"
+    @update:x-window="applyWindow"
     @point-click="value => emit('pointClick', value)"
     @point-hover="value => emit('pointHover', value)"
     @legend-toggle="onLegendToggle"

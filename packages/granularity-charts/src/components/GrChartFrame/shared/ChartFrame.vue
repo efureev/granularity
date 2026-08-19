@@ -23,7 +23,11 @@ import { type ChartHitContext, type GrChartActivePoint, useChartTooltip } from '
 import type { ChartKeyboardOptions } from '../../../composables/internal/useChartA11y'
 import { useChartA11y } from '../../../composables/internal/useChartA11y'
 import { useElementSize } from '../../../composables/internal/useElementSize'
+import type { GrChartZoom } from '../../../composables/internal/useChartZoom'
+import { useChartZoom } from '../../../composables/internal/useChartZoom'
+import type { GrChartXWindow } from '../../../chart/chartZoom'
 import ChartAxis from './ChartAxis.vue'
+import ChartBrush from './ChartBrush.vue'
 import ChartDataTable from './ChartDataTable.vue'
 import ChartGrid from './ChartGrid.vue'
 import ChartLegend from './ChartLegend.vue'
@@ -185,6 +189,15 @@ export interface ChartFrameProps {
   describePoint?: (index: number, seriesIndex: number) => string
   /** Карта клавиш под свою систему координат. Не задана — декартова. */
   keyboard?: ChartKeyboardOptions
+  /**
+   * Какими жестами меняется видимое окно. `false` — приближения нет.
+   *
+   * Рама только производит окно и рисует полосу выделения; владеет окном
+   * компонент — оно уходит в нормализацию данных, а рама получает уже готовые.
+   */
+  zoom?: GrChartZoom
+  /** Текущее окно; `null` — весь ряд. */
+  xWindow?: GrChartXWindow | null
 }
 
 export interface ChartFrameEmits {
@@ -193,6 +206,7 @@ export interface ChartFrameEmits {
   (e: 'pointHover', value: GrChartActivePoint | null): void
   (e: 'update:activeSeriesIndex', value: number): void
   (e: 'legendToggle', value: { seriesId: string, hidden: boolean }): void
+  (e: 'update:xWindow', value: GrChartXWindow | null): void
 }
 
 const props = withDefaults(defineProps<ChartFrameProps>(), {
@@ -236,6 +250,8 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   tableModel: undefined,
   describePoint: undefined,
   keyboard: undefined,
+  zoom: false,
+  xWindow: null,
 })
 
 const emit = defineEmits<ChartFrameEmits>()
@@ -463,6 +479,17 @@ const xTicks = computed(() => withPosition(xLabels.value, xScale.value))
 const yTicks = computed(() => withPosition(yLabels.value, yScale.value))
 const yTicksRight = computed(() => (yScaleRight.value === null ? [] : withPosition(yLabelsRight.value, yScaleRight.value)))
 
+const zoomApi = useChartZoom({
+  mode: () => (props.interactive && !isEmpty.value ? props.zoom ?? false : false),
+  surface: surfaceEl,
+  plot: () => plot.value,
+  xScale: () => xScale.value,
+  positions: () => props.data.positions,
+  full: () => props.data.fullXDomain,
+  window: () => props.xWindow ?? null,
+  apply: value => emit('update:xWindow', value),
+})
+
 const tooltipApi = useChartTooltip({
   data: () => props.data,
   xScale: () => xScale.value,
@@ -470,7 +497,9 @@ const tooltipApi = useChartTooltip({
   yScaleRight: () => yScaleRight.value,
   plot: () => plot.value,
   surface: surfaceEl,
-  enabled: () => props.tooltip && props.interactive && !isEmpty.value,
+  // Во время протяжки тултип молчит: панель под рукой закрывала бы ровно тот
+  // участок, который сейчас выделяют.
+  enabled: () => props.tooltip && props.interactive && !isEmpty.value && !zoomApi.brushing.value,
   hitTest: props.hitTest,
   anchor: props.anchorPoint,
 })
@@ -484,12 +513,43 @@ const { floatingStyle } = useFloating(anchorEl, tooltipEl, tooltipApi.open, {
 const activeSeriesIndex = ref(0)
 
 function formatX(point: NormalizedPoint): string {
-  if (props.data.kind === 'time')
-    return formatTimeValue(point.x, resolvedLocale.value)
   if (props.data.kind === 'band')
     return props.data.categories[point.x] ?? String(point.raw)
 
-  return formatNumber(point.x, { locale: resolvedLocale.value })
+  return formatXValue(point.x)
+}
+
+/** Абсцисса без точки: границы окна — это значения шкалы, а не данные. */
+function formatXValue(x: number): string {
+  return props.data.kind === 'time'
+    ? formatTimeValue(x, resolvedLocale.value)
+    : formatNumber(x, { locale: resolvedLocale.value })
+}
+
+/**
+ * Смена окна — в живой регион.
+ *
+ * Приближение меняет и рисунок, и содержимое скрытой таблицы: без объявления
+ * читатель без зрения обнаружил бы подмену только по следующей стрелке.
+ */
+watch(() => props.xWindow, (value, previous) => {
+  if (!props.interactive || sameWindow(value ?? null, previous ?? null))
+    return
+
+  announce(value
+    ? t('grCharts.zoom.window', 'Showing {from} to {to}, {points} points', {
+        from: formatXValue(value[0]),
+        to: formatXValue(value[1]),
+        points: props.data.positions.length,
+      })
+    : t('grCharts.zoom.reset', 'Full range'))
+})
+
+function sameWindow(a: GrChartXWindow | null, b: GrChartXWindow | null): boolean {
+  if (a === null || b === null)
+    return a === b
+
+  return a[0] === b[0] && a[1] === b[1]
 }
 
 const numberFormat = computed<GrChartNumberFormat>(() => ({
@@ -571,7 +631,7 @@ function pointAt(index: number): NormalizedPoint | null {
     return null
 
   for (const series of visibleSeries.value) {
-    const point = series.points.find(item => item.x === x)
+    const point = series.byX.get(x)
 
     if (point)
       return point
@@ -601,12 +661,12 @@ function describePoint(index: number, seriesIndex: number): string {
 
     return t('grCharts.chart.point', '{x}. {values}', {
       x: xText,
-      values: formatPointValue(only?.points.find(item => item.x === x)?.y ?? null, only?.axis ?? 'left'),
+      values: formatPointValue(only?.byX.get(x)?.y ?? null, only?.axis ?? 'left'),
     })
   }
 
   const current = series[Math.min(seriesIndex, series.length - 1)]!
-  const value = current.points.find(item => item.x === x)?.y ?? null
+  const value = current.byX.get(x)?.y ?? null
   const values = t('grCharts.chart.seriesValue', '{series}: {value}', {
     series: current.label,
     value: formatPointValue(value, current.axis),
@@ -908,6 +968,8 @@ watch(tooltipApi.activeIndex, (value) => {
         <g v-if="!isEmpty && !loading">
           <slot name="plot" v-bind="plotScope" />
         </g>
+
+        <ChartBrush v-if="zoomApi.band.value" :band="zoomApi.band.value" :plot="plot" />
       </svg>
 
       <!-- Якорь тултипа — HTML-див нулевого размера: `useFloating` типизирован
@@ -926,6 +988,8 @@ watch(tooltipApi.activeIndex, (value) => {
         :aria-label="surfaceLabel"
         :aria-description="surfaceDescription"
         @pointermove="onPointerMove"
+        @pointerdown="zoomApi.onPointerDown"
+        @wheel="zoomApi.onWheel"
         @pointerleave="tooltipApi.onPointerLeave"
         @keydown="onKeydown"
         @click="onClick"

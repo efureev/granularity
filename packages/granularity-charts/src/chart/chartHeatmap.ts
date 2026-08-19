@@ -212,36 +212,62 @@ export function heatmapCells(
   scale: HeatmapScale,
   grid: HeatmapGrid,
 ): HeatmapCell[] {
-  const { plot, columns, rows } = grid
+  const { columns, rows } = grid
 
   if (columns <= 0 || rows <= 0)
     return []
 
-  const gap = Math.max(0, grid.gap ?? 0)
-  const stepX = plot.width / columns
-  const stepY = plot.height / rows
   const cells: HeatmapCell[] = []
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
-      const value = finiteOrNull(matrix[y]?.[x])
+      const cell = heatmapCell(matrix, scale, grid, x, y)
 
-      cells.push({
-        x,
-        y,
-        value,
-        fraction: scale.fractionOf(value),
-        rect: {
-          x: plot.x + stepX * x + gap / 2,
-          y: plot.y + stepY * y + gap / 2,
-          // Зазор съедается изнутри ячейки: сетка иначе перестала бы упираться
-          // в края области, и последняя колонка оказалась бы уже остальных.
-          width: Math.max(0, stepX - gap),
-          height: Math.max(0, stepY - gap),
-        },
-      })
+      if (cell)
+        cells.push(cell)
     }
   }
 
   return cells
+}
+
+/**
+ * Одна ячейка без построения сетки.
+ *
+ * Якорю тултипа и обводке активной ячейки нужна ровно одна из `R × C`, а
+ * считаются они на каждую смену активной точки. Арифметика та же, что у
+ * `heatmapCells` — она через эту функцию и проходит, чтобы прямоугольник у
+ * рисунка и у якоря не мог разойтись.
+ */
+export function heatmapCell(
+  matrix: readonly (readonly (number | null)[])[],
+  scale: HeatmapScale,
+  grid: HeatmapGrid,
+  x: number,
+  y: number,
+): HeatmapCell | null {
+  const { plot, columns, rows } = grid
+
+  if (x < 0 || y < 0 || x >= columns || y >= rows)
+    return null
+
+  const gap = Math.max(0, grid.gap ?? 0)
+  const stepX = plot.width / columns
+  const stepY = plot.height / rows
+  const value = finiteOrNull(matrix[y]?.[x])
+
+  return {
+    x,
+    y,
+    value,
+    fraction: scale.fractionOf(value),
+    rect: {
+      x: plot.x + stepX * x + gap / 2,
+      y: plot.y + stepY * y + gap / 2,
+      // Зазор съедается изнутри ячейки: сетка иначе перестала бы упираться
+      // в края области, и последняя колонка оказалась бы уже остальных.
+      width: Math.max(0, stepX - gap),
+      height: Math.max(0, stepY - gap),
+    },
+  }
 }

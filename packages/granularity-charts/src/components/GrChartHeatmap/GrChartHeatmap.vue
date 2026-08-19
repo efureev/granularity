@@ -6,8 +6,8 @@ import { computed, ref } from 'vue'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatValue } from '../../chart/chartFormat'
 import { labelGutters, type Rect } from '../../chart/chartLayout'
-import type { HeatmapCell, HeatmapScaleKind } from '../../chart/chartHeatmap'
-import { heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from '../../chart/chartHeatmap'
+import type { HeatmapCell, HeatmapGrid, HeatmapScaleKind } from '../../chart/chartHeatmap'
+import { heatmapCell, heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from '../../chart/chartHeatmap'
 import { normalizeChartData } from '../../chart/chartModel'
 import type { ChartTableModel } from '../../chart/chartTable'
 import type { ChartHitContext, GrChartActivePoint } from '../../composables/useChartTooltip'
@@ -232,13 +232,22 @@ function gridOf(plot: Rect): Rect {
   }
 }
 
-function cellsOf(plot: Rect): HeatmapCell[] {
-  return heatmapCells(matrix.value, scale.value, {
+function gridSpecOf(plot: Rect): HeatmapGrid {
+  return {
     plot: gridOf(plot),
     columns: columns.value,
     rows: rows.value,
     gap: resolvedGap.value,
-  })
+  }
+}
+
+function cellsOf(plot: Rect): HeatmapCell[] {
+  return heatmapCells(matrix.value, scale.value, gridSpecOf(plot))
+}
+
+/** Одна ячейка — без построения всей матрицы: см. `heatmapCell`. */
+function cellOf(plot: Rect, x: number, y: number): HeatmapCell | null {
+  return heatmapCell(matrix.value, scale.value, gridSpecOf(plot), x, y)
 }
 
 function fillOf(cell: HeatmapCell): string {
@@ -305,7 +314,7 @@ function outlineOf(plot: Rect): Rect[] {
   if (column === null)
     return []
 
-  const cell = cellsOf(plot).find(item => item.x === column && item.y === activeRow.value)
+  const cell = cellOf(plot, column, activeRow.value)
 
   return cell ? [cell.rect] : []
 }
@@ -335,7 +344,7 @@ function hitSeries(point: { x: number, y: number }, context: ChartHitContext): n
 }
 
 function anchorPoint(index: number, context: ChartHitContext): { x: number, y: number } | null {
-  const cell = cellsOf(context.plot).find(item => item.x === index && item.y === activeRow.value)
+  const cell = cellOf(context.plot, index, activeRow.value)
 
   return cell ? { x: cell.rect.x + cell.rect.width / 2, y: cell.rect.y } : null
 }

@@ -1,5 +1,6 @@
 import type { GrChartCurve } from '../../chart/chartPath'
 import type { GrChartSize } from '../GrChartFrame/chartFrameStyles'
+import type { GrChartZoom } from '../../composables/internal/useChartZoom'
 
 /**
  * Пропы `GrChartArea`, настраиваемые глобально через
@@ -15,6 +16,14 @@ export interface GrChartAreaConfigurableProps {
   decimate: 'auto' | 'always' | 'never'
   /** Бюджет точек на серию. */
   maxPoints: number
+  /**
+   * Какими жестами меняется видимое окно.
+   *
+   * Политика приложения, а не свойство отдельного графика: включать
+   * приближение на одной панели и не включать на соседней — это разные правила
+   * поведения у одинаковых с виду картинок.
+   */
+  zoom: GrChartZoom
 
   size: GrChartSize
   height: number

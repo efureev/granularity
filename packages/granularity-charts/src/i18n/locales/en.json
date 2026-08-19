@@ -15,6 +15,10 @@
     "axisLeft": "left axis",
     "axisRight": "right axis"
   },
+  "zoom": {
+    "window": "Showing {from} to {to}, {points} points",
+    "reset": "Full range"
+  },
   "funnel": {
     "roleDescription": "funnel chart",
     "summary": "Funnel chart, {stages} steps",

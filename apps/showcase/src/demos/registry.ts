@@ -32,6 +32,7 @@ export const demoPathByPreviewKey = {
   'extra-charts-line-references':         'extra/granularity-charts/GrChartLineReferencesDemo.vue',
   'extra-charts-line-series':             'extra/granularity-charts/GrChartLineSeriesDemo.vue',
   'extra-charts-line-states':             'extra/granularity-charts/GrChartLineStatesDemo.vue',
+  'extra-charts-line-zoom':               'extra/granularity-charts/GrChartLineZoomDemo.vue',
   'extra-charts-pie-basic':               'extra/granularity-charts/GrChartPieBasicDemo.vue',
   'extra-charts-pie-labels':              'extra/granularity-charts/GrChartPieLabelsDemo.vue',
   'extra-charts-pie-textures':            'extra/granularity-charts/GrChartPieTexturesDemo.vue',

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { barBandwidth, barHitIndex, barPath, barRect, barToward, groupSlots } from '../chartBars'
+import { bandScale } from '../chartScale'
 
 describe('groupSlots', () => {
   it('одна серия занимает полосу целиком', () => {
@@ -199,5 +200,65 @@ describe('barHitIndex', () => {
 
   it('пустой набор категорий — всегда промах', () => {
     expect(barHitIndex({ point: { x: 60, y: 100 }, area, positions: [], scale, bandwidth: 32 })).toBe(-1)
+  })
+})
+
+describe('barHitIndex — бинарный поиск против обхода', () => {
+  /** Прежняя реализация: обход всех категорий. Эталон для сверки. */
+  function scanHitIndex(input: Parameters<typeof barHitIndex>[0]): number {
+    const orientation = input.orientation ?? 'vertical'
+    const [low, high] = [input.area.y, input.area.y + input.area.height]
+    const across = orientation === 'horizontal' ? input.point.x : input.point.y
+
+    if (orientation === 'vertical' && (across < low || across > high)) return -1
+    if (input.positions.length === 0) return -1
+
+    const along = orientation === 'horizontal' ? input.point.y : input.point.x
+    let index = 0
+    let best = Number.POSITIVE_INFINITY
+
+    for (let i = 0; i < input.positions.length; i += 1) {
+      const distance = Math.abs(along - input.scale.scale(input.positions[i]!))
+
+      if (distance < best) {
+        best = distance
+        index = i
+      }
+    }
+
+    return best <= input.bandwidth / 2 ? index : -1
+  }
+
+  it('отвечают одинаково на каждом пикселе области', () => {
+    const area = { x: 0, y: 0, width: 240, height: 100 }
+    const scale = bandScale(6, [area.x, area.x + area.width])
+    const positions = [0, 1, 2, 3, 4, 5]
+
+    for (let px = 0; px <= area.width; px += 1) {
+      const input = { point: { x: px, y: 50 }, area, positions, scale, bandwidth: scale.bandwidth }
+
+      expect(barHitIndex(input), `пиксель ${px}`).toBe(scanHitIndex(input))
+    }
+  })
+
+  it('совпадают и на ряде с пропущенной категорией', () => {
+    // Скрытая серия оставляет дыру в позициях: номер категории и её место в
+    // массиве расходятся, и арифметика по равномерному шагу тут соврала бы.
+    const area = { x: 0, y: 0, width: 240, height: 100 }
+    const scale = bandScale(6, [area.x, area.x + area.width])
+    const positions = [0, 2, 3, 5]
+
+    for (let px = 0; px <= area.width; px += 1) {
+      const input = { point: { x: px, y: 50 }, area, positions, scale, bandwidth: scale.bandwidth }
+
+      expect(barHitIndex(input), `пиксель ${px}`).toBe(scanHitIndex(input))
+    }
+  })
+
+  it('пустой ряд — мимо', () => {
+    const area = { x: 0, y: 0, width: 240, height: 100 }
+    const scale = bandScale(0, [area.x, area.x + area.width])
+
+    expect(barHitIndex({ point: { x: 10, y: 50 }, area, positions: [], scale, bandwidth: 0 })).toBe(-1)
   })
 })

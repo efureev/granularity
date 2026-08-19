@@ -520,7 +520,7 @@ function anchorPoint(index: number, context: ChartHitContext): { x: number, y: n
     if (item.hidden)
       continue
 
-    const point = item.points.find(candidate => candidate.x === position)
+    const point = item.byX.get(position)
 
     if (!point || point.y === null)
       continue

@@ -7,6 +7,54 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.7.0] 2026-08-19
+
+### Added
+
+- **Zoom into a stretch of the x axis.** `GrChartLine` and `GrChartArea` gained `zoom`
+  (`false | 'brush' | 'wheel' | 'both'`, default `false`) and `v-model:xWindow`. The window
+  **selects data** rather than cropping the drawing: it is applied inside normalisation, right
+  after sorting and before stacking, so positions, cursor, keyboard, hidden data table and the
+  value-axis extent all follow it. That is deliberately the opposite of decimation, and the rule
+  behind both is the same — the accessible representation must match what is on screen, and what is
+  on screen is the user's choice. Decimation is invisible to the user, so hiding rows from a screen
+  reader would be a lie; the window is visible, so the table follows it. One consequence is worth
+  knowing: zooming resolves fine structure that reads as solid hatching at full range, because the
+  decimation budget is measured against plot width and a narrow window holds fewer points, so each
+  gets more vertices. The axis domain becomes
+  the window itself rather than the extent of the surviving points, so a brushed stretch does not
+  snap to the nearest data; `includeXValues` no longer widens it, since a reference past the edge
+  would undo the zoom; `activeIndex` addresses the current window. A drag shorter than 4px is a
+  click, not a brush, so picking a point still works; `Escape` cancels a drag in progress; the
+  tooltip goes quiet while brushing; touch is left alone, because a drag across the canvas is how a
+  page is scrolled. Category scales have no window, for the same reason they are never decimated.
+- **`chart/chartZoom`** — the window arithmetic as a pure module: `windowFromPixels`, `zoomWindow`,
+  `clampWindow` and `smallestGap`. A consumer restoring a zoom level from the URL needs no chart to
+  compute it. `ChartData` also reports `fullXDomain`, the unwindowed extent — measure a gesture
+  against the current window and there would be no way out of a zoom.
+- **`alignedTicks` and `scaleForAxis` are re-exported** from `@feugene/granularity-charts/chart`.
+  Both were announced in v0.4.0 but never left the barrel.
+
+### Changed
+
+- **The pointer hot path is indexed, not scanned.** Every normalised series now carries
+  `byX: ReadonlyMap<number, NormalizedPoint>`, built in the same pass that reads the points. The
+  tooltip's active point, `activeSymbolMarks`, the hidden table and the bar chart's tooltip anchor
+  used to walk the whole series — up to `S + 2` full passes per change of active point, measured
+  against complete series rather than decimated ones. `barHitIndex`, the only one that ran on
+  **every** `pointermove` for bars and waterfalls, is now a binary search; a per-pixel sweep test
+  pins it to the old traversal, ragged position sets included. `GrChartHeatmap` builds one cell
+  instead of the whole matrix for its anchor and active outline.
+
+### Fixed
+
+- **The `canvasThreshold` doc block was attached to the wrong prop** on both `GrChartLine` and
+  `GrChartArea`, and described the wrong mode: with default settings the threshold only gates
+  `showPoints: 'always'`, because `'auto'` stops drawing markers earlier, at sixty points. The
+  same inaccuracy is corrected in the showcase, whose API tables were also missing `decimate` and
+  `maxPoints` entirely. The binary-search note in `chartScale` sat on `scaleForAxis` while
+  describing `nearestIndex`.
+
 ## [v0.6.0] 2026-08-19
 
 ### Added

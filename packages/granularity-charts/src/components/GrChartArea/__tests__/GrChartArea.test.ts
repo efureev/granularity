@@ -1,4 +1,4 @@
-import { granularityGlobal, mockRect } from '@feugene/granularity/testing'
+import { granularityGlobal, mockRect, move, press, release } from '@feugene/granularity/testing'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
@@ -248,5 +248,40 @@ describe('GrChartArea: сто процентов', () => {
   it('график называет себя нормированным', () => {
     expect(factory({ stacked: '100%' }).find('[data-gr-chart-surface]').attributes('aria-roledescription'))
       .toContain('100%')
+  })
+})
+
+describe('приближение по абсциссе', () => {
+  const dense = [{ id: 'a', x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], y: [0, 4, 1, 6, 2, 8, 3, 9, 5, 7] }]
+
+  it('протяжка сужает окно', () => {
+    const wrapper = factory({ series: dense, zoom: 'brush' })
+
+    press(wrapper.find('[data-gr-chart-surface]').element, { clientX: 150, clientY: 60 })
+    move({ clientX: 400, clientY: 60 })
+    release({ clientX: 400, clientY: 60 })
+
+    const [value] = (wrapper.emitted('update:xWindow')!.at(-1) ?? []) as [[number, number]]
+
+    expect(value[0]).toBeGreaterThan(0)
+    expect(value[1]).toBeLessThan(9)
+  })
+
+  it('окно сужает и рисунок, и скрытую таблицу', () => {
+    const wrapper = factory({ series: dense, xWindow: [2, 5], dataTable: 'visible' })
+
+    expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(4)
+  })
+
+  it('стек внутри окна считается по видимому', () => {
+    // Полосы стека обязаны опираться на сумму тех точек, что в окне: сумма по
+    // всему ряду увела бы верх стопки за край оси.
+    const stacked = [
+      { id: 'a', x: [0, 1, 2, 3], y: [1, 1, 100, 100] },
+      { id: 'b', x: [0, 1, 2, 3], y: [1, 1, 100, 100] },
+    ]
+    const wrapper = factory({ series: stacked, stacked: true, xWindow: [0, 1] })
+
+    expect(wrapper.findAll('[data-gr-chart-area-fill]')).toHaveLength(2)
   })
 })
