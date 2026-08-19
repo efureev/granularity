@@ -7,6 +7,29 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-20
+
+### Added
+
+- **Cross-field schema rules now reach the fields they name.** `z.object({…}).refine(…)` — password
+  confirmation, "end date after start", "fill at least one of these two" — used to do nothing at all:
+  the flag it sets lands on the **container**, and containers carry no rules, so the compiled
+  validation never saw it. There was no error and no warning; the form simply submitted. The form now
+  runs `model.validate(value)` on submit and routes the issues by path through the same channel it
+  already uses for a server response — a path that matches a field lands on that field, one that does
+  not goes to the form summary. `submit` is withheld and `invalid` is emitted instead, so the
+  "either submit or invalid" contract survives the new outcome.
+
+  A rule on a **field** (`z.string().refine(…)`) was never affected: it marks that node, and the
+  compiler has always turned it into an ordinary field rule.
+
+  The check runs only when there is something to check — the schema can validate itself **and**
+  carries a rule no node can express. A form without cross-field rules pays nothing, including
+  asynchrony: its `submit` fires exactly as before, and a synchronous validator (zod) does not push
+  the emit onto a microtask either. Turn it off through the existing `validation.tiers` by dropping
+  `'residual'`. JSON Schema has no built-in full check — the package ships no validator — so pass a
+  compiled Ajv through `parseOptions.validate` to get the same behaviour.
+
 ## [v0.1.3] 2026-08-20
 
 ### Fixed

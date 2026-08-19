@@ -1,7 +1,10 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, reactive } from 'vue'
+import { defineComponent, markRaw, nextTick, reactive } from 'vue'
 import GrConfigProvider from '@feugene/granularity/components/GrConfigProvider'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
+
+import { zodAdapter } from '../../../adapters/zod'
 
 import { jsonSchemaAdapter } from '../../../adapters/json-schema'
 import type { JsonSchemaDocument } from '../../../adapters/json-schema'
@@ -274,5 +277,124 @@ describe('GrSchemaForm и GrConfigProvider', () => {
     })
 
     expect(wrapper.find('h5').exists()).toBe(true)
+  })
+})
+
+describe('кросс-полевые правила схемы', () => {
+  /**
+   * `refine` на объекте помечает `residual` контейнер, а контейнеры правил не
+   * несут: путь ошибки схема сообщает только в момент проверки. Такие правила
+   * форма гоняет сама на отправке — иначе они молча не работали бы.
+   */
+  // `markRaw` — не украшение: `mount` оборачивает пропы в `reactive`, а у zod
+  // `_def` non-configurable, и глубокий прокси на нём падает. В приложении
+  // этого не бывает: пропы компонента вглубь не проксируются.
+  const schema = markRaw(z.object({
+    password: z.string().min(4),
+    passwordAgain: z.string().min(4),
+  }).refine(value => value.password === value.passwordAgain, {
+    path: ['passwordAgain'],
+    message: 'Пароли не совпадают',
+  }))
+
+  const mountZod = (props: Record<string, unknown> = {}) => mount(GrSchemaForm, {
+    props: { schema, adapters: [zodAdapter], ...props },
+    attachTo: document.body,
+  })
+
+  const submit = async (wrapper: ReturnType<typeof mountZod>) => {
+    await wrapper.find('form').trigger('submit')
+    await nextTick()
+    await nextTick()
+  }
+
+  it('не отправляет форму и сажает сообщение на поле из `path`', async () => {
+    const wrapper = mountZod({ modelValue: { password: 'lorem', passwordAgain: 'ipsum' } })
+    await submit(wrapper)
+
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    expect(wrapper.text()).toContain('Пароли не совпадают')
+  })
+
+  it('несогласие обещано событием: молчание после нажатия читается как поломка', async () => {
+    const wrapper = mountZod({ modelValue: { password: 'lorem', passwordAgain: 'ipsum' } })
+    await submit(wrapper)
+
+    expect(wrapper.emitted('invalid')?.[0]?.[0]).toEqual({ passwordAgain: 'Пароли не совпадают' })
+  })
+
+  it('совпавшие значения отправляются', async () => {
+    const wrapper = mountZod({ modelValue: { password: 'lorem', passwordAgain: 'lorem' } })
+    await submit(wrapper)
+
+    expect(wrapper.emitted('submit')).toBeTruthy()
+    expect(wrapper.text()).not.toContain('Пароли не совпадают')
+  })
+
+  it('правка поля снимает сообщение — иначе оно залипает до конца жизни формы', async () => {
+    const wrapper = mountZod({ modelValue: { password: 'lorem', passwordAgain: 'ipsum' } })
+    await submit(wrapper)
+    expect(wrapper.text()).toContain('Пароли не совпадают')
+
+    const inputs = wrapper.findAll('input')
+    await inputs[1]!.setValue('lorem')
+    await nextTick()
+
+    expect(wrapper.text()).not.toContain('Пароли не совпадают')
+  })
+
+  it('замечание без пути уходит в сводку, а не теряется', async () => {
+    const anonymous = markRaw(z.object({ a: z.string() }).refine(value => value.a === 'ok', { message: 'Так нельзя' }))
+    const wrapper = mount(GrSchemaForm, {
+      props: { schema: anonymous, adapters: [zodAdapter], modelValue: { a: 'нет' }, showFormErrors: true },
+      attachTo: document.body,
+    })
+    await submit(wrapper as never)
+
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    expect(wrapper.text()).toContain('Так нельзя')
+  })
+
+  it('выключается тем же `tiers`, а не вторым пропом', async () => {
+    const wrapper = mountZod({
+      modelValue: { password: 'lorem', passwordAgain: 'ipsum' },
+      validation: { tiers: ['declarative', 'local'] },
+    })
+    await submit(wrapper)
+
+    expect(wrapper.emitted('submit')).toBeTruthy()
+    expect(wrapper.text()).not.toContain('Пароли не совпадают')
+  })
+
+  it('без кросс-полевых правил схема не гоняется вовсе', async () => {
+    // Гарантия, что обычные формы за эту возможность не платят.
+    const plain = markRaw(z.object({ a: z.string() }))
+    const spy = vi.fn(() => [])
+    const wrapper = mount(GrSchemaForm, {
+      props: { schema: plain, adapters: [zodAdapter], parseOptions: { validate: spy }, modelValue: { a: 'ok' } },
+      attachTo: document.body,
+    })
+    await submit(wrapper as never)
+
+    expect(spy).not.toHaveBeenCalled()
+    expect(wrapper.emitted('submit')).toBeTruthy()
+  })
+
+  it('асинхронную проверку дожидается', async () => {
+    const asyncSchema = markRaw(z.object({ a: z.string() }).refine(() => true))
+    const wrapper = mount(GrSchemaForm, {
+      props: {
+        schema: asyncSchema,
+        adapters: [zodAdapter],
+        parseOptions: { validate: async () => [{ path: 'a', message: 'Занято' }] },
+        modelValue: { a: 'ok' },
+      },
+      attachTo: document.body,
+    })
+    await submit(wrapper as never)
+    await nextTick()
+
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    expect(wrapper.text()).toContain('Занято')
   })
 })

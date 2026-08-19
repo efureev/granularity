@@ -21,7 +21,7 @@ import GrAlert from '@feugene/granularity/components/GrAlert'
 import GrForm from '@feugene/granularity/components/GrForm'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import type { GrSchemaAdapter, GrSchemaFieldInstance, GrSchemaModel, GrSchemaNode, GrSchemaParseOptions, GrSchemaWarning } from '../../model'
+import type { GrSchemaAdapter, GrSchemaFieldInstance, GrSchemaIssue, GrSchemaModel, GrSchemaNode, GrSchemaParseOptions, GrSchemaWarning } from '../../model'
 import {
   createInitialModel,
   ensureShape,
@@ -35,7 +35,7 @@ import { useServerFieldErrors } from '../../server-errors'
 import type { GrUiColumns, GrUiSchema, GrUiSection } from '../../ui-schema'
 import { applyOrder, evaluateCondition, createConditionContext } from '../../ui-schema'
 import type { GrSchemaRuleCompilerOptions } from '../../validation'
-import { compileRules } from '../../validation'
+import { compileRules, includesTier } from '../../validation'
 import { useTranslations } from '../../internal/i18n'
 
 import { useGrComponentProp } from '@feugene/granularity/composables/useGrComponentConfig'
@@ -241,6 +241,32 @@ watch(() => props.serverErrors, (source) => {
   else serverErrors.set(source)
 }, { immediate: true, deep: true })
 
+/**
+ * Замечания самой схемы — отдельным каналом от серверных.
+ *
+ * Жизненный цикл у них разный: серверные живут до следующей отправки, а эти
+ * пересчитываются на каждой. Один канал с двумя писателями означал бы, что проп
+ * потребителя затирает внутреннее состояние в непредсказуемый момент.
+ */
+const schemaErrors = useServerFieldErrors({
+  knownPaths: () => visibleFields.value.map(field => field.name),
+})
+
+/**
+ * Есть ли правило, которое компилятор выразить не смог, — и не на листе.
+ *
+ * `refine` на поле помечает `residual` само поле, и правило до него доходит.
+ * `refine` на объекте помечает контейнер, а контейнеры правил не несут — до
+ * `passwordAgain` объявлением поля не дотянуться, потому что путь ошибки схема
+ * сообщает только в момент проверки. Такие правила и остаются на отправку.
+ */
+const hasContainerResidual = computed(() =>
+  // Корень проверяется отдельно: `expandFields` раскрывает только листья, и
+  // сам объект в список инстансов не попадает вовсе — а `refine` на схеме
+  // помечает именно его.
+  root.value?.residual === true
+  || allFields.value.some(field => !field.leaf && field.node.residual === true))
+
 /** Поля верхнего уровня — их рисует форма; вложенные рисуют контейнеры. */
 const rootFields = computed(() =>
   applyOrder(allFields.value.filter(field => field.parent === ''), ui.value.order))
@@ -282,7 +308,7 @@ const rules = computed<GrFormRules>(() => ({
   ...props.rules,
 }))
 
-const formErrors = computed(() => serverErrors.formErrors.value)
+const formErrors = computed(() => [...serverErrors.formErrors.value, ...schemaErrors.formErrors.value])
 
 provideSchemaForm({
   root,
@@ -292,8 +318,15 @@ provideSchemaForm({
   disabled: computed(() => props.disabled),
   readonly: computed(() => props.readonly),
 
-  serverErrorAt: name => serverErrors.get(name),
-  dismissServerError: name => serverErrors.dismiss(name),
+  serverErrorAt: (name) => {
+    const messages = [...(serverErrors.get(name) ?? []), ...(schemaErrors.get(name) ?? [])]
+
+    return messages.length > 0 ? messages : undefined
+  },
+  dismissServerError: (name) => {
+    serverErrors.dismiss(name)
+    schemaErrors.dismiss(name)
+  },
 
   nodeAt: (templatePath) => {
     if (!root.value) return undefined
@@ -325,13 +358,87 @@ provideSchemaForm({
 
 async function validate(): Promise<boolean> {
   const valid = (await formRef.value?.validate()) ?? true
-  return valid && Object.keys(serverErrors.errors.value).length === 0
+
+  if (!valid) return false
+
+  if (needsSchemaCheck() && applySchemaIssues(await parsed.value!.validate!(model.value)))
+    return false
+
+  return Object.keys(serverErrors.errors.value).length === 0
+}
+
+/**
+ * Нужна ли вообще полная проверка схемой.
+ *
+ * Проверка стоит прохода по всей схеме, поэтому спрашивается заранее и дёшево:
+ * схема умеет проверять себя целиком, в ней есть правило, не выразимое узлом, и
+ * ярус не выключен. Форме без кросс-полевых правил всё это не стоит ничего —
+ * включая асинхронность: `submit` у неё эмитится ровно так же, как раньше.
+ */
+function needsSchemaCheck(): boolean {
+  return Boolean(parsed.value?.validate)
+    && hasContainerResidual.value
+    && includesTier(props.validation, 'residual')
+}
+
+/**
+ * Замечания схемы — по полям, тем же каналом, что и ответ сервера.
+ *
+ * Путь совпал с полем — сообщение на поле, не совпал или пуст — в сводку.
+ * Работа та же самая, и делать её вторым способом было бы странно.
+ */
+function applySchemaIssues(issues: readonly GrSchemaIssue[]): boolean {
+  if (issues.length === 0) return false
+
+  const byPath = new Map<string, string[]>()
+
+  for (const issue of issues)
+    byPath.set(issue.path, [...(byPath.get(issue.path) ?? []), issue.message])
+
+  for (const [path, messages] of byPath)
+    schemaErrors.setField(path, messages)
+
+  return true
+}
+
+/**
+ * Контракт «либо `submit`, либо `invalid`» обязан пережить и этот отказ:
+ * молчание после нажатия читается как поломка формы.
+ */
+function finishSubmit(rejected: boolean): void {
+  if (!rejected) {
+    emit('submit', model.value as TModel)
+
+    return
+  }
+
+  emit('invalid', Object.fromEntries(
+    Object.entries(schemaErrors.errors.value).map(([path, messages]) => [path, messages[0] ?? '']),
+  ))
 }
 
 function onSubmit(): void {
-  // Серверные ошибки относятся к прошлой отправке — снимаются в её начале.
+  // Ошибки прошлой отправки снимаются в начале следующей — и серверные, и свои.
   serverErrors.clear()
-  emit('submit', model.value as TModel)
+  schemaErrors.clear()
+
+  if (!needsSchemaCheck()) {
+    finishSubmit(false)
+
+    return
+  }
+
+  const issues = parsed.value!.validate!(model.value)
+
+  // Синхронный ответ — синхронный `submit`: zod отвечает сразу, и сдвигать ему
+  // эмит на микрозадачу незачем. Ждём только ту проверку, что правда ждёт.
+  if (Array.isArray(issues)) {
+    finishSubmit(applySchemaIssues(issues))
+
+    return
+  }
+
+  void issues.then(resolved => finishSubmit(applySchemaIssues(resolved)))
 }
 
 function onInvalid(errors: Record<string, string>): void {

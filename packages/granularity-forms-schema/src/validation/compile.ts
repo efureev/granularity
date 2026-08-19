@@ -34,6 +34,16 @@ export interface GrSchemaRuleCompilerOptions {
 
 const DEFAULT_TIERS: readonly GrSchemaRuleTier[] = ['declarative', 'local', 'residual']
 
+/**
+ * Включён ли ярус. Дефолт живёт здесь и только здесь.
+ *
+ * Спрашивает не только компилятор: форма гоняет полную проверку схемой на
+ * отправке, и выключаться это обязано тем же `tiers`, а не вторым пропом.
+ */
+export function includesTier(options: GrSchemaRuleCompilerOptions | undefined, tier: GrSchemaRuleTier): boolean {
+  return (options?.tiers ?? DEFAULT_TIERS).includes(tier)
+}
+
 function translate(options: GrSchemaRuleCompilerOptions, key: string, fallback: string, params?: Record<string, unknown>): string {
   return options.t ? options.t(key, fallback, params) : interpolate(fallback, params)
 }

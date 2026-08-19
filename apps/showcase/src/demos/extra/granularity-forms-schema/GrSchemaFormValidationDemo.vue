@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
+import { ref } from 'vue'
 import { z } from 'zod'
 
 import { GrButton } from '@feugene/granularity'
 import { GrSchemaForm } from '@feugene/granularity-forms-schema'
-import type { GrSchemaModel } from '@feugene/granularity-forms-schema'
 import type { GrUiSchema } from '@feugene/granularity-forms-schema/ui-schema'
 import { zodAdapter } from '@feugene/granularity-forms-schema/zod'
 
@@ -27,8 +26,7 @@ const schema = z.object({
   terms: z.literal(true).meta({ title: 'Согласен с условиями' }),
 })
   // Ярус 3 — кросс-полевое правило. Из модели такое не выражается вовсе:
-  // `residual` получает корневой узел, а дальше схему надо звать самому — см.
-  // `onSubmit` ниже.
+  // `residual` получает корневой узел, и форма гоняет схему сама на отправке.
   .refine(value => value.password === value.passwordAgain, {
     path: ['passwordAgain'],
     message: 'Пароли не совпадают',
@@ -48,38 +46,6 @@ const model = ref<Record<string, unknown>>({
 
 const submitted = ref(false)
 
-const parsed = shallowRef<GrSchemaModel | null>(null)
-const schemaErrors = ref<{ errors: Record<string, string[]> } | null>(null)
-
-/**
- * Ярус 3 — схема как последняя инстанция, и подключается он вручную.
- *
- * `refine` помечает `residual` **корневой** узел, а контейнеры правил не несут:
- * дотянуться до `passwordAgain` объявлением поля нечем — путь ошибки zod
- * сообщает только в момент проверки. Поэтому схему гоняют на отправке, а её
- * замечания раскладывают по полям тем же путём, что и ответ сервера.
- */
-function onSubmit(): void {
-  const issues = parsed.value?.validate?.(model.value)
-
-  if (!Array.isArray(issues) || issues.length === 0) {
-    schemaErrors.value = null
-    submitted.value = true
-
-    return
-  }
-
-  submitted.value = false
-  // Карта «поле: сообщения» — форма Laravel, самая короткая из тех, что
-  // `serverErrors` понимает без настройки.
-  schemaErrors.value = {
-    errors: issues.reduce<Record<string, string[]>>((map, issue) => {
-      map[issue.path] = [...(map[issue.path] ?? []), issue.message]
-
-      return map
-    }, {}),
-  }
-}
 </script>
 
 <template>
@@ -89,10 +55,8 @@ function onSubmit(): void {
       :schema="schema"
       :adapters="[zodAdapter]"
       :ui-schema="ui"
-      :server-errors="schemaErrors"
       show-form-errors
-      @parsed="value => (parsed = value)"
-      @submit="onSubmit"
+      @submit="submitted = true"
       @invalid="submitted = false"
     >
       <!-- Кнопку рисует потребитель: форма не знает, одна она на странице или
@@ -122,12 +86,12 @@ function onSubmit(): void {
     </p>
 
     <p class="text-[length:var(--gr-control-text-sm)] text-[var(--gr-muted-fg)]">
-      Третий ярус подключается <strong>вручную</strong>, обвязкой в исходнике демо, и причина
-      видна в модели: <code>refine</code> помечает <code>residual</code> у <strong>корневого</strong>
-      узла, а не у <code>passwordAgain</code>. Путь ошибки zod сообщает только в момент проверки,
-      объявить его заранее нечем. Поэтому схему гоняют на отправке, а её замечания раскладывают по
-      полям тем же способом, что и ответ сервера, — через <code>serverErrors</code>. Схема здесь
-      последняя инстанция, ровно как бэкенд.
+      Третий ярус не требует ни строчки обвязки. <code>refine</code> на объекте помечает
+      <code>residual</code> у <strong>корневого</strong> узла, а не у <code>passwordAgain</code>:
+      путь ошибки схема сообщает только в момент проверки, объявить его заранее нечем. Поэтому
+      форма сама прогоняет схему на отправке и раскладывает её замечания по полям — тем же путём,
+      которым разбирает ответ сервера. Формам без кросс-полевых правил это не стоит ничего: проверка
+      не запускается вовсе. Выключается тем же <code>validation.tiers</code>, без второго пропа.
     </p>
 
     <p class="text-[length:var(--gr-control-text-sm)] text-[var(--gr-muted-fg)]">
