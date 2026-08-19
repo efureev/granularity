@@ -7,6 +7,42 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.5.0] 2026-08-19
+
+### Added
+
+- **Quick ranges live in the picker panel.** `GrDateRangePicker` and `GrDatePicker` gained a
+  `presets` prop — a row of shortcuts in the panel footer: «Today», «Last 7 days», «This month».
+  Bounds may be given as a function, so «last 7 days» counts from today rather than from the day
+  the prop was declared. A shortcut whose range falls outside `min`/`max`, touches `disabledDates`
+  or breaks `minRange`/`maxRange` arrives disabled: a button that does nothing lies about what it
+  does. The docs used to redirect this to `GrSegmented` next to the field, and for a single date
+  that still holds — but a range shortcut has to set **both** bounds and respect the length limits,
+  which is knowledge only the picker has.
+- **The `footer` slot now carries the selection.** `GrDateRangePicker` passes `setRange`,
+  `canSetRange` and `close`; `GrDatePicker` and `GrCalendar` pass `select`, `canSelect` (and
+  `close` for the picker). A custom footer replaces the preset row entirely and gets exactly the
+  same rules, so it cannot select a value the grid would refuse.
+- **`GrDuration` — how long it lasted, not when it happened.** «2 h 30 min» from a number of
+  seconds, from a pair of dates, or counted live from a starting moment. Unit names and numeral
+  agreement come from `Intl`, so the component ships no strings of its own; the markup is `<time>`
+  with an exact ISO 8601 duration in `datetime` even when the text is shortened.
+- **Duration arithmetic is public**: `selectDurationParts`, `formatDuration`, `durationToIso` and
+  `resetDurationFormatCache`. Units stop at days — months and years are calendar-bound, and
+  deriving them from a count of seconds cannot be done without lying. `maxUnits` is a ceiling
+  rather than a quota (exactly two hours reads «2 h», not «2 h 0 min»), and the smallest shown unit
+  is truncated rather than rounded, so the display never runs ahead of the time that actually
+  passed. Where `Intl.DurationFormat` is missing — the package declares Node `>=22`, which has no
+  such API, and the SSR harness runs in Node — the same string is assembled from
+  `Intl.NumberFormat` with `style: 'unit'`.
+
+### Changed
+
+- **The panel footer moved out of the calendar grid into the picker panel.** Rendered inside
+  `[data-gr-calendar]` it had no padding of its own: the panel hands its background and spacing to
+  the calendar. Anything already using the `footer` slot of `GrDatePicker` or `GrDateRangePicker`
+  now sits one level higher in the DOM.
+
 ## [v0.4.0] 2026-08-19
 
 ### Changed

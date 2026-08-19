@@ -31,6 +31,7 @@ declare module 'vue' {
     GrDateRangePicker: typeof import('@feugene/granularity-chrono/components/GrDateRangePicker')['GrDateRangePicker']
     GrDateTimePicker: typeof import('@feugene/granularity-chrono/components/GrDateTimePicker')['GrDateTimePicker']
     GrDialog: typeof import('@feugene/granularity/components/GrDialog')['GrDialog']
+    GrDuration: typeof import('@feugene/granularity-chrono/components/GrDuration')['GrDuration']
     GrFormField: typeof import('@feugene/granularity/components/GrFormField')['GrFormField']
     GrRelativeTime: typeof import('@feugene/granularity-chrono/components/GrRelativeTime')['GrRelativeTime']
     GrSegmented: typeof import('@feugene/granularity/components/GrSegmented')['GrSegmented']

@@ -612,6 +612,34 @@ function calendarApiSections(): ShowcaseApiSectionMeta[] {
 }
 
 /** Метка относительного времени: показ, а не выбор — и поверхность здесь другая. */
+function durationApiSections(): ShowcaseApiSectionMeta[] {
+  return [
+    {
+      key: 'props',
+      title: 'Props',
+      origin: 'manual',
+      items: [
+        { name: 'value', type: 'number | Date | readonly [Date, Date] | null', description: 'Число — секунды, пара дат — промежуток между ними, одна дата — время до «сейчас»: такая метка живая.' },
+        { name: 'base', type: 'Date', description: 'С чем сравнивать вместо «сейчас» — для формы с одной датой. Задан — часы не читаются вовсе.' },
+        { name: 'live', type: 'boolean', default: 'true', description: 'Обновляться живьём. Такт выбирается по младшей показанной единице.' },
+        { name: 'maxUnits', type: 'number', default: '2', description: 'Потолок числа единиц, а не квота: ровно два часа — это «2 ч», а не «2 ч 0 мин».' },
+        { name: 'largestUnit', type: `'day' | 'hour' | 'minute' | 'second'`, default: `'day'`, description: 'Крупнее не дробить: остаток копится в этой единице.' },
+        { name: 'smallestUnit', type: `'day' | 'hour' | 'minute' | 'second'`, default: `'second'`, description: 'Мельче не спускаться.' },
+        { name: 'width', type: `'long' | 'short' | 'narrow'`, default: `'short'`, description: '«2 часа 30 минут» против «2 ч 30 мин».' },
+        { name: 'locale', type: 'string', description: 'Локаль показа. Не задана — из адаптера i18n приложения.' },
+      ],
+    },
+    {
+      key: 'slots',
+      title: 'Slots',
+      origin: 'manual',
+      items: [
+        { name: 'default', type: '{ text: string, datetime: string, seconds: number }', description: 'Своя разметка вместо текста: значения те же, что компонент рисует сам.' },
+      ],
+    },
+  ]
+}
+
 function relativeTimeApiSections(): ShowcaseApiSectionMeta[] {
   return [
     {
@@ -1498,6 +1526,13 @@ export const companionPackages: CompanionPackage[] = [
             description: '`minRange` и `maxRange` считают обе границы. Недопустимая длина не выбирается, но и не сбрасывает начало.',
             previewKey: 'extra-chrono-range-limits',
           },
+          {
+            id: 'chrono-range-presets',
+            title: 'Quick ranges live inside the panel',
+            description: 'Шорткат периода обязан выставить обе границы разом и уважать ограничения длины — то есть знать внутренности пикера. Ряд рядом с полем этого не умеет, поэтому готовые периоды живут в подвале панели.',
+            previewKey: 'extra-chrono-range-presets',
+            note: 'Период длиннее `maxRange` приходит выключенным, а не молча ничего не делает; то же с датами вне `min`/`max` и с `disabledDates`. Границы можно задать функцией — «последние 7 дней» отсчитываются от сегодняшнего дня, а не от дня, когда объявили проп.',
+          },
         ],
         apiSections: dateRangePickerApiSections(),
       },
@@ -1530,6 +1565,23 @@ export const companionPackages: CompanionPackage[] = [
           },
         ],
         apiSections: relativeTimeApiSections(),
+      },
+      {
+        name: 'GrDuration',
+        slug: 'gr-duration',
+        title: 'GrDuration',
+        summary: 'Сколько длилось, а не когда случилось: «2 ч 30 мин» из секунд, из пары дат или живым счётом от момента начала. Имена единиц знает `Intl`, своих строк у метки нет.',
+        importPath: '@feugene/granularity-chrono/components/GrDuration',
+        examples: [
+          {
+            id: 'chrono-duration-basic',
+            title: 'Seconds, a pair of dates, or a running clock',
+            description: 'Три формы значения — три разных вопроса. Число это готовая длина, пара дат — промежуток между моментами, одна дата — время, которое идёт прямо сейчас и пересчитывается само.',
+            previewKey: 'extra-chrono-duration-basic',
+            note: 'Младшее отбрасывается, а не округляется: «2 ч 59 мин 30 с» остаётся «2 ч 59 мин», иначе показ ушёл бы вперёд реально прошедшего времени. В `datetime` при этом уезжает полное значение — сокращение сделано для человека, не для машины.',
+          },
+        ],
+        apiSections: durationApiSections(),
       },
     ],
   },
