@@ -10,6 +10,7 @@ import {
   breadcrumbsCurrentClass,
   breadcrumbsEllipsisClass,
   breadcrumbsItemIconClass,
+  breadcrumbsItemWrapClass,
   breadcrumbsLabelClass,
   breadcrumbsListClass,
   breadcrumbsListNowrapClass,
@@ -54,6 +55,14 @@ export interface GrBreadcrumbsProps {
   ariaLabel?: string
   /** Последний пункт остаётся ссылкой (текущая страница кликабельна). */
   linkCurrent?: boolean
+  /**
+   * Какой пункт — текущая страница. Не задан — последний.
+   *
+   * `-1` означает, что текущей страницы в пути нет: её имя стоит в `h1`, а
+   * путь показывает только родителей. Тогда `aria-current` не получает никто,
+   * и последний пункт остаётся обычной ссылкой.
+   */
+  currentIndex?: number
   /** i18n-метка кнопки раскрытия схлопнутого пути. */
   expandLabel?: string
   /**
@@ -76,6 +85,7 @@ const props = withDefaults(defineProps<GrBreadcrumbsProps>(), {
   itemsAfterCollapse: 1,
   ariaLabel: undefined,
   linkCurrent: false,
+  currentIndex: undefined,
   expandLabel: undefined,
   autoCollapse: false,
 })
@@ -162,15 +172,19 @@ const entries = computed(() => resolveBreadcrumbsLayout({
   expanded: expanded.value,
 }))
 
+const resolvedCurrentIndex = computed(() => props.currentIndex ?? lastIndex.value)
+
 function isCurrent(index: number): boolean {
-  return index === lastIndex.value
+  return index === resolvedCurrentIndex.value
 }
 
-/** Ссылкой пункт становится, только если ведёт куда-то и не выключен. */
+/**
+ * Ссылкой пункт становится, только если ведёт куда-то и не выключен.
+ */
 function isLink(item: GrBreadcrumbItem, index: number): boolean {
   if (item.disabled) return false
   if (isCurrent(index) && !props.linkCurrent) return false
-  return item.href !== undefined || item.to !== undefined || props.as !== undefined
+  return item.href !== undefined || item.to !== undefined
 }
 
 function widthOf(el: Element | null | undefined): number {
@@ -328,7 +342,7 @@ async function expand(): Promise<void> {
           </slot>
         </li>
 
-        <li v-else data-gr-breadcrumbs-item-wrap class="min-w-0">
+        <li v-else data-gr-breadcrumbs-item-wrap :class="breadcrumbsItemWrapClass">
           <GrLink
             v-if="isLink(entry.item, entry.index)"
             :key="`link-${entry.index}`"

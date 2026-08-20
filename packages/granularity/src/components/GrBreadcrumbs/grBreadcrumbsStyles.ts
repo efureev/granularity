@@ -49,6 +49,16 @@ export const breadcrumbsSeparatorClass = 'select-none text-[var(--gr-muted-fg)]'
 /** Текущая страница: не ссылка, но и не «выключенный» текст — обычный акцент подписи. */
 export const breadcrumbsCurrentClass = 'inline-flex items-center gap-1 min-w-0 font-600 text-[var(--gr-fg)]'
 
+/**
+ * Обёртка пункта — flex, а не блок с линейным боксом.
+ *
+ * Базовая линия `inline-flex` берётся от первого flex-элемента: у пункта
+ * с иконкой это блочная иконка, и линейный бокс раздувается на высоту
+ * подстрочных выносных. Пункт с иконкой выходил на 3px выше соседей, а при
+ * `align-items: center` списка это смещало его содержимое на полтора пикселя.
+ */
+export const breadcrumbsItemWrapClass = 'flex items-center min-w-0'
+
 export const breadcrumbsItemIconClass = 'inline-block h-4 w-4 shrink-0'
 
 export const breadcrumbsLabelClass = 'truncate'

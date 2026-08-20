@@ -3,6 +3,7 @@ import {
   breadcrumbsCurrentClass,
   breadcrumbsEllipsisClass,
   breadcrumbsItemIconClass,
+  breadcrumbsItemWrapClass,
   breadcrumbsLabelClass,
   breadcrumbsListClass,
   breadcrumbsListNowrapClass,
@@ -24,6 +25,7 @@ export const grBreadcrumbsSafelist = [...new Set([
   ...splitClassTokens(breadcrumbsSeparatorClass),
   ...splitClassTokens(breadcrumbsCurrentClass),
   ...splitClassTokens(breadcrumbsItemIconClass),
+  ...splitClassTokens(breadcrumbsItemWrapClass),
   ...splitClassTokens(breadcrumbsLabelClass),
   ...splitClassTokens(breadcrumbsEllipsisClass),
 ])]

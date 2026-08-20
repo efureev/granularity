@@ -7,6 +7,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrBreadcrumbs` — `currentIndex`.** Which item is the current page; unset keeps the previous
+  behaviour (the last one). `-1` states that the current page is not in the path at all — its name
+  lives in the page `h1` and the trail shows parents only. Then no item gets `aria-current` and the
+  last one stays an ordinary link.
+
+### Fixed
+
+- **`GrBreadcrumbs` — `as` no longer turns an item into a link.** It says *what* to render a link
+  with, not that the item *is* one. A menu section without `href` used to render as a link, and a
+  router component without a target navigates to the current address. Links are made by `href` / `to`.
+- **`GrBreadcrumbs` — an item with an icon no longer sits 1.5px off.** The wrapper `li` was a block
+  box, so the `inline-flex` item took its baseline from the first flex child — a block icon — and the
+  line box grew by the descender space. The item came out 3px taller than its icon-less neighbours and
+  `align-items: center` on the list shifted its content by half of that. The wrapper is a flex
+  container now.
+
 ## [v0.27.2] 2026-08-20
 
 ### Fixed

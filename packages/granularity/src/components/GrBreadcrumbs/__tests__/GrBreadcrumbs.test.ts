@@ -94,6 +94,63 @@ describe('GrBreadcrumbs — структура и семантика', () => {
   })
 })
 
+describe('GrBreadcrumbs — какой пункт текущий', () => {
+  it('`currentIndex: -1` — текущей страницы в пути нет', () => {
+    // Имя страницы стоит в `h1`, путь показывает только родителей: объявлять
+    // текущей последнюю из них значит врать диктору.
+    const wrapper = mountPath({ currentIndex: -1 })
+
+    const items = wrapper.findAll('[data-gr-breadcrumbs-item]')
+    expect(items.every(i => i.attributes('aria-current') === undefined)).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('`currentIndex: -1` оставляет последний пункт ссылкой', () => {
+    const wrapper = mount(GrBreadcrumbs, {
+      props: {
+        items: [{ label: 'Главная', href: '/' }, { label: 'Проекты', href: '/projects' }],
+        currentIndex: -1,
+      },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.findAll('a')).toHaveLength(2)
+
+    wrapper.unmount()
+  })
+
+  it('`currentIndex` указывает текущий пункт в середине пути', () => {
+    const wrapper = mountPath({ currentIndex: 1 })
+
+    const items = wrapper.findAll('[data-gr-breadcrumbs-item]')
+    expect(items[1].attributes('aria-current')).toBe('page')
+    expect(items[3].attributes('aria-current')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+})
+
+describe('GrBreadcrumbs — `as` не делает пункт ссылкой', () => {
+  it('пункт без `href` и `to` остаётся текстом даже при заданном `as`', () => {
+    // Роутерный компонент без адреса ведёт на текущую же страницу — раздел
+    // меню превращался в ссылку в никуда.
+    const Stub = defineComponent({ setup: (_, { slots }) => () => h('a', slots.default?.()) })
+    const wrapper = mount(GrBreadcrumbs, {
+      props: {
+        items: [{ label: 'Отчёты' }, { label: 'Выручка', href: '/reports/revenue' }],
+        as: Stub,
+        currentIndex: -1,
+      },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.findAll('a')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+})
+
 describe('GrBreadcrumbs — схлопывание', () => {
   const LONG = Array.from({ length: 6 }, (_, i) => ({ label: `Уровень ${i + 1}`, href: `/l${i + 1}` }))
 
