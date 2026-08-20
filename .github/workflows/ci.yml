@@ -152,6 +152,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # Пакет линтуется с проверкой типов, а гейты импортируют
+      # `@feugene/granularity-test-kit/gates`. Без его `dist` типы приезжают как
+      # `any`, и `ts/no-unsafe-call` роняет шаг Lint.
+      - name: Build test kit
+        run: yarn build:test-kit
+
       - name: Lint package
         run: yarn lint:datasource
 
@@ -310,6 +316,7 @@ jobs:
       - build-granularity-charts
       - build-granularity-dashboard
       - build-granularity-forms-schema
+      - build-granularity-datasource
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -362,6 +369,12 @@ jobs:
         with:
           name: granularity-forms-schema-dist
           path: packages/granularity-forms-schema/dist
+
+      - name: Download granularity-datasource dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datasource-dist
+          path: packages/granularity-datasource/dist
 
       - name: Lint showcase
         run: yarn lint:showcase
@@ -556,6 +569,7 @@ jobs:
       - build-granularity-charts
       - build-granularity-dashboard
       - build-granularity-forms-schema
+      - build-granularity-datasource
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -603,6 +617,12 @@ jobs:
           name: granularity-forms-schema-dist
           path: packages/granularity-forms-schema/dist
 
+      - name: Download granularity-datasource dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datasource-dist
+          path: packages/granularity-datasource/dist
+
       - name: Test showcase
         run: yarn test:showcase
 
@@ -617,6 +637,7 @@ jobs:
       - build-granularity-charts
       - build-granularity-dashboard
       - build-granularity-forms-schema
+      - build-granularity-datasource
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -670,6 +691,12 @@ jobs:
           name: granularity-forms-schema-dist
           path: packages/granularity-forms-schema/dist
 
+      - name: Download granularity-datasource dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datasource-dist
+          path: packages/granularity-datasource/dist
+
       - name: Install Playwright browsers
         working-directory: apps/showcase
         run: npx playwright install --with-deps chromium
@@ -703,6 +730,7 @@ jobs:
       - build-granularity-charts
       - build-granularity-dashboard
       - build-granularity-forms-schema
+      - build-granularity-datasource
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -749,6 +777,12 @@ jobs:
         with:
           name: granularity-forms-schema-dist
           path: packages/granularity-forms-schema/dist
+
+      - name: Download granularity-datasource dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-datasource-dist
+          path: packages/granularity-datasource/dist
 
       - name: Build showcase
         run: yarn build:showcase
