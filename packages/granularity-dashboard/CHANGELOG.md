@@ -7,6 +7,48 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.5.0] 2026-08-20
+
+### Added
+
+- **A widget can be dragged from one dashboard to another.** Two boards on a page — working and
+  archive, mine and the team's — had no way to exchange widgets except a "delete here, add there"
+  button the application wrote itself.
+
+  The gesture starts as an ordinary in-grid drag and **escalates** once the pointer leaves its own
+  grid and lands over another one. Merely leaving the edge does not count: on a long page the
+  pointer exits the grid constantly, and a widget that detached on every scroll-past would be
+  unusable.
+
+  While the widget is being carried it is **out of the source layout** — neighbours compact, and the
+  preview honestly shows what will remain. The markup is still rendered by the application, so the
+  element hides itself rather than losing its grid placement.
+
+- **`itemTransferOut`** — the source grid removes the widget from its own layout and says so. This
+  departs from the package's usual "the grid says where, the application places it" rule, and
+  deliberately: removal is unambiguous — unlike insertion it needs no markup — and leaving it to the
+  application would mean the same three `removeItem` lines in every consumer, with a widget on two
+  dashboards at once for anyone who forgot.
+
+  Only after a successful landing. Releasing between grids, pressing `Esc`, or coming back into the
+  source grid carry nothing away — and the return does not interrupt the gesture: the in-grid drag
+  continues from where it was.
+
+- **`transferable`** on the grid — giving away and receiving are separate permissions. An archive
+  board accepts widgets but hands none back. `static` widgets do not travel; they have no handle to
+  begin with.
+
+- `GrDashboardTransfer` gained `source: 'dashboard'` and `from` — the id of the grid a widget came
+  from, so a receiver can tell a catalogue drop from a neighbour's widget.
+
+### Changed
+
+- `useDashboardTransfer` can now run a session it does not own: `adopt`, `moveTo`, `release` and
+  `hasTargetAt` drive the same machinery as `start` (target resolution, per-frame flush, `Esc`,
+  cleanup) while the points come from outside. A cross-grid transfer grows out of a drag the source
+  grid already owns, and starting a second gesture on top of the first would split one stream of
+  `pointermove` between two state machines.
+
 ## [v0.4.0] 2026-08-20
 
 ### Added

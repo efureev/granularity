@@ -33,6 +33,7 @@ import {
   metricsOf,
   moveItem,
   rectOfItem,
+  removeItem,
   resizeItem,
   resolveBreakpoint,
   rowsForHeight,
@@ -40,6 +41,7 @@ import {
   withBreakpointLayout,
 } from '../../layout'
 import DashboardPlaceholder from '../GrDashboardFrame/shared/DashboardPlaceholder.vue'
+import TransferGhost from '../GrDashboardFrame/shared/TransferGhost.vue'
 import { animatedClass, emptyTextClass, emptyWrapClass, gridClass } from '../GrDashboardFrame/frameStyles'
 import type {
   GrDashboardActiveGeometry,
@@ -86,6 +88,13 @@ export interface GrDashboardProps {
    * несколько, а принимать должна одна.
    */
   droppable?: boolean
+  /**
+   * Из сетки можно утащить виджет в соседний дашборд.
+   *
+   * Отдельно от `droppable`: принимать и отдавать — разные разрешения. Архивный
+   * дашборд принимает виджеты, но своих не отдаёт.
+   */
+  transferable?: boolean
   ariaLabel?: string
 }
 
@@ -113,6 +122,14 @@ export interface GrDashboardEmits {
    * приложение не рисовало разметки.
    */
   (e: 'itemDrop', event: GrDashboardDropEvent): void
+  /**
+   * Виджет уехал в другую сетку.
+   *
+   * Из своей раскладки сетка убирает его сама — удаление однозначно, разметки
+   * для него не нужно, в отличие от вставки. Событие говорит приложению, что
+   * произошло, и несёт ту же нагрузку, что уехала в `itemDrop` приёмника.
+   */
+  (e: 'itemTransferOut', id: string, transfer: GrDashboardTransfer): void
 }
 
 const props = withDefaults(defineProps<GrDashboardProps>(), {
@@ -129,6 +146,7 @@ const props = withDefaults(defineProps<GrDashboardProps>(), {
   preventCollision: undefined,
   lazy: undefined,
   droppable: undefined,
+  transferable: undefined,
 })
 
 const emit = defineEmits<GrDashboardEmits>()
@@ -150,6 +168,7 @@ const compaction = useGrComponentProp('GrDashboard', 'compact', () => props.comp
 const preventCollision = useGrComponentProp('GrDashboard', 'preventCollision', () => props.preventCollision, false)
 const lazy = useGrComponentProp('GrDashboard', 'lazy', () => props.lazy, false)
 const droppable = useGrComponentProp('GrDashboard', 'droppable', () => props.droppable, true)
+const transferable = useGrComponentProp('GrDashboard', 'transferable', () => props.transferable, true)
 
 const rootId = useId()
 const rootEl = ref<HTMLElement | null>(null)
@@ -382,6 +401,69 @@ function clearVars(id: string): void {
     el.style.removeProperty(name)
 }
 
+// ————— Перенос виджетов: и приём из каталога, и отдача в соседний дашборд.
+
+// Объявляется раньше обоих блоков: на модель ссылаются и кадр жеста, и приём.
+const transfer = useDashboardTransfer()
+
+// ————— Перенос в соседний дашборд: жест за ручку, ушедший за край своей сетки.
+
+/** Виджет, который сейчас несут наружу. `null` — переноса нет. */
+const carriedAway = shallowRef<GrDashboardTransfer | null>(null)
+const carriedAwayId = computed(() => carriedAway.value?.id ?? null)
+
+function canTransferOut(id: string): boolean {
+  const item = itemFor(id)
+
+  return transferable.value && item !== undefined && !item.static && canMove(id)
+}
+
+function transferOf(item: GrDashboardItemLayout): GrDashboardTransfer {
+  return {
+    id: item.id,
+    title: titleOf(item.id),
+    size: { w: item.w, h: item.h },
+    minW: item.minW,
+    minH: item.minH,
+    maxW: item.maxW,
+    maxH: item.maxH,
+    source: 'dashboard',
+    from: rootId,
+  }
+}
+
+function isInsideOwnGrid(x: number, y: number): boolean {
+  const rect = rootEl.value?.getBoundingClientRect()
+  if (!rect) return true
+
+  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+}
+
+/**
+ * Виджет уехал в чужую сетку: из своей он уходит, соседи уплотняются.
+ *
+ * Превью честно показывает, что останется, — так же, как при обычном переносе.
+ * Разметку виджета по-прежнему рисует приложение, поэтому сам элемент прячется
+ * по `carriedAwayId`, а не остаётся без `grid-area`.
+ */
+function beginTransferOut(state: NonNullable<typeof dragState.value>, at: GrDashboardTransferPoint): void {
+  const payload = transferOf(state.origin)
+
+  carriedAway.value = payload
+  clearVars(state.id)
+  preview.value = removeItem(baseLayout.value, state.id, moveOptions.value)
+  transfer.adopt(payload)
+  transfer.moveTo(at)
+}
+
+/** Указатель вернулся домой: сессия сворачивается, обычный перенос продолжается. */
+function endTransferOut(): void {
+  if (!carriedAway.value) return
+
+  carriedAway.value = null
+  transfer.release(false)
+}
+
 /**
  * Кадр жеста: переменные пишутся всегда, раскладка пересчитывается только при
  * смене целевой ячейки. Именно это отделяет один перерисованный виджет от всех.
@@ -394,6 +476,20 @@ function flush(): void {
   writeVars(state)
 
   if (state.kind === 'move') {
+    const at = { x: state.pointerX + pendingDx, y: state.pointerY + pendingDy }
+
+    if (carriedAway.value) {
+      if (isInsideOwnGrid(at.x, at.y)) endTransferOut()
+      else {
+        transfer.moveTo(at)
+        return
+      }
+    }
+    else if (!isInsideOwnGrid(at.x, at.y) && canTransferOut(state.id) && transfer.hasTargetAt(at)) {
+      beginTransferOut(state, at)
+      return
+    }
+
     const cell = cellFromDelta(state.origin, state.metrics, pendingDx, pendingDy)
     if (cell.x === state.cell.x && cell.y === state.cell.y) return
 
@@ -422,6 +518,31 @@ function scheduleFlush(event: PointerEvent): void {
 function finishGesture(commitResult: boolean): void {
   const state = dragState.value
   if (!state) return
+
+  // Виджет на весу над чужой сеткой: исход решает она, а не наша арифметика.
+  // Приёмник эмитит свой `itemDrop`, мы убираем виджет у себя — но только если
+  // он действительно куда-то лёг.
+  if (carriedAway.value) {
+    const payload = carriedAway.value
+    const landed = commitResult && transfer.hasTargetAt(transfer.point.value)
+
+    carriedAway.value = null
+    transfer.release(commitResult)
+
+    clearVars(state.id)
+    dragState.value = null
+    activeGeometry.value = null
+    preview.value = null
+    pendingDx = 0
+    pendingDy = 0
+
+    if (!landed) return
+
+    emit('itemTransferOut', state.id, payload)
+    commit(removeItem(baseLayout.value, state.id, moveOptions.value))
+
+    return
+  }
 
   // Отложенный кадр доигрывается, а не отменяется: движение и отпускание могут
   // прийти внутри одного кадра, и отменённый кадр потерял бы последний сдвиг —
@@ -453,8 +574,6 @@ function finishGesture(commitResult: boolean): void {
 }
 
 // ————— Приём виджета из каталога.
-
-const transfer = useDashboardTransfer()
 
 function phantomOf(payload: GrDashboardTransfer): GrDashboardItemLayout {
   return {
@@ -897,6 +1016,7 @@ const context: GrDashboardContext = {
   onHandleFocus: id => roving.setActive(id),
   requestSettings: id => emit('itemSettings', id),
   canResize: canResizeItem,
+  carriedAwayId,
   resizeItemTo: applyResize,
   reportContentHeight,
   tabindexFor: id => roving.tabindexFor(id),
@@ -942,6 +1062,14 @@ const label = computed(() => props.ariaLabel ?? t('grDashboard.dashboard.label',
     @focusout="onFocusout"
   >
     <DashboardPlaceholder :cell="placeholderCell" />
+
+    <!-- Пока виджет несут в соседний дашборд, за указателем едет тот же
+         призрак, что и у каталога: источник у переноса разный, вид — один. -->
+    <TransferGhost
+      v-if="carriedAway"
+      :transfer="carriedAway"
+      :point="transfer.point.value"
+    />
     <slot />
     <div v-if="order.length === 0 && transferCell === null" :class="emptyWrapClass">
       <slot name="empty">

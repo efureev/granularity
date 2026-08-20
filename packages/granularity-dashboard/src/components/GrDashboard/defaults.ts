@@ -20,6 +20,8 @@ export interface GrDashboardConfigurableProps {
   preventCollision: boolean
   lazy: boolean
   droppable: boolean
+  /** Из сетки можно утащить виджет в соседний дашборд. */
+  transferable: boolean
 }
 
 declare module '@feugene/granularity/composables/useGrComponentConfig' {

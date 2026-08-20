@@ -174,6 +174,10 @@ const style = computed(() => {
     }
   }
 
+  // Виджет несут в другую сетку: из раскладки он уже убран, и без этого
+  // элемент потерял бы `grid-area` и всплыл бы в свободной ячейке.
+  if (dashboard?.carriedAwayId.value === props.itemId) return { display: 'none' }
+
   const placed = item.value
   if (!placed) return undefined
 

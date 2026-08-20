@@ -7,7 +7,7 @@
     "@feugene/granularity": "^0.27.0",
     "@feugene/granularity-charts": "^0.8.0",
     "@feugene/granularity-chrono": "^0.5.0",
-    "@feugene/granularity-dashboard": "^0.4.0",
+    "@feugene/granularity-dashboard": "^0.5.0",
     "@unocss/reset": "^66.7.5",
     "vue": "^3.5.40"
   },

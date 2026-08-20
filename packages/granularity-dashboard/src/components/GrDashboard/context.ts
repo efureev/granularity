@@ -72,6 +72,14 @@ export interface GrDashboardContext {
   itemFor: (id: string) => GrDashboardItemLayout | undefined
   activeGeometry: Readonly<Ref<GrDashboardActiveGeometry | null>>
   grabbedId: Readonly<Ref<string | null>>
+  /**
+   * Виджет, который сейчас несут в другой дашборд.
+   *
+   * Из раскладки он уже убран — соседи уплотнились, и превью честно показывает
+   * дыру, — но разметку для него по-прежнему рисует приложение. Без флага такой
+   * элемент потерял бы `grid-area` и всплыл бы в свободной ячейке.
+   */
+  carriedAwayId: Readonly<Ref<string | null>>
 
   registerItem: (id: string, bounds: GrDashboardItemBounds) => void
   unregisterItem: (id: string) => void

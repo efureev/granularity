@@ -40,8 +40,15 @@ export interface GrDashboardTransfer {
   minH?: number
   maxW?: number
   maxH?: number
-  /** Откуда несут. Набор открыт: перенос между дашбордами добавит своё значение. */
-  source: 'palette'
+  /** Откуда несут. */
+  source: 'palette' | 'dashboard'
+  /**
+   * Сетка, из которой виджет уехал. Есть только у `source: 'dashboard'`.
+   *
+   * Приёмнику это нужно, чтобы не принять виджет обратно в тот же дашборд, а
+   * приложению — чтобы понять, откуда он приехал.
+   */
+  from?: string
   /** Полезная нагрузка приложения: возвращается в эмите сетки нетронутой. */
   payload?: unknown
 }
@@ -76,6 +83,29 @@ export interface UseDashboardTransferReturn {
   start: (transfer: GrDashboardTransfer, event: PointerEvent) => void
   cancel: () => void
   registerTarget: (target: GrDashboardTransferTarget) => () => void
+
+  /**
+   * Начать сессию, не заводя своего жеста.
+   *
+   * Перенос между сетками вырастает из уже идущего жеста за ручку виджета:
+   * указатель у источника, слушатели у него же. Заводить второй жест поверх
+   * первого значило бы делить один поток `pointermove` на две машины —
+   * поэтому источник кормит модель точками сам, через `moveTo`.
+   */
+  adopt: (transfer: GrDashboardTransfer) => void
+  /** Следующая точка внешней сессии. Кадр планируется тот же, что и у жеста. */
+  moveTo: (at: GrDashboardTransferPoint) => void
+  /** Закончить внешнюю сессию: `true` — уронить на цель, `false` — свернуть. */
+  release: (commit: boolean) => void
+  /**
+   * Есть ли под точкой готовый принять приёмник.
+   *
+   * Сетке-источнику это нужно, чтобы отличить «указатель вышел за край» от
+   * «указатель над соседним дашбордом»: первое случается на любой длинной
+   * странице и переносом становиться не должно. Себя источник не найдёт — его
+   * собственный `enabled` на время жеста отвечает `false`.
+   */
+  hasTargetAt: (at: GrDashboardTransferPoint) => boolean
 }
 
 /**
@@ -206,6 +236,34 @@ function onMove(event: PointerEvent): void {
   frame ??= requestAnimationFrame(flush)
 }
 
+/**
+ * Сессия, которой владеет кто-то другой.
+ *
+ * `stopActive` здесь — свой, а не жестовый: `Esc` и смерть области обязаны
+ * сворачивать внешнюю сессию так же, как жестовую, и не трогать при этом чужой
+ * жест — его прервёт сам источник.
+ */
+function adoptExternal(value: GrDashboardTransfer): void {
+  if (transfer.value || pending) return
+
+  transfer.value = value
+  stopActive = releaseExternal
+  attachEscape()
+}
+
+function moveExternal(at: GrDashboardTransferPoint): void {
+  if (!transfer.value) return
+
+  point.value = at
+  frame ??= requestAnimationFrame(flush)
+}
+
+function releaseExternal(commit: boolean): void {
+  if (!transfer.value) return
+
+  finish(commit)
+}
+
 export function useDashboardTransfer(): UseDashboardTransferReturn {
   const gesture = useDragGesture({
     onMove,
@@ -260,5 +318,9 @@ export function useDashboardTransfer(): UseDashboardTransferReturn {
     start,
     cancel: () => stopActive?.(false),
     registerTarget,
+    adopt: adoptExternal,
+    hasTargetAt: at => targetAt(at.x, at.y) !== null,
+    moveTo: moveExternal,
+    release: releaseExternal,
   }
 }
