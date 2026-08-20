@@ -8,8 +8,9 @@
     "weekNumber": "Неделя"
   },
   "datePicker": {
-    "panelLabel": "Выбор даты",
+    "andMore": "и ещё {count}",
     "gridLabel": "Календарь",
+    "panelLabel": "Выбор даты",
     "patternDay": "Д",
     "patternMonth": "М",
     "patternYear": "Г",

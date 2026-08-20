@@ -739,3 +739,106 @@ describe('GrDatePicker — готовые даты', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Набор — не диапазон: произвольное множество дат. Отсюда предмет проверок:
+ * клик по выбранной **снимает** её, порядок в модели всегда по возрастанию, а
+ * панель после выбора остаётся открытой — набор набирают, а не выбирают однажды.
+ */
+describe('GrDatePicker — множественный выбор', () => {
+  function mountMultiple(props: Record<string, unknown> = {}) {
+    return mountPicker({ multiple: true, ...props })
+  }
+
+  function keysOf(wrapper: Picker): string[] {
+    const emitted = wrapper.emitted('update:modelValue')
+    const last = emitted?.at(-1)?.[0] as Date[] | null | undefined
+
+    return (last ?? []).map(date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`)
+  }
+
+  it('клик добавляет дату в набор', async () => {
+    const wrapper = mountMultiple({ modelValue: [] })
+    await openPicker(wrapper)
+
+    await day(wrapper, '2026-08-12').trigger('click')
+
+    expect(keysOf(wrapper)).toEqual(['2026-08-12'])
+  })
+
+  it('повторный клик её снимает', async () => {
+    const wrapper = mountMultiple({ modelValue: [at('2026-08-12'), at('2026-08-14')] })
+    await openPicker(wrapper)
+
+    await day(wrapper, '2026-08-12').trigger('click')
+
+    expect(keysOf(wrapper)).toEqual(['2026-08-14'])
+  })
+
+  /** Модель обязана быть сравнима: перестановка не должна читаться как изменение. */
+  it('набор приходит отсортированным, куда бы ни кликнули', async () => {
+    const wrapper = mountMultiple({ modelValue: [at('2026-08-20')] })
+    await openPicker(wrapper)
+
+    await day(wrapper, '2026-08-05').trigger('click')
+
+    expect(keysOf(wrapper)).toEqual(['2026-08-05', '2026-08-20'])
+  })
+
+  it('панель после выбора остаётся открытой', async () => {
+    const wrapper = mountMultiple({ modelValue: [] })
+    await openPicker(wrapper)
+
+    await day(wrapper, '2026-08-12').trigger('click')
+    await nextTick()
+
+    expect(calendar(wrapper).exists()).toBe(true)
+  })
+
+  it('все даты набора подсвечены в сетке', async () => {
+    const wrapper = mountMultiple({ modelValue: [at('2026-08-12'), at('2026-08-14')] })
+    await openPicker(wrapper)
+
+    const selected = calendar(wrapper).findAll('[data-gr-calendar-cell]')
+      .filter(cell => cell.attributes('aria-selected') === 'true')
+      .map(cell => cell.text())
+
+    expect(selected).toEqual(['12', '14'])
+  })
+
+  /** Инвариант 11: запрещённое значение не выбирается ни кликом, ни `Enter`. */
+  it('дата за `max` в набор не попадает', async () => {
+    const wrapper = mountMultiple({ modelValue: [], max: at('2026-08-10') })
+    await openPicker(wrapper)
+
+    await day(wrapper, '2026-08-12').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('`readonly` набор не меняет', async () => {
+    const wrapper = mountMultiple({ modelValue: [at('2026-08-12')], readonly: true })
+    await openPicker(wrapper)
+
+    await day(wrapper, '2026-08-14').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('в поле видно первые даты и остаток числом', async () => {
+    const wrapper = mountMultiple({
+      modelValue: [at('2026-08-05'), at('2026-08-12'), at('2026-08-14'), at('2026-08-20'), at('2026-08-25')],
+    })
+    await nextTick()
+
+    expect(field(wrapper).attributes('value')).toContain('and 2 more')
+  })
+
+  /** Ручной ввод: одна строка описывает N дат — это отдельный парсер. */
+  it('`editable` в наборе не включается', async () => {
+    const wrapper = mountMultiple({ modelValue: [], editable: true })
+    await nextTick()
+
+    expect(field(wrapper).attributes('readonly')).toBeDefined()
+  })
+})

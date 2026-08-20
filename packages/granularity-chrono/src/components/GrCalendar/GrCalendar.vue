@@ -100,6 +100,11 @@ export interface GrCalendarProps {
    */
   rangePreview?: PlainDate | null
   /**
+   * Набор выбранных дат. Как и у диапазона, сетка про него ничего не решает —
+   * только рисует: складывать, снимать и сортировать набор — дело пикера.
+   */
+  selectedDates?: readonly PlainDate[]
+  /**
    * Объявлять выбор в живом регионе. Выключается, когда объявляет оболочка:
    * у диапазона осмысленно состояние периода («начало выбрано»), а не
    * отдельный день, и два объявления на один клик перебили бы друг друга.
@@ -301,7 +306,18 @@ const weekdayColumns = computed(() => weekdayOrder(resolvedWeekStart.value).map(
  * В режиме недели сравниваются начала недель, а не сами даты: подсвечивается
  * вся строка, и ячейка по-прежнему ничего о выборе не знает.
  */
+/**
+ * Ключи набора — `Set`, собранный один раз на смену набора.
+ *
+ * Обход массива на каждую из сорока двух ячеек превратил бы подсветку в
+ * квадрат: тот же довод, по которому `createDisabledPredicate` нормализует
+ * список запрещённых дат, и он там закреплён тестом со шпионом на `Set.has`.
+ */
+const selectedKeys = computed(() => new Set((props.selectedDates ?? []).map(plainDateKey)))
+
 function isSelected(cell: CalendarCell): boolean {
+  if (selectedKeys.value.size > 0) return selectedKeys.value.has(cell.key)
+
   const selected = props.modelValue
   if (!selected) return false
 

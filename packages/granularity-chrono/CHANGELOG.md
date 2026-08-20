@@ -7,6 +7,36 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.7.0] 2026-08-20
+
+### Added
+
+- **`multiple` on `GrDatePicker` — a set of dates, not a range.** Class schedules, exception days,
+  booked dates: an arbitrary set where adjacency means nothing. Until now this had no expression at
+  all — `GrDatePicker` held one date and `GrDateRangePicker` two ends of a continuous span, leaving
+  the application with its own grid or a list of fields.
+
+  Clicking a selected date **removes** it: a set is a toggle, not an accumulator, or there would be
+  no way to undo a mistaken pick. The panel stays open — a set is accumulated, whereas a single date
+  is chosen once, and closing after the first click would turn ten dates into ten openings.
+
+  The model always arrives sorted ascending, wherever you clicked. It has to be comparable:
+  reordering must not read as a change, or "unsaved edits" fires on nothing.
+
+  Manual entry is off in this mode even with `editable`. One string describing N dates is a separate
+  parser with its own behaviour on partial input, and the package does not have it yet.
+
+  The field shows the first three dates and the rest as a count ("and 2 more") — without a cap the
+  label overflows by the fifth. The form receives one hidden field per date, sharing a name, as
+  `FormData.getAll` reads them. `min`, `max` and `disabledDates` apply per date.
+
+- **`selectedDates` on `GrCalendar`** — painting only, exactly like `rangeStart`/`rangeEnd`. The grid
+  answers one question, how to colour a cell; adding, removing, sorting and length rules belong to
+  the picker. Membership is tested against a `Set` rebuilt once per set change: walking the array for
+  each of the forty-two cells would make highlighting quadratic.
+
+- `separator` on `GrDatePicker` — what joins the dates of a set in the field.
+
 ## [v0.6.0] 2026-08-20
 
 ### Added

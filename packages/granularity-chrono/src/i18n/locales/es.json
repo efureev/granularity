@@ -8,8 +8,9 @@
     "weekNumber": "Semana"
   },
   "datePicker": {
-    "panelLabel": "Elegir fecha",
+    "andMore": "y {count} más",
     "gridLabel": "Calendario",
+    "panelLabel": "Elegir fecha",
     "patternDay": "D",
     "patternMonth": "M",
     "patternYear": "A",

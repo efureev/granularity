@@ -11,7 +11,7 @@ import { localeDatePattern, maskLocaleDate, parseLocaleDate } from '../../chrono
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
-import { isPlainDateWithin } from '../../chrono/plainDate'
+import { comparePlainDates, isPlainDateWithin, plainDateKey } from '../../chrono/plainDate'
 import {
   clearButtonClass,
   iconClass,
@@ -23,7 +23,8 @@ import {
 import { presetRowClass } from '../../internal/presetRowStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
 import { useEditableField } from '../../internal/useEditableField'
-import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
+import type { PickerCodec } from '../../internal/usePickerShell'
+import { dateCodec, multipleCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrButton from '@feugene/granularity/components/GrButton'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 
@@ -45,7 +46,25 @@ export interface GrDatePickerProps<T = Date | null> {
    * двенадцать ячеек, а значением становится первое число периода.
    */
   mode?: 'day' | 'week' | 'month' | 'quarter' | 'year'
-  modelValue?: T
+  /**
+   * Значение. При `multiple` — массив: набор, а не диапазон.
+   *
+   * Точнее объединения в генерик-SFC не выразить: условный тип от булева пропа
+   * Vue выводит ненадёжно, а обещание, которое иногда не работает, хуже
+   * честного `T | readonly T[]`. Рантайм-контракт при этом точный — наружу
+   * уходит ровно то, что объявлено пропом.
+   */
+  modelValue?: T | readonly T[]
+  /**
+   * Набор дат вместо одной: расписание, даты-исключения, брони.
+   *
+   * Отличие от `GrDateRangePicker` — в существе: там непрерывный отрезок с
+   * двумя краями, здесь произвольное множество. Панель после выбора не
+   * закрывается, а клик по выбранной дате её снимает.
+   */
+  multiple?: boolean
+  /** Чем разделять даты набора в поле. */
+  separator?: string
   /**
    * Как значение уходит наружу и приходит обратно: имя готового адаптера
    * (`date`, `isoDate`, `isoDateTime`, `timestamp`) либо свой.
@@ -121,8 +140,8 @@ export interface GrDatePickerProps<T = Date | null> {
 }
 
 export interface GrDatePickerEmits<T = Date | null> {
-  (e: 'update:modelValue', value: T | null): void
-  (e: 'change', value: T | null): void
+  (e: 'update:modelValue', value: T | readonly T[] | null): void
+  (e: 'change', value: T | readonly T[] | null): void
   (e: 'update:open', value: boolean): void
   (e: 'clear'): void
   (e: 'focus', event: FocusEvent): void
@@ -153,6 +172,8 @@ const props = withDefaults(defineProps<GrDatePickerProps<TValue>>(), {
   format: undefined,
   placeholder: undefined,
   editable: false,
+  multiple: false,
+  separator: ', ',
   applyOnBlur: true,
   // Дефолты живут в резолвере: Vue подставил бы свои раньше, чем компонент
   // заглянет в `GrConfigProvider`.
@@ -197,9 +218,15 @@ defineSlots<{
 
 const calendarRef = ref<InstanceType<typeof GrCalendar> | null>(null)
 
-const shell = usePickerShell<TValue>({
+const shell = usePickerShell<TValue | readonly TValue[], Date | Date[]>({
   props: () => props,
-  codec: () => dateCodec(resolveChronoAdapter<TValue>(props.valueAdapter)),
+  // Форма модели объявлена пропом, и кодек выбирается по нему. Приведение — на
+  // одной этой границе: дальше `selectedList` разводит оба случая в один вид.
+  codec: () => {
+    const adapter = resolveChronoAdapter<TValue>(props.valueAdapter)
+
+    return (props.multiple ? multipleCodec(adapter) : dateCodec(adapter)) as PickerCodec<TValue | readonly TValue[], Date | Date[]>
+  },
   component: 'GrDatePicker',
   emit: {
     open: value => emit('update:open', value),
@@ -231,8 +258,16 @@ const {
   showClear,
 } = shell
 
+/** Выбранное одним видом: набор — списком, одиночное — списком из одного. */
+const selectedList = computed<PlainDate[]>(() => {
+  const raw = selectedDate.value
+  if (!raw) return []
+
+  return Array.isArray(raw) ? raw.map(toPlainDate) : [toPlainDate(raw)]
+})
+
 const selected = computed<PlainDate | null>(() => (
-  selectedDate.value ? toPlainDate(selectedDate.value) : null
+  props.multiple ? null : selectedList.value[0] ?? null
 ))
 
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
@@ -261,12 +296,31 @@ const displayFormat = computed<Intl.DateTimeFormatOptions | undefined>(() => {
   return undefined
 })
 
-const displayValue = computed(() => (
-  selected.value ? formatPlainDate(resolvedLocale.value, selected.value, displayFormat.value) : ''
-))
+/** Сколько дат показывать в поле, прежде чем свернуть остальные в «и ещё N». */
+const DISPLAY_LIMIT = 3
+
+const displayValue = computed(() => {
+  const list = selectedList.value
+  if (list.length === 0) return ''
+
+  if (!props.multiple) return formatPlainDate(resolvedLocale.value, list[0]!, displayFormat.value)
+
+  // Потолок обязателен: без него поле переполняется на пятой дате, а набор из
+  // тридцати превращает подпись в нечитаемую строку.
+  // Остаток считается по массиву, а не по собранной строке: разделитель может
+  // встретиться внутри самого формата даты, и `split` соврал бы.
+  const head = list.slice(0, DISPLAY_LIMIT)
+  const shown = head
+    .map(date => formatPlainDate(resolvedLocale.value, date, displayFormat.value))
+    .join(props.separator)
+
+  const rest = list.length - head.length
+
+  return rest > 0 ? `${shown} ${t('grChrono.datePicker.andMore', 'and {count} more', { count: rest })}` : shown
+})
 
 /** Ввод руками — только в дневном режиме: у периодов текстом набирать нечего. */
-const isEditable = computed(() => props.editable && props.mode === 'day')
+const isEditable = computed(() => props.editable && props.mode === 'day' && !props.multiple)
 
 const field = useEditableField({
   editable: () => isEditable.value,
@@ -302,10 +356,30 @@ function onFieldKeydown(event: KeyboardEvent): void {
   shell.onFieldKeydown(event)
 }
 
+/**
+ * Набор с переключённой датой: была — снимается, не была — добавляется.
+ *
+ * Порядок по возрастанию держится всегда: модель обязана быть сравнима, и
+ * перестановка элементов не должна читаться как изменение.
+ */
+function toggled(date: PlainDate): Date[] {
+  const key = plainDateKey(date)
+  const rest = selectedList.value.filter(item => plainDateKey(item) !== key)
+  const next = rest.length === selectedList.value.length ? [...rest, date] : rest
+
+  return next.sort(comparePlainDates).map(item => fromPlainParts(item))
+}
+
 function onSelect(date: PlainDate): void {
   // Гард здесь, а не только в `commit`: закрытая по клику панель выглядела бы
   // так, будто выбор состоялся.
   if (shell.isLocked.value) return
+
+  // Набор набирают, а не выбирают однажды: панель остаётся открытой.
+  if (props.multiple) {
+    shell.commit(toggled(date))
+    return
+  }
 
   shell.commit(fromPlainParts(date))
 
@@ -332,6 +406,11 @@ function canSelectDate(date: Date): boolean {
 /** Выбор из подвала. Возвращает `false`, если дата запрещена. */
 function selectDate(date: Date): boolean {
   if (!canSelectDate(date)) return false
+
+  if (props.multiple) {
+    shell.commit(toggled(toPlainDate(date)))
+    return true
+  }
 
   shell.commit(fromPlainParts(toPlainDate(date)))
   shell.closePanel()
@@ -463,6 +542,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             ref="calendarRef"
             :mode="mode"
             :model-value="selected"
+            :selected-dates="multiple ? selectedList : undefined"
             :min="minPlain"
             :max="maxPlain"
             :disabled-dates="disabledDates"

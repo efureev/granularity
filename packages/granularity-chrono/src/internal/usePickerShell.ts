@@ -57,6 +57,33 @@ export function dateCodec<TValue>(adapter: GrChronoAdapter<TValue>): PickerCodec
   }
 }
 
+/**
+ * Кодек набора: адаптер применяется к каждому элементу.
+ *
+ * Терпимость та же, что у диапазона: неразобравшийся элемент выпадает, а не
+ * рушит весь набор. Массив приходит из хранилища и с сервера, и одна испорченная
+ * дата не повод потерять остальные — по той же причине, по которой `parseLayout`
+ * у дашборда отдаёт `null` вместо исключения.
+ */
+export function multipleCodec<TItem>(
+  adapter: GrChronoAdapter<TItem>,
+): PickerCodec<readonly TItem[] | null, Date[]> {
+  return {
+    parse: (raw) => {
+      if (!Array.isArray(raw)) return null
+
+      // `Array.isArray` сужает до `any[]` и теряет тип элемента: возвращаем его
+      // явной аннотацией, иначе адаптер получает `any`.
+      const items: readonly TItem[] = raw
+      const parsed = items.map(item => adapter.parse(item)).filter((date): date is Date => date !== null)
+
+      return parsed.length > 0 ? parsed : null
+    },
+    serialize: dates => dates.map(date => adapter.serialize(date)),
+    toFormValues: dates => dates.map(date => serializedToString(adapter.serialize(date))),
+  }
+}
+
 /** Кодек диапазона: адаптер применяется к каждой границе, обе обязательны. */
 export function rangeCodec<TItem>(
   adapter: GrChronoAdapter<TItem>,

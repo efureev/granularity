@@ -8,8 +8,9 @@
     "weekNumber": "Week"
   },
   "datePicker": {
-    "panelLabel": "Choose date",
+    "andMore": "and {count} more",
     "gridLabel": "Calendar",
+    "panelLabel": "Choose date",
     "patternDay": "D",
     "patternMonth": "M",
     "patternYear": "Y",

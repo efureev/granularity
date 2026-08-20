@@ -23,6 +23,7 @@ declare module 'vue' {
     GrChartPie: typeof import('@feugene/granularity-charts/components/GrChartPie')['GrChartPie']
     GrChartRadar: typeof import('@feugene/granularity-charts/components/GrChartRadar')['GrChartRadar']
     GrChartWaterfall: typeof import('@feugene/granularity-charts/components/GrChartWaterfall')['GrChartWaterfall']
+    GrChip: typeof import('@feugene/granularity/components/GrChip')['GrChip']
     GrDashboard: typeof import('@feugene/granularity-dashboard/components/GrDashboard')['GrDashboard']
     GrDashboardItem: typeof import('@feugene/granularity-dashboard/components/GrDashboardItem')['GrDashboardItem']
     GrDashboardItemSettings: typeof import('@feugene/granularity-dashboard/components/GrDashboardItemSettings')['GrDashboardItemSettings']
