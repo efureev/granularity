@@ -3,6 +3,7 @@ import type {
   GrSchemaNode,
   GrSchemaObjectNode,
   GrSchemaScalarNode,
+  GrSchemaUnionNode,
 } from '../types'
 
 /**
@@ -42,6 +43,19 @@ export function array(
   extra: Partial<GrSchemaArrayNode> = {},
 ): GrSchemaArrayNode {
   return { ...base, path: key, key, kind: 'array', constraints: {}, item, ...extra }
+}
+
+/** Вариант объединения: объект, у которого дискриминатор несёт `const`. */
+export function variant(tag: string, fields: GrSchemaNode[], title?: string): GrSchemaObjectNode {
+  return object(tag, [scalar('kind', 'string', { const: tag }), ...fields], { title })
+}
+
+export function union(
+  key: string,
+  variants: GrSchemaObjectNode[],
+  extra: Partial<GrSchemaUnionNode> = {},
+): GrSchemaUnionNode {
+  return { ...base, path: key, key, kind: 'union', constraints: {}, discriminator: 'kind', variants, ...extra }
 }
 
 export function root(fields: GrSchemaNode[]): GrSchemaObjectNode {

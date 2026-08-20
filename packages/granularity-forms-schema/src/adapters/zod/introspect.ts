@@ -145,6 +145,23 @@ export function shapeOf(schema: ZodLike): Record<string, ZodLike> | undefined {
   return shape && typeof shape === 'object' ? shape as Record<string, ZodLike> : undefined
 }
 
+/**
+ * Схема значения свободного ключа: `.catchall(...)`, а в v4 ещё и `looseObject`,
+ * который кладёт в `catchall` схему `unknown`.
+ *
+ * `never` отсеивается: им v3 и v4 обозначают «лишних ключей нет».
+ */
+export function catchallOf(schema: ZodLike): ZodLike | undefined {
+  const catchall = defOf(schema).catchall
+
+  return isZodSchema(catchall) && typeNameOf(catchall) !== 'never' ? catchall : undefined
+}
+
+/** v3 объявляет свободные ключи флагом `passthrough`, а не схемой значения. */
+export function passesUnknownKeys(schema: ZodLike): boolean {
+  return defOf(schema).unknownKeys === 'passthrough'
+}
+
 export function elementOf(schema: ZodLike): ZodLike | undefined {
   const def = defOf(schema)
 

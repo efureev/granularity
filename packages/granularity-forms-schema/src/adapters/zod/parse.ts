@@ -7,12 +7,14 @@ import type {
   GrSchemaObjectNode,
   GrSchemaOption,
   GrSchemaParseOptions,
+  GrSchemaUnionNode,
   GrSchemaWarning,
 } from '../../model'
-import { GR_SCHEMA_MODEL_VERSION, joinPath } from '../../model'
+import { GR_SCHEMA_MODEL_VERSION, joinPath, unionIsResolved } from '../../model'
 
 import type { ZodCheck, ZodLike } from './introspect'
 import {
+  catchallOf,
   checksOf,
   defaultOf,
   descriptionOf,
@@ -22,6 +24,7 @@ import {
   isZodSchema,
   metaOf,
   optionsOf,
+  passesUnknownKeys,
   schemaFormatOf,
   shapeOf,
   typeNameOf,
@@ -270,11 +273,15 @@ function parseNode(
 
   if (kind === 'object') {
     const shape = shapeOf(schema) ?? {}
+    const catchall = catchallOf(schema)
 
     return {
       ...base,
       kind: 'object',
-      additional: false,
+      additional: catchall !== undefined || passesUnknownKeys(schema),
+      additionalValue: catchall
+        ? parseNode(catchall, '*', joinPath(path, '*'), true, ctx, depth + 1)
+        : undefined,
       fields: Object.entries(shape).map(([childKey, child]) =>
         parseNode(child, childKey, joinPath(path, childKey), true, ctx, depth + 1)),
     }
@@ -315,13 +322,24 @@ function parseNode(
         return { ...base, kind: 'string', options: toOptions(literals) }
     }
 
-    return {
+    const union: GrSchemaUnionNode = {
       ...base,
       kind: 'union',
       discriminator: discriminatorOf(schema),
       variants: parsedVariants,
-      residual: true,
     }
+
+    // Разобранное объединение выражено моделью целиком: форма сама рисует
+    // переключатель ветки, и гонять ради него полную проверку схемой незачем.
+    if (unionIsResolved(union)) return union
+
+    ctx.warnings.push({
+      path,
+      code: 'unsupported-node',
+      message: 'Объединение без дискриминатора — ветку выбрать нельзя, значение проверяется схемой целиком',
+    })
+
+    return { ...union, residual: true }
   }
 
   if (kind === 'unknown')

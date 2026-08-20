@@ -118,8 +118,13 @@ export interface GrSchemaScalarNode extends GrSchemaNodeBase {
 export interface GrSchemaObjectNode extends GrSchemaNodeBase {
   kind: 'object'
   fields: GrSchemaNode[]
-  /** `additionalProperties` — свободные ключи. Первый выпуск их не рисует. */
+  /** Разрешены ли ключи сверх описанных (`additionalProperties`, `catchall`). */
   additional: boolean
+  /**
+   * Схема значения свободного ключа. Есть — форма рисует пары «ключ — значение»
+   * этим узлом; нет — свободные ключи разрешены, но формой не вводятся.
+   */
+  additionalValue?: GrSchemaNode
 }
 
 export interface GrSchemaArrayNode extends GrSchemaNodeBase {

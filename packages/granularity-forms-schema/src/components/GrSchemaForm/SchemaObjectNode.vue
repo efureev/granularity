@@ -19,8 +19,10 @@ import type { GrSchemaObjectNode } from '../../model'
 import type { GrUiColumns } from '../../ui-schema'
 
 import { useSchemaForm } from './context'
+import GrSchemaAdditionalFields from './GrSchemaAdditionalFields.vue'
 import GrSchemaArrayField from './GrSchemaArrayField.vue'
 import GrSchemaField from './GrSchemaField.vue'
+import GrSchemaUnionField from './GrSchemaUnionField.vue'
 import { columnsToClass, schemaGridClass } from './grSchemaFormStyles'
 
 const props = withDefaults(defineProps<{
@@ -32,17 +34,29 @@ const props = withDefaults(defineProps<{
   headingLevel?: 2 | 3 | 4 | 5 | 6
   /** Без заголовка узел рисуется просто сеткой — так вложенность не плодит рамки. */
   plain?: boolean
+  /**
+   * Ключи, которые рисует кто-то другой.
+   *
+   * Нужно объединению: дискриминатором управляет его переключатель, и второе
+   * поле с тем же именем спорило бы с ним за значение.
+   */
+  omit?: readonly string[]
 }>(), {
   indices: undefined,
   columns: undefined,
   headingLevel: 3,
   plain: false,
+  omit: undefined,
 })
 
 const form = useSchemaForm()
 
-const fields = computed(() =>
-  form?.fieldsOf(props.name, props.path, props.indices ?? []) ?? [])
+const fields = computed(() => {
+  const all = form?.fieldsOf(props.name, props.path, props.indices ?? []) ?? []
+  const omit = props.omit
+
+  return omit && omit.length > 0 ? all.filter(field => !omit.includes(field.node.key)) : all
+})
 
 /** Настройки повторителя живут в `uiSchema` под шаблонным путём массива. */
 function arrayUi(templatePath: string) {
@@ -72,6 +86,16 @@ const hasHeading = computed(() => !props.plain && Boolean(props.node.title))
           :ui="arrayUi(field.templatePath)"
           class="col-span-full"
         />
+        <GrSchemaUnionField
+          v-else-if="field.node.kind === 'union'"
+          :node="field.node"
+          :path="field.templatePath"
+          :name="field.name"
+          :indices="field.indices"
+          :columns="columns"
+          :heading-level="headingLevel"
+          class="col-span-full"
+        />
         <SchemaObjectNode
           v-else-if="field.node.kind === 'object'"
           :node="field.node"
@@ -90,6 +114,15 @@ const hasHeading = computed(() => !props.plain && Boolean(props.node.title))
           :indices="field.indices"
         />
       </template>
+
+      <GrSchemaAdditionalFields
+        v-if="node.additional && node.additionalValue"
+        :node="node"
+        :path="path"
+        :name="name"
+        :indices="indices"
+        class="col-span-full"
+      />
     </div>
   </GrFormSection>
 
@@ -102,6 +135,16 @@ const hasHeading = computed(() => !props.plain && Boolean(props.node.title))
         :name="field.name"
         :indices="field.indices"
         :ui="arrayUi(field.templatePath)"
+        class="col-span-full"
+      />
+      <GrSchemaUnionField
+        v-else-if="field.node.kind === 'union'"
+        :node="field.node"
+        :path="field.templatePath"
+        :name="field.name"
+        :indices="field.indices"
+        :columns="columns"
+        :heading-level="headingLevel"
         class="col-span-full"
       />
       <SchemaObjectNode
@@ -122,5 +165,14 @@ const hasHeading = computed(() => !props.plain && Boolean(props.node.title))
         :indices="field.indices"
       />
     </template>
+
+    <GrSchemaAdditionalFields
+      v-if="node.additional && node.additionalValue"
+      :node="node"
+      :path="path"
+      :name="name"
+      :indices="indices"
+      class="col-span-full"
+    />
   </div>
 </template>

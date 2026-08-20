@@ -1,4 +1,5 @@
 import { isSchemaArrayNode, isSchemaLeafNode, isSchemaObjectNode, isSchemaUnionNode } from './guards'
+import { unionVariantFor } from './union'
 import { getAtPath, joinPath } from './paths'
 import type { GrSchemaFieldInstance, GrSchemaNode, GrSchemaObjectNode } from './types'
 
@@ -85,11 +86,24 @@ export function expandFields(
       const discriminator = node.discriminator
       if (!discriminator || current === null || typeof current !== 'object') return
 
-      const tag = (current as Record<string, unknown>)[discriminator]
-      const variant = node.variants.find(item =>
-        item.fields.some(field => field.key === discriminator && field.const === tag))
+      const variant = unionVariantFor(node, (current as Record<string, unknown>)[discriminator])
 
-      if (variant) visit(variant, name, templatePath, indices, parent, depth + 1)
+      if (!variant) return
+
+      // Раскрываются **поля** варианта, а не он сам: инстанс варианта нёс бы то
+      // же имя, что и объединение, и список полей контейнера содержал бы два
+      // узла под одним ключом. Родитель у них — само объединение, поэтому оно
+      // и спрашивает их у контекста.
+      for (const field of variant.fields) {
+        visit(
+          field,
+          joinPath(name, field.key),
+          joinPath(templatePath, field.key),
+          indices,
+          name,
+          depth + 1,
+        )
+      }
     }
   }
 

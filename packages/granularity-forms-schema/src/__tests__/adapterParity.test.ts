@@ -148,3 +148,54 @@ describe('своя схема остаётся источником правды
     expect(issues).toEqual([{ path: 'nick', message: 'Имя занято', code: 'custom' }])
   })
 })
+
+/**
+ * Ветвление — самое вероятное место расхождения: zod записывает его
+ * `discriminatedUnion`, JSON Schema — `oneOf` с общим `const`. Это разные
+ * записи одной мысли, и разъехаться они могут молча.
+ */
+describe('паритет ветвления', () => {
+  const value = { delivery: { kind: 'courier', address: 'Тверская, 1' } }
+
+  const zodBranching = z.object({
+    delivery: z.discriminatedUnion('kind', [
+      z.object({ kind: z.literal('pickup'), point: z.string() }),
+      z.object({ kind: z.literal('courier'), address: z.string() }),
+    ]),
+  })
+
+  const jsonBranching: JsonSchemaDocument = {
+    type: 'object',
+    required: ['delivery'],
+    properties: {
+      delivery: {
+        oneOf: [
+          { type: 'object', properties: { kind: { const: 'pickup' }, point: { type: 'string' } } },
+          { type: 'object', properties: { kind: { const: 'courier' }, address: { type: 'string' } } },
+        ],
+      },
+    },
+  }
+
+  const branching: [string, typeof zodAdapter | typeof jsonSchemaAdapter, unknown][] = [
+    ['zod', zodAdapter, zodBranching],
+    ['json-schema', jsonSchemaAdapter, jsonBranching],
+  ]
+
+  function shapeOf(adapter: typeof zodAdapter | typeof jsonSchemaAdapter, schema: unknown): string[] {
+    return expandFields(adapter.parse(schema as never).root, value)
+      .map(field => `${field.name}:${field.node.kind}`)
+  }
+
+  it('после выбора ветки набор полей одинаков', () => {
+    expect(shapeOf(zodAdapter, zodBranching)).toEqual(shapeOf(jsonSchemaAdapter, jsonBranching))
+  })
+
+  it.each(branching)('%s разбирает ветвление без резидуала и без предупреждений', (_name, adapter, schema) => {
+    const model = adapter.parse(schema as never)
+
+    expect(model.root.fields[0]!.kind).toBe('union')
+    expect(model.root.fields[0]!.residual).toBe(false)
+    expect(model.warnings).toEqual([])
+  })
+})

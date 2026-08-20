@@ -6,9 +6,10 @@ import type {
   GrSchemaObjectNode,
   GrSchemaOption,
   GrSchemaParseOptions,
+  GrSchemaUnionNode,
   GrSchemaWarning,
 } from '../../model'
-import { GR_SCHEMA_MODEL_VERSION, joinPath } from '../../model'
+import { GR_SCHEMA_MODEL_VERSION, joinPath, unionIsResolved } from '../../model'
 
 import type { JsonSchemaDocument, JsonSchemaType } from './types'
 
@@ -163,6 +164,19 @@ function hasResidual(document: JsonSchemaDocument): boolean {
   )
 }
 
+/**
+ * Ключ, который во всех вариантах несёт `const`. Так дискриминатор записывают в
+ * чистой JSON Schema — `discriminator.propertyName` есть только в OpenAPI.
+ */
+function inferDiscriminator(variants: GrSchemaObjectNode[]): string | undefined {
+  const first = variants[0]
+  if (!first) return undefined
+
+  return first.fields.find(field => field.const !== undefined
+    && variants.every(variant => variant.fields.some(other => other.key === field.key && other.const !== undefined)),
+  )?.key
+}
+
 function parseNode(
   rawDocument: JsonSchemaDocument,
   key: string,
@@ -223,6 +237,65 @@ function parseNode(
     annotations: readAnnotations(document, ctx.options.annotationPrefix ?? 'x-'),
   }
 
+  const branches = document.oneOf ?? document.anyOf
+
+  if (branches && branches.length > 0) {
+    const shared = { ...document }
+    delete shared.oneOf
+    delete shared.anyOf
+    delete shared.discriminator
+
+    // Подписи принадлежат самому объединению, а не веткам: `mergeAllOf` отдаёт
+    // приоритет общей части, и заголовок ветки затёрся бы заголовком узла —
+    // все варианты в переключателе назывались бы одинаково.
+    delete shared.title
+    delete shared.description
+
+    // Ветка живёт вместе с общей частью документа: `allOf` их и сливает, причём
+    // свойства ветки перекрывают общие.
+    const parsed = branches.map((branch, index) => parseNode(
+      { ...shared, allOf: [branch] },
+      String(index),
+      path,
+      true,
+      ctx,
+      depth + 1,
+    ))
+    const variants = parsed.filter((node): node is GrSchemaObjectNode => node.kind === 'object')
+
+    // `oneOf` из одних `const` — это перечисление с подписями, а не ветвление.
+    if (variants.length === 0 && branches.every(branch => branch.const !== undefined)) {
+      return {
+        ...base,
+        kind: typeof branches[0]!.const === 'number' ? 'number' : 'string',
+        residual: false,
+        options: branches.map(branch => ({
+          value: branch.const as string | number,
+          label: branch.title ?? String(branch.const),
+          description: branch.description,
+        })),
+      }
+    }
+
+    const union: GrSchemaUnionNode = {
+      ...base,
+      kind: 'union',
+      residual: false,
+      discriminator: document.discriminator?.propertyName ?? inferDiscriminator(variants),
+      variants,
+    }
+
+    if (unionIsResolved(union)) return union
+
+    ctx.warnings.push({
+      path,
+      code: 'unsupported-node',
+      message: 'Ветвление без дискриминатора — выбрать вариант нельзя, значение проверяется схемой целиком',
+    })
+
+    return { ...union, residual: true }
+  }
+
   if (kind === 'object') {
     const requiredKeys = new Set(document.required ?? [])
     const properties = document.properties ?? {}
@@ -231,6 +304,9 @@ function parseNode(
       ...base,
       kind: 'object',
       additional: document.additionalProperties !== false && document.additionalProperties !== undefined,
+      additionalValue: typeof document.additionalProperties === 'object'
+        ? parseNode(document.additionalProperties, '*', joinPath(path, '*'), true, ctx, depth + 1)
+        : undefined,
       fields: Object.entries(properties).map(([childKey, child]) => parseNode(
         child,
         childKey,

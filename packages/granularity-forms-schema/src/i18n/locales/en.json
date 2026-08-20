@@ -1,4 +1,14 @@
 {
+  "additional": {
+    "add": "Add field",
+    "added": "Field {key} added",
+    "empty": "No extra fields",
+    "keyLabel": "Field name",
+    "newKey": "key",
+    "removeAt": "Remove field {key}",
+    "removed": "Field {key} removed",
+    "title": "Extra fields"
+  },
   "array": {
     "add": "Add",
     "added": "Row {index} added, {count} total",

@@ -2,7 +2,8 @@ import { runFieldRules } from '@feugene/granularity'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
-import { expandFields, expandLeafFields } from '../../../model'
+import type { GrSchemaUnionNode } from '../../../model'
+import { expandFields, expandLeafFields, isResolvedUnion, unionOptions } from '../../../model'
 import { compileRules } from '../../../validation'
 import { parseZodSchema, zodAdapter } from '../index'
 
@@ -193,5 +194,53 @@ describe('формат, объявленный самой схемой', () => {
     const model = parseZodSchema(z.object({ id: z.string() }))
 
     expect(model.root.fields?.find(field => field.key === 'id')?.format).toBeUndefined()
+  })
+})
+
+describe('ветвления', () => {
+  const pickup = z.object({ kind: z.literal('pickup'), point: z.string() })
+  const courier = z.object({ kind: z.literal('courier'), address: z.string() })
+
+  /**
+   * Разобранное объединение выражено моделью целиком, и полная проверка схемой
+   * ему не нужна: `residual` тут — не «на всякий случай», а признак того, что
+   * форма про узел ничего сказать не может.
+   */
+  it('`discriminatedUnion` разбирается и не уходит в резидуал', () => {
+    const model = parseZodSchema(z.object({ delivery: z.discriminatedUnion('kind', [pickup, courier]) }))
+    const node = model.root.fields.find(field => field.key === 'delivery')!
+
+    expect(node.kind).toBe('union')
+    expect(node.residual).toBe(false)
+    expect(isResolvedUnion(node)).toBe(true)
+    expect(unionOptions(node as GrSchemaUnionNode).map(option => option.value)).toEqual(['pickup', 'courier'])
+    expect(model.warnings).toEqual([])
+  })
+
+  it('объединение объектов без дискриминатора остаётся резидуальным и предупреждает', () => {
+    const model = parseZodSchema(z.object({
+      payload: z.union([z.object({ a: z.string() }), z.object({ b: z.string() })]),
+    }))
+    const node = model.root.fields.find(field => field.key === 'payload')!
+
+    expect(node.kind).toBe('union')
+    expect(node.residual).toBe(true)
+    expect(model.warnings.map(warning => warning.code)).toContain('unsupported-node')
+  })
+})
+
+describe('свободные ключи', () => {
+  it('`catchall` сохраняет схему значения', () => {
+    const model = parseZodSchema(z.object({ title: z.string() }).catchall(z.number()))
+
+    expect(model.root.additional).toBe(true)
+    expect(model.root.additionalValue?.kind).toBe('number')
+  })
+
+  it('обычный объект свободных ключей не объявляет', () => {
+    const model = parseZodSchema(z.object({ title: z.string() }))
+
+    expect(model.root.additional).toBe(false)
+    expect(model.root.additionalValue).toBeUndefined()
   })
 })

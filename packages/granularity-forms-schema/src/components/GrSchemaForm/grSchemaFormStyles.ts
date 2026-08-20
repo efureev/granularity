@@ -69,6 +69,11 @@ export const schemaSectionsClass = 'grid gap-6'
 export const schemaFormErrorsClass = 'mb-4'
 export const schemaRowLabelClass = 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] font-600 text-[var(--gr-muted-fg)]'
 
+export const schemaAdditionalHeaderClass = 'mb-2 flex items-center justify-between gap-2'
+export const schemaAdditionalRowClass = 'flex items-start gap-[var(--gr-schema-form-gap-x,1rem)]'
+export const schemaAdditionalKeyClass = 'w-1/3 min-w-0'
+export const schemaAdditionalValueClass = 'flex-1 min-w-0'
+
 export const ALL_GRID_CLASSES: readonly string[] = [
   schemaGridClass,
   schemaRowClass,
@@ -78,6 +83,10 @@ export const ALL_GRID_CLASSES: readonly string[] = [
   schemaSectionsClass,
   schemaFormErrorsClass,
   schemaRowLabelClass,
+  schemaAdditionalHeaderClass,
+  schemaAdditionalRowClass,
+  schemaAdditionalKeyClass,
+  schemaAdditionalValueClass,
   ...Object.values(gridColumnsClass).flatMap(map => COLUMN_COUNTS.map(count => map[count])),
   ...Object.values(gridSpanClass).flatMap(map => [...COLUMN_COUNTS.map(count => map[count]), map.full]),
 ]

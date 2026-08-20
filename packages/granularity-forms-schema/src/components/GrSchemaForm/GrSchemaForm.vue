@@ -24,6 +24,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import type { GrSchemaAdapter, GrSchemaFieldInstance, GrSchemaIssue, GrSchemaModel, GrSchemaNode, GrSchemaParseOptions, GrSchemaWarning } from '../../model'
 import {
   createInitialModel,
+  deleteAtPath,
   ensureShape,
   expandFields,
   getAtPath,
@@ -41,8 +42,10 @@ import { useTranslations } from '../../internal/i18n'
 import { useGrComponentProp } from '@feugene/granularity/composables/useGrComponentConfig'
 
 import { provideSchemaForm } from './context'
+import GrSchemaAdditionalFields from './GrSchemaAdditionalFields.vue'
 import GrSchemaArrayField from './GrSchemaArrayField.vue'
 import GrSchemaField from './GrSchemaField.vue'
+import GrSchemaUnionField from './GrSchemaUnionField.vue'
 import SchemaObjectNode from './SchemaObjectNode.vue'
 import {
   columnsToClass,
@@ -340,6 +343,11 @@ provideSchemaForm({
     syncModel(model.value)
   },
 
+  deleteValueAt: name => {
+    deleteAtPath(model.value, name)
+    syncModel(model.value)
+  },
+
   fieldsOf: (name, templatePath, indices) =>
     allFields.value.filter(field =>
       field.parent === name
@@ -497,13 +505,22 @@ defineExpose({
         <template v-for="section in sections" :key="section.id">
           <SchemaObjectNode
             v-if="isSectionVisible(section)"
-            :node="{ ...root!, title: section.title, description: section.description, fields: sectionFields(section).map(field => field.node) }"
+            :node="{ ...root!, title: section.title, description: section.description, additional: false, fields: sectionFields(section).map(field => field.node) }"
             path=""
             name=""
             :columns="section.columns ?? resolvedColumns"
             :heading-level="section.headingLevel ?? resolvedHeadingLevel"
           />
         </template>
+
+        <GrSchemaAdditionalFields
+          v-if="root && root.additional && root.additionalValue"
+          :node="root"
+          path=""
+          name=""
+          :disabled="disabled"
+          :readonly="readonly"
+        />
       </div>
 
       <div v-else :class="gridClass">
@@ -530,6 +547,16 @@ defineExpose({
             :heading-level="resolvedHeadingLevel"
             class="col-span-full"
           />
+          <GrSchemaUnionField
+            v-else-if="field.node.kind === 'union'"
+            :node="field.node"
+            :path="field.templatePath"
+            :name="field.name"
+            :indices="field.indices"
+            :columns="resolvedColumns"
+            :heading-level="resolvedHeadingLevel"
+            class="col-span-full"
+          />
           <GrSchemaField
             v-else-if="field.leaf"
             :node="field.node"
@@ -541,6 +568,15 @@ defineExpose({
             @unresolved="(node, name) => emit('unresolved', node, name)"
           />
         </template>
+
+        <GrSchemaAdditionalFields
+          v-if="root && root.additional && root.additionalValue"
+          :node="root"
+          path=""
+          name=""
+          :disabled="disabled"
+          :readonly="readonly"
+        />
       </div>
     </slot>
 

@@ -1,7 +1,8 @@
 import { runFieldRules } from '@feugene/granularity'
 import { describe, expect, it } from 'vitest'
 
-import { expandFields, expandLeafFields } from '../../../model'
+import type { GrSchemaUnionNode } from '../../../model'
+import { expandFields, expandLeafFields, isResolvedUnion, unionOptions } from '../../../model'
 import { compileRules } from '../../../validation'
 import { jsonSchemaAdapter, parseJsonSchema } from '../index'
 import type { JsonSchemaDocument } from '../types'
@@ -137,14 +138,93 @@ describe('ссылки и композиция', () => {
     expect(fields.map(f => [f.name, f.node.required])).toEqual([['a', true], ['b', true]])
   })
 
-  /** Ветвление модель не выражает — узел помечается для полной проверки схемой. */
-  it('oneOf помечает узел резидуальным', () => {
+  /** `oneOf` из одних `const` — это перечисление с подписями, а не ветвление. */
+  it('oneOf из констант даёт перечисление, а не резидуал', () => {
     const { fields } = fieldsOf({
       type: 'object',
-      properties: { a: { type: 'string', oneOf: [{ const: 'x' }, { const: 'y' }] } },
+      properties: { a: { type: 'string', oneOf: [{ const: 'x', title: 'Икс' }, { const: 'y' }] } },
     })
 
-    expect(fields[0]!.node.residual).toBe(true)
+    expect(fields[0]!.node.residual).toBe(false)
+    expect(fields[0]!.node.options).toEqual([
+      { value: 'x', label: 'Икс', description: undefined },
+      { value: 'y', label: 'y', description: undefined },
+    ])
+  })
+
+  /** OpenAPI пишет дискриминатор явно, чистая JSON Schema — общим `const`. */
+  it.each([
+    ['discriminator.propertyName', { discriminator: { propertyName: 'kind' } }],
+    ['общий const у вариантов', {}],
+  ])('oneOf объектов даёт ветвление: %s', (_case, extra) => {
+    const model = parseJsonSchema({
+      type: 'object',
+      properties: {
+        delivery: {
+          ...extra,
+          oneOf: [
+            { type: 'object', title: 'Самовывоз', properties: { kind: { const: 'pickup' }, point: { type: 'string' } } },
+            { type: 'object', title: 'Курьер', properties: { kind: { const: 'courier' }, address: { type: 'string' } } },
+          ],
+        },
+      },
+    })
+
+    const node = model.root.fields[0]!
+
+    expect(node.kind).toBe('union')
+    expect(node.residual).toBe(false)
+    expect(isResolvedUnion(node)).toBe(true)
+    expect(unionOptions(node as GrSchemaUnionNode)).toEqual([
+      { value: 'pickup', label: 'Самовывоз', description: undefined },
+      { value: 'courier', label: 'Курьер', description: undefined },
+    ])
+    expect(model.warnings).toEqual([])
+  })
+
+  /** Общая часть документа принадлежит каждой ветке, а не теряется. */
+  it('свойства рядом с oneOf попадают в каждый вариант', () => {
+    const model = parseJsonSchema({
+      type: 'object',
+      properties: {
+        delivery: {
+          type: 'object',
+          properties: { note: { type: 'string' } },
+          oneOf: [
+            { properties: { kind: { const: 'pickup' }, point: { type: 'string' } } },
+            { properties: { kind: { const: 'courier' }, address: { type: 'string' } } },
+          ],
+        },
+      },
+    })
+
+    const node = model.root.fields[0]! as GrSchemaUnionNode
+
+    expect(node.variants.map(variant => variant.fields.map(field => field.key))).toEqual([
+      ['note', 'kind', 'point'],
+      ['note', 'kind', 'address'],
+    ])
+  })
+
+  /** Ветки есть, а выбрать их нечем — это модель не выражает. */
+  it('oneOf объектов без дискриминатора остаётся резидуальным и предупреждает', () => {
+    const model = parseJsonSchema({
+      type: 'object',
+      properties: {
+        payload: {
+          oneOf: [
+            { type: 'object', properties: { a: { type: 'string' } } },
+            { type: 'object', properties: { b: { type: 'string' } } },
+          ],
+        },
+      },
+    })
+
+    const node = model.root.fields[0]!
+
+    expect(node.kind).toBe('union')
+    expect(node.residual).toBe(true)
+    expect(model.warnings.map(warning => warning.code)).toContain('unsupported-node')
   })
 })
 

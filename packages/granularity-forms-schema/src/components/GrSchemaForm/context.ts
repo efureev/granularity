@@ -28,6 +28,14 @@ export interface GrSchemaFormContext {
   /** Значение по инстанс-пути. */
   valueAt: (name: string) => unknown
   setValueAt: (name: string, value: unknown) => void
+  /**
+   * Убирает ключ из модели совсем.
+   *
+   * Не `setValueAt(name, undefined)`: свободные ключи вводит пользователь, и
+   * ключ, оставшийся со значением `undefined`, уехал бы на сервер и занял бы
+   * имя, которое форма считает свободным.
+   */
+  deleteValueAt: (name: string) => void
   /** Развёрнутые поля контейнера — их рисуют объектный узел и повторитель. */
   fieldsOf: (name: string, templatePath: string, indices: number[]) => GrSchemaFieldInstance[]
   /** Строка повторителя добавлена, удалена или переставлена. */

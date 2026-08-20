@@ -1,4 +1,5 @@
 import { getAtPath, joinPath, setAtPath } from './paths'
+import { isResolvedUnion } from './union'
 import type { GrSchemaNode, GrSchemaObjectNode } from './types'
 
 function cloneDefault(value: unknown): unknown {
@@ -46,6 +47,10 @@ export function defaultValueFor(node: GrSchemaNode): unknown {
     case 'object':
       return emptyObjectFor(node)
     case 'union':
+      // Первый вариант, а не `null`: иначе `expand` уходит по «значения нет»,
+      // и объединение не показывает ни одного поля, пока значение не проставят
+      // снаружи. Форма, которую нельзя починить изнутри, — не форма.
+      return isResolvedUnion(node) ? emptyObjectFor(node.variants[0]!) : null
     case 'unknown':
       return null
   }

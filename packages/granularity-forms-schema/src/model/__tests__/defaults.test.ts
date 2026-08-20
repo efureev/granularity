@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createInitialItem, createInitialModel, defaultValueFor, emptyModelFor, ensureShape } from '../defaults'
-import { array, object, root, scalar } from './nodes'
+import { array, object, root, scalar, union, variant } from './nodes'
 
 /**
  * Начальное значение выбирается не по вкусу, а по тому, как ядро считает поле
@@ -140,5 +140,27 @@ describe('ensureShape', () => {
     ensureShape(model, schema)
 
     expect(Array.isArray(model.items)).toBe(true)
+  })
+})
+
+/**
+ * Ветвление без стартового значения не появляется на экране вовсе: `expand`
+ * уходит по «значение не объект» и не разворачивает ни одного варианта. Поэтому
+ * дефолт объединения — не `null`, а форма первого варианта.
+ */
+describe('defaultValueFor: ветвление', () => {
+  it('разобранное объединение стартует первым вариантом', () => {
+    const node = union('delivery', [
+      variant('pickup', [scalar('point')]),
+      variant('courier', [scalar('address')]),
+    ])
+
+    expect(defaultValueFor(node)).toEqual({ kind: 'pickup', point: '' })
+  })
+
+  it('без дискриминатора выбирать нечего — значения нет', () => {
+    const node = union('payload', [variant('a', []), variant('b', [])], { discriminator: undefined })
+
+    expect(defaultValueFor(node)).toBeNull()
   })
 })

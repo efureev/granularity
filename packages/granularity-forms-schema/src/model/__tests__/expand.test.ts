@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { expandFields, expandLeafFields } from '../expand'
-import { array, object, root, scalar } from './nodes'
+import { array, object, root, scalar, union, variant } from './nodes'
 
 /**
  * Развёртка — место, где описание встречается с данными: узел элемента массива
@@ -78,5 +78,43 @@ describe('expandFields', () => {
     const fields = expandLeafFields(deep, {}, { maxDepth: 2 })
 
     expect(fields).toEqual([])
+  })
+})
+
+/**
+ * Вариант объединения — не самостоятельное поле, а его содержимое: он
+ * посещается под именем самого объединения. Раньше вариант приходил в список
+ * отдельным инстансом с тем же `name`, и `:key="field.name"` давал в шаблоне
+ * два узла с одинаковым ключом.
+ */
+describe('развёртка ветвления', () => {
+  const branching = root([
+    scalar('title'),
+    union('delivery', [
+      variant('pickup', [scalar('point')]),
+      variant('courier', [scalar('address')]),
+    ]),
+  ])
+
+  it('объединение приходит одним инстансом, а не двумя', () => {
+    const names = expandFields(branching, { delivery: { kind: 'pickup', point: '' } }).map(field => field.name)
+
+    expect(names.filter(name => name === 'delivery')).toHaveLength(1)
+    expect(new Set(names).size).toBe(names.length)
+  })
+
+  it('в корне лежит само объединение, а поля варианта — под ним', () => {
+    const fields = expandFields(branching, { delivery: { kind: 'courier', address: '' } })
+
+    expect(fields.filter(field => field.parent === '').map(field => field.name)).toEqual(['title', 'delivery'])
+    expect(fields.filter(field => field.parent === 'delivery').map(field => field.name))
+      .toEqual(['delivery.kind', 'delivery.address'])
+  })
+
+  it('смена дискриминатора меняет набор развёрнутых полей', () => {
+    const of = (kind: string) => expandLeafFields(branching, { delivery: { kind } }).map(field => field.name)
+
+    expect(of('pickup')).toEqual(['title', 'delivery.kind', 'delivery.point'])
+    expect(of('courier')).toEqual(['title', 'delivery.kind', 'delivery.address'])
   })
 })

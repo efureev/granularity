@@ -7,6 +7,64 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.0] 2026-08-20
+
+### Added
+
+- **Branching schemas now build a form.** A discriminated union — delivery method, payment type,
+  document kind — used to be a promise the package did not keep: the model had `kind: 'union'` and
+  the zod adapter even built it, but without an initial value nothing rendered at all, and with one
+  the discriminator came out as a **free text field**, so the only way to pick a branch was to guess
+  and type `pickup`. The form now renders a branch switcher (up to five variants as radios, more as
+  a select) and the fields of the selected variant beneath it.
+
+  Switching rewrites the value: keys the new variant also has are kept, foreign ones are dropped,
+  the discriminator is set. Keeping foreign keys is not an option — the schema rejects them — and
+  resetting everything would lose shared fields such as a comment that every variant carries.
+
+  The discriminator itself is **not** drawn as a field: the switcher owns it, and a second field
+  under the same name would fight it for the value.
+
+- **JSON Schema learned to branch.** `oneOf`/`anyOf` over object variants becomes a union, with the
+  discriminator found two ways: `discriminator.propertyName` (the OpenAPI extension, whose type was
+  declared and never read) or inference — the key that carries a `const` in every variant, which is
+  how plain JSON Schema writes it. Properties sitting next to `oneOf` belong to every branch and are
+  merged into each variant, so a shared field need not be repeated. Neither path resolves — the node
+  stays residual and now says so through `model.warnings`, which the docs had been promising all
+  along.
+
+- **`oneOf` of bare `const`s is an enum, not a branch.** It used to be marked residual and rendered
+  as a free text input; it now becomes a choice with per-branch `title` as the label.
+
+- **Free-form keys are editable.** `additionalProperties` with a value schema (and `catchall` /
+  `looseObject` in zod) keeps that schema in the new `additionalValue` node, and the object renders
+  a list of key–value pairs with add, rename and remove. The value is an ordinary control built from
+  the stored node, so its constraints apply as they would to a declared field. The `additional` flag
+  itself was written by four places and read by none.
+
+  `additionalProperties: true` renders nothing: keys are allowed, but the schema never said what the
+  value looks like, and inventing a text field would silently lose the type.
+
+### Fixed
+
+- **A resolved union no longer runs the whole schema for nothing.** The zod adapter set
+  `residual: true` on every union unconditionally, which made a parsed branch indistinguishable from
+  an unparsed one and dragged the full schema check along with it. It is now set only when the
+  branch could not be resolved — and that case also emits a warning instead of staying silent.
+
+- **A union in a repeater row rendered as a text field.** The kind switch is copied into every
+  template that iterates fields, and there are four such copies; the new branch was missing from the
+  one inside array rows. A gate (`structuralKinds`) now fails when any of them falls behind.
+
+- **Dead branch removed** in `validation/compile.ts`: the condition was a strict subset of the line
+  above it and could never be reached.
+
+### Changed
+
+- `GrSchemaObjectNode` gained `additionalValue`; `GrSchemaFormContext` gained `deleteValueAt`, which
+  removes a key outright — `setValueAt(name, undefined)` would leave it in the payload and keep the
+  name occupied.
+
 ## [v0.2.0] 2026-08-20
 
 ### Added

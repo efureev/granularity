@@ -1,7 +1,6 @@
 import type { GrFormRule, GrFormRules, GrFormTrigger } from '@feugene/granularity'
 
 import type { GrSchemaFieldInstance, GrSchemaNode } from '../model'
-import { isSchemaChoiceNode } from '../model'
 
 import { KNOWN_FORMATS, toSafeRegExp } from './formats'
 
@@ -298,7 +297,6 @@ export function compileRules(
     // проверяются на нём самом.
     if (!instance.leaf && instance.node.kind !== 'array') continue
     if (instance.node.kind === 'array' && !hasArrayRules(instance)) continue
-    if (isSchemaChoiceNode(instance.node) && instance.node.kind === 'array' && !hasArrayRules(instance)) continue
 
     rules[instance.name] = compileFieldRules(instance, options)
   }

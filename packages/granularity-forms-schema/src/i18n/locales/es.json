@@ -1,4 +1,14 @@
 {
+  "additional": {
+    "add": "Añadir campo",
+    "added": "Campo {key} añadido",
+    "empty": "Sin campos adicionales",
+    "keyLabel": "Nombre del campo",
+    "newKey": "clave",
+    "removeAt": "Eliminar el campo {key}",
+    "removed": "Campo {key} eliminado",
+    "title": "Campos adicionales"
+  },
   "array": {
     "add": "Añadir",
     "added": "Fila {index} añadida, {count} en total",

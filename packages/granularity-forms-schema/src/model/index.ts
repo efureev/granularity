@@ -15,6 +15,14 @@ export {
   isSchemaUnionNode,
 } from './guards'
 export {
+  type GrSchemaUnionOption,
+  isResolvedUnion,
+  unionIsResolved,
+  unionOptions,
+  unionTagOf,
+  unionVariantFor,
+} from './union'
+export {
   deleteAtPath,
   getAtPath,
   joinPath,
