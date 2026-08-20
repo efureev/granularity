@@ -2,7 +2,7 @@
 
 Ответ на вопрос «какой компонент взять под эту задачу» — по всем пакетам сразу:
 ядро `@feugene/granularity` и спутники `granularity-charts`, `granularity-chrono`,
-`granularity-dashboard`, `extra-granularity`.
+`granularity-dashboard`, `granularity-datasource`, `extra-granularity`.
 
 Читается сверху вниз: **Развилки** ставят различающий вопрос и приводят к одному
 компоненту, **Быстрый выбор** — алфавитный список на случай, когда имя уже
@@ -130,6 +130,13 @@
 | строки — события во времени | [`GrTimeline`](../packages/granularity/docs/components/GrTimeline.md) |
 | строк больше, чем помещается на экран | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) |
 | секции, из которых открыта одна-две | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) |
+
+Компонента, связывающего таблицу с фильтрами и пагинацией, в карте нет намеренно:
+это не компонент, а **состояние**. Сортировка, фильтры, страница, поиск, адресная
+строка и защита от гонок живут в `useDataSource`
+([`granularity-datasource`](../packages/granularity-datasource/README.md)) —
+он отдаёт готовые объекты пропов, которые раскрываются в `GrDataTable` и
+`GrPagination` через `v-bind`.
 
 ### Сообщение пользователю
 

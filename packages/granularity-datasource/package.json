@@ -1,0 +1,80 @@
+{
+  "name": "@feugene/granularity-datasource",
+  "description": "List state for @feugene/granularity: sorting, filters, paging, URL sync and race-free fetching behind one composable.",
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-datasource"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "granularity",
+    "design-system",
+    "vue",
+    "composable",
+    "data-table",
+    "pagination",
+    "query-string"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./url": {
+      "types": "./dist/types/url/index.d.ts",
+      "import": "./dist/url.js",
+      "default": "./dist/url.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "scripts": {
+    "build": "vite build && gr-check-dist-dev-guard && tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@feugene/granularity-test-kit": "^0.4.0",
+    "@types/node": "^26.1.1",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.7.0",
+    "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.2",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10",
+    "vue": "^3.5.40"
+  }
+}

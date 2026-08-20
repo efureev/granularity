@@ -46,6 +46,8 @@ export const demoPathByPreviewKey = {
   'extra-charts-sparkline-table':         'extra/granularity-charts/GrSparklineTableDemo.vue',
   'extra-charts-waterfall-basic':         'extra/granularity-charts/GrChartWaterfallBasicDemo.vue',
   'extra-charts-waterfall-horizontal':    'extra/granularity-charts/GrChartWaterfallHorizontalDemo.vue',
+  'extra-datasource-basic':               'extra/granularity-datasource/UseDataSourceBasicDemo.vue',
+  'extra-datasource-url':                 'extra/granularity-datasource/UseDataSourceUrlDemo.vue',
   'extra-chrono-calendar-basic':          'extra/granularity-chrono/GrCalendarBasicDemo.vue',
   'extra-chrono-calendar-day-slot':       'extra/granularity-chrono/GrCalendarDaySlotDemo.vue',
   'extra-chrono-calendar-modes':          'extra/granularity-chrono/GrCalendarModesDemo.vue',

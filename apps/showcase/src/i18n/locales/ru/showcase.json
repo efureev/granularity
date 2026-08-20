@@ -427,6 +427,7 @@
     "backTo": "Назад в {target}",
     "about": {
       "title": "О компоненте",
+      "titleComposable": "О композабле",
       "featuresTitle": "Возможности"
     },
     "liveExamples": {

@@ -1,5 +1,6 @@
 import chartsPkg from '@feugene/granularity-charts/package.json'
 import dashboardPkg from '@feugene/granularity-dashboard/package.json'
+import datasourcePkg from '@feugene/granularity-datasource/package.json'
 import formsSchemaPkg from '@feugene/granularity-forms-schema/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
@@ -24,6 +25,12 @@ export type CompanionExample = {
 }
 
 export type CompanionComponent = {
+  /**
+   * Чем запись является. Умолчание — компонент; композабл отличается тем, что
+   * страница не вправе называть его компонентом, а секции API у него другие
+   * (`parameters` и `returns` вместо пропов и событий).
+   */
+  kind?: 'component' | 'composable'
   /** Имя компонента, напр. `GrDateTimePicker`. */
   name: string
   /** Kebab-slug для route (`/extras/<slug>`), напр. `gr-date-time-picker`. */
@@ -2248,6 +2255,93 @@ interface GrDashboardItemSettingsProps {
           },
         ],
         apiSections: [],
+      },
+    ],
+  },
+  {
+    id: 'granularity-datasource',
+    npmName: '@feugene/granularity-datasource',
+    label: 'Datasource',
+    version: datasourcePkg.version,
+    description: 'Состояние списка одним композаблом: сортировка, фильтры, страница, поиск, адресная строка и запрос без гонок. Пакет ничего не рисует — он связывает то, что уже нарисовано.',
+    dependencies: [],
+    components: [
+      {
+        kind: 'composable',
+        name: 'useDataSource',
+        slug: 'use-data-source',
+        title: 'useDataSource',
+        summary: 'Пара «таблица + фильтры + пагинация» перестаёт писаться заново: состояние, серверная и клиентская стратегии и защита от гонок живут в одном месте.',
+        importPath: '@feugene/granularity-datasource',
+        overview: {
+          paragraphs: [
+            'Композабл держит состояние списка и умеет две стратегии за одним интерфейсом: серверную (`fetcher`) и клиентскую (`rows` целиком). Наружу он отдаёт писуемые ссылки под `v-model` — `page`, `perPage`, `sortKey`, `sortDir`, `search` — и те же значения одним объектом для `v-bind`.',
+            'Ядро он не импортирует ни разу. Это не экономия, а граница: состояние списка не обязано знать, чем этот список нарисован, — те же объекты раскрываются на чужой таблице и на собственной разметке.',
+          ],
+          features: [
+            'Поздний ответ раннего запроса не побеждает: гонку закрывает номер запроса, а не только `AbortController`.',
+            'Смена фильтра, поиска и размера страницы возвращает на первую страницу.',
+            'Набор текста откладывается и схлопывается в один запрос; клик по странице уходит сразу.',
+            'Двусторонняя сериализация в строку запроса — по требованию, с префиксом на каждый список.',
+            'Пустое в адрес не пишется: ссылка на список по умолчанию выглядит как адрес страницы.',
+          ],
+        },
+        typeDeclarations: `import type {
+  DataSourceRequest,
+  DataSourceResult,
+  DataSourceSort,
+  DataSourceState,
+  FilterValue,
+} from '@feugene/granularity-datasource'
+
+import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`,
+        examples: [
+          {
+            id: 'datasource-basic',
+            title: 'Server-backed list',
+            description: 'Сервер-заглушка отвечает вразнобой: нечётный запрос медленнее чётного. Наберите пару букв подряд — в таблице окажется ответ на последний запрос.',
+            previewKey: 'extra-datasource-basic',
+            note: 'Гонку закрывает номер запроса, а не только `AbortController`: транспорт потребителя вправе не пробросить `signal`, и тогда прерванный запрос всё равно вернётся и перезапишет свежие данные. Набор в поиске откладывается на 300 мс, клик по странице и по заголовку — нет: это разовое действие, а не набор текста.',
+          },
+          {
+            id: 'datasource-url',
+            title: 'State in the query string',
+            description: 'Состояние уходит в строку запроса и возвращается из неё. Адрес витрины при этом не трогается: у демо свой адаптер, пишущий в поле под таблицей.',
+            previewKey: 'extra-datasource-url',
+            note: 'Синхронизация включается опцией, а не сама: композабл, пишущий в адрес по умолчанию, вмешался бы в чужую навигацию и столкнул бы два списка на одной странице. Префикс разводит их — `?users.page=2&orders.page=1`. Пустое не пишется, чужие параметры не трогаются.',
+          },
+        ],
+        apiSections: [
+          {
+            key: 'parameters',
+            title: 'Options',
+            origin: 'manual',
+            items: [
+              { name: 'fetcher', type: '(request, { signal }) => Promise<{ rows, total }>', description: 'Серверная стратегия. Пробрасывать `signal` в транспорт стоит, но не обязательно: от гонки защищает не только он.' },
+              { name: 'rows', type: 'MaybeRefOrGetter<readonly TRow[]>', description: 'Клиентская стратегия: весь набор сразу, фильтр, порядок и срез считаются на месте.' },
+              { name: 'match / filter / compare', type: '(row, …) => boolean · number', description: 'Как клиентская стратегия ищет, фильтрует и сортирует. Умолчания: подстрока по текстовым полям, равенство по имени поля, сравнение значений `sort.key`.' },
+              { name: 'defaults', type: 'DataSourceDefaults', description: 'Начальные страница, размер, сортировка, фильтры и поиск. Они же задают, что не пишется в адрес, и восстанавливают тип фильтра при разборе.' },
+              { name: 'debounce', type: 'number', default: '300', description: 'Задержка перед запросом при правке поиска и фильтров, мс. `0` выключает. Страница и сортировка не откладываются.' },
+              { name: 'immediate', type: 'boolean', default: 'true', description: 'Запросить сразу. `false` — ждать первого `reload()`.' },
+              { name: 'url', type: '{ prefix?, adapter? }', description: 'Синхронизация с адресной строкой. Не задана — состояние живёт в памяти. Адаптер по умолчанию — History API.' },
+            ],
+          },
+          {
+            key: 'returns',
+            title: 'Returns',
+            origin: 'manual',
+            items: [
+              { name: 'page / perPage / sortKey / sortDir / search', type: 'WritableComputedRef', description: 'Основной способ связки: `v-model:page`, `v-model:sort-key` и так далее. Длиннее спреда ровно на имена пропов, зато их видит `vue-tsc`.' },
+              { name: 'table / pagination', type: 'ComputedRef<DataSourceTableBinding<TRow>> · ComputedRef<DataSourcePaginationBinding>', description: 'Те же значения одним объектом под `v-bind`. Цена: строгая проверка шаблонов не засчитывает спред в обязательные пропсы, и `rows`, `page`, `pageSize`, `total` придётся указать ещё и явно.' },
+              { name: 'state', type: 'ComputedRef<DataSourceState>', description: 'Текущее состояние целиком: страница, размер, сортировка, фильтры, поиск.' },
+              { name: 'rows / total / pageCount', type: 'ComputedRef', description: 'Строки текущей страницы, полное число совпадений и число страниц.' },
+              { name: 'loading / error', type: 'Ref<boolean> · Ref<unknown>', description: 'Состояние запроса. Прерванный запрос ошибкой не считается: его прервали мы сами.' },
+              { name: 'setPage / setPerPage / setSort / setSearch', type: '(value) => void', description: 'Точечные правки состояния.' },
+              { name: 'setFilter / setFilters', type: '(name, value) · (filters) => void', description: 'Один фильтр или весь набор разом.' },
+              { name: 'reset / reload', type: '() => void · () => Promise<void>', description: '`reset` возвращает умолчания; `reload` повторяет запрос текущего состояния — например после правки строки.' },
+            ],
+          },
+        ],
       },
     ],
   },

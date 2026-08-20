@@ -427,6 +427,7 @@
     "backTo": "Back to {target}",
     "about": {
       "title": "About the component",
+      "titleComposable": "About the composable",
       "featuresTitle": "Features"
     },
     "liveExamples": {

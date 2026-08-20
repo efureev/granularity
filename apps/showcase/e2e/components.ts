@@ -46,11 +46,22 @@ export const registryComponentNames: string[] = Object.keys(granularityComponent
  * 2.6 e2e не видел companion-страниц вовсе, и ни axe, ни визуальный слой их
  * не проверяли.
  */
+/**
+ * Композаблы-компаньоны — руками, и это единственное исключение из правила выше.
+ *
+ * Выводить их не из чего: список строится по реестрам компонентов пресета, а у
+ * пакета состояния компонентов нет вовсе. Без этой строки страница
+ * `/extras/use-data-source` существовала бы, но ни axe, ни визуальный слой на
+ * неё бы не зашли.
+ */
+const composableCompanionNames = ['useDataSource']
+
 export const companionComponentNames: string[] = [
   ...Object.keys(granularityChronoComponentConfigs),
   ...Object.keys(granularityChartsComponentConfigs),
   ...Object.keys(granularityDashboardComponentConfigs),
   ...Object.keys(granularityFormsSchemaComponentConfigs),
+  ...composableCompanionNames,
 ].sort()
 
 /**
@@ -78,6 +89,12 @@ export const companionComponentNames: string[] = [
 const VISUAL_EXCLUDED_PACKAGES = [
   ...Object.keys(granularityChartsComponentConfigs),
   ...Object.keys(granularityDashboardComponentConfigs),
+  // `useDataSource` — по другой причине: его демо ждёт сервер-заглушку с
+  // разными задержками, и на момент снимка таблица бывает и с данными, и в
+  // загрузке. Пиксельный эталон у такой страницы измерял бы удачу. Раскладку
+  // здесь держат страницы самих `GrDataTable` и `GrPagination`, доступность —
+  // axe, который на страницу как раз заходит.
+  ...composableCompanionNames,
 ]
 
 /** Компаньоны для визуального слоя — см. `VISUAL_EXCLUDED_PACKAGES`. */

@@ -64,7 +64,7 @@ v{{ component.version }}
 
     <section v-if="component.overview" id="about" class="scroll-mt-28 space-y-4">
       <h2 class="text-2xl font-semibold">
-        {{ t('showcase.detailPage.about.title') }}
+        {{ t(component.kind === 'composable' ? 'showcase.detailPage.about.titleComposable' : 'showcase.detailPage.about.title') }}
       </h2>
 
       <div class="max-w-3xl space-y-3">
