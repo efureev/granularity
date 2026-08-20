@@ -35,6 +35,7 @@ import {
   rectOfItem,
   resizeItem,
   resolveBreakpoint,
+  rowsForHeight,
   spanFromDelta,
   withBreakpointLayout,
 } from '../../layout'
@@ -93,6 +94,14 @@ export interface GrDashboardEmits {
   (e: 'layoutChange', value: GrDashboardLayout, breakpoint: GrDashboardBreakpoint): void
   (e: 'itemMove', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
   (e: 'itemResize', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
+  /**
+   * Виджет с `auto-height` подстроился под содержимое.
+   *
+   * Отдельно от `itemResize` потому, что это не действие пользователя:
+   * приложение, которое считает раскладку грязной по правкам, иначе спрашивало
+   * бы «сохранить изменения?» после загрузки данных в виджет.
+   */
+  (e: 'itemAutoResize', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
   (e: 'breakpointChange', breakpoint: GrDashboardBreakpoint, cols: number): void
   /** Виджет попросил открыть свои настройки: нажата встроенная кнопка-шестерёнка. */
   (e: 'itemSettings', id: string): void
@@ -397,7 +406,7 @@ function flush(): void {
   if (span.w === state.span.w && span.h === state.span.h) return
 
   state.span = span
-  preview.value = resizeItem(baseLayout.value, state.id, span, moveOptions.value)
+  preview.value = resizeItem(baseLayout.value, state.id, pinAutoHeight(state.id, span), moveOptions.value)
 }
 
 function scheduleFlush(event: PointerEvent): void {
@@ -751,7 +760,7 @@ function applyResize(id: string, span: GrDashboardSpan): boolean {
   const from = itemFor(id)
   if (!from) return false
 
-  const next = resizeItem(baseLayout.value, id, span, moveOptions.value)
+  const next = resizeItem(baseLayout.value, id, pinAutoHeight(id, span), moveOptions.value)
   const to = next.find(entry => entry.id === id)
   if (!to || (to.w === from.w && to.h === from.h)) return false
 
@@ -760,6 +769,78 @@ function applyResize(id: string, span: GrDashboardSpan): boolean {
   announcePosition('grDashboard.item.resized', '{title}, {w} by {h}', to)
 
   return true
+}
+
+// ————— Авто-высота: содержимое виджета решает, сколько строк он занимает.
+
+/** Запрошенная содержимым высота в пикселях, по виджетам. */
+const contentHeights = new Map<string, number>()
+let autoFrame: number | null = null
+
+/**
+ * Применяет накопленные замеры одним пакетом.
+ *
+ * Мимо `applyResize`: тот требует режима редактирования и объявляет результат в
+ * живой регион. Авто-высота — не действие пользователя: в просмотре она обязана
+ * работать так же, а диктору сообщать не о чем.
+ */
+function flushAutoHeights(): void {
+  autoFrame = null
+  if (contentHeights.size === 0) return
+
+  let next = baseLayout.value
+  const changed: [string, GrDashboardItemLayout, GrDashboardItemLayout][] = []
+
+  for (const [id, px] of contentHeights) {
+    const from = next.find(entry => entry.id === id)
+    if (!from) continue
+
+    const rows = rowsForHeight(px, metrics.value)
+    if (rows === from.h) continue
+
+    const applied = resizeItem(next, id, { w: from.w, h: rows }, moveOptions.value)
+    const to = applied.find(entry => entry.id === id)
+    if (!to || to.h === from.h) continue
+
+    next = applied
+    changed.push([id, from, to])
+  }
+
+  if (changed.length === 0) return
+
+  for (const [id, from, to] of changed) emit('itemAutoResize', id, from, to)
+  commit(next)
+}
+
+function scheduleAutoHeights(): void {
+  if (autoFrame !== null) return
+
+  autoFrame = typeof requestAnimationFrame === 'undefined'
+    ? (queueMicrotask(flushAutoHeights), -1)
+    : requestAnimationFrame(flushAutoHeights)
+}
+
+/**
+ * Высоту виджета с `auto-height` определяет содержимое, а не пользователь:
+ * запрошенный `h` затёр бы следующий же замер. Уголок и стрелки меняют такому
+ * виджету только ширину.
+ */
+function pinAutoHeight(id: string, span: GrDashboardSpan): GrDashboardSpan {
+  if (!contentHeights.has(id)) return span
+
+  return { w: span.w, h: itemFor(id)?.h ?? span.h }
+}
+
+function reportContentHeight(id: string, px: number | null): void {
+  if (px === null) {
+    contentHeights.delete(id)
+    return
+  }
+
+  if (contentHeights.get(id) === px) return
+
+  contentHeights.set(id, px)
+  scheduleAutoHeights()
 }
 
 /** Взятое не может остаться взятым навсегда: фокус ушёл — перенос отменён. */
@@ -817,6 +898,7 @@ const context: GrDashboardContext = {
   requestSettings: id => emit('itemSettings', id),
   canResize: canResizeItem,
   resizeItemTo: applyResize,
+  reportContentHeight,
   tabindexFor: id => roving.tabindexFor(id),
   dragLabelFor: id => t('grDashboard.item.dragHandle', 'Move {title}', { title: titleOf(id) }),
   resizeLabelFor: (id) => {

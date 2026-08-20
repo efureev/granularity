@@ -76,6 +76,7 @@ export const demoPathByPreviewKey = {
   'extra-forms-schema-server-errors': 'extra/granularity-forms-schema/GrSchemaFormServerErrorsDemo.vue',
   'extra-forms-schema-validation':    'extra/granularity-forms-schema/GrSchemaFormValidationDemo.vue',
   'extra-forms-schema-widget':        'extra/granularity-forms-schema/GrSchemaFormWidgetDemo.vue',
+  'extra-dashboard-auto-height':          'extra/granularity-dashboard/GrDashboardAutoHeightDemo.vue',
   'extra-dashboard-basic':                'extra/granularity-dashboard/GrDashboardBasicDemo.vue',
   'extra-dashboard-compaction':           'extra/granularity-dashboard/GrDashboardCompactionDemo.vue',
   'extra-dashboard-edge-to-edge':         'extra/granularity-dashboard/GrDashboardEdgeToEdgeDemo.vue',

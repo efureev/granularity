@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cellFromDelta, cellFromPoint, metricsOf, rectOfItem, spanFromDelta } from '../layoutGeometry'
+import { cellFromDelta, cellFromPoint, metricsOf, rectOfItem, rowsForHeight, spanFromDelta } from '../layoutGeometry'
 
 // 1000px, 10 колонок, зазор 10 → колонка 91px, шаг 101px.
 const metrics = metricsOf(1000, 10, 60, 10)
@@ -96,5 +96,38 @@ describe('cellFromPoint', () => {
 
   it('нулевая ширина контейнера даёт нулевую ячейку, а не NaN', () => {
     expect(cellFromPoint(metricsOf(0, 12, 64, 12), 100, 100, { w: 2, h: 1 })).toEqual({ x: 0, y: 0 })
+  })
+})
+
+/**
+ * Строка — 60px, зазор — 10px, шаг — 70px. Виджет в `h` строк занимает
+ * `h * 60 + (h - 1) * 10`: одна — 60, две — 130, три — 200.
+ */
+describe('rowsForHeight', () => {
+  it('точная высота не просит лишней строки', () => {
+    expect(rowsForHeight(60, metrics)).toBe(1)
+    expect(rowsForHeight(130, metrics)).toBe(2)
+    expect(rowsForHeight(200, metrics)).toBe(3)
+  })
+
+  it('лишний пиксель округляется вверх, а не обрезает содержимое', () => {
+    expect(rowsForHeight(61, metrics)).toBe(2)
+    expect(rowsForHeight(131, metrics)).toBe(3)
+  })
+
+  it('недобор до строки её не отнимает', () => {
+    expect(rowsForHeight(59, metrics)).toBe(1)
+    expect(rowsForHeight(129, metrics)).toBe(2)
+  })
+
+  it('пустое содержимое занимает строку, а не ноль', () => {
+    expect(rowsForHeight(0, metrics)).toBe(1)
+    expect(rowsForHeight(-40, metrics)).toBe(1)
+  })
+
+  /** Замер до отрисовки и вырожденная метрика не должны давать выдуманных чисел. */
+  it('нечисловая высота и нулевой шаг дают строку', () => {
+    expect(rowsForHeight(Number.NaN, metrics)).toBe(1)
+    expect(rowsForHeight(500, metricsOf(1000, 10, 0, 0))).toBe(1)
   })
 })

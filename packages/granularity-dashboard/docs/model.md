@@ -34,6 +34,12 @@ interface GrDashboardItemLayout {
 7. `static` не двигается ни сам, ни под давлением соседей.
 8. `deriveLayout` не теряет и не дублирует виджеты.
 
+Авто-высота инвариантов не ослабляет: замеренная высота идёт в раскладку той же
+`resizeItem`, что и уголок, — с теми же `minH`/`maxH`, тем же отказом на
+`static` и тем же разрешением столкновений. Пиксели превращаются в целые строки
+**до** этого, округлением вверх (`rowsForHeight`); дробных `h` в модели не
+появляется. Подробности — [`components/GrDashboardItem.md`](./components/GrDashboardItem.md).
+
 Противоречие `maxW < minW` разрешается в пользу `minW`: виджет, объявивший «мне нужно не меньше
 четырёх колонок», в трёх нарисуется сломанным, а лишняя колонка — всего лишь пустое место.
 
@@ -147,6 +153,48 @@ const { layout, isRestored, reset, flush } = useDashboardLayout({
 
 Запись идёт с паузой: жест меняет раскладку на каждой смене ячейки, и без неё один перенос давал бы
 десяток обращений к хранилищу. Размонтирование дописывает отложенное.
+
+## Выгрузить и загрузить раскладку файлом
+
+`serializeLayout` и `parseLayout` — всё, что для этого нужно со стороны пакета:
+первый кладёт раскладку в JSON вместе с номером версии, второй читает его
+терпимо. Остальное — три десятка строк на стороне приложения, и они здесь
+потому, что каждый пишет их заново.
+
+```ts
+import { GR_DASHBOARD_LAYOUT_VERSION, parseLayout, serializeLayout } from '@feugene/granularity-dashboard/layout'
+
+function download(layout: GrDashboardResponsiveLayout): void {
+  const blob = new Blob([serializeLayout(layout)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = Object.assign(document.createElement('a'), { href: url, download: 'dashboard.json' })
+
+  link.click()
+  // Иначе объект живёт до перезагрузки страницы: у ссылки нет владельца,
+  // который бы его отпустил.
+  URL.revokeObjectURL(url)
+}
+
+async function upload(file: File): Promise<GrDashboardResponsiveLayout | null> {
+  return parseLayout(await file.text(), {
+    version: GR_DASHBOARD_LAYOUT_VERSION,
+    migrate: (raw, from) => (from === null ? null : migrateLayout(raw, from)),
+  })
+}
+```
+
+**`null` — рабочий ответ, а не сбой.** Файл могли отредактировать руками,
+принести из другого приложения или из прошлого мажора вашего же. Разбор в этом
+случае молчит и отдаёт `null`, а показать «файл не подошёл» и оставить текущую
+раскладку — задача приложения. Исключение здесь было бы хуже: пользователь
+потерял бы то, что уже было на экране.
+
+**Версия — ваша, а не пакетная.** `GR_DASHBOARD_LAYOUT_VERSION` меняется вместе
+с форматом снимка, но нумеровать свои раскладки удобнее самому: передайте
+`version` и `migrate`, и старый файл поднимется вместо того, чтобы отвергнуться.
+
+Тот же `parseLayout` стоит и за `useDashboardLayout`, так что файл и хранилище
+читаются одним кодом: снимок, выгруженный из одного браузера, ложится в другой.
 
 ## Виджет: шапка, отступы, прокрутка
 

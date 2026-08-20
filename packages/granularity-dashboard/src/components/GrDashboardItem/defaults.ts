@@ -15,6 +15,8 @@ export interface GrDashboardItemConfigurableProps {
   /** Не задан — отступы берутся от `size`. */
   padding: GrDashboardItemPadding
   overflow: GrDashboardItemOverflow
+  /** Высоту виджета определяет содержимое, а не запись раскладки. */
+  autoHeight: boolean
 }
 
 declare module '@feugene/granularity/composables/useGrComponentConfig' {

@@ -53,6 +53,14 @@ export interface GrDashboardItemProps {
   /** `hidden` снимает и полосу прокрутки, и остановку `Tab` у тела. */
   overflow?: GrDashboardItemOverflow
   /**
+   * Высоту виджета определяет его содержимое, а не запись раскладки.
+   *
+   * Округляется вверх до целой строки: сетка целочисленная, и пустота в
+   * несколько пикселей внизу лучше обрезанной последней строки. `minH`/`maxH`
+   * продолжают действовать, а уголок у такого виджета меняет только ширину.
+   */
+  autoHeight?: boolean
+  /**
    * Можно ли этот виджет тащить и растягивать. Не задан — действует правило
    * сетки; `static` сильнее обоих, потому что он про раскладку, а не про
    * интерфейс.
@@ -76,6 +84,7 @@ const props = withDefaults(defineProps<GrDashboardItemProps>(), {
   size: undefined,
   padding: undefined,
   overflow: undefined,
+  autoHeight: undefined,
   draggable: undefined,
   resizable: undefined,
   static: undefined,
@@ -102,6 +111,7 @@ defineSlots<{
 const dashboard = useGrDashboardContext()
 const size = useGrComponentSize(() => props.size, { component: 'GrDashboardItem' })
 const overflow = useGrComponentProp('GrDashboardItem', 'overflow', () => props.overflow, 'auto')
+const autoHeight = useGrComponentProp('GrDashboardItem', 'autoHeight', () => props.autoHeight, false)
 
 /**
  * Отступы: проп → конфиг → ступень от `size`.
@@ -191,6 +201,58 @@ function syncScrollable(): void {
   scrollable.value = el.scrollHeight - el.clientHeight > 1
 }
 
+// ————— Авто-высота: содержимое сообщает сетке, сколько ему нужно.
+
+const measureEl = ref<HTMLElement | null>(null)
+
+/**
+ * Высота содержимого плюс обвес виджета: шапка, подвал, отступы, рамка карточки.
+ *
+ * Замеряется **обёртка**, а не тело: высота тела задана ячейкой сетки, и
+ * `scrollHeight` у него равен `max(содержимое, контейнер)` — виджет смог бы
+ * вырасти под содержимое, но никогда не ужался бы обратно.
+ *
+ * Обвес считается разностью «корень минус тело» плюс отступы самого тела: оба
+ * слагаемых от числа строк не зависят — тело забирает весь излишек высоты.
+ */
+function syncContentHeight(): void {
+  if (!autoHeight.value) return
+
+  const content = measureEl.value
+  const root = rootEl.value
+  const body = bodyEl.value
+  if (!content || !root || !body) return
+
+  // Отступы тела не входят ни в обёртку, ни в разность: `getBoundingClientRect`
+  // у тела — это его border-box, то есть padding внутри него, а обёртка стоит
+  // уже за ним. Без этой поправки виджет просил на строку меньше, чем нужно, и
+  // обрезал собственное содержимое.
+  const style = getComputedStyle(body)
+  const padding = (Number.parseFloat(style.paddingTop) || 0) + (Number.parseFloat(style.paddingBottom) || 0)
+
+  const chrome = Math.max(0, root.getBoundingClientRect().height - body.getBoundingClientRect().height)
+  dashboard?.reportContentHeight(props.itemId, content.getBoundingClientRect().height + chrome + padding)
+}
+
+function attachMeasure(): void {
+  if (!measureEl.value) return
+
+  syncContentHeight()
+  dashboard?.observeBody(measureEl.value, syncContentHeight)
+}
+
+function detachMeasure(el: HTMLElement | null): void {
+  if (el) dashboard?.unobserveBody(el)
+  dashboard?.reportContentHeight(props.itemId, null)
+}
+
+// Обёртки нет до включения пропа и не остаётся после выключения: подписка
+// переезжает вместе с ней, а снятый запрос возвращает высоту раскладке.
+watch(measureEl, (el, previous) => {
+  if (previous) detachMeasure(previous)
+  if (el) attachMeasure()
+})
+
 // ————— Панель режима редактирования у виджета без шапки.
 
 const hovered = ref(false)
@@ -259,6 +321,7 @@ onBeforeUnmount(() => {
   hoverQuery?.removeEventListener('change', syncCoarsePointer)
   hoverQuery = null
   if (bodyEl.value) dashboard?.unobserveBody(bodyEl.value)
+  detachMeasure(measureEl.value)
 
   dashboard?.unregisterItem(props.itemId)
 })
@@ -377,8 +440,14 @@ const named = computed(() => Boolean(props.ariaLabel) || Boolean(props.title))
         :class="[bodyClass, overflowClass[overflow], paddingSizes[padding]]"
         :tabindex="scrollable ? 0 : undefined"
       >
-        <slot v-if="visible" />
-        <slot v-else name="skeleton" />
+        <div v-if="autoHeight" ref="measureEl" data-gr-dashboard-measure>
+          <slot v-if="visible" />
+          <slot v-else name="skeleton" />
+        </div>
+        <template v-else>
+          <slot v-if="visible" />
+          <slot v-else name="skeleton" />
+        </template>
       </div>
 
       <template v-if="$slots.footer" #footer>

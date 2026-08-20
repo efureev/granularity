@@ -87,6 +87,18 @@ export interface GrDashboardContext {
   observeBody: (el: HTMLElement, onResize: () => void) => void
   unobserveBody: (el: HTMLElement) => void
 
+  /**
+   * Виджет сообщил, сколько пикселей занимает его содержимое.
+   *
+   * `null` снимает запрос: виджет размонтировался или у него выключили
+   * `autoHeight`, — и высота снова принадлежит раскладке.
+   *
+   * Сетка сама переводит пиксели в строки и применяет их одним пакетом на
+   * кадр: десять виджетов, доехавших в одном коллбэке наблюдателя, обязаны
+   * дать одно обновление раскладки, а не десять.
+   */
+  reportContentHeight: (id: string, px: number | null) => void
+
   startMove: (id: string, event: PointerEvent) => void
   startResize: (id: string, event: PointerEvent) => void
   onHandleKeydown: (id: string, event: KeyboardEvent) => void

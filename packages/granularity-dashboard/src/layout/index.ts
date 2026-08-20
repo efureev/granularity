@@ -37,7 +37,7 @@ export type { GrDashboardCell, GrDashboardMoveOptions, GrDashboardSpan } from '.
 export { addItem, moveItem, removeItem, resizeItem } from './layoutMove'
 
 export type { GrDashboardMetrics, GrDashboardRect } from './layoutGeometry'
-export { cellFromDelta, cellFromPoint, colStep, metricsOf, rectOfItem, rowStep, spanFromDelta } from './layoutGeometry'
+export { cellFromDelta, cellFromPoint, colStep, metricsOf, rectOfItem, rowsForHeight, rowStep, spanFromDelta } from './layoutGeometry'
 
 export type { LayoutForOptions } from './layoutBreakpoints'
 export {

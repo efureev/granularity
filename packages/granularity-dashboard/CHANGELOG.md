@@ -7,6 +7,46 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.4.0] 2026-08-20
+
+### Added
+
+- **A widget can size itself to its content.** `auto-height` on `GrDashboardItem` measures what the
+  widget actually renders and asks the grid for as many rows as it needs. Until now the height was a
+  number the application had to guess on the user's behalf, and it guessed wrong every time the data
+  changed: a twenty-row table got clipped by `overflow: auto`, a single big number left dead space
+  underneath.
+
+  What is measured is a **wrapper around the content**, not the widget body. The body's height is
+  dictated by the grid cell, and its `scrollHeight` is `max(content, container)` — a widget could
+  grow to fit its content but, once taller than it, would report its own height and never shrink
+  back. The wrapper is only rendered when the prop is on, so widgets without it keep the DOM they
+  had.
+
+  Height is rounded **up** to a whole row: the grid is integral (`docs/model.md`, invariant 1), and
+  a few pixels of slack at the bottom beat a clipped last row. This is the one place that rounds up
+  — dragging the corner still snaps to the nearest cell, because there the user is aiming.
+
+  `minH` and `maxH` still apply, `static` still refuses, and the measured height goes into the
+  layout through the same `resizeItem` as every other size change — collisions and compaction
+  included. The resize corner on such a widget changes width only: a height set by hand would be
+  overwritten by the next measurement.
+
+- **`itemAutoResize`** — emitted when content, rather than a person, changed a widget's height. The
+  change still travels through `update:layout` (the layout stays the single source of truth), but an
+  application that treats an edit as "unsaved changes" would otherwise prompt after a plain data
+  load. `itemResize` remains user-only.
+
+  Measurements arriving in one observer callback are applied as a single batch: ten widgets settling
+  at once produce one `update:layout`, not ten.
+
+### Documentation
+
+- **Exporting and importing a layout as a file** — a recipe in `docs/model.md`. The package side was
+  already complete (`serializeLayout`/`parseLayout` carry a version); what was missing was the thirty
+  lines every application writes again: `Blob` download, `<input type="file">` upload, and what to do
+  with a file that does not parse — `null` is a working answer, not a failure.
+
 ## [v0.3.0] 2026-08-19
 
 ### Added

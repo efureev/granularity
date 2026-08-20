@@ -121,3 +121,22 @@ export function spanFromDelta(
     h: Math.max(1, Math.round((origin.height + dh + metrics.gap) / rowStep(metrics))),
   }
 }
+
+/**
+ * Сколько строк нужно, чтобы вместить содержимое высотой `height` пикселей.
+ *
+ * Округление **вверх**, в отличие от `spanFromDelta`: там пользователь тянет
+ * уголок и ждёт, что виджет прилипнет к ближайшей ячейке, а здесь округление
+ * вниз обрезало бы содержимое — ради нескольких пикселей пропала бы последняя
+ * строка таблицы. Пустота внизу заметна и безобидна, обрезанная строка — нет.
+ *
+ * Зазор прибавляется потому, что `h` строк занимают `h * rowHeight` плюс
+ * `h - 1` зазоров между ними: без поправки виджет ровно в две строки требовал
+ * бы третью.
+ */
+export function rowsForHeight(height: number, metrics: GrDashboardMetrics): number {
+  const step = rowStep(metrics)
+  if (!(step > 0) || !Number.isFinite(height)) return 1
+
+  return Math.max(1, Math.ceil((height + metrics.gap) / step))
+}
