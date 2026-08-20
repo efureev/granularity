@@ -61,6 +61,7 @@ export const demoPathByPreviewKey = {
   'extra-chrono-range-basic':             'extra/granularity-chrono/GrDateRangePickerBasicDemo.vue',
   'extra-chrono-duration-basic':          'extra/granularity-chrono/GrDurationBasicDemo.vue',
   'extra-chrono-range-limits':            'extra/granularity-chrono/GrDateRangePickerLimitsDemo.vue',
+  'extra-chrono-range-time':              'extra/granularity-chrono/GrDateRangePickerTimeDemo.vue',
   'extra-chrono-range-presets':           'extra/granularity-chrono/GrDateRangePickerPresetsDemo.vue',
   'extra-chrono-relative-cutoff':         'extra/granularity-chrono/GrRelativeTimeCutoffDemo.vue',
   'extra-chrono-relative-live':           'extra/granularity-chrono/GrRelativeTimeLiveDemo.vue',

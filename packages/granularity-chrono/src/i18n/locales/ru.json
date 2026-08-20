@@ -17,11 +17,14 @@
     "presetsLabel": "Готовые даты"
   },
   "dateRangePicker": {
-    "panelLabel": "Выбор периода",
-    "startSelected": "Начало выбрано: {date}. Выберите конец периода",
-    "rangeSelected": "Период выбран: с {from} по {to}",
+    "endTime": "Время конца",
     "lengthRejected": "Такая длина периода недопустима",
-    "presetsLabel": "Готовые периоды"
+    "panelLabel": "Выбор периода",
+    "presetsLabel": "Готовые периоды",
+    "rangeSelected": "Период выбран: с {from} по {to}",
+    "startSelected": "Начало выбрано: {date}. Выберите конец периода",
+    "startTime": "Время начала",
+    "timeRejected": "Конец не может быть раньше начала"
   },
   "dateTimePicker": {
     "panelLabel": "Выбор даты и времени",

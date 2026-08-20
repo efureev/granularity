@@ -559,3 +559,160 @@ describe('готовые периоды', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Период с точностью до минут. Предмет проверок не «колонки нарисовались», а
+ * две вещи, которых у диапазона по датам не было вовсе: умолчание «сутки
+ * целиком» и порядок краёв внутри одного дня, который держит только время.
+ */
+describe('GrDateRangePicker — время границ', () => {
+  function times(wrapper: Picker): [Date, Date] {
+    return lastModel(wrapper) as [Date, Date]
+  }
+
+  function hm(date: Date): string {
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  }
+
+  /**
+   * Компонент управляемый: без возврата значения в проп `selected` остаётся
+   * пустым, и колонки времени не появятся — им нечего править.
+   */
+  async function pickRange(wrapper: Picker) {
+    await openPicker(wrapper)
+    await day('2026-08-12').trigger('click')
+    await day('2026-08-14').trigger('click')
+    await nextTick()
+
+    const emitted = lastModel(wrapper)
+    if (emitted) await wrapper.setProps({ modelValue: emitted as readonly [Date, Date] })
+    await nextTick()
+  }
+
+  /**
+   * Две полуночи молча отрезали бы почти весь последний день: «с 12 по 14»
+   * по-человечески включает всё четырнадцатое.
+   */
+  it('свежий период получает сутки целиком', async () => {
+    const wrapper = mountPicker({ enableTime: true })
+    await pickRange(wrapper)
+
+    const [from, to] = times(wrapper)
+    expect([hm(from), hm(to)]).toEqual(['00:00', '23:59'])
+  })
+
+  /**
+   * 23:59 при шаге в 15 минут в колонке отсутствует: минуты остались бы без
+   * выбранного варианта, и конец периода нельзя было бы прочитать там, где его
+   * правят. Умолчание обязано лежать на той же сетке, что и столбец.
+   */
+  it('с крупным шагом конец кладётся на последний доступный слот', async () => {
+    const wrapper = mountPicker({ enableTime: true, minuteStep: 15 })
+    await pickRange(wrapper)
+
+    expect(hm(times(wrapper)[1])).toBe('23:45')
+  })
+
+  it('с секундами конец — 23:59:59', async () => {
+    const wrapper = mountPicker({ enableTime: true, enableSeconds: true })
+    await pickRange(wrapper)
+
+    expect(times(wrapper)[1].getSeconds()).toBe(59)
+  })
+
+  it('без `enableTime` обе границы остаются полуночью', async () => {
+    const wrapper = mountPicker()
+    await pickRange(wrapper)
+
+    const [from, to] = times(wrapper)
+    expect([hm(from), hm(to)]).toEqual(['00:00', '00:00'])
+    expect(document.querySelector('[data-gr-date-range-picker-times]')).toBeNull()
+  })
+
+  it('колонки времени появляются только после выбора периода', async () => {
+    const wrapper = mountPicker({ enableTime: true })
+    await openPicker(wrapper)
+
+    expect(document.querySelector('[data-gr-date-range-picker-times]')).toBeNull()
+
+    await day('2026-08-12').trigger('click')
+    await day('2026-08-14').trigger('click')
+    await nextTick()
+    await wrapper.setProps({ modelValue: lastModel(wrapper) as readonly [Date, Date] })
+    await nextTick()
+
+    expect(document.querySelectorAll('[data-gr-date-range-picker-time]')).toHaveLength(2)
+  })
+
+  it('поле показывает и дату, и время', async () => {
+    const wrapper = mountPicker({ enableTime: true })
+    await pickRange(wrapper)
+    await nextTick()
+
+    expect(field(wrapper).attributes('value')).toMatch(/\d{1,2}:\d{2}/)
+  })
+})
+
+/**
+ * Порядок краёв внутри одного дня держит только время: по датам они равны.
+ * Раньше такого случая не существовало, и это единственное место, где время
+ * добавляет новое правило, а не новое поле.
+ */
+describe('GrDateRangePicker — порядок краёв со временем', () => {
+  function timeOption(edge: 0 | 1, unit: string, value: string) {
+    const block = document.querySelectorAll('[data-gr-date-range-picker-time]')[edge]
+    const option = [...(block?.querySelectorAll(`[data-unit="${unit}"] [role="option"]`) ?? [])]
+      .find(el => el.textContent?.trim() === value)
+
+    if (!option) throw new Error(`нет варианта ${unit}=${value} у края ${edge}`)
+
+    return new DOMWrapper(option as HTMLElement)
+  }
+
+  async function sameDayRange() {
+    // 24 часа явно: у `en-US` колонка двенадцатичасовая, и «07» при PM — это 19:00.
+    const wrapper = mountPicker({ enableTime: true, use12Hours: false })
+    await field(wrapper).trigger('click')
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    await day('2026-08-12').trigger('click')
+    await day('2026-08-12').trigger('click')
+    await nextTick()
+    await wrapper.setProps({ modelValue: lastModel(wrapper) as readonly [Date, Date] })
+    await nextTick()
+
+    return wrapper
+  }
+
+  it('правка времени меняет свой край и не трогает второй', async () => {
+    const wrapper = await sameDayRange()
+
+    await timeOption(0, 'hour', '08').trigger('click')
+    await nextTick()
+
+    const [from, to] = lastModel(wrapper) as [Date, Date]
+    expect(from.getHours()).toBe(8)
+    expect([to.getHours(), to.getMinutes()]).toEqual([23, 59])
+  })
+
+  it('конец раньше начала внутри одного дня не применяется', async () => {
+    const wrapper = await sameDayRange()
+
+    // Начало в 08:00, затем попытка увести конец на 07:00.
+    await timeOption(0, 'hour', '08').trigger('click')
+    await nextTick()
+    await wrapper.setProps({ modelValue: lastModel(wrapper) as readonly [Date, Date] })
+    await nextTick()
+
+    await timeOption(1, 'hour', '07').trigger('click')
+    await nextTick()
+    // Отказ объявляется тиком позже, чтобы не быть перебитым колонками.
+    await nextTick()
+
+    // Сравниваем исход, а не ссылку: перерисовка вправе переиздать то же значение.
+    const [from, to] = lastModel(wrapper) as [Date, Date]
+    expect(to.getTime()).toBeGreaterThanOrEqual(from.getTime())
+    expect(to.getHours()).toBe(23)
+    expect(await announced()).toContain('The end must not come before the start')
+  })
+})

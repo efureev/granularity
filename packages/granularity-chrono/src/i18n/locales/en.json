@@ -17,11 +17,14 @@
     "presetsLabel": "Quick dates"
   },
   "dateRangePicker": {
-    "panelLabel": "Choose date range",
-    "startSelected": "Start date selected: {date}. Choose the end date",
-    "rangeSelected": "Range selected: {from} — {to}",
+    "endTime": "End time",
     "lengthRejected": "This range length is not allowed",
-    "presetsLabel": "Quick ranges"
+    "panelLabel": "Choose date range",
+    "presetsLabel": "Quick ranges",
+    "rangeSelected": "Range selected: {from} — {to}",
+    "startSelected": "Start date selected: {date}. Choose the end date",
+    "startTime": "Start time",
+    "timeRejected": "The end must not come before the start"
   },
   "dateTimePicker": {
     "panelLabel": "Choose date and time",

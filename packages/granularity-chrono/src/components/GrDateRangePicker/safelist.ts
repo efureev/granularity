@@ -1,6 +1,7 @@
 import { splitClassTokens } from '../../internal/classTokens'
 import { pickerFieldClassTokens } from '../../internal/pickerFieldStyles'
 import { presetRowClassTokens } from '../../internal/presetRowStyles'
+import { rangeTimeLabelClass, rangeTimeRowClass } from './grDateRangePickerStyles'
 
 /**
  * Классы поля приходят из общего модуля, а он уезжает в `dist/chunks/` —
@@ -10,4 +11,6 @@ import { presetRowClassTokens } from '../../internal/presetRowStyles'
 export const grDateRangePickerSafelist: string[] = [
   ...pickerFieldClassTokens,
   ...presetRowClassTokens,
+  rangeTimeRowClass,
+  rangeTimeLabelClass,
 ].flatMap(splitClassTokens)

@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TItem = Date">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { titleWhenTruncated } from '@feugene/granularity'
@@ -7,9 +7,12 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { createDisabledPredicate } from '../../chrono/calendarGrid'
-import { formatPlainDate } from '../../chrono/chronoFormat'
+import { formatPlainDate, formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
+import TimeColumns from '../GrTimePicker/TimeColumns.vue'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
-import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
+import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import type { PlainTime } from '../../chrono/plainTime'
+import { floorToStep } from '../../chrono/plainTime'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
 import { comparePlainDates, differenceInDays, isPlainDateWithin } from '../../chrono/plainDate'
 import {
@@ -21,6 +24,7 @@ import {
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
 import { presetRowClass } from '../../internal/presetRowStyles'
+import { rangeTimeLabelClass, rangeTimeRowClass } from './grDateRangePickerStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
 import { rangeCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrButton from '@feugene/granularity/components/GrButton'
@@ -52,6 +56,21 @@ export interface GrDateRangePickerProps<T = Date> {
   /** Запрещённые даты: список или предикат. */
   disabledDates?: readonly Date[] | ((date: Date) => boolean)
   /** Наименьшая длина периода в днях, считая обе границы. */
+  /**
+   * Границы периода задаются с точностью до минут, а не полуночью.
+   *
+   * Панель получает две колонки времени — для начала и для конца. Порядок
+   * произвольный: даты выбираются кликами, время правится когда угодно. Мастера
+   * из четырёх шагов здесь нет намеренно — он завёл бы скрытое состояние «на
+   * каком мы шаге», из которого промахнувшегося не вывести иначе как пройдя всё
+   * заново.
+   */
+  enableTime?: boolean
+  minuteStep?: number
+  secondStep?: number
+  enableSeconds?: boolean
+  /** Не задан — берётся из локали. */
+  use12Hours?: boolean
   minRange?: number
   /** Наибольшая длина периода в днях, считая обе границы. */
   maxRange?: number
@@ -125,6 +144,11 @@ const props = withDefaults(defineProps<GrDateRangePickerProps<TItem>>(), {
   min: undefined,
   max: undefined,
   disabledDates: undefined,
+  enableTime: false,
+  minuteStep: 1,
+  secondStep: 1,
+  enableSeconds: false,
+  use12Hours: undefined,
   minRange: undefined,
   maxRange: undefined,
   presets: undefined,
@@ -252,15 +276,97 @@ const disabledDates = computed<DisabledDatesInput>(() => {
   return source.map(toPlainDate)
 })
 
+// ————— Время границ.
+
+const twelveHour = computed(() => props.use12Hours ?? localeUsesTwelveHour(resolvedLocale.value))
+
+/**
+ * Конец суток — **последнее значение, которое колонки могут показать**.
+ *
+ * 23:59 при шаге в 15 минут в колонке отсутствует: минуты остались бы без
+ * выбранного варианта, и пользователь не смог бы прочитать конец периода там,
+ * где его правит. Поэтому умолчание кладётся на ту же сетку, что и весь столбец,
+ * — с шагом в минуту это ровно 23:59, а с крупным шагом последний доступный слот.
+ */
+const endOfDay = computed<PlainTime>(() => {
+  const step = Math.max(1, props.enableSeconds ? props.secondStep : props.minuteStep * 60)
+
+  return floorToStep({ h: 23, min: 59, s: 59 }, step)
+})
+
+/**
+ * Время выбранных краёв. Пока период не закрыт, правится только начало: у конца
+ * ещё нет даты, и колонки правили бы несуществующее значение.
+ */
+const boundTimes = computed<[PlainTime, PlainTime] | null>(() => {
+  const value = selected.value
+  if (!value) return null
+
+  return [toPlainTime(value[0]), toPlainTime(value[1])]
+})
+
+/**
+ * Свежий период получает сутки целиком: 00:00 и 23:59.
+ *
+ * Две полуночи молча отрезали бы почти весь последний день — «с 1 по 3 августа»
+ * по-человечески включает всё третье, и отчёт, посчитанный до 3 августа 00:00,
+ * теряет сутки данных.
+ */
+function withDefaultTimes(from: PlainDate, to: PlainDate): [Date, Date] {
+  if (!props.enableTime) return [fromPlainParts(from), fromPlainParts(to)]
+
+  return [fromPlainParts(from, { h: 0, min: 0, s: 0 }), fromPlainParts(to, endOfDay.value)]
+}
+
+/** Правка времени края. Переворот периода не применяется — как и чужая длина. */
+function setBoundTime(edge: 0 | 1, time: PlainTime): void {
+  const value = selected.value
+  const times = boundTimes.value
+  if (isLocked.value || !value || !times) return
+
+  const next: [Date, Date] = [...value] as [Date, Date]
+  next[edge] = fromPlainParts(toPlainDate(value[edge]), time)
+
+  // Внутри одного дня порядок держит только время: без этой проверки конец
+  // уезжал бы раньше начала, и период читался бы отрицательной длиной.
+  if (next[1].getTime() < next[0].getTime()) {
+    // Тиком позже: колонки объявляют выбранный вариант сами, и без задержки
+    // «07:59» перебило бы отказ — диктор сообщил бы о выборе, которого не было.
+    void nextTick(() => {
+      announce(t('grChrono.dateRangePicker.timeRejected', 'The end must not come before the start'))
+    })
+    return
+  }
+
+  shell.commit(next)
+}
+
+/**
+ * Подпись границы. Со временем — дата и время через запятую, как у
+ * `GrDateTimePicker`: два пикера обязаны читаться одинаково.
+ */
+function boundLabel(date: PlainDate, edge: 0 | 1): string {
+  const text = formatPlainDate(resolvedLocale.value, date, props.format)
+  const times = boundTimes.value
+  if (!props.enableTime || props.format || !times) return text
+
+  const time = formatPlainTime(resolvedLocale.value, times[edge], {
+    hour: twelveHour.value ? 'numeric' : '2-digit',
+    minute: '2-digit',
+    ...(props.enableSeconds ? { second: '2-digit' } : {}),
+    hour12: twelveHour.value,
+  })
+
+  return `${text}, ${time}`
+}
+
 const displayValue = computed(() => {
   const range = selectedRange.value
   if (!range) return ''
 
   const [from, to] = range
-  return [
-    formatPlainDate(resolvedLocale.value, from, props.format),
-    formatPlainDate(resolvedLocale.value, to, props.format),
-  ].join(props.separator)
+
+  return [boundLabel(from, 0), boundLabel(to, 1)].join(props.separator)
 })
 
 /** Длина периода в днях, считая обе границы: 12–12 августа — это один день. */
@@ -315,10 +421,14 @@ function onDaySelect(date: PlainDate): void {
     return
   }
 
-  shell.commit([fromPlainParts(from), fromPlainParts(to)])
+  shell.commit(withDefaultTimes(from, to))
   announceRange(from, to)
   anchor.value = null
   hovered.value = null
+
+  // Со временем выбор на второй дате не заканчивается: закрыв панель, мы отняли
+  // бы у пользователя колонки, ради которых он и включил `enableTime`.
+  if (props.enableTime) return
 
   // Фокус на поле вернёт стек слоёв: на момент закрытия он ещё внутри панели.
   shell.closePanel()
@@ -520,6 +630,33 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
               <slot name="weekday" v-bind="slotProps" />
             </template>
           </GrCalendar>
+
+          <!--
+            Время правится когда угодно и в любом порядке: мастер из четырёх
+            шагов завёл бы скрытое состояние «на каком мы шаге», из которого
+            промахнувшегося не вывести иначе как пройдя всё заново.
+          -->
+          <div v-if="enableTime && boundTimes" :class="rangeTimeRowClass" data-gr-date-range-picker-times>
+            <div v-for="(edge, index) in ([0, 1] as const)" :key="edge" data-gr-date-range-picker-time>
+              <div :class="rangeTimeLabelClass">
+                {{ index === 0
+                  ? t('grChrono.dateRangePicker.startTime', 'Start time')
+                  : t('grChrono.dateRangePicker.endTime', 'End time') }}
+              </div>
+              <TimeColumns
+                :model-value="boundTimes[edge]"
+                :minute-step="minuteStep"
+                :second-step="secondStep"
+                :enable-seconds="enableSeconds"
+                :twelve-hour="twelveHour"
+                :locale="resolvedLocale"
+                :size="resolvedSize"
+                :locked="isLocked"
+                :open="panelOpen"
+                @update:model-value="time => setBoundTime(edge, time)"
+              />
+            </div>
+          </div>
 
           <slot name="footer" :set-range="setRange" :can-set-range="canSetRange" :close="shell.closePanel">
             <div

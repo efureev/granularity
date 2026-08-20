@@ -17,11 +17,14 @@
     "presetsLabel": "Fechas rápidas"
   },
   "dateRangePicker": {
-    "panelLabel": "Elegir periodo",
-    "startSelected": "Fecha de inicio seleccionada: {date}. Elige la fecha final",
-    "rangeSelected": "Periodo seleccionado: del {from} al {to}",
+    "endTime": "Hora de fin",
     "lengthRejected": "Esta duración del periodo no está permitida",
-    "presetsLabel": "Períodos rápidos"
+    "panelLabel": "Elegir periodo",
+    "presetsLabel": "Períodos rápidos",
+    "rangeSelected": "Periodo seleccionado: del {from} al {to}",
+    "startSelected": "Fecha de inicio seleccionada: {date}. Elige la fecha final",
+    "startTime": "Hora de inicio",
+    "timeRejected": "El fin no puede ser anterior al inicio"
   },
   "dateTimePicker": {
     "panelLabel": "Elegir fecha y hora",

@@ -7,6 +7,41 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.8.0] 2026-08-20
+
+### Added
+
+- **`enable-time` on `GrDateRangePicker` — a window, not two midnights.** A shift from 8:00 Monday to
+  20:00 Wednesday, a maintenance window, a two-day room booking: until now this had to be assembled
+  from separate fields, because the range picker gave two midnights and the datetime picker a single
+  moment.
+
+  A freshly picked pair gets **00:00 and 23:59** — the whole span of days. The end lands on the same
+  grid as the columns, so `minute-step="15"` gives 23:45: otherwise the minutes column would have no
+  selected option and the end could not be read where it is edited. At the default step of a minute
+  it is exactly 23:59. Two midnights would look
+  symmetrical, but "1 to 3 August" means all of the third to a person, and `[1 Aug 00:00, 3 Aug
+  00:00)` quietly drops almost all of it: the classic reporting bug. With `enable-seconds` the end
+  gets 23:59:59. Both values are visible and editable.
+
+  **No four-step wizard**, which is what the spec had assumed this feature would need. Dates are
+  picked with the same two clicks as before and the times are edited whenever, in any order. Stepping
+  would introduce hidden "which step are we on" state that a person who mis-clicks can only escape by
+  walking the whole thing again.
+
+  **The panel no longer closes on the second date** when time is on: selection is not finished there,
+  and closing would take away the very columns the prop was enabled for.
+
+  **Inside a single day only the time keeps the ends in order.** An edit that would put the end
+  before the start is not applied and is announced — the same way a disallowed length is refused
+  today: the user simply mis-aimed, and there is nothing to reset.
+
+  `minRange` and `maxRange` still count **days**. Changing the unit of existing props would break
+  consumers; a minute-level limit is `minDuration`/`maxDuration`, and those arrive when asked for.
+
+  `minuteStep`, `secondStep`, `enableSeconds` and `use12Hours` carry the same names they have on
+  `GrDateTimePicker`, so the two pickers do not drift apart.
+
 ## [v0.7.0] 2026-08-20
 
 ### Added
