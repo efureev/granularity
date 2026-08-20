@@ -84,3 +84,42 @@ describe('сетка лет', () => {
     expect(current.map(cell => cell.value)).toEqual([2026])
   })
 })
+
+/**
+ * Квартал — четыре ячейки, а не двенадцать: год делится на них ровно, и
+ * добирать соседние, как это делает десятилетие, здесь нечем.
+ */
+describe('сетка кварталов', () => {
+  it('четыре ячейки, каждая — первое число своего квартала', () => {
+    const cells = buildPeriodGrid({ mode: 'quarter', year: 2026 })
+
+    expect(values(cells)).toEqual([0, 1, 2, 3])
+    expect(cells.map(cell => `${cell.date.m}-${cell.date.d}`)).toEqual(['0-1', '3-1', '6-1', '9-1'])
+    expect(cells.map(cell => cell.key)).toEqual(['2026-Q1', '2026-Q2', '2026-Q3', '2026-Q4'])
+  })
+
+  /** Запрет — «нет ни одного допустимого дня», а не «начало за границей». */
+  it('квартал с `min` посередине выбирать можно, целиком до него — нельзя', () => {
+    const cells = buildPeriodGrid({ mode: 'quarter', year: 2026, min: { y: 2026, m: 4, d: 20 } })
+
+    expect(cells.map(cell => cell.disabled)).toEqual([true, false, false, false])
+  })
+
+  it('`max` отсекает кварталы, целиком лежащие позже', () => {
+    const cells = buildPeriodGrid({ mode: 'quarter', year: 2026, max: { y: 2026, m: 6, d: 5 } })
+
+    expect(cells.map(cell => cell.disabled)).toEqual([false, false, false, true])
+  })
+
+  it('текущий квартал считается по месяцу «сегодня»', () => {
+    const cells = buildPeriodGrid({ mode: 'quarter', year: 2026, today: { y: 2026, m: 7, d: 12 } })
+
+    expect(cells.filter(cell => cell.current).map(cell => cell.value)).toEqual([2])
+  })
+
+  it('в чужом году текущего квартала нет', () => {
+    const cells = buildPeriodGrid({ mode: 'quarter', year: 2025, today: { y: 2026, m: 7, d: 12 } })
+
+    expect(cells.some(cell => cell.current)).toBe(false)
+  })
+})

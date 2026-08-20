@@ -7,6 +7,54 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.6.0] 2026-08-20
+
+### Added
+
+- **`GrTimePicker`'s footer hands the selection inward.** The `footer` slot now receives
+  `select`, `canSelect` and `close` — the same trio the date pickers already pass — so an
+  application can finally put a "now" button there. Until now the slot took no props at all: there
+  was neither a way to pick a time nor a way to ask whether one was allowed.
+
+  Time snaps **up** to the step: 14:37 with a 15-minute step gives 14:45, not 14:30. A time in a
+  picker almost always means "starting from this moment" — a booking, a reminder, an appointment —
+  and a value rounded down has already passed. This is the mirror of the columns, which round
+  **down** when displaying an existing value; there the task is the opposite, not to invent a slot
+  the column does not have.
+
+  The coarsest declared step wins and finer units zero out, so `minuteStep: 15` yields `14:45:00`
+  rather than `14:45:37`. With seconds switched off they stay out of the value too — otherwise the
+  model would carry what was never on screen.
+
+  **Bounds are checked after snapping, not before.** With `max` at 14:40 and a 15-minute step, a
+  "now" of 14:37 snaps to 14:45 — already past the bound — and `canSelect` returns `false`. The
+  button arrives disabled instead of silently doing nothing; checking before the snap would have let
+  it through.
+
+- **`quarter` mode** in `GrCalendar` and `GrDatePicker` — four cells in two columns (three would
+  leave one cell alone on the second row). The value is the first day of the quarter. Labels come
+  from the package's own locale strings: `Intl` does not name quarters at all, and `Q1` vs `1 кв.`
+  is interface text rather than locale-dependent data.
+
+- **`week` mode** — drawn with the **day grid**, not the period grid. Twelve cells in three columns
+  would be twelve weeks on screen: a quarter of a year without a single month label, with nothing to
+  aim at. Instead, clicking any day selects the week it belongs to and the whole row highlights.
+
+  The value is the **start** of the week, so the shape of the model stays the same across all five
+  modes and `valueAdapter` keeps working as before. The first day comes from the locale, as
+  everywhere else — in the US the same date falls in a week starting on Sunday. Week numbers are not
+  shown: ISO and US number them differently and `Intl` does not provide them.
+
+- `startOfWeek(date, firstDayOfWeek)` and `ceilToStep(time, stepSeconds)` are exported — the twins
+  of `leadingOffset` (which was internal) and `floorToStep`.
+
+### Fixed
+
+- **`GrTimePicker`'s footer had no container of its own.** Slot content sat flush against the
+  columns and read as their continuation rather than a separate action. It now gets the same wrapper
+  the date pickers' footer uses — a hairline rule and spacing — so the two pickers look alike, which
+  was the point of giving the slot the same props.
+
 ## [v0.5.0] 2026-08-19
 
 ### Added

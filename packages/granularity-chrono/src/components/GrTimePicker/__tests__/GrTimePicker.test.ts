@@ -572,3 +572,78 @@ describe('GrTimePicker — ручной ввод', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Подвал панели раздаёт выбор внутрь — тем же контрактом, что и у пикеров дат.
+ * Проверяется не «кнопка нарисовалась», а правило округления и порядок, в
+ * котором оно применяется относительно границ.
+ */
+describe('подвал: «сейчас»', () => {
+  function withFooter(props: Record<string, unknown> = {}) {
+    const seen = { canSelect: null as ((date: Date) => boolean) | null, select: null as ((date: Date) => boolean) | null }
+
+    const wrapper = mount(GrTimePicker, {
+      props: { locale: 'en-US', today: TODAY, use12Hours: false, open: true, ...props },
+      attachTo: document.body,
+      slots: {
+        footer: (slotProps: { select: (d: Date) => boolean, canSelect: (d: Date) => boolean }) => {
+          seen.canSelect = slotProps.canSelect
+          seen.select = slotProps.select
+          return h('span', 'подвал')
+        },
+      },
+    })
+
+    return { wrapper, seen }
+  }
+
+  it('время встаёт на следующую отметку шага, а не на прошедшую', async () => {
+    const { wrapper, seen } = withFooter({ minuteStep: 15 })
+    await nextTick()
+
+    expect(seen.select!(at(14, 37))).toBe(true)
+    await nextTick()
+
+    const emitted = wrapper.emitted('update:modelValue')!.at(-1)![0] as Date
+    expect([emitted.getHours(), emitted.getMinutes(), emitted.getSeconds()]).toEqual([14, 45, 0])
+  })
+
+  /**
+   * Порядок обязателен: `max` в 14:40 при шаге 15 отсекает 14:37 **после**
+   * округления до 14:45. Проверка до округления пропустила бы кнопку.
+   */
+  it('упор в `max` считается после округления, а не до', async () => {
+    const { seen } = withFooter({ minuteStep: 15, max: at(14, 40) })
+    await nextTick()
+
+    expect(seen.canSelect!(at(14, 37))).toBe(false)
+    expect(seen.select!(at(14, 37))).toBe(false)
+  })
+
+  it('в пределах границ выбор разрешён', async () => {
+    const { seen } = withFooter({ minuteStep: 15, max: at(23, 0) })
+    await nextTick()
+
+    expect(seen.canSelect!(at(14, 37))).toBe(true)
+  })
+
+  /** Инвариант 11: `readonly` не меняется ничем. */
+  it('`readonly` подвалу выбирать не даёт', async () => {
+    const { seen } = withFooter({ readonly: true })
+    await nextTick()
+
+    expect(seen.canSelect!(at(14, 37))).toBe(false)
+    expect(seen.select!(at(14, 37))).toBe(false)
+  })
+
+  it('без секунд на экране их нет и в значении', async () => {
+    const { wrapper, seen } = withFooter({ enableSeconds: false })
+    await nextTick()
+
+    seen.select!(at(14, 37, 23))
+    await nextTick()
+
+    const emitted = wrapper.emitted('update:modelValue')!.at(-1)![0] as Date
+    expect([emitted.getMinutes(), emitted.getSeconds()]).toEqual([38, 0])
+  })
+})

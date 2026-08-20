@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { PlainDate } from '../plainDate'
 import { plainDateKey } from '../plainDate'
-import { buildCalendarGrid, createDisabledPredicate } from '../calendarGrid'
+import { buildCalendarGrid, createDisabledPredicate, startOfWeek } from '../calendarGrid'
 
 function iso(value: string): PlainDate {
   const [y, m, d] = value.split('-').map(Number) as [number, number, number]
@@ -185,5 +185,27 @@ describe('стоимость пересборки', () => {
     august2026({ isDisabled })
 
     expect(isDisabled).toHaveBeenCalledTimes(42)
+  })
+})
+
+/**
+ * Начало недели — то, что кладётся в модель в режиме `week`. Первый день
+ * приходит снаружи, из `Intl` по локали (инвариант 2), а не прибит к
+ * понедельнику: в США неделя начинается с воскресенья.
+ */
+describe('начало недели', () => {
+  it('при неделе с понедельника', () => {
+    expect(plainDateKey(startOfWeek(iso('2026-08-12'), 1))).toBe('2026-08-10')
+    expect(plainDateKey(startOfWeek(iso('2026-08-10'), 1))).toBe('2026-08-10')
+    expect(plainDateKey(startOfWeek(iso('2026-08-16'), 1))).toBe('2026-08-10')
+  })
+
+  it('при неделе с воскресенья та же дата даёт другую неделю', () => {
+    expect(plainDateKey(startOfWeek(iso('2026-08-12'), 7))).toBe('2026-08-09')
+    expect(plainDateKey(startOfWeek(iso('2026-08-09'), 7))).toBe('2026-08-09')
+  })
+
+  it('переход через границу месяца', () => {
+    expect(plainDateKey(startOfWeek(iso('2026-09-01'), 1))).toBe('2026-08-31')
   })
 })

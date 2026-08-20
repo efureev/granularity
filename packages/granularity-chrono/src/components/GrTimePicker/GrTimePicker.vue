@@ -10,6 +10,7 @@ import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoMo
 import { clockDate, fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
 import type { PlainDate } from '../../chrono/plainDate'
 import type { PlainTime } from '../../chrono/plainTime'
+import { ceilToStep, isPlainTimeWithin } from '../../chrono/plainTime'
 import {
   clearButtonClass,
   iconClass,
@@ -20,6 +21,7 @@ import {
 } from '../../internal/pickerFieldStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
 import { useEditableField } from '../../internal/useEditableField'
+import { presetRowClass } from '../../internal/presetRowStyles'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 
 import type { GrTimePickerSize } from './grTimePickerStyles'
@@ -142,8 +144,18 @@ const props = withDefaults(defineProps<GrTimePickerProps<TValue>>(), {
 const emit = defineEmits<GrTimePickerEmits<TValue>>()
 
 defineSlots<{
-  /** Подвал панели: «сейчас», «очистить». */
-  footer?: () => unknown
+  /**
+   * Подвал панели: «сейчас», «очистить».
+   *
+   * Выбор отдаётся внутрь, как у пикеров дат: запрет складывается из `min`,
+   * `max` и шага, а `readonly` запрещает выбор целиком — снаружи этих правил
+   * не видно.
+   */
+  footer?: (props: {
+    select: (date: Date) => boolean
+    canSelect: (date: Date) => boolean
+    close: () => void
+  }) => unknown
 }>()
 
 const columnsRef = ref<InstanceType<typeof TimeColumns> | null>(null)
@@ -232,6 +244,50 @@ function onFieldKeydown(event: KeyboardEvent): void {
 
 function onTimeChange(time: PlainTime): void {
   shell.commit(fromPlainParts(anchorDate(), time))
+}
+
+/**
+ * Сетка, на которую встаёт время из подвала.
+ *
+ * Побеждает самая крупная объявленная ступень, а мелкие обнуляются: при шаге
+ * в 15 минут «сейчас» обязано дать 14:45:00, а не 14:45:37. Секунды выключены
+ * — в значении их тоже быть не должно, иначе в модель уедет то, чего на экране
+ * не было.
+ */
+const nowStepSeconds = computed(() => {
+  if (props.minuteStep > 1) return props.minuteStep * 60
+  if (!props.enableSeconds) return 60
+
+  return Math.max(1, props.secondStep)
+})
+
+/** Время из подвала, уже поставленное на сетку шага. */
+function snapTime(date: Date): PlainTime {
+  return ceilToStep(toPlainTime(date), nowStepSeconds.value)
+}
+
+/**
+ * Подвал сетку колонок обходит, поэтому спрашивает явно; кнопка с недоступным
+ * временем приходит выключенной, а не молча ничего не делает.
+ *
+ * Порядок обязателен: **сначала на сетку, потом границы.** При `max` в 14:40 и
+ * шаге в 15 минут время 14:37 округляется до 14:45 — уже за границей, и кнопка
+ * обязана погаснуть. Проверка до округления пропустила бы её.
+ */
+function canSelectTime(date: Date): boolean {
+  if (shell.isLocked.value) return false
+
+  return isPlainTimeWithin(snapTime(date), minTime.value, maxTime.value)
+}
+
+/** Выбор из подвала. Возвращает `false`, если время запрещено. */
+function selectTime(date: Date): boolean {
+  if (!canSelectTime(date)) return false
+
+  shell.commit(fromPlainParts(anchorDate(), snapTime(date)))
+  shell.closePanel()
+
+  return true
 }
 
 defineExpose({
@@ -342,7 +398,14 @@ const fieldClass = computed(() => pickerFieldClass({
             @update:model-value="onTimeChange"
           />
 
-          <slot name="footer" />
+          <!--
+            Тот же контейнер, что у подвала пикеров дат: отбивка линией и
+            отступ. Без него содержимое слота висело бы вплотную к колонкам и
+            читалось бы как их продолжение, а не как отдельное действие.
+          -->
+          <div v-if="$slots.footer" data-gr-time-picker-footer :class="presetRowClass">
+            <slot name="footer" :select="selectTime" :can-select="canSelectTime" :close="shell.closePanel" />
+          </div>
         </div>
     </PickerSurface>
   </div>

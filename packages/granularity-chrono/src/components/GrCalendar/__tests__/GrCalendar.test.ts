@@ -591,6 +591,59 @@ describe('GrCalendar — режимы месяца и года', () => {
  * так `showWeekNumbers` числился настраиваемым и им не был — IDE подсказывала
  * ключ, `GrConfigProvider` на него не влиял, и ошибки не было ни одной.
  */
+/**
+ * Квартал — четыре ячейки, а не двенадцать: год делится на них ровно.
+ * Название берётся строкой локали пакета: `Intl` кварталы не именует.
+ */
+describe('GrCalendar — режим квартала', () => {
+  function mountQuarters(props: Record<string, unknown> = {}) {
+    return mount(GrCalendar, {
+      props: { mode: 'quarter', today: iso('2026-08-12'), locale: 'en-US', ...props },
+      attachTo: document.body,
+    })
+  }
+
+  it('четыре ячейки с подписями кварталов', () => {
+    const wrapper = mountQuarters()
+    const cells = wrapper.findAll('[data-gr-calendar-period]')
+
+    expect(cells).toHaveLength(4)
+    expect(cells.map(cell => cell.text())).toEqual(['Q1', 'Q2', 'Q3', 'Q4'])
+    expect(wrapper.find('[data-gr-calendar-grid]').exists(), 'дневная сетка в этом режиме не рендерится').toBe(false)
+    wrapper.unmount()
+  })
+
+  it('выбор ячейки отдаёт первое число квартала', async () => {
+    const wrapper = mountQuarters()
+
+    await wrapper.findAll('[data-gr-calendar-period]')[2]!.trigger('click')
+
+    const selected = wrapper.emitted('update:modelValue')!.at(-1)![0] as { y: number, m: number, d: number }
+    expect([selected.y, selected.m, selected.d]).toEqual([2026, 6, 1])
+    wrapper.unmount()
+  })
+
+  it('выбранный квартал подсвечен по месяцу значения', () => {
+    const wrapper = mountQuarters({ modelValue: iso('2026-08-12') })
+    const cells = wrapper.findAll('[data-gr-calendar-period]')
+
+    expect(cells.map(cell => cell.attributes('aria-selected'))).toEqual(['false', 'false', 'true', 'false'])
+    wrapper.unmount()
+  })
+
+  /** Инвариант 11: запрещённое значение не выбирается ни кликом, ни `Enter`. */
+  it('квартал целиком за `max` не выбирается', async () => {
+    const wrapper = mountQuarters({ max: iso('2026-07-05') })
+    const cells = wrapper.findAll('[data-gr-calendar-period]')
+
+    expect(cells[3]!.attributes('aria-disabled')).toBe('true')
+
+    await cells[3]!.trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+})
+
 describe('GrCalendar и GrConfigProvider', () => {
   function mountWithConfig(defaults: Record<string, unknown>, props: Record<string, unknown> = {}) {
     const Harness = defineComponent({
@@ -666,5 +719,84 @@ describe('GrCalendar и GrConfigProvider', () => {
 
     on.unmount()
     off.unmount()
+  })
+})
+
+/**
+ * Неделя рисуется **сеткой дней**, а не сеткой периодов: двенадцать недель в
+ * три колонки — это четверть года без единой подписи месяца, выбирать там
+ * нечего. Клик по любому дню выбирает его неделю, строка подсвечивается целиком.
+ */
+describe('GrCalendar — режим недели', () => {
+  function mountWeeks(props: Record<string, unknown> = {}) {
+    return mount(GrCalendar, {
+      props: { mode: 'week', today: iso('2026-08-12'), locale: 'en-US', ...props },
+      attachTo: document.body,
+    })
+  }
+
+  function days(wrapper: ReturnType<typeof mountWeeks>) {
+    return wrapper.findAll('[data-gr-calendar-day]')
+  }
+
+  it('рисуется дневная сетка, а не сетка периодов', () => {
+    const wrapper = mountWeeks()
+
+    expect(wrapper.find('[data-gr-calendar-grid]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-calendar-periods]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  /** У `en-US` неделя начинается с воскресенья — 12 августа 2026 попадает в неделю с 9-го. */
+  it('клик по любому дню кладёт в модель начало его недели', async () => {
+    const wrapper = mountWeeks()
+
+    const wednesday = days(wrapper).find(day => day.text() === '12')!
+    await wednesday.trigger('click')
+
+    const selected = wrapper.emitted('update:modelValue')!.at(-1)![0] as { y: number, m: number, d: number }
+    expect([selected.y, selected.m, selected.d]).toEqual([2026, 7, 9])
+    wrapper.unmount()
+  })
+
+  it('с неделей от понедельника начало другое', async () => {
+    const wrapper = mountWeeks({ weekStart: 1 })
+
+    await days(wrapper).find(day => day.text() === '12')!.trigger('click')
+
+    const selected = wrapper.emitted('update:modelValue')!.at(-1)![0] as { y: number, m: number, d: number }
+    expect([selected.y, selected.m, selected.d]).toEqual([2026, 7, 10])
+    wrapper.unmount()
+  })
+
+  function selectedDays(wrapper: ReturnType<typeof mountWeeks>): string[] {
+    return wrapper.findAll('[data-gr-calendar-cell]')
+      .filter(cell => cell.attributes('aria-selected') === 'true')
+      .map(cell => cell.text())
+  }
+
+  it('подсвечивается вся строка недели, а не один день', () => {
+    const wrapper = mountWeeks({ modelValue: iso('2026-08-12') })
+
+    expect(selectedDays(wrapper)).toEqual(['9', '10', '11', '12', '13', '14', '15'])
+    wrapper.unmount()
+  })
+
+  /** Первый день приходит из `Intl` по локали, а не прибит к понедельнику. */
+  it('с неделей от понедельника подсвечивается другая строка', () => {
+    const wrapper = mountWeeks({ modelValue: iso('2026-08-12'), weekStart: 1 })
+
+    expect(selectedDays(wrapper)).toEqual(['10', '11', '12', '13', '14', '15', '16'])
+    wrapper.unmount()
+  })
+
+  /** Инвариант 11: `readonly` не меняется ни одной клавишей и ни одним кликом. */
+  it('`readonly` неделю не выбирает', async () => {
+    const wrapper = mountWeeks({ readonly: true })
+
+    await days(wrapper)[10]!.trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
   })
 })

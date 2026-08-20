@@ -1,10 +1,11 @@
 {
   "calendar": {
-    "previousMonth": "Предыдущий месяц",
     "nextMonth": "Следующий месяц",
-    "weekNumber": "Неделя",
+    "nextPeriod": "Следующий",
+    "previousMonth": "Предыдущий месяц",
     "previousPeriod": "Предыдущий",
-    "nextPeriod": "Следующий"
+    "quarter": "{n} кв.",
+    "weekNumber": "Неделя"
   },
   "datePicker": {
     "panelLabel": "Выбор даты",

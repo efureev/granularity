@@ -4,6 +4,7 @@ import {
   calendarCellSizes,
   calendarPeriodClass,
   calendarPeriodGridClass,
+  calendarQuarterGridClass,
   calendarPeriodSizes,
   calendarRangeCellClass,
   calendarDayClass,
@@ -50,6 +51,7 @@ const periodVariants = (['xs', 'sm', 'md', 'lg'] as const).flatMap(size => [
 
 export const grCalendarSafelist: string[] = [
   ...splitClassTokens(calendarPeriodGridClass),
+  ...splitClassTokens(calendarQuarterGridClass),
   ...Object.values(calendarPeriodSizes).flatMap(splitClassTokens),
   ...periodVariants.flatMap(splitClassTokens),
   ...rangeVariants.flatMap(splitClassTokens),

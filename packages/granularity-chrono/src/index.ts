@@ -40,6 +40,7 @@ export {
   addHours,
   addMinutes,
   addSeconds,
+  ceilToStep,
   clampPlainTime,
   comparePlainTimes,
   floorToStep,
@@ -63,7 +64,7 @@ export type {
   CalendarWeek,
   DisabledDatesInput,
 } from './chrono/calendarGrid'
-export { buildCalendarGrid, createDisabledPredicate } from './chrono/calendarGrid'
+export { buildCalendarGrid, createDisabledPredicate, startOfWeek } from './chrono/calendarGrid'
 
 // Колонки времени — та же чистая функция, что и сетка месяца, и та же причина
 // её иметь: запреты на границах проверяются тестом, а не глазами.

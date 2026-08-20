@@ -102,6 +102,17 @@ function leadingOffset(firstOfMonth: PlainDate, firstDayOfWeek: IsoWeekday): num
   return (isoWeekday(firstOfMonth) - firstDayOfWeek + 7) % 7
 }
 
+/**
+ * Начало недели, в которую попала дата.
+ *
+ * Первый день недели приходит снаружи, из `Intl` по локали (инвариант 2), а не
+ * прибивается к понедельнику: в США неделя начинается с воскресенья, и
+ * «выбранная неделя» там другая.
+ */
+export function startOfWeek(date: PlainDate, firstDayOfWeek: IsoWeekday): PlainDate {
+  return addDays(date, -leadingOffset(date, firstDayOfWeek))
+}
+
 export function buildCalendarGrid(options: BuildCalendarGridOptions): CalendarGrid {
   const { year, month, firstDayOfWeek, today, min, max } = options
   const weekCount = options.weeks ?? 6

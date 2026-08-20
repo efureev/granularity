@@ -8,7 +8,7 @@ import { useGrComponentDefaults, useGrComponentProp, useGrComponentSize } from '
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { clockDate } from '../../chrono/chronoModel'
-import { buildCalendarGrid, createDisabledPredicate } from '../../chrono/calendarGrid'
+import { buildCalendarGrid, createDisabledPredicate, startOfWeek } from '../../chrono/calendarGrid'
 import {
   formatMonthTitle,
   formatPlainDate,
@@ -36,6 +36,7 @@ import {
   calendarGridClass,
   calendarPeriodClass,
   calendarPeriodGridClass,
+  calendarQuarterGridClass,
   calendarRangeCellClass,
   calendarHeaderClass,
   calendarNavButtonClass,
@@ -62,7 +63,7 @@ export interface GrCalendarProps {
    * Что выбирается: день, месяц или год. В режимах периода сетка показывает
    * двенадцать ячеек в три колонки, а выбор отдаёт первое число периода.
    */
-  mode?: 'day' | PeriodMode
+  mode?: 'day' | 'week' | PeriodMode
   /** Выбранная дата. `null` — ничего не выбрано. */
   modelValue?: PlainDate | null
   /** Показываемый месяц. Без него календарь ведёт его сам, отталкиваясь от выбора. */
@@ -238,7 +239,9 @@ const grid = computed(() => buildCalendarGrid({
   isDisabled: isDisabledDate.value,
 }))
 
-const isDayMode = computed(() => props.mode === 'day')
+/** Неделя рисуется сеткой дней: двенадцать недель в сетке периодов выбирать нечем. */
+const isWeekMode = computed(() => props.mode === 'week')
+const isDayMode = computed(() => props.mode === 'day' || isWeekMode.value)
 
 /**
  * Сетка периодов строится только в своём режиме: в дневном она осталась бы
@@ -258,13 +261,23 @@ const periodCells = computed<PeriodCell[]>(() => (
 
 const periodLabels = computed(() => (props.mode === 'month' ? monthNames(resolvedLocale.value, 'short') : []))
 
+/**
+ * Подпись ячейки периода.
+ *
+ * Месяцы приходят из `Intl` (инвариант 2), кварталы — строкой локали пакета:
+ * `Intl` их не именует вовсе, и «Q1» против «I кв.» — это интерфейсный текст,
+ * а не локале-зависимые данные.
+ */
 function periodLabel(cell: PeriodCell): string {
-  return props.mode === 'month' ? periodLabels.value[cell.value] ?? String(cell.value) : String(cell.value)
+  if (props.mode === 'month') return periodLabels.value[cell.value] ?? String(cell.value)
+  if (props.mode === 'quarter') return t('grChrono.calendar.quarter', 'Q{n}', { n: cell.value + 1 })
+
+  return String(cell.value)
 }
 
 /** Заголовок: месяц с годом, год или десятилетие — смотря что показываем. */
 const periodTitle = computed(() => {
-  if (props.mode === 'month') return formatYearTitle(resolvedLocale.value, viewDate.value.y)
+  if (props.mode === 'month' || props.mode === 'quarter') return formatYearTitle(resolvedLocale.value, viewDate.value.y)
   if (props.mode === 'year') return decadeLabel(viewDate.value.y)
 
   return formatMonthTitle(resolvedLocale.value, viewDate.value.y, viewDate.value.m)
@@ -282,8 +295,19 @@ const weekdayColumns = computed(() => weekdayOrder(resolvedWeekStart.value).map(
   full: weekdaysFull.value[index] ?? '',
 })))
 
+/**
+ * Выбор считается на отрисовке сравнением кортежей — инвариант 3.
+ *
+ * В режиме недели сравниваются начала недель, а не сами даты: подсвечивается
+ * вся строка, и ячейка по-прежнему ничего о выборе не знает.
+ */
 function isSelected(cell: CalendarCell): boolean {
-  return props.modelValue ? isSamePlainDate(cell.date, props.modelValue) : false
+  const selected = props.modelValue
+  if (!selected) return false
+
+  return isWeekMode.value
+    ? isSamePlainDate(startOfWeek(cell.date, resolvedWeekStart.value), startOfWeek(selected, resolvedWeekStart.value))
+    : isSamePlainDate(cell.date, selected)
 }
 
 /**
@@ -341,14 +365,17 @@ const cellKeys = computed(() => (
   isDayMode.value ? grid.value.cells.map(cell => cell.key) : periodCells.value.map(cell => cell.key)
 ))
 
-/** Ячейка периода, попавшая в выбор: месяц выбранной даты либо её год. */
+/** Ячейка периода, попавшая в выбор: месяц выбранной даты, её квартал либо год. */
 const selectedPeriodKey = computed(() => {
   const selected = props.modelValue
   if (!selected || isDayMode.value) return undefined
 
-  return periodCells.value.find(cell => (
-    props.mode === 'month' ? cell.date.y === selected.y && cell.value === selected.m : cell.value === selected.y
-  ))?.key
+  return periodCells.value.find((cell) => {
+    if (props.mode === 'month') return cell.date.y === selected.y && cell.value === selected.m
+    if (props.mode === 'quarter') return cell.date.y === selected.y && cell.value === Math.floor(selected.m / 3)
+
+    return cell.value === selected.y
+  })?.key
 })
 
 /**
@@ -470,14 +497,18 @@ function selectPeriod(cell: PeriodCell): void {
 function selectCell(cell: CalendarCell): void {
   if (isLocked.value || cell.disabled) return
 
-  emit('update:modelValue', cell.date)
-  emit('change', cell.date)
+  // В режиме недели значение — её начало: форма модели остаётся общей для всех
+  // режимов, и `valueAdapter` работает как работал.
+  const value = isWeekMode.value ? startOfWeek(cell.date, resolvedWeekStart.value) : cell.date
+
+  emit('update:modelValue', value)
+  emit('change', value)
 
   // Клик по добору соседнего месяца переводит показ туда: иначе выбранный
   // день исчез бы из сетки сразу после выбора.
   if (!cell.inMonth) goToPeriod(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
 
-  announceSelected(cell.date)
+  announceSelected(value)
 }
 
 /**
@@ -604,7 +635,7 @@ defineExpose({
       :id="gridId"
       data-gr-calendar-periods
       role="grid"
-      :class="calendarPeriodGridClass"
+      :class="mode === 'quarter' ? calendarQuarterGridClass : calendarPeriodGridClass"
       :aria-label="ariaLabel"
       :aria-labelledby="ariaLabel ? undefined : titleId"
       :aria-readonly="readonly ? 'true' : undefined"

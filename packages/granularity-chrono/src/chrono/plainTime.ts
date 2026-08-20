@@ -100,6 +100,29 @@ export function floorToStep(time: PlainTime, stepSeconds: number): PlainTime {
 }
 
 /**
+ * Округление **вверх** — близнец `floorToStep` для «сейчас» в подвале пикера.
+ *
+ * Вверх, а не к ближайшему: время в пикере почти всегда значит «начиная с
+ * этого момента» — запись, бронь, напоминание, — и округлённое вниз уже
+ * прошло. 14:37 на сетке в 15 минут даёт 14:45.
+ *
+ * Кольцевания нет, в отличие от `addSeconds`: 23:58 на пятиминутной сетке
+ * упирается в конец суток, а не уезжает на 00:00 следующего дня — про дни
+ * пикер времени не знает и сместить их не может.
+ */
+export function ceilToStep(time: PlainTime, stepSeconds: number): PlainTime {
+  if (stepSeconds <= 1) return time
+
+  const total = toSecondsOfDay(time)
+  const rest = total % stepSeconds
+  if (rest === 0) return time
+
+  const ceiled = total - rest + stepSeconds
+
+  return ceiled >= SECONDS_IN_DAY ? { h: 23, min: 59, s: 59 } : fromSecondsOfDay(ceiled)
+}
+
+/**
  * 24-часовое значение в 12-часовое.
  *
  * Полночь — это 12 am, а не 0 am, и полдень — 12 pm, а не 0 pm. Наивное

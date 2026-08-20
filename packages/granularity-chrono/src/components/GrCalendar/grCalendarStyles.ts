@@ -117,6 +117,9 @@ export function calendarDayClass(options: CalendarDayClassOptions): string {
 /** Сетка месяцев и лет: три колонки вместо семи, ячейка шире и ниже. */
 export const calendarPeriodGridClass = 'grid grid-cols-3 gap-1'
 
+/** Четыре квартала — две колонки: три оставили бы одинокую ячейку во второй строке. */
+export const calendarQuarterGridClass = 'grid grid-cols-2 gap-1'
+
 export const calendarPeriodSizes: Record<GrCalendarSize, string> = {
   xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
   sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',

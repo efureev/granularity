@@ -1,5 +1,6 @@
 import { splitClassTokens } from '../../internal/classTokens'
 import { pickerFieldClassTokens } from '../../internal/pickerFieldStyles'
+import { presetRowClassTokens } from '../../internal/presetRowStyles'
 
 import {
   timeColumnClass,
@@ -24,6 +25,7 @@ const optionVariants = (['xs', 'sm', 'md', 'lg'] as const).flatMap(size => [
 
 export const grTimePickerSafelist: string[] = [
   ...pickerFieldClassTokens.flatMap(splitClassTokens),
+  ...presetRowClassTokens.flatMap(splitClassTokens),
   ...splitClassTokens(timePanelClass),
   ...splitClassTokens(timeColumnClass),
   ...splitClassTokens(timeColumnLabelClass),

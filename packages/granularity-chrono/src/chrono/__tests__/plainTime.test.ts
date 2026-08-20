@@ -7,6 +7,7 @@ import {
   addSeconds,
   clampPlainTime,
   comparePlainTimes,
+  ceilToStep,
   floorToStep,
   fromSecondsOfDay,
   fromTwelveHour,
@@ -114,10 +115,33 @@ describe('округление к шагу', () => {
     expect(fmt(floorToStep(at('10:59'), 900))).toBe('10:45:00')
   })
 
+  /**
+   * Вверх, а не к ближайшему: «сейчас» в подвале значит «начиная с этого
+   * момента», и округлённое вниз время уже прошло.
+   */
+  it('вверх — для «сейчас» в подвале', () => {
+    expect(fmt(ceilToStep(at('14:37'), 900))).toBe('14:45:00')
+    expect(fmt(ceilToStep(at('10:01'), 300))).toBe('10:05:00')
+    expect(fmt(ceilToStep(at('10:46'), 900))).toBe('11:00:00')
+  })
+
+  it('время ровно на шаге не двигается', () => {
+    const time = at('10:45')
+    expect(ceilToStep(time, 900)).toBe(time)
+  })
+
+  /** Про дни пикер времени не знает и сместить их не может. */
+  it('конец суток не заворачивается на следующий день', () => {
+    expect(fmt(ceilToStep(at('23:58'), 300))).toBe('23:59:59')
+    expect(fmt(ceilToStep(at('23:59:59'), 900))).toBe('23:59:59')
+  })
+
   it('шаг в секунду и меньше ничего не меняет', () => {
     const time = at('10:07:33')
     expect(floorToStep(time, 1)).toBe(time)
     expect(floorToStep(time, 0)).toBe(time)
+    expect(ceilToStep(time, 1)).toBe(time)
+    expect(ceilToStep(time, 0)).toBe(time)
   })
 })
 
