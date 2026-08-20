@@ -4,17 +4,20 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import { computed, ref } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
-import { type GrChartScaleKind, scaleForAxis } from '../../chart/chartScale'
+import { type GrChartScale, type GrChartScaleKind, scaleForAxis } from '../../chart/chartScale'
 import type { GrChartSeries, GrChartXValue, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData, resolveScaleKind, resolveXWindow } from '../../chart/chartModel'
 import type { GrChartReference } from '../../chart/chartReference'
 import { referenceDomainValues } from '../../chart/chartReference'
 import { activeSymbolMarks, symbolMarks, toPixelPoints } from '../../chart/chartMarks'
-import { bridgePath, dashArrayFor, type GrChartCurve, linePath } from '../../chart/chartPath'
+import { GR_CHART_CANVAS_THRESHOLD, GR_CHART_MARKERS_LIMIT } from '../../chart/chartCanvasMode'
+import { bridgePath, curveCommands, dashArrayFor, type GrChartCurve, linePath } from '../../chart/chartPath'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { GrChartActivePoint } from '../../composables/useChartTooltip'
 import type { GrChartZoom } from '../../composables/internal/useChartZoom'
 import type { GrChartXWindow } from '../../chart/chartZoom'
+import type { CanvasSeries } from '../GrChartFrame/shared/ChartCanvas.vue'
+import ChartCanvas from '../GrChartFrame/shared/ChartCanvas.vue'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
 import {
   ACTIVE_MARKER_SCALE,
@@ -195,7 +198,7 @@ const props = withDefaults(defineProps<GrChartLineProps>(), {
   ariaDescription: undefined,
   decimate: undefined,
   maxPoints: undefined,
-  canvasThreshold: 2000,
+  canvasThreshold: GR_CHART_CANVAS_THRESHOLD,
   zoom: undefined,
   xWindow: undefined,
   dataTableMaxRows: undefined,
@@ -301,11 +304,27 @@ const showMarkers = computed(() => {
 
   if (props.showPoints === 'never')
     return false
-  if (total > props.canvasThreshold)
+  if (total > GR_CHART_MARKERS_LIMIT)
     return false
 
   return props.showPoints === 'always' || total <= AUTO_MARKERS_LIMIT
 })
+
+/** Ряды в том виде, в каком их рисует холст: команды и цвета, без разметки. */
+function canvasSeries(
+  drawSeries: readonly NormalizedSeries[],
+  sx: GrChartScale,
+  sy: GrChartScale,
+  syr: GrChartScale | null,
+): CanvasSeries[] {
+  return drawSeries.map(item => ({
+    key: item.id,
+    commands: curveCommands(toPixelPoints(item, sx, scaleForAxis(item.axis, sy, syr)), resolvedCurve.value),
+    color: item.style.color,
+    width: Number.parseFloat(lineStrokeWidth) || 2,
+    dash: item.style.dashArray,
+  }))
+}
 
 const markerSize = computed(() => markerSizes[resolvedSize.value])
 
@@ -338,6 +357,7 @@ defineExpose({
 <template>
   <ChartFrame
     ref="frameEl"
+    :canvas-threshold="canvasThreshold"
     :data="data"
     :height="resolvedHeight"
     :width="width"
@@ -385,8 +405,26 @@ defineExpose({
       на конкретном значении, и брать его из прорежённой выборки нельзя — она
       сводка, а не данные.
     -->
-    <template #plot="{ xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, drawSeries, activeIndex: cursor, clipPathId }">
-      <g :clip-path="`url(#${clipPathId})`" data-gr-chart-line-body>
+    <!--
+      Выше порога тело уезжает на холст. Слот отдельный от `plot`: `<canvas>`
+      ребёнком `<svg>` не бывает, и рама кладёт его в обёртку области построения
+      под сам `<svg>`. Сетку там же рисует холст — оставшись в SVG, она легла бы
+      поверх рядов.
+    -->
+    <template #canvas="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, drawSeries, xTicks: gx, yTicks: gy }">
+      <ChartCanvas
+        :plot="plot"
+        :width="plot.x * 2 + plot.width"
+        :height="plot.y * 2 + plot.height"
+        :series="canvasSeries(drawSeries, sx, sy, syr)"
+        :x-ticks="gx"
+        :y-ticks="gy"
+        :show-grid="resolvedGrid"
+      />
+    </template>
+
+    <template #plot="{ xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, drawSeries, activeIndex: cursor, clipPathId, useCanvas }">
+      <g v-if="!useCanvas" :clip-path="`url(#${clipPathId})`" data-gr-chart-line-body>
         <!--
           Перемычки идут ПОД линией и под марками: разрыв не должен спорить с
           тем, что действительно измерено.

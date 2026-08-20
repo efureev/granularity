@@ -1039,3 +1039,64 @@ describe('приближение по абсциссе', () => {
     expect(await announced()).toContain('2')
   })
 })
+
+/**
+ * Холст — второй рендерер, а не замена первому. Главный риск правки не в том,
+ * что он не нарисует, а в том, что вместе с SVG-марками пропадёт доступность:
+ * оверлей, клавиатура и скрытая таблица обязаны работать в обоих режимах.
+ */
+describe('GrChartLine — холст выше порога', () => {
+  /** Двадцать рядов по 60 точек: 1200 вершин. */
+  function heavy(count = 20, points = 60) {
+    return Array.from({ length: count }, (_, s) => ({
+      id: `s${s}`,
+      label: `Ряд ${s}`,
+      x: Array.from({ length: points }, (_, i) => i),
+      y: Array.from({ length: points }, (_, i) => Math.sin((i + s) / 5) * 10 + 20),
+    }))
+  }
+
+  it('ниже порога рисует SVG и холста не заводит', () => {
+    const wrapper = factory({ series: heavy(2), canvasThreshold: 24_000 })
+
+    expect(wrapper.findAll('[data-gr-chart-series]').length).toBeGreaterThan(0)
+    expect(wrapper.find('[data-gr-chart-canvas]').exists()).toBe(false)
+  })
+
+  it('выше порога заводит холст и убирает SVG-марки', () => {
+    const wrapper = factory({ series: heavy(), canvasThreshold: 100 })
+
+    expect(wrapper.find('[data-gr-chart-canvas]').exists()).toBe(true)
+    expect(wrapper.findAll('[data-gr-chart-series]')).toHaveLength(0)
+  })
+
+  /** Порог считается по вершинам: один длинный ряд холста не требует. */
+  it('один ряд в 2000 точек остаётся в SVG', () => {
+    const wrapper = factory({ series: heavy(1, 2000), canvasThreshold: 24_000 })
+
+    expect(wrapper.find('[data-gr-chart-canvas]').exists()).toBe(false)
+  })
+
+  it('нулевой порог холст выключает совсем', () => {
+    const wrapper = factory({ series: heavy(), canvasThreshold: 0 })
+
+    expect(wrapper.find('[data-gr-chart-canvas]').exists()).toBe(false)
+  })
+
+  it('доступность от смены рендерера не меняется', () => {
+    const svg = factory({ series: heavy(2), canvasThreshold: 24_000 })
+    const canvas = factory({ series: heavy(), canvasThreshold: 100 })
+
+    for (const wrapper of [svg, canvas]) {
+      expect(wrapper.find('[data-gr-chart-surface]').exists(), 'оверлей').toBe(true)
+      expect(wrapper.find('table').exists(), 'скрытая таблица').toBe(true)
+    }
+  })
+
+  it('холст спрятан от скринридера и не ловит указатель', () => {
+    const canvas = factory({ series: heavy(), canvasThreshold: 100 }).find('[data-gr-chart-canvas]')
+
+    expect(canvas.attributes('aria-hidden')).toBe('true')
+    expect(canvas.classes()).toContain('pointer-events-none')
+  })
+})

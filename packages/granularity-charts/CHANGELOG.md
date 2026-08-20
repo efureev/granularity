@@ -7,6 +7,46 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.9.0] 2026-08-20
+
+### Changed
+
+- **`canvasThreshold` now counts drawn vertices, not total points, and defaults to `24_000`
+  instead of `2000`.** If you set this prop, re-read it: the old number now means "canvas almost
+  always".
+
+  The old axis was simply the wrong one. Decimation caps **each series** at the resolution of the
+  screen — about two vertices per pixel — so one series of 100 000 points draws as 2400 vertices and
+  costs a millisecond, while twenty series of 2400 (the same 48 000 points) cost sixteen. Total
+  points say nothing about the price; `series × drawn vertices` does.
+
+  Until now the prop gated markers rather than any canvas — there was no canvas in the package. That
+  cap still exists, at the same number, as an internal constant: marker behaviour is unchanged.
+
+### Added
+
+- **A canvas renderer above the threshold**, for `GrChartLine` and `GrChartArea`. Measured at 1200px
+  wide with 2400 vertices per series: SVG grows linearly at ~0.8 ms per series and stops fitting a
+  frame at twenty (16.3 ms); canvas stays near flat (1.7 ms). Below a few series the difference is
+  noise, which is why the threshold is high rather than aggressive.
+
+  **Accessibility is untouched by the switch.** The cursor, keyboard, tooltip and hidden table work
+  off one transparent overlay and the full series — never off the marks — so they carry over
+  unchanged. The canvas is `aria-hidden` and does not take pointer events. The accessibility suite
+  runs against both renderers.
+
+  `canvasThreshold: 0` disables canvas entirely, for when the drawing has to stay vector: printing,
+  SVG export, custom CSS over the marks.
+
+  Two consequences worth knowing: the grid moves into the canvas (it has to stay under the series,
+  and the canvas sits under the `<svg>` so that axes and the active point stay on top), and a
+  gradient area fill becomes a solid one — `url(#…)` means nothing to a canvas, and twenty
+  gradient-filled areas read as mush anyway.
+
+- `curveCommands` and `commandsToPath` in the geometry module. Curve maths is now computed once into
+  numeric draw commands, and the `d` string and the canvas each read from it. The two renderers have
+  nowhere to diverge — the equivalence is pinned by a test.
+
 ## [v0.8.1] 2026-08-20
 
 ### Fixed

@@ -2,8 +2,13 @@
  * Геометрия марок: сегменты, линия, площадь, символы точек, штриховка.
  *
  * `segmentsOf` первичен, `linePath` — адаптер над ним. Это не стиль, а задел:
- * canvas-путь возьмёт те же сегменты и сделает `ctx.lineTo`, не разбирая
- * строку `d` обратно.
+ * canvas-путь берёт те же сегменты и делает `ctx.lineTo`, не разбирая строку
+ * `d` обратно.
+ *
+ * Между сегментами и разметкой стоит третий вид — **команды рисования**
+ * (`curveCommands`). Математика кривой считается ровно один раз, а `linePath` и
+ * холст берут из неё числа каждый по-своему: разойтись двум рендерерам просто
+ * негде, и это закреплено тестом эквивалентности проекций.
  */
 
 export type GrChartCurve = 'linear' | 'smooth' | 'step'
@@ -23,6 +28,18 @@ interface SolidPoint {
   x: number
   y: number
 }
+
+/**
+ * Команда рисования: числа, а не разметка.
+ *
+ * Округления здесь нет намеренно — оно нужно только строке `d`, чтобы та была
+ * короче и читаемее в diff. Холсту полная точность достаётся даром.
+ */
+export type DrawCommand =
+  | { op: 'move', x: number, y: number }
+  | { op: 'line', x: number, y: number }
+  | { op: 'cubic', x1: number, y1: number, x2: number, y2: number, x: number, y: number }
+  | { op: 'close' }
 
 /** Координаты в `d` округляются: строка короче, а diff снимка читаем. */
 function n(value: number): number {
@@ -70,25 +87,33 @@ export function linePath(points: readonly PathPoint[], curve: GrChartCurve = 'li
  * Каждый сегмент замыкается **сам по себе**: одна общая заливка на весь ряд
  * закрасила бы и разрывы, то есть показала бы данные там, где их нет.
  */
+export function areaCommands(
+  points: readonly PathPoint[],
+  baselineY: number,
+  curve: GrChartCurve = 'linear',
+): DrawCommand[] {
+  return segmentsOf(points).flatMap((segment) => {
+    const top = segmentCommands(segment, curve)
+    if (top.length === 0) return []
+
+    const first = segment[0]!
+    const last = segment[segment.length - 1]!
+
+    return [
+      ...top,
+      { op: 'line', x: last.x, y: baselineY },
+      { op: 'line', x: first.x, y: baselineY },
+      { op: 'close' },
+    ] satisfies DrawCommand[]
+  })
+}
+
 export function areaPath(
   points: readonly PathPoint[],
   baselineY: number,
   curve: GrChartCurve = 'linear',
 ): string {
-  return segmentsOf(points)
-    .map((segment) => {
-      const top = segmentPath(segment, curve)
-
-      if (!top)
-        return ''
-
-      const first = segment[0]!
-      const last = segment[segment.length - 1]!
-
-      return `${top} L ${n(last.x)} ${n(baselineY)} L ${n(first.x)} ${n(baselineY)} Z`
-    })
-    .filter(Boolean)
-    .join(' ')
+  return commandsToPath(areaCommands(points, baselineY, curve))
 }
 
 /**
@@ -126,11 +151,11 @@ export function bridgePath(points: readonly PathPoint[]): string {
  * иначе получился бы второй подпуть, и заливка вышла бы двумя лентами вместо
  * одной замкнутой фигуры.
  */
-export function bandPath(
+export function bandCommands(
   top: readonly PathPoint[],
   base: readonly PathPoint[],
   curve: GrChartCurve = 'linear',
-): string {
+): DrawCommand[] {
   const runs: number[][] = []
   let current: number[] = []
 
@@ -155,48 +180,81 @@ export function bandPath(
   if (current.length > 0)
     runs.push(current)
 
-  return runs
-    .map((run) => {
-      if (run.length < 2)
-        return ''
+  return runs.flatMap((run) => {
+    if (run.length < 2) return []
 
-      const upper = segmentPath(run.map(i => ({ x: top[i]!.x, y: top[i]!.y as number })), curve)
-      const lower = segmentPath(run.map(i => ({ x: base[i]!.x, y: base[i]!.y as number })).reverse(), curve)
+    const upper = segmentCommands(run.map(i => ({ x: top[i]!.x, y: top[i]!.y as number })), curve)
+    const lower = segmentCommands(run.map(i => ({ x: base[i]!.x, y: base[i]!.y as number })).reverse(), curve)
+    if (upper.length === 0 || lower.length === 0) return []
 
-      return upper && lower ? `${upper} L${lower.slice(1)} Z` : ''
-    })
-    .filter(Boolean)
-    .join(' ')
+    // Низ пришивается к верху линией, а не переносом: `move` разорвал бы контур,
+    // и заливка потекла бы по своим правилам заполнения.
+    const [head, ...rest] = lower
+    const stitched: DrawCommand = head!.op === 'move' ? { op: 'line', x: head!.x, y: head!.y } : head!
+
+    return [...upper, stitched, ...rest, { op: 'close' }] satisfies DrawCommand[]
+  })
 }
 
-function segmentPath(segment: readonly SolidPoint[], curve: GrChartCurve): string {
-  if (segment.length === 0)
-    return ''
+export function bandPath(
+  top: readonly PathPoint[],
+  base: readonly PathPoint[],
+  curve: GrChartCurve = 'linear',
+): string {
+  return commandsToPath(bandCommands(top, base, curve))
+}
+
+function segmentCommands(segment: readonly SolidPoint[], curve: GrChartCurve): DrawCommand[] {
+  // Одна точка линией не рисуется: `M` без продолжения не даёт штриха ни в
+  // одном рендерере. Её показывает маркер — это забота компонента.
+  if (segment.length < 2)
+    return []
 
   const first = segment[0]!
 
-  // Одна точка линией не рисуется: `M` без продолжения не даёт штриха ни в
-  // одном рендерере. Её показывает маркер — это забота компонента.
-  if (segment.length === 1)
-    return ''
-
   if (curve === 'step') {
-    const parts = [`M ${n(first.x)} ${n(first.y)}`]
+    const commands: DrawCommand[] = [{ op: 'move', x: first.x, y: first.y }]
 
     for (let i = 1; i < segment.length; i++) {
       const point = segment[i]!
       const previous = segment[i - 1]!
 
-      parts.push(`L ${n(point.x)} ${n(previous.y)}`, `L ${n(point.x)} ${n(point.y)}`)
+      commands.push({ op: 'line', x: point.x, y: previous.y }, { op: 'line', x: point.x, y: point.y })
     }
 
-    return parts.join(' ')
+    return commands
   }
 
   if (curve === 'smooth')
-    return smoothPath(segment)
+    return smoothCommands(segment)
 
-  return [`M ${n(first.x)} ${n(first.y)}`, ...segment.slice(1).map(p => `L ${n(p.x)} ${n(p.y)}`)].join(' ')
+  return [
+    { op: 'move', x: first.x, y: first.y },
+    ...segment.slice(1).map((p): DrawCommand => ({ op: 'line', x: p.x, y: p.y })),
+  ]
+}
+
+function segmentPath(segment: readonly SolidPoint[], curve: GrChartCurve): string {
+  return commandsToPath(segmentCommands(segment, curve))
+}
+
+/** Команды рисования всего ряда: разрывы дают отдельные `move`. */
+export function curveCommands(points: readonly PathPoint[], curve: GrChartCurve = 'linear'): DrawCommand[] {
+  return segmentsOf(points).flatMap(segment => segmentCommands(segment, curve))
+}
+
+/** Команды в строку `d`. Здесь и только здесь координаты округляются. */
+export function commandsToPath(commands: readonly DrawCommand[]): string {
+  return commands
+    .map((command) => {
+      if (command.op === 'move') return `M ${n(command.x)} ${n(command.y)}`
+      if (command.op === 'line') return `L ${n(command.x)} ${n(command.y)}`
+
+      if (command.op === 'close') return 'Z'
+
+      return `C ${n(command.x1)} ${n(command.y1)} ${n(command.x2)} ${n(command.y2)} ${n(command.x)} ${n(command.y)}`
+    })
+    .join(' ')
 }
 
 /**
@@ -206,7 +264,7 @@ function segmentPath(segment: readonly SolidPoint[], curve: GrChartCurve): strin
  * то есть рисует на графике максимум, которого в данных нет. Инвариант
  * монотонности проверяется тестом.
  */
-function smoothPath(segment: readonly SolidPoint[]): string {
+function smoothCommands(segment: readonly SolidPoint[]): DrawCommand[] {
   const count = segment.length
   const slopes: number[] = []
 
@@ -247,21 +305,25 @@ function smoothPath(segment: readonly SolidPoint[]): string {
   }
 
   const first = segment[0]!
-  const parts = [`M ${n(first.x)} ${n(first.y)}`]
+  const commands: DrawCommand[] = [{ op: 'move', x: first.x, y: first.y }]
 
   for (let i = 0; i < count - 1; i++) {
     const from = segment[i]!
     const to = segment[i + 1]!
     const h = (to.x - from.x) / 3
 
-    parts.push(
-      `C ${n(from.x + h)} ${n(from.y + tangents[i]! * h)}`
-      + ` ${n(to.x - h)} ${n(to.y - tangents[i + 1]! * h)}`
-      + ` ${n(to.x)} ${n(to.y)}`,
-    )
+    commands.push({
+      op: 'cubic',
+      x1: from.x + h,
+      y1: from.y + tangents[i]! * h,
+      x2: to.x - h,
+      y2: to.y - tangents[i + 1]! * h,
+      x: to.x,
+      y: to.y,
+    })
   }
 
-  return parts.join(' ')
+  return commands
 }
 
 /**

@@ -11,12 +11,15 @@ import type { GrChartSeries, GrChartXValue, NormalizedSeries } from '../../chart
 import { normalizeChartData, resolveScaleKind, resolveXWindow } from '../../chart/chartModel'
 import type { GrChartReference } from '../../chart/chartReference'
 import { referenceDomainValues } from '../../chart/chartReference'
-import { areaPath, bandPath, type GrChartCurve, linePath } from '../../chart/chartPath'
+import { GR_CHART_CANVAS_THRESHOLD, GR_CHART_MARKERS_LIMIT } from '../../chart/chartCanvasMode'
+import { areaCommands, areaPath, bandCommands, bandPath, curveCommands, type GrChartCurve, linePath } from '../../chart/chartPath'
 import { type GrChartScale, type GrChartScaleKind, scaleForAxis } from '../../chart/chartScale'
 import type { ChartTickFormat } from '../../composables/useChartTicks'
 import type { GrChartActivePoint } from '../../composables/useChartTooltip'
 import type { GrChartZoom } from '../../composables/internal/useChartZoom'
 import type { GrChartXWindow } from '../../chart/chartZoom'
+import type { CanvasSeries } from '../GrChartFrame/shared/ChartCanvas.vue'
+import ChartCanvas from '../GrChartFrame/shared/ChartCanvas.vue'
 import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
 import {
   ACTIVE_MARKER_SCALE,
@@ -208,7 +211,7 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
   ariaDescription: undefined,
   decimate: undefined,
   maxPoints: undefined,
-  canvasThreshold: 2000,
+  canvasThreshold: GR_CHART_CANVAS_THRESHOLD,
   zoom: undefined,
   xWindow: undefined,
   dataTableMaxRows: undefined,
@@ -333,7 +336,7 @@ const showMarkers = computed(() => {
   if (props.showPoints === 'never')
     return false
   if (props.showPoints === 'always')
-    return total <= props.canvasThreshold
+    return total <= GR_CHART_MARKERS_LIMIT
 
   // На стеке `auto` означает «не надо». Марка садится на стык двух полос, и
   // обводка цветом фона превращает её в дырку между ними; сами же точки на
@@ -341,8 +344,41 @@ const showMarkers = computed(() => {
   if (props.stacked)
     return false
 
-  return total <= Math.min(AUTO_MARKERS_LIMIT, props.canvasThreshold)
+  return total <= Math.min(AUTO_MARKERS_LIMIT, GR_CHART_MARKERS_LIMIT)
 })
+
+/**
+ * Ряды для холста: команды линии и заливки.
+ *
+ * Градиент здесь становится сплошной заливкой цвета серии. `url(#…)` холст не
+ * понимает вовсе, а честный `createLinearGradient` под каждый ряд стоил бы
+ * своего слоя состояния ради эффекта, который на двадцати площадях всё равно
+ * читается как каша. Порог включается именно там, где градиент перестаёт
+ * что-либо сообщать.
+ */
+function canvasSeries(
+  drawSeries: readonly NormalizedSeries[],
+  sx: GrChartScale,
+  sy: GrChartScale,
+  plot: Rect,
+  syr: GrChartScale | null,
+): CanvasSeries[] {
+  return drawSeries.map((item) => {
+    const scale = scaleForAxis(item.axis, sy, syr)
+    const fillCommands = props.stacked
+      ? bandCommands(toStackBand(item, sx, scale).top, toStackBand(item, sx, scale).base, resolvedCurve.value)
+      : areaCommands(toPixelPoints(item, sx, scale), baselineOf(scale, plot), resolvedCurve.value)
+
+    return {
+      key: item.id,
+      commands: curveCommands(edgePoints(item, sx, sy, syr), resolvedCurve.value),
+      color: item.style.color,
+      width: Number.parseFloat(areaStrokeWidth) || 2,
+      dash: item.style.dashArray,
+      fill: { commands: fillCommands, color: item.style.color, opacity: Number.parseFloat(fillOpacity.value) || 0.2 },
+    }
+  })
+}
 
 const markerSize = computed(() => markerSizes[resolvedSize.value])
 
@@ -479,6 +515,7 @@ defineExpose({
 <template>
   <ChartFrame
     ref="frameEl"
+    :canvas-threshold="canvasThreshold"
     :data="data"
     :height="resolvedHeight"
     :width="width"
@@ -526,8 +563,21 @@ defineExpose({
 </template>
 
     <!-- Рисуй по `drawSeries`, утверждай по `visibleSeries`. -->
-    <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, drawSeries, activeIndex: cursor, clipPathId }">
-      <defs v-if="resolvedFill === 'gradient'">
+    <!-- Выше порога тело уезжает на холст: `<canvas>` ребёнком `<svg>` не бывает. -->
+    <template #canvas="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, drawSeries, xTicks: gx, yTicks: gy }">
+      <ChartCanvas
+        :plot="plot"
+        :width="plot.x * 2 + plot.width"
+        :height="plot.y * 2 + plot.height"
+        :series="canvasSeries(drawSeries, sx, sy, plot, syr)"
+        :x-ticks="gx"
+        :y-ticks="gy"
+        :show-grid="resolvedGrid"
+      />
+    </template>
+
+    <template #plot="{ plot, xScale: sx, yScale: sy, yScaleRight: syr, visibleSeries, drawSeries, activeIndex: cursor, clipPathId, useCanvas }">
+      <defs v-if="resolvedFill === 'gradient' && !useCanvas">
         <linearGradient
           v-for="stop in gradientStops(visibleSeries, sy, plot, syr)"
           :id="stop.id"
@@ -543,7 +593,7 @@ defineExpose({
         </linearGradient>
       </defs>
 
-      <g :clip-path="`url(#${clipPathId})`" data-gr-chart-area-body>
+      <g v-if="!useCanvas" :clip-path="`url(#${clipPathId})`" data-gr-chart-area-body>
         <path
           v-for="mark in areaMarks(drawSeries, sx, sy, plot, syr)"
           :key="mark.key"

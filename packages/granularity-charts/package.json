@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-charts",
   "description": "Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",

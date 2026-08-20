@@ -28,6 +28,7 @@ export const demoPathByPreviewKey = {
   'extra-charts-heatmap-incidents':       'extra/granularity-charts/GrChartHeatmapIncidentsDemo.vue',
   'extra-charts-heatmap-scale':           'extra/granularity-charts/GrChartHeatmapScaleDemo.vue',
   'extra-charts-line-basic':              'extra/granularity-charts/GrChartLineBasicDemo.vue',
+  'extra-charts-line-canvas':             'extra/granularity-charts/GrChartLineCanvasDemo.vue',
   'extra-charts-line-decimate':           'extra/granularity-charts/GrChartLineDecimateDemo.vue',
   'extra-charts-line-dual-axis':          'extra/granularity-charts/GrChartLineDualAxisDemo.vue',
   'extra-charts-line-references':         'extra/granularity-charts/GrChartLineReferencesDemo.vue',

@@ -29,6 +29,7 @@ import type { GrChartXWindow } from '../../../chart/chartZoom'
 import ChartAxis from './ChartAxis.vue'
 import ChartBrush from './ChartBrush.vue'
 import ChartDataTable from './ChartDataTable.vue'
+import { shouldUseCanvas } from '../../../chart/chartCanvasMode'
 import ChartGrid from './ChartGrid.vue'
 import ChartLegend from './ChartLegend.vue'
 import ChartReferences from './ChartReferences.vue'
@@ -77,6 +78,15 @@ export interface ChartPlotScope {
    * прореживания это один и тот же массив по ссылке.
    */
   drawSeries: readonly NormalizedSeries[]
+  /**
+   * Рисовать ли тело на холсте.
+   *
+   * Решает рама, а не компонент: порог считается по **нарисованным** вершинам,
+   * а прореживание живёт здесь же. Компоненту остаётся выбрать ветку.
+   */
+  useCanvas: boolean
+  xTicks: readonly ChartTick[]
+  yTicks: readonly ChartTick[]
   activeIndex: number | null
   /** Активная серия. У матрицы это строка; декартовы графики её игнорируют. */
   activeSeriesIndex: number
@@ -92,6 +102,13 @@ export interface ChartFrameProps {
   size?: GrChartSize
   axes?: boolean
   showGrid?: 'both' | 'x' | 'y' | 'none'
+  /**
+   * Порог перехода на холст в **нарисованных вершинах**.
+   *
+   * Ноль — холста нет вовсе: так рама ведёт себя для типов, которым второй
+   * рендерер не нужен. Считает рама, потому что прореживание живёт здесь.
+   */
+  canvasThreshold?: number
   showLegend?: boolean
   legendPosition?: 'top' | 'bottom'
   tooltip?: boolean
@@ -220,6 +237,7 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   size: 'md',
   axes: true,
   showGrid: 'y',
+  canvasThreshold: 0,
   showLegend: false,
   legendPosition: 'bottom',
   tooltip: true,
@@ -265,6 +283,14 @@ const emit = defineEmits<ChartFrameEmits>()
 defineSlots<{
   /** Марки графика: линия, площадь, столбцы. */
   plot?: (props: ChartPlotScope) => unknown
+  /**
+   * Тело графика на холсте вместо SVG-марок.
+   *
+   * Слот отдельный от `plot`, потому что `<canvas>` ребёнком `<svg>` не бывает:
+   * содержимое кладётся в обёртку области построения, под сам `<svg>`. Есть
+   * слот — сетку рисует холст, иначе она легла бы поверх рядов.
+   */
+  canvas?: (props: ChartPlotScope) => unknown
   /**
    * Своя панель тултипа.
    *
@@ -447,6 +473,9 @@ const drawSeries = computed<readonly NormalizedSeries[]>(() => {
 
   return decimateSeriesGroup(visibleSeries.value, { maxPoints: budget, sharedX: props.decimateSharedX })
 })
+
+/** Режим рисования: решает рама, потому что прореживание живёт здесь же. */
+const useCanvas = computed(() => shouldUseCanvas(drawSeries.value, props.canvasThreshold))
 
 const plotStyle = computed(() => ({
   left: `${plot.value.x}px`,
@@ -902,6 +931,9 @@ const plotScope = computed<ChartPlotScope>(() => ({
   data: props.data,
   visibleSeries: visibleSeries.value,
   drawSeries: drawSeries.value,
+  useCanvas: useCanvas.value,
+  xTicks: xTicks.value,
+  yTicks: yTicks.value,
   activeIndex: tooltipApi.activeIndex.value,
   activeSeriesIndex: activeSeriesIndex.value,
   clipPathId,
@@ -1024,6 +1056,12 @@ watch(tooltipApi.activeIndex, (value) => {
 
     <div data-gr-chart-plot class="relative" :style="frameHeightStyle">
       <!--
+        Холст лежит **под** `<svg>`: оверлей, оси и активная точка обязаны
+        остаться сверху. Слот необязательный — без него рама рисует как раньше,
+        целиком в SVG.
+      -->
+      <slot v-if="useCanvas" name="canvas" v-bind="plotScope" />
+      <!--
         В интерактивном режиме рисунок — декорация: смысл несут оверлей с
         клавиатурой и скрытая таблица. `role="img"` на `<svg>` объявил бы его
         потомков презентационными, и точки перестали бы существовать для
@@ -1049,7 +1087,8 @@ watch(tooltipApi.activeIndex, (value) => {
           </clipPath>
         </defs>
 
-        <ChartGrid :plot="plot" :x-ticks="xTicks" :y-ticks="yTicks" :show="showAxes ? showGrid : 'none'" />
+        <!-- Сетку рисует холст, когда он есть: оставшись здесь, она легла бы поверх рядов. -->
+        <ChartGrid v-if="!useCanvas" :plot="plot" :x-ticks="xTicks" :y-ticks="yTicks" :show="showAxes ? showGrid : 'none'" />
 
         <template v-if="showAxes">
           <ChartAxis
