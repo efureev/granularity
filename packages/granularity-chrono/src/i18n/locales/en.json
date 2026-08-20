@@ -36,6 +36,9 @@
     "hours": "Hours",
     "minutes": "Minutes",
     "seconds": "Seconds",
-    "period": "AM/PM"
+    "period": "AM/PM",
+    "patternHour": "H",
+    "patternMinute": "M",
+    "patternSecond": "S"
   }
 }

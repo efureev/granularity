@@ -182,7 +182,273 @@ export function parseLocaleTime(locale: string, text: string): PlainTime | null 
   return { h: hour, min: minute, s: second }
 }
 
+export type TimeUnit = 'hour' | 'minute' | 'second'
+
+export interface LocaleDateTimeOrder {
+  /** Время идёт перед датой: `vi` показывает `15:30 12/8/26`. */
+  timeFirst: boolean
+  /** Половина суток стоит перед часом: `ko` показывает `오후 3:30`. */
+  dayPeriodFirst: boolean
+  /** Чем локаль разделяет часы и минуты: `15:30` против `15.30`. */
+  timeSeparator: string
+}
+
+const dateTimeOrders = new Map<string, LocaleDateTimeOrder>()
+
+const DEFAULT_DATE_TIME_ORDER: LocaleDateTimeOrder = {
+  timeFirst: false,
+  dayPeriodFirst: false,
+  timeSeparator: ':',
+}
+
+/** Взаимное расположение частей в локали — то, чего не выведешь из строки. */
+export function localeDateTimeOrder(locale: string): LocaleDateTimeOrder {
+  const cached = dateTimeOrders.get(locale)
+  if (cached) return cached
+
+  let result = DEFAULT_DATE_TIME_ORDER
+
+  try {
+    const parts = new Intl.DateTimeFormat(locale, {
+      dateStyle: 'short',
+      timeStyle: 'short',
+      timeZone: 'UTC',
+    }).formatToParts(new Date(Date.UTC(2026, 7, 12, 15, 30)))
+
+    const at = (...types: string[]): number => parts.findIndex(part => types.includes(part.type))
+    const date = at('day', 'month', 'year')
+    const hour = at('hour')
+    const dayPeriod = at('dayPeriod')
+    const separator = parts.find((part, index) => part.type === 'literal' && index > hour)?.value.trim()
+
+    if (date >= 0 && hour >= 0) {
+      result = {
+        timeFirst: hour < date,
+        dayPeriodFirst: dayPeriod >= 0 && dayPeriod < hour,
+        timeSeparator: separator || ':',
+      }
+    }
+  }
+  catch {
+    // Некорректный тег локали — остаётся значение по умолчанию.
+  }
+
+  dateTimeOrders.set(locale, result)
+
+  return result
+}
+
+/** Группы цифр вместе с положением: резать придётся текст, а не числа. */
+function digitMatches(text: string): RegExpExecArray[] {
+  return [...text.matchAll(/\d+/g)] as RegExpExecArray[]
+}
+
+/**
+ * Разрез между группами цифр `count` и `count + 1`.
+ *
+ * Буквы в промежутке — это половина суток (`PM`, `오후`), и уехать она обязана к
+ * своим цифрам: в одних локалях она стоит после часа, в других перед ним.
+ * Отсюда же следует, что сам разделитель частей опознавать не нужно — ни тире,
+ * ни запятую, ни слово: в `en-CA` дата пишется через дефис (`2026-08-12`), и
+ * список разделителей развалился бы на первой же локали.
+ */
+function cutBetweenGroups(
+  locale: string,
+  text: string,
+  groups: RegExpExecArray[],
+  count: number,
+): [string, string] {
+  const before = groups[count - 1] as RegExpExecArray
+  const after = groups[count] as RegExpExecArray
+  const gapStart = before.index + before[0].length
+  const gap = text.slice(gapStart, after.index)
+  const letters = /\p{L}+/u.exec(gap)
+
+  if (!letters) return [text.slice(0, gapStart), text.slice(gapStart)]
+
+  const cut = gapStart + letters.index + (localeDateTimeOrder(locale).dayPeriodFirst ? 0 : letters[0].length)
+
+  return [text.slice(0, cut), text.slice(cut)]
+}
+
+export interface PlainDateTimeParts {
+  date: PlainDate
+  /** `null` — в строке набрана одна дата. */
+  time: PlainTime | null
+}
+
+/**
+ * Дата и время из одной строки: `12.08.2026, 14:30`, `8/12/2026, 3:30 PM`.
+ *
+ * Три группы цифр — только дата, пять или шесть — дата и время. Какая половина
+ * строки чья, говорит `Intl`, а не порядок слагаемых: `vi` ставит время первым.
+ */
+export function parseLocaleDateTime(locale: string, text: string): PlainDateTimeParts | null {
+  const groups = digitMatches(text)
+
+  if (groups.length === 3) {
+    const date = parseLocaleDate(locale, text)
+
+    return date ? { date, time: null } : null
+  }
+
+  if (groups.length < 5 || groups.length > 6) return null
+
+  const { timeFirst } = localeDateTimeOrder(locale)
+  const [head, tail] = cutBetweenGroups(locale, text, groups, timeFirst ? groups.length - 3 : 3)
+  const date = parseLocaleDate(locale, timeFirst ? tail : head)
+  const time = parseLocaleTime(locale, timeFirst ? head : tail)
+
+  return date && time ? { date, time } : null
+}
+
+/**
+ * Строка диапазона на две границы. `null` — цифр не поровну, то есть границы
+ * описаны по-разному и делить нечего.
+ */
+export function splitLocaleRange(locale: string, text: string): [string, string] | null {
+  const groups = digitMatches(text)
+  if (groups.length < 2 || groups.length % 2 !== 0) return null
+
+  return cutBetweenGroups(locale, text, groups, groups.length / 2)
+}
+
+/** То, что уже набрано: части, которых в строке ещё нет, отсутствуют. */
+export interface PartialPlainTime {
+  h?: number
+  min?: number
+  s?: number
+}
+
+/**
+ * Время из недобранной строки: `18` — это уже час, `18:4` — час и четыре минуты.
+ *
+ * Нужно панели, а не модели: пока человек печатает, колонки обязаны
+ * подсвечивать набранное, иначе набор идёт вслепую. Наружу такое значение не
+ * уходит — за это отвечает `parseLocaleTime`, который неполноту не прощает.
+ */
+export function parsePartialLocaleTime(locale: string, text: string): PartialPlainTime | null {
+  const groups = digitGroups(text)
+  if (groups.length === 0 || groups.length > 3) return null
+
+  const [am, pm] = dayPeriodNames(locale)
+  const lower = text.toLowerCase()
+  const hasPm = lower.includes(pm.toLowerCase()) || /\bpm\b/.test(lower)
+  const hasAm = lower.includes(am.toLowerCase()) || /\bam\b/.test(lower)
+  const [hourText, minuteText, secondText] = groups as [string, string?, string?]
+
+  const hour = Number(hourText)
+  const result: PartialPlainTime = {}
+
+  if (hasAm || hasPm) {
+    if (hour < 1 || hour > 12) return null
+    result.h = fromTwelveHour(hour, hasPm ? 'pm' : 'am')
+  }
+  else {
+    if (hour > 23) return null
+    result.h = hour
+  }
+
+  if (minuteText !== undefined) {
+    const minute = Number(minuteText)
+    if (minute > 59) return null
+    result.min = minute
+  }
+
+  if (secondText !== undefined) {
+    const second = Number(secondText)
+    if (second > 59) return null
+    result.s = second
+  }
+
+  return result
+}
+
+export interface PartialDateTimeParts {
+  /** Дата — только целиком: по двум третям её не показать. */
+  date: PlainDate | null
+  time: PartialPlainTime | null
+}
+
+/**
+ * Что из набранного уже можно показать в панели.
+ *
+ * Сколько групп цифр приходится на время, знает не строка, а компонент: с
+ * секундами их три, без — две. По одному тексту это неотличимо, пока время не
+ * набрано целиком, а подсвечивать надо раньше.
+ */
+export function parsePartialLocaleDateTime(
+  locale: string,
+  text: string,
+  options: { seconds?: boolean } = {},
+): PartialDateTimeParts {
+  const empty: PartialDateTimeParts = { date: null, time: null }
+  const groups = digitMatches(text)
+  if (groups.length === 0) return empty
+
+  const { timeFirst } = localeDateTimeOrder(locale)
+  const timeCount = options.seconds ? 3 : 2
+  const split = timeFirst ? timeCount : 3
+
+  // Обе части — подстроки, а не числа: подпись половины суток живёт в тексте.
+  const [head, tail] = groups.length > split
+    ? cutBetweenGroups(locale, text, groups, split)
+    : [text, '']
+
+  const dateText = timeFirst ? tail : head
+  const timeText = timeFirst ? head : tail
+
+  return {
+    date: parseLocaleDate(locale, dateText),
+    time: timeText.trim() ? parsePartialLocaleTime(locale, timeText) : null,
+  }
+}
+
+/**
+ * Вид значения, который разбор понимает обратно.
+ *
+ * Редактируемое поле обязано показывать то же, что принимает. `Aug 12, 2026`
+ * читается человеком лучше, но правка `12` на `14` прямо в поле оставит две
+ * группы цифр вместо трёх — разбор откажет, и набранное молча откатится.
+ * Поэтому поле с `editable` переходит на цифры, если формат не задан снаружи.
+ */
+export const EDITABLE_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+}
+
+/** Парная времени: часы и минуты двумя цифрами, секунды по запросу. */
+export function editableTimeFormat(
+  options: { seconds?: boolean, twelveHour?: boolean } = {},
+): Intl.DateTimeFormatOptions {
+  return {
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(options.seconds ? { second: '2-digit' } : {}),
+    hour12: options.twelveHour,
+  }
+}
+
+/** Подсказка формата времени: `HH:mm` буквами и разделителем локали. */
+export function localeTimePattern(
+  locale: string,
+  letters: Record<TimeUnit, string>,
+  options: { seconds?: boolean, twelveHour?: boolean } = {},
+): string {
+  const { timeSeparator, dayPeriodFirst } = localeDateTimeOrder(locale)
+  const units: TimeUnit[] = options.seconds ? ['hour', 'minute', 'second'] : ['hour', 'minute']
+  const clock = units.map(unit => letters[unit].repeat(2)).join(timeSeparator)
+
+  if (!options.twelveHour) return clock
+
+  const [am] = dayPeriodNames(locale)
+
+  return dayPeriodFirst ? `${am} ${clock}` : `${clock} ${am}`
+}
+
 /** Для тестов и для смены локали приложением на лету. */
 export function resetChronoParseCache(): void {
   orders.clear()
+  dateTimeOrders.clear()
 }

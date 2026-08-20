@@ -7,7 +7,7 @@ import type { UseFloatingPlacement } from '@feugene/granularity/composables/useF
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
 import { createDisabledPredicate } from '../../chrono/calendarGrid'
 import { formatPlainDate } from '../../chrono/chronoFormat'
-import { localeDatePattern, maskLocaleDate, parseLocaleDate } from '../../chrono/chronoParse'
+import { EDITABLE_DATE_FORMAT, localeDatePattern, maskLocaleDate, parseLocaleDate } from '../../chrono/chronoParse'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
@@ -37,8 +37,8 @@ import type { GrDatePickerSize } from './grDatePickerStyles'
  * `Date` (или на том, что задаёт `valueAdapter`), внутрь — кортежами
  * `PlainDate`, на которых считает весь пакет.
  *
- * Ручного ввода текстом в этой версии нет, поэтому поле честно помечено
- * `readonly`: значение меняется только через панель.
+ * Пока `editable` не включён, поле честно помечено `readonly`: значение
+ * меняется только через панель.
  */
 export interface GrDatePickerProps<T = Date | null> {
   /**
@@ -270,6 +270,7 @@ const selected = computed<PlainDate | null>(() => (
   props.multiple ? null : selectedList.value[0] ?? null
 ))
 
+
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
 const maxPlain = computed(() => (props.max ? toPlainDate(props.max) : undefined))
 const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : undefined))
@@ -288,12 +289,15 @@ const disabledDates = computed<DisabledDatesInput>(() => {
 })
 
 /** Показ по умолчанию соответствует режиму: день, месяц с годом или год. */
+/** Ввод руками — только в дневном режиме: у периодов текстом набирать нечего. */
+const isEditable = computed(() => props.editable && props.mode === 'day' && !props.multiple)
+
 const displayFormat = computed<Intl.DateTimeFormatOptions | undefined>(() => {
   if (props.format) return props.format
   if (props.mode === 'month') return { month: 'long', year: 'numeric' }
   if (props.mode === 'year') return { year: 'numeric' }
 
-  return undefined
+  return isEditable.value ? EDITABLE_DATE_FORMAT : undefined
 })
 
 /** Сколько дат показывать в поле, прежде чем свернуть остальные в «и ещё N». */
@@ -319,9 +323,6 @@ const displayValue = computed(() => {
   return rest > 0 ? `${shown} ${t('grChrono.datePicker.andMore', 'and {count} more', { count: rest })}` : shown
 })
 
-/** Ввод руками — только в дневном режиме: у периодов текстом набирать нечего. */
-const isEditable = computed(() => props.editable && props.mode === 'day' && !props.multiple)
-
 const field = useEditableField({
   editable: () => isEditable.value,
   applyOnBlur: () => props.applyOnBlur,
@@ -330,8 +331,13 @@ const field = useEditableField({
   mask: raw => maskLocaleDate(resolvedLocale.value, raw),
   parse: (text) => {
     const parsed = parseLocaleDate(resolvedLocale.value, text)
+    if (!parsed) return null
 
-    return parsed ? fromPlainParts(parsed) : null
+    // Запрещённая дата не выбирается ни кликом, ни `Enter`: сетка такую ячейку
+    // просто не даёт нажать, а текст обязан спросить сам.
+    const date = fromPlainParts(parsed)
+
+    return canSelectDate(date) ? date : null
   },
   commit: date => shell.commit(date),
 })
@@ -356,6 +362,15 @@ function onFieldKeydown(event: KeyboardEvent): void {
   shell.onFieldKeydown(event)
 }
 
+/**
+ * Сетка идёт за набором: как только дата набрана целиком, она подсвечена и
+ * показан её месяц. Модель при этом не тронута — подтверждает `Enter`.
+ */
+const shownDate = computed<PlainDate | null>(() => {
+  const draft = field.draft.value
+
+  return (draft === null ? null : parseLocaleDate(resolvedLocale.value, draft)) ?? selected.value
+})
 /**
  * Набор с переключённой датой: была — снимается, не была — добавляется.
  *
@@ -499,7 +514,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="isEditable ? shell.openPanel() : shell.togglePanel()"
+            @click="isEditable ? shell.openPanel(false) : shell.togglePanel()"
             @keydown="onFieldKeydown"
             @input="field.onInput"
             @focus="emit('focus', $event)"
@@ -541,7 +556,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
           <GrCalendar
             ref="calendarRef"
             :mode="mode"
-            :model-value="selected"
+            :model-value="shownDate"
             :selected-dates="multiple ? selectedList : undefined"
             :min="minPlain"
             :max="maxPlain"

@@ -124,6 +124,11 @@ const navigation = {
   period: createNavigation('period'),
 } as const
 
+const UNITS = ['hour', 'minute', 'second', 'period'] as const
+
+/** Куда колонки уже прокручены: чтобы не дёргать те, чей выбор не менялся. */
+const shown: Record<TimeUnit, number> = { hour: -1, minute: -1, second: -1, period: -1 }
+
 /**
  * Курсор ставится на выбранные значения, как только колонки на экране.
  *
@@ -135,14 +140,58 @@ watch(() => props.open, (open) => {
   if (open) initNavigation()
 }, { immediate: true })
 
+/**
+ * Показать выбранное значение колонки — **по центру**, а не у ближнего края.
+ *
+ * Шаг стрелкой по-прежнему доводит до края (`nearest` в самой навигации): там
+ * список не должен прыгать под рукой. А прыжок к новому значению — открытие
+ * панели или набор в поле — обязан показать соседей выбранного: 18 у нижней
+ * кромки читается как «дальше ничего нет».
+ */
+function revealSelected(unit: TimeUnit): void {
+  const column = columnOf(unit)
+  const option = column?.options[column.selectedIndex]
+  if (!option) return
+
+  // В jsdom метода нет, и это не повод падать: прокрутка — оформление.
+  optionEls.value.get(option.key)?.scrollIntoView?.({ block: 'center' })
+}
+
 function initNavigation(): void {
-  for (const nav of Object.values(navigation)) {
+  for (const unit of UNITS) {
+    const nav = navigation[unit]
     nav.init()
     // `init` только ставит курсор, прокрутку он не трогает — а колонка на 24
     // значения открывается на нуле, и выбранные 09:30 остаются за кадром.
     nav.setActive(nav.activeIndex.value)
+    revealSelected(unit)
+    shown[unit] = columnOf(unit)?.selectedIndex ?? -1
   }
 }
+
+/**
+ * Значение сменилось, пока колонки на экране, — прокрутка идёт за ним.
+ *
+ * Прокрутка на открытии этого не покрывает: набранное в поле меняет значение
+ * уже у открытой панели, и выбранные 18:45 остались бы за кадром — подсветка
+ * без прокрутки бесполезна.
+ *
+ * Двигаются только те колонки, чей выбор действительно изменился: иначе выбор
+ * часа возвращал бы к своему значению курсор, который в соседней колонке увели
+ * стрелками, но ещё не подтвердили.
+ */
+watch(() => props.modelValue, () => {
+  if (!props.open) return
+
+  for (const unit of UNITS) {
+    const index = columnOf(unit)?.selectedIndex ?? -1
+    if (index < 0 || index === shown[unit]) continue
+
+    shown[unit] = index
+    navigation[unit].setActive(index)
+    revealSelected(unit)
+  }
+})
 
 function select(unit: TimeUnit, option: TimeOption): void {
   if (props.locked || option.disabled) return

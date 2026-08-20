@@ -503,7 +503,7 @@ describe('GrDatePicker — ручной ввод', () => {
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
-    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/12/2026')
     wrapper.unmount()
   })
 
@@ -515,7 +515,7 @@ describe('GrDatePicker — ручной ввод', () => {
     await nextTick()
 
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
-    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/12/2026')
     wrapper.unmount()
   })
 
@@ -526,7 +526,7 @@ describe('GrDatePicker — ручной ввод', () => {
     await field(wrapper).trigger('keydown', { key: 'Escape' })
     await nextTick()
 
-    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/12/2026')
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
     wrapper.unmount()
   })
@@ -551,7 +551,7 @@ describe('GrDatePicker — ручной ввод', () => {
     await wrapper.setProps({ modelValue: at('2026-08-20') })
     await nextTick()
 
-    expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 20, 2026')
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/20/2026')
     wrapper.unmount()
   })
 
@@ -579,6 +579,27 @@ describe('GrDatePicker — ручной ввод', () => {
 
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
     wrapper.unmount()
+  })
+
+  /**
+   * Поле показывает то, что разбор принимает обратно. С `Aug 12, 2026` правка
+   * числа прямо в поле оставила бы две группы цифр вместо трёх, разбор бы
+   * отказал, и набранное молча откатилось бы.
+   */
+  it('редактируемое поле показывает значение цифрами, а обычное — по локали', async () => {
+    const editable = mountPicker({ editable: true, modelValue: at('2026-08-12') })
+    expect((field(editable).element as HTMLInputElement).value).toBe('08/12/2026')
+
+    const input = field(editable)
+    ;(input.element as HTMLInputElement).value = '08/14/2026'
+    await input.trigger('input')
+    await input.trigger('keydown', { key: 'Enter' })
+    expect(editable.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(at('2026-08-14'))
+    editable.unmount()
+
+    const plain = mountPicker({ modelValue: at('2026-08-12') })
+    expect((field(plain).element as HTMLInputElement).value).toBe('Aug 12, 2026')
+    plain.unmount()
   })
 })
 

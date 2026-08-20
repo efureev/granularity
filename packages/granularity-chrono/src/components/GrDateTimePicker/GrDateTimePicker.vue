@@ -6,10 +6,20 @@ import { titleWhenTruncated } from '@feugene/granularity'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import type { CalendarCell, DisabledDatesInput } from '../../chrono/calendarGrid'
+import { createDisabledPredicate } from '../../chrono/calendarGrid'
 import { formatPlainDate, formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { clockDate, fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import {
+  EDITABLE_DATE_FORMAT,
+  editableTimeFormat,
+  localeDatePattern,
+  localeTimePattern,
+  parseLocaleDateTime,
+  parsePartialLocaleDateTime,
+} from '../../chrono/chronoParse'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
+import { isPlainDateWithin } from '../../chrono/plainDate'
 import type { PlainTime } from '../../chrono/plainTime'
 import { plainTime } from '../../chrono/plainTime'
 import {
@@ -21,6 +31,7 @@ import {
   trailingZoneClass,
 } from '../../internal/pickerFieldStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
+import { useEditableField } from '../../internal/useEditableField'
 import { dateCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
 import TimeColumns from '../GrTimePicker/TimeColumns.vue'
@@ -73,6 +84,13 @@ export interface GrDateTimePickerProps<T = Date | null> {
   /** Вид значения в поле — опциями `Intl`, а не строкой-паттерном. */
   format?: Intl.DateTimeFormatOptions
   placeholder?: string
+  /**
+   * Значение можно набрать руками. Разбор идёт от `Intl`: порядок частей и
+   * разделители берутся у локали, а не у строки-паттерна.
+   */
+  editable?: boolean
+  /** Набранное фиксируется на уходе фокуса, а не только по `Enter`. */
+  applyOnBlur?: boolean
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -127,6 +145,8 @@ const props = withDefaults(defineProps<GrDateTimePickerProps<TValue>>(), {
   today: undefined,
   format: undefined,
   placeholder: undefined,
+  editable: false,
+  applyOnBlur: true,
   // Дефолты живут в резолвере: Vue подставил бы свои раньше, чем компонент
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
@@ -216,32 +236,9 @@ watch(panelVisible, (next) => {
   if (next && !props.autoApply) draft.value = selectedDate.value
 }, { immediate: true })
 
-const shownDate = computed<PlainDate | null>(() => (shown.value ? toPlainDate(shown.value) : null))
-const shownTime = computed<PlainTime | null>(() => (shown.value ? toPlainTime(shown.value) : null))
-
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
 const maxPlain = computed(() => (props.max ? toPlainDate(props.max) : undefined))
 const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : undefined))
-
-/**
- * Границы времени работают только внутри граничного дня: 09:00–18:00 у
- * `min = 2026-08-12T09:00` осмысленно 12 августа, а 13-го запрещало бы утро
- * без всякой причины.
- */
-const timeBounds = computed(() => {
-  const date = shownDate.value
-
-  const at = (bound: Date | undefined): PlainTime | undefined => {
-    if (!bound || !date) return undefined
-    const boundDate = toPlainDate(bound)
-
-    return boundDate.y === date.y && boundDate.m === date.m && boundDate.d === date.d
-      ? toPlainTime(bound)
-      : undefined
-  }
-
-  return { min: at(props.min), max: at(props.max) }
-})
 
 /**
  * Запреты приходят в `Date`, а сетка спрашивает кортежами. Предикат
@@ -262,15 +259,133 @@ const displayValue = computed(() => {
     return formatPlainDate(resolvedLocale.value, toPlainDate(selectedDate.value), props.format)
   }
 
-  const date = formatPlainDate(resolvedLocale.value, toPlainDate(selectedDate.value))
-  const time = formatPlainTime(resolvedLocale.value, toPlainTime(selectedDate.value), {
-    hour: twelveHour.value ? 'numeric' : '2-digit',
-    minute: '2-digit',
-    ...(props.enableSeconds ? { second: '2-digit' } : {}),
-    hour12: twelveHour.value,
-  })
+  const date = formatPlainDate(
+    resolvedLocale.value,
+    toPlainDate(selectedDate.value),
+    props.editable ? EDITABLE_DATE_FORMAT : undefined,
+  )
+  const time = formatPlainTime(resolvedLocale.value, toPlainTime(selectedDate.value), props.editable
+    ? editableTimeFormat({ seconds: props.enableSeconds, twelveHour: twelveHour.value })
+    : {
+        hour: twelveHour.value ? 'numeric' : '2-digit',
+        minute: '2-digit',
+        ...(props.enableSeconds ? { second: '2-digit' } : {}),
+        hour12: twelveHour.value,
+      })
 
   return `${date}, ${time}`
+})
+
+/**
+ * Разрешено ли значение. Спрашивается перед коммитом набранного: сетка
+ * запрещённый день просто не даёт нажать, а текст обязан проверить сам —
+ * иначе `Enter` выбирал бы то, чего не выбирает клик.
+ */
+const isDisabledDate = computed(() => createDisabledPredicate(disabledDates.value))
+
+function isAllowed(date: Date): boolean {
+  const plain = toPlainDate(date)
+  if (isDisabledDate.value(plain) || !isPlainDateWithin(plain, minPlain.value, maxPlain.value)) return false
+
+  return (!props.min || date.getTime() >= props.min.getTime())
+    && (!props.max || date.getTime() <= props.max.getTime())
+}
+
+const field = useEditableField<Date>({
+  editable: () => props.editable,
+  applyOnBlur: () => props.applyOnBlur,
+  locked: () => isLocked.value,
+  display: () => displayValue.value,
+  parse: (text) => {
+    const parts = parseLocaleDateTime(resolvedLocale.value, text)
+    if (!parts) return null
+
+    // Набрана одна дата — время остаётся прежним: не набранное не меняется.
+    // Пустая модель времени не хранит, и тогда это полночь.
+    const time = parts.time ?? (selectedDate.value ? toPlainTime(selectedDate.value) : plainTime(0, 0, 0))
+    const date = fromPlainParts(parts.date, time)
+
+    return isAllowed(date) ? date : null
+  },
+  // Минуя `put`: `autoApply` управляет панелью, где выбор многошаговый и
+  // подтверждать есть что. `Enter` в поле сам по себе и есть подтверждение, а
+  // уход в черновик выглядел бы как «ничего не произошло» — поле-то показывает
+  // модель.
+  commit: date => shell.commit(date),
+})
+
+/**
+ * Плейсхолдер редактируемого поля по умолчанию — подсказка формата: порядок
+ * частей у локалей разный, и без неё непонятно, чего от тебя ждут.
+ */
+const fieldPlaceholder = computed(() => {
+  if (props.placeholder || !props.editable) return props.placeholder
+
+  const date = localeDatePattern(resolvedLocale.value, {
+    day: t('grChrono.datePicker.patternDay', 'D'),
+    month: t('grChrono.datePicker.patternMonth', 'M'),
+    year: t('grChrono.datePicker.patternYear', 'Y'),
+  })
+  const time = localeTimePattern(resolvedLocale.value, {
+    hour: t('grChrono.timePicker.patternHour', 'H'),
+    minute: t('grChrono.timePicker.patternMinute', 'M'),
+    second: t('grChrono.timePicker.patternSecond', 'S'),
+  }, { seconds: props.enableSeconds, twelveHour: twelveHour.value })
+
+  return `${date}, ${time}`
+})
+
+function onFieldKeydown(event: KeyboardEvent): void {
+  if (field.handleKeydown(event)) return
+
+  shell.onFieldKeydown(event)
+}
+
+/**
+ * Что из набранного уже можно показать в панели.
+ *
+ * Пока текст неполон, модель трогать нельзя, а показывать набор надо: иначе
+ * человек печатает вслепую и не видит, что попадёт в значение.
+ */
+const preview = computed(() => (field.draft.value === null
+  ? null
+  : parsePartialLocaleDateTime(resolvedLocale.value, field.draft.value, { seconds: props.enableSeconds })))
+
+const shownDate = computed<PlainDate | null>(() => (
+  preview.value?.date ?? (shown.value ? toPlainDate(shown.value) : null)
+))
+
+/**
+ * Набранные части перекрывают показ по одной: час без минут подсвечивает час, а
+ * минуты остаются теми, что были. Не набранное не меняется — то же правило, по
+ * которому дата без времени сохраняет время модели.
+ */
+const shownTime = computed<PlainTime | null>(() => {
+  const base = shown.value ? toPlainTime(shown.value) : null
+  const typed = preview.value?.time
+  if (!typed) return base
+
+  return { h: typed.h ?? base?.h ?? 0, min: typed.min ?? base?.min ?? 0, s: typed.s ?? base?.s ?? 0 }
+})
+
+/**
+ * Границы времени работают только внутри граничного дня: 09:00–18:00 у
+ * `min = 2026-08-12T09:00` осмысленно 12 августа, а 13-го запрещало бы утро
+ * без всякой причины.
+ */
+const timeBounds = computed(() => {
+  const date = shownDate.value
+
+  const at = (bound: Date | undefined): PlainTime | undefined => {
+    if (!bound || !date) return undefined
+    const boundDate = toPlainDate(bound)
+
+    return boundDate.y === date.y && boundDate.m === date.m && boundDate.d === date.d
+      ? toPlainTime(bound)
+      : undefined
+  }
+
+  return { min: at(props.min), max: at(props.max) }
 })
 
 /** Новое значение: либо наружу, либо в черновик — по `autoApply`. */
@@ -347,10 +462,11 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             data-gr-date-time-picker-field
             type="text"
             role="combobox"
-            readonly
-            aria-readonly="true"
-            :value="displayValue"
-            :placeholder="placeholder"
+            :readonly="!editable"
+            :aria-readonly="editable ? undefined : 'true'"
+            :aria-autocomplete="editable ? 'none' : undefined"
+            :value="field.text.value"
+            :placeholder="fieldPlaceholder"
             :class="fieldClass"
             :disabled="isDisabled"
             :aria-label="ariaLabel"
@@ -358,11 +474,12 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="shell.togglePanel"
-            @keydown="shell.onFieldKeydown"
+            @click="editable ? shell.openPanel(false) : shell.togglePanel()"
+            @keydown="onFieldKeydown"
+            @input="field.onInput"
             @focus="emit('focus', $event)"
             @pointerenter="titleWhenTruncated"
-            @blur="emit('blur', $event)"
+            @blur="field.onBlur(); emit('blur', $event)"
           >
 
           <span :class="trailingZoneClass">

@@ -5,7 +5,7 @@ import { titleWhenTruncated } from '@feugene/granularity'
 import type { UseFloatingPlacement } from '@feugene/granularity/composables/useFloating'
 
 import { formatPlainTime, localeUsesTwelveHour } from '../../chrono/chronoFormat'
-import { parseLocaleTime } from '../../chrono/chronoParse'
+import { parseLocaleTime, parsePartialLocaleTime } from '../../chrono/chronoParse'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { clockDate, fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
 import type { PlainDate } from '../../chrono/plainDate'
@@ -202,6 +202,7 @@ const selectedTime = computed<PlainTime | null>(() => (
   selectedDate.value ? toPlainTime(selectedDate.value) : null
 ))
 
+
 const minTime = computed(() => (props.min ? toPlainTime(props.min) : undefined))
 const maxTime = computed(() => (props.max ? toPlainTime(props.max) : undefined))
 
@@ -242,6 +243,19 @@ function onFieldKeydown(event: KeyboardEvent): void {
   shell.onFieldKeydown(event)
 }
 
+/**
+ * Колонки идут за набором по частям: набран час — подсвечен час, минуты пока
+ * остаются прежними. Не набранное не меняется, и модель ждёт `Enter`.
+ */
+const shownTime = computed<PlainTime | null>(() => {
+  const draft = field.draft.value
+  const typed = draft === null ? null : parsePartialLocaleTime(resolvedLocale.value, draft)
+  if (!typed) return selectedTime.value
+
+  const base = selectedTime.value
+
+  return { h: typed.h ?? base?.h ?? 0, min: typed.min ?? base?.min ?? 0, s: typed.s ?? base?.s ?? 0 }
+})
 function onTimeChange(time: PlainTime): void {
   shell.commit(fromPlainParts(anchorDate(), time))
 }
@@ -343,7 +357,7 @@ const fieldClass = computed(() => pickerFieldClass({
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="editable ? shell.openPanel() : shell.togglePanel()"
+            @click="editable ? shell.openPanel(false) : shell.togglePanel()"
             @keydown="onFieldKeydown"
             @input="field.onInput"
             @focus="emit('focus', $event)"
@@ -384,7 +398,7 @@ const fieldClass = computed(() => pickerFieldClass({
       <div v-if="hasBeenOpen" data-gr-time-picker-panel>
           <TimeColumns
             ref="columnsRef"
-            :model-value="selectedTime"
+            :model-value="shownTime"
             :min="minTime"
             :max="maxTime"
             :minute-step="minuteStep"

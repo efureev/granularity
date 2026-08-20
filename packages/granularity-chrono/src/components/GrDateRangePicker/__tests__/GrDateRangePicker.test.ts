@@ -716,3 +716,241 @@ describe('GrDateRangePicker — порядок краёв со временем'
     expect(await announced()).toContain('The end must not come before the start')
   })
 })
+
+describe('GrDateRangePicker — ручной ввод', () => {
+  function atTime(day: number, hour = 0, minute = 0): Date {
+    return new Date(2026, 7, day, hour, minute)
+  }
+
+  async function type(wrapper: Picker, text: string) {
+    const input = field(wrapper)
+    ;(input.element as HTMLInputElement).value = text
+    await input.trigger('input')
+  }
+
+  async function commit(wrapper: Picker, text: string) {
+    await type(wrapper, text)
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+  }
+
+  it('без `editable` поле остаётся readonly и текста не принимает', async () => {
+    const wrapper = mountPicker({ modelValue: [at(12), at(14)] })
+
+    expect(field(wrapper).attributes('readonly')).toBeDefined()
+    await commit(wrapper, '08/16/2026 — 08/18/2026')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('строка из двух дат становится периодом', async () => {
+    const wrapper = mountPicker({ editable: true })
+
+    await commit(wrapper, '08/16/2026 — 08/18/2026')
+
+    expect(lastModel(wrapper)).toEqual([at(16), at(18)])
+    wrapper.unmount()
+  })
+
+  it('поле показывает период тем же видом, какой принимает обратно', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: [at(12), at(14)] })
+
+    const shown = (field(wrapper).element as HTMLInputElement).value
+    expect(shown).toBe('08/12/2026 — 08/14/2026')
+
+    // Круг замкнулся: показанное разбирается обратно в ту же пару.
+    await commit(wrapper, shown)
+    expect(lastModel(wrapper)).toEqual([at(12), at(14)])
+    wrapper.unmount()
+  })
+
+  it('обратный порядок нормализуется, как и при кликах', async () => {
+    const wrapper = mountPicker({ editable: true })
+
+    await commit(wrapper, '08/18/2026 — 08/16/2026')
+
+    expect(lastModel(wrapper)).toEqual([at(16), at(18)])
+    wrapper.unmount()
+  })
+
+  it('одна дата — не период: набранное откатывается', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: [at(12), at(14)] })
+
+    await commit(wrapper, '08/16/2026')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/12/2026 — 08/14/2026')
+    wrapper.unmount()
+  })
+
+  it('недопустимая длина отклоняется и объявляется', async () => {
+    const wrapper = mountPicker({ editable: true, maxRange: 3 })
+
+    await commit(wrapper, '08/16/2026 — 08/26/2026')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(await announced()).toBe('This range length is not allowed')
+    wrapper.unmount()
+  })
+
+  it('запрещённая граница не принимается текстом', async () => {
+    const wrapper = mountPicker({ editable: true, disabledDates: [at(18)] })
+
+    await commit(wrapper, '08/16/2026 — 08/18/2026')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('со временем набираются обе границы целиком', async () => {
+    const wrapper = mountPicker({ editable: true, enableTime: true, use12Hours: false })
+
+    await commit(wrapper, '08/16/2026, 08:00 — 08/18/2026, 20:30')
+
+    expect(lastModel(wrapper)).toEqual([atTime(16, 8, 0), atTime(18, 20, 30)])
+    wrapper.unmount()
+  })
+
+  it('время принимается ровно тогда, когда пикер его показывает', async () => {
+    const withTime = mountPicker({ editable: true, enableTime: true, use12Hours: false })
+    await commit(withTime, '08/16/2026 — 08/18/2026')
+    expect(withTime.emitted('update:modelValue')).toBeUndefined()
+    withTime.unmount()
+
+    const withoutTime = mountPicker({ editable: true })
+    await commit(withoutTime, '08/16/2026, 08:00 — 08/18/2026, 20:30')
+    expect(withoutTime.emitted('update:modelValue')).toBeUndefined()
+    withoutTime.unmount()
+  })
+
+  it('уход фокуса фиксирует набранное, а `applyOnBlur=false` — нет', async () => {
+    const wrapper = mountPicker({ editable: true })
+    await type(wrapper, '08/16/2026 — 08/18/2026')
+    await field(wrapper).trigger('blur')
+    expect(lastModel(wrapper)).toEqual([at(16), at(18)])
+    wrapper.unmount()
+
+    const strict = mountPicker({ editable: true, applyOnBlur: false })
+    await type(strict, '08/16/2026 — 08/18/2026')
+    await field(strict).trigger('blur')
+    expect(strict.emitted('update:modelValue')).toBeUndefined()
+    strict.unmount()
+  })
+
+  it('`readonly` не принимает набранное', async () => {
+    const wrapper = mountPicker({ editable: true, readonly: true, modelValue: [at(12), at(14)] })
+
+    await commit(wrapper, '08/16/2026 — 08/18/2026')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('ввод строкой закрывает период, начатый кликом в панели', async () => {
+    const wrapper = mountPicker({ editable: true })
+    await openPicker(wrapper)
+
+    await day('2026-08-20').trigger('click')
+    await commit(wrapper, '08/16/2026 — 08/18/2026')
+    expect(lastModel(wrapper)).toEqual([at(16), at(18)])
+
+    // Начало, оставшееся от клика, снято: иначе следующий клик закрыл бы период
+    // от 20-го, о котором в поле уже ничего не написано.
+    await day('2026-08-22').trigger('click')
+    await nextTick()
+
+    expect(lastModel(wrapper)).toEqual([at(16), at(18)])
+    expect(await announced()).toContain('Start date selected')
+    wrapper.unmount()
+  })
+
+  it('плейсхолдер по умолчанию показывает обе границы', () => {
+    const plain = mountPicker({ editable: true })
+    expect(field(plain).attributes('placeholder')).toBe('MM/DD/YYYY — MM/DD/YYYY')
+    plain.unmount()
+
+    const timed = mountPicker({ editable: true, enableTime: true, use12Hours: false })
+    expect(field(timed).attributes('placeholder')).toBe('MM/DD/YYYY, HH:MM — MM/DD/YYYY, HH:MM')
+    timed.unmount()
+  })
+})
+
+describe('GrDateRangePicker — время готовых периодов', () => {
+  /**
+   * Шорткат обязан давать то же, что две даты кликом: иначе «последние 7 дней»
+   * с `enable-time` молча отрезали бы последние сутки.
+   */
+  it('с `enable-time` готовый период получает 00:00 и конец суток', async () => {
+    const wrapper = mountPicker({
+      enableTime: true,
+      use12Hours: false,
+      presets: [{ label: 'Эта неделя', range: [at(10), at(16)] as const }],
+    })
+    await openPicker(wrapper)
+
+    await new DOMWrapper(queryOne('[data-gr-date-range-picker-preset]')).trigger('click')
+    await nextTick()
+
+    expect(lastModel(wrapper)).toEqual([
+      new Date(2026, 7, 10, 0, 0, 0),
+      new Date(2026, 7, 16, 23, 59, 0),
+    ])
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateRangePicker — панель идёт за набором', () => {
+  async function type(wrapper: Picker, text: string) {
+    const input = field(wrapper)
+    ;(input.element as HTMLInputElement).value = text
+    await input.trigger('input')
+  }
+
+  it('первая набранная граница подсвечивается началом периода', async () => {
+    const wrapper = mountPicker({ editable: true })
+    await openPicker(wrapper)
+
+    await type(wrapper, '08/16/2026')
+    await nextTick()
+
+    expect(day('2026-08-16').attributes('class')).toContain('--gr-calendar-selected-bg')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('обе набранные границы подсвечивают полосу между ними', async () => {
+    const wrapper = mountPicker({ editable: true })
+    await openPicker(wrapper)
+
+    await type(wrapper, '08/16/2026 — 08/20/2026')
+    await nextTick()
+
+    expect(inRange('2026-08-18')).toBe(true)
+    expect(inRange('2026-08-22')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('сетка переходит на месяц набранного', async () => {
+    const wrapper = mountPicker({ editable: true })
+    await openPicker(wrapper)
+
+    await type(wrapper, '09/23/2026')
+    await nextTick()
+
+    expect(query('[data-gr-calendar-title]').text()).toContain('September')
+    wrapper.unmount()
+  })
+
+  it('недобранная строка не гасит уже набранную границу', async () => {
+    const wrapper = mountPicker({ editable: true })
+    await openPicker(wrapper)
+
+    // Чётное число групп цифр делится пополам, и половинки не разбираются, —
+    // подсветка обязана остаться на первой границе, а не мигать по дороге.
+    await type(wrapper, '08/16/2026 — 08')
+    await nextTick()
+
+    expect(day('2026-08-16').attributes('class')).toContain('--gr-calendar-selected-bg')
+    wrapper.unmount()
+  })
+})

@@ -7,6 +7,68 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.9.0] 2026-08-20
+
+### Added
+
+- **Manual input in `GrDateTimePicker` and `GrDateRangePicker`.** `editable` now works on all four
+  pickers. One string describes two values here — a date with a time, or two bounds — and that is a
+  parser of its own, which is why these two came last.
+
+  Parsing is driven by `Intl`, not by a pattern string. Which half of the string is the date and
+  which is the time, in what order the parts come and what separates them is known by the locale:
+  `vi` puts the time first (`15:30 12/8/26`), `ko` puts the day period before the hour
+  (`오후 3:30`), `en-US` after it. Separators themselves are never matched — digit groups are
+  counted instead. That is what makes `en-CA`, where the date is itself written with hyphens
+  (`2026-08-12 - 2026-08-14`), split correctly; a list of range separators would have broken on the
+  first such locale.
+
+  For the range, the string is split in half by digit-group count and each half is parsed as a
+  bound. Reversed order is normalised, exactly as clicking backwards is. **A single date is
+  rejected**: one date is not a period, and inventing the other bound would make up something the
+  user never entered. Time is accepted precisely when the picker shows it — required on both bounds
+  with `enable-time`, refused without it. A parsed but disallowed period (`disabledDates`, `min`,
+  `max`, `minRange`, `maxRange`) is not applied and **is announced**: the input was well formed, and
+  silence would read as a lost `Enter`.
+
+  For the datetime picker, a bare date keeps the model's time — what was not typed does not change.
+  Typed text commits the model directly, bypassing `autoApply`: that prop governs the panel, where
+  selection is multi-step, while `Enter` in the field is already a finished action.
+
+  Neither field masks input: a mask would have to guess where the date ends and the time begins, and
+  fight the caret on deletion.
+
+- **The panel follows what is being typed.** In all four editable pickers, a fully typed date is
+  highlighted in the grid and the grid moves to its month; a typed hour is highlighted in the hours
+  column, minutes in the minutes column. The model is untouched until `Enter` or blur — this is a
+  preview, not a commit. Parts that were not typed keep their current value.
+
+  Typing into a panel that still shows the previous value is exactly the blind spot a text field was
+  supposed to remove, so the draft is parsed on every keystroke: completely for the date, part by
+  part for the time.
+
+### Fixed
+
+- **An editable field now shows what it can parse back.** With `editable`, values are rendered as
+  digits (`08/12/2026`) instead of `Aug 12, 2026`. Editing a number in place used to leave the
+  parser two digit groups instead of three, so the edit was silently rolled back although the user
+  had done nothing wrong. An explicit `format` still wins. This also affects `GrDatePicker`, where
+  the same defect had been present since `editable` was introduced.
+- **A disallowed date is no longer accepted as text.** `disabledDates`, `min` and `max` now apply to
+  `Enter` in the field the same way they apply to a click, in all three editable pickers. The grid
+  refuses such a day; the field used to take it.
+- **A time column now scrolls to a selection that changed while it was open.** Scrolling happened
+  only when the panel opened, so a value set from anywhere else — typing in the field, an external
+  `v-model` write — stayed off-screen and the highlight was useless. Jumping to a new value also
+  centres it instead of stopping at the nearest edge: an hour pinned to the bottom of the column
+  reads as "nothing below". Stepping with arrow keys still stops at the edge, so the list does not
+  jump under the hand.
+- **Clicking an editable field no longer moves focus into the panel.** The panel opens, as before,
+  but focus stays where the user put it: they came to type. Keyboard opening (`↓`) still moves into
+  the grid — that is what it means.
+- **Quick ranges honour `enable-time`.** A footer preset committed two midnights while the same two
+  dates picked by hand got 00:00 and the end of day, so "last 7 days" quietly dropped the final day.
+
 ## [v0.8.0] 2026-08-20
 
 ### Added

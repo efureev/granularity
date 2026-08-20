@@ -36,6 +36,9 @@
     "hours": "Часы",
     "minutes": "Минуты",
     "seconds": "Секунды",
-    "period": "До и после полудня"
+    "period": "До и после полудня",
+    "patternHour": "Ч",
+    "patternMinute": "М",
+    "patternSecond": "С"
   }
 }

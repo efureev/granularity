@@ -11,6 +11,15 @@ import { formatPlainDate, formatPlainTime, localeUsesTwelveHour } from '../../ch
 import TimeColumns from '../GrTimePicker/TimeColumns.vue'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { fromPlainParts, resolveChronoAdapter, toPlainDate, toPlainTime } from '../../chrono/chronoModel'
+import {
+  EDITABLE_DATE_FORMAT,
+  editableTimeFormat,
+  localeDatePattern,
+  localeTimePattern,
+  parseLocaleDateTime,
+  parsePartialLocaleDateTime,
+  splitLocaleRange,
+} from '../../chrono/chronoParse'
 import type { PlainTime } from '../../chrono/plainTime'
 import { floorToStep } from '../../chrono/plainTime'
 import type { IsoWeekday, PlainDate } from '../../chrono/plainDate'
@@ -26,6 +35,7 @@ import {
 import { presetRowClass } from '../../internal/presetRowStyles'
 import { rangeTimeLabelClass, rangeTimeRowClass } from './grDateRangePickerStyles'
 import PickerSurface from '../../internal/PickerSurface.vue'
+import { useEditableField } from '../../internal/useEditableField'
 import { rangeCodec, usePickerShell } from '../../internal/usePickerShell'
 import GrButton from '@feugene/granularity/components/GrButton'
 import GrCalendar from '../GrCalendar/GrCalendar.vue'
@@ -95,6 +105,13 @@ export interface GrDateRangePickerProps<T = Date> {
   /** Разделитель границ в поле. */
   separator?: string
   placeholder?: string
+  /**
+   * Период можно набрать руками одной строкой. Порядок частей и разделители
+   * берутся из локали; чем разделены сами границы, разбору безразлично.
+   */
+  editable?: boolean
+  /** Набранное фиксируется на уходе фокуса, а не только по `Enter`. */
+  applyOnBlur?: boolean
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -160,6 +177,8 @@ const props = withDefaults(defineProps<GrDateRangePickerProps<TItem>>(), {
   format: undefined,
   separator: ' — ',
   placeholder: undefined,
+  editable: false,
+  applyOnBlur: true,
   // Дефолты живут в резолвере: Vue подставил бы свои раньше, чем компонент
   // заглянет в `GrConfigProvider`.
   clearable: undefined,
@@ -261,9 +280,6 @@ const selectedRange = computed<[PlainDate, PlainDate] | null>(() => (
   selected.value ? [toPlainDate(selected.value[0]), toPlainDate(selected.value[1])] : null
 ))
 
-const rangeStart = computed(() => anchor.value ?? selectedRange.value?.[0] ?? null)
-const rangeEnd = computed(() => (anchor.value ? null : selectedRange.value?.[1] ?? null))
-
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
 const maxPlain = computed(() => (props.max ? toPlainDate(props.max) : undefined))
 const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : undefined))
@@ -346,16 +362,19 @@ function setBoundTime(edge: 0 | 1, time: PlainTime): void {
  * `GrDateTimePicker`: два пикера обязаны читаться одинаково.
  */
 function boundLabel(date: PlainDate, edge: 0 | 1): string {
-  const text = formatPlainDate(resolvedLocale.value, date, props.format)
+  const format = props.format ?? (props.editable ? EDITABLE_DATE_FORMAT : undefined)
+  const text = formatPlainDate(resolvedLocale.value, date, format)
   const times = boundTimes.value
   if (!props.enableTime || props.format || !times) return text
 
-  const time = formatPlainTime(resolvedLocale.value, times[edge], {
-    hour: twelveHour.value ? 'numeric' : '2-digit',
-    minute: '2-digit',
-    ...(props.enableSeconds ? { second: '2-digit' } : {}),
-    hour12: twelveHour.value,
-  })
+  const time = formatPlainTime(resolvedLocale.value, times[edge], props.editable
+    ? editableTimeFormat({ seconds: props.enableSeconds, twelveHour: twelveHour.value })
+    : {
+        hour: twelveHour.value ? 'numeric' : '2-digit',
+        minute: '2-digit',
+        ...(props.enableSeconds ? { second: '2-digit' } : {}),
+        hour12: twelveHour.value,
+      })
 
   return `${text}, ${time}`
 }
@@ -367,6 +386,117 @@ const displayValue = computed(() => {
   const [from, to] = range
 
   return [boundLabel(from, 0), boundLabel(to, 1)].join(props.separator)
+})
+
+/**
+ * Одна граница из своей половины строки.
+ *
+ * Время обязательно ровно тогда, когда пикер его показывает: без `enableTime`
+ * набранные часы некуда деть, а с ним — нечем заполнить вторую колонку. Молча
+ * проглотить и то, и другое значило бы показать значение, которого не вводили.
+ */
+function parseBound(text: string): Date | null {
+  const parts = parseLocaleDateTime(resolvedLocale.value, text)
+  if (!parts || props.enableTime !== (parts.time !== null)) return null
+
+  return fromPlainParts(parts.date, parts.time ?? undefined)
+}
+
+const field = useEditableField<[Date, Date]>({
+  editable: () => props.editable,
+  applyOnBlur: () => props.applyOnBlur,
+  locked: () => isLocked.value,
+  display: () => displayValue.value,
+  parse: (text) => {
+    const halves = splitLocaleRange(resolvedLocale.value, text)
+    if (!halves) return null
+
+    const bounds = halves.map(parseBound)
+    if (bounds.some(bound => bound === null)) return null
+
+    // Порядок нормализуется, как и у кликов: период можно вести назад.
+    const [from, to] = (bounds as Date[]).sort((a, b) => a.getTime() - b.getTime()) as [Date, Date]
+
+    // Разобралось, но не подошло — это единственный случай, когда сказать
+    // нужно вслух: пользователь набрал всё правильно, а не произошло ничего.
+    if (!canSetRange(from, to)) {
+      announce(t('grChrono.dateRangePicker.lengthRejected', 'This range length is not allowed'))
+
+      return null
+    }
+
+    return [from, to]
+  },
+  commit: (value) => {
+    shell.commit(value)
+    announceRange(toPlainDate(value[0]), toPlainDate(value[1]))
+
+    // Незакрытый период, начатый в панели, после ввода строкой уже не про то
+    // значение, что стоит в поле.
+    anchor.value = null
+    hovered.value = null
+  },
+})
+
+/** Плейсхолдер-подсказка: обе границы, чтобы было видно, что их ждут две. */
+const fieldPlaceholder = computed(() => {
+  if (props.placeholder || !props.editable) return props.placeholder
+
+  const date = localeDatePattern(resolvedLocale.value, {
+    day: t('grChrono.datePicker.patternDay', 'D'),
+    month: t('grChrono.datePicker.patternMonth', 'M'),
+    year: t('grChrono.datePicker.patternYear', 'Y'),
+  })
+
+  if (!props.enableTime) return `${date}${props.separator}${date}`
+
+  const time = localeTimePattern(resolvedLocale.value, {
+    hour: t('grChrono.timePicker.patternHour', 'H'),
+    minute: t('grChrono.timePicker.patternMinute', 'M'),
+    second: t('grChrono.timePicker.patternSecond', 'S'),
+  }, { seconds: props.enableSeconds, twelveHour: twelveHour.value })
+
+  return `${date}, ${time}${props.separator}${date}, ${time}`
+})
+
+function onFieldKeydown(event: KeyboardEvent): void {
+  if (field.handleKeydown(event)) return
+
+  shell.onFieldKeydown(event)
+}
+
+/**
+ * Границы, уже набранные в поле. Пока в строке одна дата, она показывается
+ * началом периода — тем же состоянием, что и после первого клика в сетке.
+ *
+ * Делить строку пополам можно только при чётном числе групп цифр, а по дороге
+ * оно бывает и нечётным. Поэтому неудачное деление не гасит подсветку: строка
+ * разбирается ещё раз как одна граница.
+ */
+const previewRange = computed<[PlainDate | null, PlainDate | null]>(() => {
+  const draft = field.draft.value
+  if (draft === null) return [null, null]
+
+  const bound = (text: string): PlainDate | null => parsePartialLocaleDateTime(
+    resolvedLocale.value,
+    text,
+    { seconds: props.enableSeconds },
+  ).date
+
+  const halves = splitLocaleRange(resolvedLocale.value, draft)
+  const first = halves ? bound(halves[0]) : null
+
+  return first ? [first, halves ? bound(halves[1]) : null] : [bound(draft), null]
+})
+
+const rangeStart = computed(() => (
+  previewRange.value[0] ?? anchor.value ?? selectedRange.value?.[0] ?? null
+))
+
+const rangeEnd = computed(() => {
+  if (previewRange.value[0]) return previewRange.value[1]
+
+  return anchor.value ? null : selectedRange.value?.[1] ?? null
 })
 
 /** Длина периода в днях, считая обе границы: 12–12 августа — это один день. */
@@ -465,7 +595,7 @@ function setRange(from: Date, to: Date): boolean {
 
   const [start, end] = orderPlain(toPlainDate(from), toPlainDate(to))
 
-  shell.commit([fromPlainParts(start), fromPlainParts(end)])
+  shell.commit(withDefaultTimes(start, end))
   announceRange(start, end)
   anchor.value = null
   hovered.value = null
@@ -551,10 +681,11 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             data-gr-date-range-picker-field
             type="text"
             role="combobox"
-            readonly
-            aria-readonly="true"
-            :value="displayValue"
-            :placeholder="placeholder"
+            :readonly="!editable"
+            :aria-readonly="editable ? undefined : 'true'"
+            :aria-autocomplete="editable ? 'none' : undefined"
+            :value="field.text.value"
+            :placeholder="fieldPlaceholder"
             :class="fieldClass"
             :disabled="isDisabled"
             :aria-label="ariaLabel"
@@ -562,11 +693,12 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             :aria-invalid="isInvalid ? 'true' : undefined"
             :aria-required="isRequired ? 'true' : undefined"
             :aria-busy="loading ? 'true' : undefined"
-            @click="shell.togglePanel"
-            @keydown="shell.onFieldKeydown"
+            @click="editable ? shell.openPanel(false) : shell.togglePanel()"
+            @keydown="onFieldKeydown"
+            @input="field.onInput"
             @focus="emit('focus', $event)"
             @pointerenter="titleWhenTruncated"
-            @blur="emit('blur', $event)"
+            @blur="field.onBlur(); emit('blur', $event)"
           >
 
           <span :class="trailingZoneClass">
@@ -604,6 +736,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
             ref="calendarRef"
             :model-value="null"
             :announce-selection="false"
+            :view-date="previewRange[0] ?? undefined"
             :range-start="rangeStart"
             :range-end="rangeEnd"
             :range-preview="hovered"

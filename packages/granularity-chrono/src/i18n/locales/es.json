@@ -36,6 +36,9 @@
     "hours": "Horas",
     "minutes": "Minutos",
     "seconds": "Segundos",
-    "period": "a. m./p. m."
+    "period": "a. m./p. m.",
+    "patternHour": "H",
+    "patternMinute": "M",
+    "patternSecond": "S"
   }
 }

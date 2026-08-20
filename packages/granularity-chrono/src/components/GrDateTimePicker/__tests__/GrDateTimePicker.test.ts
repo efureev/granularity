@@ -356,3 +356,183 @@ describe('GrDateTimePicker — проброс слота шапки недели
     wrapper.unmount()
   })
 })
+
+async function type(wrapper: Picker, text: string) {
+  const input = field(wrapper)
+  ;(input.element as HTMLInputElement).value = text
+  await input.trigger('input')
+}
+
+describe('GrDateTimePicker — ручной ввод', () => {
+  it('без `editable` поле не принимает текст и остаётся readonly', async () => {
+    const wrapper = mountPicker({ modelValue: at(12, 9, 30) })
+
+    expect(field(wrapper).attributes('readonly')).toBeDefined()
+    await type(wrapper, '8/14/2026, 10:00')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(lastModel(wrapper)).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('набранное уходит наружу по `Enter`', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+
+    await type(wrapper, '8/14/2026, 10:15')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(lastModel(wrapper)).toEqual(at(14, 10, 15))
+    wrapper.unmount()
+  })
+
+  it('одна дата без времени сохраняет время модели', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+
+    await type(wrapper, '8/14/2026')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(lastModel(wrapper)).toEqual(at(14, 9, 30))
+    wrapper.unmount()
+  })
+
+  it('уход фокуса фиксирует набранное, а `applyOnBlur=false` — нет', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+
+    await type(wrapper, '8/14/2026, 10:15')
+    await field(wrapper).trigger('blur')
+    expect(lastModel(wrapper)).toEqual(at(14, 10, 15))
+    wrapper.unmount()
+
+    const strict = mountPicker({ editable: true, applyOnBlur: false, modelValue: at(12, 9, 30) })
+
+    await type(strict, '8/14/2026, 10:15')
+    await strict.trigger('blur')
+    await field(strict).trigger('blur')
+    expect(lastModel(strict)).toBeUndefined()
+    strict.unmount()
+  })
+
+  it('мусор откатывается к значению модели', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+
+    await type(wrapper, 'кто здесь')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(lastModel(wrapper)).toBeUndefined()
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/12/2026, 09:30')
+    wrapper.unmount()
+  })
+
+  /** Инвариант 11: запрещённое не выбирается ни кликом, ни `Enter`. */
+  it('запрещённая дата не принимается текстом', async () => {
+    const wrapper = mountPicker({
+      editable: true,
+      modelValue: at(12, 9, 30),
+      disabledDates: [at(14)],
+    })
+
+    await type(wrapper, '8/14/2026, 10:15')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+    expect(lastModel(wrapper)).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('значение вне `min`/`max` не принимается текстом', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30), max: at(12, 18, 0) })
+
+    await type(wrapper, '8/12/2026, 19:00')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+    expect(lastModel(wrapper)).toBeUndefined()
+
+    await type(wrapper, '8/12/2026, 17:00')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+    expect(lastModel(wrapper)).toEqual(at(12, 17, 0))
+    wrapper.unmount()
+  })
+
+  it('`readonly` не принимает набранное', async () => {
+    const wrapper = mountPicker({ editable: true, readonly: true, modelValue: at(12, 9, 30) })
+
+    await type(wrapper, '8/14/2026, 10:15')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(lastModel(wrapper)).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('текст подтверждает сам себя и при `autoApply=false`', async () => {
+    const wrapper = mountPicker({ editable: true, autoApply: false, modelValue: at(12, 9, 30) })
+
+    await type(wrapper, '8/14/2026, 10:15')
+    await field(wrapper).trigger('keydown', { key: 'Enter' })
+
+    expect(lastModel(wrapper)).toEqual(at(14, 10, 15))
+    wrapper.unmount()
+  })
+
+  it('плейсхолдер по умолчанию — подсказка формата локали', () => {
+    const wrapper = mountPicker({ editable: true })
+
+    expect(field(wrapper).attributes('placeholder')).toBe('MM/DD/YYYY, HH:MM')
+    wrapper.unmount()
+  })
+})
+
+describe('GrDateTimePicker — панель идёт за набором', () => {
+  it('набранная целиком дата подсвечивается и переводит сетку, модель не трогая', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    await type(wrapper, '9/23/2026')
+    await nextTick()
+
+    expect(query('[data-gr-calendar-title]').text()).toContain('September')
+    expect(day('2026-09-23').attributes('class')).toContain('--gr-calendar-selected-bg')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('набранный час подсвечивается в колонке, минуты остаются прежними', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    await type(wrapper, '8/12/2026 18')
+    await nextTick()
+
+    expect(timeOption('hour-18').attributes('aria-selected')).toBe('true')
+    expect(timeOption('minute-30').attributes('aria-selected')).toBe('true')
+    wrapper.unmount()
+  })
+
+  it('дописанные минуты подсвечиваются следом', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    await type(wrapper, '8/12/2026 18:45')
+    await nextTick()
+
+    expect(timeOption('hour-18').attributes('aria-selected')).toBe('true')
+    expect(timeOption('minute-45').attributes('aria-selected')).toBe('true')
+    wrapper.unmount()
+  })
+
+  /**
+   * Первый `Esc` при открытой панели достаётся ей, а не полю: стек слоёв ловит
+   * его в capture-фазе и гасит, чтобы нажатие не провалилось на слой ниже.
+   * Черновик снимает второй — или первый, если панель не открывали.
+   */
+  it('снятый черновик возвращает панель к модели', async () => {
+    const wrapper = mountPicker({ editable: true, modelValue: at(12, 9, 30) })
+    await openPicker(wrapper)
+
+    await type(wrapper, '9/23/2026 18:45')
+    await field(wrapper).trigger('keydown', { key: 'Escape' })
+    await field(wrapper).trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect((field(wrapper).element as HTMLInputElement).value).toBe('08/12/2026, 09:30')
+    expect(query('[data-gr-calendar-title]').text()).toContain('August')
+    expect(timeOption('hour-9').attributes('aria-selected')).toBe('true')
+    wrapper.unmount()
+  })
+})

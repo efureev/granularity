@@ -3,10 +3,14 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import {
   localeDateOrder,
   localeDatePattern,
+  localeDateTimeOrder,
+  localeTimePattern,
   maskLocaleDate,
   parseLocaleDate,
+  parseLocaleDateTime,
   parseLocaleTime,
   resetChronoParseCache,
+  splitLocaleRange,
 } from '../chronoParse'
 
 beforeEach(() => {
@@ -126,5 +130,127 @@ describe('разбор времени', () => {
     expect(parseLocaleTime('en-US', '9:60')).toBeNull()
     expect(parseLocaleTime('en-US', '13:00 PM')).toBeNull()
     expect(parseLocaleTime('en-US', '9')).toBeNull()
+  })
+})
+
+describe('взаимное расположение даты и времени', () => {
+  it('вьетнамский показывает время первым', () => {
+    expect(localeDateTimeOrder('vi').timeFirst).toBe(true)
+    expect(localeDateTimeOrder('en-US').timeFirst).toBe(false)
+  })
+
+  it('корейский ставит половину суток перед часом, американский — после', () => {
+    expect(localeDateTimeOrder('ko').dayPeriodFirst).toBe(true)
+    expect(localeDateTimeOrder('en-US').dayPeriodFirst).toBe(false)
+  })
+
+  it('некорректный тег не роняет разбор', () => {
+    expect(localeDateTimeOrder('не-локаль').timeSeparator).toBe(':')
+  })
+})
+
+describe('разбор даты со временем', () => {
+  it('дата и время через запятую', () => {
+    expect(parseLocaleDateTime('ru-RU', '12.08.2026, 14:30')).toEqual({
+      date: { y: 2026, m: 7, d: 12 },
+      time: { h: 14, min: 30, s: 0 },
+    })
+  })
+
+  it('половина суток остаётся при времени, а не при дате', () => {
+    expect(parseLocaleDateTime('en-US', '8/12/2026, 3:30 PM')).toEqual({
+      date: { y: 2026, m: 7, d: 12 },
+      time: { h: 15, min: 30, s: 0 },
+    })
+  })
+
+  it('половина суток перед часом читается там, где локаль её так и пишет', () => {
+    expect(parseLocaleDateTime('ko', '2026. 8. 12. 오후 3:30')).toEqual({
+      date: { y: 2026, m: 7, d: 12 },
+      time: { h: 15, min: 30, s: 0 },
+    })
+  })
+
+  it('время перед датой — тоже дата со временем', () => {
+    expect(parseLocaleDateTime('vi', '15:30 12/8/2026')).toEqual({
+      date: { y: 2026, m: 7, d: 12 },
+      time: { h: 15, min: 30, s: 0 },
+    })
+  })
+
+  it('секунды разбираются шестой группой', () => {
+    expect(parseLocaleDateTime('ru-RU', '12.08.2026, 14:30:45')?.time).toEqual({ h: 14, min: 30, s: 45 })
+  })
+
+  it('одна дата разбирается без времени', () => {
+    expect(parseLocaleDateTime('ru-RU', '12.08.2026')).toEqual({
+      date: { y: 2026, m: 7, d: 12 },
+      time: null,
+    })
+  })
+
+  it('неполный ввод и несуществующая дата не разбираются', () => {
+    expect(parseLocaleDateTime('ru-RU', '12.08.2026, 14')).toBeNull()
+    expect(parseLocaleDateTime('ru-RU', '31.02.2026, 14:30')).toBeNull()
+    expect(parseLocaleDateTime('ru-RU', '12.08.2026, 25:30')).toBeNull()
+  })
+})
+
+describe('деление строки диапазона', () => {
+  it('две даты режутся пополам по числу групп цифр', () => {
+    expect(splitLocaleRange('ru-RU', '12.08.2026 — 14.08.2026')).toEqual(['12.08.2026', ' — 14.08.2026'])
+  })
+
+  /** Дефис внутри даты — не разделитель границ, и опознавать его не нужно. */
+  it('дефисы внутри дат не путают деление', () => {
+    const parts = splitLocaleRange('en-CA', '2026-08-12 - 2026-08-14')
+
+    expect(parts?.map(part => parseLocaleDate('en-CA', part))).toEqual([
+      { y: 2026, m: 7, d: 12 },
+      { y: 2026, m: 7, d: 14 },
+    ])
+  })
+
+  it('половина суток между границами достаётся своей', () => {
+    const parts = splitLocaleRange('en-US', '8/12/2026, 3:30 PM — 8/14/2026, 5:00 PM')
+
+    expect(parts?.map(part => parseLocaleDateTime('en-US', part)?.time)).toEqual([
+      { h: 15, min: 30, s: 0 },
+      { h: 17, min: 0, s: 0 },
+    ])
+  })
+
+  it('в префиксной локали та же половина достаётся правой границе', () => {
+    const parts = splitLocaleRange('ko', '2026. 8. 12. 오전 9:00 ~ 2026. 8. 14. 오후 5:00')
+
+    expect(parts?.map(part => parseLocaleDateTime('ko', part)?.time)).toEqual([
+      { h: 9, min: 0, s: 0 },
+      { h: 17, min: 0, s: 0 },
+    ])
+  })
+
+  it('нечётное число групп делить нечем', () => {
+    expect(splitLocaleRange('ru-RU', '12.08.2026 — 14.08')).toBeNull()
+    expect(splitLocaleRange('ru-RU', '')).toBeNull()
+  })
+})
+
+describe('подсказка формата времени', () => {
+  it('часы и минуты разделителем локали', () => {
+    expect(localeTimePattern('ru-RU', { hour: 'Ч', minute: 'М', second: 'С' })).toBe('ЧЧ:ММ')
+  })
+
+  it('секунды и половина суток дописываются по запросу', () => {
+    const letters = { hour: 'H', minute: 'M', second: 'S' }
+
+    expect(localeTimePattern('en-US', letters, { seconds: true })).toBe('HH:MM:SS')
+    expect(localeTimePattern('en-US', letters, { twelveHour: true })).toBe('HH:MM AM')
+  })
+
+  it('в префиксной локали половина суток идёт впереди', () => {
+    const pattern = localeTimePattern('ko', { hour: 'H', minute: 'M', second: 'S' }, { twelveHour: true })
+
+    expect(pattern.startsWith('HH')).toBe(false)
+    expect(pattern.endsWith('HH:MM')).toBe(true)
   })
 })

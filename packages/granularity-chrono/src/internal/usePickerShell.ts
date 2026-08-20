@@ -174,7 +174,8 @@ export interface UsePickerShellReturn<TParsed = Date> {
   hasBeenOpen: Ref<boolean>
   fieldEl: Ref<HTMLInputElement | null>
   showClear: ComputedRef<boolean>
-  openPanel: () => void
+  /** `moveFocus = false` оставляет фокус в поле: см. саму функцию. */
+  openPanel: (moveFocus?: boolean) => void
   closePanel: () => void
   togglePanel: () => void
   onFieldKeydown: (event: KeyboardEvent) => void
@@ -244,6 +245,8 @@ export function usePickerShell<TValue, TParsed = Date>(
 
   const fieldEl = ref<HTMLInputElement | null>(null)
 
+  const focusPanelOnOpen = ref(true)
+
   /**
    * Монтирование и перенос фокуса висят на самом состоянии, а не на обработчике
    * открытия: панель открывают и снаружи, через `v-model:open`, и такой вызов
@@ -258,15 +261,28 @@ export function usePickerShell<TValue, TParsed = Date>(
     // пользователя значит забирать его у страницы на монтировании.
     if (props().inline) return
 
+    // Однократное «не забирай фокус»: следующее открытие снова обычное, каким
+    // бы способом оно ни пришло.
+    const moveFocus = focusPanelOnOpen.value
+    focusPanelOnOpen.value = true
+    if (!moveFocus) return
+
     // Два тика: первый монтирует панель, второй отдаёт ей отрисованное содержимое.
     await nextTick()
     await nextTick()
     options.focusPanel()
   }, { immediate: true })
 
-  function openPanel(): void {
+  /**
+   * Клик в **редактируемое** поле открывает панель, но фокус обязан остаться в
+   * поле: пользователь пришёл печатать, а не выбирать мышью, и уехавший на
+   * втором тике фокус съел бы набранное. Клавиатурное открытие (`↓`) —
+   * наоборот: оно ровно и значит «уведи меня в сетку».
+   */
+  function openPanel(moveFocus = true): void {
     if (isDisabled.value || panelOpen.value || props().inline) return
 
+    focusPanelOnOpen.value = moveFocus
     panelOpen.value = true
   }
 
