@@ -31,9 +31,7 @@ import { createInitialItem, joinPath } from '../../model'
 import type { GrUiArrayOptions, GrUiColumns } from '../../ui-schema'
 
 import { useSchemaForm } from './context'
-import GrSchemaField from './GrSchemaField.vue'
-import GrSchemaUnionField from './GrSchemaUnionField.vue'
-import SchemaObjectNode from './SchemaObjectNode.vue'
+import SchemaNodeSwitch from './SchemaNodeSwitch.vue'
 import {
   columnsToClass,
   schemaArrayEmptyClass,
@@ -362,28 +360,9 @@ defineExpose({ add, remove, move, duplicate, focusRow, count: computed(() => row
 
           <slot name="row" :index="index" :item="item" :path="joinPath(arrayName, index)" :fields="rowFields(index)">
             <template v-for="field in rowFields(index)" :key="field.name">
-              <GrSchemaUnionField
-                v-if="field.node.kind === 'union'"
-                :node="field.node"
-                :path="field.templatePath"
-                :name="field.name"
-                :indices="field.indices"
+              <SchemaNodeSwitch
+                :field="field"
                 :columns="columns ?? ui?.columns"
-              />
-              <SchemaObjectNode
-                v-else-if="field.node.kind === 'object'"
-                :node="field.node"
-                :path="field.templatePath"
-                :name="field.name"
-                :indices="field.indices"
-                :columns="columns ?? ui?.columns"
-              />
-              <GrSchemaField
-                v-else
-                :node="field.node"
-                :path="field.templatePath"
-                :name="field.name"
-                :indices="field.indices"
                 :disabled="disabled"
                 :readonly="readonly"
               />

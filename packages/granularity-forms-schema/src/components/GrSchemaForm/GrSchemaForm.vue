@@ -43,9 +43,7 @@ import { useGrComponentProp } from '@feugene/granularity/composables/useGrCompon
 
 import { provideSchemaForm } from './context'
 import GrSchemaAdditionalFields from './GrSchemaAdditionalFields.vue'
-import GrSchemaArrayField from './GrSchemaArrayField.vue'
-import GrSchemaField from './GrSchemaField.vue'
-import GrSchemaUnionField from './GrSchemaUnionField.vue'
+import SchemaNodeSwitch from './SchemaNodeSwitch.vue'
 import SchemaObjectNode from './SchemaObjectNode.vue'
 import {
   columnsToClass,
@@ -525,46 +523,14 @@ defineExpose({
 
       <div v-else :class="gridClass">
         <template v-for="field in rootFields" :key="field.name">
-          <GrSchemaArrayField
-            v-if="field.node.kind === 'array' && field.node.item.kind === 'object'"
-            :node="field.node"
-            :path="field.templatePath"
-            :name="field.name"
-            :indices="field.indices"
-            :ui="ui.fields?.[field.templatePath]?.array"
-            :heading-level="resolvedHeadingLevel"
-            :disabled="disabled"
-            :readonly="readonly"
-            class="col-span-full"
-          />
-          <SchemaObjectNode
-            v-else-if="field.node.kind === 'object'"
-            :node="field.node"
-            :path="field.templatePath"
-            :name="field.name"
-            :indices="field.indices"
+          <SchemaNodeSwitch
+            :field="field"
             :columns="resolvedColumns"
             :heading-level="resolvedHeadingLevel"
-            class="col-span-full"
-          />
-          <GrSchemaUnionField
-            v-else-if="field.node.kind === 'union'"
-            :node="field.node"
-            :path="field.templatePath"
-            :name="field.name"
-            :indices="field.indices"
-            :columns="resolvedColumns"
-            :heading-level="resolvedHeadingLevel"
-            class="col-span-full"
-          />
-          <GrSchemaField
-            v-else-if="field.leaf"
-            :node="field.node"
-            :path="field.templatePath"
-            :name="field.name"
-            :indices="field.indices"
             :label-position="resolvedLabelPosition"
             :label-width="resolvedLabelWidth"
+            :disabled="disabled"
+            :readonly="readonly"
             @unresolved="(node, name) => emit('unresolved', node, name)"
           />
         </template>

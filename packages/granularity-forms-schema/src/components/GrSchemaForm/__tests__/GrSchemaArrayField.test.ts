@@ -147,3 +147,36 @@ describe('доступность', () => {
     expect(remove[1]!.attributes('aria-label')).toBe('Remove position 2')
   })
 })
+
+/**
+ * Повторитель раздаёт строкам `disabled`/`readonly` собственными пропами, а
+ * `GrSchemaField` резолвит их цепочкой `props ?? uiSchema ?? форма`. Пока
+ * умолчанием было литеральное `false`, оно короткозамыкало оба нижних яруса:
+ * поле, выключенное через `uiSchema`, внутри строки оставалось доступным, —
+ * и ровно так же вело себя, когда `disabled` не задавали вовсе.
+ */
+describe('выключенность доходит до строк', () => {
+  it('`uiSchema` выключает поле внутри строки', async () => {
+    const wrapper = mount(GrSchemaForm, {
+      props: {
+        schema,
+        adapters: [jsonSchemaAdapter],
+        modelValue: reactive({ items: [{ name: '', qty: 1 }] }),
+        uiSchema: { fields: { 'items.*.name': { disabled: true } } },
+      },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const name = wrapper.findAll('[data-gr-schema-row] input')[0]!
+    expect((name.element as HTMLInputElement).disabled).toBe(true)
+  })
+
+  it('без указаний поле строки остаётся доступным', async () => {
+    const wrapper = mountForm(reactive({ items: [{ name: '', qty: 1 }] }))
+    await nextTick()
+
+    const name = wrapper.findAll('[data-gr-schema-row] input')[0]!
+    expect((name.element as HTMLInputElement).disabled).toBe(false)
+  })
+})

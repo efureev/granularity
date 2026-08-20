@@ -7,6 +7,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.1] 2026-08-20
+
+### Fixed
+
+- **`uiSchema` could not disable a field inside a repeater row.** `GrSchemaField` resolves
+  `props.disabled ?? uiSchema ?? form`, and every caller passed a literal `false` down — which
+  short-circuits both lower tiers. A field marked `disabled` (or `readonly`) for
+  `items.*.name` stayed editable, with nothing to indicate why. `false` now means "no opinion" and
+  is not forwarded; only `true` travels down.
+
+### Changed
+
+- **The node-kind switch lives in one place.** Array-of-objects, union, nested object and leaf field
+  were dispatched by four separate copies of the same `v-if` chain — the form root, both branches of
+  `SchemaObjectNode` and the repeater row. That is how the union branch shipped missing from two of
+  them in `0.3.0`. The chain now lives in `SchemaNodeSwitch.vue`, and the `structuralKinds` gate
+  fails both when a caller stops delegating to it and when a caller grows a copy of its own.
+
+  Internal only — no public component, prop or slot changed.
+
 ## [v0.3.0] 2026-08-20
 
 ### Added
