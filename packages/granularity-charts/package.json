@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-charts",
   "description": "Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -156,7 +156,7 @@
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.27.0",
-    "@feugene/granularity-test-kit": "^0.3.0",
+    "@feugene/granularity-test-kit": "^0.4.0",
     "@feugene/unocss-preset-granular": "^0.9.1",
     "@feugene/unplugin-granularity": "^0.4.1",
     "@types/node": "^26.1.1",
@@ -176,7 +176,7 @@
     "vue-tsc": "^3.3.7"
   },
   "scripts": {
-    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "build": "vite build && gr-check-dist-dev-guard && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "doctor": "granular doctor ./granular.options.mjs --strict",
     "generate:registry": "node scripts/generate-registry.mjs",

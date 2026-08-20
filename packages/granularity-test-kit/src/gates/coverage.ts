@@ -15,6 +15,7 @@ export const REQUIRED_GATES = [
   'defineComponentDocsGate',
   'defineEmitNamingGate',
   'defineLocaleCompletenessGate',
+  'defineEnvGuardGate',
 ] as const
 
 export interface GateCoverageOptions {

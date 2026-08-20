@@ -80,6 +80,16 @@ Every `defaults.ts` augments the registry at the module where it is declared, an
 augmentation routed through a re-export works until a second one — declared directly — enters the same
 program; then the first silently stops applying, with no error at all.
 
+The gate also checks that a declared default is **read**. Declaring one and never reading it is a promise
+nobody keeps: `GrConfigProvider` configures, the component never looks, and nothing says so. Two such
+props lived that way and were both found by hand. Reads are collected across the whole `src` — not the
+component's own directory — because the resolution is sometimes hoisted into a shared module: chrono's
+four pickers read their props from `src/internal/usePickerShell.ts`. Four channels count as evidence: a
+literal call (newlines included), `useGrComponentSize` with `{ component }` for the `size` key, a manual
+chain through `useGrComponentDefaults`, and a call whose component name is a variable — that last one
+counts the key for every component in the package. Coarse on purpose: it can miss a dead default, but it
+never invents one, and a gate that cries wolf gets switched off.
+
 | Option | Default | What it is for |
 | --- | --- | --- |
 | `registryModule` | — | the only accepted augmentation target |
@@ -118,6 +128,32 @@ design: `t()` falls back to English, so only a gate ever notices.
 | `locales` | `['en','ru','es']` | the first one is the base |
 | `pluralForms` | `false` | require CLDR plural categories |
 | `keyParity` | `{ sourceDirs: ['src'] }` | compare asked-for keys against declared ones |
+
+### `defineEnvGuardGate(options?)`
+
+One symbol guards every dev-time warning, and this gate keeps it that way. It fails on two things: an
+environment check written by hand (`process.env.NODE_ENV` is a `ReferenceError` in a worker;
+`import.meta.env?.DEV` is silently `undefined` outside Vite), and a `console.*` call with no guard above
+it — that one shipped four warnings into consumers' production builds, because nothing was checking for
+the *absence* of a condition.
+
+The guard counts on the same line (inline `&& __GR_DEV__`) and on any line above: one block guard
+routinely covers four warnings in a row. A warning whose guard sits lower — in a module function called
+from a guarded site — goes into `allowUnguarded` with a reason.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `srcDir` | `<cwd>/src` | where to scan |
+| `guard` | `'__GR_DEV__'` | the symbol |
+| `guardValue` | — | pass `__GR_DEV__` from the package: `define` is textual and never reaches this factory from `node_modules` |
+| `minFiles` | `0` | anti-silence floor for the scan |
+| `minGuards` | — | anti-silence floor for guards; only for packages that certainly have them |
+| `allowUnguarded` | `{}` | `{ path: reason }`; the reason is required |
+
+The paired check runs on the built package: `gr-check-dist-dev-guard`, a bin this package ships. Add it
+to `build` — `vite build && gr-check-dist-dev-guard && vue-tsc …`. Unit tests run with the guard defined
+as `true`, so a `define` that stopped working stays invisible to them while consumers get
+`__GR_DEV__ is not defined` on import.
 
 ### `defineGateCoverage(options?)`
 

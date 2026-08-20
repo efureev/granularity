@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.8.1] 2026-08-20
+
+### Fixed
+
+- **Two dev warnings no longer reach production.** Repeated categories in a series and a series carrying
+  both `data` and `x`/`y` are reported through `console.warn`, and neither call was behind a condition —
+  the message shipped in consumers' builds. The package now expands `__GR_DEV__` on build like the core
+  does, and the paired `gr-check-dist-dev-guard` runs on `yarn build` so a substitution that stops
+  working fails the build instead of reaching a consumer as `__GR_DEV__ is not defined`.
+
 ## [v0.8.0] 2026-08-20
 
 ### Added

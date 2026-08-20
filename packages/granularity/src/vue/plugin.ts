@@ -89,7 +89,8 @@ function installComponent(app: App, c: GranularityInstallableComponent): void {
     }
 
     // Сознательно без throw — просто сообщаем в dev-режиме.
-     
+    if (!__GR_DEV__) return
+
     console.warn('[granularity] component passed to createGranularity has no `install`, `name`, or `__name` — skipped.')
 }
 
@@ -105,7 +106,8 @@ function installDirective(app: App, d: GranularityInstallableDirective): void {
     }
 
     // Сознательно без throw — согласовано с `installComponent`.
-     
+    if (!__GR_DEV__) return
+
     console.warn('[granularity] directive passed to createGranularity has no `install` or `{ name, directive }` — skipped.')
 }
 

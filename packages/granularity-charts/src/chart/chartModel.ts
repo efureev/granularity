@@ -453,7 +453,7 @@ function collectCategories(series: readonly GrChartSeries[]): string[] {
     }
   }
 
-  if (duplicates > 0) {
+  if (duplicates > 0 && __GR_DEV__) {
     console.warn(
       `[granularity-charts] в серии повторяются категории (${duplicates}) — точки объединены по имени`,
     )
@@ -467,7 +467,7 @@ function readPoints(
   kind: GrChartScaleKind,
   categoryIndex: ReadonlyMap<string, number>,
 ): NormalizedPoint[] {
-  if (series.data && (series.x || series.y))
+  if (series.data && (series.x || series.y) && __GR_DEV__)
     console.warn(`[granularity-charts] серия «${series.id}»: заданы и \`data\`, и \`x\`/\`y\` — взят \`data\``)
 
   if (series.data) {

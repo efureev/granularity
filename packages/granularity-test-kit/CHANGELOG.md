@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.0] 2026-08-20
+
+### Added
+
+- **`defineEnvGuardGate`** — the dev-guard rule, until now a hand-written test living only in the core.
+  It fails on an environment check written by hand (`process.env.NODE_ENV` throws in a worker,
+  `import.meta.env?.DEV` is silently `undefined` outside Vite) and — this part is new — on a `console.*`
+  call with **no guard above it**. Nothing was checking for the *absence* of a condition, so four
+  warnings shipped into consumers' production builds while every gate stayed green. The guard counts on
+  the same line and on any line above, because one block guard routinely covers four warnings in a row;
+  a warning whose guard sits lower goes into `allowUnguarded` with a reason. A weaker, file-level version
+  ("the guard appears somewhere in the file") was written first and discarded: the very first mutation
+  check walked straight through it.
+- **`gr-check-dist-dev-guard`** — the paired check on the built package, now a bin instead of a script
+  copied per package. Unit tests run with the guard defined as `true`, so a `define` that stopped working
+  is invisible to them while consumers get `__GR_DEV__ is not defined` on import. Add it to `build`:
+  `vite build && gr-check-dist-dev-guard && vue-tsc …`.
+- `REQUIRED_GATES` gained `defineEnvGuardGate`, so `defineGateCoverage` now asks every package for it.
+
+### Changed
+
+- **`defineComponentDefaultsGate` checks that a declared default is read.** Declaring one and never
+  reading it is a promise nobody keeps: the provider configures, the component never looks, and nothing
+  says so — two props lived that way and both were found by hand. Reads are collected across the whole
+  `src`, not the component's directory, because resolution is sometimes hoisted into a shared module.
+  Four channels count as evidence: a literal call including multi-line ones, `useGrComponentSize` with
+  `{ component }` for the `size` key, a manual chain through `useGrComponentDefaults`, and a call whose
+  component name is a variable — that one counts the key for every component in the package. Coarse on
+  purpose: it can miss a dead default but never invents one, and a gate that cries wolf gets switched off.
+  A naive version of the same check produces sixteen red entries with zero real ones.
+
 ## [v0.3.0] 2026-08-19
 
 ### Added

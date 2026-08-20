@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-test-kit",
   "description": "Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -36,8 +36,12 @@
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "files": [
+    "bin",
     "dist"
   ],
+  "bin": {
+    "gr-check-dist-dev-guard": "./bin/check-dist-dev-guard.mjs"
+  },
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",

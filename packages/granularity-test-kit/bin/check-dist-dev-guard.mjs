@@ -1,22 +1,28 @@
+#!/usr/bin/env node
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import process from 'node:process'
 
 /**
- * Парный гейт к `src/__tests__/envGuard.test.ts` — по собранному `dist`.
+ * Парный гейт к `defineEnvGuardGate` — по собранному `dist`.
  *
  * Юнит-тесты идут с `define: { __GR_DEV__: 'true' }`, поэтому отвалившаяся
  * подстановка на сборке им незаметна: тесты останутся зелёными, а потребитель
  * получит `__GR_DEV__ is not defined` в момент импорта. Проверять это можно
  * только по собранному пакету, отсюда скрипт, а не тест.
  *
- * Проверяется две вещи:
- * 1. имени `__GR_DEV__` в `dist` не осталось — значит `define` отработал;
- * 2. развёрнутое условие в `dist` есть — значит оно развернулось во что-то
- *    осмысленное, а не в `true`/`false`, зашитые на нашей стороне.
+ * Живёт в тест-ките бинарём, а не копией в каждом пакете: копии расходятся на
+ * первой же правке, а этот скрипт — единственное место, где записано, как
+ * выглядит правильно развёрнутый гард.
+ *
+ * Проверяется три вещи:
+ * 1. в `dist` вообще что-то есть — иначе сборка не отработала;
+ * 2. имени `__GR_DEV__` не осталось — значит `define` отработал;
+ * 3. развёрнутое условие есть — значит оно развернулось во что-то осмысленное,
+ *    а не в `true`/`false`, зашитые на нашей стороне.
  */
 
-const distDir = fileURLToPath(new URL('../dist', import.meta.url))
+const distDir = resolve(process.cwd(), process.argv[2] ?? 'dist')
 
 const GUARD = 'process.env.NODE_ENV !== \'production\''
 const GUARD_DOUBLE = 'process.env.NODE_ENV !== "production"'
@@ -32,7 +38,7 @@ function jsFiles(dir) {
 const files = jsFiles(distDir).filter(file => statSync(file).isFile())
 
 if (files.length === 0) {
-  console.error('[dev-guard] в `dist` нет ни одного .js — сборка не отработала')
+  console.error(`[dev-guard] в \`${distDir}\` нет ни одного .js — сборка не отработала`)
   process.exit(1)
 }
 
@@ -49,7 +55,7 @@ for (const file of files) {
 
 if (leaked.length > 0) {
   console.error(
-    `[dev-guard] \`__GR_DEV__\` уехал в \`dist\` неразвёрнутым — у потребителя это `
+    '[dev-guard] `__GR_DEV__` уехал в `dist` неразвёрнутым — у потребителя это '
     + `ReferenceError на импорте. Проверь \`define\` в \`vite.config.ts\`:\n  ${leaked.join('\n  ')}`,
   )
   process.exit(1)

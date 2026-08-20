@@ -4,9 +4,101 @@ import process from 'node:process'
 
 import { describe, expect, it } from 'vitest'
 
-import { componentDirs } from '../sources'
+import { componentDirs, readSources, stripComments } from '../sources'
 
 const AUGMENTATION = /declare module '([^']+)'/g
+
+/**
+ * Свидетельства того, что настраиваемый проп кто-то читает.
+ *
+ * Каналов четыре, и это не запас прочности: наивная проверка «есть строка
+ * `useGrComponentProp('GrX', 'key'`» даёт шестнадцать красных, среди которых
+ * ноль виноватых. Каждый канал закрывает свою форму записи, встречающуюся в
+ * репозитории.
+ */
+const LITERAL_PROP = /useGrComponentProp\(\s*'(Gr\w+)'\s*,\s*'(\w+)'/g
+const DYNAMIC_PROP = /useGrComponentProp\(\s*(?!['\s])[^,]*,\s*'(\w+)'/g
+const LITERAL_SIZE = /useGrComponentSize[\s\S]{0,160}?\{\s*component:\s*'(Gr\w+)'/g
+const DYNAMIC_SIZE = /useGrComponentSize[\s\S]{0,160}?\{\s*component:\s*(?!')/g
+const MANUAL_DEFAULTS = /useGrComponentDefaults\(\s*'(Gr\w+)'/g
+const MANUAL_READ = /\.value\.(\w+)/g
+
+export interface ReadEvidence {
+  /** Ключи, прочитанные для конкретного компонента. */
+  byComponent: Map<string, Set<string>>
+  /** Ключи, прочитанные с нелитеральным именем компонента: засчитываются всем. */
+  wildcard: Set<string>
+  /** Сколько свидетельств собрано всего — страховка от сломавшейся регулярки. */
+  total: number
+}
+
+function add(map: Map<string, Set<string>>, component: string, key: string): void {
+  const keys = map.get(component) ?? new Set<string>()
+
+  keys.add(key)
+  map.set(component, keys)
+}
+
+/**
+ * Собирает свидетельства по **всему** `src`, а не по директории компонента.
+ *
+ * Резолв бывает вынесен в общий модуль вне `src/components` — у chrono все
+ * четыре пикера читают свои пропы из `src/internal/usePickerShell.ts`, и по
+ * директории компонента там не найти ничего.
+ */
+export function collectReadsFrom(sources: readonly { source: string }[]): ReadEvidence {
+  const evidence: ReadEvidence = { byComponent: new Map(), wildcard: new Set(), total: 0 }
+
+  for (const { source } of sources) {
+    const code = stripComments(source)
+
+    for (const [, component, key] of code.matchAll(LITERAL_PROP)) {
+      add(evidence.byComponent, component!, key!)
+      evidence.total += 1
+    }
+
+    for (const [, component] of code.matchAll(LITERAL_SIZE)) {
+      add(evidence.byComponent, component!, 'size')
+      evidence.total += 1
+    }
+
+    // Имя компонента приходит переменной — какому именно оно принадлежит, из
+    // текста не узнать: связать `usePickerShell` с четырьмя пикерами можно
+    // только разобрав тип-объединение. Ключ засчитывается всем компонентам
+    // пакета. Огрубление даёт ложные **отрицания**, но не ложные срабатывания,
+    // а гейт, который врёт, выключают.
+    for (const [, key] of code.matchAll(DYNAMIC_PROP)) {
+      evidence.wildcard.add(key!)
+      evidence.total += 1
+    }
+
+    if (DYNAMIC_SIZE.test(code)) {
+      evidence.wildcard.add('size')
+      evidence.total += 1
+    }
+    DYNAMIC_SIZE.lastIndex = 0
+
+    // Ручная цепочка: у пропа производный дефолт, и `useGrComponentProp` с его
+    // константным `fallback` не годится. Ключи такого файла засчитываются
+    // компонентам, чьи дефолты он взял.
+    const manual = [...code.matchAll(MANUAL_DEFAULTS)].map(match => match[1]!)
+
+    if (manual.length > 0) {
+      for (const [, key] of code.matchAll(MANUAL_READ)) {
+        for (const component of manual) {
+          add(evidence.byComponent, component, key!)
+          evidence.total += 1
+        }
+      }
+    }
+  }
+
+  return evidence
+}
+
+function collectReads(srcDir: string): ReadEvidence {
+  return collectReadsFrom(readSources({ dir: srcDir, extensions: /\.(?:ts|vue)$/ }))
+}
 
 export interface ComponentDefaultsGateOptions {
   /** Корень пакета; по умолчанию — cwd, из которого запущен vitest. */
@@ -104,6 +196,8 @@ export function defineComponentDefaultsGate(options: ComponentDefaultsGateOption
     .filter(({ path }) => existsSync(path))
     .map(({ component, path }) => ({ component, source: readFileSync(path, 'utf8') }))
 
+  const reads = collectReads(resolve(pkgDir, 'src'))
+
   describe('реестр componentDefaults', () => {
     it('в пакете есть компоненты с настраиваемыми пропами', () => {
       // Гейт на пустом списке зелен всегда — проверяем, что список не опустел.
@@ -162,6 +256,32 @@ export function defineComponentDefaultsGate(options: ComponentDefaultsGateOption
         expect(offenders, offenders.join('\n')).toEqual([])
       },
     )
+
+    /**
+     * Объявить проп настраиваемым и не прочитать его — обещание, которого никто
+     * не выполняет: `GrConfigProvider` настраивает, компонент не смотрит, а
+     * узнать об этом неоткуда. Так прожили `showWeekNumbers` у chrono и четыре
+     * ключа `GrSchemaForm`; оба раза их нашли руками.
+     */
+    it('каждый настраиваемый проп кто-то читает', () => {
+      const offenders = files.flatMap(({ component, source }) => {
+        const read = reads.byComponent.get(component) ?? new Set<string>()
+
+        return configurableKeys(source)
+          .filter(key => !read.has(key) && !reads.wildcard.has(key))
+          .map(key => `${component}.${key}`)
+      })
+
+      expect(
+        offenders,
+        `${offenders.join('\n')}\n\nобъявлены настраиваемыми, но не читаются: дочитай проп или убери ключ из реестра`,
+      ).toEqual([])
+    })
+
+    it('разбор нашёл чтения — регулярки не молчат', () => {
+      // Сломанное выражение иначе зеленит проверку выше на любом пакете.
+      expect(reads.total, 'ни одного чтения настраиваемого пропа не найдено').toBeGreaterThanOrEqual(files.length)
+    })
 
     it.runIf(options.registryDeclaration !== undefined)('реестр объявлен там, куда ссылаются аугментации', () => {
       const declaration = options.registryDeclaration!

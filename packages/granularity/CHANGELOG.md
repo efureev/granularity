@@ -7,6 +7,22 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.27.2] 2026-08-20
+
+### Fixed
+
+- **Two dev warnings no longer reach production.** `createGranularity` warns when a component or a
+  directive arrives without `install`, `name` or `__name` — both calls sat outside any condition, so the
+  message shipped in consumers' builds. The comment above one of them had claimed a dev-mode check that
+  was never there.
+
+### Changed
+
+- The dev-guard gate moved to `@feugene/granularity-test-kit` (`defineEnvGuardGate`), and
+  `scripts/check-dist-dev-guard.mjs` was replaced by the `gr-check-dist-dev-guard` bin the kit ships. The
+  rule itself got stricter — a `console.*` call now needs a guard above it — which is what exposed the
+  two warnings above.
+
 ## [v0.27.1] 2026-08-19
 
 ### Changed

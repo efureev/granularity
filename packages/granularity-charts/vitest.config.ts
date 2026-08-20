@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [vue()],
+  define: { __GR_DEV__: 'true' },
   test: {
     coverage: {
       provider: 'v8',
