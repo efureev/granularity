@@ -43,6 +43,37 @@ describe('свободные ключи', () => {
     expect((keyInputs(wrapper)[0]!.element as HTMLInputElement).value).toBe('colour')
   })
 
+  it('поле значения подписано своим ключом', async () => {
+    const wrapper = mountForm(reactive({ title: 'Заголовок', colour: 'красный' }))
+    await nextTick()
+
+    // Видимой подписи у пары нет — её роль играет само поле ключа, — поэтому
+    // имя контролу значения обязан дать `aria-label`. Без него axe объявляет
+    // `label` critical: поле есть, назвать его диктору нечем.
+    const value = wrapper.find('[data-gr-schema-additional-row] [data-gr-schema-field] input')
+    expect(value.attributes('aria-label')).toContain('colour')
+
+    // Поле ключа подписано своей строкой, а не ключом: путать их нельзя.
+    expect(keyInputs(wrapper)[0]!.attributes('aria-label')).not.toContain('colour')
+
+    wrapper.unmount()
+  })
+
+  it('переименование ключа переносит подпись на значение', async () => {
+    const wrapper = mountForm(reactive({ title: '', colour: 'красный' }))
+    await nextTick()
+
+    const key = keyInputs(wrapper)[0]!
+    ;(key.element as HTMLInputElement).value = 'tint'
+    await key.trigger('change')
+    await nextTick()
+
+    const value = wrapper.find('[data-gr-schema-additional-row] [data-gr-schema-field] input')
+    expect(value.attributes('aria-label')).toContain('tint')
+
+    wrapper.unmount()
+  })
+
   it('объявленное поле в свободные не попадает', async () => {
     const wrapper = mountForm(reactive({ title: 'Заголовок' }))
     await nextTick()

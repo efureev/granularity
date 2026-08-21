@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-forms-schema",
   "description": "Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",

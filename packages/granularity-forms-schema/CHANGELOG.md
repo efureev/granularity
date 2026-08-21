@@ -7,7 +7,20 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [v0.3.1] 2026-08-20
+## [v0.3.2] 2026-08-22
+
+### Fixed
+
+- **A free-key value field had no accessible name.** In a pair «key — value» the visible label is
+  the key input itself, so the value control was left with nothing: `GrFormField` without a `label`
+  gives no name, and an input drawn next to it does not become one. axe reported it as `label`,
+  critical. The value is now named by its own key («Value of {key}»), and the name follows a rename.
+
+### Added
+
+- **`GrSchemaField` accepts `ariaLabel`** — a name for the control where a visible label does not
+  belong (a table cell, a free-key row). Weaker than `ui.controlProps`, so a consumer can still name
+  the field their own way.
 
 ### Fixed
 

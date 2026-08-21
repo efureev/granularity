@@ -219,8 +219,12 @@ defineExpose({ add, remove, count: computed(() => rows.value.length) })
           />
         </div>
 
+        <!-- Подпись пары рисует поле ключа слева, поэтому у значения видимой
+             подписи нет — имя ему даёт сам ключ. Без этого контрол остаётся
+             безымянным: `GrFormField` без `label` имени не даёт. -->
         <GrSchemaField
           :class="schemaAdditionalValueClass"
+          :aria-label="t('grForms.additional.valueLabel', 'Value of {key}', { key: row.key })"
           :node="valueNode"
           :path="valuePath"
           :name="nameOf(row.key)"

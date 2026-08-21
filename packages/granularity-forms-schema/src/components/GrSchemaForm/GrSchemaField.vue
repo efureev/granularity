@@ -47,6 +47,13 @@ export interface GrSchemaFieldProps {
   /** Не рисовать обвязку — только контрол. Для поля в ячейке таблицы. */
   bare?: boolean
 
+  /**
+   * Доступное имя контрола там, где видимой подписи нет и быть не должно:
+   * строка свободного ключа, ячейка таблицы. Слабее `ui.controlProps`, чтобы
+   * потребитель мог назвать поле по-своему.
+   */
+  ariaLabel?: string
+
   label?: string
   hint?: string
   labelPosition?: 'top' | 'start'
@@ -72,6 +79,7 @@ const props = withDefaults(defineProps<GrSchemaFieldProps>(), {
   readonly: undefined,
   error: undefined,
   bare: false,
+  ariaLabel: undefined,
   label: undefined,
   hint: undefined,
   labelPosition: undefined,
@@ -139,6 +147,7 @@ const control = computed(() => {
   }) ?? {}
 
   return {
+    ...(props.ariaLabel === undefined ? {} : { ariaLabel: props.ariaLabel }),
     ...fromRenderer,
     ...(ui.value?.options ? { options: ui.value.options } : {}),
     ...(ui.value?.placeholder ? { placeholder: ui.value.placeholder } : {}),
