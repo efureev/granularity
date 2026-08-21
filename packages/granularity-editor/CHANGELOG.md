@@ -7,6 +7,20 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.1] 2026-08-21
+
+### Fixed
+
+- **Toolbar buttons draw icons instead of a letter.** A button used to print the first letter of its
+  label, and the letters collided: `B` was both Bold and Bulleted list, `H` both headings, `C` both
+  inline code and code block. The panel looked broken because it was unreadable — no action could be
+  picked without hovering every button.
+
+  Icons are inline SVG shipped with the package, not `i-lucide-*` classes: an icon class is generated
+  by the application's UnoCSS build, so a consumer without their own `presetIcons` would get blank
+  squares — the same unreadable panel, now on their side. The label stays as the button's accessible
+  name and is now also its `title`.
+
 ## [v0.1.0] 2026-08-21
 
 ### Added

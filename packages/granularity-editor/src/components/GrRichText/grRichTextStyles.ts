@@ -41,6 +41,9 @@ export const bubbleClass = 'flex items-center gap-1'
 
 export const contentClass = 'px-3 py-2 outline-none'
 
+/** Иконка кнопки: размер ведёт кегль, поэтому в `em`, а не в пикселях. */
+export const iconClass = 'h-[1.15em] w-[1.15em]'
+
 /**
  * Классы из `.ts`-хелпера обязаны быть в safelist: бандлер выносит модуль в
  * общий `dist/chunks/`, а пресет сканирует только `dist/components/<Name>/**`.
@@ -57,4 +60,5 @@ export const grRichTextSafelist: string[] = [
   ...splitClassTokens(toolbarSeparatorClass),
   ...splitClassTokens(bubbleClass),
   ...splitClassTokens(contentClass),
+  ...splitClassTokens(iconClass),
 ]

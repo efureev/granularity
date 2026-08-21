@@ -277,3 +277,44 @@ describe('GrRichText — предупреждения разработки', () 
     wrapper.unmount()
   })
 })
+
+describe('GrRichText — иконки тулбара', () => {
+  /**
+   * Буква вместо иконки была нечитаемой: `B` — и «Bold», и «Bulleted list»,
+   * `H` — оба заголовка, `C` — код в строке и блок кода. По такой панели нельзя
+   * выбрать действие, не наводя курсор на каждую кнопку.
+   */
+  it('каждая кнопка рисует контур, а не букву', async () => {
+    const wrapper = mountEditor({ schema: 'article' })
+    await ready(wrapper)
+
+    for (const button of actions(wrapper)) {
+      expect(button.find('svg').exists(), button.attributes('data-key')).toBe(true)
+      expect(button.findAll('svg path').length).toBeGreaterThan(0)
+      expect(button.text().trim()).toBe('')
+    }
+
+    wrapper.unmount()
+  })
+
+  it('подпись остаётся именем кнопки и всплывающей подсказкой', async () => {
+    const wrapper = mountEditor({ schema: 'article' })
+    await ready(wrapper)
+
+    const bold = action(wrapper, 'bold')
+
+    expect(bold.attributes('aria-label')).toBe('Bold')
+    expect(bold.attributes('title')).toBe('Bold')
+    wrapper.unmount()
+  })
+
+  it('контуры у действий разные: одинаковые не различить на глаз', async () => {
+    const wrapper = mountEditor({ schema: 'article' })
+    await ready(wrapper)
+
+    const shapes = actions(wrapper).map(button => button.findAll('svg path').map(p => p.attributes('d')).join('|'))
+
+    expect(new Set(shapes).size).toBe(shapes.length)
+    wrapper.unmount()
+  })
+})

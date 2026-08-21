@@ -20,10 +20,12 @@ import { useRovingFocus } from '@feugene/granularity/composables/useRovingFocus'
 import type { GrRichTextAction, GrRichTextExtension, GrRichTextSchemaName } from '../../editor/schemas'
 import { createSchema } from '../../editor/schemas'
 
+import { iconPathsFor } from './icons'
 import type { GrRichTextSize } from './grRichTextStyles'
 import {
   bubbleClass,
   contentClass,
+  iconClass,
   rootClass,
   rootDisabledClass,
   rootFocusClass,
@@ -397,11 +399,23 @@ const rootClasses = computed(() => [
           :aria-pressed="isActive(action)"
           :aria-label="t(action.labelKey, action.labelFallback)"
           :tabindex="roving.tabindexFor(action.key)"
+          :title="t(action.labelKey, action.labelFallback)"
           @click="run(action)"
           @focus="roving.setActive(action.key)"
         >
           <slot :name="`action-${action.key}`" :action="action" :active="isActive(action)">
-            {{ t(action.labelKey, action.labelFallback).slice(0, 1) }}
+            <svg
+              :class="iconClass"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
+            </svg>
           </slot>
         </GrButton>
       </template>
@@ -431,9 +445,21 @@ const rootClasses = computed(() => [
           square
           :aria-pressed="isActive(action)"
           :aria-label="t(action.labelKey, action.labelFallback)"
+          :title="t(action.labelKey, action.labelFallback)"
           @click="run(action)"
         >
-          {{ t(action.labelKey, action.labelFallback).slice(0, 1) }}
+          <svg
+            :class="iconClass"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
+          </svg>
         </GrButton>
       </div>
     </GrPopover>
