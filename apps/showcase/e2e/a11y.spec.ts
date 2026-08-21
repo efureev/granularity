@@ -38,6 +38,11 @@ for (const target of scanTargets) {
   test(`a11y: ${target.name} has no un-baselined serious/critical violations`, async ({ page }) => {
     await page.goto(target.path)
     await page.locator(target.ready).waitFor()
+    // Демо приезжают асинхронными компонентами, а `ready` — это заголовок
+    // секции: он появляется раньше них. Без ожидания axe успевал просканировать
+    // пустые рамки превью и объявить страницу чистой, ничего не проверив.
+    await expect.poll(async () => page.evaluate(() => [...document.querySelectorAll('[data-example-preview]')]
+      .filter(preview => preview.childElementCount === 0).length)).toBe(0)
 
     await expectNoA11yRegressions(page, {
       include: '[data-example-preview]',
