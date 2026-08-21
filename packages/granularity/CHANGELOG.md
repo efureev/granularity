@@ -9,6 +9,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrBreadcrumbs` — `iconOnly` on an item.** The classic home icon at the start of a trail: the
+  icon is shown, the label is hidden visually but stays in the markup under `sr-only`. It is neither
+  dropped nor moved into `aria-label` on purpose — a trail is read by search engines and screen
+  readers alike, and an unnamed house makes the first item empty for a blind user.
+
+  Without `icon` the flag is ignored and warns in development: hiding the label while showing
+  nothing in its place erases the item, and in the markup everything still looks fine.
+
 - **`GrBreadcrumbs` — `currentIndex`.** Which item is the current page; unset keeps the previous
   behaviour (the last one). `-1` states that the current page is not in the path at all — its name
   lives in the page `h1` and the trail shows parents only. Then no item gets `aria-current` and the

@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrBreadcrumbs from '../GrBreadcrumbs.vue'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
@@ -509,5 +509,62 @@ const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', 
     const wrapper = mountPath({ items: [{ label: 'Главная', href: '/', icon: CustomIcon }, { label: 'Тут' }] })
 
     expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
+  })
+})
+
+describe('GrBreadcrumbs — пункт-иконка', () => {
+  const home = { label: 'Главная', href: '#/', icon: 'i-lucide-house', iconOnly: true }
+
+  /**
+   * Подпись прячется визуально, но остаётся в разметке: путь читают и поиском,
+   * и диктором, и «домик» без имени делает первый пункт для незрячего пустым.
+   */
+  it('подпись скрыта визуально, но не удалена', () => {
+    const wrapper = mount(GrBreadcrumbs, { props: { items: [home, { label: 'Проект' }] } })
+    const label = wrapper.findAll('[data-gr-breadcrumbs-item] span').find(span => span.text() === 'Главная')
+
+    expect(label).toBeDefined()
+    expect(label!.classes()).toContain('sr-only')
+    expect(wrapper.text()).toContain('Главная')
+
+    wrapper.unmount()
+  })
+
+  it('иконка при этом рисуется', () => {
+    const wrapper = mount(GrBreadcrumbs, { props: { items: [home, { label: 'Проект' }] } })
+
+    expect(wrapper.find('.i-lucide-house').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('соседние пункты подпись не прячут', () => {
+    const wrapper = mount(GrBreadcrumbs, { props: { items: [home, { label: 'Проект' }] } })
+    const labels = wrapper.findAll('span').filter(span => span.text() === 'Проект')
+
+    expect(labels.some(span => span.classes().includes('sr-only'))).toBe(false)
+    wrapper.unmount()
+  })
+
+  /** Спрятать подпись, не показав иконку, значит стереть пункт. */
+  it('`iconOnly` без иконки оставляет подпись видимой и предупреждает', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrBreadcrumbs, {
+      props: { items: [{ label: 'Главная', iconOnly: true }, { label: 'Проект' }] },
+    })
+
+    const label = wrapper.findAll('span').find(span => span.text() === 'Главная')
+
+    expect(label!.classes()).not.toContain('sr-only')
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('iconOnly'))
+
+    warn.mockRestore()
+    wrapper.unmount()
+  })
+
+  it('последний пункт остаётся текущим независимо от пункта-иконки', () => {
+    const wrapper = mount(GrBreadcrumbs, { props: { items: [home, { label: 'Проект' }] } })
+
+    expect(wrapper.find('[aria-current="page"]').text()).toContain('Проект')
+    wrapper.unmount()
   })
 })

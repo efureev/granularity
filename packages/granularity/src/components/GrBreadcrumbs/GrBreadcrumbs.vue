@@ -12,6 +12,7 @@ import {
   breadcrumbsItemIconClass,
   breadcrumbsItemWrapClass,
   breadcrumbsLabelClass,
+  breadcrumbsLabelHiddenClass,
   breadcrumbsListClass,
   breadcrumbsListNowrapClass,
   breadcrumbsListWrapClass,
@@ -176,6 +177,31 @@ const resolvedCurrentIndex = computed(() => props.currentIndex ?? lastIndex.valu
 
 function isCurrent(index: number): boolean {
   return index === resolvedCurrentIndex.value
+}
+
+/**
+ * Класс подписи: у пункта-иконки она прячется визуально, но остаётся в
+ * разметке — путь читают и поиском, и диктором.
+ *
+ * Без иконки поле игнорируется: спрятать подпись, не показав ничего взамен,
+ * значит стереть пункт. Молчать тут нельзя — в разметке всё на месте, и
+ * пропажу видно только глазами.
+ */
+function labelClassFor(item: GrBreadcrumbItem): string {
+  if (!item.iconOnly) return breadcrumbsLabelClass
+
+  if (!item.icon) {
+    if (__GR_DEV__) {
+      console.warn(
+        `[granularity] GrBreadcrumbs: у пункта «${item.label}» стоит \`iconOnly\` без \`icon\`. `
+        + 'Подпись осталась видимой: прятать её, не показав иконку, значит стереть пункт.',
+      )
+    }
+
+    return breadcrumbsLabelClass
+  }
+
+  return breadcrumbsLabelHiddenClass
 }
 
 /**
@@ -362,7 +388,7 @@ async function expand(): Promise<void> {
                 :class="[breadcrumbsItemIconClass, iconClass(entry.item.icon)]"
                 aria-hidden="true"
               />
-              <span :class="breadcrumbsLabelClass">{{ entry.item.label }}</span>
+              <span :class="labelClassFor(entry.item)">{{ entry.item.label }}</span>
             </slot>
           </GrLink>
 
@@ -386,7 +412,7 @@ async function expand(): Promise<void> {
                 :class="[breadcrumbsItemIconClass, iconClass(entry.item.icon)]"
                 aria-hidden="true"
               />
-              <span :class="breadcrumbsLabelClass">{{ entry.item.label }}</span>
+              <span :class="labelClassFor(entry.item)">{{ entry.item.label }}</span>
             </slot>
           </span>
         </li>

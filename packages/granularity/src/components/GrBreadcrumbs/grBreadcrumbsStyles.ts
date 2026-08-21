@@ -15,6 +15,16 @@ export type GrBreadcrumbItem = {
    * UnoCSS-сборки (`i-lucide-*` требует вашего `presetIcons`).
    */
   icon?: string | Component
+  /**
+   * Показывать только иконку: подпись прячется визуально, но остаётся в
+   * разметке и в дереве доступности. Классический «домик» в начале пути.
+   *
+   * Подпись не выбрасывается и не подменяется на `aria-label` намеренно: путь
+   * читают и поиском, и диктором, и пункт без имени для незрячего пустой.
+   * Без `icon` поле игнорируется — прятать подпись, ничего не показав взамен,
+   * значит стереть пункт.
+   */
+  iconOnly?: boolean
   disabled?: boolean
   /** Доступное имя пункта, когда подписи недостаточно («Настройки» → «Настройки проекта»). */
   ariaLabel?: string
@@ -62,6 +72,9 @@ export const breadcrumbsItemWrapClass = 'flex items-center min-w-0'
 export const breadcrumbsItemIconClass = 'inline-block h-4 w-4 shrink-0'
 
 export const breadcrumbsLabelClass = 'truncate'
+
+/** Подпись пункта-иконки: не видна, но читается диктором и поиском. */
+export const breadcrumbsLabelHiddenClass = 'sr-only'
 
 /**
  * Кнопка «…»: раскрывает схлопнутую середину пути на месте. Оформлена как
