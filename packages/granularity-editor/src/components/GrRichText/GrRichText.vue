@@ -353,6 +353,18 @@ function closeBubble(): void {
 }
 
 /**
+ * Пузырёк живёт при выделении, а не сам по себе, поэтому закрытие с той стороны
+ * (Esc) обязано погасить якорь: иначе `open` тут же вернулся бы в `true`.
+ *
+ * Клик вне у него отключён намеренно. Слушать пришлось бы `click`, а именно им
+ * заканчивается протяжка выделения — пузырёк закрывался бы ровно в тот момент,
+ * когда должен появиться. Источник истины один: выделение и фокус в поле.
+ */
+function onBubbleOpen(next: boolean): void {
+  if (!next) closeBubble()
+}
+
+/**
  * Якорь пузырька — прямоугольник выделения в координатах вьюпорта: у выделения
  * нет своего элемента, и `GrPopover` для такого случая принимает `anchor`.
  */
@@ -459,35 +471,45 @@ const rootClasses = computed(() => [
       placement="top"
       size="sm"
       :close-on-content-click="false"
+      :auto-focus="false"
+      :close-on-click-outside="false"
+      @update:open="onBubbleOpen"
     >
-      <div data-gr-rich-text-bubble :class="bubbleClass">
-        <GrButton
-          v-for="action in actions"
-          :key="action.key"
-          data-gr-rich-text-bubble-action
-          :data-key="action.key"
-          :size="toolbarButtonSize[resolvedSize]"
-          variant="ghost"
-          square
-          :aria-pressed="isActive(action)"
-          :aria-label="t(action.labelKey, action.labelFallback)"
-          :title="t(action.labelKey, action.labelFallback)"
-          @click="run(action)"
-        >
-          <svg
-            :class="iconClass"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
+      <template #content>
+        <div data-gr-rich-text-bubble :class="bubbleClass">
+          <!-- `mousedown.prevent` здесь обязателен, в отличие от панели сверху:
+               пузырёк держится на фокусе в тексте, и уход фокуса на кнопку гасит
+               его блюром прямо под курсором — второй формат подряд применить уже
+               нечем. Панель сверху от фокуса не зависит и обходится без этого. -->
+          <GrButton
+            v-for="action in actions"
+            :key="action.key"
+            data-gr-rich-text-bubble-action
+            :data-key="action.key"
+            :size="toolbarButtonSize[resolvedSize]"
+            variant="ghost"
+            square
+            :aria-pressed="isActive(action)"
+            :aria-label="t(action.labelKey, action.labelFallback)"
+            :title="t(action.labelKey, action.labelFallback)"
+            @mousedown.prevent
+            @click="run(action)"
           >
-            <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
-          </svg>
-        </GrButton>
-      </div>
+            <svg
+              :class="iconClass"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
+            </svg>
+          </GrButton>
+        </div>
+      </template>
     </GrPopover>
   </div>
 </template>

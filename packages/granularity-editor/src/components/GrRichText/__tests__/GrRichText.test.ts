@@ -42,8 +42,43 @@ function lastModel(wrapper: Editor): unknown {
 /** Инстанс редактора наружу: тесту нужен курсор, а мышью его не поставить. */
 function instanceOf(wrapper: Editor) {
   return (wrapper.vm as unknown as {
-    editor: { commands: { selectAll: () => void } }
+    editor: {
+      commands: { selectAll: () => void }
+      state: { selection: { empty: boolean } }
+    }
   }).editor
+}
+
+/**
+ * Координаты выделения в jsdom не считаются: `coordsAtPos` доходит до
+ * `getClientRects`, которого у текстового узла тут нет. Подмена отвечает за
+ * геометрию, а проверяется всё остальное — открытие, фокус, реакция на кнопку.
+ */
+function stubCoords(wrapper: Editor): void {
+  const view = (instanceOf(wrapper) as unknown as {
+    view: { coordsAtPos: (pos: number) => unknown }
+  }).view
+
+  view.coordsAtPos = () => ({ left: 10, right: 40, top: 20, bottom: 32 })
+}
+
+/** Панель поповера уезжает в портал — искать её в обёртке бесполезно. */
+function bubblePanel(): HTMLElement | null {
+  const bubble = document.body.querySelector('[data-gr-rich-text-bubble]')
+
+  return (bubble?.closest('[data-gr-popover-panel]') as HTMLElement | null) ?? null
+}
+
+function bubbleButtons(): HTMLElement[] {
+  return [...document.body.querySelectorAll<HTMLElement>('[data-gr-rich-text-bubble-action]')]
+}
+
+/** Выделить всё в поле с пузырьком и дождаться, пока он встанет у выделения. */
+async function selectAllWithBubble(wrapper: Editor) {
+  stubCoords(wrapper)
+  area(wrapper).focus()
+  instanceOf(wrapper).commands.selectAll()
+  for (let i = 0; i < 3; i += 1) await nextTick()
 }
 
 /**
@@ -369,6 +404,83 @@ describe('GrRichText — смена схемы и расширений на жи
     expect(after.storage.characterCount).toBeDefined()
     // Текст пережил пересборку.
     expect(area(wrapper).innerHTML).toContain('текст')
+    wrapper.unmount()
+  })
+})
+
+describe('GrRichText — пузырьковый тулбар', () => {
+  it('встаёт у выделения с кнопками внутри', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+
+    expect(bubblePanel()?.style.display).toBe('none')
+
+    await selectAllWithBubble(wrapper)
+
+    // Содержимое поповера живёт в слоте `content`: в слоте по умолчанию оно
+    // не рисуется вовсе, и панель открывается пустой.
+    expect(bubbleButtons().length).toBeGreaterThan(0)
+    expect(bubblePanel()?.style.display).not.toBe('none')
+    expect(bubbleButtons()[0]?.querySelector('svg')).not.toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('не забирает фокус из текста', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+    await selectAllWithBubble(wrapper)
+
+    // Панель с автофокусом уводила бы фокус из поля, а уход фокуса гасит
+    // пузырёк блюром — он закрывался в тот же кадр, в котором открылся.
+    expect(document.activeElement).toBe(area(wrapper))
+    expect(bubblePanel()?.style.display).not.toBe('none')
+
+    wrapper.unmount()
+  })
+
+  it('кнопка не уводит фокус и применяет формат', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+    await selectAllWithBubble(wrapper)
+
+    const button = bubbleButtons().find(node => node.dataset.key === 'bold')
+    if (!button) throw new Error('нет кнопки bold')
+
+    const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    button.dispatchEvent(mousedown)
+    expect(mousedown.defaultPrevented).toBe(true)
+
+    button.click()
+    for (let i = 0; i < 3; i += 1) await nextTick()
+
+    expect(String(lastModel(wrapper))).toContain('<strong>')
+    expect(bubblePanel()?.style.display).not.toBe('none')
+
+    wrapper.unmount()
+  })
+
+  it('Esc закрывает пузырёк, не трогая выделение', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+    await selectAllWithBubble(wrapper)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    for (let i = 0; i < 3; i += 1) await nextTick()
+
+    // Закрытие с той стороны обязано погасить якорь: иначе `open` возвращался
+    // бы в `true` тем же вычислением, и Esc не делал бы ничего.
+    expect(bubblePanel()?.style.display).toBe('none')
+    expect(instanceOf(wrapper).state.selection.empty).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('в режиме панели не появляется', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: true })
+    await ready(wrapper)
+
+    expect(bubblePanel()).toBeNull()
     wrapper.unmount()
   })
 })

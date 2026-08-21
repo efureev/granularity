@@ -7,6 +7,25 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.3] 2026-08-21
+
+### Added
+
+- **Each toolbar action now carries its keyboard shortcut** (`GrRichTextAction.shortcut`, in TipTap
+  notation: `Mod-B`, `Mod-Alt-2`, …). The component does not render it — the field is there for
+  whoever builds their own panel or writes a hint. The values are read from the extensions' own
+  sources, because the shortcuts belong to them, not to this package.
+
+### Fixed
+
+- **The bubble toolbar works at all.** With `toolbar="bubble"` (and `"both"`) nothing showed up at
+  the selection: the buttons sat in the popover's default slot, and the panel renders only the
+  `content` one — it opened empty. Filled, it then closed in the frame it opened: the panel takes
+  focus by default, the field loses it, and blur clears the anchor. The panel no longer autofocuses,
+  and a bubble button no longer steals focus on `mousedown` — without that the bubble vanished under
+  the cursor after the first format and the second could not be applied. `Esc` closes it; an outside
+  click does not, because a drag-select ends with exactly that click.
+
 ## [v0.1.2] 2026-08-21
 
 ### Fixed
