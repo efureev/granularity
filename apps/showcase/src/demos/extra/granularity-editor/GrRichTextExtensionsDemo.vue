@@ -1,0 +1,119 @@
+<script setup lang="ts">
+import { computed, ref, shallowRef, watch } from 'vue'
+
+import { CharacterCount, Focus, TrailingNode } from '@tiptap/extensions'
+import type { GrRichTextExtension } from '@feugene/granularity-editor'
+
+/**
+ * Свои расширения TipTap поверх схемы.
+ *
+ * Переключатели включают их **на живом поле**: смена набора пересобирает
+ * редактор, а текст переносится разметкой и проходит разбор по новой схеме.
+ * Схему ProseMirror подменить нельзя — из неё выведены и документ, и команды.
+ */
+const value = ref('<p>Включите расширение и продолжайте печатать.</p>')
+
+const LIMIT = 120
+
+const catalogue = [
+  {
+    key: 'characterCount',
+    title: 'CharacterCount',
+    about: `Счётчик символов и потолок. Здесь предел — ${LIMIT}: дальше ввод просто не проходит.`,
+    make: () => CharacterCount.configure({ limit: LIMIT }),
+  },
+  {
+    key: 'trailingNode',
+    title: 'TrailingNode',
+    about: 'Держит пустой абзац в конце: под цитатой или заголовком всегда есть куда поставить курсор.',
+    make: () => TrailingNode,
+  },
+  {
+    key: 'focus',
+    title: 'Focus',
+    about: 'Помечает узел под курсором классом `has-focus` — зацепка для своего оформления.',
+    make: () => Focus.configure({ className: 'has-focus' }),
+  },
+] as const
+
+type ExtensionKey = typeof catalogue[number]['key']
+
+const enabled = ref<ExtensionKey[]>([])
+
+const extensions = computed<GrRichTextExtension[]>(() => (
+  catalogue
+    .filter(entry => enabled.value.includes(entry.key))
+    .map(entry => entry.make() as GrRichTextExtension)
+))
+
+/** Инстанс редактора наружу отдаёт сам компонент — счётчик живёт в нём. */
+const field = shallowRef<{ editor: { storage: Record<string, { characters?: () => number }> } } | null>(null)
+
+const typed = ref(0)
+
+// `flush: 'post'` — не педантизм: включение расширения пересобирает редактор в
+// собственном наблюдателе компонента, и до этого момента счётчика в хранилище
+// ещё нет. Без задержки поле показывало «0» при непустом тексте.
+watch([value, enabled], () => {
+  const storage = field.value?.editor?.storage?.characterCount
+
+  typed.value = typeof storage?.characters === 'function' ? storage.characters() : 0
+}, { flush: 'post' })
+
+const counted = computed(() => enabled.value.includes('characterCount'))
+</script>
+
+<template>
+  <div class="grid gap-4">
+    <GrRichText
+      ref="field"
+      v-model="value"
+      schema="article"
+      :extensions="extensions"
+      aria-label="Текст с расширениями"
+    />
+
+    <div class="showcase-demo-panel grid gap-3 rounded-[var(--gr-radius-lg)] border p-4">
+      <div class="showcase-demo-title text-sm font-semibold">
+        Расширения
+      </div>
+
+      <label v-for="entry in catalogue" :key="entry.key" class="flex items-start gap-3">
+        <GrCheckbox
+          :model-value="enabled.includes(entry.key)"
+          :aria-label="entry.title"
+          @update:model-value="enabled = $event ? [...enabled, entry.key] : enabled.filter(k => k !== entry.key)"
+        />
+        <span class="grid gap-0.5">
+          <code class="text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]">{{ entry.title }}</code>
+          <span class="showcase-demo-text text-sm opacity-70">{{ entry.about }}</span>
+        </span>
+      </label>
+
+      <p v-if="counted" class="showcase-demo-text text-sm">
+        Набрано символов: <strong>{{ typed }}</strong> из {{ LIMIT }}
+      </p>
+    </div>
+
+    <p class="showcase-demo-text text-sm opacity-70">
+      Набор расширений задаётся пропом <code>extensions</code> и добавляется <strong>к схеме</strong>,
+      а не заменяет её. Кнопку для своего расширения тулбар не покажет: он строится по схеме, и
+      кнопка без команды за ней была бы обманом.
+    </p>
+
+    <p class="showcase-demo-text text-sm opacity-70">
+      Смена набора пересобирает редактор: схема ProseMirror неизменяема — из неё выведены и документ,
+      и команды. Текст переносится разметкой и проходит разбор заново, поэтому узел, которого в новой
+      схеме нет, отбрасывается — то же правило, что и при вставке.
+    </p>
+
+    <p class="showcase-demo-text text-sm opacity-70">
+      Полный список готовых расширений —
+      <GrLink href="https://tiptap.dev/docs/editor/extensions" external>каталог TipTap</GrLink>; как
+      написать своё —
+      <GrLink href="https://tiptap.dev/docs/editor/extensions/custom-extensions" external>руководство по расширениям</GrLink>.
+      Пакет ничего в них не оборачивает: <code>extensions</code> принимает их как есть, а инстанс
+      редактора компонент отдаёт через <code>defineExpose</code> — для своих команд и плагинов.
+    </p>
+  </div>
+</template>

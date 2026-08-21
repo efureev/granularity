@@ -202,19 +202,17 @@ function editorAttributes(): Record<string, string> {
  * — пустая оболочка, а участок помечен `data-allow-mismatch`, иначе гидрация
  * сообщит о расхождении, которого мы и добиваемся сознательно.
  */
-onMounted(() => {
+function create(content: unknown): void {
   if (!hostEl.value) return
 
-  checkShape(props.modelValue)
-
-  const instance = new Editor({
+  editor.value = new Editor({
     element: hostEl.value,
     extensions: [
       ...schema.value.extensions,
       ...(props.extensions ?? []),
       Placeholder.configure({ placeholder: () => props.placeholder ?? '' }),
     ],
-    content: (props.modelValue ?? '') as string,
+    content: content as string,
     editable: !field.locked.value,
     editorProps: { attributes: editorAttributes() },
     onUpdate: ({ editor: instance }) => {
@@ -231,13 +229,41 @@ onMounted(() => {
       emit('blur')
     },
   })
+}
 
-  editor.value = instance
+onMounted(() => {
+  checkShape(props.modelValue)
+  create(props.modelValue ?? '')
 })
 
 onBeforeUnmount(() => {
   editor.value?.destroy()
   editor.value = null
+})
+
+/**
+ * Схема и набор расширений пересобирают редактор.
+ *
+ * Заменить их на живом экземпляре нельзя: схема ProseMirror неизменяема, из неё
+ * выведены и документ, и команды. Читай их только при монтировании — и смена
+ * `schema` меняла бы **тулбар**, не трогая правил документа: кнопка «Заголовок»
+ * осталась бы у схемы, которая заголовков не допускает.
+ *
+ * Текст переносится в новый экземпляр и по дороге проходит разбор: узлы, которых
+ * в новой схеме нет, отбрасываются — то же правило, что и при вставке.
+ */
+watch([() => props.schema, () => props.extensions], () => {
+  const previous = editor.value
+  if (!previous) return
+
+  // Разметкой, а не документом: JSON разбирается строго, и первый же узел,
+  // которого нет в новой схеме, уносит с собой весь текст. HTML разбирается
+  // терпимо — заголовок станет абзацем, а написанное уцелеет.
+  const carried = previous.getHTML()
+
+  previous.destroy()
+  create(carried)
+  revision.value += 1
 })
 
 // Значение сменилось снаружи — документ пересобирается. Сравнение обязательно:

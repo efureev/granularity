@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.2] 2026-08-21
+
+### Fixed
+
+- **`schema` and `extensions` now take effect on a live field.** Both were read once, at mount: after
+  that, switching `schema` moved the **toolbar** without touching the document rules — a «Heading»
+  button on a schema that allows no headings. Changing them now rebuilds the editor, because a
+  ProseMirror schema is immutable: the document and the commands are derived from it.
+
+  Content is carried over as **markup**, not as a document. JSON is parsed strictly, and the first
+  node missing from the new schema takes the whole text with it; HTML is parsed leniently — a heading
+  becomes a paragraph and what was written survives.
+
 ## [v0.1.1] 2026-08-21
 
 ### Fixed

@@ -1,3 +1,4 @@
+import { CharacterCount } from '@tiptap/extensions'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
@@ -315,6 +316,59 @@ describe('GrRichText — иконки тулбара', () => {
     const shapes = actions(wrapper).map(button => button.findAll('svg path').map(p => p.attributes('d')).join('|'))
 
     expect(new Set(shapes).size).toBe(shapes.length)
+    wrapper.unmount()
+  })
+})
+
+describe('GrRichText — смена схемы и расширений на живом поле', () => {
+  /**
+   * Схема ProseMirror неизменяема: из неё выведены и документ, и команды.
+   * Читай её только при монтировании — и смена `schema` двигала бы тулбар, не
+   * трогая правил документа.
+   */
+  it('смена схемы пересобирает редактор и правила документа', async () => {
+    const wrapper = mountEditor({ schema: 'article', modelValue: '<h2>Заголовок</h2><p>Текст</p>' })
+    await ready(wrapper)
+
+    expect(area(wrapper).innerHTML).toContain('<h2>')
+
+    await wrapper.setProps({ schema: 'minimal' })
+    await ready(wrapper)
+
+    // Заголовка в «минимуме» нет — узел не пережил переноса, как и при вставке.
+    expect(area(wrapper).innerHTML).not.toContain('<h2>')
+    expect(area(wrapper).innerHTML).toContain('Заголовок')
+    expect(area(wrapper).innerHTML).toContain('Текст')
+    wrapper.unmount()
+  })
+
+  it('тулбар идёт за схемой', async () => {
+    const wrapper = mountEditor({ schema: 'minimal' })
+    await ready(wrapper)
+
+    expect(wrapper.find('[data-key="heading2"]').exists()).toBe(false)
+
+    await wrapper.setProps({ schema: 'article' })
+    await ready(wrapper)
+
+    expect(wrapper.find('[data-key="heading2"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('добавленное расширение включается без перемонтирования', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>' })
+    await ready(wrapper)
+
+    const before = (wrapper.vm as unknown as { editor: { storage: Record<string, unknown> } }).editor
+    expect(before.storage.characterCount).toBeUndefined()
+
+    await wrapper.setProps({ extensions: [CharacterCount] })
+    await ready(wrapper)
+
+    const after = (wrapper.vm as unknown as { editor: { storage: Record<string, unknown> } }).editor
+    expect(after.storage.characterCount).toBeDefined()
+    // Текст пережил пересборку.
+    expect(area(wrapper).innerHTML).toContain('текст')
     wrapper.unmount()
   })
 })
