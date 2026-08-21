@@ -48,6 +48,7 @@ export const demoPathByPreviewKey = {
   'extra-charts-waterfall-horizontal':    'extra/granularity-charts/GrChartWaterfallHorizontalDemo.vue',
   'extra-editor-basic':                   'extra/granularity-editor/GrRichTextBasicDemo.vue',
   'extra-editor-schema':                  'extra/granularity-editor/GrRichTextSchemaDemo.vue',
+  'extra-editor-toolbar':                 'extra/granularity-editor/GrRichTextToolbarDemo.vue',
   'extra-editor-extensions':              'extra/granularity-editor/GrRichTextExtensionsDemo.vue',
   'extra-datasource-basic':               'extra/granularity-datasource/UseDataSourceBasicDemo.vue',
   'extra-datasource-url':                 'extra/granularity-datasource/UseDataSourceUrlDemo.vue',

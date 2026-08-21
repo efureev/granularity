@@ -31,27 +31,33 @@ export interface GrRichTextAction {
   /** Ключ подписи; fallback совпадает с английским словарём. */
   labelKey: string
   labelFallback: string
+  /**
+   * Горячая клавиша расширения TipTap в его же записи: `Mod` — `⌘` на Apple и
+   * `Ctrl` на остальных. Компонент её не рисует — она здесь для того, кто строит
+   * свою панель или пишет подсказку.
+   */
+  shortcut: string
   /** Группа тулбара: между группами ставится разделитель. */
   group: 'inline' | 'block' | 'list'
 }
 
 const INLINE_ACTIONS: GrRichTextAction[] = [
-  { key: 'bold', active: 'bold', command: 'toggleBold', labelKey: 'grEditor.richText.bold', labelFallback: 'Bold', group: 'inline' },
-  { key: 'italic', active: 'italic', command: 'toggleItalic', labelKey: 'grEditor.richText.italic', labelFallback: 'Italic', group: 'inline' },
-  { key: 'strike', active: 'strike', command: 'toggleStrike', labelKey: 'grEditor.richText.strike', labelFallback: 'Strikethrough', group: 'inline' },
-  { key: 'code', active: 'code', command: 'toggleCode', labelKey: 'grEditor.richText.code', labelFallback: 'Inline code', group: 'inline' },
+  { key: 'bold', active: 'bold', command: 'toggleBold', labelKey: 'grEditor.richText.bold', labelFallback: 'Bold', shortcut: 'Mod-B', group: 'inline' },
+  { key: 'italic', active: 'italic', command: 'toggleItalic', labelKey: 'grEditor.richText.italic', labelFallback: 'Italic', shortcut: 'Mod-I', group: 'inline' },
+  { key: 'strike', active: 'strike', command: 'toggleStrike', labelKey: 'grEditor.richText.strike', labelFallback: 'Strikethrough', shortcut: 'Mod-Shift-S', group: 'inline' },
+  { key: 'code', active: 'code', command: 'toggleCode', labelKey: 'grEditor.richText.code', labelFallback: 'Inline code', shortcut: 'Mod-E', group: 'inline' },
 ]
 
 const LIST_ACTIONS: GrRichTextAction[] = [
-  { key: 'bulletList', active: 'bulletList', command: 'toggleBulletList', labelKey: 'grEditor.richText.bulletList', labelFallback: 'Bulleted list', group: 'list' },
-  { key: 'orderedList', active: 'orderedList', command: 'toggleOrderedList', labelKey: 'grEditor.richText.orderedList', labelFallback: 'Numbered list', group: 'list' },
+  { key: 'bulletList', active: 'bulletList', command: 'toggleBulletList', labelKey: 'grEditor.richText.bulletList', labelFallback: 'Bulleted list', shortcut: 'Mod-Shift-8', group: 'list' },
+  { key: 'orderedList', active: 'orderedList', command: 'toggleOrderedList', labelKey: 'grEditor.richText.orderedList', labelFallback: 'Numbered list', shortcut: 'Mod-Shift-7', group: 'list' },
 ]
 
 const BLOCK_ACTIONS: GrRichTextAction[] = [
-  { key: 'heading2', active: 'heading', activeAttrs: { level: 2 }, command: 'toggleHeading', commandArgs: { level: 2 }, labelKey: 'grEditor.richText.heading2', labelFallback: 'Heading', group: 'block' },
-  { key: 'heading3', active: 'heading', activeAttrs: { level: 3 }, command: 'toggleHeading', commandArgs: { level: 3 }, labelKey: 'grEditor.richText.heading3', labelFallback: 'Subheading', group: 'block' },
-  { key: 'blockquote', active: 'blockquote', command: 'toggleBlockquote', labelKey: 'grEditor.richText.blockquote', labelFallback: 'Quote', group: 'block' },
-  { key: 'codeBlock', active: 'codeBlock', command: 'toggleCodeBlock', labelKey: 'grEditor.richText.codeBlock', labelFallback: 'Code block', group: 'block' },
+  { key: 'heading2', active: 'heading', activeAttrs: { level: 2 }, command: 'toggleHeading', commandArgs: { level: 2 }, labelKey: 'grEditor.richText.heading2', labelFallback: 'Heading', shortcut: 'Mod-Alt-2', group: 'block' },
+  { key: 'heading3', active: 'heading', activeAttrs: { level: 3 }, command: 'toggleHeading', commandArgs: { level: 3 }, labelKey: 'grEditor.richText.heading3', labelFallback: 'Subheading', shortcut: 'Mod-Alt-3', group: 'block' },
+  { key: 'blockquote', active: 'blockquote', command: 'toggleBlockquote', labelKey: 'grEditor.richText.blockquote', labelFallback: 'Quote', shortcut: 'Mod-Shift-B', group: 'block' },
+  { key: 'codeBlock', active: 'codeBlock', command: 'toggleCodeBlock', labelKey: 'grEditor.richText.codeBlock', labelFallback: 'Code block', shortcut: 'Mod-Alt-C', group: 'block' },
 ]
 
 /**

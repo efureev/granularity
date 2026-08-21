@@ -86,3 +86,31 @@ describe('схемы редактора', () => {
     editor.destroy()
   })
 })
+
+describe('горячие клавиши действий', () => {
+  /**
+   * Значения взяты из исходников расширений TipTap, а не по памяти: пакет их не
+   * задаёт и не может — клавиши приходят от самих расширений.
+   */
+  it('у каждого действия объявлена клавиша в записи TipTap', () => {
+    for (const name of GR_RICH_TEXT_SCHEMAS) {
+      for (const action of createSchema(name).actions) {
+        expect(action.shortcut, action.key).toMatch(/^Mod-[A-Za-z0-9-]+$/)
+      }
+    }
+  })
+
+  it('клавиши не повторяются: две команды на одном сочетании — это одна нерабочая', () => {
+    const shortcuts = createSchema('article').actions.map(action => action.shortcut)
+
+    expect(new Set(shortcuts).size).toBe(shortcuts.length)
+  })
+
+  it('состав «минимума» — подмножество «статьи», и клавиши там те же', () => {
+    const article = new Map(createSchema('article').actions.map(action => [action.key, action.shortcut]))
+
+    for (const action of createSchema('minimal').actions) {
+      expect(article.get(action.key), action.key).toBe(action.shortcut)
+    }
+  })
+})

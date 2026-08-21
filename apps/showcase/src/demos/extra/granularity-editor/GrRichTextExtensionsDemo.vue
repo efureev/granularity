@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { CharacterCount, Focus, TrailingNode } from '@tiptap/extensions'
+import { CharacterCount, Focus, Selection } from '@tiptap/extensions'
 import type { GrRichTextExtension } from '@feugene/granularity-editor'
 
 /**
@@ -23,16 +23,16 @@ const catalogue = [
     make: () => CharacterCount.configure({ limit: LIMIT }),
   },
   {
-    key: 'trailingNode',
-    title: 'TrailingNode',
-    about: 'Держит пустой абзац в конце: под цитатой или заголовком всегда есть куда поставить курсор.',
-    make: () => TrailingNode,
-  },
-  {
     key: 'focus',
     title: 'Focus',
-    about: 'Помечает узел под курсором классом `has-focus` — зацепка для своего оформления.',
-    make: () => Focus.configure({ className: 'has-focus' }),
+    about: 'Помечает абзац под курсором классом `has-focus`. Оформление — ваше: здесь это полоса слева.',
+    make: () => Focus.configure({ className: 'has-focus', mode: 'shallowest' }),
+  },
+  {
+    key: 'selection',
+    title: 'Selection',
+    about: 'Оставляет выделение видимым, когда фокус ушёл из поля. Выделите текст и щёлкните мимо.',
+    make: () => Selection,
   },
 ] as const
 
@@ -64,7 +64,7 @@ const counted = computed(() => enabled.value.includes('characterCount'))
 </script>
 
 <template>
-  <div class="grid gap-4">
+  <div class="showcase-editor-extensions grid gap-4">
     <GrRichText
       ref="field"
       v-model="value"
@@ -108,6 +108,18 @@ const counted = computed(() => enabled.value.includes('characterCount'))
     </p>
 
     <p class="showcase-demo-text text-sm opacity-70">
+      <code>Focus</code> и <code>Selection</code> сами ничего не рисуют — они вешают класс, а
+      оформление остаётся за вами. В этом демо классы оформлены парой правил рядом; без них
+      расширение честно работает, но выглядит как выключенное.
+    </p>
+
+    <p class="showcase-demo-text text-sm opacity-70">
+      <code>TrailingNode</code> в списке нет намеренно: он уже входит в <code>StarterKit</code>, то
+      есть в саму схему. Добавить его пропом можно, но переключатель ничего бы не менял — под
+      заголовком и цитатой пустой абзац есть и без него.
+    </p>
+
+    <p class="showcase-demo-text text-sm opacity-70">
       Полный список готовых расширений —
       <GrLink href="https://tiptap.dev/docs/editor/extensions" external>каталог TipTap</GrLink>; как
       написать своё —
@@ -117,3 +129,21 @@ const counted = computed(() => enabled.value.includes('characterCount'))
     </p>
   </div>
 </template>
+
+<!--
+  Классы вешают сами расширения, а рисует их потребитель — в этом и смысл
+  `Focus` и `Selection`. Стиль не `scoped`: узлы создаёт ProseMirror в рантайме,
+  атрибут области видимости на них не попадает.
+-->
+<style>
+.showcase-editor-extensions .has-focus {
+  border-left: 2px solid var(--gr-primary);
+  padding-left: 0.5rem;
+  margin-left: -0.625rem;
+}
+
+.showcase-editor-extensions .selection {
+  background: var(--gr-accent);
+  border-radius: var(--gr-radius-sm);
+}
+</style>
