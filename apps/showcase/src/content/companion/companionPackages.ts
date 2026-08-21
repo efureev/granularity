@@ -1,6 +1,7 @@
 import chartsPkg from '@feugene/granularity-charts/package.json'
 import dashboardPkg from '@feugene/granularity-dashboard/package.json'
 import datasourcePkg from '@feugene/granularity-datasource/package.json'
+import editorPkg from '@feugene/granularity-editor/package.json'
 import formsSchemaPkg from '@feugene/granularity-forms-schema/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
@@ -2339,6 +2340,96 @@ import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`
               { name: 'setPage / setPerPage / setSort / setSearch', type: '(value) => void', description: 'Точечные правки состояния.' },
               { name: 'setFilter / setFilters', type: '(name, value) · (filters) => void', description: 'Один фильтр или весь набор разом.' },
               { name: 'reset / reload', type: '() => void · () => Promise<void>', description: '`reset` возвращает умолчания; `reload` повторяет запрос текущего состояния — например после правки строки.' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'granularity-editor',
+    npmName: '@feugene/granularity-editor',
+    label: 'Editor',
+    version: editorPkg.version,
+    description: 'Поле форматированного текста на TipTap: тулбар из кнопок дизайн-системы, пузырьковое меню у выделения и схема вместо санитайзера.',
+    dependencies: ['@tiptap/core', '@tiptap/pm', '@tiptap/starter-kit', '@tiptap/extensions'],
+    components: [
+      {
+        name: 'GrRichText',
+        slug: 'gr-rich-text',
+        title: 'GrRichText',
+        summary: 'Описание товара, тело письма, текст статьи: разметку хранит документ, а набор допустимого задаёт схема.',
+        importPath: '@feugene/granularity-editor/components/GrRichText',
+        overview: {
+          paragraphs: [
+            'Поле форматированного текста поверх TipTap. В отличие от `GrTextarea`, где значение — простой текст, здесь значением остаётся размеченный документ, а что в нём разрешено, решает схема.',
+            'Схема же служит санитайзером: содержимое разбирается по ней, узлы и марки вне схемы отбрасываются, на выход документ сериализуется из того же дерева. Отдельного санитайзера в пакете нет — и не нужно.',
+          ],
+          features: [
+            'Две готовые схемы: «минимум» — начертание, ссылка, список; «статья» — плюс заголовки, цитата, блок кода.',
+            'Тулбар строится по схеме, а не пишется разметкой: кнопка без команды за ней невозможна.',
+            'Одна остановка `Tab` на весь тулбар, внутри — стрелки; активный формат объявлен `aria-pressed`.',
+            'Форма значения — проп: строка HTML или документ TipTap.',
+            'Полный форменный контракт: `GrFormField`, `disabled`, `readonly`, `invalid`, скрытое поле формы.',
+            'TipTap — peer-зависимость: ProseMirror обязан быть в приложении в одном экземпляре.',
+          ],
+        },
+        typeDeclarations: `import type {
+  GrRichTextAction,
+  GrRichTextExtension,
+  GrRichTextProps,
+  GrRichTextSchemaName,
+  GrRichTextSize,
+} from '@feugene/granularity-editor'`,
+        examples: [
+          {
+            id: 'editor-basic',
+            title: 'Text with a toolbar',
+            description: 'Поле со схемой «статья» и панель модели рядом: значение — размеченный текст, и увидеть, что уходит наружу, иначе нельзя.',
+            previewKey: 'extra-editor-basic',
+            note: 'Тулбар — одна остановка `Tab`, внутри стрелки: у «статьи» десять кнопок, и без этого до текста пришлось бы добираться десятью нажатиями. `Tab` в самом поле уводит из него, а не вставляет отступ — иначе пользователь клавиатуры оказался бы заперт.',
+          },
+          {
+            id: 'editor-schema',
+            title: 'The schema is the sanitiser',
+            description: 'Одно и то же значение в двух схемах. Вставка одинаковая, результат разный — и это не фильтр поверх, а разбор.',
+            previewKey: 'extra-editor-schema',
+            note: 'Скрипта и фрейма не остаётся нигде: узлы вне схемы не переживают разбора. Обратная сторона того же свойства — чего нет в схеме, того не будет и в значении: статья с картинками, вставленная в «минимум», станет текстом.',
+          },
+        ],
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'modelValue', type: 'string | Record<string, unknown> | null', description: 'Значение: строка HTML либо документ TipTap — по `output`.' },
+              { name: 'output', type: `'html' | 'json'`, default: `'html'`, description: 'В каком виде значение уходит наружу. Форму задаёт проп, а не поведение пользователя.' },
+              { name: 'schema', type: `'minimal' | 'article'`, default: `'minimal'`, description: '`minimal` — начертание, ссылка, список; `article` добавляет заголовки, цитату и блок кода. Заголовка первого уровня не даёт ни одна: `h1` принадлежит странице, а не полю внутри неё.' },
+              { name: 'extensions', type: 'GrRichTextExtension[]', description: 'Свои расширения TipTap **в дополнение** к схеме. Кнопку для них тулбар не покажет: он строится по схеме.' },
+              { name: 'toolbar', type: `boolean | 'bubble' | 'both'`, default: 'true', description: 'Панель сверху, пузырьковое меню у выделения, оба или ничего.' },
+              { name: 'placeholder', type: 'string', description: 'Подсказка в пустом поле.' },
+              { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль поля и ступень кнопок тулбара. Не задан — из `GrConfigProvider`.' },
+              { name: 'disabled / readonly / invalid / required', type: 'boolean', description: 'Форменный контракт. `readonly` показывает значение и отдаёт его в форму, но не даёт править.' },
+              { name: 'id / name / ariaLabel', type: 'string', description: '`id` уходит на область ввода — она же фокусируемый виджет. `name` включает скрытое поле формы: разметка уходит строкой в любом режиме `output`.' },
+            ],
+          },
+          {
+            key: 'events',
+            title: 'Events',
+            origin: 'manual',
+            items: [
+              { name: 'update:modelValue / change', type: '(value) => void', description: 'Правка содержимого. Форма значения — по `output`.' },
+              { name: 'focus / blur', type: '() => void', description: 'Фокус области ввода.' },
+            ],
+          },
+          {
+            key: 'expose',
+            title: 'Expose',
+            origin: 'manual',
+            items: [
+              { name: 'editor', type: 'ComputedRef<Editor | null>', description: 'Инстанс TipTap: своя команда, своё расширение, свой плагин. До монтирования — `null`.' },
+              { name: 'focus / blur', type: '() => void', description: 'Фокус в область ввода и из неё.' },
             ],
           },
         ],

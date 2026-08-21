@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path'
 import ChartsPage from '../src/ChartsPage.vue'
 import ChronoPage from '../src/ChronoPage.vue'
 import DashboardPage from '../src/DashboardPage.vue'
+import EditorPage from '../src/EditorPage.vue'
 import OverlayStackPage from '../src/OverlayStackPage.vue'
 import RiskyPage from '../src/RiskyPage.vue'
 import TeleportPage from '../src/TeleportPage.vue'
@@ -31,8 +32,9 @@ export default async function setup(): Promise<void> {
   // `overlayStack` — два открытых оверлея и чтение темы,
   // `chrono` — companion-пакет: часы в отрисовке, ленивые панели, `useAnnouncer`,
   // `charts` — companion-пакет: `ResizeObserver`, `useId()` в разметке SVG,
-  // `dashboard` — companion-пакет: `ResizeObserver` и `IntersectionObserver` в выборе раскладки.
-  const [app, teleport, risky, overlayStack, chrono, charts, dashboard] = await Promise.all([
+  // `dashboard` — companion-пакет: `ResizeObserver` и `IntersectionObserver` в выборе раскладки,
+  // `editor` — companion-пакет: ProseMirror требует DOM, и на сервере области ввода нет вовсе.
+  const [app, teleport, risky, overlayStack, chrono, charts, dashboard, editor] = await Promise.all([
     render(),
     render(TeleportPage),
     render(RiskyPage),
@@ -40,8 +42,9 @@ export default async function setup(): Promise<void> {
     render(ChronoPage),
     render(ChartsPage),
     render(DashboardPage),
+    render(EditorPage),
   ])
 
   await mkdir(dirname(SSR_SNAPSHOT_PATH), { recursive: true })
-  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack, chrono, charts, dashboard }), 'utf8')
+  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack, chrono, charts, dashboard, editor }), 'utf8')
 }

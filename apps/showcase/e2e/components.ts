@@ -6,6 +6,7 @@ import { granularityChartsComponentConfigs } from '@feugene/granularity-charts/g
 import { granularityChronoComponentConfigs } from '@feugene/granularity-chrono/granular-provider'
 import { granularityDashboardComponentConfigs } from '@feugene/granularity-dashboard/granular-provider'
 import { granularityFormsSchemaComponentConfigs } from '@feugene/granularity-forms-schema/granular-provider'
+import { granularityEditorComponentConfigs } from '@feugene/granularity-editor/granular-provider'
 
 /**
  * Что сканируют e2e и откуда берётся список.
@@ -61,6 +62,7 @@ export const companionComponentNames: string[] = [
   ...Object.keys(granularityChartsComponentConfigs),
   ...Object.keys(granularityDashboardComponentConfigs),
   ...Object.keys(granularityFormsSchemaComponentConfigs),
+  ...Object.keys(granularityEditorComponentConfigs),
   ...composableCompanionNames,
 ].sort()
 
@@ -89,6 +91,8 @@ export const companionComponentNames: string[] = [
 const VISUAL_EXCLUDED_PACKAGES = [
   ...Object.keys(granularityChartsComponentConfigs),
   ...Object.keys(granularityDashboardComponentConfigs),
+  // `GrRichText` — курсор в редакторе мигает, и снимок ловил бы его фазу.
+  ...Object.keys(granularityEditorComponentConfigs),
   // `useDataSource` — по другой причине: его демо ждёт сервер-заглушку с
   // разными задержками, и на момент снимка таблица бывает и с данными, и в
   // загрузке. Пиксельный эталон у такой страницы измерял бы удачу. Раскладку

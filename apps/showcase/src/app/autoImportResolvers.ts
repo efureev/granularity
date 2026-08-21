@@ -2,6 +2,7 @@ import { GranularityResolver } from '@feugene/unplugin-granularity'
 import { GranularityChartsResolver } from '@feugene/granularity-charts/resolver'
 import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
 import { GranularityDashboardResolver } from '@feugene/granularity-dashboard/resolver'
+import { GranularityEditorResolver } from '@feugene/granularity-editor/resolver'
 import { GranularityFormsSchemaResolver } from '@feugene/granularity-forms-schema/resolver'
 
 /**
@@ -13,7 +14,8 @@ import { GranularityFormsSchemaResolver } from '@feugene/granularity-forms-schem
  *   фабрике `createGranularResolver`;
  * - `@feugene/granularity-charts` (companion) — он же;
  * - `@feugene/granularity-dashboard` (companion) — он же.
- * - `@feugene/granularity-forms-schema` (companion) — он же.
+ * - `@feugene/granularity-forms-schema` (companion) — он же;
+ * - `@feugene/granularity-editor` (companion) — он же.
  *
  * Порядок важен: whitelist-резолверы компаньонов идут **первыми**, иначе жадный
  * core-резолвер перехватил бы `GrCalendar`, `GrChartLine` и остальные и
@@ -29,6 +31,7 @@ export function granularityAutoImportResolvers() {
     GranularityChartsResolver(),
     GranularityDashboardResolver(),
     GranularityFormsSchemaResolver(),
+    GranularityEditorResolver(),
     GranularityResolver({ importStyle: false }),
   ]
 }

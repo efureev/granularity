@@ -1,0 +1,7 @@
+export { default } from './GrRichText.vue'
+export { default as GrRichText } from './GrRichText.vue'
+export { grRichTextConfig } from './config'
+export { grRichTextSafelist } from './grRichTextStyles'
+export type { GrRichTextSize } from './grRichTextStyles'
+export type { GrRichTextConfigurableProps } from './defaults'
+export type { GrRichTextEmits, GrRichTextProps } from './GrRichText.vue'

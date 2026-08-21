@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp } from '../app'
 import ChartsPage from '../ChartsPage.vue'
 import DashboardPage from '../DashboardPage.vue'
+import EditorPage from '../EditorPage.vue'
 import ChronoPage from '../ChronoPage.vue'
 import OverlayStackPage from '../OverlayStackPage.vue'
 import RiskyPage from '../RiskyPage.vue'
@@ -42,6 +43,7 @@ const snapshots = JSON.parse(
   chrono: SsrSnapshot
   charts: SsrSnapshot
   dashboard: SsrSnapshot
+  editor: SsrSnapshot
 }
 
 function captureConsole(): string[] {
@@ -492,5 +494,35 @@ describe('гидрация companion-пакета dashboard', () => {
     const problems = hydrationProblems(await hydrate(distorted, { root: DashboardPage }))
 
     expect(problems.length).toBeGreaterThan(0)
+  })
+})
+
+/**
+ * Единственный компонент экосистемы, чьё содержимое на сервере не печатается
+ * вовсе: ProseMirror требует DOM, и редактор поднимается только в `onMounted`.
+ */
+describe('гидрация companion-пакета editor', () => {
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.editor, { root: EditorPage }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('сервер отдаёт оболочку поля, а не содержимое', () => {
+    expect(snapshots.editor.html).toMatch(/data-gr-rich-text[ >]/)
+    // Область ввода создаёт ProseMirror — на сервере её нет по построению.
+    expect(snapshots.editor.html).not.toContain('contenteditable')
+    // Участок помечен: расхождение здесь ожидаемое, и гидрация обязана молчать.
+    expect(snapshots.editor.html).toContain('data-allow-mismatch')
+  })
+
+  it('тулбар печатается на сервере: он обычная разметка, а не редактор', () => {
+    expect(snapshots.editor.html).toMatch(/data-gr-rich-text-toolbar/)
+    expect(snapshots.editor.html).toMatch(/role="toolbar"/)
+  })
+
+  /** Значение приходит с сервера, но как проп, а не как напечатанный HTML. */
+  it('сохранённая разметка в серверный HTML не попадает', () => {
+    expect(snapshots.editor.html).not.toContain('Текст, сохранённый ранее')
   })
 })

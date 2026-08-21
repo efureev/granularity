@@ -887,6 +887,13 @@
             "default": "false"
           },
           {
+            "name": "currentIndex",
+            "description": "Какой пункт — текущая страница. Не задан — последний. `-1` означает, что текущей страницы в пути нет: её имя стоит в `h1`, а путь показывает только родителей. Тогда `aria-current` не получает никто, и последний пункт остаётся обычной ссылкой.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "expandLabel",
             "description": "i18n-метка кнопки раскрытия схлопнутого пути.",
             "type": "string | undefined",

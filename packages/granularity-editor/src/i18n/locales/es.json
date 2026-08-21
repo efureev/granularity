@@ -1,0 +1,15 @@
+{
+  "richText": {
+    "toolbar": "Formato",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "strike": "Tachado",
+    "code": "Código en línea",
+    "bulletList": "Lista con viñetas",
+    "orderedList": "Lista numerada",
+    "heading2": "Título",
+    "heading3": "Subtítulo",
+    "blockquote": "Cita",
+    "codeBlock": "Bloque de código"
+  }
+}

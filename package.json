@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "yarn build:test-kit && yarn build:granularity && yarn build:chrono && yarn build:charts && yarn build:dashboard && yarn build:forms-schema && yarn build:datasource && yarn build:showcase",
+    "build": "yarn build:test-kit && yarn build:granularity && yarn build:chrono && yarn build:charts && yarn build:dashboard && yarn build:forms-schema && yarn build:datasource && yarn build:editor && yarn build:showcase",
     "build:test-kit": "yarn workspace @feugene/granularity-test-kit build",
     "build:granularity": "yarn workspace @feugene/granularity build",
     "build:chrono": "yarn workspace @feugene/granularity-chrono build",
@@ -15,6 +15,7 @@
     "build:dashboard": "yarn workspace @feugene/granularity-dashboard build",
     "build:forms-schema": "yarn workspace @feugene/granularity-forms-schema build",
     "build:datasource": "yarn workspace @feugene/granularity-datasource build",
+    "build:editor": "yarn workspace @feugene/granularity-editor build",
     "build:extra": "yarn workspace @feugene/extra-granularity build",
     "build:playground": "yarn workspace @feugene/granularity-playground build",
     "build:showcase": "yarn workspace @feugene/granularity-showcase build",
@@ -26,7 +27,7 @@
     "dev:playground-theme": "yarn workspace @feugene/granularity-playground-theme dev",
     "dev:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr dev",
     "dev:showcase": "yarn workspace @feugene/granularity-showcase dev",
-    "test": "yarn test:test-kit && yarn test:granularity && yarn test:chrono && yarn test:charts && yarn test:dashboard && yarn test:extra && yarn test:forms-schema && yarn test:datasource && yarn test:playground && yarn test:playground-theme && yarn test:playground-ssr",
+    "test": "yarn test:test-kit && yarn test:granularity && yarn test:chrono && yarn test:charts && yarn test:dashboard && yarn test:extra && yarn test:forms-schema && yarn test:datasource && yarn test:editor && yarn test:playground && yarn test:playground-theme && yarn test:playground-ssr",
     "test:test-kit": "yarn workspace @feugene/granularity-test-kit test:run",
     "test:granularity": "yarn build:test-kit && yarn workspace @feugene/granularity test:run",
     "test:chrono": "yarn build:test-kit && yarn workspace @feugene/granularity-chrono test:run",
@@ -34,12 +35,13 @@
     "test:dashboard": "yarn build:test-kit && yarn workspace @feugene/granularity-dashboard test:run",
     "test:forms-schema": "yarn build:test-kit && yarn workspace @feugene/granularity-forms-schema test:run",
     "test:datasource": "yarn build:test-kit && yarn workspace @feugene/granularity-datasource test:run",
+    "test:editor": "yarn build:test-kit && yarn workspace @feugene/granularity-editor test:run",
     "test:extra": "yarn build:test-kit && yarn workspace @feugene/extra-granularity test:run",
     "docs:map": "node scripts/generate-component-map.mjs",
     "docs:check": "node scripts/generate-component-map.mjs --check",
     "docs:audit": "node scripts/docs-audit.mjs --report",
     "docs:audit:check": "node scripts/docs-audit.mjs --check",
-    "lint": "yarn lint:test-kit && yarn lint:granularity && yarn lint:chrono && yarn lint:charts && yarn lint:dashboard && yarn lint:forms-schema && yarn lint:datasource && yarn lint:showcase",
+    "lint": "yarn lint:test-kit && yarn lint:granularity && yarn lint:chrono && yarn lint:charts && yarn lint:dashboard && yarn lint:forms-schema && yarn lint:datasource && yarn lint:editor && yarn lint:showcase",
     "lint:test-kit": "yarn workspace @feugene/granularity-test-kit lint",
     "lint:granularity": "yarn workspace @feugene/granularity lint",
     "lint:chrono": "yarn workspace @feugene/granularity-chrono lint",
@@ -47,8 +49,9 @@
     "lint:dashboard": "yarn workspace @feugene/granularity-dashboard lint",
     "lint:forms-schema": "yarn workspace @feugene/granularity-forms-schema lint",
     "lint:datasource": "yarn workspace @feugene/granularity-datasource lint",
+    "lint:editor": "yarn workspace @feugene/granularity-editor lint",
     "lint:showcase": "yarn workspace @feugene/granularity-showcase lint",
-    "typecheck": "yarn typecheck:test-kit && yarn typecheck:granularity && yarn typecheck:chrono && yarn typecheck:charts && yarn typecheck:dashboard && yarn typecheck:forms-schema && yarn typecheck:datasource && yarn typecheck:showcase && yarn typecheck:extra && yarn typecheck:unplugin",
+    "typecheck": "yarn typecheck:test-kit && yarn typecheck:granularity && yarn typecheck:chrono && yarn typecheck:charts && yarn typecheck:dashboard && yarn typecheck:forms-schema && yarn typecheck:datasource && yarn typecheck:editor && yarn typecheck:showcase && yarn typecheck:extra && yarn typecheck:unplugin",
     "typecheck:test-kit": "yarn workspace @feugene/granularity-test-kit typecheck",
     "typecheck:granularity": "yarn build:test-kit && yarn workspace @feugene/granularity typecheck",
     "typecheck:chrono": "yarn build:test-kit && yarn workspace @feugene/granularity-chrono typecheck",
@@ -56,6 +59,7 @@
     "typecheck:dashboard": "yarn build:test-kit && yarn workspace @feugene/granularity-dashboard typecheck",
     "typecheck:forms-schema": "yarn build:test-kit && yarn workspace @feugene/granularity-forms-schema typecheck",
     "typecheck:datasource": "yarn build:test-kit && yarn workspace @feugene/granularity-datasource typecheck",
+    "typecheck:editor": "yarn build:test-kit && yarn workspace @feugene/granularity-editor typecheck",
     "typecheck:showcase": "yarn workspace @feugene/granularity-showcase typecheck",
     "coverage:granularity": "yarn build:test-kit && yarn workspace @feugene/granularity test:coverage",
     "test:playground": "yarn workspace @feugene/granularity-playground test:run",
@@ -68,5 +72,6 @@
     "typecheck:extra": "yarn build:test-kit && yarn workspace @feugene/extra-granularity typecheck",
     "typecheck:unplugin": "yarn workspace @feugene/unplugin-granularity typecheck",
     "test:unplugin": "yarn workspace @feugene/unplugin-granularity test:run"
-  }
+  },
+  "devDependencies": {}
 }

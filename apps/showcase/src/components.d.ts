@@ -39,6 +39,7 @@ declare module 'vue' {
     GrInput: typeof import('@feugene/granularity/components/GrInput')['GrInput']
     GrPagination: typeof import('@feugene/granularity/components/GrPagination')['GrPagination']
     GrRelativeTime: typeof import('@feugene/granularity-chrono/components/GrRelativeTime')['GrRelativeTime']
+    GrRichText: typeof import('@feugene/granularity-editor/components/GrRichText')['GrRichText']
     GrSegmented: typeof import('@feugene/granularity/components/GrSegmented')['GrSegmented']
     GrSelect: typeof import('@feugene/granularity/components/GrSelect')['GrSelect']
     GrSparkline: typeof import('@feugene/granularity-charts/components/GrSparkline')['GrSparkline']

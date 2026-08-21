@@ -1,0 +1,140 @@
+{
+  "name": "@feugene/granularity-editor",
+  "description": "Rich-text editing for @feugene/granularity: a TipTap-backed GrRichText field with a design-system toolbar.",
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-editor"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "granularity",
+    "design-system",
+    "vue",
+    "rich-text",
+    "wysiwyg",
+    "tiptap",
+    "prosemirror"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components/GrRichText": {
+      "types": "./dist/types/components/GrRichText/index.d.ts",
+      "import": "./dist/components/GrRichText/index.js"
+    },
+    "./editor": {
+      "types": "./dist/types/editor/index.d.ts",
+      "import": "./dist/editor.js"
+    },
+    "./i18n": {
+      "types": "./dist/types/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js"
+    },
+    "./i18n/all": {
+      "types": "./dist/types/i18n/all.d.ts",
+      "import": "./dist/i18n/all.js"
+    },
+    "./granular-provider": {
+      "types": "./dist/types/granular-provider/index.d.ts",
+      "import": "./dist/granular-provider.js"
+    },
+    "./granular-provider/node": {
+      "types": "./dist/types/granular-provider/node.d.ts",
+      "import": "./dist/granular-provider-node.js"
+    },
+    "./resolver": {
+      "types": "./dist/types/resolver.d.ts",
+      "import": "./dist/resolver.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.28.0 <1.0.0",
+    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@tiptap/core": "^3.30.0",
+    "@tiptap/extensions": "^3.30.0",
+    "@tiptap/pm": "^3.30.0",
+    "@tiptap/starter-kit": "^3.30.0",
+    "vue": "^3.5.0",
+    "@feugene/fint-i18n": "^0.6.0",
+    "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
+    "unplugin-vue-components": ">=0.26.0"
+  },
+  "peerDependenciesMeta": {
+    "@feugene/fint-i18n": {
+      "optional": true
+    },
+    "@feugene/unplugin-granularity": {
+      "optional": true
+    },
+    "unplugin-vue-components": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "build": "vite build && gr-check-dist-dev-guard && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "doctor": "granular doctor ./granular.options.mjs --strict",
+    "generate:registry": "node scripts/generate-registry.mjs",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "check:messages": "fint-i18n-check-messages src/i18n/locales"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@feugene/fint-i18n": "^0.6.0",
+    "@feugene/granularity": "^0.28.0",
+    "@feugene/granularity-test-kit": "^0.4.0",
+    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/unplugin-granularity": "^0.4.1",
+    "@tiptap/core": "^3.30.2",
+    "@tiptap/extensions": "^3.30.2",
+    "@tiptap/pm": "^3.30.2",
+    "@tiptap/starter-kit": "^3.30.2",
+    "@types/node": "^26.1.1",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.11",
+    "axe-core": "~4.12.1",
+    "eslint": "^10.7.0",
+    "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.2",
+    "unplugin-vue-components": "^32.0.0",
+    "vite": "^8.1.5",
+    "vite-plugin-lib-inject-css": "^2.2.2",
+    "vitest": "^4.1.10",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
+  }
+}

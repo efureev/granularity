@@ -1,0 +1,92 @@
+/**
+ * Содержимое рисует ProseMirror, а не шаблон, поэтому утилитами его не
+ * оформить: узлы появляются в рантайме, и класса на них никто не вешает.
+ * Отсюда настоящие селекторы — единственный такой случай в пакете.
+ *
+ * Все значения — токены. Литералов кеглей, радиусов и отступов здесь нет, иначе
+ * содержимое перестало бы слушаться темы ровно там, где его читают.
+ */
+
+[data-gr-rich-text-content] .ProseMirror {
+  min-height: var(--gr-rich-text-min-height, 8rem);
+  max-height: var(--gr-rich-text-max-height, none);
+  overflow-y: auto;
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+[data-gr-rich-text-content] .ProseMirror > * + * {
+  margin-top: var(--gr-rich-text-content-gap, 0.75em);
+}
+
+[data-gr-rich-text-content] .ProseMirror h2,
+[data-gr-rich-text-content] .ProseMirror h3 {
+  font-weight: 600;
+  line-height: var(--gr-leading-tight, 1.25);
+}
+
+[data-gr-rich-text-content] .ProseMirror h2 {
+  font-size: 1.25em;
+}
+
+[data-gr-rich-text-content] .ProseMirror h3 {
+  font-size: 1.1em;
+}
+
+[data-gr-rich-text-content] .ProseMirror ul,
+[data-gr-rich-text-content] .ProseMirror ol {
+  padding-left: 1.5em;
+}
+
+[data-gr-rich-text-content] .ProseMirror ul {
+  list-style: disc;
+}
+
+[data-gr-rich-text-content] .ProseMirror ol {
+  list-style: decimal;
+}
+
+[data-gr-rich-text-content] .ProseMirror blockquote {
+  padding-left: 0.75em;
+  border-left: 2px solid var(--gr-brd);
+  color: var(--gr-muted-fg);
+}
+
+[data-gr-rich-text-content] .ProseMirror a {
+  color: var(--gr-primary);
+  text-decoration: underline;
+}
+
+[data-gr-rich-text-content] .ProseMirror code {
+  padding: 0.1em 0.3em;
+  border-radius: var(--gr-radius-sm);
+  background: var(--gr-muted);
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+
+[data-gr-rich-text-content] .ProseMirror pre {
+  padding: 0.75em;
+  border-radius: var(--gr-radius-md);
+  background: var(--gr-muted);
+  overflow-x: auto;
+}
+
+[data-gr-rich-text-content] .ProseMirror pre code {
+  padding: 0;
+  background: none;
+}
+
+/**
+ * Плейсхолдер — псевдоэлементом на пустом первом абзаце: настоящего
+ * `placeholder` у `contenteditable` не бывает, а расширение TipTap ради одной
+ * строки текста тянуть незачем.
+ */
+[data-gr-rich-text-content] .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--gr-muted-fg);
+  pointer-events: none;
+}

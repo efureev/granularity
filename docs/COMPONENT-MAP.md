@@ -2,7 +2,7 @@
 
 Ответ на вопрос «какой компонент взять под эту задачу» — по всем пакетам сразу:
 ядро `@feugene/granularity` и спутники `granularity-charts`, `granularity-chrono`,
-`granularity-dashboard`, `granularity-datasource`, `extra-granularity`.
+`granularity-dashboard`, `granularity-datasource`, `granularity-editor`, `extra-granularity`.
 
 Читается сверху вниз: **Развилки** ставят различающий вопрос и приводят к одному
 компоненту, **Быстрый выбор** — алфавитный список на случай, когда имя уже
@@ -20,6 +20,7 @@
 | --- | --- |
 | строку в одну строку | [`GrInput`](../packages/granularity/docs/components/GrInput.md) |
 | текст в несколько строк | [`GrTextarea`](../packages/granularity/docs/components/GrTextarea.md) |
+| текст с форматированием: абзацы, списки, заголовки | [`GrRichText`](../packages/granularity-editor/docs/components/GrRichText.md) |
 | число со ступенями и границами | [`GrNumberInput`](../packages/granularity/docs/components/GrNumberInput.md) |
 | число перетаскиванием, диапазон «от–до» | [`GrSlider`](../packages/granularity/docs/components/GrSlider.md) |
 | оценку символами | [`GrRating`](../packages/granularity/docs/components/GrRating.md) |
