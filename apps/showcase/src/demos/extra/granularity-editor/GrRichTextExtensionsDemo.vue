@@ -86,7 +86,7 @@ const counted = computed(() => enabled.value.includes('characterCount'))
         />
         <span class="grid gap-0.5">
           <code class="text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]">{{ entry.title }}</code>
-          <span class="showcase-demo-text text-sm opacity-70">{{ entry.about }}</span>
+          <span class="showcase-demo-text text-sm">{{ entry.about }}</span>
         </span>
       </label>
 
@@ -95,31 +95,31 @@ const counted = computed(() => enabled.value.includes('characterCount'))
       </p>
     </div>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Набор расширений задаётся пропом <code>extensions</code> и добавляется <strong>к схеме</strong>,
       а не заменяет её. Кнопку для своего расширения тулбар не покажет: он строится по схеме, и
       кнопка без команды за ней была бы обманом.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Смена набора пересобирает редактор: схема ProseMirror неизменяема — из неё выведены и документ,
       и команды. Текст переносится разметкой и проходит разбор заново, поэтому узел, которого в новой
       схеме нет, отбрасывается — то же правило, что и при вставке.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       <code>Focus</code> и <code>Selection</code> сами ничего не рисуют — они вешают класс, а
       оформление остаётся за вами. В этом демо классы оформлены парой правил рядом; без них
       расширение честно работает, но выглядит как выключенное.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       <code>TrailingNode</code> в списке нет намеренно: он уже входит в <code>StarterKit</code>, то
       есть в саму схему. Добавить его пропом можно, но переключатель ничего бы не менял — под
       заголовком и цитатой пустой абзац есть и без него.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Полный список готовых расширений —
       <GrLink href="https://tiptap.dev/docs/editor/extensions" external>каталог TipTap</GrLink>; как
       написать своё —

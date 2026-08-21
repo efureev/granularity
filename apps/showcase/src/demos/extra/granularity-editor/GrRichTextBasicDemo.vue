@@ -95,19 +95,19 @@ function onOutputChange(next: 'html' | 'json'): void {
 
     <pre class="max-h-64 overflow-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] p-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-leading-sm)]">{{ model }}</pre>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       <strong>output</strong> меняет форму значения, а не поведение: <code>html</code> отдаёт строку
       разметки, <code>json</code> — документ TipTap. В нативную форму значение уходит строкой в любом
       режиме: скрытое поле не умеет объектов.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       <strong>toolbar</strong> решает, где живут кнопки: панель сверху, пузырёк у выделения, оба или
       ничего. Выделите фрагмент в режиме «Пузырёк» — панель появится у самого текста. Горячие клавиши
       работают всегда: <strong>Ctrl/Cmd + B</strong> и <strong>I</strong>.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Тулбар — одна остановка <strong>Tab</strong>, внутри ходят стрелками: у «статьи» десять кнопок,
       и без этого до самого текста пришлось бы добираться десятью нажатиями. Активный формат объявлен
       <code>aria-pressed</code>, а не только подсветкой — подсветки скринридер не видит.

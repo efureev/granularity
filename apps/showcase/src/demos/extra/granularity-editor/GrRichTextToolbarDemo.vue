@@ -55,22 +55,22 @@ const rows = computed(() => article.map(action => ({
         <tbody>
           <tr v-for="row in rows" :key="row.action.key" class="border-b border-[var(--gr-brd)]">
             <td class="py-2 pr-3">{{ row.action.labelFallback }}</td>
-            <td class="py-2 pr-3 opacity-70">{{ row.group }}</td>
+            <td class="showcase-demo-text py-2 pr-3">{{ row.group }}</td>
             <td class="py-2 pr-3"><code>{{ row.action.command }}</code></td>
             <td class="py-2 pr-3"><code>{{ row.shortcut }}</code></td>
-            <td class="py-2 opacity-70">{{ row.schemas }}</td>
+            <td class="showcase-demo-text py-2">{{ row.schemas }}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Таблица построена из той же схемы, по которой собирается панель: разойтись они не могут по
       построению. Кнопка без команды за ней тут невозможна — это и есть причина, по которой тулбар
       описан данными, а не написан разметкой.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Горячие клавиши приходят от расширений TipTap, а не от пакета: они работают и при
       <code>toolbar="false"</code>. Кроме перечисленного из коробки идут отмена и повтор
       (<code>⌘/Ctrl + Z</code> и <code>⌘/Ctrl + Shift + Z</code>), перенос строки внутри абзаца
@@ -78,7 +78,7 @@ const rows = computed(() => article.map(action => ({
       черта ставится правилом ввода <code>---</code>, ссылка живёт маркой и ждёт своего интерфейса.
     </p>
 
-    <p class="showcase-demo-text text-sm opacity-70">
+    <p class="showcase-demo-text text-sm">
       Схема <code>minimal</code> оставляет только начертание и списки, <code>article</code> добавляет
       структуру. Заголовка первого уровня не даёт ни одна: <code>h1</code> принадлежит странице, а не
       полю внутри неё.
