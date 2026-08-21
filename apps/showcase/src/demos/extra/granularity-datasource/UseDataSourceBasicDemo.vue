@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { DataSourceRequest } from '@feugene/granularity-datasource'
-import { useDataSource } from '@feugene/granularity-datasource'
+import { createState, useDataSource, writeStateToQuery } from '@feugene/granularity-datasource'
 
 // `GrDataTable`, `GrPagination`, `GrInput` и `GrSelect` подставляются авто-импортом.
 
@@ -65,10 +65,24 @@ async function fetchPeople(request: DataSourceRequest) {
 
 // Писуемые ссылки, а не `v-bind`-объект: спред короче, но `vue-tsc` не
 // засчитывает его в обязательные пропсы, и проверка шаблонов краснеет.
+const DEFAULTS = { perPage: 5, filters: { role: '' } }
+
 const { rows, loading, total, page, perPage, sortKey, sortDir, search, state, setFilter } = useDataSource<Person>({
   fetcher: fetchPeople,
-  defaults: { perPage: 5, filters: { role: '' } },
+  defaults: DEFAULTS,
 })
+
+/**
+ * Как это состояние выглядело бы ссылкой.
+ *
+ * Синхронизация с адресом здесь **выключена** — она включается опцией, — но
+ * строку видно всегда: без неё главное свойство пакета остаётся на словах.
+ * Считает её тот же `writeStateToQuery`, что пишет в адрес по-настоящему.
+ */
+const query = computed(() => writeStateToQuery('', state.value, {
+  defaults: createState(DEFAULTS),
+  prefix: 'people',
+}))
 
 const columns = [
   { key: 'id', label: '#', sortable: true, width: 72 },
@@ -116,6 +130,11 @@ const role = computed({
       show-total
     />
 
+    <div class="grid gap-1">
+      <span class="showcase-demo-text text-sm font-semibold">Строка запроса</span>
+      <pre class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] p-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-leading-sm)]">{{ query || '(пусто: состояние совпадает с умолчаниями)' }}</pre>
+    </div>
+
     <p class="showcase-demo-text text-sm opacity-70">
       Набор в поиске откладывается на 300 мс и схлопывается в один запрос, а клик по странице или по
       заголовку уходит сразу: это разовое действие, а не набор текста. Смена фильтра, поиска и размера
@@ -128,6 +147,14 @@ const role = computed({
       таблице окажется ответ на <strong>последний</strong> запрос, а не тот, что вернулся позже.
       Гонку закрывает номер запроса, а не только <code>AbortController</code>: транспорт потребителя
       вправе не пробросить <code>signal</code>, и тогда прерванный запрос всё равно вернётся.
+    </p>
+
+    <p class="showcase-demo-text text-sm opacity-70">
+      Поле «Строка запроса» показывает, как это же состояние выглядело бы <strong>ссылкой</strong>.
+      Синхронизация с адресом здесь выключена — она включается опцией, — но строку считает тот же
+      <code>writeStateToQuery</code>, что пишет в адрес по-настоящему. Вернитесь к умолчаниям, и она
+      опустеет: пустое не пишется, иначе ссылка на список по умолчанию состояла бы из параметров, ни
+      один из которых ничего не меняет.
     </p>
   </div>
 </template>
