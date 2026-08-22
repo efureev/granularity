@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any> = any">
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import type {
   GrTreeAllowDropType,
   GrTreeInstance,
@@ -40,6 +40,13 @@ export interface GrTreeEmits<T extends Record<string, any> = any> {
   (e: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
   (e: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
   (e: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
+  (e: 'update:currentKey', key: GrTreeKey | undefined): void
+  /**
+   * Результат фильтрации. Без него потребитель не отличит «данных нет» от
+   * «поиск ничего не нашёл» — а это разные пустые экраны: второй пользователь
+   * может исправить сам.
+   */
+  (e: 'filter', info: { value: string, visibleCount: number, matchedCount: number }): void
   (e: 'update:checkedKeys', keys: GrTreeKey[]): void
   (e: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
 }
@@ -65,6 +72,9 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   virtual: false,
   maxHeight: undefined,
   showCheckbox: false,
+  currentKey: undefined,
+  filterValue: undefined,
+  dragHandleVisibility: 'auto',
   checkedKeys: undefined,
   defaultCheckedKeys: () => [],
   checkStrictly: false,
@@ -126,6 +136,30 @@ const collapseLabel = computed(() => treeProps.collapseLabel ?? t('gr.tree.colla
 const currentKey = treeStore.currentKey
 const hoveredKey = interactionContext.hoveredKey
 const dropTarget = interactionContext.dropTarget
+
+/**
+ * Текущий узел: управляемый режим включает сам факт того, что проп задан.
+ *
+ * Иначе у одного понятия два владельца — подсветку рисует дерево по своему
+ * ключу, а обёртка считает остальное по своему пропу; разойдись они на такт, и
+ * строка подсвечена, а подпись не выделена. С `v-model:current-key` источник
+ * правды один, и `nextTick` вокруг `setCurrentKey()` больше не нужен.
+ */
+const currentKeyControlled = computed(() => treeProps.currentKey !== undefined)
+
+watch(() => treeProps.currentKey, (key) => {
+  if (!currentKeyControlled.value) return
+  if (treeStore.currentKey.value === (key ?? undefined)) return
+
+  treeStore.setCurrentKey(key ?? undefined)
+}, { immediate: true })
+
+/** Значение фильтра приходит пропом; метод `filter()` остаётся для императивных сценариев. */
+watch(() => treeProps.filterValue, (value) => {
+  if (value === undefined) return
+
+  applyFilter(value)
+}, { immediate: true })
 
 // Корневой элемент дерева — область для делегированной клавиатуры (WAI-ARIA tree).
 const treeRootEl = ref<HTMLElement | null>(null)
@@ -194,7 +228,10 @@ const roving = useRovingFocus<GrTreeNode<T>['key']>({
 })
 
 function onRowClick(node: GrTreeNode<T>) {
+  // В управляемом режиме дерево ведёт подсветку до ответа снаружи: строка
+  // отзывается на клик сразу, а расхождение снимет наблюдатель за пропом.
   treeStore.setCurrentKey(node.key)
+  emit('update:currentKey', node.key)
   roving.setActive(node.key)
   interactionContext.emitNodeClick(node.data, node)
 }
@@ -548,8 +585,19 @@ function canDrag(node: GrTreeNode<T>): boolean {
   return interactionContext.canDrag(node)
 }
 
+/**
+ * Ручка «по наведению» на тач-устройстве недостижима: событий наведения там нет,
+ * ключ не выставляется, класс видимости не появляется — то есть перетаскивания
+ * нет вовсе, хотя `touch-action: none` у ручки стоит ровно ради него.
+ *
+ * Режим `auto` решает это без JS: класс-модификатор на корне, а показ включает
+ * `@media (hover: none)` — так поведение остаётся верным и на сервере, где
+ * никакого `matchMedia` спрашивать нельзя.
+ */
 function shouldShowDragHandle(node: GrTreeNode<T>): boolean {
-  return canDrag(node) && hoveredKey.value === node.key
+  if (!canDrag(node)) return false
+
+  return treeProps.dragHandleVisibility === 'always' || hoveredKey.value === node.key
 }
 
 /**
@@ -661,8 +709,26 @@ async function onNodeMoveKey(node: GrTreeNode<T>, key: string): Promise<void> {
   focusRow(node.key)
 }
 
-function filter(value: string) {
+/**
+ * Фильтрация и отчёт о её результате.
+ *
+ * Счёт снимается после пересчёта видимых строк: `visibleCount` — то, что
+ * пользователь реально видит, а `matchedCount` — сколько узлов совпало само,
+ * без учёта родителей, раскрытых ради показа совпадения.
+ */
+async function applyFilter(value: string) {
   treeStore.filter(value)
+  await nextTick()
+
+  emit('filter', {
+    value,
+    visibleCount: visibleRows.value.length,
+    matchedCount: treeStore.filterInfo.value.matchedKeys.size,
+  })
+}
+
+function filter(value: string) {
+  void applyFilter(value)
 }
 
 function resolveNodeClass(classValue: GrTreeNodeClass<T> | undefined, row: GrTreeVisibleRow<T>) {
@@ -758,6 +824,7 @@ defineExpose<GrTreeInstance<T>>({
       ref="treeRootEl"
       data-gr-tree
       class="gr-tree"
+      :class="treeProps.dragHandleVisibility === 'auto' ? 'gr-tree--drag-handle-auto' : ''"
       tabindex="-1"
       :data-gr-virtual="treeProps.virtual ? '' : undefined"
       role="tree"
@@ -1094,6 +1161,17 @@ defineExpose<GrTreeInstance<T>>({
     visibility: hidden;
     pointer-events: none;
     opacity: 0;
+}
+
+/* Где наведения не бывает, ручка «по наведению» недостижима — то есть
+   перетаскивания нет вовсе. Медиазапрос, а не `matchMedia`: ответ нужен и на
+   сервере, а спрашивать среду в первом рендере нельзя. */
+@media (hover: none) {
+    .gr-tree--drag-handle-auto .gr-tree__drag-handle {
+        visibility: visible;
+        pointer-events: auto;
+        opacity: var(--gr-tree-drag-handle-opacity);
+    }
 }
 
 .gr-tree__drag-handle--visible {

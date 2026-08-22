@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grTreeExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'tree-controlled',
+    title: 'Controlled selection and reachable drag handle',
+    description: 'Выбранный узел живёт снаружи через `v-model:current-key`, поэтому подсветка строки и состояние обёртки не могут разойтись. `dragHandleVisibility` решает, когда видна ручка переноса: по умолчанию `auto` — всегда там, где наведения не бывает.',
+    status: 'ready',
+    previewKey: 'gr-tree-controlled',
+  },
+  {
     id: 'tree-expanded-state',
     title: 'Controlled expanded state and branch lines',
     description: 'Показываем `GrTree` как иерархический explorer, где внешняя orchestration управляет раскрытием групп и визуальными branch lines.',

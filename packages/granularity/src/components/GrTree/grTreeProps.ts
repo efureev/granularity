@@ -52,6 +52,15 @@ export type GrTreeDataProps<T extends object> = {
   defaultExpandAll?: boolean
   filterNodeMethod?: GrTreeFilterNodeMethod<T>
   /**
+   * Значение фильтра. Проп, а не только метод `filter()`: обёртке иначе
+   * приходится держать `ref` на дерево и гонять значение в обход собственного
+   * реактивного контура.
+   *
+   * Результат фильтрации дерево сообщает событием `filter` — без него нельзя
+   * отличить «данных нет» от «поиск ничего не нашёл», а это разные экраны.
+   */
+  filterValue?: string
+  /**
    * Ленивый режим: дети ветки приходят по её раскрытию через `load`.
    * Узел считается разворачиваемым, пока не доказано обратное — полем `isLeaf`
    * из карты `props`.
@@ -124,11 +133,29 @@ export type GrTreeInteractionProps<T extends object> = {
   dragHandleIcon?: string | Component
   allowDrop?: (draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, type: GrTreeAllowDropType) => boolean
   allowDrag?: (draggingNode: GrTreeNode<T>) => boolean
+  /**
+   * Когда показывать ручку переноса.
+   *
+   * `hover` — только под курсором; `always` — всегда; `auto` (по умолчанию) —
+   * `always` там, где наведения не бывает (`@media (hover: none)`), иначе
+   * `hover`. На тач-устройстве ручка «по наведению» недостижима вовсе, то есть
+   * перетаскивания там нет — а это не решение дизайна, а отсутствие функции.
+   */
+  dragHandleVisibility?: 'hover' | 'always' | 'auto'
 }
 
 export type GrTreeSelectionProps = {
   /** Чекбоксы у узлов: множественный выбор поверх дерева. */
   showCheckbox?: boolean
+  /**
+   * Текущий узел — `v-model:current-key`.
+   *
+   * Не задан — дерево ведёт текущий узел само, как и раньше. Задан — источник
+   * правды снаружи: подсветка строки и признак, по которому обёртка рисует
+   * собственные детали, перестают быть двумя разными состояниями, способными
+   * разойтись на такт.
+   */
+  currentKey?: GrTreeKey | null
   /** Отмеченные ключи (`v-model:checked-keys`). */
   checkedKeys?: GrTreeKey[]
   defaultCheckedKeys?: GrTreeKey[]

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref } from 'vue'
 
-import { GrBadge, GrInput, GrTree } from '@feugene/granularity'
+import { GrBadge, GrEmptyState, GrInput, GrTree } from '@feugene/granularity'
 
 type TreeItem = {
   id: number
@@ -41,34 +41,14 @@ const treeData: TreeItem[] = [
 ]
 
 const query = ref('')
-const treeRef = ref<{
-  filter: (value: string) => void
-} | null>(null)
 
-const matchedCount = computed(() => {
-  const normalizedQuery = query.value.trim().toLowerCase()
-
-  if (!normalizedQuery)
-    return treeData.length
-
-  const walk = (items: TreeItem[]): number => {
-    return items.reduce((total, item) => {
-      const selfMatched = `${item.label} ${item.team}`.toLowerCase().includes(normalizedQuery)
-      const childMatches = item.children ? walk(item.children) : 0
-      return total + (selfMatched ? 1 : 0) + childMatches
-    }, 0)
-  }
-
-  return walk(treeData)
-})
-
-watch(
-  query,
-  (value) => {
-    treeRef.value?.filter(value)
-  },
-  { immediate: true },
-)
+/**
+ * Результат фильтрации приходит от дерева, а не считается вторым проходом по
+ * данным. Разница видна в пустом экране: «ничего не нашлось» и «данных нет» —
+ * разные сообщения, и первое пользователь может исправить сам.
+ */
+const matched = ref(treeData.length)
+const visible = ref(treeData.length)
 </script>
 
 <template>
@@ -76,14 +56,21 @@ watch(
     <GrInput v-model="query" placeholder="Filter tree nodes by label or team" aria-label="Filter tree nodes" />
 
     <GrTree
-      ref="treeRef"
       :data="treeData"
+      :filter-value="query"
       :filter-node-method="(value, data) => `${data.label} ${data.team}`.toLowerCase().includes(String(value).toLowerCase())"
       branch-line
+      @filter="({ matchedCount, visibleCount }) => { matched = matchedCount; visible = visibleCount }"
+    />
+
+    <GrEmptyState
+      v-if="visible === 0"
+      title="Nothing matches the query"
+      description="Try a shorter word — the filter looks at both the label and the team."
     />
 
     <GrBadge>
-      Matches: {{ matchedCount }}
+      Matches: {{ matched }}
     </GrBadge>
   </div>
 </template>

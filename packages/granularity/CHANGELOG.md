@@ -7,6 +7,32 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.29.0] 2026-08-22
+
+### Added
+
+- **`GrTree` — `v-model:current-key`.** The current node was settable only through an instance method,
+  so a wrapper had to keep a `ref` on the tree and push state into it outside its own reactive loop,
+  with a `nextTick` the types never mentioned. Worse, one notion had two owners: the tree painted the
+  row from its internal key while the wrapper drew everything else from its own prop — a tick apart
+  and the row is highlighted while the panel says otherwise. The prop is optional: unset, the tree
+  keeps leading the current node itself.
+
+- **`GrTree` — `filterValue` prop and a `filter` event.** Filtering was an instance method that
+  reported nothing back, so «no data» and «the search found nothing» looked the same from the
+  outside — and they are different screens, one of which the user can fix. The event carries
+  `visibleCount` (rows actually on screen, matches plus the parents opened for them) and
+  `matchedCount` (nodes that matched on their own).
+
+### Fixed
+
+- **`GrTree` — the drag handle is reachable by touch.** It appeared on hover only, and a touch device
+  has no hover: the key was never set, the class never applied, so dragging did not exist there at
+  all — while `touch-action: none` sat on the handle precisely for that gesture. `dragHandleVisibility`
+  now decides: `hover`, `always`, or `auto` (the default) — always shown where hovering does not
+  happen, via `@media (hover: none)` rather than `matchMedia`, so the answer holds on the server too.
+  Reported by a consumer of `@efureev/ft-extra-granularity`.
+
 ## [v0.28.4] 2026-08-22
 
 ### Fixed

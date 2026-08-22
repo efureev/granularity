@@ -433,6 +433,7 @@ export const demoPathByPreviewKey = {
   'gr-tooltip-placement':                 'components/gr-tooltip/GrTooltipPlacementDemo.vue',
   'gr-tooltip-sizes':                     'components/gr-tooltip/GrTooltipSizesDemo.vue',
   'gr-tree-checkboxes':                   'components/gr-tree/GrTreeCheckboxesDemo.vue',
+  'gr-tree-controlled':                   'components/gr-tree/GrTreeControlledDemo.vue',
   'gr-tree-drag-and-slot':                'components/gr-tree/GrTreeDragAndSlotDemo.vue',
   'gr-tree-expanded-state':               'components/gr-tree/GrTreeExpandedStateDemo.vue',
   'gr-tree-filtering':                    'components/gr-tree/GrTreeFilteringDemo.vue',

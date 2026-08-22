@@ -11707,6 +11707,13 @@
             "required": false
           },
           {
+            "name": "filterValue",
+            "description": "Значение фильтра. Проп, а не только метод `filter()`: обёртке иначе приходится держать `ref` на дерево и гонять значение в обход собственного реактивного контура. Результат фильтрации дерево сообщает событием `filter` — без него нельзя отличить «данных нет» от «поиск ничего не нашёл», а это разные экраны.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "lazy",
             "description": "Ленивый режим: дети ветки приходят по её раскрытию через `load`. Узел считается разворачиваемым, пока не доказано обратное — полем `isLeaf` из карты `props`.",
             "type": "boolean | undefined",
@@ -11868,6 +11875,13 @@
             "default": "false"
           },
           {
+            "name": "currentKey",
+            "description": "Текущий узел — `v-model:current-key`. Не задан — дерево ведёт текущий узел само, как и раньше. Задан — источник правды снаружи: подсветка строки и признак, по которому обёртка рисует собственные детали, перестают быть двумя разными состояниями, способными разойтись на такт.",
+            "type": "GrTreeKey | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "checkedKeys",
             "description": "Отмеченные ключи (`v-model:checked-keys`).",
             "type": "GrTreeKey[] | undefined",
@@ -11927,6 +11941,13 @@
             "description": "",
             "type": "((draggingNode: GrTreeNode<T>) => boolean) | undefined",
             "required": false
+          },
+          {
+            "name": "dragHandleVisibility",
+            "description": "Когда показывать ручку переноса. `hover` — только под курсором; `always` — всегда; `auto` (по умолчанию) — `always` там, где наведения не бывает (`@media (hover: none)`), иначе `hover`. На тач-устройстве ручка «по наведению» недостижима вовсе, то есть перетаскивания там нет — а это не решение дизайна, а отсутствие функции.",
+            "type": "\"auto\" | \"hover\" | \"always\" | undefined",
+            "required": false,
+            "default": "\"auto\""
           }
         ]
       },
@@ -11976,6 +11997,18 @@
             "description": "",
             "type": "[MouseEvent, T, GrTreeNode<T>]",
             "signature": "(e: \"nodeContextMenu\", evt: MouseEvent, data: T, node: GrTreeNode<T>): void"
+          },
+          {
+            "name": "update:currentKey",
+            "description": "",
+            "type": "[GrTreeKey | undefined]",
+            "signature": "(e: \"update:currentKey\", key: GrTreeKey | undefined): void"
+          },
+          {
+            "name": "filter",
+            "description": "Результат фильтрации. Без него потребитель не отличит «данных нет» от «поиск ничего не нашёл» — а это разные пустые экраны: второй пользователь может исправить сам.",
+            "type": "[{ value: string; visibleCount: number; matchedCount: number; }]",
+            "signature": "(e: \"filter\", info: { value: string; visibleCount: number; matchedCount: number; }): void"
           },
           {
             "name": "update:checkedKeys",
